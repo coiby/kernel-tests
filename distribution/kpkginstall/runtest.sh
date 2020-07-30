@@ -417,6 +417,34 @@ else
 
   cki_print_success "Found the correct kernel version running!"
 
+  # Workaround for cross compiling non x86_64 kernels
+  if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]] ; then
+    # Backup and restore the .config files otherwise regenerated .config
+    # files will be incompatible with the running kernel
+    PREFIX="/usr/src/kernels/$ckver"
+    FILES="$PREFIX/.config
+      $PREFIX/include/config/auto.conf
+      $PREFIX/include/config/auto.conf.cmd
+      $PREFIX/include/config/cc/can/link/static.h
+      $PREFIX/include/generated/autoconf.h"
+
+    # Backup the files individually otherwise missing files will abort rstrnt-backup
+    for file in $FILES; do
+      rstrnt-backup $file
+    done
+
+    # Temporarily unset ARCH var defined in libcki to avoid Makefile conflicts
+    # otherwise you will see an error about a non-existing arch dir
+    env -u ARCH make -C /usr/src/kernels/$ckver olddefconfig || \
+      cki_abort_recipe "Failed applying cross compiling workaround" WARN
+    env -u ARCH make -C /usr/src/kernels/$ckver modules_prepare || \
+      cki_abort_recipe "Failed applying cross compiling workaround" WARN
+    env -u ARCH make -C /usr/src/kernels/$ckver scripts || \
+      cki_abort_recipe "Failed applying cross compiling workaround" WARN
+
+    rstrnt-restore
+  fi
+
   # We have the right kernel. Do we have any call traces?
   dmesg | grep -qi 'Call Trace:'
   dmesgret=$?

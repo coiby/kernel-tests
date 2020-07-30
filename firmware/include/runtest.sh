@@ -107,19 +107,7 @@ function fwtsSetup()
         # setup efi_runtime module needed by uefirt* tests
         # make modules_install so efi_runtime can be loaded with modprobe as fwts requires
         rlRun "cd efi_runtime" 0 "cd into efi_runtime directory"
-        # Rebuild natively on target machine to work around upstream cross compile issues
-        if [[ ! -f /usr/src/kernels/$(uname -r)/scripts/basic/fixdep ]] ; then
-          rlRun "make -C /usr/src/kernels/$(uname -r) olddefconfig" 0 "apply default configs"
-          rlRun "make modules_prepare -C /usr/src/kernels/$(uname -r)" 0 "rebuild modules"
-          rlRun "make -C /usr/src/kernels/$(uname -r) scripts" 0 "regenerate native build scripts"
-          rlRun "uname -r > /usr/src/kernels/$(uname -r)/include/config/kernel.release" 0 "update kernel.release with cki kernel"
-        fi
-        # Setting $KVER to the running kernel version should negate the need for 0003-efi_runtime_Makefile_modules_install.patch
-        if [ "$(uname -m)" = "aarch64" ] ; then
-            rlRun "ARCH=arm64 KVER=$(uname -r) make all install" 0 "make all install inside efi_runtime"
-        else
-            rlRun "KVER=$(uname -r) make all install" 0 "make all install inside efi_runtime"
-        fi
+        rlRun "make all install" 0 "make all install inside efi_runtime"
         rlRun "cd .." 0 "cd up one directory back into fwts source root"
 
         # run autoreconf to recreate build system files for fwts
