@@ -3,9 +3,13 @@ LTP upstream lite testsuite can be used to run a subset tests in the LTP testsui
 Test Maintainer: [Memory Management](mailto:mm-qe@redhat.com)
 
 ## How to run it
-Please refer to the top-level README.md for common dependencies. Test-specific dependencies will automatically be installed when executing 'make run'. For a complete detail, see https://github.com/linux-test-project/ltp. 
+Please refer to the top-level README.md for common dependencies. For a complete detail, see https://github.com/linux-test-project/ltp. 
 
+### Install dependencies
+```bash
+root# bash ../../../cki_bin/pkgs_install.sh metadata
+```
 ### Execute the test
 ```bash
-$ make run
+$ bash ./runtest.sh
 ```

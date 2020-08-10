@@ -1,0 +1,13 @@
+[General]
+name=distribution/kernel-debuginfo
+owner=Čestmír Kalina <ckalina@redhat.com>
+description=Ensure that debuginfo vmlinux comes with .debug* sections
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=grep;coreutils;rpm;sed;findutils;bash;cpio;file;gawk;binutils
+softDependencies=kernel-modules-extra;yum-utils
+repoRequires=cki_lib;legacy/shared

@@ -3,6 +3,8 @@ set -x
 
 . ../../cki_lib/libcki.sh || exit 1
 
+TEST="distribution/kernel-debuginfo"
+
 YUM=$(command -v yum)
 if [ -z "$YUM" ]
 then
