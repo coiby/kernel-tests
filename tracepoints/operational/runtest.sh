@@ -2,9 +2,6 @@
 
 # Source the common test script helpers
 . ../../cki_lib/libcki.sh || exit 1
-. /usr/share/beakerlib/beakerlib.sh || exit 1
-
-
 
 STAP_VERBOSE_FLAG="-v"
 if [ x"${STP_VERBOSE}" = x"y" ]; then
@@ -163,20 +160,7 @@ else
     installeddistro=unknown
 fi
 
-# select tool to manage package, which could be "yum" or "dnf"
-function select_yum_tool() {
-    if [ -x /usr/bin/dnf ]; then
-        echo "/usr/bin/dnf"
-    elif [ -x /usr/bin/yum ]; then
-        echo "/usr/bin/yum"
-    else
-        return 1
-    fi
-
-    return 0
-}
-
-yum=$(select_yum_tool)
+yum=$(cki_get_yum_tool)
 
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r))
 stapbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /usr/bin/stap)

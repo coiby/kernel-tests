@@ -1,21 +1,20 @@
 #!/bin/bash
 
+FILE=$(readlink -f $BASH_SOURCE)
+CDIR=$(dirname $FILE)
 
-rtr=0
-
-for i in $(ls *.sh | grep -v runtest.sh) ; do
-    echo $i
-    ./$i
-    rtr1=$?
-    rtr=$(expr $rtr + $rtr1)
+rc=0
+sh_files=""
+sh_files+=" $CDIR/ftrace-tracer.sh"
+for sh_file in $sh_files; do
+    echo $sh_file
+    bash $sh_file
+    (( rc += $? ))
 done
-if [ -f $(dirname $0)/../../include/testframeworks ]; then
-  . $(dirname $0)/../../include/testframeworks
-  uploadlogs
+
+if [[ -f $(dirname $0)/../../include/testframeworks ]]; then
+    source $(dirname $0)/../../include/testframeworks
+    uploadlogs
 fi
 
-if [ $rtr -ne 0 ]; then
-    exit 1
-else
-    exit 0
-fi
+(( rc != 0 )) && exit 1 || exit 0

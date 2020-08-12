@@ -1,8 +1,6 @@
 #!/bin/bash
 # Include beaker environment
 . ../../../cki_lib/libcki.sh || exit 1
-. /usr/share/beakerlib/beakerlib.sh
-. ../../include/install.sh
 
 # Logic:
 # 1. Download the SRPM and install the SRPM
@@ -32,7 +30,7 @@ if [[ $(uname -r) == *"debug"* ]]; then
     KVARIANT="-debug"
 fi
 
-yum=$(select_yum_tool)
+yum=$(cki_get_yum_tool)
 
 rlJournalStart
     rlPhaseStartSetup

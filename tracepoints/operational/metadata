@@ -1,0 +1,12 @@
+[General]
+name=tracepoints/operational
+owner=Jeff Bastian <jbastian@redhat.com>
+description=Ensure tracepoints are working
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=systemtap
+repoRequires=cki_lib

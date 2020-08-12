@@ -1,9 +1,12 @@
 [General]
-name=ftrace-tracer
-owner="Ziqian SUN (Zamir) <zsun@redhat.com>"
-description="Minimal test for ftrace tracers"
+name=trace/ftrace/tracer
+owner=Ziqian SUN<zsun@redhat.com>
+description=Minimal test for ftrace tracers
+license=GPLv2
+confidential=no
+destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=bash ./runtest.sh
 repoRequires=trace/include;cki_lib
 use_pty=true
