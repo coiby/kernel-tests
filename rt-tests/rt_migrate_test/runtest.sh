@@ -3,6 +3,8 @@
 # Source rt common functions
 . ../include/runtest.sh
 
+TEST="rt-tests/rt_migrate_test"
+
 function RprtRslt ()
 {
     test_item=$1
