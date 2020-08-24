@@ -3,6 +3,8 @@
 # Source rt common functions
 . ../include/runtest.sh
 
+TEST="rt-tests/sched_deadline"
+
 function runtest()
 {
     result_r="PASS"

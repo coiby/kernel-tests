@@ -3,6 +3,8 @@
 # Source rt common functions
 . ../include/runtest.sh
 
+TEST="rt-tests/smidetect"
+
 function RprtRslt ()
 {
     result=$1
