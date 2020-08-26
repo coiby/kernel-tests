@@ -45,7 +45,7 @@ function enable_nvme_core_multipath
 	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
 		modprobe -r nvme nvme_core
 		echo "options nvme_core multipath=Y"  > /etc/modprobe.d/nvme.conf
-		modprobe nvme-core nvme
+		modprobe nvme
 		#wait enough time for NVMe disk initialized
 		sleep 5
 	fi
@@ -109,7 +109,7 @@ function get_test_cases_rdma
 {
 	typeset testcases=""
 	if is_rhel7; then
-		testcases+=" nvme/003"
+		uname -ri | grep -qE "3.10.0.*ppc64" || testcases+=" nvme/003" # BZ1872714
 		testcases+=" nvme/004"
 		testcases+=" nvme/006"
 		testcases+=" nvme/008"
@@ -129,8 +129,8 @@ function get_test_cases_rdma
 		testcases+=" nvme/009"
 		testcases+=" nvme/010"
 		testcases+=" nvme/011"
-		testcases+=" nvme/012"
-		testcases+=" nvme/013"
+		uname -ri | grep -qE "4.18.0.*aarch64" || testcases+=" nvme/012" # BZ1871774
+		uname -ri | grep -qE "4.18.0.*aarch64" || testcases+=" nvme/013" # BZ1871774
 		testcases+=" nvme/014"
 		testcases+=" nvme/015"
 		testcases+=" nvme/018"
