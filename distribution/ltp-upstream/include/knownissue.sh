@@ -155,12 +155,8 @@ function knownissue_filter()
 	tskip "syslog.*" unfix
 	# These tests are not suitable if there is overcommit for s390x guests
 	is_arch "s390x" && tskip "mtest01 dio20 dio30 fallocate05 fallocate06 fork13 preadv203 preadv203_64 sendfile09 sendfile09_64" unfix
-	# [Test bug] clock_settime03 is a new test and not yet stable
-	# https://github.com/linux-test-project/ltp/issues/712
-	tskip "clock_settime03" unfix
-	# [LTP] [PATCH] syscalls/clone302: drop CLONE_CHILD_SETTID and CLONE_PARENT_SETTID
-	# https://lists.linux.it/pipermail/ltp/2020-August/018437.html
-	tskip "clone302" unfix
+	# ioctl failures for /dev/loop0p1 https://github.com/linux-test-project/ltp/issues/718
+	tskip "ioctl_loop01 ioctl09" unfix
 
 	if is_rhel8; then
                 # ------- unfix ---------
