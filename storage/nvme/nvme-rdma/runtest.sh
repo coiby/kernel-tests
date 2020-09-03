@@ -109,9 +109,9 @@ function get_test_cases_rdma
 {
 	typeset testcases=""
 	if is_rhel7; then
-		uname -ri | grep -qE "3.10.0.*ppc64" || testcases+=" nvme/003" # BZ1872714
-		uname -ri | grep -qE "3.10.0.*ppc64" || testcases+=" nvme/004" # BZ1872714
-		testcases+=" nvme/006"
+		testcases+=" nvme/003" # BZ1872714
+		testcases+=" nvme/004" # BZ1872714
+		testcases+=" nvme/006" # BZ1872714
 		testcases+=" nvme/008"
 		testcases+=" nvme/010"
 		testcases+=" nvme/012"
