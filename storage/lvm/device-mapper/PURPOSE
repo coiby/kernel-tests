@@ -1,0 +1,3 @@
+PURPOSE of storage/lvm/device-mapper
+
+DESCRIPTION: Run basic tests for device mapper kernel targets.

@@ -1,0 +1,13 @@
+[General]
+name=storage/lvm/device-mapper
+owner=Fine Fan <ffan@redhat.com>
+description=Wrapper of device mapper test suite
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=bc;wget;unzip;gcc;git;curl;make;valgrind-devel;boost-devel;expat-devel;libaio-devel
+softDependencies=coreutils;fio;bonnie++;blktrace;iozone
+repoRequires=cki_lib;storage/include

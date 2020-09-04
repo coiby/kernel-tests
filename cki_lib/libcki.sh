@@ -148,6 +148,7 @@ function cki_set_reason()
 {
     typeset rc=${1?"*** result code"}
     shift
+    cki_log "$*"
     case $rc in
         "$CKI_FAIL") g_reason_fail="$*" ;;
         "$CKI_UNSUPPORTED") g_reason_unsupported="$*" ;;
