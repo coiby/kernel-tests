@@ -157,6 +157,9 @@ function knownissue_filter()
 	is_arch "s390x" && tskip "mtest01 dio20 dio30 fallocate05 fallocate06 fork13 preadv203 preadv203_64 sendfile09 sendfile09_64" unfix
 	# ioctl failures for /dev/loop0p1 https://github.com/linux-test-project/ltp/issues/718
 	tskip "ioctl_loop01 ioctl09" unfix
+	# [bug] msgstress04 fills up >4GB data on conserver for ppc64le
+	# https://lore.kernel.org/linux-block/491751.10128377.1599217585366.JavaMail.zimbra@redhat.com/T/#t
+	is_arch "ppc64le" && tskip "msgstress04" fatal
 
 	if is_rhel8; then
                 # ------- unfix ---------
