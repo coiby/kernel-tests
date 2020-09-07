@@ -5,6 +5,8 @@
 skip_tests=(
 # CONFIG_TEST_BPF is not set
 test_bpf.sh
+# Skip bpf/test_progs and run the test individually
+test_progs
 )
 
 # Tests in this list need large memory
