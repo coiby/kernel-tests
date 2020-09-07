@@ -242,10 +242,11 @@ run_tc_test()
 
 	for name in ${total_tests}; do
 		num=$(($num + 1))
-		local OUTPUTFILE=$(new_outputfile)
 
 		check_skipped_tests "${name}" && \
-			test_pass "${num}..${total_num} selftests: ${item}: ${name} Skip" && continue
+			test_skip "${num}..${total_num} selftests: ${item}: ${name} Skip" && continue
+
+		local OUTPUTFILE=$(new_outputfile)
 
 		echo ${tc_tests[$num - 1]} | grep -qP "tests\.json|concurrency\.json"  && extra_p="-d $DEFAULT_IFACE" || extra_p=""
 		./tdc.py -f ${name} $extra_p &> $OUTPUTFILE
