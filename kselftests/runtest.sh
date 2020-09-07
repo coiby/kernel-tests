@@ -36,7 +36,7 @@ SKIP=4
 LOG_ONCE=0
 EXEC_DIR="$PWD/selftests"
 TOTAL_MEM=$(free -m | awk '/Mem/ {print $2}')
-TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding bpf bpf_test_progs tc-testing"}
+TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding netfilter bpf bpf_test_progs tc-testing"}
 DEFAULT_IFACE=$(ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}')
 
 debug_info()
@@ -177,6 +177,11 @@ do_net_forwarding_config()
 	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
 	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
 	cp forwarding.config.sample forwarding.config
+}
+
+do_netfilter_config()
+{
+	install_sendip
 }
 
 run_bpf_test_progs()

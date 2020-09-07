@@ -57,3 +57,13 @@ install_smcroute()
 	which smcroute && return 0 || return 1
 }
 
+install_sendip()
+{
+	which sendip && return 0
+	git clone https://github.com/rickettm/SendIP.git || return 1
+	pushd SendIP &> /dev/null
+	sed -i 's/-Werror//g' Makefile
+	make && make install
+	popd &> /dev/null
+	which sendip && return 0 || return 1
+}
