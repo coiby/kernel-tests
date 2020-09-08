@@ -1,0 +1,7 @@
+modprobe raid module
+modprobe -r raid module
+
+modprobe raid0 raid1 raid10 raid456
+modprobe -r  raid0 raid1 raid10 raid456
+
+
