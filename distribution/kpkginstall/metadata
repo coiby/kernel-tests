@@ -1,0 +1,13 @@
+[General]
+name=distribution/kpkginstall
+owner=Artem Savkov <asavkov@redhat.com>
+description=Install kernel from a tarball
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=make;curl;grubby;tar;binutils
+softDependencies=yum-utils
+repoRequires=cki_lib

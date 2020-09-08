@@ -2,8 +2,9 @@
 
 . ../../cki_lib/libcki.sh || exit 1
 
+TEST="distribution/kpkginstall"
 ARCH=$(uname -m)
-REBOOTCOUNT=${REBOOTCOUNT:-0}
+REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
 PACKAGE_NAME=""
 
