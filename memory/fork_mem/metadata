@@ -1,0 +1,12 @@
+[General]
+name=memory/fork_mem
+owner=Rachel Sibley <rasibley@redhat.com>
+description=Avocado Form Memory Test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+softDependencies=git
+repoRequires=cki_lib
