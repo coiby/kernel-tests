@@ -36,7 +36,7 @@ SKIP=4
 LOG_ONCE=0
 EXEC_DIR="$PWD/selftests"
 TOTAL_MEM=$(free -m | awk '/Mem/ {print $2}')
-TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding bpf tc-testing"}
+TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding netfilter bpf bpf_test_progs tc-testing"}
 DEFAULT_IFACE=$(ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}')
 
 debug_info()
@@ -179,7 +179,53 @@ do_net_forwarding_config()
 	cp forwarding.config.sample forwarding.config
 }
 
-do_tc_test()
+do_netfilter_config()
+{
+	install_sendip
+}
+
+run_bpf_test_progs()
+{
+	local item="bpf_test_progs"
+	local ret ret_1 ret_2
+
+	[ ! -d $EXEC_DIR/bpf ] && test_skip "No $item test, skip" && return 1
+	pushd $EXEC_DIR/bpf
+	if [ ! -f test_progs ] || [ ! -f test_progs-no_alu32 ]; then
+		test_skip "No $item test, skip"
+		return 1
+	fi
+
+	total_tests=$(basename -s .c prog_tests/*.c)
+	total_num=$(echo ${total_tests} | wc -w)
+	nfail=0 num=0 name=""
+
+	for name in ${total_tests}; do
+		num=$(($num + 1))
+		OUTPUTFILE=$(new_outputfile)
+
+		dmesg -C
+
+		run "./test_progs -t $name"
+		ret_1=$?
+
+		run "./test_progs-no_alu32 -t $name"
+		ret_2=$?
+
+		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
+		dmesg >> $OUTPUTFILE
+
+		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
+		check_result $num $total_num ${item} ${name} $ret || \
+			nfail=$((nfail+1))
+		clean_env
+	done
+
+	echo "${item}: total $total_num, failed $nfail"
+	popd
+}
+
+run_tc_test()
 {
 	# Start tc test
 	local item="tc-testing"
@@ -201,10 +247,11 @@ do_tc_test()
 
 	for name in ${total_tests}; do
 		num=$(($num + 1))
-		local OUTPUTFILE=$(new_outputfile)
 
 		check_skipped_tests "${name}" && \
-			test_pass "${num}..${total_num} selftests: ${item}: ${name} Skip" && continue
+			test_skip "${num}..${total_num} selftests: ${item}: ${name} Skip" && continue
+
+		local OUTPUTFILE=$(new_outputfile)
 
 		echo ${tc_tests[$num - 1]} | grep -qP "tests\.json|concurrency\.json"  && extra_p="-d $DEFAULT_IFACE" || extra_p=""
 		./tdc.py -f ${name} $extra_p &> $OUTPUTFILE
@@ -236,12 +283,15 @@ reset_net_env
 submit_log "$EXEC_DIR/run_kselftest.sh"
 
 for item in $TEST_ITEMS; do
+	# deal with bpf/test_progs specially
+	[ "$item" == "bpf_test_progs" ] && run_bpf_test_progs && continue
+
 	grep -q "cd $item$" selftests/run_kselftest.sh || \
 		{ test_skip "$item test not find in run_kselftest.sh" && continue; }
 
 	pushd $EXEC_DIR/$item
 	if [ "$item" == "tc-testing" ]; then
-		do_tc_test
+		run_tc_test
 		continue
 	fi
 
