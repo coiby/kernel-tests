@@ -269,8 +269,8 @@ def setup(exc):
     exc['linux/netfilter_ipv6/ip6t_rt.h'] = (['sys/types.h', 'linux/in6.h'],
                                              OK, 'u_int32_t in6_addr')
 
-    exc['linux/netfilter/nf_conntrack_sctp.h'] = (['linux/types.h'],
-                                                  OK, '__be32')
+    exc['linux/netfilter/nf_conntrack_sctp.h'] = (['linux/types.h', '* typedef __u8 u8;'],
+                                                  OK | WARN, '__be32 from linux/types.h; u8 not defined')
 
     exc['linux/netfilter/xt_connlimit.h'] = (['linux/types.h', SA_FAMILY_T, 'linux/in.h',
                                              'linux/in6.h', 'linux/netfilter.h'],
