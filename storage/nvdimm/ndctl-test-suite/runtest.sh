@@ -41,7 +41,7 @@ function nvdimm_test_module_setup
 	rlAssertExists "$rpmfile"
 
 	rlRun "rpm -ivh $rpmfile"
-	rlRun "rpmbuild -bp ~/rpmbuild/SPECS/kernel.spec"
+	rlRun "rpmbuild -bp --nodeps ~/rpmbuild/SPECS/kernel.spec"
 	rlAssertExists "$linux_srcdir"
 	rlAssertExists "$test_srcdir"
 
