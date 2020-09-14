@@ -7,5 +7,6 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=bash ./runtest.sh
+softDependencies=libgcc;glibc-static;gcc;gcc-c++;kernel-devel;elfutils-libelf-devel;binutils-devel;libcap-devel;openssl-devel;bison;autoconf;automake;binutils;gettext;libtool;pkgconfig;flex
 repoRequires=trace/include;cki_lib
