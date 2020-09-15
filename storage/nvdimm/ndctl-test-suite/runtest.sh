@@ -25,16 +25,17 @@ CDIR=$(dirname $FILE)
 YUM=$(cki_get_yum_tool)
 TNAME="storage/nvdimm/ndctl-test-suite"
 RELEASE=$(uname -r | sed s/\.$(arch)//)
+LINUX_RELEASE=$(echo $RELEASE | sed s/el8_[0-9]/el8/)
 KERNEL="kernel-${RELEASE}"
 DEVEL="kernel-devel-${RELEASE}"
 
 function nvdimm_test_module_setup
 {
 	typeset pkg=$KERNEL
-	typeset linux_srcdir="/root/rpmbuild/BUILD/$KERNEL/linux-$RELEASE.$(arch)"
+	typeset linux_srcdir="/root/rpmbuild/BUILD/$KERNEL/linux-$LINUX_RELEASE.$(arch)"
 	typeset test_srcdir="$linux_srcdir/tools/testing/nvdimm"
 
-	[ -d "$linux_srcdir" ] && rm -fr /oot/rpmbuild
+	[ -d "$linux_srcdir" ] && rm -fr /root/rpmbuild
 	rlRun "$YUM -y install $DEVEL"
 	rlRun "$YUM download ${pkg} --source"
 	typeset rpmfile=$(ls -1 ${pkg}.src.rpm)
@@ -84,7 +85,7 @@ function get_test_cases
 	testcases+=" monitor.sh"
 	testcases+=" max_available_extent_ns.sh"
 	testcases+=" pfn-meta-errors.sh"
-	testcases+=" track-uuid.sh"
+	uname -r | grep -qE "4.18.0-147" || testcases+=" track-uuid.sh"
 
 	echo $testcases
 }
