@@ -19,6 +19,7 @@
 
 set +x
 
+TEST="test/misc/machineinfo"
 MDESC=/tmp/machinedesc.log
 DATAFILE=/tmp/lshw.log
 

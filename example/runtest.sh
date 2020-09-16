@@ -1,12 +1,47 @@
 #!/bin/bash
+#
+# Copyright (c) 2020 Red Hat, Inc. All rights reserved.
+#
+# This copyrighted material is made available to anyone wishing
+# to use, modify, copy, or redistribute it subject to the terms
+# and conditions of the GNU General Public License version 2.
+#
+# This program is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+# PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public
+# License along with this program; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
+#
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# This is an example test which always passes
-#
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+FILE=$(readlink -f $BASH_SOURCE)
+NAME=$(basename $FILE)
+CDIR=$(dirname $FILE)
 
 # Include enviroment and libraries
-. ../../cki_lib/libcki.sh || exit 1
+source $CDIR/../cki_lib/libcki.sh || exit 1
 
-exit 0
+function startup
+{
+    cki_log "$NAME: startup"
+    return 0
+}
+
+function cleanup
+{
+    cki_log "$NAME: cleanup"
+    return 0
+}
+
+function runtest
+{
+    cki_log "$NAME: runtest"
+    cki_log "This this is an example test which always passes"
+    return 0
+}
+
+cki_main
+exit $?
