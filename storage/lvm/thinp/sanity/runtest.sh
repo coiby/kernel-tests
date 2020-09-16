@@ -9,7 +9,7 @@ PS4='+ $(date "+%s.%N")\011 '
 #set -x
 
 IOZONE="iozone3_414"
-LOOKASIDE="http://cki-artifacts.s3.us-east-2.amazonaws.com/lookaside/static"
+LOOKASIDE="http://arr-cki-prod-lookaside.s3.us-east-1.amazonaws.com/lookaside/static"
 function build_iozone
 {
 	echo "--- Download iozone ---"
