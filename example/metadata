@@ -1,0 +1,11 @@
+[General]
+name=template/dummy-test
+owner=Ondrej Kinst <okinst@redhat.com>
+description=Dummy test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib

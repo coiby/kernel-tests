@@ -1,0 +1,12 @@
+[General]
+name=test/misc/machineinfo
+owner=Artem Savkov <asavkov@redhat.com>
+description=Upload machine info
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=lshw
+repoRequires=cki_lib
