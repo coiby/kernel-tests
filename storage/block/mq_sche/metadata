@@ -1,0 +1,12 @@
+[General]
+name=storage/block/mq_sche
+owner=Changhui Zhong <czhong@redhat.com>
+description=Storage block queue scheduler test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=fio
+repoRequires=cki_lib
