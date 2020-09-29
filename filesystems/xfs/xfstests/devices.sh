@@ -297,6 +297,7 @@ function get_test_dev()
 		# restart rpc.statd on RHEL7 for PPC64, it's not running by default
 		rlServiceStop nfs-lock && rlServiceStart nfs-lock
 		xlog rlServiceStop nfs && xlog rlServiceStart nfs
+		xlog rlServiceStop nfs-server && xlog rlServiceStart nfs-server
 		TEST_DEV=localhost:/export/test
 		DEV_TYPE=nfs
 		;;
@@ -519,6 +520,7 @@ function get_scratch_dev()
 		# restart rpc.statd on RHEL7 for PPC64, it's not running by default
 		rlServiceStop nfs-lock && rlServiceStart nfs-lock
 		xlog rlServiceStop nfs && xlog rlServiceStart nfs
+		xlog rlServiceStop nfs-server && xlog rlServiceStart nfs-server
 		SCRATCH_DEV=localhost:/export/scratch
 		DEV_TYPE=nfs
 		;;
