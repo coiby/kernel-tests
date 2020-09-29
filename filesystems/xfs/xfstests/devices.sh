@@ -298,6 +298,8 @@ function get_test_dev()
 		rlServiceStop nfs-lock && rlServiceStart nfs-lock
 		xlog rlServiceStop nfs && xlog rlServiceStart nfs
 		xlog rlServiceStop nfs-server && xlog rlServiceStart nfs-server
+		echoo "NFS exports:"
+		exportfs -s
 		TEST_DEV=localhost:/export/test
 		DEV_TYPE=nfs
 		;;
@@ -313,6 +315,8 @@ function get_test_dev()
 	writable = yes
 EOF
 		xlog rlServiceStop smb && xlog rlServiceStart smb
+		echoo "samba shares:"
+		testparm -s
 		TEST_DEV=//$HOSTNAME/test
 		DEV_TYPE=cifs
 		;;
@@ -521,6 +525,8 @@ function get_scratch_dev()
 		rlServiceStop nfs-lock && rlServiceStart nfs-lock
 		xlog rlServiceStop nfs && xlog rlServiceStart nfs
 		xlog rlServiceStop nfs-server && xlog rlServiceStart nfs-server
+		echoo "NFS exports:"
+		exportfs -s
 		SCRATCH_DEV=localhost:/export/scratch
 		DEV_TYPE=nfs
 		;;
@@ -536,6 +542,8 @@ function get_scratch_dev()
 	writable = yes
 EOF
 		xlog rlServiceStop smb && xlog rlServiceStart smb
+		echoo "samba shares:"
+		testparm -s
 		SCRATCH_DEV=//$HOSTNAME/scratch
 		DEV_TYPE=cifs
 		;;
