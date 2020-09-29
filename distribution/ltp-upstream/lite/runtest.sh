@@ -10,7 +10,7 @@
 
 TARGET_DIR=/mnt/testarea/ltp
 GIT_USER_ADDR=${GIT_USER_ADDR:-0}
-RUNTESTS=${RUNTESTS:-"sched syscalls can commands containers dio fs fsx math hugetlb mm nptl pty ipc tracing"}
+RUNTESTS=${RUNTESTS:-"cve sched syscalls can commands containers dio fs fsx math hugetlb mm nptl pty ipc tracing"}
 CPUS_NUM=$(getconf _NPROCESSORS_ONLN || echo 1)
 MEM_AVAILABLE=$(echo "$(grep '^MemAvailable:' /proc/meminfo | sed 's/^[^0-9]*\([0-9]*\).*/\1/') / 1024" |bc -q)
 
@@ -51,7 +51,7 @@ function ltp_test_build()
 	fi
 
 	pushd ltp > /dev/null 2>&1
-	git checkout a1d74f49b7e34549fc5774f50c6968bfa2ced04f
+	git checkout 04254512d00a5a1a7efd030f2023d5a53bb55273
 	# Timing on systems with shared resources (and high steal time) is not accurate, apply patch for non bare-metal machines
 	patch -p1 < ../patches/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
 	# Disable btrfs testing
