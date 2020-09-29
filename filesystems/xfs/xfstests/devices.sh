@@ -256,9 +256,11 @@ function get_test_dev()
 		     "$FSTYPE" == "cifs" && DEV_TYPE="$FSTYPE"
 
 		# User specified mount point
+		[ -z "$DEV_TYPE" ] &&
 		test -n "${TEST_DIR}" -a -n "$(findmnt -n -o SOURCE $TEST_DIR)" && DEV_TYPE=mount
 
 		# User specified test device
+		[ -z "$DEV_TYPE" ] &&
 		test -n "${TEST_DEV}" && DEV_TYPE=user
 
 		# If no DEV_TYPE was specified, use the default one
