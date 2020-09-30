@@ -29,7 +29,7 @@ if [ $? -ne 0 ]; then
 fi
 ~~~
 
-### Abort recipe if infrastructure failure affects the entire recipe 
+### Abort recipe if infrastructure failure affects the entire recipe
 ~~~
 if [ $? -ne 0 ]; then
     rlLog "Aborting recipe because $reason"
@@ -59,3 +59,18 @@ as infrastructure issue. Machineinfo (to get HW specification) is ran before
 kpkginstall, so the same logic applies there. PANIC during kpkginstall means the
 kernel is bad (can't boot).
 
+In addition, please use the following guidelines while onboarding or updating
+a test:
+* If updating an existing test, be sure to trigger the bot to test related
+  changes to verify nothing broke, the bot attaches to the MR and will provide
+  instructions to trigger. Ask a project member with privileges to do so or
+  request access for these rights
+* Be sure to only use [Restraint compatible commands][01] and metadata vs
+  Legacy RHTS/Makefile
+* Use [cki lib](cki_lib) for common tasks
+* Be sure there is nothing confidential and complies with open source
+  guidelines, including a valid license header (e.g. GPLv3)
+* Verify the test can be run stand alone without any internal dependencies to
+  enable external contributors to reproduce failures
+
+[01]: https://restraint.readthedocs.io/en/latest/commands.html#command-usage
