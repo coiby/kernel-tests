@@ -1,0 +1,12 @@
+[General]
+name=watchdog/hw-generic
+owner=Rachel Sibley <rasibley@redhat.com>
+description=Watchdog test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=gcc;psmisc
+repoRequires=cki_lib
