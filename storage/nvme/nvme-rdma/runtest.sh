@@ -65,11 +65,13 @@ function get_test_result
 	typeset result_file=$(find $result_dir -type f | egrep "$test_case")
 	typeset result="UNTESTED"
 	if [[ -n $result_file ]]; then
-		typeset res=$(egrep "^status" $result_file | awk '{print $NF}')
+		typeset res=$(grep "^status" $result_file)
 		if [[ $res == *"pass" ]]; then
 			result="PASS"
 		elif [[ $res == *"fail" ]]; then
 			result="FAIL"
+		elif [[ $res == *"not run" ]]; then
+			result="SKIP"
 		else
 			result="OTHER"
 		fi
@@ -97,6 +99,9 @@ function do_test
 	elif [[ $result == "FAIL" ]]; then
 		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" FAIL 1
 		ret=1
+	elif [[ $result == "SKIP" ]]; then
+		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" SKIP 0
+		ret=0
 	else
 		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" WARN 2
 		ret=2
@@ -130,9 +135,9 @@ function get_test_cases_rdma
 		testcases+=" nvme/010"
 		testcases+=" nvme/011"
 		uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" nvme/012" # BZ1871774
-		uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" nvme/013" # BZ1871774
+		uname -ri | grep -qE "4.18.0-147|4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" nvme/013" # BZ1871774/dislable 013 on 8.1.z
 		testcases+=" nvme/014"
-		testcases+=" nvme/015"
+		uname -ri | grep -q "4.18.0-147" || testcases+=" nvme/015" # disable 015 on 8.1.z
 		testcases+=" nvme/018"
 		testcases+=" nvme/019"
 		testcases+=" nvme/020"
@@ -146,7 +151,7 @@ function get_test_cases_rdma
 		testcases+=" nvme/028"
 		testcases+=" nvme/029"
 		testcases+=" nvme/030"
-		testcases+=" nvme/031"
+		uname -ri | grep "4.18.0-147" | grep -Eq "s390x|ppc64le|aarch64" || testcases+=" nvme/031"
 	fi
 	echo $testcases
 }
