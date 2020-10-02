@@ -25,7 +25,7 @@ See examples below to properly abort or skip in beaker:
 ~~~
 if [ $? -ne 0 ]; then
     rlLog "Aborting test because $reason"
-    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 fi
 ~~~
 
