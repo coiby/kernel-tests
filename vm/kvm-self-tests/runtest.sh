@@ -16,6 +16,7 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA 02110-1301, USA.
 #
+. ../../cki_lib/libcki.sh || exit 1
 
 NAME=$(basename $0)
 CDIR=$(dirname $0)
@@ -24,6 +25,81 @@ RELEASE=$(uname -r | sed s/\.`arch`//)
 PACKAGE="kernel-${RELEASE}"
 TMPDIR=/var/tmp/$(date +"%Y%m%d%H%M%S")
 BINDIR=${TMPDIR}-bin
+GICVERSION=""
+CPUTYPE=""
+OSVERSION=""
+KVMPARAMFILE=/etc/modprobe.d/kvm-ci.conf
+
+source /usr/share/beakerlib/beakerlib.sh
+
+#
+# A simple wrapper function to skip a test because beakerlib doesn't support
+# such an important feature, right here we just leverage 'beaker'. Note we
+# don't call function report_result() as it directly invoke command
+# rstrnt-report-result actually
+#
+function rlSkip
+{
+    . ../../cki_lib/libcki.sh || exit 1
+
+    rlLog "Skipping test because $*"
+    rstrnt-report-result $TEST SKIP $OUTPUTFILE
+
+    #
+    # As we want result="Skip" status="Completed" for all scenarios, right here
+    # we always exit 0, otherwise the test will skip/abort
+    #
+    exit 0
+}
+
+function checkPlatformSupport
+{
+    typeset hwpf=${1?"*** what hardware-platform?, e.g. x86_64"}
+    [[ $hwpf == "x86_64" ]] && return 0
+    [[ $hwpf == "aarch64" ]] && return 0
+    [[ $hwpf == "ppc64" ]] && return 1
+    [[ $hwpf == "ppc64le" ]] && return 1
+    [[ $hwpf == "s390x" ]] && return 0
+    return 1
+}
+
+function checkVirtSupport
+{
+    typeset hwpf=${1?"*** what hardware-platform?, e.g. x86_64"}
+
+    if [[ $hwpf == "x86_64" ]]; then
+        if (egrep -q 'vmx' /proc/cpuinfo); then
+            CPUTYPE="INTEL"
+        elif (egrep -q 'svm' /proc/cpuinfo); then
+            CPUTYPE="AMD"
+        fi
+        egrep -q '(vmx|svm)' /proc/cpuinfo
+        return $?
+    elif [[ $hwpf == "aarch64" ]]; then
+        if journalctl -k | egrep -qi "disabling GICv2" ; then
+            GICVERSION="3"
+        else
+            GICVERSION="2"
+        fi
+        CPUTYPE="ARMGICv$GICVERSION"
+        journalctl -k | egrep -iq "kvm.*: (Hyp|VHE) mode initialized successfully"
+        return $?
+    elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
+        if (egrep -q 'POWER9' /proc/cpuinfo); then
+            CPUTYPE="POWER9"
+        else
+            CPUTYPE="POWER8"
+        fi
+        grep -q 'platform.*PowerNV' /proc/cpuinfo
+        return $?
+    elif [[ $hwpf == "s390x" ]]; then
+        CPUTYPE="S390X"
+        grep -q 'features.*sie' /proc/cpuinfo
+        return $?
+    else
+        return 1
+    fi
+}
 
 function getTests
 {
@@ -60,47 +136,13 @@ function disableTests
     typeset hwpf=$(uname -i)
 
     # Disable tests for RHEL8 Kernel (4.18.X)
-    if uname -r | grep --quiet '^4'; then
-        # Disabled x86_64 tests for Intel & AMD machines due to bugs
-        if [[ $hwpf == "x86_64" ]]; then
-            # Disable test clear_dirty_log_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1718479
-            mapfile -d $'\0' -t ALLARCH_TESTS < <(printf '%s\0' "${ALLARCH_TESTS[@]}" | grep -Pzv "clear_dirty_log_test")
+    if [[ $OSVERSION == "RHEL8" ]]; then
 
-            # Disable test x86_64/vmx_set_nested_state_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1740235
-            mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/vmx_set_nested_state_test")
-        fi
-
-        # Disabled x86_64 tests for AMD machines due to bugs
-        if lsmod | grep --quiet kvm_amd; then
-            # Disable test x86_64/platform_info_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1718499
-            mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/platform_info_test")
-
-            if lscpu | grep --quiet Opteron; then
-                # Disable test x86_64/state_test & x86_64/smm_test
-                # due to https://bugzilla.redhat.com/show_bug.cgi?id=1741347
-                mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/state_test")
-                mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/smm_test")
-            fi
-        fi
-
-        # Disabled x86_64 tests for Intel machines due to bugs
-        if lsmod | grep --quiet kvm_intel; then
-            if lscpu | grep --quiet "CPU E3-"; then
-                # Disable test dirty_log_test
-                # due to https://bugzilla.redhat.com/show_bug.cgi?id=1741201
-                mapfile -d $'\0' -t ALLARCH_TESTS < <(printf '%s\0' "${ALLARCH_TESTS[@]}" | grep -Pzv "dirty_log_test")
-            fi
-
-            if lscpu | grep --quiet E5504; then
-                # Disable test x86_64/state_test, x86_64/smm_test & x86_64/evmcs_test
-                # due to https://bugzilla.redhat.com/show_bug.cgi?id=1741347
-                mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/state_test")
-                mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/smm_test")
-                mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/evmcs_test")
-            fi
+        # Disabled tests for AMD systems
+        if [[ $CPUTYPE == "AMD" ]]; then
+            # Disable test smm_test
+            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1850663
+            mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "smm_test")
         fi
 
         # Disabled s390x tests due to bugs
@@ -111,129 +153,149 @@ function disableTests
         fi
     fi
 
-    # Disable tests for ARK Kernel (5.X)
-    if uname -r | grep --quiet '^5'; then
-        # Disable x86_64/sync_regs_test
-        # due to https://bugzilla.redhat.com/show_bug.cgi?id=1719397
-        mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/sync_regs_test")
-
-        # Disabled x86_64 tests for AMD machines due to bugs
-        if lsmod | grep --quiet kvm_amd; then
-            # Disable test x86_64/platform_info_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1719387
-            mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/platform_info_test")
-            # Disable x86_64/state_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1719401
-            mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/state_test")
-            # Disable x86_64/smm_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1719402
-            mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/smm_test")
-        fi
-
-        # Disabled x86_64 tests for Intel machines due to bugs
-        if lsmod | grep --quiet kvm_intel; then
-            # Disable x86_64/evmcs_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1719400
-            mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "x86_64/evmcs_test")
-        fi
-    fi
 }
 
-source /usr/share/beakerlib/beakerlib.sh
-
-#
-# A simple wrapper function to skip a test because beakerlib doesn't support
-# such an important feature, right here we just leverage 'beaker'. Note we
-# don't call function report_result() as it directly invoke command
-# rstrnt-report-result actually
-#
-function rlSkip
+function setup
 {
-    . ../../cki_lib/libcki.sh || exit 1
+    rlPhaseStartSetup
+    rlRun "pushd '.'"
 
-    rlLog "Skipping test because $*"
-    rstrnt-report-result $TEST SKIP $OUTPUTFILE
+    typeset pkg=$PACKAGE
 
-    #
-    # As we want result="Skip" status="Completed" for all scenarios, right here
-    # we always exit 0, otherwise the test will skip/abort
-    #
-    exit 0
-}
-
-function check_platform_support
-{
-    typeset hwpf=${1?"*** what hardware-platform?, e.g. x86_64"}
-    [[ $hwpf == "x86_64" ]] && return 0
-    [[ $hwpf == "aarch64" ]] && return 0
-    [[ $hwpf == "ppc64" ]] && return 0
-    [[ $hwpf == "ppc64le" ]] && return 0
-    [[ $hwpf == "s390x" ]] && return 0
-    return 1
-}
-
-function check_virt_support
-{
-    typeset hwpf=${1?"*** what hardware-platform?, e.g. x86_64"}
-    if [[ $hwpf == "x86_64" ]]; then
-        egrep -q '(vmx|svm)' /proc/cpuinfo
-        return $?
-    elif [[ $hwpf == "aarch64" ]]; then
-        dmesg | egrep -iq "kvm"
-        if (( $? == 0 )); then
-            dmesg | egrep -iq "kvm.*: (Hyp|VHE) mode initialized successfully"
-        else
-            #
-            # XXX: Note that the harness (i.e. beaker) does clear dmesg, hence
-            #      we have to fetch the output of kernel buffer from
-            #      "journalctl -k"
-            #
-            journalctl -k | \
-                egrep -iq "kvm.*: (Hyp|VHE) mode initialized successfully"
-        fi
-        return $?
-    elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
-        grep -q 'platform.*PowerNV' /proc/cpuinfo
-        return $?
-    elif [[ $hwpf == "s390x" ]]; then
-        grep -q 'features.*sie' /proc/cpuinfo
-        return $?
+    if grep -q "Red Hat Enterprise Linux release 8." /etc/redhat-release; then
+        OSVERSION="RHEL8"
     else
-        return 1
+        OSVERSION="ARK"
     fi
-}
 
-function check
-{
-    # test is only supported on x86_64 and aarch64
-    typeset hwpf=$(uname -i)
-    check_platform_support $hwpf
+    # tests are currently supported on x86_64, aarch64, ppc64 and s390x
+    hwpf=$(uname -i)
+    checkPlatformSupport $hwpf
     if (( $? == 0 )); then
-        rlLog "Running on supported arch (x86_64 or aarch64)"
-
         # test can only run on hardware that supports virtualization
-        check_virt_support $hwpf
+        checkVirtSupport $hwpf
+        rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running on supported arch"
         if (( $? == 0 )); then
-            rlLog "Hardware supports virtualization, proceeding"
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Hardware supports virtualization, proceeding"
         else
-            rlSkip "CPU doesn't support virtualization"
+            rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] CPU doesn't support virtualization"
         fi
     else
-        rlSkip "test is only supported on x86_64 and aarch64"
+        rlSkip "[$OSVERSION][$hwpf] test is only supported on x86_64, aarch64 or s390x"
     fi
 
     # test should only run on a system with 1 or more cpus
     typeset cpus=$(grep -c ^processor /proc/cpuinfo)
     if (( $cpus > 1 )); then
-        rlLog "You have sufficient CPU's to run the test"
+        rlLog "[$OSVERSION][$hwpf][$CPUTYPE] You have sufficient CPU's to run the test"
     else
-        rlSkip "system requires > 1 CPU"
+        rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] system requires > 1 CPU"
     fi
+
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running tests for OSVERSION: $OSVERSION"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running tests for ARCH: $hwpf"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running tests for CPUTYPE: $CPUTYPE"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running tests for KERNEL: $(uname -a)"
+
+    KVM_SYSFS=/sys/module/kvm/parameters/
+    KVM_OPTIONS=""
+    if [[ $hwpf == "x86_64" ]]; then
+        KVM_OPTIONS+=("enable_vmware_backdoor")
+        KVM_OPTIONS+=("force_emulation_prefix")
+    elif [[ $hwpf == "s390x" ]]; then
+        KVM_OPTIONS+=("nested")
+    fi
+
+    KVM_ARCH=""
+    KVM_MODULES=()
+    KVM_ARCH_OPTIONS=()
+    if [[ $CPUTYPE == "INTEL" ]]; then
+        KVM_ARCH="kvm_intel"
+        KVM_ARCH_OPTIONS+=("nested")
+    elif [[ $CPUTYPE == "AMD" ]]; then
+        KVM_ARCH="kvm_amd"
+        KVM_ARCH_OPTIONS+=("nested")
+    elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
+        KVM_ARCH="kvm_hv"
+        KVM_MODULES+=("kvm_pr")
+        KVM_ARCH_OPTIONS+=("nested")
+    fi
+    KVM_MODULES+=("$KVM_ARCH")
+    KVM_MODULES+=("kvm")
+    KVM_ARCH_SYSFS=/sys/module/$KVM_ARCH/parameters/
+
+    # Set the KVM parameters needed for the tests
+    > $KVMPARAMFILE
+    for opt in ${KVM_OPTIONS[*]}; do
+        echo -e "options kvm $opt=1\n" >> $KVMPARAMFILE
+    done
+    for opt in ${KVM_ARCH_OPTIONS[*]}; do
+        echo -e "options $KVM_ARCH $opt=1\n" >> $KVMPARAMFILE
+    done
+
+    # Export env variables used by KVM Unit Tests
+    export TIMEOUT=3000s
+
+    # Reload the modules
+    for mod in ${KVM_MODULES[*]}; do rmmod -f $mod > /dev/null 2>&1; done
+    modprobe -a kvm $KVM_ARCH
+
+    # Test if the KVM parameters were set correctly
+    for opt in ${KVM_OPTIONS[*]}; do
+        if ! cat $KVM_SYSFS/$opt | egrep -q "Y|y|1"; then
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt not set"
+            rstrnt-report-result $TEST WARN
+            rstrnt-abort -t recipe
+        else
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
+        fi
+    done
+    for opt in ${KVM_ARCH_OPTIONS[*]}; do
+        if ! cat $KVM_ARCH_SYSFS/$opt | egrep -q "Y|y|1"; then
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt not set"
+            rstrnt-report-result $TEST WARN
+            rstrnt-abort -t recipe
+        else
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt is set"
+        fi
+    done
+    rlRun "rm -rf $TMPDIR && mkdir $TMPDIR"
+    rlRun "rm -rf ${BINDIR} && mkdir -p ${BINDIR}/x86_64 && mkdir -p ${BINDIR}/s390x && mkdir ${BINDIR}/aarch64"
+
+    # if running on rhel8, use python3
+    if [[ $OSVERSION == "RHEL8" ]] && [ ! -f /usr/bin/python ]; then
+        ln -s /usr/libexec/platform-python /usr/bin/python
+    fi
+
+    rlRun "cd $TMPDIR"
+    if [ -x /usr/bin/dnf ]; then
+        dnf download ${pkg} --source > /dev/null 2>&1
+    elif [ -x /usr/bin/yum ]; then
+        yum download ${pkg} --source > /dev/null 2>&1
+    fi
+    if [ ! -f $TMPDIR/${pkg}.src.rpm ]; then
+        rlFetchSrcForInstalled $pkg
+    fi
+    typeset rpmfile=$(ls -1 $TMPDIR/${pkg}.src.rpm)
+    rlAssertExists $rpmfile
+
+    rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile > /dev/null 2>&1" 0
+
+    typeset linux_tarball=$(find $TMPDIR -name "linux*.tar.xz")
+    rlAssertExists $linux_tarball
+
+    typeset tarball_dirname=$(dirname $linux_tarball)
+    rlRun "cd $tarball_dirname"
+    rlRun "tar Jxf $linux_tarball > /dev/null 2>&1"
+
+    rlRun "popd"
+    rlPhaseEnd
 }
 
 function runtest
 {
     rlPhaseStartTest
+    rlRun "pushd '.'"
 
     typeset linux_srcdir=$(find $TMPDIR -type d -a -name "linux-*")
     typeset tests_srcdir="$linux_srcdir/tools/testing/selftests/kvm"
@@ -256,8 +318,6 @@ function runtest
               "Patching via patches/bitmap.h.patch"
     fi
 
-    rlRun "pushd '.'"
-
     # Build tests
     [[ $hwpf == "x86_64" ]] && ARCH="x86_64"
     [[ $hwpf == "aarch64" ]] && ARCH="arm64"
@@ -277,70 +337,18 @@ function runtest
     [[ $hwpf == "s390x" ]] &&  for test in ${S390X_TESTS[*]}; do rlRun "${outputdir}/${test}" 0,4; done
 
     rlRun "popd"
-
-    rlPhaseEnd
-}
-
-function setup
-{
-    typeset pkg=$PACKAGE
-
-    rlPhaseStartSetup
-
-    check
-
-    if lsmod | grep --quiet kvm_intel; then
-        rmmod kvm_intel; rmmod kvm
-        modprobe kvm; modprobe kvm_intel
-    elif lsmod | grep --quiet kvm_amd; then
-        rmmod kvm_amd; rmmod kvm
-        modprobe kvm; modprobe kvm_amd
-    fi
-    rlRun "rm -rf $TMPDIR && mkdir $TMPDIR"
-    rlRun "rm -rf ${BINDIR} && mkdir -p ${BINDIR}/x86_64 && mkdir -p ${BINDIR}/s390x && mkdir ${BINDIR}/aarch64"
-
-    rlRun "pushd '.'"
-
-    # if running on rhel8, use python3
-    if grep --quiet "release 8." /etc/redhat-release && [ ! -x /usr/bin/python ];then
-        ln -s /usr/libexec/platform-python /usr/bin/python
-    fi
-
-    rlRun "cd $TMPDIR"
-    if [ -x /usr/bin/dnf ]; then
-        dnf download ${pkg} --source
-    elif [ -x /usr/bin/yum ]; then
-        yum download ${pkg} --source
-    fi
-    if [ ! -f $TMPDIR/${pkg}.src.rpm ]; then
-        rlFetchSrcForInstalled $pkg
-    fi
-    typeset rpmfile=$(ls -1 $TMPDIR/${pkg}.src.rpm)
-    rlAssertExists $rpmfile
-    rlRun "ls -l $rpmfile"
-
-    rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile" 0
-
-    typeset linux_tarball=$(find $TMPDIR -name "linux*.tar.xz")
-    rlAssertExists $linux_tarball
-    rlRun "ls -l $linux_tarball"
-
-    typeset tarball_dirname=$(dirname $linux_tarball)
-    rlRun "cd $tarball_dirname"
-    rlRun "tar Jxf $linux_tarball"
-
-    rlRun "popd"
-
     rlPhaseEnd
 }
 
 function cleanup
 {
     rlPhaseStartCleanup
+    rlRun "pushd '.'"
 
     rlRun "rm -rf $TMPDIR"
     rlRun "rm -rf ${BINDIR}"
 
+    rlRun "popd"
     rlPhaseEnd
 }
 
