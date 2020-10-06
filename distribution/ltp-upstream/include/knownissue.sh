@@ -160,6 +160,9 @@ function knownissue_filter()
 	# [bug] msgstress04 fills up >4GB data on conserver for ppc64le
 	# https://lore.kernel.org/linux-block/491751.10128377.1599217585366.JavaMail.zimbra@redhat.com/T/#t
 	is_arch "ppc64le" && tskip "msgstress04" fatal
+	# [test bug] semop03 is a new test which is not yet stable
+	# http://post-office.corp.redhat.com/archives/cki-project/2020-October/msg00016.html
+	tskip "semop03" unfix
 
 	if is_rhel8; then
                 # ------- unfix ---------
