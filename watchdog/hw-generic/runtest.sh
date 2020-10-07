@@ -45,7 +45,7 @@ efi_save()
     order=$(efibootmgr | grep BootOrder | cut -d : -f 2)
     echo $order > $FILE
     curr=$(efibootmgr | grep BootCurrent | cut -d : -f 2)
-    echo "SAVE" | tee -a ${OUTPUTFILE}
+    echo -e "\nSAVE" | tee -a ${OUTPUTFILE}
     efibootmgr -o $curr
     echo
 }
@@ -54,13 +54,13 @@ efi_restore()
 {
     [ ! -e $FILE ] && echo "Error: save data is missing" && exit
     order=$(cat $FILE)
-    echo "RESTORE" | tee -a ${OUTPUTFILE}
+    echo -e "\nRESTORE" | tee -a ${OUTPUTFILE}
     efibootmgr -o $order
     echo
     rm $FILE
 }
 
-efi_set ()
+efi_set()
 {
     if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
 		echo "Invalid command: $1" | tee -a ${OUTPUTFILE}
@@ -142,18 +142,19 @@ disable_wdt_test() {
 	rstrnt-report-result $TEST/disable_wdt_test FAIL
 }
 
+chk_support
 # Set the boot order correctly for UEFI systems
 which efibootmgr &> /dev/null
 if [ $? -eq 0 ]; then
-	echo "========== UEFI system detected, setting the bootorder using efibootmgr ============" | tee -a ${OUTPUTFILE}
-	echo "== Original BootOrder:" | tee -a ${OUTPUTFILE}
-	efibootmgr
-		if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
-			efi_set save
-		else
-			efi_set restore
-		fi
+	if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
+		echo -e "\n========== Setting the BootOrder correcty for UEFI system ============" | tee -a ${OUTPUTFILE}
+		echo "== Original BootOrder:" | tee -a ${OUTPUTFILE}
+		efibootmgr
+		efi_set save
+	else
+		echo -e "\n========== Restoring the BootOrder correcty for UEFI system ============" | tee -a ${OUTPUTFILE}
+		efi_set restore
+	fi
 fi
-chk_support
 disable_wdt_test
 cleanup
