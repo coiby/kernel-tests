@@ -36,17 +36,38 @@ TEST="watchdog/hw-generic"
 # Status file to indicate where we are in the test (after reboot)
 TEST_STATUS=/var/tmp/watchdog.status
 touch "$TEST_STATUS"
+# File to backup/restore bootorder
+FILE=/tmp/watchdog_boot_order
 
-efi_set()
+efi_save()
 {
-	# Set the boot order correctly for UEFI systems
-	which efibootmgr &> /dev/null
-	if [ $? -eq 0 ]; then
-		echo "========== UEFI system detected, setting the bootorder using efibootmgr ============" | tee -a ${OUTPUTFILE}
-		curr=$(efibootmgr | awk '/BootCurrent/ {print $2}')
-		echo -e "\n==BootCurrent will be set to $curr" | tee -a ${OUTPUTFILE}
-		efibootmgr -n $curr
-	fi
+    [ -e $FILE ] && echo "error: back to back save" && exit
+    order=$(efibootmgr | grep BootOrder | cut -d : -f 2)
+    echo $order > $FILE
+    curr=$(efibootmgr | grep BootCurrent | cut -d : -f 2)
+    echo "SAVE" | tee -a ${OUTPUTFILE}
+    efibootmgr -o $curr
+    echo
+}
+
+efi_restore()
+{
+    [ ! -e $FILE ] && echo "Error: save data is missing" && exit
+    order=$(cat $FILE)
+    echo "RESTORE" | tee -a ${OUTPUTFILE}
+    efibootmgr -o $order
+    echo
+    rm $FILE
+}
+
+efi_set ()
+{
+    if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
+		echo "Invalid command: $1" | tee -a ${OUTPUTFILE}
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+    fi
+
+    [ "$1" = "save" ] && efi_save || efi_restore
 }
 
 chk_support() {
@@ -121,8 +142,17 @@ disable_wdt_test() {
 	rstrnt-report-result $TEST/disable_wdt_test FAIL
 }
 
-if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
-    efi_set
+# Set the boot order correctly for UEFI systems
+which efibootmgr &> /dev/null
+if [ $? -eq 0 ]; then
+	echo "========== UEFI system detected, setting the bootorder using efibootmgr ============" | tee -a ${OUTPUTFILE}
+	echo "== Original BootOrder:" | tee -a ${OUTPUTFILE}
+	efibootmgr
+		if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
+			efi_set save
+		else
+			efi_set restore
+		fi
 fi
 chk_support
 disable_wdt_test
