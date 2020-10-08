@@ -68,6 +68,10 @@ efi_restore()
 	order=$(cat $FILE)
 	echo -e "\nRESTORE BootOrder" | tee -a ${OUTPUTFILE} ${kmsg}
 	efibootmgr -o "$order"
+	if [ $? -ne 0 ]; then
+		echo -e "\nRESTORE Failed! Please investigate to avoid an incorrect boot order" | tee -a ${OUTPUTFILE} ${kmsg}
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+	fi
 	rm $FILE
 	sync;sync
 }
