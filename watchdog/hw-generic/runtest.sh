@@ -89,7 +89,7 @@ efi_set()
 
 chk_support() {
 	# Return if we've already executed this function
-	if `grep -q chk_support "$TEST_STATUS"` ; then
+	if grep -q chk_support "$TEST_STATUS" ; then
 		return 0
 	fi
 
