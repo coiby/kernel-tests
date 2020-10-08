@@ -45,33 +45,42 @@ kmsg=/dev/kmsg
 
 efi_save()
 {
-    [ -e $FILE ] && echo "error: back to back save" && exit
-    order=$(efibootmgr | grep BootOrder | cut -d : -f 2)
-    echo $order > $FILE
-    curr=$(efibootmgr | grep BootCurrent | cut -d : -f 2)
-    echo -e "\nSAVE BootOrder" | tee -a ${OUTPUTFILE} ${kmsg}
-    efibootmgr -o $curr
-    echo
+	order=$(efibootmgr | grep BootOrder | awk '{print $2}')
+	curr=$(efibootmgr | grep BootCurrent | awk '{print $2}')
+	first=$(echo $order | cut -d ',' -f 1 )
+	if [ "$first" = "$curr" ]; then
+		echo -e "\nSAVE: boot order is *already* correct" | tee -a ${OUTPUTFILE} ${kmsg}
+		return
+	fi
+	echo -e "\nSAVE BootOrder" | tee -a ${OUTPUTFILE} ${kmsg}
+	new="$curr,$order"
+	efibootmgr -o "$new"
+	echo "$order" > $FILE
+	sync;sync # make sure we save the file
 }
 
 efi_restore()
 {
-    [ ! -e $FILE ] && echo "Error: save data is missing" && exit
-    order=$(cat $FILE)
-    echo -e "\nRESTORE BootOrder" | tee -a ${OUTPUTFILE} ${kmsg}
-    efibootmgr -o $order
-    echo
-    rm $FILE
+	if [ ! -e $FILE ]; then
+		echo "RESTORE: boot order is correct" | tee -a ${OUTPUTFILE} ${kmsg}
+		return
+	fi
+	order=$(cat $FILE)
+	echo -e "\nRESTORE BootOrder" | tee -a ${OUTPUTFILE} ${kmsg}
+	efibootmgr -o "$order"
+	rm $FILE
+	sync;sync
 }
+
 
 efi_set()
 {
-    if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
+	if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
 		echo "Invalid command: $1" | tee -a ${OUTPUTFILE} ${kmsg}
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-    fi
+	fi
 
-    [ "$1" = "save" ] && efi_save || efi_restore
+	[ "$1" = "save" ] && efi_save || efi_restore
 }
 
 chk_support() {
