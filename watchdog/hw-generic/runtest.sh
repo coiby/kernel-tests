@@ -133,7 +133,7 @@ disable_wdt_test() {
 	if grep -q disable_wdt_test "$TEST_STATUS" ; then
 		echo "== Disabling watchdog successfully triggered a reboot:" | tee -a ${OUTPUTFILE} ${kmsg}
 		rstrnt-report-result $TEST/disable_wdt_test PASS
-		return 0${kmsg}
+		return 0
 	fi
 	# Record we've run the test so on reboot we don't run it again
 	echo disable_wdt_test >> "$TEST_STATUS"
