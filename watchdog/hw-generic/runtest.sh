@@ -45,8 +45,8 @@ kmsg=/dev/kmsg
 
 efi_save()
 {
-	order=$(efibootmgr | grep BootOrder | awk '{print $2}')
-	curr=$(efibootmgr | grep BootCurrent | awk '{print $2}')
+	order=$(efibootmgr | awk '/BootOrder/ {print $2}')
+	curr=$(efibootmgr | awk '/BootCurrent/ {print $2}')
 	first=$(echo $order | cut -d ',' -f 1 )
 	if [ "$first" = "$curr" ]; then
 		echo -e "\nSAVE: boot order is *already* correct" | tee -a ${OUTPUTFILE} ${kmsg}
