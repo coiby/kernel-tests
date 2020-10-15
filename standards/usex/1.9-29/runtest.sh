@@ -1,7 +1,14 @@
 #!/bin/sh
 
+TEST="standards/usex/1.9-29"
+
 # Source the common test script helpers
 . ../../../cki_lib/libcki.sh || exit 1
+
+function setup()
+{
+    make appinstall
+}
 
 function SysStats()
 {
@@ -16,15 +23,15 @@ function SysStats()
     cat /proc/slabinfo >> $OUTPUTFILE
     echo "***** System stats *****" >> $OUTPUTFILE
 
-    logger -t USEXINFO -f $OUTPUTFILE 
+    logger -t USEXINFO -f $OUTPUTFILE
 }
 
 function VerboseCupsLog()
 {
    # This funnction was added Nov 2010 in hopes of assisting in resoltion of bugzilla 452305
    # See comment #31 https://bugzilla.redhat.com/show_bug.cgi?id=452305
-   # Provide more verbose debug logging in /var/log/cups/error_log  
-   echo "-------------------------------------------------------------------------" | tee -a ${OUTPUTFILE} 
+   # Provide more verbose debug logging in /var/log/cups/error_log
+   echo "-------------------------------------------------------------------------" | tee -a ${OUTPUTFILE}
    echo "Setting up verbose debug logging in /var/log/cups/error_log for BZ452305." | tee -a ${OUTPUTFILE}
    echo "-------------------------------------------------------------------------" | tee -a ${OUTPUTFILE}
    rstrnt-backup /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
@@ -76,11 +83,12 @@ echo "RHELVER is $RHELVER" | tee -a $OUTPUTFILE
 INFILE=rhtsusex.tcf
 MYARCH=`uname -m`
 if [ "$MYARCH" = "x86_64" -o "$MYARCH" = "s390x" ]; then
+    rm -f /usr/lib/libc.a
     ln -s /usr/lib64/libc.a /usr/lib/libc.a
 fi
 
-if [ -z "$OUTPUTDIR" ]; then                                                                                                                                 
-    OUTPUTDIR=/mnt/testarea                                                                                                                                  
+if [ -z "$OUTPUTDIR" ]; then
+    OUTPUTDIR=/mnt/testarea
 fi
 
 #if ppc64 has less than or equal to 1 GB of memory don't run the vm tests
@@ -92,6 +100,8 @@ if [ "$MYARCH" = "ppc64" ]; then
 fi
 
 SysStats
+
+setup
 
 USEX_LOG="usex_log.txt"
 
