@@ -159,7 +159,7 @@ function get_test_cases_rdma
 bash $CDIR/../include/build.sh
 if (( $? != 0 )); then
 	rlLog "Abort test because build env setup failed"
-	rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 fi
 
 enable_nvme_core_multipath

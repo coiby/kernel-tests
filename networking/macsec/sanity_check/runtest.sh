@@ -40,7 +40,7 @@ rlJournalStart
         rlRun -l "ip macsec help" 255
         if (( $? == 0 )); then
                 rlLog "Aborting test because 'ip macsec' not found"
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 0
         fi
     rlPhaseEnd

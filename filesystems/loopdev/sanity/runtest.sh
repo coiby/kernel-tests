@@ -66,7 +66,7 @@ cp -f ${TARGET}/src/current/iozone ./
 if [ $? -ne 0 ]; then
       rstrnt-report-result $TEST WARN
       # Abort the task
-      rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+      rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
       exit 0
 fi
 

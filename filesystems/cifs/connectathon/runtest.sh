@@ -96,7 +96,7 @@ function Make()
       outputecho "Failed to clone cthon04"
       rstrnt-report-result $TEST WARN
       # Abort the task
-      rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+      rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
       exit 0
    fi
    make clean || ( status=$? && return $status )
@@ -191,7 +191,7 @@ if [ $result = "FAIL" ] ; then
    outputecho "Failed to compile cthon04"
    rstrnt-report-result $TEST WARN
    # Abort the task
-   rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+   rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
    exit 0
 fi
 
