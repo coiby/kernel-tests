@@ -33,11 +33,26 @@ function kver_lt() { ! kver_ge "$1"; }
 function kver_le() { version_le "$(uname -r)" "$1"; }
 function kver_gt() { ! kver_le "$1"; }
 
+function abort() {
+    local msg="$1"
+
+    if command -v rstrnt-abort &>/dev/null; then
+        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+    fi
+    rlDie "$msg"
+}
+
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "git clone '$GIT_URL' libkcapi"
-        rlRun "(cd libkcapi && git checkout $GIT_REF)"
-        rlRun "(cd libkcapi && autoreconf -i)"
+        if ! rlRun "git clone '$GIT_URL' libkcapi"; then
+            abort "Unable to clone the libkcapi repo!"
+        fi
+        if ! rlRun "(cd libkcapi && git checkout $GIT_REF)"; then
+            abort "Unable to checkout the requested git ref!"
+        fi
+        if ! rlRun "(cd libkcapi && autoreconf -i)"; then
+            abort "Unable to prepare build environment!"
+        fi
 
         # Old versions of aes_neon_bs cause some tests to fail. Fixed in:
         # https://bugzilla.redhat.com/show_bug.cgi?id=1826982
