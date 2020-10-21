@@ -18,7 +18,7 @@ function __cleanup()
         done
 }
 
-trap "__cleanup" 0 1 9 15
+trap "__cleanup" 0 1 15
 
 # -- RPM Dependencies ---------------------------------------------------------
 # Specify which packages ought to be:
