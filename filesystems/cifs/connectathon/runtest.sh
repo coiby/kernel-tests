@@ -34,7 +34,7 @@ TESTLOCAL=0
 # Commands in this section are provided by test developer.
 # ---------------------------------------------
 function outputecho() {
-	echo $@ | tee -a ${OUTPUTFILE}
+	echo "$@" | tee -a ${OUTPUTFILE}
 }
 
 exitcleanup() {

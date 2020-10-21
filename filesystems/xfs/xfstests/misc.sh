@@ -118,7 +118,7 @@ function conv_to_num()
 # Prints file to OUTPUTFILE as well as stdout
 function echoo()
 {
-	echo $@ | tee -a $OUTPUTFILE
+	echo "$@" | tee -a $OUTPUTFILE
 }
 
 # Wrapper to rstrnt-report-result, clears $OUTPUTFILE
@@ -136,6 +136,7 @@ function report()
 # Wrapper to log the output of the command
 function xlog()
 {
+	# shellcheck disable=SC2068
 	$@ 2>&1 | tee -a $OUTPUTFILE
 	return $?
 }

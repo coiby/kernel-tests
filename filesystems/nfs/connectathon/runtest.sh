@@ -423,7 +423,7 @@ function get_ip_types ()
         _types="tcp"
       fi
     else
-      if [ -n $CTHONPOVERRIDE ]; then
+      if [ -n "$CTHONPOVERRIDE" ]; then
         _types=$CTHONPROTOCOL
       fi
     fi
