@@ -32,7 +32,7 @@
 
 function test_fail()
 {
-        echo "FAIL: $@"
+        echo "FAIL: $*"
         rstrnt-report-result $TEST FAIL 1
         exit 1
 }

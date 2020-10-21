@@ -191,27 +191,27 @@ function new_symbols()
         local new_whitelist="$2"
 
         {
-                for system_map in ${NEW_KERNEL_SYSTEM_MAP[@]}
+                for system_map in "${NEW_KERNEL_SYSTEM_MAP[@]}"
                 do
                         symbols_system_map "$system_map"
                 done
 
-                for module_symvers in ${NEW_KERNEL_MODULE_SYMVERS[@]}
+                for module_symvers in "${NEW_KERNEL_MODULE_SYMVERS[@]}"
                 do
                         symbols_module_symvers "$module_symvers"
                 done
 
-                for kmod_folder in ${NEW_KERNEL_KMOD_FOLDERS[@]}
+                for kmod_folder in "${NEW_KERNEL_KMOD_FOLDERS[@]}"
                 do
                         symbols_kmod "$kmod_folder"
                 done
 
-                for vmlinux in ${NEW_KERNEL_VMLINUX[@]}
+                for vmlinux in "${NEW_KERNEL_VMLINUX[@]}"
                 do
                         symbols_vmlinux "$vmlinux"
                 done
 
-                for vmlinuz in ${NEW_KERNEL_VMLINUZ[@]}
+                for vmlinuz in "${NEW_KERNEL_VMLINUZ[@]}"
                 do
                         vmlinuz_extracted="$(vmlinuz_extract "$vmlinuz")"
                         TMP_FILES+=("$vmlinuz_extracted")
@@ -223,7 +223,7 @@ function new_symbols()
                 done
         } >> "$new_list"
 
-        for whitelist in ${NEW_KERNEL_KABI_WHITELITS[@]}
+        for whitelist in "${NEW_KERNEL_KABI_WHITELITS[@]}"
         do
                 symbols_whitelist "$whitelist" >> "$new_whitelist"
         done
@@ -241,12 +241,12 @@ function old_symbols()
         local old_list="$1"
         local old_whitelist="$2"
 
-        for module_symvers in ${OLD_KERNEL_SYMVERS[@]}
+        for module_symvers in "${OLD_KERNEL_SYMVERS[@]}"
         do
                 symbols_module_symvers "$module_symvers" >> "$old_list"
         done
 
-        for whitelist in ${OLD_KERNEL_WHITELIST[@]}
+        for whitelist in "${OLD_KERNEL_WHITELIST[@]}"
         do
                 symbols_whitelist "$whitelist" >> "$old_whitelist"
         done
@@ -313,7 +313,7 @@ function main()
         then
 		echo "--- BEGIN LIST ---"
                 comm -13 \
-                     <(comm -23 "$new_whitelist" "$new_symbol_list"
+                     <(comm -23 "$new_whitelist" "$new_symbol_list" \
                        | sort  \
                        | uniq) \
                      <(comm -23 "$old_whitelist" "$old_symbol_list" \
