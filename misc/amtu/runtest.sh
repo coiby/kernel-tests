@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -135,7 +135,7 @@ amtubase=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf "$
 #   result_pass
 #fi
 
-if [[ $(expr match $kernbase 'kernel-xen.*') > 0 ]]; then
+if [[ "$kernbase" =~ kernel-xen.* ]]; then
    echo "*** Unsure why this kernel was not in the defult list" | tee -a $OUTPUTFILE
    echo "*** Added back in Dec 21, 2009 - Jeff Burke <jburke@redhat.com>" | tee -a $OUTPUTFILE
    result_pass

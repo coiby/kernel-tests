@@ -84,6 +84,7 @@ arch=$(uname -m)
 
 case "$arch" in
 	i?86)
+		# shellcheck disable=SC2144
 		if [ -s modules.i?86 ] ; then
 			MODLIST=modules.i?86
 		else
@@ -105,6 +106,7 @@ case "$arch" in
 		fi
 		;;
 	ppc*)
+		# shellcheck disable=SC2144
 		if [ -s modules.ppc* ] ; then
 			MODLIST=modules.ppc*
 		else
