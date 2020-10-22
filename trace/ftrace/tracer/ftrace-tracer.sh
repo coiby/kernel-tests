@@ -6,6 +6,7 @@ TRACING_ON="${FTRACE_PREFIX}/tracing_on"
 TRACE="${FTRACE_PREFIX}/trace"
 
 assertPass(){
+# shellcheck disable=SC2068
 $@
 assertEquals '$@ failed' 0 $?
 }
