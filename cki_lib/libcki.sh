@@ -10,15 +10,16 @@
 
 # Set CKI test environment
 if [ -z "$OUTPUTFILE" ]; then
-        export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+    OUTPUTFILE=$(mktemp /mnt/testarea/tmp.XXXXXX)
+    export OUTPUTFILE
 fi
 
 if [ -z "$ARCH" ]; then
-        ARCH=$(uname -i)
+    ARCH=$(uname -i)
 fi
 
 if [ -z "$FAMILY" ]; then
-        FAMILY=$(cat /etc/redhat-release | sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g')
+    FAMILY=$(sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g' /etc/redhat-release)
 fi
 
 # Set well-known logname so users can easily find
@@ -26,9 +27,9 @@ fi
 # used by the local watchdog to upload the log
 # of the current task.
 if [ -h /mnt/testarea/current.log ]; then
-        ln -sf $OUTPUTFILE /mnt/testarea/current.log
+    ln -sf "$OUTPUTFILE" /mnt/testarea/current.log
 else
-        ln -s $OUTPUTFILE /mnt/testarea/current.log
+    ln -s "$OUTPUTFILE" /mnt/testarea/current.log
 fi
 
 # Include beaker library
@@ -64,14 +65,14 @@ function cki_log()
 #
 function cki_abort_recipe()
 {
-    typeset failure_message=$1
+    typeset failure_message="$1"
     typeset failure_type=${2:-"FAIL"}
 
     echo "❌ ${failure_message}"
-    if [[ $failure_type == 'WARN' ]]; then
-        rstrnt-report-result ${TEST} WARN 99
+    if [[ "$failure_type" == 'WARN' ]]; then
+        rstrnt-report-result "${TEST}" WARN 99
     else
-        rstrnt-report-result ${TEST} FAIL 1
+        rstrnt-report-result "${TEST}" FAIL 1
     fi
     rstrnt-abort -t recipe
     exit $CKI_STATUS_ABORTED
@@ -82,7 +83,7 @@ function cki_abort_task()
     typeset reason="$*"
     [[ -z $reason ]] && reason="unknown reason"
     cki_log "Aborting current task: $reason"
-    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$TASKID/status"
     exit $CKI_STATUS_ABORTED
 }
 
@@ -102,29 +103,29 @@ function cki_report_result
     shift 2
     typeset argv="$*"
     case $rc in
-        $CKI_PASS)
+        "$CKI_PASS")
             rlPass "$argv"
             ;;
-        $CKI_FAIL)
+        "$CKI_FAIL")
             rlFail "$argv $g_reason_fail"
             ;;
         #
         # NOTE: If a task is aborted or skipped, its cleanup should be done,
         #       or succeeding tasks may be impacted.
         #
-        $CKI_UNSUPPORTED)
-            if [[ -n $cleanup ]]; then
+        "$CKI_UNSUPPORTED")
+            if [[ -n "$cleanup" ]]; then
                 cki_log "Now go to cleanup because task is UNSUPPORTED ..."
-                eval $cleanup
+                eval "$cleanup"
             fi
             typeset reason=$g_reason_unsupported
-            [[ -z $reason ]] && reason="UNKNOWN REASON"
+            [[ -z "$reason" ]] && reason="UNKNOWN REASON"
             cki_skip_task "$reason"
             ;;
-        $CKI_UNINITIATED)
-            if [[ -n $cleanup ]]; then
+        "$CKI_UNINITIATED")
+            if [[ -n "$cleanup" ]]; then
                 cki_log "Now go to cleanup because task is UNINITIATED ..."
-                eval $cleanup
+                eval "$cleanup"
             fi
             typeset reason=$g_reason_uninitiated
             [[ -z $reason ]] && reason="UNKNOWN REASON"
@@ -145,9 +146,9 @@ function cki_set_reason()
     typeset rc=${1?"*** result code"}
     shift
     case $rc in
-        $CKI_FAIL) g_reason_fail="$@" ;;
-        $CKI_UNSUPPORTED) g_reason_unsupported="$@" ;;
-        $CKI_UNINITIATED) g_reason_uninitiated="$@" ;;
+        "$CKI_FAIL") g_reason_fail="$*" ;;
+        "$CKI_UNSUPPORTED") g_reason_unsupported="$*" ;;
+        "$CKI_UNINITIATED") g_reason_uninitiated="$*" ;;
         *) g_reason_other="$rc is an invalid result code" ;;
     esac
 }
@@ -164,7 +165,7 @@ function cki_main
 
     rlJournalStart
 
-    rlPhaseStartSetup $hook_startup
+    rlPhaseStartSetup "$hook_startup"
     $hook_startup
     typeset -i rc1=$?
     cki_log "$hook_startup(): rc=$rc1"
@@ -174,8 +175,8 @@ function cki_main
 
     if (( rc == 0 )); then
         typeset tfunc=""
-        for tfunc in $(echo $hook_runtest | tr ',' ' '); do
-            rlPhaseStartTest $tfunc
+        for tfunc in ${hook_runtest//,/ }; do
+            rlPhaseStartTest "$tfunc"
             $tfunc
             typeset -i rc2=$?
             cki_log "$tfunc(): rc=$rc2"
@@ -185,7 +186,7 @@ function cki_main
         done
     fi
 
-    rlPhaseStartCleanup $hook_cleanup
+    rlPhaseStartCleanup "$hook_cleanup"
     $hook_cleanup
     typeset -i rc3=$?
     cki_log "$hook_cleanup(): rc=$rc3"
@@ -213,7 +214,7 @@ function cki_main
 #
 function cki_run_cmd_pos()
 {
-    typeset cmd="$@"
+    typeset cmd="$*"
     (( ${#cmd} > 64 )) && cmd="${cmd:0:63}..."
     typeset msg="[ POS ] run '$cmd', expect to pass"
     rlRun -l "$@" "$CKI_RC_POS" "$msg"
@@ -222,16 +223,19 @@ function cki_run_cmd_pos()
 
 function cki_run_cmd_neg()
 {
-    typeset cmd="$@"
+    typeset cmd="$*"
     (( ${#cmd} > 64 )) && cmd="${cmd:0:63}..."
     typeset msg="[ NEG ] run '$cmd', expect to fail"
-    rlRun -l "$@" "$CKI_RC_NEG" "$msg"
-    (( $? == 0 )) && return 1 || return 0
+    if rlRun -l "$@" "$CKI_RC_NEG" "$msg" ; then
+        return 1
+    else
+        return 0
+    fi
 }
 
 function cki_run_cmd_neu()
 {
-    typeset cmd="$@"
+    typeset cmd="$*"
     (( ${#cmd} > 64 )) && cmd="${cmd:0:63}..."
     typeset msg="[ NEU ] run '$cmd', expect nothing"
     rlRun -l "$@" "$CKI_RC_ANY" "$msg"
