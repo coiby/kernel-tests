@@ -90,7 +90,7 @@ EOF
         fi
     fi
 
-    # blacklist tests on certain arch or RHEL release
+    # blacklist tests on certain arch, kernel, or distro
     if [ "$(uname -i)" = "ppc64le" ]; then
         # TODO: open BZ: vforkmany triggers kernel "BUG: soft lockup" on ppc64le
         sed -ie '/vforkmany/d' os.stressors
@@ -99,6 +99,11 @@ EOF
     if [[ "$(uname -r)" =~ 3.10.0.*rt.*el7 ]]; then
         # https://bugzilla.redhat.com/show_bug.cgi?id=1789039
         sed -ie '/af-alg/d' cpu.stressors
+    fi
+
+    if grep -q 'Fedora' /etc/redhat-release ; then
+        # TODO: open BZ: kernel BUG at mm/usercopy.c:99! for upstream kernels
+        sed -ie '/pthread/d' os.stressors
     fi
 
     # stress-ng-dccp is blocked by SELinux (see RHBZ 1459941) on RHEL-7.x with
