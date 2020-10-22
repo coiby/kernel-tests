@@ -7,6 +7,29 @@ $ sudo wget -O /etc/yum.repos.d/beaker-client.repo https://beaker-project.org/yu
 $ sudo wget -O /etc/yum.repos.d/beaker-harness.repo https://beaker-project.org/yum/beaker-harness-Fedora.repo
 $ sudo dnf install -y beaker-client beakerlib restraint-rhts
 ~~~
+
+### How to check the tests
+
+Every time a test is pushed it gets automatically checked for syntax or format
+errors with [ShellCheck](https://github.com/koalaman/shellcheck). It's convenient
+to use it locally before to push the code, to save some time and be able to quickly
+catch misspellings and silly errors.
+
+To check locally for those errors it's recommended to install `ShellCheck` with
+the package manager (e.g. `dnf install ShellCheck`) and to run this line in the
+directory of the changed code:
+
+```shell
+$ shellcheck -S error *.sh
+```
+
+If there are more directories with scripts or libraries, they can be checked
+recursively with the following:
+
+```shell
+$ find -name '*.sh' -exec shellcheck -S error {} +
+```
+
 ## Test onboarding
 
 Currently, all onboarded tests must use the following combinations of
