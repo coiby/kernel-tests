@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ### Gloable parameter setting for ipsec
 IPSEC_PARA_LOG="/tmp/ipsec-setting.log"
 

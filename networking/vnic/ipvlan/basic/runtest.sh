@@ -17,7 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
+FILE=$(readlink -f ${BASH_SOURCE[0]})
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 RPATH=${RELATIVE_PATH:-"networking/vnic/ipvlan/basic"}
@@ -40,7 +40,7 @@ waitbeforepass()
 {
 	try_num=${1:-10}
 	try_cmd=${2:-":"}
-	for i in {1..$try_num}
+	for i in $(seq 1 $try_num)
 	do
 		if $try_cmd
 		then
@@ -108,7 +108,7 @@ rlPhaseStartTest "multihost_netns"
 				rlRun "ip netns exec ns_s ip link set ipvlan_s type ipvlan $flag"
 				rlRun "ip netns exec ns_s ip link set ipvlan_s type ipvlan $flag" "0-255"
 
-				for feature_id in ${!dev_features[@]}
+				for feature_id in "${!dev_features[@]}"
 				do
 					rlRun "ip netns exec ns_s ethtool -K ipvlan_s ${dev_features[$feature_id]}"
 					rlRun "ip netns exec ns_s ethtool -k ipvlan_s"
@@ -209,7 +209,7 @@ rlPhaseStartTest "local_netns"
 	for mode in l2 l3s
 	do
 		rlRun "ip netns exec client ip link set ipvlan_c type ipvlan mode $mode"
-		for feature_id in ${!dev_features[@]}
+		for feature_id in "${!dev_features[@]}"
 		do
 			rlRun "ip netns exec server ethtool -K ipvlan_s ${dev_features[$feature_id]}"
 			rlRun "ip netns exec server ethtool -k ipvlan_s"
@@ -240,7 +240,7 @@ rlPhaseStartTest "local_stress_netns"
 	do
 		for j in {1..100}
 		do
-			let netns_num=(i-1)*100+j
+			let netns_num="(i-1)*100+j"
 			ip netns add netns$netns_num
 			ip link add link dummy0 name ipvlan$netns_num type ipvlan mode l2
 			ip link add link dummy0 name ipvlan$netns_num type ipvlan mode l2
@@ -272,7 +272,7 @@ rlPhaseStartTest "local_stress_netns"
 		do
 			for j in {1..100}
 			do
-				let netns_num=(i-1)*100+j
+				let netns_num="(i-1)*100+j"
 				if ! ip netns exec netns$netns_num ping -q 192.1.1.1 -c 1 &> /dev/null
 				then
 					rlLog "$netns_num ping fail"
@@ -292,7 +292,7 @@ rlPhaseStartTest "local_stress_netns"
 		do
 			for j in {1..100}
 			do
-				let netns_num=(i-1)*100+j
+				let netns_num="(i-1)*100+j"
 				ip netns exec netns$netns_num netperf -4 -H 192.1.1.1 -t UDP_STREAM -l 5 -- -R 1 &> ip4-netns$netns_num-udp.log &
 				ip netns exec netns$netns_num netperf -4 -H 192.1.1.1 -t TCP_STREAM -l 5 -- -m 16k &> ip4-netns$netns_num-tcp.log &
 				ip netns exec netns$netns_num netperf -4 -H 192.1.1.1 -t SCTP_STREAM -l 5 -- -m 16k &> ip4-netns$netns_num-sctp.log &
@@ -304,7 +304,7 @@ rlPhaseStartTest "local_stress_netns"
 		do
 			for j in {1..100}
 			do
-				let netns_num=(i-1)*100+j
+				let netns_num="(i-1)*100+j"
 				ip netns exec netns$netns_num netperf -6 -H 7777:1:1::1 -t UDP_STREAM -l 5 -- -R 1 &> ip6-netns$netns_num-udp.log &
 				ip netns exec netns$netns_num netperf -6 -H 7777:1:1::1 -t TCP_STREAM -l 5 -- -m 16k &> ip6-netns$netns_num-tcp.log &
 				ip netns exec netns$netns_num netperf -6 -H 7777:1:1::1 -t SCTP_STREAM -l 5 -- -m 16k &> ip6-netns$netns_num-sctp.log &
@@ -360,7 +360,7 @@ rlPhaseStartTest "ethtool_test"
 	rlRun "ip netns exec client netperf -6 -H 2222::171 -t SCTP_STREAM -l 1 -- -m 16k"
 	rlRun "ip netns exec client netperf -6 -H 2222::171 -t UDP_STREAM -l 1 -- -R 1"
 
-	for setting_para in ${!ethtool_setting[@]}
+	for setting_para in "${!ethtool_setting[@]}"
 	do
 		rlRun "ip netns exec server ethtool ${ethtool_setting[$setting_para]} ipvlan_s "
 		rlRun "ip netns exec client ping 2.2.2.171 -c 1"
@@ -439,7 +439,7 @@ rlPhaseStartTest "link_test"
 	rlRun "ip netns exec client netperf -6 -H 2222::171 -t SCTP_STREAM -l 1 -- -m 16k"
 	rlRun "ip netns exec client netperf -6 -H 2222::171 -t UDP_STREAM -l 1 -- -R 1"
 
-	for setting_para in ${!link_setting[@]}
+	for setting_para in "${!link_setting[@]}"
 	do
 		rlRun "ip netns exec client ip link set ipvlan_c ${link_setting[$setting_para]}"
 		rlRun "ip netns exec client ping 2.2.2.171 -c 1"

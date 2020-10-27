@@ -57,7 +57,8 @@ broadcom_setup()
 	done
 	# disable NetworkManager for Broadcom ifaces
 	local iface
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 		if [ "$vendor" != "0x15b3" ]; then
 			continue
@@ -77,7 +78,8 @@ broadcom_get_pfs()
 {
 	local target="0x16ca"; local iface;
 	[ "$NIC_DEVICE" == "BCM57304 NetXtreme-C" ] && { target="0x16ca"; }
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 		local device=$(cat /sys/class/net/$iface/device/device 2>/dev/null)
 		# Broadcom
@@ -97,7 +99,8 @@ broadcom_get_vfs()
 	local target="0x16cb"; local iface; local pcid;
 	[ "$NIC_DEVICE" == "BCM57304 NetXtreme-C" ] && { local VFS_DEVICE="Ethernet Virtual Function"; target="0x16cb"; }
 	for pcid in $(lspci -D | grep Broadcom | grep "$VFS_DEVICE" | awk '{print $1}'); do
-		for iface in $(ls /sys/class/net/); do
+		for iface in /sys/class/net/*; do
+			iface=$(basename $iface)
 			local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 			local device=$(cat /sys/class/net/$iface/device/device 2>/dev/null)
 			if [ "$vendor" != "0x14e4" ]; then
@@ -117,7 +120,8 @@ broadcom_get_vfs()
 broadcom_get_reps()
 {
 	local iface; local pf;
-	for iface in $(ls /sys/devices/virtual/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		local phys_switch_id=$(cat /sys/devices/virtual/net/$iface/phys_switch_id 2>/dev/null)
 		[ -z "$phys_switch_id" ] && continue
 		for pf in $(broadcom_get_pfs); do

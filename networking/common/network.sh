@@ -17,7 +17,7 @@ function select_yum_tool() {
 
 yum=$(select_yum_tool)
 
-trap 'cleanup_swcfg' HUP TERM KILL EXIT
+trap 'cleanup_swcfg' HUP TERM EXIT
 
 # ---------------------- Global variables  ------------------
 
@@ -209,7 +209,8 @@ mac2name()
 	local target=""
 	local ethX=""
 
-	for ethX in `ls /sys/class/net`; do
+	for ethX in /sys/class/net/*; do
+		ethX=$(basename $ethX)
 		# skip virtual device
 		if ethtool -i $ethX 2>/dev/null | grep -q "bus-info: [0-9].*"; then
 			target=`get_iface_mac $ethX`
@@ -899,8 +900,8 @@ change_iface_mtu()
 			;;
 		bridge)
 			local i
-			for i in $(ls /sys/class/net/$iface/brif); do
-				change_iface_mtu $i $value
+			for i in /sys/class/net/$iface/brif/*; do
+				change_iface_mtu $(basename $i) $value
 			done
 			;;
 		openvswitch)
@@ -1704,7 +1705,7 @@ get_iface_sw_port()
 			let exitcode++
 		}
 	done
-	port_list="`echo ${iface_port_array[@]}`" # remove newline
+	port_list="`echo ${iface_port_array[*]}`" # remove newline
 
 	# save and print results
 	[[ "$_switch_name" ]] && eval $_switch_name="'$switch_name'" || echo $switch_name

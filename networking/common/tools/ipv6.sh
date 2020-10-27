@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # Get a length 128 ipv6 address.
 # e.g. you give me 2001:1::44:55:66, i will give you 2001:0001:0000:0000:0000:0044:0055:0066

@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # variables to control some default action
 if [ ! "$JOBID" ]; then

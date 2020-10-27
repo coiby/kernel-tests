@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ###########################################################
 # Mellanox hardware offload settings
@@ -59,7 +59,8 @@ mellanox_setup()
 	done
 	# disable NetworkManager for Mellanox ifaces
 	local iface
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 		if [ "$vendor" != "0x15b3" ]; then
 			continue
@@ -82,7 +83,8 @@ mellanox_get_pfs()
 	[ "$NIC_DEVICE" == "ConnectX-4 Lx" ] && { target="0x1015"; }
 	[ "$NIC_DEVICE" == "MT27800" ] && { target="0x1017"; }
 	[ "$NIC_DEVICE" == "ConnectX-5" ] && { target="0x1017"; }
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 		local device=$(cat /sys/class/net/$iface/device/device 2>/dev/null)
 		if [ "$vendor" != "0x15b3" ]; then
@@ -103,7 +105,8 @@ mellanox_get_vfs()
 	[ "$NIC_DEVICE" == "MT27800" ] && { local VFS_DEVICE="Virtual Function"; target="0x1018"; }
 	[ "$NIC_DEVICE" == "ConnectX-5" ] && { local VFS_DEVICE="Virtual Function"; target="0x1018"; }
 	for pcid in $(lspci -D | grep Mellanox | grep "$VFS_DEVICE" | awk '{print $1}'); do
-		for iface in $(ls /sys/class/net/); do
+		for iface in /sys/class/net/*; do
+			iface=$(basename $iface)
 			local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 			local device=$(cat /sys/class/net/$iface/device/device 2>/dev/null)
 			if [ "$vendor" != "0x15b3" ]; then
@@ -123,7 +126,8 @@ mellanox_get_vfs()
 mellanox_get_reps()
 {
 	local iface; local pf;
-	for iface in $(ls /sys/devices/virtual/net/); do
+	for iface in /sys/devices/virtual/net/*; do
+		iface=$(basename $iface)
 		local phys_switch_id=$(cat /sys/devices/virtual/net/$iface/phys_switch_id 2>/dev/null)
 		[ -z "$phys_switch_id" ] && continue
 		for pf in $(mellanox_get_pfs); do

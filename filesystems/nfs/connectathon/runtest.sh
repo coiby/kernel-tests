@@ -417,7 +417,7 @@ function get_ip_types ()
     local special_server=${server%-*}
 
     if [ -z "$CTHONPROTOCOL" ]; then
-      if [ "$nfsver" -ge 3 -a "$ipv6" -eq 1 ]; then
+      if [[ "$nfsver" -ge 3 ]] && [[ "$ipv6" -eq 1 ]]; then
         _types="tcp tcp6"
       else
         _types="tcp"

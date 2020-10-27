@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ###########################################################
 # Netronome hardware offload settings
@@ -8,7 +8,7 @@ netronome_firmware_update()
 	# update firmware
 	local target=$1; local firmware;
 	pushd /usr/lib/firmware/netronome
-	for firmware in $(ls nic_*.nffw); do
+	for firmware in nic_*.nffw; do
 		test -e $target/$firmware && { rm -f $firmware; ln -s $target/$firmware $firmware; }
 	done
 	popd
@@ -52,7 +52,8 @@ netronome_setup()
 	done
 	# disable NetworkManager for Netronome ifaces
 	local iface
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 		if [ "$vendor" != "0x19ee" ]; then
 			continue
@@ -75,7 +76,8 @@ netronome_get_pfs()
 	local target="0x4000"; local iface;
 	[ "$NIC_DEVICE" == "Device 4000" ] && { target="0x4000"; }
 	[ "$NIC_DEVICE" == "Device 6000" ] && { target="0x6000"; }
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 		local device=$(cat /sys/class/net/$iface/device/device 2>/dev/null)
 		if [ "$vendor" != "0x19ee" ]; then
@@ -96,7 +98,8 @@ netronome_get_vfs()
 	local target="0x6003"; local iface; local pcid;
 	[ "$NIC_DEVICE" == "Device 4000" ] && { local VFS_DEVICE="Device 6003"; target="0x6003"; }
 	for pcid in $(lspci -D | grep Netronome | grep "$VFS_DEVICE" | awk '{print $1}'); do
-		for iface in $(ls /sys/class/net/); do
+		for iface in /sys/class/net/*; do
+			iface=$(basename $iface)
 			local vendor=$(cat /sys/class/net/$iface/device/vendor 2>/dev/null)
 			local device=$(cat /sys/class/net/$iface/device/device 2>/dev/null)
 			if [ "$vendor" != "0x19ee" ]; then

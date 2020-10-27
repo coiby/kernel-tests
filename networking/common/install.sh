@@ -337,7 +337,7 @@ libsctp_static_install()
 	fi
 	popd
 	popd
-	[ -a /usr/include/netinet/sctp.h ] || \ 
+	[ -a /usr/include/netinet/sctp.h ] || \
 	ln -s ${NETWORK_COMMONLIB_DIR}/lksctp-tools/src/include/netinet/sctp.h /usr/include/netinet/sctp.h
 	ln -sf ${NETWORK_COMMONLIB_DIR}/lksctp-tools/src/lib/.libs/libsctp.a /usr/lib64/libsctp.a
 	[ -a /usr/lib64/libsctp.a ] && return 0 || return 1

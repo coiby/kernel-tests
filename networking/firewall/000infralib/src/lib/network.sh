@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ###########################################################
 # network cleaning
@@ -40,7 +40,8 @@ network_link_clean()
 network_addr_clean()
 {
 	local iface;
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		if ip route | grep default | grep -q $iface; then
 			continue
 		fi
@@ -82,7 +83,8 @@ network_set_offload()
 network_show_drivers()
 {
 	local iface;
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=$(basename $iface)
 		if ! ethtool -i $iface > /dev/null 2>&1; then
 			continue
 		fi
