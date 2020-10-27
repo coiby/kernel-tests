@@ -150,7 +150,7 @@ function get_test_cases_rdma
 		testcases+=" nvme/027"
 		testcases+=" nvme/028"
 		testcases+=" nvme/029"
-		testcases+=" nvme/030"
+		uname -ri | grep -q "4.18.0-147.*s390x" || testcases+=" nvme/030" # BZ1753057, skip on 8.1.z fixed on 8.2
 		uname -ri | grep "4.18.0-147" | grep -Eq "s390x|ppc64le|aarch64" || testcases+=" nvme/031"
 	fi
 	echo $testcases
