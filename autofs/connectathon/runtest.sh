@@ -184,11 +184,11 @@ server() {
 	rlRun "mkdir -p $AUTO_SERVER_DIR/export{1..6}; chmod 777 $AUTO_SERVER_DIR"
 	rlRun "echo \"$AUTO_SERVER_DIR  *(rw,insecure,sync,no_root_squash,no_subtree_check)\" >/etc/exports"
 
-	[ -n "ExportSubdir" ] && {
-		for d in $AUTO_SERVER_DIR/export{1..6}; do
-			rlRun "echo \"$d  *(rw,insecure,sync,no_root_squash,no_subtree_check)\" >>/etc/exports"
-		done
-	}
+	# ExportSubdir
+	for d in $AUTO_SERVER_DIR/export{1..6}; do
+		rlRun "echo \"$d  *(rw,insecure,sync,no_root_squash,no_subtree_check)\" >>/etc/exports"
+	done
+
 	yp_server_setup
 	if [ $? -ne 0 ]; then
 		cki_abort_task "Errors on NIS/YP configuration"
