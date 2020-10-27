@@ -103,7 +103,7 @@ EOF
 
     if grep -q 'Fedora' /etc/redhat-release ; then
         # TODO: open BZ: kernel BUG at mm/usercopy.c:99! for upstream kernels
-        sed -ie '/pthread/d' os.stressors
+        sed -ie '/procfs/d' os.stressors
     fi
 
     # stress-ng-dccp is blocked by SELinux (see RHBZ 1459941) on RHEL-7.x with
