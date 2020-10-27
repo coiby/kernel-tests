@@ -17,7 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f ${BASH_SOURCE})
+FILE=$(readlink -f ${BASH_SOURCE[0]})
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 
@@ -31,7 +31,7 @@ start_load_test()
 
     [ ! -e "$BUSY" ] && echo "missing $BUSY" && exit 1
 
-    for ((i=0; i < $cores; ++i)); do
+    for ((i=0; i < cores; ++i)); do
         # if hyperthreading is enabled - only start on the even cores
         [ "$even_only" = true ] && [ $((i % 2)) -eq 1 ] && continue
         bash $BUSY $i &>/dev/null &
@@ -51,7 +51,7 @@ start_load_test()
         result=$(ps -p $pid -o comm=)
         size=${#result}
 
-        if [ $size -eq 0 ]; then
+        if [ "$size" -eq 0 ]; then
             echo "start_load_test: $BUSY is not running!"
             exit 1
         fi
@@ -62,7 +62,7 @@ start_load_test()
 
 end_load_test()
 {
-    if [ ! -z "$STRESSPIDS" ]; then
+    if [ -n "$STRESSPIDS" ]; then
         for pid in $STRESSPIDS; do
             kill $pid
             wait $pid 2>/dev/null
@@ -101,10 +101,10 @@ last_reg=-1
 handle_overflow()
 {
     updated_reg=$1
-    if [ $last_reg -eq -1 ]; then
+    if [ "$last_reg" -eq -1 ]; then
 	last_reg=$updated_reg
     else
-	[ $updated_reg -lt $last_reg ] && updated_reg=$((updated_reg+INTMAX))
+	[ "$updated_reg" -lt "$last_reg" ] && updated_reg=$((updated_reg+INTMAX))
 	last_reg=-1
     fi
 }
@@ -131,12 +131,12 @@ monitor_power()
     curr=$energy
     curr_time=$(date +%s%N | cut -b1-13)
     milliseconds=$((curr_time - last_time))
-    joules=$(echo $curr-$last | bc -l)
+    joules=$(echo "$curr-$last" | bc -l)
     watts=$(echo "$joules*1000/$milliseconds" | bc -l)
     printf "average power use = %5.2f watts over last %d seconds\n" \
            $watts $duration
-    average=$(echo $watts+0.5 | bc -l)
-    average=${average%.*}
+    # Round the average of watts
+    average=$(echo "($watts+0.5)/1" | bc)
 }
 
 trap 'finish' EXIT
@@ -148,8 +148,8 @@ monitor_power
 busy_ave=$average
 end_load_test
 max_expected=$((busy_ave/2))
-if [ $idle_ave -ge $max_expected ]; then
-    if [[ $idle_ave -lt $busy_ave ]] && [[ $busy_ave -lt 20 ]]; then
+if [ "$idle_ave" -ge "$max_expected" ]; then
+    if [[ "$idle_ave" -lt "$busy_ave" ]] && [[ "$busy_ave" -lt 20 ]]; then
 	echo "SKIP - system power draw is too low"
 	exit 2
     fi
