@@ -2,28 +2,40 @@
 #
 # Install packages according to metadata file
 #
+set -euo pipefail
 
 function get_pkgs
 {
-    typeset metadata_file=${1?"*** metadata file ***"}
-    # cki_lib/libcki.sh depends on beakerlib
-    typeset pkgs="beakerlib"
-    typeset keyword=""
-    for keyword in "dependencies" "softDependencies"; do
-        typeset _pkgs
-        typeset kv=$(grep -E "^${keyword}=" "$metadata_file")
-        [[ -z "$kv" ]] && continue
+    local metadata_file=${1?"*** metadata file ***"}
+    local keyword="$2"
+    local pkgs=""
 
+    typeset _pkgs
+    typeset kv=$(grep -E "^${keyword}=" "$metadata_file")
+    if [[ -n "$kv" ]]; then
         # convert ';' to ',' as a new var $keyword will be created via eval
         kv="${kv//;/,}"
         # strip comment starting with '#'
         eval "$kv"
 
+        # shellcheck disable=SC2086
         eval _pkgs=\$${keyword}
         pkgs+=" ${_pkgs//,/ }"
-        unset _pkgs $keyword
-    done
+    fi
+
     echo "$pkgs"
+}
+
+function get_deps_pkgs
+{
+    local metadata_file="$1"
+    get_pkgs "$metadata_file" "dependencies"
+}
+
+function get_soft_deps_pkgs
+{
+    local metadata_file="$1"
+    get_pkgs "$metadata_file" "softDependencies"
 }
 
 function get_pkg_mgr
@@ -57,8 +69,9 @@ if [[ ! -f "$metadata_file" ]]; then
     exit 1
 fi
 
-pkgs=$(get_pkgs "$metadata_file")
-if [[ -z "$pkgs" ]]; then
+pkgs_deps=$(get_deps_pkgs "$metadata_file")
+pkgs_soft_deps=$(get_soft_deps_pkgs "$metadata_file")
+if [[ -z "$pkgs_deps" ]] && [[ -z "$pkgs_soft_deps" ]]; then
     echo "Packages to install not found" >&2
     exit 0
 fi
@@ -66,10 +79,22 @@ fi
 pkg_mgr=$(get_pkg_mgr)
 if [[ $dry_run == "yes" ]]; then
     echo "=== DRY RUN ==="
-    echo "$pkg_mgr -y install $pkgs"
+    if [[ -n "$pkgs_deps" ]]; then
+        echo "$pkg_mgr -y install $pkgs_deps"
+    fi
+    if [[ -n "$pkgs_soft_deps" ]]; then
+        echo "$pkg_mgr -y install --skip-broken $pkgs_soft_deps"
+    fi
     exit 0
 fi
-echo "Now install packages <$pkgs>, please wait for a while ..."
-# shellcheck disable=SC2086
-$pkg_mgr -y install $pkgs
+if [[ -n "$pkgs_deps" ]]; then
+    echo "Now install packages <$pkgs_deps >, please wait for a while ..."
+    # shellcheck disable=SC2086
+    $pkg_mgr -y install $pkgs_deps
+fi
+if [[ -n "$pkgs_soft_deps" ]]; then
+    echo "Now try to install extra packages <$pkgs_soft_deps >, please wait for a while ..."
+    # shellcheck disable=SC2086
+    $pkg_mgr -y install --skip-broken $pkgs_soft_deps
+fi
 exit $?
