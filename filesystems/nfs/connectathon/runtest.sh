@@ -126,7 +126,7 @@ function checkServers ()
                 echo "Not found online nfs server from the list, aborting the task" | tee -a $OUTPUTFILE
                 rstrnt-report-result $TEST WARN/ABORTED
                 # Abort the task
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 0
             else
                 # Found online nfs servers
@@ -163,7 +163,7 @@ function checkServers ()
                 # nfs server list is empty
                 echo "nfs server list is empty, aborting the task" | tee -a $OUTPUTFILE
                 # Abort the task
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
             fi
         fi
         exit 0
@@ -379,7 +379,7 @@ function get_supported_server_versions ()
                 rstrnt-report-result server_unexpected_v41_mount_err WARN/ABORTED
                 if  is_run_byci ; then
                     # Abort the task
-                   rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+                   rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                    exit 0
                 fi
 
@@ -393,7 +393,7 @@ function get_supported_server_versions ()
             rstrnt-report-result NoSupportedNFSVersions WARN/ABORTED
             if  is_run_byci ; then
                 # Abort the task
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 0
             fi
     fi
@@ -584,7 +584,7 @@ if [ $? -ne 0 ]; then
     echo "WARN : Failed cloning $LOOKASIDE_DEFAULT" | tee -a $OUTPUTFILE
     rstrnt-report-result $TEST WARN
     # Abort the task
-    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 0
 fi
 
@@ -600,7 +600,7 @@ if [ $? -ne 0 ]; then
     echo "WARN : Failed patching/compiling $CONNECTATHON_SRCDIR" | tee -a $OUTPUTFILE
     rstrnt-report-result $TEST WARN
     # Abort the task
-    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 0
 fi
 popd

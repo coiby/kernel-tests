@@ -51,7 +51,7 @@ function nvdimm_test_module_setup
 	rlRun "make -C /lib/modules/$(uname -r)/build M=$PWD modules_install"
 	if (( $? != 0 )); then
 		rlLog "Abort test because nvdimm test module setup failed"
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 	rlRun "popd"
 }
@@ -102,7 +102,7 @@ function ndctl_setup
 	rlRun "./configure CFLAGS='-g -O2' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib64 --disable-docs --enable-test"
 	if (( $? != 0 )); then
 		rlLog "Abort test because ndctl setup failed"
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status
+		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 	rlRun "popd"
 }
