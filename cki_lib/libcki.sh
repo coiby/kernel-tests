@@ -23,7 +23,7 @@ if [ -z "$FAMILY" ]; then
 fi
 
 # Set RHTS REBOOTCOUNT to Restraint compatiable environent variable
-REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
+export REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 
 # Set well-known logname so users can easily find
 # current tasks log file.  This well-known file is also
