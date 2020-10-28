@@ -102,7 +102,8 @@ EOF
     fi
 
     if grep -q 'Fedora' /etc/redhat-release ; then
-        # TODO: open BZ: kernel BUG at mm/usercopy.c:99! for upstream kernels
+        # kernel BUG at mm/usercopy.c:99! for upstream kernels
+        # https://bugzilla.kernel.org/show_bug.cgi?id=209919
         sed -ie '/procfs/d' os.stressors
     fi
 
