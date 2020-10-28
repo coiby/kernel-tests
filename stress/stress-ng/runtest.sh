@@ -54,7 +54,7 @@ CLASSES="interrupt cpu cpu-cache memory os"
 
 rlPhaseStartSetup
     # if stress-ng triggers a panic and reboot, then abort the test
-    if [ $REBOOTCOUNT -ge 1 ] ; then
+    if [ $RSTRNT_REBOOTCOUNT -ge 1 ] ; then
         rlDie "Aborting due to system crash and reboot"
         rstrnt-abort -t recipe
     fi
