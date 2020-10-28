@@ -140,7 +140,7 @@ function get_test_cases_tcp
 		testcases+=" nvme/027"
 		testcases+=" nvme/028"
 		testcases+=" nvme/029"
-		testcases+=" nvme/030"
+		uname -ri | grep -q "4.18.0-147.*s390x" || testcases+=" nvme/030" # BZ1753057, skip on 8.1.z fixed on 8.2
 		uname -ri | grep "4.18.0-147" | grep -qE "x86_64|s390x|ppc64le" || testcases+=" nvme/031"
 
 	fi
