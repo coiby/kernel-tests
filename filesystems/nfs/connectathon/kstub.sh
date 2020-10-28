@@ -218,8 +218,8 @@ function ReportStatus ()
 # then we can update this function to check variables
 function K_CheckRebootCount ()
 {
-    if [ -n "$REBOOTCOUNT" ]; then
-        if [ "$REBOOTCOUNT" -gt "0" ]; then
+    if [ -n "$RSTRNT_REBOOTCOUNT" ]; then
+        if [ "$RSTRNT_REBOOTCOUNT" -gt "0" ]; then
             echo "" | tee -a $OUTPUTFILE
             echo "***** System rebooted *****" | tee -a $OUTPUTFILE
             echo "***** Check logs for oops or panic *****" | tee -a $OUTPUTFILE
