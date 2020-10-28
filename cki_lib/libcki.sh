@@ -22,6 +22,9 @@ if [ -z "$FAMILY" ]; then
     FAMILY=$(sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g' /etc/redhat-release)
 fi
 
+# Set RHTS REBOOTCOUNT to Restraint compatiable environent variable
+REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
+
 # Set well-known logname so users can easily find
 # current tasks log file.  This well-known file is also
 # used by the local watchdog to upload the log

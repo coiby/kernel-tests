@@ -181,7 +181,7 @@ ltp_lite_end()
 }
 
 # ---------- Start Test -------------
-if [ "${REBOOTCOUNT}" -ge 1 ]; then
+if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
 	echo "===== Test has already been run,
 	Check logs for possible failures ======"
 	rstrnt-report-result CHECKLOGS FAIL 99

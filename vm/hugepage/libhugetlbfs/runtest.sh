@@ -225,7 +225,7 @@ EOF
 
     free_hugepages=`cat /proc/meminfo | grep HugePages_Free | awk '{ print $2 }'`
     if [[ x"${ARCH}" == "xaarch64" ]]; then
-       if [[ x"${HPSIZE}" == "x512M" && ${free_hugepages} -lt $HPCOUNT && ( -z "${REBOOTCOUNT}" || ${REBOOTCOUNT} -eq 0 ) ]]; then
+       if [[ x"${HPSIZE}" == "x512M" && ${free_hugepages} -lt $HPCOUNT && ( -z "${RSTRNT_REBOOTCOUNT}" || ${RSTRNT_REBOOTCOUNT} -eq 0 ) ]]; then
 	  rlLog "Have ${free_hugepages} free hugepages of ${HPCOUNT} needed.  Rebooting with 2M hugepages"
 	  grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
 	  rstrnt-reboot

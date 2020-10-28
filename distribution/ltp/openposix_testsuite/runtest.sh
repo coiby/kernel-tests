@@ -8,7 +8,7 @@
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
 
-if [ -z "$REBOOTCOUNT" ]; then
+if [ -z "$RSTRNT_REBOOTCOUNT" ]; then
     REBOOTCOUNT=0
 fi
 
@@ -16,7 +16,7 @@ cver=$(uname -r)
 echo "Current kernel is: $cver" | tee -a $OUTPUTFILE
 
 # ---------- Start Test -------------
-if [ "${REBOOTCOUNT}" -ge 1 ]; then
+if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
     echo "============ Test has already been run, Check logs for possible failures ============" | tee -a $OUTPUTFILE
     rstrnt-report-result CHECKLOGS  WARN/ABORTED
     rstrnt-abort -t recipe
