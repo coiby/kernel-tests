@@ -1,4 +1,4 @@
-# storage/blk-mq/mq-sche test suite
+# storage/block/mq_sche test suite
 
 Storage: block queue scheduler test
 Test Maintainer: [Changhui Zhong](mailto:czhong@redhat.com)
