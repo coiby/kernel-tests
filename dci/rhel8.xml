@@ -1,0 +1,78 @@
+<job retention_tag="scratch">
+  <whiteboard>DCI: CKI Kernel Testing - RHEL8</whiteboard>
+  <recipeSet priority="Normal">
+    <recipe whiteboard="" role="None" ks_meta="harness='restraint-rhts beakerlib'" kernel_options="" kernel_options_post="">
+      <autopick random="false"/>
+      <watchdog panic="None"/>
+      <packages/>
+      <ks_appends/>
+      <repos/>
+      <distroRequires>
+        <and>
+          <distro_family op="=" value="RedHatEnterpriseLinux8"/>
+          <distro_variant op="=" value="BaseOS"/>
+          <distro_arch op="=" value="x86_64"/>
+        </and>
+      </distroRequires>
+      <hostRequires>
+        <system_type value="Machine"/>
+      </hostRequires>
+      <partitions/>
+      <task name="/test/misc/machineinfo">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#test/misc/machineinfo"/>
+      </task>
+      <task name="LTP" role="STANDALONE">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#distribution/ltp/lite"/>
+        <dependencies>
+          <dependency url="https://github.com/linux-test-project/ltp/releases/download/20200515/ltp-full-20200515.tar.bz2"/>
+        </dependencies>
+        <params>
+          <param name="CKI_NAME" value="LTP lite"/>
+          <param name="CKI_MAINTAINERS" value="Memory Management &lt;mm-qe@redhat.com&gt;, Jan Stancek &lt;jstancek@redhat.com&gt;"/>
+          <param name="CKI_SELFTESTS_URL" value=""/>
+          <param name="KILLTIMEOVERRIDE" value="14400"/>
+        </params>
+      </task>
+      <task name="ACPI table test" role="STANDALONE">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#acpi/acpitable"/>
+        <params>
+          <param name="CKI_NAME" value="ACPI table test"/>
+          <param name="CKI_UNIVERSAL_ID" value="redhat_acpi_table"/>
+          <param name="CKI_MAINTAINERS" value="Al Stone &lt;ahs3@redhat.com&gt;"/>
+          <param name="CKI_SELFTESTS_URL" value=""/>
+          <param name="KILLTIMEOVERRIDE" value="600"/>
+        </params>
+      </task>
+      <task name="Memory function: memfd_create" role="STANDALONE">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#memory/function/memfd_create"/>
+        <params>
+          <param name="CKI_NAME" value="Memory function: memfd_create"/>
+          <param name="CKI_UNIVERSAL_ID" value="redhat_memfd_create"/>
+          <param name="CKI_MAINTAINERS" value="Memory Management &lt;mm-qe@redhat.com&gt;"/>
+          <param name="CKI_SELFTESTS_URL" value=""/>
+          <param name="KILLTIMEOVERRIDE" value="3600"/>
+        </params>
+      </task>
+      <task name="load/unload kernel module test" role="STANDALONE">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#misc/module-load"/>
+        <params>
+          <param name="CKI_NAME" value="load/unload kernel module test"/>
+          <param name="CKI_UNIVERSAL_ID" value="redhat_module_load_unload"/>
+          <param name="CKI_MAINTAINERS" value="Jeff Bastian &lt;jbastian@redhat.com&gt;"/>
+          <param name="CKI_SELFTESTS_URL" value=""/>
+          <param name="KILLTIMEOVERRIDE" value="840"/>
+        </params>
+      </task>
+      <task name="Trinity Fuzzer - Tier0" role="STANDALONE">
+        <fetch url="git://git.host.prod.eng.bos.redhat.com/kernel-tests#general/process/trinity_git"/>
+        <params>
+          <param name="CKI_NAME" value="Trinity Fuzzer - Tier0"/>
+          <param name="CKI_WAIVED" value="True"/>
+          <param name="CKI_MAINTAINERS" value="Memory Management &lt;mm-qe@redhat.com&gt;, Chunyu Hu &lt;chuhu@redhat.com&gt;"/>
+          <param name="CKI_SELFTESTS_URL" value=""/>
+          <param name="KILLTIMEOVERRIDE" value="4200"/>
+        </params>
+      </task>
+    </recipe>
+  </recipeSet>
+</job>
