@@ -289,6 +289,7 @@ function install_xfstests_git_upstream ()
 	cd "$repo"
 	make
 	rm -f configure
+	rm -fr tests/ceph/
 	make && make install
 	res=$?
 	cd ..
