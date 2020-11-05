@@ -36,7 +36,7 @@ SKIP=4
 LOG_ONCE=0
 EXEC_DIR="$PWD/selftests"
 TOTAL_MEM=$(free -m | awk '/Mem/ {print $2}')
-TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding netfilter bpf bpf_test_progs tc-testing"}
+TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding netfilter bpf bpf_test_progs tc-testing kvm"}
 DEFAULT_IFACE=$(ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}')
 
 debug_info()
@@ -106,16 +106,8 @@ get_test_list()
 
 	pushd $EXEC_DIR &> /dev/null
 
-	if [ $name == "net/forwarding" ]; then
-		test_list=$(find net/forwarding -maxdepth 1 -perm -g=x -type f | sed "s/net\/forwarding\///")
-	else
-		start_line=$(grep -n "cd $name$" run_kselftest.sh | cut -f1 -d:)
-		sed -n "${start_line},$ p" run_kselftest.sh > ${name}.list
-		end_line=$(grep -n "cd \$ROOT" ${name}.list | head -n1 | cut -f1 -d:)
-		sed -i "${end_line},$ d" ${name}.list
-		sed -i "1,2 d" ${name}.list
-		test_list=$(cat ${name}.list | awk -F'"' '{print $2}')
-	fi
+	test_list=$(grep "^$name:"  kselftest-list.txt | cut -f2 -d:)
+
 	popd &> /dev/null
 	echo $test_list
 }
@@ -286,7 +278,7 @@ for item in $TEST_ITEMS; do
 	# deal with bpf/test_progs specially
 	[ "$item" == "bpf_test_progs" ] && run_bpf_test_progs && continue
 
-	grep -q "cd $item$" selftests/run_kselftest.sh || \
+	grep -q "^$item:" selftests/kselftest-list.txt || \
 		{ test_skip "$item test not find in run_kselftest.sh" && continue; }
 
 	pushd $EXEC_DIR/$item
