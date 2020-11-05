@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=bc;gcc;make;patch;rsync
+dependencies=bc;gcc;make;patch;rsync;wget
 repoRequires=cki_lib

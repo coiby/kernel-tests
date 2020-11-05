@@ -167,6 +167,8 @@ function setup
 
     if grep -q "Red Hat Enterprise Linux release 8." /etc/redhat-release; then
         OSVERSION="RHEL8"
+    elif [ ! -z "$CKI_SELFTESTS_URL" ]; then
+        OSVERSION="UPSTREAM"
     else
         OSVERSION="ARK"
     fi
@@ -248,18 +250,14 @@ function setup
     # Test if the KVM parameters were set correctly
     for opt in ${KVM_OPTIONS[*]}; do
         if ! cat $KVM_SYSFS/$opt | egrep -q "Y|y|1"; then
-            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt not set"
-            rstrnt-report-result $TEST WARN
-            rstrnt-abort -t recipe
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] kvm module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
         fi
     done
     for opt in ${KVM_ARCH_OPTIONS[*]}; do
         if ! cat $KVM_ARCH_SYSFS/$opt | egrep -q "Y|y|1"; then
-            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt not set"
-            rstrnt-report-result $TEST WARN
-            rstrnt-abort -t recipe
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] $KVM_ARCH module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt is set"
         fi
