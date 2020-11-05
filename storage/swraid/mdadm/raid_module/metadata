@@ -1,0 +1,12 @@
+[General]
+name=storage/swraid/mdadm/raid_module
+owner=Fan Fan <ffan@redhat.com>
+description=Check the raid module
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=util-linux;coreutils;mdadm
+repoRequires=cki_lib;storage/swraid/common
