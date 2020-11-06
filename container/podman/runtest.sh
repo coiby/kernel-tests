@@ -19,7 +19,7 @@
 
 # Global variables
 ret=0
-BATS_RPM="http://mirrors.kernel.org/fedora/releases/31/Everything/x86_64/os/Packages/b/bats-1.1.0-3.fc31.noarch.rpm"
+BATS_RPM="http://mirrors.kernel.org/fedora/releases/33/Everything/x86_64/os/Packages/b/bats-1.1.0-5.fc33.noarch.rpm"
 TEST_REGISTRY="docker.io"
 TEST_IMAGE_NAME="alpine"
 TEST_IMAGE_TAG="latest"
