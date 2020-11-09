@@ -3,12 +3,36 @@
 . ../../../cki_lib/libcki.sh || exit 1
 . ../include/runtest.sh      || exit 1
 . ../include/knownissue.sh   || exit 1
+. ../include/ltp-make.sh     || exit 1
 
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
 
 core_pattern="$(cat /proc/sys/kernel/core_pattern)"
 core_pattern_ltp_dir="/mnt/testarea/ltp/cores"
+
+PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
+
+function ltp_test_build()
+{
+	download_ltp
+
+	#Patch-inc
+	echo "============ Patch patch-inc-tolerant ==============" | tee -a $OUTPUTFILE
+	patch-inc > patchinc.log 2>&1
+	cat patchinc.log | tee -a $OUTPUTFILE
+
+	echo "============ Patch ltp-lite test suite. ============" | tee -a $OUTPUTFILE
+	bash ./is_baremetal.sh
+	#Patching, if non-baremetal
+	if [ $? -ne 0 ]; then
+		patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
+	fi
+	cp -vf configs/RHELKT1LITE.20200515 RHELKT1LITE
+
+	build-all
+}
+
 
 # prepare_aiodio_scratchspace
 # exports:
@@ -176,9 +200,13 @@ ltp_lite_end()
 		EnableNTP
 	fi
 
-	./grab_corefiles.sh >> $DEBUGLOG 2>&1
+	bash ./grab_corefiles.sh >> $DEBUGLOG 2>&1
 	SubmitLog $DEBUGLOG
 }
+
+
+# Build ltp test
+ltp_test_build
 
 # ---------- Start Test -------------
 if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
@@ -191,13 +219,14 @@ fi
 # report patch errors from ltp/include
 grep -i -e "FAIL" -e "ERROR" patchinc.log > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-	rstrnt-abort -t recipe
+	rstrnt-report-result "ltp-include-patch-errors" WARN/ABORTED
+	rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 fi
 
 # Sometimes it takes too long to waiting for syscalls
 # finish and I want to know whether the compilation is
 # finish or not.
-rstrnt-report-result "install" "PASS"
+rstrnt-report-result "install" PASS
 
 ltp_lite_begin
 
