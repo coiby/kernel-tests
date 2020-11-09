@@ -30,17 +30,10 @@
 
 rlJournalStart
   rlPhaseStartSetup
-    yum=$(cki_get_yum_tool)
-    # Install python3-avocado
-    if rlIsFedora; then
-      rlRun -l "curl https://avocado-project.org/data/repos/avocado-fedora.repo -o /etc/yum.repos.d/avocado.repo"
-    else
-      rlRun -l "curl https://avocado-project.org/data/repos/avocado-el.repo -o /etc/yum.repos.d/avocado.repo"
-    fi
-
-    rlRun -l "$yum -y install python3-avocado"
+    # Install avocado framework
+    pip3 install avocado-framework
     if [ $? -ne 0 ]; then
-      rlLog "Unable to install python3-avocado, aborting test"
+      rlLog "Unable to install avocado framework, aborting test"
       rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     fi
   rlPhaseEnd
