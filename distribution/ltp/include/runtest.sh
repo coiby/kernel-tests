@@ -165,7 +165,7 @@ SubmitLog ()
 {
     LOG=$1
 
-    rstrnt-report-log -S $RESULT_SERVER -T $TESTID -l $LOG
+    rstrnt-report-log -l $LOG
 }
 
 CleanUp ()

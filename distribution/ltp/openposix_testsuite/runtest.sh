@@ -4,12 +4,53 @@
 . ../../../cki_lib/libcki.sh || exit 1
 . ../include/runtest.sh      || exit 1
 . ../include/kvercmp.sh      || exit 1
+. ../include/ltp-make.sh     || exit 1
 
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
 
+function ltp_test_build()
+{
+    download_ltp
+
+    #Patch-inc
+    echo "============ Patch openposx patch-inc ===============" | tee -a $OUTPUTFILE
+    patch-inc > patchinc.log 2>&1
+    cat patchinc.log | tee -a $OUTPUTFILE
+
+    echo "============ Patch openposix test suite =============" | tee -a $OUTPUTFILE
+    #upstream
+    cp -fv patches/pthread_cancel/3-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/pthread_cancel/3-1.c
+    cp -fv patches/pthread_rwlock_rdlock/4-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/pthread_rwlock_rdlock/4-1.c
+
+    if [ "$TESTVERSION"  == "20120822" ]; then
+        cp -fv patches/20120822/pthread_cond_broadcast-1-2.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/pthread_cond_broadcast/1-2.c
+        cp -fv patches/20120822/sigset-6-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/sigset/6-1.c
+        cp -fv patches/20120822/sigset-7-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/sigset/7-1.c
+        cp -fv patches/20120822/pthread_cond_signal-1-1.c $(TARGET)/testcases/open_posix_testsuite/conformance/interfaces/pthread_cond_signal/1-1.c
+    fi
+
+    if [ "$TESTVERSION"  == "20130109" ]; then
+        cp -fv patches/20130109/aio_fsync-2-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/aio_fsync/2-1.c
+        cp -fv patches/20130109/aio_fsync-3-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/aio_fsync/3-1.c
+    fi
+
+    if [ "$TESTVERSION"  == "20130904" ]; then
+        cp -fv patches/20130904/2-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/pthread_attr_setschedpolicy
+    fi
+
+    if [ "$TESTVERSION"  == "20140115" ]; then
+        cp -fv patches/20140115/run-tests.sh ${TARGET}/testcases/open_posix_testsuite/bin
+    fi
+
+    if [ "$TESTVERSION"  == "20140422" ]; then
+        cp -fv patches/20140422/run-tests.sh ${TARGET}/testcases/open_posix_testsuite/bin
+    fi
+}
+
+
 if [ -z "$RSTRNT_REBOOTCOUNT" ]; then
-    REBOOTCOUNT=0
+     RSTRNT_REBOOTCOUNT=0
 fi
 
 cver=$(uname -r)
@@ -19,7 +60,7 @@ echo "Current kernel is: $cver" | tee -a $OUTPUTFILE
 if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
     echo "============ Test has already been run, Check logs for possible failures ============" | tee -a $OUTPUTFILE
     rstrnt-report-result CHECKLOGS  WARN/ABORTED
-    rstrnt-abort -t recipe
+    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
     exit
 fi
 
@@ -27,7 +68,7 @@ fi
 grep -i -e "FAIL" -e "ERROR" patchinc.log > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     rstrnt-report-result "ltp-include-patch-errors" WARN/ABORTED
-    rstrnt-abort -t recipe
+    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
     exit
 fi
 
@@ -53,6 +94,10 @@ if [ $? -eq 0 ]; then
     service chronyd stop
 fi
 DisableNTP
+
+
+# Build ltp test
+ltp_test_build
 
 # START TEST
 opt_dir="$(pwd)/ltp-full-*/testcases/open_posix_testsuite"
@@ -91,7 +136,7 @@ if [ $? -ne 0 ]; then
     bzip2 buildlog.txt
     SubmitLog buildlog.txt.bz2
     rstrnt-report-result build WARN/ABORTED
-    rstrnt-abort -t recipe
+    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
     exit
 else
     rstrnt-report-result build PASS
@@ -155,7 +200,7 @@ done
 # some testcases send signals which result in corefiles by design
 # these are not interesting, unless the testcase failed
 echo "Grabbing core files" | tee -a $DEBUGLOG
-./grab_corefiles.sh $opt_dir $(pwd)/grab_corefiles_excluded_bins.filtered >> $DEBUGLOG 2>&1
+bash ./grab_corefiles.sh $opt_dir $(pwd)/grab_corefiles_excluded_bins.filtered >> $DEBUGLOG 2>&1
 SubmitLog $DEBUGLOG
 echo "Submitted $DEBUGLOG" | tee -a $DEBUGLOG
 
