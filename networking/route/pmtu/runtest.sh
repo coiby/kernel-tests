@@ -68,7 +68,9 @@ rlPhaseEnd
 
 for DO_SEC in $SEC_TYPE
 do
+    netns_clean.sh
     pmtu_test
+    netns_clean.sh
 done
 
 rlJournalEnd
