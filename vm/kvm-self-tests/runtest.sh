@@ -104,31 +104,10 @@ function checkVirtSupport
 function getTests
 {
     # List of tests to run on all architectures
-    ALLARCH_TESTS=()
+    ALL_TESTS=()
     while IFS=  read -r -d $'\0'; do
-        ALLARCH_TESTS+=("$REPLY")
+        ALL_TESTS+=("$REPLY")
     done < <(find ${BINDIR} -maxdepth 1 -type f -executable -printf "%f\0")
-
-    # List of tests to run on x86_64 architecture
-    X86_64_TESTS=()
-    while IFS=  read -r -d $'\0'; do
-        X86_64_TESTS+=("$REPLY")
-    done < <(find ${BINDIR}/x86_64 -maxdepth 1 -type f -executable -printf "x86_64/%f\0")
-
-    # List of tests to run on aarch64 architecture
-    AARCH64_TESTS=()
-    while IFS=  read -r -d $'\0'; do
-        AARCH64_TESTS+=("$REPLY")
-    done < <(find ${BINDIR}/aarch64 -maxdepth 1 -type f -executable -printf "aarch64/%f\0")
-
-    # List of tests to run on ppc64 architecture
-    PPC64_TESTS=()
-
-    # List of tests to run on s390x architecture
-    S390X_TESTS=()
-    while IFS=  read -r -d $'\0'; do
-        S390X_TESTS+=("$REPLY")
-    done < <(find ${BINDIR}/s390x -maxdepth 1 -type f -executable -printf "s390x/%f\0")
 }
 
 function disableTests
@@ -138,18 +117,11 @@ function disableTests
     # Disable tests for RHEL8 Kernel (4.18.X)
     if [[ $OSVERSION == "RHEL8" ]]; then
 
-        # Disabled tests for AMD systems
-        if [[ $CPUTYPE == "AMD" ]]; then
-            # Disable test smm_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1850663
-            mapfile -d $'\0' -t X86_64_TESTS < <(printf '%s\0' "${X86_64_TESTS[@]}" | grep -Pzv "smm_test")
-        fi
-
         # Disabled s390x tests due to bugs
         if [[ $hwpf == "s390x" ]]; then
             # Disable test dirty_log_test
             # due to https://bugzilla.redhat.com/show_bug.cgi?id=1741201
-            mapfile -d $'\0' -t ALLARCH_TESTS < <(printf '%s\0' "${ALLARCH_TESTS[@]}" | grep -Pzv "dirty_log_test")
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "dirty_log_test")
         fi
     fi
 
@@ -164,6 +136,8 @@ function setup
 
     if grep -q "Red Hat Enterprise Linux release 8." /etc/redhat-release; then
         OSVERSION="RHEL8"
+    elif [ ! -z "$CKI_SELFTESTS_URL" ]; then
+        OSVERSION="UPSTREAM"
     else
         OSVERSION="ARK"
     fi
@@ -243,18 +217,14 @@ function setup
     # Test if the KVM parameters were set correctly
     for opt in ${KVM_OPTIONS[*]}; do
         if ! cat $KVM_SYSFS/$opt | egrep -q "Y|y|1"; then
-            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt not set"
-            rstrnt-report-result $TEST WARN
-            rstrnt-abort -t recipe
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] kvm module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
         fi
     done
     for opt in ${KVM_ARCH_OPTIONS[*]}; do
         if ! cat $KVM_ARCH_SYSFS/$opt | egrep -q "Y|y|1"; then
-            rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt not set"
-            rstrnt-report-result $TEST WARN
-            rstrnt-abort -t recipe
+            rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] $KVM_ARCH module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt is set"
         fi
@@ -268,25 +238,62 @@ function setup
     fi
 
     rlRun "cd $TMPDIR"
-    if [ -x /usr/bin/dnf ]; then
-        dnf download ${pkg} --source > /dev/null 2>&1
-    elif [ -x /usr/bin/yum ]; then
-        yum download ${pkg} --source > /dev/null 2>&1
+    if [ ! "$CKI_SELFTESTS_URL" ] ; then
+        if [ -x /usr/bin/dnf ]; then
+            dnf download ${pkg} --source > /dev/null 2>&1
+        elif [ -x /usr/bin/yum ]; then
+            yum download ${pkg} --source > /dev/null 2>&1
+        fi
+        if [ ! -f $TMPDIR/${pkg}.src.rpm ]; then
+            rlFetchSrcForInstalled $pkg
+        fi
+        typeset rpmfile=$(ls -1 $TMPDIR/${pkg}.src.rpm)
+        rlAssertExists $rpmfile
+
+        rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile > /dev/null 2>&1" 0
+
+        typeset linux_tarball=$(find $TMPDIR -name "linux*.tar.xz")
+        rlAssertExists $linux_tarball
+
+        typeset tarball_dirname=$(dirname $linux_tarball)
+        rlRun "cd $tarball_dirname"
+        rlRun "tar Jxf $linux_tarball > /dev/null 2>&1"
+
+        typeset linux_srcdir=$(find $TMPDIR -type d -a -name "linux-*")
+        typeset tests_srcdir="$linux_srcdir/tools/testing/selftests/kvm"
+        typeset outputdir="${BINDIR}"
+        typeset hwpf=$(uname -i)
+
+        rlAssertExists $tests_srcdir
+        rlAssertExists ${BINDIR}
+
+        #
+        # XXX: Apply a patch because case 'dirty_log_test' fails to be built, which
+        #      is because patch [1] is missed when backporting to RHEL8 repo. Note
+        #      we should remove the workaround if the case is fixed.
+        #      [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=07a262cc
+        #
+        # This patch was merged in version 4.18.0-97.el8 only earlier versions need to apply it
+        rlTestVersion "${RELEASE}" "<" "4.18.0-97.el8"
+        if (( $? == 0)); then
+            rlRun "patch -d $linux_srcdir -p1 < patches/bitmap.h.patch" 0 \
+                  "Patching via patches/bitmap.h.patch"
+        fi
+
+        # Build tests
+        [[ $hwpf == "x86_64" ]] && ARCH="x86_64"
+        [[ $hwpf == "aarch64" ]] && ARCH="arm64"
+        [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]] && ARCH="powerpc"
+        [[ $hwpf == "s390x" ]] && ARCH="s390"
+        rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm"
+        rlRun "mv ${BINDIR}/x86_64/* ${BINDIR} && rm -rf ${BINDIR}/x86_64"
+        rlRun "mv ${BINDIR}/s390x/* ${BINDIR} && rm -rf ${BINDIR}/s390x"
+        rlRun "mv ${BINDIR}/aarch64/* ${BINDIR} && rm -rf ${BINDIR}/aarch64"
+    else
+        rlRun "wget --no-check-certificate $CKI_SELFTESTS_URL -O kselftest.tar.gz"
+        rlRun "tar zxf kselftest.tar.gz"
+        rlRun "cp kvm/* ${BINDIR}"
     fi
-    if [ ! -f $TMPDIR/${pkg}.src.rpm ]; then
-        rlFetchSrcForInstalled $pkg
-    fi
-    typeset rpmfile=$(ls -1 $TMPDIR/${pkg}.src.rpm)
-    rlAssertExists $rpmfile
-
-    rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile > /dev/null 2>&1" 0
-
-    typeset linux_tarball=$(find $TMPDIR -name "linux*.tar.xz")
-    rlAssertExists $linux_tarball
-
-    typeset tarball_dirname=$(dirname $linux_tarball)
-    rlRun "cd $tarball_dirname"
-    rlRun "tar Jxf $linux_tarball > /dev/null 2>&1"
 
     rlRun "popd"
     rlPhaseEnd
@@ -297,44 +304,12 @@ function runtest
     rlPhaseStartTest
     rlRun "pushd '.'"
 
-    typeset linux_srcdir=$(find $TMPDIR -type d -a -name "linux-*")
-    typeset tests_srcdir="$linux_srcdir/tools/testing/selftests/kvm"
-    typeset outputdir="${BINDIR}"
-    typeset hwpf=$(uname -i)
-
-    rlAssertExists $tests_srcdir
-    rlAssertExists ${outputdir}
-
-    #
-    # XXX: Apply a patch because case 'dirty_log_test' fails to be built, which
-    #      is because patch [1] is missed when backporting to RHEL8 repo. Note
-    #      we should remove the workaround if the case is fixed.
-    #      [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=07a262cc
-    #
-    # This patch was merged in version 4.18.0-97.el8 only earlier versions need to apply it
-    rlTestVersion "${RELEASE}" "<" "4.18.0-97.el8"
-    if (( $? == 0)); then
-        rlRun "patch -d $linux_srcdir -p1 < patches/bitmap.h.patch" 0 \
-              "Patching via patches/bitmap.h.patch"
-    fi
-
-    # Build tests
-    [[ $hwpf == "x86_64" ]] && ARCH="x86_64"
-    [[ $hwpf == "aarch64" ]] && ARCH="arm64"
-    [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]] && ARCH="powerpc"
-    [[ $hwpf == "s390x" ]] && ARCH="s390"
-    rlRun "make -C ${tests_srcdir} OUTPUT=${outputdir} ARCH=${ARCH} TARGETS=kvm"
-
     # Prepare lists of tests to run
     getTests
     disableTests
 
     # Run tests
-    for test in ${ALLARCH_TESTS[*]}; do rlRun "${outputdir}/${test}" 0,4; done
-    [[ $hwpf == "x86_64" ]] && for test in ${X86_64_TESTS[*]}; do rlRun "${outputdir}/${test}" 0,4;  done
-    [[ $hwpf == "aarch64" ]] && for test in ${AARCH64_TESTS[*]}; do rlRun "${outputdir}/${test}" 0,4;  done
-    [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]] && for test in ${PPC64_TESTS[*]}; do rlRun "${outputdir}/${test}" 0,4; done
-    [[ $hwpf == "s390x" ]] &&  for test in ${S390X_TESTS[*]}; do rlRun "${outputdir}/${test}" 0,4; done
+    for test in ${ALL_TESTS[*]}; do rlRun "${BINDIR}/${test}" 0,4; done
 
     rlRun "popd"
     rlPhaseEnd
