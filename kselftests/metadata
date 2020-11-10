@@ -1,0 +1,13 @@
+[General]
+name=kselftests
+owner=Hangbin Liu <haliu@redhat.com>
+description=test wrapper for kernel selftest
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=tar;autoconf;automake;wget;bison;bpftool;flex;python3;llvm;iproute-tc;clang;jq
+softDependencies=netsniff-ng;valgrind;numactl-libs
+repoRequires=cki_lib

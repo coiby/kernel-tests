@@ -1,4 +1,7 @@
 #!/bin/bash
+
+TEST="kselftests"
+
 [ ! "$RSTRNT_JOBID" ] && rm -rf logs && mkdir logs && export LOG_DIR="$PWD/logs"
 
 if [ ! "$RSTRNT_JOBID" ]; then
