@@ -11,6 +11,13 @@ COUNT=0
 echo -e "\n****Running : Counting the number of ethernet devices"
 for netdev in /sys/class/net/*
 do
+        #
+        # Skip any virtual netdev
+        #
+	if [ -e /sys/devices/virtual/net/$(basename ${netdev}) ]
+	then
+		continue
+	fi
 	if [ "$(cat ${netdev}/type)" == "1" ]
 	then
 		COUNT=$(($COUNT + 1))
@@ -34,6 +41,14 @@ fi
 echo -e "\n****Running : 'ethtool -i' against each ethernet device"
 for netdev in /sys/class/net/*
 do
+        #
+        # Skip any virtual netdev
+        #
+	if [ -e /sys/devices/virtual/net/$(basename ${netdev}) ]
+	then
+		continue
+	fi
+
         #
         # Check if type == 1 (ethernet)
         #
