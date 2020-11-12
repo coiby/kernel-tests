@@ -286,9 +286,9 @@ function setup
         [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]] && ARCH="powerpc"
         [[ $hwpf == "s390x" ]] && ARCH="s390"
         rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm"
-        rlRun "mv ${BINDIR}/x86_64/* ${BINDIR} && rm -rf ${BINDIR}/x86_64"
-        rlRun "mv ${BINDIR}/s390x/* ${BINDIR} && rm -rf ${BINDIR}/s390x"
-        rlRun "mv ${BINDIR}/aarch64/* ${BINDIR} && rm -rf ${BINDIR}/aarch64"
+        rlRun "mv ${BINDIR}/x86_64/* ${BINDIR} ; rm -rf ${BINDIR}/x86_64"
+        rlRun "mv ${BINDIR}/s390x/* ${BINDIR} ; rm -rf ${BINDIR}/s390x"
+        rlRun "mv ${BINDIR}/aarch64/* ${BINDIR} ; rm -rf ${BINDIR}/aarch64"
     else
         rlRun "wget --no-check-certificate $CKI_SELFTESTS_URL -O kselftest.tar.gz"
         rlRun "tar zxf kselftest.tar.gz"
