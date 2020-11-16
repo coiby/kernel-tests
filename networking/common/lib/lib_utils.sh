@@ -17,7 +17,7 @@ then
 	
 	rstrnt-report-log()
 	{
-		echo :: $FUNCNAME $@
+		echo ":: $FUNCNAME $*"
 	}
 
 	# get NIC(s) for test by NIC_NUM and NIC_TEST

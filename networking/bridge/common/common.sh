@@ -20,7 +20,7 @@
 
 log()
 {
-        echo $@ | tee -a $OUTPUTFILE
+        echo "$@" | tee -a $OUTPUTFILE
 }
 
 br_setup() 
@@ -70,9 +70,9 @@ br_check()
         if [ $mtu = 1400 ]; then
                 rstrnt-report-result $TEST/decrease_mtu "PASS" 0
         fi
-        for eth in `ls /sys/class/net/$br/brif/`
+        for eth in /sys/class/net/$br/brif/*
         do
-                ifconfig $eth mtu 1800
+                ifconfig $(basename $eth) mtu 1800
         done
         mtu=`cat /sys/class/net/$br/mtu`
         if [ $mtu = 1800 ]; then

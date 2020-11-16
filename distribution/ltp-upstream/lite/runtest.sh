@@ -19,9 +19,9 @@ function test_msg()
 	case $1 in
 		pass) echo "PASS: $2" ;;
 		warn) echo "WARN: $2" ;;
-		fail) echo "FAIL: $2"; exit -1 ;;
+		fail) echo "FAIL: $2"; exit 1 ;;
 		 log) echo "LOG : $2" ;;
-		   *) echo "EXIT: Wrong parameters"; exit -2 ;;
+		   *) echo "EXIT: Wrong parameters"; exit 2 ;;
 	esac
 }
 

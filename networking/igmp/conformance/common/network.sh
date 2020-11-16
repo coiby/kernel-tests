@@ -44,7 +44,8 @@ mac2name()
     local target=""
     local ethX=""
 
-    for ethX in `ls /sys/class/net`; do
+    for ethX in /sys/class/net/*; do
+        ethX=$(basename $ethX)
         # skip virtual device
         if ethtool -i $ethX 2>/dev/null | grep -q "bus-info: [0-9].*"; then
             target=`get_iface_mac $ethX`

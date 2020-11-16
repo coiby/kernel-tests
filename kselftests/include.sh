@@ -39,7 +39,7 @@ log()
 
 submit_log()
 {
-	for file in $@; do
+	for file in "$@"; do
 		[ "$RSTRNT_JOBID" ] && rstrnt-report-log -l $file || cp $file $LOG_DIR/
 	done
 }

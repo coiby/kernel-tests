@@ -32,7 +32,7 @@ source $MH_INFRA_ROOT/src/packet/sock.sh
 latency()
 {
 	local latency=0
-	for entry in $@; do
+	for entry in "$@"; do
 		if [ $entry == "nw" ]; then
 			[ "$MH_INFRA_TYPE" == "ns" ] && { :; }
 			[ "$MH_INFRA_TYPE" == "vm" ] && { latency=$((latency+1)); }

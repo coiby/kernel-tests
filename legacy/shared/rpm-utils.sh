@@ -122,7 +122,7 @@ function __yum_call()
                         PKG_TARGET=install
                 fi
 
-                if ! (set -x; $PKG_MANAGER ${YUM_ARGS[@]} $PKG_TARGET $pkg -y)
+                if ! (set -x; $PKG_MANAGER "${YUM_ARGS[@]}" $PKG_TARGET $pkg -y)
                 then
                         exit 1
                 fi

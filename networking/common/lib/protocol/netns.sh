@@ -43,8 +43,8 @@ vcommon()
 {
 	CUR_NETNS=$1
 	shift
-	echo -e "\n[$(date '+%T')][$(whoami)]# echo '"$@"' | ip netns exec $CUR_NETNS"
-	echo "source /mnt/tests/kernel/networking/common/include.sh; rm -f /tmp/test_iface; $@" | \
+	echo -e "\n[$(date '+%T')][$(whoami)]# echo '"$*"' | ip netns exec $CUR_NETNS"
+	echo "source /mnt/tests/kernel/networking/common/include.sh; rm -f /tmp/test_iface; $*" | \
 		ip netns exec $CUR_NETNS bash
 }
 
@@ -52,13 +52,13 @@ vrun()
 {
 	CUR_NETNS=$1
 	shift
-	echo -e "\n[$(date '+%T')][$(whoami)]# echo '"$@"' | ip netns exec $CUR_NETNS bash"
+	echo -e "\n[$(date '+%T')][$(whoami)]# echo '"$*"' | ip netns exec $CUR_NETNS bash"
 	#echo "$@" | ip netns exec $CUR_NETNS bash
-	echo $@ | ip netns exec $CUR_NETNS bash
+	echo "$@" | ip netns exec $CUR_NETNS bash
 }
 
 # no need to really cp in netns, just log the cmd
-vcp() { echo -e "\n[$(date '+%T')][$(whoami)]# $@"; }
+vcp() { echo -e "\n[$(date '+%T')][$(whoami)]# $*"; }
 
 env_init()
 {

@@ -99,7 +99,7 @@ function get_ram_dev()
 
 	RAM_DEV=""
 	if lsmod|grep -wq zram;then
-		for i in `ls /dev/zram*`;do
+		for i in /dev/zram*;do
 			if ! cat /proc/mounts /proc/swaps|grep -wq $i;then
 				RAM_DEV=$i
 				break;
@@ -144,7 +144,7 @@ function get_brd_dev()
 
 	RAM_DEV=""
 	if lsmod|grep -wq brd;then
-		for i in `ls /dev/ram*`;do
+		for i in /dev/ram*;do
 			if ! cat /proc/mounts /proc/swaps|grep -wq $i;then
 				if [ "$TEST_DEV" != "$i" ] && [ "$SCRATCH_DEV" != "$i"  ];then
 					RAM_DEV=$i
@@ -1191,7 +1191,7 @@ function update_fstab()
 	local uuid
 	uuid=`blkid $dev | sed -n 's;.*UUID=\"\([[:graph:]]*\)\".*;\1;p'`
 	sed -i "/${dev##*/}[[:blank:]]*/d" /etc/fstab
-	sed -i "/UUID=$uuid[[:blank:]]*/d" /etc/fstab
+	sed -i "/UUID=${uuid}[[:blank:]]*/d" /etc/fstab
 
 	echo "$dev $mnt $type defaults 0 0" >> /etc/fstab
 	return 0

@@ -1,28 +1,28 @@
-#!/bin/sh
+#!/bin/bash
 
 ping_pass()
 {
 	local field
-	for field in $@; do
+	for field in "$@"; do
 		ipcalc -c4s $field > /dev/null 2>&1 && { local cmd="ping"; break; }
 		ipcalc -c6s $field > /dev/null 2>&1 && { local cmd="ping6"; break; }
 	done
-	wait_pass $cmd $@
+	wait_pass $cmd "$@"
 }
 ping_fail()
 {
 	local field
-	for field in $@; do
+	for field in "$@"; do
 		ipcalc -c4s $field > /dev/null 2>&1 && { local cmd="ping"; break; }
 		ipcalc -c6s $field > /dev/null 2>&1 && { local cmd="ping6"; break; }
 	done
-	wait_fail $cmd $@
+	wait_fail $cmd "$@"
 }
 wait_pass()
 {
 	local result=1
 	for count in $(seq 30); do
-		$@ && { result=0; break; }
+		"$@" && { result=0; break; }
 	done
 	return $result
 }
@@ -30,7 +30,7 @@ wait_fail()
 {
 	local result=1
 	for count in $(seq 30); do
-		$@ || { result=0; break; }
+		"$@" || { result=0; break; }
 	done
 	return $result
 }

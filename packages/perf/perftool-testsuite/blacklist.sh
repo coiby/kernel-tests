@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # This is a list of test exceptions for perftool-testsuite, see
 # expected_result() in runtest.sh to see how it is currently used.
 

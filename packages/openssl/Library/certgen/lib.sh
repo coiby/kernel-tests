@@ -2364,7 +2364,7 @@ x509Key() {
                 fi
                 options=("${options[@]}" -nocerts)
             fi
-            ${x509OPENSSL} pkcs12 ${options[@]}
+            ${x509OPENSSL} pkcs12 "${options[@]}"
             if [[ $? -ne 0 ]]; then
                 echo "Key export failed" >&2
                 return 1

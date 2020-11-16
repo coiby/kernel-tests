@@ -670,6 +670,7 @@ httpDisableMod() {
 httpRestoreMod() {
     ret=0
 
+    # shellcheck disable=SC2068 # Add double quotes would break this code
     for mod in ${@:-''}; do
         for conf_disabled in ${httpCONFDIR}/conf{,.modules}.d/*${mod}.conf.disabled; do
             if [[ -e $conf_disabled ]]; then

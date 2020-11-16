@@ -381,7 +381,7 @@ function MD_Get_State_RAID()
 
 function create_loop_devices()
 {
-    Create_Loop_Devices $@
+    Create_Loop_Devices "$@"
 }
 
 # ---------------------------------------------------------#
@@ -472,7 +472,7 @@ function local_clean()
                 if [ $? = 0 ];then
                                 echo "have some md don't clean"
 				ls /dev/md* |egrep md[0-9]+
-				for md_name in "$(ls /dev/md* |egrep md[0-9]+)" ;do
+				for md_name in $(ls /dev/md* |egrep md[0-9]+) ;do
 					mdadm --stop $md_name
 					sleep 5
 					echo "$md_name have stop"

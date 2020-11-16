@@ -38,19 +38,19 @@ sync_set()
 	local hn=$(hostname)
 	local result=0
 
-	echo "SYNC_NC: sync_set $@" | tee -a $nc_log
+	echo "SYNC_NC: sync_set $*" | tee -a $nc_log
 
 	case "$peer" in
-		"server" | "SERVER") peer=($(echo $SERVERS));;
-		"client" | "CLIENT") peer=($(echo $CLIENTS));;
+		"server" | "SERVER") peer=($SERVERS);;
+		"client" | "CLIENT") peer=($CLIENTS);;
 		*) peer=($peer)
 	esac
 
 	while (($timeout > 0)) && ((${#peer[*]} > 0)); do
-		for p in $(echo ${peer[@]}); do
+		for p in "${peer[@]}"; do
 			if echo "$state@$hn" | ncat $p 54321 2>>$nc_log; then
 				echo "SYNC_NC: sent \"$state\" to $p" | tee -a $nc_log
-				peer=($(echo ${peer[@]#$p}))
+				peer=(${peer[@]#$p})
 			fi
 			sleep 1
 		done
@@ -58,7 +58,7 @@ sync_set()
 		let timeout=timeout-1
 	done
 
-	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_set $@\"")
+	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_set $*\"")
 
 	# Re-enable tracing if it had been set previously
     [[ "$xtrace_state" == "yes" ]] && set -x
@@ -100,11 +100,11 @@ sync_wait()
 	local timeout=${3:-7200}
 	local result=0
 
-	echo "SYNC_NC: sync_wait $@" | tee -a $nc_log
+	echo "SYNC_NC: sync_wait $*" | tee -a $nc_log
 
 	case "$peer" in
-		"server" | "SERVER") peer=($(echo $SERVERS));;
-		"client" | "CLIENT") peer=($(echo $CLIENTS));;
+		"server" | "SERVER") peer=($SERVERS);;
+		"client" | "CLIENT") peer=($CLIENTS);;
 		*) peer=($peer)
 	esac
 
@@ -114,7 +114,7 @@ sync_wait()
 
 	tmp=$(mktemp)
 	ncat -l 54321 -k > $tmp &
-	echo "SYNC_NC: waiting \"${peer[@]}\"" | tee -a $nc_log
+	echo "SYNC_NC: waiting \"${peer[*]}\"" | tee -a $nc_log
 
 	{
 		while [ -e $tmp ] && (($timeout > 0)) && ((${#peer[*]} > 0)); do
@@ -122,8 +122,8 @@ sync_wait()
 				local s=$(echo $line | awk -F '@' '{print $1}')
 				local h=$(echo $line | awk -F '@' '{print $2}')
 				echo "SYNC_NC: got \"$s\" from $h" | tee -a $nc_log
-				peer=($(echo ${peer[@]#$h}))
-				((${#peer[*]} > 0)) && echo "SYNC_NC: waiting \"${peer[@]}\"" | tee -a $nc_log
+				peer=(${peer[@]#$h})
+				((${#peer[*]} > 0)) && echo "SYNC_NC: waiting \"${peer[*]}\"" | tee -a $nc_log
 			fi
 			#usleep 100
 			sleep 0.0001
@@ -131,7 +131,7 @@ sync_wait()
 		done
 	} < $tmp
 
-	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_wait $@\"")
+	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_wait $*\"")
 
 	sync_cleanup
 	
@@ -160,11 +160,11 @@ sync_wait_choice()
 	local timeout=${4:-7200}
 	local result=0
 
-	echo "SYNC_NC: sync_wait $@" | tee -a $nc_log
+	echo "SYNC_NC: sync_wait $*" | tee -a $nc_log
 
 	case "$peer" in
-		"server" | "SERVER") peer=($(echo $SERVERS));;
-		"client" | "CLIENT") peer=($(echo $CLIENTS));;
+		"server" | "SERVER") peer=($SERVERS);;
+		"client" | "CLIENT") peer=($CLIENTS);;
 		*) peer=($peer)
 	esac
 
@@ -174,7 +174,7 @@ sync_wait_choice()
 
 	tmp=$(mktemp)
 	ncat -l 54321 -k > $tmp &
-	echo "SYNC_NC: waiting \"${peer[@]}\"" | tee -a $nc_log
+	echo "SYNC_NC: waiting \"${peer[*]}\"" | tee -a $nc_log
 
 	{
 		while [ -e $tmp ] && (($timeout > 0)) && ((${#peer[*]} > 0)); do
@@ -184,14 +184,14 @@ sync_wait_choice()
 				if [ "$s" == "$opt_no" ];then
 					echo "SYNC_NC: got \"$s\" from $h" | tee -a $nc_log
 					let result++
-					peer=($(echo ${peer[@]#$h}))
+					peer=(${peer[@]#$h})
 				elif [ "$s" == "$opt_yes" ];then
 					echo "SYNC_NC: got \"$s\" from $h" | tee -a $nc_log
-					peer=($(echo ${peer[@]#$h}))
+					peer=(${peer[@]#$h})
 				else
 					echo " SYNC_NC: warn, got a unexpected option $s from $h"
 				fi
-				((${#peer[*]} > 0)) && echo "SYNC_NC: wait_choice \"${peer[@]}\"" | tee -a $nc_log
+				((${#peer[*]} > 0)) && echo "SYNC_NC: wait_choice \"${peer[*]}\"" | tee -a $nc_log
 			fi
 			#usleep 100
 			sleep 0.0001
@@ -199,7 +199,7 @@ sync_wait_choice()
 		done
 	} < $tmp
 
-	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_wait_choice $@\"")
+	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_wait_choice $*\"")
 
 	sync_cleanup
 	

@@ -59,7 +59,7 @@ test_env_init()
 	array+=('conntrack-tools' 'keepalived')
 	array+=('python3')
 	# array+=('bash-completion')
-	for pkt in ${array[@]}; do
+	for pkt in "${array[@]}"; do
 		rpm -q $pkt || { ${YUM} install $pkt -y; }
 	done
 

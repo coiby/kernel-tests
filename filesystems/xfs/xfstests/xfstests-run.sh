@@ -70,7 +70,7 @@ function check_tests()
 		elif test "$REPORT_PASS" == "1"; then
 			TESTTIME=`grep -w ^$XFSTEST results/check.time | awk '{print $2}'`
 			if [ -f results/$XFSTEST.notrun ]; then
-				XFSTEST="$XFSTEST[notrun]"
+				XFSTEST="${XFSTEST}[notrun]"
 			fi
 			report $XFSTEST PASS $TESTTIME
 		fi

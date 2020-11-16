@@ -69,7 +69,7 @@ log()
 submit_log()
 {
 	[ ! $JOBID ] && return 0
-	for file in $@; do
+	for file in "$@"; do
 		rstrnt-report-log -l $file
 	done
 }
@@ -371,7 +371,7 @@ rstrnt-sync-block()
 	local i
 	shift; shift
 	hosts=($@)
-	for i in ${hosts[@]}; do
+	for i in "${hosts[@]}"; do
 		local key="$i $message"
 		while true; do
 			grep "$key" /tmp/sync_message 2>/dev/null && {
@@ -382,6 +382,6 @@ rstrnt-sync-block()
 			sleep 5
 		done
 	done
-	echo "rstrnt-sync-block -s $message $@ DONE"
+	echo "rstrnt-sync-block -s $message $* DONE"
 }
 fi
