@@ -29,4 +29,3 @@ shell check runtests:
   rules:
     - changes:
       - "**/*.sh"
-  allow_failure: true
