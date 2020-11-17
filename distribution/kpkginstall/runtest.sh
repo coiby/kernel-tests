@@ -140,6 +140,7 @@ function targz_install()
   cki_print_info "Applying architecture-specific workarounds (if needed)"
   case ${ARCH} in
     ppc64|ppc64le)
+      # shellcheck disable=SC2045
       for xname in $(ls /boot/vmlinux-*${KVER}); do
         zname="${xname//x-/z-}"
         mv ${xname} ${zname}
@@ -411,6 +412,7 @@ else
   cki_print_info "Running kernel version string:     ${ckver}"
 
   # Did we get the right kernel running after reboot?
+  # shellcheck disable=SC2076
   if [[ ! " ${valid_kernel_versions[*]} " =~ " ${ckver} " ]]; then
     cki_abort_recipe "Kernel version after reboot (${ckver}) does not match expected version strings!" WARN
   fi
