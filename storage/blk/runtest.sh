@@ -57,6 +57,8 @@ function get_test_result
 			result="PASS"
 		elif [[ $res == *"fail" ]]; then
 			result="FAIL"
+		elif [[ $res == *"not run" ]]; then
+			result="SKIP"
 		else
 			result="OTHER"
 		fi
@@ -83,6 +85,9 @@ function do_test
 	elif [[ $result == "FAIL" ]]; then
 		rstrnt-report-result "$TNAME/tests/$test_case" FAIL 1
 		ret=1
+	elif [[ $result == "SKIP" ]]; then
+		rstrnt-report-result "$TNAME/tests/$test_case" SKIP 0
+		ret=0
 	else
 		rstrnt-report-result "$TNAME/tests/$test_case" WARN 2
 		ret=2
