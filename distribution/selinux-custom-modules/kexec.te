@@ -1,0 +1,14 @@
+
+module kexec 1.0;
+
+require {
+	type kdump_t;
+	type tmp_t;
+	class dir write;
+}
+
+#============= kdump_t ==============
+
+#!!!! This avc is allowed in the current policy
+allow kdump_t tmp_t:dir write;
+
