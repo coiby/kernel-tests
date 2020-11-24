@@ -1,6 +1,6 @@
-# storage/nvme/nvme-tcp test suite
+# storage/blktests/nvme/nvme-rdma test suite
 
-Storage: nvme tcp test
+Storage: nvme rdma test
 Test Maintainer: [Yi Zhang](mailto:yi.zhang@redhat.com)
 
 ## How to run it
@@ -8,7 +8,7 @@ Please refer to the top-level README.md for common dependencies.
 
 ### Install dependencies
 ```bash
-root# bash ../../cki_bin/pkgs_install.sh metadata
+root# bash ../../../cki_bin/pkgs_install.sh metadata
 ```
 
 ### Execute the test

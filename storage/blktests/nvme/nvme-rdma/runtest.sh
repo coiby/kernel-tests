@@ -20,10 +20,10 @@
 FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
-TNAME="storage/nvme/nvme-tcp"
-TRTYPE=${TRTYPE:-"tcp"}
+TNAME="storage/blktests/nvme/nvme-rdma"
+TRTYPE=${TRTYPE:-"rdma"}
 
-source $CDIR/../../../cki_lib/libcki.sh
+source $CDIR/../../../../cki_lib/libcki.sh
 
 function is_rhel7
 {
@@ -110,10 +110,21 @@ function do_test
 	return $ret
 }
 
-function get_test_cases_tcp
+function get_test_cases_rdma
 {
 	typeset testcases=""
-	if ! is_rhel7; then
+	if is_rhel7; then
+		testcases+=" nvme/003" # BZ1872714
+		testcases+=" nvme/004" # BZ1872714
+		testcases+=" nvme/006" # BZ1872714
+		testcases+=" nvme/008"
+		testcases+=" nvme/010"
+		testcases+=" nvme/012"
+		testcases+=" nvme/014"
+		testcases+=" nvme/019"
+		testcases+=" nvme/023"
+		testcases+=" nvme/031"
+	else
 		testcases+=" nvme/003"
 		testcases+=" nvme/004"
 		testcases+=" nvme/005"
@@ -123,11 +134,10 @@ function get_test_cases_tcp
 		testcases+=" nvme/009"
 		testcases+=" nvme/010"
 		testcases+=" nvme/011"
-		# BZ1875640, disable on 8.2.z and 8.3
-		uname -ri | grep -q "4.18.0-193.*x86_64" || grep -q 8.3 /etc/redhat-release || testcases+=" nvme/012"
-		uname -ri | grep -q "4.18.0-147" || testcases+=" nvme/013"
+		uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" nvme/012" # BZ1871774
+		uname -ri | grep -qE "4.18.0-147|4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" nvme/013" # BZ1871774/dislable 013 on 8.1.z
 		testcases+=" nvme/014"
-		uname -ri | grep -q "4.18.0-147" || testcases+=" nvme/015"
+		uname -ri | grep -q "4.18.0-147" || testcases+=" nvme/015" # disable 015 on 8.1.z
 		testcases+=" nvme/018"
 		testcases+=" nvme/019"
 		testcases+=" nvme/020"
@@ -141,8 +151,7 @@ function get_test_cases_tcp
 		testcases+=" nvme/028"
 		testcases+=" nvme/029"
 		uname -ri | grep -q "4.18.0-147.*s390x" || testcases+=" nvme/030" # BZ1753057, skip on 8.1.z fixed on 8.2
-		uname -ri | grep "4.18.0-147" | grep -qE "x86_64|s390x|ppc64le" || testcases+=" nvme/031"
-
+		uname -ri | grep "4.18.0-147" | grep -Eq "s390x|ppc64le|aarch64" || testcases+=" nvme/031"
 	fi
 	echo $testcases
 }

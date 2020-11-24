@@ -20,9 +20,9 @@
 FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
-TNAME="storage/blk"
+TNAME="storage/blktests/blk"
 
-source $CDIR/../../cki_lib/libcki.sh
+source $CDIR/../../../cki_lib/libcki.sh
 
 function is_rhel7
 {
