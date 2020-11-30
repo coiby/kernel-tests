@@ -1,5 +1,7 @@
+---
 include:
-  - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
+  - project: cki-project/containers
+    file: /includes/gitlab-cki.yml
 
 variables:
   GIT_DEPTH: "1"
@@ -9,7 +11,7 @@ default:
   image: registry.gitlab.com/cki-project/containers/mirror/shellcheck-alpine:stable
 
 shell check cki:
-  stage: test
+  stage: 🐛
   before_script:
     - shellcheck --version
     - "# Mock beakerlib.sh to avoid source import errors:"
@@ -17,16 +19,10 @@ shell check cki:
     - touch /usr/share/beakerlib/beakerlib.sh
   script:
     - shellcheck --external-sources --format=gcc cki_*/*.sh
-  rules:
-    - changes:
-      - "cki_*/*.sh"
 
 shell check runtests:
-  stage: test
+  stage: 🐛
   before_script:
     - shellcheck --version
   script:
     - find -name '*.sh' -exec shellcheck --severity=error -f gcc {} +
-  rules:
-    - changes:
-      - "**/*.sh"
