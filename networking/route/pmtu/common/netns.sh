@@ -40,9 +40,29 @@ default_pmtu_setup()
 	ip netns add route0
 	ip netns add route1
 
-	ip link add veth0_client netns client type veth peer name veth0_client_r netns route0
-	ip link add veth0_server netns server type veth peer name veth0_server_r netns route1
-	ip link add veth0_route0 netns route0 type veth peer name veth0_route0_r netns route1
+	# failed to add veth with error "RTNETLINK answers: Operation not permitted" sometimes
+	# but didn't know the root cause, so add veth for multiple time if failed
+	for i in {1..5}
+	do
+		if ip link add veth0_client netns client type veth peer name veth0_client_r netns route0
+		then
+			break
+		fi
+	done
+	for i in {1..5}
+	do
+		if ip link add veth0_server netns server type veth peer name veth0_server_r netns route1
+		then
+			break
+		fi
+	done
+	for i in {1..5}
+	do
+		if ip link add veth0_route0 netns route0 type veth peer name veth0_route0_r netns route1
+		then
+			break
+		fi
+	done
 
 	$CLIENTNS ip link set lo up
 	$CLIENTNS ip link set veth0_client up
