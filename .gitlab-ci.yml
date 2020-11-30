@@ -5,7 +5,8 @@ variables:
   GIT_DEPTH: "1"
 
 default:
-  image: koalaman/shellcheck-alpine:stable
+  # docker.io/koalaman/shellcheck-alpine:stable
+  image: registry.gitlab.com/cki-project/containers/mirror/shellcheck-alpine:stable
 
 shell check cki:
   stage: test
