@@ -1,0 +1,12 @@
+[General]
+name=custom-selinux-modules
+owner=Rachel Sibley <rasibley@redhat.com>
+description=Install custom SELinux modules
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=selinux-policy-devel
+environment=AVC_ERROR=+no_avc_check
