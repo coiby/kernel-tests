@@ -3,6 +3,8 @@
 # Source the common test script helpers
 . ../../cki_lib/libcki.sh || exit 1
 
+TEST="tracepoints/operational"
+
 STAP_VERBOSE_FLAG="-v"
 if [ x"${STP_VERBOSE}" = x"y" ]; then
     STAP_VERBOSE_FLAG="-vvvv"
