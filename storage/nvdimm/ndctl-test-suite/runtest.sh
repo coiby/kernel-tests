@@ -33,6 +33,9 @@ function nvdimm_test_module_setup
 {
 	typeset pkg=$KERNEL
 	typeset linux_srcdir="/root/rpmbuild/BUILD/$KERNEL/linux-$LINUX_RELEASE.$(arch)"
+	if uname -r | grep -q 5.9; then
+		linux_srcdir="/root/rpmbuild/BUILD/kernel-5.9/linux-$LINUX_RELEASE.$(arch)"
+	fi
 	typeset test_srcdir="$linux_srcdir/tools/testing/nvdimm"
 
 	[ -d "$linux_srcdir" ] && rm -fr /root/rpmbuild
@@ -40,17 +43,30 @@ function nvdimm_test_module_setup
 	rlRun "$YUM download ${pkg} --source"
 	typeset rpmfile=$(ls -1 ${pkg}.src.rpm)
 	rlAssertExists "$rpmfile"
+	if (($? != 0)); then
+		rlLog "Abort test as kernel source rpm doesn't exists"
+		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+	fi
 
 	rlRun "rpm -ivh $rpmfile"
 	rlRun "rpmbuild -bp --nodeps ~/rpmbuild/SPECS/kernel.spec"
 	rlAssertExists "$linux_srcdir"
 	rlAssertExists "$test_srcdir"
+	if (($? != 0)); then
+		rlLog "Abort test as kernel source doesn't exists after rpmbuild -bp"
+		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+	fi
 
 	rlRun "pushd $test_srcdir"
 	rlRun "make -C /lib/modules/$(uname -r)/build M=$PWD"
+	if (( $? != 0 )); then
+		rlLog "Abort test as make under test dir failed"
+		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 1
+	fi
 	rlRun "make -C /lib/modules/$(uname -r)/build M=$PWD modules_install"
 	if (( $? != 0 )); then
-		rlLog "Abort test because nvdimm test module setup failed"
+		rlLog "Abort test as make modules_install under test dir failed"
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 	rlRun "popd"
@@ -101,7 +117,7 @@ function ndctl_setup
 	rlRun "./autogen.sh"
 	rlRun "./configure CFLAGS='-g -O2' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib64 --disable-docs --enable-test"
 	if (( $? != 0 )); then
-		rlLog "Abort test because ndctl setup failed"
+		rlLog "Abort test as ndctl setup failed"
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 	rlRun "popd"
