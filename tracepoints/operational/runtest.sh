@@ -28,10 +28,10 @@ function resultPass ()
 function submitLog ()
 {
     LOG=$1
-    if [ -z "$TESTPATH" ]; then
-        echo "Running in developer mode"
+    if [ -n "$TESTPATH" -o -n "$RSTRNT_TASKPATH" ]; then
+        rstrnt-report-log -l $LOG
     else
-        rstrnt-report-log -S $RESULT_SERVER -T $TESTID -l $LOG
+        echo "Running in developer mode"
     fi
 }
 
