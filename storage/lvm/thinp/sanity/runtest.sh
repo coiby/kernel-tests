@@ -8,7 +8,7 @@ TNAME="storage/lvm/thinp/sanity"
 PS4='+ $(date "+%s.%N")\011 '
 #set -x
 
-IOZONE="iozone3_414"
+IOZONE="iozone3_490"
 LOOKASIDE="http://arr-cki-prod-lookaside.s3.us-east-1.amazonaws.com/lookaside/static"
 function build_iozone
 {
