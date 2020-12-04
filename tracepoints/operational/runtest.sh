@@ -28,10 +28,10 @@ function resultPass ()
 function submitLog ()
 {
     LOG=$1
-    if [ -z "$TESTPATH" ]; then
-        echo "Running in developer mode"
+    if [ -n "$TESTPATH" -o -n "$RSTRNT_TASKPATH" ]; then
+        rstrnt-report-log -l $LOG
     else
-        rstrnt-report-log -S $RESULT_SERVER -T $TESTID -l $LOG
+        echo "Running in developer mode"
     fi
 }
 
@@ -213,7 +213,7 @@ if [ $? -eq 0 ] ; then  # Check if upstream-Fedora
     runTest
 elif [[ "$OSREL" = "5" ]] && [[ "$KERNVER" -ge "156" ]] ; then
     runTest
-elif [[ "$OSREL" =~ [678] ]] ; then
+elif [[ "$OSREL" =~ [6789] ]] ; then
     runTest
 else
     echo "***** tracepoint not enabled in this kernel *****" | tee -a $OUTPUTFILE

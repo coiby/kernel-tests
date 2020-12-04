@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=systemtap
+dependencies=systemtap;kernel-devel
 repoRequires=cki_lib
