@@ -181,17 +181,22 @@ case "$release" in
 		;;
 	"release 7"|"el7")
 		if [ -s modules.rhel7 ]; then
-			MODLIST="modules.rhel7"
+			MODLIST="$MODLIST modules.rhel7"
 		fi
 		;;
 	"release 8"|"el8")
-		if [ -s modules.rhel7 ]; then
-			MODLIST="modules.rhel8"
+		if [ -s modules.rhel8 ]; then
+			MODLIST="$MODLIST modules.rhel8"
+		fi
+		;;
+	"release 9"|"el9")
+		if [ -s modules.rhel9 ]; then
+			MODLIST="$MODLIST modules.rhel9"
 		fi
 		;;
 
 	*)
-		if [ -s modules.$release ]; then
+		if [ -s "modules.$release" ]; then
 			MODLIST="$MODLIST modules.$release"
                 else
 		    echo "Warning: Running on unknown release: ${release}, using modules list contained in ${MODLIST}!"
@@ -237,6 +242,14 @@ for (( i = 0; i < $ITERATIONS; i++)); do
 		# names, so convert all "-" to "_". Do this so things like grep
 		# work correctly later on.
 		module=`echo $module | tr '-' '_'`
+
+		# known issues for specific architectures
+		if [ "$(uname -i)" = "aarch64" ]; then
+			# sd_mod is builtin to the aarch64 kernel
+			if [ "$module" = "sd_mod" ]; then
+				continue
+			fi
+		fi
 
 		# get a module alias
 		mod_alias=`cat "$kernel_mod_dir/modules.alias" | grep "alias $module " | cut -f3 -d' '`

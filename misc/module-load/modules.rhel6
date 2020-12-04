@@ -324,6 +324,7 @@ khazad
 md4
 zlib
 blowfish
+twofish
 authenc
 rmd320
 fcrypt
