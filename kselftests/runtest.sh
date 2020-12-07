@@ -98,20 +98,6 @@ run_test()
 	fi
 }
 
-# @arg1: test name
-get_test_list()
-{
-	local name=$1
-	local start_line end_line test_list
-
-	pushd $EXEC_DIR &> /dev/null
-
-	test_list=$(grep "^$name:"  kselftest-list.txt | cut -f2 -d:)
-
-	popd &> /dev/null
-	echo $test_list
-}
-
 check_result()
 {
 	local num=$1
@@ -288,7 +274,7 @@ for item in $TEST_ITEMS; do
 	fi
 
 	_item=$(echo $item | tr -s "/-" "_")
-	total_tests=$(get_test_list ${item})
+	total_tests=$(grep "^${item}:"  $EXEC_DIR/kselftest-list.txt | cut -f2 -d:)
 	total_num=$(echo ${total_tests} | wc -w)
 	FAIL=0 num=0 name=""
 
