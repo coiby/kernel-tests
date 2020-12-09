@@ -58,6 +58,13 @@ function preset_testparams()
 	test -n "${TEST_PARAM_GITREPO}" && GITREPO="${TEST_PARAM_GITREPO}"
 	export GITREPO=git://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git
 	export GITREPO_PLANB=https://github.com/guaneryu/xfstests.git
+	# From Dec 2020, xfstests upstream needs C99 support to build,
+	# which fails on RHEL7. Due to RHEL7 going stablized, do not run
+	# latest xfstests for it.
+	if [[ "$(uname -r)" =~ 3.10.0.*el7 ]]; then
+		export GITREPO=htps://github.com/jencce/xfstests.git
+		export GITREPO_PLANB=https://gitlab.com/jencce2002/xfstests.git
+	fi
 	test -n "${TEST_PARAM_TEST_DEV}" && TEST_DEV="${TEST_PARAM_TEST_DEV}"
 	test -n "${TEST_PARAM_TEST_DIR}" && TEST_DIR="${TEST_PARAM_TEST_DIR}"
 	test -n "${TEST_PARAM_SCRATCH_DEV}" && SCRATCH_DEV="${TEST_PARAM_SCRATCH_DEV}"
