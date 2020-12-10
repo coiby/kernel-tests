@@ -19,10 +19,10 @@
       </hostRequires>
       <partitions/>
       <task name="/test/misc/machineinfo">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#test/misc/machineinfo"/>
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.zip#test/misc/machineinfo"/>
       </task>
       <task name="LTP" role="STANDALONE">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#distribution/ltp/lite"/>
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.zip#distribution/ltp/lite"/>
         <dependencies>
           <dependency url="https://github.com/linux-test-project/ltp/releases/download/20200515/ltp-full-20200515.tar.bz2"/>
         </dependencies>
@@ -34,7 +34,7 @@
         </params>
       </task>
       <task name="ACPI table test" role="STANDALONE">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#acpi/acpitable"/>
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.zip#acpi/acpitable"/>
         <params>
           <param name="CKI_NAME" value="ACPI table test"/>
           <param name="CKI_UNIVERSAL_ID" value="redhat_acpi_table"/>
@@ -44,7 +44,7 @@
         </params>
       </task>
       <task name="Memory function: memfd_create" role="STANDALONE">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#memory/function/memfd_create"/>
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.zip#memory/function/memfd_create"/>
         <params>
           <param name="CKI_NAME" value="Memory function: memfd_create"/>
           <param name="CKI_UNIVERSAL_ID" value="redhat_memfd_create"/>
@@ -54,7 +54,7 @@
         </params>
       </task>
       <task name="load/unload kernel module test" role="STANDALONE">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/master/kernel-tests-master.zip#misc/module-load"/>
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.zip#misc/module-load"/>
         <params>
           <param name="CKI_NAME" value="load/unload kernel module test"/>
           <param name="CKI_UNIVERSAL_ID" value="redhat_module_load_unload"/>
