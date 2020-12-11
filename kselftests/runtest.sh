@@ -258,14 +258,14 @@ install_kselftests || test_fail_exit "install kselftests failed"
 
 run "uname -r"
 reset_net_env
-submit_log "$EXEC_DIR/run_kselftest.sh"
+submit_log "$EXEC_DIR/kselftest-list.txt"
 
 for item in $TEST_ITEMS; do
 	# deal with bpf/test_progs specially
 	[ "$item" == "bpf_test_progs" ] && run_bpf_test_progs && continue
 
 	grep -q "^$item:" selftests/kselftest-list.txt || \
-		{ test_skip "$item test not find in run_kselftest.sh" && continue; }
+		{ test_skip "$item test not find in kselftest-list.txt" && continue; }
 
 	pushd $EXEC_DIR/$item
 	if [ "$item" == "tc-testing" ]; then
