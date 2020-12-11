@@ -287,6 +287,7 @@ function install_xfstests_git_upstream ()
 	[ -d $repo ] || return 1
 
 	cd "$repo"
+	grep _filter_stat common/filter || patch -p1 < ../f33-stat.patch
 	make
 	rm -f configure
 	rm -fr tests/ceph/

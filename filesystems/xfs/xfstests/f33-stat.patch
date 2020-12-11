@@ -1,0 +1,106 @@
+From eb95f30613d6648609211ca404aa8e3d6f308022 Mon Sep 17 00:00:00 2001
+From: Murphy Zhou <jencce.kernel@gmail.com>
+Date: Tue, 8 Dec 2020 09:59:02 +0800
+Subject: [PATCH] common/filter: add _filter_stat
+
+New stat(2) starts to use statx(7) call. Then if file does not
+exist, it breaks golden output like this:
+
+-stat: cannot stat 'SCRATCH_MNT/xxx': No such file or directory
++stat: cannot statx 'SCRATCH_MNT/xxx': No such file or directory
+
+Add this filter to fix it, and add this filter to testcases that
+need it.
+
+Signed-off-by: Murphy Zhou <jencce.kernel@gmail.com>
+---
+ common/filter     | 6 ++++++
+ tests/generic/397 | 6 +++---
+ tests/generic/435 | 2 +-
+ tests/generic/440 | 2 +-
+ tests/xfs/348     | 2 +-
+ 5 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/common/filter b/common/filter
+index a8b3882f..6fbf70c2 100644
+--- a/common/filter
++++ b/common/filter
+@@ -510,6 +510,12 @@ _filter_mv()
+ 	sed -e "s/^renamed //"
+ }
+ 
++# New stat(2) uses statx(7)
++_filter_stat()
++{
++	sed -e "s/cannot statx/cannot stat/"
++}
++
+ _filter_lostfound()
+ {
+ 	sed -e '/^lost+found$/d'
+diff --git a/tests/generic/397 b/tests/generic/397
+index 97111555..bb4de31c 100755
+--- a/tests/generic/397
++++ b/tests/generic/397
+@@ -83,8 +83,8 @@ _unlink_session_encryption_key $keydesc
+ _scratch_cycle_mount
+ 
+ # Check that unencrypted names aren't there
+-stat $SCRATCH_MNT/edir/empty |& _filter_scratch
+-stat $SCRATCH_MNT/edir/symlink |& _filter_scratch
++stat $SCRATCH_MNT/edir/empty |& _filter_stat |& _filter_scratch
++stat $SCRATCH_MNT/edir/symlink |& _filter_stat |& _filter_scratch
+ 
+ # Check that the correct numbers of files and subdirectories are there
+ ls $SCRATCH_MNT/edir | wc -l
+@@ -106,7 +106,7 @@ ln -s foo $SCRATCH_MNT/edir/0123456789abcdef |& _filter_scratch
+ 
+ # Delete the encrypted directory (should succeed)
+ rm -r $SCRATCH_MNT/edir
+-stat $SCRATCH_MNT/edir |& _filter_scratch
++stat $SCRATCH_MNT/edir |& _filter_stat |& _filter_scratch
+ 
+ # success, all done
+ status=0
+diff --git a/tests/generic/435 b/tests/generic/435
+index 9f54c6c4..71c5a3f0 100755
+--- a/tests/generic/435
++++ b/tests/generic/435
+@@ -73,7 +73,7 @@ _scratch_cycle_mount
+ # and ext4 reported a "Structure needs cleaning" error when removing files.
+ find $SCRATCH_MNT/edir/ -type f | xargs stat -c %i | sort | uniq | wc -l
+ rm -rf $SCRATCH_MNT/edir |& head -n 10
+-stat $SCRATCH_MNT/edir |& _filter_scratch
++stat $SCRATCH_MNT/edir |& _filter_stat |& _filter_scratch
+ 
+ # success, all done
+ status=0
+diff --git a/tests/generic/440 b/tests/generic/440
+index d775f1e0..8a81d60a 100755
+--- a/tests/generic/440
++++ b/tests/generic/440
+@@ -87,7 +87,7 @@ _scratch_cycle_mount
+ cat $SCRATCH_MNT/edir2/link
+ exec 3< $SCRATCH_MNT/edir2/link # pin inode with cached key in memory
+ _unlink_session_encryption_key $keydesc
+-stat $SCRATCH_MNT/edir/file |& _filter_scratch
++stat $SCRATCH_MNT/edir/file |& _filter_stat |& _filter_scratch
+ cat "$(find $SCRATCH_MNT/edir/ -type f)"
+ exec 3>&-
+ 
+diff --git a/tests/xfs/348 b/tests/xfs/348
+index 194d9f99..208382fb 100755
+--- a/tests/xfs/348
++++ b/tests/xfs/348
+@@ -112,7 +112,7 @@ for dt in $dtypes; do
+ 		rm -f $tmp.stat.err
+ 		ftype=$(stat --printf=%F $testdir/$file 2>$tmp.stat.err)
+ 		if [ -s $tmp.stat.err ]; then
+-			cat $tmp.stat.err
++			cat $tmp.stat.err | _filter_stat
+ 		else
+ 			echo "stat: '$testdir/$file' is a $ftype"
+ 			# Verify that readlink of a file posing as a symlink
+-- 
+2.20.1
+
