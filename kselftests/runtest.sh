@@ -174,8 +174,8 @@ run_bpf_test_progs()
 		return 1
 	fi
 
-	total_tests=$(basename -s .c prog_tests/*.c)
-	total_num=$(echo ${total_tests} | wc -w)
+	total_tests=$(./test_progs --list)
+	total_num=$(./test_progs --count)
 	nfail=0 num=0 name=""
 
 	for name in ${total_tests}; do
