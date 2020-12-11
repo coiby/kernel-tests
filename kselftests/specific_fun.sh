@@ -7,6 +7,7 @@ skip_tests=(
 test_bpf.sh
 # Skip bpf/test_progs and run the test individually
 test_progs
+test_progs-no_alu32
 )
 
 # Tests in this list need large memory
