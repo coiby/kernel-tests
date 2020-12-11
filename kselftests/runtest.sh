@@ -57,19 +57,9 @@ reset_net_env()
 {
 	# log the link before clean
 	debug_info
-	modprobe -r ipip
-	modprobe -r vxlan
-	modprobe -r geneve
-	modprobe -r ip_gre
-	modprobe -r ip6_gre
-	modprobe -r ip6_vti
-	modprobe -r ip6_tunnel
-	modprobe -r veth
-	# Looks fedora doesn't has this module
-	# modprobe -r netdevsim
 	ip -a netns del
 	sleep 2
-	debug_info
+	run "ip link show"
 }
 
 # usage: check_skipped_tests test_name "${skip_test[@]}"
