@@ -178,8 +178,10 @@ rlPhaseEnd
 local_netns()
 {
 rlPhaseStartTest "local_netns"
-	local dev_features[0]="gso off gro off"
-	local dev_features[1]="gso on gro on"
+	# gso off and gro off are not supported
+	# https://bugzilla.redhat.com/show_bug.cgi?id=1905818
+
+	local dev_features[0]="gso on gro on"
 	rlRun "ip netns add client"
 	rlRun "ip netns add server"
 	rlRun "ip link add link $TEST_IFACE name ipvlan_c type ipvlan mode l3"
