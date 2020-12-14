@@ -281,7 +281,14 @@ function setup_full
 	SKIPTESTS="$TEST_PARAM_SKIPTESTS"
 	[ -z "$SKIPTESTS" ] && SKIPTESTS="$(cat known_issues)"
 	RUNTESTS="$TEST_PARAM_RUNTESTS"
-	[ -z "$RUNTESTS" ] && RUNTESTS="$(cat RUNTESTS)"
+	if [ -z "$RUNTESTS" ] ; then
+		case $FSTYPE in
+		xfs|ext4|btrfs) RUNTESTS="$(cat RUNTESTS)" ;;
+		# Small set of xfstests are stable for network filesystems
+		cifs|nfs4) RUNTESTS="$(cat RUNTESTS.net)" ;;
+		esac
+
+	fi
 	DEV_TYPE="$TEST_PARAM_DEV_TYPE"
 	FSCK=""
 	FSCK_OPTS=""
