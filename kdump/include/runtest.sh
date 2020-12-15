@@ -42,6 +42,7 @@ mkdir -p ${K_TMP_DIR}
 [[ "$FAMILY" =~ [a-zA-Z]+6 ]] && IS_RHEL6=true || IS_RHEL6=false
 [[ "$FAMILY" =~ [a-zA-Z]+7 ]] && IS_RHEL7=true || IS_RHEL7=false
 [[ "$FAMILY" =~ [a-zA-Z]+8 ]] && IS_RHEL8=true || IS_RHEL8=false
+[[ "$FAMILY" =~ [a-zA-Z]+9 ]] && IS_RHEL9=true || IS_RHEL9=false
 [[ "$FAMILY" =~ Fedora ]] && IS_FC=true || IS_FC=false
 
 if $IS_RHEL5 || $IS_RHEL6; then
@@ -111,7 +112,7 @@ Chomp()
 
 TurnDebugOn()
 {
-    if $IS_RHEL7 || $IS_RHEL8 ; then
+    if $IS_RHEL7 || $IS_RHEL8 || $IS_RHEL9 ; then
         sed -i 's;\(/bin/sh\)$;\1 -x;' /usr/bin/kdumpctl
         sed -i 's;2>/dev/null;;g' /usr/bin/kdumpctl
     else
@@ -477,7 +478,7 @@ DefKdumpMem()
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=512M"
         fi
 
-    elif $IS_RHEL8 || $IS_FC; then
+    elif $IS_RHEL8 || $IS_RHEL9 || $IS_FC; then
         if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0M-64G:160M,64G-1T:256M,1T-:512M"
         elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0M-64G:160M,64G-1T:256M,1T-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
