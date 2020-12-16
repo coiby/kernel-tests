@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=tar;autoconf;automake;wget;bison;bpftool;flex;python3;llvm;iproute-tc;clang;jq
+dependencies=tar;autoconf;automake;wget;bison;bpftool;flex;python3;llvm;iproute-tc;clang;jq;ethtool;net-tools;nmap-ncat
 softDependencies=netsniff-ng;valgrind;numactl-libs
 repoRequires=cki_lib
