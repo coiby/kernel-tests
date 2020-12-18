@@ -9,3 +9,7 @@ def setup(exc):
 
     exc['asm/papr_pdsm.h'] = (['* #define PAGE_SIZE (1UL << 16)'],
                               OK, 'PAGE_SIZE')
+
+    # https://bugzilla.redhat.com/1908140
+    exc['linux/bpf_perf_event.h'] = ([], WARN | BLACKLIST,
+                                     'struct pt_regs is undefined in userspace kernel headers')
