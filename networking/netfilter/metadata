@@ -1,5 +1,5 @@
 [General]
-name=networking/firewall/netfilter/target
+name=networking/netfilter
 owner=Hangbin Liu <haliu@redhat.com>
 description=Basic netfilter tests
 license=GPLv2
@@ -8,5 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=lksctp-tools;nmap-ncat;socat
-repoRequires=cki_lib;networking/common;networking/firewall/000infralib
+dependencies=nmap-ncat;lksctp-tools;tcpdump;nftables
+softDependencies=ipvsadm;ipset;conntrack-tools
+repoRequires=cki_lib
