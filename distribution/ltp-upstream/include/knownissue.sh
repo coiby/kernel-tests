@@ -155,14 +155,18 @@ function knownissue_filter()
 	tskip "syslog.*" unfix
 	# These tests are not suitable if there is overcommit for s390x guests
 	is_arch "s390x" && tskip "mtest01 dio20 dio30 fallocate05 fallocate06 fork13 preadv203 preadv203_64 sendfile09 sendfile09_64" unfix
-	# ioctl failures for /dev/loop0p1 https://github.com/linux-test-project/ltp/issues/718
-	tskip "ioctl_loop01 ioctl09" unfix
 	# [bug] msgstress04 fills up >4GB data on conserver for ppc64le
 	# https://lore.kernel.org/linux-block/491751.10128377.1599217585366.JavaMail.zimbra@redhat.com/T/#t
 	is_arch "ppc64le" && tskip "msgstress04" fatal
-	# [test bug] semop03 is a new test which is not yet stable
-	# http://post-office.corp.redhat.com/archives/cki-project/2020-October/msg00016.html
-	tskip "semop03" unfix
+	# [bug] mm: migrate: initialize err in do_migrate_pages
+	# https://lore.kernel.org/linux-mm/456a021c7ef3636d7668cec9dcb4a446a4244812.1609855564.git.jstancek@redhat.com/T/#u
+	tskip "migrate_pages01" unfix
+	# Issue to be filed
+	tskip "perf_event_open02" unfix
+	# netns_breakns_ip_ipv6_netlink was re-written upstream, not yet stable
+	tskip "netns_breakns_ip_ipv6_netlink" unfix
+	# Bug 1912670 - semctl SEM_STAT_ANY fails to pass the buffer specified by the caller to the kernel
+	tskip "semctl09" unfix
 
 	if is_rhel8; then
                 # ------- unfix ---------
