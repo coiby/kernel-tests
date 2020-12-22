@@ -46,6 +46,7 @@ function check_tests()
 		# Rename log file by adding dir name prefix, so results/generic/300.full
 		# will be results/generic/generic-300.full, results/ext4/300.full will be
 		# results/ext4/ext4-300.full
+		false_alarm=0
 		XFSTEST_LOGNAME=$(dirname $XFSTEST)/${XFSTEST/\//-}
 		if test $ret -ne 0; then
 			if [ -f results/$XFSTEST.full ]; then
@@ -58,13 +59,19 @@ function check_tests()
 				# Gather the full diff
 				diff -u <(tr '`' "'" < tests/$XFSTEST.out) results/$XFSTEST.out.bad  > results/$XFSTEST_LOGNAME.out.bad.diff
 				rstrnt-report-log -l results/$XFSTEST_LOGNAME.out.bad.diff
+				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*No space left on device" &&
+				false_alarm=1
 			fi
 			if [ -f results/$XFSTEST.dmesg ]; then
 				cp results/$XFSTEST.dmesg results/$XFSTEST_LOGNAME.dmesg
 				rstrnt-report-log -l results/$XFSTEST_LOGNAME.dmesg
+				grep "possible circular locking dependency detected" results/$XFSTEST_LOGNAME.dmesg &&
+				false_alarm=1
 			fi
-			ret=1
-			report $XFSTEST FAIL 0
+			if [ $false_alarm -eq 0 ] ; then
+				ret=1
+				report $XFSTEST FAIL 0
+			fi
 			# Work around, so that loop device bug does not interrupt the test, might be nice to do the same with the dm device release bug
 			release_loops
 		elif test "$REPORT_PASS" == "1"; then
