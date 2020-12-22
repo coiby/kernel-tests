@@ -43,6 +43,15 @@ function cleanup ()
 	general_cleanup
 }
 
+# Skip btrfs on eln kernel as btrfs is not supported in
+# RHEL configs
+if [ "$TEST_PARAM_FSTYPE" == "btrfs" ] && [[ "$(uname -r)" =~ eln ]]
+then
+	echo "Skipping test, no btrfs support for eln kernels"
+	rstrnt-report-result "xfstests - btrfs" SKIP
+	exit 0
+fi
+
 # Just use the default run function from ./xfstests-run.sh
 run_full
 exit 0
