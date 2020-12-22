@@ -21,10 +21,17 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST_ROOT=$(dirname $(readlink -f $BASH_SOURCE))
+TEST="sound/user-ctl-elem"
 
 rlJournalStart
 
   rlPhaseStartSetup
+    # Unsupported on aarch64/ark-eln kernel
+    if [[ $(uname -r) =~ eln && $(uname -m) == "aarch64" ]]; then
+      rlLog "Skipping test, no sound driver support for RHEL/aarch64"
+      rstrnt-report-result $TEST SKIP
+      exit 0
+    fi
     rlRun -l "modprobe snd-dummy" 0 "Load kernel module snd-dummy"
   rlPhaseEnd
 

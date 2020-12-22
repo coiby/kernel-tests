@@ -20,6 +20,8 @@
 . ../../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+TEST="sound/aloop"
+
 TEST_ROOT=$(dirname $(readlink -f $BASH_SOURCE))
 
 PYTHON=${PYTHON:-python}
@@ -59,6 +61,12 @@ function aloop() {
 rlJournalStart
 
   rlPhaseStartSetup
+    # Unsupported on aarch64/ark-eln kernel
+    if [[ $(uname -r) =~ eln && $(uname -m) == "aarch64" ]]; then
+      rlLog "Skipping test, no sound driver support for RHEL/aarch64"
+      rstrnt-report-result $TEST SKIP
+      exit 0
+    fi
     rlRun -l "modprobe snd-dummy" 0 "Load kernel module snd-dummy"
     rlRun -l "modprobe snd-aloop" 0 "Load kernel module snd-aloop"
     rlRun -l "$PYTHON data.py generate s.raw" 0 "Generate test samples"
