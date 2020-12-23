@@ -361,7 +361,7 @@ PrepareKdump()
     # Try upgrading kexec-tools to the latest version if on FC.
     # If it fails, still use the kexec-tools from the default repo.
     if $IS_FC && $UPGRADE_FC_KDUMP; then
-        UpgradePackages kexec-tools dracut systemd --enablerepo=updates-testing --enablerepo=fedora --releasever=33
+        UpgradePackages kexec-tools dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=34
     fi
 }
 
@@ -373,7 +373,7 @@ PrepareCrash()
     # Try upgrading crash to the latest version if on FC.
     # If it fails, still use the crash from the default repo.
     if $IS_FC && $UPGRADE_FC_CRASH; then
-        UpgradePackages crash --enablerepo=updates-testing --enablerepo=fedora --releasever=33
+        UpgradePackages crash --enablerepo=updates-testing --enablerepo=fedora --releasever=34
     fi
     InstallDebuginfo
 }
