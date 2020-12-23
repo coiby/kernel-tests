@@ -67,6 +67,8 @@ function check_tests()
 				rstrnt-report-log -l results/$XFSTEST_LOGNAME.dmesg
 				grep "possible circular locking dependency detected" results/$XFSTEST_LOGNAME.dmesg &&
 				false_alarm=1
+				grep "MAX_LOCKDEP_ENTRIES too low" results/$XFSTEST_LOGNAME.dmesg &&
+				false_alarm=1
 			fi
 			if [ $false_alarm -eq 0 ] ; then
 				ret=1
