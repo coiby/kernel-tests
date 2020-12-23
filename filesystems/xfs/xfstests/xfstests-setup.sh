@@ -8,40 +8,7 @@
 # Sets FSTYPE, CHECK_OPTS
 function setup_nfs34()
 {
-	if [ "$FSTYPE" == "nfs3" ];then
-		cat /etc/nfsmount.conf |grep -v 'Defaultvers=' |grep -v 'Nfsvers=' > nfsmount.conf.mod
-		cp -f /etc/exports exports.bup
-		cp -f /etc/nfsmount.conf nfsmount.conf.bup
-		mv -f nfsmount.conf.mod /etc/nfsmount.conf
-		echo 'Defaultvers=3' >> /etc/nfsmount.conf
-		echo 'Nfsvers=3' >> /etc/nfsmount.conf
-		cat /etc/sysconfig/nfs | grep -v 'MOUNTD_NFS_V3=' > nfs.mod
-		cp -f /etc/sysconfig/nfs nfs.bup
-		mv -f nfs.mod /etc/sysconfig/nfs
-		echo 'MOUNTD_NFS_V3=yes' >> /etc/sysconfig/nfs
-		CHECK_OPTS="-nfs $CHECK_OPTS"
-	fi
-
-	if [ "$FSTYPE" == "nfs4" ];then
-		cat /etc/nfsmount.conf |grep -v 'Defaultvers=' |grep -v 'Nfsvers=' > nfsmount.conf.mod
-		cp -f /etc/exports exports.bup
-		cp -f /etc/nfsmount.conf nfsmount.conf.bup
-		mv -f nfsmount.conf.mod /etc/nfsmount.conf
-		echo 'Defaultvers=4' >> /etc/nfsmount.conf
-		echo 'Nfsvers=4' >> /etc/nfsmount.conf
-		cat /etc/sysconfig/nfs | grep -v 'MOUNTD_NFS_V4=' > nfs.mod
-		cp -f /etc/sysconfig/nfs nfs.bup
-		mv -f nfs.mod /etc/sysconfig/nfs
-		echo 'MOUNTD_NFS_V4=yes' >> /etc/sysconfig/nfs
-		if [ $RHEL_MAJOR -eq 5 ];then
-			# Nfs4 can't be mounted by nfs on rhel5, mask it
-			# Nfs4 also does not support option context=
-			cp -f /bin/mount /bin/mount.real
-			cp -f mount4.py /bin/mount
-			chmod a+x /bin/mount
-		fi
-		CHECK_OPTS="-nfs $CHECK_OPTS"
-	fi
+	CHECK_OPTS="-nfs $CHECK_OPTS"
 }
 
 
