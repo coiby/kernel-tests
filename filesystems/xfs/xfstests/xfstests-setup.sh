@@ -8,7 +8,9 @@
 # Sets FSTYPE, CHECK_OPTS
 function setup_nfs34()
 {
-	CHECK_OPTS="-nfs $CHECK_OPTS"
+	if [[ "$FSTYPE" =~ nfs ]]; then
+		CHECK_OPTS="-nfs $CHECK_OPTS"
+	fi
 }
 
 
