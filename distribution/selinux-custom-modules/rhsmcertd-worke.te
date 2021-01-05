@@ -1,0 +1,11 @@
+
+module rhsmcertd-worke 1.0;
+
+require {
+	type proc_t;
+	type rhsmcertd_t;
+	class filesystem getattr;
+}
+
+#============= rhsmcertd_t ==============
+allow rhsmcertd_t proc_t:filesystem getattr;
