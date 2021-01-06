@@ -15,10 +15,13 @@ rlJournalStart
       rlRun "semodule -i kexec.pp" 0 "Installing kexec SELinux module"
     # Bug 1910373 - selinux avc denials for rhsmcertd-worke and rpcbind
     # https://bugzilla.redhat.com/show_bug.cgi?id=1910373
+    # Bug 1913372 - selinux avc denials for systemd-logind
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1910373
     elif rlIsRHEL 9; then
-      rlRun "make -f /usr/share/selinux/devel/Makefile rpcbind-mod.pp" 0 "Building rpcbind-mod SELinux module"
+      rlRun "make -f /usr/share/selinux/devel/Makefile rpcbind-mod.pp" 0 "Building rpcbind SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile rhsmcertd-worke.pp" 0 "Building rhsmcertd-worke SELinux module"
-      rlRun "semodule -i rpcbind-mod.pp -i rhsmcertd-worke.pp" 0 "Installing rhsmcertd-worke and rpcbind-mod.pp SELinux modules"
+      rlRun "make -f /usr/share/selinux/devel/Makefile systemd-logind-mod.pp" 0 "Building systemd-logind SELinux module"
+      rlRun "semodule -i rpcbind-mod.pp -i rhsmcertd-worke.pp systemd-logind-mod.pp" 0 "Installing rpcbind rhsmcertd-worke systemd-logind SELinux modules"
     else
       rlLog "No custom SELinux modules required, skipping"
       rstrnt-report-result $TEST SKIP
