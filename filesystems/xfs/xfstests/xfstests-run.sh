@@ -74,7 +74,8 @@ function check_tests()
 				ret=1
 				report $XFSTEST FAIL 0
 			fi
-			# Work around, so that loop device bug does not interrupt the test, might be nice to do the same with the dm device release bug
+			# Work around, so that loop device bug does not interrupt the test,
+			# might be nice to do the same with the dm device release bug
 			release_loops
 		elif test "$REPORT_PASS" == "1"; then
 			TESTTIME=`grep -w ^$XFSTEST results/check.time | awk '{print $2}'`
@@ -83,44 +84,14 @@ function check_tests()
 			fi
 			report $XFSTEST PASS $TESTTIME
 		fi
-
-		if test $ret -eq 0; then
-			PASSED="$PASSED $XFSTEST"
-		else
-			FAILED="$FAILED $XFSTEST"
-		fi
 	done
-	test -z "$FAILED"
-	return $?
 }
-
-
-function create_test_report()
-{
-	RESULT=PASS
-	echoo "============ TEST REPORT ============"
-
-	echoo -e "\n\n\n======== FAILED TESTS ========"
-	for TEST in $(echo $FAILED | tr " " "\n" | sort -u); do
-		if grep -qw $TEST known_issues ; then
-			echoo -e "\n\n ==== $RHEL_VERSION|$FSTYPE|$TEST ====\nKnown failure, WAIVED"
-		else
-			echoo -e "\n\n ==== $RHEL_VERSION|$FSTYPE|$TEST ====\nUnknown failure, ERROR"
-			RESULT=FAIL
-		fi
-	done
-
-	report TEST_REPORT $RESULT 0
-}
-
 
 # Needs SKIPTESTS, RUNTESTS,
 function check()
 {
 	local groups="${CHECK_GROUPS:-auto}"
 
-	FAILED=""
-	PASSED=""
 	# And go!
 	pushd /var/lib/xfstests/
 
