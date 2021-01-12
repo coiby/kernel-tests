@@ -1,0 +1,132 @@
+From 336ae069e046a329d34ddd8cd717fd95631079cc Mon Sep 17 00:00:00 2001
+From: Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Date: Mon, 19 Oct 2020 19:36:13 +0800
+Subject: [PATCH] syscalls/send02: Ensure recv() succeed when not using
+ MSG_MORE flag
+
+In this test, we only check send()/sendto()/sendmsg() calls
+with MSG_MORE flag whether get EAGAIN/EWOULDBLOCK error immediately.
+
+For other flag, we just call recv again when meeting EAGAIN/EWOULDBLOCK
+error.
+
+Also, improve message and make this case more clean when failed.
+
+Signed-off-by: Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Reviewed-by: Alexey Kodanev <alexey.kodanev@oracle.com>
+---
+ testcases/kernel/syscalls/send/send02.c | 64 ++++++++++++++-----------
+ 1 file changed, 37 insertions(+), 27 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/send/send02.c b/testcases/kernel/syscalls/send/send02.c
+index 5630230fa..4d8da1613 100644
+--- a/testcases/kernel/syscalls/send/send02.c
++++ b/testcases/kernel/syscalls/send/send02.c
+@@ -71,32 +71,40 @@ static void setup(void)
+ 	memset(sendbuf, 0x42, SENDSIZE);
+ }
+ 
+-static int check_recv(int sock, long expsize)
++static int check_recv(int sock, long expsize, int loop)
+ {
+ 	char recvbuf[RECVSIZE] = {0};
+ 
+-	TEST(recv(sock, recvbuf, RECVSIZE, MSG_DONTWAIT));
+-
+-	if (TST_RET == -1) {
+-		/* expected error immediately after send(MSG_MORE) */
+-		if (!expsize && (TST_ERR == EAGAIN || TST_ERR == EWOULDBLOCK))
+-			return 1;
+-
+-		/* unexpected error */
+-		tst_res(TFAIL | TTERRNO, "recv() error");
+-		return 0;
+-	}
+-
+-	if (TST_RET < 0) {
+-		tst_res(TFAIL | TTERRNO, "Invalid recv() return value %ld",
+-			TST_RET);
+-		return 0;
+-	}
+-
+-	if (TST_RET != expsize) {
+-		tst_res(TFAIL, "recv() read %ld bytes, expected %ld", TST_RET,
+-			expsize);
+-		return 0;
++	while (1) {
++		TEST(recv(sock, recvbuf, RECVSIZE, MSG_DONTWAIT));
++
++		if (TST_RET == -1) {
++			/* expected error immediately after send(MSG_MORE) */
++			if (TST_ERR == EAGAIN || TST_ERR == EWOULDBLOCK) {
++				if (expsize)
++					continue;
++				else
++					break;
++			}
++
++			/* unexpected error */
++			tst_res(TFAIL | TTERRNO, "recv() error at step %d, expsize %ld",
++				loop, expsize);
++			return 0;
++		}
++
++		if (TST_RET < 0) {
++			tst_res(TFAIL | TTERRNO, "recv() returns %ld at step %d, expsize %ld",
++				TST_RET, loop, expsize);
++			return 0;
++		}
++
++		if (TST_RET != expsize) {
++			tst_res(TFAIL, "recv() read %ld bytes, expected %ld, step %d",
++				TST_RET, expsize, loop);
++			return 0;
++		}
++		return 1;
+ 	}
+ 
+ 	return 1;
+@@ -120,6 +128,8 @@ static void run(unsigned int n)
+ 	struct test_case *tc = testcase_list + n;
+ 	socklen_t len = sizeof(addr);
+ 
++	tst_res(TINFO, "Tesing %s", tc->name);
++
+ 	tst_init_sockaddr_inet_bin(&addr, INADDR_LOOPBACK, 0);
+ 	listen_sock = SAFE_SOCKET(tc->domain, tc->type, tc->protocol);
+ 	dst_sock = listen_sock;
+@@ -139,19 +149,19 @@ static void run(unsigned int n)
+ 			dst_sock = SAFE_ACCEPT(listen_sock, NULL, NULL);
+ 
+ 		tc->send(sock, sendbuf, SENDSIZE, 0);
+-		ret = check_recv(dst_sock, SENDSIZE);
++		ret = check_recv(dst_sock, SENDSIZE, i + 1);
+ 
+ 		if (!ret)
+ 			break;
+ 
+ 		tc->send(sock, sendbuf, SENDSIZE, MSG_MORE);
+-		ret = check_recv(dst_sock, 0);
++		ret = check_recv(dst_sock, 0, i + 1);
+ 
+ 		if (!ret)
+ 			break;
+ 
+ 		tc->send(sock, sendbuf, 1, 0);
+-		ret = check_recv(dst_sock, SENDSIZE + 1);
++		ret = check_recv(dst_sock, SENDSIZE + 1, i + 1);
+ 
+ 		if (!ret)
+ 			break;
+@@ -163,7 +173,7 @@ static void run(unsigned int n)
+ 	}
+ 
+ 	if (ret)
+-		tst_res(TPASS, "%s(MSG_MORE) works correctly", tc->name);
++		tst_res(TPASS, "MSG_MORE works correctly");
+ 
+ 	cleanup();
+ 	dst_sock = -1;
+-- 
+2.21.3
+

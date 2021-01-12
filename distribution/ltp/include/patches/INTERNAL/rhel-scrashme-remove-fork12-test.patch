@@ -10,10 +10,7 @@ diff --git a/runtest/crashme b/runtest/crashme
 index a4c5b41..432b660 100644
 --- a/runtest/crashme
 +++ b/runtest/crashme
-@@ -13,6 +13,8 @@ crash02 crash02
- mem01 mem01 -r
- # Memory eater. Loves to be run in parallel with other programs.
- # May panic on buggy systems if the OOM killer was not fast enough :-)
+@@ -13,3 +13,5 @@ crash02 crash02
 -fork12 fork12
 +## Removed by Jeff Burke: This is a fork bomb test. Not very realistic
 +## for running as user root in automated environment.

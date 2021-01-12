@@ -2,7 +2,7 @@
 #
 #
 #TEST_VERSION can override the default
-TESTVERSION=${TEST_VERSION:-"20200515"}
+TESTVERSION=${TEST_VERSION:-"20200930"}
 
 
 # the task path may be different under the restraint harness if the task
@@ -42,11 +42,11 @@ fi
 
 download_ltp()
 {
-    echo "============ Download package ============"
-    wget -q ${DOWNLOAD_URL}/${TARGET}.tar.bz2 | tee -a $OUTPUTFILE
+    echo "============ Download package ============" | tee -a $OUTPUTFILE
+    wget -q ${DOWNLOAD_URL}/${TARGET}.tar.bz2
     if [ $? -ne 0 -a x${IS_DEVEL} = x ]; then
         echo "global sync seems not working correctly, using default location" | tee -a $OUTPUTFILE
-        wget -q https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2 | tee -a $OUTPUTFILE
+        wget -q https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
         if [ $? -ne 0 ]; then
             echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
         fi
@@ -84,12 +84,25 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
-    if [ "$TESTVERSION"  == "20200515" ]; then
+    if [ "$TESTVERSION"  == "20200930" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
-	${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel_only-migrate_page02-avoid-warning.patch
-	${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
-	${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
-	${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-zram-btrfs-support.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel_only-migrate_page02-avoid-warning.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-zram-btrfs-support.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-crypto-af_alg07-Skip-this-case-when-not-having-sockf.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-send02-Ensure-recv-succeed-when-not-using-M.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-semop-Increase-timeout-for-semop03.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-tst_cgroup-fix-short-reads-of-mems-cpus.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-Increase-reliability-and-diagnostic-info.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-Add-tag-for-mm-memcg-link-page-counters-to.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-Allow-for-kmem-and-memsw-counters-being-di.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-madvise06-Add-check-for-proc-sys-vm-stat_re.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-libnewipc-Add-get_ipc_timestamp.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-syscalls-ipc-Make-use-of-get_ipc_timestamp.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-add-.min_cpus-in-tst_test-struct.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-syscalls-make-use-of-.min_cpus.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-af_alg07-add-dynamic-bias-for-ARM.patch
     fi
 
     # The following ones are for specific hardware/release

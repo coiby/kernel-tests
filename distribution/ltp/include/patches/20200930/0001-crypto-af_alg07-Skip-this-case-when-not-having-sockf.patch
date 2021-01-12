@@ -1,0 +1,31 @@
+From c5004bf071bf8ca96a01f03bde873e9292f7f83b Mon Sep 17 00:00:00 2001
+From: Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Date: Tue, 6 Oct 2020 14:47:55 +0800
+Subject: [PATCH] crypto/af_alg07: Skip this case when not having
+ sockfs_setattr
+
+Since kernel 4.10-rc1 commit 86741ec25462 ("net: core: Add a UID field to struct sock."),
+it introduced sockfs_setattr function. This test needs to use this function
+to trigger this cve bug, so skip it if kernel < 4.10.
+
+Signed-off-by: Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Acked-by: Jan Stancek <jstancek@redhat.com>
+---
+ testcases/kernel/crypto/af_alg07.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testcases/kernel/crypto/af_alg07.c b/testcases/kernel/crypto/af_alg07.c
+index 270197bb0..6ad86f4f3 100644
+--- a/testcases/kernel/crypto/af_alg07.c
++++ b/testcases/kernel/crypto/af_alg07.c
+@@ -109,6 +109,7 @@ static struct tst_test test = {
+ 	.test_all = run,
+ 	.setup = setup,
+ 	.cleanup = cleanup,
++	.min_kver = "4.10.0",
+ 	.taint_check = TST_TAINT_W | TST_TAINT_D,
+ 	.tags = (const struct tst_tag[]) {
+ 		{"linux-git", "9060cb719e61"},
+-- 
+2.21.3
+

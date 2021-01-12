@@ -15,8 +15,10 @@ function rhel8_fatal_issues()
 
 function rhel8_unfix_issues()
 {
+	# Bug 1880265 - RHEL8.3 Snapshot1 - Slab memory controller issue (mm-) 
+	osver_in_range "800" "805" && tskip "madvise06" unfix
 	# Bug 1832099 - fanotify: fix merging marks masks with FAN_ONDIR
-	osver_in_range "800" "804" && tskip "fanotify09" unfix
+	osver_in_range "800" "805" && tskip "fanotify09" unfix
 	# Bug 1805587 - [FJ8.2 Bug]: system crash happened due to NULL pointer dereference at slip_write_wakeup()
 	osver_in_range "800" "804" && tskip "pty03" unfix
 	# Bug 1657032 - fallocate05 intermittently failing in ltp lite
@@ -42,25 +44,40 @@ function rhel8_unfix_issues()
 	# oom03, oom05, ksm03, ksm04 testcases don't work with cgroup2
 	tskip "oom03 oom05" unfix
 	# Bug 1804478 scheduler exceeds prctl timerslack on s390x
-	osver_in_range "800" "804" && is_arch "s390x" && tskip "prctl09" unfix
+	osver_in_range "800" "805" && is_arch "s390x" && tskip "prctl09" unfix
 	# Bug 1842025 - ltp: connect02: setsockopt(IPV6_ADDRFORM) failed: ENOPROTOOPT (92)
 	tskip "connect02" unfix
 	# Bug 1842076 - ltp: ptrace09 PANIC: double fault, error_code: 0x0
 	tskip "ptrace09" unfix
 	# Failing on s390x, ppc64le
 	(is_arch "s390x" || is_arch "ppc64le") && tskip "ioctl_loop05" unfix
-	# Bug 1842628 - [ltp-lite] pty04.c:264: FAIL: Padding bytes may contain stack data b1 ff ff
+	# Bug 1842628 - [RHEL-8.3][ltp-lite] pty04.c:264: FAIL: Padding bytes may contain stack data b1 ff ff
 	tskip "pty04 cve-2020-11494" unfix
+	# Bug 1844854 - ltp: bpf_prog01 Failed verification: in-kernel BTF is malformed
+	is_arch "s390x" && tskip "bpf_prog01" unfix
+	# Bug 1845879 - fanotify: fix ignore mask logic for events on child and on dir
+	osver_in_range "800" "805" && tskip "fanotify10" unfix
+	# ptrace08 case issue, tst_kvercmp isn't suitable for rhel8's kernel version
+	osver_in_range "800" "805" && tskip "ptrace08 cve-2018-1000199" unfix
+	# Unable to load BPF programs on s390x kernels built by CKI
+	# https://projects.engineering.redhat.com/browse/FASTMOVING-1825
+	is_arch "s390x" && tskip "bpf_prog01 bpf_prog02" unfix
+	# send02 fails with TFAIL: recv() error: EAGAIN/EWOULDBLOCK, issue TBF
+	osver_in_range "800" "805" && tskip "send02" unfix
 }
 
 function rhel8_fixed_issues()
 {
+	# Bug 1820405 - KEYS: allow reaching the keys quotas exactly
+	kernel_in_range "0" "4.18.0-193.7.el8" && tskip "add_key05" fixed
+	# Bug 1771351 - fat: race between udev and mkdir leads to EIO
+	kernel_in_range "0" "4.18.0-193.5.el8" && tskip "statx04" fixed
 	# Bug 1760638  timer_create: alarmtimer return wrong errno, on RTC-less system, s390x, ppc64
 	kernel_in_range "0" "4.18.0-148.el8" && tskip "timer_delete01 timer_settime01 timer_settime02" fixed
 	! is_arch "x86_64" && osver_in_range "800" "803" && tskip "timer_create01" fixed
 	# Bug 1734286 - mm: mempolicy: make mbind() return -EIO when MPOL_MF_STRICT is specified
 	kernel_in_range "0" "4.18.0-147.12.el8" && tskip "mbind02" unfix
-	# Bug 171erlayfs fixes up to upstream 5.2
+	# Bug 1718370 - overlayfs fixes up to upstream 5.2
 	kernel_in_range "0" "4.18.0-109.el8" && tskip "fanotify06" fixed
 	# Bug 1657880 - CVE-2018-19854 kernel: Information Disclosure in crypto_report_one in crypto/crypto_user.c
 	kernel_in_range "0" "4.18.0-80.13.el8" && tskip "cve-2018-19854 crypto_user01" fixed
@@ -68,6 +85,12 @@ function rhel8_fixed_issues()
 	kernel_in_range "0" "4.18.0-27.el8" && tskip "execveat03" fixed
 	# Bug 1652432 - fanotify: fix handling of events on child sub-directory
 	kernel_in_range "0" "4.18.0-50.el8" && tskip "fanotify09" fixed
+	# 20200515 updated fallocate06 xfs failure disappeared since kernel-4.18.0-194.el8
+	kernel_in_range "0" "4.18.0-194.el8" && tskip "fallocate06" fixed
+	# Bug 1820405 - KEYS: allow reaching the keys quotas exactly        fixed 4.18.0-193.7.el8 during early dev
+	kernel_in_range "0" "4.18.0-194.el8" && tskip "add_key05" fixed
+	# Bug 1875699 - CVE-2020-14386 kernel: memory corruption in net/packet/af_packet.c leads to elevation of privilege
+	kernel_in_range "0" "4.18.0-237.el8" && tskip "sendto03 cve-2020-14386" fixed
 }
 
 function rhel8_knownissue_filter()
@@ -75,4 +98,10 @@ function rhel8_knownissue_filter()
 	rhel8_fatal_issues;
 	rhel8_unfix_issues;
 	rhel8_fixed_issues;
+	if is_zstream; then
+		# Bug 1875699 - CVE-2020-14386 kernel: memory corruption in net/packet/af_packet.c leads to elevation of privilege
+		kernel_in_range "4.18.0-147.31.1.el8_1" "4.18.0-147.9999"  && tback "sendto03 cve-2020-14386"
+		# Bug 1875699 - CVE-2020-14386 kernel: memory corruption in net/packet/af_packet.c leads to elevation of privilege
+		kernel_in_range "4.18.0-193.23.1.el8_2" "4.18.0-193.9999"  && tback "sendto03 cve-2020-14386"
+	fi
 }
