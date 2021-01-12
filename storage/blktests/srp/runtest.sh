@@ -28,6 +28,9 @@ source $CDIR/../../../cki_lib/libcki.sh
 function pre_setup
 {
 	modprobe -r ib_isert ib_srpt iscsi_target_mod target_core_mod
+	echo "options nvme_core multipath=N"  > /etc/modprobe.d/nvme.conf
+	pidof multipathd && pkill -9 multipathd
+	[ -f /etc/multipath.conf ] && rm -f /etc/multipath.conf
 }
 
 function get_timestamp

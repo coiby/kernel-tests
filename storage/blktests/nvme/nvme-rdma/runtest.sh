@@ -21,7 +21,7 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 TNAME="storage/blktests/nvme/nvme-rdma"
-TRTYPE=${TRTYPE:-"rdma"}
+USE_SIW=${USE_SIW:-"0"}
 
 source $CDIR/../../../../cki_lib/libcki.sh
 
@@ -84,26 +84,33 @@ function do_test
 {
 	typeset test_ws=$1
 	typeset test_case=$2
-	typeset trtype=$3
-
 	typeset this_case=$test_ws/tests/$test_case
-	echo ">>> $(get_timestamp) | Start to run test case nvme-$trtype: $this_case ..."
-	(cd $test_ws && nvme_trtype=$trtype ./check $test_case)
+	typeset use_siw=$3
+	typeset USE_SIW
+
+	if (( $use_siw == 0 )); then
+		USE_SIW=""
+	elif (($use_siw == 1)); then
+		USE_SIW="use_siw=1"
+	fi
+
+	echo ">>> $(get_timestamp) | Start to run test case $USE_SIW nvme-rdma: $this_case ..."
+	(cd $test_ws && eval $USE_SIW nvme_trtype=rdma ./check $test_case)
 	typeset result=$(get_test_result $test_ws $test_case)
-	echo ">>> $(get_timestamp) | End nvme-$trtype: $this_case | $result"
+	echo ">>> $(get_timestamp) | End nvme-rdma: $this_case | $result"
 
 	typeset -i ret=0
 	if [[ $result == "PASS" ]]; then
-		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" PASS 0
+		rstrnt-report-result "$USE_SIW nvme-rdma: $TNAME/tests/$test_case" PASS 0
 		ret=0
 	elif [[ $result == "FAIL" ]]; then
-		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" FAIL 1
+		rstrnt-report-result "$USE_SIW nvme-rdma: $TNAME/tests/$test_case" FAIL 1
 		ret=1
 	elif [[ $result == "SKIP" ]]; then
-		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" SKIP 0
+		rstrnt-report-result "$USE_SIW nvme-rdma: $TNAME/tests/$test_case" SKIP 0
 		ret=0
 	else
-		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" WARN 2
+		rstrnt-report-result "$USE_SIW nvme-rdma: $TNAME/tests/$test_case" WARN 2
 		ret=2
 	fi
 
@@ -166,12 +173,12 @@ enable_nvme_core_multipath
 
 test_ws=$CDIR/blktests
 ret=0
-for trtype in $TRTYPE; do
-	testcases_default=""
-	testcases_default+=" $(get_test_cases_${trtype})"
-	testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
-	for testcase in $testcases; do
-		do_test $test_ws $testcase $trtype
+testcases_default=""
+testcases_default+=" $(get_test_cases_rdma)"
+testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
+for testcase in $testcases; do
+	for use_siw in $USE_SIW; do
+		do_test $test_ws $testcase $use_siw
 		((ret += $?))
 	done
 done
