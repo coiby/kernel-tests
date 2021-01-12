@@ -153,6 +153,36 @@ function get_blkdev_info()
 	blockdev -v --getsz --getss --getpbsz --getbsz --getsize64 $dev
 }
 
+# Needs TEST_DEV, TEST_DIR, SRATCH_DEV, SCRATCH_MNT
+function check_config()
+{
+	local seclabel="-o context=system_u:object_r:nfs_t:s0"
+	local ret=0
+	local cnt=10
+
+	echo mount $TEST_FS_MOUNT_OPTS $seclabel $TEST_DEV $TEST_DIR
+	echo mount $MOUNT_OPTS $seclabel $SCRATCH_DEV $SCRATCH_MNT
+
+	while [ $cnt -gt 0 ]
+	do
+		ret=0
+		mount $TEST_FS_MOUNT_OPTS $seclabel $TEST_DEV $TEST_DIR
+		((ret+=$?))
+		mount $MOUNT_OPTS $seclabel $SCRATCH_DEV $SCRATCH_MNT
+		((ret+=$?))
+		[ $ret -eq 0 ] && break
+		((cnt++))
+		sleep 5
+	done
+	umount $SCRATCH_MNT
+	umount $TEST_DIR
+	if [ $ret -ne 0 ] ; then
+		echo "Failed to mount $FSTYPE shares, skip this run"
+		rstrnt-report-result "xfstests - $FSTYPE" SKIP
+		exit 0
+	fi
+}
+
 # Needs TEST_DEV, TEST_DIR, SRATCH_DEV, SCRATCH_MNT, SCRATCH_DEV_POOL, SCRATCH_LOGDEV and SCRATCH_RTDEV
 function setup_config()
 {
@@ -272,6 +302,8 @@ function setup_full
 	setup_test_dev_mkfs
 	sleep 10
 	sync
+	# Check Network filesystems availability
+	check_config
 	# Write the new xfstests config file
 	setup_config
 	sleep 10
