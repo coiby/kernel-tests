@@ -286,30 +286,30 @@ function rpm_install()
   if $YUM install -y "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-devel-${KVER} successfully"
   else
-    cki_print_warning "No package kernel-devel-${KVER} found, skipping!"
+    cki_print_warning "No package ${PACKAGE_NAME}-devel-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
   if $YUM install -y "${PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-modules-extra-${KVER} successfully"
   else
-    cki_print_warning "No package kernel-modules-extra-${KVER} found, skipping!"
+    cki_print_warning "No package ${PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
   if $YUM install -y "${PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-modules-internal-${KVER} successfully"
   else
-    cki_print_warning "No package kernel-modules-internal-${KVER} found, skipping!"
+    cki_print_warning "No package ${PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
   if $YUM install -y "${PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-headers-${KVER} successfully"
   else
-    cki_print_warning "No package kernel-headers-${KVER} found, trying without exact ${KVER}"
+    cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
     ALT_HEADERS=$(ls ${PACKAGE_NAME}-headers* | grep -v src.rpm | head -1)
     if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
         cki_print_success "Installed ${ALT_HEADERS} successfully"
     else
-        cki_print_warning "No package kernel-headers-${KVER} found, skipping!"
+        cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, skipping!"
         cki_print_warning "Note that some tests might require the package and can fail!"
     fi
   fi
