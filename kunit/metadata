@@ -1,0 +1,12 @@
+[General]
+name=KUNIT
+owner=Nico Pache <npache@redhat.com>
+description=KUNIT Test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib
+dependencies=python3
