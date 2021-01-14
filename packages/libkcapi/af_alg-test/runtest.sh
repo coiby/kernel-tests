@@ -56,7 +56,9 @@ rlJournalStart
 
         # Old versions of aes_neon_bs cause some tests to fail. Fixed in:
         # https://bugzilla.redhat.com/show_bug.cgi?id=1826982
-        if rlIsRHEL && kver_lt 4.18.0-193.15.el8; then
+        # NOTE: This was actually fixed in 4.18.0-193.15.el8, but because of
+        # stupid Z-stream kernel versioning we need to compare to -194...
+        if rlIsRHEL && kver_lt 4.18.0-194; then
             rlRun "rmmod aes_neon_bs" 0-1 "Remove buggy aes_neon_bs module"
         fi
     rlPhaseEnd
