@@ -57,19 +57,9 @@ reset_net_env()
 {
 	# log the link before clean
 	debug_info
-	modprobe -r ipip
-	modprobe -r vxlan
-	modprobe -r geneve
-	modprobe -r ip_gre
-	modprobe -r ip6_gre
-	modprobe -r ip6_vti
-	modprobe -r ip6_tunnel
-	modprobe -r veth
-	# Looks fedora doesn't has this module
-	# modprobe -r netdevsim
 	ip -a netns del
 	sleep 2
-	debug_info
+	run "ip link show"
 }
 
 # usage: check_skipped_tests test_name "${skip_test[@]}"
@@ -96,20 +86,6 @@ run_test()
 	else
 		return $ret
 	fi
-}
-
-# @arg1: test name
-get_test_list()
-{
-	local name=$1
-	local start_line end_line test_list
-
-	pushd $EXEC_DIR &> /dev/null
-
-	test_list=$(grep "^$name:"  kselftest-list.txt | cut -f2 -d:)
-
-	popd &> /dev/null
-	echo $test_list
 }
 
 check_result()
@@ -188,8 +164,8 @@ run_bpf_test_progs()
 		return 1
 	fi
 
-	total_tests=$(basename -s .c prog_tests/*.c)
-	total_num=$(echo ${total_tests} | wc -w)
+	total_tests=$(./test_progs --list)
+	total_num=$(./test_progs --count)
 	nfail=0 num=0 name=""
 
 	for name in ${total_tests}; do
@@ -272,14 +248,14 @@ install_kselftests || test_fail_exit "install kselftests failed"
 
 run "uname -r"
 reset_net_env
-submit_log "$EXEC_DIR/run_kselftest.sh"
+submit_log "$EXEC_DIR/kselftest-list.txt"
 
 for item in $TEST_ITEMS; do
 	# deal with bpf/test_progs specially
 	[ "$item" == "bpf_test_progs" ] && run_bpf_test_progs && continue
 
 	grep -q "^$item:" selftests/kselftest-list.txt || \
-		{ test_skip "$item test not find in run_kselftest.sh" && continue; }
+		{ test_skip "$item test not find in kselftest-list.txt" && continue; }
 
 	pushd $EXEC_DIR/$item
 	if [ "$item" == "tc-testing" ]; then
@@ -288,7 +264,7 @@ for item in $TEST_ITEMS; do
 	fi
 
 	_item=$(echo $item | tr -s "/-" "_")
-	total_tests=$(get_test_list ${item})
+	total_tests=$(grep "^${item}:"  $EXEC_DIR/kselftest-list.txt | cut -f2 -d:)
 	total_num=$(echo ${total_tests} | wc -w)
 	FAIL=0 num=0 name=""
 
