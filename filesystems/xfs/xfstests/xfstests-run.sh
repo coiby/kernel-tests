@@ -124,7 +124,6 @@ function check()
 		while check_tests; do :;done
 	fi
 	popd
-	create_test_report
 	return 0
 }
 
