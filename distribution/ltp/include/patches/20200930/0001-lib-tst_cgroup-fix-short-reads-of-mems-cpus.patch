@@ -1,0 +1,99 @@
+From 80c26b8c9d5a7915790c29af2f9fcc6c3ac877fa Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Tue, 3 Nov 2020 14:09:23 +0100
+Subject: [PATCH] lib/tst_cgroup: fix short reads of mems/cpus
+
+tst_cgroup_cpuset_read_files() is wrongly using sizeof on pointer
+type to figure out length of buffer. On some systems there's
+more content in cgroup mems/cpus, which leads to partial read
+and subsequent EINVAL on write.
+
+Also the retval buffer should be zero terminated, since buffer
+can be passed uninitialized, subsequently leading to writing garbage
+to cgroup and again hitting EINVAL.
+
+Before:
+  tst_test.c:1250: TINFO: Timeout per run is 0h 05m 00s
+  tst_device.c:423: TINFO: No device is mounted at cgroup2
+  tst_device.c:423: TINFO: No device is mounted at /tmp/cgroup_cst
+  tst_cgroup.c:100: TINFO: Cgroup(cpuset) v1 mount at /tmp/cgroup_cst success
+  safe_macros.c:458: TBROK: tst_cgroup.c:449: write(6,0x7fffc0425410,18446744073709551615) failed: EINVAL (22)
+  tst_cgroup.c:173: TWARN: umount /tmp/cgroup_cst: EBUSY (16)
+  tst_cgroup.c:175: TWARN: rmdir /tmp/cgroup_cst: EBUSY (16)
+  tst_cgroup.c:178: TINFO: Cgroup v1 unmount success
+
+After:
+  tst_test.c:1250: TINFO: Timeout per run is 0h 05m 00s
+  tst_device.c:423: TINFO: No device is mounted at cgroup2
+  tst_device.c:423: TINFO: No device is mounted at /tmp/cgroup_cst
+  tst_cgroup.c:100: TINFO: Cgroup(cpuset) v1 mount at /tmp/cgroup_cst success
+  cpuset01.c:83: TPASS: cpuset test pass
+  tst_cgroup.c:178: TINFO: Cgroup v1 unmount success
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ include/tst_cgroup.h                   | 6 ++++--
+ lib/tst_cgroup.c                       | 6 ++++--
+ testcases/kernel/mem/cpuset/cpuset01.c | 4 ++--
+ 3 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/include/tst_cgroup.h b/include/tst_cgroup.h
+index 77780e0d6..bfd848260 100644
+--- a/include/tst_cgroup.h
++++ b/include/tst_cgroup.h
+@@ -39,7 +39,9 @@ int  tst_cgroup_mem_swapacct_enabled(const char *cgroup_dir);
+ void tst_cgroup_mem_set_maxswap(const char *cgroup_dir, long memsz);
+ 
+ /* Set of functions to read/write cpuset controller files content */
+-void tst_cgroup_cpuset_read_files(const char *cgroup_dir, const char *filename, char *retbuf);
+-void tst_cgroup_cpuset_write_files(const char *cgroup_dir, const char *filename, const char *buf);
++void tst_cgroup_cpuset_read_files(const char *cgroup_dir, const char *filename,
++	char *retbuf, size_t retbuf_sz);
++void tst_cgroup_cpuset_write_files(const char *cgroup_dir, const char *filename,
++	const char *buf);
+ 
+ #endif /* TST_CGROUP_H */
+diff --git a/lib/tst_cgroup.c b/lib/tst_cgroup.c
+index ba413d874..96c9524d2 100644
+--- a/lib/tst_cgroup.c
++++ b/lib/tst_cgroup.c
+@@ -393,7 +393,8 @@ void tst_cgroup_mem_set_maxswap(const char *cgroup_dir, long memsz)
+ 		tst_cgroup_set_knob(cgroup_dir, "memory.swap.max", memsz);
+ }
+ 
+-void tst_cgroup_cpuset_read_files(const char *cgroup_dir, const char *filename, char *retbuf)
++void tst_cgroup_cpuset_read_files(const char *cgroup_dir, const char *filename,
++	char *retbuf, size_t retbuf_sz)
+ {
+ 	int fd;
+ 	char *cgroup_new_dir;
+@@ -417,7 +418,8 @@ void tst_cgroup_cpuset_read_files(const char *cgroup_dir, const char *filename,
+ 			tst_brk(TBROK | TERRNO, "open %s", knob_path);
+ 	}
+ 
+-	if (read(fd, retbuf, sizeof(retbuf)) < 0)
++	memset(retbuf, 0, retbuf_sz);
++	if (read(fd, retbuf, retbuf_sz) < 0)
+ 		tst_brk(TBROK | TERRNO, "read %s", knob_path);
+ 
+ 	close(fd);
+diff --git a/testcases/kernel/mem/cpuset/cpuset01.c b/testcases/kernel/mem/cpuset/cpuset01.c
+index f70ae0e48..528c3eddd 100644
+--- a/testcases/kernel/mem/cpuset/cpuset01.c
++++ b/testcases/kernel/mem/cpuset/cpuset01.c
+@@ -51,9 +51,9 @@ static void test_cpuset(void)
+ 	unsigned long nmask[MAXNODES / BITS_PER_LONG] = { 0 };
+ 	char mems[BUFSIZ], buf[BUFSIZ];
+ 
+-	tst_cgroup_cpuset_read_files(PATH_TMP_CG_CST, "cpus", buf);
++	tst_cgroup_cpuset_read_files(PATH_TMP_CG_CST, "cpus", buf, BUFSIZ);
+ 	tst_cgroup_cpuset_write_files(PATH_TMP_CG_CST, "cpus", buf);
+-	tst_cgroup_cpuset_read_files(PATH_TMP_CG_CST, "mems", mems);
++	tst_cgroup_cpuset_read_files(PATH_TMP_CG_CST, "mems", mems, BUFSIZ);
+ 	tst_cgroup_cpuset_write_files(PATH_TMP_CG_CST, "mems", mems);
+ 	tst_cgroup_move_current(PATH_TMP_CG_CST);
+ 
+-- 
+2.21.3
+

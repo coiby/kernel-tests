@@ -1,0 +1,33 @@
+From 4706bf2fa58272decd2bdfa726283eeaa4030685 Mon Sep 17 00:00:00 2001
+From: Richard Palethorpe <rpalethorpe@suse.com>
+Date: Tue, 3 Nov 2020 15:49:50 +0000
+Subject: [PATCH] madvise06: Add tag for "mm: memcg: link page counters to root
+ ..."
+
+The test may trigger a warning if bf4f059 is present (5.9) and
+use_hierarchy=0 which is fixed by 8de15e920dc8. Full details of the
+bug are in the kernel commit description and I do not want to repeat
+them in the test description as they are likely to be irrelevant to
+most readers.
+
+Signed-off-by: Richard Palethorpe <rpalethorpe@suse.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ testcases/kernel/syscalls/madvise/madvise06.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testcases/kernel/syscalls/madvise/madvise06.c b/testcases/kernel/syscalls/madvise/madvise06.c
+index 23ebbead6..817faae39 100644
+--- a/testcases/kernel/syscalls/madvise/madvise06.c
++++ b/testcases/kernel/syscalls/madvise/madvise06.c
+@@ -235,6 +235,7 @@ static struct tst_test test = {
+ 	.needs_root = 1,
+ 	.tags = (const struct tst_tag[]) {
+ 		{"linux-git", "55231e5c898c"},
++		{"linux-git", "8de15e920dc8"},
+ 		{}
+ 	}
+ };
+-- 
+2.21.3
+

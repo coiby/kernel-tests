@@ -1,0 +1,85 @@
+From 85c37ee63f9dacd086a06e816d1028c536b29300 Mon Sep 17 00:00:00 2001
+From: Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Date: Wed, 18 Nov 2020 14:00:23 +0800
+Subject: [PATCH] syscalls/madvise06: Add check for /proc/sys/vm/stat_refresh
+ file
+
+On older kernel(i.e. centos 7.8ga) the file /proc/sys/vm/stat_refresh
+does not exist because the kernel it was introduced in [1]. Since the
+test uses FILE_PRINTF() it will continue regardless but the overall test
+status will report TWARN(4) and ltp-pan will mark this testcase as
+failed.
+
+......
+safe_file_ops.c:238: TWARN: Failed to open FILE '/proc/sys/vm/stat_refresh' at madvise06.c:78
+......
+Summary:
+passed   2
+failed   0
+skipped  0
+warnings 7
+<<<execution_status>>>
+initiation_status="ok"
+duration=6 termination_type=exited termination_id=4 corefile=no
+cutime=4 cstime=66
+<<<test_end>>>
+INFO: ltp-pan reported some tests FAIL
+
+This commit changes the code so that we attempt to write to the file
+only if it exists and is writeable.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=52b6f46bc
+
+Signed-off-by: Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ testcases/kernel/syscalls/madvise/madvise06.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/madvise/madvise06.c b/testcases/kernel/syscalls/madvise/madvise06.c
+index 7e9e9ef84..962554163 100644
+--- a/testcases/kernel/syscalls/madvise/madvise06.c
++++ b/testcases/kernel/syscalls/madvise/madvise06.c
+@@ -54,7 +54,7 @@
+ #define GROUP_NAME "madvise06"
+ 
+ static const char drop_caches_fname[] = "/proc/sys/vm/drop_caches";
+-static int pg_sz;
++static int pg_sz, stat_refresh_sup;
+ 
+ static long init_swap, init_swap_cached, init_cached;
+ 
+@@ -75,7 +75,9 @@ static void meminfo_diag(const char *point)
+ {
+ 	long rval;
+ 
+-	FILE_PRINTF("/proc/sys/vm/stat_refresh", "1");
++	if (stat_refresh_sup)
++		SAFE_FILE_PRINTF("/proc/sys/vm/stat_refresh", "1");
++
+ 	tst_res(TINFO, "%s", point);
+ 	tst_res(TINFO, "\tSwap: %ld Kb",
+ 		SAFE_READ_MEMINFO("SwapTotal:") - SAFE_READ_MEMINFO("SwapFree:") - init_swap);
+@@ -143,6 +145,9 @@ static void setup(void)
+ 	init_swap_cached = SAFE_READ_MEMINFO("SwapCached:");
+ 	init_cached = SAFE_READ_MEMINFO("Cached:");
+ 
++	if (!access("/proc/sys/vm/stat_refresh", W_OK))
++		stat_refresh_sup = 1;
++
+ 	tst_res(TINFO, "mapping %ld Kb (%ld pages), limit %ld Kb, pass threshold %ld Kb",
+ 		CHUNK_SZ / 1024, CHUNK_SZ / pg_sz, MEM_LIMIT / 1024, PASS_THRESHOLD_KB);
+ }
+@@ -203,7 +208,8 @@ static void test_advice_willneed(void)
+ 	do {
+ 		loops--;
+ 		usleep(100000);
+-		FILE_PRINTF("/proc/sys/vm/stat_refresh", "1");
++		if (stat_refresh_sup)
++			SAFE_FILE_PRINTF("/proc/sys/vm/stat_refresh", "1");
+ 		SAFE_FILE_LINES_SCANF("/proc/meminfo", "SwapCached: %ld",
+ 			&swapcached);
+ 	} while (swapcached < swapcached_start + PASS_THRESHOLD_KB && loops > 0);
+-- 
+2.21.3
+
