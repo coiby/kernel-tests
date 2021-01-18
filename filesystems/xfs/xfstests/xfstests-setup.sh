@@ -171,7 +171,7 @@ function check_config()
 		mount $MOUNT_OPTS $seclabel $SCRATCH_DEV $SCRATCH_MNT
 		((ret+=$?))
 		[ $ret -eq 0 ] && break
-		((cnt++))
+		((cnt--))
 		sleep 5
 	done
 	umount $SCRATCH_MNT
