@@ -29,8 +29,12 @@ function pre_setup
 {
 	modprobe -r ib_isert ib_srpt iscsi_target_mod target_core_mod
 	echo "options nvme_core multipath=N"  > /etc/modprobe.d/nvme.conf
-	pidof multipathd && pkill -9 multipathd
-	[ -f /etc/multipath.conf ] && rm -f /etc/multipath.conf
+}
+
+function disable_multipath
+{
+        pidof multipathd &>/dev/null && pkill -9 multipathd
+        [ -f /etc/multipath.conf ] && rm -f /etc/multipath.conf
 }
 
 function get_timestamp
@@ -135,6 +139,7 @@ testcases_default+=" $(get_test_cases_srp)"
 testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
 for testcase in $testcases; do
 	for use_siw in $USE_SIW; do
+		disable_multipath
 		do_test $test_ws $testcase $use_siw
 		((ret += $?))
 	done
