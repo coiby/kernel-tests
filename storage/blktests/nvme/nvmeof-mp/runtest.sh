@@ -105,7 +105,7 @@ function do_test
 function get_test_cases
 {
 	typeset testcases=""
-	testcases+=" nvmeof-mp/001"
+	[[ $(ip -4 -o a s | grep -v "127.0.0.1" | wc -l) != 1 ]] || testcases+=" nvmeof-mp/001"
 	testcases+=" nvmeof-mp/002"
 	# testcases+=" nvmeof-mp/004", need legacy device mapper support
 	testcases+=" nvmeof-mp/005"
