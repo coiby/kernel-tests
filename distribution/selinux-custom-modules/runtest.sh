@@ -17,7 +17,7 @@ rlJournalStart
     # https://bugzilla.redhat.com/show_bug.cgi?id=1910373
     # Bug 1913372 - selinux avc denials for systemd-logind
     # https://bugzilla.redhat.com/show_bug.cgi?id=1910373
-    elif rlIsRHEL 9; then
+    elif rlIsRHEL 9 || rlIsFedora; then
       rlRun "make -f /usr/share/selinux/devel/Makefile rpcbind-mod.pp" 0 "Building rpcbind SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile rhsmcertd-worke.pp" 0 "Building rhsmcertd-worke SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile systemd-logind-mod.pp" 0 "Building systemd-logind SELinux module"
