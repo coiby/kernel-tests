@@ -164,7 +164,7 @@ function knownissue_filter()
 	# Issue to be filed
 	tskip "perf_event_open02" unfix
 	# netns_breakns_ip_ipv6_netlink was re-written upstream, not yet stable
-	tskip "netns_breakns_ip_ipv6_netlink" unfix
+	tskip "netns_breakns_ip_ipv6_netlink netns_breakns_ns_exec_ipv6_netlink" unfix
 	# Bug 1912670 - semctl SEM_STAT_ANY fails to pass the buffer specified by the caller to the kernel
 	tskip "semctl09" unfix
 
