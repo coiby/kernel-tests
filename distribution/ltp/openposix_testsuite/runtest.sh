@@ -5,6 +5,7 @@
 . ../include/runtest.sh      || exit 1
 . ../include/kvercmp.sh      || exit 1
 . ../include/ltp-make.sh     || exit 1
+. ../include/knownissue.sh   || exit 1
 
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
@@ -117,6 +118,17 @@ DISABLED_LIST='disabled.common'
 # maps when using tmpfs so this test fails. See mmap(2) man page for more info.
 if grep -q '/tmp tmpfs' /proc/mounts; then
     echo './conformance/interfaces/mmap/11-4.c' >> ${DISABLED_LIST}
+fi
+
+#
+# mlock_8-1, munlock_10-1
+# http://lists.linux.it/pipermail/ltp/2019-October/013912.html
+# 597399d0cb91 ("arm64: tags: Preserve tags for addresses translated via TTBR1")
+# d0022c0ef29b ("arm64: memory: Add missing brackets to untagged_addr() macro")
+#
+if is_arch "aarch64" && kernel_in_range "0" "5.6.0"; then
+    echo './conformance/interfaces/mlock/8-1.c' >> $DISABLED_LIST
+    echo './conformance/interfaces/munlock/10-1.c' >> $DISABLED_LIST
 fi
 
 echo "Disabling testcases" | tee -a $OUTPUTFILE
