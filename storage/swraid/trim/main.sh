@@ -28,8 +28,9 @@ function runtest()
 {
 	rlRun "modprobe raid456 devices_handle_discard_safely=Y"
 	rlRun "echo Y >/sys/module/raid456/parameters/devices_handle_discard_safely"
-	typeset release=$(cat /etc/redhat-release | tr -cd "[0-9.]")
-	if [[ $(bc -l <<< "$release <= 7.4") -eq 1 ]]; then # release <= 7.4 is true
+	# it seems devices_discard_performance is only support on early RHEL-7 releases (7.0 to 7.4)
+	# but I couldn't find any referrence saying this parameter got deprecated.
+	if modinfo raid0 | grep "parm:[[:space:]]\+devices_discard_performance:"; then
 		rlRun "modprobe raid0 devices_discard_performance=Y"
 		rlRun "echo Y >/sys/module/raid0/parameters/devices_discard_performance"
 	fi
@@ -73,10 +74,10 @@ function runtest()
 		[ ! -d /mnt/md_test ] && mkdir /mnt/md_test
 		rlRun "mount -t $FILESYS $MD_RAID /mnt/md_test "
 		rlRun "fstrim -v /mnt/md_test"
-		[ $? -ne 0 ] && rlLog "fstrim -v /mnt/md_test failed"	
+		[ $? -ne 0 ] && rlLog "fstrim -v /mnt/md_test failed"
 		rlRun "umount $MD_RAID"
 		MD_Clean_RAID $MD_RAID
-	done	
+	done
 	remove_disks "$devlist"
 }
 
