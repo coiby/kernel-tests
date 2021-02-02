@@ -1,0 +1,13 @@
+
+module rhsmcertd-worke-nodebind 1.0;
+
+require {
+	type node_t;
+	type rhsmcertd_t;
+	class tcp_socket node_bind;
+}
+
+#============= rhsmcertd_t ==============
+
+#!!!! This avc can be allowed using the boolean 'nis_enabled'
+allow rhsmcertd_t node_t:tcp_socket node_bind;
