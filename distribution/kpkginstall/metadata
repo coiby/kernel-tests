@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=elfutils-libelf-devel;flex;bison;gcc;openssl-devel;make;curl;grubby;tar;binutils
-softDependencies=yum-utils
+softDependencies=yum-utils;llvm;lld;clang
 repoRequires=cki_lib
