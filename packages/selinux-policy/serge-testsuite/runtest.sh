@@ -29,7 +29,7 @@
 set -ex
 
 git_url=${WRAPPER_GIT_URL:-"https://src.fedoraproject.org/tests/selinux.git"}
-git_branch=${WRAPPER_GIT_BRANCH:-"master"}
+git_branch=${WRAPPER_GIT_BRANCH:-"main"}
 git_path=${WRAPPER_GIT_PATH:-"kernel/selinux-testsuite"}
 
 git clone "$git_url" "test-repo"
