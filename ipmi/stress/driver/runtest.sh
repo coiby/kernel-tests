@@ -50,7 +50,7 @@ rlJournalStart
     rlPhaseStartTest
     # Load and unload ipmi drivers in a loop
     modules="ipmi_ssif ipmi_devintf ipmi_poweroff ipmi_watchdog ipmi_si"
-    rlRun -l "modprobe -r $modules"
+    rlRun -l "modprobe -r $modules" 0,1
     for i in $(seq 0 10); do
         for i in $modules; do
             rlRun -l "modprobe $i" 0,1
