@@ -25,6 +25,11 @@ function test_msg()
 	esac
 }
 
+# A recent commit in the upstream LTP repo that passes all Travis checks
+#
+# NOTE: We use a tested commit to avoid that breakage in LTP's master branch
+#       can make our test suites less stable
+LTP_REPO_COMMIT_ID=8e08ce80c77bc809912d1797fef465665f08b801
 function ltp_test_build()
 {
 	# workaround for the beaker issue when arch is ppc64:
@@ -51,7 +56,7 @@ function ltp_test_build()
 	fi
 
 	pushd ltp > /dev/null 2>&1
-	git checkout 84d1927ece47f01527b55ae1b9967cc0aa85b7e3
+	git checkout $LTP_REPO_COMMIT_ID
 	# Timing on systems with shared resources (and high steal time) is not accurate, apply patch for non bare-metal machines
 	patch -p1 < ../patches/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
 	# Disable btrfs testing
