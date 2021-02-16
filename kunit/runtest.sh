@@ -32,13 +32,15 @@ process_results(){
 	sed -i '/^S/d' "$1" #remove all empty lines
 	sed -i 's/^[ \t]*//' "$1" #remove all leading whitespace
 	sed -i '/^#/d' "$1" #remove comments
+	sed -i '$d' "$1"
 	uniq "$1" > "$TMPFILE"  #remove dup
+
 	tappy "$TMPFILE" &> "$OUTFILE"
         RESULT_OUTPUT=$(cat "$OUTFILE" |tail -1)
 	if [ "$RESULT_OUTPUT" = "OK" ]; then
-		return 1
-	else
 		return 0
+	else
+		return 1
 	fi
 }
 
@@ -49,7 +51,21 @@ process_results(){
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Global parameters
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# TODO: find a better way to determine available tests  
+
+# When rebasing create a new array at the current release number (eg rhel8.5)
+# Then add a check for the proper tag number
+
+tag=$(uname -rm | grep -o "\-.*.el8")
+el8=$( echo "$tag" | grep -o ".el8" )
+version=$( echo "$tag" | sed 's/\-\(.*\).el8/\1/')
+
+#currently only supports rhel 8
+if [ "$el8" != ".el8" ]; then
+	rlLog "RHEL8 Varient not detected. currently only supports =>rhel8.4"
+	rstrnt-report-result "KUNIT" SKIP
+	exit 0
+fi
+
 test_arr=(kunit-test ext4-inode-test list-test sysctl-test mptcp_crypto_test \
 	mptcp_token_test)
 
@@ -78,13 +94,9 @@ rlJournalStart
     for TEST in ${test_arr[*]}
     do
 	rlLog "running test $TEST"
-	modprobe $TEST
+	modprobe "$TEST"
 	if [ $? -ne 0 ]; then
 		rlLog "Could not install $TEST module, skipping this module"
-		#rstrnt-report-result $TEST SKIP 0
-	else
-		#rmmod $TEST
-		#rstrnt-report-result $TEST PASS 1
 	fi
     done
 
@@ -93,16 +105,18 @@ rlJournalStart
     cp -r /sys/kernel/debug/kunit/. /tmp/kunit_results/
     for TEST in /tmp/kunit_results/*
     do
-	if [ -d ${TEST} ]
+	if [ -d "${TEST}" ]
 	then
-		process_results ${TEST}/results
-		if [ $? -ne 0 ]
+		test_name="$(basename "$TEST")"
+		process_results "${TEST}/results"
+		result=$?
+		cp "${TEST}/results" "${TEST}/${test_name}.log"
+		if [ $result -eq 0 ]
 		then
-			rstrnt-report-result $TEST PASS 1
+			rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" PASS 0
                 else
-			rstrnt-report-result $TEST FAIL 0
+			rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" FAIL 1
                 fi
-		rstrnt-report-log -l "${TEST}/results"
 	fi
     done
   rlPhaseEnd
@@ -110,11 +124,12 @@ rlJournalStart
 #-------------------- Clean Up ------------------
   rlPhaseStartCleanup
   #remove installed modules and kunit framework
-  for TEST in "${test_arr[*]}"
+  for TEST in ${test_arr[*]}
   do
 	  rmmod "$TEST"
   done
   rmmod kunit
+  rm -rf /tmp/kunit_results/
   rlPhaseEnd
 
 rlJournalEnd
