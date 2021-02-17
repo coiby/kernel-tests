@@ -1,19 +1,11 @@
 ---
 include:
-  - project: cki-project/containers
-    file: /includes/gitlab-cki.yml
-
-variables:
-  GIT_DEPTH: "1"
-
-default:
-  # docker.io/koalaman/shellcheck-alpine:stable
-  image: registry.gitlab.com/cki-project/containers/mirror/shellcheck-alpine:stable
+  - project: cki-project/cki-lib
+    file: .gitlab/ci_templates/cki-common.yml
 
 shell check cki:
-  stage: 🐛
+  extends: .tox
   before_script:
-    - shellcheck --version
     - "# Mock beakerlib.sh to avoid source import errors:"
     - mkdir /usr/share/beakerlib
     - touch /usr/share/beakerlib/beakerlib.sh
@@ -21,8 +13,6 @@ shell check cki:
     - shellcheck --external-sources --format=gcc cki_*/*.sh
 
 shell check runtests:
-  stage: 🐛
-  before_script:
-    - shellcheck --version
+  extends: .tox
   script:
     - find -name '*.sh' -exec shellcheck --severity=error -f gcc {} +
