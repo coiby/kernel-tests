@@ -11,5 +11,6 @@ entry_point=bash ./runtest.sh
 dependencies[RedHatEnterpriseLinux6]=kernel-headers;gcc;bash;python
 dependencies[RedHatEnterpriseLinux7]=kernel-headers;gcc;bash;python
 dependencies[RedHatEnterpriseLinux8]=kernel-headers;gcc;bash;platform-python;python2;python3
+dependencies[RedHatEnterpriseLinux9]=kernel-headers;gcc;bash;platform-python;python2;python3
 use_pty=false
 repoRequires=cki_lib

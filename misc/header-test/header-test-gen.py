@@ -21,12 +21,16 @@ __author__ = """Copyright Jan Stancek 2011"""
 __maintainer__ = """Jeff Bastian 2019"""
 
 
+try:
+    from importlib.machinery import SourceFileLoader
+except (ImportError):
+    import imp
+
 import os
 import sys
 import shutil
 import stat
 import platform
-import imp
 import re
 import rpm
 from flags import *
@@ -113,7 +117,10 @@ def includeExc(release, arch, up_to_version):
 
     for (version, update_file_path) in update_list:
         print('Including: ', update_file_path, 'Version:', version)
-        py_mod = imp.load_source(arch, update_file_path)
+        try:
+            py_mod = SourceFileLoader(arch, update_file_path).load_module()
+        except(NameError):
+            py_mod = imp.load_source(arch, update_file_path)
         py_mod.setup(exc)
         for header in exc:
             if len(exc[header]) < 4:
@@ -156,9 +163,22 @@ def makeHeaderList():
         except StopIteration:
             print("RPM Error: nothing provides kernel-headers")
             sys.exit("Aborting test\n")
-        print('generating header list from %s package' % (hdr['name'].decode('UTF-8')))
+        # python rpm module version 4.14.1 and older return raw bytes rather
+        # than a string so they must be decoded.  Newer modules return a
+        # string which does not have a decode() function.
+        try:
+            hdrname = hdr['name'].decode('UTF-8')
+        except (UnicodeDecodeError, AttributeError):
+            hdrname = hdr['name']
+            pass
+        print('generating header list from %s package' % (hdrname))
         for name in sorted(hdr['FILENAMES']):
-            header_file.write("%s\n" % name.decode('UTF-8'))
+            try:
+                filename = name.decode('UTF-8')
+            except (UnicodeDecodeError, AttributeError):
+                filename = name
+                pass
+            header_file.write("%s\n" % (filename))
 
         header_file.close()
 
