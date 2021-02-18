@@ -26,7 +26,7 @@
 #
 # -----------------------------------------------------------------------------
 
-SCRIPT_DIR="$(realpath "$(dirname "$BASH_SOURCE")")"
+SCRIPT_DIR="$(readlink -e "$(dirname "$BASH_SOURCE")")"
 
 source "$SCRIPT_DIR/../shared/file-utils.sh"
 source "$SCRIPT_DIR/../shared/vmlinuz.sh"
