@@ -68,3 +68,20 @@ install_sendip()
 	popd &> /dev/null
 	which sendip && return 0 || return 1
 }
+
+# Need to make sure we are undering test case's folder as we use
+# relative path when checking missed files.
+check_if_missing_files()
+{
+	test_name=$1
+	if [ ! -f ../bpf/xdp_dummy.o ]; then
+		if [ "$test_name" = "udpgro_bench.sh" ] || \
+			[ "$test_name" = "udpgro.sh" ] ; then
+			return 0
+		fi
+	elif [ ! -f forwarding/lib.sh ] && [ "$test_name" = "altnames.sh" ]; then
+			return 0
+	fi
+
+	return 1
+}

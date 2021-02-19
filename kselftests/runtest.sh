@@ -62,10 +62,11 @@ reset_net_env()
 	run "ip link show"
 }
 
-# usage: check_skipped_tests test_name "${skip_test[@]}"
+# usage: check_skipped_tests test_name
 check_skipped_tests()
 {
 	local match="$1"
+	check_if_missing_files $match && return 0
 	[[ " ${skip_tests[*]} " == *" $match "* ]] && return 0
 	[ $TOTAL_MEM -lt 8000 ] && [[ " ${large_mem_tests[*]} " == *" $match "* ]] && return 0
 	# skip the test if it not exist for backward compatibility
