@@ -8,6 +8,8 @@ test_bpf.sh
 # Skip bpf/test_progs and run the test individually
 test_progs
 test_progs-no_alu32
+# This test need special NICs that support devlink split and lanes
+devlink_port_split.py
 )
 
 # Tests in this list need large memory
