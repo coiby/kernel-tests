@@ -50,7 +50,7 @@ fi
 check_whitelisted()
 {
 	HASH=`echo -n "$1" | sha1sum | awk '{print $1}'`
-	cat white.list | perl -pe 's/#.*$//' | grep $HASH | grep -q -e "all" -e "$ARCH"
+	cat white.list | perl -pe 's/#.*$//' | grep $HASH | grep -q -e "all" -e "$MY_ARCH"
 	return $?
 }
 
@@ -74,8 +74,12 @@ rlJournalStart
 	rlPhaseStartSetup
 		rlAssertRpm $PACKAGE
 		rlCheckRpm python-perf || yum -y install python-perf
-		export ARCH=`arch`
+		rlCheckRpm python3-perf || yum -y install python3-perf
+		export MY_ARCH=`arch`
 		export KERNEL=`uname -r`
+		# unset ARCH variable in case it is set to something
+		# (wrongly set ARCH variable breaks LLVM tests!!)
+		unset ARCH
 
 		export KERNEL_PKG_NAME="kernel-$KERNEL"
 		if [ $(is_kernel_rt) -eq 0 ]; then
@@ -124,6 +128,24 @@ rlJournalStart
 		rlCheckRpm iputils-debuginfo || rlRun "debuginfo-install -y iputils"
 		rlAssertRpm iputils-debuginfo
 
+		# BPF tests require clang/llvm
+		rlRun "yum install -y clang llvm"
+		rlCheckRpm "clang"
+		rlCheckRpm "llvm"
+
+		# BPF tests also require kernel-devel and elfutils-libelf-devel
+		rlCheckRpm "kernel-devel" || rlRun "yum -y install kernel-devel"
+		rlAssertRpm "kernel-devel"
+		rlCheckRpm "elfutils-libelf-devel" || rlRun "yum -y install elfutils-libelf-devel"
+		rlAssertRpm "elfutils-libelf-devel"
+
+		# because of BPF tests, we need more memory to be lockable
+		OLD_ULIMIT_L=`ulimit -l`
+		# experimentally found that 4096 should be enough, may be necessary to bump in future
+		NEW_ULIMIT_L=4096
+		ulimit -l $NEW_ULIMIT_L
+		rlAssertEquals "uname -l should be bumped to $NEW_ULIMIT_L" `ulimit -l` $NEW_ULIMIT_L
+
 		mkdir TMP ; cd TMP
 		export TmpDir=`pwd`
 		cd ..
@@ -158,10 +180,10 @@ rlJournalStart
 			if check_whitelisted "$TEST_DESC"; then
 				rlLog "[ WHITELISTED ] :: $TEST_NUMBER: $TEST_DESC  (known issue)"
 			else
-				perf test -vv $TEST_NUMBER &>  $TEST_NUMBER.log
+				perf test -F -vv $TEST_NUMBER &> $TEST_NUMBER.log
 				RETVAL=$?
 				cat $TEST_NUMBER.log
-				RESULT=`tail -n 1 $TEST_NUMBER.log | awk -F':' '{print $NF}' | tr -d ' '`
+				RESULT=`grep "^$TEST_DESC" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
 				printf "%8s -- %s\n" $RESULT "$line" | tee -a results.log
 				echo $RESULT | grep -qi FAIL
 				if [ $RETVAL -ne 0 -o $? -eq 0 ]; then
@@ -231,6 +253,10 @@ rlJournalStart
 		rlRun "rm -rf $TmpDir"
 		# restore the sample rate back to the original or something reasonable
 		sysctl kernel.perf_event_max_sample_rate=$ORIGINAL_SAMPLE_RATE
+		# restore ulimit -l back
+		ulimit -l $OLD_ULIMIT_L
+		rlAssertEquals "uname -l should be restored back to $OLD_ULIMIT_L" `ulimit -l` $OLD_ULIMIT_L
+
 	rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd

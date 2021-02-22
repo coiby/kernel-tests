@@ -19,7 +19,7 @@ dc25abc10dbbe8bbcfd828943e562325bb04d11d s390x	# Read samples using the mmap int
 1452f6a9560857ae31acc9eaad816ae63c0cec44 s390x	# PERF_RECORD_* events & perf_sample fields
 
 #### tests that should be skipped, if it is not, we have to do it ourselves
-b81906564501bbdb29b976760f7e3735760c3d05 s390x	# Number of exit events of a simple workload
+b81906564501bbdb29b976760f7e3735760c3d05 s390x aarch64 # Number of exit events of a simple workload
 
 #### to be investigated
 3370c451caa40aa5cb102f145c75eb22141766eb x86_64	# DWARF unwind
@@ -41,6 +41,7 @@ b549be0430aa3df45cf25675e2cad1b50d710435 aarch64 s390x # Breakpoint overflow sig
 8d036401505f5579ff5912c30cbccb3c5098d8cd aarch64 s390x x86_64 ppc64le # Object code reading
 3370c451caa40aa5cb102f145c75eb22141766eb aarch64 s390x x86_64 ppc64le # DWARF unwind
 aba5be59b8476eb15178828406fa0d307fb794b9 aarch64 s390x x86_64 ppc64le # Test dwarf unwind
+b549be0430aa3df45cf25675e2cad1b50d710435 aarch64 s390x x86_64 ppc64le # Breakpoint overflow signal handler
 
 #### PMU might not work on KVM guests
 30d384952b664d5c4f5b81753b0edffc0b003695 x86_64 # x86 rdpmc
@@ -48,8 +49,15 @@ aba5be59b8476eb15178828406fa0d307fb794b9 aarch64 s390x x86_64 ppc64le # Test dwa
 
 # Known bugs
 9e14b86f572e9d058f59302cfa8759e5afb20017 ppc64le aarch64 x86_64 # probe libc's inet_pton & backtrace it with ping
-90ae3743ecb512bf3d9956df1d6ea8cbb3f63dc6 ppc64le # Use vfs_getname probe to get syscall args filenames
-0e5b27841d80bf495ebfbfb1a446f7ca08fe5e97 ppc64le # Check open filename arg using perf trace + vfs_getname
-b011103996bcd810c4c87e049fffb48326edf705 ppc64le s390x aarch64 # Parse sched tracepoints fields
+90ae3743ecb512bf3d9956df1d6ea8cbb3f63dc6 ppc64le aarch64 x86_64 # Use vfs_getname probe to get syscall args filenames
+0e5b27841d80bf495ebfbfb1a446f7ca08fe5e97 ppc64le s390x aarch64 x86_64 # Check open filename arg using perf trace + vfs_getname
+d4b88ad2ef3ad11d1d65485ad3209f8849f4aeeb ppc64le aarch64 x86_64 # Add vfs_getname probe to get syscall args filenames
+b011103996bcd810c4c87e049fffb48326edf705 ppc64le s390x aarch64  # Parse sched tracepoints fields
 887e416aca88217834c65490461a2137431efddd ppc64le # Watchpoint
 05b9b8fb2a5d4d41a867a36111ae380bf111f0f0 aarch64 # Track with sched_switch
+b31fbb4e7501b04082bf8edd16872ba11c580297 ppc64le # PMU events
+adb2cda40ae61b84668595f3be67de89ed281658 ppc64le ppc64 s390x aarch64 x86_64 # DSO data reopen
+529b1f92ce1b20584468e6a9ec8b53c051cca11d ppc64le s390x # PE file support
+b110fc5887abacbcdaa32fd5e9ea2e3f6e580dc5 aarch64 # vmlinux symtab matches kallsyms
+2160bdaf7e5f48987e31c1d90d0260ac9fdd3ef7 ppc64le s390x aarch64 x86_64 # BPF filter
+e72d804e5361e9a66889207602ac75e4dd409aa6 x86_64  # x86 instruction decoder - new instructions
