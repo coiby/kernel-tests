@@ -160,4 +160,5 @@ default_pmtu_cleanup()
 	modprobe -r veth
 	modprobe -r br_netfilter
 	modprobe -r bridge
+	return 0
 }
