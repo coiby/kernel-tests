@@ -32,6 +32,14 @@ git_url=${WRAPPER_GIT_URL:-"https://src.fedoraproject.org/tests/selinux.git"}
 git_branch=${WRAPPER_GIT_BRANCH:-"main"}
 git_path=${WRAPPER_GIT_PATH:-"kernel/selinux-testsuite"}
 
+TEST="packages/selinux-policy/serge-testsuite"
+# Test doesn't run without IPv6
+if grep "ipv6.disable=1" /proc/cmdline ; then
+    rlLog "Skip test as system doesn't have IPv6."
+    rstrnt-report-result $TEST SKIP
+    exit
+fi
+
 git clone "$git_url" "test-repo"
 trap "rm -rf '$(readlink -f test-repo)'" EXIT
 cd "test-repo"

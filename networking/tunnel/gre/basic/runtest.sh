@@ -31,6 +31,14 @@
 
 YUM=$(cki_get_yum_tool)
 
+TEST="networking/tunnel/gre/basic"
+# Test doesn't run without IPv6
+if grep "ipv6.disable=1" /proc/cmdline ; then
+    rlLog "Skip test as system doesn't have IPv6."
+    rstrnt-report-result $TEST SKIP
+    exit
+fi
+
 kernel_name=$(uname -r)
 if [[ $kernel_name =~ "rt" ]]; then
      echo "running the $kernel_name" | tee -a $OUTPUTFILE
