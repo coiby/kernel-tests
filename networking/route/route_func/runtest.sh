@@ -44,6 +44,14 @@ TEST_TOPO=${TEST_TOPO:-"default"}
 
 
 #init
+TEST="networking/route/route_func"
+
+# Test doesn't run without IPv6
+if grep "ipv6.disable=1" /proc/cmdline ; then
+    echo "Skip test as system doesn't have IPv6."
+    rstrnt-report-result $TEST SKIP
+    exit
+fi
 
 
 rlJournalStart

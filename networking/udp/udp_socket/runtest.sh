@@ -29,10 +29,18 @@ csum_zero_msg="udp checksum is 0"
 port=$(($RANDOM % 10000 + $RANDOM % 1000))
 wait_time="2"
 
+TEST="networking/udp/udp_socket"
+# Test doesn't run without IPv6
+if grep "ipv6.disable=1" /proc/cmdline ; then
+    rlLog "Skip test as system doesn't have IPv6."
+    rstrnt-report-result $TEST SKIP
+    exit
+fi
+
 rlJournalStart
     rlPhaseStartSetup
 	(uname -r |grep el6) || rlRun "modprobe -r br_netfilter" 0-255 "disable from bridge call iptables 4/6"
-	rlRun "gcc -g -Wall -o udp_no_check udp_no_check.c" 
+	rlRun "gcc -g -Wall -o udp_no_check udp_no_check.c"
 	rlRun "gcc -g -Wall -o udp_socket udp_socket.c"
     rlPhaseEnd
 
