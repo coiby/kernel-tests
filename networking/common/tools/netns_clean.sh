@@ -8,3 +8,4 @@ modprobe -r veth
 # br_netfilter would stop bridge to be removed as it depends on bridge
 modprobe -r br_netfilter
 modprobe -r bridge
+exit 0
