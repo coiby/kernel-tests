@@ -1,0 +1,10 @@
+
+module ioperm01 1.0;
+
+require {
+	type unconfined_t;
+	class lockdown integrity;
+}
+
+#============= unconfined_t ==============
+allow unconfined_t self:lockdown integrity;
