@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2020 Red Hat, Inc. All rights reserved.
+# Copyright (c) 2020-2021 Red Hat, Inc. All rights reserved.
 #
 # This copyrighted material is made available to anyone wishing
 # to use, modify, copy, or redistribute it subject to the terms
@@ -27,6 +27,16 @@ source $CDIR/setup.sh
 DMTS_REPO="https://github.com/jthornber/device-mapper-test-suite.git"
 DMTS_LOCAL="$CDIR/$(basename $DMTS_REPO | sed 's%.git%%')"
 
+function upload_log_files
+{
+	typeset log_dir=$(get_test_log_dir)
+	typeset log_file=""
+	typeset log_files=$(find $log_dir -name "*.log")
+	for log_file in $(echo $log_files); do
+		cki_upload_log_file $log_file
+	done
+}
+
 function runtest
 {
 	# XXX: Never use cki_run_cmd_xxx() wrapper, or it hangs
@@ -34,12 +44,20 @@ function runtest
 
 	cki_cd $DMTS_LOCAL
 
-	cki_run_cmd_pos "dmtest list --suite thin-provisioning -t BasicTests" ||
-	    return $CKI_FAIL
-	cki_run_cmd_pos "dmtest run --suite thin-provisioning -t BasicTests" ||
-	    return $CKI_FAIL
+	cki_run_cmd_pos "dmtest list --suite thin-provisioning -t BasicTests"
+	if (( $? != 0 )); then
+		upload_log_files
+		return $CKI_FAIL
+	fi
+
+	cki_run_cmd_pos "dmtest run --suite thin-provisioning -t BasicTests"
+	if (( $? != 0 )); then
+		upload_log_files
+		return $CKI_FAIL
+	fi
 
 	cki_pd
+	upload_log_files
 	return $CKI_PASS
 }
 
