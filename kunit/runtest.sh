@@ -23,6 +23,27 @@
 #   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #   Boston, MA 02110-1301, USA.
 #
+
+#processes a test result from the debug/sysfs
+process_results(){
+	TMPFILE=$(mktemp) || exit 1
+        OUTFILE=$(mktemp) || exit 1
+	rlLog "processing results from test ${1}"
+	sed -i '/^S/d' "$1" #remove all empty lines
+	sed -i 's/^[ \t]*//' "$1" #remove all leading whitespace
+	sed -i '/^#/d' "$1" #remove comments
+	sed -i '$d' "$1"
+	uniq "$1" > "$TMPFILE"  #remove dup
+
+	tappy "$TMPFILE" &> "$OUTFILE"
+        RESULT_OUTPUT=$(cat "$OUTFILE" |tail -1)
+	if [ "$RESULT_OUTPUT" = "OK" ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
 #Include Beaker environment
 . ../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
@@ -30,9 +51,23 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Global parameters
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# When rebasing create a new array at the current release number (eg rhel8.5)
+# Then add a check for the proper tag number
+
+tag=$(uname -rm | grep -o "\-.*.el8")
+el8=$( echo "$tag" | grep -o ".el8" )
+version=$( echo "$tag" | sed 's/\-\(.*\).el8/\1/')
+
+#currently only supports rhel 8
+if [ "$el8" != ".el8" ]; then
+	rlLog "RHEL8 Varient not detected. currently only supports =>rhel8.4"
+	rstrnt-report-result "KUNIT" SKIP
+	exit 0
+fi
+
 test_arr=(kunit-test ext4-inode-test list-test sysctl-test mptcp_crypto_test \
 	mptcp_token_test)
-NUM_TESTS=$((${#test_arr[@]}+2))
 
 rlJournalStart
 #-------------------- Setup ---------------------
@@ -51,8 +86,6 @@ rlJournalStart
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     fi
 
-    TMPFILE=$(mktemp) || exit 1
-    OUTFILE=$(mktemp) || exit 1
   rlPhaseEnd
 
 #-------------------- Run Tests -----------------
@@ -61,37 +94,42 @@ rlJournalStart
     for TEST in ${test_arr[*]}
     do
 	rlLog "running test $TEST"
-	modprobe $TEST
+	modprobe "$TEST"
 	if [ $? -ne 0 ]; then
 		rlLog "Could not install $TEST module, skipping this module"
-		#rstrnt-report-result $TEST SKIP 0
-	else
-		rmmod $TEST
-		#rstrnt-report-result $TEST PASS 1
 	fi
     done
 
 #------------------ Collect Output --------------
-    dmesg -t > $TMPFILE
-    sed -i "s/TAP version 14/1..$NUM_TESTS/g" $TMPFILE
-    tappy $TMPFILE &> $OUTFILE
-    OUTPUT=$(cat $OUTFILE |tail -1)
-    cat $TMPFILE
-    rstrnt-report-log -l ${OUTFILE}
-    rstrnt-report-log -l ${TMPFILE}
-    
-#-------------------- Return --------------------   
-    #exit 0 if all tests ran 'ok'
-    if [[ $OUTPUT == "OK" ]]; then
-    	rstrnt-report-result 'KUNIT RESULTS' PASS 0
-    else
-    	rstrnt-report-result 'KUNIT RESULTS' FAIL 1
-    fi
+    mkdir -p /tmp/kunit_results/
+    cp -r /sys/kernel/debug/kunit/. /tmp/kunit_results/
+    for TEST in /tmp/kunit_results/*
+    do
+	if [ -d "${TEST}" ]
+	then
+		test_name="$(basename "$TEST")"
+		process_results "${TEST}/results"
+		result=$?
+		cp "${TEST}/results" "${TEST}/${test_name}.log"
+		if [ $result -eq 0 ]
+		then
+			rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" PASS 0
+                else
+			rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" FAIL 1
+                fi
+	fi
+    done
   rlPhaseEnd
 
 #-------------------- Clean Up ------------------
   rlPhaseStartCleanup
-    rmmod kunit
+  #remove installed modules and kunit framework
+  for TEST in ${test_arr[*]}
+  do
+	  rmmod "$TEST"
+  done
+  rmmod kunit
+  rm -rf /tmp/kunit_results/
   rlPhaseEnd
 
 rlJournalEnd
