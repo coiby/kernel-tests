@@ -24,6 +24,13 @@
 
 TEST="misc/module-load"
 
+# Test doesn't run without IPv6
+if grep "ipv6.disable=1" /proc/cmdline ; then
+    rlLog "Skip test as system doesn't have IPv6."
+    rstrnt-report-result $TEST SKIP
+    exit
+fi
+
 # Commands in this section are provided by test developer.
 # ---------------------------------------------
 
@@ -202,13 +209,13 @@ case "$release" in
 		    echo "Warning: Running on unknown release: ${release}, using modules list contained in ${MODLIST}!"
                 fi
 		;;
-esac		
+esac
 
 if [ "$release" = "release 6" ] || [ "$release" = "el6" ]; then
         workaround_BZ1371265
 fi
 
-# run the test. For each module in the MODLIST file, try to load it, check 
+# run the test. For each module in the MODLIST file, try to load it, check
 # that it is there, then unload it and check lsmod again. All modules should
 # be loadable/unloadable for each arch without issue.
 
@@ -393,7 +400,7 @@ if [ $fail -eq 0 ] && [ $pass -gt 0 ] ; then
 else
 	result_fail
 fi
-	
+
 
 # something  bad must have happened, otherwise we should not get here.
 echo "Unhandled exception or other problem, results not reliable!" >> $OUTPUTFILE
