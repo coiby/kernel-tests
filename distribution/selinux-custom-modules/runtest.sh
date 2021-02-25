@@ -27,7 +27,10 @@ rlJournalStart
       rlRun "make -f /usr/share/selinux/devel/Makefile avahi-daemon.pp" 0 "Building avahi-daemon SELinux module"
       # Bug 1929332 - [RHEL-9] avc: denied { integrity } for pid=11514 comm="ioperm01"  and comm="grep"
       rlRun "make -f /usr/share/selinux/devel/Makefile ioperm01.pp" 0 "Building ioperm01 SELinux module"
-      rlRun "semodule -i rpcbind-mod.pp -i rhsmcertd-worke.pp rhsmcertd-worke-nodebind.pp systemd-logind-mod.pp groupadd.pp mandb-mod.pp avahi-daemon.pp ioperm01.pp" 0 "Installing SELinux modules"
+      # Bug 1932436 - avc denied related to sssd and systemd-hostname
+      rlRun "make -f /usr/share/selinux/devel/Makefile sssd-mod.pp" 0 "Building sssd SELinux module"
+      rlRun "make -f /usr/share/selinux/devel/Makefile systemd-hostnam-mod.pp" 0 "Building systemd-hostname SELinux module"
+      rlRun "semodule -i rpcbind-mod.pp -i rhsmcertd-worke.pp rhsmcertd-worke-nodebind.pp systemd-logind-mod.pp groupadd.pp mandb-mod.pp avahi-daemon.pp ioperm01.pp sssd-mod.pp systemd-hostnam-mod.pp" 0 "Installing SELinux modules"
     else
       rlLog "No custom SELinux modules required, skipping"
       rstrnt-report-result $TEST SKIP

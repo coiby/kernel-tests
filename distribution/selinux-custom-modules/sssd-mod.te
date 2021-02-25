@@ -1,0 +1,13 @@
+
+module sssd-mod 1.0;
+
+require {
+	type sssd_t;
+	type cgroup_t;
+	class dir search;
+	class filesystem getattr;
+}
+
+#============= sssd_t ==============
+allow sssd_t cgroup_t:dir search;
+allow sssd_t cgroup_t:filesystem getattr;
