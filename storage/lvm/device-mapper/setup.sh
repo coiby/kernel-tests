@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2020 Red Hat, Inc. All rights reserved.
+# Copyright (c) 2020-2021 Red Hat, Inc. All rights reserved.
 #
 # This copyrighted material is made available to anyone wishing
 # to use, modify, copy, or redistribute it subject to the terms
@@ -27,6 +27,24 @@ function get_user_home_dir
 	[[ -z $home_dir ]] && return 1
 	echo $home_dir
 	return 0
+}
+
+function get_test_root
+{
+	typeset home_dir=$(get_user_home_dir $(id -un))
+	echo "$home_dir/.dmtest"
+}
+
+function get_test_log_dir
+{
+	typeset test_root=${1:-$(get_test_root)}
+	echo "$test_root/log"
+}
+
+function get_test_reports_dir
+{
+	typeset test_root=${1:-$(get_test_root)}
+	echo "$test_root/reports"
 }
 
 function clean_loop_devices
@@ -144,8 +162,11 @@ function loop_device_setup
 	#
 	typeset quota="22000M"
 	typeset mntpt=""
-	# FIXME: Just look into "/" and "/home" for the time being
-	for mntpoint in '/' '/home'; do
+	#
+	# XXX: env TEST_PARAM_DMTEST_MNT defined by user which should have free
+	#      disk more than 22G
+	#
+	for mntpoint in $TEST_PARAM_DMTEST_MNT '/' '/home'; do
 		check_mntpoint_quota $mntpoint $quota
 		(( $? == 0 )) && mntpt=$mntpoint && break
 	done
@@ -241,7 +262,7 @@ function ts_setup
 	#      due to ruby setup
 	#      [1] https://github.com/jthornber/device-mapper-test-suite.git
 	#
-	typeset f_done=$CDIR/.${NAME}.${FUNCTION}
+	typeset f_done=$CDIR/.ts_setup
 	[[ -f $f_done && $(cat $f_done) == "DONE" ]] && return $CKI_PASS
 
 	install_ruby || return $CKI_UNINITIATED
@@ -252,10 +273,10 @@ function ts_setup
 	cki_run_cmd_pos "bundle update" || return $CKI_UNINITIATED
 	cki_pd
 
-	typeset home_dir=$(get_user_home_dir $(id -un))
-	typeset subdirs="$home_dir/.dmtest"
-	subdirs+=" $home_dir/.dmtest/log"
-	subdirs+=" $home_dir/.dmtest/reports"
+	typeset test_root=$(get_test_root)
+	typeset subdirs="$test_root"
+	subdirs+=" $(get_test_log_dir $test_root)"
+	subdirs+=" $(get_test_reports_dir $test_root)"
 	for subdir in $subdirs; do
 		if [[ ! -d $subdir ]]; then
 			cki_run_cmd_pos "mkdir -p -m 0755 $subdir" || \
@@ -263,7 +284,7 @@ function ts_setup
 		fi
 	done
 
-	ts_config_setup $home_dir/.dmtest/config || return $CKI_UNINITIATED
+	ts_config_setup $test_root/config || return $CKI_UNINITIATED
 	echo "DONE" > $f_done
 
 	return $CKI_PASS

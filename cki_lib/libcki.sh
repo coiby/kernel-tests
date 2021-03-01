@@ -99,7 +99,7 @@ function cki_skip_task()
     exit $CKI_STATUS_COMPLETED
 }
 
-function cki_report_result
+function cki_report_result()
 {
     typeset rc=${1?"*** result code"}
     typeset cleanup=$2
@@ -157,10 +157,10 @@ function cki_set_reason()
     esac
 }
 
-function runtest { :; }
-function startup { :; }
-function cleanup { :; }
-function cki_main
+function runtest() { :; }
+function startup() { :; }
+function cleanup() { :; }
+function cki_main()
 {
     typeset hook_runtest=${1:-"runtest"}
     typeset hook_startup=${2:-"startup"}
@@ -264,7 +264,7 @@ function cki_pd()
 # switch on, just set env DEBUG, e.g.
 # $ export DEBUG=yes
 #
-function cki_debug
+function cki_debug()
 {
     typeset -l s=$DEBUG
     if [[ "$s" == "yes" || "$s" == "true" ]]; then
@@ -284,6 +284,13 @@ function cki_get_yum_tool()
         rstrnt-abort -t recipe
         exit 0
     fi
+}
+
+function cki_upload_log_file()
+{
+    typeset logfile=${1?"*** log file ***"}
+    echo "Upload log file $logfile ..."
+    rstrnt-report-log -S "$RESULT_SERVER" -T "$TESTID" -l "$logfile"
 }
 
 # Print an informational message with a friendly emoji.
