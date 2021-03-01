@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2019 Red Hat, Inc. All rights reserved.
+# Copyright (c) 2019-2021 Red Hat, Inc. All rights reserved.
 #
 # This copyrighted material is made available to anyone wishing
 # to use, modify, copy, or redistribute it subject to the terms
@@ -42,28 +42,19 @@ function stqe_init_fwroot
     # install the framework
     cki_cd $fwroot
 
-    #
-    # XXX: On RHEL7, should use python2 instead because python3
-    #      is not available by default
-    #
-    typeset python=""
-    typeset cmd=""
-    for cmd in python python3 python2; do
-        $cmd -V > /dev/null 2>&1 && python=$cmd && break
-    done
-    if [[ -z $python ]]; then
-        cki_run_cmd_pos "yum install -y python36 python3-pip python3-setuptools" || \
-            cki_abort_task "fail python not found"
-        python="python3"
-    fi
-    typeset pip_cmd=$([[ $python == python3 ]] && echo pip3 || echo pip)
+    typeset python="python3"
+    typeset pkg_mgr=$(dnf > /dev/null 2>&1 && echo dnf || echo yum)
+    typeset python_pkg="python36"
+    cki_run_cmd_pos "$pkg_mgr install -y $python_pkg" || \
+        cki_abort_task "fail to install $python_pkg"
     if [[ $fwbranch != "master" ]]; then
         if [[ -n $STQE_STABLE_VERSION ]]; then
             cki_run_cmd_pos "git checkout $STQE_STABLE_VERSION" || \
                 cki_abort_task "fail to checkout $STQE_STABLE_VERSION"
         fi
         if [[ -n $LIBSAN_STABLE_VERSION ]]; then
-            cki_run_cmd_pos "$pip_cmd install libsan==$LIBSAN_STABLE_VERSION" || \
+            typeset pip_cmd="$python -m pip install -U pip==19"
+            cki_run_cmd_pos "$pip_cmd libsan==$LIBSAN_STABLE_VERSION" || \
                 cki_abort_task "fail to install libsan==$LIBSAN_STABLE_VERSION"
         fi
     fi
