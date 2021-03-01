@@ -7,7 +7,7 @@ set -o pipefail
 # RHEL7 and older use /usr/bin/python
 # RHEL8 and newer use /usr/libexec/platform-python
 PYTHON=/usr/bin/python
-if grep -q "release 8" /etc/redhat-release ; then
+if [[ -e /usr/libexec/platform-python ]] ; then
     PYTHON=/usr/libexec/platform-python
 fi
 export PYTHON
