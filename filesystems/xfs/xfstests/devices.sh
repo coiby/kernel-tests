@@ -291,13 +291,13 @@ function get_test_dev()
 		mkdir -p /export/test
 		echo '/export/test  *(rw,no_root_squash)' >> /etc/exports
 		# stop iptables, service name is iptables on RHEL6, firewalld on RHEL7
-		rlServiceStop iptables
-		rlServiceStop firewalld
-		xlog rlServiceStop rpcbind && xlog rlServiceStart rpcbind
+		systemctl stop iptables
+		systemctl stop firewalld
+		xlog systemctl stop rpcbind && xlog systemctl start rpcbind
 		# restart rpc.statd on RHEL7 for PPC64, it's not running by default
-		rlServiceStop nfs-lock && rlServiceStart nfs-lock
-		xlog rlServiceStop nfs && xlog rlServiceStart nfs
-		xlog rlServiceStop nfs-server && xlog rlServiceStart nfs-server
+		systemctl stop nfs-lock && systemctl start nfs-lock
+		xlog systemctl stop nfs && xlog systemctl start nfs
+		xlog systemctl stop nfs-server && xlog systemctl start nfs-server
 		echoo "NFS exports:"
 		exportfs -s
 		TEST_DEV=localhost:/export/test
@@ -314,7 +314,7 @@ function get_test_dev()
 	path = /export/test
 	writable = yes
 EOF
-		xlog rlServiceStop smb && xlog rlServiceStart smb
+		xlog systemctl stop smb && xlog systemctl start smb
 		echoo "samba shares:"
 		testparm -s
 		TEST_DEV=//$HOSTNAME/test
@@ -518,13 +518,13 @@ function get_scratch_dev()
 		mkdir -p /export/scratch
 		echo '/export/scratch  *(rw,no_root_squash)' >> /etc/exports
 		# stop iptables, service name is iptables on RHEL6, firewalld on RHEL7
-		rlServiceStop iptables
-		rlServiceStop firewalld
-		xlog rlServiceStop rpcbind && xlog rlServiceStart rpcbind
+		systemctl stop iptables
+		systemctl stop firewalld
+		xlog systemctl stop rpcbind && xlog systemctl start rpcbind
 		# restart rpc.statd on RHEL7 for PPC64, it's not running by default
-		rlServiceStop nfs-lock && rlServiceStart nfs-lock
-		xlog rlServiceStop nfs && xlog rlServiceStart nfs
-		xlog rlServiceStop nfs-server && xlog rlServiceStart nfs-server
+		systemctl stop nfs-lock && systemctl start nfs-lock
+		xlog systemctl stop nfs && xlog systemctl start nfs
+		xlog systemctl stop nfs-server && xlog systemctl start nfs-server
 		echoo "NFS exports:"
 		exportfs -s
 		SCRATCH_DEV=localhost:/export/scratch
@@ -541,7 +541,7 @@ function get_scratch_dev()
 	path = /export/scratch
 	writable = yes
 EOF
-		xlog rlServiceStop smb && xlog rlServiceStart smb
+		xlog systemctl stop smb && xlog systemctl start smb
 		echoo "samba shares:"
 		testparm -s
 		SCRATCH_DEV=//$HOSTNAME/scratch

@@ -15,15 +15,6 @@ fi
 RHEL_VERSION=$(egrep -o "[0-9]*\\.[0-9]* " /etc/redhat-release|tr '.' '_')
 RHEL_MAJOR=$(echo $RHEL_VERSION|cut -d '_' -f 1)
 RHEL_MINOR=$(echo $RHEL_VERSION|cut -d '_' -f 2)
-if [[ -x /usr/bin/python ]]; then
-	PYTHON_PROG=/usr/bin/python
-elif [[ -x /usr/bin/python2 ]]; then
-	PYTHON_PROG=/usr/bin/python2
-elif [[ -x /usr/bin/python3 ]]; then
-	PYTHON_PROG=/usr/bin/python3
-elif [[ -x /usr/libexec/platform-python ]]; then
-	PYTHON_PROG=/usr/libexec/platform-python
-fi
 
 # Returns non-zero value if any of the piped commands fails.
 # This is a must for our test framework.

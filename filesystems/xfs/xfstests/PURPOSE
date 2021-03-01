@@ -33,8 +33,6 @@ TEST_PARAM_SCRATCH_DEV_POOL	# list of devices used as SCRATCH_DEV_POOL
 TEST_PARAM_SCRATCH_DEV_POOL_MNT	# list of mount points of devices used as SCRATCH_DEV_POOL, useful when testing in beaker, see not below
 TEST_PARAM_LOGWRITES_MNT	# mount point of logwrites device, useful when testing in beaker
 TEST_PARAM_CIFS_MOUNT_OPTS	# mount options for cifs, e.g. TEST_PARAM_CIFS_MOUNT_OPTS="-o vers=2.0"
-TEST_PARAM_KNOWN_ISSUE		# specify which known issue to lookup at, used by "-r" option of parse.py, useful when testing upstream kernel,
-				# RHEL kernel testing doesn't need this param. e.g. TEST_PARAM_KNOWN_ISSUE="upstream_xfs__4k_crc"
 TEST_PARAM_TEST_ID		# Test identifier when reporting test result, e.g. "TEST_PARAM_TEST_ID=xfs_2k_finobt", default to TEST_PARAM_FSTYPE
 TEST_PARAM_FIO_VERSION		# fio verison parameter to run tests with different fio versions
 
