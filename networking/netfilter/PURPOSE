@@ -1,0 +1,13 @@
+Description
+This suite provides very basic netfilter function test through ip/ip6tables.
+Rule add/flush in different table/chain.
+basic NAT target.
+
+Dependencies
+nmap-ncat lksctp-tools conntrack-tools
+tcpdump
+nftables ipset ipvsadm
+sctp module
+
+Execute the test
+$ sh runtest.sh
