@@ -117,6 +117,12 @@ function get_test_cases
 	echo $testcases
 }
 
+if [[ "$USE_SIW" -eq 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
+	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
+	rstrnt-report-result "$TNAME" SKIP
+	exit
+fi
+
 bash $CDIR/../include/build.sh
 if (( $? != 0 )); then
 	rlLog "Abort test because build env setup failed"
