@@ -12,6 +12,12 @@ rlJournalStart
       rlRun "make -f /usr/share/selinux/devel/Makefile kexec.pp" 0 "Building kexec SELinux module"
       # Bug 1896424 - [RHEL-8.4] selinux denies kexec write on aarch64
       rlRun "semodule -i kexec.pp" 0 "Installing kexec SELinux module"
+    elif rlIsRHEL 8; then
+      # Bug 1932849 - avc: denied { module_request } kmod="net-pf-10"
+      rlRun "make -f /usr/share/selinux/devel/Makefile smbd-mod.pp" 0 "Building smbd SELinux module"
+      rlRun "make -f /usr/share/selinux/devel/Makefile rpc.statd-mod.pp" 0 "Building rpc.statd SELinux module"
+      rlRun "semodule -i smbd-mod.pp" 0 "Installing smbd SELinux module"
+      rlRun "semodule -i rpc.statd-mod.pp" 0 "Installing rpc.statd SELinux module"
     elif rlIsRHEL 9 || rlIsFedora; then
       # Bug 1910373 - selinux avc denials for rhsmcertd-worke and rpcbind
       rlRun "make -f /usr/share/selinux/devel/Makefile rpcbind-mod.pp" 0 "Building rpcbind SELinux module"
@@ -30,7 +36,12 @@ rlJournalStart
       # Bug 1932436 - avc denied related to sssd and systemd-hostname
       rlRun "make -f /usr/share/selinux/devel/Makefile sssd-mod.pp" 0 "Building sssd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile systemd-hostnam-mod.pp" 0 "Building systemd-hostname SELinux module"
-      rlRun "semodule -i rpcbind-mod.pp -i rhsmcertd-worke.pp rhsmcertd-worke-nodebind.pp systemd-logind-mod.pp groupadd.pp mandb-mod.pp avahi-daemon.pp ioperm01.pp sssd-mod.pp systemd-hostnam-mod.pp" 0 "Installing SELinux modules"
+      # Bug 1933680 - avc: denied { confidentiality } for pid=814 comm="modprobe" lockdown_reason="use of tracefs"
+      rlRun "make -f /usr/share/selinux/devel/Makefile modprobe-mod.pp" 0 "Building modprobe SELinux module"
+      rules="rpcbind-mod rhsmcertd-worke rhsmcertd-worke-nodebind systemd-logind-mod groupadd mandb-mod avahi-daemon ioperm01 sssd-mod systemd-hostnam-mod modprobe-mod"
+      for rule in $rules; do
+           rlRun "semodule -i ${rule}.pp"  0 "Installing $rule SELinux modules"
+      done
     else
       rlLog "No custom SELinux modules required, skipping"
       rstrnt-report-result $TEST SKIP
