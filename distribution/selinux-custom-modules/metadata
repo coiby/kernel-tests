@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=selinux-policy-devel
+dependencies=selinux-policy-devel;setools-console
 environment=AVC_ERROR=+no_avc_check
