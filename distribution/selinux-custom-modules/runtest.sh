@@ -29,16 +29,29 @@ rlJournalStart
       # Bug 1931470 - avc: denied { fowner } comm="groupadd" comm="mandb" capability=3
       rlRun "make -f /usr/share/selinux/devel/Makefile groupadd.pp" 0 "Building groupadd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile mandb-mod.pp" 0 "Building mandb SELinux module"
-      # Bug 1929329 - [RHEL-9] avc: denied { watch } for pid=328374 comm="avahi-daemon"
-      rlRun "make -f /usr/share/selinux/devel/Makefile avahi-daemon.pp" 0 "Building avahi-daemon SELinux module"
-      # Bug 1929332 - [RHEL-9] avc: denied { integrity } for pid=11514 comm="ioperm01"  and comm="grep"
-      rlRun "make -f /usr/share/selinux/devel/Makefile ioperm01.pp" 0 "Building ioperm01 SELinux module"
+      rules="rpcbind-mod rhsmcertd-worke rhsmcertd-worke-nodebind systemd-logind-mod groupadd mandb-mod"
+      # Skip if watch* permissions still not available, like Fedora 33
+      if seinfo --common file -x | grep -q watch ; then
+          # Bug 1929329 - [RHEL-9] avc: denied { watch } for pid=328374 comm="avahi-daemon"
+          rlRun "make -f /usr/share/selinux/devel/Makefile avahi-daemon.pp" 0 "Building avahi-daemon SELinux module"
+          rules="${rules} avahi-daemon"
+      fi
+      # Fedora 33 doesn't have lockdown class
+      if seinfo --class lockdown -x  | grep -q integrity ; then
+          # Bug 1929332 - [RHEL-9] avc: denied { integrity } for pid=11514 comm="ioperm01"  and comm="grep"
+          rlRun "make -f /usr/share/selinux/devel/Makefile ioperm01.pp" 0 "Building ioperm01 SELinux module"
+          rules="${rules} ioperm01"
+      fi
       # Bug 1932436 - avc denied related to sssd and systemd-hostname
       rlRun "make -f /usr/share/selinux/devel/Makefile sssd-mod.pp" 0 "Building sssd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile systemd-hostnam-mod.pp" 0 "Building systemd-hostname SELinux module"
-      # Bug 1933680 - avc: denied { confidentiality } for pid=814 comm="modprobe" lockdown_reason="use of tracefs"
-      rlRun "make -f /usr/share/selinux/devel/Makefile modprobe-mod.pp" 0 "Building modprobe SELinux module"
-      rules="rpcbind-mod rhsmcertd-worke rhsmcertd-worke-nodebind systemd-logind-mod groupadd mandb-mod avahi-daemon ioperm01 sssd-mod systemd-hostnam-mod modprobe-mod"
+      rules="${rules} sssd-mod systemd-hostnam-mod"
+      # Fedora 33 doesn't have lockdown class
+      if seinfo --class lockdown -x  | grep -q confidentiality ; then
+          # Bug 1933680 - avc: denied { confidentiality } for pid=814 comm="modprobe" lockdown_reason="use of tracefs"
+          rlRun "make -f /usr/share/selinux/devel/Makefile modprobe-mod.pp" 0 "Building modprobe SELinux module"
+          rules="${rules} modprobe-mod"
+      fi
       for rule in $rules; do
            rlRun "semodule -i ${rule}.pp"  0 "Installing $rule SELinux modules"
       done
