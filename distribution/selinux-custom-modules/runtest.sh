@@ -29,7 +29,8 @@ rlJournalStart
       # Bug 1931470 - avc: denied { fowner } comm="groupadd" comm="mandb" capability=3
       rlRun "make -f /usr/share/selinux/devel/Makefile groupadd.pp" 0 "Building groupadd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile mandb-mod.pp" 0 "Building mandb SELinux module"
-      rules="rpcbind-mod rhsmcertd-worke rhsmcertd-worke-nodebind systemd-logind-mod groupadd mandb-mod"
+      rlRun "make -f /usr/share/selinux/devel/Makefile fowner-sadc.pp" 0 "Building fowner-sadc SELinux module"
+      rules="rpcbind-mod rhsmcertd-worke rhsmcertd-worke-nodebind systemd-logind-mod groupadd mandb-mod fowner-sadc"
       # Skip if watch* permissions still not available, like Fedora 33
       if seinfo --common file -x | grep -q watch ; then
           # Bug 1929329 - [RHEL-9] avc: denied { watch } for pid=328374 comm="avahi-daemon"
