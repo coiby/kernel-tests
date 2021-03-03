@@ -137,7 +137,7 @@ function check_mntpoint_quota
 	#
 	[[ $avail != *"M" && $avail != *"G" && $avail != *"T" ]] && return 1
 	[[ $avail == *"G" ]] && n=$(echo "$n * 1024" | bc)
-	[[ $avail == "*T" ]] && n=$(echo "$n * 1024 * 1024" | bc)
+	[[ $avail == *"T" ]] && n=$(echo "$n * 1024 * 1024" | bc)
 	# rstrip ".*" if n is a float as (( n )) doesn't support float
 	n=${n%.*}
 
