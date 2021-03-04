@@ -8,16 +8,16 @@ TEST="/kernel/distribution/selinux-custom-modules"
 
 rlJournalStart
   rlPhaseStartTest
+    # https://gitlab.com/cki-project/kernel-tests/-/issues/528
+    # Bug 1932849 - avc: denied { module_request } kmod="net-pf-10"
+    if grep "ipv6.disable=1" /proc/cmdline ; then
+      rlRun "setsebool -P domain_kernel_load_modules on" 0 "Mask problems with module_request due BZ1932849 when IPv6 is disabled"
+    fi
+
     if rlIsRHEL 8.4 && [ $(uname -m) == "aarch64" ]; then
       rlRun "make -f /usr/share/selinux/devel/Makefile kexec.pp" 0 "Building kexec SELinux module"
       # Bug 1896424 - [RHEL-8.4] selinux denies kexec write on aarch64
       rlRun "semodule -i kexec.pp" 0 "Installing kexec SELinux module"
-    elif rlIsRHEL 8; then
-      # Bug 1932849 - avc: denied { module_request } kmod="net-pf-10"
-      rlRun "make -f /usr/share/selinux/devel/Makefile smbd-mod.pp" 0 "Building smbd SELinux module"
-      rlRun "make -f /usr/share/selinux/devel/Makefile rpc.statd-mod.pp" 0 "Building rpc.statd SELinux module"
-      rlRun "semodule -i smbd-mod.pp" 0 "Installing smbd SELinux module"
-      rlRun "semodule -i rpc.statd-mod.pp" 0 "Installing rpc.statd SELinux module"
     elif rlIsRHEL 9 || rlIsFedora; then
       # Bug 1910373 - selinux avc denials for rhsmcertd-worke and rpcbind
       rlRun "make -f /usr/share/selinux/devel/Makefile rpcbind-mod.pp" 0 "Building rpcbind SELinux module"
@@ -56,7 +56,7 @@ rlJournalStart
       for rule in $rules; do
            rlRun "semodule -i ${rule}.pp"  0 "Installing $rule SELinux modules"
       done
-    else
+    elif ! grep "ipv6.disable=1" /proc/cmdline ; then
       rlLog "No custom SELinux modules required, skipping"
       rstrnt-report-result $TEST SKIP
       exit
