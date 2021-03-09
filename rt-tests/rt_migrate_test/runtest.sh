@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source rt common functions
-. ../include/runtest.sh
+. ../include/runtest.sh || exit 1
 
 TEST="rt-tests/rt_migrate_test"
 
