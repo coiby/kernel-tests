@@ -5,13 +5,13 @@
 
 function rt_package_install()
 {
-    packages="rt-tests rt-setup rteval rteval-loads tuned-profiles-realtime tuna"
+    packages="rt-tests rt-setup rteval rteval-loads tuned-profiles-realtime tuna realtime-tests realtime-setup"
     echo "install needed package $packages " | tee -a $OUTPUTFILE
     for i in $packages; do
         if $(rpm -q --quiet $i); then
             continue
         else
-            dnf install -y $i
+            yum install -y $i
         fi
     done
 }

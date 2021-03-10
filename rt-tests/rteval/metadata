@@ -1,11 +1,11 @@
 [General]
 name=rt-tests/rteval
-owner=Clark Williams <williams@redhat.com>
+owner=Qiao Zhao <qzhao@redhat.com>
 description=PRE Verification for Real Time
 license=GPLv2
 confidential=no
 destructive=no
 
 [restraint]
-entry_point=bash ./runtest.sh
+entry_point=bash -x ./runtest.sh
 repoRequires=cki_lib;rt-tests/include

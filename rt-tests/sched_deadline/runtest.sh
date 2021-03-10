@@ -1,15 +1,13 @@
 #!/bin/bash
 
 # Source rt common functions
-. ../include/runtest.sh
+. ../include/runtest.sh || exit 1
 
 TEST="rt-tests/sched_deadline"
 
 function runtest()
 {
     result_r="PASS"
-
-    which deadline_test || yum install -y rt-tests
 
     echo "clean the dmesg log" | tee -a $OUTPUTFILE
     dmesg -c
