@@ -73,7 +73,7 @@ function getServerList ()
 
     if [[ -z $NFSSERVERS ]]; then
         echo " ========== Use static NFS server list =========="
-        servers="rhel3-nfs:/export/home rhel4-nfs:/export/home rhel5-nfs:/export/home rhel6-nfs:/export/home rhel7-nfs:/export/home netapp-v41:/export/kernel-test netapp-nfs:/vol/vol0/home/cthon sol10-nfs:/export/home"
+        servers="rhel3-nfs:/export/home rhel4-nfs:/export/home rhel5-nfs:/export/home rhel6-nfs:/export/home rhel7-nfs:/export/home sol10-nfs:/export/home"
     else
         echo " ========== Use dynamic NFS server list =========="
         servers=$NFSSERVERS
