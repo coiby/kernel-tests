@@ -120,7 +120,9 @@ function knownissue_filter()
 	# skip OOM tests on large boxes since it takes too long
 	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 8 ] && tskip "oom0.*" fatal
 	# copy_file_range02 is a new unstable test case and changes too frequently
-	tskip "copy_file_range02" unfix 
+	tskip "copy_file_range02" unfix
+	# Issue: https://github.com/linux-test-project/ltp/issues/799
+	tskip "clock_gettime04" unfix
 	# Issue TBD
 	tskip "madvise09" fatal
 	# Issue TBD
@@ -158,9 +160,6 @@ function knownissue_filter()
 	# [bug] msgstress04 fills up >4GB data on conserver for ppc64le
 	# https://lore.kernel.org/linux-block/491751.10128377.1599217585366.JavaMail.zimbra@redhat.com/T/#t
 	is_arch "ppc64le" && tskip "msgstress04" fatal
-	# [bug] mm: migrate: initialize err in do_migrate_pages
-	# https://lore.kernel.org/linux-mm/456a021c7ef3636d7668cec9dcb4a446a4244812.1609855564.git.jstancek@redhat.com/T/#u
-	tskip "migrate_pages01" unfix
 	# Issue to be filed
 	tskip "perf_event_open02" unfix
 	# netns_breakns_ip_ipv6_netlink was re-written upstream, not yet stable
