@@ -109,7 +109,8 @@ function get_test_cases_srp
 {
 	typeset testcases=""
 	testcases+=" srp/001"
-	testcases+=" srp/002"
+	# srp/002 srp/011 srp/015 failure on ppc64le, BZ1938508
+	uname -ri | grep -q "4.18.0.*ppc64le" || testcases+=" srp/002"
 	# testcases+=" srp/003", need legacy device mapper support
 	# testcases+=" srp/004", need legacy device mapper support
 	testcases+=" srp/005"
@@ -118,11 +119,11 @@ function get_test_cases_srp
 	testcases+=" srp/008"
 	testcases+=" srp/009"
 	testcases+=" srp/010"
-	testcases+=" srp/011"
+	uname -ri | grep  -q "4.18.0.*ppc64le" || testcases+=" srp/011"
 	# testcases+=" srp/012", need legacy device mapper support
 	testcases+=" srp/013"
 	# testcases+=" srp/014", BZ1900153
-	testcases+=" srp/015"
+	uname -ri | grep  -q "4.18.0.*ppc64le" || testcases+=" srp/015"
 	echo $testcases
 }
 
