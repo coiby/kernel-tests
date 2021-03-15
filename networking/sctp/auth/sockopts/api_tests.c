@@ -26,6 +26,7 @@ char *usage = "Usage: apitester [-f] [-l] [-r] suitelist\n"
 static unsigned int run    = 0;
 static unsigned int passed = 0;
 static unsigned int failed = 0;
+static char description[41];
 
 static void
 print_usage()
