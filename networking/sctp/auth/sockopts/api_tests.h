@@ -20,8 +20,6 @@ struct test {
 	char *(*func)(void);
 };
 
-char description[41];
-
 #define I_AM_HERE \
 		do { \
 			printf("%s:%d at %s\n", __FILE__, __LINE__ , __FUNCTION__); \
