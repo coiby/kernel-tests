@@ -131,6 +131,18 @@ if is_arch "aarch64" && kernel_in_range "0" "5.6.0"; then
     echo './conformance/interfaces/munlock/10-1.c' >> $DISABLED_LIST
 fi
 
+#
+# rhel9, disable pthread_cond_destroy_2-1 temporary
+# https://github.com/linux-test-project/ltp/issues/746
+# The commit c4ad832276(nptl: Remove private futex optimization
+# refers to https://gitlab.com/cki-project/kernel-tests/-/issues/488#note_525972497
+# The fix update: https://bodhi.fedoraproject.org/updates/FEDORA-2021-6749bfcfd9
+# glibc build that contains the fix is glibc-2.33-5.el9 will be in 9.0.0 beta,
+# We are currently using alpha,and will re-enable this sub test when testing 9.0.0 beta
+if is_rhel9; then
+    echo './conformance/interfaces/pthread_cond_destroy/2-1.c' >> $DISABLED_LIST
+fi
+
 echo "Disabling testcases" | tee -a $OUTPUTFILE
 for entry in $(cat $DISABLED_LIST); do
     first_char=$(echo $entry | cut -b1)
