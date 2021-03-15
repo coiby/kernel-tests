@@ -37,6 +37,8 @@ PACKAGE_VERSION=$(get_pkg_version)
 TARGET=${PACKAGE_NAME}-${PACKAGE_VERSION}
 is_rhel8 && set_default_python
 PYTHON_VERSION=$(get_python_version)
+OS_REL_ID=$(awk -F= '/^ID=/ {gsub("\"","",$2);print $2}' /etc/os-release)
+OS_MAJOR_RELEASE=$(grep -Go 'release [0-9]\+' /etc/redhat-release | sed 's/release //')
 
 patch_files="
         assume-support-rhel6.patch \
@@ -72,6 +74,11 @@ else # 2.21
         patch_files+=" \
             huge_page_setup_helper-python3-convert.patch \
             run_tests-python3-convert.patch \
+            "
+    fi
+    if [ "$OS_REL_ID" = "rhel" ] && [[ $OS_MAJOR_RELEASE == 9 ]] || [ "$OS_REL_ID" = "fedora" ]; then
+        patch_files+=" \
+		max_hugetlb_segs.patch
             "
     fi
     patch_files+=" \
