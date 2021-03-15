@@ -123,8 +123,8 @@ function get_test_cases_srp
 	uname -ri | grep -q "4.18.0.*ppc64le" || testcases+=" srp/011"
 	# testcases+=" srp/012", need legacy device mapper support
 	testcases+=" srp/013"
-	# testcases+=" srp/014", BZ1900153
-	uname -ri | grep  -q "4.18.0.*ppc64le" || testcases+=" srp/015"
+	uname -r | grep -q 4.18.0 || testcases+=" srp/014" #BZ1900153
+	uname -ri | grep -q "4.18.0.*ppc64le" || testcases+=" srp/015"
 	echo $testcases
 }
 
