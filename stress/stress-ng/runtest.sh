@@ -48,7 +48,7 @@ BUILDDIR="stress-ng"
 # stress-ng git location
 GIT_URL=${GIT_URL:-"git://kernel.ubuntu.com/cking/stress-ng.git"}
 # current release
-GIT_BRANCH=${GIT_BRANCH:-"tags/V0.09.56"}
+GIT_BRANCH=${GIT_BRANCH:-"tags/V0.12.05"}
 
 CLASSES="interrupt cpu cpu-cache memory os"
 
