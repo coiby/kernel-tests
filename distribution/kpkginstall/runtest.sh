@@ -451,6 +451,10 @@ else
     rstrnt-restore
   fi
 
+  # Save configuration used to build the kernel
+  cat /boot/config-${ckver} > kernel_${ckver}_config.log
+  rstrnt-report-log -l kernel_${ckver}_config.log
+
   # We have the right kernel. Do we have any call traces?
   dmesg | grep -qi 'Call Trace:'
   dmesgret=$?
