@@ -48,10 +48,10 @@ b549be0430aa3df45cf25675e2cad1b50d710435 aarch64 s390x x86_64 ppc64le # Breakpoi
 24a8cd476d3077c41e5795428ea7820d88d12309 x86_64 # Convert perf time to TSC
 
 # Known bugs
-9e14b86f572e9d058f59302cfa8759e5afb20017 ppc64le aarch64 x86_64 # probe libc's inet_pton & backtrace it with ping
-90ae3743ecb512bf3d9956df1d6ea8cbb3f63dc6 ppc64le aarch64 x86_64 # Use vfs_getname probe to get syscall args filenames
+9e14b86f572e9d058f59302cfa8759e5afb20017 ppc64le s390x aarch64 x86_64 # probe libc's inet_pton & backtrace it with ping
+90ae3743ecb512bf3d9956df1d6ea8cbb3f63dc6 ppc64le s390x aarch64 x86_64 # Use vfs_getname probe to get syscall args filenames
 0e5b27841d80bf495ebfbfb1a446f7ca08fe5e97 ppc64le s390x aarch64 x86_64 # Check open filename arg using perf trace + vfs_getname
-d4b88ad2ef3ad11d1d65485ad3209f8849f4aeeb ppc64le aarch64 x86_64 # Add vfs_getname probe to get syscall args filenames
+d4b88ad2ef3ad11d1d65485ad3209f8849f4aeeb ppc64le s390x aarch64 x86_64 # Add vfs_getname probe to get syscall args filenames
 b011103996bcd810c4c87e049fffb48326edf705 ppc64le s390x aarch64  # Parse sched tracepoints fields
 887e416aca88217834c65490461a2137431efddd ppc64le # Watchpoint
 05b9b8fb2a5d4d41a867a36111ae380bf111f0f0 aarch64 # Track with sched_switch
@@ -61,3 +61,4 @@ adb2cda40ae61b84668595f3be67de89ed281658 ppc64le ppc64 s390x aarch64 x86_64 # DS
 b110fc5887abacbcdaa32fd5e9ea2e3f6e580dc5 aarch64 # vmlinux symtab matches kallsyms
 2160bdaf7e5f48987e31c1d90d0260ac9fdd3ef7 ppc64le s390x aarch64 x86_64 # BPF filter
 e72d804e5361e9a66889207602ac75e4dd409aa6 x86_64  # x86 instruction decoder - new instructions
+64b224a2fb478a47529700c6237c6c0a0a90ad98 aarch64 # Session topology
