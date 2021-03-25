@@ -497,6 +497,10 @@ function cthon_main ()
     for server_path in $servers; do
         : > result.txt
 
+        if [[ "$CI" = yes && "$server_path" = netapp* ]]; then
+            continue
+        fi
+
         # start time
         local STIME=`date +%s`
         local server=$(echo $server_path| cut -f1 -d:)
@@ -617,15 +621,7 @@ else
     echo " ========== Use default single test run ============"
 fi
 
-#
-# XXX: After we removed getServerList() and defined CTHONSERVERS via kpet-db,
-#      the case fails randomly. Looks the client and nfs servers are not in the
-#      same domain, but we are not sure the root cause as a matter of fact.
-#      Hence, just go back to use getServerList() so as to save the effort to
-#      dig out the root cause. Hence, right here we disable the code block in
-#      the following to avoid updating kpet-db for the time being
-#
-if false && [[ -n "$CTHONSERVERS" ]]; then
+if [[ -n "$CTHONSERVERS" ]]; then
     # We can specify a list of servers it test against
     # For example, we can provide a customized list of
     # servers CTHONSERVER="host1-nfs host2-nfs host3-nfs"
