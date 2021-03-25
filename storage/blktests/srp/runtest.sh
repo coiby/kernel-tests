@@ -140,8 +140,6 @@ if (( $? != 0 )); then
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 fi
 
-pre_setup
-
 test_ws=$CDIR/blktests
 ret=0
 testcases_default=""
@@ -149,6 +147,7 @@ testcases_default+=" $(get_test_cases_srp)"
 testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
 for testcase in $testcases; do
 	for use_siw in $USE_SIW; do
+		pre_setup
 		disable_multipath
 		do_test $test_ws $testcase $use_siw
 		((ret += $?))
