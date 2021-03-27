@@ -36,7 +36,8 @@ function fio_device_level_test
 {
     local test_dev=$1
     local ret=0
-    local size=2G
+    local size=1G
+    local runtime=180
 
     rlLog "INFO: Executing fio_device_level_test() with device: $test_dev"
 
@@ -50,12 +51,12 @@ function fio_device_level_test
         rlLog "FAIL: fio device level randwrite testing for $test_dev failed"
         ret=1
     fi
-    rlRun "fio -filename=$test_dev -iodepth=16 -rw=read -ioengine=libaio -bssplit=4K -direct=1 -size=$size -group_reporting -name=mytest -verify=crc32c"
+    rlRun "fio -filename=$test_dev -iodepth=16 -rw=read -ioengine=libaio -bssplit=4K -direct=1 -size=$size -group_reporting -name=mytest -runtime=$runtime -time_based"
     if [ $? -ne 0 ]; then
         rlLog "FAIL: fio device level read testing for $test_dev failed"
         ret=1
     fi
-    rlRun "fio -filename=$test_dev -iodepth=16 -rw=randread -ioengine=libaio -bssplit=4K -direct=1 -size=$size -group_reporting -name=mytest -verify=crc32c"
+    rlRun "fio -filename=$test_dev -iodepth=16 -rw=randread -ioengine=libaio -bssplit=4K -direct=1 -size=$size -group_reporting -name=mytest -runtime=$runtime -time_based"
     if [ $? -ne 0 ]; then
         rlLog "FAIL: fio device level randread testing for $test_dev failed"
         ret=1
