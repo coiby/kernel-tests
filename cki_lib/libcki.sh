@@ -310,3 +310,16 @@ function cki_print_warning()
 {
     echo "⚠️ ${1}"
 }
+
+# Check if the passed variable has a truthy value or not.
+# Args: Variable
+# Returns: 0 if the variable is truthy, 1 otherwise
+# (copied from gitlab.com/cki-project/cki-lib/cki_utils.sh)
+function cki_is_true {
+    if [[ "${1}" = [Tt]rue ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+

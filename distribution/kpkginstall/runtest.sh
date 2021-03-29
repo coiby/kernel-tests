@@ -8,6 +8,9 @@ REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
 PACKAGE_NAME=""
 
+# default values for URL parameters
+KPKG_VAR_DEBUG_KERNEL="false"
+
 # Bring in library functions.
 FILE=$(readlink -f ${BASH_SOURCE})
 CDIR=$(dirname $FILE)
@@ -68,7 +71,7 @@ function set_package_name()
   fi
 
   # Append "-debug" if we were asked to install the debug kernel.
-  if [[ "${KPKG_VAR_DEBUG:no}" == "yes" ]]; then
+  if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"; then
     cki_print_info "Debug kernel was requested -- appending -debug to package name"
     PACKAGE_NAME=${PACKAGE_NAME}-debug
   fi
@@ -271,7 +274,7 @@ function rpm_install()
 
   # Ensure that the debug kernel is selected as the default kernel in
   # /boot/grub2/grubenv.
-  if [[ "${KPKG_VAR_DEBUG:no}" == "yes" ]]; then
+  if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"; then
     echo "Adjusting settings in /etc/sysconfig/kernel to set debug as default"
     echo "UPDATEDEFAULT=yes" > /etc/sysconfig/kernel
     echo "DEFAULTKERNEL=kernel-debug" >> /etc/sysconfig/kernel
@@ -348,8 +351,8 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
 
   # If we are installing a debug kernel, make a reminder for us to check for
   # a debug kernel after the reboot
-  if [[ "${KPKG_VAR_DEBUG:no}" == "yes" ]]; then
-    echo "yes" > /kpkginstall/KPKG_VAR_DEBUG
+  if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"; then
+    echo "true" > /kpkginstall/KPKG_VAR_DEBUG_KERNEL
   fi
 
   if [ -z "${KPKG_URL}" ]; then
@@ -400,7 +403,7 @@ else
   fi
 
   # Make a list of kernel versions we expect to see after reboot.
-  if [ -f /kpkginstall/KPKG_VAR_DEBUG ]; then
+  if [ -f /kpkginstall/KPKG_VAR_DEBUG_KERNEL ]; then
     valid_kernel_versions=(
       "${KVER}.debug"           # RHEL 7 style debug kernels
       "${KVER}+debug"           # RHEL 8 style debug kernels
