@@ -1,0 +1,12 @@
+[General]
+name=net-snmp/tcp-transport
+owner=Evgeny Fedin <efedin@redhat.com>
+description=Checkthat TCP transport works
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+softDependencies=net-snmp;net-snmp-utils
+repoRequires=packages/net-snmp/testlib;cki_lib
