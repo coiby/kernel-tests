@@ -8,5 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=alsa-utils;python2;python3
+dependencies=alsa-utils
+softDependencies=python2;python3
 repoRequires=cki_lib
