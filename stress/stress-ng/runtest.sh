@@ -57,6 +57,24 @@ function detect_testenv()
     fi
 }
 
+function build_stress-ng()
+{
+    rlLog "Downloading stress-ng from source"
+    rlRun "git clone $GIT_URL" 0
+    if [ $? != 0 ]; then
+        echo "Failed to git clone $GIT_URL." | tee -a $OUTPUTFILE
+        rstrnt-report-result $TEST WARN $OUTPUTFILE
+        rstrnt-abort -t recipe
+    fi
+
+    # build
+    rlLog "Building stress-ng from source"
+    rlRun "pushd stress-ng" 0
+    rlRun "git checkout $GIT_BRANCH" 0
+    rlRun "make" 0 "Building stress-ng"
+    rlRun "popd" 0 "Done building stress-ng"
+}
+
 function customize_param()
 {
     # known issue list:
@@ -79,21 +97,7 @@ rlPhaseStartSetup
     fi
 
     detect_testenv
-
-    rlLog "Downloading stress-ng from source"
-    rlRun "git clone $GIT_URL" 0
-    if [ $? != 0 ]; then
-        echo "Failed to git clone $GIT_URL." | tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST WARN $OUTPUTFILE
-        rstrnt-abort -t recipe
-    fi
-
-    # build
-    rlLog "Building stress-ng from source"
-    rlRun "pushd stress-ng" 0
-    rlRun "git checkout $GIT_BRANCH" 0
-    rlRun "make" 0 "Building stress-ng"
-    rlRun "popd" 0 "Done building stress-ng"
+    build_stress-ng
 
     # disable systemd-coredump collection
     if [ -f /lib/systemd/systemd ] ; then
