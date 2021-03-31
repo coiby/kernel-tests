@@ -31,16 +31,7 @@
 
 TEST="stress/stress-ng"
 
-# Mustangs have a hardware flaw which causes kernel warnings under stress:
-#    list_add corruption. prev->next should be next
-if type -p dmidecode >/dev/null ; then
-    if dmidecode -t1 | grep -q 'Product Name:.*Mustang.*' ; then
-        rstrnt-report-result $TEST SKIP $OUTPUTFILE
-        exit
-    fi
-fi
 
-rlJournalStart
 
 BUILDDIR="stress-ng"
 
@@ -53,6 +44,18 @@ GIT_BRANCH=${GIT_BRANCH:-"tags/V0.12.05"}
 CLASSES=${CLASSES:-"interrupt cpu cpu-cache memory os"}
 EXCLUDE_STRESSOR=${EXCLUDE_STRESSOR:-"close,cyclic,vfork"}
 TIMEOUT=${TIMEOUT:-1h}
+
+function detect_testenv()
+{
+    # Mustangs have a hardware flaw which causes kernel warnings under stress:
+    #    list_add corruption. prev->next should be next
+    if type -p dmidecode >/dev/null ; then
+        if dmidecode -t1 | grep -q 'Product Name:.*Mustang.*' ; then
+            rstrnt-report-result $TEST SKIP $OUTPUTFILE
+            exit
+        fi
+    fi
+}
 
 function customize_param()
 {
@@ -67,12 +70,15 @@ function customize_param()
 }
 
 # ----- Test Start ------
+rlJournalStart
 rlPhaseStartSetup
     # if stress-ng triggers a panic and reboot, then abort the test
     if [ $RSTRNT_REBOOTCOUNT -ge 1 ] ; then
         rlDie "Aborting due to system crash and reboot"
         rstrnt-abort -t recipe
     fi
+
+    detect_testenv
 
     rlLog "Downloading stress-ng from source"
     rlRun "git clone $GIT_URL" 0
