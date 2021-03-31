@@ -497,7 +497,14 @@ function cthon_main ()
     for server_path in $servers; do
         : > result.txt
 
-        if [[ "$CI" = yes && "$server_path" = netapp* ]]; then
+	# see: https://bugzilla.redhat.com/show_bug.cgi?id=1937636#c7
+        # `skip rhel5 server on fedora and rhel9(or higher)
+        OSV=$(rpm -E %rhel)
+        if [[ "$server_path" =~ rhel-?5 ]]; then
+            [[ "$OSV" = "%rhel" || "$OSV" -ge 9 ]] && continue
+        fi
+
+        if [[ "$CI" = yes && "$server_path" = *netapp* ]]; then
             continue
         fi
 
