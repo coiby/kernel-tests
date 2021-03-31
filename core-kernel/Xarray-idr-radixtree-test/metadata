@@ -1,0 +1,12 @@
+[General]
+name=core-kernel/Xarray-idx-radixtree-test
+owner=Li Wang <liwang@redhat.com>
+description=Wrapper for Linux radix-tree Test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=git;python3-pip
+repoRequires=cki_lib
