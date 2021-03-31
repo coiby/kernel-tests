@@ -30,9 +30,6 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST="stress/stress-ng"
-
-
-
 BUILDDIR="stress-ng"
 
 # task parameters
@@ -40,7 +37,7 @@ BUILDDIR="stress-ng"
 GIT_URL=${GIT_URL:-"git://kernel.ubuntu.com/cking/stress-ng.git"}
 # current release
 GIT_BRANCH=${GIT_BRANCH:-"tags/V0.12.05"}
-
+# test 'random' or 'sequential' class only by parameter passing
 CLASSES=${CLASSES:-"interrupt cpu cpu-cache memory os"}
 EXCLUDE_STRESSOR=${EXCLUDE_STRESSOR:-"close,cyclic,vfork"}
 TIMEOUT=${TIMEOUT:-1h}
@@ -88,9 +85,10 @@ function disable_systemd_coredump()
 Storage=none
 ProcessSizeMax=0
 EOF
-        if systemctl list-units --all | grep -qw systemd-coredump.socket ; then
-            rlRun "systemctl mask --now systemd-coredump.socket" 0 "Masking and stopping systemd-coredump.socket"
-        fi
+        ln -s /dev/null /etc/sysctl.d/50-coredump.conf
+        systemctl daemon-reload
+        sysctl 'kernel.core_pattern=|/bin/false'
+        sysctl kernel.core_uses_pid=0
     fi
 }
 
@@ -99,9 +97,9 @@ function restore_systemd_coredump()
     # restore default systemd-coredump config
     if [ -f /lib/systemd/systemd ] ; then
         rm -f /etc/systemd/coredump.conf.d/stress-ng.conf
-        if systemctl list-units --all | grep -qw systemd-coredump.socket ; then
-            rlRun "systemctl unmask systemd-coredump.socket" 0 "Unmasking systemd-coredump.socket"
-        fi
+        rm -f /etc/sysctl.d/50-coredump.conf
+        systemctl daemon-reload
+        sysctl --system
     fi
 }
 
