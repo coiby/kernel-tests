@@ -105,6 +105,26 @@ function restore_systemd_coredump()
     fi
 }
 
+function filter_excludelist()
+{
+    # exclude tests on certain arch, kernel, or distro
+    if [ "$(uname -i)" = "ppc64le" ]; then
+        # TODO: open BZ: vforkmany triggers kernel "BUG: soft lockup" on ppc64le
+        sed -ie '/vforkmany/d' os.stressors
+    fi
+
+    if [[ "$(uname -r)" =~ 3.10.0.*rt.*el7 ]]; then
+        # https://bugzilla.redhat.com/show_bug.cgi?id=1789039
+        sed -ie '/af-alg/d' cpu.stressors
+    fi
+
+    if grep -q 'Fedora' /etc/redhat-release ; then
+        # kernel BUG at mm/usercopy.c:99! for upstream kernels
+        # https://bugzilla.kernel.org/show_bug.cgi?id=209919
+        sed -ie '/procfs/d' os.stressors
+    fi
+}
+
 function customize_param()
 {
     # known issue list:
@@ -129,23 +149,7 @@ rlPhaseStartSetup
     detect_testenv
     build_stress-ng
     disable_systemd_coredump
-
-    # blacklist tests on certain arch, kernel, or distro
-    if [ "$(uname -i)" = "ppc64le" ]; then
-        # TODO: open BZ: vforkmany triggers kernel "BUG: soft lockup" on ppc64le
-        sed -ie '/vforkmany/d' os.stressors
-    fi
-
-    if [[ "$(uname -r)" =~ 3.10.0.*rt.*el7 ]]; then
-        # https://bugzilla.redhat.com/show_bug.cgi?id=1789039
-        sed -ie '/af-alg/d' cpu.stressors
-    fi
-
-    if grep -q 'Fedora' /etc/redhat-release ; then
-        # kernel BUG at mm/usercopy.c:99! for upstream kernels
-        # https://bugzilla.kernel.org/show_bug.cgi?id=209919
-        sed -ie '/procfs/d' os.stressors
-    fi
+    filter_excludelist
 
     # stress-ng-dccp is blocked by SELinux (see RHBZ 1459941) on RHEL-7.x with
     # selinux-policy-3.13.1-175.el7 and earlier, so generate an SELinux module
