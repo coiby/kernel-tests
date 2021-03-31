@@ -50,8 +50,23 @@ GIT_URL=${GIT_URL:-"git://kernel.ubuntu.com/cking/stress-ng.git"}
 # current release
 GIT_BRANCH=${GIT_BRANCH:-"tags/V0.12.05"}
 
-CLASSES="interrupt cpu cpu-cache memory os"
+CLASSES=${CLASSES:-"interrupt cpu cpu-cache memory os"}
+EXCLUDE_STRESSOR=${EXCLUDE_STRESSOR:-"close,cyclic,vfork"}
+TIMEOUT=${TIMEOUT:-1h}
 
+function customize_param()
+{
+    # known issue list:
+    # Bug 1869760 - Host becomes unresponsive during stress-ng --cyclic test rcu:
+    # Bug 1866855 - Host Unexpectedly Reboots: BUG: Bad rss-counter state mm:000000009db8edc6
+    sed -i "s/#EXCLUDE_STRESSOR#/\"${EXCLUDE_STRESSOR}\"/g" *.stressors
+
+    if [ ! -z "$TIMEOUT" ]; then
+        sed -i "s/#TIMEOUT#/\"${TIMEOUT}\"/g" *.stressors
+    fi
+}
+
+# ----- Test Start ------
 rlPhaseStartSetup
     # if stress-ng triggers a panic and reboot, then abort the test
     if [ $RSTRNT_REBOOTCOUNT -ge 1 ] ; then
@@ -118,6 +133,8 @@ EOF
             rlRun "semodule -i stress-ng-dccp.pp" 0 "Installing stress-ng-dccp SELinux module"
         fi
     fi
+
+    customize_param
 
 rlPhaseEnd
 
