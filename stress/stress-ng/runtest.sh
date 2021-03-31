@@ -125,6 +125,21 @@ function filter_excludelist()
     fi
 }
 
+function selinux_dccp()
+{
+    # stress-ng-dccp is blocked by SELinux (see RHBZ 1459941) on RHEL-7.x with
+    # selinux-policy-3.13.1-175.el7 and earlier, so generate an SELinux module
+    # to allow DCCP sockets
+    if grep -q 'Red Hat Enterprise Linux.*release 7.*' /etc/redhat-release ; then
+        rpmdev-vercmp "$(rpm -q --qf '%{epochnum}:%{version}-%{release}\n' selinux-policy)" "0:3.13.1-175.el7" >/dev/null
+        if [ $? -eq 12 ]; then
+            rlRun "yum -y install selinux-policy-devel" 0 "Installing SELinux development tools"
+            rlRun "make -f /usr/share/selinux/devel/Makefile stress-ng-dccp.pp" 0 "Building stress-ng-dccp SELinux module"
+            rlRun "semodule -i stress-ng-dccp.pp" 0 "Installing stress-ng-dccp SELinux module"
+        fi
+    fi
+}
+
 function customize_param()
 {
     # known issue list:
@@ -150,21 +165,8 @@ rlPhaseStartSetup
     build_stress-ng
     disable_systemd_coredump
     filter_excludelist
-
-    # stress-ng-dccp is blocked by SELinux (see RHBZ 1459941) on RHEL-7.x with
-    # selinux-policy-3.13.1-175.el7 and earlier, so generate an SELinux module
-    # to allow DCCP sockets
-    if grep -q 'Red Hat Enterprise Linux.*release 7.*' /etc/redhat-release ; then
-        rpmdev-vercmp "$(rpm -q --qf '%{epochnum}:%{version}-%{release}\n' selinux-policy)" "0:3.13.1-175.el7" >/dev/null
-        if [ $? -eq 12 ]; then
-            rlRun "yum -y install selinux-policy-devel" 0 "Installing SELinux development tools"
-            rlRun "make -f /usr/share/selinux/devel/Makefile stress-ng-dccp.pp" 0 "Building stress-ng-dccp SELinux module"
-            rlRun "semodule -i stress-ng-dccp.pp" 0 "Installing stress-ng-dccp SELinux module"
-        fi
-    fi
-
+    selinux_dccp
     customize_param
-
 rlPhaseEnd
 
 rlPhaseStartTest
