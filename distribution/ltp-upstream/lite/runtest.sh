@@ -25,11 +25,11 @@ function test_msg()
 	esac
 }
 
-# A recent commit in the upstream LTP repo that passes all Travis checks
+# A recent commit in the upstream LTP repo that passes all travis checks
 #
 # NOTE: We use a tested commit to avoid that breakage in LTP's master branch
-#       can make our test suites less stable
-LTP_REPO_COMMIT_ID=8e08ce80c77bc809912d1797fef465665f08b801
+#       which may make our test suites less stable
+LTP_REPO_COMMIT_ID=306adc9bed112ddee3c008b42f8bfd6dc4dadf7a
 function ltp_test_build()
 {
 	# workaround for the beaker issue when arch is ppc64:
