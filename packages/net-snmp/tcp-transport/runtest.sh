@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -21,7 +21,7 @@ CDIR=$(dirname $FILE)
 
 
 # include common routines
-source $CDIR/../../cki_lib/libcki.sh || exit
+source $CDIR/../../../cki_lib/libcki.sh || exit
 source $CDIR/../testlib/net-snmp-lib.sh
 
 rlJournalStart
@@ -42,7 +42,7 @@ rlPhaseStartTest
     rlAssertGrep "sysLocation.*Unknown" $rlRun_LOG
 
     rm $rlRun_LOG
-    
+
     rlRun "nsCheckAndStop snmpd"
 rlPhaseEnd
 
