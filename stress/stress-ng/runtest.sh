@@ -75,6 +75,36 @@ function build_stress-ng()
     rlRun "popd" 0 "Done building stress-ng"
 }
 
+function disable_systemd_coredump()
+{
+    # disable systemd-coredump collection
+    if [ -f /lib/systemd/systemd ] ; then
+        rlLog "Disabling systemd-coredump collection"
+        if [ ! -d /etc/systemd/coredump.conf.d ] ; then
+            mkdir /etc/systemd/coredump.conf.d
+        fi
+        cat >/etc/systemd/coredump.conf.d/stress-ng.conf <<EOF
+[Coredump]
+Storage=none
+ProcessSizeMax=0
+EOF
+        if systemctl list-units --all | grep -qw systemd-coredump.socket ; then
+            rlRun "systemctl mask --now systemd-coredump.socket" 0 "Masking and stopping systemd-coredump.socket"
+        fi
+    fi
+}
+
+function restore_systemd_coredump()
+{
+    # restore default systemd-coredump config
+    if [ -f /lib/systemd/systemd ] ; then
+        rm -f /etc/systemd/coredump.conf.d/stress-ng.conf
+        if systemctl list-units --all | grep -qw systemd-coredump.socket ; then
+            rlRun "systemctl unmask systemd-coredump.socket" 0 "Unmasking systemd-coredump.socket"
+        fi
+    fi
+}
+
 function customize_param()
 {
     # known issue list:
@@ -98,22 +128,7 @@ rlPhaseStartSetup
 
     detect_testenv
     build_stress-ng
-
-    # disable systemd-coredump collection
-    if [ -f /lib/systemd/systemd ] ; then
-        rlLog "Disabling systemd-coredump collection"
-        if [ ! -d /etc/systemd/coredump.conf.d ] ; then
-            mkdir /etc/systemd/coredump.conf.d
-        fi
-        cat >/etc/systemd/coredump.conf.d/stress-ng.conf <<EOF
-[Coredump]
-Storage=none
-ProcessSizeMax=0
-EOF
-        if systemctl list-units --all | grep -qw systemd-coredump.socket ; then
-            rlRun "systemctl mask --now systemd-coredump.socket" 0 "Masking and stopping systemd-coredump.socket"
-        fi
-    fi
+    disable_systemd_coredump
 
     # blacklist tests on certain arch, kernel, or distro
     if [ "$(uname -i)" = "ppc64le" ]; then
@@ -161,13 +176,7 @@ rlPhaseStartTest
 rlPhaseEnd
 
 rlPhaseStartCleanup
-    # restore default systemd-coredump config
-    if [ -f /lib/systemd/systemd ] ; then
-        rm -f /etc/systemd/coredump.conf.d/stress-ng.conf
-        if systemctl list-units --all | grep -qw systemd-coredump.socket ; then
-            rlRun "systemctl unmask systemd-coredump.socket" 0 "Unmasking systemd-coredump.socket"
-        fi
-    fi
+    restore_systemd_coredump
 
     # remove selinux module
     if semodule -l | grep -q stress-ng-dccp ; then
