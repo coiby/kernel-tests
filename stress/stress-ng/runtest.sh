@@ -30,18 +30,6 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST="stress/stress-ng"
-
-# Mustangs have a hardware flaw which causes kernel warnings under stress:
-#    list_add corruption. prev->next should be next
-if type -p dmidecode >/dev/null ; then
-    if dmidecode -t1 | grep -q 'Product Name:.*Mustang.*' ; then
-        rstrnt-report-result $TEST SKIP $OUTPUTFILE
-        exit
-    fi
-fi
-
-rlJournalStart
-
 BUILDDIR="stress-ng"
 
 # task parameters
@@ -49,16 +37,25 @@ BUILDDIR="stress-ng"
 GIT_URL=${GIT_URL:-"git://kernel.ubuntu.com/cking/stress-ng.git"}
 # current release
 GIT_BRANCH=${GIT_BRANCH:-"tags/V0.12.05"}
+# test 'random' or 'sequential' class only by parameter passing
+CLASSES=${CLASSES:-"interrupt cpu cpu-cache memory os"}
+EXCLUDE_STRESSOR=${EXCLUDE_STRESSOR:-"close,cyclic,vfork"}
+TIMEOUT=${TIMEOUT:-1h}
 
-CLASSES="interrupt cpu cpu-cache memory os"
-
-rlPhaseStartSetup
-    # if stress-ng triggers a panic and reboot, then abort the test
-    if [ $RSTRNT_REBOOTCOUNT -ge 1 ] ; then
-        rlDie "Aborting due to system crash and reboot"
-        rstrnt-abort -t recipe
+function detect_testenv()
+{
+    # Mustangs have a hardware flaw which causes kernel warnings under stress:
+    #    list_add corruption. prev->next should be next
+    if type -p dmidecode >/dev/null ; then
+        if dmidecode -t1 | grep -q 'Product Name:.*Mustang.*' ; then
+            rstrnt-report-result $TEST SKIP $OUTPUTFILE
+            exit
+        fi
     fi
+}
 
+function build_stress-ng()
+{
     rlLog "Downloading stress-ng from source"
     rlRun "git clone $GIT_URL" 0
     if [ $? != 0 ]; then
@@ -73,7 +70,10 @@ rlPhaseStartSetup
     rlRun "git checkout $GIT_BRANCH" 0
     rlRun "make" 0 "Building stress-ng"
     rlRun "popd" 0 "Done building stress-ng"
+}
 
+function disable_systemd_coredump()
+{
     # disable systemd-coredump collection
     if [ -f /lib/systemd/systemd ] ; then
         rlLog "Disabling systemd-coredump collection"
@@ -85,12 +85,27 @@ rlPhaseStartSetup
 Storage=none
 ProcessSizeMax=0
 EOF
-        if systemctl list-units --all | grep -qw systemd-coredump.socket ; then
-            rlRun "systemctl mask --now systemd-coredump.socket" 0 "Masking and stopping systemd-coredump.socket"
-        fi
+        ln -s /dev/null /etc/sysctl.d/50-coredump.conf
+        systemctl daemon-reload
+        sysctl 'kernel.core_pattern=|/bin/false'
+        sysctl kernel.core_uses_pid=0
     fi
+}
 
-    # blacklist tests on certain arch, kernel, or distro
+function restore_systemd_coredump()
+{
+    # restore default systemd-coredump config
+    if [ -f /lib/systemd/systemd ] ; then
+        rm -f /etc/systemd/coredump.conf.d/stress-ng.conf
+        rm -f /etc/sysctl.d/50-coredump.conf
+        systemctl daemon-reload
+        sysctl --system
+    fi
+}
+
+function filter_excludelist()
+{
+    # exclude tests on certain arch, kernel, or distro
     if [ "$(uname -i)" = "ppc64le" ]; then
         # TODO: open BZ: vforkmany triggers kernel "BUG: soft lockup" on ppc64le
         sed -ie '/vforkmany/d' os.stressors
@@ -106,7 +121,10 @@ EOF
         # https://bugzilla.kernel.org/show_bug.cgi?id=209919
         sed -ie '/procfs/d' os.stressors
     fi
+}
 
+function selinux_dccp()
+{
     # stress-ng-dccp is blocked by SELinux (see RHBZ 1459941) on RHEL-7.x with
     # selinux-policy-3.13.1-175.el7 and earlier, so generate an SELinux module
     # to allow DCCP sockets
@@ -118,7 +136,35 @@ EOF
             rlRun "semodule -i stress-ng-dccp.pp" 0 "Installing stress-ng-dccp SELinux module"
         fi
     fi
+}
 
+function customize_param()
+{
+    # known issue list:
+    # Bug 1869760 - Host becomes unresponsive during stress-ng --cyclic test rcu:
+    # Bug 1866855 - Host Unexpectedly Reboots: BUG: Bad rss-counter state mm:000000009db8edc6
+    sed -i "s/#EXCLUDE_STRESSOR#/\"${EXCLUDE_STRESSOR}\"/g" *.stressors
+
+    if [ ! -z "$TIMEOUT" ]; then
+        sed -i "s/#TIMEOUT#/\"${TIMEOUT}\"/g" *.stressors
+    fi
+}
+
+# ----- Test Start ------
+rlJournalStart
+rlPhaseStartSetup
+    # if stress-ng triggers a panic and reboot, then abort the test
+    if [ $RSTRNT_REBOOTCOUNT -ge 1 ] ; then
+        rlDie "Aborting due to system crash and reboot"
+        rstrnt-abort -t recipe
+    fi
+
+    detect_testenv
+    build_stress-ng
+    disable_systemd_coredump
+    filter_excludelist
+    selinux_dccp
+    customize_param
 rlPhaseEnd
 
 rlPhaseStartTest
@@ -134,13 +180,7 @@ rlPhaseStartTest
 rlPhaseEnd
 
 rlPhaseStartCleanup
-    # restore default systemd-coredump config
-    if [ -f /lib/systemd/systemd ] ; then
-        rm -f /etc/systemd/coredump.conf.d/stress-ng.conf
-        if systemctl list-units --all | grep -qw systemd-coredump.socket ; then
-            rlRun "systemctl unmask systemd-coredump.socket" 0 "Unmasking systemd-coredump.socket"
-        fi
-    fi
+    restore_systemd_coredump
 
     # remove selinux module
     if semodule -l | grep -q stress-ng-dccp ; then
