@@ -9,7 +9,8 @@
 
 set -o pipefail
 
-CKI_RADIXTREE_URL=${CKI_RADIXTREE_URL:-https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-5.10.tar.gz}
+export KERNEL_GIT_BRANCH=${KERNEL_GIT_BRANCH:-}
+export KERNEL_DOWNLOAD_ADDR=${KERNEL_DOWNLOAD_ADDR:-"https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/snapshot"}
 
 function install_dependency()
 {
@@ -37,10 +38,44 @@ function install_dependency()
 		userspace-rcu-devel
 }
 
+function get_running_kernel_src()
+{
+	running_kernel=$(uname -r)
+
+	echo $running_kernel | grep -q -v 'el[0-9]\|fc'
+
+	if [ $? -eq 0 ]; then
+		cki_log "system detecting upstream kernel..."
+
+		echo $running_kernel | grep -q 'rc[1-9]'
+		if [ $? -eq 0 ]; then
+			a="$(echo $running_kernel | awk -F"." '{print $1"."$2}')"
+			b="$(echo $running_kernel | cut -d '-' -f 2)"
+			treeish="$a-$b"
+		else
+			treeish="$(echo $running_kernel | awk -F"." '{print $1"."$2"."$3}')"
+		fi
+
+		if [ "$KERNEL_GIT_BRANCH" != "" ]; then
+			treeish=${KERNEL_GIT_BRANCH}
+		fi
+
+		treeish=${treeish#*v}
+		treeish=${treeish%+*}
+
+		wget --no-check-certificate ${KERNEL_DOWNLOAD_ADDR}/linux-${treeish}.tar.gz
+		tar xf linux-*.tar.gz -C .
+	else
+		cki_log "system detecting rhel/fedora kernel..."
+		sh wget-kernel.sh --running --srpm -i
+		tar xf /root/rpmbuild/SOURCES/linux-*.tar.xz -C .
+	fi
+}
+
 function build_radixtree()
 {
-	wget --no-check-certificate ${CKI_RADIXTREE_URL}
-	tar xf linux-*.tar.gz
+	get_running_kernel_src
+
 	cki_cd linux-*/
 	make -C tools/testing/radix-tree/
 	[ -f tools/testing/radix-tree/main ]     || return 1
@@ -87,7 +122,7 @@ function runtest()
 
 function cleanup()
 {
-	cki_run_cmd_pos "rm -fr linux-*/ *.log"
+	cki_run_cmd_pos "rm -fr linux-*/ *.log *.tar.*"
 
 	return $CKI_PASS
 }
