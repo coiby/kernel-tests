@@ -40,6 +40,52 @@ SLUB_RANDOM=${SLUB_RANDOM:-0}
 
 this_arch=$(uname -m)
 
+# For debug extra reboot code
+function fault_injection()
+{
+	! test -f INJECTION && touch INJECTION && echo 0 > INJECTION
+	local injc=$(cat INJECTION)
+	((injc > 2)) && return
+
+	local fault_list=$(comm  -13 --nocheck-order <(echo -e ${stable_file_list// /"\n"} | sort)  <(echo -e ${cmp_file_list// /"\n"} | sort))
+	if [ "$1" = "d" ]; then
+		echo "Injecting failure on stable files"
+		for f in $stable_file_list; do
+			rlLogInfo "$f is injected fault"
+			echo ${!f} > ${f}
+		done
+		echo $((++injc)) > INJECTION
+		return
+	fi
+
+	if [ "$1" = "c" ]; then
+		echo "Injecting failure on cmp files: $fault_list"
+		for f in $fault_list; do
+			rlLogInfo "$f is injected fault"
+			cp ${f} ${f}.old -f
+		done
+		echo $((++injc)) > INJECTION
+		return
+	fi
+
+	[ "$1" = r ] || return
+
+	if [ "$(echo $(date +%N) % 4 | bc)" = 0 ]; then
+		echo "Injecting failure on stable files"
+		for f in $stable_file_list; do
+			rlLogInfo "$f is injected fault"
+			echo ${!f} > ${f}
+		done
+	else
+		echo "Injecting failure on cmp files: $fault_list"
+		for f in $fault_list; do
+			rlLogInfo "$f is injected fault"
+			cp ${f} ${f}.old -f
+		done
+	fi
+	echo $((++injc)) > INJECTION
+}
+
 function get_symbol_addr_snapshot()
 {
 	case $this_arch in
@@ -57,9 +103,11 @@ function get_symbol_addr_snapshot()
 		awk '/Kernel data/ {gsub("-.*", "", $1); print $1}' /proc/iomem > Kernel_data
 		awk '/Kernel bss/ {gsub("-.*", "", $1); print $1}' /proc/iomem > Kernel_bss
 
+		#fault_injection ${FAULT:-r}
+
 		for f in $cmp_file_list; do
 			echo -e "$f: $(cat $f)"
-			echo -e "${f}.old: $(cat ${f}.old)"
+			test -f ${f}.old && echo -e "${f}.old: $(cat ${f}.old)"
 		done
 
 		! test -s page_offset_base && rlDie "failed to get symbol addr"
@@ -149,7 +197,23 @@ function x86_kaslr_test()
 
 	if [[ ! $phase =~ cleanup ]]; then
 		get_symbol_addr_snapshot
+
+		if test -s SETUP_FINISH; then
+			local extra_reboots="$(cat SETUP_FINISH)"
+		else
+			local extra_reboots=0
+		fi
+
 		for f in $stable_file_list; do
+			if [ "${!f}" = "$(cat ${f})" ] && ((extra_reboots < 3)); then
+				rlLogInfo "Default $f: Inserted $extra_reboots extra reboot/compare"
+				rlRun "cat TEST_STATE" 0 "Before"
+				sed -i '1i'$current_state'' TEST_STATE
+				rlRun "cat TEST_STATE" 0 "After"
+				echo "$((++extra_reboots))" > SETUP_FINISH
+				rlReport "reboot-default-$f-$extra_reboots" PASS
+				rhts-reboot
+			fi
 			rlAssertNotEquals "$f should be non-default" "${!f}" "$(cat $f)"
 		done
 	fi
@@ -159,8 +223,24 @@ function x86_kaslr_test()
 		rlReport "reboot" PASS
 		rlAssertNotGrep nokaslr /proc/cmdline || rlDie "unexpedted test state!"
 
+		if test -s SETUP_FINISH; then
+			local extra_reboots="$(cat SETUP_FINISH)"
+		else
+			local extra_reboots=0
+		fi
+
 		((i++))
 		for f in $cmp_file_list; do
+			# If two reboots hit the same address value, do an extra reboot, 3 extra reboots at most
+			if [ "$(diff ${f}.old ${f} | wc -l)" = "0" ] && ((extra_reboots < 3)); then
+				rlLogInfo "$f: Inserted $extra_reboots extra reboot/compare"
+				rlRun "cat TEST_STATE" 0 "Before"
+				sed -i '1iafter_r_kaslr_compare' TEST_STATE
+				rlRun "cat TEST_STATE" 0 "After"
+				echo "$((++extra_reboots))" > SETUP_FINISH
+				rlReport "reboot-same-$f-$extra_reboots" PASS
+				rhts-reboot
+			fi
 			rlAssertNotEquals "$f should be changed" "$(cat ${f}.old)" "$(cat $f)"
 		done
 		slub_freelist_random 1 $i
@@ -329,6 +409,7 @@ rlJournalStart
 
 	rlPhaseStartCleanup
 		rlRun "rm TEST_STATE SETUP_FINISH -f"
+		#test -f INJECTION && rlRun "rm INJECTION -f"
 	rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
