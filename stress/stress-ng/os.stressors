@@ -76,8 +76,8 @@
 --mlock 0 --timeout 5 --log-file mlock.log
 # mlockmany reports errors
 #--mlockmany 0 --timeout 5 --log-file mlockmany.log
---mmap 0 --timeout 5 --log-file mmap.log
-# mmapaddr and mmapfix trigger SELinux AVCs
+# mmap stressors trigger SELinux AVCs
+#--mmap 0 --timeout 5 --log-file mmap.log
 #--mmapaddr 0 --timeout 5 --log-file mmapaddr.log
 #--mmapfixed 0 --timeout 5 --log-file mmapfixed.log
 --mmapfork 0 --timeout 5 --log-file mmapfork.log
