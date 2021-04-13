@@ -1,0 +1,9 @@
+[General]
+name=add-gcov-repo
+description=Enable kernel gcov repository
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
