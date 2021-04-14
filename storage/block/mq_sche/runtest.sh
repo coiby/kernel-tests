@@ -41,9 +41,10 @@ function fio_test()
 
 	rlRun "fio --bs=$bsize"k" --ioengine=$engine --iodepth=$depth --numjobs=4 \
 		--rw=$pattern --name=$device-$engine-$pattern-$bsize"k" \
-		--filename=/dev/$device --direct=$is_direct --size=${sg_gb}"G" &> /dev/null"
+		--filename=/dev/$device --direct=$is_direct --size=${sg_gb}"G" \
+		--runtime=60 &> /dev/null"
 	wait
-    sync
+	sync
 	echo 3 > /proc/sys/vm/drop_caches
 	sleep 2
 }
@@ -57,7 +58,7 @@ function run_test()
 	multipath -F > /dev/null 2>&1
 	sleep 3
 	device=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
-	sg_gb=10
+	sg_gb=60
 	is_direct=1
 	cnt=0
 
