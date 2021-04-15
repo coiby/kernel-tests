@@ -137,6 +137,8 @@ function knownissue_filter()
 	tskip "ftrace-stress-test" fatal
 	# Issue TBD
 	tskip "sync_file_range02" unfix
+	# https://github.com/linux-test-project/ltp/issues/718
+	is_arch "s390x" && tskip "ioctl09" unfix
 	# Issue read_all_sys is triggering hard lockups on mustangs while reading /sys
 	# https://lore.kernel.org/linux-arm-kernel/1507592549.3785589.1570404050459.JavaMail.zimbra@redhat.com/
 	is_arch "aarch64" && tskip "read_all_sys" fatal
