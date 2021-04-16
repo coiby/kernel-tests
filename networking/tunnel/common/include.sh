@@ -136,6 +136,11 @@ netns_crs_cleanup()
 	unset C_CMD
 	unset S_CMD
 	bash $NIC_COMMON_DIR/../../common/tools/netns_clean.sh
+	for iface in br_c br_s veth0_c veth0_c_br veth1_c veth1_c_br veth0_cr veth0_cr_br veth0_s veth0_s_br veth1_s veth1_s_br veth0_sr veth0_sr_br br0
+	do
+		ip link del $iface
+	done
+	return 0
 }
 
 netns_cs_setup()
