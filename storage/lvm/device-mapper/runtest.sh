@@ -26,6 +26,7 @@ source $CDIR/setup.sh
 
 DMTS_REPO="https://github.com/jthornber/device-mapper-test-suite.git"
 DMTS_LOCAL="$CDIR/$(basename $DMTS_REPO | sed 's%.git%%')"
+LOG_DIR=$(get_test_log_dir)
 
 function upload_log_files
 {
@@ -43,21 +44,29 @@ function runtest
 
     cki_cd $DMTS_LOCAL
 
-    cki_run_cmd_pos "dmtest list --suite thin-provisioning -t BasicTests"
+    # Save list of tests
+    # the test cases names have '^    ' before their name
+    cki_run_cmd_pos "dmtest list --suite thin-provisioning -t BasicTests | grep -E '^    ' > test.list"
     if (( $? != 0 )); then
         upload_log_files
         return $CKI_FAIL
     fi
 
-    cki_run_cmd_pos "dmtest run --suite thin-provisioning -t BasicTests"
-    if (( $? != 0 )); then
-        # save what is keeping resources open
-        # this can help debug failures like when it is unable to remove a device
-        # ex: https://gitlab.com/cki-project/kernel-tests/-/issues/538
-        cki_run_cmd_neu "lsof > $LOG_DIR/lsof.log"
-        cki_run_cmd_neu "ps -aux > $LOG_DIR/ps_aux.log"
-        cki_run_cmd_neu "dmsetup ls > $LOG_DIR/dmsetup_ls.log"
-        cki_run_cmd_neu "dmsetup info > $LOG_DIR/dmsetup_info.log"
+    failed=0
+    while read testcase; do
+        cki_run_cmd_pos "dmtest run --suite thin-provisioning -n $testcase"
+        if (( $? != 0 )); then
+            # save information about running devices
+            # this can help debug failures like when it is unable to remove a device
+            # ex: https://gitlab.com/cki-project/kernel-tests/-/issues/538
+            cki_run_cmd_neu "lsof > $LOG_DIR/BasicTests_${testcase}_lsof.log"
+            cki_run_cmd_neu "ps -aux > $LOG_DIR/BasicTests_${testcase}_ps_aux.log"
+            cki_run_cmd_neu "dmsetup ls > $LOG_DIR/BasicTests_${testcase}_dmsetup_ls.log"
+            cki_run_cmd_neu "dmsetup info > $LOG_DIR/BasicTests_${testcase}_dmsetup_info.log"
+            failed=1
+        fi
+    done < "test.list"
+    if (( $failed != 0 )); then
         upload_log_files
         return $CKI_FAIL
     fi
