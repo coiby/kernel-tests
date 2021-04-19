@@ -129,7 +129,9 @@ rlJournalStart
 		rlAssertRpm iputils-debuginfo
 
 		# BPF tests require clang/llvm
-		rlRun "yum install -y clang llvm"
+		if rlIsRHEL '>7'; then
+			rlRun "yum install -y clang llvm"
+		fi
 		rlCheckRpm "clang"
 		rlCheckRpm "llvm"
 
