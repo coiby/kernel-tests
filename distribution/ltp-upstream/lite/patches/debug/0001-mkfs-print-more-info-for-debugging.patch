@@ -1,0 +1,82 @@
+From c4742ee0df03b260ef362c52ec724d71b2976ec6 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 20 Apr 2021 15:53:51 +0800
+Subject: [PATCH] mkfs: print more info for debugging
+
+We can NOT reproduce the problem by manual with both ppc64le and s390x,
+so let's print more useful info from test when getting fail.
+
+ mkfs01 1 TPASS: 'mkfs -t ext4  /dev/loop0 ' passed.
+ mkfs01 2 TFAIL: 'mkfs -t ext4  /dev/loop0 16000' failed, not expected.
+ mkfs01 3 TPASS: 'mkfs -t ext4 -c /dev/loop0 ' passed.
+ mkfs01 4 TPASS: 'mkfs -V   ' passed.
+ mkfs01 5 TPASS: 'mkfs -h   ' passed.
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+---
+ testcases/commands/mkfs/mkfs01.sh | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/testcases/commands/mkfs/mkfs01.sh b/testcases/commands/mkfs/mkfs01.sh
+index 90368190d..13491c968 100755
+--- a/testcases/commands/mkfs/mkfs01.sh
++++ b/testcases/commands/mkfs/mkfs01.sh
+@@ -101,13 +101,13 @@ mkfs_test()
+ 
+ 	echo ${fs_op} | grep -q "\-c"
+ 	if [ $? -eq 0 ] && [ "$fs_type" = "ntfs" ]; then
+-		tst_res TCONF "'${mkfs_cmd}' not supported."
++		tst_res TCONF "'$mkfs_cmd' not supported."
+ 		return
+ 	fi
+ 
+ 	if [ -n "$size" ]; then
+ 		if [ "$fs_type" = "xfs" ] || [ "$fs_type" = "btrfs" ]; then
+-			tst_res TCONF "'${mkfs_cmd}' not supported."
++			tst_res TCONF "'$mkfs_cmd' not supported."
+ 			return
+ 		fi
+ 	fi
+@@ -116,10 +116,10 @@ mkfs_test()
+ 	if [ $? -ne 0 ]; then
+ 		grep -q -E "unknown option | invalid option" temp
+ 		if [ $? -eq 0 ]; then
+-			tst_res TCONF "'${mkfs_cmd}' not supported."
++			tst_res TCONF "'$mkfs_cmd' not supported."
+ 			return
+ 		else
+-			tst_res TFAIL "'${mkfs_cmd}' failed."
++			tst_res TFAIL "'$mkfs_cmd' failed."
+ 			cat temp
+ 			return
+ 		fi
+@@ -128,7 +128,8 @@ mkfs_test()
+ 	if [ -n "$device" ]; then
+ 		mkfs_verify_type "$fs_type" "$device"
+ 		if [ $? -ne 0 ]; then
+-			tst_res TFAIL "'${mkfs_cmd}' failed, not expected."
++			tst_res TFAIL "'$mkfs_cmd' failed, unexpected type."
++			cat temp
+ 			return
+ 		fi
+ 	fi
+@@ -136,12 +137,13 @@ mkfs_test()
+ 	if [ -n "$size" ]; then
+ 		mkfs_verify_size "$fs_type" "$size"
+ 		if [ $? -ne 0 ]; then
+-			tst_res TFAIL "'${mkfs_cmd}' failed, not expected."
++			tst_res TFAIL "'$mkfs_cmd' failed, unexpected size."
++			cat temp
+ 			return
+ 		fi
+ 	fi
+ 
+-	tst_res TPASS "'${mkfs_cmd}' passed."
++	tst_res TPASS "'$mkfs_cmd' passed."
+ }
+ 
+ test1()
+-- 
+2.30.2
+

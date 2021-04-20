@@ -57,10 +57,14 @@ function ltp_test_build()
 
 	pushd ltp > /dev/null 2>&1
 	git checkout $LTP_REPO_COMMIT_ID
+
 	# Timing on systems with shared resources (and high steal time) is not accurate, apply patch for non bare-metal machines
 	patch -p1 < ../patches/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
 	# Disable btrfs testing
 	patch -p1 < ../patches/disable-btrfs.patch
+	# Debug patching temporarily (remove it after got the reason)
+	git describe c4742ee0df03b 2>&1 >/dev/null || patch -p1 < ../patches/debug/0001-mkfs-print-more-info-for-debugging.patch
+
 	make autotools                      &> configlog.txt || if cat configlog.txt; then test_msg fail "config  ltp failed"; fi
 	./configure --prefix=${TARGET_DIR}  &> configlog.txt || if cat configlog.txt; then test_msg fail "config  ltp failed"; fi
 	make -j$CPUS_NUM                    &> buildlog.txt  || if cat buildlog.txt;  then test_msg fail "build   ltp failed"; fi
