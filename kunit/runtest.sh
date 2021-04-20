@@ -67,7 +67,9 @@ if [ "$el8" != ".el8" ]; then
 fi
 
 test_arr=(kunit-test ext4-inode-test list-test sysctl-test mptcp_crypto_test \
-	mptcp_token_test)
+	mptcp_token_test bitfield_kunit cmdline_kunit property-entry-test \
+	qos-test resource_kunit soc-topology-test string-stream-test \
+	test_linear_ranges test_bits test_kasan)
 
 rlJournalStart
 #-------------------- Setup ---------------------
