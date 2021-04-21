@@ -26,52 +26,67 @@ source $CDIR/setup.sh
 
 DMTS_REPO="https://github.com/jthornber/device-mapper-test-suite.git"
 DMTS_LOCAL="$CDIR/$(basename $DMTS_REPO | sed 's%.git%%')"
+LOG_DIR=$(get_test_log_dir)
 
 function upload_log_files
 {
-	typeset log_dir=$(get_test_log_dir)
-	typeset log_file=""
-	typeset log_files=$(find $log_dir -name "*.log")
-	for log_file in $(echo $log_files); do
-		cki_upload_log_file $log_file
-	done
+    typeset log_file=""
+    typeset log_files=$(find $LOG_DIR -name "*.log")
+    for log_file in $(echo $log_files); do
+        cki_upload_log_file $log_file
+    done
 }
 
 function runtest
 {
-	# XXX: Never use cki_run_cmd_xxx() wrapper, or it hangs
-	source /etc/profile.d/rvm.sh || return 1
+    # XXX: Never use cki_run_cmd_xxx() wrapper, or it hangs
+    source /etc/profile.d/rvm.sh || return 1
 
-	cki_cd $DMTS_LOCAL
+    cki_cd $DMTS_LOCAL
 
-	cki_run_cmd_pos "dmtest list --suite thin-provisioning -t BasicTests"
-	if (( $? != 0 )); then
-		upload_log_files
-		return $CKI_FAIL
-	fi
+    # Save list of tests
+    # the test cases names have '^    ' before their name
+    cki_run_cmd_pos "dmtest list --suite thin-provisioning -t BasicTests | grep -E '^    ' > test.list"
+    if (( $? != 0 )); then
+        upload_log_files
+        return $CKI_FAIL
+    fi
 
-	cki_run_cmd_pos "dmtest run --suite thin-provisioning -t BasicTests"
-	if (( $? != 0 )); then
-		upload_log_files
-		return $CKI_FAIL
-	fi
+    failed=0
+    while read testcase; do
+        cki_run_cmd_pos "dmtest run --suite thin-provisioning -n $testcase"
+        if (( $? != 0 )); then
+            # save information about running devices
+            # this can help debug failures like when it is unable to remove a device
+            # ex: https://gitlab.com/cki-project/kernel-tests/-/issues/538
+            cki_run_cmd_neu "lsof > $LOG_DIR/BasicTests_${testcase}_lsof.log"
+            cki_run_cmd_neu "ps -aux > $LOG_DIR/BasicTests_${testcase}_ps_aux.log"
+            cki_run_cmd_neu "dmsetup ls > $LOG_DIR/BasicTests_${testcase}_dmsetup_ls.log"
+            cki_run_cmd_neu "dmsetup info > $LOG_DIR/BasicTests_${testcase}_dmsetup_info.log"
+            failed=1
+        fi
+    done < "test.list"
+    if (( $failed != 0 )); then
+        upload_log_files
+        return $CKI_FAIL
+    fi
 
-	cki_pd
-	upload_log_files
-	return $CKI_PASS
+    cki_pd
+    upload_log_files
+    return $CKI_PASS
 }
 
 function startup
 {
-	[[ ! -d $TMPDIR ]] && mkdir -p -m 0755 $TMPDIR
-	ts_setup || return $?
-	return $CKI_PASS
+    [[ ! -d $TMPDIR ]] && mkdir -p -m 0755 $TMPDIR
+    ts_setup || return $?
+    return $CKI_PASS
 }
 
 function cleanup
 {
-	cki_run_cmd_neu "rm -rf $TMPDIR"
-	return $CKI_PASS
+    cki_run_cmd_neu "rm -rf $TMPDIR"
+    return $CKI_PASS
 }
 
 cki_main

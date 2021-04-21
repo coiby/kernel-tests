@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=bc;wget;unzip;gcc;git;curl;make;valgrind-devel;boost-devel;expat-devel;libaio-devel;lvm2
+dependencies=bc;wget;unzip;gcc;git;curl;make;valgrind-devel;boost-devel;expat-devel;libaio-devel;lvm2;lsof
 softDependencies=coreutils;fio;bonnie++;blktrace;iozone
 repoRequires=cki_lib;storage/include
