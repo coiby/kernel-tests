@@ -10,14 +10,8 @@ def setup(exc):
     exc['asm-generic/ipcbuf.h'] = (['linux/posix_types.h'],
                                    OK, '__kernel_key_t')
 
-    exc['asm-generic/msgbuf.h'] = (['linux/posix_types.h', 'asm-generic/ipcbuf.h'],
-                                   OK, 'ipc64_perm __kernel_time_t')
-
-    exc['asm-generic/sembuf.h'] = (['linux/posix_types.h', 'asm-generic/ipcbuf.h'],
-                                   OK, 'ipc64_perm __kernel_time_t')
-
-    exc['asm-generic/shmbuf.h'] = ([SIZE_T, 'linux/posix_types.h', 'linux/shm.h', 'asm-generic/ipcbuf.h'],
-                                   OK, 'ipc64_perm __kernel_time_t __kernel_pid_t shm_perm size_t')
+    exc['asm-generic/shmbuf.h'] = ([SIZE_T, 'linux/posix_types.h', 'asm/ipcbuf.h'],
+                                   OK, '__kernel_key_t __kernel_pid_t ipc64_perm size_t')
 
     exc['asm-generic/signal.h'] = ([SIZE_T],
                                    OK, 'size_t')
@@ -28,7 +22,7 @@ def setup(exc):
     exc['asm/ipcbuf.h'] = (['linux/posix_types.h'],
                            OK, '__kernel_key_t')
 
-    exc['asm/msgbuf.h'] = (['linux/posix_types.h', 'asm-generic/ipcbuf.h'],
+    exc['asm/msgbuf.h'] = (['linux/posix_types.h', 'asm/ipcbuf.h'],
                            OK, 'msg_perm, __kernel_time_t')
 
     exc['asm/sembuf.h'] = (['linux/sem.h'],
