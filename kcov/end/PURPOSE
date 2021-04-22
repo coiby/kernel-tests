@@ -1,0 +1,7 @@
+PURPOSE of kcov/end
+Description: Capture lcov test coverage data and combine with initial data
+
+Input parameter:
+    OPTIONAL: TEST_NAME : Test name of initial data which will also be used
+    for combined data. kcov/start must have been run with the same TEST_NAME. 
+    Defaults to "kernel tests"

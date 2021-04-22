@@ -1,0 +1,13 @@
+[General]
+name=kcov/finalize
+owner=Hushan Jia <hjia@redhat.com>
+description=finalize - generate and submit cov data
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=wget;git;gcc;perl-Digest-MD5
+softDependencies=
+repoRequires=kcov/include

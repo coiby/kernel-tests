@@ -1,0 +1,15 @@
+PURPOSE of kcov/finalize
+Description: Combine coverage data for all tests and optionally generate html.
+
+Input parameter:
+    OPTIONAL: NO_HTML : if set to "true", genhtml will not be called to
+        generate a coverage report. genhtml will be called for any other value
+        of NO_HTML.
+
+        If the following arguments are specified, a tgz with html and the
+        coverage .info file will be uploaded to
+        $NFS_SHARE/$(uname -r)/$TASKNAME/.
+        If NO_HTML=="true", these are ignored:
+        NFS_SHARE : an nfs share address (e.g. 10.66.12.241:/kcov)
+        TASKNAME  : a dirname be created to save the file (e.g. localfs or nfs
+                    or cifs)
