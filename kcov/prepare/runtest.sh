@@ -20,6 +20,8 @@
 # source include file
 . ../include/include.sh
 
+set -x
+
 TEST="/kcov/prepare"
 
 RHEL=$(sed -ne's/^Red Hat.*release \([0-9]\.[0-9]\).*$/\1/p' /etc/redhat-release)
@@ -30,19 +32,14 @@ VERSION=${RHEL_KRNL[$MAJOR$MINOR]}
 setup()
 {
 	KN=kernel
-	GCOVRPM=$KN-$VERSION.gcov.$(arch).rpm
-	GCOVCORERPM=$KN-core-$VERSION.gcov.$(arch).rpm
-	GCOVMODULESRPM=$KN-modules-$VERSION.gcov.$(arch).rpm
-	GCOVURL="$REPO/$VERSION.gcov/$(arch)/$GCOVRPM \
-		 $REPO/$VERSION.gcov/$(arch)/$GCOVCORERPM \
-		 $REPO/$VERSION.gcov/$(arch)/$GCOVMODULESRPM"
-	GCOVDARPM=$KN-gcov-$VERSION.gcov.$(arch).rpm
-	GCOVDAURL=$REPO/$VERSION.gcov/$(arch)/$GCOVDARPM
+    GCOVKERNEL=$KN-$VERSION.gcov
+    GCOVCOREKERNEL=$KN-core-$VERSION.gcov
+    GCOVMODULES=$KN-modules-$VERSION.gcov
+    GCOVDA=$KN-gcov-$VERSION.gcov
 
 	# prepare the kernel for coverage collection
 	log "Red Hat release: $(cat /etc/redhat-release)"
 	log "Running on $(arch), kernel $(uname -r)"
-	log "gcov kernel to download is $GCOVURL"
 
 	# setting configs
 	log "setting configs"
@@ -59,58 +56,56 @@ setup()
 	log "submit config"
 	rhts-submit-log -l $KCOV_CONF
 
+   #REPO is defined on include.sh
+   repo_url="${REPO}/${VERSION}.gcov/`arch`/"
 
-	rm -rf $TDIR/$GCOVRPM
-	wget -P $TDIR $GCOVURL > /dev/null
-	if [ $? -ne 0 ]; then
-		fail "prepare" "Cannot download the gcov kernel.";
-		exit
-	fi
+   log "Configuring kcov kernel repo ($repo_url)"
+   cat << EOF > /etc/yum.repos.d/kernel-gcov.repo
+[kernel-gcov]
+name=kernel-gcov
+baseurl=${repo_url}
+enabled=1
+gpgcheck=0
+EOF
 
-	rm -rf $TDIR/$GCOVDARPM
-	wget -P $TDIR $GCOVDAURL > /dev/null
-	if [ $? -ne 0 ]; then
-		fail "prepare" "Cannot download the gcov graph files.";
-		exit
-	fi
+    log "install kcov kernel"
+    dnf install -y $GCOVKERNEL $GCOVCOREKERNEL $GCOVMODULES
+    if [ $? -ne 0 ]; then
+        fail prepare "Cannot install the kcov kernel package.";
+        exit
+    fi
 
+    log "install gcov data files"
+    dnf install -y $GCOVDA
+    if [ $? -ne 0 ]; then
+        fail prepare "Cannot install the gcov data files package.";
+        exit
+    fi
 
-	log "install kcov kernel"
-	rpm -ivh --force $TDIR/$GCOVRPM $TDIR/$GCOVCORERPM $TDIR/$GCOVMODULESRPM
-	if [ $? -ne 0 ]; then
-		fail prepare "Cannot install the kcov kernel package.";
-		exit
-	fi
+    install_lcov
 
-	log "install gcov data files"
-	rpm -ivh $TDIR/$GCOVDARPM
-	if [ $? -ne 0 ]; then
-		fail prepare "Cannot install the gcov data files package.";
-		exit
-	fi
+    # Enable NFS service on startup to make sure sunrpc module is loaded,
+    # otherwise we see errors like
+    # "lcov: ERROR: subdirectory net/sunrpc not found" in kcov/end if
+    # "net/sunrpc" is in KDIR, but the test didn't load it.
+    # This is just a workaround
+    chkconfig nfs on >/dev/null 2>&1
+    systemctl enable nfs-server >/dev/null 2>&1
 
-	install_lcov
+    # gcov needs tens of hours to process xfs_sb.c on RHEL7, workaround it
+    # by setting geninfo_gcov_all_blocks = 0 to /etc/lcovrc
+    # see Bug 1290759 for details
+    echo "geninfo_gcov_all_blocks = 0" >> /etc/lcovrc
 
-	# Enable NFS service on startup to make sure sunrpc module is loaded,
-	# otherwise we see errors like
-	# "lcov: ERROR: subdirectory net/sunrpc not found" in kcov/end if
-	# "net/sunrpc" is in KDIR, but the test didn't load it.
-	# This is just a workaround
-	chkconfig nfs on >/dev/null 2>&1
-	systemctl enable nfs-server >/dev/null 2>&1
+    log "current boot kernel is: $(grubby --default-kernel)"
+    log "change boot kernel to gcov kernel"
+    grubby --set-default=$KCOV_IMG
+    log "new boot kernel is: $(grubby --default-kernel)"
+    log "reboot to gcov kernel"
 
-	# gcov needs tens of hours to process xfs_sb.c on RHEL7, workaround it
-	# by setting geninfo_gcov_all_blocks = 0 to /etc/lcovrc
-	# see Bug 1290759 for details
-	echo "geninfo_gcov_all_blocks = 0" >> /etc/lcovrc
+    touch ./kernel_installed
 
-	log "current boot kernel is: $(grubby --default-kernel)"
-	log "change boot kernel to gcov kernel"
-	grubby --set-default=$KCOV_IMG
-	log "new boot kernel is: $(grubby --default-kernel)"
-	log "reboot to gcov kernel"
-
-	rhts-reboot
+    rhts-reboot
 }
 
 verify()
@@ -135,8 +130,8 @@ verify()
 	pass
 }
 
-if [ -z "$REBOOTCOUNT" ] || [ "$REBOOTCOUNT" -eq 0 ]; then
-	setup
+if [ ! -e ./kernel_installed ]; then
+    setup
 else
 	verify
 fi

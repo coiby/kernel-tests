@@ -74,11 +74,7 @@ reboot_hook
 log "start collecting coverage on test case $KCOV_TEST_NAME"
 log "capture the initial data as the baseline"
 
-if [ $MAJOR -eq 8 ]; then
-	bbbdir="$(rpm -qpl $TDIR/$GCOVDARPM | head -1)"
-else
-	bbbdir="/builddir/build/BUILD"
-fi
+bbbdir=$(rpm -ql kernel-gcov | head -1)
 
 lcov --initial --capture --base-directory $bbbdir/*/*$VERSION*$(arch)*/ $KDIR_OPT --output-file $KCOV_BASE_INFO
 if [ $? -ne 0 ]; then
