@@ -1,0 +1,12 @@
+[General]
+name=kcov/include
+owner=Hushan Jia <hjia@redhat.com>
+description=routines to be inclued
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=wget;git;gcc;perl-Digest-MD5
+softDependencies=

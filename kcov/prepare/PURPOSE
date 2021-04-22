@@ -1,0 +1,7 @@
+PURPOSE of kcov/prepare
+Description: prepare for kcov tasks, install gcov kernel, and boot into gcov kernel.
+
+Input parameter:
+	OPTIONAL: KDIR : kernel directories to pass to lcov with --kernel-directory option
+	OPTIONAL: ONLY_FINAL_INFO : if "true", intermediate .info file uploads
+		normally performed by start and end will be skipped

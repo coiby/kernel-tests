@@ -1,0 +1,13 @@
+[General]
+name=kcov/merge
+owner=Jing Yang <jinyang@redhat.com>
+description=Merge kcov/finalize data
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=wget;git;gcc;perl-Digest-MD5
+softDependencies=
+repoRequires=kcov/include

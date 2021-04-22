@@ -1,0 +1,13 @@
+[General]
+name=kcov/prepare
+owner=Hushan Jia <hjia@redhat.com>
+description=prepare - install gcov kernel and lcov
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=wget;git;gcc;perl-Digest-MD5
+softDependencies=
+repoRequires=kcov/include

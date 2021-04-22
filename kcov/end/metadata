@@ -1,0 +1,13 @@
+[General]
+name=kcov/end
+owner=Hushan Jia <hjia@redhat.com>
+description=end - capture cov data
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=wget;git;gcc;perl-Digest-MD5
+softDependencies=
+repoRequires=kcov/include
