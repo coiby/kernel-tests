@@ -15,6 +15,8 @@
 #
 # Author: Matthew Kenigsberg <mkenigs@redhat.com>
 
+TEST="/kcov/wait"
+
 . /mnt/tests/kernel/filesystems/include/install.sh || exit 1
 install_jq
 echo "jq installed"

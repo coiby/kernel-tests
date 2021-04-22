@@ -33,6 +33,8 @@
 
 PACKAGE="merge"
 
+TEST="/kcov/merge"
+
 #ssl certificate
 curl -s https://password.corp.redhat.com/RH-IT-Root-CA.crt -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt
 curl -s https://password.corp.redhat.com/legacy.crt -o /etc/pki/ca-trust/source/anchors/legacy.crt

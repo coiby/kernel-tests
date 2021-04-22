@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2010 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2010 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -18,6 +18,8 @@
 . /usr/bin/rhts_environment.sh
 
 . ../include/include.sh
+
+TEST="/kcov/finalize"
 
 log "loading config from $KCOV_CONF"
 # set KCOV_BASE_INFO, KCOV_TEST_INFO, KCOV_ALL_INFO, KCOV_COMBINED_INFO
