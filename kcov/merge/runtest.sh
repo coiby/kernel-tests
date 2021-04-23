@@ -33,6 +33,8 @@
 
 PACKAGE="merge"
 
+TEST="/kcov/merge"
+
 #ssl certificate
 curl -s https://password.corp.redhat.com/RH-IT-Root-CA.crt -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt
 curl -s https://password.corp.redhat.com/legacy.crt -o /etc/pki/ca-trust/source/anchors/legacy.crt
@@ -214,7 +216,7 @@ kcov_genhtml() {
 KCOV_TEST_LIST=test.list
 KCOV_DESC=test.desc
 JOBS=${JOBS:-"$@"}
-JOBS=${JOBS:-"J:$JOBID"}
+JOBS=${JOBS:-"J:$RSTRNT_JOBID"}
 
 # work space dir for every merge
 RESDIR=kcov_merged.`date +%F`
@@ -225,7 +227,7 @@ INFO_DIR=kcov_info_dir
 # __main__
 install_lcov
 
-[ -n "$JOBID" ] && {
+[ -n "$RSTRNT_JOBID" ] && {
 	# install src used by genhtml
 	if [ -n "$KCOV_SRC_RPM" ]; then
 		rpm -ivh $KCOV_SRC_RPM
@@ -250,7 +252,7 @@ pushd $RESDIR
 	rc=$?
 popd
 
-if [ -z "$JOBID" ]; then
+if [ -z "$RSTRNT_JOBID" ]; then
 	tar -czf ${RESDIR//:/-}.tgz $RESDIR
 else
 	tar -czf ${RESDIR//:/-}.tgz $RESDIR/kcovcomb.info $RESDIR/kcov.comb

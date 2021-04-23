@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2010 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2010 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -18,6 +18,8 @@
 . /usr/bin/rhts_environment.sh
 
 . ../include/include.sh
+
+TEST="/kcov/start"
 
 RHEL=$(sed -ne's/^Red Hat.*release \([0-9]\.[0-9]\).*$/\1/p' /etc/redhat-release)
 MAJOR=$(echo $RHEL | cut -c1)
@@ -72,11 +74,7 @@ reboot_hook
 log "start collecting coverage on test case $KCOV_TEST_NAME"
 log "capture the initial data as the baseline"
 
-if [ $MAJOR -eq 8 ]; then
-	bbbdir="$(rpm -qpl $TDIR/$GCOVDARPM | head -1)"
-else
-	bbbdir="/builddir/build/BUILD"
-fi
+bbbdir=$(rpm -ql kernel-gcov | head -1)
 
 lcov --initial --capture --base-directory $bbbdir/*/*$VERSION*$(arch)*/ $KDIR_OPT --output-file $KCOV_BASE_INFO
 if [ $? -ne 0 ]; then

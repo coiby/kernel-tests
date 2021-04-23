@@ -15,11 +15,13 @@
 #
 # Author: Matthew Kenigsberg <mkenigs@redhat.com>
 
+TEST="/kcov/wait"
+
 . /mnt/tests/kernel/filesystems/include/install.sh || exit 1
 install_jq
 echo "jq installed"
 
-JOB_URL="${BEAKER}jobs/$JOBID"
+JOB_URL="${BEAKER}jobs/$RSTRNT_JOBID"
 echo "Getting job info from $JOB_URL"
 until curl "$JOB_URL" --header 'Accept: application/json' | jq \
 	'[select(.recipesets[].is_finished==false)] | length==1' --exit-status
