@@ -134,6 +134,12 @@ if egrep -q "Fedora|.*release 8" /etc/redhat-release; then
 	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"brk_near_huge\""
 fi
 
+if grep -q "release [9].*" /etc/redhat-release; then
+	#https://bugzilla.redhat.com/show_bug.cgi?id=1939792
+	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"heapshrink.*Heap did not shrink\""
+	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"heapshrink.*Heap did not shrink\""
+fi
+
 # Bug 859906 - open() on tmpfs file with O_DIRECT fails with EINVAL -> WONTFIX
 # impacts all distros / all kernel versions, if /tmp is tmpfs
 if df -T /tmp | tail | grep -q tmpfs; then
