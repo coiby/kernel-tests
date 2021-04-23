@@ -31,30 +31,30 @@ VERSION=${RHEL_KRNL[$MAJOR$MINOR]}
 
 setup()
 {
-	KN=kernel
+    KN=kernel
     GCOVKERNEL=$KN-$VERSION.gcov
     GCOVCOREKERNEL=$KN-core-$VERSION.gcov
     GCOVMODULES=$KN-modules-$VERSION.gcov
     GCOVDA=$KN-gcov-$VERSION.gcov
 
-	# prepare the kernel for coverage collection
-	log "Red Hat release: $(cat /etc/redhat-release)"
-	log "Running on $(arch), kernel $(uname -r)"
+    # prepare the kernel for coverage collection
+    log "Red Hat release: $(cat /etc/redhat-release)"
+    log "Running on $(arch), kernel $(uname -r)"
 
-	# setting configs
-	log "setting configs"
+    # setting configs
+    log "setting configs"
         if [ -n "$KDIR" ]; then
-		KCOV_KDIR=$KDIR
+        KCOV_KDIR=$KDIR
         fi
 
 
-	log "write config"
-	echo "KDIR=$KCOV_KDIR" > $KCOV_CONF
-	if [ -n "$ONLY_FINAL_INFO" ]; then
-		echo "ONLY_FINAL_INFO=$ONLY_FINAL_INFO" >> $KCOV_CONF
-	fi
-	log "submit config"
-	rhts-submit-log -l $KCOV_CONF
+    log "write config"
+    echo "KDIR=$KCOV_KDIR" > $KCOV_CONF
+    if [ -n "$ONLY_FINAL_INFO" ]; then
+        echo "ONLY_FINAL_INFO=$ONLY_FINAL_INFO" >> $KCOV_CONF
+    fi
+    log "submit config"
+    rhts-submit-log -l $KCOV_CONF
 
    #REPO is defined on include.sh
    repo_url="${REPO}/${VERSION}.gcov/`arch`/"
@@ -110,28 +110,28 @@ EOF
 
 verify()
 {
-	log "after reboot"
-	log "current kernel is $(uname -r)"
-	uname -r | grep gcov
-	if [ $? -ne 0 ]; then
-		fail "prapare" "not running on gcov kernel."
-		fail
-		exit
-	fi
+    log "after reboot"
+    log "current kernel is $(uname -r)"
+    uname -r | grep gcov
+    if [ $? -ne 0 ]; then
+        fail "prapare" "not running on gcov kernel."
+        fail
+        exit
+    fi
 
-	log "ok, going on the coverage testing..."
+    log "ok, going on the coverage testing..."
 
-	mount | grep debugfs
-	if [ $? -ne 0 ]; then
-		mount none /sys/kernel/debug -t debugfs
-	fi
-	log "proc entries: $(ls /sys/kernel/debug/gcov)"
+    mount | grep debugfs
+    if [ $? -ne 0 ]; then
+        mount none /sys/kernel/debug -t debugfs
+    fi
+    log "proc entries: $(ls /sys/kernel/debug/gcov)"
 
-	pass
+    pass
 }
 
 if [ ! -e ./kernel_installed ]; then
     setup
 else
-	verify
+    verify
 fi
