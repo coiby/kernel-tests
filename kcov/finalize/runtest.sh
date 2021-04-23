@@ -28,7 +28,7 @@ load_config
 log "processing coverage data for all cases."
 
 HTMLDIR=$(mktemp -d $TDIR/kcov.XXXX)
-tag="J:${JOBID}-${HOSTNAME%.redhat.com}-${TASKID}"
+tag="J:${RSTRNT_JOBID}-${HOSTNAME%.redhat.com}-${RSTRNT_TASKID}"
 
 
 
