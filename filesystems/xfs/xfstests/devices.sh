@@ -1107,7 +1107,7 @@ function mount_devices()
 	fi
 	# Make sure scratch device is mounted
 	if [ -n "$SCRATCH_MNT" -a -n "$SCRATCH_DEV" ];then
-		blkid $SCRATCH_DEV | mkfs_dev $SCRATCH_DEV
+		blkid $SCRATCH_DEV || mkfs_dev $SCRATCH_DEV
 		findmnt $SCRATCH_DEV >/dev/null || mount $SCRATCH_DEV $SCRATCH_MNT
 	fi
 	# Make sure logwrites device is mounted
@@ -1120,7 +1120,7 @@ function mount_devices()
 		ARRAY_SCRATCH_DEV_POOL=(`echo $SCRATCH_DEV_POOL`)
 		ARRAY_SCRATCH_DEV_POOL_MNT=(`echo $SCRATCH_DEV_POOL_MNT`)
 		for (( i=0; i<${#ARRAY_SCRATCH_DEV_POOL[@]}; i++ ));do
-			blkid ${ARRAY_SCRATCH_DEV_POOL[$i]} | mkfs_dev ${ARRAY_SCRATCH_DEV_POOL[$i]}
+			blkid ${ARRAY_SCRATCH_DEV_POOL[$i]} || mkfs_dev ${ARRAY_SCRATCH_DEV_POOL[$i]}
 			findmnt ${ARRAY_SCRATCH_DEV_POOL[$i]} >/dev/null || mount ${ARRAY_SCRATCH_DEV_POOL[$i]}  ${ARRAY_SCRATCH_DEV_POOL_MNT[$i]}
 		done
 	fi
