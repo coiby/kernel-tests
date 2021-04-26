@@ -46,9 +46,9 @@ rlJournalStart
 
     rlPhaseStartTest "load unload bridge module"
         for i in `seq 50`; do
-            rlRun "modprobe bridge"
+            rlRun "modprobe bridge" "0-255"
             sleep 1
-            rlRun "modprobe -r bridge"
+            rlRun "modprobe -r bridge" "0-255"
             sleep 1
         done
     rlPhaseEnd
