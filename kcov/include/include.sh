@@ -89,6 +89,12 @@ install_lcov()
 		fail prepare "failed ot install lcov"
 		exit
 	fi
+
+    # http://ltp.sourceforge.net/coverage/lcov/genhtml.1.php
+    # Show yellow for >=25 < 50, green >= 50
+    echo "genhtml_med_limit = 25" >> /etc/lcovrc
+    echo "genhtml_hi_limit = 50" >> /etc/lcovrc
+
 }
 
 if [ -n "$DEBUG" ]; then
