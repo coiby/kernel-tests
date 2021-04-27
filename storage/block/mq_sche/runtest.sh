@@ -66,8 +66,9 @@ function run_test()
 		for sched in `sed 's/[][]//g' /sys/block/$device/queue/scheduler`; do
 			echo $sched > /sys/block/$device/queue/scheduler
 			for pattern in randrw; do
-				for depth in 1 8 64; do
-					for bsize in 4 16 64; do
+				for depth in 1 8; do
+#'bs=64k' test is disabled, because of https://bugzilla.redhat.com/show_bug.cgi?id=1953510
+					for bsize in 4 16 32; do
 						fio_test $device $engine $sched $pattern $is_direct $depth $bsize $sg_gb
 						let cnt+=1
 					done
