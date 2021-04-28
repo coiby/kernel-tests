@@ -48,6 +48,10 @@ process_results(){
 . ../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+# variables used by beakerlib
+TEST="KUNIT"
+PACKAGE="kernel"
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Global parameters
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,7 +66,7 @@ version=$( echo "$tag" | sed 's/\-\(.*\).el8/\1/')
 #currently only supports rhel 8
 if [ "$el8" != ".el8" ]; then
 	rlLog "RHEL8 Varient not detected. currently only supports =>rhel8.4"
-	rstrnt-report-result "KUNIT" SKIP
+	rstrnt-report-result $TEST SKIP
 	exit 0
 fi
 
@@ -83,7 +87,7 @@ rlJournalStart
     rlCmpVersion `uname -r` "4.18.0-279.el8"
     if [ $? -eq 2 ]; then
         # kernel is too old to support kunit module
-        rstrnt-report-result "KUNIT" SKIP
+        rstrnt-report-result $TEST SKIP
         rlPhaseEnd
         rlJournalEnd
         #print the test report
@@ -94,7 +98,7 @@ rlJournalStart
     modprobe kunit
     if [ $? -ne 0 ]; then
         rlFail "Could not install KUNIT module, aborting test"
-        rstrnt-report-result "KUNIT" FAIL
+        rstrnt-report-result $TEST FAIL
         rlPhaseEnd
         rlJournalEnd
         #print the test report
