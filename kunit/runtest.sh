@@ -79,11 +79,27 @@ rlJournalStart
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     fi
 
+    # kunit module was added on kernel 4.18.0-279 (BZ#1900119)
+    rlCmpVersion `uname -r` "4.18.0-279.el8"
+    if [ $? -eq 2 ]; then
+        # kernel is too old to support kunit module
+        rstrnt-report-result "KUNIT" SKIP
+        rlPhaseEnd
+        rlJournalEnd
+        #print the test report
+        rlJournalPrintText
+        exit 0
+    fi
     #test for kunit
     modprobe kunit
     if [ $? -ne 0 ]; then
-	rlLog "Could not install KUNIT module, aborting test"
-	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+        rlFail "Could not install KUNIT module, aborting test"
+        rstrnt-report-result "KUNIT" FAIL
+        rlPhaseEnd
+        rlJournalEnd
+        #print the test report
+        rlJournalPrintText
+        exit 1
     fi
 
   rlPhaseEnd
