@@ -46,7 +46,7 @@ void test_ipv6_group()
 			IPV6_JOIN_GROUP, &mreq_test, size, EINVAL, 6);
 
 	ret = inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
-	mreq_test.ipv6mr_interface = 500;
+	mreq_test.ipv6mr_interface = 0xffffffff;
 	test_setsockopt_error("IPV6_JOIN_GROUP no device found",
 			IPV6_JOIN_GROUP, &mreq_test, size, ENODEV, 6);
 
@@ -77,7 +77,7 @@ void test_ipv6_group()
 	//FIXME setsockopt return EADDRNOTAVAIL rather than ENODEV, it means
 	//that it check ipv6mr_multiaddr first
 	ret = inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
-	mreq_test.ipv6mr_interface = 500;
+	mreq_test.ipv6mr_interface = 0xffffffff;
 	test_setsockopt_error("IPV6_LEAVE_GROUP No device found",
 			IPV6_LEAVE_GROUP, &mreq_test, size, EADDRNOTAVAIL, 6);
 
@@ -116,7 +116,7 @@ void test_mcast_group_v6()
 	test_setsockopt_error("MCAST_JOIN_GROUP not multicast address",
 			MCAST_JOIN_GROUP, &group, size, EINVAL, 6);
 
-	group.gr_interface = 500;
+	group.gr_interface = 0xffffffff;
 	ret = inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 	test_setsockopt_error("MCAST_JOIN_GROUP no device found",
 			MCAST_JOIN_GROUP, &group, size, ENODEV, 6);
@@ -146,7 +146,7 @@ void test_mcast_group_v6()
 #endif
 
 	//FIXME the same problem as IPV6_LEAVE_GROUP
-	group.gr_interface = 500;
+	group.gr_interface = 0xffffffff;
 	ret = inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 	test_setsockopt_error("MCAST_LEAVE_GROUP no device found",
 			MCAST_LEAVE_GROUP, &group, size, EADDRNOTAVAIL, 6);
@@ -186,7 +186,7 @@ void test_mcast_group_v4()
 	test_setsockopt_error("MCAST_JOIN_GROUP not multicast addr",
 			MCAST_JOIN_GROUP, &group, size, EINVAL, 4);
 
-	group.gr_interface = 500;
+	group.gr_interface = 0xffffffff;
 	inet_pton(AF_INET, MCASTV4_GROUP_JOIN, &((struct sockaddr_in *)&group.gr_group)->sin_addr);
 	test_setsockopt_error("MCAST_JOIN_GROUP no device found",
 			MCAST_JOIN_GROUP, &group, size, ENODEV, 4);
@@ -207,7 +207,7 @@ void test_mcast_group_v4()
 	test_setsockopt_error("MCAST_LEAVE_GROUP not multicast addr",
 			MCAST_LEAVE_GROUP, &group, size, EADDRNOTAVAIL, 4);
 
-	group.gr_interface = 500;
+	group.gr_interface = 0xffffffff;
 	inet_pton(AF_INET, MCASTV4_GROUP_JOIN, &((struct sockaddr_in *)&group.gr_group)->sin_addr);
 #ifndef EL6
 	test_setsockopt_error("MCAST_LEAVE_GROUP no device found",
