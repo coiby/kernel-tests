@@ -68,7 +68,7 @@ select_yum_tool()
 skip_testcase()
 {
 	echo "$1" | tee -a ${OUTPUTFILE}
-	rstrnt-report-result $TEST SKIP $OUTPUTFILE
+	rstrnt-report-result $TEST SKIP
 	exit 0
 }
 
@@ -250,7 +250,7 @@ rlJournalStart
 		fetch_the_testsuite
 		# return SKip if the testsuite could not be fetched
 		test -d "perftool-testsuite" || rlDie "Could not fetch the upstream testsuite from github. I am sorry, dude."
-		
+
 		pushd perftool-testsuite
 	rlPhaseEnd
 

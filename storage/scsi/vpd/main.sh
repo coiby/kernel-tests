@@ -98,7 +98,7 @@ function scsi_level(){
 
     if (( $flag == 0 )); then
         rlLog "Skipping test because test device not found"
-        rstrnt-report-result $TEST SKIP $OUTPUTFILE
+        rstrnt-report-result $TEST SKIP
         exit 0
     fi
 }

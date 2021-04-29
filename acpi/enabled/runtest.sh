@@ -5,7 +5,7 @@
 
 # verify to run on aarch64
 if [ "$(uname -i)" != "aarch64" ]; then
-    rstrnt-report-result $TEST SKIP $OUTPUTFILE
+    rstrnt-report-result $TEST SKIP
 else
     rlJournalStart
 
