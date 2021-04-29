@@ -51,7 +51,7 @@ rlJournalStart
                 rlPass "fips mode enabled"
 	    else
                 echo "fips mode disabled. Test requires fips mode! Skipping." | tee -a $OUTPUTFILE
-                rstrnt-report-result $TEST SKIP $OUTPUTFILE
+                rstrnt-report-result $TEST SKIP
                 exit
 	    fi
         fi

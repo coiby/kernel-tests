@@ -43,7 +43,7 @@ function rlSkip
     . ../../cki_lib/libcki.sh || exit 1
 
     rlLog "Skipping test because $*"
-    rstrnt-report-result $TEST SKIP $OUTPUTFILE
+    rstrnt-report-result $TEST SKIP
 
     #
     # As we want result="Skip" status="Completed" for all scenarios, right here

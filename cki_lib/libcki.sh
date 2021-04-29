@@ -95,7 +95,7 @@ function cki_skip_task()
     typeset reason="$*"
     [[ -z $reason ]] && reason="unknown reason"
     cki_log "Skipping current task: $reason"
-    rstrnt-report-result "$TEST" SKIP "$OUTPUTFILE"
+    rstrnt-report-result "$TEST" SKIP
     exit $CKI_STATUS_COMPLETED
 }
 

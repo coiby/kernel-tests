@@ -89,7 +89,7 @@ rlJournalStart
         rlRun "git clone $GIT_URL" 0
         if [ $? != 0 ]; then
             echo "Failed to git clone $GIT_URL." | tee -a $OUTPUTFILE
-            rstrnt-report-result $TEST WARN $OUTPUTFILE
+            rstrnt-report-result $TEST WARN
             rstrnt-abort -t recipe
         fi
 
@@ -103,7 +103,7 @@ rlJournalStart
         # Turn off x86_64 specific test when running on non x86_64 architectures.
 	test "$(rlGetPrimaryArch)" != "x86_64" && \
 	    rlRun "sed -i '/syscall_socketcall/d' tests/Makefile" 0
-        
+
         # Initialize report.
         rlRun "echo 'Remote: $GIT_URL' >results.log" 0
         rlRun "echo 'Branch: $GIT_BRANCH' >>results.log" 0
@@ -111,7 +111,7 @@ rlJournalStart
         rlRun "echo 'Kernel: $(uname -r)' >>results.log" 0
         rlRun "echo 'Auditd: $(rpm -q audit)' >>results.log" 0
         rlRun "echo '' >>results.log" 0
-        
+
     rlPhaseEnd
 
     rlPhaseStartTest
@@ -192,7 +192,7 @@ rlJournalStart
         # Clean-up.
         rlRun "popd" 0
         rlRun "rm -rf audit-testsuite" 0
-    
+
     rlPhaseEnd
 
 rlJournalPrintText

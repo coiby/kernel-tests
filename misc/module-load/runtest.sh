@@ -236,7 +236,7 @@ echo "** Module list prior to testing. **" | tee -a $OUTPUTFILE
 RC=$?
 if [ $RC -ne 0 ] ; then
         echo "*** There is a problem with lsmod, no need to continue further ***" | tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST WARN $OUTPUTFILE
+        rstrnt-report-result $TEST WARN
         rstrnt-abort -t recipe
         exit 0
 fi
