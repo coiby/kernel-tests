@@ -48,7 +48,7 @@ function detect_testenv()
     #    list_add corruption. prev->next should be next
     if type -p dmidecode >/dev/null ; then
         if dmidecode -t1 | grep -q 'Product Name:.*Mustang.*' ; then
-            rstrnt-report-result $TEST SKIP $OUTPUTFILE
+            rstrnt-report-result $TEST SKIP 0
             exit
         fi
     fi
@@ -60,7 +60,7 @@ function build_stress-ng()
     rlRun "git clone $GIT_URL" 0
     if [ $? != 0 ]; then
         echo "Failed to git clone $GIT_URL." | tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST WARN $OUTPUTFILE
+        rstrnt-report-result $TEST WARN 0
         rstrnt-abort -t recipe
     fi
 
