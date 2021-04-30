@@ -57,6 +57,7 @@ b011103996bcd810c4c87e049fffb48326edf705 ppc64le s390x aarch64  # Parse sched tr
 05b9b8fb2a5d4d41a867a36111ae380bf111f0f0 aarch64 # Track with sched_switch
 b31fbb4e7501b04082bf8edd16872ba11c580297 ppc64le # PMU events
 adb2cda40ae61b84668595f3be67de89ed281658 ppc64le ppc64 s390x aarch64 x86_64 # DSO data reopen
+b088f72d0fb0684642cbea4121d3bd463d5af43a ppc64le ppc64 s390x x86_64 # LLVM search and compile
 529b1f92ce1b20584468e6a9ec8b53c051cca11d ppc64le s390x # PE file support
 b110fc5887abacbcdaa32fd5e9ea2e3f6e580dc5 aarch64 # vmlinux symtab matches kallsyms
 2160bdaf7e5f48987e31c1d90d0260ac9fdd3ef7 ppc64le s390x aarch64 x86_64 # BPF filter
