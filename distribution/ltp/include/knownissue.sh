@@ -35,6 +35,7 @@
 . ../include/kvercmp.sh				|| exit 1
 . ../include/knownissue/upstream_knownissue.sh	|| exit 1
 . ../include/knownissue/rhel_alt_knownissue.sh	|| exit 1
+. ../include/knownissue/rhel9_knownissue.sh	|| exit 1
 . ../include/knownissue/rhel8_knownissue.sh	|| exit 1
 . ../include/knownissue/rhel7_knownissue.sh	|| exit 1
 . ../include/knownissue/rhel6_knownissue.sh	|| exit 1
@@ -168,6 +169,7 @@ function knownissue_filter()
 	# to add new issues in knownissue/* file from now on.
 	is_upstream && upstream_knownissue_filter;
 	is_rhel_alt && rhel_alt_knownissue_filter;
+	is_rhel9 && rhel9_knownissue_filter;
 	is_rhel8 && rhel8_knownissue_filter;
 	is_rhel7 && rhel7_knownissue_filter;
 	is_rhel6 && rhel6_knownissue_filter;
