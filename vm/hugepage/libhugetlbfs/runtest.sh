@@ -129,7 +129,7 @@ if uname -r | grep -q s390x; then
 fi
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1628794#c8
-if egrep -q "Fedora|.*release 8" /etc/redhat-release; then
+if egrep -q "Fedora|.*release [89]" /etc/redhat-release; then
 	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"brk_near_huge\""
 	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"brk_near_huge\""
 fi
