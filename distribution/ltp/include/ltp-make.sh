@@ -2,7 +2,7 @@
 #
 #
 #TEST_VERSION can override the default
-TESTVERSION=${TEST_VERSION:-"20200930"}
+TESTVERSION=${TEST_VERSION:-"20210121"}
 
 
 # the task path may be different under the restraint harness if the task

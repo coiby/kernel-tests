@@ -88,6 +88,22 @@ function rhel7_unfix_issues()
 	tskip "fanotify09" unfix
 	# A xfs failure
 	tskip "fallocate06" unfix
+	# thp04: rhel7 missing commit 8310d48b125d
+	osver_in_range "700" "710" && tskip "thp04 cve-2017-1000405" unfix
+	# ptrace08: rhel7 missing 27747f8bc355
+	osver_in_range "700" "710" && tskip "ptrace08 cve-2018-1000199" unfix
+	# Bug 1597759 - kernel: Integer overflow in kernel/time/posix-timers.c
+	osver_in_range "700" "710" && tskip "timer_settime03 cve-2018-12896" unfix
+	# sched_rr_get_interval01: rhel7 missing 975e155ed873
+	osver_in_range "700" "710" && tskip "sched_rr_get_interval01" unfix
+	# timer_settime01: rhel7 missing e86fea764991
+	osver_in_range "708" "710" && tskip "timer_settime01" unfix
+	# Bug 1579402 - SAP RHEL 7 Feature: sysvipc: introduce STAT_ANY commands
+	osver_in_range "702" "705" && tskip "msgctl06" unfix
+	# Bug 1912670 - semctl SEM_STAT_ANY fails to pass the buffer specified by the caller to the kernel
+	osver_in_range "702" "710" && tskip "semctl09" unfix
+	# missing linux patch bd14406b78e6
+	osver_in_range "700" "710" && tskip "ptrace10" unfix
 }
 
 function rhel7_fixed_issues()
@@ -168,6 +184,8 @@ function rhel7_fixed_issues()
 	kernel_in_range "0" "3.10.0-656.el7" && tskip "setsockopt02" fixed
 	# Bug 1760639 rhel7 timer_create: alarmtimer return wrong errno, on RTC-less system, s390x, ppc64
 	kernel_in_range "0" "3.10.0-1104.el7" && tskip "timer_delete01 timer_settime01 timer_settime02" fixed
+	# Bug 1579402 - SAP RHEL 7 Feature: sysvipc: introduce STAT_ANY commands
+	kernel_in_range "0" "3.10.0-911.el7" && tskip "shmctl04" fixed
 }
 
 function rhel7_knownissue_filter()
@@ -192,5 +210,9 @@ function rhel7_knownissue_filter()
 		kernel_in_range "0" "3.10.0-327.9999" && tskip "cve-2016-9793 setsockopt04" fixed
 		# fanotify06 new subcase skipped on zstream.
 		tskip "fanotify06" fixed
+		# Bug 1481136 (CVE-2017-10661) - CVE-2017-10661 kernel: Handling of might_cancel queueing is not properly pretected against race
+		osver_in_range "700" "704" && tskip "timerfd_settime02" unfix
+		# Bug 1589324 CVE-2018-1000204 kernel: Infoleak caused by incorrect handling of the SG_IO ioctl
+		osver_in_range "700" "708" && tskip "ioctl_sg01" unfix
 	fi
 }

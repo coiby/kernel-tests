@@ -15,10 +15,14 @@ function rhel8_fatal_issues()
 
 function rhel8_unfix_issues()
 {
+	# Bug 1945052 - CVE-2021-3444 kernel: bpf verifier incorrect mod32 truncation
+	osver_in_range "800" "806" && tskip "bpf_prog05" unfix
+	# Bug 1879689 - [RHEL-8.3] move_pages12.c:95: FAIL: madvise failed: ENOMEM (12)
+	osver_in_range "800" "805" && is_arch "aarch64" && tskip "move_pages12" unfix
 	# Bug 1880265 - RHEL8.3 Snapshot1 - Slab memory controller issue (mm-) 
 	osver_in_range "800" "805" && tskip "madvise06" unfix
 	# Bug 1832099 - fanotify: fix merging marks masks with FAN_ONDIR
-	osver_in_range "800" "805" && tskip "fanotify09" unfix
+	osver_in_range "800" "806" && tskip "fanotify09" unfix
 	# Bug 1805587 - [FJ8.2 Bug]: system crash happened due to NULL pointer dereference at slip_write_wakeup()
 	osver_in_range "800" "804" && tskip "pty03" unfix
 	# Bug 1657032 - fallocate05 intermittently failing in ltp lite
@@ -41,8 +45,6 @@ function rhel8_unfix_issues()
 	pkg_in_range "systemd" "239-20" "239-25" && tskip "fork09" unfix
 	# s390x failed cases.
 	is_arch "s390x" && tskip "open04 create05" unfix
-	# oom03, oom05, ksm03, ksm04 testcases don't work with cgroup2
-	tskip "oom03 oom05" unfix
 	# Bug 1804478 scheduler exceeds prctl timerslack on s390x
 	osver_in_range "800" "805" && is_arch "s390x" && tskip "prctl09" unfix
 	# Bug 1842025 - ltp: connect02: setsockopt(IPV6_ADDRFORM) failed: ENOPROTOOPT (92)
@@ -56,14 +58,12 @@ function rhel8_unfix_issues()
 	# Bug 1844854 - ltp: bpf_prog01 Failed verification: in-kernel BTF is malformed
 	is_arch "s390x" && tskip "bpf_prog01" unfix
 	# Bug 1845879 - fanotify: fix ignore mask logic for events on child and on dir
-	osver_in_range "800" "805" && tskip "fanotify10" unfix
+	osver_in_range "800" "806" && tskip "fanotify10" unfix
 	# ptrace08 case issue, tst_kvercmp isn't suitable for rhel8's kernel version
 	osver_in_range "800" "805" && tskip "ptrace08 cve-2018-1000199" unfix
 	# Unable to load BPF programs on s390x kernels built by CKI
 	# https://projects.engineering.redhat.com/browse/FASTMOVING-1825
 	is_arch "s390x" && tskip "bpf_prog01 bpf_prog02" unfix
-	# send02 fails with TFAIL: recv() error: EAGAIN/EWOULDBLOCK, issue TBF
-	osver_in_range "800" "805" && tskip "send02" unfix
 }
 
 function rhel8_fixed_issues()
@@ -71,12 +71,12 @@ function rhel8_fixed_issues()
 	# Bug 1820405 - KEYS: allow reaching the keys quotas exactly
 	kernel_in_range "0" "4.18.0-193.7.el8" && tskip "add_key05" fixed
 	# Bug 1771351 - fat: race between udev and mkdir leads to EIO
-	kernel_in_range "0" "4.18.0-193.5.el8" && tskip "statx04" fixed
+	kernel_in_range "0" "4.18.0-194.el8" && tskip "statx04" fixed
 	# Bug 1760638  timer_create: alarmtimer return wrong errno, on RTC-less system, s390x, ppc64
 	kernel_in_range "0" "4.18.0-148.el8" && tskip "timer_delete01 timer_settime01 timer_settime02" fixed
 	! is_arch "x86_64" && osver_in_range "800" "803" && tskip "timer_create01" fixed
 	# Bug 1734286 - mm: mempolicy: make mbind() return -EIO when MPOL_MF_STRICT is specified
-	kernel_in_range "0" "4.18.0-147.12.el8" && tskip "mbind02" unfix
+	kernel_in_range "0" "4.18.0-148.el8" && tskip "mbind02" fixed
 	# Bug 1718370 - overlayfs fixes up to upstream 5.2
 	kernel_in_range "0" "4.18.0-109.el8" && tskip "fanotify06" fixed
 	# Bug 1657880 - CVE-2018-19854 kernel: Information Disclosure in crypto_report_one in crypto/crypto_user.c
