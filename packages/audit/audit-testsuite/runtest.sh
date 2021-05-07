@@ -36,7 +36,7 @@ PACKAGE="kernel"
 GIT_URL=${GIT_URL:-"https://github.com/linux-audit/audit-testsuite.git"}
 
 # Optional test paramenter - branch containing tests.
-GIT_BRANCH=${GIT_BRANCH:-"ece04ca5517449930cafdddd8c076a258d0e0faf"}
+GIT_BRANCH=${GIT_BRANCH:-"04265a988361129dd80f8735bc08dd2970e9807d"}
 
 # Optional test parameter - list to tests to be executed.
 TESTS=${TESTS:-""}
@@ -101,8 +101,8 @@ rlJournalStart
         rlRun "echo $(id -u) >/proc/self/loginuid" 0
 
         # Turn off x86_64 specific test when running on non x86_64 architectures.
-	test "$(rlGetPrimaryArch)" != "x86_64" && \
-	    rlRun "sed -i '/syscall_socketcall/d' tests/Makefile" 0
+        test "$(rlGetPrimaryArch)" != "x86_64" && \
+            rlRun "sed -i '/syscall_socketcall/d' tests/Makefile" 0
 
         # Initialize report.
         rlRun "echo 'Remote: $GIT_URL' >results.log" 0
@@ -143,10 +143,15 @@ rlJournalStart
                 TESTS="$(echo $TESTS | sed 's/bpf//g')"
             fi
 
-            # saddr_fam filter was added on RHEL-8.1.
+            # saddr_fam filter was added on RHEL-8.1 and requires IPv6.
             if rlIsRHEL "<8.1"; then
                 TESTS="$(echo $TESTS | sed 's/filter_saddr_fam//g')"
+            elif grep -q "ipv6.disable=1" /proc/cmdline ; then
+                TESTS="$(echo $TESTS | sed 's/filter_saddr_fam//g')"
             fi
+
+            # Backlog time test does not work reliably.
+            TESTS="$(echo $TESTS | sed 's/backlog_wait_time_actual_reset//g')"
 
             # Test lost_reset is unstable.
             TESTS="$(echo $TESTS | sed 's/lost_reset//g')"
