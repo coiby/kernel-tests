@@ -35,11 +35,6 @@ function install_dependency()
 		libubsan \
 		userspace-rcu \
 		userspace-rcu-devel
-
-	rpm --quiet -q libasan		   || sh buildroot.sh libasan
-	rpm --quiet -q libubsan		   || sh buildroot.sh libubsan
-	rpm --quiet -q userspace-rcu	   || sh buildroot.sh userspace-rcu
-	rpm --quiet -q userspace-rcu-devel || sh buildroot.sh userspace-rcu-devel
 }
 
 function build_radixtree()
