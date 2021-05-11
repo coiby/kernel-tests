@@ -14,9 +14,9 @@ export KERNEL_DOWNLOAD_ADDR=${KERNEL_DOWNLOAD_ADDR:-"https://git.kernel.org/pub/
 
 function install_dependency()
 {
-	yum="yum -y install"
+	dnf="dnf -y install"
 
-	$yum \
+	$dnf \
 		tar \
 		autoconf \
 		automake \
