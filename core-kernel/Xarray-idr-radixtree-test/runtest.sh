@@ -14,9 +14,9 @@ export KERNEL_DOWNLOAD_ADDR=${KERNEL_DOWNLOAD_ADDR:-"https://git.kernel.org/pub/
 
 function install_dependency()
 {
-	yum="yum -y install"
+	dnf="dnf -y install"
 
-	$yum \
+	$dnf \
 		tar \
 		autoconf \
 		automake \
@@ -40,7 +40,7 @@ function install_dependency()
 
 function get_running_kernel_src()
 {
-	running_kernel=$(uname -r)
+	running_kernel=$(uname -r | sed "s/+debug//" | sed "s/\.`arch`//")
 
 	echo $running_kernel | grep -q -v 'el[0-9]\|fc'
 
@@ -66,8 +66,15 @@ function get_running_kernel_src()
 		wget --no-check-certificate ${KERNEL_DOWNLOAD_ADDR}/linux-${treeish}.tar.gz
 		tar xf linux-*.tar.gz -C .
 	else
+		kernelpkg="kernel"
+		# check if it is running kernel-rt
+		echo $running_kernel | grep -q -v '\.rt'
+		if [ $? -eq 1 ]; then
+			kernelpkg="kernel-rt"
+		fi
 		cki_log "system detecting rhel/fedora kernel..."
-		sh wget-kernel.sh --running --srpm -i
+		cki_run_cmd_pos "dnf download --source ${kernelpkg}-${running_kernel}"
+		rpm -ivh kernel-*.src.rpm
 		tar xf /root/rpmbuild/SOURCES/linux-*.tar.xz -C .
 	fi
 }
