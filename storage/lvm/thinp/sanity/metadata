@@ -1,6 +1,6 @@
 [General]
 name=storage/lvm/thinp/sanity
-owner=Jakub Krysl <jkrysl@redhat.com>
+owner=Filip Suba <fsuba@redhat.com>
 description=lvm thinp sanity test
 license=GPLv2
 confidential=no
@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=gcc;glibc-static;gnuplot;kernel-devel;lvm2;make;wget
+dependencies=gcc;glibc-static;kernel-devel;lvm2;make;wget
 repoRequires=cki_lib
