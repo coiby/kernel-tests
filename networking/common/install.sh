@@ -212,9 +212,9 @@ netperf_install()
 		modprobe sctp
 	fi
 	if checksctp; then
-		./configure --enable-sctp && make && make install | tee -a $OUTPUTFILE
+		./configure --enable-sctp CFLAGS=-fcommon && make && make install | tee -a $OUTPUTFILE
 	else
-		./configure && make && make install | tee -a $OUTPUTFILE
+		./configure CFLAGS=-fcommon && make && make install | tee -a $OUTPUTFILE
 	fi
 	popd 1>/dev/null
 
