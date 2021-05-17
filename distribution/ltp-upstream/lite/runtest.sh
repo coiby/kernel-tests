@@ -137,12 +137,32 @@ function hugetlb_test_pre()
 	[ $low_mem_mode -eq 1 ] && hugetlb_nr_setup
 }
 
+function is_baremetal()
+{
+	# system with shared resources
+	# any s390x system
+	(uname -m | grep -q s390) && return 1
+
+	# any guest system, e.g. ppc64 guests
+	(hostname | grep -q guest) && return 1
+
+	# any ppc lpar
+	(uname -m | grep -q ppc) && (hostname | grep "\-lp") && return 1
+
+	if command -v virt-what >/dev/null; then
+		hv=$(virt-what)
+		[ $? -eq 0 -a "$hv" != "" ] && return 1
+	fi
+
+	return 0
+}
+
 function runtest_tweaker()
 {
 	local runtest="$LTPDIR/runtest/*"
 
 	# tolerate s390 high steal time
-	uname -m | grep -q s390 && {
+	if uname -m | grep -q s390; then
 		sed -i 's/nanosleep01 nanosleep01/nanosleep01 timeout 300 sh -c "nanosleep01 || true"/' "$runtest"
 		sed -i 's/clock_nanosleep01 clock_nanosleep01/clock_nanosleep01 timeout 300 sh -c "clock_nanosleep01 || true"/' "$runtest"
 		sed -i 's/clock_nanosleep02 clock_nanosleep02/clock_nanosleep02 timeout 300 sh -c "clock_nanosleep02 || true"/' "$runtest"
@@ -153,10 +173,16 @@ function runtest_tweaker()
 		sed -i 's/pselect01 pselect01/pselect01 timeout 30 sh -c "pselect01 || true"/' "$runtest"
 		sed -i 's/pselect01_64 pselect01_64/pselect01_64 timeout 30 sh -c "pselect01_64 || true"/' "$runtest"
 		sed -i 's/select04 select04/select04 timeout 30 sh -c "select04 || true"/' "$runtest"
-	}
+	fi
 
 	# reduce fork13 iteration
 	sed -i 's/fork13 fork13 -i 1000000/fork13 fork13 -i 10000/' "$runtest"
+
+	# reduce the number of dio tests on VM
+	if ! is_baremetal; then
+		sed -i 's/^dio/#&/' "$runtest"
+		sed -i 's/^#\(dio0[1-6]\)/\1/' "$runtest"
+	fi
 }
 
 function knownissue_handle()
