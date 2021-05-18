@@ -9,9 +9,6 @@
 
 set -o pipefail
 
-export KERNEL_GIT_BRANCH=${KERNEL_GIT_BRANCH:-}
-export KERNEL_DOWNLOAD_ADDR=${KERNEL_DOWNLOAD_ADDR:-"https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/snapshot"}
-
 function install_dependency()
 {
 	dnf="dnf -y install"
@@ -46,25 +43,9 @@ function get_running_kernel_src()
 
 	if [ $? -eq 0 ]; then
 		cki_log "system detecting upstream kernel..."
-
-		echo $running_kernel | grep -q 'rc[1-9]'
-		if [ $? -eq 0 ]; then
-			a="$(echo $running_kernel | awk -F"." '{print $1"."$2}')"
-			b="$(echo $running_kernel | cut -d '-' -f 2)"
-			treeish="$a-$b"
-		else
-			treeish="$(echo $running_kernel | awk -F"." '{print $1"."$2"."$3}')"
-		fi
-
-		if [ "$KERNEL_GIT_BRANCH" != "" ]; then
-			treeish=${KERNEL_GIT_BRANCH}
-		fi
-
-		treeish=${treeish#*v}
-		treeish=${treeish%+*}
-
-		wget --no-check-certificate ${KERNEL_DOWNLOAD_ADDR}/linux-${treeish}.tar.gz
-		tar xf linux-*.tar.gz -C .
+		# For CKI upstream kernels, the source is extracted under /usr/src/kernels/
+		# this is done as part of distribution/kpkginstall (Boot test)
+		cki_run_cmd_pos "ln -s /usr/src/kernels/${running_kernel} linux-${running_kernel}"
 	else
 		kernelpkg="kernel"
 		# check if it is running kernel-rt
