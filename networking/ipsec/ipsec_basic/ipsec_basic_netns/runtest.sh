@@ -98,7 +98,7 @@ data_tests(){
 		rlRun "sleep 2"
 		[ $TEST_VER -eq 4 ] && rlRun "$HA socat -u -4 /dev/zero,readbytes=$size udp-sendto:${HB_IP[$TEST_VER]}:$udpport"
 		[ $TEST_VER -eq 6 ] && rlRun "$HA socat -u -6 /dev/zero,readbytes=$size udp-sendto:[${HB_IP[$TEST_VER]}]:$udpport"
-		rlRun "sleep 4"
+		rlRun "sleep 10"
 		rlRun "ls -l udprecv | grep $size" 0 "udp should receive $size bytes, received `ls -l udprecv | awk '{print $5}'` bytes"
 		rlRun "pkill socat"
 		rm -f udprecv
