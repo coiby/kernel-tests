@@ -30,22 +30,21 @@ ANALYZE_VMCORE="${ANALYZE_VMCORE:-true}"
 Crash()
 {
     if [ ! -f "${C_REBOOT}" ]; then
-        # Clear previous vmcores if any and restore kdump configurations
-        Cleanup
         SetupKdump
 
-        # Test with
-        #    default kdump config
-        #    default kdump sysconfig but with KDUMP_FILE_LOAD = off
-        ResetKdumpConfig
-        # if KDUMP_FILE_LOAD presents, turn it off 
-        # Otherwise kdump service would fail to start if the kernel 
-        # is not signed with a ceritified key.
-        if grep -i KDUMP_FILE_LOAD "${KDUMP_SYS_CONFIG}" ; then
-            AppendSysconfig KDUMP_FILE_LOAD override "off"
-        fi
+        # Restore kdump configurations and clear previous vmcores if any
+        Cleanup
+
+        # Remove -s from KEXEC_ARGS if it presents in default options.
+        # Kdump would then load/unload crash kernel by kexec_load instead
+        # of kexec_file_load(). kexec_load() will not verify kernel key
+        # This is to make both kexec_load() and kexec_file_load() are tested
+        # no matter what default option is.
+        AppendSysconfig KEXEC_ARGS remove "-s"
         RestartKdump
+
         ReportSystemInfo
+
         TriggerSysrqPanic
         rm -f "${C_REBOOT}"
     else
