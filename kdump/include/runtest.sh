@@ -305,6 +305,9 @@ RstrntSubmit() {
 SafeReboot() {
     # It will config BootNext to be same as current boot for EFI boot machine.
     rstrnt-reboot
+    # Make sure the script doesn't continue if rstrnt-reboot get's killed
+    # https://github.com/beaker-project/restraint/issues/219
+    exit 0
 }
 
 

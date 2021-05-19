@@ -43,7 +43,7 @@ dmesgReport=iommu-dmesg-report.txt
 
 function bootOptions() {
     bootOptionsFile=$1
-    
+
 
     while read -r line; do
         # Check to see if new options have been set yet
@@ -68,6 +68,9 @@ function bootOptions() {
 		echo "Reboot now!" | tee -a "${OUTPUTFILE}"
 		rstrnt-report-result "${TEST}/boot_loader" "PASS" 0
 		rstrnt-reboot
+		# Make sure the script doesn't continue if rstrnt-reboot get's killed
+		# https://github.com/beaker-project/restraint/issues/219
+		exit 0
 	    fi
 	else
             # The reboot has finished. Verify the cmdline.
@@ -76,7 +79,7 @@ function bootOptions() {
             grep "$(cat $CurrentBootOptions)" /proc/cmdline
 	    code=$?
 	    # remove spaces for reporting boot option to beaker
-	    CurrentBootOptionsReport=$(cat $CurrentBootOptions | sed 's/\ /-/')	    
+	    CurrentBootOptionsReport=$(cat $CurrentBootOptions | sed 's/\ /-/')
 
 	    if [ ${code} -ne 0 ]; then
 		echo "Fail: error booting kernel with specified cmdline" |
@@ -104,7 +107,7 @@ function bootOptions() {
 
 function dmesgErrors() {
     dmesgLineNumber=0
-    
+
     # find any iommu errors in dmesg/messages file
     while read -r dmesgLine; do
 	dmesgLineNumber=$(($dmesgLineNumber+1))
@@ -131,7 +134,7 @@ function dmesgErrors() {
     else
 	rstrnt-report-result "${TEST}/iommu-dmesg" "PASS" 0
     fi
-    
+
     rstrnt-report-log -l $dmesgReport
 
 }

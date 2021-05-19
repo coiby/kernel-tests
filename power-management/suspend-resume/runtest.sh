@@ -48,7 +48,7 @@ function result_pass ()
 }
 
 #return 0 when running on baremetal
-function is_baremetal 
+function is_baremetal
 {
    local virtwhat=$(virt-what)
    local virtret=$?
@@ -104,6 +104,9 @@ function setup ()
 	echo "Rebooting now..." | tee -a ${OUTPUTFILE}
 
 	rstrnt-reboot
+	# Make sure the script doesn't continue if rstrnt-reboot get's killed
+	# https://github.com/beaker-project/restraint/issues/219
+	exit 0
 
 	echo "Finish Rebooting !" | tee -a ${OUTPUTFILE}
 
@@ -259,7 +262,7 @@ function runTest ()
 		case $i in
 			standby)
 				echo "Did nothing in standby S1 state" | tee -a ${OUTPUTFILE}
-				
+
 				;;
 			mem)
 				echo '--------------------------------------------------------' | tee -a ${OUTPUTFILE}
@@ -320,5 +323,5 @@ echo "***** Current Running Distro = "$installeddistro" *****" | tee -a $OUTPUTF
 getdetails
 
 systemctl stop ntpd  > /dev/null 2>&1
-runTest 
+runTest
 systemctl start ntpd > /dev/null 2>&1

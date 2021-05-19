@@ -235,6 +235,9 @@ EOF
 	  rlLog "Have ${free_hugepages} free hugepages of ${HPCOUNT} needed.  Rebooting with 2M hugepages"
 	  grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
 	  rstrnt-reboot
+	  # Make sure the script doesn't continue if rstrnt-reboot get's killed
+	  # https://github.com/beaker-project/restraint/issues/219
+	  exit 0
        fi
        sed -i '/mremap-expand-slice-collision/d' run_tests.py
     fi
