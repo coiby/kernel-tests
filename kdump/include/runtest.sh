@@ -433,10 +433,11 @@ SetupKdump()
     fi
 
     Log "- kexec-tools/systemd/dracut kernel versions"
-    rpm -q kexec-tools systemd dracut kernel
+    rpm -q kexec-tools systemd dracut
+    uname -r
 
     Log "- Crashkernel reservation and current cmdline"
-    rpm -q lshw || InstallPackages lshw
+    rpm -q --quiet lshw || InstallPackages lshw
     echo "Total system memory: $(lshw -short | grep -i "System Memory" | awk '{print $3}')"
     cat /proc/cmdline
     kdumpctl showmem || cat /sys/kernel/kexec_crash_size
@@ -505,7 +506,7 @@ ResetKdumpConfig()
     Log "- Reset to default kdump config"
     echo >"${KDUMP_CONFIG}"
     echo "path /var/crash" >>"${KDUMP_CONFIG}"
-    echo "core_collector makedumpfile -l --message-level 1 -d 31" >>"${KDUMP_CONFIG}"
+    echo "core_collector makedumpfile -l --message-level 7 -d 31" >>"${KDUMP_CONFIG}"
 }
 
 
@@ -668,6 +669,7 @@ RestartKdump()
     rm -f /boot/initramfs-*kdump.img    # For RHEL7
     touch "${KDUMP_CONFIG}"
     RstrntSubmit "${KDUMP_CONFIG}"
+    RstrntSubmit "${KDUMP_SYS_CONFIG}"
 
     if $IS_RHEL5 || $IS_RHEL6; then
         tmp=initrd
