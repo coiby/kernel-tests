@@ -18,6 +18,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # Global variables
+PODMANUSER=${PODMANUSER:-root}
 TEST="Podman"
 ret=0
 BATS_RPM="http://mirrors.kernel.org/fedora/releases/33/Everything/x86_64/os/Packages/b/bats-1.1.0-5.fc33.noarch.rpm"
@@ -29,13 +30,6 @@ if [ -z "$pkg" ] ; then
     rstrnt-report-result "${TEST}" WARN
     rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 fi
-
-# Bug reports require this information.
-echo "Podman version:"
-podman --version
-echo "Podman debug info:"
-podman info --debug
-
 
 # RHEL 8 will install podman-tests, but it will not install bats. We can use
 # the Fedora 31 package instead. Attempt the installation five times.
@@ -87,26 +81,26 @@ if [ "$ARCH" != "x86_64" ]; then
     mv -f ${TEST_DIR}/260-sdnotify.bats ${TEST_DIR}/260-sdnotify.baks
 fi
 
-# Clear images
-podman system prune --all --force && podman rmi --all
-
-for TEST_FILE in ${TEST_DIR}/*.bats; do
-    echo -e "\n📊  $(basename $TEST_FILE):"
-    sleep 1
-    bats $TEST_FILE  | tee -a "${OUTPUTFILE}"
-
-    # Save a marker if this test failed.
-    if [[ ${PIPESTATUS[0]} != 0 ]]; then
-        TEST_FAILED=1
+if  [[ "$PODMANUSER" != "root" ]]; then
+    # Switch to rootless for non root
+    # Check existing rootless podman user
+    if ! id $PODMANUSER ;then
+        echo "Adding rootless podman user: $PODMANUSER"
+        adduser $PODMANUSER
     fi
-done
-
-echo "Test finished" | tee -a "${OUTPUTFILE}"
+    su - podmantest -c "cd `pwd`; bash ./podmantest.sh"
+    TEST_FAILED=$?
+    cat /tmp/podmantest-rootless.log >> "${OUTPUTFILE}"
+else # Stay with root
+    bash ./podmantest.sh
+    TEST_FAILED=$?
+    cat /tmp/podmantest-root.log >> "${OUTPUTFILE}"
+fi
 
 if [[ ${TEST_FAILED:-} == 1 ]] ; then
     echo "😭 One or more tests failed."
-    rstrnt-report-result "${TEST}" FAIL 1
+    rstrnt-report-result "${TEST}" FAIL 
 else
     echo "😎 All tests passed."
-    rstrnt-report-result "${TEST}" PASS 0
+    rstrnt-report-result "${TEST}" PASS 
 fi
