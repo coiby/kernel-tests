@@ -39,7 +39,7 @@ function get_running_kernel_src()
 {
 	running_kernel=$(uname -r | sed "s/+debug//" | sed "s/\.`arch`//")
 
-	echo $running_kernel | grep -q -v 'el[0-9]\|fc'
+	echo $running_kernel | grep -q -v 'el[0-9]\|fc\|eln'
 
 	if [ $? -eq 0 ]; then
 		cki_log "system detecting upstream kernel..."
