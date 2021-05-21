@@ -389,6 +389,9 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
 EOF
   rstrnt-report-result ${TEST}/kernel-in-place PASS 0
   rstrnt-reboot
+  # Make sure the script doesn't continue if rstrnt-reboot get's killed
+  # https://github.com/beaker-project/restraint/issues/219
+  exit 0
 else
   # set YUM var.
   select_yum_tool

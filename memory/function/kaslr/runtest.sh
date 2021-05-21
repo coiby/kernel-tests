@@ -213,6 +213,9 @@ function x86_kaslr_test()
 				echo "$((++extra_reboots))" > SETUP_FINISH
 				rlReport "reboot-default-$f-$extra_reboots" PASS
 				rhts-reboot
+				# Make sure the script doesn't continue if rstrnt-reboot get's killed
+				# https://github.com/beaker-project/restraint/issues/219
+				exit 0
 			fi
 			rlAssertNotEquals "$f should be non-default" "${!f}" "$(cat $f)"
 		done
@@ -240,6 +243,9 @@ function x86_kaslr_test()
 				echo "$((++extra_reboots))" > SETUP_FINISH
 				rlReport "reboot-same-$f-$extra_reboots" PASS
 				rhts-reboot
+				# Make sure the script doesn't continue if rstrnt-reboot get's killed
+				# https://github.com/beaker-project/restraint/issues/219
+				exit 0
 			fi
 			rlAssertNotEquals "$f should be changed" "$(cat ${f}.old)" "$(cat $f)"
 		done
@@ -247,6 +253,9 @@ function x86_kaslr_test()
 		rlRun "grubby --args nokaslr --update-kernel ALL" 0
 		rlPhaseEnd
 		rstrnt-reboot
+		# Make sure the script doesn't continue if rstrnt-reboot get's killed
+		# https://github.com/beaker-project/restraint/issues/219
+		exit 0
 	elif [ "$current_state" = "after_r_kaslr_cleanup" ]; then
 		rlAssertGrep nokaslr /proc/cmdline || rlDie "unexpedted test state!"
 	elif [ "$current_state" = "after_r_kaslr_snapshot" ]; then
@@ -254,11 +263,17 @@ function x86_kaslr_test()
 		rlAssertNotGrep nokaslr /proc/cmdline || rlDie "unexpedted test state!"
 		rlPhaseEnd
 		rstrnt-reboot
+		# Make sure the script doesn't continue if rstrnt-reboot get's killed
+		# https://github.com/beaker-project/restraint/issues/219
+		exit 0
 	else
 		rlAssertNotGrep nokaslr /proc/cmdline || rlDie "unexpedted test state!"
 		slub_freelist_random 1 $i
 		rlPhaseEnd
 		rstrnt-reboot
+		# Make sure the script doesn't continue if rstrnt-reboot get's killed
+		# https://github.com/beaker-project/restraint/issues/219
+		exit 0
 	fi
 }
 
