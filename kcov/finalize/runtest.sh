@@ -40,7 +40,12 @@ lcov $FILE_OPTION_LIST -o $KCOV_COMBINED_INFO
 rhts-submit-log -l $KCOV_COMBINED_INFO
 
 if [[ $NO_HTML != 'true' ]]; then
-	genhtml --show-details --title "Coverage of kernel tests on $(uname -r)" --legend --highlight -o $HTMLDIR $KCOV_COMBINED_INFO
+	params="--show-details --legend --highlight -o $HTMLDIR"
+	if [ -n "$HIERARCHICAL" ]; then
+		params="${params} --hierarchical"
+	fi
+	echo "{Info} running genhtml with the following parameters: ${params}"
+	genhtml --title "Coverage of kernel tests on $(uname -r)" $params $KCOV_COMBINED_INFO
 	cp $KCOV_COMBINED_INFO $HTMLDIR
 
 	tar -C $TDIR -zcf $TDIR/kcov_all-${tag}.tgz $(basename $HTMLDIR)

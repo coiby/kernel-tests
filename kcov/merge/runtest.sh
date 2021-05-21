@@ -204,7 +204,13 @@ kcov_genhtml() {
 		descOption="--description-file $desc_file"
 	fi
 
-	genhtml --show-details --title "Coverage of kernel tests" --keep-descriptions --legend --highlight -o kcov.comb $info_file $descOption
+	params="--show-details --keep-descriptions --legend --highlight $descOption -o kcov.comb"
+	if [ -n "$HIERARCHICAL" ]; then
+		params="${params} --hierarchical"
+	fi
+
+	echo "{Info} running genhtml with the following parameters: ${params}"
+	genhtml --title "Coverage of kernel tests" $params $info_file
 	srcfile1=$(sed -n '/^SF:/{p; q}' $info_file | sed 's/^SF://')
 	test -e ${srcfile1} || {
 		echo "{Warn} source file [$srcfile1] not exist."
