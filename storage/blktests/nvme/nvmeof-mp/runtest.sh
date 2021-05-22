@@ -28,6 +28,10 @@ source $CDIR/../../../../cki_lib/libcki.sh
 function pre_setup
 {
 	echo "options nvme_core multipath=N"  > /etc/modprobe.d/nvme.conf
+	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
+		modprobe -r nvme nvme_core
+		modprobe nvme
+	fi
 }
 
 function disable_multipath
