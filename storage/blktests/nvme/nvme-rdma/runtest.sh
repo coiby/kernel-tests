@@ -21,7 +21,7 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 TNAME="storage/blktests/nvme/nvme-rdma"
-USE_SIW=${USE_SIW:-"0"}
+USE_SIW=${USE_SIW:-"0 1"}
 
 source $CDIR/../../../../cki_lib/libcki.sh
 
