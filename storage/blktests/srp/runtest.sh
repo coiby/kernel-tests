@@ -113,14 +113,13 @@ function get_test_cases_srp
 	uname -ri | grep -q "4.18.0.*ppc64le" || testcases+=" srp/002"
 	# testcases+=" srp/003", need legacy device mapper support
 	# testcases+=" srp/004", need legacy device mapper support
-	# upstream stable branch 5.11 with 005-010 lead panic
-	uname -ri | grep -q "5.11" || testcases+=" srp/005"
-	uname -ri | grep -q "5.11" || testcases+=" srp/006"
-	uname -ri | grep -q "5.11" || testcases+=" srp/007"
-	uname -ri | grep -q "5.11" || testcases+=" srp/008"
-	uname -ri | grep -q "5.11" || testcases+=" srp/009"
-	uname -ri | grep -q "5.11" || testcases+=" srp/010"
-	uname -ri | grep -q "4.18.0.*ppc64le" || testcases+=" srp/011"
+	testcases+=" srp/005"
+	testcases+=" srp/006"
+	testcases+=" srp/007"
+	testcases+=" srp/008"
+	testcases+=" srp/009"
+	testcases+=" srp/010"
+	uname -ri | grep  -q "4.18.0.*ppc64le" || testcases+=" srp/011"
 	# testcases+=" srp/012", need legacy device mapper support
 	testcases+=" srp/013"
 	uname -r | grep -q 4.18.0 || testcases+=" srp/014" #BZ1900153
