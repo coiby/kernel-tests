@@ -45,7 +45,7 @@ function get_running_kernel_src()
 		cki_log "system detecting upstream kernel..."
 		# For CKI upstream kernels, the source is extracted under /usr/src/kernels/
 		# this is done as part of distribution/kpkginstall (Boot test)
-		cki_run_cmd_pos "ln -s /usr/src/kernels/${running_kernel} linux-${running_kernel}"
+		cki_run_cmd_pos "cp -r /usr/src/kernels/${running_kernel} linux-${running_kernel}"
 	else
 		kernelpkg="kernel"
 		# check if it is running kernel-rt
