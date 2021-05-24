@@ -51,7 +51,7 @@ void test_mcast_join_leave_source_v4()
 	test_setsockopt_error("MCAST_JOIN_SOURCE_GROUP not multicast addr",
 			MCAST_JOIN_SOURCE_GROUP, &group_sr, size, EINVAL, 4);
 
-	group_sr.gsr_interface = 500;
+	group_sr.gsr_interface = 0xffffffff;
 	inet_pton(AF_INET, V4GROUP_JOIN, &((struct sockaddr_in *)&group_sr.gsr_group)->sin_addr);
 	test_setsockopt_error("MCAST_JOIN_SOURCE_GROUP no device found",
 			MCAST_JOIN_SOURCE_GROUP, &group_sr, size, ENODEV, 4);
@@ -75,7 +75,7 @@ void test_mcast_join_leave_source_v4()
 	test_setsockopt_error("MCAST_LEAVE_SOURCE_GROUP not multicast addr",
 			MCAST_LEAVE_SOURCE_GROUP, &group_sr, size, EINVAL, 4);
 
-	group_sr.gsr_interface = 500;
+	group_sr.gsr_interface = 0xffffffff;
 	inet_pton(AF_INET, V4GROUP_JOIN, &((struct sockaddr_in *)&group_sr.gsr_group)->sin_addr);
 	test_setsockopt_error("MCAST_LEAVE_SOURCE_GROUP no device found",
 			MCAST_LEAVE_SOURCE_GROUP, &group_sr, size, ENODEV, 4);
@@ -127,7 +127,7 @@ void test_mcast_join_leave_source_v6()
 			MCAST_JOIN_SOURCE_GROUP, &group_sr, size, EINVAL, 6);
 
 	inet_pton(AF_INET6, V6GROUP_JOIN, &((struct sockaddr_in6 *)&group_sr.gsr_group)->sin6_addr);
-	group_sr.gsr_interface = 500;
+	group_sr.gsr_interface = 0xffffffff;
 	test_setsockopt_error("MCAST_JOIN_SOURCE_GROUP no device found",
 			MCAST_JOIN_SOURCE_GROUP, &group_sr, size, ENODEV, 6);
 
@@ -151,7 +151,7 @@ void test_mcast_join_leave_source_v6()
 			MCAST_LEAVE_SOURCE_GROUP, &group_sr, size, EINVAL, 6);
 
 	inet_pton(AF_INET6, V6GROUP_JOIN, &((struct sockaddr_in6 *)&group_sr.gsr_group)->sin6_addr);
-	group_sr.gsr_interface = 500;
+	group_sr.gsr_interface = 0xffffffff;
 	test_setsockopt_error("MCAST_LEAVE_SOURCE_GROUP no device found",
 			MCAST_LEAVE_SOURCE_GROUP, &group_sr, size, ENODEV, 6);
 
@@ -211,7 +211,7 @@ void test_mcast_block_unblock_source_v4()
 			MCAST_BLOCK_SOURCE, &group_sr, size, EINVAL, 4);
 
 	inet_pton(AF_INET, V4GROUP_BLOCK, &((struct sockaddr_in *)&group_sr.gsr_group)->sin_addr);
-	group_sr.gsr_interface = 500;
+	group_sr.gsr_interface = 0xffffffff;
 	test_setsockopt_error("MCAST_BLOCK_SOURCE no device found",
 			MCAST_BLOCK_SOURCE, &group_sr, size, ENODEV, 4);
 
@@ -247,7 +247,7 @@ void test_mcast_block_unblock_source_v4()
 	test_setsockopt_error("MCAST_UNBLOCK_SOURCE not multicast addr",
 			MCAST_UNBLOCK_SOURCE, &group_sr, size, EINVAL, 4);
 
-	group_sr.gsr_interface = 500;
+	group_sr.gsr_interface = 0xffffffff;
 	inet_pton(AF_INET, V4GROUP_BLOCK, &((struct sockaddr_in *)&group_sr.gsr_group)->sin_addr);
 	test_setsockopt_error("MCAST_UNBLOCK_SOURCE no device found",
 			MCAST_UNBLOCK_SOURCE, &group_sr, size, ENODEV, 4);
@@ -298,7 +298,7 @@ void test_mcast_block_unblock_source_v6()
 	test_setsockopt_error("MCAST_BLOCK_SOURCE not multicast addr",
 			MCAST_BLOCK_SOURCE, &group_sr, size, EINVAL, 6);
 
-	group_sr.gsr_interface = 500;
+	group_sr.gsr_interface = 0xffffffff;
 	inet_pton(AF_INET6, V6GROUP_BLOCK, &((struct sockaddr_in6 *)&group_sr.gsr_group)->sin6_addr);
 	test_setsockopt_error("MCAST_BLOCK_SOURCE no device found",
 			MCAST_BLOCK_SOURCE, &group_sr, size, ENODEV, 6);
@@ -335,7 +335,7 @@ void test_mcast_block_unblock_source_v6()
 
 	inet_pton(AF_INET6, V6GROUP_BLOCK, &((struct sockaddr_in6 *)&group_sr.gsr_group)->sin6_addr);
 	inet_pton(AF_INET6, V6SOURCE_BLOCK, &((struct sockaddr_in6 *)&group_sr.gsr_source)->sin6_addr);
-	group_sr.gsr_interface = 500;
+	group_sr.gsr_interface = 0xffffffff;
 	test_setsockopt_error("MCAST_UNBLOCK_SOURCE no device found",
 			MCAST_UNBLOCK_SOURCE, &group_sr, size, ENODEV, 6);
 

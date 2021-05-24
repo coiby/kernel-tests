@@ -182,7 +182,7 @@ void test_mcast_msfilter_v4()
 			MCAST_MSFILTER, &gr_filter, GROUP_FILTER_SIZE(gr_filter.gf_numsrc), EINVAL, 4);
 
 	inet_pton(AF_INET, GROUP_JOIN_V4, &((struct sockaddr_in *)&gr_filter.gf_group)->sin_addr);
-	gr_filter.gf_interface = 500;
+	gr_filter.gf_interface = 0xffffffff;
 	test_setsockopt_error("MCAST_MSFILTER no device found",
 			MCAST_MSFILTER, &gr_filter, GROUP_FILTER_SIZE(gr_filter.gf_numsrc), ENODEV, 4);
 
@@ -302,7 +302,7 @@ void test_mcast_msfilter_v6()
 	test_setsockopt_error("MCAST_MSFITLER not multicast addr",
 			MCAST_MSFILTER, &gr_filter, GROUP_FILTER_SIZE(gr_filter.gf_numsrc), EINVAL, 6);
 
-	gr_filter.gf_interface = 500;
+	gr_filter.gf_interface = 0xffffffff;
 	inet_pton(AF_INET6, GROUP_JOIN_V6, &((struct sockaddr_in6 *)&gr_filter.gf_group)->sin6_addr);
 	test_setsockopt_error("MCAST_MSFITLER no device found",
 			MCAST_MSFILTER, &gr_filter, GROUP_FILTER_SIZE(gr_filter.gf_numsrc), ENODEV, 6);

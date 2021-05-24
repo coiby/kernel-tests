@@ -37,7 +37,7 @@ void test_add_membership()
 
 	mreqn.imr_multiaddr.s_addr = inet_addr("239.1.2.3");
 	mreqn.imr_address.s_addr = inet_addr("255.255.255.255");
-	mreqn.imr_ifindex = 500;
+	mreqn.imr_ifindex = 0xffffffff;
 	test_setsockopt_error("IP_ADD_MEMBERSHIP No device found",
 			IP_ADD_MEMBERSHIP, &mreqn, sizeof(mreqn), ENODEV, 4);
 }
@@ -61,7 +61,7 @@ void test_drop_membership()
 
 	mreqn.imr_multiaddr.s_addr = inet_addr("239.1.2.3");
 	mreqn.imr_address.s_addr = inet_addr("255.255.255.255");
-	mreqn.imr_ifindex = 500;
+	mreqn.imr_ifindex = 0xffffffff;
 #ifndef EL6
 	test_setsockopt_error("IP_DROP_MEMBERSHIP No device found",
 			IP_DROP_MEMBERSHIP, &mreqn, sizeof(mreqn), EADDRNOTAVAIL, 4);
