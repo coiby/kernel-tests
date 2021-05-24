@@ -127,9 +127,10 @@ function setup_test_dev_mkfs()
 	# Nfs cannot be dd'd nor mkfs'd
 	if [ "$FSTYPE" != "nfs3" -a "$FSTYPE" != "nfs4" -a "$FSTYPE" != "tmpfs" -a "$FSTYPE" != "cifs" ]; then
 		# check TEST_DEV
-		if ! blkid $TEST_DEV; then
+		if [ -z "$TEST_DEV" ] || ! blkid $TEST_DEV; then
 			echoo " * TEST_DEV $TEST_DEV looks invalid"
 			echo " * TEST_DEV $TEST_DEV looks invalid" > /dev/kmsg
+			rstrnt-report-result "xfstests - $FSTYPE" SKIP
 			exit 0
 		fi
 		# Make FSTYPE fs with MKFS_OPTS options on the device, exit on failure
