@@ -39,6 +39,8 @@ TOTAL_MEM=$(free -m | awk '/Mem/ {print $2}')
 TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding netfilter bpf bpf_test_progs tc-testing kvm"}
 DEFAULT_IFACE=$(ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}')
 
+TOTAL_FAIL=0
+
 debug_info()
 {
 	[ ${LOG_ONCE} -eq 0 ] && \
@@ -191,6 +193,7 @@ run_bpf_test_progs()
 	done
 
 	echo "${item}: total $total_num, failed $nfail"
+	TOTAL_FAIL=$(($TOTAL_FAIL+$nfail))
 	popd
 }
 
@@ -240,6 +243,7 @@ run_tc_test()
 	done
 
 	echo "${item}: total $total_num, failed $FAIL, skipped $nskip"
+	TOTAL_FAIL=$(($TOTAL_FAIL+$FAIL))
 	popd
 }
 
@@ -294,7 +298,14 @@ for item in $TEST_ITEMS; do
 	done
 
 	echo "${item}: total $total_num, failed $FAIL"
+	TOTAL_FAIL=$(($TOTAL_FAIL+$FAIL))
 	popd
 done
 
 #-------------------- Clean Up --------------------
+
+if [[ ${TOTAL_FAIL} -eq 0 ]]; then
+	test_pass_exit
+else
+	test_fail_exit
+fi
