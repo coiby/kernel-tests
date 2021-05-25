@@ -28,7 +28,7 @@ function ltp_test_build()
 	if [ $? -ne 0 ]; then
 		patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
 	fi
-	cp -vf configs/RHELKT1LITE.20200930 RHELKT1LITE
+	cp -vf configs/RHELKT1LITE.20210121 RHELKT1LITE
 
 	build-all
 }
