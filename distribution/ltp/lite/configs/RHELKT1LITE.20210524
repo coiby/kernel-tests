@@ -1,4 +1,5 @@
 kmsg01 kmsg01
+rtc02 rtc02
 umip_basic_test umip_basic_test
 #DESCRIPTION:Math library tests - CPU tests
 abs01 abs01
@@ -99,8 +100,10 @@ bpf_prog01 bpf_prog01
 bpf_prog02 bpf_prog02
 bpf_prog03 bpf_prog03
 bpf_prog04 bpf_prog04
+bpf_prog05 bpf_prog05
 
 brk01 brk01
+brk02 brk02
 
 capget01 capget01
 capget02 capget02
@@ -175,7 +178,9 @@ clone302 clone302
 
 close01 close01
 close02 close02
-close08 close08
+
+close_range01 close_range01
+close_range02 close_range02
 
 confstr01 confstr01
 
@@ -542,6 +547,7 @@ getrlimit02 getrlimit02
 getrlimit03 getrlimit03
 
 get_mempolicy01 get_mempolicy01
+get_mempolicy02 get_mempolicy02
 get_robust_list01 get_robust_list01
 
 getrusage01 getrusage01
@@ -636,6 +642,9 @@ fanotify13 fanotify13
 fanotify14 fanotify14
 fanotify15 fanotify15
 fanotify16 fanotify16
+fanotify17 fanotify17
+fanotify18 fanotify18
+fanotify19 fanotify19
 
 ioperm01 ioperm01
 ioperm02 ioperm02
@@ -733,6 +742,8 @@ lstat01_64 lstat01_64
 lstat02 lstat02
 lstat02_64 lstat02_64
 
+mallinfo02 mallinfo02
+
 mallopt01 mallopt01
 
 mbind01 mbind01
@@ -805,6 +816,7 @@ mmap15 mmap15
 mmap16 mmap16
 mmap17 mmap17
 mmap18 mmap18
+mmap19 mmap19
 
 modify_ldt01 modify_ldt01
 modify_ldt02 modify_ldt02
@@ -1183,7 +1195,6 @@ sched_get_priority_min01 sched_get_priority_min01
 sched_get_priority_min02 sched_get_priority_min02
 
 sched_getparam01 sched_getparam01
-sched_getparam02 sched_getparam02
 sched_getparam03 sched_getparam03
 
 sched_rr_get_interval01 sched_rr_get_interval01
@@ -1484,7 +1495,7 @@ socketpair02 socketpair02
 sockioctl01 sockioctl01
 
 splice01 splice01
-splice02 seq 1 20000 | splice02
+splice02 splice02
 splice03 splice03
 splice04 splice04
 splice05 splice05
@@ -1582,7 +1593,6 @@ tgkill02 tgkill02
 tgkill03 tgkill03
 
 time01 time01
-time02 time02
 
 times01 times01
 times03 times03
@@ -1716,6 +1726,7 @@ write05 write05
 
 writev01 writev01
 writev02 writev02
+writev03 writev03
 writev05 writev05
 writev06 writev06
 writev07 writev07
@@ -1752,6 +1763,7 @@ statx07 statx07
 
 
 io_uring01 io_uring01
+io_uring02 io_uring02
 #DESCRIPTION:Memory Mgmt tests
 mm01 mmap001 -m 10000
 # 40 Mb mmap() test.
@@ -1775,7 +1787,6 @@ mtest06_3 mmap3 -x 0.002 -p
 #mtest-6_4 shmat1 -x 0.00005
 
 mem02 mem02
-mem03 mem03
 
 page01 page01
 page02 page02
@@ -1898,14 +1909,15 @@ rwtest05 export LTPROOT; rwtest -N rwtest05 -c -q -i 50 -T 64b 500b:$TMPDIR/rwte
 # to disturb the kernel. A good kernel latency killer too.
 # Was not sure why it should reside in runtest/crashme and won't get tested ever
 
+read_all_dev read_all -d /dev -p -q -r 3
+read_all_proc read_all -d /proc -q -r 3
+read_all_sys read_all -d /sys -q -r 3
 
 #Run the File System Race Condition Check tests as well
 
 #Run the Quota Remount Test introduced in linux-2.6.26
 
-read_all_dev read_all -d /dev -p -q -r 3
-read_all_proc read_all -d /proc -q -r 3
-read_all_sys read_all -d /sys -q -r 3
+
 
 binfmt_misc01 binfmt_misc01.sh
 binfmt_misc02 binfmt_misc02.sh
