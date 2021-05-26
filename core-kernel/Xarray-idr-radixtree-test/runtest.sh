@@ -42,7 +42,7 @@ function get_running_kernel_src()
 	echo $running_kernel | grep -q -v 'el[0-9]\|fc\|eln'
 
 	if [ $? -eq 0 ]; then
-		cki_log "system detecting upstream kernel..."
+		cki_log "detected upstream kernel..."
 		# For CKI upstream kernels, the source is extracted under /usr/src/kernels/
 		# this is done as part of distribution/kpkginstall (Boot test)
 		cki_run_cmd_pos "cp -r /usr/src/kernels/${running_kernel} linux-${running_kernel}"
@@ -53,7 +53,15 @@ function get_running_kernel_src()
 		if [ $? -eq 1 ]; then
 			kernelpkg="kernel-rt"
 		fi
-		cki_log "system detecting rhel/fedora kernel..."
+		cki_log "detected rhel/fedora/ark kernel..."
+		echo $running_kernel | grep -q -v 'fc'
+		if [ $? -ne  0 ]; then
+			cki_log "workaround to find srpm name for ark kernels..."
+			# ARK kernel don't always have disttag correct
+			# workaround to find the srpm version on cki repo
+			running_kernel=$(dnf -q --disablerepo="*" --enablerepo="kernel-cki" list --all "${kernelpkg}.src" --showduplicates \
+				| awk '{print$2}' | tail -1)
+		fi
 		cki_run_cmd_pos "dnf download --source ${kernelpkg}-${running_kernel}"
 		rpm -ivh kernel-*.src.rpm
 		tar xf /root/rpmbuild/SOURCES/linux-*.tar.xz -C .
