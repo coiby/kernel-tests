@@ -152,7 +152,7 @@ if [ -z "$amtubin" -o ! -e "$amtubin" ]; then
     # Add task param, needed for kernel-ci/CKI, e.g. <params><param name="CI" value="yes"/><params>
     if [ $? -ne 0 ] && [ "$CI" = "yes" ]; then
         rstrnt-report-result $TEST WARN
-        rstrnt-abort -t recipe
+        cki_abort_task "Couldn't build atmu"
     fi
 
 fi

@@ -37,7 +37,7 @@ ret=0
 pkg=$(rpm -qa | grep acpica-tools)
 if [ -z "$pkg" ] ; then
     rstrnt-report-result $TEST WARN
-    rstrnt-abort -t recipe
+    cki_abort_task "$pkg is not installed"
 fi
 
 # verify  ACPI is enabled in the kernel

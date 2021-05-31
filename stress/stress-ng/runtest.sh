@@ -59,9 +59,8 @@ function build_stress-ng()
     rlLog "Downloading stress-ng from source"
     rlRun "git clone $GIT_URL" 0
     if [ $? != 0 ]; then
-        echo "Failed to git clone $GIT_URL." | tee -a $OUTPUTFILE
         rstrnt-report-result $TEST WARN 0
-        rstrnt-abort -t recipe
+        cki_abort_task "Failed to git clone $GIT_URL."
     fi
 
     # build
@@ -156,7 +155,7 @@ rlPhaseStartSetup
     # if stress-ng triggers a panic and reboot, then abort the test
     if [ $RSTRNT_REBOOTCOUNT -ge 1 ] ; then
         rlDie "Aborting due to system crash and reboot"
-        rstrnt-abort -t recipe
+        cki_abort_task "Aborting due to system crash and reboot"
     fi
 
     detect_testenv

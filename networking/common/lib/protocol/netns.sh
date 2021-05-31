@@ -159,7 +159,8 @@ setup_net_default()
 	if [ $? -ne 0 ]; then
         	echo -e "\nNo SERVER IFACE"
 		rstrnt-report-result $TEST WARN
-		rstrnt-abort -t recipe
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	fi
 	SERVER_ADDR4="192.168.1.1"
 	SERVER_ADDR6="2001::1"

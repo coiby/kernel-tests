@@ -31,8 +31,7 @@ rlJournalStart
  rlPhaseStartTest
     rlRun -l "wget https://arr-cki-prod-lookaside.s3.us-east-1.amazonaws.com/lookaside/static/dacapo-9.12-MR1-bach.jar"
         if [ $? -ne 0 ]; then
-            rstrnt-abort -t recipe
-            exit 0
+            cki_abort_task "Couldn't download dacapo-9.12-MR1-bach.jar"
         fi
     rlRun -l "java -jar dacapo-9.12-MR1-bach.jar eclipse jython lusearch-fix"
   rlPhaseEnd
