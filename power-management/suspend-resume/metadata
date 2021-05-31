@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=autoconf;automake;gcc;gettext;git;kernel-devel;make;pciutils;virt-what;wget
+dependencies=autoconf;automake;gcc;gettext;git;make;pciutils;virt-what;wget
 repoRequires=cki_lib

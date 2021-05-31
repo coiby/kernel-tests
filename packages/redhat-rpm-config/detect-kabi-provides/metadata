@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=redhat-rpm-config;rpm-build;kernel-devel
+dependencies=redhat-rpm-config;rpm-build
 repoRequires=cki_lib
