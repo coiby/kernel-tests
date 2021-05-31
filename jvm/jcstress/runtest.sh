@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #--------------------------------------------------------------------------------
-# Copyright (c) 2019 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2019 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -33,14 +33,12 @@ rlJournalStart
               -DarchetypeArtifactId=jcstress-java-test-archetype  -DgroupId=org.sample \
               -DartifactId=test  -Dversion=1.0"
     if [ $? -ne 0 ]; then
-        rstrnt-abort -t recipe
-        exit 0
+        cki_abort_task
     fi
     rlRun -l "cd test"
     rlRun -l "mvn clean install"
     if [ $? -ne 0 ]; then
-        rstrnt-abort -t recipe
-        exit 0
+        cki_abort_task
     fi
     rlRun -l "java -jar target/jcstress.jar"
   rlPhaseEnd

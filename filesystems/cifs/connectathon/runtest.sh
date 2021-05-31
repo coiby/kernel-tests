@@ -96,8 +96,7 @@ function Make()
       outputecho "Failed to clone cthon04"
       rstrnt-report-result $TEST WARN
       # Abort the task
-      rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-      exit 0
+      cki_abort_task "Failed to clone cthon04"
    fi
    make clean || ( status=$? && return $status )
 
@@ -172,8 +171,8 @@ outputecho "**** Start CIFS ${TESTNAME} test *******"
 touch /mnt/testarea/printcap
 sed -i -e '/^Browsing/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
 sed -i -e '/^DefaultShared/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-echo "Browsing No" >> /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-echo "DefaultShared No" >> /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
+echo "Browsing No" | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
+echo "DefaultShared No" | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
 restorecon /etc/cups/cupsd.conf
 
 (rlServiceStop cups && rlServiceStart cups) | tee -a ${OUTPUTFILE}
@@ -188,11 +187,9 @@ CURRENT_DIR=`pwd`
 outputecho "Building connectathon test suite"
 Make
 if [ $result = "FAIL" ] ; then
-   outputecho "Failed to compile cthon04"
    rstrnt-report-result $TEST WARN
    # Abort the task
-   rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-   exit 0
+   cki_abort_task "Failed to compile cthon04"
 fi
 
 # Randomly, we are getting the following AVC denial with RHEL 6.9:

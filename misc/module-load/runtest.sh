@@ -237,8 +237,7 @@ RC=$?
 if [ $RC -ne 0 ] ; then
         echo "*** There is a problem with lsmod, no need to continue further ***" | tee -a $OUTPUTFILE
         rstrnt-report-result $TEST WARN
-        rstrnt-abort -t recipe
-        exit 0
+        cki_abort_task "There is a problem with lsmod"
 fi
 
 echo "** Doing $ITERATIONS load/unload cycles of each module in the file $MODLIST **" | tee -a $OUTPUTFILE

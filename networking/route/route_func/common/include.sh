@@ -109,7 +109,8 @@ test_warn()
 	echo -e "\n:: [  WARN  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	if [ $JOBID ]; then
 		rstrnt-report-result "${TEST}/$1" "WARN"
-		rstrnt-abort -t recipe
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	else
 		echo -e "\n:::::::::::::::::"
 		echo -e ":: [  ${YEL}WARN${RES}  ] :: Test '"${TEST}/$1"'"
@@ -318,7 +319,7 @@ else
 
 	# work around bz883695
 	lsmod | grep mlx4_en || modprobe mlx4_en
-	# work around bz1642795 
+	# work around bz1642795
 	lsmod | grep sctp || modprobe sctp
 
 	[ -d $networkLib/network-scripts.bak ] || \

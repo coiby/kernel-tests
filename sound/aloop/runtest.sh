@@ -45,8 +45,7 @@ function aloop() {
   rlPhaseStartTest $1
     arecord -D hw:Loopback,1 $2 -f dat -t raw -d 12 a.raw &
     if [ $? -ne 0 ]; then
-      rstrnt-abort -t recipe
-      exit 0
+      cki_abort_task "Failed to start recording"
     fi
     rlLog "Recording started"
     PID=$!
