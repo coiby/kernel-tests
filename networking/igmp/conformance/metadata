@@ -9,5 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=bzip2;gcc;git;patch;rsync;tcpdump;wget
-softDdependencies=kernel-modules-extra
 repoRequires=cki_lib

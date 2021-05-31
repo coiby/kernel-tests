@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=pciutils
-softDependencies=kernel-modules-extra;python2-lxml;python3-lxml
+softDependencies=python2-lxml;python3-lxml
 repoRequires=cki_lib

@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=grep;coreutils;rpm;sed;findutils;bash;cpio;file;gawk;binutils
-softDependencies=kernel-modules-extra;yum-utils
+softDependencies=yum-utils
 repoRequires=cki_lib;legacy/shared

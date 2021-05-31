@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=wget;git;time;patch;bzip2;autoconf;glib2-devel;make;gettext;automake;gcc;libtool;bison;flex;libcap-devel;zlib-devel;beakerlib
-softDependencies=dmidecode;rpmdevtools;kernel-headers;libaio-devel;libattr-devel;libbsd-devel;libgcrypt-devel;libsctp-devel;keyutils-libs;beakerlib-redhat
+softDependencies=dmidecode;rpmdevtools;libaio-devel;libattr-devel;libbsd-devel;libgcrypt-devel;libsctp-devel;keyutils-libs;beakerlib-redhat
 repoRequires=cki_lib
