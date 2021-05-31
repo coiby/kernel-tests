@@ -37,11 +37,11 @@ function VerboseCupsLog()
    rstrnt-backup /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
    sed -i -e 's,^LogLevel.*,LogLevel debug2,' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
    sed -i -e '/^MaxLogSize/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-   echo MaxLogSize 0 >> /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
+   echo MaxLogSize 0 | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
    sed -i -e '/^Browsing/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
    sed -i -e '/^DefaultShared/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-   echo "Browsing No" >> /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-   echo "DefaultShared No" >> /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
+   echo "Browsing No" | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
+   echo "DefaultShared No" | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
    # sed will create temporary file in /etc/cups and rename it to cupds.conf
    # so file ends up with wrong label
    restorecon /etc/cups/cupsd.conf

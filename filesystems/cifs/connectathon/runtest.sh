@@ -171,8 +171,8 @@ outputecho "**** Start CIFS ${TESTNAME} test *******"
 touch /mnt/testarea/printcap
 sed -i -e '/^Browsing/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
 sed -i -e '/^DefaultShared/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-echo "Browsing No" >> /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-echo "DefaultShared No" >> /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
+echo "Browsing No" | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
+echo "DefaultShared No" | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
 restorecon /etc/cups/cupsd.conf
 
 (rlServiceStop cups && rlServiceStart cups) | tee -a ${OUTPUTFILE}
