@@ -9,4 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib
-dependencies=python3;kernel-modules-internal
+dependencies=python3
