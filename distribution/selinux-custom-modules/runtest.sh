@@ -8,11 +8,6 @@ TEST="/kernel/distribution/selinux-custom-modules"
 
 rlJournalStart
 
-  rlPhaseStartTest "Modify to generate audit records"
-    rlRun "echo '-w /etc/shadow -p w' >> /etc/audit/rules.d/audit.rules" 0 "Adding extra rule task"
-    rlServiceStop auditd && rlServiceStart auditd
-  rlPhaseEnd
-
   rlPhaseStartTest
     # https://gitlab.com/cki-project/kernel-tests/-/issues/528
     # Bug 1932849 - avc: denied { module_request } kmod="net-pf-10"
