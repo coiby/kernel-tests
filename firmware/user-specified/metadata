@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=iasl;wget;acpidump;pciutils;dmidecode;sendmail;pcre-devel;patch;autoconf;json-c-devel;git;elfutils-libelf-devel;kernel-devel;glib2-devel;make;gettext;automake;gcc;libtool;bison;flex
+dependencies=iasl;wget;acpidump;pciutils;dmidecode;sendmail;pcre-devel;patch;autoconf;json-c-devel;git;elfutils-libelf-devel;glib2-devel;make;gettext;automake;gcc;libtool;bison;flex
 softDependencies=beakerlib-redhat
 repoRequires=firmware/include;cki_lib

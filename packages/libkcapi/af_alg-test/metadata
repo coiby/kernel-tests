@@ -8,4 +8,4 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=git;coreutils;perl;openssl;gcc;kernel-headers;autoconf;automake;libtool
+dependencies=git;coreutils;perl;openssl;gcc;autoconf;automake;libtool

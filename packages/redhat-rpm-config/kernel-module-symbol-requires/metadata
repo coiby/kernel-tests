@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=redhat-rpm-config;rpm-build;kernel-devel;kernel-abi-whitelists;gcc;kernel-devel;elfutils-libelf-devel
+dependencies=redhat-rpm-config;rpm-build;kernel-abi-whitelists;gcc;elfutils-libelf-devel
 softDependencies=kernel-rpm-macros
 repoRequires=cki_lib

@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=wget;git;time;patch;bzip2;autoconf;glib2-devel;make;gettext;automake;gcc;libtool;bison;flex
-softDependencies=amtu;kernel-headers;kernel;kernel-devel;auditd;audit-tools;audit-libs;libao-devel;libgcrypt-devel;audit-libs-devel
+softDependencies=amtu;auditd;audit-tools;audit-libs;libao-devel;libgcrypt-devel;audit-libs-devel
 repoRequires=cki_lib

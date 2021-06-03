@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=make;gcc;glibc-kernheaders;glibc-static;kernel-headers;ncurses-devel
+dependencies=make;gcc;glibc-kernheaders;glibc-static;ncurses-devel
 softDpendencies=xorg-x11-devel;xorg-x11-server-devel
 repoRequires=cki_lib
