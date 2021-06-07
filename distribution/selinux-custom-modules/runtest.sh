@@ -82,6 +82,11 @@ rlJournalStart
           rlRun "make -f /usr/share/selinux/devel/Makefile modprobe-mod.pp" 0 "Building modprobe SELinux module"
           rules="${rules} modprobe-mod"
       fi
+      # Fedora34 BZ#1967590 - avc:  denied  { search } for  pid=13640 comm="mdadm"
+      if seinfo --type | grep dma_device_t ; then
+          rlRun "make -f /usr/share/selinux/devel/Makefile mdadm-dma-device.pp" 0 "Building mdadm-dma-device SELinux module"
+          rules="${rules} mdadm-dma-device"
+      fi
       for rule in $rules; do
            rlRun "semodule -i ${rule}.pp"  0 "Installing $rule SELinux modules"
       done

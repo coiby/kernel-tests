@@ -1,0 +1,11 @@
+module mdadm-dma-device 1.0;
+
+require {
+	type mdadm_t;
+	type dma_device_t;
+	class dir search;
+}
+
+#============= mdadm_t ==============
+allow mdadm_t dma_device_t:dir search;
+
