@@ -47,6 +47,10 @@ rlJournalStart
       for rule in $rules; do
            rlRun "semodule -i ${rule}.pp"  0 "Installing $rule SELinux modules"
       done
+      echo "(allow domain dma_device_t (dir (getattr search open read)))" > bz1969323.cil
+      rlRun "semodule -i bz1969323.cil" 0
+      echo "(allow domain init_t (dir (getattr search open read)))" > bz1965412.cil
+      rlRun "semodule -i bz1965412.cil" 0
     elif rlIsFedora; then
       # Bug 1910373 - selinux avc denials for rhsmcertd-worke and rpcbind
       rlRun "make -f /usr/share/selinux/devel/Makefile rpcbind-mod.pp" 0 "Building rpcbind SELinux module"
