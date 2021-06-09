@@ -94,6 +94,8 @@ rlJournalStart
           echo "(allow domain dma_device_t (dir (getattr search open read)))" > bz1965743.cil
           rlRun "semodule -i bz1965743.cil" 0
       fi
+      echo "(allow systemd_modules_load_t systemd_modules_load_t (lockdown (confidentiality)))" > bz1969985.cil
+      rlRun "semodule -i bz1969985.cil" 0
     elif ! grep "ipv6.disable=1" /proc/cmdline ; then
       rlLog "No custom SELinux modules required, skipping"
       rstrnt-report-result $TEST SKIP
