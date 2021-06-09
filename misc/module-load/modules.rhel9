@@ -1,6 +1,5 @@
 8021q
 af_key
-af_packet_diag
 ah4
 ah6
 ansi_cprng
@@ -8,8 +7,6 @@ anubis
 apple_bl
 arc4
 atm
-authenc
-authencesn
 auth_rpcgss
 binfmt_misc
 # RHBZ 1903802 - kernel panic from unloading nfsv4 and nfs modules (and blocklayoutdriver too)
@@ -28,14 +25,12 @@ can-gw
 can-raw
 cast5_generic
 cast6_generic
-ccm
 cdc-acm
 ceph
 ch
 # fails to load: chacha20_generic
 chacha20poly1305
 cifs
-cmac
 cmtp
 cramfs
 crc32_generic
@@ -49,7 +44,6 @@ dm-mod
 dm-raid
 dm-snapshot
 dummy
-ecdh_generic
 echainiv
 em_cmp
 em_ipset
@@ -78,7 +72,6 @@ ib_ipoib
 ieee802154_6lowpan
 ieee802154_socket
 ifb
-inet_diag
 ipcomp
 ipcomp6
 ip_gre
@@ -109,7 +102,6 @@ mpt3sas
 msdos
 mtd
 nd_pmem
-netlink_diag
 nf_conntrack_amanda
 nf_conntrack_ftp
 nf_conntrack_h323
@@ -213,7 +205,6 @@ raid0
 raid1
 raid10
 raid456
-raw_diag
 rc-core
 rdma_cm
 rfcomm
@@ -231,7 +222,6 @@ seed
 ser_gigaset
 serpent_generic
 sg
-sha3_generic
 sha512-ssse3
 sit
 snd
@@ -246,7 +236,6 @@ squashfs
 sr_mod
 st
 sunrpc
-tcp_diag
 tea
 team
 team_mode_activebackup
@@ -258,10 +247,8 @@ tgr192
 tun
 twofish_generic
 udf
-udp_diag
 uhid
 uinput
-unix_diag
 usbvision
 veth
 vfat
@@ -338,7 +325,6 @@ xt_RATEEST
 xt_realm
 xt_recent
 xt_REDIRECT
-xts
 xt_sctp
 xt_SECMARK
 xt_set
