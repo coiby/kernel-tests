@@ -93,6 +93,8 @@ rlJournalStart
       if seinfo --type | grep dma_device_t ; then
           echo "(allow domain dma_device_t (dir (getattr search open read)))" > bz1965743.cil
           rlRun "semodule -i bz1965743.cil" 0
+          echo "(allow domain dma_device_dir_t (dir (getattr search open read)))" > bz1971517.cil
+          rlRun "semodule -i bz1971517.cil" 0
       fi
       echo "(allow systemd_modules_load_t systemd_modules_load_t (lockdown (confidentiality)))" > bz1969985.cil
       rlRun "semodule -i bz1969985.cil" 0
