@@ -47,28 +47,6 @@ function get_test_reports_dir
     echo "$test_root/reports"
 }
 
-function clean_loop_devices
-{
-    cki_debug
-
-    typeset f_out=$TMPDIR/$NAME.$FUNCNAME.out.$$
-    losetup -l | awk '{print $1":"$6}' > $f_out
-
-    # Detach all associated loop devices
-    losetup -D
-
-    # Remove those back files once created to release disk space
-    typeset back_file=""
-    while read line; do
-        [[ $line == *"NAME"*"BACK-FILE"* ]] && continue
-        back_file=$(echo $line | awk -F':' '{print $2}')
-        [[ -n $back_file ]] && rm -f $back_file
-    done < $f_out
-
-    rm -f $f_out
-    return 0
-}
-
 DT_TARBALL="https://github.com/RobinTMiller/dt/archive/master.zip"
 function install_dt
 {
@@ -145,75 +123,13 @@ function check_mntpoint_quota
     (( n > quota )) && return 0 || return 1
 }
 
-function loop_device_setup
-{
-    #
-    # XXX: To make sure the command below could be successful,
-    #          o dmtest run --suite thin-provisioning -t BasicTests
-    #      we have to create two loop devices, and the size of them is
-    #      11000 MiB
-    #
-    cki_debug
-
-    #
-    # XXX: Currently the minimal available size required by device mapper
-    #      test suite is 22G, which looks bad as many systems in beaker
-    #      does not match it
-    #
-    typeset quota="22000M"
-    typeset mntpt=""
-    #
-    # XXX: env TEST_PARAM_DMTEST_MNT defined by user which should have free
-    #      disk more than 22G
-    #
-    for mntpoint in $TEST_PARAM_DMTEST_MNT '/' '/home'; do
-        check_mntpoint_quota $mntpoint $quota
-        (( $? == 0 )) && mntpt=$mntpoint && break
-    done
-    if [[ -z $mntpt ]]; then
-        typeset reason="fail to find mountpoint > $quota"
-        cki_set_reason $CKI_UNINITIATED $reason
-        return 1
-    fi
-
-    [[ $mntpt == '/' ]] && mntpt="/opt"
-
-    # Clean all loop devices on SUT
-    typeset tag="DMTEST0123456789AB.loop"
-    clean_loop_devices
-    rm -f $mntpt/$tag.*
-
-    # Creat two loop devices
-    for (( i = 1; i <= 2; i++ )); do
-        typeset back_file=$mntpt/$tag.$i
-        typeset dev_name=/dev/loop$i
-        cki_run_cmd_pos \
-            "dd if=/dev/urandom of=$back_file bs=1M count=11000" || \
-            return 1
-        cki_run_cmd_pos "losetup $dev_name $back_file" || \
-            return 1
-        cki_run_cmd_neu "sleep 1"
-    done
-
-    return 0
-}
-
 function ts_config_setup
 {
     #
     # XXX: Get metadata_dev and data_dev on SUT(system under test)
     #
-    # The config file consists of one or more profiles (these are selected
-    # with the --profile command line switch). Within each profile you have
-    # to specify a device which is used to store thin provisioning metadata
-    # and cache data on it. Typically this should be a fast device such as
-    # an SSD (or a logical volume allocated on an SSD of course). The other
-    # device should be a slower data device.
-    #
-    # As you can see I normally use several profiles, depending on whether
-    # I'm developing new code and want the tests to run quickly (:ssd),
-    # testing a realistic set up (:mix), or just searching for those race
-    # conditions that only appear when using slower devices (:spindle).
+    # It assumes the system is provisioned with 2 partitions,
+    # one partition for the metadata and another for the data.
     #
     # A metadata dev of 1G, and data dev of 4G is sufficient.
     # Some poorly written tests use all of the data dev, no matter how big
@@ -223,26 +139,38 @@ function ts_config_setup
 
     typeset f_conf=${1?"*** config file ***"}
 
-    loop_device_setup || return $?
+    mnt_metadata=/mnt/dmtest/metadata
+    mnt_data=/mnt/dmtest/data
+
+    if ! df | grep ${mnt_metadata} ; then
+        rlFail "Couldn't find metadata device"
+        return 1
+    fi
+    if ! df | grep ${mnt_data} ; then
+        rlFail "Couldn't find data device"
+        return 1
+    fi
+
+    metadata_device=$(df ${mnt_metadata} | tail -n 1 | awk '{print$1}')
+    data_device=$(df ${mnt_data} | tail -n 1 | awk '{print$1}')
+
+    cki_run_cmd_pos "umount ${mnt_metadata} ${mnt_data}"
+    cki_run_cmd_pos "lsblk"
+
+    cki_log "Metadata device: ${metadata_device}"
+    cki_log "Data device ${data_device}"
 
     cat > $f_conf << EOF
-profile :ssd do
-  metadata_dev '/dev/loop1'
-  data_dev '/dev/loop2'
+profile :cki do
+  metadata_dev '${metadata_device}'
+  data_dev '${data_device}'
 end
 
-profile :spindle do
-  metadata_dev '/dev/loop1'
-  data_dev '/dev/loop2'
-end
-
-profile :mix do
-  metadata_dev '/dev/loop1'
-  data_dev '/dev/loop2'
-end
-
-default_profile :ssd
+default_profile :cki
 EOF
+
+    cki_run_cmd_pos "cat $f_conf"
+
     return 0
 }
 
