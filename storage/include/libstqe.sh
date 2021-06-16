@@ -44,9 +44,12 @@ function stqe_init_fwroot
 
     typeset python="python3"
     typeset pkg_mgr=$(dnf > /dev/null 2>&1 && echo dnf || echo yum)
-    typeset python_pkg="python36"
-    cki_run_cmd_pos "$pkg_mgr install -y $python_pkg" || \
-        cki_abort_task "fail to install $python_pkg"
+    if ! $python -V > /dev/null 2>&1; then
+        cki_run_cmd_neu "$pkg_mgr install -y python3" || \
+            cki_run_cmd_neu "$pkg_mgr install -y python36"
+        cki_run_cmd_pos "$python -V > /dev/null 2>&1" || \
+            cki_abort_task "FAIL: Could not install python3!"
+    fi
     if [[ $fwbranch != "master" ]]; then
         if [[ -n $STQE_STABLE_VERSION ]]; then
             cki_run_cmd_pos "git checkout $STQE_STABLE_VERSION" || \
