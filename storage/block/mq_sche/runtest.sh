@@ -53,7 +53,7 @@ function run_test()
 {
 	echo 4 > /proc/sys/vm/drop_caches
 	rmmod scsi_debug > /dev/null 2>&1
-	rlRun "modprobe scsi_debug virtual_gb=128 delay=0"
+	rlRun "modprobe scsi_debug virtual_gb=128"
 	sleep 4
 	multipath -F > /dev/null 2>&1
 	sleep 3
