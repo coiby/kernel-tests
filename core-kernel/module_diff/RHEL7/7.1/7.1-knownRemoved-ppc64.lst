@@ -1,0 +1,5 @@
+snd-cs5530.ko
+snd-cs5535audio.ko
+snd-page-alloc.ko
+snd-sb16-dsp.ko
+snd-sb-common.ko

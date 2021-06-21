@@ -1,0 +1,3 @@
+drm_usb.ko
+of_i2c.ko
+tpm_bios.ko

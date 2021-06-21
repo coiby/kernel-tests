@@ -1,0 +1,11 @@
+[General]
+name=module_diff
+owner=zhijwang@redhat.com	
+description=test wrapper for kernel module_diff
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib
