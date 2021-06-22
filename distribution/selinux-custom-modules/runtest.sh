@@ -93,6 +93,9 @@ rlJournalStart
       if seinfo --type | grep dma_device_t ; then
           echo "(allow domain dma_device_t (dir (getattr search open read)))" > bz1965743.cil
           rlRun "semodule -i bz1965743.cil" 0
+      fi
+      # dma_device_dir_t was added in attempt to fix bz1965743, but this fix has since been reverted on Rawhide, but still present on F34
+      if seinfo --type | grep dma_device_dir_t ; then
           echo "(allow domain dma_device_dir_t (dir (getattr search open read)))" > bz1971517.cil
           rlRun "semodule -i bz1971517.cil" 0
       fi
