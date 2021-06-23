@@ -99,6 +99,10 @@ rlJournalStart
           echo "(allow domain dma_device_dir_t (dir (getattr search open read)))" > bz1971517.cil
           rlRun "semodule -i bz1971517.cil" 0
       fi
+      if seinfo --type | grep udev_var_run_t && seinfo --type | grep systemd_gpt_generator_t ; then
+          echo "(allow systemd_gpt_generator_t udev_var_run_t (file (getattr open read ioctl lock)))" > bz1975125.cil
+          rlRun "semodule -i bz1975125.cil" 0
+      fi
       echo "(allow systemd_modules_load_t systemd_modules_load_t (lockdown (confidentiality)))" > bz1969985.cil
       rlRun "semodule -i bz1969985.cil" 0
     elif ! grep "ipv6.disable=1" /proc/cmdline ; then
