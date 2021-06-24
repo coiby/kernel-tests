@@ -1,4 +1,12 @@
 #!/bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright Red Hat, Inc 
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later  
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 # Include beaker environment
 . ../../../cki_lib/libcki.sh || exit 1
 
