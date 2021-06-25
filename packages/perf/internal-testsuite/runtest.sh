@@ -195,7 +195,7 @@ rlJournalStart
 				fi
 
 				# restore original sample rate to ensure the tests dependent on it pass
-				# more info: https://bugzilla.redhat.com/show_bug.cgi?id=1532741#c18
+				# more info: bz1532741#c18
 				sysctl kernel.perf_event_max_sample_rate=$ORIGINAL_SAMPLE_RATE
 			fi
 		rlPhaseEnd
