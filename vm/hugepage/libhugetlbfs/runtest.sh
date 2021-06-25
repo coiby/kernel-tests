@@ -128,14 +128,14 @@ if uname -r | grep -q s390x; then
 	KNOWNISSUE_64="$KNOWNISSUE_32 -e \"zero_filesize_segment (1024K: 64):\""
 fi
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=1628794#c8
+# more info: bz1628794#c8
 if egrep -q "Fedora|.*release [89]" /etc/redhat-release; then
 	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"brk_near_huge\""
 	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"brk_near_huge\""
 fi
 
 if grep -q "release [9].*" /etc/redhat-release; then
-	#https://bugzilla.redhat.com/show_bug.cgi?id=1939792
+	#bz1939792
 	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"heapshrink.*Heap did not shrink\""
 	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"heapshrink.*Heap did not shrink\""
 fi
