@@ -20,6 +20,8 @@
 #
 # -----------------------------------------------------------------------------
 
+BREWROOT_KERN=http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel
+
 # -----------------------------------------------------------------------------
 # PREP: Initialize globals provided they haven't been already -----------------
 # -----------------------------------------------------------------------------
@@ -173,10 +175,33 @@ function rpm_install()
         return 0
 }
 
-function rpm_extract()
+function rpm_extract_latest()
 {
         yumdownloader --disablerepo='*' --enablerepo=rhel-latest \
                       --downloaddir=$RPM_TMPDIR "${RPM_EXTRACT[@]}"
+	_rpm_extract
+}
+
+function rpm_extract()
+{
+	local karch="$(uname -i)"
+	local kver="$(uname -r | cut -f1 -d'-')"
+	local krel="$(uname -r | grep -Po "\-\K[^.]+\.el[^.]+")"
+
+	for pkg in "${RPM_EXTRACT[@]}"
+	do
+		if ! yumdownloader -q -y --downloaddir=$RPM_TMPDIR $pkg-$kver-$krel
+		then
+			local filename="$pkg-$kver-$krel.$karch.rpm"
+			curl -q $BREWROOT_KERN/$kver/$krel/$karch/$filename > $RPM_TMPDIR/$filename
+		fi
+	done
+
+	_rpm_extract
+}
+
+function _rpm_extract()
+{
 
         if test $? -gt 0
         then
@@ -186,6 +211,17 @@ function rpm_extract()
         RPM_EXTRACT=()
 
         local oldcwd="$(pwd)"
+
+	local IFS=$'\n'
+	for rpm_file in $(find $RPM_TMPDIR -maxdepth 1 -mindepth 1 -name "*.rpm")
+	do
+		if ! rpm -qi $rpm_file &> /dev/null
+		then
+			cat >&2 <<-EOF
+			ERROR: $rpm_file not a valid RPM file. This indicates a test failure.
+			EOF
+		fi
+	done
 
         find $RPM_TMPDIR -maxdepth 1 -mindepth 1 -name "*.rpm" \
         | xargs -I RPM bash -c "
