@@ -41,6 +41,12 @@ Crash()
         # This is to make both kexec_load() and kexec_file_load() are tested
         # no matter what default option is.
         AppendSysconfig KEXEC_ARGS remove "-s"
+
+        # This is for debugging purpose in case kdump kernel got OOM on Fedora
+        if $IS_FC;
+            then AppendSysconfig KDUMP_COMMANDLINE_APPEND add "rd.memdebug=3"
+        fi
+
         RestartKdump
 
         ReportSystemInfo
