@@ -40,6 +40,12 @@ Crash()
         # of kexec_load(). kexec_file_load() will verify kernel key only if
         # it's in lockdown or key forcing mode
         AppendSysconfig KEXEC_ARGS add "-s"
+
+        # This is for debugging purpose in case kdump kernel got OOM on Fedora
+        if $IS_FC;
+            then AppendSysconfig KDUMP_COMMANDLINE_APPEND add "rd.memdebug=3"
+        fi
+
         RestartKdump
 
         ReportSystemInfo
