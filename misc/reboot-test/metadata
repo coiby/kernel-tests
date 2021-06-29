@@ -1,0 +1,11 @@
+[General]
+name=misc/reboot-test
+owner=Bruno Goncalves <bgoncalv@redhat.com>
+description=Basic reboot test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib
