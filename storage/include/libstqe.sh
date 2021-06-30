@@ -20,8 +20,8 @@
 source $(dirname $(readlink -f $BASH_SOURCE))/../../cki_lib/libcki.sh
 
 STQE_GIT="https://gitlab.com/rh-kernel-stqe/python-stqe.git"
-STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-"stable"}
-LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-"0.3.0"}
+STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-"0.1.4"}
+LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-"0.3.2"}
 
 function stqe_get_fwroot
 {
