@@ -17,8 +17,12 @@
 # Boston, MA 02110-1301, USA.
 #
 
+echo -n "DEBUG frequency before cpupower runs: "
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
 cpupower_out="$(cpupower -c 0 frequency-info)"
 cpupower_out_n="$(cpupower -c 0 frequency-info -n)"
+echo -n "DEBUG frequency after cpupower runs: "
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
 
 low_hw_limit_str="$(echo "$cpupower_out" | grep 'hardware limits' | sed 's/.*: \([0-9.]* *[kMG]Hz \).*/\1/')"
 hi_hw_limit_str="$(echo "$cpupower_out" | grep 'hardware limits' | sed 's/.*: .*Hz.*- \([0-9.]* *[kMG]Hz\).*/\1/')"
