@@ -58,6 +58,8 @@ function startup
 
     cki_run_cmd_neu "uname -srvm"
     cki_run_cmd_neu "cpupower -c 0 frequency-info"
+    cki_run_cmd_neu "dmesg | grep intel_pstate"
+    cki_run_cmd_neu 'for a in /sys/devices/system/cpu/intel_pstate/*; do echo "$a"; cat "$a"; done'
 
     if [[ ! -d $TMPDIR ]]; then
         cki_run_cmd_pos "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
