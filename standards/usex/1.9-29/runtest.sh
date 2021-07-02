@@ -1,4 +1,11 @@
 #!/bin/sh
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright Red Hat, Inc
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TEST="standards/usex/1.9-29"
 
