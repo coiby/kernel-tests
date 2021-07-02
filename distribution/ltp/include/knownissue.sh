@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Description:
-#   See: https://wiki.test.redhat.com/Kernel/LTPKnownIssue
-#        https://url.corp.redhat.com/ltp-overview
-#
 # Knownissue classification:
 #
 #   fatal: means the issue/bz caused by this testcase will block(system
