@@ -119,6 +119,10 @@ function knownissue_filter()
 {
 	# skip OOM tests on large boxes since it takes too long
 	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 8 ] && tskip "oom0.*" fatal
+	# msgget/shmget03 failed unexpectedly: ENOSPC (28)
+	# Issue: https://github.com/linux-test-project/ltp/issues/842
+	tskip "msgget03" unfix
+	tskip "shmget03" unfix
 	# copy_file_range02 is a new unstable test case and changes too frequently
 	tskip "copy_file_range02" unfix
 	# Issue: https://github.com/linux-test-project/ltp/issues/799
@@ -174,7 +178,6 @@ function knownissue_filter()
                 # Bug 1734286 - mm: mempolicy: make mbind() return -EIO when MPOL_MF_STRICT is specified
                 osver_in_range "800" "802" && tskip "mbind02" unfix
         fi
-
 }
 
 function tcase_exclude()
