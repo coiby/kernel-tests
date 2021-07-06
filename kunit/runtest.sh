@@ -32,7 +32,8 @@ process_results(){
 	sed -i '/^S/d' "$1" #remove all empty lines
 	sed -i 's/^[ \t]*//' "$1" #remove all leading whitespace
 	sed -i '/^#/d' "$1" #remove comments
-	sed -i '$d' "$1"
+	sed -i '$d' "$1" #remove last line.
+	sed -i '/^\(ok\|not ok\|1..\)/!d' "$1" #removeall but 1..N and ok/not ok
 	uniq "$1" > "$TMPFILE"  #remove dup
 
 	tappy "$TMPFILE" &> "$OUTFILE"
@@ -130,9 +131,9 @@ rlJournalStart
 	if [ -d "${TEST}" ]
 	then
 		test_name="$(basename "$TEST")"
-		process_results "${TEST}/results"
-		result=$?
 		cp "${TEST}/results" "${TEST}/${test_name}.log"
+		process_results "${TEST}/results"
+		result=$?	
 		if [ $result -eq 0 ]
 		then
 			rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" PASS 0
