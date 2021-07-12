@@ -44,7 +44,7 @@ Crash()
 
         # This is for debugging purpose in case kdump kernel got OOM on Fedora
         if $IS_FC;
-            then AppendSysconfig KDUMP_COMMANDLINE_APPEND add "rd.memdebug=3"
+            then AppendSysconfig KDUMP_COMMANDLINE_APPEND add "rd.memdebug=1"
         fi
 
         RestartKdump
