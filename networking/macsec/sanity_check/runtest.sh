@@ -328,10 +328,16 @@ rlJournalStart
 
     # Workaround: Temporarily disable this case because system panicked due to
     #             bz1745880. For more, please refer to FASTMOVING-1155
-:<<!
+    
+    # bz1745880 is fixed, enable this case. add by Liu Fei at 2021-06-11
+
+Xversion=`cat /etc/os-release|grep VERSION_ID|awk -F= '{print $2}'|sed 's/\"//g' |awk -F "." '{print $1}'`
+Zversion=`cat /etc/os-release|grep VERSION_ID|awk -F= '{print $2}'|sed 's/\"//g' |awk -F "." '{print $2}'`
+if  [ "$Xversion" -eq 8 ] && [ "$Zversion" -eq 0 -o  "$Zversion" -eq 1 ] ;then
+                echo "skip test,cause bz1745880 is not fixed in rhel8.0 and rhel8.1"
+else
     rlPhaseStartTest "Setup masec between 2 netns, do ping/netperf test"
         netid=100
-#        brctl addbr br0
         ip link add br0 type bridge
         ip link set br0 up
 
@@ -339,8 +345,6 @@ rlJournalStart
         ip link add veth2 type veth peer name veth3
         ip link set veth1 up
         ip link set veth3 up
-       # brctl addif br0 veth1
-       # brctl addif br0 veth3
         ip link set veth1 master br0
         ip link set veth3 master br0
 
@@ -358,7 +362,6 @@ rlJournalStart
         ip netns exec ns1 ip addr add 2001:db8:${netid}::21/64 dev veth2
         ip netns exec ns1 netserver
 
-       # brctl show br0
         bridge link show
         ip netns exec ns0 ifconfig -a
         ip netns exec ns1 ifconfig -a
@@ -401,17 +404,14 @@ rlJournalStart
         ip netns del ns0
         ip netns del ns1
 
-        #brctl delif br0 veth1
-       # brctl delif br0 veth3
         ip link set veth1 nomaster
         ip link set veth3 nomaster
         ip link set br0 down
-       # brctl delbr br0
         ip link del br0
         ip link del veth0
         ip link del veth2
     rlPhaseEnd
-!
+fi
 
     rlPhaseStartTest "fault injection"
         rlRun "CMD_ARRAY=(
