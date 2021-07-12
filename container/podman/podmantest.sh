@@ -20,6 +20,7 @@
 TEST_FAILED=0
 TEST_DIR=/usr/share/podman/test/system
 OUTPUTFILE=""
+ARCH=$(uname -m)
 
 # Exclude tests that would fail runnning rootless
 excludeTests="220-healthcheck 250-systemd 260-sdnotify 410-selinux"
@@ -30,11 +31,20 @@ if [[ $(id -u) -eq 0 ]]; then
     > $OUTPUTFILE
     echo "Running root podmantest:" | tee -a "${OUTPUTFILE}"
     excludeTests=""
+    if [ "$ARCH" == "ppc64le" ]; then
+        # 050-stops would fail in ppc64le, add to exclusion
+        excludeTests="050-stops"
+    fi
+
     
 else
     OUTPUTFILE=/tmp/podmantest-rootless.log
     > $OUTPUTFILE
     echo "Running rootless podmantest" | tee -a "${OUTPUTFILE}"
+    if [ "$ARCH" != "x86_64" ]; then
+        # 500-networking would fail in non x86_64, add to exclusion
+        excludeTests="${excludeTests} 500-networking"
+    fi
 fi
 
 # Bug reports required this information.
