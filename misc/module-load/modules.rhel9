@@ -272,7 +272,6 @@ msdos
 mtd
 n_gsm
 n_hdlc
-nbd
 nd_blk
 nd_btt
 nd_pmem
