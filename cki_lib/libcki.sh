@@ -315,7 +315,8 @@ function cki_print_warning()
 # Args: Variable
 # Returns: 0 if the variable is truthy, 1 otherwise
 # (copied from gitlab.com/cki-project/cki-lib/cki_utils.sh)
-function cki_is_true {
+function cki_is_true()
+{
     if [[ "${1}" = [Tt]rue ]] ; then
         return 0
     else
@@ -323,3 +324,31 @@ function cki_is_true {
     fi
 }
 
+# Check the system under test is bare metal or not
+# XXX: It is mainly for the beaker lab, hence s390x system is not regared as
+#      bare metal on purpose
+function cki_is_baremetal()
+{
+    # system with shared resources
+    # any s390x system
+    uname -m | grep -q s390 && return 1
+
+    # any guest system, e.g. ppc64 guests
+    hostname | grep -q guest && return 1
+
+    # any ppc lpar
+    (uname -m | grep -q ppc) && (hostname | grep -q "\-lp") && return 1
+
+    if command -v virt-what; then
+        hv=$(virt-what)
+        [[ -z "$hv" ]] && return 1
+    fi
+
+    return 0
+}
+
+# Check the system under test is vm or not
+function cki_is_vm()
+{
+    cki_is_baremetal && return 1 || return 0
+}
