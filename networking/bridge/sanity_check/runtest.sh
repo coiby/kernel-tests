@@ -150,7 +150,10 @@ if (($rhel_version >= 7)); then
                         rlRun "bridge link show dev $IFACE | grep disabled"
                         rlRun "cat /sys/class/net/$BRIDGE/brif/$IFACE/state | grep 0"
                         rlRun "bridge link set dev $IFACE state 1"
+			sleep 1
+                        rlRun "bridge link show dev $IFACE"
                         rlRun "bridge link show dev $IFACE | grep listening"
+                        rlRun "cat /sys/class/net/$BRIDGE/brif/$IFACE/state "
                         rlRun "cat /sys/class/net/$BRIDGE/brif/$IFACE/state | grep 1"
                         rlRun "bridge link set dev $IFACE state 2"
                         rlRun "bridge link show dev $IFACE | grep learning"
