@@ -1,7 +1,7 @@
 [General]
-name=misc/amtu
-owner=Jan Stancek <jstancek@redhat.com>
-description=Abstract Machine Test Utility
+name=misc/module-load
+owner=Jeff Bastian <jbastian@redhat.com>
+description=Simple kernel sanity check that loads and unloads various kernel modules
 license=GPLv3
 confidential=no
 destructive=no
