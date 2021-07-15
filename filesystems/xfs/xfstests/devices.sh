@@ -317,7 +317,7 @@ EOF
 		xlog systemctl stop smb && xlog systemctl start smb
 		echoo "samba shares:"
 		testparm -s
-		TEST_DEV=//$HOSTNAME/test
+		TEST_DEV=//127.0.0.1/test
 		DEV_TYPE=cifs
 		;;
 	tmpfs)
@@ -544,7 +544,7 @@ EOF
 		xlog systemctl stop smb && xlog systemctl start smb
 		echoo "samba shares:"
 		testparm -s
-		SCRATCH_DEV=//$HOSTNAME/scratch
+		SCRATCH_DEV=//127.0.0.1/scratch
 		DEV_TYPE=cifs
 		;;
 	tmpfs)
