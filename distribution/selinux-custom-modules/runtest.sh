@@ -103,8 +103,13 @@ rlJournalStart
           echo "(allow systemd_gpt_generator_t udev_var_run_t (file (getattr open read ioctl lock)))" > bz1975125.cil
           rlRun "semodule -i bz1975125.cil" 0
       fi
+
       echo "(allow systemd_modules_load_t systemd_modules_load_t (lockdown (confidentiality)))" > bz1969985.cil
       rlRun "semodule -i bz1969985.cil" 0
+
+      echo "(allow systemd_coredump_t usermodehelper_t (file (write)))" > bz1982961.cil
+      rlRun "semodule -i bz1982961.cil" 0
+
     elif ! grep "ipv6.disable=1" /proc/cmdline ; then
       rlLog "No custom SELinux modules required, skipping"
       rstrnt-report-result $TEST SKIP
