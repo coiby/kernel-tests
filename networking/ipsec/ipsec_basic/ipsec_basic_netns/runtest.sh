@@ -92,7 +92,7 @@ data_tests(){
 	rm -f tcprecv
 	ipsec_stat tcp after
 	rlLog "***** udp ******"
-	for size in $msg_size 20000;do
+	for size in $msg_size 3000;do
 		ipsec_stat udp before
 		rlRun "$HB socat -u -$TEST_VER udp-l:$udpport open:udprecv,creat &"
 		rlRun "sleep 2"
@@ -165,12 +165,6 @@ perf_tests(){
 rlJournalStart
 	rlPhaseStartSetup
 		rlRun "netperf_install"
-		if cat /boot/config-`uname -r`| grep -v "^#" |grep CONFIG_DEBUG_KMEMLEAK; then
-			KMEMLEAK=${KMEMLEAK:-"enable"}
-		else
-			KMEMLEAK="disable"
-		fi
-		[ $KMEMLEAK == "enable" ] && rlRun "cat /sys/kernel/debug/kmemleak > kmemleak.before"
 		THRESHOLD=${THRESHOLD:-"10"}
 		SUB_PARAM=${SUB_PARAM:-"-p esp -e aes -m tunnel -s '10 65450'"}
 		rlRun "source $CDIR/ipsec-parameter-setting.sh $SUB_PARAM"
@@ -205,12 +199,6 @@ rlJournalStart
 	rlPhaseStartCleanup
 		rlRun "bash $NET_COMMON_ROOT/tools/netns_clean.sh"
 		rlFileSubmit $PERF_RESULTS
-		if [ $KMEMLEAK == "enable" ];then
-			rlRun "sleep 180" && rlRun "echo scan > /sys/kernel/debug/kmemleak"
-			rlRun "cat /sys/kernel/debug/kmemleak > kmemleak.after"
-			diff kmemleak.before kmemleak.after
-			rlRun "diff kmemleak.before kmemleak.after | grep -B5 -A16 backtrace" 1 "checking kmemleak"
-		fi
 	rlPhaseEnd
 
 	rlJournalPrintText
