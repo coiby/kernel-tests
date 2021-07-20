@@ -30,7 +30,7 @@ function ltp_test_build()
 	cat patchinc.log | tee -a $OUTPUTFILE
 
 	echo "============ Patch ltp-lite test suite. ============" | tee -a $OUTPUTFILE
-	bash ./is_baremetal.sh
+	cki_is_baremetal
 	#Patching, if non-baremetal
 	if [ $? -ne 0 ]; then
 		patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
