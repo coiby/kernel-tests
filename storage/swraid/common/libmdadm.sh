@@ -42,106 +42,162 @@ fi
 
 function MD_Create_RAID()
 {
-	RETURN_STR=''
-	MD_DEVS=''
-	local level=$1
-	local dev_list=$2
-	local raid_dev_num=$3
-	local bitmap=$4
-	local spar_dev_num=${5:-0}
-	local chunk=${6:-512}
-	local bitmap_chunksize=${7:-64M}
-	local dev_num=0
-	local raid_dev=''
-	local spar_dev=''
-	local md_raid=""
-	local mtdata=${8:-1.2}
-	local ret=0
-	# start to create
-	echo "INFO: Executing MD_Create_RAID() to create raid $level"
-	# check if the given disks are more the needed
-	for i in $dev_list; do
-		dev_num=$((dev_num+1))
-	done
-	if [ $dev_num -lt $(($raid_dev_num+$spar_dev_num)) ]; then
-		echo "FAIL: Required devices are more than given."
-	fi
-	# get free md device name, only scan /dev/md[0-15].
-	for i in `seq 1 30`; do
-		ls -l /dev/md$i > /dev/null 2>&1
-		if [ $? -ne 0 ]; then
-			md_raid=/dev/md$i
-			break
-		fi
-	done
-	# get raid disk list.
-	for i in `seq 1 $raid_dev_num`; do
-		tmp_dev=`echo $dev_list | cut -d " " -f $i`
-		raid_dev="$raid_dev /dev/$tmp_dev"
-	done
-	echo "INFO: Created md raid with these raid devices \"$raid_dev\"."
-	# get spare disk list.
-	if [ $spar_dev_num -ne 0 ]; then
-		for i in `seq $((raid_dev_num+1)) $((raid_dev_num+spar_dev_num))`; do
-			tmp_dev=`echo $dev_list | cut -d " " -f $i`
-			spar_dev="$spar_dev /dev/$tmp_dev"
-		done
-		echo "INFO: Created md raid with these spare disks \"$spar_dev\"."
-	fi
-	sleep 5
-	# create md raid
-	if [ $bitmap -eq 1 ]; then
-		if [ $spar_dev_num -ne 0 ]; then
-			rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
-			--raid-devices $raid_dev_num $raid_dev \
-			--spare-devices $spar_dev_num $spar_dev --chunk $chunk --bitmap=internal \
-			--bitmap-chunk=$bitmap_chunksize"
-		else
-			rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
-			--raid-devices $raid_dev_num $raid_dev --chunk $chunk --bitmap=internal \
-			--bitmap-chunk=$bitmap_chunksize"
-		fi
-	elif [ $bitmap -eq 2 ];then
-		touch /home/bitmap_md_$level
-	 	echo "INFO:bitmap backup in /home/bitmap_md_$level"
-		bitmap_dir="/home/bitmap_md_$level"
-		if [ $spar_dev_num -ne 0 ]; then
-			rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
-                        --raid-devices $raid_dev_num $raid_dev \
-                        --spare-devices $spar_dev_num $spar_dev --chunk $chunk --bitmap=$bitmap_dir \
-			--force  --bitmap-chunk=$bitmap_chunksize"
-                else
-			rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
-                        --raid-devices $raid_dev_num $raid_dev --chunk $chunk --bitmap=$bitmap_dir \
-			--force --bitmap-chunk=$bitmap_chunksize"
-                fi
-	else
-		if [ $spar_dev_num -ne 0 ]; then
-			rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
-			--raid-devices $raid_dev_num $raid_dev \
-			--spare-devices $spar_dev_num $spar_dev --chunk $chunk"
-		else
-			rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
-			--raid-devices $raid_dev_num $raid_dev --chunk $chunk"
-		fi
-	fi
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		rlLog "INFO:create $md_raid failed."
-		exit
-	fi
-	echo "create `date +%s` mdadm -CR $md_raid -l $level -e $mtdata -n $raid_dev_num \"$raid_dev\" \
-	      -x=$spar_dev_num $spar_dev bitmap=$bitmap --chunk $chunk --bitmap-chunk=$bitmap_chunksize"
-	echo "INFO:cat /proc/mdstat######################"
-	rlRun "cat /proc/mdstat"
-	rlRun "lsblk"
-	ls /dev/md* |egrep md[0-9]+
-	echo "INFO:mdadm -D $md_raid #########################"
-	rlRun "mdadm --detail $md_raid"
-	# define global variables
-	MD_DEVS="$raid_dev $spar_dev"
-	RETURN_STR="$md_raid"	
-	return $ret
+    RETURN_STR=''
+    MD_DEVS=''
+    local level=$1
+    local dev_list=$2
+    local raid_dev_num=$3
+    local bitmap=$4
+    local spar_dev_num=${5:-0}
+    local chunk=${6:-512}
+    local bitmap_chunksize=${7:-64M}
+    local dev_num=0
+    local raid_dev=''
+    local spar_dev=''
+    local md_raid=""
+    local mtdata=${8:-1.2}
+    local ret=0
+    # start to create
+    echo "INFO: Executing MD_Create_RAID() to create raid $level"
+    # check if the given disks are more the needed
+    for i in $dev_list; do
+        dev_num=$((dev_num+1))
+    done
+    if [ $dev_num -lt $(($raid_dev_num+$spar_dev_num)) ]; then
+        echo "FAIL: Required devices are more than given."
+    fi
+    # get free md device name, only scan /dev/md[0-15].
+    for i in `seq 1 30`; do
+        ls -l /dev/md$i > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            md_raid=/dev/md$i
+            break
+        fi
+    done
+    # get raid disk list.
+    for i in `seq 1 $raid_dev_num`; do
+        tmp_dev=`echo $dev_list | cut -d " " -f $i`
+        raid_dev="$raid_dev /dev/$tmp_dev"
+    done
+    echo "INFO: Created md raid with these raid devices \"$raid_dev\"."
+    # get spare disk list.
+    if [ $spar_dev_num -ne 0 ]; then
+        for i in `seq $((raid_dev_num+1)) $((raid_dev_num+spar_dev_num))`; do
+            tmp_dev=`echo $dev_list | cut -d " " -f $i`
+            spar_dev="$spar_dev /dev/$tmp_dev"
+        done
+        echo "INFO: Created md raid with these spare disks \"$spar_dev\"."
+    fi
+    sleep 5
+    if [ $level -eq 1 ]; then
+    # create md raid1 without --chunk 
+        if [ $bitmap -eq 1 ]; then
+            if [ $spar_dev_num -ne 0 ]; then
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev \
+                --spare-devices $spar_dev_num $spar_dev --bitmap=internal \
+                --bitmap-chunk=$bitmap_chunksize"
+            else
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev --bitmap=internal \
+                --bitmap-chunk=$bitmap_chunksize"
+            fi
+        elif [ $bitmap -eq 2 ];then
+            touch /home/bitmap_md_$level
+             echo "INFO:bitmap backup in /home/bitmap_md_$level"
+            bitmap_dir="/home/bitmap_md_$level"
+            if [ $spar_dev_num -ne 0 ]; then
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev \
+                --spare-devices $spar_dev_num $spar_dev --bitmap=$bitmap_dir \
+                --force  --bitmap-chunk=$bitmap_chunksize"
+            else
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev --bitmap=$bitmap_dir \
+                --force --bitmap-chunk=$bitmap_chunksize"
+            fi
+        else
+            if [ $spar_dev_num -ne 0 ]; then
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev \
+                --spare-devices $spar_dev_num $spar_dev"
+            else
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev"
+            fi
+        fi
+    else
+    # create md raid
+        if [ $bitmap -eq 1 ]; then
+            if [ $spar_dev_num -ne 0 ]; then
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev \
+                --spare-devices $spar_dev_num $spar_dev --chunk $chunk \
+                --bitmap=internal \
+                --bitmap-chunk=$bitmap_chunksize"
+            else
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev --chunk $chunk \
+                --bitmap=internal \
+                --bitmap-chunk=$bitmap_chunksize"
+            fi
+        elif [ $bitmap -eq 2 ];then
+            touch /home/bitmap_md_$level
+             echo "INFO:bitmap backup in /home/bitmap_md_$level"
+            bitmap_dir="/home/bitmap_md_$level"
+            if [ $spar_dev_num -ne 0 ]; then
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev \
+                --spare-devices $spar_dev_num $spar_dev --chunk $chunk \
+                --bitmap=$bitmap_dir \
+                --force  --bitmap-chunk=$bitmap_chunksize"
+            else
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev --chunk $chunk \
+                --bitmap=$bitmap_dir \
+                --force --bitmap-chunk=$bitmap_chunksize"
+            fi
+        else
+            if [ $spar_dev_num -ne 0 ]; then
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev \
+                --spare-devices $spar_dev_num $spar_dev --chunk $chunk"
+            else
+                rlRun "mdadm --create --run $md_raid --level $level \
+                --metadata $mtdata \
+                --raid-devices $raid_dev_num $raid_dev --chunk $chunk"
+            fi
+        fi
+
+    fi
+
+
+    ret=$?
+    if [ $ret -ne 0 ]; then
+        rlLog "INFO:create $md_raid failed."
+        exit
+    fi
+    echo "INFO:cat /proc/mdstat######################"
+    rlRun "cat /proc/mdstat"
+    rlRun "lsblk"
+    ls /dev/md* |egrep md[0-9]+
+    echo "INFO:mdadm -D $md_raid #########################"
+    rlRun "mdadm --detail $md_raid"
+    # define global variables
+    MD_DEVS="$raid_dev $spar_dev"
+    RETURN_STR="$md_raid"    
+    return $ret
 }
 ####################### End of functoin MD_Create_RAID
 
@@ -166,86 +222,91 @@ function MD_Create_RAID()
 
 function MD_Create_RAID_Journal()
 {
-	RETURN_STR=''
-	MD_DEVS=''
-	local level=$1
-	local dev_list=$2
-	local raid_dev_num=$3
-	local bitmap=$4
-	local spar_dev_num=${5:-0}
-	local chunk=${6:-512}
-	local bitmap_chunksize=${7:-64M}
-	local mtdata=${8:-1.2}
-	local dev_num=0
-	local raid_dev=''
-	local spar_dev=''
-	local md_raid=""
-	local ret=0
-	# start to create
-	echo "INFO: Executing MD_Create_RAID_Journal() to create raid $level"
-	# check if the given disks are more the needed
-	for i in $dev_list; do
-		dev_num=$((dev_num+1))
-	done
-	if [ $dev_num -lt $(($raid_dev_num+$spar_dev_num)) ]; then
-		echo "FAIL: Required devices are more than given."
-	fi
-	# get free md device name, only scan /dev/md[0-15].
-	for i in `seq 0 15`; do
-		ls -l /dev/md$i > /dev/null 2>&1
-		if [ $? -ne 0 ]; then
-			md_raid=/dev/md$i
-			break
-		fi
-	done
-	# take the first disk as journal disk
-	tmp_dev=`echo $dev_list | cut -d " " -f 1`
-	journal_dev="/dev/$tmp_dev"
-	echo "INFO: Created md raid with write journal disk \"$journal_dev\"."
-	# get raid disk list.
-	for i in `seq 2 $raid_dev_num`; do
-		tmp_dev=`echo $dev_list | cut -d " " -f $i`
-		raid_dev="$raid_dev /dev/$tmp_dev"
-	done
-	echo "INFO: Created md raid with these raid devices \"$raid_dev\"."
+    RETURN_STR=''
+    MD_DEVS=''
+    local level=$1
+    local dev_list=$2
+    local raid_dev_num=$3
+    local bitmap=$4
+    local spar_dev_num=${5:-0}
+    local chunk=${6:-512}
+    local bitmap_chunksize=${7:-64M}
+    local mtdata=${8:-1.2}
+    local dev_num=0
+    local raid_dev=''
+    local spar_dev=''
+    local md_raid=""
+    local ret=0
+    # start to create
+    echo "INFO: Executing MD_Create_RAID_Journal() to create raid $level"
+    # check if the given disks are more the needed
+    for i in $dev_list; do
+        dev_num=$((dev_num+1))
+    done
+    if [ $dev_num -lt $(($raid_dev_num+$spar_dev_num)) ]; then
+        echo "FAIL: Required devices are more than given."
+    fi
+    # get free md device name, only scan /dev/md[0-15].
+    for i in `seq 0 15`; do
+        ls -l /dev/md$i > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            md_raid=/dev/md$i
+            break
+        fi
+    done
+    # take the first disk as journal disk
+    tmp_dev=`echo $dev_list | cut -d " " -f 1`
+    journal_dev="/dev/$tmp_dev"
+    echo "INFO: Created md raid with write journal disk \"$journal_dev\"."
+    # get raid disk list.
+    for i in `seq 2 $raid_dev_num`; do
+        tmp_dev=`echo $dev_list | cut -d " " -f $i`
+        raid_dev="$raid_dev /dev/$tmp_dev"
+    done
+    echo "INFO: Created md raid with these raid devices \"$raid_dev\"."
 
-	# get spare disk list.
-	if [ $spar_dev_num -ne 0 ]; then
-		for i in `seq $((raid_dev_num+1)) $((raid_dev_num+spar_dev_num))`; do
-			tmp_dev=`echo $dev_list | cut -d " " -f $i`
-			spar_dev="$spar_dev /dev/$tmp_dev"
-		done
-		echo "INFO: Created md raid with these spare disks \"$spar_dev\"."
-	fi
-	#There is one write journal disk, so change the raid_dev_num--
-	((raid_dev_num--))
-	# create md raid
-	# prepare the parameter
-	BITMAP=""
-	SPAR_DEV=""
-	if [ $spar_dev_num -ne 0 ]; then
-		SPAR_DEV="--spare-devices $spar_dev_num $spar_dev"
-	fi
-	if [ -n "$journal_dev" ]; then
-		WRITE_JOURNAL="--write-journal $journal_dev"
-	fi
-	rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
-		--raid-devices $raid_dev_num $raid_dev $WRITE_JOURNAL $SPAR_DEV \
-		$BITMAP --chunk $chunk"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "INFO:create $md_raid failed"
-		exit
-	fi
-	echo "create raid time `date +%s` mdadm -CR $md_raid --level $level \
-		--metadata $mtdata --raid-devices $raid_dev_num $raid_dev $WRITE_JOURNAL \
-		$SPAR_DEV $BITMAP --chunk $chunk "
-	rlRun "cat /proc/mdstat"
-	rlRun "mdadm --detail $md_raid"
-	# define global variables
-	MD_DEVS="$journal_dev $raid_dev $spar_dev"
-	RETURN_STR="$md_raid"
-	return $ret
+    # get spare disk list.
+    if [ $spar_dev_num -ne 0 ]; then
+        for i in `seq $((raid_dev_num+1)) $((raid_dev_num+spar_dev_num))`; do
+            tmp_dev=`echo $dev_list | cut -d " " -f $i`
+            spar_dev="$spar_dev /dev/$tmp_dev"
+        done
+        echo "INFO: Created md raid with these spare disks \"$spar_dev\"."
+    fi
+    #There is one write journal disk, so change the raid_dev_num--
+    ((raid_dev_num--))
+    # create md raid
+    # prepare the parameter
+    BITMAP=""
+    SPAR_DEV=""
+    if [ $spar_dev_num -ne 0 ]; then
+        SPAR_DEV="--spare-devices $spar_dev_num $spar_dev"
+    fi
+    if [ -n "$journal_dev" ]; then
+        WRITE_JOURNAL="--write-journal $journal_dev"
+    fi
+
+    if [ $level -eq 1  ];then
+    rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
+        --raid-devices $raid_dev_num $raid_dev $WRITE_JOURNAL $SPAR_DEV \
+        $BITMAP"
+    else
+    rlRun "mdadm --create --run $md_raid --level $level --metadata $mtdata \
+        --raid-devices $raid_dev_num $raid_dev $WRITE_JOURNAL $SPAR_DEV \
+        $BITMAP --chunk $chunk"
+    fi
+    ret=$?
+    if [ $ret -ne 0 ]; then
+        echo "INFO:create $md_raid failed"
+        exit
+    fi
+
+    rlRun "cat /proc/mdstat"
+    rlRun "mdadm --detail $md_raid"
+    # define global variables
+    MD_DEVS="$journal_dev $raid_dev $spar_dev"
+    RETURN_STR="$md_raid"
+    return $ret
 }
 ####################### End of functoin MD_Create_RAID_Journal
 
