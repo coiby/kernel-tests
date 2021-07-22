@@ -119,6 +119,9 @@ function knownissue_filter()
 {
 	# skip OOM tests on large boxes since it takes too long
 	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 8 ] && tskip "oom0.*" fatal
+	# shmget02 failed on ppc64le because of ENOENT
+	# Issue: https://github.com/linux-test-project/ltp/issues/853
+	is_arch "ppc64le" && tskip "shmget02" unfix
 	# msgget/shmget03 failed unexpectedly: ENOSPC (28)
 	# Issue: https://github.com/linux-test-project/ltp/issues/842
 	tskip "msgget03" unfix
