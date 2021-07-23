@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Description: module_diff
@@ -30,11 +30,11 @@ function DeBug ()
             flock -x 200 2>/dev/null
             echo -n "${timestamp}: " 2>&1
             echo "${msg}"  2>&1
-        )  
+        )
     else
         echo "${msg}" > /dev/null 2>&1
     fi
-} 
+}
 
 # Functions
 
@@ -415,12 +415,17 @@ elif [ "${K_VER}" = "4.18.0" ]; then
             ;;
         *)
             # We are currently developing RHEL-8.5
-			# Therefore we test at HEAD-RHEL-8.5
-			# Need to refresh the list after 8.5 GA, current simple copy from 8.4
+            # Therefore we test at HEAD-RHEL-8.5
+            # Need to refresh the list after 8.5 GA, current simple copy from 8.4
             DeBug "Base release is HEAD-RHEL-8.5"
             echo "" | tee -a $OUTPUTFILE
             echo "***** $ARCH: Base release is HEAD-RHEL-8.5 *****" | tee -a $OUTPUTFILE
             Release="HEAD-8.5"
+            # BZ1973106 moved sha512_generic and sha512-ssse3.ko as builtin
+            if cki_kver_lt "4.18.0-320"; then
+                sed -i '/sha512_generic.ko/d' ${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                sed -i '/sha512-ssse3.ko/d' ${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+            fi
             ;;
     esac
 elif [ "${K_VER}" = "5.13.0" ]; then

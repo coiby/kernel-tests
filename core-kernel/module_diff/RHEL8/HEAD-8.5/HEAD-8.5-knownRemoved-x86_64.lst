@@ -7,3 +7,5 @@ nf_log_ipv6.ko
 nf_log_netdev.ko
 pinctrl-amd.ko
 remoteproc.ko
+sha512_generic.ko
+sha512-ssse3.ko
