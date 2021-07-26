@@ -79,6 +79,10 @@ fi
 # Patch 255-auto-update.bats system test: auto-update: multiarch fixes, and cleanup https://github.com/containers/podman/pull/10985
 sed -i -e 's/alpine_nginx/busybox/g' $TEST_DIR/255-auto-update.bats
 
+# Patch 120-loads.bats System tests: fix a multiarch problem https://github.com/containers/podman/pull/10947
+sed -i -e 's/img1=.*/img1=${PODMAN_NONLOCAL_IMAGE_FQN}/g' $TEST_DIR/120-load.bats
+sed -i -e 's/img2=.*/img2="$PODMAN_TEST_IMAGE_REGISTRY\/$PODMAN_TEST_IMAGE_USER\/$PODMAN_TEST_IMAGE_NAME:multiimage"/g' $TEST_DIR/120-load.bats
+
 # Skip 150-logins,420-cgroups.bats,260-sdnotify,200-pod,410-selinux,600-completion,700-play,035-logs for non x86_64, would fail on non x86_64
 if [ "$ARCH" != "x86_64" ]; then
     mv -f ${TEST_DIR}/150-login.bats ${TEST_DIR}/150-login.baks
