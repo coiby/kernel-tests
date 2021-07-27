@@ -11,15 +11,6 @@ KCOV_CONF=$TDIR/kcov.conf
 KCOV_KDIR=
 KCOV_INFO_LIST=$TDIR/kernel_tests_name.lst
 KCOV_COMBINED_NAME=kcov.combined.info
-REPO=http://download.devel.redhat.com/qa/rhts/lookaside/gcov_kernels
-
-RHEL_KRNL=( \
-	[80]=4.18.0-80.el8 \
-	[81]=4.18.0-147.el8 \
-	[82]=4.18.0-193.el8 \
-	[83]=4.18.0-233.el8 \
-	[84]=4.18.0-304.el8 \
-)
 
 log()
 {

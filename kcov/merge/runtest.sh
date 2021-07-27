@@ -214,7 +214,6 @@ kcov_genhtml() {
 	srcfile1=$(sed -n '/^SF:/{p; q}' $info_file | sed 's/^SF://')
 	test -e ${srcfile1} || {
 		echo "{Warn} source file [$srcfile1] not exist."
-		echo "{Warn} you can download src.rpm from $REPO, and run genthml again."
 	}
 }
 
@@ -238,9 +237,7 @@ install_lcov
 	if [ -n "$KCOV_SRC_RPM" ]; then
 		rpm -ivh $KCOV_SRC_RPM
 	else
-		XY=${XY:-$(lsb_release -sr)}
-		kver=${RHEL_KRNL[${XY//./}]}
-		rpm -ivh $REPO/$kver.gcov/$(arch)/kernel-gcov-$kver.gcov.$(arch).rpm
+		dnf install -y kernel-gcov
 	fi
 }
 

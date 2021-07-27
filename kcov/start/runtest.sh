@@ -21,12 +21,6 @@
 
 TEST="/kcov/start"
 
-RHEL=$(sed -ne's/^Red Hat.*release \([0-9]\.[0-9]\).*$/\1/p' /etc/redhat-release)
-MAJOR=$(echo $RHEL | cut -c1)
-MINOR=$(echo $RHEL | cut -c3)
-VERSION=${RHEL_KRNL[$MAJOR$MINOR]}
-GCOVDARPM=kernel-gcov-$VERSION.gcov.$(arch).rpm
-
 log "loading config from $KCOV_CONF"
 # set KCOV_KDIR, KCOV_TEST_NAME, TEST_NAME, KCOV_BASE_INFO, KCOV_ALL_INFO
 load_config
@@ -76,7 +70,7 @@ log "capture the initial data as the baseline"
 
 bbbdir=$(rpm -ql kernel-gcov | head -1)
 
-lcov --initial --capture --base-directory $bbbdir/*/*$VERSION*$(arch)*/ $KDIR_OPT --output-file $KCOV_BASE_INFO
+lcov --initial --capture --base-directory $bbbdir/*/*$(uname -r)*/ $KDIR_OPT --output-file $KCOV_BASE_INFO
 if [ $? -ne 0 ]; then
 	if [ -n "$KCOV_KDIR" ]; then
 		log "Fail to capture initial base data for $KCOV_KDIR."
