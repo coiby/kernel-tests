@@ -1,0 +1,75 @@
+From dce2b4bb64877cc473e66dcb90c13f02e5ec09ac Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Wed, 28 Jul 2021 10:14:19 +0800
+Subject: [PATCH] drop the static build for tests
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+---
+ tests/Makefile     | 16 ++++++++--------
+ tests/run_tests.py |  5 -----
+ 2 files changed, 8 insertions(+), 13 deletions(-)
+
+diff --git a/tests/Makefile b/tests/Makefile
+index 073df96..6e25b9c 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -156,12 +156,12 @@ $(LIB_TESTS:%=obj64/%) $(LIB_TESTS_64_ALL:%=obj64/%): %: %.o obj64/testutils.o o
+ 	$(CC64) $(LDFLAGS) $(LDFLAGS64) -o $@ $^ $(LDLIBS) -lhugetlbfs
+ 
+ $(LIB_TESTS:%=obj32/%_static): %_static: %.o obj32/testutils.o obj32/libtestutils.o
+-	@$(VECHO) LD32 "(lib test)" $@
+-	$(CC32) -static $(LDFLAGS) $(LDFLAGS32) -o $@ $^ $(STATIC_LDLIBS) $(STATIC_LIBHUGE)
++#	@$(VECHO) LD32 "(lib test)" $@
++#	$(CC32) -static $(LDFLAGS) $(LDFLAGS32) -o $@ $^ $(STATIC_LDLIBS) $(STATIC_LIBHUGE)
+ 
+ $(LIB_TESTS:%=obj64/%_static) $(LIB_TESTS_64_ALL:%=obj64/%_static): %_static: %.o obj64/testutils.o obj64/libtestutils.o
+-	@$(VECHO) LD64 "(lib test)" $@
+-	$(CC64) -static $(LDFLAGS) $(LDFLAGS64) -o $@ $^ $(STATIC_LDLIBS) $(STATIC_LIBHUGE)
++#	@$(VECHO) LD64 "(lib test)" $@
++#	$(CC64) -static $(LDFLAGS) $(LDFLAGS64) -o $@ $^ $(STATIC_LDLIBS) $(STATIC_LIBHUGE)
+ 
+ $(NOLIB_TESTS:%=obj32/%): %: %.o obj32/testutils.o
+ 	@$(VECHO) LD32 "(nolib test)" $@
+@@ -216,12 +216,12 @@ $(STRESS_TESTS:%=obj64/%): %: %.o obj64/testutils.o
+ 	$(CC64) $(LDFLAGS) $(LDFLAGS64) -o $@ $^ $(LDLIBS) -lhugetlbfs
+ 
+ $(STRESS_TESTS:%=obj32/%_static): %_static: %.o obj32/testutils.o
+-	@$(VECHO) LD32 "(lib test)" $@
+-	$(CC32) -static $(LDFLAGS) $(LDFLAGS32) -o $@ $^ $(STATIC_LDLIBS) $(STATIC_LIBHUGE)
++#	@$(VECHO) LD32 "(lib test)" $@
++#	$(CC32) -static $(LDFLAGS) $(LDFLAGS32) -o $@ $^ $(STATIC_LDLIBS) $(STATIC_LIBHUGE)
+ 
+ $(STRESS_TESTS:%=obj64/%_static): %_static: %.o obj64/testutils.o
+-	@$(VECHO) LD64 "(lib test)" $@
+-	$(CC64) -static $(LDFLAGS) $(LDFLAGS64) -o $@ $^ $(STATIC_LDLIBS) $(STATIC_LIBHUGE)
++#	@$(VECHO) LD64 "(lib test)" $@
++#	$(CC64) -static $(LDFLAGS) $(LDFLAGS64) -o $@ $^ $(STATIC_LDLIBS) $(STATIC_LIBHUGE)
+ 
+ obj32/xB.%: $(SCRIPTS32).xB $(HUGETLBFS_LD) obj32/%.o obj32/testutils.o
+ 	@$(VECHO) LD32 "(xB test)" $@
+diff --git a/tests/run_tests.py b/tests/run_tests.py
+index 3c95a03..a5c127c 100755
+--- a/tests/run_tests.py
++++ b/tests/run_tests.py
+@@ -530,9 +530,6 @@ def functional_tests():
+     do_test("ptrace-write-hugepage")
+     do_test("icache-hygiene")
+     do_test("slbpacaflush")
+-    do_test("straddle_4GB_static", bits=(64,))
+-    do_test("huge_at_4GB_normal_below_static", bits=(64,))
+-    do_test("huge_below_4GB_normal_above_static", bits=(64,))
+     do_test("map_high_truncate_2")
+     do_test("misaligned_offset")
+     do_test("truncate_above_4GB")
+@@ -642,8 +639,6 @@ def functional_tests():
+     # Test overriding of shmget()
+     do_shm_test("shmoverride_linked")
+     do_shm_test("shmoverride_linked", HUGETLB_SHM="yes")
+-    do_shm_test("shmoverride_linked_static")
+-    do_shm_test("shmoverride_linked_static", HUGETLB_SHM="yes")
+     do_shm_test("shmoverride_unlinked", LD_PRELOAD="libhugetlbfs.so")
+     do_shm_test("shmoverride_unlinked", LD_PRELOAD="libhugetlbfs.so", HUGETLB_SHM="yes")
+ 
+-- 
+2.31.1
+

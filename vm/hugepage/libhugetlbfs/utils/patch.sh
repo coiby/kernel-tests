@@ -84,6 +84,7 @@ else # 2.21
     patch_files+=" \
         build_flags.patch \
         hack-task-size-overrun.patch \
+	0001-drop-the-static-build-for-tests.patch \
         "
 fi
 
