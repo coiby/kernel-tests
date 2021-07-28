@@ -9,3 +9,7 @@ pinctrl-amd.ko
 remoteproc.ko
 sha512_generic.ko
 sha512-ssse3.ko
+snd-soc-sst-acpi.ko
+snd-soc-sst-firmware.ko
+snd-soc-sst-haswell-pcm.ko
+snd-sof-intel-byt.ko
