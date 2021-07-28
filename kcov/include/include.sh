@@ -80,7 +80,7 @@ install_lcov()
 			# Install extra dependencies needed by genhtml from this commit
 			release=`cut -f1 -d. /etc/redhat-release | sed 's/[^0-9]//g'`
 			dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${release}.noarch.rpm
-			dnf install -y perl-DateTime perl-DateTime-Format-W3CDTF
+			dnf install -y perl-DateTime perl-DateTime-Format-W3CDTF perl-IO-Compress perl-JSON
 		fi
 		git clone $repo_url
 		cd lcov
