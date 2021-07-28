@@ -423,8 +423,12 @@ elif [ "${K_VER}" = "4.18.0" ]; then
             Release="HEAD-8.5"
             # BZ1973106 moved sha512_generic and sha512-ssse3.ko as builtin
             if cki_kver_lt "4.18.0-320"; then
-                sed -i '/sha512_generic.ko/d' ${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-                sed -i '/sha512-ssse3.ko/d' ${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                sed -i '/sha512_generic.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                sed -i '/sha512-ssse3.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+            fi
+	    if cki_kver_lt "4.18.0-322"; then
+                sed -i '/snd-soc-sst-acpi.ko/d;/snd-soc-sst-firmware.ko/d;/snd-soc-sst-haswell-pcm.ko/d;/snd-sof-intel-byt.ko/d' \
+			${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
             fi
             ;;
     esac
