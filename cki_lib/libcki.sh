@@ -352,3 +352,21 @@ function cki_is_vm()
 {
     cki_is_baremetal && return 1 || return 0
 }
+
+# Functions to compare kernel versions
+function cki_kernel_version()
+{
+    _ver=$(uname -r | sed "s/+debug//" | sed "s/\.gcov//" | sed "s/\.$(arch)//")
+    # shellcheck disable=SC2001
+    echo "${_ver}" | sed "s/\.el[0-9]\|\.fc\|\.eln//"
+}
+
+function _cki_version_le()
+{
+    { echo "$1"; echo "$2"; } | sort -V | tail -n 1 | grep -qx "$2"
+}
+
+function cki_kver_ge() { _cki_version_le "$1" "$(cki_kernel_version)"; }
+function cki_kver_le() { _cki_version_le "$(cki_kernel_version)" "$1"; }
+function cki_kver_lt() { ! cki_kver_ge "$1"; }
+function cki_kver_gt() { ! cki_kver_le "$1"; }
