@@ -211,6 +211,11 @@ kcov_genhtml() {
 
 	echo "{Info} running genhtml with the following parameters: ${params}"
 	genhtml --title "Coverage of kernel tests" $params $info_file
+	if [ $? -ne  0 ]; then
+		echo "{Err} couldn't generate html result."
+		return 1
+	fi
+
 	srcfile1=$(sed -n '/^SF:/{p; q}' $info_file | sed 's/^SF://')
 	test -e ${srcfile1} || {
 		echo "{Warn} source file [$srcfile1] not exist."
