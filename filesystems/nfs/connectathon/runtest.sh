@@ -581,6 +581,17 @@ function cthon_main ()
     popd
 }
 
+build_nfs_server ()
+{
+	local expdir=$1
+	which systemctl &>/dev/null || return 1
+
+	mkdir -p $expdir
+	echo "$expdir *(rw,no_root_squash)" >/etc/exports
+	systemctl restart nfs-server &>/dev/null
+	echo "localhost:$expdir"
+}
+
 # ---------- Start Test -------------
 #
 DEBUG
@@ -639,6 +650,9 @@ else
     # Get the server list
     getServerList
 fi
+
+local_server=$(build_nfs_server /export)
+servers="$local_server $servers"
 
 # RHEL4 is no longer supported
 servers=$(sed 's/rhel4[^[:space:]]*//' <<<$servers)
