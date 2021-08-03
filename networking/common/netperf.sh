@@ -78,12 +78,12 @@ netperf_test() {
 		cat perf_result_${func}_6
 	done
 
-	if [ ! -f "/tmp/${JOBID}_perf.log" ]; then
-		touch /tmp/${JOBID}_perf.log
-		printf "$log_printf_format" "Test Items" "IPv4 TCP" "IPv6 TCP" "IPv4 UDP" "IPv6 UDP" "IPv4 SCTP" "IPv6 SCTP" >> /tmp/${JOBID}_perf.log
-		printf "$log_printf_format" "----------" "--------" "--------" "--------" "--------" "---------" "---------" >> /tmp/${JOBID}_perf.log
+	if [ ! -f "/tmp/${RSTRNT_JOBID}_perf.log" ]; then
+		touch /tmp/${RSTRNT_JOBID}_perf.log
+		printf "$log_printf_format" "Test Items" "IPv4 TCP" "IPv6 TCP" "IPv4 UDP" "IPv6 UDP" "IPv4 SCTP" "IPv6 SCTP" >> /tmp/${RSTRNT_JOBID}_perf.log
+		printf "$log_printf_format" "----------" "--------" "--------" "--------" "--------" "---------" "---------" >> /tmp/${RSTRNT_JOBID}_perf.log
 	fi
-	printf "$log_printf_format" "$test_items" "$tcp_speed_4" "$tcp_speed_6" "$udp_speed_4_send/$udp_speed_4_receive" "$udp_speed_6_send/$udp_speed_6_receive" "$sctp_speed_4" "$sctp_speed_6" >> /tmp/${JOBID}_perf.log
+	printf "$log_printf_format" "$test_items" "$tcp_speed_4" "$tcp_speed_6" "$udp_speed_4_send/$udp_speed_4_receive" "$udp_speed_6_send/$udp_speed_6_receive" "$sctp_speed_4" "$sctp_speed_6" >> /tmp/${RSTRNT_JOBID}_perf.log
 
 	pkill -9 netserver
 	rm -rf perf_result*

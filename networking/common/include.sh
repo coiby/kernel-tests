@@ -26,7 +26,7 @@ yum=$(select_yum_tool)
 NM_CTL=${NM_CTL:-"no"}
 FIREWALL=${FIREWALL:-"no"}
 AVC_CHECK=${AVC_CHECK:-"yes"}
-if [ ! "$JOBID" ]; then
+if [ ! "$RSTRNT_JOBID" ]; then
 	RED='\E[1;31m'
 	GRN='\E[1;32m'
 	YEL='\E[1;33m'
@@ -67,7 +67,7 @@ log()
 
 submit_log()
 {
-	[ ! $JOBID ] && return 0
+	[ ! $RSTRNT_JOBID ] && return 0
 	for file in "$@"; do
 		rstrnt-report-log -l $file
 	done
@@ -78,7 +78,7 @@ test_pass()
 	#SCORE=${2:-$PASS}
 	echo -e "\n:: [  PASS  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	# we don't care how many test passed
-	if [ $JOBID ]; then
+	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result "${TEST}/$1" "PASS"
 	else
 		echo -e "\n::::::::::::::::"
@@ -93,7 +93,7 @@ test_fail()
 	#echo ":: [  FAIL  ] :: RESULT: $1" | tee -a $OUTPUTFILE
 	echo -e ":: [  FAIL  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	# we only care how many test failed
-	if [ $JOBID ]; then
+	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result "${TEST}/$1" "FAIL" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
@@ -106,7 +106,7 @@ test_warn()
 {
 	#echo ":: [  WARN  ] :: RESULT: $1" | tee -a $OUTPUTFILE
 	echo -e "\n:: [  WARN  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
-	if [ $JOBID ]; then
+	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result "${TEST}/$1" "WARN"
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 		exit 1
@@ -218,8 +218,8 @@ get_round()
 net_sync()
 {
 	local FLAG=$1
-	# only enalbe get_round when (no JOBID and no DONT_GET_ROUND)
-	if [ ! "$JOBID" ] && [ ! "$DONT_GET_ROUND" ];then
+	# only enalbe get_round when (no RSTRNT_JOBID and no DONT_GET_ROUND)
+	if [ ! "$RSTRNT_JOBID" ] && [ ! "$DONT_GET_ROUND" ];then
 		FLAG="$(get_round)_${FLAG}"
 	fi
 	log "Start sync ${FLAG}"
@@ -326,7 +326,7 @@ fi
 popd > /dev/null
 
 # use our own rstrnt-sync for manually testing
-if [ ! "$JOBID" ];then
+if [ ! "$RSTRNT_JOBID" ];then
 rstrnt-sync-set()
 {
 	local message=$2

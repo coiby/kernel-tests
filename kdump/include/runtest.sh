@@ -124,12 +124,12 @@ TurnDebugOn()
 CheckEnv()
 {
     # Check test environment.
-    if [ -z "${JOBID}" ]; then
-        Log "Variable JOBID does not set! Assume developer mode."
+    if [ -z "${RSTRNT_JOBID}" ]; then
+        Log "Variable RSTRNT_JOBID does not set! Assume developer mode."
         SERVERFILE="Server-$(date +%H_%j)"
         DEVMODE=true
     else
-        SERVERFILE="Server-${JOBID}"
+        SERVERFILE="Server-${RSTRNT_JOBID}"
     fi
 }
 
