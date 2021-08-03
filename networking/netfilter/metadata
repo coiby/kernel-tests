@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=nmap-ncat;lksctp-tools;tcpdump;nftables
+dependencies=nmap-ncat;lksctp-tools;tcpdump;nftables;iptables
 softDependencies=ipvsadm;ipset;conntrack-tools
 repoRequires=cki_lib
