@@ -29,7 +29,7 @@ function test_msg()
 #
 # NOTE: We use a tested commit to avoid that breakage in LTP's master branch
 #       which may make our test suites less stable
-LTP_REPO_COMMIT_ID=af2b6f5ee6b171078b18246dd73f71cf6e350859
+LTP_REPO_COMMIT_ID=9bb4d96c01dce268180fa72b217b47048ad63621
 function ltp_test_build()
 {
 	# workaround for the beaker issue when arch is ppc64:
