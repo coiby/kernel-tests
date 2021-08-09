@@ -63,6 +63,13 @@ if rlIsRHEL; then
     sed -i -e 's/\(:00000000\|:00000001\|:00000002\)/:00000003/' $TEST_DIR/*.bats
 fi
 
+# Add container-tools module for rhel8 through Appstreams:
+#   rhel8 -> fast rolling stream that closes to upstream/latest
+#   1.0, 2.0, ....  -> stable stream for production
+if rlIsRHEL '8'; then
+    dnf module install -y container-tools:rhel8
+fi
+
 # Patch 030-run and 500-networking,  system tests: fix two race condition https://github.com/containers/podman/pull/10157
 if ! grep -q "run_podman kill \$cid; run_podman wait \$cid" $TEST_DIR/030-run.bats; then
     sed -i -e 's/run_podman kill $cid/run_podman kill $cid; run_podman wait $cid/' $TEST_DIR/030-run.bats
