@@ -11,15 +11,6 @@ KCOV_CONF=$TDIR/kcov.conf
 KCOV_KDIR=
 KCOV_INFO_LIST=$TDIR/kernel_tests_name.lst
 KCOV_COMBINED_NAME=kcov.combined.info
-REPO=http://download.devel.redhat.com/qa/rhts/lookaside/gcov_kernels
-
-RHEL_KRNL=( \
-	[80]=4.18.0-80.el8 \
-	[81]=4.18.0-147.el8 \
-	[82]=4.18.0-193.el8 \
-	[83]=4.18.0-233.el8 \
-	[84]=4.18.0-304.el8 \
-)
 
 log()
 {
@@ -89,7 +80,7 @@ install_lcov()
 			# Install extra dependencies needed by genhtml from this commit
 			release=`cut -f1 -d. /etc/redhat-release | sed 's/[^0-9]//g'`
 			dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${release}.noarch.rpm
-			dnf install -y perl-DateTime perl-DateTime-Format-W3CDTF
+			dnf install -y perl-DateTime perl-DateTime-Format-W3CDTF perl-IO-Compress perl-JSON
 		fi
 		git clone $repo_url
 		cd lcov
