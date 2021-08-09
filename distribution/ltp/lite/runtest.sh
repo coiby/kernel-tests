@@ -167,17 +167,13 @@ function ltp_lite_begin()
 	echo "$core_pattern_ltp_dir/core" > /proc/sys/kernel/core_pattern
 	echo 1 > /proc/sys/kernel/core_uses_pid
 
-	echo "numactl --hardware" | tee -a $OUTPUTFILE
-	echo "-----" | tee -a $OUTPUTFILE
-	numactl --hardware >> ./numactl.txt 2>&1
-	cat ./numactl.txt | tee -a $OUTPUTFILE
-	echo "-----" | tee -a $OUTPUTFILE
-
 	echo "Using config file: $t" | tee -a $OUTPUTFILE
 	ss -antup >> $OUTPUTFILE 2>&1
 
 	cp -f $OUTPUTFILE ./setup.txt
 	SubmitLog ./setup.txt
+
+	PrintSysInfo
 }
 
 ltp_lite_run()

@@ -47,6 +47,7 @@ devnull=0
 
 # Create debug log.
 DEBUGLOG=`mktemp -p /mnt/testarea -t DeBug.XXXXXX`
+SYSINFO=`mktemp -p /mnt/testarea -t SysInfo.XXXXXX`
 
 # locking to avoid races
 lck=$OUTPUTDIR/$(basename $0).lck
@@ -142,6 +143,58 @@ DebugInfo ()
         echo >> $DEBUGLOG
     fi
 
+}
+
+PrintSysInfo ()
+{
+    echo "uname -rm" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    hostname | tee -a $SYSINFO
+    uname -rm | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    echo "lscpu" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    lscpu | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    echo "numactl --hardware" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    numactl --hardware | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    echo "cat /proc/meminfo" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    cat /proc/meminfo | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    echo "lsblk" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    lsblk | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    echo "dmsetup table" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    dmsetup table | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    echo "df -Th" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    df -Th | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    echo "fdisk -l" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    fdisk -l | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    echo "mount | column -t" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    mount | column -t | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
+    cp -f $SYSINFO ./systeminfo.txt
+    SubmitLog ./systeminfo.txt
 }
 
 RprtRslt ()
