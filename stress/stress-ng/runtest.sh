@@ -36,10 +36,7 @@ BUILDDIR="stress-ng"
 # stress-ng git location
 GIT_URL=${GIT_URL:-"git://kernel.ubuntu.com/cking/stress-ng.git"}
 # current release
-# GIT_BRANCH=${GIT_BRANCH:-"tags/V0.12.05"}
-# Run from master until new release > V0.12.12 is released
-# https://gitlab.com/cki-project/kernel-tests/-/issues/613
-GIT_BRANCH=${GIT_BRANCH:-"master"}
+GIT_BRANCH=${GIT_BRANCH:-"tags/V0.13.00"}
 # test 'random' or 'sequential' class only by parameter passing
 CLASSES=${CLASSES:-"interrupt cpu cpu-cache memory os"}
 EXCLUDE_STRESSOR=${EXCLUDE_STRESSOR:-"close,cyclic,vfork"}
