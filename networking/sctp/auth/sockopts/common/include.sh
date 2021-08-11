@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables to control some default action
-if [ ! "$JOBID" ]; then
+if [ ! "$RSTRNT_JOBID" ]; then
         RED='\E[1;31m'
         GRN='\E[1;32m'
         YEL='\E[1;33m'

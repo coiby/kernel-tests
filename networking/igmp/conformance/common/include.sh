@@ -4,7 +4,7 @@
 NM_CTL=${NM_CTL:-"no"}
 FIREWALL=${FIREWALL:-"no"}
 AVC_CHECK=${AVC_CHECK:-"yes"}
-if [ ! "$JOBID" ]; then
+if [ ! "$RSTRNT_JOBID" ]; then
     RED='\E[1;31m'
     GRN='\E[1;32m'
     YEL='\E[1;33m'
@@ -22,7 +22,7 @@ test_pass()
     #SCORE=${2:-$PASS}
     echo -e "\n:: [  PASS  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
     # we don't care how many test passed
-    if [ $JOBID ]; then
+    if [ $RSTRNT_JOBID ]; then
        rstrnt-report-result "${TEST}/$1" "PASS"
     else
         echo -e "\n::::::::::::::::"
@@ -36,7 +36,7 @@ test_fail()
     SCORE=${2:-$FAIL}
     echo -e ":: [  FAIL  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
     # we only care how many test failed
-    if [ $JOBID ]; then
+    if [ $RSTRNT_JOBID ]; then
         rstrnt-report-result "${TEST}/$1" "FAIL" "$SCORE"
     else
         echo -e "\n:::::::::::::::::"
@@ -48,7 +48,7 @@ test_fail()
 test_warn()
 {
     echo -e "\n:: [  WARN  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
-    if [ $JOBID ]; then
+    if [ $RSTRNT_JOBID ]; then
         rstrnt-report-result "${TEST}/$1" "WARN"
     else
         echo -e "\n:::::::::::::::::"

@@ -97,7 +97,7 @@ test_pass()
 	let PASS++
         echo -e "PASS\t${1}" >> summary.log
         echo -e "\n[  Test '"$1"' PASS  ]" | tee -a $OUTPUTFILE
-        if [ $JOBID ]; then
+        if [ $RSTRNT_JOBID ]; then
                 rstrnt-report-result "${TEST}/$1" "PASS" $PASS
         else
                 echo -e "\n\n********\n\n"
@@ -113,7 +113,7 @@ test_fail()
         echo -e "FAIL\t${1}" >> summary.log
         echo -e "\n[  Test '"$1"' FAIL  ]" | tee -a $OUTPUTFILE
         # we only care how many test failed
-        if [ $JOBID ]; then
+        if [ $RSTRNT_JOBID ]; then
                 rstrnt-report-result "${TEST}/$1" "FAIL" "$FAIL"
         else
                 echo -e "\n\n********\n\n"

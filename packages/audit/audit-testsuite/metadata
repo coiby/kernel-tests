@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=gcc;autoconf;automake;binutils;gettext;libtool;make;patch;pkgconfig;bison;flex;git;audit;perl;libgcc;glibc-devel;expect;nmap-ncat
+dependencies=gcc;autoconf;automake;binutils;gettext;libtool;make;patch;pkgconfig;bison;flex;git;audit;perl;libgcc;glibc-devel;expect;nmap-ncat;iptables
 softDependencies=perl-Test;perl-Test-Harness;perl-File-Which;perl-Time-HiRes;glibc-devel.i686;libgcc.i686;glibc-devel.s390;libgcc.s390;glibc-devel.ppc;libgcc.ppc;iproute
 repoRequires=cki_lib

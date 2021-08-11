@@ -38,12 +38,12 @@ UPGRADE_FC_CRASH=${UPGRADE_FC_CRASH:-"true"}
 
 mkdir -p ${K_TMP_DIR}
 
-[[ "$FAMILY" =~ [a-zA-Z]+5 ]] && IS_RHEL5=true || IS_RHEL5=false
-[[ "$FAMILY" =~ [a-zA-Z]+6 ]] && IS_RHEL6=true || IS_RHEL6=false
-[[ "$FAMILY" =~ [a-zA-Z]+7 ]] && IS_RHEL7=true || IS_RHEL7=false
-[[ "$FAMILY" =~ [a-zA-Z]+8 ]] && IS_RHEL8=true || IS_RHEL8=false
-[[ "$FAMILY" =~ [a-zA-Z]+9 ]] && IS_RHEL9=true || IS_RHEL9=false
-[[ "$FAMILY" =~ Fedora ]] && IS_FC=true || IS_FC=false
+rlIsRHEL 5 && IS_RHEL5=true || IS_RHEL5=false
+rlIsRHEL 6 && IS_RHEL6=true || IS_RHEL6=false
+rlIsRHEL 7 && IS_RHEL7=true || IS_RHEL7=false
+rlIsRHEL 8 && IS_RHEL8=true || IS_RHEL8=false
+rlIsRHEL 9 && IS_RHEL9=true || IS_RHEL9=false
+rlIsFedora && IS_FC=true || IS_FC=false
 
 if $IS_RHEL5 || $IS_RHEL6; then
     INITRD_PREFIX=initrd
@@ -124,12 +124,12 @@ TurnDebugOn()
 CheckEnv()
 {
     # Check test environment.
-    if [ -z "${JOBID}" ]; then
-        Log "Variable JOBID does not set! Assume developer mode."
+    if [ -z "${RSTRNT_JOBID}" ]; then
+        Log "Variable RSTRNT_JOBID does not set! Assume developer mode."
         SERVERFILE="Server-$(date +%H_%j)"
         DEVMODE=true
     else
-        SERVERFILE="Server-${JOBID}"
+        SERVERFILE="Server-${RSTRNT_JOBID}"
     fi
 }
 
