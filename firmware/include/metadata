@@ -1,6 +1,6 @@
 [General]
 name=firmware/include
-owner=Erico Nunes <ernunes@redhat.com>
+owner=Jiri Dluhos <jdluhos@redhat.com>
 description=library for Firmware Test Suite (fwts)
 license=GPLv2
 confidential=no
