@@ -40,11 +40,23 @@ if grep "ipv6.disable=1" /proc/cmdline ; then
     exit
 fi
 
+function __prepare_failed()
+{
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+    exit 1
+}
+
+trap "__prepare_failed" ERR
+
+test_repo_path=$(readlink -f test-repo)
+
 git clone "$git_url" "test-repo"
-trap "rm -rf '$(readlink -f test-repo)'" EXIT
 cd "test-repo"
 git checkout "$git_branch"
 git rev-parse --verify "$git_branch"
+
+trap "cd /; rm -rf '${test_repo_path}'" EXIT ERR
+
 cd "$git_path"
 
 ./runtest.sh
