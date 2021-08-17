@@ -247,8 +247,8 @@ function get_test_cases_nvme
 
 bash $CDIR/build.sh
 if (( $? != 0 )); then
-	rstrnt-report-result "build" FAIL 1
-	exit 0
+	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+	exit 1
 fi
 
 testcases_default=""
