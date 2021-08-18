@@ -90,6 +90,15 @@ sed -i -e 's/alpine_nginx/busybox/g' $TEST_DIR/255-auto-update.bats
 sed -i -e 's/img1=.*/img1=${PODMAN_NONLOCAL_IMAGE_FQN}/g' $TEST_DIR/120-load.bats
 sed -i -e 's/img2=.*/img2="$PODMAN_TEST_IMAGE_REGISTRY\/$PODMAN_TEST_IMAGE_USER\/$PODMAN_TEST_IMAGE_NAME:multiimage"/g' $TEST_DIR/120-load.bats
 
+# Patch 050-stop.bats system tests: fix race in stop test https://github.com/containers/podman/pull/11080
+if ! grep -q "trap 'echo Received SIGTERM, ignoring' SIGTERM; echo READY; while :; do sleep 0.2" $TEST_DIR/050-stop.bats; then
+    sed -i -e 's/.*echo Received SIGTERM, ignoring.*/        "trap '\''echo Received SIGTERM, ignoring'\'' SIGTERM; echo READY; while :; do sleep 0.2; done"/g' \
+        $TEST_DIR/050-stop.bats
+    sed -i -e  '/# Stop the container in the background/{' -e 'r sed-patch/050.sed1' -e 'd' -e '}' $TEST_DIR/050-stop.bats
+    sed -i -e  '/$PODMAN stop -t 20 stopme &/{' -e 'r sed-patch/050.sed2' -e 'd' -e '}' $TEST_DIR/050-stop.bats
+    sed -i -e  '/is "$output" "stopping" "Status of container should be.*/{' -e 'r sed-patch/050.sed3' -e 'd' -e '}' $TEST_DIR/050-stop.bats
+fi
+
 # Skip 150-logins,420-cgroups.bats,260-sdnotify,200-pod,410-selinux,600-completion,700-play,035-logs for non x86_64, would fail on non x86_64
 if [ "$ARCH" != "x86_64" ]; then
     mv -f ${TEST_DIR}/150-login.bats ${TEST_DIR}/150-login.baks

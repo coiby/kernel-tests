@@ -1,0 +1,9 @@
+    is "$output" "stopping" "Status of container should be 'stopping'"
+
+    # Time check: make sure we were able to run 'ps' before the container
+    # exited. If this takes too long, it means ps had to wait for lock.
+    local delta_t=$(( $SECONDS - t0 ))
+    if [[ $delta_t -gt 5 ]]; then
+        die "Operations took too long ($delta_t seconds)"
+    fi
+
