@@ -1,6 +1,7 @@
 hns-roce-hw-v1.ko
 hns-roce-hw-v2.ko
 hns-roce.ko
+mdio-xpcs.ko
 nf_log_arp.ko
 nf_log_bridge.ko
 nf_log_common.ko

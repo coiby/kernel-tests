@@ -426,9 +426,13 @@ elif [ "${K_VER}" = "4.18.0" ]; then
                 sed -i '/sha512_generic.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
                 sed -i '/sha512-ssse3.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
             fi
-	    if cki_kver_lt "4.18.0-322"; then
+            if cki_kver_lt "4.18.0-322"; then
                 sed -i '/snd-soc-sst-acpi.ko/d;/snd-soc-sst-firmware.ko/d;/snd-soc-sst-haswell-pcm.ko/d;/snd-sof-intel-byt.ko/d' \
 			${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+            fi
+            if cki_kver_lt "4.18.0-328"; then
+                sed -i '/mdio-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                sed -i '/pcs-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-modules-${ARCH}.lst
             fi
             ;;
     esac
