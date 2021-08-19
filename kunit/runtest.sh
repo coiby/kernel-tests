@@ -87,8 +87,7 @@ rlJournalStart
     fi
 
     # kunit module was added on kernel 4.18.0-279 (BZ#1900119)
-    rlCmpVersion `uname -r` "4.18.0-279.el8"
-    if [ $? -eq 2 ]; then
+    if cki_kver_lt "4.18.0-279"; then
         # kernel is too old to support kunit module
         rstrnt-report-result $TEST SKIP
         rlPhaseEnd
@@ -97,10 +96,26 @@ rlJournalStart
         rlJournalPrintText
         exit 0
     fi
+
+    module_pkg="kernel"
+    if  cki_is_kernel_rt; then
+        module_pkg="${module_pkg}-rt"
+    fi
+    if  cki_is_kernel_debug; then
+        module_pkg="${module_pkg}-debug"
+    fi
+    version=$(uname -r | sed s'/\+debug//')
+    module_pkg="${module_pkg}-modules-internal-$version"
+
+    if ! rpm -q $module_pkg; then
+        echo "FAIL: kernel-modules-internal is not installed, aborting test"
+        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        exit 1
+    fi
     #test for kunit
     modprobe kunit
     if [ $? -ne 0 ]; then
-        rlFail "Could not install KUNIT module, aborting test"
+        rlFail "Could not load KUNIT module, aborting test"
         rstrnt-report-result $TEST FAIL
         rlPhaseEnd
         rlJournalEnd
@@ -133,7 +148,7 @@ rlJournalStart
 		test_name="$(basename "$TEST")"
 		cp "${TEST}/results" "${TEST}/${test_name}.log"
 		process_results "${TEST}/results"
-		result=$?	
+		result=$?
 		if [ $result -eq 0 ]
 		then
 			rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" PASS 0
