@@ -358,7 +358,7 @@ function cki_kernel_version()
 {
     _ver=$(uname -r | sed "s/+debug//" | sed "s/\.gcov//" | sed "s/\.$(arch)//")
     # shellcheck disable=SC2001
-    echo "${_ver}" | sed "s/\.el[0-9]\|\.fc\|\.eln//"
+    echo "${_ver}" | sed "s/\.el[0-9].*\|\.fc.*\|\.eln.*//"
 }
 
 function _cki_version_le()
