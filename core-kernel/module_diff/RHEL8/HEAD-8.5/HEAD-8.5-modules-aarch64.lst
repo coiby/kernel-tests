@@ -937,6 +937,7 @@ p8022.ko
 parman.ko
 pcbc.ko
 pcrypt.ko
+pcs-xpcs.ko
 pcwd_pci.ko
 pcwd_usb.ko
 peak_pci.ko
