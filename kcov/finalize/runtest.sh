@@ -27,41 +27,10 @@ load_config
 
 log "processing coverage data for all cases."
 
-HTMLDIR=$(mktemp -d $TDIR/kcov.XXXX)
-tag="J:${RSTRNT_JOBID}-${HOSTNAME%.redhat.com}-${RSTRNT_TASKID}"
-
-
-
-log "Generate html archive."
-ALL_INFO_FILES=$(cat $KCOV_INFO_LIST | tr '\n' ' ')
 FILE_OPTION_LIST=$(awk 1 ORS=' -a ' $KCOV_INFO_LIST)
 FILE_OPTION_LIST=" -a ${FILE_OPTION_LIST%' -a '}"
 lcov $FILE_OPTION_LIST -o $KCOV_COMBINED_INFO
 rhts-submit-log -l $KCOV_COMBINED_INFO
-
-if [[ $NO_HTML != 'true' ]]; then
-	params="--show-details --legend --highlight -o $HTMLDIR"
-	if [ -n "$HIERARCHICAL" ]; then
-		params="${params} --hierarchical"
-	fi
-	echo "{Info} running genhtml with the following parameters: ${params}"
-	genhtml --title "Coverage of kernel tests on $(uname -r)" $params $KCOV_COMBINED_INFO
-	cp $KCOV_COMBINED_INFO $HTMLDIR
-
-	tar -C $TDIR -zcf $TDIR/kcov_all-${tag}.tgz $(basename $HTMLDIR)
-	rhts-submit-log -l $TDIR/kcov_all-${tag}.tgz
-
-	[ -n "$NFS_SHARE" ] && {
-		MP=/nfs-kcov
-		UPDIR=$(uname -r)/$TASKNAME
-		log "{Info} upload kcov result file to $NFS_SHARE / $UPDIR"
-		mkdir $MP
-		mount $NFS_SHARE /$MP && mkdir -p $MP/$UPDIR &&
-			cp $TDIR/kcov_all-${tag}.tgz  $MP/$UPDIR/.
-		ls -l $MP/$UPDIR
-		umount $MP
-	}
-fi
 
 pass
 

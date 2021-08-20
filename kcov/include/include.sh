@@ -71,17 +71,6 @@ install_lcov()
 	if ! which lcov; then
 		repo_url="https://github.com/linux-test-project/lcov.git"
 		commit_id="aa56a43774e54955f5ca7ab798a7b0babdd13cb1"
-		if [ -n "$HIERARCHICAL" ]; then
-			# use not official repo that has support to hierarchical on genhtml
-			# https://github.com/linux-test-project/lcov/issues/97
-			# https://github.com/henry2cox/lcov/commit/3e7bc717dbce4aa807822187de8c3bd1ac8c7bf9
-			repo_url="https://github.com/henry2cox/lcov.git"
-			commit_id="3e7bc717dbce4aa807822187de8c3bd1ac8c7bf9"
-			# Install extra dependencies needed by genhtml from this commit
-			release=`cut -f1 -d. /etc/redhat-release | sed 's/[^0-9]//g'`
-			dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${release}.noarch.rpm
-			dnf install -y perl-DateTime perl-DateTime-Format-W3CDTF perl-IO-Compress perl-JSON
-		fi
 		git clone $repo_url
 		cd lcov
 		git checkout $commit_id
