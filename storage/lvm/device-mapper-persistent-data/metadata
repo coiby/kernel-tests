@@ -1,0 +1,13 @@
+[General]
+name=storage/lvm/device-mapper-persistent-data
+owner=Filip Suba <fsuba@redhat.com>
+description=lvm device mapper persistent data test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=augeas;git;python3;wget
+softDependencies=python3-devel
+repoRequires=cki_lib;storage/include
