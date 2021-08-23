@@ -268,8 +268,6 @@ then
 	[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
 else
 	{
-	yum info kernel-modules-extra && yum install kernel-modules-extra -y --skip-broken
-
 	# ssh to switch would fail with error "no matching key exchange method found. Their offer: diffie-hellman-group1-sha1" on rhel8
 	# add extra configuration for ssh
 	yum install openssh-clients -y
