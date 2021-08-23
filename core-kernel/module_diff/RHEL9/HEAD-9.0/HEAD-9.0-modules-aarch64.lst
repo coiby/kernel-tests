@@ -6,8 +6,10 @@ acpiphp_ibm.ko
 acpi_power_meter.ko
 act_bpf.ko
 act_csum.ko
+act_ct.ko
 act_gact.ko
 act_mirred.ko
+act_mpls.ko
 act_pedit.ko
 act_police.ko
 act_sample.ko
@@ -60,6 +62,7 @@ async_pq.ko
 async_raid6_recov.ko
 async_tx.ko
 async_xor.ko
+at24.ko
 ata_generic.ko
 atl1c.ko
 atl1e.ko
@@ -106,6 +109,7 @@ cast5_generic.ko
 cast6_generic.ko
 cast_common.ko
 catc.ko
+cavium_ptp.ko
 cavium-rng.ko
 cavium-rng-vf.ko
 cb710.ko
@@ -132,7 +136,6 @@ ch7006.ko
 ch9200.ko
 chacha20poly1305.ko
 chacha_generic.ko
-chacha-neon.ko
 chaoskey.ko
 chcr.ko
 chipreg.ko
@@ -163,6 +166,7 @@ coresight-replicator.ko
 coresight-stm.ko
 coresight-tmc.ko
 coresight-tpiu.ko
+coresight-trbe.ko
 cortina.ko
 cp210x.ko
 cppc_cpufreq.ko
@@ -184,6 +188,8 @@ cxgb4i.ko
 cxgb4.ko
 cxgb4vf.ko
 cxgbit.ko
+cxl_pci.ko
+cxl_pmem.ko
 cyberjack.ko
 cypress_m8.ko
 davicom.ko
@@ -237,6 +243,7 @@ dummy.ko
 dw_dmac_core.ko
 dw_dmac.ko
 dw_dmac_pci.ko
+dwmac-dwc-qos-eth.ko
 dw_mmc-bluefield.ko
 dw_mmc.ko
 dw_mmc-pltfm.ko
@@ -262,7 +269,10 @@ ebt_redirect.ko
 ebt_snat.ko
 ebt_stp.ko
 ebt_vlan.ko
+ecc.ko
+ecdsa_generic.ko
 echainiv.ko
+ee1004.ko
 eeprom_93cx6.ko
 eeprom.ko
 efa.ko
@@ -397,6 +407,7 @@ hid-roccat-ryos.ko
 hid-roccat-savu.ko
 hid-saitek.ko
 hid-samsung.ko
+hid-semitek.ko
 hid-sensor-hub.ko
 hid-sjoy.ko
 hid-sony.ko
@@ -463,7 +474,6 @@ i2c-versatile.ko
 i2c-xgene-slimpro.ko
 i2c-xlp9xx.ko
 i40e.ko
-i40iw.ko
 i6300esb.ko
 iavf.ko
 ib_cm.ko
@@ -484,7 +494,6 @@ igb.ko
 igbvf.ko
 igc.ko
 int51x1.ko
-intel_pmt.ko
 intel-xway.ko
 io_edgeport.ko
 ionic.ko
@@ -517,6 +526,7 @@ ipcomp.ko
 ip_gre.ko
 ipheth.ko
 ipip.ko
+ipmb_dev_int.ko
 ipmi_devintf.ko
 ipmi_msghandler.ko
 ipmi_poweroff.ko
@@ -561,6 +571,7 @@ ip_vs.ko
 ip_vs_lblc.ko
 ip_vs_lblcr.ko
 ip_vs_lc.ko
+ip_vs_mh.ko
 ip_vs_nq.ko
 ip_vs_ovf.ko
 ip_vs_pe_sip.ko
@@ -572,6 +583,7 @@ ip_vs_wrr.ko
 ipvtap.ko
 ip_vti.ko
 ipw.ko
+irdma.ko
 ir-usb.ko
 iscsi_boot_sysfs.ko
 iscsi_target_mod.ko
@@ -584,6 +596,7 @@ iw_cxgb4.ko
 ixgbe.ko
 ixgbevf.ko
 jbd2.ko
+jc42.ko
 jmb38x_ms.ko
 kalmia.ko
 kaweth.ko
@@ -628,8 +641,6 @@ libarc4.ko
 libblake2s-generic.ko
 libblake2s.ko
 libceph.ko
-libchacha20poly1305.ko
-libchacha.ko
 libcrc32c.ko
 libcurve25519-generic.ko
 libcurve25519.ko
@@ -644,8 +655,6 @@ libnvdimm.ko
 libpoly1305.ko
 libsas.ko
 linear.ko
-liquidio.ko
-liquidio_vf.ko
 llc.ko
 lm70.ko
 lockd.ko
@@ -703,6 +712,10 @@ megaraid_sas.ko
 memstick.ko
 mfd-core.ko
 mgag200.ko
+mhi.ko
+mhi_net.ko
+mhi_pci_generic.ko
+mhi_wwan_ctrl.ko
 michael_mic.ko
 micrel.ko
 microchip.ko
@@ -716,6 +729,9 @@ mlx4_ib.ko
 mlx5_core.ko
 mlx5_ib.ko
 mlx5_vdpa.ko
+mlxbf-bootctl.ko
+mlxbf_gige.ko
+mlxbf-tmfifo.ko
 mlxfw.ko
 mlxreg-hotplug.ko
 mlxreg-io.ko
@@ -724,12 +740,11 @@ mlxsw_i2c.ko
 mlxsw_minimal.ko
 mlxsw_pci.ko
 mlxsw_spectrum.ko
-mlxsw_switchib.ko
-mlxsw_switchx2.ko
 mmc_block.ko
 mmc_core.ko
 mos7720.ko
 mos7840.ko
+mpi3mr.ko
 mpls_iptunnel.ko
 mpls_router.ko
 mpt3sas.ko
@@ -780,6 +795,10 @@ nf_defrag_ipv6.ko
 nf_dup_ipv4.ko
 nf_dup_ipv6.ko
 nf_dup_netdev.ko
+nf_flow_table_inet.ko
+nf_flow_table_ipv4.ko
+nf_flow_table_ipv6.ko
+nf_flow_table.ko
 nfit.ko
 nf_log_syslog.ko
 nf_nat_amanda.ko
@@ -793,6 +812,7 @@ nf_nat_snmp_basic.ko
 nf_nat_tftp.ko
 nfnetlink_cthelper.ko
 nfnetlink_cttimeout.ko
+nfnetlink_hook.ko
 nfnetlink.ko
 nfnetlink_log.ko
 nfnetlink_osf.ko
@@ -824,6 +844,7 @@ nft_fib_ipv4.ko
 nft_fib_ipv6.ko
 nft_fib.ko
 nft_fib_netdev.ko
+nft_flow_offload.ko
 nft_fwd_netdev.ko
 nft_hash.ko
 nft_limit.ko
@@ -895,6 +916,7 @@ nls_koi8-ru.ko
 nls_koi8-u.ko
 nls_utf8.ko
 nouveau.ko
+ns.ko
 ntc_thermistor.ko
 null_blk.ko
 nvme-core.ko
@@ -923,6 +945,7 @@ parman.ko
 pcbc.ko
 pci-pf-stub.ko
 pcrypt.ko
+pcs_xpcs.ko
 pcwd_pci.ko
 pcwd_usb.ko
 peak_pciefd.ko
@@ -930,6 +953,7 @@ peak_usb.ko
 pegasus.ko
 phy-bcm-sr-usb.ko
 phy-hi6220-usb.ko
+phylink.ko
 physmap.ko
 pi3usb30532.ko
 pkcs8_key_parser.ko
@@ -939,7 +963,6 @@ platform_lcd.ko
 plusb.ko
 pmbus_core.ko
 poly1305_generic.ko
-poly1305-neon.ko
 powr1220.ko
 ppp_async.ko
 ppp_deflate.ko
@@ -956,6 +979,8 @@ psample.ko
 psnap.ko
 ptp_kvm.ko
 pulse8-cec.ko
+pvpanic.ko
+pvpanic-pci.ko
 pwm_bl.ko
 pwm-fan.ko
 qcaux.ko
@@ -970,6 +995,8 @@ qla2xxx.ko
 qla3xxx.ko
 qla4xxx.ko
 qmi_wwan.ko
+qrtr.ko
+qrtr-mhi.ko
 qsemi.ko
 quatech2.ko
 qxl.ko
@@ -989,7 +1016,6 @@ rainshadow-cec.ko
 ramoops.ko
 rbd.ko
 rdma_cm.ko
-rdma_rxe.ko
 rdma_ucm.ko
 realtek.ko
 reed_solomon.ko
@@ -1069,6 +1095,7 @@ sch_hfsc.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_multiq.ko
 sch_netem.ko
 sch_prio.ko
 sch_red.ko
@@ -1112,11 +1139,6 @@ siw.ko
 slcan.ko
 slhc.ko
 slip.ko
-sm2_generic.ko
-sm3-ce.ko
-sm3_generic.ko
-sm4-ce.ko
-sm4_generic.ko
 smartpqi.ko
 smb347-charger.ko
 smc91x.ko
@@ -1140,6 +1162,8 @@ ssu100.ko
 ste10Xp.ko
 st.ko
 stm_core.ko
+stmmac.ko
+stmmac-platform.ko
 stp.ko
 sunrpc.ko
 symbolserial.ko
@@ -1193,6 +1217,9 @@ tls.ko
 tmp103.ko
 toshsd.ko
 tpm_atmel.ko
+tpm_i2c_atmel.ko
+tpm_i2c_infineon.ko
+tpm_i2c_nuvoton.ko
 tps40422.ko
 tps6598x.ko
 trusted.ko
@@ -1246,7 +1273,9 @@ usb_wwan.ko
 ushc.ko
 vcan.ko
 vdpa.ko
+vdpa_sim_blk.ko
 vdpa_sim.ko
+vdpa_sim_net.ko
 veth.ko
 vexpress-hwmon.ko
 vfat.ko
@@ -1275,11 +1304,13 @@ visor.ko
 vitesse.ko
 vkms.ko
 vmac.ko
+vmwgfx.ko
 vmw_vsock_virtio_transport_common.ko
 vmw_vsock_virtio_transport.ko
 vport-geneve.ko
 vport-gre.ko
 vport-vxlan.ko
+vp_vdpa.ko
 vrf.ko
 vringh.ko
 vsock_diag.ko

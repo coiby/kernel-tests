@@ -749,6 +749,7 @@ hwpoison-inject.ko
 hyperv_fb.ko
 hyperv-keyboard.ko
 hysdn.ko
+i10nm_edac.ko
 i1480-dfu-usb.ko
 i1480-est.ko
 i2c-algo-bit.ko

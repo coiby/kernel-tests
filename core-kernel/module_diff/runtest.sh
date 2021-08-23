@@ -17,6 +17,7 @@ K_VER=`rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r)`
 K_VARIANT=$(echo $K_NAME | sed -e "s/kernel//g")
 #   are we a DEBUG kernel?
 K_REL=`rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r)`
+K_ARCH=$(rpm -q --queryformat '%{arch}' -f /boot/config-$(uname -r))
 
 devnull=0
 
@@ -49,12 +50,17 @@ function GetCurrentModuleList ()
     # rpm -q --filesbypkg kernel-2.6.32-220.el6 | grep '\.ko' | awk -F/ '{ print $NF }' | sort
 
     if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
-        rpm -q --filesbypkg kernel-modules-${K_VER}-${K_REL} kernel-modules-extra-${K_VER}-${K_REL} kernel-core-${K_VER}-${K_REL} | \
-            grep '\.ko' | awk -F/ '{ print $NF }' | sed 's/\.xz$//' | sort > ${TESTAREA}/moduleList_current
+		PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
+		if $(cki_is_kernel_rt); then
+			PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
+		fi
     else
-	rpm -q --filesbypkg ${K_NAME}-${K_VER}-${K_REL} | grep '\.ko' | awk -F/ '{ print $NF }' | \
-            sed 's/\.xz$//' | sort > ${TESTAREA}/moduleList_current
+		PKG_LIST="${name}-${K_VER}-${K_REL}"
+		if $(cki_is_kernel_rt); then
+			PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
+		fi
     fi
+	rpm -q --filesbypkg $PKG_LIST | grep '\.ko' | awk -F/ '{ print $NF }' | sed 's/\.xz$//' | sort > ${TESTAREA}/moduleList_current
 
     if [ ! -s "${TESTAREA}/moduleList_current" ]; then
         echo "" | tee -a $OUTPUTFILE
@@ -67,6 +73,26 @@ function GetCurrentModuleList ()
     echo "***** Stored current module list: ${TESTAREA}/moduleList_current *****" | tee -a $OUTPUTFILE
 }
 
+function AddDebugKernelModuleToBase ()
+{
+    cat ./${OS}/${Release}/${Release}{-,-debug-}modules-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_base_debug
+    \cp ${TESTAREA}/moduleList_base_debug ${TESTAREA}/moduleList_base
+}
+
+function AddRTBaseList ()
+{
+    if [ -f ./${OS}/${Release}/${Release}-rt-modules-${ARCH}.lst ]; then
+        cat ./${OS}/${Release}/${Release}{-,-rt-}modules-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_base_rt
+        \cp ${TESTAREA}/moduleList_base_rt ${TESTAREA}/moduleList_base
+    fi
+}
+
+function AddRTnDebugBaseList ()
+{
+    cat ${TESTAREA}/moduleList_base_debug ./${OS}/${Release}/${Release}-rt-modules-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_base_rt
+    \cp ${TESTAREA}/moduleList_base_rt ${TESTAREA}/moduleList_base
+}
+
 function GetBaseModuleList ()
 {
     # Lets determine the module list for the base release kernel package
@@ -75,6 +101,17 @@ function GetBaseModuleList ()
     echo "***** Determining base module list: RHEL-${Release}-${ARCH} *****" | tee -a $OUTPUTFILE
 
     cat ./${OS}/${Release}/${Release}-modules-${ARCH}.lst > ${TESTAREA}/moduleList_base
+
+    if $(cki_is_kernel_debug); then
+		AddDebugKernelModuleToBase
+		if $(cki_is_kernel_rt); then
+			AddRTnDebugBaseList
+		fi
+	else
+		if $(cki_is_kernel_rt); then
+			AddRTBaseList
+		fi
+	fi
 
     if [ ! -s "${TESTAREA}/moduleList_base" ]; then
         echo "" | tee -a $OUTPUTFILE
@@ -85,6 +122,13 @@ function GetBaseModuleList ()
     fi
 
     echo "***** Stored base module list: ${TESTAREA}/moduleList_base *****" | tee -a $OUTPUTFILE
+}
+
+# Workround for RT
+function AddRTKnowRemovedList ()
+{
+    cat ./${OS}/${Release}/${Release}{-,-rt-}knownRemoved-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_knownRemoved-rt
+    \cp ${TESTAREA}/moduleList_knownRemoved-rt ${TESTAREA}/moduleList_knownRemoved
 }
 
 function GetKnownRemovedList ()
@@ -100,6 +144,10 @@ function GetKnownRemovedList ()
         touch ${TESTAREA}/moduleList_knownRemoved
     else
         cat ./${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst > ${TESTAREA}/moduleList_knownRemoved
+    fi
+
+    if $(cki_is_kernel_rt); then
+        AddRTKnowRemovedList
     fi
 
     if [ ! -e "${TESTAREA}/moduleList_knownRemoved" ]; then
@@ -124,7 +172,7 @@ function FileClean ()
     sed -i '1d' ${TESTAREA}/${filename}
 
     # Remove the "leading -" from each line, providing a new clean module listing
-    sed -i 's/^-//' ${TESTAREA}/${filename}
+    sed -i 's/^-//;s/^+//' ${TESTAREA}/${filename}
 }
 
 function RHEL6_TestBZ839667 ()
@@ -178,27 +226,39 @@ function DisplayModuleFail ()
     echo "**************************************" | tee -a $OUTPUTFILE
 }
 
+function inst_kernel_rt_kvm ()
+{
+    rt_kvm="${name}-kvm-${version}-${release}.${arch}"
+    rpm -q $rt_kvm || $YUM -y install $rt_kvm || (cki_report_result 1 1 "Missing ${name}-kvm" && exit 1)
+
+}
+
 # Check if kernel{,-debug}-modules-extra installed
 function chk_inst_kernel_modules_extra ()
 {
-        local name="kernel"
-        local arch=$(uname -m)
-        local version_release=`uname -r | sed "s/\.$arch//;s/+debug//"`
-        local version=${version_release%-*}
-        local release=${version_release#*-}
-        local kvari=`uname -r | grep -Eo '(debug|PAE|xen)$'`
-        [[ $(rpm -qa kernel-rt) =~ ${version_release} ]] && name="${name}-rt"
-        # kernel-modules-extra for rhel8.
-        if [[ -n ${kvari} ]]; then
-                pkg_kms_extra="${name}-${kvari}-modules-extra-$version-${release}.${arch}"
-        else
-                pkg_kms_extra="${name}-modules-extra-$version-${release}.${arch}"
-        fi
-        YUM=$(cki_get_yum_tool)
-        rpm -q $pkg_kms_extra || $YUM -y install $pkg_kms_extra || (cki_report_result 1 1 "Missing kernel-modules-extra" && exit 1)
+    pkg_kms_extra="${name}-modules-extra-${version}-${release}.${arch}"
+    rpm -q $pkg_kms_extra || $YUM -y install $pkg_kms_extra || (cki_report_result 1 1 "Missing ${name}-modules-extra" && exit 1)
 }
+
+YUM=$(cki_get_yum_tool)
+name="kernel"
+arch=$(uname -m)
+version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//"`
+version=${version_release%-*}
+release=${version_release#*-}
+kvari=`uname -r | grep -Eo '(debug|PAE|xen)$'`
+if $(cki_is_kernel_rt); then
+	name="${name}-rt"
+fi
+if $(cki_is_kernel_debug); then
+	name="${name}-debug"
+fi
+
 if  grep -q "release 8" /etc/redhat-release || grep -q "release 9" /etc/redhat-release ; then
     chk_inst_kernel_modules_extra
+fi
+if $(cki_is_kernel_rt); then
+	inst_kernel_rt_kvm
 fi
 # -----------------------------------
 # --------   Start Test   -----------
@@ -412,6 +472,13 @@ elif [ "${K_VER}" = "4.18.0" ]; then
             echo "" | tee -a $OUTPUTFILE
             echo "***** $ARCH: Base release is RHEL-8.4 *****" | tee -a $OUTPUTFILE
             Release="8.4"
+            if cki_kver_lt "4.18.0-305.8.1.el8_4"; then
+                sed -i "/pinctrl-emmitsburg\.ko/d"  ${OS}/${Release}/8.4-modules-${ARCH}.lst
+            fi
+            #known issue: bz1968381
+            if cki_kver_lt "4.18.0-305.11.1.el8_4"; then
+                sed -i "/dptf_power\.ko/d" ${OS}/${Release}/8.4-modules-${ARCH}.lst
+            fi
             ;;
         *)
             # We are currently developing RHEL-8.5
@@ -436,11 +503,11 @@ elif [ "${K_VER}" = "4.18.0" ]; then
             fi
             ;;
     esac
-elif [ "${K_VER}" = "5.13.0" ]; then
+elif [ "${K_VER}" = "5.14.0" -o "${K_VER}" = "5.13.0" ]; then
 	# This is RHEL9
     OS="RHEL9"
     case ${Base} in
-		0)
+		*)
 			# Still in developing phase, need to update in future.
 			DeBug "Base release is HEAD-RHEL-9.0"
             echo "" | tee -a $OUTPUTFILE
@@ -487,6 +554,30 @@ cki_upload_log_file ${TESTAREA}/moduleList_base-current_diff.log
 #
 echo "" | tee -a $OUTPUTFILE
 echo "***** $ARCH: Comparing base and current module lists. *****" | tee -a $OUTPUTFILE
+echo "***** Stored compare module list: ${TESTAREA}/moduleList_base-current_diff.log *****" | tee -a $OUTPUTFILE
+
+# Check new added modules
+diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^+" > ${TESTAREA}/moduleList_compare_added
+FileClean moduleList_compare_added
+
+echo "" | tee -a $OUTPUTFILE
+echo "***** $ARCH: Checking against "New added" modules list. *****" | tee -a $OUTPUTFILE
+
+if [ ! -s ${TESTAREA}/moduleList_compare_added ]; then
+    echo "***** PASS: *****" | tee -a $OUTPUTFILE
+    echo "***** Files checked. There are no new modules. *****" | tee -a $OUTPUTFILE
+    cki_report_result 0 1 "New added modules check PASS"
+else
+    echo "***** WARNING: *****" | tee -a $OUTPUTFILE
+    echo "***** Files compared. There are new modules!!! *****" | tee -a $OUTPUTFILE
+    cp ${TESTAREA}/moduleList_compare_added ${TESTAREA}/moduleList_compare_added.log
+	cki_upload_log_file ${TESTAREA}/moduleList_compare_added.log
+    rlLogWarning "Existing new module(s), please update case!"
+    echo "**************************************" | tee -a $OUTPUTFILE
+    cat ${TESTAREA}/moduleList_compare_added | tee -a $OUTPUTFILE
+    echo "**************************************" | tee -a $OUTPUTFILE
+    cki_report_result 0 1 "Warn: existing new added modules"
+fi
 
 diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^-" > ${TESTAREA}/moduleList_compare
 
@@ -549,6 +640,5 @@ else
     cki_print_info "Checked"
     cki_report_result 1 1 "There are missing modules!"
 fi
-
 
 # EndFile

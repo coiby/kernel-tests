@@ -793,6 +793,7 @@ xt_TCPOPTSTRIP.ko
 xt_TEE.ko
 xt_TPROXY.ko
 xt_TRACE.ko
+xt_u32.ko
 zcrypt_cex2a.ko
 zcrypt_cex2c.ko
 zcrypt_cex4.ko

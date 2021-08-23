@@ -46,6 +46,7 @@ aquantia.ko
 arc4.ko
 arc_ps2.ko
 ark3116.ko
+arm-cmn.ko
 arm_mhu.ko
 armmmci.ko
 arm_scpi.ko
@@ -198,7 +199,9 @@ dm-crypt.ko
 dm-delay.ko
 dm-era.ko
 dm-flakey.ko
+dm-historical-service-time.ko
 dm-integrity.ko
+dm-io-affinity.ko
 dm-log.ko
 dm-log-userspace.ko
 dm-log-writes.ko
@@ -653,6 +656,7 @@ libiscsi_tcp.ko
 libnvdimm.ko
 libsas.ko
 linear.ko
+linear_ranges.ko
 liquidio.ko
 liquidio_vf.ko
 llc.ko
@@ -709,6 +713,8 @@ megaraid_sas.ko
 memstick.ko
 mfd-core.ko
 mgag200.ko
+mhi.ko
+mhi_pci_generic.ko
 michael_mic.ko
 micrel.ko
 microchip.ko
@@ -721,6 +727,7 @@ mlx4_en.ko
 mlx4_ib.ko
 mlx5_core.ko
 mlx5_ib.ko
+mlx5_vdpa.ko
 mlxbf-bootctl.ko
 mlxbf-pmc.ko
 mlxbf-tmfifo.ko
@@ -983,6 +990,7 @@ qla2xxx.ko
 qla3xxx.ko
 qla4xxx.ko
 qmi_wwan.ko
+qrtr.ko
 qsemi.ko
 quatech2.ko
 qxl.ko

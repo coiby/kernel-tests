@@ -283,6 +283,7 @@ cordic.ko
 coretemp.ko
 cp210x.ko
 cpufreq_stats.ko
+cpuidle-haltpoll.ko
 cqhci.ko
 cramfs.ko
 crc32c-intel.ko

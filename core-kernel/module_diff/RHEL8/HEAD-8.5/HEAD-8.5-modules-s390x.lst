@@ -110,7 +110,9 @@ dm-crypt.ko
 dm-delay.ko
 dm-era.ko
 dm-flakey.ko
+dm-historical-service-time.ko
 dm-integrity.ko
+dm-io-affinity.ko
 dm-log.ko
 dm-log-userspace.ko
 dm-log-writes.ko
@@ -314,6 +316,7 @@ libiscsi_tcp.ko
 libnvdimm.ko
 libsas.ko
 linear.ko
+linear_ranges.ko
 liquidio.ko
 liquidio_vf.ko
 llc.ko
@@ -345,6 +348,8 @@ mdio-cavium.ko
 mdio-mscc-miim.ko
 mdio-thunder.ko
 mfd-core.ko
+mhi.ko
+mhi_pci_generic.ko
 michael_mic.ko
 mip6.ko
 mlx4_core.ko
@@ -352,6 +357,7 @@ mlx4_en.ko
 mlx4_ib.ko
 mlx5_core.ko
 mlx5_ib.ko
+mlx5_vdpa.ko
 mlxfw.ko
 mlxsw_core.ko
 mlxsw_pci.ko
@@ -544,6 +550,7 @@ qdio.ko
 qeth.ko
 qeth_l2.ko
 qeth_l3.ko
+qrtr.ko
 raid0.ko
 raid10.ko
 raid1.ko
@@ -699,6 +706,7 @@ vhost_vdpa.ko
 vhost_vsock.ko
 virtio_balloon.ko
 virtio_blk.ko
+virtio_console.ko
 virtiofs.ko
 virtio-gpu.ko
 virtio_input.ko
