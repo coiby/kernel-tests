@@ -293,9 +293,6 @@ then
 	[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
 else
 	{
-	# install kernel-module-extra version matching the current running kernel version
-	${yum} install kernel-modules-extra -y --skip-broken
-
 	# install customer tools
 	mkdir -p /usr/local/src /usr/local/bin
 	\cp -af src/*    /usr/local/src/.
