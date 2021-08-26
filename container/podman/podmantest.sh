@@ -26,7 +26,7 @@ ARCH=$(uname -m)
 excludeTests="220-healthcheck 250-systemd 260-sdnotify 410-selinux"
 
 #  Switching root or rootless podmantest
-if [[ $(id -u) -eq 0 ]]; then 
+if [[ $(id -u) -eq 0 ]]; then
     OUTPUTFILE=/tmp/podmantest-root.log
     > $OUTPUTFILE
     echo "Running root podmantest:" | tee -a "${OUTPUTFILE}"
@@ -36,7 +36,7 @@ if [[ $(id -u) -eq 0 ]]; then
         excludeTests="050-stops"
     fi
 
-    
+
 else
     OUTPUTFILE=/tmp/podmantest-rootless.log
     > $OUTPUTFILE
@@ -61,14 +61,14 @@ for TEST_FILE in ${TEST_DIR}/*.bats; do
     for excTest in $excludeTests; do
         if [[ "$(basename $TEST_FILE .bats)" == "$excTest" ]]; then
             excFound=true
-            break   
+            break
         fi
     done
     if  $excFound; then
         continue
     fi
 
-    echo -e "\n📊  $(basename $TEST_FILE):"   | tee -a "${OUTPUTFILE}"
+    echo -e "\n[$(date '+%F %T')] $(basename $TEST_FILE)" | tee -a "${OUTPUTFILE}"
     bats $TEST_FILE | tee -a "${OUTPUTFILE}"
     # Save a marker if this test failed.
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
