@@ -428,6 +428,11 @@ else
   fi
 
   cki_print_success "Found the correct kernel version running!"
+  # save the CKI installed kernel so following tests can check if they are running on correct kernel
+  # this should help detect cases where by mistake the kernel gets updated.
+  # https://gitlab.com/cki-project/kpet-db/-/issues/56
+  mkdir -p /var/opt/cki/
+  echo "${ckver}" > /var/opt/cki/kernel_version
 
   # Workaround for cross compiling non x86_64 kernels
   if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]] ; then
