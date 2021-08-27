@@ -9,7 +9,6 @@
 . ../include/knownissue.sh		|| exit 1
 
 TARGET_DIR=/mnt/testarea/ltp
-GIT_USER_ADDR=${GIT_USER_ADDR:-0}
 RUNTESTS=${RUNTESTS:-"cve sched syscalls can commands containers dio fs fsx math hugetlb mm nptl pty ipc tracing"}
 CPUS_NUM=$(getconf _NPROCESSORS_ONLN || echo 1)
 MEM_AVAILABLE=$(echo "$(grep '^MemAvailable:' /proc/meminfo | sed 's/^[^0-9]*\([0-9]*\).*/\1/') / 1024" |bc -q)
@@ -32,6 +31,15 @@ function test_msg()
 LTP_REPO_COMMIT_ID=9bb4d96c01dce268180fa72b217b47048ad63621
 function ltp_test_build()
 {
+	# NOTE: Skip to built and install ltp if it is done as we split a
+	#       single task to run LTP tests into multiple tasks. For more
+	#       details, please refer to:
+	#       o https://gitlab.com/cki-project/kpet-db/-/issues/54
+	if [ -f ${LTPDIR}/runltp ]; then
+		test_msg pass "LTP has been built and installed!"
+		return
+	fi
+
 	# workaround for the beaker issue when arch is ppc64:
 	# Makefile:495: /mnt/tests/kernel/distribution/upstream-kernel/install/linux/arch/ppc64/Makefile: No such file or directory
 	if [ ${ARCH} = ppc64 -o ${ARCH} = ppc -o ${ARCH} = s390x -o ${ARCH} = s390 ]; then
@@ -41,18 +49,10 @@ function ltp_test_build()
 	if [ -f ltp/.git/config ]; then
 		pushd ltp; git pull  > /dev/null 2>&1; popd
 	else
-		if [ $GIT_USER_ADDR = 0 ]; then
-			git clone https://github.com/linux-test-project/ltp ltp \
-				> /dev/null 2>&1 || test_msg fail "git clone ltp upstream failed"
-
-			test_msg pass "git clone LTP upstream"
-		else
-			git clone git://git.engineering.redhat.com/users/${GIT_USER_ADDR} ltp  \
-				> /dev/null 2>&1 || test_msg fail "git clone ltp ${GIT_USER_ADDR} failed"
-
-			test_msg pass "git clone LTP ${GIT_USER_ADDR}"
-		fi
-
+		git clone https://github.com/linux-test-project/ltp ltp \
+		    > /dev/null 2>&1 || \
+		    test_msg fail "git clone ltp upstream failed"
+		test_msg pass "git clone LTP upstream"
 	fi
 
 	pushd ltp > /dev/null 2>&1
