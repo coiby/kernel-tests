@@ -163,25 +163,25 @@ function runtest_tweaker()
 
 	# tolerate s390 high steal time
 	if uname -m | grep -q s390; then
-		sed -i 's/nanosleep01 nanosleep01/nanosleep01 timeout 300 sh -c "nanosleep01 || true"/' "$runtest"
-		sed -i 's/clock_nanosleep01 clock_nanosleep01/clock_nanosleep01 timeout 300 sh -c "clock_nanosleep01 || true"/' "$runtest"
-		sed -i 's/clock_nanosleep02 clock_nanosleep02/clock_nanosleep02 timeout 300 sh -c "clock_nanosleep02 || true"/' "$runtest"
-		sed -i 's/futex_wait_bitset01 futex_wait_bitset01/futex_wait_bitset01 timeout 30 sh -c "futex_wait_bitset01 || true"/' "$runtest"
-		sed -i 's/futex_wait05 futex_wait05/futex_wait05 timeout 30 sh -c "futex_wait05 || true"/' "$runtest"
-		sed -i 's/epoll_pwait01 epoll_pwait01/epoll_pwait01 timeout 30 sh -c "epoll_pwait01 || true"/' "$runtest"
-		sed -i 's/poll02 poll02/poll02 timeout 30 sh -c "poll02 || true"/' "$runtest"
-		sed -i 's/pselect01 pselect01/pselect01 timeout 30 sh -c "pselect01 || true"/' "$runtest"
-		sed -i 's/pselect01_64 pselect01_64/pselect01_64 timeout 30 sh -c "pselect01_64 || true"/' "$runtest"
-		sed -i 's/select04 select04/select04 timeout 30 sh -c "select04 || true"/' "$runtest"
+		sed -i 's/nanosleep01 nanosleep01/nanosleep01 timeout 300 sh -c "nanosleep01 || true"/' $runtest
+		sed -i 's/clock_nanosleep01 clock_nanosleep01/clock_nanosleep01 timeout 300 sh -c "clock_nanosleep01 || true"/' $runtest
+		sed -i 's/clock_nanosleep02 clock_nanosleep02/clock_nanosleep02 timeout 300 sh -c "clock_nanosleep02 || true"/' $runtest
+		sed -i 's/futex_wait_bitset01 futex_wait_bitset01/futex_wait_bitset01 timeout 30 sh -c "futex_wait_bitset01 || true"/' $runtest
+		sed -i 's/futex_wait05 futex_wait05/futex_wait05 timeout 30 sh -c "futex_wait05 || true"/' $runtest
+		sed -i 's/epoll_pwait01 epoll_pwait01/epoll_pwait01 timeout 30 sh -c "epoll_pwait01 || true"/' $runtest
+		sed -i 's/poll02 poll02/poll02 timeout 30 sh -c "poll02 || true"/' $runtest
+		sed -i 's/pselect01 pselect01/pselect01 timeout 30 sh -c "pselect01 || true"/' $runtest
+		sed -i 's/pselect01_64 pselect01_64/pselect01_64 timeout 30 sh -c "pselect01_64 || true"/' $runtest
+		sed -i 's/select04 select04/select04 timeout 30 sh -c "select04 || true"/' $runtest
 	fi
 
 	# reduce fork13 iteration
-	sed -i 's/fork13 fork13 -i 1000000/fork13 fork13 -i 10000/' "$runtest"
+	sed -i 's/fork13 fork13 -i 1000000/fork13 fork13 -i 10000/' $runtest
 
 	# reduce the number of dio tests on VM
 	if ! is_baremetal; then
-		sed -i 's/^dio/#&/' "$runtest"
-		sed -i 's/^#\(dio0[1-6]\)/\1/' "$runtest"
+		sed -i 's/^dio/#&/' $runtest
+		sed -i 's/^#\(dio0[1-6]\)/\1/' $runtest
 	fi
 }
 
