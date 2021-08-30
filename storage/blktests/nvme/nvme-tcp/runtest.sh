@@ -62,7 +62,8 @@ function get_test_result
 	typeset test_case=$2
 
 	typeset result_dir="$test_ws/results"
-	typeset result_file=$(find $result_dir -type f | egrep "$test_case")
+	typeset result_file=$(find $result_dir -type f | egrep "$test_case$")
+	typeset out_bad_file="${result_file}.out.bad"
 	typeset result="UNTESTED"
 	if [[ -n $result_file ]]; then
 		typeset res=$(grep "^status" $result_file)
@@ -70,6 +71,7 @@ function get_test_result
 			result="PASS"
 		elif [[ $res == *"fail" ]]; then
 			result="FAIL"
+			[ -f $out_bad_file ] && cki_upload_log_file "$out_bad_file"
 		elif [[ $res == *"not run" ]]; then
 			result="SKIP"
 		else
