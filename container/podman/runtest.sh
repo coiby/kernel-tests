@@ -109,6 +109,7 @@ if  [[ "$PODMANUSER" != "root" ]]; then
         echo "Adding rootless podman user: $PODMANUSER"
         adduser $PODMANUSER
     fi
+    loginctl enable-linger $PODMANUSER
     su - podmantest -c "cd `pwd`; bash ./podmantest.sh"
     TEST_FAILED=$?
     cat /tmp/podmantest-rootless.log >> "${OUTPUTFILE}"
@@ -120,8 +121,8 @@ fi
 
 if [[ ${TEST_FAILED:-} == 1 ]] ; then
     echo "😭 One or more tests failed."
-    rstrnt-report-result "${TEST}" FAIL 
+    rstrnt-report-result "${TEST}" FAIL
 else
     echo "😎 All tests passed."
-    rstrnt-report-result "${TEST}" PASS 
+    rstrnt-report-result "${TEST}" PASS
 fi
