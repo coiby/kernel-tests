@@ -290,7 +290,7 @@ function cki_upload_log_file()
 {
     typeset logfile=${1?"*** log file ***"}
     echo "Upload log file $logfile ..."
-    rstrnt-report-log -S "$RESULT_SERVER" -T "$TESTID" -l "$logfile"
+    rstrnt-report-log -l "$logfile"
 }
 
 # Print an informational message with a friendly emoji.
