@@ -109,7 +109,7 @@ function get_test_cases_srp
 {
 	typeset testcases=""
 	testcases+=" srp/001"
-	# srp/002 srp/011 srp/015 failure on ppc64le|x86_64, BZ1938508|BZ1963685|BZ1963696
+	# srp/002 srp/011 srp/015 failure on ppc64le|x86_64|aarch64, BZ1938508|BZ1963685|BZ1963696|BZ1999540
 	uname -ri | grep -qE "el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/002"
 	# testcases+=" srp/003", need legacy device mapper support
 	# testcases+=" srp/004", need legacy device mapper support
@@ -124,7 +124,7 @@ function get_test_cases_srp
 	# srp/013 on aarch64/ppc64le BZ1951961
 	uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" srp/013"
 	uname -r | grep -q 4.18.0 || testcases+=" srp/014" #BZ1900153
-	uname -ri | grep -qE "el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/015"
+	uname -ri | grep -qE "el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/015"
 	echo $testcases
 }
 
