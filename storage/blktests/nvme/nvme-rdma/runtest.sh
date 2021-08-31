@@ -145,8 +145,8 @@ function get_test_cases_rdma
 		testcases+=" nvme/011"
 		uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le|el9.ppc64le" || testcases+=" nvme/012" # BZ1871774 BZ1912968
 		uname -ri | grep -qE "4.18.0-147|4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" nvme/013" # BZ1871774/dislable 013 on 8.1.z
-		testcases+=" nvme/014"
-		uname -ri | grep -q "4.18.0-147" || testcases+=" nvme/015" # disable 015 on 8.1.z
+		uname -ri | grep -qE "4.18.0.*x86_64|4.18.0.*aarch64" || testcases+=" nvme/014" #BZ1964313 disable nvme/014 on x86_64/aarch64, nvme/015 on aarch64
+		uname -ri | grep -qE "4.18.0-147|4.18.0.*aarch64" || testcases+=" nvme/015" # disable 015 on 8.1.z
 		testcases+=" nvme/018"
 		testcases+=" nvme/019"
 		testcases+=" nvme/020"
