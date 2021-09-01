@@ -27,30 +27,27 @@ rlJournalStart
       rlRun "make -f /usr/share/selinux/devel/Makefile groupadd.pp" 0 "Building groupadd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile mandb-mod.pp" 0 "Building mandb SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile fowner-sadc.pp" 0 "Building fowner-sadc SELinux module"
-      rules="rpcbind-mod rhsmcertd-worke rhsmcertd-worke-nodebind systemd-logind-mod groupadd mandb-mod fowner-sadc"
+      modules_to_load+=" rpcbind-mod.pp rhsmcertd-worke.pp rhsmcertd-worke-nodebind.pp systemd-logind-mod.pp groupadd.pp mandb-mod.pp fowner-sadc.pp"
       # Bug 1929329 - [RHEL-9] avc: denied { watch } for pid=328374 comm="avahi-daemon"
       rlRun "make -f /usr/share/selinux/devel/Makefile avahi-daemon.pp" 0 "Building avahi-daemon SELinux module"
-      rules="${rules} avahi-daemon"
+      modules_to_load+=" avahi-daemon.pp"
 
       # Bug 1929332 - [RHEL-9] avc: denied { integrity } for pid=11514 comm="ioperm01"  and comm="grep"
       rlRun "make -f /usr/share/selinux/devel/Makefile ioperm01.pp" 0 "Building ioperm01 SELinux module"
-      rules="${rules} ioperm01"
+      modules_to_load+=" ioperm01.pp"
 
       # Bug 1932436 - avc denied related to sssd and systemd-hostname
       rlRun "make -f /usr/share/selinux/devel/Makefile sssd-mod.pp" 0 "Building sssd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile systemd-hostnam-mod.pp" 0 "Building systemd-hostname SELinux module"
-      rules="${rules} sssd-mod systemd-hostnam-mod"
+      modules_to_load+=" sssd-mod.pp systemd-hostnam-mod.pp"
       # Bug 1933680 - avc: denied { confidentiality } for pid=814 comm="modprobe" lockdown_reason="use of tracefs"
       rlRun "make -f /usr/share/selinux/devel/Makefile modprobe-mod.pp" 0 "Building modprobe SELinux module"
-      rules="${rules} modprobe-mod"
+      modules_to_load+=" modprobe-mod.pp"
 
-      for rule in $rules; do
-           rlRun "semodule -i ${rule}.pp"  0 "Installing $rule SELinux modules"
-      done
       echo "(allow domain dma_device_t (dir (getattr search open read)))" > bz1969323.cil
-      rlRun "semodule -i bz1969323.cil" 0
+      modules_to_load+=" bz1969323.cil"
       echo "(allow domain init_t (dir (getattr search open read)))" > bz1965412.cil
-      rlRun "semodule -i bz1965412.cil" 0
+      modules_to_load+=" bz1965412.cil"
     elif rlIsFedora; then
       # Bug 1910373 - selinux avc denials for rhsmcertd-worke and rpcbind
       rlRun "make -f /usr/share/selinux/devel/Makefile rpcbind-mod.pp" 0 "Building rpcbind SELinux module"
@@ -63,53 +60,59 @@ rlJournalStart
       rlRun "make -f /usr/share/selinux/devel/Makefile groupadd.pp" 0 "Building groupadd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile mandb-mod.pp" 0 "Building mandb SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile fowner-sadc.pp" 0 "Building fowner-sadc SELinux module"
-      rules="rpcbind-mod rhsmcertd-worke rhsmcertd-worke-nodebind systemd-logind-mod groupadd mandb-mod fowner-sadc"
+      modules_to_load+=" rpcbind-mod.pp rhsmcertd-worke.pp rhsmcertd-worke-nodebind.pp systemd-logind-mod.pp groupadd.pp mandb-mod.pp fowner-sadc.pp"
       # Skip if watch* permissions still not available, like Fedora 33
       if seinfo --common file -x | grep -q watch ; then
           # Bug 1929329 - [RHEL-9] avc: denied { watch } for pid=328374 comm="avahi-daemon"
           rlRun "make -f /usr/share/selinux/devel/Makefile avahi-daemon.pp" 0 "Building avahi-daemon SELinux module"
-          rules="${rules} avahi-daemon"
+          modules_to_load+=" avahi-daemon.pp"
       fi
       # Fedora 33 doesn't have lockdown class
       if seinfo --class lockdown -x  | grep -q integrity ; then
           # Bug 1929332 - [RHEL-9] avc: denied { integrity } for pid=11514 comm="ioperm01"  and comm="grep"
           rlRun "make -f /usr/share/selinux/devel/Makefile ioperm01.pp" 0 "Building ioperm01 SELinux module"
-          rules="${rules} ioperm01"
+          modules_to_load+=" ioperm01.pp"
       fi
       # Bug 1932436 - avc denied related to sssd and systemd-hostname
       rlRun "make -f /usr/share/selinux/devel/Makefile sssd-mod.pp" 0 "Building sssd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile systemd-hostnam-mod.pp" 0 "Building systemd-hostname SELinux module"
-      rules="${rules} sssd-mod systemd-hostnam-mod"
+      modules_to_load+=" sssd-mod.pp systemd-hostnam-mod.pp"
       # Fedora 33 doesn't have lockdown class
       if seinfo --class lockdown -x  | grep -q confidentiality ; then
           # Bug 1933680 - avc: denied { confidentiality } for pid=814 comm="modprobe" lockdown_reason="use of tracefs"
           rlRun "make -f /usr/share/selinux/devel/Makefile modprobe-mod.pp" 0 "Building modprobe SELinux module"
-          rules="${rules} modprobe-mod"
+          modules_to_load+=" modprobe-mod.pp"
       fi
-      for rule in $rules; do
-          rlRun "semodule -i ${rule}.pp"  0 "Installing $rule SELinux modules"
-      done
       # Fedora34 BZ#1965743 - systemd was denied reading and searching /dev/dma_heap
       if seinfo --type | grep dma_device_t ; then
           echo "(allow domain dma_device_t (dir (getattr search open read)))" > bz1965743.cil
-          rlRun "semodule -i bz1965743.cil" 0
+          modules_to_load+=" bz1965743.cil"
       fi
       # dma_device_dir_t was added in attempt to fix bz1965743, but this fix has since been reverted on Rawhide, but still present on F34
       if seinfo --type | grep dma_device_dir_t ; then
           echo "(allow domain dma_device_dir_t (dir (getattr search open read)))" > bz1971517.cil
-          rlRun "semodule -i bz1971517.cil" 0
+          modules_to_load+=" bz1971517.cil"
       fi
       if seinfo --type | grep udev_var_run_t && seinfo --type | grep systemd_gpt_generator_t ; then
           echo "(allow systemd_gpt_generator_t udev_var_run_t (file (getattr open read ioctl lock)))" > bz1975125.cil
-          rlRun "semodule -i bz1975125.cil" 0
+          modules_to_load+=" bz1975125.cil"
       fi
 
       echo "(allow systemd_modules_load_t systemd_modules_load_t (lockdown (confidentiality)))" > bz1969985.cil
-      rlRun "semodule -i bz1969985.cil" 0
+      modules_to_load+=" bz1969985.cil"
 
       echo "(allow systemd_coredump_t usermodehelper_t (file (write)))" > bz1982961.cil
-      rlRun "semodule -i bz1982961.cil" 0
+      modules_to_load+=" bz1982961.cil"
+    fi
 
+    if [ -n "$modules_to_load" ]; then
+      if ! rlRun "semodule $(for m in $modules_to_load; do echo -n "-i $m "; done)" 0 \
+          "Install required SELinux modules"; then
+        rlLog "Transaction failed, trying to install modules one by one..."
+        for m in $modules_to_load; do
+          rlRun "semodule -i $m" 0 "Install $m SELinux module"
+        done
+      fi
     elif ! grep "ipv6.disable=1" /proc/cmdline ; then
       rlLog "No custom SELinux modules required, skipping"
       rstrnt-report-result $TEST SKIP
