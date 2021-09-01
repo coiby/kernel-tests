@@ -77,6 +77,7 @@ function hugetlb_nr_setup()
 {
        grep -q hugetlbfs /proc/filesystems || return
        echo 3 >/proc/sys/vm/drop_caches
+       echo 1 >/proc/sys/vm/compact_memory
 
        cat hugetlb.inc > hugetlb
 
@@ -84,7 +85,7 @@ function hugetlb_nr_setup()
        hpagesize=$(echo `grep 'Hugepagesize:' /proc/meminfo | awk '{print $2}'` / 1024 | bc)
 
        test_msg log "Calculate memory to be reserved for hugepages" | tee -a ${OUTPUTFILE}
-       [ $MEM_AVAILABLE -gt 1024 ] && mem_alloc=1024
+       [ $MEM_AVAILABLE -gt 512 ] && mem_alloc=512
        [ "${ARCH}" = "s390x" ] && [ $MEM_AVAILABLE -gt 128 ] && mem_alloc=128 # only allocate 128MB on s390x
 
        [ $mem_alloc -eq 0 ] && RUNTESTS=${RUNTESTS//hugetlb} &&
@@ -94,9 +95,9 @@ function hugetlb_nr_setup()
        sed -i "s/#nr_hpage#/$nr_hpage/g" hugetlb
 
        # hugemmap05 test is a little different
-       mem_alloc_overcommit=$(echo $MEM_AVAILABLE / 5 | bc)
+       mem_alloc_overcommit=$(echo $MEM_AVAILABLE / 10 | bc)
        # reserve mem_alloc_overcommit for hugepage_size = 512MB system(eg. rhel_alt aarch64)
-       [ "$mem_alloc_overcommit" -gt "128" ] && [ "x${hpagesize}" != "x512" ] && mem_alloc_overcommit=128
+       [ "$mem_alloc_overcommit" -gt "64" ] && [ "x${hpagesize}" != "x512" ] && mem_alloc_overcommit=64
        nr_hugemmap5=$(echo $mem_alloc_overcommit / $hpagesize | bc)
        sed -i "s/#size#/${nr_hugemmap5}/g" hugetlb
 
