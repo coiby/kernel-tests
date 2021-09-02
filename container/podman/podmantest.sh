@@ -69,7 +69,7 @@ for TEST_FILE in ${TEST_DIR}/*.bats; do
     fi
 
     echo -e "\n[$(date '+%F %T')] $(basename $TEST_FILE)" | tee -a "${OUTPUTFILE}"
-    bats $TEST_FILE | tee -a "${OUTPUTFILE}"
+    bats $TEST_FILE |& awk --file timestamp.awk | tee -a "${OUTPUTFILE}"
     # Save a marker if this test failed.
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
         TEST_FAILED=1
