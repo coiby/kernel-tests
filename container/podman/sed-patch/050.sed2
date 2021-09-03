@@ -1,0 +1,17 @@
+    $PODMAN stop -t 20 stopme &
+
+    # Wait for container to acknowledge the signal. We can't use wait_for_output
+    # because that aborts if .State.Running != true
+    local timeout=5
+    while [[ $timeout -gt 0 ]]; do
+        run_podman logs stopme
+        if [[ "$output" =~ "Received SIGTERM, ignoring" ]]; then
+            break
+        fi
+        timeout=$((timeout - 1))
+        if [[ $timeout -eq 0 ]]; then
+            die "Timed out waiting for container to receive SIGERM"
+        fi
+        sleep 0.5
+    done
+
