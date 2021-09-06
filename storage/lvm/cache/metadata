@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=augeas;git;python3;wget
+dependencies=augeas;git;python3;wget;lvm2
 softDependencies=python3-devel
 repoRequires=cki_lib;storage/include
