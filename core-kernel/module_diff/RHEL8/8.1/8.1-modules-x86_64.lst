@@ -270,6 +270,7 @@ cordic.ko
 coretemp.ko
 cortina.ko
 cp210x.ko
+cpuidle-haltpoll.ko
 cqhci.ko
 cramfs.ko
 crc32c-intel.ko

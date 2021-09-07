@@ -301,7 +301,9 @@ dm-crypt.ko
 dm-delay.ko
 dm-era.ko
 dm-flakey.ko
+dm-historical-service-time.ko
 dm-integrity.ko
+dm-io-affinity.ko
 dm-log.ko
 dm-log-userspace.ko
 dm-log-writes.ko
@@ -895,6 +897,7 @@ libnvdimm.ko
 libsas.ko
 lineage-pem.ko
 linear.ko
+linear_ranges.ko
 liquidio.ko
 liquidio_vf.ko
 lis3lv02d_i2c.ko
@@ -991,6 +994,8 @@ megaraid_sas.ko
 memstick.ko
 mfd-core.ko
 mgag200.ko
+mhi.ko
+mhi_pci_generic.ko
 michael_mic.ko
 micrel.ko
 microchip.ko
@@ -1008,6 +1013,7 @@ mlx4_en.ko
 mlx4_ib.ko
 mlx5_core.ko
 mlx5_ib.ko
+mlx5_vdpa.ko
 mlxfw.ko
 mlxsw_core.ko
 mlxsw_i2c.ko
@@ -1296,6 +1302,7 @@ qla4xxx.ko
 qm1d1b0004.ko
 qm1d1c0042.ko
 qmi_wwan.ko
+qrtr.ko
 qsemi.ko
 qt1010.ko
 quatech2.ko

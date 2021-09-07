@@ -11,8 +11,10 @@ ac97_bus.ko
 acecad.ko
 act_bpf.ko
 act_csum.ko
+act_ct.ko
 act_gact.ko
 act_mirred.ko
+act_mpls.ko
 act_pedit.ko
 act_police.ko
 act_sample.ko
@@ -141,7 +143,6 @@ btusb.ko
 budget-av.ko
 budget-core.ko
 budget.ko
-budget-patch.ko
 cachefiles.ko
 camellia_generic.ko
 can-bcm.ko
@@ -224,6 +225,8 @@ cxgb4vf.ko
 cxgbit.ko
 cxlflash.ko
 cxl.ko
+cxl_pci.ko
+cxl_pmem.ko
 cyapatp.ko
 cyberjack.ko
 cypress_firmware.ko
@@ -288,7 +291,6 @@ ds620.ko
 dummy.ko
 dvb-core.ko
 dvb-pll.ko
-dvb-ttpci.ko
 dvb-ttusb-budget.ko
 dvb-usb-af9015.ko
 dvb-usb-af9035.ko
@@ -328,6 +330,9 @@ ebt_snat.ko
 ebt_stp.ko
 ebt_vlan.ko
 ec100.ko
+ecc.ko
+ecdh_generic.ko
+ecdsa_generic.ko
 echainiv.ko
 eeprom_93cx6.ko
 eeprom.ko
@@ -510,6 +515,7 @@ hid-roccat-ryos.ko
 hid-roccat-savu.ko
 hid-saitek.ko
 hid-samsung.ko
+hid-semitek.ko
 hid-sjoy.ko
 hid-sony.ko
 hid-speedlink.ko
@@ -547,7 +553,6 @@ i2c-stub.ko
 i2c-tiny-usb.ko
 i2c-viperboard.ko
 i40e.ko
-i40iw.ko
 i6300esb.ko
 iavf.ko
 ib_cm.ko
@@ -583,7 +588,6 @@ igc.ko
 ina209.ko
 ina2xx.ko
 int51x1.ko
-intel_pmt.ko
 intel-xway.ko
 io_edgeport.ko
 ionic.ko
@@ -662,6 +666,7 @@ ip_vs.ko
 ip_vs_lblc.ko
 ip_vs_lblcr.ko
 ip_vs_lc.ko
+ip_vs_mh.ko
 ip_vs_nq.ko
 ip_vs_ovf.ko
 ip_vs_pe_sip.ko
@@ -673,6 +678,7 @@ ip_vs_wrr.ko
 ipvtap.ko
 ip_vti.ko
 ipw.ko
+irdma.ko
 ir-usb.ko
 iscsi_boot_sysfs.ko
 iscsi_target_mod.ko
@@ -749,8 +755,6 @@ libata.ko
 libblake2s-generic.ko
 libblake2s.ko
 libceph.ko
-libchacha20poly1305.ko
-libchacha.ko
 libcrc32c.ko
 libcurve25519-generic.ko
 libcurve25519.ko
@@ -762,12 +766,9 @@ libfcoe.ko
 libiscsi.ko
 libiscsi_tcp.ko
 libnvdimm.ko
-libpoly1305.ko
 libsas.ko
 lineage-pem.ko
 linear.ko
-liquidio.ko
-liquidio_vf.ko
 lis3lv02d_i2c.ko
 lis3lv02d.ko
 llc.ko
@@ -855,6 +856,10 @@ megaraid_sas.ko
 memstick.ko
 mfd-core.ko
 mgag200.ko
+mhi.ko
+mhi_net.ko
+mhi_pci_generic.ko
+mhi_wwan_ctrl.ko
 michael_mic.ko
 micrel.ko
 microchip.ko
@@ -874,14 +879,13 @@ mlxsw_i2c.ko
 mlxsw_minimal.ko
 mlxsw_pci.ko
 mlxsw_spectrum.ko
-mlxsw_switchib.ko
-mlxsw_switchx2.ko
 mmc_block.ko
 mmc_core.ko
 mn88472.ko
 mn88473.ko
 mos7720.ko
 mos7840.ko
+mpi3mr.ko
 mpls_iptunnel.ko
 mpls_router.ko
 mpt3sas.ko
@@ -941,6 +945,10 @@ nf_defrag_ipv6.ko
 nf_dup_ipv4.ko
 nf_dup_ipv6.ko
 nf_dup_netdev.ko
+nf_flow_table_inet.ko
+nf_flow_table_ipv4.ko
+nf_flow_table_ipv6.ko
+nf_flow_table.ko
 nf_log_syslog.ko
 nf_nat_amanda.ko
 nf_nat_ftp.ko
@@ -953,6 +961,7 @@ nf_nat_snmp_basic.ko
 nf_nat_tftp.ko
 nfnetlink_cthelper.ko
 nfnetlink_cttimeout.ko
+nfnetlink_hook.ko
 nfnetlink.ko
 nfnetlink_log.ko
 nfnetlink_osf.ko
@@ -984,6 +993,7 @@ nft_fib_ipv4.ko
 nft_fib_ipv6.ko
 nft_fib.ko
 nft_fib_netdev.ko
+nft_flow_offload.ko
 nft_fwd_netdev.ko
 nft_hash.ko
 nft_limit.ko
@@ -1069,6 +1079,7 @@ nvmet-fc.ko
 nvmet.ko
 nvmet-rdma.ko
 nvmet-tcp.ko
+nvram.ko
 nxt200x.ko
 objagg.ko
 ocxl.ko
@@ -1082,6 +1093,7 @@ option.ko
 oti6858.ko
 overlay.ko
 p8022.ko
+papr_scm.ko
 parman.ko
 pata_of_platform.ko
 pata_platform.ko
@@ -1162,7 +1174,6 @@ rainshadow-cec.ko
 ramoops.ko
 rbd.ko
 rdma_cm.ko
-rdma_rxe.ko
 rdma_ucm.ko
 realtek.ko
 reed_solomon.ko
@@ -1247,6 +1258,7 @@ sch_hfsc.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_multiq.ko
 sch_netem.ko
 sch_prio.ko
 sch_red.ko
@@ -1287,9 +1299,6 @@ siw.ko
 slcan.ko
 slhc.ko
 slip.ko
-sm2_generic.ko
-sm3_generic.ko
-sm4_generic.ko
 sm501.ko
 smartpqi.ko
 smb347-charger.ko
@@ -1301,13 +1310,10 @@ smsdvb.ko
 smsmdtv.ko
 smsusb.ko
 snd-ac97-codec.ko
-snd-ad1889.ko
 snd-ak4113.ko
 snd-ak4114.ko
 snd-ak4xxx-adda.ko
 snd-aloop.ko
-snd-atiixp.ko
-snd-atiixp-modem.ko
 snd-au8810.ko
 snd-au8820.ko
 snd-au8830.ko
@@ -1361,8 +1367,6 @@ snd-indigodjx.ko
 snd-indigoio.ko
 snd-indigoiox.ko
 snd-indigo.ko
-snd-intel8x0.ko
-snd-intel8x0m.ko
 snd-intel-dspcfg.ko
 snd-isight.ko
 snd.ko
@@ -1395,7 +1399,6 @@ snd-seq.ko
 snd-seq-midi-emul.ko
 snd-seq-midi-event.ko
 snd-seq-midi.ko
-snd-seq-oss.ko
 snd-seq-virmidi.ko
 snd-timer.ko
 snd-ua101.ko
@@ -1410,8 +1413,6 @@ snd-usb-pod.ko
 snd-usb-toneport.ko
 snd-usb-usx2y.ko
 snd-usb-variax.ko
-snd-via82xx.ko
-snd-via82xx-modem.ko
 snd-virmidi.ko
 snd-virtuoso.ko
 snd-vx222.ko
@@ -1419,7 +1420,6 @@ snd-vx-lib.ko
 softdog.ko
 softing.ko
 soundcore.ko
-sp8870.ko
 sparse-keymap.ko
 spcp8x5.ko
 speedtch.ko
@@ -1575,7 +1575,9 @@ uvcvideo.ko
 v4l2-dv-timings.ko
 vcan.ko
 vdpa.ko
+vdpa_sim_blk.ko
 vdpa_sim.ko
+vdpa_sim_net.ko
 ves1820.ko
 ves1x93.ko
 veth.ko
@@ -1626,6 +1628,7 @@ vmx-crypto.ko
 vport-geneve.ko
 vport-gre.ko
 vport-vxlan.ko
+vp_vdpa.ko
 vrf.ko
 vringh.ko
 vsock_diag.ko

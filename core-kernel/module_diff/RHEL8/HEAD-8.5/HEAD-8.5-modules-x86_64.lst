@@ -74,6 +74,7 @@ amd_energy.ko
 amd_freq_sensitivity.ko
 amdgpu.ko
 amd.ko
+amd-pmc.ko
 amd-rng.ko
 amd-xgbe.ko
 amilo-rfkill.ko
@@ -114,6 +115,8 @@ ata_piix.ko
 atbm8830.ko
 ath10k_core.ko
 ath10k_pci.ko
+ath11k.ko
+ath11k_pci.ko
 ath3k.ko
 ath9k_common.ko
 ath9k_htc.ko
@@ -370,7 +373,9 @@ dm-delay.ko
 dme1737.ko
 dm-era.ko
 dm-flakey.ko
+dm-historical-service-time.ko
 dm-integrity.ko
+dm-io-affinity.ko
 dm-log.ko
 dm-log-userspace.ko
 dm-log-writes.ko
@@ -848,6 +853,7 @@ ifcvf.ko
 igb.ko
 igbvf.ko
 igc.ko
+igen6_edac.ko
 iguanair.ko
 imon.ko
 imon_raw.ko
@@ -876,6 +882,10 @@ intel_oaktrail.ko
 intel_pch_thermal.ko
 intel_pmc_core.ko
 intel_pmc_core_pltdrv.ko
+intel_pmt_class.ko
+intel_pmt_crashlog.ko
+intel_pmt.ko
+intel_pmt_telemetry.ko
 intel_powerclamp.ko
 intel_qat.ko
 intel_rapl_common.ko
@@ -1116,6 +1126,7 @@ libnvdimm.ko
 libsas.ko
 lineage-pem.ko
 linear.ko
+linear_ranges.ko
 liquidio.ko
 liquidio_vf.ko
 lis3lv02d_i2c.ko
@@ -1175,6 +1186,7 @@ macsec.ko
 mac-turkish.ko
 macvlan.ko
 macvtap.ko
+mana.ko
 mantis_core.ko
 mantis.ko
 marvell10g.ko
@@ -1218,6 +1230,8 @@ mei-me.ko
 mei_wdt.ko
 memstick.ko
 mgag200.ko
+mhi.ko
+mhi_pci_generic.ko
 michael_mic.ko
 micrel.ko
 microchip.ko
@@ -1235,6 +1249,7 @@ mlx4_en.ko
 mlx4_ib.ko
 mlx5_core.ko
 mlx5_ib.ko
+mlx5_vdpa.ko
 mlxfw.ko
 mlx-platform.ko
 mlxreg-fan.ko
@@ -1513,12 +1528,14 @@ peak_pci.ko
 peak_usb.ko
 pegasus.ko
 pi3usb30532.ko
+pinctrl-alderlake.ko
 pinctrl-amd.ko
 pinctrl-broxton.ko
 pinctrl-cannonlake.ko
 pinctrl-cedarfork.ko
 pinctrl-denverton.ko
 pinctrl-elkhartlake.ko
+pinctrl-emmitsburg.ko
 pinctrl-geminilake.ko
 pinctrl-icelake.ko
 pinctrl-lewisburg.ko
@@ -1527,6 +1544,7 @@ pinctrl-tigerlake.ko
 pktcdvd.ko
 pl2303.ko
 platform_lcd.ko
+platform_profile.ko
 plusb.ko
 pluto2.ko
 plx_pci.ko
@@ -1582,7 +1600,9 @@ qla3xxx.ko
 qla4xxx.ko
 qm1d1b0004.ko
 qm1d1c0042.ko
+qmi_helpers.ko
 qmi_wwan.ko
+qrtr.ko
 qsemi.ko
 qt1010.ko
 quatech2.ko
@@ -2203,6 +2223,8 @@ stm_console.ko
 stm_core.ko
 stm_ftrace.ko
 stm_heartbeat.ko
+stm_p_basic.ko
+stm_p_sys-t.ko
 stp.ko
 streamzap.ko
 stusb160x.ko
@@ -2396,6 +2418,7 @@ usnic_verbs.ko
 uss720.ko
 uvcvideo.ko
 uv_mmtimer.ko
+uv_sysfs.ko
 uwb.ko
 v4l2-common.ko
 v4l2-dv-timings.ko

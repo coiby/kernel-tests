@@ -1518,6 +1518,7 @@ pinctrl-cannonlake.ko
 pinctrl-cedarfork.ko
 pinctrl-denverton.ko
 pinctrl-elkhartlake.ko
+pinctrl-emmitsburg.ko
 pinctrl-geminilake.ko
 pinctrl-icelake.ko
 pinctrl-lewisburg.ko

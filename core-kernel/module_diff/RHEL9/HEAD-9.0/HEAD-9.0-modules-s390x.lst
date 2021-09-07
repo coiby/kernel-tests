@@ -2,8 +2,10 @@
 8021q.ko
 act_bpf.ko
 act_csum.ko
+act_ct.ko
 act_gact.ko
 act_mirred.ko
+act_mpls.ko
 act_pedit.ko
 act_police.ko
 act_sample.ko
@@ -79,6 +81,8 @@ crypto_user.ko
 csiostor.ko
 ctcm.ko
 cuse.ko
+cxl_pci.ko
+cxl_pmem.ko
 dasd_diag_mod.ko
 dasd_eckd_mod.ko
 dasd_fba_mod.ko
@@ -145,6 +149,8 @@ ebt_redirect.ko
 ebt_snat.ko
 ebt_stp.ko
 ebt_vlan.ko
+ecc.ko
+ecdsa_generic.ko
 echainiv.ko
 enclosure.ko
 esp4.ko
@@ -173,7 +179,6 @@ gfs2.ko
 ghash_s390.ko
 grace.ko
 gre.ko
-gve.ko
 hangcheck-timer.ko
 hdlc_cisco.ko
 hdlc_fr.ko
@@ -191,7 +196,6 @@ ieee802154.ko
 ieee802154_socket.ko
 ifb.ko
 ifcvf.ko
-intel_pmt.ko
 ionic.ko
 iova.ko
 ip6_gre.ko
@@ -256,6 +260,7 @@ ip_vs.ko
 ip_vs_lblc.ko
 ip_vs_lblcr.ko
 ip_vs_lc.ko
+ip_vs_mh.ko
 ip_vs_nq.ko
 ip_vs_ovf.ko
 ip_vs_pe_sip.ko
@@ -290,8 +295,6 @@ libarc4.ko
 libblake2s-generic.ko
 libblake2s.ko
 libceph.ko
-libchacha20poly1305.ko
-libchacha.ko
 libcrc32c.ko
 libcurve25519-generic.ko
 libcurve25519.ko
@@ -301,11 +304,8 @@ libfcoe.ko
 libiscsi.ko
 libiscsi_tcp.ko
 libnvdimm.ko
-libpoly1305.ko
 libsas.ko
 linear.ko
-liquidio.ko
-liquidio_vf.ko
 llc.ko
 lockd.ko
 loop.ko
@@ -346,10 +346,9 @@ mlxfw.ko
 mlxsw_core.ko
 mlxsw_pci.ko
 mlxsw_spectrum.ko
-mlxsw_switchib.ko
-mlxsw_switchx2.ko
 monreader.ko
 monwriter.ko
+mpi3mr.ko
 mpls_iptunnel.ko
 mpls_router.ko
 mptbase.ko
@@ -386,6 +385,10 @@ nf_defrag_ipv6.ko
 nf_dup_ipv4.ko
 nf_dup_ipv6.ko
 nf_dup_netdev.ko
+nf_flow_table_inet.ko
+nf_flow_table_ipv4.ko
+nf_flow_table_ipv6.ko
+nf_flow_table.ko
 nf_log_syslog.ko
 nf_nat_amanda.ko
 nf_nat_ftp.ko
@@ -398,6 +401,7 @@ nf_nat_snmp_basic.ko
 nf_nat_tftp.ko
 nfnetlink_cthelper.ko
 nfnetlink_cttimeout.ko
+nfnetlink_hook.ko
 nfnetlink.ko
 nfnetlink_log.ko
 nfnetlink_osf.ko
@@ -429,6 +433,7 @@ nft_fib_ipv4.ko
 nft_fib_ipv6.ko
 nft_fib.ko
 nft_fib_netdev.ko
+nft_flow_offload.ko
 nft_fwd_netdev.ko
 nft_hash.ko
 nft_limit.ko
@@ -538,7 +543,6 @@ raid6test.ko
 raid_class.ko
 rbd.ko
 rdma_cm.ko
-rdma_rxe.ko
 rdma_ucm.ko
 reed_solomon.ko
 rfkill.ko
@@ -556,6 +560,7 @@ sch_hfsc.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_multiq.ko
 sch_netem.ko
 sch_prio.ko
 sch_red.ko
@@ -581,9 +586,6 @@ sha3_512_s390.ko
 sha512_s390.ko
 sit.ko
 siw.ko
-sm2_generic.ko
-sm3_generic.ko
-sm4_generic.ko
 smc_diag.ko
 smc.ko
 smsgiucv_app.ko
@@ -638,13 +640,15 @@ twofish_generic.ko
 udf.ko
 udp_tunnel.ko
 vdpa.ko
+vdpa_sim_blk.ko
 vdpa_sim.ko
+vdpa_sim_net.ko
 veth.ko
 vfat.ko
 vfio_ap.ko
+vfio_ccw.ko
 vfio_iommu_type1.ko
 vfio.ko
-vfio_mdev.ko
 vfio-pci.ko
 vfio_virqfd.ko
 vhost_iotlb.ko
@@ -654,11 +658,13 @@ vhost_vdpa.ko
 vhost_vsock.ko
 virtio_balloon.ko
 virtio_blk.ko
+virtio_console.ko
 virtio_dma_buf.ko
 virtiofs.ko
 virtio-gpu.ko
 virtio_input.ko
 virtio_net.ko
+virtio_pci_modern_dev.ko
 virtio_scsi.ko
 virtio_vdpa.ko
 vkms.ko
@@ -670,6 +676,7 @@ vmw_vsock_virtio_transport.ko
 vport-geneve.ko
 vport-gre.ko
 vport-vxlan.ko
+vp_vdpa.ko
 vrf.ko
 vringh.ko
 vsock_diag.ko

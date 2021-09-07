@@ -1,0 +1,3 @@
+mce_amd_inj.ko
+rc-loopback.ko
+test-string_helpers.ko
