@@ -111,7 +111,9 @@ function get_test_cases_srp
 {
 	typeset testcases=""
 	testcases+=" srp/001"
-	testcases+=" srp/002"
+	# srp/002 srp/011 srp/015 failure on ppc64le|x86_64|aarch64, BZ1938508|BZ1963685|BZ1963696|BZ1999540
+	# srp/002 failure on aarch64 BZ2000815
+	uname -ri | grep -qE "el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/002"
 	# testcases+=" srp/003", need legacy device mapper support
 	# testcases+=" srp/004", need legacy device mapper support
 	testcases+=" srp/005"
@@ -120,15 +122,16 @@ function get_test_cases_srp
 	testcases+=" srp/008"
 	testcases+=" srp/009"
 	testcases+=" srp/010"
-	testcases+=" srp/011"
+	uname -ri | grep  -qE "el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/011"
 	# testcases+=" srp/012", need legacy device mapper support
-	testcases+=" srp/013"
-	# testcases+=" srp/014", BZ1900153
-	testcases+=" srp/015"
+	# srp/013 on aarch64/ppc64le BZ1951961
+	uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" srp/013"
+	uname -r | grep -q 4.18.0 || testcases+=" srp/014" #BZ1900153
+	uname -ri | grep -qE "el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/015"
 	echo $testcases
 }
 
-if [[ "$USE_SIW" -eq 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
+if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
 	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
@@ -140,8 +143,6 @@ if (( $? != 0 )); then
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 fi
 
-pre_setup
-
 test_ws=$CDIR/blktests
 ret=0
 testcases_default=""
@@ -149,6 +150,7 @@ testcases_default+=" $(get_test_cases_srp)"
 testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
 for testcase in $testcases; do
 	for use_siw in $USE_SIW; do
+		pre_setup
 		disable_multipath
 		do_test $test_ws $testcase $use_siw
 		((ret += $?))

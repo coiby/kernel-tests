@@ -28,6 +28,10 @@ source $CDIR/../../../../cki_lib/libcki.sh
 function pre_setup
 {
 	echo "options nvme_core multipath=N"  > /etc/modprobe.d/nvme.conf
+	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
+		modprobe -r nvme nvme_core
+		modprobe nvme
+	fi
 }
 
 function disable_multipath
@@ -110,18 +114,19 @@ function get_test_cases
 {
 	typeset testcases=""
 	[[ $(ip -4 -o a s | grep -v "127.0.0.1" | wc -l) != 1 ]] || testcases+=" nvmeof-mp/001"
-	testcases+=" nvmeof-mp/002"
+	#RHEL8 aarch64 BZ1919363 BZ1938434, RHEL9 #BZ1912968
+	uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le|5.12.*aarch64|el9.ppc64le|5.11.*ppc64le" || testcases+=" nvmeof-mp/002"
 	# testcases+=" nvmeof-mp/004", need legacy device mapper support
 	testcases+=" nvmeof-mp/005"
 	testcases+=" nvmeof-mp/006"
 	testcases+=" nvmeof-mp/009"
 	testcases+=" nvmeof-mp/010"
 	testcases+=" nvmeof-mp/011"
-	testcases+=" nvmeof-mp/012"
+	uname -ri | grep -qE "4.18.0.*x86_64|4.18.0.*ppc64le" || testcases+=" nvmeof-mp/012"  #BZ2000074
 	echo $testcases
 }
 
-if [[ "$USE_SIW" -eq 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
+if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
 	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit

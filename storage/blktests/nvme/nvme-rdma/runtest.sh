@@ -21,7 +21,7 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 TNAME="storage/blktests/nvme/nvme-rdma"
-USE_SIW=${USE_SIW:-"0"}
+USE_SIW=${USE_SIW:-"0 1"}
 
 source $CDIR/../../../../cki_lib/libcki.sh
 
@@ -145,10 +145,10 @@ function get_test_cases_rdma
 		testcases+=" nvme/009"
 		testcases+=" nvme/010"
 		testcases+=" nvme/011"
-		uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" nvme/012" # BZ1871774
+		uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le|el9.ppc64le" || testcases+=" nvme/012" # BZ1871774 BZ1912968
 		uname -ri | grep -qE "4.18.0-147|4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" nvme/013" # BZ1871774/dislable 013 on 8.1.z
-		testcases+=" nvme/014"
-		uname -ri | grep -q "4.18.0-147" || testcases+=" nvme/015" # disable 015 on 8.1.z
+		uname -ri | grep -qE "4.18.0.*x86_64|4.18.0.*aarch64" || testcases+=" nvme/014" #BZ1964313 disable nvme/014 on x86_64/aarch64, nvme/015 on aarch64
+		uname -ri | grep -qE "4.18.0-147|4.18.0.*aarch64" || testcases+=" nvme/015" # disable 015 on 8.1.z
 		testcases+=" nvme/018"
 		testcases+=" nvme/019"
 		testcases+=" nvme/020"
@@ -167,7 +167,7 @@ function get_test_cases_rdma
 	echo $testcases
 }
 
-if [[ "$USE_SIW" -eq 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
+if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
 	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
