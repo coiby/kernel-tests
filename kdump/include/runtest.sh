@@ -376,7 +376,7 @@ PrepareKdump()
     # Try upgrading kexec-tools to the latest version if on FC.
     # If it fails, still use the kexec-tools from the default repo.
     if $IS_FC && $UPGRADE_FC_KDUMP; then
-        UpgradePackages kexec-tools dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=34
+        UpgradePackages kexec-tools dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
     fi
 }
 
