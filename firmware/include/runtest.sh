@@ -44,28 +44,29 @@ function fwtsSetup()
     # task Beaker won't check the rpm-requirements for this task
     if ! rlCheckRpm pcre-devel; then
         $YUM install pcre-devel -y
-        rlAssertRpm pcre-devel
     fi
 
     if ! rlCheckRpm json-c-devel; then
         $YUM install json-c-devel -y
-        rlAssertRpm json-c-devel
     fi
 
     if ! rlCheckRpm glib2-devel; then
         $YUM install glib2-devel -y
-        rlAssertRpm glib2-devel
     fi
 
     if ! rlCheckRpm elfutils-libelf-devel; then
         $YUM install elfutils-libelf-devel -y
-        rlAssertRpm elfutils-libelf-devel
+    fi
+
+    rpm -q pcre-devel json-c-devel glib2-devel elfutils-libelf-devel
+    if [ $? -ne 0 ]; then
+        cki_abort_task "Required test dependencies couldn't be installed"
     fi
 
     # libbsd is a requirement to build.
     if ! rlCheckRpm libbsd-devel; then
         $YUM install libbsd-devel -y
-        if [ $? -ne 0 ]; then 
+        if [ $? -ne 0 ]; then
             # libbsd-devel is available from epel for rhel7
             if rlIsRHEL 7; then
                $YUM  -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -73,7 +74,10 @@ function fwtsSetup()
                $YUM  -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
             fi
             $YUM install libbsd-devel -y
-            rlAssertRpm libbsd-devel
+            rpm -q libbsd-devel
+            if [ $? -ne 0 ]; then
+                cki_abort_task "libbsd-devel couldn't be installed"
+            fi
         fi
     fi
     # Skip download/build/installation if it looks like fwts is already installed
@@ -151,7 +155,7 @@ function fwtsReportResults()
 
     # Test |Pass |Fail |Abort |Warn |Skip |Info |
     sed -n $beginTableLine\,$endTableLine\p results.log > resultsSummary.out
-  
+
     while IFS= read -r line
     do
         fwtsTest=$(echo "$line" | awk -F \| '{print $1}')
@@ -192,7 +196,7 @@ function fwtsReportResults()
             rlPass "fwtsPass count: $fwtsPass"
             rlPhaseEnd
         fi
-    done < resultsSummary.out    
+    done < resultsSummary.out
 }
 
 function fwtsCleanup()
