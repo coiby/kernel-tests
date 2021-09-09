@@ -22,29 +22,35 @@ TEST_DIR=/usr/share/podman/test/system
 OUTPUTFILE=""
 ARCH=$(uname -m)
 
-# Exclude tests that would fail runnning rootless
-excludeTests="220-healthcheck 250-systemd 260-sdnotify 410-selinux"
+excludeTests=""
 
 #  Switching root or rootless podmantest
 if [[ $(id -u) -eq 0 ]]; then
     OUTPUTFILE=/tmp/podmantest-root.log
     > $OUTPUTFILE
     echo "Running root podmantest:" | tee -a "${OUTPUTFILE}"
-    excludeTests=""
     if [ "$ARCH" == "ppc64le" ]; then
         # 050-stops would fail in ppc64le, add to exclusion
-        excludeTests="050-stops"
+        excludeTests="${excludeTests} 050-stops"
     fi
 
 
 else
     OUTPUTFILE=/tmp/podmantest-rootless.log
     > $OUTPUTFILE
+    # Exclude tests that would fail runnning rootless
+    excludeTests="${excludeTests} 220-healthcheck 250-systemd 260-sdnotify 410-selinux"
     echo "Running rootless podmantest" | tee -a "${OUTPUTFILE}"
     if [ "$ARCH" != "x86_64" ]; then
         # 500-networking would fail in non x86_64, add to exclusion
         excludeTests="${excludeTests} 500-networking"
     fi
+    if rlIsRHEL; then
+        # skip this test until this fix is available in RHEL
+        # https://github.com/containers/podman/pull/11414
+        excludeTests="${excludeTests} 255-auto-update"
+    fi
+
 fi
 
 # Bug reports required this information.
