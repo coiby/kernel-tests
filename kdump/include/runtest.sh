@@ -494,9 +494,17 @@ DefKdumpMem()
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=512M"
         fi
 
-    elif $IS_RHEL8 || $IS_RHEL9; then
+    elif $IS_RHEL8; then
         if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:160M,4G-64G:192M,64G-1T:256M,1T-:512M"
         elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:160M,4G-64G:192M,64G-1T:256M,1T-:512M"
+        elif [[ "${K_ARCH}"  = ppc64*  ]]; then
+            args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=512M"
+        fi
+
+    elif $IS_RHEL9; then
+        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:192M,64G-1T:256M,1T-:512M"
+        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:192M,64G-1T:256M,1T-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
             args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=512M"
