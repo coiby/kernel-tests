@@ -62,7 +62,7 @@ function get_test_result
 		elif [[ $res == *"fail" ]]; then
 			result="FAIL"
 			[ -f $out_bad_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
-			[ -f $out_full_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
+			[ -f $out_full_file ] && cki_upload_log_file "$out_full_file" >/dev/null
 		elif [[ $res == *"not run" ]]; then
 			result="SKIP"
 		else
