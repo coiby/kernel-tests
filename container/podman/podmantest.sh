@@ -18,7 +18,11 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST_FAILED=0
-TEST_DIR=/usr/share/podman/test/system
+if rlIsRHEL; then
+    TEST_DIR="$PWD/podman/test/system"
+else
+    TEST_DIR=/usr/share/podman/test/system
+fi
 OUTPUTFILE=""
 ARCH=$(uname -m)
 
@@ -33,8 +37,6 @@ if [[ $(id -u) -eq 0 ]]; then
         # 050-stops would fail in ppc64le, add to exclusion
         excludeTests="${excludeTests} 050-stops"
     fi
-
-
 else
     OUTPUTFILE=/tmp/podmantest-rootless.log
     > $OUTPUTFILE
@@ -45,12 +47,6 @@ else
         # 500-networking would fail in non x86_64, add to exclusion
         excludeTests="${excludeTests} 500-networking"
     fi
-    if rlIsRHEL; then
-        # skip this test until this fix is available in RHEL
-        # https://github.com/containers/podman/pull/11414
-        excludeTests="${excludeTests} 255-auto-update"
-    fi
-
 fi
 
 # Bug reports required this information.
