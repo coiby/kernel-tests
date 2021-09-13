@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=podman;podman-tests;buildah;openssl;socat;httpd-tools;nmap-ncat;skopeo;jq
+dependencies=podman;podman-tests;buildah;openssl;socat;httpd-tools;nmap-ncat;skopeo;jq;git
 repoRequires=cki_lib

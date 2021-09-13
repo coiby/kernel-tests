@@ -21,47 +21,70 @@
 PODMANUSER=${PODMANUSER:-root}
 TEST="Podman"
 ret=0
-BATS_RPM="http://mirrors.kernel.org/fedora/releases/33/Everything/x86_64/os/Packages/b/bats-1.1.0-5.fc33.noarch.rpm"
 ARCH=$(uname -m)
+PODMAN_VERSION=$(podman --version | awk '{print$3}')
 
-# Verify that podman-tests is installed
-pkg=$(rpm -qa | grep podman-tests)
-if [ -z "$pkg" ] ; then
-    rstrnt-report-result "${TEST}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+function _install_bats ()
+{
+    curl --retry 5 -LO https://github.com/bats-core/bats-core/archive/v1.1.0.tar.gz
+    tar xvf v1.1.0.tar.gz > /dev/null
+    ./bats-core-1.1.0/install.sh /usr
+    if [ $? -ne 0 ]; then
+        echo "FAIL Couldn't install BATS. Aborting test..."
+        rstrnt-report-result "${TEST}" WARN
+        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+        exit 1
+    fi
+}
+
+# there was some fixes in podman tests, that were not available on 3.3.1
+if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
+    COMMIT_HASH=02a0d4b7fb8fe99d012e9c8035a063e903eab5b6
+
+    if [ ! -d podman ]; then
+        git clone https://github.com/containers/podman
+        if [ $? -ne 0 ]; then
+            echo "FAIL to clone podman repo. Aborting test..."
+            rstrnt-report-result "${TEST}" WARN
+            rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+            exit 1
+        fi
+        pushd podman
+        git checkout ${COMMIT_HASH}
+        if [ $? -ne 0 ]; then
+            echo "FAIL to checkout ${COMMIT_HASH}. Aborting test..."
+            rstrnt-report-result "${TEST}" WARN
+            rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+            exit 1
+        fi
+        popd
+    fi
+    TEST_DIR="$PWD/podman/test/system"
+else
+    rpm -q podman-tests
+    if [ $? -ne 0 ]; then
+        echo "FAIL: podman-tests is not installed. Aborting test..."
+        rstrnt-report-result "${TEST}" WARN
+        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+        exit 1
+    fi
+    TEST_DIR=/usr/share/podman/test/system
 fi
 
-# RHEL 8 will install podman-tests, but it will not install bats. We can use
-# the Fedora 31 package instead. Attempt the installation five times.
+# If bats is not install, install it from source
 if [ ! -x /usr/bin/bats ]; then
-    for i in {1..5}; do
-        dnf -y --nogpgcheck install $BATS_RPM && break
-    done
+    _install_bats
 fi
 
 # NOTE(mhayden): The 'metacopy=on' mount option may be causing issues with
 # podman on RHEL 8. It needs to be disabled per BZ 1734799.
-PODMAN_RPM_NAME=$(rpm -q podman)
-if [[ $PODMAN_RPM_NAME =~ el8 ]]; then
+if rlTestVersion ${PODMAN_VERSION} '<' '1.4.4'; then
     sed -i 's/,metacopy=on//' /etc/containers/storage.conf || true
     grep ^mountopt /etc/containers/storage.conf || true
 fi
 
-# Run the podman system tests.
-TEST_DIR=/usr/share/podman/test/system
-# Buildah now supports cross-arch builds
-# https://github.com/containers/podman/pull/9491
-sed -i -e 's/\(20200902\|20200929\|20210223\|20210427\)/20210610/' $TEST_DIR/helpers.bash
-sed -i -e 's/\(:00000000\|:00000001\|:00000002\)/:00000003/' $TEST_DIR/helpers.bash
-
 # patch 070-builds to make test passing
 sed -i -e '/io.buildah.version/d' $TEST_DIR/070-build.bats
-
-# Patch when running rhel to make tests passing
-if rlIsRHEL; then
-    sed -i -e 's/\(20200902\|20200929\|20210223\|20210427\)/20210610/' $TEST_DIR/*.bats
-    sed -i -e 's/\(:00000000\|:00000001\|:00000002\)/:00000003/' $TEST_DIR/*.bats
-fi
 
 # Add container-tools module for rhel8 through Appstreams:
 #   rhel8 -> fast rolling stream that closes to upstream/latest
@@ -70,33 +93,27 @@ if rlIsRHEL '8'; then
     dnf module install -y container-tools:rhel8
 fi
 
-# Patch 030-run and 500-networking,  system tests: fix two race condition https://github.com/containers/podman/pull/10157
-if ! grep -q "run_podman kill \$cid; run_podman wait \$cid" $TEST_DIR/030-run.bats; then
-    sed -i -e 's/run_podman kill $cid/run_podman kill $cid; run_podman wait $cid/' $TEST_DIR/030-run.bats
-fi
-if ! grep -q "run_podman wait \$cid" $TEST_DIR/500-networking.bats; then
-    sed -i -e 's/run_podman rm $cid/run_podman wait $cid; run_podman rm $cid/' $TEST_DIR/500-networking.bats
-fi
-
-# Patch 050-stop.bats flake, fix racy podman-inspect https://github.com/containers/podman/pull/10028
-if ! grep -q "run_podman wait stopme" $TEST_DIR/050-stop.bats; then
-    sed -i -e 's/run_podman kill stopme/run_podman kill stopme; run_podman wait stopme/' $TEST_DIR/050-stop.bats
+if rlIsRHEL; then
+    # At least for now, it seems same tests can be skipped for RHEL-8 and RHEL-9
+    # In the future it might be better to check podman version instead of release...
+    # Skip journal related tests due to: https://bugzilla.redhat.com/show_bug.cgi?id=1972780
+    echo "Skipping journald related tests due to BZ1972780..."
+    sed -i 's/@test "podman run --log-driver" {/@test "podman run --log-driver" {\n    skip/' ${TEST_DIR}/030-run.bats
+    sed -i 's/@test "podman logs - multi journald" {/@test "podman logs - multi journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
+    sed -i 's/@test "podman logs - since journald" {/@test "podman logs - since journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
+    sed -i 's/@test "podman logs - until journald" {/@test "podman logs - until journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
 fi
 
-# Patch 255-auto-update.bats system test: auto-update: multiarch fixes, and cleanup https://github.com/containers/podman/pull/10985
-sed -i -e 's/alpine_nginx/busybox/g' $TEST_DIR/255-auto-update.bats
-
-# Patch 120-loads.bats System tests: fix a multiarch problem https://github.com/containers/podman/pull/10947
-sed -i -e 's/img1=.*/img1=${PODMAN_NONLOCAL_IMAGE_FQN}/g' $TEST_DIR/120-load.bats
-sed -i -e 's/img2=.*/img2="$PODMAN_TEST_IMAGE_REGISTRY\/$PODMAN_TEST_IMAGE_USER\/$PODMAN_TEST_IMAGE_NAME:multiimage"/g' $TEST_DIR/120-load.bats
-
-# Patch 050-stop.bats system tests: fix race in stop test https://github.com/containers/podman/pull/11080
-if ! grep -q "trap 'echo Received SIGTERM, ignoring' SIGTERM; echo READY; while :; do sleep 0.2" $TEST_DIR/050-stop.bats; then
-    sed -i -e 's/.*echo Received SIGTERM, ignoring.*/        "trap '\''echo Received SIGTERM, ignoring'\'' SIGTERM; echo READY; while :; do sleep 0.2; done"/g' \
-        $TEST_DIR/050-stop.bats
-    sed -i -e  '/# Stop the container in the background/{' -e 'r sed-patch/050.sed1' -e 'd' -e '}' $TEST_DIR/050-stop.bats
-    sed -i -e  '/$PODMAN stop -t 20 stopme &/{' -e 'r sed-patch/050.sed2' -e 'd' -e '}' $TEST_DIR/050-stop.bats
-    sed -i -e  '/is "$output" "stopping" "Status of container should be.*/{' -e 'r sed-patch/050.sed3' -e 'd' -e '}' $TEST_DIR/050-stop.bats
+if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
+    # Unsupported tests
+    sed -i 's/@test "podman logs - --follow journald" {/@test "podman logs - --follow journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
+    sed -i 's/@test "podman logs - --follow k8s-file" {/@test "podman logs - --follow k8s-file" {\n    skip/' ${TEST_DIR}/035-logs.bats
+    sed -i 's/@test "podman buildx - basic test" {/@test "podman buildx - basic test" {\n    skip/' ${TEST_DIR}/070-build.bats
+    sed -i 's/@test "podman volume import test" {/@test "podman volume import test" {\n    skip/' ${TEST_DIR}/160-volumes.bats
+    sed -i 's/@test "podman generate systemd - restart policy" {/@test "podman generate systemd - restart policy" {\n    skip/' ${TEST_DIR}/250-systemd.bats
+    sed -i 's/@test "podman pass LISTEN environment " {/@test "podman pass LISTEN environment" {\n    skip/' ${TEST_DIR}/250-systemd.bats
+    sed -i 's/@test "podman auto-update - label io.containers.autoupdate=image with rollback" {/@test "podman auto-update - label io.containers.autoupdate=image with rollback" {\n    skip/' ${TEST_DIR}/255-auto-update.bats
+    sed -i 's/@test "podman auto-update - label io.containers.autoupdate=local with rollback" {/@test "podman auto-update - label io.containers.autoupdate=local with rollback" {\n    skip/' ${TEST_DIR}/255-auto-update.bats
 fi
 
 # Skip 150-logins,420-cgroups.bats,260-sdnotify,200-pod,410-selinux,600-completion,700-play,035-logs for non x86_64, would fail on non x86_64
