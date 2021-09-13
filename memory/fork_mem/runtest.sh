@@ -48,8 +48,10 @@ rlJournalStart
   rlPhaseEnd
 
   rlPhaseStartTest
-    # Run fork_mem.py 
-    rlRun -l "avocado run avocado-misc-tests/memory/fork_mem.py"
+    # Run fork_mem.py with timeout to make sure the test exit gracefully. If
+    # there is a timeout, it also exits 0 because it seems reasonable to
+    # expect a timeout exit code in machines with large RAM
+    rlRun -l "avocado run avocado-misc-tests/memory/fork_mem.py --job-timeout 15m" "0,8"
     rstrnt-report-log -l /root/avocado/job-results/latest/job.log
   rlPhaseEnd
 rlJournalEnd
