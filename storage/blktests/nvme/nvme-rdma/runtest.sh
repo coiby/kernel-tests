@@ -43,7 +43,7 @@ function enable_nvme_core_multipath
 {
 	modprobe nvme_core
 	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
-		modprobe -r nvme nvme_core
+		modprobe -fr nvme_rdma nvme_fabrics nvme nvme_core
 		echo "options nvme_core multipath=Y"  > /etc/modprobe.d/nvme.conf
 		modprobe nvme
 		#wait enough time for NVMe disk initialized
