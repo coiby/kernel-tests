@@ -113,13 +113,14 @@ function get_test_cases_srp
 	testcases+=" srp/001"
 	# srp/002 srp/011 srp/015 failure on ppc64le|x86_64|aarch64, BZ1938508|BZ1963685|BZ1963696|BZ1999540
 	# srp/002 failure on aarch64 BZ2000815
-	uname -ri | grep -qE "ppc64le|el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/002"
+	# srp/002 srp/005 srp/008 failed on linux-block 5.14 s390x, unstalble rdma_rxe on upstream
+	uname -ri | grep -qE "5.*s390x|ppc64le|el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/002"
 	# testcases+=" srp/003", need legacy device mapper support
 	# testcases+=" srp/004", need legacy device mapper support
-	testcases+=" srp/005"
+	[[ $USE_SIW =~ 0 ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/005"
 	testcases+=" srp/006"
 	testcases+=" srp/007"
-	testcases+=" srp/008"
+	[[ $USE_SIW =~ 0 ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/008"
 	testcases+=" srp/009"
 	testcases+=" srp/010"
 	uname -ri | grep  -qE "ppc64le|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/011"
