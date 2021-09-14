@@ -1,0 +1,14 @@
+[General]
+name=/distribution/command
+owner=CAI Qian <caiqian@redhat.com>
+description=Execute any arbitrary command.
+license=GPL
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=60m
+dependencies=
+softDependencies=
+repoRequires=
