@@ -114,7 +114,8 @@ function get_test_cases_srp
 	# srp/002 srp/011 srp/015 failure on ppc64le|x86_64|aarch64, BZ1938508|BZ1963685|BZ1963696|BZ1999540
 	# srp/002 failure on aarch64 BZ2000815
 	# srp/002 srp/005 srp/008 failed on linux-block 5.14 s390x, unstalble rdma_rxe on upstream
-	uname -ri | grep -qE "5.*s390x|ppc64le|el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/002"
+	# srp/002 hang when use siw on upstream aarch64|ppc64le
+	uname -ri | grep -qE "^5.*aarch64|^5.*ppc64le|el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/002"
 	# testcases+=" srp/003", need legacy device mapper support
 	# testcases+=" srp/004", need legacy device mapper support
 	[[ $USE_SIW =~ 0 ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/005"
