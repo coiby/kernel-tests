@@ -159,7 +159,8 @@ function get_test_cases_block
 		#      - block/026
 		#      - block/028
 		#
-		testcases+=" block/001"
+		# Disable block/001 for upstream s390x BZ2001597
+		uname -ri | grep -qE "^5\..*s390x" || testcases+=" block/001"
 		#testcases+=" block/002" # Test case issue: https://lore.kernel.org/linux-block/e84b29e1-209e-d598-0828-bed5e3b98093@acm.org/
 		testcases+=" block/006"
 		#testcases+=" block/009" # Fail randomly on x86_64, powerpc
