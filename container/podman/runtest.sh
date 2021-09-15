@@ -136,6 +136,8 @@ if  [[ "$PODMANUSER" != "root" ]]; then
         adduser $PODMANUSER
     fi
     loginctl enable-linger $PODMANUSER
+    # wait few seconds to give time for enable-linger
+    sleep 5
     su - podmantest -c "cd `pwd`; bash ./podmantest.sh"
     TEST_FAILED=$?
     cat /tmp/podmantest-rootless.log >> "${OUTPUTFILE}"
