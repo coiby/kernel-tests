@@ -50,17 +50,17 @@ function GetCurrentModuleList ()
     # rpm -q --filesbypkg kernel-2.6.32-220.el6 | grep '\.ko' | awk -F/ '{ print $NF }' | sort
 
     if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
-		PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
-		if $(cki_is_kernel_rt); then
-			PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
-		fi
+        PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
+        if $(cki_is_kernel_rt); then
+            PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
+        fi
     else
-		PKG_LIST="${name}-${K_VER}-${K_REL}"
-		if $(cki_is_kernel_rt); then
-			PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
-		fi
+        PKG_LIST="${name}-${K_VER}-${K_REL}"
+        if $(cki_is_kernel_rt); then
+            PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
+        fi
     fi
-	rpm -q --filesbypkg $PKG_LIST | grep '\.ko' | awk -F/ '{ print $NF }' | sed 's/\.xz$//' | sort > ${TESTAREA}/moduleList_current
+    rpm -q --filesbypkg $PKG_LIST | grep '\.ko' | awk -F/ '{ print $NF }' | sed 's/\.xz$//' | sort > ${TESTAREA}/moduleList_current
 
     if [ ! -s "${TESTAREA}/moduleList_current" ]; then
         echo "" | tee -a $OUTPUTFILE
@@ -103,15 +103,15 @@ function GetBaseModuleList ()
     cat ./${OS}/${Release}/${Release}-modules-${ARCH}.lst > ${TESTAREA}/moduleList_base
 
     if $(cki_is_kernel_debug); then
-		AddDebugKernelModuleToBase
-		if $(cki_is_kernel_rt); then
-			AddRTnDebugBaseList
-		fi
-	else
-		if $(cki_is_kernel_rt); then
-			AddRTBaseList
-		fi
-	fi
+        AddDebugKernelModuleToBase
+        if $(cki_is_kernel_rt); then
+            AddRTnDebugBaseList
+        fi
+    else
+        if $(cki_is_kernel_rt); then
+            AddRTBaseList
+        fi
+    fi
 
     if [ ! -s "${TESTAREA}/moduleList_base" ]; then
         echo "" | tee -a $OUTPUTFILE
@@ -240,405 +240,410 @@ function chk_inst_kernel_modules_extra ()
     rpm -q $pkg_kms_extra || $YUM -y install $pkg_kms_extra || (cki_report_result 1 1 "Missing ${name}-modules-extra" && exit 1)
 }
 
-YUM=$(cki_get_yum_tool)
-name="kernel"
-arch=$(uname -m)
-version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//"`
-version=${version_release%-*}
-release=${version_release#*-}
-kvari=`uname -r | grep -Eo '(debug|PAE|xen)$'`
-if $(cki_is_kernel_rt); then
-	name="${name}-rt"
-fi
-if $(cki_is_kernel_debug); then
-	name="${name}-debug"
-fi
+rlJournalStart
+    rlPhaseStartTest
+        YUM=$(cki_get_yum_tool)
+        name="kernel"
+        arch=$(uname -m)
+        version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//"`
+        version=${version_release%-*}
+        release=${version_release#*-}
+        kvari=`uname -r | grep -Eo '(debug|PAE|xen)$'`
+        if $(cki_is_kernel_rt); then
+            name="${name}-rt"
+        fi
+        if $(cki_is_kernel_debug); then
+            name="${name}-debug"
+        fi
 
-if  grep -q "release 8" /etc/redhat-release || grep -q "release 9" /etc/redhat-release ; then
-    chk_inst_kernel_modules_extra
-fi
-if $(cki_is_kernel_rt); then
-	inst_kernel_rt_kvm
-fi
-# -----------------------------------
-# --------   Start Test   -----------
-# -----------------------------------
+        if  grep -q "release 8" /etc/redhat-release || grep -q "release 9" /etc/redhat-release ; then
+            chk_inst_kernel_modules_extra
+        fi
+        if $(cki_is_kernel_rt); then
+            inst_kernel_rt_kvm
+        fi
+        # -----------------------------------
+        # --------   Start Test   -----------
+        # -----------------------------------
 
-echo "" | tee -a $OUTPUTFILE
-echo "***** Start of runtest.sh *****" | tee -a $OUTPUTFILE
-echo "" | tee -a $OUTPUTFILE
-echo "***** Currently running kernel: ${K_RUNNING} *****" | tee -a $OUTPUTFILE
+        echo "" | tee -a $OUTPUTFILE
+        echo "***** Start of runtest.sh *****" | tee -a $OUTPUTFILE
+        echo "" | tee -a $OUTPUTFILE
+        echo "***** Currently running kernel: ${K_RUNNING} *****" | tee -a $OUTPUTFILE
 
-#
-# Base: Lets determine base release kernel package
-#
-Base=`echo ${K_REL} | cut -d. -f1`
-if [ "${K_VER}" = "2.6.32" ]; then
-    # This is RHEL6 (Santiago)
-    OS="RHEL6"
-    case ${Base} in
-        71)
-            # RHEL-6.0
-            DeBug "Base release is RHEL-6.0"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.0 *****" | tee -a $OUTPUTFILE
-            Release="6.0"
-            ;;
-        131)
-            # Actual RHEL-6.1 is 131.0.15, but 131 will suffice for this case.
-            DeBug "Base release is RHEL-6.1"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.1 *****" | tee -a $OUTPUTFILE
-            Release="6.1"
-            ;;
-        220)
-            # RHEL-6.2
-            DeBug "Base release is RHEL-6.2"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.2 *****" | tee -a $OUTPUTFILE
-            Release="6.2"
-            ;;
-        279)
-            # RHEL-6.3
-            DeBug "Base release is RHEL-6.3"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.3 *****" | tee -a $OUTPUTFILE
-            Release="6.3"
-            ;;
-        358)
-            # RHEL-6.4
-            DeBug "Base release is RHEL-6.4"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.4 *****" | tee -a $OUTPUTFILE
-            Release="6.4"
-            ;;
-        431)
-            # RHEL-6.5
-            DeBug "Base release is RHEL-6.5"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.5 *****" | tee -a $OUTPUTFILE
-            Release="6.5"
-            ;;
-        504)
-            # RHEL-6.6
-            DeBug "Base release is RHEL-6.6"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.6 *****" | tee -a $OUTPUTFILE
-            Release="6.6"
-            ;;
-        573)
-            # RHEL-6.7
-            DeBug "Base release is RHEL-6.7"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.7 *****" | tee -a $OUTPUTFILE
-            Release="6.7"
-            ;;
-        642)
-            # RHEL-6.8
-            DeBug "Base release is RHEL-6.8"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.8 *****" | tee -a $OUTPUTFILE
-            Release="6.8"
-            ;;
-        696)
-            # RHEL-6.9
-            DeBug "Base release is RHEL-6.9"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-6.9 *****" | tee -a $OUTPUTFILE
-            Release="6.9"
-            ;;
-        *)
-            # We are currently developing RHEL-6.10
-            # Therefore we test at HEAD-RHEL-6.10
-            DeBug "Base release is HEAD RHEL-6.10"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is HEAD-RHEL-6.10 *****" | tee -a $OUTPUTFILE
-            Release="HEAD-6.10"
-            ;;
-    esac
-elif [ "${K_VER}" = "3.10.0" ]; then
-    # This is RHEL7 (Maipo)
-    OS="RHEL7"
-    case ${Base} in
-        123)
-            # RHEL-7.0
-            DeBug "Base release is RHEL-7.0"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.0 *****" | tee -a $OUTPUTFILE
-            Release="7.0"
-            ;;
-        229)
-            # RHEL-7.1
-            DeBug "Base release is RHEL-7.1"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.1 *****" | tee -a $OUTPUTFILE
-            Release="7.1"
-            ;;
+        #
+        # Base: Lets determine base release kernel package
+        #
+        Base=`echo ${K_REL} | cut -d. -f1`
+        if [ "${K_VER}" = "2.6.32" ]; then
+            # This is RHEL6 (Santiago)
+            OS="RHEL6"
+            case ${Base} in
+                71)
+                    # RHEL-6.0
+                    DeBug "Base release is RHEL-6.0"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.0 *****" | tee -a $OUTPUTFILE
+                    Release="6.0"
+                    ;;
+                131)
+                    # Actual RHEL-6.1 is 131.0.15, but 131 will suffice for this case.
+                    DeBug "Base release is RHEL-6.1"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.1 *****" | tee -a $OUTPUTFILE
+                    Release="6.1"
+                    ;;
+                220)
+                    # RHEL-6.2
+                    DeBug "Base release is RHEL-6.2"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.2 *****" | tee -a $OUTPUTFILE
+                    Release="6.2"
+                    ;;
+                279)
+                    # RHEL-6.3
+                    DeBug "Base release is RHEL-6.3"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.3 *****" | tee -a $OUTPUTFILE
+                    Release="6.3"
+                    ;;
+                358)
+                    # RHEL-6.4
+                    DeBug "Base release is RHEL-6.4"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.4 *****" | tee -a $OUTPUTFILE
+                    Release="6.4"
+                    ;;
+                431)
+                    # RHEL-6.5
+                    DeBug "Base release is RHEL-6.5"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.5 *****" | tee -a $OUTPUTFILE
+                    Release="6.5"
+                    ;;
+                504)
+                    # RHEL-6.6
+                    DeBug "Base release is RHEL-6.6"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.6 *****" | tee -a $OUTPUTFILE
+                    Release="6.6"
+                    ;;
+                573)
+                    # RHEL-6.7
+                    DeBug "Base release is RHEL-6.7"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.7 *****" | tee -a $OUTPUTFILE
+                    Release="6.7"
+                    ;;
+                642)
+                    # RHEL-6.8
+                    DeBug "Base release is RHEL-6.8"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.8 *****" | tee -a $OUTPUTFILE
+                    Release="6.8"
+                    ;;
+                696)
+                    # RHEL-6.9
+                    DeBug "Base release is RHEL-6.9"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-6.9 *****" | tee -a $OUTPUTFILE
+                    Release="6.9"
+                    ;;
+                *)
+                    # We are currently developing RHEL-6.10
+                    # Therefore we test at HEAD-RHEL-6.10
+                    DeBug "Base release is HEAD RHEL-6.10"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is HEAD-RHEL-6.10 *****" | tee -a $OUTPUTFILE
+                    Release="HEAD-6.10"
+                    ;;
+            esac
+        elif [ "${K_VER}" = "3.10.0" ]; then
+            # This is RHEL7 (Maipo)
+            OS="RHEL7"
+            case ${Base} in
+                123)
+                    # RHEL-7.0
+                    DeBug "Base release is RHEL-7.0"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.0 *****" | tee -a $OUTPUTFILE
+                    Release="7.0"
+                    ;;
+                229)
+                    # RHEL-7.1
+                    DeBug "Base release is RHEL-7.1"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.1 *****" | tee -a $OUTPUTFILE
+                    Release="7.1"
+                    ;;
 
-        327)
-            # RHEL-7.2
-            DeBug "Base release is RHEL-7.2"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.2 *****" | tee -a $OUTPUTFILE
-            Release="7.2"
-            ;;
-        514)
-            # RHEL-7.3
-            DeBug "Base release is RHEL-7.3"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.3 *****" | tee -a $OUTPUTFILE
-            Release="7.3"
-            ;;
-        693)
-            # RHEL-7.4
-            DeBug "Base release is RHEL-7.4"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.4 *****" | tee -a $OUTPUTFILE
-            Release="7.4"
-            ;;
-        862)
-            # RHEL-7.5
-            DeBug "Base release is RHEL-7.5"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.5 *****" | tee -a $OUTPUTFILE
-            Release="7.5"
-            ;;
-        957)
-            # RHEL-7.6
-            DeBug "Base release is RHEL-7.6"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.6 *****" | tee -a $OUTPUTFILE
-            Release="7.6"
-            ;;
-        1062)
-            # RHEL-7.7
-            DeBug "Base release is RHEL-7.7"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.7 *****" | tee -a $OUTPUTFILE
-            Release="7.7"
-            ;;
-        1127)
-            # RHEL-7.8
-            DeBug "Base release is RHEL-7.8"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-7.8 *****" | tee -a $OUTPUTFILE
-            Release="7.8"
-            ;;
+                327)
+                    # RHEL-7.2
+                    DeBug "Base release is RHEL-7.2"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.2 *****" | tee -a $OUTPUTFILE
+                    Release="7.2"
+                    ;;
+                514)
+                    # RHEL-7.3
+                    DeBug "Base release is RHEL-7.3"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.3 *****" | tee -a $OUTPUTFILE
+                    Release="7.3"
+                    ;;
+                693)
+                    # RHEL-7.4
+                    DeBug "Base release is RHEL-7.4"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.4 *****" | tee -a $OUTPUTFILE
+                    Release="7.4"
+                    ;;
+                862)
+                    # RHEL-7.5
+                    DeBug "Base release is RHEL-7.5"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.5 *****" | tee -a $OUTPUTFILE
+                    Release="7.5"
+                    ;;
+                957)
+                    # RHEL-7.6
+                    DeBug "Base release is RHEL-7.6"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.6 *****" | tee -a $OUTPUTFILE
+                    Release="7.6"
+                    ;;
+                1062)
+                    # RHEL-7.7
+                    DeBug "Base release is RHEL-7.7"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.7 *****" | tee -a $OUTPUTFILE
+                    Release="7.7"
+                    ;;
+                1127)
+                    # RHEL-7.8
+                    DeBug "Base release is RHEL-7.8"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-7.8 *****" | tee -a $OUTPUTFILE
+                    Release="7.8"
+                    ;;
 
-        *)
-            # We are currently developing RHEL-7.9
-            # Therefore we test at HEAD-RHEL-7.9
-            DeBug "Base release is HEAD-RHEL-7.9"
+                *)
+                    # We are currently developing RHEL-7.9
+                    # Therefore we test at HEAD-RHEL-7.9
+                    DeBug "Base release is HEAD-RHEL-7.9"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is HEAD-RHEL-7.9 *****" | tee -a $OUTPUTFILE
+                    Release="HEAD-7.9"
+                    ;;
+            esac
+        elif [ "${K_VER}" = "4.18.0" ]; then
+            # This is RHEL8, Ootpa
+            OS="RHEL8"
+            case ${Base} in
+                80)
+                    # RHEL-8.0
+                    DeBug "Base release is RHEL-8.0"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-8.0 *****" | tee -a $OUTPUTFILE
+                    Release="8.0"
+                    ;;
+                147)
+                    # RHEL-8.1
+                    DeBug "Base release is RHEL-8.1"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-8.1 *****" | tee -a $OUTPUTFILE
+                    Release="8.1"
+                    ;;
+                193)
+                    # RHEL-8.2
+                    DeBug "Base release is RHEL-8.2"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-8.2 *****" | tee -a $OUTPUTFILE
+                    Release="8.2"
+                    ;;
+                240)
+                    # RHEL-8.3
+                    DeBug "Base release is RHEL-8.3"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-8.3 *****" | tee -a $OUTPUTFILE
+                    Release="8.3"
+                    ;;
+                305)
+                    # RHEL-8.4
+                    DeBug "Base release is RHEL-8.4"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-8.4 *****" | tee -a $OUTPUTFILE
+                    Release="8.4"
+                    if cki_kver_lt "4.18.0-305.8.1.el8_4"; then
+                        sed -i "/pinctrl-emmitsburg\.ko/d"  ${OS}/${Release}/8.4-modules-${ARCH}.lst
+                    fi
+                    #known issue: bz1968381
+                    if cki_kver_lt "4.18.0-305.11.1.el8_4"; then
+                        sed -i "/dptf_power\.ko/d" ${OS}/${Release}/8.4-modules-${ARCH}.lst
+                    fi
+                    ;;
+                *)
+                    # We are currently developing RHEL-8.5
+                    # Therefore we test at HEAD-RHEL-8.5
+                    # Need to refresh the list after 8.5 GA, current simple copy from 8.4
+                    DeBug "Base release is HEAD-RHEL-8.5"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is HEAD-RHEL-8.5 *****" | tee -a $OUTPUTFILE
+                    Release="HEAD-8.5"
+                    # BZ1973106 moved sha512_generic and sha512-ssse3.ko as builtin
+                    if cki_kver_lt "4.18.0-320"; then
+                        sed -i '/sha512_generic.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                        sed -i '/sha512-ssse3.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                    fi
+                    if cki_kver_lt "4.18.0-322"; then
+                        sed -i '/snd-soc-sst-acpi.ko/d;/snd-soc-sst-firmware.ko/d;/snd-soc-sst-haswell-pcm.ko/d;/snd-sof-intel-byt.ko/d' \
+                    ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                    fi
+                    if cki_kver_lt "4.18.0-328"; then
+                        sed -i '/mdio-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                        sed -i '/pcs-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-modules-${ARCH}.lst
+                    fi
+                    ;;
+            esac
+        elif [ "${K_VER}" = "5.14.0" -o "${K_VER}" = "5.13.0" ]; then
+            # This is RHEL9
+            OS="RHEL9"
+            case ${Base} in
+                *)
+                    # Still in developing phase, need to update in future.
+                    DeBug "Base release is HEAD-RHEL-9.0"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is HEAD-RHEL-9.0 *****" | tee -a $OUTPUTFILE
+                    Release="HEAD-9.0"
+                    ;;
+            esac
+        elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
+            DeBug "Base release is RHEL7/Pegas1, skipping test."
+            OS="RHEL7"
+            Release="Pegas1"
+            cki_print_info "Skipped"
+            exit 0
+        else
             echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is HEAD-RHEL-7.9 *****" | tee -a $OUTPUTFILE
-            Release="HEAD-7.9"
-            ;;
-    esac
-elif [ "${K_VER}" = "4.18.0" ]; then
-    # This is RHEL8, Ootpa
-    OS="RHEL8"
-    case ${Base} in
-        80)
-            # RHEL-8.0
-            DeBug "Base release is RHEL-8.0"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-8.0 *****" | tee -a $OUTPUTFILE
-            Release="8.0"
-            ;;
-        147)
-            # RHEL-8.1
-            DeBug "Base release is RHEL-8.1"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-8.1 *****" | tee -a $OUTPUTFILE
-            Release="8.1"
-            ;;
-        193)
-            # RHEL-8.2
-            DeBug "Base release is RHEL-8.2"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-8.2 *****" | tee -a $OUTPUTFILE
-            Release="8.2"
-            ;;
-        240)
-            # RHEL-8.3
-            DeBug "Base release is RHEL-8.3"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-8.3 *****" | tee -a $OUTPUTFILE
-            Release="8.3"
-            ;;
-        305)
-            # RHEL-8.4
-            DeBug "Base release is RHEL-8.4"
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is RHEL-8.4 *****" | tee -a $OUTPUTFILE
-            Release="8.4"
-            if cki_kver_lt "4.18.0-305.8.1.el8_4"; then
-                sed -i "/pinctrl-emmitsburg\.ko/d"  ${OS}/${Release}/8.4-modules-${ARCH}.lst
+            echo "***** FAILED: *****" | tee -a $OUTPUTFILE
+            echo "***** Unable to determine base release kernel package. *****" | tee -a $OUTPUTFILE
+            DeBug "Unable to determine base release"
+            cki_print_info "Base"
+        fi
+
+        # Lets determine the module list for the current kernel package
+        DeBug "Call GetCurrentModuleList"
+        GetCurrentModuleList
+        DeBug "Return GetCurrentModuleList"
+
+        # Lets determine the module list for the base release kernel package
+        DeBug "Call GetBaseModuleList"
+        GetBaseModuleList
+        DeBug "Return GetBaseModuleList"
+
+        # Lets determine the known removed module list for the base release kernel package
+        DeBug "Call GetKnownRemovedList"
+        GetKnownRemovedList
+        DeBug "Return GetKnownRemovedList"
+
+        # Lets submit the complete log from the diff of base module list and the current module list
+        diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current > ${TESTAREA}/moduleList_base-current_diff
+        cp ${TESTAREA}/moduleList_base-current_diff ${TESTAREA}/moduleList_base-current_diff.log
+        cki_upload_log_file ${TESTAREA}/moduleList_base-current_diff.log
+
+        #
+        # Compared: Lets compare the base and current module lists
+        #
+        echo "" | tee -a $OUTPUTFILE
+        echo "***** $ARCH: Comparing base and current module lists. *****" | tee -a $OUTPUTFILE
+        echo "***** Stored compare module list: ${TESTAREA}/moduleList_base-current_diff.log *****" | tee -a $OUTPUTFILE
+
+        # Check new added modules
+        diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^+" > ${TESTAREA}/moduleList_compare_added
+        FileClean moduleList_compare_added
+
+        echo "" | tee -a $OUTPUTFILE
+        echo "***** $ARCH: Checking against "New added" modules list. *****" | tee -a $OUTPUTFILE
+
+        if [ ! -s ${TESTAREA}/moduleList_compare_added ]; then
+            echo "***** PASS: *****" | tee -a $OUTPUTFILE
+            echo "***** Files checked. There are no new modules. *****" | tee -a $OUTPUTFILE
+            cki_report_result 0 1 "New added modules check PASS"
+        else
+            echo "***** WARNING: *****" | tee -a $OUTPUTFILE
+            echo "***** Files compared. There are new modules!!! *****" | tee -a $OUTPUTFILE
+            cp ${TESTAREA}/moduleList_compare_added ${TESTAREA}/moduleList_compare_added.log
+            cki_upload_log_file ${TESTAREA}/moduleList_compare_added.log
+            rlLogWarning "Existing new module(s), please update case!"
+            echo "**************************************" | tee -a $OUTPUTFILE
+            cat ${TESTAREA}/moduleList_compare_added | tee -a $OUTPUTFILE
+            echo "**************************************" | tee -a $OUTPUTFILE
+            cki_report_result 0 1 "Warn: existing new added modules"
+        fi
+
+        diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^-" > ${TESTAREA}/moduleList_compare
+
+        # Lets clean up the format of our diff outputfile
+        FileClean moduleList_compare
+
+        if [ ! -s "${TESTAREA}/moduleList_compare" ]; then
+            # RHEL6 only: There is one final test for RHEL6
+            if [ "${K_VER}" = "2.6.32" ]; then
+                RHEL6_TestBZ839667
             fi
-            #known issue: bz1968381
-            if cki_kver_lt "4.18.0-305.11.1.el8_4"; then
-                sed -i "/dptf_power\.ko/d" ${OS}/${Release}/8.4-modules-${ARCH}.lst
-            fi
-            ;;
-        *)
-            # We are currently developing RHEL-8.5
-            # Therefore we test at HEAD-RHEL-8.5
-            # Need to refresh the list after 8.5 GA, current simple copy from 8.4
-            DeBug "Base release is HEAD-RHEL-8.5"
+
+            # If we get here there are no missing modules
             echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is HEAD-RHEL-8.5 *****" | tee -a $OUTPUTFILE
-            Release="HEAD-8.5"
-            # BZ1973106 moved sha512_generic and sha512-ssse3.ko as builtin
-            if cki_kver_lt "4.18.0-320"; then
-                sed -i '/sha512_generic.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-                sed -i '/sha512-ssse3.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+            echo "***** PASS: *****" | tee -a $OUTPUTFILE
+            echo "***** Files compared. There are no missing modules. *****" | tee -a $OUTPUTFILE
+            DeBug "Files compared. There are no missing modules."
+            cki_print_info "Compared"
+        fi
+
+        echo "***** Stored compare module list: ${TESTAREA}/moduleList_compare *****" | tee -a $OUTPUTFILE
+
+        #
+        # Checked: Lets check against the "known removed" list
+        #
+        echo "" | tee -a $OUTPUTFILE
+        echo "***** $ARCH: Checking against "known removed" modules list. *****" | tee -a $OUTPUTFILE
+
+        diff -u ${TESTAREA}/moduleList_compare ${TESTAREA}/moduleList_knownRemoved | grep -e "^-" > ${TESTAREA}/moduleList_missing
+
+        # Lets clean up the format of our diff outputfile
+        FileClean moduleList_missing
+
+        if [ ! -s "${TESTAREA}/moduleList_missing" ]; then
+            # RHEL6 only: There is one final test for RHEL6
+            if [ "${K_VER}" = "2.6.32" ]; then
+                RHEL6_TestBZ839667
             fi
-            if cki_kver_lt "4.18.0-322"; then
-                sed -i '/snd-soc-sst-acpi.ko/d;/snd-soc-sst-firmware.ko/d;/snd-soc-sst-haswell-pcm.ko/d;/snd-sof-intel-byt.ko/d' \
-			${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-            fi
-            if cki_kver_lt "4.18.0-328"; then
-                sed -i '/mdio-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-                sed -i '/pcs-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-modules-${ARCH}.lst
-            fi
-            ;;
-    esac
-elif [ "${K_VER}" = "5.14.0" -o "${K_VER}" = "5.13.0" ]; then
-	# This is RHEL9
-    OS="RHEL9"
-    case ${Base} in
-		*)
-			# Still in developing phase, need to update in future.
-			DeBug "Base release is HEAD-RHEL-9.0"
+
+            # If we get here there are no missing modules
             echo "" | tee -a $OUTPUTFILE
-            echo "***** $ARCH: Base release is HEAD-RHEL-9.0 *****" | tee -a $OUTPUTFILE
-            Release="HEAD-9.0"
-            ;;
-	esac
-elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
-    DeBug "Base release is RHEL7/Pegas1, skipping test."
-    OS="RHEL7"
-    Release="Pegas1"
-    cki_print_info "Skipped"
-    exit 0
-else
-    echo "" | tee -a $OUTPUTFILE
-    echo "***** FAILED: *****" | tee -a $OUTPUTFILE
-    echo "***** Unable to determine base release kernel package. *****" | tee -a $OUTPUTFILE
-    DeBug "Unable to determine base release"
-    cki_print_info "Base"
-fi
+            echo "***** PASS: *****" | tee -a $OUTPUTFILE
+            echo "***** Files checked. There are no missing modules. *****" | tee -a $OUTPUTFILE
+            DeBug "Files checked. There are no missing modules."
+            cki_print_info "Checked"
+        else
+            echo "***** Stored missing module list: ${TESTAREA}/moduleList_missing *****" | tee -a $OUTPUTFILE
+            # This is a fail. There are missing modules.
 
-# Lets determine the module list for the current kernel package
-DeBug "Call GetCurrentModuleList"
-GetCurrentModuleList
-DeBug "Return GetCurrentModuleList"
+            # We still need to do the final RHEL6 test
+            # RHEL6 only: There is one final test for RHEL6
+            if [ "${K_VER}" = "2.6.32" ]; then
+                RHEL6_TestBZ839667
+            fi
 
-# Lets determine the module list for the base release kernel package
-DeBug "Call GetBaseModuleList"
-GetBaseModuleList
-DeBug "Return GetBaseModuleList"
+            DisplayModuleFail moduleList_missing
+            cp ${TESTAREA}/moduleList_missing ${TESTAREA}/moduleList_missing.log
+            cki_upload_log_file ${TESTAREA}/moduleList_missing.log
+            DeBug "Files checked. There are missing modules."
+            cki_print_info "Checked"
+            cki_report_result 1 1 "There are missing modules!"
+        fi
+    rlPhaseEnd
+rlJournalEnd
 
-# Lets determine the known removed module list for the base release kernel package
-DeBug "Call GetKnownRemovedList"
-GetKnownRemovedList
-DeBug "Return GetKnownRemovedList"
-
-# Lets submit the complete log from the diff of base module list and the current module list
-diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current > ${TESTAREA}/moduleList_base-current_diff
-cp ${TESTAREA}/moduleList_base-current_diff ${TESTAREA}/moduleList_base-current_diff.log
-cki_upload_log_file ${TESTAREA}/moduleList_base-current_diff.log
-
-#
-# Compared: Lets compare the base and current module lists
-#
-echo "" | tee -a $OUTPUTFILE
-echo "***** $ARCH: Comparing base and current module lists. *****" | tee -a $OUTPUTFILE
-echo "***** Stored compare module list: ${TESTAREA}/moduleList_base-current_diff.log *****" | tee -a $OUTPUTFILE
-
-# Check new added modules
-diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^+" > ${TESTAREA}/moduleList_compare_added
-FileClean moduleList_compare_added
-
-echo "" | tee -a $OUTPUTFILE
-echo "***** $ARCH: Checking against "New added" modules list. *****" | tee -a $OUTPUTFILE
-
-if [ ! -s ${TESTAREA}/moduleList_compare_added ]; then
-    echo "***** PASS: *****" | tee -a $OUTPUTFILE
-    echo "***** Files checked. There are no new modules. *****" | tee -a $OUTPUTFILE
-    cki_report_result 0 1 "New added modules check PASS"
-else
-    echo "***** WARNING: *****" | tee -a $OUTPUTFILE
-    echo "***** Files compared. There are new modules!!! *****" | tee -a $OUTPUTFILE
-    cp ${TESTAREA}/moduleList_compare_added ${TESTAREA}/moduleList_compare_added.log
-	cki_upload_log_file ${TESTAREA}/moduleList_compare_added.log
-    rlLogWarning "Existing new module(s), please update case!"
-    echo "**************************************" | tee -a $OUTPUTFILE
-    cat ${TESTAREA}/moduleList_compare_added | tee -a $OUTPUTFILE
-    echo "**************************************" | tee -a $OUTPUTFILE
-    cki_report_result 0 1 "Warn: existing new added modules"
-fi
-
-diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^-" > ${TESTAREA}/moduleList_compare
-
-# Lets clean up the format of our diff outputfile
-FileClean moduleList_compare
-
-if [ ! -s "${TESTAREA}/moduleList_compare" ]; then
-    # RHEL6 only: There is one final test for RHEL6
-    if [ "${K_VER}" = "2.6.32" ]; then
-        RHEL6_TestBZ839667
-    fi
-
-    # If we get here there are no missing modules
-    echo "" | tee -a $OUTPUTFILE
-    echo "***** PASS: *****" | tee -a $OUTPUTFILE
-    echo "***** Files compared. There are no missing modules. *****" | tee -a $OUTPUTFILE
-    DeBug "Files compared. There are no missing modules."
-    cki_print_info "Compared"
-fi
-
-echo "***** Stored compare module list: ${TESTAREA}/moduleList_compare *****" | tee -a $OUTPUTFILE
-
-#
-# Checked: Lets check against the "known removed" list
-#
-echo "" | tee -a $OUTPUTFILE
-echo "***** $ARCH: Checking against "known removed" modules list. *****" | tee -a $OUTPUTFILE
-
-diff -u ${TESTAREA}/moduleList_compare ${TESTAREA}/moduleList_knownRemoved | grep -e "^-" > ${TESTAREA}/moduleList_missing
-
-# Lets clean up the format of our diff outputfile
-FileClean moduleList_missing
-
-if [ ! -s "${TESTAREA}/moduleList_missing" ]; then
-    # RHEL6 only: There is one final test for RHEL6
-    if [ "${K_VER}" = "2.6.32" ]; then
-        RHEL6_TestBZ839667
-    fi
-
-    # If we get here there are no missing modules
-    echo "" | tee -a $OUTPUTFILE
-    echo "***** PASS: *****" | tee -a $OUTPUTFILE
-    echo "***** Files checked. There are no missing modules. *****" | tee -a $OUTPUTFILE
-    DeBug "Files checked. There are no missing modules."
-    cki_print_info "Checked"
-else
-    echo "***** Stored missing module list: ${TESTAREA}/moduleList_missing *****" | tee -a $OUTPUTFILE
-    # This is a fail. There are missing modules.
-
-    # We still need to do the final RHEL6 test
-    # RHEL6 only: There is one final test for RHEL6
-    if [ "${K_VER}" = "2.6.32" ]; then
-        RHEL6_TestBZ839667
-    fi
-
-    DisplayModuleFail moduleList_missing
-    cp ${TESTAREA}/moduleList_missing ${TESTAREA}/moduleList_missing.log
-    cki_upload_log_file ${TESTAREA}/moduleList_missing.log
-    DeBug "Files checked. There are missing modules."
-    cki_print_info "Checked"
-    cki_report_result 1 1 "There are missing modules!"
-fi
-
+rlJournalPrintText
 # EndFile
