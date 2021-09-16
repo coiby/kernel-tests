@@ -18,7 +18,9 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST_FAILED=0
-if rlIsRHEL; then
+PODMAN_VERSION=$(podman --version | awk '{print$3}')
+# in this case runtest.sh cloned the tests from git repo
+if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
     TEST_DIR="$PWD/podman/test/system"
 else
     TEST_DIR=/usr/share/podman/test/system
