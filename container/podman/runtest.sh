@@ -138,11 +138,11 @@ if  [[ "$PODMANUSER" != "root" ]]; then
     loginctl enable-linger $PODMANUSER
     # wait few seconds to give time for enable-linger
     sleep 5
-    su - podmantest -c "cd `pwd`; bash ./podmantest.sh"
+    su - podmantest -c "cd `pwd`; bash ./podmantest.sh ${TEST_DIR}"
     TEST_FAILED=$?
     cat /tmp/podmantest-rootless.log >> "${OUTPUTFILE}"
 else # Stay with root
-    bash ./podmantest.sh
+    bash ./podmantest.sh ${TEST_DIR}
     TEST_FAILED=$?
     cat /tmp/podmantest-root.log >> "${OUTPUTFILE}"
 fi

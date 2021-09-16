@@ -18,13 +18,6 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST_FAILED=0
-PODMAN_VERSION=$(podman --version | awk '{print$3}')
-# in this case runtest.sh cloned the tests from git repo
-if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
-    TEST_DIR="$PWD/podman/test/system"
-else
-    TEST_DIR=/usr/share/podman/test/system
-fi
 OUTPUTFILE=""
 ARCH=$(uname -m)
 
@@ -50,6 +43,12 @@ else
         excludeTests="${excludeTests} 500-networking"
     fi
 fi
+
+if [ -z $1 ]; then
+    echo "FAIL: test requires test directory as parameter" | tee -a "${OUTPUTFILE}"
+    exit 1
+fi
+TEST_DIR=$1
 
 # Bug reports required this information.
 echo "Podman version:" | tee -a "${OUTPUTFILE}"
