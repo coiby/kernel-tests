@@ -21,7 +21,6 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 TNAME="storage/blktests/nvme/nvmeof-mp"
-USE_SIW=${USE_SIW:-"0 1"}
 
 source $CDIR/../../../../cki_lib/libcki.sh
 
@@ -29,7 +28,7 @@ function pre_setup
 {
 	echo "options nvme_core multipath=N"  > /etc/modprobe.d/nvme.conf
 	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
-		modprobe -r nvme nvme_core
+		modprobe -fr nvme_rdma nvme_fabrics nvme nvme_core
 		modprobe nvme
 	fi
 }
@@ -62,7 +61,7 @@ function get_test_result
 		elif [[ $res == *"fail" ]]; then
 			result="FAIL"
 			[ -f $out_bad_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
-			[ -f $out_full_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
+			[ -f $out_full_file ] && cki_upload_log_file "$out_full_file" >/dev/null
 		elif [[ $res == *"not run" ]]; then
 			result="SKIP"
 		else
@@ -122,17 +121,17 @@ function get_test_cases
 	testcases+=" nvmeof-mp/009"
 	testcases+=" nvmeof-mp/010"
 	testcases+=" nvmeof-mp/011"
-	uname -ri | grep -qE "4.18.0.*x86_64|4.18.0.*ppc64le" || testcases+=" nvmeof-mp/012"  #BZ2000074
+	uname -ri | grep -qE "^5.*s390x|^5.*x86_64|4.18.0.*x86_64|4.18.0.*ppc64le" || testcases+=" nvmeof-mp/012"  #BZ2000074
 	echo $testcases
 }
 
-if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
+if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release; then
 	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
 fi
 
-bash $CDIR/../include/build.sh
+. $CDIR/../include/build.sh
 if (( $? != 0 )); then
 	rlLog "Abort test because build env setup failed"
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
@@ -140,6 +139,7 @@ fi
 
 pre_setup
 
+USE_SIW=${USE_SIW:-"0 1"}
 test_ws=$CDIR/blktests
 ret=0
 testcases_default=""

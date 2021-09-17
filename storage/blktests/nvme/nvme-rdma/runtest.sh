@@ -21,7 +21,6 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 TNAME="storage/blktests/nvme/nvme-rdma"
-USE_SIW=${USE_SIW:-"0 1"}
 
 source $CDIR/../../../../cki_lib/libcki.sh
 
@@ -43,7 +42,7 @@ function enable_nvme_core_multipath
 {
 	modprobe nvme_core
 	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
-		modprobe -r nvme nvme_core
+		modprobe -fr nvme_rdma nvme_fabrics nvme nvme_core
 		echo "options nvme_core multipath=Y"  > /etc/modprobe.d/nvme.conf
 		modprobe nvme
 		#wait enough time for NVMe disk initialized
@@ -73,7 +72,7 @@ function get_test_result
 		elif [[ $res == *"fail" ]]; then
 			result="FAIL"
 			[ -f $out_bad_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
-			[ -f $out_full_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
+			[ -f $out_full_file ] && cki_upload_log_file "$out_full_file" >/dev/null
 		elif [[ $res == *"not run" ]]; then
 			result="SKIP"
 		else
@@ -167,13 +166,13 @@ function get_test_cases_rdma
 	echo $testcases
 }
 
-if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
+if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release; then
 	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
 fi
 
-bash $CDIR/../include/build.sh
+. $CDIR/../include/build.sh
 if (( $? != 0 )); then
 	rlLog "Abort test because build env setup failed"
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
@@ -181,6 +180,7 @@ fi
 
 enable_nvme_core_multipath
 
+USE_SIW=${USE_SIW:-"0 1"}
 test_ws=$CDIR/blktests
 ret=0
 testcases_default=""

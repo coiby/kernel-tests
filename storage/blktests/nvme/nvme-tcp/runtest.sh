@@ -43,7 +43,7 @@ function enable_nvme_core_multipath
 {
 	modprobe nvme_core
 	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
-		modprobe -r nvme nvme_core
+		modprobe -fr nvme_rdma nvme_fabrics nvme nvme_core
 		echo "options nvme_core multipath=Y"  > /etc/modprobe.d/nvme.conf
 		modprobe nvme
 		#wait enough time for NVMe disk initialized
@@ -73,7 +73,7 @@ function get_test_result
 		elif [[ $res == *"fail" ]]; then
 			result="FAIL"
 			[ -f $out_bad_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
-			[ -f $out_full_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
+			[ -f $out_full_file ] && cki_upload_log_file "$out_full_file" >/dev/null
 		elif [[ $res == *"not run" ]]; then
 			result="SKIP"
 		else

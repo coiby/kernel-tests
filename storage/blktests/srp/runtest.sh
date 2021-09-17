@@ -21,7 +21,6 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 TNAME="storage/blktests/srp"
-USE_SIW=${USE_SIW:-"0 1"}
 
 source $CDIR/../../../cki_lib/libcki.sh
 
@@ -113,36 +112,39 @@ function get_test_cases_srp
 	testcases+=" srp/001"
 	# srp/002 srp/011 srp/015 failure on ppc64le|x86_64|aarch64, BZ1938508|BZ1963685|BZ1963696|BZ1999540
 	# srp/002 failure on aarch64 BZ2000815
-	uname -ri | grep -qE "el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/002"
+	# srp/002 srp/005 srp/008 failed on linux-block 5.14 s390x, unstalble rdma_rxe on upstream
+	# srp/002 hang when use siw on upstream aarch64|ppc64le
+	uname -ri | grep -qE "^5.*aarch64|^5.*ppc64le|el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/002"
 	# testcases+=" srp/003", need legacy device mapper support
 	# testcases+=" srp/004", need legacy device mapper support
-	testcases+=" srp/005"
+	[[ $USE_SIW =~ 0 ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/005"
 	testcases+=" srp/006"
 	testcases+=" srp/007"
-	testcases+=" srp/008"
+	[[ $USE_SIW =~ 0 ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/008"
 	testcases+=" srp/009"
 	testcases+=" srp/010"
-	uname -ri | grep  -qE "el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/011"
+	uname -ri | grep  -qE "ppc64le|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/011"
 	# testcases+=" srp/012", need legacy device mapper support
 	# srp/013 on aarch64/ppc64le BZ1951961
 	uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" srp/013"
 	uname -r | grep -q 4.18.0 || testcases+=" srp/014" #BZ1900153
-	uname -ri | grep -qE "el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/015"
+	uname -ri | grep -qE "ppc64le|el8.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/015"
 	echo $testcases
 }
 
-if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
+if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release ; then
 	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
 fi
 
-bash $CDIR/build.sh
+. $CDIR/build.sh
 if (( $? != 0 )); then
 	rlLog "Abort test because build env setup failed"
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 fi
 
+USE_SIW=${USE_SIW:-"0 1"}
 test_ws=$CDIR/blktests
 ret=0
 testcases_default=""
