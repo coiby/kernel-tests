@@ -21,7 +21,6 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 TNAME="storage/blktests/srp"
-USE_SIW=${USE_SIW:-"0 1"}
 
 source $CDIR/../../../cki_lib/libcki.sh
 
@@ -139,12 +138,13 @@ if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline ; then
 	exit
 fi
 
-bash $CDIR/build.sh
+. $CDIR/build.sh
 if (( $? != 0 )); then
 	rlLog "Abort test because build env setup failed"
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 fi
 
+USE_SIW=${USE_SIW:-"0 1"}
 test_ws=$CDIR/blktests
 ret=0
 testcases_default=""
