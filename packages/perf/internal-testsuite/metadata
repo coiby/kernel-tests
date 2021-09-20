@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=kernel-debuginfo;iputils-debuginfo;perf;perf-debuginfo;yum-utils;beakerlib;beakerlib-redhat
+dependencies=iputils-debuginfo;perf;perf-debuginfo;yum-utils;beakerlib;beakerlib-redhat
 softDependencies=dmidecode;dnf-utils;python-perf;python3-perf;libbpf;elfutils-libelf-devel;clang;llvm
 repoRequires=cki_lib
