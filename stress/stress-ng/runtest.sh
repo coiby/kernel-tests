@@ -30,7 +30,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST="stress/stress-ng"
-BUILDDIR="stress-ng"
+BUILDDIR="/opt/stress-ng"
 
 # task parameters
 # stress-ng git location
@@ -56,8 +56,13 @@ function detect_testenv()
 
 function build_stress-ng()
 {
+    if [[ -f  "${BUILDDIR}/stress-ng" ]]; then
+        rlLog "${BUILDDIR}/stress-ng is already built"
+        return
+    fi
+
     rlLog "Downloading stress-ng from source"
-    rlRun "git clone $GIT_URL" 0
+    rlRun "git clone $GIT_URL $BUILDDIR" 0
     if [ $? != 0 ]; then
         rstrnt-report-result $TEST WARN 0
         cki_abort_task "Failed to git clone $GIT_URL."
@@ -65,7 +70,7 @@ function build_stress-ng()
 
     # build
     rlLog "Building stress-ng from source"
-    rlRun "pushd stress-ng" 0
+    rlRun "pushd $BUILDDIR" 0
     rlRun "git checkout $GIT_BRANCH" 0
     rlRun "make" 0 "Building stress-ng"
     rlRun "popd" 0 "Done building stress-ng"
@@ -167,6 +172,8 @@ rlPhaseStartSetup
 rlPhaseEnd
 
 rlPhaseStartTest
+    # Clean previous logs, if existed
+    rm -f *.log > /dev/null 2>&1
     for CLASS in ${CLASSES} ; do
         while read STRESSOR ; do
             [[ ${STRESSOR} =~ ^# ]] && continue
