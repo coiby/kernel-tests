@@ -9,5 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=net-tools
-softDependencies=kernel-debug-modules-extra
 repoRequires=cki_lib;networking/common;networking/tunnel/common
