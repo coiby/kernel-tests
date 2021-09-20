@@ -1,6 +1,0 @@
-    wait_for_ready stopme
-
-    local t0=$SECONDS
-    # Stop the container, but do so in the background so we can inspect
-    # the container status while it's stopping. Use $PODMAN because we
-    # don't want the overhead and error checks of run_podman.
