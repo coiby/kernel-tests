@@ -66,7 +66,7 @@ function verify_intel_cpufreq_driver
 	return $CKI_PASS
     fi
 
-    if [[ $driver != "intel_pstate" ]]; then
+    if [ $driver != "intel_pstate" ] && [ $driver != "intel_cpufreq" ]; then
 	if [ "$vendor" = "lenovo" ]; then
 	    cki_log "lenovo intel system is running: $driver"
 	    cki_log "PASS"
@@ -79,12 +79,18 @@ function verify_intel_cpufreq_driver
 
     cki_run_cmd_neu "lscpu | grep 'hwp '"
     if (( $? == 0 )); then
-        cki_run_cmd_pos "rdmsr 0x770"
-        if (( $? != 0 )); then
-            cki_set_reason $CKI_UNSUPPORTED \
-                "intel system has HWP, but it is not enabled"
-            return $CKI_UNSUPPORTED
-        fi
+	if [ "$driver" = "intel_pstate" ]; then
+            cki_run_cmd_pos "rdmsr 0x770"
+            if (( $? != 0 )); then
+		cki_set_reason $CKI_UNSUPPORTED \
+		    "intel system has HWP, but it is not enabled"
+		return $CKI_UNSUPPORTED
+            fi
+	else
+            cki_set_reason $CKI_FAIL \
+                "intel system is not running intel_pstate running: $driver"
+            return $CKI_FAIL
+	fi
     else
         cki_run_cmd_pos "ls /sys/devices/system/cpu/intel_pstate/"
         if (( $? != 0 )); then
