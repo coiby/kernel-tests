@@ -23,6 +23,7 @@ TEST="Podman"
 ret=0
 ARCH=$(uname -m)
 PODMAN_VERSION=$(podman --version | awk '{print$3}')
+BUILDAH_VERSION=$(buildah --version | awk '{print$3}')
 
 function _install_bats ()
 {
@@ -102,6 +103,12 @@ if rlIsRHEL; then
     sed -i 's/@test "podman logs - multi journald" {/@test "podman logs - multi journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
     sed -i 's/@test "podman logs - since journald" {/@test "podman logs - since journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
     sed -i 's/@test "podman logs - until journald" {/@test "podman logs - until journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
+fi
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=2006678
+# https://gitlab.com/cki-project/kernel-tests/-/issues/622
+if rlTestVersion ${BUILDAH_VERSION} '<' '1.23.0'; then
+    sed -i 's/@test "podman build - global runtime flags test" {/@test "podman build - global runtime flags test" {\n    skip/' ${TEST_DIR}/070-build.bats
 fi
 
 if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
