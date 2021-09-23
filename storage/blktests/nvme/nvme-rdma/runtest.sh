@@ -24,20 +24,6 @@ TNAME="storage/blktests/nvme/nvme-rdma"
 
 source $CDIR/../../../../cki_lib/libcki.sh
 
-function is_rhel7
-{
-	#
-	# XXX: _TREE is set in kpet-db via:
-	#
-	#      {% if TREE == "rhel7" %}
-	#          <param name="_TREE" value="rhel7"/>
-	#      {% else %}
-	#          <param name="_TREE" value="rhel8|upstream"/>
-	#      {% endif %}
-	#
-	[[ ${_TREE} == "rhel7" ]] && return 0 || return 1
-}
-
 function enable_nvme_core_multipath
 {
 	modprobe nvme_core
@@ -123,7 +109,7 @@ function do_test
 function get_test_cases_rdma
 {
 	typeset testcases=""
-	if is_rhel7; then
+	if rlIsRHEL 7; then
 		testcases+=" nvme/003" # BZ1872714
 		testcases+=" nvme/004" # BZ1872714
 		testcases+=" nvme/006" # BZ1872714

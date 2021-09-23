@@ -24,20 +24,6 @@ TNAME="storage/blktests/blk"
 
 source $CDIR/../../../cki_lib/libcki.sh
 
-function is_rhel7
-{
-	#
-	# XXX: _TREE is set in kpet-db via:
-	#
-	#      {% if TREE == "rhel7" %}
-	#          <param name="_TREE" value="rhel7"/>
-	#      {% else %}
-	#          <param name="_TREE" value="rhel8|ark|upstream"/>
-	#      {% endif %}
-	#
-	[[ ${_TREE} == "rhel7" ]] && return 0 || return 1
-}
-
 function get_timestamp
 {
 	date +"%Y-%m-%d %H:%M:%S"
@@ -103,7 +89,7 @@ function do_test
 function get_test_cases_block
 {
 	typeset testcases=""
-	if is_rhel7; then
+	if rlIsRHEL 7; then
 		#
 		# XXX: There are 27 cases of block testing, and these cases
 		#      in the following are not available to run
@@ -179,7 +165,7 @@ function get_test_cases_block
 function get_test_cases_loop
 {
 	typeset testcases=""
-	if is_rhel7; then
+	if rlIsRHEL 7; then
 		#
 		# XXX: There are 7 cases of loop testing, and these cases
 		#      in the following are not available to run
@@ -209,7 +195,7 @@ function get_test_cases_loop
 function get_test_cases_nvme
 {
 	typeset testcases=""
-	if is_rhel7; then
+	if rlIsRHEL 7; then
 		testcases+=" nvme/004"
 		testcases+=" nvme/006"
 		testcases+=" nvme/008"
