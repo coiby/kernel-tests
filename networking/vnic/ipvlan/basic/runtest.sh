@@ -222,7 +222,8 @@ rlPhaseStartTest "local_netns"
 		rlRun "ip netns exec client ip link set ipvlan_c type ipvlan mode $mode"
 		for feature_id in "${!dev_features[@]}"
 		do
-			rlRun "ip netns exec server ethtool -K ipvlan_s ${dev_features[$feature_id]}"
+			# ibm-z systems doesn't support gso on
+			uname -i | grep -i s390x || rlRun "ip netns exec server ethtool -K ipvlan_s ${dev_features[$feature_id]}"
 			rlRun "ip netns exec server ethtool -k ipvlan_s"
 			waitbeforepass 30 "ip netns exec client ping 2.2.2.171 -c 1"
 			rlRun "ip netns exec client ping 2.2.2.171 -c 2"
