@@ -119,6 +119,9 @@ function knownissue_filter()
 {
 	# skip OOM tests on large boxes since it takes too long
 	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 8 ] && tskip "oom0.*" fatal
+	# New test cve-2021-3609 (can_bcm01) caused panic, which has been fixed
+	# in 5.14-rc1
+	kernel_in_range "5.0.0" "5.14" && tskip "cve-2021-3609 can_bcm01" fatal
 	# shmget02 failed on ppc64le because of ENOENT
 	# Issue: https://github.com/linux-test-project/ltp/issues/853
 	is_arch "ppc64le" && tskip "shmget02" unfix
