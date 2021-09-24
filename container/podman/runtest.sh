@@ -94,8 +94,8 @@ if rlIsRHEL '8'; then
     dnf module install -y container-tools:rhel8
 fi
 
-if rlIsRHEL; then
-    # At least for now, it seems same tests can be skipped for RHEL-8 and RHEL-9
+if rlIsRHEL || rlIsCentOS '9'; then
+    # At least for now, it seems same tests can be skipped for RHEL-8, RHEL-9, and CentOS Stream 9
     # In the future it might be better to check podman version instead of release...
     # Skip journal related tests due to: https://bugzilla.redhat.com/show_bug.cgi?id=1972780
     echo "Skipping journald related tests due to BZ1972780..."
