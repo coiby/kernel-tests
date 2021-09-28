@@ -682,4 +682,3 @@ xt_TEE
 xt_TPROXY
 xt_TRACE
 xxhash_generic
-zram
