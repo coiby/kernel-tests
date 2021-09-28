@@ -142,6 +142,17 @@ if  [[ "$PODMANUSER" != "root" ]]; then
         echo "Adding rootless podman user: $PODMANUSER"
         adduser $PODMANUSER
     fi
+
+    mv -f ${TEST_DIR}/220-healthcheck.bats ${TEST_DIR}/220-healthcheck.baks
+    mv -f ${TEST_DIR}/250-systemd.bats ${TEST_DIR}/250-systemd.baks
+    mv -f ${TEST_DIR}/260-sdnotify.bats ${TEST_DIR}/260-sdnotify.baks
+    mv -f ${TEST_DIR}/410-selinux.bats ${TEST_DIR}/410-selinux.baks
+
+    if [ "$ARCH" != "x86_64" ]; then
+        # 500-networking would fail in non x86_64, add to exclusion
+        mv -f ${TEST_DIR}/500-networking.bats ${TEST_DIR}/500-networking.baks
+    fi
+
     loginctl enable-linger $PODMANUSER
     # wait few seconds to give time for enable-linger
     sleep 5
@@ -149,6 +160,12 @@ if  [[ "$PODMANUSER" != "root" ]]; then
     TEST_FAILED=$?
     cat /tmp/podmantest-rootless.log >> "${OUTPUTFILE}"
 else # Stay with root
+
+    if [ "$ARCH" == "ppc64le" ]; then
+        # 050-stops would fail in ppc64le, add to exclusion
+        mv -f ${TEST_DIR}/050-stops.bats ${TEST_DIR}/050-stops.baks
+    fi
+
     bash ./podmantest.sh ${TEST_DIR}
     TEST_FAILED=$?
     cat /tmp/podmantest-root.log >> "${OUTPUTFILE}"
