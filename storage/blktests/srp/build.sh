@@ -6,7 +6,7 @@ rm -rf blktests
 git clone $LOOKASIDE
 cd blktests
 
-if uname -ri | grep -qE "^5.*eln|^5.*el9|^5.*fc"; then
+if ! modprobe -qn rdma_rxe; then
 	export USE_SIW="1"
 	sed -i "/rdma_rxe/d" ./tests/srp/rc
 	sed -i "/rdma_rxe/d" ./tests/nvmeof-mp/rc
