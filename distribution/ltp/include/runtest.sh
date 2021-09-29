@@ -202,13 +202,20 @@ RprtRslt ()
     TEST=$1
     result=$2
 
+    logfile_run=$OUTPUTDIR/$TEST.run.log
+    logfile_fail=$OUTPUTDIR/$TEST.fail.log
+
+    # Always upload parsed test log for those failed test cases
+    GetFailureLog $logfile_run "None" > $logfile_fail
+    [ -s $logfile_fail ] && SubmitLog $logfile_fail
+
     # File the results in the database
     if [ "$result" = "PASS" ]; then
         # I want to see the succeeded running log as well
-        SubmitLog "$OUTPUTDIR/$TEST.run.log"
+        SubmitLog $logfile_run
         rstrnt-report-result $TEST $result
     else
-        SubmitLog "$OUTPUTDIR/$TEST.run.log"
+        SubmitLog $logfile_run
         score=$(cat $OUTPUTDIR/$RUNTEST.log | grep "Total Failures:" |cut -d ' ' -f 3)
         rstrnt-report-result $TEST $result $score
     fi
@@ -414,4 +421,17 @@ RunFiltTest ()
     fi
 
     return 1
+}
+
+GetFailureLog ()
+{
+    local logfile=${1?"*** log file ***"}
+    local kifile=${2?"*** known issue file ***"}
+    local thisdir=$(dirname $(readlink -f $BASH_SOURCE))
+    local parser=$thisdir/ltp_log_parser.py
+    if [ $kifile == "None" ]; then
+        python3 $parser -F -t 0 $logfile
+    else
+        python3 $parser -f $kifile -F -t 0 $logfile
+    fi
 }
