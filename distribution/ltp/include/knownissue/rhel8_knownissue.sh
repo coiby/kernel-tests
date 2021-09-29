@@ -91,6 +91,7 @@ function rhel8_fixed_issues()
 	kernel_in_range "0" "4.18.0-194.el8" && tskip "add_key05" fixed
 	# Bug 1875699 - CVE-2020-14386 kernel: memory corruption in net/packet/af_packet.c leads to elevation of privilege
 	kernel_in_range "0" "4.18.0-237.el8" && tskip "sendto03 cve-2020-14386" fixed
+	pkg_in_range "glibc" "0" "2.28-153.el8" && tskip "semctl09" fixed
 }
 
 function rhel8_knownissue_filter()
