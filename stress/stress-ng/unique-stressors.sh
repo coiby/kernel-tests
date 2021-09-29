@@ -2,7 +2,7 @@
 
 # A script to help generate the list of stressors to run and
 # eliminate duplicate stressors from the classes.
-# The list may need further editing to blacklist known issues.
+# The list may need further editing to denylist known issues.
 # Build stress-ng and run this script in the same directory (./stress-ng)
 
 CLASSES="cpu cpu-cache interrupt memory os"
