@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2019-2020 Red Hat, Inc. All rights reserved.
+# Copyright (c) 2019 Red Hat, Inc. All rights reserved.
 #
 # This copyrighted material is made available to anyone wishing
 # to use, modify, copy, or redistribute it subject to the terms
@@ -17,11 +17,73 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
-TNAME=$(egrep '^name=' $CDIR/metadata | awk -F'=' '{print $2}')
+# Include Beaker environment
+. ../../../cki_lib/libcki.sh || exit 1
+. /usr/share/beakerlib/beakerlib.sh || exit 1
 
-bash $CDIR/main.sh
-rc=$?
-(( $rc == 0 )) && res="PASS" || res="FAIL"
-rstrnt-report-result "$TNAME" "$res" $rc
+YUM=$(cki_get_yum_tool)
+
+#find all the disks on the system in test
+sd=$(lsblk -nd --output NAME)
+
+#Function to install FIO
+function install_fio() {
+    rlRun "rpm -q fio || $YUM -y install fio"
+}
+
+#Function to Generate I/O with FIO
+function fio_device_level_test
+{
+    local test_dev=$1
+    local ret=0
+    local size=1G
+    local runtime=180
+
+    rlLog "INFO: Executing fio_device_level_test() with device: $test_dev"
+
+    rlRun "fio -filename=$test_dev -iodepth=16 -rw=write -ioengine=libaio -bssplit=4K -direct=1 -size=$size -group_reporting -name=mytest -verify=crc32c"
+    if [ $? -ne 0 ]; then
+        rlLog "FAIL: fio device level write testing for $test_dev failed"
+        ret=1
+    fi
+    rlRun "fio -filename=$test_dev -iodepth=16 -rw=randwrite -ioengine=libaio -bssplit=4K -direct=1 -size=$size -group_reporting -name=mytest -verify=crc32c"
+    if [ $? -ne 0 ]; then
+        rlLog "FAIL: fio device level randwrite testing for $test_dev failed"
+        ret=1
+    fi
+    rlRun "fio -filename=$test_dev -iodepth=16 -rw=read -ioengine=libaio -bssplit=4K -direct=1 -size=$size -group_reporting -name=mytest -runtime=$runtime -time_based"
+    if [ $? -ne 0 ]; then
+        rlLog "FAIL: fio device level read testing for $test_dev failed"
+        ret=1
+    fi
+    rlRun "fio -filename=$test_dev -iodepth=16 -rw=randread -ioengine=libaio -bssplit=4K -direct=1 -size=$size -group_reporting -name=mytest -runtime=$runtime -time_based"
+    if [ $? -ne 0 ]; then
+        rlLog "FAIL: fio device level randread testing for $test_dev failed"
+        ret=1
+    fi
+
+    return $ret
+}
+
+#function to find non-boot disks and run FIO
+function get_disk_and_FIO {
+    for d in $sd; do
+        boot_drv_check=$(lsblk /dev/$d | grep -E "boot|SWAP|home|rom" | grep -v grep | wc -l)
+        if [ $boot_drv_check -gt 0 ]; then
+            rlLog "Skipping disk /dev/$d"
+        else
+            fio_device_level_test "/dev/$d"
+        fi
+    done
+
+}
+
+rlJournalStart
+    rlPhaseStartSetup
+        install_fio
+    rlPhaseEnd
+    rlPhaseStartTest
+        get_disk_and_FIO
+    rlPhaseEnd
+rlJournalEnd
+rlJournalPrintText
