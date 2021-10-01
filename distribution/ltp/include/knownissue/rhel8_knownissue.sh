@@ -16,10 +16,10 @@ function rhel8_fatal_issues()
 function rhel8_unfix_issues()
 {
 	# Bug 1945052 - CVE-2021-3444 kernel: bpf verifier incorrect mod32 truncation
-	osver_in_range "800" "806" && tskip "bpf_prog05" unfix
+	osver_in_range "800" "806" && tskip "bpf_prog05 cve-2021-3444" unfix
 	# Bug 1879689 - [RHEL-8.3] move_pages12.c:95: FAIL: madvise failed: ENOMEM (12)
 	osver_in_range "800" "805" && is_arch "aarch64" && tskip "move_pages12" unfix
-	# Bug 1880265 - RHEL8.3 Snapshot1 - Slab memory controller issue (mm-) 
+	# Bug 1880265 - RHEL8.3 Snapshot1 - Slab memory controller issue (mm-)
 	osver_in_range "800" "805" && tskip "madvise06" unfix
 	# Bug 1832099 - fanotify: fix merging marks masks with FAN_ONDIR
 	osver_in_range "800" "806" && tskip "fanotify09" unfix
@@ -68,6 +68,8 @@ function rhel8_unfix_issues()
 
 function rhel8_fixed_issues()
 {
+	# Bug 1913045 - [RHEL-8.4.0] ltp/lite - ioctl_sg01 - fail - broken mmap() for MAP_FAILED
+	is_arch "aarch64" && kernel_in_range "0" "kernel-4.18.0-304.5.el8" && tskip "ioctl_sg01" unfix
 	# Bug 1820405 - KEYS: allow reaching the keys quotas exactly
 	kernel_in_range "0" "4.18.0-193.7.el8" && tskip "add_key05" fixed
 	# Bug 1771351 - fat: race between udev and mkdir leads to EIO
@@ -91,6 +93,8 @@ function rhel8_fixed_issues()
 	kernel_in_range "0" "4.18.0-194.el8" && tskip "add_key05" fixed
 	# Bug 1875699 - CVE-2020-14386 kernel: memory corruption in net/packet/af_packet.c leads to elevation of privilege
 	kernel_in_range "0" "4.18.0-237.el8" && tskip "sendto03 cve-2020-14386" fixed
+	# Bug 1985920 - [RHEL-8.2] LTP quotactl07 failed : Q_XQUOTARM doesn't have quota type check
+	kernel_in_range "0" "4.18.0-195.el8" && tskip "quotactl07" fixed
 	pkg_in_range "glibc" "0" "2.28-153.el8" && tskip "semctl09" fixed
 }
 
