@@ -174,3 +174,12 @@ else
     echo "😎 All tests passed."
     rstrnt-report-result "${TEST}" PASS
 fi
+
+# Clean podman interfaces when is done
+ifaces=$(ip -json link show  | jq -r '.[].ifname' | grep cni-podman)
+if [ ! -z "$ifaces" ]; then
+    for iface in $ifaces; do
+         echo "Delete podman interface: $iface"
+         ip link delete $iface
+    done
+fi
