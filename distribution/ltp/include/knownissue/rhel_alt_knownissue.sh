@@ -19,6 +19,8 @@ function rhel_alt_fatal_issues()
 	tskip "pty02" fatal
 	# Bug 1708066 - fs/binfmt_misc.c: do not allow offset overflow
 	osver_in_range "700" "707" && tskip "binfmt_misc01" fatal
+	# Bug 1875699 - CVE-2020-14386 kernel: memory corruption in net/packet/af_packet.c leads to elevation of privilege
+	osver_in_range "700" "707" && tskip "cve-2020-14386 sendto03" fatal
 }
 
 function rhel_alt_unfix_issues()
@@ -34,6 +36,8 @@ function rhel_alt_unfix_issues()
 	# Note: this can be removed when pkey01 is fixed upstream
 	#       http://lists.linux.it/pipermail/ltp/2019-December/014683.html
 	is_arch "aarch64" && tskip "pkey01" unfix
+	# Bug 1579402 - SAP RHEL 7 Feature: sysvipc: introduce STAT_ANY commands
+	tskip "shmctl04" unfix
 }
 
 function rhel_alt_fixed_issues()
