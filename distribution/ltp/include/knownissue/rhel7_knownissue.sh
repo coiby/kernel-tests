@@ -68,6 +68,8 @@ function rhel7_unfix_issues()
 	osver_in_range "705" "707" && is_arch "ppc64" && tskip "getrandom02" unfix
 	# Bug 1593435 - ppc64: kt1lite getrandom02 test failure reported
 	osver_in_range "705" "707" && is_arch "ppc64le" && tskip "getrandom02" unfix
+	# without this kernel commit "pipe: fix limit checking in alloc_pipe_info()"
+	osver_in_range "700" "705" && is_arch "ppc64le" && tskip "pipe2_04" unfix
 	# Bug 1185242 - Corruption with O_DIRECT and unaligned user buffers
 	tskip "dma_thread_diotest" unfix
 	# disable sysctl tests -> RHEL7 does not support these
@@ -104,6 +106,8 @@ function rhel7_unfix_issues()
 	osver_in_range "702" "710" && tskip "semctl09" unfix
 	# missing linux patch bd14406b78e6
 	osver_in_range "700" "710" && tskip "ptrace10" unfix
+	# Bug 1843799 - ltp xfs quotactl07 fail
+	osver_in_range "700" "710" && tskip "quotactl07" unfix
 }
 
 function rhel7_fixed_issues()
