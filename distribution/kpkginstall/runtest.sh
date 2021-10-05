@@ -406,7 +406,8 @@ else
   fi
 
   # Make a list of kernel versions we expect to see after reboot.
-  if [ -f /kpkginstall/KPKG_VAR_DEBUG_KERNEL ]; then
+  # the debug suffix on kernel names do not apply for kernel builds from tarball
+  if [ -f /kpkginstall/KPKG_VAR_DEBUG_KERNEL ] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
     valid_kernel_versions=(
       "${KVER}.debug"           # RHEL 7 style debug kernels
       "${KVER}+debug"           # RHEL 8 style debug kernels
