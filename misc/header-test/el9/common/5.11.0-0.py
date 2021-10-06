@@ -38,7 +38,7 @@ def setup(exc):
     exc['asm/ucontext.h'] = ([SIZE_T, 'asm/signal.h', 'asm/sigcontext.h'],
                              OK, 'stack_t sigcontext')
 
-    exc['drm/vmwgfx_drm.h'] = ([], WARN | BLACKLIST,
+    exc['drm/vmwgfx_drm.h'] = ([], WARN | DENYLIST,
                                'SVGA3dMSPattern and SVGA3dMSQualityLevel not defined in UAPI')
 
     exc['linux/android/binder.h'] = ([PID_T],
@@ -92,7 +92,7 @@ def setup(exc):
                              OK, 'size_t')
 
     exc['linux/patchkey.h'] = ([SIZE_T],
-                               WARN | BLACKLIST, 'error: #error "patchkey.h included directly"')
+                               WARN | DENYLIST, 'error: #error "patchkey.h included directly"')
 
     exc['linux/phonet.h'] = ([SOCKADDR],
                              OK, 'sa_family_t sockaddr')
@@ -135,13 +135,13 @@ def setup(exc):
                                          OK, 'u8 u16 u32 (fixed upstream in commit fb504caae7ef')
 
     exc['xen/evtchn.h'] = ([],
-                           BLACKLIST | WARN, 'no domid_t')
+                           DENYLIST | WARN, 'no domid_t')
 
     exc['xen/gntdev.h'] = ([],
-                           BLACKLIST | WARN, 'no domid_t nor grant_ref_t')
+                           DENYLIST | WARN, 'no domid_t nor grant_ref_t')
 
     exc['xen/privcmd.h'] = ([],
-                            BLACKLIST | WARN, 'no domid_t')
+                            DENYLIST | WARN, 'no domid_t')
 
     exc['sound/sof/eq.h'] = (['stdint.h'], OK, 'int32_t uint32_t')
 

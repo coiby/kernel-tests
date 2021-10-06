@@ -8,6 +8,6 @@ def setup(exc):
     exc['asm/ucontext.h'] = ([SIZE_T],
                              OK, 'size_t')
 
-    exc['asm/setup.h'] = ([], WARN | BLACKLIST,
+    exc['asm/setup.h'] = ([], WARN | DENYLIST,
                             'nonexistent types phys_addr_t gfp_t')
 

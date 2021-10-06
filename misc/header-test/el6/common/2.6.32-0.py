@@ -38,7 +38,7 @@ def setup(exc):
                                OK, 'uint32_t uint64_t drm_clip_rect size_t')
 
     exc['drm/via_drm.h'] = ([SIZE_T],
-                            WARN | BLACKLIST, 'nonexistent file in include: via_drmclient.h, blacklisted')
+                            WARN | DENYLIST, 'nonexistent file in include: via_drmclient.h, denylisted')
 
     exc['linux/netfilter/xt_set.h'] = (['* typedef int ip_set_id_t;','* #define IPSET_DIM_MAX 1'],
                                             OK, 'ip_set_id_t IPSET_DIM_MAX')
@@ -52,11 +52,11 @@ def setup(exc):
     exc['linux/netfilter/ipset/ip_set_hash.h'] = (['linux/netfilter/ipset/ip_set.h'],
                                             OK, 'IPSET_ERR_TYPE_SPECIFIC')
 
-    exc['linux/if_bridge.h'] = ([], BLACKLIST | WARN, 'ip6 incomplete type')
+    exc['linux/if_bridge.h'] = ([], DENYLIST | WARN, 'ip6 incomplete type')
 
     exc['rdma/rdma_user_cm.h'] = (['sys/socket.h'], OK, 'sockaddr_storage')
 
-    exc['drm/sis_drm.h'] = ([], WARN | BLACKLIST,
+    exc['drm/sis_drm.h'] = ([], WARN | DENYLIST,
                             'list_head not available')
 
     exc['linux/virtio_net.h'] = (['linux/types.h', '* typedef __u16 u16;', '* typedef __u64 u64;'],
@@ -456,7 +456,7 @@ def setup(exc):
                                    OK, 'in_addr NFS_MAXPATHLEN sockaddr NFS_FHSIZE struct cr_getfs')
 
     exc['linux/patchkey.h'] = ([SIZE_T],
-                               WARN | BLACKLIST, 'error: #error "patchkey.h included directly"')
+                               WARN | DENYLIST, 'error: #error "patchkey.h included directly"')
 
     exc['linux/phonet.h'] = ([SA_FAMILY_T, SOCKADDR],
                              OK, 'sa_family_t sockaddr')
