@@ -75,10 +75,10 @@ def setup(exc):
 
     exc['drm/savage_drm.h'] = exc['drm/i810_drm.h']
 
-    exc['drm/via_drm.h'] = ([], WARN | BLACKLIST,
-                            'nonexistent file in include: via_drmclient.h, blacklisted')
+    exc['drm/via_drm.h'] = ([], WARN | DENYLIST,
+                            'nonexistent file in include: via_drmclient.h, denylisted')
 
-    exc['drm/vmwgfx_drm.h'] = ([], WARN | BLACKLIST,
+    exc['drm/vmwgfx_drm.h'] = ([], WARN | DENYLIST,
                                'requires -I/usr/include/drm flag for gcc')
 
     exc['linux/agpgart.h'] = ([SIZE_T],
@@ -308,7 +308,7 @@ def setup(exc):
     exc['linux/netfilter/xt_sctp.h'] = (['* typedef int bool;', '* #define true 1;', '* #define false 0;'],
                                         OK | WARN, 'bool true false not defined')
 
-    exc['linux/netfilter/xt_set.h'] = ([], BLACKLIST | WARN, 'no ip_set_id_t')
+    exc['linux/netfilter/xt_set.h'] = ([], DENYLIST | WARN, 'no ip_set_id_t')
 
     exc['linux/netfilter/xt_TEE.h'] = ([SOCKADDR, 'linux/if.h', 'linux/in.h', 'linux/in6.h', 'linux/netfilter.h'],
                                        OK, 'IFNAMSIZ')
@@ -328,7 +328,7 @@ def setup(exc):
                                OK, 'size_t')
 
     exc['linux/patchkey.h'] = ([SIZE_T],
-                               WARN | BLACKLIST, 'error: #error "patchkey.h included directly"')
+                               WARN | DENYLIST, 'error: #error "patchkey.h included directly"')
 
     exc['linux/phonet.h'] = ([SA_FAMILY_T, SOCKADDR],
                              OK, 'sa_family_t sockaddr')
@@ -386,17 +386,17 @@ def setup(exc):
                                 OK, 'size_t timespec')
 
     exc['xen/privcmd.h'] = ([],
-                            BLACKLIST | WARN, 'no domid_t')
+                            DENYLIST | WARN, 'no domid_t')
 
     exc['drm/exynos_drm.h'] = ([SIZE_T, 'stdint.h', 'drm/drm.h'],
                                OK, 'drm_clip_rect size_t uint32_t uint64_t')
 
-    exc['drm/sis_drm.h'] = ([], WARN | BLACKLIST,
+    exc['drm/sis_drm.h'] = ([], WARN | DENYLIST,
                             'list_head not available')
 
-    exc['linux/ext2_fs.h'] = ([], WARN | BLACKLIST, 'will be unexported')
+    exc['linux/ext2_fs.h'] = ([], WARN | DENYLIST, 'will be unexported')
 
-    exc['linux/ext3_fs.h'] = ([], WARN | BLACKLIST, 'will be unexported')
+    exc['linux/ext3_fs.h'] = ([], WARN | DENYLIST, 'will be unexported')
 
     exc['linux/netfilter/nf_conntrack_tuple_common.h'] = (['linux/types.h'],
                                                   OK, '__be16')
@@ -431,11 +431,11 @@ def setup(exc):
     exc['linux/netfilter_ipv6/ip6t_NPT.h'] = ([SIZE_T, 'linux/in.h', 'linux/in6.h'],
                                              OK, 'SIZE_T in in6')
 
-    exc['linux/omap3isp.h'] = ([], WARN | BLACKLIST, '')
+    exc['linux/omap3isp.h'] = ([], WARN | DENYLIST, '')
 
     exc['linux/packet_diag.h'] = (['net/if_arp.h'], OK, 'MAX_ADDR_LEN')
 
-    exc['linux/if_bridge.h'] = ([], BLACKLIST | WARN, 'no ip_set_id_t')
+    exc['linux/if_bridge.h'] = ([], DENYLIST | WARN, 'no ip_set_id_t')
 
     exc['linux/virtio_net.h'] = (['linux/types.h', '* typedef __u16 u16;', '* typedef __u64 u64;'],
                                    OK | WARN, 'u16 u64 not defined')
@@ -472,8 +472,8 @@ def setup(exc):
     exc['linux/openvswitch.h'] = ([SIZE_T, 'stdint.h'],
                                   OK, 'size_t uint32_t uint64_t')
 
-    exc['sound/asoc.h'] = ([], WARN | BLACKLIST,
-                           'sound/asoc.h is blacklisted in kernel 3.10.0')
+    exc['sound/asoc.h'] = ([], WARN | DENYLIST,
+                           'sound/asoc.h is denylisted in kernel 3.10.0')
 
     exc['linux/target_core_user.h'] = (['stdint.h'],
                                        OK, 'size_t uint32_t uint64_t')

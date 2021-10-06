@@ -8,6 +8,6 @@ def setup(exc):
     SOCKADDR = 'sys/socket.h'
 
     # https://bugzilla.redhat.com/1908140
-    exc['linux/bpf_perf_event.h'] = ([], WARN | BLACKLIST,
+    exc['linux/bpf_perf_event.h'] = ([], WARN | DENYLIST,
                                      'struct pt_regs is undefined in userspace kernel headers')
 

@@ -229,10 +229,10 @@ def makeTest(testname, header, extra = None, flags = None, comment = None):
         else:
             test_file.write('#include <%s>\n' % action)
 
-    if not flags & BLACKLIST:
+    if not flags & DENYLIST:
         test_file.write('#include <%s>\n' % header)
     else:
-        test_file.write('#warning this header was blacklisted: %s\n' % header)
+        test_file.write('#warning this header was denylisted: %s\n' % header)
 
     test_file.close()
 
@@ -250,9 +250,9 @@ def makeTestsVerify():
             print('Comment:', comment)
 
             v_count = (1 << len(extra)) - 1
-            if flags & BLACKLIST:
-                print('Clearing BLACKLIST flag')
-                flags &= ~BLACKLIST
+            if flags & DENYLIST:
+                print('Clearing DENYLIST flag')
+                flags &= ~DENYLIST
                 v_count += 1
 
             for v_val in range(0, v_count):

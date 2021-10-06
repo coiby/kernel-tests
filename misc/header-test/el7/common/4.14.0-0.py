@@ -70,13 +70,13 @@ def setup(exc):
 
     exc['drm/savage_drm.h'] = exc['drm/i810_drm.h']
 
-    exc['drm/sis_drm.h'] = ([], WARN | BLACKLIST,
+    exc['drm/sis_drm.h'] = ([], WARN | DENYLIST,
                             'list_head not available')
 
     exc['drm/tegra_drm.h'] = ([SIZE_T, 'stdint.h'], OK, 'size_t uint32_t')
 
-    exc['drm/via_drm.h'] = ([], WARN | BLACKLIST,
-                            'nonexistent file in include: via_drmclient.h, blacklisted')
+    exc['drm/via_drm.h'] = ([], WARN | DENYLIST,
+                            'nonexistent file in include: via_drmclient.h, denylisted')
 
     exc['drm/vmwgfx_drm.h'] = ([SIZE_T, 'stdint.h'],
                              OK, 'size_t uint32_t uint64_t')
@@ -319,7 +319,7 @@ def setup(exc):
     exc['linux/packet_diag.h'] = (['net/if_arp.h'], OK, 'MAX_ADDR_LEN')
 
     exc['linux/patchkey.h'] = ([SIZE_T],
-                               WARN | BLACKLIST, 'error: #error "patchkey.h included directly"')
+                               WARN | DENYLIST, 'error: #error "patchkey.h included directly"')
 
     exc['linux/phonet.h'] = ([SOCKADDR],
                              OK, 'sa_family_t sockaddr')
@@ -368,7 +368,7 @@ def setup(exc):
 
     exc['xen/gntalloc.h'] = (['stdint.h'], OK, 'uint32_t uint64_t')
 
-    exc['xen/privcmd.h'] = ([], BLACKLIST | WARN, 'no domid_t')
+    exc['xen/privcmd.h'] = ([], DENYLIST | WARN, 'no domid_t')
 
 
     exc['asm/ucontext.h'] = ([SIZE_T, 'asm/signal.h', 'asm/sigcontext.h'],
@@ -385,7 +385,7 @@ def setup(exc):
 
     exc['linux/virtio_gpu.h'] = (['stdint.h'], OK, 'uint8_t')
 
-    exc['xen/gntdev.h'] = ([], BLACKLIST | WARN, 'no domid_t')
+    exc['xen/gntdev.h'] = ([], DENYLIST | WARN, 'no domid_t')
 
     exc['asm/stat.h'] = (['sys/types.h'],
                          OK, 'ino_t nlink_t mode_t uid_t gid_t off_t')
@@ -393,12 +393,12 @@ def setup(exc):
     exc['rdma/rdma_user_rxe.h'] = ([SOCKADDR, 'linux/in.h', 'linux/in6.h'],
                                    OK, 'sockaddr sockaddr_in sockaddr_in6')
 
-    exc['sound/asoc.h'] = ([], WARN | BLACKLIST,
-                           'sound/asoc.h is blacklisted in kernel 4.8.0')
+    exc['sound/asoc.h'] = ([], WARN | DENYLIST,
+                           'sound/asoc.h is denylisted in kernel 4.8.0')
 
-    exc['xen/evtchn.h'] = ([], BLACKLIST | WARN, 'no domid_t')
+    exc['xen/evtchn.h'] = ([], DENYLIST | WARN, 'no domid_t')
 
-    exc['linux/bpf_perf_event.h'] = ([], WARN | BLACKLIST,
+    exc['linux/bpf_perf_event.h'] = ([], WARN | DENYLIST,
                                      'struct pt_regs is undefined in userspace kernel headers')
 
     exc['rdma/mlx5-abi.h'] = (['linux/if_ether.h'], OK, 'ETH_ALEN')

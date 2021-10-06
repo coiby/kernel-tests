@@ -11,5 +11,5 @@ def setup(exc):
                               OK, 'PAGE_SIZE')
 
     # https://bugzilla.redhat.com/1908140
-    exc['linux/bpf_perf_event.h'] = ([], WARN | BLACKLIST,
+    exc['linux/bpf_perf_event.h'] = ([], WARN | DENYLIST,
                                      'struct pt_regs is undefined in userspace kernel headers')

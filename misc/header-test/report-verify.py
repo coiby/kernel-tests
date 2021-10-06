@@ -24,7 +24,7 @@ def log_load():
             else:
                 m = re.search('^PASS:\s*test-(.*\.h).c$', line.strip())
                 if m and m.group(1) in header:
-                    header[m.group(1)]['Pass'].append('(blacklisted)')
+                    header[m.group(1)]['Pass'].append('(denylisted)')
 
 def log_report():
     for h, l in sorted(header.items()):
