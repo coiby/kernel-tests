@@ -2,8 +2,16 @@
 #
 #
 #TEST_VERSION can override the default
-TESTVERSION=${TEST_VERSION:-"20210524"}
-
+TESTVERSION=$TEST_VERSION
+if [ -z ${TESTVERSION} ]; then
+    if rlIsRHEL 5;  then
+        TESTVERSION="20200120"
+    elif rlIsRHEL 6;  then
+        TESTVERSION="20210121"
+    else
+        TESTVERSION="20210524"
+    fi
+fi
 
 # the task path may be different under the restraint harness if the task
 # is fetched directly from git, so use a relative path to the include task
@@ -49,6 +57,7 @@ download_ltp()
         wget -q https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
         if [ $? -ne 0 ]; then
             echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
+            cki_abort_task "Couldn't download LTP source. Aborting..."
         fi
     fi
 
