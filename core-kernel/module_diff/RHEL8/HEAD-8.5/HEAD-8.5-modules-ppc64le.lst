@@ -198,7 +198,9 @@ chacha20_generic.ko
 chacha20poly1305.ko
 chcr.ko
 chipreg.ko
+ch_ipsec.ko
 ch.ko
+ch_ktls.ko
 cicada.ko
 cifs.ko
 cirrus.ko
@@ -704,6 +706,7 @@ intel-xway.ko
 io_edgeport.ko
 ionic.ko
 io_ti.ko
+iova.ko
 iowarrior.ko
 ip6_gre.ko
 ip6table_filter.ko
@@ -1028,6 +1031,7 @@ mn88472.ko
 mn88473.ko
 mos7720.ko
 mos7840.ko
+mpi3mr.ko
 mpls_iptunnel.ko
 mpls_router.ko
 mpt3sas.ko
@@ -1916,7 +1920,9 @@ v4l2-common.ko
 v4l2-dv-timings.ko
 vcan.ko
 vdpa.ko
+vdpa_sim_blk.ko
 vdpa_sim.ko
+vdpa_sim_net.ko
 ves1820.ko
 ves1x93.ko
 veth.ko
@@ -1966,6 +1972,7 @@ vp27smpx.ko
 vport-geneve.ko
 vport-gre.ko
 vport-vxlan.ko
+vp_vdpa.ko
 vrf.ko
 vringh.ko
 vsock_diag.ko

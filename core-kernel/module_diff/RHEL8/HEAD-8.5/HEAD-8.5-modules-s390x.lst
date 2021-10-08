@@ -211,6 +211,7 @@ ifb.ko
 ifcvf.ko
 inet_diag.ko
 ionic.ko
+iova.ko
 ip6_gre.ko
 ip6table_filter.ko
 ip6table_mangle.ko
@@ -689,7 +690,9 @@ udp_diag.ko
 udp_tunnel.ko
 unix_diag.ko
 vdpa.ko
+vdpa_sim_blk.ko
 vdpa_sim.ko
+vdpa_sim_net.ko
 veth.ko
 vfat.ko
 vfio_ap.ko
@@ -711,6 +714,7 @@ virtiofs.ko
 virtio-gpu.ko
 virtio_input.ko
 virtio_net.ko
+virtio_pci_modern_dev.ko
 virtio_scsi.ko
 virtio_vdpa.ko
 vkms.ko
@@ -722,6 +726,7 @@ vmw_vsock_virtio_transport.ko
 vport-geneve.ko
 vport-gre.ko
 vport-vxlan.ko
+vp_vdpa.ko
 vrf.ko
 vringh.ko
 vsock_diag.ko

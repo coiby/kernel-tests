@@ -140,7 +140,9 @@ chacha20poly1305.ko
 chaoskey.ko
 chcr.ko
 chipreg.ko
+ch_ipsec.ko
 ch.ko
+ch_ktls.ko
 cicada.ko
 cifs.ko
 cirrus.ko
@@ -729,6 +731,7 @@ mlx5_core.ko
 mlx5_ib.ko
 mlx5_vdpa.ko
 mlxbf-bootctl.ko
+mlxbf_gige.ko
 mlxbf-pmc.ko
 mlxbf-tmfifo.ko
 mlxfw.ko
@@ -747,6 +750,7 @@ mmc_block.ko
 mmc_core.ko
 mos7720.ko
 mos7840.ko
+mpi3mr.ko
 mpls_iptunnel.ko
 mpls_router.ko
 mpt3sas.ko
@@ -1300,7 +1304,9 @@ ushc.ko
 uwb.ko
 vcan.ko
 vdpa.ko
+vdpa_sim_blk.ko
 vdpa_sim.ko
+vdpa_sim_net.ko
 veth.ko
 vexpress-hwmon.ko
 vfat.ko
@@ -1333,6 +1339,7 @@ vmw_vsock_virtio_transport.ko
 vport-geneve.ko
 vport-gre.ko
 vport-vxlan.ko
+vp_vdpa.ko
 vrf.ko
 vringh.ko
 vsock_diag.ko
