@@ -138,6 +138,12 @@ if is_arch "aarch64" && kernel_in_range "0" "5.6.0"; then
     echo './conformance/interfaces/munlock/10-1.c' >> $DISABLED_LIST
 fi
 
+# This test is invalid and got removed by
+# https://github.com/linux-test-project/ltp/commit/9ce71152bf21e410c471fd8d7ca43a06abbe7c54
+# related to https://gitlab.com/cki-project/kernel-tests/-/issues/768
+# This can be removed once using LTP version > 20210927
+echo './conformance/interfaces/pthread_kill/6-1.c' >> $DISABLED_LIST
+
 echo "Disabling testcases" | tee -a $OUTPUTFILE
 for entry in $(cat $DISABLED_LIST); do
     first_char=$(echo $entry | cut -b1)
