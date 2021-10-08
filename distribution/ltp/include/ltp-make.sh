@@ -49,6 +49,7 @@ download_ltp()
         wget -q https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
         if [ $? -ne 0 ]; then
             echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
+            cki_abort_task "Couldn't download LTP source. Aborting..."
         fi
     fi
 
