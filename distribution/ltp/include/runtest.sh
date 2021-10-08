@@ -429,6 +429,10 @@ GetFailureLog ()
     local kifile=${2?"*** known issue file ***"}
     local thisdir=$(dirname $(readlink -f $BASH_SOURCE))
     local parser=$thisdir/ltp_log_parser.py
+    if ! python3 --version > /dev/null 2>&1; then
+        echo "python3 is not installed, not parsing failures"
+        return
+    fi
     if [ $kifile == "None" ]; then
         python3 $parser -F -t 0 $logfile
     else
