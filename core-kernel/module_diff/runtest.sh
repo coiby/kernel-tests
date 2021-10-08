@@ -503,6 +503,11 @@ rlJournalStart
                         sed -i '/mdio-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
                         sed -i '/pcs-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-modules-${ARCH}.lst
                     fi
+                    if cki_kver_lt "4.18.0-345"; then
+                        sed -i '/qrtr.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
+                        sed -i '/ch_ipsec.ko/d;/ch_ktls.ko/d;/iova.ko/d;/mlxbf_gige.ko/d;/mpi3mr.ko/d;/vdpa_sim_blk.ko/d;/vdpa_sim_net.ko/d;\
+							/virtio_pci_modern_dev.ko/d;/vp_vdpa.ko/d' ${OS}/${Release}/HEAD-8.5-modules-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" -o "${K_VER}" = "5.13.0" ]; then
