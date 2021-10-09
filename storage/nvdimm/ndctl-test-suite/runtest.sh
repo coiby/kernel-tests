@@ -133,10 +133,12 @@ function do_test
 	export KVER=5.7
 	typeset test_case=$1
 
+	echo "Start: ndctl test suite: $test_case" >/dev/kmsg
 	echo ">>> $(get_timestamp) | Start to run test case $test_case ..."
 	rlRun "make TESTS=$test_case check"
 	typeset -i ret=$?
 	echo ">>> $(get_timestamp) | End: $test_case"
+	echo "End: ndctl test suite: $test_case" >/dev/kmsg
 
 	if (( $ret == 0)); then
 		rstrnt-report-result "ndctl test suite: $test_case" PASS 0
