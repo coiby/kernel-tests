@@ -1,6 +1,6 @@
 [General]
 name=jvm/jcstress
-owner=Christine Flood <cflood@redhat.com>
+owner=Aleksey Shipilev <shade@redhat.com>
 description=Java Concurrency Stress tests
 license=GPLv2
 confidential=no
@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=maven;java;wget
+dependencies=java-11-openjdk;wget
 repoRequires=cki_lib

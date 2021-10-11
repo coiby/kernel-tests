@@ -15,12 +15,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 #---------------------------------------------------------------------------------
-# This script downloads a jar test file
-# and executes the test against localhost
-
-# See https://github.com/guozheng/jmh-tutorial/blob/master/README.md
-# for more information.
-#---------------------------------------------------------------------------------
 
 # Source the common test script helpers
 . ../../cki_lib/libcki.sh || exit 1
@@ -29,18 +23,11 @@
 rlJournalStart
 # Run jcstress test
   rlPhaseStartTest
-    rlRun -l "mvn archetype:generate  -DinteractiveMode=false  -DarchetypeGroupId=org.openjdk.jcstress \
-              -DarchetypeArtifactId=jcstress-java-test-archetype  -DgroupId=org.sample \
-              -DartifactId=test  -Dversion=1.0"
+    rlRun -l "wget https://arr-cki-prod-lookaside.s3.us-east-1.amazonaws.com/lookaside/static/jcstress-20210920.jar -O jcstress.jar"
     if [ $? -ne 0 ]; then
         cki_abort_task
     fi
-    rlRun -l "cd test"
-    rlRun -l "mvn clean install"
-    if [ $? -ne 0 ]; then
-        cki_abort_task
-    fi
-    rlRun -l "java -jar target/jcstress.jar"
+    rlRun -l "java -jar jcstress.jar -m quick -t samples"
   rlPhaseEnd
 
 rlJournalEnd
