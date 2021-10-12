@@ -117,6 +117,11 @@ function tskip()
 # - osver_in_range "600" "99999" -> PROBLEM, will be excluded forever
 function knownissue_filter()
 {
+	# cfs_bandwidth01 failed on aarch64 because of kernel bug
+	# https://gitlab.com/cki-project/kernel-tests/-/issues/654
+	# + https://bugzilla.redhat.com/show_bug.cgi?id=2000839
+	# + https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2630cde26711dab0d0b56a8be1616475be646d13
+	kernel_in_range "5.0.0" "5.15" && tskip cfs_bandwidth01 unfix
 	# skip OOM tests on large boxes since it takes too long
 	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 8 ] && tskip "ioctl_sg01 oom0.*" fatal
 	# New test cve-2021-3609 (can_bcm01) caused panic, which has been fixed
