@@ -21,13 +21,14 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
-# Run jcstress test
+# Run jcstress samples in quick profile without split compilation.
+# This should be reasonably fast for kernel testing.
   rlPhaseStartTest
     rlRun -l "wget https://arr-cki-prod-lookaside.s3.us-east-1.amazonaws.com/lookaside/static/jcstress-20210920.jar -O jcstress.jar"
     if [ $? -ne 0 ]; then
         cki_abort_task
     fi
-    rlRun -l "java -jar jcstress.jar -m quick -t samples"
+    rlRun -l "java -jar jcstress.jar -m quick -t samples -sc false"
   rlPhaseEnd
 
 rlJournalEnd
