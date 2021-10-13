@@ -119,6 +119,11 @@ if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
     sed -i 's/@test "podman auto-update - label io.containers.autoupdate=local with rollback" {/@test "podman auto-update - label io.containers.autoupdate=local with rollback" {\n    skip/' ${TEST_DIR}/255-auto-update.bats
 fi
 
+if rlTestVersion ${PODMAN_VERSION} '=' '3.4.0'; then
+    # https://gitlab.com/cki-project/kernel-tests/-/issues/774
+    sed -i 's/@test "podman volume import test" {/@test "podman volume import test" {\n    skip/' ${TEST_DIR}/160-volumes.bats
+fi
+
 # Skip 150-logins,420-cgroups.bats,260-sdnotify,200-pod,410-selinux,600-completion,700-play,035-logs for non x86_64, would fail on non x86_64
 if [ "$ARCH" != "x86_64" ]; then
     mv -f ${TEST_DIR}/150-login.bats ${TEST_DIR}/150-login.baks
