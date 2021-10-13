@@ -101,17 +101,25 @@ int main(int argc, char** argv) {
         printf("accepted, and block ACK from client\n");
 
         sprintf(command, "iptables -A INPUT -i lo -p tcp --dport %d --tcp-flags ALL ACK -j DROP", port);
-        system(command);
-
+        if ( system(command) == 0 ) {
+            system("iptables -L");
+        } else {
+            sprintf(command, "iptables-nft -A INPUT -i lo -p tcp --dport %d --tcp-flags ALL ACK -j DROP", port);
+            system(command);
+            printf("using iptables-nft command to replace iptables command!\n");
+            system("iptables-nft -L");
+        }
         wait(&status);
         if(status == 0){
-             printf("Child process terminated normally!\n");
-             return -1;
+            printf("Child process terminated normally!\n");
+            return -1;
         } else {
-             printf("Child process terminated as expected - Test passed!\n");
+            printf("Child process terminated as expected - Test passed!\n");
         }
     }
-    system("iptables -F");
+    if ( system("iptables -F") != 0 ) {
+        system("iptables-nft -F");
+    }
     return 0;
 }
 
