@@ -169,6 +169,17 @@ rlPhaseStartSetup
     filter_excludelist
     selinux_dccp
     customize_param
+
+    # disable swap for os class tests
+    if [[ "$CLASSES" == "os" ]]; then
+        rlRun "swapoff -a" 0 "disable swap for os class tests"
+        res=$?
+        if  [[ "$res" -eq 32 ]]; then
+            rlLog "all swapoff failed on --all"
+        elif [[ "$res" -eq 64 ]]; then
+            rlLog "some swapoff failed on --all"
+        fi
+    fi
 rlPhaseEnd
 
 rlPhaseStartTest
@@ -192,6 +203,12 @@ rlPhaseStartCleanup
     if semodule -l | grep -q stress-ng-dccp ; then
         rlRun "semodule -r stress-ng-dccp" 0 "Removing stress-ng-dccp SELinux module"
     fi
+
+    # re-enable swap after finishing os class tests
+    if [[ "$CLASSES" == "os" ]]; then
+        rlRun "swapon -a" 0 "re-enable swap back"
+    fi
+
 rlPhaseEnd
 
 rlJournalPrintText
