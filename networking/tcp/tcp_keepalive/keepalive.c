@@ -93,6 +93,7 @@ int main(int argc, char** argv) {
         pause();
     } else {
         int status;
+        int use_iptables=0;
         char command[256];
 
         client = accept(server, NULL, NULL);
@@ -100,26 +101,34 @@ int main(int argc, char** argv) {
         enable_keepalive(client, idle, interval, maxpkt);
         printf("accepted, and block ACK from client\n");
 
-        sprintf(command, "iptables -A INPUT -i lo -p tcp --dport %d --tcp-flags ALL ACK -j DROP", port);
-        if ( system(command) == 0 ) {
-            system("iptables -L");
-        } else {
-            sprintf(command, "iptables-nft -A INPUT -i lo -p tcp --dport %d --tcp-flags ALL ACK -j DROP", port);
+        // use nft by default
+        // If no nft commands on some old systems (eg: on rhel6|7), use iptables
+        if ( system("which nft") == 0 ) {
+            system("nft add table inet filter");
+            system("nft add chain inet filter input '{ type filter hook input priority 0 ; }'");
+            sprintf(command, "nft add rule inet filter input iifname lo ip protocol tcp tcp dport %d 'tcp flags & (fin|syn|rst|psh|ack|urg) == ack' counter drop", port);
             system(command);
-            printf("using iptables-nft command to replace iptables command!\n");
-            system("iptables-nft -L");
+            system("nft list ruleset");
+        } else {
+            use_iptables=1;
+            printf("nft commands fail on some old systems, replace iptables with nft");
+            sprintf(command, "iptables -A INPUT -i lo -p tcp --dport %d --tcp-flags ALL ACK -j DROP", port);
+            system(command);
+            system("iptables -L");
         }
         wait(&status);
         if(status == 0){
             printf("Child process terminated normally!\n");
-            return -1;
         } else {
             printf("Child process terminated as expected - Test passed!\n");
         }
-    }
-    if ( system("iptables -F") != 0 ) {
-        system("iptables-nft -F");
+        if ( use_iptables == 1 ) {
+            printf("iptables -F");
+            system("iptables -F");
+        } else {
+            printf("nft delete table inet filter");
+            system("nft delete table inet filter");
+        }
     }
     return 0;
 }
-
