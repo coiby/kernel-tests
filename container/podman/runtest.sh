@@ -37,6 +37,24 @@ function _install_bats ()
     fi
 }
 
+function _disable_test()
+{
+    if [ -f ${TEST_DIR}/${1} ]; then
+        echo "INFO: disabling ${TEST_DIR}/${1}"
+        mv -f ${TEST_DIR}/${1} ${TEST_DIR}/${1}.bak
+    fi
+}
+
+function _restore_tests()
+{
+    backed_files=$(find ${TEST_DIR} -iname *.bak)
+    for test_file in ${backed_files}; do
+        orig_name=$(echo ${test_file} | sed 's/.bak//')
+        echo "INFO: restoring ${orig_name}"
+        mv -f ${test_file} ${orig_name}
+    done
+}
+
 # there was some fixes in podman tests, that were not available on 3.3.1
 if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
     COMMIT_HASH=02a0d4b7fb8fe99d012e9c8035a063e903eab5b6
@@ -126,14 +144,14 @@ fi
 
 # Skip 150-logins,420-cgroups.bats,260-sdnotify,200-pod,410-selinux,600-completion,700-play,035-logs for non x86_64, would fail on non x86_64
 if [ "$ARCH" != "x86_64" ]; then
-    mv -f ${TEST_DIR}/150-login.bats ${TEST_DIR}/150-login.baks
-    mv -f ${TEST_DIR}/420-cgroups.bats ${TEST_DIR}/420-cgroups.baks
-    mv -f ${TEST_DIR}/260-sdnotify.bats ${TEST_DIR}/260-sdnotify.baks
-    mv -f ${TEST_DIR}/200-pod.bats ${TEST_DIR}/200-pod.baks
-    mv -f ${TEST_DIR}/410-selinux.bats ${TEST_DIR}/410-selinux.baks
-    mv -f ${TEST_DIR}/600-completion.bats ${TEST_DIR}/600-completion.baks
-    mv -f ${TEST_DIR}/700-play.bats ${TEST_DIR}/700-play.baks
-    mv -f ${TEST_DIR}/035-logs.bats ${TEST_DIR}/035-logs.baks
+    _disable_test 150-login.bats
+    _disable_test 420-cgroups.bats
+    _disable_test 260-sdnotify.bats
+    _disable_test 200-pod.bats
+    _disable_test 410-selinux.bats
+    _disable_test 600-completion.bats
+    _disable_test 700-play.bats
+    _disable_test 035-logs.bats
 fi
 
 if  [[ "$PODMANUSER" != "root" ]]; then
@@ -144,14 +162,14 @@ if  [[ "$PODMANUSER" != "root" ]]; then
         adduser $PODMANUSER
     fi
 
-    mv -f ${TEST_DIR}/220-healthcheck.bats ${TEST_DIR}/220-healthcheck.baks
-    mv -f ${TEST_DIR}/250-systemd.bats ${TEST_DIR}/250-systemd.baks
-    mv -f ${TEST_DIR}/260-sdnotify.bats ${TEST_DIR}/260-sdnotify.baks
-    mv -f ${TEST_DIR}/410-selinux.bats ${TEST_DIR}/410-selinux.baks
+    _disable_test 220-healthcheck.bats
+    _disable_test 250-systemd.bats
+    _disable_test 260-sdnotify.bats
+    _disable_test 410-selinux.bats
 
     if [ "$ARCH" != "x86_64" ]; then
         # 500-networking would fail in non x86_64, add to exclusion
-        mv -f ${TEST_DIR}/500-networking.bats ${TEST_DIR}/500-networking.baks
+        _disable_test 500-networking.bats
     fi
 
     loginctl enable-linger $PODMANUSER
@@ -164,7 +182,7 @@ else # Stay with root
 
     if [ "$ARCH" == "ppc64le" ]; then
         # 050-stops would fail in ppc64le, add to exclusion
-        mv -f ${TEST_DIR}/050-stops.bats ${TEST_DIR}/050-stops.baks
+        _disable_test 050-stops.bats
     fi
 
     bash ./podmantest.sh ${TEST_DIR}
@@ -188,3 +206,5 @@ if [ ! -z "$ifaces" ]; then
          ip link delete $iface
     done
 fi
+
+_restore_tests
