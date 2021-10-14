@@ -65,7 +65,7 @@ function stqe_init_fwroot
     # install required packages
     cki_run_cmd_neu "bash env_setup.sh"
 
-    cki_run_cmd_pos "$python setup.py install --prefix=" || \
+    cki_run_cmd_pos "$python -m pip install ." || \
         cki_abort_task "fail to install test framework"
 
     cki_pd
