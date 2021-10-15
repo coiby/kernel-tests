@@ -4,10 +4,8 @@
 #TEST_VERSION can override the default
 TESTVERSION=$TEST_VERSION
 if [ -z ${TESTVERSION} ]; then
-    if rlIsRHEL 5;  then
+    if rlIsRHEL 5 || rlIsRHEL 6; then
         TESTVERSION="20200120"
-    elif rlIsRHEL 6;  then
-        TESTVERSION="20210121"
     else
         TESTVERSION="20210524"
     fi
