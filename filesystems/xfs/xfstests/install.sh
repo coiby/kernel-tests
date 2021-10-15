@@ -7,9 +7,9 @@
 . ../../../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-export YUM_PROG=`which yum`
-if which dnf >/dev/null; then
-        YUM_PROG="$(which dnf) --setopt=strict=0"
+export YUM_PROG=`type -P yum`
+if type -P dnf >/dev/null; then
+        YUM_PROG="$(type -P dnf) --setopt=strict=0"
 fi
 
 # Install xfsprogs from upstream (or any other) repo
@@ -229,7 +229,7 @@ install_duperemove()
 	local res=0
 
 	# Just return if duperemove has been installed
-	if which duperemove; then
+	if type -P duperemove; then
 		return 0
 	fi
 

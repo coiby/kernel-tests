@@ -455,7 +455,7 @@ function systemd_disable_mount_unit()
 	local ret=0
 
 	test -n "$mnt"  || return $ret
-	which systemctl || return $ret
+	type -P systemctl || return $ret
 
 	unit=$(systemctl list-units | grep $mnt | awk '{print $1}')
 	test -n "$unit" || return $ret
@@ -1141,7 +1141,7 @@ function mkfs_dev(){
 		report mkfs_dev:no_block FAIL 0
 		return 1
 	fi
-	if ! which "mkfs.$FSTYPE" >/dev/null 2>&1;then
+	if ! type -P "mkfs.$FSTYPE" >/dev/null 2>&1;then
 		echoo "No 'mkfs.$FSTYPE' is present in system"
 		report mkfs_dev:no_mkfs FAIL 0
 		return 1
