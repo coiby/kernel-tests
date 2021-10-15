@@ -50,19 +50,19 @@ function init_test_param_fstype()
 	test -n "$TEST_PARAM_FSTYPE" && return 0
 	# If corresponded userspace uitls is available, set
 	# default filesystem type by priority.
-	if which mkfs.xfs ; then
+	if type -P mkfs.xfs ; then
 		TEST_PARAM_FSTYPE="xfs"
 		return
 	fi
-	if which mkfs.ext4 ; then
+	if type -P mkfs.ext4 ; then
 		TEST_PARAM_FSTYPE="ext4"
 		return
 	fi
-	if which mkfs.ext3 ; then
+	if type -P mkfs.ext3 ; then
 		TEST_PARAM_FSTYPE="ext3"
 		return
 	fi
-	if which mkfs.ext2 ; then
+	if type -P mkfs.ext2 ; then
 		TEST_PARAM_FSTYPE="ext2"
 		return
 	fi
