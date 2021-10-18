@@ -120,6 +120,17 @@ TurnDebugOn()
     fi
 }
 
+CommandExists()
+{
+    local cmd=$1
+    if [ -z "$cmd" ]; then
+        return 1
+    elif which $cmd > /dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
 
 CheckEnv()
 {
@@ -160,11 +171,12 @@ PrepareReboot()
 
 RunTest()
 {
-    func=$1
+    local func=$1
     local stage=$2
 
     warn=0
     error=0
+    skip=0
 
     CheckEnv
 
@@ -175,17 +187,13 @@ RunTest()
 
     elif echo "${CLIENTS}" | grep -qi "${HOSTNAME}"; then
         TEST="${TEST}/client"
-
         ${func}
-
-        Log "- client finishes."
+        Log "Client finishes."
 
     elif echo "${SERVERS}" | grep -qi "${HOSTNAME}"; then
         TEST="${TEST}/server"
-
         # Do nothing.
-
-        Log "- server finishes."
+        Log "Server finishes."
 
     else
         Error "Neither server nor client"
@@ -197,7 +205,12 @@ RunTest()
 CheckVmlinux()
 {
     vmlinux="/usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
-    [ ! -f "${vmlinux}" ] && MajorError "vmlinux not found."
+    if [ -f "${vmlinux}" ]; then
+        Log "Kernel debug vmlinux is ready at ${vmlinux}"
+    else
+        Log "Kernel debug vmlinux is not found at ${vmlinux}"
+        return 1
+    fi
 }
 
 
@@ -205,63 +218,84 @@ CheckVmlinux()
 
 declare -i error warn skip
 
+GetLogPrefix() {
+    local timestamp=$(date +%H:%M:%S)
+    case "${1^^}" in
+        LOG)
+            echo "[  ${timestamp}  ] :: [  LOG  ] :: "
+        ;;
+        RUN)
+            echo "[  ${timestamp}  ] :: [  RUN  ] :: "
+        ;;
+        SKIP)
+            echo "[  ${timestamp}]   :: [  SKIP ] :: "
+        ;;
+        WARN)
+            echo "[  ${timestamp}  ] :: [  WARN ] :: "
+        ;;
+        ERROR)
+            echo "[  ${timestamp}  ] :: [ ERROR ] :: "
+        ;;
+        FATAL)
+            echo "[  ${timestamp}  ] :: [ ERROR ] :: "
+        ;;
+        *)
+            echo "[  ${timestamp}  ] :: [  LOG  ] :: "
+        ;;
+    esac
+}
+
 Log() {
-    local msg="$1"
-    echo -e "$msg" | tee -a "${OUTPUTFILE}"
+    echo -e "$(GetLogPrefix LOG)$1" | tee -a "${OUTPUTFILE}"
 }
 
 LogRun() {
-    local comm="$1"
-    local ret
+    echo -e "$(GetLogPrefix RUN)# $*" | tee -a "${OUTPUTFILE}"
 
-    echo -e "# ${comm}" | tee -a "${OUTPUTFILE}"
-    eval ${comm} | tee -a "${OUTPUTFILE}"
-    ret=${PIPESTATUS[0]}
-    echo | tee -a "${OUTPUTFILE}"
+    eval "$*" | tee -a "${OUTPUTFILE}"
+    local ret=${PIPESTATUS[0]}
     return ${ret}
 }
 
 Skip() {
-    local msg="$1"
-    echo "- skip: $msg" | tee -a "${OUTPUTFILE}"
+    echo -e "$(GetLogPrefix SKIP)$1" | tee -a "${OUTPUTFILE}"
     skip=$((skip + 1))
 
     Report
 }
 
 Warn() {
-    local msg="$1"
-    echo "- warn: $msg" | tee -a "${OUTPUTFILE}"
+    echo -e "$(GetLogPrefix WARN)$1" | tee -a "${OUTPUTFILE}"
     warn=$((warn + 1))
 }
 
 # error occurs - but won't abort recipe set
 Error() {
-    local msg="$1"
-    echo "- error: $msg" | tee -a "${OUTPUTFILE}"
+    echo -e "$(GetLogPrefix ERROR)$1" | tee -a "${OUTPUTFILE}"
     error=$((error + 1))
 }
 
 # major error occurs - stop current test task and proceed to next test task.
 # do not abort recipe set
 MajorError() {
-    local msg="$1"
-    echo "- major error: $msg" | tee -a "${OUTPUTFILE}"
+    echo -e "$(GetLogPrefix ERROR)$1" | tee -a "${OUTPUTFILE}"
     error=$((error + 1))
 
+    # If it's the client in a multi-hosts test, sent out sync message
+    # before finish tests.
+    if echo "${CLIENTS}" | grep -qi "${HOSTNAME}"; then
+        rhts_sync_set -s "DONE"
+    fi
     Report
 }
 
 # fatal error occurs - must abort recipe set
 FatalError() {
-    local msg="$1"
-
-    [ -n "$msg" ] &&
-    echo "- fatal error: $msg" | tee -a "${OUTPUTFILE}"
-    echo "- fatal error: aborting the recipe set." | tee -a "${OUTPUTFILE}"
+    echo -e "$(GetLogPrefix FATAL)$1" | tee -a "${OUTPUTFILE}"
+    echo -e "$(GetLogPrefix FATAL)Aborting the recipe set" | tee -a "${OUTPUTFILE}"
 
     error=$((error + 1))
-    rstrnt-report-result "${TEST}" "FAIL" "${error}"
+    rstrnt-report-result"${TEST}" "FAIL" "${error}"
     rstrnt-abort -t recipeset
 }
 
@@ -282,6 +316,12 @@ Report() {
         result="PASS"
         code=0
     fi
+
+    echo ":::::::::::::::::::::::::::::::::::::::::::::"
+    [ -n "${stage}" ] && echo -e ":: PHASE: $stage"
+    echo -e ":: RESULT: ${result} (skip: ${skip} warn: ${warn} error: ${error})"
+    echo ":::::::::::::::::::::::::::::::::::::::::::::"
+
 
     #reset codes to avoid propogating them
     error=0
@@ -321,8 +361,8 @@ SafeReboot() {
 GetBiosInfo()
 {
     # Get BIOS information.
-    rpm -q dmidecode || InstallPackages dmidecode
-    which dmidecode && {
+    rpm -q --quiet dmidecode || InstallPackages dmidecode
+    CommandExists dmidecode && {
         dmidecode >"${K_TMP_DIR}/bios.output"
         RstrntSubmit "${K_TMP_DIR}/bios.output"
     }
@@ -330,12 +370,11 @@ GetBiosInfo()
 
 GetHWInfo()
 {
-    Log "- Getting system hw or firmware config."
-    rpm -q lshw || InstallPackages lshw
+    rpm -q --quiet lshw || InstallPackages lshw
     lshw > "${K_TMP_DIR}/lshw.output"
     RstrntSubmit "${K_TMP_DIR}/lshw.output"
 
-    which lscfg && {
+    CommandExists lscfg && {
         lscfg > "${K_TMP_DIR}/lscfg.output"
         RstrntSubmit "${K_TMP_DIR}/lscfg.output"
     }
@@ -343,6 +382,7 @@ GetHWInfo()
 
 ReportSystemInfo()
 {
+    Log "Upload system hardware info"
     [[ "${K_ARCH}" =~ i.86|x86_64 ]] && GetBiosInfo
     GetHWInfo
 }
@@ -358,7 +398,8 @@ ClearReport()
 # Install/Upgrade Kexec-tools and related packages
 PrepareKdump()
 {
-    rpm -q kexec-tools || {
+    Log "Install kexec-tools and related packages"
+    rpm -q --quiet kexec-tools || {
         # On Fedora, kexec-tools is not installed by default.
         # Install kexec-tools and enable kdump service.
         InstallPackages kexec-tools
@@ -383,20 +424,27 @@ PrepareKdump()
 # Install/Upgrade Crash and related packages
 PrepareCrash()
 {
-    Log "- Installing crash and kernel-debuginfo packages required for testing crash untilities."
+    Log "Install crash"
     rpm -q crash || InstallPackages crash
     # Try upgrading crash to the latest version if on FC.
     # If it fails, still use the crash from the default repo.
     if $IS_FC && $UPGRADE_FC_CRASH; then
-        UpgradePackages crash --enablerepo=updates-testing --enablerepo=fedora --releasever=34
+        UpgradePackages crash --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
     fi
+
     InstallDebuginfo
+    CheckVmlinux || {
+        Log "- Warn: Skip running crash utitlies against the vmcore."
+        return 1
+    }
 }
 
 # Config kernel options and make sure Kdump is operational
 SetupKdump()
 {
+
     if [ ! -f "${K_REBOOT}" ]; then
+        Log "Prepare Kdump"
         PrepareKdump
 
         local default=/boot/vmlinuz-`uname -r`
@@ -404,13 +452,13 @@ SetupKdump()
 
         # For uncompressed kernel, i.e. vmlinux
         [[ ${default} == *vmlinux* ]] && {
-            Log "- Modifying /etc/sysconfig/kdump properly for 'vmlinux'."
+            Log "Modifying /etc/sysconfig/kdump properly for 'vmlinux'."
             sed -i 's/\(KDUMP_IMG\)=.*/\1="vmlinux"/' /etc/sysconfig/kdump
         }
 
         # For kernel-rt
         $IS_RT_KEN && [ -f /usr/bin/rt-setup-kdump ] && {
-            Log "- Modifying /etc/sysconfig/kdump properly for RT."
+            Log "Modifying /etc/sysconfig/kdump properly for RT."
             set -x; /usr/bin/rt-setup-kdump -g; set +x
         }
 
@@ -419,50 +467,37 @@ SetupKdump()
             local kdumpMem=$(DefKdumpMem)
             [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
 
-            $IS_RHEL5 && KER1ARGS+="${kdumpMem}" || {
-                # memory >= auto-threshold and kdump already default on
-                [ `cat /sys/kernel/kexec_crash_size` -eq 0 ] && {
-                    Log "`grep MemTotal /proc/meminfo`"
-                    KER1ARGS+="${kdumpMem}"
-                }
-            }
+            if $IS_RHEL5 ; then
+                KER1ARGS+="${kdumpMem}"
+            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then
+                # Check kdump status if it's fadump mode which caused kexec_crash_size is 0
+                kdumpctl status > /dev/null 2>&1 || KER1ARGS+="${kdumpMem}"
+            fi
         }
+
         [ "${KER1ARGS}" ] && {
             touch "${K_REBOOT}"
 
             # Kdump service will not be enabled if crashkernel=auto && system
             # memory is less the threshold required by kdump service.
-            /bin/systemctl enable kdump.service || /sbin/chkconfig kdump on
+            Log "Enable kdump service"
+            systemctl enable kdump.service || chkconfig kdump on
             rpm -q --quiet grubby || InstallPackages grubby
-            Log "- Changing boot loader."
+            Log "Update boot loader"
             {
-                /sbin/grubby                     \
-                    --args="${KER1ARGS}"         \
-                    --update-kernel="${default}" &&
+                LogRun "/sbin/grubby --args=\"${KER1ARGS}\" --update-kernel=\"${default}\"" &&
                 if [ "${K_ARCH}" = "s390x" ]; then zipl; fi
             } || FatalError "Error changing boot loader."
 
             Report 'pre-reboot'
-            Log "- Rebooting\n"; sync; SafeReboot
+            Log "Rebooting..."; sync; SafeReboot
         }
     fi
-
-    Log "- kexec-tools/systemd/dracut kernel versions"
-    rpm -q kexec-tools systemd dracut
-    uname -r
-
-    Log "- Crashkernel reservation and current cmdline"
-    rpm -q --quiet lshw || InstallPackages lshw
-    echo "Total system memory: $(lshw -short | grep -i "System Memory" | awk '{print $3}')"
-    cat /proc/cmdline
-    kdumpctl showmem || cat /sys/kernel/kexec_crash_size
-    grep "fadump=on" /proc/cmdline && dmesg | grep "firmware-assisted dump" | grep "Reserved"
-    [ -f "${K_REBOOT}" ] && rm -f "${K_REBOOT}"
 
     # Make sure kdump service fully up after a boot
     # If kdump service is not started yet, wait for max 5 mins.
     # It may take time to start kdump service.
-    Log "- Waiting for kdump service to be fully up"
+    Log "Waiting for kdump service to be fully up"
     local kdump_status=off
     for i in {1..5}
     do
@@ -473,6 +508,25 @@ SetupKdump()
         }
         sleep 60
     done
+
+    ReportSystemInfo
+    Log "Packages versions:"
+    uname -r; rpm -q kexec-tools systemd dracut
+
+    Log "Kernel cmdline and crash memory reservation"
+    cat /proc/cmdline
+    echo "Total system memory: $(lshw -short | grep -i "System Memory" | awk '{print $3}')"
+    kdumpctl showmem || cat /sys/kernel/kexec_crash_size
+    grep -q "fadump=on" /proc/cmdline && {
+        Log "Crash memory reserved for fadump:"
+        if CommandExists journalctl ; then
+            journalctl | grep -i "firmware-assisted" | grep -i "Reserved"
+        else
+            dmesg | grep -i "firmware-assisted" | grep -i "Reserved"
+        fi
+    }
+
+    [ -f "${K_REBOOT}" ] && rm -f "${K_REBOOT}"
 }
 
 DefKdumpMem()
@@ -535,7 +589,7 @@ DefKdumpMem()
 ResetKdumpConfig()
 {
     Log "- Reset to default kdump config"
-    echo >"${KDUMP_CONFIG}"
+    echo > "${KDUMP_CONFIG}"
     echo "path /var/crash" >>"${KDUMP_CONFIG}"
     echo "core_collector makedumpfile -l --message-level 7 -d 31" >>"${KDUMP_CONFIG}"
 }
@@ -548,17 +602,17 @@ TriggerSysrqPanic()
 
     PrepareReboot
 
-    Log "- Triggering crash."
+    Log "Alert: Triggering crash"
     echo 1 > /proc/sys/kernel/sysrq
     echo c > /proc/sysrq-trigger
 
     sleep 60
-    Error "- Failed to trigger crash after waiting for 60s."
+    Error "Failed to trigger crash after waiting for 60s"
 }
 
 AppendConfig()
 {
-    Log "- Modifying /etc/kdump.conf"
+    Log "Modifying ${KDUMP_CONFIG}"
 
     if [ $# -eq 0 ]; then
         Warn "Nothing to append."
@@ -567,7 +621,7 @@ AppendConfig()
 
     while [ $# -gt 0 ]; do
         Log "- Removing existed old ${1%%[[:space:]]*} settings."
-        sed -i "/^${1%%[[:space:]]*}/d" ${KDUMP_CONFIG}
+        sed -i "/^${1%%[[:space:]]*}/d" "${KDUMP_CONFIG}"
         Log "- Adding new '$1'."
         echo "$1" >>"${KDUMP_CONFIG}"
         shift
@@ -579,7 +633,7 @@ AppendConfig()
 
 AppendSysconfig()
 {
-    Log "- Modifying /etc/sysconfig/kdump"
+    Log "Modifying ${KDUMP_SYS_CONFIG}"
 
     local KEY=$1
     local ACTION=$2
@@ -592,7 +646,7 @@ AppendSysconfig()
     elif [ "$ACTION" = "replace" ] && [ -z "$VALUE2" ]; then
         Error "- Missing new_value for replacing."
         return 1
-    elif ! grep "^$KEY=\"" "${KDUMP_SYS_CONFIG}"; then
+    elif ! grep -q "^$KEY=\"" "${KDUMP_SYS_CONFIG}"; then
         Error "- Invalid KEY: $KEY."
         return 1
     fi
@@ -606,7 +660,7 @@ AppendSysconfig()
     # if there is no value set to KDUMP_COMMANDLINE, assign current kernel cmdline
     # to it for later string manipluation.
     if [ "$KEY" == "KDUMP_COMMANDLINE" ] && \
-        grep "^$KEY=[\ \"]*$" "${kdump_sys_config_tmp}"; then
+        grep -q "^$KEY=[\ \"]*$" "${kdump_sys_config_tmp}"; then
 
         sed -i "/^KDUMP_COMMANDLINE=\"/d" "${kdump_sys_config_tmp}"
         echo "KDUMP_COMMANDLINE=\"$(cat /proc/cmdline)\"" >> "${kdump_sys_config_tmp}"
@@ -638,7 +692,7 @@ AppendSysconfig()
             echo "$KEY=\"$VALUE1\"" >> "${kdump_sys_config_tmp}"
             ;;
         *)
-            Error "Invalid action '${ACTION}' for editing kdump sysconfig."
+            Error "- Invalid action '${ACTION}' for editing kdump sysconfig."
             false
             ;;
     esac
@@ -657,7 +711,7 @@ AppendSysconfig()
 
 ReportKdumprd()
 {
-    Log "- Reporting kdump rd image"
+    Log "Uploading kdump initramfs image"
     if $IS_RHEL5 || $IS_RHEL6; then
         tmp=initrd
     else
@@ -674,7 +728,7 @@ ReportKdumprd()
     if [ -f "${kdumprd}" ]; then
         RstrntSubmit "${kdumprd}"
     else
-        Error '- No ĸdumprd generated!'
+        Error 'Not found kdump initramfs img at ${kdumprd}'
     fi
 
     sync
@@ -684,7 +738,7 @@ ReportKdumprd()
 # no error handling
 CheckKdumpStatus()
 {
-    kdumpctl status || service kdump status || systemctl status kdump
+    LogRun "kdumpctl status" || LogRun "service kdump status" || LogRun "systemctl status kdump"
 }
 
 RestartKdump()
@@ -694,7 +748,7 @@ RestartKdump()
     local rc=
     local UPLOADRD=${1:-"false"}
 
-    Log "- Restarting Kdump service."
+    Log "Restarting Kdump service."
 
     rm -f /boot/initrd-*kdump.img
     rm -f /boot/initramfs-*kdump.img    # For RHEL7
@@ -712,14 +766,12 @@ RestartKdump()
         /usr/bin/kdumpctl restart 2>&1 | tee /tmp/kdump_restart.log
         /usr/bin/kdumpctl status  2>&1
     fi
-    rc=$?
-    Log "`cat /tmp/kdump_restart.log`"
-    [ $rc -ne 0 ] && FatalError 'Restarting kdump failed.'
+    [ "$?" -ne 0 ] && FatalError 'Restarting kdump failed.'
     sync; sync; sleep 10
 
     # It may report "No kdump initial ramdisk found.[WARNING]" in rhel6
     local skip_pat="No kdump initial ramdisk found|Warning: There might not be enough space to save a vmcore|Warning no default label"
-    if grep -v -E "$skip_pat" /tmp/kdump_restart.log |  grep -i -E "can't|error|warn";  then
+    if grep -v -E "$skip_pat" /tmp/kdump_restart.log |  grep -q -i -E "can't|error|warn";  then
         Warn 'Restarting kdump reported warn/error message'
     fi
     sync;
@@ -732,99 +784,114 @@ RestartKdump()
 
 InstallPackages()
 {
-    [ $# -eq 0 ] && return 1
-    local pkg=$@
+    local action=install
+    if [ "${1,,}" = "upgrade" ]; then
+        shift
+        action=upgrade
+    fi
+    [ $# -eq 0 ] && {
+        Error "No package specified for ${action}ing"
+        return 1
+    }
 
-    if which dnf; then
-        dnf install -y $pkg
-    elif which yum; then
-        yum install -y $pkg
+    if CommandExists dnf ; then
+        LogRun "dnf ${action} -y $*"
+    elif CommandExists yum ; then
+        LogRun "yum ${action} -y $*"
     else
         return 1
     fi
-
-    return 0
 }
 
 UpgradePackages()
 {
-    [ $# -eq 0 ] && return 1
-    local pkg=$@
-
-    if which dnf; then
-        dnf upgrade -y $pkg
-    elif which yum; then
-        yum upgrade -y $pkg
-    else
-        return 1
-    fi
-
-    return 0
+    InstallPackages upgrade $*
 }
 
 InstallDebuginfo()
 {
     local kern=$(rpm -qf /boot/vmlinuz-$(uname -r) --qf "%{name}-debuginfo-%{version}-%{release}.%{arch}" | sed -e "s/-core//g")
     if [[ "$kern" == *"is not owned by any package" ]]; then
-        Log "- Kernel is installed from a tar, not from yum/dnf package."
-        Log "- kernel-debuginfo should be prepared in cki boot test."
-        Log "- Check if /usr/lib/debug/lib/modules/$(uname -r)/vmlinux exists"
-        [ -f "/usr/lib/debug/lib/modules/$(uname -r)/vmlinux" ] || {
-            Log "- Failed to find /usr/lib/debug/lib/modules/$(uname -r)/vmlinux."
-            Log "- Warn: Skip running crash utitlies against the vmcore."
-            return 1
-        }
-        return 0
+        Log "Kernel is installed from a tar, not from yum/dnf. Expect kernel-debuginfo to be prepared in cki boot test."
+        return
     fi
+
     #workaround the kernel name if it's kernel-core
     if [[ "$kern" == kernel-core-debuginfo-* ]]; then
         kern=${kern//kernel-core/kernel}
     fi
 
-    Log "- Installing ${kern}"
+    Log "Install ${kern}"
     rpm -q ${kern} || {
         InstallPackages ${kern}
         rpm -q ${kern} || {
             Log "- Failed to install ${kern}"
-            Log "- Warn: Skip running crash utitlies against the vmcore."
             return 1
         }
     }
-    Log "- Done installation of crash and kernel-debuginfo packages"
-    Log "$(rpm -q crash ${kern})"
+
 }
 
 LsCore()
 {
-    Log "\n# ls -l ${vmcore}"
-    ls -l "${vmcore}" >>"${OUTPUTFILE}" 2>&1
-    [ $? -ne 0 ] && FatalError "ls returns errors."
-    Log "\n"
+    LogRun "ls -l ${vmcore}" && FatalError "ls returns errors."
+}
+
+GetDumpFile()
+{
+    [ -z "$1" ] && return 1
+
+    Log "Checking dumped file: ${1}"
+    local file_name="$1"
+    local core_dir="${K_DEFAULT_PATH}"
+
+    dump_file_path=""
+
+    [ -f "${K_PATH}" ] && core_dir="$(cat ${K_PATH})"
+    [ -f "${K_NFS}" ] && core_dir="$(cat ${K_NFS})${core_dir}"
+
+    # Print files under ${coredir}
+    LogRun "find ${core_dir}"
+
+    # Find the dump file (vmcore or dmesg files)
+    dump_file_path=$(ls -t -1 "${core_dir}"/*/${file_name} 2>/dev/null | head -1)
+    if [ -z "${dump_file_path}" ]; then
+        Error "No ${file_name} saved in ${core_dir}. Please check kdump process in console.log"
+        return 1
+    elif [ ! -s "${dump_file_path}" ]; then
+        Error "The ${file_name} is empty. Please check kdump process in console.log"
+        return 1
+    else
+        LogRun "file -i ${dump_file_path}"
+        Log "${file_name} path: ${dump_file_path}"
+        return 0
+    fi
 }
 
 GetCorePath()
 {
-    local path
-    [ -f "${K_PATH}" ] && path=`cat "${K_PATH}"` || path="${K_DEFAULT_PATH}"
-    if [ -f "${K_NFS}" ]; then
-        corepath="$(cat "${K_NFS}")${path}"
-    else
-        corepath="${path}"
-    fi
+    GetDumpFile "vmcore"
+    local retval=$?
+    vmcore="${dump_file_path}"
+    return $retval
+}
 
-    # debug use
-    Log "# find ${corepath}"
-    find "${corepath}" 2>&1 | tee -a "${OUTPUTFILE}"
-    Log "\n# ls -tl ${corepath}/*/"
-    ls -tl "${corepath}"/*/ 2>&1 | tee -a "${OUTPUTFILE}"
+SimpleCrashAnalyseTest()
+{
+    # Only check the return code of this session.
+    cat <<EOF > "${K_TESTAREA}/crash-simple.cmd"
+bt -a
+ps
+log
+exit
+EOF
 
-    # Always analyse the latest vmcore.
-    if ls -t "${corepath}"/*/vmcore; then
-        vmcore=$(ls -t "${corepath}"/*/vmcore 2>/dev/null | head -1)
-        return 0
+    Log "Simple crash tests against the vmcore"
+
+    if [ "${K_KVARI}" = 'rt' ]; then
+        CrashCommand "--reloc=12m" "${vmlinux}" "${vmcore}"
     else
-        Error "no vmcore found in ${corepath}"
-        return 1
+        CrashCommand "" "${vmlinux}" "${vmcore}"
     fi
 }
 
@@ -862,14 +929,14 @@ CrashCommand_CheckReturnCode()
 EOF
         code=$?
 
-        echo | tee -a "${OUTPUTFILE}"
+#        echo | tee -a "${OUTPUTFILE}"
         RstrntSubmit "${K_TESTAREA}/${cmd_file%.*}.$log_suffix"
         RstrntSubmit "${K_TESTAREA}/${cmd_file}"
 
         if [ ${code} -eq 0 ]; then
             return 0
         else
-            Error "crash returns error code ${code}."
+            Error "- Crash returns error code ${code}."
             return 1
         fi
 
@@ -878,6 +945,7 @@ EOF
 
 RemoveVmcores()
 {
+    Log "Remove vmcores"
     local path
     # Do not remove anything if it's a NFS kdump target
     [ ! -f "${K_NFS}" ] && {
@@ -887,28 +955,34 @@ RemoveVmcores()
             path=${K_DEFAULT_PATH}
         fi
 
-        if [ -d "${path}" ]; then
+        # Check again if the vmcore path is a mounted remoted file system.
+        # If yes, do not remove any files under the path
+        df -T "${path}" | tail -n 1 | awk '{print $2}' | grep -q nfs
+        if [ "$?" -ne 0 ] && [ -d "${path}" ]; then
             Log "- Remove all files in ${path}"
             rm -rf "${path}"/*
+            return
         fi
     }
+    Log "- Nothing removed"
 }
 
 RestoreKdumpConfig()
 {
+    Log "Restore Kdump configurations"
     # If nfs kdump is configured, unmount the kdump nfs target
     [ -f "${K_NFS}" ] && {
         path=$(cat "${K_NFS}")
-        umount "${path}"
+        LogRun "umount \"${path}\""
     }
 
     rm -f "${K_NFS}" "${K_PATH}"
 
-    Log "- Restore /etc/kdump.conf"
+    Log "- Restore default /etc/kdump.conf"
     echo > "${KDUMP_CONFIG}"
     [ -f "${KDUMP_CONFIG}.bk" ] && \cp -f "${KDUMP_CONFIG}.bk" "${KDUMP_CONFIG}"
 
-    Log "- Restore /etc/sysconfig/kdump"
+    Log "- Restore default /etc/sysconfig/kdump"
     [ -f "${KDUMP_SYS_CONFIG}.bk" ] && \cp -f "${KDUMP_SYS_CONFIG}.bk" "${KDUMP_SYS_CONFIG}"
 }
 
@@ -916,6 +990,9 @@ RestoreKdumpConfig()
 # - Restore Kdump default configurations
 # - Clean up vmcores
 Cleanup(){
+    echo ":::::::::::::::::::::::::::::::::::::::::::::"
+    echo -e ":: TEST CLEANUP"
     RemoveVmcores
     RestoreKdumpConfig
+    echo ":::::::::::::::::::::::::::::::::::::::::::::"
 }

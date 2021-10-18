@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2019 Red Hat, Inc.
@@ -31,8 +31,6 @@ Crash()
 {
     if [ ! -f "${C_REBOOT}" ]; then
         SetupKdump
-
-        # Restore kdump configurations and clear previous vmcores if any
         Cleanup
 
         # Remove -s from KEXEC_ARGS if it presents in default options.
@@ -43,44 +41,22 @@ Crash()
         AppendSysconfig KEXEC_ARGS remove "-s"
 
         # This is for debugging purpose in case kdump kernel got OOM on Fedora
-        if $IS_FC;
-            then AppendSysconfig KDUMP_COMMANDLINE_APPEND add "rd.memdebug=1"
+        if $IS_FC; then
+            AppendSysconfig KDUMP_COMMANDLINE_APPEND add "rd.memdebug=1"
         fi
 
         RestartKdump
-
-        ReportSystemInfo
-
         TriggerSysrqPanic
         rm -f "${C_REBOOT}"
     else
         rm -f "${C_REBOOT}"
-        GetCorePath || return
+        GetDumpFile "vmcore-dmesg.txt"
+        GetCorePath|| return
 
-        if [ "${ANALYZE_VMCORE,,}" != "true" ]; then
-          return
-        fi
-
-        # Analyse the vmcore by crash utilities
-        PrepareCrash
-        [ $? -eq 1 ] && return
-
-        # Only check the return code of this session.
-        cat <<EOF > "${K_TESTAREA}/crash-simple.cmd"
-bt -a
-ps
-log
-exit
-EOF
-        local vmcores
-        CheckVmlinux
-
-        Log "- Analyze the vmcore by crash utilities."
-        if [ "${K_KVARI}" = 'rt' ]; then
-            CrashCommand "--reloc=12m" "${vmlinux}" "${vmcore}"
-        else
-            CrashCommand "" "${vmlinux}" "${vmcore}"
-        fi
+        # Analyse the vmcore by crash utilities if ANALYZE_VMCORE=true
+        [ "${ANALYZE_VMCORE,,}" == "true" ] && {
+            PrepareCrash && SimpleCrashAnalyseTest
+        }
     fi
 }
 
