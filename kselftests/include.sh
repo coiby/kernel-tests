@@ -51,7 +51,7 @@ test_pass()
 {
 	echo -e "\n:: [  PASS  ] :: Test '"$1"'" >> $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "PASS"
+		rstrnt-report-result "${TEST}" "PASS"
 	else
 		echo -e "::::::::::::::::"
 		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test '"${TEST}/$1"'"
@@ -64,7 +64,7 @@ test_fail()
 	SCORE=${2:-$FAIL}
 	echo -e ":: [  FAIL  ] :: Test '"$1"'" >> $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "FAIL" "$SCORE"
+		rstrnt-report-result "${TEST}" "FAIL" "$SCORE"
 	else
 		echo -e ":::::::::::::::::"
 		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test '"${TEST}/$1"' FAIL $SCORE"
@@ -76,7 +76,7 @@ test_warn()
 {
 	echo -e "\n:: [  WARN  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "WARN"
+		rstrnt-report-result "${TEST}" "WARN"
 	else
 		echo -e "\n:::::::::::::::::"
 		echo -e ":: [  ${YEL}WARN${RES}  ] :: Test '"${TEST}/$1"'"
@@ -88,7 +88,7 @@ test_skip()
 {
 	echo -e "\n:: [  SKIP  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" SKIP 0
+		rstrnt-report-result "${TEST}" SKIP 0
 	else
 		echo -e "\n:::::::::::::::::"
 		echo -e ":: [  ${YEL}SKIP${RES}  ] :: Test '"${TEST}/$1"'"
