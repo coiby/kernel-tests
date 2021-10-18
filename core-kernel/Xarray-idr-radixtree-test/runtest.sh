@@ -88,7 +88,8 @@ function run_radixtree()
 
 	case $t_name in
 	"xarray" | "idr-test" | "main")
-		linux-*/tools/testing/radix-tree/${t_name} > ${t_name}.log
+		linux-*/tools/testing/radix-tree/${t_name} 2>&1 | tee ${t_name}.log
+		return ${PIPESTATUS[0]}
 		;;
 	*)
 		cki_log "No test $t_name in the tools/testing/radix-tree/" && return 1
