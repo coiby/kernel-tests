@@ -248,6 +248,7 @@ dw_mmc-bluefield.ko
 dw_mmc.ko
 dw_mmc-pltfm.ko
 e1000e.ko
+e1000.ko
 ebt_802_3.ko
 ebtable_broute.ko
 ebtable_filter.ko
@@ -1411,3 +1412,4 @@ xxhash_generic.ko
 yenta_socket.ko
 zaurus.ko
 zram.ko
+zstd_decompress.ko

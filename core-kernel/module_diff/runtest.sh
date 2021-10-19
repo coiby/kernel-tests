@@ -520,6 +520,15 @@ rlJournalStart
                     echo "" | tee -a $OUTPUTFILE
                     echo "***** $ARCH: Base release is HEAD-RHEL-9.0 *****" | tee -a $OUTPUTFILE
                     Release="HEAD-9.0"
+                    if cki_kver_lt "5.14.0-4"; then
+                        sed -i '/vmwgfx.ko/d' ${OS}/${Release}/$Release-knownRemoved-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-6"; then
+                        sed -i '/e1000.ko/d' ${OS}/${Release}/$Release-modules-${ARCH}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-5"; then
+                        sed -i '/zstd_decompress.ko/d' ${OS}/${Release}/$Release-modules-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then

@@ -306,6 +306,7 @@ dvb_usb_v2.ko
 dw_dmac_core.ko
 dw_dmac.ko
 e1000e.ko
+e1000.ko
 e4000.ko
 earth-pt1.ko
 ebt_802_3.ko
@@ -1744,3 +1745,4 @@ zl10353.ko
 zl6100.ko
 zr364xx.ko
 zram.ko
+zstd_decompress.ko
