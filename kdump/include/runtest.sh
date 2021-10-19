@@ -403,11 +403,11 @@ PrepareKdump()
         # On Fedora, kexec-tools is not installed by default.
         # Install kexec-tools and enable kdump service.
         InstallPackages kexec-tools
-        if [ $? -ne 0 ]; then
+        rpm -q kexec-tools || {
             Log "- Aborting test as kexec-tools couldn't be installed"
             rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
             exit 1
-        fi
+        }
         systemctl enable kdump.service || chkconfig kdump on
 
         # Back up configurations if kexec-tools is installed for the first time
