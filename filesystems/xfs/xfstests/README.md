@@ -14,7 +14,7 @@ $ export TEST_PARAM_RUNTESTS=generic/001
 ```
 ### Install dependencies
 ```bash
-root# bash ../../cki_bin/pkgs_install.sh metadata
+root# bash ../../../cki_bin/pkgs_install.sh metadata
 ```
 ### Execute the test
 ```bash
