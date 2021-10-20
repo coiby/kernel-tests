@@ -28,11 +28,6 @@ OS_MAJOR_RELEASE=$(grep -Go 'release [0-9]\+' /etc/redhat-release | sed 's/relea
 # Whether NXBIT is Set in /proc/cpuinfo
 NXBIT=$(grep '^flags' /proc/cpuinfo 2>/dev/null | grep -q " nx " && echo TRUE || echo FALSE)
 NR_CPUS=$(getconf _NPROCESSORS_ONLN || echo 1)
-# Allow lab sites to use their local $LOOKASIDE domain
-DOWNLOAD_URL=${LOOKASIDE:-"http://linux-test-project/ltp/releases/download/"}
-IS_DEVEL=$(echo $DOWNLOAD_URL} | grep -o devel)
-#global sync seems not working properly for now, use reverse proxy
-#RELPATH=$(hostname | grep -v nay | grep -qv brq && echo / || echo /pub/rhel)
 RELPATH="/"
 
 MAKE="make -j${NR_CPUS}"
@@ -49,28 +44,17 @@ fi
 download_ltp()
 {
     echo "============ Download package ============" | tee -a $OUTPUTFILE
-    wget -q ${DOWNLOAD_URL}/${TARGET}.tar.bz2
-    if [ $? -ne 0 -a x${IS_DEVEL} = x ]; then
-        echo "global sync seems not working correctly, using default location" | tee -a $OUTPUTFILE
-        wget -q https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
-        if [ $? -ne 0 ]; then
-            echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
-            cki_abort_task "Couldn't download LTP source. Aborting..."
-        fi
+    curl --fail --retry 5 -s -SLO https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
+    if [ $? -ne 0 ]; then
+        echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
+        echo "Aborting current task: Couldn't download LTP source." | tee -a $OUTPUTFILE
+        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
     fi
 
-    clean_ltp
+    rm -rf ${TARGET}
 
     echo "============ Unzip package ============" | tee -a $OUTPUTFILE
     tar xjf ${TARGET}.tar.bz2 | tee -a $OUTPUTFILE
-}
-
-
-clean_ltp()
-{
-    rm -rf ${TARGET}
-    rm -rf m4-1.4.16
-    rm -rf autoconf-2.69
 }
 
 
@@ -214,20 +198,6 @@ configure()
     setup-testarea
     download_ltp
     echo "============ Start configure ============" | tee -a $OUTPUTFILE
-    if [ ${AUTOCONFIGVER_1} -lt 1 -o ${AUTOCONFIGVER_1} -eq 2 -a ${AUTOCONFIGVER_2} -lt 69 ]; then
-        wget -q ${DOWNLOAD_URL}/m4-1.4.16.tar.gz
-        tar xzf m4-1.4.16.tar.gz
-        pushd  m4-1.4.16
-        ./configure --prefix=/usr 2>&1 >/dev/null
-        make 2>&1 >/dev/null && make install 2>&1 >/dev/null
-        popd
-        wget -q ${DOWNLOAD_URL}/autoconf-2.69.tar.gz
-        tar xzf autoconf-2.69.tar.gz
-        pushd autoconf-2.69
-        ./configure --prefix=/usr 2>&1 >/dev/null
-        make 2>&1 >/dev/null && make install 2>&1 >/dev/null
-        popd
-    fi
     pushd ${TARGET}; make autotools; ./configure --prefix=${TARGET_DIR} &> configlog.txt || cat configlog.txt; popd
 }
 
@@ -263,15 +233,6 @@ build-all()
     fi
     echo "============ ${MAKE} -C ${TARGET} install: ${res}  ============" | tee -a $OUTPUTFILE
 }
-
-
-clean()
-{
-    rm -rf ${TARGET}
-    rm -rf m4-1.4.16
-    rm -rf autoconf-2.69
-}
-
 
 # For manual testing
 testpatch()
