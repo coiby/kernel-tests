@@ -83,6 +83,7 @@ function check_log()
 
 rlJournalStart
     rlPhaseStartTest
+        rlRun "dmesg -C"
         rlRun "uname -a"
         rlLog "$0"
         run_test
