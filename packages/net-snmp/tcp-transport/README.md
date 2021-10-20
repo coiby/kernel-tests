@@ -9,7 +9,7 @@ test-specific dependencies.
 
 ### Install dependencies
 ```bash
-root# bash ../cki_bin/pkgs_install.sh metadata
+root# bash ../../../cki_bin/pkgs_install.sh metadata
 ```
 
 ### Execute the test
