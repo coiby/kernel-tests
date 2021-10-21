@@ -64,7 +64,7 @@ function prepare_aiodio_scratchspace()
 	export BIG_FILE="$SCRATCH_MNT/bigfile"
 
 	block_size=0
-	mntpoint=`df "$SCRATCH_MNT" | tail -n +2 | head -1`
+	mntpoint=`df "$SCRATCH_MNT" | tail -n +2 | head -1 | cut -d ' ' -f1`
 	if [ -n "$mntpoint" ]; then
 		block_size=`blockdev --getbsz $mntpoint`
 		echo "$SCRATCH_MNT's mount point is: $mntpoint" | tee -a $OUTPUTFILE
