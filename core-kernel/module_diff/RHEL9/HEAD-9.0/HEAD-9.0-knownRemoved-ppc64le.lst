@@ -1,0 +1,15 @@
+firedtv.ko
+firewire-core.ko
+firewire-net.ko
+firewire-ohci.ko
+firewire-sbp2.ko
+snd-bebob.ko
+snd-dice.ko
+snd-fireface.ko
+snd-firewire-digi00x.ko
+snd-firewire-lib.ko
+snd-firewire-motu.ko
+snd-firewire-tascam.ko
+snd-fireworks.ko
+snd-isight.ko
+snd-oxfw.ko
