@@ -1282,6 +1282,7 @@ n_hdlc.ko
 nhpoly1305-avx2.ko
 nhpoly1305.ko
 nhpoly1305-sse2.ko
+nitro_enclaves.ko
 nlmon.ko
 nls_cp1250.ko
 nls_cp1251.ko

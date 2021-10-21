@@ -529,6 +529,15 @@ rlJournalStart
                     if cki_kver_lt "5.14.0-5"; then
                         sed -i '/zstd_decompress.ko/d' ${OS}/${Release}/$Release-modules-${ARCH}.lst
                     fi
+                    if cki_kver_lt "5.14.0-6"; then
+                        sed -i '/firedtv.ko/d;/firewire-core.ko/d;/firewire-net.ko/d;/firewire-ohci.ko/d;/firewire-sbp2.ko/d;/snd-bebob.ko/d;\
+                            /snd-dice.ko/d;/snd-fireface.ko/d;/snd-firewire-digi00x.ko/d;/snd-firewire-lib.ko/d;/snd-firewire-motu.ko/d;\
+                            /snd-firewire-tascam.ko/d;/snd-fireworks.ko/d;/snd-isight.ko/d;/snd-oxfw.ko/d' \
+                            ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-7"; then
+                        sed -i '/nitro_enclaves.ko/d' ${OS}/${Release}/$Release-modules-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
