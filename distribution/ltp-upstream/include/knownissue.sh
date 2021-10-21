@@ -192,6 +192,8 @@ function knownissue_filter()
 
 	# XXX: https://gitlab.com/cki-project/kernel-tests/-/issues/541
 	cki_is_vm && tskip "ksm*" unfix
+	# https://gitlab.com/cki-project/kernel-tests/-/issues/639
+	cki_is_vm && tskip "msgstress03 msgstress04" fatal
 }
 
 function tcase_exclude()
