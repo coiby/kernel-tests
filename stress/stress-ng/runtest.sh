@@ -34,7 +34,7 @@ BUILDDIR="/opt/stress-ng"
 
 # task parameters
 # stress-ng git location
-GIT_URL=${GIT_URL:-"git://kernel.ubuntu.com/cking/stress-ng.git"}
+GIT_URL=${GIT_URL:-"https://github.com/ColinIanKing/stress-ng.git"}
 # current release
 GIT_BRANCH=${GIT_BRANCH:-"tags/V0.13.00"}
 # test 'random' or 'sequential' class only by parameter passing
