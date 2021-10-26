@@ -187,8 +187,12 @@ function ts_setup
 {
     cki_debug
 
-    install_blktrace || return $CKI_UNINITIATED
-    install_dt || return $CKI_UNINITIATED
+    if ! rpm -q blktrace; then
+        install_blktrace || return $CKI_UNINITIATED
+    fi
+    if ! rpm -q dt; then
+        install_dt || return $CKI_UNINITIATED
+    fi
     cki_run_cmd_pos "modprobe dm-thin-pool" || return $CKI_UNINITIATED
 
     #
