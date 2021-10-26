@@ -94,7 +94,14 @@ function install_ruby
     source /etc/profile.d/rvm.sh || return 1
 
     # XXX: Again, never use cki_run_cmd_xxx() wrapper, or it hangs
-    rvm install 2.5.3 || return 1
+    if ! rvm install 2.5.3; then
+        # Try to upload the installation logs
+        rvm_logs=$(ls /usr/local/rvm/log/*/*.log)
+        for log in $rvm_logs; do
+            cki_upload_log_file $log
+        done
+        return 1
+    fi
     gem update || return 1
     gem install bundler || return 1
     return 0
