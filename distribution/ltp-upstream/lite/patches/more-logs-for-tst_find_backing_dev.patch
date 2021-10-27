@@ -1,0 +1,47 @@
+From 03c1c3d4bab0e937ffb620d21c16a7e0412b1c98 Mon Sep 17 00:00:00 2001
+Message-Id: <03c1c3d4bab0e937ffb620d21c16a7e0412b1c98.1635332587.git.jstancek@redhat.com>
+From: Jan Stancek <jstancek@redhat.com>
+Date: Wed, 27 Oct 2021 13:01:52 +0200
+Subject: [PATCH] lib: more logs for tst_find_backing_dev
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+---
+ lib/tst_device.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/lib/tst_device.c b/lib/tst_device.c
+index 73e70d26e83a..0c7bd253ec97 100644
+--- a/lib/tst_device.c
++++ b/lib/tst_device.c
+@@ -519,6 +519,7 @@ void tst_find_backing_dev(const char *path, char *dev)
+ 
+ 	dev_major = major(buf.st_dev);
+ 	dev_minor = minor(buf.st_dev);
++	system("cat /proc/self/mountinfo > /tmp/mountinfo.ltp");
+ 	file = SAFE_FOPEN(NULL, "/proc/self/mountinfo", "r");
+ 	*dev = '\0';
+ 
+@@ -527,6 +528,7 @@ void tst_find_backing_dev(const char *path, char *dev)
+ 			continue;
+ 
+ 		if (line_mjr == dev_major && line_mnr == dev_minor) {
++			tst_resm(TINFO, "matching line: %s", line);
+ 			pre = strstr(line, " - ");
+ 			pre = strtok_r(pre, " ", &next);
+ 			pre = strtok_r(NULL, " ", &next);
+@@ -538,8 +540,11 @@ void tst_find_backing_dev(const char *path, char *dev)
+ 
+ 	SAFE_FCLOSE(NULL, file);
+ 
+-	if (!*dev)
++	if (!*dev) {
++		tst_resm(TINFO, "dev major: %u, minor: %u", dev_major, dev_minor);
++		system("cat /tmp/mountinfo.ltp");
+ 		tst_brkm(TBROK, NULL, "Cannot find block device for %s", path);
++	}
+ 
+ 	if (stat(dev, &buf) < 0)
+ 		tst_brkm(TWARN | TERRNO, NULL, "stat(%s) failed", dev);
+-- 
+2.27.0
+

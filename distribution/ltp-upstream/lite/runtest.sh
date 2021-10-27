@@ -62,6 +62,8 @@ function ltp_test_build()
 	patch -p1 < ../patches/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
 	# Disable btrfs testing
 	patch -p1 < ../patches/disable-btrfs.patch
+	# more logs for issue 674
+	patch -p1 < ../patches/more-logs-for-tst_find_backing_dev.patch
 	# Debug patching temporarily (remove it after got the reason)
 	git describe c4742ee0df03b 2>&1 >/dev/null || patch -p1 < ../patches/debug/0001-mkfs-print-more-info-for-debugging.patch
 
