@@ -482,31 +482,23 @@ rlJournalStart
                         sed -i "/dptf_power\.ko/d" ${OS}/${Release}/8.4-modules-${ARCH}.lst
                     fi
                     ;;
-                *)
-                    # We are currently developing RHEL-8.5
-                    # Therefore we test at HEAD-RHEL-8.5
-                    # Need to refresh the list after 8.5 GA, current simple copy from 8.4
-                    DeBug "Base release is HEAD-RHEL-8.5"
+                348)
+                    # RHEL-8.5
+                    DeBug "Base release is RHEL-8.5"
                     echo "" | tee -a $OUTPUTFILE
-                    echo "***** $ARCH: Base release is HEAD-RHEL-8.5 *****" | tee -a $OUTPUTFILE
-                    Release="HEAD-8.5"
-                    # BZ1973106 moved sha512_generic and sha512-ssse3.ko as builtin
-                    if cki_kver_lt "4.18.0-320"; then
-                        sed -i '/sha512_generic.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-                        sed -i '/sha512-ssse3.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "4.18.0-322"; then
-                        sed -i '/snd-soc-sst-acpi.ko/d;/snd-soc-sst-firmware.ko/d;/snd-soc-sst-haswell-pcm.ko/d;/snd-sof-intel-byt.ko/d' \
-                    ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "4.18.0-328"; then
-                        sed -i '/mdio-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-                        sed -i '/pcs-xpcs.ko/d' ${OS}/${Release}/HEAD-8.5-modules-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "4.18.0-345"; then
-                        sed -i '/qrtr.ko/d' ${OS}/${Release}/HEAD-8.5-knownRemoved-${ARCH}.lst
-                        sed -i '/ch_ipsec.ko/d;/ch_ktls.ko/d;/iova.ko/d;/mlxbf_gige.ko/d;/mpi3mr.ko/d;/vdpa_sim_blk.ko/d;/vdpa_sim_net.ko/d;\
-							/virtio_pci_modern_dev.ko/d;/vp_vdpa.ko/d' ${OS}/${Release}/HEAD-8.5-modules-${ARCH}.lst
+                    echo "***** $ARCH: Base release is RHEL-8.5 *****" | tee -a $OUTPUTFILE
+                    Release="8.5"
+                    ;;
+                *)
+                    # We are currently developing RHEL-8.6
+                    # Therefore we test at HEAD-RHEL-8.6
+                    # Need to refresh the list after 8.6 GA, current simple copy from 8.4
+                    DeBug "Base release is HEAD-RHEL-8.6"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is HEAD-RHEL-8.6 *****" | tee -a $OUTPUTFILE
+                    Release="HEAD-8.6"
+                    if cki_kver_lt "4.18.0-348.3"; then
+                        sed -i '/sm4-ce.ko/d;/sm4_generic.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-aarch64.lst
                     fi
                     ;;
             esac

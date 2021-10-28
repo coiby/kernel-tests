@@ -1,4 +1,3 @@
-dptf_power.ko
 nf_log_arp.ko
 nf_log_bridge.ko
 nf_log_common.ko
