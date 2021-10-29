@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=grep;coreutils;rpm;sed;findutils;bash;cpio;file;gawk;binutils
+dependencies=grep;coreutils;rpm;sed;findutils;bash;cpio;file;gawk;binutils;yum-utils
 softDependencies=yum-utils
 repoRequires=cki_lib;legacy/shared
