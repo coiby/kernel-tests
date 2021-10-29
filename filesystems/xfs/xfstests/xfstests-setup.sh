@@ -116,6 +116,9 @@ function setup_gfs2()
 	# GFS2 needs lock_nolock option for testing
 	if [ "$FSTYPE" == "gfs2" ]; then
 		MKFS_OPTS="-p lock_nolock -j 1 -O $MKFS_OPTS"
+		# Make sure the module is loaded
+		# avoid failures like: https://access.redhat.com/solutions/3539401
+		modprobe gfs2
 	fi
 }
 
