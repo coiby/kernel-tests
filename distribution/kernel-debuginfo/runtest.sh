@@ -124,35 +124,43 @@ rpm)
 	;;
 esac
 
-RPM_VMLINUX_PATH="$(
-	rpm2cpio "$RPM" 2> /dev/null                                       \
-	| cpio -t       2> /dev/null                                       \
-	| grep vmlinux
-)"
+for file in vmlinux .ko.debug
+do
+	RPM_PATH="$(
+		rpm2cpio "$RPM" 2> /dev/null                                       \
+		| cpio -t       2> /dev/null                                       \
+		| grep -m1 -F $file
+	)"
 
-rpm2cpio "$RPM"                 2> /dev/null                               \
-| cpio -idv "$RPM_VMLINUX_PATH" 2> /dev/null
+	if [ -z "$RPM_PATH" ]
+	then
+		echo "ERROR: Unable to find filename (by glob $file) in RPM." >&2
+		test_fail "FAILED. SEE ERROR OUTPUT ABOVE."
+	fi
 
-VMLINUX="$(find . -iname "vmlinux" -type f)"
+	rpm2cpio "$RPM" 2> /dev/null                                           \
+	| cpio -idv "$RPM_PATH" 2> /dev/null
 
-if [ -z "$VMLINUX" -o ! -e "$VMLINUX" ]
-then
-	echo "ERROR: Unable to find vmlinux in RPM's contents." >&2
-	echo "DEBUG: find ." >&2
-	set -x
-	find . >&2
-	test_skip "FAILED. SEE ERROR OUTPUT ABOVE."
-	exit 0
-fi
+	FILENAME="$(find . -iname "*$file" -type f)"
 
-if ! objdump -h "$VMLINUX" \
-     | grep -E "[[:space:]]*[0-9]+[[:space:]]*.debug" &> /dev/null
-then
-	echo "ERROR: Unable to find .debug sections in vmlinux ELF." >&2
-	test_fail "FAILED. SEE ERROR OUTPUT ABOVE."
-	exit 1
-else
-	test_pass "TEST PASSED."
-fi
+	if [ -z "$FILENAME" -o ! -e "$FILENAME" ]
+	then
+		echo "ERROR: Unable to find filename (by glob $file) in RPM's contents." >&2
+		echo "DEBUG: find . output" >&2
+		find . >&2
+		test_skip "FAILED. SEE ERROR OUTPUT ABOVE."
+		exit 0
+	fi
+
+	if ! objdump -h "$FILENAME" \
+		| grep -E "[[:space:]]*[0-9]+[[:space:]]*.debug" &> /dev/null
+	then
+		echo "ERROR: Unable to find .debug sections in vmlinux ELF." >&2
+		test_fail "FAILED. SEE ERROR OUTPUT ABOVE."
+		exit 1
+	fi
+done
+
+test_pass "TEST PASSED."
 
 cd $OLD_CWD
