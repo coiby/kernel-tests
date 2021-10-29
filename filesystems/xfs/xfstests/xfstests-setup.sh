@@ -286,6 +286,8 @@ function setup_full
 		xfs|ext4|btrfs) RUNTESTS="$(cat RUNTESTS)" ;;
 		# Small set of xfstests are stable for network filesystems
 		cifs|nfs4) RUNTESTS="$(cat RUNTESTS.net)" ;;
+		# Set of tests to run on gfs2
+		gfs2) RUNTESTS="$(cat RUNTESTS.gfs2)" ;;
 		esac
 
 	fi
