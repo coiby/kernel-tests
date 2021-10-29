@@ -36,3 +36,5 @@ BLACKLIST+=("FAIL  ppc64le,                             4.18.0      9.99.9      
 BLACKLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        4.18.0      9.99.9      perf_probe :: test_listing :: kernel lines list")
 BLACKLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        4.18.0      9.99.9      perf_probe :: test_listing :: kernel source lines list")
 BLACKLIST+=("FAIL  aarch64,                             4.18.0      9.99.9      perf_probe :: test_advanced :: function string argument kprobing :: script (output regexp parsing)")
+
+BLACKLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        4.18.0      9.99.9      perf_diff :: test_basic :: basic execution - diff (output regexp parsing)")
