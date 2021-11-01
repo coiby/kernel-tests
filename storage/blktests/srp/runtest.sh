@@ -95,7 +95,7 @@ function do_test
 	elif [[ $result == "FAIL" ]]; then
 		rstrnt-report-result "$USE_SIW srp: $TNAME/tests/$test_case" FAIL 1
 		ret=1
-	elif [[ $result == "SKIP" ]]; then
+	elif [[ $result == "SKIP" || $result == "UNTESTED" ]]; then
 		rstrnt-report-result "$USE_SIW srp: $TNAME/tests/$test_case" SKIP 0
 		ret=0
 	else
