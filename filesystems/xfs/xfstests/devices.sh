@@ -1261,3 +1261,9 @@ function general_cleanup()
 }
 
 export FSTYPE=${FSTYPE:-xfs}
+
+# Show devices setup
+echo "####################"
+lsblk
+df -h
+echo "####################"
