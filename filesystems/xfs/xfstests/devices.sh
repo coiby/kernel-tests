@@ -278,6 +278,12 @@ function get_test_dev()
 		# Mount point was specified
 		# Get TEST_DEV from /proc/mounts
 		TEST_DEV=$(findmnt -n -o SOURCE $TEST_DIR)
+		if [ -z "$TEST_DEV" ];then
+			echoo "Mountpoint $TEST_DIR doesn't exist"
+			# replace SKIP by FAIL once beaker workaround for BZ1977236 is removed
+			rstrnt-report-result "xfstests - $FSTYPE" SKIP
+			exit 0
+		fi
 		xlog umount $TEST_DEV
 		# Remove the entry from fstab in case there's one
 		cp /etc/fstab{,.test_dev}
@@ -1261,3 +1267,9 @@ function general_cleanup()
 }
 
 export FSTYPE=${FSTYPE:-xfs}
+
+# Show devices setup
+echo "####################"
+lsblk
+df -h
+echo "####################"
