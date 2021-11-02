@@ -68,9 +68,7 @@ reboot_hook
 log "start collecting coverage on test case $KCOV_TEST_NAME"
 log "capture the initial data as the baseline"
 
-bbbdir=$(rpm -ql kernel-gcov | head -1)
-
-lcov --initial --capture --base-directory $bbbdir/*/*$(uname -r)*/ $KDIR_OPT --output-file $KCOV_BASE_INFO
+lcov --initial --capture --base-directory $GCOV_BASEDIR/*/*$(uname -r)*/ $KDIR_OPT --output-file $KCOV_BASE_INFO
 if [ $? -ne 0 ]; then
 	if [ -n "$KCOV_KDIR" ]; then
 		log "Fail to capture initial base data for $KCOV_KDIR."

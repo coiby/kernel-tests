@@ -87,12 +87,17 @@ verify()
     log "after reboot"
     log "current kernel is $(uname -r)"
     if [ ! -e /sys/kernel/debug/gcov ]; then
-        cki_abort_recipe "prapare" "not running on gcov kernel."
+        cki_abort_recipe "not running on gcov kernel."
         exit
     fi
 
     log "proc entries: $(ls /sys/kernel/debug/gcov)"
 
+    ls $GCOV_BASEDIR/*/*$(uname -r)*/
+    if [ $? -ne 0 ]; then
+        cki_abort_recipe "kernel-gcov files were not available after reboot"
+        exit
+    fi
     pass
 }
 
