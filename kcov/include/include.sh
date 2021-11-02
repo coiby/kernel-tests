@@ -3,6 +3,7 @@
 
 #source rhts environment
 . /usr/bin/rhts_environment.sh
+. ../../cki_lib/libcki.sh || exit 1
 
 # /mnt/testarea can be overwritten by tests, like ltp/generic
 TDIR=/mnt/kcov
@@ -11,6 +12,8 @@ KCOV_CONF=$TDIR/kcov.conf
 KCOV_KDIR=
 KCOV_INFO_LIST=$TDIR/kernel_tests_name.lst
 KCOV_COMBINED_NAME=kcov.combined.info
+
+GCOV_BASEDIR=$(rpm -ql kernel-gcov | head -1)
 
 log()
 {

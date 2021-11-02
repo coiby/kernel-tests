@@ -37,7 +37,7 @@ setup()
     fi
 
     if [ ! -e /sys/kernel/debug/gcov ]; then
-        fail prepare "kernel doesn't seem to support gcov";
+        cki_abort_recipe "kernel doesn't seem to support gcov";
         exit
     fi
 
@@ -55,7 +55,7 @@ setup()
         log "install gcov data files"
         dnf install -y kernel-gcov
         if [ $? -ne 0 ]; then
-            fail prepare "Cannot install the gcov data files package.";
+            cki_abort_recipe "Cannot install the gcov data files package.";
             exit
         fi
     fi
@@ -87,13 +87,17 @@ verify()
     log "after reboot"
     log "current kernel is $(uname -r)"
     if [ ! -e /sys/kernel/debug/gcov ]; then
-        fail "prapare" "not running on gcov kernel."
-        fail
+        cki_abort_recipe "not running on gcov kernel."
         exit
     fi
 
     log "proc entries: $(ls /sys/kernel/debug/gcov)"
 
+    ls $GCOV_BASEDIR/*/*$(uname -r)*/
+    if [ $? -ne 0 ]; then
+        cki_abort_recipe "kernel-gcov files were not available after reboot"
+        exit
+    fi
     pass
 }
 
