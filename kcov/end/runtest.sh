@@ -49,15 +49,22 @@ if [ $? -ne 0 ]; then
 	if [ $? -ne 0 ]; then
 		log "Fail to capture coverage data with '--ignore-error gcov'"
 		fail
+		exit 1
 	fi
 fi
 
-log "submit the coverage data file"
+if [ ! -f $KCOV_TEST_INFO ]; then
+	fail check_kcov_test_info "kcov test info file does not exists."
+	exit 1
+fi
+ls -allh $KCOV_TEST_INFO
+log "submit the coverage data file $KCOV_TEST_INFO"
 submit_info $KCOV_TEST_INFO
 
 log "Combine baseline and test coveraged data."
 if [ ! -f $KCOV_BASE_INFO ]; then
 	fail check_base_info "base cov data does not exists."
+	exit 1
 fi
 REBOOT_TRACE_ARGS=""
 for gdata in ${KCOV_TEST_INFO}.reboot*; do
