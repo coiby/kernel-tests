@@ -247,6 +247,49 @@ run_tc_test()
 	popd
 }
 
+
+run_lkdtm_seccomp_test()
+{
+	item=$1
+	pushd $EXEC_DIR/$item
+	if [ "$item" == "lkdtm" ]; then
+		# CKI by default sets panic_on_oops on kernel config.
+		# For this test it has to be disabled
+		panic_on_oops=$(cat /proc/sys/kernel/panic_on_oops)
+		echo 0 > /proc/sys/kernel/panic_on_oops
+	fi
+
+	total_tests=$(grep "^${item}:"  $EXEC_DIR/kselftest-list.txt | cut -f2 -d:)
+	total_num=$(echo ${total_tests} | wc -w)
+	FAIL=0 num=0 test_name=""
+
+	for test_name in ${total_tests}; do
+		local _base_filename="$(echo $test_name | sed s'/\.sh//')"
+		local _log_file="${_base_filename}.log"
+		local _dmesg_log_file="${_base_filename}_dmesg.log"
+        OUTPUTFILE=$_log_file
+		echo "Start test: ${item}/${test_name}"
+		num=$(($num + 1))
+		dmesg -C
+		./${test_name} |& tee ${_log_file}
+		local ret=${PIPESTATUS[0]}
+		dmesg > ${_dmesg_log_file}
+		submit_log ${_log_file}
+		submit_log ${_dmesg_log_file}
+		check_result $num $total_num ${item} ${test_name} $ret || \
+			FAIL=$(($FAIL+1))
+	done
+
+	if [ "$item" == "lkdtm" ]; then
+		# CKI by default sets panic_on_oops on kernel config.
+		# Restore the initial value
+		echo ${panic_on_oops} > /proc/sys/kernel/panic_on_oops
+	fi
+	echo "${item}: total $total_num, failed $FAIL"
+	TOTAL_FAIL=$(($TOTAL_FAIL+$FAIL))
+	popd
+}
+
 #-------------------- Start Test --------------------
 setup_env
 install_kselftests || test_fail_exit "install kselftests failed"
@@ -265,6 +308,16 @@ for item in $TEST_ITEMS; do
 	pushd $EXEC_DIR/$item
 	if [ "$item" == "tc-testing" ]; then
 		run_tc_test
+		continue
+	fi
+
+	if [ "$item" == "lkdtm" ]; then
+		run_lkdtm_seccomp_test $item
+		continue
+	fi
+
+	if [ "$item" == "seccomp" ]; then
+		run_lkdtm_seccomp_test $item
 		continue
 	fi
 
