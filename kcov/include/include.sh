@@ -73,7 +73,7 @@ install_lcov()
 	log "install lcov"
 	if ! which lcov; then
 		repo_url="https://github.com/linux-test-project/lcov.git"
-		commit_id="aa56a43774e54955f5ca7ab798a7b0babdd13cb1"
+		commit_id="d100e6cdd4c67cbe5322fa26b2ee8aa34ea7ebcf"
 		git clone $repo_url
 		cd lcov
 		git checkout $commit_id
