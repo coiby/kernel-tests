@@ -61,7 +61,9 @@ reset_net_env()
 	debug_info
 	ip -a netns del
 	sleep 2
-	run "ip link show"
+	if [ "$DEBUG" ]; then
+		run "ip link show"
+	fi
 }
 
 # usage: check_skipped_tests test_name
