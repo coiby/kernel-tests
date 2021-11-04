@@ -78,21 +78,6 @@ check_skipped_tests()
 	return 1
 }
 
-run_test()
-{
-	local test_name=$1
-
-	# some times the test may fail with resource issue, re-run it would
-	# pass
-	./${test_name} &> $OUTPUTFILE
-	local ret=$?
-	if [ $ret -ne 0 ]; then
-		./${test_name} &>> $OUTPUTFILE
-	else
-		return $ret
-	fi
-}
-
 check_result()
 {
 	local num=$1
@@ -250,46 +235,20 @@ run_tc_test()
 }
 
 
-run_lkdtm_seccomp_test()
+do_lkdtm_config()
 {
-	item=$1
-	pushd $EXEC_DIR/$item
-	if [ "$item" == "lkdtm" ]; then
-		# CKI by default sets panic_on_oops on kernel config.
-		# For this test it has to be disabled
-		panic_on_oops=$(cat /proc/sys/kernel/panic_on_oops)
-		echo 0 > /proc/sys/kernel/panic_on_oops
-	fi
+	# CKI by default sets panic_on_oops on kernel config.
+	# For this test it has to be disabled
+	panic_on_oops=$(cat /proc/sys/kernel/panic_on_oops)
+	echo 0 > /proc/sys/kernel/panic_on_oops
+}
 
-	total_tests=$(grep "^${item}:"  $EXEC_DIR/kselftest-list.txt | cut -f2 -d:)
-	total_num=$(echo ${total_tests} | wc -w)
-	FAIL=0 num=0 test_name=""
 
-	for test_name in ${total_tests}; do
-		local _base_filename="$(echo $test_name | sed s'/\.sh//')"
-		local _log_file="${_base_filename}.log"
-		local _dmesg_log_file="${_base_filename}_dmesg.log"
-        OUTPUTFILE=$_log_file
-		echo "Start test: ${item}/${test_name}"
-		num=$(($num + 1))
-		dmesg -C
-		./${test_name} |& tee ${_log_file}
-		local ret=${PIPESTATUS[0]}
-		dmesg > ${_dmesg_log_file}
-		submit_log ${_log_file}
-		submit_log ${_dmesg_log_file}
-		check_result $num $total_num ${item} ${test_name} $ret || \
-			FAIL=$(($FAIL+1))
-	done
-
-	if [ "$item" == "lkdtm" ]; then
-		# CKI by default sets panic_on_oops on kernel config.
-		# Restore the initial value
-		echo ${panic_on_oops} > /proc/sys/kernel/panic_on_oops
-	fi
-	echo "${item}: total $total_num, failed $FAIL"
-	TOTAL_FAIL=$(($TOTAL_FAIL+$FAIL))
-	popd
+do_lkdtm_clenup()
+{
+	# CKI by default sets panic_on_oops on kernel config.
+	# Restore the initial value
+	echo ${panic_on_oops} > /proc/sys/kernel/panic_on_oops
 }
 
 #-------------------- Start Test --------------------
@@ -313,16 +272,6 @@ for item in $TEST_ITEMS; do
 		continue
 	fi
 
-	if [ "$item" == "lkdtm" ]; then
-		run_lkdtm_seccomp_test $item
-		continue
-	fi
-
-	if [ "$item" == "seccomp" ]; then
-		run_lkdtm_seccomp_test $item
-		continue
-	fi
-
 	_item=$(echo $item | tr -s "/-" "_")
 	total_tests=$(grep "^${item}:"  $EXEC_DIR/kselftest-list.txt | cut -f2 -d:)
 	total_num=$(echo ${total_tests} | wc -w)
@@ -333,24 +282,36 @@ for item in $TEST_ITEMS; do
 	fi
 
 	for name in ${total_tests}; do
-		num=$(($num + 1))
-		OUTPUTFILE=$(new_outputfile)
+		_base_filename="/tmp/$(echo $name | sed s'/\.sh//')"
+		_log_file="${_base_filename}.log"
+		_dmesg_log_file="${_base_filename}_dmesg.log"
+		OUTPUTFILE=$_log_file
 
+		echo "Start test: ${item}/${name}"
+		num=$(($num + 1))
 		check_skipped_tests "${name}" && \
 			test_pass "${num}..${total_num} selftests: ${item}: ${name} Skip" && continue
 
 		dmesg -C
 
-		run_test ${name}
-		ret=$?
+		./${name} |& tee ${_log_file}
+		ret=${PIPESTATUS[0]}
 
-		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
-		dmesg >> $OUTPUTFILE
+		dmesg > ${_dmesg_log_file}
+		submit_log ${_log_file}
+		submit_log ${_dmesg_log_file}
 
 		check_result $num $total_num ${item} ${name} $ret || \
 			FAIL=$(($FAIL+1))
-		reset_net_env
+
+		if [ ${_item} == "net" ] || [ ${_item} == "net_forwarding" ]; then
+			reset_net_env
+		fi
 	done
+
+	if type do_${_item}_cleanup &>/dev/null; then
+		do_${_item}_cleanup || continue
+	fi
 
 	echo "${item}: total $total_num, failed $FAIL"
 	TOTAL_FAIL=$(($TOTAL_FAIL+$FAIL))
