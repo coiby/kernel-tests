@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=wget;git;gcc;perl-Digest-MD5
-softDependencies=
+dependencies=wget;git;gcc;perl-Digest-MD5;perl-IO-Compress;perl-JSON;perl-JSON-PP
+softDependencies=perl-File-Copy
 repoRequires=kcov/include
