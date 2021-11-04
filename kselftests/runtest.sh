@@ -357,8 +357,6 @@ done
 
 #-------------------- Clean Up --------------------
 
-if [[ ${TOTAL_FAIL} -eq 0 ]]; then
-	test_pass_exit
-else
-	test_fail_exit
+if [[ ${TOTAL_FAIL} -ne 0 ]]; then
+	exit 1
 fi
