@@ -8,13 +8,8 @@ function rhel9_fatal_issues()
 
 function rhel9_unfix_issues()
 {
-	# https://github.com/linux-test-project/ltp/issues/718
-	is_arch "s390x" && tskip "ioctl09" unfix
 	# https://bugzilla.redhat.com/show_bug.cgi?id=1913045#c24
 	is_arch "aarch64" && tskip "ioctl_sg01" unfix
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/612
-	# enable again, once using LTP version > 20210524
-	tskip "mbind01" unfix
 }
 
 function rhel9_fixed_issues()

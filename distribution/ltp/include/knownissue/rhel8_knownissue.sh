@@ -64,6 +64,8 @@ function rhel8_unfix_issues()
 	# Unable to load BPF programs on s390x kernels built by CKI
 	# https://projects.engineering.redhat.com/browse/FASTMOVING-1825
 	is_arch "s390x" && tskip "bpf_prog01 bpf_prog02" unfix
+	# Bug 1981743 - RHEL-9-Beta: WARNING: CPU: 3 PID: 0 at kernel/sched/fair.c:401 enqueue_task_fair+0x254/0x5b0
+	osver_in_range "800" "806" && tskip "cfs_bandwidth01" unfix
 }
 
 function rhel8_fixed_issues()
@@ -96,6 +98,8 @@ function rhel8_fixed_issues()
 	# Bug 1985920 - [RHEL-8.2] LTP quotactl07 failed : Q_XQUOTARM doesn't have quota type check
 	kernel_in_range "0" "4.18.0-195.el8" && tskip "quotactl07" fixed
 	pkg_in_range "glibc" "0" "2.28-153.el8" && tskip "semctl09" fixed
+	# Bug 2004810 - [FJ8.5 Bug]: LTP creat09, which is a test for CVE-2018-13405, failed.
+	kernel_in_range "0" "4.18.0-349.el8" && tskip "creat09 cve-2018-13405" fixed
 }
 
 function rhel8_knownissue_filter()
