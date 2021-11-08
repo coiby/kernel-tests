@@ -179,6 +179,16 @@ rlPhaseStartSetup
         elif [[ "$res" -eq 64 ]]; then
             rlLog "some swapoff failed on --all"
         fi
+
+        # disable zram if needed
+	if systemctl list-unit-files | grep -q systemd-zram-setup ; then
+            rlRun "systemctl disable --now systemd-zram-setup@zram0" 0 "disable zram for os class tests"
+            if [ -e /etc/systemd/zram-generator.conf ]; then
+                rstrnt-backup /etc/systemd/zram-generator.conf
+            fi
+            cat /dev/null > /etc/systemd/zram-generator.conf
+         fi
+
     fi
 rlPhaseEnd
 
@@ -207,6 +217,13 @@ rlPhaseStartCleanup
     # re-enable swap after finishing os class tests
     if [[ "$CLASSES" == "os" ]]; then
         rlRun "swapon -a" 0 "re-enable swap back"
+
+        if systemctl list-unit-files | grep -q systemd-zram-setup ; then
+            rm -f /etc/systemd/zram-generator.conf
+            rstrnt-restore
+            rlRun "systemctl enable --now systemd-zram-setup@zram0" 0 "re-enable zram"
+
+        fi
     fi
 
 rlPhaseEnd
