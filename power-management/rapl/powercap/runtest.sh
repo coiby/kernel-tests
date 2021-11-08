@@ -202,11 +202,30 @@ function cleanup
     return $CKI_PASS
 }
 
+function HW_good {
+    hw_problems=0
+    if cpupower frequency-info | grep 'current CPU frequency:' | grep -q 'Unable to call to kernel'; then
+        echo "Skipping test due to H/W return invalid current CPU frequency"
+        (( hw_problems+=1 ))
+    fi
+    if cpupower frequency-info | grep -q 'no or unknown cpufreq driver is active on this CPU'; then
+        echo "Skipping test due to H/W return invalid cpufreq driver"
+        (( hw_problems+=1 ))
+    fi
+    if [ "$hw_problems" -gt 0 ]; then
+       rstrnt-report-result "rapl/powermanagement" SKIP
+       exit 0
+    fi
+}
+
 function runtest
 {
     # For debugging
     cki_run_cmd_neu "find /sys/devices/ -name *rapl*"
     cki_run_cmd_neu "lsmod"
+
+    # check if HW supports known cpufreq driver and returns the frequency to the standard tools
+    HW_good
 
     # Check if capping works, it should take approx 1.5 - 2 minutes
     test_capping || return $CKI_FAIL
