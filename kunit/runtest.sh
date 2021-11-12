@@ -29,9 +29,10 @@ process_results(){
 	TMPFILE=$(mktemp) || exit 1
         OUTFILE=$(mktemp) || exit 1
 	rlLog "processing results from test ${1}"
-	sed -i '/^S/d' "$1" #remove all empty lines
+	sed -i '/^$/d' "$1" #remove all empty lines
 	sed -i 's/^[ \t]*//' "$1" #remove all leading whitespace
 	sed -i '/^#/d' "$1" #remove comments
+	sed -i 's/#.*//' "$1" #remove comments
 	sed -i '$d' "$1" #remove last line.
 	sed -i '/^\(ok\|not ok\|1..\)/!d' "$1" #removeall but 1..N and ok/not ok
 	uniq "$1" > "$TMPFILE"  #remove dup
