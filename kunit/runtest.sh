@@ -29,9 +29,10 @@ process_results(){
 	TMPFILE=$(mktemp) || exit 1
         OUTFILE=$(mktemp) || exit 1
 	rlLog "processing results from test ${1}"
-	sed -i '/^S/d' "$1" #remove all empty lines
+	sed -i '/^$/d' "$1" #remove all empty lines
 	sed -i 's/^[ \t]*//' "$1" #remove all leading whitespace
 	sed -i '/^#/d' "$1" #remove comments
+	sed -i 's/#.*//' "$1" #remove comments
 	sed -i '$d' "$1" #remove last line.
 	sed -i '/^\(ok\|not ok\|1..\)/!d' "$1" #removeall but 1..N and ok/not ok
 	uniq "$1" > "$TMPFILE"  #remove dup
@@ -60,21 +61,13 @@ PACKAGE="kernel"
 # When rebasing create a new array at the current release number (eg rhel8.5)
 # Then add a check for the proper tag number
 
-tag=$(uname -rm | grep -o "\-.*.el8")
-el8=$( echo "$tag" | grep -o ".el8" )
-version=$( echo "$tag" | sed 's/\-\(.*\).el8/\1/')
-
-#currently only supports rhel 8
-if [ "$el8" != ".el8" ]; then
-	rlLog "RHEL8 Varient not detected. currently only supports =>rhel8.4"
-	rstrnt-report-result $TEST SKIP
-	exit 0
-fi
+version=$(uname -rm | sed 's/\-*//' | sed 's/\..*//')
 
 test_arr=(kunit-test ext4-inode-test list-test sysctl-test mptcp_crypto_test \
 	mptcp_token_test bitfield_kunit cmdline_kunit property-entry-test \
 	qos-test resource_kunit soc-topology-test string-stream-test \
-	test_linear_ranges test_bits test_kasan)
+	test_linear_ranges test_bits test_kasan time_test fat_test lib_test\
+	rational-test test_list_sort slub_kunit)
 
 rlJournalStart
 #-------------------- Setup ---------------------
