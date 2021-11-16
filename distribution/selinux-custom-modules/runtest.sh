@@ -103,6 +103,9 @@ rlJournalStart
 
       echo "(allow systemd_coredump_t usermodehelper_t (file (write)))" > bz1982961.cil
       modules_to_load+=" bz1982961.cil"
+
+      echo "(allow groupadd_t groupadd_t (capability (setgid)))" > bz2022690.cil
+      modules_to_load+=" bz2022690.cil"
     fi
 
     if [ -n "$modules_to_load" ]; then
