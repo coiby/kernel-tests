@@ -105,6 +105,7 @@ rlJournalStart
       modules_to_load+=" bz1982961.cil"
 
       echo "(allow groupadd_t groupadd_t (capability (setgid)))" > bz2022690.cil
+      echo "(allow useradd_t useradd_t (capability (setgid)))" >> bz2022690.cil
       modules_to_load+=" bz2022690.cil"
     fi
 
