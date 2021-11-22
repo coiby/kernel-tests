@@ -108,6 +108,8 @@ function rhel7_unfix_issues()
 	osver_in_range "700" "710" && tskip "ptrace10" unfix
 	# Bug 1843799 - ltp xfs quotactl07 fail
 	osver_in_range "700" "710" && tskip "quotactl07" unfix
+	# Missing commit dd83c161fbcc in RHEL7
+	osver_in_range "700" "710" && tskip "wait403" unfix
 }
 
 function rhel7_fixed_issues()

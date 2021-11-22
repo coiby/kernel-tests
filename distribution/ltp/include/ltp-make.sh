@@ -7,7 +7,7 @@ if [ -z ${TESTVERSION} ]; then
     if rlIsRHEL 5 || rlIsRHEL 6; then
         TESTVERSION="20200120"
     else
-        TESTVERSION="20210524"
+        TESTVERSION="20210927"
     fi
 fi
 
@@ -75,7 +75,7 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
-    if [ "$TESTVERSION" == "20210524" ]; then
+    if [ "$TESTVERSION" == "20210927" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel_only-migrate_page02-avoid-warning.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
