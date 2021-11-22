@@ -1,0 +1,12 @@
+[General]
+name=storage/block/fio_numa
+owner=Yi Zhang <yizhan@redhat.com>
+description=Storage block fio random write/read with each NUMA CPU
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=fio;numactl;bc
+repoRequires=cki_lib
