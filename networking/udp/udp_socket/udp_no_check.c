@@ -37,7 +37,6 @@ static char *local_host = NULL;
 static char *remote_host = NULL;
 static int remote_port = 0;
 
-static int protocol = IPPROTO_UDP;
 static int role = NOT_DEFINED;
 
 struct packet {
@@ -49,7 +48,7 @@ void usage(char *argv0)
 {
 	fprintf(stderr, "\nusage:\n");
 	fprintf(stderr, "\n%s -c 0:\n", argv0);
-	fprintf(stderr, "\nOr:\n\n", argv0);
+	fprintf(stderr, "\nOr:\n\n");
 	fprintf(stderr, "  Server:\n");
 	fprintf(stderr, "  %8s -c 1 -P local-port -l [ -r no_check6_rx] [ -R (use sock_raw)]", argv0);
 	fprintf(stderr, "\n");
