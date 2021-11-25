@@ -32,14 +32,12 @@
 . ./include.sh
 . ./specific_fun.sh
 #-------------------- Setup --------------------
-SKIP=4
+SKIP_CODE=4
 LOG_ONCE=0
 EXEC_DIR="$PWD/selftests"
 TOTAL_MEM=$(free -m | awk '/Mem/ {print $2}')
 TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding netfilter bpf bpf_test_progs tc-testing kvm"}
 DEFAULT_IFACE=$(ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}')
-
-TOTAL_FAIL=0
 
 debug_info()
 {
@@ -92,8 +90,8 @@ check_result()
 		test_pass "${num}..${total_num} selftests: ${test_folder}: ${test_name} [WAIVE]"
 	elif [[ " ${uninves_tests[*]} " == *" $test_name "* ]] && [ ! $CHECK_UNINVES ]; then
 		test_pass "${num}..${total_num} selftests: ${test_folder}: ${test_name} [WAIVE]"
-	elif [ "$test_result" -eq $SKIP ]; then
-		test_pass "${num}..${total_num} selftests: ${test_folder}: ${test_name} [SKIP]"
+	elif [ "$test_result" -eq $SKIP_CODE ]; then
+		test_skip "${num}..${total_num} selftests: ${test_folder}: ${test_name} [SKIP]"
 	else
 		test_fail "${num}..${total_num} selftests: ${test_folder}: ${test_name} [FAIL]"
 	fi
@@ -156,7 +154,7 @@ run_bpf_test_progs()
 
 	total_tests=$(./test_progs --list)
 	total_num=$(./test_progs --count)
-	nfail=0 num=0 name=""
+	num=0 name=""
 
 	for name in ${total_tests}; do
 		num=$(($num + 1))
@@ -174,13 +172,9 @@ run_bpf_test_progs()
 		dmesg >> $OUTPUTFILE
 
 		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
-		check_result $num $total_num ${item} ${name} $ret || \
-			nfail=$((nfail+1))
-		clean_env
+		check_result $num $total_num ${item} ${name} $ret
 	done
 
-	echo "${item}: total $total_num, failed $nfail"
-	TOTAL_FAIL=$(($TOTAL_FAIL+$nfail))
 	popd
 }
 
@@ -193,7 +187,7 @@ run_tc_test()
 	local qdi_tests=$(ls -d tc-tests/qdiscs/*.json)
 	local total_tests="$act_tests $fil_tests $qdi_tests"
 	local total_num=$(echo ${total_tests} | wc -w)
-	local FAIL=0 nskip=0 ret=0
+	local ret=0
 
 	# prepare evn
 	rpm -q clang || dnf install -y clang valgrind
@@ -217,20 +211,15 @@ run_tc_test()
 		ret=$?
 		if grep -q "not ok" $OUTPUTFILE; then
 			check_result $num $total_num ${item} ${name} 1
-			FAIL=$(($FAIL+1))
 		elif grep -q "# skipped -" $OUTPUTFILE; then
 			check_result $num $total_num ${item} ${name} 4
-			nskip=$((nskip+1))
 		elif grep -q "Traceback" $OUTPUTFILE; then
 			check_result $num $total_num ${item} ${name} 4
-			nskip=$((nskip+1))
 		else
 			check_result $num $total_num ${item} ${name} $ret
 		fi
 	done
 
-	echo "${item}: total $total_num, failed $FAIL, skipped $nskip"
-	TOTAL_FAIL=$(($TOTAL_FAIL+$FAIL))
 	popd
 }
 
@@ -275,7 +264,7 @@ for item in $TEST_ITEMS; do
 	_item=$(echo $item | tr -s "/-" "_")
 	total_tests=$(grep "^${item}:"  $EXEC_DIR/kselftest-list.txt | cut -f2 -d:)
 	total_num=$(echo ${total_tests} | wc -w)
-	FAIL=0 num=0 name=""
+	num=0 name=""
 
 	if type do_${_item}_config &>/dev/null; then
 		do_${_item}_config || continue
@@ -301,8 +290,7 @@ for item in $TEST_ITEMS; do
 		submit_log ${_log_file}
 		submit_log ${_dmesg_log_file}
 
-		check_result $num $total_num ${item} ${name} $ret || \
-			FAIL=$(($FAIL+1))
+		check_result $num $total_num ${item} ${name} $ret
 
 		if [ ${_item} == "net" ] || [ ${_item} == "net_forwarding" ]; then
 			reset_net_env
@@ -313,13 +301,17 @@ for item in $TEST_ITEMS; do
 		do_${_item}_cleanup || continue
 	fi
 
-	echo "${item}: total $total_num, failed $FAIL"
-	TOTAL_FAIL=$(($TOTAL_FAIL+$FAIL))
 	popd
 done
 
 #-------------------- Clean Up --------------------
 
-if [[ ${TOTAL_FAIL} -ne 0 ]]; then
-	exit 1
+if [[ ${FAIL} -ne 0 ]]; then
+	test_fail_exit
+elif [[ ${WARN} -ne 0 ]]; then
+	test_warn_exit
+elif [[ ${SKIP} -ne 0 ]]; then
+	test_skip_exit
+else
+	test_pass_exit
 fi
