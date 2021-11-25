@@ -1,3 +1,5 @@
 The test is run for udp/udp_socket
 Add test items to cover UDP_NO_CHECK6_RX/TX
 Add test item to cover SO_NO_CHECK
+Add test item to cover UDP_CORK
+Add test item to cover general get/set option.

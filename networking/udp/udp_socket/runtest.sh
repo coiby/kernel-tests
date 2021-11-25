@@ -42,9 +42,15 @@ rlJournalStart
 	(uname -r |grep el6) || rlRun "modprobe -r br_netfilter" 0-255 "disable from bridge call iptables 4/6"
 	rlRun "gcc -g -Wall -o udp_no_check udp_no_check.c"
 	rlRun "gcc -g -Wall -o udp_socket udp_socket.c"
+	rlRun "gcc -g -Wall -o UDP_CORK UDP_CORK.c"
     rlPhaseEnd
 
-    rlPhaseStartTest "Regression test for Bug 518034"
+    rlPhaseStartTest "UDP_CORK option test"
+		rlRun "./UDP_CORK -4" 0 "Start UDP_CORK IPv4 Test"
+		rlRun "./UDP_CORK -6" 0 "Start UDP_CORK IPv6 Test"
+    rlPhaseEnd
+
+    rlPhaseStartTest "udp socket option set/get test. & Regression test for Bug 518034"
 		rlRun "./udp_socket" 0 "Start Test"
     rlPhaseEnd
 
