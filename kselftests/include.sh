@@ -23,6 +23,8 @@ setup_env()
 	# export our new variable
 	export PASS=0
 	export FAIL=0
+	export WARN=0
+	export SKIP=0
 	export OUTPUTFILE=$(new_outputfile)
 }
 
@@ -32,6 +34,8 @@ clean_env()
 	# restore environment
 	unset PASS
 	unset FAIL
+	unset WARN
+	unset SKIP
 }
 
 log()
@@ -49,9 +53,11 @@ submit_log()
 
 test_pass()
 {
+	let PASS++
+	SCORE=${2:-$PASS}
 	echo -e "\n:: [  PASS  ] :: Test '"$1"'" >> $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "PASS"
+		rstrnt-report-result "${TEST}/$1" "PASS" "$SCORE"
 	else
 		echo -e "::::::::::::::::"
 		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test '"${TEST}/$1"'"
@@ -61,6 +67,7 @@ test_pass()
 
 test_fail()
 {
+	let FAIL++
 	SCORE=${2:-$FAIL}
 	echo -e ":: [  FAIL  ] :: Test '"$1"'" >> $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
@@ -74,9 +81,11 @@ test_fail()
 
 test_warn()
 {
+	let WARN++
+	SCORE=${2:-$WARN}
 	echo -e "\n:: [  WARN  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "WARN"
+		rstrnt-report-result "${TEST}/$1" "WARN" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
 		echo -e ":: [  ${YEL}WARN${RES}  ] :: Test '"${TEST}/$1"'"
@@ -86,9 +95,11 @@ test_warn()
 
 test_skip()
 {
+	let SKIP++
+	SCORE=${2:-$SKIP}
 	echo -e "\n:: [  SKIP  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" SKIP 0
+		rstrnt-report-result "${TEST}/$1" "SKIP" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
 		echo -e ":: [  ${YEL}SKIP${RES}  ] :: Test '"${TEST}/$1"'"
@@ -99,24 +110,28 @@ test_skip()
 test_pass_exit()
 {
 	test_pass "$@"
+	clean_env
 	exit 0
 }
 
 test_fail_exit()
 {
 	test_fail "$@"
+	clean_env
 	exit 1
 }
 
 test_warn_exit()
 {
-	test_fail "$@"
+	test_warn "$@"
+	clean_env
 	exit 1
 }
 
 test_skip_exit()
 {
 	test_skip "$@"
+	clean_env
 	exit 0
 }
 
@@ -132,11 +147,9 @@ run()
 	eval "$cmd" > >(tee -a $OUTPUTFILE)
 	ret=$?
 	if [ "$exp" -eq "$ret" ];then
-		let PASS++
 		echo -e ":: [  ${GRN}PASS${RES}  ] :: Command '"$cmd"' (Expected $exp, got $ret, score $PASS)" | tee -a $OUTPUTFILE
 		return 0
 	else
-		let FAIL++
 		echo -e ":: [  ${RED}FAIL${RES}  ] :: Command '"$cmd"' (Expected $exp, got $ret, score $FAIL)" | tee -a $OUTPUTFILE
 		return 1
 	fi
