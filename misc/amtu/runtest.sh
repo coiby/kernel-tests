@@ -72,7 +72,7 @@ function build_amtu()
             fi
             exit 1
         fi
-    else 
+    else
         # unpack
         tar xfvz $AMTU_NVR.tar.gz
         if [ $? -ne 0 ]; then
@@ -151,7 +151,6 @@ if [ -z "$amtubin" -o ! -e "$amtubin" ]; then
     build_amtu
     # Add task param, needed for kernel-ci/CKI, e.g. <params><param name="CI" value="yes"/><params>
     if [ $? -ne 0 ] && [ "$CI" = "yes" ]; then
-        rstrnt-report-result $TEST WARN
         cki_abort_task "Couldn't build atmu"
     fi
 

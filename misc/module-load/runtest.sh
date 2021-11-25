@@ -236,7 +236,6 @@ echo "** Module list prior to testing. **" | tee -a $OUTPUTFILE
 RC=$?
 if [ $RC -ne 0 ] ; then
         echo "*** There is a problem with lsmod, no need to continue further ***" | tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST WARN
         cki_abort_task "There is a problem with lsmod"
 fi
 
