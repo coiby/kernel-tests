@@ -7,6 +7,8 @@
 # Needs RUNTESTS, SKIPTESTS, MKFS_OPTS, FSCK_OPTS, CHECK_OPTS and REPORT_PASS, REPORT_FAIL, KNOWN_ISSUE
 function check_tests()
 {
+	# backup original OUTPUTFILE, each XFSTEST will use different OUTPUTFILE
+	BAK_OUTPUTFILE=${OUTPUTFILE}
 	for XFSTEST in $RUNTESTS; do
 		ret=0
 		# Skip tests that are failing, for now.  Some need fixing, others expected
@@ -28,6 +30,16 @@ function check_tests()
 			continue
 		fi
 
+		# Construct XFSTEST_LOGNAME, used for submitting logs to beaker to avoid
+		# overwriting test logs with the same seq number under different dirs.
+		# e.g. if both generic/300 and ext4/300 fail, log file to be submitted
+		# are both 300.full/300.out.bad
+		# Rename log file by adding dir name prefix, so results/generic/300.full
+		# will be results/generic/generic-300.full, results/ext4/300.full will be
+		# results/ext4/ext4-300.full
+		XFSTEST_LOGNAME=$(dirname $XFSTEST)/${XFSTEST/\//-}
+		OUTPUTFILE="results/${XFSTEST_LOGNAME}.log"
+		mkdir -p $(dirname $OUTPUTFILE)
 		echoo "Running test $XFSTEST"
 		if test -f tests/$XFSTEST; then
 			xlog head -n 10 tests/$XFSTEST
@@ -39,16 +51,9 @@ function check_tests()
 		MOUNT_OPTIONS="$MOUNT_OPTS" MKFS_OPTIONS="$MKFS_OPTS" xlog ./check $CHECK_OPTS $XFSTEST
 		ret=$?
 
-		# Construct XFSTEST_LOGNAME, used for submitting logs to beaker to avoid
-		# overwriting test logs with the same seq number under different dirs.
-		# e.g. if both generic/300 and ext4/300 fail, log file to be submitted
-		# are both 300.full/300.out.bad
-		# Rename log file by adding dir name prefix, so results/generic/300.full
-		# will be results/generic/generic-300.full, results/ext4/300.full will be
-		# results/ext4/ext4-300.full
 		false_alarm=0
-		XFSTEST_LOGNAME=$(dirname $XFSTEST)/${XFSTEST/\//-}
 		if test $ret -ne 0; then
+			rstrnt-report-log -l results/$XFSTEST_LOGNAME.log
 			if [ -f results/$XFSTEST.full ]; then
 				cp results/$XFSTEST.full results/$XFSTEST_LOGNAME.full
 				rstrnt-report-log -l results/$XFSTEST_LOGNAME.full
@@ -72,7 +77,7 @@ function check_tests()
 			fi
 			if [ $false_alarm -eq 0 ] ; then
 				ret=1
-				report $XFSTEST FAIL 0
+				rstrnt-report-result $XFSTEST FAIL 0
 			fi
 			# Work around, so that loop device bug does not interrupt the test,
 			# might be nice to do the same with the dm device release bug
@@ -82,9 +87,10 @@ function check_tests()
 			if [ -f results/$XFSTEST.notrun ]; then
 				XFSTEST="${XFSTEST}[notrun]"
 			fi
-			report $XFSTEST PASS $TESTTIME
+			rstrnt-report-result $XFSTEST PASS $TESTTIME
 		fi
 	done
+	OUTPUTFILE=${BAK_OUTPUTFILE}
 }
 
 # Needs SKIPTESTS, RUNTESTS,
