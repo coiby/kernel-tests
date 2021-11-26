@@ -383,7 +383,6 @@ function select_yum_tool()
 		ALL="all"
 		${YUM} install -y yum-plugin-copr
 	else
-		rstrnt-report-result ${RSTRNT_TASKNAME} WARN 99
 		cki_abort_task "No tool to download kernel from a repo"
 	fi
 }

@@ -64,7 +64,6 @@ function build_stress-ng()
     rlLog "Downloading stress-ng from source"
     rlRun "git clone $GIT_URL $BUILDDIR" 0
     if [ $? != 0 ]; then
-        rstrnt-report-result $TEST WARN 0
         cki_abort_task "Failed to git clone $GIT_URL."
     fi
 

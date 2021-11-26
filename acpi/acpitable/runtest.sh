@@ -36,7 +36,6 @@ ret=0
 # make sure acpica-tools are installed
 pkg=$(rpm -qa | grep acpica-tools)
 if [ -z "$pkg" ] ; then
-    rstrnt-report-result $TEST WARN
     cki_abort_task "$pkg is not installed"
 fi
 

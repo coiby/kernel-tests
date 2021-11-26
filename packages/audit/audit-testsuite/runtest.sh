@@ -89,7 +89,6 @@ rlJournalStart
         rlRun "git clone $GIT_URL" 0
         if [ $? != 0 ]; then
             echo "Failed to git clone $GIT_URL." | tee -a $OUTPUTFILE
-            rstrnt-report-result $TEST WARN
             cki_abort_task "Failed to git clone $GIT_URL."
         fi
 
