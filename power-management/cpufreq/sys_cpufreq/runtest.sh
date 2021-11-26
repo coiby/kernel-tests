@@ -58,13 +58,25 @@ function runtest
     # 3. lowest  frequency would be at least 300MHz
     # 4. highest frequency would be at most    8GHz
     #
-    (( $cur_freq < $min_freq )) && return $CKI_FAIL
+    if (( $cur_freq < $min_freq )); then
+        cki_log "FAIL: current frequency ($cur_freq) < min frequency ($min_freq)"
+        return $CKI_FAIL
+    fi
     cki_log "+OK: current frequency ($cur_freq) >= min frequency ($min_freq)"
-    (( $cur_freq > $max_freq )) && return $CKI_FAIL
+    if (( $cur_freq > $max_freq )); then
+        cki_log "FAIL: current frequency ($cur_freq) > max frequency ($max_freq)"
+        return $CKI_FAIL
+    fi
     cki_log "+OK: current frequency ($cur_freq) <= max frequency ($max_freq)"
-    (( $min_freq < 300000    )) && return $CKI_FAIL
+    if (( $min_freq < 300000 )); then
+        cki_log "FAIL: min frequency ($min_freq) < 300MHz (300000)"
+        return $CKI_FAIL
+    fi
     cki_log "+OK: min frequency ($min_freq) >= 300MHz (300000)"
-    (( $max_freq > 8000000   )) && return $CKI_FAIL
+    if (( $max_freq > 8000000 )); then
+        cki_log "FAIL: max frequency ($max_freq) > 8GHz (8000000)"
+        return $CKI_FAIL
+    fi
     cki_log "+OK: max frequency ($max_freq) <= 8GHz (8000000)"
 
     return $CKI_PASS
