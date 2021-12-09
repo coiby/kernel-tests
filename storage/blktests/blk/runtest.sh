@@ -247,6 +247,13 @@ function get_test_cases_scsi
 	echo $testcases
 }
 
+if cki_is_kernel_debug; then
+    # the test is not supported on debug kernels due to performance issues
+    # https://gitlab.com/cki-project/kernel-tests/-/issues/657
+    rstrnt-report-result "$TNAME" SKIP
+    exit 0
+fi
+
 bash $CDIR/build.sh
 if (( $? != 0 )); then
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
