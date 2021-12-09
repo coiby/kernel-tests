@@ -389,3 +389,12 @@ cki_is_kernel_debug()
     fi
     return 1
 }
+
+# return 0 when running kernel auto
+cki_is_kernel_auto()
+{
+    if rpm -q "kernel-auto-$(uname -r)" > /dev/null 2>&1; then
+       return  0
+    fi
+    return 1
+}
