@@ -122,6 +122,12 @@ if rlIsRHEL || rlIsCentOS '9'; then
     sed -i 's/@test "podman logs - until journald" {/@test "podman logs - until journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
 fi
 
+if rlTestVersion ${PODMAN_VERSION} '<' '3.4.3'; then
+    # Please refer to https://gitlab.com/cki-project/kernel-tests/-/issues/807
+    # and https://github.com/containers/podman/pull/12496
+    sed -i 's/@test "podman kill - test signal handling in containers" {/@test "podman kill - test signal handling in containers" {\n    skip/' ${TEST_DIR}/130-kill.bats
+fi
+
 if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
     # https://bugzilla.redhat.com/show_bug.cgi?id=2006678
     # https://gitlab.com/cki-project/kernel-tests/-/issues/622
