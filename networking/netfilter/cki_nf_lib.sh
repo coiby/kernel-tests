@@ -288,8 +288,8 @@ do_clean()
 do_check()
 {
 	local ret=0
-	ip netns exec client ping -W 20 -$(4or6 $ip_s) -I c_r $ip_s -c 5 || { ret=1; }
-	ip netns exec server ping -W 20 -$(4or6 $ip_c) -I s_r $ip_c -c 5 || { ret=1; }
+	ip netns exec client ping -W 40 -$(4or6 $ip_s) -I c_r $ip_s -c 5 -i 0.2 || { ret=1; }
+	ip netns exec server ping -W 40 -$(4or6 $ip_c) -I s_r $ip_c -c 5 -i 0.2 || { ret=1; }
 	return $ret
 }
 
@@ -309,6 +309,7 @@ do_setup()
 		ip_rc=2001:db8:ffff:21::fffe
 		ip_rs=2001:db8:ffff:22::fffe
 		N=64
+		nodad=nodad
 	elif [[ "$1x" == "ipv4x" ]];then
 		ip netns exec router sysctl -w net.ipv4.ip_forward=1
 		ip_c=10.167.1.1
@@ -326,20 +327,20 @@ do_setup()
 		 link add name r_s type veth peer name s_r netns server
 		 link set r_c up
 		 link set r_s up
-		 addr add $ip_rc/$N dev r_c
-		 addr add $ip_rs/$N dev r_s
+		 addr add $ip_rc/$N dev r_c $nodad
+		 addr add $ip_rs/$N dev r_s $nodad
 		 link set lo up
 	EOF
 
 	ip -d -n server -b /dev/stdin <<-EOF
-		 addr add $ip_s/$N dev s_r
+		 addr add $ip_s/$N dev s_r $nodad
 		 link set s_r up
 		 route add default via $ip_rs dev s_r
 		 link set lo up
 	EOF
 
 	ip -d -n client -b /dev/stdin <<-EOF
-		 addr add $ip_c/$N dev c_r
+		 addr add $ip_c/$N dev c_r $nodad
 		 link set c_r up
 		 route add default via $ip_rc dev c_r
 		 link set lo up

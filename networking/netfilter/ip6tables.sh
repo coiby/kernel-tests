@@ -51,7 +51,7 @@ for table in filter mangle raw security; do
 		run server ip6tables -t $table -A $chain -p icmpv6 -m icmp6 --icmpv6-type 135 -j ACCEPT
 		run server ip6tables -t $table -A $chain $cont -j ACCEPT
 		run server ip6tables -t $table -A $chain $cont -j DROP
-		run client ping -W 1 -6 -I c_r $ip_s -c3 $pktsize
+		run client ping -W 1 -6 -I c_r $ip_s -c3
 		run server ip6tables -t $table -L -n -v
 		run server ip6tables -t $table -F
 
@@ -60,7 +60,7 @@ for table in filter mangle raw security; do
 		run server ip6tables -t $table -A $chain -p icmpv6 -m icmp6 --icmpv6-type 135 -j ACCEPT
 		run server ip6tables -t $table -A $chain $cont -j DROP
 		run server ip6tables -t $table -A $chain $cont -j ACCEPT
-		run client ping -W 1 -6 -I c_r $ip_s -c3 $pktsize assert_fail
+		run client ping -W 1 -6 -I c_r $ip_s -c3 assert_fail
 		run server ip6tables -t $table -L -n -v
 		run server ip6tables -t $table -F
 
@@ -72,7 +72,7 @@ for table in filter mangle raw security; do
 		run server ip6tables -t $table -A TEST $cont -j DROP
 		run server ip6tables -t $table -A $chain $cont -j TEST
 		run server ip6tables -t $table -A $chain $cont -j ACCEPT
-		run client ping -W 1 -6 -I c_r $ip_s -c3 $pktsize
+		run client ping -W 1 -6 -I c_r $ip_s -c3
 		run server ip6tables -t $table -L -n -v
 		run server ip6tables -t $table -F
 		run server ip6tables -t $table -X
@@ -102,7 +102,7 @@ for table in filter mangle raw security; do
 		run router ip6tables -t $table -A $chain -p icmpv6 -m icmp6 --icmpv6-type 135 -j ACCEPT
 		run router ip6tables -t $table -A $chain $cont -j ACCEPT
 		run router ip6tables -t $table -A $chain $cont -j DROP
-		run client ping -W 1 -6 -I c_r $ip_s -c3 $pktsize
+		run client ping -W 1 -6 -I c_r $ip_s -c3
 		run router ip6tables -t $table -L -n -v
 		run router ip6tables -t $table -F
 
@@ -111,7 +111,7 @@ for table in filter mangle raw security; do
 		run router ip6tables -t $table -A $chain -p icmpv6 -m icmp6 --icmpv6-type 135 -j ACCEPT
 		run router ip6tables -t $table -A $chain $cont -j DROP
 		run router ip6tables -t $table -A $chain $cont -j ACCEPT
-		run client ping -W 1 -6 -I c_r $ip_s -c3 $pktsize assert_fail
+		run client ping -W 1 -6 -I c_r $ip_s -c3 assert_fail
 		run router ip6tables -t $table -L -n -v
 		run router ip6tables -t $table -F
 
@@ -123,7 +123,7 @@ for table in filter mangle raw security; do
 		run router ip6tables -t $table -A TEST $cont -j DROP
 		run router ip6tables -t $table -A $chain $cont -j TEST
 		run router ip6tables -t $table -A $chain $cont -j ACCEPT
-		run client ping -W 1 -6 -I c_r $ip_s -c3 $pktsize
+		run client ping -W 1 -6 -I c_r $ip_s -c3
 		run router ip6tables -t $table -L -n -v
 		run router ip6tables -t $table -F
 		run router ip6tables -t $table -X

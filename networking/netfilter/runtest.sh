@@ -1,13 +1,25 @@
 #! /bin/bash
 
 . ./cki_nf_lib.sh
-
 install_dependence
 
-. iptables.sh
+if which iptables;then
+	. iptables.sh
 
-# If disable ipv6, skip test
-ping -6 ::1 -c1 -W1
-[ $? -eq 2 ] && exit 0
+	# If disable ipv6, skip test
+	ping -6 ::1 -c1 -W1
+	if [ $? -eq 0 ];then
+		. ip6tables.sh
+	fi
+fi
 
-. ip6tables.sh
+if which nft;then
+	. nftables.sh ipv4
+	INET=1 . nftables.sh ipv4
+
+	ping -6 ::1 -c1 -W1
+	if [ $? -eq 0 ];then
+		. nftables.sh ipv6
+		INET=1 . nftables.sh ipv6
+	fi
+fi
