@@ -250,10 +250,11 @@ static void parse_opts(int argc, char **argv)
 int main(int argc, char **argv)
 {
 	parse_opts(argc, argv);
+	int i;
 
-	for (int i = 0; i < sizeof(buf[0]); i++)
+	for (i = 0; i < sizeof(buf[0]); i++)
 		buf[0][i] = 'a' + (i % 26);
-	for (int i = 1; i < NUM_PKT; i++)
+	for (i = 1; i < NUM_PKT; i++)
 		memcpy(buf[i], buf[0], sizeof(buf[0]));
 
 	if (cfg_do_ipv4)
