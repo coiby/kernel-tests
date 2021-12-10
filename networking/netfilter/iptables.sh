@@ -47,14 +47,14 @@ for table in filter mangle raw security; do
 		# -j ACCEPT
 		run server iptables -t $table -A $chain $cont -j ACCEPT
 		run server iptables -t $table -A $chain $cont -j DROP
-		run client ping -W 1 $ip_s -c1 $pktsize
+		run client ping -W 1 $ip_s -c1
 		run server iptables -t $table -L -n -v
 		run server iptables -t $table -F
 
 		# -j DROP
 		run server iptables -t $table -A $chain $cont -j DROP
 		run server iptables -t $table -A $chain $cont -j ACCEPT
-		run client ping -W 1 $ip_s -c1 $pktsize assert_fail
+		run client ping -W 1 $ip_s -c1 assert_fail
 		run server iptables -t $table -L -n -v
 		run server iptables -t $table -F
 
@@ -64,7 +64,7 @@ for table in filter mangle raw security; do
 		run server iptables -t $table -A TEST $cont -j DROP
 		run server iptables -t $table -A $chain $cont -j TEST
 		run server iptables -t $table -A $chain $cont -j ACCEPT
-		run client ping -W 1 $ip_s -c1 $pktsize
+		run client ping -W 1 $ip_s -c1
 		run server iptables -t $table -L -n -v
 		run server iptables -t $table -F
 		run server iptables -t $table -X
@@ -93,14 +93,14 @@ for table in filter mangle raw security; do
 		# -j ACCEPT
 		run router iptables -t $table -A $chain $cont -j ACCEPT
 		run router iptables -t $table -A $chain $cont -j DROP
-		run client ping -W 1 $ip_s -c1 $pktsize
+		run client ping -W 1 $ip_s -c1
 		run router iptables -t $table -L -n -v
 		run router iptables -t $table -F
 
 		# -j DROP
 		run router iptables -t $table -A $chain $cont -j DROP
 		run router iptables -t $table -A $chain $cont -j ACCEPT
-		run client ping -W 1 $ip_s -c1 $pktsize assert_fail
+		run client ping -W 1 $ip_s -c1 assert_fail
 		run router iptables -t $table -L -n -v
 		run router iptables -t $table -F
 
@@ -110,7 +110,7 @@ for table in filter mangle raw security; do
 		run router iptables -t $table -A TEST $cont -j DROP
 		run router iptables -t $table -A $chain $cont -j TEST
 		run router iptables -t $table -A $chain $cont -j ACCEPT
-		run client ping -W 1 $ip_s -c1 $pktsize
+		run client ping -W 1 $ip_s -c1
 		run router iptables -t $table -L -n -v
 		run router iptables -t $table -F
 		run router iptables -t $table -X
