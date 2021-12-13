@@ -174,6 +174,7 @@ then
 	rlRun "modprobe -r ip_gre" "0-255"
 else
 
+	netns_clean.sh
 	# if use vlan topo, use cs ttopology
 	if [ -z "${TOPO##*vlan*}" ]
 	then

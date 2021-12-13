@@ -187,6 +187,7 @@ then
 		rlRun "ip link del $gre_devname" "0-255"
 	done
 else
+	netns_clean.sh
 	# if use vlan topo, use cs ttopology
 	if [ -z "${TOPO##*vlan*}" ]
 	then
