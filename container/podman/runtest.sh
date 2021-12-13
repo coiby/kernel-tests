@@ -126,6 +126,7 @@ if rlTestVersion ${PODMAN_VERSION} '<' '3.4.3'; then
     # Please refer to https://gitlab.com/cki-project/kernel-tests/-/issues/807
     # and https://github.com/containers/podman/pull/12496
     sed -i 's/@test "podman kill - test signal handling in containers" {/@test "podman kill - test signal handling in containers" {\n    skip/' ${TEST_DIR}/130-kill.bats
+    sed -i 's/@test "podman logs - --follow journald" {/@test "podman logs - --follow journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
 fi
 
 if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
