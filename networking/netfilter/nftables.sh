@@ -23,7 +23,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 rlJournalStart
-rlPhaseStartSetup
+
+rlPhaseStartSetup "Forward $1"
 	if [ "$1x" == "ipv4x" ];then
 		family=ip
 		rlRun "do_setup ipv4" 0 "ipv4 topo init done..."
@@ -40,8 +41,7 @@ rlPhaseStartSetup
 	fi
 rlPhaseEnd
 
-echo $family
-rlPhaseStartSetup "policy test input/output path"
+rlPhaseStartTest "nftables $family family $1 policy test input/output path"
 	run server nft add table ${family} filter
 	for chain in prerouting input output postrouting; do
 		run server nft add chain ${family} filter ${chain} { type filter hook ${chain} priority 0 \\\; policy accept \\\; }
@@ -58,7 +58,7 @@ rlPhaseStartSetup "policy test input/output path"
 rlPhaseEnd
 
 	# policy test forward path
-rlPhaseStartSetup "policy test forward path"
+rlPhaseStartTest "nftables $family family $1 policy test forward path"
 	run router nft add table ${family} filter
 	for chain in prerouting forward postrouting; do
 		run router nft add chain ${family} filter ${chain} { type filter hook ${chain} priority 0 \\\; policy accept \\\; }
@@ -75,7 +75,7 @@ rlPhaseStartSetup "policy test forward path"
 rlPhaseEnd
 
 	# basic action test input/output path
-rlPhaseStartSetup "basic action test input/output path"
+rlPhaseStartTest "nftables $family family $1 basic action test input/output path"
 	run server nft add table ${family} filter
 	for chain in prerouting input output postrouting; do
 		run server nft add chain ${family} filter ${chain} { type filter hook ${chain} priority 0 \\\; }
@@ -115,7 +115,7 @@ rlPhaseStartSetup "basic action test input/output path"
 rlPhaseEnd
 
 
-rlPhaseStartSetup "basic action test forward path"
+rlPhaseStartTest "nftables $family family $1 basic action test forward path"
 	run router nft add table ${family} filter
 	for chain in prerouting forward postrouting; do
 		run router nft add chain ${family} filter ${chain} { type filter hook ${chain} priority 0 \\\; }
@@ -155,3 +155,9 @@ rlPhaseStartSetup "basic action test forward path"
 	done
 	run router nft delete table ${family} filter
 rlPhaseEnd
+
+rlPhaseStartCleanup
+	rlRun "do_clean"
+rlPhaseEnd
+
+rlJournalEnd
