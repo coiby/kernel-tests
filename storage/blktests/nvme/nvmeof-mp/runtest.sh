@@ -121,7 +121,7 @@ function get_test_cases
 	testcases+=" nvmeof-mp/009"
 	testcases+=" nvmeof-mp/010"
 	testcases+=" nvmeof-mp/011"
-	uname -ri | grep -qE "^5.*s390x|^5.*x86_64|4.18.0.*x86_64|4.18.0.*ppc64le" || testcases+=" nvmeof-mp/012"  #BZ2000074
+	testcases+=" nvmeof-mp/012"
 	echo $testcases
 }
 
