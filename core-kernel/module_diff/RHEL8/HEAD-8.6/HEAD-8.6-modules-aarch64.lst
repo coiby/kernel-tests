@@ -586,6 +586,7 @@ ip_vs_wrr.ko
 ipvtap.ko
 ip_vti.ko
 ipw.ko
+irdma.ko
 ir-usb.ko
 iscsi_boot_sysfs.ko
 iscsi_target_mod.ko

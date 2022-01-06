@@ -794,6 +794,7 @@ ip_vs_wrr.ko
 ipvtap.ko
 ip_vti.ko
 ipw.ko
+irdma.ko
 ir-imon-decoder.ko
 ir-jvc-decoder.ko
 ir-kbd-i2c.ko
