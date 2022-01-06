@@ -242,6 +242,7 @@ compal-laptop.ko
 cordic.ko
 coretemp.ko
 cortina.ko
+counter.ko
 cp210x.ko
 cqhci.ko
 cramfs.ko
@@ -476,6 +477,7 @@ fuse.ko
 g760a.ko
 garmin_gps.ko
 garp.ko
+genet.ko
 geneve.ko
 gfs2.ko
 ghash-clmulni-intel.ko
@@ -772,6 +774,7 @@ intel_pmt.ko
 intel_pmt_telemetry.ko
 intel_powerclamp.ko
 intel_qat.ko
+intel-qep.ko
 intel_rapl_common.ko
 intel_rapl_msr.ko
 intel-rng.ko
