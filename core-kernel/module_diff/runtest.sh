@@ -500,6 +500,10 @@ rlJournalStart
                     if cki_kver_lt "4.18.0-348.3"; then
                         sed -i '/sm4-ce.ko/d;/sm4_generic.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-aarch64.lst
                     fi
+                    if cki_kver_lt "4.18.0-357"; then
+                        sed -i '/i40iw.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-${ARCH}.lst
+                        sed -i '/irdma.ko/d' ${OS}/${Release}/HEAD-8.6-modules-${ARCH}.lst 
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" -o "${K_VER}" = "5.13.0" ]; then
