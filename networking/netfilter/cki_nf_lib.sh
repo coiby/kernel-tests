@@ -316,6 +316,7 @@ do_setup()
 		ip_s=10.167.2.2
 		ip_rc=10.167.1.254
 		ip_rs=10.167.2.254
+		unset nodad
 		N=24
 	else
 		set +x

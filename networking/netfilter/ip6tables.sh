@@ -23,13 +23,13 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 rlJournalStart
-rlPhaseStartSetup
+rlPhaseStartSetup "Forward ipv6"
 	rlRun "do_setup ipv6" 0 "ipv6 topo init done..."
 rlPhaseEnd
 
 # The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
 # https://bugzilla.redhat.com/show_bug.cgi?id=1298879#c2
-rlPhaseStartTest "cki: Basic TARGETS"
+rlPhaseStartTest "ip6tables: Basic TARGETS"
 # Test on server
 for table in filter mangle raw security; do
 	for chain in PREROUTING INPUT OUTPUT POSTROUTING; do
@@ -131,12 +131,7 @@ for table in filter mangle raw security; do
 done
 rlPhaseEnd
 
-rlPhaseStartTest "cki:Plain NAT test"
-	if which conntrack;then
-		unset __NoCheck
-	else
-		__NoCheck=NoCheck
-	fi
+rlPhaseStartTest "ip6tables: Plain NAT test"
 	SCTP=false
 	#DNAT:
 	run server "modprobe sctp && SCTP=true" NoCheck

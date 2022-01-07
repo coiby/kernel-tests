@@ -23,11 +23,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 rlJournalStart
-rlPhaseStartSetup
+rlPhaseStartSetup "Forward ipv4"
 	rlRun "do_setup ipv4" 0 "ipv4 topo init done..."
 rlPhaseEnd
 
-rlPhaseStartTest "cki: Basic TARGETS"
+rlPhaseStartTest "iptables: Basic TARGETS"
 # Test on server side
 for table in filter mangle raw security; do
 	for chain in PREROUTING INPUT OUTPUT POSTROUTING; do
@@ -118,12 +118,7 @@ for table in filter mangle raw security; do
 done
 rlPhaseEnd
 
-rlPhaseStartTest "cki: Plain NAT test"
-	if which conntrack;then
-		unset __NoCheck
-	else
-		__NoCheck=NoCheck
-	fi
+rlPhaseStartTest "iptables: Plain NAT test"
 	SCTP=false
 	#DNAT:
 	run server "modprobe sctp && SCTP=true" NoCheck
