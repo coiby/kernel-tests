@@ -314,6 +314,7 @@ fuse.ko
 g762.ko
 garmin_gps.ko
 garp.ko
+genet.ko
 geneve.ko
 gen_probe.ko
 ghash-ce.ko
@@ -368,6 +369,7 @@ hid-gyration.ko
 hid-holtekff.ko
 hid-holtek-kbd.ko
 hid-holtek-mouse.ko
+hid-hyperv.ko
 hid-icade.ko
 hid-ite.ko
 hid-jabra.ko
@@ -442,7 +444,15 @@ hns_mdio.ko
 hpsa.ko
 hso.ko
 huawei_cdc_ncm.ko
+hv_balloon.ko
+hv_netvsc.ko
+hv_sock.ko
+hv_storvsc.ko
+hv_utils.ko
+hv_vmbus.ko
 hwpoison-inject.ko
+hyperv_drm.ko
+hyperv-keyboard.ko
 i2c-algo-bit.ko
 i2c-algo-pca.ko
 i2c-algo-pcf.ko
@@ -877,6 +887,7 @@ nhpoly1305.ko
 nhpoly1305-neon.ko
 nicpf.ko
 nicvf.ko
+nitro_enclaves.ko
 nlmon.ko
 nls_cp1250.ko
 nls_cp1251.ko
@@ -1241,6 +1252,7 @@ udl.ko
 udp_tunnel.ko
 ueagle-atm.ko
 uhid.ko
+uio_hv_generic.ko
 uio.ko
 uio_pci_generic.ko
 ulpi.ko
@@ -1308,6 +1320,7 @@ vmac.ko
 vmwgfx.ko
 vmw_vsock_virtio_transport_common.ko
 vmw_vsock_virtio_transport.ko
+vmxnet3.ko
 vport-geneve.ko
 vport-gre.ko
 vport-vxlan.ko
