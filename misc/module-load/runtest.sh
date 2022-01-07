@@ -215,6 +215,14 @@ if [ "$release" = "release 6" ] || [ "$release" = "el6" ]; then
         workaround_BZ1371265
 fi
 
+# wireguard: a new module in rhel9, but disable in FIPS mode
+if [ "$release" = "release 9" ] || [ "$release" = "el9" ]; then
+    fips_enabled=`cat /proc/sys/crypto/fips_enabled`
+    if [ "$fips_enabled" = "1" ]; then
+        sed -i "s/wireguard/# \0/" modules.rhel9
+    fi
+fi
+
 # run the test. For each module in the MODLIST file, try to load it, check
 # that it is there, then unload it and check lsmod again. All modules should
 # be loadable/unloadable for each arch without issue.
