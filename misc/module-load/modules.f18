@@ -339,7 +339,6 @@ ib700wdt
 ib_addr
 ib_cm
 ib_core
-ib_ipoib
 ib_iser
 ib_mad
 ibmasr

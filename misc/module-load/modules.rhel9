@@ -157,7 +157,6 @@ hpilo
 iavf
 ib_cm
 ib_core
-ib_ipoib
 ib_iser
 ib_isert
 ib_srp
