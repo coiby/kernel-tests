@@ -37,9 +37,10 @@ function ltp_test_build()
 	fi
 	cp -vf configs/RHELKT1LITE.${TESTVERSION} RHELKT1LITE
 	if [ $? -ne 0 ]; then
-        echo "FAIL: couldn't copy configs/RHELKT1LITE.${TESTVERSION}"
-        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-    fi
+		echo "FAIL: couldn't copy configs/RHELKT1LITE.${TESTVERSION}"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+	fi
 
 
 	build-all

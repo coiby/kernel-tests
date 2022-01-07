@@ -388,6 +388,7 @@ fuse.ko
 g760a.ko
 garmin_gps.ko
 garp.ko
+genet.ko
 geneve.ko
 genwqe_card.ko
 gfs2.ko

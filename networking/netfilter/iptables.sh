@@ -121,7 +121,7 @@ rlPhaseEnd
 rlPhaseStartTest "iptables: Plain NAT test"
 	SCTP=false
 	#DNAT:
-	run server modprobe sctp && SCTP=true
+	run server "modprobe sctp && SCTP=true" NoCheck
 	run server sleep 1
 	run router iptables -t nat -A PREROUTING -i r_c -p tcp -j DNAT --to-destination $ip_s:9999
 	run router iptables -t nat -A PREROUTING -i r_c -p udp -j DNAT --to-destination $ip_s:9999
@@ -133,15 +133,15 @@ rlPhaseStartTest "iptables: Plain NAT test"
 	run client ncat -4 $ip_rc 8888 <<<'abc'
 	# DNAT udp assert pass
 	run client ncat -4 -u $ip_rc 8888 <<<'abc'
-	run router conntrack -L
+	run router conntrack -L $__NoCheck
 	if [[ "$SCTP" == "true" && `which sctp_test` ]];then
 		run router iptables -t nat -A PREROUTING -i r_c -p sctp -j DNAT --to-destination $ip_s:9999
 		run server sctp_test -H 0 -P 9999 -l NoCheck &
 		run server sleep 3
 		# DNAT sctp assert pass
 		run client timeout 5 sctp_test -H $ip_c -P 6013 -h $ip_rc -p 8888 -s -c 1 -x 1 -X 1
-		run router conntrack -L
-		run router conntrack -F
+		run router conntrack -L $__NoCheck
+		run router conntrack -F $__NoCheck
 		run router sleep 2
 		pkill tcpdump
 		pkill sctp_test
@@ -168,7 +168,7 @@ rlPhaseStartTest "iptables: Plain NAT test"
 	run client ncat -4 $ip_s 9999 <<<'abc'
 	# SNAT udp assert pass
 	run client ncat -4 -u $ip_s 9999 <<<'abc'
-	run router conntrack -L
+	run router conntrack -L $__NoCheck
 	if [[ "$SCTP" == "true" && `which sctp_test` ]];then
 		#When snat ip&port, new connection have to wait old conntrack item timeout/disappear
 		run router iptables -t nat -A POSTROUTING -o r_s -p sctp -j SNAT --to-source $ip_rs:1234
@@ -177,8 +177,8 @@ rlPhaseStartTest "iptables: Plain NAT test"
 		run server sleep 3
 		# SNAT sctp assert_pass
 		run client timeout 5 sctp_test -H $ip_c -P 6013 -h $ip_s -p 9999 -s -c 1 -x 1 -X 1
-		run router conntrack -L
-		run router conntrack -F
+		run router conntrack -L $__NoCheck
+		run router conntrack -F $__NoCheck
 		run router sleep 2
 		pkill tcpdump
 		pkill sctp_test

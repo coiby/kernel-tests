@@ -520,6 +520,7 @@ p8022.ko
 paes_s390.ko
 parman.ko
 pcbc.ko
+pci-pf-stub.ko
 pcrypt.ko
 pkcs8_key_parser.ko
 pkey.ko
