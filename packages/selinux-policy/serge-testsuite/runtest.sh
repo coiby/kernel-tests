@@ -42,6 +42,7 @@ fi
 
 function __prepare_failed()
 {
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 1
 }
