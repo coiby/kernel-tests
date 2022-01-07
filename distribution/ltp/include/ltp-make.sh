@@ -48,6 +48,7 @@ download_ltp()
     if [ $? -ne 0 ]; then
         echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
         echo "Aborting current task: Couldn't download LTP source." | tee -a $OUTPUTFILE
+        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
         rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
     fi
 
