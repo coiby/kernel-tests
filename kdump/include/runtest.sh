@@ -295,7 +295,7 @@ FatalError() {
     echo -e "$(GetLogPrefix FATAL)Aborting the recipe set" | tee -a "${OUTPUTFILE}"
 
     error=$((error + 1))
-    rstrnt-report-result"${TEST}" "FAIL" "${error}"
+    rstrnt-report-result "${TEST}" "FAIL" "${error}"
     rstrnt-abort -t recipeset
 }
 
@@ -405,6 +405,7 @@ PrepareKdump()
         InstallPackages kexec-tools
         rpm -q kexec-tools || {
             Log "- Aborting test as kexec-tools couldn't be installed"
+            rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
             rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
             exit 1
         }
