@@ -67,11 +67,13 @@ function fwtsSetup()
     if ! rlCheckRpm libbsd-devel; then
         $YUM install libbsd-devel -y
         if [ $? -ne 0 ]; then
-            # libbsd-devel is available from epel for rhel7
+            # libbsd-devel is available from epel for rhel
             if rlIsRHEL 7; then
                $YUM  -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
             elif rlIsRHEL 8; then
                $YUM  -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+            elif rlIsRHEL 9 || rlIsCentOS 9; then
+               $YUM  -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
             fi
             $YUM install libbsd-devel -y
             rpm -q libbsd-devel
