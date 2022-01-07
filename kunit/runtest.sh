@@ -75,8 +75,9 @@ rlJournalStart
   #install tappy
     pip3 install tap.py
     if [ $? -ne 0 ]; then
-	rlLog "Pip unable to install tap.py, aborting test"
-	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+        rlLog "Pip unable to install tap.py, aborting test"
+        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     fi
 
     # kunit module was added on kernel 4.18.0-279 (BZ#1900119)
@@ -102,6 +103,7 @@ rlJournalStart
 
     if ! rpm -q $module_pkg; then
         echo "FAIL: kernel-modules-internal is not installed, aborting test"
+        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
         rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
         exit 1
     fi
