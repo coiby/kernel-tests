@@ -75,7 +75,6 @@ hidp
 hpilo
 iavf
 ib_core
-ib_ipoib
 ieee802154_6lowpan
 ieee802154_socket
 ifb
