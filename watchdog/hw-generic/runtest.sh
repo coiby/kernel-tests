@@ -70,6 +70,7 @@ efi_restore()
 	efibootmgr -o "$order"
 	if [ $? -ne 0 ]; then
 		echo -e "\nRESTORE Failed! Please investigate to avoid an incorrect boot order" | tee -a ${OUTPUTFILE} ${kmsg}
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 	fi
 	rm $FILE
@@ -81,6 +82,7 @@ efi_set()
 {
 	if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
 		echo "Invalid command: $1" | tee -a ${OUTPUTFILE} ${kmsg}
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 	fi
 
@@ -114,6 +116,7 @@ chk_support() {
 	gcc -o watchdog-simple watchdog-simple.c
 	if [ ! -x watchdog-simple ] ; then
 		echo "Failed to build tests, exiting!" | tee -a ${OUTPUTFILE} ${kmsg}
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 	else
 		echo "Compiled successfully." | tee -a ${OUTPUTFILE} ${kmsg}

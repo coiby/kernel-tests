@@ -34,6 +34,7 @@ rlJournalStart
     pip3 install avocado-framework
     if [ $? -ne 0 ]; then
       rlLog "Unable to install avocado framework, aborting test"
+      rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
       rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     fi
   rlPhaseEnd
@@ -43,6 +44,7 @@ rlJournalStart
     rlRun -l "git clone https://github.com/avocado-framework-tests/avocado-misc-tests.git"
     if [ $? -ne 0 ]; then
       rlLog "Unable to clone avocado-framework-tests, aborting test"
+      rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
       rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     fi
   rlPhaseEnd
