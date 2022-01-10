@@ -109,6 +109,8 @@ rlJournalStart
       modules_to_load+=" bz2022690.cil"
       rlRun "make -f /usr/share/selinux/devel/Makefile bz2031356.pp" 0 "Building SELinux module for bz2031356"
       modules_to_load+=" bz2031356.pp"
+      echo "(allow iptables_t container_file_t (dir (ioctl)))" > bz2031022.cil
+      modules_to_load+=" bz2031022.cil"
     fi
 
     if [ -n "$modules_to_load" ]; then
