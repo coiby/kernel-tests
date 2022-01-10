@@ -140,6 +140,7 @@ function get_test_cases_tcp
 bash $CDIR/../include/build.sh
 if (( $? != 0 )); then
 	rlLog "Abort test because build env setup failed"
+	rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 fi
 

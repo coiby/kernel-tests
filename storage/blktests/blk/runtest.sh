@@ -256,6 +256,7 @@ fi
 
 bash $CDIR/build.sh
 if (( $? != 0 )); then
+	rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	exit 1
 fi

@@ -45,6 +45,7 @@ function nvdimm_test_module_setup
 	rlAssertExists "$rpmfile"
 	if (($? != 0)); then
 		rlLog "Abort test as kernel source rpm doesn't exists"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 
@@ -54,6 +55,7 @@ function nvdimm_test_module_setup
 	rlAssertExists "$test_srcdir"
 	if (($? != 0)); then
 		rlLog "Abort test as kernel source doesn't exists after rpmbuild -bp"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 
@@ -61,12 +63,14 @@ function nvdimm_test_module_setup
 	rlRun "make -C /lib/modules/$(uname -r)/build M=$PWD"
 	if (( $? != 0 )); then
 		rlLog "Abort test as make under test dir failed"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 		exit 1
 	fi
 	rlRun "make -C /lib/modules/$(uname -r)/build M=$PWD modules_install"
 	if (( $? != 0 )); then
 		rlLog "Abort test as make modules_install under test dir failed"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 	rlRun "popd"
@@ -118,6 +122,7 @@ function ndctl_setup
 	rlRun "./configure CFLAGS='-g -O2' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib64 --disable-docs --enable-test"
 	if (( $? != 0 )); then
 		rlLog "Abort test as ndctl setup failed"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 	rlRun "popd"
