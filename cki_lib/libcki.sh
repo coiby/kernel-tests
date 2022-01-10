@@ -337,6 +337,8 @@ function cki_is_baremetal()
     # any guest system, e.g. ppc64 guests
     hostname | grep -q guest && return 1
 
+    hostname | grep -q "\-vm\-" && return 1
+
     # any ppc lpar
     (uname -m | grep -q ppc) && (hostname | grep -q "\-lp") && return 1
 
