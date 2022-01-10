@@ -375,6 +375,15 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
     cki_abort_recipe "Failed installing kernel ${KVER}" WARN
   fi
 
+  # force panic on oops
+  # oops can cause system to crash, but restraint fails to detect it
+  # causing in some cases the task to abort by external watchdog
+  # and pipeline to handle this as infra failure.
+  # Hopefully, forcing the panic will help to handle this as test failure.
+  # https://gitlab.com/cki-project/upt/-/issues/49
+  echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf
+  cki_print_success "Set panic_on_oops to 1"
+
   cki_print_success "Installed kernel ${KVER}, rebooting (this may take a while)"
   cat << EOF
 *******************************************************************************
@@ -466,6 +475,8 @@ else
   # Save configuration used to build the kernel
   cat /boot/config-${ckver} > kernel_${ckver}_config.log
   rstrnt-report-log -l kernel_${ckver}_config.log
+
+  sysctl kernel.panic_on_oops
 
   # We have the right kernel. Do we have any call traces?
   dmesg | grep -qi 'Call Trace:'
