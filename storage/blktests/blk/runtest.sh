@@ -247,7 +247,7 @@ function get_test_cases_scsi
 	echo $testcases
 }
 
-if cki_is_kernel_debug; then
+if cki_has_kernel_debug_flags; then
     # the test is not supported on debug kernels due to performance issues
     # https://gitlab.com/cki-project/kernel-tests/-/issues/657
     rstrnt-report-result "$TNAME" SKIP
