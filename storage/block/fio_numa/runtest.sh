@@ -84,11 +84,11 @@ function compare_min_max()
 	done
 	rlLog "min: $min, max:$max"
 
-	if [ `echo "$min*1.1 > $max" |bc` -eq 1 ] ; then
-		rlPass "Performance comparison: min:$min * 1.1 > max:$max"
+	if [ `echo "$min*1.15 > $max" |bc` -eq 1 ] ; then
+		rlPass "Performance comparison: min:$min * 1.15 > max:$max"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" PASS 0
 	else
-		rlFail "Performance comparison: min:$min * 1.1 < max:$max"
+		rlFail "Performance comparison: min:$min * 1.15 < max:$max"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL 0
 	fi
 }
