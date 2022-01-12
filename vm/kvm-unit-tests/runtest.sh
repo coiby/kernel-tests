@@ -29,6 +29,8 @@ REPOS=("default")
 SETUPS=("setupDF")
 CLEANUPS=("cleanupDF")
 ACCELS=()
+MAJOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $1}')
+MINOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $2}')
 
 source /usr/share/beakerlib/beakerlib.sh
 
@@ -67,13 +69,13 @@ function checkVirtSupport
 {
     typeset hwpf=${1?"*** what hardware-platform?, e.g. x86_64"}
 
-    if [[ $OSVERSION == "RHEL8" ]] && dnf repolist --all | grep -q rhel8-advvirt; then
+    if [[ $OSVERSION == "RHEL8" ]] && [[ $MINOR -lt 6 ]] && dnf repolist --all | grep -q rhel8-advvirt; then
         REPOS+=("rhel8-advvirt")
         SETUPS+=("setupAV")
         CLEANUPS+=("cleanupAV")
     fi
 
-    if [[ $OSVERSION == "RHEL8" ]] && dnf repolist --all | grep -q virt-weeklyrebase; then
+    if [[ $OSVERSION == "RHEL9" ]] && dnf repolist --all | grep -q virt-weeklyrebase; then
         REPOS+=("virt-weeklyrebase")
         SETUPS+=("setupWR")
         CLEANUPS+=("cleanupWR")
@@ -111,7 +113,15 @@ function checkVirtSupport
         return $?
     elif [[ $hwpf == "s390x" ]]; then
         ACCELS+=("kvm")
-        CPUTYPE="S390X"
+        if (egrep -q 'machine = 2964' /proc/cpuinfo); then
+            CPUTYPE="z13"
+        elif (egrep -q 'machine = 3907' /proc/cpuinfo); then
+            CPUTYPE="z14"
+        elif (egrep -q 'machine = 8561' /proc/cpuinfo); then
+            CPUTYPE="z15"
+        else
+           CPUTYPE="S390X"
+	fi
         grep -q 'features.*sie' /proc/cpuinfo
         return $?
     else
@@ -135,15 +145,24 @@ function disableTests
     # Disable tests for RHEL8 Kernel (4.18.X)
     if [[ $OSVERSION == "RHEL8" ]]; then
         # Disabled x86_64 tests for Intel & AMD machines
-        # Disabled x86_64 tests for pc qemu machine type
-        if [[ $hwpf == "x86_64" ]] && [[ $MACHINE == "pc" ]]; then
+        if [[ $hwpf == "x86_64" ]]; then
             # Disable test hyperv_synic, hyperv_connections, hyperv_stimer
             # due to https://bugzilla.redhat.com/show_bug.cgi?id=1668573
             mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_synic")
             mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_connections")
             mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_stimer")
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu_lbr")
+            if [[ $CPUTYPE == "AMD" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmware_backdoors")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
+            fi
+            if [[ $CPUTYPE == "INTEL" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu_emulation")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
+            fi
         fi
     fi
+
 }
 
 function setupRepo
@@ -167,6 +186,8 @@ function setup
 
     if grep -q "Red Hat Enterprise Linux release 8." /etc/redhat-release; then
         OSVERSION="RHEL8"
+    elif grep -q "Red Hat Enterprise Linux release 9." /etc/redhat-release; then
+        OSVERSION="RHEL9"
     elif [ ! -z "$CKI_SELFTESTS_URL" ]; then
         OSVERSION="UPSTREAM"
     else
@@ -309,7 +330,7 @@ function setupAV
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Installing qemu-kvm version from given repository"
     dnf remove -y qemu-* > /dev/null 2>&1
     dnf module -y reset virt > /dev/null 2>&1
-    dnf module -y --enablerepo=rhel8-advvirt enable virt:8.3  > /dev/null 2>&1
+    dnf module -y --enablerepo=rhel8-advvirt enable virt:av  > /dev/null 2>&1
     dnf install -y --enablerepo=rhel8-advvirt qemu-kvm > /dev/null 2>&1
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
 }
@@ -326,6 +347,8 @@ function setupWR
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Installing qemu-kvm version from given repository"
     dnf remove -y qemu-* > /dev/null 2>&1
+    dnf module -y reset virt > /dev/null 2>&1
+    dnf module -y disable virt > /dev/null 2>&1
     dnf install -y --enablerepo=virt-weeklyrebase qemu-kvm > /dev/null 2>&1
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
 }
@@ -334,6 +357,8 @@ function cleanupWR
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Removing qemu-kvm version installed from repository"
     dnf remove -y qemu-* > /dev/null 2>&1
+    dnf module -y reset virt > /dev/null 2>&1
+    dnf module -y enable virt > /dev/null 2>&1
 }
 
 function runtest
@@ -346,13 +371,12 @@ function runtest
     rm -rf $LOGDIR
     mkdir $LOGDIR
 
-    for mach in ${MACHINES[*]}; do
-        export MACHINE=$mach
+    i=0
+    for repo in ${REPOS[*]}; do
+        ${SETUPS[$i]}
 
-
-        i=0
-        for repo in ${REPOS[*]}; do
-            ${SETUPS[$i]}
+        for mach in ${MACHINES[*]}; do
+            export MACHINE=$mach
 
             j=0
             for accel in ${ACCELS[*]}; do
@@ -362,15 +386,15 @@ function runtest
                 # Prepare lists of tests to run
                 getTests
                 disableTests
-                rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Running tests for ACCEL: $accel"
+                rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo][$accel] Running tests for ACCEL: $accel"
                 # Run tests
-                for test in ${ALL_TESTS[*]}; do rlRun "yes | $BINDIR/$test > $LOGDIR/${j}_${mach}_${repo}_$test.log 2>&1" 0,2,77; done
+                for test in ${ALL_TESTS[*]}; do rlRun "yes | $BINDIR/$test > $LOGDIR/${j}_${mach}_${repo}_${accel}_$test.log 2>&1" 0,2,77; done
                 j=$((j+1))
             done
 
             ${CLEANUPS[$i]}
-            i=$((i+1))
         done
+        i=$((i+1))
     done
 
     cd $LOGDIR

@@ -93,7 +93,15 @@ function checkVirtSupport
         grep -q 'platform.*PowerNV' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "s390x" ]]; then
-        CPUTYPE="S390X"
+        if (egrep -q 'machine = 2964' /proc/cpuinfo); then
+            CPUTYPE="z13"
+        elif (egrep -q 'machine = 3907' /proc/cpuinfo); then
+            CPUTYPE="z14"
+        elif (egrep -q 'machine = 8561' /proc/cpuinfo); then
+            CPUTYPE="z15"
+        else
+           CPUTYPE="S390X"
+	fi
         grep -q 'features.*sie' /proc/cpuinfo
         return $?
     else
@@ -119,9 +127,14 @@ function disableTests
 
         # Disabled s390x tests due to bugs
         if [[ $hwpf == "s390x" ]]; then
-            # Disable test dirty_log_test
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1741201
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "dirty_log_test")
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "rseq_test")
+        fi
+        if [[ $hwpf == "aarch64" ]]; then
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "rseq_test")
+        fi
+        if [[ $hwpf == "x86_64" ]]; then
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "rseq_test")
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "access_tracking_perf_test")
         fi
     fi
 
@@ -136,6 +149,8 @@ function setup
 
     if grep -q "Red Hat Enterprise Linux release 8." /etc/redhat-release; then
         OSVERSION="RHEL8"
+    elif grep -q "Red Hat Enterprise Linux release 9." /etc/redhat-release; then
+        OSVERSION="RHEL9"
     elif [ ! -z "$CKI_SELFTESTS_URL" ]; then
         OSVERSION="UPSTREAM"
     else
