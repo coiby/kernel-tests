@@ -111,6 +111,8 @@ rlJournalStart
       modules_to_load+=" bz2031356.pp"
       echo "(allow iptables_t container_file_t (dir (ioctl)))" > bz2031022.cil
       modules_to_load+=" bz2031022.cil"
+      echo "(allow systemd_logind_t session_dbusd_tmp_t (sock_file (unlink)))" >> bz2039671.cil
+      modules_to_load+=" bz2039671.cil"
     fi
 
     if [ -n "$modules_to_load" ]; then
