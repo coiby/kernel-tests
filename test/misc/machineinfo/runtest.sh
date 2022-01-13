@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2014 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2014 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -22,14 +22,31 @@ set +x
 TEST="test/misc/machineinfo"
 MDESC=/tmp/machinedesc.log
 DATAFILE=/tmp/lshw.log
+DFFILE=/tmp/df.log
+MOUNTFILE=/tmp/mount.log
+INSTALLEDPKGSFILE=/tmp/installedpkgs.log
 
 echo "arch: $(uname -m)" > ${MDESC}
 lshw -class cpu -short >> ${MDESC}
 lshw -json -sanitize -notime > ${DATAFILE}
 
+echo "df -h"
+df -h | tee ${DFFILE}
+
+echo "mount"
+mount | tee ${MOUNTFILE}
+
+rpm -qa | sort > ${INSTALLEDPKGSFILE}
+
 rstrnt-report-log -l ${MDESC}
 rstrnt-report-log -l ${DATAFILE}
+rstrnt-report-log -l ${DFFILE}
+rstrnt-report-log -l ${MOUNTFILE}
+rstrnt-report-log -l ${INSTALLEDPKGSFILE}
 rstrnt-report-result $TEST PASS 0
 
+rm ${DFFILE}
+rm ${MOUNTFILE}
+rm ${INSTALLEDPKGSFILE}
 rm ${DATAFILE}
 exit 0
