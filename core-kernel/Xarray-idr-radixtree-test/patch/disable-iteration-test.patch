@@ -1,0 +1,15 @@
+diff --git a/tools/testing/radix-tree/main.c b/tools/testing/radix-tree/main.c
+index f2cbc8e5b97..dc383a474fd 100644
+--- a/tools/testing/radix-tree/main.c
++++ b/tools/testing/radix-tree/main.c
+@@ -309,8 +309,8 @@ int main(int argc, char **argv)
+ 	regression2_test();
+ 	regression3_test();
+ 	regression4_test();
+-	iteration_test(0, 10 + 90 * long_run);
+-	iteration_test(7, 10 + 90 * long_run);
++//	iteration_test(0, 10 + 90 * long_run);
++//	iteration_test(7, 10 + 90 * long_run);
+ 	iteration_test2(10 + 90 * long_run);
+ 	single_thread_tests(long_run);
+ 
