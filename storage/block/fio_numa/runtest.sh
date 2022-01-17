@@ -97,15 +97,16 @@ function runtest
 {
 	local node=0
 	local nodel=1
-	nodes_num=$(numactl -H | grep available | awk '{print $2}')
-	if [ $nodes_num -eq 1 ]; then
+	avail_num=$(numactl -H | grep available | awk '{print $2}')
+	nodes_num=$(numactl -H | grep -E "node\ [0-9]\ cpus:\ [0-9]" | wc -l)
+	rlRun "numactl -H"
+	if ((nodes_num == 1 || avail_num == 1)); then
 		rstrnt-report-result "There is only one node on this server" SKIP 0
 		exit
 	fi
 	rlLog "There are $nodes_num nodes on this server:"
-	rlRun "numactl -H"
 	while [ $node -lt $nodes_num ]; do
-		eval "NODE_${node}_CPU=$(numactl -H | grep "node.*cpus" | head -$nodel | tail -1 | awk '{print $4}')"
+		eval "NODE_${node}_CPU=$(numactl -H | grep -E "node\ [0-9]\ cpus:\ [0-9]" | head -$nodel | tail -1 | awk '{print $4}')"
 		((node++))
 		((nodel++))
 	done
