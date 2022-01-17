@@ -110,7 +110,7 @@ function get_symbol_addr_snapshot()
 			test -f ${f}.old && echo -e "${f}.old: $(cat ${f}.old)"
 		done
 
-		! test -s page_offset_base && rlDie "failed to get symbol addr"
+		! test -s page_offset_base && cki_abort_task "failed to get symbol addr"
 	;;
 	esac
 }
@@ -224,7 +224,7 @@ function x86_kaslr_test()
 	local i=0
 	if [ "$current_state" = "after_r_kaslr_compare" ]; then
 		rlReport "reboot" PASS
-		rlAssertNotGrep nokaslr /proc/cmdline || rlDie "unexpedted test state!"
+		rlAssertNotGrep nokaslr /proc/cmdline || cki_abort_task "unexpedted test state!"
 
 		if test -s SETUP_FINISH; then
 			local extra_reboots="$(cat SETUP_FINISH)"
@@ -257,17 +257,17 @@ function x86_kaslr_test()
 		# https://github.com/beaker-project/restraint/issues/219
 		exit 0
 	elif [ "$current_state" = "after_r_kaslr_cleanup" ]; then
-		rlAssertGrep nokaslr /proc/cmdline || rlDie "unexpedted test state!"
+		rlAssertGrep nokaslr /proc/cmdline || cki_abort_task "unexpedted test state!"
 	elif [ "$current_state" = "after_r_kaslr_snapshot" ]; then
 		rlReport "reboot" PASS
-		rlAssertNotGrep nokaslr /proc/cmdline || rlDie "unexpedted test state!"
+		rlAssertNotGrep nokaslr /proc/cmdline || cki_abort_task "unexpedted test state!"
 		rlPhaseEnd
 		rstrnt-reboot
 		# Make sure the script doesn't continue if rstrnt-reboot get's killed
 		# https://github.com/beaker-project/restraint/issues/219
 		exit 0
 	else
-		rlAssertNotGrep nokaslr /proc/cmdline || rlDie "unexpedted test state!"
+		rlAssertNotGrep nokaslr /proc/cmdline || cki_abort_task "unexpedted test state!"
 		slub_freelist_random 1 $i
 		rlPhaseEnd
 		rstrnt-reboot
