@@ -92,8 +92,8 @@ rlJournalStart
             cki_abort_task "Failed to git clone $GIT_URL."
         fi
 
-        rlRun "pushd audit-testsuite" 0 || rlDie
-        rlRun "git checkout $GIT_BRANCH" 0 || rlDie
+        rlRun "pushd audit-testsuite" 0 || cki_abort_task "Failed to pushd audit-testsuite"
+        rlRun "git checkout $GIT_BRANCH" 0 || cki_abort_task "Failed checkout $GIT_BRANCH"
 
         # Apply workarounds for beaker environment.
         rlRun "unset DISTRO" 0
