@@ -32,18 +32,10 @@ rlJournalStart
       rlRun "make -f /usr/share/selinux/devel/Makefile avahi-daemon.pp" 0 "Building avahi-daemon SELinux module"
       modules_to_load+=" avahi-daemon.pp"
 
-      # Bug 1929332 - [RHEL-9] avc: denied { integrity } for pid=11514 comm="ioperm01"  and comm="grep"
-      rlRun "make -f /usr/share/selinux/devel/Makefile ioperm01.pp" 0 "Building ioperm01 SELinux module"
-      modules_to_load+=" ioperm01.pp"
-
       # Bug 1932436 - avc denied related to sssd and systemd-hostname
       rlRun "make -f /usr/share/selinux/devel/Makefile sssd-mod.pp" 0 "Building sssd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile systemd-hostnam-mod.pp" 0 "Building systemd-hostname SELinux module"
       modules_to_load+=" sssd-mod.pp systemd-hostnam-mod.pp"
-      # Bug 1933680 - avc: denied { confidentiality } for pid=814 comm="modprobe" lockdown_reason="use of tracefs"
-      rlRun "make -f /usr/share/selinux/devel/Makefile modprobe-mod.pp" 0 "Building modprobe SELinux module"
-      modules_to_load+=" modprobe-mod.pp"
-
       echo "(allow domain dma_device_t (dir (getattr search open read)))" > bz1969323.cil
       modules_to_load+=" bz1969323.cil"
       echo "(allow domain init_t (dir (getattr search open read)))" > bz1965412.cil
@@ -67,22 +59,10 @@ rlJournalStart
           rlRun "make -f /usr/share/selinux/devel/Makefile avahi-daemon.pp" 0 "Building avahi-daemon SELinux module"
           modules_to_load+=" avahi-daemon.pp"
       fi
-      # Fedora 33 doesn't have lockdown class
-      if seinfo --class lockdown -x  | grep -q integrity ; then
-          # Bug 1929332 - [RHEL-9] avc: denied { integrity } for pid=11514 comm="ioperm01"  and comm="grep"
-          rlRun "make -f /usr/share/selinux/devel/Makefile ioperm01.pp" 0 "Building ioperm01 SELinux module"
-          modules_to_load+=" ioperm01.pp"
-      fi
       # Bug 1932436 - avc denied related to sssd and systemd-hostname
       rlRun "make -f /usr/share/selinux/devel/Makefile sssd-mod.pp" 0 "Building sssd SELinux module"
       rlRun "make -f /usr/share/selinux/devel/Makefile systemd-hostnam-mod.pp" 0 "Building systemd-hostname SELinux module"
       modules_to_load+=" sssd-mod.pp systemd-hostnam-mod.pp"
-      # Fedora 33 doesn't have lockdown class
-      if seinfo --class lockdown -x  | grep -q confidentiality ; then
-          # Bug 1933680 - avc: denied { confidentiality } for pid=814 comm="modprobe" lockdown_reason="use of tracefs"
-          rlRun "make -f /usr/share/selinux/devel/Makefile modprobe-mod.pp" 0 "Building modprobe SELinux module"
-          modules_to_load+=" modprobe-mod.pp"
-      fi
       # Fedora34 BZ#1965743 - systemd was denied reading and searching /dev/dma_heap
       if seinfo --type | grep dma_device_t ; then
           echo "(allow domain dma_device_t (dir (getattr search open read)))" > bz1965743.cil
