@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #--------------------------------------------------------------------------------
-# Copyright (c) 2019 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2019 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -33,7 +33,7 @@ rlJournalStart
         if [ $? -ne 0 ]; then
             cki_abort_task "Couldn't download dacapo-9.12-MR1-bach.jar"
         fi
-    rlRun -l "java -jar dacapo-9.12-MR1-bach.jar eclipse jython lusearch-fix"
+    rlRun -l "/usr/lib/jvm/jre-1.8.0-openjdk/bin/java -jar dacapo-9.12-MR1-bach.jar eclipse jython lusearch-fix"
   rlPhaseEnd
 
 rlJournalEnd

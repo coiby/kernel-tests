@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=maven;java;wget
+dependencies=maven;java-1.8.0-openjdk;wget
 repoRequires=cki_lib
