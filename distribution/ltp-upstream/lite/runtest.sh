@@ -186,6 +186,17 @@ function runtest_tweaker()
 		sed -i 's/^dio/#&/' $runtest
 		sed -i 's/^#\(dio0[1-6]\)/\1/' $runtest
 	fi
+
+	#
+	# reduce the number of dio tests on x86_64 if the available memory size
+	# of SUT <= 4G. For defails, please refer to:
+	#     https://gitlab.com/cki-project/kernel-tests/-/issues/624
+	#
+	if [ $(uname -m) == "x86_64" ] &&
+	   [ $MEM_AVAILABLE -le 4096 ]; then
+		sed -i 's/^dio/#&/' $runtest
+		sed -i 's/^#\(dio0[1-6]\)/\1/' $runtest
+	fi
 }
 
 function knownissue_handle()
