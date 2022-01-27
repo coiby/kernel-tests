@@ -1,0 +1,38 @@
+----------------------- pi_tests README ---------------------------
+DESCRIPTION
+
+The pi_stress program is a stress test that is intended to exercise
+kernel and C library code paths for POSIX mutexes using the Priority
+Inheritance attribute (PTHREAD_PRIO_INHERIT).
+
+The program consists of an admin thread (main), a reporter thread and
+some number of groups of three threads called "inversion
+groups". These thread groups are called that because they cause a
+condition called Priority Inversion, where a high priority thread is
+blocked due to a low-priority thread holding a shared
+resource. Priority inversion with no contravening logic is a deadlock
+condition.
+
+Each inversion group consists of three threads:
+
+1. A high-priority thread
+2. A medium-priority thread
+3. A low-priority thread
+
+The threads run through a state machine designed to guarantee that a
+low-priority thread holds a mutex while a medium priority thread runs
+(keeping the low-priority thread from releasing the mutex). The
+high-priority thread attempts to acquire the mutex and is blocked
+because of the low-priority thread holding it. If priority inheritence
+is working, the low-priority thread will receive a priority boost
+(will inherit the high-priority thread's priority) and will then run
+and release the mutex, averting a deadlock.
+
+On a multi-processor system, the admin and reporter threads are run
+one one processor while the inversion groups are run on another
+processor.
+
+
+STEPS TO RUN
+
+./runtest.sh
