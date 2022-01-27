@@ -119,6 +119,11 @@ rlJournalStart
         exit 1
     fi
 
+    # CKI kernel set panic_on_oops to 1 by default
+    # Disable panic on oops as some kunit tests might trigger oops intentionally
+    panic_on_oops=$(sysctl kernel.panic_on_oops | awk '{print$3}')
+    rlRun "sysctl kernel.panic_on_oops=0"
+
   rlPhaseEnd
 
 #-------------------- Run Tests -----------------
@@ -156,6 +161,8 @@ rlJournalStart
 
 #-------------------- Clean Up ------------------
   rlPhaseStartCleanup
+  # Restore panic on oops value
+  rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
   #remove installed modules and kunit framework
   for TEST in ${test_arr[*]}
   do
