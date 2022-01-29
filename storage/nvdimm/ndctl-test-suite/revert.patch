@@ -1,0 +1,42 @@
+From ca5e7f7efff0426a122ea4ed9888793bdbc07f02 Mon Sep 17 00:00:00 2001
+From: root <root@storageqe-62.rhts.eng.pek2.redhat.com>
+Date: Sat, 29 Jan 2022 05:40:34 -0500
+Subject: [PATCH] Revert "tools/test/nvdimm: Fix out of tree build"
+
+This reverts commit 1f776799628139d0da47e710ad86eb58d987ff66.
+---
+ tools/testing/nvdimm/Kbuild      | 4 ++--
+ tools/testing/nvdimm/test/Kbuild | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tools/testing/nvdimm/Kbuild b/tools/testing/nvdimm/Kbuild
+index c57d9e9d4480..09d43a45ca15 100644
+--- a/tools/testing/nvdimm/Kbuild
++++ b/tools/testing/nvdimm/Kbuild
+@@ -21,8 +21,8 @@ DRIVERS := ../../../drivers
+ NVDIMM_SRC := $(DRIVERS)/nvdimm
+ ACPI_SRC := $(DRIVERS)/acpi/nfit
+ DAX_SRC := $(DRIVERS)/dax
+-ccflags-y := -I$(srctree)/drivers/nvdimm/
+-ccflags-y += -I$(srctree)/drivers/acpi/nfit/
++ccflags-y := -I$(src)/$(NVDIMM_SRC)/
++ccflags-y += -I$(src)/$(ACPI_SRC)/
+ 
+ obj-$(CONFIG_LIBNVDIMM) += libnvdimm.o
+ obj-$(CONFIG_BLK_DEV_PMEM) += nd_pmem.o
+diff --git a/tools/testing/nvdimm/test/Kbuild b/tools/testing/nvdimm/test/Kbuild
+index 197bcb2b7f35..ccae79d6292a 100644
+--- a/tools/testing/nvdimm/test/Kbuild
++++ b/tools/testing/nvdimm/test/Kbuild
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+-ccflags-y := -I$(srctree)/drivers/nvdimm/
+-ccflags-y += -I$(srctree)/drivers/acpi/nfit/
++ccflags-y := -I$(src)/../../../../drivers/nvdimm/
++ccflags-y += -I$(src)/../../../../drivers/acpi/nfit/
+ 
+ obj-m += nfit_test.o
+ obj-m += nfit_test_iomap.o
+-- 
+2.31.1
+
