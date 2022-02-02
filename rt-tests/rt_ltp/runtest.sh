@@ -7,9 +7,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 # Source rt common functions
 . ../include/runtest.sh  || exit 1
-. ../include/ltp-make.sh || exit 1
+. ../../distribution/ltp/include/ltp-make.sh || exit 1
 
 TEST="rt-tests/rt_ltp"
 
@@ -36,9 +37,17 @@ function runtest()
         rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
         exit 1
     }
+
+    # Downoad and setup ltp
     download_ltp
+
+    pushd "ltp-full-$ltp_version"
+    ./configure
+
+    pushd "testcases/realtime"
+    ./configure
+
     # default test-arguments: func, stress, perf, list
-    pushd "ltp-full-$ltp_version/testcases/realtime"
     func_list=$(./run.sh -t list | grep func)
     while IFS= read -r case; do
         echo "running $case"
