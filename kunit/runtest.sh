@@ -67,7 +67,8 @@ test_arr=(kunit-test ext4-inode-test list-test sysctl-test mptcp_crypto_test \
 	mptcp_token_test bitfield_kunit cmdline_kunit property-entry-test \
 	qos-test resource_kunit soc-topology-test string-stream-test \
 	test_linear_ranges test_bits test_kasan time_test fat_test lib_test\
-	rational-test test_list_sort slub_kunit)
+	rational-test test_list_sort slub_kunit memcpy_kunit dev_addr_lists_test\
+	kfence_test test_hash)
 
 rlJournalStart
 #-------------------- Setup ---------------------
