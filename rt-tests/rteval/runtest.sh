@@ -41,15 +41,17 @@ function MeasureLatency()
                          grep 'Std.dev:' | awk -F ':' '{print $2}' | xargs)
 
     echo "rteval max/stddev lat was: ${max_lat} / ${stddev_lat}" | \
-      tee -a $OUTPUTFILE
+        tee -a $OUTPUTFILE
 
     if ! (( $(echo "${max_lat%us} < $MAXLAT" | bc -l) )); then
-        echo "FAIL: maximum latency of $max_lat exceeds ${MAXLAT}us"
+        echo "FAIL: maximum latency of $max_lat exceeds ${MAXLAT}us" | \
+            tee -a $OUTPUTFILE
         result_r="FAIL"
     fi
 
     if ! (( $(echo "${stddev_lat%us} < $STDDEVLAT" | bc -l) )); then
-        echo "FAIL: std.dev latency of $stddev_lat exceeds ${STDDEVLAT}us"
+        echo "FAIL: std.dev latency of $stddev_lat exceeds ${STDDEVLAT}us" | \
+            tee -a $OUTPUTFILE
         result_r="FAIL"
     fi
 }
@@ -61,12 +63,13 @@ function RunTest ()
 
     echo "Test Start Time: $(date)" | tee -a $OUTPUTFILE
 
-    echo "-- INFO -- Default run time: $DURATION seconds"
+    echo "-- INFO -- Default run time: $DURATION seconds" | tee -a $OUTPUTFILE
 
-    echo "-- INFO -- Mounting debugfs to/sys/kernel/debug"
+    echo "-- INFO -- Mounting debugfs to/sys/kernel/debug" | tee -a $OUTPUTFILE
     mount -t debugfs none /sys/kernel/debug
 
-    echo "-- INFO -- Using command line: rteval --duration=$DURATION"
+    echo "-- INFO -- Using command line: rteval --duration=$DURATION" | \
+        tee -a $OUTPUTFILE
 
     # Lets rock'n'roll
     rteval --duration=$DURATION | tee -a $OUTPUTFILE
@@ -74,7 +77,7 @@ function RunTest ()
 
     find . -maxdepth 1 -name "rteval-????????-*.tar.bz2" -print |
         while IFS= read -r rep; do
-            echo "-- INFO -- Attaching report: $rep"
+            echo "-- INFO -- Attaching report: $rep" | tee -a $OUTPUTFILE
             rstrnt-report-log -l $rep
         done
 
