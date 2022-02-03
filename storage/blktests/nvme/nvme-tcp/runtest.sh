@@ -51,6 +51,7 @@ function get_test_result
 	typeset result_file=$(find $result_dir -type f | egrep "$test_case$")
 	typeset out_bad_file="${result_file}.out.bad"
 	typeset out_full_file="${result_file}.full"
+	typeset out_dmesg_file="${result_file}.dmesg"
 	typeset result="UNTESTED"
 	if [[ -n $result_file ]]; then
 		typeset res=$(grep "^status" $result_file)
@@ -60,6 +61,7 @@ function get_test_result
 			result="FAIL"
 			[ -f $out_bad_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
 			[ -f $out_full_file ] && cki_upload_log_file "$out_full_file" >/dev/null
+			[ -f $out_dmesg_file ] && cki_upload_log_file "$out_dmesg_file" >/dev/null
 		elif [[ $res == *"not run" ]]; then
 			result="SKIP"
 		else
