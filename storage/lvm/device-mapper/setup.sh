@@ -95,7 +95,7 @@ function install_ruby
 
     source /etc/profile.d/rvm.sh || return 1
 
-    if ! rvm install 2.5.3; then
+    if ! rvm install 2.7.5; then
         # Try to upload the installation logs
         rvm_logs=$(ls /usr/local/rvm/log/*/*.log)
         for log in $rvm_logs; do
