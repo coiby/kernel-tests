@@ -17,6 +17,9 @@
 # Boston, MA 02110-1301, USA.
 #
 
+FILE=$(readlink -f $BASH_SOURCE)
+CDIR=$(dirname $FILE)
+
 function get_user_home_dir
 {
     cki_debug
@@ -53,14 +56,14 @@ function install_dt
     cki_debug
 
     typeset tarball=$(basename $DT_TARBALL)
-    wget -O $CDIR/$tarball $DT_TARBALL || return 1
-    pushd $(pwd -P)
-    cd $CDIR
+    wget -O /tmp/$tarball $DT_TARBALL || return 1
+    pushd /tmp
     unzip $tarball
-    cd $CDIR/dt-master/linux-rhel7x64
+    pushd dt-master/linux-rhel7x64
     make -f ../Makefile.linux VPATH=.. OS=linux || return 1
     install -m 755 -d /usr/local/bin || return 1
     install -m 755 dt /usr/local/bin || return 1
+    popd
     popd
     return 0
 }
@@ -69,15 +72,14 @@ BLKTRACE_TARBALL="https://git.kernel.dk/cgit/blktrace/snapshot/blktrace-1.2.0.ta
 function install_blktrace
 {
     cki_debug
-
     typeset tarball=$(basename $BLKTRACE_TARBALL)
-    wget -O $CDIR/$tarball $BLKTRACE_TARBALL || return 1
-    pushd $(pwd -P)
-    cd $CDIR
+    wget -O /tmp/$tarball $BLKTRACE_TARBALL || return 1
+    pushd /tmp
     tar zxf $tarball
-    cd $CDIR/${tarball%.tar.gz}
+    pushd /tmp/${tarball%.tar.gz}
     make || return 1
     make install || return 1
+    popd
     popd
     return 0
 }
@@ -86,14 +88,13 @@ function install_ruby
 {
     cki_debug
 
-    cki_run_cmd_pos "curl -L https://get.rvm.io | bash" || return 1
-    cki_run_cmd_pos "usermod -a -G rvm $(id -un)" || return 1
-    cki_run_cmd_pos "umask u=rwx,g=rwx,o=rx" || return 1
 
-    # XXX: Never use cki_run_cmd_xxx() wrapper, or it hangs
+    curl -L https://get.rvm.io | bash || return 1
+    usermod -a -G rvm $(id -un) || return 1
+    umask u=rwx,g=rwx,o=rx || return 1
+
     source /etc/profile.d/rvm.sh || return 1
 
-    # XXX: Again, never use cki_run_cmd_xxx() wrapper, or it hangs
     if ! rvm install 2.5.3; then
         # Try to upload the installation logs
         rvm_logs=$(ls /usr/local/rvm/log/*/*.log)
@@ -150,22 +151,28 @@ function ts_config_setup
     mnt_data=/mnt/dmtest/data
 
     if ! df | grep ${mnt_metadata} ; then
-        rlFail "Couldn't find metadata device"
+        echo "FAIL: Couldn't find metadata device"
         return 1
     fi
     if ! df | grep ${mnt_data} ; then
-        rlFail "Couldn't find data device"
+        echo "FAIL: Couldn't find data device"
         return 1
     fi
 
     metadata_device=$(df ${mnt_metadata} | tail -n 1 | awk '{print$1}')
     data_device=$(df ${mnt_data} | tail -n 1 | awk '{print$1}')
 
-    cki_run_cmd_pos "umount ${mnt_metadata} ${mnt_data}"
-    cki_run_cmd_pos "lsblk"
+    if ! umount ${mnt_metadata} ${mnt_data} ; then
+        echo "FAIL: umount ${mnt_metadata} ${mnt_data}"
+        return 1
+    fi
+    if ! lsblk ; then
+        echo "FAIL: lsblk"
+        return 1
+    fi
 
-    cki_log "Metadata device: ${metadata_device}"
-    cki_log "Data device ${data_device}"
+    echo "INFO: Metadata device: ${metadata_device}"
+    echo "INFO: Data device ${data_device}"
 
     cat > $f_conf << EOF
 profile :cki do
@@ -176,13 +183,14 @@ end
 default_profile :cki
 EOF
 
-    cki_run_cmd_pos "cat $f_conf"
+    echo "INFO: show $f_conf"
+    cat $f_conf || return 1
 
     return 0
 }
 
 DMTS_REPO="https://github.com/jthornber/device-mapper-test-suite.git"
-DMTS_LOCAL="$CDIR/$(basename $DMTS_REPO | sed 's%.git%%')"
+DMTS_LOCAL="/opt/$(basename $DMTS_REPO | sed 's%.git%%')"
 function ts_setup
 {
     cki_debug
@@ -193,7 +201,7 @@ function ts_setup
     if ! rpm -q dt; then
         install_dt || return $CKI_UNINITIATED
     fi
-    cki_run_cmd_pos "modprobe dm-thin-pool" || return $CKI_UNINITIATED
+    modprobe dm-thin-pool || return $CKI_UNINITIATED
 
     #
     # XXX: Have to support to set up the test enviroment only once because
@@ -205,12 +213,11 @@ function ts_setup
     [[ -f $f_done && $(cat $f_done) == "DONE" ]] && return $CKI_PASS
 
     install_ruby || return $CKI_UNINITIATED
-    cki_run_cmd_neu "rm -rf $DMTS_LOCAL"
-    cki_run_cmd_pos "git clone $DMTS_REPO $DMTS_LOCAL" || \
-        return $CKI_UNINITIATED
-    cki_cd $DMTS_LOCAL
-    cki_run_cmd_pos "bundle update" || return $CKI_UNINITIATED
-    cki_pd
+    rm -rf $DMTS_LOCAL
+    git clone $DMTS_REPO $DMTS_LOCAL || return $CKI_UNINITIATED
+    pushd $DMTS_LOCAL
+    bundle update || return $CKI_UNINITIATED
+    popd
 
     typeset test_root=$(get_test_root)
     typeset subdirs="$test_root"
@@ -218,8 +225,7 @@ function ts_setup
     subdirs+=" $(get_test_reports_dir $test_root)"
     for subdir in $subdirs; do
         if [[ ! -d $subdir ]]; then
-            cki_run_cmd_pos "mkdir -p -m 0755 $subdir" || \
-                return $CKI_UNINITIATED
+            mkdir -p -m 0755 $subdir || return $CKI_UNINITIATED
         fi
     done
 

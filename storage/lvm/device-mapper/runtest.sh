@@ -17,15 +17,12 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
+
+source ../../../cki_lib/libcki.sh
+source ./setup.sh
+
 TMPDIR=/var/tmp/$(date +"%Y%m%d%H%M%S")
 
-source $CDIR/../../include/libstqe.sh
-source $CDIR/setup.sh
-
-DMTS_REPO="https://github.com/jthornber/device-mapper-test-suite.git"
-DMTS_LOCAL="$CDIR/$(basename $DMTS_REPO | sed 's%.git%%')"
 LOG_DIR=$(get_test_log_dir)
 
 function upload_log_files
@@ -42,27 +39,29 @@ function runtest
     # XXX: Never use cki_run_cmd_xxx() wrapper, or it hangs
     source /etc/profile.d/rvm.sh || return 1
 
-    cki_cd $DMTS_LOCAL
+    pushd $DMTS_LOCAL
 
     # Save list of tests
     # the test cases names have '^    ' before their name
-    cki_run_cmd_pos "dmtest list --suite thin-provisioning -t BasicTests | grep -E '^    ' > test.list"
+    dmtest list --suite thin-provisioning -t BasicTests | grep -E '^    ' > test.list
     if (( $? != 0 )); then
+        echo "FAIL: couldn't get the list of tests"
         upload_log_files
-        return $CKI_FAIL
+        return $CKI_UNINITIATED
     fi
 
     failed=0
     while read testcase; do
-        cki_run_cmd_pos "dmtest run --suite thin-provisioning -n $testcase"
+        echo "Running: dmtest run --suite thin-provisioning -n $testcase"
+        dmtest run --suite thin-provisioning -n $testcase
         if (( $? != 0 )); then
             # save information about running devices
             # this can help debug failures like when it is unable to remove a device
             # ex: https://gitlab.com/cki-project/kernel-tests/-/issues/538
-            cki_run_cmd_neu "lsof > $LOG_DIR/BasicTests_${testcase}_lsof.log"
-            cki_run_cmd_neu "ps -aux > $LOG_DIR/BasicTests_${testcase}_ps_aux.log"
-            cki_run_cmd_neu "dmsetup ls > $LOG_DIR/BasicTests_${testcase}_dmsetup_ls.log"
-            cki_run_cmd_neu "dmsetup info > $LOG_DIR/BasicTests_${testcase}_dmsetup_info.log"
+            lsof > $LOG_DIR/BasicTests_${testcase}_lsof.log
+            ps -aux > $LOG_DIR/BasicTests_${testcase}_ps_aux.log
+            dmsetup ls > $LOG_DIR/BasicTests_${testcase}_dmsetup_ls.log
+            dmsetup info > $LOG_DIR/BasicTests_${testcase}_dmsetup_info.log
             failed=1
         fi
     done < "test.list"
@@ -71,7 +70,7 @@ function runtest
         return $CKI_FAIL
     fi
 
-    cki_pd
+    popd
     upload_log_files
     return $CKI_PASS
 }
@@ -79,15 +78,42 @@ function runtest
 function startup
 {
     [[ ! -d $TMPDIR ]] && mkdir -p -m 0755 $TMPDIR
+    echo "INFO: Going to install testsuite"
     ts_setup || return $?
     return $CKI_PASS
 }
 
 function cleanup
 {
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rm -rf $TMPDIR
     return $CKI_PASS
 }
 
-cki_main
-exit $?
+if ! startup &> setup.log ; then
+    cat setup.log
+    echo "Aborting test as it failed to setup test suite."
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+    exit $CKI_STATUS_ABORTED
+fi
+
+echo "INFO: testsuite installed successfully. More information on setup.log"
+cki_upload_log_file setup.log
+
+runtest
+test_status=$?
+
+cleanup
+
+if [ $test_status -eq $CKI_FAIL ] ; then
+    rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL
+    exit 1
+fi
+
+if [ $test_status -eq $CKI_UNINITIATED ] ; then
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+    exit $CKI_STATUS_ABORTED
+fi
+
+exit 0
