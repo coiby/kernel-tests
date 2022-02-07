@@ -57,7 +57,7 @@ function randwrite_fio()
 function randread_fio()
 {
 	local node=0 filed value
-	TEST_DEV=$(lsblk | grep -oE "sda|vda|nvme0n1" | head -1)
+	TEST_DEV=$(lsblk | grep "/boot" | grep -oE "sda|sdb|vda|nvme0n1" | head -1)
 	FIO_PERF_FIELDS=("read iops")
 	field="${FIO_TERSE_FIELDS["$FIO_PERF_FIELDS"]}"
 	while [ $node -lt $nodes_num ]; do
