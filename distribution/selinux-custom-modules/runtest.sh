@@ -93,6 +93,9 @@ rlJournalStart
       modules_to_load+=" bz2031022.cil"
       echo "(allow systemd_logind_t session_dbusd_tmp_t (sock_file (unlink)))" >> bz2039671.cil
       modules_to_load+=" bz2039671.cil"
+
+      # BZ2051417 - avc denials related to scontext=system_u:system_r:NetworkManager_dispatcher_t:s
+      rlRun "semanage permissive -a NetworkManager_dispatcher_t"
     fi
 
     if [ -n "$modules_to_load" ]; then
