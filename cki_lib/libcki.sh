@@ -212,6 +212,18 @@ function cki_main()
 }
 
 #
+# Basic function that prints the command to run before running it
+# Similar to rlRun, but doesn't require beakerlib
+#
+function cki_run()
+{
+    typeset timestamp=$(date +"%H:%M:%S")
+    echo "[ $timestamp ] Running: \'$*\'"
+    eval "$@"
+    return $?
+}
+
+#
 # Wrapper functions to run a single cmd
 # o cki_run_cmd_pos(): $? must be 0
 # o cki_run_cmd_neg(): $? must be !0
