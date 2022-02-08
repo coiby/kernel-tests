@@ -269,9 +269,10 @@ vhost_net
 vhost_vsock
 videodev
 vmac
-vport-geneve
-vport-gre
-vport-vxlan
+# https://gitlab.com/cki-project/kernel-tests/-/issues/963
+# vport-geneve
+# vport-gre
+# vport-vxlan
 vsock_diag
 vsockmon
 vxlan
