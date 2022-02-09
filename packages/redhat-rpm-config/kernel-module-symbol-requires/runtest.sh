@@ -34,6 +34,13 @@ PACKAGE="redhat-rpm-config"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm $PACKAGE
+        $(cki_get_yum_tool) install -y kernel-abi-whitelists || :
+        if ! rlCheckRpm kernel-abi-whitelists; then
+            $(cki_get_yum_tool) install -y kernel-abi-stablelists || :
+            rlAssertRpm kernel-abi-stablelists
+        else
+            rlAssertRpm kernel-abi-whitelists
+        fi
         rlIsRHEL '<8' || rlAssertRpm kernel-rpm-macros
         rlRun "TmpDir=\$(mktemp -d)" 0 "Create tmp directory"
         rlRun "cp test* $TmpDir"
