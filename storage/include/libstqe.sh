@@ -17,11 +17,17 @@
 # Boston, MA 02110-1301, USA.
 #
 
-source $(dirname $(readlink -f $BASH_SOURCE))/../../cki_lib/libcki.sh
+FILE=$(readlink -f $BASH_SOURCE)
+CDIR=$(dirname $FILE)
+
+# Include enviroment and libraries
+source $CDIR/../../cki_lib/libcki.sh || \
+    cki_abort_task "fail to include libcki.sh"
 
 STQE_GIT="https://gitlab.com/rh-kernel-stqe/python-stqe.git"
-STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-"0.1.4"}
-LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-"0.3.2"}
+# Test parameters to use some specific version of stqe tests or libsan library
+STQE_COMMIT=${STQE_COMMIT:-""}
+LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-""}
 
 function stqe_get_fwroot
 {
@@ -31,8 +37,6 @@ function stqe_get_fwroot
 
 function stqe_init_fwroot
 {
-    typeset fwbranch=$1
-
     # clone the framework
     typeset fwroot=$(stqe_get_fwroot)
     cki_run_cmd_neu "rm -rf $fwroot"
@@ -50,16 +54,16 @@ function stqe_init_fwroot
         cki_run_cmd_pos "$python -V > /dev/null 2>&1" || \
             cki_abort_task "FAIL: Could not install python3!"
     fi
-    if [[ $fwbranch != "master" ]]; then
-        if [[ -n $STQE_STABLE_VERSION ]]; then
-            cki_run_cmd_pos "git checkout $STQE_STABLE_VERSION" || \
-                cki_abort_task "fail to checkout $STQE_STABLE_VERSION"
-        fi
-        if [[ -n $LIBSAN_STABLE_VERSION ]]; then
-            typeset pip_cmd="$python -m pip install -U pip==19"
-            cki_run_cmd_pos "$pip_cmd libsan==$LIBSAN_STABLE_VERSION" || \
-                cki_abort_task "fail to install libsan==$LIBSAN_STABLE_VERSION"
-        fi
+
+    if [[ -n $STQE_COMMIT ]]; then
+        cki_run_cmd_pos "git checkout $STQE_STABLE_VERSION" || \
+            cki_abort_task "fail to checkout $STQE_STABLE_VERSION"
+    fi
+
+    if [[ -n $LIBSAN_STABLE_VERSION ]]; then
+        typeset pip_cmd="$python -m pip install -U pip==19"
+        cki_run_cmd_pos "$pip_cmd libsan==$LIBSAN_STABLE_VERSION" || \
+            cki_abort_task "fail to install libsan==$LIBSAN_STABLE_VERSION"
     fi
 
     # install required packages
