@@ -32,13 +32,10 @@ DEVEL="kernel-devel-${RELEASE}"
 function nvdimm_test_module_setup
 {
 	typeset pkg=$KERNEL
-	typeset linux_srcdir="/root/rpmbuild/BUILD/$KERNEL/linux-$LINUX_RELEASE.$(arch)"
-	if uname -r | grep -q 5.9; then
-		linux_srcdir="/root/rpmbuild/BUILD/kernel-5.9/linux-$LINUX_RELEASE.$(arch)"
-	fi
-	typeset test_srcdir="$linux_srcdir/tools/testing/nvdimm"
+	typeset srcdir="/root/rpmbuild/BUILD/$KERNEL/linux-$LINUX_RELEASE.$(arch)"
+	typeset test_srcdir="$srcdir/tools/testing/nvdimm"
 
-	[ -d "$linux_srcdir" ] && rm -fr /root/rpmbuild
+	[ -d "$srcdir" ] && rm -fr /root/rpmbuild
 	rlRun "$YUM -y install $DEVEL"
 	rlRun "$YUM download ${pkg} --source"
 	typeset rpmfile=$(ls -1 ${pkg}.src.rpm)
@@ -51,7 +48,7 @@ function nvdimm_test_module_setup
 
 	rlRun "rpm -ivh $rpmfile"
 	rlRun "rpmbuild -bp --nodeps ~/rpmbuild/SPECS/kernel.spec"
-	rlAssertExists "$linux_srcdir"
+	rlAssertExists "$srcdir"
 	rlAssertExists "$test_srcdir"
 	if (($? != 0)); then
 		rlLog "Abort test as kernel source doesn't exists after rpmbuild -bp"
@@ -59,6 +56,12 @@ function nvdimm_test_module_setup
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
 
+	#RHEL9 need revert one patch to make compiling pass
+	if rlIsRHEL 9 || rlIsCentOS 9; then
+		rlRun "cp revert.patch $srcdir"
+		rlRun "pushd $srcdir"
+		rlRun "patch -p1 < revert.patch"
+	fi
 	rlRun "pushd $test_srcdir"
 	rlRun "make -C /lib/modules/$(uname -r)/build M=$PWD"
 	if (( $? != 0 )); then
@@ -113,11 +116,19 @@ function get_test_cases
 
 function ndctl_setup
 {
-	LOOKASIDE=https://github.com/yizhanglinux/ndctl.git
 
-	[ -d ndctl ] &&	rm -rf ndctl
-	rlRun "git clone $LOOKASIDE"
-	rlRun "pushd ndctl"
+	pushd "$CDIR"
+	rlRun "$YUM download ndctl --source"
+	typeset rpmfile=$(ls -1 ndctl*.src.rpm)
+	rlAssertExists "$rpmfile"
+	if (($? != 0)); then
+		rlLog "Abort test as ndctl source rpm doesn't exists"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+	fi
+	rlRun "rpm -ivh $rpmfile"
+	rlRun "rpmbuild -bp ~/rpmbuild/SPECS/ndctl.spec"
+	rlRun "pushd ~/rpmbuild/BUILD/ndctl*"
 	rlRun "./autogen.sh"
 	rlRun "./configure CFLAGS='-g -O2' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib64 --disable-docs --enable-test"
 	if (( $? != 0 )); then
@@ -125,7 +136,6 @@ function ndctl_setup
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 	fi
-	rlRun "popd"
 }
 
 function get_timestamp
@@ -167,7 +177,7 @@ function runtest
 	testcases_default+=" $(get_test_cases)"
 	testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
 	ret=0
-	rlRun "pushd ndctl"
+	rlRun "pushd ~/rpmbuild/BUILD/ndctl*"
 	for testcase in $testcases; do
 		do_test $testcase
 		((ret += $?))
