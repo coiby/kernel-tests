@@ -19,26 +19,21 @@
 
 source ../../include/libstqe.sh
 
-function startup
-{
-    stqe_init_fwroot "master"
-}
-
-function cleanup
-{
-    stqe_fini_fwroot
-}
-
 TEST_CASE_PATH="lvm/snapper/snapper_basic.py"
 function runtest
 {
-    cki_cd $(stqe_get_fwroot)
-    cki_run_cmd_pos "stqe-test run -t $TEST_CASE_PATH"
+    cki_run "stqe-test run -t $TEST_CASE_PATH"
     typeset -i rc=$?
-    cki_pd
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }
 
-cki_debug
-cki_main
-exit $?
+# stqe_init_fwroot will abort the task if fails to run
+stqe_init_fwroot
+
+runtest
+rc=$?
+
+# do some cleanup
+stqe_fini_fwroot
+
+exit $rc

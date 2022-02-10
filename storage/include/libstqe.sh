@@ -39,40 +39,41 @@ function stqe_init_fwroot
 {
     # clone the framework
     typeset fwroot=$(stqe_get_fwroot)
-    cki_run_cmd_neu "rm -rf $fwroot"
-    cki_run_cmd_pos "git clone $STQE_GIT $fwroot" || \
+    cki_run "rm -rf $fwroot"
+    cki_run "git clone $STQE_GIT $fwroot" || \
         cki_abort_task "fail to clone $STQE_GIT"
 
     # install the framework
-    cki_cd $fwroot
+    pushd $fwroot
 
     typeset python="python3"
     typeset pkg_mgr=$(dnf > /dev/null 2>&1 && echo dnf || echo yum)
     if ! $python -V > /dev/null 2>&1; then
-        cki_run_cmd_neu "$pkg_mgr install -y python3" || \
-            cki_run_cmd_neu "$pkg_mgr install -y python36"
-        cki_run_cmd_pos "$python -V > /dev/null 2>&1" || \
+        cki_run "$pkg_mgr install -y python3" || \
+            cki_run "$pkg_mgr install -y python36"
+        cki_run "$python -V > /dev/null 2>&1" || \
             cki_abort_task "FAIL: Could not install python3!"
     fi
 
     if [[ -n $STQE_COMMIT ]]; then
-        cki_run_cmd_pos "git checkout $STQE_STABLE_VERSION" || \
-            cki_abort_task "fail to checkout $STQE_STABLE_VERSION"
+        cki_run "git checkout $STQE_COMMIT" || \
+            cki_abort_task "fail to checkout $STQE_COMMIT"
     fi
 
     if [[ -n $LIBSAN_STABLE_VERSION ]]; then
         typeset pip_cmd="$python -m pip install -U pip==19"
-        cki_run_cmd_pos "$pip_cmd libsan==$LIBSAN_STABLE_VERSION" || \
+        cki_run "$pip_cmd libsan==$LIBSAN_STABLE_VERSION" || \
             cki_abort_task "fail to install libsan==$LIBSAN_STABLE_VERSION"
     fi
 
     # install required packages
-    cki_run_cmd_neu "bash env_setup.sh"
+    cki_run "bash env_setup.sh" || \
+        cki_abort_task "fail to test framework dependencies"
 
-    cki_run_cmd_pos "$python -m pip install ." || \
+    cki_run "$python -m pip install ." || \
         cki_abort_task "fail to install test framework"
 
-    cki_pd
+    popd
 
     return 0
 }
@@ -80,5 +81,5 @@ function stqe_init_fwroot
 function stqe_fini_fwroot
 {
     typeset fwroot=$(stqe_get_fwroot)
-    cki_run_cmd_neu "rm -rf $fwroot"
+    cki_run "rm -rf $fwroot"
 }

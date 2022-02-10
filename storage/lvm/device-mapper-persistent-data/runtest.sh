@@ -19,32 +19,27 @@
 
 source ../../include/libstqe.sh
 
-function startup
-{
-    stqe_init_fwroot "master"
-}
-
-function cleanup
-{
-    stqe_fini_fwroot
-}
-
 function runtest
 {
-    cki_cd $(stqe_get_fwroot)
     typeset -i rc=0
     typeset tc_list=""
     tc_list+=" lvm/device_mapper_persistent_data/thin"
     tc_list+=" lvm/device_mapper_persistent_data/cache"
     typeset tc=""
     for tc in $tc_list; do
-        cki_run_cmd_pos "stqe-test run --fmf --path $tc"
+        cki_run "stqe-test run --fmf --path $tc"
         (( rc += $? ))
     done
-    cki_pd
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }
 
-cki_debug
-cki_main
-exit $?
+# stqe_init_fwroot will abort the task if fails to run
+stqe_init_fwroot
+
+runtest
+rc=$?
+
+# do some cleanup
+stqe_fini_fwroot
+
+exit $rc
