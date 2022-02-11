@@ -17,11 +17,17 @@
 # Boston, MA 02110-1301, USA.
 #
 
-source $(dirname $(readlink -f $BASH_SOURCE))/../../cki_lib/libcki.sh
+FILE=$(readlink -f $BASH_SOURCE)
+CDIR=$(dirname $FILE)
+
+# Include enviroment and libraries
+source $CDIR/../../cki_lib/libcki.sh || \
+    cki_abort_task "fail to include libcki.sh"
 
 STQE_GIT="https://gitlab.com/rh-kernel-stqe/python-stqe.git"
-STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-"0.1.4"}
-LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-"0.3.2"}
+# Test parameters to use some specific version of stqe tests or libsan library
+STQE_COMMIT=${STQE_COMMIT:-""}
+LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-""}
 
 function stqe_get_fwroot
 {
@@ -31,44 +37,43 @@ function stqe_get_fwroot
 
 function stqe_init_fwroot
 {
-    typeset fwbranch=$1
-
     # clone the framework
     typeset fwroot=$(stqe_get_fwroot)
-    cki_run_cmd_neu "rm -rf $fwroot"
-    cki_run_cmd_pos "git clone $STQE_GIT $fwroot" || \
+    cki_run "rm -rf $fwroot"
+    cki_run "git clone $STQE_GIT $fwroot" || \
         cki_abort_task "fail to clone $STQE_GIT"
 
     # install the framework
-    cki_cd $fwroot
+    pushd $fwroot
 
     typeset python="python3"
     typeset pkg_mgr=$(dnf > /dev/null 2>&1 && echo dnf || echo yum)
     if ! $python -V > /dev/null 2>&1; then
-        cki_run_cmd_neu "$pkg_mgr install -y python3" || \
-            cki_run_cmd_neu "$pkg_mgr install -y python36"
-        cki_run_cmd_pos "$python -V > /dev/null 2>&1" || \
+        cki_run "$pkg_mgr install -y python3" || \
+            cki_run "$pkg_mgr install -y python36"
+        cki_run "$python -V > /dev/null 2>&1" || \
             cki_abort_task "FAIL: Could not install python3!"
     fi
-    if [[ $fwbranch != "master" ]]; then
-        if [[ -n $STQE_STABLE_VERSION ]]; then
-            cki_run_cmd_pos "git checkout $STQE_STABLE_VERSION" || \
-                cki_abort_task "fail to checkout $STQE_STABLE_VERSION"
-        fi
-        if [[ -n $LIBSAN_STABLE_VERSION ]]; then
-            typeset pip_cmd="$python -m pip install -U pip==19"
-            cki_run_cmd_pos "$pip_cmd libsan==$LIBSAN_STABLE_VERSION" || \
-                cki_abort_task "fail to install libsan==$LIBSAN_STABLE_VERSION"
-        fi
+
+    if [[ -n $STQE_COMMIT ]]; then
+        cki_run "git checkout $STQE_COMMIT" || \
+            cki_abort_task "fail to checkout $STQE_COMMIT"
+    fi
+
+    if [[ -n $LIBSAN_STABLE_VERSION ]]; then
+        typeset pip_cmd="$python -m pip install -U pip==19"
+        cki_run "$pip_cmd libsan==$LIBSAN_STABLE_VERSION" || \
+            cki_abort_task "fail to install libsan==$LIBSAN_STABLE_VERSION"
     fi
 
     # install required packages
-    cki_run_cmd_neu "bash env_setup.sh"
+    cki_run "bash env_setup.sh" || \
+        cki_abort_task "fail to test framework dependencies"
 
-    cki_run_cmd_pos "$python -m pip install ." || \
+    cki_run "$python -m pip install ." || \
         cki_abort_task "fail to install test framework"
 
-    cki_pd
+    popd
 
     return 0
 }
@@ -76,5 +81,5 @@ function stqe_init_fwroot
 function stqe_fini_fwroot
 {
     typeset fwroot=$(stqe_get_fwroot)
-    cki_run_cmd_neu "rm -rf $fwroot"
+    cki_run "rm -rf $fwroot"
 }

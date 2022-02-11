@@ -17,32 +17,22 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
-CDIR=$(dirname $FILE)
-
-source $CDIR/../../../storage/include/libstqe.sh
-
-function startup
-{
-    stqe_init_fwroot "master"
-}
-
-function cleanup
-{
-    stqe_fini_fwroot
-}
+source ../../include/libstqe.sh
 
 function runtest
 {
-    typeset fwroot=$(stqe_get_fwroot)
-    cki_cd $fwroot
-    cki_run_cmd_pos "stqe-test run --fmf --filter component:device-mapper"
+    cki_run "stqe-test run --fmf --filter component:device-mapper"
     typeset -i rc=$?
-    cki_pd
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }
 
-cki_debug
-cki_main
-exit $?
+# stqe_init_fwroot will abort the task if fails to run
+stqe_init_fwroot
+
+runtest
+rc=$?
+
+# do some cleanup
+stqe_fini_fwroot
+
+exit $rc

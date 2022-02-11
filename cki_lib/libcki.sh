@@ -218,7 +218,7 @@ function cki_main()
 function cki_run()
 {
     typeset timestamp=$(date +"%H:%M:%S")
-    echo "[ $timestamp ] Running: \'$*\'"
+    echo "[ $timestamp ] Running: '$*'"
     eval "$@"
     return $?
 }
