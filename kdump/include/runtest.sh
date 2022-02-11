@@ -44,6 +44,8 @@ rlIsRHEL 7 && IS_RHEL7=true || IS_RHEL7=false
 rlIsRHEL 8 && IS_RHEL8=true || IS_RHEL8=false
 rlIsRHEL 9 && IS_RHEL9=true || IS_RHEL9=false
 rlIsFedora && IS_FC=true || IS_FC=false
+rlIsCentOS 8 && IS_CentOS8=true || IS_CentOS8=false
+rlIsCentOS 9 && IS_CentOS9=true || IS_CentOS9=false
 
 if $IS_RHEL5 || $IS_RHEL6; then
     INITRD_PREFIX=initrd
@@ -549,7 +551,7 @@ DefKdumpMem()
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=512M"
         fi
 
-    elif $IS_RHEL8; then
+    elif $IS_RHEL8 || $IS_CentOS8; then
         if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:160M,4G-64G:192M,64G-1T:256M,1T-:512M"
         elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:160M,4G-64G:192M,64G-1T:256M,1T-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
@@ -557,7 +559,7 @@ DefKdumpMem()
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=512M"
         fi
 
-    elif $IS_RHEL9; then
+    elif $IS_RHEL9 || $IS_CentOS9; then
         if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:192M,64G-1T:256M,1T-:512M"
         elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:192M,64G-1T:256M,1T-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
