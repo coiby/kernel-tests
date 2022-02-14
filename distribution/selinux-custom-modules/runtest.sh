@@ -9,6 +9,15 @@ TEST="/kernel/distribution/selinux-custom-modules"
 rlJournalStart
 
   rlPhaseStartTest
+
+    # enable selinux with full audit, usefull to submit selinux-policy bugs
+    # https://lukas-vrabec.com/index.php/2018/07/16/how-to-enable-full-auditing-in-audit-daemon/
+    if [[ -n "${FULL_AUDIT}" ]]; then
+        rlRun "sed -i '/-a task,never/d' /etc/audit/rules.d/audit.rules"
+        rlRun "echo '-w /etc/shadow -p w' >> /etc/audit/rules.d/audit.rules"
+        rlServiceStart auditd
+    fi
+
     # https://gitlab.com/cki-project/kernel-tests/-/issues/528
     # Bug 1932849 - avc: denied { module_request } kmod="net-pf-10"
     if grep "ipv6.disable=1" /proc/cmdline ; then
