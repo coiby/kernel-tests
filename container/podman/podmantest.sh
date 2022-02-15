@@ -48,6 +48,12 @@ for TEST_FILE in ${TEST_DIR}/*.bats; do
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
         TEST_FAILED=1
         rstrnt-report-log -l ${TEST_LOG}
+        if grep -qF "[ rc=124 (** EXPECTED 0 **) ]" ${TEST_LOG}; then
+            echo "FAIL: test failed with timeout. Likely infra issue."
+            rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+            rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+            exit 1
+        fi
     fi
 done
 
