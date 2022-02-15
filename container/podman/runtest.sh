@@ -186,7 +186,6 @@ if  [[ "$PODMANUSER" != "root" ]]; then
     sleep 5
     su - podmantest -c "cd `pwd`; bash ./podmantest.sh ${TEST_DIR}"
     TEST_FAILED=$?
-    cat /tmp/podmantest-rootless.log >> "${OUTPUTFILE}"
 else # Stay with root
 
     if [ "$ARCH" == "ppc64le" ]; then
@@ -196,7 +195,6 @@ else # Stay with root
 
     bash ./podmantest.sh ${TEST_DIR}
     TEST_FAILED=$?
-    cat /tmp/podmantest-root.log >> "${OUTPUTFILE}"
 fi
 
 if [[ ${TEST_FAILED:-} == 1 ]] ; then

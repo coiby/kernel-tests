@@ -18,44 +18,42 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST_FAILED=0
-OUTPUTFILE=""
 ARCH=$(uname -m)
 
 #  Switching root or rootless podmantest
 if [[ $(id -u) -eq 0 ]]; then
-    OUTPUTFILE=/tmp/podmantest-root.log
-    > $OUTPUTFILE
-    echo "Running root podmantest:" | tee -a "${OUTPUTFILE}"
+    echo "Running root podmantest:"
 else
-    OUTPUTFILE=/tmp/podmantest-rootless.log
-    > $OUTPUTFILE
-    echo "Running rootless podmantest" | tee -a "${OUTPUTFILE}"
+    echo "Running rootless podmantest"
 fi
 
 if [ -z $1 ]; then
-    echo "FAIL: test requires test directory as parameter" | tee -a "${OUTPUTFILE}"
+    echo "FAIL: test requires test directory as parameter"
     exit 1
 fi
 TEST_DIR=$1
 
 # Bug reports required this information.
-echo "Podman version:" | tee -a "${OUTPUTFILE}"
-podman --version | tee -a "${OUTPUTFILE}"
-echo "Podman debug info:" | tee -a "${OUTPUTFILE}"
-podman info --debug | tee -a "${OUTPUTFILE}"
+echo "Podman version:"
+podman --version
+echo "Podman debug info:"
+podman info --debug
 
 # Clear images
 podman system prune --all --force && podman rmi --all
 
 for TEST_FILE in ${TEST_DIR}/*.bats; do
-    echo -e "\n[$(date '+%F %T')] $(basename $TEST_FILE)" | tee -a "${OUTPUTFILE}"
-    bats $TEST_FILE |& awk --file timestamp.awk | tee -a "${OUTPUTFILE}"
+    TEST_NAME=$(basename $TEST_FILE)
+    TEST_LOG="./${TEST_NAME/bats/log}"
+    echo -e "\n[$(date '+%F %T')] $TEST_NAME" | tee "${TEST_LOG}"
+    bats $TEST_FILE |& awk --file timestamp.awk | tee -a "${TEST_LOG}"
     # Save a marker if this test failed.
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
         TEST_FAILED=1
+        cki_upload_log_file ${TEST_LOG}
     fi
 done
 
-echo "Test finished" | tee -a "${OUTPUTFILE}"
+echo "Test finished"
 
 exit $TEST_FAILED
