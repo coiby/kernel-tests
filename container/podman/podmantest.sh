@@ -13,9 +13,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# Source the common test script helpers
-. ../../cki_lib/libcki.sh || exit 1
-. /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TEST_FAILED=0
 ARCH=$(uname -m)
@@ -50,7 +47,7 @@ for TEST_FILE in ${TEST_DIR}/*.bats; do
     # Save a marker if this test failed.
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
         TEST_FAILED=1
-        cki_upload_log_file ${TEST_LOG}
+        rstrnt-report-log -l ${TEST_LOG}
     fi
 done
 
