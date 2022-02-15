@@ -54,6 +54,9 @@ if [ -r /etc/system-release-cpe ]; then
 	enterprise_linux)
 			osver=$(echo $cpe | awk -F: '{print int(substr($5, 1,1))*100 + (int(substr($5,3,2)))}')
 			;;
+	centos)
+			osver=$(echo $cpe | awk -F: '{print int(substr($5, 1,1))*100 + (int(substr($5,3,2)))}')
+			;;
 	esac
 else
 	# if we don't have system-release-cpe, use the old mechanism
