@@ -37,6 +37,7 @@ atm.ko
 auth_rpcgss.ko
 bareudp.ko
 binfmt_misc.ko
+blake2b_generic.ko
 blocklayoutdriver.ko
 blowfish_common.ko
 blowfish_generic.ko
@@ -102,6 +103,7 @@ dm-crypt.ko
 dm-delay.ko
 dm-era.ko
 dm-flakey.ko
+dm-historical-service-time.ko
 dm-integrity.ko
 dm-io-affinity.ko
 dm-log.ko
@@ -190,6 +192,8 @@ i2c-algo-bit.ko
 i2c-core.ko
 ib_cm.ko
 ib_core.ko
+ib_iser.ko
+ib_isert.ko
 ib_uverbs.ko
 ieee802154_6lowpan.ko
 ieee802154.ko
@@ -769,4 +773,6 @@ zcrypt_cex4.ko
 zcrypt.ko
 zfcp.ko
 zram.ko
+zstd_compress.ko
 zstd_decompress.ko
+zstd.ko

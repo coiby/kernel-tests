@@ -535,6 +535,12 @@ rlJournalStart
                     if cki_kver_lt "5.14.0-33"; then
                         sed -i '/zstd_decompress.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
                     fi
+                    if cki_kver_lt "5.14.0-50"; then
+                        sed -i '/dnet.ko/d;/ethoc.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-56"; then
+                        sed -i '/cramfs.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
