@@ -1,2 +1,5 @@
+cramfs.ko
+dnet.ko
+ethoc.ko
 vmwgfx.ko
 zstd_decompress.ko

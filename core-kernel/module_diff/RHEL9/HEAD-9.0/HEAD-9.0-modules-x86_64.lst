@@ -147,6 +147,7 @@ belkin_sa.ko
 bfusb.ko
 bh1770glc.ko
 binfmt_misc.ko
+blake2b_generic.ko
 blake2s-x86_64.ko
 blocklayoutdriver.ko
 blowfish_common.ko
@@ -320,6 +321,7 @@ dm-delay.ko
 dme1737.ko
 dm-era.ko
 dm-flakey.ko
+dm-historical-service-time.ko
 dm-integrity.ko
 dm-io-affinity.ko
 dm-log.ko
@@ -1144,6 +1146,7 @@ mt2131.ko
 mt312.ko
 mt352.ko
 mt7601u.ko
+mt76-connac-lib.ko
 mt76.ko
 mt76-usb.ko
 mt76x02-lib.ko
@@ -1154,6 +1157,7 @@ mt76x0u.ko
 mt76x2-common.ko
 mt76x2e.ko
 mt76x2u.ko
+mt7921e.ko
 mtd_blkdevs.ko
 mtdblock.ko
 mtd.ko
@@ -1328,7 +1332,15 @@ nls_utf8.ko
 nouveau.ko
 nozomi.ko
 ns.ko
+ntb_hw_amd.ko
+ntb_hw_intel.ko
 ntb.ko
+ntb_msi_test.ko
+ntb_netdev.ko
+ntb_perf.ko
+ntb_pingpong.ko
+ntb_tool.ko
+ntb_transport.ko
 ntc_thermistor.ko
 null_blk.ko
 nvme-core.ko
@@ -2019,6 +2031,7 @@ team_mode_roundrobin.ko
 tee.ko
 teranetics.ko
 tg3.ko
+think-lmi.ko
 thinkpad_acpi.ko
 thmc50.ko
 thunderbolt-net.ko
@@ -2158,6 +2171,7 @@ virtio_dma_buf.ko
 virtiofs.ko
 virtio-gpu.ko
 virtio_input.ko
+virtio_mem.ko
 virtio_net.ko
 virtio_scsi.ko
 virtio_snd.ko
@@ -2317,4 +2331,6 @@ zl10353.ko
 zl6100.ko
 zr364xx.ko
 zram.ko
+zstd_compress.ko
 zstd_decompress.ko
+zstd.ko

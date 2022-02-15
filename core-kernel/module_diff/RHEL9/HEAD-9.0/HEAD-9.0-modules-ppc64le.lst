@@ -112,6 +112,7 @@ belkin_sa.ko
 bfusb.ko
 bh1770glc.ko
 binfmt_misc.ko
+blake2b_generic.ko
 blocklayoutdriver.ko
 blowfish_common.ko
 blowfish_generic.ko
@@ -251,6 +252,7 @@ dm-crypt.ko
 dm-delay.ko
 dm-era.ko
 dm-flakey.ko
+dm-historical-service-time.ko
 dm-integrity.ko
 dm-io-affinity.ko
 dm-log.ko
@@ -1746,4 +1748,6 @@ zl10353.ko
 zl6100.ko
 zr364xx.ko
 zram.ko
+zstd_compress.ko
 zstd_decompress.ko
+zstd.ko
