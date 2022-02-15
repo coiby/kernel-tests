@@ -1,0 +1,12 @@
+[General]
+name=storage/block/zstd_compression
+owner=Changhui Zhong <czhong@redhat.com>
+description=Storage block zstd compression test on zram device
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=zstd
+repoRequires=cki_lib
