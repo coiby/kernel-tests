@@ -14,7 +14,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 # Source the common test script helpers
-. ../../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # Global variables
@@ -186,7 +185,6 @@ if  [[ "$PODMANUSER" != "root" ]]; then
     sleep 5
     su - podmantest -c "cd `pwd`; bash ./podmantest.sh ${TEST_DIR}"
     TEST_FAILED=$?
-    cat /tmp/podmantest-rootless.log >> "${OUTPUTFILE}"
 else # Stay with root
 
     if [ "$ARCH" == "ppc64le" ]; then
@@ -196,7 +194,6 @@ else # Stay with root
 
     bash ./podmantest.sh ${TEST_DIR}
     TEST_FAILED=$?
-    cat /tmp/podmantest-root.log >> "${OUTPUTFILE}"
 fi
 
 if [[ ${TEST_FAILED:-} == 1 ]] ; then
