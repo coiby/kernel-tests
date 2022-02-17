@@ -1,0 +1,12 @@
+[General]
+name=networking/tunnel/tunctl/permtest
+owner=Hushan Jia <hjia@redhat.com>
+description=Test on user pemissions and previledges of tun interface
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+softDependencies=
+repoRequires=cki_lib;networking/common
