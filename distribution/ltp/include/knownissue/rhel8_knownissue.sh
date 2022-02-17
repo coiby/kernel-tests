@@ -70,6 +70,8 @@ function rhel8_unfix_issues()
 
 function rhel8_fixed_issues()
 {
+	# Bug 1895961 (CVE-2020-25704) - CVE-2020-25704 kernel: perf_event_parse_addr_filter memory
+	kernel_in_range "0" "4.18.0-193.59.1.el8" && tskip "perf_event_open03" fixed
 	# Bug 1913045 - [RHEL-8.4.0] ltp/lite - ioctl_sg01 - fail - broken mmap() for MAP_FAILED
 	is_arch "aarch64" && kernel_in_range "0" "kernel-4.18.0-304.5.el8" && tskip "ioctl_sg01" unfix
 	# Bug 1820405 - KEYS: allow reaching the keys quotas exactly
