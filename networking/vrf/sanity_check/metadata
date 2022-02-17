@@ -1,0 +1,12 @@
+[General]
+name=networking/vrf/sanity_check
+owner=Antoine Tenart <atenart@redhat.com>
+description=VRF sanity tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=iproute;net-tools;tcpdump
+repoRequires=cki_lib;networking/common
