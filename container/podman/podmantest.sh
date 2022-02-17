@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
+LOG_DIR="/tmp/podmantestroot"
 TEST_FAILED=0
 ARCH=$(uname -m)
 
@@ -22,7 +23,10 @@ if [[ $(id -u) -eq 0 ]]; then
     echo "Running root podmantest:"
 else
     echo "Running rootless podmantest"
+    LOG_DIR="/tmp/podmantestrootless"
 fi
+
+mkdir ${LOG_DIR}
 
 if [ -z $1 ]; then
     echo "FAIL: test requires test directory as parameter"
@@ -41,7 +45,7 @@ podman system prune --all --force && podman rmi --all
 
 for TEST_FILE in ${TEST_DIR}/*.bats; do
     TEST_NAME=$(basename $TEST_FILE)
-    TEST_LOG="./${TEST_NAME/bats/log}"
+    TEST_LOG="${LOG_DIR}/${TEST_NAME/bats/log}"
     echo -e "\n[$(date '+%F %T')] $TEST_NAME" | tee "${TEST_LOG}"
     bats $TEST_FILE |& awk --file timestamp.awk | tee -a "${TEST_LOG}"
     # Save a marker if this test failed.
