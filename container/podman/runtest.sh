@@ -18,6 +18,7 @@
 
 # Global variables
 PODMANUSER=${PODMANUSER:-root}
+LOG_DIR="/tmp/podmantestlog"
 TEST="Podman"
 ret=0
 ARCH=$(uname -m)
@@ -52,6 +53,64 @@ function _restore_tests()
         echo "INFO: restoring ${orig_name}"
         mv -f ${test_file} ${orig_name}
     done
+}
+
+function cleanup()
+{
+    # Clean podman interfaces when is done
+    ifaces=$(ip -json link show  | jq -r '.[].ifname' | grep cni-podman)
+    if [ ! -z "$ifaces" ]; then
+        for iface in $ifaces; do
+             echo "Delete podman interface: $iface"
+             ip link delete $iface
+        done
+    fi
+
+    _restore_tests
+}
+
+function run_cmd_user()
+{
+    if  [[ "$PODMANUSER" != "root" ]]; then
+        su - "$PODMANUSER" -c "$@"
+    else
+        eval "$@"
+    fi
+}
+
+function run_tests()
+{
+    TEST_FAILED=0
+    # Bug reports required this information.
+    echo "Podman version:"
+    run_cmd_user "podman --version"
+    echo "Podman debug info:"
+    run_cmd_user "podman info --debug"
+
+    # Clear images
+    run_cmd_user "podman system prune --all --force && podman rmi --all"
+
+    for TEST_FILE in ${TEST_DIR}/*.bats; do
+        TEST_NAME=$(basename $TEST_FILE)
+        TEST_LOG="${LOG_DIR}/${TEST_NAME/bats/log}"
+        echo -e "\n[$(date '+%F %T')] $TEST_NAME" | tee "${TEST_LOG}"
+        run_cmd_user "bats $TEST_FILE" |& awk --file timestamp.awk | tee -a "${TEST_LOG}"
+        # Save a marker if this test failed.
+        if [[ ${PIPESTATUS[0]} != 0 ]]; then
+            TEST_FAILED=1
+            rstrnt-report-log -l ${TEST_LOG}
+            if grep -qF "[ rc=124 (** EXPECTED 0 **) ]" ${TEST_LOG}; then
+                echo "FAIL: test failed with timeout. Likely infra issue."
+                rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+                cleanup
+                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+                exit 1
+            fi
+        fi
+    done
+
+    echo "Test finished"
+    return $TEST_FAILED
 }
 
 # there was some fixes in podman tests, that were not available on 3.3.1
@@ -183,20 +242,23 @@ if  [[ "$PODMANUSER" != "root" ]]; then
     loginctl enable-linger $PODMANUSER
     # wait few seconds to give time for enable-linger
     sleep 5
-    su - podmantest -c "cd `pwd`; bash ./podmantest.sh ${TEST_DIR}"
-    TEST_FAILED=$?
 else # Stay with root
 
     if [ "$ARCH" == "ppc64le" ]; then
         # 050-stops would fail in ppc64le, add to exclusion
         _disable_test 050-stops.bats
     fi
-
-    bash ./podmantest.sh ${TEST_DIR}
-    TEST_FAILED=$?
 fi
 
-if [[ ${TEST_FAILED:-} == 1 ]] ; then
+if [ ! -d ${LOG_DIR} ]; then
+    mkdir ${LOG_DIR}
+fi
+rm -f "${LOG_DIR}/*.log"
+
+run_tests
+TEST_FAILED=$?
+
+if [[ ${TEST_FAILED} != 0 ]] ; then
     echo "😭 One or more tests failed."
     rstrnt-report-result "${TEST}" FAIL
 else
@@ -204,13 +266,6 @@ else
     rstrnt-report-result "${TEST}" PASS
 fi
 
-# Clean podman interfaces when is done
-ifaces=$(ip -json link show  | jq -r '.[].ifname' | grep cni-podman)
-if [ ! -z "$ifaces" ]; then
-    for iface in $ifaces; do
-         echo "Delete podman interface: $iface"
-         ip link delete $iface
-    done
-fi
+cleanup
 
-_restore_tests
+exit ${TEST_FAILED}
