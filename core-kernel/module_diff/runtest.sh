@@ -504,6 +504,12 @@ rlJournalStart
                         sed -i '/i40iw.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-${ARCH}.lst
                         sed -i '/irdma.ko/d' ${OS}/${Release}/HEAD-8.6-modules-${ARCH}.lst 
                     fi
+                    if cki_kver_lt "4.18.0-362"; then
+                        sed -i '/i2c-hid.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-ppc64le.lst
+					fi
+                    if cki_kver_lt "4.18.0-366"; then
+                        sed -i '/snd-sof-intel-ipc.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-x86_64.lst
+					fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then

@@ -404,6 +404,8 @@ nf_dup_ipv4.ko
 nf_dup_ipv6.ko
 nf_dup_netdev.ko
 nf_flow_table_inet.ko
+nf_flow_table_ipv4.ko
+nf_flow_table_ipv6.ko
 nf_flow_table.ko
 nf_log_syslog.ko
 nf_nat_amanda.ko
