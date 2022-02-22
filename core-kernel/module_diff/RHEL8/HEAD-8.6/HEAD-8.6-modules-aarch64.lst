@@ -47,6 +47,7 @@ arc4.ko
 arc_ps2.ko
 ark3116.ko
 arm-cmn.ko
+arm_dmc620_pmu.ko
 arm_mhu.ko
 armmmci.ko
 arm_scpi.ko
@@ -367,6 +368,7 @@ hid-gyration.ko
 hid-holtekff.ko
 hid-holtek-kbd.ko
 hid-holtek-mouse.ko
+hid-hyperv.ko
 hid-icade.ko
 hid-ite.ko
 hid-jabra.ko
@@ -412,6 +414,7 @@ hid-sony.ko
 hid-speedlink.ko
 hid-steelseries.ko
 hid-sunplus.ko
+hid-thrustmaster.ko
 hid-tivo.ko
 hid-tmff.ko
 hid-topseed.ko
@@ -437,9 +440,16 @@ hns_mdio.ko
 hpsa.ko
 hso.ko
 huawei_cdc_ncm.ko
+hv_netvsc.ko
+hv_sock.ko
+hv_storvsc.ko
+hv_utils.ko
+hv_vmbus.ko
 hwa-hc.ko
 hwa-rc.ko
 hwpoison-inject.ko
+hyperv_fb.ko
+hyperv-keyboard.ko
 i1480-dfu-usb.ko
 i1480-est.ko
 i2c-algo-bit.ko
@@ -451,6 +461,7 @@ i2c-designware-platform.ko
 i2c-dev.ko
 i2c-diolan-u2c.ko
 i2c-gpio.ko
+i2c-hid-acpi.ko
 i2c-hid.ko
 i2c-mlxbf.ko
 i2c-mux-gpio.ko
@@ -800,6 +811,8 @@ nf_dup_ipv4.ko
 nf_dup_ipv6.ko
 nf_dup_netdev.ko
 nf_flow_table_inet.ko
+nf_flow_table_ipv4.ko
+nf_flow_table_ipv6.ko
 nf_flow_table.ko
 nfit.ko
 nf_log_syslog.ko
@@ -872,6 +885,7 @@ n_gsm.ko
 n_hdlc.ko
 nicpf.ko
 nicvf.ko
+nitro_enclaves.ko
 nlmon.ko
 nls_cp1250.ko
 nls_cp1251.ko
@@ -938,6 +952,8 @@ overlay.ko
 p8022.ko
 parman.ko
 pcbc.ko
+pci-hyperv-intf.ko
+pci-hyperv.ko
 pcrypt.ko
 pcs-xpcs.ko
 pcwd_pci.ko
@@ -1254,6 +1270,7 @@ ueagle-atm.ko
 uhid.ko
 uio_aec.ko
 uio_cif.ko
+uio_hv_generic.ko
 uio.ko
 uio_pci_generic.ko
 uio_pdrv_genirq.ko

@@ -76,6 +76,7 @@ amdgpu.ko
 amd.ko
 amd-pmc.ko
 amd-rng.ko
+amd_sfh.ko
 amd-xgbe.ko
 amilo-rfkill.ko
 ansi_cprng.ko
@@ -275,6 +276,7 @@ compal-laptop.ko
 cordic.ko
 coretemp.ko
 cortina.ko
+counter.ko
 cp210x.ko
 cpuidle-haltpoll.ko
 cqhci.ko
@@ -558,6 +560,7 @@ firewire-core.ko
 firewire-net.ko
 firewire-ohci.ko
 firewire-sbp2.ko
+firmware_attributes_class.ko
 fjes.ko
 fm10k.ko
 fnic.ko
@@ -741,6 +744,7 @@ hid-sony.ko
 hid-speedlink.ko
 hid-steelseries.ko
 hid-sunplus.ko
+hid-thrustmaster.ko
 hid-tivo.ko
 hid-tmff.ko
 hid-topseed.ko
@@ -790,6 +794,7 @@ i2c-designware-core.ko
 i2c-designware-platform.ko
 i2c-dev.ko
 i2c-diolan-u2c.ko
+i2c-hid-acpi.ko
 i2c-hid.ko
 i2c-i801.ko
 i2c-isch.ko
@@ -867,6 +872,7 @@ industrialio-triggered-buffer.ko
 inet_diag.ko
 input-polldev.ko
 int3400_thermal.ko
+int3401_thermal.ko
 int3402_thermal.ko
 int3403_thermal.ko
 int340x_thermal_zone.ko
@@ -891,6 +897,7 @@ intel_pmt.ko
 intel_pmt_telemetry.ko
 intel_powerclamp.ko
 intel_qat.ko
+intel-qep.ko
 intel_rapl_common.ko
 intel_rapl_msr.ko
 intel-rng.ko
@@ -1297,6 +1304,7 @@ mt2266.ko
 mt312.ko
 mt352.ko
 mt7601u.ko
+mt76-connac-lib.ko
 mt76.ko
 mt76-usb.ko
 mt76x02-lib.ko
@@ -1305,6 +1313,7 @@ mt76x0-common.ko
 mt76x0u.ko
 mt76x2-common.ko
 mt76x2u.ko
+mt7921e.ko
 mtd_blkdevs.ko
 mtdblock.ko
 mtd.ko
@@ -1355,6 +1364,8 @@ nf_dup_ipv4.ko
 nf_dup_ipv6.ko
 nf_dup_netdev.ko
 nf_flow_table_inet.ko
+nf_flow_table_ipv4.ko
+nf_flow_table_ipv6.ko
 nf_flow_table.ko
 nfit.ko
 nf_log_syslog.ko
@@ -1470,7 +1481,9 @@ nouveau.ko
 nozomi.ko
 ns.ko
 ntb_hw_amd.ko
+ntb_hw_intel.ko
 ntb.ko
+ntb_netdev.ko
 ntb_perf.ko
 ntb_pingpong.ko
 ntb_tool.ko
@@ -1571,6 +1584,11 @@ pps-ldisc.ko
 pps_parport.ko
 pptp.ko
 processor_thermal_device.ko
+processor_thermal_device_pci.ko
+processor_thermal_device_pci_legacy.ko
+processor_thermal_mbox.ko
+processor_thermal_rapl.ko
+processor_thermal_rfim.ko
 psample.ko
 psnap.ko
 ptp_kvm.ko
@@ -1840,6 +1858,8 @@ rtw88_8822ce.ko
 rtw88_8822c.ko
 rtw88_core.ko
 rtw88_pci.ko
+rtw89_core.ko
+rtw89_pci.ko
 s2255drv.ko
 s5h1409.ko
 s5h1411.ko
@@ -1962,6 +1982,9 @@ smsusb.ko
 snd-ac97-codec.ko
 snd-acp3x-pdm-dma.ko
 snd-acp3x-rn.ko
+snd-acp5x-i2s.ko
+snd-acp5x-pcm-dma.ko
+snd-acp6x-pdm-dma.ko
 snd-ad1889.ko
 snd-ak4113.ko
 snd-ak4114.ko
@@ -2010,6 +2033,7 @@ snd-hda-codec-ca0132.ko
 snd-hda-codec-cirrus.ko
 snd-hda-codec-cmedia.ko
 snd-hda-codec-conexant.ko
+snd-hda-codec-cs8409.ko
 snd-hda-codec-generic.ko
 snd-hda-codec-hdmi.ko
 snd-hda-codec-idt.ko
@@ -2059,6 +2083,8 @@ snd-opl3-synth.ko
 snd-oxfw.ko
 snd-oxygen.ko
 snd-oxygen-lib.ko
+snd-pci-acp5x.ko
+snd-pci-acp6x.ko
 snd-pcm.ko
 snd-pcsp.ko
 snd-pcxhr.ko
@@ -2077,11 +2103,14 @@ snd-seq-midi.ko
 snd-seq-oss.ko
 snd-seq-virmidi.ko
 snd-skl_nau88l25_max98357a.ko
+snd-soc-acp5x-mach.ko
+snd-soc-acp6x-mach.ko
 snd-soc-acpi-intel-match.ko
 snd-soc-acpi.ko
 snd-soc-catpt.ko
 snd-soc-cml_rt1011_rt5682.ko
 snd-soc-core.ko
+snd-soc-cs35l41-spi.ko
 snd-soc-cx2072x.ko
 snd-soc-da7213.ko
 snd-soc-da7219.ko
@@ -2090,6 +2119,8 @@ snd-soc-ehl-rt5660.ko
 snd-soc-es8316.ko
 snd-soc-hdac-hda.ko
 snd-soc-hdac-hdmi.ko
+snd-soc-intel-hda-dsp-common.ko
+snd-soc-intel-sof-maxim-common.ko
 snd-soc-kbl_da7219_max98357a.ko
 snd-soc-kbl_da7219_max98927.ko
 snd-soc-kbl_rt5660.ko
@@ -2102,6 +2133,7 @@ snd-soc-max98373.ko
 snd-soc-max98373-sdw.ko
 snd-soc-max98390.ko
 snd-soc-max98927.ko
+snd-soc-nau8821.ko
 snd-soc-nau8824.ko
 snd-soc-nau8825.ko
 snd-soc-pcm512x-i2c.ko
@@ -2129,6 +2161,7 @@ snd-soc-rt5677-spi.ko
 snd-soc-rt5682-i2c.ko
 snd-soc-rt5682.ko
 snd-soc-rt5682-sdw.ko
+snd-soc-rt5682s.ko
 snd-soc-rt700.ko
 snd-soc-rt711.ko
 snd-soc-rt711-sdca.ko
@@ -2140,6 +2173,7 @@ snd-soc-skl_nau88l25_ssm4567.ko
 snd-soc-skl_rt286.ko
 snd-soc-skl-ssp-clk.ko
 snd-soc-sof_da7219_max98373.ko
+snd-soc-sof_es8336.ko
 snd-soc-sof_rt5682.ko
 snd-soc-sof-sdw.ko
 snd-soc-ssm4567.ko
@@ -2171,6 +2205,7 @@ snd-soc-wm8804.ko
 snd-sof-acpi-intel-bdw.ko
 snd-sof-acpi-intel-byt.ko
 snd-sof-acpi.ko
+snd-sof-intel-atom.ko
 snd-sof-intel-hda-common.ko
 snd-sof-intel-hda.ko
 snd-sof-intel-ipc.ko
@@ -2321,6 +2356,7 @@ team_mode_roundrobin.ko
 teranetics.ko
 tg3.ko
 tgr192.ko
+think-lmi.ko
 thinkpad_acpi.ko
 thmc50.ko
 thunderbolt-net.ko
@@ -2482,6 +2518,7 @@ virtio-gpu.ko
 virtio_input.ko
 virtio_net.ko
 virtio_scsi.ko
+virtio_snd.ko
 virtio_vdpa.ko
 visor.ko
 vitesse.ko
