@@ -34,7 +34,7 @@ report_fail()
 	echo "FAIL: $MSG" | tee -a $OUTPUTFILE
 
 	RESULT=FAIL
-	rstrnt-report-result $RSTRNT_TASKNAME $RESULT $SCORE
+	rstrnt-report-result "$RSTRNT_TASKNAME" "$RESULT" "$SCORE"
 }
 
 loadmod()
@@ -194,4 +194,4 @@ test_non_root
 
 cleanup
 
-rstrnt-report-result $RSTRNT_TASKNAME $RESULT $SCORE
+rstrnt-report-result "$RSTRNT_TASKNAME" "$RESULT" "$SCORE"
