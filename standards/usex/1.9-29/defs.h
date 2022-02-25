@@ -934,7 +934,7 @@ static inline void sigset(int sig,void *func)
 /*
  *  usex.c
  */
-struct shm_buf *Shm;
+extern struct shm_buf *Shm;
 extern int ID;
 
 #define SEPARATOR "--------------------------------------------------------------------------------\n"
@@ -1081,7 +1081,7 @@ void input_mgr(void);
 /*
  *  curses_mgr.c
  */
-WINDOW_TABLE Window;           /* Table of curses window pointers. */
+extern WINDOW_TABLE Window;           /* Table of curses window pointers. */
 int curses_mgr(int, char **);
 void clear_field(int, int, int);
 void wind_intr(void);

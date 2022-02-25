@@ -1454,7 +1454,6 @@ void
 test_inquiry(int target, FILE *fp, int show_messages)
 {
 	int others;
-	extern __const char *__const sys_siglist[_NSIG];
 	PROC_TABLE *tbl;
 	
 	tbl = &Shm->ptbl[target];
@@ -1571,7 +1570,7 @@ test_inquiry(int target, FILE *fp, int show_messages)
 	fprintf(fp, "i_signal_received: %d ",
 		tbl->i_signal_received);
 	if (tbl->i_signal_received && (tbl->i_signal_received <= _NSIG))
-		fprintf(fp, "(%s) ", sys_siglist[tbl->i_signal_received]);
+		fprintf(fp, "(%s) ", strsignal(tbl->i_signal_received));
 	
 	fprintf(fp, " i_exit_status: %d ", tbl->i_exit_status);
 	switch (tbl->i_exit_status)
