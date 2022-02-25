@@ -773,6 +773,7 @@ libnvdimm.ko
 libsas.ko
 lineage-pem.ko
 linear.ko
+linear_ranges.ko
 lis3lv02d_i2c.ko
 lis3lv02d.ko
 llc.ko

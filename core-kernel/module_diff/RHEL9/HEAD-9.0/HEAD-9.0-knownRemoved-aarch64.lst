@@ -1,5 +1,8 @@
 cramfs.ko
 dnet.ko
 ethoc.ko
+nct6683.ko
+ns.ko
 vmwgfx.ko
+yenta_socket.ko
 zstd_decompress.ko

@@ -668,6 +668,7 @@ libnvdimm.ko
 libpoly1305.ko
 libsas.ko
 linear.ko
+linear_ranges.ko
 llc.ko
 lm70.ko
 lockd.ko
@@ -957,6 +958,8 @@ overlay.ko
 p8022.ko
 parman.ko
 pcbc.ko
+pci-hyperv-intf.ko
+pci-hyperv.ko
 pci-pf-stub.ko
 pcrypt.ko
 pcs_xpcs.ko

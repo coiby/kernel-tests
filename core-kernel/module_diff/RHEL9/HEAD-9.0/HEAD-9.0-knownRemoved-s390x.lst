@@ -1,2 +1,3 @@
 cramfs.ko
+yenta_socket.ko
 zstd_decompress.ko

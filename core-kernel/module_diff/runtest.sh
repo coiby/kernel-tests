@@ -547,6 +547,15 @@ rlJournalStart
                     if cki_kver_lt "5.14.0-56"; then
                         sed -i '/cramfs.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
                     fi
+                    if cki_kver_lt "5.14.0-65"; then
+                        sed -i '/snd-sof-intel-ipc.ko/d' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-68"; then
+                        sed -i '/yenta_socket.ko/d;/nct6683.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-69"; then
+                        sed -i '/^ns.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
