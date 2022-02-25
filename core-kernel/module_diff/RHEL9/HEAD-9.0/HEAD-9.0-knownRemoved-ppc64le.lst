@@ -16,4 +16,5 @@ snd-firewire-tascam.ko
 snd-fireworks.ko
 snd-isight.ko
 snd-oxfw.ko
+yenta_socket.ko
 zstd_decompress.ko

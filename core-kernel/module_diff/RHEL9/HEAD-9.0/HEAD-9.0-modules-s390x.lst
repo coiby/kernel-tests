@@ -310,6 +310,7 @@ libiscsi_tcp.ko
 libnvdimm.ko
 libsas.ko
 linear.ko
+linear_ranges.ko
 llc.ko
 lockd.ko
 loop.ko

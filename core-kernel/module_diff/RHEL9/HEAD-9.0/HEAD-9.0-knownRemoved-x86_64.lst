@@ -6,6 +6,7 @@ firewire-core.ko
 firewire-net.ko
 firewire-ohci.ko
 firewire-sbp2.ko
+ns.ko
 snd-bebob.ko
 snd-dice.ko
 snd-fireface.ko
@@ -16,4 +17,6 @@ snd-firewire-tascam.ko
 snd-fireworks.ko
 snd-isight.ko
 snd-oxfw.ko
+snd-sof-intel-ipc.ko
+yenta_socket.ko
 zstd_decompress.ko
