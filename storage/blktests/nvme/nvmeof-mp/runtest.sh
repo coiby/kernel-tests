@@ -115,8 +115,8 @@ function get_test_cases
 {
 	typeset testcases=""
 	[[ $(ip -4 -o a s | grep -v "127.0.0.1" | wc -l) != 1 ]] || testcases+=" nvmeof-mp/001"
-	#RHEL8 aarch64 BZ1919363 BZ1938434, RHEL9 #BZ1912968
-	uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le|5.12.*aarch64|el9.ppc64le|5.11.*ppc64le" || testcases+=" nvmeof-mp/002"
+	#RHEL8 aarch64 BZ1919363 BZ1938434, RHEL9 #BZ191296, RHEL-8.2 BZ2058980
+	uname -ri | grep -qE "4.18.0-193|4.18.0.*aarch64|4.18.0.*ppc64le|5.12.*aarch64|el9.ppc64le|5.11.*ppc64le" || testcases+=" nvmeof-mp/002"
 	# testcases+=" nvmeof-mp/004", need legacy device mapper support
 	testcases+=" nvmeof-mp/005"
 	testcases+=" nvmeof-mp/006"
