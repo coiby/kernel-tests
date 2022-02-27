@@ -108,7 +108,7 @@ function get_test_cases
 	testcases+=" monitor.sh"
 	testcases+=" max_available_extent_ns.sh"
 	testcases+=" pfn-meta-errors.sh"
-	uname -r | grep -qE "4.18.0-147" || testcases+=" track-uuid.sh"
+	uname -r | grep -qE "4.18.0-147|4.18.0-193|4.18.0-240" || testcases+=" track-uuid.sh"
 
 	echo $testcases
 }
