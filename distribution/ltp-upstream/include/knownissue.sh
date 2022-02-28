@@ -196,6 +196,7 @@ function knownissue_filter()
 	cki_is_vm && tskip "msgstress03 msgstress04" fatal
 	# http://lists.infradead.org/pipermail/linux-arm-kernel/2021-June/668228.html
 	is_arch "aarch64" && tskip "read_all_sys" fatal
+	cki_has_kernel_debug_flags && tskip "futex_cmp_requeue01" unfix
 }
 
 function tcase_exclude()
