@@ -15,6 +15,11 @@
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
 
+# debug kernel is slower increase LTP_TIMEOUT_MUL
+if  cki_is_kernel_debug; then
+    export LTP_TIMEOUT_MUL=2
+fi
+
 core_pattern="$(cat /proc/sys/kernel/core_pattern)"
 core_pattern_ltp_dir="/mnt/testarea/ltp/cores"
 

@@ -8,6 +8,13 @@
 . ../include/runtest.sh			|| exit 1
 . ../include/knownissue.sh		|| exit 1
 
+# debug kernel is slower increase LTP_TIMEOUT_MUL
+# upstream kernels don't contain _debug on kernel name,
+# check for common debug flag options
+if  cki_has_kernel_debug_flags; then
+    export LTP_TIMEOUT_MUL=2
+fi
+
 TARGET_DIR=/mnt/testarea/ltp
 RUNTESTS=${RUNTESTS:-"cve sched syscalls can commands containers dio fs fsx math hugetlb mm nptl pty ipc tracing"}
 CPUS_NUM=$(getconf _NPROCESSORS_ONLN || echo 1)
