@@ -163,6 +163,8 @@ function knownissue_filter()
 	# Bug 1534635 - CVE-2018-1000001 glibc: realpath() buffer underflow when getcwd()
 	pkg_in_range "glibc" "0" "2.17-221.el7" && tskip "realpath01 cve-2018-1000001" fixed
 
+	cki_is_kernel_debug && tskip "futex_cmp_requeue01" unfix
+
 	# ----------------- NOTE: -----------------------------
 	# we have split the knownissue's data from code, better
 	# to add new issues in knownissue/* file from now on.
