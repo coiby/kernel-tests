@@ -52,6 +52,12 @@ CKI_UNINITIATED=3 # should go to cki_abort_task()
 CKI_STATUS_COMPLETED=0 # task is completed
 CKI_STATUS_ABORTED=1   # task is aborted
 
+# unction to write log
+function cki_log()
+{
+    echo "$*"
+}
+
 # Wrapper function to write log
 function cki_beakerlib_log()
 {
@@ -86,7 +92,7 @@ function cki_abort_task()
     typeset reason="$*"
     [[ -z $reason ]] && reason="unknown reason"
     rstrnt-report-result "${TEST}" WARN
-    cki_beakerlib_log "Aborting current task: $reason"
+    cki_log "Aborting current task: $reason"
     rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit $CKI_STATUS_ABORTED
 }
