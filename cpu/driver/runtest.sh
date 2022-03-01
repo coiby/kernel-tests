@@ -72,8 +72,7 @@ function verify_intel_cpufreq_driver
 	    cki_beakerlib_log "PASS"
 	    return $CKI_PASS
 	fi
-        cki_set_reason $CKI_FAIL \
-            "intel system is running: $driver"
+        cki_beakerlib_fail "intel system is running: $driver"
         return $CKI_FAIL
     fi
 
@@ -85,15 +84,13 @@ function verify_intel_cpufreq_driver
                 cki_beakerlib_skip_task "intel system has HWP, but it is not enabled"
             fi
 	else
-            cki_set_reason $CKI_FAIL \
-                "intel system is not running intel_pstate running: $driver"
+            cki_beakerlib_fail "intel system is not running intel_pstate running: $driver"
             return $CKI_FAIL
 	fi
     else
         cki_run_cmd_pos "ls /sys/devices/system/cpu/intel_pstate/"
         if (( $? != 0 )); then
-            cki_set_reason $CKI_FAIL \
-                "intel system does not have HWP, intel_pstate is not active"
+            cki_beakerlib_fail "intel system does not have HWP, intel_pstate is not active"
             return $CKI_FAIL
         fi
     fi
@@ -114,8 +111,7 @@ function verify_amd_cpufreq_driver
     # verify family is >= 15h
     if (( $family >= 0x15 )); then
         if [[ $driver != "acpi-cpufreq" ]]; then
-            cki_set_reason $CKI_FAIL \
-                "amd system is running: $driver"
+            cki_beakerlib_fail "amd system is running: $driver"
             return $CKI_FAIL
         fi
     else

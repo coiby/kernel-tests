@@ -64,6 +64,12 @@ function cki_beakerlib_log()
     rlLog "$*"
 }
 
+# Wrapper function to write log
+function cki_beakerlib_fail()
+{
+    rlFail "$*"
+}
+
 #
 # When a serious problem occurs and we cannot proceed any further, we abort
 # this recipe with an error message.
@@ -145,10 +151,6 @@ function cki_beakerlib_report_result()
     esac
 }
 
-#
-# Set reason for according to result code, once function cki_beakerlib_report_result() is
-# invoked, the related reason will be used when calling cki_beakerlib_log()
-#
 function cki_set_reason()
 {
     typeset rc=${1?"*** result code"}
