@@ -74,13 +74,13 @@ function build_radixtree()
 {
 	get_running_kernel_src
 
-	cki_cd linux-*/
+	pushd linux-*/
 	patch -d tools/testing/radix-tree/ < ../patch/disable-iteration-test.patch
 	make -C tools/testing/radix-tree/
 	[ -f tools/testing/radix-tree/main ]     || return 1
 	[ -f tools/testing/radix-tree/xarray ]   || return 1
 	[ -f tools/testing/radix-tree/idr-test ] || return 1
-	cki_pd
+	popd
 }
 
 function run_radixtree()

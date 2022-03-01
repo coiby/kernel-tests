@@ -212,20 +212,6 @@ function cki_run()
     return $?
 }
 
-
-# Wrapper function to change working directory
-function cki_cd()
-{
-    rlRun "pushd $(pwd)"
-    rlRun "cd $1"
-}
-
-# Wrapper function to return to original working directory
-function cki_pd()
-{
-    rlRun "popd"
-}
-
 #
 # Enable to debug bash script by resetting PS4. If user wants to turn debug
 # switch on, just set env DEBUG, e.g.

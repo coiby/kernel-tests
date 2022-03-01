@@ -68,9 +68,9 @@ function msr_tools_uninstall
     typeset dst_dir=$MSR_TOOLS_DST_DIR
     [[ ! -d $dst_dir ]] && return $CKI_PASS
 
-    cki_cd "$dst_dir"
+    rlRun "pushd $dst_dir"
     rlRun -l "make uninstall" "0-255"
-    cki_pd
+    rlRun "popd"
 
     return $CKI_PASS
 }
