@@ -29,20 +29,20 @@ source $CDIR/../cki_lib/libcki.sh || exit 1
 
 function startup
 {
-    cki_beakerlib_log "$NAME: startup"
+    rlLog "$NAME: startup"
     return 0
 }
 
 function cleanup
 {
-    cki_beakerlib_log "$NAME: cleanup"
+    rlLog "$NAME: cleanup"
     return 0
 }
 
 function runtest
 {
-    cki_beakerlib_log "$NAME: runtest"
-    cki_beakerlib_log "This this is an example test which always passes"
+    rlLog "$NAME: runtest"
+    rlLog "This this is an example test which always passes"
     return 0
 }
 

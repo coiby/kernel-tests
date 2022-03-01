@@ -25,7 +25,7 @@ source $CDIR/../../common/libpwmgmt.sh
 
 function runtest
 {
-    cki_beakerlib_log "This test checks that current frequency is between min and max" \
+    rlLog "This test checks that current frequency is between min and max" \
             "frequency and these two has plausible values"
 
     # Dump sysinfo
@@ -47,9 +47,9 @@ function runtest
     typeset max_freq=$(egrep [0-9] $file1)
     typeset cur_freq=$(egrep [0-9] $file2)
     typeset min_freq=$(egrep [0-9] $file3)
-    cki_beakerlib_log "CPU max     frequency: $max_freq"
-    cki_beakerlib_log "CPU min     frequency: $min_freq"
-    cki_beakerlib_log "CPU current frequency: $cur_freq"
+    rlLog "CPU max     frequency: $max_freq"
+    rlLog "CPU min     frequency: $min_freq"
+    rlLog "CPU current frequency: $cur_freq"
 
     #
     # Verify max/min/current frequency, and the rules are:
@@ -59,25 +59,25 @@ function runtest
     # 4. highest frequency would be at most    8GHz
     #
     if (( $cur_freq < $min_freq )); then
-        cki_beakerlib_log "FAIL: current frequency ($cur_freq) < min frequency ($min_freq)"
+        rlLog "FAIL: current frequency ($cur_freq) < min frequency ($min_freq)"
         return $CKI_FAIL
     fi
-    cki_beakerlib_log "+OK: current frequency ($cur_freq) >= min frequency ($min_freq)"
+    rlLog "+OK: current frequency ($cur_freq) >= min frequency ($min_freq)"
     if (( $cur_freq > $max_freq )); then
-        cki_beakerlib_log "FAIL: current frequency ($cur_freq) > max frequency ($max_freq)"
+        rlLog "FAIL: current frequency ($cur_freq) > max frequency ($max_freq)"
         return $CKI_FAIL
     fi
-    cki_beakerlib_log "+OK: current frequency ($cur_freq) <= max frequency ($max_freq)"
+    rlLog "+OK: current frequency ($cur_freq) <= max frequency ($max_freq)"
     if (( $min_freq < 300000 )); then
-        cki_beakerlib_log "FAIL: min frequency ($min_freq) < 300MHz (300000)"
+        rlLog "FAIL: min frequency ($min_freq) < 300MHz (300000)"
         return $CKI_FAIL
     fi
-    cki_beakerlib_log "+OK: min frequency ($min_freq) >= 300MHz (300000)"
+    rlLog "+OK: min frequency ($min_freq) >= 300MHz (300000)"
     if (( $max_freq > 8000000 )); then
-        cki_beakerlib_log "FAIL: max frequency ($max_freq) > 8GHz (8000000)"
+        rlLog "FAIL: max frequency ($max_freq) > 8GHz (8000000)"
         return $CKI_FAIL
     fi
-    cki_beakerlib_log "+OK: max frequency ($max_freq) <= 8GHz (8000000)"
+    rlLog "+OK: max frequency ($max_freq) <= 8GHz (8000000)"
 
     return $CKI_PASS
 }

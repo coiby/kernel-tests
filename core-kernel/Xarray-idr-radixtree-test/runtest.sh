@@ -42,10 +42,10 @@ function get_running_kernel_src()
 	echo $running_kernel | grep -q -v 'el[0-9]\|fc\|eln'
 
 	if [ $? -eq 0 ]; then
-		cki_beakerlib_log "detected upstream kernel..."
+		rlLog "detected upstream kernel..."
 		# For CKI upstream kernels, the source is extracted under /usr/src/kernels/
 		# this is done as part of distribution/kpkginstall (Boot test)
-		cki_beakerlib_log "Copying /usr/src/kernels/${running_kernel} to linux-${running_kernel}"
+		rlLog "Copying /usr/src/kernels/${running_kernel} to linux-${running_kernel}"
 		# Not using rlRun as sometimes the function causes "Segmentation fault"
 		cp -r /usr/src/kernels/${running_kernel} linux-${running_kernel}
 	else
@@ -55,10 +55,10 @@ function get_running_kernel_src()
 		if [ $? -eq 1 ]; then
 			kernelpkg="kernel-rt"
 		fi
-		cki_beakerlib_log "detected rhel/fedora/ark kernel..."
+		rlLog "detected rhel/fedora/ark kernel..."
 		echo $running_kernel | grep -q -v 'fc'
 		if [ $? -ne  0 ]; then
-			cki_beakerlib_log "workaround to find srpm name for ark kernels..."
+			rlLog "workaround to find srpm name for ark kernels..."
 			# ARK kernel don't always have disttag correct
 			# workaround to find the srpm version on cki repo
 			running_kernel=$(dnf -q --disablerepo="*" --enablerepo="kernel-cki" list --all "${kernelpkg}.src" --showduplicates \
@@ -93,7 +93,7 @@ function run_radixtree()
 		return ${PIPESTATUS[0]}
 		;;
 	*)
-		cki_beakerlib_log "No test $t_name in the tools/testing/radix-tree/" && return 1
+		rlLog "No test $t_name in the tools/testing/radix-tree/" && return 1
 		;;
 	esac
 }

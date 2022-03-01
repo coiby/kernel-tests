@@ -34,7 +34,7 @@ function load_start
     for ((i = 0; i < nload; i++)); do
         dd if=/dev/zero of=/dev/null 2>/dev/null &
         typeset pid=$!
-        cki_beakerlib_log "$i:\ta load is running, pid=$pid"
+        rlLog "$i:\ta load is running, pid=$pid"
         g_load_pids[$i]=$pid
     done
 }
@@ -45,14 +45,14 @@ function load_stop
     for ((i = 0; i < ${#g_load_pids[@]}; i++)); do
         typeset pid=${g_load_pids[$i]}
         kill -9 $pid
-        cki_beakerlib_log "$i:\ta load is stopped, pid=$pid"
+        rlLog "$i:\ta load is stopped, pid=$pid"
     done
     unset g_load_pids
 }
 
 function runtest
 {
-    cki_beakerlib_log "This test tests if CPU frequency is changing between idle" \
+    rlLog "This test tests if CPU frequency is changing between idle" \
         "on powersave governor and full load on performance governor"
 
     # Dump sysinfo
@@ -73,16 +73,16 @@ function runtest
 
     typeset file_freq1=$TMPDIR/curfreq1
     typeset file_freq2=$TMPDIR/curfreq2
-    cki_beakerlib_log "write 'powersave' to file $file2"
+    rlLog "write 'powersave' to file $file2"
     rlRun "echo powersave > $file2 && cat $file2" || return $CKI_FAIL
-    cki_beakerlib_log "sleep a while then get current cpu frequency"
+    rlLog "sleep a while then get current cpu frequency"
     rlRun  "sleep 20"
     rlRun -l "cat $file3 > $file_freq1 && cat $file_freq1" "0-255"
     typeset cur_freq_pows=$(cat $file_freq1)
 
-    cki_beakerlib_log "write 'performance' to file $file2"
+    rlLog "write 'performance' to file $file2"
     rlRun "echo performance > $file2 && cat $file2" || return $CKI_FAIL
-    cki_beakerlib_log "start workloads then get current cpu frequency"
+    rlLog "start workloads then get current cpu frequency"
     load_start
     rlRun "sleep 20"
     rlRun -l "cat $file3 > $file_freq2 && cat $file_freq2" "0-255"
@@ -92,9 +92,9 @@ function runtest
     typeset msg_governor="CPU scaling governor"
     typeset msg_freq_pows="CPU scaling frequency with powersave"
     typeset msg_freq_perf="CPU scaling frequency with performance"
-    cki_beakerlib_log "$msg_governor:\t\t\t$scaling_governor"
-    cki_beakerlib_log "$msg_freq_pows:\t$cur_freq_pows"
-    cki_beakerlib_log "$msg_freq_perf:\t$cur_freq_perf"
+    rlLog "$msg_governor:\t\t\t$scaling_governor"
+    rlLog "$msg_freq_pows:\t$cur_freq_pows"
+    rlLog "$msg_freq_perf:\t$cur_freq_perf"
     #
     # NOTE: CPU scaling frequency with powersave should be less than
     #       CPU scaling frequency with performance
@@ -102,10 +102,10 @@ function runtest
     typeset msg2fail="($cur_freq_pows) >= ($cur_freq_perf)"
     typeset msg2pass="($cur_freq_pows) <  ($cur_freq_perf)"
     if (( $cur_freq_pows >= $cur_freq_perf )); then
-        cki_beakerlib_log "FAIL: $msg_freq_pows $msg2fail $msg_freq_perf"
+        rlLog "FAIL: $msg_freq_pows $msg2fail $msg_freq_perf"
         return $CKI_FAIL
     fi
-    cki_beakerlib_log "PASS: $msg_freq_pows $msg2pass $msg_freq_perf"
+    rlLog "PASS: $msg_freq_pows $msg2pass $msg_freq_perf"
     return $CKI_PASS
 }
 
