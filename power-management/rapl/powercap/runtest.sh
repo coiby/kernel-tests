@@ -194,7 +194,7 @@ function startup
 
 function cleanup
 {
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun -l "rm -rf $TMPDIR" "0-255"
     return $CKI_PASS
 }
 
@@ -217,8 +217,8 @@ function HW_good {
 function runtest
 {
     # For debugging
-    cki_run_cmd_neu "find /sys/devices/ -name *rapl*"
-    cki_run_cmd_neu "lsmod"
+    rlRun -l "find /sys/devices/ -name *rapl*" "0-255"
+    rlRun -l "lsmod" "0-255"
 
     # check if HW supports known cpufreq driver and returns the frequency to the standard tools
     HW_good

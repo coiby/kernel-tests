@@ -76,7 +76,7 @@ function verify_intel_cpufreq_driver
         return $CKI_FAIL
     fi
 
-    cki_run_cmd_neu "lscpu | grep 'hwp '"
+    rlRun -l "lscpu | grep 'hwp '" "0-255"
     if (( $? == 0 )); then
 	if [ "$driver" = "intel_pstate" ]; then
             rlRun -l "rdmsr 0x770"
@@ -174,7 +174,7 @@ function startup
 function cleanup
 {
     msr_tools_cleanup
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun "rm -rf $TMPDIR"
     return $CKI_PASS
 }
 

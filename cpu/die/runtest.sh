@@ -40,7 +40,7 @@ rlJournalStart
 
     # Cleanup phase: Remove test directory
     rlPhaseStartCleanup
-        cki_run_cmd_neu "rm -f $TMPDIR"
+        rlRun "rm -f $TMPDIR"
     rlPhaseEnd
 rlJournalEnd
 

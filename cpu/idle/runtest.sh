@@ -64,7 +64,7 @@ function startup
 function cleanup
 {
     msr_tools_cleanup
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun "rm -rf $TMPDIR"
     return $CKI_PASS
 }
 

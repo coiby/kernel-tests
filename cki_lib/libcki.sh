@@ -38,10 +38,6 @@ fi
 # Include beaker library
 source /usr/share/beakerlib/beakerlib.sh
 
-CKI_RC_POS=0
-CKI_RC_NEG="1-255"
-CKI_RC_ANY="0-255" # To assist rlRun() to support any return code
-
 # Result code definitions
 CKI_PASS=0        # should go to rlPass()
 CKI_FAIL=1        # should go to rlFail()
@@ -216,19 +212,6 @@ function cki_run()
     return $?
 }
 
-#
-# Wrapper functions to run a single cmd
-# o cki_run_cmd_neu(): don't care about $?
-#
-
-function cki_run_cmd_neu()
-{
-    typeset cmd="$*"
-    (( ${#cmd} > 64 )) && cmd="${cmd:0:63}..."
-    typeset msg="[ NEU ] run '$cmd', expect nothing"
-    rlRun -l "$@" "$CKI_RC_ANY" "$msg"
-    return $?
-}
 
 # Wrapper function to change working directory
 function cki_cd()

@@ -29,9 +29,9 @@ function runtest
             "frequency and these two has plausible values"
 
     # Dump sysinfo
-    cki_run_cmd_neu "uname -srvm"
-    cki_run_cmd_neu "lscpu"
-    cki_run_cmd_neu "dmidecode | grep -A 3 'BIOS Information'"
+    rlRun -l "uname -srvm"
+    rlRun -l "lscpu"
+    rlRun -l "dmidecode | grep -A 3 'BIOS Information'" "0-255"
 
     # Dump cpu0/cpufreq/cpuinfo_{max,cur,min}_freq
     typeset file1="/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq"
@@ -41,7 +41,7 @@ function runtest
     typeset file3="/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq"
     typeset filex=""
     for filex in $file1 $file2 $file3; do
-        cki_run_cmd_neu "cat $filex"
+        rlRun -l "cat $filex" "0-255"
     done
 
     typeset max_freq=$(egrep [0-9] $file1)
@@ -108,7 +108,7 @@ function startup
 
 function cleanup
 {
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun "rm -rf $TMPDIR"
     return $CKI_PASS
 }
 

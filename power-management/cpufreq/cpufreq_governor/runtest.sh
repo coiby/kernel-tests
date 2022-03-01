@@ -29,7 +29,7 @@ function load_start
     typeset ncpus=$(lscpu -p=cpu | grep -v '^#' | wc -l)
     typeset nload=$((ncpus * 1 + ncpus / 2))
     # XXX: Make sure no running "dd" processes are on the system under test
-    cki_run_cmd_neu "pkill dd"
+    rlRun -l "pkill dd" "0-255"
     typeset -i i
     for ((i = 0; i < nload; i++)); do
         dd if=/dev/zero of=/dev/null 2>/dev/null &
@@ -56,9 +56,9 @@ function runtest
         "on powersave governor and full load on performance governor"
 
     # Dump sysinfo
-    cki_run_cmd_neu "uname -srvm"
-    cki_run_cmd_neu "lscpu"
-    cki_run_cmd_neu "dmidecode | grep -A 3 'BIOS Information'"
+    rlRun -l "uname -srvm"
+    rlRun -l "lscpu"
+    rlRun -l  "dmidecode | grep -A 3 'BIOS Information'" "0-255"
 
     typeset cpufreq_dir="/sys/devices/system/cpu/cpu0/cpufreq"
     typeset file1="$cpufreq_dir/scaling_available_governors"
@@ -67,8 +67,8 @@ function runtest
     ls $file3 > /dev/null 2>&1 || \
             file3="$cpufreq_dir/scaling_cur_freq"
 
-    cki_run_cmd_neu "cat $file1"
-    cki_run_cmd_neu "cat $file2"
+    rlRun -l "cat $file1" "0-255"
+    rlRun -l "cat $file2" "0-255"
     typeset scaling_governor=$(cat $file2)
 
     typeset file_freq1=$TMPDIR/curfreq1
@@ -76,16 +76,16 @@ function runtest
     cki_beakerlib_log "write 'powersave' to file $file2"
     rlRun "echo powersave > $file2 && cat $file2" || return $CKI_FAIL
     cki_beakerlib_log "sleep a while then get current cpu frequency"
-    cki_run_cmd_neu "sleep 20"
-    cki_run_cmd_neu "cat $file3 > $file_freq1 && cat $file_freq1"
+    rlRun  "sleep 20"
+    rlRun -l "cat $file3 > $file_freq1 && cat $file_freq1" "0-255"
     typeset cur_freq_pows=$(cat $file_freq1)
 
     cki_beakerlib_log "write 'performance' to file $file2"
     rlRun "echo performance > $file2 && cat $file2" || return $CKI_FAIL
     cki_beakerlib_log "start workloads then get current cpu frequency"
     load_start
-    cki_run_cmd_neu "sleep 20"
-    cki_run_cmd_neu "cat $file3 > $file_freq2 && cat $file_freq2"
+    rlRun "sleep 20"
+    rlRun -l "cat $file3 > $file_freq2 && cat $file_freq2" "0-255"
     typeset cur_freq_perf=$(cat $file_freq2)
     load_stop
 
@@ -135,7 +135,7 @@ function startup
 
 function cleanup
 {
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun "rm -rf $TMPDIR"
     return $CKI_PASS
 }
 

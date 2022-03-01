@@ -56,8 +56,8 @@ function msr_tools_install
     exit 0
 EOF
 
-    cki_run_cmd_neu "chmod +x $script"
-    cki_run_cmd_neu "cat -n $script"
+    rlRun -l "chmod +x $script"
+    rlRun -l "cat -n $script"
     rlRun -l "bash $script" || return $CKI_UNINITIATED
 
     return $CKI_PASS
@@ -69,7 +69,7 @@ function msr_tools_uninstall
     [[ ! -d $dst_dir ]] && return $CKI_PASS
 
     cki_cd "$dst_dir"
-    cki_run_cmd_neu "make uninstall"
+    rlRun -l "make uninstall" "0-255"
     cki_pd
 
     return $CKI_PASS
@@ -83,10 +83,10 @@ function msr_tools_epel_install()
     [[ ! -e /etc/yum.repos.d/epel.repo ]] && add_repo=true
 
     [[ "$add_repo" == "true" ]] && \
-        cki_run_cmd_neu "${YUM} -y install $EPEL"
-    cki_run_cmd_neu "${YUM} -y install msr-tools"
+        rlRun -l "${YUM} -y install $EPEL" "0-255"
+    rlRun -l "${YUM} -y install msr-tools" "0-255"
     [[ "$add_repo" == "true" ]] && \
-        cki_run_cmd_neu "${YUM} -y remove epel-release"
+        rlRun -l "${YUM} -y remove epel-release" "0-255"
 
     rlRun -l "which rdmsr"
     (( $? == 0 )) && return $CKI_PASS || return $CKI_UNINITIATED
@@ -94,7 +94,7 @@ function msr_tools_epel_install()
 
 function msr_tools_epel_uninstall
 {
-    cki_run_cmd_neu "${YUM} -y remove msr-tools"
+    rlRun -l "${YUM} -y remove msr-tools" "0-255"
 }
 
 function msr_tools_setup

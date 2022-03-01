@@ -46,7 +46,7 @@ function runtest
 {
     typeset i
     for i in 0 1 456 10; do
-        cki_run_cmd_neu "modprobe -r raid$i"
+        rlRun -l "modprobe -r raid$i" "0-255"
         sleep 5
         rlRun -l "modprobe raid$i"
         sleep 5
