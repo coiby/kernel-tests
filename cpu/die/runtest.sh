@@ -29,7 +29,7 @@ rlJournalStart
     # Setup phase: Prepare test directory
     rlPhaseStartSetup
     if [ ! -e /sys/devices/system/cpu/cpu0/topology/die_id ]; then
-        cki_skip_task "the operating system does not have die support"
+        cki_beakerlib_skip_task "the operating system does not have die support"
     fi
     rlPhaseEnd
 

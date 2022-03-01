@@ -45,7 +45,7 @@ CKI_RC_ANY="0-255" # To assist rlRun() to support any return code
 # Result code definitions
 CKI_PASS=0        # should go to rlPass()
 CKI_FAIL=1        # should go to rlFail()
-CKI_UNSUPPORTED=2 # should go to cki_skip_task()
+CKI_UNSUPPORTED=2 # should go to cki_beakerlib_skip_task()
 CKI_UNINITIATED=3 # should go to cki_abort_task()
 
 # Status code definitions
@@ -97,7 +97,7 @@ function cki_abort_task()
     exit $CKI_STATUS_ABORTED
 }
 
-function cki_skip_task()
+function cki_beakerlib_skip_task()
 {
     typeset reason="$*"
     [[ -z $reason ]] && reason="unknown reason"
@@ -130,7 +130,7 @@ function cki_report_result()
             fi
             typeset reason=$g_reason_unsupported
             [[ -z "$reason" ]] && reason="UNKNOWN REASON"
-            cki_skip_task "$reason"
+            cki_beakerlib_skip_task "$reason"
             ;;
         "$CKI_UNINITIATED")
             if [[ -n "$cleanup" ]]; then
