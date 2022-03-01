@@ -51,8 +51,7 @@ function startup
     # setup msr tools as package 'msr-tools' is not installed by default
     msr_tools_setup
     if [ $? -ne 0 ]; then
-        cki_set_reason $CKI_UNINITIATED "fail to setup msr tools"
-        return $CKI_UNINITIATED
+        cki_abort_task "fail to setup msr tools"
     fi
 
     # check this test is supported by CPU

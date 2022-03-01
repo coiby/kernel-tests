@@ -82,9 +82,7 @@ function verify_intel_cpufreq_driver
 	if [ "$driver" = "intel_pstate" ]; then
             cki_run_cmd_pos "rdmsr 0x770"
             if (( $? != 0 )); then
-		cki_set_reason $CKI_UNSUPPORTED \
-		    "intel system has HWP, but it is not enabled"
-		return $CKI_UNSUPPORTED
+                cki_beakerlib_skip_task "intel system has HWP, but it is not enabled"
             fi
 	else
             cki_set_reason $CKI_FAIL \
@@ -121,9 +119,7 @@ function verify_amd_cpufreq_driver
             return $CKI_FAIL
         fi
     else
-        cki_set_reason $CKI_UNSUPPORTED \
-            "this test is not valid for the AMD family"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "this test is not valid for the AMD family"
     fi
 
     cki_beakerlib_log "PASS"
@@ -153,9 +149,7 @@ function runtest
         ;;
 
     *) # UNSUPPORTED
-        cki_set_reason $CKI_UNSUPPORTED \
-            "it is an unsupported vendor: $vendor_str"
-        typeset -i ret=$CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "it is an unsupported vendor: $vendor_str"
         ;;
     esac
 
@@ -165,9 +159,7 @@ function runtest
 function startup
 {
     if [[ $(virt-what) == "kvm" ]]; then
-        cki_set_reason $CKI_UNSUPPORTED \
-            "this test is unsupported in kvm"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "this test is unsupported in kvm"
     fi
 
     if [[ ! -d $TMPDIR ]]; then
@@ -177,8 +169,7 @@ function startup
     # setup msr tools as package 'msr-tools' is not installed by default
     msr_tools_setup
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNINITIATED "fail to setup msr tools"
-        return $CKI_UNINITIATED
+        cki_abort_task "fail to setup msr tools"
     fi
 
     return $CKI_PASS

@@ -172,21 +172,17 @@ function startup
 {
     is_kvm
     if (( $? == 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED "kvm is unsupported"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "kvm is unsupported"
     fi
 
     is_intel
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED "non-intel CPU is unsupported"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "non-intel CPU is unsupported"
     fi
 
     has_kmod_intel_rapl
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED \
-            "kernel module 'intel-rapl' is not loaded"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "kernel module 'intel-rapl' is not loaded"
     fi
 
     if [[ ! -d $TMPDIR ]]; then
