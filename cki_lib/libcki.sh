@@ -218,19 +218,9 @@ function cki_run()
 
 #
 # Wrapper functions to run a single cmd
-# o cki_run_cmd_pos(): $? must be 0
 # o cki_run_cmd_neg(): $? must be !0
 # o cki_run_cmd_neu(): don't care about $?
 #
-function cki_run_cmd_pos()
-{
-    typeset cmd="$*"
-    (( ${#cmd} > 64 )) && cmd="${cmd:0:63}..."
-    typeset msg="[ POS ] run '$cmd', expect to pass"
-    rlRun -l "$@" "$CKI_RC_POS" "$msg"
-    return $?
-}
-
 function cki_run_cmd_neg()
 {
     typeset cmd="$*"

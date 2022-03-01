@@ -74,16 +74,14 @@ function runtest
     typeset file_freq1=$TMPDIR/curfreq1
     typeset file_freq2=$TMPDIR/curfreq2
     cki_beakerlib_log "write 'powersave' to file $file2"
-    cki_run_cmd_pos "echo powersave > $file2 && cat $file2" || \
-        return $CKI_FAIL
+    rlRun "echo powersave > $file2 && cat $file2" || return $CKI_FAIL
     cki_beakerlib_log "sleep a while then get current cpu frequency"
     cki_run_cmd_neu "sleep 20"
     cki_run_cmd_neu "cat $file3 > $file_freq1 && cat $file_freq1"
     typeset cur_freq_pows=$(cat $file_freq1)
 
     cki_beakerlib_log "write 'performance' to file $file2"
-    cki_run_cmd_pos "echo performance > $file2 && cat $file2" || \
-        return $CKI_FAIL
+    rlRun "echo performance > $file2 && cat $file2" || return $CKI_FAIL
     cki_beakerlib_log "start workloads then get current cpu frequency"
     load_start
     cki_run_cmd_neu "sleep 20"
@@ -129,7 +127,7 @@ function startup
     fi
 
     if [[ ! -d $TMPDIR ]]; then
-        cki_run_cmd_pos "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
+        rlRun "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
     fi
 
     return $CKI_PASS

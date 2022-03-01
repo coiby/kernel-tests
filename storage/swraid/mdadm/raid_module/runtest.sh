@@ -21,24 +21,25 @@
 # This case just test raid modules loading and unloading for several times.
 #
 
-source ../../../../cki_lib/libcki.sh || exit 1  
+source /usr/share/beakerlib/beakerlib.sh || exit 1
+source ../../../../cki_lib/libcki.sh || exit 1
 
 function clean_all_loop_md
 {
-    umount /dev/md?                                                             
-    mdadm --stop /dev/md?                                                       
-    losetup -D                                                                  
-    rm -f /opt/loop.* 
+    umount /dev/md?
+    mdadm --stop /dev/md?
+    losetup -D
+    rm -f /opt/loop.*
 }
 
 function startup
 {
-    clean_all_loop_md 
+    clean_all_loop_md
 }
 
 function cleanup
 {
-    clean_all_loop_md 
+    clean_all_loop_md
 }
 
 function runtest
@@ -47,13 +48,13 @@ function runtest
     for i in 0 1 456 10; do
         cki_run_cmd_neu "modprobe -r raid$i"
         sleep 5
-        cki_run_cmd_pos "modprobe raid$i"
+        rlRun -l "modprobe raid$i"
         sleep 5
-        cki_run_cmd_pos "modprobe -r raid$i"
+        rlRun -l "modprobe -r raid$i"
         sleep 5
-        cki_run_cmd_pos "modprobe raid$i"
+        rlRun -l "modprobe raid$i"
         sleep 5
-        cki_run_cmd_pos "modprobe -r raid$i"
+        rlRun -l "modprobe -r raid$i"
     done
 }
 

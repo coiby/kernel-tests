@@ -58,7 +58,7 @@ EOF
 
     cki_run_cmd_neu "chmod +x $script"
     cki_run_cmd_neu "cat -n $script"
-    cki_run_cmd_pos "bash $script" || return $CKI_UNINITIATED
+    rlRun -l "bash $script" || return $CKI_UNINITIATED
 
     return $CKI_PASS
 }
@@ -88,7 +88,7 @@ function msr_tools_epel_install()
     [[ "$add_repo" == "true" ]] && \
         cki_run_cmd_neu "${YUM} -y remove epel-release"
 
-    cki_run_cmd_pos "which rdmsr"
+    rlRun -l "which rdmsr"
     (( $? == 0 )) && return $CKI_PASS || return $CKI_UNINITIATED
 }
 

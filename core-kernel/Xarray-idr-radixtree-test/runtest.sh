@@ -64,7 +64,7 @@ function get_running_kernel_src()
 			running_kernel=$(dnf -q --disablerepo="*" --enablerepo="kernel-cki" list --all "${kernelpkg}.src" --showduplicates \
 				| awk '{print$2}' | tail -1)
 		fi
-		cki_run_cmd_pos "dnf download --source ${kernelpkg}-${running_kernel}"
+		rlRun -l "dnf download --source ${kernelpkg}-${running_kernel}"
 		rpm -ivh kernel-*.src.rpm
 		tar xf /root/rpmbuild/SOURCES/linux-*.tar.xz -C .
 	fi
@@ -100,21 +100,21 @@ function run_radixtree()
 
 function startup()
 {
-	cki_run_cmd_pos "install_dependency"
-	cki_run_cmd_pos "build_radixtree"
+	rlRun -l "install_dependency"
+	rlRun -l "build_radixtree"
 
 	return $CKI_PASS
 }
 
 function runtest()
 {
-	cki_run_cmd_pos "run_radixtree xarray"
+	rlRun -l "run_radixtree xarray"
 	cki_upload_log_file xarray.log
 
-	cki_run_cmd_pos "run_radixtree idr-test"
+	rlRun -l "run_radixtree idr-test"
 	cki_upload_log_file idr-test.log
 
-	cki_run_cmd_pos "run_radixtree main"
+	rlRun -l "run_radixtree main"
 	cki_upload_log_file main.log
 
 	return $CKI_PASS
@@ -122,7 +122,7 @@ function runtest()
 
 function cleanup()
 {
-	cki_run_cmd_pos "rm -fr linux-*/ *.log *.tar.*"
+	rlRun -l "rm -fr linux-*/ *.log *.tar.*"
 
 	return $CKI_PASS
 }

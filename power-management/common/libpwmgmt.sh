@@ -47,6 +47,6 @@ function has_kmod_intel_rapl
     cki_run_cmd_neu "{ modprobe intel_rapl || modprobe rapl || : ; } >/dev/null 2>&1"
 
     # Check 'intel_rapl' has been loaded
-    cki_run_cmd_pos "lsmod | egrep '(^intel_rapl )|(^rapl )'"
+    rlRun -l "lsmod | egrep '(^intel_rapl )|(^rapl )'"
     return $?
 }

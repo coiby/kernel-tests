@@ -35,7 +35,7 @@ rlJournalStart
 
     # Test phase: verifying die layout
     rlPhaseStartTest
-        cki_run_cmd_pos "bash $CDIR/utils/verify-x86-die-support.sh"
+        rlRun -l "bash $CDIR/utils/verify-x86-die-support.sh"
     rlPhaseEnd
 
     # Cleanup phase: Remove test directory

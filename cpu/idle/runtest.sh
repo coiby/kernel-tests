@@ -27,7 +27,7 @@ source $CDIR/../../cpu/common/libutil.sh
 
 function runtest
 {
-    cki_run_cmd_pos "bash $CDIR/utils/idle-power-test.sh $CDIR/utils/busy.sh"
+    rlRun -l "bash $CDIR/utils/idle-power-test.sh $CDIR/utils/busy.sh"
     status=$?
     if [ $status -eq 0 ]; then
 	return $CKI_PASS
@@ -40,11 +40,11 @@ function runtest
 
 function startup
 {
-    cki_run_cmd_pos "lscpu | grep ' monitor '"
+    rlRun -l "lscpu | grep ' monitor '"
     [ $? -ne 0 ] && cki_beakerlib_skip_task "system does not support mwait"
 
     if [[ ! -d $TMPDIR ]]; then
-        cki_run_cmd_pos "mkdir -p -m 0755 $TMPDIR"
+        rlRun "mkdir -p -m 0755 $TMPDIR"
         [ $? -ne 0 ] && return $CKI_UNINITIATED
     fi
 
@@ -55,7 +55,7 @@ function startup
     fi
 
     # check this test is supported by CPU
-    cki_run_cmd_pos "rdmsr 0x606"
+    rlRun -l "rdmsr 0x606"
     [ $? -ne 0 ] && cki_beakerlib_skip_task "su access is not available"
 
     return $CKI_PASS

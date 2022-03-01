@@ -79,7 +79,7 @@ function verify_intel_cpufreq_driver
     cki_run_cmd_neu "lscpu | grep 'hwp '"
     if (( $? == 0 )); then
 	if [ "$driver" = "intel_pstate" ]; then
-            cki_run_cmd_pos "rdmsr 0x770"
+            rlRun -l "rdmsr 0x770"
             if (( $? != 0 )); then
                 cki_beakerlib_skip_task "intel system has HWP, but it is not enabled"
             fi
@@ -88,7 +88,7 @@ function verify_intel_cpufreq_driver
             return $CKI_FAIL
 	fi
     else
-        cki_run_cmd_pos "ls /sys/devices/system/cpu/intel_pstate/"
+        rlRun -l "ls /sys/devices/system/cpu/intel_pstate/"
         if (( $? != 0 )); then
             cki_beakerlib_fail "intel system does not have HWP, intel_pstate is not active"
             return $CKI_FAIL
@@ -159,7 +159,7 @@ function startup
     fi
 
     if [[ ! -d $TMPDIR ]]; then
-        cki_run_cmd_pos "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
+        rlRun "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
     fi
 
     # setup msr tools as package 'msr-tools' is not installed by default
