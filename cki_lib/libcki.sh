@@ -151,19 +151,6 @@ function cki_beakerlib_report_result()
     esac
 }
 
-function cki_set_reason()
-{
-    typeset rc=${1?"*** result code"}
-    shift
-    cki_beakerlib_log "$*"
-    case $rc in
-        "$CKI_FAIL") g_reason_fail="$*" ;;
-        "$CKI_UNSUPPORTED") g_reason_unsupported="$*" ;;
-        "$CKI_UNINITIATED") g_reason_uninitiated="$*" ;;
-        *) g_reason_other="$rc is an invalid result code" ;;
-    esac
-}
-
 function runtest() { :; }
 function startup() { :; }
 function cleanup() { :; }
