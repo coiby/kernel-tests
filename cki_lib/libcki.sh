@@ -106,7 +106,7 @@ function cki_beakerlib_skip_task()
     exit $CKI_STATUS_COMPLETED
 }
 
-function cki_report_result()
+function cki_beakerlib_report_result()
 {
     typeset rc=${1?"*** result code"}
     typeset cleanup=$2
@@ -117,7 +117,7 @@ function cki_report_result()
             rlPass "$argv"
             ;;
         "$CKI_FAIL")
-            rlFail "$argv $g_reason_fail"
+            rlFail "$argv"
             ;;
         #
         # NOTE: If a task is aborted or skipped, its cleanup should be done,
@@ -128,8 +128,7 @@ function cki_report_result()
                 cki_beakerlib_log "Now go to cleanup because task is UNSUPPORTED ..."
                 eval "$cleanup"
             fi
-            typeset reason=$g_reason_unsupported
-            [[ -z "$reason" ]] && reason="UNKNOWN REASON"
+            typeset reason="UNKNOWN REASON"
             cki_beakerlib_skip_task "$reason"
             ;;
         "$CKI_UNINITIATED")
@@ -137,18 +136,17 @@ function cki_report_result()
                 cki_beakerlib_log "Now go to cleanup because task is UNINITIATED ..."
                 eval "$cleanup"
             fi
-            typeset reason=$g_reason_uninitiated
-            [[ -z $reason ]] && reason="UNKNOWN REASON"
+            typeset reason="UNKNOWN REASON"
             cki_abort_task "$reason"
             ;;
         *)
-            cki_abort_task "$g_reason_other #$argv#"
+            cki_abort_task "UNKNOWN REASON #$argv#"
             ;;
     esac
 }
 
 #
-# Set reason for according to result code, once function cki_report_result() is
+# Set reason for according to result code, once function cki_beakerlib_report_result() is
 # invoked, the related reason will be used when calling cki_beakerlib_log()
 #
 function cki_set_reason()
@@ -181,7 +179,7 @@ function cki_main()
     typeset -i rc1=$?
     cki_beakerlib_log "$hook_startup(): rc=$rc1"
     (( rc += rc1 ))
-    cki_report_result $rc1 "$hook_cleanup" "$hook_startup()"
+    cki_beakerlib_report_result $rc1 "$hook_cleanup" "$hook_startup()"
     rlPhaseEnd
 
     if (( rc == 0 )); then
@@ -192,7 +190,7 @@ function cki_main()
             typeset -i rc2=$?
             cki_beakerlib_log "$tfunc(): rc=$rc2"
             (( rc += rc2 ))
-            cki_report_result $rc2 "$hook_cleanup" "$tfunc()"
+            cki_beakerlib_report_result $rc2 "$hook_cleanup" "$tfunc()"
             rlPhaseEnd
         done
     fi
@@ -202,7 +200,7 @@ function cki_main()
     typeset -i rc3=$?
     cki_beakerlib_log "$hook_cleanup(): rc=$rc3"
     (( rc += rc3 ))
-    cki_report_result $rc3 "" "$hook_cleanup()"
+    cki_beakerlib_report_result $rc3 "" "$hook_cleanup()"
     rlPhaseEnd
 
     cki_beakerlib_log "OVERALL RESULT CODE: $rc"
