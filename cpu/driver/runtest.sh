@@ -30,7 +30,7 @@ check_pstate_support()
 {
     for m in $NON_PSTATE_PROCESSORS; do
 	if [ $m -eq $1 ]; then
-	    cki_log "model: $model - does not support intel_pstate"
+	    cki_beakerlib_log "model: $model - does not support intel_pstate"
 	    return 1
 	fi
     done
@@ -42,14 +42,14 @@ function verify_intel_cpufreq_driver
 {
     typeset driver=$1
 
-    cki_log "Start to verify intel cpu freq driver"
+    cki_beakerlib_log "Start to verify intel cpu freq driver"
 
     typeset vendor=$(dmidecode -t 0 | grep Vendor: | \
                      cut -d: -f 2 | awk '{print tolower($1)}')
 
     typeset model=$(lscpu | grep Model: | awk '{print $2}')
     if [ -z "$model" ]; then
-	cki_log "unable to determine cpu model"
+	cki_beakerlib_log "unable to determine cpu model"
 	return $CKI_FAIL
     fi
 
@@ -58,18 +58,18 @@ function verify_intel_cpufreq_driver
     if [ $? -ne 0 ]; then
 	# older systems do not support intel pstate
 	if [ $driver != "acpi-cpufreq" ]; then
-	    cki_log "intel (non-pstate) system is running: $driver"
+	    cki_beakerlib_log "intel (non-pstate) system is running: $driver"
 	    # maps to SKIP
 	    return $CKI_UNSUPPORTED
 	fi
-	cki_log "intel system is running: $driver"
+	cki_beakerlib_log "intel system is running: $driver"
 	return $CKI_PASS
     fi
 
     if [ $driver != "intel_pstate" ] && [ $driver != "intel_cpufreq" ]; then
 	if [ "$vendor" = "lenovo" ]; then
-	    cki_log "lenovo intel system is running: $driver"
-	    cki_log "PASS"
+	    cki_beakerlib_log "lenovo intel system is running: $driver"
+	    cki_beakerlib_log "PASS"
 	    return $CKI_PASS
 	fi
         cki_set_reason $CKI_FAIL \
@@ -100,7 +100,7 @@ function verify_intel_cpufreq_driver
         fi
     fi
 
-    cki_log "PASS"
+    cki_beakerlib_log "PASS"
     return $CKI_PASS
 }
 
@@ -108,7 +108,7 @@ function verify_amd_cpufreq_driver
 {
     typeset driver=$1
 
-    cki_log "Start to verify amd cpu freq driver"
+    cki_beakerlib_log "Start to verify amd cpu freq driver"
 
     typeset family=$(cat /proc/cpuinfo | grep family | \
                      sort -u | awk '{print $4}')
@@ -126,7 +126,7 @@ function verify_amd_cpufreq_driver
         return $CKI_UNSUPPORTED
     fi
 
-    cki_log "PASS"
+    cki_beakerlib_log "PASS"
     return $CKI_PASS
 }
 

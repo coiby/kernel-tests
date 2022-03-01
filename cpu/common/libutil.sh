@@ -17,6 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
+source /usr/share/beakerlib/beakerlib.sh
 source $(dirname $(readlink -f $BASH_SOURCE))/../../cki_lib/libcki.sh
 
 TMPDIR=${TMPDIR:-"/tmp"}

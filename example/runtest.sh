@@ -21,25 +21,28 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 
+# This example uses beakerlib framework, include the library
+source /usr/share/beakerlib/beakerlib.sh
+
 # Include enviroment and libraries
 source $CDIR/../cki_lib/libcki.sh || exit 1
 
 function startup
 {
-    cki_log "$NAME: startup"
+    cki_beakerlib_log "$NAME: startup"
     return 0
 }
 
 function cleanup
 {
-    cki_log "$NAME: cleanup"
+    cki_beakerlib_log "$NAME: cleanup"
     return 0
 }
 
 function runtest
 {
-    cki_log "$NAME: runtest"
-    cki_log "This this is an example test which always passes"
+    cki_beakerlib_log "$NAME: runtest"
+    cki_beakerlib_log "This this is an example test which always passes"
     return 0
 }
 

@@ -53,7 +53,7 @@ CKI_STATUS_COMPLETED=0 # task is completed
 CKI_STATUS_ABORTED=1   # task is aborted
 
 # Wrapper function to write log
-function cki_log()
+function cki_beakerlib_log()
 {
     rlLog "$*"
 }
@@ -86,7 +86,7 @@ function cki_abort_task()
     typeset reason="$*"
     [[ -z $reason ]] && reason="unknown reason"
     rstrnt-report-result "${TEST}" WARN
-    cki_log "Aborting current task: $reason"
+    cki_beakerlib_log "Aborting current task: $reason"
     rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit $CKI_STATUS_ABORTED
 }
@@ -95,7 +95,7 @@ function cki_skip_task()
 {
     typeset reason="$*"
     [[ -z $reason ]] && reason="unknown reason"
-    cki_log "Skipping current task: $reason"
+    cki_beakerlib_log "Skipping current task: $reason"
     rstrnt-report-result "$TEST" SKIP
     exit $CKI_STATUS_COMPLETED
 }
@@ -119,7 +119,7 @@ function cki_report_result()
         #
         "$CKI_UNSUPPORTED")
             if [[ -n "$cleanup" ]]; then
-                cki_log "Now go to cleanup because task is UNSUPPORTED ..."
+                cki_beakerlib_log "Now go to cleanup because task is UNSUPPORTED ..."
                 eval "$cleanup"
             fi
             typeset reason=$g_reason_unsupported
@@ -128,7 +128,7 @@ function cki_report_result()
             ;;
         "$CKI_UNINITIATED")
             if [[ -n "$cleanup" ]]; then
-                cki_log "Now go to cleanup because task is UNINITIATED ..."
+                cki_beakerlib_log "Now go to cleanup because task is UNINITIATED ..."
                 eval "$cleanup"
             fi
             typeset reason=$g_reason_uninitiated
@@ -143,13 +143,13 @@ function cki_report_result()
 
 #
 # Set reason for according to result code, once function cki_report_result() is
-# invoked, the related reason will be used when calling cki_log()
+# invoked, the related reason will be used when calling cki_beakerlib_log()
 #
 function cki_set_reason()
 {
     typeset rc=${1?"*** result code"}
     shift
-    cki_log "$*"
+    cki_beakerlib_log "$*"
     case $rc in
         "$CKI_FAIL") g_reason_fail="$*" ;;
         "$CKI_UNSUPPORTED") g_reason_unsupported="$*" ;;
@@ -173,7 +173,7 @@ function cki_main()
     rlPhaseStartSetup "$hook_startup"
     $hook_startup
     typeset -i rc1=$?
-    cki_log "$hook_startup(): rc=$rc1"
+    cki_beakerlib_log "$hook_startup(): rc=$rc1"
     (( rc += rc1 ))
     cki_report_result $rc1 "$hook_cleanup" "$hook_startup()"
     rlPhaseEnd
@@ -184,7 +184,7 @@ function cki_main()
             rlPhaseStartTest "$tfunc"
             $tfunc
             typeset -i rc2=$?
-            cki_log "$tfunc(): rc=$rc2"
+            cki_beakerlib_log "$tfunc(): rc=$rc2"
             (( rc += rc2 ))
             cki_report_result $rc2 "$hook_cleanup" "$tfunc()"
             rlPhaseEnd
@@ -194,12 +194,12 @@ function cki_main()
     rlPhaseStartCleanup "$hook_cleanup"
     $hook_cleanup
     typeset -i rc3=$?
-    cki_log "$hook_cleanup(): rc=$rc3"
+    cki_beakerlib_log "$hook_cleanup(): rc=$rc3"
     (( rc += rc3 ))
     cki_report_result $rc3 "" "$hook_cleanup()"
     rlPhaseEnd
 
-    cki_log "OVERALL RESULT CODE: $rc"
+    cki_beakerlib_log "OVERALL RESULT CODE: $rc"
 
     rlJournalEnd
 
