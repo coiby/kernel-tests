@@ -1313,6 +1313,7 @@ mt76x0-common.ko
 mt76x0u.ko
 mt76x2-common.ko
 mt76x2u.ko
+mt7921-common.ko
 mt7921e.ko
 mtd_blkdevs.ko
 mtdblock.ko
