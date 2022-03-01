@@ -229,7 +229,7 @@ function DisplayModuleFail ()
 function inst_kernel_rt_kvm ()
 {
     rt_kvm="${name}-kvm-${version}-${release}.${arch}"
-    rpm -q $rt_kvm || $YUM -y install $rt_kvm || (cki_report_result 1 1 "Missing ${name}-kvm" && exit 1)
+    rpm -q $rt_kvm || $YUM -y install $rt_kvm || (cki_abort_task "Missing ${name}-kvm")
 
 }
 
@@ -237,7 +237,7 @@ function inst_kernel_rt_kvm ()
 function chk_inst_kernel_modules_extra ()
 {
     pkg_kms_extra="${name}-modules-extra-${version}-${release}.${arch}"
-    rpm -q $pkg_kms_extra || $YUM -y install $pkg_kms_extra || (cki_report_result 1 1 "Missing ${name}-modules-extra" && exit 1)
+    rpm -q $pkg_kms_extra || $YUM -y install $pkg_kms_extra || (cki_abort_task "Missing ${name}-modules-extra")
 }
 
 rlJournalStart
@@ -502,7 +502,7 @@ rlJournalStart
                     fi
                     if cki_kver_lt "4.18.0-357"; then
                         sed -i '/i40iw.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-${ARCH}.lst
-                        sed -i '/irdma.ko/d' ${OS}/${Release}/HEAD-8.6-modules-${ARCH}.lst 
+                        sed -i '/irdma.ko/d' ${OS}/${Release}/HEAD-8.6-modules-${ARCH}.lst
                     fi
                     if cki_kver_lt "4.18.0-362"; then
                         sed -i '/i2c-hid.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-ppc64le.lst
@@ -612,7 +612,7 @@ rlJournalStart
         if [ ! -s ${TESTAREA}/moduleList_compare_added ]; then
             echo "***** PASS: *****" | tee -a $OUTPUTFILE
             echo "***** Files checked. There are no new modules. *****" | tee -a $OUTPUTFILE
-            cki_report_result 0 1 "New added modules check PASS"
+            rlPass "New added modules check PASS"
         else
             echo "***** WARNING: *****" | tee -a $OUTPUTFILE
             echo "***** Files compared. There are new modules!!! *****" | tee -a $OUTPUTFILE
@@ -622,7 +622,7 @@ rlJournalStart
             echo "**************************************" | tee -a $OUTPUTFILE
             cat ${TESTAREA}/moduleList_compare_added | tee -a $OUTPUTFILE
             echo "**************************************" | tee -a $OUTPUTFILE
-            cki_report_result 0 1 "Warn: existing new added modules"
+            rlPass "Warn: existing new added modules"
         fi
 
         diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^-" > ${TESTAREA}/moduleList_compare
@@ -684,7 +684,7 @@ rlJournalStart
             cki_upload_log_file ${TESTAREA}/moduleList_missing.log
             DeBug "Files checked. There are missing modules."
             cki_print_info "Checked"
-            cki_report_result 1 1 "There are missing modules!"
+            rlFail "There are missing modules!"
         fi
     rlPhaseEnd
 rlJournalEnd
