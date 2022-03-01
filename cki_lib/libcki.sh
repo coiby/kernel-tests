@@ -218,20 +218,8 @@ function cki_run()
 
 #
 # Wrapper functions to run a single cmd
-# o cki_run_cmd_neg(): $? must be !0
 # o cki_run_cmd_neu(): don't care about $?
 #
-function cki_run_cmd_neg()
-{
-    typeset cmd="$*"
-    (( ${#cmd} > 64 )) && cmd="${cmd:0:63}..."
-    typeset msg="[ NEG ] run '$cmd', expect to fail"
-    if rlRun -l "$@" "$CKI_RC_NEG" "$msg" ; then
-        return 1
-    else
-        return 0
-    fi
-}
 
 function cki_run_cmd_neu()
 {
