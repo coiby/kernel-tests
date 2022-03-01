@@ -54,12 +54,6 @@ function cki_log()
     echo "$*"
 }
 
-# Wrapper function to write log
-function cki_beakerlib_fail()
-{
-    rlFail "$*"
-}
-
 #
 # When a serious problem occurs and we cannot proceed any further, we abort
 # this recipe with an error message.
