@@ -1,10 +1,12 @@
 --access 0 --timeout 5 --log-file access.log
 # RHEL uses SELinux instead of AppArmor
 #--apparmor 0 --timeout 5 --log-file apparmor.log
---bigheap 0 --timeout 5 --log-file bigheap.log
+# bigheap would hangs,  due to stressing more memory resources
+#--bigheap 0 --timeout 5 --log-file bigheap.log
 # bind-mount reports errors
 #--bind-mount 0 --timeout 5 --log-file bind-mount.log
---brk 0 --timeout 5 --log-file brk.log
+# brk would hangs, due to stressing more memory resources
+#--brk 0 --timeout 5 --log-file brk.log
 --cap 0 --timeout 5 --log-file cap.log
 --chdir 0 --timeout 5 --log-file chdir.log
 --chmod 0 --timeout 5 --log-file chmod.log
