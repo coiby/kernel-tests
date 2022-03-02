@@ -8,6 +8,11 @@
 . ../include/runtest.sh			|| exit 1
 . ../include/knownissue.sh		|| exit 1
 
+# VMs can have slow performance, therefore increase LTP_TIMEOUT_MUL
+if  cki_is_vm; then
+    export LTP_TIMEOUT_MUL=2
+fi
+
 # debug kernel is slower increase LTP_TIMEOUT_MUL
 # upstream kernels don't contain _debug on kernel name,
 # check for common debug flag options
