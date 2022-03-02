@@ -218,11 +218,11 @@ function knownissue_handle()
 		knownissue_exclude "none"  $LTPDIR/runtest/*
 		;;
 	   "2")
-		knownissue_exclude "fatal"  $LTPDIR/runtest/*
+		knownissue_exclude "all"   $LTPDIR/runtest/*
 		;;
 	     *)
-		# Skip all known issue cases by default
-		knownissue_exclude "all"  $LTPDIR/runtest/*
+		# Skip the fatal cases by default
+		knownissue_exclude "fatal" $LTPDIR/runtest/*
 		;;
 	esac
 }
