@@ -47,7 +47,7 @@ log()
 submit_log()
 {
 	for file in "$@"; do
-		[ "$RSTRNT_JOBID" ] && rstrnt-report-log -l $file || cp $file $LOG_DIR/
+		[ "$RSTRNT_JOBID" ] && rstrnt-report-log -l $file || echo $file
 	done
 }
 
@@ -183,3 +183,24 @@ watch()
 		fi
 	done
 }
+
+check_result()
+{
+        local num=$1
+        local total_num=$2
+        local test_folder=$3
+        local test_name=$4
+        local test_result=$5
+
+        if [ "$test_result" -eq 0 ]; then
+                test_pass "${num}..${total_num} selftests: ${test_name} [PASS]"
+        elif [ "$test_result" -eq $SKIP_CODE ]; then
+                test_skip "${num}..${total_num} selftests: ${test_name} [SKIP]"
+        else
+                test_fail "${num}..${total_num} selftests: ${test_name} [FAIL]"
+        fi
+
+        return $test_result
+}
+
+[ ! "$CKI_SELFTESTS_URL" ] && [ ! "$BUILD_FROM_SRC" ] && [ ! "$DELIVERED_TESTS" ] && test_skip_exit "CKI_SELFTESTS_URL/BUILD_FROM_SRC/DELIVERED_TESTS not found. At least one must be set."
