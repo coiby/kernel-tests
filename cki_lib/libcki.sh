@@ -69,9 +69,9 @@ function cki_abort_recipe()
 
     echo "❌ ${failure_message}"
     if [[ "$failure_type" == 'WARN' ]]; then
-        rstrnt-report-result "${TEST}" WARN 99
+        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN 99
     else
-        rstrnt-report-result "${TEST}" FAIL 1
+        rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL 1
     fi
     rstrnt-abort -t recipe
     exit $CKI_STATUS_ABORTED
@@ -81,7 +81,7 @@ function cki_abort_task()
 {
     typeset reason="$*"
     [[ -z $reason ]] && reason="unknown reason"
-    rstrnt-report-result "${TEST}" WARN
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     cki_log "Aborting current task: $reason"
     rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit $CKI_STATUS_ABORTED
@@ -92,7 +92,7 @@ function cki_beakerlib_skip_task()
     typeset reason="$*"
     [[ -z $reason ]] && reason="unknown reason"
     rlLog "Skipping current task: $reason"
-    rstrnt-report-result "$TEST" SKIP
+    rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
     exit $CKI_STATUS_COMPLETED
 }
 
