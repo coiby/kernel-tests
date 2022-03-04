@@ -90,7 +90,8 @@
 --nice 0 --timeout 5 --log-file nice.log
 --open 0 --timeout 5 --log-file open.log
 --personality 0 --timeout 5 --log-file personality.log
---poll 0 --timeout 5 --log-file poll.log
+# poll would hangs, due to stressing more memory resources
+#--poll 0 --timeout 5 --log-file poll.log
 --prctl 0 --timeout 5 --log-file prctl.log
 --procfs 0 --timeout 5 --log-file procfs.log
 --pthread 0 --timeout 5 --log-file pthread.log
@@ -136,7 +137,8 @@
 --vfork 0 --timeout 5 --log-file vfork.log
 --vforkmany 0 --timeout 5 --log-file vforkmany.log
 --vm-splice 0 --timeout 5 --log-file vm-splice.log
---wait 0 --timeout 5 --log-file wait.log
+# wait would hangs, due to stressing more memory resources
+#--wait 0 --timeout 5 --log-file wait.log
 # watchdog reports errors
 #--watchdog 0 --timeout 5 --log-file watchdog.log
 --xattr 0 --timeout 5 --log-file xattr.log
