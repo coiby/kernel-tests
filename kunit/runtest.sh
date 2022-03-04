@@ -109,7 +109,7 @@ rlJournalStart
         exit 1
     fi
     #test for kunit
-    modprobe kunit
+    rlRun "modprobe kunit"
     if [ $? -ne 0 ]; then
         rlFail "Could not load KUNIT module, aborting test"
         rstrnt-report-result $TEST FAIL
@@ -133,7 +133,7 @@ rlJournalStart
     for TEST in ${test_arr[*]}
     do
 	rlLog "running test $TEST"
-	modprobe "$TEST"
+	modprobe "$TEST" 2>/dev/null
 	if [ $? -ne 0 ]; then
 		rlLog "Could not install $TEST module, skipping this module"
 	fi
@@ -148,7 +148,7 @@ rlJournalStart
 	then
 		test_name="$(basename "$TEST")"
 		cp "${TEST}/results" "${TEST}/${test_name}.log"
-		process_results "${TEST}/results"
+		rlRun "process_results \"${TEST}/results\""
 		result=$?
 		if [ $result -eq 0 ]
 		then
@@ -167,7 +167,7 @@ rlJournalStart
   #remove installed modules and kunit framework
   for TEST in ${test_arr[*]}
   do
-	  rmmod "$TEST"
+      rmmod "$TEST" 2>/dev/null
   done
   rmmod kunit
   rm -rf /tmp/kunit_results/
