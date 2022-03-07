@@ -72,7 +72,7 @@ function RunTest ()
         tee -a $OUTPUTFILE
 
     # Lets rock'n'roll
-    rteval --duration=$DURATION | tee -a $OUTPUTFILE
+    rteval --duration=$DURATION -D | tee -a $OUTPUTFILE
     retcode="$?"
 
     find . -maxdepth 1 -name "rteval-????????-*.tar.bz2" -print |

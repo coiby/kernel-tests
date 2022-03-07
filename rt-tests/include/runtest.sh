@@ -10,10 +10,20 @@
 # Source beaker environment
 . ../../cki_lib/libcki.sh || exit 1
 
+export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+
 function rt_package_install()
 {
-    packages="rt-tests rt-setup rteval rteval-loads tuned-profiles-realtime tuna realtime-tests realtime-setup"
-    echo "install needed package $packages " | tee -a $OUTPUTFILE
+    # install RT packages
+    if [ $rhel_major -eq 7 ]; then
+        packages="rt-tests rt-setup rteval rteval-loads rtcheck tuned-profiles-realtime tuna"
+    elif [ $rhel_major -eq 8 ]; then
+        packages="rt-tests rt-setup rteval rteval-loads tuned-profiles-realtime tuna"
+    else
+        packages="realtime-tests realtime-setup rteval rteval-loads tuned-profiles-realtime tuna stress-ng stalld"
+    fi
+    echo "install needed package $packages" | tee -a $OUTPUTFILE
+
     for i in $packages; do
         if $(rpm -q --quiet $i); then
             continue
@@ -21,6 +31,14 @@ function rt_package_install()
             yum install -y $i
         fi
     done
+
+    # install additional standard packages
+    yum install -y --skip-broken bc curl gcc gdb git patch pciutils rpm-build strace time unzip wget zip
+    if [ $rhel_major -eq 8 ]; then
+        dnf install -y --skip-broken python36 python3-pip
+    elif [ $rhel_major -ge 9 ]; then
+        dnf install -y --skip-broken python3 python3-pip
+    fi
 }
 
 function rt_env_setup()
