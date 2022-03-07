@@ -13,4 +13,12 @@ if ! modprobe -qn rdma_rxe; then
 	sed -i "/rdma_rxe/d" ./tests/nvme/rc
 fi
 
+# modprobe siw on ppc64le with distro less than RHEL8.4 will lead panic, BZ1919502
+ARCH=$(uname -i)
+ver="4.18.0-303"
+KVER=$(uname -r)
+if [[ $ARCH == "ppc64le" ]] && [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | head -1)" ]]; then
+	export USE_SIW="0"
+fi
+
 make
