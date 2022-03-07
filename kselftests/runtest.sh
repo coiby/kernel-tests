@@ -29,214 +29,289 @@
 # DEBUG: enable debug or not, default is true
 # CHECK_UNINVES: also check uninvestigated tests result, default is false
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-. /usr/bin/rhts-environment.sh || exit 1
-. /usr/share/beakerlib/beakerlib.sh || exit 1
-#-------------------- Setup --------------------
-arch=$(uname -i)
-version=$(uname -r | cut -f1 -d'-')
-release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
-SKIP_CODE=4
-TMPDIR=/var/tmp/$(date +"%Y%m%d%H%M%S")
-TEST_ITEMS=${TEST_ITEMS:-"default"}
-if [ ${DELIVERED_TESTS} ]; then
-    EXEC_DIR="/usr/libexec/kselftests"
-else
-    EXEC_DIR="$TMPDIR/selftests"
-fi
-# List of selftests to skip.
-SKIP_TARGETS=${SKIP_TARGETS:-""}
-INCLUDE=${INCLUDE:-""}
-
 . ./include.sh
-for file in $INCLUDE; do
-    echo "Loading "$file"."
-    . ./$file
+. ./specific_fun.sh
+#-------------------- Setup --------------------
+SKIP_CODE=4
+LOG_ONCE=0
+EXEC_DIR="$PWD/selftests"
+TOTAL_MEM=$(free -m | awk '/Mem/ {print $2}')
+TEST_ITEMS=${TEST_ITEMS:-"net net/forwarding netfilter bpf bpf_test_progs tc-testing kvm"}
+DEFAULT_IFACE=$(ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}')
+
+debug_info()
+{
+	[ ${LOG_ONCE} -eq 0 ] && \
+		log "$(rpm -q bpftool clang llvm iproute iproute-tc)" && \
+		LOG_ONCE=1
+
+	if [ "$DEBUG" ]; then
+		run "ip link show"
+		run "bpftool prog show"
+		run "iptables -L"
+		run "ip6tables -L"
+	fi
+}
+
+reset_net_env()
+{
+	# log the link before clean
+	debug_info
+	ip -a netns del
+	sleep 2
+	if [ "$DEBUG" ]; then
+		run "ip link show"
+	fi
+}
+
+# usage: check_skipped_tests test_name
+check_skipped_tests()
+{
+	local match="$1"
+	check_if_missing_files $match && return 0
+	[[ " ${skip_tests[*]} " == *" $match "* ]] && return 0
+	[ $TOTAL_MEM -lt 8000 ] && [[ " ${large_mem_tests[*]} " == *" $match "* ]] && return 0
+	# skip the test if it not exist for backward compatibility
+	[ ! -f $match ] && return 0
+	return 1
+}
+
+check_result()
+{
+	local num=$1
+	local total_num=$2
+	local test_folder=$3
+	local test_name=$4
+	local test_result=$5
+
+	if [ "$test_result" -eq 0 ]; then
+		test_pass "${num}..${total_num} selftests: ${test_folder}: ${test_name} [PASS]"
+	elif [[ " ${pending_tests[*]} " == *" $test_name "* ]] && [ ! $CHECK_UNINVES ]; then
+		test_pass "${num}..${total_num} selftests: ${test_folder}: ${test_name} [WAIVE]"
+	elif [[ " ${uninves_tests[*]} " == *" $test_name "* ]] && [ ! $CHECK_UNINVES ]; then
+		test_pass "${num}..${total_num} selftests: ${test_folder}: ${test_name} [WAIVE]"
+	elif [ "$test_result" -eq $SKIP_CODE ]; then
+		test_skip "${num}..${total_num} selftests: ${test_folder}: ${test_name} [SKIP]"
+	else
+		test_fail "${num}..${total_num} selftests: ${test_folder}: ${test_name} [FAIL]"
+	fi
+
+	return $test_result
+}
+
+do_net_config()
+{
+	# Fix some known issues
+	# rm 0x10 for fib_rule_tests.sh due to bz1480136
+	# FIXME: should we restore it back after finishing test?
+	sed -i "/0x10/d" /etc/iproute2/rt_dsfield
+	# FIXME: sleep 5s before do IPv6 "Using route with mtu metric" test to
+	# pass it. Not sure why ping would fail if not sleep some seconds, need to check
+	sed -i "/via 2001:db8:101::2 mtu 1300/a\\\\tsleep 5" fib_tests.sh
+	# need to be run on bare metal machines, or set -C 0 when run on VM
+	sed -i 's/-C [0-9]/-C 0/g' msg_zerocopy.sh
+	# fou is not enabled on RHEL
+	sed -i 's/kci_test_encap_fou /#kci_test_encap_fou /' rtnetlink.sh
+	# ip_defrag.sh need setting net.netfilter.nf_conntrack_frag6_high_thresh
+	modprobe nf_conntrack_ipv6
+	# pmtu.sh will return 1 for skiped tests, remove fou,gue tests
+	sed -i '/^\tpmtu_ipv[4,6]_fou[4,6]_exception/d' pmtu.sh
+	sed -i '/^\tpmtu_ipv[4,6]_gue[4,6]_exception/d' pmtu.sh
+	sed -i 's/exitcode=1/[ $ret -ne 2 ] \&\& exitcode=1/' pmtu.sh
+	# for test fib-onlink-tests.sh we need remove default IPv6 route
+	ip -6 route del default
+	# for test fcnal-test.sh
+	cp nettest /usr/local/bin/
+	# for l2tp.sh
+	modprobe l2tp_eth
+	modprobe l2tp_ip
+}
+
+do_net_forwarding_config()
+{
+	which tc || dnf install -q -y iproute-tc
+	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
+	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
+	cp forwarding.config.sample forwarding.config
+}
+
+do_netfilter_config()
+{
+	install_sendip
+}
+
+run_bpf_test_progs()
+{
+	local item="bpf_test_progs"
+	local ret ret_1 ret_2
+
+	[ ! -d $EXEC_DIR/bpf ] && test_skip "No $item test, skip" && return 1
+	pushd $EXEC_DIR/bpf
+	if [ ! -f test_progs ] || [ ! -f test_progs-no_alu32 ]; then
+		test_skip "No $item test, skip"
+		return 1
+	fi
+
+	total_tests=$(./test_progs --list)
+	total_num=$(./test_progs --count)
+	num=0 name=""
+
+	for name in ${total_tests}; do
+		num=$(($num + 1))
+		OUTPUTFILE=$(new_outputfile)
+
+		dmesg -C
+
+		run "./test_progs -t $name"
+		ret_1=$?
+
+		run "./test_progs-no_alu32 -t $name"
+		ret_2=$?
+
+		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
+		dmesg >> $OUTPUTFILE
+
+		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
+		check_result $num $total_num ${item} ${name} $ret
+	done
+
+	popd
+}
+
+run_tc_test()
+{
+	# Start tc test
+	local item="tc-testing"
+	local act_tests=$(ls -d tc-tests/actions/*.json)
+	local fil_tests=$(ls -d tc-tests/filters/*.json)
+	local qdi_tests=$(ls -d tc-tests/qdiscs/*.json)
+	local total_tests="$act_tests $fil_tests $qdi_tests"
+	local total_num=$(echo ${total_tests} | wc -w)
+	local ret=0
+
+	# prepare evn
+	rpm -q clang || dnf install -y clang valgrind
+	modprobe -r veth
+
+	# extend test timeout
+	sed -i '/TIMEOUT/s/12/180/' tdc_config.py
+	# to build action.o for test tc-tests/actions/bpf.json
+	run "clang -target bpf -c bpf/action.c -o bpf/action.o"
+
+	for name in ${total_tests}; do
+		num=$(($num + 1))
+
+		check_skipped_tests "${name}" && \
+			test_skip "${num}..${total_num} selftests: ${item}: ${name} Skip" && continue
+
+		local OUTPUTFILE=$(new_outputfile)
+
+		echo ${tc_tests[$num - 1]} | grep -qP "tests\.json|concurrency\.json"  && extra_p="-d $DEFAULT_IFACE" || extra_p=""
+		./tdc.py -f ${name} $extra_p &> $OUTPUTFILE
+		ret=$?
+		if grep -q "not ok" $OUTPUTFILE; then
+			check_result $num $total_num ${item} ${name} 1
+		elif grep -q "# skipped -" $OUTPUTFILE; then
+			check_result $num $total_num ${item} ${name} 4
+		elif grep -q "Traceback" $OUTPUTFILE; then
+			check_result $num $total_num ${item} ${name} 4
+		else
+			check_result $num $total_num ${item} ${name} $ret
+		fi
+	done
+
+	popd
+}
+
+
+do_lkdtm_config()
+{
+	# CKI by default sets panic_on_oops on kernel config.
+	# For this test it has to be disabled
+	panic_on_oops=$(cat /proc/sys/kernel/panic_on_oops)
+	echo 0 > /proc/sys/kernel/panic_on_oops
+}
+
+
+do_lkdtm_clenup()
+{
+	# CKI by default sets panic_on_oops on kernel config.
+	# Restore the initial value
+	echo ${panic_on_oops} > /proc/sys/kernel/panic_on_oops
+}
+
+#-------------------- Start Test --------------------
+setup_env
+install_kselftests || test_fail_exit "install kselftests failed"
+
+run "uname -r"
+reset_net_env
+submit_log "$EXEC_DIR/kselftest-list.txt"
+
+for item in $TEST_ITEMS; do
+	# deal with bpf/test_progs specially
+	[ "$item" == "bpf_test_progs" ] && run_bpf_test_progs && continue
+
+	grep -q "^$item:" selftests/kselftest-list.txt || \
+		{ test_skip "$item test not find in kselftest-list.txt" && continue; }
+
+	pushd $EXEC_DIR/$item
+	if [ "$item" == "tc-testing" ]; then
+		run_tc_test
+		continue
+	fi
+
+	_item=$(echo $item | tr -s "/-" "_")
+	total_tests=$(grep "^${item}:"  $EXEC_DIR/kselftest-list.txt | cut -f2 -d:)
+	total_num=$(echo ${total_tests} | wc -w)
+	num=0 name=""
+
+	if type do_${_item}_config &>/dev/null; then
+		do_${_item}_config || continue
+	fi
+
+	for name in ${total_tests}; do
+		_base_filename="/tmp/$(echo $name | sed s'/\.sh//')"
+		_log_file="${_base_filename}.log"
+		_dmesg_log_file="${_base_filename}_dmesg.log"
+		OUTPUTFILE=$_log_file
+
+		echo "Start test: ${item}/${name}"
+		num=$(($num + 1))
+		check_skipped_tests "${name}" && \
+			test_pass "${num}..${total_num} selftests: ${item}: ${name} Skip" && continue
+
+		dmesg -C
+
+		./${name} |& tee ${_log_file}
+		ret=${PIPESTATUS[0]}
+
+		dmesg > ${_dmesg_log_file}
+		submit_log ${_log_file}
+		submit_log ${_dmesg_log_file}
+
+		check_result $num $total_num ${item} ${name} $ret
+
+		if [ ${_item} == "net" ] || [ ${_item} == "net_forwarding" ]; then
+			reset_net_env
+		fi
+	done
+
+	if type do_${_item}_cleanup &>/dev/null; then
+		do_${_item}_cleanup || continue
+	fi
+
+	popd
 done
 
-name="kernel"
-if [ -x /usr/sbin/kernel-is-rt ]; then
-        name="kernel-rt"
+#-------------------- Clean Up --------------------
+
+if [[ ${FAIL} -ne 0 ]]; then
+	test_fail_exit
+elif [[ ${WARN} -ne 0 ]]; then
+	test_warn_exit
+elif [[ ${SKIP} -ne 0 ]]; then
+	test_skip_exit
+else
+	test_pass_exit
 fi
-
-debug_dash=""
-debug_dot=""
-if uname -r | grep -q '+debug$'; then
-    debug_dash="-debug"
-    debug_dot=".debug"
-fi
-
-mkdir $TMPDIR
-mkdir $EXEC_DIR
-install_packages()
-{
-    pushd $TMPDIR
-    # for 32 bit support
-    if [ "${arch}" == "x86_64" ]; then
-        dnf install -y glibc-devel.*i686
-    fi
-    if [ "$UPSTREAM_SOURCE_URL" ]; then
-        wget --no-check-certificate $UPSTREAM_SOURCE_URL -O kselftest.tar.gz || test_fail_exit "Fetch Pkg Failed"
-        tar zxf kselftest.tar.gz
-        pushd linux-kselftest-*/
-    else
-        pkg=${name}-${version}-${release}
-        rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
-        rpm -ivh --define "_topdir $TMPDIR" ${name}-${version}-${release}.src.rpm
-        pushd SPECS
-        rlRun "yum-builddep -y ./kernel.spec"
-        pushd ../SOURCES
-        tar Jxf linux-${version}-${release}.tar.xz
-        pushd linux-${version}-${release}/
-        extraversion="-${release}.${arch}${debug_dot}"
-        sed -i "s/^EXTRAVERSION =.*/EXTRAVERSION = ${extraversion}/" Makefile
-    fi
-    # to get Module.symvers
-    rlRun "dnf install -y ${name}${debug_dash}-devel-${version}-${release}"
-    symvers=$(rpm -ql "${name}${debug_dash}-devel" | grep '\<Module.symvers\>$')
-    rlRun "ln -s "${symvers}" Module.symvers"
-    popd
-}
-
-install_kselftests()
-{
-    # Install the selftests-internal, modules-internal packages by default
-    if [ "${CKI_SELFTESTS_URL}" ] ; then
-        pushd ${EXEC_DIR}
-        wget --no-check-certificate $CKI_SELFTESTS_URL -O kselftest.tar.gz
-        tar zxf kselftest.tar.gz
-        rlLog "Upstream ${TEST} installed..."
-        popd
-    elif [ "${BUILD_FROM_SRC}" ] ; then
-        if [ "${UPSTREAM_SOURCE_URL}" ]; then
-            pushd $TMPDIR/linux-kselftest-*/
-        else
-            pushd $TMPDIR/SOURCES/linux-${version}-${release}/
-        fi
-        yes "" | make config
-        # for bpf build
-        make -j`nproc` modules_prepare
-        sed -i "s/^SKIP_TARGETS.*/#SKIP_TARGETS ?= /" tools/testing/selftests/Makefile
-        # issue with builddep so adding this temporarily till resolved.
-        rlRun "dnf install -y rsync libcap-devel clang llvm python3-docutils numactl-devel"
-        make -j`nproc` -C tools/testing/selftests install TARGETS="${TEST_ITEMS}" INSTALL_PATH=${EXEC_DIR}
-        rlLog "Compiled ${TEST} installed..."
-        [ -f $TMPDIR/selftests/run_kselftest.sh ] && return 0 || return 1
-        popd
-    else
-        rlRpmInstall ${name}${debug_dash}-modules-internal ${version} ${release} ${arch}
-        rlRpmInstall ${name}-selftests-internal ${version} ${release} ${arch}
-        rlLog "Delivered ${TEST} installed..."
-    fi
-}
-
-function NormalizeTestItems()
-{
-    item=$1
-    total_tests=""
-    grep -qE "^${item}(:|$)" ${EXEC_DIR}/kselftest-list.txt || \
-        { test_skip "$item test not found in kselftest-list.txt"; }
-    #add echo because += does not add white space to the end or begining of lists it processes.
-    total_tests+=`echo " " $(grep -E "^${item}(:|$)" ${EXEC_DIR}/kselftest-list.txt)`
-    TARGETS=${total_tests}
-}
-
-function RunKSelfTest()
-{
-    declare testscript="$1"
-    declare log="`echo ${testscript}|tr \/ \_`.log"
-    declare dmesglog="dmesg_`echo ${testscript}|tr \/ \_`.log"
-    local ret
-
-    OUTPUTFILE=$LOG_DIR/$log
-    # check if the test is to be ignored
-    if [[ "$SKIP_TARGETS" = *"$testscript"* ]]; then
-        rlLog "=== Skipping: $testscript"
-        ret=$SKIP_CODE
-        return $ret
-    fi
-    # clear dmesg
-    dmesg -c >/dev/null
-
-    # run the self-test script
-    rlLog "=== Running: $testscript"
-    pushd $EXEC_DIR/`echo ${testscript}|cut -d : -f 1`
-    ./`echo ${testscript}|cut -d : -f 2`|& tee $OUTPUTFILE
-    ret=${PIPESTATUS[0]}
-    # report the result with a copy of the dmesg log
-    dmesg > $LOG_DIR/$dmesglog
-    submit_log $LOG_DIR/$dmesglog
-    submit_log $OUTPUTFILE
-    popd
-    return $ret
-}
-
-function SetupTest ()
-{
-    rlPhaseStartSetup
-    if [ "${BUILD_FROM_SRC}" ]; then
-        rlRun install_packages
-        # do patches
-        for item in $TEST_ITEMS; do
-            _item=`echo $item | tr \/ \_`
-            if type do_${_item}_patch >& /dev/null; then
-                rlRun do_${_item}_patch
-            fi
-        done
-    fi
-    rlRun install_kselftests || test_fail_exit "install kselftests failed"
-    submit_log "$EXEC_DIR/kselftest-list.txt"
-    rlPhaseEnd
-}
-
-function RunTest ()
-{
-    local ret
-    for item in $TEST_ITEMS; do
-        rlPhaseStartTest $item
-        rlLog "Test Start Time: $(date)"
-        # do setup
-        _item=`echo $item | tr \/ \_`
-        if type do_${_item}_config >& /dev/null; then
-            rlRun do_${_item}_config
-        fi
-        # create list of tests to run
-        if [ "${TEST_ITEMS}" == "default" ]; then
-            TARGETS=$(${EXEC_DIR}/run_kselftest.sh -l)
-        else
-            NormalizeTestItems $item
-        fi
-        total_num=$(echo ${TARGETS} | wc -w)
-        num=0
-        # Run self-tests
-        for t in ${TARGETS}; do
-            num=$(($num + 1))
-            RunKSelfTest ${t}
-            ret=$?
-            check_result $num $total_num ${item} ${t} $ret
-        done
-        # do reset
-        if type do_${_item}_reset >& /dev/null; then
-            rlRun do_${_item}_reset
-        fi
-        rlLog "Test End Time: $(date)"
-        rlPhaseEnd
-    done
-}
-
-function CleanupTest ()
-{
-    rlPhaseStartCleanup
-    rlRun "pushd '$HOME'"
-
-    rlRun "rm -rf $TMPDIR"
-
-    rlPhaseEnd
-}
-
-rlJournalStart
-
-SetupTest
-RunTest
-CleanupTest
-
-rlJournalEnd
