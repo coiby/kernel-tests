@@ -375,6 +375,15 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
     cki_abort_recipe "Failed installing kernel ${KVER}" WARN
   fi
 
+  # Make sure tests are not able to install other kernels
+  _exclude_pkgs="kernel kernel-core kernel-debug kernel-rt kernel-rt-debug"
+  if [ -e /etc/dnf/dnf.conf ]; then
+    echo "exclude=${_exclude_pkgs}" >> /etc/dnf/dnf.conf
+  fi
+  if [ -e /etc/yum/yum.conf ]; then
+    echo "exclude=${_exclude_pkgs}" >> /etc/yum/yum.conf
+  fi
+
   # force panic on oops
   # oops can cause system to crash, but restraint fails to detect it
   # causing in some cases the task to abort by external watchdog
