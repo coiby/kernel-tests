@@ -336,6 +336,7 @@ function rpm_install()
   return 0
 }
 
+cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
 if [ ${REBOOTCOUNT} -eq 0 ]; then
   # kernel packages that should be excluded from yum/dnf after CKI kernel is installed
   _exclude_pkgs="kernel kernel-core kernel-debug kernel-rt kernel-rt-debug"
