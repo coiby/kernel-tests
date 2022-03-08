@@ -21,6 +21,9 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 
+# TEST is required for beakerlib tests
+TEST=${RSTRNT_TASKNAME}
+
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh || exit 1
 
@@ -29,7 +32,7 @@ function run_test()
 ### create one zram device
         rlRun "modprobe zram num_devices=1"
 
-### check and set zstd compression                                
+### check and set zstd compression
         rlRun "cat /sys/block/zram0/comp_algorithm"
         rlRun "echo zstd > /sys/block/zram0/comp_algorithm"
         rlRun "cat /sys/block/zram0/comp_algorithm"

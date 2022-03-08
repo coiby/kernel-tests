@@ -21,6 +21,9 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 
+# TEST is required for beakerlib tests
+TEST=${RSTRNT_TASKNAME}
+
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh || exit 1
 
