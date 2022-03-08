@@ -337,6 +337,8 @@ function rpm_install()
 }
 
 if [ ${REBOOTCOUNT} -eq 0 ]; then
+  # kernel packages that should be excluded from yum/dnf after CKI kernel is installed
+  _exclude_pkgs="kernel kernel-core kernel-debug kernel-rt kernel-rt-debug"
 
   # If we haven't rebooted yet, then we shouldn't have the directory present on the system.
   rm -rfv /kpkginstall
@@ -359,6 +361,15 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
     cki_abort_recipe "No KPKG_URL specified" FAIL
   fi
 
+  # Make sure exclude kernel files from removed from config file
+  # this can happen when rerunning the test
+  if [ -e /etc/dnf/dnf.conf ]; then
+    sed "/^exclude=${_exclude_pkgs}/d" /etc/dnf/dnf.conf
+  fi
+  if [ -e /etc/yum/yum.conf ]; then
+    sed "/^exclude=${_exclude_pkgs}/d" /etc/yum/yum.conf
+  fi
+
   if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
       targz_install
   elif [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
@@ -376,7 +387,6 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
   fi
 
   # Make sure tests are not able to install other kernels
-  _exclude_pkgs="kernel kernel-core kernel-debug kernel-rt kernel-rt-debug"
   if [ -e /etc/dnf/dnf.conf ]; then
     echo "exclude=${_exclude_pkgs}" >> /etc/dnf/dnf.conf
   fi
