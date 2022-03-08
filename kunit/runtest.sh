@@ -27,7 +27,7 @@
 #processes a test result from the debug/sysfs
 process_results(){
 	TMPFILE=$(mktemp) || exit 1
-        OUTFILE=$(mktemp) || exit 1
+	OUTFILE=$(mktemp) || exit 1
 	rlLog "processing results from test ${1}"
 	sed -i '/^$/d' "$1" #remove all empty lines
 	sed -i 's/^[ \t]*//' "$1" #remove all leading whitespace
@@ -38,7 +38,7 @@ process_results(){
 	uniq "$1" > "$TMPFILE"  #remove dup
 
 	tappy "$TMPFILE" &> "$OUTFILE"
-        RESULT_OUTPUT=$(cat "$OUTFILE" |tail -1)
+	RESULT_OUTPUT=$(cat "$OUTFILE" |tail -1)
 	if [ "$RESULT_OUTPUT" = "OK" ]; then
 		return 0
 	else
@@ -73,104 +73,104 @@ test_arr=(kunit-test ext4-inode-test list-test sysctl-test mptcp_crypto_test \
 rlJournalStart
 #-------------------- Setup ---------------------
   rlPhaseStartSetup
-  #install tappy
-    pip3 install tap.py
-    if [ $? -ne 0 ]; then
-        rlLog "Pip unable to install tap.py, aborting test"
-        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-    fi
+	#install tappy
+	pip3 install tap.py
+	if [ $? -ne 0 ]; then
+		rlLog "Pip unable to install tap.py, aborting test"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+	fi
 
-    # kunit module was added on kernel 4.18.0-279 (BZ#1900119)
-    if cki_kver_lt "4.18.0-279"; then
-        # kernel is too old to support kunit module
-        rstrnt-report-result $TEST SKIP
-        rlPhaseEnd
-        rlJournalEnd
-        #print the test report
-        rlJournalPrintText
-        exit 0
-    fi
+	# kunit module was added on kernel 4.18.0-279 (BZ#1900119)
+	if cki_kver_lt "4.18.0-279"; then
+		# kernel is too old to support kunit module
+		rstrnt-report-result $TEST SKIP
+		rlPhaseEnd
+		rlJournalEnd
+		#print the test report
+		rlJournalPrintText
+		exit 0
+	fi
 
-    module_pkg="kernel"
-    if  cki_is_kernel_rt; then
-        module_pkg="${module_pkg}-rt"
-    fi
-    if  cki_is_kernel_debug; then
-        module_pkg="${module_pkg}-debug"
-    fi
-    version=$(uname -r | sed s'/\+debug//')
-    module_pkg="${module_pkg}-modules-internal-$version"
+	module_pkg="kernel"
+	if  cki_is_kernel_rt; then
+		module_pkg="${module_pkg}-rt"
+	fi
+	if  cki_is_kernel_debug; then
+		module_pkg="${module_pkg}-debug"
+	fi
+	version=$(uname -r | sed s'/\+debug//')
+	module_pkg="${module_pkg}-modules-internal-$version"
 
-    if ! rpm -q $module_pkg; then
-        echo "FAIL: kernel-modules-internal is not installed, aborting test"
-        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-        exit 1
-    fi
-    #test for kunit
-    modprobe kunit
-    if [ $? -ne 0 ]; then
-        rlFail "Could not load KUNIT module, aborting test"
-        rstrnt-report-result $TEST FAIL
-        rlPhaseEnd
-        rlJournalEnd
-        #print the test report
-        rlJournalPrintText
-        exit 1
-    fi
+	if ! rpm -q $module_pkg; then
+		echo "FAIL: kernel-modules-internal is not installed, aborting test"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
+	fi
+	#test for kunit
+	rlRun "modprobe kunit"
+	if [ $? -ne 0 ]; then
+		rlFail "Could not load KUNIT module, aborting test"
+		rstrnt-report-result $TEST FAIL
+		rlPhaseEnd
+		rlJournalEnd
+		#print the test report
+		rlJournalPrintText
+		exit 1
+	fi
 
-    # CKI kernel set panic_on_oops to 1 by default
-    # Disable panic on oops as some kunit tests might trigger oops intentionally
-    panic_on_oops=$(sysctl kernel.panic_on_oops | awk '{print$3}')
-    rlRun "sysctl kernel.panic_on_oops=0"
+	# CKI kernel set panic_on_oops to 1 by default
+	# Disable panic on oops as some kunit tests might trigger oops intentionally
+	panic_on_oops=$(sysctl kernel.panic_on_oops | awk '{print$3}')
+	rlRun "sysctl kernel.panic_on_oops=0"
 
   rlPhaseEnd
 
 #-------------------- Run Tests -----------------
   rlPhaseStartTest
-  dmesg --clear
-    for TEST in ${test_arr[*]}
-    do
-	rlLog "running test $TEST"
-	modprobe "$TEST"
-	if [ $? -ne 0 ]; then
-		rlLog "Could not install $TEST module, skipping this module"
-	fi
-    done
+	dmesg --clear
+	for TEST in ${test_arr[*]}
+	do
+		rlLog "running test $TEST"
+		modprobe "$TEST" 2>/dev/null
+		if [ $? -ne 0 ]; then
+			rlLog "Could not install $TEST module, skipping this module"
+		fi
+	done
 
 #------------------ Collect Output --------------
-    mkdir -p /tmp/kunit_results/
-    cp -r /sys/kernel/debug/kunit/. /tmp/kunit_results/
-    for TEST in /tmp/kunit_results/*
-    do
-	if [ -d "${TEST}" ]
-	then
-		test_name="$(basename "$TEST")"
-		cp "${TEST}/results" "${TEST}/${test_name}.log"
-		process_results "${TEST}/results"
-		result=$?
-		if [ $result -eq 0 ]
+	mkdir -p /tmp/kunit_results/
+	cp -r /sys/kernel/debug/kunit/. /tmp/kunit_results/
+	for TEST in /tmp/kunit_results/*
+	do
+		if [ -d "${TEST}" ]
 		then
-			rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" PASS 0
-                else
-			rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" FAIL 1
-                fi
-	fi
-    done
+			test_name="$(basename "$TEST")"
+			cp "${TEST}/results" "${TEST}/${test_name}.log"
+			rlRun "process_results \"${TEST}/results\""
+			result=$?
+			if [ $result -eq 0 ]
+			then
+				rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" PASS 0
+			else
+				rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" FAIL 1
+			fi
+		fi
+	done
   rlPhaseEnd
 
 #-------------------- Clean Up ------------------
   rlPhaseStartCleanup
-  # Restore panic on oops value
-  rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
-  #remove installed modules and kunit framework
-  for TEST in ${test_arr[*]}
-  do
-	  rmmod "$TEST"
-  done
-  rmmod kunit
-  rm -rf /tmp/kunit_results/
+	# Restore panic on oops value
+	rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
+	#remove installed modules and kunit framework
+	for TEST in ${test_arr[*]}
+	do
+		rmmod "$TEST" 2>/dev/null
+	done
+	rmmod kunit
+	rm -rf /tmp/kunit_results/
   rlPhaseEnd
 
 rlJournalEnd
