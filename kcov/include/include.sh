@@ -13,7 +13,7 @@ KCOV_KDIR=
 KCOV_INFO_LIST=$TDIR/kernel_tests_name.lst
 KCOV_COMBINED_NAME=kcov.combined.info
 
-GCOV_BASEDIR=$(rpm -ql kernel-gcov | head -1)
+GCOV_BASEDIR=$(rpm -ql kernel-gcov | head -1)/*/*$(uname -r)*/
 
 log()
 {
@@ -46,11 +46,12 @@ load_config()
 {
 	KCOV_KDIR=$(awk -F= '$1~/KDIR/{print $2}' $KCOV_CONF)
 	KCOV_ONLY_FINAL_INFO=$(awk -F= '$1~/ONLY_FINAL_INFO/{print $2}' $KCOV_CONF)
-	if [ -n "$KCOV_KDIR" ]; then
-		KDIR_OPT=" --kernel-directory ${KCOV_KDIR//,/ --kernel-directory } "
-	else
-		KDIR_OPT=""
+	if [ -z "$KCOV_KDIR" ]; then
+		# lcov to collect the results for the test can only use directories currently loaded.
+		KCOV_KDIR=$(ls --format=commas /sys/kernel/debug/gcov/$GCOV_BASEDIR/)
 	fi
+	log "collecting coverage from directories: ${KCOV_KDIR}"
+	KDIR_OPT=" --kernel-directory ${KCOV_KDIR//,/ --kernel-directory } "
 
 	KCOV_TEST_NAME=${TEST_NAME:-kernel tests}
 	CLEANED_NAME=${KCOV_TEST_NAME// /-}

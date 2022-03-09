@@ -93,7 +93,7 @@ verify()
 
     log "proc entries: $(ls /sys/kernel/debug/gcov)"
 
-    ls $GCOV_BASEDIR/*/*$(uname -r)*/
+    ls $GCOV_BASEDIR/
     if [ $? -ne 0 ]; then
         cki_abort_recipe "kernel-gcov files were not available after reboot"
         exit

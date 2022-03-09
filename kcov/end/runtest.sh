@@ -22,7 +22,7 @@
 TEST="/kcov/end"
 
 log "loading config from $KCOV_CONF"
-# set KCOV_KDIR, KCOV_TEST_NAME, KCOV_TEST_INFO
+# set KDIR_OPT, KCOV_TEST_NAME, KCOV_TEST_INFO
 load_config
 
 # clean up reboot_hook() in start/runtest.sh
