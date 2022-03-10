@@ -22,7 +22,7 @@
 TEST="/kcov/start"
 
 log "loading config from $KCOV_CONF"
-# set KCOV_KDIR, KCOV_TEST_NAME, TEST_NAME, KCOV_BASE_INFO, KCOV_ALL_INFO
+# set KDIR_OPT, KCOV_KDIR, KCOV_TEST_NAME, KCOV_BASE_INFO, KCOV_ALL_INFO
 load_config
 
 # copied from /kernel/general/code-coverage/start/runtest.sh with modification
@@ -68,7 +68,7 @@ reboot_hook
 log "start collecting coverage on test case $KCOV_TEST_NAME"
 log "capture the initial data as the baseline"
 
-lcov --initial --capture --base-directory $GCOV_BASEDIR/*/*$(uname -r)*/ $KDIR_OPT --output-file $KCOV_BASE_INFO
+lcov --initial --capture --base-directory $GCOV_BASEDIR/ $KDIR_OPT --output-file $KCOV_BASE_INFO
 if [ $? -ne 0 ]; then
 	if [ -n "$KCOV_KDIR" ]; then
 		log "Fail to capture initial base data for $KCOV_KDIR."
