@@ -72,7 +72,7 @@ function RunTest ()
         tee -a $OUTPUTFILE
 
     # Lets rock'n'roll
-    rteval --duration=$DURATION -D | tee -a $OUTPUTFILE
+    rteval --duration=$DURATION -D -L | tee -a $OUTPUTFILE
     retcode="$?"
 
     find . -maxdepth 1 -name "rteval-????????-*.tar.bz2" -print |
@@ -80,6 +80,8 @@ function RunTest ()
             echo "-- INFO -- Attaching report: $rep" | tee -a $OUTPUTFILE
             rstrnt-report-log -l $rep
         done
+
+    rstrnt-report-log rteval-????????-*.tar.bz2
 
     if [ ${retcode} -eq 0 ] ; then
         echo "rteval Passed: " | tee -a $OUTPUTFILE
