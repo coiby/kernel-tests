@@ -29,11 +29,6 @@ OUTPUTFILE=$(new_outputfile)
 
 rlPhaseStartSetup
     YUM=$(cki_get_yum_tool)
-    kernel_name=$(uname -r)
-    if [[ $kernel_name =~ "rt" ]]; then
-        echo "running the $kernel_name" | tee -a $OUTPUTFILE
-        $YUM install -y kernel-rt-modules-extra
-    fi
     rlRun "$YUM install -y lksctp-tools-devel gcc" 0
     rlRun "lsmod | grep sctp || modprobe sctp" "0-255"
     rlRun "sysctl -w net.sctp.auth_enable=1" 0

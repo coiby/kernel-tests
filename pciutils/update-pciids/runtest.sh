@@ -31,17 +31,10 @@
 PACKAGE="pciutils"
 PCI_IDS="/usr/share/hwdata/pci.ids"
 
-YUM=$(cki_get_yum_tool)
-kernel_name=$(uname -r)
-
 rlJournalStart
     rlPhaseStartSetup Setup
         rlAssertRpm ${PACKAGE}
         rlFileBackup ${PCI_IDS}
-        if [[ $kernel_name =~ "rt" ]]; then
-            echo "running the $kernel_name"
-            $YUM install -y kernel-rt-modules-extra
-        fi
     rlPhaseEnd
 
     rlPhaseStartTest Testing
