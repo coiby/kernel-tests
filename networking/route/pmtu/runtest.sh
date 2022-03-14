@@ -42,12 +42,6 @@ if grep "ipv6.disable=1" /proc/cmdline ; then
     exit
 fi
 
-kernel_name=$(uname -r)
-if [[ $kernel_name =~ "rt" ]]; then
-     echo "running the $kernel_name" | tee -a $OUTPUTFILE
-     $YUM install -y kernel-rt-modules-extra
-fi
-
 # Functions
 
 

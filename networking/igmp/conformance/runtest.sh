@@ -35,12 +35,6 @@
 
 YUM=$(cki_get_yum_tool)
 
-kernel_name=$(uname -r)
-if [[ $kernel_name =~ "rt" ]]; then
-     echo "running the $kernel_name"
-     $YUM install -y kernel-rt-modules-extra
-fi
-
 # Build binaries in test_tools in setup phase
 function setup
 {
