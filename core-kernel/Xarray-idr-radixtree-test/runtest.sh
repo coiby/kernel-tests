@@ -42,10 +42,10 @@ function get_running_kernel_src()
 	echo $running_kernel | grep -q -v 'el[0-9]\|fc\|eln'
 
 	if [ $? -eq 0 ]; then
-		cki_log "detected upstream kernel..."
+		rlLog "detected upstream kernel..."
 		# For CKI upstream kernels, the source is extracted under /usr/src/kernels/
 		# this is done as part of distribution/kpkginstall (Boot test)
-		cki_log "Copying /usr/src/kernels/${running_kernel} to linux-${running_kernel}"
+		rlLog "Copying /usr/src/kernels/${running_kernel} to linux-${running_kernel}"
 		# Not using rlRun as sometimes the function causes "Segmentation fault"
 		cp -r /usr/src/kernels/${running_kernel} linux-${running_kernel}
 	else
@@ -55,16 +55,16 @@ function get_running_kernel_src()
 		if [ $? -eq 1 ]; then
 			kernelpkg="kernel-rt"
 		fi
-		cki_log "detected rhel/fedora/ark kernel..."
+		rlLog "detected rhel/fedora/ark kernel..."
 		echo $running_kernel | grep -q -v 'fc'
 		if [ $? -ne  0 ]; then
-			cki_log "workaround to find srpm name for ark kernels..."
+			rlLog "workaround to find srpm name for ark kernels..."
 			# ARK kernel don't always have disttag correct
 			# workaround to find the srpm version on cki repo
 			running_kernel=$(dnf -q --disablerepo="*" --enablerepo="kernel-cki" list --all "${kernelpkg}.src" --showduplicates \
 				| awk '{print$2}' | tail -1)
 		fi
-		cki_run_cmd_pos "dnf download --source ${kernelpkg}-${running_kernel}"
+		rlRun -l "dnf download --source ${kernelpkg}-${running_kernel}"
 		rpm -ivh kernel-*.src.rpm
 		tar xf /root/rpmbuild/SOURCES/linux-*.tar.xz -C .
 	fi
@@ -74,13 +74,13 @@ function build_radixtree()
 {
 	get_running_kernel_src
 
-	cki_cd linux-*/
+	pushd linux-*/
 	patch -d tools/testing/radix-tree/ < ../patch/disable-iteration-test.patch
 	make -C tools/testing/radix-tree/
 	[ -f tools/testing/radix-tree/main ]     || return 1
 	[ -f tools/testing/radix-tree/xarray ]   || return 1
 	[ -f tools/testing/radix-tree/idr-test ] || return 1
-	cki_pd
+	popd
 }
 
 function run_radixtree()
@@ -93,28 +93,28 @@ function run_radixtree()
 		return ${PIPESTATUS[0]}
 		;;
 	*)
-		cki_log "No test $t_name in the tools/testing/radix-tree/" && return 1
+		rlLog "No test $t_name in the tools/testing/radix-tree/" && return 1
 		;;
 	esac
 }
 
 function startup()
 {
-	cki_run_cmd_pos "install_dependency"
-	cki_run_cmd_pos "build_radixtree"
+	rlRun -l "install_dependency"
+	rlRun -l "build_radixtree"
 
 	return $CKI_PASS
 }
 
 function runtest()
 {
-	cki_run_cmd_pos "run_radixtree xarray"
+	rlRun -l "run_radixtree xarray"
 	cki_upload_log_file xarray.log
 
-	cki_run_cmd_pos "run_radixtree idr-test"
+	rlRun -l "run_radixtree idr-test"
 	cki_upload_log_file idr-test.log
 
-	cki_run_cmd_pos "run_radixtree main"
+	rlRun -l "run_radixtree main"
 	cki_upload_log_file main.log
 
 	return $CKI_PASS
@@ -122,7 +122,7 @@ function runtest()
 
 function cleanup()
 {
-	cki_run_cmd_pos "rm -fr linux-*/ *.log *.tar.*"
+	rlRun -l "rm -fr linux-*/ *.log *.tar.*"
 
 	return $CKI_PASS
 }

@@ -29,12 +29,12 @@ function load_start
     typeset ncpus=$(lscpu -p=cpu | grep -v '^#' | wc -l)
     typeset nload=$((ncpus * 1 + ncpus / 2))
     # XXX: Make sure no running "dd" processes are on the system under test
-    cki_run_cmd_neu "pkill dd"
+    rlRun -l "pkill dd" "0-255"
     typeset -i i
     for ((i = 0; i < nload; i++)); do
         dd if=/dev/zero of=/dev/null 2>/dev/null &
         typeset pid=$!
-        cki_log "$i:\ta load is running, pid=$pid"
+        rlLog "$i:\ta load is running, pid=$pid"
         g_load_pids[$i]=$pid
     done
 }
@@ -45,20 +45,20 @@ function load_stop
     for ((i = 0; i < ${#g_load_pids[@]}; i++)); do
         typeset pid=${g_load_pids[$i]}
         kill -9 $pid
-        cki_log "$i:\ta load is stopped, pid=$pid"
+        rlLog "$i:\ta load is stopped, pid=$pid"
     done
     unset g_load_pids
 }
 
 function runtest
 {
-    cki_log "This test tests if CPU frequency is changing between idle" \
+    rlLog "This test tests if CPU frequency is changing between idle" \
         "on powersave governor and full load on performance governor"
 
     # Dump sysinfo
-    cki_run_cmd_neu "uname -srvm"
-    cki_run_cmd_neu "lscpu"
-    cki_run_cmd_neu "dmidecode | grep -A 3 'BIOS Information'"
+    rlRun -l "uname -srvm"
+    rlRun -l "lscpu"
+    rlRun -l  "dmidecode | grep -A 3 'BIOS Information'" "0-255"
 
     typeset cpufreq_dir="/sys/devices/system/cpu/cpu0/cpufreq"
     typeset file1="$cpufreq_dir/scaling_available_governors"
@@ -67,36 +67,34 @@ function runtest
     ls $file3 > /dev/null 2>&1 || \
             file3="$cpufreq_dir/scaling_cur_freq"
 
-    cki_run_cmd_neu "cat $file1"
-    cki_run_cmd_neu "cat $file2"
+    rlRun -l "cat $file1" "0-255"
+    rlRun -l "cat $file2" "0-255"
     typeset scaling_governor=$(cat $file2)
 
     typeset file_freq1=$TMPDIR/curfreq1
     typeset file_freq2=$TMPDIR/curfreq2
-    cki_log "write 'powersave' to file $file2"
-    cki_run_cmd_pos "echo powersave > $file2 && cat $file2" || \
-        return $CKI_FAIL
-    cki_log "sleep a while then get current cpu frequency"
-    cki_run_cmd_neu "sleep 20"
-    cki_run_cmd_neu "cat $file3 > $file_freq1 && cat $file_freq1"
+    rlLog "write 'powersave' to file $file2"
+    rlRun "echo powersave > $file2 && cat $file2" || return $CKI_FAIL
+    rlLog "sleep a while then get current cpu frequency"
+    rlRun  "sleep 20"
+    rlRun -l "cat $file3 > $file_freq1 && cat $file_freq1" "0-255"
     typeset cur_freq_pows=$(cat $file_freq1)
 
-    cki_log "write 'performance' to file $file2"
-    cki_run_cmd_pos "echo performance > $file2 && cat $file2" || \
-        return $CKI_FAIL
-    cki_log "start workloads then get current cpu frequency"
+    rlLog "write 'performance' to file $file2"
+    rlRun "echo performance > $file2 && cat $file2" || return $CKI_FAIL
+    rlLog "start workloads then get current cpu frequency"
     load_start
-    cki_run_cmd_neu "sleep 20"
-    cki_run_cmd_neu "cat $file3 > $file_freq2 && cat $file_freq2"
+    rlRun "sleep 20"
+    rlRun -l "cat $file3 > $file_freq2 && cat $file_freq2" "0-255"
     typeset cur_freq_perf=$(cat $file_freq2)
     load_stop
 
     typeset msg_governor="CPU scaling governor"
     typeset msg_freq_pows="CPU scaling frequency with powersave"
     typeset msg_freq_perf="CPU scaling frequency with performance"
-    cki_log "$msg_governor:\t\t\t$scaling_governor"
-    cki_log "$msg_freq_pows:\t$cur_freq_pows"
-    cki_log "$msg_freq_perf:\t$cur_freq_perf"
+    rlLog "$msg_governor:\t\t\t$scaling_governor"
+    rlLog "$msg_freq_pows:\t$cur_freq_pows"
+    rlLog "$msg_freq_perf:\t$cur_freq_perf"
     #
     # NOTE: CPU scaling frequency with powersave should be less than
     #       CPU scaling frequency with performance
@@ -104,10 +102,10 @@ function runtest
     typeset msg2fail="($cur_freq_pows) >= ($cur_freq_perf)"
     typeset msg2pass="($cur_freq_pows) <  ($cur_freq_perf)"
     if (( $cur_freq_pows >= $cur_freq_perf )); then
-        cki_log "FAIL: $msg_freq_pows $msg2fail $msg_freq_perf"
+        rlLog "FAIL: $msg_freq_pows $msg2fail $msg_freq_perf"
         return $CKI_FAIL
     fi
-    cki_log "PASS: $msg_freq_pows $msg2pass $msg_freq_perf"
+    rlLog "PASS: $msg_freq_pows $msg2pass $msg_freq_perf"
     return $CKI_PASS
 }
 
@@ -115,25 +113,21 @@ function startup
 {
     is_kvm
     if (( $? == 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED "kvm is unsupported"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "kvm is unsupported"
     fi
 
     is_intel
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED "non-intel CPU is unsupported"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "non-intel CPU is unsupported"
     fi
 
     has_kmod_intel_rapl
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED \
-            "kernel module 'intel-rapl' is not loaded"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "kernel module 'intel-rapl' is not loaded"
     fi
 
     if [[ ! -d $TMPDIR ]]; then
-        cki_run_cmd_pos "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
+        rlRun "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
     fi
 
     return $CKI_PASS
@@ -141,7 +135,7 @@ function startup
 
 function cleanup
 {
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun "rm -rf $TMPDIR"
     return $CKI_PASS
 }
 

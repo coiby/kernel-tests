@@ -29,18 +29,18 @@ rlJournalStart
     # Setup phase: Prepare test directory
     rlPhaseStartSetup
     if [ ! -e /sys/devices/system/cpu/cpu0/topology/die_id ]; then
-        cki_skip_task "the operating system does not have die support"
+        cki_beakerlib_skip_task "the operating system does not have die support"
     fi
     rlPhaseEnd
 
     # Test phase: verifying die layout
     rlPhaseStartTest
-        cki_run_cmd_pos "bash $CDIR/utils/verify-x86-die-support.sh"
+        rlRun -l "bash $CDIR/utils/verify-x86-die-support.sh"
     rlPhaseEnd
 
     # Cleanup phase: Remove test directory
     rlPhaseStartCleanup
-        cki_run_cmd_neu "rm -f $TMPDIR"
+        rlRun "rm -f $TMPDIR"
     rlPhaseEnd
 rlJournalEnd
 

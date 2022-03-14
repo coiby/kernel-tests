@@ -17,6 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
+source /usr/share/beakerlib/beakerlib.sh
 source $(dirname $(readlink -f $BASH_SOURCE))/../../cki_lib/libcki.sh
 
 TMPDIR=${TMPDIR:-"/tmp"}
@@ -55,9 +56,9 @@ function msr_tools_install
     exit 0
 EOF
 
-    cki_run_cmd_neu "chmod +x $script"
-    cki_run_cmd_neu "cat -n $script"
-    cki_run_cmd_pos "bash $script" || return $CKI_UNINITIATED
+    rlRun -l "chmod +x $script"
+    rlRun -l "cat -n $script"
+    rlRun -l "bash $script" || return $CKI_UNINITIATED
 
     return $CKI_PASS
 }
@@ -67,9 +68,9 @@ function msr_tools_uninstall
     typeset dst_dir=$MSR_TOOLS_DST_DIR
     [[ ! -d $dst_dir ]] && return $CKI_PASS
 
-    cki_cd "$dst_dir"
-    cki_run_cmd_neu "make uninstall"
-    cki_pd
+    rlRun "pushd $dst_dir"
+    rlRun -l "make uninstall" "0-255"
+    rlRun "popd"
 
     return $CKI_PASS
 }
@@ -82,18 +83,18 @@ function msr_tools_epel_install()
     [[ ! -e /etc/yum.repos.d/epel.repo ]] && add_repo=true
 
     [[ "$add_repo" == "true" ]] && \
-        cki_run_cmd_neu "${YUM} -y install $EPEL"
-    cki_run_cmd_neu "${YUM} -y install msr-tools"
+        rlRun -l "${YUM} -y install $EPEL" "0-255"
+    rlRun -l "${YUM} -y install msr-tools" "0-255"
     [[ "$add_repo" == "true" ]] && \
-        cki_run_cmd_neu "${YUM} -y remove epel-release"
+        rlRun -l "${YUM} -y remove epel-release" "0-255"
 
-    cki_run_cmd_pos "which rdmsr"
+    rlRun -l "which rdmsr"
     (( $? == 0 )) && return $CKI_PASS || return $CKI_UNINITIATED
 }
 
 function msr_tools_epel_uninstall
 {
-    cki_run_cmd_neu "${YUM} -y remove msr-tools"
+    rlRun -l "${YUM} -y remove msr-tools" "0-255"
 }
 
 function msr_tools_setup

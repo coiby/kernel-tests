@@ -106,7 +106,7 @@ function loadm
     for (( i = 0; i < $nthreads; i++ )); do
         (load1 $timeout) > /dev/null 2>&1 &
         typeset pid=$!
-        cki_log "load1[$i] is started, pid=$pid"
+        rlLog "load1[$i] is started, pid=$pid"
     done
 }
 
@@ -121,24 +121,24 @@ function test_capping
 
     # 1. no load, no cap
     typeset e_no_no=$(get_energy $measurement_time)
-    cki_log "Power consumtion on uncapped system with no load: $e_no_no microwatts"
+    rlLog "Power consumtion on uncapped system with no load: $e_no_no microwatts"
 
     # 2. load, no cap
     typeset cpus=$(lscpu | grep '^CPU(s):' | \
                    sed 's/^CPU(s):[^0-9]*\([0-9]*\)/\1/')
     loadm $load_time $cpus
     typeset e_full_no=$(get_energy $measurement_time)
-    cki_log "Power consumtion on uncapped system with full load: $e_full_no microwatts"
+    rlLog "Power consumtion on uncapped system with full load: $e_full_no microwatts"
 
     # 3. cap to average between full load and no load
     typeset e_mid=$(( (e_no_no + e_full_no) / 2 ))
-    cki_log "Going to cap the system to: $e_mid microwatts"
+    rlLog "Going to cap the system to: $e_mid microwatts"
 
     typeset old_cap=$(get_cap)
     set_cap $e_mid
     loadm $load_time $cpus
     typeset e_full_cap=$(get_energy $measurement_time)
-    cki_log "Power consumtion on capped system with full load: $e_full_cap microwatts"
+    rlLog "Power consumtion on capped system with full load: $e_full_cap microwatts"
 
     #
     # measured_max is maximal measured value which will not cause fail
@@ -151,17 +151,17 @@ function test_capping
     typeset measured_max=$(( e_mid * 11 / 10 ))
     typeset measured_min=$(( e_mid *  9 / 10 ))
 
-    cki_log "capping back to $old_cap"
+    rlLog "capping back to $old_cap"
     set_cap $old_cap
 
-    cki_log "e_no_no      = $e_no_no"
-    cki_log "e_full_no    = $e_full_no"
-    cki_log "e_mid        = $e_mid"
-    cki_log "e_full_cap   = $e_full_cap"
-    cki_log "measured_max = $measured_max"
-    cki_log "measured_min = $measured_min"
+    rlLog "e_no_no      = $e_no_no"
+    rlLog "e_full_no    = $e_full_no"
+    rlLog "e_mid        = $e_mid"
+    rlLog "e_full_cap   = $e_full_cap"
+    rlLog "measured_max = $measured_max"
+    rlLog "measured_min = $measured_min"
     if (( e_full_cap > measured_max || e_full_cap < measured_min )); then
-        cki_log "FAIL: measured energy consumption doesn't match capped value"
+        rlLog "FAIL: measured energy consumption doesn't match capped value"
         return 1
     fi
 
@@ -172,25 +172,21 @@ function startup
 {
     is_kvm
     if (( $? == 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED "kvm is unsupported"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "kvm is unsupported"
     fi
 
     is_intel
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED "non-intel CPU is unsupported"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "non-intel CPU is unsupported"
     fi
 
     has_kmod_intel_rapl
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED \
-            "kernel module 'intel-rapl' is not loaded"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "kernel module 'intel-rapl' is not loaded"
     fi
 
     if [[ ! -d $TMPDIR ]]; then
-        cki_run_cmd_pos "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
+        rlRun "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
     fi
 
     return $CKI_PASS
@@ -198,7 +194,7 @@ function startup
 
 function cleanup
 {
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun -l "rm -rf $TMPDIR" "0-255"
     return $CKI_PASS
 }
 
@@ -221,8 +217,8 @@ function HW_good {
 function runtest
 {
     # For debugging
-    cki_run_cmd_neu "find /sys/devices/ -name *rapl*"
-    cki_run_cmd_neu "lsmod"
+    rlRun -l "find /sys/devices/ -name *rapl*" "0-255"
+    rlRun -l "lsmod" "0-255"
 
     # check if HW supports known cpufreq driver and returns the frequency to the standard tools
     HW_good

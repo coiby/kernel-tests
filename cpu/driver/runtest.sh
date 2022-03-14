@@ -30,7 +30,7 @@ check_pstate_support()
 {
     for m in $NON_PSTATE_PROCESSORS; do
 	if [ $m -eq $1 ]; then
-	    cki_log "model: $model - does not support intel_pstate"
+	    rlLog "model: $model - does not support intel_pstate"
 	    return 1
 	fi
     done
@@ -42,14 +42,14 @@ function verify_intel_cpufreq_driver
 {
     typeset driver=$1
 
-    cki_log "Start to verify intel cpu freq driver"
+    rlLog "Start to verify intel cpu freq driver"
 
     typeset vendor=$(dmidecode -t 0 | grep Vendor: | \
                      cut -d: -f 2 | awk '{print tolower($1)}')
 
     typeset model=$(lscpu | grep Model: | awk '{print $2}')
     if [ -z "$model" ]; then
-	cki_log "unable to determine cpu model"
+	rlLog "unable to determine cpu model"
 	return $CKI_FAIL
     fi
 
@@ -58,49 +58,44 @@ function verify_intel_cpufreq_driver
     if [ $? -ne 0 ]; then
 	# older systems do not support intel pstate
 	if [ $driver != "acpi-cpufreq" ]; then
-	    cki_log "intel (non-pstate) system is running: $driver"
+	    rlLog "intel (non-pstate) system is running: $driver"
 	    # maps to SKIP
 	    return $CKI_UNSUPPORTED
 	fi
-	cki_log "intel system is running: $driver"
+	rlLog "intel system is running: $driver"
 	return $CKI_PASS
     fi
 
     if [ $driver != "intel_pstate" ] && [ $driver != "intel_cpufreq" ]; then
 	if [ "$vendor" = "lenovo" ]; then
-	    cki_log "lenovo intel system is running: $driver"
-	    cki_log "PASS"
+	    rlLog "lenovo intel system is running: $driver"
+	    rlLog "PASS"
 	    return $CKI_PASS
 	fi
-        cki_set_reason $CKI_FAIL \
-            "intel system is running: $driver"
+        rlFail "intel system is running: $driver"
         return $CKI_FAIL
     fi
 
-    cki_run_cmd_neu "lscpu | grep 'hwp '"
+    rlRun -l "lscpu | grep 'hwp '" "0-255"
     if (( $? == 0 )); then
 	if [ "$driver" = "intel_pstate" ]; then
-            cki_run_cmd_pos "rdmsr 0x770"
+            rlRun -l "rdmsr 0x770"
             if (( $? != 0 )); then
-		cki_set_reason $CKI_UNSUPPORTED \
-		    "intel system has HWP, but it is not enabled"
-		return $CKI_UNSUPPORTED
+                cki_beakerlib_skip_task "intel system has HWP, but it is not enabled"
             fi
 	else
-            cki_set_reason $CKI_FAIL \
-                "intel system is not running intel_pstate running: $driver"
+            rlFail "intel system is not running intel_pstate running: $driver"
             return $CKI_FAIL
 	fi
     else
-        cki_run_cmd_pos "ls /sys/devices/system/cpu/intel_pstate/"
+        rlRun -l "ls /sys/devices/system/cpu/intel_pstate/"
         if (( $? != 0 )); then
-            cki_set_reason $CKI_FAIL \
-                "intel system does not have HWP, intel_pstate is not active"
+            rlFail "intel system does not have HWP, intel_pstate is not active"
             return $CKI_FAIL
         fi
     fi
 
-    cki_log "PASS"
+    rlLog "PASS"
     return $CKI_PASS
 }
 
@@ -108,7 +103,7 @@ function verify_amd_cpufreq_driver
 {
     typeset driver=$1
 
-    cki_log "Start to verify amd cpu freq driver"
+    rlLog "Start to verify amd cpu freq driver"
 
     typeset family=$(cat /proc/cpuinfo | grep family | \
                      sort -u | awk '{print $4}')
@@ -116,17 +111,14 @@ function verify_amd_cpufreq_driver
     # verify family is >= 15h
     if (( $family >= 0x15 )); then
         if [[ $driver != "acpi-cpufreq" ]]; then
-            cki_set_reason $CKI_FAIL \
-                "amd system is running: $driver"
+            rlFail "amd system is running: $driver"
             return $CKI_FAIL
         fi
     else
-        cki_set_reason $CKI_UNSUPPORTED \
-            "this test is not valid for the AMD family"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "this test is not valid for the AMD family"
     fi
 
-    cki_log "PASS"
+    rlLog "PASS"
     return $CKI_PASS
 }
 
@@ -153,9 +145,7 @@ function runtest
         ;;
 
     *) # UNSUPPORTED
-        cki_set_reason $CKI_UNSUPPORTED \
-            "it is an unsupported vendor: $vendor_str"
-        typeset -i ret=$CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "it is an unsupported vendor: $vendor_str"
         ;;
     esac
 
@@ -165,20 +155,17 @@ function runtest
 function startup
 {
     if [[ $(virt-what) == "kvm" ]]; then
-        cki_set_reason $CKI_UNSUPPORTED \
-            "this test is unsupported in kvm"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "this test is unsupported in kvm"
     fi
 
     if [[ ! -d $TMPDIR ]]; then
-        cki_run_cmd_pos "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
+        rlRun "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
     fi
 
     # setup msr tools as package 'msr-tools' is not installed by default
     msr_tools_setup
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNINITIATED "fail to setup msr tools"
-        return $CKI_UNINITIATED
+        cki_abort_task "fail to setup msr tools"
     fi
 
     return $CKI_PASS
@@ -187,7 +174,7 @@ function startup
 function cleanup
 {
     msr_tools_cleanup
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun "rm -rf $TMPDIR"
     return $CKI_PASS
 }
 

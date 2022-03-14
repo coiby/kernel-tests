@@ -17,6 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
+source /usr/share/beakerlib/beakerlib.sh
 source $(dirname $(readlink -f $BASH_SOURCE))/../../cki_lib/libcki.sh
 
 #
@@ -43,9 +44,9 @@ function is_kvm
 function has_kmod_intel_rapl
 {
     # Always try to load kernel module 'intel-rapl' in case it is not loaded
-    cki_run_cmd_neu "{ modprobe intel_rapl || modprobe rapl || : ; } >/dev/null 2>&1"
+    rlRun -l "{ modprobe intel_rapl || modprobe rapl || : ; } >/dev/null 2>&1" "0-255"
 
     # Check 'intel_rapl' has been loaded
-    cki_run_cmd_pos "lsmod | egrep '(^intel_rapl )|(^rapl )'"
+    rlRun -l "lsmod | egrep '(^intel_rapl )|(^rapl )'"
     return $?
 }

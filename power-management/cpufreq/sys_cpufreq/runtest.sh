@@ -25,13 +25,13 @@ source $CDIR/../../common/libpwmgmt.sh
 
 function runtest
 {
-    cki_log "This test checks that current frequency is between min and max" \
+    rlLog "This test checks that current frequency is between min and max" \
             "frequency and these two has plausible values"
 
     # Dump sysinfo
-    cki_run_cmd_neu "uname -srvm"
-    cki_run_cmd_neu "lscpu"
-    cki_run_cmd_neu "dmidecode | grep -A 3 'BIOS Information'"
+    rlRun -l "uname -srvm"
+    rlRun -l "lscpu"
+    rlRun -l "dmidecode | grep -A 3 'BIOS Information'" "0-255"
 
     # Dump cpu0/cpufreq/cpuinfo_{max,cur,min}_freq
     typeset file1="/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq"
@@ -41,15 +41,15 @@ function runtest
     typeset file3="/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq"
     typeset filex=""
     for filex in $file1 $file2 $file3; do
-        cki_run_cmd_neu "cat $filex"
+        rlRun -l "cat $filex" "0-255"
     done
 
     typeset max_freq=$(egrep [0-9] $file1)
     typeset cur_freq=$(egrep [0-9] $file2)
     typeset min_freq=$(egrep [0-9] $file3)
-    cki_log "CPU max     frequency: $max_freq"
-    cki_log "CPU min     frequency: $min_freq"
-    cki_log "CPU current frequency: $cur_freq"
+    rlLog "CPU max     frequency: $max_freq"
+    rlLog "CPU min     frequency: $min_freq"
+    rlLog "CPU current frequency: $cur_freq"
 
     #
     # Verify max/min/current frequency, and the rules are:
@@ -59,25 +59,25 @@ function runtest
     # 4. highest frequency would be at most    8GHz
     #
     if (( $cur_freq < $min_freq )); then
-        cki_log "FAIL: current frequency ($cur_freq) < min frequency ($min_freq)"
+        rlLog "FAIL: current frequency ($cur_freq) < min frequency ($min_freq)"
         return $CKI_FAIL
     fi
-    cki_log "+OK: current frequency ($cur_freq) >= min frequency ($min_freq)"
+    rlLog "+OK: current frequency ($cur_freq) >= min frequency ($min_freq)"
     if (( $cur_freq > $max_freq )); then
-        cki_log "FAIL: current frequency ($cur_freq) > max frequency ($max_freq)"
+        rlLog "FAIL: current frequency ($cur_freq) > max frequency ($max_freq)"
         return $CKI_FAIL
     fi
-    cki_log "+OK: current frequency ($cur_freq) <= max frequency ($max_freq)"
+    rlLog "+OK: current frequency ($cur_freq) <= max frequency ($max_freq)"
     if (( $min_freq < 300000 )); then
-        cki_log "FAIL: min frequency ($min_freq) < 300MHz (300000)"
+        rlLog "FAIL: min frequency ($min_freq) < 300MHz (300000)"
         return $CKI_FAIL
     fi
-    cki_log "+OK: min frequency ($min_freq) >= 300MHz (300000)"
+    rlLog "+OK: min frequency ($min_freq) >= 300MHz (300000)"
     if (( $max_freq > 8000000 )); then
-        cki_log "FAIL: max frequency ($max_freq) > 8GHz (8000000)"
+        rlLog "FAIL: max frequency ($max_freq) > 8GHz (8000000)"
         return $CKI_FAIL
     fi
-    cki_log "+OK: max frequency ($max_freq) <= 8GHz (8000000)"
+    rlLog "+OK: max frequency ($max_freq) <= 8GHz (8000000)"
 
     return $CKI_PASS
 }
@@ -86,25 +86,21 @@ function startup
 {
     is_kvm
     if (( $? == 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED "kvm is unsupported"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "kvm is unsupported"
     fi
 
     is_intel
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED "non-intel CPU is unsupported"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "non-intel CPU is unsupported"
     fi
 
     has_kmod_intel_rapl
     if (( $? != 0 )); then
-        cki_set_reason $CKI_UNSUPPORTED \
-            "kernel module 'intel-rapl' is not loaded"
-        return $CKI_UNSUPPORTED
+        cki_beakerlib_skip_task "kernel module 'intel-rapl' is not loaded"
     fi
 
     if [[ ! -d $TMPDIR ]]; then
-        cki_run_cmd_pos "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
+        rlRun "mkdir -p -m 0755 $TMPDIR" || return $CKI_UNINITIATED
     fi
 
     return $CKI_PASS
@@ -112,7 +108,7 @@ function startup
 
 function cleanup
 {
-    cki_run_cmd_neu "rm -rf $TMPDIR"
+    rlRun "rm -rf $TMPDIR"
     return $CKI_PASS
 }
 
