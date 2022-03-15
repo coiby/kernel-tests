@@ -340,7 +340,7 @@ cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
 if [ ${REBOOTCOUNT} -eq 0 ]; then
   # kernel packages only from CKI kernel repo should be used
   # rpm_prepare creates kernel-cki.repo
-  _exclude_pkgs="kernel*"
+  _exclude_pkgs="kernel kernel-core kernel-debug kernel-debug-core kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-core kernel-rt-debug-core"
   _repofiles=$(ls /etc/yum.repos.d/ | grep -v kernel-cki.repo)
 
   # If we haven't rebooted yet, then we shouldn't have the directory present on the system.
