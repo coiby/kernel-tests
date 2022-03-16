@@ -208,6 +208,8 @@ dup202 dup202
 dup203 dup203
 dup204 dup204
 dup205 dup205
+dup206 dup206
+dup207 dup207
 
 dup3_01 dup3_01
 dup3_02 dup3_02
@@ -655,6 +657,9 @@ fanotify16 fanotify16
 fanotify17 fanotify17
 fanotify18 fanotify18
 fanotify19 fanotify19
+fanotify20 fanotify20
+fanotify21 fanotify21
+fanotify22 fanotify22
 
 ioperm01 ioperm01
 ioperm02 ioperm02
@@ -723,8 +728,6 @@ link02 link02
 link03 link03
 link04 link04
 link05 link05
-link06 link06
-link07 link07
 link08 link08
 
 #linkat test cases
@@ -1043,8 +1046,6 @@ pread01 pread01
 pread01_64 pread01_64
 pread02 pread02
 pread02_64 pread02_64
-pread03 pread03
-pread03_64 pread03_64
 
 preadv01 preadv01
 preadv01_64 preadv01_64
@@ -1116,6 +1117,8 @@ quotactl04 quotactl04
 quotactl05 quotactl05
 quotactl06 quotactl06
 quotactl07 quotactl07
+quotactl08 quotactl08
+quotactl09 quotactl09
 
 read01 read01
 read02 read02
@@ -1742,6 +1745,7 @@ write02 write02
 write03 write03
 write04 write04
 write05 write05
+write06 write06
 
 writev01 writev01
 writev02 writev02
@@ -1779,6 +1783,7 @@ statx03 statx03
 statx04 statx04
 statx06 statx06
 statx07 statx07
+statx08 statx08
 
 
 io_uring01 io_uring01
@@ -2002,18 +2007,18 @@ ADSP015 aiodio_sparse -i 4 -a 8k -w 2048k -s 8192k -n 2
 ADSP016 aiodio_sparse -i 4 -a 8k -w 4096k -s 16384k -n 2
 ADSP017 aiodio_sparse -i 4 -a 8k -w 8192k -s 32768k -n 2
 ADSP018 aiodio_sparse -i 4 -a 8k -w 16384k -s 65536k -n 2
-ADSP045 dio_sparse -a 4k -w 4k -s 2k -n 2
-ADSP046 dio_sparse -a 4k -w 4k -s 4k -n 2
-ADSP047 dio_sparse -a 8k -w 16k -s 16k -n 2
-ADSP048 dio_sparse -a 8k -w 32k -s 32k -n 2
-ADSP049 dio_sparse -a 8k -w 64k -s 64k -n 2
-ADSP050 dio_sparse -a 8k -w 128k -s 128k -n 2
-ADSP051 dio_sparse -a 8k -w 256k -s 256k -n 2
-ADSP052 dio_sparse -a 8k -w 512k -s 512k -n 2
-ADSP053 dio_sparse -a 8k -w 1024k -s 1024k -n 2
-ADSP054 dio_sparse -a 8k -w 2048k -s 2048k -n 2
-ADSP055 dio_sparse -a 8k -w 4096k -s 4096k -n 2
-ADSP056 dio_sparse -a 8k -w 8192k -s 8192k -n 2
+ADSP045 dio_sparse -w 4k -s 2k -n 2
+ADSP046 dio_sparse -w 4k -s 4k -n 2
+ADSP047 dio_sparse -w 16k -s 16k -n 2
+ADSP048 dio_sparse -w 32k -s 32k -n 2
+ADSP049 dio_sparse -w 64k -s 64k -n 2
+ADSP050 dio_sparse -w 128k -s 128k -n 2
+ADSP051 dio_sparse -w 256k -s 256k -n 2
+ADSP052 dio_sparse -w 512k -s 512k -n 2
+ADSP053 dio_sparse -w 1024k -s 1024k -n 2
+ADSP054 dio_sparse -w 2048k -s 2048k -n 2
+ADSP055 dio_sparse -w 4096k -s 4096k -n 2
+ADSP056 dio_sparse -w 8192k -s 8192k -n 2
 
 #ltp-aiodio.part3
 # lower number of ops for KT1

@@ -7,7 +7,7 @@ if [ -z ${TESTVERSION} ]; then
     if rlIsRHEL 5 || rlIsRHEL 6; then
         TESTVERSION="20200120"
     else
-        TESTVERSION="20210927"
+        TESTVERSION="20220121"
     fi
 fi
 
