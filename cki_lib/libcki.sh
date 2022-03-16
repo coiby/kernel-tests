@@ -282,9 +282,10 @@ function cki_is_baremetal()
     # any ppc lpar
     (uname -m | grep -q ppc) && (hostname | grep -q "\-lp") && return 1
 
+    # virt-what returns non empty string. when detected non-baremetal
     if command -v virt-what; then
         hv=$(virt-what)
-        [[ -z "$hv" ]] && return 1
+        [[ -n "$hv" ]] && return 1
     fi
 
     return 0
