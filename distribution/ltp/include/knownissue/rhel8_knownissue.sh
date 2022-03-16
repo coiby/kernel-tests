@@ -66,6 +66,9 @@ function rhel8_unfix_issues()
 	is_arch "s390x" && tskip "bpf_prog01 bpf_prog02" unfix
 	# Bug 1981743 - RHEL-9-Beta: WARNING: CPU: 3 PID: 0 at kernel/sched/fair.c:401 enqueue_task_fair+0x254/0x5b0
 	osver_in_range "800" "806" && tskip "cfs_bandwidth01" unfix
+	# Skip test until RHEL-8.3
+	# https://gitlab.com/cki-project/kernel-tests/-/issues/690
+	osver_in_range "800" "803" && tskip "fanotify15" unfix
 }
 
 function rhel8_fixed_issues()
