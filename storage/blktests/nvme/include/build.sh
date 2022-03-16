@@ -17,7 +17,7 @@ fi
 ARCH=$(uname -i)
 ver="4.18.0-303"
 KVER=$(uname -r)
-if [[ $ARCH == "ppc64le" ]] && [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | head -1)" ]]; then
+if [[ $ARCH == "ppc64le" ]] && [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then
 	export USE_SIW="0"
 fi
 
