@@ -40,7 +40,11 @@ function get_soft_deps_pkgs
 
 function get_pkg_mgr
 {
-    [[ -x /usr/bin/dnf ]] && echo dnf || echo yum
+    if [[ -x /usr/bin/rpm-ostree ]]; then
+      echo rpm-ostree
+    else
+      [[ -x /usr/bin/dnf ]] && echo dnf || echo yum
+    fi
 }
 
 function usage
@@ -77,24 +81,33 @@ if [[ -z "$pkgs_deps" ]] && [[ -z "$pkgs_soft_deps" ]]; then
 fi
 
 pkg_mgr=$(get_pkg_mgr)
+pkg_mgr_inst_string="-y install"
+soft_pkg_mgr_inst_string="-y install --skip-broken"
+if [[ $pkg_mgr == "rpm-ostree" ]]; then
+  echo "pkg_mgr = RPM OSTREE"
+  pkg_mgr_inst_string="-A --idempotent --allow-inactive install"
+  soft_pkg_mgr_inst_string=$pkg_mgr_inst_string
+fi
+
 if [[ $dry_run == "yes" ]]; then
     echo "=== DRY RUN ==="
     if [[ -n "$pkgs_deps" ]]; then
-        echo "$pkg_mgr -y install $pkgs_deps"
+        echo "$pkg_mgr $pkg_mgr_inst_string $pkgs_deps"
     fi
     if [[ -n "$pkgs_soft_deps" ]]; then
-        echo "$pkg_mgr -y install --skip-broken $pkgs_soft_deps"
+        echo "$pkg_mgr $soft_pkg_mgr_inst_string  $pkgs_soft_deps"
     fi
     exit 0
 fi
 if [[ -n "$pkgs_deps" ]]; then
     echo "Now install packages <$pkgs_deps >, please wait for a while ..."
     # shellcheck disable=SC2086
-    $pkg_mgr -y install $pkgs_deps
+    $pkg_mgr $pkg_mgr_inst_string $pkgs_deps
 fi
 if [[ -n "$pkgs_soft_deps" ]]; then
     echo "Now try to install extra packages <$pkgs_soft_deps >, please wait for a while ..."
     # shellcheck disable=SC2086
-    $pkg_mgr -y install --skip-broken $pkgs_soft_deps
+    # true because the exit status doesnt matter rpm-ostree no skip broken
+    $pkg_mgr $soft_pkg_mgr_inst_string $pkgs_soft_deps || true
 fi
 exit $?
