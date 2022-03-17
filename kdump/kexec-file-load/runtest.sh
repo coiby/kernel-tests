@@ -1,7 +1,7 @@
 #!/bin/bash
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2019 Red Hat, Inc.
+#   Copyright (c) 2022 Red Hat, Inc.
 #
 #   This program is free software: you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License as
@@ -23,9 +23,9 @@
 . ../../cki_lib/libcki.sh || exit 1
 . ../include/runtest.sh
 
-TEST="/kdump/kexec-boot"
+TEST="/kdump/kexec-file-load"
 
 KEXEC_VER=${KEXEC_VER:-"$(uname -r)"}
-EXTRA_KEXEC_OPTIONS=${EXTRA_KEXEC_OPTIONS:-"-d"}
+EXTRA_KEXEC_OPTIONS=${EXTRA_KEXEC_OPTIONS:-"-d -s"}
 
-RunTest "KexecBoot kexecbootoption"
+RunTest "KexecBoot fileloadoption"

@@ -28,6 +28,7 @@ K_PATH="${K_TESTAREA}/KDUMP-PATH"
 
 KDUMP_CONFIG="/etc/kdump.conf"
 KDUMP_SYS_CONFIG="/etc/sysconfig/kdump"
+KDUMP_LOG="/var/log/kdump.log"
 
 K_TMP_DIR="${K_TESTAREA}/tmp"
 K_REBOOT="${K_TMP_DIR}/KDUMP-REBOOT"
@@ -769,7 +770,12 @@ RestartKdump()
         /usr/bin/kdumpctl restart 2>&1 | tee /tmp/kdump_restart.log
         /usr/bin/kdumpctl status  2>&1
     fi
-    [ "$?" -ne 0 ] && FatalError 'Restarting kdump failed.'
+
+    local retval=$?
+
+    RstrntSubmit "${KDUMP_LOG}"
+
+    [ "$retval" -ne 0 ] && FatalError 'Restarting kdump failed.'
     sync; sync; sleep 10
 
     # It may report "No kdump initial ramdisk found.[WARNING]" in rhel6
@@ -998,4 +1004,86 @@ Cleanup(){
     RemoveVmcores
     RestoreKdumpConfig
     echo ":::::::::::::::::::::::::::::::::::::::::::::"
+}
+
+# Kexec load and reboot to kexec kernel
+# GLOBALS:
+#   EXTRA_KEXEC_OPTIONS - Extra options passed to kexec command
+#   EXEC_VER - Version of kernel it kexecs to.
+# Params:
+#   String will be appended to kexec kernel options
+KexecBoot()
+{
+    local test_boot_option=${1:-"newkerneloption"}
+
+    if [ ! -f "${C_REBOOT}_1" ] && [ ! -f "${C_REBOOT}_2" ]; then
+
+        # On aarch64, Kexec load is supported only if it's supporting PSCI
+        if [ "$K_ARCH" = "aarch64" ]; then
+            local supported=1
+            if which journalctl ; then
+                journalctl -k | grep -i psci | grep -i "is not implemented" && supported=0
+            else
+                grep -i  psci /var/log/messages | grep -i "is not implemented" && supported=0
+            fi
+            if [ "$supported" -eq 0 ]; then
+                Skip "- Warn: This aarch64 system doesn't support PSCI. Terminate the test."
+                return
+            fi
+        fi
+
+        PrepareKdump
+        # Make sure kdump service is finish loading kexec for panic (i.e. kexec -p)
+        # So `kexec -l`` won't compete resources with kexec -p
+        # Otherwise it may fail with: kexec_load failed: Device or resource busy
+        if which kdumpctl &> /dev/null; then
+            kdumpctl status &> /dev/null
+        else
+            service kdump status &> /dev/null
+        fi
+
+        # Prepare kexec cmd and run kexec load
+        touch "${C_REBOOT}_1"
+        cmd="kexec ${EXTRA_KEXEC_OPTIONS} \
+            -l /boot/vmlinuz-${KEXEC_VER} \
+            --initrd=/boot/initramfs-${KEXEC_VER}.img \
+            --command-line=\"$(cat /proc/cmdline) ${test_boot_option}\""
+
+        Log "- Running cmd: ${cmd}"
+        eval ${cmd} || {
+            rm -f "${C_REBOOT}_1"
+            Error "kexec cmd returned a non-zero value."
+            return
+        }
+
+        Log "- Loaded new kernel $KEXEC_VER."
+        Log "- Switch to new kernel"
+        # A system reboot after kexec -l call will kexec-switch to the loaded kernel.
+        # Note, do not use rstrnt-reboot here as it will set next boot option affecting
+        # next normal reboot instead this kexec reboot.
+        reboot
+
+    elif [ -f "${C_REBOOT}_1" ]; then
+        rm -f "${C_REBOOT}_1"
+        Log "- Current kernel and options are: "
+        Log "$(uname -r)"
+        Log "$(cat /proc/cmdline)"
+
+        if cat /proc/cmdline | grep -q "${test_boot_option}"; then
+            Log "- Kexec boot to new kernel $KEXEC_VER successfully."
+            Log "- Reboot to normal kernel"
+            touch "${C_REBOOT}_2"
+            SafeReboot
+        else
+            Error "Kexec boot failed. Expect to see ${test_boot_option} in kernel boot options"
+            return
+        fi
+
+    elif [ -f "${C_REBOOT}_2" ]; then
+        rm -f "${C_REBOOT}_2"
+        Log "- Current kernel and options are: "
+        Log "$(uname -r)"
+        Log "$(cat /proc/cmdline)"
+        Log "- Reboot back to normal kernel successfully."
+    fi
 }
