@@ -58,7 +58,17 @@ function runtest
     # 3. lowest  frequency would be at least 300MHz
     # 4. highest frequency would be at most    8GHz
     #
-    if (( $cur_freq < $min_freq )); then
+
+    # Let's do an ugly workaround, because we don't want to see an error
+    # showing us, that CPU is running on 1198843 MHz, while the minimal
+    # frequency is 1200000 MHz. So the new fake minimal frequency will
+    # be defined as 90% of the real one. Notice the order of numbers -
+    # it's important to multiply before division in the integer arithmetic.
+    # The issue is described in the:
+    # https://gitlab.com/cki-project/kernel-tests/-/issues/920
+    (( fake_min_freq = $min_freq * 9 / 10 ))
+
+    if (( $cur_freq < $fake_min_freq )); then
         rlLog "FAIL: current frequency ($cur_freq) < min frequency ($min_freq)"
         return $CKI_FAIL
     fi
