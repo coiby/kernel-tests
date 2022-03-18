@@ -39,7 +39,7 @@ if [ ! -x socket ];then
 	gcc -Wall socket.c help.c func.c udp.c tcp.c sctp.c common.c setopt.c \
 	-o socket -pthread -lrt
 fi
-TEST_TIME=${TEST_TIME:-1000}
+TEST_TIME=${TEST_TIME:-600}
 REMOTE_ADDR4=${REMOTE_ADDR4:-"127.0.0.1"}
 REMOTE_ADDR6=${REMOTE_ADDR6:-"::1"}
 
