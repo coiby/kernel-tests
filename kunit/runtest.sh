@@ -30,7 +30,7 @@ process_results(){
 	OUTFILE=$(mktemp) || exit 1
 	rlLog "processing results from test ${1}"
 	sed -i '/^$/d' "$1" #remove all empty lines
-	sed -i 's/^[ \t]*//' "$1" #remove all leading whitespace
+	sed -i 's/^    //g' "$1" #remove first tab
 	sed -i '/^#/d' "$1" #remove comments
 	sed -i 's/#.*//' "$1" #remove comments
 	sed -i '$d' "$1" #remove last line.
