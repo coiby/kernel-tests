@@ -21,4 +21,8 @@ if [[ $ARCH == "ppc64le" ]] && [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V |
 	export USE_SIW="0"
 fi
 
+if rlIsRHEL 7; then
+	export USE_SIW="0"
+fi
+
 make
