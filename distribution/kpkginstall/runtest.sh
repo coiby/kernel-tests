@@ -499,7 +499,7 @@ else
   # We have the right kernel. Do we have any call traces?
   dmesg | grep -qi 'Call Trace:'
   dmesgret=$?
-  if [[ -n "${CHECK_DMESG}" && ${dmesgret} -eq 0 ]]; then
+  if [[ -z "${SKIP_CHECK_DMESG}" && ${dmesgret} -eq 0 ]]; then
     DMESGLOG=/tmp/dmesg.log
     dmesg > ${DMESGLOG}
     rstrnt-report-log -l ${DMESGLOG}
