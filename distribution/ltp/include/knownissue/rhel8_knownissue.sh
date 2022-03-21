@@ -107,6 +107,8 @@ function rhel8_fixed_issues()
 	kernel_in_range "0" "4.18.0-349.el8" && tskip "creat09 cve-2018-13405" fixed
 	# Bug 1964047 - fixed by Bug 1944404
 	cki_is_kernel_debug && kernel_in_range "0" "kernel-4.18.0-326.el8" && tskip "read_all_sys" fixed
+	# Bug 2035746 - [s390x] cat: /proc/sys/kernel/ftrace_enabled: No such device
+	is_arch "s390x" && kernel_in_range "0" "kernel-4.18.0-362.el8" && tskip "proc01" fixed
 }
 
 function rhel8_knownissue_filter()
