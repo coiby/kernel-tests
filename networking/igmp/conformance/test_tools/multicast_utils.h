@@ -39,15 +39,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#if !defined(SEND) && !defined(RECEIVE)
-#error  "At least one of SEND/RECEIVE macros must be defined!"
-#endif
-
-#include "parameters_multicast.h"
-
 #define MESSAGE "Hello world!"
-
-int __verbosity = 0;
 
 /* Verbose print */
 #define printv(args...) \
@@ -57,206 +49,67 @@ int __verbosity = 0;
 		fflush(stdout); \
 	}
 
+/** Structure that carries test parameters */
+struct parameters
+{
+	struct in_addr multiaddr;
+	struct in_addr interface;
+
+	struct in6_addr multiaddr6;
+	struct in6_addr interface6;
+
+	int duration; /* seconds */
+	short port;
+	int protocol;
+	unsigned int if_index;
+
+	//RECEIVE
+	struct in_addr sourceaddr;
+	struct in6_addr sourceaddr6;
+
+	//SEND
+	double delay;
+	int ttl;
+	int loop;
+	int hops;
+	int pkts;
+};
+
 /** Initiailze socket for receiving multicast data */
-int init_in_socket(struct in_addr multiaddr, short port)
-{
-	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	if (sockfd < 0)	{
-		perror("socket()");
-		exit(EXIT_FAILURE);
-	}
+int init_in_socket(struct in_addr multiaddr, short port);
 
-	struct sockaddr_in addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
-	addr.sin_addr = multiaddr;
-	memset(&(addr.sin_zero), 0, sizeof(addr.sin_zero));
-
-	if (bind(sockfd, (struct sockaddr*) &addr, sizeof(addr)) < 0) {
-		perror("bind()");
-		exit(EXIT_FAILURE);
-	}
-
-	return sockfd;
-}
-
-int init_in_socket6(struct in6_addr multiaddr, short port)
-{
-	int sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-	if (sockfd < 0)	{
-		perror("socket()");
-		exit(EXIT_FAILURE);
-	}
-
-	struct sockaddr_in6 addr6;
-	addr6.sin6_family = AF_INET6;
-	addr6.sin6_port = htons(port);
-	addr6.sin6_addr = multiaddr;
-
-	if(bind(sockfd, (struct sockaddr*)&addr6, sizeof(addr6)) < 0)
-	{
-		addr6.sin6_addr = in6addr_any;
-		if(bind(sockfd, (struct sockaddr*)&addr6, sizeof(addr6)) < 0)
-		{
-			perror("bind()");
-			exit(EXIT_FAILURE);
-		}
-	}
-	return sockfd;
-}
+int init_in_socket6(struct in6_addr multiaddr, short port);
 
 /** Initialize socket for sending multicast data */
-int init_out_socket()
-{
-	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	if (sockfd < 0) {
-		perror("socket()");
-		exit(EXIT_FAILURE);
-	}
+int init_out_socket();
 
-	return sockfd;
-}
-
-int init_out_socket6()
-{
-	int sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-	if (sockfd < 0) {
-		perror("socket()");
-		exit(EXIT_FAILURE);
-	}
-
-	return sockfd;
-}
+int init_out_socket6();
 
 /** Close a socket */
-void free_socket(int sockfd)
-{
-	close(sockfd);
-}
+void free_socket(int sockfd);
 
 /** Wait for data up to `duration' seconds */
-int wait_for_data(int sockfd, int duration, int packet_limit)
-{
-	const char message[] = MESSAGE;
-	char buffer[] = MESSAGE;
-	memset(buffer, 0, sizeof(buffer));
-
-	int num_received = 0;
-
-	fd_set receive_fd_set;
-	struct timeval timeout;
-
-	time_t deadline = time(NULL) + duration;
-
-	printv("Receiving\n");
-
-	while (1) {
-		FD_ZERO(&receive_fd_set);
-		FD_SET(sockfd, &receive_fd_set);
-
-		if (duration == 0) {
-            // extend timeout value to have more time receive pkgs
-			timeout.tv_sec  = 10;
-			timeout.tv_usec = 0;
-		} else {
-			time_t now = time(NULL);
-			if ((deadline - now) <= 0)
-				break;
-
-			timeout.tv_sec  = deadline - now;
-			timeout.tv_usec = 0;
-		}
-
-
-		if (select(sockfd + 1, &receive_fd_set,	NULL, NULL, &timeout) > 0) {
-			recv(sockfd, buffer, sizeof(buffer), 0);
-			if (strncmp(message, buffer, sizeof(buffer)) == 0) {
-				num_received++;
-
-				printv(".");
-				if (!(num_received % 10))
-					printv("\n");
-
-				if (packet_limit > 0 && num_received > packet_limit)
-					break;
-			}
-		}
-	}
-
-	printv("\n");
-
-	return num_received;
-}
+int wait_for_data(int sockfd, int duration, int packet_limit);
 
 /** Send data for specified amount of time */
 int send_data(int sockfd, struct in_addr multiaddr, short port,
-					int duration, double delay)
-{
-	const char message[] = MESSAGE;
-	int i = 0;
-
-	struct sockaddr_in addr;
-
-	addr.sin_family = AF_INET;
-	addr.sin_addr = multiaddr;
-	addr.sin_port = htons(port);
-	memset(&(addr.sin_zero), 0, sizeof(addr.sin_zero));
-
-	struct timespec delay_value;
-	delay_value.tv_sec = 0;
-	delay_value.tv_nsec = delay * 999999999;
-
-	printv("Sending...\n");
-
-	time_t started_at = time(NULL);
-	while (duration == 0 || (time(NULL) - started_at) < duration) {
-		i++;
-		sendto(sockfd, message, strlen(message), 0,
-			(struct sockaddr*) &addr, sizeof(addr));
-
-		printv(".");
-		if (!(i % 10))
-			printv("\n");
-
-		nanosleep(&delay_value, NULL);
-	}
-
-	printv("\n");
-
-	return i;
-}
+					int pkts, double delay);
 
 int send_data6(int sockfd, struct in6_addr multiaddr, short port,
-		int duration, double delay)
-{
-	const char message[] = MESSAGE;
-	int i = 0;
+		int pkts, double delay);
 
-	struct sockaddr_in6 addr6;
+int setup_sk4(struct parameters *params);
 
-	addr6.sin6_family = AF_INET6;
-	addr6.sin6_addr = multiaddr;
-	addr6.sin6_port = htons(port);
+int send_sk4(int sockfd, struct parameters *params);
 
-	struct timespec delay_value;
-	delay_value.tv_sec = 0;
-	delay_value.tv_nsec = delay * 999999999;
-	printv("Sending...\n");
-	time_t started_at = time(NULL);
-	while (duration == 0 || (time(NULL) - started_at) < duration) {
-		i++;
-		sendto(sockfd, message, strlen(message), 0,
-			(struct sockaddr*) &addr6, sizeof(addr6));
+int setup_sk6(struct parameters *params);
 
-		printv(".");
-		if (!(i % 10))
-			printv("\n");
+int send_sk6(int sockfd, struct parameters *params);
 
-		nanosleep(&delay_value, NULL);
-	}
-	printv("\n");
-
-	return i;
-}
+/** Initialize parameters struct with default values. */
+void default_parameters(struct parameters* params);
+void usage(char *program_name, int retval);
+/** Generic function for parsing arguments */
+void parse_args(int argc, char** argv, struct parameters* args);
 
 #endif

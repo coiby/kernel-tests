@@ -20,10 +20,9 @@
  * 02110-1301, USA.
  */
 
-#define RECEIVE
 #include "multicast_utils.h"
 
-int send_simple4(struct parameters *params)
+int recv_simple4(int snd_sk, struct parameters *params)
 {
 	int sockfd = init_in_socket(params->multiaddr, params->port);
 	int num_recv = 0;
@@ -33,18 +32,19 @@ int send_simple4(struct parameters *params)
 	mreq.imr_interface = params->interface;
 
 	if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-				&mreq, sizeof(mreq)) < 0)
+	               &mreq, sizeof(mreq)) < 0)
 	{
 		perror("setsockopt");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
-	num_recv = wait_for_data(sockfd, params->duration, 0);
+	send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, params->pkts);
 
-	return num_recv;
-
+	printf("packets_received=%d\n", num_recv);
+	return 0;
 }
 
-int send_simple6(struct parameters *params)
+int recv_simple6(int snd_sk, struct parameters *params)
 {
 	int num_recv = 0;
 	int sockfd = init_in_socket6(params->multiaddr6, params->port);
@@ -54,33 +54,31 @@ int send_simple6(struct parameters *params)
 	mreq6.ipv6mr_interface = params->if_index;
 
 	if(setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP,
-				&mreq6, sizeof(mreq6)) < 0)
+	              &mreq6, sizeof(mreq6)) < 0)
 	{
 		perror("setsockopt");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
-	num_recv = wait_for_data(sockfd, params->duration, 0);
+	send_sk6(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, params->pkts);
 
-	return num_recv;
-
+	printf("packets_received=%d\n", num_recv);
+	return 0;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	struct parameters params;
 	parse_args(argc, argv, &params);
-	int num_recv = 0;
+	int ret = 0, snd_sk;
 
-	if ( 4 == params.protocol )
-	{
-		num_recv = send_simple4(&params);
+	if ( 4 == params.protocol ) {
+		snd_sk = setup_sk4(&params);
+		recv_simple4(snd_sk, &params);
+	} else {
+		snd_sk = setup_sk6(&params);
+		recv_simple6(snd_sk, &params);
 	}
-	else
-	{
-		num_recv = send_simple6(&params);
-	}
 
-	printf("packets_received=%d\n", num_recv);
-
-	return EXIT_SUCCESS;
+	return ret;
 }

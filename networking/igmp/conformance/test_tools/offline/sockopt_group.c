@@ -32,25 +32,24 @@ void test_ipv6_group()
 #define V6_GROUP_NOTJOIN "ff05::2"
 	struct ipv6_mreq mreq_test;
 	size_t size = sizeof(mreq_test);
-	int ret;
 
 	/* IPV6_JOIN_GROUP */
-	ret = inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
 	mreq_test.ipv6mr_interface = 0;
 
 	test_setsockopt_error("IPV6_JOIN_GROUP bad optlen",
 			IPV6_JOIN_GROUP, &mreq_test, 5, EINVAL, 6);
 
-	ret = inet_pton(AF_INET6, V6_GROUP_INVALID, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6_GROUP_INVALID, &mreq_test.ipv6mr_multiaddr);
 	test_setsockopt_error("IPV6_JOIN_GROUP bad multicast addr",
 			IPV6_JOIN_GROUP, &mreq_test, size, EINVAL, 6);
 
-	ret = inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
 	mreq_test.ipv6mr_interface = 0xffffffff;
 	test_setsockopt_error("IPV6_JOIN_GROUP no device found",
 			IPV6_JOIN_GROUP, &mreq_test, size, ENODEV, 6);
 
-	ret = inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
 	mreq_test.ipv6mr_interface = 0;
 	test_setsockopt("IPV6_JOIN_GROUP ff05::1",
 			IPV6_JOIN_GROUP, &mreq_test, size, 6);
@@ -61,11 +60,11 @@ void test_ipv6_group()
 	/*IPV6_LEAVE_GROUP*/
 
 	mreq_test.ipv6mr_interface = 0;
-	ret = inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
 	test_setsockopt_error("IPV6_LEAVE_GROUP Bad optlen",
 			IPV6_LEAVE_GROUP, &mreq_test, 5, EINVAL, 6);
 
-	ret = inet_pton(AF_INET6, V6_GROUP_INVALID, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6_GROUP_INVALID, &mreq_test.ipv6mr_multiaddr);
 #ifndef EL6
 	test_setsockopt_error("IPV6_LEAVE_GROUP not multicast addr",
 			IPV6_LEAVE_GROUP, &mreq_test, size, EINVAL, 6);
@@ -76,17 +75,17 @@ void test_ipv6_group()
 
 	//FIXME setsockopt return EADDRNOTAVAIL rather than ENODEV, it means
 	//that it check ipv6mr_multiaddr first
-	ret = inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
 	mreq_test.ipv6mr_interface = 0xffffffff;
 	test_setsockopt_error("IPV6_LEAVE_GROUP No device found",
 			IPV6_LEAVE_GROUP, &mreq_test, size, EADDRNOTAVAIL, 6);
 
 	mreq_test.ipv6mr_interface = 0;
-	ret = inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6GROUP_JOIN, &mreq_test.ipv6mr_multiaddr);
 	test_setsockopt("IPV6_LEAVE_GROUP ff05::1",
 			IPV6_LEAVE_GROUP, &mreq_test, size, 6);
 
-	ret = inet_pton(AF_INET6, V6_GROUP_NOTJOIN, &mreq_test.ipv6mr_multiaddr);
+	inet_pton(AF_INET6, V6_GROUP_NOTJOIN, &mreq_test.ipv6mr_multiaddr);
 	test_setsockopt_error("IPV6_LEAVE_GROUP group not joined",
 			IPV6_LEAVE_GROUP, &mreq_test, size, EADDRNOTAVAIL, 6);
 #undef V6GROUP_JOIN
@@ -101,7 +100,6 @@ void test_mcast_group_v6()
 #define MCASTV6_GROUP_INVALID "2011::1"
 	struct group_req group;
 	size_t size = sizeof(group);
-	int ret;
 
 	/*MCAST_JOIN_GROUP*/
 
@@ -112,12 +110,12 @@ void test_mcast_group_v6()
 	test_setsockopt_error("MCAST_JOIN_GROUP Bad optlen",
 			MCAST_JOIN_GROUP, &group, 5, EINVAL, 6);
 
-	ret = inet_pton(AF_INET6, MCASTV6_GROUP_INVALID, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
+	inet_pton(AF_INET6, MCASTV6_GROUP_INVALID, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 	test_setsockopt_error("MCAST_JOIN_GROUP not multicast address",
 			MCAST_JOIN_GROUP, &group, size, EINVAL, 6);
 
 	group.gr_interface = 0xffffffff;
-	ret = inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
+	inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 	test_setsockopt_error("MCAST_JOIN_GROUP no device found",
 			MCAST_JOIN_GROUP, &group, size, ENODEV, 6);
 
@@ -132,11 +130,11 @@ void test_mcast_group_v6()
 	/*MCAST_LEAVE_GROUP*/
 
 	group.gr_interface = 0;
-	ret = inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
+	inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 	test_setsockopt_error("MCAST_LEAVE_GROUP Bad optlen",
 			MCAST_LEAVE_GROUP, &group, 5, EINVAL, 6);
 
-	ret = inet_pton(AF_INET6, MCASTV6_GROUP_INVALID, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
+	inet_pton(AF_INET6, MCASTV6_GROUP_INVALID, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 #ifndef EL6
 	test_setsockopt_error("MCAST_LEAVE_GROUP not multicast addr",
 			MCAST_LEAVE_GROUP, &group, size, EINVAL, 6);
@@ -147,16 +145,16 @@ void test_mcast_group_v6()
 
 	//FIXME the same problem as IPV6_LEAVE_GROUP
 	group.gr_interface = 0xffffffff;
-	ret = inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
+	inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 	test_setsockopt_error("MCAST_LEAVE_GROUP no device found",
 			MCAST_LEAVE_GROUP, &group, size, EADDRNOTAVAIL, 6);
 
 	group.gr_interface = 0;
-	ret = inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
+	inet_pton(AF_INET6, MCASTV6_GROUP_JOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 	test_setsockopt("MCAST_LEAVE_GROUP ff06::1",
 			MCAST_LEAVE_GROUP, &group, size, 6);
 
-	ret = inet_pton(AF_INET6, MCASTV6_GROUP_NOTJOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
+	inet_pton(AF_INET6, MCASTV6_GROUP_NOTJOIN, &((struct sockaddr_in6 *)&group.gr_group)->sin6_addr);
 	test_setsockopt_error("MCAST_LEAVE_GROUP multicast not joined",
 			MCAST_LEAVE_GROUP, &group, size, EADDRNOTAVAIL, 6);
 #undef MCASTV6_GROUP_JOIN
@@ -172,7 +170,6 @@ void test_mcast_group_v4()
 
 	struct group_req group;
 	size_t size = sizeof(group);
-	int ret;
 
 	/*MCAST_JOIN_GROUP*/
 	group.gr_interface = 0;

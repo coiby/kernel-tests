@@ -22,17 +22,17 @@
  * 02110-1301, USA.
  */
 
-#define RECEIVE
+
 #include "multicast_utils.h"
 
-int recv_mem4(struct parameters *params)
+int recv_mem4(int snd_sk, struct parameters *params)
 {
 	int sockfd = init_in_socket(params->multiaddr, params->port);
-	int num_recv = 0;
+	int num_recv = 0, num_snd = 0;
 	struct ip_mreq mreq;
 
-
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_before_add=%d\n", num_recv);
 
 	mreq.imr_multiaddr = params->multiaddr;
@@ -40,54 +40,58 @@ int recv_mem4(struct parameters *params)
 	if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
 			   &(mreq), sizeof(mreq)) < 0) {
 		perror("setsockopt");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
-	wait_for_data(sockfd, params->duration/12, 0);
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+
+	num_snd = send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received=%d\n", num_recv);
 
 	if (setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP,
 			   &(mreq), sizeof(mreq)) < 0) {
 		perror("setsockopt");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
-	wait_for_data(sockfd, params->duration/12, 0);
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+
+	num_snd = send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_after_drop=%d\n", num_recv);
 
 	return 0;
-
 }
 
-int recv_mem6(struct parameters *params)
+int recv_mem6(int snd_sk, struct parameters *params)
 {
 	int sockfd = init_in_socket6(params->multiaddr6, params->port);
-	int num_recv = 0;
+	int num_recv = 0, num_snd = 0;
 	struct ipv6_mreq mreq6;
 
 	mreq6.ipv6mr_multiaddr = params->multiaddr6;
 	mreq6.ipv6mr_interface = params->if_index;
 
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk6(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_before_add=%d\n", num_recv);
 	if(setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP,
 				&mreq6, sizeof(mreq6)) <0 )
 	{
 		perror("setsockopt");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
-	wait_for_data(sockfd, params->duration/12, 0);
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+
+	num_snd = send_sk6(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received=%d\n", num_recv);
 
 	if(setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP,
 				&mreq6, sizeof(mreq6)) <0 )
 	{
 		perror("setsockopt");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
-	wait_for_data(sockfd, params->duration/12, 0);
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+
+	num_snd = send_sk6(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_after_drop=%d\n", num_recv);
 
 	return 0;
@@ -97,15 +101,17 @@ int main(int argc, char** argv)
 {
 	struct parameters params;
 	parse_args(argc, argv, &params);
-	int ret = 0;
+	int ret = 0, snd_sk;
 
 	if ( 4 == params.protocol )
 	{
-		ret = recv_mem4(&params);
+		snd_sk = setup_sk4(&params);
+		ret = recv_mem4(snd_sk, &params);
 	}
 	else
 	{
-		ret = recv_mem6(&params);
+		snd_sk = setup_sk6(&params);
+		ret = recv_mem6(snd_sk, &params);
 	}
 
 	return ret;

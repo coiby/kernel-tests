@@ -22,7 +22,6 @@
  * 02110-1301, USA.
  */
 
-#define RECEIVE
 #include "multicast_utils.h"
 
 int main(int argc, char** argv)
@@ -44,8 +43,6 @@ int main(int argc, char** argv)
 	struct ip_mreq mreq;
 	mreq.imr_multiaddr.s_addr = params.multiaddr.s_addr+htonl(i);
 	mreq.imr_interface = params.interface;
-
-	int num_recv = 0;
 
 	if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
 			   &(mreq), sizeof(mreq)) < 0) {
