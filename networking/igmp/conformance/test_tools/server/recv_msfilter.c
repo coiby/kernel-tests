@@ -23,13 +23,13 @@
  * 02110-1301, USA.
  */
 
-#define RECEIVE
+
 #include "multicast_utils.h"
 
-int recv_msfilter4(struct parameters *params)
+int recv_msfilter4(int snd_sk, struct parameters *params)
 {
 	int sockfd = init_in_socket(params->multiaddr, params->port);
-	int num_recv = 0;
+	int num_recv = 0, num_snd = 0;
 	struct group_filter gr_filter;
 	struct sockaddr_in *psin4;
 	struct ip_msfilter filter;
@@ -50,7 +50,8 @@ int recv_msfilter4(struct parameters *params)
 		return -1;
 	}
 
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_before_msfilter=%d\n", num_recv);
 
 	if (setsockopt(sockfd, IPPROTO_IP, IP_MSFILTER,
@@ -60,7 +61,8 @@ int recv_msfilter4(struct parameters *params)
 		return -1;
 	}
 
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_after_include=%d\n", num_recv);
 
 	filter.imsf_fmode = MCAST_EXCLUDE;
@@ -70,9 +72,9 @@ int recv_msfilter4(struct parameters *params)
 		perror("setsockopt");
 		return -1;
 	}
-	wait_for_data(sockfd, params->duration/12, 0);
 
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_after_exclude=%d\n", num_recv);
 
 	gr_filter.gf_interface = params->if_index;
@@ -91,7 +93,8 @@ int recv_msfilter4(struct parameters *params)
 		perror("setsockopt");
 		return -1;
 	}
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_after_mcast_include=%d\n", num_recv);
 
 	gr_filter.gf_fmode = MCAST_EXCLUDE;
@@ -101,18 +104,18 @@ int recv_msfilter4(struct parameters *params)
 		perror("setsockopt");
 		return -1;
 	}
-	wait_for_data(sockfd, params->duration/12, 0);
 
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk4(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_after_mcast_exclude=%d\n", num_recv);
 
 	return 0;
 }
 
-int recv_msfilter6(struct parameters *params)
+int recv_msfilter6(int snd_sk, struct parameters *params)
 {
 	int sockfd = init_in_socket6(params->multiaddr6, params->port);
-	int num_recv = 0;
+	int num_recv = 0, num_snd = 0;
 	struct group_req group;
 	struct group_filter gr_filter;
 	struct sockaddr_in6 *psin6;
@@ -137,7 +140,8 @@ int recv_msfilter6(struct parameters *params)
 		return -1;
 	}
 
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk6(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_before_msfilter=%d\n", num_recv);
 	if( (setsockopt(sockfd, IPPROTO_IPV6, MCAST_MSFILTER,
 					&gr_filter, sizeof(gr_filter))) < 0 )
@@ -145,7 +149,8 @@ int recv_msfilter6(struct parameters *params)
 		perror("setsockopt");
 		return -1;
 	}
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk6(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_after_mcast_include=%d\n", num_recv);
 	gr_filter.gf_fmode = MCAST_EXCLUDE;
 	if( (setsockopt(sockfd, IPPROTO_IPV6, MCAST_MSFILTER,
@@ -154,9 +159,9 @@ int recv_msfilter6(struct parameters *params)
 		perror("setsockopt");
 		return -1;
 	}
-	wait_for_data(sockfd, params->duration/12, 0);
 
-	num_recv = wait_for_data(sockfd, params->duration/6, 0);
+	num_snd = send_sk6(snd_sk, params);
+	num_recv = wait_for_data(sockfd, 0, num_snd);
 	printf("packets_received_after_mcast_exclude=%d\n", num_recv);
 
 	group.gr_interface = params->if_index;
@@ -176,15 +181,17 @@ int main(int argc, char** argv)
 {
 	struct parameters params;
 	parse_args(argc, argv, &params);
-	int ret = 0;
+	int ret = 0, snd_sk;
 
 	if ( 4 == params.protocol )
 	{
-		ret = recv_msfilter4(&params);
+		snd_sk = setup_sk4(&params);
+		ret = recv_msfilter4(snd_sk, &params);
 	}
 	else
 	{
-		ret = recv_msfilter6(&params);
+		snd_sk = setup_sk6(&params);
+		ret = recv_msfilter6(snd_sk, &params);
 	}
 
 	return ret;

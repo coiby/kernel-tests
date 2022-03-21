@@ -58,8 +58,6 @@ PORT2="1338"
 NUM_PACKETS="10"
 TTL="11"
 HOPS="11"
-PHASE_DURATION=6
-#PHASE_DURATION=30
 NONEXISTING_SOURCE[4]="127.0.0.2"
 NONEXISTING_SOURCE[6]="::2"
 OUTFILE="/tmp/igmp_max.file"
@@ -86,10 +84,11 @@ if [ ! "${LOCAL_IP[6]}" ];then
 	test_fail "NO LOCAL_IP[6] address"
 fi
 
+waitready() { echo "wait for $1"; while ! pgrep -f "$1"; do sleep 0.1; done; sleep 2;}
+
 rlJournalStart
 for f in $family
 do
-	PHASE_DURATION=6
     rlPhaseStartSetup
         rlRun "OUTPUT=`mktemp`" 0 "Create temporary file for tcpdump output"
         rlAssertEquals "Must be root to run this test." `id -u` 0
@@ -104,51 +103,36 @@ do
     done
 
     rlPhaseStartTest "MULTICAST_LOOP enabled v$f"
-        rlRun "./test_tools/recv_simple -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -n$TEST_IFACE >$OUTPUT 2>/dev/null &" 0
-		[ x"$f" == x"4" ] && rlRun "cat /proc/net/igmp &"
-		[ x"$f" == x"6" ] && rlRun "cat /proc/net/igmp6 &"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -n $TEST_IFACE" 0
-
-        wait && sleep 2
-
+        rlRun "./test_tools/recv_simple -c $f -a${GROUP_ADDR[$f]} -p$PORT -l1 -n$TEST_IFACE >$OUTPUT" 0
+        [ x"$f" == x"4" ] && rlRun "cat /proc/net/igmp"
+        [ x"$f" == x"6" ] && rlRun "cat /proc/net/igmp6"
         number_of_packets=`grep "packets_received" $OUTPUT | cut -c 18-`
         rlAssertGreater "Received $number_of_packets packets" $number_of_packets 0
+        rlRun "cat $OUTPUT"
     rlPhaseEnd
 
     rlPhaseStartTest "MULTICAST_LOOP disabled v$f"
-        rlRun "./test_tools/recv_simple -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -n$TEST_IFACE>$OUTPUT 2>/dev/null &" 0
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l0 -n$TEST_IFACE" 0
-
-        wait && sleep 2
-
+        rlRun "./test_tools/recv_simple -c $f -a${GROUP_ADDR[$f]} -p$PORT -l0 -n$TEST_IFACE >$OUTPUT" 0
         number_of_packets=`grep "packets_received" $OUTPUT | cut -c 18-`
         rlAssertEquals "Received $number_of_packets packets" $number_of_packets 0
+        rlRun "cat $OUTPUT"
     rlPhaseEnd
-
 
     rlPhaseStartTest "MULTICAST_IF v$f"
-        rlRun "tcpdump -i $TEST_IFACE -vvv net ${GROUP_ADDR[$f]} >$OUTPUT 2>/dev/null &" 0
-        pid=$!
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE" 0
-        # sleep sometimes to wait tcpdump capture all packages
-        sleep 5
-        still_running=`ps -A | grep $pid`
-        if [ -n "$still_running" ];
-        then
-            kill $pid
-        fi
+        rlRun "tcpdump -Ui $TEST_IFACE -vvv net ${GROUP_ADDR[$f]} -w mlc_if_v${f}.pcap &" 0
+        waitready "tcpdump"
+        rlRun "./test_tools/send_simple -c $f -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE" 0
+        rlRun "sleep 2 && pkill tcpdump"
         sleep 5
 
-        number_of_packets=`grep "${GROUP_ADDR[$f]}" $OUTPUT | wc -l`
+        number_of_packets=`tcpdump -nr mlc_if_v${f}.pcap dst host ${GROUP_ADDR[$f]} and src host ${LOCAL_IP[$f]} | wc -l`
         rlAssertGreater "Received $number_of_packets packets" $number_of_packets 0
+        # for debugging
+        rlRun "tcpdump -nner mlc_if_v${f}.pcap"
     rlPhaseEnd
 
-    PHASE_DURATION=12
     rlPhaseStartTest "IP_ADD_MEMBERSHIP/IP_DROP_MEMBERSHIP v$f"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_membership -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -n$TEST_IFACE >$OUTPUT 2>/dev/null " 0
-
-        wait && sleep 2
+        rlRun "./test_tools/recv_membership -c $f -a${GROUP_ADDR[$f]} -p$PORT -n$TEST_IFACE >$OUTPUT" 0
 
         number_before_add=`grep "packets_received_before_add\=" $OUTPUT | cut -c 29-`
         number_of_good=`grep "packets_received\=" $OUTPUT | cut -c 18-`
@@ -159,10 +143,7 @@ do
     rlPhaseEnd
 
     rlPhaseStartTest "IP_ADD_SOURCE_MEMBERSHIP/IP_DROP_SOURCE_MEMBERSHIP v$f"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_source_membership -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${LOCAL_IP[$f]} -n$TEST_IFACE>$OUTPUT 2>/dev/null " 0
-
-        wait && sleep 2
+        rlRun "./test_tools/recv_source_membership -c $f -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${LOCAL_IP[$f]} -n$TEST_IFACE>$OUTPUT" 0
 
         number_before_join=`grep "packets_received_before_join\=" $OUTPUT | cut -c 30-`
         number_after_join=`grep "packets_received_after_join\=" $OUTPUT | cut -c 29-`
@@ -170,20 +151,17 @@ do
         rlAssertEquals "Received number_before_join:$number_before_join packets" $number_before_join 0
         rlAssertGreater "Received number_after_join:$number_after_join packets" $number_after_join 0
         rlAssertEquals "Received number_after_leave:$number_after_leave packets" $number_after_leave 0
-		if [ x"$f" == x"4" ]
-		then
-        number_after_add=`grep "packets_received_after_add\=" $OUTPUT | cut -c 28-`
-        number_after_drop=`grep "packets_received_after_drop\=" $OUTPUT | cut -c 29-`
-        rlAssertGreater "Received number_after_add:$number_after_add packets" $number_after_add 0
-        rlAssertEquals "Received number_after_drop:$number_after_drop packets" $number_after_drop 0
-		fi
+        if [ x"$f" == x"4" ]
+        then
+            number_after_add=`grep "packets_received_after_add\=" $OUTPUT | cut -c 28-`
+            number_after_drop=`grep "packets_received_after_drop\=" $OUTPUT | cut -c 29-`
+            rlAssertGreater "Received number_after_add:$number_after_add packets" $number_after_add 0
+            rlAssertEquals "Received number_after_drop:$number_after_drop packets" $number_after_drop 0
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "IP_ADD_SOURCE_MEMBERSHIP/IP_DROP_SOURCE_MEMBERSHIP nonexisting source v$f"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_source_membership -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -s${NONEXISTING_SOURCE[$f]} -i${LOCAL_IP[$f]} -n$TEST_IFACE>$OUTPUT 2>/dev/null " 0
-
-        wait && sleep 2
+        rlRun "./test_tools/recv_source_membership -c $f -a${GROUP_ADDR[$f]} -p$PORT -s${NONEXISTING_SOURCE[$f]} -i${LOCAL_IP[$f]} -n$TEST_IFACE>$OUTPUT" 0
 
         number_before_join=`grep "packets_received_before_join\=" $OUTPUT | cut -c 30-`
         number_after_join=`grep "packets_received_after_join\=" $OUTPUT | cut -c 29-`
@@ -191,20 +169,17 @@ do
         rlAssertEquals "Received number_before_join:$number_before_join packets" $number_before_join 0
         rlAssertEquals "Received number_after_join:$number_after_join packets" $number_after_join 0
         rlAssertEquals "Received number_after_leave:$number_after_leave packets" $number_after_leave 0
-		if [ x"$f" == x"4" ]
-		then
-        number_after_add=`grep "packets_received_after_add\=" $OUTPUT | cut -c 28-`
-        number_after_drop=`grep "packets_received_after_drop\=" $OUTPUT | cut -c 29-`
-        rlAssertEquals "Received number_after_add:$number_after_add packets" $number_after_add 0
-        rlAssertEquals "Received number_after_drop:$number_after_drop packets" $number_after_drop 0
-		fi
+        if [ x"$f" == x"4" ]
+        then
+            number_after_add=`grep "packets_received_after_add\=" $OUTPUT | cut -c 28-`
+            number_after_drop=`grep "packets_received_after_drop\=" $OUTPUT | cut -c 29-`
+            rlAssertEquals "Received number_after_add:$number_after_add packets" $number_after_add 0
+            rlAssertEquals "Received number_after_drop:$number_after_drop packets" $number_after_drop 0
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "IP_BLOCK_SOURCE/IP_UNBLOCK_SOURCE v$f"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_block_source -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${LOCAL_IP[$f]} -n$TEST_IFACE >$OUTPUT 2>/dev/null " 0
-
-        wait && sleep 2
+        rlRun "./test_tools/recv_block_source -c $f -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${LOCAL_IP[$f]} -n$TEST_IFACE >$OUTPUT" 0
 
         number_before_block=`grep "packets_received_before_block\=" $OUTPUT | cut -c 31-`
         number_while_mcast_block=`grep "packets_received_while_mcast_block\=" $OUTPUT | cut -c 36-`
@@ -222,145 +197,117 @@ do
     rlPhaseEnd
 
     rlPhaseStartTest "IP_BLOCK_SOURCE/IP_UNBLOCK_SOURCE nonexisting source v$f"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_block_source -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${NONEXISTING_SOURCE[$f]} -n$TEST_IFACE >$OUTPUT 2>/dev/null " 0
-
-        wait && sleep 2
+        rlRun "./test_tools/recv_block_source -c $f -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${NONEXISTING_SOURCE[$f]} -n$TEST_IFACE >$OUTPUT" 0
 
         number_before_block=`grep "packets_received_before_block\=" $OUTPUT | cut -c 31-`
         number_while_mcast_block=`grep "packets_received_while_mcast_block\=" $OUTPUT | cut -c 36-`
-		number_after_mcast_unblock=`grep "packets_received_after_mcast_unblock\=" $OUTPUT | cut -c 38-`
+        number_after_mcast_unblock=`grep "packets_received_after_mcast_unblock\=" $OUTPUT | cut -c 38-`
         rlAssertGreater "Received number_before_block:$number_before_block packets" $number_before_block 0
         rlAssertGreater "Received number_while_mcast_block:$number_while_mcast_block blocked packets" $number_while_mcast_block 0
         rlAssertGreater "Received number_after_mcast_block:$number_after_mcast_unblock packets" $number_after_mcast_unblock 0
-		if [ x"$f" == x"4" ]
-		then
-        number_while_block=`grep "packets_received_while_block\=" $OUTPUT | cut -c 30-`
-        number_after_unblock=`grep "packets_received_after_unblock\=" $OUTPUT | cut -c 32-`
-        rlAssertGreater "Received number_while_block:$number_while_block blocked packets" $number_while_block 0
-        rlAssertGreater "Received number_after_unblock:$number_after_unblock packets" $number_after_unblock 0
-		fi
+        if [ x"$f" == x"4" ]
+        then
+            number_while_block=`grep "packets_received_while_block\=" $OUTPUT | cut -c 30-`
+            number_after_unblock=`grep "packets_received_after_unblock\=" $OUTPUT | cut -c 32-`
+            rlAssertGreater "Received number_while_block:$number_while_block blocked packets" $number_while_block 0
+            rlAssertGreater "Received number_after_unblock:$number_after_unblock packets" $number_after_unblock 0
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "MCAST_JOIN_GROUP/MCAST_LEAVE_GROUP v$f"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_group -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]}  -n$TEST_IFACE >$OUTPUT 2>/dev/null " 0
-		wait && sleep 2
-
-		number_before_join=`grep "packets_received_before_join\=" $OUTPUT | cut -c 30-`
-		number_after_join=`grep "packets_received\=" $OUTPUT | cut -c 18-`
-		number_after_leave=`grep "packets_received_after_leave\=" $OUTPUT | cut -c 30-`
+        rlRun "./test_tools/recv_group -c $f -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]}  -n$TEST_IFACE >$OUTPUT" 0
+        number_before_join=`grep "packets_received_before_join\=" $OUTPUT | cut -c 30-`
+        number_after_join=`grep "packets_received\=" $OUTPUT | cut -c 18-`
+        number_after_leave=`grep "packets_received_after_leave\=" $OUTPUT | cut -c 30-`
         rlAssertEquals "Received number_before_join:$number_before_join packets" $number_before_join 0
         rlAssertGreater "Received number_after_join:$number_after_join packets" $number_after_join 0
         rlAssertEquals "Received number_after_leave:$number_after_leave packets" $number_after_leave 0
     rlPhaseEnd
 
     rlPhaseStartTest "IP_MSFILTER/MCAST_MSFILTER v$f"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_msfilter -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${LOCAL_IP[$f]} -n$TEST_IFACE >$OUTPUT 2>/dev/null " 0
-		[ x"$f" == x"4" ] && rlRun -l "cat /proc/net/mcfilter"
-		[ x"$f" == x"6" ] && rlRun -l "cat /proc/net/mcfilter6"
-		wait && sleep 2
+        rlRun "./test_tools/recv_msfilter -c $f -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${LOCAL_IP[$f]} -n$TEST_IFACE >$OUTPUT" 0
+        [ x"$f" == x"4" ] && rlRun -l "cat /proc/net/mcfilter"
+        [ x"$f" == x"6" ] && rlRun -l "cat /proc/net/mcfilter6"
 
-		number_before_msfilter=`grep "packets_received_before_msfilter\=" $OUTPUT | cut -c 34-`
-		number_after_mcast_include=`grep "packets_received_after_mcast_include\=" $OUTPUT | cut -c 38-`
-		number_after_mcast_exclude=`grep "packets_received_after_mcast_exclude\=" $OUTPUT | cut -c 38-`
+        number_before_msfilter=`grep "packets_received_before_msfilter\=" $OUTPUT | cut -c 34-`
+        number_after_mcast_include=`grep "packets_received_after_mcast_include\=" $OUTPUT | cut -c 38-`
+        number_after_mcast_exclude=`grep "packets_received_after_mcast_exclude\=" $OUTPUT | cut -c 38-`
         rlAssertGreater "Received number_before_msfilter:$number_before_msfilter packets" $number_before_msfilter 0
         rlAssertGreater "Received number_after_mcast_include:$number_after_mcast_include packets" $number_after_mcast_include 0
         rlAssertEquals "Received number_after_mcast_exclude:$number_after_mcast_exclude packets" $number_after_mcast_exclude 0
 
-		if [ x"$f" == x"4" ]
-		then
-		number_after_include=`grep "packets_received_after_include\=" $OUTPUT | cut -c 32-`
-		number_after_exclude=`grep "packets_received_after_exclude\=" $OUTPUT | cut -c 32-`
-        rlAssertGreater "Received number_after_include:$number_after_include packets" $number_after_include 0
-        rlAssertEquals "Received number_after_exclude:$number_after_exclude packets" $number_after_exclude 0
-		fi
-
+        if [ x"$f" == x"4" ]
+        then
+            number_after_include=`grep "packets_received_after_include\=" $OUTPUT | cut -c 32-`
+            number_after_exclude=`grep "packets_received_after_exclude\=" $OUTPUT | cut -c 32-`
+            rlAssertGreater "Received number_after_include:$number_after_include packets" $number_after_include 0
+            rlAssertEquals "Received number_after_exclude:$number_after_exclude packets" $number_after_exclude 0
+	fi
     rlPhaseEnd
 
     rlPhaseStartTest "IP_MSFILTER/MCAST_MSFILTER noexistsource v$f"
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_msfilter -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${NONEXISTING_SOURCE[$f]} -n$TEST_IFACE >$OUTPUT 2>/dev/null " 0
-		wait && sleep 2
+        rlRun "./test_tools/recv_msfilter -c $f -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${NONEXISTING_SOURCE[$f]} -n$TEST_IFACE >$OUTPUT" 0
 
-		number_before_msfilter=`grep "packets_received_before_msfilter\=" $OUTPUT | cut -c 34-`
-		number_after_mcast_include=`grep "packets_received_after_mcast_include\=" $OUTPUT | cut -c 38-`
-		number_after_mcast_exclude=`grep "packets_received_after_mcast_exclude\=" $OUTPUT | cut -c 38-`
+        number_before_msfilter=`grep "packets_received_before_msfilter\=" $OUTPUT | cut -c 34-`
+        number_after_mcast_include=`grep "packets_received_after_mcast_include\=" $OUTPUT | cut -c 38-`
+        number_after_mcast_exclude=`grep "packets_received_after_mcast_exclude\=" $OUTPUT | cut -c 38-`
         rlAssertGreater "Received number_before_msfilter:$number_before_msfilter packets" $number_before_msfilter 0
         rlAssertEquals "Received number_after_mcast_include:$number_after_mcast_include packets" $number_after_mcast_include 0
         rlAssertGreater "Received number_after_mcast_exclude:$number_after_mcast_exclude packets" $number_after_mcast_exclude 0
 
-		if [ x"$f" == x"4" ]
-		then
-		number_after_include=`grep "packets_received_after_include\=" $OUTPUT | cut -c 32-`
-		number_after_exclude=`grep "packets_received_after_exclude\=" $OUTPUT | cut -c 32-`
-        rlAssertEquals "Received number_after_include:$number_after_include packets" $number_after_include 0
-        rlAssertGreater "Received number_after_exclude:$number_after_exclude packets" $number_after_exclude 0
-		fi
-
+        if [ x"$f" == x"4" ]
+        then
+            number_after_include=`grep "packets_received_after_include\=" $OUTPUT | cut -c 32-`
+            number_after_exclude=`grep "packets_received_after_exclude\=" $OUTPUT | cut -c 32-`
+            rlAssertEquals "Received number_after_include:$number_after_include packets" $number_after_include 0
+            rlAssertGreater "Received number_after_exclude:$number_after_exclude packets" $number_after_exclude 0
+        fi
     rlPhaseEnd
 
-	rlPhaseStartTest "filter multicast for socket v$f"
-		#Filtering of packets based upon a socket's multicast reception state
-		#as described in RFC3376 and RFC3810
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT2 -l1 -i${LOCAL_IP[$f]} -n$TEST_IFACE &" 0
-        rlRun "./test_tools/recv_source_membership -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${LOCAL_IP[$f]} -n$TEST_IFACE>output1.log 2>/dev/null &" 0
-        rlRun "./test_tools/recv_source_membership -c $f -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT2 -i${LOCAL_IP[$f]} -s${NONEXISTING_SOURCE[$f]} -n$TEST_IFACE>output2.log 2>/dev/null" 0
+    rlPhaseStartTest "filter multicast for socket v$f"
+        #Filtering of packets based upon a socket's multicast reception state
+        #as described in RFC3376 and RFC3810
+        rlRun "./test_tools/recv_source_membership -c $f -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]} -s${LOCAL_IP[$f]} -n$TEST_IFACE>output1.log &" 0
+        rlRun "./test_tools/recv_source_membership -c $f -a${GROUP_ADDR[$f]} -p$PORT2 -i${LOCAL_IP[$f]} -s${NONEXISTING_SOURCE[$f]} -n$TEST_IFACE>output2.log &" 0
 
-		wait && sleep 2
+        wait
 
         number_after_join_in=`grep "packets_received_after_join\=" output1.log | cut -c 29-`
         number_after_join_notin=`grep "packets_received_after_join\=" output2.log | cut -c 29-`
         rlAssertGreater "Received number_after_join_in:$number_after_join_in packets" $number_after_join_in 0
         rlAssertEquals "Received number_after_join_notin:$number_after_join_notin packets" $number_after_join_notin 0
-		rlRun "rm -f output{1,2}.log"
     rlPhaseEnd
 
-    PHASE_DURATION=6
 if [ x"$f" == x"6" ]
 then
     rlPhaseStartTest "IPV6_MULTICAST_HOPS"
-        rlRun "tcpdump -i any -vvv net ${GROUP_ADDR[$f]} >$OUTPUT 2>/dev/null &" 0
-        pid=$!
-        rlRun "./test_tools/send_simple -c $f -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -e$HOPS -i${LOCAL_IP[$f]} -n$TEST_IFACE" 0
-        sleep 15
-        still_running=`ps -A | grep $pid`
-        if [ -n "$still_running" ];
-        then
-            kill $pid
-        fi
-        number_of_packets=`grep "hlim[[:space:]]*$HOPS" $OUTPUT | wc -l`
+        rlRun "tcpdump -Ui $TEST_IFACE -vvv net ${GROUP_ADDR[$f]} -w ipv6_mlc_hops.pcap &" 0
+        waitready "tcpdump"
+        rlRun "./test_tools/send_simple -c $f -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -e$HOPS -i${LOCAL_IP[$f]} -n$TEST_IFACE" 0
+        rlRun "sleep 2 && pkill tcpdump"
+        sleep 5
+        number_of_packets=`tcpdump -vvv -nr ipv6_mlc_hops.pcap | grep "hlim[[:space:]]*$HOPS" | wc -l`
         rlAssertGreater "Received $number_of_packets packets" $number_of_packets 0
+        rlRun "tcpdump -vvv -nner ipv6_mlc_hops.pcap"
     rlPhaseEnd
 fi
 
 if [ x"$f" == x"4" ]
 then
     rlPhaseStartTest "IP_MULTICAST_TTL"
-        rlRun "tcpdump -i any -vvv net ${GROUP_ADDR[$f]} >$OUTPUT 2>/dev/null &" 0
-        pid=$!
-        rlRun "./test_tools/send_simple -c 4 -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -t$TTL -i${LOCALHOST[$f]}" 0
-        # sleep sometimes to wait tcpdump capture all packages
-        sleep 5
-        still_running=`ps -A | grep $pid`
-        if [ -n "$still_running" ];
-        then
-            kill $pid
-        fi
+        rlRun "tcpdump -Ui any -vvv net ${GROUP_ADDR[$f]} -w ttl.pcap &" 0
+        waitready "tcpdump"
+        rlRun "./test_tools/send_simple -c 4 -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -t$TTL -i${LOCALHOST[$f]}" 0
+        rlRun "sleep 2 && pkill tcpdump"
         sleep 5
 
-        number_of_packets=`grep "ttl[[:space:]]*$TTL" $OUTPUT | wc -l`
+        number_of_packets=`tcpdump -vvv -nr ttl.pcap | grep "ttl[[:space:]]*$TTL" | wc -l`
         rlAssertGreater "Received $number_of_packets packets" $number_of_packets 0
+        rlRun "tcpdump -vvv -nner ttl.pcap"
     rlPhaseEnd
 
     rlPhaseStartTest "IP_ADD_SOURCE_MEMBERSHIP/IP_DROP_SOURCE_MEMBERSHIP-----------------NONEXISTING_SOURCE"
-    	rlRun "PHASE_DURATION=30"
-        rlRun "./test_tools/recv_add_drop_src -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -s${NONEXISTING_SOURCE[$f]} -i${LOCAL_IP[$f]}>$OUTPUT 2>/dev/null &" 0
-        rlRun "./test_tools/send_simple -c 4 -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]}" 0
-
-        wait && sleep 2
+        rlRun "./test_tools/recv_add_drop_src -a${GROUP_ADDR[$f]} -p$PORT -s${NONEXISTING_SOURCE[$f]} -i${LOCAL_IP[$f]}>$OUTPUT" 0
 
         number_of_report=`grep "Report sent--packets_received\=" $OUTPUT | cut -c 31-`
         number_of_addSource=`grep "AddSrcMember--packets_received\=" $OUTPUT | cut -c 32-`
@@ -373,43 +320,34 @@ then
     rlPhaseEnd
 
     rlPhaseStartTest "IP_ADD_SOURCE_MEMBERSHIP/IP_DROP_SOURCE_MEMBERSHIP-----------------FUNCTIONAL TEST"
-            rlRun "PHASE_DURATION=30"
-            rlRun "./test_tools/recv_add_drop_src -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -s${LOCAL_IP[$f]} -i${LOCAL_IP[$f]}>$OUTPUT 2>/dev/null &" 0
-            rlRun "./test_tools/send_simple -c 4 -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]}" 0
+        rlRun "./test_tools/recv_add_drop_src -a${GROUP_ADDR[$f]} -p$PORT -s${LOCAL_IP[$f]} -i${LOCAL_IP[$f]}>$OUTPUT" 0
 
-            wait && sleep 2
-
-            number_of_report=`grep "Report sent--packets_received\=" $OUTPUT | cut -c 31-`
-            number_of_addSource=`grep "AddSrcMember--packets_received\=" $OUTPUT | cut -c 32-`
-            number_of_dropSource=`grep "DropSrcMember--packets_received\=" $OUTPUT | cut -c 33-`
-            rlAssertGreater "Reported--Received $number_of_report packets" $number_of_report 0
-           #if added srcIP is not local IP, number_of_addSource = 0
-            #if else, number_of_addSource > 0
-            rlAssertGreater "Add Src Membership--Received $number_of_addSource" $number_of_addSource 0
-            rlAssertEquals "Drop src Membership--Received $number_of_dropSource packets" $number_of_dropSource 0
+        number_of_report=`grep "Report sent--packets_received\=" $OUTPUT | cut -c 31-`
+        number_of_addSource=`grep "AddSrcMember--packets_received\=" $OUTPUT | cut -c 32-`
+        number_of_dropSource=`grep "DropSrcMember--packets_received\=" $OUTPUT | cut -c 33-`
+        rlAssertGreater "Reported--Received $number_of_report packets" $number_of_report 0
+        #if added srcIP is not local IP, number_of_addSource = 0
+        #if else, number_of_addSource > 0
+        rlAssertGreater "Add Src Membership--Received $number_of_addSource" $number_of_addSource 0
+        rlAssertEquals "Drop src Membership--Received $number_of_dropSource packets" $number_of_dropSource 0
    rlPhaseEnd
 
     rlPhaseStartTest "IP_ADD_BLOCK_SOURCE_MEMBERSHIP------INCLUDE_EXCLUDE-----------FUNCTIONAL TEST"
-            rlRun "PHASE_DURATION=60"
-            rlRun "./test_tools/recv_add_block_hybrid -d$PHASE_DURATION -a${GROUP_ADDR[$f]} -p$PORT -s${LOCAL_IP[$f]} -i${LOCAL_IP[$f]}>$OUTPUT 2>/dev/null &" 0
-            rlRun "PHASE_DURATION=120"
-            rlRun "./test_tools/send_simple -c 4 -d$PHASE_DURATION -f0.2 -a${GROUP_ADDR[$f]} -p$PORT -i${LOCAL_IP[$f]}" 0
+        rlRun "./test_tools/recv_add_block_hybrid -a${GROUP_ADDR[$f]} -p$PORT -s${LOCAL_IP[$f]} -i${LOCAL_IP[$f]}>$OUTPUT" 0
 
-            wait && sleep 2
-
-            number_of_report=`grep "report--packets_received\=" $OUTPUT | cut -c 26-`
-            number_of_addSource=`grep "AddSrcMember--packets_received\=" $OUTPUT | cut -c 32-`
-            number_of_dropSource=`grep "DropSrcMember--packets_received\=" $OUTPUT | cut -c 33-`
-            number_of_blockSource=`grep "BlockSrcMember--packets_received\=" $OUTPUT | cut -c 34-`
-            number_of_unblockSource=`grep "UnblockSrcMember--packets_received\=" $OUTPUT | cut -c 36-`
-            rlAssertGreater "Report Membership--Received $number_of_report" $number_of_report 0
-            rlAssertGreater "Add Src Membership--Received $number_of_addSource" $number_of_addSource 0
-            rlAssertEquals "Drop src Membership--Received $number_of_dropSource packets" $number_of_dropSource 0
-            rlAssertEquals "Block src Membership--Received $number_of_blockSource packets" $number_of_blockSource 0
-            rlAssertGreater "Unblock src Membership--Received $number_of_unblockSource packets" $number_of_unblockSource 0
+        number_of_report=`grep "report--packets_received\=" $OUTPUT | cut -c 26-`
+        number_of_addSource=`grep "AddSrcMember--packets_received\=" $OUTPUT | cut -c 32-`
+        number_of_dropSource=`grep "DropSrcMember--packets_received\=" $OUTPUT | cut -c 33-`
+        number_of_blockSource=`grep "BlockSrcMember--packets_received\=" $OUTPUT | cut -c 34-`
+        number_of_unblockSource=`grep "UnblockSrcMember--packets_received\=" $OUTPUT | cut -c 36-`
+        rlAssertGreater "Report Membership--Received $number_of_report" $number_of_report 0
+        rlAssertGreater "Add Src Membership--Received $number_of_addSource" $number_of_addSource 0
+        rlAssertEquals "Drop src Membership--Received $number_of_dropSource packets" $number_of_dropSource 0
+        rlAssertEquals "Block src Membership--Received $number_of_blockSource packets" $number_of_blockSource 0
+        rlAssertGreater "Unblock src Membership--Received $number_of_unblockSource packets" $number_of_unblockSource 0
    rlPhaseEnd
-fi
 
+fi
 
     rlPhaseStartCleanup
         rlRun "rm -f $OUTPUT" 0 "Remove temporary file"

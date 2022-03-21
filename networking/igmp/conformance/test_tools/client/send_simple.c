@@ -20,7 +20,6 @@
  * 02110-1301, USA.
  */
 
-#define SEND
 #include "multicast_utils.h"
 
 int send_simp4(struct parameters *params)
@@ -45,7 +44,7 @@ int send_simp4(struct parameters *params)
 	}
 	int num_sent = 0;
 	num_sent = send_data(sockfd, params->multiaddr, params->port,
-					params->duration, params->delay);
+					params->pkts, params->delay);
 
 	return num_sent;
 }
@@ -75,7 +74,7 @@ int send_simp6(struct parameters *params)
 	}
 
 	num_sent = send_data6(sockfd, params->multiaddr6, params->port,
-					params->duration, params->delay);
+					params->pkts, params->delay);
 
 	return num_sent;
 }

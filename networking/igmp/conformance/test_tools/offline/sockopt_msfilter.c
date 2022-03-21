@@ -36,9 +36,8 @@ void test_ip_msfilter()
 	struct ip_msfilter filter;
 	struct group_req group;
 	struct in_addr src_addr_list[3];
-	int size_filter;
+	socklen_t size_filter;
 	int status = 0;
-	int i = 0;
 
 	group.gr_interface = 0;
 	group.gr_group.ss_family = AF_INET;
@@ -144,7 +143,7 @@ void test_mcast_msfilter_v4()
 	struct group_filter gr_filter;
 	struct sockaddr_in *psin4;
 	int status = 0;
-	int size_grfilter = 0;
+	socklen_t size_grfilter = 0;
 
 	group.gr_interface = 1;
 	group.gr_group.ss_family = AF_INET;
@@ -261,11 +260,9 @@ void test_mcast_msfilter_v6()
 
 	struct group_req group;
 	struct group_filter gr_filter;
-	struct sockaddr_storage src_addr_list[3];
 	struct sockaddr_in6 *psin6;
-	int i = 0;
 	int status = 0;
-	int size_grfilter = 0;
+	socklen_t size_grfilter = 0;
 
 	group.gr_interface = 1;
 	group.gr_group.ss_family = AF_INET6;

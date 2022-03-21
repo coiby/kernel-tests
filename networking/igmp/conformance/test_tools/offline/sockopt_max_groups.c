@@ -20,15 +20,12 @@
  * 02110-1301, USA.
  */
 
-#define RECEIVE
-#include "multicast_utils.h"
+#include "sockopt_utils.h"
 
 #define IGMP_MAX_GROUP_FILE "/proc/sys/net/ipv4/igmp_max_memberships"
 
 int main(int argc, char** argv)
 {
-	struct parameters params;
-	parse_args(argc, argv, &params);
 	FILE *fp;
 	char max_mem[16]="";
 	int i = 0;
@@ -54,13 +51,14 @@ int main(int argc, char** argv)
 	printf("max_mem setting=%d\n", atoi(max_mem));
 
 
-	int sockfd = init_in_socket(params.multiaddr, params.port);
+	initialize(4);
+	int sockfd = __sockfd;
 
 	struct ip_mreq mreq;
 	struct in_addr multiaddr;
 	int groups = 0;
 	multiaddr.s_addr = 0xe1000001;
-	mreq.imr_interface = params.interface;
+	mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 
 	do {
 		mreq.imr_multiaddr.s_addr = htonl(multiaddr.s_addr);

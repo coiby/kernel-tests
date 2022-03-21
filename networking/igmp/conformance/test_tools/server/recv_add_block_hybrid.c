@@ -1,6 +1,6 @@
 /*
  * igmp_add_block_hybrid.c - Join multicast group and then add/drop block and
- *                       unblock specific sources
+ *			 unblock specific sources
  * For igmp INCLUDE/EXCLUDE filter mode hybrid test.
  *
  * Copyright (C) 2012 Red Hat Inc.
@@ -23,7 +23,6 @@
  * 02110-1301, USA.
  */
 
-#define RECEIVE
 #include "multicast_utils.h"
 
 int main(int argc, char** argv)
@@ -32,15 +31,16 @@ int main(int argc, char** argv)
 	parse_args(argc, argv, &params);
 
 	int sockfd = init_in_socket(params.multiaddr, params.port);
+	int snd_sk = setup_sk4(&params);
 	
 	/*for reuse addr*/
 	int one=1;
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0) {
-	          perror("setsockopt SO_REUSEADDR failed");
-	          exit(1);
+	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0) {
+		  perror("setsockopt SO_REUSEADDR failed");
+		  exit(1);
 	}
 
-	int num_report = 0;
+	int num_report = 0, num_snd = 0;
 	int num_add_src = 0;
 	int num_drop_src = 0;
 	int num_block_src = 0;
@@ -52,14 +52,10 @@ int main(int argc, char** argv)
 	mreq.imr_multiaddr  = params.multiaddr;
 	mreq.imr_interface  = params.interface;
 
-	struct ip_mreq_source mreqs, mreqs_add;
+	struct ip_mreq_source mreqs;
 	mreqs.imr_multiaddr  = params.multiaddr;
 	mreqs.imr_interface  = params.interface;
 	mreqs.imr_sourceaddr = params.sourceaddr;
-
-	mreqs_add.imr_multiaddr  = params.multiaddr;
-	mreqs_add.imr_interface  = params.interface;
-	mreqs_add.imr_sourceaddr.s_addr = params.sourceaddr.s_addr+ntohs(0x1);
 
 	if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
 				   &(mreq), sizeof(mreq)) < 0)
@@ -68,30 +64,31 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	num_report = wait_for_data(sockfd, params.duration/6, 0);
-        printf("report--packets_received=%d\n", num_report);
+	num_snd = send_sk4(snd_sk, &params);
+	num_report = wait_for_data(sockfd, 0, num_snd);
+	printf("report--packets_received=%d\n", num_report);
 
-        if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
-                                &(mreqs), sizeof(mreqs)) < 0)
-        {
-                   perror("setsockopt");
-                   return -1;
-        }
-		wait_for_data(sockfd, params.duration/12, 0);
+	if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
+				&(mreqs), sizeof(mreqs)) < 0)
+	{
+		   perror("setsockopt");
+		   return -1;
+	}
 
-        num_add_src = wait_for_data(sockfd, params.duration/6, 0);
-        printf("AddSrcMember--packets_received=%d\n", num_add_src);
+	num_snd = send_sk4(snd_sk, &params);
+	num_add_src = wait_for_data(sockfd, 0, num_snd);
+	printf("AddSrcMember--packets_received=%d\n", num_add_src);
 
-        if (setsockopt(sockfd, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP,
-                                &(mreqs), sizeof(mreqs)) < 0)
-        {
-                   perror("setsockopt");
-                   return -1;
-        }
-		wait_for_data(sockfd, params.duration/12, 0);
+	if (setsockopt(sockfd, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP,
+				&(mreqs), sizeof(mreqs)) < 0)
+	{
+		   perror("setsockopt");
+		   return -1;
+	}
 
-        num_drop_src = wait_for_data(sockfd, params.duration/6, 0);
-        printf("DropSrcMember--packets_received=%d\n", num_drop_src);
+	num_snd = send_sk4(snd_sk, &params);
+	num_drop_src = wait_for_data(sockfd, 0, num_snd);
+	printf("DropSrcMember--packets_received=%d\n", num_drop_src);
 
 	/*another socket session for igmp EXCLUDE filter*/
 	/*Set reuse port op*/
@@ -102,11 +99,11 @@ int main(int argc, char** argv)
 	}
 	
 	//for reuse addr
-        if (setsockopt(sockfd2, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0) {
-           perror("setsockopt SO_REUSEADDR failed");
-           exit(1);
-        }
-        //printf("Reusing the address...\r\n");
+	if (setsockopt(sockfd2, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0) {
+	   perror("setsockopt SO_REUSEADDR failed");
+	   exit(1);
+	}
+	//printf("Reusing the address...\r\n");
 
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
@@ -120,19 +117,19 @@ int main(int argc, char** argv)
 	}
 	//init socket2 over
 	
-        mreq.imr_multiaddr  = params.multiaddr;
-        mreq.imr_interface  = params.interface;
+	mreq.imr_multiaddr  = params.multiaddr;
+	mreq.imr_interface  = params.interface;
 
-        mreqs.imr_multiaddr  = params.multiaddr;
-        mreqs.imr_interface  = params.interface;
-        mreqs.imr_sourceaddr = params.sourceaddr;
+	mreqs.imr_multiaddr  = params.multiaddr;
+	mreqs.imr_interface  = params.interface;
+	mreqs.imr_sourceaddr = params.sourceaddr;
 
-        if (setsockopt(sockfd2, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                                   &(mreq), sizeof(mreq)) < 0)
-        {
-                perror("setsockopt");
-                return -1;
-        }
+	if (setsockopt(sockfd2, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+				   &(mreq), sizeof(mreq)) < 0)
+	{
+		perror("setsockopt");
+		return -1;
+	}
 
 	if (setsockopt(sockfd2, IPPROTO_IP, IP_BLOCK_SOURCE,
 				   &(mreqs), sizeof(mreqs)) < 0)
@@ -140,9 +137,9 @@ int main(int argc, char** argv)
 		perror("setsockopt");
 		return -1;
 	}
-	wait_for_data(sockfd2, params.duration/12, 0);
-	num_block_src = wait_for_data(sockfd2, params.duration/6, 0);
-        printf("BlockSrcMember--packets_received=%d\n", num_block_src);
+	num_snd = send_sk4(snd_sk, &params);
+	num_block_src = wait_for_data(sockfd2, 0, num_snd);
+	printf("BlockSrcMember--packets_received=%d\n", num_block_src);
 	
 	if (setsockopt(sockfd2, IPPROTO_IP, IP_UNBLOCK_SOURCE,
 				   &(mreqs), sizeof(mreqs)) < 0)
@@ -150,10 +147,10 @@ int main(int argc, char** argv)
 		perror("setsockopt");
 		return -1;
 	}
-	wait_for_data(sockfd2, params.duration/12, 0);
 
-	num_unblock_src = wait_for_data(sockfd2, params.duration/6, 0);
-        printf("UnblockSrcMember--packets_received=%d\n", num_unblock_src);
+	num_snd = send_sk4(snd_sk, &params);
+	num_unblock_src = wait_for_data(sockfd2, 0, num_snd);
+	printf("UnblockSrcMember--packets_received=%d\n", num_unblock_src);
 
 	return EXIT_SUCCESS;
 }
