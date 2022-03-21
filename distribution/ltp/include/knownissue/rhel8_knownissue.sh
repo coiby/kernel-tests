@@ -105,6 +105,8 @@ function rhel8_fixed_issues()
 	pkg_in_range "glibc" "0" "2.28-153.el8" && tskip "semctl09" fixed
 	# Bug 2004810 - [FJ8.5 Bug]: LTP creat09, which is a test for CVE-2018-13405, failed.
 	kernel_in_range "0" "4.18.0-349.el8" && tskip "creat09 cve-2018-13405" fixed
+	# Bug 1964047 - fixed by Bug 1944404
+	cki_is_kernel_debug && kernel_in_range "0" "kernel-4.18.0-326.el8" && tskip "read_all_sys" fixed
 }
 
 function rhel8_knownissue_filter()
