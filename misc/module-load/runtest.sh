@@ -223,6 +223,11 @@ if [ "$release" = "release 9" ] || [ "$release" = "el9" ]; then
     fi
 fi
 
+# c9s automotive kernel has crc8 built-in for aarch64, not a module
+if grep -q CONFIG_CRC8=y /boot/config-$(uname -r); then
+    sed -i 's/crc8/# \0/' modules.rhel9
+fi
+
 # run the test. For each module in the MODLIST file, try to load it, check
 # that it is there, then unload it and check lsmod again. All modules should
 # be loadable/unloadable for each arch without issue.
