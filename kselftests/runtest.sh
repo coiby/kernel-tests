@@ -1,5 +1,5 @@
 #!/bin/bash
-# vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+# vim: expandtab ts=4 sw=4 ai
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /kernel/networking/kselftests
@@ -102,7 +102,8 @@ install_kselftests()
     # Install the selftests-internal, modules-internal packages by default
     if [ "${CKI_SELFTESTS_URL}" ] ; then
         pushd ${EXEC_DIR}
-        wget --no-check-certificate $CKI_SELFTESTS_URL -O kselftest.tar.gz
+        wget --no-check-certificate $CKI_SELFTESTS_URL -O kselftest.tar.gz || \
+            { rlLog "Wget CKI_SELFTESTS_URL failed" && return 1; }
         tar zxf kselftest.tar.gz
         rlLog "Upstream ${TEST} installed..."
         popd
@@ -120,12 +121,19 @@ install_kselftests()
         rlRun "dnf install -y rsync libcap-devel clang llvm python3-docutils numactl-devel"
         make -j`nproc` -C tools/testing/selftests install TARGETS="${TEST_ITEMS}" INSTALL_PATH=${EXEC_DIR}
         rlLog "Compiled ${TEST} installed..."
-        [ -f $TMPDIR/selftests/run_kselftest.sh ] && return 0 || return 1
         popd
+        [ -f $TMPDIR/selftests/run_kselftest.sh ] && return 0 || return 1
     else
         rlRpmInstall ${name}${debug_dash}-modules-internal ${version} ${release} ${arch}
         rlRpmInstall ${name}-selftests-internal ${version} ${release} ${arch}
-        rlLog "Delivered ${TEST} installed..."
+        if rpm -q ${name}-selftests-internal; then
+            rlLog "Delivered ${TEST} installed..."
+            return 0
+        else
+            # CKI don't build kselftest rpm for none x86. Let's report SKIP directly
+            [ ${arch} != "x86_64" ] && test_skip_exit "install kselftests failed on none x86 arch"
+            return 1
+        fi
     fi
 }
 
