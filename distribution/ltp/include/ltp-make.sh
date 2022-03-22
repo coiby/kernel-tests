@@ -6,6 +6,8 @@ TESTVERSION=$TEST_VERSION
 if [ -z ${TESTVERSION} ]; then
     if rlIsRHEL 6; then
         TESTVERSION="20200120"
+    elif rlIsRHEL 7; then
+        TESTVERSION="20210927"
     else
         TESTVERSION="20220121"
     fi
