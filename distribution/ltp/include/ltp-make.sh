@@ -4,10 +4,12 @@
 #TEST_VERSION can override the default
 TESTVERSION=$TEST_VERSION
 if [ -z ${TESTVERSION} ]; then
-    if rlIsRHEL 5 || rlIsRHEL 6; then
+    if rlIsRHEL 6; then
         TESTVERSION="20200120"
-    else
+    elif rlIsRHEL 7; then
         TESTVERSION="20210927"
+    else
+        TESTVERSION="20220121"
     fi
 fi
 
@@ -81,12 +83,6 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel_only-migrate_page02-avoid-warning.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
-    fi
-
-    # The following ones are for specific hardware/release
-    if ([ "$OS_MAJOR_RELEASE" == "4" ] || [ "$OS_MAJOR_RELEASE" == "5" ]) && ([ "$ARCH" == "s390" ] || [ "$ARCH" == "s390x" ]); then
-        echo " - remove cfs sched hacbench in RHEL[45] and s390x" | tee -a $OUTPUTFILE
-        $(PATCH) < $(ABS_DIR)/INTERNAL/rhel345-sched-remove-cfs-sched-hackbench.patch
     fi
 
     if [ "$ARCH" == "ppc" ] || [ "$ARCH" == "ppc64" ] || [ "$ARCH" == "s390" ] || [ "$ARCH" == "s390x" ]; then
