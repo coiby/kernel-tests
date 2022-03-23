@@ -27,7 +27,10 @@ source $CDIR/../../../cki_lib/libcki.sh
 function pre_setup
 {
 	modprobe -r ib_isert ib_srpt iscsi_target_mod target_core_mod
-	echo "options nvme_core multipath=N"  > /etc/modprobe.d/nvme.conf
+	echo "options nvme_core multipath=N" > /etc/modprobe.d/nvme.conf
+	# some servers have large CPUS, which lead srp tests hang, this also
+	# exists on upstream: BZ2036032 BZ2036033
+	echo "options ib_srp ch_count=10" > /etc/modprobe.d/ib_srp.conf
 }
 
 function disable_multipath
