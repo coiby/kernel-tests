@@ -8,6 +8,7 @@ abituguru3.ko
 abituguru.ko
 ac97_bus.ko
 acecad.ko
+acer-wireless.ko
 acer-wmi.ko
 acpi-cpufreq.ko
 acpi_extlog.ko
@@ -768,6 +769,7 @@ intel-ish-ipc.ko
 intel-ishtp-hid.ko
 intel-ishtp.ko
 intel_oaktrail.ko
+intel_pch_thermal.ko
 intel_pmc_core.ko
 intel_pmc_core_pltdrv.ko
 intel_pmt_class.ko
@@ -958,6 +960,7 @@ leds-lm3530.ko
 leds-lp3944.ko
 leds-lt3593.ko
 leds-mlxcpld.ko
+leds-mlxreg.ko
 leds-ss4200.ko
 ledtrig-audio.ko
 ledtrig-backlight.ko
@@ -1112,6 +1115,7 @@ mlx5_ib.ko
 mlx5_vdpa.ko
 mlxfw.ko
 mlx-platform.ko
+mlxreg-fan.ko
 mlxreg-hotplug.ko
 mlxreg-io.ko
 mlxsw_core.ko
@@ -1119,6 +1123,7 @@ mlxsw_i2c.ko
 mlxsw_minimal.ko
 mlxsw_pci.ko
 mlxsw_spectrum.ko
+mlx_wdt.ko
 mmc_block.ko
 mmc_core.ko
 mn88472.ko

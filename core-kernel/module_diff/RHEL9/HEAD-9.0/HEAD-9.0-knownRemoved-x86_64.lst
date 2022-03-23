@@ -1,5 +1,8 @@
 cramfs.ko
 dnet.ko
+ecc.ko
+ecdh_generic.ko
+ecdsa_generic.ko
 ethoc.ko
 firedtv.ko
 firewire-core.ko
