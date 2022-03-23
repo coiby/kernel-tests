@@ -559,6 +559,9 @@ rlJournalStart
                     if cki_kver_lt "5.14.0-69"; then
                         sed -i '/^ns.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
                     fi
+                    if cki_kver_lt "5.14.0-73"; then
+                        sed -i '/ecc.ko/d;/ecdh_generic.ko/d;/ecdsa_generic.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then

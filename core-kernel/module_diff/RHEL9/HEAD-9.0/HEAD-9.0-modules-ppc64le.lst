@@ -735,6 +735,7 @@ leds-blinkm.ko
 leds-lm3530.ko
 leds-lp3944.ko
 leds-lt3593.ko
+leds-mlxreg.ko
 leds-powernv.ko
 ledtrig-audio.ko
 ledtrig-backlight.ko

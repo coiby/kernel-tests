@@ -1,5 +1,7 @@
 cramfs.ko
 dnet.ko
+ecc.ko
+ecdsa_generic.ko
 ethoc.ko
 nct6683.ko
 ns.ko

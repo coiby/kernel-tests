@@ -637,6 +637,7 @@ leds-blinkm.ko
 leds-lm3530.ko
 leds-lp3944.ko
 leds-lt3593.ko
+leds-mlxreg.ko
 ledtrig-audio.ko
 ledtrig-backlight.ko
 ledtrig-camera.ko
@@ -747,6 +748,7 @@ mlxbf-bootctl.ko
 mlxbf_gige.ko
 mlxbf-tmfifo.ko
 mlxfw.ko
+mlxreg-fan.ko
 mlxreg-hotplug.ko
 mlxreg-io.ko
 mlxsw_core.ko
@@ -754,6 +756,7 @@ mlxsw_i2c.ko
 mlxsw_minimal.ko
 mlxsw_pci.ko
 mlxsw_spectrum.ko
+mlx_wdt.ko
 mmc_block.ko
 mmc_core.ko
 mos7720.ko
