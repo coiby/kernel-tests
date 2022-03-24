@@ -207,21 +207,27 @@ function RunTest ()
         if type do_${_item}_config >& /dev/null; then
             rlRun do_${_item}_config
         fi
-        # create list of tests to run
-        if [ "${TEST_ITEMS}" == "default" ]; then
-            TARGETS=$(${EXEC_DIR}/run_kselftest.sh -l)
+
+        if type do_${_item}_run >& /dev/null; then
+            rlRun do_${_item}_run
         else
-            NormalizeTestItems $item
+            # create list of tests to run
+            if [ "${TEST_ITEMS}" == "default" ]; then
+                TARGETS=$(${EXEC_DIR}/run_kselftest.sh -l)
+            else
+                NormalizeTestItems $item
+            fi
+            total_num=$(echo ${TARGETS} | wc -w)
+            num=0
+            # Run self-tests
+            for t in ${TARGETS}; do
+                num=$(($num + 1))
+                RunKSelfTest ${t}
+                ret=$?
+                check_result $num $total_num ${item} ${t} $ret
+            done
         fi
-        total_num=$(echo ${TARGETS} | wc -w)
-        num=0
-        # Run self-tests
-        for t in ${TARGETS}; do
-            num=$(($num + 1))
-            RunKSelfTest ${t}
-            ret=$?
-            check_result $num $total_num ${item} ${t} $ret
-        done
+
         # do reset
         if type do_${_item}_reset >& /dev/null; then
             rlRun do_${_item}_reset
