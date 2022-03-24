@@ -15,6 +15,8 @@ function rhel8_fatal_issues()
 
 function rhel8_unfix_issues()
 {
+	# Bug 2040615 - finit_module02.c:122: TFAIL: TestName: file-not-readable expected EBADF: ETXTBSY
+	osver_in_range "800" "808" && tskip "finit_module02" unfix
 	# Bug 1945052 - CVE-2021-3444 kernel: bpf verifier incorrect mod32 truncation
 	osver_in_range "800" "806" && tskip "bpf_prog05 cve-2021-3444" unfix
 	# Bug 1879689 - [RHEL-8.3] move_pages12.c:95: FAIL: madvise failed: ENOMEM (12)
