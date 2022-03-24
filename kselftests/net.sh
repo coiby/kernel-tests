@@ -150,6 +150,50 @@ do_netfilter_config()
 	install_sendip
 }
 
+do_bpf_test_progs_run()
+{
+	local item="bpf_test_progs"
+	local ret ret_1 ret_2
+
+	[ ! -d $EXEC_DIR/bpf ] && test_skip "No $item test, skip" && return 1
+
+	pushd $EXEC_DIR/bpf
+	if [ ! -f test_progs ] || [ ! -f test_progs-no_alu32 ] || ! ./test_progs --count; then
+		test_skip "No $item test, skip"
+		return 1
+	fi
+
+	local total_tests=$(./test_progs --list)
+	local total_num=$(./test_progs --count)
+	local num=0
+	local name=""
+
+	for name in ${total_tests}; do
+		num=$(($num + 1))
+
+		check_skip "${item}:${name}" && check_result $num $total_num "${item}:${name}" $SKIP_CODE && continue
+
+		local OUTPUTFILE=$LOG_DIR/${item}_${name}.log
+		dmesg -C
+
+		run "./test_progs -t $name"
+		ret_1=$?
+		# Get more detailed log info with -vv if failed
+		[ ${ret_1} -ne 0 ] && run "./test_progs -vv -t $name"
+
+		run "./test_progs-no_alu32 -t $name"
+		ret_2=$?
+
+		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
+		dmesg >> $OUTPUTFILE
+
+		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
+		check_result $num $total_num "${item}:${name}" $ret
+	done
+
+	popd
+}
+
 # ----------- init setups -----------
 
 # source skip/waive list
