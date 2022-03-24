@@ -13,10 +13,11 @@ if ! modprobe -qn rdma_rxe; then
 fi
 
 # modprobe siw on ppc64le with distro less than RHEL8.4 will lead panic, BZ1919502
+# siw srp testing with distro less than RHEL8.4 on x86_64 has issues
 ARCH=$(uname -i)
-ver="4.18.0-303"
+ver="4.18.0-305"
 KVER=$(uname -r)
-if [[ $ARCH == "ppc64le" ]] && [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then
+if [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then
 	export USE_SIW="0"
 fi
 
