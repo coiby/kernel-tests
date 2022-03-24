@@ -47,6 +47,20 @@ install_sendip()
 	which sendip && return 0 || return 1
 }
 
+install_scapy()
+{
+	scapy -h && return 0
+
+	[ "$(krelease)" == "el8" ] && \
+		dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
+	dnf install -y scapy
+
+	[ "$(krelease)" == "el8" ] && rpm -e epel-release
+
+	scapy -h && return 0 || return 1
+}
+
 reset_net_env()
 {
 	modprobe -r act_tunnel_key
@@ -194,6 +208,64 @@ do_bpf_test_progs_run()
 	popd
 }
 
+do_tc-testing_config()
+{
+	# prepare evn
+	dnf install -y clang valgrind
+	install_scapy
+	modprobe -r veth
+
+	pushd $EXEC_DIR/tc-testing
+	# extend test timeout
+	sed -i '/TIMEOUT/s/12/180/' tdc_config.py
+	popd
+}
+
+do_tc-testing_run()
+{
+	# Start tc test
+	local item="tc-testing"
+
+	[ ! -d $EXEC_DIR/${item} ] && test_skip "No $item test, skip" && return 1
+
+	pushd $EXEC_DIR/${item}
+
+	local act_tests=$(ls -d tc-tests/actions/*.json)
+	local fil_tests=$(ls -d tc-tests/filters/*.json)
+	local qdi_tests=$(ls -d tc-tests/qdiscs/*.json)
+	local total_tests="$act_tests $fil_tests $qdi_tests"
+	local total_num=$(echo ${total_tests} | wc -w)
+	local DEFAULT_IFACE=$(ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}')
+	local fail=0 nskip=0 ret=0
+
+	for name in ${total_tests}; do
+		num=$(($num + 1))
+
+		check_skip "${item}:${name}" && check_result $num $total_num "${item}:${name}" $SKIP_CODE && continue
+
+		local OUTPUTFILE=$LOG_DIR/$(echo ${name} | tr '/' '_').log
+
+		echo ${tc_tests[$num - 1]} | grep -qP "tests\.json|concurrency\.json"  && extra_p="-d $DEFAULT_IFACE" || extra_p=""
+		./tdc.py -f ${name} $extra_p &> $OUTPUTFILE
+		ret=$?
+		if grep -q "not ok" $OUTPUTFILE; then
+			check_result $num $total_num "${item}:${name}" 1
+			fail=$(($fail+1))
+		elif grep -q "# skipped -" $OUTPUTFILE; then
+			check_result $num $total_num "${item}:${name}" $SKIP_CODE
+			nskip=$((nskip+1))
+		elif grep -q "Traceback" $OUTPUTFILE; then
+			check_result $num $total_num "${item}:${name}" $SKIP_CODE
+			nskip=$((nskip+1))
+		else
+			check_result $num $total_num "${item}:${name}" $ret
+		fi
+	done
+
+	echo "${item}: total $total_num, failed $fail, skipped $nskip"
+
+	popd
+}
 # ----------- init setups -----------
 
 # source skip/waive list
