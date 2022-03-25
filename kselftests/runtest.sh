@@ -223,7 +223,7 @@ function RunTest ()
                 num=$(($num + 1))
                 RunKSelfTest ${t}
                 ret=$?
-                check_result $num $total_num ${item} ${t} $ret
+                check_result $num $total_num ${t} $ret
             done
         fi
 
