@@ -201,6 +201,8 @@ check_result()
                 test_pass "${num}..${total_num} selftests: ${test_name} [PASS]"
         elif [ "$test_result" -eq $SKIP_CODE ]; then
                 test_skip "${num}..${total_num} selftests: ${test_name} [SKIP]"
+        elif [[ " $WAIVE_TARGETS " = *" ${test_name} "* ]]; then
+                test_pass "${num}..${total_num} selftests: ${test_name} [WAIVE]"
         else
                 test_fail "${num}..${total_num} selftests: ${test_name} [FAIL]"
         fi

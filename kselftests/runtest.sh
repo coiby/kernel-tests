@@ -45,6 +45,7 @@ else
 fi
 # List of selftests to skip.
 SKIP_TARGETS=${SKIP_TARGETS:-""}
+WAIVE_TARGETS=${WAIVE_TARGETS:-""}
 INCLUDE=${INCLUDE:-""}
 
 . ./include.sh

@@ -39,6 +39,9 @@ default none
 SKIP_TARGETS 		List of selftests to skip. This list must be in test format "collection:test". At this time it does not support skipping a whole collection. e.g. "bpf:test_progs net:tls netfilter:nft_trans_stress.sh".
 default none
 
+WAIVE_TARGETS 		List of selftests to waive. The same with SKIP_TARGETS. This list must be in test format "collection:test".
+default none
+
 INCLUDE			Include any files with special variables or function definitions.
 default none
 
