@@ -71,6 +71,9 @@ function rhel8_unfix_issues()
 	# Skip test until RHEL-8.3
 	# https://gitlab.com/cki-project/kernel-tests/-/issues/690
 	osver_in_range "800" "803" && tskip "fanotify15" unfix
+	# remove this once using LTP > 20220121
+	# https://gitlab.com/cki-project/kernel-tests/-/merge_requests/1187
+	is_rt && osver_in_range "800" "808" && tskip "migrate_pages02" unfix
 }
 
 function rhel8_fixed_issues()
