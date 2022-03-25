@@ -513,6 +513,9 @@ rlJournalStart
                     if cki_kver_lt "4.18.0-371"; then
                         sed -i '/^ns.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-x86_64.lst
 					fi
+                    if cki_kver_lt "4.18.0-374"; then
+                        sed -i '/nct6683.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-aarch64.lst
+					fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then
