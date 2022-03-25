@@ -184,6 +184,11 @@ watch()
 	done
 }
 
+check_skip()
+{
+	[[ " $SKIP_TARGETS " = *" $1 "* ]] && return 0 || return 1
+}
+
 check_result()
 {
         local num=$1

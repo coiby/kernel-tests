@@ -156,12 +156,10 @@ function RunKSelfTest()
     local ret
 
     OUTPUTFILE=$LOG_DIR/$log
+
     # check if the test is to be ignored
-    if [[ "$SKIP_TARGETS" = *"$testscript"* ]]; then
-        rlLog "=== Skipping: $testscript"
-        ret=$SKIP_CODE
-        return $ret
-    fi
+    check_skip "$testscript" && rlLog "=== Skipping: $testscript" && return $SKIP_CODE
+
     # clear dmesg
     dmesg -c >/dev/null
 
