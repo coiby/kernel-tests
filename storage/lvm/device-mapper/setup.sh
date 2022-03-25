@@ -150,6 +150,8 @@ function ts_config_setup
     mnt_metadata=/mnt/dmtest/metadata
     mnt_data=/mnt/dmtest/data
 
+    cki_run "df -h"
+
     if ! df | grep ${mnt_metadata} ; then
         echo "FAIL: Couldn't find metadata device"
         return 1
