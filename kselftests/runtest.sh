@@ -25,10 +25,6 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Global parameters
-# DEBUG: enable debug or not, default is true
-# CHECK_UNINVES: also check uninvestigated tests result, default is false
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 #-------------------- Setup --------------------
@@ -45,6 +41,7 @@ else
 fi
 # List of selftests to skip.
 SKIP_TARGETS=${SKIP_TARGETS:-""}
+WAIVE_TARGETS=${WAIVE_TARGETS:-""}
 INCLUDE=${INCLUDE:-""}
 
 . ./include.sh
@@ -156,12 +153,10 @@ function RunKSelfTest()
     local ret
 
     OUTPUTFILE=$LOG_DIR/$log
+
     # check if the test is to be ignored
-    if [[ "$SKIP_TARGETS" = *"$testscript"* ]]; then
-        rlLog "=== Skipping: $testscript"
-        ret=$SKIP_CODE
-        return $ret
-    fi
+    check_skip "$testscript" && rlLog "=== Skipping: $testscript" && return $SKIP_CODE
+
     # clear dmesg
     dmesg -c >/dev/null
 
@@ -207,21 +202,27 @@ function RunTest ()
         if type do_${_item}_config >& /dev/null; then
             rlRun do_${_item}_config
         fi
-        # create list of tests to run
-        if [ "${TEST_ITEMS}" == "default" ]; then
-            TARGETS=$(${EXEC_DIR}/run_kselftest.sh -l)
+
+        if type do_${_item}_run >& /dev/null; then
+            rlRun do_${_item}_run
         else
-            NormalizeTestItems $item
+            # create list of tests to run
+            if [ "${TEST_ITEMS}" == "default" ]; then
+                TARGETS=$(${EXEC_DIR}/run_kselftest.sh -l)
+            else
+                NormalizeTestItems $item
+            fi
+            total_num=$(echo ${TARGETS} | wc -w)
+            num=0
+            # Run self-tests
+            for t in ${TARGETS}; do
+                num=$(($num + 1))
+                RunKSelfTest ${t}
+                ret=$?
+                check_result $num $total_num ${t} $ret
+            done
         fi
-        total_num=$(echo ${TARGETS} | wc -w)
-        num=0
-        # Run self-tests
-        for t in ${TARGETS}; do
-            num=$(($num + 1))
-            RunKSelfTest ${t}
-            ret=$?
-            check_result $num $total_num ${item} ${t} $ret
-        done
+
         # do reset
         if type do_${_item}_reset >& /dev/null; then
             rlRun do_${_item}_reset
