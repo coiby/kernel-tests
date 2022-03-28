@@ -81,7 +81,7 @@ function rhel8_fixed_issues()
 	# Bug 1895961 (CVE-2020-25704) - CVE-2020-25704 kernel: perf_event_parse_addr_filter memory
 	kernel_in_range "0" "4.18.0-193.59.1.el8" && tskip "perf_event_open03" fixed
 	# Bug 1913045 - [RHEL-8.4.0] ltp/lite - ioctl_sg01 - fail - broken mmap() for MAP_FAILED
-	is_arch "aarch64" && kernel_in_range "0" "kernel-4.18.0-304.5.el8" && tskip "ioctl_sg01" unfix
+	is_arch "aarch64" && kernel_in_range "0" "4.18.0-304.5.el8" && tskip "ioctl_sg01" unfix
 	# Bug 1820405 - KEYS: allow reaching the keys quotas exactly
 	kernel_in_range "0" "4.18.0-193.7.el8" && tskip "add_key05" fixed
 	# Bug 1771351 - fat: race between udev and mkdir leads to EIO
@@ -111,9 +111,9 @@ function rhel8_fixed_issues()
 	# Bug 2004810 - [FJ8.5 Bug]: LTP creat09, which is a test for CVE-2018-13405, failed.
 	kernel_in_range "0" "4.18.0-349.el8" && tskip "creat09 cve-2018-13405" fixed
 	# Bug 1964047 - fixed by Bug 1944404
-	cki_is_kernel_debug && kernel_in_range "0" "kernel-4.18.0-326.el8" && tskip "read_all_sys" fixed
+	cki_is_kernel_debug && kernel_in_range "0" "4.18.0-326.el8" && tskip "read_all_sys" fixed
 	# Bug 2035746 - [s390x] cat: /proc/sys/kernel/ftrace_enabled: No such device
-	is_arch "s390x" && kernel_in_range "0" "kernel-4.18.0-362.el8" && tskip "proc01" fixed
+	is_arch "s390x" && kernel_in_range "0" "4.18.0-362.el8" && tskip "proc01" fixed
 }
 
 function rhel8_knownissue_filter()
