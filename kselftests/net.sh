@@ -1,9 +1,11 @@
 #!/bin/sh
 # This file is used for network related tests configurations.
 
+# use it in a separate shell in case variables tainted
 krelease()
 {
-	uname -r | awk -F. '{print $(NF-1)}' | cut -f1 -d'_'
+	source /etc/os-release
+	echo $VERSION_ID | awk -F. '{print $1}'
 }
 
 install_netsniff()
@@ -11,7 +13,7 @@ install_netsniff()
 	which mausezahn && return 0
 
 	# Use f35 repo for RHEL8/9 before netsniff-ng epel9 repo enabled
-	if [ $(krelease) == "el8" ] || [ $(krelease) == "el9" ]; then
+	if [ $(krelease) -eq "8" ] || [ $(krelease) -eq "9" ]; then
 		cp f35.repo /etc/yum.repos.d/
 		dnf install -y netsniff-ng jq
 		# remove the repo incase other tests install f35 pkgs via it
@@ -51,12 +53,12 @@ install_scapy()
 {
 	scapy -h && return 0
 
-	[ "$(krelease)" == "el8" ] && \
+	[ "$(krelease)" -eq "8" ] && \
 		dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 
 	dnf install -y scapy
 
-	[ "$(krelease)" == "el8" ] && rpm -e epel-release
+	[ "$(krelease)" -eq "8" ] && rpm -e epel-release
 
 	scapy -h && return 0 || return 1
 }
@@ -134,7 +136,7 @@ do_net_forwarding_config()
 
 	pushd $EXEC_DIR/net/forwarding
 	# RHEL9 doesn't support meta
-	if [ $(krelease) == "el9" ]; then
+	if [ $(krelease) -eq "9" ]; then
 		sed -i '0, /ets_test_strict/ {/ets_test_strict/d;}' sch_ets.sh
 		sed -i '0, /ets_test_mixed/ {/ets_test_mixed/d;}' sch_ets.sh
 		sed -i '0, /ets_test_dwrr/ {/ets_test_dwrr/d;}' sch_ets.sh
@@ -269,7 +271,7 @@ do_tc-testing_run()
 # ----------- init setups -----------
 
 # source skip/waive list
-if [ $(krelease) == "el8" ] || [ $(krelease) == "el9" ]; then
+if [ $(krelease) -eq "8" ] || [ $(krelease) -eq "9" ]; then
 	[ ! -f skip_waive.list ] && \
 		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.$(krelease) -O skip_waive.list
 	submit_log skip_waive.list
