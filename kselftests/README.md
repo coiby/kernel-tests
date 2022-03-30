@@ -89,3 +89,87 @@ for _item in $TARGETS; do
     fi
 done
 ```
+### Examples
+
+1. Delivered Tests
+
+    **Beaker task for testing all the delivered test collections**:
+```
+    <task name="/kernel-tests/kselftests delivered tests" role="None">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
+            <params>
+                <param name="DELIVERED_TESTS" value="y" />
+            </params>
+    </task>
+```
+
+Corresponding tmt entry:
+```
+environment:
+    DELIVERED_TESTS: y
+```
+
+**Beaker task for testing select collections from the delivered tests**:
+```
+    <task name="/kernel-tests/kselftests select delivered tests" role="None">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
+            <params>
+                <param name="DELIVERED_TESTS" value="y" />
+                <param name="TEST_ITEMS" value="bpf net" />
+                <param name="SKIP_TARGETS" value="bpf:test_lwt_ip_encap.sh net:netdevice.sh" />
+            </params>
+    </task>
+```
+
+Corresponding tmt entry:
+```
+environment:
+    DELIVERED_TESTS: y
+    TEST_ITEMS: bp net
+    SKIP_TARGETS: bpf:test_lwt_ip_encap.sh net:netdevice.sh
+```
+
+2. Upstream Source
+
+**Beaker task for upstream case** (Current issue when building aarch64 through beaker requires setting ARCH to arm64 to resolve.)
+```
+    <task name="/kernel-tests/kselftests upstream source" role="None">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
+            <params>
+                <param name="ARCH" value="arm64" />
+                <param name="TEST_ITEMS" value="bpf net" />
+                <param name="BUILD_FROM_SRC" value="y" />
+                <param name="UPSTREAM_SOURCE_URL" value="https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/snapshot/linux-kselftest-fixes-5.14-rc6.tar.gz" />
+            </params>
+    </task>
+```
+
+Corresponding tmt entry: (ARCH variable can be removed if not running test through beaker)
+```
+environment:
+    ARCH: arm64
+    BUILD_FROM_SRC: y
+    UPSTREAM_SOURCE_URL: https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/snapshot/linux-kselftest-fixes-5.14-rc6.tar.gz
+    TEST_ITEMS: bpf net
+```
+
+3. Downstream Source
+
+**Beaker task to build using kernel source based on installed system** (same issue with aarch64 as above):
+```
+    <task name="/kernel-tests/kselftests kernel internal" role="None">
+        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
+            <params>
+                <param name="TEST_ITEMS" value="bpf net" />
+                <param name="BUILD_FROM_SRC" value="y" />
+            </params>
+    </task>
+```
+
+Corresponding tmt entry:
+```
+environment:
+    BUILD_FROM_SRC: y
+    TEST_ITEMS: bpf net
+```
+****
