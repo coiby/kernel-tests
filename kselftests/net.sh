@@ -29,13 +29,8 @@ install_netsniff()
 install_smcroute()
 {
 	which smcroute && return 0
-	yum install -y libcap-devel
-	smc_v="2.4.4"
-	wget https://github.com/troglobit/smcroute/releases/download/${smc_v}/smcroute-${smc_v}.tar.gz
-	tar zxf smcroute-${smc_v}.tar.gz
-	pushd smcroute-${smc_v}
-	./autogen.sh && ./configure --sysconfdir=/etc --localstatedir=/var && make && make install
-	popd
+	dnf copr -y enable liuhangbin/smcroute
+	dnf install -y smcroute
 	which smcroute && return 0 || return 1
 }
 
