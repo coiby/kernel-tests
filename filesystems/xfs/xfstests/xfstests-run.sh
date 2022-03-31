@@ -47,9 +47,12 @@ function check_tests()
 			echoo "The test $XFSTEST does not seem to exist."
 			continue
 		fi
+		# Clear the dmesg ring buffer, save dmesg for each test separately
+		dmesg -c >/dev/null
 		echo "./checking $XFSTEST" > /dev/kmsg
 		MOUNT_OPTIONS="$MOUNT_OPTS" MKFS_OPTIONS="$MKFS_OPTS" xlog ./check $CHECK_OPTS $XFSTEST
 		ret=$?
+		dmesg > results/$XFSTEST.dmesg
 
 		false_alarm=0
 		if test $ret -ne 0; then
