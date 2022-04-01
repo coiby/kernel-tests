@@ -161,6 +161,14 @@ do_netfilter_config()
 	install_sendip
 }
 
+do_bpf_test_progs_config()
+{
+	# bz1969582 - the bpf:test_progs tests hit an expected mmap_zero avc
+	# denial, unless we first turn mmap_low_allowed on
+	echo "=== Setting mmap_low_allowed on ===" | tee -a $OUTPUTFILE
+	setsebool -P mmap_low_allowed on
+}
+
 do_bpf_test_progs_run()
 {
 	local item="bpf_test_progs"
@@ -203,6 +211,13 @@ do_bpf_test_progs_run()
 	done
 
 	popd
+}
+
+do_bpf_test_progs_reset()
+{
+	# after testing completes, turn mmap_low_allowed off again
+	echo "=== Setting mmap_low_allowed off ===" | tee -a $OUTPUTFILE
+	setsebool -P mmap_low_allowed off
 }
 
 do_tc-testing_config()
