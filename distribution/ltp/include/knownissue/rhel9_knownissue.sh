@@ -12,6 +12,8 @@ function rhel9_unfix_issues()
 {
 	# https://bugzilla.redhat.com/show_bug.cgi?id=1913045#c24
 	is_arch "aarch64" && tskip "ioctl_sg01" unfix
+	# https://gitlab.com/cki-project/kernel-tests/-/issues/536#note_896846475
+	(is_arch "aarch64" || is_arch "s390x" || is_arch "x86_64") && tskip "ioctl09" unfix
 }
 
 function rhel9_fixed_issues()
