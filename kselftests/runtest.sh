@@ -147,29 +147,24 @@ function NormalizeTestItems()
 
 function RunKSelfTest()
 {
-    declare testscript="$1"
-    declare log="`echo ${testscript}|tr \/ \_`.log"
-    declare dmesglog="dmesg_`echo ${testscript}|tr \/ \_`.log"
+    local testscript="$1"
     local ret
 
-    OUTPUTFILE=$LOG_DIR/$log
+    OUTPUTFILE=$(new_outputfile)
 
     # check if the test is to be ignored
     check_skip "$testscript" && rlLog "=== Skipping: $testscript" && return $SKIP_CODE
 
-    # clear dmesg
-    dmesg -c >/dev/null
+    # clear dmesg before each test
+    dmesg -C
 
     # run the self-test script
     rlLog "=== Running: $testscript"
     pushd $EXEC_DIR/`echo ${testscript}|cut -d : -f 1`
     ./`echo ${testscript}|cut -d : -f 2`|& tee $OUTPUTFILE
     ret=${PIPESTATUS[0]}
-    # report the result with a copy of the dmesg log
-    dmesg > $LOG_DIR/$dmesglog
-    submit_log $LOG_DIR/$dmesglog
-    submit_log $OUTPUTFILE
     popd
+
     return $ret
 }
 
