@@ -352,6 +352,7 @@ do_setup()
 		ip netns exec server ethtool -K s_r $i off
 	done 1>/dev/null 2>/dev/null
 
+	sleep 2
 	set +x
 	do_check
 }
