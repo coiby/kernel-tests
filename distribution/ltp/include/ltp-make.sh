@@ -78,6 +78,11 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
+    # Remove when update latest stable to run on version > 20220121
+    if [ "$TESTVERSION" == "20220121" ]; then
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-clock_gettime04-set-threshold-based-on-the-clock-res.patch
+    fi
+
     if [ "$TESTVERSION" == "20210927" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel_only-migrate_page02-avoid-warning.patch
