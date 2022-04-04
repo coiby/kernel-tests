@@ -81,6 +81,7 @@ patch-generic()
     # Remove when update latest stable to run on version > 20220121
     if [ "$TESTVERSION" == "20220121" ]; then
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-clock_gettime04-set-threshold-based-on-the-clock-res.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-pread02-extend-buffer-to-avoid-glibc-overfl.patch
     fi
 
     if [ "$TESTVERSION" == "20210927" ]; then
