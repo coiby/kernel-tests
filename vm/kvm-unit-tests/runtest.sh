@@ -31,8 +31,35 @@ CLEANUPS=("cleanupDF")
 ACCELS=()
 MAJOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $1}')
 MINOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $2}')
+UPSTREAM=NO
+NODISABLE=NO
 
 source /usr/share/beakerlib/beakerlib.sh
+
+POSITIONAL_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -u|--upstream)
+      UPSTREAM=YES
+      shift # past argument
+      ;;
+    -n|--nodisable)
+      NODISABLE=YES
+      shift # past argument
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}"
 
 #
 # A simple wrapper function to skip a test because beakerlib doesn't support
@@ -83,7 +110,11 @@ function checkVirtSupport
 
     if [[ $hwpf == "x86_64" ]]; then
         ACCELS+=("kvm")
-        MACHINES+=("q35")
+        if [[ $OSVERSION == "RHEL9" ]]; then
+            MACHINES=("q35")
+        else
+            MACHINES+=("q35")
+        fi
         if (egrep -q 'vmx' /proc/cpuinfo); then
             CPUTYPE="INTEL"
         elif (egrep -q 'svm' /proc/cpuinfo); then
@@ -146,30 +177,62 @@ function disableTests
     if [[ $OSVERSION == "RHEL8" ]]; then
         # Disabled x86_64 tests for Intel & AMD machines
         if [[ $hwpf == "x86_64" ]]; then
-            # Disable test hyperv_synic, hyperv_connections, hyperv_stimer
-            # due to https://bugzilla.redhat.com/show_bug.cgi?id=1668573
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_synic")
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_connections")
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_stimer")
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu_lbr")
+            if [[ $KUT_MACHINE == "pc" ]]; then
+                # Disable test hyperv_synic, hyperv_connections, hyperv_stimer
+                # due to https://bugzilla.redhat.com/show_bug.cgi?id=1668573
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_synic")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_connections")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_stimer")
+            fi
             if [[ $CPUTYPE == "AMD" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmware_backdoors")
                 mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
             fi
             if [[ $CPUTYPE == "INTEL" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu_emulation")
                 mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu_lbr")
             fi
         fi
     fi
 
+    # Disable tests for RHEL9 Kernel (5.14.X)
+    if [[ $OSVERSION == "RHEL9" ]]; then
+        # Disabled x86_64 tests for Intel & AMD machines
+        if [[ $hwpf == "x86_64" ]]; then
+            if [[ $CPUTYPE == "AMD" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
+            fi
+            if [[ $CPUTYPE == "INTEL" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu_lbr")
+            fi
+        fi
+    fi
+
+    # Disable this test on Upstream testing (5.18.X)
+    if [[ $OSVERSION == "ARK" || $OSVERSION == "UPSTREAM" ]]; then
+        if [[ $hwpf == "x86_64" ]]; then
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "apic-split")
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "apic")
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "xsave")
+            if [[ $CPUTYPE == "INTEL" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
+            fi
+            if [[ $CPUTYPE == "AMD" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
+            fi
+        fi
+    fi
 }
 
 function setupRepo
 {
     # clone the kvm-unit-tests repo
     rlRun "rm -rf kvm-unit-tests"
-    rlRun "git clone --depth=1 --branch=mcondotta_fixes https://gitlab.com/mcondotta/kvm-unit-tests.git > /dev/null 2>&1"
+    if [[ "${UPSTREAM}" == "YES" ]] ; then
+      rlRun "git clone --depth=1 --branch=upstream https://gitlab.com/multi-arch-ci/kvm-unit-tests.git > /dev/null 2>&1"
+    else
+      rlRun "git clone --depth=1 --branch=master https://gitlab.com/multi-arch-ci/kvm-unit-tests.git > /dev/null 2>&1"
+    fi
     rlRun "cd kvm-unit-tests > /dev/null 2>&1"
 
     if [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
@@ -376,7 +439,7 @@ function runtest
         ${SETUPS[$i]}
 
         for mach in ${MACHINES[*]}; do
-            export MACHINE=$mach
+            export KUT_MACHINE=$mach
 
             j=0
             for accel in ${ACCELS[*]}; do
@@ -385,7 +448,9 @@ function runtest
                 rlRun "make standalone > /dev/null 2>&1"
                 # Prepare lists of tests to run
                 getTests
-                disableTests
+                if [[ "${NODISABLE}" == "NO" ]] ; then
+                    disableTests
+                fi
                 rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo][$accel] Running tests for ACCEL: $accel"
                 # Run tests
                 for test in ${ALL_TESTS[*]}; do rlRun "yes | $BINDIR/$test > $LOGDIR/${j}_${mach}_${repo}_${accel}_$test.log 2>&1" 0,2,77; done
