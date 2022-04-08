@@ -57,7 +57,11 @@ function randwrite_fio()
 function randread_fio()
 {
 	local node=0 filed value
-	TEST_DEV=$(lsblk | grep "/boot" | grep -oE "sda|sdb|vda|nvme0n1" | head -1)
+	TEST_DEV=$(lsblk | grep "/boot$" | grep -oE "sd[a-f]|vda|nvme0n1" | head -1)
+	if [ -z $TEST_DEV ]; then
+		rlRun "lsblk"
+		cki_abort_task "Didn't get the boot disk"
+	fi
 	FIO_PERF_FIELDS=("read iops")
 	field="${FIO_TERSE_FIELDS["$FIO_PERF_FIELDS"]}"
 	while [ $node -lt $nodes_num ]; do
