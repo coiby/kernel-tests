@@ -228,6 +228,11 @@ if grep -q CONFIG_CRC8=y /boot/config-$(uname -r); then
     sed -i 's/crc8/# \0/' modules.rhel9
 fi
 
+# likewise for c9s and CRYPTO_USER
+if grep -q CONFIG_CRYPTO_USER=y /boot/config-$(uname -r); then
+    sed -i 's/crypto_user/# \0/' modules.rhel9
+fi
+
 # run the test. For each module in the MODLIST file, try to load it, check
 # that it is there, then unload it and check lsmod again. All modules should
 # be loadable/unloadable for each arch without issue.
