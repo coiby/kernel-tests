@@ -190,7 +190,7 @@ do_bpf_test_progs_run()
 	for name in ${total_tests}; do
 		num=$(($num + 1))
 
-		check_skip "${item}:${name}" && check_result $num $total_num "${item}:${name}" $SKIP_CODE && continue
+		check_skip "${item}:${name}" && test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]" && continue
 
 		local OUTPUTFILE=$LOG_DIR/${item}_${name}.log
 		dmesg -C
@@ -253,7 +253,7 @@ do_tc-testing_run()
 	for name in ${total_tests}; do
 		num=$(($num + 1))
 
-		check_skip "${item}:${name}" && check_result $num $total_num "${item}:${name}" $SKIP_CODE && continue
+		check_skip "${item}:${name}" && test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]" && continue
 
 		local OUTPUTFILE=$LOG_DIR/$(echo ${name} | tr '/' '_').log
 

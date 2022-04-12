@@ -45,6 +45,9 @@ default none
 INCLUDE			Include any files with special variables or function definitions. e.g. "net.sh"
 default none
 
+DEBUG_CMD		Run debug commands after running each test case. i.e. at the end of each check_result().
+default none
+
 ### Usage
 
 The wrapper allows you to run your tests with four suites.
@@ -82,6 +85,8 @@ for _item in $TARGETS; do
         do_${_item}_run
     else
         <execute test(s)>
+        <run debug cmds>
+        <check results>
     fi
 
     if type do_${_item}_reset &>/dev/null; then

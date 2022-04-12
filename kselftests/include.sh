@@ -196,6 +196,11 @@ check_result()
 	local test_name=$3
 	local test_result=$4
 
+	if [ "${DEBUG_CMD}" ]; then
+		log "Following are DEBUG commands output"
+		run "${DEBUG_CMD}"
+	fi
+
 	if [ "$test_result" -eq 0 ]; then
 		test_pass "${num}..${total_num} selftests: ${test_name} [PASS]"
 	elif [ "$test_result" -eq $SKIP_CODE ]; then
