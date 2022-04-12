@@ -27,10 +27,33 @@ TEST=${RSTRNT_TASKNAME}
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh || exit 1
 
+function restore_swap()
+{
+        rlRun "modprobe -v zram"
+        rlRun "echo zstd > /sys/block/zram0/comp_algorithm"
+        rlRun "echo 4G > /sys/block/zram0/disksize"
+        rlRun "mkswap /dev/zram0"
+        rlRun "swapon /dev/zram0"
+        rlRun "lsblk"
+}
+
 function run_test()
 {
+        lsblk | grep zram
+        if [ $? == 0 ];then
+            rlLog "need remove swap frist"
+            swap_size=$(lsblk | grep zram0 | awk -F " " '{print $4}')
+            rlRun "swapoff /dev/zram0"
+            rlRun "echo 0 > /sys/class/zram-control/hot_remove"
+            rlRun "rmmod zram"
+            rlRun "lsblk"
+        else
+            rlLog "no zram device as swap,no need do setup"
+        fi
+
 ### create one zram device
         rlRun "modprobe zram num_devices=1"
+        sleep 3
 
 ### check and set zstd compression
         rlRun "cat /sys/block/zram0/comp_algorithm"
@@ -38,8 +61,8 @@ function run_test()
         rlRun "cat /sys/block/zram0/comp_algorithm"
 ### < *** the output must contain "[zstd]" here *** >
 
-### set max ram usage = 512 Mbytes
-        rlRun "echo 512M > /sys/block/zram0/disksize"
+### set max ram usage = 1GB
+        rlRun "echo 1G > /sys/block/zram0/disksize"
         rlRun "lsblk"
 
 ### write, read and test some data (/boot, for example)
@@ -65,8 +88,10 @@ function run_test()
 
 ### uncreate
         rlRun "umount /mnt/zram"
+        rlRun "rm -rf /mnt/zram/*"
         rlRun "rmdir /mnt/zram/"
         rlRun "rmmod zram"
+        [[ -z $swap_size ]] || restore_swap
 }
 
 function check_log()
