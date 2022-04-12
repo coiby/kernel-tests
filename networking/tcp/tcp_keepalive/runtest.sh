@@ -35,15 +35,23 @@ rlJournalStart
     rlPhaseStartSetup
        # workaround for bz1755825: stop firewalld
        if [ $(rlGetDistroRelease) -ge "7" ]; then
-           rlServiceStop firewalld
+           rlRun "systemctl stop firewalld"
+           rlRun "sleep 60" # continuous workaround for bz1755825: sleep for slow host(s390x) or debug kernel
+           rlRun "systemctl status firewalld" 1-255
        else
-           rlServiceStop iptables
-           rlServiceStop ip6tables
+           rlRun "service iptables stop"
+           rlRun "service ip6tables stop"
+           rlRun "sleep 60" # continuous workaround for bz1755825: sleep for slow host(s390x) or debug kernel
+           rlRun "chkconfig iptables off"
+           rlRun "chkconfig ip6tables off"
        fi
-       # continuousworkaround for bz1755825: sleep for slow host(s390x) or debug kernel
-       rlRun "sleep 30"
-       rlRun "iptables -F" 0-255
-       rlRun "ip6tables -F" 0-255
+       if which nft > /dev/null; then
+           rlRun "nft delete table inet filter" 0-255
+       else
+           rlRun "iptables -F" 0-255
+           rlRun "ip6tables -F" 0-255
+       fi
+       rlRun "sleep 10"
        # host
        rlRun "sys_ka_idle=$(cat /proc/sys/net/ipv4/tcp_keepalive_time)" 0
        rlRun "sys_ka_interval=$(cat /proc/sys/net/ipv4/tcp_keepalive_intvl)" 0
