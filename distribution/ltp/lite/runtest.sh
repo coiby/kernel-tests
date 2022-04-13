@@ -32,19 +32,6 @@ PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
 
 function ltp_test_build()
 {
-	download_ltp
-
-	#Patch-inc
-	echo "============ Patch patch-inc-tolerant ==============" | tee -a $OUTPUTFILE
-	patch-inc > patchinc.log 2>&1
-	cat patchinc.log | tee -a $OUTPUTFILE
-
-	echo "============ Patch ltp-lite test suite. ============" | tee -a $OUTPUTFILE
-	cki_is_baremetal
-	#Patching, if non-baremetal
-	if [ $? -ne 0 ]; then
-		patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
-	fi
 	cp -vf configs/RHELKT1LITE.${TESTVERSION} RHELKT1LITE
 	if [ $? -ne 0 ]; then
 		echo "FAIL: couldn't copy configs/RHELKT1LITE.${TESTVERSION}"
