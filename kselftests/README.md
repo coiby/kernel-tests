@@ -42,7 +42,10 @@ default none
 WAIVE_TARGETS 		List of selftests to waive. The same with SKIP_TARGETS. This list must be in test format "collection:test".
 default none
 
-INCLUDE			Include any files with special variables or function definitions.
+INCLUDE			Include any files with special variables or function definitions. e.g. "net.sh"
+default none
+
+DEBUG_CMD		Run debug commands after running each test case. i.e. at the end of each check_result().
 default none
 
 ### Usage
@@ -82,6 +85,8 @@ for _item in $TARGETS; do
         do_${_item}_run
     else
         <execute test(s)>
+        <run debug cmds>
+        <check results>
     fi
 
     if type do_${_item}_reset &>/dev/null; then
@@ -117,6 +122,7 @@ environment:
                 <param name="DELIVERED_TESTS" value="y" />
                 <param name="TEST_ITEMS" value="bpf net" />
                 <param name="SKIP_TARGETS" value="bpf:test_lwt_ip_encap.sh net:netdevice.sh" />
+                <param name="INCLUDE" value="net.sh" />
             </params>
     </task>
 ```
@@ -127,6 +133,7 @@ environment:
     DELIVERED_TESTS: y
     TEST_ITEMS: bp net
     SKIP_TARGETS: bpf:test_lwt_ip_encap.sh net:netdevice.sh
+    INCLUDE: net.sh
 ```
 
 2. Upstream Source
@@ -140,6 +147,7 @@ environment:
                 <param name="TEST_ITEMS" value="bpf net" />
                 <param name="BUILD_FROM_SRC" value="y" />
                 <param name="UPSTREAM_SOURCE_URL" value="https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/snapshot/linux-kselftest-fixes-5.14-rc6.tar.gz" />
+                <param name="INCLUDE" value="net.sh" />
             </params>
     </task>
 ```
@@ -151,6 +159,7 @@ environment:
     BUILD_FROM_SRC: y
     UPSTREAM_SOURCE_URL: https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/snapshot/linux-kselftest-fixes-5.14-rc6.tar.gz
     TEST_ITEMS: bpf net
+    INCLUDE: net.sh
 ```
 
 3. Downstream Source
@@ -162,6 +171,7 @@ environment:
             <params>
                 <param name="TEST_ITEMS" value="bpf net" />
                 <param name="BUILD_FROM_SRC" value="y" />
+                <param name="INCLUDE" value="net.sh" />
             </params>
     </task>
 ```
@@ -171,5 +181,6 @@ Corresponding tmt entry:
 environment:
     BUILD_FROM_SRC: y
     TEST_ITEMS: bpf net
+    INCLUDE: net.sh
 ```
 ****
