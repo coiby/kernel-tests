@@ -1,0 +1,11 @@
+[General]
+name=upt-smoke-tests/kernel_panic
+owner=Israel Santana <isantana@redhat.com>
+description=UPT smoke test with a kernel panic
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib
