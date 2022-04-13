@@ -15,7 +15,7 @@ TEST="rt-tests/rteval"
 # User Parameters
 DURATION=${DURATION:-900}
 LATCHECK=${LATCHECK:-1}
-MAXLAT=${MATLAT:-150}
+MAXLAT=${MAXLAT:-150}
 STDDEVLAT=${STDDEVLAT:-5}
 
 function RprtRslt ()
