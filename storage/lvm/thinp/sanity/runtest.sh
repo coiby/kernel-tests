@@ -31,7 +31,7 @@ function build_iozone
 	return 0
 }
 
-storage_path=/mnt/testarea
+storage_path=/var/tmp
 i=0
 ret=0
 
@@ -128,7 +128,12 @@ rcmd lvs
 for j in `seq 1 4`; do
 	rcmd lvcreate -V512M -T myvg/mythinpool -n thinvolume$j
 	rcmd mkdir -p /mnt/testmnt$j
-	rcmd mkfs.xfs -f /dev/mapper/myvg-thinvolume$j
+	# use noalign option to fix error: internal log size is too large
+	# mkfs.xfs has increased the minimum log size to 64MB in newer version
+	# This is causing an error when creating xfs on 512MB thinvol
+	# in case noalign option would cause some troubles(performance etc.),
+	# thinvol size has to be increased
+	rcmd mkfs.xfs -fd noalign /dev/mapper/myvg-thinvolume$j
 
 	rcmd mount /dev/mapper/myvg-thinvolume$j /mnt/testmnt$j
 	rcmd umount /mnt/testmnt$j
