@@ -151,6 +151,7 @@ function knownissue_filter()
 	# -------------------Common Issues ---------------------
 	# skip OOM tests on large boxes since it takes too long
 	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 8 ] && tskip "oom0.*" fatal
+	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 32 ] && tskip "ioctl_sg01" fatal
 	# this case always make the beaker task abort with 'incrementing stop' msg
 	tskip "min_free_kbytes" fatal
 	# msgctl10 -> keeps triggerring OOM...(Bug 1162965?), msgctl11 -> too many pids
