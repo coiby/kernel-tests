@@ -155,8 +155,8 @@ function knownissue_filter()
 	tskip "ftrace-stress-test" fatal
 	# Issue TBD
 	tskip "sync_file_range02" unfix
-	# https://github.com/linux-test-project/ltp/issues/718
-	(is_arch "aarch64" || is_arch "s390x" || is_arch "x86_64") && tskip "ioctl09" unfix
+	# https://gitlab.com/cki-project/kernel-tests/-/issues/536
+	tskip "ioctl09" unfix
 	# OOM tests result in oom errors killing the test harness
 	tskip "oom.*" fatal
 	# fs_fill test exceeds timeout, TBD adjust timeout settings
