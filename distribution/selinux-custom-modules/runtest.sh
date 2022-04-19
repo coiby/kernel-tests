@@ -16,6 +16,8 @@ rlJournalStart
         rlRun "sed -i '/-a task,never/d' /etc/audit/rules.d/audit.rules"
         rlRun "echo '-w /etc/shadow -p w' >> /etc/audit/rules.d/audit.rules"
         rlServiceStart auditd
+        # it looks like there is a bug with audit and -sv option doesn't work well with full audit
+        rlRun "sed -i 's/ -sv no//' /usr/share/restraint/plugins/report_result.d/10_avc_check"
     fi
 
     # https://gitlab.com/cki-project/kernel-tests/-/issues/528
