@@ -54,6 +54,10 @@ function ltp_test_build()
     if [ "$TESTVERSION"  == "20140422" ]; then
         cp -fv patches/20140422/run-tests.sh ${TARGET}/testcases/open_posix_testsuite/bin
     fi
+
+    if [ "$TESTVERSION"  == "20220121" ]; then
+        cp -vf patches/20220121/2-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/lio_listio/2-1.c
+    fi
 }
 
 
