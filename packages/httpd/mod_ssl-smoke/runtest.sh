@@ -85,11 +85,21 @@ rlJournalStart
 
         rlRun "rpm -q $MOD_SSL_RPM" && \
         rlRun "rpm -q --scripts $MOD_SSL_RPM| $PYTHON run_postinstall_script.py"
-        rlRun "rlServiceStart $httpHTTPD" && rlRun "rlServiceStop $httpHTTPD" ||\
-            (
+        certFile="/etc/pki/tls/certs/localhost.crt"
+        rlRun "rlServiceStart $httpHTTPD" 0 "starting httpd service"
+        resstart=$?
+        # cert file created at the first start of httpd, and not empty
+        if [ ! -f "$certFile" ] || [ ! -s "$certFile" ]; then
+            rlFileRestore --namespace mod_ssl_smoke
+            cki_abort_task "Aborting task due on missing or empty $certFile certification"
+        fi
+
+        rlRun "rlServiceStop $httpHTTPD" 0 "stopping httpd service"
+        resstop=$?
+        if  [[ "$resstart" -ne 0 ]] || [[ "$resstop" -ne 0 ]] ; then
             cat $httpLOGDIR/error_log
             rlFileSubmit $httpLOGDIR/error_log
-            )
+        fi
     rlPhaseEnd
 
     rlPhaseStartCleanup
