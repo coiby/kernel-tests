@@ -228,9 +228,12 @@ if grep -q CONFIG_CRC8=y /boot/config-$(uname -r); then
     sed -i 's/crc8/# \0/' modules.rhel9
 fi
 
-# likewise for c9s and CRYPTO_USER
+# likewise for c9s and CRYPTO_USER and CRYPTO_SHA512_SSSE3
 if grep -q CONFIG_CRYPTO_USER=y /boot/config-$(uname -r); then
     sed -i 's/crypto_user/# \0/' modules.rhel9
+fi
+if grep -q CONFIG_CRYPTO_SHA512_SSSE3=y /boot/config-$(uname -r); then
+    sed -i 's/sha512-ssse3/# \0/' modules.rhel9
 fi
 
 # run the test. For each module in the MODLIST file, try to load it, check
