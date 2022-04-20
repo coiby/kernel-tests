@@ -1,0 +1,12 @@
+[General]
+name=storage/swraid/scsi_raid
+owner=Changhui Zhong <czhong@redhat.com>
+description=test for scsi raid
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=lvm2
+repoRequires=cki_lib
