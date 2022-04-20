@@ -1,0 +1,57 @@
+From 46ce4dcc97e862cbf009acf414059517e3cd258a Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Mon, 11 Apr 2022 17:40:19 +0800
+Subject: [PATCH] fsync02: multiply the timediff if test in VM
+
+Similar to 59e73f2 ("clock_gettime04: multiply the
+timediff if test in VM"), extend tolerance for this test too.
+
+  fsync02.c:93: TFAIL: fsync took too long: 167.000000 seconds;
+                max_block: 17768; data_blocks: 2287
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Acked-by: Petr Vorel <pvorel@suse.cz>
+---
+ testcases/kernel/syscalls/fsync/fsync02.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/fsync/fsync02.c b/testcases/kernel/syscalls/fsync/fsync02.c
+index fcdc14f89f..e13ba89f1b 100644
+--- a/testcases/kernel/syscalls/fsync/fsync02.c
++++ b/testcases/kernel/syscalls/fsync/fsync02.c
+@@ -21,13 +21,13 @@
+ 
+ #define BLOCKSIZE 8192
+ #define MAXBLKS 65536
+-#define TIME_LIMIT 120
+ #define BUF_SIZE 2048
+ 
+ char tempfile[40] = "";
+ char pbuf[BUF_SIZE];
+ int fd;
+ off_t max_blks = MAXBLKS;
++int time_limit = 120;
+ 
+ struct statvfs stat_buf;
+ 
+@@ -35,6 +35,11 @@ static void setup(void) {
+ 	/* free blocks avail to non-superuser */
+ 	unsigned long f_bavail;
+ 
++	if (tst_is_virt(VIRT_ANY)) {
++		tst_res(TINFO, "Running in a VM, multiply the time_limit by 2");
++		time_limit *= 2;
++	}
++
+ 	fd = SAFE_OPEN("tempfile", O_RDWR | O_CREAT | O_TRUNC, 0777);
+ 
+ 	if (fstatvfs(fd, &stat_buf) != 0) {
+@@ -89,7 +94,7 @@ static void run(void) {
+ 		"timer broken end %ld < start %ld",
+ 		time_end, time_start);
+ 	} else if ((time_delta =
+-		difftime(time_end, time_start)) > TIME_LIMIT) {
++		difftime(time_end, time_start)) > time_limit) {
+ 		tst_res(TFAIL,
+ 		"fsync took too long: %lf seconds; "
+ 		"max_block: %d; data_blocks: %d",
