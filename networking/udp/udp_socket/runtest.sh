@@ -45,10 +45,13 @@ rlJournalStart
 	rlRun "gcc -g -Wall -o UDP_CORK UDP_CORK.c"
     rlPhaseEnd
 
-    rlPhaseStartTest "UDP_CORK option test"
-		rlRun "./UDP_CORK -4" 0 "Start UDP_CORK IPv4 Test"
-		rlRun "./UDP_CORK -6" 0 "Start UDP_CORK IPv6 Test"
-    rlPhaseEnd
+	# https://bugzilla.redhat.com/show_bug.cgi?id=2025863
+	if rlIsRHEL '>=8.6'; then
+		rlPhaseStartTest "UDP_CORK option test"
+			rlRun "./UDP_CORK -4" 0 "Start UDP_CORK IPv4 Test"
+			rlRun "./UDP_CORK -6" 0 "Start UDP_CORK IPv6 Test"
+		rlPhaseEnd
+	fi
 
     rlPhaseStartTest "udp socket option set/get test. & Regression test for Bug 518034"
 		rlRun "./udp_socket" 0 "Start Test"
