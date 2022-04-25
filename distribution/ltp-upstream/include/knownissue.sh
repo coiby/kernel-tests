@@ -117,6 +117,9 @@ function tskip()
 # - osver_in_range "600" "99999" -> PROBLEM, will be excluded forever
 function knownissue_filter()
 {
+	# https://gitlab.com/cki-project/kernel-tests/-/issues/1052#note_922133965
+	# + https://lists.linux.it/pipermail/ltp/2022-March/028110.html
+	tskip "waitid10" unfix
 	# https://gitlab.com/cki-project/kernel-tests/-/issues/797
 	# + https://github.com/linux-test-project/ltp/commit/ba50e6f93c944617cb4c94bf20a597b204dc275c
 	kernel_in_range "4.14.0" "5.15.0" && tskip "finit_module02" unfix
