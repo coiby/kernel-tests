@@ -29,24 +29,24 @@ function create_raid()
                 raid0)
                         rlRun "lvcreate --type raid0 --stripesize 64k -i 3 \
                                 -n non_synced_primary_raid_3legs_1 -L 1G \
-                                black_bird /dev/loop0:0-300 /dev/loop1:0-300 \
-                                /dev/loop2:0-300 /dev/loop3:0-300"
+                                black_bird $dev0:0-300 $dev1:0-300 \
+                                $dev2:0-300 $dev3:0-300"
                         ;;
                 raid1)
                         rlRun "lvcreate --type raid1 -m 3 -n non_synced_primary_raid_3legs_1 \
-                                -L 1G black_bird /dev/loop0:0-300 /dev/loop1:0-300 \
-                                /dev/loop2:0-300 /dev/loop3:0-300"
+                                -L 1G black_bird $dev0:0-300 $dev1:0-300 \
+                                $dev2:0-300 $dev3:0-300"
                         ;;
                 raid5)
                         rlRun "lvcreate --type raid5 -i 3 -n non_synced_primary_raid_3legs_1 \
-                                -L 1G black_bird /dev/loop0:0-300 /dev/loop1:0-300 \
-                                /dev/loop2:0-300 /dev/loop3:0-300"
+                                -L 1G black_bird $dev0:0-300 $dev1:0-300 \
+                                $dev2:0-300 $dev3:0-300"
                         ;;
                 raid10)
                         rlRun "lvcreate --type raid10 -i 2 -m 1 \
                                 -n non_synced_primary_raid_3legs_1 -L 1G black_bird \
-                                /dev/loop0:0-300 /dev/loop1:0-300 /dev/loop2:0-300 \
-                                /dev/loop3:0-300"
+                                $dev0:0-300 $dev1:0-300 $dev2:0-300 \
+                                $dev3:0-300"
         esac
 }
 
@@ -54,14 +54,18 @@ function run_test()
 {
         for i in {0..3};do
             rlRun "dd if=/dev/zero bs=1M count=2000 of=file$i.img"
-            rlRun "losetup -fP file$i.img"
             sleep 1
-            rlRun "mkfs -t xfs -f /dev/loop$i"
+            device=$(rlRun -l "losetup -fP --show file$i.img")
+            devices+=" $device"
+            eval "dev$i=$device"
+            sleep 1
+            rlRun "mkfs -t xfs -f $device"
             rlRun "lsblk"
         done
 
-        rlRun "pvcreate -y /dev/{loop0,loop1,loop2,loop3}"
-        rlRun "vgcreate  black_bird /dev/{loop0,loop1,loop2,loop3}"
+        rlLog "dev list: $dev0 ,$dev1 ,$dev2 ,$dev3"
+        rlRun "pvcreate -y $devices"
+        rlRun "vgcreate  black_bird $devices"
         rlRun "pvdisplay"
         rlRun "vgdisplay"
 
@@ -74,8 +78,8 @@ function run_test()
         done
 
         rlRun "vgremove black_bird"
-        rlRun "pvremove /dev/{loop0,loop1,loop2,loop3}"
-        rlRun "losetup -d /dev/{loop0,loop1,loop2,loop3}"
+        rlRun "pvremove $devices"
+        rlRun "losetup -d $devices"
         rlRun "rm -rf file*"
         rlRun "lsblk"
 }

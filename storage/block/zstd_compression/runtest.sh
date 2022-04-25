@@ -71,12 +71,12 @@ function run_test()
         rlRun "mount -o relatime,noexec,nosuid /dev/zram0 /mnt/zram"
         rlRun "mount | grep zram"
         rlRun "lsblk"
-        rlRun "cp -rp /boot /mnt/zram"
+        rlRun "cp -rp /root /mnt/zram"
         rlRun "umount /mnt/zram"
         rlRun "echo 3 > /proc/sys/vm/drop_caches"
 
         rlRun "mount -o relatime,noexec,nosuid /dev/zram0 /mnt/zram"
-        rlRun "diff -rp /boot /mnt/zram/boot"
+        rlRun "diff -rp /root /mnt/zram/root"
 ### < *** must be no output here *** >
 
 ### get funny stats
