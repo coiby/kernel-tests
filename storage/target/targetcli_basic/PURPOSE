@@ -1,0 +1,28 @@
+PURPOSE of /kernel/storage/target/targetcli_basic
+
+DESCRIPTION: Testing various functions of targetcli including use of supported backstore types or CHAP authentication
+Runtime is <5 minutes
+
+   Test name: targetcli/cli/saveconfig_backup
+  Setup name: targetcli/setup/create_loopdev
+  Setup name: targetcli/setup/create_block
+   Test name: targetcli/cli/block_attributes
+  Setup name: targetcli/setup/stop_multipath
+  Setup name: targetcli/setup/create_fileio
+  Setup name: targetcli/setup/create_loopback
+   Test name: targetcli/cli/create_pscsi
+  Setup name: targetcli/setup/create_fileio_1g
+  Setup name: targetcli/setup/create_fileio_target
+   Test name: targetcli/cli/iscsi_fileio_lun_stress
+  Setup name: targetcli/setup/configure_chap
+   Test name: targetcli/cli/iscsi_chap
+  Setup name: targetcli/setup/configure_chap_2ways
+   Test name: targetcli/cli/iscsi_chap_2way
+  Setup name: targetcli/setup/configure_chap_2ways_random
+   Test name: targetcli/cli/iscsi_chap_2way_random
+  Setup name: targetcli/setup/configure_chap_random
+   Test name: targetcli/cli/iscsi_chap_random
+  Setup name: targetcli/setup/create_fileio
+   Test name: targetcli/cli/fileio_attributes
+  Setup name: targetcli/setup/create_ramdisk
+   Test name: targetcli/cli/ramdisk_attributes
