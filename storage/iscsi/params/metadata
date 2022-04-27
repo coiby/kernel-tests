@@ -1,6 +1,6 @@
 [General]
 name=storage/iscsi/params
-owner=Filip Suba <fsuba@redhat.com>
+owner=Martin Hoyer <mhoyer@redhat.com>
 description=iSCSI parameters test
 license=GPLv2
 confidential=no
@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=augeas;git;python3;wget
-softDependencies=python-devel;python3-devel;platform-python-devel
+dependencies=python3-pip;augeas-libs;
+softDependencies=python3-augeas;python3-netifaces
 repoRequires=cki_lib;storage/include
