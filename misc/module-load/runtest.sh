@@ -236,6 +236,21 @@ if grep -q CONFIG_CRYPTO_SHA512_SSSE3=y /boot/config-$(uname -r); then
     sed -i 's/sha512-ssse3/# \0/' modules.rhel9
 fi
 
+# skip blocked modules
+for x in $(grep -o -w 'module_blacklist=[^[:space:]]*' /proc/cmdline |
+           awk -F= '{print $2}' | tr ',' ' ') \
+         $(grep -h ^blacklist /etc/modprobe.d/* | awk '{print $2}')
+do
+    for y in modules.* ; do
+        sed -i "s/$x/# \0/" $y
+        # remove dependencies too
+        for z in $(awk -F: "/$x\.[^/[:space:]]*/ {print \$1}" \
+                       /lib/modules/$(uname -r)/modules.dep) ; do
+            sed -i "s/$(basename $z .ko.xz)/# \0/" $y
+        done
+    done
+done
+
 # run the test. For each module in the MODLIST file, try to load it, check
 # that it is there, then unload it and check lsmod again. All modules should
 # be loadable/unloadable for each arch without issue.
