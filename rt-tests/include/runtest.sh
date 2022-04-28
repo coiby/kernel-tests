@@ -8,7 +8,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Source beaker environment
-. ../../cki_lib/libcki.sh || exit 1
+. $(dirname $(readlink -f $BASH_SOURCE))/../../cki_lib/libcki.sh || exit 1
 
 export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 
