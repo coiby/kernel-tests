@@ -27,13 +27,10 @@ function runtest
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }
 
-# stqe_init_fwroot will abort the task if fails to run
-stqe_init_fwroot
+# stqe_init will abort the task if fails to run
+stqe_init
 
 runtest
 rc=$?
-
-# do some cleanup
-stqe_fini_fwroot
 
 exit $rc

@@ -1,13 +1,13 @@
 [General]
-name=storage/iscsi/params
+name=storage/target/targetcli_basic
 owner=Martin Hoyer <mhoyer@redhat.com>
-description=iSCSI parameters test
+description=Testing various functions of targetcli including use of supported backstore types or CHAP authentication
 license=GPLv2
 confidential=no
 destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=python3-pip;augeas-libs;
+dependencies=augeas-libs;python3-pip;wget;git
 softDependencies=python3-augeas;python3-netifaces
 repoRequires=cki_lib;storage/include

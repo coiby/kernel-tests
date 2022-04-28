@@ -20,66 +20,52 @@
 FILE=$(readlink -f $BASH_SOURCE)
 CDIR=$(dirname $FILE)
 
-# Include enviroment and libraries
+# Include environment and libraries
 source $CDIR/../../cki_lib/libcki.sh || \
     cki_abort_task "fail to include libcki.sh"
 
-STQE_GIT="https://gitlab.com/rh-kernel-stqe/python-stqe.git"
 # Test parameters to use some specific version of stqe tests or libsan library
-STQE_COMMIT=${STQE_COMMIT:-""}
+STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-""}
 LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-""}
 
-function stqe_get_fwroot
+function stqe_init
 {
-    typeset fwroot="/var/tmp/$(basename $STQE_GIT | sed 's/.git//')"
-    echo $fwroot
-}
-
-function stqe_init_fwroot
-{
-    # clone the framework
-    typeset fwroot=$(stqe_get_fwroot)
-    cki_run "rm -rf $fwroot"
-    cki_run "git clone $STQE_GIT $fwroot" || \
-        cki_abort_task "fail to clone $STQE_GIT"
-
-    # install the framework
-    pushd $fwroot
-
-    typeset python="python3"
+    typeset pip="python3 -m pip"
     typeset pkg_mgr=$(dnf > /dev/null 2>&1 && echo dnf || echo yum)
-    if ! $python -V > /dev/null 2>&1; then
-        cki_run "$pkg_mgr install -y python3" || \
-            cki_run "$pkg_mgr install -y python36"
-        cki_run "$python -V > /dev/null 2>&1" || \
-            cki_abort_task "FAIL: Could not install python3!"
+
+    # augeas-libs needed for RHEL-7, netifaces needed for aarch64
+    cki_run "$pkg_mgr install -y --skip-broken python3-pip python3-augeas augeas-libs python3-netifaces" || \
+        cki_abort_task "FAIL: Could not install framework dependencies"
+    # ppc64, ppc64le, and s390x need to compile some python modules for now
+    if [[ $ARCH == 'ppc64' || $ARCH == 'ppc64le' || $ARCH == 's390x' ]]; then
+      cki_run "$pkg_mgr install -y gcc cmake openssl-devel python3-devel libffi-devel zlib-devel" || \
+          cki_abort_task "FAIL: Could not install framework dependencies"
     fi
 
-    if [[ -n $STQE_COMMIT ]]; then
-        cki_run "git checkout $STQE_COMMIT" || \
-            cki_abort_task "fail to checkout $STQE_COMMIT"
+    # Check if we have pip>=20, install 20.3 if not
+    if [[ $($pip -V | cut -f 2 -d ' ' | cut -f 1 -d '.') -lt 20 ]]; then
+        cki_run "$pip install -U pip==20.3" || \
+            cki_abort_task "FAIL: Could not install pip==20.3!"
+    fi
+
+    # Workaround for python-augeas compiling bug on RHEL-7 ppc64le
+    if [[ $ARCH == 'ppc64le' ]]; then
+        cki_run "$pip install cffi --no-binary=cffi" || \
+            cki_abort_task "FAIL: Could not install cffi from source on ppc64le RHEL-7"
     fi
 
     if [[ -n $LIBSAN_STABLE_VERSION ]]; then
-        typeset pip_cmd="$python -m pip install -U pip==19"
-        cki_run "$pip_cmd libsan==$LIBSAN_STABLE_VERSION" || \
-            cki_abort_task "fail to install libsan==$LIBSAN_STABLE_VERSION"
+        cki_run "$pip libsan==$LIBSAN_STABLE_VERSION" || \
+            cki_abort_task "Fail to install libsan==$LIBSAN_STABLE_VERSION"
     fi
 
-    # install required packages
-    cki_run "bash env_setup.sh" || \
-        cki_abort_task "fail to test framework dependencies"
-
-    cki_run "$python -m pip install ." || \
-        cki_abort_task "fail to install test framework"
-
-    popd
+    if [[ -n $STQE_STABLE_VERSION ]]; then
+        cki_run "$pip install stqe==$STQE_STABLE_VERSION" || \
+            cki_abort_task "Fail to install stqe==$STQE_STABLE_VERSION"
+    else
+        cki_run "$pip install stqe" || \
+            cki_abort_task "Fail to install stqe"
+    fi
 
     return 0
-}
-
-function stqe_fini_fwroot
-{
-    typeset fwroot=$(stqe_get_fwroot)
-    cki_run "rm -rf $fwroot"
 }
