@@ -121,6 +121,8 @@ do_net_reset()
 	# for test fib-onlink-tests.sh we'd better restore default IPv6 route
 	ip -6 route restore < default_ipv6.route
 	popd
+
+	reset_net_env
 }
 
 do_net_forwarding_config()
@@ -155,10 +157,25 @@ do_net_forwarding_reset()
 	reset_net_env
 }
 
+do_net_mptcp_reset()
+{
+	reset_net_env
+}
+
 do_netfilter_config()
 {
 	which conntrack || dnf install -q -y conntrack-tools
 	install_sendip
+}
+
+do_netfilter_reset()
+{
+	reset_net_env
+}
+
+do_bpf_reset()
+{
+	reset_net_env
 }
 
 do_bpf_test_progs_config()
@@ -218,6 +235,7 @@ do_bpf_test_progs_reset()
 	# after testing completes, turn mmap_low_allowed off again
 	echo "=== Setting mmap_low_allowed off ===" | tee -a $OUTPUTFILE
 	setsebool -P mmap_low_allowed off
+	reset_net_env
 }
 
 do_tc-testing_config()
