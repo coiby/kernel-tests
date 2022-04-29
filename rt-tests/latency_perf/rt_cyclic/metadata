@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/latency_perf/rt_cyclic
+owner=Waylon Cude <wcude@redhat.com>
+description="rt cyclictest for latency performance evaluate"
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+repoRequires=cki_lib;rt-tests/include
+max_time=1h
+use_pty=false
