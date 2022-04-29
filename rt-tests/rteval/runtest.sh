@@ -81,8 +81,6 @@ function RunTest ()
             rstrnt-report-log -l $rep
         done
 
-    rstrnt-report-log rteval-????????-*.tar.bz2
-
     if [ ${retcode} -eq 0 ] ; then
         echo "rteval Passed: " | tee -a $OUTPUTFILE
         result_r="PASS"
