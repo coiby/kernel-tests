@@ -10,6 +10,9 @@
 
 # Set CKI test environment
 if [ -z "$OUTPUTFILE" ]; then
+    if ! [ -d '/mmt/testarea' ]; then
+        mkdir /mnt/testarea/
+    fi
     OUTPUTFILE=$(mktemp /mnt/testarea/tmp.XXXXXX)
     export OUTPUTFILE
 fi
