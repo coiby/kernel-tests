@@ -188,6 +188,8 @@ rlPhaseStartSetup
          fi
 
     fi
+
+    getsebool selinuxuser_execmod >/dev/null 2>&1 && setsebool selinuxuser_execmod on
 rlPhaseEnd
 
 rlPhaseStartTest
@@ -224,6 +226,7 @@ rlPhaseStartCleanup
         fi
     fi
 
+    getsebool selinuxuser_execmod >/dev/null 2>&1 && setsebool selinuxuser_execmod off
 rlPhaseEnd
 
 rlJournalPrintText
