@@ -73,7 +73,7 @@ function RunTest ()
 
     # Lets rock'n'roll
     rteval --duration=$DURATION -D -L | tee -a $OUTPUTFILE
-    retcode="$?"
+    retcode="${PIPESTATUS[0]}"
 
     find . -maxdepth 1 -name "rteval-????????-*.tar.bz2" -print |
         while IFS= read -r rep; do
