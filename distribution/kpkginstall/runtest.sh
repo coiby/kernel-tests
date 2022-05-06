@@ -473,7 +473,7 @@ else
 
   # Did we get the right kernel running after reboot?
   if [[ ! " ${valid_kernel_versions[*]} " == *" ${ckver} "* ]]; then
-    cki_abort_recipe "Kernel version after reboot (${ckver}) does not match expected version strings!" WARN
+    cki_abort_recipe "Kernel version after reboot (${ckver}) does not match expected version strings!" FAIL
   fi
 
   cki_print_success "Found the correct kernel version running!"
