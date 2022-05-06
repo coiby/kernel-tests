@@ -83,6 +83,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-clock_gettime04-set-threshold-based-on-the-clock-res.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-pread02-extend-buffer-to-avoid-glibc-overfl.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-fsync02-multiply-the-timediff-if-test-in-VM.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-clock_gettime03-multiply-the-timediff-if-test-in-VM.patch
     fi
 
     if [ "$TESTVERSION" == "20210927" ]; then
