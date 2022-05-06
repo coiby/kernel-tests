@@ -32,6 +32,10 @@ PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
 
 function ltp_test_build()
 {
+	if [ -f ${LTPDIR}/runltp ]; then
+		echo "LTP has been built and installed!"
+		return
+	fi
 	cp -vf configs/RHELKT1LITE.${TESTVERSION} RHELKT1LITE
 	if [ $? -ne 0 ]; then
 		echo "FAIL: couldn't copy configs/RHELKT1LITE.${TESTVERSION}"
