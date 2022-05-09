@@ -1,0 +1,57 @@
+From 3afa25abe7c2b8dab6ad6f000c20901b9eb77753 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 27 Jan 2022 11:09:00 +0100
+Subject: [PATCH] clock_gettime03: multiply the timediff if test in VM
+
+Similar to 59e73f295dc7 ("clock_gettime04: multiply the
+timediff if test in VM"), extend tolerance for this test too.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ .../kernel/syscalls/clock_gettime/clock_gettime03.c    | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/clock_gettime/clock_gettime03.c b/testcases/kernel/syscalls/clock_gettime/clock_gettime03.c
+index 83e97d9072..f185977d36 100644
+--- a/testcases/kernel/syscalls/clock_gettime/clock_gettime03.c
++++ b/testcases/kernel/syscalls/clock_gettime/clock_gettime03.c
+@@ -37,6 +37,7 @@ static struct tcase {
+ 
+ static struct tst_ts now, then, parent_then;
+ static int parent_ns;
++static long long delta = 10;
+ 
+ static struct time64_variants variants[] = {
+ 	{ .clock_gettime = libc_clock_gettime, .ts_type = TST_LIBC_TIMESPEC, .desc = "vDSO or syscall with libc spec"},
+@@ -70,7 +71,7 @@ static void child(struct time64_variants *tv, struct tcase *tc)
+ 
+ 	diff = tst_ts_diff_ms(then, now);
+ 
+-	if (diff - tc->off * 1000 > 10) {
++	if (diff - tc->off * 1000 > delta) {
+ 		tst_res(TFAIL, "Wrong offset (%s) read %llims",
+ 		        tst_clock_name(tc->clk_id), diff);
+ 	} else {
+@@ -80,7 +81,7 @@ static void child(struct time64_variants *tv, struct tcase *tc)
+ 
+ 	diff = tst_ts_diff_ms(parent_then, now);
+ 
+-	if (diff > 10) {
++	if (diff > delta) {
+ 		tst_res(TFAIL, "Wrong offset (%s) read %llims",
+ 		        tst_clock_name(tc->clk_id), diff);
+ 	} else {
+@@ -113,6 +114,11 @@ static void setup(void)
+ {
+ 	struct time64_variants *tv = &variants[tst_variant];
+ 
++	if (tst_is_virt(VIRT_ANY)) {
++		tst_res(TINFO, "Running in a VM, multiply the delta by 10.");
++		delta *= 10;
++	}
++
+ 	now.type = then.type = parent_then.type = tv->ts_type;
+ 	tst_res(TINFO, "Testing variant: %s", variants[tst_variant].desc);
+ 	parent_ns = SAFE_OPEN("/proc/self/ns/time_for_children", O_RDONLY);
