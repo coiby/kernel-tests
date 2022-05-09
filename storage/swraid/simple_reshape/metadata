@@ -1,0 +1,12 @@
+[General]
+name=storage/swraid/simple_reshape
+owner=Fine Fan<ffan@redhat.com>
+description=Check mdadm simple reshape function
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=mdadm
+repoRequires=cki_lib
