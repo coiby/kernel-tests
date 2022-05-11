@@ -28,10 +28,17 @@ fi
 core_pattern="$(cat /proc/sys/kernel/core_pattern)"
 core_pattern_ltp_dir="/mnt/testarea/ltp/cores"
 
+# RHELKT1LITE is the default set of tests to run for RHEL builds
+RUNTEST=${RUNTEST:-"RHELKT1LITE"}
+
 PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
 
 function ltp_test_build()
 {
+	if [ -f ${LTPDIR}/runltp ]; then
+		echo "LTP has been built and installed!"
+		return
+	fi
 	cp -vf configs/RHELKT1LITE.${TESTVERSION} RHELKT1LITE
 	if [ $? -ne 0 ]; then
 		echo "FAIL: couldn't copy configs/RHELKT1LITE.${TESTVERSION}"
@@ -123,27 +130,40 @@ function exclude_disruptive_for_kt1()
 
 function runtest_prepare()
 {
+	# Doesn't matter the RUNTEST save logs with same name
+	# to make easier triaging issues
 	t="RHELKT1LITE.FILTERED"
-	cp -f RHELKT1LITE "$t"
+	local runtest_path=$LTPDIR/runtest
+	local runtest=$runtest_path/$t
+	if [[ ${RUNTEST} == "RHELKT1LITE" ]]; then
+		cp -f RHELKT1LITE "$runtest"
+	else
+		echo "Using ${RUNTEST} as base for $runtest"
+		# get the test names used on defined on $RUNTEST
+		local tests=$(cat $runtest_path/${RUNTEST} | grep -vE "^#|^$" | awk '{print$1}')
+		rm -f "$runtest"
+		# from the possible tests, only uses tests configured/enabled on RHELKT1LITE
+		for test in $tests; do
+			grep "^$test" RHELKT1LITE >> "$runtest"
+		done
+	fi
 
 	case $SKIP_LEVEL in
 	   "0")
-		knownissue_exclude  "none"  "$t"
+		knownissue_exclude  "none"  "$runtest"
 		;;
 	   "1")
-		knownissue_exclude  "fatal" "$t"
+		knownissue_exclude  "fatal" "$runtest"
 		;;
 	     *)
 		# skip all the issues by default
-		knownissue_exclude  "all"   "$t"
+		knownissue_exclude  "all"   "$runtest"
 		;;
 	esac
 
-	tolerate_s390_high_steal_time "$t"
+	tolerate_s390_high_steal_time "$runtest"
 
-	exclude_disruptive_for_kt1 "$t"
-
-	cp -fv "$t" $LTPDIR/runtest/
+	exclude_disruptive_for_kt1 "$runtest"
 }
 
 function ltp_lite_begin()
