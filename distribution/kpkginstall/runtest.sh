@@ -317,6 +317,14 @@ function rpm_install()
     fi
   fi
 
+  if [[ ${PACKAGE_NAME} =~ "kernel-rt" ]]; then
+    if $YUM install -y "/usr/sbin/kernel-is-rt" > /dev/null; then
+      cki_print_success "Installed /usr/sbin/kernel-is-rt successfully"
+    else
+      cki_print_warning "No package for /usr/sbin/kernel-is-rt found, skipping!"
+    fi
+  fi
+
   # The package was renamed (and temporarily aliased) in Fedora/RHEL"
   if $YUM search kernel-firmware | grep "^kernel-firmware\.noarch" ; then
     FIRMWARE_PKG=kernel-firmware
