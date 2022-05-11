@@ -29,7 +29,7 @@ core_pattern="$(cat /proc/sys/kernel/core_pattern)"
 core_pattern_ltp_dir="/mnt/testarea/ltp/cores"
 
 # RHELKT1LITE is the default set of tests to run for RHEL builds
-RUNTEST=${RUNTEST:-"RHELKT1LITE"}
+RUNTESTS=${RUNTESTS:-""}
 
 PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
 
@@ -135,17 +135,28 @@ function runtest_prepare()
 	t="RHELKT1LITE.FILTERED"
 	local runtest_path=$LTPDIR/runtest
 	local runtest=$runtest_path/$t
-	if [[ ${RUNTEST} == "RHELKT1LITE" ]]; then
+	if [[ -z "${RUNTESTS}"  ]]; then
 		cp -f RHELKT1LITE "$runtest"
 	else
-		echo "Using ${RUNTEST} as base for $runtest"
-		# get the test names used on defined on $RUNTEST
-		local tests=$(cat $runtest_path/${RUNTEST} | grep -vE "^#|^$" | awk '{print$1}')
 		rm -f "$runtest"
-		# from the possible tests, only uses tests configured/enabled on RHELKT1LITE
-		for test in $tests; do
-			grep "^$test" RHELKT1LITE >> "$runtest"
+		for RUNTEST in ${RUNTESTS}; do
+			echo "Using ${RUNTEST} as base for $runtest"
+			# get the test names used on defined on $RUNTEST
+			if [[ ! -e $runtest_path/${RUNTEST} ]]; then
+				echo "skipping runtest ${RUNTEST}, because it doesn't exist"
+				continue
+			fi
+			local tests=$(cat $runtest_path/${RUNTEST} | grep -vE "^#|^$" | awk '{print$1}')
+			# from the possible tests, only uses tests configured/enabled on RHELKT1LITE
+			for test in $tests; do
+				grep "^$test\>" RHELKT1LITE >> "$runtest"
+			done
 		done
+		if [ ! -s $runtest ]; then
+			echo "skipping as no test is available for '${RUNTESTS}'"
+			rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
+			exit 0
+		fi
 	fi
 
 	case $SKIP_LEVEL in
