@@ -60,12 +60,13 @@ function stqe_init
     fi
 
     if [[ -n $STQE_STABLE_VERSION ]]; then
-        cki_run "$pip install stqe==$STQE_STABLE_VERSION" || \
+        cki_run "$pip install stqe==$STQE_STABLE_VERSION --no-binary=stqe" || \
             cki_abort_task "Fail to install stqe==$STQE_STABLE_VERSION"
     else
-        cki_run "$pip install stqe" || \
+        cki_run "$pip install stqe --no-binary=stqe" || \
             cki_abort_task "Fail to install stqe"
     fi
 
     return 0
 }
+
