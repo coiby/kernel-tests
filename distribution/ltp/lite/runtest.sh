@@ -35,17 +35,18 @@ PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
 
 function ltp_test_build()
 {
-	if [ -f ${LTPDIR}/runltp ]; then
-		echo "LTP has been built and installed!"
-		return
-	fi
 	cp -vf configs/RHELKT1LITE.${TESTVERSION} RHELKT1LITE
 	if [ $? -ne 0 ]; then
 		echo "FAIL: couldn't copy configs/RHELKT1LITE.${TESTVERSION}"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 	fi
-
+	# The test could be running on different path
+	# Just skip the build, but make sure the config is copied
+	if [ -f ${LTPDIR}/runltp ]; then
+		echo "LTP has been built and installed!"
+		return
+	fi
 
 	build-all
 }
