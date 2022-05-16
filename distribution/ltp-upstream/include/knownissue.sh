@@ -186,6 +186,8 @@ function knownissue_filter()
 	tskip "netns_breakns_ip_ipv6_netlink netns_breakns_ns_exec_ipv6_netlink" unfix
 	# Bug 1912670 - semctl SEM_STAT_ANY fails to pass the buffer specified by the caller to the kernel
 	tskip "semctl09" unfix
+	# https://gitlab.com/cki-project/kernel-tests/-/issues/563#note_658789326
+	tskip "mkswap01" unfix
 
 	if is_rhel8; then
                 # ------- unfix ---------
