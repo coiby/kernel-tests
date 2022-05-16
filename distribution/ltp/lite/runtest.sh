@@ -44,7 +44,7 @@ function ltp_test_build()
 	# The test could be running on different path
 	# Just skip the build, but make sure the config is copied
 	if [ -f ${LTPDIR}/runltp ]; then
-		echo "LTP has been built and installed!"
+		echo "LTP has been built and installed at ${LTPDIR}/runltp !"
 		return
 	fi
 

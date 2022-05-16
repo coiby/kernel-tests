@@ -238,9 +238,11 @@ build-all()
     echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
     timeout 20m ${MAKE} -C ${TARGET} all &> buildlog.txt
     if [ $? -eq 124 ]; then
+        echo "Cleaning up ${TARGET_DIR}"
         rm -rf ${TARGET_DIR}
         rstrnt-report-result "build-all build timeout" WARN/ABORTED
         rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        exit 1
     fi
     res="PASSED"
     if [ $? -ne 0 ]; then
