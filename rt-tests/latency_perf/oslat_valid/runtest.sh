@@ -34,7 +34,14 @@ function runtest()
     if [ $rhel_major -ge 9 ]; then
         dnf install -y realtime-tests stalld
     else
-        dnf install -y rt-tests stalld
+        dnf install -y rt-tests 
+        dnf install -y stalld
+        if [ $? -ne 0 ] ; then
+            echo "Unable to install stalld, RHEL version likely too low" | tee -a $OUTPUTFILE
+            rstrnt-report-result "$TEST" "SKIP" 0
+            exit 0
+        fi
+
     fi
 
     declare duration_flag="--duration" && oslat --help | grep -q '\-\-runtime' && duration_flag="--runtime"
