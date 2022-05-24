@@ -55,7 +55,7 @@ function scsi_level(){
             rlLog "Can not get test device at level $i, skip it"
             continue
         fi
-        (( $flag += 1 ))
+        flag=$(($flag+1))
         rlLog "Checking if VPD for "$dev" is exported correctly"
         rlRun "sg_inq $dev" 0  "get message by sg_ing"
         rlRun "sg_vpd --page=0x80 $dev" 0 "get mesage by page=0x80"
@@ -90,7 +90,7 @@ function scsi_level(){
             rlServiceStop multipathd
             rlRun "dmsetup remove_all"
             rlRun "echo -1 > /sys/bus/pseudo/drivers/scsi_debug/add_host"
-            rLrun "modprobe -r scsi_debug" "$g_rc_any" "remove scsi_debug"
+            rlRun "modprobe -r scsi_debug" "$g_rc_any" "remove scsi_debug"
             stat=$?
         done
         rlLog "test passed scsi_debug $i level vpd "
