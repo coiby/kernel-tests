@@ -121,6 +121,7 @@ install_kselftests()
         popd
         [ -f $TMPDIR/selftests/run_kselftest.sh ] && return 0 || return 1
     else
+        rpm -q ${name}-selftests-internal && rlLog "Delivered ${TEST} installed..." && return 0
         rlRpmInstall ${name}${debug_dash}-modules-internal ${version} ${release} ${arch}
         rlRpmInstall ${name}-selftests-internal ${version} ${release} ${arch}
         if rpm -q ${name}-selftests-internal; then
