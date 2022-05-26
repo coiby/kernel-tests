@@ -71,12 +71,12 @@ function run_test()
         rlRun "mount -o relatime,noexec,nosuid /dev/zram0 /mnt/zram"
         rlRun "mount | grep zram"
         rlRun "lsblk"
-        rlRun "cp -rp /root /mnt/zram"
+        rlRun "rsync -av --exclude=".debug" /root /mnt/zram"
         rlRun "umount /mnt/zram"
         rlRun "echo 3 > /proc/sys/vm/drop_caches"
 
         rlRun "mount -o relatime,noexec,nosuid /dev/zram0 /mnt/zram"
-        rlRun "diff -rp /root /mnt/zram/root"
+        rlRun "diff -rp -x ".debug" /root /mnt/zram/root"
 ### < *** must be no output here *** >
 
 ### get funny stats
@@ -104,7 +104,7 @@ rlJournalStart
         rlRun "dmesg -C"
         rlRun "uname -a"
         rlLog "$0"
-        rlRun "rpm -q zstd || yum install -y zstd"
+        rlRun "rpm -q zstd rsync || yum install -y zstd rsync"
         run_test
         check_log
     rlPhaseEnd
