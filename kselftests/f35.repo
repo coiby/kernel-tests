@@ -1,5 +1,0 @@
-[f35]
-name=F35
-metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-35&arch=$basearch
-enabled=1
-gpgcheck=0
