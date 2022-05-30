@@ -28,13 +28,21 @@ source $CDIR/../../cki_lib/libcki.sh || \
 STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-""}
 LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-""}
 
+function get_release() {
+    source /etc/os-release
+    export DISTRO_FAMILY=$ID  # e.g. 'fedora', 'rhel'
+    export DISTRO_VERSION=$VERSION_ID  # e.g. '36', '8.6'
+    export DISTRO_MIN=$DISTRO_FAMILY-$DISTRO_VERSION  # e.g. 'rhel-9.1', 'fedora-36'
+    export DISTRO_MAJ=$(echo $DISTRO_MIN | cut -d '.' -f 1)  # e.g. 'rhel-9', 'fedora-36
+}
+
 function stqe_init
 {
     typeset pip="python3 -m pip"
     typeset pkg_mgr=$(dnf > /dev/null 2>&1 && echo dnf || echo yum)
 
     # augeas-libs needed for RHEL-7, netifaces needed for aarch64
-    cki_run "$pkg_mgr install -y --skip-broken python3-pip python3-augeas augeas-libs python3-netifaces" || \
+    cki_run "$pkg_mgr install -y --skip-broken python3-pip python3-augeas wheel augeas-libs python3-netifaces" || \
         cki_abort_task "FAIL: Could not install framework dependencies"
     # ppc64, ppc64le, and s390x need to compile some python modules for now
     if [[ $ARCH == 'ppc64' || $ARCH == 'ppc64le' || $ARCH == 's390x' ]]; then

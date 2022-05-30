@@ -21,7 +21,17 @@ source ../../include/libstqe.sh
 
 function runtest
 {
-    cki_run "stqe-test run --fmf -f tags:targetcli_basic"
+    get_release
+    if [[ "$DISTRO_FAMILY" == "fedora" ]]; then
+        distro=$DISTRO_FAMILY;
+    else
+        distro=$DISTRO_MAJ;
+    fi
+    cmd="stqe-test run --fmf -f tags:targetcli_basic"
+    if [[ $distro == "rhel-7" ]]; then
+        cmd=$cmd" -f distro:$distro"
+    fi
+    cki_run $cmd
     typeset -i rc=$?
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }
