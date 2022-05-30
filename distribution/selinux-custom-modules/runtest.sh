@@ -26,12 +26,6 @@ rlJournalStart
       rlRun "setsebool -P domain_kernel_load_modules on" 0 "Mask problems with module_request due BZ1932849 when IPv6 is disabled"
     fi
 
-    if rlIsRHEL 9; then
-      # https://bugzilla.redhat.com/show_bug.cgi?id=2085392
-      echo "(allow system_dbusd_t kernel_t (unix_stream_socket (ioctl getopt)))" > bz2085392.cil
-      modules_to_load+=" bz2085392.cil"
-    fi
-
     if rlIsFedora; then
       echo "(allow iptables_t container_file_t (dir (ioctl)))" > bz2031022.cil
       modules_to_load+=" bz2031022.cil"
