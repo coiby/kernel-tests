@@ -170,10 +170,24 @@ function targz_install()
 
   cki_print_info "Finishing boot loader configuration for the new kernel"
   if [ ! -x /sbin/new-kernel-pkg ]; then
-    kernel-install add ${KVER} /boot/vmlinuz-${KVER} 2>&1
-    grubby --set-default /boot/vmlinuz-${KVER} 2>&1
+    if kernel-install add ${KVER} /boot/vmlinuz-${KVER} 2>&1; then
+      cki_print_success "Kernel installed"
+    else
+      ls -allh /boot
+      cki_abort_recipe "kernel-install failed" FAIL
+    fi
+    if grubby --set-default /boot/vmlinuz-${KVER} 2>&1; then
+      cki_print_success "updated default kernel"
+    else
+      ls -allh /boot
+      cki_abort_recipe "fail to update default kernel" FAIL
+    fi
   else
-    new-kernel-pkg -v --mkinitrd --dracut --depmod --make-default --host-only --install ${KVER} 2>&1
+    if new-kernel-pkg -v --mkinitrd --dracut --depmod --make-default --host-only --install ${KVER} 2>&1; then
+      cki_print_success "new kernel installed correctly"
+    else
+      cki_abort_recipe "fail to install new kernel" FAIL
+    fi
   fi
   cki_print_success "Boot loader configuration complete"
 
