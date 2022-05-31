@@ -40,23 +40,23 @@ fi
 PACKAGE="perf"
 
 # configuration
-PERFTESTS_ENABLE_BLACKLIST=${PERFTESTS_ENABLE_BLACKLIST:-0}
+PERFTESTS_ENABLE_DENYLIST=${PERFTESTS_ENABLE_DENYLIST:-0}
 
 # hook, someone likes using "True" there, we like 1, 0 values more
-if [ "$PERFTESTS_ENABLE_BLACKLIST" = "true" -o "$PERFTESTS_ENABLE_BLACKLIST" = "True" ]; then
-	PERFTESTS_ENABLE_BLACKLIST=1
+if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" -o "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
+	PERFTESTS_ENABLE_DENYLIST=1
 fi
 
-check_whitelisted()
+check_allowlisted()
 {
 	HASH=`echo -n "$1" | sha1sum | awk '{print $1}'`
-	cat white.list | perl -pe 's/#.*$//' | grep $HASH | grep -q -e "all" -e "$MY_ARCH"
+	cat allow.list | perl -pe 's/#.*$//' | grep $HASH | grep -q -e "all" -e "$MY_ARCH"
 	return $?
 }
 
-prepare_whitelists()
+prepare_allowlists()
 {
-	rlRun "cp white.list $TmpDir/" 0 "WHITELIST: adding basic whitelist"
+	rlRun "cp allow.list $TmpDir/" 0 "ALLOWLIST: adding basic allowlist"
 }
 
 # return 0 when running kernel rt
@@ -152,8 +152,8 @@ rlJournalStart
 		export TmpDir=`pwd`
 		cd ..
 
-		# PREPARE WHITELISTS
-		prepare_whitelists
+		# PREPARE ALLOWLISTS
+		prepare_allowlists
 
 		# This is important: remember the original sample rate to be restored later
 		#
@@ -179,8 +179,8 @@ rlJournalStart
 		# skip the incompatible lines (basically the subtests)
 		test -n "$TEST_NUMBER" || continue
 		rlPhaseStart FAIL "TEST #$TEST_NUMBER : $TEST_DESC"
-			if check_whitelisted "$TEST_DESC"; then
-				rlLog "[ WHITELISTED ] :: $TEST_NUMBER: $TEST_DESC  (known issue)"
+			if check_allowlisted "$TEST_DESC"; then
+				rlLog "[ ALLOWLISTED ] :: $TEST_NUMBER: $TEST_DESC  (known issue)"
 			else
 				perf test -F -vv $TEST_NUMBER &> $TEST_NUMBER.log
 				RETVAL=$?
@@ -210,8 +210,8 @@ rlJournalStart
 			# check if the test is not disabled on this machine
 			TEST_NUMBER="`perf test list |& grep topology | perl -ne 'print $1 if /^(\d+):\s/'`"
 			TEST_DESC="`perf test list |& grep topology | perl -pe 's/^\d+:\s//'`"
-			if check_whitelisted "$TEST_DESC" || check_whitelisted "Session topology with CPU disabled"; then
-				rlLog "bz1414043 coverage skipped (whitelisted)"
+			if check_allowlisted "$TEST_DESC" || check_allowlisted "Session topology with CPU disabled"; then
+				rlLog "bz1414043 coverage skipped (allowlisted)"
 			else
 				# check if we can disable a cpu (we sometimes cannot on aarch64)
 				echo 0 > /sys/devices/system/cpu/cpu1/online
@@ -234,8 +234,8 @@ rlJournalStart
 		# check if the test is not disabled on this machine
 		TEST_NUMBER="`perf test list |& grep perf_event_attr | perl -ne 'print $1 if /^(\d+):\s/'`"
 		TEST_DESC="`perf test list |& grep perf_event_attr | perl -pe 's/^\d+:\s//'`"
-		if check_whitelisted "$TEST_DESC"; then
-			rlLog "bz1308907 coverage skipped (whitelisted)"
+		if check_allowlisted "$TEST_DESC"; then
+			rlLog "bz1308907 coverage skipped (allowlisted)"
 		else
 			# the corresponding perf-test should NOT contain the following line in the output:
 			# FAILED '/usr/libexec/perf-core/tests/attr/test-stat-C0' - match failure
