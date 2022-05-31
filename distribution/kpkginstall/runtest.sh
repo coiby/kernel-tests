@@ -143,10 +143,11 @@ function targz_install()
   cki_print_info "Applying architecture-specific workarounds (if needed)"
   case ${ARCH} in
     ppc64|ppc64le)
-      for xname in /boot/vmlinux-*${KVER}; do
-        zname="${xname//x-/z-}"
-        mv ${xname} ${zname}
-      done
+      if [ -f "/boot/vmlinux-kbuild-${KVER}" ]; then
+        mv /boot/vmlinux-kbuild-${KVER} /boot/vmlinuz-${KVER}
+      fi
+      # vmlinux shouldn't be necessary and just uses too much space on /boot
+      rm -f /boot/vmlinux-${KVER}
       ;;
     s390x)
       # These steps are required until the following patch is backported into
