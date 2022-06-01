@@ -340,6 +340,8 @@ Report() {
 }
 
 RstrntSubmit() {
+    [ ! -f "$1" ] && return
+
     local size
     size=$(wc -c < "$1")
     # zip and upload the zipped file if the size of which is larger than 100M
