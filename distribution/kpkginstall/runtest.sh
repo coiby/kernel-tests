@@ -92,7 +92,7 @@ function get_kpkg_ver()
 
   if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
     declare -r kpkg=${KPKG_URL##*/}
-    KVER=$(tar tf "$kpkg" | sed -ne '/^boot\/vmlinu[xz]-[1-9]/ {s/^[^-]*-//p;q}; $Q1')
+    KVER=$(tar tf "$kpkg" | grep -E '^boot\/vmlinu[xz](-kbuild)?-[1-9]'| awk -F'-' '{print $NF}' | head -n 1)
   else
     if [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
       # Repo names in configs are formatted as "USER-REPO", so take the kpkgurl
