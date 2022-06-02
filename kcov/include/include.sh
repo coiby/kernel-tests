@@ -94,6 +94,7 @@ install_lcov()
     # Enable branch coverage
     echo "lcov_branch_coverage = 1" >> /etc/lcovrc
 
+    rhts-submit-log -l "/etc/lcovrc"
 }
 
 if [ -n "$DEBUG" ]; then
