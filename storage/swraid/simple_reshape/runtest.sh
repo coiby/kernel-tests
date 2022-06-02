@@ -26,9 +26,9 @@ source ../../../cki_lib/libcki.sh || exit 1
 function runtest
 {
 # Refer to bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=2066373 
-   cki_run "mdadm --create --run /dev/md0 --level 0  --metadata 1.2 \
+   rlRun "mdadm --create --run /dev/md0 --level 0  --metadata 1.2 \
        --raid-devices 3 /dev/loop0 /dev/loop1 /dev/loop2 --chunk 512"
-   cki_run "mdadm --grow -l10 /dev/md0 \
+   rlRun "mdadm --grow -l10 /dev/md0 \
        -a  /dev/loop3 /dev/loop4 /dev/loop5 --backup-file=tmp0"
 
     return $CKI_PASS
@@ -36,12 +36,16 @@ function runtest
 
 function startup
 {
+    if ( ! rpm -q mdadm );then
+        yum -y install mdadm
+    fi
+
     for i in {0..8};do 
-        cki_run "dd if=/dev/urandom of=/opt/loop_$i bs=1M count=500"
+        rlRun "dd if=/dev/urandom of=/opt/loop_$i bs=1M count=500"
     done
 
     for i in {0..8};do 
-        cki_run "losetup /dev/loop$i /opt/loop_$i"
+        rlRun "losetup /dev/loop$i /opt/loop_$i"
     done
 
     return $CKI_PASS
@@ -49,9 +53,9 @@ function startup
 
 function cleanup
 {
-    cki_run "mdadm --stop /dev/md0"
-    cki_run "losetup -D"
-    cki_run "rm -f /opt/loop_*"
+    rlRun "mdadm --stop /dev/md0"
+    rlRun "losetup -D"
+    rlRun "rm -f /opt/loop_*"
     return $CKI_PASS
 }
 
