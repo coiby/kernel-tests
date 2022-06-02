@@ -43,8 +43,9 @@ function install_dependency()
 	rpm -q userspace-rcu-devel   --quiet	|| RC=1
 
 	if [ $RC -eq 1 ]; then
-		echo "Failed to install dependecy packages"
-		exit 1
+		rlLog "Failed to install dependecy packages"
+		rstrnt-report-result "${TEST}" WARN
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 	fi
 
 }
