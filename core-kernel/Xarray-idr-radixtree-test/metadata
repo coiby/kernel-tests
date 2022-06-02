@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=git;python3-pip
+dependencies=git;python3-pip;dwarves;libasan;libubsan;userspace-rcu;userspace-rcu-devel
 repoRequires=cki_lib
