@@ -11,6 +11,8 @@ set -o pipefail
 
 function install_dependency()
 {
+	local RC=0
+
 	dnf="dnf -y install"
 
 	$dnf \
@@ -33,6 +35,18 @@ function install_dependency()
 		libubsan \
 		userspace-rcu \
 		userspace-rcu-devel
+
+	rpm -q dwarves               --quiet	|| RC=1
+	rpm -q libasan               --quiet	|| RC=1
+	rpm -q libubsan              --quiet	|| RC=1
+	rpm -q userspace-rcu         --quiet	|| RC=1
+	rpm -q userspace-rcu-devel   --quiet	|| RC=1
+
+	if [ $RC -eq 1 ]; then
+		echo "Failed to install dependecy packages"
+		exit 1
+	fi
+
 }
 
 function get_running_kernel_src()
