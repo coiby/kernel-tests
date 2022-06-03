@@ -546,17 +546,34 @@ else
   rstrnt-report-log -l io_perf_cki_kernel.log
 
   # We have the right kernel. Do we have any call traces?
+  reboot_status="PASS"
   dmesg | grep -qi 'Call Trace:'
   dmesgret=$?
-  if [[ -z "${SKIP_CHECK_DMESG}" && ${dmesgret} -eq 0 ]]; then
+  if [[ ${dmesgret} -eq 0 ]]; then
+    reboot_status="FAIL"
     DMESGLOG=/tmp/dmesg.log
     dmesg > ${DMESGLOG}
     rstrnt-report-log -l ${DMESGLOG}
     cki_print_warning "Call trace found in dmesg, see dmesg.log"
-    rstrnt-report-result ${TEST} WARN 7
+    rstrnt-report-result ${TEST}/dmesg-check WARN 7
   else
-    rstrnt-report-result ${TEST}/reboot PASS 0
+    rstrnt-report-result ${TEST}/dmesg-check PASS 0
   fi
+  if which journalctl > /dev/null 2>&1; then
+    journalctl -b | grep -qi 'Call Trace:'
+    journalctlret=$?
+    if [[ ${journalctlret} -eq 0 ]]; then
+      reboot_status="FAIL"
+      JOURNALCTLLOG=/tmp/journalctl.log
+      journalctl -b > ${JOURNALCTLLOG}
+      rstrnt-report-log -l ${JOURNALCTLLOG}
+      cki_print_warning "Call trace found in journalctl, see journalctl.log"
+      rstrnt-report-result ${TEST}journalctl-check WARN 7
+    else
+      rstrnt-report-result ${TEST}/journalctl-check PASS 0
+    fi
+  fi
+  rstrnt-report-result ${TEST}/reboot ${reboot_status}
 
   # Clean up temporary files
   rm -rfv /kpkginstall
