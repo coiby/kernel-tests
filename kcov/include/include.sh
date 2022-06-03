@@ -91,7 +91,10 @@ install_lcov()
     # Show yellow for >=25 < 50, green >= 50
     echo "genhtml_med_limit = 25" >> /etc/lcovrc
     echo "genhtml_hi_limit = 50" >> /etc/lcovrc
+    # Enable branch coverage
+    echo "lcov_branch_coverage = 1" >> /etc/lcovrc
 
+    rhts-submit-log -l "/etc/lcovrc"
 }
 
 if [ -n "$DEBUG" ]; then
