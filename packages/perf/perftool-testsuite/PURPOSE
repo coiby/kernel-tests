@@ -5,5 +5,5 @@ Author: Michael Petlan <mpetlan@redhat.com>
 This test runs upstream perftool-testsuite. This wrapper fetches the latest
 version of perftool-testsuite from GitHub.
 
-PERFTESTS_ENABLE_BLACKLIST=1 must be passed as an argument if the list of known
+PERFTESTS_ENABLE_DENYLIST=1 must be passed as an argument if the list of known
 failures is to be taken into consideration for the Beaker results.
