@@ -28,14 +28,14 @@
 # Include Beaker environment
 . ../../../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. blacklist.sh
+. denylist.sh
 
 PACKAGE="perf"
 
 # configuration
 GIT_CLONE_ATTEMPTS_COUNT=25
 KEEP_LOGS="no"
-PERFTESTS_ENABLE_BLACKLIST=${PERFTESTS_ENABLE_BLACKLIST:-1}
+PERFTESTS_ENABLE_DENYLIST=${PERFTESTS_ENABLE_DENYLIST:-1}
 
 # constants
 RUNMODE_BASIC=0
@@ -47,8 +47,8 @@ export TEST_IGNORE_MISSING_PMU=y
 export PERFTOOL_TESTSUITE_RUNMODE=$RUNMODE_BASIC
 
 # hook, someone likes using "True" there, we like 1, 0 values more
-if [ "$PERFTESTS_ENABLE_BLACKLIST" = "true" -o "$PERFTESTS_ENABLE_BLACKLIST" = "True" ]; then
-	PERFTESTS_ENABLE_BLACKLIST=1
+if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" -o "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
+	PERFTESTS_ENABLE_DENYLIST=1
 fi
 
 # select tool to manage package, which could be "yum" or "dnf"
@@ -145,20 +145,20 @@ waive_fails()
 	local kernel_version="$1"; shift
 	local test_name="$@"
 
-	for fail in "${BLACKLIST[@]}"
+	for fail in "${DENYLIST[@]}"
 	do
 		set -- $fail
-		local blacklist_result=$1; shift
-		local blacklist_arch=$1; shift
-		local blacklist_kernel_version_start=$1; shift
-		local blacklist_kernel_version_end=$1; shift
-		local blacklist_name="$@"
+		local denylist_result=$1; shift
+		local denylist_arch=$1; shift
+		local denylist_kernel_version_start=$1; shift
+		local denylist_kernel_version_end=$1; shift
+		local denylist_name="$@"
 
-		grep -q "$architecture," <<<"$blacklist_arch" || continue
-		grep -q "$blacklist_name" <<<"$test_name" || continue
-		K_Vercmp $kernel_version $blacklist_kernel_version_start
+		grep -q "$architecture," <<<"$denylist_arch" || continue
+		grep -q "$denylist_name" <<<"$test_name" || continue
+		K_Vercmp $kernel_version $denylist_kernel_version_start
 		[[ $K_KVERCMP_RET -ge "0" ]] || continue
-		K_Vercmp $kernel_version $blacklist_kernel_version_end
+		K_Vercmp $kernel_version $denylist_kernel_version_end
 		[[ $K_KVERCMP_RET -lt "0" ]] || continue
 		return 0
 	done
@@ -234,11 +234,11 @@ rlJournalStart
 		rpmquery -a | grep -e kernel -e perf
 		echo "==================================================================="
 
-		# log whether we use blacklisting
-		if [ $PERFTESTS_ENABLE_BLACKLIST -ne 0 ]; then
-			rlLog "BLACKLISTING ENABLED (known fails will be hidden)"
+		# log whether we use denylisting
+		if [ $PERFTESTS_ENABLE_DENYLIST -ne 0 ]; then
+			rlLog "DENYLISTING ENABLED (known fails will be hidden)"
 		else
-			rlLog "BLACKLISTING DISABLED"
+			rlLog "DENYLISTING DISABLED"
 		fi
 
 		# set kptr_restrict to 0
@@ -263,11 +263,11 @@ rlJournalStart
 			for testcase in setup.sh test_*; do
 				# skip setup.sh if not present or not executable
 				test -x $testcase || continue
-				if [ $PERFTESTS_ENABLE_BLACKLIST -eq 0 ]; then
-					# running the test without blacklisting
+				if [ $PERFTESTS_ENABLE_DENYLIST -eq 0 ]; then
+					# running the test without denylisting
 					rlRun "./$testcase" 0 "Running test $testcase"
 				else
-					# blacklisting enabled
+					# denylisting enabled
 					./$testcase | tee logs/${testcase}.txt
 
 					# parse the result, accounting for known failures
