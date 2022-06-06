@@ -1,5 +1,5 @@
 #!/bin/bash
-# This file is used for RT related tests configurations.
+# This file is used for Real Time kernel related tests configurations.
 
 do_bpf_config()
 {
@@ -43,10 +43,11 @@ do_default_reset()
 # The following test cases defined in $rtskips are automatically excluded
 # from kernel-rt kselftests due to the known issues detailed below.  While
 # a handful of them could be classified as system setup issues, there is
-# minimal interest in comitting to resolve or debug these all individually,
+# minimal capacity in comitting to resolve or debug these all individually,
 # and as such, we shall simply skip such tests.
 rtskips=(
-# 64+ tests fail that pass on RHEL kernel: tracking in a private BZ
+# expected to fail: "On RT enabled kernels run-time allocation of all trace
+# type programs is strictly prohibited due to lock type constraints."
 bpf:test_verifier
 # occasional failure on IPv6 encap test
 bpf:test_lwt_ip_encap.sh
@@ -54,6 +55,8 @@ bpf:test_lwt_ip_encap.sh
 bpf:test_netcnt
 # traceback with 3 BPF maps loaded, expected 2
 bpf:test_offload.py
+# bz2092952: BUG: using __this_cpu_add_return() in preemptible code
+bpf:test_sockmap
 # occasionally hangs the system and causes remaining cases to abort
 bpf:test_xsk.sh
 # occasionally hits the maximum timeout
