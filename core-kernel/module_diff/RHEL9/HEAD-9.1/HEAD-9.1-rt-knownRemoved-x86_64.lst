@@ -1,0 +1,5 @@
+dax_pmem_compat.ko
+dax_pmem_core.ko
+dax_pmem.ko
+device_dax.ko
+kmem.ko
