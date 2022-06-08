@@ -489,81 +489,48 @@ rlJournalStart
                     echo "***** $ARCH: Base release is RHEL-8.5 *****" | tee -a $OUTPUTFILE
                     Release="8.5"
                     ;;
-                *)
-                    # We are currently developing RHEL-8.6
-                    # Therefore we test at HEAD-RHEL-8.6
-                    # Need to refresh the list after 8.6 GA, current simple copy from 8.4
-                    DeBug "Base release is HEAD-RHEL-8.6"
+                372)
+                    # RHEL-8.6
+                    DeBug "Base release is RHEL-8.6"
                     echo "" | tee -a $OUTPUTFILE
-                    echo "***** $ARCH: Base release is HEAD-RHEL-8.6 *****" | tee -a $OUTPUTFILE
-                    Release="HEAD-8.6"
-                    if cki_kver_lt "4.18.0-348.3"; then
-                        sed -i '/sm4-ce.ko/d;/sm4_generic.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-aarch64.lst
-                    fi
-                    if cki_kver_lt "4.18.0-357"; then
-                        sed -i '/i40iw.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-${ARCH}.lst
-                        sed -i '/irdma.ko/d' ${OS}/${Release}/HEAD-8.6-modules-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "4.18.0-362"; then
-                        sed -i '/i2c-hid.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-ppc64le.lst
-					fi
-                    if cki_kver_lt "4.18.0-366"; then
-                        sed -i '/snd-sof-intel-ipc.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-x86_64.lst
-					fi
-                    if cki_kver_lt "4.18.0-371"; then
-                        sed -i '/^ns.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-x86_64.lst
-					fi
-                    if cki_kver_lt "4.18.0-374"; then
-                        sed -i '/nct6683.ko/d' ${OS}/${Release}/HEAD-8.6-knownRemoved-aarch64.lst
-					fi
+                    echo "***** $ARCH: Base release is RHEL-8.6 *****" | tee -a $OUTPUTFILE
+                    Release="8.6"
+                    ;;
+                *)
+                    # We are currently developing RHEL-8.7
+                    # Therefore we test at HEAD-RHEL-8.7
+                    # Need to refresh the list after 8.7 GA
+                    DeBug "Base release is HEAD-RHEL-8.7"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is HEAD-RHEL-8.7 *****" | tee -a $OUTPUTFILE
+                    Release="HEAD-8.7"
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then
             # This is RHEL9
             OS="RHEL9"
             case ${Base} in
+                70)
+                    # RHEL-9.0
+                    DeBug "Base release is RHEL-9.0"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-9.0 *****" | tee -a $OUTPUTFILE
+                    Release="9.0"
+                    ;;
                 *)
                     # Still in developing phase, need to update in future.
-                    DeBug "Base release is HEAD-RHEL-9.0"
+                    DeBug "Base release is HEAD-RHEL-9.1"
                     echo "" | tee -a $OUTPUTFILE
-                    echo "***** $ARCH: Base release is HEAD-RHEL-9.0 *****" | tee -a $OUTPUTFILE
-                    Release="HEAD-9.0"
-                    if cki_kver_lt "5.14.0-4"; then
-                        sed -i '/vmwgfx.ko/d' ${OS}/${Release}/$Release-knownRemoved-aarch64.lst
+                    echo "***** $ARCH: Base release is HEAD-RHEL-9.1 *****" | tee -a $OUTPUTFILE
+                    Release="HEAD-9.1"
+                    if cki_kver_lt "5.14.0-77"; then
+                        sed -i '/intel_pmt_class.ko/d;/intel_pmt_crashlog.ko/d;/intel_pmt.ko/d;/intel_pmt_telemetry.ko/d;' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
                     fi
-                    if cki_kver_lt "5.14.0-5"; then
-                        sed -i '/zstd_decompress.ko/d' ${OS}/${Release}/$Release-modules-${ARCH}.lst
+                    if cki_kver_lt "5.14.0-87"; then
+                        sed -i '/libarc4.ko/d' ${OS}/${Release}/$Release-knownRemoved-s390x.lst
                     fi
-                    if cki_kver_lt "5.14.0-6"; then
-                        sed -i '/firedtv.ko/d;/firewire-core.ko/d;/firewire-net.ko/d;/firewire-ohci.ko/d;/firewire-sbp2.ko/d;/snd-bebob.ko/d;\
-                            /snd-dice.ko/d;/snd-fireface.ko/d;/snd-firewire-digi00x.ko/d;/snd-firewire-lib.ko/d;/snd-firewire-motu.ko/d;\
-                            /snd-firewire-tascam.ko/d;/snd-fireworks.ko/d;/snd-isight.ko/d;/snd-oxfw.ko/d' \
-                            ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
-                        sed -i '/e1000.ko/d' ${OS}/${Release}/$Release-modules-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-7"; then
-                        sed -i '/nitro_enclaves.ko/d' ${OS}/${Release}/$Release-modules-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-33"; then
-                        sed -i '/zstd_decompress.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-50"; then
-                        sed -i '/dnet.ko/d;/ethoc.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-56"; then
-                        sed -i '/cramfs.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-65"; then
-                        sed -i '/snd-sof-intel-ipc.ko/d' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
-                    fi
-                    if cki_kver_lt "5.14.0-68"; then
-                        sed -i '/yenta_socket.ko/d;/nct6683.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-69"; then
-                        sed -i '/^ns.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-73"; then
-                        sed -i '/ecc.ko/d;/ecdh_generic.ko/d;/ecdsa_generic.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    if cki_kver_lt "5.14.0-95"; then
+                        sed -i '/libblake2s-generic.ko/d;/libblake2s.ko/d;/^xor.ko/d;/xor-neon.ko/d;' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
                     fi
                     ;;
             esac

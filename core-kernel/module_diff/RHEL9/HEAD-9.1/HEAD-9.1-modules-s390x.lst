@@ -63,7 +63,9 @@ chacha20poly1305.ko
 chacha_generic.ko
 ch.ko
 chsc_sch.ko
+cifs_arc4.ko
 cifs.ko
+cifs_md4.ko
 clip.ko
 cls_bpf.ko
 cls_flower.ko
@@ -73,12 +75,10 @@ cls_matchall.ko
 cls_u32.ko
 cmm.ko
 cordic.ko
-cramfs.ko
 crc32_generic.ko
 crc7.ko
 crc8.ko
 crc-itu-t.ko
-crypto_user.ko
 csiostor.ko
 ctcm.ko
 cuse.ko
@@ -151,8 +151,6 @@ ebt_redirect.ko
 ebt_snat.ko
 ebt_stp.ko
 ebt_vlan.ko
-ecc.ko
-ecdsa_generic.ko
 echainiv.ko
 enclosure.ko
 esp4.ko
@@ -190,6 +188,7 @@ hdlc_raw.ko
 hmcdrv.ko
 i2c-algo-bit.ko
 i2c-core.ko
+i6300esb.ko
 ib_cm.ko
 ib_core.ko
 ib_iser.ko
@@ -461,6 +460,7 @@ nft_reject_ipv6.ko
 nft_reject.ko
 nft_reject_netdev.ko
 nft_socket.ko
+nft_synproxy.ko
 nft_tproxy.ko
 nft_tunnel.ko
 nft_xfrm.ko
@@ -589,7 +589,6 @@ ses.ko
 sg.ko
 sha3_256_s390.ko
 sha3_512_s390.ko
-sha512_s390.ko
 sit.ko
 siw.ko
 smc_diag.ko
@@ -655,6 +654,7 @@ vfio_ap.ko
 vfio_ccw.ko
 vfio_iommu_type1.ko
 vfio.ko
+vfio-pci-core.ko
 vfio-pci.ko
 vfio_virqfd.ko
 vhost_iotlb.ko
@@ -767,7 +767,6 @@ xt_TEE.ko
 xt_TPROXY.ko
 xt_TRACE.ko
 xxhash_generic.ko
-yenta_socket.ko
 zcrypt_cex2a.ko
 zcrypt_cex2c.ko
 zcrypt_cex4.ko
@@ -775,5 +774,4 @@ zcrypt.ko
 zfcp.ko
 zram.ko
 zstd_compress.ko
-zstd_decompress.ko
 zstd.ko
