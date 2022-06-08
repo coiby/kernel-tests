@@ -57,8 +57,8 @@ function set_package_name()
   # Please someone come up with a better solution how to determine the package name...
 
   # Recover the saved package name from KPKG_PACKAGE_NAME if it exists.
-  if [ -f "/kpkginstall/KPKG_PACKAGE_NAME" ]; then
-    PACKAGE_NAME=$(cat /kpkginstall/KPKG_PACKAGE_NAME)
+  if [ -f "/var/tmp/kpkginstall/KPKG_PACKAGE_NAME" ]; then
+    PACKAGE_NAME=$(cat /var/tmp/kpkginstall/KPKG_PACKAGE_NAME)
     cki_print_success "Found cached package name on disk: ${PACKAGE_NAME}"
     return
   fi
@@ -77,15 +77,15 @@ function set_package_name()
   fi
 
   # Write the PACKAGE_NAME to a file so we have it after reboot.
-  echo -n "${PACKAGE_NAME}" > /kpkginstall/KPKG_PACKAGE_NAME
+  echo -n "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
   cki_print_success "Package name is set: ${PACKAGE_NAME} (cached to disk)"
 }
 
 function get_kpkg_ver()
 {
   # Recover the saved package name from KPKG_KVER if it exists.
-  if [ -f "/kpkginstall/KPKG_KVER" ]; then
-    KVER=$(cat /kpkginstall/KPKG_KVER)
+  if [ -f "/var/tmp/kpkginstall/KPKG_KVER" ]; then
+    KVER=$(cat /var/tmp/kpkginstall/KPKG_KVER)
     cki_print_success "Found kernel version string in cache on disk: ${KVER}"
     return
   fi
@@ -112,7 +112,7 @@ function get_kpkg_ver()
   fi
 
   # Write the KVER to a file so we have it after reboot.
-  echo -n "${KVER}" > /kpkginstall/KPKG_KVER
+  echo -n "${KVER}" > /var/tmp/kpkginstall/KPKG_KVER
 }
 
 function targz_install()
@@ -214,6 +214,9 @@ function select_yum_tool()
     YUM=/usr/bin/dnf
     ALL="--all"
     COPR_PLUGIN_PACKAGE=dnf-plugins-core
+    if [[ -e /run/ostree-booted ]]; then
+      RPM_OSTREE=/usr/bin/rpm-ostree
+    fi
   elif [ -x /usr/bin/yum ]; then
     YUM=/usr/bin/yum
     ALL="all"
@@ -260,19 +263,33 @@ function copr_prepare()
 
 function download_install_package()
 {
-  # If download of a package fails, report warn/abort -> infrastructure issue
-  if $YUM install --downloadonly -y $1 > /dev/null || yumdownloader -y $1 > /dev/null; then
-    cki_print_success "Downloaded $1 successfully"
-  else
-    cki_abort_recipe "Failed to download ${1}!" WARN
-  fi
+  if [[ -z $RPM_OSTREE ]]; then
+    # If download of a package fails, report warn/abort -> infrastructure issue
+    if $YUM install --downloadonly -y $1 > /dev/null || yumdownloader -y $1 > /dev/null; then
+      cki_print_success "Downloaded $1 successfully"
+    else
+      cki_abort_recipe "Failed to download ${1}!" WARN
+    fi
 
   # If installation of a downloaded package fails, report fail/abort
   # -> distro issue
-  if $YUM install -y $1 > /dev/null; then
-    cki_print_success "Installed $1 successfully"
+    if $YUM install -y $1 > /dev/null; then
+      cki_print_success "Installed $1 successfully"
+    else
+      cki_abort_recipe "Failed to install $1!" FAIL
+    fi
   else
-    cki_abort_recipe "Failed to install $1!" FAIL
+    if $YUM download --resolve $1 > /dev/null; then
+    cki_print_success "Downloaded $1 successfully"
+    else
+      cki_abort_recipe "Failed to download ${1}!" WARN
+    fi
+    cki_print_info "$1 will be installed using rpm-ostree override replace"
+    if rpm-ostree override replace ./kernel*.rpm > /dev/null; then
+      cki_print_success "Installed $1 successfully"
+    else
+      cki_abort_recipe "RPM-OSTRE failed to install $1!" FAIL
+    fi
   fi
 }
 
@@ -299,26 +316,87 @@ function rpm_install()
   # download & install kernel, or report result
   download_install_package "${PACKAGE_NAME}-$KVER" "kernel"
 
+  if [[ -z $RPM_OSTREE ]];then
+    if $YUM install -y "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${PACKAGE_NAME}-devel-${KVER} successfully"
+    else
+      cki_print_warning "No package ${PACKAGE_NAME}-devel-${KVER} found, skipping!"
+      cki_print_warning "Note that some tests might require the package and can fail!"
+    fi
+    if $YUM install -y "${PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${PACKAGE_NAME}-modules-extra-${KVER} successfully"
+    else
+      cki_print_warning "No package ${PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
+      cki_print_warning "Note that some tests might require the package and can fail!"
+    fi
+    if $YUM install -y "${PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${PACKAGE_NAME}-modules-internal-${KVER} successfully"
+    else
+      cki_print_warning "No package ${PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
+      cki_print_warning "Note that some tests might require the package and can fail!"
+    fi
+    if $YUM install -y "${PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${PACKAGE_NAME}-headers-${KVER} successfully"
+    else
+      cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
+      ALT_HEADERS=$(ls ${PACKAGE_NAME}-headers* | grep -v src.rpm | head -1)
+      if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
+          cki_print_success "Installed ${ALT_HEADERS} successfully"
+      else
+          cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, skipping!"
+          cki_print_warning "Note that some tests might require the package and can fail!"
+      fi
+    fi
 
-  if $YUM install -y "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
+    if [[ ${PACKAGE_NAME} =~ "kernel-rt" ]]; then
+      if $YUM install -y "/usr/sbin/kernel-is-rt" > /dev/null; then
+        cki_print_success "Installed /usr/sbin/kernel-is-rt successfully"
+      else
+        cki_print_warning "No package for /usr/sbin/kernel-is-rt found, skipping!"
+      fi
+    fi
+
+    # The package was renamed (and temporarily aliased) in Fedora/RHEL"
+    if $YUM search kernel-firmware | grep "^kernel-firmware\.noarch" ; then
+      FIRMWARE_PKG=kernel-firmware
+    else
+      FIRMWARE_PKG=linux-firmware
+    fi
+    cki_print_info "Installing kernel firmware package"
+    $YUM install -y $FIRMWARE_PKG > /dev/null
+    cki_print_success "Kernel firmware package installed"
+
+    # Workaround for BZ 1698363
+    if [[ "${ARCH}" == s390x ]] ; then
+      grubby --set-default /boot/vmlinuz-"${KVER}" && zipl
+      cki_print_success "Grubby workaround for s390x completed"
+    fi
+  fi
+  return 0
+}
+
+function ostree_extra_package_install()
+{
+  PKG_CMD="${RPM_OSTREE} -A install --allow-inactive --idempotent "
+  if $PKG_CMD "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-devel-${KVER} successfully"
   else
     cki_print_warning "No package ${PACKAGE_NAME}-devel-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $YUM install -y "${PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
+  if $PKG_CMD "${PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-modules-extra-${KVER} successfully"
   else
     cki_print_warning "No package ${PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $YUM install -y "${PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
+  if $PKG_CMD "${PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-modules-internal-${KVER} successfully"
   else
     cki_print_warning "No package ${PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $YUM install -y "${PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+  if $PKG_CMD "${PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-headers-${KVER} successfully"
   else
     cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
@@ -330,15 +408,6 @@ function rpm_install()
         cki_print_warning "Note that some tests might require the package and can fail!"
     fi
   fi
-
-  if [[ ${PACKAGE_NAME} =~ "kernel-rt" ]]; then
-    if $YUM install -y "/usr/sbin/kernel-is-rt" > /dev/null; then
-      cki_print_success "Installed /usr/sbin/kernel-is-rt successfully"
-    else
-      cki_print_warning "No package for /usr/sbin/kernel-is-rt found, skipping!"
-    fi
-  fi
-
   # The package was renamed (and temporarily aliased) in Fedora/RHEL"
   if $YUM search kernel-firmware | grep "^kernel-firmware\.noarch" ; then
     FIRMWARE_PKG=kernel-firmware
@@ -346,14 +415,8 @@ function rpm_install()
     FIRMWARE_PKG=linux-firmware
   fi
   cki_print_info "Installing kernel firmware package"
-  $YUM install -y $FIRMWARE_PKG > /dev/null
+  $RPM_OSTREE install -A $FIRMWARE_PKG > /dev/null
   cki_print_success "Kernel firmware package installed"
-
-  # Workaround for BZ 1698363
-  if [[ "${ARCH}" == s390x ]] ; then
-    grubby --set-default /boot/vmlinuz-"${KVER}" && zipl
-    cki_print_success "Grubby workaround for s390x completed"
-  fi
 
   return 0
 }
@@ -381,9 +444,9 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
   _repofiles=$(ls /etc/yum.repos.d/ | grep -v kernel-cki.repo)
 
   # If we haven't rebooted yet, then we shouldn't have the directory present on the system.
-  rm -rfv /kpkginstall
+  rm -rfv /var/tmp/kpkginstall
   # Make a directory to hold small bits of information for the test.
-  mkdir -p /kpkginstall
+  mkdir -p /var/tmp/kpkginstall
 
   # If the KPKG_URL contains a pound sign, then we have variables on the end
   # which need to be removed and parsed.
@@ -394,7 +457,7 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
   # If we are installing a debug kernel, make a reminder for us to check for
   # a debug kernel after the reboot
   if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"; then
-    echo "true" > /kpkginstall/KPKG_VAR_DEBUG_KERNEL
+    echo "true" > /var/tmp/kpkginstall/KPKG_VAR_DEBUG_KERNEL
   fi
 
   if [ -z "${KPKG_URL}" ]; then
@@ -477,7 +540,7 @@ else
 
   # Make a list of kernel versions we expect to see after reboot.
   # the debug suffix on kernel names do not apply for kernel builds from tarball
-  if [ -f /kpkginstall/KPKG_VAR_DEBUG_KERNEL ] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
+  if [ -f /var/tmp/kpkginstall/KPKG_VAR_DEBUG_KERNEL ] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
     valid_kernel_versions=(
       "${KVER}.debug"           # RHEL 7 style debug kernels
       "${KVER}+debug"           # RHEL 8 style debug kernels
@@ -499,6 +562,13 @@ else
   fi
 
   cki_print_success "Found the correct kernel version running!"
+
+  # rpm-ostree extra packages install has to be after reboot
+  if [[ -n $RPM_OSTREE ]]; then
+    cki_print_info "Install kernel extra packages - rpm-ostree after reboot"
+    ostree_extra_package_install
+  fi
+
   # save the CKI installed kernel so following tests can check if they are running on correct kernel
   # this should help detect cases where by mistake the kernel gets updated.
   # https://gitlab.com/cki-project/kpet-db/-/issues/56
@@ -506,7 +576,7 @@ else
   echo "${ckver}" > /var/opt/cki/kernel_version
 
   # Workaround for cross compiling non x86_64 kernels
-  if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]] ; then
+  if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]] && [[ -z $RPM_OSTREE ]]; then
     # Backup and restore the .config files otherwise regenerated .config
     # files will be incompatible with the running kernel
     PREFIX="/usr/src/kernels/$ckver"
@@ -559,5 +629,5 @@ else
   fi
 
   # Clean up temporary files
-  rm -rfv /kpkginstall
+  rm -rfv /var/tmp/kpkginstall
 fi
