@@ -1,4 +1,5 @@
 libblake2s-generic.ko
 libblake2s.ko
+linear_ranges.ko
 xor.ko
 xor-neon.ko

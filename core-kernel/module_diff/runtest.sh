@@ -529,6 +529,9 @@ rlJournalStart
                     if cki_kver_lt "5.14.0-87"; then
                         sed -i '/libarc4.ko/d' ${OS}/${Release}/$Release-knownRemoved-s390x.lst
                     fi
+                    if cki_kver_lt "5.14.0-92"; then
+                        sed -i '/linear_ranges.ko/d' ${OS}/${Release}/$Release-knownRemoved-aarch64.lst
+                    fi
                     if cki_kver_lt "5.14.0-95"; then
                         sed -i '/libblake2s-generic.ko/d;/libblake2s.ko/d;/^xor.ko/d;/xor-neon.ko/d;' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
                     fi
