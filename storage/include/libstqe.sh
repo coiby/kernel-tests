@@ -42,12 +42,18 @@ function stqe_init
     typeset pkg_mgr=$(dnf > /dev/null 2>&1 && echo dnf || echo yum)
 
     # augeas-libs needed for RHEL-7, netifaces needed for aarch64
-    cki_run "$pkg_mgr install -y --skip-broken python3-pip python3-augeas wheel augeas-libs python3-netifaces" || \
+    cki_run "$pkg_mgr install -y --skip-broken python3-pip python3-wheel python3-augeas augeas-libs python3-netifaces" || \
         cki_abort_task "FAIL: Could not install framework dependencies"
     # ppc64, ppc64le, and s390x need to compile some python modules for now
     if [[ $ARCH == 'ppc64' || $ARCH == 'ppc64le' || $ARCH == 's390x' ]]; then
       cki_run "$pkg_mgr install -y gcc cmake openssl-devel python3-devel libffi-devel zlib-devel" || \
           cki_abort_task "FAIL: Could not install framework dependencies"
+    fi
+
+    # Needed to install ruamel.yaml.clib from source, can be removed if aarch64 wheel is available
+    if [[ $ARCH == 'aarch64' ]]; then
+        cki_run "$pkg_mgr install -y gcc python3-devel" || \
+            cki_abort_task "FAIL: Could not install cffi from source on ppc64le RHEL-7"
     fi
 
     # Check if we have pip>=20, install 20.3 if not
