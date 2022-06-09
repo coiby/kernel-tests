@@ -58,7 +58,7 @@ install_scapy()
 	scapy -h && return 0 || return 1
 }
 
-reset_net_env()
+reset_network_env()
 {
 	modprobe -r act_tunnel_key
 	modprobe -r ip_gre ip6_gre gre
@@ -122,7 +122,7 @@ do_net_reset()
 	ip -6 route restore < default_ipv6.route
 	popd
 
-	reset_net_env
+	reset_network_env
 }
 
 do_net_forwarding_config()
@@ -154,12 +154,12 @@ do_net_forwarding_reset()
 	sysctl -qw net.ipv4.ping_group_range="${reset_ping_group_range}"
 	# forwarding tests created veth pairs and netns, which may affect
 	# later tests when they also want to create veth interfaces.
-	reset_net_env
+	reset_network_env
 }
 
 do_net_mptcp_reset()
 {
-	reset_net_env
+	reset_network_env
 }
 
 do_netfilter_config()
@@ -170,12 +170,12 @@ do_netfilter_config()
 
 do_netfilter_reset()
 {
-	reset_net_env
+	reset_network_env
 }
 
 do_bpf_reset()
 {
-	reset_net_env
+	reset_network_env
 }
 
 do_bpf_test_progs_config()
@@ -235,7 +235,7 @@ do_bpf_test_progs_reset()
 	# after testing completes, turn mmap_low_allowed off again
 	echo "=== Setting mmap_low_allowed off ===" | tee -a $OUTPUTFILE
 	setsebool -P mmap_low_allowed off
-	reset_net_env
+	reset_network_env
 }
 
 do_tc-testing_config()
