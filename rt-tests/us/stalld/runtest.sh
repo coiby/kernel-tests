@@ -1,0 +1,127 @@
+#!/bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright Red Hat, Inc
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+###############################################################################
+# I confimed that without stalld running and having the busyloop timeout set
+# to 240s will result in the echo taking 240s to complete.
+#
+# With stalld running the echo should complete in less than 240s. This tells
+# us that the task is indeed being boosted.
+###############################################################################
+
+# Source rt common functions
+. ../../include/runtest.sh || exit 1
+
+# Vars
+export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+export nrcpus=$(grep -c ^processor /proc/cpuinfo)
+export TEST="rt-tests/us/stalld"
+export STALLD_PID=""
+export BUSYLOOP_PID=""
+
+# Default ACTION=TEST: Is to run the stalld performance test.
+# Non-Default ACTION=START: Is used to start and run stalld daemon  until
+#   ACTION=STOP is recieved. This will allow us to introduce stalld daemon
+#   running during select test cases.
+# Non-Default ACTION=STOP: Is used to stop stalld
+export ACTION=${ACTION:-"TEST"}
+
+function install_and_start_stalld()
+{
+    # Only run on 8.4 and up
+    if ! (( ("$rhel_major" == 8 && "$rhel_minor" >= 4) || ("$rhel_major" > 8) )); then
+        echo "stalld is only supported for RHEL >= 8.4 and up" || tee -a "$OUTPUTFILE"
+        rstrnt-report-result $TEST "SKIP" 5
+        exit 0
+    fi
+
+    if [ "$nrcpus" -eq 1 ] ; then
+        echo "stalld needs muliple cpus to run" || tee -a "$OUTFILE"
+        rstrnt-report-result $TEST "SKIP" 1
+        exit 0
+    fi
+
+    # Verify stalld is installed
+    rpm -q stalld || yum install -y stalld || {
+        echo "Could not install stalld" | tee -a "$OUTPUTFILE"
+        rstrnt-report-result $TEST "FAIL" 5
+        exit 1
+    }
+
+    # Enable stalld if needed
+    systemctl status stalld.service >>"$OUTPUTFILE" 2>&1 || {
+        echo "Starting stalld" | tee -a "$OUTPUTFILE"
+        
+        # Use a higher runtime ns for boosting, equal to 0.1s
+        # With the default boost timing it will take multiple boosts
+        # to finish the test and will take much longer
+        stalld -v -t 30 -r 1000000 | tee -a "$OUTPUTFILE" &
+        export STALLD_PID=$!
+    }
+}
+
+function run_test()
+{
+    echo "Compile rt_busyloop" | tee -a "$OUTPUTFILE"
+    gcc -o rt_busyloop rt_busyloop.c
+
+    # Run in a loop to get several readings
+    declare -i ITERS=1
+    while [[ $ITERS -lt 11 ]]; do
+        START=$(date +%s)
+
+        # Run a busy loop to stall cpu 1
+        # For some reason this takes 420 seconds to timeout
+        timeout 240s chrt -f 1 taskset -c 1 ./rt_busyloop &
+        export BUSYLOOP_PID=$!
+
+        # Print process info so we can see PIDs and tell if the right process
+        # is getting boosted
+        sh -c 'sleep 5; ps aux | tail' &
+
+        # This process blocks, and has to get boosted to finish
+        chrt -f 1 taskset -c 1 sh -c "echo \"Finished\""
+
+        END=$(date +%s)
+        RUNTIME=$(( END - START))
+
+        if [[ $RUNTIME -lt 240 ]]; then
+            echo "Iteration $ITERS runtime is $RUNTIME : PASS" | tee -a "$OUTPUTFILE"
+            rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "PASS" 0
+        else
+            echo "Iteration $ITERS runtime is $RUNTIME : FAIL" | tee -a "$OUTPUTFILE"
+            rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "FAIL" 1
+        fi
+        ITERS=$(( ITERS + 1 ))
+        kill "$BUSYLOOP_PID"
+    done
+}
+
+function stop_stalld()
+{
+    echo "Stoping stalld." | tee -a "$OUTPUTFILE"
+    kill "$STALLD_PID"
+}
+
+# ----------------------------------------------------------------------------
+
+if [ "$ACTION" == "TEST" ]; then
+    echo "Running stalld performance test." | tee -a "$OUTPUTFILE"
+    rt_env_setup # Should this be ran before START and STOP?
+    install_and_start_stalld
+    run_test
+    stop_stalld
+elif [ "$ACTION" == "START" ];then
+    echo "Check stalld installation and start stalld." | tee -a "$OUTPUTFILE"
+    install_and_start_stalld
+elif [ "$ACTION" == "STOP" ];then
+    echo "Stop stalld by running stop." | tee -a "$OUTPUTFILE"
+    stop_stalld
+fi
