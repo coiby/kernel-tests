@@ -57,7 +57,7 @@ function runtest
         if (( $? != 0 )); then
             # save information about running devices
             # this can help debug failures like when it is unable to remove a device
-            # ex: https://gitlab.com/cki-project/kernel-tests/-/issues/538
+            # ex: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/538
             lsof > $LOG_DIR/BasicTests_${testcase}_lsof.log
             ps -aux > $LOG_DIR/BasicTests_${testcase}_ps_aux.log
             dmsetup ls > $LOG_DIR/BasicTests_${testcase}_dmsetup_ls.log

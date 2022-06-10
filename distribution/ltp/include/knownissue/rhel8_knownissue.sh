@@ -69,10 +69,10 @@ function rhel8_unfix_issues()
 	# Bug 1981743 - RHEL-9-Beta: WARNING: CPU: 3 PID: 0 at kernel/sched/fair.c:401 enqueue_task_fair+0x254/0x5b0
 	osver_in_range "800" "806" && tskip "cfs_bandwidth01" unfix
 	# Skip test until RHEL-8.3
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/690
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/690
 	osver_in_range "800" "803" && tskip "fanotify15" unfix
 	# remove this once using LTP > 20220121
-	# https://gitlab.com/cki-project/kernel-tests/-/merge_requests/1187
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/merge_requests/1187
 	is_rt && osver_in_range "800" "808" && tskip "migrate_pages02" unfix
 }
 

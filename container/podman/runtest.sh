@@ -181,7 +181,7 @@ if rlIsRHEL || rlIsCentOS '9'; then
 fi
 
 if rlTestVersion ${PODMAN_VERSION} '<' '3.4.3'; then
-    # Please refer to https://gitlab.com/cki-project/kernel-tests/-/issues/807
+    # Please refer to https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/807
     # and https://github.com/containers/podman/pull/12496
     sed -i 's/@test "podman kill - test signal handling in containers" {/@test "podman kill - test signal handling in containers" {\n    skip/' ${TEST_DIR}/130-kill.bats
     sed -i 's/@test "podman logs - --follow journald" {/@test "podman logs - --follow journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
@@ -189,7 +189,7 @@ fi
 
 if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
     # https://bugzilla.redhat.com/show_bug.cgi?id=2006678
-    # https://gitlab.com/cki-project/kernel-tests/-/issues/622
+    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/622
     sed -i 's/@test "podman build - global runtime flags test" {/@test "podman build - global runtime flags test" {\n    skip/' ${TEST_DIR}/070-build.bats
     # Unsupported tests
     sed -i 's/@test "podman logs - --follow journald" {/@test "podman logs - --follow journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
@@ -203,9 +203,9 @@ if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
 fi
 
 if rlTestVersion ${PODMAN_VERSION} '=' '3.4.0'; then
-    # https://gitlab.com/cki-project/kernel-tests/-/issues/774
+    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/774
     sed -i 's/@test "podman volume import test" {/@test "podman volume import test" {\n    skip/' ${TEST_DIR}/160-volumes.bats
-    # https://gitlab.com/cki-project/kernel-tests/-/issues/781
+    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/781
     _disable_test 270-socket-activation.bats
 fi
 

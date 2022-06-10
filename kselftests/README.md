@@ -101,7 +101,7 @@ done
     **Beaker task for testing all the delivered test collections**:
 ```
     <task name="/kernel-tests/kselftests delivered tests" role="None">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
+        <fetch url="https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
             <params>
                 <param name="DELIVERED_TESTS" value="y" />
             </params>
@@ -117,7 +117,7 @@ environment:
 **Beaker task for testing select collections from the delivered tests**:
 ```
     <task name="/kernel-tests/kselftests select delivered tests" role="None">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
+        <fetch url="https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
             <params>
                 <param name="DELIVERED_TESTS" value="y" />
                 <param name="TEST_ITEMS" value="bpf net" />
@@ -141,7 +141,7 @@ environment:
 **Beaker task for upstream case** (Current issue when building aarch64 through beaker requires setting ARCH to arm64 to resolve.)
 ```
     <task name="/kernel-tests/kselftests upstream source" role="None">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
+        <fetch url="https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
             <params>
                 <param name="ARCH" value="arm64" />
                 <param name="TEST_ITEMS" value="bpf net" />
@@ -167,7 +167,7 @@ environment:
 **Beaker task to build using kernel source based on installed system** (same issue with aarch64 as above):
 ```
     <task name="/kernel-tests/kselftests kernel internal" role="None">
-        <fetch url="https://gitlab.com/cki-project/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
+        <fetch url="https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/main/kernel-tests-main.tar.gz#kselftests"/>
             <params>
                 <param name="TEST_ITEMS" value="bpf net" />
                 <param name="BUILD_FROM_SRC" value="y" />
