@@ -8,6 +8,11 @@ krelease()
 	echo $VERSION_ID | awk -F. '{print $1}'
 }
 
+get_default_iface()
+{
+	ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}'
+}
+
 install_netsniff()
 {
 	which mausezahn && return 0
@@ -58,7 +63,40 @@ install_scapy()
 	scapy -h && return 0 || return 1
 }
 
-reset_net_env()
+# Config Networkmanager to ignore network interfaces except default port.
+# Edit /usr/lib/udev/rules.d/85-nm-unmanaged.rules with rule like
+# ENV{ID_NET_DRIVER}=="ipip", ENV{NM_UNMANAGED}="1"
+# also works, but it only takes care one driver.
+set_nm_unmanage()
+{
+        local default_iface=$(get_default_iface)
+
+	# ignore ports except default port
+        echo "[keyfile]" >> /etc/NetworkManager/NetworkManager.conf
+        echo "unmanaged-devices=except:interface-name:$default_iface" \
+                >> /etc/NetworkManager/NetworkManager.conf
+
+        systemctl restart NetworkManager
+}
+
+# You'd better restore the configuration at the end of your case.
+unset_nm_unmanage()
+{
+        sed -i '/\[keyfile\]/d' /etc/NetworkManager/NetworkManager.conf
+        sed -i '/unmanaged-devices/d' /etc/NetworkManager/NetworkManager.conf
+
+        systemctl restart NetworkManager
+}
+
+# some common network setups
+set_network_env()
+{
+	set_nm_unmanage
+	return 0
+}
+
+# common network resets
+reset_network_env()
 {
 	modprobe -r act_tunnel_key
 	modprobe -r ip_gre ip6_gre gre
@@ -72,10 +110,17 @@ reset_net_env()
 	modprobe -r bareudp udp_tunnel ip6_udp_tunnel
 	ip -a netns del
 	sleep 2
+
+	# call unset_nm_unmanage() here as each reset function will call
+	# reset_network_env()
+	unset_nm_unmanage
+	return 0
 }
 
 do_net_config()
 {
+	set_network_env
+
 	pushd $EXEC_DIR/net
 	# Fix some known issues
 	# rm 0x10 for fib_rule_tests.sh due to bz1480136
@@ -122,11 +167,13 @@ do_net_reset()
 	ip -6 route restore < default_ipv6.route
 	popd
 
-	reset_net_env
+	reset_network_env
 }
 
 do_net_forwarding_config()
 {
+	set_network_env
+
 	which tc || dnf install -q -y iproute-tc
 	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
 	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
@@ -154,32 +201,46 @@ do_net_forwarding_reset()
 	sysctl -qw net.ipv4.ping_group_range="${reset_ping_group_range}"
 	# forwarding tests created veth pairs and netns, which may affect
 	# later tests when they also want to create veth interfaces.
-	reset_net_env
+	reset_network_env
+}
+
+do_net_mptcp_config()
+{
+	set_network_env
 }
 
 do_net_mptcp_reset()
 {
-	reset_net_env
+	reset_network_env
 }
 
 do_netfilter_config()
 {
+	set_network_env
+
 	which conntrack || dnf install -q -y conntrack-tools
 	install_sendip
 }
 
 do_netfilter_reset()
 {
-	reset_net_env
+	reset_network_env
+}
+
+do_bpf_config()
+{
+	set_network_env
 }
 
 do_bpf_reset()
 {
-	reset_net_env
+	reset_network_env
 }
 
 do_bpf_test_progs_config()
 {
+	set_network_env
+
 	# bz1969582 - the bpf:test_progs tests hit an expected mmap_zero avc
 	# denial, unless we first turn mmap_low_allowed on
 	echo "=== Setting mmap_low_allowed on ===" | tee -a $OUTPUTFILE
@@ -235,11 +296,13 @@ do_bpf_test_progs_reset()
 	# after testing completes, turn mmap_low_allowed off again
 	echo "=== Setting mmap_low_allowed off ===" | tee -a $OUTPUTFILE
 	setsebool -P mmap_low_allowed off
-	reset_net_env
+	reset_network_env
 }
 
 do_tc-testing_config()
 {
+	set_network_env
+
 	# prepare evn
 	dnf install -y clang valgrind
 	install_scapy
@@ -295,6 +358,11 @@ do_tc-testing_run()
 	echo "${item}: total $total_num, failed $fail, skipped $nskip"
 
 	popd
+}
+
+do_tc-testing_reset()
+{
+	reset_network_env
 }
 # ----------- init setups -----------
 
