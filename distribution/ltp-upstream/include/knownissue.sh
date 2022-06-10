@@ -117,14 +117,14 @@ function tskip()
 # - osver_in_range "600" "99999" -> PROBLEM, will be excluded forever
 function knownissue_filter()
 {
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/1052#note_922133965
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1052#note_922133965
 	# + https://lists.linux.it/pipermail/ltp/2022-March/028110.html
 	tskip "waitid10" unfix
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/797
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/797
 	# + https://github.com/linux-test-project/ltp/commit/ba50e6f93c944617cb4c94bf20a597b204dc275c
 	kernel_in_range "4.14.0" "5.15.0" && tskip "finit_module02" unfix
 	# cfs_bandwidth01 failed on aarch64 because of kernel bug
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/654
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/654
 	# + https://bugzilla.redhat.com/show_bug.cgi?id=2000839
 	# + https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2630cde26711dab0d0b56a8be1616475be646d13
 	kernel_in_range "5.0.0" "5.15" && tskip cfs_bandwidth01 unfix
@@ -158,7 +158,7 @@ function knownissue_filter()
 	tskip "ftrace-stress-test" fatal
 	# Issue TBD
 	tskip "sync_file_range02" unfix
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/536
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/536
 	tskip "ioctl09" unfix
 	# OOM tests result in oom errors killing the test harness
 	tskip "oom.*" fatal
@@ -186,7 +186,7 @@ function knownissue_filter()
 	tskip "netns_breakns_ip_ipv6_netlink netns_breakns_ns_exec_ipv6_netlink" unfix
 	# Bug 1912670 - semctl SEM_STAT_ANY fails to pass the buffer specified by the caller to the kernel
 	tskip "semctl09" unfix
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/563#note_658789326
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/563#note_658789326
 	tskip "mkswap01" unfix
 
 	if is_rhel8; then
@@ -195,9 +195,9 @@ function knownissue_filter()
                 osver_in_range "800" "802" && tskip "mbind02" unfix
         fi
 
-	# XXX: https://gitlab.com/cki-project/kernel-tests/-/issues/541
+	# XXX: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/541
 	cki_is_vm && tskip "ksm*" unfix
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/639
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/639
 	cki_is_vm && tskip "msgstress03 msgstress04" fatal
 	# http://lists.infradead.org/pipermail/linux-arm-kernel/2021-June/668228.html
 	is_arch "aarch64" && tskip "read_all_sys" fatal

@@ -202,7 +202,7 @@ function runtest_tweaker()
 	#
 	# reduce the number of dio tests on x86_64 if the available memory size
 	# of SUT <= 4G. For defails, please refer to:
-	#     https://gitlab.com/cki-project/kernel-tests/-/issues/624
+	#     https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/624
 	#
 	if [ $(uname -m) == "x86_64" ] &&
 	   [ $MEM_AVAILABLE -le 4096 ]; then

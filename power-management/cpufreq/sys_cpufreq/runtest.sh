@@ -65,7 +65,7 @@ function runtest
     # be defined as 90% of the real one. Notice the order of numbers -
     # it's important to multiply before division in the integer arithmetic.
     # The issue is described in the:
-    # https://gitlab.com/cki-project/kernel-tests/-/issues/920
+    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/920
     (( fake_min_freq = $min_freq * 9 / 10 ))
 
     if (( $cur_freq < $fake_min_freq )); then

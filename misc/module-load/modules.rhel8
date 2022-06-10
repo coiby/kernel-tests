@@ -269,7 +269,7 @@ vhost_net
 vhost_vsock
 videodev
 vmac
-# https://gitlab.com/cki-project/kernel-tests/-/issues/963
+# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/963
 # vport-geneve
 # vport-gre
 # vport-vxlan

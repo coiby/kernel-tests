@@ -12,10 +12,10 @@ function rhel9_unfix_issues()
 {
 	# https://bugzilla.redhat.com/show_bug.cgi?id=1913045#c24
 	is_arch "aarch64" && tskip "ioctl_sg01" unfix
-	# https://gitlab.com/cki-project/kernel-tests/-/issues/536#note_896846475
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/536#note_896846475
 	tskip "ioctl09" unfix
 	# remove this once using LTP > 20220121
-	# https://gitlab.com/cki-project/kernel-tests/-/merge_requests/1187
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/merge_requests/1187
 	is_rt && osver_in_range "900" "901" && tskip "migrate_pages02" unfix
 }
 

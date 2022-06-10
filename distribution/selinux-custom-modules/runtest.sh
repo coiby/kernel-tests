@@ -20,7 +20,7 @@ rlJournalStart
         rlRun "sed -i 's/ -sv no//' /usr/share/restraint/plugins/report_result.d/10_avc_check"
     fi
 
-    # https://gitlab.com/cki-project/kernel-tests/-/issues/528
+    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/528
     # Bug 1932849 - avc: denied { module_request } kmod="net-pf-10"
     if grep "ipv6.disable=1" /proc/cmdline ; then
       rlRun "setsebool -P domain_kernel_load_modules on" 0 "Mask problems with module_request due BZ1932849 when IPv6 is disabled"

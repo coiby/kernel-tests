@@ -341,7 +341,7 @@ cki_is_kernel_debug()
 # For example some ELN kernel builds in koji
 # Check for debug options that can cause performance issues
 # handle these sort of kernel as debug kernels
-# https://gitlab.com/cki-project/kernel-tests/-/issues/657
+# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/657
 cki_has_kernel_debug_flags()
 {
     if grep -qwE "CONFIG_LOCKDEP=y|CONFIG_DEBUG_OBJECTS=y" /boot/config-"$(uname -r)"; then
