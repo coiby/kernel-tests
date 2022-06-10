@@ -3,6 +3,10 @@ include:
   - project: cki-project/cki-lib
     file: .gitlab/ci_templates/cki-common.yml
 
+default:
+  tags:
+    - kernel-qe-internal-runner
+
 shell check cki:
   extends: .tox
   before_script:
