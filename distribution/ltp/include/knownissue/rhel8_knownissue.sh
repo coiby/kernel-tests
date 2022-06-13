@@ -60,7 +60,7 @@ function rhel8_unfix_issues()
 	# Bug 1844854 - ltp: bpf_prog01 Failed verification: in-kernel BTF is malformed
 	is_arch "s390x" && tskip "bpf_prog01" unfix
 	# Bug 1845879 - fanotify: fix ignore mask logic for events on child and on dir
-	osver_in_range "800" "806" && tskip "fanotify10" unfix
+	tskip "fanotify10" unfix
 	# ptrace08 case issue, tst_kvercmp isn't suitable for rhel8's kernel version
 	osver_in_range "800" "805" && tskip "ptrace08 cve-2018-1000199" unfix
 	# Unable to load BPF programs on s390x kernels built by CKI
