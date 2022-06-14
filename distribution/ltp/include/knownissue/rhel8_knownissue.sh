@@ -23,6 +23,8 @@ function rhel8_unfix_issues()
 	osver_in_range "800" "805" && is_arch "aarch64" && tskip "move_pages12" unfix
 	# Bug 1880265 - RHEL8.3 Snapshot1 - Slab memory controller issue (mm-)
 	osver_in_range "800" "805" && tskip "madvise06" unfix
+	# Bug 1937519 - [HPE 8.4 Bug] madvise page faults - ltp
+	tskip "madvise06" unfix
 	# Bug 1832099 - fanotify: fix merging marks masks with FAN_ONDIR
 	osver_in_range "800" "806" && tskip "fanotify09" unfix
 	# Bug 1805587 - [FJ8.2 Bug]: system crash happened due to NULL pointer dereference at slip_write_wakeup()
