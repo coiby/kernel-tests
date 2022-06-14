@@ -40,28 +40,28 @@
 cver=$(uname -r)
 arch=$(uname -m)
 
+function is_fedora() { grep -iq "fedora" /etc/system-release; }
+function is_rhel() { grep -iq "red hat enterprise linux" /etc/system-release; }
+function is_centos() { grep -iq "CentOS" /etc/system-release; }
+
 # Identify OS release
-if [ -r /etc/system-release-cpe ]; then
-	# If system-release-cpe exists, we're on Fedora or RHEL6 or newer
-	cpe=$(cat /etc/system-release-cpe)
-	osflav=$(echo $cpe | cut -d: -f4)
+if [ -r /etc/system-release ]; then
+	# If system-release exists, we're on Fedora or RHEL6 or newer
+	release=$(cat /etc/system-release)
 
-	case $osflav in
-		  fedora)
-			osver=$(echo $cpe | cut -d: -f5)
-			;;
-
-	enterprise_linux)
-			osver=$(echo $cpe | awk -F: '{print int(substr($5, 1,1))*100 + (int(substr($5,3,2)))}')
-			;;
-	centos)
-			osver=$(echo $cpe | awk -F: '{print int(substr($5, 1,1))*100 + (int(substr($5,3,2)))}')
-			;;
-	esac
+	if is_fedora; then
+		osver=$(echo $release | cut -d' ' -f3)
+	elif is_rhel; then
+		osver=$(echo $release | awk -F' ' '{print int(substr($6, 1,1))*100 + (int(substr($6,3,1)))}')
+	elif is_centos; then
+		# CentOS Stream seems to contain only major release info
+		osver=$(echo $release | awk -F' ' '{print int(substr($4, 1,1))*100}')
+	fi
 else
-	# if we don't have system-release-cpe, use the old mechanism
+	# if we don't have system-release, use the old mechanism
 	osver=0
 fi
+
 
 kn_fatal=${LTPDIR}/KNOWNISSUE_FATAL
 kn_unfix=${LTPDIR}/KNOWNISSUE_UNFIX
@@ -80,8 +80,7 @@ function is_zstream() { uname -r | awk -F. '{if (match($4, "[[:digit:]]") != 1) 
 function is_kvm()
 {
 	if command -v virt-what; then
-		hv=$(virt-what)
-		[ "$hv" == "kvm" ] && return 0
+		return $(virt-what | grep -q "kvm")
 	fi
 	return 1
 }
