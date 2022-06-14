@@ -3,9 +3,37 @@ include:
   - project: cki-project/cki-lib
     file: .gitlab/ci_templates/cki-common.yml
 
+.rules:
+  no-merge-train:
+    if: $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
+    when: never
+  mr-parent:
+    if: $CI_MERGE_REQUEST_ID && $CI_PROJECT_ID == $CI_MERGE_REQUEST_PROJECT_ID
+  mr-fork:
+    if: $CI_MERGE_REQUEST_ID && $CI_PROJECT_ID != $CI_MERGE_REQUEST_PROJECT_ID
+  default-branch:
+    if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PROJECT_PATH =~ /^redhat/
+
+# override the default CKI workflow rules to only run in very specific
+# circumstances as forks don't have the tagged runners available
+workflow:
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, mr-fork]
+    - !reference [.rules, default-branch]
+
 default:
   tags:
     - kernel-qe-internal-runner
+
+# explicitly fail MR pipelines running in a fork instead of the parent repo
+# most likely a click on https://red.ht/GitLabSSO is needed for RH employees
+insufficient-permissions:
+  trigger:
+    project: redhat/insufficient-permissions
+    strategy: depend
+  rules:
+    - !reference [.rules, mr-fork]
 
 shell check cki:
   extends: .tox
@@ -15,8 +43,120 @@ shell check cki:
     - touch /usr/share/beakerlib/beakerlib.sh
   script:
     - shellcheck --external-sources --format=gcc cki_*/*.sh
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
 
 shell check runtests:
   extends: .tox
   script:
     - find -name '*.sh' -exec shellcheck --severity=error -f gcc {} +
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+
+.git-sync:
+  stage: 🚀
+  image: registry.gitlab.com/cki-project/cki-tools/cki-tools:production
+  variables:
+    INTERNAL_GITLAB_HOST: gitlab.cee.redhat.com
+    INTERNAL_GITLAB_PROJECT: kernel-qe/kernel-tests-public
+    COMMENT_TEMPLATE_J2: |
+      {% set suite_url = 'https://' +
+        env['INTERNAL_GITLAB_HOST'] +
+        '/api/v4/projects/' +
+        (env['INTERNAL_GITLAB_PROJECT'] | replace('/', '%2f')) +
+        '/repository/archive.zip?sha=refs/heads/' +
+        env['TARGET_BRANCH']
+      -%}
+      {% set mr_url = env['CI_MERGE_REQUEST_PROJECT_URL'] +
+        '/-/merge_requests/' +
+        env['CI_MERGE_REQUEST_IID']
+      -%}
+      The updated code is synced to the [internal mirror]({{ suite_url }}).
+
+      <details>
+      <summary>Click here for an example on how to trigger a Beaker job with it.</summary>
+
+      ```xml
+      <job>
+        <whiteboard>Beaker job for {{ mr_url }}</whiteboard>
+        <recipeSet>
+          <recipe ks_meta="redhat_ca_cert">
+            <distroRequires>
+              <distro_arch op="=" value="x86_64"/>
+              <variant op="=" value="BaseOS"/>
+              <distro_family op="=" value="CentOSStream9"/>
+            </distroRequires>
+            <hostRequires/>
+            <task name="/test/misc/machineinfo">
+              <fetch url="{{ suite_url }}#test/misc/machineinfo"/>
+              <params/>
+            </task>
+          </recipe>
+        </recipeSet>
+      </job>
+      ```
+      </details>
+  script:
+    - git push --force
+      "https://git:${GITLAB_JOB_MIRROR_KERNEL_TESTS_MIRROR_ACCESS_TOKEN}@${INTERNAL_GITLAB_HOST}/${INTERNAL_GITLAB_PROJECT}.git"
+      "HEAD:refs/heads/$TARGET_BRANCH"
+    - |
+      if [[ -n "${CI_MERGE_REQUEST_PROJECT_ID:-}" ]]; then
+        # delete old bot notes
+        bot_user_id=$(
+            gitlab \
+                --private-token "${GITLAB_JOB_MIRROR_KERNEL_TESTS_COMMENT_ACCESS_TOKEN}" \
+                --output json \
+                --fields id \
+                current-user get \
+            | jq \
+                --raw-output \
+                '.id'
+        )
+        gitlab \
+            --private-token "${GITLAB_JOB_MIRROR_KERNEL_TESTS_COMMENT_ACCESS_TOKEN}" \
+            --output json \
+            --fields id,author \
+            project-merge-request-note list \
+            --project-id "${CI_MERGE_REQUEST_PROJECT_ID}" \
+            --mr-iid "${CI_MERGE_REQUEST_IID}" \
+            --all \
+        | jq \
+            --raw-output \
+            --arg user_id "${bot_user_id}" \
+            '.[] | select(.author.id == ($user_id | tonumber)) | .id' \
+        | xargs \
+            --max-args 1 \
+            --no-run-if-empty \
+            gitlab \
+            --private-token "${GITLAB_JOB_MIRROR_KERNEL_TESTS_COMMENT_ACCESS_TOKEN}" \
+            project-merge-request-note delete \
+            --project-id "${CI_MERGE_REQUEST_PROJECT_ID}" \
+            --mr-iid "${CI_MERGE_REQUEST_IID}" \
+            --id
+        # post a new note with the URL
+        body=$(python3 -m cki.deployment_tools.render <<< "${COMMENT_TEMPLATE_J2}")
+        gitlab \
+            --private-token "${GITLAB_JOB_MIRROR_KERNEL_TESTS_COMMENT_ACCESS_TOKEN}" \
+            project-merge-request-note create \
+            --project-id "${CI_MERGE_REQUEST_PROJECT_ID}" \
+            --mr-iid "${CI_MERGE_REQUEST_IID}" \
+            --body "${body}"
+      fi
+
+git-sync-mr:
+  extends: .git-sync
+  variables:
+    TARGET_BRANCH: merge-requests/$CI_MERGE_REQUEST_IID
+  rules:
+    - !reference [.rules, no-merge-train]
+    - !reference [.rules, mr-parent]
+
+git-sync-default-branch:
+  extends: .git-sync
+  variables:
+    TARGET_BRANCH: $CI_COMMIT_BRANCH
+  rules:
+    - !reference [.rules, default-branch]
