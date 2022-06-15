@@ -122,3 +122,11 @@ vm/hugepage/libhugetlbfs @cki-project
 vm/kvm-self-tests @cki-project
 vm/kvm-unit-tests @cki-project
 watchdog/hw-generic @cki-project
+
+[MM-QE tests]
+memory @mm-qe
+core-kernel/xarray-idr-radixtree-test @mm-qe
+distribution/ltp @mm-qe
+distribution/ltp-upstream @mm-qe
+misc/amtu @mm-qe
+vm/hugepage @mm-qe
