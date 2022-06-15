@@ -181,7 +181,7 @@ function check_x86_paging_level()
 function x86_get_default_addr()
 {
 	cmp_file_list="_text page_offset_base vmemmap_base Kernel_code Kernel_data Kernel_bss"
-	stable_file_list="_text Kernel_code"
+	stable_file_list="_text"
 	_text=ffffffff81000000
 	Kernel_code=01000000
 
