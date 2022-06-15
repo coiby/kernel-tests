@@ -52,7 +52,11 @@ if [ -r /etc/system-release ]; then
 	if is_fedora; then
 		osver=$(echo $release | cut -d' ' -f3)
 	elif is_rhel; then
-		osver=$(echo $release | awk -F' ' '{print int(substr($6, 1,1))*100 + (int(substr($6,3,1)))}')
+		osver=$(echo $release | awk -F' ' '{print int(substr($6, 1,1))*100 + (int(substr($6,3,2)))}')
+		if [ "$osver" == "0" ]; then
+			# fallback for format in rhel <= 7
+			osver=$(echo $release | awk -F' ' '{print int(substr($7, 1,1))*100 + (int(substr($7,3,2)))}')
+		fi
 	elif is_centos; then
 		# CentOS Stream seems to contain only major release info
 		osver=$(echo $release | awk -F' ' '{print int(substr($4, 1,1))*100}')
