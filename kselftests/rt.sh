@@ -76,6 +76,8 @@ net:icmp.sh
 net:gro.sh
 # Error: Specified qdisc not found, several link failures
 net/mptcp:mptcp_join.sh
+# bz2096948: BUG: scheduling while atomic: swapper/1/0/0x00000002
+net:udpgro_fwd.sh
 # ERROR: ns2-L4PDHwvX did not pick up tcp connection from peer
 netfilter:conntrack_tcp_unreplied.sh
 )
