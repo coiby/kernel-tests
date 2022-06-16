@@ -133,6 +133,3 @@ vm/hugepage/ @mm-qe
 
 [Codeowners]
 CODEOWNERS @bgoncalv @lulinqing @mh21
-
-[Fallback]
-* @redhat/centos-stream/tests/kernel
