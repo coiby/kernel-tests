@@ -1,5 +1,4 @@
 [CKI tests]
-* @redhat/centos-stream/tests/kernel
 .gitlab-ci.yml @cki-project
 acpi/acpitable/ @cki-project
 acpi/enabled/ @cki-project
@@ -125,7 +124,6 @@ vm/kvm-unit-tests/ @cki-project
 watchdog/hw-generic/ @cki-project
 
 [MM-QE tests]
-* @redhat/centos-stream/tests/kernel
 memory/ @mm-qe
 core-kernel/xarray-idr-radixtree-test/ @mm-qe
 distribution/ltp/ @mm-qe
@@ -134,4 +132,7 @@ misc/amtu/ @mm-qe
 vm/hugepage/ @mm-qe
 
 [Codeowners]
-CODEOWNERS @bgoncalv @lilu @mh21
+CODEOWNERS @bgoncalv @lulinqing @mh21
+
+[Fallback]
+* @redhat/centos-stream/tests/kernel
