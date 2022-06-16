@@ -80,7 +80,7 @@ build_pjd_fstest()
 {
 	local workdir=$1
 	pushd $workdir
-	rlRun -l "git clone git://git.code.sf.net/p/ntfs-3g/pjd-fstest" "0-255" "Cloning pjd-fstest repo"
+	rlRun -l "git clone https://github.com/tuxera/pjd-fstest.git" "0-255" "Cloning pjd-fstest repo"
 	if [ $? -ne 0 ]; then
 		echo "WARN : Failed cloning pjd-fstest" | tee -a $OUTPUTFILE
 		rstrnt-report-result $TEST WARN
