@@ -1,135 +1,209 @@
-[CKI tests]
-.gitlab-ci.yml @redhat/centos-stream/tests/kernel/groups/cki
-acpi/acpitable/ @redhat/centos-stream/tests/kernel/groups/cki
-acpi/enabled/ @redhat/centos-stream/tests/kernel/groups/cki
-autofs/connectathon/ @redhat/centos-stream/tests/kernel/groups/cki
-container/podman/ @redhat/centos-stream/tests/kernel/groups/cki
-core-kernel/module_diff/ @redhat/centos-stream/tests/kernel/groups/cki
-core-kernel/Xarray-idr-radixtree-test/ @redhat/centos-stream/tests/kernel/groups/cki
-cpu/die/ @redhat/centos-stream/tests/kernel/groups/cki
-cpu/driver/ @redhat/centos-stream/tests/kernel/groups/cki
-cpu/idle/ @redhat/centos-stream/tests/kernel/groups/cki
-cki_bin/ @redhat/centos-stream/tests/kernel/groups/cki
-cki_lib/ @redhat/centos-stream/tests/kernel/groups/cki
-dci/ @redhat/centos-stream/tests/kernel/groups/cki
-distribution/kernel-debuginfo/ @redhat/centos-stream/tests/kernel/groups/cki
-distribution/ltp/lite/ @redhat/centos-stream/tests/kernel/groups/cki
-distribution/ltp/openposix_testsuite/ @redhat/centos-stream/tests/kernel/groups/cki
-distribution/ltp-upstream/lite/ @redhat/centos-stream/tests/kernel/groups/cki
-filesystems/cifs/connectathon/ @redhat/centos-stream/tests/kernel/groups/cki
-filesystems/general/pjd-fstest/ @redhat/centos-stream/tests/kernel/groups/cki
-filesystems/loopdev/sanity/ @redhat/centos-stream/tests/kernel/groups/cki
-filesystems/nfs/connectathon/ @redhat/centos-stream/tests/kernel/groups/cki
-filesystems/xfs/xfstests/ @redhat/centos-stream/tests/kernel/groups/cki
-firmware/user-specified/ @redhat/centos-stream/tests/kernel/groups/cki
-iommu/boot/ @redhat/centos-stream/tests/kernel/groups/cki
-ipmi/stress/driver/ @redhat/centos-stream/tests/kernel/groups/cki
-ipmi/stress/ipmitool-loop/ @redhat/centos-stream/tests/kernel/groups/cki
-jvm/dacapobench/ @redhat/centos-stream/tests/kernel/groups/cki
-jvm/jcstress/ @redhat/centos-stream/tests/kernel/groups/cki
-kdump/kdump-file-load/ @redhat/centos-stream/tests/kernel/groups/cki
-kdump/kdump-sysrq-c/ @redhat/centos-stream/tests/kernel/groups/cki
-kdump/kexec-boot/ @redhat/centos-stream/tests/kernel/groups/cki
-kdump/kexec-file-load/ @redhat/centos-stream/tests/kernel/groups/cki
-kselftests/ @redhat/centos-stream/tests/kernel/groups/cki
-kunit/ @redhat/centos-stream/tests/kernel/groups/cki
-legacy/pci_id/ @redhat/centos-stream/tests/kernel/groups/cki
-legacy/whitelist/ @redhat/centos-stream/tests/kernel/groups/cki
-memory/fork_mem/ @redhat/centos-stream/tests/kernel/groups/cki
-memory/function/kaslr/ @redhat/centos-stream/tests/kernel/groups/cki
-memory/function/memfd_create/ @redhat/centos-stream/tests/kernel/groups/cki
-misc/amtu/ @redhat/centos-stream/tests/kernel/groups/cki
-misc/header-test/ @redhat/centos-stream/tests/kernel/groups/cki
-misc/kernel-fips-mode/ @redhat/centos-stream/tests/kernel/groups/cki
-misc/module-load/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/bridge/sanity_check/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/driver/sanity/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/igmp/conformance/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/ipsec/ipsec_basic/ipsec_basic_netns/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/macsec/sanity_check/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/netfilter/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/route/pmtu/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/route/route_func/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/sctp/auth/sockopts/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/socket/fuzz/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/tcp/tcp_keepalive/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/tunnel/geneve/basic/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/tunnel/gre/basic/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/tunnel/l2tp/basic/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/tunnel/tunctl/permtest/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/tunnel/vxlan/basic/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/udp/udp_socket/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/vnic/ipvlan/basic/ @redhat/centos-stream/tests/kernel/groups/cki
-networking/vrf/sanity_check/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/httpd/mod_ssl-smoke/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/i2c-tools/sanity/i2cdetect-smoke/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/iotop/sanity/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/libkcapi/af_alg-test/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/net-snmp/tcp-transport/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/perf/internal-testsuite/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/perf/perftool-testsuite/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/redhat-rpm-config/detect-kabi-provides/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/redhat-rpm-config/kabi-whitelist-not-found/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/redhat-rpm-config/kernel-module-symbol-requires/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/selinux-policy/serge-testsuite/ @redhat/centos-stream/tests/kernel/groups/cki
-packages/tuned/tune-processes-through-perf/ @redhat/centos-stream/tests/kernel/groups/cki
-pciutils/sanity-smoke/ @redhat/centos-stream/tests/kernel/groups/cki
-pciutils/update-pciids/ @redhat/centos-stream/tests/kernel/groups/cki
-power-management/cpufreq/cpufreq_governor/ @redhat/centos-stream/tests/kernel/groups/cki
-power-management/cpufreq/sys_cpufreq/ @redhat/centos-stream/tests/kernel/groups/cki
-power-management/rapl/powercap/ @redhat/centos-stream/tests/kernel/groups/cki
-rt-tests/latency_perf/oslat_valid/ @redhat/centos-stream/tests/kernel/groups/cki
-rt-tests/latency_perf/rt_cyclic/ @redhat/centos-stream/tests/kernel/groups/cki
-rt-tests/pi_stress/ @redhat/centos-stream/tests/kernel/groups/cki
-rt-tests/rteval/ @redhat/centos-stream/tests/kernel/groups/cki
-rt-tests/rt_ltp/ @redhat/centos-stream/tests/kernel/groups/cki
-rt-tests/rt_migrate_test/ @redhat/centos-stream/tests/kernel/groups/cki
-rt-tests/sched_deadline/ @redhat/centos-stream/tests/kernel/groups/cki
-rt-tests/smidetect/ @redhat/centos-stream/tests/kernel/groups/cki
-sound/aloop/ @redhat/centos-stream/tests/kernel/groups/cki
-sound/user-ctl-elem/ @redhat/centos-stream/tests/kernel/groups/cki
-standards/usex/1.9-29/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/blktests/blk/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/blktests/nvme/nvmeof-mp/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/blktests/nvme/nvme-rdma/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/blktests/nvme/nvme-tcp/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/blktests/srp/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/block/fio_numa/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/block/fs_fio/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/block/mq_sche/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/block/zstd_compression/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/block/zstd_smoke/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/dm/common/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/hba/san-device-stress/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/hw_raid/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/iscsi/params/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/lvm/cache/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/lvm/device-mapper/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/lvm/snapper/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/lvm/thinp/sanity/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/lvm/thinp/stqe/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/nvdimm/ndctl-test-suite/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/scsi/vpd/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/swraid/mdadm/raid_module/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/swraid/scsi_raid/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/swraid/trim/ @redhat/centos-stream/tests/kernel/groups/cki
-storage/target/targetcli_basic/ @redhat/centos-stream/tests/kernel/groups/cki
-stress/stress-ng/ @redhat/centos-stream/tests/kernel/groups/cki
-trace/bpf/test_bpf/ @redhat/centos-stream/tests/kernel/groups/cki
-trace/ftrace/tracer/ @redhat/centos-stream/tests/kernel/groups/cki
-tracepoints/operational/ @redhat/centos-stream/tests/kernel/groups/cki
-vm/hugepage/libhugetlbfs/ @redhat/centos-stream/tests/kernel/groups/cki
-vm/kvm-self-tests/ @redhat/centos-stream/tests/kernel/groups/cki
-vm/kvm-unit-tests/ @redhat/centos-stream/tests/kernel/groups/cki
-watchdog/hw-generic/ @redhat/centos-stream/tests/kernel/groups/cki
-
-[MM-QE tests]
-memory/ @mm-qe
-core-kernel/xarray-idr-radixtree-test/ @mm-qe
-distribution/ltp/ @mm-qe
-distribution/ltp-upstream/ @mm-qe
-misc/amtu/ @mm-qe
-vm/hugepage/ @mm-qe
-
 [Codeowners]
 CODEOWNERS @bgoncalv @lulinqing @mh21
+
+# GITLAB-CODEOWNERS-CONFIG-BEGIN
+#
+# general:
+#   project_url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests
+#   access_level: 30
+# sections:
+#   Infrastructure:
+#     users:
+#       - cki-project
+#     paths:
+#       - .gitlab-ci.yml
+#   CKI:
+#     users:
+#       - cki-project
+#     kpet: locations
+#   Maintainers:
+#     kpet: maintainers
+#   MM-QE:
+#     users:
+#       - mm-qe
+#     paths:
+#       - memory/
+#       - core-kernel/xarray-idr-radixtree-test/
+#       - distribution/ltp/
+#       - distribution/ltp-upstream/
+#       - misc/amtu/
+#       - vm/hugepage/
+#
+# GITLAB-CODEOWNERS-CONFIG-END
+
+# GITLAB-CODEOWNERS-GENERATED-BEGIN
+# 817bf36db4b1824a866d1a472a8fc2455ccf4a9d7440c78e00691f08315289fa
+
+[Infrastructure]
+.gitlab-ci.yml @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+
+[CKI]
+acpi/acpitable/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+acpi/enabled/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+autofs/connectathon/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+container/podman/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+core-kernel/module_diff/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+cpu/die/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+cpu/driver/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+cpu/idle/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+distribution/kernel-debuginfo/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+distribution/ltp-upstream/lite/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+distribution/ltp/lite/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+distribution/ltp/openposix_testsuite/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+filesystems/cifs/connectathon/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+filesystems/general/pjd-fstest/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+filesystems/loopdev/sanity/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+filesystems/nfs/connectathon/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+filesystems/xfs/xfstests/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+firmware/user-specified/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+iommu/boot/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+ipmi/stress/driver/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+ipmi/stress/ipmitool-loop/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+jvm/dacapobench/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+jvm/jcstress/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+kdump/kdump-file-load/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+kdump/kdump-sysrq-c/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+kdump/kexec-boot/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+kdump/kexec-file-load/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+kselftests/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+kunit/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+legacy/pci_id/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+legacy/whitelist/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+memory/fork_mem/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+memory/function/kaslr/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+memory/function/memfd_create/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+misc/amtu/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+misc/header-test/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+misc/kernel-fips-mode/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+misc/module-load/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/bridge/sanity_check/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/driver/sanity/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/igmp/conformance/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/macsec/sanity_check/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/netfilter/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/route/pmtu/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/route/route_func/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/sctp/auth/sockopts/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/socket/fuzz/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/tcp/tcp_keepalive/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/tunnel/geneve/basic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/tunnel/gre/basic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/tunnel/l2tp/basic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/tunnel/tunctl/permtest/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/tunnel/vxlan/basic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/udp/udp_socket/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/vnic/ipvlan/basic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+networking/vrf/sanity_check/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/httpd/mod_ssl-smoke/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/iotop/sanity/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/libkcapi/af_alg-test/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/net-snmp/tcp-transport/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/perf/internal-testsuite/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/perf/perftool-testsuite/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/selinux-policy/serge-testsuite/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+packages/tuned/tune-processes-through-perf/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+pciutils/sanity-smoke/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+pciutils/update-pciids/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+power-management/cpufreq/cpufreq_governor/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+power-management/cpufreq/sys_cpufreq/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+power-management/rapl/powercap/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/latency_perf/oslat_valid/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/latency_perf/rt_cyclic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/pi_stress/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/rt_ltp/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/rt_migrate_test/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/rteval/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/sched_deadline/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/smidetect/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+rt-tests/us/stalld/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+sound/aloop/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+sound/user-ctl-elem/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+standards/usex/1.9-29/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/blktests/blk/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/blktests/nvme/nvme-rdma/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/blktests/nvme/nvme-tcp/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/blktests/nvme/nvmeof-mp/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/blktests/srp/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/block/fio_numa/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/block/fs_fio/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/block/mq_sche/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/block/zstd_compression/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/block/zstd_smoke/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/dm/common/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/hba/san-device-stress/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/hw_raid/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/iscsi/params/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/lvm/cache/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/lvm/device-mapper/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/lvm/snapper/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/lvm/thinp/sanity/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/lvm/thinp/stqe/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/nvdimm/ndctl-test-suite/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/scsi/vpd/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/swraid/mdadm/raid_module/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/swraid/scsi_raid/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/swraid/trim/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/target/targetcli_basic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+stress/stress-ng/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+trace/bpf/test_bpf/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+trace/ftrace/tracer/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+tracepoints/operational/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+vm/hugepage/libhugetlbfs/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+vm/kvm-self-tests/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+vm/kvm-unit-tests/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+watchdog/hw-generic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+
+[Maintainers]
+acpi/acpitable/ @ahs3
+acpi/enabled/ @jbastianrh
+container/podman/ @ftjahjad
+core-kernel/Xarray-idr-radixtree-test/ @chuhu @liwan1 @pifang
+distribution/ltp-upstream/lite/ @chuhu @liwan1 @pifang
+distribution/ltp/lite/ @chuhu @liwan1 @pifang
+distribution/ltp/openposix_testsuite/ @chuhu @liwan1 @pifang
+filesystems/xfs/xfstests/ @nstraz
+ipmi/stress/driver/ @ftjahjad
+ipmi/stress/ipmitool-loop/ @ftjahjad
+kdump/kdump-file-load/ @emmawu1
+kdump/kdump-sysrq-c/ @emmawu1
+kdump/kexec-boot/ @emmawu1
+kdump/kexec-file-load/ @emmawu1
+memory/fork_mem/ @chuhu @liwan1 @pifang
+memory/function/kaslr/ @chuhu @liwan1 @pifang
+memory/function/memfd_create/ @chuhu @liwan1 @pifang
+misc/amtu/ @chuhu @liwan1 @pifang
+misc/header-test/ @jbastianrh
+misc/module-load/ @jbastianrh
+packages/libkcapi/af_alg-test/ @omos
+packages/selinux-policy/serge-testsuite/ @omos
+rt-tests/latency_perf/oslat_valid/ @waylon531
+rt-tests/latency_perf/rt_cyclic/ @waylon531
+rt-tests/pi_stress/ @waylon531
+rt-tests/rt_ltp/ @waylon531
+rt-tests/rt_migrate_test/ @zhaoqiao
+rt-tests/rteval/ @zhaoqiao
+rt-tests/sched_deadline/ @zhaoqiao
+rt-tests/smidetect/ @zhaoqiao
+rt-tests/us/stalld/ @waylon531
+stress/stress-ng/ @jbastianrh
+trace/bpf/test_bpf/ @sztsian
+trace/ftrace/tracer/ @sztsian
+tracepoints/operational/ @jbastianrh
+vm/hugepage/libhugetlbfs/ @chuhu @liwan1 @pifang
+watchdog/hw-generic/ @ftjahjad
+
+[MM-QE]
+core-kernel/xarray-idr-radixtree-test/ @chuhu @liwan1 @pifang
+distribution/ltp-upstream/ @chuhu @liwan1 @pifang
+distribution/ltp/ @chuhu @liwan1 @pifang
+memory/ @chuhu @liwan1 @pifang
+misc/amtu/ @chuhu @liwan1 @pifang
+vm/hugepage/ @chuhu @liwan1 @pifang
+
+# GITLAB-CODEOWNERS-GENERATED-END
