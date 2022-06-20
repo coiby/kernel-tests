@@ -40,7 +40,7 @@ function test_msg()
 #
 # NOTE: We use a tested commit to avoid that breakage in LTP's master branch
 #       which may make our test suites less stable
-LTP_REPO_COMMIT_ID=9bc65ed242de360968682922d20f576e25340e86
+LTP_REPO_COMMIT_ID=6763a3650734e020383d17b511376a11b208944b
 function ltp_test_build()
 {
 	# NOTE: Skip to built and install ltp if it is done as we split a
