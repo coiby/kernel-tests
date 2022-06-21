@@ -1,0 +1,54 @@
+From 1cb689d4f2e086f977791c17ccb4a4c6fb97bc64 Mon Sep 17 00:00:00 2001
+From: Ping Fang <pifang@redhat.com>
+Date: Thu, 9 Jun 2022 15:37:57 +0800
+Subject: [PATCH] rhel9 support futex_waitv
+
+Signed-off-by: Ping Fang <pifang@redhat.com>
+---
+ testcases/kernel/syscalls/futex/futex_waitv01.c | 2 +-
+ testcases/kernel/syscalls/futex/futex_waitv02.c | 2 +-
+ testcases/kernel/syscalls/futex/futex_waitv03.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/futex/futex_waitv01.c b/testcases/kernel/syscalls/futex/futex_waitv01.c
+index f2c19b748..2457daa04 100644
+--- a/testcases/kernel/syscalls/futex/futex_waitv01.c
++++ b/testcases/kernel/syscalls/futex/futex_waitv01.c
+@@ -132,7 +132,7 @@ static struct tst_test test = {
+ 	.test_all = run,
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+-	.min_kver = "5.16",
++	.min_kver = "5.14",
+ 	.bufs =
+ 		(struct tst_buffers[]){
+ 			{ &waitv, .size = sizeof(struct futex_waitv) },
+diff --git a/testcases/kernel/syscalls/futex/futex_waitv02.c b/testcases/kernel/syscalls/futex/futex_waitv02.c
+index 0a0e2b620..efbf3ff0c 100644
+--- a/testcases/kernel/syscalls/futex/futex_waitv02.c
++++ b/testcases/kernel/syscalls/futex/futex_waitv02.c
+@@ -96,7 +96,7 @@ static void run(void)
+ static struct tst_test test = {
+ 	.test_all = run,
+ 	.setup = setup,
+-	.min_kver = "5.16",
++	.min_kver = "5.14",
+ 	.test_variants = FUTEX_VARIANTS,
+ 	.options =
+ 		(struct tst_option[]){
+diff --git a/testcases/kernel/syscalls/futex/futex_waitv03.c b/testcases/kernel/syscalls/futex/futex_waitv03.c
+index ffe5c66cd..74194b349 100644
+--- a/testcases/kernel/syscalls/futex/futex_waitv03.c
++++ b/testcases/kernel/syscalls/futex/futex_waitv03.c
+@@ -117,7 +117,7 @@ static struct tst_test test = {
+ 	.test_all = run,
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+-	.min_kver = "5.16",
++	.min_kver = "5.14",
+ 	.test_variants = FUTEX_VARIANTS,
+ 	.options =
+ 		(struct tst_option[]){
+-- 
+2.31.1
+

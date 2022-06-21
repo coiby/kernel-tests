@@ -18,9 +18,6 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "902" && tskip "inotify11" unfix
 	# Bug 2085824 - [RHEL-9.1] /ltp/lite madvise06.c:231: TFAIL: 7 pages were faulted out of 2 max 54
 	osver_in_range "900" "902" && tskip "madvise06" unfix
-	# remove this once using LTP > 20220121
-	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/merge_requests/1187
-	is_rt && osver_in_range "900" "902" && tskip "migrate_pages02" unfix
 }
 
 function rhel9_fixed_issues()

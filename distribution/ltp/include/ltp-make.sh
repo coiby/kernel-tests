@@ -9,7 +9,7 @@ if [ -z ${TESTVERSION} ]; then
     elif rlIsRHEL 7; then
         TESTVERSION="20210927"
     else
-        TESTVERSION="20220121"
+        TESTVERSION="20220527"
     fi
 fi
 
@@ -78,7 +78,13 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
-    # Remove when update latest stable to run on version > 20220121
+    if [ "$TESTVERSION" == "20220527" ]; then
+        # Tips: this patch should be applied in single on ltp-next(version > 20180926)
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+    fi
+
     if [ "$TESTVERSION" == "20220121" ]; then
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-clock_gettime04-set-threshold-based-on-the-clock-res.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-pread02-extend-buffer-to-avoid-glibc-overfl.patch
@@ -98,7 +104,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/skip-firmware-tests.patch
     fi
 
-    if  [ $TESTVERSION  -ge 20170516 ]; then
+    if  [ $TESTVERSION -ge 20170516 ]; then
         echo " - cron_tests.sh has been rewritten since ltp-20170516" | tee -a $OUTPUTFILE
     elif [  "$OS_MAJOR_RELEASE"  == "6" ]; then
         echo " - fix cron01 in RHEL6" | tee -a $OUTPUTFILE
