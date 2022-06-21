@@ -18,21 +18,11 @@ CODEOWNERS @bgoncalv @lulinqing @mh21
 #     kpet: locations
 #   Maintainers:
 #     kpet: maintainers
-#   MM-QE:
-#     users:
-#       - mm-qe
-#     paths:
-#       - memory/
-#       - core-kernel/xarray-idr-radixtree-test/
-#       - distribution/ltp/
-#       - distribution/ltp-upstream/
-#       - misc/amtu/
-#       - vm/hugepage/
 #
 # GITLAB-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-GENERATED-BEGIN
-# 817bf36db4b1824a866d1a472a8fc2455ccf4a9d7440c78e00691f08315289fa
+# c832cd5c238a9b052c2d4b154803c58611fdb072d041a0a45a016e846b39aa6c
 
 [Infrastructure]
 .gitlab-ci.yml @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
@@ -164,6 +154,7 @@ acpi/acpitable/ @ahs3
 acpi/enabled/ @jbastianrh
 container/podman/ @ftjahjad
 core-kernel/Xarray-idr-radixtree-test/ @chuhu @liwan1 @pifang
+core-kernel/module_diff/ @zhijwang
 distribution/ltp-upstream/lite/ @chuhu @liwan1 @pifang
 distribution/ltp/lite/ @chuhu @liwan1 @pifang
 distribution/ltp/openposix_testsuite/ @chuhu @liwan1 @pifang
@@ -197,13 +188,5 @@ trace/ftrace/tracer/ @sztsian
 tracepoints/operational/ @jbastianrh
 vm/hugepage/libhugetlbfs/ @chuhu @liwan1 @pifang
 watchdog/hw-generic/ @ftjahjad
-
-[MM-QE]
-core-kernel/xarray-idr-radixtree-test/ @chuhu @liwan1 @pifang
-distribution/ltp-upstream/ @chuhu @liwan1 @pifang
-distribution/ltp/ @chuhu @liwan1 @pifang
-memory/ @chuhu @liwan1 @pifang
-misc/amtu/ @chuhu @liwan1 @pifang
-vm/hugepage/ @chuhu @liwan1 @pifang
 
 # GITLAB-CODEOWNERS-GENERATED-END
