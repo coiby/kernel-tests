@@ -69,7 +69,7 @@ codeowners check:
       # compare CODEOWNERS
       export GITLAB_TOKENS='{"gitlab.com":"GITLAB_JOB_CODEOWNERS_KERNEL_TESTS_MR_ACCESS_TOKEN"}'
       if ! python3 -m cki.deployment_tools.gitlab_codeowners_config \
-          --comment-mr-iid "${CI_MERGE_REQUEST_IID}" \
+          ${CI_MERGE_REQUEST_IID:+--comment-mr-iid "${CI_MERGE_REQUEST_IID}"} \
           needs-update
       then
           python3 -m pip install git+https://gitlab.com/cki-project/kpet.git
@@ -77,7 +77,7 @@ codeowners check:
           python3 -m kpet --db kpet-db test list -o json > kpet-db-tests.json
           python3 -m cki.deployment_tools.gitlab_codeowners_config \
               --test-path kpet-db-tests.json \
-              --comment-mr-iid "${CI_MERGE_REQUEST_IID}" \
+              ${CI_MERGE_REQUEST_IID:+--comment-mr-iid "${CI_MERGE_REQUEST_IID}"} \
               diff
       fi
   rules:
