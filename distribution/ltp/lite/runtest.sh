@@ -29,7 +29,7 @@ core_pattern="$(cat /proc/sys/kernel/core_pattern)"
 core_pattern_ltp_dir="/mnt/testarea/ltp/cores"
 
 # RHELKT1LITE is the default set of tests to run for RHEL builds
-RUNTESTS=${RUNTESTS:-""}
+RUNTESTS=${RUNTESTS:-"RHELKT1LITE"}
 
 PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
 
@@ -131,34 +131,23 @@ function exclude_disruptive_for_kt1()
 
 function runtest_prepare()
 {
-	# Doesn't matter the RUNTEST save logs with same name
-	# to make easier triaging issues
-	t="RHELKT1LITE.FILTERED"
-	local runtest_path=$LTPDIR/runtest
-	local runtest=$runtest_path/$t
-	if [[ -z "${RUNTESTS}"  ]]; then
-		cp -f RHELKT1LITE "$runtest"
-	else
-		rm -f "$runtest"
-		for RUNTEST in ${RUNTESTS}; do
-			echo "Using ${RUNTEST} as base for $runtest"
-			# get the test names used on defined on $RUNTEST
-			if [[ ! -e $runtest_path/${RUNTEST} ]]; then
-				echo "skipping runtest ${RUNTEST}, because it doesn't exist"
-				continue
-			fi
-			local tests=$(cat $runtest_path/${RUNTEST} | grep -vE "^#|^$" | awk '{print$1}')
-			# from the possible tests, only uses tests configured/enabled on RHELKT1LITE
-			for test in $tests; do
-				grep "^$test\>" RHELKT1LITE >> "$runtest"
-			done
-		done
-		if [ ! -s $runtest ]; then
-			echo "skipping as no test is available for '${RUNTESTS}'"
-			rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
-			exit 0
-		fi
+	local runtest_config=$1
+	if [[ -z "${runtest_config}"  ]]; then
+		echo "FAIL: no runtest conig was passed as argument to runtest_prepare"
+		exit 1
 	fi
+	local runtest_path=$LTPDIR/runtest
+	if [[ "${runtest_config}" == "RHELKT1LITE" ]]; then
+		cp -f RHELKT1LITE "${runtest_path}/"
+	fi
+	if [[ ! -s "${runtest_path}/${runtest_config}" ]]; then
+		echo "FAIL: ${runtest_config} doesn't exit on ${runtest_path}"
+		ls ${runtest_path}
+		exit 1
+	fi
+	cp "${runtest_path}/${runtest_config}" "${runtest_path}/${runtest_config}.FILTERED"
+	local runtest="$runtest_path/${runtest_config}.FILTERED"
+	echo "Using config file: $runtest" | tee -a $OUTPUTFILE
 
 	case $SKIP_LEVEL in
 	   "0")
@@ -194,7 +183,6 @@ function ltp_lite_begin()
 
 	prepare_aiodio_scratchspace
 
-	runtest_prepare
 
 	echo "ulimit -c unlimited" | tee -a $OUTPUTFILE
 	ulimit -c unlimited
@@ -202,7 +190,6 @@ function ltp_lite_begin()
 	echo "$core_pattern_ltp_dir/core" > /proc/sys/kernel/core_pattern
 	echo 1 > /proc/sys/kernel/core_uses_pid
 
-	echo "Using config file: $t" | tee -a $OUTPUTFILE
 	ss -antup >> $OUTPUTFILE 2>&1
 
 	cp -f $OUTPUTFILE ./setup.txt
@@ -213,16 +200,19 @@ function ltp_lite_begin()
 
 ltp_lite_run()
 {
-	RunFiltTest && return
+	for RUNTEST in $RUNTESTS; do
+		RunFiltTest && return
 
-	rm -f /mnt/testarea/$t.*
-	rm -f /mnt/testarea/ltp/output/*
-	CleanUp $t
+		rm -f /mnt/testarea/$RUNTEST.*
+		rm -f /mnt/testarea/ltp/output/*
+		CleanUp $RUNTEST
 
-	OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
-	service cgconfig stop
-
-	RunTest $t
+		OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
+		service cgconfig stop
+		runtest_prepare $RUNTEST
+		# runtest_prepare created the $RUNTEST.FILTERED
+		RunTest $RUNTEST.FILTERED
+	done
 }
 
 ltp_lite_end()
