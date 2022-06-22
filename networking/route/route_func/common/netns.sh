@@ -2,10 +2,10 @@
 
 vrun()
 {
-    CUR_NETNS=$1
-    shift
-    echo -e "\n[$(date '+%T')][$(whoami)]# echo '"$*"' | ip netns exec $CUR_NETNS bash"
-    echo "$@" | ip netns exec $CUR_NETNS bash
+	CUR_NETNS=$1
+	shift
+	echo -e "\n[$(date '+%T')][$(whoami)]# echo '"$*"' | ip netns exec $CUR_NETNS bash"
+	echo "$@" | ip netns exec $CUR_NETNS bash
 }
 
 # local route test topo

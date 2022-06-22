@@ -27,9 +27,9 @@ TEST="networking/vrf/sanity_checks"
 
 # Test doesn't work w/o IPv6.
 if grep "ipv6.disable=1" /proc/cmdline ; then
-	echo "Skip test as system doesn't have IPv6."
-	rstrnt-report-result $TEST SKIP
-	exit
+    echo "Skip test as system doesn't have IPv6."
+    rstrnt-report-result $TEST SKIP
+    exit
 fi
 
 # Load VRF module

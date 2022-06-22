@@ -113,7 +113,7 @@ pjd_fstest_prepare() {
 localfs_prepare()
 {
 	rlPhaseStartSetup ${TEST}:Setup:$FSTYPE
-                # prepare for local fstest
+		# prepare for local fstest
 		rlRun "echo -e \"os=Linux\nfs=${FSTYPE}\" > $TestsDir/conf" 0 "Setting up environment"
 
 		# we have a pre-mount test partition, grab it
@@ -170,8 +170,8 @@ localfs_test()
 		feature=`basename $testFeature`
 		rlPhaseStartTest "$feature: fs=\"$FSTYPE\" options=\"$FSOPTS\""
 		# prove in RHEL 5 and less does not support -f option
-                local flags="rv"
-                if [ $RHEL_DISTRO -ge 5 ] || rlIsFedora ;then
+		local flags="rv"
+		if [ $RHEL_DISTRO -ge 5 ] || rlIsFedora ;then
 			flags="rf"
 		fi
 		rlRun "prove -$flags $testFeature 2>&1|tee output.log" 0 "Testing feature $feature"
@@ -180,7 +180,7 @@ localfs_test()
 	done
 
 	rlPhaseStartCleanup "Unmounted $TEST_DEV"
-                rlRun "popd"
+		rlRun "popd"
 		rlRun "umount $TEST_DEV" 0 "Umounting workdir"
 	rlPhaseEnd
 }

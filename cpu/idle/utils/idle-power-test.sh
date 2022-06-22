@@ -102,10 +102,10 @@ handle_overflow()
 {
     updated_reg=$1
     if [ "$last_reg" -eq -1 ]; then
-	last_reg=$updated_reg
+        last_reg=$updated_reg
     else
-	[ "$updated_reg" -lt "$last_reg" ] && updated_reg=$((updated_reg+INTMAX))
-	last_reg=-1
+        [ "$updated_reg" -lt "$last_reg" ] && updated_reg=$((updated_reg+INTMAX))
+        last_reg=-1
     fi
 }
 
@@ -150,8 +150,8 @@ end_load_test
 max_expected=$((busy_ave/2))
 if [ "$idle_ave" -ge "$max_expected" ]; then
     if [[ "$idle_ave" -lt "$busy_ave" ]] && [[ "$busy_ave" -lt 20 ]]; then
-	echo "SKIP - system power draw is too low"
-	exit 2
+        echo "SKIP - system power draw is too low"
+        exit 2
     fi
     echo "FAIL"
     exit 1

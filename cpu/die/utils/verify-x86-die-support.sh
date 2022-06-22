@@ -59,7 +59,7 @@ process_packages()
     packages=$(cat /sys/devices/system/cpu/cpu*/topology/physical_package_id | sort -u)
 
     for package in $packages; do
-	package_count=$((package_count+1))
+        package_count=$((package_count+1))
     done
 
     echo "physical packages: $package_count"
@@ -72,14 +72,14 @@ process_dies()
     dies=$(cat /sys/devices/system/cpu/cpu*/topology/die_id | sort -u)
 
     for die in $dies; do
-	die_count=$((die_count+1))
+        die_count=$((die_count+1))
     done
 
     if [ $die_count -gt 1 ]; then
-	echo "this is a multi-die system"
-	multidie=true
+        echo "this is a multi-die system"
+        multidie=true
     else
-	echo "this is not a multi-die system"
+        echo "this is not a multi-die system"
     fi
 }
 
@@ -91,13 +91,13 @@ process_logical_dies()
     output=$(dmesg | grep Converting | grep "to logical die" | tail -1)
 
     if [ -z "$output" ]; then
-	output=$(grep Converting /var/log/messages | \
-                 grep "to logical die" | tail -1)
+        output=$(grep Converting /var/log/messages | \
+            grep "to logical die" | tail -1)
     fi
 
     if [ ! -z "$output" ]; then
-	logical_die_count=$(echo $output | awk '{print $NF}')
-	logical_die_count=$((logical_die_count+1))
+        logical_die_count=$(echo $output | awk '{print $NF}')
+        logical_die_count=$((logical_die_count+1))
     fi
 
     echo "logical_die_count: $logical_die_count"
@@ -114,8 +114,8 @@ verify_data()
     diff $old $new &> /dev/null
 
     if [ $? -ne 0 ]; then
-	echo "$verify_dir: $old does not match $new"
-	global_error=true
+        echo "$verify_dir: $old does not match $new"
+        global_error=true
     fi
 }
 
@@ -135,13 +135,13 @@ verify_topology_dir()
     verify_data thread_siblings_list core_cpus_list
 
     if [ "$multidie" = "false" ]; then
-	# on a non-multidie system the dies cpu list
-	# should match the package cpu list
-	if [ "$first_verify" = "true" ]; then
-	    echo "Note: non-multidie system - die and package cpus should match"
-	fi
-	verify_data die_cpus package_cpus
-	verify_data die_cpus_list package_cpus_list
+        # on a non-multidie system the dies cpu list
+        # should match the package cpu list
+        if [ "$first_verify" = "true" ]; then
+            echo "Note: non-multidie system - die and package cpus should match"
+        fi
+        verify_data die_cpus package_cpus
+        verify_data die_cpus_list package_cpus_list
     fi
 
     first_verify=false
@@ -152,13 +152,13 @@ process_cpus()
     dirs=$(ls -dv1 /sys/devices/system/cpu/cpu*[0-9])
 
     for dir in $dirs; do
-	verify_topology_dir $dir
+        verify_topology_dir $dir
     done
 
     echo "cpu_count: $cpu_count"
     if [ $(nproc --all) -ne $cpu_count ]; then
-	echo "mismatch nproc=$(nproc --all) dirs=$cpu_count"
-	global_error=true
+        echo "mismatch nproc=$(nproc --all) dirs=$cpu_count"
+        global_error=true
     fi
 }
 
@@ -178,14 +178,14 @@ build_numa_list()
 
     output=$(lscpu | grep "NUMA node" | grep CPU)
     while read -r line; do
-	data=$(echo $line | cut -d : -f 2)
-	build_numa_entry "$data"
+        data=$(echo $line | cut -d : -f 2)
+        build_numa_entry "$data"
     done <<< "$output"
 
     if [ $numa_max -eq 0 ] || [ $numa_max -ne $numa_count ]; then
-	echo "unable to parse NUMA data"
-	numa_max=0 # don't bother to compare bad data
-	global_error=true
+        echo "unable to parse NUMA data"
+        numa_max=0 # don't bother to compare bad data
+        global_error=true
     fi
 
     echo
@@ -197,20 +197,20 @@ verify_die_cpu()
     end=$(echo $1 | cut -d- -f 2)
 
     for ((i=$start; i <= $end; ++i)); do
-	die=$(cat /sys/devices/system/cpu/cpu${i}/topology/die_id)
-	pkg=$(cat /sys/devices/system/cpu/cpu${i}/topology/physical_package_id)
-	if [ "$first" = "true" ]; then
-	    die_id=$die
-	    physical_package_id=$pkg
-	    first=false
-	else
-	    if [[ $die_id -ne $die ]] || [[ $physical_package_id -ne $pkg ]]
-	    then
-		echo "error die/package mismatch for cpu $i"
-		error=true
-		break
-	    fi
-	fi
+        die=$(cat /sys/devices/system/cpu/cpu${i}/topology/die_id)
+        pkg=$(cat /sys/devices/system/cpu/cpu${i}/topology/physical_package_id)
+        if [ "$first" = "true" ]; then
+            die_id=$die
+            physical_package_id=$pkg
+            first=false
+        else
+            if [[ $die_id -ne $die ]] || [[ $physical_package_id -ne $pkg ]]
+            then
+                echo "error die/package mismatch for cpu $i"
+                error=true
+                break
+            fi
+        fi
     done
 }
 
@@ -228,28 +228,28 @@ verify_die_cpu_list()
     first=true
     error=false
     for dies in $die_cpus; do
-	verify_die_cpu $dies
+        verify_die_cpu $dies
     done
 
     if [ "$error" = "false" ]; then
-	echo "all cpus verified"
+        echo "all cpus verified"
     else
-	global_error=true
+        global_error=true
     fi
 
     match=false
     for ((j=0; j<$numa_max; ++j)); do
-	# make sure we match numactl --hardware output
-	if [ "${numa_node_cpus[$j]}" = "$1" ]; then
-	    echo "match numa_index=$j"
-	    numa_node_verified[$j]=true
-	    match=true
-	fi
+        # make sure we match numactl --hardware output
+        if [ "${numa_node_cpus[$j]}" = "$1" ]; then
+            echo "match numa_index=$j"
+            numa_node_verified[$j]=true
+            match=true
+        fi
     done
 
     if [ "$match" = "false" ]; then
-	echo "ERROR: does not match any numa node data"
-	global_error=true
+        echo "ERROR: does not match any numa node data"
+        global_error=true
     fi
 
     echo
@@ -262,12 +262,12 @@ process_die_cpus_list()
     array_len=${#die_array[@]}
 
     for ((k=0; k < $array_len; ++k)); do
-	verify_die_cpu_list ${die_array[$k]}
+        verify_die_cpu_list ${die_array[$k]}
     done
 
     if [ $array_len -ne $logical_die_count ]; then
-	echo "logical_die_count: $logical_die_count mismatch found $array_len"
-	global_error=true
+        echo "logical_die_count: $logical_die_count mismatch found $array_len"
+        global_error=true
     fi
 }
 
@@ -275,10 +275,10 @@ process_numa_list()
 {
     match_fail=false
     for ((i=0; i < $numa_max; ++i)); do
-	if [ "${numa_node_verified[$i]}" != "true" ]; then
-	    match_fail=true
-	    echo "no match for numa index $i"
-	fi
+        if [ "${numa_node_verified[$i]}" != "true" ]; then
+            match_fail=true
+            echo "no match for numa index $i"
+        fi
     done
     [ "$match_fail" = "true" ] && global_error=true
 }
@@ -287,7 +287,7 @@ log_result()
 {
     echo "$1"
     if [ "$beaker" = "true" ]; then
-	[ "$1" = "PASS" ] && exit 0 || exit 1
+        [ "$1" = "PASS" ] && exit 0 || exit 1
     fi
     echo "$1" > .result
 }

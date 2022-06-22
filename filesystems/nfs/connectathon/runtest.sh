@@ -497,7 +497,7 @@ function cthon_main ()
     for server_path in $servers; do
         : > result.txt
 
-	# see: https://bugzilla.redhat.com/show_bug.cgi?id=1937636#c7
+        # see: https://bugzilla.redhat.com/show_bug.cgi?id=1937636#c7
         # `skip rhel5 server on fedora and rhel9(or higher)
         OSV=$(rpm -E %rhel)
         if [[ "$server_path" =~ rhel-?5 ]]; then
@@ -583,13 +583,13 @@ function cthon_main ()
 
 build_nfs_server ()
 {
-	local expdir=$1
-	which systemctl &>/dev/null || return 1
+    local expdir=$1
+    which systemctl &>/dev/null || return 1
 
-	mkdir -p $expdir
-	echo "$expdir *(rw,no_root_squash)" >/etc/exports
-	systemctl restart nfs-server &>/dev/null
-	echo "localhost:$expdir"
+    mkdir -p $expdir
+    echo "$expdir *(rw,no_root_squash)" >/etc/exports
+    systemctl restart nfs-server &>/dev/null
+    echo "localhost:$expdir"
 }
 
 # ---------- Start Test -------------

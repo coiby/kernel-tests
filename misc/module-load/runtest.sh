@@ -26,9 +26,9 @@ TEST="misc/module-load"
 
 # Test doesn't run without IPv6
 if grep "ipv6.disable=1" /proc/cmdline ; then
-    rlLog "Skip test as system doesn't have IPv6."
-    rstrnt-report-result $TEST SKIP
-    exit
+	rlLog "Skip test as system doesn't have IPv6."
+	rstrnt-report-result $TEST SKIP
+	exit
 fi
 
 # Commands in this section are provided by test developer.
@@ -67,23 +67,23 @@ function mlog()
 
 function workaround_BZ1371265()
 {
-        # Bug 1371265 - [RHEL-6.8] module-load task fails - ip_queue: failed to register queue handler
-        # https://bugzilla.redhat.com/show_bug.cgi?id=1371265
-        local bz_module="nfnetlink_queue"
-        local loaded=$(lsmod | grep -c "$bz_module")
+	# Bug 1371265 - [RHEL-6.8] module-load task fails - ip_queue: failed to register queue handler
+	# https://bugzilla.redhat.com/show_bug.cgi?id=1371265
+	local bz_module="nfnetlink_queue"
+	local loaded=$(lsmod | grep -c "$bz_module")
 
-        if [ "$loaded" -gt "0" ]; then
-                echo "" | tee -a $OUTPUTFILE
-                echo "***** BZ1371265: performing workaround" | tee -a $OUTPUTFILE
-                echo "***** BZ1371265: unloading $bz_module" | tee -a $OUTPUTFILE
-                rmmod $bz_module
-                if [ $? -eq 0 ]; then
-                        echo "***** BZ1371265: successfully unloaded $bz_module" | tee -a $OUTPUTFILE
-                else
-                        echo "***** BZ1371265: NOT able to unlooad $bz_module" | tee -a $OUTPUTFILE
-                fi
-                echo "" | tee -a $OUTPUTFILE
-        fi
+	if [ "$loaded" -gt "0" ]; then
+		echo "" | tee -a $OUTPUTFILE
+		echo "***** BZ1371265: performing workaround" | tee -a $OUTPUTFILE
+		echo "***** BZ1371265: unloading $bz_module" | tee -a $OUTPUTFILE
+		rmmod $bz_module
+		if [ $? -eq 0 ]; then
+			echo "***** BZ1371265: successfully unloaded $bz_module" | tee -a $OUTPUTFILE
+		else
+			echo "***** BZ1371265: NOT able to unlooad $bz_module" | tee -a $OUTPUTFILE
+		fi
+		echo "" | tee -a $OUTPUTFILE
+	fi
 }
 
 # Find our arch and get the appropriate list of modules for testing.
@@ -159,14 +159,14 @@ cat /etc/redhat-release | tee -a $OUTPUTFILE
 release=""
 cat /etc/redhat-release | grep "^Fedora"
 if [ $? -ne 0 ]; then
-    release=$(cat /etc/redhat-release |sed 's/.*\(release [0-9]\).*/\1/')
+	release=$(cat /etc/redhat-release |sed 's/.*\(release [0-9]\).*/\1/')
 else
-    release=$(cat /etc/fedora-release | sed 's/.*release \([0-9]*\).*/f\1/')
+	release=$(cat /etc/fedora-release | sed 's/.*release \([0-9]*\).*/f\1/')
 fi
 
 if [ -z "$release" ]; then
-    release=$(uname -r | grep -o el[0-9])
-    echo "Taking release from kernel version: $release" | tee -a $OUTPUTFILE
+	release=$(uname -r | grep -o el[0-9])
+	echo "Taking release from kernel version: $release" | tee -a $OUTPUTFILE
 fi
 
 
@@ -205,50 +205,50 @@ case "$release" in
 	*)
 		if [ -s "modules.$release" ]; then
 			MODLIST="$MODLIST modules.$release"
-                else
-		    echo "Warning: Running on unknown release: ${release}, using modules list contained in ${MODLIST}!"
-                fi
+		else
+			echo "Warning: Running on unknown release: ${release}, using modules list contained in ${MODLIST}!"
+		fi
 		;;
 esac
 
 if [ "$release" = "release 6" ] || [ "$release" = "el6" ]; then
-        workaround_BZ1371265
+	workaround_BZ1371265
 fi
 
 # wireguard: a new module in rhel9, but disable in FIPS mode
 if [ "$release" = "release 9" ] || [ "$release" = "el9" ]; then
-    fips_enabled=`cat /proc/sys/crypto/fips_enabled`
-    if [ "$fips_enabled" = "1" ]; then
-        sed -i "s/wireguard/# \0/" modules.rhel9
-    fi
+	fips_enabled=`cat /proc/sys/crypto/fips_enabled`
+	if [ "$fips_enabled" = "1" ]; then
+		sed -i "s/wireguard/# \0/" modules.rhel9
+	fi
 fi
 
 # c9s automotive kernel has crc8 built-in for aarch64, not a module
 if grep -q CONFIG_CRC8=y /boot/config-$(uname -r); then
-    sed -i 's/crc8/# \0/' modules.rhel9
+	sed -i 's/crc8/# \0/' modules.rhel9
 fi
 
 # likewise for c9s and CRYPTO_USER and CRYPTO_SHA512_SSSE3
 if grep -q CONFIG_CRYPTO_USER=y /boot/config-$(uname -r); then
-    sed -i 's/crypto_user/# \0/' modules.rhel9
+	sed -i 's/crypto_user/# \0/' modules.rhel9
 fi
 if grep -q CONFIG_CRYPTO_SHA512_SSSE3=y /boot/config-$(uname -r); then
-    sed -i 's/sha512-ssse3/# \0/' modules.rhel9
+	sed -i 's/sha512-ssse3/# \0/' modules.rhel9
 fi
 
 # skip blocked modules
 for x in $(grep -o -w 'module_blacklist=[^[:space:]]*' /proc/cmdline |
-           awk -F= '{print $2}' | tr ',' ' ') \
-         $(grep -h ^blacklist /etc/modprobe.d/* | awk '{print $2}')
+			awk -F= '{print $2}' | tr ',' ' ') \
+			$(grep -h ^blacklist /etc/modprobe.d/* | awk '{print $2}')
 do
-    for y in modules.* ; do
-        sed -i "s/$x/# \0/" $y
-        # remove dependencies too
-        for z in $(awk -F: "/$x\.[^/[:space:]]*/ {print \$1}" \
-                       /lib/modules/$(uname -r)/modules.dep) ; do
-            sed -i "s/$(basename $z .ko.xz)/# \0/" $y
-        done
-    done
+	for y in modules.* ; do
+		sed -i "s/$x/# \0/" $y
+		# remove dependencies too
+		for z in $(awk -F: "/$x\.[^/[:space:]]*/ {print \$1}" \
+					/lib/modules/$(uname -r)/modules.dep) ; do
+					sed -i "s/$(basename $z .ko.xz)/# \0/" $y
+		done
+	done
 done
 
 # run the test. For each module in the MODLIST file, try to load it, check
@@ -271,8 +271,8 @@ echo "** Module list prior to testing. **" | tee -a $OUTPUTFILE
 /sbin/lsmod >> $OUTPUTFILE 2>&1
 RC=$?
 if [ $RC -ne 0 ] ; then
-        echo "*** There is a problem with lsmod, no need to continue further ***" | tee -a $OUTPUTFILE
-        cki_abort_task "There is a problem with lsmod"
+	echo "*** There is a problem with lsmod, no need to continue further ***" | tee -a $OUTPUTFILE
+	cki_abort_task "There is a problem with lsmod"
 fi
 
 echo "** Doing $ITERATIONS load/unload cycles of each module in the file $MODLIST **" | tee -a $OUTPUTFILE
@@ -339,7 +339,7 @@ for (( i = 0; i < $ITERATIONS; i++)); do
 		fi
 
 		if [ $(/sbin/lsmod | grep -c $module) -gt 0 ] || ( [ ! -z "$mod_alias" ] && [ $(/sbin/lsmod | grep -c "$mod_alias") -gt 0 ] ); then
-        	echo "** $module loaded sucessfully. **" >> $OUTPUTFILE
+			echo "** $module loaded sucessfully. **" >> $OUTPUTFILE
 			pass=$(expr $pass + 1)
 		else
 			echo "** $module FAILED to load. **" >> $OUTPUTFILE

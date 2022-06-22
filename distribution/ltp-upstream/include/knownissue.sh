@@ -190,10 +190,10 @@ function knownissue_filter()
 	tskip "mkswap01" unfix
 
 	if is_rhel8; then
-                # ------- unfix ---------
-                # Bug 1734286 - mm: mempolicy: make mbind() return -EIO when MPOL_MF_STRICT is specified
-                osver_in_range "800" "802" && tskip "mbind02" unfix
-        fi
+		# ------- unfix ---------
+		# Bug 1734286 - mm: mempolicy: make mbind() return -EIO when MPOL_MF_STRICT is specified
+		osver_in_range "800" "802" && tskip "mbind02" unfix
+	fi
 
 	# XXX: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/541
 	cki_is_vm && tskip "ksm*" unfix

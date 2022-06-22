@@ -248,10 +248,10 @@ function get_test_cases_scsi
 }
 
 if cki_has_kernel_debug_flags; then
-    # the test is not supported on debug kernels due to performance issues
-    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/657
-    rstrnt-report-result "$TNAME" SKIP
-    exit 0
+	# the test is not supported on debug kernels due to performance issues
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/657
+	rstrnt-report-result "$TNAME" SKIP
+	exit 0
 fi
 
 bash $CDIR/build.sh

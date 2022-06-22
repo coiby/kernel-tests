@@ -121,7 +121,7 @@ function checkVirtSupport
             CPUTYPE="z15"
         else
            CPUTYPE="S390X"
-	fi
+        fi
         grep -q 'features.*sie' /proc/cpuinfo
         return $?
     else

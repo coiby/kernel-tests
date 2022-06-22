@@ -30,10 +30,10 @@ function runtest
     rlRun -l "bash $CDIR/utils/idle-power-test.sh $CDIR/utils/busy.sh"
     status=$?
     if [ $status -eq 0 ]; then
-	return $CKI_PASS
+        return $CKI_PASS
     elif [ $status -eq 2 ]; then
-	# maps to SKIP
-	return $CKI_UNSUPPORTED
+        # maps to SKIP
+        return $CKI_UNSUPPORTED
     fi
     return $CKI_FAIL
 }

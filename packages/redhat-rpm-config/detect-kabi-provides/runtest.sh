@@ -43,11 +43,11 @@ rlJournalStart
 
     rlPhaseStartTest
         rlRun "rpmbuild -bb $TESTDIR/symvers-foo.spec &> log" 0 "building the test package"
-	cat log
-	RPM=`awk '/Wrote:/ {print $2}' log`
-	rlRun "rpm -q --provides -p $RPM > provides" 0 "Listing the test package provides"
-	cat provides
-	rlAssertEquals "There should be 10 kernel(xxx) symbols" `grep 'kernel(' provides | wc -l` 10
+        cat log
+        RPM=`awk '/Wrote:/ {print $2}' log`
+        rlRun "rpm -q --provides -p $RPM > provides" 0 "Listing the test package provides"
+        cat provides
+        rlAssertEquals "There should be 10 kernel(xxx) symbols" `grep 'kernel(' provides | wc -l` 10
     rlPhaseEnd
 
     rlPhaseStartCleanup

@@ -295,9 +295,9 @@ function main()
         echo " :: Comparing baseline kABI whitelist w/ new kABI whitelist"
         if test -n "$(comm -13 "$new_whitelist" "$old_whitelist")"
         then
-		echo      "--- BEGIN LIST ---"
+                echo      "--- BEGIN LIST ---"
                 comm -13  "$new_whitelist" "$old_whitelist"
-		echo      "--- END LIST   ---"
+                echo      "--- END LIST   ---"
                 test_fail "New kABI whitelist is missing symbols with respect" \
                           "to baseline."
 
@@ -311,7 +311,7 @@ function main()
                 <(comm -23 "$new_whitelist" "$new_symbol_list" | sort | uniq) \
                 <(comm -23 "$old_whitelist" "$old_symbol_list" | sort | uniq))"
         then
-		echo "--- BEGIN LIST ---"
+                echo "--- BEGIN LIST ---"
                 comm -13 \
                      <(comm -23 "$new_whitelist" "$new_symbol_list" \
                        | sort  \
@@ -319,7 +319,7 @@ function main()
                      <(comm -23 "$old_whitelist" "$old_symbol_list" \
                        | sort  \
                        | uniq)
-		echo "--- END LIST ---"
+                echo "--- END LIST ---"
                 test_fail "The following symbols are present on kABI " \
                           "whitelist, however, they weren't found on" \
                           "the system. They are present on the baseline though."

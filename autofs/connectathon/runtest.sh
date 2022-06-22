@@ -49,19 +49,19 @@ NISDOMAIN="autofs.test"
 
 # output the test env info:(Test name, distro, hostname, kernel, pkg versions)
 envinfo() {
-    rlLog "{INFO} Test env info:"
-    rlLog "------------------------------------------------"
-    rlLog "Time & CURDIR : [`date '+%F %T'` @$PWD]"
-    rlLog "Case Name     : $TEST"
-    rlLog '$HOSTNAME     : '$HOSTNAME
-    rlLog "Distro Info   : `lsb_release -sir` : $DISTRO_BUILD"
-    rlLog "NVR & host    : `uname -a`"
-    rlLog "LANG          : $LANG"
-    rlLog "cmdline       :"; cat /proc/cmdline | sed 's/^/\t/'
-    rlLog "Package Info  :"
-        rpm -q `for p in $PKG_LIST "$@"; do echo $p; done|sort -u` 2>&1 |
-                sed 's/^/\t/'
-    rlLog "------------------------------------------------"
+	rlLog "{INFO} Test env info:"
+	rlLog "------------------------------------------------"
+	rlLog "Time & CURDIR : [`date '+%F %T'` @$PWD]"
+	rlLog "Case Name     : $TEST"
+	rlLog '$HOSTNAME     : '$HOSTNAME
+	rlLog "Distro Info   : `lsb_release -sir` : $DISTRO_BUILD"
+	rlLog "NVR & host    : `uname -a`"
+	rlLog "LANG          : $LANG"
+	rlLog "cmdline       :"; cat /proc/cmdline | sed 's/^/\t/'
+	rlLog "Package Info  :"
+	rpm -q `for p in $PKG_LIST "$@"; do echo $p; done|sort -u` 2>&1 |
+		sed 's/^/\t/'
+	rlLog "------------------------------------------------"
 }
 
 
@@ -106,7 +106,7 @@ cthon_setup() {
 	rlRun "./setup -a" "0-255"
 	if [ $? -ne 0 ]; then
 		cki_abort_task "Failed to configure cthon test environment "
-        fi
+	fi
 	mkdir -p $AUTO_CLIENT_MNTPNT
 	test -n "$DEBUG" && chmod 777 $AUTO_CLIENT_MNTPNT
 
@@ -118,37 +118,37 @@ cthon_setup() {
 }
 
 client() {
-    rlPhaseStartSetup do-$role-Setup-Client
-	rlFileBackup /etc/sysconfig/{autofs,nfs} /etc/exports /etc/auto.master
-	rlRun 'rstrnt-sync-block -s SERVER_READY $Server1 $Server2'
-	rlRun 'mkdir -p /export/'
-	rlRun 'echo "/export/   *(rw,no_root_squash)" >> /etc/exports'
-	rlRun "systemctl restart nfs-server" "0-255"
-	if [ $? -ne 0 ]; then
-		cki_abort_task "Failed to restart client nfs server"
-	fi
-	cthon_setup
-	rlRun 'cat /etc/auto.master'
-	rlRun 'echo "LOGGING=\"debug\"" >>/etc/sysconfig/autofs'
-	yp_client_setup
-	if [ $? -ne 0 ]; then
-		cki_abort_task "Errors on NIS/YP client configuration"
-	fi
-	rlRun "systemctl restart autofs" "0-255"
-	if [ $? -ne 0 ]; then
-		cki_abort_task "Failed to restart client nfs server, aborting the task"
-        fi
-	rlRun 'mount -t autofs'
-	rlRun 'automount -m'
+	rlPhaseStartSetup do-$role-Setup-Client
+		rlFileBackup /etc/sysconfig/{autofs,nfs} /etc/exports /etc/auto.master
+		rlRun 'rstrnt-sync-block -s SERVER_READY $Server1 $Server2'
+		rlRun 'mkdir -p /export/'
+		rlRun 'echo "/export/   *(rw,no_root_squash)" >> /etc/exports'
+		rlRun "systemctl restart nfs-server" "0-255"
+		if [ $? -ne 0 ]; then
+			cki_abort_task "Failed to restart client nfs server"
+		fi
+		cthon_setup
+		rlRun 'cat /etc/auto.master'
+		rlRun 'echo "LOGGING=\"debug\"" >>/etc/sysconfig/autofs'
+		yp_client_setup
+		if [ $? -ne 0 ]; then
+			cki_abort_task "Errors on NIS/YP client configuration"
+		fi
+		rlRun "systemctl restart autofs" "0-255"
+		if [ $? -ne 0 ]; then
+			cki_abort_task "Failed to restart client nfs server, aborting the task"
+			fi
+		rlRun 'mount -t autofs'
+		rlRun 'automount -m'
 
-        for h in $SERVERS $CLIENTS; do
-		rlRun "showmount -e $h"
-	done
-	rlRun 'pushd $pkgPath/bin'
-    	rlPhaseEnd
+		for h in $SERVERS $CLIENTS; do
+			rlRun "showmount -e $h"
+		done
+		rlRun 'pushd $pkgPath/bin'
+	rlPhaseEnd
 
 	for test in test.*; do
-    		rlPhaseStartTest do-$role-Test-$test
+		rlPhaseStartTest do-$role-Test-$test
 			case "$test" in
 				"test.net" | "test.net1")
 				rlRun "./$test $Server1 $Server2" "0,2" "Running $test with $Server1, and $Server2"
@@ -167,8 +167,8 @@ client() {
 				fi
 
 			;;
-		esac
-	rlPhaseEnd
+			esac
+		rlPhaseEnd
 	done
 
 	rlPhaseStartCleanup do-$role-Cleanup-
@@ -179,39 +179,39 @@ client() {
 }
 
 server() {
-    rlPhaseStartSetup do-$role-Setup-Server
-	rlFileBackup /etc/sysconfig/nfs /etc/exports
-	rlRun "mkdir -p $AUTO_SERVER_DIR/export{1..6}; chmod 777 $AUTO_SERVER_DIR"
-	rlRun "echo \"$AUTO_SERVER_DIR  *(rw,insecure,sync,no_root_squash,no_subtree_check)\" >/etc/exports"
+	rlPhaseStartSetup do-$role-Setup-Server
+		rlFileBackup /etc/sysconfig/nfs /etc/exports
+		rlRun "mkdir -p $AUTO_SERVER_DIR/export{1..6}; chmod 777 $AUTO_SERVER_DIR"
+		rlRun "echo \"$AUTO_SERVER_DIR  *(rw,insecure,sync,no_root_squash,no_subtree_check)\" >/etc/exports"
 
-	# ExportSubdir
-	for d in $AUTO_SERVER_DIR/export{1..6}; do
-		rlRun "echo \"$d  *(rw,insecure,sync,no_root_squash,no_subtree_check)\" >>/etc/exports"
-	done
+		# ExportSubdir
+		for d in $AUTO_SERVER_DIR/export{1..6}; do
+			rlRun "echo \"$d  *(rw,insecure,sync,no_root_squash,no_subtree_check)\" >>/etc/exports"
+		done
 
-	yp_server_setup
-	if [ $? -ne 0 ]; then
-		cki_abort_task "Errors on NIS/YP configuration"
-	fi
-	#if distro version >= 8, enable NFS over UDP
-	vercmp "$(lsb_release -sr)" '>=' 8 && cp "$pkgPath/config/nfs" /etc/sysconfig/nfs && nfsconvert
-    rlPhaseEnd
+		yp_server_setup
+		if [ $? -ne 0 ]; then
+			cki_abort_task "Errors on NIS/YP configuration"
+		fi
+		#if distro version >= 8, enable NFS over UDP
+		vercmp "$(lsb_release -sr)" '>=' 8 && cp "$pkgPath/config/nfs" /etc/sysconfig/nfs && nfsconvert
+	rlPhaseEnd
 
-    rlPhaseStartTest do-$role-Test-
-	rlLog "{INFO} restart nfs server ..."
-	rlRun "exportfs -ua"
-	rlRun "systemctl restart nfs-server" "0-255"
-	if [ $? -ne 0 ]; then
-		cki_abort_task "Failed to restart server nfs server"
-	fi
-	rlRun "rstrnt-sync-set -s SERVER_READY"
-    rlPhaseEnd
+	rlPhaseStartTest do-$role-Test-
+		rlLog "{INFO} restart nfs server ..."
+		rlRun "exportfs -ua"
+		rlRun "systemctl restart nfs-server" "0-255"
+		if [ $? -ne 0 ]; then
+			cki_abort_task "Failed to restart server nfs server"
+		fi
+		rlRun "rstrnt-sync-set -s SERVER_READY"
+	rlPhaseEnd
 
-    rlPhaseStartCleanup do-$role-Cleanup-
-	rlLog "{INFO} server ready. wait the client ..."
-	rlRun 'rstrnt-sync-block -s DONE${TEST} $Client'
-	rlFileRestore
-    rlPhaseEnd
+	rlPhaseStartCleanup do-$role-Cleanup-
+		rlLog "{INFO} server ready. wait the client ..."
+		rlRun 'rstrnt-sync-block -s DONE${TEST} $Client'
+		rlFileRestore
+	rlPhaseEnd
 }
 
 
@@ -219,12 +219,12 @@ server() {
 #
 
 rlJournalStart
-    envinfo
-    case $HOSTNAME in
-        $Client)  client;;
-        $Server1) server;;
-        $Server2) server;;
-        *)         :;;
-    esac
+	envinfo
+	case $HOSTNAME in
+		$Client)  client;;
+		$Server1) server;;
+		$Server2) server;;
+		*)         :;;
+	esac
 rlJournalEnd
 

@@ -9,7 +9,7 @@
 
 export YUM_PROG=`type -P yum`
 if type -P dnf >/dev/null; then
-        YUM_PROG="$(type -P dnf) --setopt=strict=0"
+	YUM_PROG="$(type -P dnf) --setopt=strict=0"
 fi
 
 # Install xfsprogs from upstream (or any other) repo

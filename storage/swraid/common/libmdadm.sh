@@ -26,18 +26,18 @@ fi
 # Usage:
 #   Create md raid.
 # Parameter:
-# 	$level				# like 0, 1, 3, 5, 10, 50                       
-# 	$dev_list			# like 'sda sdb sdc sdd'
-# 	$raid_dev_num		# like 3                       
-# 	$spar_dev_num		# like 2                                    
-# 	$chunk				# like 64                                     
+#  $level               # like 0, 1, 3, 5, 10, 50
+#  $dev_list            # like 'sda sdb sdc sdd'
+#  $raid_dev_num        # like 3
+#  $spar_dev_num        # like 2
+#  $chunk               # like 64
 # Returns:
 #   Return code:
 #       0 on success
 #       1 if something went wrong.
 #   Return string:
-#       RETURN_STR		# $md_raid like '/dev/md0'
-#		MD_DEVS			# $raid_dev_list like '/dev/sda /dev/sdb'
+#       RETURN_STR      # $md_raid like '/dev/md0'
+#       MD_DEVS         # $raid_dev_list like '/dev/sda /dev/sdb'
 #----------------------------------------------------------------------------#
 
 function MD_Create_RAID()
@@ -90,7 +90,7 @@ function MD_Create_RAID()
     fi
     sleep 5
     if [ $level -eq 1 ]; then
-    # create md raid1 without --chunk 
+    # create md raid1 without --chunk
         if [ $bitmap -eq 1 ]; then
             if [ $spar_dev_num -ne 0 ]; then
                 rlRun "mdadm --create --run $md_raid --level $level \
@@ -196,7 +196,7 @@ function MD_Create_RAID()
     rlRun "mdadm --detail $md_raid"
     # define global variables
     MD_DEVS="$raid_dev $spar_dev"
-    RETURN_STR="$md_raid"    
+    RETURN_STR="$md_raid"
     return $ret
 }
 ####################### End of functoin MD_Create_RAID
@@ -206,18 +206,18 @@ function MD_Create_RAID()
 # Usage:
 #   Create md raid with journal.
 # Parameter:
-# 	$level				# like 4, 5, 6
-# 	$dev_list			# like 'sda sdb sdc sdd'
-# 	$raid_dev_num		# like 3
-# 	$spar_dev_num		# like 2
-# 	$chunk				# like 64
+#   $level              # like 4, 5, 6
+#   $dev_list           # like 'sda sdb sdc sdd'
+#   $raid_dev_num       # like 3
+#   $spar_dev_num       # like 2
+#   $chunk              # like 64
 # Returns:
 #   Return code:
 #       0 on success
 #       1 if something went wrong.
 #   Return string:
-#       RETURN_STR		# $md_raid like '/dev/md0'
-#		MD_DEVS			# $raid_dev_list like '/dev/sda /dev/sdb'
+#       RETURN_STR      # $md_raid like '/dev/md0'
+#       MD_DEVS         # $raid_dev_list like '/dev/sda /dev/sdb'
 #----------------------------------------------------------------------------#
 
 function MD_Create_RAID_Journal()
@@ -315,7 +315,7 @@ function MD_Create_RAID_Journal()
 # Usage:
 #   Save md raid configuration.
 # Parameter:
-# 	NULL
+#   NULL
 # Returns:
 #   Return code:
 #       0 on success
@@ -326,25 +326,25 @@ function MD_Create_RAID_Journal()
 
 function MD_Save_RAID()
 {
-    echo "INFO: Executing MD_Save_RAID()"                    
+    echo "INFO: Executing MD_Save_RAID()"
     echo "DEVICE $MD_DEVS" > /etc/mdadm.conf
-	if [ $? -ne 0 ]; then
-		echo "FAIL: Failed to save md device info to /etc/mdadm.conf"
-	fi
-	mdadm --detail --scan >> /etc/mdadm.conf
-	if [ $? -ne 0 ]; then
-		echo "FAIL: Failed to save md state info to /etc/mdadm.conf"
-	fi
-	return 0
+    if [ $? -ne 0 ]; then
+        echo "FAIL: Failed to save md device info to /etc/mdadm.conf"
+    fi
+    mdadm --detail --scan >> /etc/mdadm.conf
+    if [ $? -ne 0 ]; then
+        echo "FAIL: Failed to save md state info to /etc/mdadm.conf"
+    fi
+    return 0
 }
 ####################### End of functoin MD_Save_RAID
 
 #----------------------------------------------------------------------------#
 # MD_Clean_RAID ()
 # Usage:
-#	Clean md raid.
+#   Clean md raid.
 # Parameter:
-#   $md_name		# like '/dev/md0'
+#   $md_name        # like '/dev/md0'
 # Returns:
 #   Return code:
 #       0 on success
@@ -356,40 +356,40 @@ function MD_Save_RAID()
 function MD_Clean_RAID()
 {
     echo "INFO: Executing MD_Clean_RAID() against this md device: $md_name"
-	local md_name=$1	
-	echo "mdadm --stop $md_name"
-	mdadm --stop $md_name
-	st=$?
-	while [ $st -ne 0 ]; do
-		echo "INFO:mdadm stop failed"	
-		sleep 10
-		rm -rf /etc/mdadm.conf
-		for i in $(cat /proc/mdstat |grep "inactive" |awk '{print $1}') ;do
-			mdadm --stop "/dev/$i"
-		done
-	mdadm --stop $md_name
-	st=$?
-	done
-	sleep 10	
-	echo "clean devs : $MD_DEVS"
-	for dev in $MD_DEVS; do
-		echo "mdadm --zero-superblock $dev"
-		`mdadm --zero-superblock $dev` 
-	done
-	#`mdadm --zero-superblock "$MD_DEVS"` 
-	echo "ret is $?"
-	rm -rf /etc/mdadm.conf
-	sleep 10
-	echo "ls $md_name"
-        ls $md_name
-        if [ $? = 1 ];then
-                echo "mdadm --stop command can't delete md node name $md_name in /dev node"
-		ls /dev/md*
-		cat /proc/mdstat
-        else
-        	echo "mdadm --stop can delete md node name $md_name in /dev"
-        fi
-	return 0
+    local md_name=$1
+    echo "mdadm --stop $md_name"
+    mdadm --stop $md_name
+    st=$?
+    while [ $st -ne 0 ]; do
+        echo "INFO:mdadm stop failed"
+        sleep 10
+        rm -rf /etc/mdadm.conf
+        for i in $(cat /proc/mdstat |grep "inactive" |awk '{print $1}') ;do
+            mdadm --stop "/dev/$i"
+        done
+        mdadm --stop $md_name
+        st=$?
+    done
+    sleep 10
+    echo "clean devs : $MD_DEVS"
+    for dev in $MD_DEVS; do
+        echo "mdadm --zero-superblock $dev"
+        `mdadm --zero-superblock $dev`
+    done
+    #`mdadm --zero-superblock "$MD_DEVS"`
+    echo "ret is $?"
+    rm -rf /etc/mdadm.conf
+    sleep 10
+    echo "ls $md_name"
+    ls $md_name
+    if [ $? = 1 ];then
+        echo "mdadm --stop command can't delete md node name $md_name in /dev node"
+        ls /dev/md*
+        cat /proc/mdstat
+    else
+        echo "mdadm --stop can delete md node name $md_name in /dev"
+    fi
+    return 0
 }
 ####################### End of functoin MD_Clean_RAID
 
@@ -398,7 +398,7 @@ function MD_Clean_RAID()
 # Usage:
 #   get md raid status
 # Parameter:
-#   $md_name		# like "/dev/md0"
+#   $md_name        # like "/dev/md0"
 # Returns:
 #   Return code:
 #       0 on success
@@ -410,32 +410,32 @@ function MD_Clean_RAID()
 function MD_Get_State_RAID()
 {
     RETURN_STR=''
-	local md_name=$1
-	local state=''
-	local start_times=0
-	local end_times=0
-	local spend_times=0
-	start_times=$(date +%s)
-	echo " $start_times start_time against this md array: $md_name "
-	state=`mdadm --detail $md_name | grep "State :" | cut -d ":" -f 2 | cut -d " " -f 2`
-	sta=$?
-	if [ -z "$state" ]; then
-		echo "`date +%s`  first_time_failed get raid statu #######################"
-		while [ $sta ];do
-			state=`mdadm --detail $md_name | grep "State :" | cut -d ":" -f 2 | cut -d " " -f 2`
-			sta=$?
-			end_times=$(date +%s)
-			spend_times=$((end_times - start_times))
-				if [[ $spend_times -gt 10  ]];then
-					echo "get raid status spend $spend_times and exit  "
-					ls /dev/md* |egrep md[0-9]+
-					cat /proc/mdstat
-					exit
-				fi
-		done
-		echo "$spend_times spend raid statu_time #############################"	
-	fi
-	echo "state is $state"
+    local md_name=$1
+    local state=''
+    local start_times=0
+    local end_times=0
+    local spend_times=0
+    start_times=$(date +%s)
+    echo " $start_times start_time against this md array: $md_name "
+    state=`mdadm --detail $md_name | grep "State :" | cut -d ":" -f 2 | cut -d " " -f 2`
+    sta=$?
+    if [ -z "$state" ]; then
+        echo "`date +%s`  first_time_failed get raid statu #######################"
+        while [ $sta ];do
+            state=`mdadm --detail $md_name | grep "State :" | cut -d ":" -f 2 | cut -d " " -f 2`
+            sta=$?
+            end_times=$(date +%s)
+            spend_times=$((end_times - start_times))
+            if [[ $spend_times -gt 10  ]];then
+                echo "get raid status spend $spend_times and exit  "
+                ls /dev/md* |egrep md[0-9]+
+                cat /proc/mdstat
+                exit
+            fi
+        done
+        echo "$spend_times spend raid statu_time #############################"
+    fi
+    echo "state is $state"
     RETURN_STR="$state"
     return 0
 }
@@ -470,7 +470,7 @@ function Create_Loop_Devices()
     mkdir /home/loop
     for X in `seq 1 ${count}`;do
         local loop_file_name=$(mktemp /home/loop/loop.XXXXXX)
-	     dd if=/dev/zero of=${loop_file_name} count=$size_mib  bs=1M 1>/dev/null 2>&1
+         dd if=/dev/zero of=${loop_file_name} count=$size_mib  bs=1M 1>/dev/null 2>&1
         local loop_dev_name=$(losetup -f)
 #BUG: RHEL5 only support 8 loop device and we need to check whether we are run out of it
         local command="losetup ${loop_dev_name} ${loop_file_name} 1>/dev/null 2>&1"
@@ -491,65 +491,65 @@ function Create_Loop_Devices()
 
 function get_disks()
 {
-	disk_num=$1
-	disk_size=$2
-	LOOP_DEVICE_LIST=$(create_loop_devices $disk_num $disk_size)
-	for i in $(seq 1 $disk_num); do
-	   	disk_temp=$(echo $LOOP_DEVICE_LIST | cut -d " " -f $i)
-   		disk_temp=$(echo $disk_temp | cut -d "/" -f 3)
-   		devlist="$devlist $disk_temp"
-	done
-	RETURN_STR="$devlist"
+    disk_num=$1
+    disk_size=$2
+    LOOP_DEVICE_LIST=$(create_loop_devices $disk_num $disk_size)
+    for i in $(seq 1 $disk_num); do
+        disk_temp=$(echo $LOOP_DEVICE_LIST | cut -d " " -f $i)
+        disk_temp=$(echo $disk_temp | cut -d "/" -f 3)
+        devlist="$devlist $disk_temp"
+    done
+    RETURN_STR="$devlist"
 }
 
 function remove_disks()
 {
-	disks=$1			  
-	for disk in $disks; do
-		try_num=1
-		disk="/dev/"$disk
-		echo "losetup -d $disk"
-		losetup -d $disk
-		state=$?
-		while [ $state -ne 0 ]; do
-			if [ $try_num -eq 4 ]; then
-				echo "FAIL: After tried 3 times losetup -d $disk"
-				return 1
-			fi
-			sleep 1
-			losetup -d $disk
-			state=$?
-			((try_num++))
-                done
-	done
-	rm -rf /home/loop/loop.*
-	rm -rf /home/loop/
+    disks=$1
+    for disk in $disks; do
+        try_num=1
+        disk="/dev/"$disk
+        echo "losetup -d $disk"
+        losetup -d $disk
+        state=$?
+        while [ $state -ne 0 ]; do
+            if [ $try_num -eq 4 ]; then
+                echo "FAIL: After tried 3 times losetup -d $disk"
+                return 1
+            fi
+            sleep 1
+            losetup -d $disk
+            state=$?
+            ((try_num++))
+        done
+    done
+    rm -rf /home/loop/loop.*
+    rm -rf /home/loop/
 }
 
 function local_clean()
 {
-		local md_name=""
-                mdadm -E /dev/sd[b-i]1 |grep "raid" || cat /proc/mdstat |grep "inactive" || ls /dev/md* |egrep md[0-9]+
-                if [ $? = 0 ];then
-                                echo "have some md don't clean"
-				ls /dev/md* |egrep md[0-9]+
-				for md_name in $(ls /dev/md* |egrep md[0-9]+) ;do
-					mdadm --stop $md_name
-					sleep 5
-					echo "$md_name have stop"
-				done
-				rm -rf  /etc/mdadm.conf 
-				mdadm -Ss;sleep 5
-                                mdadm  --zero-superblock  /dev/sd[b-i]1
-                            	mdadm  --zero-superblock /dev/sd[b-i]
-                                cat /proc/mdstat
-               			lsblk 
-fi		
-		echo "INFO:need to remove partition first"
-		for i in b c d e f g h i ;do
-			mdadm  --zero-superblock "/dev/sd$i"
-			sleep 1
-			gdisk /dev/sd$i  &> /dev/null  <<EOF
+    local md_name=""
+    mdadm -E /dev/sd[b-i]1 |grep "raid" || cat /proc/mdstat |grep "inactive" || ls /dev/md* |egrep md[0-9]+
+    if [ $? = 0 ];then
+        echo "have some md don't clean"
+        ls /dev/md* |egrep md[0-9]+
+        for md_name in $(ls /dev/md* |egrep md[0-9]+) ;do
+            mdadm --stop $md_name
+            sleep 5
+            echo "$md_name have stop"
+        done
+        rm -rf  /etc/mdadm.conf
+        mdadm -Ss;sleep 5
+        mdadm  --zero-superblock  /dev/sd[b-i]1
+        mdadm  --zero-superblock /dev/sd[b-i]
+        cat /proc/mdstat
+        lsblk
+    fi
+    echo "INFO:need to remove partition first"
+    for i in b c d e f g h i ;do
+        mdadm  --zero-superblock "/dev/sd$i"
+        sleep 1
+        gdisk /dev/sd$i  &> /dev/null  <<EOF
 d
 3
 d
@@ -559,10 +559,10 @@ d
 w
 Y
 EOF
-			sleep 1
-			partprobe /dev/sd$i 
-		done
+        sleep 1
+        partprobe /dev/sd$i
+    done
 
-		echo "have been remove all partition,check it"
-		lsblk;cat /proc/mdstat; ls /dev/md*
+    echo "have been remove all partition,check it"
+    lsblk;cat /proc/mdstat; ls /dev/md*
 }

@@ -267,13 +267,13 @@ LogDeceiver ()
 
 skip_testcase ()
 {
-	# skip tests defined in var SKIPTESTS, seperated by space
-	if [ -n "$SKIPTESTS" ]; then
-		echo -e ${SKIPTESTS// /"\n"} > SKIPTESTS
-		# skip file needs to be an absolute path or path relative to $LTPROOT
-		# use absolute path here
-		OPTS="$OPTS -S $PWD/SKIPTESTS"
-	fi
+    # skip tests defined in var SKIPTESTS, seperated by space
+    if [ -n "$SKIPTESTS" ]; then
+        echo -e ${SKIPTESTS// /"\n"} > SKIPTESTS
+        # skip file needs to be an absolute path or path relative to $LTPROOT
+        # use absolute path here
+        OPTS="$OPTS -S $PWD/SKIPTESTS"
+    fi
 }
 
 RunTest ()

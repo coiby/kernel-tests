@@ -34,51 +34,51 @@ TESTLOCAL=0
 # Commands in this section are provided by test developer.
 # ---------------------------------------------
 function outputecho() {
-	echo "$@" | tee -a ${OUTPUTFILE}
+    echo "$@" | tee -a ${OUTPUTFILE}
 }
 
 exitcleanup() {
 
-	#successful, and restore the original environment
-	mountpoint $TESTMOUNTPATH && umount $TESTMOUNTPATH
-	rm -fr ${TESTEXPORTPATH} ${TESTMOUNTPATH}
+    #successful, and restore the original environment
+    mountpoint $TESTMOUNTPATH && umount $TESTMOUNTPATH
+    rm -fr ${TESTEXPORTPATH} ${TESTMOUNTPATH}
 
-	# I think we need it
-   	make clean
+    # I think we need it
+    make clean
 
-	rlJournalStart
-	   rlServiceStop $TESTSERVICE
+    rlJournalStart
+       rlServiceStop $TESTSERVICE
 
-	   if [ ${TESTLOCAL} -eq 1 ] ; then
-		   if [ -e /etc/samba/smb.conf-${TESTNAME} ]; then
-			   cp -fr /etc/samba/smb.conf-${TESTNAME} /etc/samba/smb.conf
-		   fi
-	   else
-			   rstrnt-restore
-	   fi
-	   rlServiceRestore $TESTSERVICE
-	rlJournalEnd
+       if [ ${TESTLOCAL} -eq 1 ] ; then
+           if [ -e /etc/samba/smb.conf-${TESTNAME} ]; then
+               cp -fr /etc/samba/smb.conf-${TESTNAME} /etc/samba/smb.conf
+           fi
+       else
+           rstrnt-restore
+       fi
+       rlServiceRestore $TESTSERVICE
+    rlJournalEnd
 }
 
 function passexit() {
 
-	outputecho "$@"
+    outputecho "$@"
 
-	rstrnt-report-result $TEST PASS
+    rstrnt-report-result $TEST PASS
 
-	exitcleanup
+    exitcleanup
 
-	exit 0
+    exit 0
 }
 
 function failexit() {
 
-	outputecho "$@"
-	rstrnt-report-result $TEST FAIL
+    outputecho "$@"
+    rstrnt-report-result $TEST FAIL
 
-	exitcleanup
+    exitcleanup
 
-	exit
+    exit
 }
 
 # ---------------------------------------------
@@ -112,7 +112,7 @@ function Client()
 {
    local servpath=testuser
    if [ "$1" == "nounix" ]; then
-		CTHON_FLAGS='-C'
+        CTHON_FLAGS='-C'
    fi
 
    pushd cthon04
@@ -132,37 +132,37 @@ Server()
 {
    # samba and samba-client should already be installed
 
-	outputecho "Save the original configure files"
-	# We use this, to avoid the re-backup config file,
-	# and the definite original config file is overrided
-	if [ ! -e ${TESTCONFIGFLE}-${TESTNAME} ] ; then
-		if [ ${TESTLOCAL} -eq 1 ] ; then
-			cp -fr ${TESTCONFIGFILE} ${TESTCONFIGFILE}-${TESTNAME}
-		else
-			rstrnt-backup ${TESTCONFIGFILE}
-		fi
-	fi
+    outputecho "Save the original configure files"
+    # We use this, to avoid the re-backup config file,
+    # and the definite original config file is overrided
+    if [ ! -e ${TESTCONFIGFLE}-${TESTNAME} ] ; then
+        if [ ${TESTLOCAL} -eq 1 ] ; then
+            cp -fr ${TESTCONFIGFILE} ${TESTCONFIGFILE}-${TESTNAME}
+        else
+            rstrnt-backup ${TESTCONFIGFILE}
+        fi
+    fi
 
-	outputecho "Prepare directory, file and link"
-	rm -fr  ${TESTEXPORTPATH} && mkdir -p ${TESTEXPORTPATH} && chmod 1777 ${TESTEXPORTPATH} || failexit "prepare directory failed.."
-	#add the access permission, this don't support rhel4
-	if ! grep "Nahant" /etc/redhat-release ; then
-		chcon -t samba_share_t ${TESTEXPORTPATH} || failexit "Chcon the ${TESTEXPORTPATH} failed.."
-	fi
+    outputecho "Prepare directory, file and link"
+    rm -fr  ${TESTEXPORTPATH} && mkdir -p ${TESTEXPORTPATH} && chmod 1777 ${TESTEXPORTPATH} || failexit "prepare directory failed.."
+    #add the access permission, this don't support rhel4
+    if ! grep "Nahant" /etc/redhat-release ; then
+        chcon -t samba_share_t ${TESTEXPORTPATH} || failexit "Chcon the ${TESTEXPORTPATH} failed.."
+    fi
 
 ###
 ## The directory wild at last,so we use this absolute dir
     if [ "$1" == "nounix" ]; then
-		cp -f ${CURRENT_DIR}/smb.conf ${TESTCONFIGFILE}
+        cp -f ${CURRENT_DIR}/smb.conf ${TESTCONFIGFILE}
     else
-		cp -f ${CURRENT_DIR}/smb.conf.unix ${TESTCONFIGFILE}
+        cp -f ${CURRENT_DIR}/smb.conf.unix ${TESTCONFIGFILE}
     fi
 
-	echo -e "redhat\nredhat" | smbpasswd -s -a root || failexit "Fail to add test samba account"
+    echo -e "redhat\nredhat" | smbpasswd -s -a root || failexit "Fail to add test samba account"
 
-	rlServiceStop $TESTSERVICE && rlServiceStart $TESTSERVICE
+    rlServiceStop $TESTSERVICE && rlServiceStart $TESTSERVICE
 
-	sleep 20
+    sleep 20
 }
 
 # ------------------Start test -----------------
@@ -202,8 +202,8 @@ fi
 # name="mtab" dev=dm-0 ino=652679 scontext=unconfined_u:system_r:smbd_t:s0
 # tcontext=unconfined_u:object_r:etc_runtime_t:s0 tclass=file
 if grep -q "6.9" /etc/redhat-release ; then
-	make -f /usr/share/selinux/devel/Makefile local.pp
-	semodule -i local.pp
+    make -f /usr/share/selinux/devel/Makefile local.pp
+    semodule -i local.pp
 fi
 
 outputecho "======================================="
@@ -218,7 +218,7 @@ outputecho "Now, Test result=>${result}, status=>${status}, score=>${score}"
 if [ "$result" != "PASS" ]; then
     outputecho "Status = $status\n"
     dmesg
-	failexit "${TEST} ==> FAIL, score:$score"
+    failexit "${TEST} ==> FAIL, score:$score"
 fi
 
 outputecho "======================================="
@@ -233,7 +233,7 @@ outputecho "Now, Test result=>${result}, status=>${status}, score=>${score}"
 if [ "$result" != "PASS" ]; then
     outputecho "Status = $status\n"
     dmesg
-	failexit "${TEST} ==> FAIL, score:$score"
+    failexit "${TEST} ==> FAIL, score:$score"
 fi
 
 passexit "${TEST} ==> PASS, score:$score"

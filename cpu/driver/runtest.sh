@@ -29,10 +29,10 @@ NON_PSTATE_PROCESSORS="26 31 46"
 check_pstate_support()
 {
     for m in $NON_PSTATE_PROCESSORS; do
-	if [ $m -eq $1 ]; then
-	    rlLog "model: $model - does not support intel_pstate"
-	    return 1
-	fi
+        if [ $m -eq $1 ]; then
+            rlLog "model: $model - does not support intel_pstate"
+            return 1
+        fi
     done
 
     return 0
@@ -49,44 +49,44 @@ function verify_intel_cpufreq_driver
 
     typeset model=$(lscpu | grep Model: | awk '{print $2}')
     if [ -z "$model" ]; then
-	rlLog "unable to determine cpu model"
-	return $CKI_FAIL
+        rlLog "unable to determine cpu model"
+        return $CKI_FAIL
     fi
 
     # make sure the given system supports p-state
     check_pstate_support $model
     if [ $? -ne 0 ]; then
-	# older systems do not support intel pstate
-	if [ $driver != "acpi-cpufreq" ]; then
-	    rlLog "intel (non-pstate) system is running: $driver"
-	    # maps to SKIP
-	    return $CKI_UNSUPPORTED
-	fi
-	rlLog "intel system is running: $driver"
-	return $CKI_PASS
+        # older systems do not support intel pstate
+        if [ $driver != "acpi-cpufreq" ]; then
+            rlLog "intel (non-pstate) system is running: $driver"
+            # maps to SKIP
+            return $CKI_UNSUPPORTED
+        fi
+        rlLog "intel system is running: $driver"
+        return $CKI_PASS
     fi
 
     if [ $driver != "intel_pstate" ] && [ $driver != "intel_cpufreq" ]; then
-	if [ "$vendor" = "lenovo" ]; then
-	    rlLog "lenovo intel system is running: $driver"
-	    rlLog "PASS"
-	    return $CKI_PASS
-	fi
+        if [ "$vendor" = "lenovo" ]; then
+            rlLog "lenovo intel system is running: $driver"
+            rlLog "PASS"
+            return $CKI_PASS
+        fi
         rlFail "intel system is running: $driver"
         return $CKI_FAIL
     fi
 
     rlRun -l "lscpu | grep 'hwp '" "0-255"
     if (( $? == 0 )); then
-	if [ "$driver" = "intel_pstate" ]; then
+        if [ "$driver" = "intel_pstate" ]; then
             rlRun -l "rdmsr 0x770"
             if (( $? != 0 )); then
                 cki_beakerlib_skip_task "intel system has HWP, but it is not enabled"
             fi
-	else
+        else
             rlFail "intel system is not running intel_pstate running: $driver"
             return $CKI_FAIL
-	fi
+        fi
     else
         rlRun -l "ls /sys/devices/system/cpu/intel_pstate/"
         if (( $? != 0 )); then

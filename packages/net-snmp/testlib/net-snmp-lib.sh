@@ -121,7 +121,7 @@ nsInstallConfig() {
     rlLog "`cat $SYSCONFIG_NAME`"
     if [ -e snmptrapd.conf ]; then
         rlLog "=== snmptrapd.conf ===:"
-	rlLog "`cat /etc/snmp/snmptrapd.conf`"
+        rlLog "`cat /etc/snmp/snmptrapd.conf`"
     fi
 }
 

@@ -31,18 +31,18 @@ wait_time="2"
 TEST="networking/udp/udp_socket"
 # Test doesn't run without IPv6
 if grep "ipv6.disable=1" /proc/cmdline ; then
-    rlLog "Skip test as system doesn't have IPv6."
-    rstrnt-report-result $TEST SKIP
-    exit
+	rlLog "Skip test as system doesn't have IPv6."
+	rstrnt-report-result $TEST SKIP
+	exit
 fi
 
 rlJournalStart
-    rlPhaseStartSetup
+	rlPhaseStartSetup
 	(uname -r |grep el6) || rlRun "modprobe -r br_netfilter" 0-255 "disable from bridge call iptables 4/6"
 	rlRun "gcc -g -Wall -o udp_no_check udp_no_check.c"
 	rlRun "gcc -g -Wall -o udp_socket udp_socket.c"
 	rlRun "gcc -g -Wall -o UDP_CORK UDP_CORK.c"
-    rlPhaseEnd
+	rlPhaseEnd
 
 	# https://bugzilla.redhat.com/show_bug.cgi?id=2025863
 	if rlIsRHEL '>=8.6'; then
@@ -55,7 +55,7 @@ rlJournalStart
 		rlPhaseEnd
 	fi
 
-    rlPhaseStartTest "SO_NO_CHECK and UDP_NO_CHECK6_RX/TX"
+	rlPhaseStartTest "SO_NO_CHECK and UDP_NO_CHECK6_RX/TX"
 		# Basic setsockopt/getsockopt tests
 		rlRun "./udp_no_check -c 0"
 
@@ -119,9 +119,9 @@ rlJournalStart
 		rstrnt-report-log -l $ns1_if.pcap
 		bash ../../common/tools/netns_clean.sh
 	fi
-    rlPhaseEnd
+	rlPhaseEnd
 
-    rlPhaseStartCleanup
-    rlPhaseEnd
+	rlPhaseStartCleanup
+	rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd

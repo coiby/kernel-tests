@@ -37,8 +37,8 @@ function rhel8_unfix_issues()
 	osver_in_range "800" "801" && is_arch "aarch64" && tskip "migrate_pages03" unfix
 	# Bug 1724724 - [RHEL-8.1]LTP: SMSW operation get success with KVM UMIP enabled from userspace
 	is_kvm && is_arch "x86_64" && tskip "umip_basic_test" unfix
-        # Bug 1739587 - [RHEL-8.1] ltp/generic: syscalls/perf_event_open02 test failures on RT kernel
-        is_rt && osver_in_range "800" "802" && tskip "perf_event_open02" unfix
+	# Bug 1739587 - [RHEL-8.1] ltp/generic: syscalls/perf_event_open02 test failures on RT kernel
+	is_rt && osver_in_range "800" "802" && tskip "perf_event_open02" unfix
 	# Bug 1758717 - Snap 4.1 LTP move_pages fail
 	osver_in_range "800" "803" && tskip "move_pages12" unfix
 	# Bug 1777554 - false positive with huge pages on aarch64

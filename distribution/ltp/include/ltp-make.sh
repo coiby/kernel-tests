@@ -189,18 +189,18 @@ setup-testarea()
         if [ "${STYP}" == "overlayfs" ]; then
             mkdir -p /mnt/ltp-overlay
             mount ${MOUNT_OPTS} $dev /mnt/ltp-overlay
-			mkdir -p /mnt/ltp-overlay/lower
-			mkdir -p /mnt/ltp-overlay/upper
-			mkdir -p /mnt/ltp-overlay/workdir
-			mount -t overlay overlay -olowerdir=/mnt/ltp-overlay/lower,upperdir=/mnt/ltp-overlay/upper,workdir=/mnt/ltp-overlay/workdir /mnt/testarea
-		else
-			mount ${MOUNT_OPTS} $dev /mnt/testarea
-		fi
-		if [ $? -ne 0 ]; then
-			echo " - mount $dev at /mnt/testarea failed" | tee -a $OUTPUTFILE
-			exit 1
-		fi
-	fi
+            mkdir -p /mnt/ltp-overlay/lower
+            mkdir -p /mnt/ltp-overlay/upper
+            mkdir -p /mnt/ltp-overlay/workdir
+            mount -t overlay overlay -olowerdir=/mnt/ltp-overlay/lower,upperdir=/mnt/ltp-overlay/upper,workdir=/mnt/ltp-overlay/workdir /mnt/testarea
+        else
+            mount ${MOUNT_OPTS} $dev /mnt/testarea
+        fi
+        if [ $? -ne 0 ]; then
+            echo " - mount $dev at /mnt/testarea failed" | tee -a $OUTPUTFILE
+            exit 1
+        fi
+    fi
 }
 
 
