@@ -77,8 +77,8 @@ function dump_alias()
 
                 mkdir -p "$(dirname "'$alias_dir'/${rel_path}")";
 
-                modinfo -F alias "$tmpfile" >> "'$alias_dir'/$alias_out";
-                modinfo -F alias "$tmpfile" >> "'$alias_all'";
+                modinfo -F alias "$tmpfile" | grep -v "^platform:" >> "'$alias_dir'/$alias_out";
+                modinfo -F alias "$tmpfile" | grep -v "^platform:" >> "'$alias_all'";
 
                 rm $tmpfile;'
 }
