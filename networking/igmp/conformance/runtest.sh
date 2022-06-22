@@ -78,10 +78,10 @@ LOCAL_IP[4]=$(get_iface_ip4 $TEST_IFACE)
 LOCAL_IP[6]=$(get_iface_ip6 $TEST_IFACE)
 # make sure we have ip addrss before start
 if [ ! "${LOCAL_IP[4]}" ];then
-	test_fail "NO LOCAL_IP[4] address"
+    test_fail "NO LOCAL_IP[4] address"
 fi
 if [ ! "${LOCAL_IP[6]}" ];then
-	test_fail "NO LOCAL_IP[6] address"
+    test_fail "NO LOCAL_IP[6] address"
 fi
 
 waitready() { echo "wait for $1"; while ! pgrep -f "$1"; do sleep 0.1; done; sleep 2;}
@@ -242,7 +242,7 @@ do
             number_after_exclude=`grep "packets_received_after_exclude\=" $OUTPUT | cut -c 32-`
             rlAssertGreater "Received number_after_include:$number_after_include packets" $number_after_include 0
             rlAssertEquals "Received number_after_exclude:$number_after_exclude packets" $number_after_exclude 0
-	fi
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "IP_MSFILTER/MCAST_MSFILTER noexistsource v$f"
@@ -353,7 +353,7 @@ fi
         rlRun "rm -f $OUTPUT" 0 "Remove temporary file"
     rlPhaseEnd
 done
-	ip link del dummy1
-	modprobe -r dummy
+    ip link del dummy1
+    modprobe -r dummy
 rlJournalPrintText
 rlJournalEnd

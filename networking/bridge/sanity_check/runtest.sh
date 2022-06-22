@@ -33,13 +33,13 @@ rlJournalStart
         # br_netfilter would use bridge, and that would stop bridge from being removed
         rlRun "modprobe -r br_netfilter" "0-255"
         rlRun -l "modinfo bridge"
-	modprobe -r dummy
-	rlRun "modprobe -nv dummy | grep 'numdummies=0'>/dev/null && spare_param='Y'" "0,1"
-	if [ $spare_param = "Y" ];then
+    modprobe -r dummy
+    rlRun "modprobe -nv dummy | grep 'numdummies=0'>/dev/null && spare_param='Y'" "0,1"
+    if [ $spare_param = "Y" ];then
         	rlRun "modprobe dummy numdummies=1"
-	else
-		rlRun "modprobe dummy"
-	fi
+    else
+        rlRun "modprobe dummy"
+    fi
         rlRun "BRIDGE=br0"
         rlRun "IFACE=dummy0"
     rlPhaseEnd
@@ -150,7 +150,7 @@ if (($rhel_version >= 7)); then
                         rlRun "bridge link show dev $IFACE | grep disabled"
                         rlRun "cat /sys/class/net/$BRIDGE/brif/$IFACE/state | grep 0"
                         rlRun "bridge link set dev $IFACE state 1"
-			sleep 1
+                        sleep 1
                         rlRun "bridge link show dev $IFACE"
                         rlRun "bridge link show dev $IFACE | grep listening"
                         rlRun "cat /sys/class/net/$BRIDGE/brif/$IFACE/state "

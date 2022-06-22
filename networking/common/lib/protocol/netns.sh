@@ -95,31 +95,31 @@ env_clean()
 test_pass()
 {
 	let PASS++
-        echo -e "PASS\t${1}" >> summary.log
-        echo -e "\n[  Test '"$1"' PASS  ]" | tee -a $OUTPUTFILE
-        if [ $RSTRNT_JOBID ]; then
-                rstrnt-report-result "${TEST}/$1" "PASS" $PASS
-        else
-                echo -e "\n\n********\n\n"
-                echo -e "[ Test '"${TEST}/$1"' PASS $PASS ]\n"
-                echo -e "\n\n********\n\n"
-        fi
+	echo -e "PASS\t${1}" >> summary.log
+	echo -e "\n[  Test '"$1"' PASS  ]" | tee -a $OUTPUTFILE
+	if [ $RSTRNT_JOBID ]; then
+		rstrnt-report-result "${TEST}/$1" "PASS" $PASS
+	else
+		echo -e "\n\n********\n\n"
+		echo -e "[ Test '"${TEST}/$1"' PASS $PASS ]\n"
+		echo -e "\n\n********\n\n"
+	fi
 
 }
 
 test_fail()
 {
 	let FAIL++
-        echo -e "FAIL\t${1}" >> summary.log
-        echo -e "\n[  Test '"$1"' FAIL  ]" | tee -a $OUTPUTFILE
-        # we only care how many test failed
-        if [ $RSTRNT_JOBID ]; then
-                rstrnt-report-result "${TEST}/$1" "FAIL" "$FAIL"
-        else
-                echo -e "\n\n********\n\n"
-                echo -e "[ Test '"${TEST}/$1"' FAIL $FAIL ]"
-                echo -e "\n\n********\n\n"
-        fi
+	echo -e "FAIL\t${1}" >> summary.log
+	echo -e "\n[  Test '"$1"' FAIL  ]" | tee -a $OUTPUTFILE
+	# we only care how many test failed
+	if [ $RSTRNT_JOBID ]; then
+		rstrnt-report-result "${TEST}/$1" "FAIL" "$FAIL"
+	else
+		echo -e "\n\n********\n\n"
+		echo -e "[ Test '"${TEST}/$1"' FAIL $FAIL ]"
+		echo -e "\n\n********\n\n"
+	fi
 }
 
 setup_net()
@@ -157,7 +157,7 @@ setup_net_default()
 	vcommon server "rm -f /tmp/test_*; $VTOPO; get_test_iface"
 	SERVER_IFACE=$(tail -n1 /tmp/test_iface | tr -d '\r\n')
 	if [ $? -ne 0 ]; then
-        	echo -e "\nNo SERVER IFACE"
+		echo -e "\nNo SERVER IFACE"
 		rstrnt-report-result $TEST WARN
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 		exit 1

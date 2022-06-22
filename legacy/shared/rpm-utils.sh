@@ -28,12 +28,12 @@ BREWROOT_KERN=http://download-node-02.eng.bos.redhat.com/brewroot/packages/kerne
 
 if test -z ${RPM_INSTALL+x}
 then
-        RPM_INSTALL=()
+	RPM_INSTALL=()
 fi
 
 if test -z ${RPM_EXTRACT+x}
 then
-        RPM_EXTRACT=()
+	RPM_EXTRACT=()
 fi
 
 # -----------------------------------------------------------------------------
@@ -42,16 +42,16 @@ fi
 
 if test -z $(command -v cpio)
 then
-        RPM_INSTALL+=(
-                cpio    # required for rpm extract; namely: cpio
-        )
+	RPM_INSTALL+=(
+		cpio    # required for rpm extract; namely: cpio
+	)
 fi
 
 if test -z $(command -v rpm2cpio)
 then
-        RPM_INSTALL+=(
-                rpm     # required for rpm extract; namely: rpm2cpio
-        )
+	RPM_INSTALL+=(
+		rpm     # required for rpm extract; namely: rpm2cpio
+	)
 fi
 
 # -----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ fi
 PKG_MANAGER=dnf
 if ! which dnf &> /dev/null
 then
-        PKG_MANAGER=yum
+	PKG_MANAGER=yum
 fi
 
 # -----------------------------------------------------------------------------
@@ -88,49 +88,49 @@ TMP_FILES+=("$RPM_TMPDIR")
 #
 function __yum_call()
 {
-        if test $# -eq 0
-        then
-                # Nothing to do.
-                return 0
-        fi
+	if test $# -eq 0
+	then
+		# Nothing to do.
+		return 0
+	fi
 
-        # Create a temporary file for dnf output logging
-        local log="$(mktemp)"
-        TMP_FILES+=("$log")
+	# Create a temporary file for dnf output logging
+	local log="$(mktemp)"
+	TMP_FILES+=("$log")
 
-        # Filter out yum arguments
-        YUM_ARGS=()
-        while test "${1:0:1}" == "-"
-        do
-                YUM_ARGS+=("$1")
-                shift 1
-        done
+	# Filter out yum arguments
+	YUM_ARGS=()
+	while test "${1:0:1}" == "-"
+	do
+		YUM_ARGS+=("$1")
+		shift 1
+	done
 
-        # Install/extract RPMs.
-        for pkg in "$@"
-        do
-                PKG_TARGETS=()
-                # Check whether the package has been installed, or not.
-                # This influences whether we use (re)install command used.
-                if $PKG_MANAGER list installed "$pkg" &> /dev/null
-                then
-                        if $PKG_MANAGER list --upgrades "$pkg" &> /dev/null
-                        then
-                                PKG_TARGET=update
-                        else
-                                PKG_TARGET=reinstall
-                        fi
-                else
-                        PKG_TARGET=install
-                fi
+	# Install/extract RPMs.
+	for pkg in "$@"
+	do
+		PKG_TARGETS=()
+		# Check whether the package has been installed, or not.
+		# This influences whether we use (re)install command used.
+		if $PKG_MANAGER list installed "$pkg" &> /dev/null
+		then
+			if $PKG_MANAGER list --upgrades "$pkg" &> /dev/null
+			then
+				PKG_TARGET=update
+			else
+				PKG_TARGET=reinstall
+			fi
+		else
+			PKG_TARGET=install
+		fi
 
-                if ! (set -x; $PKG_MANAGER "${YUM_ARGS[@]}" $PKG_TARGET $pkg -y)
-                then
-                        exit 1
-                fi
-        done
+		if ! (set -x; $PKG_MANAGER "${YUM_ARGS[@]}" $PKG_TARGET $pkg -y)
+		then
+			exit 1
+		fi
+	done
 
-        return 0
+	return 0
 }
 
 # -----------------------------------------------------------------------------
@@ -139,46 +139,46 @@ function __yum_call()
 
 function rpm_install_add()
 {
-        for pkg in "$@"
-        do
-                if [ -z "$(rpm -qa $pkg | head -n 1)" ]
-                then
-                        continue
-                fi
-                RPM_INSTALL+=("$pkg")
-        done
+	for pkg in "$@"
+	do
+		if [ -z "$(rpm -qa $pkg | head -n 1)" ]
+		then
+			continue
+		fi
+		RPM_INSTALL+=("$pkg")
+	    done
 }
 
 function rpm_extract_add()
 {
-        for pkg in "$@"
-        do
-                if [ -z "$(rpm -qa $pkg | head -n 1)" ]
-                then
-                        continue
-                fi
-                RPM_EXTRACT+=("$pkg")
-        done
+	for pkg in "$@"
+	do
+		if [ -z "$(rpm -qa $pkg | head -n 1)" ]
+		then
+			continue
+		fi
+		RPM_EXTRACT+=("$pkg")
+	    done
 }
 
 function rpm_install()
 {
-        __yum_call "${RPM_INSTALL[@]}"
+	__yum_call "${RPM_INSTALL[@]}"
 
-        if test $? -gt 0
-        then
-                return $ret
-        fi
+	if test $? -gt 0
+	then
+		return $ret
+	fi
 
-        RPM_INSTALL=()
+	RPM_INSTALL=()
 
-        return 0
+	return 0
 }
 
 function rpm_extract_latest()
 {
-        yumdownloader --disablerepo='*' --enablerepo=rhel-latest \
-                      --downloaddir=$RPM_TMPDIR "${RPM_EXTRACT[@]}"
+	yumdownloader --disablerepo='*' --enablerepo=rhel-latest \
+		--downloaddir=$RPM_TMPDIR "${RPM_EXTRACT[@]}"
 	_rpm_extract
 }
 
@@ -203,14 +203,14 @@ function rpm_extract()
 function _rpm_extract()
 {
 
-        if test $? -gt 0
-        then
-               return $?
-        fi
+	if test $? -gt 0
+	then
+		return $?
+	fi
 
-        RPM_EXTRACT=()
+	RPM_EXTRACT=()
 
-        local oldcwd="$(pwd)"
+	local oldcwd="$(pwd)"
 
 	local IFS=$'\n'
 	for rpm_file in $(find $RPM_TMPDIR -maxdepth 1 -mindepth 1 -name "*.rpm")
@@ -223,16 +223,16 @@ function _rpm_extract()
 		fi
 	done
 
-        find $RPM_TMPDIR -maxdepth 1 -mindepth 1 -name "*.rpm" \
-        | xargs -I RPM bash -c "
-                cd \"$RPM_TMPDIR\";
-                rpm2cpio \"RPM\" | cpio -idmv
-                rm -f RPM;"
+	find $RPM_TMPDIR -maxdepth 1 -mindepth 1 -name "*.rpm" \
+		| xargs -I RPM bash -c "
+			cd \"$RPM_TMPDIR\";
+			rpm2cpio \"RPM\" | cpio -idmv
+			rm -f RPM;"
 
-        return 0
+	return 0
 }
 
 function rpm_extract_path()
 {
-        find "$RPM_TMPDIR" -mindepth 1 -maxdepth 1 -type d -iname "$1*"
+	find "$RPM_TMPDIR" -mindepth 1 -maxdepth 1 -type d -iname "$1*"
 }

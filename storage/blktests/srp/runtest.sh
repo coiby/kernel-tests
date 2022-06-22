@@ -35,8 +35,8 @@ function pre_setup
 
 function disable_multipath
 {
-        pidof multipathd &>/dev/null && pkill -9 multipathd
-        [ -f /etc/multipath.conf ] && rm -f /etc/multipath.conf
+	pidof multipathd &>/dev/null && pkill -9 multipathd
+	[ -f /etc/multipath.conf ] && rm -f /etc/multipath.conf
 }
 
 function get_timestamp

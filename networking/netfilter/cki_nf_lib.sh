@@ -1,21 +1,21 @@
 #!/bin/bash
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#	Copyright (c) 2014 Red Hat, Inc. All rights reserved.
+#    Copyright (c) 2014 Red Hat, Inc. All rights reserved.
 #
-#	This copyrighted material is made available to anyone wishing
-#	to use, modify, copy, or redistribute it subject to the terms
-#	and conditions of the GNU General Public License version 2.
+#    This copyrighted material is made available to anyone wishing
+#    to use, modify, copy, or redistribute it subject to the terms
+#    and conditions of the GNU General Public License version 2.
 #
-#	This program is distributed in the hope that it will be
-#	useful, but WITHOUT ANY WARRANTY; without even the implied
-#	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#	PURPOSE. See the GNU General Public License for more details.
+#    This program is distributed in the hope that it will be
+#    useful, but WITHOUT ANY WARRANTY; without even the implied
+#    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#    PURPOSE. See the GNU General Public License for more details.
 #
-#	You should have received a copy of the GNU General Public
-#	License along with this program; if not, write to the Free
-#	Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-#	Boston, MA 02110-1301, USA.
+#    You should have received a copy of the GNU General Public
+#    License along with this program; if not, write to the Free
+#    Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+#    Boston, MA 02110-1301, USA.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
@@ -71,54 +71,54 @@ EOF
 
 cat > search.awk <<'EOF'
 BEGIN {
-    name = ARGV[1]
-    release = ARGV[2]
-    ARGV[1]=""
-    ARGV[2]=""
-    result = NotFound;
-    col = 255;
-    FS=" "
+	name = ARGV[1]
+	release = ARGV[2]
+	ARGV[1]=""
+	ARGV[2]=""
+	result = NotFound;
+	col = 255;
+	FS=" "
 }
 {
-    if (NR == 1) {
-        for (i = 1; i <= NF; i++) {
-            if ($i == release) {
-                col = i;
-                break;
-            }
-        }
-    }
-    if (col == 255) {
-        exit 1;
-    }
-    if ($1 == name) {
-        result = $col;
-        exit 0;
-    }
+	if (NR == 1) {
+		for (i = 1; i <= NF; i++) {
+			if ($i == release) {
+				col = i;
+				break;
+			}
+		}
+	}
+	if (col == 255) {
+		exit 1;
+	}
+	if ($1 == name) {
+		result = $col;
+		exit 0;
+	}
 }
 
 END {
-    if (col == 255) {
-	printf ("awk: release = [%s] not found !\n", release);
-        exit 1;
-    }
-    if (result == NotFound) {
-        printf ("awk: package name = [%s] not found !\n", name);
-        exit 2;
-    }
-    if (result == "N/A") {
-        printf ("awk: result Not appicable !\n", name);
-        exit 3;
+	if (col == 255) {
+		printf ("awk: release = [%s] not found !\n", release);
+		exit 1;
+	}
+	if (result == NotFound) {
+		printf ("awk: package name = [%s] not found !\n", name);
+		exit 2;
+	}
+	if (result == "N/A") {
+		printf ("awk: result Not appicable !\n", name);
+		exit 3;
 
-    }
-    printf("%s\n", result);
+	}
+	printf("%s\n", result);
 }
 EOF
 	version=$(cat VerMap | awk -f search.awk $Pkgname $Release)
 	if [[ $? != 0 ]];then
-	# Find upstream lastest version
+		# Find upstream lastest version
 		wget https://www.netfilter.org/projects/$Pkgname/files -O $Pkgname.html 1>/dev/null 2>/dev/null || \
-			{ echo "connect to www.netfilter.org fail"; return 2; }
+		{ echo "connect to www.netfilter.org fail"; return 2; }
 		version=`grep -Po "$Pkgname.*?tar" $Pkgname.html | tail -1 | grep -o '[0-9].*[0-9]'`
 	fi
 	eval $_output="'$version'"
@@ -185,18 +185,18 @@ libmnl"
 		tar jxf ${name}-${Ver}.tar.bz2
 		local retry=true
 		while $retry;do
-		echo ""
-		echo ""
-		echo "---------- Try to installing ${name}-${Ver}... ----------------"
-		echo ""
-		echo ""
-		cd ${name}-${Ver}
-		export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-		./configure --build=$(rpm --eval %{_host}) 2>&1 | tee $name.configure.log; [[ ${PIPESTATUS[1]} -eq 0 ]] && make && make install && { left=( ${left[@]#$name} ); retry=false;cd $WORK_PATH; }||\
-		{ # handle "No package found error"
-			tmp=`grep "No package" $name.configure.log` || { echo "netfilter_install: Can't handle error"; retry=false; return 1; } && \
+			echo ""
+			echo ""
+			echo "---------- Try to installing ${name}-${Ver}... ----------------"
+			echo ""
+			echo ""
+			cd ${name}-${Ver}
+			export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+			./configure --build=$(rpm --eval %{_host}) 2>&1 | tee $name.configure.log; [[ ${PIPESTATUS[1]} -eq 0 ]] && make && make install && { left=( ${left[@]#$name} ); retry=false;cd $WORK_PATH; }||\
+			{ # handle "No package found error"
+				tmp=`grep "No package" $name.configure.log` || { echo "netfilter_install: Can't handle error"; retry=false; return 1; } && \
 				{ cd $WORK_PATH; netfilter_install `{ echo $nf_pkgs; eval echo $tmp; } |tr " " "\n"|sort | uniq -d`; }
-		}
+			}
 		done
 	done
 }
@@ -208,11 +208,11 @@ ipvsadm_install()
 	rpm -q libnl3-devel || yum install libnl3-devel -y
 	rpm -q popt-devel || yum install popt-devel -y
 	wget https://mirrors.edge.kernel.org/pub/linux/utils/kernel/ipvsadm -O ipvsadm.html || \
-			{ echo "connect to mirrors.edge.kernel.org fail"; return 2; }
+	{ echo "connect to mirrors.edge.kernel.org fail"; return 2; }
 	local version=`grep -Po "ipvsadm.*?.tar" ipvsadm.html |tail -1 |grep -o '[0-9].*[0-9]'`
 
 	wget https://mirrors.edge.kernel.org/pub/linux/utils/kernel/ipvsadm/ipvsadm-1.31.tar.xz || \
-			{ echo "Download ipvs-${version}.tar.xz fail"; return 2; }
+	{ echo "Download ipvs-${version}.tar.xz fail"; return 2; }
 	tar xf ipvsadm-$version.tar.xz
 	pushd ipvsadm-$version
 	make && make install
@@ -225,7 +225,7 @@ install_dependence()
 	local _pkg
 	for _pkg in "${dependences[@]}"
 	do
-		yum -y install ${_pkg} || left+=( "$_pkg" )
+	    yum -y install ${_pkg} || left+=( "$_pkg" )
 	done
 	[[ ${#left[*]} -ne 0 ]] && echo "Packege ${left[*]} need to be installed..."
 
@@ -239,9 +239,9 @@ install_dependence()
 4or6()
 {
 	if [[ $1 =~ .*:.* ]];then
-		echo "6"
+	    echo "6"
 	else
-		echo "4"
+	    echo "4"
 	fi
 }
 
@@ -261,9 +261,9 @@ netfilter_rules_clean()
 	done
 	echo ":: [    LOG    ] :: nft rules clean"
 	nft --version > /dev/null 2>&1 && {
-		local line=""
-		nft list tables | while read line; do
-			nft delete $line
+	local line=""
+	nft list tables | while read line; do
+		nft delete $line
 		done
 	}
 	echo ":: [    LOG    ] :: ipset rules clean"
@@ -299,7 +299,7 @@ do_setup()
 	do_clean
 	local i
 	for i in client router server;do
-		ip netns add $i
+	    ip netns add $i
 	done
 
 	if [[ "$1x" == "ipv6x" ]];then
@@ -324,27 +324,27 @@ do_setup()
 	fi
 
 	ip -d -n router -b /dev/stdin <<-EOF
-		 link add name r_c type veth peer name c_r netns client
-		 link add name r_s type veth peer name s_r netns server
-		 link set r_c up
-		 link set r_s up
-		 addr add $ip_rc/$N dev r_c $nodad
-		 addr add $ip_rs/$N dev r_s $nodad
-		 link set lo up
+		link add name r_c type veth peer name c_r netns client
+		link add name r_s type veth peer name s_r netns server
+		link set r_c up
+		link set r_s up
+		addr add $ip_rc/$N dev r_c $nodad
+		addr add $ip_rs/$N dev r_s $nodad
+		link set lo up
 	EOF
 
 	ip -d -n server -b /dev/stdin <<-EOF
-		 addr add $ip_s/$N dev s_r $nodad
-		 link set s_r up
-		 route add default via $ip_rs dev s_r
-		 link set lo up
+		addr add $ip_s/$N dev s_r $nodad
+		link set s_r up
+		route add default via $ip_rs dev s_r
+		link set lo up
 	EOF
 
 	ip -d -n client -b /dev/stdin <<-EOF
-		 addr add $ip_c/$N dev c_r $nodad
-		 link set c_r up
-		 route add default via $ip_rc dev c_r
-		 link set lo up
+		addr add $ip_c/$N dev c_r $nodad
+		link set c_r up
+		route add default via $ip_rc dev c_r
+		link set lo up
 	EOF
 
 	for i in tx rx tx-sctp-segmentation; do

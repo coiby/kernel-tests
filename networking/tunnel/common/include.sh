@@ -4,15 +4,15 @@ NIC_COMMON_DIR=$(dirname $(readlink -f $BASH_SOURCE))
 
 # select tool to manage package, which could be "yum" or "dnf"
 function select_yum_tool() {
-    if [ -x /usr/bin/dnf ]; then
-        echo "/usr/bin/dnf"
-    elif [ -x /usr/bin/yum ]; then
-        echo "/usr/bin/yum"
-    else
-        return 1
-    fi
+	if [ -x /usr/bin/dnf ]; then
+		echo "/usr/bin/dnf"
+	elif [ -x /usr/bin/yum ]; then
+		echo "/usr/bin/yum"
+	else
+		return 1
+	fi
 
-    return 0
+	return 0
 }
 
 yum=$(select_yum_tool)
@@ -173,11 +173,11 @@ netns_cs_setup()
 	ip link set veth0_s netns server
 	ip link set veth1_s netns server
 
-        ip link set veth0_c_br master br0
-        ip link set veth1_c_br master br0
+	ip link set veth0_c_br master br0
+	ip link set veth1_c_br master br0
 
-        ip link set veth0_s_br master br0
-        ip link set veth1_s_br master br0
+	ip link set veth0_s_br master br0
+	ip link set veth1_s_br master br0
 
 	local iface
 	local iface_c

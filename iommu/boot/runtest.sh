@@ -42,74 +42,71 @@ dmesgErrors=iommu-dmesg-errors.txt
 dmesgReport=iommu-dmesg-report.txt
 
 function bootOptions() {
-    bootOptionsFile=$1
+	bootOptionsFile=$1
 
 
-    while read -r line; do
-        # Check to see if new options have been set yet
-	if [[ -z "${RSTRNT_REBOOTCOUNT}" ||  "${RSTRNT_REBOOTCOUNT}" -eq 0 ]] || \
-	    [[ ! -a $CurrentBootOptions ]]; then
-	    echo "Start test." | tee -a "${OUTPUTFILE}"
-	    echo "Old cmdline: $(cat /proc/cmdline)" | tee -a "${OUTPUTFILE}"
+	while read -r line; do
+	# Check to see if new options have been set yet
+		if [[ -z "${RSTRNT_REBOOTCOUNT}" ||  "${RSTRNT_REBOOTCOUNT}" -eq 0 ]] || \
+			[[ ! -a $CurrentBootOptions ]]; then
+			echo "Start test." | tee -a "${OUTPUTFILE}"
+			echo "Old cmdline: $(cat /proc/cmdline)" | tee -a "${OUTPUTFILE}"
 
-            # Update the boot loader.
-	    default=$(/sbin/grubby --default-kernel)
+			# Update the boot loader.
+			default=$(/sbin/grubby --default-kernel)
 
-	    echo "Cmdline to be added: ${line}" | tee -a "${OUTPUTFILE}"
-	    /sbin/grubby --args="${line}" --update-kernel="${default}"
-	    code=$?
+			echo "Cmdline to be added: ${line}" | tee -a "${OUTPUTFILE}"
+			/sbin/grubby --args="${line}" --update-kernel="${default}"
+			code=$?
 
-	    if [ ${code} -ne 0 ]; then
-		echo "Fail: error changing boot loader." |
-		tee -a "${OUTPUTFILE}"
-		rstrnt-report-result "${TEST}/boot_loader" "FAIL" 0
-	    else
-		echo "${line}" > $CurrentBootOptions
-		echo "Reboot now!" | tee -a "${OUTPUTFILE}"
-		rstrnt-report-result "${TEST}/boot_loader" "PASS" 0
-		rstrnt-reboot
-		# Make sure the script doesn't continue if rstrnt-reboot get's killed
-		# https://github.com/beaker-project/restraint/issues/219
-		exit 0
-	    fi
-	else
-            # The reboot has finished. Verify the cmdline.
-	    echo "New cmdline: $(cat /proc/cmdline)" | tee -a "${OUTPUTFILE}"
+			if [ ${code} -ne 0 ]; then
+				echo "Fail: error changing boot loader." |
+				tee -a "${OUTPUTFILE}"
+				rstrnt-report-result "${TEST}/boot_loader" "FAIL" 0
+			else
+				echo "${line}" > $CurrentBootOptions
+				echo "Reboot now!" | tee -a "${OUTPUTFILE}"
+				rstrnt-report-result "${TEST}/boot_loader" "PASS" 0
+				rstrnt-reboot
+				# Make sure the script doesn't continue if rstrnt-reboot get's killed
+				# https://github.com/beaker-project/restraint/issues/219
+				exit 0
+			fi
+		else
+			# The reboot has finished. Verify the cmdline.
+			echo "New cmdline: $(cat /proc/cmdline)" | tee -a "${OUTPUTFILE}"
 
-            grep "$(cat $CurrentBootOptions)" /proc/cmdline
-	    code=$?
-	    # remove spaces for reporting boot option to beaker
-	    CurrentBootOptionsReport=$(cat $CurrentBootOptions | sed 's/\ /-/')
+			grep "$(cat $CurrentBootOptions)" /proc/cmdline
+			code=$?
+			# remove spaces for reporting boot option to beaker
+			CurrentBootOptionsReport=$(cat $CurrentBootOptions | sed 's/\ /-/')
 
-	    if [ ${code} -ne 0 ]; then
-		echo "Fail: error booting kernel with specified cmdline" |
-		tee -a "${OUTPUTFILE}"
+			if [ ${code} -ne 0 ]; then
+				echo "Fail: error booting kernel with specified cmdline" |
+				tee -a "${OUTPUTFILE}"
 
-		rstrnt-report-result "${TEST}/$CurrentBootOptionsReport" "FAIL" 0
-		rm $CurrentBootOptions
-	        /sbin/grubby --remove-args="${line}" \
-		 --update-kernel="${default}"
-        	sed -i "/$line\$/d" $bootOptionsFile
-	    else
-       		echo "boot options persisted through reboot." | tee -a "${OUTPUTFILE}"
-		rstrnt-report-result "${TEST}/$CurrentBootOptionsReport" "PASS" 0
-	        rm $CurrentBootOptions
-                /sbin/grubby --remove-args="${line}" \
-                 --update-kernel="${default}"
-        	sed -i "/$line\$/d" $bootOptionsFile
-	    fi
-	fi
-
-
-
-    done < $bootOptionsFile
+				rstrnt-report-result "${TEST}/$CurrentBootOptionsReport" "FAIL" 0
+				rm $CurrentBootOptions
+				/sbin/grubby --remove-args="${line}" \
+					--update-kernel="${default}"
+				sed -i "/$line\$/d" $bootOptionsFile
+			else
+				echo "boot options persisted through reboot." | tee -a "${OUTPUTFILE}"
+				rstrnt-report-result "${TEST}/$CurrentBootOptionsReport" "PASS" 0
+				rm $CurrentBootOptions
+				/sbin/grubby --remove-args="${line}" \
+					--update-kernel="${default}"
+				sed -i "/$line\$/d" $bootOptionsFile
+			fi
+		fi
+	done < $bootOptionsFile
 }
 
 function dmesgErrors() {
-    dmesgLineNumber=0
+	dmesgLineNumber=0
 
-    # find any iommu errors in dmesg/messages file
-    while read -r dmesgLine; do
+	# find any iommu errors in dmesg/messages file
+	while read -r dmesgLine; do
 	dmesgLineNumber=$(($dmesgLineNumber+1))
 	journalctl | grep "$dmesgLine"
 	    code=$?
@@ -123,46 +120,46 @@ function dmesgErrors() {
 	    else
 		echo "$dmesgLineNumber PASS $dmesgLine" >> $dmesgReport
 	    fi
-    done < $dmesgErrors
+	done < $dmesgErrors
 
-    # report pass/fail to beaker if errors were found, upload report
-    grep FAIL $dmesgReport
-    dmesgReportCode=$?
+	# report pass/fail to beaker if errors were found, upload report
+	grep FAIL $dmesgReport
+	dmesgReportCode=$?
 
-    if [ ${dmesgReportCode} -ne 1 ]; then
-	rstrnt-report-result "${TEST}/iommu-dmesg" "FAIL" 0
-    else
-	rstrnt-report-result "${TEST}/iommu-dmesg" "PASS" 0
-    fi
+	if [ ${dmesgReportCode} -ne 1 ]; then
+		rstrnt-report-result "${TEST}/iommu-dmesg" "FAIL" 0
+	else
+		rstrnt-report-result "${TEST}/iommu-dmesg" "PASS" 0
+	fi
 
-    rstrnt-report-log -l $dmesgReport
+	rstrnt-report-log -l $dmesgReport
 
 }
 
 function cleanupTest() {
-    rm $dmesgReport
+	rm $dmesgReport
 }
 
 if [[ -n $CMDLINEARGS ]]; then
-    if [ -z "${RSTRNT_REBOOTCOUNT}" ] || [ "${RSTRNT_REBOOTCOUNT}" -eq 0 ]; then
-       IFS=':'
-       for i in $CMDLINEARGS; do
-	   echo $i >> $CustomBootOptions
-       done
-    fi
-    bootOptions $CustomBootOptions
-    dmesgErrors
+	if [ -z "${RSTRNT_REBOOTCOUNT}" ] || [ "${RSTRNT_REBOOTCOUNT}" -eq 0 ]; then
+		IFS=':'
+		for i in $CMDLINEARGS; do
+			echo $i >> $CustomBootOptions
+		done
+	fi
+	bootOptions $CustomBootOptions
+	dmesgErrors
 else
-    if [[ $cpuvendor = "GenuineIntel" ]]; then
-	bootOptions $DefaultBootOptionsIntel
-	dmesgErrors
-    elif [[ $cpuvendor = "AuthenticAMD" ]]; then
-       	bootOptions $DefaultBootOptionsAMD
-	dmesgErrors
-    else
-	rstrnt-report-result "${TEST}/nonAMDorIntelProcessor" "SKIP" 0
-	exit 0
-    fi
+	if [[ $cpuvendor = "GenuineIntel" ]]; then
+		bootOptions $DefaultBootOptionsIntel
+		dmesgErrors
+	elif [[ $cpuvendor = "AuthenticAMD" ]]; then
+		bootOptions $DefaultBootOptionsAMD
+		dmesgErrors
+	else
+		rstrnt-report-result "${TEST}/nonAMDorIntelProcessor" "SKIP" 0
+		exit 0
+	fi
 fi
 
 cleanupTest

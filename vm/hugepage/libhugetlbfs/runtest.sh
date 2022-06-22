@@ -42,9 +42,9 @@ TARGET=${PACKAGE_NAME}-${PACKAGE_VERSION}
 PACKAGE_URL="$LOOKASIDE/$PACKAGE_VERSION/$TARGET.tar.gz"
 bash $CDIR/utils/build.sh $PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_URL
 if [ $? -ne 0 ]; then
-	echo "Oops, failed to build $TARGET"
-	rstrnt-report-result Build_${TARGET}_failed FAIL 1
-	exit 0
+    echo "Oops, failed to build $TARGET"
+    rstrnt-report-result Build_${TARGET}_failed FAIL 1
+    exit 0
 fi
 
 TESTAREA=/mnt/testarea
@@ -52,33 +52,33 @@ WORK_DIR=${TARGET}/tests
 
 cat /proc/filesystems | grep -q hugetlbfs
 if [ $? -ne 0 ]; then
-	# Bug 1143877 - hugetlbfs: disabling because there are no supported hugepage sizes
-	echo "hugetlbfs not found in /proc/filesystems, skipping test"
-	rstrnt-report-result Test_Skipped PASS 99
-	exit 0
+    # Bug 1143877 - hugetlbfs: disabling because there are no supported hugepage sizes
+    echo "hugetlbfs not found in /proc/filesystems, skipping test"
+    rstrnt-report-result Test_Skipped PASS 99
+    exit 0
 fi
 
 # we need at least 6 hugepages and at least ~128M of memory
 hpagesz=$(cat /proc/meminfo | grep Hugepagesize | awk '{print $2}')
 if [ -z "$hpagesz" ]; then
-	echo "Failed to get Hugepagesize from /proc/meminfo" | tee -a $OUTPUTFILE
-	cat /proc/meminfo | tee -a $OUTPUTFILE
-	rstrnt-report-result Hugepagesize_parse_failed FAIL 1
-	exit 0
+    echo "Failed to get Hugepagesize from /proc/meminfo" | tee -a $OUTPUTFILE
+    cat /proc/meminfo | tee -a $OUTPUTFILE
+    rstrnt-report-result Hugepagesize_parse_failed FAIL 1
+    exit 0
 fi
 target_mem=${TESTARGS:-131072}
 
 HMEMSZ=$(($target_mem / 1024))
 HPCOUNT=$(($target_mem / $hpagesz))
 if [ "$HPCOUNT" -lt 6 ]; then
-	HPCOUNT=6
-	HMEMSZ=$((HPCOUNT * $hpagesz / 1024))
+    HPCOUNT=6
+    HMEMSZ=$((HPCOUNT * $hpagesz / 1024))
 fi
 
 if [ -n "$hpagesz" -a "$hpagesz" -gt 0 ]; then
-	HPSIZE="$(($hpagesz / 1024))M"
+    HPSIZE="$(($hpagesz / 1024))M"
 else
-	HPSIZE=0
+    HPSIZE=0
 fi
 
 echo "HMEMSZ: $HMEMSZ" | tee -a $OUTPUTFILE
@@ -92,19 +92,19 @@ echo "HPCOUNT: $HPCOUNT" | tee -a $OUTPUTFILE
 cver=$(uname -r)
 
 if grep -q "release 6.[0-9] " /etc/redhat-release; then
-	# legacy known issue
-	# TODO: BZ
-	if uname -r | grep -q 686; then
-		KNOWNISSUE_32="$KNOWNISSUE_32 -e \"truncate_above_4GB.*mmap() offset 4GB\""
-	fi
+    # legacy known issue
+    # TODO: BZ
+    if uname -r | grep -q 686; then
+        KNOWNISSUE_32="$KNOWNISSUE_32 -e \"truncate_above_4GB.*mmap() offset 4GB\""
+    fi
 fi
 
 # single CPU hosts, like KVM make some test fail with "Bad configuration"
 # TODO: fix upstream
 cpus=$(cat /proc/cpuinfo  | grep ^processor | wc -l)
 if [ "$cpus" -lt 2 ]; then
-	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"Bad configuration: sched_setaffinity\""
-	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Bad configuration: sched_setaffinity\""
+    KNOWNISSUE_32="$KNOWNISSUE_32 -e \"Bad configuration: sched_setaffinity\""
+    KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Bad configuration: sched_setaffinity\""
 fi
 
 kvercmp "$cver" '4.3'
@@ -115,42 +115,42 @@ fi
 
 # Bug 1006253 libhugetlbfs counters testcase occasionally fails on NUMA systems
 if grep -q "release 7.[0-9]" /etc/redhat-release; then
-	kvercmp "$cver" '4.10'
-	if [ $kver_ret -le 0 ]; then
-		KNOWNISSUE_32="$KNOWNISSUE_32 -e \"^counters.sh.*Bad HugePages\""
-		KNOWNISSUE_64="$KNOWNISSUE_64 -e \"^counters.sh.*Bad HugePages\""
-	fi
+    kvercmp "$cver" '4.10'
+    if [ $kver_ret -le 0 ]; then
+        KNOWNISSUE_32="$KNOWNISSUE_32 -e \"^counters.sh.*Bad HugePages\""
+        KNOWNISSUE_64="$KNOWNISSUE_64 -e \"^counters.sh.*Bad HugePages\""
+    fi
 fi
 
 # Bug 1161661 - s390x: zero_filesize_segment (64bit) testcase crashing -> CANTFIX
 # impacts all distros / all kernel versions
 if uname -r | grep -q s390x; then
-	KNOWNISSUE_64="$KNOWNISSUE_32 -e \"zero_filesize_segment (1024K: 64):\""
+    KNOWNISSUE_64="$KNOWNISSUE_32 -e \"zero_filesize_segment (1024K: 64):\""
 fi
 
 # more info: bz1628794#c8
 if egrep -q "Fedora|.*release [89]" /etc/redhat-release; then
-	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"brk_near_huge\""
-	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"brk_near_huge\""
+    KNOWNISSUE_32="$KNOWNISSUE_32 -e \"brk_near_huge\""
+    KNOWNISSUE_64="$KNOWNISSUE_64 -e \"brk_near_huge\""
 fi
 
 if grep -q "release [9].*" /etc/redhat-release; then
-	#bz1939792
-	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"heapshrink.*Heap did not shrink\""
-	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"heapshrink.*Heap did not shrink\""
+    #bz1939792
+    KNOWNISSUE_32="$KNOWNISSUE_32 -e \"heapshrink.*Heap did not shrink\""
+    KNOWNISSUE_64="$KNOWNISSUE_64 -e \"heapshrink.*Heap did not shrink\""
 fi
 
 # Bug 859906 - open() on tmpfs file with O_DIRECT fails with EINVAL -> WONTFIX
 # impacts all distros / all kernel versions, if /tmp is tmpfs
 if df -T /tmp | tail | grep -q tmpfs; then
-	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"^direct .*Bad configuration\""
-	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"^direct .*Bad configuration\""
+    KNOWNISSUE_32="$KNOWNISSUE_32 -e \"^direct .*Bad configuration\""
+    KNOWNISSUE_64="$KNOWNISSUE_64 -e \"^direct .*Bad configuration\""
 fi
 
 # Bug 1631911 - [ALT-7.6] vm/hugepage/libhugetlbfs -fails Page size is too large for configured
 if [ "x${HPSIZE}" == "x512M" ]; then
-	KNOWNISSUE_32="$KNOWNISSUE_32 -e \"Page size is too large for configured SEGMENT_SIZE\""
-	KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Page size is too large for configured SEGMENT_SIZE\""
+    KNOWNISSUE_32="$KNOWNISSUE_32 -e \"Page size is too large for configured SEGMENT_SIZE\""
+    KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Page size is too large for configured SEGMENT_SIZE\""
 fi
 
 RunTest()
@@ -202,7 +202,7 @@ rlJournalStart
         rlRun "hugeadm --pool-pages-max ${HPSIZE}:0"
 
         # Set up hugepage
-	/usr/bin/huge_page_setup_helper.py > hpage_setup.txt <<EOF
+    /usr/bin/huge_page_setup_helper.py > hpage_setup.txt <<EOF
 ${HMEMSZ}
 hugepages
 hugepages root
@@ -232,12 +232,12 @@ EOF
     free_hugepages=`cat /proc/meminfo | grep HugePages_Free | awk '{ print $2 }'`
     if [[ x"${ARCH}" == "xaarch64" ]]; then
        if [[ x"${HPSIZE}" == "x512M" && ${free_hugepages} -lt $HPCOUNT && ( -z "${RSTRNT_REBOOTCOUNT}" || ${RSTRNT_REBOOTCOUNT} -eq 0 ) ]]; then
-	  rlLog "Have ${free_hugepages} free hugepages of ${HPCOUNT} needed.  Rebooting with 2M hugepages"
-	  grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
-	  rstrnt-reboot
-	  # Make sure the script doesn't continue if rstrnt-reboot get's killed
-	  # https://github.com/beaker-project/restraint/issues/219
-	  exit 0
+      rlLog "Have ${free_hugepages} free hugepages of ${HPCOUNT} needed.  Rebooting with 2M hugepages"
+      grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
+      rstrnt-reboot
+      # Make sure the script doesn't continue if rstrnt-reboot get's killed
+      # https://github.com/beaker-project/restraint/issues/219
+      exit 0
        fi
        sed -i '/mremap-expand-slice-collision/d' run_tests.py
     fi
@@ -246,22 +246,22 @@ EOF
             RunTest func
         rlPhaseEnd
 
-	# stress test takes too long on aarch64
-	if [ x"${ARCH}" != "xaarch64" ]; then
-	   rlPhaseStartTest "stress"
-	       RunTest stress
-	   rlPhaseEnd
-	fi
+    # stress test takes too long on aarch64
+    if [ x"${ARCH}" != "xaarch64" ]; then
+       rlPhaseStartTest "stress"
+           RunTest stress
+       rlPhaseEnd
+    fi
     else
         mem_total=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
         hpsize=$(cat /proc/meminfo | grep Hugepagesize | awk '{print $2}')
-	if [ ${mem_total} -gt $((1024 * ${HMEMSZ} * 10)) ]; then
-	   rlPhaseStart WARN "not_enough_huge_pages"
-	       rlAssertGreaterOrEqual "Need $HPCOUNT hugepages for test, have: $free_hugepages" $free_hugepages $HPCOUNT
-	   rlPhaseEnd
-	else
-	   rstrnt-report-result Test_Skipped PASS 99
-	fi
+    if [ ${mem_total} -gt $((1024 * ${HMEMSZ} * 10)) ]; then
+       rlPhaseStart WARN "not_enough_huge_pages"
+           rlAssertGreaterOrEqual "Need $HPCOUNT hugepages for test, have: $free_hugepages" $free_hugepages $HPCOUNT
+       rlPhaseEnd
+    else
+       rstrnt-report-result Test_Skipped PASS 99
+    fi
     fi
 
     rlPhaseStartCleanup

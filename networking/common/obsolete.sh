@@ -40,30 +40,30 @@ myecho()
 # Usage : mywatch command timeout [signal]
 mywatch()
 {
-        command=$1
-        timeout=$2
-        single=${3:-9}
-        now=`date '+%s'`
-        after=`date -d "$timeout seconds" '+%s'`
+	command=$1
+	timeout=$2
+	single=${3:-9}
+	now=`date '+%s'`
+	after=`date -d "$timeout seconds" '+%s'`
 
-        $command &
-        pid=$!
-        while true; do
-                now=`date '+%s'`
+	$command &
+	pid=$!
+	while true; do
+		now=`date '+%s'`
 
-                if ps -p $pid; then
-                        if [ "$after" -gt "$now" ]; then
-                                sleep 10
-                        else
-                                echo "command (# $command) still alive, kill it"
-                                kill -$single $pid
-                                break
-                        fi
-                else
-                        echo "command (# $command) exit itself"
-                        break
-                fi
-        done
+		if ps -p $pid; then
+			if [ "$after" -gt "$now" ]; then
+				sleep 10
+			else
+				echo "command (# $command) still alive, kill it"
+				kill -$single $pid
+				break
+			fi
+		else
+			echo "command (# $command) exit itself"
+			break
+		fi
+	done
 }
 
 # check_cmd_fail "cmd" "test_should_fail"

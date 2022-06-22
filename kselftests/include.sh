@@ -191,7 +191,7 @@ check_skip()
 
 check_result()
 {
-        local num=$1
+	local num=$1
 	local total_num=$2
 	local test_name=$3
 	local test_result=$4

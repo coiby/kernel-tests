@@ -3,15 +3,15 @@
 
 # select tool to manage package, which could be "yum" or "dnf"
 function select_yum_tool() {
-    if [ -x /usr/bin/dnf ]; then
-        echo "/usr/bin/dnf"
-    elif [ -x /usr/bin/yum ]; then
-        echo "/usr/bin/yum"
-    else
-        return 1
-    fi
+	if [ -x /usr/bin/dnf ]; then
+		echo "/usr/bin/dnf"
+	elif [ -x /usr/bin/yum ]; then
+		echo "/usr/bin/yum"
+	else
+		return 1
+	fi
 
-    return 0
+	return 0
 }
 
 yum=$(select_yum_tool)
@@ -29,9 +29,9 @@ sync_set()
 {
 	local xtrace_state="no"
 	
-    # Disable tracing if it is enabled to avoid excessive output to log file
-    if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
-    
+	# Disable tracing if it is enabled to avoid excessive output to log file
+	if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
+
 	local peer=$1
 	local state=$2
 	local timeout=${3:-7200}
@@ -61,7 +61,7 @@ sync_set()
 	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_set $*\"")
 
 	# Re-enable tracing if it had been set previously
-    [[ "$xtrace_state" == "yes" ]] && set -x
+	[[ "$xtrace_state" == "yes" ]] && set -x
 
 	return $result
 }
@@ -92,9 +92,9 @@ sync_wait()
 {
 	local xtrace_state="no"
 	
-    # Disable tracing if it is enabled to avoid excessive output to log file
-    if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
-    
+	# Disable tracing if it is enabled to avoid excessive output to log file
+	if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
+
 	local peer=$1
 	local state=${2:-""}
 	local timeout=${3:-7200}
@@ -136,7 +136,7 @@ sync_wait()
 	sync_cleanup
 	
 	# Re-enable tracing if it had been set previously
-    [[ "$xtrace_state" == "yes" ]] && set -x
+	[[ "$xtrace_state" == "yes" ]] && set -x
 
 	return $result
 }
@@ -151,9 +151,9 @@ sync_wait_choice()
 {
 	local xtrace_state="no"
 	
-    # Disable tracing if it is enabled to avoid excessive output to log file
-    if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
-    
+	# Disable tracing if it is enabled to avoid excessive output to log file
+	if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
+
 	local peer=$1
 	local opt_yes=${2:-"yes"}
 	local opt_no=${3:-"no"}
@@ -204,7 +204,7 @@ sync_wait_choice()
 	sync_cleanup
 	
 	# Re-enable tracing if it had been set previously
-    [[ "$xtrace_state" == "yes" ]] && set -x
+	[[ "$xtrace_state" == "yes" ]] && set -x
 
 	return $result
 }

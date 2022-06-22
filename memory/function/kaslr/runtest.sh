@@ -366,10 +366,10 @@ function prepare_state_q()
 
 function get_kernel_version()
 {
-    kver_major=$(uname -r | cut -d- -f1 | cut -d. -f 1) # 3
-    kver_minor=$(uname -r | cut -d- -f1 | cut -d. -f 2) # 10
-    kver_mminor=$(uname -r | cut -d- -f1 | cut -d. -f 3) # 0
-    krel_major=$(uname -r | cut -d- -f2 | cut -d. -f 1) # 514
+	kver_major=$(uname -r | cut -d- -f1 | cut -d. -f 1) # 3
+	kver_minor=$(uname -r | cut -d- -f1 | cut -d. -f 2) # 10
+	kver_mminor=$(uname -r | cut -d- -f1 | cut -d. -f 3) # 0
+	krel_major=$(uname -r | cut -d- -f2 | cut -d. -f 1) # 514
 }
 
 function select_yum_tool()

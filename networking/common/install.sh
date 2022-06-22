@@ -6,15 +6,15 @@ EPEL_BASEURL=${EPEL_BASEURL:-"https://dl.fedoraproject.org/pub/epel/"}
 
 # select tool to manage package, which could be "yum" or "dnf"
 function select_yum_tool() {
-    if [ -x /usr/bin/dnf ]; then
-        echo "/usr/bin/dnf"
-    elif [ -x /usr/bin/yum ]; then
-        echo "/usr/bin/yum"
-    else
-        return 1
-    fi
+	if [ -x /usr/bin/dnf ]; then
+		echo "/usr/bin/dnf"
+	elif [ -x /usr/bin/yum ]; then
+		echo "/usr/bin/yum"
+	else
+		return 1
+	fi
 
-    return 0
+	return 0
 }
 
 yum=$(select_yum_tool)
@@ -201,7 +201,7 @@ netperf_install()
 	lksctp_install
 
 	local OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
-        SRC_NETPERF=${SRC_NETPERF:-"https://github.com/HewlettPackard/netperf/archive/netperf-2.7.0.tar.gz"}
+	SRC_NETPERF=${SRC_NETPERF:-"https://github.com/HewlettPackard/netperf/archive/netperf-2.7.0.tar.gz"}
 	pushd ${NETWORK_COMMONLIB_DIR} 1>/dev/null
 	wget -nv -N $SRC_NETPERF
 	tar xvzf $(basename $SRC_NETPERF)
@@ -247,8 +247,8 @@ iperf_install()
 	${yum} install -y gcc-c++ make gcc
 	# grab sctp-enabled iperf and install it:
 	IPERF_FILE="iperf-2.0.10.tar.gz"
-        # download iperf-2 from sourceforge mirrors download page
-        wget --trust-server-names https://sourceforge.net/projects/iperf2/files/${IPERF_FILE}/download
+	# download iperf-2 from sourceforge mirrors download page
+	wget --trust-server-names https://sourceforge.net/projects/iperf2/files/${IPERF_FILE}/download
 	if [[ $? != 0 ]]; then
 		echo "${TEST} fail grabbing iperf source"
 		test_warn "Grabbing iperf-2 source failed"
@@ -295,28 +295,28 @@ sockperf_install(){
 }
 packetdrill_install()
 {
-        if [ -x /usr/local/bin/packetdrill ];then
-                log "packetdrill has been installed"
-                return 0
-        fi
-        pushd ${NETWORK_COMMONLIB_DIR}
-        ${yum} install -y bison flex glibc-static
-        git clone https://github.com/google/packetdrill.git
-        pushd packetdrill
-        patch -p1 < ../patch/packetdrill_rm_ufo_flag.patch
-        patch -p1 < ../patch/packetdrill_cases.patch
-        # pegas kernel has this patch "tcp: limit GSO packets to half cwnd", need do a workaround.
-        # pegas kernel also need improve undo case since another commit.
+	if [ -x /usr/local/bin/packetdrill ];then
+		log "packetdrill has been installed"
+		return 0
+	fi
+	pushd ${NETWORK_COMMONLIB_DIR}
+	${yum} install -y bison flex glibc-static
+	git clone https://github.com/google/packetdrill.git
+	pushd packetdrill
+	patch -p1 < ../patch/packetdrill_rm_ufo_flag.patch
+	patch -p1 < ../patch/packetdrill_cases.patch
+	# pegas kernel has this patch "tcp: limit GSO packets to half cwnd", need do a workaround.
+	# pegas kernel also need improve undo case since another commit.
 	[ $(echo "`uname -r| awk -F. '{print $1"."$2}'` >= 4.11"|bc -l) = 1 ] && \
-		patch -p1 < ../patch/packetdrill_cases.pegas.patch
-        pushd gtests/net/packetdrill
-        ./configure
-        make
-        popd
-        popd
-        popd
-        ln -s ${NETWORK_COMMONLIB_DIR}/packetdrill/gtests/net/packetdrill/packetdrill /usr/local/bin/packetdrill
-        [ -x /usr/local/bin/packetdrill ] && return 0 || return 1
+	patch -p1 < ../patch/packetdrill_cases.pegas.patch
+	pushd gtests/net/packetdrill
+	./configure
+	make
+	popd
+	popd
+	popd
+	ln -s ${NETWORK_COMMONLIB_DIR}/packetdrill/gtests/net/packetdrill/packetdrill /usr/local/bin/packetdrill
+	[ -x /usr/local/bin/packetdrill ] && return 0 || return 1
 }
 
 libsctp_static_install()

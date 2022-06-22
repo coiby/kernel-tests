@@ -111,9 +111,9 @@ ah)
 		ALG='auth-trunc hmac\('$ATALGO'\) '$ATALGO_KEY" 96"
 	else
 		echo "Error: ah protocol doesn't set authentication" | tee $IPSEC_PARA_LOG
-                rstrnt-report-result $TEST WARN
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-                exit 1
+		rstrnt-report-result $TEST WARN
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	fi
 	;;
 esp)
@@ -126,9 +126,9 @@ esp)
 		ALG="enc $EALGO $EALGO_KEY "$ALG
 	else
 		echo "Error: esp protocol doesn't set encryption" | tee $IPSEC_PARA_LOG
-                rstrnt-report-result $TEST WARN
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-                exit 1
+		rstrnt-report-result $TEST WARN
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	fi
 	;;
 esp_aead)
@@ -149,9 +149,9 @@ comp)
 	;;
 *)
 	echo "Error: tst_ipsec protocol mismatch" | tee $IPSEC_PARA_LOG
-                rstrnt-report-result $TEST WARN
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-                exit 1
+	rstrnt-report-result $TEST WARN
+	rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+	exit 1
 	;;
 esac
 

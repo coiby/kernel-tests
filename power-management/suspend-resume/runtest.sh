@@ -35,29 +35,29 @@ NOT_SUPPORT=0
 # Helper functions
 function result_fail()
 {
-    echo "***** End of runtest.sh *****" | tee -a $OUTPUTFILE
-    rstrnt-report-result $TEST FAIL 1
-    exit 0
+	echo "***** End of runtest.sh *****" | tee -a $OUTPUTFILE
+	rstrnt-report-result $TEST FAIL 1
+	exit 0
 }
 
 function result_pass ()
 {
-    echo "***** End of runtest.sh *****" | tee -a $OUTPUTFILE
-    rstrnt-report-result $TEST PASS 0
-    exit 0
+	echo "***** End of runtest.sh *****" | tee -a $OUTPUTFILE
+	rstrnt-report-result $TEST PASS 0
+	exit 0
 }
 
 #return 0 when running on baremetal
 function is_baremetal
 {
-   local virtwhat=$(virt-what)
-   local virtret=$?
-   # virt-what returns empty string  and exit code 0, when is baremetal
-   if [[  -z "$virtwhat" ]] && [[ $virtret -eq 0 ]]; then
-      return 0
-   else
-      return 1
-   fi
+	local virtwhat=$(virt-what)
+	local virtret=$?
+	# virt-what returns empty string  and exit code 0, when is baremetal
+	if [[  -z "$virtwhat" ]] && [[ $virtret -eq 0 ]]; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 
@@ -65,7 +65,7 @@ function getdetails ()
 {
 	echo "grep /var/log/messages for which time source kernel is using" >> $OUTPUTFILE
 	echo "------------------------------------------------------------" >> $OUTPUTFILE
-        journalctl > /tmp/messages
+	journalctl > /tmp/messages
 #REMOVE	grep kernel: /var/log/messages | grep time >> $OUTPUTFILE
 	grep kernel: /tmp/messages | grep time >> $OUTPUTFILE
 	echo "------------------------------------------------------------" >> $OUTPUTFILE
@@ -84,19 +84,19 @@ function setup ()
 {
 	echo '=============== Setup ==================================' | tee -a ${OUTPUTFILE}
 
-        is_baremetal
-        if (( $? != 0 )); then
-            echo "Not running on baremetal machine" | tee -a ${OUTPUTFILE}
-            rstrnt-report-result $TEST SKIP 0
-            exit 0
-        fi
+	is_baremetal
+	if (( $? != 0 )); then
+		echo "Not running on baremetal machine" | tee -a ${OUTPUTFILE}
+		rstrnt-report-result $TEST SKIP 0
+		exit 0
+	fi
 
 	systemctl disable ntpd  > /dev/null 2>&1
 
 	echo "Supported sleep states: `cat /sys/power/state`" | tee -a ${OUTPUTFILE}
 
 	# Set the system to UTC to avoid problems with RTC alarm
-        timedatectl set-timezone UTC
+	timedatectl set-timezone UTC
 
 	default=`grubby --default-kernel`
 	grubby --args="no_console_suspend" --update-kernel=$default
@@ -119,17 +119,17 @@ function setup ()
 }
 
 function print_rtc () {
-        echo '-- RTC Status: ----' | tee -a ${OUTPUTFILE}
-        echo "*** System time: `date`" | tee -a ${OUTPUTFILE}
+	echo '-- RTC Status: ----' | tee -a ${OUTPUTFILE}
+	echo "*** System time: `date`" | tee -a ${OUTPUTFILE}
 
-        echo "*** /proc/driver/rtc:" | tee -a ${OUTPUTFILE}
-        cat /proc/driver/rtc | tee -a ${OUTPUTFILE}
-        echo '-------------------' | tee -a ${OUTPUTFILE}
+	echo "*** /proc/driver/rtc:" | tee -a ${OUTPUTFILE}
+	cat /proc/driver/rtc | tee -a ${OUTPUTFILE}
+	echo '-------------------' | tee -a ${OUTPUTFILE}
 }
 
 function set_rtc_alarm () {
-        echo "Setting RTC alarm to now + $SLEEP_TIME minutes..." | tee -a ${OUTPUTFILE}
-        rtcwake -m no -s $(($SLEEP_TIME * 60))
+	echo "Setting RTC alarm to now + $SLEEP_TIME minutes..." | tee -a ${OUTPUTFILE}
+	rtcwake -m no -s $(($SLEEP_TIME * 60))
 }
 
 function suspend_resume ()
@@ -140,8 +140,8 @@ function suspend_resume ()
 	set_rtc_alarm
 	print_rtc
 
-        echo "/sys/power/disk: "$(cat  /sys/power/disk 2>/dev/null)  | tee -a ${OUTPUTFILE}
-        echo "/sys/power/mem_sleep: "$(cat  /sys/power/mem_sleep 2>/dev/null) | tee -a ${OUTPUTFILE}
+	echo "/sys/power/disk: "$(cat  /sys/power/disk 2>/dev/null)  | tee -a ${OUTPUTFILE}
+	echo "/sys/power/mem_sleep: "$(cat  /sys/power/mem_sleep 2>/dev/null) | tee -a ${OUTPUTFILE}
 	echo "Suspend to $state" | tee -a ${OUTPUTFILE}
 
 	if [[ "$state" = "disk" ]]; then
@@ -165,12 +165,12 @@ function suspend_resume ()
 		if grep -q s2idle  /sys/power/mem_sleep; then
 			echo "Setting to s2idle suspend  mode" | tee -a ${OUTPUTFILE}
 			echo "s2idle" > /sys/power/mem_sleep
-                fi
+		fi
 	fi
 
 	RES=1
 	if [[ "$state" = "disk" ]]; then
-                # setting boot order
+		# setting boot order
 		if efibootmgr &>/dev/null ; then
 			os_boot_entry=$(efibootmgr | awk '/BootCurrent/ { print $2 }')
 			# fall back to /root/EFI_BOOT_ENTRY.TXT if it exists and BootCurrent is not available
@@ -309,9 +309,9 @@ function runTest ()
 # ---------- Start Test -------------
 # Setup some variables
 if [ -e /etc/redhat-release ] ; then
-    installeddistro=$(cat /etc/redhat-release)
+	installeddistro=$(cat /etc/redhat-release)
 else
-    installeddistro=unknown
+	installeddistro=unknown
 fi
 
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r))

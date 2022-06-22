@@ -9,15 +9,15 @@ networkLib=$NETWORK_COMMONLIB_DIR
 
 # select tool to manage package, which could be "yum" or "dnf"
 function select_yum_tool() {
-    if [ -x /usr/bin/dnf ]; then
-        echo "/usr/bin/dnf"
-    elif [ -x /usr/bin/yum ]; then
-        echo "/usr/bin/yum"
-    else
-        return 1
-    fi
+	if [ -x /usr/bin/dnf ]; then
+		echo "/usr/bin/dnf"
+	elif [ -x /usr/bin/yum ]; then
+		echo "/usr/bin/yum"
+	else
+		return 1
+	fi
 
-    return 0
+	return 0
 }
 
 yum=$(select_yum_tool)
@@ -178,24 +178,24 @@ watch()
 	now=`date '+%s'`
 	after=`date -d "$timeout seconds" '+%s'`
 
-        eval "$command" &
-        pid=$!
-        while true; do
-                now=`date '+%s'`
+	eval "$command" &
+	pid=$!
+	while true; do
+		now=`date '+%s'`
 
-                if ps -p $pid; then
-                        if [ "$after" -gt "$now" ]; then
-                                sleep 10
-                        else
-                                log "command (# $command) still alive, kill it"
-                                kill -$single $pid
-                                break
-                        fi
-                else
-                        log "command (# $command) exit itself"
-                        break
-                fi
-        done
+		if ps -p $pid; then
+			if [ "$after" -gt "$now" ]; then
+				sleep 10
+			else
+				log "command (# $command) still alive, kill it"
+				kill -$single $pid
+				break
+			fi
+		else
+			log "command (# $command) exit itself"
+			break
+		fi
+	done
 }
 
 get_round()
@@ -297,7 +297,7 @@ else
 	mkdir -p /usr/local/src /usr/local/bin
 	\cp -af src/*    /usr/local/src/.
 	\cp -af tools/*  /usr/local/bin/.
-        chmod a+x /usr/local/bin/netns_clean.sh
+	chmod a+x /usr/local/bin/netns_clean.sh
 
 	# work around bz883695
 	lsmod | grep mlx4_en || modprobe mlx4_en

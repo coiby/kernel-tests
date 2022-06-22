@@ -47,31 +47,31 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "Checking validity of current path"
-	grep kabi_file= /usr/lib/rpm/redhat/find-requires.ksyms
-	rlRun "arch=\$( uname -i | sed 's/i386/i686/' )"
-	KABIFILE=`grep 'kabi_file=' /usr/lib/rpm/redhat/find-requires.ksyms | cut -d = -f 2 | sed 's/"//g'`
-	echo $KABIFILE
-	rlRun "ls `echo $KABIFILE | sed 's/\\\$arch/*/'`"
-	rlAssertExists `echo $KABIFILE | sed "s/\\\$arch/$arch/"`
+        grep kabi_file= /usr/lib/rpm/redhat/find-requires.ksyms
+        rlRun "arch=\$( uname -i | sed 's/i386/i686/' )"
+        KABIFILE=`grep 'kabi_file=' /usr/lib/rpm/redhat/find-requires.ksyms | cut -d = -f 2 | sed 's/"//g'`
+        echo $KABIFILE
+        rlRun "ls `echo $KABIFILE | sed 's/\\\$arch/*/'`"
+        rlAssertExists `echo $KABIFILE | sed "s/\\\$arch/$arch/"`
     rlPhaseEnd
 
     rlPhaseStartTest "Checking if we are using kabi-current symlink"
 
-	PREFIX=kabi_whitelist_
-	if rlCheckRpm kernel-abi-stablelists; then
-		PREFIX=kabi_stablelist_
-	fi
+        PREFIX=kabi_whitelist_
+        if rlCheckRpm kernel-abi-stablelists; then
+            PREFIX=kabi_stablelist_
+        fi
 
-	if rlIsRHEL 8; then
-		rlAssertGrep 'kabi_file="/lib/modules/kabi-current/kabi_(stable|white)list_\$arch"' /usr/lib/rpm/redhat/find-requires.ksyms -E
-	else
-		rlAssertGrep 'kabi_file="/lib/modules/kabi-current/'$PREFIX'$arch"' /usr/lib/rpm/redhat/find-requires.ksyms
-	fi
-	rlAssertExists /lib/modules/kabi-current/$PREFIX$arch
-	ls -ld /lib/modules/kabi-*
+        if rlIsRHEL 8; then
+            rlAssertGrep 'kabi_file="/lib/modules/kabi-current/kabi_(stable|white)list_\$arch"' /usr/lib/rpm/redhat/find-requires.ksyms -E
+        else
+            rlAssertGrep 'kabi_file="/lib/modules/kabi-current/'$PREFIX'$arch"' /usr/lib/rpm/redhat/find-requires.ksyms
+        fi
+        rlAssertExists /lib/modules/kabi-current/$PREFIX$arch
+        ls -ld /lib/modules/kabi-*
         rlRun "test -L /lib/modules/kabi-current"
-	rlRun "TARGET=\$( readlink -f /lib/modules/kabi-current )"
-	rlAssertExists $TARGET
+        rlRun "TARGET=\$( readlink -f /lib/modules/kabi-current )"
+        rlAssertExists $TARGET
     rlPhaseEnd
 
     rlPhaseStartCleanup

@@ -47,13 +47,13 @@ fi
 rlJournalStart
     rlPhaseStartSetup
         if [[ $FIPS == "true" ]]; then
-	    if [ -e "/etc/system-fips" ] && grep -q 1 /proc/sys/crypto/fips_enabled; then
+            if [ -e "/etc/system-fips" ] && grep -q 1 /proc/sys/crypto/fips_enabled; then
                 rlPass "fips mode enabled"
-	    else
+            else
                 echo "fips mode disabled. Test requires fips mode! Skipping." | tee -a $OUTPUTFILE
                 rstrnt-report-result $TEST SKIP
                 exit
-	    fi
+            fi
         fi
         rlAssertRpm --all
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"

@@ -78,13 +78,13 @@ else # 2.21
     fi
     if [ "$OS_REL_ID" = "rhel" ] && [[ $OS_MAJOR_RELEASE == 9 ]] || [ "$OS_REL_ID" = "fedora" ]; then
         patch_files+=" \
-		max_hugetlb_segs.patch
-            "
+        max_hugetlb_segs.patch
+        "
     fi
     patch_files+=" \
         build_flags.patch \
         hack-task-size-overrun.patch \
-	0001-drop-the-static-build-for-tests.patch \
+        0001-drop-the-static-build-for-tests.patch \
         "
 fi
 

@@ -84,6 +84,22 @@ codeowners check:
     - !reference [.rules-codeowners, mr-parent]
     - !reference [.rules-codeowners, default-branch]
 
+check bash with mixed tabs and spaces:
+  extends: .tox
+  script:
+    - |
+      mixed=$(comm -12 \
+          <(find . -type f -iname '*.sh' -exec grep -lPe '^\t' {} + | sort) \
+          <(find . -type f -iname '*.sh' -exec grep -lPe '^ ' {} + | sort))
+      if [[ -n "${mixed}" ]]; then
+          echo "Files with mixed tabs/spaces:"
+          echo "${mixed}" | sed 's/^/  /'
+          exit 1
+      fi
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+
 .git-sync:
   stage: 🚀
   image: registry.gitlab.com/cki-project/cki-tools/cki-tools:production

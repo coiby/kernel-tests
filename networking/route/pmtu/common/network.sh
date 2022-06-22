@@ -42,10 +42,10 @@ export REMOTE_IFACE_MAC=
 #restart network service, for "service network restart" failed at rhel7
 pure_restart_network()
 {
-        pkill -9 dhclient
-        ip link set $1 down &> /dev/null
-        ip link set $1 up &> /dev/null
-        sleep 10
+	pkill -9 dhclient
+	ip link set $1 down &> /dev/null
+	ip link set $1 up &> /dev/null
+	sleep 10
 	if [ "$IPVER" != "6" ]; then
 		dhclient $1
 	else
@@ -1197,54 +1197,54 @@ setup_ip6()
 
 	ip6=$(get_iface_ip6 $iface)
 	# manauly setup
-        if [ -z "$ip6" ]; then
-                # I find the current code(get_iface_and_addr) only call this func for the last topo.
-                # So , at here, treat $iface belongs to last topo. 
-                # By liali.
-                last_topo=$(echo $TOPO | awk -F, '{print $NF}')
-                last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
-                topo_contain_vlan=$(echo $last_topo | grep -iq vlan && echo yes || echo no)
-                let exitcode++
+	if [ -z "$ip6" ]; then
+		# I find the current code(get_iface_and_addr) only call this func for the last topo.
+		# So , at here, treat $iface belongs to last topo. 
+		# By liali.
+		last_topo=$(echo $TOPO | awk -F, '{print $NF}')
+		last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
+		topo_contain_vlan=$(echo $last_topo | grep -iq vlan && echo yes || echo no)
+		let exitcode++
 
-                [ -z "$NAY" ] && { ip6=NULL; return 1; }
-                ip6="2$(printf %03d ${last_vlan_id})::250/64"
+		[ -z "$NAY" ] && { ip6=NULL; return 1; }
+		ip6="2$(printf %03d ${last_vlan_id})::250/64"
 
-                #newcode
-                if [ ${topo_contain_vlan} = yes ];then
-                        ip6="2$(printf %03d ${last_vlan_id})::250/64"
-                        if i_am_server;then
-                                ip6="2$(printf %03d ${last_vlan_id})::251/64"
-                        fi
-                        if i_am_client;then
-                                ip6="2$(printf %03d ${last_vlan_id})::252/64"
-                        fi
-                else
-                        if i_am_server;then
-                                ip6="2001::251/64"
-                        fi
-                        if i_am_client;then
-                                ip6="2001::252/64"
-                        fi
-                fi
+		#newcode
+		if [ ${topo_contain_vlan} = yes ];then
+			ip6="2$(printf %03d ${last_vlan_id})::250/64"
+			if i_am_server;then
+				ip6="2$(printf %03d ${last_vlan_id})::251/64"
+			fi
+			if i_am_client;then
+				ip6="2$(printf %03d ${last_vlan_id})::252/64"
+			fi
+		else
+			if i_am_server;then
+				ip6="2001::251/64"
+			fi
+			if i_am_client;then
+				ip6="2001::252/64"
+			fi
+		fi
 
-                #oldcode
-                if((0));then
-                        echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::250/64"
-                        echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::250/64"
+		#oldcode
+		if((0));then
+			echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::250/64"
+			echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::250/64"
 
-                        if i_am_server; then
-                                ip6="2001::251/64"
-                                echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::251/64"
-                                echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::251/64"
-                        fi
-                        if i_am_client; then
-                                ip6="2001::252/64"
-                                echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::252/64"
-                                echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::252/64"
-                        fi
-                fi
-                ip addr add $ip6 dev $iface || let exitcode++
-        fi
+			if i_am_server; then
+				ip6="2001::251/64"
+				echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::251/64"
+				echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::251/64"
+			fi
+			if i_am_client; then
+				ip6="2001::252/64"
+				echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::252/64"
+				echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::252/64"
+			fi
+		fi
+		ip addr add $ip6 dev $iface || let exitcode++
+	fi
 	return $exitcode
 }
 

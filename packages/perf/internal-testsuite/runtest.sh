@@ -31,10 +31,10 @@
 
 # Known failure on Mustangs, skip this test until BZ 1619305 is resolved
 if type -p dmidecode >/dev/null ; then
-    if dmidecode -t1 | grep -q 'Product Name:.*Mustang.*' ; then
-        rstrnt-report-result $TEST SKIP
-        exit
-    fi
+	if dmidecode -t1 | grep -q 'Product Name:.*Mustang.*' ; then
+		rstrnt-report-result $TEST SKIP
+		exit
+	fi
 fi
 
 PACKAGE="perf"
@@ -113,12 +113,12 @@ rlJournalStart
 			fi
 		fi
 		rlRun "rpmquery $KERNEL_DEBUGINFO_PKG_NAME" 0 "Correct debuginfo is installed ($KERNEL)"
-                # return Skip when correct kernel debug is not installed
-                if [ $? -ne 0 ]; then
-                    echo "Correct kernel debuginfo pkg: ${KERNEL_DEBUGINFO_PKG_NAME} is not installed" | tee -a ${OUTPUTFILE}
-                    rstrnt-report-result $TEST SKIP
-                    exit 0
-                fi
+		# return Skip when correct kernel debug is not installed
+		if [ $? -ne 0 ]; then
+			echo "Correct kernel debuginfo pkg: ${KERNEL_DEBUGINFO_PKG_NAME} is not installed" | tee -a ${OUTPUTFILE}
+			rstrnt-report-result $TEST SKIP
+			exit 0
+		fi
 		echo "==================== kernel packages installed ===================="
 		rpmquery -a | grep -e kernel -e perf
 		echo "==================================================================="

@@ -69,23 +69,23 @@ install_scapy()
 # also works, but it only takes care one driver.
 set_nm_unmanage()
 {
-        local default_iface=$(get_default_iface)
+	local default_iface=$(get_default_iface)
 
 	# ignore ports except default port
-        echo "[keyfile]" >> /etc/NetworkManager/NetworkManager.conf
-        echo "unmanaged-devices=except:interface-name:$default_iface" \
-                >> /etc/NetworkManager/NetworkManager.conf
+	echo "[keyfile]" >> /etc/NetworkManager/NetworkManager.conf
+	echo "unmanaged-devices=except:interface-name:$default_iface" \
+		>> /etc/NetworkManager/NetworkManager.conf
 
-        systemctl restart NetworkManager
+	systemctl restart NetworkManager
 }
 
 # You'd better restore the configuration at the end of your case.
 unset_nm_unmanage()
 {
-        sed -i '/\[keyfile\]/d' /etc/NetworkManager/NetworkManager.conf
-        sed -i '/unmanaged-devices/d' /etc/NetworkManager/NetworkManager.conf
+	sed -i '/\[keyfile\]/d' /etc/NetworkManager/NetworkManager.conf
+	sed -i '/unmanaged-devices/d' /etc/NetworkManager/NetworkManager.conf
 
-        systemctl restart NetworkManager
+	systemctl restart NetworkManager
 }
 
 # some common network setups

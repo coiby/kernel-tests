@@ -1,9 +1,9 @@
 #!/bin/bash
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright Red Hat, Inc 
+#   Copyright Red Hat, Inc
 #
-#   SPDX-License-Identifier: GPL-3.0-or-later  
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -19,7 +19,7 @@ function RprtRslt ()
 
     # File the results in the database
     if [ $result = "PASS" ]; then
-	    rstrnt-report-result $test_item $result 0
+        rstrnt-report-result $test_item $result 0
     else
         rstrnt-report-result $test_item $result 1
     fi

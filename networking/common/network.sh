@@ -4,15 +4,15 @@
 
 # select tool to manage package, which could be "yum" or "dnf"
 function select_yum_tool() {
-    if [ -x /usr/bin/dnf ]; then
-        echo "/usr/bin/dnf"
-    elif [ -x /usr/bin/yum ]; then
-        echo "/usr/bin/yum"
-    else
-        return 1
-    fi
+	if [ -x /usr/bin/dnf ]; then
+		echo "/usr/bin/dnf"
+	elif [ -x /usr/bin/yum ]; then
+		echo "/usr/bin/yum"
+	else
+		return 1
+	fi
 
-    return 0
+	return 0
 }
 
 yum=$(select_yum_tool)
@@ -67,10 +67,10 @@ export REMOTE_IFACE_MAC=
 #restart network service, for "service network restart" failed at rhel7
 pure_restart_network()
 {
-        pkill -9 dhclient
-        ip link set $1 down &> /dev/null
-        ip link set $1 up &> /dev/null
-        sleep 10
+	pkill -9 dhclient
+	ip link set $1 down &> /dev/null
+	ip link set $1 up &> /dev/null
+	sleep 10
 	if [ "$IPVER" != "6" ]; then
 		dhclient $1
 	else
@@ -98,7 +98,7 @@ reset_network_env()
 		# Clear variables
 		\rm /tmp/test_nic 2>/dev/null
 		\rm /tmp/test_iface 2>/dev/null
-		
+
 		# restart network service
 		pkill -9 dhclient
 		pkill -f "nc -l"
@@ -106,7 +106,7 @@ reset_network_env()
 		rsync -a --delete $networkLib/network-scripts.bak/ /etc/sysconfig/network-scripts/
 		systemctl restart network
 		systemctl restart NetworkManager
-		
+
 		# delete it when the device does not exist
 		ip link del $TEAM_NAME
 		ip link del $BOND_NAME
@@ -134,7 +134,7 @@ reset_network_env()
 		# restart network service
 		pkill -9 dhclient
 		pkill -f "nc -l"
-	
+
 		rsync -a --delete $networkLib/network-scripts.no_nm/ /etc/sysconfig/network-scripts/
 		service network restart
 	fi
@@ -592,7 +592,7 @@ setup_team()
 	# config port-channel on switch
 	#if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w \
 	#	"runner.*:.*(roundrobin|loadbalance|lacp)"; then
-	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w "runner.*:.*(lacp)"; then	
+	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w "runner.*:.*(lacp)"; then
 		if echo "$team_json" | \egrep -q -w "runner.*:.*lacp"; then
 			port_channel_mode=active
 		else
@@ -643,7 +643,7 @@ setup_bond()
 	#if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$BOND_OPTS" | \egrep -q -w \
 	#	"mode=(0|2|4|balance-rr|balance-xor|802.3ad)"; then
 	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$BOND_OPTS" | \egrep -q -w \
-                "mode=(4|802.3ad)"; then
+		"mode=(4|802.3ad)"; then
 		if echo "$BOND_OPTS" | \egrep -q -w "mode=(4|802.3ad)"; then
 			port_channel_mode=active
 		else
@@ -656,7 +656,7 @@ setup_bond()
 
 	# add bonding interface
 	test -f /sys/class/net/bonding_masters || {
-		if [ $(GetDistroRelease) = 8 ];then 
+		if [ $(GetDistroRelease) = 8 ];then
 			modprobe -nv bonding | grep 'max_bonds=0' > /dev/null && spare_param='Y'
 			if [ $spare_param = 'Y' ]
 			then
@@ -1316,7 +1316,7 @@ setup_ip()
 		do
 			pkill -9 dhclient; sleep 2
 			dhclient $arg $iface
-			ip4=$(get_iface_ip4 $iface)	
+			ip4=$(get_iface_ip4 $iface)
 			let try_times++
 		done
 	fi
@@ -1324,7 +1324,7 @@ setup_ip()
 	ip4=$(get_iface_ip4 $iface)
 	if [ -z "$ip4" ]; then
 		# I find the current code(get_iface_and_addr) only call this func for the last topo.
-		# So , at here, treat $iface belongs to last topo. 
+		# So , at here, treat $iface belongs to last topo.
 		# By liali.
 		last_topo=$(echo $TOPO | awk -F, '{print $NF}')
 		last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
@@ -1334,7 +1334,7 @@ setup_ip()
 		[ -z "$NAY" ] && { ip4=NULL; return 1; }
 		ip4="192.168.1.250/24"
 		brd="192.168.1.255"
-		
+
 		#newcode
 		if [ ${topo_contain_vlan} = yes ];then
 			ip4="192.168.${last_vlan_id}.250/24"
@@ -1358,7 +1358,7 @@ setup_ip()
 		if((0));then
 			echo $iface | grep -q 'vlan3\|\.3' && ip4="192.168.3.250/24"
 			echo $iface | grep -q 'vlan4\|\.4' && ip4="192.168.4.250/24"
-		
+
 			if i_am_server; then
 				ip4="192.168.1.251/24"
 				echo $iface | grep -q 'vlan3\|\.3' && ip4="192.168.3.251/24"
@@ -1370,7 +1370,7 @@ setup_ip()
 				echo $iface | grep -q 'vlan4\|\.4' && ip4="192.168.4.252/24"
 			fi
 		fi
-		
+
 		ip addr add $ip4 brd $brd dev $iface || let exitcode++
 	fi
 	return $exitcode
@@ -1412,54 +1412,54 @@ setup_ip6()
 
 	ip6=$(get_iface_ip6 $iface)
 	# manauly setup
-        if [ -z "$ip6" ]; then
-                # I find the current code(get_iface_and_addr) only call this func for the last topo.
-                # So , at here, treat $iface belongs to last topo. 
-                # By liali.
-                last_topo=$(echo $TOPO | awk -F, '{print $NF}')
-                last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
-                topo_contain_vlan=$(echo $last_topo | grep -iq vlan && echo yes || echo no)
-                let exitcode++
+	if [ -z "$ip6" ]; then
+		# I find the current code(get_iface_and_addr) only call this func for the last topo.
+		# So , at here, treat $iface belongs to last topo.
+		# By liali.
+		last_topo=$(echo $TOPO | awk -F, '{print $NF}')
+		last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
+		topo_contain_vlan=$(echo $last_topo | grep -iq vlan && echo yes || echo no)
+		let exitcode++
 
-                [ -z "$NAY" ] && { ip6=NULL; return 1; }
-                ip6="2$(printf %03d ${last_vlan_id})::250/64"
+		[ -z "$NAY" ] && { ip6=NULL; return 1; }
+		ip6="2$(printf %03d ${last_vlan_id})::250/64"
 
-                #newcode
-                if [ ${topo_contain_vlan} = yes ];then
-                        ip6="2$(printf %03d ${last_vlan_id})::250/64"
-                        if i_am_server;then
-                                ip6="2$(printf %03d ${last_vlan_id})::251/64"
-                        fi
-                        if i_am_client;then
-                                ip6="2$(printf %03d ${last_vlan_id})::252/64"
-                        fi
-                else
-                        if i_am_server;then
-                                ip6="2001::251/64"
-                        fi
-                        if i_am_client;then
-                                ip6="2001::252/64"
-                        fi
-                fi
+		#newcode
+		if [ ${topo_contain_vlan} = yes ];then
+			ip6="2$(printf %03d ${last_vlan_id})::250/64"
+			if i_am_server;then
+				ip6="2$(printf %03d ${last_vlan_id})::251/64"
+			fi
+			if i_am_client;then
+				ip6="2$(printf %03d ${last_vlan_id})::252/64"
+			fi
+		else
+			if i_am_server;then
+				ip6="2001::251/64"
+			fi
+			if i_am_client;then
+				ip6="2001::252/64"
+			fi
+		fi
 
-                #oldcode
-                if((0));then
-                        echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::250/64"
-                        echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::250/64"
+		#oldcode
+		if((0));then
+			echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::250/64"
+			echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::250/64"
 
-                        if i_am_server; then
-                                ip6="2001::251/64"
-                                echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::251/64"
-                                echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::251/64"
-                        fi
-                        if i_am_client; then
-                                ip6="2001::252/64"
-                                echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::252/64"
-                                echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::252/64"
-                        fi
-                fi
-                ip addr add $ip6 dev $iface || let exitcode++
-        fi
+			if i_am_server; then
+				ip6="2001::251/64"
+				echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::251/64"
+				echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::251/64"
+			fi
+			if i_am_client; then
+				ip6="2001::252/64"
+				echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::252/64"
+				echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::252/64"
+			fi
+		fi
+		ip addr add $ip6 dev $iface || let exitcode++
+	fi
 	return $exitcode
 }
 
@@ -1648,7 +1648,7 @@ update_ip()
 		echo $pid | grep -e "\b[0-9]\+\b" >/dev/null && kill -9 $pid && wait $pid
 		sleep 1
 	done
-	
+
 	LOCAL_ADDR4=$(awk '/IP4/ {print $2}' /tmp/my_ip)
 	LOCAL_ADDR6=$(awk '/IP6/ {print $2}' /tmp/my_ip)
 	REMOTE_ADDR4=$(awk '/IP4/ {print $2}' /tmp/target_ip | uniq)
@@ -1846,8 +1846,8 @@ get_reachable_ips()
 	return $exitcode
 }
 
-# Function to obtain reachable target IP addresses on 192.168.1.0/24 subnet 
-# in case other methods fail.  Requires that there is a route available to the 
+# Function to obtain reachable target IP addresses on 192.168.1.0/24 subnet
+# in case other methods fail.  Requires that there is a route available to the
 # 192.168.1.0/24 subnet.
 # Usage: get_target_ip_addr
 get_target_ip_addr()

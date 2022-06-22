@@ -37,9 +37,9 @@ YUM=$(cki_get_yum_tool)
 TEST="networking/tunnel/geneve/basic"
 # Test doesn't run without IPv6
 if grep "ipv6.disable=1" /proc/cmdline ; then
-    rlLog "Skip test as system doesn't have IPv6."
-    rstrnt-report-result $TEST SKIP
-    exit
+	rlLog "Skip test as system doesn't have IPv6."
+	rstrnt-report-result $TEST SKIP
+	exit
 fi
 
 # Functions
@@ -251,7 +251,7 @@ TEST_ITEMS=${TEST_ITEMS:-$TEST_ITEMS_ALL}
 
 rlJournalStart
 	rlPhaseStartSetup
-        rlRun "lsmod | grep sctp || modprobe sctp" "0-255"
+		rlRun "lsmod | grep sctp || modprobe sctp" "0-255"
 	rlPhaseEnd
 
 

@@ -64,7 +64,7 @@ rlJournalStart
         rlRun -s "rpmbuild -bb ~/rpmbuild/SPECS/testprov-kmod.spec"
         TESTPROVRPM=$( awk '/Wrote:/ { print $2 }' $rlRun_LOG)
         rlRun -s "rpm -qp --provides $TESTPROVRPM" 0 "Get the testprov-kmod provides"
-	    rlIsRHEL '<8' || rlAssertGrep "^kmod(testprov.ko)" $rlRun_LOG
+        rlIsRHEL '<8' || rlAssertGrep "^kmod(testprov.ko)" $rlRun_LOG
         rlAssertGrep "^ksym(saa7146_vmalloc_build_pgtable) =" $rlRun_LOG
         rlRun "rpm -i $TESTPROVRPM"
         rlRun -s "rpmbuild -bb ~/rpmbuild/SPECS/testreq-kmod.spec"

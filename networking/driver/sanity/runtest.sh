@@ -14,14 +14,14 @@ do
         #
         # Skip any virtual netdev
         #
-	if [ -e /sys/devices/virtual/net/$(basename ${netdev}) ]
-	then
-		continue
-	fi
-	if [ "$(cat ${netdev}/type)" == "1" ]
-	then
-		COUNT=$(($COUNT + 1))
-	fi
+        if [ -e /sys/devices/virtual/net/$(basename ${netdev}) ]
+        then
+                continue
+        fi
+        if [ "$(cat ${netdev}/type)" == "1" ]
+        then
+                COUNT=$(($COUNT + 1))
+        fi
 done
         echo "$COUNT ethernet devices were found"
 
@@ -44,10 +44,10 @@ do
         #
         # Skip any virtual netdev
         #
-	if [ -e /sys/devices/virtual/net/$(basename ${netdev}) ]
-	then
-		continue
-	fi
+        if [ -e /sys/devices/virtual/net/$(basename ${netdev}) ]
+        then
+                continue
+        fi
 
         #
         # Check if type == 1 (ethernet)
@@ -66,8 +66,8 @@ do
                 #
                 if [ $? -ne 0 ];
                 then
-		        echo "FAIL: ethtool -i returned a failure"
-		        rstrnt-report-result $TEST FAIL 1
+                        echo "FAIL: ethtool -i returned a failure"
+                        rstrnt-report-result $TEST FAIL 1
                 fi
         fi
 done
