@@ -88,6 +88,7 @@ codeowners check:
   stage: 🚀
   image: registry.gitlab.com/cki-project/cki-tools/cki-tools:production
   variables:
+    GIT_DEPTH: 100  # works for MRs <= 100 commits on top of the target branch
     INTERNAL_GITLAB_HOST: gitlab.cee.redhat.com
     INTERNAL_GITLAB_PROJECT: kernel-qe/kernel-tests-public
     COMMENT_TEMPLATE_J2: |
