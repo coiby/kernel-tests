@@ -142,6 +142,7 @@ storage/nvdimm/ndctl-test-suite/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakima
 storage/scsi/vpd/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
 storage/swraid/mdadm/raid_module/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
 storage/swraid/scsi_raid/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
+storage/swraid/simple_reshape/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
 storage/swraid/trim/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
 storage/target/targetcli_basic/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
 stress/stress-ng/ @bgoncalv @dzickusrh @ftjahjad @idorax @inakimalerba @mh21 @sturivny @veruu
