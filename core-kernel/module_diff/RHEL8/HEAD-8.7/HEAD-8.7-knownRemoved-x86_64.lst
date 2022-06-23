@@ -1,0 +1,4 @@
+intel_pmt_class.ko
+intel_pmt_crashlog.ko
+intel_pmt.ko
+intel_pmt_telemetry.ko

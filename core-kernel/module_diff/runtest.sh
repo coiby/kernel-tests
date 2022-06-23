@@ -504,6 +504,13 @@ rlJournalStart
                     echo "" | tee -a $OUTPUTFILE
                     echo "***** $ARCH: Base release is HEAD-RHEL-8.7 *****" | tee -a $OUTPUTFILE
                     Release="HEAD-8.7"
+                    if cki_kver_lt "4.18.0-395"; then
+                        sed -i '/idxd_bus.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-399"; then
+                        sed -i '/intel_vsec.ko/d;/pmt_class.ko/d;/pmt_crashlog.ko/d;/pmt_telemetry.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                        sed -i '/intel_pmt_class.ko/d;/intel_pmt_crashlog.ko/d;/intel_pmt.ko/d;/intel_pmt_telemetry.ko/d;' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then

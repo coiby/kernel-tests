@@ -849,6 +849,7 @@ icplus.ko
 ideapad-laptop.ko
 idma64.ko
 idmouse.ko
+idxd_bus.ko
 idxd.ko
 ie31200_edac.ko
 ie6xx_wdt.ko
@@ -912,6 +913,7 @@ intel_th_pti.ko
 intel_th_sth.ko
 intel-uncore.ko
 intel-vbtn.ko
+intel_vsec.ko
 intel-wmi-thunderbolt.ko
 intel-xway.ko
 ioatdma.ko
@@ -1564,6 +1566,9 @@ pluto2.ko
 plx_pci.ko
 pmbus_core.ko
 pmbus.ko
+pmt_class.ko
+pmt_crashlog.ko
+pmt_telemetry.ko
 pnd2_edac.ko
 poly1305_generic.ko
 poly1305-x86_64.ko
