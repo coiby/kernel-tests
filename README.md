@@ -1,4 +1,31 @@
-# Beaker tasks used with [skt](https://gitlab.com/cki-project/skt) runner
+# Red Hat Kernel QE and CKI kernel tests repository
+
+The main branch is continuously synced to the [internal
+mirror](https://gitlab.cee.redhat.com/api/v4/projects/kernel-qe%2fkernel-tests-public/repository/archive.zip?sha=refs/heads/main).
+
+<details>
+<summary>Click here for an example on how to trigger a Beaker job with it.</summary>
+
+```xml
+<job>
+  <whiteboard>Beaker job for https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests</whiteboard>
+  <recipeSet>
+    <recipe ks_meta="redhat_ca_cert">
+      <distroRequires>
+        <distro_arch op="=" value="x86_64"/>
+        <variant op="=" value="BaseOS"/>
+        <distro_family op="=" value="CentOSStream9"/>
+      </distroRequires>
+      <hostRequires/>
+      <task name="/test/misc/machineinfo">
+        <fetch url="https://gitlab.cee.redhat.com/api/v4/projects/kernel-qe%2fkernel-tests-public/repository/archive.zip?sha=refs/heads/main#test/misc/machineinfo"/>
+        <params/>
+      </task>
+    </recipe>
+  </recipeSet>
+</job>
+```
+</details>
 
 ## How to run tests
 Here is a list of common prerequisites for all beaker tests. Test-specific dependencies and steps can be found in the README.md within each test's directory.
