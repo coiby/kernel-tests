@@ -11,6 +11,8 @@ function rhel8_fatal_issues()
 	osver_in_range "800" "802" && is_arch "s390x" && tskip "mtest06" fatal
 	# Bug 1738338 - [ RHEL-8.1][PANIC][kernel-debug] Oops: 0000 [#1] SMP KASAN NOPTI
 	osver_in_range "800" "803" && tskip "proc01" fatal
+	# BZ 2068338 - [FJ8.6 Bug]: system crash happened due to a use-after-free at VT_RESIZEX ioctl()
+	osver_in_range "800" "807" && tskip "pty07" fatal
 }
 
 function rhel8_unfix_issues()
