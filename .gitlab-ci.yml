@@ -43,7 +43,7 @@ insufficient-permissions:
     - !reference [.rules, mr-fork]
 
 shell check cki:
-  extends: .tox
+  extends: .cki_tools
   before_script:
     - "# Mock beakerlib.sh to avoid source import errors:"
     - mkdir /usr/share/beakerlib
@@ -55,7 +55,7 @@ shell check cki:
     - !reference [.rules, default-branch]
 
 shell check runtests:
-  extends: .tox
+  extends: .cki_tools
   script:
     - find -name '*.sh' -exec shellcheck --severity=error -f gcc {} +
   rules:
@@ -63,7 +63,7 @@ shell check runtests:
     - !reference [.rules, default-branch]
 
 codeowners check:
-  extends: .tox
+  extends: .cki_tools
   script:
     - |
       # compare CODEOWNERS
@@ -85,7 +85,7 @@ codeowners check:
     - !reference [.rules-codeowners, default-branch]
 
 check bash with mixed tabs and spaces:
-  extends: .tox
+  extends: .cki_tools
   script:
     - |
       mixed=$(comm -12 \
