@@ -17,16 +17,18 @@ install_netsniff()
 {
 	which mausezahn && return 0
 
-	# Use f35 repo for RHEL8/9 before netsniff-ng epel9 repo enabled
 	if [ $(krelease) -eq "8" ] || [ $(krelease) -eq "9" ]; then
-		cp f35.repo /etc/yum.repos.d/
-		dnf install -y netsniff-ng jq
-		# remove the repo incase other tests install f35 pkgs via it
-		rm -f /etc/yum.repos.d/f35.repo
-		dnf clean metadata
-	else
-		dnf install -y jq netsniff-ng
+		if ! rpm -q epel-release; then
+			dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(krelease).noarch.rpm
+			local need_remove=1
+		else
+			local param="--enablerepo=epel"
+		fi
 	fi
+
+	dnf $param install -y jq netsniff-ng
+
+	[ "${need_remove}" ] && dnf -y remove epel-release
 
 	which mausezahn && return 0 || return 1
 }
