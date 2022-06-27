@@ -25,7 +25,7 @@ function rt_package_install()
     echo "install needed package $packages" | tee -a $OUTPUTFILE
 
     for i in $packages; do
-        if $(rpm -q --quiet $i); then
+        if rpm -q --quiet $i ; then
             continue
         else
             yum install -y $i
