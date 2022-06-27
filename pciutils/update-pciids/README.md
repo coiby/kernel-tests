@@ -1,6 +1,5 @@
 # PCI Sanity Smoke test.
-Run pciids update, and check new pciids updated successfully. \
-Test Maintainer: [William Gomeringer](mailto:willg@redhat.com) 
+Run pciids update, and check new pciids updated successfully.
 
 ## How to run it
 

@@ -1,7 +1,6 @@
 # packages/perf/perftool-testsuite test
 This test runs upstream perftool-testsuite. This wrapper fetches the latest
 version of perftool-testsuite from GitHub.
-Test Maintainer: [Michael Petlan](mailto:mpetlan@redhat.com)
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

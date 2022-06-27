@@ -1,6 +1,5 @@
 # loopdevice sanity test suite
-Sanity test suite for loop device. This test will mount various filesystems, and stress them through iozone. \
-Test Maintainer: [Xiong Zhou](mailto:xzhou@redhat.com)
+Sanity test suite for loop device. This test will mount various filesystems, and stress them through iozone.
 
 ## How to run it
 

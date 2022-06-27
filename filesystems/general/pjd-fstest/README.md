@@ -1,6 +1,5 @@
 # pjd-fstest filesystem test suite
-Tests POSIX features of file systems. \
-Test Maintainer: [Zorro Lang](mailto:zlang@redhat.com)
+Tests POSIX features of file systems.
 
 ## How to run it
 

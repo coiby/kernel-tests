@@ -1,6 +1,5 @@
 # AutoFS Connectathon test suite
-Basic tests for automounter AutoFS. \
-Test Maintainer: [Kun Wang](mailto:kunwan@redhat.com)
+Basic tests for automounter AutoFS.
 
 ## How to run it
 

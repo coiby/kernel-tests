@@ -1,7 +1,6 @@
 # storage/blktests/srp test suite
 
 Storage: srp test
-Test Maintainer: [Yi Zhang](mailto:yi.zhang@redhat.com)
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

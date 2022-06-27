@@ -1,6 +1,5 @@
 # mod_ssl sanity test 
-Sanity testing for mod_ssl: reinstalls mod_ssl, and runs httpd with mod_ssl. \
-Test Maintainer: [Branislav Nater](mailto:bnater@redhat.com)
+Sanity testing for mod_ssl: reinstalls mod_ssl, and runs httpd with mod_ssl.
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

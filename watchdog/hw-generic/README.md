@@ -1,7 +1,6 @@
 # Watchdog Timer Tests
 Confirm hardware watchdog exists and is functional. \
 Disable the watchdog and make sure system reboots as expected.
-Test Maintainer: [Rachel Sibley](mailto:rasibley@redhat.com)
 
 
 ## How to run it

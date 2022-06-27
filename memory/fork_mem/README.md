@@ -9,8 +9,6 @@ These default settings can be changed using the yaml file or using \
  --mux-inject  parameter (with avocado run command). The selected values \
  would depend on resources available on the system where the program is executed.
 
-Test Maintainer: MM-QE@redhat.com
-
 ## How to run it
 Please refer to the top-level README.md for common dependencies.
 

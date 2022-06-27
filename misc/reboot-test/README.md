@@ -1,5 +1,4 @@
 # reboot test
-Test Maintainer: [Bruno Goncalves](mailto:bgoncalv@redhat.com)
 
 ## How to run it
 

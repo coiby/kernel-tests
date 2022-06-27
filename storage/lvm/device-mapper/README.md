@@ -1,6 +1,5 @@
 # storage/lvm/device-mapper
 Simple test wrapper to run [Device Mapper Test Suite][01].
-Test Maintainer: [Fine Fan](mailto:ffan@redhat.com)
 
 [01]: https://github.com/jthornber/device-mapper-test-suite
 

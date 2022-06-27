@@ -1,6 +1,5 @@
 # kaslr test
-Kaslr sanity test. \
-Test Maintainer: [Memory Management](mailto:mm-qe@redhat.com)
+Kaslr sanity test.
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

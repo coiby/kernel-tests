@@ -1,6 +1,5 @@
 # storage/lvm/device-mapper-persistent-data
 Device mapper persistent data test for LVM.
-Test Maintainer: [Filip Suba](mailto:fsuba@redhat.com)
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

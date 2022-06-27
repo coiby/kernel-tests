@@ -1,6 +1,5 @@
 # ACPI table test suite
-Testing ACPI table is present in sysfs. \
-Test Maintainer: [Al Stone](mailto:ahs3@redhat.com)
+Testing ACPI table is present in sysfs.
 
 
 ## How to run it

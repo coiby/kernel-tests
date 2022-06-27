@@ -1,6 +1,5 @@
 # Firmware test suite
-fwts tests suite for exercising and testing different aspects of a machine's firmware. \
-Test Maintainer: [Jiri Dluhos](mailto:jdluhos@redhat.com)
+fwts tests suite for exercising and testing different aspects of a machine's firmware.
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

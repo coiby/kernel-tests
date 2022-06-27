@@ -1,6 +1,5 @@
 # networking/macsec/sanity_check
 This suite provides MACsec sanity testing.
-Test Maintainer: [Fei Liu](mailto:feliu@redhat.com)
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

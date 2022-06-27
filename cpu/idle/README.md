@@ -1,6 +1,5 @@
 # cpu idle power test suite
 It provides cpu idle power test.
-Test Maintainer: [David Arcari](mailto:darcari@redhat.com)
 
 ## How to run it
 
