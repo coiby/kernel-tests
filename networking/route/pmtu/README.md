@@ -1,6 +1,5 @@
 # pmtu test suite
-Testing path max transit unit from client to router/server host. \
-Test Maintainer: [Jianlin Shi](mailto:jishi@redhat.com)
+Testing path max transit unit from client to router/server host.
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

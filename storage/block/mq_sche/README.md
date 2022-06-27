@@ -1,7 +1,6 @@
 # storage/block/mq_sche test suite
 
 Storage: block queue scheduler test
-Test Maintainer: [Changhui Zhong](mailto:czhong@redhat.com)
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

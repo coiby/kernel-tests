@@ -1,6 +1,5 @@
 # cpu die test suite
 It provides cpu die test
-Test Maintainer: [David Arcari](mailto:darcari@redhat.com)
 
 ## How to run it
 

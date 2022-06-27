@@ -5,8 +5,6 @@ KUNIT tests are packaged as modules inside the kernel-modules-internals package.
 
 Kernel Config requires CONFIG_KUNIT=m & CONFIG_KUNIT_ALL_TESTS=m
 
-Test Maintainer: [Nico Pache](mailto:npache@redhat.com)
-
 ## How to run it
 Please refer to the top-level README.md for common dependencies.
 

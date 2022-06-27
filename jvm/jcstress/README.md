@@ -4,7 +4,6 @@ to aid the research in the correctness of concurrency support in the JVM, class 
 and hardware.
 For more details see https://github.com/openjdk/jcstress
 
-Test Maintainer: [Aleksey Shipilev](mailto:shade@redhat.com)
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

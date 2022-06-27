@@ -1,6 +1,5 @@
 # networking/tunnel/tunctl/permtest
 This suite provides test on user pemissions and previledges of tun interface.
-Test Maintainer: [Hushan Jia](mailto:hjia@redhat.com)
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

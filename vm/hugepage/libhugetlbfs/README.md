@@ -1,8 +1,7 @@
 # libhugetlbfs test suite
 libhugetlbfs test provides huge pages of memory unit testing for the 
 libhugetlbfs file system. The source code for libhugetlbfs wrapper can be 
-found at https://github.com/libhugetlbfs/libhugetlbfs.git \
-Test Maintainer: [Memory Management](mailto:mm-qe@redhat.com) 
+found at https://github.com/libhugetlbfs/libhugetlbfs.git
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

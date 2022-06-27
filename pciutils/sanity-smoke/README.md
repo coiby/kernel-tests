@@ -1,6 +1,5 @@
 # PCI Sanity Smoke test.
-List lspci output, and run simple pci check. \
-Test Maintainer: [William Gomeringer](mailto:willg@redhat.com) 
+List lspci output, and run simple pci check.
 
 ## How to run it
 

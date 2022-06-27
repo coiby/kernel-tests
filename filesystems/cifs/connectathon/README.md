@@ -1,6 +1,5 @@
 # CIFS Connectathon test suite
-Basic tests for CIFS through Samba. \
-Test Maintainer: [Jianhong Yin](mailto:jiyin@redhat.com) 
+Basic tests for CIFS through Samba.
 
 ## How to run it
 

@@ -1,6 +1,5 @@
 # test/misc/machineinfo
 A simple wrapper to upload machine info.
-Test Maintainer: [Artem Savkov](mailto:asavkov@redhat.com)
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

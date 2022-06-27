@@ -1,6 +1,5 @@
 # cpu frequency driver test suite
 It provides cpu frequency driver test.
-Test Maintainer: [David Arcari](mailto:darcari@redhat.com)
 
 ## How to run it
 

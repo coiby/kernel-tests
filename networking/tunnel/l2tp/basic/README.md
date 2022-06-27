@@ -1,7 +1,6 @@
 # l2tp basic test
 Basic test for l2tp. \
-This test is supported in both single host and multi-host environment \
-Test Maintainer: [Jianlin Shi](mailto:jishi@redhat.com), and [Hangbin Liu](mailto:haliu@redhat.com)
+This test is supported in both single host and multi-host environment.
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

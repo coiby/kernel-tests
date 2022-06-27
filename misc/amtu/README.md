@@ -1,6 +1,5 @@
 # amtu test suite
-Source code for amtu, see https://github.com/jstancek/amtu \
-Test Maintainer: [Jan Stancek](mailto:jstancek@redhat.com) 
+Source code for amtu, see https://github.com/jstancek/amtu. 
 
 ## How to run it
 

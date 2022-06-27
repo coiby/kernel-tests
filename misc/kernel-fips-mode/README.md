@@ -1,6 +1,5 @@
 # kernel-fips-mode
 Test kernel FIPS 140 mode. 
-Test Maintainer: [Ondrej Moris](mailto:omoris@redhat.com)
 
 ### Description
 Test enables FIPS mode and reboot the system to boot into FIPS mode. After successful boot FIPS mode is disabled again.

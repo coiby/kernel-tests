@@ -1,6 +1,5 @@
 # TCP keepalive test
-Test TCP keepalive and determine the connection is still up and running. \
-Test Maintainer: [Xiumei Mu](mailto:xmu@redhat.com), and [Hangbin Liu](mailto:haliu@redhat.com)
+Test TCP keepalive and determine the connection is still up and running.
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

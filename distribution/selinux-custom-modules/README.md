@@ -1,5 +1,4 @@
 # Setup task for installing custom SElinux modules
-Test Maintainer: [Rachel Sibley](mailto:rasibley@redhat.com) 
 
 ## How to run it
 The task does the following:

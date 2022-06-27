@@ -1,7 +1,6 @@
 # stress-ng test
 stress-ng does stress tests for hardware and software subsystems.
-Source code for stress-ng, see https://kernel.ubuntu.com/git/cking/stress-ng.git \
-Test Maintainer: [Jeff Bastian](mailto:jbastian@redhat.com) 
+Source code for stress-ng, see https://kernel.ubuntu.com/git/cking/stress-ng.git
 
 ## How to run it
 

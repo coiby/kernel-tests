@@ -1,6 +1,5 @@
 # xfstests test suite
-Wrapper for xfstests test suite, see http://git.kernel.org/?p=fs/xfs/xfstests-dev.git;a=summary \
-Test Maintainer: [Xiong Murphy Zhou](mailto:xzhou@redhat.com)
+Wrapper for xfstests test suite, see http://git.kernel.org/?p=fs/xfs/xfstests-dev.git;a=summary
 
 ## How to run it
 

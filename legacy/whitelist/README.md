@@ -1,6 +1,5 @@
 # kABI Whitelist Symbol Removal Check
 
-Test Maintainer: [Čestmír Kalina](mailto:ckalina@redhat.com)
 
 ## Test Description
 
