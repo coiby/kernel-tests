@@ -8,6 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=elfutils-libelf-devel;flex;bison;gcc;openssl-devel;make;curl;grubby;tar;binutils
+# Don't set dependencies here. The test installs the required dependencies
+# and aborts the job in case of failure as required by CKI
 softDependencies=yum-utils;llvm;lld;clang
 repoRequires=cki_lib

@@ -439,6 +439,14 @@ function io_test() {
 
 cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
 if [ ${REBOOTCOUNT} -eq 0 ]; then
+  # set YUM var.
+  select_yum_tool
+  if $YUM install -y elfutils-libelf-devel flex bison gcc openssl-devel make curl grubby tar binutils; then
+      cki_print_success "Installed test dependencies"
+    else
+      cki_abort_recipe "Failed to install test dependencies" WARN
+  fi
+
   # kernel packages only from CKI kernel repo should be used
   # rpm_prepare creates kernel-cki.repo
   _exclude_pkgs="kernel kernel-core kernel-debug kernel-debug-core kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-core kernel-rt-debug-core"
