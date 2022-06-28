@@ -170,12 +170,24 @@ kdump/kdump-file-load/ @bgoncalv @emmawu1 @lulinqing
 kdump/kdump-sysrq-c/ @bgoncalv @emmawu1 @lulinqing
 kdump/kexec-boot/ @bgoncalv @emmawu1 @lulinqing
 kdump/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
+kselftests/ @bgoncalv @liuhangbin @lulinqing
 memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 misc/header-test/ @bgoncalv @jbastianrh @lulinqing
 misc/module-load/ @bgoncalv @jbastianrh @lulinqing
+networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
+networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing
+networking/netfilter/ @bgoncalv @liuhangbin @lulinqing
+networking/route/route_func/ @bgoncalv @liuhangbin @lulinqing
+networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing
+networking/socket/fuzz/ @bgoncalv @liuhangbin @lulinqing
+networking/tcp/tcp_keepalive/ @bgoncalv @liuhangbin @lulinqing
+networking/tunnel/geneve/basic/ @bgoncalv @liuhangbin @lulinqing
+networking/tunnel/gre/basic/ @bgoncalv @liuhangbin @lulinqing
+networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
+networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing
 packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
 rt-tests/latency_perf/oslat_valid/ @bgoncalv @lulinqing @waylon531
