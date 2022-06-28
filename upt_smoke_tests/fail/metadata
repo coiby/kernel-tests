@@ -1,0 +1,11 @@
+[General]
+name=upt-smoke-tests/fail
+owner=Israel Santana <isantana@redhat.com>
+description=UPT smoke test ending with FAIL status
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib

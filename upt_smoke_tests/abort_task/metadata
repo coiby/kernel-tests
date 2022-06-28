@@ -1,0 +1,11 @@
+[General]
+name=upt-smoke-tests/abort_task
+owner=Israel Santana <isantana@redhat.com>
+description=UPT smoke test aborting a task
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib
