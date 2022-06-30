@@ -55,8 +55,6 @@ bpf:test_lwt_ip_encap.sh
 bpf:test_netcnt
 # traceback with 3 BPF maps loaded, expected 2
 bpf:test_offload.py
-# bz2092952: BUG: using __this_cpu_add_return() in preemptible code
-bpf:test_sockmap
 # occasionally hangs the system and causes remaining cases to abort
 bpf:test_xsk.sh
 # occasionally hits the maximum timeout
