@@ -1,0 +1,104 @@
+From 00e769e63515e51ee1020314efcf4fe880c46d7c Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 21 Jun 2022 11:47:29 +0800
+Subject: [PATCH] madvise06: shrink to 3 MADV_WILLNEED pages to stabilize the
+ test
+
+Paul Bunyan reports that the madvise06 test fails intermittently with many
+LTS kernels, after checking with mm developer we prefer to think this is
+more like a test issue (but not kernel bug):
+
+   madvise06.c:231: TFAIL: 4 pages were faulted out of 2 max
+
+So this improvement is target to reduce the false positive happens from
+three points:
+
+  1. Adding the while-loop to give more chances for madvise_willneed()
+     reads memory asynchronously
+  2. Raise value of `loop` to let test waiting for more times if swapchache
+     haven't reached the expected
+  3. Shrink to only 3 pages for verifying MADV_WILLNEED that to make the
+     system easily takes effect on it
+
+From Rafael Aquini:
+
+  The problem here is that MADV_WILLNEED is an asynchronous non-blocking
+  hint, which will tell the kernel to start doing read-ahead work for the
+  hinted memory chunk, but will not wait up for the read-ahead to finish.
+  So, it is possible that when the dirty_pages() call start re-dirtying
+  the pages in that target area, is racing against a scheduled swap-in
+  read-ahead that hasn't yet finished. Expecting faulting only 2 pages
+  out of 102400 also seems too strict for a PASS threshold.
+
+Note:
+  As Rafael suggested, another possible approach to tackle this failure
+  is to tally up, and loosen the threshold to more than 2 major faults
+  after a call to madvise() with MADV_WILLNEED.
+  But from my test, seems the faulted-out page shows a significant
+  variance in different platforms, so I didn't take this way.
+
+Btw, this patch get passed on my two easy reproducible systems more than 1000 times
+
+Reported-by: Paul Bunyan <pbunyan@redhat.com>
+Signed-off-by: Li Wang <liwang@redhat.com>
+Cc: Rafael Aquini <aquini@redhat.com>
+Cc: Richard Palethorpe <rpalethorpe@suse.com>
+Reviewed-by: Richard Palethorpe <rpalethorpe@suse.com>
+---
+ testcases/kernel/syscalls/madvise/madvise06.c | 21 +++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/madvise/madvise06.c b/testcases/kernel/syscalls/madvise/madvise06.c
+index 6d218801c..27aff18f1 100644
+--- a/testcases/kernel/syscalls/madvise/madvise06.c
++++ b/testcases/kernel/syscalls/madvise/madvise06.c
+@@ -164,7 +164,7 @@ static int get_page_fault_num(void)
+ 
+ static void test_advice_willneed(void)
+ {
+-	int loops = 50, res;
++	int loops = 100, res;
+ 	char *target;
+ 	long swapcached_start, swapcached;
+ 	int page_fault_num_1, page_fault_num_2;
+@@ -202,23 +202,32 @@ static void test_advice_willneed(void)
+ 		"%s than %ld Kb were moved to the swap cache",
+ 		res ? "more" : "less", PASS_THRESHOLD_KB);
+ 
+-
+-	TEST(madvise(target, PASS_THRESHOLD, MADV_WILLNEED));
++	loops = 100;
++	SAFE_FILE_LINES_SCANF("/proc/meminfo", "SwapCached: %ld", &swapcached_start);
++	TEST(madvise(target, pg_sz * 3, MADV_WILLNEED));
+ 	if (TST_RET == -1)
+ 		tst_brk(TBROK | TTERRNO, "madvise failed");
++	do {
++		loops--;
++		usleep(100000);
++		if (stat_refresh_sup)
++			SAFE_FILE_PRINTF("/proc/sys/vm/stat_refresh", "1");
++		SAFE_FILE_LINES_SCANF("/proc/meminfo", "SwapCached: %ld",
++				&swapcached);
++	} while (swapcached < swapcached_start + pg_sz*3/1024 && loops > 0);
+ 
+ 	page_fault_num_1 = get_page_fault_num();
+ 	tst_res(TINFO, "PageFault(madvice / no mem access): %d",
+ 			page_fault_num_1);
+-	dirty_pages(target, PASS_THRESHOLD);
++	dirty_pages(target, pg_sz * 3);
+ 	page_fault_num_2 = get_page_fault_num();
+ 	tst_res(TINFO, "PageFault(madvice / mem access): %d",
+ 			page_fault_num_2);
+ 	meminfo_diag("After page access");
+ 
+ 	res = page_fault_num_2 - page_fault_num_1;
+-	tst_res(res < 3 ? TPASS : TFAIL,
+-		"%d pages were faulted out of 2 max", res);
++	tst_res(res == 0 ? TPASS : TFAIL,
++		"%d pages were faulted out of 3 max", res);
+ 
+ 	SAFE_MUNMAP(target, CHUNK_SZ);
+ }
+-- 
+2.36.1
+

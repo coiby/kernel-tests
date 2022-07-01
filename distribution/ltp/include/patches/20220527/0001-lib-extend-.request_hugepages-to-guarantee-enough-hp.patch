@@ -1,0 +1,670 @@
+From 1bc9349d63843589be17503b30f05fe2f519c479 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Mon, 6 Jun 2022 18:00:33 +0800
+Subject: [PATCH] lib: extend .request_hugepages to guarantee enough hpages
+
+This is to satisfy tests which need to reserve hugepage precisely for
+using, with eliminating other process side effects at the same time.
+
+For example, if there are 'N' (N > 1) hpages reserved but all occupying.
+New '.request_hugepage = 1' in another test will only save the N and do
+echo 1 into hugetlbfs. That obviously may cause problems during test run.
+
+Here, we introduce two policies to make hugepage reserve work fit for
+more requirements but no need to care about details. And simply rename
+.request_hugepages to .hugepages.
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+---
+ doc/c-test-api.txt                            | 37 ++++++++++++-------
+ include/tst_hugepage.h                        | 14 ++++++-
+ include/tst_test.h                            | 26 +++++++++----
+ lib/newlib_tests/test20.c                     | 14 ++++---
+ lib/newlib_tests/test_zero_hugepage.c         | 11 +++---
+ lib/tst_hugepage.c                            | 22 +++++++++--
+ lib/tst_test.c                                |  4 +-
+ .../kernel/mem/hugetlb/hugemmap/hugemmap01.c  |  2 +-
+ .../kernel/mem/hugetlb/hugemmap/hugemmap02.c  |  2 +-
+ .../kernel/mem/hugetlb/hugemmap/hugemmap04.c  |  2 +-
+ .../kernel/mem/hugetlb/hugemmap/hugemmap05.c  |  5 +--
+ .../kernel/mem/hugetlb/hugemmap/hugemmap06.c  |  4 +-
+ .../mem/hugetlb/hugeshmat/hugeshmat01.c       |  2 +-
+ .../mem/hugetlb/hugeshmat/hugeshmat02.c       |  2 +-
+ .../mem/hugetlb/hugeshmat/hugeshmat03.c       |  2 +-
+ .../mem/hugetlb/hugeshmat/hugeshmat04.c       | 12 ++----
+ .../mem/hugetlb/hugeshmat/hugeshmat05.c       |  5 +--
+ .../mem/hugetlb/hugeshmctl/hugeshmctl01.c     |  2 +-
+ .../mem/hugetlb/hugeshmctl/hugeshmctl02.c     |  2 +-
+ .../mem/hugetlb/hugeshmctl/hugeshmctl03.c     |  2 +-
+ .../mem/hugetlb/hugeshmdt/hugeshmdt01.c       |  2 +-
+ .../mem/hugetlb/hugeshmget/hugeshmget01.c     |  2 +-
+ .../mem/hugetlb/hugeshmget/hugeshmget02.c     |  2 +-
+ .../mem/hugetlb/hugeshmget/hugeshmget03.c     |  2 +-
+ .../mem/hugetlb/hugeshmget/hugeshmget05.c     |  2 +-
+ .../kernel/syscalls/futex/futex_wake04.c      |  5 +--
+ .../kernel/syscalls/ipc/shmget/shmget02.c     |  2 +-
+ testcases/kernel/syscalls/pkeys/pkey01.c      |  4 +-
+ 28 files changed, 112 insertions(+), 81 deletions(-)
+
+diff --git a/doc/c-test-api.txt b/doc/c-test-api.txt
+index 711b445d9..026a57466 100644
+--- a/doc/c-test-api.txt
++++ b/doc/c-test-api.txt
+@@ -1998,15 +1998,25 @@ For full documentation see the comments in 'include/tst_fuzzy_sync.h'.
+ ~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+ Many of the LTP tests need to use hugepage in their testing, this allows the
+-test can reserve hugepages from system only via '.request_hugepages = xx'.
++test can reserve hugepages from system via '.hugepages = {xx, TST_REQUEST}'.
+ 
+-If set non-zero number of 'request_hugepages', test will try to reserve the
+-expected number of hugepage for testing in setup phase. If system does not
+-have enough hpage for using, it will try the best to reserve 80% available
+-number of hpages. With success test stores the reserved hugepage number in
+-'tst_hugepages'. For the system without hugetlb supporting, variable
+-'tst_hugepages' will be set to 0. If the hugepage number needs to be set to 0
+-on supported hugetlb system, please use '.request_hugepages = TST_NO_HUGEPAGES'.
++We achieved two policies for reserving hugepages:
++
++TST_REQUEST:
++  It will try the best to reserve available huge pages and return the number
++  of available hugepages in tst_hugepages, which may be 0 if hugepages are
++  not supported at all.
++
++TST_NEEDS:
++  This is an enforced requirement, LTP should strictly do hpages applying and
++  guarantee the 'HugePages_Free' no less than pages which makes that test can
++  use these specified numbers correctly. Otherwise, test exits with TCONF if
++  the attempt to reserve hugepages fails or reserves less than requested.
++
++With success test stores the reserved hugepage number in 'tst_hugepages'. For
++system without hugetlb supporting, variable 'tst_hugepages' will be set to 0.
++If the hugepage number needs to be set to 0 on supported hugetlb system, please
++use '.hugepages = {TST_NO_HUGEPAGES}'.
+ 
+ Also, we do cleanup and restore work for the hpages resetting automatically.
+ 
+@@ -2018,7 +2028,7 @@ static void run(void)
+ {
+ 	...
+ 
+-	if (tst_hugepages == test.request_hugepages)
++	if (tst_hugepages == test.hugepages.number)
+ 		TEST(do_hpage_test);
+ 	else
+ 		...
+@@ -2027,7 +2037,7 @@ static void run(void)
+ 
+ struct tst_test test = {
+ 	.test_all = run,
+-	.request_hugepages = 2,
++	.hugepages = {2, TST_REQUEST},
+ 	...
+ };
+ -------------------------------------------------------------------------------
+@@ -2045,13 +2055,14 @@ static void run(void)
+ 
+ static void setup(void)
+ {
+-        if (tst_hugepages != test.requested_hugepages)
+-                tst_brk(TCONF, "...");
++	/* TST_NEEDS achieved this automatically in the library */
++	if (tst_hugepages != test.hugepages.number)
++		tst_brk(TCONF, "...");
+ }
+ 
+ struct tst_test test = {
+ 	.test_all = run,
+-	.request_hugepages = 2,
++	.hugepages = {2, TST_NEEDS},
+ 	...
+ };
+ -------------------------------------------------------------------------------
+diff --git a/include/tst_hugepage.h b/include/tst_hugepage.h
+index e08a2daa2..7fba02c40 100644
+--- a/include/tst_hugepage.h
++++ b/include/tst_hugepage.h
+@@ -12,6 +12,16 @@
+ extern char *nr_opt; /* -s num   Set the number of the been allocated hugepages */
+ extern char *Hopt;   /* -H /..   Location of hugetlbfs, i.e.  -H /var/hugetlbfs */
+ 
++enum tst_hp_policy {
++	TST_REQUEST,
++	TST_NEEDS,
++};
++
++struct tst_hugepage {
++	const unsigned long number;
++	enum  tst_hp_policy policy;
++};
++
+ /*
+  * Get the default hugepage size. Returns 0 if hugepages are not supported.
+  */
+@@ -23,11 +33,11 @@ size_t tst_get_hugepage_size(void);
+  *
+  * Note: this depend on the status of system memory fragmentation.
+  */
+-unsigned long tst_request_hugepages(unsigned long hpages);
++unsigned long tst_reserve_hugepages(struct tst_hugepage *hp);
+ 
+ /*
+  * This variable is used for recording the number of hugepages which system can
+- * provides. It will be equal to 'hpages' if tst_request_hugepages on success,
++ * provides. It will be equal to 'hpages' if tst_reserve_hugepages on success,
+  * otherwise set it to a number of hugepages that we were able to reserve.
+  *
+  * If system does not support hugetlb, then it will be set to 0.
+diff --git a/include/tst_test.h b/include/tst_test.h
+index 60316092d..f56e19181 100644
+--- a/include/tst_test.h
++++ b/include/tst_test.h
+@@ -191,17 +191,27 @@ struct tst_test {
+ 	unsigned long min_mem_avail;
+ 
+ 	/*
+-	 * If set non-zero number of request_hugepages, test will try to reserve the
+-	 * expected number of hugepage for testing in setup phase. If system does not
+-	 * have enough hpage for using, it will try the best to reserve 80% available
+-	 * number of hpages. With success test stores the reserved hugepage number in
+-	 * 'tst_hugepages. For the system without hugetlb supporting, variable
+-	 * 'tst_hugepages' will be set to 0. If the hugepage number needs to be set to
+-	 * 0 on supported hugetlb system, please use '.request_hugepages = TST_NO_HUGEPAGES'.
++	 * Two policies for reserving hugepage:
++	 *
++	 * TST_REQUEST:
++	 *   It will try the best to reserve available huge pages and return the number
++	 *   of available hugepages in tst_hugepages, which may be 0 if hugepages are
++	 *   not supported at all.
++	 *
++	 * TST_NEEDS:
++	 *   This is an enforced requirement, LTP should strictly do hpages applying and
++	 *   guarantee the 'HugePages_Free' no less than pages which makes that test can
++	 *   use these specified numbers correctly. Otherwise, test exits with TCONF if
++	 *   the attempt to reserve hugepages fails or reserves less than requested.
++	 *
++	 * With success test stores the reserved hugepage number in 'tst_hugepages. For
++	 * the system without hugetlb supporting, variable 'tst_hugepages' will be set to 0.
++	 * If the hugepage number needs to be set to 0 on supported hugetlb system, please
++	 * use '.hugepages = {TST_NO_HUGEPAGES}'.
+ 	 *
+ 	 * Also, we do cleanup and restore work for the hpages resetting automatically.
+ 	 */
+-	unsigned long request_hugepages;
++	struct tst_hugepage hugepages;
+ 
+ 	/*
+ 	 * If set to non-zero, call tst_taint_init(taint_check) during setup
+diff --git a/lib/newlib_tests/test20.c b/lib/newlib_tests/test20.c
+index 5c24770a1..3982ab79f 100644
+--- a/lib/newlib_tests/test20.c
++++ b/lib/newlib_tests/test20.c
+@@ -4,7 +4,7 @@
+  */
+ 
+ /*
+- * Tests .request_hugepages + .save_restore
++ * Tests .hugepages + .save_restore
+  */
+ 
+ #include "tst_test.h"
+@@ -18,24 +18,26 @@ static void do_test(void) {
+ 	tst_res(TINFO, "tst_hugepages = %lu", tst_hugepages);
+ 	SAFE_FILE_PRINTF("/proc/sys/kernel/numa_balancing", "1");
+ 
+-	hpages = test.request_hugepages;
++	hpages = test.hugepages.number;
+ 	SAFE_FILE_SCANF(PATH_NR_HPAGES, "%lu", &val);
+ 	if (val != hpages)
+ 		tst_brk(TBROK, "nr_hugepages = %lu, but expect %lu", val, hpages);
+ 	else
+-		tst_res(TPASS, "test .needs_hugepges");
++		tst_res(TPASS, "test .hugepges");
++
++	struct tst_hugepage hp = { 1000000000000, TST_REQUEST };
++	hpages = tst_reserve_hugepages(&hp);
+ 
+-	hpages = tst_request_hugepages(3);
+ 	SAFE_FILE_SCANF(PATH_NR_HPAGES, "%lu", &val);
+ 	if (val != hpages)
+ 		tst_brk(TBROK, "nr_hugepages = %lu, but expect %lu", val, hpages);
+ 	else
+-		tst_res(TPASS, "tst_request_hugepages");
++		tst_res(TPASS, "tst_reserve_hugepages");
+ }
+ 
+ static struct tst_test test = {
+ 	.test_all = do_test,
+-	.request_hugepages = 2,
++	.hugepages = {2, TST_NEEDS},
+ 	.save_restore = (const struct tst_path_val[]) {
+ 		{"!/proc/sys/kernel/numa_balancing", "0"},
+ 		{}
+diff --git a/lib/newlib_tests/test_zero_hugepage.c b/lib/newlib_tests/test_zero_hugepage.c
+index 0d85ce866..eec48ffb4 100644
+--- a/lib/newlib_tests/test_zero_hugepage.c
++++ b/lib/newlib_tests/test_zero_hugepage.c
+@@ -4,7 +4,7 @@
+  */
+ 
+ /*
+- * Tests .request_hugepages = TST_NO_HUGEPAGES
++ * Tests .hugepages = {TST_NO_HUGEPAGES}
+  */
+ 
+ #include "tst_test.h"
+@@ -19,17 +19,18 @@ static void do_test(void)
+ 	if (val != 0)
+ 		tst_brk(TBROK, "nr_hugepages = %lu, but expect 0", val);
+ 	else
+-		tst_res(TPASS, "test .request_hugepages = TST_NO_HUGEPAGES");
++		tst_res(TPASS, "test .hugepages = {TST_NO_HUGEPAGES}");
+ 
+-	hpages = tst_request_hugepages(3);
++	struct tst_hugepage hp = { 3, TST_REQUEST };
++	hpages = tst_reserve_hugepages(&hp);
+ 	SAFE_FILE_SCANF(PATH_NR_HPAGES, "%lu", &val);
+ 	if (val != hpages)
+ 		tst_brk(TBROK, "nr_hugepages = %lu, but expect %lu", val, hpages);
+ 	else
+-		tst_res(TPASS, "tst_request_hugepages");
++		tst_res(TPASS, "tst_reserve_hugepages");
+ }
+ 
+ static struct tst_test test = {
+ 	.test_all = do_test,
+-	.request_hugepages = TST_NO_HUGEPAGES,
++	.hugepages = {TST_NO_HUGEPAGES},
+ };
+diff --git a/lib/tst_hugepage.c b/lib/tst_hugepage.c
+index a7585bc3d..e97cc560e 100644
+--- a/lib/tst_hugepage.c
++++ b/lib/tst_hugepage.c
+@@ -20,11 +20,13 @@ size_t tst_get_hugepage_size(void)
+ 	return SAFE_READ_MEMINFO("Hugepagesize:") * 1024;
+ }
+ 
+-unsigned long tst_request_hugepages(unsigned long hpages)
++unsigned long tst_reserve_hugepages(struct tst_hugepage *hp)
+ {
+ 	unsigned long val, max_hpages;
+ 
+ 	if (access(PATH_HUGEPAGES, F_OK)) {
++		if (hp->policy == TST_NEEDS)
++			tst_brk(TCONF, "hugetlbfs is not supported");
+ 		tst_hugepages = 0;
+ 		goto out;
+ 	}
+@@ -32,16 +34,20 @@ unsigned long tst_request_hugepages(unsigned long hpages)
+ 	if (nr_opt)
+ 		tst_hugepages = SAFE_STRTOL(nr_opt, 1, LONG_MAX);
+ 	else
+-		tst_hugepages = hpages;
++		tst_hugepages = hp->number;
+ 
+-	if (hpages == TST_NO_HUGEPAGES) {
++	if (hp->number == TST_NO_HUGEPAGES) {
+ 		tst_hugepages = 0;
+ 		goto set_hugepages;
+ 	}
+ 
+ 	SAFE_FILE_PRINTF("/proc/sys/vm/drop_caches", "3");
+-	max_hpages = SAFE_READ_MEMINFO("MemFree:") / SAFE_READ_MEMINFO("Hugepagesize:");
++	if (hp->policy == TST_NEEDS) {
++		tst_hugepages += SAFE_READ_MEMINFO("HugePages_Total:");
++		goto set_hugepages;
++	}
+ 
++	max_hpages = SAFE_READ_MEMINFO("MemFree:") / SAFE_READ_MEMINFO("Hugepagesize:");
+ 	if (tst_hugepages > max_hpages) {
+ 		tst_res(TINFO, "Requested number(%lu) of hugepages is too large, "
+ 				"limiting to 80%% of the max hugepage count %lu",
+@@ -61,6 +67,14 @@ set_hugepages:
+ 				"Not enough hugepages for testing.",
+ 				val, tst_hugepages);
+ 
++	if (hp->policy == TST_NEEDS) {
++		unsigned long free_hpages = SAFE_READ_MEMINFO("HugePages_Free:");
++		if (hp->number > free_hpages)
++			tst_brk(TCONF, "free_hpages = %lu, but expect %lu. "
++				"Not enough hugepages for testing.",
++				free_hpages, hp->number);
++	}
++
+ 	tst_res(TINFO, "%lu hugepage(s) reserved", tst_hugepages);
+ out:
+ 	return tst_hugepages;
+diff --git a/lib/tst_test.c b/lib/tst_test.c
+index d48e53a76..4a196fc46 100644
+--- a/lib/tst_test.c
++++ b/lib/tst_test.c
+@@ -1166,8 +1166,8 @@ static void do_setup(int argc, char *argv[])
+ 	if (tst_test->min_mem_avail > (unsigned long)(tst_available_mem() / 1024))
+ 		tst_brk(TCONF, "Test needs at least %luMB MemAvailable", tst_test->min_mem_avail);
+ 
+-	if (tst_test->request_hugepages)
+-		tst_request_hugepages(tst_test->request_hugepages);
++	if (tst_test->hugepages.number)
++		tst_reserve_hugepages(&tst_test->hugepages);
+ 
+ 	setup_ipc();
+ 
+diff --git a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap01.c b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap01.c
+index fcb4443f7..3fc730002 100644
+--- a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap01.c
++++ b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap01.c
+@@ -98,5 +98,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = test_hugemmap,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap02.c b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap02.c
+index 3be68418a..e818cd5a3 100644
+--- a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap02.c
++++ b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap02.c
+@@ -145,5 +145,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = test_hugemmap,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap04.c b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap04.c
+index 236010fe0..6af032aa5 100644
+--- a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap04.c
++++ b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap04.c
+@@ -116,5 +116,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = test_hugemmap,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap05.c b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap05.c
+index 40d3bd8da..d5983fc55 100644
+--- a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap05.c
++++ b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap05.c
+@@ -185,9 +185,6 @@ static void setup(void)
+ {
+ 	unsigned long hpages;
+ 
+-	if (tst_hugepages != NR_HPAGES)
+-		tst_brk(TCONF, "Not enough hugepages for testing!");
+-
+ 	hugepagesize = SAFE_READ_MEMINFO("Hugepagesize:") * 1024;
+ 	init_sys_sz_paths();
+ 
+@@ -307,5 +304,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = test_overcommit,
+-	.request_hugepages = NR_HPAGES,
++	.hugepages = {NR_HPAGES, TST_NEEDS},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap06.c b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap06.c
+index ab2ccc40b..91dfa0616 100644
+--- a/testcases/kernel/mem/hugetlb/hugemmap/hugemmap06.c
++++ b/testcases/kernel/mem/hugetlb/hugemmap/hugemmap06.c
+@@ -39,8 +39,6 @@ struct mp {
+ 
+ static void setup(void)
+ {
+-	if (tst_hugepages != test.request_hugepages)
+-		tst_brk(TCONF, "System RAM is not enough to test.");
+ 	hpage_size = SAFE_READ_MEMINFO("Hugepagesize:") * 1024;
+ }
+ 
+@@ -122,7 +120,7 @@ static struct tst_test test = {
+ 	.needs_tmpdir = 1,
+ 	.test = do_mmap,
+ 	.setup = setup,
+-	.request_hugepages = (ARSZ + 1) * LOOP,
++	.hugepages = {(ARSZ + 1) * LOOP, TST_NEEDS},
+ 	.tags = (const struct tst_tag[]) {
+ 		{"linux-git", "f522c3ac00a4"},
+ 		{"linux-git", "9119a41e9091"},
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat01.c b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat01.c
+index 8273ede83..3a50e6b55 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat01.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat01.c
+@@ -180,5 +180,5 @@ static struct tst_test test = {
+ 	.test = verify_hugeshmat,
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat02.c b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat02.c
+index 11000a4f0..e79d682f3 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat02.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat02.c
+@@ -107,5 +107,5 @@ static struct tst_test test = {
+ 	.test = verify_hugeshmat,
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat03.c b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat03.c
+index 5aca7dab0..9de925739 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat03.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat03.c
+@@ -101,5 +101,5 @@ static struct tst_test test = {
+ 	.test_all = verify_hugeshmat,
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat04.c b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat04.c
+index 128671051..50efa8a52 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat04.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat04.c
+@@ -27,7 +27,6 @@
+ 
+ static long huge_free;
+ static long huge_free2;
+-static long hugepages;
+ static long orig_shmmax = -1, new_shmmax;
+ 
+ static void shared_hugepage(void);
+@@ -83,9 +82,6 @@ static void setup(void)
+ {
+ 	long hpage_size, orig_hugepages;
+ 
+-	if (tst_hugepages == 0)
+-		tst_brk(TCONF, "Not enough hugepages for testing.");
+-
+ 	orig_hugepages = get_sys_tune("nr_hugepages");
+ 	SAFE_FILE_SCANF(PATH_SHMMAX, "%ld", &orig_shmmax);
+ 	SAFE_FILE_PRINTF(PATH_SHMMAX, "%ld", (long)SIZE);
+@@ -96,10 +92,8 @@ static void setup(void)
+ 
+ 	hpage_size = SAFE_READ_MEMINFO("Hugepagesize:") * 1024;
+ 
+-	hugepages = orig_hugepages + SIZE / hpage_size;
+-	tst_request_hugepages(hugepages);
+-	if (tst_hugepages != (unsigned long)hugepages)
+-		tst_brk(TCONF, "No enough hugepages for testing.");
++	struct tst_hugepage hp = { orig_hugepages + SIZE / hpage_size, TST_NEEDS };
++	tst_reserve_hugepages(&hp);
+ }
+ 
+ static void cleanup(void)
+@@ -121,5 +115,5 @@ static struct tst_test test = {
+ 	.min_mem_avail = 2048,
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+-	.request_hugepages = 1,
++	.hugepages = {1, TST_NEEDS},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat05.c b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat05.c
+index 7152e3363..3b2ae351c 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat05.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmat/hugeshmat05.c
+@@ -35,9 +35,6 @@ static long hpage_size;
+ 
+ void setup(void)
+ {
+-	if (tst_hugepages != test.request_hugepages)
+-		tst_brk(TCONF, "Not enough hugepages for testing.");
+-
+ 	page_size = getpagesize();
+ 	hpage_size = SAFE_READ_MEMINFO("Hugepagesize:") * 1024;
+ }
+@@ -91,7 +88,7 @@ static struct tst_test test = {
+ 	.needs_tmpdir = 1,
+ 	.test_all = test_hugeshmat,
+ 	.setup = setup,
+-	.request_hugepages = N + 1,
++	.hugepages = {N+1, TST_NEEDS},
+ 	.tags = (const struct tst_tag[]) {
+ 		{"linux-git", "091d0d55b286"},
+ 		{"linux-git", "af73e4d9506d"},
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl01.c b/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl01.c
+index 56f3a73dd..11cd69050 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl01.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl01.c
+@@ -310,5 +310,5 @@ static struct tst_test test = {
+ 	.cleanup = cleanup,
+ 	.test = test_hugeshmctl,
+ 	.needs_checkpoints = 1,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl02.c b/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl02.c
+index 8a4c8bc2d..0bc9ffd74 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl02.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl02.c
+@@ -110,5 +110,5 @@ static struct tst_test test = {
+ 	},
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl03.c b/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl03.c
+index f7dd43452..21ec6bf78 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl03.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmctl/hugeshmctl03.c
+@@ -134,5 +134,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = test_hugeshmctl,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmdt/hugeshmdt01.c b/testcases/kernel/mem/hugetlb/hugeshmdt/hugeshmdt01.c
+index 287e5990e..0b9515fda 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmdt/hugeshmdt01.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmdt/hugeshmdt01.c
+@@ -152,5 +152,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = hugeshmdt_test,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget01.c b/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget01.c
+index 2a440f79d..627356510 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget01.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget01.c
+@@ -78,5 +78,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = test_hugeshmget,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget02.c b/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget02.c
+index 11497d150..bbd968c06 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget02.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget02.c
+@@ -98,5 +98,5 @@ static struct tst_test test = {
+ 	.cleanup = cleanup,
+ 	.test = test_hugeshmget,
+ 	.tcnt = ARRAY_SIZE(tcases),
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget03.c b/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget03.c
+index 72d8701f4..7e72a19ca 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget03.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget03.c
+@@ -96,5 +96,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = test_hugeshmget,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget05.c b/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget05.c
+index 91e30afa4..336319603 100644
+--- a/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget05.c
++++ b/testcases/kernel/mem/hugetlb/hugeshmget/hugeshmget05.c
+@@ -92,5 +92,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test_all = test_hugeshmget,
+-	.request_hugepages = 128,
++	.hugepages = {128, TST_REQUEST},
+ };
+diff --git a/testcases/kernel/syscalls/futex/futex_wake04.c b/testcases/kernel/syscalls/futex/futex_wake04.c
+index 2260a3936..110c628c3 100644
+--- a/testcases/kernel/syscalls/futex/futex_wake04.c
++++ b/testcases/kernel/syscalls/futex/futex_wake04.c
+@@ -48,9 +48,6 @@ static struct futex_test_variants variants[] = {
+ 
+ static void setup(void)
+ {
+-	if (tst_hugepages == 0)
+-		tst_brk(TCONF, "No enough hugepages for testing.");
+-
+ 	struct futex_test_variants *tv = &variants[tst_variant];
+ 
+ 	tst_res(TINFO, "Testing variant: %s", tv->desc);
+@@ -135,5 +132,5 @@ static struct tst_test test = {
+ 	.needs_root = 1,
+ 	.min_kver = "2.6.32",
+ 	.needs_tmpdir = 1,
+-	.request_hugepages = 1,
++	.hugepages = {1, TST_NEEDS},
+ };
+diff --git a/testcases/kernel/syscalls/ipc/shmget/shmget02.c b/testcases/kernel/syscalls/ipc/shmget/shmget02.c
+index 165a34456..3788e711f 100644
+--- a/testcases/kernel/syscalls/ipc/shmget/shmget02.c
++++ b/testcases/kernel/syscalls/ipc/shmget/shmget02.c
+@@ -148,5 +148,5 @@ static struct tst_test test = {
+ 	.cleanup = cleanup,
+ 	.test = do_test,
+ 	.tcnt = ARRAY_SIZE(tcases),
+-	.request_hugepages = TST_NO_HUGEPAGES,
++	.hugepages = {TST_NO_HUGEPAGES},
+ };
+diff --git a/testcases/kernel/syscalls/pkeys/pkey01.c b/testcases/kernel/syscalls/pkeys/pkey01.c
+index 04f50924c..2daa42797 100644
+--- a/testcases/kernel/syscalls/pkeys/pkey01.c
++++ b/testcases/kernel/syscalls/pkeys/pkey01.c
+@@ -52,7 +52,7 @@ static void setup(void)
+ 
+ 	check_pkey_support();
+ 
+-	if (tst_hugepages == test.request_hugepages)
++	if (tst_hugepages == test.hugepages.number)
+ 		size = SAFE_READ_MEMINFO("Hugepagesize:") * 1024;
+ 	else
+ 		size = getpagesize();
+@@ -221,5 +221,5 @@ static struct tst_test test = {
+ 	.forks_child = 1,
+ 	.test = verify_pkey,
+ 	.setup = setup,
+-	.request_hugepages = 1,
++	.hugepages = {1, TST_REQUEST},
+ };
+-- 
+2.36.1
+

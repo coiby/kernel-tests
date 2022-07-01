@@ -83,6 +83,12 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-extend-.request_hugepages-to-guarantee-enough-hp.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-memfd_create03-make-use-of-new-.hugepages.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-pkey01-print-more-info-when-write-buff-fail.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-utime03-print-more-details-when-test-fails.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-shrink-to-3-MADV_WILLNEED-pages-to-stabili.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-swapping01-make-use-of-remaining-runtime-in-test-loo.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/migrate_pages03_timeout.patch
     fi
 

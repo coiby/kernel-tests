@@ -1,0 +1,40 @@
+From d8e1b385cc51f38b88ac6cf083ff8602ff6a7330 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Tue, 21 Jun 2022 09:41:00 +0200
+Subject: [PATCH] syscalls/utime03: print more details when test fails
+
+Test is sporadically failing in past couple months on upstream
+kernels. Print more data when that happens to see by how much
+we are failing the checks.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ testcases/kernel/syscalls/utime/utime03.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/utime/utime03.c b/testcases/kernel/syscalls/utime/utime03.c
+index 2358fd70b..8c1167fdb 100644
+--- a/testcases/kernel/syscalls/utime/utime03.c
++++ b/testcases/kernel/syscalls/utime/utime03.c
+@@ -79,10 +79,14 @@ static void run(void)
+ 	SAFE_STAT(TEMP_FILE, &statbuf);
+ 
+ 	if (statbuf.st_atime < mintime || statbuf.st_atime > maxtime)
+-		tst_res(TFAIL, "utime() did not set expected atime");
++		tst_res(TFAIL, "utime() did not set expected atime, "
++			"mintime: %ld, maxtime: %ld, st_atime: %ld",
++			mintime, maxtime, statbuf.st_atime);
+ 
+ 	if (statbuf.st_mtime < mintime || statbuf.st_mtime > maxtime)
+-		tst_res(TFAIL, "utime() did not set expected mtime");
++		tst_res(TFAIL, "utime() did not set expected mtime, "
++			"mintime: %ld, maxtime: %ld, st_mtime: %ld",
++			mintime, maxtime, statbuf.st_mtime);
+ }
+ 
+ static struct tst_test test = {
+-- 
+2.36.1
+
