@@ -202,6 +202,10 @@ function knownissue_filter()
 	# http://lists.infradead.org/pipermail/linux-arm-kernel/2021-June/668228.html
 	is_arch "aarch64" && tskip "read_all_sys" fatal
 	cki_has_kernel_debug_flags && tskip "futex_cmp_requeue01" unfix
+
+	# XXX: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/680
+	# skip "cve-2019-8912" because al_alg07 is fragile
+	tskip "cve-2019-8912" unfix
 }
 
 function tcase_exclude()
