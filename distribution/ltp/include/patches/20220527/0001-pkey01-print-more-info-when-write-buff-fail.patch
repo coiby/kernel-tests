@@ -1,0 +1,44 @@
+From 3b783e45c91c856c3e097d4e5b925ff0ba27c3d0 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Mon, 11 Apr 2022 17:40:47 +0800
+Subject: [PATCH] pkey01: print more info when write buff fail
+
+We got sporadically failed on POWER9 but couldn't reproduce the problem
+manually. Here add printf to show info to see if the PKEY_DISABLE_WRITE
+takes effect on buffers.
+
+  pkey01.c:149: TINFO: Set PKEY_DISABLE_WRITE on (MAP_ANONYMOUS|MAP_PRIVATE|MAP_HUGETLB) buffer
+  pkey01.c:174: TFAIL: Child: exited with 0
+  pkey01.c:176: TINFO: Remove PKEY_DISABLE_WRITE from the buffer
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ testcases/kernel/syscalls/pkeys/pkey01.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/pkeys/pkey01.c b/testcases/kernel/syscalls/pkeys/pkey01.c
+index 2daa42797..b47e7006b 100644
+--- a/testcases/kernel/syscalls/pkeys/pkey01.c
++++ b/testcases/kernel/syscalls/pkeys/pkey01.c
+@@ -161,6 +161,8 @@ static void pkey_test(struct tcase *tc, struct mmap_param *mpa)
+ 		break;
+ 		case PKEY_DISABLE_WRITE:
+ 			*buffer = 'a';
++			tst_res(TFAIL | TERRNO,
++				"Write buffer success, buffer[0] = %d", *buffer);
+ 		break;
+ 		}
+ 		exit(0);
+@@ -183,6 +185,7 @@ static void pkey_test(struct tcase *tc, struct mmap_param *mpa)
+ 	break;
+ 	case PROT_WRITE:
+ 		*buffer = 'a';
++		tst_res(TPASS, "Write buffer success, buffer[0] = %d", *buffer);
+ 	break;
+ 	case PROT_READ | PROT_WRITE:
+ 	case PROT_READ | PROT_WRITE | PROT_EXEC:
+-- 
+2.36.1
+

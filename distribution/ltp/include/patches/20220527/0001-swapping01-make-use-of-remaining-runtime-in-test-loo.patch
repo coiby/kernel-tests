@@ -1,0 +1,95 @@
+From 3eb312e1f947782d8a48ff652429e2f81ce2fbca Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Mon, 20 Jun 2022 14:34:56 +0800
+Subject: [PATCH] swapping01: make use of remaining runtime in test looping
+
+Here go with default to 10 minutes for max_runtime. At the same time limit
+the loop that waits for the swap usage to settle to run for a reminder
+of max_runtime/2 instead of the hardcoded 30 seconds.
+
+This fix can significantly improve timeouts on slower systems:
+
+  # free -h
+                total        used        free      shared  buff/cache   available
+  Mem:          2.9Gi       1.1Gi       1.1Gi        20Mi       732Mi       1.5Gi
+  Swap:         2.0Gi          0B       2.0Gi
+
+  # time ./swapping01
+  tst_kconfig.c:82: TINFO: Parsing kernel config '/boot/config-4.18.0-309.el8.x86_64+debug'
+  tst_test.c:1528: TINFO: Timeout per run is 0h 02m 00s
+  swapping01.c:110: TINFO: available physical memory: 1545 MB
+  swapping01.c:113: TINFO: try to allocate: 2008 MB
+  swapping01.c:152: TPASS: no heavy swapping detected, 218 MB swapped.
+  ...
+
+  real    0m34.241s
+  user    0m0.386s
+  sys     0m16.040s
+
+Co-developed-by: Cyril Hrubis <chrubis@suse.cz>
+Signed-off-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ testcases/kernel/mem/swapping/swapping01.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/testcases/kernel/mem/swapping/swapping01.c b/testcases/kernel/mem/swapping/swapping01.c
+index f6133cc0d..fc225e4a6 100644
+--- a/testcases/kernel/mem/swapping/swapping01.c
++++ b/testcases/kernel/mem/swapping/swapping01.c
+@@ -58,6 +58,7 @@ static long swap_free_init;
+ static long mem_over;
+ static long mem_over_max;
+ static pid_t pid;
++static unsigned int start_runtime;
+ 
+ static void test_swapping(void)
+ {
+@@ -67,6 +68,8 @@ static void test_swapping(void)
+ 	FILE *file;
+ 	char line[PATH_MAX];
+ 
++	start_runtime = tst_remaining_runtime();
++
+ 	file = SAFE_FOPEN("/proc/swaps", "r");
+ 	while (fgets(line, sizeof(line), file)) {
+ 		if (strstr(line, "/dev/zram")) {
+@@ -122,7 +125,7 @@ static void do_alloc(int allow_raise)
+ 
+ static void check_swapping(void)
+ {
+-	int status, i;
++	int status;
+ 	long swap_free_now, swapped;
+ 
+ 	/* wait child stop */
+@@ -131,14 +134,14 @@ static void check_swapping(void)
+ 		tst_brk(TBROK, "child was not stopped.");
+ 
+ 	/* Still occupying memory, loop for a while */
+-	i = 0;
+-	while (i < 30) {
++	while (tst_remaining_runtime() > start_runtime/2) {
+ 		swap_free_now = SAFE_READ_MEMINFO("SwapFree:");
+ 		sleep(1);
+-		if (labs(swap_free_now - SAFE_READ_MEMINFO("SwapFree:")) < 10)
++		long diff = labs(swap_free_now - SAFE_READ_MEMINFO("SwapFree:"));
++		if (diff < 10)
+ 			break;
+ 
+-		i++;
++		tst_res(TINFO, "SwapFree difference %li", diff);
+ 	}
+ 
+ 	swapped = SAFE_READ_PROC_STATUS(pid, "VmSwap:");
+@@ -159,6 +162,7 @@ static struct tst_test test = {
+ 	.needs_root = 1,
+ 	.forks_child = 1,
+ 	.min_mem_avail = 10,
++	.max_runtime = 600,
+ 	.test_all = test_swapping,
+ 	.needs_kconfigs = (const char *[]) {
+ 		"CONFIG_SWAP=y",
+-- 
+2.36.1
+
