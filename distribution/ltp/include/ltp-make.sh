@@ -1,5 +1,11 @@
 #!/bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
+#   Copyright Red Hat, Inc
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #TEST_VERSION can override the default
 TESTVERSION=$TEST_VERSION
