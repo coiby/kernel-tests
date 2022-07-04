@@ -1,25 +1,22 @@
 PURPOSE of /kernel/distribution/ltp/include
 Description: Linux Test Project - include part
-Author: Caspar Zhang <czhang@redhat.com>
 
 LTP Introduction
 ================
-LTP is a famous test suite under Linux, I port
-LTP to Beaker every 4 months (+/-1 month if
-needed). You can use this testcase for your
-RHEL testing.
+LTP is a famous test suite under Linux, We port LTP to Beaker
+every 4 months (+/-1 month if needed). You can use this testcase
+for RHEL/Fedora testing.
 
 What's this
 ===========
-This is a include testcase, you should include
-it in your own ltp projects.
+This is a include testcase, you should include it in your own ltp projects.
 
 HOW TO USE IT
 =============
 
-1. What you should put in your own Makefile:
+1. What you should put in your own shell script:
 
- - include /mnt/tests/kernel/distribution/ltp/include/ltp-make.include
+ - include /mnt/tests/kernel/distribution/ltp/include/ltp-make.sh
 
  - add "patch-inc" to patch section, i.e.:
    patch: patch-inc
@@ -28,7 +25,7 @@ HOW TO USE IT
    or if you are 100% sure you don't need generic patches, you can just
    add "patch-critical" to patch section.
 
- - add "build-basic" or "build-all" to build section, depends on you:
+ - add "build-all" to build section, depends on you:
    . are running a general test or cann't be sure which tests to build,
      you should add "build-all";
    . are 100% sure which sub tests you will build,

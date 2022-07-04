@@ -66,7 +66,6 @@ download_ltp()
     tar xjf ${TARGET}.tar.bz2 | tee -a $OUTPUTFILE
 }
 
-
 # Critical patches
 # 1. If a patch fixes installation issue
 # 2. a patch fixes critical issues (causing deadlock, crash, etc), no
@@ -219,8 +218,6 @@ setup-testarea()
 
 configure()
 {
-    setup-testarea
-    download_ltp
     #Patch-inc
     echo "============ Patch patch-inc-tolerant ==============" | tee -a $OUTPUTFILE
     patch-inc > patchinc.log 2>&1
@@ -236,23 +233,10 @@ configure()
     pushd ${TARGET}; make autotools; ./configure --prefix=${TARGET_DIR} &> configlog.txt || cat configlog.txt; popd
 }
 
-
-build-basic()
-{
-    configure
-    echo "============ Start make and install ============" | tee -a $OUTPUTFILE
-    ${MAKE} -C ${TARGET}/pan all
-    ${MAKE} -C ${TARGET}/pan install
-    ${MAKE} -C ${TARGET}/runtest install
-    ${MAKE} -C ${TARGET}/tools all
-    ${MAKE} -C ${TARGET}/tools install
-    ${MAKE} -C ${TARGET} Version
-    cd ${TARGET}; cp -f ver_linux Version runltp IDcheck.sh ${TARGET_DIR}/
-}
-
-
 build-all()
 {
+    setup-testarea
+    download_ltp
     configure
     echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
     timeout 20m ${MAKE} -C ${TARGET} all &> buildlog.txt
@@ -292,7 +276,5 @@ testconfigure()
 
 testfullbuild()
 {
-    download_ltp
-    patch-inc
     build-all
 }
