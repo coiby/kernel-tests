@@ -45,15 +45,15 @@ function rhel6_unfix_issues()
 	# Bug 1537371 - KEYS: prevent creating a different user's keyrings
 	osver_in_range "600" "611" && tskip "add_key03" unfix
 	# Bug 1477055 - add_key02.c:99: FAIL: unexpected error with key type 'user': EINVAL
-	osver_in_range "600" "610" && tskip "add_key02" unfix
+	osver_in_range "600" "611" && tskip "add_key02" unfix
 	# Bug 1323048 - Page fault is not avoidable by using madvise...
-	osver_in_range "600" "610" && tskip "madvise06" unfix
+	osver_in_range "600" "611" && tskip "madvise06" unfix
 	# disable signal06 until we backport df24fb859a4e200d, 66463db4fc5605d51c7bb
-	osver_in_range "600" "610" && tskip "signal06" unfix
+	osver_in_range "600" "611" && tskip "signal06" unfix
 	# Bug 1413025 - avc: denied { write } for pid=11089
-	osver_in_range "600" "610" && tskip "quotactl01" unfix
+	osver_in_range "600" "611" && tskip "quotactl01" unfix
 	# Bug 1412044 - sctp: fix -ENOMEM result with invalid
-	osver_in_range "600" "610" && tskip "sendto02" unfix
+	osver_in_range "600" "611" && tskip "sendto02" unfix
 	# Bug 1455546 - [RHEL6.9][kernel] LTP recvmsg03 test hangs
 	osver_in_range "600" "611" && tskip "recvmsg03.*" unfix
 	# Bug 1490308 - [LTP keyctl04] fix keyctl_set_reqkey_keyring() to not leak thread keyrings
