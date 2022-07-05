@@ -49,8 +49,8 @@ check_cpu_cgroup ()
 
     cpu_cgroup_mntpoint=$(mount | grep "type cgroup (.*cpu[,)]" | awk '{print $3}')
     if [ -z "$cpu_cgroup_mntpoint" ]; then
-        echo "Couldn't find cgroup mount point. Is system using cgroup2?" | tee -a $OUTPUTDIR
-        mount | grep cgroup | tee -a $OUTPUTDIR
+        echo "Couldn't find cgroup mount point. Is system using cgroup2?" | tee -a $OUTPUTFILE
+        mount | grep cgroup | tee -a $OUTPUTFILE
         return
     fi
 
