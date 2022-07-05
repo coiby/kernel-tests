@@ -133,6 +133,21 @@ patch-generic()
     fi
 }
 
+patch-lite()
+{
+    path_name=${PWD}
+    cur_dir=$(echo ${path_name##*/})
+    if [ "$cur_dir" != "lite" ]; then
+        return
+    fi
+
+    echo "============ Patch ltp-lite ============" | tee -a $OUTPUTFILE
+    cki_is_baremetal
+    #Patching, if non-baremetal
+    if [ $? -ne 0 ]; then
+        patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
+    fi
+}
 
 patch-cgroups()
 {
@@ -145,6 +160,7 @@ patch-inc()
 {
     patch-critical
     patch-generic
+    patch-lite
 }
 
 
@@ -215,7 +231,6 @@ setup-testarea()
     fi
 }
 
-
 configure()
 {
     #Patch-inc
@@ -223,12 +238,6 @@ configure()
     patch-inc > patchinc.log 2>&1
     cat patchinc.log | tee -a $OUTPUTFILE
 
-    echo "============ Patch ltp-lite test suite. ============" | tee -a $OUTPUTFILE
-    cki_is_baremetal
-    #Patching, if non-baremetal
-    if [ $? -ne 0 ]; then
-        patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
-    fi
     echo "============ Start configure ============" | tee -a $OUTPUTFILE
     pushd ${TARGET}; make autotools; ./configure --prefix=${TARGET_DIR} &> configlog.txt || cat configlog.txt; popd
 }
