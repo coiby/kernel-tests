@@ -37,7 +37,7 @@ HOW TO USE IT
          make -C $(TARGET)/testcases/kernel/mem/hugetlb all
          make -C $(TARGET)/testcases/kernel/mem/hugetlb install
 
- - add "distribution/ltp-upstream/include" as repoRequires in METADATA
+ - add "distribution/upstream/include" as repoRequires in METADATA
 
 2. What you should put in your own runtest.sh:
 
