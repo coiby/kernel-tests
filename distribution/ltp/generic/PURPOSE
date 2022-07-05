@@ -1,0 +1,30 @@
+PURPOSE of /kernel/distribution/ltp/generic
+Description: Linux Test Project Generic
+
+LTP Introduction
+================
+LTP is a famous test suite under Linux, I port LTP to Beaker every
+4 months (+/-1 month if needed). You can use this testcase for your
+RHEL testing.
+
+Parameters
+==========
+TESTARGS		LTP job file to run, see configs dir in git repo
+TEST_VERSION		Running a specific version of LTP other than the default
+FILTERTESTS		Running some specific testcases other than the default
+			e.g. FILTERTESTS="accept01 readahead01"
+SKIPTESTS		Specify test list that not run, seperated by space
+			e.g. SKIPTESTS="rename11 rename13"
+			useful to disable specific tests temporarily
+REPORT_FAILED_RESULT	Report each failed test to beaker if set to "yes"
+SKIP_LEVEL		0) - none of the knownissues will be skiped, only change
+			     from 'FAIL' to 'KNOW' in test log
+			1) - only skip the fatal knownissues, and mark the others
+			     from 'FAIL' to 'KNOW' in test log
+			     BTW, it'll go to this way if the 'SKIP_LEVEL' not set
+			2) - skip all of the knownissues on test system
+
+
+# Notes: SKIP_LEVEL is different to SKIPTESTS. SKIP_LEVEL is based on a script only
+	 to handle the known issues. And SKIPTESTS is used to skip general case in
+	 ltp/generic test suit.
