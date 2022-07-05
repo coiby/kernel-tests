@@ -26,12 +26,6 @@ function test_build()
 
 function fetch_testcase()
 {
-	# There are some new testcase added to LTP but not included
-	# in this release yet, you probably don't want to include it
-	# into Tier1 or Tier2 since it's not very stable, but QE will
-	# run them for our own purpose.
-	cp -f ../include/stagecase $LTPDIR/runtest/
-
 	if [ "$TESTARGS" ]; then
 		# We can specify lists of tests to run. If the list file provided,
 		# copy/replace it. For example, we can provide a customized list of
