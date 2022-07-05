@@ -110,7 +110,11 @@ function rhel7_unfix_issues()
 	osver_in_range "700" "710" && tskip "quotactl07" unfix
 	# Missing commit dd83c161fbcc in RHEL7
 	osver_in_range "700" "710" && tskip "wait403" unfix
-	# Missing commit 01ea173e103e ("xfs: fix up non-directory creation in SGID directories") in RHEL7
+	# Missing commit 39d637af5aa7, 032146cda855 in RHEL7
+	osver_in_range "700" "710" && tskip "finit_module02" unfix
+	# Missing commit 7e08da50cf70 in RHEL7
+	osver_in_range "700" "710" && tskip "quotactl06" unfix
+	# wontfix bz1366788 in RHEL7 - Missing commit 01ea173e103e ("xfs: fix up non-directory creation in SGID directories") in RHEL7
 	tskip "creat09" unfix
 }
 

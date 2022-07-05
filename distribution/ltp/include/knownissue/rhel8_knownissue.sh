@@ -13,10 +13,14 @@ function rhel8_fatal_issues()
 	osver_in_range "800" "803" && tskip "proc01" fatal
 	# BZ 2068338 - [FJ8.6 Bug]: system crash happened due to a use-after-free at VT_RESIZEX ioctl()
 	osver_in_range "800" "807" && tskip "pty07" fatal
+	# Bug 2101733 - ltp/lite - pty06 fail
+	kernel_in_range "0" "4.18.0-261.el8" && tskip "pty06" fixed
 }
 
 function rhel8_unfix_issues()
 {
+	# Bug 1937519 - [HPE 8.4 Bug] madvise page faults - ltp
+	osver_in_range "800" "808" && tskip "madvise06" unfix
 	# Bug 2040615 - finit_module02.c:122: TFAIL: TestName: file-not-readable expected EBADF: ETXTBSY
 	osver_in_range "800" "808" && tskip "finit_module02" unfix
 	# Bug 1945052 - CVE-2021-3444 kernel: bpf verifier incorrect mod32 truncation
