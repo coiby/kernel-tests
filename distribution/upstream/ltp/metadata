@@ -8,7 +8,8 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=git;automake;autoconf;procmail;flex;bison;rsyslog;util-linux;rpm-build;gcc;wget;bc;libaio-devel;libcap-devel;libcgroup;strace;libattr-devel;bzip2
-softDependencies=numactl;numactl-devel;redhat-lsb;ntpdate;chrony;e2fsprogs;e4fsprogs;xfsprogs;btrfs-progs;ethtool;sysstat;mkisofs;genisoimage
+max_time=180m
+dependencies=git;automake;autoconf;procmail;flex;bison;rsyslog;util-linux;rpm-build;gcc;wget;bc;libaio-devel;libcap-devel;strace;libattr-devel;bzip2
+softDependencies=numactl;numactl-devel;redhat-lsb;ntpdate;chrony;e2fsprogs;e4fsprogs;xfsprogs;btrfs-progs;ethtool;sysstat;mkisofs;genisoimage;libcgroup
 repoRequires=distribution/upstream/include;cki_lib
 environment=AVC_ERROR=+no_avc_check
