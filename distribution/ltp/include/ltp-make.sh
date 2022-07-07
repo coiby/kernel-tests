@@ -1,5 +1,11 @@
 #!/bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
+#   Copyright Red Hat, Inc
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #TEST_VERSION can override the default
 TESTVERSION=$TEST_VERSION
@@ -59,7 +65,6 @@ download_ltp()
     echo "============ Unzip package ============" | tee -a $OUTPUTFILE
     tar xjf ${TARGET}.tar.bz2 | tee -a $OUTPUTFILE
 }
-
 
 # Critical patches
 # 1. If a patch fixes installation issue
@@ -128,6 +133,21 @@ patch-generic()
     fi
 }
 
+patch-lite()
+{
+    path_name=${PWD}
+    cur_dir=$(echo ${path_name##*/})
+    if [ "$cur_dir" != "lite" ]; then
+        return
+    fi
+
+    echo "============ Patch ltp-lite ============" | tee -a $OUTPUTFILE
+    cki_is_baremetal
+    #Patching, if non-baremetal
+    if [ $? -ne 0 ]; then
+        patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
+    fi
+}
 
 patch-cgroups()
 {
@@ -140,6 +160,7 @@ patch-inc()
 {
     patch-critical
     patch-generic
+    patch-lite
 }
 
 
@@ -210,43 +231,21 @@ setup-testarea()
     fi
 }
 
-
 configure()
 {
-    setup-testarea
-    download_ltp
     #Patch-inc
     echo "============ Patch patch-inc-tolerant ==============" | tee -a $OUTPUTFILE
     patch-inc > patchinc.log 2>&1
     cat patchinc.log | tee -a $OUTPUTFILE
 
-    echo "============ Patch ltp-lite test suite. ============" | tee -a $OUTPUTFILE
-    cki_is_baremetal
-    #Patching, if non-baremetal
-    if [ $? -ne 0 ]; then
-        patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
-    fi
     echo "============ Start configure ============" | tee -a $OUTPUTFILE
     pushd ${TARGET}; make autotools; ./configure --prefix=${TARGET_DIR} &> configlog.txt || cat configlog.txt; popd
 }
 
-
-build-basic()
-{
-    configure
-    echo "============ Start make and install ============" | tee -a $OUTPUTFILE
-    ${MAKE} -C ${TARGET}/pan all
-    ${MAKE} -C ${TARGET}/pan install
-    ${MAKE} -C ${TARGET}/runtest install
-    ${MAKE} -C ${TARGET}/tools all
-    ${MAKE} -C ${TARGET}/tools install
-    ${MAKE} -C ${TARGET} Version
-    cd ${TARGET}; cp -f ver_linux Version runltp IDcheck.sh ${TARGET_DIR}/
-}
-
-
 build-all()
 {
+    setup-testarea
+    download_ltp
     configure
     echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
     timeout 20m ${MAKE} -C ${TARGET} all &> buildlog.txt
@@ -286,7 +285,5 @@ testconfigure()
 
 testfullbuild()
 {
-    download_ltp
-    patch-inc
     build-all
 }

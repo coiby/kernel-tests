@@ -1,0 +1,12 @@
+#Lite version of CGROUP test for KT1 testing
+cgroup_regression cgroup_regression_test.sh
+memcg_regression memcg_regression_test.sh
+memcg_function memcg_function_test.sh
+memcg_control PAGESIZE=$(mem_process -p);memcg_control_test.sh $PAGESIZE $PAGESIZE $((PAGESIZE * 2))
+#the ones below were picked from test_controller.sh
+cpuctl_test_4 run_cpuctl_test.sh 4;
+cpuctl_stress_test_6 run_cpuctl_stress_test.sh 6;
+memctl_test_2 run_memctl_test.sh 2;
+cpuset_test_1 run_cpuset_test.sh 1;
+cpuacct_test_1 run_cpuacct_test.sh 1;
+

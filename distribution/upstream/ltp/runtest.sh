@@ -9,16 +9,12 @@
 . ../include/knownissue.sh		|| exit 1
 
 # VMs can have slow performance, therefore increase LTP_TIMEOUT_MUL
-if  cki_is_vm; then
-	export LTP_TIMEOUT_MUL=2
-fi
+cki_is_vm && export LTP_TIMEOUT_MUL=2
 
 # debug kernel is slower increase LTP_TIMEOUT_MUL
 # upstream kernels don't contain _debug on kernel name,
 # check for common debug flag options
-if  cki_has_kernel_debug_flags; then
-	export LTP_TIMEOUT_MUL=2
-fi
+cki_has_kernel_debug_flags && export LTP_TIMEOUT_MUL=2
 
 TARGET_DIR=/mnt/testarea/ltp
 RUNTESTS=${RUNTESTS:-"cve sched syscalls can commands containers dio fs fsx math hugetlb mm nptl pty ipc tracing"}
@@ -89,37 +85,37 @@ function ltp_test_build()
 
 function hugetlb_nr_setup()
 {
-		grep -q hugetlbfs /proc/filesystems || return
-		echo 3 >/proc/sys/vm/drop_caches
-		echo 1 >/proc/sys/vm/compact_memory
+	grep -q hugetlbfs /proc/filesystems || return
+	echo 3 >/proc/sys/vm/drop_caches
+	echo 1 >/proc/sys/vm/compact_memory
 
-		cat hugetlb.inc > hugetlb
+	cat hugetlb.inc > hugetlb
 
-		mem_alloc=0
-		hpagesize=$(echo `grep 'Hugepagesize:' /proc/meminfo | awk '{print $2}'` / 1024 | bc)
+	mem_alloc=0
+	hpagesize=$(echo `grep 'Hugepagesize:' /proc/meminfo | awk '{print $2}'` / 1024 | bc)
 
-		test_msg log "Calculate memory to be reserved for hugepages" | tee -a ${OUTPUTFILE}
-		[ $MEM_AVAILABLE -gt 512 ] && mem_alloc=512
-		[ "${ARCH}" = "s390x" ] && [ $MEM_AVAILABLE -gt 128 ] && mem_alloc=128 # only allocate 128MB on s390x
+	test_msg log "Calculate memory to be reserved for hugepages" | tee -a ${OUTPUTFILE}
+	[ $MEM_AVAILABLE -gt 512 ] && mem_alloc=512
+	[ "${ARCH}" = "s390x" ] && [ $MEM_AVAILABLE -gt 128 ] && mem_alloc=128 # only allocate 128MB on s390x
 
-		[ $mem_alloc -eq 0 ] && RUNTESTS=${RUNTESTS//hugetlb} &&
-			test_msg log "Removing hugetlb test (Mem_Available is too low to test)" && return
+	[ $mem_alloc -eq 0 ] && RUNTESTS=${RUNTESTS//hugetlb} &&
+		test_msg log "Removing hugetlb test (Mem_Available is too low to test)" && return
 
-		nr_hpage=$(echo $mem_alloc / $hpagesize | bc)
-		sed -i "s/#nr_hpage#/$nr_hpage/g" hugetlb
+	nr_hpage=$(echo $mem_alloc / $hpagesize | bc)
+	sed -i "s/#nr_hpage#/$nr_hpage/g" hugetlb
 
-		# hugemmap05 test is a little different
-		mem_alloc_overcommit=$(echo $MEM_AVAILABLE / 10 | bc)
-		# reserve mem_alloc_overcommit for hugepage_size = 512MB system(eg. rhel_alt aarch64)
-		[ "$mem_alloc_overcommit" -gt "64" ] && [ "x${hpagesize}" != "x512" ] && mem_alloc_overcommit=64
-		nr_hugemmap5=$(echo $mem_alloc_overcommit / $hpagesize | bc)
-		sed -i "s/#size#/${nr_hugemmap5}/g" hugetlb
+	# hugemmap05 test is a little different
+	mem_alloc_overcommit=$(echo $MEM_AVAILABLE / 10 | bc)
+	# reserve mem_alloc_overcommit for hugepage_size = 512MB system(eg. rhel_alt aarch64)
+	[ "$mem_alloc_overcommit" -gt "64" ] && [ "x${hpagesize}" != "x512" ] && mem_alloc_overcommit=64
+	nr_hugemmap5=$(echo $mem_alloc_overcommit / $hpagesize | bc)
+	sed -i "s/#size#/${nr_hugemmap5}/g" hugetlb
 
-		# hugemmap06 need more than 255 hugepages
-		nr_hugemmap6=$(echo $MEM_AVAILABLE / $hpagesize | bc)
-		[ "$nr_hugemmap6" -lt "256" ] && sed -i "s/hugemmap06//g" hugetlb
+	# hugemmap06 need more than 255 hugepages
+	nr_hugemmap6=$(echo $MEM_AVAILABLE / $hpagesize | bc)
+	[ "$nr_hugemmap6" -lt "256" ] && sed -i "s/hugemmap06//g" hugetlb
 
-		mv -f hugetlb $LTPDIR/runtest
+	mv -f hugetlb $LTPDIR/runtest
 }
 
 function hugetlb_test_pre()

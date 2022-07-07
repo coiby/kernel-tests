@@ -1,30 +1,11 @@
 #!/bin/bash
-# vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /kernel/distribution/ltp/include
-#   Description: Linux Test Project - include part
-#   Author: Caspar Zhang <czhang@redhat.com>
+#   Copyright Red Hat, Inc
 #
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
-#   Copyright (c) 2011 Red Hat, Inc. All rights reserved.
-#
-#   This copyrighted material is made available to anyone wishing
-#   to use, modify, copy, or redistribute it subject to the terms
-#   and conditions of the GNU General Public License version 2.
-#
-#   This program is distributed in the hope that it will be
-#   useful, but WITHOUT ANY WARRANTY; without even the implied
-#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#   PURPOSE. See the GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public
-#   License along with this program; if not, write to the Free
-#   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-#   Boston, MA 02110-1301, USA.
-#
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Source the common test script helpers
 . ../../../cki_lib/libcki.sh || exit 1
@@ -68,8 +49,8 @@ check_cpu_cgroup ()
 
     cpu_cgroup_mntpoint=$(mount | grep "type cgroup (.*cpu[,)]" | awk '{print $3}')
     if [ -z "$cpu_cgroup_mntpoint" ]; then
-        echo "Couldn't find cgroup mount point. Is system using cgroup2?" | tee -a $OUTPUTDIR
-        mount | grep cgroup | tee -a $OUTPUTDIR
+        echo "Couldn't find cgroup mount point. Is system using cgroup2?" | tee -a $OUTPUTFILE
+        mount | grep cgroup | tee -a $OUTPUTFILE
         return
     fi
 

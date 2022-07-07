@@ -1,5 +1,5 @@
 [General]
-name=/kernel/distribution/ltp-upstream/include
+name=/kernel/distribution/upstream/include
 owner=MM-QE@redhat.com
 description=Linux Test Project - include
 license=GPLv3

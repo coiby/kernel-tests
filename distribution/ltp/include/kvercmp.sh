@@ -1,4 +1,11 @@
 #!/bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright Red Hat, Inc
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 kver_ret=0
 function kvercmp()

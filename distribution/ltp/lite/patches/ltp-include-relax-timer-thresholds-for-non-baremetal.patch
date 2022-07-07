@@ -1,13 +1,26 @@
+From b2c20a5a0b1b5c5ee678fdebe8b084469a82fbc6 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 5 Jul 2022 10:44:06 +0800
+Subject: ltp-include-relax-timer-thresholds-for-non-baremetal
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+---
+ lib/tst_timer_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/lib/tst_timer_test.c b/lib/tst_timer_test.c
-index cd4ebcaa89e0..c08b7cadb385 100644
+index ef9b24d11..84ffa0661 100644
 --- a/lib/tst_timer_test.c
 +++ b/lib/tst_timer_test.c
-@@ -194,7 +194,7 @@ static int cmp(const void *a, const void *b)
+@@ -184,7 +184,7 @@ static int cmp(const void *a, const void *b)
  static long long compute_threshold(long long requested_us,
  				   unsigned int nsamples)
  {
--	unsigned int slack_per_scall = MIN(100000, requested_us / 1000);
+-	unsigned int slack_per_scall = MIN(100000LL, requested_us / 1000);
 +	unsigned int slack_per_scall = requested_us / 100;
  
  	slack_per_scall = MAX(slack_per_scall, timerslack);
  
+-- 
+2.36.1
+

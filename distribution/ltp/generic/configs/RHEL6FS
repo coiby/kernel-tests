@@ -1,0 +1,991 @@
+#Added-by: Igor Zhang <yugzhang@redhat.com>
+
+#DESCRIPTION:Filesystem stress tests
+gf01 growfiles -W gf01 -b -e 1 -u -i 0 -L 20 -w -C 1 -l -I r -T 10 -f glseek20 -S 2 -d $TMPDIR
+gf02 growfiles -W gf02 -b -e 1 -L 10 -i 100 -I p -S 2 -u -f gf03_ -d $TMPDIR
+gf03 growfiles -W gf03 -b -e 1 -g 1 -i 1 -S 150 -u -f gf05_ -d $TMPDIR
+gf04 growfiles -W gf04 -b -e 1 -g 4090 -i 500 -t 39000 -u -f gf06_ -d $TMPDIR
+gf05 growfiles -W gf05 -b -e 1 -g 5000 -i 500 -t 49900 -T10 -c9 -I p -u -f gf07_ -d $TMPDIR
+gf06 growfiles -W gf06 -b -e 1 -u -r 1-5000 -R 0--1 -i 0 -L 30 -C 1 -f g_rand10 -S 2 -d $TMPDIR
+gf07 growfiles -W gf07 -b -e 1 -u -r 1-5000 -R 0--2 -i 0 -L 30 -C 1 -I p -f g_rand13 -S 2 -d $TMPDIR
+gf08 growfiles -W gf08 -b -e 1 -u -r 1-5000 -R 0--2 -i 0 -L 30 -C 1 -f g_rand11 -S 2 -d $TMPDIR
+gf09 growfiles -W gf09 -b -e 1 -u -r 1-5000 -R 0--1 -i 0 -L 30 -C 1 -I p -f g_rand12 -S 2 -d $TMPDIR
+gf10 growfiles -W gf10 -b -e 1 -u -r 1-5000 -i 0 -L 30 -C 1 -I l -f g_lio14 -S 2 -d $TMPDIR
+gf11 growfiles -W gf11 -b -e 1 -u -r 1-5000 -i 0 -L 30 -C 1 -I L -f g_lio15 -S 2 -d $TMPDIR
+gf12 mkfifo $TMPDIR/gffifo17; growfiles -b -W gf12 -e 1 -u -i 0 -L 30 $TMPDIR/gffifo17
+gf13 mkfifo $TMPDIR/gffifo18; growfiles -b -W gf13 -e 1 -u -i 0 -L 30 -I r -r 1-4096 $TMPDIR/gffifo18
+gf14 growfiles -W gf14 -b -e 1 -u -i 0 -L 20 -w -l -C 1 -T 10 -f glseek19 -S 2 -d $TMPDIR
+gf15 growfiles -W gf15 -b -e 1 -u -r 1-49600 -I r -u -i 0 -L 120 -f Lgfile1 -d $TMPDIR
+gf16 growfiles -W gf16 -b -e 1 -i 0 -L 120 -u -g 4090 -T 101 -t 408990 -l -C 10 -c 1000 -S 10 -f Lgf02_ -d $TMPDIR
+gf17 growfiles -W gf17 -b -e 1 -i 0 -L 120 -u -g 5000 -T 101 -t 499990 -l -C 10 -c 1000 -S 10 -f Lgf03_ -d $TMPDIR
+gf18 growfiles -W gf18 -b -e 1 -i 0 -L 120 -w -u -r 10-5000 -I r -l -S 2 -f Lgf04_ -d $TMPDIR
+gf19 growfiles -W gf19 -b -e 1 -g 5000 -i 500 -t 49900 -T10 -c9 -I p -o O_RDWR,O_CREAT,O_TRUNC -u -f gf08i_ -d $TMPDIR
+gf20 growfiles -W gf20 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -r 1-256000:512 -R 512-256000 -T 4 -f gfbigio-$$ -d $TMPDIR
+
+gf21 growfiles -W gf21 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -g 20480 -T 10 -t 20480 -f gf-bld-$$ -d $TMPDIR
+gf22 growfiles -W gf22 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -g 20480 -T 10 -t 20480 -f gf-bldf-$$ -d $TMPDIR
+gf23 growfiles -W gf23 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -r 512-64000:1024 -R 1-384000 -T 4 -f gf-inf-$$ -d $TMPDIR
+gf24 growfiles -W gf24 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -g 20480 -f gf-jbld-$$ -d $TMPDIR
+gf25 growfiles -W gf25 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -r 1024000-2048000:2048 -R 4095-2048000 -T 1 -f gf-large-gs-$$ -d $TMPDIR
+gf26 growfiles -W gf26 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -r 128-32768:128 -R 512-64000 -T 4 -f gfsmallio-$$ -d $TMPDIR
+gf27 growfiles -W gf27 -b -D 0 -w -g 8b -C 1 -b -i 1000 -u -f gfsparse-1-$$ -d $TMPDIR
+gf28 growfiles -W gf28 -b -D 0 -w -g 16b -C 1 -b -i 1000 -u -f gfsparse-2-$$ -d $TMPDIR
+gf29 growfiles -W gf29 -b -D 0 -r 1-4096 -R 0-33554432 -i 0 -L 60 -C 1 -u -f gfsparse-3-$$ -d $TMPDIR
+gf30 growfiles -W gf30 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -o O_RDWR,O_CREAT,O_SYNC -g 20480 -T 10 -t 20480 -f gf-sync-$$ -d $TMPDIR
+rwtest01 export LTPROOT; rwtest -N rwtest01 -c -q -i 60s  -f sync 10%25000:$TMPDIR/rw-sync-$$
+rwtest02 export LTPROOT; rwtest -N rwtest02 -c -q -i 60s  -f buffered 10%25000:$TMPDIR/rw-buffered-$$
+rwtest03 export LTPROOT; rwtest -N rwtest03 -c -q -i 60s -n 2  -f buffered -s mmread,mmwrite -m random -Dv 10%25000:$TMPDIR/mm-buff-$$
+rwtest04 export LTPROOT; rwtest -N rwtest04 -c -q -i 60s -n 2  -f sync -s mmread,mmwrite -m random -Dv 10%25000:$TMPDIR/mm-sync-$$
+rwtest05 export LTPROOT; rwtest -N rwtest05 -c -q -i 50 -T 64b 500b:$TMPDIR/rwtest01%f
+
+#must be run as root
+iogen01 iogen -i 120s -s read,write 500b:doio.f1.$$ 1000b:doio.f2.$$ | doio -akv -n 2
+iogen01 export LTPROOT; rwtest -N iogen01 -i 120s -s read,write -Da -Dv -n 2 500b:doio.f1.$$ 1000b:doio.f2.$$
+
+fs_inod01 fs_inod $TMPDIR 10 10 1
+fs_inod01 fs_inod $TMPDIR 10 10 10
+linker01 linktest.sh 1000 1000
+openfile01 openfile -f10 -t10
+inode01 inode01
+inode02 inode02
+stream01 stream01
+stream02 stream02
+stream03 stream03
+stream04 stream04
+stream05 stream05
+ftest01 ftest01
+ftest02 ftest02
+ftest03 ftest03
+ftest04 ftest04
+ftest05 ftest05
+ftest06 ftest06
+ftest07 ftest07
+ftest08 ftest08
+
+lftest01	lftest 100
+writetest01	writetest
+
+#Also run the fs_di (Data Integrity tests)
+fs_di fs_di -d $TMPDIR
+
+#
+# These tests are setting file permissions/group/uid and are trying to
+# open/write/execute the file.
+#
+# fs_perms file_mode file_uid file_gid test_uid test_gid mode (r|w|x) expected_result
+# We are executing shell script, thuss
+# both exec and read right is needed.
+fs_perms01 fs_perms 005 99 99 12 100 x 0
+fs_perms02 fs_perms 050 99 99 200 99 x 0
+fs_perms03 fs_perms 500 99 99 99 500 x 0
+fs_perms04 fs_perms 002 99 99 12 100 w 0
+fs_perms05 fs_perms 020 99 99 200 99 w 0
+fs_perms06 fs_perms 200 99 99 99 500 w 0
+fs_perms07 fs_perms 004 99 99 12 100 r 0
+fs_perms08 fs_perms 040 99 99 200 99 r 0
+fs_perms09 fs_perms 400 99 99 99 500 r 0
+fs_perms10 fs_perms 000 99 99 99 99  r 1
+fs_perms11 fs_perms 000 99 99 99 99  w 1
+fs_perms12 fs_perms 000 99 99 99 99  x 1
+fs_perms13 fs_perms 010 99 99 99 500 x 1
+fs_perms14 fs_perms 100 99 99 200 99 x 1
+fs_perms15 fs_perms 020 99 99 99 500 w 1
+fs_perms16 fs_perms 200 99 99 200 99 w 1
+fs_perms17 fs_perms 040 99 99 99 500 r 1
+fs_perms18 fs_perms 400 99 99 200 99 r 1
+
+# Read every file in /proc. Not likely to crash, but does enough 
+# to disturb the kernel. A good kernel latency killer too.
+# Was not sure why it should reside in runtest/crashme and won´t get tested ever
+# Limit read max to 128M, /proc/kpageflags read all zeros
+proc01 proc01 -m 128
+
+#Run the File System Race Condition Check tests as well
+fs_racer fs_racer.sh -t 5
+
+#Run the Quota Remount Test introduced in linux-2.6.26
+quota_remount_test01 quota_remount_test01.sh
+#DESCRIPTION:Bind mounts and shared subtrees
+BindMounts	$LTPROOT/testscripts/test_fs_bind.sh
+
+fsx-linux export TCbin=$LTPROOT/testcases/bin;fsxtest02 10000
+# fsx-fstype broken tests
+#fsx-ext2 fsxtest $SCRATCHDEV ext2 10000
+#fsx-ext3 fsxtest $SCRATCHDEV ext3 10000
+#fsx-xfs  fsxtest $SCRATCHDEV xfs 10000
+
+chdir01 chdir01
+chdir01A symlink01 -T chdir01
+chdir02 chdir02
+chdir03 chdir03
+chdir04 chdir04
+
+chmod01 chmod01
+chmod01A symlink01 -T chmod01
+chmod02 chmod02
+chmod03 chmod03
+chmod04 chmod04
+chmod05 chmod05
+chmod06 chmod06
+chmod07 chmod07
+
+chown01 chown01
+chown01_16 chown01_16
+chown02 chown02
+chown02_16 chown02_16
+chown03 chown03
+chown03_16 chown03_16
+chown04 chown04
+chown04_16 chown04_16
+chown05 chown05
+chown05_16 chown05_16
+
+close01 close01
+close02 close02
+close08 close08
+
+creat01 creat01
+creat03 creat03
+creat04 creat04
+creat05 creat05
+creat06 creat06
+creat07 creat07
+creat08 creat08
+
+dup01 dup01
+dup02 dup02
+dup03 dup03
+dup04 dup04
+dup05 dup05
+dup06 dup06
+dup07 dup07
+
+dup201 dup201
+dup202 dup202
+dup203 dup203
+dup204 dup204
+dup205 dup205
+
+dup3_01 dup3_01
+dup3_02 dup3_02
+
+epoll_create1_01 epoll_create1_01
+epoll01 epoll-ltp
+epoll_ctl01 epoll_ctl01
+epoll_ctl02 epoll_ctl02
+epoll_wait01 epoll_wait01
+epoll_wait02 epoll_wait02
+epoll_wait03 epoll_wait03
+epoll_pwait01 epoll_pwait01
+
+eventfd01 eventfd01
+
+eventfd2_01 eventfd2_01
+eventfd2_02 eventfd2_02
+eventfd2_03 eventfd2_03
+
+execl01 execl01
+execle01 execle01
+execlp01 execlp01
+
+execv01 execv01
+execve01 execve01
+execve02 execve02
+execve03 execve03
+execve04 execve04
+execve05 execve05 20 $LTPROOT/testcases/bin/execve05 $LTPROOT/testcases/bin/execve05 4
+execvp01 execvp01
+
+exit01 exit01
+exit02 exit02
+
+exit_group01 exit_group01
+
+#faccessat test cases
+faccessat01 faccessat01
+
+# access tests
+access01 access01
+access02 access02
+access03 access03
+access04 access04
+
+#fallocate test cases
+fallocate01 fallocate01
+fallocate02 fallocate02
+fallocate03 fallocate03
+fallocate04 fallocate04
+
+#posix_fadvise test cases
+posix_fadvise01                      posix_fadvise01
+posix_fadvise01_64                posix_fadvise01_64
+posix_fadvise02                      posix_fadvise02
+posix_fadvise02_64                posix_fadvise02_64
+posix_fadvise03                      posix_fadvise03
+posix_fadvise03_64                posix_fadvise03_64
+posix_fadvise04                      posix_fadvise04
+posix_fadvise04_64                posix_fadvise04_64
+
+fchdir01 fchdir01
+fchdir02 fchdir02
+fchdir03 fchdir03
+
+fchmod01 fchmod01
+fchmod02 fchmod02
+fchmod03 fchmod03
+fchmod04 fchmod04
+fchmod05 fchmod05
+fchmod06 fchmod06
+fchmod07 fchmod07
+
+#fchmodat test cases
+fchmodat01 fchmodat01
+
+fchown01 fchown01
+fchown01_16 fchown01_16
+fchown02 fchown02
+fchown02_16 fchown02_16
+fchown03 fchown03
+fchown03_16 fchown03_16
+fchown04 fchown04
+fchown04_16 fchown04_16
+fchown05 fchown05
+fchown05_16 fchown05_16
+
+#fchownat test case
+fchownat01 fchownat01
+fchownat02 fchownat02
+
+fcntl01 fcntl01
+fcntl01_64 fcntl01_64
+fcntl02 fcntl02
+fcntl02_64 fcntl02_64
+fcntl03 fcntl03
+fcntl03_64 fcntl03_64
+fcntl04 fcntl04
+fcntl04_64 fcntl04_64
+fcntl05 fcntl05
+fcntl05_64 fcntl05_64
+fcntl06 fcntl06
+fcntl06_64 fcntl06_64
+fcntl07 fcntl07
+fcntl07_64 fcntl07_64
+fcntl08 fcntl08
+fcntl08_64 fcntl08_64
+fcntl09 fcntl09
+fcntl09_64 fcntl09_64
+fcntl10 fcntl10
+fcntl10_64 fcntl10_64
+fcntl11 fcntl11
+fcntl11_64 fcntl11_64
+fcntl12 fcntl12
+fcntl12_64 fcntl12_64
+fcntl13 fcntl13
+fcntl13_64 fcntl13_64
+fcntl14 fcntl14
+fcntl14_64 fcntl14_64
+fcntl15 fcntl15
+fcntl15_64 fcntl15_64
+fcntl16 fcntl16
+fcntl16_64 fcntl16_64
+fcntl17 fcntl17
+fcntl17_64 fcntl17_64
+fcntl18 fcntl18
+fcntl18_64 fcntl18_64
+fcntl19 fcntl19
+fcntl19_64 fcntl19_64
+fcntl20 fcntl20
+fcntl20_64 fcntl20_64
+fcntl21 fcntl21
+fcntl21_64 fcntl21_64
+fcntl22 fcntl22
+fcntl22_64 fcntl22_64
+fcntl23 fcntl23
+fcntl23_64 fcntl23_64
+fcntl24 fcntl24
+fcntl24_64 fcntl24_64
+fcntl25 fcntl25
+fcntl25_64 fcntl25_64
+fcntl26 fcntl26
+fcntl26_64 fcntl26_64
+fcntl27 fcntl27
+fcntl27_64 fcntl27_64
+fcntl28 fcntl28
+fcntl28_64 fcntl28_64
+fcntl29_64 fcntl29_64
+fcntl29 fcntl29
+fcntl30 fcntl30
+fcntl30_64 fcntl30_64
+fcntl31 fcntl31
+fcntl31_64 fcntl31_64
+fcntl32 fcntl32
+fcntl32_64 fcntl32_64
+fcntl33 fcntl33
+fcntl33_64 fcntl33_64
+fcntl34 fcntl34
+fcntl34_64 fcntl34_64
+
+fdatasync01 fdatasync01
+fdatasync02 fdatasync02
+
+flock01 flock01
+flock02 flock02
+flock03 flock03
+flock04 flock04
+flock05 flock05
+flock06 flock06
+
+fmtmsg01 fmtmsg01
+
+fpathconf01 fpathconf01
+
+fstat01 fstat01
+fstat01_64 fstat01_64
+fstat02 fstat02
+fstat02_64 fstat02_64
+fstat03 fstat03
+fstat03_64 fstat03_64
+fstat05 fstat05
+fstat05_64 fstat05_64
+
+#fstatat64/newfstatat test cases
+fstatat01 fstatat01
+
+fstatfs01 fstatfs01
+fstatfs01_64 fstatfs01_64
+fstatfs02 fstatfs02
+fstatfs02_64 fstatfs02_64
+
+fsync01 fsync01
+fsync02 fsync02
+fsync03 fsync03
+
+ftruncate01 ftruncate01
+ftruncate01_64 ftruncate01_64
+ftruncate02 ftruncate02
+ftruncate02_64 ftruncate02_64
+ftruncate03 ftruncate03
+ftruncate03_64 ftruncate03_64
+ftruncate04 ftruncate04
+ftruncate04_64 ftruncate04_64
+
+#futimesat test cases
+#futimesat01 futimesat01
+
+#getcontext01 getcontext01
+
+#getcpu01 getcpu01
+
+getcwd01 getcwd01
+getcwd02 getcwd02
+getcwd03 getcwd03
+getcwd04 getcwd04
+
+getdents01 getdents01
+getdents01_64 getdents01 -l
+getdents02 getdents02
+getdents02_64 getdents02 -l
+
+
+#Needs tty device.
+#ioctl01 ioctl01 -D /dev/tty0
+#ioctl02 ioctl02 -D /dev/tty0
+
+# Introducing ioctl tests for all /dev/tty* devices
+ioctl01_02   test_ioctl
+ioctl03      ioctl03
+ioctl test_ioctl
+
+inotify_init1_01 inotify_init1_01
+inotify_init1_02 inotify_init1_02
+
+inotify01 inotify01
+inotify02 inotify02
+inotify03 inotify03
+inotify04 inotify04
+inotify05 inotify05
+inotify06 inotify06
+
+fanotify01 fanotify01
+fanotify02 fanotify02
+fanotify03 fanotify03
+fanotify04 fanotify04
+fanotify05 fanotify05
+fanotify06 fanotify06
+
+ioperm01 ioperm01
+ioperm02 ioperm02
+
+iopl01 iopl01
+iopl02 iopl02
+
+io_cancel01 io_cancel01
+io_destroy01 io_destroy01
+io_getevents01 io_getevents01
+io_setup01 io_setup01
+io_submit01 io_submit01
+
+lchown01 lchown01
+lchown01_16 lchown01_16
+lchown02_16 lchown02_16
+lchown02 lchown02
+lchown03 lchown03
+lchown03_16 lchown03_16
+
+lgetxattr01 lgetxattr01
+lgetxattr02 lgetxattr02
+
+link01 symlink01 -T link01
+link02 link02
+link03 link03
+link04 link04
+link05 link05
+link06 link06
+link07 link07
+link08 link08
+
+#linkat test cases
+linkat01 linkat01
+linkat02 linkat02
+
+listen01 listen01
+
+llseek01 llseek01
+llseek02 llseek02
+llseek03 llseek03
+
+lseek01 lseek01
+lseek02 lseek02
+lseek03 lseek03
+lseek04 lseek04
+lseek05 lseek05
+lseek06 lseek06
+lseek07 lseek07
+lseek08 lseek08
+lseek09 lseek09
+lseek10 lseek10
+
+lstat01A symlink01 -T lstat01
+lstat01A_64 symlink01 -T lstat01_64
+lstat01 lstat01
+lstat01_64 lstat01_64
+lstat02 lstat02
+lstat02_64 lstat02_64
+lstat03 lstat03
+lstat03_64 lstat03_64
+
+mkdir01 mkdir01
+mkdir02 mkdir02
+mkdir03 mkdir03
+mkdir04 mkdir04
+mkdir05 mkdir05
+mkdir05A symlink01 -T mkdir05
+mkdir08 mkdir08
+mkdir09 mkdir09
+
+#mkdirat test cases
+mkdirat01 mkdirat01
+mkdirat02 mkdirat02
+mkdir_tests01 mkdir_tests.sh
+
+mknod01 mknod01
+mknod02 mknod02
+mknod03 mknod03
+mknod04 mknod04
+mknod05 mknod05
+mknod06 mknod06
+mknod07 mknod07
+mknod08 mknod08
+mknod09 mknod09
+
+#mknodat test cases
+mknodat01 mknodat01
+mknodat02 mknodat02
+
+qmm01 mmap001 -m 1
+mmap01 mmap01
+mmap02 mmap02
+mmap03 mmap03
+mmap04 mmap04
+mmap05 mmap05
+mmap06 mmap06
+mmap07 mmap07
+mmap08 mmap08
+mmap09 mmap09
+mmap10_1 mmap10 -a
+mmap10_2 mmap10 -s
+mmap10_3 mmap10 -a -s
+mmap10_4 mmap10 -a -s -i 60
+mmap10 mmap10
+# test is broken, mask it for now.
+#mmap11 mmap11 -i 30000
+mmap12 mmap12
+mmap13 mmap13
+mmap14 mmap14
+mmap15 mmap15
+mmap16 mmap16
+
+modify_ldt01 modify_ldt01
+modify_ldt02 modify_ldt02
+modify_ldt03 modify_ldt03
+
+#
+# These tests require an unmounted block device
+# to run correctly. Please see individual test
+# code for more information.
+#
+mount01 mount01
+mount02 mount02
+mount03 mount03
+mount04 mount04
+mount05 mount05
+mount06 mount06
+
+msync01 msync01
+msync02 msync02
+msync03 msync03
+
+munlock01 munlock01
+munlock02 munlock02
+
+munlockall01 munlockall01
+munlockall02 munlockall02
+
+munmap01 munmap01
+munmap02 munmap02
+munmap03 munmap03
+
+open01 open01
+open01A symlink01 -T open01
+open02 open02
+open03 open03
+open04 open04
+open05 open05
+open06 open06
+open07 open07
+open08 open08
+open09 open09
+open10 open10
+open11 open11
+open12 open12
+open13 open13
+open14 open14
+
+#openat test cases
+openat01 openat01
+openat02 openat02
+openat03 openat03
+
+pipe01 pipe01
+pipe02 pipe02
+pipe03 pipe03
+pipe04 pipe04
+pipe05 pipe05
+pipe06 pipe06
+pipe07 pipe07
+pipe08 pipe08
+pipe09 pipe09
+pipe10 pipe10
+pipe11 pipe11
+
+pipe2_01 pipe2_01
+pipe2_02 pipe2_02
+
+poll01 poll01
+
+ppoll01 ppoll01
+
+prctl01 prctl01
+prctl02 prctl02
+
+pread01 pread01
+pread01_64 pread01_64
+pread02 pread02
+pread02_64 pread02_64
+pread03 pread03
+pread03_64 pread03_64
+
+preadv01 preadv01
+preadv01_64 preadv01_64
+
+profil01 profil01
+
+pselect01 pselect01
+pselect01_64 pselect01_64
+pselect02 pselect02
+pselect02_64 pselect02_64
+
+ptrace01 ptrace01
+ptrace02 ptrace02
+ptrace03 ptrace03
+ptrace04 ptrace04
+ptrace05 ptrace05
+
+pwrite01 pwrite01
+pwrite01_64 pwrite01_64
+pwrite02 pwrite02
+pwrite02_64 pwrite02_64
+pwrite04 pwrite04
+pwrite04_64 pwrite04_64
+
+pwritev01 pwritev01
+pwritev01_64 pwritev01_64
+pwritev02 pwritev02
+pwritev02_64 pwritev02_64
+
+preadv01 preadv01
+preadv01_64 preadv01_64
+preadv02 preadv02
+preadv02_64 preadv02_64
+
+quotactl01 quotactl01
+# xfs only
+#quotactl02 quotactl02 -D $LTP_DEV
+
+read01 read01
+read02 read02
+read03 read03
+read04 read04
+
+readahead01 readahead01
+readahead02 readahead02
+readdir01 readdir01
+readdir02 readdir02
+readdir21 readdir21
+
+readlink01A symlink01 -T readlink01
+readlink01 readlink01
+readlink02 readlink02
+readlink03 readlink03
+readlink04 readlink04
+
+#readlinkat test cases
+readlinkat01 readlinkat01
+# new case for next ltp release
+readlinkat02 readlinkat02
+
+readv01 readv01
+readv02 readv02
+readv03 readv03
+
+reboot01 reboot01
+reboot02 reboot02
+
+recv01 recv01
+
+recvfrom01 recvfrom01
+
+recvmsg01 recvmsg01
+
+remap_file_pages01 remap_file_pages01
+remap_file_pages02 remap_file_pages02
+
+rename01 rename01
+rename01A symlink01 -T rename01
+rename02 rename02
+rename03 rename03
+rename04 rename04
+rename05 rename05
+rename06 rename06
+rename07 rename07
+rename08 rename08
+rename09 rename09
+rename10 rename10
+rename11 rename11
+rename12 rename12
+rename13 rename13
+rename14 rename14
+
+#renameat test cases
+renameat01 renameat01
+
+renameat201 renameat201
+renameat202 renameat202 -i 10
+
+rmdir01 rmdir01
+rmdir02 rmdir02
+rmdir03 rmdir03
+rmdir03A symlink01 -T rmdir03
+rmdir04 rmdir04
+rmdir05 rmdir05
+
+select01 select01
+select02 select02
+select03 select03
+
+sendfile02 sendfile02
+sendfile02_64 sendfile02_64
+sendfile03 sendfile03
+sendfile03_64 sendfile03_64
+sendfile04 sendfile04
+sendfile04_64 sendfile04_64
+sendfile05 sendfile05
+sendfile05_64 sendfile05_64
+sendfile06 sendfile06
+sendfile06_64 sendfile06_64
+sendfile07 sendfile07
+sendfile07_64 sendfile07_64
+sendfile08 sendfile08
+sendfile08_64 sendfile08_64
+sendfile09 sendfile09
+sendfile09_64 sendfile09_64
+
+#splice test
+splice01 splice01
+splice02 seq 1 20000 | splice02 splice02-temp
+splice03 splice03
+
+tee01 tee01
+
+stat01 stat01
+stat01_64 stat01_64
+stat02 stat02
+stat02_64 stat02_64
+stat03 stat03
+stat03_64 stat03_64
+stat04 symlink01 -T stat04
+stat04_64 symlink01 -T stat04_64
+stat05 stat05
+stat05_64 stat05_64
+stat06 stat06
+stat06_64 stat06_64
+
+statfs01 statfs01
+statfs01_64 statfs01_64
+statfs02 statfs02
+statfs02_64 statfs02_64
+statfs03 statfs03
+statfs03_64 statfs03_64
+
+statvfs01 statvfs01
+statvfs02 statvfs02
+
+string01 string01
+
+swapoff01 swapoff01
+swapoff02 swapoff02
+
+swapon01 swapon01
+swapon02 swapon02
+swapon03 swapon03
+
+symlink01 symlink01
+symlink02 symlink02
+symlink03 symlink03
+symlink04 symlink04
+symlink05 symlink05
+
+#symlinkat test cases
+symlinkat01 symlinkat01
+
+sync01 sync01
+sync02 sync02
+
+#testcases for sync_file_range
+sync_file_range01 sync_file_range01
+
+syscall01 syscall01
+
+sysconf01 sysconf01
+
+#sysctl01 sysctl01
+#sysctl03 sysctl03
+#sysctl04 sysctl04
+#sysctl05 sysctl05
+
+sysfs01 sysfs01
+sysfs02 sysfs02
+sysfs03 sysfs03
+sysfs04 sysfs04
+sysfs05 sysfs05
+sysfs06 sysfs06
+
+sysinfo01 sysinfo01
+sysinfo02 sysinfo02
+
+truncate01 truncate01
+truncate01_64 truncate01_64
+truncate02 truncate02
+truncate02_64 truncate02_64
+truncate03 truncate03
+truncate03_64 truncate03_64
+
+unlink01 symlink01 -T unlink01
+unlink05 unlink05
+unlink06 unlink06
+unlink07 unlink07
+unlink08 unlink08
+
+#unlinkat test cases
+unlinkat01 unlinkat01
+
+umask01 umask01
+
+#
+# These tests require an unmounted block device
+# to run correctly. Please see individual test
+# code for more information.
+#
+umount01 umount01
+umount02 umount02
+umount03 umount03
+
+umount2_01 umount2_01
+umount2_02 umount2_02
+umount2_03 umount2_03
+
+ustat01 ustat01
+ustat02 ustat02
+
+#vmsplice test cases
+vmsplice01 vmsplice01
+vmsplice02 vmsplice02
+
+write01 write01
+write02 write02
+write03 write03
+write04 write04
+write05 write05
+
+writev01 writev01
+writev02 writev02
+writev05 writev05
+writev06 writev06
+writev07 writev07
+
+#DESCRIPTION:file capabilities
+Filecaps	filecapstest.sh
+#DESCRIPTION:Posix capability bounding set
+Cap_bounds	run_capbounds.sh
+
+#acl
+acl_test01 acl_test01
+
+#DESCRIPTION:Direct IO tests
+## Complete a default run.
+dio01 diotest1
+dio02 diotest2
+dio03 diotest3
+dio04 diotest4
+dio05 diotest5
+dio06 diotest6
+
+## Run the tests with larger buffersize
+dio07 diotest1 -b 65536
+dio08 diotest2 -b 65536
+dio09 diotest3 -b 65536
+dio10 diotest4 -b 65536
+dio11 diotest5 -b 65536
+dio12 diotest6 -b 65536
+
+### Run the tests with larger iterations
+dio13 diotest1 -b 65536 -n 2000
+dio14 diotest2 -b 65536 -i 1000
+dio15 diotest3 -b 65536 -i 1000 
+dio16 diotest5 -b 65536 -i 1000
+dio17 diotest6 -b 65536 -i 1000
+
+## Run the tests with larger offset - 1MB
+dio18 diotest2 -b 65536 -i 1000 -o 1024000 
+dio19 diotest3 -b 65536 -i 1000 -o 1024000 
+dio20 diotest5 -b 65536 -i 1000 -o 1024000 
+dio21 diotest6 -b 65536 -i 1000 -o 1024000 
+
+## Run the tests with larger offset - 100 MB
+dio22 diotest2 -b 65536 -i 1000 -o 104857600
+dio23 diotest3 -b 65536 -i 1000 -o 104857600
+dio24 diotest5 -b 65536 -i 1000 -o 104857600
+dio25 diotest6 -b 65536 -i 1000 -o 104857600
+
+### Run tests with larger vector array
+dio26 diotest6 -b 8192 -v 100
+dio27 diotest6 -b 8192 -o 1024000 -i 1000 -v 100
+dio28 diotest6 -b 8192 -o 1024000 -i 1000 -v 200
+
+### Run the tests with more children
+dio29 diotest3 -b 65536 -n 100 -i 1000 -o 1024000
+dio30 diotest6 -b 65536 -n 100 -i 1000 -o 1024000
+
+# fcntl lock test
+FCNTL_LOCKTESTS locktests -n 100 -f /tmp/fcntl_locktest_testfile
+
+# Extend attribute test
+setxattr01 setxattr01
+setxattr02 setxattr02
+setxattr03 setxattr03
+
+getxattr01 getxattr01
+getxattr02 getxattr02
+getxattr03 getxattr03
+
+removexattr01 removexattr01
+removexattr02 removexattr02
+
+flistxattr01 flistxattr01
+flistxattr02 flistxattr02
+flistxattr03 flistxattr03
+
+listxattr01 listxattr01
+listxattr02 listxattr02
+listxattr03 listxattr03
+
+llistxattr01 llistxattr01
+llistxattr02 llistxattr02
+llistxattr03 llistxattr03
+
+# tests from fs_readonly
+test_robind01 test_robind.sh -c "growfiles -W gf01 -b -e 1 -u -i 0 -L 5 -w -C 1 -l -I r -T 10 glseek20 glseek20.2"
+test_robind02 test_robind.sh -c "growfiles -W gf02 -b -e 1 -L 10 -i 100 -I p -S 2 -u -f gf03_"
+test_robind03 test_robind.sh -c "growfiles -W gf03 -b -e 1 -g 1 -i 1 -S 150 -u -f gf05_"
+test_robind04 test_robind.sh -c "growfiles -W gf04 -b -e 1 -g 4090 -i 500 -t 39000 -u -f gf06_"
+test_robind05 test_robind.sh -c "growfiles -W gf05 -b -e 1 -g 5000 -i 500 -t 49900 -T10 -c9 -I p -u -f gf07_"
+test_robind06 test_robind.sh -c "growfiles -W gf06 -b -e 1 -u -r 1-5000 -R 0--1 -i 0 -L 3 -C 1 g_rand10 g_rand10.2"
+test_robind07 test_robind.sh -c "growfiles -W gf07 -b -e 1 -u -r 1-5000 -R 0--2 -i 0 -L 3 -C 1 -I p g_rand13 g_rand13.2"
+test_robind08 test_robind.sh -c "growfiles -W gf08 -b -e 1 -u -r 1-5000 -R 0--2 -i 0 -L 3 -C 1 g_rand11 g_rand11.2"
+test_robind09 test_robind.sh -c "growfiles -W gf09 -b -e 1 -u -r 1-5000 -R 0--1 -i 0 -L 3 -C 1 -I p g_rand12 g_rand12.2"
+test_robind10 test_robind.sh -c "growfiles -W gf10 -b -e 1 -u -r 1-5000 -i 0 -L 3 -C 1 -I l g_lio14 g_lio14.2"
+test_robind11 test_robind.sh -c "growfiles -W gf11 -b -e 1 -u -r 1-5000 -i 0 -L 3 -C 1 -I L g_lio15 g_lio15.2"
+test_robind12 test_robind.sh -c "mkfifo gffifo17; growfiles -b -W gf12 -e 1 -u -i 0 -L 3 gffifo17"
+test_robind13 test_robind.sh -c "mkfifo gffifo18; growfiles -b -W gf13 -e 1 -u -i 0 -L 3 -I r -r 1-4096 gffifo18"
+test_robind14 test_robind.sh -c "growfiles -W gf14 -b -e 1 -u -i 0 -L 2 -w -l -C 1 -T 10 glseek19 glseek19.2"
+test_robind15 test_robind.sh -c "growfiles -W gf15 -b -e 1 -u -r 1-49600 -I r -u -i 0 -L 3 Lgfile1"
+test_robind16 test_robind.sh -c "growfiles -W gf16 -b -e 1 -i 0 -L 3 -u -g 4090 -T 100 -t 408990 -l -C 10 -c 1000 -S 10 -f Lgf02_"
+test_robind17 test_robind.sh -c "growfiles -W gf17 -b -e 1 -i 0 -L 3 -u -g 5000 -T 100 -t 499990 -l -C 10 -c 1000 -S 10 -f Lgf03_"
+test_robind18 test_robind.sh -c "growfiles -W gf18 -b -e 1 -i 0 -L 3 -w -u -r 10-5000 -I r -l -S 2 -f Lgf04_"
+test_robind19 test_robind.sh -c "growfiles -W gf19 -b -e 1 -g 5000 -i 500 -t 49900 -T10 -c9 -I p -o O_RDWR,O_CREAT,O_TRUNC -u -f gf08i_"
+test_robind20 test_robind.sh -c "growfiles -W gf20 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -r 1-256000:512 -R 512-256000 -T 4 gfbigio-$$"
+test_robind21 test_robind.sh -c "growfiles -W gf21 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -g 20480 -T 10 -t 20480 gf-bld-$$"
+test_robind22 test_robind.sh -c "growfiles -W gf22 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -g 20480 -T 10 -t 20480 gf-bldf-$$"
+test_robind23 test_robind.sh -c "growfiles -W gf23 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -r 512-64000:1024 -R 1-384000 -T 4 gf-inf-$$"
+test_robind24 test_robind.sh -c "growfiles -W gf24 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -g 20480 gf-jbld-$$"
+test_robind25 test_robind.sh -c "growfiles -W gf25 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -r 1024000-2048000:2048 -R 4095-2048000 -T 1 gf-large-gs-$$"
+test_robind26 test_robind.sh -c "growfiles -W gf26 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -r 128-32768:128 -R 512-64000 -T 4 gfsmallio-$$"
+test_robind27 test_robind.sh -c "growfiles -W gf27 -b -D 0 -w -g 8b -C 1 -b -i 1000 -u gfsparse-1-$$"
+test_robind28 test_robind.sh -c "growfiles -W gf28 -b -D 0 -w -g 16b -C 1 -b -i 1000 -u gfsparse-2-$$"
+test_robind29 test_robind.sh -c "growfiles -W gf29 -b -D 0 -r 1-4096 -R 0-33554432 -i 0 -L 60 -C 1 -u gfsparse-3-$$"
+test_robind30 test_robind.sh -c "growfiles -W gf30 -D 0 -b -i 0 -L 60 -u -B 1000b -e 1 -o O_RDWR,O_CREAT,O_SYNC -g 20480 -T 10 -t 20480 gf-sync-$$"
+test_robind31 test_robind.sh -c "rwtest -N rwtest01 -c -q -i 60s  -f sync 10%25000:rw-sync-$$"
+test_robind32 test_robind.sh -c "rwtest -N rwtest02 -c -q -i 60s  -f buffered 10%25000:rw-buffered-$$"
+test_robind33 test_robind.sh -c "rwtest -N rwtest03 -c -q -i 60s -n 2  -f buffered -s mmread,mmwrite -m random -Dv 10%25000:mm-buff-$$"
+test_robind34 test_robind.sh -c "rwtest -N rwtest04 -c -q -i 60s -n 2  -f sync -s mmread,mmwrite -m random -Dv 10%25000:mm-sync-$$"
+test_robind35 test_robind.sh -c "rwtest -N rwtest05 -c -q -i 50 -T 64b 500b:rwtest01%f"
+test_robind36 test_robind.sh -c "rwtest -N iogen01 -i 120s -s read,write -Da -Dv -n 2 500b:doio.f1.$$ 1000b:doio.f2.$$"
+test_robind37 test_robind.sh -c "fs_inod . 10 10 1"
+test_robind38 test_robind.sh -c "openfile -f10 -t10"
+test_robind39 test_robind.sh -c "inode01"
+test_robind40 test_robind.sh -c "inode02"
+test_robind41 test_robind.sh -c "stream01"
+test_robind42 test_robind.sh -c "stream02"
+test_robind43 test_robind.sh -c "stream03"
+test_robind44 test_robind.sh -c "stream04"
+test_robind45 test_robind.sh -c "stream05"
+test_robind46 test_robind.sh -c "ftest01"
+test_robind47 test_robind.sh -c "ftest02"
+test_robind48 test_robind.sh -c "ftest03"
+test_robind49 test_robind.sh -c "ftest04"
+test_robind50 test_robind.sh -c "ftest05"
+test_robind51 test_robind.sh -c "ftest06"
+test_robind52 test_robind.sh -c "ftest07"
+test_robind53 test_robind.sh -c "ftest08"
+test_robind54 test_robind.sh -c "lftest 80"
+test_robind55 test_robind.sh -c "writetest"
