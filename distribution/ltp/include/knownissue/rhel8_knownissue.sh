@@ -41,8 +41,6 @@ function rhel8_unfix_issues()
 	is_kvm && is_arch "x86_64" && tskip "umip_basic_test" unfix
 	# Bug 1739587 - [RHEL-8.1] ltp/generic: syscalls/perf_event_open02 test failures on RT kernel
 	is_rt && osver_in_range "800" "802" && tskip "perf_event_open02" unfix
-	# Bug 1758717 - Snap 4.1 LTP move_pages fail
-	osver_in_range "800" "803" && tskip "move_pages12" unfix
 	# Bug 1777554 - false positive with huge pages on aarch64
 	# Note: this can be removed when pkey01 is fixed upstream
 	#       http://lists.linux.it/pipermail/ltp/2019-December/014683.html
@@ -79,6 +77,8 @@ function rhel8_unfix_issues()
 
 function rhel8_fixed_issues()
 {
+	# Bug 2099510 - LTP lite: move_pages12.c:106: TFAIL: madvise failed: EIO
+	kernel_in_range "0" "4.18.0-408.el8" && tskip "move_pages12" fixed
 	# Bug 1895961 (CVE-2020-25704) - CVE-2020-25704 kernel: perf_event_parse_addr_filter memory
 	kernel_in_range "0" "4.18.0-193.59.1.el8" && tskip "perf_event_open03" fixed
 	# Bug 1913045 - [RHEL-8.4.0] ltp/lite - ioctl_sg01 - fail - broken mmap() for MAP_FAILED
