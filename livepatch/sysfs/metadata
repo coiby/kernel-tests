@@ -1,0 +1,12 @@
+[General]
+name=livepatch/sysfs
+owner=Yulia Kopkova <ykopkova@redhat.com>
+description=Livepatch sysfs tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=5m
+use_pty=false

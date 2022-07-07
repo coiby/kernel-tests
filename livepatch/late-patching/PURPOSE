@@ -1,0 +1,3 @@
+PURPOSE of /kernel/livepatch/late-patching
+Livepatch late kernel module patching test
+Author: Yulia Kopkova <ykopkova@redhat.com>
