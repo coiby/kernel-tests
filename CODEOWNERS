@@ -1,5 +1,5 @@
 [Codeowners]
-CODEOWNERS @bgoncalv @lulinqing @mh21
+/CODEOWNERS @bgoncalv @lulinqing @mh21
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
 #
@@ -11,7 +11,7 @@ CODEOWNERS @bgoncalv @lulinqing @mh21
 #     users:
 #       - cki-project
 #     paths:
-#       - .gitlab-ci.yml
+#       - /.gitlab-ci.yml
 #   CKI:
 #     users:
 #       - cki-project
@@ -26,187 +26,187 @@ CODEOWNERS @bgoncalv @lulinqing @mh21
 # GITLAB-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-GENERATED-BEGIN
-# 8845beb7d9b9fbf771892c377ff4304f2f10f9f77d4d5b1c7155677d54b40cc3
+# 53b30a28c9473c5e357905ab7f52ba883d71cb59ff7e92f1fa6f2484026fcfe8
 
 [Infrastructure]
-.gitlab-ci.yml @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/.gitlab-ci.yml @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
 
 [CKI]
-acpi/acpitable/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-acpi/enabled/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-autofs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-container/podman/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-core-kernel/module_diff/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-cpu/die/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-cpu/driver/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-cpu/idle/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-distribution/kernel-debuginfo/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-distribution/ltp/lite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-distribution/ltp/openposix_testsuite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-distribution/upstream/ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-filesystems/cifs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-filesystems/general/pjd-fstest/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-filesystems/loopdev/sanity/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-filesystems/nfs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-filesystems/xfs/xfstests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-firmware/user-specified/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-iommu/boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-ipmi/stress/driver/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-ipmi/stress/ipmitool-loop/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-jvm/dacapobench/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-jvm/jcstress/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-kdump/kdump-file-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-kdump/kdump-sysrq-c/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-kdump/kexec-boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-kdump/kexec-file-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-kselftests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-kunit/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-legacy/pci_id/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-legacy/whitelist/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-memory/fork_mem/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-memory/function/kaslr/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-memory/function/memfd_create/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-misc/amtu/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-misc/header-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-misc/kernel-fips-mode/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-misc/module-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/bridge/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/driver/sanity/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/igmp/conformance/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/macsec/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/netfilter/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/route/pmtu/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/route/route_func/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/sctp/auth/sockopts/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/socket/fuzz/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/tcp/tcp_keepalive/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/tunnel/geneve/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/tunnel/gre/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/tunnel/l2tp/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/tunnel/tunctl/permtest/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/tunnel/vxlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/udp/udp_socket/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/vnic/ipvlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-networking/vrf/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/httpd/mod_ssl-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/iotop/sanity/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/libkcapi/af_alg-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/net-snmp/tcp-transport/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/perf/internal-testsuite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/perf/perftool-testsuite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/selinux-policy/serge-testsuite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-packages/tuned/tune-processes-through-perf/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-pciutils/sanity-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-pciutils/update-pciids/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-power-management/cpufreq/cpufreq_governor/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-power-management/cpufreq/sys_cpufreq/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-power-management/rapl/powercap/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/latency_perf/oslat_valid/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/latency_perf/rt_cyclic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/pi_stress/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/rt_ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/rt_migrate_test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/rteval/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/sched_deadline/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/smidetect/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-rt-tests/us/stalld/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-sound/aloop/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-sound/user-ctl-elem/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-standards/usex/1.9-29/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/blktests/blk/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/blktests/nvme/nvme-rdma/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/blktests/nvme/nvme-tcp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/blktests/nvme/nvmeof-mp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/blktests/srp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/block/fio_numa/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/block/fs_fio/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/block/mq_sche/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/block/zstd_compression/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/block/zstd_smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/dm/common/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/hba/san-device-stress/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/hw_raid/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/iscsi/params/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/lvm/cache/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/lvm/device-mapper/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/lvm/snapper/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/lvm/thinp/sanity/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/lvm/thinp/stqe/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/nvdimm/ndctl-test-suite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/scsi/vpd/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/swraid/mdadm/raid_module/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/swraid/scsi_raid/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/swraid/simple_reshape/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/swraid/trim/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-storage/target/targetcli_basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-stress/stress-ng/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-trace/bpf/test_bpf/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-trace/ftrace/tracer/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-tracepoints/operational/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-vm/hugepage/libhugetlbfs/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-vm/kvm-self-tests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-vm/kvm-unit-tests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-watchdog/hw-generic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/acpi/acpitable/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/acpi/enabled/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/autofs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/container/podman/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/core-kernel/module_diff/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/cpu/die/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/cpu/driver/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/cpu/idle/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/distribution/kernel-debuginfo/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/distribution/ltp/lite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/distribution/ltp/openposix_testsuite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/distribution/upstream/ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/filesystems/cifs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/filesystems/general/pjd-fstest/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/filesystems/loopdev/sanity/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/filesystems/nfs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/filesystems/xfs/xfstests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/firmware/user-specified/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/iommu/boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/ipmi/stress/driver/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/ipmi/stress/ipmitool-loop/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/jvm/dacapobench/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/jvm/jcstress/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kdump/kdump-file-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kdump/kdump-sysrq-c/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kdump/kexec-boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kdump/kexec-file-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kselftests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kunit/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/legacy/pci_id/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/legacy/whitelist/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/memory/fork_mem/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/memory/function/kaslr/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/memory/function/memfd_create/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/misc/amtu/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/misc/header-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/misc/kernel-fips-mode/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/misc/module-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/bridge/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/driver/sanity/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/igmp/conformance/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/macsec/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/netfilter/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/route/pmtu/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/route/route_func/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/sctp/auth/sockopts/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/socket/fuzz/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/tcp/tcp_keepalive/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/tunnel/geneve/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/tunnel/gre/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/tunnel/l2tp/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/tunnel/tunctl/permtest/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/tunnel/vxlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/udp/udp_socket/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/vnic/ipvlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/networking/vrf/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/httpd/mod_ssl-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/iotop/sanity/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/libkcapi/af_alg-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/net-snmp/tcp-transport/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/perf/internal-testsuite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/perf/perftool-testsuite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/selinux-policy/serge-testsuite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/packages/tuned/tune-processes-through-perf/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/pciutils/sanity-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/pciutils/update-pciids/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/power-management/cpufreq/cpufreq_governor/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/power-management/cpufreq/sys_cpufreq/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/power-management/rapl/powercap/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/latency_perf/oslat_valid/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/latency_perf/rt_cyclic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/pi_stress/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/rt_ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/rt_migrate_test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/rteval/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/sched_deadline/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/smidetect/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/rt-tests/us/stalld/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/sound/aloop/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/sound/user-ctl-elem/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/standards/usex/1.9-29/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/blktests/blk/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/blktests/nvme/nvme-rdma/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/blktests/nvme/nvme-tcp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/blktests/nvme/nvmeof-mp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/blktests/srp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/block/fio_numa/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/block/fs_fio/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/block/mq_sche/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/block/zstd_compression/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/block/zstd_smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/dm/common/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/hba/san-device-stress/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/hw_raid/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/iscsi/params/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/lvm/cache/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/lvm/device-mapper/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/lvm/snapper/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/lvm/thinp/sanity/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/lvm/thinp/stqe/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/nvdimm/ndctl-test-suite/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/scsi/vpd/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/swraid/mdadm/raid_module/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/swraid/scsi_raid/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/swraid/simple_reshape/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/swraid/trim/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/storage/target/targetcli_basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/stress/stress-ng/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/trace/bpf/test_bpf/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/trace/ftrace/tracer/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/tracepoints/operational/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/vm/hugepage/libhugetlbfs/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/vm/kvm-self-tests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/vm/kvm-unit-tests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/watchdog/hw-generic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
 
 [Maintainers]
-acpi/acpitable/ @ahs3 @bgoncalv @lulinqing
-acpi/enabled/ @bgoncalv @jbastianrh @lulinqing
-container/podman/ @bgoncalv @ftjahjad @lulinqing
-core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
-distribution/ltp/lite/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-distribution/upstream/ltp/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-filesystems/xfs/xfstests/ @bgoncalv @lulinqing @nstraz
-ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
-ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
-kdump/kdump-file-load/ @bgoncalv @emmawu1 @lulinqing
-kdump/kdump-sysrq-c/ @bgoncalv @emmawu1 @lulinqing
-kdump/kexec-boot/ @bgoncalv @emmawu1 @lulinqing
-kdump/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
-kselftests/ @bgoncalv @liuhangbin @lulinqing
-kunit/ @bgoncalv @lulinqing @npache
-memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-misc/header-test/ @bgoncalv @jbastianrh @lulinqing
-misc/module-load/ @bgoncalv @jbastianrh @lulinqing
-networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
-networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing
-networking/netfilter/ @bgoncalv @liuhangbin @lulinqing
-networking/route/route_func/ @bgoncalv @liuhangbin @lulinqing
-networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing
-networking/socket/fuzz/ @bgoncalv @liuhangbin @lulinqing
-networking/tcp/tcp_keepalive/ @bgoncalv @liuhangbin @lulinqing
-networking/tunnel/geneve/basic/ @bgoncalv @liuhangbin @lulinqing
-networking/tunnel/gre/basic/ @bgoncalv @liuhangbin @lulinqing
-networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
-networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing
-packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
-packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
-rt-tests/latency_perf/oslat_valid/ @bgoncalv @lulinqing @waylon531
-rt-tests/latency_perf/rt_cyclic/ @bgoncalv @lulinqing @waylon531
-rt-tests/pi_stress/ @bgoncalv @lulinqing @waylon531
-rt-tests/rt_ltp/ @bgoncalv @lulinqing @waylon531
-rt-tests/rt_migrate_test/ @bgoncalv @lulinqing @zhaoqiao
-rt-tests/rteval/ @bgoncalv @lulinqing @zhaoqiao
-rt-tests/sched_deadline/ @bgoncalv @lulinqing @zhaoqiao
-rt-tests/smidetect/ @bgoncalv @lulinqing @zhaoqiao
-rt-tests/us/stalld/ @bgoncalv @lulinqing @waylon531
-stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
-trace/bpf/test_bpf/ @bgoncalv @lulinqing @sztsian
-trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian
-tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing
-vm/hugepage/libhugetlbfs/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-vm/kvm-self-tests/ @bgoncalv @lulinqing @mcondotta
-vm/kvm-unit-tests/ @bgoncalv @lulinqing @mcondotta
-watchdog/hw-generic/ @bgoncalv @ftjahjad @lulinqing
+/acpi/acpitable/ @ahs3 @bgoncalv @lulinqing
+/acpi/enabled/ @bgoncalv @jbastianrh @lulinqing
+/container/podman/ @bgoncalv @ftjahjad @lulinqing
+/core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
+/distribution/ltp/lite/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/distribution/upstream/ltp/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/filesystems/xfs/xfstests/ @bgoncalv @lulinqing @nstraz
+/ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
+/ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
+/kdump/kdump-file-load/ @bgoncalv @emmawu1 @lulinqing
+/kdump/kdump-sysrq-c/ @bgoncalv @emmawu1 @lulinqing
+/kdump/kexec-boot/ @bgoncalv @emmawu1 @lulinqing
+/kdump/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
+/kselftests/ @bgoncalv @liuhangbin @lulinqing
+/kunit/ @bgoncalv @lulinqing @npache
+/memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/misc/header-test/ @bgoncalv @jbastianrh @lulinqing
+/misc/module-load/ @bgoncalv @jbastianrh @lulinqing
+/networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
+/networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing
+/networking/netfilter/ @bgoncalv @liuhangbin @lulinqing
+/networking/route/route_func/ @bgoncalv @liuhangbin @lulinqing
+/networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing
+/networking/socket/fuzz/ @bgoncalv @liuhangbin @lulinqing
+/networking/tcp/tcp_keepalive/ @bgoncalv @liuhangbin @lulinqing
+/networking/tunnel/geneve/basic/ @bgoncalv @liuhangbin @lulinqing
+/networking/tunnel/gre/basic/ @bgoncalv @liuhangbin @lulinqing
+/networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
+/networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing
+/packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
+/packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
+/rt-tests/latency_perf/oslat_valid/ @bgoncalv @lulinqing @waylon531
+/rt-tests/latency_perf/rt_cyclic/ @bgoncalv @lulinqing @waylon531
+/rt-tests/pi_stress/ @bgoncalv @lulinqing @waylon531
+/rt-tests/rt_ltp/ @bgoncalv @lulinqing @waylon531
+/rt-tests/rt_migrate_test/ @bgoncalv @lulinqing @zhaoqiao
+/rt-tests/rteval/ @bgoncalv @lulinqing @zhaoqiao
+/rt-tests/sched_deadline/ @bgoncalv @lulinqing @zhaoqiao
+/rt-tests/smidetect/ @bgoncalv @lulinqing @zhaoqiao
+/rt-tests/us/stalld/ @bgoncalv @lulinqing @waylon531
+/stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
+/trace/bpf/test_bpf/ @bgoncalv @lulinqing @sztsian
+/trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian
+/tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing
+/vm/hugepage/libhugetlbfs/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/vm/kvm-self-tests/ @bgoncalv @lulinqing @mcondotta
+/vm/kvm-unit-tests/ @bgoncalv @lulinqing @mcondotta
+/watchdog/hw-generic/ @bgoncalv @ftjahjad @lulinqing
 
 # GITLAB-CODEOWNERS-GENERATED-END
