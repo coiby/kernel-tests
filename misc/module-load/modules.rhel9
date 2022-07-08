@@ -593,7 +593,6 @@ xfrm_interface
 xfrm_ipcomp
 xfs
 xt_addrtype
-xor
 xsk_diag
 xt_AUDIT
 xt_bpf
