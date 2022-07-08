@@ -131,6 +131,11 @@ rlJournalStart
 		dmesg --clear
 		for TEST in ${test_arr[*]}
 		do
+			if [[ ${SKIP_TESTS} =~ "${TEST}" ]]; then
+				rlLog "Skipping $TEST"
+				continue
+			fi
+
 			rlLog "running test $TEST"
 			modprobe "$TEST" 2>/dev/null
 			if [ $? -ne 0 ]; then
