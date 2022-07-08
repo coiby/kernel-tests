@@ -43,8 +43,8 @@ function ltp_test_build()
 	#       single task to run LTP tests into multiple tasks. For more
 	#       details, please refer to:
 	#       o https://gitlab.com/cki-project/kpet-db/-/issues/54
-	if [ -f ${LTPDIR}/runltp ]; then
-		test_msg pass "LTP has been built and installed!"
+	if [ -f ${LTPDIR}/runltp ] && grep -q "${LTP_REPO_COMMIT_ID}" ${LTPDIR}/ltp_version; then
+		test_msg pass "LTP (${LTP_REPO_COMMIT_ID}) has been built and installed!"
 		return
 	fi
 
@@ -80,7 +80,8 @@ function ltp_test_build()
 	make -j$CPUS_NUM                    &> buildlog.txt  || if cat buildlog.txt;  then test_msg fail "build   ltp failed"; fi
 	make install                        &> buildlog.txt  || if cat buildlog.txt;  then test_msg fail "install ltp failed"; fi
 	popd > /dev/null 2>&1
-	test_msg pass "LTP build/install successful"
+	test_msg pass "LTP (${LTP_REPO_COMMIT_ID}) build/install successful"
+	echo "${LTP_REPO_COMMIT_ID}" > ${LTPDIR}/ltp_version
 }
 
 function hugetlb_nr_setup()
