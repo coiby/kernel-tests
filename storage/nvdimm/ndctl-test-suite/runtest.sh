@@ -25,8 +25,7 @@ CDIR=$(dirname $FILE)
 YUM=$(cki_get_yum_tool)
 TNAME="storage/nvdimm/ndctl-test-suite"
 RELEASE=$(uname -r | sed s/\.$(arch)//)
-LINUX_RELEASE=$(echo $RELEASE | sed s/el8_[0-9]/el8/)
-LINUX_RELEASE=$(echo $RELEASE | sed s/el9_[0-9]/el9/)
+LINUX_RELEASE=$(echo $RELEASE | sed s/_[0-9]//)
 KERNEL="kernel-${RELEASE}"
 DEVEL="kernel-devel-${RELEASE}"
 
