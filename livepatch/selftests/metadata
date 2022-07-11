@@ -1,5 +1,5 @@
 [General]
-name=livepatch/kselftests
+name=livepatch/selftests
 owner=Yulia Kopkova <ykopkova@redhat.com>
 description=Livepatch Kernel Selftests
 license=GPLv2

@@ -17,7 +17,7 @@
 export TESTVERSION=0.1
 
 # The combined namespace of the test.
-export TEST=/kernel/livepatch/kselftests
+export TEST=/kernel/livepatch/selftests
 
 # A phony target is one that is not really the name of a file.
 # It is just a name for some commands to be executed when you
@@ -57,7 +57,7 @@ $(METADATA): Makefile
 	@echo "Path:         $(TEST_DIR)"	>> $(METADATA)
 	@echo "License:      GPLv2" >> $(METADATA)
 	@echo "TestVersion:  $(TESTVERSION)"	>> $(METADATA)
-	@echo "Description:  livepatching kselftests">> $(METADATA)
+	@echo "Description:  livepatching selftests">> $(METADATA)
 	@echo "TestTime:     180m" >> $(METADATA)
 	@echo "Type:         Tier1" >> $(METADATA)
 	@echo "RunFor:       kernel" >> $(METADATA)
