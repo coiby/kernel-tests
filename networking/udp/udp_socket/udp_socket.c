@@ -39,6 +39,8 @@ int get_set_test(char * family)
 	int off = 0;
 	int reval = 0;
 	int fd = 0;
+	int domain = 0;
+	int value = 0;
 	socklen_t optlen = sizeof(reval);
 	if (strcmp (family, "ipv4") == 0)
 		fd = socket(PF_INET, SOCK_DGRAM, 0);
@@ -50,6 +52,7 @@ int get_set_test(char * family)
 		exit (-1);
 	}
 // UDP_GRO
+#ifdef UDP_GRO
 	if (setsockopt(fd, IPPROTO_UDP, UDP_GRO, &on, sizeof(int))) {
 		perror ("setsockopt UDP_GRO");
 		exit (-1);
@@ -74,10 +77,10 @@ int get_set_test(char * family)
 		dprintf(2, "UDP_GRO getsockopt fail");
 		exit (-1);
 	}
+#endif
 
 // UDP_SEGMENT
-	int domain = 0;
-	int value = 0;
+#ifdef UDP_SEGMENT
 	getsockopt(fd, SOL_SOCKET, SO_DOMAIN, &domain, &optlen);
 	if (domain == AF_INET)
 		value = CONST_MSS_V4;
@@ -108,7 +111,10 @@ int get_set_test(char * family)
 		dprintf(2, "UDP_SEGMENT getsockopt fail");
 		exit (-1);
 	}
+#endif
+
 // UDP_CORK
+#ifdef UDP_CORK
 	if (setsockopt(fd, IPPROTO_UDP, UDP_CORK, &on, sizeof(int))) {
 		perror ("setsockopt UDP_CORK");
 		exit (-1);
@@ -133,7 +139,10 @@ int get_set_test(char * family)
 		dprintf(2, "UDP_CORK getsockopt fail");
 		exit (-1);
 	}
+#endif
+
 // UDP_ENCAP
+#ifdef UDP_ENCAP
 	value = UDP_ENCAP_L2TPINUDP;
 	if (setsockopt(fd, IPPROTO_UDP, UDP_ENCAP, &value, sizeof(int))) {
 		perror ("setsockopt UDP_ENCAP");
@@ -159,7 +168,10 @@ int get_set_test(char * family)
 		dprintf(2, "UDP_ENCAP getsockopt fail");
 		exit (-1);
 	}
+#endif
+
 // UDP_NO_CHECK6_TX
+#ifdef UDP_NO_CHECK6_TX
 	reval = 0;
 	if (setsockopt(fd, IPPROTO_UDP, UDP_NO_CHECK6_TX, &on, sizeof(int))) {
 		perror ("setsockopt UDP_NO_CHECK6_TX");
@@ -185,7 +197,10 @@ int get_set_test(char * family)
 		dprintf(2, "UDP_NO_CHECK6_TX getsockopt fail");
 		exit (-1);
 	}
+#endif
+
 // UDP_NO_CHECK6_RX
+#ifdef UDP_NO_CHECK6_RX
 	reval = 0;
 	if (setsockopt(fd, IPPROTO_UDP, UDP_NO_CHECK6_RX, &on, sizeof(int))) {
 		perror ("setsockopt UDP_NO_CHECK6_RX");
@@ -211,6 +226,7 @@ int get_set_test(char * family)
 		dprintf(2, "UDP_NO_CHECK6_RX getsockopt fail");
 		exit (-1);
 	}
+#endif
 	return 0;
 }
 
