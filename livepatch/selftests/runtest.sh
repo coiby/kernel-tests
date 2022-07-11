@@ -2,8 +2,8 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /kernel/livepatch/kselftests
-#   Description: kselftests
+#   runtest.sh of /kernel/livepatch/selftests
+#   Description: selftests
 #   Author: Joe Lawrence <joe.lawrence@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,7 +149,7 @@ build_selftests()
 	EXEC_DIR=$(pwd)/tools/testing/selftests
 }
 
-install_kselftests()
+install_selftests()
 {
 	rpm -q kernel-selftests-internal && return 0
 	if debug_kernel; then
@@ -270,7 +270,7 @@ cmp_min_rhel8=$kver_ret
 if [ "$cmp_min_rhel7" -ge "0" -a "$cmp_max_rhel7" -lt "0" ]; then
 	build_selftests || { test_fail "build selftests failed" && exit 1; }
 elif [ "$cmp_min_rhel8" -ge "0" ]; then
-	install_kselftests || { test_fail "install kselftests failed" && exit 1; }
+	install_selftests || { test_fail "install selftests failed" && exit 1; }
 else
 	[ $RSTRNT_JOBID ] && rstrnt-report-result "LIVEPATCH_SELFTESTS_UNSUPPORTED" "SKIP" 0
 	exit 0
