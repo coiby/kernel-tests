@@ -1,0 +1,42 @@
+#!/bin/bash
+
+export TEST="rdma/pyverbs-tests"
+
+# Include the common libraries
+. ./../common/rdma-qa.sh || exit 1
+
+function setup {
+    # install RDMA related packages if there exists RDMA HCA
+    pkg_list="rdma-core pciutils nfs-utils libibverbs libibverbs-utils libibverbs-devel librdmacm librdmacm-utils librdmacm-devel perftest infiniband-diags opensm mstflint opa-fm opa-basic-tools opa-ff opa-fastfabric opa-address-resolution"
+    RQA_exist_RDMA_HCA && RQA_pkg_install ${pkg_list} || exit 1
+
+    # install the required packages for the Pyverbs test suite
+    local pyverbs_pkg_req="python3-pyverbs"
+    rpm -q $pyverbs_pkg_req || RQA_pkg_install $pyverbs_pkg_req
+
+    cd /usr/share/doc/rdma-core/tests/
+    chmod +x run_tests.py
+}
+
+function run_tests {
+    hca_ids=$(RQA_get_hca_id)
+    for hca_id in ${hca_ids}; do
+        ./run_tests.py -v --dev $hca_id
+        return $?
+    done
+}
+
+# Start test
+#####################################################################
+result=FAIL
+TEST=${TEST}/standalone
+setup
+run_tests
+if [[ $? -eq 0 ]]; then
+    result=PASS
+fi
+# Report the result and submit the test log
+rstrnt-report-result $TEST $result
+
+echo ' ------ end of runtest.sh.'
+exit 0
