@@ -180,7 +180,7 @@
 /misc/module-load/ @bgoncalv @jbastianrh @lulinqing
 /networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing
-/networking/netfilter/ @bgoncalv @liuhangbin @lulinqing
+/networking/netfilter/ @bgoncalv @liuhangbin @lulinqing @yiche
 /networking/route/route_func/ @bgoncalv @liuhangbin @lulinqing
 /networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing
 /networking/socket/fuzz/ @bgoncalv @liuhangbin @lulinqing
@@ -188,7 +188,7 @@
 /networking/tunnel/geneve/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/tunnel/gre/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
-/networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing
+/networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 /packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
 /rt-tests/latency_perf/oslat_valid/ @bgoncalv @lulinqing @waylon531
