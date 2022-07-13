@@ -1,6 +1,8 @@
 #!/bin/bash
 
 export TEST="rdma/pyverbs-tests"
+# to record how many commands fail
+export bad=0
 
 # Include the common libraries
 . ./../common/rdma-qa.sh || exit 1
@@ -22,8 +24,9 @@ function run_tests {
     hca_ids=$(RQA_get_hca_id)
     for hca_id in ${hca_ids}; do
         ./run_tests.py -v --dev $hca_id
-        return $?
+	let bad++
     done
+    return $bad
 }
 
 # Start test
@@ -32,11 +35,11 @@ result=FAIL
 TEST=${TEST}/standalone
 setup
 run_tests
-if [[ $? -eq 0 ]]; then
+if [[ $bad -eq 0 ]]; then
     result=PASS
 fi
 # Report the result and submit the test log
-rstrnt-report-result $TEST $result
+rstrnt-report-result $TEST $result $bad
 
 echo ' ------ end of runtest.sh.'
 exit 0

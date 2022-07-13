@@ -1,7 +1,7 @@
 #!/bin/bash
 ###                                                           ###
 # This script contains many of the common functions, variables, #
-# and constants infiniband-qe uses for test cases.              #
+# and constants that RDMA QE uses for test cases.               #
 ###                                                           ###
 
 ##
@@ -23,8 +23,8 @@ function RQA_exist_RDMA_HCA {
 # This function is to get the hca_id list
 ##
 function RQA_get_hca_id {
-    which ibv_devinfo || PKGINSTALL libibverbs-utils
-    ibv_devinfo -l && echo $(ibv_devinfo -l | sed '1d' | tr -s '\n')
+    which ibv_devinfo >/dev/null 2>&1 || PKGINSTALL libibverbs-utils
+    ibv_devinfo >/dev/null 2>&1 && echo $(ibv_devinfo -l | sed '1d' | tr -s '\n')
 }
 
 ##
