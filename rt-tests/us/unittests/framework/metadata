@@ -1,0 +1,11 @@
+[General]
+name=rt-tests/us/unittests/framework
+owner=Mike Stowell <mstowell@redhat.com>
+description=RT Unittest Framework
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=:
+dependencies=python3
