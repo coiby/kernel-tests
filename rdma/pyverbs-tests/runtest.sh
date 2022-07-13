@@ -24,7 +24,7 @@ function run_tests {
     hca_ids=$(RQA_get_hca_id)
     for hca_id in ${hca_ids}; do
         ./run_tests.py -v --dev $hca_id
-	let bad++
+        let bad++
     done
     return $bad
 }
