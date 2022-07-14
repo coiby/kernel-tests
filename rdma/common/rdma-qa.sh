@@ -12,7 +12,7 @@ PS4='$(date +"+ [%y-%m-%d %H:%M:%S]") '
 ## functions #################################################################
 
 ##
-# This function is to check if there exist RDMA HCA on the machine
+# This function is to check if there exists RDMA HCA on the test machine
 ##
 function RQA_exist_RDMA_HCA {
     lspci | grep -i -e connect -e omni -e FastLinQ -e NetXtreme-E -e e810
