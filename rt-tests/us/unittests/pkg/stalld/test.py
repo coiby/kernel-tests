@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+"""
+Unittest for package stalld
+"""
+import rtut
+
+class StalldTest(rtut.RTUnitTest):
+    def setUp(self):
+        self.cpulist = "0"
+
+    def test_help(self):
+        self.run_cmd('stalld -h')
+
+    def test_cpulist(self):
+        self.run_cmd(f'timeout --preserve-status 2 stalld -f -c {self.cpulist}')
+
+    def test_boost_runtime(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -r 1000000')
+
+    def test_boost_period(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -p 200000000')
+
+    def test_duration_time(self):
+        self.run_cmd('timeout --preserve-status 10 stalld -f -d 2 -t 3')
+
+    def test_logging_verbose(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -l -v')
+
+    def test_kmsg_syslog(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -k -s')
+
+    def test_force_fifo(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -F')
+
+    def test_aggressive_power_gran(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -A -O -g 1')
+
+    def test_ignore_thread(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -i foo')
+
+    def test_ignore_proc(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -I foo')
+
+    def test_pidfile(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f --pidfile /tmp/stalldPid')
+
+    def test_systemd(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -S')
+
+    def test_logging_single(self):
+        self.run_cmd('timeout --preserve-status 2 stalld -f -l -O')
+
+if __name__ == '__main__':
+    StalldTest.run_unittests()

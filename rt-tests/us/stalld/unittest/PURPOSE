@@ -1,4 +1,0 @@
-Test cli options and args for various rt pkg components
-in this case stalld. The intent is to run a regression test
-to ensure options and args are valid post dev changes. It is 
-not a full functional check.
