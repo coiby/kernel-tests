@@ -10,8 +10,12 @@ export bad=0
 function setup {
     # install RDMA related packages if there exists RDMA HCA
     pkg_list="rdma-core libibverbs libibverbs-utils libibverbs-devel librdmacm librdmacm-utils librdmacm-devel perftest infiniband-diags opensm mstflint opa-fm opa-basic-tools opa-ff opa-fastfabric opa-address-resolution"
-    RQA_exist_RDMA_HCA && RQA_pkg_install ${pkg_list} || rstrnt-report-result $TEST SKIP 0 || exit 0
-
+    if RQA_exist_RDMA_HCA; then
+        RQA_pkg_install ${pkg_list}
+    else
+        rstrnt-report-result $TEST SKIP
+        exit
+    fi
     # install the required packages for the Pyverbs test suite
     local pyverbs_pkg_req="python3-pyverbs"
     rpm -q $pyverbs_pkg_req || RQA_pkg_install $pyverbs_pkg_req
