@@ -1,0 +1,11 @@
+summary: Security Integrity verifier for 1843774
+description: ''
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/integrity/1843774
+test: make run
+framework: shell
+duration: 12m
+extra-summary: /kernel-tests/security/integrity/1843774
+extra-task: /kernel-tests/security/integrity/1843774

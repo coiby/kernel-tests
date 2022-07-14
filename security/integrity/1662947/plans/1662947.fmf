@@ -1,0 +1,19 @@
+summary: Security Integrity verifier for 1662947
+discover:
+    how: fmf
+    test:
+        - /security/integrity/1662947/tests/1662947
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/include.h
+        install_repos
+  - name: Install packages
+    how: install
+    package: [make]
+environment-file:
+        - ./security/integrity/1662947/plans/tmt.env
