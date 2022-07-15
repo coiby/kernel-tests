@@ -21,14 +21,16 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        grep CONFIG_IMA /boot/config-`uname -r`
-        rlRun "yum install -y grubby"
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            grep CONFIG_IMA /usr/lib/ostree-boot/config-`uname -r`
+        else
+            grep CONFIG_IMA /boot/config-`uname -r`
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest

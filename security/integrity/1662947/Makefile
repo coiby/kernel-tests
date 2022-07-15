@@ -12,10 +12,3 @@ build: $(BUILT_FILES)
 
 clean:
 	rm -f *~ $(BUILT_FILES)
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner: Linqing Lu <lilu@redhat.com>" > $(METADATA)
-
-	rhts-lint $(METADATA)

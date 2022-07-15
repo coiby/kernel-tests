@@ -21,13 +21,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        rlRun "yum install ima-evm-utils keyutils openssl -y"
         rlRun "openssl genrsa -out rsa_private.pem 1024"
         rlRun "openssl rsa -pubout -in rsa_private.pem -out rsa_public.pem"
         rlRun "keyctl show"
