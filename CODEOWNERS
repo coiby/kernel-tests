@@ -194,7 +194,7 @@
 /rt-tests/latency_perf/oslat_valid/ @bgoncalv @lulinqing @waylon531
 /rt-tests/latency_perf/rt_cyclic/ @bgoncalv @lulinqing @waylon531
 /rt-tests/pi_stress/ @bgoncalv @lulinqing @waylon531
-/rt-tests/rt_ltp/ @bgoncalv @lulinqing @waylon531
+/rt-tests/rt_ltp/ @bgoncalv @cyin2 @lulinqing @stowellm @waylon531 @zhaoqiao
 /rt-tests/rt_migrate_test/ @bgoncalv @lulinqing @zhaoqiao
 /rt-tests/rteval/ @bgoncalv @lulinqing @zhaoqiao
 /rt-tests/sched_deadline/ @bgoncalv @lulinqing @zhaoqiao
