@@ -170,7 +170,7 @@
 /kdump/kdump-sysrq-c/ @bgoncalv @emmawu1 @lulinqing
 /kdump/kexec-boot/ @bgoncalv @emmawu1 @lulinqing
 /kdump/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
-/kselftests/ @bgoncalv @liuhangbin @lulinqing
+/kselftests/ @bgoncalv @liuhangbin @lulinqing @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
 /memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
