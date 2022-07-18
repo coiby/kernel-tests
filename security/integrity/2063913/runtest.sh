@@ -21,7 +21,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
@@ -29,9 +28,14 @@ rlJournalStart
         rlShowRunningKernel
         rlIsRHEL "<9.1" && { echo "only applies to RHEL 9.1 or newer"; rstrnt-report-result $RSTRNT_TASKNAME SKIP; exit 0; }
         grubby --info=DEFAULT
-        rlFileSubmit /boot/config-$(uname -r)
-        grep 'CONFIG_INTEGRITY=y' /boot/config-$(uname -r) || { echo "integrity subsystem disabled"; rstrnt-report-result $RSTRNT_TASKNAME SKIP; exit 0; }
-    yum install -y attr
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            rlFileSubmit /usr/lib/ostree-boot/config-$(uname -r)
+            grep 'CONFIG_INTEGRITY=y' /usr/lib/ostree-boot/config-$(uname -r) || { echo "integrity subsystem disabled"; rstrnt-report-result $RSTRNT_TASKNAME SKIP; exit 0; }
+        else
+            rlFileSubmit /boot/config-$(uname -r)
+            grep 'CONFIG_INTEGRITY=y' /boot/config-$(uname -r) || { echo "integrity subsystem disabled"; rstrnt-report-result $RSTRNT_TASKNAME SKIP; exit 0; }
+        fi
+
     rlPhaseEnd
 
     rlPhaseStartTest

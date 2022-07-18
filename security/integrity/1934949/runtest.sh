@@ -21,14 +21,12 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         rlIsRHEL "<9" && { echo "only applies to RHEL9 or newer"; rstrnt-report-result $RSTRNT_TASKNAME SKIP; exit 0; }
-        rlRun "yum install -y ima-evm-utils"
     rlPhaseEnd
 
     rlPhaseStartTest

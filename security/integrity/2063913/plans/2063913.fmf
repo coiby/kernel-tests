@@ -1,0 +1,19 @@
+summary: Security Integrity verifier for 2063913
+discover:
+    how: fmf
+    test:
+        - /security/integrity/2063913/tests/2063913
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/include.h
+        install_repos
+  - name: Install packages
+    how: install
+    package: [attr, grubby, make]
+environment-file:
+        - ./security/integrity/2063913/plans/tmt.env

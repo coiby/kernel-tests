@@ -21,7 +21,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
@@ -32,7 +31,6 @@ rlJournalStart
             rstrnt-report-result $RSTRNT_TASKNAME SKIP
             exit 0
         fi
-        rlRun "yum install -y keyutils"
         rlRun "keyctl show %:.ima | tee /tmp/.ima"
     rlPhaseEnd
 
