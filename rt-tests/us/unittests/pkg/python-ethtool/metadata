@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/unittests/pkg/python-ethtool
+owner=Chang Yin <cyin@redhat.com>
+description=Unittest case for python-ethtool
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=python3 test.py
+repoRequires=rt-tests/us/unittests/framework
+dependencies=python3-ethtool
+max_time=10m
