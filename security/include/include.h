@@ -236,8 +236,8 @@ kernel_automotive()
 install_repos()
 {
     kcomp=${COMPOSE} #To create the right repo links later and grab certain packages. not used on automotive builds.
-    id=$(grep ^ID=\" /etc/os-release | cut -d = -f 2) #Information about what os we are on, rhel or centos
-    major=$(grep ^VERSION_ID=\" /etc/os-release | cut -d = -f 2 | cut -d \" -f 2 | cut -d . -f 1) #Main release e.g. 9
+    id=$(grep ^ID= /etc/os-release | cut -d = -f 2) #Information about what os we are on, rhel or centos
+    major=$(grep ^VERSION_ID= /etc/os-release | cut -d = -f 2 | cut -d \" -f 2 | cut -d . -f 1) #Main release e.g. 9
     karch=$(uname -i)
     
     if kernel_automotive; then

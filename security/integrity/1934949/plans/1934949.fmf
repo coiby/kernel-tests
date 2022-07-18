@@ -1,0 +1,19 @@
+summary: Security Integrity verifier for 1934949
+discover:
+    how: fmf
+    test:
+        - /security/integrity/1934949/tests/1934949
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/include.h
+        install_repos
+  - name: Install packages
+    how: install
+    package: [ima-evm-utils, make]
+environment-file:
+        - ./security/integrity/1934949/plans/tmt.env

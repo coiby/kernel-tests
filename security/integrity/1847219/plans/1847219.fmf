@@ -1,0 +1,19 @@
+summary: Security Integrity verifier for 1847219
+discover:
+    how: fmf
+    test:
+        - /security/integrity/1847219/tests/1847219
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/include.h
+        install_repos
+  - name: Install packages
+    how: install
+    package: [grubby, make]
+environment-file:
+        - ./security/integrity/1847219/plans/tmt.env
