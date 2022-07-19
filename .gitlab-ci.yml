@@ -73,7 +73,7 @@ codeowners check:
           needs-update
       then
           python3 -m pip install git+https://gitlab.com/cki-project/kpet.git
-          git clone https://gitlab.com/cki-project/kpet-db.git --depth 1
+          git clone https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db.git --depth 1
           python3 -m kpet --db kpet-db test list -o json > kpet-db-tests.json
           python3 -m cki.deployment_tools.gitlab_codeowners_config \
               --test-path kpet-db-tests.json \

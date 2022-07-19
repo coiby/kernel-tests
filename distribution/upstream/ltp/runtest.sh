@@ -42,7 +42,7 @@ function ltp_test_build()
 	# NOTE: Skip to built and install ltp if it is done as we split a
 	#       single task to run LTP tests into multiple tasks. For more
 	#       details, please refer to:
-	#       o https://gitlab.com/cki-project/kpet-db/-/issues/54
+	#       o https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db/-/issues/54
 	if [ -f ${LTPDIR}/runltp ] && grep -q "${LTP_REPO_COMMIT_ID}" ${LTPDIR}/ltp_version; then
 		test_msg pass "LTP (${LTP_REPO_COMMIT_ID}) has been built and installed!"
 		return
