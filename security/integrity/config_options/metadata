@@ -1,0 +1,12 @@
+[General]
+description=Security Integrity config_options
+name=/kernel-tests/security/integrity/config_options
+owner=Linqing Lu <lilu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=12m
+dependencies=grubby

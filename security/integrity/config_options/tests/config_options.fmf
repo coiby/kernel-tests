@@ -1,0 +1,11 @@
+summary: Security Integrity config_options
+description: ''
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/integrity/config_options
+test: make run
+framework: shell
+duration: 12m
+extra-summary: /kernel-tests/security/integrity/config_options
+extra-task: /kernel-tests/security/integrity/config_options

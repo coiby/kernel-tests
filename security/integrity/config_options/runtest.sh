@@ -21,14 +21,18 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         grubby --info=DEFAULT
-        rlFileSubmit /boot/config-$(uname -r)
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            CONFIG=/usr/lib/ostree-boot/config-$(uname -r)
+        else
+            CONFIG=/boot/config-$(uname -r)
+        fi
+        rlFileSubmit ${CONFIG}
     rlPhaseEnd
 
     rlPhaseStartTest
@@ -38,22 +42,22 @@ rlJournalStart
             exit 0
         fi
         if [[ $(uname -i) == "ppc64le" || $(uname -i) == "aarch64" ]]; then
-            rlAssertGrep 'CONFIG_HAVE_IMA_KEXEC=y' /boot/config-$(uname -r)
-            rlAssertGrep 'CONFIG_IMA_KEXEC=y' /boot/config-$(uname -r)
+            rlAssertGrep 'CONFIG_HAVE_IMA_KEXEC=y' ${CONFIG}
+            rlAssertGrep 'CONFIG_IMA_KEXEC=y' ${CONFIG}
         fi
         if [[ $(uname -i) == "ppc64le" || $(uname -i) == "x86_64" ]]; then
-            rlAssertGrep 'CONFIG_IMA_ARCH_POLICY=y' /boot/config-$(uname -r)
+            rlAssertGrep 'CONFIG_IMA_ARCH_POLICY=y' ${CONFIG}
         fi
         if $(rlIsRHEL 9); then
-            rlAssertGrep 'CONFIG_IMA_QUEUE_EARLY_BOOT_KEYS=y' /boot/config-$(uname -r)
+            rlAssertGrep 'CONFIG_IMA_QUEUE_EARLY_BOOT_KEYS=y' ${CONFIG}
         fi
-        rlAssertGrep 'CONFIG_IMA_APPRAISE_MODSIG=y' /boot/config-$(uname -r)
-        rlAssertGrep 'CONFIG_IMA_DEFAULT_HASH=\"sha256\"' /boot/config-$(uname -r)
-        rlAssertGrep 'CONFIG_IMA_DEFAULT_TEMPLATE=\"ima-sig\"' /boot/config-$(uname -r)
-        rlAssertGrep 'CONFIG_IMA_READ_POLICY=y' /boot/config-$(uname -r)
-        rlAssertGrep 'CONFIG_IMA_SIG_TEMPLATE=y' /boot/config-$(uname -r)
+        rlAssertGrep 'CONFIG_IMA_APPRAISE_MODSIG=y' ${CONFIG}
+        rlAssertGrep 'CONFIG_IMA_DEFAULT_HASH=\"sha256\"' ${CONFIG}
+        rlAssertGrep 'CONFIG_IMA_DEFAULT_TEMPLATE=\"ima-sig\"' ${CONFIG}
+        rlAssertGrep 'CONFIG_IMA_READ_POLICY=y' ${CONFIG}
+        rlAssertGrep 'CONFIG_IMA_SIG_TEMPLATE=y' ${CONFIG}
         # bz2002350
-        rlAssertGrep 'CONFIG_SYSTEM_BLACKLIST_KEYRING=y' /boot/config-$(uname -r)
+        rlAssertGrep 'CONFIG_SYSTEM_BLACKLIST_KEYRING=y' ${CONFIG}
         rlAssertGrep '.blacklist' /proc/keys
         rlAssertGrep '.platform' /proc/keys
     rlPhaseEnd
