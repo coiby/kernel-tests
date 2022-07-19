@@ -21,7 +21,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
@@ -41,30 +40,6 @@ rlJournalStart
         fi
         rm -f ./REBOOT
         rlShowRunningKernel
-        yum install autoconf \
-                    automake \
-                    bison \
-                    elfutils-libelf-devel \
-                    flex \
-                    gcc \
-                    git \
-                    glibc-headers \
-                    kernel-devel \
-                    kernel-headers \
-                    keyutils-libs-devel \
-                    libacl-devel \
-                    libcap-devel \
-                    libselinux-devel \
-                    libtirpc-devel \
-                    lksctp-tools-devel \
-                    m4 \
-                    make \
-                    numactl-devel \
-                    openssl \
-                    openssl-devel \
-                    pkgconf \
-                    xfsprogs-devel \
-                    -y
         rlRun "git clone https://github.com/linux-test-project/ltp.git"
         rlRun "cd ltp"
         rlRun "make -s autotools"

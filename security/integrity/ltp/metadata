@@ -1,0 +1,12 @@
+[General]
+description=Security Integrity ltp
+name=/kernel-tests/security/integrity/ltp
+owner=Linqing Lu <lilu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=1h
+dependencies=autoconf automake bison elfutils-libelf-devel flex gcc git glibc-headers kernel-devel kernel-headers keyutils-libs-devel libacl-devel libcap-devel libselinux-devel libtirpc-devel lksctp-tools-devel m4 make numactl-devel openssl openssl-devel pkgconf xfsprogs-devel
