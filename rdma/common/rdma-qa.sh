@@ -71,6 +71,61 @@ function RQA_get_rhel_minor {
     echo $(RQA_get_rhel_release) | awk -F "." '{print $2}'
 }
 
+##
+# Find the appropriate Python interpreter to use and export it as PYEXEC.
+# This function is needed to support cross-compatibility of test infrastructure
+# between RHEL-6/7 (python 2 distributions) and RHEL-8 (python 3 distribution
+# with unusual python paths)
+# Arguments :none
+##
+function RQA_set_pyexec {
+    PYEXEC=''
+
+    # first check if we have a python interpreter on the PATH
+    if which python 1>/dev/null 2>&1; then
+        export PYEXEC='python'
+        return 0
+    fi
+
+    # if not, check for a python3 interpreter on the PATH
+    if which python3 1>/dev/null 2>&1; then
+        export PYEXEC='python3'
+        return 0
+    fi
+
+    # if not, RHEL-8+ defaults to /usr/libexec/platform-python as the
+    # default location for a python interpreter
+    if which /usr/libexec/platform-python 1>/dev/null 2>&1; then
+        export PYEXEC='/usr/libexec/platform-python'
+        return 0
+    fi
+
+    # if we get here, python may not be installed; try installing various
+    # pythons and searching again for a python interpreter on the PATH
+    $PKGINSTALL --quiet --skip-broken python3 python2 python
+    if which /usr/libexec/platform-python 1>/dev/null 2>&1; then
+        PYEXEC='/usr/libexec/platform-python'
+    elif which python3 1>/dev/null 2>&1; then
+        PYEXEC='python3'
+    elif which python2 1>/dev/null 2>&1; then
+        PYEXEC='python2'
+    elif which python 1>/dev/null 2>&1; then
+        PYEXEC='python'
+    fi
+
+    if [ ! -z "$PYEXEC" ]; then
+        # we found a python interpreter - use it
+        export PYEXEC
+    else
+        # no python found in this distribution!
+        echo "### WARNING: NO PYTHON INTERPRETER AVAILABLE ###"
+        return 1
+    fi
+}
+
+# set the PYEXEC variable to a python interpreter scripts can use
+RQA_set_pyexec
+
 # determine whether to use yum or dnf
 if [[ $(grep -i fedora /etc/redhat-release >/dev/null) || $(RQA_get_rhel_major) -ge 8 ]]; then
     export PKGINSTALL="dnf install -y --setopt=strict=0 --nogpgcheck"

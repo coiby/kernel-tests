@@ -19,15 +19,12 @@ function setup {
     # install the required packages for the Pyverbs test suite
     local pyverbs_pkg_req="python3-pyverbs"
     rpm -q $pyverbs_pkg_req || RQA_pkg_install $pyverbs_pkg_req
-
-    cd /usr/share/doc/rdma-core/tests/
-    chmod +x run_tests.py
 }
 
 function run_tests {
     hca_ids=$(RQA_get_hca_id)
     for hca_id in ${hca_ids}; do
-        ./run_tests.py -v --dev $hca_id
+        $PYEXEC /usr/share/doc/rdma-core/tests/run_tests.py -v --dev $hca_id
         let bad++
     done
     return $bad
