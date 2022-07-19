@@ -1,0 +1,13 @@
+[General]
+name=storage/dm-crypt/cryptsetup_libblockdev
+owner=Guangwu Zhang <guazhang@redhat.com>
+description=Storage dm-crypt test suite
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=cryptsetup;fio;libblockdev;libblockdev-lvm;libblockdev-kbd;libblockdev-dm;libblockdev-fs;libblockdev-loop;libblockdev-mpath;libblockdev-swap;libblockdev-nvdimm;libblockdev-lvm-dbus;libblockdev-mdraid;libblockdev-crypto;libblockdev-part;python3-blockdev;python3-gobject-base;integritysetup;veritysetup;python3;python3-devel
+repoRequires=cki_lib;storage/include
+max_time=16h
