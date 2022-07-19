@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/unittests/pkg/realtime-tests/pi_stress
+owner=Qiao Zhao <qzhao@redhat.com>
+description=Unittest case for pi_stress
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=python3 test.py
+repoRequires=rt-tests/us/unittests/framework
+softDependencies=rt-tests;realtime-tests
+max_time=10m

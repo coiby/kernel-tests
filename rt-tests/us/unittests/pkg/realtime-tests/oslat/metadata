@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/unittests/pkg/realtime-tests/oslat
+owner=Qiao Zhao <qzhao@redhat.com>
+description=Unittest case for oslat
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=python3 test.py
+repoRequires=rt-tests/us/unittests/framework
+softDependencies=rt-tests;realtime-tests
+max_time=10m
