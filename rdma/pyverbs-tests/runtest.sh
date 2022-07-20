@@ -31,6 +31,7 @@ function run_tests {
 #####################################################################
 result=FAIL
 TEST=${TEST}/standalone
+RQA_system_info_for_debug
 setup
 run_tests
 if [[ $bad -eq 0 ]]; then

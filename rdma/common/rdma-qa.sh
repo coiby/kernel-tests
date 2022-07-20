@@ -131,11 +131,38 @@ function RQA_install_packages() {
         $PKGINSTALL opa-fm opa-fastfabric opa-address-resolution opa-basic-tools libpsm2
         if ! opafabricinfo; then
             systemctl enable opafm --now
+            systemctl status opafm
+            opafabricinfo
         fi
     else
         $PKGINSTALL opensm
         systemctl enable opensm --now
+        systemctl status opensm
+        sminfo
+        ibnodes
+        ibhosts
+        iblinkinfo
     fi
+}
+
+##
+# Prints out some IB debug information
+# Arguments: none
+##
+function RQA_system_info_for_debug {
+    [ -f /etc/motd ] && grep -i distro /etc/motd | tr -d ' '
+    [ -f /etc/redhat-release ] && cat /etc/redhat-release
+    [ -f /etc//etc/fedora-release ] && cat /etc/fedora-release
+    uname -a
+    cat /proc/cmdline
+    rpm -q rdma-core linux-firmware
+    tail /sys/class/infiniband/*/fw_ver
+    lspci | grep -i -e ConnectX -e omni -e FastLinQ -e NetXtreme-E -e e810 -e "Ethernet controller: Chelsio" 
+    lscpu
+    ibstat
+    ibstatus
+    /usr/bin/ibv_devinfo -v
+    ip addr show
 }
 
 # set the PYEXEC variable to a python interpreter scripts can use
