@@ -135,6 +135,7 @@ dns_resolver.ko
 drm_kms_helper.ko
 drm.ko
 drm_panel_orientation_quirks.ko
+drm_shmem_helper.ko
 dummy.ko
 eadm_sch.ko
 ebt_802_3.ko

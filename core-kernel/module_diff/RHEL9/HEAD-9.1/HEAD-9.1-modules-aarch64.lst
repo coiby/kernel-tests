@@ -92,6 +92,7 @@ bnx2x.ko
 bnxt_en.ko
 bnxt_re.ko
 bochs-drm.ko
+bochs.ko
 bonding.ko
 br2684.ko
 brd.ko
@@ -162,6 +163,7 @@ ci_hdrc_usb2.ko
 cirrus.ko
 clip.ko
 clk-bd718x7.ko
+clk-max77686.ko
 clk-scmi.ko
 clk-scpi.ko
 cls_bpf.ko
@@ -254,8 +256,10 @@ dp83822.ko
 dp83848.ko
 dp83867.ko
 dp83tc811.ko
+drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko
+drm_shmem_helper.ko
 drm_ttm_helper.ko
 drm_vram_helper.ko
 dummy.ko
@@ -739,6 +743,9 @@ max1111.ko
 max20751.ko
 max31790.ko
 max6875.ko
+max77620_thermal.ko
+max77686.ko
+max77686-regulator.ko
 mbcache.ko
 m_can.ko
 m_can_pci.ko
@@ -1015,6 +1022,7 @@ phylink.ko
 phy-mxs-usb.ko
 physmap.ko
 phy-tegra-usb.ko
+phy-tegra-xusb.ko
 pi3usb30532.ko
 pkcs8_key_parser.ko
 pktcdvd.ko
@@ -1126,6 +1134,7 @@ rtc-m48t35.ko
 rtc-m48t59.ko
 rtc-max6900.ko
 rtc-max6902.ko
+rtc-max77686.ko
 rtc-mcp795.ko
 rtc-msm6242.ko
 rtc-pcf2123.ko
@@ -1187,6 +1196,7 @@ sdhci-iproc.ko
 sdhci.ko
 sdhci-pci.ko
 sdhci-pltfm.ko
+sdhci-tegra.ko
 sdio_uart.ko
 serio_raw.ko
 serpent_generic.ko
@@ -1269,6 +1279,8 @@ team_mode_loadbalance.ko
 team_mode_random.ko
 team_mode_roundrobin.ko
 tee.ko
+tegra-bpmp-thermal.ko
+tegra-xudc.ko
 teranetics.ko
 tg3.ko
 thunder_bgx.ko
@@ -1329,6 +1341,7 @@ upd78f0730.ko
 usb3503.ko
 usb_8dev.ko
 usbatm.ko
+usb-conn-gpio.ko
 usb_debug.ko
 usblcd.ko
 usblp.ko
@@ -1410,6 +1423,7 @@ xgene-enet.ko
 xgene-enet-v2.ko
 xgene-hwmon.ko
 xgene-rng.ko
+xhci-tegra.ko
 xilinx_gmii2rgmii.ko
 xor.ko
 xor-neon.ko
