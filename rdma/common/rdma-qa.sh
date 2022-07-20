@@ -15,7 +15,7 @@ PS4='$(date +"+ [%y-%m-%d %H:%M:%S]") '
 # This function is to check if there exists RDMA HCA on the test machine
 ##
 function RQA_exist_RDMA_HCA {
-    lspci | grep -i -e ConnectX -e omni -e FastLinQ -e NetXtreme-E -e e810
+    lspci | grep -i -e ConnectX -e omni -e FastLinQ -e NetXtreme-E -e e810 -e "Ethernet controller: Chelsio"
     return $?
 }
 
@@ -122,19 +122,19 @@ function RQA_set_pyexec {
         return 1
     fi
 }
-    
+
 function RQA_install_packages() {
     # the very core packages available on all release
     $PKGINSTALL rdma-core libibverbs libibverbs-utils libibverbs-devel librdmacm librdmacm-utils librdmacm-devel perftest iperf3 infiniband-diags iscsi-initiator-utils
     hfi1=$(lspci | grep -i Omni-Path)
     if [ ! -z "$hfi1" ]; then
-        $PKGINSTALL libhfi1 opa-fm opa-fastfabric opa-address-resolution opa-basic-tools libpsm2
+        $PKGINSTALL opa-fm opa-fastfabric opa-address-resolution opa-basic-tools libpsm2
         if ! opafabricinfo; then
-	    systemctl enable opafm --now
+            systemctl enable opafm --now
         fi
     else
         $PKGINSTALL opensm
-	systemctl enable opensm --now
+        systemctl enable opensm --now
     fi
 }
 
