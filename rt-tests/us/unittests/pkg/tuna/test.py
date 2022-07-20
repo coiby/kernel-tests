@@ -13,7 +13,7 @@ class TunaTest(rtut.RTUnitTest):
         self.fnull = open(os.devnull, 'w', encoding="utf-8")
         self.thrdplay = subprocess.Popen(["vmstat", "1", "5000"], stdout=self.fnull)
         self.pidplay = self.thrdplay.pid
-        self.tmp_file = "/tmp/outfile"
+        self.tmp_file = f"{os.getcwd()}/output.txt"
 
     def tearDown(self):
         self.thrdplay.terminate()

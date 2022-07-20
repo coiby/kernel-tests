@@ -2,11 +2,18 @@
 """
 Unittest for package stalld
 """
+import os
 import rtut
 
 class StalldTest(rtut.RTUnitTest):
+
     def setUp(self):
         self.cpulist = "0"
+        self.tmp_file = f"{os.getcwd()}/pidfile"
+
+    def tearDown(self):
+        if os.path.exists(self.tmp_file):
+            os.remove(self.tmp_file)
 
     def test_help(self):
         self.run_cmd('stalld -h')
@@ -42,7 +49,7 @@ class StalldTest(rtut.RTUnitTest):
         self.run_cmd('timeout --preserve-status 2 stalld -f -I foo')
 
     def test_pidfile(self):
-        self.run_cmd('timeout --preserve-status 2 stalld -f --pidfile /tmp/stalldPid')
+        self.run_cmd(f'timeout --preserve-status 2 stalld -f --pidfile {self.tmp_file}')
 
     def test_systemd(self):
         self.run_cmd('timeout --preserve-status 2 stalld -f -S')
