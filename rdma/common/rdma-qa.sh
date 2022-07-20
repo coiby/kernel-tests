@@ -122,6 +122,21 @@ function RQA_set_pyexec {
         return 1
     fi
 }
+    
+function RQA_install_packages() {
+    # the very core packages available on all release
+    $PKGINSTALL rdma-core libibverbs libibverbs-utils libibverbs-devel librdmacm librdmacm-utils librdmacm-devel perftest iperf3 infiniband-diags iscsi-initiator-utils
+    hfi1=$(lspci | grep -i Omni-Path)
+    if [ ! -z "$hfi1" ]; then
+        $PKGINSTALL libhfi1 opa-fm opa-fastfabric opa-address-resolution opa-basic-tools libpsm2
+        if ! opafabricinfo; then
+	    systemctl enable opafm --now
+        fi
+    else
+        $PKGINSTALL opensm
+	systemctl enable opensm --now
+    fi
+}
 
 # set the PYEXEC variable to a python interpreter scripts can use
 RQA_set_pyexec
@@ -133,4 +148,8 @@ if [[ $(grep -i fedora /etc/redhat-release >/dev/null) || $(RQA_get_rhel_major) 
 else
     export PKGINSTALL="yum install -y --skip-broken --nogpgcheck"
     export PKGREMOVE="yum remove -y"
+fi
+
+if RQA_exist_RDMA_HCA; then
+    RQA_install_packages
 fi

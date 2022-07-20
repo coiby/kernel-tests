@@ -8,11 +8,7 @@ export bad=0
 . ./../common/rdma-qa.sh || exit 1
 
 function setup {
-    # install RDMA related packages if there exists RDMA HCA
-    pkg_list="rdma-core libibverbs libibverbs-utils libibverbs-devel librdmacm librdmacm-utils librdmacm-devel perftest infiniband-diags opensm mstflint opa-fm opa-basic-tools opa-ff opa-fastfabric opa-address-resolution"
-    if RQA_exist_RDMA_HCA; then
-        RQA_pkg_install ${pkg_list}
-    else
+    if ! RQA_exist_RDMA_HCA; then
         rstrnt-report-result $TEST SKIP
         exit
     fi
@@ -22,6 +18,7 @@ function setup {
 }
 
 function run_tests {
+    set -x
     hca_ids=$(RQA_get_hca_id)
     for hca_id in ${hca_ids}; do
         $PYEXEC /usr/share/doc/rdma-core/tests/run_tests.py -v --dev $hca_id
