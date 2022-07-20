@@ -511,6 +511,9 @@ rlJournalStart
                         sed -i '/intel_vsec.ko/d;/pmt_class.ko/d;/pmt_crashlog.ko/d;/pmt_telemetry.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
                         sed -i '/intel_pmt_class.ko/d;/intel_pmt_crashlog.ko/d;/intel_pmt.ko/d;/intel_pmt_telemetry.ko/d;' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
                     fi
+                    if cki_kver_lt "4.18.0-410"; then
+                        sed -i '/bochs-drm.ko/d;' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then
@@ -541,6 +544,10 @@ rlJournalStart
                     fi
                     if cki_kver_lt "5.14.0-95"; then
                         sed -i '/libblake2s-generic.ko/d;/libblake2s.ko/d;/^xor.ko/d;/xor-neon.ko/d;' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-129"; then
+                        sed -i '/bochs-drm.ko/d;' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                        sed -i '/regmap-i2c.ko/d;/mfd-core.ko/d;/i2c-algo-pcf.ko/d;/fixed.ko/d;' ${OS}/${Release}/$Release-knownRemoved-aarch64.lst
                     fi
                     ;;
             esac

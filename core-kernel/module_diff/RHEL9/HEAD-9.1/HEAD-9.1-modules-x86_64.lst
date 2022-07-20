@@ -152,6 +152,7 @@ bnx2x.ko
 bnxt_en.ko
 bnxt_re.ko
 bochs-drm.ko
+bochs.ko
 bonding.ko
 bpa10x.ko
 br2684.ko
@@ -320,8 +321,11 @@ dp83867.ko
 dp83tc811.ko
 dptf_pch_fivr.ko
 dptf_power.ko
+drm_buddy.ko
+drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko
+drm_shmem_helper.ko
 drm_ttm_helper.ko
 drm_vram_helper.ko
 ds1621.ko

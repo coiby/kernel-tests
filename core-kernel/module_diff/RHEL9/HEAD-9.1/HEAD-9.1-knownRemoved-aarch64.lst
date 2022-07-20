@@ -1,5 +1,10 @@
+bochs-drm.ko
+fixed.ko
+i2c-algo-pcf.ko
 libblake2s-generic.ko
 libblake2s.ko
 linear_ranges.ko
+mfd-core.ko
+regmap-i2c.ko
 xor.ko
 xor-neon.ko
