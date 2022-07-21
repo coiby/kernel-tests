@@ -56,10 +56,10 @@
 /ipmi/stress/ipmitool-loop/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
 /jvm/dacapobench/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
 /jvm/jcstress/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-/kdump/kdump-file-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-/kdump/kdump-sysrq-c/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-/kdump/kexec-boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
-/kdump/kexec-file-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kdump-cki/kdump-file-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kdump-cki/kdump-sysrq-c/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kdump-cki/kexec-boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
+/kdump-cki/kexec-file-load/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
 /kselftests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
 /kunit/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
 /legacy/pci_id/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @sturivny @veruu
@@ -167,10 +167,10 @@
 /filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing @nstraz
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
-/kdump/kdump-file-load/ @bgoncalv @emmawu1 @lulinqing
-/kdump/kdump-sysrq-c/ @bgoncalv @emmawu1 @lulinqing
-/kdump/kexec-boot/ @bgoncalv @emmawu1 @lulinqing
-/kdump/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
+/kdump-cki/kdump-file-load/ @bgoncalv @emmawu1 @lulinqing
+/kdump-cki/kdump-sysrq-c/ @bgoncalv @emmawu1 @lulinqing
+/kdump-cki/kexec-boot/ @bgoncalv @emmawu1 @lulinqing
+/kdump-cki/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
 /kselftests/ @bgoncalv @liuhangbin @lulinqing @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
 /memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
@@ -201,6 +201,8 @@
 /rt-tests/sched_deadline/ @bgoncalv @lulinqing @zhaoqiao
 /rt-tests/smidetect/ @bgoncalv @lulinqing @zhaoqiao
 /rt-tests/us/stalld/ @bgoncalv @lulinqing @waylon531
+/storage/dm/common/ @bgoncalv @guazhang @lulinqing
+/storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @sztsian
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian
