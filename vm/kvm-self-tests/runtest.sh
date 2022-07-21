@@ -29,8 +29,30 @@ GICVERSION=""
 CPUTYPE=""
 OSVERSION=""
 KVMPARAMFILE=/etc/modprobe.d/kvm-ci.conf
+NODISABLE=NO
 
 source /usr/share/beakerlib/beakerlib.sh
+
+POSITIONAL_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -n|--nodisable)
+      NODISABLE=YES
+      shift # past argument
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}"
 
 #
 # A simple wrapper function to skip a test because beakerlib doesn't support
@@ -124,8 +146,17 @@ function disableTests
 
     # Disable tests for RHEL8 Kernel (4.18.X)
     if [[ $OSVERSION == "RHEL8" ]]; then
+        if [[ $hwpf == "s390x" ]]; then
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "rseq_test")
+        fi
+        if [[ $hwpf == "aarch64" ]]; then
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "rseq_test")
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "get-reg-list")
+        fi
+    fi
 
-        # Disabled s390x tests due to bugs
+    # Disable tests for RHEL9 Kernel (5.14.X)
+    if [[ $OSVERSION == "RHEL9" ]]; then
         if [[ $hwpf == "s390x" ]]; then
             mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "rseq_test")
         fi
@@ -134,10 +165,22 @@ function disableTests
         fi
         if [[ $hwpf == "x86_64" ]]; then
             mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "rseq_test")
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "access_tracking_perf_test")
         fi
     fi
 
+    # Disable this test on Upstream testing
+    if [[ $OSVERSION == "ARK" || $OSVERSION == "UPSTREAM" ]]; then
+        if [[ $hwpf == "x86_64" ]]; then
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "rseq_test")
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "set_memory_region_test")
+            if [[ $CPUTYPE == "AMD" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_clock")
+            fi
+            if [[ $CPUTYPE == "INTEL" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx_preemption_timer_test")
+            fi
+        fi
+    fi
 }
 
 function setup
@@ -321,7 +364,9 @@ function runtest
 
     # Prepare lists of tests to run
     getTests
-    disableTests
+    if [[ "${NODISABLE}" == "NO" ]] ; then
+        disableTests
+    fi
 
     # Run tests
     for test in ${ALL_TESTS[*]}; do rlRun "${BINDIR}/${test}" 0,4; done
