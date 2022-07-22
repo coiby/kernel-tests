@@ -165,6 +165,61 @@ function RQA_system_info_for_debug {
     ip addr show
 }
 
+# Arguments: service name and service action (order independent)
+# Example: RQA_sys_service restart opensm
+##
+function RQA_sys_service {
+    SERVICE_RETURN=1
+    if [ $# -ne 2 ]; then
+        echo "Pass two arguments - service_name & service action"
+        return 1
+    fi
+    while test ${#} -gt 0; do
+        case $1 in
+            start|status|restart|stop|enable|disable|is-active|is-enabled)
+                action=$1
+                ;;
+            *)
+                serv=$1
+                ;;
+        esac
+        shift
+    done
+
+    [ -f /lib/systemd/system/$serv.service ] && systemctl $action $serv
+    SERVICE_RETURN=$?
+
+    serv=$(echo $serv | awk -F '.' '{print $1}')
+    if [[ -f /etc/rc.d/init.d/$serv ]]; then
+        case "$action" in
+            "enable")
+                # enable a service using chkconfig on
+                /sbin/chkconfig $serv on
+                ;;
+            "disable")
+                # disable a service using chkconfig off
+                /sbin/chkconfig $serv off
+                ;;
+            "is-active")
+                # similar to systemctl is-active, service status will
+                # return 0 for an active service and 3 for inactive
+                /sbin/service $serv status
+                ;;
+            "is-enabled")
+                # to simulate systemctl is-enabled, use chkconfig to
+                # check if the service is enabled at runlevel 3
+                /sbin/chkconfig --list | grep $serv | grep "3:on"
+                ;;
+            *)
+                # all other actions (start, status, restart, stop)
+                # can be used directly by the service command
+                /sbin/service $serv $action
+                ;;
+        esac
+        SERVICE_RETURN=$?
+    fi
+}
+
 # set the PYEXEC variable to a python interpreter scripts can use
 RQA_set_pyexec
 
