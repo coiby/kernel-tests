@@ -1,0 +1,11 @@
+summary: Security Audit upstream testsuite
+description: ''
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/audit/testsuite
+test: make run
+framework: shell
+duration: 15m
+extra-summary: /kernel-tests/security/audit/testsuite
+extra-task: /kernel-tests/security/audit/testsuite

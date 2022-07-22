@@ -1,0 +1,19 @@
+summary: Security Audit upstream testsuite
+discover:
+    how: fmf
+    test:
+        - /security/audit/testsuite/tests/testsuite
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/include.h
+        install_repos
+  - name: Install packages
+    how: install
+    package: [audit, gcc, perl, perl-Test, perl-Test-Harness, perl-File-Which, perl-Time-HiRes, nmap-ncat, psmisc, git, expect]
+environment-file:
+        - ./security/audit/testsuite/plans/tmt.env

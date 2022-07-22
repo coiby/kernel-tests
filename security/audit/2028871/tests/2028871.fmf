@@ -1,0 +1,12 @@
+summary: Security Audit verifier for 2028871
+description: ''
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/audit/2028871
+test: make run
+framework: shell
+duration: 12m
+extra-summary: /kernel-tests/security/audit/2028871
+extra-task: /kernel-tests/security/audit/2028871
+
