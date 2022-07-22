@@ -580,7 +580,7 @@ else
 
   # save the CKI installed kernel so following tests can check if they are running on correct kernel
   # this should help detect cases where by mistake the kernel gets updated.
-  # https://gitlab.com/cki-project/kpet-db/-/issues/56
+  # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db/-/issues/56
   mkdir -p /var/opt/cki/
   echo "${ckver}" > /var/opt/cki/kernel_version
 
