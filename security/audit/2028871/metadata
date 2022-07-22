@@ -1,0 +1,12 @@
+[General]
+description=Security Audit verifier for 2028871
+name=/kernel-tests/security/audit/2028871
+owner=Linqing Lu <lilu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=12m
+dependencies=make

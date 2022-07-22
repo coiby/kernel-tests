@@ -21,28 +21,13 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        yum install audit \
-                    gcc \
-                    glibc.i686 \
-                    glibc-devel.i686 \
-                    libgcc.i686 \
-                    perl \
-                    perl-Test \
-                    perl-tests \
-                    perl-Test-Harness \
-                    perl-File-Which \
-                    perl-Time-HiRes \
-                    nmap-ncat \
-                    psmisc \
-                    git \
-                    expect \
-                    -y --skip-broken
+        rlIsRHEL "<9" && { yum install -y perl-tests; }
+        [ "$(uname -i)" = "x86_64" ] && { yum install -y glibc.i686 glibc-devel.i686 libgcc.i686; }
         rlRun "git clone https://github.com/linux-audit/audit-testsuite.git"
         rlRun "cd audit-testsuite"
         rlIsRHEL "<9" && rlRun "sed -i '/backlog_wait_time_actual_reset/d' tests/Makefile"

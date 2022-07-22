@@ -1,0 +1,13 @@
+[General]
+description=Security Audit upstream testsuite
+name=/kernel-tests/security/audit/testsuite
+owner=Linqing Lu <lilu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=15m
+dependencies=audit;gcc;perl;perl-Test;perl-Test-Harness;perl-File-Which;perl-Time-HiRes;nmap-ncat;psmisc;git;expect
+softDependencies=perl-tests;glibc.i686;glibc-devel.i686;libgcc.i686
