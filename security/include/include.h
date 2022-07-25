@@ -280,9 +280,11 @@ install_repos()
         dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main/debug
         dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main
         dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main/debug
+        dnf config-manager --add-repo https://download.hosts.prod.upshift.rdu2.redhat.com/rhel-${major}/composes/BUILDROOT-9/BUILDROOT-9.1.0-RHEL-9-20220524.0/compose/Buildroot/${karch}/os
         sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main.repo
         sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main_debug.repo
         sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main.repo
         sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main_debug.repo
+        sed -i '$ a gpgcheck=0' /etc/yum.repos.d/download.hosts.prod.upshift.rdu2.redhat.com_rhel-${major}_composes_BUILDROOT-9_BUILDROOT-9.1.0-RHEL-9-20220524.0_compose_Buildroot_${karch}_os.repo
     fi
 }

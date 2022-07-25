@@ -21,14 +21,16 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../include/include.h
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        yum install libkcapi-tools \
+        if ! kernel_automotive; then
+            yum install libkcapi-tools \
                     -y --enablerepo=*
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest

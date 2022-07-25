@@ -26,15 +26,17 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../include/include.h
 
 rlJournalStart
     rlPhaseStartSetup
         if [ $(rlIsRHEL 7) ]; then
             rlRun "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
         fi
-        rlRun "yum install -y python3"
+        if ! kernel_automotive; then
+            rlRun "yum install -y python3"
+        fi
         rlRun "ls -l /usr/bin/python3*"
     rlPhaseEnd
 

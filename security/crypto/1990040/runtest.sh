@@ -21,7 +21,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
@@ -33,7 +32,11 @@ rlJournalStart
         rlRun "ls -l /lib/modules/$(uname -r)/kernel/crypto"
         rlRun "ls -l /lib/modules/$(uname -r)/kernel/crypto/sm*.ko.xz" 2
         rlRun "find /lib/modules/$(uname -r)/kernel -name sm*.ko.xz | grep 'sm[2-4]'" 1
-        rlRun "grep CONFIG_CRYPTO_SM /boot/config-$(uname -r) | grep '='" 1
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            rlRun "grep CONFIG_CRYPTO_SM /usr/lib/ostree-boot/config-$(uname -r) | grep '='" 1
+        else
+            rlRun "grep CONFIG_CRYPTO_SM /boot/config-$(uname -r) | grep '='" 1
+        fi
     rlPhaseEnd
 
     rlPhaseStartCleanup
