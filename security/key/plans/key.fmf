@@ -1,0 +1,19 @@
+summary: LTP key syscalls tests
+discover:
+    how: fmf
+    test:
+        - /security/key/tests/key
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/include.h
+        install_repos
+  - name: Install packages
+    how: install
+    package: [automake,gcc,git]
+environment-file:
+        - ./security/key/plans/tmt.env

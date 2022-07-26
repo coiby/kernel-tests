@@ -1,0 +1,1 @@
+Check /sys/devices/system/cpu/vulnerabilities/* for non-mitigated CVEs.
