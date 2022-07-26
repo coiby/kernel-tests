@@ -1,0 +1,10 @@
+summary: Check vulnerabilities/* for unmitigated CVEs
+discover:
+    how: fmf
+    test:
+        - /security/vulnerabilities/tests/vulnerabilities
+execute:
+    how: tmt
+    framework: beakerlib
+environment-file:
+        - ./security/vulnerabilities/plans/tmt.env

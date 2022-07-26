@@ -1,0 +1,16 @@
+summary: Kernel KRSI selftests
+discover:
+    how: fmf
+    test:
+        - /security/krsi/tests/krsi
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/include.h
+        install_repos
+environment-file:
+        - ./security/krsi/plans/tmt.env

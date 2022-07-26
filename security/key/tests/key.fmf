@@ -1,0 +1,8 @@
+summary: LTP key syscalls tests
+contact: Linqing Lu <lilu@redhat.com>
+path: /security/key
+test: ./runtest.sh
+framework: beakerlib
+component:
+  - kernel
+duration: 30m

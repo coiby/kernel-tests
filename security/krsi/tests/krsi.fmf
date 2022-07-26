@@ -1,0 +1,8 @@
+summary: Kernel KRSI selftests
+contact: Linqing Lu <lilu@redhat.com>
+test: ./runtest.sh
+path: /security/krsi
+framework: beakerlib
+component:
+  - kernel
+duration: 15m

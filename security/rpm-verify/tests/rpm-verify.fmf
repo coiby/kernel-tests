@@ -1,0 +1,8 @@
+summary: RPM verify on a kernel package
+contact: Linqing Lu <lilu@redhat.com>
+path: /security/rpm-verify
+test: ./runtest.sh
+framework: beakerlib
+duration: 5m
+component:
+  - kernel
