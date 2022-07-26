@@ -1,0 +1,12 @@
+[General]
+name=general/time/timer_migration
+owner=Qiao Zhao <qzhao@redhat.com>
+description=System vaule /proc/sys/kernel/timer_migration testing
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=10m
+use_pty=false
