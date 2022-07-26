@@ -1,0 +1,9 @@
+summary: system c-state test when nohz=off
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+test: bash -x ./runtest.sh
+framework: shell
+duration: 30m
+extra-summary: /kernel-tests/general/time/c_state_nohzoff
+extra-task: /kernel-tests/general/time/c_state_nohzoff
