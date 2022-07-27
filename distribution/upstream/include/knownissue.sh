@@ -117,6 +117,10 @@ function tskip()
 # - osver_in_range "600" "99999" -> PROBLEM, will be excluded forever
 function knownissue_filter()
 {
+	# skip OOM tests on large boxes since it takes too long
+	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 8 ] && tskip "oom0.*" fatal
+	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 32 ] || cki_is_kernel_debug && tskip "ioctl_sg01" fatal
+
 	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1052#note_922133965
 	# + https://lists.linux.it/pipermail/ltp/2022-March/028110.html
 	tskip "waitid10" unfix
