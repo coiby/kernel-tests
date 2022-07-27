@@ -201,6 +201,7 @@
 /rt-tests/sched_deadline/ @bgoncalv @lulinqing @zhaoqiao
 /rt-tests/smidetect/ @bgoncalv @lulinqing @zhaoqiao
 /rt-tests/us/stalld/ @bgoncalv @lulinqing @waylon531
+/standards/usex/1.9-29/ @bgoncalv @headrat @lulinqing
 /storage/dm/common/ @bgoncalv @guazhang @lulinqing
 /storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
