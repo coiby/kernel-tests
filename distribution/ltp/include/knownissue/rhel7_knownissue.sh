@@ -48,6 +48,9 @@ function rhel7_fatal_issues()
 
 function rhel7_unfix_issues()
 {
+	# skip madvise06 because of known issue:
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/742#note_1039619667
+	osver_in_range "700" "711" && tskip "madvise06" unfix
 	# Bug 1543262 - CVE-2017-17807 kernel: Missing permissions check for request_key()
 	osver_in_range "700" "709" && tskip "request_key04 cve-2017-17807" unfix
 	# Bug 1688067 - [xfstests]: copy_file_range cause corruption on rhel-7
