@@ -227,7 +227,7 @@ kernel_debug()
 # return 0 when running kernel automotive
 kernel_automotive()
 {
-    if [[ $(uname -r) =~ "el9s" ]]; then
+    if rpm -q "kernel-automotive-$(uname -r)" > /dev/null 2>&1; then
        return  0
     fi
     return 1
@@ -236,43 +236,13 @@ kernel_automotive()
 install_repos()
 {
     kcomp=${COMPOSE} #To create the right repo links later and grab certain packages. not used on automotive builds.
-    id=$(grep ^ID= /etc/os-release | cut -d = -f 2) #Information about what os we are on, rhel or centos
-    major=$(grep ^VERSION_ID= /etc/os-release | cut -d = -f 2 | cut -d \" -f 2 | cut -d . -f 1) #Main release e.g. 9
+#    id=$(grep ^ID= /etc/os-release | cut -d = -f 2) #Information about what os we are on, rhel or centos
+#    major=$(grep ^VERSION_ID= /etc/os-release | cut -d = -f 2 | cut -d \" -f 2 | cut -d . -f 1) #Main release e.g. 9
+    id=$(grep ^ID= /etc/os-release | awk -F = '{print $2}') #Information about what os we are on, rhel or centos
+    major=$(grep ^VERSION_ID= /etc/os-release | awk -F = '{print $2}' | sed s/\"//g) #Main release e.g. 9
     karch=$(uname -i)
     
     if kernel_automotive; then
-#        for component in \
-#            BaseOS \
-#            AppStream \
-#            RT \
-#            CRB
-#        do
-#        if [[ ${id} =~ "rhel" ]]; then
-#            repo=download.devel.redhat.com/rhel-${major}/composes/RHEL-${major}/${kcomp}/compose/${component}/${karch}/os
-#            repo_debug=download.devel.redhat.com/rhel-${major}/composes/RHEL-${major}/${kcomp}/compose/${component}/${karch}/debug/tree
-#        else
-#            repo=composes.stream.centos.org/production/${kcomp}/compose/${component}/${karch}/os
-#            repo_debug=composes.stream.centos.org/production/${kcomp}/compose/${component}/${karch}/debug/tree
-#            if [ ${component} == "RT" ]; then
-#                continue;
-#            fi
-#        fi
-#        dnf config-manager --add-repo https://${repo}
-#        dnf config-manager --add-repo https://${repo_debug}
-#        _repo=$(echo ${repo} | tr \/ \_)
-#        _repo_debug=$(echo ${repo_debug} | tr \/ \_)
-#        sed -i '$ a gpgcheck=0' /etc/yum.repos.d/${_repo}.repo
-#        sed -i '$ a gpgcheck=0' /etc/yum.repos.d/${_repo_debug}.repo
-#        done
-#        if ! rpm -q epel-release > /dev/null 2>&1; then
-#            if [[ ${id} =~ "rhel" ]]; then
-#                subscription-manager repos --enable codeready-builder-beta-for-rhel-${major}-$(arch)-rpms
-#                dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${major}.noarch.rpm
-#            else
-#                dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${major}.noarch.rpm https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-${major}.noarch.rpm
-#            fi
-#        fi
-#    else
         sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
         dnf install 'dnf-command(config-manager)' -y
         dnf config-manager --set-enabled crb
@@ -280,11 +250,9 @@ install_repos()
         dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main/debug
         dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main
         dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main/debug
-        dnf config-manager --add-repo https://download.hosts.prod.upshift.rdu2.redhat.com/rhel-${major}/composes/BUILDROOT-9/BUILDROOT-9.1.0-RHEL-9-20220524.0/compose/Buildroot/${karch}/os
         sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main.repo
         sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main_debug.repo
         sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main.repo
         sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main_debug.repo
-        sed -i '$ a gpgcheck=0' /etc/yum.repos.d/download.hosts.prod.upshift.rdu2.redhat.com_rhel-${major}_composes_BUILDROOT-9_BUILDROOT-9.1.0-RHEL-9-20220524.0_compose_Buildroot_${karch}_os.repo
     fi
 }
