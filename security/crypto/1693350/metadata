@@ -1,0 +1,11 @@
+[General]
+description=Security Crypto verifier for 1693350
+name=/kernel-tests/security/crypto/1693350
+owner=Linqing Lu <lilu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=10m

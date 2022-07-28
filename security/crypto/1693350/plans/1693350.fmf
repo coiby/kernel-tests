@@ -1,0 +1,14 @@
+summary: Security Crypto verifier for 1693350
+discover:
+  - name: Verifier for 1693350
+    how: fmf 
+    test: /security/crypto/1693350/tests/1693350
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Install packages
+    how: install
+    package: [libkcapi-tools]
+environment-file:
+        - ./security/crypto/1693350/plans/tmt.env
