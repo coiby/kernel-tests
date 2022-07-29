@@ -39,14 +39,6 @@ karch=$(uname -i)
 kver=$(uname -r | cut -f1 -d'-')
 krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//")
 
-modules="kernel-modules-internal"
-echo "Install $modules package"
-dnf install -q -y ${modules}-${kver}-${krel} \
-		|| dnf install -q -y $BREW/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
-rpm -q $modules || { test_fail "Could not install $modules" && exit 1; }
-klp_module_file=$(modinfo $KLP_MODULE | head -n 1 | awk '{print $2}')
-busy_module_file=$(modinfo $BUSY_MODULE | head -n 1 | awk '{print $2}')
-
 test_fail()
 {
 	echo -e ":: [  FAIL  ] :: $1" | tee -a $OUTPUTFILE
@@ -63,6 +55,14 @@ test_pass()
 	echo -e ":: [  PASS  ] :: $1" | tee -a $OUTPUTFILE
 	rstrnt-report-result $TEST "PASS" 0
 }
+
+modules="kernel-modules-internal"
+echo "Install $modules package"
+dnf install -q -y ${modules}-${kver}-${krel} \
+		|| dnf install -q -y $BREW/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
+rpm -q $modules || { test_fail "Could not install $modules" && exit 1; }
+klp_module_file=$(modinfo $KLP_MODULE | head -n 1 | awk '{print $2}')
+busy_module_file=$(modinfo $BUSY_MODULE | head -n 1 | awk '{print $2}')
 
 echo "Trigger livepatch stall transition with $klp_module_file" | tee -a $OUTPUTFILE
 insmod $busy_module_file block_transition=Y
