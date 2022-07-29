@@ -1,5 +1,5 @@
 [General]
-name=kdump/include
+name=kdump-cki/include
 owner=Kdump QE <kdump-qe-list@redhat.com>
 description=kdump test library
 license=GPLv3

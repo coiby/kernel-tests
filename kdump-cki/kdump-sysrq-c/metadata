@@ -1,5 +1,5 @@
 [General]
-name=kdump/kdump-sysrq-c
+name=kdump-cki/kdump-sysrq-c
 owner=Kdump QE <kdump-qe-list@redhat.com>
 description=kdump sysrq-c test
 license=GPLv3
@@ -8,4 +8,4 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-repoRequires=kdump/include;cki_lib
+repoRequires=kdump-cki/include;cki_lib
