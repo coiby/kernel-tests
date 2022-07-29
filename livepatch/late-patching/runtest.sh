@@ -41,11 +41,6 @@ dmesg > $DMESG_SAVED
 
 yum install -y gcc kernel-devel elfutils-libelf-devel
 
-msg="Build $TARGET_MODULE and $KLP_MODULE modules"
-pushd source
-	make ARCH=$arch || test_log "$msg"
-popd
-
 test_fail()
 {
 	echo -e ":: [  FAIL  ] :: $1" | tee -a $OUTPUTFILE
@@ -62,6 +57,11 @@ test_pass()
 	echo -e ":: [  PASS  ] :: $1" | tee -a $OUTPUTFILE
 	rstrnt-report-result $TEST "PASS" 0
 }
+
+msg="Build $TARGET_MODULE and $KLP_MODULE modules"
+pushd source
+	make ARCH=$arch || test_log "$msg"
+popd
 
 echo "Trigger late module patching" | tee -a $OUTPUTFILE
 insmod source/$KLP_MODULE.ko
