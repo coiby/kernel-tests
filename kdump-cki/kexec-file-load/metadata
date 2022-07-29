@@ -1,5 +1,5 @@
 [General]
-name=kdump/kexec-file-load
+name=kdump-cki/kexec-file-load
 owner=Kdump QE <kdump-qe-list@redhat.com>
 description=kdump kexec load via kexec_file_load() and reboot test
 license=GPLv3
@@ -8,4 +8,4 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-repoRequires=kdump/include;cki_lib
+repoRequires=kdump-cki/include;cki_lib
