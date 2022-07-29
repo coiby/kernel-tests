@@ -6,9 +6,5 @@ discover:
 execute:
     how: tmt
     framework: beakerlib
-prepare:
-  - name: Install packages
-    how: install
-    package: [libkcapi-tools]
 environment-file:
         - ./security/crypto/1693350/plans/tmt.env
