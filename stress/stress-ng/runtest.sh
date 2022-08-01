@@ -72,6 +72,10 @@ function build_stress-ng()
     rlRun "pushd $BUILDDIR" 0
     rlRun "git checkout $GIT_BRANCH" 0
     rlRun "make" 0 "Building stress-ng"
+    if [ $? != 0 ]; then
+        rm -rf "$BUILDDIR"
+        cki_abort_task "Failed to build stress-ng."
+    fi
     rlRun "popd" 0 "Done building stress-ng"
 }
 
