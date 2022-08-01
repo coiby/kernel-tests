@@ -40,8 +40,8 @@ rlJournalStart
             rlRun "rpm-ostree -A --idempotent --allow-inactive install kernel-automative-selftests-internal"
         else
             kconfig="/boot/config-$knvr"
-            kselftests="$(dnf list kernel\*-selftests-internal-$knvr --enablerepo=rhel-buildroot* | grep -Eo kernel.*-selftests-internal)-${knvr%.*}"
-            rlRun "yum install -y $kselftests --enablerepo=rhel-buildroot* --skip-broken"
+            kselftests="$(dnf list kernel\*-selftests-internal-$knvr --enablerepo=* | grep -Eo kernel.*-selftests-internal)-${knvr%.*}"
+            rlRun "yum install -y $kselftests --enablerepo=* --skip-broken"
         fi
     rlPhaseEnd
 
