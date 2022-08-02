@@ -192,15 +192,15 @@
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 /packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
-/rt-tests/latency_perf/oslat_valid/ @bgoncalv @lulinqing @waylon531
-/rt-tests/latency_perf/rt_cyclic/ @bgoncalv @lulinqing @waylon531
-/rt-tests/pi_stress/ @bgoncalv @lulinqing @waylon531
-/rt-tests/rt_ltp/ @bgoncalv @cyin2 @lulinqing @stowellm @waylon531 @zhaoqiao
-/rt-tests/rt_migrate_test/ @bgoncalv @lulinqing @zhaoqiao
-/rt-tests/rteval/ @bgoncalv @lulinqing @zhaoqiao
-/rt-tests/sched_deadline/ @bgoncalv @lulinqing @zhaoqiao
-/rt-tests/smidetect/ @bgoncalv @lulinqing @zhaoqiao
-/rt-tests/us/stalld/ @bgoncalv @lulinqing @waylon531
+/rt-tests/latency_perf/oslat_valid/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/latency_perf/rt_cyclic/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/pi_stress/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/rt_ltp/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/rt_migrate_test/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/rteval/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/sched_deadline/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/smidetect/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/us/stalld/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /standards/usex/1.9-29/ @bgoncalv @headrat @lulinqing
 /storage/dm/common/ @bgoncalv @guazhang @lulinqing
 /storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
