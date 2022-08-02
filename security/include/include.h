@@ -241,7 +241,7 @@ install_repos()
     id=$(grep ^ID= /etc/os-release | awk -F = '{print $2}') #Information about what os we are on, rhel or centos
     major=$(grep ^VERSION_ID= /etc/os-release | awk -F = '{print $2}' | sed s/\"//g) #Main release e.g. 9
     karch=$(uname -i)
-    
+
     if kernel_automotive; then
         sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
         dnf install 'dnf-command(config-manager)' -y
