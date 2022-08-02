@@ -1,0 +1,11 @@
+summary: Security Crypto ltp
+description: ''
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/crypto/ltp
+test: make run
+framework: shell
+duration: 1h
+extra-summary: /kernel-tests/security/crypto/ltp
+extra-task: /kernel-tests/security/crypto/ltp
