@@ -18,6 +18,7 @@
 
 # Global variables
 PODMANUSER=${PODMANUSER:-root}
+BATS_DIR=${BATS_DIR:-/usr}
 LOG_DIR="/tmp/podmantestlog"
 TEST="Podman"
 ret=0
@@ -28,7 +29,7 @@ function _install_bats ()
 {
     curl --retry 5 -LO https://github.com/bats-core/bats-core/archive/v1.1.0.tar.gz
     tar xvf v1.1.0.tar.gz > /dev/null
-    ./bats-core-1.1.0/install.sh /usr
+    ./bats-core-1.1.0/install.sh "${BATS_DIR}"
     if [ $? -ne 0 ]; then
         echo "FAIL Couldn't install BATS. Aborting test..."
         rstrnt-report-result "${TEST}" WARN
@@ -148,7 +149,7 @@ else
 fi
 
 # If bats is not install, install it from source
-if [ ! -x /usr/bin/bats ]; then
+if [ ! -x "${BATS_DIR}"/bin/bats ]; then
     _install_bats
 fi
 
