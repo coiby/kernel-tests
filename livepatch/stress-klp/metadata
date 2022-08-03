@@ -1,0 +1,13 @@
+[General]
+name=livepatch/stress-klp
+owner=Dennis Li <denli@redhat.com>
+description=Kernel Livepatch stress testsuite based on SUSE's qa_test_klp
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=10m
+use_pty=false
+dependencies=gcc;git;automake;kernel-devel;elfutils-libelf-devel
