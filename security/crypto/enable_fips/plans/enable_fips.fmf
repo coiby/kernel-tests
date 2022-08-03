@@ -1,0 +1,19 @@
+summary: Security Crypto enable_fips
+discover:
+    how: fmf
+    test:
+        - /security/crypto/enable_fips/tests/enable_fips
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/include.h
+        install_repos
+  - name: Install packages
+    how: install
+    package: [grubby, make]
+environment-file:
+        - ./security/crypto/enable_fips/plans/tmt.env

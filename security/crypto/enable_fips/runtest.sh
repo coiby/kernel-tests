@@ -21,7 +21,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
@@ -35,7 +34,14 @@ rlJournalStart
         rlRun "fips-mode-setup --is-enabled" && rlPass "FIPS mode is enabled" && exit 0
         [[ -e /tmp/enable_fips_attempted ]] && rlDie "Failed to enable FIPS"
         touch /tmp/enable_fips_attempted && sync
-        rlRun "fips-mode-setup --enable"
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            rlRun "fips-mode-setup --enable --no-bootcfg"
+            kernel_args=$(fips-mode-setup --enable --no-bootcfg | awk -F\" '/fips=1/ {print $2}')
+            kernel_current=$(grubby --info=DEFAULT | awk -F\" '/kernel=/ {print $2}')
+            grubby --update-kernel="${kernel_current}" --args="${kernel_args}"
+        else
+            rlRun "fips-mode-setup --enable"
+        fi
         rlRun "rhts-reboot"
     rlPhaseEnd
 

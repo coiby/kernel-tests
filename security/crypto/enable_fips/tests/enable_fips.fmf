@@ -1,0 +1,11 @@
+summary: Security Crypto enable_fips
+description: ''
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/crypto/enable_fips
+test: make run
+framework: shell
+duration: 10m
+extra-summary: /kernel-tests/security/crypto/enable_fips
+extra-task: /kernel-tests/security/crypto/enable_fips
