@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=blktrace;fio;gcc;gcc-c++;git;nvme-cli;xfsprogs
+dependencies=blktrace;fio;gcc;gcc-c++;git;nvme-cli;xfsprogs;parted
 repoRequires=cki_lib
