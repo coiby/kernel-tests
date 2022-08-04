@@ -36,6 +36,7 @@ set -x
 #-------------------- Setup --------------------
 EXEC_DIR=/usr/libexec/kselftests/
 SKIP=4
+BUILDS_URL="${BUILDS_URL:-}"
 
 # Test items
 
@@ -74,7 +75,7 @@ build_selftests()
 	if [[ ! -e "kernel-${kver}-${krel}.src.rpm" ]]; then
 		# Download and install kernel source rpm
 		yumdownloader -q -y --source kernel-${kver}-${krel} \
-		  || wget http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel/${kver}/${krel}/src/kernel-${kver}-${krel}.src.rpm
+		  || wget ${BUILDS_URL}/kernel/${kver}/${krel}/src/kernel-${kver}-${krel}.src.rpm
 	fi
 	rpm -ivh kernel-${kver}-${krel}.src.rpm
 
@@ -85,7 +86,7 @@ build_selftests()
 		devel="kernel-devel"
 	fi
 	yum install -q -y ${devel}-${kver}-${krel} \
-	   || yum install -q -y http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel/${kver}/${krel}/${karch}/${devel}-${kver}-${krel}.${karch}.rpm
+	   || yum install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${devel}-${kver}-${krel}.${karch}.rpm
 
 	# Add a backports as needed, backports/* directories hold fixes
 	# for kernels greater or equal to the directory name and only
@@ -160,12 +161,12 @@ install_selftests()
 	# These two appease the net test part of kernel-selftests-internal
 	which tc || dnf install -q -y iproute-tc
 	dnf install -q -y bpftool-${kver}-${krel} \
-		|| dnf install -q -y http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel/${kver}/${krel}/${karch}/bpftool-${kver}-${krel}.${karch}.rpm
+		|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/bpftool-${kver}-${krel}.${karch}.rpm
 	# Livepatch selftests require both modules and scripts
 	dnf install -q -y ${modules}-${kver}-${krel} \
-		|| dnf install -q -y http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
+		|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
 	dnf install -q -y kernel-selftests-internal-${kver}-${krel} \
-		|| dnf install -q -y http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel/${kver}/${krel}/${karch}/kernel-selftests-internal-${kver}-${krel}.${karch}.rpm
+		|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/kernel-selftests-internal-${kver}-${krel}.${karch}.rpm
 }
 
 test_fail()
