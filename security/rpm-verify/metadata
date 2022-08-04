@@ -1,5 +1,5 @@
 [General]
-name=/kernel/security/rpm-verify
+name=/kernel-tests/security/rpm-verify
 owner=Linqing Lu <lilu@redhat.com>
 description=RPM verify on a kernel package
 license=GPLv2
@@ -9,7 +9,7 @@ destructive=no
 [restraint]
 entry_point=./runtest.sh
 dependencies=kernel
-Path=/mnt/tests/kernel/security/rpm-verify
+Path=/mnt/tests/kernel-tests/security/rpm-verify
 Type=Function
 RunFor=kernel
 Priority=Normal

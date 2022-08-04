@@ -1,5 +1,5 @@
 [General]
-name=/kernel/security/vulnerabilities
+name=/kernel-tests/security/vulnerabilities
 owner=Jeff Bastian <jbastian@redhat.com>
 description=Check /sys/devices/system/cpu/vulnerabilities/* for non-mitigated CVEs
 license=GPLv2
@@ -9,7 +9,7 @@ destructive=no
 [restraint]
 entry_point=./runtest.sh
 dependencies=kernel
-Path=/mnt/tests/kernel/security/vulnerabilities
+Path=/mnt/tests/kernel-tests/security/vulnerabilities
 Type=Function
 RunFor=kernel
 Priority=Normal
