@@ -33,7 +33,7 @@ TEST="/kernel/livepatch/sysfs"
 KLP_SYSFS="/sys/kernel/livepatch"
 KLP_MODULE="test_klp_callbacks_demo"
 BUSY_MODULE="test_klp_callbacks_busy"
-BREW="http://download-node-02.eng.bos.redhat.com/brewroot/packages"
+BUILDS_URL="${BUILDS_URL:-}"
 
 karch=$(uname -i)
 kver=$(uname -r | cut -f1 -d'-')
@@ -59,7 +59,7 @@ test_pass()
 modules="kernel-modules-internal"
 echo "Install $modules package"
 dnf install -q -y ${modules}-${kver}-${krel} \
-		|| dnf install -q -y $BREW/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
+	|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
 rpm -q $modules || { test_fail "Could not install $modules" && exit 1; }
 klp_module_file=$(modinfo $KLP_MODULE | head -n 1 | awk '{print $2}')
 busy_module_file=$(modinfo $BUSY_MODULE | head -n 1 | awk '{print $2}')
