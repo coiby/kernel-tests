@@ -1,0 +1,8 @@
+summary: LTP security tests
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/ltp
+test: ./runtest.sh
+framework: beakerlib
+duration: 1h

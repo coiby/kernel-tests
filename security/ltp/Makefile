@@ -1,6 +1,6 @@
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile
+FILES=runtest.sh Makefile
 
 .PHONY: all install download clean
 
@@ -12,11 +12,3 @@ build: $(BUILT_FILES)
 
 clean:
 	rm -f *~ $(BUILT_FILES)
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner: Linqing Lu <lilu@redhat.com>" > $(METADATA)
-	@echo "TestTime:        4h" >> $(METADATA)
-
-	rhts-lint $(METADATA)
