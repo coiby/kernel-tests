@@ -2,7 +2,7 @@
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /kernel/security/vulnerabilities
+#   runtest.sh of /kernel-tests/security/vulnerabilities
 #   Description: Check vulnerabilities/* files for unmitigated CVEs
 #   Author: Jeff Bastian <jbastian@redhat.com>
 #

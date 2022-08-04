@@ -1,5 +1,5 @@
 [General]
-name=/kernel/security/krsi
+name=/kernel-tests/security/krsi
 owner=Linqing Lu <lilu@redhat.com>
 description=Kernel KRSI selftests
 license=GPLv2
@@ -9,8 +9,8 @@ destructive=no
 [restraint]
 entry_point=./runtest.sh
 dependencies=kernel
-Path=/mnt/tests/kernel/security/krsi
+Path=/mnt/tests/kernel-tests/security/krsi
 Type=Function
 RunFor=kernel
 Priority=Normal
-max_time=5m
+max_time=15m

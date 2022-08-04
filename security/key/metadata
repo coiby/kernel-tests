@@ -1,5 +1,5 @@
 [General]
-name=/kernel/security/key
+name=/kernel-tests/security/key
 owner=Linqing Lu <lilu@redhat.com>
 description=LTP key syscalls tests
 license=GPLv2
@@ -9,7 +9,7 @@ destructive=no
 [restraint]
 entry_point=./runtest.sh
 dependencies=kernel
-Path=/mnt/tests/kernel/security/key
+Path=/mnt/tests/kernel-tests/security/key
 Type=Function
 RunFor=kernel
 Priority=Normal
