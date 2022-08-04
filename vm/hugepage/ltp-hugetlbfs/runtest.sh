@@ -27,8 +27,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include rhts environment
-. /usr/bin/rhts-environment.sh
-. /mnt/tests/kernel/distribution/ltp/include/runtest.sh
+. /usr/bin/rhts-environment.sh				|| exit 1
+. ../../../distribution/ltp/include/runtest.sh		|| exit 1
+. ../../../distribution/ltp/include/ltp-make.sh		|| exit 1
 
 trap 'trap "" EXIT; TearDown' EXIT
 HPAGE=/proc/sys/vm/nr_hugepages
@@ -38,6 +39,18 @@ RESULT=PASS
 TearDown()
 {
     echo 0 > ${HPAGE}
+}
+
+function TestBuild()
+{
+        # The test could be running on different path
+        # Just skip the build, but make sure the config is copied
+        if [ -f ${LTPDIR}/runltp ]; then
+                echo "LTP has been built and installed at ${LTPDIR}/runltp !"
+                return
+        fi
+
+        build-all
 }
 
 SetupHugetlb()
@@ -111,6 +124,7 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
+TestBuild
 SetupHugetlb
 
 report_result "${TEST}/Setup" "${RESULT}"

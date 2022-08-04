@@ -1,3 +1,2 @@
 PURPOSE of /kernel/vm/hugepage/ltp-hugetlbfs
 Description: Porting hugetlb tests from ltp to Beaker
-Author: Caspar Zhang <czhang@redhat.com>
