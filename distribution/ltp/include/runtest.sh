@@ -289,7 +289,7 @@ DisableKsmd ()
 # Workaround for Bug 1263712 - OOM is sporadically killing more than just expected process
 ProtectHarnessFromOOM ()
 {
-    for pid in $(pgrep beah) $(pgrep rhts) $(pgrep ltp) $(pgrep dhclient) $(pgrep NetworkManager); do
+    for pid in $(pgrep systemd) $(pgrep restraintd) $(pgrep beah) $(pgrep rhts) $(pgrep ltp) $(pgrep dhclient) $(pgrep NetworkManager); do
         echo -16 > /proc/$pid/oom_adj
     done
 
