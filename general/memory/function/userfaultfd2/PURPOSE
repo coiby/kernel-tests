@@ -1,0 +1,4 @@
+PURPOSE of /kernel/general/memory/function/userfaultfd2
+Description: Kernel self test for userfaultfd mechanism
+Source: https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/userfaultfd.c
+Author: David McDougall <dmcdouga@redhat-com>

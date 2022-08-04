@@ -1,0 +1,6 @@
+#HWpoison
+HWPOISON-SOFT cases/function/hwpoison/run_soft.sh
+HWPOISON-HARD cases/function/hwpoison/run_hard.sh
+HWPOISON-HUGEPAGE cases/function/hwpoison/run_hugepage.sh
+HWPOISON-HUGEPAGE-OVERCOMMIT cases/function/hwpoison/run_hugepage_overcommit.sh
+HWPOISON-THP cases/function/hwpoison/run_thp.sh

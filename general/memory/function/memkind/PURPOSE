@@ -1,0 +1,7 @@
+PURPOSE of /kernel/general/memory/function/memkind
+Description: Test memkind with upstream testsuite
+Author: Li Wang <liwang@redhat.com>
+
+This testcase contains two parts:
+  - Function Test
+  - Stress Test

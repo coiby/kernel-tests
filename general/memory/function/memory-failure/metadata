@@ -1,0 +1,13 @@
+[General]
+name=memory-failure
+owner=Chunyu Hu <chuhu@redhat.com>
+description=memory-failure testing with hwpoison-inject interface
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=24h
+dependencies=python3
+repoRequires=

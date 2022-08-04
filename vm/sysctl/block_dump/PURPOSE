@@ -1,0 +1,2 @@
+block_dump enables block I/O debugging when set to a nonzero value.
+the case is desinged to test the tune's feature.

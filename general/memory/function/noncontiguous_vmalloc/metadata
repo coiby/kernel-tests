@@ -1,0 +1,14 @@
+[General]
+name=kernel vmalloc sanity test
+owner= Shizhao Chen <shichen@redhat.com>
+description=Regression test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=5m
+dependencies=yum-utils
+softDependencies=@development
+repoRequires=general/include

@@ -1,0 +1,39 @@
+# gcc -m32 tshmget.c -o tshmget
+
+Usage: tshmget <segment_size>
+
+NOTE: should only be run on 64-bit platforms, in 32-bit mode
+
+(1) Category
+	Defect Report
+
+(2) Abstract
+	[RHEL4] Bug of shmget system call with 2GB shared memory 
+
+(3) Symptom
+	shmget system call which is issued by 32bit application running
+	on 64bit architectures fails when the size is 2GB.
+
+(4) Environment
+	RHEL4(EM64T)
+
+(5) Recreation Steps
+	N/A
+
+(6) Investigation
+	This is well known bug and upstream kernel as well as RHEL5 is fixed.
+	http://kernel.org/pub/linux/kernel/people/akpm/patches/2.6/2.6.11-rc3/2.6.11-rc3-mm2/broken-out/fix-compat-shmget-overflow.patch
+
+	The bug is caused by the lost of signed bit, therefore the cast "(unsigned)"
+	should be added before the variable "second" in sys32_ipc() function.
+
+(7) Related Documentation/Related Bugzilla #
+(8) Attachments
+(9) Business Impacts
+	Middleware which expects to  get shared memory more than 2GB
+	cannot work well and it cause some unexpected trouble.
+
+(10) Requests
+	This is well known bugs and very simple to fix. Therefore, please fix
+	this bug as soon as possible (RHEL4U5).
+

@@ -1,0 +1,26 @@
+From a44e130ce6e2663a84a6f7edb15812d932335856 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kulakowski <krzysztof.kulakowski@intel.com>
+Date: Thu, 6 Oct 2016 12:25:38 +0200
+Subject: [PATCH] Fix for checking autohbw limits
+
+Change-Id: Iad8f195cb93459153da1978786c0a0779110b760
+---
+ autohbw/autohbw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/autohbw/autohbw.c b/autohbw/autohbw.c
+index 8f1373a..59437a9 100644
+--- a/autohbw/autohbw.c
++++ b/autohbw/autohbw.c
+@@ -259,7 +259,7 @@ static void setEnvValues()
+         HBWLowLimit = getLimit(lowlim, lowC);
+         HBWHighLimit = getLimit(highlim, highC);
+ 
+-        if (HBWLowLimit >= HBWLowLimit) {
++        if (HBWLowLimit >= HBWHighLimit) {
+             LOG(ALWAYS, "WARN: In AUTO_HBW_SIZE=X:Y, X cannot be greater or equal to Y. "
+                         "None of allocations will use HBW memory.\n");
+         }
+-- 
+1.8.3.1
+

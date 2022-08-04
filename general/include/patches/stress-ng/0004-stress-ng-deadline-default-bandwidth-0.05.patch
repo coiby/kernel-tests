@@ -1,0 +1,52 @@
+From 8d408a02e5b7c598a42c5c95c19d9c06aee2fa1c Mon Sep 17 00:00:00 2001
+From: Chunyu Hu <chuhu@redhat.com>
+Date: Wed, 21 Nov 2018 16:57:52 +0800
+Subject: [PATCH 4/4] stress-ng: deadline: default bandwidth 0.05
+
+---
+ sched.c     | 8 ++++++++
+ stress-ng.c | 9 +++++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/sched.c b/sched.c
+index 920179d..ac97a63 100644
+--- a/sched.c
++++ b/sched.c
+@@ -119,6 +119,14 @@ int sched_deadline_init(void *params)
+ 		(void)get_setting("sched-runtime", &sched_runtime);
+ 		(void)get_setting("sched-deadline", &sched_deadline);
+ 	}
++	if (sched_deadline <= 0) {
++		sched_runtime = 50000;
++		sched_deadline = 1000000;
++		sched_period = 0;
++	}
++	if (sched_period == 0)
++		sched_period = sched_deadline;
++
+ 	pr_inf("%s: setting scheduler class '%s'(period=%lu,runtime=%lu,deadline=%lu)\n",
+ 		__func__, "deadline", sched_period, sched_runtime, sched_deadline);
+ 	rc = stress_set_deadline_sched(getpid(), sched_period,
+diff --git a/stress-ng.c b/stress-ng.c
+index d60a574..87d4469 100644
+--- a/stress-ng.c
++++ b/stress-ng.c
+@@ -2494,6 +2494,15 @@ again:
+ 					(void)get_setting("sched-period", &sched_period);
+ 					(void)get_setting("sched-runtime", &sched_runtime);
+ 					(void)get_setting("sched-deadline", &sched_deadline);
++
++					if (sched_deadline <= 0) {
++						sched_runtime = 50000;
++						sched_deadline = 1000000;
++						sched_period = 0;
++					}
++					if (sched_period <= 0)
++						sched_period = sched_deadline;
++
+ 					if (sched == SCHED_DEADLINE && stress_set_deadline_sched(getpid(),
+ 						sched_period, sched_runtime, sched_deadline, false) < 0)
+ 						exit(EXIT_FAILURE);
+-- 
+1.8.3.1
+

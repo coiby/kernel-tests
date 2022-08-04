@@ -1,0 +1,9 @@
+PURPOSE of /kernel/general/memory/function/kasan
+Description: Check that Kernel-Address-Sanitizer (KASAN) is enabled.  This does
+a read-after-free error in the kernels memory space, and then searches "dmesg"
+for the resulting error message.  KASAN is currently only enabled on:
+ * RHEL-8,
+ * Debug kernels,
+ * x86_64 & aarch64 architectures.
+
+Author: David McDougall <dmcdouga@redhat.com>

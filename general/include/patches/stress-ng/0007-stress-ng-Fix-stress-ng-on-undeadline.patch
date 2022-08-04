@@ -1,0 +1,29 @@
+From f8fec4298169ef4f9799d8ef0e4a51868eda85d0 Mon Sep 17 00:00:00 2001
+From: root <root@localhost>
+Date: Thu, 21 Mar 2019 04:58:01 -0400
+Subject: [PATCH] stress-ng: Fix stress-ng on undeadline
+
+Signed-off-by: Ping Fang <pifang@redhat.com>
+---
+ stress-ng.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/stress-ng.c b/stress-ng.c
+index 87d4469..3800e43 100644
+--- a/stress-ng.c
++++ b/stress-ng.c
+@@ -2503,9 +2503,11 @@ again:
+ 					if (sched_period <= 0)
+ 						sched_period = sched_deadline;
+ 
++#if defined(SCHED_DEADLINE)
+ 					if (sched == SCHED_DEADLINE && stress_set_deadline_sched(getpid(),
+ 						sched_period, sched_runtime, sched_deadline, false) < 0)
+ 						exit(EXIT_FAILURE);
++#endif
+ 					/* Child */
+ 					(void)atexit(stress_child_atexit);
+ 					(void)setpgid(0, g_pgrp);
+-- 
+1.7.1
+
