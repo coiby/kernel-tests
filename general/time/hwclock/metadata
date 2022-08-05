@@ -1,0 +1,14 @@
+[General]
+name=general/time/hwclock
+owner=Qiao Zhao <qzhao@redhat.com>
+description=warp_clock function test by using the hwclock command
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=gcc
+repoRequires=cki_lib
+max_time=2h
+use_pty=false
