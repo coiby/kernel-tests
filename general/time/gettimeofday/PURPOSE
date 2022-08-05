@@ -1,0 +1,22 @@
+Bugzilla Bug 262481: something deeply wrong with gettimeofday
+
+When using hpet for a timer, the clock would jump forward at an
+enormous rate due to a bug in the gettimeofday vdso implementation.
+
+timedrift.c attempts to detect this case.
+
+-------------------------------------------------------------------
+
+Bugzilla Bug 250708: RHEL5.2: Fix time of gettimeofday() going backward (EM64T)
+
+When using the pit/tsc for a timer, the gtod clock occasionally jumps backwards
+by 1 msec.
+
+gtod_backwards.c attempts to detect this case.
+
+-------------------------------------------------------------------
+
+Disable timedifftest-qa test.  This is known failure in RHEL5.
+Fix for this issue is significant and would require medium code
+change - see BZs 250708 and 4611184.
+

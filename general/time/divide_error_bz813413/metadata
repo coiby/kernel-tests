@@ -1,0 +1,14 @@
+[General]
+name=general/time/divide_error_bz813413
+owner=Qiao Zhao <qzhao@redhat.com>
+description=bz813413 divide by zero check
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=gcc
+repoRequires=cki_lib
+max_time=1h
+use_pty=false

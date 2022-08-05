@@ -1,0 +1,3 @@
+Kernel Function getboottime functino testing due to RHEL-6.4 patchsets
+
+commit 79342c8 and cd6d136

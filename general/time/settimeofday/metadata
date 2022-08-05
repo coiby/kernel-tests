@@ -1,0 +1,14 @@
+[General]
+name=general/time/settimeofday
+owner=Qiao Zhao <qzhao@redhat.com>
+description=kernel syscall gettimeofday()/settimeofday() test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=gcc
+repoRequires=cki_lib
+max_time=1h
+use_pty=false

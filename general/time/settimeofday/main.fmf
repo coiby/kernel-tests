@@ -1,0 +1,9 @@
+summary: kernel syscall gettimeofday()/settimeofday() test
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+test: bash -x ./runtest.sh
+framework: shell
+duration: 60m
+extra-summary: /kernel-tests/general/time/settimeofday
+extra-task: /kernel-tests/general/time/settimeofday

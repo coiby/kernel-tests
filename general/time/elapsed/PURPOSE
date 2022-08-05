@@ -1,0 +1,7 @@
+Read the clock, sleep for 0.5 seconds, and read the clock again,
+and verify that approximately 0.5 seconds actually passed.  A bug
+in gettimeofday() on aarch64 (64-bit ARM) returned bad values
+and failed this test.
+
+See https://bugzilla.redhat.com/show_bug.cgi?id=1479588
+and https://bugzilla.redhat.com/show_bug.cgi?id=1451467

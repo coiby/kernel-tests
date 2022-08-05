@@ -1,0 +1,9 @@
+summary: kernel function getboottime testing
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+test: bash -x ./runtest.sh
+framework: shell
+duration: 120m
+extra-summary: /kernel-tests/general/time/getboottime
+extra-task: /kernel-tests/general/time/getboottime
