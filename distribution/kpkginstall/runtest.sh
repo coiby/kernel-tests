@@ -3,6 +3,7 @@
 . ../../cki_lib/libcki.sh || exit 1
 
 TEST="distribution/kpkginstall"
+TEST_DEPS="elfutils-libelf-devel flex bison gcc openssl-devel make curl grubby tar binutils"
 ARCH=$(uname -m)
 REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
@@ -441,10 +442,18 @@ cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
 if [ ${REBOOTCOUNT} -eq 0 ]; then
   # set YUM var.
   select_yum_tool
-  if $YUM install -y elfutils-libelf-devel flex bison gcc openssl-devel make curl grubby tar binutils; then
-      cki_print_success "Installed test dependencies"
-    else
-      cki_abort_recipe "Failed to install test dependencies" WARN
+  if [[ -z $RPM_OSTREE ]];then
+      if $YUM install -y $TEST_DEPS; then
+          cki_print_success "Installed test dependencies"
+      else
+          cki_abort_recipe "Failed to install test dependencies" WARN
+      fi
+  else
+      if rpm-ostree install -A --idempotent --allow-inactive $TEST_DEPS; then
+          cki_print_success "Installed test dependencies"
+      else
+          cki_abort_recipe "Failed to install test dependencies" WARN
+      fi
   fi
 
   # kernel packages only from CKI kernel repo should be used
