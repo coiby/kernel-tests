@@ -64,6 +64,7 @@
 /kunit/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @spbnick @sturivny @veruu
 /legacy/pci_id/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @spbnick @sturivny @veruu
 /legacy/whitelist/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @spbnick @sturivny @veruu
+/livepatch/selftests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @spbnick @sturivny @veruu
 /memory/fork_mem/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @spbnick @sturivny @veruu
 /memory/function/kaslr/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @spbnick @sturivny @veruu
 /memory/function/memfd_create/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @inakimalerba @kamaxeon @mh21 @spbnick @sturivny @veruu
@@ -173,6 +174,7 @@
 /kdump-cki/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
 /kselftests/ @bgoncalv @liuhangbin @lulinqing @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
+/livepatch/selftests/ @bgoncalv @joe.lawrence @lulinqing @ykopkova
 /memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
@@ -190,6 +192,7 @@
 /networking/tunnel/gre/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
+/networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 /packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
 /rt-tests/latency_perf/oslat_valid/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
