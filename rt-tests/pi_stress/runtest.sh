@@ -7,19 +7,27 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Enable TMT testing for RHIVOS
+. ../../automotive/include/include.sh || exit 1
+: ${OUTPUTFILE:=runtest.log}
+
 # Source rt common functions
 . ../include/runtest.sh || exit 1
 
 export TEST="rt-tests/pi_stress"
 
-rt_env_setup
+if ! kernel_automotive; then
+    rt_env_setup
+fi
 
 export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 
 echo "--- Test Start ---" | tee -a $OUTPUTFILE
 
-declare pkg_name="rt-tests" && [ $rhel_major -ge 9 ] && pkg_name="realtime-tests"
-which pi_stress || yum install -y $pkg_name
+if ! kernel_automotive; then
+    declare pkg_name="rt-tests" && [ $rhel_major -ge 9 ] && pkg_name="realtime-tests"
+    which pi_stress || yum install -y $pkg_name
+fi
 
 if [ -z "$PARAM_SEC" ]; then
     PARAM_SEC=300
