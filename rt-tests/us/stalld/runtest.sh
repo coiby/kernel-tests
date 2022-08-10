@@ -15,6 +15,10 @@
 # us that the task is indeed being boosted.
 ###############################################################################
 
+# Enable TMT testing for RHIVOS
+. ../../../automotive/include/include.sh || exit 1
+: ${OUTPUTFILE:=runtest.log}
+
 # Source rt common functions
 . ../../include/runtest.sh || exit 1
 
@@ -33,16 +37,17 @@ export BUSYLOOP_PID=""
 # Non-Default ACTION=STOP: Is used to stop stalld
 export ACTION=${ACTION:-"TEST"}
 
-function install_and_start_stalld()
-{
-    # Only run on 8.4 and up
-    if ! (( ("$rhel_major" == 8 && "$rhel_minor" >= 4) || ("$rhel_major" > 8) )); then
-        echo "stalld is only supported for RHEL >= 8.4 and up" || tee -a "$OUTPUTFILE"
-        rstrnt-report-result $TEST "SKIP" 5
-        exit 0
+function install_and_start_stalld() {
+    if ! kernel_automotive; then
+        # Only run on 8.4 and up
+        if ! (( ("$rhel_major" == 8 && "$rhel_minor" >= 4) || ("$rhel_major" > 8) )); then
+            echo "stalld is only supported for RHEL >= 8.4 and up" || tee -a "$OUTPUTFILE"
+            rstrnt-report-result $TEST "SKIP" 5
+            exit 0
+        fi
     fi
 
-    if [ "$nrcpus" -eq 1 ] ; then
+    if [ "$nrcpus" -eq 1 ]; then
         echo "stalld needs muliple cpus to run" || tee -a "$OUTFILE"
         rstrnt-report-result $TEST "SKIP" 1
         exit 0
@@ -58,7 +63,7 @@ function install_and_start_stalld()
     # Enable stalld if needed
     systemctl status stalld.service >>"$OUTPUTFILE" 2>&1 || {
         echo "Starting stalld" | tee -a "$OUTPUTFILE"
-        
+
         # Use a higher runtime ns for boosting, equal to 0.1s
         # With the default boost timing it will take multiple boosts
         # to finish the test and will take much longer
@@ -67,8 +72,7 @@ function install_and_start_stalld()
     }
 }
 
-function run_test()
-{
+function run_test() {
     echo "Compile rt_busyloop" | tee -a "$OUTPUTFILE"
     gcc -o rt_busyloop rt_busyloop.c
 
@@ -90,7 +94,7 @@ function run_test()
         chrt -f 1 taskset -c 1 sh -c "echo \"Finished\""
 
         END=$(date +%s)
-        RUNTIME=$(( END - START))
+        RUNTIME=$((END - START))
 
         if [[ $RUNTIME -lt 240 ]]; then
             echo "Iteration $ITERS runtime is $RUNTIME : PASS" | tee -a "$OUTPUTFILE"
@@ -99,13 +103,12 @@ function run_test()
             echo "Iteration $ITERS runtime is $RUNTIME : FAIL" | tee -a "$OUTPUTFILE"
             rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "FAIL" 1
         fi
-        ITERS=$(( ITERS + 1 ))
+        ITERS=$((ITERS + 1))
         kill "$BUSYLOOP_PID"
     done
 }
 
-function stop_stalld()
-{
+function stop_stalld() {
     echo "Stoping stalld." | tee -a "$OUTPUTFILE"
     kill "$STALLD_PID"
 }
@@ -114,14 +117,16 @@ function stop_stalld()
 
 if [ "$ACTION" == "TEST" ]; then
     echo "Running stalld performance test." | tee -a "$OUTPUTFILE"
-    rt_env_setup # Should this be ran before START and STOP?
+    if ! kernel_automotive; then
+        rt_env_setup # Should this be ran before START and STOP?
+    fi
     install_and_start_stalld
     run_test
     stop_stalld
-elif [ "$ACTION" == "START" ];then
+elif [ "$ACTION" == "START" ]; then
     echo "Check stalld installation and start stalld." | tee -a "$OUTPUTFILE"
     install_and_start_stalld
-elif [ "$ACTION" == "STOP" ];then
+elif [ "$ACTION" == "STOP" ]; then
     echo "Stop stalld by running stop." | tee -a "$OUTPUTFILE"
     stop_stalld
 fi

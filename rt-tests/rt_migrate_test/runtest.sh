@@ -9,6 +9,7 @@
 
 # Source rt common functions
 . ../include/runtest.sh || exit 1
+. ../../automotive/include/include.sh || exit 1
 
 TEST="rt-tests/rt_migrate_test"
 
@@ -72,7 +73,9 @@ function RunStress ()
 }
 
 # ---------- Start Test -------------
-rt_env_setup
+if ! kernel_automotive; then
+    rt_env_setup
+fi
 
 # set default variables
 NUMBERPROCS=$(/bin/cat /proc/cpuinfo | /bin/grep processor | wc -l)

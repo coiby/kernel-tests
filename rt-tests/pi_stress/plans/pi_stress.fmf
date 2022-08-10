@@ -1,0 +1,19 @@
+summary: Test priority inheritance mutexes
+discover:
+    how: fmf
+    test:
+        - /rt-tests/pi_stress
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [realtime-tests]
+environment-file:
+    - ./rt-tests/pi_stress/plans/tmt.env

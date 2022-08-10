@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash -x ./runtest.sh
-repoRequires=cki_lib;rt-tests/include
+repoRequires=cki_lib;rt-tests/include;automotive/include
 dependencies=gcc
 max_time=40m
 use_pty=false
