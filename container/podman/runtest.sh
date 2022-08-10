@@ -149,6 +149,11 @@ else
 fi
 
 # If bats is not install, install it from source
+
+if [[ -e /run/ostree-booted ]];then
+   BATS_DIR=/usr/local
+fi
+
 if [ ! -x "${BATS_DIR}"/bin/bats ]; then
     _install_bats
 fi

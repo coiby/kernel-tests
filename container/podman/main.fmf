@@ -1,0 +1,20 @@
+summary: Podman system test
+contact: Major Hayden <major@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+require:
+  - podman
+  - podman-tests
+  - buildah
+  - openssl
+  - socat
+  - httpd-tools
+  - nmap-ncat
+  - skopeo
+  - jq
+  - git
+framework: beakerlib
+duration: 3h
+extra-summary: container/podman
+extra-task: container/podman
