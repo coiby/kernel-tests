@@ -4,8 +4,8 @@ function rhel9_fatal_issues()
 {
 	# systemd oom policy will send SIGTERM to restraintd
 	osver_in_range "900" "901" && tskip "oom0.*" fatal
-	# BZ2026959
-	osver_in_range "900" "901" && is_arch "aarch64" && tskip "read_all_sys" fatal
+	# BZ2026959, BZ2112284
+	osver_in_range "900" "903" && is_arch "aarch64" && tskip "read_all_sys" fatal
 }
 
 function rhel9_unfix_issues()
