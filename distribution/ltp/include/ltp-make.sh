@@ -95,6 +95,12 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-shrink-to-3-MADV_WILLNEED-pages-to-stabili.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-swapping01-make-use-of-remaining-runtime-in-test-loo.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/migrate_pages03_timeout.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-futex_waitv03-replace-TST_THREAD_STATE_WAIT.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-read_all-Add-worker-timeout-and-rewrite-scheduling.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-read_all-Fix-type-warnings.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0003-read_all-Allow-sys-power-wakeup_count.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0004-read_all-Prevent-FNM_EXTMATCH-redefinition.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-accept4_01-don-t-hardcode-port-number-for-t.patch
     fi
 
     if [ "$TESTVERSION" == "20220121" ]; then

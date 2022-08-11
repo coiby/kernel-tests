@@ -1,0 +1,37 @@
+From dd3c1ed705bfff16d47484d5da60d8808aff47f3 Mon Sep 17 00:00:00 2001
+From: Richard Palethorpe <rpalethorpe@suse.com>
+Date: Tue, 12 Jul 2022 13:23:08 +0100
+Subject: [PATCH 2/4] read_all: Fix type warnings
+
+Signed-off-by: Richard Palethorpe <rpalethorpe@suse.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ testcases/kernel/fs/read_all/read_all.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/fs/read_all/read_all.c b/testcases/kernel/fs/read_all/read_all.c
+index 4449fe894..02c8f1754 100644
+--- a/testcases/kernel/fs/read_all/read_all.c
++++ b/testcases/kernel/fs/read_all/read_all.c
+@@ -184,7 +184,7 @@ static void sanitize_str(char *buf, ssize_t count)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < MIN(count, MAX_DISPLAY); i++)
++	for (i = 0; i < MIN(count, (ssize_t)MAX_DISPLAY); i++)
+ 		if (!isprint(buf[i]))
+ 			buf[i] = ' ';
+ 
+@@ -552,7 +552,7 @@ static void setup(void)
+ 		tst_brk(TBROK, "The directory argument (-d) is required");
+ 
+ 	if (!worker_count)
+-		worker_count = MIN(MAX(tst_ncpus() - 1, 1), max_workers);
++		worker_count = MIN(MAX(tst_ncpus() - 1, 1L), max_workers);
+ 	workers = SAFE_MALLOC(worker_count * sizeof(*workers));
+ 
+ 	if (tst_parse_int(str_worker_timeout, &worker_timeout, 1, INT_MAX)) {
+-- 
+2.35.3
+

@@ -1,0 +1,79 @@
+From 39d5c93c142c73d4a6ad80370acdc45fd6c129a6 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 7 Jul 2022 18:50:21 +0200
+Subject: [PATCH] syscalls/futex_waitv03: replace TST_THREAD_STATE_WAIT with
+ repeated wake
+
+TST_THREAD_STATE_WAIT isn't reliable to tell that it's safe to call futex_wake().
+futex_wake() can be called prematurely and return 0, which leaves other thread
+timing out on futex call:
+  tst_test.c:1459: TINFO: Timeout per run is 0h 10m 00s
+  futex_waitv03.c:37: TINFO: Testing variant: syscall with old kernel spec
+  tst_buffers.c:55: TINFO: Test is using guarded buffers
+  futex_waitv03.c:106: TBROK: futex_waitv returned: -1: ETIMEDOUT (110)
+
+Replace it with repeated futex_wake() until it fails or wakes at least 1 waiter.
+Also extend timeout to 5 seconds to avoid false positives from systems with
+high steal time (e.g. overloaded s390x host).
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ .../kernel/syscalls/futex/futex_waitv03.c     | 25 ++++++++-----------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/futex/futex_waitv03.c b/testcases/kernel/syscalls/futex/futex_waitv03.c
+index ffe5c66cd..ee7972847 100644
+--- a/testcases/kernel/syscalls/futex/futex_waitv03.c
++++ b/testcases/kernel/syscalls/futex/futex_waitv03.c
+@@ -70,19 +70,19 @@ static void cleanup(void)
+ 	}
+ }
+ 
+-static void *threaded(void *arg)
++static void *threaded(LTP_ATTRIBUTE_UNUSED void *arg)
+ {
+ 	struct futex_test_variants tv = futex_variant();
+-	int tid = *(int *)arg;
+ 
+-	TST_THREAD_STATE_WAIT(tid, 'S', 0);
+-
+-	TEST(futex_wake(tv.fntype, (void *)(uintptr_t)waitv[numfutex - 1].uaddr,
++	do {
++		TEST(futex_wake(tv.fntype, (void *)(uintptr_t)waitv[numfutex - 1].uaddr,
+ 			1, 0));
+-	if (TST_RET < 0) {
+-		tst_brk(TBROK | TTERRNO,
+-			"futex_wake private returned: %ld", TST_RET);
+-	}
++		if (TST_RET < 0) {
++			tst_brk(TBROK | TTERRNO,
++				"futex_wake private returned: %ld", TST_RET);
++		}
++		usleep(1000);
++	} while (TST_RET < 1);
+ 
+ 	return NULL;
+ }
+@@ -90,16 +90,13 @@ static void *threaded(void *arg)
+ static void run(void)
+ {
+ 	struct timespec to;
+-	int tid;
+ 	pthread_t t;
+ 
+-	tid = tst_syscall(__NR_gettid);
+-
+-	SAFE_PTHREAD_CREATE(&t, NULL, threaded, (void *)&tid);
++	SAFE_PTHREAD_CREATE(&t, NULL, threaded, NULL);
+ 
+ 	/* setting absolute timeout for futex2 */
+ 	SAFE_CLOCK_GETTIME(CLOCK_MONOTONIC, &to);
+-	to.tv_sec++;
++	to.tv_sec += 5;
+ 
+ 	TEST(futex_waitv(waitv, numfutex, 0, &to, CLOCK_MONOTONIC));
+ 	if (TST_RET < 0) {
+-- 
+2.35.3
+

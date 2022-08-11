@@ -1,0 +1,34 @@
+From d4f0d8ed1d6246a7e30e9351ea751112da87afb9 Mon Sep 17 00:00:00 2001
+From: Richard Palethorpe <rpalethorpe@suse.com>
+Date: Mon, 25 Jul 2022 10:44:02 +0100
+Subject: [PATCH 4/4] read_all: Prevent FNM_EXTMATCH redefinition
+
+Signed-off-by: Richard Palethorpe <rpalethorpe@suse.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ testcases/kernel/fs/read_all/read_all.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/fs/read_all/read_all.c b/testcases/kernel/fs/read_all/read_all.c
+index c36203846..266678ea7 100644
+--- a/testcases/kernel/fs/read_all/read_all.c
++++ b/testcases/kernel/fs/read_all/read_all.c
+@@ -30,6 +30,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/wait.h>
++#include <fnmatch.h>
+ #include <lapi/fnmatch.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+@@ -39,7 +40,6 @@
+ #include <unistd.h>
+ #include <string.h>
+ #include <limits.h>
+-#include <fnmatch.h>
+ #include <semaphore.h>
+ #include <ctype.h>
+ #include <pwd.h>
+-- 
+2.35.3
+
