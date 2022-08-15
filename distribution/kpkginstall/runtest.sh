@@ -208,6 +208,13 @@ function targz_install()
       grubby --set-default /boot/vmlinuz-"${KVER}" && zipl
       cki_print_success "Grubby workaround for s390x completed"
   fi
+
+  # Make sure kernel args doesn't have 'quiet' argument as it silences kernel messages
+  # related https://bugzilla.redhat.com/show_bug.cgi?id=2118292
+  if grep -wq quiet /boot/loader/entries/*-${KVER}.conf; then
+    sed -i s/quiet// /boot/loader/entries/*-${KVER}.conf
+    cki_print_success "removed 'quiet' from kernel arguments"
+  fi
 }
 
 function select_yum_tool()
