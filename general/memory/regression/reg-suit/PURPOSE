@@ -1,0 +1,9 @@
+PURPOSE of regression
+Description: 
+Author: Chao Ye <cye@redhat.com>
+
+When your subcase paniced and need cleanup before skip. You should add casecleanup() in you subcase.
+
+PARAMETER
+- LOOPS
+	how many loops for sub test case which uses this parameter.
