@@ -41,7 +41,7 @@ function runtest()
         rstrnt-reboot
     fi
     if [ $RSTRNT_REBOOTCOUNT -eq 2 ]; then
-        echo "boot parameter: $parameter"
+        echo "boot parameter: $bootparam"
         if [[ $bootparam =~ "clocksource=tsc" ]]; then
             rstrnt-report-result "remove clocksource=tsc" FAIL 1
         else

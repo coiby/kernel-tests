@@ -10,4 +10,4 @@ destructive=no
 entry_point=bash ./runtest.sh
 dependencies=git;automake;autoconf;flex;bison;rsyslog;util-linux;rpm-build;bc;time;libaio-devel;libcap-devel;strace;gcc;bzip2
 softDependencies=numactl-devel;ntpdate;chrony;sysklogd;util-linux-ng;numactl;redhat-lsb
-repoRequires=distribution/ltp/include;cki_lib
+repoRequires=distribution/ltp/include;cki_lib;automotive/include
