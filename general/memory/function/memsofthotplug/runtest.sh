@@ -28,17 +28,16 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include rhts environment. Comment out for now while testing script
-. /usr/bin/rhts-environment.sh
-. /usr/share/rhts-library/rhtslib.sh
+. /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="kernel"
 NODES=`numactl -H | grep available | cut -d ' ' -f 2`
 BASE="/sys/devices/system/node/node$(($NODES-1))"
 
 if [ $NODES -lt 2 ]; then
-        rlLog "The NUMA NODES should be more than 2"
-        report_result Test_Skipped PASS 99
-        exit 0
+    rlLog "The NUMA NODES should be more than 2"
+    rstrnt-report-result Test_Skipped PASS 99
+    exit 0
 fi
 
 
@@ -85,7 +84,7 @@ rlJournalStart
         rlLog "Checking Memory blocks"
 
         for i in ${BASE}/memory*; do
-                REMOVABLE=`cat ${i}/removable`
+            REMOVABLE=`cat ${i}/removable`
                 if [ $REMOVABLE -eq 1 ]
                 then
                                 rlLog "Memory block $i is removable"

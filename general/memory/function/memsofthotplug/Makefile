@@ -30,7 +30,7 @@ export TESTVERSION=3.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE
+FILES=runtest.sh Makefile PURPOSE
 
 .PHONY: all install download clean
 
@@ -42,23 +42,3 @@ build: $(BUILT_FILES)
 
 clean:
 	rm -f *~ $(BUILT_FILES)
-
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Li Wang <liwang@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Test for memory online/offline hotplug" >> $(METADATA)
-	@echo "TestTime:        2h" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel numactl" >> $(METADATA)
-	@echo "NeedProperty:	PROCESSORS >= 2" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-
-	rhts-lint $(METADATA)

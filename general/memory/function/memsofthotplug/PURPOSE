@@ -12,4 +12,4 @@ b) Continous: This test tries to offline or online random memory
               modules for ~10 min (see CONTIME variable) while ebizzy
               produces 50% load on the total memory in the system. (This section is not complete)
 
-PASS on no kernel panic or kernel oops or no failue to offline/online memory
+PASS on no kernel panic or kernel oops or no failure to offline/online memory
