@@ -1,0 +1,12 @@
+summary: Linux Test Project openposix testsuite KernelTier1
+description: Linux Test Project openposix testsuite KernelTier1
+contact: Kernel General Test Team <kernel-general-test-team@redhat.com>
+component:
+  - kernel
+path: /distribution/ltp/openposix_testsuite
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 40m
+extra-summary: /distribution/ltp/openposix_testsuite
+extra-task: /distribution/ltp/openposix_testsuite
+environment:
