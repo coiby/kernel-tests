@@ -167,6 +167,8 @@ function runtest_prepare()
 	tolerate_s390_high_steal_time "$runtest"
 
 	exclude_disruptive_for_kt1 "$runtest"
+
+	skip_testcase
 }
 
 function ltp_lite_begin()

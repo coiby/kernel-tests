@@ -47,12 +47,14 @@ check_cpu_cgroup ()
     # Move us to root cpu cgroup
     # see: Bug 773259 - tests don't run in root cpu cgroup with systemd
 
-    cpu_cgroup_mntpoint=$(mount | grep "type cgroup (.*cpu[,)]" | awk '{print $3}')
-    if [ -z "$cpu_cgroup_mntpoint" ]; then
-        echo "Couldn't find cgroup mount point. Is system using cgroup2?" | tee -a $OUTPUTFILE
-        mount | grep cgroup | tee -a $OUTPUTFILE
+    cgroup2_mntpoint=$(mount | grep ^cgroup2 | awk '{print $3}')
+    if [ -n "$cgroup2_mntpoint" ]; then
+        echo "Found cgroup2 mount point, moving pid $$ to $cgroup2_mntpoint/cgroup.procs"
+        echo $$ > $cgroup2_mntpoint/cgroup.procs
         return
     fi
+
+    cpu_cgroup_mntpoint=$(mount | grep "type cgroup (.*cpu[,)]" | awk '{print $3}')
 
     [ -d $cpu_cgroup_mntpoint/system.slice/ ] || mkdir -p $cpu_cgroup_mntpoint/system.slice/
     cat $cpu_cgroup_mntpoint/cpu.rt_runtime_us > $cpu_cgroup_mntpoint/system.slice/cpu.rt_runtime_us
