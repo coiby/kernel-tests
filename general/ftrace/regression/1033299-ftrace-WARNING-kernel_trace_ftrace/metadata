@@ -1,0 +1,13 @@
+[General]
+name=general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace
+owner=Qiao Zhao <qzhao@redhat.com>
+description=Bug 1033299 - RHEL6.3+: reproducible ftrace failure, requires reboot - WARNING: at kernel/trace/ftrace.c:1391 __ftrace_hash_rec_update
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+repoRequires=cki_lib;general/ftrace/include
+max_time=1h
+use_pty=false
