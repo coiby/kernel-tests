@@ -1,0 +1,28 @@
+summary: 'Bug 1033299 - RHEL6.3+: reproducible ftrace failure, requires reboot - WARNING:
+    at kernel/trace/ftrace.c:1391 __ftrace_hash_rec_update'
+description: |4
+     reproducible ftrace failure, requires reboot - WARNING: at kernel/trace/ftrace.c:1391 __ftrace_hash_rec_update
+
+    RPC: Registered named UNIX socket transport module.
+    RPC: Registered udp transport module.
+    RPC: Registered tcp transport module.
+    RPC: Registered tcp NFSv4.1 backchannel transport module.
+    SELinux: initialized (dev rpc_pipefs, type rpc_pipefs), uses genfs_contexts
+    Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+    SELinux: initialized (dev nfsd, type nfsd), uses genfs_contexts
+    ------------[ cut here ]------------
+    WARNING: at kernel/trace/ftrace.c:1391 __ftrace_hash_rec_update+0x2a5/0x300() (Not tainted)
+    Hardware name: ProLiant DL360p Gen8
+    Modules linked in: nfsd lockd nfs_acl auth_rpcgss sunrpc exportfs cpufreq_ondemand freq_table pcc_cpufreq ipv6 sg power_meter serio_raw hpwdt hpilo tg3 microcode iTCO_wdt iTCO_vendor_support ioatdma dca shpchp ext4 mbcache jbd2 sd_mod crc_t10dif hpsa pata_acpi ata_generic ata_piix dm_mirror dm_region_hash dm_log dm_mod [last unloaded: scsi_wait_scan]
+    Pid: 2331, comm: bash Not tainted 2.6.32-279.el6.x86_64 #1
+    ……
+    snip
+    ……
+contact: Yanzhen Ren<yren@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 5m
+tier: 2
+tag: [tier2]
+extra-summary: /kernel/general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace
+extra-task: /kernel/general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace

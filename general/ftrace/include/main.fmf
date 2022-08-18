@@ -1,0 +1,10 @@
+summary: ftrace include RPM
+description: ''
+contact: Caspar Zhang <czhang@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: shell 
+duration: 5m
+extra-summary: /kernel/general/ftrace/include
+extra-task: /kernel/general/ftrace/include
