@@ -129,8 +129,10 @@ function runtest()
 	rlRun -l "run_radixtree idr-test"
 	cki_upload_log_file idr-test.log
 
-	rlRun -l "run_radixtree main"
-	cki_upload_log_file main.log
+#	Disable running main test case as it returns too many false positives
+#	https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/787#note_1058092780
+#	rlRun -l "run_radixtree main"
+#	cki_upload_log_file main.log
 
 	return $CKI_PASS
 }
