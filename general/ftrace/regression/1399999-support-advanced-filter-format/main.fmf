@@ -1,0 +1,11 @@
+summary: Add support for advanced filter format
+description: |
+    Add support for advanced filter format
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+tier: 2
+tag: [tier2]
+duration: 60m
+extra-summary: /kernel/general/ftrace/regression/1399999-support-advanced-filter-format
+extra-task: /kernel/general/ftrace/regression/1399999-support-advanced-filter-format

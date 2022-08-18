@@ -1,0 +1,18 @@
+[General]
+description=Add support for advanced filter format
+name=/kernel/general/ftrace/regression/1399999-support-advanced-filter-format
+owner=Ziqian SUN <zsun@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=60m
+dependencies=
+repoRequires=
+TestVersion=1.0
+Path=/mnt/tests/kernel/general/ftrace/regression/1399999-support-advanced-filter-format
+Type=
+RunFor=kernel
+Priority=Normal
