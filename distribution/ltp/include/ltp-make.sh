@@ -151,6 +151,9 @@ patch-lite()
     cki_is_baremetal
     #Patching, if non-baremetal
     if [ $? -ne 0 ]; then
+        if [ "$TESTVERSION" == "20200120" -o "$TESTVERSION" == "20210927" ]; then
+            sed -i 's/LL//' ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
+        fi
         patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
     fi
 }
