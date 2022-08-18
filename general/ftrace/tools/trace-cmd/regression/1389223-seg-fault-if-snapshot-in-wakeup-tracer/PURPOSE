@@ -1,0 +1,1 @@
+Test if Segmentation fault when trace-cmd snapshot after trace-cmd start -p wakeup

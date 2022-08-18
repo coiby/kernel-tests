@@ -1,0 +1,12 @@
+summary: Test if Segmentation fault when trace-cmd snapshot after trace-cmd start
+    -p wakeup
+description: |
+    Test if Segmentation fault when trace-cmd snapshot after trace-cmd start -p wakeup
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+tier: 2
+tag: [tier2]
+extra-summary: /kernel/general/ftrace/tools/trace-cmd/regression/1389223-seg-fault-if-snapshot-in-wakeup-tracer
+extra-task: /kernel/general/ftrace/tools/trace-cmd/regression/1389223-seg-fault-if-snapshot-in-wakeup-tracer
