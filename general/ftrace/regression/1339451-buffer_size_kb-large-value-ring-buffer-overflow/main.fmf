@@ -1,0 +1,11 @@
+summary: Test if large value for buffer_size_kb will cause a overflow or not
+description: |
+    Test if large value for buffer_size_kb will cause a overflow or not
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+tier: 2
+tag: [tier2]
+extra-summary: /kernel/general/ftrace/regression/1339451-buffer_size_kb-large-value-ring-buffer-overflow
+extra-task: /kernel/general/ftrace/regression/1339451-buffer_size_kb-large-value-ring-buffer-overflow

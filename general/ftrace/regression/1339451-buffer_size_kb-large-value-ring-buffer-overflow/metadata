@@ -1,0 +1,18 @@
+[General]
+description=Test if large value for buffer_size_kb will cause a overflow or not
+name=/kernel/general/ftrace/regression/1339451-buffer_size_kb-large-value-ring-buffer-overflow
+owner=Ziqian SUN <zsun@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=60m
+dependencies=
+repoRequires=
+TestVersion=1.0
+Path=/mnt/tests/kernel/general/ftrace/regression/1339451-buffer_size_kb-large-value-ring-buffer-overflow
+Type=
+RunFor=kernel
+Priority=Normal
