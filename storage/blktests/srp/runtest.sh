@@ -17,12 +17,9 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
-CDIR=$(dirname $FILE)
 TNAME="storage/blktests/srp"
 
-source $CDIR/../../../cki_lib/libcki.sh
+source ../include/include.sh || exit 1
 
 function pre_setup
 {
@@ -31,45 +28,6 @@ function pre_setup
 	# some servers have large CPUS, which lead srp tests hang, this also
 	# exists on upstream: BZ2036032 BZ2036033
 	echo "options ib_srp ch_count=10" > /etc/modprobe.d/ib_srp.conf
-}
-
-function disable_multipath
-{
-	pidof multipathd &>/dev/null && pkill -9 multipathd
-	[ -f /etc/multipath.conf ] && rm -f /etc/multipath.conf
-}
-
-function get_timestamp
-{
-	date +"%Y-%m-%d %H:%M:%S"
-}
-
-function get_test_result
-{
-	typeset test_ws=$1
-	typeset test_case=$2
-
-	typeset result_dir="$test_ws/results"
-	typeset result_file=$(find $result_dir -type f | egrep "$test_case$")
-	typeset out_bad_file="${result_file}.out.bad"
-	typeset out_full_file="${result_file}.full"
-	typeset result="UNTESTED"
-	if [[ -n $result_file ]]; then
-		typeset res=$(grep "^status" $result_file)
-		if [[ $res == *"pass" ]]; then
-			result="PASS"
-		elif [[ $res == *"fail" ]]; then
-			result="FAIL"
-			[ -f $out_bad_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
-			[ -f $out_full_file ] && cki_upload_log_file "$out_full_file" >/dev/null
-		elif [[ $res == *"not run" ]]; then
-			result="SKIP"
-		else
-			result="OTHER"
-		fi
-	fi
-
-	echo $result
 }
 
 function do_test
@@ -141,15 +99,10 @@ if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "
 	exit
 fi
 
-. $CDIR/build.sh
-if (( $? != 0 )); then
-	rlLog "Abort test because build env setup failed"
-	rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-fi
+bash ./build.sh
 
 USE_SIW=${USE_SIW:-"0 1"}
-test_ws=$CDIR/blktests
+test_ws=./blktests
 ret=0
 testcases_default=""
 testcases_default+=" $(get_test_cases_srp)"

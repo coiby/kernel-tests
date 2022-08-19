@@ -4,7 +4,7 @@ LOOKASIDE=https://github.com/yizhanglinux/blktests.git
 
 rm -rf blktests
 git clone $LOOKASIDE
-cd blktests
+pushd blktests
 
 if ! modprobe -qn rdma_rxe; then
 	export USE_SIW="1"
@@ -22,3 +22,8 @@ if [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then
 fi
 
 make
+if (( $? != 0 )); then
+	cki_abort_task "Abort test because build env setup failed"
+fi
+
+popd
