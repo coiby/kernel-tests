@@ -1,0 +1,18 @@
+[General]
+description=Test if events listed in available_events can be setup
+name=/kernel/general/ftrace/regression/1311824-ftrace-function-event-is-listed-but-cannot-be-setup
+owner=Ziqian SUN <zsun@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=60m
+dependencies=
+repoRequires=
+TestVersion=1.0
+Path=/mnt/tests/kernel/general/ftrace/regression/1311824-ftrace-function-event-is-listed-but-cannot-be-setup
+Type=Regression
+RunFor=kernel
+Priority=Normal
