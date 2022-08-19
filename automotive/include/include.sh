@@ -220,7 +220,7 @@ install_repos() {
 
 	if kernel_automotive; then
 		sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
-		dnf install 'dnf-command(config-manager)' -y
+		rpm -q --quiet yum-utils || rpm-ostree install -A --allow-inactive 'dnf-command(config-manager)'
 		dnf config-manager --set-enabled crb
 		dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main
 		dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main/debug

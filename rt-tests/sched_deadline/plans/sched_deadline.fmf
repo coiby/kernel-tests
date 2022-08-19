@@ -1,0 +1,19 @@
+summary: Special deadline_test on rt kernel
+discover:
+    how: fmf
+    test:
+        - /rt-tests/sched_deadline
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [realtime-tests]
+environment-file:
+    - ./rt-tests/sched_deadline/plans/tmt.env

@@ -1,0 +1,13 @@
+DESCRIPTION
+Install associated userspace packages, if needed. And verify the automotive
+kernel is running for rt-tests.
+
+STEPS TO RUN
+To execute, use:
+  bash -x runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none
