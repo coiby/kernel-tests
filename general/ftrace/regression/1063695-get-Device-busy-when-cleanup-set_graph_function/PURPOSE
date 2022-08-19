@@ -1,0 +1,14 @@
+Decription of problem:
+	Always "write error: Device or resource busy" when removing items within 'set_graph_function
+	Ftrace operations as below assuming debugfs mounted at /debug:
+	# cd tracing
+	# cat current_tracer
+	nop
+	# echo '*irq*' > set_graph_function
+	# wc -l set_graph_function
+	32 set_graph_function
+	# echo '!*8259A*' >> set_graph_function
+	-bash: echo: write error: Device or resource busy    <-----
+	# wc -l set_graph_function
+	32 set_graph_function
+Author: Yahuan Cong <ycong@redhat.com>
