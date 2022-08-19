@@ -777,6 +777,7 @@ mtd_blkdevs.ko
 mtdblock.ko
 mtd.ko
 mtk-sd.ko
+mxl-gpy.ko
 mxuport.ko
 n5pf.ko
 national.ko

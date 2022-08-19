@@ -127,6 +127,7 @@ btbcm.ko
 btintel.ko
 btmrvl.ko
 btmrvl_sdio.ko
+btmtk.ko
 btrtl.ko
 btsdio.ko
 btusb.ko
@@ -316,6 +317,7 @@ fb_sys_fops.ko
 fcrypt.ko
 ff-memless.ko
 fm10k.ko
+fsa4480.ko
 fscache.ko
 ftdi-elan.ko
 ftdi_sio.ko
@@ -420,6 +422,7 @@ hid-keytouch.ko
 hid-kye.ko
 hid-lcpower.ko
 hid-led.ko
+hid-letsketch.ko
 hid-lg-g15.ko
 hid-logitech-dj.ko
 hid-logitech-hidpp.ko
@@ -452,6 +455,7 @@ hid-roccat-savu.ko
 hid-saitek.ko
 hid-samsung.ko
 hid-semitek.ko
+hid-sigmamicro.ko
 hid-sjoy.ko
 hid-sony.ko
 hid-speedlink.ko
@@ -465,6 +469,7 @@ hid-twinhan.ko
 hid-uclogic.ko
 hid-waltop.ko
 hid-wiimote.ko
+hid-xiaomi.ko
 hid-zpff.ko
 hid-zydacron.ko
 hpsa.ko
@@ -817,6 +822,7 @@ mscc.ko
 msdos.ko
 mspro_block.ko
 mtd.ko
+mxl-gpy.ko
 mxuport.ko
 myri10ge.ko
 n5pf.ko
@@ -1088,6 +1094,7 @@ rpaphp.ko
 rpcrdma.ko
 rpcsec_gss_krb5.ko
 rsxx.ko
+rt1719.ko
 rtc-bq32k.ko
 rtc-bq4802.ko
 rtc-ds1286.ko
@@ -1470,6 +1477,7 @@ wdrtas.ko
 whiteheat.ko
 wireguard.ko
 wp512.ko
+wusb3801.ko
 xcbc.ko
 xfrm4_tunnel.ko
 xfrm6_tunnel.ko

@@ -1,4 +1,5 @@
 bochs-drm.ko
+hid-playstation.ko
 intel_pmt_class.ko
 intel_pmt_crashlog.ko
 intel_pmt.ko

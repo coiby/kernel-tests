@@ -293,6 +293,7 @@ crypto_user.ko
 cs3308.ko
 cs5345.ko
 cs53l32a.ko
+cs_dsp.ko
 csiostor.ko
 cuse.ko
 cx18-alsa.ko
@@ -1334,6 +1335,7 @@ mxl111sf-tuner.ko
 mxl5005s.ko
 mxl5007t.ko
 mxl5xx.ko
+mxl-gpy.ko
 mxm-wmi.ko
 mxuport.ko
 myri10ge.ko
@@ -1998,6 +2000,7 @@ snd-acp3x-rn.ko
 snd-acp5x-i2s.ko
 snd-acp5x-pcm-dma.ko
 snd-acp6x-pdm-dma.ko
+snd-acp-config.ko
 snd-ad1889.ko
 snd-ak4113.ko
 snd-ak4114.ko
@@ -2057,6 +2060,9 @@ snd-hda-codec-via.ko
 snd-hda-core.ko
 snd-hda-ext-core.ko
 snd-hda-intel.ko
+snd-hda-scodec-cs35l41-i2c.ko
+snd-hda-scodec-cs35l41.ko
+snd-hda-scodec-cs35l41-spi.ko
 snd-hdmi-lpe-audio.ko
 snd-hdsp.ko
 snd-hdspm.ko
@@ -2120,9 +2126,13 @@ snd-soc-acp5x-mach.ko
 snd-soc-acp6x-mach.ko
 snd-soc-acpi-intel-match.ko
 snd-soc-acpi.ko
+snd-soc-avs.ko
 snd-soc-catpt.ko
 snd-soc-cml_rt1011_rt5682.ko
 snd-soc-core.ko
+snd-soc-cs35l41-i2c.ko
+snd-soc-cs35l41.ko
+snd-soc-cs35l41-lib.ko
 snd-soc-cs35l41-spi.ko
 snd-soc-cx2072x.ko
 snd-soc-da7213.ko
@@ -2133,7 +2143,9 @@ snd-soc-es8316.ko
 snd-soc-hdac-hda.ko
 snd-soc-hdac-hdmi.ko
 snd-soc-intel-hda-dsp-common.ko
+snd-soc-intel-sof-cirrus-common.ko
 snd-soc-intel-sof-maxim-common.ko
+snd-soc-intel-sof-realtek-common.ko
 snd-soc-kbl_da7219_max98357a.ko
 snd-soc-kbl_da7219_max98927.ko
 snd-soc-kbl_rt5660.ko
@@ -2187,8 +2199,10 @@ snd-soc-skl_rt286.ko
 snd-soc-skl-ssp-clk.ko
 snd-soc-sof_da7219_max98373.ko
 snd-soc-sof_es8336.ko
+snd-soc-sof_nau8825.ko
 snd-soc-sof_rt5682.ko
 snd-soc-sof-sdw.ko
+snd-soc-sof-ssp-amp.ko
 snd-soc-ssm4567.ko
 snd-soc-sst-atom-hifi2-platform.ko
 snd-soc-sst-bdw-rt5650-mach.ko
@@ -2215,9 +2229,12 @@ snd-soc-sst-sof-wm8804.ko
 snd-soc-ts3a227e.ko
 snd-soc-wm8804-i2c.ko
 snd-soc-wm8804.ko
+snd-soc-wm-adsp.ko
 snd-sof-acpi-intel-bdw.ko
 snd-sof-acpi-intel-byt.ko
 snd-sof-acpi.ko
+snd-sof-amd-acp.ko
+snd-sof-amd-renoir.ko
 snd-sof-intel-atom.ko
 snd-sof-intel-hda-common.ko
 snd-sof-intel-hda.ko
@@ -2228,6 +2245,8 @@ snd-sof-pci-intel-icl.ko
 snd-sof-pci-intel-tgl.ko
 snd-sof-pci-intel-tng.ko
 snd-sof-pci.ko
+snd-sof-probes.ko
+snd-sof-utils.ko
 snd-sof-xtensa-dsp.ko
 snd-timer.ko
 snd-trident.ko
@@ -2268,6 +2287,7 @@ spcp8x5.ko
 speedfax.ko
 speedstep-lib.ko
 speedtch.ko
+spi-amd.ko
 spi_ks8995.ko
 spi-pxa2xx-pci.ko
 spi-pxa2xx-platform.ko

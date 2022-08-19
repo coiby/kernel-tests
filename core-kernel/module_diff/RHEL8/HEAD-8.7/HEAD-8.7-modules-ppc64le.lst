@@ -1061,6 +1061,7 @@ mxl111sf-tuner.ko
 mxl5005s.ko
 mxl5007t.ko
 mxl5xx.ko
+mxl-gpy.ko
 mxuport.ko
 myri10ge.ko
 n5pf.ko
