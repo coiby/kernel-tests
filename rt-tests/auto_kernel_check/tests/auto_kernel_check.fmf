@@ -1,0 +1,11 @@
+summary: RHIVOS test environment setup and kernel check for rt-tests
+description: RHIVOS test environment setup and kernel check for rt-tests
+contact: Charles Shi <cheshi@redhat.com>
+component:
+  - kernel
+path: /rt-tests/auto_kernel_check
+test: bash -x ./runtest.sh
+framework: shell
+duration: 20m
+extra-summary: /rt-tests/auto_kernel_check
+extra-task: /rt-tests/auto_kernel_check

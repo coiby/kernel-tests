@@ -5,6 +5,10 @@
 #   SPDX-License-Identifier: GPL-3.0-or-later  
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Enable TMT testing for RHIVOS
+. ../../automotive/include/include.sh || exit 1
+: ${OUTPUTFILE:=runtest.log}
+
 # Source rt common functions
 . ../include/runtest.sh || exit 1
 
@@ -67,7 +71,9 @@ function runtest()
     fi
 }
 
-rt_env_setup
+if ! kernel_automotive; then
+    rt_env_setup
+fi
 enable_hrtick
 runtest
 restore_hrtick
