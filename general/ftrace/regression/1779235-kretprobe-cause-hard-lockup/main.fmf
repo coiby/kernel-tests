@@ -1,0 +1,11 @@
+summary: Regression test for 1779235
+description: |
+    Regression test for 1779235 - bpftrace experienced Kernel panic - not syncing: Hard LOCKUP
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+tier: 2
+tag: [tier2]
+extra-summary: /kernel/general/ftrace/regression/1779235-kretprobe-cause-hard-lockup
+extra-task: /kernel/general/ftrace/regression/1779235-kretprobe-cause-hard-lockup
