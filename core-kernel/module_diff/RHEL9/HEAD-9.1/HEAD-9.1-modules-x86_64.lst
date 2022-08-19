@@ -169,6 +169,7 @@ btcoexist.ko
 btintel.ko
 btmrvl.ko
 btmrvl_sdio.ko
+btmtk.ko
 btrtl.ko
 btsdio.ko
 btusb.ko
@@ -332,6 +333,10 @@ ds1621.ko
 ds620.ko
 dummy.ko
 dummy_stm.ko
+dwc2.ko
+dwc3-haps.ko
+dwc3.ko
+dwc3-pci.ko
 dw_dmac.ko
 dwmac-intel.ko
 e1000e.ko
@@ -404,6 +409,7 @@ firmware_attributes_class.ko
 fjes.ko
 fm10k.ko
 fnic.ko
+fsa4480.ko
 fscache.ko
 fschmd.ko
 ftdi-elan.ko
@@ -526,6 +532,7 @@ hid-kye.ko
 hid-lcpower.ko
 hid-led.ko
 hid-lenovo.ko
+hid-letsketch.ko
 hid-lg-g15.ko
 hid-logitech-dj.ko
 hid-logitech-hidpp.ko
@@ -573,6 +580,7 @@ hid-sensor-prox.ko
 hid-sensor-rotation.ko
 hid-sensor-temperature.ko
 hid-sensor-trigger.ko
+hid-sigmamicro.ko
 hid-sjoy.ko
 hid-sony.ko
 hid-speedlink.ko
@@ -586,6 +594,7 @@ hid-twinhan.ko
 hid-uclogic.ko
 hid-waltop.ko
 hid-wiimote.ko
+hid-xiaomi.ko
 hid-xinmo.ko
 hid-zpff.ko
 hid-zydacron.ko
@@ -1037,6 +1046,7 @@ mlx-platform.ko
 mlxreg-fan.ko
 mlxreg-hotplug.ko
 mlxreg-io.ko
+mlxreg-lc.ko
 mlxsw_core.ko
 mlxsw_i2c.ko
 mlxsw_minimal.ko
@@ -1082,6 +1092,7 @@ mwifiex.ko
 mwifiex_pcie.ko
 mwifiex_sdio.ko
 mwifiex_usb.ko
+mxl-gpy.ko
 mxm-wmi.ko
 mxuport.ko
 myri10ge.ko
@@ -1420,6 +1431,7 @@ rockchip.ko
 rotary_encoder.ko
 rpcrdma.ko
 rpcsec_gss_krb5.ko
+rt1719.ko
 rt2800lib.ko
 rt2800mmio.ko
 rt2800pci.ko
@@ -2052,6 +2064,7 @@ wireless-hotkey.ko
 wmi-bmof.ko
 wmi.ko
 wp512.ko
+wusb3801.ko
 x38_edac.ko
 x86_pkg_temp_thermal.ko
 xcbc.ko
@@ -2067,6 +2080,7 @@ xfrm6_tunnel.ko
 xfrm_interface.ko
 xfrm_ipcomp.ko
 xfs.ko
+xhci-plat-hcd.ko
 xilinx_gmii2rgmii.ko
 xor.ko
 xpc.ko

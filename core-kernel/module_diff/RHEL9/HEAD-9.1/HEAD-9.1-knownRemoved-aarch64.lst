@@ -1,5 +1,6 @@
 bochs-drm.ko
 fixed.ko
+hid-playstation.ko
 i2c-algo-pcf.ko
 libblake2s-generic.ko
 libblake2s.ko

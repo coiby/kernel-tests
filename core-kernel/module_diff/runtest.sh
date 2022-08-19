@@ -549,6 +549,9 @@ rlJournalStart
                         sed -i '/bochs-drm.ko/d;' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
                         sed -i '/regmap-i2c.ko/d;/mfd-core.ko/d;/i2c-algo-pcf.ko/d;/fixed.ko/d;' ${OS}/${Release}/$Release-knownRemoved-aarch64.lst
                     fi
+                    if cki_kver_lt "5.14.0-142"; then
+                        sed -i '/hid-playstation.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
