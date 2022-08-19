@@ -1,0 +1,18 @@
+[General]
+description=autotest for bz1063695
+name=/kernel/general/ftrace/regression/1063695-get-Device-busy-when-cleanup-set_graph_function
+owner=Yahuan Cong<ycong@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=40m
+dependencies=trace-cmd
+repoRequires=/general/ftrace/include
+TestVersion=1.0
+Path=/mnt/tests/kernel/general/ftrace/regression/1063695-get-Device-busy-when-cleanup-set_graph_function
+Type=Regression
+RunFor=kernel
+Priority=Normal

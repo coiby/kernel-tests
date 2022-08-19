@@ -1,0 +1,28 @@
+summary: autotest for bz1063695
+description: |
+    Decription of problem:
+    	Always "write error: Device or resource busy" when removing items within 'set_graph_function
+    	Ftrace operations as below assuming debugfs mounted at /debug:
+    	# cd tracing
+    	# cat current_tracer
+    	nop
+    	# echo '*irq*' > set_graph_function
+    	# wc -l set_graph_function
+    	32 set_graph_function
+    	# echo '!*8259A*' >> set_graph_function
+    	-bash: echo: write error: Device or resource busy    <-----
+    	# wc -l set_graph_function
+    	32 set_graph_function
+    Author: Yahuan Cong <ycong@redhat.com>
+contact: Yahuan Cong<ycong@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - trace-cmd
+duration: 40m
+tier: 2
+tag: [tier2]
+extra-summary: /kernel/general/ftrace/regression/1063695-get-Device-busy-when-cleanup-set_graph_function
+extra-task: /kernel/general/ftrace/regression/1063695-get-Device-busy-when-cleanup-set_graph_function
