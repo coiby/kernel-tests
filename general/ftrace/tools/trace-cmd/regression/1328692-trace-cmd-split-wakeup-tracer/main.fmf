@@ -1,0 +1,11 @@
+summary: Test if trace-cmd split report error against latency tracer
+description: |
+    Test if trace-cmd split report error against latency tracer
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+tier: 2
+tag: [tier2]
+extra-summary: /kernel/general/ftrace/tools/trace-cmd/regression/1328692-trace-cmd-split-wakeup-tracer
+extra-task: /kernel/general/ftrace/tools/trace-cmd/regression/1328692-trace-cmd-split-wakeup-tracer
