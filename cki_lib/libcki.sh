@@ -350,10 +350,10 @@ cki_has_kernel_debug_flags()
     return 1
 }
 
-# return 0 when running kernel auto
-cki_is_kernel_auto()
+# return 0 when running kernel automotive
+cki_is_kernel_automotive()
 {
-    if rpm -q "kernel-auto-$(uname -r)" > /dev/null 2>&1; then
+    if rpm -q "kernel-automotive-$(uname -r)" > /dev/null 2>&1; then
        return  0
     fi
     return 1
