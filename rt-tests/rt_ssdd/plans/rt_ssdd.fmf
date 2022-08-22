@@ -1,0 +1,19 @@
+summary: rt-tests ssdd test
+discover:
+    how: fmf
+    test:
+        - /rt-tests/rt_ssdd
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [realtime-tests]
+environment-file:
+    - ./rt-tests/rt_ssdd/plans/tmt.env

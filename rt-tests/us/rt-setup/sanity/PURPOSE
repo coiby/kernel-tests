@@ -1,0 +1,19 @@
+DESCRIPTION
+Unit test for the rt-setup userspace package.
+
+The 'rt-setup' package configures details required by RHEL-RT environment.
+  - creates realtime group
+  - adds realtime limits configuration for PAM
+  - adds /usr/bin/rt-setup-kdump to config kdump in RT
+  - adds udev specific rules for threaded irqs and /dev/rtc access
+  - adds /usr/bin/slub_cpu_partial_off to turn off cpu_partials in SLUB
+  - adds net-socket timestamp static key daemon (rt-entsk)
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none
