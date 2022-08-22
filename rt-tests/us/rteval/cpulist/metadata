@@ -1,0 +1,12 @@
+[General]
+name=rt-tests/us/rteval/cpulist
+owner=Mike Stowell <mstowell@redhat.com>
+description=cpulist test for rteval
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=30m
+use_pty=false

@@ -1,0 +1,11 @@
+DESCRIPTION
+Unit test for the tuna userspace package.
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none

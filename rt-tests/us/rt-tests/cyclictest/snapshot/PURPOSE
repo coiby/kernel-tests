@@ -1,0 +1,17 @@
+DESCRIPTION
+Unit test for the rt-tests userspace package.
+ - Get a snapshot of a running cyclictest without interrupt it.
+   Detail in bz1469185
+
+This is the manual method of getting a cyclictest snapshot before
+rt-tests v1.8, which introduced the get_cyclictest_snapshot utility.
+
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none

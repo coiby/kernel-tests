@@ -1,0 +1,12 @@
+[General]
+name=rt-tests/us/rt-setup/sanity
+owner=Mike Stowell <mstowell@redhat.com>
+description=Basic/sanity test for rt-setup
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=10m
+use_pty=false

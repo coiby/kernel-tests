@@ -1,0 +1,45 @@
+PURPOSE
+
+Isolate CPUs on a system:
+	# numactl --hardware | grep cpus
+	node 0 cpus: 0 1 2 3 4 5 12 13 14 15 16 17
+	node 1 cpus: 6 7 8 9 10 11 18 19 20 21 22 23
+	# grep isolcpus /proc/cmdline
+	BOOT_IMAGE=/vmlinuz-3.10.0-1136.rt56.1107.el7.x86_64 [...] isolcpus=6-11,18-23
+
+Test 1: Verify cyclictest runs only on the non-isolated CPUs when -a not specified:
+	# cyclictest --smp -umq -p95 --duration=10s
+	[...]
+	# watch -n 1 -d 'ps -eLo psr,args | grep cyclictest' # run in another window
+	  0 cyclictest --smp -umq -p95 --duration=10s
+	  0 cyclictest --smp -umq -p95 --duration=10s
+	  1 cyclictest --smp -umq -p95 --duration=10s
+	  2 cyclictest --smp -umq -p95 --duration=10s
+	  3 cyclictest --smp -umq -p95 --duration=10s
+	  4 cyclictest --smp -umq -p95 --duration=10s
+	  5 cyclictest --smp -umq -p95 --duration=10s
+	 12 cyclictest --smp -umq -p95 --duration=10s
+	 13 cyclictest --smp -umq -p95 --duration=10s
+	 14 cyclictest --smp -umq -p95 --duration=10s
+	 15 cyclictest --smp -umq -p95 --duration=10s
+	 16 cyclictest --smp -umq -p95 --duration=10s
+	 17 cyclictest --smp -umq -p95 --duration=10s
+
+Test 2: Verify -a is respected:
+
+	# cyclictest -a 1-2 -umq -p95 --duration=10s
+	[...]
+	# watch -n 1 -d 'ps -eLo psr,args | grep cyclictest' # run in another window
+	  2 cyclictest -a 1-2 -umq -p95 --duration=10s
+	  1 cyclictest -a 1-2 -umq -p95 --duration=10s
+
+Note: previously the following test 3 was performed to ensure -a could not
+schedule to isolated cores:
+
+	# cyclictest -a 6-7 -umq -p95 --duration=10s
+	WARN: Couldn't setaffinity in main thread: Invalid argument
+	# /dev/cpu_dma_latency set to 0us
+	pid = 2804FATAL: No allowable cpus to run on
+
+however it was decided in bz2050242 that this is undesirable behavior and
+a patch was added to allow -a to schedule to isolated cores.

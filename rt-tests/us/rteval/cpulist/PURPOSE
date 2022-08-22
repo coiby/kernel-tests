@@ -1,0 +1,16 @@
+DESCRIPTION
+Ensure loads and measurement CPUs are scheduled correctly via rteval.
+
+STEPS TO RUN
+MCPU=<measurement-cpulist> LCPU=<loads-cpulist> ./runtest.sh
+By default MCPU=1, LCPU=2
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+RHEL-7: rteval-2.14* does not correctly schedule loads on the specified cpulist.
+  Bug 1752512 - rteval can't enforce stress load on specified cpu list with --loads-cpulist
+This was only fixed in RHEL-8.2:
+  Bug 1724768 - rteval: adjust meaurement and loads modules to start on specified cpus
+As such, this test case should only be run for RHEL-8.2+.

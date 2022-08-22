@@ -1,0 +1,12 @@
+DESCRIPTION
+Unit test for the python-schedutils userspace package.
+Python interface for the Linux scheduler functions etc.
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none

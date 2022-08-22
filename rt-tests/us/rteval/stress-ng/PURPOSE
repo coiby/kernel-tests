@@ -1,0 +1,11 @@
+DESCRIPTION
+Test stress-ng loads and options in rteval / rteval-loads.
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all, RHEL-8.3+
+
+KNOWN ISSUES
+n/a

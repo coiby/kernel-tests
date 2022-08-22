@@ -1,0 +1,12 @@
+[General]
+name=rt-tests/us/rteval/stress-ng
+owner=Mike Stowell <mstowell@redhat.com>
+description=stress-ng test for rteval
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=90m
+use_pty=false
