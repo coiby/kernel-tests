@@ -34,6 +34,21 @@ PACKAGE="redhat-rpm-config"
 
 TESTDIR=`pwd`
 
+# make sure that kernel-rpm-macros is installed
+# package not available on rhel7
+source /etc/os-release
+if [ ${VERSION%%.*} -gt 7 ]; then
+    if command -v dnf; then
+        dnf install -y kernel-rpm-macros
+    elif command -v yum; then
+        yum install -y kernel-rpm-macros
+    elif ! rpm -ql kernel-rpm-macros; then
+        rlLog "ERROR: dependency not met, missing kernel-rpm-macros."
+        rstrnt-report-result "$RSTRNT_TASKNAME" WARN
+        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+    fi
+fi
+
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm $PACKAGE
