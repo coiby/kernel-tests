@@ -17,45 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
-CDIR=$(dirname $FILE)
-TNAME="storage/blktests/blk"
-
-source $CDIR/../../../cki_lib/libcki.sh
-
-function get_timestamp
-{
-	date +"%Y-%m-%d %H:%M:%S"
-}
-
-function get_test_result
-{
-	typeset test_ws=$1
-	typeset test_case=$2
-
-	typeset result_dir="$test_ws/results"
-	typeset result_file=$(find $result_dir -type f | egrep "$test_case$")
-	typeset out_bad_file="${result_file}.out.bad"
-	typeset out_full_file="${result_file}.full"
-	typeset result="UNTESTED"
-	if [[ -n $result_file ]]; then
-		typeset res=$(egrep "^status" $result_file | awk '{print $NF}')
-		if [[ $res == *"pass" ]]; then
-			result="PASS"
-		elif [[ $res == *"fail" ]]; then
-			result="FAIL"
-			[ -f $out_bad_file ] && cki_upload_log_file "$out_bad_file" >/dev/null
-			[ -f $out_full_file ] && cki_upload_log_file "$out_full_file" >/dev/null
-		elif [[ $res == *"not run" ]]; then
-			result="SKIP"
-		else
-			result="OTHER"
-		fi
-	fi
-
-	echo $result
-}
+source ../include/include.sh || exit 1
 
 function do_test
 {
@@ -254,12 +216,7 @@ if cki_has_kernel_debug_flags; then
 	exit 0
 fi
 
-bash $CDIR/build.sh
-if (( $? != 0 )); then
-	rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-	exit 1
-fi
+bash ./build.sh
 
 testcases_default=""
 testcases_default+=" $(get_test_cases_block)"
@@ -267,7 +224,7 @@ testcases_default+=" $(get_test_cases_loop)"
 uname -ri | grep -qE "3.10.0-862.*s390x" || testcases_default+=" $(get_test_cases_nvme)"
 uname -r | grep -q "3.10.0" || testcases_default+=" $(get_test_cases_scsi)"
 testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
-test_ws=$CDIR/blktests
+test_ws=./blktests
 ret=0
 for testcase in $testcases; do
 	do_test $test_ws $testcase
