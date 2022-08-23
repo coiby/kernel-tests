@@ -28,6 +28,7 @@
 
 # Include Beakerlib environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../cki_lib/libcki.sh || exit 1
 export AVC_ERROR="+no_avc_check"
 PACKAGE="selinux-policy"
 
@@ -102,7 +103,9 @@ function installDepsYum() {
 }
 
 function installDeps() {
-    if type yum >/dev/null; then
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        rpm-ostree -A --idempotent --allow-inactive install "$@"
+    elif type yum >/dev/null; then
         installDepsYum yum "$@"
     elif type dnf >/dev/null; then
         installDepsYum dnf "$@"
@@ -118,7 +121,16 @@ function boolSet() {
     [ "$(boolGet "$1")" == "$2" ]
 }
 
-
+kname="kernel"
+if cki_is_kernel_rt; then
+    kname="kernel-rt"
+fi
+if cki_is_kernel_automotive; then
+    kname="kernel-automotive"
+fi
+if cki_is_kernel_debug; then
+    kname="${kname}-debug"
+fi
 rlJournalStart
     rlPhaseStartSetup "Install"
         # We need to install the kernel-* packages by ourselves, since we need
@@ -127,19 +139,12 @@ rlJournalStart
         # dependencies here. Thus we don't need to maintain duplicate lists of
         # package requirements in many places (RH repo, Fedora kernel dist-git,
         # CKI).
-        PKG_SUFFIX=""
         KERNEL_VERSION="$(uname -r)"
         PKG_VERSION="${KERNEL_VERSION%+debug}"
-        if [ "$PKG_VERSION" != "$KERNEL_VERSION" ]; then
-            rlLog "Detected debug kernel running."
-            PKG_SUFFIX="-debug"
-        fi
 
         REQUIRES="
-            kernel$PKG_SUFFIX-modules-extra-$PKG_VERSION
-            kernel-rt$PKG_SUFFIX-modules-extra-$PKG_VERSION
-            kernel$PKG_SUFFIX-devel-$PKG_VERSION
-            kernel-rt$PKG_SUFFIX-devel-$PKG_VERSION
+            ${kname}-modules-extra-$PKG_VERSION
+            ${kname}-devel-$PKG_VERSION
             /usr/bin/unbuffer
             attr
             audit

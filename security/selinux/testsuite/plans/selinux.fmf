@@ -1,0 +1,16 @@
+summary: selinux testsuite security tests
+discover:
+    how: fmf
+    test:
+        - /security/selinux/testsuite/tests
+execute:
+    how: tmt
+    framework: beakerlib
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/rhivos.sh
+        install_repos
+environment-file:
+        - ./security/selinux/testsuite/plans/tmt.env

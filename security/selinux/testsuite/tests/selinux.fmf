@@ -1,0 +1,9 @@
+summary: Selinux testsuite security tests
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/selinux/testsuite
+require: [expect]
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 1h
