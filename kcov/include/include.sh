@@ -13,7 +13,12 @@ KCOV_KDIR=
 KCOV_INFO_LIST=$TDIR/kernel_tests_name.lst
 KCOV_COMBINED_NAME=kcov.combined.info
 
-GCOV_BASEDIR=$(rpm -ql kernel-gcov | head -1)/*/*$(uname -r)*/
+KERNEL_GCOV="kernel-gcov"
+if cki_is_kernel_automotive; then
+	KERNEL_GCOV="kernel-automotive-gcov"
+fi
+
+GCOV_BASEDIR=$(rpm -ql ${KERNEL_GCOV} | head -1)/*/*$(uname -r)*/
 
 log()
 {
