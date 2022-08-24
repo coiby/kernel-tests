@@ -1,0 +1,18 @@
+[General]
+description=Bug 1260517 - [ftrace] function_graph tracer make /proc hide all pid directories , making ps / top user tool fail to work
+name=/kernel/general/ftrace/regression/1260517-funcion_graph_hide_pid
+owner=Ziqian SUN <zsun@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=5m
+dependencies=
+repoRequires=/general/ftrace/include
+TestVersion=1.0
+Path=/mnt/tests/kernel/general/ftrace/regression/1260517-funcion_graph_hide_pid
+Type=Regression
+RunFor=kernel
+Priority=Normal
