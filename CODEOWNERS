@@ -161,6 +161,7 @@
 /container/podman/ @bgoncalv @ftjahjad @lulinqing
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
+/distribution/kernel-debuginfo/ @bgoncalv @ckalina @lulinqing
 /distribution/ltp/lite/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /distribution/upstream/ltp/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
@@ -174,6 +175,8 @@
 /kdump-cki/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
 /kselftests/ @bgoncalv @liuhangbin @lulinqing @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
+/legacy/pci_id/ @bgoncalv @ckalina @lulinqing
+/legacy/whitelist/ @bgoncalv @ckalina @lulinqing
 /livepatch/selftests/ @bgoncalv @joe.lawrence @lulinqing @ykopkova
 /memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
@@ -194,6 +197,9 @@
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
+/packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @ckalina @lulinqing
+/packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @ckalina @lulinqing
+/packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @ckalina @lulinqing
 /packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
 /rt-tests/latency_perf/oslat_valid/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/latency_perf/rt_cyclic/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
