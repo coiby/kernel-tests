@@ -1,0 +1,18 @@
+[General]
+description=Test osnoise tracer
+name=/kernel/general/ftrace/sanity/osnoise
+owner=Qiao Zhao <qzhao@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=60m
+dependencies=
+TestVersion=1.0
+Path=/kernel/general/ftrace/sanity/osnoise
+Type=KernelTier2
+RunFor=kernel
+Priority=Normal
+use_pty=false

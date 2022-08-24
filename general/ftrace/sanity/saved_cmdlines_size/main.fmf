@@ -1,0 +1,9 @@
+summary: Testing /sys/kernel/debug/tracing/saved_cmdlines_size for bug 1117093
+description: |
+    Testing /sys/kernel/debug/tracing/saved_cmdlines_size
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /kernel/general/ftrace/sanity/saved_cmdlines_size
+extra-task: /kernel/general/ftrace/sanity/saved_cmdlines_size

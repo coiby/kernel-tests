@@ -1,0 +1,17 @@
+[General]
+description=Testing /sys/kernel/debug/tracing/saved_cmdlines_size for bug 1117093
+name=/kernel/general/ftrace/sanity/saved_cmdlines_size
+owner=Ziqian SUN <zsun@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=60m
+dependencies=
+TestVersion=1.0
+Path=/kernel/general/ftrace/sanity/saved_cmdlines_size
+Type=KernelTier2
+RunFor=kernel
+Priority=Normal
