@@ -15,8 +15,6 @@
 #
 # Author: Hushan Jia <hjia@redhat.com>
 
-. /usr/bin/rhts_environment.sh
-
 # source include file
 . ../include/include.sh
 
@@ -47,16 +45,24 @@ setup()
         echo "ONLY_FINAL_INFO=$ONLY_FINAL_INFO" >> $KCOV_CONF
     fi
     log "submit config"
-    rhts-submit-log -l $KCOV_CONF
+    cki_upload_log_file $KCOV_CONF
 
-    rpm -q kernel-gcov
+    rpm -q ${KERNEL_GCOV}
     if [ $? -ne 0 ]; then
         # Expects cki repo with kernel rpms to be configured
         log "install gcov data files"
-        dnf install -y kernel-gcov
-        if [ $? -ne 0 ]; then
-            cki_abort_recipe "Cannot install the gcov data files package.";
-            exit
+        if [[ -e /run/ostree-booted ]]; then
+            rpm-ostree install -A ${KERNEL_GCOV}
+            if [ $? -ne 0 ]; then
+                cki_abort_recipe "Cannot install the gcov data files package.";
+                exit
+            fi
+        else
+            dnf install -y ${KERNEL_GCOV}
+            if [ $? -ne 0 ]; then
+                cki_abort_recipe "Cannot install the gcov data files package.";
+                exit
+            fi
         fi
     fi
 
@@ -79,7 +85,7 @@ setup()
 
     touch ./kernel_installed
 
-    rhts-reboot
+    rstrnt-reboot
 }
 
 verify()
@@ -95,7 +101,7 @@ verify()
 
     ls $GCOV_BASEDIR/
     if [ $? -ne 0 ]; then
-        cki_abort_recipe "kernel-gcov files were not available after reboot"
+        cki_abort_recipe "${KERNEL_GCOV} files were not available after reboot"
         exit
     fi
     pass
