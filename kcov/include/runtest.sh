@@ -15,9 +15,7 @@
 #
 # Author: Hushan Jia <hjia@redhat.com>
 
-. /usr/bin/rhts_environment.sh
-
 RESULT=PASS
 SCORE=0
 
-report_result $TEST $RESULT $SCORE
+rstrnt-report-result $TEST $RESULT $SCORE

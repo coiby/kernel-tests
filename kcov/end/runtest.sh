@@ -15,8 +15,6 @@
 #
 # Author: Hushan Jia <hjia@redhat.com>
 
-. /usr/bin/rhts_environment.sh
-
 . ../include/include.sh
 
 TEST="/kcov/end"
@@ -29,11 +27,11 @@ load_config
 function reboot_cleanup()
 {
 	local REBOOTBIN=`which reboot`
-	local RHTSREBOOTBIN=`which rhts-reboot`
+	local RSTRNTREBOOTBIN=`which rstrnt-reboot`
 
 	rm -f /etc/dracut.conf.d/gcov.conf
 	mv ${REBOOTBIN}.bak ${REBOOTBIN}
-	mv ${RHTSREBOOTBIN}.bak ${RHTSREBOOTBIN}
+	mv ${RSTRNTREBOOTBIN}.bak ${RSTRNTREBOOTBIN}
 }
 
 reboot_cleanup

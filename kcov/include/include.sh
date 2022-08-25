@@ -1,8 +1,6 @@
 #!/bin/bash
 # common routines to include.
 
-#source rhts environment
-. /usr/bin/rhts_environment.sh
 . ../../cki_lib/libcki.sh || exit 1
 
 # /mnt/testarea can be overwritten by tests, like ltp/generic
@@ -32,18 +30,18 @@ fail()
 	fi
 
 	if [ -n "$1" ]; then
-		report_result $TEST/$1 FAIL $SCORE
+		rstrnt-report-result $TEST/$1 FAIL $SCORE
 	else
-		report_result $TEST FAIL $SCORE
+		rstrnt-report-result $TEST FAIL $SCORE
 	fi
 }
 
 pass()
 {
 	if [ -n "$1" ]; then
-		report_result $TEST/$1 PASS $SCORE
+		rstrnt-report-result $TEST/$1 PASS $SCORE
 	else
-		report_result $TEST PASS $SCORE
+		rstrnt-report-result $TEST PASS $SCORE
 	fi
 }
 
@@ -70,7 +68,7 @@ load_config()
 submit_info()
 {
 	if [[ $KCOV_ONLY_FINAL_INFO != 'true' ]]; then
-		rhts-submit-log -l "$1"
+		cki_upload_log_file "$1"
 	fi
 }
 
@@ -99,7 +97,7 @@ install_lcov()
 	# Enable branch coverage
 	echo "lcov_branch_coverage = 1" >> /etc/lcovrc
 
-	rhts-submit-log -l "/etc/lcovrc"
+	cki_upload_log_file "/etc/lcovrc"
 }
 
 if [ -n "$DEBUG" ]; then

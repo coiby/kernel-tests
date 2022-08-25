@@ -15,8 +15,6 @@
 #
 # Author: Hushan Jia <hjia@redhat.com>
 
-. /usr/bin/rhts_environment.sh
-
 # source include file
 . ../include/include.sh
 
@@ -47,7 +45,7 @@ setup()
         echo "ONLY_FINAL_INFO=$ONLY_FINAL_INFO" >> $KCOV_CONF
     fi
     log "submit config"
-    rhts-submit-log -l $KCOV_CONF
+    cki_upload_log_file $KCOV_CONF
 
     rpm -q ${KERNEL_GCOV}
     if [ $? -ne 0 ]; then
@@ -87,7 +85,7 @@ setup()
 
     touch ./kernel_installed
 
-    rhts-reboot
+    rstrnt-reboot
 }
 
 verify()

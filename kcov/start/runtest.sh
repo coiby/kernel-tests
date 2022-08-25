@@ -15,8 +15,6 @@
 #
 # Author: Hushan Jia <hjia@redhat.com>
 
-. /usr/bin/rhts_environment.sh
-
 . ../include/include.sh
 
 TEST="/kcov/start"
@@ -29,38 +27,38 @@ load_config
 function reboot_hook()
 {
 	#hook up lcov capture with system reboot to avoid gcov data lose
-	grep -q lcov /usr/bin/rhts-reboot
+	grep -q lcov /usr/bin/rstrnt-reboot
 	if [ $? -eq 0 ]; then
-		log "rhts-reboot has already been hacked"
+		log "rstrnt-reboot has already been hacked"
 		return 0
 	fi
 
-	log "hookup lcov with rhts-reboot"
-	cp /usr/bin/rhts-reboot /usr/bin/rhts-reboot.bak
-	sed -i "/shutdown -r/ilcov -c --ignore-errors gcov $KDIR_OPT --test-name \"$KCOV_TEST_NAME\" -o ${KCOV_TEST_INFO}.reboot$(date '+%y%m%d%H%M%S')" /usr/bin/rhts-reboot
+	log "hookup lcov with rstrnt-reboot"
+	cp /usr/bin/rstrnt-reboot /usr/bin/rstrnt-reboot.bak
+	sed -i "/shutdown -r/ilcov -c --ignore-errors gcov $KDIR_OPT --test-name \"$KCOV_TEST_NAME\" -o ${KCOV_TEST_INFO}.reboot$(date '+%y%m%d%H%M%S')" /usr/bin/rstrnt-reboot
 
 	cat >reboot <<-'EOF'
 	#!/bin/bash
 	cat /proc/mounts  | grep -v 'rootfs' | grep -q ' / '
 	if [ $? == 0 ]; then
-	    rhts-reboot
+	    rstrnt-reboot
 	else
 	    systemctl reboot
 	fi
 	EOF
 
 	cat >gcov.conf <<-'EOF'
-	install_optional_items+=" PATHTOREBOOT PATHTORHTSREBOOT"
+	install_optional_items+=" PATHTOREBOOT PATHTORSTRNTREBOOT"
 	EOF
 
-	#force to use rhts-reboot
+	#force to use rstrnt-reboot
 	local REBOOTBIN=`which reboot`
 	mv ${REBOOTBIN} ${REBOOTBIN}.bak
 	cp ./reboot ${REBOOTBIN}
 	chmod a+x ${REBOOTBIN}
 	cp gcov.conf /etc/dracut.conf.d/
 	sed -i "s|PATHTOREBOOT|$(which reboot).bin|g" /etc/dracut.conf.d/gcov.conf
-	sed -i "s|PATHTORHTSREBOOT|$(which rhts-reboot)|g" /etc/dracut.conf.d/gcov.conf
+	sed -i "s|PATHTORSTRNTREBOOT|$(which rstrnt-reboot)|g" /etc/dracut.conf.d/gcov.conf
 }
 
 reboot_hook

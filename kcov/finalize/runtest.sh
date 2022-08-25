@@ -15,8 +15,6 @@
 #
 # Author: Hushan Jia <hjia@redhat.com>
 
-. /usr/bin/rhts_environment.sh
-
 . ../include/include.sh
 
 TEST="/kcov/finalize"
@@ -30,7 +28,7 @@ log "processing coverage data for all cases."
 FILE_OPTION_LIST=$(awk 1 ORS=' -a ' $KCOV_INFO_LIST)
 FILE_OPTION_LIST=" -a ${FILE_OPTION_LIST%' -a '}"
 lcov $FILE_OPTION_LIST -o $KCOV_COMBINED_INFO
-rhts-submit-log -l $KCOV_COMBINED_INFO
+cki_upload_log_file $KCOV_COMBINED_INFO
 
 pass
 
