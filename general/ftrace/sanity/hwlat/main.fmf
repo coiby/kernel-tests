@@ -1,0 +1,9 @@
+summary: Test hwlat tracer
+description: |
+    This case is a sanity test for hwlat tracer.
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /kernel/general/ftrace/sanity/hwlat
+extra-task: /kernel/general/ftrace/sanity/hwlat

@@ -1,0 +1,9 @@
+summary: Test the ftrace interface for blktrace
+description: |
+    Test the ftrace interface for blktrace
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /kernel/general/ftrace/sanity/blktrace
+extra-task: /kernel/general/ftrace/sanity/blktrace

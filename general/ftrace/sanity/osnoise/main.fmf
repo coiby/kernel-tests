@@ -1,0 +1,10 @@
+summary: Test osnoise tracer
+description: |
+    This case is a sanity test for osnoise tracer.
+    Detail: https://www.kernel.org/doc/html/latest/trace/osnoise-tracer.html
+contact: Qiao Zhao <qzhao@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /kernel/general/ftrace/sanity/osnoise
+extra-task: /kernel/general/ftrace/sanity/osnoise

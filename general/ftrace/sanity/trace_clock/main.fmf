@@ -1,0 +1,9 @@
+summary: Test trace clock
+description: |
+    Test trace_clock
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /kernel/general/ftrace/sanity/trace_clock
+extra-task: /kernel/general/ftrace/sanity/trace_clock

@@ -1,0 +1,17 @@
+[General]
+description=Test the ftrace interface for blktrace
+name=/kernel/general/ftrace/sanity/blktrace
+owner=Ziqian SUN <zsun@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=60m
+dependencies=
+TestVersion=1.0
+Path=/kernel/general/ftrace/sanity/blktrace
+Type=KernelTier2
+RunFor=kernel
+Priority=Normal

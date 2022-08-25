@@ -1,0 +1,9 @@
+summary: Sanity test for stacktrace
+description: |
+    Sanity test for stacktrace
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /kernel/general/ftrace/sanity/stacktrace
+extra-task: /kernel/general/ftrace/sanity/stacktrace
