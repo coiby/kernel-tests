@@ -1,0 +1,14 @@
+[General]
+name=general/time/posix_timer
+owner=Qiao Zhao <qzhao@redhat.com>
+description=Posix timer/clock test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=gcc;make;wget;tar
+repoRequires=cki_lib
+max_time=30m
+use_pty=false

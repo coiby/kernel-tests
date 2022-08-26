@@ -1,0 +1,13 @@
+[General]
+name=general/time/timetests_upstream
+owner=Qiao Zhao <qzhao@redhat.com>
+description=Run upstream timetests in rhel kernel
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=gcc;make;git
+max_time=240m
+use_pty=false
