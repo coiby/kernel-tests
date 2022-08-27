@@ -211,7 +211,14 @@
 /rt-tests/smidetect/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/us/stalld/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /standards/usex/1.9-29/ @bgoncalv @headrat @lulinqing
+/storage/blktests/blk/ @bgoncalv @lulinqing @yizhanglinux
+/storage/blktests/nvme/nvme-rdma/ @bgoncalv @lulinqing @yizhanglinux
+/storage/blktests/nvme/nvme-tcp/ @bgoncalv @lulinqing @yizhanglinux
+/storage/blktests/nvme/nvmeof-mp/ @bgoncalv @lulinqing @yizhanglinux
+/storage/blktests/srp/ @bgoncalv @lulinqing @yizhanglinux
+/storage/block/fio_numa/ @bgoncalv @lulinqing @yizhanglinux
 /storage/dm/common/ @bgoncalv @guazhang @lulinqing
+/storage/nvdimm/ndctl-test-suite/ @bgoncalv @lulinqing @yizhanglinux
 /storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
