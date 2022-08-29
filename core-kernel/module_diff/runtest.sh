@@ -514,6 +514,9 @@ rlJournalStart
                     if cki_kver_lt "4.18.0-410"; then
                         sed -i '/bochs-drm.ko/d;' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
                     fi
+                    if cki_kver_lt "4.18.0-421"; then
+                        sed -i '/gve.ko/d;' ${OS}/${Release}/$Release-knownRemoved-{s390x,aarch64}.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then

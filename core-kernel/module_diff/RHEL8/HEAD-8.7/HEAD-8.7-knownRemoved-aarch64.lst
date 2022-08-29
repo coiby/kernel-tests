@@ -1,2 +1,3 @@
 bochs-drm.ko
+gve.ko
 nct6683.ko
