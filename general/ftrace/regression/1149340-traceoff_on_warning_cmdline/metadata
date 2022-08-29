@@ -1,0 +1,18 @@
+[General]
+description=1149340 - ftrace: add traceoff_on_warning kernel cmdline option
+name=general/ftrace/regression/1149340-traceoff_on_warning_cmdline
+owner=Chunyu Hu <chuhu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=30m
+dependencies=
+repoRequires=cki_lib;general/ftrace/include
+TestVersion=1.0
+Type=Regression
+RunFor=kernel
+Priority=Normal
+use_pty=false
