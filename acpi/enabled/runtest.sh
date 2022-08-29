@@ -4,8 +4,8 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # verify to run on aarch64
-if [ "$(uname -i)" != "aarch64" ]; then
-    rstrnt-report-result $TEST SKIP
+if [ "$(arch)" != "aarch64" ]; then
+    rstrnt-report-result $RSTRNT_TASKNAME SKIP
 else
     rlJournalStart
 
