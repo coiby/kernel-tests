@@ -99,7 +99,7 @@ if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "
 	exit
 fi
 
-bash ./build.sh
+. ./build.sh
 
 USE_SIW=${USE_SIW:-"0 1"}
 test_ws=./blktests
