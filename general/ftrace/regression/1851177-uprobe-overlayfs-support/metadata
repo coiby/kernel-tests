@@ -1,0 +1,17 @@
+[General]
+description=Regression test for 1851177
+name=general/ftrace/regression/1851177-uprobe-overlayfs-support
+owner=Ziqian SUN <zsun@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=60m
+dependencies=
+repoRequires=
+TestVersion=1.0
+Type=Regression
+RunFor=kernel
+Priority=Normal

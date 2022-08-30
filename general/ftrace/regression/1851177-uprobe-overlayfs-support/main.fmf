@@ -1,0 +1,11 @@
+summary: Regression test for 1851177
+description: |
+    Regression test for Bug 1851177 - Can't attach uprobe to binary inside of containers on overlayfs
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+tier: 2
+tag: [tier2]
+extra-summary: /kernel/general/ftrace/regression/1851177-uprobe-overlayfs-support
+extra-task: /kernel/general/ftrace/regression/1851177-uprobe-overlayfs-support
