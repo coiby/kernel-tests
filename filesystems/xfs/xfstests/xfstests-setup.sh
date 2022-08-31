@@ -223,6 +223,7 @@ _EOF_
 	get_blkdev_info $SCRATCH_DEV >> blockdev.info
 	get_blkdev_info $LOGWRITES_DEV >> blockdev.info
 
+	sed -i -e 's/^/export /g' $config
 	rstrnt-report-log -l $config
 	rstrnt-report-log -l blockdev.info
 }
