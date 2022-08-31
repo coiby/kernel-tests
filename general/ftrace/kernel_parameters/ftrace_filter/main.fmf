@@ -1,0 +1,9 @@
+summary: Test ftrace_filter=<function-list> kernel parameter
+description: |
+    Test ftrace_filter=<function-list> kernel parameters
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /kernel/general/ftrace/kernel_parameters/ftrace_filter
+extra-task: /kernel/general/ftrace/kernel_parameters/ftrace_filter

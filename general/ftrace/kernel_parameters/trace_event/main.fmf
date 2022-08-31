@@ -1,0 +1,9 @@
+summary: Test trace_event=<event-list> kernel parameter
+description: |
+    Test trace_event=<event-list> kernel parameters
+contact: Ziqian SUN <zsun@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /kernel/general/ftrace/kernel_parameters/trace_event
+extra-task: /kernel/general/ftrace/kernel_parameters/trace_event

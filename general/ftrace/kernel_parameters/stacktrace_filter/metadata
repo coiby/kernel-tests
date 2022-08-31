@@ -1,0 +1,18 @@
+[General]
+description=Test stacktrace_filter=<function-list> kernel parameter
+name=/kernel/general/ftrace/kernel_parameters/stacktrace_filter
+owner=Qiao Zhao <qzhao@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=60m
+dependencies=
+TestVersion=1.0
+Path=/kernel/general/ftrace/kernel_parameters/stacktrace_filter
+Type=KernelTier2
+RunFor=kernel
+Priority=Normal
+use_pty=false
