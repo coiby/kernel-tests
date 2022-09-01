@@ -6,6 +6,6 @@ component:
 path: /security/audit/testsuite
 test: make run
 framework: shell
-duration: 15m
+duration: 2h
 extra-summary: /kernel-tests/security/audit/testsuite
 extra-task: /kernel-tests/security/audit/testsuite

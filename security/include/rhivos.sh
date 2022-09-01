@@ -9,7 +9,7 @@ if [ ! "$RSTRNT_JOBID" ]; then
     RES='\E[0m'
 fi
 
-[ ! "$RSTRNT_JOBID" ] && rm -rf /mnt/testarea #&& mkdir /mnt/testarea && export TESTAREA="/mnt/testarea"
+[ ! "$RSTRNT_JOBID" ] && rm -rf /mnt/testarea && mkdir /mnt/testarea && export TESTAREA="/mnt/testarea"
 
 new_outputfile()
 {
