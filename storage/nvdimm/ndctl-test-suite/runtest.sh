@@ -130,7 +130,7 @@ function ndctl_setup
 	ndctl_srcdir=$(realpath /root/rpmbuild/BUILD/ndctl-*)
 	rlRun "pushd $ndctl_srcdir"
 
-	if rlIsFedora && [[ "$ndctl_version" -ge 73 ]]; then
+	if [[ "$ndctl_version" -ge 73 ]]; then
 		rlRun "lsmod | grep -q e1000e" || rlRun "sed -i "/firmware-update.sh/d" test/meson.build"
 		rlRun "meson setup build"
 		rlRun "meson compile -C build"
@@ -185,7 +185,7 @@ function runtest
 	testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
 	local ret=0
 	rlRun "pushd $ndctl_srcdir"
-	if rlIsFedora && [[ "$ndctl_version" -ge 73 ]]; then
+	if [[ "$ndctl_version" -ge 73 ]]; then
 		echo "Start: ndctl test suite" >/dev/kmsg
 		rlRun "meson test -C build --no-suite cxl"
 		ret=$?
