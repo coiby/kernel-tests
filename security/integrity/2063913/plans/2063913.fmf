@@ -10,10 +10,10 @@ prepare:
   - name: Enable Repos
     how: shell
     script: |
-        . ./security/include/include.h
+        . ./security/include/rhivos.sh
         install_repos
   - name: Install packages
     how: install
-    package: [attr, grubby, make]
+    package: [attr, grubby, make, beakerlib]
 environment-file:
         - ./security/integrity/2063913/plans/tmt.env

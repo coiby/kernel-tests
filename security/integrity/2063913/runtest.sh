@@ -48,7 +48,7 @@ rlJournalStart
     rlRun "evmctl ima_hash -a sha512 runtest.sh"
     rlRun "getfattr -d -m - runtest.sh"
     rlRun "evmctl ima_hash -a sha256 runtest.sh" 1-255
-    rlRun "ausearch -c evmctl"
+    rlRun "ausearch --input-logs -c evmctl"
     rlPhaseEnd
 
     rlPhaseStartCleanup
