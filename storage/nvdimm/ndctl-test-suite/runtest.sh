@@ -99,7 +99,7 @@ function get_test_cases
 	testcases+=" btt-errors.sh"
 	testcases+=" hugetlb"
 	testcases+=" btt-pad-compat.sh"
-	testcases+=" firmware-update.sh"
+	lsmod | grep -q e1000e || testcases+=" firmware-update.sh"  #BZ2123263
 	testcases+=" ack-shutdown-count-set"
 	testcases+=" rescan-partitions.sh"
 	testcases+=" inject-smart.sh"
@@ -131,6 +131,7 @@ function ndctl_setup
 	rlRun "pushd $ndctl_srcdir"
 
 	if rlIsFedora && [[ "$ndctl_version" -ge 73 ]]; then
+		rlRun "lsmod | grep -q e1000e" || rlRun "sed -i "/firmware-update.sh/d" test/meson.build"
 		rlRun "meson setup build"
 		rlRun "meson compile -C build"
 	else
