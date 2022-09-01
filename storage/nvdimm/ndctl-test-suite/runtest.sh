@@ -25,17 +25,13 @@ CDIR=$(dirname $FILE)
 YUM=$(cki_get_yum_tool)
 TNAME="storage/nvdimm/ndctl-test-suite"
 RELEASE=$(uname -r | sed s/\.$(arch)//)
-LINUX_RELEASE=$(echo $RELEASE | sed -e 's/el8_[0-9]/el8/' -e 's/el9_[0-9]/el9/')
 KERNEL="kernel-${RELEASE}"
 DEVEL="kernel-devel-${RELEASE}"
 
 function nvdimm_test_module_setup
 {
 	typeset pkg=$KERNEL
-	typeset srcdir="/root/rpmbuild/BUILD/$KERNEL/linux-$LINUX_RELEASE.$(arch)"
-	typeset test_srcdir="$srcdir/tools/testing/nvdimm"
-
-	[ -d "$srcdir" ] && rm -fr /root/rpmbuild
+	[ -d "/root/rpmbuild" ] && rm -fr /root/rpmbuild
 	rlRun "$YUM -y install $DEVEL"
 	rlRun "$YUM download ${pkg} --source"
 	typeset rpmfile=$(ls -1 ${pkg}.src.rpm)
@@ -48,6 +44,8 @@ function nvdimm_test_module_setup
 
 	rlRun "rpm -ivh $rpmfile"
 	rlRun "rpmbuild -bp --nodeps ~/rpmbuild/SPECS/kernel.spec"
+	srcdir=$(realpath /root/rpmbuild/BUILD/kernel-*/linux-*)
+	test_srcdir="$srcdir/tools/testing/nvdimm"
 	rlAssertExists "$srcdir"
 	rlAssertExists "$test_srcdir"
 	if (($? != 0)); then
@@ -57,7 +55,7 @@ function nvdimm_test_module_setup
 	fi
 
 	#RHEL9 need revert one patch to make compiling pass
-	if rlIsRHEL 9 || rlIsCentOS 9; then
+	if rlIsRHEL 9 || rlIsCentOS 9 || rlIsFedora; then
 		rlRun "cp revert.patch $srcdir"
 		rlRun "pushd $srcdir"
 		rlRun "patch -p1 < revert.patch"
@@ -101,7 +99,7 @@ function get_test_cases
 	testcases+=" btt-errors.sh"
 	testcases+=" hugetlb"
 	testcases+=" btt-pad-compat.sh"
-	testcases+=" firmware-update.sh"
+	lsmod | grep -q e1000e || testcases+=" firmware-update.sh"  #BZ2123263
 	testcases+=" ack-shutdown-count-set"
 	testcases+=" rescan-partitions.sh"
 	testcases+=" inject-smart.sh"
@@ -117,6 +115,7 @@ function get_test_cases
 function ndctl_setup
 {
 
+	ndctl_version=$(ndctl --version)
 	pushd "$CDIR"
 	rlRun "$YUM download ndctl --source"
 	typeset rpmfile=$(ls -1 ndctl*.src.rpm)
@@ -128,9 +127,17 @@ function ndctl_setup
 	fi
 	rlRun "rpm -ivh $rpmfile"
 	rlRun "rpmbuild -bp ~/rpmbuild/SPECS/ndctl.spec"
-	rlRun "pushd ~/rpmbuild/BUILD/ndctl*"
-	rlRun "./autogen.sh"
-	rlRun "./configure CFLAGS='-g -O2' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib64 --disable-docs --enable-test"
+	ndctl_srcdir=$(realpath /root/rpmbuild/BUILD/ndctl-*)
+	rlRun "pushd $ndctl_srcdir"
+
+	if [[ "$ndctl_version" -ge 73 ]]; then
+		rlRun "lsmod | grep -q e1000e" || rlRun "sed -i "/firmware-update.sh/d" test/meson.build"
+		rlRun "meson setup build"
+		rlRun "meson compile -C build"
+	else
+		rlRun "./autogen.sh"
+		rlRun "./configure CFLAGS='-g -O2' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib64 --disable-docs --enable-test"
+	fi
 	if (( $? != 0 )); then
 		rlLog "Abort test as ndctl setup failed"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
@@ -156,10 +163,10 @@ function do_test
 	echo "End: ndctl test suite: $test_case" >/dev/kmsg
 
 	if (( $ret == 0)); then
-		rstrnt-report-result "ndctl test suite: $test_case" PASS 0
+		rstrnt-report-result "ndctl test suite: $test_case" PASS
 	else
-		rstrnt-report-result "ndctl test suite: $test_case" FAIL 0
-		rlFileSubmit "test/${test_case}.log"
+		rstrnt-report-result "ndctl test suite: $test_case" FAIL
+		cki_upload_log_file "test/${test_case}.log"
 	fi
 
 	return $ret
@@ -176,13 +183,25 @@ function runtest
 	testcases_default=""
 	testcases_default+=" $(get_test_cases)"
 	testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
-	ret=0
-	rlRun "pushd ~/rpmbuild/BUILD/ndctl*"
-	for testcase in $testcases; do
-		do_test $testcase
-		((ret += $?))
-	done
-
+	local ret=0
+	rlRun "pushd $ndctl_srcdir"
+	if [[ "$ndctl_version" -ge 73 ]]; then
+		echo "Start: ndctl test suite" >/dev/kmsg
+		rlRun "meson test -C build --no-suite cxl"
+		ret=$?
+		if (( $ret == 0)); then
+			rstrnt-report-result "ndctl test suite" PASS
+		else
+			rstrnt-report-result "ndctl test suite" FAIL
+		fi
+		echo "End: ndctl test suite" >/dev/kmsg
+		cki_upload_log_file "$ndctl_srcdir/build/meson-logs/testlog.txt"
+	else
+		for testcase in $testcases; do
+			do_test $testcase
+			((ret += $?))
+		done
+	fi
 	if (( $ret != 0 )); then
 		echo ">> There are failing tests, pls check it"
 	fi
