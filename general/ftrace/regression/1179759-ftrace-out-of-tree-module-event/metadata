@@ -1,0 +1,18 @@
+[General]
+description=1179759 - Trace event on out of tree module not functional
+name=general/ftrace/regression/1179759-ftrace-out-of-tree-module-event
+owner=Chunyu Hu <chuhu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=30m
+dependencies=
+repoRequires=general/ftrace/include;cki_lib
+TestVersion=1.0
+Type=Regression
+RunFor=kernel
+Priority=Normal
+use_pty=false
