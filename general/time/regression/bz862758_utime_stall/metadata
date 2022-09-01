@@ -1,0 +1,13 @@
+[General]
+name=general/time/regression/bz862758_utime_stall
+owner=Qiao Zhao <qzhao@redhat.com>
+description=Regression testing for bug 862758
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=gcc
+max_time=2h
+use_pty=false

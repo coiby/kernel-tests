@@ -1,0 +1,12 @@
+[General]
+name=general/time/rtc_sync
+owner=Qiao Zhao <qzhao@redhat.com>
+description=System should be sync per 11 mins when use rtcsync
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=30m
+use_pty=false

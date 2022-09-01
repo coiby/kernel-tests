@@ -1,0 +1,13 @@
+[General]
+name=general/time/hpet_device
+owner=Qiao Zhao <qzhao@redhat.com>
+description=hpet device /dev/hpet test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=gcc
+max_time=30m
+use_pty=false

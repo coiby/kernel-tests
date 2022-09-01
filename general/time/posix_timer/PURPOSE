@@ -1,0 +1,5 @@
+Upstream case "Open POSIX Test Suite"
+Git repo: https://github.com/juj/posixtestsuite
+Project: http://posixtest.sourceforge.net/
+For timers/clock: TMR) echo "Executing timers and clocks tests"
+  $ ./run_tests TMR

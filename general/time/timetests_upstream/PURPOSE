@@ -1,0 +1,6 @@
+Test upstream time case
+Git site: https://github.com/johnstultz-work/timetests
+> Since original code was not maintained by anyone, so use the 
+> downstream code: https://github.com/linuxqiao/timetests
+This case developed and tested this on Ubuntu 12.04. Need update.
+To run: ./runall.sh
