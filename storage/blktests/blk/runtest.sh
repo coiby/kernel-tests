@@ -216,7 +216,7 @@ if cki_has_kernel_debug_flags; then
 	exit 0
 fi
 
-bash ./build.sh
+. ./build.sh
 
 testcases_default=""
 testcases_default+=" $(get_test_cases_block)"
