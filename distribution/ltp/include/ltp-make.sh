@@ -39,15 +39,6 @@ NR_CPUS=$(getconf _NPROCESSORS_ONLN || echo 1)
 RELPATH="/"
 
 MAKE="make -j${NR_CPUS}"
-# if TEST_VERSION is set, use the --forward flag so patches which are
-# already applied do not cause the entire job to fail, and ignore
-# the exit status (which will be 1 for an error even with --forward)
-if [ ! -n "$TEST_VERSION" ]
-then
-    PATCH="patch -p1 -d ${TARGET}"
-else
-    PATCH="-patch --forward -p1 -d ${TARGET}"
-fi
 
 download_ltp()
 {
@@ -64,6 +55,29 @@ download_ltp()
 
     echo "============ Unzip package ============" | tee -a $OUTPUTFILE
     tar xjf ${TARGET}.tar.bz2 | tee -a $OUTPUTFILE
+}
+
+clone_ltp()
+{
+    TARGET=${PWD}/ltp
+    rm -rf ${TARGET}
+    git clone https://github.com/linux-test-project/ltp ${TARGET}
+    if [ $? -ne 0 ]; then
+        echo "Aborting current task: Couldn't clone LTP" | tee -a $OUTPUTFILE
+        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+    fi
+    if [[ -n ${LTP_COMMIT_ID} && ${LTP_COMMIT_ID} != "latest" ]]; then
+        git -C ${TARGET} checkout ${LTP_COMMIT_ID}
+        echo "Aborting current task: Couldn't checkout ${LTP_COMMIT_ID}" | tee -a $OUTPUTFILE
+        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+    fi
+    if [[ -z ${LTP_COMMIT_ID} || ${LTP_COMMIT_ID} == "latest" ]]; then
+        LTP_COMMIT_ID=$(git -C ${TARGET} log --format="%H" -n 1)
+    fi
+    TESTVERSION="commit-${LTP_COMMIT_ID}"
+
 }
 
 # Critical patches
@@ -122,7 +136,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/skip-firmware-tests.patch
     fi
 
-    if  [ $TESTVERSION -ge 20170516 ]; then
+    if  [[ $TESTVERSION =~ '^[0-9]+$' ]] && [[ $TESTVERSION -ge 20170516 ]]; then
         echo " - cron_tests.sh has been rewritten since ltp-20170516" | tee -a $OUTPUTFILE
     elif [  "$OS_MAJOR_RELEASE"  == "6" ]; then
         echo " - fix cron01 in RHEL6" | tee -a $OUTPUTFILE
@@ -242,6 +256,16 @@ setup-testarea()
 
 configure()
 {
+    # if TEST_VERSION is set, use the --forward flag so patches which are
+    # already applied do not cause the entire job to fail, and ignore
+    # the exit status (which will be 1 for an error even with --forward)
+    if [ ! -n "$TEST_VERSION" ]
+    then
+        PATCH="patch -p1 -d ${TARGET}"
+    else
+        PATCH="-patch --forward -p1 -d ${TARGET}"
+    fi
+
     #Patch-inc
     echo "============ Patch patch-inc-tolerant ==============" | tee -a $OUTPUTFILE
     patch-inc > patchinc.log 2>&1
@@ -254,7 +278,15 @@ configure()
 build-all()
 {
     setup-testarea
-    download_ltp
+    if [[ -z ${LTP_COMMIT_ID} ]]; then
+        download_ltp
+    else
+        clone_ltp
+        if [[ -f ${TARGET_DIR}/runltp ]] && grep -q "${TESTVERSION}" ${TARGET_DIR}/ltp_version; then
+            echo "LTP ($TESTVERSION) has been built and installed at ${TARGET_DIR}/runltp !"
+            return
+        fi
+    fi
     configure
     echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
     timeout 20m ${MAKE} -C ${TARGET} all &> buildlog.txt
@@ -276,6 +308,9 @@ build-all()
         res="FAILED"
     fi
     echo "============ ${MAKE} -C ${TARGET} install: ${res}  ============" | tee -a $OUTPUTFILE
+    if [[ ${res} == "PASSED" ]]; then
+        echo "${TESTVERSION}" > ${TARGET_DIR}/ltp_version
+    fi
 }
 
 # For manual testing
