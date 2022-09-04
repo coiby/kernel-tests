@@ -131,7 +131,7 @@ function ndctl_setup
 	rlRun "pushd $ndctl_srcdir"
 
 	if [[ "$ndctl_version" -ge 73 ]]; then
-		rlRun "lsmod | grep -q e1000e" || rlRun "sed -i "/firmware-update.sh/d" test/meson.build"
+		lsmod | grep -q e1000e && rlRun "sed -i "/firmware-update.sh/d" test/meson.build"
 		rlRun "meson setup build"
 		rlRun "meson compile -C build"
 	else
