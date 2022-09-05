@@ -1,0 +1,401 @@
+From 3b67b1ce2aecc5e4c2c9c5ef2e6a5d5360ed83c3 Mon Sep 17 00:00:00 2001
+From: root <root@hp-dl585g7-01.rhts.eng.pek2.redhat.com>
+Date: Fri, 3 Aug 2018 01:46:05 -0400
+Subject: [PATCH 1/4] stress-ng: support sched deadline
+
+Signed-off-by: Chunyu Hu <chuhu@redhat.com>
+---
+ Makefile    |   2 +-
+ config      |   0
+ sched.c     | 105 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ stress-ng.c |  56 +++++++++++++++++++++++++++++++-
+ stress-ng.h |  15 ++++++++-
+ stress-vm.c |   6 +++-
+ 6 files changed, 173 insertions(+), 11 deletions(-)
+ delete mode 100644 config
+
+diff --git a/Makefile b/Makefile
+index ed70e7c..afb8000 100644
+--- a/Makefile
++++ b/Makefile
+@@ -436,7 +436,7 @@ slow-test-all: all
+ .PHONY: install
+ install: stress-ng stress-ng.1.gz
+ 	mkdir -p ${DESTDIR}${BINDIR}
+-	cp stress-ng ${DESTDIR}${BINDIR}
++	\cp stress-ng ${DESTDIR}${BINDIR}
+ 	mkdir -p ${DESTDIR}${MANDIR}
+ 	cp stress-ng.1.gz ${DESTDIR}${MANDIR}
+ 	mkdir -p ${DESTDIR}${JOBDIR}
+diff --git a/config b/config
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/sched.c b/sched.c
+index 6fef753..df36301 100644
+--- a/sched.c
++++ b/sched.c
+@@ -65,6 +65,81 @@ const char *stress_get_sched_name(const int sched)
+ 
+ #if (defined(_POSIX_PRIORITY_SCHEDULING) || defined(__linux__)) && \
+      !defined(__OpenBSD__) && !defined(__minix__) && !defined(__APPLE__)
++
++#if defined(SCHED_DEADLINE) && defined(__linux__)
++int stress_set_deadline_sched(
++	const pid_t pid,
++	const uint64_t period,
++	const uint64_t runtime,
++	const uint64_t deadline,
++	const bool quiet)
++{
++	int rc;
++	struct shim_sched_attr attr;
++
++	attr.size = sizeof(attr);
++	attr.sched_policy = SCHED_DEADLINE;
++	/* make sched_deadline task be able to fork*/
++	attr.sched_flags = SCHED_FLAG_RESET_ON_FORK;
++	attr.sched_nice = 0;
++	attr.sched_priority = 0;
++	if (!quiet)
++		pr_inf("%s: setting scheduler class '%s'(period=%lu,runtime=%lu,deadline=%lu)\n",
++			__func__, "deadline", period, runtime, deadline);
++	attr.sched_runtime = runtime;
++	attr.sched_deadline = deadline;
++	attr.sched_period = period;
++
++	rc = shim_sched_setattr(pid, &attr, 0);
++	if (rc < 0) {
++		rc = -errno;
++		if (!quiet)
++			pr_inf("Cannot set scheduler: errno=%d (%s)\n",
++				errno, strerror(errno));
++		return rc;
++	}
++	return 0;
++}
++
++int sched_deadline_init(void *params)
++{
++	long sched_period, sched_runtime, sched_deadline;
++	struct shim_sched_attr *attr;
++	int rc;
++
++	if (params) {
++		attr = params;
++		sched_period = attr->sched_period;
++		sched_runtime = attr->sched_runtime;
++		sched_deadline = attr->sched_deadline;
++	} else {
++		(void)get_setting("sched-period", &sched_period);
++		(void)get_setting("sched-runtime", &sched_runtime);
++		(void)get_setting("sched-deadline", &sched_deadline);
++	}
++	pr_inf("%s: setting scheduler class '%s'(period=%lu,runtime=%lu,deadline=%lu)\n",
++		__func__, "deadline", sched_period, sched_runtime, sched_deadline);
++	rc = stress_set_deadline_sched(getpid(), sched_period,
++		sched_runtime, sched_deadline, false);
++	return rc;
++}
++#else
++int stress_set_deadline_sched(
++	const pid_t pid,
++	const uint64_t period,
++	const uint64_t runtime,
++	const uint64_t deadline,
++	const bool quiet)
++{
++	void(period);
++	void(runtime);
++	void(deadline);
++	void(quiet);
++
++	return 0;
++}
++#endif
++
+ /*
+  *  set_sched()
+  * 	are sched settings valid, if so, set them
+@@ -85,6 +160,10 @@ int stress_set_sched(
+ 	struct sched_param param;
+ 	const char *name = stress_get_sched_name(sched);
+ 
++	long sched_period = 0;
++	long sched_runtime = 0;
++	long sched_deadline = 0;
++
+ 	(void)memset(&param, 0, sizeof(param));
+ 
+ 	switch (sched) {
+@@ -129,7 +208,7 @@ int stress_set_sched(
+ 		max = sched_get_priority_max(sched);
+ 		attr.size = sizeof(attr);
+ 		attr.sched_policy = SCHED_DEADLINE;
+-		attr.sched_flags = 0;
++		attr.sched_flags = SCHED_FLAG_RESET_ON_FORK;
+ 		attr.sched_nice = SCHED_OTHER;
+ 		attr.sched_priority = sched_priority;
+ 		if (sched_priority == UNDEFINED) {
+@@ -149,12 +228,24 @@ int stress_set_sched(
+ 				min, max);
+ 			return -EINVAL;
+ 		}
+-		if (!quiet)
+-			pr_dbg("sched: setting scheduler class '%s'\n",
+-				name);
+-		attr.sched_runtime = 10000;
+-		attr.sched_deadline = 100000;
+-		attr.sched_period = 0;
++		if (!quiet) {
++			pr_dbg("%s: setting scheduler class '%s'\n",
++					__func__, name);
++		}
++		(void)get_setting("sched-period", &sched_period);
++		(void)get_setting("sched-runtime", &sched_runtime);
++		(void)get_setting("sched-deadline", &sched_deadline);
++		if (sched_deadline <= 0) {
++			attr.sched_runtime = 10000;
++			attr.sched_deadline = 100000;
++			attr.sched_period = 0;
++		} else {
++			attr.sched_runtime = sched_runtime;
++			attr.sched_deadline = sched_deadline;
++			attr.sched_period = sched_period;
++		}
++		pr_inf("%s: setting scheduler class '%s'(period=%lu,runtime=%lu,deadline=%lu)\n",
++				__func__, "deadline", attr.sched_period, attr.sched_runtime, attr.sched_deadline);
+ 
+ 		rc = shim_sched_setattr(pid, &attr, 0);
+ 		if (rc < 0) {
+diff --git a/stress-ng.c b/stress-ng.c
+index c7b4d5b..70000a9 100644
+--- a/stress-ng.c
++++ b/stress-ng.c
+@@ -956,6 +956,10 @@ static const struct option long_options[] = {
+ 	{ "sched-prio",	1,	0,	OPT_sched_prio },
+ 	{ "schedpolicy",1,	0,	OPT_schedpolicy },
+ 	{ "schedpolicy-ops",1,	0,	OPT_schedpolicy_ops },
++	{ "sched-period",1,	0,	OPT_sched_period },
++	{ "sched-runtime",1,	0,	OPT_sched_runtime },
++	{ "sched-deadline",1,	0,	OPT_sched_deadline },
++	{ "schedpolicy",1,	0,	OPT_schedpolicy },
+ 	{ "sctp",	1,	0,	OPT_sctp },
+ 	{ "sctp-ops",	1,	0,	OPT_sctp_ops },
+ 	{ "sctp-domain",1,	0,	OPT_sctp_domain },
+@@ -1203,6 +1207,9 @@ static const help_t help_generic[] = {
+ 	{ "r",		"random N",		"start N random workers" },
+ 	{ NULL,		"sched type",		"set scheduler type" },
+ 	{ NULL,		"sched-prio N",		"set scheduler priority level N" },
++	{ NULL,		"sched-period N",	"set period for SCHED_DEADLINE to N nanosecs (Linux only)" },
++	{ NULL,		"sched-runtime N",	"set runtime for SCHED_DEADLINE to N nanosecs (Linux only)" },
++	{ NULL,		"sched-deadline N",	"set deadline for SCHED_DEADLINE to N nanosecs (Liunx only)" },
+ 	{ NULL,		"sequential N",		"run all stressors one by one, invoking N of them" },
+ 	{ NULL,		"stressors",		"show available stress tests" },
+ 	{ NULL,		"syslog",		"log messages to the syslog" },
+@@ -2432,6 +2439,15 @@ static void MLOCKED_TEXT stress_run(
+ 	int32_t n_procs, j;
+ 	const int32_t total_procs = get_total_num_procs(procs_list);
+ 
++	int32_t sched;
++
++	/*deadline scheduler*/
++	long sched_period = -1;
++	long sched_runtime = -1;
++	long sched_deadline = -1;
++
++	uint32_t reinit_flags = 0;
++
+ 	wait_flag = true;
+ 	time_start = time_now();
+ 	pr_dbg("starting stressors\n");
+@@ -2462,6 +2478,8 @@ again:
+ 				switch (pid) {
+ 				case -1:
+ 					if (errno == EAGAIN) {
++						pr_err("Cannot fork: errno=%d (%s)\n",
++							errno, strerror(errno));
+ 						(void)shim_usleep(100000);
+ 						goto again;
+ 					}
+@@ -2470,6 +2488,13 @@ again:
+ 					kill_procs(SIGALRM);
+ 					goto wait_for_procs;
+ 				case 0:
++					(void)get_setting("sched", &sched);
++					(void)get_setting("sched-period", &sched_period);
++					(void)get_setting("sched-runtime", &sched_runtime);
++					(void)get_setting("sched-deadline", &sched_deadline);
++					if (sched == SCHED_DEADLINE && stress_set_deadline_sched(getpid(),
++						sched_period, sched_runtime, sched_deadline, false) < 0)
++						exit(EXIT_FAILURE);
+ 					/* Child */
+ 					(void)atexit(stress_child_atexit);
+ 					(void)setpgid(0, g_pgrp);
+@@ -2506,6 +2531,9 @@ again:
+ 						(void)perf_enable(&stats->sp);
+ #endif
+ 					if (g_keep_stressing_flag && !(g_opt_flags & OPT_FLAGS_DRY_RUN)) {
++						if (sched == 6)
++							reinit_flags = REINIT_SCHED_DEADLINE;
++
+ 						const args_t args = {
+ 							.counter = &stats->counter,
+ 							.name = name,
+@@ -2515,6 +2543,8 @@ again:
+ 							.pid = getpid(),
+ 							.ppid = getppid(),
+ 							.page_size = stress_get_pagesize(),
++							.stressor = proc_current->stressor,
++							.child_reinit = reinit_flags,
+ 						};
+ 
+ 						rc = proc_current->stressor->info->stressor(&args);
+@@ -2993,7 +3023,6 @@ static proc_info_t *find_proc_info(const stress_t *stressor)
+ static void stressors_init(void)
+ {
+ 	proc_info_t *pi;
+-
+ 	for (pi = procs_head; pi; pi = pi->next) {
+ 		size_t i;
+ 
+@@ -3328,6 +3357,18 @@ next_opt:
+ 			i32 = get_int32(optarg);
+ 			set_setting_global("sched-prio", TYPE_ID_INT32, &i32);
+ 			break;
++		case OPT_sched_period:
++			i64 = get_uint64(optarg);
++			set_setting_global("sched-period", TYPE_ID_INT64, &i64);
++			break;
++		case OPT_sched_runtime:
++			i64 = get_uint64(optarg);
++			set_setting_global("sched-runtime", TYPE_ID_INT64, &i64);
++			break;
++		case OPT_sched_deadline:
++			i64 = get_uint64(optarg);
++			set_setting_global("sched-deadline", TYPE_ID_INT64, &i64);
++			break;
+ 		case OPT_sequential:
+ 			g_opt_flags |= OPT_FLAGS_SEQUENTIAL;
+ 			g_opt_sequential = get_int32(optarg);
+@@ -3501,6 +3542,19 @@ static inline void stress_mlock_executable(void)
+ #endif
+ }
+ 
++void stress_child_reinit(const args_t *args)
++{
++	stress_t *stress = args->stressor;
++		
++	if (stress->info && stress->info->child_reinit)
++		stress->info->child_reinit(NULL);
++	if (args->child_reinit & REINIT_SCHED_DEADLINE) {
++		extern int sched_deadline_init(void*);
++		sched_deadline_init(NULL);
++	}
++		
++}
++
+ int main(int argc, char **argv)
+ {
+ 	double duration = 0.0;			/* stressor run time in secs */
+diff --git a/stress-ng.h b/stress-ng.h
+index 7cb2f8e..92b18bb 100644
+--- a/stress-ng.h
++++ b/stress-ng.h
+@@ -55,6 +55,7 @@
+ #include <setjmp.h>
+ #include <semaphore.h>
+ #include <sched.h>
++#include <linux/sched.h>
+ 
+ #if defined(__GNUC__) && defined(__linux__)
+ #include <malloc.h>
+@@ -465,6 +466,8 @@ typedef unsigned long int __kernel_ulong_t;
+ #define CLASS_SECURITY		0x00001000	/* security APIs */
+ #define CLASS_PATHOLOGICAL	0x00002000	/* can hang a machine */
+ 
++#define REINIT_SCHED_DEADLINE	0x00000001
++
+ typedef struct proc_info *pproc_info_t;
+ 
+ /* native setting types */
+@@ -555,12 +558,15 @@ typedef struct {
+ 	pid_t pid;			/* stressor pid */
+ 	pid_t ppid;			/* stressor ppid */
+ 	size_t page_size;		/* page size */
++	void *stressor;			/* stress_t */
++	uint32_t child_reinit;		/* reinit child flags */
+ } args_t;
+ 
+ typedef struct {
+ 	int (*stressor)(const args_t *args);
+ 	int (*supported)(void);
+ 	void (*init)(void);
++	int (*child_reinit)(void *data); /*reinit*/
+ 	void (*deinit)(void);
+ 	void (*set_default)(void);
+ 	void (*set_limit)(uint64_t max);
+@@ -2196,6 +2202,10 @@ typedef enum {
+ 	OPT_schedpolicy,
+ 	OPT_schedpolicy_ops,
+ 
++	OPT_sched_period,
++	OPT_sched_runtime,
++	OPT_sched_deadline,
++
+ 	OPT_sctp,
+ 	OPT_sctp_ops,
+ 	OPT_sctp_domain,
+@@ -2486,7 +2496,7 @@ typedef struct {
+ typedef struct proc_info {
+ 	struct proc_info *next;		/* next proc info struct in list */
+ 	struct proc_info *prev;		/* prev proc info struct in list */
+-	const stress_t *stressor;	/* stressor */
++	stress_t *stressor;		/* stressor */
+ 	pid_t	*pids;			/* process id */
+ 	proc_stats_t **stats;		/* process proc stats info */
+ 	int32_t started_procs;		/* count of started processes */
+@@ -2728,6 +2738,8 @@ extern void set_oom_adjustment(const char *name, const bool killable);
+ extern WARN_UNUSED bool process_oomed(const pid_t pid);
+ extern WARN_UNUSED int stress_set_sched(const pid_t pid, const int32_t sched,
+ 	const int sched_priority, const bool quiet);
++extern WARN_UNUSED int stress_set_deadline_sched(const pid_t, const uint64_t period,
++	const uint64_t runtime, const uint64_t deadline, const bool quiet);
+ extern const char *stress_get_sched_name(const int sched);
+ extern void set_iopriority(const int32_t class, const int32_t level);
+ extern void set_proc_name(const char *name);
+@@ -2804,6 +2816,7 @@ extern char *stress_uint64_to_str(char *str, size_t len, const uint64_t val);
+ extern WARN_UNUSED int stress_drop_capabilities(const char *name);
+ extern WARN_UNUSED bool is_dot_filename(const char *name);
+ extern WARN_UNUSED void *deconstify(const void *ptr);
++extern void stress_child_reinit(const args_t *arg);
+ 
+ /*
+  *  Indicate a stress test failed because of limited resources
+diff --git a/stress-vm.c b/stress-vm.c
+index ca6be27..e0026a6 100644
+--- a/stress-vm.c
++++ b/stress-vm.c
+@@ -2050,6 +2050,8 @@ again:
+ 		/* Make sure this is killable by OOM killer */
+ 		set_oom_adjustment(args->name, true);
+ 
++		stress_child_reinit(args);
++
+ 		do {
+ 			if (no_mem_retries >= NO_MEM_RETRIES_MAX) {
+ 				pr_err("%s: gave up trying to mmap, no available memory\n",
+@@ -2124,8 +2126,10 @@ static void stress_vm_set_default(void)
+ 	stress_set_vm_method("all");
+ }
+ 
++extern int sched_deadline_init(void *params);
++
+ stressor_info_t stress_vm_info = {
+ 	.stressor = stress_vm,
+ 	.set_default = stress_vm_set_default,
+-	.class = CLASS_VM | CLASS_MEMORY | CLASS_OS
++	.class = CLASS_VM | CLASS_MEMORY | CLASS_OS,
+ };
+-- 
+1.8.3.1
+

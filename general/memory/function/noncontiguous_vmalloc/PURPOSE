@@ -1,0 +1,11 @@
+Description:
+Directly use ``vmalloc()`` from kernel module. Allocate at __init and
+free at __exit.
+
+
+Parameter(of the module):
+vm_buf_size:
+        The number of pages to be allocated by vmalloc(), can be used
+        in runtest.sh like ``insmod vmalloc.ko vm_buf_size=256``. On a
+        system of 4kB pagesize, this will allocate 1mB non-contiguous
+        memory.

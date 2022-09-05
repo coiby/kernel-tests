@@ -1,0 +1,36 @@
+PURPOSE of /kernel/general/memory/function/kmemleak
+
+Description: Function test. Check that kmemleak is working after enabled.  This simply
+allocate slub object without saving the returned address, and do kmemleak scan, if there's
+leak, /kernel/debug/kmemleak file would show something:
+
+[root@lenovo-sr258-01 kmemleak]# cat /sys/kernel/debug/kmemleak
+unreferenced object 0xffff8882897f4870 (size 8):
+  comm "insmod", pid 42609, jiffies 4296990767 (age 38.123s)
+  hex dump (first 8 bytes):
+    28 45 7f 89 82 88 ff ff                          (E......
+  backtrace:
+    [<00000000921c46d1>] kmem_cache_alloc_trace+0xf6/0x210
+    [<000000002ab05c00>] 0xffffffffc1418049
+    [<00000000d1e6aa81>] do_one_initcall+0xe9/0x57d
+    [<0000000006a51b77>] do_init_module+0x1d1/0x6f0
+    [<00000000193ced0a>] load_module+0x36bd/0x4f50
+    [<000000002724574f>] __do_sys_finit_module+0x11a/0x1b0
+    [<00000000adf3ca95>] do_syscall_64+0xa5/0x430
+    [<000000004ed47036>] entry_SYSCALL_64_after_hwframe+0x6a/0xdf
+
+
+For other kind of allocators such as page allocator and per cpu allocator,
+needs to be supported in next.
+
+TEST PARAM
+1) RESERVE_LEAK=[1|0] (This is rarely used, as it's a testcase for another testcase).
+   When set to 1, used as a test case for /kernel/general/memory/kmemleak, to detect task
+   '/kernel/general/memory/kmemleak' can report the leak info correctly,
+
+2) RESERVE_LEAK_REBOOT=[1|0] (This is rarely used, as it's a testcase for another testcase)
+   When set to 1, used as a test case for '/kernel/general/memory/kmemleak', to make sure
+   the task can report the leak info correctly. Note. /kernel/general/memory/kmemleak hacked
+   rhts-reboot to do a scan and save the data before the real reboot. This parameter
+
+Author: Chunyu Hu <chuhu@redhat.com>

@@ -1,0 +1,13 @@
+Test for 5-level paging. 
+
+The test in upstrem:
+https://github.com/sanskriti-s/pg-table_tests
+    
+See:
+Bug 1504739 - [HPE 8.0 FEAT] 5-level paging support
+Bug 1623590 - [RHEL8] Enable 5-level paging support in the kernel
+Bug 1503235 - [DELL 8.0 FEAT]5-level paging: change kernel virtual address layout
+Bug 1485547 - [Intel 8.0 Feature] 5-level paging: boottime 4/5-level switch
+Bug 1485532 - [Intel 8.0 Feature] 5-level paging: add support for 5-level paging in software (add p4d_t)
+Bug 1485525 - [Intel 8.0 Feature] 5-level paging: change kernel virtual address layout
+Bug 1528128 - [Intel 8.0 FEAT] 5-level paging: enable 5-level paging in hardware

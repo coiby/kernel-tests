@@ -1,0 +1,100 @@
+From 8d1b5126e1c7a33d0fb4d515f52b8fa16a2a547b Mon Sep 17 00:00:00 2001
+From: root <root@hp-dl360g9-23.rhts.eng.pek2.redhat.com>
+Date: Mon, 3 Sep 2018 01:03:05 -0400
+Subject: [PATCH 3/4] stress-ng: sched: support grub protocol for deadline
+ scheduling
+
+Signed-off-by: Chunyu Hu <chuhu@redhat.com>
+---
+ sched.c     |  2 ++
+ stress-ng.c |  5 +++++
+ stress-ng.h | 16 ++++++++++++++++
+ 3 files changed, 23 insertions(+)
+
+diff --git a/sched.c b/sched.c
+index df36301..920179d 100644
+--- a/sched.c
++++ b/sched.c
+@@ -81,6 +81,8 @@ int stress_set_deadline_sched(
+ 	attr.sched_policy = SCHED_DEADLINE;
+ 	/* make sched_deadline task be able to fork*/
+ 	attr.sched_flags = SCHED_FLAG_RESET_ON_FORK;
++	if (g_opt_flags & OPT_FLAGS_DEADLINE_GRUB)
++		attr.sched_flags |= SCHED_FLAG_RECLAIM;
+ 	attr.sched_nice = 0;
+ 	attr.sched_priority = 0;
+ 	if (!quiet)
+diff --git a/stress-ng.c b/stress-ng.c
+index 70000a9..d60a574 100644
+--- a/stress-ng.c
++++ b/stress-ng.c
+@@ -959,6 +959,7 @@ static const struct option long_options[] = {
+ 	{ "sched-period",1,	0,	OPT_sched_period },
+ 	{ "sched-runtime",1,	0,	OPT_sched_runtime },
+ 	{ "sched-deadline",1,	0,	OPT_sched_deadline },
++	{ "sched-reclaim",0,	0,	OPT_sched_reclaim },
+ 	{ "schedpolicy",1,	0,	OPT_schedpolicy },
+ 	{ "sctp",	1,	0,	OPT_sctp },
+ 	{ "sctp-ops",	1,	0,	OPT_sctp_ops },
+@@ -1210,6 +1211,7 @@ static const help_t help_generic[] = {
+ 	{ NULL,		"sched-period N",	"set period for SCHED_DEADLINE to N nanosecs (Linux only)" },
+ 	{ NULL,		"sched-runtime N",	"set runtime for SCHED_DEADLINE to N nanosecs (Linux only)" },
+ 	{ NULL,		"sched-deadline N",	"set deadline for SCHED_DEADLINE to N nanosecs (Liunx only)" },
++	{ NULL,		"sched-reclaim",	"set reclaim cpu bandwidth for deadline schduler (Liunx only)" },
+ 	{ NULL,		"sequential N",		"run all stressors one by one, invoking N of them" },
+ 	{ NULL,		"stressors",		"show available stress tests" },
+ 	{ NULL,		"syslog",		"log messages to the syslog" },
+@@ -3369,6 +3371,9 @@ next_opt:
+ 			i64 = get_uint64(optarg);
+ 			set_setting_global("sched-deadline", TYPE_ID_INT64, &i64);
+ 			break;
++		case OPT_sched_reclaim:
++			g_opt_flags |= OPT_FLAGS_DEADLINE_GRUB;
++			break;
+ 		case OPT_sequential:
+ 			g_opt_flags |= OPT_FLAGS_SEQUENTIAL;
+ 			g_opt_sequential = get_int32(optarg);
+diff --git a/stress-ng.h b/stress-ng.h
+index 92b18bb..7030150 100644
+--- a/stress-ng.h
++++ b/stress-ng.h
+@@ -57,6 +57,20 @@
+ #include <sched.h>
+ #include <linux/sched.h>
+ 
++#ifndef SCHED_FLAG_RESET_ON_FORK
++ #define SCHED_FLAG_RESET_ON_FORK    0x01
++#endif
++
++#ifndef  SCHED_FLAG_RECLAIM
++ #define SCHED_FLAG_RECLAIM      0x02
++#endif
++
++#ifndef SCHED_FLAG_DL_OVERRUN
++  #define SCHED_FLAG_DL_OVERRUN       0x04
++#endif
++
++
++
+ #if defined(__GNUC__) && defined(__linux__)
+ #include <malloc.h>
+ #endif
+@@ -413,6 +427,7 @@ typedef unsigned long int __kernel_ulong_t;
+ #define OPT_FLAGS_ABORT		 0x10000000000000ULL	/* --abort */
+ #define OPT_FLAGS_CPU_ONLINE_ALL 0x20000000000000ULL	/* --cpu-online-all */
+ #define OPT_FLAGS_TIMESTAMP	 0x40000000000000ULL	/* --timestamp */
++#define OPT_FLAGS_DEADLINE_GRUB  0x80000000000000ULL	/* --deadline-grub */
+ 
+ #define OPT_FLAGS_CACHE_MASK		\
+ 	(OPT_FLAGS_CACHE_FLUSH |	\
+@@ -2205,6 +2220,7 @@ typedef enum {
+ 	OPT_sched_period,
+ 	OPT_sched_runtime,
+ 	OPT_sched_deadline,
++	OPT_sched_reclaim,
+ 
+ 	OPT_sctp,
+ 	OPT_sctp_ops,
+-- 
+1.8.3.1
+

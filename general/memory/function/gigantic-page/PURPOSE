@@ -1,0 +1,18 @@
+A simple tests for gigantic page allocation in rhel7(only) kernel.
+
+The test steps as follow:
+
+  Make sure /proc/cpuinfo has "pdpe1gb" flag
+
+First:
+  Append "hugepagesz=1G default_hugepagesz=1G" to the kernel cmdline & reboot
+
+Second:
+  Append 'hugepagesz=1G hugepages=2' to kernel cmdline & reboot
+
+Third:
+  Append 'hugepagesz=1G default_hugepagesz=1G hugepages=2' to kernel cmdline & reboot
+
+See:
+https://bugzilla.redhat.com/show_bug.cgi?id=996763
+https://bugzilla.redhat.com/show_bug.cgi?id=1086333

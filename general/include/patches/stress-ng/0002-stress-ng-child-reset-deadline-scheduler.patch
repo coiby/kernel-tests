@@ -1,0 +1,1043 @@
+From 3c1936c1d3485ca7f3ea0ca8c48464971c75a26a Mon Sep 17 00:00:00 2001
+From: root <root@hp-dl360g9-23.rhts.eng.pek2.redhat.com>
+Date: Mon, 3 Sep 2018 01:02:20 -0400
+Subject: [PATCH 2/4] stress-ng: child reset deadline scheduler
+
+Signed-off-by: Chunyu Hu <chuhu@redhat.com>
+---
+ ignite-cpu.c          | 1 +
+ stress-apparmor.c     | 1 +
+ stress-bad-altstack.c | 2 ++
+ stress-bigheap.c      | 1 +
+ stress-brk.c          | 1 +
+ stress-chroot.c       | 1 +
+ stress-clone.c        | 1 +
+ stress-cyclic.c       | 1 +
+ stress-daemon.c       | 2 ++
+ stress-dccp.c         | 1 +
+ stress-dev-shm.c      | 1 +
+ stress-dev.c          | 1 +
+ stress-efivar.c       | 1 +
+ stress-enosys.c       | 2 ++
+ stress-epoll.c        | 1 +
+ stress-eventfd.c      | 1 +
+ stress-fanotify.c     | 1 +
+ stress-fiemap.c       | 1 +
+ stress-fifo.c         | 1 +
+ stress-filename.c     | 1 +
+ stress-fork.c         | 1 +
+ stress-handle.c       | 1 +
+ stress-lease.c        | 1 +
+ stress-locka.c        | 2 ++
+ stress-lockf.c        | 1 +
+ stress-lockofd.c      | 1 +
+ stress-malloc.c       | 1 +
+ stress-memfd.c        | 1 +
+ stress-memthrash.c    | 1 +
+ stress-mlock.c        | 1 +
+ stress-mmap.c         | 1 +
+ stress-mmapaddr.c     | 1 +
+ stress-mmapfixed.c    | 1 +
+ stress-mmapmany.c     | 1 +
+ stress-mq.c           | 1 +
+ stress-mremap.c       | 1 +
+ stress-msg.c          | 1 +
+ stress-netlink-proc.c | 1 +
+ stress-nice.c         | 1 +
+ stress-oom-pipe.c     | 1 +
+ stress-opcode.c       | 1 +
+ stress-pipe.c         | 1 +
+ stress-poll.c         | 1 +
+ stress-prctl.c        | 1 +
+ stress-ptrace.c       | 1 +
+ stress-resources.c    | 1 +
+ stress-rlimit.c       | 1 +
+ stress-sctp.c         | 1 +
+ stress-seccomp.c      | 1 +
+ stress-sem-sysv.c     | 1 +
+ stress-sem.c          | 1 +
+ stress-shm-sysv.c     | 1 +
+ stress-shm.c          | 1 +
+ stress-sigfd.c        | 1 +
+ stress-sigio.c        | 1 +
+ stress-sigpipe.c      | 1 +
+ stress-sigq.c         | 1 +
+ stress-socket-fd.c    | 1 +
+ stress-socket.c       | 1 +
+ stress-socketpair.c   | 2 ++
+ stress-softlockup.c   | 1 +
+ stress-stack.c        | 1 +
+ stress-stackmmap.c    | 2 ++
+ stress-switch.c       | 1 +
+ stress-sysbadaddr.c   | 2 ++
+ stress-tee.c          | 1 +
+ stress-tmpfs.c        | 1 +
+ stress-udp.c          | 1 +
+ stress-userfaultfd.c  | 1 +
+ stress-vforkmany.c    | 2 ++
+ stress-vm-addr.c      | 1 +
+ stress-vm-segv.c      | 1 +
+ stress-vm.c           | 1 +
+ stress-wait.c         | 1 +
+ stress-zlib.c         | 1 +
+ stress-zombie.c       | 1 +
+ 76 files changed, 84 insertions(+)
+
+diff --git a/ignite-cpu.c b/ignite-cpu.c
+index d31d5b4..a790391 100644
+--- a/ignite-cpu.c
++++ b/ignite-cpu.c
+@@ -204,6 +204,7 @@ void ignite_cpu_start(void)
+ 			"errno=%d (%s)\n", errno, strerror(errno));
+ 		return;
+ 	} else if (pid == 0) {
++//stress_child_reinit(args);
+ 		/* Child */
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-apparmor.c b/stress-apparmor.c
+index bfcfbad..983e793 100644
+--- a/stress-apparmor.c
++++ b/stress-apparmor.c
+@@ -207,6 +207,7 @@ again:
+ 		return -1;
+ 	}
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		int ret = EXIT_SUCCESS;
+ 
+ 		if (!g_keep_stressing_flag)
+diff --git a/stress-bad-altstack.c b/stress-bad-altstack.c
+index df98c6c..9f4821c 100644
+--- a/stress-bad-altstack.c
++++ b/stress-bad-altstack.c
+@@ -113,6 +113,8 @@ again:
+ 				}
+ 			}
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
++
+ 			uint32_t rnd;
+ 			int ret;
+ 			volatile uint8_t *vol_stack = stack;
+diff --git a/stress-bigheap.c b/stress-bigheap.c
+index 679d8bc..e1e6c77 100644
+--- a/stress-bigheap.c
++++ b/stress-bigheap.c
+@@ -120,6 +120,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-brk.c b/stress-brk.c
+index 5f87dcd..d9e95d8 100644
+--- a/stress-brk.c
++++ b/stress-brk.c
+@@ -90,6 +90,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		uint8_t *start_ptr;
+ 		bool touch = !(g_opt_flags & OPT_FLAGS_BRK_NOTOUCH);
+ 		int ret, i = 0;
+diff --git a/stress-chroot.c b/stress-chroot.c
+index 0b6e73c..f9b507f 100644
+--- a/stress-chroot.c
++++ b/stress-chroot.c
+@@ -225,6 +225,7 @@ retry:
+ 		if (pid < 0) {
+ 			goto retry;
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
+ 			(void)setpgid(0, g_pgrp);
+ 			set_oom_adjustment(args->name, true);
+ 
+diff --git a/stress-clone.c b/stress-clone.c
+index f83f701..3d062f9 100644
+--- a/stress-clone.c
++++ b/stress-clone.c
+@@ -319,6 +319,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child */
+ 		int ret;
+ 
+diff --git a/stress-cyclic.c b/stress-cyclic.c
+index 53aa4f5..2362210 100644
+--- a/stress-cyclic.c
++++ b/stress-cyclic.c
+@@ -643,6 +643,7 @@ static int stress_cyclic(const args_t *args)
+ 			args->name, errno, strerror(errno));
+ 		return EXIT_NO_RESOURCE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		const pid_t mypid = getpid();
+ #if defined(HAVE_ATOMIC)
+ 		uint32_t count;
+diff --git a/stress-daemon.c b/stress-daemon.c
+index 553c04a..75bf802 100644
+--- a/stress-daemon.c
++++ b/stress-daemon.c
+@@ -54,6 +54,7 @@ static void daemons(const args_t *args, const int fd)
+ 		if (pid < 0) {
+ 			goto tidy;
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
+ 			/* Child */
+ 			char buf[1] = { 0xff };
+ 			ssize_t sz;
+@@ -105,6 +106,7 @@ static int stress_daemon(const args_t *args)
+ 		(void)close(fds[1]);
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Children */
+ 		(void)close(fds[0]);
+ 		daemons(args, fds[1]);
+diff --git a/stress-dccp.c b/stress-dccp.c
+index de23b90..1417058 100644
+--- a/stress-dccp.c
++++ b/stress-dccp.c
+@@ -386,6 +386,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		stress_dccp_client(args, ppid, dccp_port, dccp_domain);
+ 		_exit(EXIT_SUCCESS);
+ 	} else {
+diff --git a/stress-dev-shm.c b/stress-dev-shm.c
+index 51d9e1b..550f364 100644
+--- a/stress-dev-shm.c
++++ b/stress-dev-shm.c
+@@ -180,6 +180,7 @@ fork_again:
+ 				}
+ 			}
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
+ 			/* Child, stress memory */
+ 			(void)setpgid(0, g_pgrp);
+ 			stress_parent_died_alarm();
+diff --git a/stress-dev.c b/stress-dev.c
+index d020615..6484528 100644
+--- a/stress-dev.c
++++ b/stress-dev.c
+@@ -1375,6 +1375,7 @@ again:
+ 				}
+ 			}
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
+ 			size_t i;
+ 			int r;
+ 
+diff --git a/stress-efivar.c b/stress-efivar.c
+index 00f8288..6f6e44c 100644
+--- a/stress-efivar.c
++++ b/stress-efivar.c
+@@ -306,6 +306,7 @@ again:
+ 			return EXIT_FAILURE;
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 		set_oom_adjustment(args->name, true);
+diff --git a/stress-enosys.c b/stress-enosys.c
+index 59af80f..b78770d 100644
+--- a/stress-enosys.c
++++ b/stress-enosys.c
+@@ -3051,6 +3051,7 @@ static inline int stress_do_syscall(const args_t *args, const long number)
+ 	if (pid < 0) {
+ 		_exit(EXIT_NO_RESOURCE);
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		struct itimerval it;
+ 		int ret;
+ 		size_t i;
+@@ -3210,6 +3211,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		const unsigned long mask = ULONG_MAX;
+ 		ssize_t j;
+ 
+diff --git a/stress-epoll.c b/stress-epoll.c
+index 8110cd5..b7e3d93 100644
+--- a/stress-epoll.c
++++ b/stress-epoll.c
+@@ -137,6 +137,7 @@ again:
+ 		return -1;
+ 	}
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 		func(args, child, ppid, epoll_port, epoll_domain);
+diff --git a/stress-eventfd.c b/stress-eventfd.c
+index 1171431..ae43ef2 100644
+--- a/stress-eventfd.c
++++ b/stress-eventfd.c
+@@ -61,6 +61,7 @@ again:
+ 		(void)close(fd2);
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-fanotify.c b/stress-fanotify.c
+index 4880755..514601d 100644
+--- a/stress-fanotify.c
++++ b/stress-fanotify.c
+@@ -137,6 +137,7 @@ static int stress_fanotify(const args_t *args)
+ 		rc = EXIT_NO_RESOURCE;
+ 		goto tidy;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child */
+ 
+ 		do {
+diff --git a/stress-fiemap.c b/stress-fiemap.c
+index 6c80be9..1c70f26 100644
+--- a/stress-fiemap.c
++++ b/stress-fiemap.c
+@@ -189,6 +189,7 @@ static inline pid_t stress_fiemap_spawn(
+ 	if (pid < 0)
+ 		return -1;
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 		stress_fiemap_ioctl(args, fd);
+diff --git a/stress-fifo.c b/stress-fifo.c
+index 0295f08..d638ebb 100644
+--- a/stress-fifo.c
++++ b/stress-fifo.c
+@@ -54,6 +54,7 @@ static pid_t fifo_spawn(
+ 		return -1;
+ 	}
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 		func(args, name, fifoname);
+diff --git a/stress-filename.c b/stress-filename.c
+index b4e6fb8..74f49bf 100644
+--- a/stress-filename.c
++++ b/stress-filename.c
+@@ -379,6 +379,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child, wrapped to catch OOMs */
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-fork.c b/stress-fork.c
+index 93ba91f..b4f844d 100644
+--- a/stress-fork.c
++++ b/stress-fork.c
+@@ -83,6 +83,7 @@ static int stress_fork_fn(
+ 			pid_t pid = fork_fn();
+ 
+ 			if (pid == 0) {
++stress_child_reinit(args);
+ 				/* Child, immediately exit */
+ 				_exit(0);
+ 			} else if (pid < 0) {
+diff --git a/stress-handle.c b/stress-handle.c
+index b627143..aacf085 100644
+--- a/stress-handle.c
++++ b/stress-handle.c
+@@ -152,6 +152,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-lease.c b/stress-lease.c
+index 289c60d..2630e57 100644
+--- a/stress-lease.c
++++ b/stress-lease.c
+@@ -70,6 +70,7 @@ again:
+ 		return -1;
+ 	}
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-locka.c b/stress-locka.c
+index e930c08..c202158 100644
+--- a/stress-locka.c
++++ b/stress-locka.c
+@@ -278,6 +278,8 @@ again:
+ 		goto tidy;
+ 	}
+ 	if (cpid == 0) {
++stress_child_reinit(args);
++
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-lockf.c b/stress-lockf.c
+index 50bf453..12bc96a 100644
+--- a/stress-lockf.c
++++ b/stress-lockf.c
+@@ -267,6 +267,7 @@ again:
+ 		goto tidy;
+ 	}
+ 	if (cpid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-lockofd.c b/stress-lockofd.c
+index ce878e2..97576c0 100644
+--- a/stress-lockofd.c
++++ b/stress-lockofd.c
+@@ -276,6 +276,7 @@ again:
+ 		goto tidy;
+ 	}
+ 	if (cpid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-malloc.c b/stress-malloc.c
+index d77f0be..813cc92 100644
+--- a/stress-malloc.c
++++ b/stress-malloc.c
+@@ -151,6 +151,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		void *addr[malloc_max];
+ 		size_t j;
+ 
+diff --git a/stress-memfd.c b/stress-memfd.c
+index 5fbdd85..f477d05 100644
+--- a/stress-memfd.c
++++ b/stress-memfd.c
+@@ -276,6 +276,7 @@ again:
+ 			goto again;
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 
+ 		/* Make sure this is killable by OOM killer */
+diff --git a/stress-memthrash.c b/stress-memthrash.c
+index 70a67ff..4f31e17 100644
+--- a/stress-memthrash.c
++++ b/stress-memthrash.c
+@@ -498,6 +498,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		uint32_t i;
+ 
+ 		/* Make sure this is killable by OOM killer */
+diff --git a/stress-mlock.c b/stress-mlock.c
+index b7593b0..a3935d7 100644
+--- a/stress-mlock.c
++++ b/stress-mlock.c
+@@ -144,6 +144,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		size_t i, n;
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-mmap.c b/stress-mmap.c
+index 245725e..5af3a2c 100644
+--- a/stress-mmap.c
++++ b/stress-mmap.c
+@@ -413,6 +413,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-mmapaddr.c b/stress-mmapaddr.c
+index 80ae9f7..b498ca3 100644
+--- a/stress-mmapaddr.c
++++ b/stress-mmapaddr.c
+@@ -168,6 +168,7 @@ again: 	pid = fork();
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		const size_t page_size = args->page_size;
+ 		const uintptr_t page_mask = ~(page_size - 1);
+ 		const uintptr_t page_mask32 = page_mask & 0xffffffff;
+diff --git a/stress-mmapfixed.c b/stress-mmapfixed.c
+index e89ec31..1a96932 100644
+--- a/stress-mmapfixed.c
++++ b/stress-mmapfixed.c
+@@ -188,6 +188,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-mmapmany.c b/stress-mmapmany.c
+index 9168316..d29c7c5 100644
+--- a/stress-mmapmany.c
++++ b/stress-mmapmany.c
+@@ -98,6 +98,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		ssize_t i, n;
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-mq.c b/stress-mq.c
+index 00fb93c..4bb5366 100644
+--- a/stress-mq.c
++++ b/stress-mq.c
+@@ -140,6 +140,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		struct sigevent sigev;
+ 
+ 		(void)memset(&sigev, 0, sizeof sigev);
+diff --git a/stress-mremap.c b/stress-mremap.c
+index 6171f3a..e25dffc 100644
+--- a/stress-mremap.c
++++ b/stress-mremap.c
+@@ -311,6 +311,7 @@ again:
+ 			rc = WEXITSTATUS(status);
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-msg.c b/stress-msg.c
+index 0a83967..f61adfe 100644
+--- a/stress-msg.c
++++ b/stress-msg.c
+@@ -86,6 +86,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-netlink-proc.c b/stress-netlink-proc.c
+index 6114a0b..8e11e08 100644
+--- a/stress-netlink-proc.c
++++ b/stress-netlink-proc.c
+@@ -133,6 +133,7 @@ static void spawn_several(const char *name, int n, int max)
+ 
+ 	pid = fork();
+ 	if (pid == 0) {
++//stress_child_reinit(args);
+ 		char newname[128];
+ 
+ 		(void)snprintf(newname, sizeof(newname), "stress-ng-%d", n);
+diff --git a/stress-nice.c b/stress-nice.c
+index e9cc683..e7806b2 100644
+--- a/stress-nice.c
++++ b/stress-nice.c
+@@ -69,6 +69,7 @@ static int stress_nice(const args_t *args)
+ 
+ 		pid = fork();
+ 		if (pid == 0) {
++stress_child_reinit(args);
+ 			int i;
+ 
+ 			/* Child */
+diff --git a/stress-oom-pipe.c b/stress-oom-pipe.c
+index 7f6b1cc..0f21681 100644
+--- a/stress-oom-pipe.c
++++ b/stress-oom-pipe.c
+@@ -114,6 +114,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child */
+ 		int fds[max_pipes * 2], *fd, i, pipes_open = 0, ret;
+ 		const bool aggressive = (g_opt_flags & OPT_FLAGS_AGGRESSIVE);
+diff --git a/stress-opcode.c b/stress-opcode.c
+index 0596e8d..8fc1a7e 100644
+--- a/stress-opcode.c
++++ b/stress-opcode.c
+@@ -155,6 +155,7 @@ again:
+ 			goto err;
+ 		}
+ 		if (pid == 0) {
++stress_child_reinit(args);
+ 			struct itimerval it;
+ 			uint8_t *opcodes, *ops_begin, *ops_end, *ops;
+ 
+diff --git a/stress-pipe.c b/stress-pipe.c
+index edd7e96..94a1675 100644
+--- a/stress-pipe.c
++++ b/stress-pipe.c
+@@ -172,6 +172,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		int val = 0;
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-poll.c b/stress-poll.c
+index 721a47e..d12ae0c 100644
+--- a/stress-poll.c
++++ b/stress-poll.c
+@@ -97,6 +97,7 @@ again:
+ 		goto tidy;
+ 	}
+ 	else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child writer */
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-prctl.c b/stress-prctl.c
+index 7a6c336..039abb2 100644
+--- a/stress-prctl.c
++++ b/stress-prctl.c
+@@ -426,6 +426,7 @@ static int stress_prctl(const args_t *args)
+ 			break;
+ 		}
+ 		if (pid == 0) {
++stress_child_reinit(args);
+ 			int rc;
+ 
+ 			rc = stress_prctl_child(args);
+diff --git a/stress-ptrace.c b/stress-ptrace.c
+index 339bd9e..a7d37ea 100644
+--- a/stress-ptrace.c
++++ b/stress-ptrace.c
+@@ -68,6 +68,7 @@ static int stress_ptrace(const args_t *args)
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-resources.c b/stress-resources.c
+index f3dcfb3..b8e190e 100644
+--- a/stress-resources.c
++++ b/stress-resources.c
+@@ -475,6 +475,7 @@ static int stress_resources(const args_t *args)
+ 
+ 			pid = fork();
+ 			if (pid == 0) {
++stress_child_reinit(args);
+ 				int ret;
+ 
+ 				(void)setpgid(0, g_pgrp);
+diff --git a/stress-rlimit.c b/stress-rlimit.c
+index beb8e5e..d4a76d8 100644
+--- a/stress-rlimit.c
++++ b/stress-rlimit.c
+@@ -146,6 +146,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child rlimit stressor */
+ 		do {
+ 			int ret;
+diff --git a/stress-sctp.c b/stress-sctp.c
+index bbdbb43..eaab9b1 100644
+--- a/stress-sctp.c
++++ b/stress-sctp.c
+@@ -300,6 +300,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		stress_sctp_client(args, ppid,
+ 			sctp_port, sctp_domain);
+ 		_exit(EXIT_SUCCESS);
+diff --git a/stress-seccomp.c b/stress-seccomp.c
+index 08be92c..ae82b69 100644
+--- a/stress-seccomp.c
++++ b/stress-seccomp.c
+@@ -226,6 +226,7 @@ static int stress_seccomp(const args_t *args)
+ 			break;
+ 		}
+ 		if (pid == 0) {
++stress_child_reinit(args);
+ 			/*
+ 			 *  The child has a seccomp filter applied and
+ 			 *  1 in 50 chance that write() is not allowed
+diff --git a/stress-sem-sysv.c b/stress-sem-sysv.c
+index b90de57..d967ad9 100644
+--- a/stress-sem-sysv.c
++++ b/stress-sem-sysv.c
+@@ -225,6 +225,7 @@ again:
+ 		return -1;
+ 	}
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-sem.c b/stress-sem.c
+index 093e2de..7136c25 100644
+--- a/stress-sem.c
++++ b/stress-sem.c
+@@ -128,6 +128,7 @@ again:
+ 		return -1;
+ 	}
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-shm-sysv.c b/stress-shm-sysv.c
+index c5b9a05..c1416ce 100644
+--- a/stress-shm-sysv.c
++++ b/stress-shm-sysv.c
+@@ -468,6 +468,7 @@ fork_again:
+ 					(void)shmctl(shm_ids[i], IPC_RMID, NULL);
+ 			}
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
+ 			/* Child, stress memory */
+ 			(void)setpgid(0, g_pgrp);
+ 			stress_parent_died_alarm();
+diff --git a/stress-shm.c b/stress-shm.c
+index 44ad4e5..5914964 100644
+--- a/stress-shm.c
++++ b/stress-shm.c
+@@ -389,6 +389,7 @@ fork_again:
+ 			}
+ 			free(shm_names);
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
+ 			/* Child, stress memory */
+ 			(void)setpgid(0, g_pgrp);
+ 			stress_parent_died_alarm();
+diff --git a/stress-sigfd.c b/stress-sigfd.c
+index 0ead85b..486ef75 100644
+--- a/stress-sigfd.c
++++ b/stress-sigfd.c
+@@ -58,6 +58,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-sigio.c b/stress-sigio.c
+index f7c3aa3..8d83d50 100644
+--- a/stress-sigio.c
++++ b/stress-sigio.c
+@@ -115,6 +115,7 @@ static int stress_sigio(const args_t *args)
+ 		pr_fail_err("fork");
+ 		goto err;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child */
+ 
+ 		char buffer[BUFFER_SIZE >> 4];
+diff --git a/stress-sigpipe.c b/stress-sigpipe.c
+index e0a3601..96f591a 100644
+--- a/stress-sigpipe.c
++++ b/stress-sigpipe.c
+@@ -102,6 +102,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child, only for non-clone path */
+ 		(void)pipe_child((void *)pipefds);
+ 		_exit(EXIT_SUCCESS);
+diff --git a/stress-sigq.c b/stress-sigq.c
+index 021ca6e..0c8fa2c 100644
+--- a/stress-sigq.c
++++ b/stress-sigq.c
+@@ -52,6 +52,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		sigset_t mask;
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-socket-fd.c b/stress-socket-fd.c
+index 01e5ec8..b4e9703 100644
+--- a/stress-socket-fd.c
++++ b/stress-socket-fd.c
+@@ -332,6 +332,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		set_oom_adjustment(args->name, false);
+ 		stress_socket_client(args, ppid, max_fd, socket_fd_port);
+ 		_exit(EXIT_SUCCESS);
+diff --git a/stress-socket.c b/stress-socket.c
+index 5f4a6fc..74b23ed 100644
+--- a/stress-socket.c
++++ b/stress-socket.c
+@@ -472,6 +472,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		stress_sctp_client(args, ppid, socket_type,
+ 			socket_port, socket_domain);
+ 		_exit(EXIT_SUCCESS);
+diff --git a/stress-socketpair.c b/stress-socketpair.c
+index edfaabe..852d518 100644
+--- a/stress-socketpair.c
++++ b/stress-socketpair.c
+@@ -101,6 +101,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		set_oom_adjustment(args->name, true);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+@@ -218,6 +219,7 @@ again:
+ 			}
+ 		}
+ 	 } else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child, lets do some sockpair stressing... */
+ 		int ret;
+ 
+diff --git a/stress-softlockup.c b/stress-softlockup.c
+index 5bb8477..16b039b 100644
+--- a/stress-softlockup.c
++++ b/stress-softlockup.c
+@@ -140,6 +140,7 @@ static int stress_softlockup(const args_t *args)
+ 			args->name, errno, strerror(errno));
+ 		return EXIT_NO_RESOURCE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		const pid_t mypid = getpid();
+ #if defined(HAVE_ATOMIC)
+ 		uint32_t count;
+diff --git a/stress-stack.c b/stress-stack.c
+index 6253370..be22fcc 100644
+--- a/stress-stack.c
++++ b/stress-stack.c
+@@ -92,6 +92,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		char *start_ptr = shim_sbrk(0);
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-stackmmap.c b/stress-stackmmap.c
+index c2f4c31..eb8d52d 100644
+--- a/stress-stackmmap.c
++++ b/stress-stackmmap.c
+@@ -187,6 +187,8 @@ again:
+ 				(void)waitpid(pid, &status, 0);
+ 			}
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
++
+ 			/* Child */
+ 
+ 			(void)setpgid(0, g_pgrp);
+diff --git a/stress-switch.c b/stress-switch.c
+index b35bf03..1741257 100644
+--- a/stress-switch.c
++++ b/stress-switch.c
+@@ -78,6 +78,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		char buf[buf_size];
+ 
+ 		(void)setpgid(0, g_pgrp);
+diff --git a/stress-sysbadaddr.c b/stress-sysbadaddr.c
+index 03daa36..1c248a8 100644
+--- a/stress-sysbadaddr.c
++++ b/stress-sysbadaddr.c
+@@ -529,6 +529,7 @@ static inline int stress_do_syscall(
+ 	if (pid < 0) {
+ 		_exit(EXIT_NO_RESOURCE);
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		struct itimerval it;
+ 		size_t i;
+ 		int ret;
+@@ -662,6 +663,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child, wrapped to catch OOMs */
+ 		if (!keep_stressing())
+ 			_exit(0);
+diff --git a/stress-tee.c b/stress-tee.c
+index d7de585..233ff96 100644
+--- a/stress-tee.c
++++ b/stress-tee.c
+@@ -58,6 +58,7 @@ again:
+ 		return -1;
+ 	}
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-tmpfs.c b/stress-tmpfs.c
+index df0bfcb..f3cd00b 100644
+--- a/stress-tmpfs.c
++++ b/stress-tmpfs.c
+@@ -346,6 +346,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-udp.c b/stress-udp.c
+index 6cfa757..4385752 100644
+--- a/stress-udp.c
++++ b/stress-udp.c
+@@ -111,6 +111,7 @@ again:
+ 		pr_fail_dbg("fork");
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child, client */
+ 		struct sockaddr *addr = NULL;
+ 
+diff --git a/stress-userfaultfd.c b/stress-userfaultfd.c
+index 3d64ff9..c4d49e4 100644
+--- a/stress-userfaultfd.c
++++ b/stress-userfaultfd.c
+@@ -441,6 +441,7 @@ static int stress_userfaultfd(const args_t *args)
+ 		}
+ 		rc = WEXITSTATUS(status);
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		/* Child */
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+diff --git a/stress-vforkmany.c b/stress-vforkmany.c
+index c6c101a..db455f4 100644
+--- a/stress-vforkmany.c
++++ b/stress-vforkmany.c
+@@ -73,6 +73,7 @@ fork_again:
+ 		munmap((void *)terminate_mmap, args->page_size);
+ 		return EXIT_FAILURE;
+ 	} else if (chpid == 0) {
++stress_child_reinit(args);
+ 		static uint8_t *waste;
+ 		static size_t waste_size = WASTE_SIZE;
+ 
+@@ -143,6 +144,7 @@ PRAGMA_POP
+ 				if (!first)
+ 					_exit(0);
+ 			} else if (pid == 0) {
++stress_child_reinit(args);
+ 				if (waste != MAP_FAILED) {
+ 					register size_t i;
+ 
+diff --git a/stress-vm-addr.c b/stress-vm-addr.c
+index 55dfb55..b594c89 100644
+--- a/stress-vm-addr.c
++++ b/stress-vm-addr.c
+@@ -438,6 +438,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		int no_mem_retries = 0;
+ 		void *vm_base_addr;
+ 		size_t buf_sz;
+diff --git a/stress-vm-segv.c b/stress-vm-segv.c
+index 457e951..58eb31c 100644
+--- a/stress-vm-segv.c
++++ b/stress-vm-segv.c
+@@ -109,6 +109,7 @@ again:
+ 				}
+ 			}
+ 		} else if (pid == 0) {
++stress_child_reinit(args);
+ 			/* Child */
+ 			const size_t page_size = args->page_size;
+ 			const struct rlimit lim = { RLIM_INFINITY, RLIM_INFINITY };
+diff --git a/stress-vm.c b/stress-vm.c
+index e0026a6..a5f2d87 100644
+--- a/stress-vm.c
++++ b/stress-vm.c
+@@ -2041,6 +2041,7 @@ again:
+ 			}
+ 		}
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		int no_mem_retries = 0;
+ 		const uint64_t max_ops = args->max_ops << VM_BOGO_SHIFT;
+ 
+diff --git a/stress-wait.c b/stress-wait.c
+index 0cb79fa..1086129 100644
+--- a/stress-wait.c
++++ b/stress-wait.c
+@@ -58,6 +58,7 @@ again:
+ 		return -1;
+ 	}
+ 	if (pid == 0) {
++stress_child_reinit(args);
+ 		stress_parent_died_alarm();
+ 
+ 		func(args, pid_arg);
+diff --git a/stress-zlib.c b/stress-zlib.c
+index 2cb625a..4b618f1 100644
+--- a/stress-zlib.c
++++ b/stress-zlib.c
+@@ -964,6 +964,7 @@ static int stress_zlib(const args_t *args)
+ 			args->name, errno, strerror(errno));
+ 		return EXIT_FAILURE;
+ 	} else if (pid == 0) {
++stress_child_reinit(args);
+ 		(void)setpgid(0, g_pgrp);
+ 		stress_parent_died_alarm();
+ 
+diff --git a/stress-zombie.c b/stress-zombie.c
+index 3b8aa29..6893fe6 100644
+--- a/stress-zombie.c
++++ b/stress-zombie.c
+@@ -157,6 +157,7 @@ static int stress_zombie(const args_t *args)
+ 
+ 			zombie->pid = fork();
+ 			if (zombie->pid == 0) {
++stress_child_reinit(args);
+ 				(void)setpgid(0, g_pgrp);
+ 				stress_parent_died_alarm();
+ 
+-- 
+1.8.3.1
+

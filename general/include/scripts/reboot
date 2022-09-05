@@ -1,0 +1,7 @@
+#!/bin/bash
+cat /proc/mounts  | grep -v 'rootfs' | grep -q ' / '
+if [ $? == 0 ]; then
+    rhts-reboot
+else
+    systemctl reboot
+fi

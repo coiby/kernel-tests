@@ -1,0 +1,7 @@
+Please add this line into your bash script if you want to use it:
+. /mnt/tests/kernel/storage/include/include.sh
+Add this line into your makefile:
+@echo "RhtsRequires:        rh-tests-kernel-vm-sysctl-include" >> $(METADATA)
+
+##
+

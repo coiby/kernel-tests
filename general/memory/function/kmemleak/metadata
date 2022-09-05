@@ -1,0 +1,14 @@
+[General]
+name=kmemleak function sanity check
+owner=Chunyu Hu <chuhu@redhat.com>
+description=verify kmemleak is working correctly in debug kernel
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=24h
+dependencies=
+softDependencies=rt-setup;rpm-build
+repoRequires=general/include

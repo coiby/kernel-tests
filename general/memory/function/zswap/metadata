@@ -1,0 +1,14 @@
+[General]
+name=zswap test
+owner=mm-qe <mm-qe@redhat.com>
+description=zswap test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=120m
+dependencies=gcc;libgcc;glibc-devel;bc;wget
+softDependencies=
+repoRequires=general/include

@@ -1,0 +1,29 @@
+From be18bf31eba86659fc44d296fd6cd0c98ab071a4 Mon Sep 17 00:00:00 2001
+From: root <root@localhost>
+Date: Thu, 21 Mar 2019 04:38:13 -0400
+Subject: [PATCH] stress-ng: Fix weird syntax
+
+Signed-off-by: Ping Fang <pifang@redhat.com>
+---
+ sched.c |    5 -----
+ 1 files changed, 0 insertions(+), 5 deletions(-)
+
+diff --git a/sched.c b/sched.c
+index ac97a63..87376df 100644
+--- a/sched.c
++++ b/sched.c
+@@ -141,11 +141,6 @@ int stress_set_deadline_sched(
+ 	const uint64_t deadline,
+ 	const bool quiet)
+ {
+-	void(period);
+-	void(runtime);
+-	void(deadline);
+-	void(quiet);
+-
+ 	return 0;
+ }
+ #endif
+-- 
+1.7.1
+

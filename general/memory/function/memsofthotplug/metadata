@@ -1,0 +1,19 @@
+[General]
+name=/kernel/general/memory/function/memsofthotplug
+owner=Li Wang <liwang@redhat.com>
+description=Test for memory online/offline hotplug
+license=GPLv2
+destructive=no
+confidential=no
+needproperty=PROCESSORS => 2
+_architecture=All
+
+[restraint]
+entry_point=make run
+max_time=2h
+dependencies=numactl;kernel
+TestVersion=2.0
+Path=kernel/general/memory/function/memsofthotplug
+Type=KernelTier2
+RunFor=kernel
+Priority=Normal

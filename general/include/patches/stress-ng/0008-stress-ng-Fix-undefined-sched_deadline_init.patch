@@ -1,0 +1,28 @@
+From ef7862777efe0f126845f149b72172aba128f244 Mon Sep 17 00:00:00 2001
+From: root <root@localhost>
+Date: Thu, 21 Mar 2019 05:05:17 -0400
+Subject: [PATCH] stress-ng: Fix undefined sched_deadline_init
+
+Signed-off-by: Ping Fang <pifang@redhat.com>
+---
+ sched.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/sched.c b/sched.c
+index 87376df..f247c5f 100644
+--- a/sched.c
++++ b/sched.c
+@@ -134,6 +134,10 @@ int sched_deadline_init(void *params)
+ 	return rc;
+ }
+ #else
++int sched_deadline_init(void *params)
++{
++	return 0;
++}
+ int stress_set_deadline_sched(
+ 	const pid_t pid,
+ 	const uint64_t period,
+-- 
+1.7.1
+

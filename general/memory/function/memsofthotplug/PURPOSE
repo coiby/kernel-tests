@@ -1,0 +1,15 @@
+PURPOSE of /kernel/general/memory/function/memsofthotplug
+Description: Test for memory online/offline hotplug
+Author: William Gomeringer <wgomerin@redhat.com>
+
+Description:
+
+This test tries to test Memory soft hotplug
+
+a) Basic: Tries offline and online each memory module.
+
+b) Continous: This test tries to offline or online random memory
+              modules for ~10 min (see CONTIME variable) while ebizzy
+              produces 50% load on the total memory in the system. (This section is not complete)
+
+PASS on no kernel panic or kernel oops or no failure to offline/online memory

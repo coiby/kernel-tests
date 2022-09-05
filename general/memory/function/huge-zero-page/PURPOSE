@@ -1,0 +1,4 @@
+Summary: #bz-1035927 Huge Zero Page
+The idea is to have a page filled with zeros that the kernel can use if 
+it has to provide a page full of zeros.  For example, on a read fault to
+a page which has never been used, the kernel will simply map the zero page.

@@ -1,0 +1,26 @@
+From 07d6e4ba752e43386700d98e1ec61a927e28c01b Mon Sep 17 00:00:00 2001
+From: root <root@localhost>
+Date: Thu, 21 Mar 2019 04:15:07 -0400
+Subject: [PATCH] stress-ng: Fix pragma version check
+
+Signed-off-by: Ping Fang <pifang@redhat.com>
+---
+ stress-ng.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/stress-ng.h b/stress-ng.h
+index 7030150..c28149f 100644
+--- a/stress-ng.h
++++ b/stress-ng.h
+@@ -743,7 +743,7 @@ typedef struct {
+ #define PRAGMA_PUSH	_Pragma("GCC diagnostic push")
+ #define PRAGMA_POP	_Pragma("GCC diagnostic pop")
+ #define PRAGMA_WARN_OFF	_Pragma("GCC diagnostic ignored \"-Weverything\"")
+-#elif defined(__GNUC__) && NEED_GNUC(4, 4, 0)
++#elif defined(__GNUC__) && NEED_GNUC(4, 6, 0)
+ #define PRAGMA_PUSH	_Pragma("GCC diagnostic push")
+ #define PRAGMA_POP	_Pragma("GCC diagnostic pop")
+ #define PRAGMA_WARN_OFF	_Pragma("GCC diagnostic ignored \"-Wall\"") \
+-- 
+1.7.1
+

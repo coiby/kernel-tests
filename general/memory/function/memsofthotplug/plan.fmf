@@ -1,0 +1,15 @@
+summary: 'Verifies that mem= kernel parameter works.'
+discover:
+    how: fmf
+    test:
+        - /
+prepare:
+  - name: Install packages
+    how: install
+    package: [numactl, kernel]
+  - name: Install test dependent framework.
+    how: install
+    package: [beakerlib]
+execute:
+    how: tmt
+    framework: beakerlib

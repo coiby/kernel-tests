@@ -1,0 +1,20 @@
+Test for 'mem=' kernel parameter. 
+
+The test works as follows:
+1. The 'mem=' parameter is set with 'grubby'.
+2. The system is rebooted.
+3. It is checked that amount of memory reported by 'free'
+   is at most the amount specified in 'mem='.
+4. It is verified that the amount of memory reported in the
+   '[    0.000000] Memory: 9815488K/12582912K available ...' dmesg
+   message is at most the amount specified in 'mem=' and at least
+   the amount specified in 'mem=' - 'MARGIN'. 
+    
+
+The space separated list of values to be tested is passed to the task 
+in the 'MEM' parameter.
+
+See
+https://bugzilla.redhat.com/show_bug.cgi?id=1230869
+https://bugzilla.redhat.com/show_bug.cgi?id=1219838
+

@@ -1,0 +1,18 @@
+PURPOSE of kernel/general/include
+
+A case for storing helper tools. At first, Kabi and Kmod both need a tool
+for getting kernel and kernel-debuginfo of a specified version. The tool
+was stored in general/kabi, but in kmod tests, I also need it, so have to
+move that tool to a upper dir.
+
+So start from this, I add this include dir to store some scripts or helper
+functions for kernel general testing.
+
+Tools & scraipts
+  1) wget-kernel.sh
+     sh wget-kernel.sh --nvr 4.5.0-0.48.el7 --arch aarch64 --debug (debuginfo)
+     sh wget-kernel.sh --nvr 4.5.0-0.48.el7 --arch x86_64 (kernel)
+     sh wget-kernel.sh --nvr 4.5.0-0.48.el7 --arch x86_64 --fw (firmware)
+
+Lib & functions
+  N/A

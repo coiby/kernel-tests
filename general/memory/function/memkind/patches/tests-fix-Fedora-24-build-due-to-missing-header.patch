@@ -1,0 +1,59 @@
+From ff9ce2a9e049e23e481414b847ce67efb37a899d Mon Sep 17 00:00:00 2001
+From: Lukasz Anaczkowski <lukasz.anaczkowski@intel.com>
+Date: Tue, 2 Aug 2016 16:41:23 +0200
+Subject: [PATCH] tests: fix Fedora 24 build due to missing header
+
+Also, move headers to cpp file to decrease number of dependencies.
+
+Change-Id: I323e69688de96e459bf2659ee8c5e4afad9e3e8e
+Signed-off-by: Lukasz Anaczkowski <lukasz.anaczkowski@intel.com>
+---
+ test/performance/framework.cpp  | 4 ++++
+ test/performance/framework.hpp  | 3 ---
+ test/performance/operations.hpp | 1 +
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/test/performance/framework.cpp b/test/performance/framework.cpp
+index 42b4105..ef8c010 100644
+--- a/test/performance/framework.cpp
++++ b/test/performance/framework.cpp
+@@ -22,6 +22,10 @@
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
++#include <algorithm> // sort
++#include <math.h> // log2
++#include <cassert>
++#include <iostream>
+ #include "framework.hpp"
+ 
+ namespace performance_tests
+diff --git a/test/performance/framework.hpp b/test/performance/framework.hpp
+index 239a2fd..9cf0c54 100644
+--- a/test/performance/framework.hpp
++++ b/test/performance/framework.hpp
+@@ -26,9 +26,6 @@
+ 
+ #include <thread>
+ #include <vector>
+-#include <algorithm> // log2
+-#include <cassert>
+-#include <iostream>
+ #include <mutex>
+ #include <condition_variable>
+ #include <memkind.h>
+diff --git a/test/performance/operations.hpp b/test/performance/operations.hpp
+index 85f8e90..f6fbf1c 100644
+--- a/test/performance/operations.hpp
++++ b/test/performance/operations.hpp
+@@ -26,6 +26,7 @@
+ 
+ #include <malloc.h>
+ #include <memkind.h>
++#include <cassert>
+ #include "jemalloc/jemalloc.h"
+ 
+ // Malloc, jemalloc, memkind jemalloc and memkind memory operations definitions
+-- 
+1.8.3.1
+
