@@ -64,6 +64,21 @@ fi
 
 mkdir $TMPDIR
 mkdir $EXEC_DIR
+
+# Convert parameter line to parameter array
+declare -A TEST_PARAM
+if [ "${TEST_PARAMS}" ]; then
+    OIFS=$IFS
+    IFS=";"
+    param_array=($TEST_PARAMS)
+    for i in "${param_array[@]}"; do
+        case_name=$(echo $i | cut -f1 -d' ')
+        case_param=$(echo $i | sed "s/${case_name}//")
+        [ "${case_name}" ] && TEST_PARAM[${case_name}]="${case_param}"
+    done
+    IFS=$OIFS
+fi
+
 install_packages()
 {
     pushd $TMPDIR
@@ -149,6 +164,8 @@ function NormalizeTestItems()
 function RunKSelfTest()
 {
     local testscript="$1"
+    local test_folder="$(echo ${testscript}|cut -d : -f 1)"
+    local test_case="$(echo ${testscript}|cut -d : -f 2)"
     local ret
 
     OUTPUTFILE=$(new_outputfile)
@@ -161,8 +178,8 @@ function RunKSelfTest()
 
     # run the self-test script
     rlLog "=== Running: $testscript"
-    pushd $EXEC_DIR/`echo ${testscript}|cut -d : -f 1`
-    ./`echo ${testscript}|cut -d : -f 2`|& tee $OUTPUTFILE
+    pushd $EXEC_DIR/${test_folder}
+    ./${test_case} ${TEST_PARAM[${testscript}]} |& tee $OUTPUTFILE
     ret=${PIPESTATUS[0]}
     popd
 
