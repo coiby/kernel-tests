@@ -1,0 +1,18 @@
+summary: 700499 regression test
+description: |+
+    The printk output in __oom_kill_task no longer includes p->uid as it did in
+    RHEL 5.  LLNL relies on this data point to be able to identify the user causing
+    the oom_kill.  This allows them to address the infraction with the user.
+
+contact: Petr Benas <pbenas@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+tier: 2
+tag: [tier2]
+duration: 10m
+extra-summary: /kernel/memory/700499-oom-print-uid
+extra-task: /kernel/memory/700499-oom-print-uid
