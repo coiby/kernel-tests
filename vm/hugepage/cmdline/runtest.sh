@@ -56,8 +56,8 @@ test ${ARCH} = aarch64 && test ${hpsz} = "524288" && HP_NR=2
 MULTI_HP=NO
 CMDLINEARGS="hugepages=${HP_NR}"
 if [ ${ARCH} = x86_64 ] || [ ${ARCH} = ppc64 ] || [ ${ARCH} = aarch64 ]; then
-	if egrep -q '(release 6|release 7|release 8)' /etc/redhat-release -a
-		grep -q 'pdpe1gb' /proc/cpuinfo; then
+	if (egrep -q '(release 6|release 7|release 8|release 9)' /etc/redhat-release) &&
+		(grep -q 'pdpe1gb' /proc/cpuinfo); then
 		MULTI_HP=YES
 		CMDLINEARGS="hugepages=${HP_NR} hugepagesz=1G hugepages=1"
 	fi
