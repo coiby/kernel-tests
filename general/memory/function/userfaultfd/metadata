@@ -1,0 +1,18 @@
+[General]
+description=Demonstrates the use of the userfaultfd mechanism
+name=/kernel/general/memory/function/userfaultfd
+owner=David McDougall <dmcdouga@redhat-com>
+license=GPLv2+
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=5m
+dependencies=gcc
+repoRequires=
+TestVersion=1.0
+Path=/mnt/tests/kernel/general/memory/function/userfaultfd
+Type=Sanity
+RunFor=kernel
+Priority=Normal

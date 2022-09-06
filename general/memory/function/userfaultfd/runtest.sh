@@ -26,13 +26,13 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="kernel"
 
 rlJournalStart
     rlPhaseStartTest
+        rlRun "cc -lpthread -o userfaultfd_demo userfaultfd_demo.c"
         rlRun "./userfaultfd_demo 10" 0 "Running the demo..."
     rlPhaseEnd
 rlJournalPrintText

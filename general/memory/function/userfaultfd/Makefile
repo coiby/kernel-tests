@@ -26,14 +26,11 @@
 export TEST=/kernel/general/memory/userfaultfd
 export TESTVERSION=1.0
 
-BUILT_FILES=userfaultfd_demo
+BUILT_FILES=
 
 FILES=$(METADATA) runtest.sh Makefile PURPOSE userfaultfd_demo.c
 
 .PHONY: all install download clean
-
-userfaultfd_demo:
-	cc -lpthread -o userfaultfd_demo userfaultfd_demo.c
 
 run: $(FILES) build
 	./runtest.sh
@@ -43,24 +40,3 @@ build: $(BUILT_FILES)
 
 clean:
 	rm -f *~ $(BUILT_FILES)
-
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           David McDougall <dmcdouga@redhat-com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Demonstrates the use of the userfaultfd mechanism." >> $(METADATA)
-	@echo "Type:            Sanity" >> $(METADATA)
-	@echo "TestTime:        5m" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2+" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	@echo "Releases:        -RHEL4 -RHELClient5 -RHELServer5" >> $(METADATA)
-
-	rhts-lint $(METADATA)

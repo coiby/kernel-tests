@@ -1,0 +1,14 @@
+summary: Demonstrates the use of the userfaultfd mechanism.
+description: ''
+contact: David McDougall <dmcdouga@redhat-com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+  - gcc 
+tier: 1
+tag: [tier1]
+duration: 5m
+extra-summary: /kernel/general/memory/userfaultfd
+extra-task: /kernel/general/memory/userfaultfd

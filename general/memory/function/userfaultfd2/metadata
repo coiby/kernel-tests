@@ -1,0 +1,18 @@
+[General]
+description=Kernel self test for userfaultfd mechanism
+name=/kernel/general/memory/function/userfaultfd2
+owner=David McDougall <dmcdouga@redhat-com>
+license=GPLv2+
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=5m
+dependencies=gcc
+repoRequires=
+TestVersion=2.0
+Path=/mnt/tests/kernel/general/memory/function/userfaultfd2
+Type=Sanity
+RunFor=kernel
+Priority=Normal
