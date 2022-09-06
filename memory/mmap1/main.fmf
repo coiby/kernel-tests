@@ -1,0 +1,18 @@
+summary: mmap test
+description: ''
+contact: Bill Peck <bpeck@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+path: /memory/mmap1
+framework: shell
+recommend:
+  - gcc
+  - glibc
+  - bzip2
+duration: 5m
+enabled: true
+tier: 1
+tag: [tier1]
+extra-summary: /kernel/memory/mmap1
+extra-task: /kernel/memory/mmap1

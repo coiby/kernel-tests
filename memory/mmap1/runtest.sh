@@ -1,7 +1,10 @@
 #!/bin/sh
 
 # Source the common test script helpers
-. /usr/bin/rhts_environment.sh
+. ../../general/include/include.h
+clean_env
+setup_env
+TEST="/kernel/memory/mmap1"
 
 # ---------- Start Test -------------
 # Setup some variables
@@ -17,6 +20,8 @@ echo "***** Starting the runtest.sh script *****" | tee -a $OUTPUTFILE
 echo "***** Current Running Kernel Package = "$kernbase" *****" | tee -a $OUTPUTFILE
 echo "***** Current Running Distro = "$installeddistro" *****" | tee -a $OUTPUTFILE
 
+cc -O -g -Wall -I /usr/include/ -c -o mmaptst.o mmaptst.c
+cc -o mmaptst mmaptst.o
 ./mmaptst 2>&1 >> $OUTPUTFILE
 
 echo "***** End of runtest.sh *****" | tee -a $OUTPUTFILE
@@ -38,6 +43,5 @@ else
         export result="FAIL"
     fi
 fi
-
 # Then file the results in the database
-report_result $TEST $result 0
+rstrnt-report-result $TEST $result 0

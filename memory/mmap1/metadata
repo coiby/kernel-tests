@@ -1,0 +1,18 @@
+[General]
+description=mmap test
+name=/kernel/memory/mmap1
+owner=Bill Peck <bpeck@redhat.com>
+license=GPL
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=5m
+dependencies=gcc glibc bzip2
+repoRequires=general/include
+TestVersion=1.3
+Path=/mnt/tests/kernel/memory/mmap1
+Type=Regression
+RunFor=kernel
+Priority=Normal
