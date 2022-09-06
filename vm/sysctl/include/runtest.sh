@@ -17,45 +17,45 @@
 
 function verify_tune_value()
 {
-	if [ $# -ne 2 ]; then
-		echo "Usage: verify_tune [TUNE_FILE] [TUNE_VALUE]"
-		echo ${OLD_DROPCACHES} > ${TUNE_FILE}
-		exit 1;
-	fi
+        if [ $# -ne 2 ]; then
+                echo "Usage: verify_tune [TUNE_FILE] [TUNE_VALUE]"
+                echo ${OLD_DROPCACHES} > ${TUNE_FILE}
+                exit 1;
+        fi
 
-	TUNE_FILE=$1
-	TUNE_VALUE=$2
+        TUNE_FILE=$1
+        TUNE_VALUE=$2
 
-	TEST_TUNE=`cat ${TUNE_FILE}`
-	if [ ${TEST_TUNE} -ne ${TUNE_VALUE} ]; then
-		echo "TestError: Set value to ${TUNE_FILE} Failed"
-		echo ${OLD_DROPCACHES} > ${TUNE_FILE}
-		exit 1
-	fi
+        TEST_TUNE=`cat ${TUNE_FILE}`
+        if [ ${TEST_TUNE} -ne ${TUNE_VALUE} ]; then
+                echo "TestError: Set value to ${TUNE_FILE} Failed"
+                echo ${OLD_DROPCACHES} > ${TUNE_FILE}
+                exit 1
+        fi
 }
 
 function check_file_exist()
 {
-	if [ $# -ne 1 ]; then
-		echo "Usage: check_file_exist [TUNE_FILE]"
-		exit 1;
-	fi
+    if [ $# -ne 1 ]; then
+        echo "Usage: check_file_exist [TUNE_FILE]"
+        exit 1;
+    fi
 
-	TUNE_FILE=$1
-	if ! [ -f ${TUNE_FILE} ]; then
-		echo "TestError: No this tune file ${TUNE_FILE}"
-		exit 1;
-	fi
+    TUNE_FILE=$1
+    if ! [ -f ${TUNE_FILE} ]; then
+        echo "TestError: No this tune file ${TUNE_FILE}"
+        exit 1;
+    fi
 }
 
 function set_tune_value()
 {
-	if [ $# -ne 1 ]; then
-		echo "Usage: set_tune_value [TUNE_FILE] [TUNE_VALUE]"
-		exit 1;
-	fi
+    if [ $# -ne 1 ]; then
+        echo "Usage: set_tune_value [TUNE_FILE] [TUNE_VALUE]"
+        exit 1;
+    fi
 
-	TUNE_FILE=$1
-	TUNE_VALUE=$2
-	echo $1 > $TUEN_VALUE $TUNE_FILE
+    TUNE_FILE=$1
+    TUNE_VALUE=$2
+    echo $1 > $TUEN_VALUE $TUNE_FILE
 }

@@ -1,0 +1,18 @@
+[General]
+description=drop caches
+name=/kernel/vm/sysctl/drop_caches
+owner=Zhouping Liu <zliu@redhat.com>
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./drop_caches.sh
+max_time=10m
+dependencies=
+repoRequires=vm/sysctl/include
+TestVersion=1.1
+Path=/mnt/tests/kernel/vm/sysctl/drop_caches
+Type=
+RunFor=kernel
+Priority=Normal

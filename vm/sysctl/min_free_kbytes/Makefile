@@ -49,7 +49,7 @@ export TEST=/$(TOPLEVEL_NAMESPACE)/$(PACKAGE_NAME)/$(RELATIVE_PATH)
 BUILT_FILES= 
 
 # data files, .c files, scripts anything needed to either compile the test and/or run it.
-FILES=$(METADATA) runtest.sh min_free_kbytes.sh Makefile PURPOSE
+FILES=runtest.sh min_free_kbytes.sh Makefile PURPOSE
 
 run: $(FILES) build
 	./runtest.sh
@@ -60,29 +60,3 @@ build: $(BUILT_FILES)
 
 clean:
 	rm -f *~ *.rpm $(BUILT_FILES)
-
-# You may need to add other targets e.g. to build executables from source code
-# Add them here:
-
-
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
-
-# Generate the testinfo.desc here:
-$(METADATA): Makefile
-	@touch $(METADATA)
-# Change to the test owner's name
-	@echo "Owner:        Zhouping Liu <zliu@redhat.com>" > $(METADATA)
-	@echo "Name:         $(TEST)" >> $(METADATA)
-	@echo "Path:         $(TEST_DIR)"	>> $(METADATA)
-	@echo "License:      GPL v2" >> $(METADATA)
-	@echo "TestVersion:  $(TESTVERSION)"	>> $(METADATA)
-	@echo "Description:  FIXME: Raid setup">> $(METADATA)
-	@echo "TestTime:     30m" >> $(METADATA)
-	@echo "RunFor:       $(PACKAGE_NAME)" >> $(METADATA)  
-	@echo "Requires:     $(PACKAGE_NAME)" >> $(METADATA)  
-	@echo "RhtsRequires: rh-tests-kernel-vm-sysctl-include" >> $(METADATA)
-# add any other requirements for the script to run here
-
-# You may need other fields here; see the documentation
-	rhts-lint $(METADATA)
