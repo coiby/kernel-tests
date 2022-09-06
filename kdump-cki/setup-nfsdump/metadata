@@ -1,0 +1,13 @@
+[General]
+name=kdump-cki/setup-nfsdump
+owner=Chao Ye <cye@redhat.com>
+description=Setup kdump to NFS target.
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+repoRequires=kdump-cki/include
+

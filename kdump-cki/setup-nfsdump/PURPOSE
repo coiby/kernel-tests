@@ -1,0 +1,15 @@
+This case is to Setup kdump to a NFS target.
+
+* Summary of these optional parameters:
+CRASHSIZE: custom kdump crashsize support
+NFSSERVER: nfs server for saving dumps.
+VMCOREPATH: nfs server export.
+WEBSERVERBASEURL: base URL for the web server the dumps will be available at.
+NO_COMPRESS: any positive integer(usually 1) explicitly іndicating the dump file
+must be of uncompressed ELF format. Otherwise, omitting this param or 0 for the
+compressed format.
+COMPRESSION: choose zlib or lzo compression algorithm.  zlib is default on RHEL6 and older; lzo is default on RHEL7 and newer.  NO_COMPRESS overrides this parameter.
+UPGRADE_FC_KDUMP:
+	default: false
+	When it's true and it's testing on Fedora, it will try upgrading
+	kexec-tools/dracut/systemd to the latest versions on Rawhide.
