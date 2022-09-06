@@ -5,6 +5,8 @@
 #   Signed-off-by: Li Wang <liwang@redhat.com>
 #   SPDX-License-Identifier: GPL-3.0-or-later
 #
+#   Usage: LTP_VERSION=next ./config-maker.sh
+#          LTP_VERSION=20220527 ./config-maker.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # This script is using for RHELKT1LITE.${LTP_VERSION} generating
@@ -13,22 +15,26 @@
 #  '?' - test will be tweaked
 #  '@' - test will be added-in
 
-LTP_VERSION=20220527
+LTP_VERSION=${LTP_VERSION:-20220527}
 SOURCEDIR=$PWD
-LOOKASIDE=${LOOKASIDE:-http://download.devel.redhat.com/qa/rhts/lookaside/}
+DOWNLOAD=${DOWNLOAD:-https://github.com/linux-test-project/ltp}
 
 function rhelkt1lite_preparing()
 {
-	[ -f ltp-full-${LTP_VERSION}.bz2 ] || \
-		wget ${LOOKASIDE}/ltp-full-${LTP_VERSION}.bz2 && \
-		tar xjf ltp-full-${LTP_VERSION}.bz2
+	[ $LTP_VERSION == "next" ] && \
+		wget ${DOWNLOAD}/archive/refs/heads/master.zip && \
+		unzip master.zip && mv ltp-master/ ltp-full-next/
+
+	[ $LTP_VERSION != "next" ] && [ -f ltp-full-${LTP_VERSION}.tar.bz2 ] || \
+		wget ${DOWNLOAD}/releases/download/${LTP_VERSION}/ltp-full-${LTP_VERSION}.tar.bz2 && \
+		tar xjf ltp-full-${LTP_VERSION}.tar.bz2
 
 	[ -d $SOURCEDIR/ltp-full-${LTP_VERSION}/ ] && \
 		pushd $SOURCEDIR/ltp-full-${LTP_VERSION}/runtest/ >/dev/null;
 		cat kernel_misc math fsx ipc syscalls mm sched nptl pty tracing fs > $SOURCEDIR/RHELKT1LITE.${LTP_VERSION}
 		popd >/dev/null;
 
-	rm -fr $SOURCEDIR/ltp-full-*
+	rm -fr $SOURCEDIR/ltp-full-* $SOURCEDIR/master.zip
 }
 
 function block_issue_kickout()
