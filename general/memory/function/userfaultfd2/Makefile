@@ -26,6 +26,8 @@
 export TEST=/kernel/general/memory/function/userfaultfd2
 export TESTVERSION=2.0
 
+BUILT_FILES=
+
 FILES=$(METADATA) runtest.sh Makefile PURPOSE userfaultfd-old.c userfaultfd-new.c kselftest.h
 
 .PHONY: all install download clean
@@ -33,29 +35,8 @@ FILES=$(METADATA) runtest.sh Makefile PURPOSE userfaultfd-old.c userfaultfd-new.
 run: $(FILES) build
 	./runtest.sh
 
-build:
+build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
 
 clean:
-	rm -f *~ userfaultfd
-
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           David McDougall <dmcdouga@redhat-com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Kernel self test for userfaultfd mechanism" >> $(METADATA)
-	@echo "Type:            Sanity" >> $(METADATA)
-	@echo "TestTime:        5m" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        gcc" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2+" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	@echo "Releases:        -RHEL4 -RHELClient5 -RHELServer5 -RHELClient6 -RHELServer6" >> $(METADATA)
-
-	rhts-lint $(METADATA)
+	rm -f *~ $(BUILT_FILES)

@@ -26,12 +26,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="kernel"
 
-if rlIsRHEL '<9' ; then
+if rlIsRHEL '<9' || rlIsCentOS '<9' ; then
     gcc -lpthread userfaultfd-old.c -o userfaultfd
 else
     gcc -lpthread userfaultfd-new.c -o userfaultfd
@@ -57,13 +56,13 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStart "FAIL" "Hugetlbfs"
-        if rlIsRHEL '<8' ; then
+        if rlIsRHEL '<8' || rlIsCentOS '<8'; then
             rlLogInfo "Skip hugetlbfs userfaultfd test on RHEL-7 and earlier."
         else
             cat /proc/filesystems | grep -q hugetlbfs
             if [ $? -ne 0 ]; then
                 echo "hugetlbfs not found in /proc/filesystems, skipping test"
-                report_result Test_Skipped PASS 99
+                rstrnt-report-result Test_Skipped PASS 99
                 exit 0
             fi
             # Mount the hugetlbfs.
