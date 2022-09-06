@@ -1,0 +1,18 @@
+[General]
+description=drop caches
+name=/kernel/vm/sysctl/min_free_kbytes
+owner=Zhouping Liu <zliu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./min_free_kbytes.sh
+max_time=30m
+dependencies=
+repoRequires=vm/sysctl/include
+TestVersion=1.1
+Path=/mnt/tests/kernel/vm/sysctl/min_free_kbytes
+Type=
+RunFor=kernel
+Priority=Normal
