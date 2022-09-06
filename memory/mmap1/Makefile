@@ -26,7 +26,7 @@ NAME_SRC=mmaptst
 SRCS=$(NAME_SRC).c
 OBJS=$(NAME_SRC).o
 
-BUILT_FILES=$(NAME_SRC)
+BUILT_FILES=
 FILES=$(METADATA) runtest.sh Makefile $(SRCS)
 
 run: $(FILES) build
@@ -34,7 +34,6 @@ run: $(FILES) build
 
 build: $(BUILT_FILES)
 	chmod a+x ./runtest.sh
-	chmod a+x ./$(NAME_SRC)
 
 # You may need to add other taregts e.g. to build executables from source code
 # Add them here:
@@ -47,29 +46,5 @@ DEPEND=makedepend $(CFLAGS)
 $(NAME_SRC): $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS)
 
-# what are the source dependencies
-depend:	$(SRCS)
-	$(DEPEND) $(SRCS)
-
 clean:
 	rm -f *~ $(BUILT_FILES) $(METADATA)
-
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
-
-# Generate the testinfo.desc here:
-$(METADATA): Makefile
-	@touch $(METADATA)
-	@echo "Owner:		Bill Peck <bpeck@redhat.com>" > $(METADATA)
-	@echo "Name:		$(TEST)"	>> $(METADATA)
-	@echo "Path:		$(TEST_DIR)"	>> $(METADATA)
-	@echo "TestVersion:	$(TESTVERSION)"	>> $(METADATA)
-	@echo "Description:	mmap test"	>> $(METADATA)
-	@echo "TestTime:	5m"		>> $(METADATA)
-	@echo "RunFor:		$(PACKAGE_NAME)" >> $(METADATA)
-	@echo "Requires:	gcc glibc bzip2" >> $(METADATA)
-	@echo "Releases:	-RHEL2.1"	>> $(METADATA)
-	@echo "#Architectures:	All"		>> $(METADATA)
-	@echo "Priority:        Normal"		>> $(METADATA)
-	@echo "Type:            Regression"	>> $(METADATA)
-	@echo "License:		GPL"		>> $(METADATA)
