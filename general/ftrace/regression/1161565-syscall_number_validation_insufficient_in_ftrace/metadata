@@ -1,0 +1,18 @@
+[General]
+description=Bug 1161565 - kernel: insufficient syscall number validation in perf and ftrace subsystems
+name=general/ftrace/regression/1161565-syscall_number_validation_insufficient_in_ftrace
+owner=Chunyu Hu <chuhu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=30m
+dependencies=gcc;trace-cmd
+repoRequires=cki_lib;general/ftrace/include
+TestVersion=1.0
+Type=Regression
+RunFor=kernel
+Priority=Normal
+use_pty=false
