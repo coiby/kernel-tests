@@ -69,9 +69,11 @@ clone_ltp()
     fi
     if [[ -n ${LTP_COMMIT_ID} && ${LTP_COMMIT_ID} != "latest" ]]; then
         git -C ${TARGET} checkout ${LTP_COMMIT_ID}
-        echo "Aborting current task: Couldn't checkout ${LTP_COMMIT_ID}" | tee -a $OUTPUTFILE
-        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        if [ $? -ne 0 ]; then
+            echo "Aborting current task: Couldn't checkout ${LTP_COMMIT_ID}" | tee -a $OUTPUTFILE
+            rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+            rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        fi
     fi
     if [[ -z ${LTP_COMMIT_ID} || ${LTP_COMMIT_ID} == "latest" ]]; then
         LTP_COMMIT_ID=$(git -C ${TARGET} log --format="%H" -n 1)
