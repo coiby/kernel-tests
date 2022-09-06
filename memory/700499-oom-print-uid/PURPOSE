@@ -1,0 +1,4 @@
+The printk output in __oom_kill_task no longer includes p->uid as it did in
+RHEL 5.  LLNL relies on this data point to be able to identify the user causing
+the oom_kill.  This allows them to address the infraction with the user.
+
