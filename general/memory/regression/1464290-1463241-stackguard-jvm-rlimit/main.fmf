@@ -1,0 +1,14 @@
+summary: Reproducer for stackguard regression, found jvm crash and rlimit problem.
+description: ''
+contact: Wang Shu<shuwang@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+tier: 2
+tag: [tier2]
+duration: 5m
+extra-summary: /kernel/rootworkgitlab_ceelpellecckernel_baregeneral/memory/regression/1464290-1463241-stackguard-jvm-rlimit
+extra-task: /kernel/rootworkgitlab_ceelpellecckernel_baregeneral/memory/regression/1464290-1463241-stackguard-jvm-rlimit
