@@ -1,0 +1,17 @@
+[General]
+description=Bug 1123102 - Kernel panic in trace_find_cmdline()
+name=general/ftrace/regression/1123102-kernel-panic-in-trace_find_cmdline
+owner=Chunyu Hu <chuhu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=30m
+dependencies=
+repoRequires=
+TestVersion=1.0
+Type=Regression
+RunFor=kernel
+Priority=Normal

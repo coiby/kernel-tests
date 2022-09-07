@@ -1,0 +1,17 @@
+summary: 'Bug 1123102 - Kernel panic in trace_find_cmdline()'
+description: |
+  Bug 1123102 - Kernel panic in trace_find_cmdline()
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+duration: 30m
+require:
+  - gcc
+tier: 2
+tag: [tier2]
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1123102
+extra-summary: /kernel/general/ftrace/regression/1123102-kernel-panic-in-trace_find_cmdline
+extra-task: /kernel/general/ftrace/regression/1123102-kernel-panic-in-trace_find_cmdline
