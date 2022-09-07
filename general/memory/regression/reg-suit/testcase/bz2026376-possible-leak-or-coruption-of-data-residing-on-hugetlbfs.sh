@@ -1,3 +1,4 @@
+#!/bin/bash
 function bz2026376()
 {
 	local check=_compile

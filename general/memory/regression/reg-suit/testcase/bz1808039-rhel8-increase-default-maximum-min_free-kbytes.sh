@@ -1,3 +1,4 @@
+#!/bin/bash
 function test_min_free_kbytes(){
     sub=`expr $cal_min_free_kbyte - $min_free_kbytes`
     if [[ "$arch" == "ppc64le" ]]; then

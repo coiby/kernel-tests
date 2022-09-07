@@ -1,3 +1,4 @@
+#!/bin/bash
 
 function bz1787269()
 {

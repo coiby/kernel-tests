@@ -37,7 +37,7 @@ function bz817719()
         mkdir $1
         for i in `seq 10`; do
             mount -t tmpfs none $1
-            dd if=/dev/zero of=$1/$(genstr) bs=1M count=$(($RANDOM%10+1)) 2&>1 >/dev/null
+            dd if=/dev/zero of=$1/$(genstr) bs=1M count=$(($RANDOM%10+1)) &>/dev/null
             sleep 0.1
             umount $1
         done

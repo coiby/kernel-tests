@@ -1,3 +1,4 @@
+#!/bin/bash
 function bz1980619()
 {
 	rlRun "gcc -o shm-test $DIR_SOURCE/${FUNCNAME}.c"

@@ -1,3 +1,4 @@
+#!/bin/bash
 function bz1651416()
 {
 	if [[ "$(uname -m)" = "x86_64" ]]; then

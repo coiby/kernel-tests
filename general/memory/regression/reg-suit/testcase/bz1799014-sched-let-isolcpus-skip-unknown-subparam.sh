@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function bz1799014()
 {
 	local flag=/mnt/${FUNCNAME}
