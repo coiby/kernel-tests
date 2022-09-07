@@ -1,0 +1,13 @@
+[General]
+name=general/ftrace/regression/738720-enhanced-signal-tracepoint
+owner=Guangze Bai <gbai@redhat.com>
+description=Bug 738720 - [Hitachi 6.3 FEAT] Tracepoints for signal events (*)
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+repoRequires=cki_lib;general/ftrace/include
+max_time=10m
+use_pty=false
