@@ -25,7 +25,7 @@ function rhelkt1lite_preparing()
 		wget ${DOWNLOAD}/archive/refs/heads/master.zip && \
 		unzip master.zip && mv ltp-master/ ltp-full-next/
 
-	[ $LTP_VERSION != "next" ] && [ -f ltp-full-${LTP_VERSION}.tar.bz2 ] || \
+	[ $LTP_VERSION != "next" ] && [ ! -f ltp-full-${LTP_VERSION}.tar.bz2 ] && \
 		wget ${DOWNLOAD}/releases/download/${LTP_VERSION}/ltp-full-${LTP_VERSION}.tar.bz2 && \
 		tar xjf ltp-full-${LTP_VERSION}.tar.bz2
 
