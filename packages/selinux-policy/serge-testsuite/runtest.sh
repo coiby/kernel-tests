@@ -61,3 +61,9 @@ trap "cd /; rm -rf '${test_repo_path}'" EXIT ERR
 cd "$git_path"
 
 ./runtest.sh
+if [ $? -eq 127 ]; then
+    # Aborting task due to infrastructure failure.
+    echo "Test finished with infrastructure error."
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+fi
