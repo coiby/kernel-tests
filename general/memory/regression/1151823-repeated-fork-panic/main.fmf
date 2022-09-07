@@ -1,0 +1,14 @@
+summary: This is a reproducer for bz1151823
+description: ''
+contact: Wang Shu<shuwang@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+tier: 2
+tag: [tier2]
+duration: 4h
+extra-summary: /kernel/rootworkgitlab_ceelpellecckernel_baregeneral/memory/regression/1151823-repeated-fork-panic
+extra-task: /kernel/rootworkgitlab_ceelpellecckernel_baregeneral/memory/regression/1151823-repeated-fork-panic

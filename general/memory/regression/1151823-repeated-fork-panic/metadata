@@ -1,0 +1,18 @@
+[General]
+description=This is a reproducer for bz1151823
+name=/kernel/general/memory/regression/1151823-repeated-fork-panic
+owner=Wang Shu<shuwang@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=4h
+dependencies=gcc
+repoRequires=
+TestVersion=1.0
+Path=/mnt/tests/kernel/general/memory/regression/1151823-repeated-fork-panic
+Type=Regression
+RunFor=kernel
+Priority=Normal
