@@ -29,7 +29,7 @@
 
 function bz1658039()
 {
-        yum install -y expect
+	yum install -y expect
 	if rlIsRHEL "7" && [[ "$(uname -m)" = "s390x" ]]; then
 		return 0;
 	fi

@@ -27,16 +27,16 @@
 
 function bz1443281()
 {
-     if [ "$(rlGetPrimaryArch)" != "x86_64" ]; then
-         rlLog "Only for x86_64"
-         return
-     fi
+	if [ "$(rlGetPrimaryArch)" != "x86_64" ]; then
+		rlLog "Only for x86_64"
+		return
+	fi
 
-	 if  rlIsRHEL 5 6; then
-		 rlLog "Only for >=rhel7"
-		 return
-	 fi
+	if  rlIsRHEL 5 6; then
+		rlLog "Only for >=rhel7"
+		return
+	fi
 
-    rlRun "gcc -o mpx-mini-test $DIR_SOURCE/mpx-mini-test.c"
-    rlRun "./mpx-mini-test tabletest"
+	rlRun "gcc -o mpx-mini-test $DIR_SOURCE/mpx-mini-test.c"
+	rlRun "./mpx-mini-test tabletest"
 }

@@ -28,21 +28,21 @@
 
 function bz1042807()
 {
-    case $(rlGetPrimaryArch) in
-	x86_64|i386|i686)
-		if ! rlRun "gcc -m32 -o $FUNCNAME $DIR_SOURCE/${FUNCNAME}.c"; then
-			return 1;
-		fi
-		for i in `seq 5`; do
-			./$FUNCNAME >> $FUNCNAME.log
-			if rlAssertNotGrep "error" $FUNCNAME.log; then
-			    break
+	case $(rlGetPrimaryArch) in
+		x86_64|i386|i686)
+			if ! rlRun "gcc -m32 -o $FUNCNAME $DIR_SOURCE/${FUNCNAME}.c"; then
+				return 1;
 			fi
-			sleep 5
-		done
-		;;
-	*)
-		rlLogInfo "$(uname -m) is not intended to be tested."
-		;;
+			for i in `seq 5`; do
+				./$FUNCNAME >> $FUNCNAME.log
+				if rlAssertNotGrep "error" $FUNCNAME.log; then
+					break
+				fi
+				sleep 5
+			done
+			;;
+		*)
+			rlLogInfo "$(uname -m) is not intended to be tested."
+			;;
 	esac
 }

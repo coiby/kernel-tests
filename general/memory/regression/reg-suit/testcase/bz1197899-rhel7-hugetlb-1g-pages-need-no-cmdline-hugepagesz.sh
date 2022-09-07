@@ -28,31 +28,31 @@
 
 function bz1197899()
 {
-    if rlIsRHEL ">=7.2";then
-	    case $(rlGetPrimaryArch) in
-		x86_64)
-			rlRun "CpuVendor=$(lscpu |grep -m 1 "Vendor ID" |awk -F ':'  '{print $2}'|sed 's/ //g')"
-			rlRun "CpuFamily=$(lscpu |grep -m 1 "CPU family" |awk -F ':' '{print $2}'|sed 's/ //g')"
-			rlRun "Model=\"$(lscpu |grep -m 1 "Model" |awk -F ':' '{print $2}'|sed 's/ //g')\""
-			rlRun "NumaNode=$(lscpu |grep -m 1 "NUMA node" |awk -F ':' '{print $2}'|sed 's/ //g')"
+	if rlIsRHEL ">=7.2";then
+		case $(rlGetPrimaryArch) in
+			x86_64)
+				rlRun "CpuVendor=$(lscpu |grep -m 1 "Vendor ID" |awk -F ':'  '{print $2}'|sed 's/ //g')"
+				rlRun "CpuFamily=$(lscpu |grep -m 1 "CPU family" |awk -F ':' '{print $2}'|sed 's/ //g')"
+				rlRun "Model=\"$(lscpu |grep -m 1 "Model" |awk -F ':' '{print $2}'|sed 's/ //g')\""
+				rlRun "NumaNode=$(lscpu |grep -m 1 "NUMA node" |awk -F ':' '{print $2}'|sed 's/ //g')"
 
-			rlRun -l "cat /proc/cpuinfo|grep -m 1 flags" 0-254
-			rlRun -l "cat /proc/cpuinfo|grep -m 1 flags|grep pdpe1gb" 0-254
-			[ $? -ne 0 ] && rlLogWarning "${FUCNAME}: pdpe1g flag is not supported by current CPU." && return
+				rlRun -l "cat /proc/cpuinfo|grep -m 1 flags" 0-254
+				rlRun -l "cat /proc/cpuinfo|grep -m 1 flags|grep pdpe1gb" 0-254
+				[ $? -ne 0 ] && rlLogWarning "${FUCNAME}: pdpe1g flag is not supported by current CPU." && return
 
-			rlAssertNotGrep "hugepage" /proc/cmdline "-i"
-			[ $? -ne 0 ] && rlLogInfo "To verify this featrue, please remove *any* hugepage configure in kernel cmdline." && return
+				rlAssertNotGrep "hugepage" /proc/cmdline "-i"
+				[ $? -ne 0 ] && rlLogInfo "To verify this featrue, please remove *any* hugepage configure in kernel cmdline." && return
 
-			local i
-		        for ((i = 0; i < NumaNode; i++)); do
-		             rlAssertExists "/sys/devices/system/node/node${i}/hugepages/hugepages-1048576kB"
-			done
-		    ;;
-		*)
-			rlLogInfo "$(uname -m) is not intended to be tested."
-		    ;;
-	    esac
-    else
-	rlLogWarning "The default 1g huapage pool support is added from RHEL-7.2 kernel-3.10.0-239.el7"
-    fi
+				local i
+				for ((i = 0; i < NumaNode; i++)); do
+					rlAssertExists "/sys/devices/system/node/node${i}/hugepages/hugepages-1048576kB"
+				done
+				;;
+			*)
+				rlLogInfo "$(uname -m) is not intended to be tested."
+				;;
+		esac
+	else
+		rlLogWarning "The default 1g huapage pool support is added from RHEL-7.2 kernel-3.10.0-239.el7"
+	fi
 }
