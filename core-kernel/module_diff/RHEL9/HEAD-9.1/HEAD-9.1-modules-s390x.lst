@@ -2,6 +2,7 @@
 8021q.ko
 act_bpf.ko
 act_csum.ko
+act_ctinfo.ko
 act_ct.ko
 act_gact.ko
 act_mirred.ko

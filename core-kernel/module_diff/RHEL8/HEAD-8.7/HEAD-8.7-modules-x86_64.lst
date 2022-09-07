@@ -1948,6 +1948,7 @@ seed.ko
 seqiv.ko
 ser_gigaset.ko
 serial_ir.ko
+serial-multi-instantiate.ko
 serio_raw.ko
 sermouse.ko
 serpent-avx2.ko

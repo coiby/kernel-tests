@@ -20,6 +20,7 @@ acpi_tad.ko
 acpi_thermal_rel.ko
 act_bpf.ko
 act_csum.ko
+act_ctinfo.ko
 act_ct.ko
 act_gact.ko
 act_mirred.ko
@@ -244,6 +245,7 @@ crc7.ko
 crc8.ko
 crc-itu-t.ko
 crct10dif-pclmul.ko
+cs_dsp.ko
 csiostor.ko
 curve25519-x86_64.ko
 cuse.ko
@@ -1306,6 +1308,8 @@ pcs_xpcs.ko
 peak_pciefd.ko
 peak_usb.ko
 pegasus.ko
+pfr_telemetry.ko
+pfr_update.ko
 phylink.ko
 pi3usb30532.ko
 pinctrl-alderlake.ko
@@ -1504,6 +1508,8 @@ rtw88_8822ce.ko
 rtw88_8822c.ko
 rtw88_core.ko
 rtw88_pci.ko
+rtw89_8852ae.ko
+rtw89_8852a.ko
 rtw89_core.ko
 rtw89_pci.ko
 s2255drv.ko
@@ -1555,6 +1561,7 @@ serpent_generic.ko
 serpent-sse2-x86_64.ko
 serport.ko
 ses.ko
+sev-guest.ko
 sfc.ko
 sg.ko
 sht15.ko
@@ -1585,6 +1592,7 @@ snd-acp3x-rn.ko
 snd-acp5x-i2s.ko
 snd-acp5x-pcm-dma.ko
 snd-acp6x-pdm-dma.ko
+snd-acp-config.ko
 snd-ad1889.ko
 snd-ak4113.ko
 snd-ak4114.ko
@@ -1636,6 +1644,9 @@ snd-hda-codec-via.ko
 snd-hda-core.ko
 snd-hda-ext-core.ko
 snd-hda-intel.ko
+snd-hda-scodec-cs35l41-i2c.ko
+snd-hda-scodec-cs35l41.ko
+snd-hda-scodec-cs35l41-spi.ko
 snd-hdmi-lpe-audio.ko
 snd-hdsp.ko
 snd-hdspm.ko
@@ -1696,9 +1707,13 @@ snd-soc-acp5x-mach.ko
 snd-soc-acp6x-mach.ko
 snd-soc-acpi-intel-match.ko
 snd-soc-acpi.ko
+snd-soc-avs.ko
 snd-soc-catpt.ko
 snd-soc-cml_rt1011_rt5682.ko
 snd-soc-core.ko
+snd-soc-cs35l41-i2c.ko
+snd-soc-cs35l41.ko
+snd-soc-cs35l41-lib.ko
 snd-soc-cs35l41-spi.ko
 snd-soc-cs42l42.ko
 snd-soc-cx2072x.ko
@@ -1710,7 +1725,9 @@ snd-soc-es8316.ko
 snd-soc-hdac-hda.ko
 snd-soc-hdac-hdmi.ko
 snd-soc-intel-hda-dsp-common.ko
+snd-soc-intel-sof-cirrus-common.ko
 snd-soc-intel-sof-maxim-common.ko
+snd-soc-intel-sof-realtek-common.ko
 snd-soc-kbl_da7219_max98357a.ko
 snd-soc-kbl_da7219_max98927.ko
 snd-soc-kbl_rt5660.ko
@@ -1765,8 +1782,10 @@ snd-soc-skl-ssp-clk.ko
 snd-soc-sof_cs42l42.ko
 snd-soc-sof_da7219_max98373.ko
 snd-soc-sof_es8336.ko
+snd-soc-sof_nau8825.ko
 snd-soc-sof_rt5682.ko
 snd-soc-sof-sdw.ko
+snd-soc-sof-ssp-amp.ko
 snd-soc-ssm4567.ko
 snd-soc-sst-atom-hifi2-platform.ko
 snd-soc-sst-bdw-rt5650-mach.ko
@@ -1793,9 +1812,12 @@ snd-soc-sst-sof-wm8804.ko
 snd-soc-ts3a227e.ko
 snd-soc-wm8804-i2c.ko
 snd-soc-wm8804.ko
+snd-soc-wm-adsp.ko
 snd-sof-acpi-intel-bdw.ko
 snd-sof-acpi-intel-byt.ko
 snd-sof-acpi.ko
+snd-sof-amd-acp.ko
+snd-sof-amd-renoir.ko
 snd-sof-intel-atom.ko
 snd-sof-intel-hda-common.ko
 snd-sof-intel-hda.ko
@@ -1806,6 +1828,8 @@ snd-sof-pci-intel-icl.ko
 snd-sof-pci-intel-tgl.ko
 snd-sof-pci-intel-tng.ko
 snd-sof-pci.ko
+snd-sof-probes.ko
+snd-sof-utils.ko
 snd-sof-xtensa-dsp.ko
 snd-timer.ko
 snd-trident.ko
@@ -1837,6 +1861,7 @@ soundwire-bus.ko
 soundwire-cadence.ko
 soundwire-generic-allocation.ko
 soundwire-intel.ko
+sp5100_tco.ko
 sparse-keymap.ko
 spcp8x5.ko
 speedstep-lib.ko
