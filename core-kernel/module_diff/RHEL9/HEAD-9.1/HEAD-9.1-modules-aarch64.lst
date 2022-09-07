@@ -6,6 +6,7 @@ acpiphp_ibm.ko
 acpi_power_meter.ko
 act_bpf.ko
 act_csum.ko
+act_ctinfo.ko
 act_ct.ko
 act_gact.ko
 act_mirred.ko
@@ -543,10 +544,14 @@ igbvf.ko
 igc.ko
 imx2_wdt.ko
 imx8m-ddrc.ko
+imx8mm-interconnect.ko
 imx8mm_thermal.ko
+imx8mn-interconnect.ko
+imx8mq-interconnect.ko
 imx-bus.ko
 imx-cpufreq-dt.ko
 imx-dsp.ko
+imx-interconnect.ko
 imx-mailbox.ko
 imx-sdma.ko
 int51x1.ko
@@ -1020,6 +1025,8 @@ pcs_xpcs.ko
 peak_pciefd.ko
 peak_usb.ko
 pegasus.ko
+pfr_telemetry.ko
+pfr_update.ko
 pfuze100-regulator.ko
 phy-bcm-sr-usb.ko
 phy-fsl-imx8mq-usb.ko
@@ -1402,8 +1409,10 @@ vitesse.ko
 vkms.ko
 vmac.ko
 vmwgfx.ko
+vmw_vmci.ko
 vmw_vsock_virtio_transport_common.ko
 vmw_vsock_virtio_transport.ko
+vmw_vsock_vmci_transport.ko
 vmxnet3.ko
 vport-geneve.ko
 vport-gre.ko
