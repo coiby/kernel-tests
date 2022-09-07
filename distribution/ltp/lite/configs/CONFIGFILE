@@ -129,7 +129,6 @@
 ?getrusage04 sh -c "getrusage04 || true"
 ?pselect01 sh -c "pselect01 || true"
 ?pselect01_64 sh -c "pselect01_64 || true"
-?fork13 fork13 -i 10000
 
 
 # #######################################################
