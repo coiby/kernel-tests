@@ -6,3 +6,6 @@ framework: beakerlib
 component:
   - kernel
 duration: 15m
+adjust:
+  enabled: false
+  when: arch != x86_64
