@@ -1,0 +1,15 @@
+summary: 'Bug 738720 - [Hitachi 6.3 FEAT] Tracepoints for signal events (*)'
+description: |
+    check signal:signal_generate gives 2 more fields: grp res
+contact: Guangze Bai <gbai@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 10m
+require:
+  -
+tier: 2
+tag: [tier2]
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=738720
+extra-summary: /kernel/general/ftrace/regression/738720-enhanced-signal-tracepoint
+extra-task: /kernel/general/ftrace/regression/738720-enhanced-signal-tracepoint
