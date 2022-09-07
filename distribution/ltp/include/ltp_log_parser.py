@@ -5,6 +5,7 @@ import sys
 import getopt
 from itertools import groupby
 import re
+import io
 
 VERBOSE = False
 TC_START = "<<<test_start>>>"
@@ -270,6 +271,14 @@ def main(argc, argv):
         #
         if d_tc_metadata['result'] in portion_flags:
             dump(d_tc_metadata, l_tc, known_issues)
+            # workaround to reuse dump output to save it to a file
+            old_stdout = sys.stdout
+            new_stdout = io.StringIO()
+            sys.stdout = new_stdout
+            with open('{}.fail.log'.format(d_tc_metadata['name']), 'w') as f:
+                dump(d_tc_metadata, l_tc, known_issues)
+                f.writelines(new_stdout.getvalue())
+            sys.stdout = old_stdout
 
     return 0
 
