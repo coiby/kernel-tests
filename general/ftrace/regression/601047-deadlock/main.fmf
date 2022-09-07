@@ -1,0 +1,19 @@
+summary: 'Bug 601047 - Deadlock while using stack tracer(ftrace)'
+description: |4
+    This is a ftrace regression testcase for bz601047.
+
+    For RHEL6.2, kernel 2.6.32-192.el6, only x86_64 system has
+    /proc/sys/kernel/stack_tracer_enabled, because on x86_64 has
+    CONFIG_STACK_TRACER been set in kernel config.
+contact: Yanzhen Ren<yren@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 30m
+require:
+  -
+tier: 2
+tag: [tier2]
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1123102
+extra-summary: /kernel/general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace
+extra-task: /kernel/general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace

@@ -1,0 +1,13 @@
+[General]
+name=general/ftrace/regression/601047-deadlock
+owner=Caspar Zhang <czhang@redhat.com>
+description=Bug 601047 - Deadlock while using stack tracer(ftrace)
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+repoRequires=cki_lib;general/ftrace/include
+max_time=30m
+use_pty=false
