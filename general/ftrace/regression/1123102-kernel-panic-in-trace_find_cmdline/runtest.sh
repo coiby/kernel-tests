@@ -33,36 +33,39 @@ BUG_INFO="1123102-kernel-panic-in-trace_find_cmdline"
 SRC_FILE="ftrace-page-stress.c"
 BIN_FILE="page-move-stress"
 LOOP_TIMES=${LOOP:-10}
-REBOOT_FLAG=/home/1123102_reboot
+REBOOT_FLAG=/var/1123102_reboot
 
 rlJournalStart
-	rlPhaseStartSetup "Setup $BUG_INFO"
-		if stat /run/ostree-booted > /dev/null 2>&1; then
-			rpm -q gcc || rpm-ostree install -A --idempotent --allow-inactive gcc
-		else
-			rpm -q gcc || yum -y install gcc
-		fi
-		rlRun "gcc $SRC_FILE -o $BIN_FILE"
-		mount | grep debug || rlRun "mount -t debugfs none /sys/kernel/debug"
-	rlPhaseEnd
+    if [[ "$TMT_REBOOT_COUNT" == "0" || ! -f "${REBOOT_FLAG}" ]]; then
+        rlPhaseStartSetup "Setup $BUG_INFO"
+            if stat /run/ostree-booted > /dev/null 2>&1; then
+                rpm -q gcc || rpm-ostree install -A --idempotent --allow-inactive gcc
+            else
+                rpm -q gcc || yum -y install gcc
+            fi
+            rlRun "gcc $SRC_FILE -o $BIN_FILE"
+            mount | grep debug || rlRun "mount -t debugfs none /sys/kernel/debug"
+        rlPhaseEnd
+    fi
 
-	rlPhaseStartTest  "Test $BUG_INFO"
-		if [ -f $REBOOT_FLAG ]; then
-			rlPhaseEnd
-			exit 0
-		fi
-		rlLogInfo "Loop $LOOP_TIMES times,each time 120s"
-		while((LOOP_TIMES--));do
-			rlWatchdog "./$BIN_FILE" 300
-		done
-		rlLogInfo "Test pass, the kernel doesn't crash."
-	rlPhaseEnd
+    rlPhaseStartTest  "Test $BUG_INFO"
+        if [[ "$TMT_REBOOT_COUNT" == "1" || -f "${REBOOT_FLAG}" ]]; then
+            tmt-report-result ${BUG_INFO} PASS || rstrnt-report-result ${BUG_INFO} PASS 0
+        else
+            rlLogInfo "Loop $LOOP_TIMES times,each time 120s"
+            while((LOOP_TIMES--));do
+                rlWatchdog "./$BIN_FILE" 300
+            done
+            rlLogInfo "Test pass, the kernel doesn't crash."
+        fi
+    rlPhaseEnd
 
-	rlPhaseStartCleanup "Cleanup $BUG_INFO"
-		if [ ! -f $REBOOT_FLAG ]; then
-			touch $REBOOT_FLAG
-			rstrnt-reboot
-		fi
-	rlPhaseEnd
+    if [[ "$TMT_REBOOT_COUNT" == "0" || ! -f "${REBOOT_FLAG}" ]]; then
+        rlPhaseStartCleanup "Cleanup $BUG_INFO"
+            rlRun "touch $REBOOT_FLAG"
+            rlLogInfo "Restarting ..."
+            tmt-reboot || rstrnt-reboot || rhts-reboot
+        rlPhaseEnd
+    fi
 rlJournalEnd
 rlJournalPrintText
