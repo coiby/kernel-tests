@@ -69,9 +69,11 @@ clone_ltp()
     fi
     if [[ -n ${LTP_COMMIT_ID} && ${LTP_COMMIT_ID} != "latest" ]]; then
         git -C ${TARGET} checkout ${LTP_COMMIT_ID}
-        echo "Aborting current task: Couldn't checkout ${LTP_COMMIT_ID}" | tee -a $OUTPUTFILE
-        rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        if [ $? -ne 0 ]; then
+            echo "Aborting current task: Couldn't checkout ${LTP_COMMIT_ID}" | tee -a $OUTPUTFILE
+            rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+            rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        fi
     fi
     if [[ -z ${LTP_COMMIT_ID} || ${LTP_COMMIT_ID} == "latest" ]]; then
         LTP_COMMIT_ID=$(git -C ${TARGET} log --format="%H" -n 1)
@@ -283,9 +285,23 @@ build-all()
     else
         clone_ltp
         if [[ -f ${TARGET_DIR}/runltp ]] && grep -q "${TESTVERSION}" ${TARGET_DIR}/ltp_version; then
-            echo "LTP ($TESTVERSION) has been built and installed at ${TARGET_DIR}/runltp !"
+            # the LTP_COMMIT_ID is already the version installed
             return
         fi
+        # generate RHELKT1LITE.next
+        echo "Going to generate RHELKT1LITE.next"
+        pushd ../lite/configs
+        # restraint doesn't seem to keep the file permission
+        chmod +x ./config-maker.sh
+        LTP_VERSION=next ./config-maker.sh &> config-maker.txt
+        if [ $? -ne 0 ]; then
+            cat config-maker.txt
+            echo "Aborting current task: Couldn't generate test config." | tee -a $OUTPUTFILE
+            rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+            rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        fi
+        popd
+        echo "RHELKT1LITE.next is generated"
     fi
     configure
     echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE

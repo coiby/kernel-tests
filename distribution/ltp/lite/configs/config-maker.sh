@@ -21,11 +21,16 @@ DOWNLOAD=${DOWNLOAD:-https://github.com/linux-test-project/ltp}
 
 function rhelkt1lite_preparing()
 {
-	[ $LTP_VERSION == "next" ] && \
-		wget ${DOWNLOAD}/archive/refs/heads/master.zip && \
-		unzip master.zip && mv ltp-master/ ltp-full-next/
+	if [ $LTP_VERSION == "next" ]; then
+		if [ ${LTP_COMMIT_ID} == "latest" ]; then
+			wget ${DOWNLOAD}/archive/refs/heads/master.zip -O ltp.zip || exit 1
+		else
+			wget ${DOWNLOAD}/archive/${LTP_COMMIT_ID}.zip -O ltp.zip || exit 1
+		unzip ltp.zip && mv ltp-*/ ltp-full-next/
+		fi
+	fi
 
-	[ $LTP_VERSION != "next" ] && [ -f ltp-full-${LTP_VERSION}.tar.bz2 ] || \
+	[ $LTP_VERSION != "next" ] && [ ! -f ltp-full-${LTP_VERSION}.tar.bz2 ] && \
 		wget ${DOWNLOAD}/releases/download/${LTP_VERSION}/ltp-full-${LTP_VERSION}.tar.bz2 && \
 		tar xjf ltp-full-${LTP_VERSION}.tar.bz2
 
@@ -34,7 +39,7 @@ function rhelkt1lite_preparing()
 		cat kernel_misc math fsx ipc syscalls mm sched nptl pty tracing fs > $SOURCEDIR/RHELKT1LITE.${LTP_VERSION}
 		popd >/dev/null;
 
-	rm -fr $SOURCEDIR/ltp-full-* $SOURCEDIR/master.zip
+	rm -fr $SOURCEDIR/ltp-full-* $SOURCEDIR/ltp.zip
 }
 
 function block_issue_kickout()

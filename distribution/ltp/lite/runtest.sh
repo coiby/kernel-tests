@@ -29,6 +29,7 @@ fi
 
 core_pattern="$(cat /proc/sys/kernel/core_pattern)"
 core_pattern_ltp_dir="/mnt/testarea/ltp/cores"
+runtest_path=$LTPDIR/runtest
 
 # RHELKT1LITE is the default set of tests to run for RHEL builds
 RUNTESTS=${RUNTESTS:-"RHELKT1LITE"}
@@ -37,21 +38,24 @@ PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
 
 function ltp_test_build()
 {
-	cp -vf configs/RHELKT1LITE.${TESTVERSION} RHELKT1LITE
+	# The test could be running on different path
+	# Just skip the build, but make sure the config is copied
+	if [[ ! -f ${LTPDIR}/runltp ]] || ! grep -q "${TESTVERSION}" ${TARGET_DIR}/ltp_version; then
+		build-all
+	fi
+	if [[ -z ${LTP_COMMIT_ID} ]]; then
+		RHELKT1LITE_CONFIG=RHELKT1LITE.${TESTVERSION}
+	else
+		RHELKT1LITE_CONFIG=RHELKT1LITE.next
+	fi
+	cp -vf configs/${RHELKT1LITE_CONFIG} ${runtest_path}/RHELKT1LITE
 	if [ $? -ne 0 ]; then
-		echo "FAIL: couldn't copy configs/RHELKT1LITE.${TESTVERSION}"
+		echo "FAIL: couldn't copy configs/${RHELKT1LITE_CONFIG}"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 	fi
-	# The test could be running on different path
-	# Just skip the build, but make sure the config is copied
 
-	if [[ -f ${LTPDIR}/runltp ]] && grep -q "${TESTVERSION}" ${TARGET_DIR}/ltp_version; then
-		echo "LTP ($TESTVERSION) has been built and installed at ${LTPDIR}/runltp !"
-		return
-	fi
-
-	build-all
+	echo "LTP ($TESTVERSION) has been built and installed at ${LTPDIR}/runltp"
 }
 
 
@@ -138,10 +142,6 @@ function runtest_prepare()
 	if [[ -z "${runtest_config}"  ]]; then
 		echo "FAIL: no runtest conig was passed as argument to runtest_prepare"
 		exit 1
-	fi
-	local runtest_path=$LTPDIR/runtest
-	if [[ "${runtest_config}" == "RHELKT1LITE" ]]; then
-		cp -f RHELKT1LITE "${runtest_path}/"
 	fi
 	if [[ ! -s "${runtest_path}/${runtest_config}" ]]; then
 		echo "FAIL: ${runtest_config} doesn't exit on ${runtest_path}"
