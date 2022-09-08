@@ -199,7 +199,8 @@ RprtRslt ()
         fi
         SubmitLog $failed_test
         # extract test case name from test case fail log
-        rstrnt-report-result "${failed_test%.fail.log}" FAIL
+        # don't wan't to upload outputfile
+        rstrnt-report-result -o /dev/null "${failed_test%.fail.log}" FAIL
     done
 
     # File the results in the database
