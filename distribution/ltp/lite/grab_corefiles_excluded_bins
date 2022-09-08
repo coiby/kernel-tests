@@ -11,3 +11,5 @@ ptrace07
 shmat01
 prctl04
 fstat03
+waitid10
+select03
