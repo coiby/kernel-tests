@@ -33,6 +33,15 @@ rlJournalStart
       modules_to_load+=" bz2075527.cil"
     fi
 
+    if [[ -e /run/ostree-booted ]]; then
+      # bz2125034
+      if rlRun "setsebool domain_can_mmap_files on"; then
+        rlLog "Custom SELinux mask for RHIVOS set successfully"
+      else
+        rlLog "Error setting custom SELinux RHIVOS mask"
+      fi
+    fi
+
     if [ -n "$modules_to_load" ]; then
       if ! rlRun "semodule $(for m in $modules_to_load; do echo -n "-i $m "; done)" 0 \
           "Install required SELinux modules"; then
@@ -42,9 +51,11 @@ rlJournalStart
         done
       fi
     elif ! grep "ipv6.disable=1" /proc/cmdline ; then
-      rlLog "No custom SELinux modules required, skipping"
-      rstrnt-report-result $TEST SKIP
-      exit
+      if ! [[ -e /run/ostree-booted ]]; then
+        rlLog "No custom SELinux modules required, skipping"
+        rstrnt-report-result $TEST SKIP
+        exit
+      fi
     fi
   rlPhaseEnd
 rlJournalPrintText
