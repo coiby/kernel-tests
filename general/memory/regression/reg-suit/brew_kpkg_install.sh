@@ -22,7 +22,7 @@ function brew_kpkg_install()
 	fi
 	[[ $(rpm -qa kernel-rt) =~ $(uname -r)  ]] && url="${url}-rt" && kvari="rt"
 	[[ $(rpm -qa kernel-pegas) =~ $(uname -r) ]] && url="${url}-pegas" && kvari="pegas"
-	[ $? -ne 0 ] && [[ $(uname -r) =~ "aarch64" ]] && url="${url}-aarch64"
+	[ $? -ne 0 ] && [[ $(uname -r) =~ "4.14.*.aarch64" ]] && url="${url}-aarch64"
 	pkg_kdevel="kernel-${kvari}-devel-${K_KVERS}.${karch}"
 	pkg_kdevel=${pkg_kdevel/--/-}
 
