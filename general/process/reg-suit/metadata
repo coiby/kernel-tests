@@ -1,0 +1,14 @@
+[General]
+name=process management regression test
+owner=Chunyu Hu <chuhu@redhat.com>
+description=process regression test suite
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=6h
+dependencies=psmisc;gcc;glibc;sysstat;bc
+softDependencies=bison;openssl-devel;flex;numactl-devel
+repoRequires=general/include
