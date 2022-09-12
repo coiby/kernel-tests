@@ -1,0 +1,17 @@
+# storage/ssd/nvme_mkfs_xfs_bz1443807
+
+Storage: NVMe SSD iozone test with xfs filesystem 
+
+## How to run it
+Please refer to the top-level README.md for common dependencies.
+
+### Install dependencies
+```bash
+root# bash ../../../cki_bin/pkgs_install.sh metadata
+```
+
+### Execute the test
+#### You need run test_dev_setup to define TEST_DEVS
+```bash
+bash ./runtest.sh
+```

@@ -1,0 +1,13 @@
+[General]
+name=storage/ssd/nvme_removal_cause_stuck_process_bz1279699
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=NVMe removal which will cause stuck process and stuck card device node
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=fio
+max_time=1h

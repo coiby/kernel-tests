@@ -1,0 +1,13 @@
+[General]
+name=storage/ssd/nvme_format_command_test_bz1449838
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvme format command test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=nvme-cli
+max_time=1h

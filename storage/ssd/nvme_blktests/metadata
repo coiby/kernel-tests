@@ -1,0 +1,13 @@
+[General]
+name=storage/ssd/nvme_blktests
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=blktests with nvme ssd from https://github.com/osandov/blktests
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=gcc;gcc-c++;blktrace;nvme-cli
+max_time=4h

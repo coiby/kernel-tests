@@ -1,0 +1,13 @@
+[General]
+name=storage/ssd/test_devs_setup
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=test devs setup for nvme ssd testing
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt
+dependencies=
+max_time=1h
