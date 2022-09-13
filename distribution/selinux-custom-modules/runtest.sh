@@ -35,7 +35,7 @@ rlJournalStart
 
     if [[ -e /run/ostree-booted ]]; then
       # bz2125034
-      if rlRun "setsebool domain_can_mmap_files on"; then
+      if rlRun "setsebool -P domain_can_mmap_files on"; then
         rlLog "Custom SELinux mask for RHIVOS set successfully"
       else
         rlLog "Error setting custom SELinux RHIVOS mask"
