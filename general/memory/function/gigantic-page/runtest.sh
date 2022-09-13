@@ -4,14 +4,28 @@
 # Author: Li Wang <liwang@redhat.com>
 # ---------------------------------------
 
+# Enable TMT testing for RHIVOS
+. ../../../../automotive/include/include.sh
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+declare -F check_result && report_func=check_result || report_func=report_result
+
 # include beaker environment
-. /usr/bin/rhts-environment.sh      || exit 1
+if ! (($is_rhivos)); then
+	. /usr/bin/rhts-environment.sh  || exit 1
+fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 set -o pipefail
 
 OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile}
+
+# OSTree cannot use /mnt/testarea/ as $tmpdir since it is not a permanet storage
+if stat /run/ostree-booted > /dev/null 2>&1; then
+	OUTPUTFILE=$PWD/runtest.log
+fi
+
 TASKID=${TASKID:-UNKNOWN}
+ARCH=${ARCH:-$(arch)}
 NODES=$(numactl -H | grep available | cut -d ' ' -f 2)
 
 tmpdir=$(dirname $OUTPUTFILE)/gigantic_$TASKID
@@ -49,7 +63,7 @@ function system_check()
 	fi
 
 	if [ $TESTSKIP -eq 1 ]; then
-		report_result Test_Skipped PASS 99
+		$report_func Test_Skipped PASS 99
 		exit 0
 	fi
 }
@@ -197,7 +211,7 @@ rlPhaseStartTest
 rlPhaseEnd
 
 if [ "$GIGANTIC" != "exit" ]; then
-	rhts-reboot
+	rstrnt-reboot
 fi
 
 rlPhaseStartCleanup

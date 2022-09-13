@@ -1,0 +1,19 @@
+summary: Verifies gigantic page parameter works.
+discover:
+    how: fmf
+    test:
+        - /general/memory/function/gigantic-page
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [grubby, numactl]
+environment-file:
+    - ./general/memory/function/gigantic-page/plans/tmt.env

@@ -1,0 +1,14 @@
+[General]
+name=general/memory/function/gigantic-page
+owner=Li Wang <liwang@redhat.com>
+description=Verifies gigantic page parameter works.
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+dependencies=grubby;numactl
+repoRequires=automotive/include
+max_time=60m
+use_pty=false
