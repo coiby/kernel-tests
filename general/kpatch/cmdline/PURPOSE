@@ -1,0 +1,13 @@
+PURPOSE of cmdline
+Description: Kpatch cmdline function test
+Author: Chao Ye <cye@redhat.com>
+
+Pluged stress into the test. that meaned, when
+load/unload the module, there are background
+stress.
+When using livepatch in-kernel. It's interesting
+that it will be a transition, not a one time
+patching procedure.
+
+Update Jun 9, 2022
+Using test_data_new instead of test_cmdline_string, since it removed from rhel-9

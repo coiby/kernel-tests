@@ -1,0 +1,8 @@
+Use upstream kpatch-build to buikd kpatch.ko and kpatch-patch.ko
+To find the gcc issue or kpatch-build issue.
+
+patches is for storing patches which would block the patching
+prodecure. From rhel-7.5, kpatch tool can patch by signaling to
+the blocked task(STOP,CONT pair). Other patches are from kpatch
+git hub test/integration/centos, and covered by kpatch-test in
+the repo.
