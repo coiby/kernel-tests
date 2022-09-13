@@ -1,0 +1,11 @@
+summary: Verifies gigantic page parameter works.
+description: Verifies gigantic page parameter works.
+contact: Li Wang <liwang@redhat.com>
+component:
+  - kernel
+path: /general/memory/function/gigantic-page
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 60m
+extra-summary: /general/memory/function/gigantic-page
+extra-task: /general/memory/function/gigantic-page
