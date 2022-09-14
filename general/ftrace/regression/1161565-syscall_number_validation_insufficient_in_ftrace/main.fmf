@@ -1,0 +1,23 @@
+summary: Bug 1161565 - kernel insufficient syscall number validation in perf and ftrace subsystems
+description: |+
+    Bug 1161565 - kernel: insufficient syscall number validation in perf and ftrace subsystems
+    https://bugzilla.redhat.com/show_bug.cgi?id=1161565
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+  - kernel
+require:
+  - gcc
+  - trace-cmd
+test: ./runtest.sh
+framework: beakerlib
+duration: 30m
+tier: 2
+tag: [tier2]
+enabled: true
+adjust:
+  enabled: false
+  when: arch != x86_64
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1161565
+extra-summary: /kernel/general/ftrace/regression/1161565-syscall_number_validation_insufficient_in_ftrace
+extra-task: /kernel/general/ftrace/regression/1161565-syscall_number_validation_insufficient_in_ftrace
