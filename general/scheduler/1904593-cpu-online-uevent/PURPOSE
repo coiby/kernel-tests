@@ -1,0 +1,3 @@
+This is a regression test for bz1904593. It rapidly offlines and onlines a cpu 
+while setting its affinity. If the affinity is set too quickly after the cpu
+comes online it can fail. This tests for a regression of the issue.
