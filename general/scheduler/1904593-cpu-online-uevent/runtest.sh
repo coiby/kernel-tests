@@ -1,4 +1,4 @@
-# /bin/bash
+#! /bin/bash
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -30,7 +30,7 @@
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-origin_nr_cpus=$(cat /proc/cpuinfo | grep -w ^processor | wc -l)
+origin_nr_cpus=$(grep -c -w ^processor /proc/cpuinfo)
 
 rlJournalStart
     rlPhaseStartTest
