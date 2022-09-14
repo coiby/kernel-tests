@@ -1,0 +1,14 @@
+[General]
+name=sched nohz_tick_timer
+owner=Chunyu Hu <chuhu@redhat.com>
+description=test scheduler nohz mode tick and other timer issues
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=1h
+dependencies=gcc;libgcc;glibc-devel;rpm-build;psmisc;numactl-devel
+softDependencies=rt-setup;trace-cmd;realtime-setup;git;glibc
+repoRequires=general/include;general/scheduler/include

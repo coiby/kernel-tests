@@ -1,0 +1,4 @@
+
+We need some processes to test the scheduler statistics, behaviors or
+processs behavior. So we store some specail test processes here, make
+it possible for us to reuse these factors for different test aspects.

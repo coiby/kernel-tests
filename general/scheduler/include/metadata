@@ -1,0 +1,14 @@
+[General]
+name=kernel/general/scheduler/include
+owner=Chunyu Hu <chuhu@redhat.com>
+description=scheduler test helper functions
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=1h
+dependencies=gcc;libgcc;glibc-devel;rpm-build;psmisc;
+softDependencies=rt-setup;trace-cmd
+repoRequires=general/include

@@ -1,0 +1,7 @@
+Verify workqueue and timer won't run on nohz cpu which has cpu hog process on.
+Verify the tick is stopped as expected in nohz_full cpus
+
+PARAMETERS
+
+SKIP_CASE="bzxxxxx"
+CASE_LIST="bzxxxxx"

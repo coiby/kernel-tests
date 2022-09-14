@@ -1,0 +1,5 @@
+run upstream trinity to find broken syscalls
+This refers Jan stancek's trinity test in in syscalls/rhel7
+
+To extract code from git to tgz:
+git archive --format=tgz --output trinity-9f6f9f916da3.tgz --prefix=trinity-9f6f9f916da3/ HEAD

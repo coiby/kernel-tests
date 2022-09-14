@@ -1,0 +1,31 @@
+From e20f93d69bbdcca35ba7c69375921afdc70a0df6 Mon Sep 17 00:00:00 2001
+From: Chunyu Hu <chuhu@redhat.com>
+Date: Thu, 27 Jun 2019 16:24:39 +0800
+Subject: [PATCH] trinity: define TRINITY_PF_MAX as 45
+
+The PF_MAX is defined as 45 in mainline kernel, while TRINITY_PF_MAX is 44
+currently, so a segment fault was hit in do_random_sso(), where PF_MAX is
+used to generate the net_protocols[] index, can be 44 at most, out of the
+bounder of the array.
+
+Signed-off-by: Chunyu Hu <chuhu@redhat.com>
+---
+ include/net.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net.h b/include/net.h
+index 6a535be2..6ba68eae 100644
+--- a/include/net.h
++++ b/include/net.h
+@@ -15,7 +15,7 @@ extern unsigned int specific_domain;
+ 
+ /* glibc headers might be older than the kernel, so chances are we know
+  * about more protocols than glibc does. So we define our own PF_MAX */
+-#define TRINITY_PF_MAX 44
++#define TRINITY_PF_MAX 45
+ 
+ #define PF_NOHINT (-1)
+ 
+-- 
+2.21.0
+
