@@ -6,7 +6,12 @@ KPARAM=stacktrace
 
 rlJournalStart
     # Require CONFIG_STACK_TRACE=y in kernel config
-    if grep --quiet "CONFIG_STACK_TRACER=y" /boot/config-$(uname -r); then
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        STACK_TRACER=`grep --quiet "CONFIG_STACK_TRACER=y" /lib/modules/$(uname -r)/config`
+    else
+        STACK_TRACER=`grep --quiet "CONFIG_STACK_TRACER=y" /boot/config-$(uname -r)`
+    fi
+    if ${STACK_TRACER}; then
         rlPhaseStartTest "Sanity test for ${KPARAM}"
             rlRun "echo 1 > /proc/sys/kernel/stack_tracer_enabled"
             sleep 2
