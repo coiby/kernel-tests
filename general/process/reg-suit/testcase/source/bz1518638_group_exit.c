@@ -1,0 +1,31 @@
+#include <asm/ldt.h>
+#include <pthread.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <sys/syscall.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+static void *fork_thread(void *_arg)
+{
+	fork();
+}
+
+int main(void)
+{
+	struct user_desc desc = { .entry_number = 8191 };
+
+	syscall(__NR_modify_ldt, 1, &desc, sizeof(desc));
+
+	for (;;) {
+		if (fork() == 0) {
+			pthread_t t;
+
+			srand(getpid());
+			pthread_create(&t, NULL, fork_thread, NULL);
+			usleep(rand() % 10000);
+			syscall(__NR_exit_group, 0);
+		}
+		wait(NULL);
+	}
+}
