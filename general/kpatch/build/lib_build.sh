@@ -7,14 +7,8 @@ KPATCH_LOCATION=${KPATCH_LOCATION:-"/data/kpatch"}
 KPATCH_SHARE="${NFS_SHARE}:${KPATCH_LOCATION}"
 KPATCH_MNT="/mnt/kpatch"
 
-function InstallDeps() {
+function create_build_dir(){
     mkdir -p ${built_kpatch_patch}
-    yum -y install git make openssl-devel
-    yum -y install gcc-plugin-devel
-    yum -y install flex
-    yum -y install openssl
-    yum -y install libtraceevent-devel
-    yum -y install dwarves
 }
 
 function upload_modules() {

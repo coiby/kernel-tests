@@ -39,7 +39,7 @@ KPATCH_SKIP_TEST="${KPATCH_SKIP_TEST:-}"
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "InstallDeps" || rlLogWarning "Install some depdendecies failed, still proceeding with testing"
+        rlRun "create_build_dir"
         if [ ! -e "kpatch/.git" ]; then
             if [ ! -z "${KPATCH_REV}" ]; then
                 rlRun "git clone -b ${KPATCH_REV} ${KPATCH_REPO}" || rlDie
