@@ -7,7 +7,11 @@
 rlJournalStart
     if [ -f /sys/kernel/debug/tracing/saved_cmdlines_size ]; then
     rlPhaseStartTest "Testing saved_cmdlines_size"
-        yum install -y trace-cmd
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            rpm-ostree -A --idempotent --allow-inactive install trace-cmd
+        else
+            yum install -y trace-cmd
+        fi
         trace-cmd reset
         rlRun "echo 1 > /sys/kernel/debug/tracing/events/enable"
         rlRun "echo 128 > /sys/kernel/debug/tracing/saved_cmdlines_size"
