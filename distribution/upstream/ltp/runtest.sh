@@ -36,15 +36,16 @@ function test_msg()
 #
 # NOTE: We use a tested commit to avoid that breakage in LTP's master branch
 #       which may make our test suites less stable
-LTP_REPO_COMMIT_ID=${LTP_REPO_COMMIT_ID:-"48cfd7a9977e6268b4aa2600608cebad7e0e42b8"}
+LTP_COMMIT_ID=${LTP_COMMIT_ID:-"48cfd7a9977e6268b4aa2600608cebad7e0e42b8"}
+LTP_REPO_ADDR=${LTP_REPO_ADDR:-"https://github.com/linux-test-project/ltp"}
 function ltp_test_build()
 {
 	# NOTE: Skip to built and install ltp if it is done as we split a
 	#       single task to run LTP tests into multiple tasks. For more
 	#       details, please refer to:
 	#       o https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db/-/issues/54
-	if [ -f ${LTPDIR}/runltp ] && grep -q "${LTP_REPO_COMMIT_ID}" ${LTPDIR}/ltp_version; then
-		test_msg pass "LTP (${LTP_REPO_COMMIT_ID}) has been built and installed!"
+	if [ -f ${LTPDIR}/runltp ] && grep -q "${LTP_COMMIT_ID}" ${LTPDIR}/ltp_version; then
+		test_msg pass "LTP (${LTP_COMMIT_ID}) has been built and installed!"
 		return
 	fi
 
@@ -57,14 +58,14 @@ function ltp_test_build()
 	if [ -f ltp/.git/config ]; then
 		pushd ltp; git pull  > /dev/null 2>&1; popd
 	else
-		git clone https://github.com/linux-test-project/ltp ltp \
+		git clone $LTP_REPO_ADDR ltp \
 		    > /dev/null 2>&1 || \
 		    test_msg fail "git clone ltp upstream failed"
 		test_msg pass "git clone LTP upstream"
 	fi
 
 	pushd ltp > /dev/null 2>&1
-	git checkout $LTP_REPO_COMMIT_ID
+	git checkout $LTP_COMMIT_ID
 
 	# Timing on systems with shared resources (and high steal time) is not accurate, apply patch for non bare-metal machines
 	patch -p1 < ../patches/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
@@ -80,8 +81,8 @@ function ltp_test_build()
 	make -j$CPUS_NUM                    &> buildlog.txt  || if cat buildlog.txt;  then test_msg fail "build   ltp failed"; fi
 	make install                        &> buildlog.txt  || if cat buildlog.txt;  then test_msg fail "install ltp failed"; fi
 	popd > /dev/null 2>&1
-	test_msg pass "LTP (${LTP_REPO_COMMIT_ID}) build/install successful"
-	echo "${LTP_REPO_COMMIT_ID}" > ${LTPDIR}/ltp_version
+	test_msg pass "LTP (${LTP_COMMIT_ID}) build/install successful"
+	echo "${LTP_COMMIT_ID}" > ${LTPDIR}/ltp_version
 }
 
 function hugetlb_nr_setup()
