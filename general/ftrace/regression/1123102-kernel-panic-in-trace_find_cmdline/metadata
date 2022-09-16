@@ -7,11 +7,12 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=./runtest.sh
+entry_point=bash -x ./runtest.sh
 max_time=30m
-dependencies=
+dependencies=gcc
 repoRequires=
 TestVersion=1.0
-Type=Regression
+Path=/kernel/general/ftrace/regression/1123102-kernel-panic-in-trace_find_cmdline
+Type=KernelTier2
 RunFor=kernel
 Priority=Normal

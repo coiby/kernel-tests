@@ -1,0 +1,16 @@
+summary: 'Bug 591780 - The kernel crashes if strace is executed while ftrace is enabled'
+description:
+contact: Yanzhen Ren<yren@redhat.com>
+test: bash -x ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - make
+  - trace-cmd
+duration: 10m
+tier: 2
+tag: [tier2]
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=591780
+extra-summary: /kernel/general/ftrace/regression/591780-strace-cause-panic-when-ftrace-enabled
+extra-task: /kernel/general/ftrace/regression/591780-strace-cause-panic-when-ftrace-enabled

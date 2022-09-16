@@ -1,0 +1,1 @@
+Bug 591780 - The kernel crashes if strace is executed while ftrace is enabled
