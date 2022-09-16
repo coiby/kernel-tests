@@ -1,0 +1,13 @@
+[General]
+name=storage/ssd/nvme_sg_inq_scsi_vpd_info_bz1749524
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvme sg_inq for SCSI VPD information
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=sg3_utils
+max_time=5m
