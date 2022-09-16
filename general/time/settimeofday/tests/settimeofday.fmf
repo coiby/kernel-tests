@@ -1,0 +1,11 @@
+summary: kernel syscall gettimeofday()/settimeofday() test
+description: kernel syscall gettimeofday()/settimeofday() test
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /general/time/settimeofday
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 1h
+extra-summary: /general/time/settimeofday
+extra-task: /general/time/settimeofday

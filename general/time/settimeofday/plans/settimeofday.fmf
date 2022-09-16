@@ -1,0 +1,19 @@
+summary: kernel syscall gettimeofday()/settimeofday() test
+discover:
+    how: fmf
+    test:
+        - /general/time/settimeofday
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [gcc]
+environment-file:
+    - ./general/time/settimeofday/plans/tmt.env

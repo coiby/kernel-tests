@@ -26,7 +26,7 @@ export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{
 
 gcc -o settimeofday settimeofday.c
 
-if [ $rhel_major -ge 8 ]; then
+if (type systemctl); then
     systemctl stop chronyd
     runtest
     systemctl start chronyd

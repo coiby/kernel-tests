@@ -1,0 +1,19 @@
+summary: clock_getres() function check
+discover:
+    how: fmf
+    test:
+        - /general/time/clock_getres
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [gcc, make]
+environment-file:
+    - ./general/time/clock_getres/plans/tmt.env

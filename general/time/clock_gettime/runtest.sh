@@ -55,7 +55,7 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
-if [ $rhel_major -lt 8 ]; then
+if ! (type systemctl); then
     service ntpd stop >& /dev/null
     runtest
     service ntpd start >& /dev/null

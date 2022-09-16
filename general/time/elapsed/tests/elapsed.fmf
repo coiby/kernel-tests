@@ -1,0 +1,11 @@
+summary: Run elapsed time tests
+description: Run elapsed time tests
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /general/time/elapsed
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 20m
+extra-summary: /general/time/elapsed
+extra-task: /general/time/elapsed

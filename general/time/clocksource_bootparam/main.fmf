@@ -1,9 +1,0 @@
-summary: test clocksource=tsc
-contact: Qiao Zhao <qzhao@redhat.com>
-component:
-  - kernel
-test: bash -x ./runtest.sh
-framework: shell
-duration: 1h
-extra-summary: /kernel-tests/general/time/clocksource_bootparam
-extra-task: /kernel-tests/general/time/clocksource_bootparam

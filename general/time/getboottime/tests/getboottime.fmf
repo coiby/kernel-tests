@@ -1,0 +1,11 @@
+summary: kernel function getboottime testing
+description: kernel function getboottime testing
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /general/time/getboottime
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 2h
+extra-summary: /general/time/getboottime
+extra-task: /general/time/getboottime

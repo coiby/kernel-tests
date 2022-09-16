@@ -1,0 +1,19 @@
+summary: warp_clock function test by using the hwclock command
+discover:
+    how: fmf
+    test:
+        - /general/time/hwclock
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [gcc]
+environment-file:
+    - ./general/time/hwclock/plans/tmt.env

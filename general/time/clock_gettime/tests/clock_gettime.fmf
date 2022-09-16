@@ -1,0 +1,11 @@
+summary: Test time backward for clock_gettime()
+description: Test time backward for clock_gettime()
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /general/time/clock_gettime
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 1h
+extra-summary: /general/time/clock_gettime
+extra-task: /general/time/clock_gettime
