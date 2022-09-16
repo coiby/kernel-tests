@@ -1,9 +1,0 @@
-summary: warp_clock function test by using the hwclock command
-contact: Qiao Zhao <qzhao@redhat.com>
-component:
-  - kernel
-test: bash -x ./runtest.sh
-framework: shell
-duration: 240m
-extra-summary: /kernel-tests/general/time/hwclock
-extra-task: /kernel-tests/general/time/hwclock

@@ -1,0 +1,11 @@
+summary: clock_getres() function check
+description: clock_getres() function check
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /general/time/clock_getres
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 3h
+extra-summary: /general/time/clock_getres
+extra-task: /general/time/clock_getres

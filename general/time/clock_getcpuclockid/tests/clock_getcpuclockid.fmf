@@ -1,0 +1,11 @@
+summary: clock_getcpuclockid() returns CPU-time clock for a process
+description: clock_getcpuclockid() returns CPU-time clock for a process
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /general/time/clock_getcpuclockid
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 30m
+extra-summary: /general/time/clock_getcpuclockid
+extra-task: /general/time/clock_getcpuclockid

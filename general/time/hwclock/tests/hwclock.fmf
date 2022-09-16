@@ -1,0 +1,11 @@
+summary: warp_clock function test by using the hwclock command
+description: warp_clock function test by using the hwclock command
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /general/time/hwclock
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 2h
+extra-summary: /general/time/hwclock
+extra-task: /general/time/hwclock
