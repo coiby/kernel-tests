@@ -23,6 +23,12 @@ if [ -z "$TEST_DEVS" ]; then
 	rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 fi
+TEST_DEVS_TMP="$TEST_DEVS"
+for dev in $TEST_DEVS_TMP; do
+	if [[ "$ROOT_DISK" == "$dev" ]]; then
+		TEST_DEVS=${TEST_DEVS/$ROOT_DISK/}
+	fi
+done
 
 for dev in $TEST_DEVS; do
 	TEST_DEVS_LIST+="/dev/$dev "
