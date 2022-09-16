@@ -140,12 +140,12 @@ for DISK in $DISKS; do
 	tok "nvme reset ${NVME_CHAR}"
 
 	if [[ $MODEL =~ "Dell Express Flash PM1725a" ]]; then
-		tlog "INFO: skip subsystem-reset on rdma-perf-06|rdma-perf-07|storageqe-62, Bug 1699599"
+		tlog "Skip nvme subsystem-reset on $MODEL, Bug 1699599"
 	elif [[ $MODEL =~ "INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 " ]]; then
 		tnot "nvme subsystem-reset ${NVME_CHAR}"
-		tlog "INFO: subsystem-reset not support on $DISK \"$MODEL\""
-	elif [[ $MODEL =~ "Dell Ent NVMe v2 AGN RI U.2"|"SAMSUNG MZQL2960HCJR-00A07" ]]; then
-		tlog "INFO: subsystem-reset on $DISK lead disk disappeared, BZ2093136"
+		tlog "nvme subsystem-reset not support on $DISK, MODEL:\"$MODEL\""
+	elif [[ $MODEL =~ "Dell Ent NVMe v2 AGN RI U.2"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI" ]]; then
+		tlog "nvme subsystem-reset on $DISK lead disk disappeared, BZ2093136"
 	else
 		tok "nvme subsystem-reset ${NVME_CHAR}"
 	fi
