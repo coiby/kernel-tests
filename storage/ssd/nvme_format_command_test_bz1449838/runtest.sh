@@ -58,7 +58,14 @@ for DISK in $DISKS; do
 								continue
 							fi
 							sleep 1
-							tok "dd if=/dev/$DISK of=/dev/null bs=4096 count=100000"
+							if [[ $lbaf == 0 && $ses == 0 && $pi == 0 && $pil == 0 && $ms == 0 ]]; then
+								if [[ $MODEL =~ "Micron_9300_MTFDHAL3T8TDP" ]]; then
+									trun "dd if=/dev/$DISK of=/dev/null bs=4096 count=100000"
+								else
+									tok "dd if=/dev/$DISK of=/dev/null bs=4096 count=100000"
+								fi
+
+							fi
 							if [ $? -ne 0 ]; then
 								tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms with dd operation failed" | tee -a dd_fail
 							fi
