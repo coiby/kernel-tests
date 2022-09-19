@@ -36,7 +36,7 @@ function test_msg()
 #
 # NOTE: We use a tested commit to avoid that breakage in LTP's master branch
 #       which may make our test suites less stable
-LTP_COMMIT_ID=${LTP_COMMIT_ID:-"48cfd7a9977e6268b4aa2600608cebad7e0e42b8"}
+LTP_COMMIT_ID=${LTP_COMMIT_ID:-"master"}
 LTP_REPO_ADDR=${LTP_REPO_ADDR:-"https://github.com/linux-test-project/ltp"}
 function ltp_test_build()
 {
