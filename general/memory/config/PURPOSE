@@ -1,0 +1,10 @@
+PURPOSE of configuration
+Description: This is a general memory configuration test suit
+Author: Wang Shu <shuwang@redhat.com>
+
+Parameters
+
+NEGATIVE=1
+	Run negative test cases, negative test case(panic is expected)
+	needs to check this variable to decide run or not run, see
+	debug_pagealloc.sh

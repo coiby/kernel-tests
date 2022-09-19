@@ -1,0 +1,13 @@
+[General]
+name=memory parameters test
+owner=mm-qe <mm-qe@redhat.com>
+description=memory sysctl/cmdline test suite
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=6h
+dependencies=psmisc;numactl-devel;gcc;glibc;sysstat;bc;kernel-devel
+repoRequires=general/include
