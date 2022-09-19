@@ -11,3 +11,4 @@ entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
 dependencies=gcc;gcc-c++;blktrace;nvme-cli
 max_time=4h
+use_pty=false

@@ -11,3 +11,4 @@ entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
 dependencies=sg3_utils
 max_time=5m
+use_pty=false
