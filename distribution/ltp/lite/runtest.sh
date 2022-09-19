@@ -134,6 +134,11 @@ function exclude_disruptive_for_kt1()
 			sed -i 's/mtest01w mtest01 -p80 -w/mtest01w sh -c "mtest01 -p80 -w || true"/' "$runtest"
 		fi
 	fi
+
+	if cki_is_vm; then
+		# fork13 takes 1 hour on vm, quite too long for KT1 test
+		sed -i 's/fork13 fork13/#DISABLED fork13 fork13/' "$runtest"
+	fi
 }
 
 function runtest_prepare()
