@@ -191,6 +191,17 @@ RprtRslt ()
     # Always upload parsed test log for those failed test cases
     GetFailureLog $logfile_run "None" > $logfile_fail
     [ -s $logfile_fail ] && SubmitLog $logfile_fail
+    failed_tests=$(ls *.fail.log)
+    for failed_test in $failed_tests; do
+        # skip logfile_fail as it is not a test case fail log
+        if [ "$failed_test" == "$logfile_fail" ]; then
+            continue
+        fi
+        SubmitLog $failed_test
+        # extract test case name from test case fail log
+        # don't wan't to upload outputfile
+        rstrnt-report-result -o /dev/null "${failed_test%.fail.log}" FAIL
+    done
 
     # File the results in the database
     if [ "$result" = "PASS" ]; then
