@@ -26,6 +26,9 @@
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            rlRun "export KCONFIG_PATH=/usr/lib/ostree-boot/config-$(uname -r)"
+        fi
         rlRun "git clone https://github.com/linux-test-project/ltp.git"
         rlRun "cd ltp"
         rlRun "make -s autotools"
