@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=make run
 max_time=1h
-dependencies=gcc;libgcc;glibc-devel;rpm-build;psmisc;numactl-devel
-softDependencies=rt-setup;trace-cmd;realtime-setup;git;glibc
+dependencies=gcc;libgcc;glibc-devel;rpm-build;psmisc
+softDependencies=trace-cmd;git;glibc;numactl-devel
 repoRequires=general/include;general/scheduler/include
