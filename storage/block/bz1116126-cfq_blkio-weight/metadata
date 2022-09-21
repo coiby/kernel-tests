@@ -1,0 +1,13 @@
+[General]
+name=storage/block/bz1116126-cfq_blkio-weight
+owner=Changhui Zhong <czhong@redhat.com>
+description=bz1116126-cfq_blkio-weight
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=
+repoRequires=cki_lib
+max_time=4h

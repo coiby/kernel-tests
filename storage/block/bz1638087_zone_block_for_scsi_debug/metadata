@@ -1,0 +1,13 @@
+[General]
+name=storage/block/bz1638087_zone_block_for_scsi_debug
+owner=Changhui Zhong <czhong@redhat.com>
+description=bz1638087_zone_block_for_scsi_debug
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=autoconf;autoconf-archive;automake;libtool
+repoRequires=cki_lib
+max_time=1h

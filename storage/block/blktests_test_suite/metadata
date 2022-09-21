@@ -1,0 +1,13 @@
+[General]
+name=storage/block/blktests_test_suite
+owner=Changhui Zhong <czhong@redhat.com>
+description=Storage block test suite
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=blktrace;fio;git;nvme-cli;xfsprogs;parted;docbook-utils.noarch;autoconf;automake;make;libtool;kmod-devel;libnl3-devel;libevent-devel;glib2-devel;json-c-devel;libtirpc-devel;rpcgen;glusterfs-api-devel;libcurl-devel;libuv-devel;nbdkit;autoconf-archive;elfutils-libelf-devel;gcc;gcc-c++;bison;flex
+repoRequires=cki_lib
+max_time=4h
