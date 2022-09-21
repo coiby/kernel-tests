@@ -1,0 +1,14 @@
+[General]
+name=rt-tests/template
+owner=Qiao Zhao <qzhao@redhat.com>
+description=This is a template test case. Please update this file's contents.
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=wget;gcc
+max_time=1h
+use_pty=false
+repoRequires=cki_lib;rt-tests/include;automotive/include
