@@ -236,18 +236,60 @@ install_repos()
 {
     id=$(grep ^ID= /etc/os-release | cut -d = -f 2)
     major=$(grep ^VERSION_ID= /etc/os-release | cut -d = -f 2 | cut -d \" -f 2 | cut -d . -f 1)
-    karch=$(uname -i)
+    karch=$(arch)
 
     if kernel_automotive; then
-        sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
-        if ! rpm -q dnf-plugins-core > /dev/null 2>&1; then
-            if stat /run/ostree-booted > /dev/null 2>&1; then
-                rpm-ostree -A --idempotent --allow-inactive install 'dnf-command(config-manager)'
-            else
-                dnf install 'dnf-command(config-manager)' -y
+        if [[ ${id} =~ "rhel" ]]; then
+            if ! ls /etc/yum.repos.d/rhel.repo > /dev/null 2>&1; then
+                touch /etc/yum.repos.d/rhel.repo
+ed /etc/yum.repos.d/rhel.repo << 'EOF'
+a
+[baseos-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/${karch}/os
+enabled=1
+gpgcheck=0
+[appstream-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/${karch}/os/
+enabled=1
+gpgcheck=0
+[crb-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/${karch}/os/
+enabled=1
+gpgcheck=0
+[baseos-debug-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/${karch}/debug/tree
+enabled=1
+gpgcheck=0
+[appstream-debug-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/${karch}/debug/tree
+enabled=1
+gpgcheck=0
+[crb-debug-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/${karch}/debug/tree
+enabled=1
+gpgcheck=0
+.
+w
+EOF
             fi
+            if ! rpm -q dnf-plugins-core > /dev/null 2>&1; then
+                if stat /run/ostree-booted > /dev/null 2>&1; then
+                    rpm-ostree -A --idempotent --allow-inactive install 'dnf-command(config-manager)'
+                else
+                    dnf install 'dnf-command(config-manager)' -y
+                fi
+            fi
+        else
+            sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
+            if ! rpm -q dnf-plugins-core > /dev/null 2>&1; then
+                if stat /run/ostree-booted > /dev/null 2>&1; then
+                    rpm-ostree -A --idempotent --allow-inactive install 'dnf-command(config-manager)'
+                else
+                    dnf install 'dnf-command(config-manager)' -y
+                fi
+            fi
+            dnf config-manager --set-enabled crb
         fi
-        dnf config-manager --set-enabled crb
         if ! ls /etc/yum.repos.d/*epel* > /dev/null 2>&1; then
             if stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm-ostree -A --idempotent --allow-inactive install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${major}.noarch.rpm https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-${major}.noarch.rpm
@@ -258,8 +300,12 @@ install_repos()
         if ! ls /etc/yum.repos.d/*buildlogs* > /dev/null 2>&1 && ! ls /etc/yum.repos.d/*distro* > /dev/null 2>&1; then
             dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main
             dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main/debug
+            dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main
+            dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main/debug
             sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main.repo
             sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main_debug.repo
+            sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main.repo
+            sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main_debug.repo
         fi
     fi
 }
