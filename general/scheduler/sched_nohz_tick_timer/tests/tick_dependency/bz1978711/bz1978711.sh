@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function bz1978711()
 {
 	git clone git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git

@@ -1,3 +1,4 @@
+#!/bin/bash
 
 loop=${1:-1}
 irq=${2:-Function}

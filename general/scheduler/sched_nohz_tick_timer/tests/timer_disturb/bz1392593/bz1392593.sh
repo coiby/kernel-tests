@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function bz1392593()
 {
 	rlLogInfo "Start stress-ng cpu stressor stress-ng -c 1 -t 602 &"

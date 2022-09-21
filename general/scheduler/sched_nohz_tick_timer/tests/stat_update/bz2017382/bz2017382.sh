@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function bz2017382()
 {
 	local pid

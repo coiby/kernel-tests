@@ -1185,10 +1185,12 @@ function ignore_falsepositive_knownissues()
 
         for list_name in $list_names; do
                 local i
+                # shellcheck disable=SC1087
                 local nr_items="$(eval echo \${#$list_name[*]})"
                 local line=""
                 echo $list_name: $nr_items items
                 for ((i=0; i<nr_items; i++)); do
+                        # shellcheck disable=SC1087
                         line="$(eval echo \${$list_name[$i]})"
                         grep -Eq "^$line" $filter_cfg && echo "\"$line\" already in $filter_cfg" && continue
                         echo "$line" >> $filter_cfg
