@@ -23,7 +23,11 @@ install_depends_package()
     echo "Installing rpm(s) $*"
     if [[ $# -gt 0 ]]; then
         for pkg in $*; do
-            rpm -q "$pkg" || yum install -y "$pkg" || echo "Install pakcage $pkg failed!"
+            if stat /run/ostree-booted > /dev/null 2>&1; then
+                rpm -q "$pkg" || rpm-ostree -A --idempotent --allow-inactive install "$pkg" || echo "Install pakcage $pkg failed!"
+            else
+                rpm -q "$pkg" || yum install -y "$pkg" || echo "Install pakcage $pkg failed!"
+            fi
         done
     fi
 }
