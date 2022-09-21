@@ -48,7 +48,7 @@ if [ -z "${KPATCH_MODULE}" ]; then
     if rpm -qa | grep kpatch-patch ; then
         KPATCH_PATH="/usr/lib/kpatch/$(uname -r)"
         KPATCH_MODULE=$(ls ${KPATCH_PATH} | grep kpatch- | head -n 1 | sed -e 's/.ko//')
-    yum -y install $(rpm -qa | grep kpatch-patch |grep -v debug | sed "s/-/-debuginfo-/4")
+        yum -y install $(rpm -qa | grep kpatch-patch |grep -v debug | sed "s/-/-debuginfo-/4")
     else
         KPATCH_MODULE="test-cmdline-string"
     fi
@@ -130,8 +130,8 @@ rlJournalStart
         if [ -d ${KPATCH_PATH} ] && ls ${KPATCH_PATH}/*ko > /dev/null ; then
             echo "Test module is existed"
         elif ! mount | grep mnt/kpatch; then
-        mount -t nfs "${KPATCH_SHARE}" "${KPATCH_MNT}" && { MOUNT_FLAG=1; echo "succeeded"; } || echo "failed"
-        KPATCH_PATH="${KPATCH_MNT}/$(uname -r)"
+            mount -t nfs "${KPATCH_SHARE}" "${KPATCH_MNT}" && { MOUNT_FLAG=1; echo "succeeded"; } || echo "failed"
+            KPATCH_PATH="${KPATCH_MNT}/$(uname -r)"
         else
             echo "Already mounted $(mount | grep kpatch)"
         fi
@@ -152,7 +152,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "Kpatch compat with perf"
-    setup_perf
+        setup_perf
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
         rlRun "perf stat -e probe:cmdline_proc_show  -- cat ${TARGET_FILE} 2>&1| grep '1.*probe:cmd' -o"
         rlRun "perf probe --del 'probe:cmdline_proc_show'"
@@ -180,7 +180,7 @@ rlJournalStart
     rlPhaseStartTest "Kpatch compat with live crash"
         setup_crash
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
-    rlRun "crash -i ${crash_cmd}"
+        rlRun "crash -i ${crash_cmd}"
         rlRun "grep ${GREP_STR} ~/source" 0-255
         rlRun -l "cat ~/source" 0-255
     rlPhaseEnd
@@ -191,9 +191,9 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup
-    reset_trace_probes
+        reset_trace_probes
         [[ ! -z ${kpatch_install} ]] && rlRun "kpatch force unload ${KPATCH_MODULE//-/_}; kpatch uninstall ${KPATCH_MODULE//-/_}"
-    [ ${MOUNT_FLAG} == 1 ] && umount ${KPATCH_MNT}
+        [ ${MOUNT_FLAG} == 1 ] && umount ${KPATCH_MNT}
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText

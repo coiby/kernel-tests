@@ -100,7 +100,7 @@ prepare_patches() {
     ! test -e /usr/lib/kpatch/$(uname -r)/ &&  \
     rlRun "mkdir -p /usr/lib/kpatch/$(uname -r)/"
     rlRun "find ${built_kpatch_patch} -name kpatch.ko -exec \cp {} /usr/lib/kpatch/$(uname -r)/ \;" \
-    || rlDie "Can't install kpatch.ko"
+        || rlDie "Can't install kpatch.ko"
 
     local ko
     if [ "${USE_PATCHES}" = ALL ]; then
