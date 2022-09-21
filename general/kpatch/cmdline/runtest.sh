@@ -1,4 +1,4 @@
-# /bin/bash
+#! /bin/bash
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -85,7 +85,7 @@ prepare_patches() {
         echo "Test module is existed"
     elif ! mount | grep mnt/kpatch; then
         mount -t nfs "${KPATCH_SHARE}" "${KPATCH_MNT}" && { MOUNT_FLAG=1; echo "succeeded"; } || echo "failed"
-	built_kpatch_patch="${KPATCH_MNT}/$(uname -r)"
+        built_kpatch_patch="${KPATCH_MNT}/$(uname -r)"
     else
         echo "Already mounted $(mount | grep kpatch)"
     fi
@@ -100,7 +100,7 @@ prepare_patches() {
     ! test -e /usr/lib/kpatch/$(uname -r)/ &&  \
     rlRun "mkdir -p /usr/lib/kpatch/$(uname -r)/"
     rlRun "find ${built_kpatch_patch} -name kpatch.ko -exec \cp {} /usr/lib/kpatch/$(uname -r)/ \;" \
-	|| rlDie "Can't install kpatch.ko"
+    || rlDie "Can't install kpatch.ko"
 
     local ko
     if [ "${USE_PATCHES}" = ALL ]; then

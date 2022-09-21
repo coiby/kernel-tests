@@ -1,3 +1,4 @@
+#! /bin/bash
 built_kpatch_patch="/home/kpatch-patch-modules"
 KPATCH_MNT="/mnt/kpatch"
 
@@ -6,7 +7,7 @@ collect_dir="${curr_dir}/kpatch/test/integration"
 done_list=""
 
 while true; do
-    for p in $(ls ${collect_dir}/*.ko); do
+    for p in ${collect_dir}/*.ko; do
         if echo ${done_list} | grep -wq $p; then
             continue
         fi

@@ -1,4 +1,4 @@
-
+#! /bin/bash
 # Parse kpatch patch nvr to support update of kpatch-patch.
 # This uses the code from Job submitter.
 function process_kpatch_patch_nvr() {
