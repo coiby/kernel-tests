@@ -12,18 +12,6 @@
 . ../include/knownissue.sh   || exit 1
 . ../include/ltp-make.sh     || exit 1
 
-function test_build()
-{
-	# The test could be running on different path
-	# Just skip the build, but make sure the config is copied
-	if [ -f ${LTPDIR}/runltp ]; then
-		echo "LTP has been built and installed at ${LTPDIR}/runltp !"
-		return
-	fi
-
-	build-all
-}
-
 function fetch_testcase()
 {
 	if [ "$TESTARGS" ]; then
@@ -114,7 +102,7 @@ function ltp_test_begin()
 
 	PrintSysInfo
 
-	test_build	
+	build-all
 	fetch_testcase
 	knownissue_handle
 	skip_testcase
