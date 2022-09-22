@@ -1,0 +1,11 @@
+summary: Storage block zstd compression test on zram device
+contact: Changhui Zhong <czhong@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - e2fsprogs
+  - kmod
+  - rsync
+  - zstd
+extra-summary: storage/block/zstd_compression
+extra-task: storage/block/zstd_compression
