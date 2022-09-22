@@ -8,7 +8,12 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 export YUM_PROG=`type -P yum`
-if type -P dnf >/dev/null; then
+export YUM_OPTS="-y --skip-broken "
+if [[ -e /run/ostree-booted ]];then
+	YUM_PROG="$(type -P rpm-ostree)"
+	YUM_OPTS="--apply-live --idempotent --allow-inactive "
+fi
+if type -P dnf >/dev/null && ! [[ -e /run/ostree-booted ]]; then
 	YUM_PROG="$(type -P dnf) --setopt=strict=0"
 fi
 
@@ -93,7 +98,7 @@ function install_xfsprogs()
 		rc=$?
 	else
 		if ! rpm -q xfsprogs xfsprogs-devel >/dev/null 2>&1;then
-			$YUM_PROG -y install xfsprogs xfsprogs-devel
+			$YUM_PROG $YUM_OPTS install xfsprogs xfsprogs-devel
 		fi
 
 		if ! rpm -q xfsprogs xfsprogs-devel >/dev/null 2>&1;then
@@ -144,7 +149,7 @@ function install_xfsdump()
 		echoo $RPM
 		xlog yum install --nogpgcheck -y "$RPM"
 	else
-		$YUM_PROG -y install xfsdump
+		$YUM_PROG $YUM_OPTS install xfsdump
 	fi
 	# To propagate exit code
 	if rpm -q "${XFSDUMP}";then
@@ -205,7 +210,7 @@ function install_fio()
 {
 	FIO="fio"
 
-	yum install -y $FIO
+	$YUM_PROG $YUM_OPTS install $FIO
 	rpm -q --quiet "${FIO}"
 
 	fio -v
@@ -234,7 +239,7 @@ install_duperemove()
 	fi
 
 	# Try to install the package directly
-	$YUM_PROG -y install duperemove
+	$YUM_PROG $YUM_OPTS install duperemove
 	if rpm -q duperemove; then
 		return 0
 	fi
@@ -246,7 +251,7 @@ install_duperemove()
 	fi
 
 	# Install necessary build dependences
-	$YUM_PROG -y install glib2 glib2-devel libatomic sqlite sqlite-devel
+	$YUM_PROG $YUM_OPTS install glib2 glib2-devel libatomic sqlite sqlite-devel
 
 	# Build
 	pushd duperemove
