@@ -1,0 +1,31 @@
+From bef56059a4cd93a1d85104a0e63b5aa069125e82 Mon Sep 17 00:00:00 2001
+From: Chunyu Hu <chuhu@redhat.com>
+Date: Thu, 27 Jun 2019 11:37:55 +0800
+Subject: [PATCH] modify_ldt.c: workaround for struct statx broken from
+ glibc-2.28-66.el8
+
+glibc-2.28-66.el8, from this version. statx will be the version in
+kernel-headers, which will not define __s64 if __ASSEMBLY__ defined.
+So workaround this by move this outside of the __ASSEMBLY__ wrapped
+scope.
+
+Signed-off-by: Chunyu Hu <chuhu@redhat.com>
+---
+ syscalls/x86/modify_ldt.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/syscalls/x86/modify_ldt.c b/syscalls/x86/modify_ldt.c
+index f2eaf065..9163bc87 100644
+--- a/syscalls/x86/modify_ldt.c
++++ b/syscalls/x86/modify_ldt.c
+@@ -6,6 +6,7 @@
+  */
+ #include <stdlib.h>
+ #include <sys/types.h>
++#include <sys/stat.h>
+ #define __ASSEMBLY__ 1
+ #include <asm/ldt.h>
+ #include "sanitise.h"
+-- 
+2.21.0
+
