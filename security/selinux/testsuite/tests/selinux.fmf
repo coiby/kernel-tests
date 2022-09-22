@@ -3,7 +3,50 @@ contact: Linqing Lu <lilu@redhat.com>
 component:
   - kernel
 path: /security/selinux/testsuite
-require: [expect]
+require: 
+  - attr
+  - audit
+  - checkpolicy
+  - coreutils
+  - curl
+  - dosfstools
+  - e2fsprogs
+  - elfutils-libelf-devel
+  - expect
+  - gcc
+  - git
+  - grep
+  - iptables
+  - keyutils-libs-devel
+  - libbpf-devel
+  - libibverbs-devel
+  - libselinux-devel
+  - libselinux-utils
+  - libsepol-devel
+  - libuuid-devel
+  - lksctp-tools-devel
+  - make
+  - nc
+  - netlabel_tools
+  - net-tools
+  - nftables
+  - nmap-ncat
+  - perl-Test
+  - perl-Test-Harness
+  - perl-Test-Simple
+  - policycoreutils
+  - policycoreutils-devel
+  - python3-lxml
+  - quota
+  - rdma-core-devel
+  - selinux-policy-devel
+  - setools-console
+  - xfsprogs-devel
+
+#recommend:
+#  - policycoreutils-python
+#  - python2-lxml
+#  - jfsutils
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 1h
