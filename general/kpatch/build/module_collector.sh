@@ -8,7 +8,7 @@ done_list=""
 
 while true; do
     for p in ${collect_dir}/*.ko; do
-        if echo ${done_list} | grep -wq $p; then
+	    if (echo ${done_list} | grep -wq $p) || ! [ -f "$p" ]; then
             continue
         fi
         echo "Saving $p to $KPATCH_MNT/$(uname -r)"
