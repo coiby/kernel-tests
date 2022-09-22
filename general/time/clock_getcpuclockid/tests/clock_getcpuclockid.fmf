@@ -4,8 +4,12 @@ contact: Qiao Zhao <qzhao@redhat.com>
 component:
   - kernel
 path: /general/time/clock_getcpuclockid
-test: bash -x ./runtest.sh
-framework: beakerlib
+test: bash ./runtest.sh
+framework: shell
 duration: 30m
+require:
+  - gcc
+tier: 1
+tag: [tier1]
 extra-summary: /general/time/clock_getcpuclockid
 extra-task: /general/time/clock_getcpuclockid
