@@ -30,7 +30,11 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest
-        rlRun "rpm -Va kernel*"
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            rlRun "rpm -Va --nofiles kernel*"
+        else
+            rlRun "rpm -Va kernel*"
+        fi
     rlPhaseEnd
 
     rlPhaseStartCleanup
