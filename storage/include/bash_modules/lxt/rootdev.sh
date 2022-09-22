@@ -18,7 +18,7 @@
 test "$LXT_ROOTDEV" = 1 || return
 LXT_ROOTDEV=1
 
-source /mnt/tests/kernel/storage/include/bash_modules/lxt/tc.sh
+. ./tc.sh
 
 #
 # get the root disk of /
