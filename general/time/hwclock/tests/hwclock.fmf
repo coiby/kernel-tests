@@ -5,7 +5,11 @@ component:
   - kernel
 path: /general/time/hwclock
 test: bash -x ./runtest.sh
-framework: beakerlib
+framework: shell
 duration: 2h
+require:
+  - gcc
+tier: 1
+tag: [tier1]
 extra-summary: /general/time/hwclock
 extra-task: /general/time/hwclock

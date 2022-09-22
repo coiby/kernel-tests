@@ -5,5 +5,7 @@ component:
 test: bash -x ./runtest.sh
 framework: shell
 duration: 10m
+tier: 1
+tag: [tier1]
 extra-summary: /kernel-tests/general/time/timer_migration
 extra-task: /kernel-tests/general/time/timer_migration

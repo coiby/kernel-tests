@@ -28,9 +28,14 @@ component:
 path: /general/time/gettimeofday
 test: bash -x ./runtest.sh
 framework: shell
+duration: 120m
 recommend:
   - kernel-devel
   - gcc
-duration: 120m
+require:
+  - gcc
+  - kernel-devel
+tier: 1
+tag: [tier1]
 extra-summary: /general/time/gettimeofday
 extra-task: /general/time/gettimeofday
