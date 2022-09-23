@@ -1,0 +1,37 @@
+summary: Test schedule deadline with rt-app
+discover:
+    how: fmf
+    test:
+        - /general/scheduler/sched_rt_app
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package:
+          [
+              gcc,
+              glibc,
+              wget,
+              bc,
+              json-c,
+              json-c-devel,
+              cmake,
+              autoconf,
+              libgcc,
+              gcc-c++,
+              m4,
+              libtool,
+              git,
+              bzip2,
+              util-linux,
+              stress-ng,
+          ]
+environment-file:
+    - ./general/scheduler/sched_rt_app/plans/tmt.env
