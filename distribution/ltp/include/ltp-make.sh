@@ -117,6 +117,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0003-read_all-Allow-sys-power-wakeup_count.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0004-read_all-Prevent-FNM_EXTMATCH-redefinition.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-accept4_01-don-t-hardcode-port-number-for-t.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-fanotify10-Make-evictable-marks-test-more-r.patch
     fi
 
     if [ "$TESTVERSION" == "20220121" ]; then
