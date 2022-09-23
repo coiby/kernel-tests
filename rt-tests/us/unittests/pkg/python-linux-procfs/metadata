@@ -1,0 +1,14 @@
+[General]
+name=rt-tests/us/unittests/pkg/python-linux-procfs
+owner=Mike Stowell <mstowell@redhat.com>
+description=Unittest case for python-linux-procfs
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=python3 test.py
+repoRequires=rt-tests/us/unittests/framework
+softDependencies=python-linux-procfs;python3-linux-procfs
+max_time=10m
+use_pty=false

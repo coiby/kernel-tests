@@ -1,0 +1,12 @@
+summary: Template test case for RTS
+description: This is a template test case. Please update this file's contents.
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /rt-tests/template
+test: bash -x ./runtest.sh
+framework: beakerlib
+duration: 1h
+extra-summary: /rt-tests/template
+extra-task: /rt-tests/template
+
