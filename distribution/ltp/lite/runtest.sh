@@ -135,8 +135,8 @@ function exclude_disruptive_for_kt1()
 		fi
 	fi
 
-	if cki_is_vm; then
-		# fork13 takes 1 hour on vm, quite too long for KT1 test
+	if cki_is_vm || cki_is_kernel_debug; then
+		# fork13 takes 1 hour on vm or on debug kernel, quite too long for KT1 test
 		sed -i 's/fork13 fork13/#DISABLED fork13 fork13/' "$runtest"
 	fi
 }
