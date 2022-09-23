@@ -1,0 +1,14 @@
+[General]
+name=storage/ssd/nvme_mq_io_stress_testing
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=NVMe SSD mq io stress testing with Iozone/dt/fio
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=fio
+max_time=6h
+use_pty=false

@@ -1,0 +1,14 @@
+[General]
+name=storage/ssd/nvme_module_rmmod_insmod
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvme module rmmod/insmod stress test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=
+max_time=2h
+use_pty=false

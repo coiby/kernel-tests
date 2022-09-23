@@ -1,0 +1,14 @@
+[General]
+name=storage/ssd/nvme_cpu_random_online_offline_io_bz1376948
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=random cpu offline and online during IO, got the case scenario from http://lists.infradead.org/pipermail/linux-nvme/2016-August/005921.html
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=fio
+max_time=1h
+use_pty=false

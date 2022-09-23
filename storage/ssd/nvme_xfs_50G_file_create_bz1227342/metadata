@@ -1,0 +1,14 @@
+[General]
+name=storage/ssd/nvme_xfs_50G_file_create_bz1227342
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=Format nvme to xfs and create a 50G file
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=xfsprogs
+max_time=1h
+use_pty=false

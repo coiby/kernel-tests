@@ -1,0 +1,36 @@
+#!/bin/bash
+# vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+
+# Include Storage related environment
+. ../include/include.sh
+
+function runtest() {
+
+	SSD_RM_Unused_VG
+
+	SSD_RM_Unused_Partitions
+
+	get_nvme_disk
+
+for DISK in $DISKS; do
+	MODEL=$(cat /sys/block/"$DISK"/device/model)
+	if [[ $MODEL =~ "INTEL SSDPEDMD016T4" ]]; then
+		#BZ2097565
+		tnot "nvme format --lbaf=1 /dev/$DISK -f"
+	elif rlIsRHEL 9 && [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Ent NVMe v2 AGN RI" ]]; then
+		tlog "Will skip $MODEL, this test will lead system panic, BZ2110902"
+		continue
+	else
+		tok "nvme format --lbaf=1 /dev/$DISK -f"
+	fi
+	tok "lsblk | grep nvme"
+	tok "nvme reset /dev/${DISK:0:5}"
+	tok "nvme format /dev/$DISK --lbaf=0 -f"
+
+done
+}
+
+tlog "running $0"
+trun "uname -a"
+runtest
+tend

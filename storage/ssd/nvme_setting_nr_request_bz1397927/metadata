@@ -1,0 +1,14 @@
+[General]
+name=storage/ssd/nvme_setting_nr_request_bz1397927
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=Setting nr_request on NVMe device may make node hung
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=fio
+max_time=1h
+use_pty=false
