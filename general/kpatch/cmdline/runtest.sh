@@ -31,12 +31,9 @@
 # Include Beaker environment
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. lib_update.sh
 
 # trap 'rlFileRestore; exit' SIGHUP SIGINT SIGQUIT SIGTERM
 trap 'killall make; kill $s_pid; exit 1' SIGHUP SIGINT SIGQUIT SIGTERM
-
-UPDATE_KPATCH=${UPDATE_KPATCH:-0}
 
 ARCH=$(uname -m)
 MOD=${MOD:-}
@@ -201,17 +198,6 @@ function kpatch_patch_testing() {
 
     rlShowPackageVersion ${PACKAGE}
 
-    if [ ! "${UPDATE_KPATCH}" = 0 ]; then
-        process_kpatch_patch_nvr ${KPATCH_PATCH}
-        if [ ! -f "${UPDATE_KPATCH}" ]; then
-            n_released=${#KPATCH_UPDATE_BASE}
-            for ((i=0; i < n_released; i++)); do
-                wget ${KPATCH_UPDATE_BASE[$i]}/${KPATCH_UPDATE_RPM[$i]}
-                # Only get recent released one.
-                break
-            done
-        fi
-    fi
 }
 
 function changed_functions_test() {
