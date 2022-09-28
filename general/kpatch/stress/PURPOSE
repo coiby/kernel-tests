@@ -1,0 +1,7 @@
+PURPOSE of /kernel/general/kpatch/stress
+Kpatch utility stress test
+Authors: Yulia Kopkova <ykopkova@redhat.com>
+         Chao Ye <cye@redhat.com>
+         Chunyu Hu <chuhu@redhat.com>
+
+Loading/unloading kpatch modules under stress
