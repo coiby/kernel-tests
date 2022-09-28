@@ -37,6 +37,7 @@
 
 PACKAGE="kpatch"
 SERVICE="$PACKAGE"
+BUILDS_URL="${BUILDS_URL:-}"
 
 KPATCH_MODULE="${KPATCH_MODULE:-}"
 KPATCH_PATH="${KPATCH_PATH:-}"
@@ -49,7 +50,7 @@ if [ -z "$KPATCH_MODULE" ]; then
         kver=$(uname -r | cut -f1 -d'-')
         krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//")
         dnf install -q -y kernel-modules-internal-${kver}-${krel} \
-	   || yum install -q -y http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel/${kver}/${krel}/${karch}/kernel-modules-internal-${kver}-${krel}.${karch}.rpm
+        || yum install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/kernel-modules-internal-${kver}-${krel}.${karch}.rpm
         KPATCH_MODULE="test_klp_livepatch"
         KPATCH_PATH=$(dirname `modinfo --field=filename $KPATCH_MODULE`)
         xz --decompress $KPATCH_PATH/$KPATCH_MODULE.ko.xz
@@ -154,9 +155,9 @@ rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm kpatch
         rlRun "kpatch install $KPATCH_PATH/$KPATCH_MODULE.ko" 0-255
-	rlRun "kpatch load $MOD" || rlDie "Cannot load $KPATCH_MODULE"
-	rlAssertEquals "Assert $KPATCH_MODULE is enabled" "$(cat $sys_livepatch/$MOD/enabled)" "1" \
-	    ||  rlDie "Livepatch module $KPATCH_MODULE is not enabled."
+        rlRun "kpatch load $MOD" || rlDie "Cannot load $KPATCH_MODULE"
+        rlAssertEquals "Assert $KPATCH_MODULE is enabled" "$(cat $sys_livepatch/$MOD/enabled)" "1" \
+        ||  rlDie "Livepatch module $KPATCH_MODULE is not enabled."
         rlRun "kpatch force unload $MOD"
     rlPhaseEnd
 

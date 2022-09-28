@@ -29,6 +29,7 @@
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+BUILDS_URL="${BUILDS_URL:-}"
 PACKAGE=kpatch
 SERVICE=kpatch
 karch=$(uname -i)
@@ -36,7 +37,7 @@ kver=$(uname -r | cut -f1 -d'-')
 krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//")
 
 dnf install -q -y kernel-modules-internal-${kver}-${krel} \
-	   || yum install -q -y http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel/${kver}/${krel}/${karch}/kernel-modules-internal-${kver}-${krel}.${karch}.rpm
+       || yum install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/kernel-modules-internal-${kver}-${krel}.${karch}.rpm
 
 MOD="test_klp_livepatch"
 MOD_PATH=$(dirname `modinfo --field=filename $MOD`)
@@ -72,9 +73,9 @@ rlJournalStart
             kpatch_install=1
             [ x$CHKDIR_FLAG == x1 ] && CREATE_KPATCH_DIR
         fi
-	rlRun "kpatch load $MOD" || rlDie "Cannot load $KPATCH_MODULE"
-	rlAssertEquals "Assert $MOD is enabled" "$(cat $sys_livepatch/$MOD/enabled)" "1" \
-	    ||  rlDie "Livepatch module $MOD is not enabled."
+    rlRun "kpatch load $MOD" || rlDie "Cannot load $KPATCH_MODULE"
+    rlAssertEquals "Assert $MOD is enabled" "$(cat $sys_livepatch/$MOD/enabled)" "1" \
+        ||  rlDie "Livepatch module $MOD is not enabled."
         rlRun "kpatch list | grep -E \"$MOD.*enabled\""
     rlPhaseEnd
 

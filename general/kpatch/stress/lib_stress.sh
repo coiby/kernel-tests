@@ -3,6 +3,7 @@
 # Stressers for the kpatch load
 
 STRESS_FACTOR=${STRESS_FACTOR:-1}
+BUILDS_URL="${BUILDS_URL:-}"
 LOOP_TIME_DEFAULT=100
 NR_CPU=$(grep -wo processor /proc/cpuinfo | wc -l)
 
@@ -45,8 +46,8 @@ function download_ksrc()
     which wget || yum -y install wget
     if [[ ! -e "kernel-${kver}-${krel}.src.rpm" ]]; then
         yumdownloader -q -y --source kernel-${kver}-${krel} \
-            || wget http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel/${kver}/${krel}/src/kernel-${kver}-${krel}.src.rpm
-	fi
+            || wget ${BUILDS_URL}/kernel/${kver}/${krel}/src/kernel-${kver}-${krel}.src.rpm
+    fi
     [ $? -ne 0 ] && Error "${kver}-${krel} srpm download failed"
 }
 
@@ -183,4 +184,3 @@ function load_trace()
         finish_trace
     done
 }
-

@@ -1,4 +1,4 @@
-# /bin/bash
+#! /bin/bash
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -44,7 +44,7 @@ TRACE_FUN="/sys/kernel/debug/tracing/enabled_functions"
 KPATCH_REV="${KPATCH_REV:-}"
 KPATCH_REPO="${KPATCH_REPO:-https://github.com/dynup/kpatch.git}"
 KPATCH_BUILD_OPTS="${KPATCH_BUILD_OPTS:-}"
-KSRC_URL="http://download.eng.bos.redhat.com/brewroot/vol"
+BUILDS_URL="${BUILDS_URL:-}"
 
 PATCH_PATH="test/integration/${ID}-${VERSION_ID}"
 MOD_A_PATCH1="cmdline-string.patch"
@@ -55,20 +55,14 @@ MOD_B_PATCH1="data-new.patch"
 KPATCH_MOD_A="livepatch-cmdline-meminfo"
 KPATCH_MOD_B="livepatch-meminfo-proc"
 
-VER_REL=$(uname -r | sed "s/.$(uname -m)//")
-KSRC_RPM=kernel-${VER_REL}.src.rpm
+karch=$(uname -i)
+kver=$(uname -r | cut -f1 -d'-')
+krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//")
+KSRC_RPM=kernel-${kver}-${krel}.src.rpm
 
 function download_src()
 {
-    case `uname -r` in
-        4.18.0*)
-            MAJOR=8
-            ;;
-        5.14.0*)
-            MAJOR=9
-            ;;
-    esac
-    URL=${KSRC_URL}/rhel-${MAJOR}/packages/kernel/${VER_REL%%-*}/${VER_REL##*-}/src/${KSRC_RPM}
+    URL=${BUILDS_URL}/kernel/${kver}/${krel}/src/${KSRC_RPM}
     rlRun "curl -o ${KSRC_RPM} ${URL}"
 }
 
@@ -199,4 +193,3 @@ rlJournalStart
 
 rlJournalEnd
 rlJournalPrintText
-
