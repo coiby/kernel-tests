@@ -1,0 +1,20 @@
+summary: NVMe PCI adapter rescan reset remove
+description: NVMe PCI adapter rescan reset remove
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_pci_adapter_rescan_reset_remove_bz1370507
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_pci_adapter_rescan_reset_remove_bz1370507
+extra-task: /storage/ssd/nvme_pci_adapter_rescan_reset_remove_bz1370507
+adjust:
+    enabled: false
+    when: distro < rhel-7

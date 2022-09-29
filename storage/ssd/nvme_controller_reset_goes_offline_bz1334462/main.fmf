@@ -1,0 +1,21 @@
+summary: NVMe device goes offline after reset operation
+description:
+    NVMe device goes offline after reset operation
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_controller_reset_goes_offline_bz1334462
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: nvme-cli
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_controller_reset_goes_offline_bz1334462
+extra-task: /storage/ssd/nvme_controller_reset_goes_offline_bz1334462
+adjust:
+    enabled: false
+    when: distro < rhel-7

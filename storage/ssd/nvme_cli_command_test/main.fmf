@@ -1,0 +1,21 @@
+summary: nvme cli command test on nvme ssd
+description:
+    nvme cli command test on nvme ssd
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_cli_command_test
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: nvme-cli
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_cli_command_test
+extra-task: /storage/ssd/nvme_cli_command_test
+adjust:
+    enabled: false
+    when: distro < rhel-7

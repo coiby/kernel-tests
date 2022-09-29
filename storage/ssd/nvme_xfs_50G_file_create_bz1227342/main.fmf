@@ -1,0 +1,20 @@
+summary: Format nvme to xfs and create a 50G file
+description: Format nvme to xfs and create a 50G file
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_xfs_50G_file_create_bz1227342
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: xfsprogs
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_xfs_50G_file_create_bz1227342
+extra-task: /storage/ssd/nvme_xfs_50G_file_create_bz1227342
+adjust:
+    enabled: false
+    when: distro < rhel-7

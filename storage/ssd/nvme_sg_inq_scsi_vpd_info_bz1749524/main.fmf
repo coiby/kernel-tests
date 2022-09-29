@@ -1,0 +1,20 @@
+summary: nvme sg_inq for SCSI VPD information
+description: nvme sg_inq for SCSI VPD information
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_sg_inq_scsi_vpd_info_bz1749524
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: sg3_utils
+duration: 5m
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_sg_inq_scsi_vpd_info_bz1749524
+extra-task: /storage/ssd/nvme_sg_inq_scsi_vpd_info_bz1749524
+adjust:
+    enabled: false
+    when: distro < rhel-7

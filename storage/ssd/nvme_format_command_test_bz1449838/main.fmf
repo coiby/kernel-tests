@@ -1,0 +1,20 @@
+summary: nvme format command test
+description: nvme format command test
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_format_command_test_bz1449838
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: nvme-cli
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_format_command_test_bz1449838
+extra-task: /storage/ssd/nvme_format_command_test_bz1449838
+adjust:
+    enabled: false
+    when: distro < rhel-7

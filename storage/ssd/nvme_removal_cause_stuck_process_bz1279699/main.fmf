@@ -1,0 +1,20 @@
+summary: NVMe removal lead stuck process and device node
+description: NVMe removal which will cause stuck process and stuck card device node
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_removal_cause_stuck_process_bz1279699
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_removal_cause_stuck_process_bz1279699
+extra-task: /storage/ssd/nvme_removal_cause_stuck_process_bz1279699
+adjust:
+    enabled: false
+    when: distro < rhel-7

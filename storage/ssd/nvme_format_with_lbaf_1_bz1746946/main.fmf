@@ -1,0 +1,20 @@
+summary: nvme format with lbaf=1 lead node removed test
+description: regression test for device node disappeared after nvme format with lbaf=1
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_format_with_lbaf_1_bz1746946
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: nvme-cli
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_format_with_lbaf_1_bz1746946
+extra-task: /storage/ssd/nvme_format_with_lbaf_1_bz1746946
+adjust:
+    enabled: false
+    when: distro < rhel-7

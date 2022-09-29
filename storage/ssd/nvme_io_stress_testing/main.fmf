@@ -1,0 +1,20 @@
+summary: NVMe SSD IO stress testing wit Iozone/dt/fio
+description: NVMe SSD IO stress testing wit Iozone/dt/fio
+contact: Yi Zhang <yi.zhang@redhat.com>
+component:
+  - storage-ssd
+path: /storage/ssd/nvme_io_stress_testing
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: fio
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_io_stress_testing
+extra-task: /storage/ssd/nvme_io_stress_testing
+adjust:
+    enabled: false
+    when: distro < rhel-7
