@@ -1,0 +1,31 @@
+{
+	/*
+	 * Simple use case which creates 100% load
+	 * until the use case is stopped with Ctrl+C
+	 */
+	"tasks" : {
+		"thread0" : {
+			"instance" : 1,
+			"loop" : -1,
+			"run" :   95000,
+			"sleep" :   0
+		},
+		"thread1" : {
+			"instance" : 1,
+			"loop" : -1,
+			"run" :   95000,
+			"sleep" :  0
+		}
+	},
+	"global" : {
+		"duration" : 140,
+		"calibration" : "CPU0",
+		"default_policy" : "SCHED_RR",
+		"pi_enabled" : false,
+		"lock_pages" : false,
+		"logdir" : "./rr",
+		"log_basename" : "rr",
+		"ftrace" : false,
+		"gnuplot" : true
+	}
+}

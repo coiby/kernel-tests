@@ -65,4 +65,4 @@ else
 fi
 
 shift 2
-exec "$*"
+exec $*

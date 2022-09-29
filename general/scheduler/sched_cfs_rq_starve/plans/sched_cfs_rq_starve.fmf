@@ -1,0 +1,19 @@
+summary: Test cpu cgroup low quota runq starve issue
+discover:
+    how: fmf
+    test:
+        - /general/scheduler/sched_cfs_rq_starve
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [json-c-devel, gcc, glibc]
+environment-file:
+    - ./general/scheduler/sched_cfs_rq_starve/plans/tmt.env

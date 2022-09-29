@@ -1,0 +1,46 @@
+{
+	/*
+	 * Simple use case which creates 10% load
+	 * for 6 seconds.
+	 * A "sleep" : 0 has been added so the file can be used by tune_json.py to
+	 * use a sleep event instead of the timer. In this latter case, you need
+	 * to set the timer's period to 0
+	 */
+	"tasks" : {
+		"thread0" : {
+			"instance" : 2,
+			"loop" : -1,
+			"run" :   100000,
+			"sleep" : 0,
+			"dl-deadline" : 100000,
+			"dl-period" : 100000,
+			"dl-runtime" : 50000,
+			"priority" : 100,
+			"policy" : "SCHED_DEADLINE",
+			"timer" : { "ref" : "unique", "period" : 100000 }
+		},
+		"thread1" : {
+			"instance" : 2,
+			"loop" : -1,
+			"run" :   100000,
+			"sleep" : 0,
+			"dl-deadline" : 100000,
+			"dl-period" : 100000,
+			"dl-runtime" : 50000,
+			"priority" : 100,
+			"policy" : "SCHED_DEADLINE",
+			"timer" : { "ref" : "unique", "period" : 100000 }
+		}
+	},
+	"global" : {
+		"duration" : 120,
+		"calibration" : "CPU0",
+		"default_policy" : "SCHED_DEADLINE",
+		"pi_enabled" : false,
+		"lock_pages" : false,
+		"logdir" : "./deadline",
+		"log_basename" : "deadline",
+		"gnuplot" : true,
+		"mem_buffer_size" : 1000000000 
+	}
+}
