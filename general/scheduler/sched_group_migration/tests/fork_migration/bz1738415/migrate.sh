@@ -1,3 +1,4 @@
+#!/bin/bash
 pid=${*:-0}
 
 . ../../../../include/runtest.sh

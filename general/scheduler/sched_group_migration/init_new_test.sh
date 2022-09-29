@@ -1,3 +1,4 @@
+#!/bin/bash
 
 bugid=$1
 sub_type=${2:-fork_migration}
