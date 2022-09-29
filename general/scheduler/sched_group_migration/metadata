@@ -1,0 +1,15 @@
+[General]
+name=general/scheduler/sched_group_migration
+owner=Chunyu Hu <chuhu@redhat.com>
+description=Test cpu cgroup migration
+license=RedHat Internal
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+dependencies=gcc;glibc;wget;bc
+softDependencies=json-c-devel
+repoRequires=general/include;general/scheduler/include
+max_time=30m
+use_pty=false
