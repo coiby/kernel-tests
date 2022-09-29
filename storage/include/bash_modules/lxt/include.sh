@@ -1,5 +1,7 @@
 #!/bin/bash
 
 # the order is important
-. ./tc.sh
-. ./rootdev.sh
+FILE=$(readlink -f $BASH_SOURCE)
+CDIR=$(dirname $FILE)
+. $CDIR/tc.sh
+. $CDIR/rootdev.sh

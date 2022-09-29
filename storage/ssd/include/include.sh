@@ -1,7 +1,9 @@
 #!/bin/bash
 
-. ../../../cki_lib/libcki.sh
-. ../../include/bash_modules/lxt/include.sh || exit 200
+FILE=$(readlink -f $BASH_SOURCE)
+CDIR=$(dirname $FILE)
+. $CDIR/../../../cki_lib/libcki.sh
+. $CDIR/../../include/bash_modules/lxt/include.sh || exit 200
 
 [ -f /root/TEST_DEVS ] && TEST_DEVS=$(cat /root/TEST_DEVS)
 [ -f /root/TEST_DEVS_LIST ] && TEST_DEVS_LIST=$(cat /root/TEST_DEVS_LIST)

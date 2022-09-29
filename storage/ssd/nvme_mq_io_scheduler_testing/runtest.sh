@@ -2,7 +2,9 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-. ../include/include.sh
+FILE=$(readlink -f $BASH_SOURCE)
+CDIR=$(dirname $FILE)
+. $CDIR/../include/include.sh || exit 200
 
 function BLK_MQ_IO_SCHEDULER_IO() {
 
