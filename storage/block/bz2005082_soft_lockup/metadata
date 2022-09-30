@@ -1,0 +1,13 @@
+[General]
+name=storage/block/bz2005082_soft_lockup
+owner=Changhui Zhong <czhong@redhat.com>
+description=bz2005082_soft_lockup
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=fio;sysstat
+repoRequires=cki_lib
+max_time=1h

@@ -1,0 +1,14 @@
+[General]
+name=storage/block/bz1265985_scsi_mq_raid1
+owner=Changhui Zhong <czhong@redhat.com>
+description=bz1265985_scsi_mq_raid1
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=
+repoRequires=cki_lib
+max_time=4h
+

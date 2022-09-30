@@ -1,0 +1,94 @@
+/*
+ *  *  This test program continues to read 512 bytes data from specified arguments.
+ *   *
+ *    * 	Usage : read <sec_no> <blk_dev>
+ *     * 		@sec_no  : sector number
+ *      * 		@blk_dev : block device
+ *       *
+ *        *	ex) If you want to read 512 bytes data from sector number 100 of
+ *         *	    /dev/sda
+ *          *
+ *           *	    # ./read 100 /dev/sda
+ *            *
+ *             *	How to build:
+ *              *
+ *               *	    $ gcc -D _GNU_SOURCE -o read read.c
+ *                *
+ *                 *	How to occurs a problem which is a wrong accounting of
+ *                  *	hd_struct->in_flight:
+ *                   *
+ *                    *	    1. confirm a start sector of a partition
+ *                     *	       # cat /sys/block/sda/sda2/start
+ *                      *	       1044225
+ *                       *	    2. run the test program against sector no.1044225 of /dev/sda
+ *                        *	       # ./read 1044225 /dev/sda &
+ *                         *	    3. run the test program against sector no.1044224 of /dev/sda
+ *                          *	       # ./read 1044224 /dev/sda &
+ *                           *	    4. confirm the /proc/diskstats
+ *                            *	       # cat /proc/diskstats |grep sda
+ *                             *	          8       0 sda 90524 7579 102154 20464 0 0 0 0 0 14096 20089
+ *                              *	          8       1 sda1 19085 1352 21841 4209 0 0 0 0 4294967064 15689 4293424691
+ *                               *	          8       2 sda2 71252 3624 74891 15950 0 0 0 0 232 23995 1562390
+ *                                *	          8       3 sda3 54 487 2188 92 0 0 0 0 0 88 92
+ *                                 *	          8       4 sda4 4 0 8 0 0 0 0 0 0 0 0
+ *                                  *	          8       5 sda5 81 2027 2130 138 0 0 0 0 0 87 137
+ *                                   */
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#define SECTOR 512  // sector size
+#define ALIGN  512  // for direct io
+int main(int argc, char *argv[])
+{
+	int fd;
+	int i;
+	int sector_n;
+	unsigned long ret;
+	void *buf;
+	if ( argc != 3 ) {
+		printf("invalid argument\n");
+		exit(1);
+	}
+	sector_n = atoi(argv[1]);
+	printf("read 512 bytes data from setor no.%d\n", sector_n);
+
+	ret = posix_memalign(&buf, ALIGN, SECTOR);
+	if (ret != 0) {
+		perror("posix_memalign");	
+		exit(1);
+	}
+	fd = open(argv[2], O_RDONLY|O_DIRECT);
+	if (fd < 0) {
+		perror("open");	
+		exit(1);
+	}
+	while (1) {
+		ret = lseek(fd, 0, SEEK_SET);	
+		if (ret < 0) {
+			perror("lseek");
+			printf("ret = %d\n", ret);
+			exit(1);
+		}
+		for (i = 0; i < SECTOR; i++) {
+			ret = lseek(fd, sector_n, SEEK_CUR);
+			if (ret < 0) {
+				perror("lseek");
+				printf("ret = %d\n", ret);
+				exit(1)	;
+			}
+		}
+		ret = read(fd, buf, SECTOR);
+		if (ret != SECTOR) {
+			perror("read");
+			exit(1);
+		}
+	}
+	free(buf);
+	close(fd);
+}

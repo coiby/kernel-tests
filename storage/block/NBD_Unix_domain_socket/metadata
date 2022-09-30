@@ -1,0 +1,13 @@
+[General]
+name=storage/block/NBD_Unix_domain_socket
+owner=Changhui Zhong <czhong@redhat.com>
+description=Storage test NBD with unix socket
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=docbook-utils.noarch;autoconf;automake;make;libtool;kmod-devel;libnl3-devel;libevent-devel;glib2-devel;json-c-devel;libtirpc-devel;rpcgen;glusterfs-api-devel;libcurl-devel;libuv-devel;nbdkit;elfutils-libelf-devel;xfsprogs;parted;autoconf-archive;bison;flex;gcc;gcc-c++
+repoRequires=cki_lib
+max_time=1h

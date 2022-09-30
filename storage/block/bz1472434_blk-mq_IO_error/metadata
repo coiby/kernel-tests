@@ -1,0 +1,14 @@
+[General]
+name=storage/block/bz1472434_blk-mq_IO_error
+owner=Changhui Zhong <czhong@redhat.com>
+description=bz1472434_blk-mq_IO_error
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=lsscsi
+repoRequires=cki_lib
+max_time=1h
+

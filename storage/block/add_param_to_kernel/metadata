@@ -1,0 +1,13 @@
+[General]
+name=storage/block/add_param_to_kernel
+owner=Changhui Zhong <czhong@redhat.com>
+description=add param to kernel
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=
+repoRequires=cki_lib
+max_time=4h
