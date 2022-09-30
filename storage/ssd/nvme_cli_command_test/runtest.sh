@@ -146,7 +146,7 @@ for DISK in $DISKS; do
 	elif [[ $MODEL =~ "INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 " ]]; then
 		tnot "nvme subsystem-reset ${NVME_CHAR}"
 		tlog "nvme subsystem-reset not support on $DISK, MODEL:\"$MODEL\""
-	elif [[ $MODEL =~ "Dell Ent NVMe v2 AGN RI U.2"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI" ]]; then
+	elif [[ $MODEL =~ "Samsung SSD 983 DCT"|"Dell Ent NVMe v2 AGN RI U.2"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI" ]]; then
 		tlog "nvme subsystem-reset on $DISK lead disk disappeared, BZ2093136"
 	else
 		tok "nvme subsystem-reset ${NVME_CHAR}"
