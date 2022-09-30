@@ -31,11 +31,12 @@ for dev in $TEST_DEVS_TMP; do
 		TEST_DEVS=${TEST_DEVS/$ROOT_DISK/}
 	fi
 done
-
-for dev in $TEST_DEVS; do
-	TEST_DEVS_LIST+="/dev/$dev "
-	tok "wipefs -a /dev/$dev"
-done
+if [ -z "$TEST_DEVS_LIST" ]; then
+	for dev in $TEST_DEVS; do
+		TEST_DEVS_LIST+="/dev/$dev "
+		tok "wipefs -a /dev/$dev"
+	done
+fi
 
 tok partprobe
 tok udevadm settle
