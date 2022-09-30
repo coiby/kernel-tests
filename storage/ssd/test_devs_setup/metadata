@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/test_devs_setup
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=test devs setup for nvme ssd testing
 license=GPLv3
 confidential=no

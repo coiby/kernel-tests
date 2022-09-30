@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/nvme_removal_cause_stuck_process_bz1279699
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=NVMe removal which will cause stuck process and stuck card device node
 license=GPLv3
 confidential=no

@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/nvme_sg_inq_scsi_vpd_info_bz1749524
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=nvme sg_inq for SCSI VPD information
 license=GPLv3
 confidential=no

@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/nvme_io_stress_testing
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=NVMe SSD IO stress testing wit Iozone/dt/fio
 license=GPLv3
 confidential=no

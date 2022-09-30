@@ -1,6 +1,6 @@
 summary: NVMe SSD iozone test on xfs filesystem
 description: NVMe SSD iozone test on xfs filesystem
-contact: Yi Zhang <yi.zhang@redhat.com>
+contact: Yi Zhang <yizhan@redhat.com>
 component:
   - storage-ssd
 path: /storage/ssd/nvme_mkfs_xfs_bz1443807

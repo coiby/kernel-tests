@@ -1,6 +1,6 @@
 summary: test devs setup for nvme ssd testing  
 description: test devs setup for nvme ssd testing 
-contact: Yi Zhang <yi.zhang@redhat.com>
+contact: Yi Zhang <yizhan@redhat.com>
 component:
   - storage-ssd
 path: /storage/ssd/test_devs_setup

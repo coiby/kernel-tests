@@ -1,6 +1,6 @@
 summary: Setting nr_request on NVMe device lead node hung
 description: Setting nr_request on NVMe device lead node hung
-contact: Yi Zhang <yi.zhang@redhat.com>
+contact: Yi Zhang <yizhan@redhat.com>
 component:
   - storage-ssd
 path: /storage/ssd/nvme_setting_nr_request_bz1397927

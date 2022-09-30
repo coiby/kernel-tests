@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/nvme_cli_command_test
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=nvme cli command test on nvme ssd
 license=GPLv3
 confidential=no

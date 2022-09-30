@@ -1,6 +1,6 @@
 summary: NVMe PCI adapter rescan reset remove
 description: NVMe PCI adapter rescan reset remove
-contact: Yi Zhang <yi.zhang@redhat.com>
+contact: Yi Zhang <yizhan@redhat.com>
 component:
   - storage-ssd
 path: /storage/ssd/nvme_pci_adapter_rescan_reset_remove_bz1370507

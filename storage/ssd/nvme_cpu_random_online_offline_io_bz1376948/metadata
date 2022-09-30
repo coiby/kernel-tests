@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/nvme_cpu_random_online_offline_io_bz1376948
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=random cpu offline and online during IO, got the case scenario from http://lists.infradead.org/pipermail/linux-nvme/2016-August/005921.html
 license=GPLv3
 confidential=no

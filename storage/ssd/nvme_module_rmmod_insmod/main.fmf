@@ -1,6 +1,6 @@
 summary: nvme module rmmod/insmod stress test
 description: nvme module rmmod/insmod stress test
-contact: Yi Zhang <yi.zhang@redhat.com>
+contact: Yi Zhang <yizhan@redhat.com>
 component:
   - storage-ssd
 path: /storage/ssd/nvme_module_rmmod_insmod

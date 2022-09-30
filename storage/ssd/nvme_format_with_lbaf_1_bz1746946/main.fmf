@@ -1,6 +1,6 @@
 summary: nvme format with lbaf=1 lead node removed test
 description: regression test for device node disappeared after nvme format with lbaf=1
-contact: Yi Zhang <yi.zhang@redhat.com>
+contact: Yi Zhang <yizhan@redhat.com>
 component:
   - storage-ssd
 path: /storage/ssd/nvme_format_with_lbaf_1_bz1746946

@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/nvme_setting_nr_request_bz1397927
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=Setting nr_request on NVMe device may make node hung
 license=GPLv3
 confidential=no

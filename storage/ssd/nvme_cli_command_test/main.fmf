@@ -1,7 +1,7 @@
 summary: nvme cli command test on nvme ssd
 description:
     nvme cli command test on nvme ssd
-contact: Yi Zhang <yi.zhang@redhat.com>
+contact: Yi Zhang <yizhan@redhat.com>
 component:
   - storage-ssd
 path: /storage/ssd/nvme_cli_command_test

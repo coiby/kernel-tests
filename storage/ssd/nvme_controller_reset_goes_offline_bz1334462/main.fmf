@@ -1,7 +1,7 @@
 summary: NVMe device goes offline after reset operation
 description:
     NVMe device goes offline after reset operation
-contact: Yi Zhang <yi.zhang@redhat.com>
+contact: Yi Zhang <yizhan@redhat.com>
 component:
   - storage-ssd
 path: /storage/ssd/nvme_controller_reset_goes_offline_bz1334462
