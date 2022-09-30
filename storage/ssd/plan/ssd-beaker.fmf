@@ -33,4 +33,4 @@ provision:
         hostname: "storageqe-62.rhts.eng.pek2.redhat.com"
 adjust:
   - environment:
-        TEST_DEVS: $test_devs 
+        TEST_DEVS: $TEST_DEVS
