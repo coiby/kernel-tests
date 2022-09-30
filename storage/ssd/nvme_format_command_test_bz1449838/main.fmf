@@ -2,7 +2,7 @@ summary: nvme format command test
 description: nvme format command test
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_format_command_test_bz1449838
 test: bash ./runtest.sh
 framework: shell

@@ -2,7 +2,7 @@ summary: NVMe SSD mq io stress testing with Iozone/dt/fio
 description: NVMe SSD mq io stress testing with Iozone/dt/fio
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_mq_io_stress_testing
 test: bash ./runtest.sh
 framework: shell

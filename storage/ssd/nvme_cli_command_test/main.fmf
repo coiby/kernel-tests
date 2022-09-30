@@ -3,7 +3,7 @@ description:
     nvme cli command test on nvme ssd
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_cli_command_test
 test: bash ./runtest.sh
 framework: shell

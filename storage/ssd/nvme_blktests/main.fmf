@@ -2,7 +2,7 @@ summary: blktests with nvme ssd from https://github.com/osandov/blktests
 description: blktests with nvme ssd from https://github.com/osandov/blktests
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_blktests
 test: bash ./runtest.sh
 framework: shell

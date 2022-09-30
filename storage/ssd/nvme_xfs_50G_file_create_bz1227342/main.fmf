@@ -2,7 +2,7 @@ summary: Format nvme to xfs and create a 50G file
 description: Format nvme to xfs and create a 50G file
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_xfs_50G_file_create_bz1227342
 test: bash ./runtest.sh
 framework: shell

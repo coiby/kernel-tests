@@ -2,7 +2,7 @@ summary:
 description:
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/
 test: bash ./runtest.sh
 framework: shell

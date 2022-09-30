@@ -2,7 +2,7 @@ summary: nvme sg_inq for SCSI VPD information
 description: nvme sg_inq for SCSI VPD information
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_sg_inq_scsi_vpd_info_bz1749524
 test: bash ./runtest.sh
 framework: shell

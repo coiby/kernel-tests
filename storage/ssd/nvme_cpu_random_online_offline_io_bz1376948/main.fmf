@@ -4,7 +4,7 @@ description:
     http://lists.infradead.org/pipermail/linux-nvme/2016-August/005921.html
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_cpu_random_online_offline_io_bz1376948
 test: bash ./runtest.sh
 framework: shell

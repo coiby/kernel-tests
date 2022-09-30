@@ -2,7 +2,7 @@ summary: NVMe SSD io scheduler test during iozone/dt/fio
 description: NVMe SSD mq io scheduler switch stress testing during iozone/dt/fio
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_mq_io_scheduler_testing
 test: bash ./runtest.sh
 framework: shell

@@ -2,7 +2,7 @@ summary: test devs setup for nvme ssd testing
 description: test devs setup for nvme ssd testing 
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/test_devs_setup
 test: bash -x ./runtest.sh
 framework: shell 

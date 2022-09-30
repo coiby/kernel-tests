@@ -2,7 +2,7 @@ summary: NVMe SSD IO stress testing wit Iozone/dt/fio
 description: NVMe SSD IO stress testing wit Iozone/dt/fio
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_io_stress_testing
 test: bash ./runtest.sh
 framework: shell

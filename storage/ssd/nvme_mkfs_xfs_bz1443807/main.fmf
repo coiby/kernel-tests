@@ -2,7 +2,7 @@ summary: NVMe SSD iozone test on xfs filesystem
 description: NVMe SSD iozone test on xfs filesystem
 contact: Yi Zhang <yizhan@redhat.com>
 component:
-  - storage-ssd
+  - kernel
 path: /storage/ssd/nvme_mkfs_xfs_bz1443807
 test: bash ./runtest.sh
 framework: shell
