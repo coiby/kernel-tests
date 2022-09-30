@@ -10,5 +10,5 @@ destructive=no
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
 dependencies=xfsprogs
-max_time=1h
+max_time=2h
 use_pty=false

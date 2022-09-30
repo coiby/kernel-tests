@@ -9,7 +9,7 @@ framework: shell
 recommend:
   - beakerlib-redhat
 require: xfsprogs
-duration: 1h
+duration: 2h
 tag:
   - regression
 tier: 1
