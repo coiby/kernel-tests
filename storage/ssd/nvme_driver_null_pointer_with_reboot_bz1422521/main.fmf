@@ -1,0 +1,20 @@
+summary: KS-TC:ssd/nvme_driver_null_pointer_with_reboot_bz1422521
+description: NVMe driver null pointer with reboot stress test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/nvme_driver_null_pointer_with_reboot_bz1422521
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+duration: 10m
+tag:
+  - regression
+tier: 2
+extra-summary: /storage/ssd/nvme_driver_null_pointer_with_reboot_bz1422521
+extra-task: /storage/ssd/nvme_driver_null_pointer_with_reboot_bz1422521
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: ab9f4d62-677d-4670-bc70-cf2da4364693
