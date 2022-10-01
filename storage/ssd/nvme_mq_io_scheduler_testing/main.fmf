@@ -1,4 +1,4 @@
-summary: NVMe SSD io scheduler test during iozone/dt/fio
+summary: KS-TC:ssd/nvme_mq_io_scheduler_testing
 description: NVMe SSD mq io scheduler switch stress testing during iozone/dt/fio
 contact: Yi Zhang <yizhan@redhat.com>
 component:
@@ -18,3 +18,4 @@ extra-task: /storage/ssd/nvme_mq_io_scheduler_testing
 adjust:
     enabled: false
     when: distro < rhel-7
+id: 89a72ee5-7767-4923-a566-a8a174ae6697

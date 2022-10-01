@@ -1,4 +1,4 @@
-summary: nvme format command test
+summary: KS-TC:ssd/nvme_format_command_test_bz1449838
 description: nvme format command test
 contact: Yi Zhang <yizhan@redhat.com>
 component:
@@ -18,3 +18,4 @@ extra-task: /storage/ssd/nvme_format_command_test_bz1449838
 adjust:
     enabled: false
     when: distro < rhel-7
+id: a0bd0129-e59e-433e-9ac0-15d9df352206

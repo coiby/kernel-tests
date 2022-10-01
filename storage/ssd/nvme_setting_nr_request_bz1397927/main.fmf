@@ -1,4 +1,4 @@
-summary: Setting nr_request on NVMe device lead node hung
+summary: KS-TC:ssd/nvme_setting_nr_request_bz1397927
 description: Setting nr_request on NVMe device lead node hung
 contact: Yi Zhang <yizhan@redhat.com>
 component:
@@ -18,3 +18,4 @@ extra-task: /storage/ssd/nvme_setting_nr_request_bz1397927
 adjust:
     enabled: false
     when: distro < rhel-7
+id: e5725011-3bee-4d1c-869f-54de050ac0a7

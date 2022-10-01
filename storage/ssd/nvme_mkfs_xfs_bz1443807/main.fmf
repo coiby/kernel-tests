@@ -1,4 +1,4 @@
-summary: NVMe SSD iozone test on xfs filesystem
+summary: KS-TC:ssd/nvme_mkfs_xfs_bz1443807
 description: NVMe SSD iozone test on xfs filesystem
 contact: Yi Zhang <yizhan@redhat.com>
 component:
@@ -18,3 +18,4 @@ extra-task: /storage/ssd/nvme_mkfs_xfs_bz1443807
 adjust:
     enabled: false
     when: distro < rhel-7
+id: 34bb6279-91e2-4265-8a3c-9bdabafb4c0e

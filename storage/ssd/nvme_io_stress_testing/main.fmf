@@ -1,4 +1,4 @@
-summary: NVMe SSD IO stress testing wit Iozone/dt/fio
+summary: KS-TC:ssd/nvme_io_stress_testing
 description: NVMe SSD IO stress testing wit Iozone/dt/fio
 contact: Yi Zhang <yizhan@redhat.com>
 component:
@@ -18,3 +18,4 @@ extra-task: /storage/ssd/nvme_io_stress_testing
 adjust:
     enabled: false
     when: distro < rhel-7
+id: 5841b210-5950-46de-9a51-8d2d3fa4c3f4

@@ -1,4 +1,4 @@
-summary: nvme sg_inq for SCSI VPD information
+summary: KS-TC:ssd/nvme_sg_inq_scsi_vpd_info_bz1749524
 description: nvme sg_inq for SCSI VPD information
 contact: Yi Zhang <yizhan@redhat.com>
 component:
@@ -18,3 +18,4 @@ extra-task: /storage/ssd/nvme_sg_inq_scsi_vpd_info_bz1749524
 adjust:
     enabled: false
     when: distro < rhel-7
+id: d4856396-d582-42f3-89a4-5e96907e9322

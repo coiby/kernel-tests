@@ -8,7 +8,7 @@ test: bash ./runtest.sh
 framework: shell
 recommend:
   - beakerlib-redhat
-duration: 10m 
+duration: 10m
 tag:
   - regression
 tier: 3
@@ -17,3 +17,4 @@ extra-task: /storage/ssd/boot_from_nvme
 adjust:
     enabled: false
     when: distro < rhel-7
+id: 5f44f805-ac71-49f2-ad91-478273761d32

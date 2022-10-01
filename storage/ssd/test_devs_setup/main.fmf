@@ -1,22 +1,23 @@
-summary: test devs setup for nvme ssd testing  
-description: test devs setup for nvme ssd testing 
+summary: KS-TC:ssd/test_devs_setup
+description: test devs setup for nvme ssd testing
 contact: Yi Zhang <yizhan@redhat.com>
 component:
   - kernel
 path: /storage/ssd/test_devs_setup
 test: bash -x ./runtest.sh
-framework: shell 
+framework: shell
 recommend:
   - beakerlib-redhat
 duration: 30m
 tag:
   - regression
 tier: 1
-extra-summary: /storage/ssd/test_devs_setup 
+extra-summary: /storage/ssd/test_devs_setup
 extra-task: /storage/ssd/test_devs_setup
 environment:
-  TEST_DEVS: nvme0n1
-  TEST_DEVS_LIST: /dev/nvme0n1
+    TEST_DEVS: nvme0n1
+    TEST_DEVS_LIST: /dev/nvme0n1
 adjust:
     enabled: false
     when: distro < rhel-7
+id: 23c510fc-9d2d-4365-b280-fc3b95117fd0

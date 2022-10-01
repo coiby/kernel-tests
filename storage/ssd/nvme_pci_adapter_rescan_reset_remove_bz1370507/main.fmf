@@ -1,4 +1,4 @@
-summary: NVMe PCI adapter rescan reset remove
+summary: KS-TC:ssd/nvme_pci_adapter_rescan_reset_remove_bz1370507
 description: NVMe PCI adapter rescan reset remove
 contact: Yi Zhang <yizhan@redhat.com>
 component:
@@ -18,3 +18,4 @@ extra-task: /storage/ssd/nvme_pci_adapter_rescan_reset_remove_bz1370507
 adjust:
     enabled: false
     when: distro < rhel-7
+id: dbe0fba2-83d4-4884-8dec-9064994683a9
