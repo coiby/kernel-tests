@@ -305,7 +305,7 @@ build-all()
     fi
     configure
     echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
-    timeout 20m ${MAKE} -C ${TARGET} all &> buildlog.txt
+    timeout 30m ${MAKE} -C ${TARGET} all &> buildlog.txt
     if [ $? -eq 124 ]; then
         echo "Cleaning up ${TARGET_DIR}"
         rm -rf ${TARGET_DIR}
