@@ -11,7 +11,6 @@ require:
   - perf-debuginfo
   - yum-utils
   - beakerlib
-  - beakerlib-redhat
 recommend:
   - dmidecode
   - dnf-utils
