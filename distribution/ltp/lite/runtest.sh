@@ -27,6 +27,9 @@ if cki_is_kernel_debug; then
 	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-10}
 fi
 
+[ -n "${LTP_TIMEOUT_MUL}" ] && echo "LTP_TIMEOUT_MUL is ${LTP_TIMEOUT_MUL}"
+[ -n "${LTP_RUNTIME_MUL}" ] && echo "LTP_RUNTIME_MUL is ${LTP_RUNTIME_MUL}"
+
 core_pattern="$(cat /proc/sys/kernel/core_pattern)"
 core_pattern_ltp_dir="/mnt/testarea/ltp/cores"
 runtest_path=$LTPDIR/runtest
