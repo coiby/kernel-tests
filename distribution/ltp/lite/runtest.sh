@@ -16,15 +16,15 @@
 #export RHTS_OPTION_STRONGER_AVC=
 
 # VMs can have slow performance, therefore increase LTP_TIMEOUT_MUL
-if  cki_is_vm; then
-	export LTP_TIMEOUT_MUL=2
-	export LTP_RUNTIME_MUL=10
+if cki_is_vm; then
+	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
+	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-10}
 fi
 
 # debug kernel is slower increase LTP_TIMEOUT_MUL
-if  cki_is_kernel_debug; then
-	export LTP_TIMEOUT_MUL=2
-	export LTP_RUNTIME_MUL=10
+if cki_is_kernel_debug; then
+	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
+	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-10}
 fi
 
 core_pattern="$(cat /proc/sys/kernel/core_pattern)"
