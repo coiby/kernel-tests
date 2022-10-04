@@ -1,0 +1,24 @@
+summary: Perf internal test suite for CKI
+description: ''
+contact: Michael Petlan <mpetlan@redhat.com>
+test: bash ./runtest.sh
+duration: 1h
+tag: perf-internal-test
+framework: beakerlib
+require:
+  - iputils-debuginfo
+  - perf
+  - perf-debuginfo
+  - yum-utils
+  - beakerlib
+recommend:
+  - dmidecode
+  - dnf-utils
+  - python-perf
+  - python3-perf
+  - libbpf
+  - elfutils-libelf-devel
+  - clang
+  - llvm
+extra-summary: packages/perf/internal-testsuite
+extra-task: packages/perf/internal-testsuite
