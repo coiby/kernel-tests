@@ -12,7 +12,7 @@ NR_CPU=$((STRESS_FACTOR * NR_CPU))
 
 karch=$(uname -i)
 kver=$(uname -r | cut -f1 -d'-')
-krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch[.+]debug$//")
+krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//")
 
 STRESSER_FILE="stresser"
 STRESSER_PATH="$(pwd)"
