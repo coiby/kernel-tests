@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of cmdline
-#	Description: Kpatch cmdline function test
-#   Author: Chao Ye <cye@redhat.com>
+#   Makefile of patch-upgrade
+#   Description: Kpatch upgrade test
+#   Author: Chunyu Hu <chuhu@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -37,7 +37,7 @@ ifeq ($(_TOP_DIR),)
 	_TOP_DIR=/mnt/tests/$(TOPLEVEL_NAMESPACE)
 endif
 
-export TESTVERSION=1.1
+export TESTVERSION=1.0
 
 BUILT_FILES=
 
@@ -54,19 +54,19 @@ build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
 
 clean:
-	rm -f *~ $(BUILT_FILES) KPATCH_INSTALL activiness.failure REBOOT
+	rm -f *~ $(BUILT_FILES)
 
 
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Chao Ye <cye@redhat.com>" > $(METADATA)
+	@echo "Owner:           Chunyu Hu <chuhu@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Kpatch cmdline function test" >> $(METADATA)
+	@echo "Description:     Kpatch-patch upgrade test" >> $(METADATA)
 	@echo "Type:            Function" >> $(METADATA)
-	@echo "TestTime:        60m" >> $(METADATA)
+	@echo "TestTime:        240m" >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)
 	@echo "Requires:        kernel kpatch redhat-lsb" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
