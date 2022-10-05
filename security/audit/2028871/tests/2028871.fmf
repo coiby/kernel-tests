@@ -5,7 +5,7 @@ component:
   - kernel
 path: /security/audit/2028871
 test: make run
-framework: shell
+framework: beakerlib 
 duration: 12m
 extra-summary: /kernel-tests/security/audit/2028871
 extra-task: /kernel-tests/security/audit/2028871
