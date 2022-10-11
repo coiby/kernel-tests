@@ -9,5 +9,6 @@ destructive=no
 [restraint]
 entry_point=make run
 max_time=6h
-dependencies=psmisc;numactl-devel;gcc;glibc;sysstat;bc;kernel-devel
+dependencies=psmisc;gcc;glibc;sysstat;bc;kernel-devel
+softDependencies=numactl-devel
 repoRequires=general/include
