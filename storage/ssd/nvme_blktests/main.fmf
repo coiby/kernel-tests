@@ -13,6 +13,8 @@ require:
   - gcc-c++
   - blktrace
   - nvme-cli
+  - git
+  - fio
 duration: 4h
 tag:
   - regression
