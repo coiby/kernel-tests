@@ -9,3 +9,8 @@ framework: shell
 duration: 1h
 extra-summary: /rt-tests/rt_migrate_test
 extra-task: /rt-tests/rt_migrate_test
+tag: NoRHIVOS
+enabled: true
+adjust:
+  enabled: false
+  when: arch != x86_64

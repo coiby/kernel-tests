@@ -12,3 +12,8 @@ extra-task: /rt-tests/pi_stress
 environment:
   PARAM_SEC: 10
   PARAM_GROUPS: 1
+tag: NoRHIVOS
+enabled: true
+adjust:
+  enabled: false
+  when: arch != x86_64
