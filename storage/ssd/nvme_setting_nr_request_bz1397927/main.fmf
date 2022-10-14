@@ -1,0 +1,21 @@
+summary: KS-TC:ssd/nvme_setting_nr_request_bz1397927
+description: Setting nr_request on NVMe device lead node hung
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/nvme_setting_nr_request_bz1397927
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_setting_nr_request_bz1397927
+extra-task: /storage/ssd/nvme_setting_nr_request_bz1397927
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: e5725011-3bee-4d1c-869f-54de050ac0a7

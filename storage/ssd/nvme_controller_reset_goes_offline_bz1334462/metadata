@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/nvme_controller_reset_goes_offline_bz1334462
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=NVMe device goes offline after reset operation
 license=GPLv3
 confidential=no

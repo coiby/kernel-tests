@@ -14,7 +14,7 @@
 
 # USAGE
 
-test "$LXT_TC" = 1 || return
+test "$LXT_TC" = "" || return
 LXT_TC=1
 
 #

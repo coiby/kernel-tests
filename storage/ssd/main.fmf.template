@@ -1,0 +1,21 @@
+summary:
+description:
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/
+extra-task: /storage/ssd/
+environment:
+adjust:
+    enabled: false
+    when: distro < rhel-7

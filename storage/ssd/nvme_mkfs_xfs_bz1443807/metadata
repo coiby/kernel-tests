@@ -1,7 +1,7 @@
 [General]
 name=storage/ssd/nvme_mkfs_xfs_bz1443807
-owner=Yi Zhang <yi.zhang@redhat.com>
-description= NVMe SSD iozone test on xfs filesystem
+owner=Yi Zhang <yizhan@redhat.com>
+description=NVMe SSD iozone test on xfs filesystem
 license=GPLv3
 confidential=no
 destructive=no

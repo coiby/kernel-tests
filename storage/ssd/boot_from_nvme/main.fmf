@@ -1,0 +1,20 @@
+summary: KS-TC:ssd/boot_from_nvme
+description: System boot from nvme disk
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/boot_from_nvme
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+duration: 10m
+tag:
+  - regression
+tier: 3
+extra-summary: /storage/ssd/boot_from_nvme
+extra-task: /storage/ssd/boot_from_nvme
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: 5f44f805-ac71-49f2-ad91-478273761d32

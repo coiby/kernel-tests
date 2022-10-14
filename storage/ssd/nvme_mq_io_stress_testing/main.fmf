@@ -1,0 +1,20 @@
+summary: KS-TC:ssd/nvme_mq_io_stress_testing
+description: NVMe SSD mq io stress testing with Iozone/dt/fio
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/nvme_mq_io_stress_testing
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+duration: 6h
+tag:
+  - regression
+tier: 2
+extra-summary: /storage/ssd/nvme_mq_io_stress_testing
+extra-task: /storage/ssd/nvme_mq_io_stress_testing
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: 5eaf8d49-f394-4476-9bd4-ab937b25d6cc

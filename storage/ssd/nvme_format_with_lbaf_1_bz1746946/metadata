@@ -1,6 +1,6 @@
 [General]
 name=storage/ssd/nvme_format_with_lbaf_1_bz1746946
-owner=Yi Zhang <yi.zhang@redhat.com>
+owner=Yi Zhang <yizhan@redhat.com>
 description=regression test for device node disappeared after nvme format with lbaf=1
 license=GPLv3
 confidential=no

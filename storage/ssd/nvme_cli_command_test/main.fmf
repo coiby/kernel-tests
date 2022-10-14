@@ -1,0 +1,21 @@
+summary: KS-TC:ssd/nvme_cli_command_test
+description: nvme cli command test on nvme ssd
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/nvme_cli_command_test
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: nvme-cli
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_cli_command_test
+extra-task: /storage/ssd/nvme_cli_command_test
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: e43e76c1-f4f4-4224-8c76-78f48cc12133

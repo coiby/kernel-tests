@@ -1,0 +1,21 @@
+summary: KS-TC:ssd/nvme_format_with_lbaf_1_bz1746946
+description: regression test for device node disappeared after nvme format with lbaf=1
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/nvme_format_with_lbaf_1_bz1746946
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require: nvme-cli
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_format_with_lbaf_1_bz1746946
+extra-task: /storage/ssd/nvme_format_with_lbaf_1_bz1746946
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: d4a43d8b-963b-47cf-b758-8cd4c3929d08

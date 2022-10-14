@@ -1,0 +1,27 @@
+summary: KS-TC:ssd/nvme_blktests
+description: blktests with nvme ssd from https://github.com/osandov/blktests
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/nvme_blktests
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - gcc
+  - gcc-c++
+  - blktrace
+  - nvme-cli
+  - git
+  - fio
+duration: 4h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_blktests
+extra-task: /storage/ssd/nvme_blktests
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: 077c89e2-f7c1-466c-a824-59ae55d2fad9

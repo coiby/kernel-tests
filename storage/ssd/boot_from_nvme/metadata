@@ -1,0 +1,13 @@
+[General]
+name=storage/ssd/boot_from_nvme
+owner=Yi Zhang <yizhan@redhat.com>
+description=System boot from nvme disk
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+max_time=10m
+use_pty=false

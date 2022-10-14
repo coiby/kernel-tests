@@ -1,0 +1,13 @@
+[General]
+name=storage/ssd/nvme_driver_null_pointer_with_reboot_bz1422521
+owner=Yi Zhang <yizhan@redhat.com>
+description=NVMe driver null pointer with reboot stress test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+max_time=6h
+use_pty=false

@@ -15,10 +15,12 @@
 #
 # Author: Xiaowei Li   <xiaoli@redhat.com>
 
-test "$LXT_ROOTDEV" = 1 || return
+FILE=$(readlink -f $BASH_SOURCE)
+CDIR=$(dirname $FILE)
+test "$LXT_ROOTDEV" = "" || return
 LXT_ROOTDEV=1
 
-. ./tc.sh
+. $CDIR/tc.sh
 
 #
 # get the root disk of /
