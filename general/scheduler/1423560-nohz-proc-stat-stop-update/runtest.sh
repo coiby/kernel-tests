@@ -90,8 +90,15 @@ rlJournalStart
 			_wget_compile_stress
 			which stress || cp $SCHED_STRESS_PATH/stress /usr/bin/
 			which stress || rlDie "No stress binary can be used."
-			# The old setting. looks like missing rcu_nocbs=2-max, use tuned to setup kernel params for now(rhel-9.0)
-			#rlRun "grubby --args \"nohz=on isolcpus=2-$((nr_cpu - 1)) nohz_full=2-$((nr_cpu - 1)) mce=ignore_ce nosoftlockup intel_idle.max_cstate=1 intel_pstate=disable\" --update-kernel DEFAULT"
+			# aarch64 don't have the tuned-nfv-host-profile
+			if ! uname -r | grep x86_64; then
+				rlRun "grubby --args \"nohz=on isolcpus=$isolated_cpus nohz_full=$isolated_cpus rcu_nocbs=$isolated_cpus mce=ignore_ce nosoftlockup intel_idle.max_cstate=1 intel_pstate=disable\" --update-kernel DEFAULT"
+				rlRun "touch reboot_1423560"
+				grubby --info DEFAULT
+				rhts-reboot
+				return
+			fi
+
 			if systemctl status tuned | grep running -w; then
 				active=$(tuned-adm active | awk '{print $NF}')
 				echo "$active" | grep 'No current active profile' && active=""
@@ -170,18 +177,20 @@ rlJournalStart
 		rlPhaseEnd
 
 		rlPhaseStartCleanup
-			rlRun "sed -i '/^isolated_cores=/d' $cfg_file" 0-255
-			rlRun "sed -i 's/^isolate_managed_irq=.*$/# &/' $cfg_file"
+			if uname -r | grep x86_64; then
+				rlRun "sed -i '/^isolated_cores=/d' $cfg_file" 0-255
+				rlRun "sed -i 's/^isolate_managed_irq=.*$/# &/' $cfg_file"
 
-			test -f $save_cfg_file && ln=$(cat $save_cfg_file)
-			echo "restoring default isolated_cores parameters"
-			[ -n "$ln" ] && sed -i ''$ln's/^#//' $cfg_file
+				test -f $save_cfg_file && ln=$(cat $save_cfg_file)
+				echo "restoring default isolated_cores parameters"
+				[ -n "$ln" ] && sed -i ''$ln's/^#//' $cfg_file
 
-			active=$(cat reboot_1423560)
-			if [ "$active" = "" ]; then
-				rlRun "tuned-adm off"
-			else
-				rlRun "tuned-adm profile $active" 0-255
+				active=$(cat reboot_1423560)
+				if [ "$active" = "" ]; then
+					rlRun "tuned-adm off"
+				else
+					rlRun "tuned-adm profile $active" 0-255
+				fi
 			fi
 
 			nohz_cleanup_commandline
