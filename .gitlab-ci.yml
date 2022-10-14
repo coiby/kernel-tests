@@ -101,8 +101,8 @@ check bash with mixed tabs and spaces:
     - !reference [.rules, default-branch]
 
 .git-sync:
+  extends: .cki_tools
   stage: 🚀
-  image: registry.gitlab.com/cki-project/cki-tools/cki-tools:production
   variables:
     GIT_DEPTH: 100  # works for MRs <= 100 commits on top of the target branch
     INTERNAL_GITLAB_HOST: gitlab.cee.redhat.com
