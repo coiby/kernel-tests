@@ -264,7 +264,7 @@ fi
 # Sometimes it takes too long to waiting for syscalls
 # finish and I want to know whether the compilation is
 # finish or not.
-rstrnt-report-result "install" PASS
+rstrnt-report-result "install (ltp-$TESTVERSION)" PASS
 
 ltp_lite_begin
 
