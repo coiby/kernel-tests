@@ -12,3 +12,8 @@ extra-task: /rt-tests/rt_ssdd
 environment:
   NFORKS: 10
   NITERS: 10000
+tag: NoRHIVOS
+enabled: true
+adjust:
+  enabled: false
+  when: arch != x86_64
