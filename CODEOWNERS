@@ -184,6 +184,7 @@
 /misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /misc/header-test/ @bgoncalv @jbastianrh @lulinqing
 /misc/module-load/ @bgoncalv @jbastianrh @lulinqing
+/networking/driver/sanity/ @bgoncalv @linville-rh @lulinqing
 /networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing
 /networking/netfilter/ @bgoncalv @liuhangbin @lulinqing @yiche
