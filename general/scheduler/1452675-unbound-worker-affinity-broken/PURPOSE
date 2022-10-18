@@ -1,0 +1,4 @@
+docker swarm init and docker swarm leave --force would panic kernel
+when scheduler runquue has bug.
+
+x86_64 only currently, as we only have x86_64 docker repo in rhel

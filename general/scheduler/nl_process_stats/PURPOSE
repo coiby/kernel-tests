@@ -1,0 +1,5 @@
+Test taskstats netlink interface
+
+- Use kernel getdelays.c as test script.
+- Check whether the info is right.
+

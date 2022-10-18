@@ -1,0 +1,2 @@
+Check /proc/stat to see if it still keep updating when nohz_full
+is setup.
