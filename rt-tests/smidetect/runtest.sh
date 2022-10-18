@@ -33,15 +33,11 @@ function RunTest ()
         2>&1 | tee -a $OUTPUTFILE
     RET_CODE=${PIPESTATUS[0]}
 
-    # The numeric values below assume we are dealing with user seconds.
-    VAL=$(grep 'Max Latency' $OUTPUTFILE | awk -F: '{print $2}')
-    MAXLAT=$(grep 'Max Latency' $OUTPUTFILE | awk -F: '{gsub(/ /,"");gsub(/[a-z]+/,"");print $2}')
-    LIMIT_NUMERIC=$(echo $HARDLIMIT | awk -F[a-z] '{print $1}')
-
     if [ $LATCHECK -eq 0 ]; then
-        # User chooses not to review max latency, so set pass/fail based on exit
-        # status of smidetect
-        if [ $RET_CODE -eq 0 ]; then
+        if ! grep -qE '(Traceback|Error)' $OUTPUTFILE && {
+                # return code should at least be 0 or 1 to pass functional check
+                [ $RET_CODE -eq 0 ] || [ $RET_CODE -eq 1 ]
+            }; then
             echo "smidetect(hwlatdetect) Passed - functional verification: " | tee -a $OUTPUTFILE
             rstrnt-report-result "$TEST" "PASS" 0
         else
@@ -49,8 +45,7 @@ function RunTest ()
             rstrnt-report-result "$TEST" "FAIL" 1
         fi
     else
-        # Set result to pass only if max lat remained under HARDLIMIT
-        if [[ $VAL == ' Below threshold' ]] || (($MAXLAT <= $LIMIT_NUMERIC)); then
+        if [ $RET_CODE -eq 0 ]; then
             echo "smidetect(hwlatdetect) Passed - latency verification: " | tee -a $OUTPUTFILE
             rstrnt-report-result "$TEST" "PASS" 0
         else
