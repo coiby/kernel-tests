@@ -1,0 +1,24 @@
+{
+  "8.0": {
+    "latest-ADVANCED-VIRT": "http://download-01.eng.brq.redhat.com/rhel-8/nightly/ADVANCED-VIRT-8/latest-ADVANCED-VIRT-8.0.1-RHEL-8/compose/Advanced-virt/x86_64/os/"
+  },
+  "8.1": {
+    "latest-ADVANCED-VIRT": "http://download-01.eng.brq.redhat.com/rhel-8/nightly/ADVANCED-VIRT-8/latest-ADVANCED-VIRT-8.1.1-RHEL-8/compose/Advanced-virt/x86_64/os/"
+  },
+  "8.2": {
+    "latest-ADVANCED-VIRT": "http://download.eng.pek2.redhat.com/rhel-8/rel-eng/ADVANCED-VIRT-8/latest-ADVANCED-VIRT-8.2.1-RHEL-8/compose/Advanced-virt/x86_64/os/"
+  },
+  "8.3": {
+    "latest-ADVANCED-VIRT": "http://download-01.eng.brq.redhat.com/rhel-8/nightly/ADVANCED-VIRT-8/latest-ADVANCED-VIRT-8.3.1-RHEL-8/compose/Advanced-virt/x86_64/os/"
+  },
+  "8.4": {
+    "latest-ADVANCED-VIRT": "http://download.eng.pek2.redhat.com/rhel-8/rel-eng/ADVANCED-VIRT-8/latest-ADVANCED-VIRT-8.4.0-RHEL-8/compose/Advanced-virt/x86_64/os/"
+  },
+  "8.5": {
+    "latest-ADVANCED-VIRT": "http://download.eng.pek2.redhat.com/rhel-8/rel-eng/ADVANCED-VIRT-8/latest-ADVANCED-VIRT-8.5.0-RHEL-8/compose/Advanced-virt/x86_64/os/"
+  },
+  "8.6": {
+    "latest-ADVANCED-VIRT": "http://download.eng.pek2.redhat.com/rhel-8/rel-eng/ADVANCED-VIRT-8/latest-ADVANCED-VIRT-8.6.0-RHEL-8/compose/Advanced-virt/x86_64/os/"
+  }
+}
+
