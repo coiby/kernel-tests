@@ -41,8 +41,8 @@ for TEST_DISK in $TEST_DISKS; do
 		tlog "device node /dev/$TEST_DISK still exists"
 	fi
 	} &
-done
 	wait
+done
 }
 
 tlog "running $0"

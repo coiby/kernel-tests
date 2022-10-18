@@ -52,8 +52,8 @@ for TEST_DISK in $TEST_DISKS; do
 		return 1
 	fi
 	} &
-done
 	wait
+done
 	tlog "INFO: echo 1 > /sys/bus/pci/rescan"
 	tok "echo 1 > /sys/bus/pci/rescan"
 }

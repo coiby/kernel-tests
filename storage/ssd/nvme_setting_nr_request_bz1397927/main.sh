@@ -48,8 +48,8 @@ for TEST_DISK in $TEST_DISKS; do
 		done
 	done
 	} &
-done
 	wait
+done
 	trun dmesg
 	#enable the disabled CPUs
 	tok "echo 1 > /sys/devices/system/cpu/cpu1/online"
