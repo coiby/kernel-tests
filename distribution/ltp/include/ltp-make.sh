@@ -13,8 +13,10 @@ if [ -z ${TESTVERSION} ]; then
     if rlIsRHEL 6; then
         TESTVERSION="20200120"
     elif rlIsRHEL 7; then
+        # NOTE: don't forget to update ltp version on dci/rhel7.xml as well
         TESTVERSION="20210927"
     else
+        # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
         TESTVERSION="20220527"
     fi
 fi

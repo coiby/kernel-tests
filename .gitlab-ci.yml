@@ -100,6 +100,23 @@ check bash with mixed tabs and spaces:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
 
+check if LTP version on DCI matches the default on distribution/ltp/include/ltp-make.sh:
+  extends: .cki_tools
+  script:
+    - |
+      # Check the DCI test versions
+      for rhel_version in 7 8; do
+          function rlIsRHEL() { [[ "$1" = "${rhel_version}" ]]; }; source distribution/ltp/include/ltp-make.sh
+          dci_xml="dci/rhel${rhel_version}.xml"
+          if ! grep -q ltp-full-${TESTVERSION}.tar.bz2 "${dci_xml}"; then
+              echo "FAIL: needs to update LTP version on ${dci_xml} to ${TESTVERSION}"
+              exit 1
+          fi
+      done
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+
 .git-sync:
   extends: .cki_tools
   stage: 🚀
