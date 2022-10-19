@@ -7,28 +7,28 @@ source ${CASE_PATH}/sriov/env.sh
 
 set_preinstall_host()
 {
-  yum install -y podman
-  yum install -y python38
-  yum install -y wget
-  yum install -y expect
-  # spicfy xmltodict-0.12.0-py2.py3-none-any file url
-  pip-3 install ${CASE_PATH}/rt-kernel/xmltodict-0.12.0-py2.py3-none-any.whl
-  bash brewkoji_install.sh
+	yum install -y podman
+	yum install -y python38
+	yum install -y wget
+	yum install -y expect
+	# spicfy xmltodict-0.12.0-py2.py3-none-any file url
+	pip-3 install ${CASE_PATH}/rt-kernel/xmltodict-0.12.0-py2.py3-none-any.whl
+	bash brewkoji_install.sh
 }
 
 set_preinstall_vm()
 {
-  virsh net-define /usr/share/libvirt/networks/default.xml
-  virsh net-start default
-  virsh net-autostart default
+	virsh net-define /usr/share/libvirt/networks/default.xml
+	virsh net-start default
+	virsh net-autostart default
 
-  /usr/sbin/ip link show | grep virbr1 || /usr/sbin/ip link add name virbr1 type bridge
-  /usr/sbin/ip link set virbr1 up
+	/usr/sbin/ip link show | grep virbr1 || /usr/sbin/ip link add name virbr1 type bridge
+	/usr/sbin/ip link set virbr1 up
 }
 
 MARKER=/tmp/RT_STAGE
 if [ ! -f "$MARKER" ]; then
-  echo 0 > $MARKER
+	echo 0 > $MARKER
 fi
 
 stage=$(cat $MARKER)

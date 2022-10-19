@@ -778,7 +778,7 @@ sriov_config_dpdk()
 
 sriov_test_pf_remote()
 {
-	$dbg_flag   
+	$dbg_flag
 	log_header "PF($nic_test) <---> REMOTE" $result_file $result_file
 
 	local result=0
@@ -1086,7 +1086,7 @@ sriov_test_vf_remote_switchdev()
 }
 
 sriov_test_vf_remote_jumbo()
-{   
+{
 	log_header "VF <---> REMOTE JUMBO" $result_file
 
 	local result=0
@@ -2316,9 +2316,9 @@ sriov_test_vmvf1vf2_remote()
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
 	if ! sriov_create_vfs $iface1 0 2 || 
-	   ! sriov_create_vfs $iface2 0 2; then
-	   	echo "${test_name} failed:create vfs failed."
-	   	sriov_remove_vfs $iface1 0
+		! sriov_create_vfs $iface2 0 2; then
+			echo "${test_name} failed:create vfs failed."
+			sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
 		sync_set server ${test_name}_end
 		return 1
@@ -2462,9 +2462,9 @@ sriov_test_vmvf1_vmvf2_remote()
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
 	if ! sriov_create_vfs $iface1 0 2 || 
-	   ! sriov_create_vfs $iface2 0 2; then
-	   	echo "${test_name} failed:create vfs failed."
-	   	sriov_remove_vfs $iface1 0
+		! sriov_create_vfs $iface2 0 2; then
+		echo "${test_name} failed:create vfs failed."
+		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
 		sync_set server ${test_name}_end
 		return 1
@@ -2618,9 +2618,9 @@ sriov_test_vmvf1_vmvf2_vlan_remote()
 	local mac2="00:de:ad:$(printf %02x $ipaddr):02:01"
 
 	if ! sriov_create_vfs $iface1 0 2 || 
-	   ! sriov_create_vfs $iface2 0 2; then
-	   	echo "${test_name} failed:create vfs failed."
-	   	sriov_remove_vfs $iface1 0
+		! sriov_create_vfs $iface2 0 2; then
+		echo "${test_name} failed:create vfs failed."
+		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
 		sync_set server ${test_name}_end
 		return 1
@@ -2784,13 +2784,13 @@ sriov_test_max_vfs()
 						rlFail "ping failed via vm1 vf $i"
 					fi
 					#if [ $i -eq $vm1_attach_vf_nums ];then
-					#	   if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file; then
-					#			   let result++
-					#	   fi
+					#	if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file; then
+					#			let result++
+					#	fi
 					#fi
 					local cmd=(
-					   {export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-					   {ip addr flush \$NIC_TEST}
+						{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+						{ip addr flush \$NIC_TEST}
 					)
 					vmsh cmd_set $vm1 "${cmd[*]}"
 					sriov_detach_vf_from_vm $nic_test 0 $i $vm1
@@ -2817,13 +2817,13 @@ sriov_test_max_vfs()
 							rlFail "ping failed via vm2 vf $i"
 						fi
 						#if [ $i -eq $total_vfs ];then
-						#	   if ! do_vm_netperf $vm2 ${server_ip4} ${server_ip6} $result_file; then
-						#			   let result++
-						#	   fi
+						#		if ! do_vm_netperf $vm2 ${server_ip4} ${server_ip6} $result_file; then
+						#				let result++
+						#		fi
 						#fi
 						local cmd=(
-						   {export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						   {ip addr flush \$NIC_TEST}
+							{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+							{ip addr flush \$NIC_TEST}
 						)
 						vmsh cmd_set $vm2 "${cmd[*]}"
 						sriov_detach_vf_from_vm $nic_test 0 $i $vm2
@@ -2889,7 +2889,7 @@ sriov_test_max_vfs_attaching_to_different_vms()
 
 				# define default vnet
 			if ! virsh net-list | grep default &&
-			   ! virsh net-start default;then
+				! virsh net-start default;then
 				virsh net-define /usr/share/libvirt/networks/default.xml
 				virsh net-start default
 				virsh net-autostart default
@@ -3938,8 +3938,8 @@ sriov_test_vmvf_vlan_offload_remote()
 				{ip link show \$NIC_TEST.$vid}
 				{ip addr show \$NIC_TEST.$vid}
 			)
-		   vmsh cmd_set $vm1 "${cmd[*]}"
-		   vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST tso off;ethtool -k \$NIC_TEST}"
+			vmsh cmd_set $vm1 "${cmd[*]}"
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST tso off;ethtool -k \$NIC_TEST}"
 			if [ $? -ne 0 ];then
 				rlFail "set tso off fail"
 				result=1
@@ -4213,8 +4213,8 @@ sriov_test_trusted_vf_override_macaddr_via_bonding()
 			local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 			local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
 			if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac1 || \
-			   ! sriov_attach_vf_to_vm $nic_test 0 2 $vm1 $mac2;then
-			   	#sync_set server ${testname}_end
+				! sriov_attach_vf_to_vm $nic_test 0 2 $vm1 $mac2;then
+					#sync_set server ${testname}_end
 				result=1
 
 			else
@@ -4653,13 +4653,13 @@ sriov_test_bond_failovermac0_common() {
 		#cxgb4 is different with other NICs when create VFs	
 		if [ "$NIC_DRIVER" = "cxgb4" ];then
 			if ! sriov_create_vfs $iface1 0 1 || \
-	   	   	! sriov_create_vfs $iface2 1 1;then
+				! sriov_create_vfs $iface2 1 1;then
 				let result++
 				rlFail "${test_name} failed: can't create vfs."
 			fi
 		else
 			if ! sriov_create_vfs $iface1 0 2 || \
-	   	   	! sriov_create_vfs $iface2 0 2;then
+				! sriov_create_vfs $iface2 0 2;then
 				let result++
 				rlFail "${test_name} failed: can't create vfs."
 			fi
@@ -5671,7 +5671,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 		local packet_lost=$((3000-$packet_received))
 		rlLog "packet_lost=$packet_lost"
 		if [ $packet_lost -lt 200 ];then
-		   rlRun "ip addr add 192.100.1.1/24 dev $nic_test"
+			rlRun "ip addr add 192.100.1.1/24 dev $nic_test"
 		fi
 		ip addr show dev $nic_test
 		sync_set client ${test_name}_start_feedback_result
@@ -7983,7 +7983,7 @@ sriov_test_bond_lacp_common() {
 			rlLog "warning: two ifs belong to a dual port NIC"
 		fi
 		if ! sriov_create_vfs $iface1 0 2 || \
-	   		! sriov_create_vfs $iface2 0 2;then
+				! sriov_create_vfs $iface2 0 2;then
 			let result++
 			rlFail "${test_name} failed: can't create vfs."
 
@@ -8415,7 +8415,7 @@ sriov_test_bond_lacp_cxgb4() {
 		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
 		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
 		if ! sriov_create_vfs $iface1 0 1 || \
-	   		! sriov_create_vfs $iface2 1 1;then
+				! sriov_create_vfs $iface2 1 1;then
 			let result++
 			rlFail "${test_name} failed: can't create vfs."
 
@@ -9200,7 +9200,7 @@ sriov_test_bz1489964() {
 		rlLog "test_ifaces:$iface1,$iface2"
 
 		if ! sriov_create_vfs $iface1 0 4 || \
-	   	   ! sriov_create_vfs $iface2 0 4;then
+			! sriov_create_vfs $iface2 0 4;then
 			let result++
 			rlFail "${test_name} failed: can't create vfs."
 
@@ -9224,9 +9224,9 @@ sriov_test_bz1489964() {
 			ip link set $iface2 vf 3 spoofchk on
 
 			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-			   	   ! sriov_attach_vf_to_vm $iface2 0 3 $vm1 $mac2 || \
-			   ! sriov_attach_vf_to_vm $iface1 0 2 $vm2 $mac3 || \
-			   ! sriov_attach_vf_to_vm $iface2 0 4 $vm2 $mac4;then
+				! sriov_attach_vf_to_vm $iface2 0 3 $vm1 $mac2 || \
+				! sriov_attach_vf_to_vm $iface1 0 2 $vm2 $mac3 || \
+				! sriov_attach_vf_to_vm $iface2 0 4 $vm2 $mac4;then
 				let result++
 				rlFail "${test_name} failed: can't attach vf to vm."
 			else
@@ -10286,7 +10286,7 @@ sriov_test_vmpfbond_vmvfbond_remote()
 		ip link set $iface1 up
 		ip link set $iface2 up
 		if ! sriov_create_vfs $iface1 0 2 || \
-	   	   ! sriov_create_vfs $iface2 0 2;then
+			! sriov_create_vfs $iface2 0 2;then
 				let result++
 				rlFail "${test_name} failed: can't create vfs."
 		fi
@@ -10470,7 +10470,7 @@ sriov_test_attach_method_is_forward_hostdev()
 		virsh net-start forward_hostdev
 		sleep 5
 		if ! virsh attach-device $vm1 vf1.xml || \
-		   ! virsh attach-device $vm2 vf2.xml;then
+			! virsh attach-device $vm2 vf2.xml;then
 			let result++
 			rlFail "${test_name} failed: can't attach vf to vm."
 		fi
@@ -10673,7 +10673,7 @@ sriov_test_attach_method_is_forward_hostdev_vlan()
 		virsh net-start forward_hostdev
 		sleep 5
 		if ! virsh attach-device $vm1 vf1.xml || \
-		   	   ! virsh attach-device $vm2 vf2.xml;then
+			! virsh attach-device $vm2 vf2.xml;then
 			let result++
 			rlFail "${test_name} failed: can't attach vf to vm."
 		fi
@@ -11196,7 +11196,7 @@ sriov_test_vmvf_testpmd_macswap()
 
 #create vfs via "echo ${num_vfs} > /sys/class/net/$PF/device/sriov_numvfs"
 sriov_test_vf_creation()
-{   
+{
 	log_header "VF ---- REMOTE" $result_file
 
 	local result=0
@@ -11257,7 +11257,7 @@ sriov_test_vf_creation()
 }
 
 sriov_test_vf_vlan_negative()
-{   
+{
 
 	#vlan negative testing, like setting vlan -1/0/4096
 	#reproducer for bz1859477, run the command with the VF netdev, should just fail without a kernel panic
@@ -11315,7 +11315,7 @@ sriov_test_vf_vlan_negative()
 }
 
 sriov_test_vf_pf_speed_consistency()
-{   
+{
 	#reproducer for 1844598, vf speed and pf speed should be consistent
 	local result=0
 	ip link set $nic_test up
@@ -12793,9 +12793,9 @@ sriov_test_podcntvf1_podcntvf2()
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
 	if ! sriov_create_vfs $iface1 0 2 || 
-	   ! sriov_create_vfs $iface2 0 2; then
-	   	rlLog "${test_name} failed:create vfs failed."
-	   	sriov_remove_vfs $iface1 0
+		! sriov_create_vfs $iface2 0 2; then
+		rlLog "${test_name} failed:create vfs failed."
+		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
 		sync_set server ${test_name}_end
 		return 1
@@ -13022,7 +13022,7 @@ sriov_test_podcnts_vfs_remote_bz2088787()
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
 	if ! sriov_create_vfs $iface1 0 4 ||
-	   ! sriov_create_vfs $iface2 0 4; then
+		! sriov_create_vfs $iface2 0 4; then
 		rlLog "${test_name} failed:create vfs failed."
 		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
@@ -15337,9 +15337,9 @@ sriov_test_bug_reproducer_2103801(){
 		sync_wait server sriov_test_bug_reproducer_2103801_start 14400 || { rlFail "sync timeout with server side!!!"; return 1 ; }
 		local NIC_NUM=1
 		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-		   local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[0]})"
+			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[0]})"
 		else
-		   local test_iface="$(get_test_nic ${NIC_NUM})"
+			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
 		rlLog "got test nic is: ${test_iface}"
 		local total_vfs=$(sriov_get_max_vf_from_pf ${test_iface})

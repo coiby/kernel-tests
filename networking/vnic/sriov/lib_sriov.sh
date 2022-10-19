@@ -43,12 +43,12 @@ sriov_create_vfs()
 			fi
 			;;
 		mlx5_core)
-						if [ -e lib_mlx.sh ];then
-							mlx_create_vfs $@
-						else
-							echo "no lib for mellanox"
-							return 1
-						fi
+			if [ -e lib_mlx.sh ];then
+				mlx_create_vfs $@
+			else
+				echo "no lib for mellanox"
+				return 1
+			fi
 			;;
 		*)
 			echo ${num_vfs} > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs
@@ -423,8 +423,8 @@ sriov_get_vf_iface()
 
 				local vf_iface=()
 				local cx=0
-	   			while [ -z "$vf_iface" ] && (($cx < 60)); do
-	   				sleep 1
+	    		while [ -z "$vf_iface" ] && (($cx < 60)); do
+	    			sleep 1
 					vf_iface=($(ls /sys/bus/pci/devices/${vf_bus_info}/net 2>/dev/null))
 					let cx=cx+1
 				done
