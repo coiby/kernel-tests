@@ -2,22 +2,22 @@ IMG_GUEST=http://netqe-bj.usersys.redhat.com/share/vms/rhel6.8.qcow2
 
 echo "remove any VM if exist"
 virsh list --all | sed -n 3~1p |
-    awk '/[[:alpha:]]+/ {
-        if ($3 == "running") {
-            system("virsh shutdown "$2);
-            sleep 2;
-            system("virsh destroy "$2)
-        };
-        system("virsh undefine --managed-save --snapshots-metadata --remove-all-storage "$2)
-    }'
+	awk '/[[:alpha:]]+/ {
+		if ($3 == "running") {
+			system("virsh shutdown "$2);
+			sleep 2;
+			system("virsh destroy "$2)
+		};
+		system("virsh undefine --managed-save --snapshots-metadata --remove-all-storage "$2)
+	}'
 
 echo "remove any vnet definition if exist"
 virsh net-list --all | sed -n 3~1p |
-    awk '/[[:alnum:]]+/ {
-        system("virsh net-destroy "$1);
-        sleep 2;
-        system("virsh net-undefine "$1)
-    }'
+	awk '/[[:alnum:]]+/ {
+		system("virsh net-destroy "$1);
+		sleep 2;
+		system("virsh net-undefine "$1)
+	}'
 
 echo "Download guest image..."
 
