@@ -177,7 +177,7 @@ sriov_attach_vf_to_vm()
 	$dbg_flag
 	local PF=$1
 	local iPF=$2 	# start from 0.
-	 				# For cxgb4, PF used to create VF is different from the original PF
+					# For cxgb4, PF used to create VF is different from the original PF
 	local iVF=$3 	# index of vf, starting from 1
 	local vm=$4
 	local mac=$5
@@ -476,10 +476,10 @@ sriov_get_vf_bus_info()
 			return $rtn
 			;;
 		*)
- 			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
- 			rtn=$?
+			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
+			rtn=$?
 			echo ${vf_bus_info}
-	 		return $rtn
+			return $rtn
 			;;
 		esac
 }
