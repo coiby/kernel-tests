@@ -6,7 +6,7 @@ description: |
     SystemTap is designed to provide more filtering and analysis options for collected information.
 contact: Jeff Bastian <jbastian@redhat.com>
 test: bash ./runtest.sh
-framework: shell
+framework: beakerlib
 require:
   - systemtap
 extra-summary: tracepoints/operational
