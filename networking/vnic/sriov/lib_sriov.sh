@@ -224,8 +224,8 @@ sriov_attach_vf_to_vm()
 				</interface>
 			EOF
 		else
-	  		# workaround for bz1215975
-	  		echo "$(ethtool -i $PF | grep 'driver:' | awk '{print $2}')"
+			# workaround for bz1215975
+			echo "$(ethtool -i $PF | grep 'driver:' | awk '{print $2}')"
 			if [ $(ethtool -i $PF | grep 'driver:' | awk '{print $2}') == 'qlcnic' ]; then
 				echo "ectring workaround for bz1215975 chooise"
 				cat <<- EOF > ${vf_nodedev}.xml
@@ -242,7 +242,7 @@ sriov_attach_vf_to_vm()
 			else
 				cat <<- EOF > ${vf_nodedev}.xml
 					<interface type='hostdev' managed='yes'>
-					  <driver name='vfio'/>
+						<driver name='vfio'/>
 						<source>
 							<address type='pci' domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'/>
 						</source>
@@ -266,7 +266,7 @@ sriov_attach_vf_to_vm()
 		esac
 			return 0
 		fi
-  	return 1
+	return 1
 }
 
 # detach VF from VM, one for each calling
@@ -297,7 +297,7 @@ sriov_detach_vf_from_vm()
 	if [[ $ENABLE_RT_KERNEL != "yes" ]]; then
 		virsh detach-device $vm ${vf_nodedev}.xml
 	else
-		local rhel_version=$( cat /etc/redhat-release | sed  's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
+		local rhel_version=$( cat /etc/redhat-release | sed	's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
 		if [[ $(echo "${rhel_version} > 8.6" | bc) -eq 1 ]]; then
 			virsh detach-device $vm ${vf_nodedev}.xml
 		else
@@ -306,14 +306,14 @@ sriov_detach_vf_from_vm()
 			sleep 10
 			virsh start $vm
 			sleep 10
-			local vm_status=$(virsh list --all | grep -w $vm |  awk '{print $3,$4}' | tr -d " ")
+			local vm_status=$(virsh list --all | grep -w $vm |	awk '{print $3,$4}' | tr -d " ")
 			rlLog "${vm} in ${vm_status} status"
 			if [[ x"${vm_status}" != x"running" ]]; then
 				virsh destroy $vm
 				sleep 10
 				virsh start $vm
 				sleep 10
-				local vm_status=$(virsh list --all | grep -w $vm |  awk '{print $3,$4}' | tr -d " ")
+				local vm_status=$(virsh list --all | grep -w $vm |	awk '{print $3,$4}' | tr -d " ")
 				rlLog "current ${vm} in ${vm_status} status"
 				return 0
 			fi
@@ -368,7 +368,7 @@ sriov_detach_pf_from_vm()
 	local bus=$(echo $pf_bus_info | awk -F '[:|.]' '{print $2}')
 	local slot=$(echo $pf_bus_info | awk -F '[:|.]' '{print $3}')
 	local function=$(echo $pf_bus_info | awk -F '[:|.]' '{print $4}')
-  	# fix rt-kernel can't detach vf
+	# fix rt-kernel can't detach vf
 
 	# virsh detach-device $vm ${vf_nodedev}.xml
 	# fix rt-kernel can't detach vf Bug 1887895
@@ -376,7 +376,7 @@ sriov_detach_pf_from_vm()
 			virsh detach-device $vm ${pf_nodedev}.xml
 			return 0
 	else
-		local rhel_version=$( cat /etc/redhat-release | sed  's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
+		local rhel_version=$( cat /etc/redhat-release | sed	's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
 		if [[ $(echo "${rhel_version} > 8.6" | bc) -eq 1 ]]; then
 			virsh detach-device $vm ${pf_nodedev}.xml
 		else
@@ -385,14 +385,14 @@ sriov_detach_pf_from_vm()
 			sleep 10
 			virsh start $vm
 			sleep 10
-			local vm_status=$(virsh list --all | grep -w $vm |  awk '{print $3,$4}' | tr -d " ")
+			local vm_status=$(virsh list --all | grep -w $vm |	awk '{print $3,$4}' | tr -d " ")
 			rlLog "${vm} in ${vm_status} status"
 			if [[ x"${vm_status}" != x"running" ]]; then
 				virsh destroy $vm
 				sleep 10
 				virsh start $vm
 				sleep 10
-				local vm_status=$(virsh list --all | grep -w $vm |  awk '{print $3,$4}' | tr -d " ")
+				local vm_status=$(virsh list --all | grep -w $vm |	awk '{print $3,$4}' | tr -d " ")
 				rlLog "current ${vm} in ${vm_status} status"
 				return 0
 			fi
@@ -423,8 +423,8 @@ sriov_get_vf_iface()
 
 				local vf_iface=()
 				local cx=0
-	    		while [ -z "$vf_iface" ] && (($cx < 60)); do
-	    			sleep 1
+				while [ -z "$vf_iface" ] && (($cx < 60)); do
+					sleep 1
 					vf_iface=($(ls /sys/bus/pci/devices/${vf_bus_info}/net 2>/dev/null))
 					let cx=cx+1
 				done
@@ -454,33 +454,33 @@ sriov_vfmac_is_zero()
 
 sriov_get_vf_bus_info()
 {
-  	local PF=$1
-  	local iPF=$2
-  	local iVF=$3
+	local PF=$1
+	local iPF=$2
+	local iVF=$3
 
-  	local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
-  	local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
+	local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
+	local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
 
-  	case ${driver} in
+	case ${driver} in
 		mlx4_en)
 			local vf_bus_info=$(mlx_get_vf_bus_info $@)
 			rtn=$?
-		  	echo ${vf_bus_info}
-		  	return $rtn
-		  	;;
+			echo ${vf_bus_info}
+			return $rtn
+			;;
 		cxgb4)
 			local vf_bus_info=$(chelsio_get_vf_bus_info $@)
-		  	rtn=$?
-		  	echo ${vf_bus_info}
-		  	return $rtn
-		  	;;
+			rtn=$?
+			echo ${vf_bus_info}
+			return $rtn
+			;;
 		*)
  			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
  			rtn=$?
-		  	echo ${vf_bus_info}
+			echo ${vf_bus_info}
 	 		return $rtn
-		  	;;
-	  	esac
+			;;
+		esac
 }
 
 sriov_get_pf_bus_info()
@@ -493,16 +493,16 @@ sriov_get_pf_bus_info()
 
 	case ${driver} in
 		mlx4_en)
-		  	pf_bus_info=$(mlx_get_pf_bus_info $@)
-		  	echo $pf_bus_info
-		  	;;
+			pf_bus_info=$(mlx_get_pf_bus_info $@)
+			echo $pf_bus_info
+			;;
 		cxgb4)
-		  	pf_bus_info=$(chelsio_get_pf_bus_info $@)
-		  	echo $pf_bus_info
-		  	;;
+			pf_bus_info=$(chelsio_get_pf_bus_info $@)
+			echo $pf_bus_info
+			;;
 		*)
 			echo $pf_bus_info
-		  	;;
+			;;
 		esac
 }
 
@@ -719,8 +719,8 @@ switchdev_cleanup_ice()
 
 clear_dmesg_message()
 {
-  rlRun -l "dmesg -C"
-  return 0
+	rlRun -l "dmesg -C"
+	return 0
 }
 
 check_call_trace()

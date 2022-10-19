@@ -399,8 +399,8 @@ sriov_setup()
 			--force \
 			--os-variant=rhel-unknown \
 			--noautoconsol \
-			  --controller type=pci,index=0,model=pcie-root \
-			  $pci_str
+			--controller type=pci,index=0,model=pcie-root \
+			$pci_str
 	elif [ "$SYS_ARCH" == "ppc64le" ];then
 		pci_str=$(for i in `seq 1 15`;do echo -n "--controller type=pci,index=$i,model=pci-root ";done)
 				virt-install \
@@ -498,10 +498,10 @@ sriov_setup()
 	# In rhel 8.1, modules_internal separate from modules package
 	rhel_version_2=$(cat /etc/redhat-release |awk '{print $6}'| awk  'BEGIN{FS="[.:%]"} {print $2}')
 	if (($rhel_version_2 >= 1 ));then
-	  vmsh run_cmd $vm1 "$k_modules_internal"
-	  vmsh run_cmd $vm2 "$k_modules_internal"
-	  vmsh run_cmd $vm1 "$yum_k_modules_internal"
-	  vmsh run_cmd $vm2 "$yum_k_modules_internal"
+		vmsh run_cmd $vm1 "$k_modules_internal"
+		vmsh run_cmd $vm2 "$k_modules_internal"
+		vmsh run_cmd $vm1 "$yum_k_modules_internal"
+		vmsh run_cmd $vm2 "$yum_k_modules_internal"
 	fi
 	else
 	vmsh run_cmd $vm1 "$k"
@@ -730,13 +730,13 @@ get_test_nic(){
 
 sriov_clean_pod_container()
 {
-  set -x
-  podman pod ps --format '{{.ID}}' | xargs -I {} podman pod stop {}
-  podman pod ps --format '{{.ID}}' | xargs -I {} podman pod rm {}
-  podman ps --all --format '{{.ID}}' | xargs -I {} podman stop {}
-  podman ps --all --format '{{.ID}}' | xargs -I {} podman rm {}
-  podman image list --format '{{.ID}}' | xargs -I {} podman image rm {}
-  set +x
+	set -x
+	podman pod ps --format '{{.ID}}' | xargs -I {} podman pod stop {}
+	podman pod ps --format '{{.ID}}' | xargs -I {} podman pod rm {}
+	podman ps --all --format '{{.ID}}' | xargs -I {} podman stop {}
+	podman ps --all --format '{{.ID}}' | xargs -I {} podman rm {}
+	podman image list --format '{{.ID}}' | xargs -I {} podman image rm {}
+	set +x
 }
 
 sriov_config_dpdk()
@@ -1919,10 +1919,10 @@ sriov_test_vmvf_vmvf()
 
 	#ensure netserver is running
 	local cmd=(
-		  {iptables -F}
-		  {ip6tables -F}
-		  {systemctl stop firewalld}
-		  {pkill netserver\; sleep 2\; netserver}
+			{iptables -F}
+			{ip6tables -F}
+			{systemctl stop firewalld}
+			{pkill netserver\; sleep 2\; netserver}
 	)
 	vmsh cmd_set $vm1 "${cmd[*]}"
 	vmsh cmd_set $vm2 "${cmd[*]}"
@@ -2023,13 +2023,13 @@ sriov_test_vmvf_vmvf_vlan()
 		return 1
 	fi
 
-  	#ensure netserver is running
+		#ensure netserver is running
 	local cmd=(
-		  {iptables -F}
-		  {ip6tables -F}
-		  {systemctl stop firewalld}
-		  {pkill netserver\; sleep 2\; netserver}
-		  {ip a}
+			{iptables -F}
+			{ip6tables -F}
+			{systemctl stop firewalld}
+			{pkill netserver\; sleep 2\; netserver}
+			{ip a}
 	)
 	vmsh cmd_set $vm1 "${cmd[*]}"
 	vmsh cmd_set $vm2 "${cmd[*]}"
@@ -3249,7 +3249,7 @@ sriov_test_bz1392128()
 						{ip a}
 					)
 					vmsh cmd_set $vm1 "${cmd[*]}"
-		  			sriov_detach_vf_from_vm $nic_test 0 $i $vm1
+						sriov_detach_vf_from_vm $nic_test 0 $i $vm1
 				fi
 			done
 			for((i=$((vm1_attach_vf_nums+1));i<=$total_vfs;i++))
@@ -5810,7 +5810,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 		#link down the related PF
 		ip link set $PF_DOWN down
 		ip link show $PF_DOWN
-		  	
+		
 		local cmd=(
 			# increase interval time
 			{sleep 300}
@@ -6012,18 +6012,18 @@ sriov_test_bond_failovermac1_mlx4en_dualport() {
 				{pkill ping}
 				{modprobe -rv pktgen}
 			)
-			  vmsh cmd_set $vm1 "${cmd[*]}"
-			  sync_set server ${test_name}_end_send_packet
-			  sync_wait server ${test_name}_start_feedback_result
-			  ip addr add 192.100.1.2/24 dev $iface1
-			  sleep 5
-			  ping 192.100.1.1 -c 5
-			  if [ $? -ne 0 ]; then
+				vmsh cmd_set $vm1 "${cmd[*]}"
+				sync_set server ${test_name}_end_send_packet
+				sync_wait server ${test_name}_start_feedback_result
+				ip addr add 192.100.1.2/24 dev $iface1
+				sleep 5
+				ping 192.100.1.1 -c 5
+				if [ $? -ne 0 ]; then
 					 let result++
 					 rlFail "failed: failover time is too long"
-			  fi
-			  ip addr del 192.100.1.2/24 dev $iface1
-			  sync_set server ${test_name}_end_feedback_result
+				fi
+				ip addr del 192.100.1.2/24 dev $iface1
+				sync_set server ${test_name}_end_feedback_result
 
 
 		local cmd=(
@@ -9367,7 +9367,7 @@ sriov_test_spoofchk()
 		sleep 1
 		tcpdump -r spoof.cap -e -nn | grep "$spoof_mac > $server_mac"
 		if [ $? -eq 0 ];then
-		  ip addr flush $nic_test
+			ip addr flush $nic_test
 		fi
 		sync_set client test_spoofchk_on_vf_mac_start 180
 		sync_wait client test_spoofchk_on_vf_mac_start 180
@@ -9377,7 +9377,7 @@ sriov_test_spoofchk()
 		sync_wait client test_spoofchk_on_vf_mac_check 180
 		tcpdump -r spoof.cap -e -nn | grep "${vf_mac} > ${server_mac}"
 		if [ $? -ne 0 ];then
-		  ip addr flush $nic_test
+			ip addr flush $nic_test
 		fi
 		sync_set client test_spoofchk_pktgen_setip1 180
 		sync_wait client test_spoofchk_pktgen_ping1 180
@@ -9535,14 +9535,14 @@ sriov_test_spoofchk()
 }
 sriov_test_spoofchk_vlan()
 {
-  #Bug 2118135/Bug 2112335
-  log_header "test_spoofchk_vlan" $result_file
-  local result=0
-  ip link set ${nic_test} up
-  local vf_0_mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-  local vf_1_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
-  local server_mac="00:de:ad:$(printf %02x $ipaddr):01:21"
-  if  i_am_server; then
+	#Bug 2118135/Bug 2112335
+	log_header "test_spoofchk_vlan" $result_file
+	local result=0
+	ip link set ${nic_test} up
+	local vf_0_mac="00:de:ad:$(printf %02x $ipaddr):01:01"
+	local vf_1_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
+	local server_mac="00:de:ad:$(printf %02x $ipaddr):01:21"
+	if  i_am_server; then
 	ip addr flush ${nic_test}
 	ip link set ${nic_test} down
 	sleep 1
@@ -9554,48 +9554,48 @@ sriov_test_spoofchk_vlan()
 	sync_set  client configure_finished
 	for spoof_conf in {on,off}
 	do
-	  rlLog "=====Check spoofchk ${spoof_conf}====="
-	  ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
-	  sleep 5
-	  [ -f spoof.cap ] && rm -f spoof.cap
-	  ip link set ${nic_test} spoofchk ${spoof_conf}
-	  sync_wait client capture_unicast_packet
-	  [ -f unicast.pcap ] && rm unicast.pcap
-	  tcpdump -i ${nic_test} -enn  -w unicast.pcap &
+		rlLog "=====Check spoofchk ${spoof_conf}====="
+		ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
+		sleep 5
+		[ -f spoof.cap ] && rm -f spoof.cap
+		ip link set ${nic_test} spoofchk ${spoof_conf}
+		sync_wait client capture_unicast_packet
+		[ -f unicast.pcap ] && rm unicast.pcap
+		tcpdump -i ${nic_test} -enn  -w unicast.pcap &
 
-	  sync_wait client stop_capture_unicast_packet
-	  pkill -9 tcpdump
-	  tcpdump -r unicast.pcap -e -nn | grep "vlan 100"
-	  [ $? -ne 0 ] &&  ip addr flush ${nic_test}
-	  sync_set client unicast_get_return_from_server
-	  rlLog "spoofchk ${spoof_conf}: multicast test start"
-	  [ -f multicast.pcap ] && rm multicast.pcap
-	  ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
-	  sync_wait client capture_multicast_packet
-	  tcpdump -i ${nic_test} -enn  -w multicast.pcap &
-	  sleep 3
-	  sync_wait client stop_capture_multicast_packet
-	  pkill -9 tcpdump
-	  tcpdump -r multicast.pcap -enn | grep "vlan 100"
-	  [ $? -ne 0 ] &&  ip addr flush ${nic_test}
-	  sync_set client multicast_get_return_from_server
-	  rlLog "spoofchk ${spoof_conf}: broadcast test start"
-	  [ -f broadcast.pcap ] && rm broadcast.pcap
-	  ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
-	  sync_wait client capture_broadcast_packet
-	  tcpdump -i ${nic_test} -enn  -w broadcast.pcap  &
-	  sync_wait client stop_capture_broadcast_packet
-	  pkill -9 tcpdump
-	  tcpdump -r broadcast.pcap -enn | grep "vlan 100"
-	  [ $? -ne 0 ] &&  ip addr flush ${nic_test}
-	  sync_set client broadcast_get_return_from_server
+		sync_wait client stop_capture_unicast_packet
+		pkill -9 tcpdump
+		tcpdump -r unicast.pcap -e -nn | grep "vlan 100"
+		[ $? -ne 0 ] &&	ip addr flush ${nic_test}
+		sync_set client unicast_get_return_from_server
+		rlLog "spoofchk ${spoof_conf}: multicast test start"
+		[ -f multicast.pcap ] && rm multicast.pcap
+		ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
+		sync_wait client capture_multicast_packet
+		tcpdump -i ${nic_test} -enn	-w multicast.pcap &
+		sleep 3
+		sync_wait client stop_capture_multicast_packet
+		pkill -9 tcpdump
+		tcpdump -r multicast.pcap -enn | grep "vlan 100"
+		[ $? -ne 0 ] &&	ip addr flush ${nic_test}
+		sync_set client multicast_get_return_from_server
+		rlLog "spoofchk ${spoof_conf}: broadcast test start"
+		[ -f broadcast.pcap ] && rm broadcast.pcap
+		ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
+		sync_wait client capture_broadcast_packet
+		tcpdump -i ${nic_test} -enn	-w broadcast.pcap  &
+		sync_wait client stop_capture_broadcast_packet
+		pkill -9 tcpdump
+		tcpdump -r broadcast.pcap -enn | grep "vlan 100"
+		[ $? -ne 0 ] &&	ip addr flush ${nic_test}
+		sync_set client broadcast_get_return_from_server
 	done
-	sync_set  client test_end
+	sync_set client test_end
 	sync_wait client test_end
 	#clear config
 	ip addr flush ${nic_test}
 	ip link set ${nic_test} promisc off
-  else
+	else
 	#Configure host mac and ip addr
 	ip link set ${nic_test} promisc on
 	ethtool --set-priv-flags ${nic_test} vf-true-promisc-support on
@@ -9606,44 +9606,44 @@ sriov_test_spoofchk_vlan()
 	sriov_attach_vf_to_vm ${nic_test} 0 2 g1 ${vf_1_mac}
 	#install scapy on vm
 	cmd=(
-	  {source /mnt/tests/kernel/networking/common/install.sh}
-	  {scapy_install}
+		{source /mnt/tests/kernel/networking/common/install.sh}
+		{scapy_install}
 	)
 	vmsh cmd_set g1 "${cmd[*]}"
 	#Configure virtual machine
 	cmd=(
-	  {set -x}
-	  {ip link show}
-	  {systemctl stop NetworkManager}
-	  {export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-	  {export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-	  {ip addr flush \${NIC_TEST_0}}
-	  {ip addr flush \${NIC_TEST_1}}
-	  {ip addr add 172.30.${ipaddr}.3/24 dev \${NIC_TEST_0}}
-	  {ip link set \${NIC_TEST_0} up}
-	  {ip link set \${NIC_TEST_1} up}
-	  {ip link set \${NIC_TEST_1} promisc on}
-	  {set +x}
+		{set -x}
+		{ip link show}
+		{systemctl stop NetworkManager}
+		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+		{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+		{ip addr flush \${NIC_TEST_0}}
+		{ip addr flush \${NIC_TEST_1}}
+		{ip addr add 172.30.${ipaddr}.3/24 dev \${NIC_TEST_0}}
+		{ip link set \${NIC_TEST_0} up}
+		{ip link set \${NIC_TEST_1} up}
+		{ip link set \${NIC_TEST_1} promisc on}
+		{set +x}
 	)
 	vmsh cmd_set g1 "${cmd[*]}"
-	[ $? -ne 0 ]  && result=1 && rlLog "vf ping server/host ==> failed"
+	[ $? -ne 0 ] && result=1 && rlLog "vf ping server/host ==> failed"
 	sync_set server configure_finished
 	sync_wait server configure_finished
 	cmd=(
-	  {ping -c 3 172.30.${ipaddr}.1}
-	  {ping -c 3 172.30.${ipaddr}.2}
+		{ping -c 3 172.30.${ipaddr}.1}
+		{ping -c 3 172.30.${ipaddr}.2}
 	)
 	vmsh cmd_set g1 "${cmd[*]}"
 	# Send packet from g1 vf0
 	for spoof_conf in {on,off}
 	do
-	  #config vf "spoof on" on host
-	  ip link set ${nic_test} vf 0 spoofchk ${spoof_conf}
-	  ip link set ${nic_test} vf 1 spoofchk ${spoof_conf}
-	  rlLog "spoofchk ${spoof_conf}: unicast test start"
-	  unicast_pkt="Ether(src='${vf_0_mac}', dst='${server_mac}')/Dot1Q(vlan=100)"
-	  if [ $(GetDistroRelease) = 8 ];then
-			  cmd=(
+		#config vf "spoof on" on host
+		ip link set ${nic_test} vf 0 spoofchk ${spoof_conf}
+		ip link set ${nic_test} vf 1 spoofchk ${spoof_conf}
+		rlLog "spoofchk ${spoof_conf}: unicast test start"
+		unicast_pkt="Ether(src='${vf_0_mac}', dst='${server_mac}')/Dot1Q(vlan=100)"
+		if [ $(GetDistroRelease) = 8 ];then
+			cmd=(
 		{set -x}
 		{NIC_TEST_0=\$\(ip link show \| grep \'${vf_0_mac}\' -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
 		{NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -9652,8 +9652,8 @@ sriov_test_spoofchk_vlan()
 		{bash -c \"sleep 20\"}
 		{tcpdump -r unicast.pcap -enn \| grep \"vlan 100\"}
 		{set +x}
-	  )
-		  else
+		)
+		else
 			cmd=(
 		{set -x}
 		{NIC_TEST_0=\$\(ip link show \| grep \'${vf_0_mac}\' -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -9663,21 +9663,21 @@ sriov_test_spoofchk_vlan()
 		{bash -c \"sleep 20\"}
 		{tcpdump -r unicast.pcap -enn \| grep \"vlan 100\"}
 		{set +x}
-	  )
-		  fi
-	  sync_set server capture_unicast_packet
-	  vmsh cmd_set g1 "${cmd[*]}"
-	  [ $? -eq 0 ] && result=1 && rlFail "Failed, there should be no packets captured on vf 1"
-	  sync_set server stop_capture_unicast_packet
-	  sync_wait server unicast_get_return_from_server
-	  cmd=(
+		)
+		fi
+	sync_set server capture_unicast_packet
+	vmsh cmd_set g1 "${cmd[*]}"
+	[ $? -eq 0 ] && result=1 && rlFail "Failed, there should be no packets captured on vf 1"
+	sync_set server stop_capture_unicast_packet
+	sync_wait server unicast_get_return_from_server
+	cmd=(
 		{ping -c 3 172.30.${ipaddr}.2}
-	  )
-	  vmsh cmd_set g1 "${cmd[*]}"
-	  [ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured unicast packets"
-	  rlLog "spoofchk ${spoof_conf}: multicast test start"
-	  multicast_pkt="Ether(src='${vf_0_mac}', dst='01:00:5e:00:00:01')/Dot1Q(vlan=100)"
-	  if [ $(GetDistroRelease) = 8 ];then
+	)
+	vmsh cmd_set g1 "${cmd[*]}"
+	[ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured unicast packets"
+	rlLog "spoofchk ${spoof_conf}: multicast test start"
+	multicast_pkt="Ether(src='${vf_0_mac}', dst='01:00:5e:00:00:01')/Dot1Q(vlan=100)"
+	if [ $(GetDistroRelease) = 8 ];then
 		cmd=(
 		{set -x}
 		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -9687,8 +9687,8 @@ sriov_test_spoofchk_vlan()
 		{bash -c \"sleep 20\"}
 		{tcpdump -r multicast.pcap -enn \| grep \"vlan 100\"}
 		{set +x}
-	  )
-	  else
+		)
+	else
 		cmd=(
 		{set -x}
 		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -9698,21 +9698,21 @@ sriov_test_spoofchk_vlan()
 		{bash -c \"sleep 20\"}
 		{tcpdump -r multicast.pcap -enn \| grep \"vlan 100\"}
 		{set +x}
-	  )
-	  fi
-	  sync_set server capture_multicast_packet
-	  vmsh cmd_set g1 "${cmd[*]}"
-	  [ $? -ne 0 ] && result=1 && rlFail "Failed, there should be  packets captured on vf 1"
-	  sync_set server  stop_capture_multicast_packet
-	  sync_wait server multicast_get_return_from_server
-	  cmd=(
+		)
+	fi
+	sync_set server capture_multicast_packet
+	vmsh cmd_set g1 "${cmd[*]}"
+	[ $? -ne 0 ] && result=1 && rlFail "Failed, there should be  packets captured on vf 1"
+	sync_set server  stop_capture_multicast_packet
+	sync_wait server multicast_get_return_from_server
+	cmd=(
 		{ping -c 3 172.30.${ipaddr}.2}
-	  )
-	  vmsh cmd_set g1 "${cmd[*]}"
-	  [ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured multicast packets"
-	  rlLog "spoofchk ${spoof_conf}: broadcast test start"
-	  broadcast_pkt="Ether(src='${vf_0_mac}', dst='FF:FF:FF:FF:FF:FF')/Dot1Q(vlan=100)"
-	  if [ $(GetDistroRelease) = 8 ];then
+	)
+	vmsh cmd_set g1 "${cmd[*]}"
+	[ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured multicast packets"
+	rlLog "spoofchk ${spoof_conf}: broadcast test start"
+	broadcast_pkt="Ether(src='${vf_0_mac}', dst='FF:FF:FF:FF:FF:FF')/Dot1Q(vlan=100)"
+	if [ $(GetDistroRelease) = 8 ];then
 		cmd=(
 		{set -x}
 		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -9722,8 +9722,8 @@ sriov_test_spoofchk_vlan()
 		{bash -c \"sleep 20\"}
 		{tcpdump -r broadcast.pcap -enn \| grep \"vlan 100\"}
 		{set +x}
-	  )
-	  else
+		)
+	else
 		cmd=(
 		{set -x}
 		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -9733,13 +9733,13 @@ sriov_test_spoofchk_vlan()
 		{bash -c \"sleep 20\"}
 		{tcpdump -r broadcast.pcap -enn \| grep \"vlan 100\"}
 		{set +x}
-	  )
-	  fi
-	  sync_set server capture_broadcast_packet
-	  vmsh cmd_set g1 "${cmd[*]}"
-	  [ $? -ne 0 ] && result=1 && rlFail "Failed, there should be  packets captured on vf 1"
-	  sync_set server stop_capture_broadcast_packet
-	  sync_wait server broadcast_get_return_from_server
+		)
+	fi
+	sync_set server capture_broadcast_packet
+	vmsh cmd_set g1 "${cmd[*]}"
+	[ $? -ne 0 ] && result=1 && rlFail "Failed, there should be  packets captured on vf 1"
+	sync_set server stop_capture_broadcast_packet
+	sync_wait server broadcast_get_return_from_server
 	  cmd=(
 		{ping -c 3 172.30.${ipaddr}.2}
 	  )
