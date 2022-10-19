@@ -43,13 +43,13 @@ SERVER_INTERFACES=${SERVER_INTERFACES:-'None'}
 rhel_version=$(cut -f1 -d. /etc/redhat-release | sed 's/[^0-9]//g')
 KERNEL_VERSION=$(uname -r)
 if (($rhel_version <= 6)); then
-    image_name=${image_name:-"rhel6.9.qcow2"}
+	image_name=${image_name:-"rhel6.9.qcow2"}
 elif (($rhel_version == 7)); then
-    image_name=${image_name:-"rhel7.7.qcow2"}
+	image_name=${image_name:-"rhel7.7.qcow2"}
 elif (($rhel_version == 8)); then
-    image_name=${image_name:-"rhel8.6.qcow2"}
+	image_name=${image_name:-"rhel8.6.qcow2"}
 elif (($rhel_version == 9));then
-    image_name=${image_name:-"rhel9.0.qcow2"}
+	image_name=${image_name:-"rhel9.0.qcow2"}
 fi
 
 #IMG_GUEST=${IMG_GUEST:-"http://netqe-bj.usersys.redhat.com/share/vms/${image_name}"}
@@ -65,29 +65,29 @@ fi
 kernel_ver="$(uname -r)"
 if [ "$ENABLE_RT_KERNEL" = "no" ]; then
   if [ -z "$YUM_KERNEL" ]; then
-    YUM_KERNEL="kernel-${kernel_ver}"
+	YUM_KERNEL="kernel-${kernel_ver}"
   fi
   if [ -z "$YUM_KERNEL_CORE" ]; then
-    YUM_KERNEL_CORE="kernel-core-${kernel_ver}"
+	YUM_KERNEL_CORE="kernel-core-${kernel_ver}"
   fi
   if [ -z "$YUM_KERNEL_MODULES" ]; then
-    YUM_KERNEL_MODULES="kernel-modules-${kernel_ver}"
+	YUM_KERNEL_MODULES="kernel-modules-${kernel_ver}"
   fi
   if [ -z "$YUM_KERNEL_MODULES_INTERNAL" ]; then
-    YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-${kernel_ver}"
+	YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-${kernel_ver}"
   fi
 else
   if [ -z "$YUM_KERNEL" ]; then
-    YUM_KERNEL="kernel-rt-${kernel_ver}"
+	YUM_KERNEL="kernel-rt-${kernel_ver}"
   fi
   if [ -z "$YUM_KERNEL_CORE" ]; then
-    YUM_KERNEL_CORE="kernel-core-rt-${kernel_ver}"
+	YUM_KERNEL_CORE="kernel-core-rt-${kernel_ver}"
   fi
   if [ -z "$YUM_KERNEL_MODULES" ]; then
-    YUM_KERNEL_MODULES="kernel-modules-rt-${kernel_ver}"
+	YUM_KERNEL_MODULES="kernel-modules-rt-${kernel_ver}"
   fi
   if [ -z "$YUM_KERNEL_MODULES_INTERNAL" ]; then
-    YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-rt-${kernel_ver}"
+	YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-rt-${kernel_ver}"
   fi
 fi
 

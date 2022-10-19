@@ -33,20 +33,20 @@ fi
 
 stage=$(cat $MARKER)
 while [[ "$stage" != "fin" ]] ; do
-    echo "Executing stage=$stage"
-    case "$stage" in
-            0)
-    echo 1 > $MARKER
-    crontab -l | grep "@reboot sh ${CASE_PATH}/rt-kernel/manual_run_set_up.sh"
-    if [ ! $?  ] || [ ! `crontab -l` ] ;then
-           echo "@reboot sh ${CASE_PATH}/rt-kernel/manual_run_set_up.sh"  >> /var/spool/cron/root
-    fi
+	echo "Executing stage=$stage"
+	case "$stage" in
+			0)
+	echo 1 > $MARKER
+	crontab -l | grep "@reboot sh ${CASE_PATH}/rt-kernel/manual_run_set_up.sh"
+	if [ ! $?  ] || [ ! `crontab -l` ] ;then
+		   echo "@reboot sh ${CASE_PATH}/rt-kernel/manual_run_set_up.sh"  >> /var/spool/cron/root
+	fi
 
-    #configure rt-kernel yum from repo.json
-    #install kernel-rt/rt-tests/tuned/qemu-kvm-rhev/libvirt/ from repo
-    set_preinstall_host
-    /usr/bin/python3 ${CASE_PATH}/rt-kernel/rt_kernel_paramter.py --os_type="host" --stage="0" --enable_default_yum=$ENABLE_DEFAULT_YUM || exit 1
-    ;;
+	#configure rt-kernel yum from repo.json
+	#install kernel-rt/rt-tests/tuned/qemu-kvm-rhev/libvirt/ from repo
+	set_preinstall_host
+	/usr/bin/python3 ${CASE_PATH}/rt-kernel/rt_kernel_paramter.py --os_type="host" --stage="0" --enable_default_yum=$ENABLE_DEFAULT_YUM || exit 1
+	;;
 		1)
 			echo 2 > $MARKER
 			# isolate cores and set hugepage to kernel line

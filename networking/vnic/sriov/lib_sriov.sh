@@ -43,27 +43,27 @@ sriov_create_vfs()
 			fi
 			;;
 		mlx5_core)
-                        if [ -e lib_mlx.sh ];then
-                            mlx_create_vfs $@
-                        else
-                            echo "no lib for mellanox"
-                            return 1
-                        fi
+						if [ -e lib_mlx.sh ];then
+							mlx_create_vfs $@
+						else
+							echo "no lib for mellanox"
+							return 1
+						fi
 			;;
 		*)
-            echo ${num_vfs} > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs
-                sleep 5
+			echo ${num_vfs} > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs
+				sleep 5
 
-                lspci | grep -i ether
-                echo ----------------------
+				lspci | grep -i ether
+				echo ----------------------
 
-                if (( $(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | wc -l) != ${num_vfs} )); then
-                    echo "FAIL to create VFs"
-                    return 1
-                fi
+				if (( $(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | wc -l) != ${num_vfs} )); then
+					echo "FAIL to create VFs"
+					return 1
+				fi
 
-                ip link set $PF up
-                ip link show $PF
+				ip link set $PF up
+				ip link show $PF
 			;;
 	esac
 	link_up_ifs_with_same_bus $pf_bus_info
@@ -102,16 +102,16 @@ sriov_create_vfs_1()
 			fi
 			;;
 		mlx5_core)
-            if [ -e lib_mlx.sh ];then
-                    mlx_create_vfs_1 $@
-            else
-                    echo "no lib for mellanox"
-                    return 1
-            fi
+			if [ -e lib_mlx.sh ];then
+					mlx_create_vfs_1 $@
+			else
+					echo "no lib for mellanox"
+					return 1
+			fi
 			;;
 		*)
 			echo ${num_vfs} > /sys/class/net/$PF/device/sriov_numvfs
-		        sleep 5
+				sleep 5
 
 			lspci | grep -i ether
 			echo ----------------------
@@ -146,26 +146,26 @@ sriov_remove_vfs()
 		cxgb4)
 			chelsio_remove_vfs $@
 			;;
-                mlx5_core)
+				mlx5_core)
 			mlx_remove_vfs $@
-            ;;
+			;;
 
 		*)
 			echo 0 > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs
-		        sleep 5
+				sleep 5
 
-        		lspci | grep -i ether
-        		echo ----------------------
+				lspci | grep -i ether
+				echo ----------------------
 
-        		if (($(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* 2>/dev/null | wc -l) != 0)); then
-            		echo "FAIL to remove VFs"
-            		return 1
-        		fi
+				if (($(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* 2>/dev/null | wc -l) != 0)); then
+					echo "FAIL to remove VFs"
+					return 1
+				fi
 
-        		ip link set $PF down
-        		sleep 2
-        		ip link set $PF up
-        		ip link show $PF
+				ip link set $PF down
+				sleep 2
+				ip link set $PF up
+				ip link show $PF
 			;;
 	esac
 }
@@ -176,7 +176,7 @@ sriov_attach_vf_to_vm()
 	$dbg_flag
 	local PF=$1
 	local iPF=$2 	# start from 0.
-     				# For cxgb4, PF used to create VF is different from the original PF
+	 				# For cxgb4, PF used to create VF is different from the original PF
 	local iVF=$3 	# index of vf, starting from 1
 	local vm=$4
 	local mac=$5
@@ -224,20 +224,20 @@ sriov_attach_vf_to_vm()
 				</interface>
 			EOF
 		else
-      	    # workaround for bz1215975
-      	    echo "$(ethtool -i $PF | grep 'driver:' | awk '{print $2}')"
-    		if [ $(ethtool -i $PF | grep 'driver:' | awk '{print $2}') == 'qlcnic' ]; then
-    			echo "ectring workaround for bz1215975 chooise"
-		        cat <<- EOF > ${vf_nodedev}.xml
-		            <interface type='hostdev' managed='yes'>
-		                <source>
-		                    <address type='pci' domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'/>
-		                </source>
-		                <mac address='${mac}'/>
-		                    <vlan>
-		                        <tag id='4095'/>
-		                    </vlan>
-		            </interface>
+	  		# workaround for bz1215975
+	  		echo "$(ethtool -i $PF | grep 'driver:' | awk '{print $2}')"
+			if [ $(ethtool -i $PF | grep 'driver:' | awk '{print $2}') == 'qlcnic' ]; then
+				echo "ectring workaround for bz1215975 chooise"
+				cat <<- EOF > ${vf_nodedev}.xml
+					<interface type='hostdev' managed='yes'>
+						<source>
+							<address type='pci' domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'/>
+						</source>
+						<mac address='${mac}'/>
+							<vlan>
+								<tag id='4095'/>
+							</vlan>
+					</interface>
 					EOF
 			else
 				cat <<- EOF > ${vf_nodedev}.xml
@@ -337,7 +337,7 @@ sriov_attach_pf_to_vm()
 
 	local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
 	local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
-        local pf_nodedev=pci_$(echo $pf_bus_info | sed 's/[:|.]/_/g')
+		local pf_nodedev=pci_$(echo $pf_bus_info | sed 's/[:|.]/_/g')
 
 	link_up_ifs_with_same_bus $pf_bus_info
 
@@ -363,7 +363,7 @@ sriov_detach_pf_from_vm()
 {
 	local pf_bus_info=$1
 	local vm=$2
-    local pf_nodedev=pci_$(echo $pf_bus_info | sed 's/[:|.]/_/g')
+	local pf_nodedev=pci_$(echo $pf_bus_info | sed 's/[:|.]/_/g')
 	local domain=$(echo $pf_bus_info | awk -F '[:|.]' '{print $1}')
 	local bus=$(echo $pf_bus_info | awk -F '[:|.]' '{print $2}')
 	local slot=$(echo $pf_bus_info | awk -F '[:|.]' '{print $3}')
@@ -421,15 +421,15 @@ sriov_get_vf_iface()
 		*)
 			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
 
-        		local vf_iface=()
-        		local cx=0
-       			while [ -z "$vf_iface" ] && (($cx < 60)); do
-       				sleep 1
-            		vf_iface=($(ls /sys/bus/pci/devices/${vf_bus_info}/net 2>/dev/null))
-            		let cx=cx+1
-        		done
+				local vf_iface=()
+				local cx=0
+	   			while [ -z "$vf_iface" ] && (($cx < 60)); do
+	   				sleep 1
+					vf_iface=($(ls /sys/bus/pci/devices/${vf_bus_info}/net 2>/dev/null))
+					let cx=cx+1
+				done
 
-		        echo ${vf_iface[0]}
+				echo ${vf_iface[0]}
 			;;
 	esac
 }
@@ -462,24 +462,24 @@ sriov_get_vf_bus_info()
   	local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
 
   	case ${driver} in
-	    mlx4_en)
-	    	local vf_bus_info=$(mlx_get_vf_bus_info $@)
-	    	rtn=$?
-	      	echo ${vf_bus_info}
-	      	return $rtn
-	      	;;
-	    cxgb4)
-		    local vf_bus_info=$(chelsio_get_vf_bus_info $@)
-	      	rtn=$?
-	      	echo ${vf_bus_info}
-	      	return $rtn
-	      	;;
+		mlx4_en)
+			local vf_bus_info=$(mlx_get_vf_bus_info $@)
+			rtn=$?
+		  	echo ${vf_bus_info}
+		  	return $rtn
+		  	;;
+		cxgb4)
+			local vf_bus_info=$(chelsio_get_vf_bus_info $@)
+		  	rtn=$?
+		  	echo ${vf_bus_info}
+		  	return $rtn
+		  	;;
 		*)
  			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
  			rtn=$?
-	      	echo ${vf_bus_info}
-     		return $rtn
-	      	;;
+		  	echo ${vf_bus_info}
+	 		return $rtn
+		  	;;
 	  	esac
 }
 
@@ -500,8 +500,8 @@ sriov_get_pf_bus_info()
 		  	pf_bus_info=$(chelsio_get_pf_bus_info $@)
 		  	echo $pf_bus_info
 		  	;;
-	    *)
-		    echo $pf_bus_info
+		*)
+			echo $pf_bus_info
 		  	;;
 		esac
 }
@@ -516,10 +516,10 @@ get_all_ifs_with_same_bus()
 		if [ "$ifname" = "lo" ];then
 			continue
 		fi
-        	bus_info=$(ethtool -i $ifname|grep bus-info|awk -F" " '{print $2}')
-        	if [ "$bus" = "$bus_info" ];then
-            	result+=" $ifname"
-        	fi
+			bus_info=$(ethtool -i $ifname|grep bus-info|awk -F" " '{print $2}')
+			if [ "$bus" = "$bus_info" ];then
+				result+=" $ifname"
+			fi
 	done
 
 	echo $result
@@ -537,45 +537,45 @@ link_up_ifs_with_same_bus()
 
 vm_netperf_ipv4()
 {
-    local vm=$1
-    local ipv4=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -L "$1 } else { print $1 } }')
-    local p_ipv4=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -I "$1 } else { print $1 } }')
+	local vm=$1
+	local ipv4=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -L "$1 } else { print $1 } }')
+	local p_ipv4=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -I "$1 } else { print $1 } }')
 
-    local log=""
+	local log=""
 
-    # IPv4
-    vmsh run_cmd $vm "timeout 120s bash -c \"until ping -c3 $p_ipv4; do sleep 10; done\"" > /tmp/perf.log
-    if [ $? -eq 0 ];then
-            vmsh run_cmd $vm "netperf -4 -t UDP_STREAM -H $ipv4 -l 30 -- -m 10000" > /tmp/perf.log
-            if (( $? )); then
-                UDP_STREAMv4=0
-            else
-                UDP_STREAMv4=$(cat /tmp/perf.log|sed -n '/netperf/,/^\[root@.*]#/ {/.*/ p}'|sed -n '/\(\b[0-9]\+\)\{5,\}/ p'|sed 's/[\r\n]//'|tail -n1|awk '{printf $NF}')
-            fi
-    fi
+	# IPv4
+	vmsh run_cmd $vm "timeout 120s bash -c \"until ping -c3 $p_ipv4; do sleep 10; done\"" > /tmp/perf.log
+	if [ $? -eq 0 ];then
+			vmsh run_cmd $vm "netperf -4 -t UDP_STREAM -H $ipv4 -l 30 -- -m 10000" > /tmp/perf.log
+			if (( $? )); then
+				UDP_STREAMv4=0
+			else
+				UDP_STREAMv4=$(cat /tmp/perf.log|sed -n '/netperf/,/^\[root@.*]#/ {/.*/ p}'|sed -n '/\(\b[0-9]\+\)\{5,\}/ p'|sed 's/[\r\n]//'|tail -n1|awk '{printf $NF}')
+			fi
+	fi
 
-    echo $UDP_STREAMv4
+	echo $UDP_STREAMv4
 }
 
 vm_netperf_ipv6()
 {
-        local vm=$1
-        local ipv6=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -L "$1 } else { print $1 } }')
-        local p_ipv6=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -I "$1 } else { print $1 } }')
+		local vm=$1
+		local ipv6=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -L "$1 } else { print $1 } }')
+		local p_ipv6=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -I "$1 } else { print $1 } }')
 
-        local log=""
+		local log=""
 
-        # IPv4
-        vmsh run_cmd $vm "timeout 120s bash -c \"until ping6 -c3 $p_ipv6; do sleep 10; done\"" > /tmp/perf.log
-        if [ $? -eq 0 ];then
-            vmsh run_cmd $vm "netperf -6 -t UDP_STREAM -H $ipv6 -l 30 -- -m 10000" > /tmp/perf.log
-            if (( $? )); then
-                UDP_STREAMv6=0
-            else
-                UDP_STREAMv6=$(cat /tmp/perf.log|sed -n '/netperf/,/^\[root@.*]#/ {/.*/ p}'|sed -n '/\(\b[0-9]\+\)\{5,\}/ p'|sed 's/[\r\n]//'|tail -n1|awk '{printf $NF}')
-            fi
-        fi
-        echo $UDP_STREAMv6
+		# IPv4
+		vmsh run_cmd $vm "timeout 120s bash -c \"until ping6 -c3 $p_ipv6; do sleep 10; done\"" > /tmp/perf.log
+		if [ $? -eq 0 ];then
+			vmsh run_cmd $vm "netperf -6 -t UDP_STREAM -H $ipv6 -l 30 -- -m 10000" > /tmp/perf.log
+			if (( $? )); then
+				UDP_STREAMv6=0
+			else
+				UDP_STREAMv6=$(cat /tmp/perf.log|sed -n '/netperf/,/^\[root@.*]#/ {/.*/ p}'|sed -n '/\(\b[0-9]\+\)\{5,\}/ p'|sed 's/[\r\n]//'|tail -n1|awk '{printf $NF}')
+			fi
+		fi
+		echo $UDP_STREAMv6
 }
 
 switchdev_get_reps()
