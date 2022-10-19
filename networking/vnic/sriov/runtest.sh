@@ -20,7 +20,7 @@
 #   You should have received a copy of the GNU General Public
 #   License along with this program; if not, write to the Free
 #   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-#   Boston, MA 02110-1301, USA.
+#   Boston, MA 02110-1301, USA.f
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # test
@@ -15381,9 +15381,9 @@ sriov_test_bug_reproducer_2103801(){
 setup() {
 	Configuring_NetworkManager_to_ignore_certain_devices
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
-	  rlRun install_pktgen
+		rlRun install_pktgen
 	elif [[ $ENABLE_RT_KERNEL == "yes" ]]; then
-	  sleep 1
+		sleep 1
 	fi
 
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
@@ -16495,12 +16495,12 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_bug_reprod
 		rlPhaseEnd
 fi
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_spoofchk_vlan\b)"; then
-  rlPhaseStartTest "preconfiguration"
+	rlPhaseStartTest "preconfiguration"
 	rlRun preconfiguration
-  rlPhaseEnd
+	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_spoofchk_vlan"
 	rlRun "sriov_test_spoofchk_vlan"
-  rlPhaseEnd
+	rlPhaseEnd
 fi
 
 rlJournalPrintText
