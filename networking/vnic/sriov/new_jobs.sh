@@ -38,7 +38,7 @@ for ((i=0; i<$((${#test_pairs[*]}/5)); i++)); do
 	#only run on those drivers
 	TEST_DRIVERS="i40e ixgbe cxgb4"
 	if ! echo $TEST_DRIVERS|grep -q all && ! echo $TEST_DRIVERS|grep -q $test_driver;then
-        	continue
+			continue
 	fi
 
 	#use HOSTDEV method to attach cxgb4 VF to VM

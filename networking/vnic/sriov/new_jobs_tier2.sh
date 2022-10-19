@@ -26,17 +26,17 @@ declare -A test_pairs=(
 	[machine9]="hp-dl380pg8-15.rhts.eng.pek2.redhat.com,hp-dl380pg8-08.rhts.eng.pek2.redhat.com" [systype9]="machine" [driver9]="cxgb4,mlx4_en" [model9]="Chelsio-T520-CR_Unified_Wire_Ethernet_Controller,Mellanox-MT26448"
 
 	[machine10]="netqe2.knqe.lab.eng.bos.redhat.com,netqe11.knqe.lab.eng.bos.redhat.com" [systype10]="machine,machine" [driver10]="mlx5_core,bnx2x" [model10]="Mellanox-MT27710_Family,Broadcom-NetXtreme_II_BCM57800_1-10_Gb"
-        [machine11]="dell-per730-17.rhts.eng.pek2.redhat.com,dell-per730-16.rhts.eng.pek2.redhat.com" [systype11]="prototype" [driver11]="bnxt_en,mlx5_core" [model11]="Broadcom-BCM57304_NetXtreme-C_10Gb25Gb-40Gb-50Gb_Ethernet_Controller,Mellanox-MT27710_Family"
+	[machine11]="dell-per730-17.rhts.eng.pek2.redhat.com,dell-per730-16.rhts.eng.pek2.redhat.com" [systype11]="prototype" [driver11]="bnxt_en,mlx5_core" [model11]="Broadcom-BCM57304_NetXtreme-C_10Gb25Gb-40Gb-50Gb_Ethernet_Controller,Mellanox-MT27710_Family"
 
-        [machine12]="dell-per730-16.rhts.eng.pek2.redhat.com,dell-per730-17.rhts.eng.pek2.redhat.com" [systype12]="prototype" [driver12]="mlx5_core,i40e" [model12]="Mellanox-MT27710_Family,Intel-Ethernet_Controller_XXV710_for_25Gb28"
-        [machine13]="dell-per730-17.rhts.eng.pek2.redhat.com,dell-per730-16.rhts.eng.pek2.redhat.com" [systype13]="prototype" [driver13]="bnxt_en,bnxt_en" [model13]="Broadcom-BCM57304_NetXtreme-C_10Gb25Gb-40Gb-50Gb_Ethernet_Controller,Broadcom-BCM57414_NetXtreme-E_10Gb25Gb_RDMA_Ethernet_Controller"
+	[machine12]="dell-per730-16.rhts.eng.pek2.redhat.com,dell-per730-17.rhts.eng.pek2.redhat.com" [systype12]="prototype" [driver12]="mlx5_core,i40e" [model12]="Mellanox-MT27710_Family,Intel-Ethernet_Controller_XXV710_for_25Gb28"
+	[machine13]="dell-per730-17.rhts.eng.pek2.redhat.com,dell-per730-16.rhts.eng.pek2.redhat.com" [systype13]="prototype" [driver13]="bnxt_en,bnxt_en" [model13]="Broadcom-BCM57304_NetXtreme-C_10Gb25Gb-40Gb-50Gb_Ethernet_Controller,Broadcom-BCM57414_NetXtreme-E_10Gb25Gb_RDMA_Ethernet_Controller"
 
-        [machine14]="dell-per730-16.rhts.eng.pek2.redhat.com,dell-per730-17.rhts.eng.pek2.redhat.com" [systype14]="prototype" [driver14]="mlx5_core,bnxt_en" [model14]="Mellanox-MT27710_Family,Broadcom-BCM57304_NetXtreme-C_10Gb25Gb-40Gb-50Gb_Ethernet_Controller"
-        [machine15]="hp-dl388g8-22.rhts.eng.pek2.redhat.com,dell-per730-14.rhts.eng.pek2.redhat.com" [systype15]="machine,prototype" [driver15]="sfc,mlx5_core" [model15]="Solarflare-SFC9120_10G_Ethernet_Controller,Mellanox-MT27700_Family"
+	[machine14]="dell-per730-16.rhts.eng.pek2.redhat.com,dell-per730-17.rhts.eng.pek2.redhat.com" [systype14]="prototype" [driver14]="mlx5_core,bnxt_en" [model14]="Mellanox-MT27710_Family,Broadcom-BCM57304_NetXtreme-C_10Gb25Gb-40Gb-50Gb_Ethernet_Controller"
+	[machine15]="hp-dl388g8-22.rhts.eng.pek2.redhat.com,dell-per730-14.rhts.eng.pek2.redhat.com" [systype15]="machine,prototype" [driver15]="sfc,mlx5_core" [model15]="Solarflare-SFC9120_10G_Ethernet_Controller,Mellanox-MT27700_Family"
 
-        [machine16]="hp-dl388g8-22.rhts.eng.pek2.redhat.com,ibm-x3650m5-01.rhts.eng.pek2.redhat.com" [systype16]="machine,prototype" [driver16]="qlcnic,qede" [model16]="QLogic-ISP8324_1-10Gb,QLogic-FastLinQ_QL41000_Series_10-25-40-50Gb"
+	[machine16]="hp-dl388g8-22.rhts.eng.pek2.redhat.com,ibm-x3650m5-01.rhts.eng.pek2.redhat.com" [systype16]="machine,prototype" [driver16]="qlcnic,qede" [model16]="QLogic-ISP8324_1-10Gb,QLogic-FastLinQ_QL41000_Series_10-25-40-50Gb"
 
-        [machine17]="hp-dl388g8-22.rhts.eng.pek2.redhat.com,hp-dl380g9-01.rhts.eng.pek2.redhat.com" [systype17]="machine,prototype" [driver17]="qlcnic,nfp" [model17]="QLogic-ISP8324_1-10Gb,Netronome-Device_4000"
+	[machine17]="hp-dl388g8-22.rhts.eng.pek2.redhat.com,hp-dl380g9-01.rhts.eng.pek2.redhat.com" [systype17]="machine,prototype" [driver17]="qlcnic,nfp" [model17]="QLogic-ISP8324_1-10Gb,Netronome-Device_4000"
 
 )
 
@@ -50,7 +50,7 @@ for ((i=0; i<$((${#test_pairs[*]}/4)); i++)); do
 	#only run on those drivers
 	TEST_DRIVERS="mlx5_core bnxt_en"
 	if ! echo $TEST_DRIVERS|grep -q all && ! echo $TEST_DRIVERS|grep -q $test_driver;then
-        	continue
+			continue
 	fi
 
 	#use HOSTDEV method to attach cxgb4 VF to VM

@@ -1,15 +1,15 @@
 sriov_test_bz2057244_vf_not_up()
 {
-        log_header "bz2057244" $result_file
+		log_header "bz2057244" $result_file
 
-        local result=0
+		local result=0
 
-        ip link set $nic_test up
-        local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-        local mac2="00:de:ad:$(printf %02x $ipaddr):02:02"
-        local pktgen_dst_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
+		ip link set $nic_test up
+		local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
+		local mac2="00:de:ad:$(printf %02x $ipaddr):02:02"
+		local pktgen_dst_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
 
-        if i_am_server; then
+		if i_am_server; then
 			ip addr flush $nic_test
 			ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
 			ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
@@ -35,7 +35,7 @@ sriov_test_bz2057244_vf_not_up()
 				rlFail "sync error with VM testing, need to check"
 				exit 1
 			fi
-        else
+		else
 			sync_wait server test_bz2057244_start 14400
 			if [ $? -eq 0 ] && [ ! -f /tmp/sriov_test_bz2057244_with_vm ]; then
 				rlLog "reproducer with VM for the bz2057244"
@@ -213,25 +213,25 @@ sriov_test_bz2057244_vf_not_up()
 				rm -rf /tmp/sriov_test_bz2057244_with_vm
 				exit 1
 			fi
-        fi
+		fi
 
-        return $result
+		return $result
 }
 
 sriov_test_bz2070917_vlan_bridge_nic()
 {
-        log_header "bz2057244 vf donot work at vlan over bridge over NIC topology" $result_file
-        local result=0
-        ip link set $nic_test up
-        local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-        local pktgen_dst_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
+		log_header "bz2057244 vf donot work at vlan over bridge over NIC topology" $result_file
+		local result=0
+		ip link set $nic_test up
+		local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
+		local pktgen_dst_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
 
-        if i_am_server; then
-                ip addr flush $nic_test
-                ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-                ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
+		if i_am_server; then
+				ip addr flush $nic_test
+				ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
+				ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
 
-                sync_set client test_bz2070917_start
+				sync_set client test_bz2070917_start
 		if [ $? -eq 0 ]; then
 			sync_wait client test_bz2070917_end
 			ip addr flush $nic_test
@@ -240,8 +240,8 @@ sriov_test_bz2070917_vlan_bridge_nic()
 			rlFail "sync error need to check"
 			exit 1
 		fi
-        else
-                sync_wait server test_bz2070917_start
+		else
+				sync_wait server test_bz2070917_start
 		if [ $? -eq 0 ]; then
 			rlLog "reproducer with NS for the bz2070917"
 			sriov_create_vfs $nic_test 0 1
@@ -269,33 +269,33 @@ sriov_test_bz2070917_vlan_bridge_nic()
 			rlFail "sync error with server"
 			exit 1
 		fi
-        fi
+		fi
 
-        return $result
+		return $result
 }
 
 sriov_test_bz2055446_no_arp_reply()
 {
-        log_header "bz2055446" $result_file
+		log_header "bz2055446" $result_file
 
-        local result=0
+		local result=0
 	ipaddr=$(get_static_ip_subnet $SERVERS)
 	mac_prefix=$(get_mac_prefix $SERVERS)
 
-        ip link set $nic_test up
+		ip link set $nic_test up
 
-        if i_am_server; then
+		if i_am_server; then
 
 		rlRun "ip link add link ${nic_test} name ${nic_test}.3 type vlan id 3"
 		rlRun "ip add add 172.3.$ipaddr.212/24 dev ${nic_test}.3"
 		rlRun "ip link set ${nic_test}.3 up"
 		sync_set client SERVER_DONE
 		rlRun "ping -c 5 172.3.$ipaddr.211"
-                sync_wait client CLIENT_DONE
+				sync_wait client CLIENT_DONE
 
 		ip link del ${nic_test}.3
-                ip addr flush $nic_test
-        else
+				ip addr flush $nic_test
+		else
 		local pf_bus_info=$(sriov_get_pf_bus_info $nic_test 0)
 		local total_vfs=$(cat /sys/bus/pci/devices/${pf_bus_info}/sriov_totalvfs)
 		if [[ ${total_vfs} -le 8 ]]; then
@@ -333,7 +333,7 @@ sriov_test_bz2055446_no_arp_reply()
 		rlRun "ip netns exec bz2055446_ns1 ping -c 5 172.3.$ipaddr.212"  
 		rlRun "ip link set $nic_test vf 0 spoofchk off"
 		#check vf connection with spoofchk off
-                rlRun "ip netns exec bz2055446_ns1 ping -c 5 172.3.$ipaddr.212"
+				rlRun "ip netns exec bz2055446_ns1 ping -c 5 172.3.$ipaddr.212"
 		sync_set server CLIENT_DONE
 
 		#clean up
@@ -341,21 +341,21 @@ sriov_test_bz2055446_no_arp_reply()
 		modprobe -r bridge
 		sriov_remove_vfs $nic_test 0
 
-        fi
+		fi
 
-        return $result
+		return $result
 }
 
 sriov_test_bz2071027_double_tagging()
 {
-        log_header "bz2071027" $result_file
+		log_header "bz2071027" $result_file
 
-        local result=0
+		local result=0
 	ipaddr=$(get_static_ip_subnet $SERVERS)
-        ip link set $nic_test up
+		ip link set $nic_test up
 	iperf3_install
 
-        if i_am_server; then
+		if i_am_server; then
 
 		rlRun "ip link add link ${nic_test} name ${nic_test}.3 type vlan id 3"
 		rlRun "ip link add link ${nic_test}.3 name ${nic_test}.3.3 type vlan id 3"
@@ -378,7 +378,7 @@ sriov_test_bz2071027_double_tagging()
 		rlRun "ip link del ${nic_test}.3.4"
 		rlRun "ip link del ${nic_test}.3"
 
-        else
+		else
 		sriov_create_vfs ${nic_test} 0 1
 		sleep 3
 		local VF=$(sriov_get_vf_iface $nic_test 0 1)
@@ -418,24 +418,24 @@ sriov_test_bz2071027_double_tagging()
 		rlRun "ip netns exec bz2071027_ns1 ip link del $VF.4"
 		rlRun "ip netns del bz2071027_ns1"
 		sriov_remove_vfs $nic_test 0
-        fi
+		fi
 
-        return $result
+		return $result
 }
 
 sriov_test_bz2080033_re_assign_MACs_to_VFs()
 {
-        log_header "bz2080033 assign a MAC that is already assigned to a different VF" $result_file
-        ip link set $nic_test up
-        local MAC1="00:de:ad:$(printf %02x $ipaddr):01:01"
-        local MAC2="00:de:ad:$(printf %02x $ipaddr):01:02"
+		log_header "bz2080033 assign a MAC that is already assigned to a different VF" $result_file
+		ip link set $nic_test up
+		local MAC1="00:de:ad:$(printf %02x $ipaddr):01:01"
+		local MAC2="00:de:ad:$(printf %02x $ipaddr):01:02"
 
-        if i_am_server; then
-                ip addr flush $nic_test
-                ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-                ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
+		if i_am_server; then
+				ip addr flush $nic_test
+				ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
+				ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
 
-                sync_set client test_bz2080033_start
+				sync_set client test_bz2080033_start
 		if [ $? -eq 0 ]; then
 			sync_wait client test_bz2080033_end
 			ip addr flush $nic_test
@@ -444,8 +444,8 @@ sriov_test_bz2080033_re_assign_MACs_to_VFs()
 			rlFail "sync error need to check"
 			exit 1
 		fi
-        else
-                sync_wait server test_bz2080033_start
+		else
+				sync_wait server test_bz2080033_start
 		if [ $? -eq 0 ]; then
 			rlLog "reproducer for the bz2080033"
 			sriov_create_vfs $nic_test 0 2
@@ -467,7 +467,7 @@ sriov_test_bz2080033_re_assign_MACs_to_VFs()
 			rlFail "sync error with server"
 			exit 1
 		fi
-        fi
+		fi
 
 }
 

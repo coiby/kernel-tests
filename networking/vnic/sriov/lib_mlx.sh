@@ -39,18 +39,18 @@ mlx_create_vfs()
 		;;
 	esac
 
-        sleep 5
+		sleep 5
 
-        lspci | grep -i ether
-        echo ----------------------
+		lspci | grep -i ether
+		echo ----------------------
 
-        if (( $(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | wc -l) != ${num_vfs} )); then
-                echo "FAIL to create VFs"
-                return 1
-        fi
+		if (( $(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | wc -l) != ${num_vfs} )); then
+				echo "FAIL to create VFs"
+				return 1
+		fi
 
-        ip link set $PF up
-        ip link show $PF
+		ip link set $PF up
+		ip link show $PF
 }
 
 mlx_create_vfs_1()
@@ -85,7 +85,7 @@ mlx_remove_vfs()
 
 	local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
 	local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
-        
+		
 	case ${driver} in
 		mlx4_en)
 			modprobe -r mlx4_en; modprobe -r mlx4_ib;  modprobe -r mlx4_core
@@ -180,29 +180,29 @@ mlx_get_vf_iface()
 
 mlx_get_vf_bus_info()
 {
-      local PF=$1
-      local iPF=$2
-      local iVF=$3
+	  local PF=$1
+	  local iPF=$2
+	  local iVF=$3
 
-      local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
-      local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
+	  local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
+	  local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
 
-      local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
-      rtn=$?
-      echo ${vf_bus_info}
-      return $rtn
+	  local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
+	  rtn=$?
+	  echo ${vf_bus_info}
+	  return $rtn
 
 }
 
 mlx_get_pf_bus_info()
 {
-      local PF=$1
-      local iPF=$2
+	  local PF=$1
+	  local iPF=$2
 
-      local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
-      local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
+	  local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
+	  local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
 
-      echo $pf_bus_info
+	  echo $pf_bus_info
 }
 
 load_openibd_for_mlnx()
