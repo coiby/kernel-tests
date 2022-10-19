@@ -64,80 +64,80 @@ fi
 
 kernel_ver="$(uname -r)"
 if [ "$ENABLE_RT_KERNEL" = "no" ]; then
-    if [ -z "$YUM_KERNEL" ]; then
+	if [ -z "$YUM_KERNEL" ]; then
 	YUM_KERNEL="kernel-${kernel_ver}"
-    fi
-    if [ -z "$YUM_KERNEL_CORE" ]; then
+	fi
+	if [ -z "$YUM_KERNEL_CORE" ]; then
 	YUM_KERNEL_CORE="kernel-core-${kernel_ver}"
-    fi
-    if [ -z "$YUM_KERNEL_MODULES" ]; then
+	fi
+	if [ -z "$YUM_KERNEL_MODULES" ]; then
 	YUM_KERNEL_MODULES="kernel-modules-${kernel_ver}"
-    fi
-    if [ -z "$YUM_KERNEL_MODULES_INTERNAL" ]; then
+	fi
+	if [ -z "$YUM_KERNEL_MODULES_INTERNAL" ]; then
 	YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-${kernel_ver}"
-    fi
+	fi
 else
-    if [ -z "$YUM_KERNEL" ]; then
+	if [ -z "$YUM_KERNEL" ]; then
 	YUM_KERNEL="kernel-rt-${kernel_ver}"
-    fi
-    if [ -z "$YUM_KERNEL_CORE" ]; then
+	fi
+	if [ -z "$YUM_KERNEL_CORE" ]; then
 	YUM_KERNEL_CORE="kernel-core-rt-${kernel_ver}"
-    fi
-    if [ -z "$YUM_KERNEL_MODULES" ]; then
+	fi
+	if [ -z "$YUM_KERNEL_MODULES" ]; then
 	YUM_KERNEL_MODULES="kernel-modules-rt-${kernel_ver}"
-    fi
-    if [ -z "$YUM_KERNEL_MODULES_INTERNAL" ]; then
+	fi
+	if [ -z "$YUM_KERNEL_MODULES_INTERNAL" ]; then
 	YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-rt-${kernel_ver}"
-    fi
+	fi
 fi
 
 if [ "$ENABLE_RT_KERNEL" = "no" ]; then
 	if [ -z "$RPM_KERNEL" ]; then
 		RPM_KERNEL=$(uname -r | awk '{
-		    split($0,v,"-");
-		    s=v[2];
-		    do {
-			    i=index(s,".");
-			    s=substr(s, i+1)
-		    } while(i > 0)
-		    sub("."s,"",v[2]);
-		    print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-"v[1]"-"v[2]"."s".rpm"
+			split($0,v,"-");
+			s=v[2];
+			do {
+				i=index(s,".");
+				s=substr(s, i+1)
+			} while(i > 0)
+			sub("."s,"",v[2]);
+			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_CORE" ]; then
 		RPM_KERNEL_CORE=$(uname -r | awk '{
-		    split($0,v,"-");
-		    s=v[2];
-		    do {
-			    i=index(s,".");
-			    s=substr(s, i+1)
-		    } while(i > 0)
-		    sub("."s,"",v[2]);
-		    print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-core-"v[1]"-"v[2]"."s".rpm"
+			split($0,v,"-");
+			s=v[2];
+			do {
+				i=index(s,".");
+				s=substr(s, i+1)
+			} while(i > 0)
+			sub("."s,"",v[2]);
+			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-core-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES" ]; then
 		RPM_KERNEL_MODULES=$(uname -r | awk '{
-		    split($0,v,"-");
-		    s=v[2];
-		    do {
-			    i=index(s,".");
-			    s=substr(s, i+1)
-		    } while(i > 0)
-		    sub("."s,"",v[2]);
-		    print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-modules-"v[1]"-"v[2]"."s".rpm"
+			split($0,v,"-");
+			s=v[2];
+			do {
+				i=index(s,".");
+				s=substr(s, i+1)
+			} while(i > 0)
+			sub("."s,"",v[2]);
+			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-modules-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES_INTERNAL" ]; then
 		RPM_KERNEL_MODULES_INTERNAL=$(uname -r | awk '{
-		    split($0,v,"-");
-		    s=v[2];
-		    do {
-			    i=index(s,".");
-			    s=substr(s, i+1)
-		    } while(i > 0)
-		    sub("."s,"",v[2]);
-		    print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-modules-internal-"v[1]"-"v[2]"."s".rpm"
+			split($0,v,"-");
+			s=v[2];
+			do {
+				i=index(s,".");
+				s=substr(s, i+1)
+			} while(i > 0)
+			sub("."s,"",v[2]);
+			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-modules-internal-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 else
@@ -155,38 +155,38 @@ else
 	fi
 	if [ -z "$RPM_KERNEL_CORE" ]; then
 		RPM_KERNEL_CORE=$(uname -r | awk '{
-		    split($0,v,"-");
-	        s=v[2];
-		    do {
-			    i=index(s,".");
-			    s=substr(s, i+1)
-		    } while(i > 0)
-		    sub("."s,"",v[2]);
-		    print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-core-rt-"v[1]"-"v[2]"."s".rpm"
+			split($0,v,"-");
+			s=v[2];
+			do {
+				i=index(s,".");
+				s=substr(s, i+1)
+			} while(i > 0)
+			sub("."s,"",v[2]);
+			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-core-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES" ]; then
 		RPM_KERNEL_MODULES=$(uname -r | awk '{
-		    split($0,v,"-");
-		    s=v[2];
-		    do {
-			    i=index(s,".");
-			    s=substr(s, i+1)
-		    } while(i > 0)
-		    sub("."s,"",v[2]);
-		    print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-rt-"v[1]"-"v[2]"."s".rpm"
+			split($0,v,"-");
+			s=v[2];
+			do {
+				i=index(s,".");
+				s=substr(s, i+1)
+			} while(i > 0)
+			sub("."s,"",v[2]);
+			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES_INTERNAL" ]; then
 		RPM_KERNEL_MODULES_INTERNAL=$(uname -r | awk '{
-		    split($0,v,"-");
-		    s=v[2];
-		    do {
-			    i=index(s,".");
-			    s=substr(s, i+1)
-		    } while(i > 0)
-		    sub("."s,"",v[2]);
-		    print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-internal-rt-"v[1]"-"v[2]"."s".rpm"
+			split($0,v,"-");
+			s=v[2];
+			do {
+				i=index(s,".");
+				s=substr(s, i+1)
+			} while(i > 0)
+			sub("."s,"",v[2]);
+			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-internal-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 fi
