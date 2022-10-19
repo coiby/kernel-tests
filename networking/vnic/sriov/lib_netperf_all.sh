@@ -1,3 +1,4 @@
+#!/bin/bash
 # helper for netperf
 
 #usage

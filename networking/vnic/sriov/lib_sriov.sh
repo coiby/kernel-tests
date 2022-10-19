@@ -1,5 +1,6 @@
-# helper for SR-IOV
+#!/bin/bash
 
+# helper for SR-IOV
 # create VFs for PF
 #
 # *** NOTE:
@@ -28,7 +29,7 @@ sriov_create_vfs()
 	case ${driver} in
 		mlx4_en)
 			if [ -e lib_mlx.sh ];then
-				mlx_create_vfs $@
+				mlx_create_vfs "$@"
 			else
 				echo "no lib for mellanox"
 				return 1
@@ -36,7 +37,7 @@ sriov_create_vfs()
 			;;
 		cxgb4)
 			if [ -e lib_chelsio.sh ];then
-				chelsio_create_vfs $@
+				chelsio_create_vfs "$@"
 			else
 				echo "no lib for chelsio"
 				return 1
@@ -44,7 +45,7 @@ sriov_create_vfs()
 			;;
 		mlx5_core)
 			if [ -e lib_mlx.sh ];then
-				mlx_create_vfs $@
+				mlx_create_vfs "$@"
 			else
 				echo "no lib for mellanox"
 				return 1
@@ -87,7 +88,7 @@ sriov_create_vfs_1()
 	case ${driver} in
 		mlx4_en)
 			if [ -e lib_mlx.sh ];then
-				mlx_create_vfs_1 $@
+				mlx_create_vfs_1 "$@"
 			else
 				echo "no lib for mellanox"
 				return 1
@@ -95,7 +96,7 @@ sriov_create_vfs_1()
 			;;
 		cxgb4)
 			if [ -e lib_chelsio.sh ];then
-				chelsio_create_vfs $@
+				chelsio_create_vfs "$@"
 			else
 				echo "no lib for chelsio"
 				return 1
@@ -103,7 +104,7 @@ sriov_create_vfs_1()
 			;;
 		mlx5_core)
 			if [ -e lib_mlx.sh ];then
-					mlx_create_vfs_1 $@
+					mlx_create_vfs_1 "$@"
 			else
 					echo "no lib for mellanox"
 					return 1
@@ -141,13 +142,13 @@ sriov_remove_vfs()
 	echo ----------------------
 	case ${driver} in
 		mlx4_en)
-			mlx_remove_vfs $@
+			mlx_remove_vfs "$@"
 			;;
 		cxgb4)
-			chelsio_remove_vfs $@
+			chelsio_remove_vfs "$@"
 			;;
 				mlx5_core)
-			mlx_remove_vfs $@
+			mlx_remove_vfs "$@"
 			;;
 
 		*)
@@ -189,7 +190,7 @@ sriov_attach_vf_to_vm()
 
 	case ${driver} in
 		cxgb4)
-			chelsio_attach_vf_to_vm $@
+			chelsio_attach_vf_to_vm "$@"
 			return $?
 			;;
 	esac
@@ -282,11 +283,11 @@ sriov_detach_vf_from_vm()
 
 	case ${driver} in
 		mlx4_en)
-			mlx_detach_vf_from_vm $@
+			mlx_detach_vf_from_vm "$@"
 			return $?
 			;;
 		cxgb4)
-			chelsio_detach_vf_from_vm $@
+			chelsio_detach_vf_from_vm "$@"
 			return $?
 			;;
 		*)
@@ -413,10 +414,10 @@ sriov_get_vf_iface()
 
 	case ${driver} in
 		mlx4_en)
-			echo $(mlx_get_vf_iface $@)
+			echo $(mlx_get_vf_iface "$@")
 			;;
 		cxgb4)
-			echo $(chelsio_get_vf_iface $@)
+			echo $(chelsio_get_vf_iface "$@")
 			;;
 		*)
 			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
@@ -463,13 +464,13 @@ sriov_get_vf_bus_info()
 
 	case ${driver} in
 		mlx4_en)
-			local vf_bus_info=$(mlx_get_vf_bus_info $@)
+			local vf_bus_info=$(mlx_get_vf_bus_info "$@")
 			rtn=$?
 			echo ${vf_bus_info}
 			return $rtn
 			;;
 		cxgb4)
-			local vf_bus_info=$(chelsio_get_vf_bus_info $@)
+			local vf_bus_info=$(chelsio_get_vf_bus_info "$@")
 			rtn=$?
 			echo ${vf_bus_info}
 			return $rtn
@@ -493,11 +494,11 @@ sriov_get_pf_bus_info()
 
 	case ${driver} in
 		mlx4_en)
-			pf_bus_info=$(mlx_get_pf_bus_info $@)
+			pf_bus_info=$(mlx_get_pf_bus_info "$@")
 			echo $pf_bus_info
 			;;
 		cxgb4)
-			pf_bus_info=$(chelsio_get_pf_bus_info $@)
+			pf_bus_info=$(chelsio_get_pf_bus_info "$@")
 			echo $pf_bus_info
 			;;
 		*)

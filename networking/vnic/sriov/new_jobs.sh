@@ -1,3 +1,4 @@
+#!/bin/bash
 distro="RHEL-7.7-20190619.0"
 #RPM_KERNEL="http://netqe-bj.usersys.redhat.com/share/liali/kernel-3.10.0-691.el7.x86_64.rpm"
 image_name="rhel7.7.qcow2"
