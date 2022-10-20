@@ -1,3 +1,4 @@
+#!/bin/bash
 IMG_GUEST=http://netqe-bj.usersys.redhat.com/share/vms/rhel6.8.qcow2
 
 echo "remove any VM if exist"

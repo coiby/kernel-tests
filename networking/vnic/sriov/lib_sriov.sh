@@ -1,5 +1,6 @@
-# helper for SR-IOV
+#!/bin/bash
 
+# helper for SR-IOV
 # create VFs for PF
 #
 # *** NOTE:
@@ -28,7 +29,7 @@ sriov_create_vfs()
 	case ${driver} in
 		mlx4_en)
 			if [ -e lib_mlx.sh ];then
-				mlx_create_vfs $@
+				mlx_create_vfs "$@"
 			else
 				echo "no lib for mellanox"
 				return 1
@@ -36,7 +37,7 @@ sriov_create_vfs()
 			;;
 		cxgb4)
 			if [ -e lib_chelsio.sh ];then
-				chelsio_create_vfs $@
+				chelsio_create_vfs "$@"
 			else
 				echo "no lib for chelsio"
 				return 1
@@ -44,7 +45,7 @@ sriov_create_vfs()
 			;;
 		mlx5_core)
 			if [ -e lib_mlx.sh ];then
-				mlx_create_vfs $@
+				mlx_create_vfs "$@"
 			else
 				echo "no lib for mellanox"
 				return 1
@@ -87,7 +88,7 @@ sriov_create_vfs_1()
 	case ${driver} in
 		mlx4_en)
 			if [ -e lib_mlx.sh ];then
-				mlx_create_vfs_1 $@
+				mlx_create_vfs_1 "$@"
 			else
 				echo "no lib for mellanox"
 				return 1
@@ -95,7 +96,7 @@ sriov_create_vfs_1()
 			;;
 		cxgb4)
 			if [ -e lib_chelsio.sh ];then
-				chelsio_create_vfs $@
+				chelsio_create_vfs "$@"
 			else
 				echo "no lib for chelsio"
 				return 1
@@ -103,7 +104,7 @@ sriov_create_vfs_1()
 			;;
 		mlx5_core)
 			if [ -e lib_mlx.sh ];then
-					mlx_create_vfs_1 $@
+					mlx_create_vfs_1 "$@"
 			else
 					echo "no lib for mellanox"
 					return 1
@@ -141,13 +142,13 @@ sriov_remove_vfs()
 	echo ----------------------
 	case ${driver} in
 		mlx4_en)
-			mlx_remove_vfs $@
+			mlx_remove_vfs "$@"
 			;;
 		cxgb4)
-			chelsio_remove_vfs $@
+			chelsio_remove_vfs "$@"
 			;;
 				mlx5_core)
-			mlx_remove_vfs $@
+			mlx_remove_vfs "$@"
 			;;
 
 		*)
@@ -176,7 +177,7 @@ sriov_attach_vf_to_vm()
 	$dbg_flag
 	local PF=$1
 	local iPF=$2 	# start from 0.
-	 				# For cxgb4, PF used to create VF is different from the original PF
+					# For cxgb4, PF used to create VF is different from the original PF
 	local iVF=$3 	# index of vf, starting from 1
 	local vm=$4
 	local mac=$5
@@ -189,7 +190,7 @@ sriov_attach_vf_to_vm()
 
 	case ${driver} in
 		cxgb4)
-			chelsio_attach_vf_to_vm $@
+			chelsio_attach_vf_to_vm "$@"
 			return $?
 			;;
 	esac
@@ -282,11 +283,11 @@ sriov_detach_vf_from_vm()
 
 	case ${driver} in
 		mlx4_en)
-			mlx_detach_vf_from_vm $@
+			mlx_detach_vf_from_vm "$@"
 			return $?
 			;;
 		cxgb4)
-			chelsio_detach_vf_from_vm $@
+			chelsio_detach_vf_from_vm "$@"
 			return $?
 			;;
 		*)
@@ -413,10 +414,10 @@ sriov_get_vf_iface()
 
 	case ${driver} in
 		mlx4_en)
-			echo $(mlx_get_vf_iface $@)
+			echo $(mlx_get_vf_iface "$@")
 			;;
 		cxgb4)
-			echo $(chelsio_get_vf_iface $@)
+			echo $(chelsio_get_vf_iface "$@")
 			;;
 		*)
 			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
@@ -463,22 +464,22 @@ sriov_get_vf_bus_info()
 
 	case ${driver} in
 		mlx4_en)
-			local vf_bus_info=$(mlx_get_vf_bus_info $@)
+			local vf_bus_info=$(mlx_get_vf_bus_info "$@")
 			rtn=$?
 			echo ${vf_bus_info}
 			return $rtn
 			;;
 		cxgb4)
-			local vf_bus_info=$(chelsio_get_vf_bus_info $@)
+			local vf_bus_info=$(chelsio_get_vf_bus_info "$@")
 			rtn=$?
 			echo ${vf_bus_info}
 			return $rtn
 			;;
 		*)
- 			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
- 			rtn=$?
+			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
+			rtn=$?
 			echo ${vf_bus_info}
-	 		return $rtn
+			return $rtn
 			;;
 		esac
 }
@@ -493,11 +494,11 @@ sriov_get_pf_bus_info()
 
 	case ${driver} in
 		mlx4_en)
-			pf_bus_info=$(mlx_get_pf_bus_info $@)
+			pf_bus_info=$(mlx_get_pf_bus_info "$@")
 			echo $pf_bus_info
 			;;
 		cxgb4)
-			pf_bus_info=$(chelsio_get_pf_bus_info $@)
+			pf_bus_info=$(chelsio_get_pf_bus_info "$@")
 			echo $pf_bus_info
 			;;
 		*)
@@ -610,8 +611,9 @@ if [ "$NIC_DRIVER" == "ice" ]; then
 	local count
 	local interface
 	for count in $(seq 0 $((vfs_num-1))); do
-		for interface in $(ls /sys/devices/virtual/net/); do
-			ethtool -i $interface | grep -q "driver: ice" || continue
+		for interface in /sys/devices/virtual/net/*; do
+			interface=${interface%*/}
+            			ethtool -i $interface | grep -q "driver: ice" || continue
 			local ifaces=$ifaces' '$interface
 		done
 	done
@@ -622,7 +624,8 @@ else
 	declare -A ifaces_map
 	local phys_switch_id=$(cat /sys/class/net/$PF/phys_switch_id 2>/dev/null)
 	local iface
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=${iface%*/}
 		local phys_switch_id1=$(cat /sys/class/net/$iface/phys_switch_id 2>/dev/null)
 		[ -z "$phys_switch_id1" ] && continue
 		[ "$phys_switch_id1" != "$phys_switch_id" ] && continue
@@ -635,17 +638,17 @@ else
 		esac
 		# Provided by "Alaa Hleihel" <ahleihel@redhat.com> stop
 		local item
-		for item in ${ifaces_map[@]}; do
+		for item in "${ifaces_map[@]}"; do
 			[ "$iface" == "$item" ] && continue 2
 		done
 		ifaces_map["$phys_port_name1"]="$iface"
 	done
-	local keys=($(echo ${!ifaces_map[@]} | tr " " "\n" | sort | tr "\n" " "))
+	local keys=($(echo "${!ifaces_map[@]}" | tr " " "\n" | sort | tr "\n" " "))
 	local key; local ifaces=();
-	for key in ${keys[@]}; do
+	for key in "${keys[@]}"; do
 		ifaces+=(${ifaces_map[$key]})
 	done
-	echo -n ${ifaces[@]}
+	echo -n "${ifaces[@]}"
 fi
 
 }

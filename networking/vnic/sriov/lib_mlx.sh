@@ -1,3 +1,4 @@
+#!/bin/bash
 mlx_create_vfs()
 {
 	local PF=$1

@@ -1004,7 +1004,7 @@ sriov_test_vf_remote_switchdev()
 	else
 		#sync_wait server test_vf_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -11385,7 +11385,7 @@ sriov_test_vf_remote_jumbo_switchdev()
 	else
 		#sync_wait server test_vf_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -11490,7 +11490,7 @@ sriov_test_vmvf_remote_switchdev()
 	else
 		#sync_wait server test_vmvf_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -11596,7 +11596,7 @@ sriov_test_vmvf_remote_jumbo_switchdev()
 	else
 		#sync_wait server test_vmvf_remote_jumbo_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -11710,7 +11710,7 @@ sriov_test_switchdev_bz1870593()
 	else
 		#sync_wait server test_switchdev_1870593_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -12017,7 +12017,7 @@ sriov_test_vf_mac_switchdev_bz1814350()
 	else
 		sync_wait server test_vf_mac_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
 						ip link set hostbr0 up
@@ -12129,7 +12129,7 @@ sriov_test_pf_steering_switchdev_bz1856660()
 	else
 		sync_wait server test_pf_str_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			if ! sriov_create_vfs $nic_test 0 1; then
 				sync_set server test_pf_str_remote_switchdev_end
 				return 1
@@ -13641,7 +13641,7 @@ sriov_test_reproduce_2000180()
 
 				# 3. unbind/bind vf driver
 				echo "unbind/bind vf driver"
-				for i in ${vf_pci_list[@]}; do
+				for i in "${vf_pci_list[@]}"; do
 					echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
 					echo > /sys/bus/pci/devices/${vf_pci}/driver_override
 					echo ${i} > /sys/bus/pci/drivers_probe
@@ -13654,7 +13654,7 @@ sriov_test_reproduce_2000180()
 				#5. bind vf driver (if not already)
 				#6. unbind/bind vf driver (workaround for bz1875338)
 				echo "6. unbind/bind vf driver (workaround for bz1875338)"
-				for i in ${vf_pci_list[@]}; do
+				for i in "${vf_pci_list[@]}"; do
 					echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
 					echo > /sys/bus/pci/devices/${vf_pci}/driver_override
 					echo ${i} > /sys/bus/pci/drivers_probe
@@ -13663,7 +13663,7 @@ sriov_test_reproduce_2000180()
 				sleep 2
 				#7. set vf mtu
 				echo "7. set vf mtu to ${MTU}"
-				for i in ${sort_vf_name_list[@]}; do
+				for i in "${sort_vf_name_list[@]}"; do
 					echo $MTU > /sys/class/net/${i}/mtu
 				done
 
@@ -13890,7 +13890,7 @@ sriov_test_negative_create_vfs_2000180()
 
 					# 3. unbind/bind vf driver
 					echo "unbind/bind vf driver"
-					for i in ${vf_pci_list[@]}; do
+					for i in "${vf_pci_list[@]}"; do
 						echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
 						echo > /sys/bus/pci/devices/${vf_pci}/driver_override
 						echo ${i} > /sys/bus/pci/drivers_probe
@@ -13903,7 +13903,7 @@ sriov_test_negative_create_vfs_2000180()
 					#5. bind vf driver (if not already)
 					#6. unbind/bind vf driver (workaround for bz1875338)
 					echo "6. unbind/bind vf driver (workaround for bz1875338)"
-					for i in ${vf_pci_list[@]}; do
+					for i in "${vf_pci_list[@]}"; do
 						echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
 						echo > /sys/bus/pci/devices/${vf_pci}/driver_override
 						echo ${i} > /sys/bus/pci/drivers_probe
@@ -13911,7 +13911,7 @@ sriov_test_negative_create_vfs_2000180()
 
 					#7. set vf mtu
 					echo "7. set vf mtu to ${MTU}"
-					for i in ${sort_vf_name_list[@]}; do
+					for i in "${sort_vf_name_list[@]}"; do
 						echo $MTU > /sys/class/net/${i}/mtu
 					done
 
@@ -15031,7 +15031,7 @@ sriov_test_vlan_qinq_baisc()
 			echo "vf vlan 8100====================================================================================================================="
 
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "single_outer_tag(8100) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15067,7 +15067,7 @@ sriov_test_vlan_qinq_baisc()
 			vmsh cmd_set $vm1 "${cmd[*]}"
 
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "qinq_offload on single_outer_tag(8100) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15121,7 +15121,7 @@ sriov_test_vlan_qinq_baisc()
 
 			echo "image_vm vlan 8100=================================================================================================================================================================="
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "vm_qinq single_outer_tag(8100) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15185,7 +15185,7 @@ sriov_test_vlan_qinq_baisc()
 
 			echo "vf vlan 88a8============================================================================================================================================="
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file; then
-				result +=1
+				result+=1
 				echo "single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15219,7 +15219,7 @@ sriov_test_vlan_qinq_baisc()
 			vmsh cmd_set $vm1 "${cmd[*]}"
 
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "qinq_offload on single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15273,7 +15273,7 @@ sriov_test_vlan_qinq_baisc()
 
 			echo "image_vm vlan 88a8=================================================================================================================================="
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "vm_qinq single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15381,9 +15381,9 @@ sriov_test_bug_reproducer_2103801(){
 setup() {
 	Configuring_NetworkManager_to_ignore_certain_devices
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
-	  rlRun install_pktgen
+		rlRun install_pktgen
 	elif [[ $ENABLE_RT_KERNEL == "yes" ]]; then
-	  sleep 1
+		sleep 1
 	fi
 
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
@@ -16495,12 +16495,12 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_bug_reprod
 		rlPhaseEnd
 fi
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_spoofchk_vlan\b)"; then
-  rlPhaseStartTest "preconfiguration"
+	rlPhaseStartTest "preconfiguration"
 	rlRun preconfiguration
-  rlPhaseEnd
+	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_spoofchk_vlan"
 	rlRun "sriov_test_spoofchk_vlan"
-  rlPhaseEnd
+	rlPhaseEnd
 fi
 
 rlJournalPrintText

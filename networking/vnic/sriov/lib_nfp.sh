@@ -1,3 +1,4 @@
+#!/bin/bash
 nfp_change_firmware()
 {
 	if ls -l /usr/lib/firmware/netronome/ | grep -e "^l.*" | grep -v '\-> nic-sriov/'

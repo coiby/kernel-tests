@@ -1,3 +1,4 @@
+#!/bin/bash
 chelsio_create_vfs()
 {
 	local PF=$1

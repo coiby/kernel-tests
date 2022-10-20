@@ -1,3 +1,4 @@
+#!/bin/bash
 distro="RHEL-6.10-20180525.0"
 #RPM_KERNEL="http://netqe-bj.usersys.redhat.com/share/liali/kernel-3.10.0-691.el7.x86_64.rpm"
 #image_name="RHEL-ALT-7.5-20171106.1.qcow2"
