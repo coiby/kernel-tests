@@ -42,6 +42,9 @@ default none
 INCLUDE			Include any files with special variables or function definitions. e.g. "net.sh"
 default none
 
+TEST_PARAMS 		List of test parameters. This parameter list must contain test name and test parameter the same time and separate with semicolon. With format like, e.g. "bpf:foo --test; bpf:bar --another --test".
+default none
+
 DEBUG_CMD		Run debug commands after running each test case. i.e. at the end of each check_result().
 default none
 
