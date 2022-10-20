@@ -20,7 +20,7 @@
 #   You should have received a copy of the GNU General Public
 #   License along with this program; if not, write to the Free
 #   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-#   Boston, MA 02110-1301, USA.f
+#   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # test
@@ -13641,7 +13641,7 @@ sriov_test_reproduce_2000180()
 
 				# 3. unbind/bind vf driver
 				echo "unbind/bind vf driver"
-				for i in ${vf_pci_list[@]}; do
+				for i in "${vf_pci_list[@]}"; do
 					echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
 					echo > /sys/bus/pci/devices/${vf_pci}/driver_override
 					echo ${i} > /sys/bus/pci/drivers_probe
@@ -13654,7 +13654,7 @@ sriov_test_reproduce_2000180()
 				#5. bind vf driver (if not already)
 				#6. unbind/bind vf driver (workaround for bz1875338)
 				echo "6. unbind/bind vf driver (workaround for bz1875338)"
-				for i in ${vf_pci_list[@]}; do
+				for i in "${vf_pci_list[@]}"; do
 					echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
 					echo > /sys/bus/pci/devices/${vf_pci}/driver_override
 					echo ${i} > /sys/bus/pci/drivers_probe
@@ -13663,7 +13663,7 @@ sriov_test_reproduce_2000180()
 				sleep 2
 				#7. set vf mtu
 				echo "7. set vf mtu to ${MTU}"
-				for i in ${sort_vf_name_list[@]}; do
+				for i in "${sort_vf_name_list[@]}"; do
 					echo $MTU > /sys/class/net/${i}/mtu
 				done
 
@@ -13890,7 +13890,7 @@ sriov_test_negative_create_vfs_2000180()
 
 					# 3. unbind/bind vf driver
 					echo "unbind/bind vf driver"
-					for i in ${vf_pci_list[@]}; do
+					for i in "${vf_pci_list[@]}"; do
 						echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
 						echo > /sys/bus/pci/devices/${vf_pci}/driver_override
 						echo ${i} > /sys/bus/pci/drivers_probe
@@ -13903,7 +13903,7 @@ sriov_test_negative_create_vfs_2000180()
 					#5. bind vf driver (if not already)
 					#6. unbind/bind vf driver (workaround for bz1875338)
 					echo "6. unbind/bind vf driver (workaround for bz1875338)"
-					for i in ${vf_pci_list[@]}; do
+					for i in "${vf_pci_list[@]}"; do
 						echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
 						echo > /sys/bus/pci/devices/${vf_pci}/driver_override
 						echo ${i} > /sys/bus/pci/drivers_probe
@@ -13911,7 +13911,7 @@ sriov_test_negative_create_vfs_2000180()
 
 					#7. set vf mtu
 					echo "7. set vf mtu to ${MTU}"
-					for i in ${sort_vf_name_list[@]}; do
+					for i in "${sort_vf_name_list[@]}"; do
 						echo $MTU > /sys/class/net/${i}/mtu
 					done
 
@@ -15031,7 +15031,7 @@ sriov_test_vlan_qinq_baisc()
 			echo "vf vlan 8100====================================================================================================================="
 
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "single_outer_tag(8100) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15067,7 +15067,7 @@ sriov_test_vlan_qinq_baisc()
 			vmsh cmd_set $vm1 "${cmd[*]}"
 
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "qinq_offload on single_outer_tag(8100) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15121,7 +15121,7 @@ sriov_test_vlan_qinq_baisc()
 
 			echo "image_vm vlan 8100=================================================================================================================================================================="
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "vm_qinq single_outer_tag(8100) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15185,7 +15185,7 @@ sriov_test_vlan_qinq_baisc()
 
 			echo "vf vlan 88a8============================================================================================================================================="
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file; then
-				result +=1
+				result+=1
 				echo "single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15219,7 +15219,7 @@ sriov_test_vlan_qinq_baisc()
 			vmsh cmd_set $vm1 "${cmd[*]}"
 
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "qinq_offload on single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
 			fi
 
@@ -15273,7 +15273,7 @@ sriov_test_vlan_qinq_baisc()
 
 			echo "image_vm vlan 88a8=================================================================================================================================="
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result += 1
+				result+=1
 				echo "vm_qinq single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
 			fi
 

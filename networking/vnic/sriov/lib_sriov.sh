@@ -611,8 +611,9 @@ if [ "$NIC_DRIVER" == "ice" ]; then
 	local count
 	local interface
 	for count in $(seq 0 $((vfs_num-1))); do
-		for interface in $(ls /sys/devices/virtual/net/); do
-			ethtool -i $interface | grep -q "driver: ice" || continue
+		for interface in /sys/devices/virtual/net/*; do
+			interface=${interface%*/}
+            			ethtool -i $interface | grep -q "driver: ice" || continue
 			local ifaces=$ifaces' '$interface
 		done
 	done
@@ -623,7 +624,8 @@ else
 	declare -A ifaces_map
 	local phys_switch_id=$(cat /sys/class/net/$PF/phys_switch_id 2>/dev/null)
 	local iface
-	for iface in $(ls /sys/class/net/); do
+	for iface in /sys/class/net/*; do
+		iface=${iface%*/}
 		local phys_switch_id1=$(cat /sys/class/net/$iface/phys_switch_id 2>/dev/null)
 		[ -z "$phys_switch_id1" ] && continue
 		[ "$phys_switch_id1" != "$phys_switch_id" ] && continue
@@ -636,17 +638,17 @@ else
 		esac
 		# Provided by "Alaa Hleihel" <ahleihel@redhat.com> stop
 		local item
-		for item in ${ifaces_map[@]}; do
+		for item in "${ifaces_map[@]}"; do
 			[ "$iface" == "$item" ] && continue 2
 		done
 		ifaces_map["$phys_port_name1"]="$iface"
 	done
-	local keys=($(echo ${!ifaces_map[@]} | tr " " "\n" | sort | tr "\n" " "))
+	local keys=($(echo "${!ifaces_map[@]}" | tr " " "\n" | sort | tr "\n" " "))
 	local key; local ifaces=();
-	for key in ${keys[@]}; do
+	for key in "${keys[@]}"; do
 		ifaces+=(${ifaces_map[$key]})
 	done
-	echo -n ${ifaces[@]}
+	echo -n "${ifaces[@]}"
 fi
 
 }

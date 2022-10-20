@@ -1,3 +1,4 @@
+#!/bin/bash
 sriov_test_bz2057244_vf_not_up()
 {
 		log_header "bz2057244" $result_file
