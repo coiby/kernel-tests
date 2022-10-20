@@ -37,10 +37,10 @@ cat /usr/share/rhts/failurestrings
 # Patch restraint's localwatchdog plugin to abort the recipe instead of warning,
 # when a task goes over KILLTIMEOVERRIDE.
 # The ABORT task result isn't accepted as a valid result, we should instead change it to:
-# 'sed -i 's|rstrnt-reboot|rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status\nrstrnt-reboot|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot'
+# 'sed -i 's|rstrnt-reboot|rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status\nrstrnt-reboot|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot'
 # Otherwise you may see "Failed to submit result, status: 400 Message: BAD REQUEST"
 # see: https://bugzilla.redhat.com/show_bug.cgi?id=1716997
-sed -i 's|rstrnt-reboot|rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$TASKID/status\nrstrnt-reboot|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot
+sed -i 's|rstrnt-reboot|rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status\nrstrnt-reboot|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot
 
 # Show information the test aborted due to localwatchdog
 if ! grep -q "\${RSTRNT_TASKNAME} hit test timeout" /usr/share/restraint/plugins/localwatchdog.d/10_localwatchdog; then
