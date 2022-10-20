@@ -1004,7 +1004,7 @@ sriov_test_vf_remote_switchdev()
 	else
 		#sync_wait server test_vf_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -11385,7 +11385,7 @@ sriov_test_vf_remote_jumbo_switchdev()
 	else
 		#sync_wait server test_vf_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -11490,7 +11490,7 @@ sriov_test_vmvf_remote_switchdev()
 	else
 		#sync_wait server test_vmvf_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -11596,7 +11596,7 @@ sriov_test_vmvf_remote_jumbo_switchdev()
 	else
 		#sync_wait server test_vmvf_remote_jumbo_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -11710,7 +11710,7 @@ sriov_test_switchdev_bz1870593()
 	else
 		#sync_wait server test_switchdev_1870593_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
@@ -12017,7 +12017,7 @@ sriov_test_vf_mac_switchdev_bz1814350()
 	else
 		sync_wait server test_vf_mac_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
 						ip link set hostbr0 up
@@ -12129,7 +12129,7 @@ sriov_test_pf_steering_switchdev_bz1856660()
 	else
 		sync_wait server test_pf_str_remote_switchdev_start
 		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family)
-		if [[ "$SUPPORT_MODELS" =~ "$NIC_MODEL" ]];then
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
 			if ! sriov_create_vfs $nic_test 0 1; then
 				sync_set server test_pf_str_remote_switchdev_end
 				return 1
