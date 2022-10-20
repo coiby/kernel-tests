@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/rt-tests/sanity
+owner=Shizhao Chen <shichen@redhat.com>
+description=Functional test for rt-tests
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=procps-ng;psmisc
+max_time=60m
+use_pty=false

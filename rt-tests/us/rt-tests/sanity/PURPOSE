@@ -1,0 +1,11 @@
+DESCRIPTION
+Functional test for the rt-tests userspace package.
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none
