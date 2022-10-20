@@ -1,0 +1,9 @@
+[General]
+name=cki_retraint
+description=CKI patches and plugins to restraint
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh

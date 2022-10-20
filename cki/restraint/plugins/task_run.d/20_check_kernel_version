@@ -1,0 +1,20 @@
+#!/bin/sh
+# add restraint plugins to check if test is running on expected kernel
+# https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db/-/issues/56
+# Don't run from PLUGINS
+if [ -n "$RSTRNT_NOPLUGINS" ]; then
+    exec "$@"
+    exit 0
+fi
+if [ -e /var/opt/cki/kernel_version ] && [ -n "${RSTRNT_TASKID}" ]; then
+    kernel_version=$(uname -r)
+    cki_kernel_version=$(cat /var/opt/cki/kernel_version)
+    if [ "${kernel_version}" != "${cki_kernel_version}" ]; then
+        echo "aborting as system is running kernel $kernel_version and not the expected $cki_kernel_version"
+        rstrnt-report-result "${RSTRNT_TASKNAME}" "WARN"
+        rstrnt-abort -t recipe
+        exit 1
+    fi
+fi
+exec "$@"
+EOF

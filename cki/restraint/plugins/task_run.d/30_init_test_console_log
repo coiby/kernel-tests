@@ -1,0 +1,28 @@
+#!/bin/sh
+# add restraint plugins to get console log for each task
+# https://restraint.readthedocs.io/en/latest/plugins.html
+if [ -z "${LAB_CONTROLLER}" ] || [ -z "${RSTRNT_RECIPEID}" ] || [ -z "${RSTRNT_TASKID}" ]; then
+    # not automated job in beaker
+    exec "$@"
+    exit 0
+fi
+# Don't run from PLUGINS
+if [ -n "$RSTRNT_NOPLUGINS" ]; then
+    exec "$@"
+    exit 0
+fi
+# clean up dmesg before running test, as some tests check dmesg to search for errors
+# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/782
+# restraint already has report_result.d/30_dmesg_clear that do the same,
+# but as it runs in the end of a task, it might not run in case task gets aborted
+dmesg -C
+# Add test information to console.log, when running with UPT this information is not there
+echo "Running test [R:${RSTRNT_RECIPEID} T:${RSTRNT_TASKID} - ${RSTRNT_TASKNAME:-unknown} - Kernel: $(uname -r)]" > /dev/kmsg
+mkdir -p /var/opt/cki/${RSTRNT_TASKID}
+_cki_init_file=/var/opt/cki/${RSTRNT_TASKID}/init_console.log
+if [ ! -e ${_cki_init_file} ]; then
+    # save the log the first time the task starts. Don't override the file in case of reboot.
+    curl --silent --show-error --retry 5 "http://${LAB_CONTROLLER}:8000/recipes/${RSTRNT_RECIPEID}/logs/console.log" -o ${_cki_init_file}
+fi
+exec "$@"
+EOF

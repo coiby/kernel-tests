@@ -1,0 +1,18 @@
+#!/bin/sh
+# plugins under completed.d should run even in case of localwatchdog
+if [ -z "${LAB_CONTROLLER}" ] || [ -z "${RSTRNT_RECIPEID}" ] || [ -z "${RSTRNT_TASKID}" ]; then
+    # not automated job in beaker
+    exit 0
+fi
+_cki_init_file=/var/opt/cki/${RSTRNT_TASKID}/init_console.log
+_cki_end_file=/var/opt/cki/${RSTRNT_TASKID}/end_console.log
+_cki_console_file=/var/opt/cki/${RSTRNT_TASKID}/test_console.log
+if [ ! -e ${_cki_init_file} ]; then
+    exit 0
+fi
+# there is some delay on console.log
+sleep 15
+curl --silent --show-error --retry 5 "http://${LAB_CONTROLLER}:8000/recipes/${RSTRNT_RECIPEID}/logs/console.log" -o ${_cki_end_file}
+diff --changed-group-format='%>' --unchanged-group-format='' ${_cki_init_file} ${_cki_end_file} > ${_cki_console_file}
+# if the file is empty restraint will skip the upload
+rstrnt-report-log -l "${_cki_console_file}"
