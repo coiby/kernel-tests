@@ -5094,7 +5094,7 @@ sriov_test_bond_failovermac0_vlan_common() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=0, ifenslave failed";let result++; }
@@ -5318,7 +5318,7 @@ sriov_test_bond_failovermac0_vlan_mlx4en_dualport() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
 			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=0, ifenslave failed";let result++; }
@@ -5753,7 +5753,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 				{ip link set bond0 up}
 				{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 				{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -6185,7 +6185,7 @@ sriov_test_bond_failovermac1_vlan_common() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -9801,9 +9801,9 @@ sriov_test_bz1493953()
 			ip link set dev $vnetport master br0
 			ip link set dev $nic_test master br0
 		else
-			  ip link set $nic_test master br0
-			  ip link set $vnetport master br0
-			  ip link show 
+			ip link set $nic_test master br0
+			ip link set $vnetport master br0
+			ip link show 
 		fi
 
 		if ! sriov_create_vfs $nic_test 0 1; then
