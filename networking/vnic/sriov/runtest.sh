@@ -2472,7 +2472,7 @@ sriov_test_vmvf1_vmvf2_remote()
 
 	ip link set $iface1 up
 	ip link set $iface2 up
-  	# The current attach vf operation will restart the vm and put any operations after the vm started.
+	# The current attach vf operation will restart the vm and put any operations after the vm started.
 	if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1; then
 		echo "${test_name} failed:attach vf to vm failed."
 		sriov_remove_vfs $iface1 0
@@ -2489,7 +2489,7 @@ sriov_test_vmvf1_vmvf2_remote()
 		return 1
 	fi
 
-  #ensure netserver is running
+	#ensure netserver is running
 	local cmd=(
 		{iptables -F}
 		{ip6tables -F}
@@ -2629,7 +2629,7 @@ sriov_test_vmvf1_vmvf2_vlan_remote()
 	ip link set $iface1 up
 	ip link set $iface2 up
 
-  # The current attach vf operation will restart the vm and put any operations after the vm started.
+	# The current attach vf operation will restart the vm and put any operations after the vm started.
 	if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1; then
 		echo "${test_name} failed:attach vf to vm failed."
 		sriov_remove_vfs $iface1 0
@@ -3924,7 +3924,7 @@ sriov_test_vmvf_vlan_offload_remote()
 
 		if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
 			result=1
-		 	#   sync_set server test_vmvf_vlan_offload_remote_end
+			#   sync_set server test_vmvf_vlan_offload_remote_end
 		else
 			local cmd=(
 				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -4700,7 +4700,7 @@ sriov_test_bond_failovermac0_common() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=0, ifenslave failed";let result++; }
@@ -4732,7 +4732,7 @@ sriov_test_bond_failovermac0_common() {
 		sync_set server ${test_name}_ready_send_packet
 		sync_wait server ${test_name}_start_send_packet
 		local cmd=(
-		  # increase sent interval
+			# increase sent interval
 			{ping $server_ip4 -i 0.01 -c 3000 \&}
 			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
 			{ip link set \$ACTIVE_SLAVE down}
@@ -4889,7 +4889,7 @@ sriov_test_bond_failovermac0_mlx4en_dualport() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
 			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=0, ifenslave failed";let result++; }
@@ -5539,7 +5539,7 @@ sriov_test_bond_failovermac1_common() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -5588,8 +5588,8 @@ sriov_test_bond_failovermac1_common() {
 		sleep 5
 		ping 192.100.1.1 -c 5
 		if [ $? -ne 0 ]; then
-			 let result++
-			 rlFail "failed: failover time is too long"
+			let result++
+			rlFail "failed: failover time is too long"
 		fi
 		ip addr del 192.100.1.2/24 dev $iface1
 		sync_set server ${test_name}_end_feedback_result
@@ -5825,8 +5825,8 @@ sriov_test_bond_failovermac1_pf_down_common() {
 		sleep 5
 		ping 192.100.1.1 -c 5
 		if [ $? -ne 0 ]; then
-			 let result++
-			 rlFail "failed: failover time is too long"
+			let result++
+			rlFail "failed: failover time is too long"
 		fi
 		ip addr del 192.100.1.2/24 dev $PF_UP
 		sync_set server ${test_name}_end_feedback_result
@@ -5971,7 +5971,7 @@ sriov_test_bond_failovermac1_mlx4en_dualport() {
 				{ip link set bond0 up}
 				{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
 				{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -6019,8 +6019,8 @@ sriov_test_bond_failovermac1_mlx4en_dualport() {
 				sleep 5
 				ping 192.100.1.1 -c 5
 				if [ $? -ne 0 ]; then
-					 let result++
-					 rlFail "failed: failover time is too long"
+					let result++
+					rlFail "failed: failover time is too long"
 				fi
 				ip addr del 192.100.1.2/24 dev $iface1
 				sync_set server ${test_name}_end_feedback_result
@@ -6236,18 +6236,18 @@ sriov_test_bond_failovermac1_vlan_common() {
 			{pkill ping}
 			{modprobe -rv pktgen}
 		)
-		 vmsh cmd_set $vm1 "${cmd[*]}"
-		 sync_set server ${test_name}_end_send_packet
-		 sync_wait server ${test_name}_start_feedback_result
-		 ip addr add 192.100.1.2/24 dev $iface1
-		 sleep 5
-		 ping 192.100.1.1 -c 5
-		 if [ $? -ne 0 ]; then
+		vmsh cmd_set $vm1 "${cmd[*]}"
+		sync_set server ${test_name}_end_send_packet
+		sync_wait server ${test_name}_start_feedback_result
+		ip addr add 192.100.1.2/24 dev $iface1
+		sleep 5
+		ping 192.100.1.1 -c 5
+		if [ $? -ne 0 ]; then
 			let result++
 			rlFail "failed: failover time is too long"
-		 fi
-		 ip addr del 192.100.1.2/24 dev $iface1
-		 sync_set server ${test_name}_end_feedback_result
+		fi
+		ip addr del 192.100.1.2/24 dev $iface1
+		sync_set server ${test_name}_end_feedback_result
 
 		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
 		if [ $? -ne 0 ];then
@@ -6412,7 +6412,7 @@ sriov_test_bond_failovermac1_vlan_mlx4en_dualport() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
 			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -6462,18 +6462,18 @@ sriov_test_bond_failovermac1_vlan_mlx4en_dualport() {
 				{pkill ping}
 				{modprobe -rv pktgen}
 			)
-			 vmsh cmd_set $vm1 "${cmd[*]}"
-			 sync_set server ${test_name}_end_send_packet
-			 sync_wait server ${test_name}_start_feedback_result
-			 ip addr add 192.100.1.2/24 dev $iface1
-			 sleep 5
-			 ping 192.100.1.1 -c 5
-			 if [ $? -ne 0 ]; then
-					let result++
-					rlFail "failed: failover time is too long"
-			 fi
-			 ip addr del 192.100.1.2/24 dev $iface1
-			 sync_set server ${test_name}_end_feedback_result
+			vmsh cmd_set $vm1 "${cmd[*]}"
+			sync_set server ${test_name}_end_send_packet
+			sync_wait server ${test_name}_start_feedback_result
+			ip addr add 192.100.1.2/24 dev $iface1
+			sleep 5
+			ping 192.100.1.1 -c 5
+			if [ $? -ne 0 ]; then
+				let result++
+				rlFail "failed: failover time is too long"
+			fi
+			ip addr del 192.100.1.2/24 dev $iface1
+			sync_set server ${test_name}_end_feedback_result
 
 		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
 		if [ $? -ne 0 ];then
@@ -6635,7 +6635,7 @@ sriov_test_bond_failovermac2_common() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -6869,7 +6869,7 @@ sriov_test_bond_failovermac2_swport_down_common() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -7101,7 +7101,7 @@ sriov_test_bond_failovermac2_mlx4en_dualport() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
 			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -7320,7 +7320,7 @@ sriov_test_bond_failovermac2_vlan_common() {
 				{ip link set bond0 up}
 				{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 				{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=2, ifenslave failed";let result++; }
@@ -7554,7 +7554,7 @@ sriov_test_bond_failovermac2_vlan_mlx4en_dualport() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
 			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		 )
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=2, ifenslave failed";let result++; }
@@ -8028,7 +8028,7 @@ sriov_test_bond_lacp_common() {
 			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
 			{sleep 2}
 			{cat \/proc\/net\/bonding\/bond0}
-	 	)
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlLog "${test_name} failed:ifenslave failed";let result++; }
@@ -8453,7 +8453,7 @@ sriov_test_bond_lacp_cxgb4() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-	 	)
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed:ifenslave failed";let result++; }
@@ -8713,7 +8713,7 @@ sriov_test_bond_lacp_mlx4en_dualport() {
 			{ip link set bond0 up}
 			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
 			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-	 	)
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed:ifenslave failed";let result++; }
@@ -9276,7 +9276,7 @@ sriov_test_bz1489964() {
 					{ip link show}
 					{ping ${server_vlanif_ip4} -c3}
 					{ping ${server_ip4} -c3}
-				 )
+				)
 				vmsh cmd_set $vm2 "${cmd[*]}"
 				if [ $? -ne 0 ];then
 					{ rlFail "${test_name} failed: ping failed via vm2 bond0";let result++; }
@@ -9740,19 +9740,19 @@ sriov_test_spoofchk_vlan()
 	[ $? -ne 0 ] && result=1 && rlFail "Failed, there should be  packets captured on vf 1"
 	sync_set server stop_capture_broadcast_packet
 	sync_wait server broadcast_get_return_from_server
-	  cmd=(
+	cmd=(
 		{ping -c 3 172.30.${ipaddr}.2}
-	  )
-	  vmsh cmd_set g1 "${cmd[*]}"
-	  [ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured broadcast packets"
+	)
+	vmsh cmd_set g1 "${cmd[*]}"
+	[ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured broadcast packets"
 	done
 	sync_wait server test_end
 	sync_set  server  test_end
 	#clear conf
 	cmds=(
-	  {export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-	  {ip addr flush \${NIC_TEST_0}}
-	  {systemctl start NetworkManager}
+		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+		{ip addr flush \${NIC_TEST_0}}
+		{systemctl start NetworkManager}
 	)
 	vmsh cmd_set g1 "${cmds[*]}"
 	sriov_detach_vf_from_vm  ${nic_test} 0 1 g1
@@ -9762,7 +9762,7 @@ sriov_test_spoofchk_vlan()
 	ip link set ${nic_test} promisc off
 	ethtool --set-priv-flags ${nic_test} vf-true-promisc-support off
 	return $result
-  fi
+	fi
 }
 # guest VM unable to communicate when VFs are defined on hosts PF
 #
@@ -10332,7 +10332,7 @@ sriov_test_vmpfbond_vmvfbond_remote()
 				{ip link set bond0 up}
 				{ifenslave bond0 \$\(cat /tmp/testiface1\)}
 				{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		 )
+		)
 		vmsh cmd_set $vm2 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
@@ -10441,27 +10441,27 @@ sriov_test_attach_method_is_forward_hostdev()
 
 		cat <<-EOF > /usr/share/libvirt/networks/forward_hostdev.xml
 			<network>
-  				<name>forward_hostdev</name>
-  				<forward mode='hostdev' managed='yes'>
+				<name>forward_hostdev</name>
+				<forward mode='hostdev' managed='yes'>
 					<driver name='vfio'/>
 					<address type='pci' domain='0x$vf1_domain' bus='0x$vf1_bus' slot='0x$vf1_slot' function='0x$vf1_function'/>
 					<address type='pci' domain='0x$vf2_domain' bus='0x$vf2_bus' slot='0x$vf2_slot' function='0x$vf2_function'/>
-  				</forward>
+				</forward>
 			</network>
 		EOF
 		cat <<-EOF > vf1.xml
-		  	<interface type='network'>
+			<interface type='network'>
 				<source network='forward_hostdev'/>
 				<target dev='vf1'/>
 				<mac address='$mac1'/>
-  			</interface>
+			</interface>
 		EOF
 		cat <<-EOF > vf2.xml
-		  	<interface type='network'>
+			<interface type='network'>
 				<source network='forward_hostdev'/>
 				<target dev='vf2'/>
 				<mac address='$mac2'/>
-  			</interface>
+			</interface>
 		EOF
 		cat /usr/share/libvirt/networks/forward_hostdev.xml
 		cat vf1.xml
@@ -10641,33 +10641,33 @@ sriov_test_attach_method_is_forward_hostdev_vlan()
 
 		cat <<-EOF > /usr/share/libvirt/networks/forward_hostdev.xml
 			<network>
-  				<name>forward_hostdev</name>
-  				<forward mode='hostdev' managed='yes'>
+				<name>forward_hostdev</name>
+				<forward mode='hostdev' managed='yes'>
 						<driver name='vfio'/>
 						<address type='pci' domain='0x$vf1_domain' bus='0x$vf1_bus' slot='0x$vf1_slot' function='0x$vf1_function'/>
 						<address type='pci' domain='0x$vf2_domain' bus='0x$vf2_bus' slot='0x$vf2_slot' function='0x$vf2_function'/>
-  				</forward>
+				</forward>
 			</network>
 		EOF
 		cat <<-EOF > vf1.xml
-		  	<interface type='network'>
+			<interface type='network'>
 					<source network='forward_hostdev'/>
 					<target dev='vf1'/>
 					<mac address='$mac1'/>
 					<vlan>
-	  					<tag id='$vid'/>
+						<tag id='$vid'/>
 					</vlan>
-  			</interface>
+			</interface>
 		EOF
 		cat <<-EOF > vf2.xml
-		  	<interface type='network'>
+			<interface type='network'>
 					<source network='forward_hostdev'/>
 					<target dev='vf2'/>
 					<mac address='$mac2'/>
 					<vlan>
-	  					<tag id='$vid'/>
+						<tag id='$vid'/>
 					</vlan>
-  			</interface>
+			</interface>
 		EOF
 		virsh net-define /usr/share/libvirt/networks/forward_hostdev.xml
 		virsh net-start forward_hostdev
@@ -15576,19 +15576,19 @@ else
 fi
 
 if i_am_client; then
-	 mac4vm1="00:de:ad:$(printf "%02x" $ipaddr):00:01"
-	 rlLog "mac4vm1 is: ${mac4vm1}"
-	 mac4vm2="00:de:ad:$(printf "%02x" $ipaddr):00:02"
-	 rlLog "mac4vm2 is: ${mac4vm2}"
-	 mac4vm1if2="00:de:ad:$(printf "%02x" $ipaddr):00:03"
-	 rlLog "mac4vm1if2 is: ${mac4vm1if2}"
+	mac4vm1="00:de:ad:$(printf "%02x" $ipaddr):00:01"
+	rlLog "mac4vm1 is: ${mac4vm1}"
+	mac4vm2="00:de:ad:$(printf "%02x" $ipaddr):00:02"
+	rlLog "mac4vm2 is: ${mac4vm2}"
+	mac4vm1if2="00:de:ad:$(printf "%02x" $ipaddr):00:03"
+	rlLog "mac4vm1if2 is: ${mac4vm1if2}"
 else
-	 mac4vm1="00:de:ad:$(printf "%02x" $ipaddr):00:21"
-	 rlLog "mac4vm1 is: ${mac4vm1}"
-	 mac4vm2="00:de:ad:$(printf "%02x" $ipaddr):00:22"
-	 rlLog "mac4vm2 is: ${mac4vm2}"
-	 mac4vm1if2="00:de:ad:$(printf "%02x" $ipaddr):00:23"
-	 rlLog "mac4vm1if2 is: ${mac4vm1if2}"
+	mac4vm1="00:de:ad:$(printf "%02x" $ipaddr):00:21"
+	rlLog "mac4vm1 is: ${mac4vm1}"
+	mac4vm2="00:de:ad:$(printf "%02x" $ipaddr):00:22"
+	rlLog "mac4vm2 is: ${mac4vm2}"
+	mac4vm1if2="00:de:ad:$(printf "%02x" $ipaddr):00:23"
+	rlLog "mac4vm1if2 is: ${mac4vm1if2}"
 fi
 
 result_file=${result_file:-"sriov_$nic_driver.log"}
