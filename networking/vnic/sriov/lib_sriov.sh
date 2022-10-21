@@ -613,7 +613,7 @@ if [ "$NIC_DRIVER" == "ice" ]; then
 	for count in $(seq 0 $((vfs_num-1))); do
 		for interface in /sys/devices/virtual/net/*; do
 			interface=${interface%*/}
-            			ethtool -i $interface | grep -q "driver: ice" || continue
+						ethtool -i $interface | grep -q "driver: ice" || continue
 			local ifaces=$ifaces' '$interface
 		done
 	done
