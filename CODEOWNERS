@@ -167,6 +167,7 @@
 /filesystems/loopdev/sanity/ @bgoncalv @jencce2002 @lulinqing
 /filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
 /filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing @nstraz
+/firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
 /kdump-cki/kdump-file-load/ @bgoncalv @emmawu1 @lulinqing
