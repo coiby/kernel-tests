@@ -16447,7 +16447,7 @@ fi
 #	rlPhaseEnd
 #fi
 #if [ "$SRIOV_SKIP_SETUP_ENV" != "yes" ]; then
- #	   sriov_cleanup
+#	   sriov_cleanup
 #fi
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz2008373\b)"; then
 		rlPhaseStartTest "sriov_test_bz2008373"
