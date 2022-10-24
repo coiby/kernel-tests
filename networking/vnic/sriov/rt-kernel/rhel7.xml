@@ -1,0 +1,92 @@
+<domain type='kvm'>
+  <name>rhel7.8_rt_8vcpu</name>
+  <uuid>3f23e36a-68dc-11ea-b1f0-1866da5ec252</uuid>
+  <memory unit='KiB'>4194304</memory>
+  <currentMemory unit='KiB'>4194304</currentMemory>
+  <memoryBacking>
+    <hugepages>
+      <page size='1048576' unit='KiB'/>
+    </hugepages>
+    <locked/>
+  </memoryBacking>
+  <vcpu placement='static'>10</vcpu>
+  <cputune>
+    <vcpupin vcpu='0' cpuset='16'/>
+    <vcpupin vcpu='1' cpuset='18'/>
+    <vcpupin vcpu='2' cpuset='1'/>
+    <vcpupin vcpu='3' cpuset='3'/>
+    <vcpupin vcpu='4' cpuset='5'/>
+    <vcpupin vcpu='5' cpuset='7'/>
+    <vcpupin vcpu='6' cpuset='9'/>
+    <vcpupin vcpu='7' cpuset='11'/>
+    <vcpupin vcpu='8' cpuset='13'/>
+    <vcpupin vcpu='9' cpuset='15'/>
+    <emulatorpin cpuset='0'/>
+    <vcpusched vcpus='1' scheduler='fifo' priority='1'/>
+    <vcpusched vcpus='2' scheduler='fifo' priority='1'/>
+    <vcpusched vcpus='3' scheduler='fifo' priority='1'/>
+    <vcpusched vcpus='4' scheduler='fifo' priority='1'/>
+    <vcpusched vcpus='5' scheduler='fifo' priority='1'/>
+    <vcpusched vcpus='6' scheduler='fifo' priority='1'/>
+    <vcpusched vcpus='7' scheduler='fifo' priority='1'/>
+    <vcpusched vcpus='8' scheduler='fifo' priority='1'/>
+    <vcpusched vcpus='9' scheduler='fifo' priority='1'/>
+  </cputune>
+  <numatune>
+    <memory mode='strict' nodeset='0'/>
+    <memnode cellid='0' mode='strict' nodeset='0'/>
+  </numatune>
+  <os>
+    <type arch='x86_64' machine='q35'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <pmu state='off'/>
+    <vmport state='off'/>
+  </features>
+  <cpu mode='host-passthrough' check='none'>
+    <feature policy='require' name='tsc-deadline'/>
+    <numa>
+      <cell id='0' cpus='0-9' memory='2097152' unit='KiB' memAccess='shared'/>
+    </numa>
+  </cpu>
+  <clock offset='utc'>
+    <timer name='rtc' tickpolicy='catchup'/>
+    <timer name='pit' tickpolicy='delay'/>
+    <timer name='hpet' present='no'/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none' io='threads'/>
+      <source file='/home/images_nfv-virt-rt-kvm/rhel7.8_rt_8vcpu.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+    </disk>
+    <controller type='usb' index='0' model='none'/>
+    <controller type='pci' index='0' model='pci-root'/>
+    <interface type='bridge'>
+      <mac address='11:22:33:44:dd:02'/>
+      <source bridge='switch'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+    <serial type='pty'>
+      <target type='isa-serial' port='0'>
+        <model name='isa-serial'/>
+      </target>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <input type='mouse' bus='ps2'/>
+    <input type='keyboard' bus='ps2'/>
+    <memballoon model='virtio'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+    </memballoon>
+  </devices>
+</domain>

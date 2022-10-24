@@ -1,0 +1,11 @@
+[General]
+name=networking/vnic/sriov
+owner=Yuying Ma <yuma@redhat.com>
+description=Networking SR-IOV test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=networking/common
