@@ -18,14 +18,23 @@ function runtest() {
 
 	partition_1_primary "$DISKS"
 
-for TEST_DISK in $TEST_DISKS; do
+for DISK in $DISKS; do
+
+	MODEL=$(cat /sys/block/"$DISK"/device/model)
+	tlog "The testing disk $DISK model is $MODEL"
+
+	#BZ2097317
+	if [[ $MODEL =~ "INTEL SSDPEDMD016T4" ]]; then
+		continue
+	fi
+
 	#FIO testing
 	dmesg -c
 	{
-	tnot "fio -filename=/dev/${TEST_DISK} -iodepth=1 -thread -rw=randwrite -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime=1200 -time_based -size=1G -group_reporting -name=mytest -numjobs=60" &
+	tnot "fio -filename=/dev/${DISK}p1 -iodepth=1 -thread -rw=randwrite -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime=1200 -time_based -size=1G -group_reporting -name=mytest -numjobs=60" &
 	sleep 5
 
-	nvme_pci_id="$(get_nvme_pci_id "${TEST_DISK:0:7}")"
+	nvme_pci_id="$(get_nvme_pci_id "$DISK")"
 
 	local int=1
 	while((int < 11))
@@ -44,11 +53,11 @@ for TEST_DISK in $TEST_DISKS; do
 	done
 	wait
 	dmesg
-	tok "test ! -b /dev/$TEST_DISK"
-	if [ ! -b "/dev/$TEST_DISK" ]; then
-		tlog "INFO: device node /dev/$TEST_DISK removed"
+	tok "test ! -b /dev/{$DISK}p1"
+	if [ ! -b "/dev/${DISK}p1" ]; then
+		tlog "INFO: device node /dev/${DISK}p1 removed"
 	else
-		tlog "FAIL: device node /dev/$TEST_DISK still exists"
+		tlog "FAIL: device node /dev/${DISK}p1 still exists"
 		return 1
 	fi
 	} &
