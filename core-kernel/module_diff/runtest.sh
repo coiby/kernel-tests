@@ -495,6 +495,10 @@ rlJournalStart
                     echo "" | tee -a $OUTPUTFILE
                     echo "***** $ARCH: Base release is RHEL-8.6 *****" | tee -a $OUTPUTFILE
                     Release="8.6"
+                    # known issue: bz2129923
+                    if cki_kver_lt "4.18.0-372.32.1.el8_6"; then
+                        sed -i "/hpilo\.ko/d"  ${OS}/${Release}/8.6-modules-aarch64.lst
+                    fi
                     ;;
                 *)
                     # We are currently developing RHEL-8.7
