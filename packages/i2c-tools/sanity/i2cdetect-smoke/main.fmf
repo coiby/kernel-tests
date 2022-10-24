@@ -1,0 +1,13 @@
+summary: Load i2c-dev module and try i2cdetect -l
+description: |
+    Description: Loads i2c-dev module, tries i2cdetect -l.
+    If some buses are detected probes each one for capatibilities.
+
+    Author: Lukas Zachar <lzachar@redhat.com>
+contact: Lukas Zachar <lzachar@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - i2c-tools
+extra-summary: packages/i2c-tools/sanity/i2cdetect-smoke
+extra-task: packages/i2c-tools/sanity/i2cdetect-smoke
