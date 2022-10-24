@@ -15916,7 +15916,7 @@ fi
 
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1392128\b)"; then
- 	rlPhaseStartTest "preconfiguration"
+	rlPhaseStartTest "preconfiguration"
 	rlRun preconfiguration
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1392128"
