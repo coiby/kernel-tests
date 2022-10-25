@@ -36,11 +36,11 @@ function memblock_mem_kaslr()
         mem_half=$(cat $DIR_DEBUG/${FUNCNAME}_memhalf)
     fi
 
-	rlWarn "This is bogus, need to take care of crashkernel on s390x, aarch64, and ppc64"
+    rlWarn "This is bogus, need to take care of crashkernel on s390x, aarch64, and ppc64"
 
-	if ! uname -m | grep x86_64; then
-		return
-	fi
+    if ! uname -m | grep x86_64; then
+        return
+    fi
 
     if [ "$mem_half" -lt "524288" ]; then
         rlRun "echo memory is too low, $((mem_half*2))K"

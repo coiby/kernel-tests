@@ -28,9 +28,9 @@ function kernelcore()
 {
 	local membase;
 	if [ "$(rlGetPrimaryArch)" != "x86_64" ]; then
-                rlLog "Only for x86_64"
-                return
-        fi
+		rlLog "Only for x86_64"
+		return
+	fi
 
 	rlRun "which numactl || return"
 	rlRun "yum install -y numactl"

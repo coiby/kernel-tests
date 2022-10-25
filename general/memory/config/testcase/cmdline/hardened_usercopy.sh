@@ -27,24 +27,24 @@
 # Turn off the hardened_us, and it should not panic kernel
 function out_of_boundary()
 {
-    pushd $DIR_SOURCE/hardened_usercopy
-    local flag=""
-    rlIsRHEL ">=8" && flag="EXTRA_CFLAGS=-DRHEL8"
-    rlRun "make $flag"
-    rlRun "insmod usercopy.ko"
-    rlRun "rmmod usercopy"
-    popd
+	pushd $DIR_SOURCE/hardened_usercopy
+	local flag=""
+	rlIsRHEL ">=8" && flag="EXTRA_CFLAGS=-DRHEL8"
+	rlRun "make $flag"
+	rlRun "insmod usercopy.ko"
+	rlRun "rmmod usercopy"
+	popd
 }
 
 # Default value is on
 function hardened_usercopy()
 {
-    local support=$(grep CONFIG_HARDENED_USERCOPY=y /boot/config-$(uname -r))
-    uname -r | grep x86_64 || return
+	local support=$(grep CONFIG_HARDENED_USERCOPY=y /boot/config-$(uname -r))
+	uname -r | grep x86_64 || return
 	# This can corruption kernel memory, and leading to system oops. Not good for reguler run.
 	return
-    [ -z "$support" ] && rlLog "debug_guardpage_minorder is not supported." && return 0
-    setup_cmdline_args "hardened_usercopy=off" HARDENED_USERCOPY_OFF && out_of_boundary
-    cleanup_cmdline_args "hardened_usercopy=off"
-    return 0
+	[ -z "$support" ] && rlLog "debug_guardpage_minorder is not supported." && return 0
+	setup_cmdline_args "hardened_usercopy=off" HARDENED_USERCOPY_OFF && out_of_boundary
+	cleanup_cmdline_args "hardened_usercopy=off"
+	return 0
 }

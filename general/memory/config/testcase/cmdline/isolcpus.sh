@@ -60,11 +60,11 @@ function isolcpus()
     fi
     if rlIsRHEL ">=6.10"; then
         setup_cmdline_args "isolcpus=1-10000" OVERFLOW
-	if rlIsRHEL ">=8"; then
-		rlAssertGrep "Housekeeping: nohz_full= or isolcpus= incorrect CPU range" <(journalctl -kb)
-	elif rlIsRHEL ">7.2"; then
-		rlRun "cat /var/log/messages /var/log/dmesg | grep 'sched: Error, all isolcpus= values must be between 0 and'" #bz1304216
-	fi
+        if rlIsRHEL ">=8"; then
+            rlAssertGrep "Housekeeping: nohz_full= or isolcpus= incorrect CPU range" <(journalctl -kb)
+        elif rlIsRHEL ">7.2"; then
+            rlRun "cat /var/log/messages /var/log/dmesg | grep 'sched: Error, all isolcpus= values must be between 0 and'" #bz1304216
+        fi
     fi
     cleanup_cmdline_args "isolcpus"
 }

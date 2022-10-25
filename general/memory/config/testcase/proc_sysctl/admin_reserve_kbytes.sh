@@ -47,11 +47,11 @@ admin_reserve_kbytes()
     local default_value=$(cat /proc/sys/vm/admin_reserve_kbytes)
     local total_memory=$(grep MemTotal /proc/meminfo | awk '{print $2}')
 
-	if rlIsRHEL ">=8" || rlIsFedora; then
-		rlLogInfo "admin_reserve_kbytes is not supported any more since rhel9"
-		report_result ${FUNCNAME} SKIP
-		return 0
-	fi
+    if rlIsRHEL ">=8" || rlIsFedora; then
+        rlLogInfo "admin_reserve_kbytes is not supported any more since rhel9"
+        report_result ${FUNCNAME} SKIP
+        return 0
+    fi
 
     swapoff -a
     rlAssertGreaterOrEqual "Assert the default admin_reserve_kbytes is less or equal than 8192." 8192 ${default_value}

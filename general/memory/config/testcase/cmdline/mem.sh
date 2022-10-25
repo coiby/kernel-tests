@@ -45,9 +45,9 @@ function mem()
 
     # there is a possibility that memory total vary from difference reboots.
     if [ $mem_curr -gt $memtotal ]; then
-	    rlAssertLesserOrEqual "Assert memtotal" $((mem_curr - memtotal)) 1024
+        rlAssertLesserOrEqual "Assert memtotal" $((mem_curr - memtotal)) 1024
     else
-	    rlAssertLesserOrEqual "Assert memtotal" $((memtotal - mem_curr)) 1024
+        rlAssertLesserOrEqual "Assert memtotal" $((memtotal - mem_curr)) 1024
     fi
 
     cleanup_cmdline_args "mem"

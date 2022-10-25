@@ -11,20 +11,20 @@ FILE_SKIP_SUMMARY="$DIR_DEBUG/skipped_bugs_summary.txt"
 
 function install_libcgroup()
 {
-       local pkg=libcgroup.20210106.tgz
-       [ -z "$LOOKASIDE" ] && LOOKASIDE=http://download-node-02.eng.bos.redhat.com/qa/rhts/lookaside/
-       which cgcreate &>/dev/null && return 0
-       which cgcreate &>/dev/null || yum -y install libcgroup-tools &>/dev/null
-       which cgcreate  && return 0
-
-       rpm -q cmake || yum -y install cmake &>/dev/null
-       rpm -q pam-devel || yum -y install pam-devel bison flex
-       curl -LkO  $LOOKASIDE/$pkg || return 1
-       tar -zxf $pkg
-       pushd libcgroup
-       sh bootstrap.sh
-       make install -j $(nproc)
-       popd
+	local pkg=libcgroup.20210106.tgz
+	[ -z "$LOOKASIDE" ] && LOOKASIDE=http://download-node-02.eng.bos.redhat.com/qa/rhts/lookaside/
+	which cgcreate &>/dev/null && return 0
+	which cgcreate &>/dev/null || yum -y install libcgroup-tools &>/dev/null
+	which cgcreate  && return 0
+	
+	rpm -q cmake || yum -y install cmake &>/dev/null
+	rpm -q pam-devel || yum -y install pam-devel bison flex
+	curl -LkO  $LOOKASIDE/$pkg || return 1
+	tar -zxf $pkg
+	pushd libcgroup
+	sh bootstrap.sh
+	make install -j $(nproc)
+	popd
 }
 
 install_packages(){
@@ -188,28 +188,27 @@ get_release()
 
 function check_knownissues()
 {
-    local i
-    if echo ${KNOWN_ISSUE_LIST[*]} | grep -q $subfunc; then
-        local bug_id=$(echo ${KNOWN_ISSUE_LIST[$REL_ID]} | awk -F: -v RS=' ' '/'$subfunc'/ {split($2,a,",");print a[1]}')
-        # Array elements
-        local kver_since=($(echo ${KNOWN_FILED_BUGS[$bug_id]} | awk -v RS=' ' '{split($0,a,"->");print a[1]}'))
-        local kver_until=($(echo ${KNOWN_FILED_BUGS[$bug_id]} | awk -v RS=' ' '{split($0,a,"->");print a[2]}'))
-        for ((i=0; i<${#kver_since[*]}; i++)); do
-            if kver_ge ${kver_since[$i]}; then
-                if [ "${kver_until[$i]}" = "*" ] || kver_le $kver_until; then
-                    echo "$subfunc: Switching test phase to warning, as there's knownissue $bug_id"
-                    ptype=WARN
-                    pname=${subfunc}_$(echo ${KNOWN_ISSUE_LIST[$REL_ID]} |\
-                        awk -F: -v RS=' ' '/'$subfunc'/ {if (NF>1) {gsub(",","-unfix",$2);\
-                        printf("unfix%s",$2)} else {printf("%s", $1)} exit 0}')
-                    return 0
-                fi
-            fi
+	local i
+	if echo ${KNOWN_ISSUE_LIST[*]} | grep -q $subfunc; then
+		local bug_id=$(echo ${KNOWN_ISSUE_LIST[$REL_ID]} | awk -F: -v RS=' ' '/'$subfunc'/ {split($2,a,",");print a[1]}')
+	# Array elements
+	local kver_since=($(echo ${KNOWN_FILED_BUGS[$bug_id]} | awk -v RS=' ' '{split($0,a,"->");print a[1]}'))
+	local kver_until=($(echo ${KNOWN_FILED_BUGS[$bug_id]} | awk -v RS=' ' '{split($0,a,"->");print a[2]}'))
+	for ((i=0; i<${#kver_since[*]}; i++)); do
+		if kver_ge ${kver_since[$i]}; then
+			if [ "${kver_until[$i]}" = "*" ] || kver_le $kver_until; then
+				echo "$subfunc: Switching test phase to warning, as there's knownissue $bug_id"
+			ptype=WARN
+			pname=${subfunc}_$(echo ${KNOWN_ISSUE_LIST[$REL_ID]} |\
+			awk -F: -v RS=' ' '/'$subfunc'/ {if (NF>1) {gsub(",","-unfix",$2);\
+			printf("unfix%s",$2)} else {printf("%s", $1)} exit 0}')
+			return 0
+			fi
+		fi
 	done
-    fi
-    return 1
+	fi
+	return 1
 }
-
 function test_get_diskfreek()
 {
 	local free_k=$(df -k . | awk '/Filesystem/ {for (i=1; i<=NF; i++) if ($i == "Available") avail=i;next;} {print $avail}')

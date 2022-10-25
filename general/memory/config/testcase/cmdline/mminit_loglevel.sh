@@ -37,9 +37,8 @@ function meminit_check()
 
 function mminit_loglevel()
 {
-    setup_cmdline_args "mminit_loglevel=4 loglevel=8"
-    meminit_check
-    cleanup_cmdline_args "mminit_loglevel loglevel"
-
+	 "mminit_loglevel=4 loglevel=8"
+	meminit_check
+	cleanup_cmdline_args "mminit_loglevel loglevel"
 }
 
