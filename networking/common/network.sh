@@ -966,9 +966,11 @@ change_iface_mtu()
 			;;
 		bridge)
 			local i
-			for i in $(ls /sys/class/net/$iface/brif); do
+			pushd /sys/class/net/$iface/brif
+			for i in *; do
 				change_iface_mtu $i $value
 			done
+			popd
 			;;
 		openvswitch)
 			local i
@@ -2165,7 +2167,8 @@ get_required_iface_by_mac()
 	local ports=""
 	for dev_mac in "$@";
 	do
-		for dir in $(ls /sys/class/net)
+		pushd /sys/class/net
+		for dir in *
 		do
 			mac=$(cat /sys/class/net/$dir/address 2>/dev/null)
 				if [ "$mac" == "$dev_mac" ];then
@@ -2173,6 +2176,7 @@ get_required_iface_by_mac()
 					break
 				fi
 		done
+		popd
 	done
 	echo $ports
 }
