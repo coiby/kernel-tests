@@ -68,7 +68,7 @@ log()
 submit_log()
 {
 	[ ! $JOBID ] && [ ! $RSTRNT_JOBID ] && return 0
-	for file in $@; do
+	for file in "$@"; do
 		rhts-submit-log -l $file
 	done
 }
@@ -518,7 +518,7 @@ rhts-sync-block()
 	local i
 	shift; shift
 	hosts=($@)
-	for i in ${hosts[@]}; do
+	for i in "${hosts[@]}"; do
 		local key="$i $message"
 		while true; do
 			grep "$key" /tmp/sync_message 2>/dev/null && {
@@ -529,6 +529,8 @@ rhts-sync-block()
 			sleep 5
 		done
 	done
-	echo "rhts-sync-block -s $message $@ DONE"
+#	echo "rhts-sync-block -s $message $@ DONE"
+#	https://www.shellcheck.net/wiki/SC2145
+	echo "rhts-sync-block -s $message $* DONE"
 }
 fi
