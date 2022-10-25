@@ -326,7 +326,7 @@ saving vmcore-dmesg.txt complete
 Starting Kdump Vmcore Save Service
 EOF
 
-  cat >/usr/share/rhts/falsestrings <<EOF
+	cat >/usr/share/rhts/falsestrings <<EOF
 BIOS BUG
 DEBUG
 mapping multiple BARs.*IBM System X3250 M4
