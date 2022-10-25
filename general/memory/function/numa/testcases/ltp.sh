@@ -1,8 +1,6 @@
 #!/bin/bash
 
 if [ ! -f /opt/ltp/runltp ]; then
-    yum install -y net-tools
-    yum group install -y development
     git clone https://github.com/linux-test-project/ltp.git
     pushd ltp
     git checkout 20180515
