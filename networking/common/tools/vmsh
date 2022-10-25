@@ -27,7 +27,7 @@ set timeout $VMSH_TIMEOUT
 
 # command line prompt
 if { [catch {set VMSH_PROMPT $::env(VMSH_PROMPT)}] } { set VMSH_PROMPT {\[root@(\S+) .+\]\# } }
-if { [catch {set VMSH_PROMPT1 $::env(VMSH_PROMPT1)}] } { set VMSH_PROMPT1 $VMSH_PROMPT }
+if { [catch {set VMSH_PROMPT1 $::env(VMSH_PROMPT1)}] } { set VMSH_PROMPT1 "undefined_vmsh_prompt1" }
 
 # user name and password used to login guest
 if { [catch {set VM_USERNAME $::env(VM_USERNAME)}] } { set VM_USERNAME "root" }
@@ -57,7 +57,7 @@ proc login_vm { name } {
 
         spawn virsh console $name
         expect {
-                "Escape character is \^]\r" { sleep 1; send "\r" }
+                "Escape character is \^]" { sleep 1; send "\r" }
                 timeout {
                         puts "FAIL: timeout to login vm \"$name\"!"
                         exit 1
@@ -192,23 +192,21 @@ proc run_cmd { name cmd } {
 	login_vm $name
 
 	send -i $sid "$cmd\r"
+	expect {
+		-i $sid
+		-re $VMSH_PROMPT { }
+		-re $VMSH_PROMPT1 { }
+		timeout {
+			puts "FAIL(1):TIMEOUT to run_cmd \"$cmd\""
+			exit 1
+		}
+	}
 
 	if { $VMSH_NORESULT == 0 } {
-		expect {
-			-i $sid
-			-re $VMSH_PROMPT { }
-			-re $VMSH_PROMPT1 { }
-			timeout {
-				puts "FAIL(1):TIMEOUT to run_cmd \"$cmd\""
-				exit 1
-			}
-		}
-
-		expect *
 		send -i $sid "echo \$?\r"
 		expect {
 			-i $sid
-			-re "\n(\\d+)\r" { set exit_code  $expect_out(1,string) }
+			-re "(\r|\n)(\\d+)\r" { set exit_code  $expect_out(2,string) }
 			-re $VMSH_PROMPT { send -i $sid "echo \$?\r"; exp_continue }
 			-re $VMSH_PROMPT1 { send -i $sid "echo \$?\r"; exp_continue }
 			timeout {
@@ -226,11 +224,7 @@ proc run_cmd { name cmd } {
 			}
 		}
 	} else {
-		expect {
-			-i $sid
-			"\r" { sleep 2 }
-			timeout {}
-		}
+		sleep 2
 	}
 
 	logout_vm
@@ -329,7 +323,7 @@ proc cmd_set { name cmd } {
 		send -i $sid "echo \$?\r"
 		expect {
 			-i $sid
-			-re "\n(\\d+)\r" { set result  $expect_out(1,string) }
+			-re "(\r|\n)(\\d+)\r" { set result  $expect_out(2,string) }
 			-re $VMSH_PROMPT { send -i $sid "echo \$?\r"; exp_continue }
 			-re $VMSH_PROMPT1 { send -i $sid "echo \$?\r"; exp_continue }
 			timeout {
@@ -406,4 +400,3 @@ proc ssh_cmd_set { vm_ip cmd } {
 set ret [eval $argv]
 puts stdout $ret
 exit $exit_code
-
