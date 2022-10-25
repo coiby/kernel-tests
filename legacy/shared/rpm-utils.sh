@@ -20,6 +20,10 @@
 #
 # -----------------------------------------------------------------------------
 
+FILE=$(readlink -f $BASH_SOURCE)
+NAME=$(basename $FILE)
+CDIR=$(dirname $FILE)
+
 BREWROOT_KERN=http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel
 
 # -----------------------------------------------------------------------------
@@ -177,6 +181,7 @@ function rpm_install()
 
 function rpm_extract_latest()
 {
+	[ ! -f /etc/yum.repos.d/rhel-latest.repo ] && bash ${CDIR}/create-rhel-latest-repo.sh
 	yumdownloader --disablerepo='*' --enablerepo=rhel-latest \
 		--downloaddir=$RPM_TMPDIR "${RPM_EXTRACT[@]}"
 	_rpm_extract

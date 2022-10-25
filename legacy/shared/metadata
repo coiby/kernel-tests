@@ -8,3 +8,4 @@ destructive=no
 
 [restraint]
 entry_point=echo nothing > /dev/null
+repoRequires=cki_lib
