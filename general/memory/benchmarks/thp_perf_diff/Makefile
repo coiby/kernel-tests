@@ -70,6 +70,7 @@ $(METADATA): Makefile
 	@echo "TestTime:        1h" >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)
 	@echo "Requires:        kernel bc wget rpm-build" >> $(METADATA)
+	@echo "RepoRequires:    general/include/scripts" >> $(METADATA)
 	@echo "RhtsRequires:    kernel-kernel-general-include" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
