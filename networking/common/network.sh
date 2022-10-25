@@ -2,28 +2,24 @@
 # vim: sts=8 sw=8 noexpandtab:
 # This is for network operations
 
-# select tool to manage package, which could be "yum" or "dnf"
-function select_yum_tool() {
-	if [ -x /usr/bin/dnf ]; then
-		echo "/usr/bin/dnf"
-	elif [ -x /usr/bin/yum ]; then
-		echo "/usr/bin/yum"
-	else
-		return 1
-	fi
-
-	return 0
-}
-
-yum=$(select_yum_tool)
-
-trap 'cleanup_swcfg' HUP TERM EXIT
+trap 'cleanup_swcfg' HUP TERM KILL EXIT
 
 # ---------------------- Global variables  ------------------
 
 # variable for configuration files
 SWCFG_UNDO="/mnt/testarea/swcfg_undo.sh"
+NIC_INFO_URL=${NIC_INFO_URL:-https://gitlab.cee.redhat.com/kernel-qe/kernel/raw/master/networking/inventory/nic_info}
+#if uname -r | grep 4.14
+#then
+#		NIC_INFO_URL="${NIC_INFO_URL}-alt"
+#elif uname -r | grep "^4"
+#then
+#		NIC_INFO_URL="${NIC_INFO_URL}-rhel8"
+#else
+#		NIC_INFO_URL=${NIC_INFO_URL}
+#fi
 NIC_INFO="/tmp/nic_info"; export NIC_INFO=$NIC_INFO
+NIC_INFO_WITH_ALL_NIC=/tmp/nic_info_with_all_nic; export NIC_INFO_WITH_ALL_NIC=$NIC_INFO_WITH_ALL_NIC
 
 # variables for choosing required interfaces
 PVT=${PVT:-"no"}
@@ -67,10 +63,10 @@ export REMOTE_IFACE_MAC=
 #restart network service, for "service network restart" failed at rhel7
 pure_restart_network()
 {
-	pkill -9 dhclient
-	ip link set $1 down &> /dev/null
-	ip link set $1 up &> /dev/null
-	sleep 10
+        pkill -9 dhclient
+        ip link set $1 down &> /dev/null
+        ip link set $1 up &> /dev/null
+        sleep 10
 	if [ "$IPVER" != "6" ]; then
 		dhclient $1
 	else
@@ -103,7 +99,11 @@ reset_network_env()
 		pkill -9 dhclient
 		pkill -f "nc -l"
 
-		rsync -a --delete $networkLib/network-scripts.bak/ /etc/sysconfig/network-scripts/
+		if [ "$(GetDistroRelease)" -le 8 ];then
+			rsync -a --delete $networkLib/network-scripts.bak/ /etc/sysconfig/network-scripts/
+		else
+			rsync -a --delete $networkLib/system-connections/ /etc/NetworkManager/system-connections/
+		fi
 		systemctl restart network
 		systemctl restart NetworkManager
 
@@ -111,8 +111,8 @@ reset_network_env()
 		ip link del $TEAM_NAME
 		ip link del $BOND_NAME
 	else
-		# remove ovs
-	        ovs-vsctl del-br ovsbr0 2>/dev/null && service openvswitch restart
+		 # remove ovs
+		ovs-vsctl del-br ovsbr0 2>/dev/null && service openvswitch restart
 
 		# remove netns
 		ip netns list &> /dev/null && for i in `ip netns list | awk '{print $1}'`; do ip netns del $i; done
@@ -135,10 +135,52 @@ reset_network_env()
 		pkill -9 dhclient
 		pkill -f "nc -l"
 
-		rsync -a --delete $networkLib/network-scripts.no_nm/ /etc/sysconfig/network-scripts/
+		if [ "$(GetDistroRelease)" -le 8 ];then
+			rsync -a --delete $networkLib/network-scripts.no_nm/ /etc/sysconfig/network-scripts/
+		else
+			rsync -a --delete $networkLib/system-connections.no_nm/ /etc/NetworkManager/system-connections/
+		fi
 		service network restart
 	fi
 
+	return $exitcode
+}
+
+get_iface_and_addr_bak()
+{
+	if i_am_server;then
+		sync_set client get_iface_and_addr_server
+		sync_wait client get_iface_and_addr_client
+	else
+		sync_wait server get_iface_and_addr_server
+		sync_set server get_iface_and_addr_client
+	fi
+	local exitcode=0
+	get_test_iface CUR_IFACE || let exitcode++
+	TEST_IFACE=$CUR_IFACE
+
+	exchange_ip_bak $TEST_IFACE || let exitcode++
+	LOCAL_ADDR4=$(awk '/IP4/ {print $2}' /tmp/my_ip)
+	LOCAL_ADDR6=$(awk '/IP6/ {print $2}' /tmp/my_ip)
+	REMOTE_ADDR4=$(awk '/IP4/ {print $2}' /tmp/target_ip | uniq)
+	REMOTE_ADDR6=$(awk '/IP6/ {print $2}' /tmp/target_ip | uniq)
+	LOCAL_IFACE_MAC=$(awk '/MAC/ {print $2}' /tmp/my_ip)
+	REMOTE_IFACE_MAC=$(awk '/MAC/ {print $2}' /tmp/target_ip | uniq)
+
+	i_am_server && {
+		SER_ADDR4=$LOCAL_ADDR4
+		SER_ADDR6=$LOCAL_ADDR6
+		CLI_ADDR4=$REMOTE_ADDR4
+		CLI_ADDR6=$REMOTE_ADDR6
+	}
+	
+	i_am_client && {
+		SER_ADDR4=$REMOTE_ADDR4
+		SER_ADDR6=$REMOTE_ADDR6
+		CLI_ADDR4=$LOCAL_ADDR4
+		CLI_ADDR6=$LOCAL_ADDR6
+	}
+	echo "------------- finish setup iface and IP address ----------------"
 	return $exitcode
 }
 
@@ -195,9 +237,25 @@ get_iface_and_addr()
 	echo "------------- finish setup iface and IP address ----------------"
 	return $exitcode
 }
+
+get_test_iface_and_addr_bak() { get_iface_and_addr_bak; }
+
 get_test_iface_and_addr() { get_iface_and_addr; }
 
 # ---------------------- NICs  -----------------------------
+
+# get nic_info files for NAY NICs
+# Parameter:
+#   NIC_INFO_URL: specify URL to download nic_info
+get_netqe_nic_info()
+{
+	unlink $NIC_INFO 2>/dev/null
+	wget --no-check-certificate $NIC_INFO_URL -O $NIC_INFO
+	sed -i '/^#/d' $NIC_INFO
+	# delete unsupported NIC
+	rhel_vx=rhel$(rpm -E %rhel)
+	sed -i "/$rhel_vx/d" $NIC_INFO
+}
 
 # Get interface's name by MAC address
 # @arg1: interface' MAC address (format: 00:c0:dd:1a:44:8c)
@@ -209,8 +267,7 @@ mac2name()
 	local target=""
 	local ethX=""
 
-	for ethX in /sys/class/net/*; do
-		ethX=$(basename $ethX)
+	for ethX in `ls /sys/class/net`; do
 		# skip virtual device
 		if ethtool -i $ethX 2>/dev/null | grep -q "bus-info: [0-9].*"; then
 			target=`get_iface_mac $ethX`
@@ -340,7 +397,9 @@ get_iface_mac()
 	if ethtool -h 2>&1 | grep -q show-permaddr; then
 		mac=`ethtool -P $input | awk '{print $3}'`
 	fi
-	if [ -z "$mac" -o "00:00:00:00:00:00" = "$mac" ]; then
+
+	# ethtool -P bond0 return "Permanent address: not set" now, so we need to check if "not" == "$mac" here
+	if [ -z "$mac" -o "00:00:00:00:00:00" = "$mac" -o "not" = "$mac" ]; then
 		mac=`cat /etc/sysconfig/network-scripts/ifcfg-$input | \
 			awk -F = '/HWADDR=/ {print $2}' | \
 			tr [A-Z] [a-z] | tr -d '"'`
@@ -479,8 +538,12 @@ get_required_iface()
 		for iface in $TEST_IFACE
 		do
 			get_iface_sw_port "$iface" sw port
-			swcfg port_up $sw "$port" &> /dev/null || let exitcode++
 			swcfg cleanup_port_channel $sw "$port" &> /dev/null
+			swcfg port_up $sw "$port" &> /dev/null || let exitcode++
+			if [ `echo $sw |grep 5200` ]; then
+                                # juniper 5200 update version. 88a8 and 8100 don't support at the same time. delete 88a8 config to let 8100 pass
+                                swcfg del_interface_88a8 $sw "$port" &> /dev/null
+                        fi
 		done
 	elif [ "$PVT" = yes ]; then
 		get_pvt_iface "$NIC_DRIVER" "$NIC_NUM" TEST_IFACE  || let exitcode++
@@ -506,7 +569,7 @@ report_interface()
 
 	# if running in RHTS context, submit it
 	if [ -n "$TEST" ]; then
-		type rstrnt-report-log >/dev/null 2>&1 && rstrnt-report-log -l "$inf"
+		type rhts-submit-log >/dev/null 2>&1 && rhts-submit-log -l "$inf"
 	fi
 	return 0
 }
@@ -535,7 +598,7 @@ report_iface_ethtool()
 
 	# if running in RHTS context, submit it
 	if [ -n "$TEST" ]; then
-		type rstrnt-report-log >/dev/null 2>&1 && rstrnt-report-log -l "$inf"
+		type rhts-submit-log >/dev/null 2>&1 && rhts-submit-log -l "$inf"
 	fi
 	return 0
 }
@@ -592,7 +655,7 @@ setup_team()
 	# config port-channel on switch
 	#if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w \
 	#	"runner.*:.*(roundrobin|loadbalance|lacp)"; then
-	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w "runner.*:.*(lacp)"; then
+	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w "runner.*:.*(lacp)"; then	
 		if echo "$team_json" | \egrep -q -w "runner.*:.*lacp"; then
 			port_channel_mode=active
 		else
@@ -643,7 +706,7 @@ setup_bond()
 	#if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$BOND_OPTS" | \egrep -q -w \
 	#	"mode=(0|2|4|balance-rr|balance-xor|802.3ad)"; then
 	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$BOND_OPTS" | \egrep -q -w \
-		"mode=(4|802.3ad)"; then
+                "mode=(4|802.3ad)"; then
 		if echo "$BOND_OPTS" | \egrep -q -w "mode=(4|802.3ad)"; then
 			port_channel_mode=active
 		else
@@ -656,7 +719,7 @@ setup_bond()
 
 	# add bonding interface
 	test -f /sys/class/net/bonding_masters || {
-		if [ $(GetDistroRelease) = 8 ];then
+		if [ $(GetDistroRelease) = 8 ];then 
 			modprobe -nv bonding | grep 'max_bonds=0' > /dev/null && spare_param='Y'
 			if [ $spare_param = 'Y' ]
 			then
@@ -900,8 +963,8 @@ change_iface_mtu()
 			;;
 		bridge)
 			local i
-			for i in /sys/class/net/$iface/brif/*; do
-				change_iface_mtu $(basename $i) $value
+			for i in $(ls /sys/class/net/$iface/brif); do
+				change_iface_mtu $i $value
 			done
 			;;
 		openvswitch)
@@ -1228,6 +1291,7 @@ get_cur_iface_gw()
 	local _output=$2
 	local result=`ip addr show $iface | awk '/inet.*brd/ {print $4; exit}' \
 		| awk -F. '{printf "%s.%s.%s.%s\n",$1,$2,$3,$4-1}'`
+	
 	if [ -z $result ]; then
 		result=unknown
 		returnvalue=1
@@ -1235,10 +1299,21 @@ get_cur_iface_gw()
 		returnvalue=0
 	fi
 
+	split_ip=$((${-+"(${result//./"+256*("}))))"}>>16&255))
+
+        if [[ $split_ip -eq 0 ]] || [[ $split_ip -eq 1 ]] || [[ $split_ip -eq 2 ]] || [[ $split_ip -eq 3 ]];then
+
+                new_gw="$((${-+"(${result//./"+256*("}))))"}&255))"".""$((${-+"(${result//./"+256*("}))))"}>>8&255))"".""1"".""$((${-+"(${result//./"+256*("}))))"}>>24&255))"
+                
+        else
+                echo $result
+
+        fi
+	
 	if [[ "$_output" ]]; then
-		eval $_output="'$result'"
+		eval $_output="'$new_gw'"
 	else
-		echo $result
+		echo $new_gw
 	fi
 
 	return $returnvalue
@@ -1316,7 +1391,7 @@ setup_ip()
 		do
 			pkill -9 dhclient; sleep 2
 			dhclient $arg $iface
-			ip4=$(get_iface_ip4 $iface)
+			ip4=$(get_iface_ip4 $iface)	
 			let try_times++
 		done
 	fi
@@ -1324,7 +1399,7 @@ setup_ip()
 	ip4=$(get_iface_ip4 $iface)
 	if [ -z "$ip4" ]; then
 		# I find the current code(get_iface_and_addr) only call this func for the last topo.
-		# So , at here, treat $iface belongs to last topo.
+		# So , at here, treat $iface belongs to last topo. 
 		# By liali.
 		last_topo=$(echo $TOPO | awk -F, '{print $NF}')
 		last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
@@ -1334,7 +1409,7 @@ setup_ip()
 		[ -z "$NAY" ] && { ip4=NULL; return 1; }
 		ip4="192.168.1.250/24"
 		brd="192.168.1.255"
-
+		
 		#newcode
 		if [ ${topo_contain_vlan} = yes ];then
 			ip4="192.168.${last_vlan_id}.250/24"
@@ -1358,7 +1433,7 @@ setup_ip()
 		if((0));then
 			echo $iface | grep -q 'vlan3\|\.3' && ip4="192.168.3.250/24"
 			echo $iface | grep -q 'vlan4\|\.4' && ip4="192.168.4.250/24"
-
+		
 			if i_am_server; then
 				ip4="192.168.1.251/24"
 				echo $iface | grep -q 'vlan3\|\.3' && ip4="192.168.3.251/24"
@@ -1370,7 +1445,7 @@ setup_ip()
 				echo $iface | grep -q 'vlan4\|\.4' && ip4="192.168.4.252/24"
 			fi
 		fi
-
+		
 		ip addr add $ip4 brd $brd dev $iface || let exitcode++
 	fi
 	return $exitcode
@@ -1412,54 +1487,180 @@ setup_ip6()
 
 	ip6=$(get_iface_ip6 $iface)
 	# manauly setup
-	if [ -z "$ip6" ]; then
-		# I find the current code(get_iface_and_addr) only call this func for the last topo.
-		# So , at here, treat $iface belongs to last topo.
-		# By liali.
-		last_topo=$(echo $TOPO | awk -F, '{print $NF}')
-		last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
-		topo_contain_vlan=$(echo $last_topo | grep -iq vlan && echo yes || echo no)
-		let exitcode++
+        if [ -z "$ip6" ]; then
+                # I find the current code(get_iface_and_addr) only call this func for the last topo.
+                # So , at here, treat $iface belongs to last topo. 
+                # By liali.
+                last_topo=$(echo $TOPO | awk -F, '{print $NF}')
+                last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
+                topo_contain_vlan=$(echo $last_topo | grep -iq vlan && echo yes || echo no)
+                let exitcode++
 
-		[ -z "$NAY" ] && { ip6=NULL; return 1; }
-		ip6="2$(printf %03d ${last_vlan_id})::250/64"
+                [ -z "$NAY" ] && { ip6=NULL; return 1; }
+                ip6="2$(printf %03d ${last_vlan_id})::250/64"
 
-		#newcode
-		if [ ${topo_contain_vlan} = yes ];then
-			ip6="2$(printf %03d ${last_vlan_id})::250/64"
-			if i_am_server;then
-				ip6="2$(printf %03d ${last_vlan_id})::251/64"
-			fi
-			if i_am_client;then
-				ip6="2$(printf %03d ${last_vlan_id})::252/64"
+                #newcode
+                if [ ${topo_contain_vlan} = yes ];then
+                        ip6="2$(printf %03d ${last_vlan_id})::250/64"
+                        if i_am_server;then
+                                ip6="2$(printf %03d ${last_vlan_id})::251/64"
+                        fi
+                        if i_am_client;then
+                                ip6="2$(printf %03d ${last_vlan_id})::252/64"
+                        fi
+                else
+                        if i_am_server;then
+                                ip6="2001::251/64"
+                        fi
+                        if i_am_client;then
+                                ip6="2001::252/64"
+                        fi
+                fi
+
+                #oldcode
+                if((0));then
+                        echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::250/64"
+                        echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::250/64"
+
+                        if i_am_server; then
+                                ip6="2001::251/64"
+                                echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::251/64"
+                                echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::251/64"
+                        fi
+                        if i_am_client; then
+                                ip6="2001::252/64"
+                                echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::252/64"
+                                echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::252/64"
+                        fi
+                fi
+                ip addr add $ip6 dev $iface || let exitcode++
+        fi
+	return $exitcode
+}
+
+exchange_ip_bak()
+{
+	local iface=${1:-$TEST_IFACE}
+	IPVER=${IPVER:-"4 6"}
+	local exitcode=0
+
+	if stat /run/ostree-booted > /dev/null 2>&1; then
+		lsof -v 2>/dev/null || rpm-ostree -A --idempotent --allow-inactive install lsof
+	else
+		lsof -v 2>/dev/null || yum install -y lsof
+	fi
+	echo "MAC $(get_iface_mac $iface) @$HOSTNAME" > /tmp/my_ip
+	echo $IPVER | grep -q 4 && {
+		setup_ip $iface || let exitcode++
+		echo "IP4 $(get_iface_ip4 $iface) @$HOSTNAME" >> /tmp/my_ip
+	}
+	echo $IPVER | grep -q 6 && {
+		setup_ip6 $iface || let exitcode++
+		echo "IP6 $(get_iface_ip6 $iface) @$HOSTNAME" >> /tmp/my_ip
+	}
+	ip addr show $iface
+
+	if [ -n "$TOPO" -a "$TOPO" != "nic" ];then
+		for i in `cat /tmp/test_nic`;do
+			clear_addr $i
+		done
+	fi
+
+	if [ "$IPVER" != "6" ]; then
+		local TARGET=$(get_iface_ip4 $(get_default_iface))
+	else
+		local TARGET=$(get_iface_ip6 $(get_default_iface))
+	fi
+	i_am_server && TARGET=$CLIENTS
+	i_am_client && TARGET=$SERVERS
+
+	while lsof -i TCP:1234; do
+		local pid=$(lsof -i TCP:1234 | tail -n1 | awk '{print $2}')
+		echo $pid | grep -e "\b[0-9]\+\b" >/dev/null && kill -9 $pid && wait $pid
+		sleep 1
+	done
+
+	if [ "$IPVER" != "6" ]; then
+		nc -l 1234 -k > /tmp/target_ip &
+	else
+		nc -l 1234 -6 -k > /tmp/target_ip &
+	fi
+	for i in {1..5}
+	do
+		if which ss
+		then
+			if ss -anp | grep "tcp.*LISTEN.*1234 "
+			then
+				break
+			else
+				sleep 1
 			fi
 		else
-			if i_am_server;then
-				ip6="2001::251/64"
-			fi
-			if i_am_client;then
-				ip6="2001::252/64"
-			fi
-		fi
-
-		#oldcode
-		if((0));then
-			echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::250/64"
-			echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::250/64"
-
-			if i_am_server; then
-				ip6="2001::251/64"
-				echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::251/64"
-				echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::251/64"
-			fi
-			if i_am_client; then
-				ip6="2001::252/64"
-				echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::252/64"
-				echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::252/64"
+			if netstat -anp | grep "tcp.*1234 .*LISTEN"
+			then
+				break
+			else
+				sleep 1
 			fi
 		fi
-		ip addr add $ip6 dev $iface || let exitcode++
+	done
+
+	ps aux | grep nc
+	echo $TARGET
+	systemctl status firewalld
+	getenforce
+
+	if i_am_server;then
+		sync_set client exchange_ip-started_server
+		sync_wait client exchange_ip-started_client
+	else
+		sync_wait server exchange_ip-started_server
+		sync_set server exchange_ip-started_client
 	fi
+	for target in $TARGET;do
+		if [ "$IPVER" != "6" ]; then
+			for i in {1..20}
+			do
+				if nc $target 1234 < /tmp/my_ip
+				then
+					break
+				else
+					sleep 1
+				fi
+			done
+			sleep 1
+			nc $target 1234 < /tmp/my_ip
+		else
+			for i in {1..20}
+			do
+				if nc -6 $target 1234 < /tmp/my_ip
+				then
+					break
+				else
+					sleep 1
+				fi
+			done
+			sleep 1
+			nc -6 $target 1234 < /tmp/my_ip
+		fi
+	done
+	cat /tmp/my_ip
+	cat /tmp/target_ip
+	sleep 3
+	if i_am_server;then
+		sync_set client exchange_ip-finished_server
+		sync_wait client exchange_ip-finished_client
+	else
+		sync_wait server exchange_ip-finished_server
+		sync_set server exchange_ip-finished_client
+	fi
+	while lsof -i TCP:1234; do
+		local pid=$(lsof -i TCP:1234 | tail -n1 | awk '{print $2}')
+		echo $pid | grep -e "\b[0-9]\+\b" >/dev/null && kill $pid && wait $pid
+		sleep 1
+	done
+
+	cat /tmp/target_ip
 	return $exitcode
 }
 
@@ -1473,7 +1674,11 @@ exchange_ip()
 	IPVER=${IPVER:-"4 6"}
 	local exitcode=0
 
-	lsof -v 2>/dev/null || ${yum} -y install lsof
+	if stat /run/ostree-booted > /dev/null 2>&1; then
+		lsof -v 2>/dev/null || rpm-ostree -A --idempotent --allow-inactive install lsof
+	else
+		lsof -v 2>/dev/null || yum install -y lsof
+	fi
 	echo "MAC $(get_iface_mac $iface) @$HOSTNAME" > /tmp/my_ip
 	# dislike combination_test, we just get IP addr, no mask
 	echo $IPVER | grep -q 4 && {
@@ -1599,7 +1804,11 @@ update_ip()
 	IPVER=${IPVER:-"4 6"}
 	local exitcode=0
 
-	lsof -v 2>/dev/null || ${yum} -y install lsof
+	if stat /run/ostree-booted > /dev/null 2>&1; then
+		lsof -v 2>/dev/null || rpm-ostree -A --idempotent --allow-inactive install lsof
+	else
+		lsof -v 2>/dev/null || yum install -y lsof
+	fi
 	echo "MAC $(get_iface_mac $iface) @$HOSTNAME" > /tmp/my_ip
 	# dislike combination_test, we just get IP addr, no mask
 	echo $IPVER | grep -q 4 && {
@@ -1648,7 +1857,7 @@ update_ip()
 		echo $pid | grep -e "\b[0-9]\+\b" >/dev/null && kill -9 $pid && wait $pid
 		sleep 1
 	done
-
+	
 	LOCAL_ADDR4=$(awk '/IP4/ {print $2}' /tmp/my_ip)
 	LOCAL_ADDR6=$(awk '/IP6/ {print $2}' /tmp/my_ip)
 	REMOTE_ADDR4=$(awk '/IP4/ {print $2}' /tmp/target_ip | uniq)
@@ -1705,7 +1914,7 @@ get_iface_sw_port()
 			let exitcode++
 		}
 	done
-	port_list="`echo ${iface_port_array[*]}`" # remove newline
+	port_list="`echo ${iface_port_array[@]}`" # remove newline
 
 	# save and print results
 	[[ "$_switch_name" ]] && eval $_switch_name="'$switch_name'" || echo $switch_name
@@ -1831,7 +2040,11 @@ get_reachable_ips()
 	rm -f $exclude_file
 	if [[ ! $(which nmap) ]]; then
 		epel_release_install
-		${yum} -y install nmap
+		if stat /run/ostree-booted > /dev/null 2>&1; then
+			rpm-ostree -A --idempotent --allow-inactive install nmap
+		else
+			yum install -y nmap
+		fi
 	fi
 	if [[ $(ip a | grep -w inet | grep -w "$subnet_search_string") ]]; then
 		ip a | grep -w inet | grep -w "$subnet_search_string" | awk '{print $2}' | awk -F "/" '{print $1}' > $exclude_file
@@ -1846,8 +2059,8 @@ get_reachable_ips()
 	return $exitcode
 }
 
-# Function to obtain reachable target IP addresses on 192.168.1.0/24 subnet
-# in case other methods fail.  Requires that there is a route available to the
+# Function to obtain reachable target IP addresses on 192.168.1.0/24 subnet 
+# in case other methods fail.  Requires that there is a route available to the 
 # 192.168.1.0/24 subnet.
 # Usage: get_target_ip_addr
 get_target_ip_addr()
@@ -1886,3 +2099,78 @@ get_target_ip_addr()
 	return $exitcode
 }
 
+# Return a number base on hostname
+# Please use it as the 3rd ip segment to avoid ip conflict(e.g. 172.16.${subnet_return_by_this}.1)
+# If host exist in nic_info(and not be commented out), will return his position in nic_info
+# If host not in nic_info(or be commented out), will return a random number which will less than 255 and big than total host count of nic_info
+get_static_ip_subnet()
+{
+	local host=$1
+	[ -f "$NIC_INFO_WITH_ALL_NIC" ] || {
+        		unlink $NIC_INFO_WITH_ALL_NIC 2>/dev/null
+        		wget --no-check-certificate $NIC_INFO_URL -O $NIC_INFO_WITH_ALL_NIC &>/dev/null
+        		sed -i '/^#/d' $NIC_INFO_WITH_ALL_NIC
+	}
+	local total_host=$(cat $NIC_INFO_WITH_ALL_NIC |awk '{print $3}'|sort|uniq|wc -l)
+
+	# get host position in nic_info
+	local line_num=$(grep -v ^# $NIC_INFO_WITH_ALL_NIC | awk  '{print $3}' | uniq |sed '/^$/d' | grep -n $host | awk -F':' '{print $1}')
+	
+	# when host not in nic_info
+	if [ -z "$line_num" ];then
+		#if [ $total_host -lt 254 ];then
+		#	local random_ip=$((RANDOM%(254-total_host)+total_host+1))
+		#	echo $random_ip
+		#else
+		#	echo "254"
+		#fi
+		echo "255"
+	# when host in nic_info and line_num less then 254	
+	elif [ $line_num -lt 254 ];then
+		echo $line_num
+	# when line_num big then 254, return fix value 254
+	else
+		echo "254"
+	fi
+}
+
+# return a mac prefix including 4 segments base on hostname
+get_mac_prefix()
+{
+	local host=$1
+	local segment0=0a
+	local segment1=0a
+	local segment2=$(get_static_ip_subnet $host)
+	local segment3=$((RANDOM%254+1))
+	printf "%02s:%02s:%02x:%02x:" $segment0 $segment1 $segment2 $segment3
+}
+
+set_arp_options()
+{
+	echo 1 > /proc/sys/net/ipv4/conf/all/arp_ignore
+	echo 1 > /proc/sys/net/ipv4/conf/all/arp_filter
+	echo 1 > /proc/sys/net/ipv4/conf/default/arp_ignore
+	echo 1 > /proc/sys/net/ipv4/conf/default/arp_filter
+}
+
+# usage:
+# get_required_iface_by_mac "mac1 mac2"
+# or
+# get_required_iface_by_mac mac1 mac2
+get_required_iface_by_mac()
+{
+        # get port names, save it to $ports
+        local ports=""
+        for dev_mac in $@;
+        do
+                for dir in $(ls /sys/class/net)
+                do
+                        mac=$(cat /sys/class/net/$dir/address 2>/dev/null)
+                        if [ "$mac" == "$dev_mac" ];then
+                                ports=${ports:+"$ports "}$dir
+                                break
+                        fi
+                done
+        done
+	echo $ports
+}
