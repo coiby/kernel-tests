@@ -1,0 +1,15 @@
+summary: storage/block/bz2131929_STABLE_WRITES
+description: performance regressions with STABLE_WRITES
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+  - kernel
+path: /storage/block/bz2131929_STABLE_WRITES
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+duration: 1h
+tier: 1
+extra-summary: /storage/block/bz2131929_STABLE_WRITES
+extra-task: /storage/block/bz2131929_STABLE_WRITES
