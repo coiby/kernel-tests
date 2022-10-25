@@ -1,0 +1,13 @@
+[General]
+name=storage/block/bz2131929_STABLE_WRITES
+owner=Changhui Zhong <czhong@redhat.com>
+description=performance regressions with STABLE_WRITES
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=
+repoRequires=cki_lib
+max_time=1h
