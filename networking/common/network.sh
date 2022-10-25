@@ -63,10 +63,10 @@ export REMOTE_IFACE_MAC=
 #restart network service, for "service network restart" failed at rhel7
 pure_restart_network()
 {
-        pkill -9 dhclient
-        ip link set $1 down &> /dev/null
-        ip link set $1 up &> /dev/null
-        sleep 10
+		pkill -9 dhclient
+		ip link set $1 down &> /dev/null
+		ip link set $1 up &> /dev/null
+		sleep 10
 	if [ "$IPVER" != "6" ]; then
 		dhclient $1
 	else
@@ -111,7 +111,7 @@ reset_network_env()
 		ip link del $TEAM_NAME
 		ip link del $BOND_NAME
 	else
-		 # remove ovs
+		# remove ovs
 		ovs-vsctl del-br ovsbr0 2>/dev/null && service openvswitch restart
 
 		# remove netns
@@ -541,9 +541,9 @@ get_required_iface()
 			swcfg cleanup_port_channel $sw "$port" &> /dev/null
 			swcfg port_up $sw "$port" &> /dev/null || let exitcode++
 			if [ `echo $sw |grep 5200` ]; then
-                                # juniper 5200 update version. 88a8 and 8100 don't support at the same time. delete 88a8 config to let 8100 pass
-                                swcfg del_interface_88a8 $sw "$port" &> /dev/null
-                        fi
+				# juniper 5200 update version. 88a8 and 8100 don't support at the same time. delete 88a8 config to let 8100 pass
+				swcfg del_interface_88a8 $sw "$port" &> /dev/null
+			fi
 		done
 	elif [ "$PVT" = yes ]; then
 		get_pvt_iface "$NIC_DRIVER" "$NIC_NUM" TEST_IFACE  || let exitcode++
@@ -706,7 +706,7 @@ setup_bond()
 	#if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$BOND_OPTS" | \egrep -q -w \
 	#	"mode=(0|2|4|balance-rr|balance-xor|802.3ad)"; then
 	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$BOND_OPTS" | \egrep -q -w \
-                "mode=(4|802.3ad)"; then
+		"mode=(4|802.3ad)"; then
 		if echo "$BOND_OPTS" | \egrep -q -w "mode=(4|802.3ad)"; then
 			port_channel_mode=active
 		else
@@ -1301,14 +1301,13 @@ get_cur_iface_gw()
 
 	split_ip=$((${-+"(${result//./"+256*("}))))"}>>16&255))
 
-        if [[ $split_ip -eq 0 ]] || [[ $split_ip -eq 1 ]] || [[ $split_ip -eq 2 ]] || [[ $split_ip -eq 3 ]];then
+		if [[ $split_ip -eq 0 ]] || [[ $split_ip -eq 1 ]] || [[ $split_ip -eq 2 ]] || [[ $split_ip -eq 3 ]];then
 
-                new_gw="$((${-+"(${result//./"+256*("}))))"}&255))"".""$((${-+"(${result//./"+256*("}))))"}>>8&255))"".""1"".""$((${-+"(${result//./"+256*("}))))"}>>24&255))"
-                
-        else
-                echo $result
+			new_gw="$((${-+"(${result//./"+256*("}))))"}&255))"".""$((${-+"(${result//./"+256*("}))))"}>>8&255))"".""1"".""$((${-+"(${result//./"+256*("}))))"}>>24&255))"
+		else
+			echo $result
 
-        fi
+		fi
 	
 	if [[ "$_output" ]]; then
 		eval $_output="'$new_gw'"
@@ -1487,54 +1486,54 @@ setup_ip6()
 
 	ip6=$(get_iface_ip6 $iface)
 	# manauly setup
-        if [ -z "$ip6" ]; then
-                # I find the current code(get_iface_and_addr) only call this func for the last topo.
-                # So , at here, treat $iface belongs to last topo. 
-                # By liali.
-                last_topo=$(echo $TOPO | awk -F, '{print $NF}')
-                last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
-                topo_contain_vlan=$(echo $last_topo | grep -iq vlan && echo yes || echo no)
-                let exitcode++
+		if [ -z "$ip6" ]; then
+			# I find the current code(get_iface_and_addr) only call this func for the last topo.
+			# So , at here, treat $iface belongs to last topo. 
+			# By liali.
+			last_topo=$(echo $TOPO | awk -F, '{print $NF}')
+			last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
+			topo_contain_vlan=$(echo $last_topo | grep -iq vlan && echo yes || echo no)
+			let exitcode++
 
-                [ -z "$NAY" ] && { ip6=NULL; return 1; }
-                ip6="2$(printf %03d ${last_vlan_id})::250/64"
+			[ -z "$NAY" ] && { ip6=NULL; return 1; }
+			ip6="2$(printf %03d ${last_vlan_id})::250/64"
 
-                #newcode
-                if [ ${topo_contain_vlan} = yes ];then
-                        ip6="2$(printf %03d ${last_vlan_id})::250/64"
-                        if i_am_server;then
-                                ip6="2$(printf %03d ${last_vlan_id})::251/64"
-                        fi
-                        if i_am_client;then
-                                ip6="2$(printf %03d ${last_vlan_id})::252/64"
-                        fi
-                else
-                        if i_am_server;then
-                                ip6="2001::251/64"
-                        fi
-                        if i_am_client;then
-                                ip6="2001::252/64"
-                        fi
-                fi
+			#newcode
+			if [ ${topo_contain_vlan} = yes ];then
+				ip6="2$(printf %03d ${last_vlan_id})::250/64"
+				if i_am_server;then
+					ip6="2$(printf %03d ${last_vlan_id})::251/64"
+				fi
+				if i_am_client;then
+					ip6="2$(printf %03d ${last_vlan_id})::252/64"
+				fi
+			else
+				if i_am_server;then
+					ip6="2001::251/64"
+				fi
+				if i_am_client;then
+					ip6="2001::252/64"
+				fi
+			fi
 
-                #oldcode
-                if((0));then
-                        echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::250/64"
-                        echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::250/64"
+			#oldcode
+			if((0));then
+				echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::250/64"
+				echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::250/64"
 
-                        if i_am_server; then
-                                ip6="2001::251/64"
-                                echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::251/64"
-                                echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::251/64"
-                        fi
-                        if i_am_client; then
-                                ip6="2001::252/64"
-                                echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::252/64"
-                                echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::252/64"
-                        fi
-                fi
-                ip addr add $ip6 dev $iface || let exitcode++
-        fi
+				if i_am_server; then
+					ip6="2001::251/64"
+					echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::251/64"
+					echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::251/64"
+				fi
+				if i_am_client; then
+					ip6="2001::252/64"
+					echo $iface | grep -q 'vlan3\|\.3' && ip6="2003::252/64"
+					echo $iface | grep -q 'vlan4\|\.4' && ip6="2004::252/64"
+				fi
+			fi
+			ip addr add $ip6 dev $iface || let exitcode++
+		fi
 	return $exitcode
 }
 
@@ -2107,9 +2106,9 @@ get_static_ip_subnet()
 {
 	local host=$1
 	[ -f "$NIC_INFO_WITH_ALL_NIC" ] || {
-        		unlink $NIC_INFO_WITH_ALL_NIC 2>/dev/null
-        		wget --no-check-certificate $NIC_INFO_URL -O $NIC_INFO_WITH_ALL_NIC &>/dev/null
-        		sed -i '/^#/d' $NIC_INFO_WITH_ALL_NIC
+		unlink $NIC_INFO_WITH_ALL_NIC 2>/dev/null
+		wget --no-check-certificate $NIC_INFO_URL -O $NIC_INFO_WITH_ALL_NIC &>/dev/null
+		sed -i '/^#/d' $NIC_INFO_WITH_ALL_NIC
 	}
 	local total_host=$(cat $NIC_INFO_WITH_ALL_NIC |awk '{print $3}'|sort|uniq|wc -l)
 
@@ -2159,18 +2158,18 @@ set_arp_options()
 # get_required_iface_by_mac mac1 mac2
 get_required_iface_by_mac()
 {
-        # get port names, save it to $ports
-        local ports=""
-        for dev_mac in $@;
-        do
-                for dir in $(ls /sys/class/net)
-                do
-                        mac=$(cat /sys/class/net/$dir/address 2>/dev/null)
-                        if [ "$mac" == "$dev_mac" ];then
-                                ports=${ports:+"$ports "}$dir
-                                break
-                        fi
-                done
-        done
+	# get port names, save it to $ports
+	local ports=""
+	for dev_mac in $@;
+	do
+		for dir in $(ls /sys/class/net)
+		do
+			mac=$(cat /sys/class/net/$dir/address 2>/dev/null)
+				if [ "$mac" == "$dev_mac" ];then
+					ports=${ports:+"$ports "}$dir
+					break
+				fi
+		done
+	done
 	echo $ports
 }
