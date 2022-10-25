@@ -44,7 +44,7 @@ function mem()
     setup_cmdline_args "mem=${mem_double}K" DOUB
 
     # there is a possibility that memory total vary from difference reboots.
-    if [ $mem_curr -gt $memtotal]; then
+    if [ $mem_curr -gt $memtotal ]; then
 	    rlAssertLesserOrEqual "Assert memtotal" $((mem_curr - memtotal)) 1024
     else
 	    rlAssertLesserOrEqual "Assert memtotal" $((memtotal - mem_curr)) 1024

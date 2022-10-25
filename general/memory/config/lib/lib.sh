@@ -1,3 +1,4 @@
+#!/bin/bash
 
 export DIR_ENTRY=$(pwd)
 export DIR_DEBUG=$DIR_ENTRY/debug
