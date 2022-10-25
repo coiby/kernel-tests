@@ -1913,7 +1913,7 @@ get_iface_sw_port()
 			let exitcode++
 		}
 	done
-	port_list="`echo ${iface_port_array[@]}`" # remove newline
+	port_list=`echo "${iface_port_array[@]}"` # remove newline
 
 	# save and print results
 	[[ "$_switch_name" ]] && eval $_switch_name="'$switch_name'" || echo $switch_name
@@ -2160,7 +2160,7 @@ get_required_iface_by_mac()
 {
 	# get port names, save it to $ports
 	local ports=""
-	for dev_mac in $@;
+	for dev_mac in "$@";
 	do
 		for dir in $(ls /sys/class/net)
 		do
