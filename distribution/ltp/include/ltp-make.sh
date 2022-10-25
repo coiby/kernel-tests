@@ -17,7 +17,7 @@ if [ -z ${TESTVERSION} ]; then
         TESTVERSION="20210927"
     else
         # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
-        TESTVERSION="20220527"
+        TESTVERSION="20220930"
     fi
 fi
 
@@ -101,7 +101,7 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
-    if [ "$TESTVERSION" == "20220527" ]; then
+    if [ "$TESTVERSION" == "20220930" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
@@ -267,7 +267,7 @@ configure()
     then
         PATCH="patch -p1 -d ${TARGET}"
     else
-        PATCH="-patch --forward -p1 -d ${TARGET}"
+        PATCH="patch --forward -p1 -d ${TARGET}"
     fi
 
     #Patch-inc
