@@ -1,0 +1,14 @@
+[General]
+name=swap stress test
+owner=Chunyu Hu <chuhu@redhat.com>
+description=swap to nvdimm and other disks
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=120m
+dependencies=gcc;libgcc;glibc-devel
+softDependencies=rpm-build;libxml2-devel;libuuid-devel
+repoRequires=general/include

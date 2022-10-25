@@ -1,0 +1,9 @@
+PURPOSE of stress/swap
+swap stress to solid disk and rotational disk
+
+Description:
+PARAMETERS
+* PMBENCH_RUNTIME	- run time for pmbench commands
+* STRESS_NG_RUNTIME	- run time for stress-ng commands
+
+Author: Chunyu Hu <chuhu@redhat.com>
