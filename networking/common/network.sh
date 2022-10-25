@@ -2,7 +2,8 @@
 # vim: sts=8 sw=8 noexpandtab:
 # This is for network operations
 
-trap 'cleanup_swcfg' HUP TERM KILL EXIT
+#trap 'cleanup_swcfg' HUP TERM KILL EXIT
+trap 'cleanup_swcfg' HUP TERM EXIT
 
 # ---------------------- Global variables  ------------------
 
@@ -267,7 +268,8 @@ mac2name()
 	local target=""
 	local ethX=""
 
-	for ethX in `ls /sys/class/net`; do
+	pushd /sys/class/net/
+	for ethX in *; do
 		# skip virtual device
 		if ethtool -i $ethX 2>/dev/null | grep -q "bus-info: [0-9].*"; then
 			target=`get_iface_mac $ethX`
@@ -278,6 +280,7 @@ mac2name()
 		fi
 	done
 	echo $name
+	popd
 }
 
 # Pipe into mac2name
