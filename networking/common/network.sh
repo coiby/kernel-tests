@@ -279,8 +279,8 @@ mac2name()
 			fi
 		fi
 	done
+	popd 1>/dev/null
 	echo $name
-	popd
 }
 
 # Pipe into mac2name
