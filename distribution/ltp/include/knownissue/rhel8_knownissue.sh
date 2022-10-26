@@ -77,6 +77,8 @@ function rhel8_unfix_issues()
 	# Skip test until RHEL-8.3
 	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/690
 	osver_in_range "800" "803" && tskip "fanotify15" unfix
+	# missing linux commit 1639a49ccdce
+	osver_in_range "800" "809" && tskip "creat09 cve-2018-13405" unfix
 }
 
 function rhel8_fixed_issues()
@@ -114,11 +116,13 @@ function rhel8_fixed_issues()
 	kernel_in_range "0" "4.18.0-195.el8" && tskip "quotactl07" fixed
 	pkg_in_range "glibc" "0" "2.28-153.el8" && tskip "semctl09" fixed
 	# Bug 2004810 - [FJ8.5 Bug]: LTP creat09, which is a test for CVE-2018-13405, failed.
-	kernel_in_range "0" "4.18.0-349.el8" && tskip "creat09 cve-2018-13405" fixed
+	# kernel_in_range "0" "4.18.0-349.el8" && tskip "creat09 cve-2018-13405" fixed
 	# Bug 1964047 - fixed by Bug 1944404
 	cki_is_kernel_debug && kernel_in_range "0" "4.18.0-326.el8" && tskip "read_all_sys" fixed
 	# Bug 2035746 - [s390x] cat: /proc/sys/kernel/ftrace_enabled: No such device
 	is_arch "s390x" && kernel_in_range "0" "4.18.0-362.el8" && tskip "proc01" fixed
+	# Bug 2100955 - [RHEL- 8.7] execve06_child.c:15: TFAIL: argc is 0, expected 1
+	kernel_in_range "0" "4.18.0-407.el8" && tskip "execve06" fixed
 }
 
 function rhel8_knownissue_filter()
