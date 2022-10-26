@@ -267,9 +267,9 @@ mac2name()
 	local name="mac2name-error"
 	local target=""
 	local ethX=""
+	local network_interace_list="$(ls /sys/class/net/)"
 
-	pushd /sys/class/net/
-	for ethX in *; do
+	for ethX in $network_interace_list; do
 		# skip virtual device
 		if ethtool -i $ethX 2>/dev/null | grep -q "bus-info: [0-9].*"; then
 			target=`get_iface_mac $ethX`
@@ -279,7 +279,6 @@ mac2name()
 			fi
 		fi
 	done
-	popd 1>/dev/null
 	echo $name
 }
 
