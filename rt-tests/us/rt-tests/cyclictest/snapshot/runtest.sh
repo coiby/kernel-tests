@@ -16,45 +16,47 @@ function check_status()
 
 function runtest()
 {
-    declare pkg_name="rt-tests" && [ $rhel_major -ge 9 ] && pkg_name="realtime-tests"
+    declare rt_tests_pkg="rt-tests" && [ $rhel_major -ge 9 ] && rt_tests_pkg="realtime-tests"
 
-    echo "Package rt-tests for cyclictest snapshot test." | tee -a $OUTPUTFILE
-    rpm -q --quiet $pkg_name || yum install -y $pkg_name
-    check_status "install rt-tests"
+    rpm -q --quiet $rt_tests_pkg || yum install -y $rt_tests_pkg
+    check_status "install ${rt_tests_pkg}"
 
-    echo "Cleaning /dev/shm/" | tee -a $OUTPUTFILE
-    rm -f /dev/shm/cyclic*
+    echo "Cleaning /dev/shm/..." | tee -a $OUTPUTFILE
+    rm -f /dev/shm/cyclictest*
 
-    echo "Running cyclictest on backgroud." | tee -a $OUTPUTFILE
     cyclictest -q &
     declare cyc_pid=$!
-    echo "cyclictest pid: $cyc_pid" | tee -a $OUTPUTFILE
+    echo "Running cyclictest in the backgroud: ${cyc_pid}" | tee -a $OUTPUTFILE
     sleep 10
 
-    cyc_dev=$(find /dev/shm/ -name 'cyclic*' -print | head -n 1)
-    [ ! -f $cyc_dev ] && {
-        result_r="FAIL"
-        echo "cyclictest_shm file doesn't exist!" | tee -a $OUTPUTFILE
-    }
 
-    echo "Send USR2 to cyclictest process to check snapshot." | tee -a $OUTPUTFILE
-    kill -s USR2 $cyc_pid
-    grep "^T:" $cyc_dev || {
-        result_r="FAIL"
-        echo "Didn't get the snapshot data." | tee -a $OUTPUTFILE
-    }
+    # Every running cyclictest process possesses a file under /dev/shm
+    test -f /dev/shm/cyclictest${cyc_pid}
+    check_status "test -f /dev/shm/ cyclictest${cyc_pid}"
+
+    # SIGUSR2 support added since rt-tests-v1.6
+    kill -SIGUSR2 $cyc_pid
+    grep "^T:" /dev/shm/cyclictest${cyc_pid}
+    check_status "grep \"^T:\" /dev/shm/cyclictest${cyc_pid}"
     sleep 10
 
+
+    # get_cyclictest_snapshot added since rt-tests-v1.7
     if which get_cyclictest_snapshot >/dev/null ; then
-        # package is rt-tests >= v1.8, so test this utility
-        get_cyclictest_snapshot
-        if [ $? -ne 0 ]; then
-            result_r="FAIL"
-            echo "get_cyclictest_snapshot utility failed" | tee -a $OUTPUTFILE
-        fi
+        get_cyclictest_snapshot -l | grep -q $cyc_pid
+        check_status "get_cyclictest_snapshot -l | grep -q ${cyc_pid}"
+        get_cyclictest_snapshot -s $cyc_pid
+        check_status "get_cyclictest_snapshot -s ${cyc_pid}"
+        get_cyclictest_snapshot -p $cyc_pid | grep "^T:"
+        check_status "get_cyclictest_snapshot -p ${cyc_pid} | grep \"^T:\""
     fi
 
-    kill -9 $cyc_pid
+
+    kill -SIGTERM $cyc_pid || {
+        kill -SIGKILL $cyc_pid
+        rm -f /dev/shm/cyclictest${cyc_pid}
+    }
+
 
     if [ $result_r = "PASS" ]; then
         echo "Overall result: PASS" | tee -a $OUTPUTFILE

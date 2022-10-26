@@ -21,6 +21,8 @@ if ! kernel_automotive; then
 fi
 
 export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+declare num_cpus=$(grep -c ^processor /proc/cpuinfo)
 
 echo "--- Test Start ---" | tee -a $OUTPUTFILE
 
@@ -52,6 +54,14 @@ else
     rstrnt-report-result "pi_stress SCHED_RR" "FAIL" "1"
 fi
 
+echo "Running pi_stress --quiet --groups=$(( num_cpus )) --duration=30" | tee -a $OUTPUTFILE
+pi_stress --quiet --groups=$(( num_cpus )) --duration=30 | tee -a $OUTPUTFILE
+if [ $? -eq 0 ]; then
+    rstrnt-report-result "pi_stress maxcpu" "PASS" "0"
+else
+    rstrnt-report-result "pi_stress maxcpu" "FAIL" "1"
+fi
+
 echo "Running pip_stress" | tee -a $OUTPUTFILE
 pip_stress | tee -a $OUTPUTFILE
 if [ $? -eq 0 ]; then
@@ -59,5 +69,6 @@ if [ $? -eq 0 ]; then
 else
     rstrnt-report-result "pip_stress" "FAIL" "1"
 fi
+
 
 exit 0
