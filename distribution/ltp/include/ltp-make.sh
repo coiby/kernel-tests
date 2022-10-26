@@ -106,6 +106,11 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-by-avoiding-aligned_alloc.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-when-cpuid.h-is-missing.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-when-not-on-x86.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-fix-the-broken-case-caused-by-hardcoded-xst.patch
+
     fi
 
     if [ "$TESTVERSION" == "20220527" ]; then

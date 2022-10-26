@@ -1,0 +1,39 @@
+From acf485f199347fc270a7da7e33e7635f9e78b6c7 Mon Sep 17 00:00:00 2001
+From: Richard Palethorpe <rpalethorpe@suse.com>
+Date: Tue, 18 Oct 2022 16:25:26 +0100
+Subject: [PATCH] ptrace07: Fix compilation when not on x86
+
+Strictly cpuid.h should not be included on non-x86, but this means
+each test author has to remember not to include it. Instead we can set
+a blank macro to allow compilation.
+
+Signed-off-by: Richard Palethorpe <rpalethorpe@suse.com>
+Reviewed-by: Pengfei Xu <pengfei.xu@intel.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ include/lapi/cpuid.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/lapi/cpuid.h b/include/lapi/cpuid.h
+index cd0567f92..20e977093 100644
+--- a/include/lapi/cpuid.h
++++ b/include/lapi/cpuid.h
+@@ -16,11 +16,15 @@
+  * have __cpuid_count().
+  */
+ #ifndef __cpuid_count
++#  if defined(__i386__) || defined(__x86_64__)
+ #define __cpuid_count(level, count, a, b, c, d) ({			\
+ 	__asm__ __volatile__ ("cpuid\n\t"				\
+ 			      : "=a" (a), "=b" (b), "=c" (c), "=d" (d)	\
+ 			      : "0" (level), "2" (count));		\
+ })
++#  else
++#define __cpuid_count(level, count, a, b, c, d)
++#  endif
+ #endif
+ 
+ #endif /* LAPI_CPUID_H__ */
+-- 
+2.31.1
+

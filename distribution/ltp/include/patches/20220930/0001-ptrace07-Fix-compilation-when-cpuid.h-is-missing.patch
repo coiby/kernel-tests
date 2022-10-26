@@ -1,0 +1,58 @@
+From d3c6120100352f831f86e98e5ec82bed15108b73 Mon Sep 17 00:00:00 2001
+From: Richard Palethorpe <rpalethorpe@suse.com>
+Date: Tue, 18 Oct 2022 15:42:08 +0100
+Subject: [PATCH] ptrace07: Fix compilation when cpuid.h is missing
+
+This file is absent on Debian on some non-x86 arches. So we need to
+check for it before including the file. Also we need to ensure we are
+including the lapi version in the test.
+
+Signed-off-by: Richard Palethorpe <rpalethorpe@suse.com>
+---
+ configure.ac                                | 1 +
+ include/lapi/cpuid.h                        | 4 +++-
+ testcases/kernel/syscalls/ptrace/ptrace07.c | 2 +-
+ 3 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1deeffc0c..288881d3e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -41,6 +41,7 @@ AC_CHECK_DECLS([SEM_STAT_ANY],,,[#include <sys/sem.h>])
+ 
+ AC_CHECK_HEADERS_ONCE([ \
+     asm/ldt.h \
++    cpuid.h \
+     emmintrin.h \
+     ifaddrs.h \
+     keyutils.h \
+diff --git a/include/lapi/cpuid.h b/include/lapi/cpuid.h
+index c58203509..cd0567f92 100644
+--- a/include/lapi/cpuid.h
++++ b/include/lapi/cpuid.h
+@@ -1,6 +1,8 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ 
+-#include <cpuid.h>
++#ifdef HAVE_CPUID_H
++#  include <cpuid.h>
++#endif
+ 
+ #ifndef LAPI_CPUID_H__
+ #define LAPI_CPUID_H__
+diff --git a/testcases/kernel/syscalls/ptrace/ptrace07.c b/testcases/kernel/syscalls/ptrace/ptrace07.c
+index 96510275a..6bd2b1062 100644
+--- a/testcases/kernel/syscalls/ptrace/ptrace07.c
++++ b/testcases/kernel/syscalls/ptrace/ptrace07.c
+@@ -35,7 +35,7 @@
+ #include "config.h"
+ #include "ptrace.h"
+ #include "tst_test.h"
+-#include "cpuid.h"
++#include "lapi/cpuid.h"
+ 
+ #ifndef PTRACE_GETREGSET
+ # define PTRACE_GETREGSET 0x4204
+-- 
+2.31.1
+
