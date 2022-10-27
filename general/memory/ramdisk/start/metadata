@@ -1,0 +1,18 @@
+[General]
+name=kernel/general/memory/ramdisk/start
+owner=Wang Shu <shuwang@redhat.com>
+description=Init and mount ramdisk.
+license=GPLv2
+_architectures=all
+destructive=no
+confidential=no
+
+[restraint]
+entry_point=make run
+max_time=1h
+dependencies=kernel
+TestVersion=1.1
+Path=kernel/general/memory/ramdisk/start
+Type=Function
+RunFor=kernel
+Priority=Normal

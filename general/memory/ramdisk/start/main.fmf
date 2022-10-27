@@ -1,0 +1,11 @@
+summary: Init and mount ramdisk.
+contact: Wang Shu <shuwang@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+duration: 1h
+tier: 1
+tag: [tier1]
+extra-summary: /kernel/general/memory/ramdisk/start
+extra-task: /kernel/general/memory/ramdisk/start
