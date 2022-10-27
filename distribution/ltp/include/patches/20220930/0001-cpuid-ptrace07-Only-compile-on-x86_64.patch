@@ -1,0 +1,81 @@
+From b79157c8375cfdd2abfc59f63afe8ea09eaa8c5d Mon Sep 17 00:00:00 2001
+From: Richard Palethorpe <rpalethorpe@suse.com>
+Date: Mon, 24 Oct 2022 11:29:10 +0100
+Subject: [PATCH] cpuid/ptrace07: Only compile on x86_64
+
+Both cpuid.h and ptrace07 contain inline ASM for x86(_64). There is no
+need to compile any part of the test or cpuid.h
+
+Signed-off-by: Richard Palethorpe <rpalethorpe@suse.com>
+Suggested-by: Martin Doucha <martin.doucha@suse.com>
+Acked-by: Jan Stancek <jstancek@redhat.com>
+Acked-by: Martin Doucha <martin.doucha@suse.com>
+---
+ include/lapi/cpuid.h                        |  4 ++++
+ testcases/kernel/syscalls/ptrace/ptrace07.c | 11 ++++++++---
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/include/lapi/cpuid.h b/include/lapi/cpuid.h
+index cd0567f92..7ec785ecf 100644
+--- a/include/lapi/cpuid.h
++++ b/include/lapi/cpuid.h
+@@ -1,5 +1,9 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ 
++#if !(defined(__i386__) || defined(__x86_64__))
++#  error "cpuid.h should only be included on x86"
++#endif
++
+ #ifdef HAVE_CPUID_H
+ #  include <cpuid.h>
+ #endif
+diff --git a/testcases/kernel/syscalls/ptrace/ptrace07.c b/testcases/kernel/syscalls/ptrace/ptrace07.c
+index d1e68cbc6..362cee543 100644
+--- a/testcases/kernel/syscalls/ptrace/ptrace07.c
++++ b/testcases/kernel/syscalls/ptrace/ptrace07.c
+@@ -24,6 +24,10 @@
+  * know about the architecture-dependent FPU state.
+  */
+ 
++#include "tst_test.h"
++
++#ifdef __x86_64__
++
+ #include <errno.h>
+ #include <inttypes.h>
+ #include <sched.h>
+@@ -34,7 +38,6 @@
+ 
+ #include "config.h"
+ #include "ptrace.h"
+-#include "tst_test.h"
+ #include "tst_safe_macros.h"
+ #include "lapi/cpuid.h"
+ 
+@@ -60,7 +63,6 @@ static void check_regs_loop(uint32_t initval)
+ 	uint32_t xmm0[4] = { initval, initval, initval, initval };
+ 	int status = 1;
+ 
+-#ifdef __x86_64__
+ 	asm volatile("   movdqu %0, %%xmm0\n"
+ 		     "   mov %0, %%rbx\n"
+ 		     "1: dec %2\n"
+@@ -74,7 +76,6 @@ static void check_regs_loop(uint32_t initval)
+ 		     "3:\n"
+ 		     : "+m" (xmm0), "+r" (status)
+ 		     : "r" (num_iters) : "rax", "rbx", "xmm0");
+-#endif
+ 
+ 	if (status) {
+ 		tst_res(TFAIL,
+@@ -212,3 +213,7 @@ static struct tst_test test = {
+ 	}
+ 
+ };
++
++#else
++TST_TEST_TCONF("Tests an x86_64 feature");
++#endif	/* if x86 */
+-- 
+2.31.1
+

@@ -1,0 +1,57 @@
+From 7db03d2b7a7588e2bfa063e277a6dad9d7c2c38a Mon Sep 17 00:00:00 2001
+From: Pengfei Xu <pengfei.xu@intel.com>
+Date: Tue, 18 Oct 2022 20:10:46 +0800
+Subject: [PATCH] cpuid.h: Provide the macro definition __cpuid_count()
+
+Some ltp tests rely on information provided by the cpuid function.
+The old cpuid function in the ltp/include/old/ltp_cpuid.h does not work
+correctly.
+
+Provide the macro definition __cpuid_count() in ltp.
+It references below link:
+https://github.com/gcc-mirror/gcc/blob/master/gcc/config/i386/cpuid.h#L233
+
+Makes a little improvement to eliminate the "ERROR: Macros with complex values
+should be enclosed in parentheses" warning from kernel/scripts/checkpatch.pl.
+
+Reported-by: Richard Palethorpe <rpalethorpe@suse.de>
+Signed-off-by: Pengfei Xu <pengfei.xu@intel.com>
+Reviewed-by: Richard Palethorpe <rpalethorpe@suse.com>
+---
+ include/lapi/cpuid.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+ create mode 100644 include/lapi/cpuid.h
+
+diff --git a/include/lapi/cpuid.h b/include/lapi/cpuid.h
+new file mode 100644
+index 000000000..c58203509
+--- /dev/null
++++ b/include/lapi/cpuid.h
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++#include <cpuid.h>
++
++#ifndef LAPI_CPUID_H__
++#define LAPI_CPUID_H__
++
++/*
++ * gcc cpuid.h provides __cpuid_count() since v4.4.
++ * Clang/LLVM cpuid.h provides __cpuid_count() since v3.4.0.
++ *
++ * Provide local define for tests needing __cpuid_count() because
++ * ltp needs to work in older environments that do not yet
++ * have __cpuid_count().
++ */
++#ifndef __cpuid_count
++#define __cpuid_count(level, count, a, b, c, d) ({			\
++	__asm__ __volatile__ ("cpuid\n\t"				\
++			      : "=a" (a), "=b" (b), "=c" (c), "=d" (d)	\
++			      : "0" (level), "2" (count));		\
++})
++#endif
++
++#endif /* LAPI_CPUID_H__ */
+-- 
+2.31.1
+
