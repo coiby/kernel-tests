@@ -71,12 +71,19 @@ function run_test()
         rlRun "mount -o relatime,noexec,nosuid /dev/zram0 /mnt/zram"
         rlRun "mount | grep zram"
         rlRun "lsblk"
-        rlRun "rsync -av --exclude=".debug" /root /mnt/zram"
+
+        [[ -d temp ]] || mkdir temp
+        for i in $(seq 1 10);do
+            dd if=/dev/urandom of=temp/test.file$i count=10 bs=1M iflag=fullblock
+        done
+
+        rlRun "ls temp"
+        rlRun "cp -r temp /mnt/zram"
         rlRun "umount /mnt/zram"
         rlRun "echo 3 > /proc/sys/vm/drop_caches"
 
         rlRun "mount -o relatime,noexec,nosuid /dev/zram0 /mnt/zram"
-        rlRun "diff -rp -x ".debug" /root /mnt/zram/root"
+        rlRun "diff -rp temp /mnt/zram/temp"
 ### < *** must be no output here *** >
 
 ### get funny stats
@@ -91,12 +98,16 @@ function run_test()
         rlRun "rm -rf /mnt/zram/*"
         rlRun "rmdir /mnt/zram/"
         rlRun "rmmod zram"
+        rlRun "rm -rf temp"
         [[ -z $swap_size ]] || restore_swap
 }
 
 function check_log()
 {
         rlRun "dmesg | grep -i 'Call Trace:'" 1 "check the errors"
+        rlRun "dmesg | grep -i 'kernel BUG at'" 1 "check the errors"
+        rlRun "dmesg | grep 'BUG:'" 1 "check the errors"
+        rlRun "dmesg | grep -i 'WARNING:'" 1 "check the errors"
 }
 
 rlJournalStart
