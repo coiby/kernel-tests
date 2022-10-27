@@ -1,0 +1,9 @@
+THP can be setup to the modes below:
+	[1] always
+	[2] never
+
+For mode [1], page small pages will be folded into a huge page
+by khugepaged periodically. In pressure case, they will be split
+into small pages again, this is always transparent to user space.
+
+Mode [2], THP is disalbed system wide.
