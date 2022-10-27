@@ -113,6 +113,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-by-avoiding-aligned_alloc.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-Revert-ptrace07-Fix-compilation-when-not-on-x86.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cpuid-ptrace07-Only-compile-on-x86_64.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-kconfig-adding-new-config-path.patch
 
     fi
 
