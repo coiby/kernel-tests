@@ -52,7 +52,7 @@ function rhel8_unfix_issues()
 	# Bug 1789964 [RHEL-8.2][aarch64/ppc64le] ltp/lite fork09 - fails to complete
 	pkg_in_range "systemd" "239-20" "239-25" && tskip "fork09" unfix
 	# s390x failed cases.
-	is_arch "s390x" && tskip "open04 create05" unfix
+	is_arch "s390x" && tskip "open04 creat05" unfix
 	# Bug 1804478 scheduler exceeds prctl timerslack on s390x
 	osver_in_range "800" "805" && is_arch "s390x" && tskip "prctl09" unfix
 	# Bug 1842025 - ltp: connect02: setsockopt(IPV6_ADDRFORM) failed: ENOPROTOOPT (92)

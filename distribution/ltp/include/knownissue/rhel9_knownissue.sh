@@ -21,7 +21,7 @@ function rhel9_unfix_issues()
 	# Bug 2125133 - inotify12.c:85: TFAIL: Incorrect mask 2 in inotify fdinfo (expected 80000002)
 	osver_in_range "900" "902" && tskip "inotify12" unfix
 	# Bug 2128900 - [FJ9.1 Bug]: xfs: setgid is not stripped after setting mask [xfstests: generic/697]
-	osver_in_range "900" "903" && tskip "create09 cve-2018-13405" unfix
+	osver_in_range "900" "903" && tskip "creat09 cve-2018-13405" unfix
 	# Bug 2137802 - ltp commands df01 xfs failed
 	osver_in_range "900" "903" && tskip "df01_sh" unfix
 	# Bug 2120448 - [RHEL 9.0] LTP Test failure and crash at fork14 on Sapphire Rapids Platinum 8280+
