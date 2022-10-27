@@ -1,0 +1,13 @@
+summary: noncontiguous test
+discover:
+    how: fmf
+    test:
+        - /general/memory/function/noncontiguous_vmalloc/tests/nc_vmalloc
+execute:
+    how: tmt
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./security/include/rhivos.sh
+        install_repos
