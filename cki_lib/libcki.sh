@@ -344,16 +344,23 @@ cki_is_kernel_debug()
 # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/657
 cki_has_kernel_debug_flags()
 {
-    if grep -qwE "CONFIG_LOCKDEP=y|CONFIG_DEBUG_OBJECTS=y" /boot/config-"$(uname -r)"; then
+    # ostree check for automotive
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        CONFIG=/usr/lib/ostree-boot/config-"$(uname -r)"
+    else
+        CONFIG=/boot/config-"$(uname -r)"
+    fi
+
+    if grep -qwE "CONFIG_LOCKDEP=y|CONFIG_DEBUG_OBJECTS=y" "${CONFIG}"; then
         return 0
     fi
     return 1
 }
 
-# return 0 when running kernel automotive
+# return 0 when running kernel automotive. Note will not work with older el9s kernels.
 cki_is_kernel_automotive()
 {
-    if rpm -q "kernel-automotive-$(uname -r)" > /dev/null 2>&1; then
+    if (uname -r | grep -wq "el[0-9]*iv"); then
        return  0
     fi
     return 1
