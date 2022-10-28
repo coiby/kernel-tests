@@ -50,6 +50,7 @@
 /filesystems/nfs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /filesystems/xfs/xfstests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /firmware/user-specified/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
+/general/process/trinity_git/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /iommu/boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /ipmi/stress/driver/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /ipmi/stress/ipmitool-loop/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
@@ -89,6 +90,7 @@
 /networking/tunnel/vxlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /networking/udp/udp_socket/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /networking/vnic/ipvlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
+/networking/vnic/sriov/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /networking/vrf/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
@@ -168,6 +170,7 @@
 /filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
 /filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing @nstraz
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
+/general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
 /kdump-cki/kdump-file-load/ @bgoncalv @emmawu1 @lulinqing
@@ -197,6 +200,7 @@
 /networking/tunnel/gre/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
+/networking/vnic/sriov/ @bgoncalv @lulinqing @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 /packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @ckalina @lulinqing
