@@ -346,12 +346,12 @@ cki_has_kernel_debug_flags()
 {
     # ostree check for automotive
     if stat /run/ostree-booted > /dev/null 2>&1; then
-        CONFIG=/usr/lib/ostree-boot/config-$(uname -r)
+        CONFIG=/usr/lib/ostree-boot/config-"$(uname -r)"
     else
-        CONFIG=/boot/config-$(uname -r)
+        CONFIG=/boot/config-"$(uname -r)"
     fi
 
-    if grep -qwE "CONFIG_LOCKDEP=y|CONFIG_DEBUG_OBJECTS=y" ${CONFIG}; then
+    if grep -qwE "CONFIG_LOCKDEP=y|CONFIG_DEBUG_OBJECTS=y" "${CONFIG}"; then
         return 0
     fi
     return 1
