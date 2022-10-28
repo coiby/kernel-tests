@@ -17,7 +17,7 @@ if [ -z ${TESTVERSION} ]; then
         TESTVERSION="20210927"
     else
         # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
-        TESTVERSION="20220527"
+        TESTVERSION="20220930"
     fi
 fi
 
@@ -100,6 +100,22 @@ patch-generic()
     echo "============ General Patch ============" | tee -a $OUTPUTFILE
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
+
+    if [ "$TESTVERSION" == "20220930" ]; then
+        # Tips: this patch should be applied in single on ltp-next(version > 20180926)
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cpuid.h-Provide-the-macro-definition-__cpuid_count.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-fix-the-broken-case-caused-by-hardcoded-xst.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-when-cpuid.h-is-missing.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-when-not-on-x86.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-by-avoiding-aligned_alloc.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-Revert-ptrace07-Fix-compilation-when-not-on-x86.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cpuid-ptrace07-Only-compile-on-x86_64.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-kconfig-adding-new-config-path.patch
+
+    fi
 
     if [ "$TESTVERSION" == "20220527" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
@@ -267,7 +283,7 @@ configure()
     then
         PATCH="patch -p1 -d ${TARGET}"
     else
-        PATCH="-patch --forward -p1 -d ${TARGET}"
+        PATCH="patch --forward -p1 -d ${TARGET}"
     fi
 
     #Patch-inc

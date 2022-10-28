@@ -20,6 +20,12 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "902" && tskip "madvise06" unfix
 	# Bug 2125133 - inotify12.c:85: TFAIL: Incorrect mask 2 in inotify fdinfo (expected 80000002)
 	osver_in_range "900" "902" && tskip "inotify12" unfix
+	# Bug 2128900 - [FJ9.1 Bug]: xfs: setgid is not stripped after setting mask [xfstests: generic/697]
+	osver_in_range "900" "903" && tskip "creat09 cve-2018-13405" unfix
+	# Bug 2137802 - ltp commands df01 xfs failed
+	osver_in_range "900" "903" && tskip "df01_sh" unfix
+	# Bug 2120448 - [RHEL 9.0] LTP Test failure and crash at fork14 on Sapphire Rapids Platinum 8280+
+	osver_in_range "900" "903" && tskip "fork14" unfix
 }
 
 function rhel9_fixed_issues()
@@ -28,6 +34,10 @@ function rhel9_fixed_issues()
 	kernel_in_range "0" "5.14.0-61.el9" && is_arch "ppc64le" && tskip "ftrace_stress_test" fixed
 	# Bug 2038794 - Backport futex_waitv() from Linux 5.16
 	kernel_in_range "0" "5.14.0-77.el9" && tskip "futex_waitv0.*" fixed
+	# Bug 2090079 - inotify11.c:91: TFAIL: File 5579 opened after IN_DELETE
+	kernel_in_range "0" "5.14.0-176.el9" && tskip "inotify11" fixed
+	# Bug 2125133 - inotify12.c:85: TFAIL: Incorrect mask 2 in inotify fdinfo (expected 80000002)
+	kernel_in_range "0" "5.14.0-176.el9" && tskip "inotify12" fixed
 }
 
 function rhel9_knownissue_filter()

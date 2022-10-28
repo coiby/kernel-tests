@@ -1,0 +1,40 @@
+From 62335029f729d358b5b9912c06fef41e5b7fba74 Mon Sep 17 00:00:00 2001
+From: Richard Palethorpe <rpalethorpe@suse.com>
+Date: Mon, 24 Oct 2022 11:08:25 +0100
+Subject: [PATCH] Revert "ptrace07: Fix compilation when not on x86"
+
+Empty macro could lead to confusing tests failures. This needs to be
+handled differently.
+
+This reverts commit acf485f199347fc270a7da7e33e7635f9e78b6c7.
+
+Signed-off-by: Richard Palethorpe <rpalethorpe@suse.com>
+Suggested-by: Martin Doucha <martin.doucha@suse.com>
+Acked-by: Martin Doucha <martin.doucha@suse.com>
+---
+ include/lapi/cpuid.h | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/include/lapi/cpuid.h b/include/lapi/cpuid.h
+index 20e977093..cd0567f92 100644
+--- a/include/lapi/cpuid.h
++++ b/include/lapi/cpuid.h
+@@ -16,15 +16,11 @@
+  * have __cpuid_count().
+  */
+ #ifndef __cpuid_count
+-#  if defined(__i386__) || defined(__x86_64__)
+ #define __cpuid_count(level, count, a, b, c, d) ({			\
+ 	__asm__ __volatile__ ("cpuid\n\t"				\
+ 			      : "=a" (a), "=b" (b), "=c" (c), "=d" (d)	\
+ 			      : "0" (level), "2" (count));		\
+ })
+-#  else
+-#define __cpuid_count(level, count, a, b, c, d)
+-#  endif
+ #endif
+ 
+ #endif /* LAPI_CPUID_H__ */
+-- 
+2.31.1
+

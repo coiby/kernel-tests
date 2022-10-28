@@ -21,6 +21,16 @@ function ltp_test_build()
 {
     download_ltp
 
+    # if TEST_VERSION is set, use the --forward flag so patches which are
+    # already applied do not cause the entire job to fail, and ignore
+    # the exit status (which will be 1 for an error even with --forward)
+    if [ ! -n "$TEST_VERSION" ]
+    then
+        PATCH="patch -p1 -d ${TARGET}"
+    else
+        PATCH="patch --forward -p1 -d ${TARGET}"
+    fi
+
     #Patch-inc
     echo "============ Patch openposx patch-inc ===============" | tee -a $OUTPUTFILE
     patch-inc > patchinc.log 2>&1
@@ -154,7 +164,8 @@ done
 
 # build
 echo "Building testcases" | tee -a $OUTPUTFILE
-env CFLAGS="-g3" time make -C $opt_dir all > buildlog.txt 2>&1
+pushd $opt_dir
+env CFLAGS="-g3" time ./configure && make all > buildlog.txt 2>&1
 if [ $? -ne 0 ]; then
     bzip2 buildlog.txt
     SubmitLog buildlog.txt.bz2
@@ -164,6 +175,7 @@ if [ $? -ne 0 ]; then
 else
     rstrnt-report-result build PASS
 fi
+popd
 
 OUTPUTFILE="$OUTPUTFILE.2"
 echo "Executing testcases" | tee -a $OUTPUTFILE

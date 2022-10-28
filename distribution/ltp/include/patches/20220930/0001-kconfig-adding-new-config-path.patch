@@ -1,0 +1,47 @@
+From 99d76e8b5796f5b45f017b12211d734d5049e88b Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Thu, 20 Oct 2022 11:41:40 +0800
+Subject: [PATCH] kconfig: adding new config path
+
+To make kconfig parsing on some specific systems correctly
+(e.g openSUSE Tumbleweed, Red Hat In-Vehicle OS).
+
+Before:
+  # ./sendto03
+  tst_kconfig.c:65: TINFO: Couldn't locate kernel config!
+  tst_kconfig.c:201: TBROK: Cannot parse kernel .config
+
+After:
+  # ./sendto03
+  tst_kconfig.c:88: TINFO: Parsing kernel config '/lib/modules/5.14.0-174.137.el9iv.aarch64/config'
+  tst_test.c:1526: TINFO: Timeout per run is 0h 00m 30s
+  sendto03.c:91: TPASS: setsockopt(PACKET_RESERVE) value is capped: EINVAL (22)
+  sendto03.c:197: TPASS: Nothing bad happened, probably
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Cc: Brian Grech <bgrech@redhat.com>
+Reviewed-by: Yang Xu <xuyang2018.jy@fujitsu.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+---
+ lib/tst_kconfig.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/lib/tst_kconfig.c b/lib/tst_kconfig.c
+index ac13866e8..595ea4b09 100644
+--- a/lib/tst_kconfig.c
++++ b/lib/tst_kconfig.c
+@@ -47,6 +47,11 @@ static const char *kconfig_path(char *path_buf, size_t path_buf_len)
+ 	/* Common install module path */
+ 	snprintf(path_buf, path_buf_len, "/lib/modules/%s/build/.config", un.release);
+ 
++	if (!access(path_buf, F_OK))
++		return path_buf;
++
++	snprintf(path_buf, path_buf_len, "/lib/modules/%s/config", un.release);
++
+ 	if (!access(path_buf, F_OK))
+ 		return path_buf;
+ 
+-- 
+2.31.1
+
