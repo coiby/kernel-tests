@@ -165,7 +165,9 @@ ch_ipsec.ko
 ch.ko
 ch_ktls.ko
 cicada.ko
+cifs_arc4.ko
 cifs.ko
+cifs_md4.ko
 cirrus.ko
 clip.ko
 cls_bpf.ko

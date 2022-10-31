@@ -63,7 +63,9 @@ chacha20poly1305.ko
 chacha_generic.ko
 ch.ko
 chsc_sch.ko
+cifs_arc4.ko
 cifs.ko
+cifs_md4.ko
 clip.ko
 cls_bpf.ko
 cls_flower.ko

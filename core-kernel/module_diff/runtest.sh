@@ -533,6 +533,10 @@ rlJournalStart
                     echo "" | tee -a $OUTPUTFILE
                     echo "***** $ARCH: Base release is RHEL-9.0 *****" | tee -a $OUTPUTFILE
                     Release="9.0"
+                    if cki_kver_lt "5.14.0-70.30.1.el9_0"; then
+                        sed -i '/libarc4.ko/d' ${OS}/${Release}/$Release-knownRemoved-s390x.lst
+                        sed -i '/cifs_arc4.ko/d;/cifs_md4.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
                     ;;
                 *)
                     # Still in developing phase, need to update in future.
