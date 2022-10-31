@@ -76,7 +76,7 @@ $(METADATA): Makefile
 	@echo "License:         RedHat Internal" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
 	@echo "Destructive:     no" >> $(METADATA)
-	@echo "RhtsRequires:    kernel-kernel-general-scheduler-include" >> $(METADATA)
+	@echo "RhtsRequires:    kernel-kernel-general-scheduler-include gcc" >> $(METADATA)
 
 	rhts-lint $(METADATA)
 
