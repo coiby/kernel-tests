@@ -22,7 +22,7 @@ swcfg()
 	local sw_port=$3
 
 	echo ----------------------------------------------
-	echo "$FUNCNAME $@"
+	echo "$FUNCNAME" "$@"
 	echo ----------------------------------------------
 
 	echo sw_conf=$sw_conf
@@ -205,7 +205,7 @@ swcfg_port_up_by_linux_iface()
 {
 	local iface=$1
 
-	echo "$FUNCNAME $@"
+	echo "$FUNCNAME" "$@"
 
 	local swname=""
 	local swport=""
@@ -229,7 +229,7 @@ swcfg_port_down_by_linux_iface()
 {
 	local iface=$1
 
-	echo "$FUNCNAME $@"
+	echo "$FUNCNAME" "$@"
 
 	local swname=""
 	local swport=""
@@ -259,7 +259,7 @@ swcfg_setup_bonding_by_linux_ifaces()
 	local ifaces_list="$1"
 	local lacp_mode=$2
 
-	echo "$FUNCNAME $@"
+	echo "$FUNCNAME" "$@"
 
 	local swname=""
 	local swport=""
@@ -283,7 +283,7 @@ swcfg_cleanup_bonding_by_linux_ifaces()
 {
 	local ifaces_list="$1"
 
-	echo "$FUNCNAME $@"
+	echo "$FUNCNAME" "$@"
 
 	local swname=""
 	local swport=""
