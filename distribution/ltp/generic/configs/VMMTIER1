@@ -143,7 +143,7 @@ execvp01 execvp01
 execveat03 execveat03
 
 
-fork13 fork13 -i 1000000
+fork13 fork13
 
 ftest01 ftest01
 ftest02 ftest02
