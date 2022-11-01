@@ -1,0 +1,11 @@
+Description of problem:
+System function semop() (orsemtimedop()) does not update time of semaphore update (structure sem_otime) which is inconsistent with function description:
+
+# man semop
+(...)
+       On successful completion, the sempid value for each semaphore specified
+       in the array pointed to by sops is set to the process ID of the calling
+       process.  In addition, the sem_otime is set to the current time.
+(...)
+
+Our development is using it to check if process is alive, and overseers are stating that it is not, and are killing everything one by one.
