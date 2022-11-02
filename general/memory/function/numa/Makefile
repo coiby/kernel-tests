@@ -47,9 +47,7 @@ FILES=$(TENV) $(METADATA) runtest.sh Makefile PURPOSE \
 .PHONY: all install download clean
 
 run: $(FILES) build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
-		. runtest.sh )
+	./runtest.sh
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
@@ -71,7 +69,7 @@ $(METADATA): Makefile
 	@echo "RunFor:          kernel" >> $(METADATA)
 	@echo "RunFor:          numactl" >> $(METADATA)
 	@echo "Requires:        kernel" >> $(METADATA)
-	@echo "Requires:        numactl" >> $(METADATA)
+	@echo "Requires:        numactl numactl-devel gcc git make net-tools automake flex" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)

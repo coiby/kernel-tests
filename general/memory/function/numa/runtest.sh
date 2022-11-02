@@ -27,17 +27,13 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-PACKAGE="kernel"
 TESTARG=${TESTARG:-}
 
 rlJournalStart
     rlPhaseStartSetup
-        rlAssertRpm $PACKAGE
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
-        rlRun "yum install -y numactl numactl-devel"
         rlRun "cp testcases/* $TmpDir"
         rlRun "pushd $TmpDir"
     rlPhaseEnd

@@ -1,0 +1,18 @@
+[General]
+description=Numa function test case using STREAM
+name=/kernel/general/memory/function/numa
+owner=Chao Ye <cye@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=96h
+dependencies=numactl;numactl-devel;gcc;git;make;net-tools;automake;flex
+TestVersion=1.2
+Requires=kernel
+Path=/general/memory/function/numa
+RunFor=kernel
+Priority=Normal
+Type=Function
