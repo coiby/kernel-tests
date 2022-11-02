@@ -44,7 +44,8 @@ source ${CASE_PATH}/env.sh
 # source rt kernel tuning script
 source ${CASE_PATH}/rt-kernel/set_up.sh
 
-. ${CASE_PATH}/../../common/lib/lib_nc_sync.sh || exit 1
+source ${CASE_PATH}/../../common/lib/lib_nc_sync.sh || exit 1
+source ${CASE_PATH}/../../common/lib/lib_swcfg.sh || exit 1
 #. ${CASE_PATH}/../../common/lib/lib_netperf_all.sh || exit 1
 . ./lib_netperf_all.sh || exit 1
 . ${CASE_PATH}/lib_sriov.sh || exit 1
