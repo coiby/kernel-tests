@@ -11,8 +11,9 @@ test: bash -x ./runtest.sh
 framework: shell
 require:
   - gcc
-  - make
   - git
+  - make
+  - psmisc
 duration: 240m
 tier: 2
 extra-summary: general/time/timetests_upstream
