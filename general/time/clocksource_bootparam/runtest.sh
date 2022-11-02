@@ -5,6 +5,7 @@
 TEST="general/time/clocksource_bootparam"
 export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 
+
 function runtest()
 {
     avail_cs=$(cat /sys/devices/system/clocksource/clocksource0/available_clocksource)
@@ -19,16 +20,16 @@ function runtest()
             rstrnt-reboot
         else
             echo "NO TSC CLOCKSOURCE"
-            rstrnt-report-result $TEST SKIP
+            rstrnt-report-result $TEST SKIP 0
             exit 0
         fi
     fi
     if [ $RSTRNT_REBOOTCOUNT -eq 1 ]; then
         echo "boot parameter: $bootparam"
         if [[ $bootparam =~ "clocksource=tsc" ]]; then
-            rstrnt-report-result "add-clocksource=tsc" "PASS" 0
+            rstrnt-report-result "add-clocksource=tsc" PASS 0
         else
-            rstrnt-report-result "add-clocksource=tsc" "FAIL" 1
+            rstrnt-report-result "add-clocksource=tsc" FAIL 1
         fi
         echo "current clocksource: $current_cs"
         if [[ $current_cs =~ "tsc" ]]; then
@@ -47,7 +48,7 @@ function runtest()
         else
             rstrnt-report-result "remove-clocksource=tsc" PASS 0
         fi
-        echo "All test finished!"
+        echo "All tests finished!"
     fi
 }
 
