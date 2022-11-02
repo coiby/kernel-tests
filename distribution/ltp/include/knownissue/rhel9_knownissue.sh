@@ -38,6 +38,8 @@ function rhel9_fixed_issues()
 	kernel_in_range "0" "5.14.0-176.el9" && tskip "inotify11" fixed
 	# Bug 2125133 - inotify12.c:85: TFAIL: Incorrect mask 2 in inotify fdinfo (expected 80000002)
 	kernel_in_range "0" "5.14.0-176.el9" && tskip "inotify12" fixed
+	# Bug 2097485 - [RHEL-9.1] execve06_child.c:15: TFAIL: argc is 0, expected 1
+	kernel_in_range "0" "5.14.0-122.el9" && tskip "execve06" fixed
 }
 
 function rhel9_knownissue_filter()
