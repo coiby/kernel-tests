@@ -43,10 +43,10 @@ require:
   - setools-console
   - xfsprogs-devel
 
-#recommend:
-#  - policycoreutils-python
-#  - python2-lxml
-#  - jfsutils
+recommend:
+  - policycoreutils-python
+  - python2-lxml
+  - jfsutils
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 1h

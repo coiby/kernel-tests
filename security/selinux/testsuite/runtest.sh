@@ -146,13 +146,7 @@ rlJournalStart
             ${kname}-modules-extra-$PKG_VERSION
             ${kname}-devel-$PKG_VERSION
         "
-        RECOMMEND="
-            policycoreutils-python
-            python2-lxml
-            jfsutils
-        "
         rlRun "installDeps \$REQUIRES" 0 "Install requires"
-        rlRun "installDeps \$RECOMMEND=" 0 "Install recommend"
 
         # The CRB repo with libbpf-devel might not be enabled on RHEL
         if rlIsRHEL '>=8'; then
