@@ -2,6 +2,8 @@
 
 export TEST="rt-tests/us/tuna/sanity"
 export result_r="PASS"
+export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
 
 function check_status()
 {
@@ -13,12 +15,25 @@ function check_status()
     fi
 }
 
-function runtest()
+function tuna_rhel()
 {
-    echo "Package tuna sanity test:" | tee -a $OUTPUTFILE
-    rpm -q --quiet tuna || yum install -y tuna
-    check_status "install tuna"
+    echo "Reviewing the system in the CLI:" | tee -a $OUTPUTFILE
+    tuna show_threads
+    check_status "tuna show_threads"
+    tuna show_irqs
+    check_status "tuna show_irqs"
 
+    echo "CPU tuning in the CLI:" | tee -a $OUTPUTFILE
+    tuna run "ps all" --cpus=0,1
+    check_status "tuna run='ps all' --cpus=0,1"
+
+    echo "Task tuning in the CLI:" | tee -a $OUTPUTFILE
+    tuna show_threads --threads=1
+    check_status "tuna show_threads --threads=1"
+}
+
+function tuna_rhel8()
+{
     echo "Reviewing the system in the CLI:" | tee -a $OUTPUTFILE
     tuna --show_threads
     check_status "tuna --show_threads"
@@ -32,6 +47,20 @@ function runtest()
     echo "Task tuning in the CLI:" | tee -a $OUTPUTFILE
     tuna --threads=1 --show_threads
     check_status "tuna --threads=1 --show_threads"
+}
+
+function runtest()
+{
+    echo "Package tuna sanity test:" | tee -a $OUTPUTFILE
+    rpm -q --quiet tuna || yum install -y tuna
+    check_status "install tuna"
+
+    # since 9.2 tuna CLI feature changes, detail in bz2062865
+    if [[ $rhel_major -lt 9 || ($rhel_major -eq 9 && $rhel_minor -lt 2) ]]; then
+        tuna_rhel8
+    else
+        tuna_rhel
+    fi
 
     if [ $result_r = "PASS" ]; then
         echo "Overall results: PASS" | tee -a $OUTPUTFILE
