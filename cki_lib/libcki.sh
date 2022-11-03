@@ -38,8 +38,13 @@ else
     ln -s "$OUTPUTFILE" /mnt/testarea/current.log
 fi
 
-# Include beaker library
-source /usr/share/beakerlib/beakerlib.sh
+# Most of libcki doesn't require beakerlib
+# only load it if the package is installed
+# if a test uses beakerlib functions it should install beakerlib as dependency
+if [ -e /usr/share/beakerlib/beakerlib.sh ]; then
+   # Include beaker library
+   source /usr/share/beakerlib/beakerlib.sh
+fi
 
 # Result code definitions
 CKI_PASS=0        # should go to rlPass()
