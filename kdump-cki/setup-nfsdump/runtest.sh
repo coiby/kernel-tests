@@ -167,19 +167,31 @@ function ReserveMem()
     LogRun "cat /sys/kernel/kexec_crash_size"
 
     # Assign more crashkernel than crashkernel=auto as it may require more in net dump.
+    local kernel_main_ver="$(uname -r | awk -F. '{print $1}')"
+    local kernel_main_rel="$(uname -r | awk -F '-' '{split($2,rel,"."); print rel[1]}')"
+    kernel_main_rel=${kernel_main_rel:-0}
+
     if [[ -n "$CRASHSIZE" ]]; then
         args="crashkernel=$CRASHSIZE"
-    elif [ "$(uname -r|awk -F. '{print $1}')" -ge 4 ]; then
+    elif [ "${kernel_main_ver}" -ge 5 ]; then
         args="crashkernel=1G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         [[ "yes" = "$IS_DB_KEN" ]] && args="crashkernel=1G-2G:384M,2G-3G:512M,3G-4G:768M,4G-16G:1G,16G-64G:2G,64G-128G:2G,128G-:4G"
-        # [[ "yes" = "$IS_UPSTREAM_LINUX" ]] && args="crashkernel=1G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        [[ "yes" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        [ "${ARCH}" = aarch64 ] && {
+            args="crashkernel=768M"
+            # It may fail to reserve memory as if low memory is not big enough. So here
+            # specifying ',high' explicity to reserve memory in high memory.
+            # But "crashkernel=x,high" is only supported since RHEL-9.1:
+            # Bug 2091852 - arm64: add crashkernel=x,high support on arm64 (kernel-5.14.0-122.el9)
+            if [ "${kernel_main_rel}" -ge "122" ]; then args="crashkernel=768M,high"; fi
+        }
+    elif [ "${kernel_main_ver}" -ge 4 ]; then
+        args="crashkernel=1G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        [[ "yes" = "$IS_DB_KEN" ]] && args="crashkernel=1G-2G:384M,2G-3G:512M,3G-4G:768M,4G-16G:1G,16G-64G:2G,64G-128G:2G,128G-:4G"
         [[ "yes" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         [ "${ARCH}" = aarch64 ] && args="crashkernel=768M"
-    elif [ "$(uname -r|awk -F. '{print $1}')" -ge 3 ]; then
+    elif [ "${kernel_main_ver}" -ge 3 ]; then
         args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        # [[ "${ARCH}"  = ppc64*  ]] && args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        # [[ "yes" = "$IS_DB_KEN" ]] && args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        # [[ "yes" = "$IS_UPSTREAM_LINUX" ]] && args="crashkernel=1G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         [[ "yes" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         [ "${ARCH}" = aarch64 ] && args="crashkernel=768M"
     elif expr "$(uname -r)" : '2\.6\.32.*'; then
@@ -205,7 +217,7 @@ function ReserveMem()
     if [ -z "$args" ]; then
         Log "No need to update kernel options"
     else
-        Log "Update kernel options to boot loader"
+        Log "Update kernel options"
         LogRun "grubby --args=\"${args}\" --update-kernel=\"${default}\""
         if [ $? -ne 0 ]; then
             Error "Failed to update boot options"
