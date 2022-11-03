@@ -118,6 +118,8 @@
 /rt-tests/sched_deadline/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /rt-tests/smidetect/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /rt-tests/us/stalld/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
+/security/crypto/ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
+/security/integrity/ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /sound/aloop/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /sound/user-ctl-elem/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
 /standards/usex/1.9-29/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @kamaxeon @mh21 @spbnick @sturivny @veruu
@@ -219,6 +221,8 @@
 /rt-tests/sched_deadline/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/smidetect/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/us/stalld/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/security/crypto/ltp/ @bgoncalv @denli @lulinqing
+/security/integrity/ltp/ @bgoncalv @denli @lulinqing
 /standards/usex/1.9-29/ @bgoncalv @headrat @lulinqing
 /storage/blktests/blk/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/nvme/nvme-rdma/ @bgoncalv @lulinqing @yizhanglinux
