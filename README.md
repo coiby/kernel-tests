@@ -75,7 +75,7 @@ See examples below to properly abort or skip in beaker:
 ~~~
 if [ $? -ne 0 ]; then
     rlLog "Aborting test because $reason"
-    rstrnt-report-result "${TEST}" WARN
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 fi
 ~~~
@@ -84,7 +84,7 @@ fi
 ~~~
 if [ $? -ne 0 ]; then
     rlLog "Aborting recipe because $reason"
-    rstrnt-report-result "${TEST}" WARN
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     rstrnt-abort recipe
 fi
 ~~~
@@ -93,7 +93,7 @@ fi
 ~~~
 if [ $? -ne 0 ]; then
     rlLog "Skipping test because $reason"
-    rstrnt-report-result $TEST SKIP
+    rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
     exit 0
 fi
 ~~~
