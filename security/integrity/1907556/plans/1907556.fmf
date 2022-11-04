@@ -5,15 +5,11 @@ discover:
         - /security/integrity/1907556/tests/1907556
 execute:
     how: tmt
-    framework: beakerlib
 prepare:
   - name: Enable Repos
     how: shell
     script: |
-        . ./security/include/include.h
+        . ./security/include/rhivos.sh
         install_repos
-  - name: Install packages
-    how: install
-    package: [keyutils, make]
 environment-file:
         - ./security/integrity/1907556/plans/tmt.env
