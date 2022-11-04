@@ -5,7 +5,8 @@ component:
   - kernel
 path: /security/crypto/enable_fips
 test: make run
-framework: shell
+framework: beakerlib
+require: [grubby, make, crypto-policies-scripts]
 duration: 10m
 extra-summary: /kernel-tests/security/crypto/enable_fips
 extra-task: /kernel-tests/security/crypto/enable_fips

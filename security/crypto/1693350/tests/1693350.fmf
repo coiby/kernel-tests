@@ -6,7 +6,7 @@ component:
 path: /security/crypto/1693350
 recommend: libkcapi-tools
 test: make run
-framework: shell
+framework: beakerlib
 duration: 10m
 extra-summary: /kernel-tests/security/crypto/1693350
 extra-task: /kernel-tests/security/crypto/1693350
