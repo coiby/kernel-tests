@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # include beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 set -o pipefail
@@ -63,7 +62,7 @@ function set_mem()
 
 	} else {
 		echo "Sorry, the system RAM is too low to test."
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	}
 	fi
@@ -177,7 +176,7 @@ rlPhaseStartTest
 rlPhaseEnd
 
 if [ "$next" != "exit" ]; then
-	rhts-reboot
+	rstrnt-reboot
 fi
 
 rlPhaseStartCleanup
