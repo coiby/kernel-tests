@@ -18,7 +18,7 @@
 
 #define HUGE_SIZE	(256 * 1024 * 1024)
 #define HUGE_ALIGN(s)	(((s) + (HUGE_SIZE - 1)) & ~(HUGE_SIZE-1))
-#define HUGEFILE	"/huge/testfile"
+#define HUGEFILE	"/var/huge/testfile"
 
 typedef struct {
 	pthread_t	tid;
