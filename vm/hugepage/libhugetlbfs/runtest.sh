@@ -246,22 +246,21 @@ EOF
             RunTest func
         rlPhaseEnd
 
-    # stress test takes too long on aarch64
-    if [ x"${ARCH}" != "xaarch64" ]; then
-       rlPhaseStartTest "stress"
-           RunTest stress
-       rlPhaseEnd
-    fi
+        # stress test takes too long on aarch64
+        if [ x"${ARCH}" != "xaarch64" ]; then
+           rlPhaseStartTest "stress"
+               RunTest stress
+           rlPhaseEnd
+        fi
     else
         mem_total=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
         hpsize=$(cat /proc/meminfo | grep Hugepagesize | awk '{print $2}')
-    if [ ${mem_total} -gt $((1024 * ${HMEMSZ} * 10)) ]; then
-       rlPhaseStart WARN "not_enough_huge_pages"
-           rlAssertGreaterOrEqual "Need $HPCOUNT hugepages for test, have: $free_hugepages" $free_hugepages $HPCOUNT
-       rlPhaseEnd
-    else
-       rstrnt-report-result Test_Skipped PASS 99
-    fi
+        if [ ${mem_total} -gt $((1024 * ${HMEMSZ} * 10)) ]; then
+            rlLog "Skipping test because need $HPCOUNT hugepages for test, have: $free_hugepages"
+            rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
+        else
+           rstrnt-report-result Test_Skipped PASS 99
+        fi
     fi
 
     rlPhaseStartCleanup
