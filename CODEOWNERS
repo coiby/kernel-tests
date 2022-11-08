@@ -1,6 +1,10 @@
 [Codeowners]
 /CODEOWNERS @bgoncalv @lulinqing @mh21
 
+[DDIM]
+# DDIM-CODEOWNERS-CONFIG-BEGIN
+# DDIM-CODEOWNERS-CONFIG-END
+
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
 #
 # general:
