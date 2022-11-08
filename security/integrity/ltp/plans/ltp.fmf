@@ -5,15 +5,11 @@ discover:
         - /security/integrity/ltp/tests/ltp
 execute:
     how: tmt
-    framework: beakerlib
 prepare:
   - name: Enable Repos
     how: shell
     script: |
-        . ./security/include/include.h
+        . ./security/include/rhivos.sh
         install_repos
-  - name: Install packages
-    how: install
-    package: [autoconf,automake,bison,elfutils-libelf-devel,flex,gcc,git,glibc-headers,kernel-devel,kernel-headers,keyutils-libs-devel,libacl-devel,libcap-devel,libselinux-devel,libtirpc-devel,lksctp-tools-devel,m4,make,numactl-devel,openssl,openssl-devel,pkgconf,xfsprogs-devel]
 environment-file:
         - ./security/integrity/ltp/plans/tmt.env

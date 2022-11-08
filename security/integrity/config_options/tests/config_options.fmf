@@ -5,7 +5,8 @@ component:
   - kernel
 path: /security/integrity/config_options
 test: make run
-framework: shell
+framework: beakerlib
+require: [grubby, make]
 duration: 12m
 extra-summary: /kernel-tests/security/integrity/config_options
 extra-task: /kernel-tests/security/integrity/config_options

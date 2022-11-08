@@ -5,7 +5,8 @@ component:
   - kernel
 path: /security/integrity/1907556
 test: make run
-framework: shell
+framework: beakerlib
+require: [keyutils, make]
 duration: 12m
 extra-summary: /kernel-tests/security/integrity/1907556
 extra-task: /kernel-tests/security/integrity/1907556
