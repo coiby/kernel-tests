@@ -5,15 +5,11 @@ discover:
         - /security/crypto/1528343/tests/1528343
 execute:
     how: tmt
-    framework: beakerlib
 prepare:
   - name: Enable Repos
     how: shell
     script: |
-        . ./security/include/include.h
+        . ./security/include/rhivos.sh
         install_repos
-  - name: Install packages
-    how: install
-    package: [gcc, make]
 environment-file:
         - ./security/crypto/1528343/plans/tmt.env

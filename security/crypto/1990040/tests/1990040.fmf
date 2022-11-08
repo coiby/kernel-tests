@@ -5,7 +5,8 @@ component:
   - kernel
 path: /security/crypto/1990040
 test: make run
-framework: shell
+framework: beakerlib
+require: [make]
 duration: 10m
 extra-summary: /kernel-tests/security/crypto/1990040
 extra-task: /kernel-tests/security/crypto/1990040

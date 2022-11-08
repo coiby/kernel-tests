@@ -22,12 +22,12 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. ../../include/include.h
+. ../../../cki_lib/libcki.sh
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        if ! kernel_automotive; then
+        if ! cki_is_kernel_automotive; then
             yum install libkcapi-tools \
                     -y --enablerepo=*
         fi
