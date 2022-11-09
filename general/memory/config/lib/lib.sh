@@ -16,7 +16,7 @@ function install_libcgroup()
 	which cgcreate &>/dev/null && return 0
 	which cgcreate &>/dev/null || yum -y install libcgroup-tools &>/dev/null
 	which cgcreate  && return 0
-	
+
 	rpm -q cmake || yum -y install cmake &>/dev/null
 	rpm -q pam-devel || yum -y install pam-devel bison flex
 	curl -LkO  $LOOKASIDE/$pkg || return 1
@@ -63,7 +63,7 @@ get_systeminfo(){
 	echo "########pidstat#############"
 	pidstat
 	echo ""
-	echo ""	
+	echo ""
 	echo "########lscpu##############"
 	lscpu
 	echo ""

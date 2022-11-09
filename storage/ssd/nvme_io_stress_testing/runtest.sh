@@ -51,7 +51,7 @@ for TEST_DISK in $TEST_DISKS; do
 		tlog "FAIL: DT_IO_Test_Device_Level for $TEST_DISK failed"
 		return 1
 	fi
-	} & 
+	} &
 done
 wait
 

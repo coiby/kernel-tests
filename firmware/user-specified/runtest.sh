@@ -26,7 +26,7 @@
 FWTSTESTS=${FWTSTESTS:-"--utils --batch --acpitests --acpicompliance"}
 
 rlJournalStart
-   if [[ -n $FWTSTESTS ]]; then	
+   if [[ -n $FWTSTESTS ]]; then
        rlPhaseStartSetup
            fwtsSetup
        rlPhaseEnd
@@ -37,11 +37,11 @@ rlJournalStart
            if [ $? -gt 1 ]; then
                fwtsCleanup
                cki_abort_task "Failed to run: fwts $FWTSTESTS"
-           fi 
+           fi
        rlPhaseEnd
-       
+
        fwtsReportResults
-       
+
        rlPhaseStartCleanup
            fwtsCleanup
        rlPhaseEnd

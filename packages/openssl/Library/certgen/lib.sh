@@ -878,7 +878,7 @@ Adds HOST to x509v3 nameConstraint as permitted (see RFC 5820).
 HOST can be a hostname (google.com), IP address (8.8.8.8),
 or something supported directly by openssl (IP:192.168.0.0/255.255.0.0,
 DNS:google.com - see man x509v3_config for details).
-    
+
 =item B<--ncExclude> I<HOST>
 
 Adds HOST to x509v3 nameConstraint as excluded (see RFC 5820).
@@ -1611,7 +1611,7 @@ Adds HOST to x509v3 nameConstraint as permitted (see RFC 5820).
 HOST can be a hostname (google.com), IP address (8.8.8.8),
 or something supported directly by openssl (IP:192.168.0.0/255.255.0.0,
 DNS:google.com - see man x509v3_config for details).
-    
+
 =item B<--ncExclude> I<HOST>
 
 Adds HOST to x509v3 nameConstraint as excluded (see RFC 5820).

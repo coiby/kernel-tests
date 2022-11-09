@@ -206,7 +206,7 @@ sriov_test_bond_mode2()
 					ip link set $iface1 up
 					ip link set $iface2 up
 					sleep 10
-				
+
 			local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 					local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
 		  		local mac3="00:de:ad:$(printf %02x $ipaddr):01:03"
@@ -237,7 +237,7 @@ sriov_test_bond_mode2()
 				fi
 
 		rlRun "sync_wait server ${test_name}_phase1"
-		
+
 		rlLog "layer2 hash ipv4"
 		local cmd=(
 			{loginctl enable-linger root}
@@ -263,7 +263,7 @@ sriov_test_bond_mode2()
 				if [ $? -ne 0 ];then
 						{ rlFail "${test_name} failed:ifenslave failed";let result++; }
 				fi
-		
+
 		vmsh run_cmd $vm1 "timeout 90s bash -c \"until ping -c 3 $server_ip4_1; do sleep 5; done\""
 				if [ $? -ne 0 ];then
 						{ rlFail "${test_name} ping $server_ip4_1 failed";let result++; }
@@ -375,7 +375,7 @@ sriov_test_bond_mode2()
 		vmsh run_cmd $vm1 "ip link set bond0 down"
 			vmsh run_cmd $vm1 "ip link set bond0 address $macB"
 			vmsh run_cmd $vm1 "ip link set bond0 up"
-			vmsh run_cmd $vm1 "ip addr add ${client_ip6_1}/64 dev bond0" 
+			vmsh run_cmd $vm1 "ip addr add ${client_ip6_1}/64 dev bond0"
 			vmsh run_cmd $vm1 "ip addr add ${client_ip6_2}/64 dev bond0"
 			sleep 30
 			vmsh run_cmd $vm1 "timeout 90s bash -c \"until ping6 -c 10 $server_ip6_1; do sleep 5; done\""
@@ -413,13 +413,13 @@ sriov_test_bond_mode2()
 
 		rlRun "sync_set server ${test_name}_phase2_end"
 			rlRun "sync_wait server ${test_name}_phase3"
-		
+
 		rlLog "layer2+3 ipv4"
 
 			vmsh run_cmd $vm1 "ip link set bond0 down"
 			vmsh run_cmd $vm1 "echo layer2+3 > /sys/class/net/bond0/bonding/xmit_hash_policy"
 			vmsh run_cmd $vm1 "ip link set bond0 up"
-			vmsh run_cmd $vm1 "ip addr add ${client_ip6_1}/64 dev bond0" 
+			vmsh run_cmd $vm1 "ip addr add ${client_ip6_1}/64 dev bond0"
 			vmsh run_cmd $vm1 "ip addr add ${client_ip6_2}/64 dev bond0"
 			vmsh run_cmd $vm1 "timeout 90s bash -c \"until ping -c 5 $server_ip4_1; do sleep 5; done\""
 				if [ $? -ne 0 ];then
@@ -481,7 +481,7 @@ sriov_test_bond_mode2()
 			fi
 
 		rlLog "layer2+3 hash ipv6"
-		
+
 		local cmd=(
 			{tcpdump -p -i \$\(cat /root/testiface1\) -Q out icmp6 and ip6 dst $server_ip6_1 -w slave1.pcap \&}
 					{tcpdump -p -i \$\(cat /root/testiface2\) -Q out icmp6 and ip6 dst $server_ip6_1 -w slave2.pcap \&}
@@ -888,7 +888,7 @@ EOF
 		vmsh run_cmd $vm1 "modprobe -rv bonding"
 
 		get_iface_sw_port "$iface1 $iface2" switch_name port_list kick_list
-		swcfg cleanup_port_channel $switch_name "$port_list" 
+		swcfg cleanup_port_channel $switch_name "$port_list"
 
 		if [ "$NIC_DRIVER" = "mlx4_en" ];then
 					sriov_detach_vf_from_vm $iface1 0 1 $vm1
@@ -1085,7 +1085,7 @@ sriov_test_bond_mode2_vlan()
 					ip link set $iface1 up
 					ip link set $iface2 up
 					sleep 10
-				
+
 			local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 					local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
 		  		local mac3="00:de:ad:$(printf %02x $ipaddr):01:03"
@@ -1116,7 +1116,7 @@ sriov_test_bond_mode2_vlan()
 				fi
 
 		rlRun "sync_wait server ${test_name}_phase1"
-		
+
 		rlLog "layer2 hash ipv4"
 		local cmd=(
 			{loginctl enable-linger root}
@@ -1142,7 +1142,7 @@ sriov_test_bond_mode2_vlan()
 				if [ $? -ne 0 ];then
 						{ rlFail "${test_name} failed:ifenslave failed";let result++; }
 				fi
-		
+
 		vmsh run_cmd $vm1 "timeout 90s bash -c \"until ping -c 3 $server_ip4_1; do sleep 5; done\""
 				if [ $? -ne 0 ];then
 						{ rlFail "${test_name} ping $server_ip4_1 failed";let result++; }
@@ -1254,7 +1254,7 @@ sriov_test_bond_mode2_vlan()
 		vmsh run_cmd $vm1 "ip link set bond0 down"
 			vmsh run_cmd $vm1 "ip link set bond0 address $macB"
 			vmsh run_cmd $vm1 "ip link set bond0 up"
-			vmsh run_cmd $vm1 "ip addr add ${client_ip6_1}/64 dev bond0" 
+			vmsh run_cmd $vm1 "ip addr add ${client_ip6_1}/64 dev bond0"
 			vmsh run_cmd $vm1 "ip addr add ${client_ip6_2}/64 dev bond0"
 			sleep 30
 			vmsh run_cmd $vm1 "timeout 90s bash -c \"until ping6 -c 10 $server_ip6_1; do sleep 5; done\""
@@ -1292,13 +1292,13 @@ sriov_test_bond_mode2_vlan()
 
 		rlRun "sync_set server ${test_name}_phase2_end"
 			rlRun "sync_wait server ${test_name}_phase3"
-		
+
 		rlLog "layer2+3 ipv4"
 
 			vmsh run_cmd $vm1 "ip link set bond0 down"
 			vmsh run_cmd $vm1 "echo layer2+3 > /sys/class/net/bond0/bonding/xmit_hash_policy"
 			vmsh run_cmd $vm1 "ip link set bond0 up"
-			vmsh run_cmd $vm1 "ip addr add ${client_ip6_1}/64 dev bond0" 
+			vmsh run_cmd $vm1 "ip addr add ${client_ip6_1}/64 dev bond0"
 			vmsh run_cmd $vm1 "ip addr add ${client_ip6_2}/64 dev bond0"
 			vmsh run_cmd $vm1 "timeout 90s bash -c \"until ping -c 5 $server_ip4_1; do sleep 5; done\""
 				if [ $? -ne 0 ];then
@@ -1360,7 +1360,7 @@ sriov_test_bond_mode2_vlan()
 			fi
 
 		rlLog "layer2+3 hash ipv6"
-		
+
 		local cmd=(
 			{tcpdump -p -i \$\(cat /root/testiface1\) -Q out icmp6 and ip6 dst $server_ip6_1 -w slave1.pcap \&}
 					{tcpdump -p -i \$\(cat /root/testiface2\) -Q out icmp6 and ip6 dst $server_ip6_1 -w slave2.pcap \&}
@@ -1664,7 +1664,7 @@ sriov_test_bond_mode2_vlan()
 EOF
 
 		get_iface_sw_port "$iface1 $iface2" switch_name port_list kick_list
-		swcfg cleanup_port_channel $switch_name "$port_list" 
+		swcfg cleanup_port_channel $switch_name "$port_list"
 
 		if [ "$NIC_DRIVER" = "mlx4_en" ];then
 					sriov_detach_vf_from_vm $iface1 0 1 $vm1

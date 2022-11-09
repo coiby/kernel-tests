@@ -123,7 +123,7 @@ chelsio_attach_vf_to_vm()
 		local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
 		#local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
 	local pf_bus_info=$(chelsio_get_pf_bus_info $PF $iPF)
-		
+
 	local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sort | sed -n ${iVF}p)
 		local vf_nodedev=pci_$(echo $vf_bus_info | sed 's/[:|.]/_/g')
 		local domain=$(echo $vf_bus_info | awk -F '[:|.]' '{print $1}')
@@ -235,7 +235,7 @@ chelsio_get_vf_bus_info()
 	  local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
 
 	  pf_bus_info=$(echo $pf_bus_info | sed "s/\..*$/\.$iPF/")
-	  
+
 	  local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sort | sed -n ${iVF}p)
 	  rtn=$?
 	  echo ${vf_bus_info}
@@ -250,7 +250,7 @@ chelsio_get_pf_bus_info()
 
 	  local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
 	  local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
-	  
+
 	  pf_bus_info=$(echo $pf_bus_info | sed "s/\..*$/\.$iPF/")
 	  echo $pf_bus_info
 }

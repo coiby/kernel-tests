@@ -19,7 +19,7 @@ function runtest() {
 for DISK in $DISKS; do
 
 	NVME_CHAR=/dev/${DISK:0:5}
-	NVME_DISK=/dev/${DISK}	
+	NVME_DISK=/dev/${DISK}
 	MODEL=$(cat /sys/block/"$DISK"/device/model)
 	tlog "The testing disk $DISK model is $MODEL"
 	tok "nvme list"

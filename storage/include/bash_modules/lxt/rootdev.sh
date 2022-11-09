@@ -41,10 +41,10 @@ get_root_disk ()
         origin_rootdev=$(readlink "$rootdev")
         if echo "$origin_rootdev" | grep '^/'
         then
-           rootdev=$origin_rootdev 
+           rootdev=$origin_rootdev
         else
            dir=$(dirname "$rootdev")
-           rootdev="$dir/$origin_rootdev"    
+           rootdev="$dir/$origin_rootdev"
         fi
     done
 

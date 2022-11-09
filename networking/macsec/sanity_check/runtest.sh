@@ -329,7 +329,7 @@ rlJournalStart
 
     # Workaround: Temporarily disable this case because system panicked due to
     #             bz1745880. For more, please refer to FASTMOVING-1155
-    
+
     # bz1745880 is fixed, enable this case. add by Liu Fei at 2021-06-11
 
 Xversion=`cat /etc/os-release|grep VERSION_ID|awk -F= '{print $2}'|sed 's/\"//g' |awk -F "." '{print $1}'`

@@ -30,7 +30,7 @@ rlJournalStart
                 # Setup and rebooted, now it's time for check
                 rlPhaseStartTest "Check ${KPARAM}=${VALUE}:*"
                     rlRun -l "cat /proc/cmdline"
-                    rlRun -l "cat /sys/kernel/debug/tracing/set_event | grep ${VALUE}" 
+                    rlRun -l "cat /sys/kernel/debug/tracing/set_event | grep ${VALUE}"
                     rlRun -l "cat /sys/kernel/debug/tracing/set_event | grep -v ${VALUE}" 1
                     cat /sys/kernel/debug/tracing/trace > ${KPARAM}-${VALUE}.log
                     #rlRun -l "cat ${KPARAM}-${VALUE}.log | grep -v ${VALUE} | grep -v '#'" 1

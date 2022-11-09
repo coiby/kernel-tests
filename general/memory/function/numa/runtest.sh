@@ -41,7 +41,7 @@ rlJournalStart
     if [ "TEST$TESTARG" == "TEST" ]; then
         TESTARG=$(find -name "*.sh")
     fi
-    
+
     for subcase in $TESTARG; do
         rlPhaseStartTest $(basename ${subcase%.sh})
             rlRun "$subcase"

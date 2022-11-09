@@ -174,7 +174,7 @@ get_iface_and_addr_bak()
 		CLI_ADDR4=$REMOTE_ADDR4
 		CLI_ADDR6=$REMOTE_ADDR6
 	}
-	
+
 	i_am_client && {
 		SER_ADDR4=$REMOTE_ADDR4
 		SER_ADDR6=$REMOTE_ADDR6
@@ -657,7 +657,7 @@ setup_team()
 	# config port-channel on switch
 	#if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w \
 	#	"runner.*:.*(roundrobin|loadbalance|lacp)"; then
-	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w "runner.*:.*(lacp)"; then	
+	if [ "$SWCFG_AUTO" = yes ] && [ "$NAY" = yes ] && echo "$team_json" | \egrep -q -w "runner.*:.*(lacp)"; then
 		if echo "$team_json" | \egrep -q -w "runner.*:.*lacp"; then
 			port_channel_mode=active
 		else
@@ -721,7 +721,7 @@ setup_bond()
 
 	# add bonding interface
 	test -f /sys/class/net/bonding_masters || {
-		if [ $(GetDistroRelease) = 8 ];then 
+		if [ $(GetDistroRelease) = 8 ];then
 			modprobe -nv bonding | grep 'max_bonds=0' > /dev/null && spare_param='Y'
 			if [ $spare_param = 'Y' ]
 			then
@@ -1295,7 +1295,7 @@ get_cur_iface_gw()
 	local _output=$2
 	local result=`ip addr show $iface | awk '/inet.*brd/ {print $4; exit}' \
 		| awk -F. '{printf "%s.%s.%s.%s\n",$1,$2,$3,$4-1}'`
-	
+
 	if [ -z $result ]; then
 		result=unknown
 		returnvalue=1
@@ -1312,7 +1312,7 @@ get_cur_iface_gw()
 			echo $result
 
 		fi
-	
+
 	if [[ "$_output" ]]; then
 		eval $_output="'$new_gw'"
 	else
@@ -1394,7 +1394,7 @@ setup_ip()
 		do
 			pkill -9 dhclient; sleep 2
 			dhclient $arg $iface
-			ip4=$(get_iface_ip4 $iface)	
+			ip4=$(get_iface_ip4 $iface)
 			let try_times++
 		done
 	fi
@@ -1402,7 +1402,7 @@ setup_ip()
 	ip4=$(get_iface_ip4 $iface)
 	if [ -z "$ip4" ]; then
 		# I find the current code(get_iface_and_addr) only call this func for the last topo.
-		# So , at here, treat $iface belongs to last topo. 
+		# So , at here, treat $iface belongs to last topo.
 		# By liali.
 		last_topo=$(echo $TOPO | awk -F, '{print $NF}')
 		last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
@@ -1412,7 +1412,7 @@ setup_ip()
 		[ -z "$NAY" ] && { ip4=NULL; return 1; }
 		ip4="192.168.1.250/24"
 		brd="192.168.1.255"
-		
+
 		#newcode
 		if [ ${topo_contain_vlan} = yes ];then
 			ip4="192.168.${last_vlan_id}.250/24"
@@ -1436,7 +1436,7 @@ setup_ip()
 		if((0));then
 			echo $iface | grep -q 'vlan3\|\.3' && ip4="192.168.3.250/24"
 			echo $iface | grep -q 'vlan4\|\.4' && ip4="192.168.4.250/24"
-		
+
 			if i_am_server; then
 				ip4="192.168.1.251/24"
 				echo $iface | grep -q 'vlan3\|\.3' && ip4="192.168.3.251/24"
@@ -1448,7 +1448,7 @@ setup_ip()
 				echo $iface | grep -q 'vlan4\|\.4' && ip4="192.168.4.252/24"
 			fi
 		fi
-		
+
 		ip addr add $ip4 brd $brd dev $iface || let exitcode++
 	fi
 	return $exitcode
@@ -1492,7 +1492,7 @@ setup_ip6()
 	# manauly setup
 		if [ -z "$ip6" ]; then
 			# I find the current code(get_iface_and_addr) only call this func for the last topo.
-			# So , at here, treat $iface belongs to last topo. 
+			# So , at here, treat $iface belongs to last topo.
 			# By liali.
 			last_topo=$(echo $TOPO | awk -F, '{print $NF}')
 			last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
@@ -1860,7 +1860,7 @@ update_ip()
 		echo $pid | grep -e "\b[0-9]\+\b" >/dev/null && kill -9 $pid && wait $pid
 		sleep 1
 	done
-	
+
 	LOCAL_ADDR4=$(awk '/IP4/ {print $2}' /tmp/my_ip)
 	LOCAL_ADDR6=$(awk '/IP6/ {print $2}' /tmp/my_ip)
 	REMOTE_ADDR4=$(awk '/IP4/ {print $2}' /tmp/target_ip | uniq)
@@ -2062,8 +2062,8 @@ get_reachable_ips()
 	return $exitcode
 }
 
-# Function to obtain reachable target IP addresses on 192.168.1.0/24 subnet 
-# in case other methods fail.  Requires that there is a route available to the 
+# Function to obtain reachable target IP addresses on 192.168.1.0/24 subnet
+# in case other methods fail.  Requires that there is a route available to the
 # 192.168.1.0/24 subnet.
 # Usage: get_target_ip_addr
 get_target_ip_addr()
@@ -2118,7 +2118,7 @@ get_static_ip_subnet()
 
 	# get host position in nic_info
 	local line_num=$(grep -v ^# $NIC_INFO_WITH_ALL_NIC | awk  '{print $3}' | uniq |sed '/^$/d' | grep -n $host | awk -F':' '{print $1}')
-	
+
 	# when host not in nic_info
 	if [ -z "$line_num" ];then
 		#if [ $total_host -lt 254 ];then
@@ -2128,7 +2128,7 @@ get_static_ip_subnet()
 		#	echo "254"
 		#fi
 		echo "255"
-	# when host in nic_info and line_num less then 254	
+	# when host in nic_info and line_num less then 254
 	elif [ $line_num -lt 254 ];then
 		echo $line_num
 	# when line_num big then 254, return fix value 254

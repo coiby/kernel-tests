@@ -31,7 +31,7 @@ function runtest()
 {
     echo "Check hpet device" | tee -a $OUTPUTFILE
     check_hpet_device
-    
+
     echo "run $hpet_cmd info" | tee -a $OUTPUTFILE
     $hpet_cmd info $hpet_device
     check_status "$hpet_cmd info $hpet_device"

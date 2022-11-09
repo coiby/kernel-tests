@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -18,7 +18,7 @@
 FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
- 
+
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh     || exit 1
 . /usr/share/beakerlib/beakerlib.sh         || exit 1

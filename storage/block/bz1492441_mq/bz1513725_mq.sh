@@ -26,7 +26,7 @@ source $CDIR/../../../cki_lib/libcki.sh     || exit 1
 . /usr/share/beakerlib/beakerlib.sh         || exit 1
 
 function setup()
-{  
+{
 	rm -rf /etc/multipath.conf
 	mpathconf --disable
 	systemctl stop multipathd

@@ -47,9 +47,9 @@ function SSD_RM_Unused_Partitions() {
 		tmp_p=$part_num
 		if [ "$tmp_p" -eq "0" ]; then
 			tlog "${test_dev} has no partitions, continue"
-			continue	
+			continue
 		fi
-	
+
 		while [ "$tmp_p" -gt "1" ]
 		do
 fdisk /dev/"$test_dev" >/dev/null 2>&1 << EOF
@@ -59,13 +59,13 @@ w
 EOF
 		((tmp_p--))
 		done
-	
+
 		if [ "$tmp_p" -eq "1" ]; then
 fdisk /dev/"$test_dev" >/dev/null 2>&1 << EOF
 d
 w
 EOF
-		fi	
+		fi
 		tlog "deleted $part_num partitions on $test_dev"
 	done
 }
@@ -237,7 +237,7 @@ function FIO_Device_Level_Test() {
 		test_dev=$tmp_dev
 	else
 		test_dev="/dev/${tmp_dev}"
-		
+
 	fi
 	tlog "Executing FIO_Device_Level_Test() with device: $test_dev"
 
@@ -320,7 +320,7 @@ function FIO_File_Level_Test() {
 		tlog "FAIL: fio file level randread testing for $test_dev failed"
 		ret=1
 	fi
-	
+
 	return $ret
 }
 
@@ -345,7 +345,7 @@ function DT_IO_Test_Device_Level() {
 	fi
 
 	tlog "Executing DT_IO_Test_Device_Level() with device: $test_dev"
-	tlog "dt against ${test_dev} is running with runtime: ${dt_runtime}s, log file is: ${dt_logfile}, process num is: $process_num" 
+	tlog "dt against ${test_dev} is running with runtime: ${dt_runtime}s, log file is: ${dt_logfile}, process num is: $process_num"
 	tlog "dt slices=16 disable=eof,pstats flags=direct oncerr=abort min=b max=256k pattern=iot iodir=reverse prefix='%d@%h (pid %p)' procs=${process_num} of=${test_dev} log=${dt_logfile} runtime=${dt_runtime}"
 	tok "dt slices=16 disable=eof,pstats flags=direct oncerr=abort min=b max=256k pattern=iot iodir=reverse prefix='%d@%h (pid %p)' procs=$process_num of=${test_dev} log=${dt_logfile} runtime=${dt_runtime}"
 	if [ $? -ne 0 ]; then
@@ -377,7 +377,7 @@ function DT_IO_Test_File_Level() {
 		process_num=$((mq_num*5))
 		dt_runtime=$((60*3))
 	fi
-	
+
 	tlog "Executing DT_IO_Test_File_Level() with device: $test_dev"
 	#which filesystem to test
 	trun which mkfs.ext4
@@ -391,9 +391,9 @@ function DT_IO_Test_File_Level() {
 		mkdir -p "${mountP}"
 	fi
 	tok mount -t "$FILESYS" "$test_dev" "$mountP"
-	
+
 	#Start testing
-	tlog "dt against ${test_dev} is running with runtime: ${dt_runtime}s, log file is: ${dt_logfile}, process num is: $process_num" 
+	tlog "dt against ${test_dev} is running with runtime: ${dt_runtime}s, log file is: ${dt_logfile}, process num is: $process_num"
 	tlog "dt slices=16 disable=eof,pstats dispose=keep  flags=direct oncerr=abort min=b max=256k pattern=iot iodir=reverse limit=7g procs=${process_num} runtime=$dt_runtime log=${dt_logfile} of=${mountP}/test_file"
 	tok "dt slices=16 disable=eof,pstats dispose=keep  flags=direct oncerr=abort min=b max=256k pattern=iot iodir=reverse limit=7g procs=${process_num} runtime=$dt_runtime log=$dt_logfile of=${mountP}/test_file"
 	if [ $? -ne 0 ]; then

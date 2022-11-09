@@ -58,6 +58,6 @@ if [ "$total_leak" -ge "16" ]; then
 fi
 
 delete_tmp
-exit 0 
+exit 0
 
 

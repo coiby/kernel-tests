@@ -84,7 +84,7 @@ stop_NetworkManager()
 			nmcli con del "$uuid"
 		done
 
-		for d in $(nmcli -f DEVICE device status|tail -n +2|sed 's/[ ]*$//g');do 
+		for d in $(nmcli -f DEVICE device status|tail -n +2|sed 's/[ ]*$//g');do
 			[ "$d" == "$beaker_nic" ] && continue
 			[ "$d" == "loopback" ] && continue
 			[ "$d" == "lo" ] && continue
@@ -100,7 +100,7 @@ stop_NetworkManager()
 	else
 		#interface will configure ip address in RHEL8.3, which affects testing, here down all the connections
 		#except "System ***" to elimate ip address configured.
-		# The connection name(with default interface) doesn't contain the 
+		# The connection name(with default interface) doesn't contain the
 		# string 'System' on some aarch64 systems, so use $beaker_nic as the filter pattern
 		connection_list=`nmcli connection | grep -v -E "${beaker_nic}|virbr0" | awk 'NR==1 {next} {print $(NF-2)}'`
 		device_list=`nmcli device status | awk 'NR==1 {next} {print $1}' | grep -v -E "${beaker_nic}|virbr0"`
@@ -185,7 +185,7 @@ set_nm_unmanage()
 	[ $rhel_ver -lt 7 ] && return
 
 	default_iface=$(get_default_iface)
-	
+
 	# delete old cfg first
 	#sed -i '/\[keyfile\]/d' /etc/NetworkManager/NetworkManager.conf
 	#sed -i '/unmanaged-devices/d' /etc/NetworkManager/NetworkManager.conf
@@ -208,8 +208,8 @@ unset_nm_unmanage()
 	sed -i '/unmanaged-devices/d' /etc/NetworkManager/NetworkManager.conf
 
 	systemctl restart NetworkManager
-	
-	# need to call stop_NetworkManager when NM_CTL==no	
+
+	# need to call stop_NetworkManager when NM_CTL==no
 	if [ "$NM_CTL" == "no" ];then
 		stop_NetworkManager &>/dev/null
 	fi

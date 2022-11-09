@@ -7,12 +7,12 @@ mlx_create_vfs()
 
 	local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
 	local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
-	
+
 	case ${driver} in
 		mlx4_en)
 			# FIX_ME if new NIC is introduced.
 			# Both Mellanox-MT26448 and Mellanox-MT27500 and Mellanox-MT27520 are dual-port
-			# Because it don't support to add dual-port VFs to the same bonding, so we want to only create single port VF here 
+			# Because it don't support to add dual-port VFs to the same bonding, so we want to only create single port VF here
 			# If need, please add code to test dual-port VFs
 			num_vfs="$num_vfs,$num_vfs,0"
 			if ! grep CMDLINE_OPTS /etc/modprobe.d/libmlx4.conf 2> /dev/null; then
@@ -86,7 +86,7 @@ mlx_remove_vfs()
 
 	local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
 	local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
-		
+
 	case ${driver} in
 		mlx4_en)
 			modprobe -r mlx4_en; modprobe -r mlx4_ib;  modprobe -r mlx4_core

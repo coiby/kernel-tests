@@ -51,7 +51,7 @@ function run_test()
 		dd if=/dev/$DEVICE of=/dev/null bs=1k iflag=direct count=1 >/dev/null 2>&1
 		echo 500 > /sys/fs/cgroup/blkio/testgroup1/blkio.weight
 		fgrep -e $DD_PID /sys/fs/cgroup/blkio/testgroup1/testgroup2/tasks >/dev/null
-		echo "test passed" 
+		echo "test passed"
 		echo "testgroup2 dd stopped, exiting test"
 	else
 		echo "test failed"

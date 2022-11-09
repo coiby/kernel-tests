@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-# Copyright (c) 2014 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2014 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -13,7 +13,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# Author: Li Wang <liwang@redhat.com> 
+# Author: Li Wang <liwang@redhat.com>
 
 OUTPUTFILE=get_sem_otime.log
 if [ -e $OUTPUTFILE ]; then
@@ -41,7 +41,7 @@ if [ -f call_semop ] && [ -f get_sem_otime ]; then
         sleep 3;
         SEMID=`grep semid $OUTPUTFILE| cut -d ' ' -f 5`
         echo "SEMID = $SEMID"
-        if [ "$SEMID" = "" ]; then 
+        if [ "$SEMID" = "" ]; then
                 echo "LOGINFO: the SEMID does not exist..."
                 exit 1;
         fi

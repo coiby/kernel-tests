@@ -16,7 +16,7 @@ function runtest ()
     fi
 
     for i in `seq 1 100`; do
-        guestfish -a /dev/null run -v > /tmp/fish.out 2>&1 ; 
+        guestfish -a /dev/null run -v > /tmp/fish.out 2>&1 ;
         grep "divide error" /tmp/fish.out
         if [ $? -eq 0 ]; then
             echo "divide error in /tmp/fish.out, happens for ${i}th time" | tee -a $OUTPUTFILE

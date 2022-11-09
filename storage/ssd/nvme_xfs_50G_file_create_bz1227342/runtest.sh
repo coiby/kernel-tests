@@ -23,7 +23,7 @@ for TEST_DISK in $TEST_DISKS; do
 
 	#make file system on nvme disk
 	tok mkfs.xfs -f "/dev/$TEST_DISK"
-	
+
 	#create directory to mount partition on nvme disk
 	tok mount "/dev/$TEST_DISK" "$mountP"
 
@@ -34,7 +34,7 @@ for TEST_DISK in $TEST_DISKS; do
 	#umount disk partition
 	tok "umount /dev/$TEST_DISK"
 	tok "rm -fr $mountP"
-	} &	
+	} &
 done
 	wait
 }

@@ -36,7 +36,7 @@ export pass=`cat $OUTPUTFILE | grep "Pass" | wc -l`
 
 if test ! -s "$OUTPUTFILE" ; then
     export result="FAIL"
-else    
+else
     if [ "$pass" -gt "0" ] ; then
         export result="PASS"
     else

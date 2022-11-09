@@ -43,7 +43,7 @@ function test_run()
             dd_size=$((${root_size}*2/300))
         fi
         `dd if=/dev/zero of=${TMP_FILE}${x} bs=${dd_size}k count=100`
-        
+
         sleep 2
         mem_free=`get_mem_free`
         echo "after testing, mem_free is ${mem_free}"
@@ -62,7 +62,7 @@ function main()
 {
     check_file_exist ${TARGET_FILE}
     OLD_TUNE=`get_min_free_kbytes`
-    
+
     test_run
     echo ${OLD_TUNE} > ${TARGET_FILE}
     echo "PASS: min_free_kbytes PASS"

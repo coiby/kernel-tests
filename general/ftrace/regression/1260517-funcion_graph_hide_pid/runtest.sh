@@ -47,6 +47,6 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup
-       echo 'nop' > ${T_PATH_CURR_TRACER} 
+       echo 'nop' > ${T_PATH_CURR_TRACER}
     rlPhaseEnd
 rlJournalEnd

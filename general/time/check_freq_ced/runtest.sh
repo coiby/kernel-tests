@@ -31,7 +31,7 @@ function runtest ()
         hrtimer_interrupt)
             echo "### It is high resolution mode ###" | tee -a $OUTPUTFILE
             ./check_tick_freq | tee /tmp/HRES
-            HZ=`cat /tmp/HRES | sed -n 1p  | cut -d ' ' -f 7` 
+            HZ=`cat /tmp/HRES | sed -n 1p  | cut -d ' ' -f 7`
             RES=`echo "$HZ <= 1010" | bc`
             if [ $RES == 1 ];then
                 rstrnt-report-result $TEST "FAIL" 1

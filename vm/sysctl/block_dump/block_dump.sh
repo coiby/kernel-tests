@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2011 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2011 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -12,7 +12,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# Author: Zhouping Liu <zliu@redhat.com> 
+# Author: Zhouping Liu <zliu@redhat.com>
 . /mnt/tests/kernel/vm/sysctl/include/runtest.sh
 
 OLD_BLOCK_DUMP=
@@ -27,7 +27,7 @@ function block_dump_test()
 
 	dd if=/dev/zero of=${TMP_FILE} bs=1024k count=1
 	sleep 1
-	
+
 	ls -l /dev/ > ${TMP_FILE}
 	sleep 1
 

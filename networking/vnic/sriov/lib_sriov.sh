@@ -253,11 +253,11 @@ sriov_attach_vf_to_vm()
 			fi
 		fi
 	fi
-	
+
 	# print out xml file
 	echo "Printing out ${vf_nodedev}.xml..."
 	cat ${vf_nodedev}.xml
-	
+
 	if virsh attach-device $vm ${vf_nodedev}.xml ; then
 
 		case ${driver} in
@@ -734,7 +734,7 @@ check_call_trace()
 	rlRun -l "dmesg | grep -C 100 -i 'Kernel panic'" 1
 	rlRun -l "dmesg | grep -C 100 -i BUG" 1
 	rlRun -l "dmesg | grep -C 100 -i 'failed to load firmware image'" 1
-	#bz1825389 bz1796517 
+	#bz1825389 bz1796517
 	rlRun -l "dmesg | grep $NIC_DRIVER | grep 'probe of' | grep 'failed with error'" 1
 	#bz1831401
 	rlRun -l "dmesg | grep -C 100 'firmware error detected'" 1

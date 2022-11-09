@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -16,8 +16,8 @@
 # Author: guazhang  <guazhang@redhat.com>
 
 # Include Beaker environment
-. ../../../cki_lib/libcki.sh || exit 1 
-. /usr/share/beakerlib/beakerlib.sh || cki_abort_task "fail to include beakerlib.sh" 
+. ../../../cki_lib/libcki.sh || exit 1
+. /usr/share/beakerlib/beakerlib.sh || cki_abort_task "fail to include beakerlib.sh"
 . ../../include/libstqe.sh || cki_abort_task "fail to include libstqe.sh"
 
 function install_libblockdev(){
@@ -36,7 +36,7 @@ function check_python_env(){
         cki_print_warning "Could not find the luks_main.py file, exit"
         exit 1
     fi
-    $PY -c "import libsan" 
+    $PY -c "import libsan"
     if [[ $? != 0 ]];then
         cki_print_warning "Could not import python module libsan, exit"
         exit 1

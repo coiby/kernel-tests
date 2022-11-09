@@ -20,7 +20,7 @@
 FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
- 
+
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh     || exit 1
 . /usr/share/beakerlib/beakerlib.sh         || exit 1
@@ -49,7 +49,7 @@ function setup()
     pidof multipathd &>/dev/null && pkill -9 multipathd
     [ -f /etc/multipath.conf ] && rm -f /etc/multipath.conf
 
-    
+
 
     [ -d blktests ] && rm -rf blktests
     git clone https://github.com/osandov/blktests.git
@@ -117,7 +117,7 @@ function run_test()
             fi
             rmmod -f scsi_debug > /dev/null 2>& 1
             sleep 5
-            pushd blktests  
+            pushd blktests
             rlRun "./check $j/$i"
             popd
             result=$(get_result)

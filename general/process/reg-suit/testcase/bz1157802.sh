@@ -3,7 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Bug 1197899
-#   Description: Bug 1157802 - vmstat: on-demand vmstat workers 
+#   Description: Bug 1157802 - vmstat: on-demand vmstat workers
 #   Author: Chunyu Hu <chuhu@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,7 +32,7 @@
 first_cpu=2
 last_cpu=
 
-# Check the benchmark value for the current scheduler.After the new design of 
+# Check the benchmark value for the current scheduler.After the new design of
 # vmstat worker. less overall should be observed.This result needs to be compareed
 # with the old version kernel without this fix.
 # Use the hackbench written by Ingo Mona, the tool has been integrated in perf tools.
@@ -206,7 +206,7 @@ function bz1157802()
 				return 0;
 			fi
 			if [ ! -f "$rebootflag_f" ];then
-				test_sched_hackbench				
+				test_sched_hackbench
 				check_smt_clock_source
 				((CpuCount < 4)) && rlLogWarning "Test needs number of cpu >= 4." && return 1;
 				rlLogInfo "Set kernel cmdline to isolabe some cpus and enable adjustive ticks."
@@ -214,7 +214,7 @@ function bz1157802()
 				rlRun "grubby --args=\"nohz_full=$first_cpu-$last_cpu rcu_nocbs=$first_cpu-$last_cpu nmi_watchdog=0 nohz=on nowatchdog nosoftlockup\"\
 					--update-kernel=$(grubby --default-kernel)"
 				touch $rebootflag_f
-				rhts-reboot	
+				rhts-reboot
 			else
 				# test how long a task on an isolated cpu can work continuously without being intterupted.
 				test_timer_interval

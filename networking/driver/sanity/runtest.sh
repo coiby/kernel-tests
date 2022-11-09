@@ -25,7 +25,7 @@ do
 done
         echo "$COUNT ethernet devices were found"
 
-# 
+#
 # If none found, assume failure to load any ethernet driver and fail test
 #
 if [ $COUNT -eq 0 ]

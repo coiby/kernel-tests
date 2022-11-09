@@ -21,7 +21,7 @@ LXT_TC=1
 # print the current date
 # usage: d=$(tdate)
 #
-tdate () 
+tdate ()
 {
     date '+%T' 2>/dev/null
 }
@@ -65,11 +65,11 @@ trun ()
 tnot () {
     local cmd="$*"
     _trun_ "$cmd" 1
-    if test $? -eq 0; then 
+    if test $? -eq 0; then
         tfail_ "$cmd" ;
     else
         tpass_ "$cmd" ;
-    fi 
+    fi
 }
 
 #
@@ -82,11 +82,11 @@ tok ()
 {
     local cmd="$*"
     _trun_ "$cmd" 0
-    if test $? -eq 0; then 
+    if test $? -eq 0; then
         tpass_ "$cmd" ;
     else
         tfail_ "$cmd" ;
-    fi 
+    fi
 }
 
 #
@@ -110,30 +110,30 @@ terr ()
 {
     local cmd="$*"
     _trun_ "$cmd" 0
-    if test $? -ne 0; then 
+    if test $? -ne 0; then
         tfail_ "$cmd" ;
         tend ;
-    fi 
+    fi
 }
 
 #
 # exit the program and print the log message
 # usage: texit "error message" 100
-# similar to the exception 
+# similar to the exception
 #
 texit ()
 {
     msg=$1
     err=$2
     is_null "$err" && err=1
-    test $err -lt 1 || err=1 
+    test $err -lt 1 || err=1
 
     tlog "$msg" "ERROR"
-    exit $2 
+    exit $2
 }
 
 #
-# print the test report, cleanup the testing bed and  close the testing. 
+# print the test report, cleanup the testing bed and  close the testing.
 # usage: tend
 #
 tend ()
@@ -143,9 +143,9 @@ tend ()
     local total=$((pcount+fcount))
 
     echo "#################################Test Report###############################"
-    echo "TOTAL   : $total" 
-    echo "PASSED  : $pcount" 
-    echo "FAILED  : $fcount" 
+    echo "TOTAL   : $total"
+    echo "PASSED  : $pcount"
+    echo "FAILED  : $fcount"
     cat "$tPASS_FILE" "$tFAIL_FILE"
     echo "###########################End of running $0########################"
 
@@ -217,7 +217,7 @@ _trun_ ()
     test "$tIGNORE_STDOUT" -eq 1 && stdout='redirect the stdout to /dev/null'
     test "$tIGNORE_STDERR" -eq 1 && stderr='redirect the stderr to /dev/null'
 
-    echo "[$msg][$cur_date][$HOSTNAME]$cmd" 
+    echo "[$msg][$cur_date][$HOSTNAME]$cmd"
     echo "STDOUT:"
     test "$stdout" = "" || echo "$stdout"
     echo "STDERR:$stderr"

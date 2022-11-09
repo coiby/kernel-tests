@@ -100,6 +100,21 @@ check bash with mixed tabs and spaces:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
 
+check bash lines ending with white spaces:
+  extends: .cki_tools
+  script:
+    - |
+      whitespaces=$((find . -type f -iname '*.sh' -exec grep -lPe '\s$' {} + || true ) | sort)
+      if [[ -n "${whitespaces}" ]]; then
+          echo "Files that have lines ending with whitespaces:"
+          echo "${whitespaces}" | sed 's/^/  /'
+          echo "for more details run: grep -ne '\s$' <filename>"
+          exit 1
+      fi
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+
 check if LTP version on DCI matches the default on distribution/ltp/include/ltp-make.sh:
   extends: .cki_tools
   script:

@@ -30,7 +30,7 @@ OPWD=`pwd`
 export SERVER1=$Server1 SERVER2=$Server2
 pkgPath=$OPWD/cthon_automount
 
-echo  "{INFO} cthon_automount install ..." | tee -a ${OUTPUTFILE} 
+echo  "{INFO} cthon_automount install ..." | tee -a ${OUTPUTFILE}
 (cd $pkgPath/src; make clean && make && make install && make clean)
 #===============================================================================
 source $pkgPath/src/tests.init

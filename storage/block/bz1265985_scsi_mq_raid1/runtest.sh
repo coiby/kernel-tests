@@ -27,7 +27,7 @@ source $CDIR/../../../cki_lib/libcki.sh     || exit 1
 
 function run_test()
 {
-	declare -a arr 
+	declare -a arr
 	(>disk_txt)
 	(>fsdisk)
 	sda=$(lsblk |grep boot |awk '{print $1}' |grep -Eo [a-z]{3})
@@ -45,7 +45,7 @@ function run_test()
 			echo "this $i have no parition,used $i to parition"
 			echo "$i" >> disk_txt
 			(cat disk_txt ) && echo " add those disk now"
-			parted -s /dev/${i}  mklabel gpt  mkpart primary 1M 100G 
+			parted -s /dev/${i}  mklabel gpt  mkpart primary 1M 100G
 			partprobe
 			rlRun "ls -d /sys/block/$i/sd*"
 			num=$(cat disk_txt|grep sd*|wc -l)
@@ -132,7 +132,7 @@ function part()
 			rlLog "don't used $i create raid1"
 		fi
 		sleep 5
-		echo "fdisk partition" 
+		echo "fdisk partition"
 	done
 }
 
@@ -141,9 +141,9 @@ function test_raid()
 	num=0
 	while [ $num -lt 30 ]; do
 		echo "*****************************************************$num"
-		pvcreate -y /dev/{"$sdb"1,"$sdc"1,"$sdd"1,"$sde"1} 
+		pvcreate -y /dev/{"$sdb"1,"$sdc"1,"$sdd"1,"$sde"1}
 # vgcreate -f black_bird  /dev/{"$sdb"1,"$sdc"1,"$sdd"1,"$sde"1}
-		vgcreate  black_bird  /dev/{"$sdb"1,"$sdc"1,"$sdd"1,"$sde"1} 
+		vgcreate  black_bird  /dev/{"$sdb"1,"$sdc"1,"$sdd"1,"$sde"1}
 		sleep 5
 		lvcreate --type raid1 -m 3 -n non_synced_primary_raid1_3legs_1 -L 3G black_bird /dev/"$sdb"1:0-2400 /dev/"$sdc"1:0-2400 /dev/"$sdd"1:0-2400 /dev/"$sde"1:0-2400
 		sleep 5

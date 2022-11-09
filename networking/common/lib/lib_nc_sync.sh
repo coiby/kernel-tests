@@ -28,7 +28,7 @@ lsof -v 2>/dev/null || ${yum} -y install lsof
 sync_set()
 {
 	local xtrace_state="no"
-	
+
 	# Disable tracing if it is enabled to avoid excessive output to log file
 	if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
 
@@ -91,7 +91,7 @@ function sync_ctrl_c()
 sync_wait()
 {
 	local xtrace_state="no"
-	
+
 	# Disable tracing if it is enabled to avoid excessive output to log file
 	if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
 
@@ -134,7 +134,7 @@ sync_wait()
 	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_wait $*\"")
 
 	sync_cleanup
-	
+
 	# Re-enable tracing if it had been set previously
 	[[ "$xtrace_state" == "yes" ]] && set -x
 
@@ -142,7 +142,7 @@ sync_wait()
 }
 
 # This function could be used when local system need the remote system to do a choice from 2 options.
-# such as, the server whould do some checking before start test, if the checking pass, then it could 
+# such as, the server whould do some checking before start test, if the checking pass, then it could
 # tell client to begin test, else tell the client the test should not start.
 # ex.
 # sync_wait_choice server "yes" "no" 300
@@ -150,7 +150,7 @@ sync_wait()
 sync_wait_choice()
 {
 	local xtrace_state="no"
-	
+
 	# Disable tracing if it is enabled to avoid excessive output to log file
 	if [ -o xtrace ]; then xtrace_state="yes" && set +x; fi
 
@@ -202,7 +202,7 @@ sync_wait_choice()
 	((timeout <= 0)) && (result=1; echo "SYNC_NC: timeout to \"sync_wait_choice $*\"")
 
 	sync_cleanup
-	
+
 	# Re-enable tracing if it had been set previously
 	[[ "$xtrace_state" == "yes" ]] && set -x
 

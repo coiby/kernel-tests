@@ -28,7 +28,7 @@ TESTS=${TESTS:-}
 function run_test()
 {
     [ -z "$TESTS" ] && TESTS=$(ls klp_tc_*[0-9].sh)
-IFS=" 
+IFS="
 "
     for subtest in $TESTS; do
         sed -i '/set -e/d' $subtest

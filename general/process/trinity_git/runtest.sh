@@ -69,7 +69,7 @@ function patch_apply()
 	local patch_cmd="git am"
 	local pc
 
-	if [ "$patch_method" = patch ]; then 
+	if [ "$patch_method" = patch ]; then
 		patch_cmd="patch -p1 <"
 	fi
 

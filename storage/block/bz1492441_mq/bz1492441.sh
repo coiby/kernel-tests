@@ -53,7 +53,7 @@ function run_test()
 
 	while [ -f $FLAGFILE ]; do
 		echo "1" >/sys/block/$DEVNAME/device/delete >/dev/null 2>&1
-		sleep 0.1 
+		sleep 0.1
 		echo "- - -" >/sys/bus/pseudo/drivers/scsi_debug/adapter0/$DEVHOST/scsi_host/$DEVHOST/scan  >/dev/null 2>&1
 		sleep 0.1
 	done &

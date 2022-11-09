@@ -1,4 +1,4 @@
-#!/bin/bash - 
+#!/bin/bash -
 #
 
 # ${NETWORK_COMMONLIB_DIR} is only used in Red hat netowrk-qe lab
@@ -193,7 +193,7 @@ fi # end of if [[ ! ${NETWORK_COMMONLIB_DIR+x} ]]
 
 #
 # Enable switch port connected to the interface on linux server
-# 
+#
 # @parameters
 # INPUT
 #   $iface is the interface name in linux, like eth0
@@ -217,7 +217,7 @@ swcfg_port_up_by_linux_iface()
 
 #
 # Disable switch port connected to interface on linux
-# 
+#
 # @parameters
 # INPUT
 #   $iface is the interface name in linux, like eth0

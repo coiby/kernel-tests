@@ -16,7 +16,7 @@ if [ -z "$TEST_DEVS" ]; then
 		else
 			TEST_DEVS+="$dev "
 		fi
-		
+
 	done
 fi
 

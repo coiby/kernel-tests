@@ -82,11 +82,11 @@ function heap_test_malloc()
 		alloc="${BASH_REMATCH[1]}"
 		if [[ $alloc -gt $MAX_USER_VM_4LVL_GiB ]] ; then
 			echo "$alloc GiB allocated > $MAX_USER_VM_4LVL_GiB GiB max ${PLVL:0:1}-lvl user VM max" | tee -a $testlog
-			echo -e "FAILED" | tee -a $testlog 
+			echo -e "FAILED" | tee -a $testlog
 			EXIT_STATUS=1
 		else
 			echo "$alloc GiB allocated <= $MAX_USER_VM_4LVL_GiB GiB max ${PLVL:0:1}-lvl user VM max" | tee -a $testlog
-			echo -e "PASSED" | tee -a $testlog 
+			echo -e "PASSED" | tee -a $testlog
 		fi
 	fi
 

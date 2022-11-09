@@ -105,7 +105,7 @@ function setup_phase(){
         pushd warn_mod
         [[ ! $(uname -m) =~ x86_64 ]] && unset ARCH
         make
-        popd    
+        popd
         if [ ! -f $MOD ];then
             rlLogWarning "Compile the test mod fail."
             rlDie
