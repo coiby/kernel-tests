@@ -42,13 +42,13 @@ IS_SUPPORTED=1
 function test_clean(){
 	rlPhaseStartTest  "Test $BUG_INFO"
 		rlLogInfo "Run the ftrace syscall reproducer."
-		
+
 		rlRun "trace-cmd start -e syscalls:sys_enter_write"
 		rlLogInfo "Run the ftrace reproducer for syscall"
-		./$BIN_FILE_F & 
+		./$BIN_FILE_F &
 		pid_ftrace=$!
 		sleep 600
-		kill 
+		kill
 
 		rlLogInfo "Run the perf syscall reproducer."
 		./$BIN_FILE_P &

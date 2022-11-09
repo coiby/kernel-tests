@@ -91,7 +91,7 @@ function module_check_B()
     rlRun "cat ${TRACE_FUN} | grep meminfo_proc_show" "0"
     rlRun "cat ${TRACE_FUN} | grep cmdline_proc_show" "${RT}"
     rlRun "grep kpatch=1 ${PROC_CMD}" "${RT}"
-    rlRun "grep VMALLOCCHUNK ${PROC_MEM}" "1" 
+    rlRun "grep VMALLOCCHUNK ${PROC_MEM}" "1"
     rlRun "grep VmallocChunk ${PROC_MEM}" "0" "VMALLOCCHUNK reverted to lowercase in ${PROC_MEM}"
     rlRun "grep kpatch ${PROC_MEM}" "0" "kpatch: 5 shows in ${PROC_MEM}"
 }

@@ -21,7 +21,7 @@ if [ ! "$JOBID" ] && [ ! "$RSTRNT_JOBID" ]; then
 	RES='\E[0m'
 fi
 
-if stat /run/ostree-booted > /dev/null 2>&1; then 
+if stat /run/ostree-booted > /dev/null 2>&1; then
 	YUM="rpm-ostree -A --idempotent --allow-inactive install"
 else
 	YUM="yum -y install"
@@ -443,7 +443,7 @@ else
 
 	# work around bz883695
 	lsmod | grep mlx4_en || modprobe mlx4_en
-	# work around bz1642795 
+	# work around bz1642795
 	lsmod | grep sctp || modprobe sctp
 
 	if [[ "$PERSISTENT_CONFIG" != "yes" ]]; then
@@ -474,7 +474,7 @@ else
 			sed -i '$a Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc' /etc/ssh/ssh_config
 		fi
 	fi
-	
+
 	# install dhcp-client
 	$YUM dhcp-client
 

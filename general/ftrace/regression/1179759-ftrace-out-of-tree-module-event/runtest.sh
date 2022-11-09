@@ -65,7 +65,7 @@ function setup_phase(){
         [[ ! $(uname -m) =~ x86_64|i386 ]] && unset ARCH
         pushd event_mod
         make
-        popd	
+        popd
         if [ ! -f $MOD ];then
             rlLogWarning "Compile the test mod fail."
             rlDie
@@ -80,7 +80,7 @@ function test_phase(){
         # On rhel6, the taint file is not supported
         [ -f "/sys/module/pita/taint" ] && rlRun -l "cat /sys/module/pita/taint"
         rlRun -l "echo 1 >/sys/kernel/debug/pita/test"
-        [ -f "/sys/module/pita/taint" ] && rlAssertGrep "OE" /sys/module/pita/taint 
+        [ -f "/sys/module/pita/taint" ] && rlAssertGrep "OE" /sys/module/pita/taint
         rlRun -l "cat $TRACE_BUFFER | tail -n 20"
         rlRun -l "cat $TRACE_BUFFER | tee trace.txt"
         rlAssertGrep "pita" trace.txt

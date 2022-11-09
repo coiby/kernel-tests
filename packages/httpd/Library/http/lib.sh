@@ -121,7 +121,7 @@ Function httpSecureStart will copy a private key into this location.
 Path to pem file with trusted certificates.
 Default value is /etc/pki/tls/certs/ca-bundle.crt.
 Certificate is available at http://SERVER_HOSTNAME/ca.crt
-and function !httpInstallCa can download and install it into httpSSL_PEM. 
+and function !httpInstallCa can download and install it into httpSSL_PEM.
 
 
 =item httpCOLLECTION
@@ -788,12 +788,12 @@ httpLibraryLoaded() {
     # check if mod_ssl and mod_nss are installed
     if rpm -q mod_ssl; then
         rlLogDebug "mod_ssl installed"
-    else 
+    else
         rlLogDebug "mod_ssl not installed"
     fi
     if rpm -q mod_nss; then
         rlLogDebug "mod_nss installed"
-    else 
+    else
         rlLogDebug "mod_nss not installed"
     fi
     rlAssertRpm $httpHTTPD || return 1

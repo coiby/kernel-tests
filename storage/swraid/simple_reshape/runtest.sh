@@ -25,7 +25,7 @@ source ../../../cki_lib/libcki.sh || exit 1
 
 function runtest
 {
-# Refer to bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=2066373 
+# Refer to bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=2066373
    rlRun "mdadm --create --run /dev/md0 --level 0  --metadata 1.2 \
        --raid-devices 3 /dev/loop0 /dev/loop1 /dev/loop2 --chunk 512"
    rlRun "mdadm --grow -l10 /dev/md0 \
@@ -40,11 +40,11 @@ function startup
         yum -y install mdadm
     fi
 
-    for i in {0..8};do 
+    for i in {0..8};do
         rlRun "dd if=/dev/urandom of=/opt/loop_$i bs=1M count=500"
     done
 
-    for i in {0..8};do 
+    for i in {0..8};do
         rlRun "losetup /dev/loop$i /opt/loop_$i"
     done
 

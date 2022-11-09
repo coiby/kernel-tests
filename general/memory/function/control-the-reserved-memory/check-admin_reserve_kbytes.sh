@@ -3,9 +3,9 @@
 # Description
 # The amount of free memory in the system that should be reserved for users
 # with the capability cap_sys_admin.
-# 
+#
 # admin_reserve_kbytes defaults to min(3% of free pages, 8MB)
-# 
+#
 # That should provide enough for the admin to log in and kill a process,
 # if necessary, under the default overcommit 'guess' mode.
 #
@@ -21,7 +21,7 @@ if [ -f "/proc/sys/vm/admin_reserve_kbytes" ]; then
 	# check the default valuse
 	if [ $ADMIN_RESERVE_KBYTES -le 8192 ]; then
 		echo "admin_reserve_kbytes = $ADMIN_RESERVE_KBYTES"
-	else 
+	else
 		echo "admin_reserve_kbytes = $ADMIN_RESERVE_KBYTESL"
 		TEST_SUCCESS=false
 	fi

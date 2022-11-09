@@ -71,7 +71,7 @@ reset_network_env()
 		# Clear variables
 		\rm /tmp/test_nic 2>/dev/null
 		\rm /tmp/test_iface 2>/dev/null
-		
+
 		# restart network service
 		pkill dhclient
 		pkill -f "nc -l"
@@ -79,7 +79,7 @@ reset_network_env()
 		rsync -a --delete $networkLib/network-scripts.bak/ /etc/sysconfig/network-scripts/
 		systemctl restart network
 		systemctl restart NetworkManager
-		
+
 		# delete it when the device does not exist
 		ip link del $TEAM_NAME
 		ip link del $BOND_NAME
@@ -109,7 +109,7 @@ reset_network_env()
 		# restart network service
 		pkill dhclient
 		pkill -f "nc -l"
-	
+
 		rsync -a --delete $networkLib/network-scripts.no_nm/ /etc/sysconfig/network-scripts/
 		 rlServiceStop network && rlServiceStart network
 	fi
@@ -1101,7 +1101,7 @@ setup_ip()
 		do
 			pkill dhclient; sleep 2
 			dhclient $arg $iface
-			ip4=$(get_iface_ip4 $iface)	
+			ip4=$(get_iface_ip4 $iface)
 			let try_times++
 		done
 	fi
@@ -1109,7 +1109,7 @@ setup_ip()
 	ip4=$(get_iface_ip4 $iface)
 	if [ -z "$ip4" ]; then
 		# I find the current code(get_iface_and_addr) only call this func for the last topo.
-		# So , at here, treat $iface belongs to last topo. 
+		# So , at here, treat $iface belongs to last topo.
 		# By liali.
 		last_topo=$(echo $TOPO | awk -F, '{print $NF}')
 		last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
@@ -1119,7 +1119,7 @@ setup_ip()
 		[ -z "$NAY" ] && { ip4=NULL; return 1; }
 		ip4="192.168.1.250/24"
 		brd="192.168.1.255"
-		
+
 		#newcode
 		if [ ${topo_contain_vlan} = yes ];then
 			ip4="192.168.${last_vlan_id}.250/24"
@@ -1143,7 +1143,7 @@ setup_ip()
 		if((0));then
 			echo $iface | grep -q 'vlan3\|\.3' && ip4="192.168.3.250/24"
 			echo $iface | grep -q 'vlan4\|\.4' && ip4="192.168.4.250/24"
-		
+
 			if i_am_server; then
 				ip4="192.168.1.251/24"
 				echo $iface | grep -q 'vlan3\|\.3' && ip4="192.168.3.251/24"
@@ -1155,7 +1155,7 @@ setup_ip()
 				echo $iface | grep -q 'vlan4\|\.4' && ip4="192.168.4.252/24"
 			fi
 		fi
-		
+
 		ip addr add $ip4 brd $brd dev $iface || let exitcode++
 	fi
 	return $exitcode
@@ -1199,7 +1199,7 @@ setup_ip6()
 	# manauly setup
 	if [ -z "$ip6" ]; then
 		# I find the current code(get_iface_and_addr) only call this func for the last topo.
-		# So , at here, treat $iface belongs to last topo. 
+		# So , at here, treat $iface belongs to last topo.
 		# By liali.
 		last_topo=$(echo $TOPO | awk -F, '{print $NF}')
 		last_vlan_id=$(echo $VLAN_ID | awk -F, '{print $NF}')
@@ -1358,7 +1358,7 @@ update_ip()
 		echo $pid | grep -e "\b[0-9]\+\b" >/dev/null && kill -9 $pid && wait $pid
 		sleep 1
 	done
-	
+
 	LOCAL_ADDR4=$(awk '/IP4/ {print $2}' /tmp/my_ip)
 	LOCAL_ADDR6=$(awk '/IP6/ {print $2}' /tmp/my_ip)
 	REMOTE_ADDR4=$(awk '/IP4/ {print $2}' /tmp/target_ip)
@@ -1513,8 +1513,8 @@ get_reachable_ips()
 	return $exitcode
 }
 
-# Function to obtain reachable target IP addresses on 192.168.1.0/24 subnet 
-# in case other methods fail.  Requires that there is a route available to the 
+# Function to obtain reachable target IP addresses on 192.168.1.0/24 subnet
+# in case other methods fail.  Requires that there is a route available to the
 # 192.168.1.0/24 subnet.
 # Usage: get_target_ip_addr
 get_target_ip_addr()

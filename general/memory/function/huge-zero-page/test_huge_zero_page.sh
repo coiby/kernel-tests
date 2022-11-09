@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Description 
+# Description
 #   This case measure the time cosumption of test_memcmp.c process on
 #   RHEL* system with Huge Zero Page on/off, it make judge the HZP
 #   function well or not from the results comparison.
@@ -16,7 +16,7 @@ HZP=-1
 
 # Value Config
 echo "MEM_TOTAL= $MEM_TOTAL"
-if [ $MEM_TOTAL -gt 8388608 ]; then 
+if [ $MEM_TOTAL -gt 8388608 ]; then
 {	MEM=8
 	NUM=9
 } elif [ $MEM_TOTAL -gt 4194304 ]; then
@@ -44,12 +44,12 @@ if [ -f "/sys/kernel/mm/transparent_hugepage/use_zero_page" ]; then
 	# - testing with use_zero_page disable
 	echo 0 >/sys/kernel/mm/transparent_hugepage/use_zero_page
 	(time -p taskset -c 0 ./test_memcmp $MEM) 2> memcmp0.log
-	TIME_ELAPSE0=`grep real memcmp0.log|awk '{print $2}'`	
+	TIME_ELAPSE0=`grep real memcmp0.log|awk '{print $2}'`
 	echo "TIME_ELAPSE0= $TIME_ELAPSE0"
 	# - testing with use_zero_page enable
 	echo 1 >/sys/kernel/mm/transparent_hugepage/use_zero_page
 	(time -p taskset -c 0 ./test_memcmp $MEM) 2> memcmp1.log
-	TIME_ELAPSE1=`grep real memcmp1.log|awk '{print $2}'`	
+	TIME_ELAPSE1=`grep real memcmp1.log|awk '{print $2}'`
 	echo "TIME_ELAPSE1= $TIME_ELAPSE1"
 
 	# Testing Clenup

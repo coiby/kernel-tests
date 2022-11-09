@@ -19,7 +19,7 @@ function runtest()
     insmod gettime/gettime.ko
     rmmod gettime/gettime.ko
 
-    grep "###" /var/log/messages >> $OUTPUTFILE 
+    grep "###" /var/log/messages >> $OUTPUTFILE
 
     if grep -q "test getnstimeofday() FAILED" /var/log/messages; then
         rstrnt-report-result $TEST "FAIL" 1

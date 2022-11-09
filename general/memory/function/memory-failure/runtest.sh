@@ -59,7 +59,7 @@ function test_setup()
 	pushd mce-inject &> /dev/null
 	make && make install || ret=4
 	popd
-	
+
 		[ ! $ret = 0 ] && return $ret
 
 		echo "Installing mcelog ..."

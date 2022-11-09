@@ -20,7 +20,7 @@
 FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
- 
+
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh     || exit 1
 . /usr/share/beakerlib/beakerlib.sh         || exit 1

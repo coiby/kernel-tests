@@ -79,7 +79,7 @@ rlJournalStart
 		fi
 		if [ -n "$reason" ]; then
 			report_result "Skipped$reason" PASS
-			rlPhaseEnd 
+			rlPhaseEnd
 			rlJournalPrintText
 			exit 0
 		fi

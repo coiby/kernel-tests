@@ -48,7 +48,7 @@ done
 		fi
 		((j++))
 	done
-	
+
 	for k in $(seq "$MINCPU" "$MAXCPUs")
 	do
 		tok "echo 1 > /sys/devices/system/cpu/cpu$k/online"

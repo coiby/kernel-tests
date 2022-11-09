@@ -3,7 +3,7 @@ function test_max_threads()
 {
     local setval=$1
     local tst_type=$2
-    
+
     if [[ $tst_type == min ]]; then
         echo $setval > /proc/sys/kernel/threads-max
         local tmp=$?
@@ -21,29 +21,29 @@ function test_max_threads()
 }
 
 function bz1771270()
-{   
+{
     local rh=$(uname -r | grep -Eo 'el[0-9]*' | grep -Eo '[0-9]*')
     local ver=$(uname -r | grep -Eo '\-[0-9]*.')
     local ker=${ver:1:len-1}
     local ori=$(cat /proc/sys/kernel/threads-max)
-    
+
     if ((rh == 7)); then
         test_max_threads 1 min
-        
+
         test_max_threads 2147483648 out
- 
+
         test_max_threads 2147483647 max
     elif ((ker < 163 && rh == 8)); then
         test_max_threads 1 out
-        
+
         test_max_threads 20 min
-        
+
         test_max_threads 1073741824 out
     elif (((ker >= 163 && rh == 8) || (rh > 8))); then
         test_max_threads 1 min
-        
+
         test_max_threads 1073741824 out
- 
+
         test_max_threads 1073741823 max
     else
         rlReport "bz1771270" WARN

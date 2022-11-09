@@ -270,7 +270,7 @@ do_vm_ssh_netperf()
 	local UDP_STREAMv6=0
 	local result=0
 	local log=""
-	
+
 	# IPv4
 	if [ -n "$ipv4" ]; then
 		vmsh ssh_run_cmd $vm "timeout 120s bash -c \"until ping -c3 $p_ipv4; do sleep 10; done\""

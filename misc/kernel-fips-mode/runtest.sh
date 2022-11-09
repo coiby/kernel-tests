@@ -37,7 +37,7 @@ rlJournalStart
 
         # SETUP.
         rlPhaseStartSetup
-        
+
             # Woraround for kernel hmac missing on CKI kernel.
             kernel="vmlinuz-$(uname -r)"
             if ! [ -s "/boot/.${kernel}.hmac" ]; then
@@ -102,7 +102,7 @@ rlJournalStart
         if [ -e "/boot/.${kernel}.hmac.backup" ]; then
             rlRun "mv /boot/.${kernel}.hmac.backup /boot/.${kernel}.hmac" 0
         fi
-        
+
         # Disable FIPS mode.
         rlRun "fips-mode-setup --disable" 0
 

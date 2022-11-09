@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2015 Red Hat, Inc. All rights reserved. This copyrighted material 
+# Copyright (c) 2015 Red Hat, Inc. All rights reserved. This copyrighted material
 # is made available to anyone wishing to use, modify, copy, or
 # redistribute it subject to the terms and conditions of the GNU General
 # Public License v.2.
@@ -13,7 +13,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# Jianwen Ji: <jiji@redhat.com> 
+# Jianwen Ji: <jiji@redhat.com>
 
 # include common  and Beaker environments
 . ../../../../cki_lib/libcki.sh || exit 1
@@ -41,7 +41,7 @@ rlPhaseEnd
 rlPhaseStartTest
     run "./api_tests" 0 "Done running API tests"
     grep 'FAILED' $OUTPUTFILE && rlReport $TEST FAIL || \
-        rlReport $TEST PASS 
+        rlReport $TEST PASS
     rstrnt-report-log -l $OUTPUTFILE
 rlPhaseEnd
 

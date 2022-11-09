@@ -20,12 +20,12 @@ function runtest() {
 
 	get_nvme_disk
 
-	partition_1_primary "$DISKS"	
+	partition_1_primary "$DISKS"
 
 	mq_num=$(nproc)
 
 for TEST_DISK in $TEST_DISKS; do
-	{	
+	{
 	Iozone_Multi_Process_Test "$TEST_DISK" "mq" "$mq_num"
 	if [ $? -ne 0 ]; then
 		tlog "FAIL: Iozone_6_Process_Test for $TEST_DISK failed"
@@ -36,7 +36,7 @@ done
 wait
 
 for TEST_DISK in $TEST_DISKS; do
-	{	
+	{
 	FIO_Device_Level_Test "$TEST_DISK" "mq" "$mq_num"
 	if [ $? -ne 0 ]; then
 		tlog "FAIL: FIO_Device_Level_Test for $TEST_DISK failed"
@@ -47,7 +47,7 @@ done
 wait
 
 for TEST_DISK in $TEST_DISKS; do
-	{	
+	{
 	DT_IO_Test_Device_Level "$TEST_DISK" "mq" "$mq_num"
 	if [ $? -ne 0 ]; then
 		tlog "FAIL: DT_IO_Test_Device_Level for $TEST_DISK failed"
@@ -58,7 +58,7 @@ done
 wait
 
 for TEST_DISK in $TEST_DISKS; do
-	{	
+	{
 	DT_IO_Test_File_Level "$TEST_DISK" "mq" "$mq_num"
 	if [ $? -ne 0 ]; then
 		tlog "FAIL: DT_IO_Test_File_Level for $TEST_DISK failed"

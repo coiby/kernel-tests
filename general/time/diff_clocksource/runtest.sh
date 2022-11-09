@@ -45,7 +45,7 @@ if [ $rhel_major -ge 8 ]; then
     systemctl start chronyd >& /dev/null
 else
     service ntpd stop >& /dev/null
-    runtest 
+    runtest
     service ntpd start >& /dev/null
 fi
 

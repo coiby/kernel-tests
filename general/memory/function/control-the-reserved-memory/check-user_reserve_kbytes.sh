@@ -26,7 +26,7 @@ if [ -f "/proc/sys/vm/user_reserve_kbytes" ]; then
 	# check the default valuse
 	if [ $USER_RESERVE_KBYTES -le 131072 ]; then
 		echo "user_reserve_kbytes = $USER_RESERVE_KBYTES"
-	else 
+	else
 		echo "user_reserve_kbytes = $USER_RESERVE_KBYTESL"
 		TEST_SUCCESS=false
 	fi

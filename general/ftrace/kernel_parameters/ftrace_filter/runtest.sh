@@ -26,7 +26,7 @@ rlJournalStart
         else
             FILTER=$(cat /sys/kernel/debug/tracing/available_filter_functions | grep do_fork | head -n 1)
         fi
-        #if [ $(arch) == "aarch64" ]; then 
+        #if [ $(arch) == "aarch64" ]; then
         #    FILTER="_do_fork"
         #fi
         REBOOT_FLAG=${FLAGDIR}/${FILTER}_reboot
@@ -39,11 +39,11 @@ rlJournalStart
                 # Setup and rebooted, now it's time for check
                 rlPhaseStartTest "Check ${KPARAM}=${FILTER}"
                     rlRun -l "cat /proc/cmdline"
-                    rlAssertEquals "Check ${KPARAM}" "$(cat /sys/kernel/debug/tracing/set_ftrace_filter)" "${FILTER}" 
+                    rlAssertEquals "Check ${KPARAM}" "$(cat /sys/kernel/debug/tracing/set_ftrace_filter)" "${FILTER}"
                     sleep 2
                     cat /sys/kernel/debug/tracing/trace > ${KPARAM}-${FILTER}.log
                     rlRun "cat /sys/kernel/debug/tracing/trace | grep -v '^#' | grep -v ${FILTER}" 1
-                    rlRun -l "cat /sys/kernel/debug/tracing/trace | grep -v '^#' | grep ${FILTER}" 
+                    rlRun -l "cat /sys/kernel/debug/tracing/trace | grep -v '^#' | grep ${FILTER}"
                 rlPhaseEnd
                 rlPhaseStartTest "Clean ${KPARAM}=${FILTER}"
                     rlRun "grubby --update-kernel /boot/vmlinuz-$(uname -r) --remove-args '${DEPPARAM} ${KPARAM}=${FILTER}'"

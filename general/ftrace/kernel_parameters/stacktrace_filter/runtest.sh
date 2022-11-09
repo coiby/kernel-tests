@@ -26,7 +26,7 @@ rlJournalStart
         else
             FILTER=$(cat /sys/kernel/debug/tracing/available_filter_functions | grep do_fork | head -n 1)
         fi
-        #if [ $(arch) == "aarch64" ]; then 
+        #if [ $(arch) == "aarch64" ]; then
         #    FILTER="_do_fork"
         #fi
         REBOOT_FLAG=${FLAGDIR}/${FILTER}_reboot
@@ -40,7 +40,7 @@ rlJournalStart
                 rlPhaseStartTest "Check ${KPARAM}=${FILTER}"
                     rlRun -l "cat /proc/cmdline"
                     rlAssertEquals "Check ${KPARAM}" "$(cat /proc/sys/kernel/stack_tracer_enabled)" "1"
-                    rlAssertEquals "Check ${KPARAM}" "$(cat /sys/kernel/debug/tracing/stack_trace_filter)" "${FILTER}" 
+                    rlAssertEquals "Check ${KPARAM}" "$(cat /sys/kernel/debug/tracing/stack_trace_filter)" "${FILTER}"
                     sleep 2
                     cat /sys/kernel/debug/tracing/stack_trace > ${KPARAM}.log
                     rlAssertGreater "At least one stacktrace line" "$(cat ${KPARAM}.log | tail -n +3 | grep -v '^#' | wc -l)" 1

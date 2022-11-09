@@ -16,7 +16,7 @@ declare -A test_pairs=(
 
 	[machine2]="hp-dl388g8-19.rhts.eng.pek2.redhat.com,hp-dl380g9-06.rhts.eng.pek2.redhat.com" [systype2]="machine,prototype" [driver2]="cxgb4,bnx2x" [model2]="Chelsio-T420-CR_Unified_Wire_Ethernet_Controller,Broadcom-NetXtreme_II_BCM57810_10_Gb"
 	[machine3]="hp-dl380g9-06.rhts.eng.pek2.redhat.com,dell-per730-20.rhts.eng.pek2.redhat.com" [systype3]="prototype,machine" [driver3]="bnx2x,cxgb4" [model3]="Broadcom-NetXtreme_II_BCM57810_10_Gb,Chelsio-T420-CR_Unified_Wire_Ethernet_Controller"
-	
+
 	[machine4]="hp-dl380g9-02.rhts.eng.pek2.redhat.com,hp-dl380pg8-05.rhts.eng.pek2.redhat.com" [systype4]="prototype,prototype" [driver4]="cxgb4,cxgb4" [model4]="Chelsio-T580-CR_Unified_Wire_Ethernet_Controller,Chelsio-T422-CR_Unified_Wire_Ethernet_Controller"
 	[machine5]="hp-dl380pg8-05.rhts.eng.pek2.redhat.com,hp-dl380g9-02.rhts.eng.pek2.redhat.com" [systype5]="prototype,prototype" [driver5]="cxgb4,cxgb4" [model5]="Chelsio-T422-CR_Unified_Wire_Ethernet_Controller,Chelsio-T580-CR_Unified_Wire_Ethernet_Controller"
 
@@ -93,4 +93,4 @@ for ((i=0; i<$((${#test_pairs[*]}/4)); i++)); do
 		fi
 	fi
 done
-	
+

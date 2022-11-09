@@ -34,7 +34,7 @@ function runtest()
     if [ $rhel_major -ge 9 ]; then
         dnf install -y realtime-tests stalld
     else
-        dnf install -y rt-tests 
+        dnf install -y rt-tests
         dnf install -y stalld
         if [ $? -ne 0 ] ; then
             echo "Unable to install stalld, RHEL version likely too low" | tee -a $OUTPUTFILE

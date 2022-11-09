@@ -1,7 +1,7 @@
 #!/bin/bash
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Description: 
+#   Description:
 #   Author: Ping Fang <pifang@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,7 +56,7 @@ function trace_buf_size()
 		return
 	fi
 	per_core_buf=$(($mem_early_B/$cpus))
-	
+
 	if [ $per_core_buf -gt 1048576 ]; then
 		per_core_buf=1048576
 	fi

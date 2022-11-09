@@ -73,7 +73,7 @@ function run_test()
         sd=`cat /proc/partitions |grep "$arr"|tail -1|awk '{print $4}'`
         device="/dev/$sd"
         echo "from parttion get"
-    else 
+    else
         device="/dev/$dev"1
         echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     fi
@@ -117,7 +117,7 @@ function run_test()
     rlRun "umount $device "
     if [ $? != 0 ];then
         echo "kill all"
-        kill -9 "$$" 
+        kill -9 "$$"
         killall dd
         umount $device
     fi

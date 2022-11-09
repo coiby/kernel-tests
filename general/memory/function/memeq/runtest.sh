@@ -32,12 +32,12 @@ function set_mem()
 	# For ppc64le on rhel-alt, 12G caused oom, system with 500G memory.
 	local szlist="12G"
 	local factor=12
-	
+
 	# https://beaker.engineering.redhat.com/jobs/2545298
 	# ibm-p9b-01.pnr.lab.eng.bos.redhat.com
 	hostname | grep p9b
 	[ $? = 0 ] && szlist="24G" && factor=24
-	
+
 	local comp=$((factor * 1024 * 1024 * 1024))
 	local nproc=$(nproc)
 	local inG
@@ -160,7 +160,7 @@ rlPhaseStartTest
 
 		rlRun "[ ${dmesg_total:-X} -le $(kilobytes $current) ]" $retval
 	fi
-					
+
 	if [ "$next" == "stop" ]; then
 		rlRun "grubby --update-kernel=DEFAULT --remove-args=mem"
 		if [ "$(uname -m)" = "s390x" ]; then

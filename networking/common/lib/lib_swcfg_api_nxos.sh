@@ -151,7 +151,7 @@ show run int $VAR_IFACE
 '
 
 # remove bonding master interface
-# 
+#
 # @PARAMETERS
 #   $VAR_BONDING_ID
 #

@@ -135,7 +135,7 @@ rlJournalStart
     grep CONFIG_PSI=y /boot/config-$(uname -r) && support=1 || support=0
     status=$(cat status)
 
-    if [ $support -eq 1 -a $status -eq 0 ]; then 
+    if [ $support -eq 1 -a $status -eq 0 ]; then
         rlLogInfo "Set PSI"
         rlRun "grubby --args='psi=1 cgroup_no_v1=all' --update-kernel=$DEFAULT_KERNEL" 0 "Add kernel boot options: psi=1, cgroup_no_v1=all"
         s390_zipl
@@ -161,7 +161,7 @@ rlJournalStart
         rlRun "rm -rf /mnt/cgroup2/" 0 "remove mount point"
         rlLogInfo "Clean up Finished"
         echo 3 > status
-        rlRun "rhts-reboot" 0 "Reboot to clean cgroup"  
+        rlRun "rhts-reboot" 0 "Reboot to clean cgroup"
     elif [ $support -eq 1 -a $status -eq 3 ]; then
         rlReport "PSI test finised." "PASS"
     elif [ $support -eq 0 ]; then

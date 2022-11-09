@@ -13,7 +13,7 @@ function timeZone ()
 {
     ZONE=`echo $1 | sed 's/\(.*\)\/\(.*\)/\2/g'`
 
-    echo "Setting the Time Zone $ZONE" | tee -a  $OUTPUTFILE 
+    echo "Setting the Time Zone $ZONE" | tee -a  $OUTPUTFILE
 
     /bin/cp $1 /etc/localtime
 

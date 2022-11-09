@@ -33,14 +33,14 @@ rlJournalStart
 		rlAssertRpm "device-mapper" || exit 1
 		export LC_MESSAGES="en_US.UTF-8"
 	rlPhaseEnd
-	
+
 	rlPhaseStartTest
 		rlRun "./using_unassigned_loop_device.sh" 0 "Executing reproducer"
 		if [ $? -eq 2 ]; then
 			rlLogWarning "Failed without reproducing the problem: Unexpected Error occured"
 		fi
 	rlPhaseEnd
-	
+
 	rlPhaseStartCleanup
 	rlPhaseEnd
 rlJournalPrintText

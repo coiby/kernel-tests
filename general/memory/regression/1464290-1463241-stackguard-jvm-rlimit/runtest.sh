@@ -49,7 +49,7 @@ rlJournalStart
         if stat /run/ostree-booted > /dev/null 2>&1; then
             rpm-ostree install -A --idempotent --allow-inactive java-${java_version}-openjdk java-${java_version}-openjdk-devel
         else
-            yum install -y java-${java_version}-openjdk java-${java_version}-openjdk-devel 
+            yum install -y java-${java_version}-openjdk java-${java_version}-openjdk-devel
         fi
 
         if [ $? != "0" ]; then

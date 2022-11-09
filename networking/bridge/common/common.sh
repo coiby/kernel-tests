@@ -23,7 +23,7 @@ log()
         echo "$@" | tee -a $OUTPUTFILE
 }
 
-br_setup() 
+br_setup()
 {
         br=${1:-br0}
         ETH_1=${2:-eth0}

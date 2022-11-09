@@ -43,7 +43,7 @@ get_systeminfo(){
 	echo "########pidstat#############"
 	pidstat
 	echo ""
-	echo ""	
+	echo ""
 	echo "########lscpu##############"
 	lscpu
 	echo ""

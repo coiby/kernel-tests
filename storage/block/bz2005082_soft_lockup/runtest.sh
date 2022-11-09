@@ -46,7 +46,7 @@ function run_test()
             --numjobs=64 --iodepth=1 --rw=randread --blocksize=512k \
             --time_based=1  --runtime=200 --direct=1"
     sleep 2
-    rmmod scsi_debug -f > /dev/null 2>&1    
+    rmmod scsi_debug -f > /dev/null 2>&1
 }
 
 function check_log()

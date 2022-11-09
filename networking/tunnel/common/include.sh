@@ -293,7 +293,7 @@ netns_3c_cleanup()
 
 
 
-which socat || ${yum} install socat -y 
+which socat || ${yum} install socat -y
 pushd $NIC_COMMON_DIR
 for file in *.sh
 do

@@ -331,7 +331,7 @@ sriov_test_bz2055446_no_arp_reply()
 		rlRun "ip netns exec bz2055446_ns1 ip add add 172.3.$ipaddr.211/24 dev br0.3"
 		sync_wait server SERVER_DONE
 		#check vf connection
-		rlRun "ip netns exec bz2055446_ns1 ping -c 5 172.3.$ipaddr.212"  
+		rlRun "ip netns exec bz2055446_ns1 ping -c 5 172.3.$ipaddr.212"
 		rlRun "ip link set $nic_test vf 0 spoofchk off"
 		#check vf connection with spoofchk off
 				rlRun "ip netns exec bz2055446_ns1 ping -c 5 172.3.$ipaddr.212"

@@ -86,10 +86,10 @@ gcc -o time time.c
 if (type systemctl); then
     systemctl stop chronyd
     runtest
-    systemctl start chronyd 
+    systemctl start chronyd
 else
     service ntpd stop > /dev/null 2>&1
-    runtest 
+    runtest
     service ntpd start > /dev/null 2>&1
 fi
 

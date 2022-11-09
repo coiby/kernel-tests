@@ -35,7 +35,7 @@ function runtest ()
 }
 
 # compile
-gcc -o hrtimer hrtimer.c 
+gcc -o hrtimer hrtimer.c
 gcc -o leap_second leap_second.c
 gcc -o check_hrtimer_exprie_ontime check_hrtimer_exprie_ontime.c -pthread -lrt
 

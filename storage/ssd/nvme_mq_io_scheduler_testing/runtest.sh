@@ -74,7 +74,7 @@ function runtest() {
 
 	get_nvme_disk
 
-	partition_1_primary "$DISKS"	
+	partition_1_primary "$DISKS"
 
 	local mq_num=$(nproc)
 	tlog "Will set mq_num=$mq_num during IO test"

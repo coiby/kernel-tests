@@ -11,7 +11,7 @@ rlJournalStart
             rlRun "echo ${CLOCK//[\[\]]} > /sys/kernel/debug/tracing/trace_clock"
             ls &> /dev/null
             rlRun "cat /sys/kernel/debug/tracing/trace_clock | grep '[${CLOCK//[\[\]]}]'"
-            #rlAssertEquals "Check current tracer" "$(cat /sys/kernel/debug/tracing/trace_clock)" "[${CLOCK//[\[\]]}]" 
+            #rlAssertEquals "Check current tracer" "$(cat /sys/kernel/debug/tracing/trace_clock)" "[${CLOCK//[\[\]]}]"
             rlRun "echo 0 > /sys/kernel/debug/tracing/tracing_on"
             rlRun "echo > /sys/kernel/debug/tracing/trace"
         rlPhaseEnd

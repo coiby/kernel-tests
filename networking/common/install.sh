@@ -195,7 +195,7 @@ lksctp-tools_install()
 	fi
 	git clone https://github.com/sctp/lksctp-tools
 	pushd lksctp-tools
-	# An interim workaround, will remove this after upstream fix 
+	# An interim workaround, will remove this after upstream fix
 	# https://github.com/sctp/lksctp-tools/issues/24
 	[ -f src/include/linux/sctp.h ] && git checkout 3c8bd0d26b64611c690f33f5802c734b0642c1d8
 	./bootstrap && ./configure && make && make install
@@ -249,11 +249,11 @@ scapy_install()
 			git checkout v2.4.4
 		fi
 	fi
-	
+
 	# create /usr/local/lib/python3.6/site-packages/ directory if it doesn't exist
 	# to avoid installation failures with RHEL-8.2
 	if [[ ! -d /usr/local/lib/python3.6/site-packages/ ]]; then mkdir -p /usr/local/lib/python3.6/site-packages/; fi
-	
+
 	if /usr/libexec/platform-python -V &> /dev/null; then
 		/usr/libexec/platform-python ./setup.py install
 	elif python3 -V &> /dev/null ; then
@@ -307,7 +307,7 @@ netperf_install()
 #	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
 	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-bj.usersys.redhat.com/share/tools/netperf-20210121.tar.bz2"}
 	fi
-	
+
 	pushd ${NETWORK_COMMONLIB_DIR} 1>/dev/null
 	wget -nv -N $SRC_NETPERF
 	tar xjvf $(basename $SRC_NETPERF)

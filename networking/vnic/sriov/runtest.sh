@@ -286,8 +286,8 @@ sriov_config_vm_repo()
 [beaker-tasks]
 name=beaker-tasks
 baseurl=http://beaker.engineering.redhat.com/rpms
-enabled=1 
-gpgcheck=0 
+enabled=1
+gpgcheck=0
 EOF"
 
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/beaker-harness.repo"
@@ -822,7 +822,7 @@ sriov_test_pf_remote()
 
 sriov_test_pf_remote_jumbo()
 {
-	$dbg_flag   
+	$dbg_flag
 	log_header "PF($nic_test) <---> REMOTE JUMBO" $result_file $result_file
 
 	local result=0
@@ -837,7 +837,7 @@ sriov_test_pf_remote_jumbo()
 
 		sync_set client test_pf_remote_start
 		sync_wait client test_pf_remote_end
-		
+
 		ip link set mtu 1500 dev $nic_test
 		ip addr flush $nic_test
 	else
@@ -871,7 +871,7 @@ sriov_test_pf_remote_jumbo()
 
 sriov_test_pf_vlan_remote()
 {
-	$dbg_flag   
+	$dbg_flag
 	log_header "PF VLAN($nic_test.$vid) <---> REMOTE" $result_file
 
 	local result=0
@@ -925,7 +925,7 @@ sriov_test_pf_vlan_remote()
 
 sriov_test_vf_remote()
 {
-	$dbg_flag   
+	$dbg_flag
 	log_header "VF <---> REMOTE" $result_file
 
 	local result=0
@@ -1158,7 +1158,7 @@ sriov_test_vf_remote_jumbo()
 
 sriov_test_vf_vlan_remote()
 {
-	$dbg_flag   
+	$dbg_flag
 	log_header "VF VLAN <---> REMOTE" $result_file
 
 	local result=0
@@ -1309,7 +1309,7 @@ sriov_test_vmvf1vf2_same_pf_remote()
 			return 1
 		fi
 
-		if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac1 || 
+		if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac1 ||
 			! sriov_attach_vf_to_vm $nic_test 0 2 $vm1 $mac2; then
 			result=1
 		else
@@ -1630,7 +1630,7 @@ sriov_test_vmvf_vlan_remote_jumbo()
 			sync_set server test_vmvf_vlan_remote_jumbo_end
 			return 1
 		fi
-		
+
 		ip link set mtu 9000 $nic_test || result=1
 
 		local cmd=(
@@ -1763,7 +1763,7 @@ sriov_test_pf_vmvf()
 		sync_set server test_pf_vmvf_end
 		return 1
 	fi
-	
+
 	#ensure netserver is running
 	local cmd=(
 		{iptables -F}
@@ -2252,7 +2252,7 @@ sriov_test_vmvf_bond_remote()
 sriov_test_vmvf1vf2_remote()
 {
 	log_header "sriov_test_vmvf1vf2_remote" $result_file
-	
+
 	local result=0
 	local test_name=sriov_test_vmvf1vf2_remote
 	local server_ip4="192.100.${ipaddr}.1"
@@ -2266,7 +2266,7 @@ sriov_test_vmvf1vf2_remote()
 	local pf2_ip4="192.101.${ipaddr}.1"
 
 	ip link set $nic_test up
-	
+
 	if i_am_server;then
 
 		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
@@ -2294,7 +2294,7 @@ sriov_test_vmvf1vf2_remote()
 		local test_iface="$(get_test_nic ${NIC_NUM})"
 	fi
 
-	if [ $? -ne 0 ];then 
+	if [ $? -ne 0 ];then
 		echo "$test_name get required_iface failed."
 		sync_set server ${test_name}_end
 		return 1
@@ -2315,7 +2315,7 @@ sriov_test_vmvf1vf2_remote()
 	local mac1="00:de:a1:$(printf %02x $ipaddr):11:01"
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
-	if ! sriov_create_vfs $iface1 0 2 || 
+	if ! sriov_create_vfs $iface1 0 2 ||
 		! sriov_create_vfs $iface2 0 2; then
 			echo "${test_name} failed:create vfs failed."
 			sriov_remove_vfs $iface1 0
@@ -2384,7 +2384,7 @@ sriov_test_vmvf1vf2_remote()
 
 	ping ${server_ip4} -c 5
 	[ $? -ne 0 ] && { result=1;echo "ipv4 forward failed"; }
-	
+
 	ip addr flush $iface2
 
 	# clearnup
@@ -2407,7 +2407,7 @@ sriov_test_vmvf1vf2_remote()
 sriov_test_vmvf1_vmvf2_remote()
 {
 	log_header "sriov_test_vmvf1_vmvf2_remote" $result_file
-	
+
 	local result=0
 	local test_name=sriov_test_vmvf1_vmvf2_remote
 	local server_ip4="192.100.${ipaddr}.1"
@@ -2420,7 +2420,7 @@ sriov_test_vmvf1_vmvf2_remote()
 	local ip6_mask_len=64
 
 	ip link set $nic_test up
-	
+
 	if i_am_server;then
 
 		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
@@ -2447,7 +2447,7 @@ sriov_test_vmvf1_vmvf2_remote()
 		local test_iface="$(get_test_nic ${NIC_NUM})"
 	fi
 
-	if [ $? -ne 0 ];then 
+	if [ $? -ne 0 ];then
 		echo "$test_name get required_iface failed."
 		sync_set server ${test_name}_end
 		return 1
@@ -2461,7 +2461,7 @@ sriov_test_vmvf1_vmvf2_remote()
 	local mac1="00:de:a1:$(printf %02x $ipaddr):11:01"
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
-	if ! sriov_create_vfs $iface1 0 2 || 
+	if ! sriov_create_vfs $iface1 0 2 ||
 		! sriov_create_vfs $iface2 0 2; then
 		echo "${test_name} failed:create vfs failed."
 		sriov_remove_vfs $iface1 0
@@ -2573,9 +2573,9 @@ sriov_test_vmvf1_vmvf2_vlan_remote()
 	local vlan_id=3
 
 	ip link set $nic_test up
-	
+
 	if i_am_server;then
-		
+
 		ip link add link $nic_test name ${nic_test}.$vlan_id type vlan id $vlan_id
 		ip link set ${nic_test}.$vlan_id up
 		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}.$vlan_id
@@ -2603,7 +2603,7 @@ sriov_test_vmvf1_vmvf2_vlan_remote()
 		local test_iface="$(get_test_nic ${NIC_NUM})"
 	fi
 
-	if [ $? -ne 0 ];then 
+	if [ $? -ne 0 ];then
 		echo "$test_name get required_iface failed."
 		sync_set server ${test_name}_end
 		return 1
@@ -2617,7 +2617,7 @@ sriov_test_vmvf1_vmvf2_vlan_remote()
 	local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 	local mac2="00:de:ad:$(printf %02x $ipaddr):02:01"
 
-	if ! sriov_create_vfs $iface1 0 2 || 
+	if ! sriov_create_vfs $iface1 0 2 ||
 		! sriov_create_vfs $iface2 0 2; then
 		echo "${test_name} failed:create vfs failed."
 		sriov_remove_vfs $iface1 0
@@ -2697,7 +2697,7 @@ sriov_test_vmvf1_vmvf2_vlan_remote()
 		result=1
 		echo "do_vm_netperf vm2 vm1 failed."
 	fi
-	
+
 
 	# clearnup
 	sriov_detach_vf_from_vm $iface1 0 1 $vm1
@@ -2854,7 +2854,7 @@ sriov_test_max_vfs()
 sriov_test_max_vfs_attaching_to_different_vms()
 {
 	log_header "sriov_test_max_vfs_attaching_to_different_vms" $result_file
-	
+
 	local result=0
 	local test_name="sriov_test_max_vfs_attaching_to_different_vms"
 	local server_ip4="192.100.${ipaddr}.250"
@@ -2865,7 +2865,7 @@ sriov_test_max_vfs_attaching_to_different_vms()
 	local ip6_mask_len=64
 
 	ip link set $nic_test up
-	
+
 	if i_am_server;then
 
 		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
@@ -2915,10 +2915,10 @@ sriov_test_max_vfs_attaching_to_different_vms()
 
 			local vm_num=8
 			[ $total_vfs -lt $vm_num ] && vm_num=$total_vfs
-			
+
 			#install VMs
 			for((i=1;i<=$vm_num;i++))
-			do	
+			do
 				local vmname=${vmname_perfix}$i
 
 				if virsh list | grep "$vmname " ||
@@ -3010,7 +3010,7 @@ sriov_test_max_vfs_attaching_to_different_vms()
 
 			vm_mac_perfix="00:de:ad:$(printf %02x $ipaddr):01:"
 
-			#vm_num=$(virsh list | grep "testvm" | wc -l) 
+			#vm_num=$(virsh list | grep "testvm" | wc -l)
 
 			let vfs_p=$total_vfs/$vm_num
 			rlLog "vfs num on each vm $vfs_p"
@@ -3057,7 +3057,7 @@ sriov_test_max_vfs_attaching_to_different_vms()
 					fi
 				done
 			done
-			
+
 			sleep 130
 
 			for((i=1;i<=$vm_num;i++))
@@ -3170,7 +3170,7 @@ sriov_test_bz1701191()
 sriov_test_bz1392128()
 {
 	log_header "sriov_test_bz1392128" $result_file
-	
+
 	local result=0
 	local test_name="sriov_test_bz1392128"
 	local server_ip4="192.100.${ipaddr}.1"
@@ -3185,7 +3185,7 @@ sriov_test_bz1392128()
 	local count_vm2=0
 
 	ip link set $nic_test up
-	
+
 	if i_am_server;then
 
 		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
@@ -3213,7 +3213,7 @@ sriov_test_bz1392128()
 		else
 			local vm1_mac_perfix="00:de:ad:$(printf %02x $ipaddr):01:"
 			local vm2_mac_perfix="00:de:ad:$(printf %02x $ipaddr):02:"
-		
+
 			local vm1_attach_vf_nums=$((total_vfs/2))
 
 			sleep 30
@@ -3285,8 +3285,8 @@ sriov_test_bz1392128()
 					sriov_detach_vf_from_vm $nic_test 0 $i $vm2
 				fi
 			done
-			
-			
+
+
 			#for((i=1;i<=$vm1_attach_vf_nums;i++))
 			#do
 			#	sriov_detach_vf_from_vm $nic_test 0 $i $vm1
@@ -3386,7 +3386,7 @@ sriov_test_bz1145063()
 
 		sync_set client test_bz1145063_start
 		sync_wait client test_bz1145063_end
-		
+
 		ip link set mtu 1500 dev $nic_test
 		ip addr flush $nic_test
 
@@ -3571,7 +3571,7 @@ sriov_test_bz1794812_excessive_interrupts()
 #reproducer for bz2041318
 sriov_test_vf_trust_broadcast()
 {
-	$dbg_flag   
+	$dbg_flag
 	log_header "VF <---> REMOTE" $result_file
 
 	local result=0
@@ -4196,7 +4196,7 @@ sriov_test_trusted_vf_override_macaddr_via_bonding()
 	local testname=trusted_vf_override_macaddr_via_bonding
 
 	if i_am_server;then
-		
+
 		ip addr add 172.10.${ipaddr}.2/24 dev $nic_test
 		sync_set client ${testname}_start
 		sync_wait client ${testname}_end
@@ -4257,7 +4257,7 @@ sriov_test_trusted_vf_override_macaddr_via_bonding()
 						fi
 					fi
 				fi
-				
+
 				vmsh run_cmd $vm1 "modprobe -rv bonding"
 				sriov_detach_vf_from_vm $nic_test 0 1 $vm1
 				sriov_detach_vf_from_vm $nic_test 0 2 $vm1
@@ -4642,15 +4642,15 @@ sriov_test_bond_failovermac0_common() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
 		iface1=$(echo $test_iface | awk '{print $1}')
 		iface2=$(echo $test_iface | awk '{print $2}')
 		rlLog "test_ifaces:$iface1,$iface2"
-		
-		#cxgb4 is different with other NICs when create VFs	
+
+		#cxgb4 is different with other NICs when create VFs
 		if [ "$NIC_DRIVER" = "cxgb4" ];then
 			if ! sriov_create_vfs $iface1 0 1 || \
 				! sriov_create_vfs $iface2 1 1;then
@@ -4670,7 +4670,7 @@ sriov_test_bond_failovermac0_common() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -4689,8 +4689,8 @@ sriov_test_bond_failovermac0_common() {
 				rlFail "${test_name} failed: can't attach vf to vm."
 			fi
 		fi
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -4750,16 +4750,16 @@ sriov_test_bond_failovermac0_common() {
 			if [ $? -ne 0 ]; then
 			let result++
 				rlFail "failed: failover time is too long"
-			fi 
+			fi
 		ip addr del 192.100.1.2/24 dev $iface1
 		sync_set server ${test_name}_end_feedback_result
 		local cmd=(
-				
+
 			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{\[ \$\(cat /tmp/bondmac\) = \$NIC_TEST1_MAC \] \&\& \[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -4845,7 +4845,7 @@ sriov_test_bond_failovermac0_mlx4en_dualport() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -4864,7 +4864,7 @@ sriov_test_bond_failovermac0_mlx4en_dualport() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 0 trust on
@@ -4937,16 +4937,16 @@ sriov_test_bond_failovermac0_mlx4en_dualport() {
 			if [ $? -ne 0 ]; then
 			let result++
 				rlFail "failed: failover time is too long"
-			fi 
+			fi
 		ip addr del 192.100.1.2/24 dev $iface1
 		sync_set server ${test_name}_end_feedback_result
 		local cmd=(
-				
+
 			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{\[ \$\(cat /tmp/bondmac\) = \$NIC_TEST1_MAC \] \&\& \[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -4989,7 +4989,7 @@ sriov_test_bond_failovermac0_vlan_common() {
 	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
 	local ip4_mask_len=24
 	local ip6_mask_len=64
-	
+
 	local vlan_id=3
 
 	if i_am_server;then
@@ -5034,7 +5034,7 @@ sriov_test_bond_failovermac0_vlan_common() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -5063,7 +5063,7 @@ sriov_test_bond_failovermac0_vlan_common() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -5083,8 +5083,8 @@ sriov_test_bond_failovermac0_vlan_common() {
 			fi
 		fi
 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -5120,7 +5120,7 @@ sriov_test_bond_failovermac0_vlan_common() {
 			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
 			{ip addr show}
 			{ping ${server_vlanif_ip4} -c3}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -5164,12 +5164,12 @@ sriov_test_bond_failovermac0_vlan_common() {
 		fi
 
 		local cmd=(
-								
+
 			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{\[ \$\(cat /tmp/bondmac\) = \$NIC_TEST1_MAC \] \&\& \[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -5181,8 +5181,8 @@ sriov_test_bond_failovermac0_vlan_common() {
 		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
 		#	let result++
 		#fi
-		
-					
+
+
 		local cmd=(
 			{ip link del bond0\.${vlan_id}}
 			{ip link del bond0}
@@ -5230,7 +5230,7 @@ sriov_test_bond_failovermac0_vlan_mlx4en_dualport() {
 	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
 	local ip4_mask_len=24
 	local ip6_mask_len=64
-	
+
 	local vlan_id=3
 
 	if i_am_server;then
@@ -5274,7 +5274,7 @@ sriov_test_bond_failovermac0_vlan_mlx4en_dualport() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -5293,7 +5293,7 @@ sriov_test_bond_failovermac0_vlan_mlx4en_dualport() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 0 trust on
@@ -5344,7 +5344,7 @@ sriov_test_bond_failovermac0_vlan_mlx4en_dualport() {
 			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
 			{ip addr show}
 			{ping ${server_vlanif_ip4} -c3}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -5387,12 +5387,12 @@ sriov_test_bond_failovermac0_vlan_mlx4en_dualport() {
 		fi
 
 		local cmd=(
-								
+
 			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{\[ \$\(cat /tmp/bondmac\) = \$NIC_TEST1_MAC \] \&\& \[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -5404,8 +5404,8 @@ sriov_test_bond_failovermac0_vlan_mlx4en_dualport() {
 		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
 		#	let result++
 		#fi
-		
-					
+
+
 		local cmd=(
 			{ip link del bond0\.${vlan_id}}
 			{ip link del bond0}
@@ -5465,7 +5465,7 @@ sriov_test_bond_failovermac1_common() {
 
 		sync_wait client ${test_name}_end
 		ip addr flush dev $nic_test
-		
+
 	else
 		sync_wait server ${test_name}_start
 		OLD_NIC_NUM=$NIC_NUM
@@ -5479,7 +5479,7 @@ sriov_test_bond_failovermac1_common() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -5508,7 +5508,7 @@ sriov_test_bond_failovermac1_common() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -5528,8 +5528,8 @@ sriov_test_bond_failovermac1_common() {
 			fi
 		fi
 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -5604,7 +5604,7 @@ sriov_test_bond_failovermac1_common() {
 			{echo \$BOND_MAC \| tee /tmp/bondmac}
 			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
 
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -5628,7 +5628,7 @@ sriov_test_bond_failovermac1_common() {
 		fi
 		ip addr flush $iface1
 		ip addr flush $iface2
-	
+
 		NIC_NUM=$OLD_NIC_NUM
 		NIC_DRIVER=$OLD_NIC_DRIVER
 		NIC_MODEL=$OLD_NIC_MODEL
@@ -5679,7 +5679,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 
 		sync_wait client ${test_name}_end
 		ip addr flush dev $nic_test
-		
+
 	else
 		sync_wait server ${test_name}_start
 		OLD_NIC_NUM=$NIC_NUM
@@ -5693,7 +5693,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -5722,7 +5722,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -5742,8 +5742,8 @@ sriov_test_bond_failovermac1_pf_down_common() {
 			fi
 		fi
 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -5771,7 +5771,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 		if [ $? -ne 0 ];then
 			rlFail "${test_name} failed: mac addr check failed"
 			let result++
-		fi	
+		fi
 		local cmd=(
 			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
 			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
@@ -5810,7 +5810,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 		#link down the related PF
 		ip link set $PF_DOWN down
 		ip link show $PF_DOWN
-		
+
 		local cmd=(
 			# increase interval time
 			{sleep 300}
@@ -5842,7 +5842,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
 			{ip addr show}
 
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -5866,7 +5866,7 @@ sriov_test_bond_failovermac1_pf_down_common() {
 		fi
 		ip addr flush $iface1
 		ip addr flush $iface2
-	
+
 		NIC_NUM=$OLD_NIC_NUM
 		NIC_DRIVER=$OLD_NIC_DRIVER
 		NIC_MODEL=$OLD_NIC_MODEL
@@ -5914,7 +5914,7 @@ sriov_test_bond_failovermac1_mlx4en_dualport() {
 
 		sync_wait client ${test_name}_end
 		ip addr flush dev $nic_test
-		
+
 	else
 		sync_wait server ${test_name}_start
 		OLD_NIC_NUM=$NIC_NUM
@@ -5928,7 +5928,7 @@ sriov_test_bond_failovermac1_mlx4en_dualport() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -5947,7 +5947,7 @@ sriov_test_bond_failovermac1_mlx4en_dualport() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 0 trust on
@@ -6035,7 +6035,7 @@ sriov_test_bond_failovermac1_mlx4en_dualport() {
 			{echo \$BOND_MAC \| tee /tmp/bondmac}
 			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
 
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -6080,7 +6080,7 @@ sriov_test_bond_failovermac1_vlan_common() {
 	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
 	local ip4_mask_len=24
 	local ip6_mask_len=64
-	
+
 	local vlan_id=3
 
 	if i_am_server;then
@@ -6126,7 +6126,7 @@ sriov_test_bond_failovermac1_vlan_common() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -6155,7 +6155,7 @@ sriov_test_bond_failovermac1_vlan_common() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -6175,8 +6175,8 @@ sriov_test_bond_failovermac1_vlan_common() {
 			fi
 		fi
 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 		local cmd=(
@@ -6262,8 +6262,8 @@ sriov_test_bond_failovermac1_vlan_common() {
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{echo \$BOND_MAC \| tee /tmp/bondmac}
 			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-							
-		)	
+
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -6281,7 +6281,7 @@ sriov_test_bond_failovermac1_vlan_common() {
 			{modprobe -r bonding}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-		
+
 		if [ "$NIC_DRIVER" = "cxgb4" ];then
 			sriov_detach_vf_from_vm $iface1 0 1 $vm1
 			sriov_detach_vf_from_vm $iface2 1 1 $vm1
@@ -6324,7 +6324,7 @@ sriov_test_bond_failovermac1_vlan_mlx4en_dualport() {
 	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
 	local ip4_mask_len=24
 	local ip6_mask_len=64
-	
+
 	local vlan_id=3
 
 	if i_am_server;then
@@ -6369,7 +6369,7 @@ sriov_test_bond_failovermac1_vlan_mlx4en_dualport() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -6388,7 +6388,7 @@ sriov_test_bond_failovermac1_vlan_mlx4en_dualport() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 0 trust on
@@ -6488,8 +6488,8 @@ sriov_test_bond_failovermac1_vlan_mlx4en_dualport() {
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{echo \$BOND_MAC \| tee /tmp/bondmac}
 			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-							
-		)	
+
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -6507,7 +6507,7 @@ sriov_test_bond_failovermac1_vlan_mlx4en_dualport() {
 			{modprobe -r bonding}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-		
+
 		sriov_detach_vf_from_vm $iface1 0 1 $vm1
 		sriov_remove_vfs $iface1 0
 		ip addr flush $iface1
@@ -6576,7 +6576,7 @@ sriov_test_bond_failovermac2_common() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -6605,7 +6605,7 @@ sriov_test_bond_failovermac2_common() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -6625,8 +6625,8 @@ sriov_test_bond_failovermac2_common() {
 			fi
 		fi
 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 		local cmd=(
@@ -6703,7 +6703,7 @@ sriov_test_bond_failovermac2_common() {
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
 			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -6714,7 +6714,7 @@ sriov_test_bond_failovermac2_common() {
 			{modprobe -r bonding}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-		
+
 		if [ "$NIC_DRIVER" = "cxgb4" ];then
 			sriov_detach_vf_from_vm $iface1 0 1 $vm1
 			sriov_detach_vf_from_vm $iface2 1 1 $vm1
@@ -6821,7 +6821,7 @@ sriov_test_bond_failovermac2_swport_down_common() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -6843,7 +6843,7 @@ sriov_test_bond_failovermac2_swport_down_common() {
 		get_iface_sw_port $iface1 sw p1 k || { rlFail "failed:get_iface_sw_port failed";let exitcode++; }
 		get_iface_sw_port $iface2 sw p2 k || { rlFail "failed:get_iface_sw_port failed";let exitcode++; }
 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
 		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 # after add port to bond, active slave mac will change to bond mac
 #		4: enp6s0: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc mq master bond0 state UP group default qlen 1000
@@ -6955,7 +6955,7 @@ sriov_test_bond_failovermac2_swport_down_common() {
 		local cmd=(
 			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
 			{\[ \$ACTIVE_SLAVE = \$\(cat /tmp/backupslave\) \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -6969,7 +6969,7 @@ sriov_test_bond_failovermac2_swport_down_common() {
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
 			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -6980,7 +6980,7 @@ sriov_test_bond_failovermac2_swport_down_common() {
 			{modprobe -r bonding}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-		
+
 		if [ "$NIC_DRIVER" = "cxgb4" ];then
 			sriov_detach_vf_from_vm $iface1 0 1 $vm1
 			sriov_detach_vf_from_vm $iface2 1 1 $vm1
@@ -7058,7 +7058,7 @@ sriov_test_bond_failovermac2_mlx4en_dualport() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -7077,7 +7077,7 @@ sriov_test_bond_failovermac2_mlx4en_dualport() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 0 trust on
@@ -7136,7 +7136,7 @@ sriov_test_bond_failovermac2_mlx4en_dualport() {
 			let result++
 			rlFail "${test_name} failed: ping failed via bond0"
 		fi
-		
+
 		sync_wait server ${test_name}_start_send_packet
 		local cmd=(
 			# increase interval time
@@ -7169,7 +7169,7 @@ sriov_test_bond_failovermac2_mlx4en_dualport() {
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
 			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -7180,7 +7180,7 @@ sriov_test_bond_failovermac2_mlx4en_dualport() {
 			{modprobe -r bonding}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-		
+
 		sriov_detach_vf_from_vm $iface1 0 1 $vm1
 		sriov_remove_vfs $iface1 0
 		ip addr flush $iface1
@@ -7215,7 +7215,7 @@ sriov_test_bond_failovermac2_vlan_common() {
 	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
 	local ip4_mask_len=24
 	local ip6_mask_len=64
-	
+
 	local vlan_id=3
 
 	if i_am_server;then
@@ -7260,7 +7260,7 @@ sriov_test_bond_failovermac2_vlan_common() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -7289,7 +7289,7 @@ sriov_test_bond_failovermac2_vlan_common() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -7309,8 +7309,8 @@ sriov_test_bond_failovermac2_vlan_common() {
 			fi
 		fi
 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -7405,7 +7405,7 @@ sriov_test_bond_failovermac2_vlan_common() {
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
 			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -7423,7 +7423,7 @@ sriov_test_bond_failovermac2_vlan_common() {
 			{modprobe -r bonding}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-	
+
 		if [ "$NIC_DRIVER" = "cxgb4" ];then
 			sriov_detach_vf_from_vm $iface1 0 1 $vm1
 			sriov_detach_vf_from_vm $iface2 1 1 $vm1
@@ -7466,7 +7466,7 @@ sriov_test_bond_failovermac2_vlan_mlx4en_dualport() {
 	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
 	local ip4_mask_len=24
 	local ip6_mask_len=64
-	
+
 	local vlan_id=3
 
 	if i_am_server;then
@@ -7510,7 +7510,7 @@ sriov_test_bond_failovermac2_vlan_mlx4en_dualport() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -7529,7 +7529,7 @@ sriov_test_bond_failovermac2_vlan_mlx4en_dualport() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -7638,7 +7638,7 @@ sriov_test_bond_failovermac2_vlan_mlx4en_dualport() {
 			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
 			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
 			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)	
+		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		if [ $? -ne 0 ];then
 			let result++
@@ -7656,7 +7656,7 @@ sriov_test_bond_failovermac2_vlan_mlx4en_dualport() {
 			{modprobe -r bonding}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-	
+
 		sriov_detach_vf_from_vm $iface1 0 1 $vm1
 		sriov_remove_vfs $iface1 0
 		ip addr flush $iface1
@@ -7684,7 +7684,7 @@ sriov_test_vmvf_different_vlan()
 
 		ip link set $nic_test up
 
-		if i_am_server; then 
+		if i_am_server; then
 			ip link add link $nic_test name ${nic_test}.${vid1} type vlan id $vid1
 			ip link set ${nic_test}.${vid1} up
 			ip addr flush $nic_test
@@ -7763,9 +7763,9 @@ sriov_test_vmvf_different_vlan()
 	return $result
 }
 
-# 
+#
 #  ioctl(FIONREAD) returns zero length on ixgbevf and IPv6 SCTP raw socket
-# 
+#
 sriov_test_bz1441909()
 {
 	log_header "sriov_test_bz1441909" $result_file
@@ -7890,7 +7890,7 @@ sriov_test_bond_lacp_common() {
 	local ip6_mask_len=64
 
 	local pf_ip4="192.100.${ipaddr}.3"
-	
+
 	local vlan_id=3
 
 	local server_vlanif_mac="22:22:11:11:11:10"
@@ -8284,8 +8284,8 @@ sriov_test_bond_lacp_common() {
 		sync_set server ${test_name}_end_feedback_result
 		sync_wait server ${test_name}_nc12345
 		local packets_num=$(cat /tmp/remote_received_packets)
-		if [ ! -n "$packets_num" ] ; then 
-			let result++ 
+		if [ ! -n "$packets_num" ] ; then
+			let result++
 			rlFail "failed: no packets, or failover time is too long"
 		elif [ $packets_num -lt 2800 ];then
 			let result++
@@ -8316,14 +8316,14 @@ sriov_test_bond_lacp_common() {
 		sriov_detach_vf_from_vm $iface2 0 2 $vm1
 		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
-				
+
 		ip addr flush $iface1
 		ip addr flush $iface2
 		NIC_NUM=$OLD_NIC_NUM
 		NIC_DRIVER=$OLD_NIC_DRIVER
 		NIC_MODEL=$OLD_NIC_MODEL
 		NIC_SPEED=$OLD_NIC_SPEED
-		
+
 		sync_set server ${test_name}_end
 	fi
 
@@ -8349,7 +8349,7 @@ sriov_test_bond_lacp_cxgb4() {
 	local ip6_mask_len=64
 
 	local pf_ip4="192.100.${ipaddr}.3"
-	
+
 	local vlan_id=3
 
 	local server_vlanif_mac="22:22:11:11:11:10"
@@ -8426,7 +8426,7 @@ sriov_test_bond_lacp_cxgb4() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-	
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -8443,8 +8443,8 @@ sriov_test_bond_lacp_cxgb4() {
 			rlFail "$kick_list are not on the same switch, kicked."
 		fi
 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 		local cmd=(
@@ -8572,15 +8572,15 @@ sriov_test_bond_lacp_cxgb4() {
 		sriov_detach_vf_from_vm $iface2 1 1 $vm1
 		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 1
-	
+
 		ip addr flush $iface1
 		ip addr flush $iface2
-			
+
 		NIC_NUM=$OLD_NIC_NUM
 		NIC_DRIVER=$OLD_NIC_DRIVER
 		NIC_MODEL=$OLD_NIC_MODEL
 		NIC_SPEED=$OLD_NIC_SPEED
-		
+
 		sync_set server ${test_name}_end
 	fi
 
@@ -8605,7 +8605,7 @@ sriov_test_bond_lacp_mlx4en_dualport() {
 	local ip6_mask_len=64
 
 	local pf_ip4="192.100.${ipaddr}.3"
-	
+
 	local vlan_id=3
 
 	local server_vlanif_mac="22:22:11:11:11:10"
@@ -8682,7 +8682,7 @@ sriov_test_bond_lacp_mlx4en_dualport() {
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-	
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 0 trust on
@@ -8696,8 +8696,8 @@ sriov_test_bond_lacp_mlx4en_dualport() {
 		fi
 
 		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_with_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_with_vf; done"
-		vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs" 
-		
+		vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs"
+
 		get_iface_sw_port "$iface1 $iface2" switch_name port_list kick_list || { rlFail "failed:get_iface_sw_port failed";let exitcode++; }
 		swcfg_port_channel $switch_name "$port_list" "active" || { rlFail "failed:swcfg_port_channel failed";let exitcode++; }
 		if [ -n "$kick_list" ];then
@@ -8781,14 +8781,14 @@ sriov_test_bond_lacp_mlx4en_dualport() {
 		vmsh cmd_set $vm1 "${cmd[*]}"
 		sriov_detach_vf_from_vm $iface1 0 1 $vm1
 		sriov_remove_vfs $iface1 0
-				
+
 		ip addr flush $iface1
 		ip addr flush $iface2
 		NIC_NUM=$OLD_NIC_NUM
 		NIC_DRIVER=$OLD_NIC_DRIVER
 		NIC_MODEL=$OLD_NIC_MODEL
 		NIC_SPEED=$OLD_NIC_SPEED
-		
+
 		sync_set server ${test_name}_end
 	fi
 
@@ -8944,7 +8944,7 @@ sriov_test_trusted_vf_promisc()
 }
 
 #
-# buffer overflow and/or deadlock when VF has more than 32 multicast 
+# buffer overflow and/or deadlock when VF has more than 32 multicast
 #
 sriov_test_bz1445814()
 {
@@ -8972,7 +8972,7 @@ sriov_test_bz1445814()
 			sync_set server test_bz1445814_end
 			return 1
 		fi
-		
+
 		vf_name=$(sriov_get_vf_iface $nic_test 0 1)
 		for i in $(seq 2 50); do
 			a="33:33:00:00:00:$(printf "%02x" $i)"
@@ -9014,10 +9014,10 @@ sriov_test_bz1445814()
 #		if can't find vf name from database(you have not generate the benchmark vf name), pass
 #		if equal,						  						  pass
 #		if not eauql,					  						  fail
-#	3.use "distro,driver,host,mac,vfidx" to distinguish ifname in database 
+#	3.use "distro,driver,host,mac,vfidx" to distinguish ifname in database
 #	4.if have not added vfname related to current "distro,driver,host,mac,vfidx" to database, then will add it to database
 #	5.drivers under testing:
-#		cxgb4,be2net,bnx2x,mlx4_en,ixgbe,i40e,qlcnic,sfc,igb,mlx5_core,bnxt_en 
+#		cxgb4,be2net,bnx2x,mlx4_en,ixgbe,i40e,qlcnic,sfc,igb,mlx5_core,bnxt_en
 #	6.some datas in my database:
 #		+----+--------+---------+-----------------------------------------+-------------------+-------+-------------+
 #		| id | distro | driver  | host									| mac			   | vfidx | ifname	  |
@@ -9107,7 +9107,7 @@ sriov_test_hostdev_vmvf_remote()
 			sync_set server test_hostdev_vmvf_remote_end
 			return 1
 		fi
-		local old_sriov_use_hostdev=$SRIOV_USE_HOSTDEV	
+		local old_sriov_use_hostdev=$SRIOV_USE_HOSTDEV
 		SRIOV_USE_HOSTDEV="yes"
 		if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
 			result=1
@@ -9161,7 +9161,7 @@ sriov_test_bz1489964() {
 	local client2_vlanif_ip6="2021:db10:${ipaddr_vlan}::3"
 	local ip4_mask_len=24
 	local ip6_mask_len=64
-	
+
 	local vlan_id=3
 
 	if i_am_server;then
@@ -9190,7 +9190,7 @@ sriov_test_bz1489964() {
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			sync_set server ${test_name}_end
 			return 1
@@ -9213,7 +9213,7 @@ sriov_test_bz1489964() {
 			local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
 			local mac3="00:de:ad:$(printf %02x $ipaddr):01:03"
 			local mac4="00:de:ad:$(printf %02x $ipaddr):01:04"
-		
+
 			ip link set $iface1 vf 0 trust on
 			ip link set $iface1 vf 0 spoofchk on
 			ip link set $iface1 vf 1 trust on
@@ -9230,8 +9230,8 @@ sriov_test_bz1489964() {
 				let result++
 				rlFail "${test_name} failed: can't attach vf to vm."
 			else
-				vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-				vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+				vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+				vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 				vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 				vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -9256,8 +9256,8 @@ sriov_test_bz1489964() {
 					{ rlFail "${test_name} failed: ping failed via vm1 bond0";let result++; }
 				fi
 
-				vmsh run_cmd $vm2 "echo \$(ip link | grep $mac3 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-				vmsh run_cmd $vm2 "echo \$(ip link | grep $mac4 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+				vmsh run_cmd $vm2 "echo \$(ip link | grep $mac3 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+				vmsh run_cmd $vm2 "echo \$(ip link | grep $mac4 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 				vmsh run_cmd $vm2 "ip link set \$(cat /tmp/testiface1) down"
 				vmsh run_cmd $vm2 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -9281,7 +9281,7 @@ sriov_test_bz1489964() {
 				if [ $? -ne 0 ];then
 					{ rlFail "${test_name} failed: ping failed via vm2 bond0";let result++; }
 				fi
-				
+
 				local cmd=(
 					{ping ${client1_ip4} -c3}
 					{ping6 ${client1_ip6} -c3}
@@ -9803,7 +9803,7 @@ sriov_test_bz1493953()
 		else
 			ip link set $nic_test master br0
 			ip link set $vnetport master br0
-			ip link show 
+			ip link show
 		fi
 
 		if ! sriov_create_vfs $nic_test 0 1; then
@@ -9846,7 +9846,7 @@ sriov_test_bz1493953()
 			{ip addr show \$NIC_TEST}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-		
+
 		sriov_remove_vfs $nic_test 0
 
 		sync_set server test_bz1493953_end
@@ -9894,7 +9894,7 @@ sriov_test_bz1483396()
 		#dmesg -C;dmesg -c
 		time sysctl -w net.ipv6.conf.all.forwarding=0
 		dmesg|grep "BUG: soft lockup" && { result=1; rlFail "failed:soft lockup occur"; }
-		
+
 		ip link del vf0.100
 		sriov_remove_vfs $nic_test 0
 
@@ -9916,7 +9916,7 @@ sriov_test_vmvf_multicast()
 		ip addr flush $nic_test
 		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
 		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-		
+
 		ping 224.10.10.10 -I $nic_test &
 		sync_set client test_vmvf_multicast_start
 		sync_wait client test_vmvf_multicast_end
@@ -10012,7 +10012,7 @@ sriov_test_vmvf_reg_ureg_multicast_addr()
 		ip addr flush $nic_test
 		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
 		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-		
+
 		ping 224.10.10.10 -I $nic_test &
 		sync_set client test_vmvf_reg_ureg_multicast_addr_start
 		sync_wait client test_vmvf_reg_ureg_multicast_addr_end
@@ -10088,7 +10088,7 @@ sriov_test_vmvf_reg_ureg_multicast_addr()
 				result=1
 				rlFail "failed: link down detected"
 			fi
-			
+
 			sriov_detach_vf_from_vm $nic_test 0 1 $vm1
 		fi
 
@@ -10114,7 +10114,7 @@ sriov_test_vmvf_reg_ureg_multicast_addr()
 #|   | virbr1 |			 |			   |
 #|   +--------+			 |			   |
 #|		  |			   |			   |
-#|		  |			   |			   | 
+#|		  |			   |			   |
 #|		  +--PF--+----VF--+			   |
 #|				 |						|
 #|		   +---------+					|
@@ -10224,7 +10224,7 @@ sriov_test_vmpf_vmvf_remote()
 #|   | virbr1 |		 |	  |					  |
 #|   +--------+		 |	  |					  |
 #|		  |		   |	  +-----------------+	|
-#|		  |   bond	|						|	| 
+#|		  |   bond	|						|	|
 #|		  +-----------|-------------------+	|	|
 #|		   pf|		|				 pf|	|	|
 #|		   +-----------+			   +---------+  |
@@ -10275,7 +10275,7 @@ sriov_test_vmpfbond_vmvfbond_remote()
 		else
 			local test_iface="$(get_test_nic ${NIC_NUM})"
 		fi
-		if [ $? -ne 0 ];then 
+		if [ $? -ne 0 ];then
 			rlFail "$test_name get required_iface failed."
 			let result++
 		fi
@@ -10310,7 +10310,7 @@ sriov_test_vmpfbond_vmvfbond_remote()
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		ip link set $iface1 vf 0 trust on
 		ip link set $iface1 vf 0 spoofchk off
 		ip link set $iface2 vf 1 trust on
@@ -10321,8 +10321,8 @@ sriov_test_vmpfbond_vmvfbond_remote()
 				let result++
 				rlFail "${test_name} failed: can't attach vf to vm."
 		fi
-		vmsh run_cmd $vm2 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1" 
-		vmsh run_cmd $vm2 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2" 
+		vmsh run_cmd $vm2 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
+		vmsh run_cmd $vm2 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
 		vmsh run_cmd $vm2 "ip link set \$(cat /tmp/testiface1) down"
 		vmsh run_cmd $vm2 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -10370,7 +10370,7 @@ sriov_test_vmpfbond_vmvfbond_remote()
 		#brctl delif virbr0 bond0
 		ip link set dev bond0 nomaster
 		modprobe -rv bonding
-		
+
 		NIC_NUM=$OLD_NIC_NUM
 		NIC_DRIVER=$OLD_NIC_DRIVER
 		NIC_MODEL=$OLD_NIC_MODEL
@@ -10410,7 +10410,7 @@ sriov_test_attach_method_is_forward_hostdev()
 		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
 		sleep 1
 		ip a
-		
+
 		sync_set client ${test_name}_start
 		sync_wait client ${test_name}_end
 
@@ -10426,7 +10426,7 @@ sriov_test_attach_method_is_forward_hostdev()
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		local vf1_bus_info=$(sriov_get_vf_bus_info $nic_test 0 1)
 		local vf1_domain=$(echo $vf1_bus_info | awk -F '[:|.]' '{print $1}')
 		local vf1_bus=$(echo $vf1_bus_info | awk -F '[:|.]' '{print $2}')
@@ -10626,7 +10626,7 @@ sriov_test_attach_method_is_forward_hostdev_vlan()
 
 		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		
+
 		local vf1_bus_info=$(sriov_get_vf_bus_info $nic_test 0 1)
 		local vf1_domain=$(echo $vf1_bus_info | awk -F '[:|.]' '{print $1}')
 		local vf1_bus=$(echo $vf1_bus_info | awk -F '[:|.]' '{print $2}')
@@ -10842,7 +10842,7 @@ sriov_test_vmvf_max_tx_rate()
 	local vm1_ipv6_thpt=$(vm_netperf_ipv6 $vm1 2021:db8:${ipaddr}::1)
 	local vm2_ipv6_thpt=$(vm_netperf_ipv6 $vm2 2021:db8:${ipaddr}::1)
 	rlLog "$vm1_ipv4_thpt $vm1_ipv6_thpt $vm2_ipv4_thpt $vm2_ipv6_thpt"
-	
+
 		if (($(bc <<< "$vm1_ipv4_thpt>$(bc <<< \"$vm1_max_tx_rate*1.1\")"))); then
 			((result+=1))
 			rlFail "vm1_ipv4_thpt($vm1_ipv4_thpt) exceed max_rate"
@@ -11617,7 +11617,7 @@ sriov_test_vmvf_remote_jumbo_switchdev()
 
 			ip link set mtu 9000 dev $nic_test || { result=1; rlFail "failed to set mtu 9000"; }
 			ip link set $nic_test up
-			sleep 2	
+			sleep 2
 			ip link show $nic_test
 
 			#check the vm state, re-start it if not running
@@ -12576,7 +12576,7 @@ sriov_test_cntvf_reboot()
 			ip link set ${vf} up
 		done
 		echo "#########finished vf config#####"
-		ip link show 
+		ip link show
 	}
 
 
@@ -12779,7 +12779,7 @@ sriov_test_podcntvf1_podcntvf2()
 	else
 		local test_iface="$(get_test_nic ${NIC_NUM})"
 	fi
-	if [ $? -ne 0 ];then 
+	if [ $? -ne 0 ];then
 		echo "$test_name get required_iface failed."
 		sync_set server ${test_name}_end
 		return 1
@@ -12792,7 +12792,7 @@ sriov_test_podcntvf1_podcntvf2()
 	local mac1="00:de:a1:$(printf %02x $ipaddr):11:01"
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
-	if ! sriov_create_vfs $iface1 0 2 || 
+	if ! sriov_create_vfs $iface1 0 2 ||
 		! sriov_create_vfs $iface2 0 2; then
 		rlLog "${test_name} failed:create vfs failed."
 		sriov_remove_vfs $iface1 0
@@ -13008,7 +13008,7 @@ sriov_test_podcnts_vfs_remote_bz2088787()
 	else
 		local test_iface="$(get_test_nic ${NIC_NUM})"
 	fi
-	if [ $? -ne 0 ];then 
+	if [ $? -ne 0 ];then
 		echo "$test_name get required_iface failed."
 		sync_set server ${test_name}_end
 		return 1
@@ -14846,7 +14846,7 @@ sriov_test_bz2008373() {
 			done
 			ip -d link show ${nic_name}
 			echo 0 > /sys/bus/pci/devices/$PCI/sriov_numvfs
-			
+
 			sync_set server sriov_test_bz2008373_end  52200
 		fi
 		return $result
