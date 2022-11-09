@@ -110,6 +110,7 @@ reset_network_env()
 	modprobe -r mpls_iptunnel mpls_router ipip ip_tunnel tunnel4
 	modprobe -r l2tp_eth l2tp_ip6 l2tp_ip l2tp_netlink l2tp_core
 	modprobe -r bareudp udp_tunnel ip6_udp_tunnel
+	modprobe -r br_netfilter
 	ip -a netns del
 	sleep 2
 
@@ -193,6 +194,8 @@ do_net_forwarding_config()
 	# router_multipath tests failed
 	reset_ping_group_range=$(sysctl -n net.ipv4.ping_group_range)
 	sysctl -qw net.ipv4.ping_group_range="1 0"
+	sysctl -qw net.bridge.bridge-nf-call-iptables=0
+	sysctl -qw net.bridge.bridge-nf-call-ip6tables=0
 
 	cp forwarding.config.sample forwarding.config
 	popd
