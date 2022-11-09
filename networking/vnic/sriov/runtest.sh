@@ -90,7 +90,7 @@ fi
 install_pktgen()
 {
 	$dbg_flag
-	local kname1="kernel" && /usr/sbin/kernel-is-rt && kname1="kernel-rt"
+	local kname1="kernel" && [ -x /usr/sbin/kernel-is-rt ] && kname1="kernel-rt"
 	local kname2="${kname1}"
 	local kernel_ver="$(uname -r)"
 	uname -r|grep "debug" && {
