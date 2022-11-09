@@ -212,4 +212,33 @@ check_result()
 	fi
 }
 
+# Check if expect test exist, return 0 if exist and 1 if not.
+check_test_exist()
+{
+	local item=$1
+	local folder
+
+	folder=$(echo "$item" | cut -f1 -d':')
+
+	# Check if the test in kselftest-list.txt and has it's own folder
+	if grep -qE "$folder" "$EXEC_DIR"/kselftest-list.txt; then
+		if [ -d "$EXEC_DIR/$folder" ]; then
+			return 0
+		fi
+	fi
+
+	# Special cases
+	if [ "$item" == "default" ]; then
+		return 0
+	elif [ "$item" == "bpf_test_progs" ]; then
+		if grep -q "bpf:test_progs" "$EXEC_DIR"/kselftest-list.txt; then
+			if [ -f "$EXEC_DIR"/bpf/test_progs ]; then
+				return 0
+			fi
+		fi
+	fi
+
+	return 1
+}
+
 [ ! "$CKI_SELFTESTS_URL" ] && [ ! "$BUILD_FROM_SRC" ] && [ ! "$DELIVERED_TESTS" ] && test_skip_exit "CKI_SELFTESTS_URL/BUILD_FROM_SRC/DELIVERED_TESTS not found. At least one must be set."

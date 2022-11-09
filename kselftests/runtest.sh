@@ -208,6 +208,12 @@ function RunTest ()
 {
     local ret
     for item in $TEST_ITEMS; do
+        # Check if test exist before do config and run
+        if ! check_test_exist "$item"; then
+            test_warn "$item test not found in kselftest-list.txt"
+            continue
+        fi
+
         rlPhaseStartTest $item
         rlLog "Test Start Time: $(date)"
         # do setup
