@@ -1,7 +1,7 @@
 [General]
 description=IPMItool sanity check
 name=ipmi/ipmitool/Sanity/smoke-test
-owner=Rachel Sibley <rasibley@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
