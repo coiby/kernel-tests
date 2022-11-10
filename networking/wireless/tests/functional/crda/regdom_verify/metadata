@@ -1,0 +1,9 @@
+[General]
+description=Verify the regulatory domain rules.
+name=networking/wireless/tests/functional/crda/regdom_verify
+owner=Ken Benoit <kbenoit@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=iw;crda
