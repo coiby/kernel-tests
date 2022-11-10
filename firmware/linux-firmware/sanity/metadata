@@ -1,7 +1,7 @@
 [General]
 description=Sanity check for linux-firmware files
 name=firmware/linux-firmware/sanity
-owner=Erico Nunes <ernunes@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
