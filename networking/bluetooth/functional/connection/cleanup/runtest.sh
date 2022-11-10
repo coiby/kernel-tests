@@ -10,6 +10,6 @@ if [ -n "${MAC+1}" ]
 then
 command_arguments="$command_arguments --MACaddress $MAC"
 fi
-rhts-run-simple-test $TEST "./test.py $command_arguments $@"
+rhts-run-simple-test $TEST "./test.py $command_arguments $*"
 rhts-submit-log -l ./test.log
 rhts-submit-log -l /var/log/messages

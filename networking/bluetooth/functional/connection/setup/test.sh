@@ -19,4 +19,4 @@ if [ -n "${BLE+1}" ]
 then
 command_arguments="$command_arguments --customLE"
 fi
-./test.py $command_arguments $@
+./test.py $command_arguments $*

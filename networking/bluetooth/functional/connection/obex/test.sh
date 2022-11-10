@@ -19,4 +19,4 @@ if [ -n "${BLE+1}" ]
 then
 command_arguments="$command_arguments --customLE"
 fi
-sh ../../../../test-framework/test_launcher.sh $TEST "./test.py $command_arguments $@"
+sh ../../../../test-framework/test_launcher.sh $TEST "./test.py $command_arguments $*"
