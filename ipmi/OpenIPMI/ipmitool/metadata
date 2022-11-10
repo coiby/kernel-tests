@@ -1,0 +1,9 @@
+[General]
+description=smoke test for ipmitool utility
+name=ipmi/OpenIPMI/ipmitool
+owner=Rachel Sibley <rasibley@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=45m
+dependencies=OpenIPMI;OpenIPMI-tools;mktemp
