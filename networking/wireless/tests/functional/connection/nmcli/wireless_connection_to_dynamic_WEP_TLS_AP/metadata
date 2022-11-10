@@ -1,0 +1,9 @@
+[General]
+description=Establish a wireless connection to a dynamic WEP w/ TLS AP.
+name=networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_dynamic_WEP_TLS_AP
+owner=Ken Benoit <kbenoit@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=nmcli;NetworkManager;wget;dbus-tools
