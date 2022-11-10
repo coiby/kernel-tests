@@ -1,7 +1,7 @@
 [General]
 description=smoke test for rmcp_ping utility
 name=ipmi/OpenIPMI/rmcp_ping
-owner=Rachel Sibley <rasibley@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
