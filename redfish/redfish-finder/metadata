@@ -1,0 +1,9 @@
+[General]
+description=redfish-finder sanity check
+name=redfish/redfish-finder
+owner=Rachel Sibley <rasibley@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=redfish-finder
