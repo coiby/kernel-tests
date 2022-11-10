@@ -1,0 +1,9 @@
+[General]
+description=Test for bz532445 (ipmievd init script's condrestart doesn't work)
+name=ipmi/ipmitool/Regression/bz532445-ipmievd-init-script-s-condrestart-doesn-t-work
+owner=Rachel Sibley <rasibley@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+dependencies=ipmitool;beakerlib;beakerlib-redhat
