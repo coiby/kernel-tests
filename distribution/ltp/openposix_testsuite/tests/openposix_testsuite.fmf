@@ -6,6 +6,22 @@ component:
 path: /distribution/ltp/openposix_testsuite
 test: bash -x ./runtest.sh
 framework: beakerlib
+require:
+  - git
+  - automake
+  - autoconf
+  - flex
+  - bison
+  - rsyslog
+  - util-linux
+  - rpm-build
+  - bc
+  - time
+  - libaio-devel
+  - libcap-devel
+  - strace
+  - gcc
+  - bzip2
 duration: 40m
 extra-summary: /distribution/ltp/openposix_testsuite
 extra-task: /distribution/ltp/openposix_testsuite
