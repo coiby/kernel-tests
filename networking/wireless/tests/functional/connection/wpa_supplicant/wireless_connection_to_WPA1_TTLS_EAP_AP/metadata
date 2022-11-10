@@ -1,7 +1,7 @@
 [General]
 description=Establish a wireless connection to a WPA1 TTLS EAP AP.
 name=networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_TTLS_EAP_AP
-owner=Ken Benoit <kbenoit@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
