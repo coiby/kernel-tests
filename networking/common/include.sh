@@ -385,7 +385,7 @@ else
 	fi
 
 	# make sure all required packages are installed
-	if /usr/sbin/kernel-is-rt ; then
+	if [ -x /usr/sbin/kernel-is-rt ]; then
 		if stat /run/ostree-booted > /dev/null 2>&1; then
 			packages=`awk -F: '/softDependencies=/{print $1}' metadata | awk -F'=' '{print $2}' | sed 's/;/ /g'`
 			rpm-ostree install -A --idempotent --allow-inactive $packages
