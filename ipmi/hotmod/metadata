@@ -1,0 +1,9 @@
+[General]
+description=Tests hot add/remove of IPMI interfaces
+name=ipmi/hotmod
+owner=Rachel Sibley <rasibley@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=20m
+dependencies=kernel
