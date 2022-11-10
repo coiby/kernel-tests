@@ -1,0 +1,9 @@
+[General]
+description=IPMI sanity check
+name=ipmi/sanity/ipmi-sanity-check
+owner=Rachel Sibley <rasibley@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=kernel
