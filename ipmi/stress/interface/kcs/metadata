@@ -1,7 +1,7 @@
 [General]
 description=IPMI kcs stress test
 name=ipmi/stress/interface/kcs
-owner=Rachel Sibley <rasibley@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
