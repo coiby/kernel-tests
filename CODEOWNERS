@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
