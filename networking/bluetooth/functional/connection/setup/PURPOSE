@@ -1,0 +1,9 @@
+PURPOSE of /kernel/bluetooth_tests/functional/connection/setup
+Description: Setup a Bluetooth connection.
+Author: Ken Benoit <kbenoit@redhat.com>
+Test steps:
+ * Choose which Bluetooth interface to use and describe it
+ * Determine the connection information to use
+ * Find the remote Bluetooth device
+ * Pair with the test Bluetooth device
+ * Connect to the test Bluetooth device

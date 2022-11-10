@@ -1,0 +1,8 @@
+PURPOSE of /kernel/bluetooth_tests/functional/connection/setup
+Description: Test Bluetooth's OBEX API
+Author: Don Zickus <dzickus@redhat.com>
+Test steps:
+ * Choose which Bluetooth interface to use and describe it
+ * Determine the connection information to use
+ * Find the remote Bluetooth server
+ * Run through all the OBEX API commands
