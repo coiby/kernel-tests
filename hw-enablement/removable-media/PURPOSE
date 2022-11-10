@@ -1,0 +1,7 @@
+PURPOSE of /kernel/hw-enablement/removable-media
+
+/kernel/hw-enablement/removable-media contains various test cases that pertain to detection and read-write testing of various forms of removable media. The majority of these cases require physical interaction with the hardware and thus are not suitable for automation in the traditional sense although Beaker/Restraint may be useful in preparing the system for testing.
+
+
+SD-card/ - Test cases for SD/mmc cards, designed primarily for use with PCI connected SD/MMC readers.
+USB-storage - Test cases for USB based storage devices, may also include SD readers which connect to USB rather than PCI and other similar devices. 

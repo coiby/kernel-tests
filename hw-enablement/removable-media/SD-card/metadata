@@ -1,0 +1,13 @@
+[General]
+name=hw-enablement/removable-media/SD-card
+owner=Fendy Tjahjadi <ftjahjad@redhat.com>
+description=Perform data testing of Secure Digital/SD cards
+license=GPLv2
+confidential=no
+destructive=yes
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_type=12m
+dependencies=git;python
+repoRequires=hw-enablement/removable-media/include

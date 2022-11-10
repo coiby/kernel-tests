@@ -1,0 +1,20 @@
+PURPOSE of /kernel/hw-enablement/removable-media/SD-card
+This test suite tests Secure Digital(SD) card readers attached to PCI bus or similar, for USB attached devices which use USB storage us the USB-storage test. The following tests are performed:
+
+The test is primarily designed to be used manually due to having to be present to insert/remove the media. However may be automated if the target system has an SD card installed. Set TEST_PARAM_TEST_DEV to the device you want to test, by default the test will use /dev/mmcblk0. The media should already be partitioned and formatted, the test will automatically select the largest partition for use.
+
+1.) Detection of the SD card reader.
+2.) insertion/removal detection of SD media.
+3.) Sequential read/write of data to/from the card using dt
+4.) Random read/write of data to/from the card using dt
+5.) copy and compare of previously written data
+
+Currently only items 3-5 are implemented.
+
+By default, all read/write operations are limited to 1 GB of data or the capacity of the SD card, whichever is smaller.
+
+dt: http://www.scsifaq.org/RMiller_Tools/dt.html
+
+Test Parameters:
+TEST_PARAM_TEST_DEV - device to use for testing. If the whole device is specified then the test will attempt to use the largest partition on the device. Default: /dev/mmcblk0
+TEST_PARAM_TEST_SIZE - amount of data in bytes to use for testing, 1GB is used by default.

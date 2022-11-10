@@ -1,0 +1,11 @@
+PURPOSE of /kernel/hw-enablement/removable-media/include
+
+Library files for removable media tests. Not intended to be run standalone. Currently does the following:
+
+Gathers test parameters from environment variables
+Installs hwcert and dt test suite if needed
+includes python bindings for running common shell commands and the dt test suite as well as methods for discovering partitions on the test device(s)
+
+dt: http://www.scsifaq.org/RMiller_Tools/dt.html
+
+
