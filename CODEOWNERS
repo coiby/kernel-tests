@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log/ @ltrivell
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
