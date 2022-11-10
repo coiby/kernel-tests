@@ -1,0 +1,9 @@
+[General]
+description=IPMI Watchdog sanity check
+name=ipmi/sanity/watchdog-sanity-script
+owner=Rachel Sibley <rasibley@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=gcc
