@@ -1,0 +1,11 @@
+{
+    "second_machine": {
+        "mac_address" : "7C:5C:F8:CB:94:C1",
+	"low_energy" : false
+    },
+
+    "another_machine": {
+        "mac_address" : "98:F1:70:6F:57:10",
+	"low_energy" : false
+    }
+}

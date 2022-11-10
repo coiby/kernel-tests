@@ -1,0 +1,7 @@
+PURPOSE of /kernel/bluetooth_tests/functional/connection/cleanup
+Description: Teardown a Bluetooth connection.
+Author: Ken Benoit <kbenoit@redhat.com>
+Test steps:
+ * Find the remote Bluetooth device(s)
+ * Disconnect from the remote Bluetooth device(s)
+ * Unpair the remote Bluetooth device(s)
