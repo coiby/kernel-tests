@@ -1,7 +1,7 @@
 [General]
 description=IPMI Watchdog sanity check
 name=ipmi/sanity/watchdog-sanity-script
-owner=Rachel Sibley <rasibley@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
