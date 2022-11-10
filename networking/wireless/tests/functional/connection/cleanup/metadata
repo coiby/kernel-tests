@@ -1,7 +1,7 @@
 [General]
 description=Cleanup a wireless connection
 name=networking/wireless/tests/functional/connection/cleanup
-owner=Ken Benoit <kbenoit@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
