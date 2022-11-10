@@ -1,0 +1,9 @@
+[General]
+description=Establish a wireless connection to a hidden WPA2 AP and then toggle the wireless radio.
+name=networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_hidden_WPA2_passphrase_AP
+owner=Ken Benoit <kbenoit@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=wpa_supplicant
