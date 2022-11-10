@@ -1,7 +1,7 @@
 [General]
 description=Establish a wireless connection to a dynamic WEP w/ TTLS AP.
 name=networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_dynamic_WEP_TTLS_AP
-owner=Ken Benoit <kbenoit@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
