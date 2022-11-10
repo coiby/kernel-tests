@@ -36,7 +36,7 @@ SECTION=""
 CONTENT="testcontent$$"
 rlJournalStart
 	# first start tcsd, all calls need it
-	rlPhaseStartSetup 
+	rlPhaseStartSetup
 		rlRun "dnf install -y trousers tpm-tools"
 		rlRun "service tcsd start" 0 "starting tcsd"
 		sleep 1
@@ -93,10 +93,10 @@ rlJournalStart
 	rlPhaseEnd
 
 	# stop resourcemgr
-	rlPhaseStartCleanup 
+	rlPhaseStartCleanup
 		rlRun "service tcsd stop" 0 "stopping tcsd"
 	rlPhaseEnd
-	
+
 	rlJournalPrintText
 rlJournalEnd
 
