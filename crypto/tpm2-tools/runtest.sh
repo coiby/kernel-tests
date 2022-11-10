@@ -79,14 +79,14 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStart FAIL "Data RW"
-		
+
 	rlPhaseEnd
 
 	# stop resourcemgr
 	rlPhaseStartCleanup
 		#rlRun "screen -X -S tpm2-abrmd quit" 0 "stopping tpm2-abrmd"
 	rlPhaseEnd
-	
+
 	rlJournalPrintText
 rlJournalEnd
 
