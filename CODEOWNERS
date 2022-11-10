@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/ipmi/freeipmi/Regression/bz818168-The-etc-init-d-bmc-watchdog-script-does-not-store/ @ltrivell
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
