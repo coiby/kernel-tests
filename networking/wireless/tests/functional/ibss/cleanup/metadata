@@ -1,0 +1,9 @@
+[General]
+description=Clean up an already established wireless ad-hoc (IBSS) connection
+name=networking/wireless/tests/functional/ibss/cleanup
+owner=Ken Benoit <kbenoit@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=45m
+dependencies=RhtsRequires:;NetworkManager;kernel-kernel-test-framework;kernel-kernel-wireless_tests;kernel-kernel-wireless_tests-functional;kernel-kernel-wireless_tests-functional-ibss
