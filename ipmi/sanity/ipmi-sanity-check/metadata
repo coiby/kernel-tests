@@ -1,7 +1,7 @@
 [General]
 description=IPMI sanity check
 name=ipmi/sanity/ipmi-sanity-check
-owner=Rachel Sibley <rasibley@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
