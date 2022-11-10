@@ -1,0 +1,9 @@
+[General]
+description=Check drivers supported by sensors-detect
+name=lm_sensors/Sanity/detect
+owner=Rachel Sibley <rasibley@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=lm_sensors
