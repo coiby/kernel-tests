@@ -1,0 +1,11 @@
+[General]
+name=hw-enablement/removable-media/include
+description=Library files for removable media tests and not intended to be run standalone.
+owner=Fendy Tjahjadi <ftjahjad@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+dependencies=python
+entry_point=echo nothing > /dev/null

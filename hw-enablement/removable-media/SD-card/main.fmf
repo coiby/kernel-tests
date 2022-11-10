@@ -1,0 +1,16 @@
+summary: Perform data testing of Secure Digital/SD cards
+description:
+    The test is primarily designed to be used manually 
+    due to having to be present to insert/remove the media.
+    Please insert the SD card prior to starting the test.
+contact: Fendy Tjahjadi <ftjahjad@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+require:
+  - python
+  - git
+framework: beakerlib
+duration: 12m
+extra-summary: hw-enablement/removable-media/USB-storage
+extra-task: hw-enablement/removable-media/USB-storage
