@@ -1,7 +1,7 @@
 [General]
 description=ipmitool returns wrong version number in ipmitool -V command
 name=ipmi/ipmitool/Regression/bz1170266-ipmitool-returns-wrong-version-number
-owner=Rachel Sibley <rasibley@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
