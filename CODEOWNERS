@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/networking/wireless/tests/functional/connection/ @ltrivell
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
