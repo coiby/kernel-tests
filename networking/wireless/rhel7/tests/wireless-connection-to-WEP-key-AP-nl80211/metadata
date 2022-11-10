@@ -1,7 +1,7 @@
 [General]
 description=Establish a wireless connection to a WEP key AP.
 name=networking/wireless/rhel7/tests/wireless-connection-to-WEP-key-AP-nl80211
-owner=Ken Benoit <kbenoit@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
