@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/ipmi/sanity/ipmi-sanity-check/ @ltrivell
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
