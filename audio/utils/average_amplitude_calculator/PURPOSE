@@ -1,0 +1,3 @@
+PURPOSE of /kernel/audio/utils/average_amplitude_calculator
+Description: Test to calculate the average amplitude of a wav file in dB.
+Author: Ken Benoit <kbenoit@redhat.com>
