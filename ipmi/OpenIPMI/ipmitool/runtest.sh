@@ -73,7 +73,7 @@ rlJournalStart
     rlPhaseStartTest
     rlRun -l "TEMP_FILE=$(mktemp)" 0
         rlRun -l "ipmitool sdr elist | cut -c 31-36 | sort | uniq > ${TEMP_FILE}" 0
-	for I in $(cat "${TEMP_FILE}") ; do
+        for I in $(cat "${TEMP_FILE}") ; do
             # Known issue, see BZ 1627526
             rlRun -l "ipmitool sdr entity $I" 0,1
         done
