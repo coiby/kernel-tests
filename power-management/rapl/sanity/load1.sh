@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-	sleeptime=1
+        sleeptime=1
 else
-	sleeptime="$1"
+        sleeptime="$1"
 fi
 
 #do some load

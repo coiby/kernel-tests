@@ -4,7 +4,7 @@
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-$@
+$*
 retval="$?"
 
 rlPhaseStart WARN "Unable to test."

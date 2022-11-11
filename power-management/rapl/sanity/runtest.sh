@@ -33,54 +33,54 @@
 
 rlJournalStart
     rlPhaseStartSetup
-	#rlRun "pwd_old=\$(pwd)" 
-	rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
+        #rlRun "pwd_old=\$(pwd)"
+        #rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         #rlRun "pushd $TmpDir"
     rlPhaseEnd
 
     rlPhaseStartTest
-	# Test 1: Make sure no errors occur when collecting RAPL data (See BZ 1080630 / 1080631)
-	# e.g. "/dev/cpu/0/msr offset 0x63a read failed"
-	rlRun -l "turbostat -v ls 2>&1 |grep 'read failed'" 1
+        # Test 1: Make sure no errors occur when collecting RAPL data (See BZ 1080630 / 1080631)
+        # e.g. "/dev/cpu/0/msr offset 0x63a read failed"
+        rlRun -l "turbostat -v ls 2>&1 |grep 'read failed'" 1
 
-	# Test 2: Does output appear sane?
-	# Contains partial parsing of the output, prepares data files for Test 3
-	rlRun -l "./00_get_output.sh 600"
+        # Test 2: Does output appear sane?
+        # Contains partial parsing of the output, prepares data files for Test 3
+        rlRun -l "./00_get_output.sh 600"
 
-	# for debug 
+        # for debug
         rlRun -l "ls"
-	rlRun -l "cat perf_test_output.tmp"
-	rlRun -l "cat turbostat_test_output.tmp"
+        rlRun -l "cat perf_test_output.tmp"
+        rlRun -l "cat turbostat_test_output.tmp"
 
-	# Test 3: Is reported power consumption from turbostat and perf the same?
-	# Using data from Test 2
-	rlRun -l "./01_compare_perf_and_turbostat.py"
+        # Test 3: Is reported power consumption from turbostat and perf the same?
+        # Using data from Test 2
+        rlRun -l "./01_compare_perf_and_turbostat.py"
 
-	## Test 4: Prepares data for test 5 - the same as Test 2, but under load 
-	##rlRun -l "./00_get_output.sh 600 ./load1.sh"
-	rlRun -l "./00_get_output.sh 600 ./load1.sh"
-	#rlRun -l "./00_get_output.sh 600" 
-	
-	## Test 5: Is reported power consumption from turbostat and perf the same even under load?
-	## Using data from Test 4
-	rlRun -l "./01_compare_perf_and_turbostat.py"
+        ## Test 4: Prepares data for test 5 - the same as Test 2, but under load
+        ##rlRun -l "./00_get_output.sh 600 ./load1.sh"
+        rlRun -l "./00_get_output.sh 600 ./load1.sh"
+        #rlRun -l "./00_get_output.sh 600"
+        
+        ## Test 5: Is reported power consumption from turbostat and perf the same even under load?
+        ## Using data from Test 4
+        rlRun -l "./01_compare_perf_and_turbostat.py"
 
-	## Test 6: Is reported power consumption from turbostat during idle lesser, than during load?
-	## Using data from Tests 3 and 5
-	rlRun -l "./02_compare_idle_and_load.py"
+        ## Test 6: Is reported power consumption from turbostat during idle lesser, than during load?
+        ## Using data from Tests 3 and 5
+        rlRun -l "./02_compare_idle_and_load.py"
 
-	#Check if there was a warning during testing
+        #Check if there was a warning during testing
         rlRun -l "cat ./warn.tmp"
         rlRun -l "./warn.sh"
 
-	# TODO: save power from Test 3 and Test 5, make powercap to average of these two
-	# load and try again
+        # TODO: save power from Test 3 and Test 5, make powercap to average of these two
+        # load and try again
 
     rlPhaseEnd
 
     rlPhaseStartCleanup
         #rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+        #rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
