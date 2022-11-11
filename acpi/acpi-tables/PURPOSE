@@ -1,0 +1,6 @@
+PURPOSE of /kernel/acpi/acpi-tables
+Description: Collect ACPI tables from a system
+Author: Erico Nunes <ernunes@redhat.com>
+
+Collect ACPI tables from a system so they can be attached to a BZ, plus
+a couple of other tidbits of info that may be of use.
