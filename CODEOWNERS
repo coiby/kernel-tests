@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell
 /networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell
 /networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell
 /networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell
