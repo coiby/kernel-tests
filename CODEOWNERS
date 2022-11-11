@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log/ @ltrivell
 /ipmi/ipmitool/Regression/bz532445-ipmievd-init-script-s-condrestart-doesn-t-work/ @ltrivell
 /ipmi/ipmitool/Regression/bz1170266-ipmitool-returns-wrong-version-number/ @ltrivell
 /ipmi/ipmitool/Sanity/smoke-test/ @ltrivell
