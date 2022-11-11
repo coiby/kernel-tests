@@ -6,4 +6,3 @@ owner=Laura Trivelloni <ltrivell@redhat.com>
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=45m
-dependencies=RhtsRequires:;NetworkManager;kernel-kernel-test-framework;kernel-kernel-wireless_tests;kernel-kernel-wireless_tests-functional;kernel-kernel-wireless_tests-functional-ibss
