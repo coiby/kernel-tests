@@ -1,0 +1,12 @@
+PURPOSE of /kernel/power-management/rapl/sanity
+Description: Confirm RAPL is supported
+Author: Evan McNabb <emcnabb@redhat.com>
+Author: Erik Hamera <ehamera@redhat.com>
+
+RAPL = Running Average Power Limit
+
+Sanity check to make sure RAPL basically functions. This failure was seen
+in:
+
+BZ 1080630 - turbostat on Haswell-EP shows "/dev/cpu/0/msr offset 0x63a read failed" in RAPL data (RHEL7)
+BZ 1080631 - turbostat on Haswell-EP shows "/dev/cpu/0/msr offset 0x63a read failed" in RAPL data (RHEL6)
