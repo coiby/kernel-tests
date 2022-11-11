@@ -61,13 +61,13 @@ enabled=1
 gpgcheck=0
 EOF
             yum install -y rh-python38{,-pip}
-	fi
+        fi
 
-	. scl_source enable rh-python38
+        . scl_source enable rh-python38
 
-	# fallback if RHSCL failed
+        # fallback if RHSCL failed
         if ! command -v pip >/dev/null 2>&1 ; then
-	    rlLog "RHSCL failed. Go on with pip installation from https://bootstrap.pypa.io."
+            rlLog "RHSCL failed. Go on with pip installation from https://bootstrap.pypa.io."
             rlRun -l "curl https://bootstrap.pypa.io/pip/2.7/get-pip.py -o get-pip.py"
             rlRun -l "$PYTHON get-pip.py"
             rlRun -l "pip install --user future"
