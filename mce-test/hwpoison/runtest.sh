@@ -76,7 +76,7 @@ rhts-flush
 make soft |tee soft-output.txt
 
 echo -e "\n*** Some failures above are expected since some random pages can't be offlined.
-*** See BZ 593844 for details. Test will pass as long as failures are below 
+*** See BZ 593844 for details. Test will pass as long as failures are below
 *** certain thresholds."
 # Note: these threshold values have been somewhat arbitrarily determined. Feel
 # free to change them to a more appopriate value.

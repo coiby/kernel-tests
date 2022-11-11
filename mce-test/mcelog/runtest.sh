@@ -35,10 +35,10 @@
 
 mcelog --is-cpu-supported 2>&1 >/dev/null
 if [ "$?" -ne "0" ] ; then
-	rlLogInfo "host CPU is not supported by mcelog, skipping this test set"
-	rhts-report-result $TEST SKIP $OUTPUTFILE
-	rlJournalEnd
-	exit 0
+    rlLogInfo "host CPU is not supported by mcelog, skipping this test set"
+    rhts-report-result $TEST SKIP $OUTPUTFILE
+    rlJournalEnd
+    exit 0
 fi
 
 ################# Setup #######################################################
@@ -213,12 +213,12 @@ echo -e "\n========================== Check for processor enablement: ==========
 echo 'Searching for the string: Family __ Model __ CPU: only decoding architectural errors'
 tail -n 175 /var/log/messages | grep -q "CPU: only decoding architectural errors"
 if [ $? -eq 0 ]; then
-	echo "String found, FAIL."
-	echo 'This could indicate mcelog needs to be updated to support this processor.'
-	report_result "$TEST/supported_cpu" "FAIL"
+    echo "String found, FAIL."
+    echo 'This could indicate mcelog needs to be updated to support this processor.'
+    report_result "$TEST/supported_cpu" "FAIL"
 else
-	echo "String not found, PASS."
-	report_result "$TEST/supported_cpu" "PASS"
+    echo "String not found, PASS."
+    report_result "$TEST/supported_cpu" "PASS"
 fi
 
 # Clean up
