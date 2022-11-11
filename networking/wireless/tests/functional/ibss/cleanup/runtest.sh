@@ -39,7 +39,7 @@ function uninstall_packages()
         rlRun "dnf -y remove $package_names" 0
         return 0
     fi
-    # Try yum if available 
+    # Try yum if available
     if command -v yum &> /dev/null
     then
         rlRun "yum -y remove $package_names" 0
