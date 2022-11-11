@@ -1,7 +1,7 @@
 [General]
 description=Establish a wireless connection to a WEP LEAP AP and then remove and reinsert the wireless kernel module.
 name=networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WEP_LEAP_AP
-owner=Ken Benoit <kbenoit@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
