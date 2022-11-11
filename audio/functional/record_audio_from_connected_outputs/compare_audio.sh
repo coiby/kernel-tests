@@ -13,6 +13,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # Author: Ken Benoit
+# Maintainer: Erik Hamera
 
 export TARGET_FREQUENCY="$1"
 export COMPARE_FILES="$2"

@@ -13,6 +13,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # Author: Ken Benoit
+# Maintainer: Erik Hamera
 
 """
 The functional.audio_jack_sanity_test.test module provides a class (Test)
@@ -21,7 +22,7 @@ expected audio jacks.
 
 """
 
-__author__ = 'Ken Benoit'
+__author__ = 'Erik Hamera'
 
 import json
 
@@ -42,7 +43,7 @@ class Test(base.test.Test):
         self.set_test_name(
             name = '/kernel/audio_tests/functional/audio_jack_sanity_test',
         )
-        self.set_test_author(name = 'Ken Benoit', email = 'kbenoit@redhat.com')
+        self.set_test_author(name = 'Erik Hamera', email = 'ehamera@redhat.com')
         self.set_test_description(
             description = 'Test that checks if the soundcards detected show '
                 + 'all of the expected audio jacks.',

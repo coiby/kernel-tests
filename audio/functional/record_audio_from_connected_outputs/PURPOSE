@@ -1,6 +1,7 @@
 PURPOSE of /kernel/audio_tests/functional/record_audio_from_connected_outputs
 Description: Test to play audio over the loopback cable of all connected outputs.
 Author: Ken Benoit <kbenoit@redhat.com>
+Maintainer: Erik Hamera <ehamera@redhat.com>
 
 0.Purpose
 =========

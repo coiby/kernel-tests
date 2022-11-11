@@ -13,6 +13,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # Author: Ken Benoit
+# Maintainer: Erik Hamera
 
 """
 The functional.record_audio_from_connected_outputs.test module provides a class
@@ -22,7 +23,7 @@ frequency and the recorded input file.
 
 """
 
-__author__ = 'Ken Benoit'
+__author__ = 'Erik Hamera'
 
 import re
 import time
@@ -45,7 +46,7 @@ class Test(base.test.Test):
         self.set_test_name(
             name = '/kernel/audio_tests/functional/record_audio_from_connected_outputs',
         )
-        self.set_test_author(name = 'Ken Benoit', email = 'kbenoit@redhat.com')
+        self.set_test_author(name = 'Erik Hamera', email = 'ehamera@redhat.com')
         self.set_test_description(
             description = 'Test to play audio over the loopback cable of all '
                 + 'connected outputs.',

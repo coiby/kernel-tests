@@ -13,6 +13,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # Author: Ken Benoit
+# Maintainer: Erik Hamera
 
 """
 The functional.mixer_control_range_sanity_test.test module provides a class
@@ -21,7 +22,7 @@ for that control (also testing values outside of the range).
 
 """
 
-__author__ = 'Ken Benoit'
+__author__ = 'Erik Hamera'
 
 import base.test
 import worknode.worknode_factory
@@ -40,7 +41,7 @@ class Test(base.test.Test):
         self.set_test_name(
             name = '/kernel/audio_tests/functional/mixer_control_range_sanity_test',
         )
-        self.set_test_author(name = 'Ken Benoit', email = 'kbenoit@redhat.com')
+        self.set_test_author(name = 'Erik Hamera', email = 'ehamera@redhat.com')
         self.set_test_description(
             description = 'Test that runs through each mixer control and tests '
                 + 'the full range of values for that control (also testing '
