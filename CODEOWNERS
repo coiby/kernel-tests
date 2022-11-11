@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/ipmi/hotmod/ @ltrivell
 /ipmi/sanity/watchdog-sanity-script/ @ltrivell
 /ipmi/sanity/ipmi-sanity-check/ @ltrivell
 /networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_TLS_AP/ @ltrivell
