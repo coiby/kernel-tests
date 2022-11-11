@@ -1,0 +1,8 @@
+PURPOSE of /kernel/mce-test/extended
+Description: mce-test extended tests
+Author: Evan McNabb <emcnabb@redhat.com>
+
+Execute tests within mce-test that take longer to run. For example, the stress
+and kdump tests. For quicker smoke testing, use the simple framework available
+in /kernel/mce-test/simple. 
+
