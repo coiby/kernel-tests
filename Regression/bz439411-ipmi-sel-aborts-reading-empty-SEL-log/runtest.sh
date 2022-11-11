@@ -35,25 +35,25 @@ export PACKAGE="freeipmi"
 rlJournalStart
 
     rlPhaseStartTest "test the bug"
-	rlRun "ipmi-sel --clear"
+        rlRun "ipmi-sel --clear"
     rlPhaseEnd
 
     rlPhaseStartTest "test the bug, phase A"
 # old version behaves differently in the loop
-	for i in $(seq 1 100);do
-		rlRun "ipmi-sel" 0-128 "no segfault"
-	done
+        for i in $(seq 1 100);do
+                rlRun "ipmi-sel" 0-128 "no segfault"
+        done
     rlPhaseEnd
 
     rlPhaseStartTest "test the bug, phase B"
 # see if the messages are OK
         rlRun "ipmi-sel &> log" 0-128 "no segfault"
         grep 'unable to get SEL record' log
-	rlAssertEquals "unable to get SEL record" $? 0
+        rlAssertEquals "unable to get SEL record" $? 0
     rlPhaseEnd
 
     rlPhaseStartCleanup "clean up"
-	rm -rf log
+        rm -rf log
     rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
