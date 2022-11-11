@@ -1,0 +1,13 @@
+[General]
+name=storage/block/bz2088194_cgroup_bps_throttle
+owner=Changhui Zhong <czhong@redhat.com>
+description=inaccurate bps throttle on cgroup
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=
+repoRequires=cki_lib
+max_time=1h
