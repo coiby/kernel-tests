@@ -59,9 +59,9 @@ rlJournalStart
         service lm_sensors start
         RETURNCODE="$?"
         if [[ $RETURNCODE -ne 0 ]]; then
-	    rlLogWarning "lm_sensors failed to start, is module autoloaded?"
+            rlLogWarning "lm_sensors failed to start, is module autoloaded?"
         else
-	    rlPass "lm_sensors started normally"
+            rlPass "lm_sensors started normally"
         fi
 
         eval "$(grep 'HWMON_MODULES=\|BUS_MODULES=' /etc/sysconfig/lm_sensors)"
@@ -74,8 +74,8 @@ rlJournalStart
         rlRun "sensors 2>&1 | tee display" 0 "Displaying sensors"
         if rlAssertNotGrep "No sensors" "display"; then
             sensors=$(perl -e "print join ' ', sort((join '', <stdin>)
-	    		=~ m/^([^:\s]+)$/gm)" < display)
-	    sensorscount=$(echo "$sensors" | wc -w)
+                            =~ m/^([^:\s]+)$/gm)" < display)
+            sensorscount=$(echo "$sensors" | wc -w)
         else
             sensors="none"
             sensorscount="0"
@@ -86,8 +86,8 @@ rlJournalStart
         if rlRun "grep ^Driver detection | grep -v to-be-written > drivers" \
                 0 "Investigating detected drivers"; then
             drivers=$(perl -e "print join ' ', sort((join '', <stdin>)
-	    		=~ m/Driver \\\`(.*)'/g)" < drivers)
-	    driverscount=$(echo "$drivers" | wc -w)
+                            =~ m/Driver \\\`(.*)'/g)" < drivers)
+            driverscount=$(echo "$drivers" | wc -w)
         else
             drivers="none"
             driverscount="0"
