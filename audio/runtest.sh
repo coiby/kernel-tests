@@ -9,78 +9,78 @@ SUPPORTED_CARDS="PCH Intel SB MID Generic"
 
 report()
 {
-    local result=$1
-    local code=$2
+	local result=$1
+	local code=$2
 
-    #hack to bubble up failures
-    test "$result" == "FAIL" && touch .${SUBTEST}
+	#hack to bubble up failures
+	test "$result" == "FAIL" && touch .${SUBTEST}
 
-    report_result "${TEST}/${SUBTEST}${SUBSUBTEST}" "${result}" "${code}"
+	report_result "${TEST}/${SUBTEST}${SUBSUBTEST}" "${result}" "${code}"
 }
 
 fatal()
 {
-    code=$1
-    report "FAIL" "${code}"
+	code=$1
+	report "FAIL" "${code}"
 
-    #end the test
-    exit 0
+	#end the test
+	exit 0
 }
 
 die()
 {
-    echo "$1"
-    fatal "runcmd"
+	echo "$1"
+	fatal "runcmd"
 }
 
 #internal
 runcmd()
 {
-    local cmd=$1
+	local cmd=$1
 
-    test -n "$cmd" || die "runcmd needs args"
+	test -n "$cmd" || die "runcmd needs args"
 
-    echo " -# $cmd" >> $OUTPUTFILE
-    eval $cmd | tee -a $OUTPUTFILE
+	echo " -# $cmd" >> $OUTPUTFILE
+	eval $cmd | tee -a $OUTPUTFILE
 
-    return "${PIPESTATUS[0]}"
+	return "${PIPESTATUS[0]}"
 }
 
 #run command, exit test if it fails
 runcmd_fatal()
 {
-    runcmd "$1" || fatal "$?"
+	runcmd "$1" || fatal "$?"
 }
 
 #run command, report failure but continue
 runcmd_report_fail()
 {
-    runcmd "$1" || report "FAIL" "$?"
+	runcmd "$1" || report "FAIL" "$?"
 }
 
 #run command, report success as a failure (negative testing)
 runcmd_report_notfail()
 {
-    runcmd "$1" && report "FAIL" "$?"
+	runcmd "$1" && report "FAIL" "$?"
 }
 
 #run subtest command, report pass or fail and continue
 #hacked in mechanism to bubble up failures
 runcmd_subtest()
 {
-    SUBTEST="$1"
-    local cmd="$2"
+	SUBTEST="$1"
+	local cmd="$2"
 
-    test -n "$cmd" || die "runcmd_subtest needs args"
-    rm -f .${SUBTEST}
+	test -n "$cmd" || die "runcmd_subtest needs args"
+	rm -f .${SUBTEST}
 
-    runcmd "$2" || touch .${SUBTEST}
+	runcmd "$2" || touch .${SUBTEST}
 
-    #hack to bubble up failures
-    test -f .${SUBTEST} && report "FAIL" "0" || report "PASS" "0"
-    rm -f .${SUBTEST}
+	#hack to bubble up failures
+	test -f .${SUBTEST} && report "FAIL" "0" || report "PASS" "0"
+	rm -f .${SUBTEST}
 
-    SUBTEST=""
+	SUBTEST=""
 }
 
 loopback_test() {
@@ -99,12 +99,12 @@ loopback_test() {
 	recreturncode=$(cat p2.ret)
 	rm -f p1.ret p2.ret
 	if [ $playreturncode -ne 0 ]; then
-	  echo "Playback error: $playreturncode"
-	  return 1
+		echo "Playback error: $playreturncode"
+		return 1
 	fi
 	if [ $recreturncode -ne 0 ]; then
-	  echo "Capture error: $recreturncode"
-	  return 2
+		echo "Capture error: $recreturncode"
+		return 2
 	fi
 
 	#verify the out.wav.  The guess is seen in the SPECTURAL_NAME output
@@ -115,8 +115,8 @@ loopback_test() {
 	guess=$(echo $guess | sed 's/\.[0-9]*$//')
 	rm -f out.wav
 	if [ "${guess}.wav" != "$input_file" ]; then
-	  echo "FFT verify failed: $guess != $input_file"
-	  return 3
+		echo "FFT verify failed: $guess != $input_file"
+		return 3
 	fi
 
 	return 0
@@ -210,7 +210,7 @@ setup_audio() {
 		fi
 	fi
 	if `amixer cget name='Capture Source' | grep "'Mic'" > /dev/null`; then
-	    runcmd_fatal "amixer cset name='Capture Source' 'Mic'"
+		runcmd_fatal "amixer cset name='Capture Source' 'Mic'"
 	fi
 	if `amixer|grep "ADC" > /dev/null`; then
 		runcmd_fatal "amixer set 'ADC' cap"
