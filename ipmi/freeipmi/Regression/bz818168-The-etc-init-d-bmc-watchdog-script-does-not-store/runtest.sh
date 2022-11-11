@@ -46,7 +46,7 @@ rlJournalStart
 
     rlPhaseStartTest
         rlRun "service bmc-watchdog status"
-	rlAssertEquals "compare pidof bmc-watchdog with pidfile value" x"$(pidof ${BMW_BINARY})" x"$(cat $PIDFILE)"
+    rlAssertEquals "compare pidof bmc-watchdog with pidfile value" x"$(pidof ${BMW_BINARY})" x"$(cat $PIDFILE)"
     rlPhaseEnd
 
     rlPhaseStartCleanup
