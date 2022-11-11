@@ -1,7 +1,7 @@
 [General]
 description=Simulate wireless access points by sending wireless beacon packets.
 name=networking/wireless/tests/utility/beacon_simulator
-owner=Ken Benoit <kbenoit@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
