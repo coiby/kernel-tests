@@ -1,0 +1,4 @@
+PURPOSE of /kernel/audio/utils/average_frequency_compare
+Description: Perform an average frequency comparison between the provided wav files.
+Author: Ken Benoit <kbenoit@redhat.com>
+
