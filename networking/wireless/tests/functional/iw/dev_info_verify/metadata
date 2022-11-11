@@ -1,7 +1,7 @@
 [General]
 description=Verify iw's device info output.
 name=networking/wireless/tests/functional/iw/dev_info_verify
-owner=Ken Benoit <kbenoit@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
