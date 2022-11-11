@@ -87,26 +87,26 @@ rlJournalStart
     rlPhaseEnd
 
     for index in $(seq 11); do
-	rlPhaseStartTest "ipmitool sol set ${SOL_COMMAND[index]}"
-	    # check that all bad values report "Invalid value ..."
-	    for value in ${UGLY_VALUES[index]}; do
-		rlRun "ipmitool sol set ${SOL_COMMAND[index]} $value &> ${index}-${value}.out" 1
-		rlAssertGrep "Invalid value" "${index}-${value}.out"
-		# DEBUG
-		    echo "${SOL_COMMAND[index]} ${value} output:"
-		    cat "${index}-${value}.out"
-	    done
-	    # check that impitool tries to pass all valid values ...
-	    for value in ${GOOD_VALUES[index]}; do
-		rlRun "ipmitool sol set ${SOL_COMMAND[index]} $value &> ${index}-${value}.out" 1
-		# ^ note that non-zero exitcode is expected, as impi is not running
-		# and thus opening the device fails:
-		rlAssertGrep "Could not open device" "${index}-${value}.out"
-		# DEBUG
-		    echo "${SOL_COMMAND[index]} ${value} output:"
-		    cat "${index}-${value}.out"
-	    done
-	rlPhaseEnd
+        rlPhaseStartTest "ipmitool sol set ${SOL_COMMAND[index]}"
+            # check that all bad values report "Invalid value ..."
+            for value in ${UGLY_VALUES[index]}; do
+                rlRun "ipmitool sol set ${SOL_COMMAND[index]} $value &> ${index}-${value}.out" 1
+                rlAssertGrep "Invalid value" "${index}-${value}.out"
+                # DEBUG
+                    echo "${SOL_COMMAND[index]} ${value} output:"
+                    cat "${index}-${value}.out"
+            done
+            # check that impitool tries to pass all valid values ...
+            for value in ${GOOD_VALUES[index]}; do
+                rlRun "ipmitool sol set ${SOL_COMMAND[index]} $value &> ${index}-${value}.out" 1
+                # ^ note that non-zero exitcode is expected, as impi is not running
+                # and thus opening the device fails:
+                rlAssertGrep "Could not open device" "${index}-${value}.out"
+                # DEBUG
+                    echo "${SOL_COMMAND[index]} ${value} output:"
+                    cat "${index}-${value}.out"
+            done
+        rlPhaseEnd
     done
 
     for index in $(seq 2); do
@@ -130,7 +130,7 @@ rlJournalStart
     done
 
     rlPhaseStartCleanup
-	rlServiceRestore ipmi
+        rlServiceRestore ipmi
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
