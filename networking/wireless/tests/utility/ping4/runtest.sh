@@ -61,7 +61,7 @@ Server()
         # If not then grab all of the IPv4 addresses currently defined
         rlPhaseStartSetup
             local targets
-	    targets=$(ip route | grep src | awk '{print $9}')
+            targets=$(ip route | grep src | awk '{print $9}')
             for client in $CLIENTS
             do
                 # And send each IPv4 address to the client
@@ -124,8 +124,8 @@ Client()
                         do
                             # Request an IPv4 address from the server
                             rhts-sync-set -s "CLIENT_REQUESTING_$server"
-			    local target
-			    target=$(nc -l 10013)
+                            local target
+                            target=$(nc -l 10013)
                             # If we get the string "done" then the server
                             # has sent us all of its addresses and we should
                             # break out of the loop
