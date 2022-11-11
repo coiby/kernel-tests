@@ -29,5 +29,5 @@ then
         command_arguments="$command_arguments --test-frequency $frequency"
     done
 fi
-sh ../../../test-framework/test_launcher.sh $TEST "./test.py $command_arguments $@"
+sh ../../../test-framework/test_launcher.sh $TEST "./test.py $command_arguments" "$@"
 rhts-submit-log -l ./test.log
