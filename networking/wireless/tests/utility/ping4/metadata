@@ -1,9 +1,8 @@
 [General]
 description=Ping (IPv4) test using established connections
 name=networking/wireless/tests/utility/ping4
-owner=Ken Benoit <kbenoit@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=1h
-dependencies=RhtsRequires:;nc;iputils;kernel-kernel-test-framework;kernel-kernel-wireless_tests;kernel-kernel-wireless_tests-utility
