@@ -60,4 +60,4 @@ fi
 # Go back to the test directory
 echo $test_string
 
-sh ../../../test-framework/test_launcher.sh $TEST "$test_string $@"
+sh ../../../test-framework/test_launcher.sh $TEST "$test_string $*"

@@ -10,5 +10,5 @@ if [ -n "${SKIP_UNSUPPORTED+1}" ]
 then
 	command_arguments="$command_arguments --skip_unsupported"
 fi
-sh ../../../test-framework/test_launcher.sh $TEST "./test.py $command_arguments" "$@"
+sh ../../../test-framework/test_launcher.sh $TEST "./test.py $command_arguments $*"
 rhts-submit-log -l ./test.log
