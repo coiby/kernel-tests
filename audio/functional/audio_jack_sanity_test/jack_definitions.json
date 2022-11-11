@@ -1,0 +1,385 @@
+{
+    "0x8086": {
+        "0x8ca0": {
+            "subsystem": {
+                "0x8086": {
+                    "0x7270": {
+                        "jack_definitions": [
+                            "Headphone Jack",
+                            "Internal Mic Phantom Jack",
+                            "Line Jack",
+                            "Mic Jack",
+                            "SPDIF In Phantom Jack",
+                            "SPDIF Phantom Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x160c": {
+            "subsystem": {
+                "0x8086": {
+                    "0x2010": {
+                        "jack_definitions": [
+                            "HDMI/DP,pcm=3 Jack",
+                            "HDMI/DP,pcm=7 Jack",
+                            "HDMI/DP,pcm=8 Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x0c0c": {
+            "jack_definitions": [
+                "HDMI/DP,pcm=3 Jack",
+                "HDMI/DP,pcm=7 Jack",
+                "HDMI/DP,pcm=8 Jack"
+            ]
+        },
+        "0x8c20": {
+            "subsystem": {
+                "0x1028": {
+                    "0x05a6": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack",
+                            "Speaker Phantom Jack"
+                        ]
+                    }
+                },
+                "0x103c": {
+                    "0x1906": {
+                        "jack_definitions": [
+                            "Headphone Jack",
+                            "Internal Mic Phantom Jack",
+                            "Line Jack",
+                            "Mic Jack",
+                            "SPDIF Phantom Jack"
+                        ]
+                    }
+                },
+                "0x8086": {
+                    "0x7270": {
+                        "jack_definitions": [
+                            "Headphone Jack",
+                            "Internal Mic Phantom Jack",
+                            "Line Jack",
+                            "Mic Jack",
+                            "SPDIF Phantom Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x1e20": {
+            "subsystem": {
+                "0x103c": {
+                    "0x1790": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "HDMI/DP,pcm=3 Jack",
+                            "Line Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack",
+                            "Speaker Phantom Jack"
+                        ]
+                    }
+                },
+                "0x1028": {
+                    "0x053a": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "HDMI/DP,pcm=3 Jack",
+                            "HDMI/DP,pcm=7 Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack",
+                            "Speaker Phantom Jack"
+                        ]
+                    },
+                    "0x0574": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "HDMI/DP,pcm=3 Jack",
+                            "Line Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x1d20": {
+            "subsystem": {
+                "0x1028": {
+                    "0x0496": {
+                        "jack_definitions": [
+                            "Front Mic Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack",
+                            "Speaker Phantom Jack"
+                        ]
+                    },
+                    "0x05a1": {
+                        "jack_definitions": [
+                            "Line Out Jack",
+                            "Mic Jack"
+                        ]
+                    }
+                },
+                "0x8086": {
+                    "0x3594": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "Line Jack",
+                            "Line Out CLFE Jack",
+                            "Line Out Front Jack",
+                            "Line Out Side Jack",
+                            "Line Out Surround Jack",
+                            "Rear Mic Jack",
+                            "SPDIF Phantom Jack"
+                        ]
+                    },
+                    "0x2018": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "Line Jack",
+                            "Line Out CLFE Jack",
+                            "Line Out Front Jack",
+                            "Line Out Surround Jack",
+                            "Rear Mic Jack",
+                            "SPDIF Phantom Jack",
+                            "SPDIF Phantom Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x27d8": {
+            "subsystem": {
+                "0x1462": {
+                    "0x7336": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "Line Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack",
+                            "Speaker Phantom Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x3a3e": {
+            "subsystem": {
+                "0x103c": {
+                    "0x1309": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "Line Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack",
+                            "Speaker Phantom Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x3b56": {
+            "subsystem": {
+                "0x8086": {
+                    "0x3b56": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "HDMI/DP,pcm=3 Jack",
+                            "HDMI/DP,pcm=7 Jack",
+                            "HDMI/DP,pcm=8 Jack",
+                            "Line Jack",
+                            "Line Out CLFE Jack",
+                            "Line Out Front Jack",
+                            "Line Out Surround Jack",
+                            "Rear Mic Jack",
+                            "SPDIF Phantom Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x1c20": {
+            "jack_definitions": [
+                "Front Headphone Jack",
+                "Front Mic Jack",
+                "HDMI/DP,pcm=3 Jack",
+                "HDMI/DP,pcm=7 Jack",
+                "HDMI/DP,pcm=8 Jack",
+                "Line Jack",
+                "Line Out CLFE Jack",
+                "Line Out Front Jack",
+                "Line Out Surround Jack",
+                "Rear Mic Jack",
+                "SPDIF Phantom Jack"
+            ]
+        },
+        "0xa170": {
+            "jack_definitions": [
+                "HDMI/DP,pcm=3 Jack",
+                "HDMI/DP,pcm=7 Jack",
+                "HDMI/DP,pcm=8 Jack",
+                "Headphone Jack",
+                "Internal Mic Phantom Jack",
+                "Line Jack",
+                "Mic Jack",
+                "Speaker Front Phantom Jack",
+                "Speaker Surround Phantom Jack"
+            ]
+        },
+        "0xa2f0": {
+            "subsystem": {
+                "0x8086": {
+                    "0x7270" : {
+                        "jack_definitions": [
+                            "HDMI/DP,pcm=3 Jack",
+                            "Headphone Jack",
+                            "Internal Mic Phantom Jack",
+                            "Line Out Jack",
+                            "Mic Jack",
+                            "SPDIF Phantom Jack",
+                            "Speaker Phantom Jack"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "0x1002": {
+        "0x4383": {
+            "subsystem": {
+                "0x1002": {
+                    "0x4383": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "Line Jack",
+                            "Line Out CLFE Jack",
+                            "Line Out Front Jack",
+                            "Line Out Surround Jack",
+                            "Rear Mic Jack",
+                            "SPDIF In Phantom Jack",
+                            "SPDIF Phantom Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0xaa50": {
+            "subsystem": {
+                "0x1002": {
+                    "0xaa50": {
+                        "jack_definitions": [
+                            "HDMI/DP,pcm=3 Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0x9902": {
+            "jack_definitions": [
+                "HDMI/DP,pcm=3 Jack"
+            ]
+        },
+        "0x437b": {
+            "subsystem": {
+                "0x1462": {
+                    "0x7254": {
+                        "jack_definitions": [
+                            "CD Phantom Jack",
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "Headphone Phantom Jack",
+                            "Line Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack"
+                        ]
+                    }
+                }
+            }
+        },
+        "0xaa68": {
+            "jack_definitions": [
+                "HDMI/DP,pcm=3 Jack"
+            ]
+        }
+    },
+    "0x1022": {
+        "0x780d": {
+            "subsystem": {
+                "0x17aa": {
+                    "0x3089": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "Line Jack",
+                            "Line Out Jack",
+                            "Rear Mic Jack",
+                            "Speaker Phantom Jack"
+                        ]
+                    }
+                },
+                "0x1043": {
+                    "0x85a3": {
+                        "jack_definitions": [
+                            "Front Headphone Jack",
+                            "Front Mic Jack",
+                            "HDMI Phantom Jack",
+                            "Line Jack",
+                            "Line Out CLFE Jack",
+                            "Line Out Front Jack",
+                            "Line Out Side Jack",
+                            "Line Out Surround Jack",
+                            "Rear Mic Jack"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "0x10de": {
+        "0x0be3": {
+            "jack_definitions": [
+                "HDMI/DP,pcm=3 Jack",
+                "HDMI/DP,pcm=7 Jack",
+                "HDMI/DP,pcm=8 Jack",
+                "HDMI/DP,pcm=9 Jack"
+            ]
+        },
+        "0x0e08": {
+            "jack_definitions": [
+                "HDMI/DP,pcm=3 Jack",
+                "HDMI/DP,pcm=7 Jack"
+            ]
+        },
+        "0x0e09": {
+            "subsystem": {
+                "0x3842": {
+                    "0x1587": {
+                        "jack_definitions": [
+                            "HDMI/DP,pcm=3 Jack",
+                            "HDMI/DP,pcm=7 Jack",
+                            "HDMI/DP,pcm=8 Jack",
+                            "HDMI/DP,pcm=9 Jack"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
