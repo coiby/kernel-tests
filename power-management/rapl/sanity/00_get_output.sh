@@ -20,7 +20,7 @@ warn_file="warn.tmp"
 
 if [ -n "$1" ]; then
         runtime="$1"
-else        
+else
         runtime="300"
 fi
 

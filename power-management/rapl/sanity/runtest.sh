@@ -60,7 +60,7 @@ rlJournalStart
         ##rlRun -l "./00_get_output.sh 600 ./load1.sh"
         rlRun -l "./00_get_output.sh 600 ./load1.sh"
         #rlRun -l "./00_get_output.sh 600"
-        
+
         ## Test 5: Is reported power consumption from turbostat and perf the same even under load?
         ## Using data from Test 4
         rlRun -l "./01_compare_perf_and_turbostat.py"
