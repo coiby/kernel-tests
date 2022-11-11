@@ -1,4 +1,0 @@
-PURPOSE of /kernel/wireless_tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_TLS_AP
-Description: Establish a wireless connection to a WPA2 TLS AP.
-https://tcms.engineering.redhat.com/case/215381
-Author: Ken Benoit <kbenoit@redhat.com>

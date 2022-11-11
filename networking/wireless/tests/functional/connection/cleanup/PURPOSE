@@ -1,9 +1,0 @@
-PURPOSE of /kernel/wireless_tests/functional/connection/setup
-Description: Setup a wireless connection.
-Author: Ken Benoit <kbenoit@redhat.com>
-Test steps:
- * Choose which wireless interface to use and describe it
- * Determine the connection information to use
- * Download the certificates needed for authentication
- * Disable the wired network interfaces
- * Configure the test wireless interface

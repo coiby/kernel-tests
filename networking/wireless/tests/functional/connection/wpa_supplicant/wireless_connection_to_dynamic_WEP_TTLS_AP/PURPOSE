@@ -1,4 +1,0 @@
-PURPOSE of /kernel/wireless_tests/functional/connection/wpa_supplicant/wireless_connection_to_dynamic_WEP_TTLS_AP
-Description: Establish a wireless connection to a dynamic WEP w/ TTLS AP.
-https://tcms.engineering.redhat.com/case/215377
-Author: Ken Benoit <kbenoit@redhat.com>
