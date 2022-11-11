@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell
 /networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell
 /networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WEP_LEAP_AP/ @ltrivell
 /networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell
