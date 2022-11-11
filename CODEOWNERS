@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/ipmi/ipmitool/Sanity/smoke-test/ @ltrivell
 /ipmi/stress/interface/kcs/ @ltrivell
 /ipmi/hotmod/ @ltrivell
 /ipmi/sanity/watchdog-sanity-script/ @ltrivell
