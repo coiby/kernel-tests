@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/ipmi/ipmitool/Regression/bz1170266-ipmitool-returns-wrong-version-number/ @ltrivell
 /ipmi/ipmitool/Sanity/smoke-test/ @ltrivell
 /ipmi/stress/interface/kcs/ @ltrivell
 /ipmi/hotmod/ @ltrivell
