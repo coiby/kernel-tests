@@ -86,7 +86,7 @@ rlJournalStart
     rlPhaseEnd
 
     # IPMI Driver panics during hotmod/add operation if hotmod/remove operation has been done
-    # for it before (BZ 1139464) 
+    # for it before (BZ 1139464
     rlPhaseStartTest
         rlRun -l "modprobe ipmi_si"
         rlRun -l "echo $hotmodrm > /sys/module/ipmi_si/parameters/hotmod"
@@ -97,7 +97,7 @@ rlJournalStart
         else
             rlLogInfo "kipmi process killed successfully"
         fi
-        rlRun -l "echo $hotmodadd >  /sys/module/ipmi_si/parameters/hotmod" 
+        rlRun -l "echo $hotmodadd >  /sys/module/ipmi_si/parameters/hotmod"
         sleep 5
         if pgrep "kipmi"; then
             rlLogInfo "kipmi process is running"
