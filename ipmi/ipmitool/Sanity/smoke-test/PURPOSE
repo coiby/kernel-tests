@@ -1,0 +1,7 @@
+Name: /kernel/ipmitool/Sanity/smoke-test
+Description: Smoke test for ipmitool utility
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Its aim is to test some basic functionality provided by ipmitool utility.
+The test does not check the specific output as this will differ for each
+system, we are only concerned that the commands execute without error.

@@ -1,0 +1,18 @@
+PURPOSE of /kernel/mce-test/hwpoison
+Description: HWPoison test (MCA recovery)
+Author: Evan McNabb <emcnabb@redhat.com>
+
+HWPoison description: (from RHEL6 feature page) 
+---
+The HWPoison feature gives the possibility of recovery from an uncorrectable
+memory error incurred by a user process. In the past this would have resulted
+in an automatic kernel panic.  When an uncorrectable memory error is detected
+the associated memory page is flagged, and all user processes that have mapped
+that page are dealt with. For a clean page that has a duplicate backing copy on
+disk, the page is invalidated and isolated from future use. The user process
+carries on without issue. For a dirty page, the page is unmapped, and should
+the user process reference the page again it will be killed.
+---
+
+This RHTS test uses mce-test's HWPoison test to software inject errors and
+confirm OS correctly kills associated userspace process.

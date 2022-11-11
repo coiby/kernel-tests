@@ -1,0 +1,9 @@
+[General]
+description=Test to ensure wireless connections are maintained across suspend/resume.
+name=networking/wireless/tests/functional/suspend_resume
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=wget
