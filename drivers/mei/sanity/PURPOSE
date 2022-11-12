@@ -1,0 +1,6 @@
+PURPOSE of /kernel/drivers/mei/sanity
+Description: MEI driver Sanity Check
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Quick sanity check to verify MEI version is printed correctly, scan the logs
+to ensure no errors are generated.
