@@ -1,0 +1,5 @@
+PURPOSE of /kernel/freeipmi/Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log
+Description: Test for bz439411 (ipmi-sel aborts reading empty SEL log)
+Author: Rachel Sibley <rasibley@redhat.com>
+Bug summary: ipmi-sel aborts reading empty SEL log
+Bugzilla link: https://bugzilla.redhat.com/show_bug.cgi?id=439411
