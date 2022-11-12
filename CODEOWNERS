@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/firmware/linux-firmware/sanity/ @ltrivell
 /redfish/redfish-finder/ @ltrivell
 /lm_sensors/Sanity/detect/ @ltrivell
 /lm_sensors/Sanity/smoke/ @ltrivell
