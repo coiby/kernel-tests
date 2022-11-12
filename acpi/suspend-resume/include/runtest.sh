@@ -37,8 +37,8 @@ suspend_sysfs() {
         elif [ $RELEASE = rhel5 ]; then
                 echo `date -u -d "+ $SLEEP_TIME minutes" '+%F %T'` > /proc/acpi/alarm
         fi
-        print_rtc                     
-    
+        print_rtc
+
         # weird things can happen in beaker report if
         # there is no flush before suspend
         rhts-flush
@@ -112,7 +112,7 @@ suspend_setup() {
                 # For debugging purposes, don't suspend serial console
                 default=`grubby --default-kernel`
                 grubby --args="no_console_suspend" --update-kernel=$default
-        
+
                 # compile time.c into time so we can check time before/after suspending
                 setup_time
 
@@ -144,7 +144,7 @@ avoid_reboot_hibernation() {
     if [[ $state_ = disk ]]; then
             hibernation_mode=`cat /sys/power/disk | sed 's/\(.*\)\[\(.*\)\]\(.*\)/\2/g'`
 
-            # reboot mode                                                                                      
+            # reboot mode
             if [[ $hibernation_mode = reboot ]]; then
                     if grep -q platform /sys/power/disk; then
                             echo "Setting to platform hibernation mode" | tee -a ${OUTPUTFILE}
@@ -184,20 +184,20 @@ OTTIME_1\n\t * After  suspend to $i boottime = $BOOTTIME_2\n" | tee -a ${OUTPUTF
     fi
 }
 
-suspend_time() { 
-    timeArg=$1 
-    if [ $timeArg = recordStart ]; then 
+suspend_time() {
+    timeArg=$1
+    if [ $timeArg = recordStart ]; then
         echo `./time | sed -n 2p | awk '{ print $1 }'` > $START_TIME
-    elif [ $timeArg = recordEnd ]; then 
-        END_TIME=`./time | sed -n 2p | awk '{ print $1 }'` 
-        # If we have END_TIME we must have gotten START_TIME and can  
-        # do math to see if suspend happened within reasonable amount of time 
-        SUSPENSION_TIME=`expr $END_TIME - $(cat $START_TIME)` 
+    elif [ $timeArg = recordEnd ]; then
+        END_TIME=`./time | sed -n 2p | awk '{ print $1 }'`
+        # If we have END_TIME we must have gotten START_TIME and can
+        # do math to see if suspend happened within reasonable amount of time
+        SUSPENSION_TIME=`expr $END_TIME - $(cat $START_TIME)`
         echo "suspension time is $SUSPENSION_TIME seconds" | tee -a ${OUTPUTFILE}
 
-    else 
+    else
         echo "suspend_time() called without either recordStart or recordEnd"  | tee -a ${OUTPUTFILE}
-    fi  
+    fi
 }
 
 acceptable_delta() {
@@ -216,7 +216,7 @@ acceptable_delta() {
             SUSPENDTIME=PASS
         else
             SUSPENDTIME=FAIL
-        fi  
+        fi
     else
         echo "no expected_delta passed to acceptable_delta()" | tee -a ${OUTPUTFILE}
         echo "just make sure suspendedTime was >= $SLEEP_TIME minutes" | tee -a ${OUTPUTFILE}
@@ -226,12 +226,12 @@ acceptable_delta() {
             SUSPENDTIME=FAIL
         fi
      fi
-    
+
 
     echo "acceptable delta  $SUSPENDTIME" | tee -a ${OUTPUTFILE}
 }
 
-suspend_state_support() {                                                                                            
+suspend_state_support() {
     if [ $1 = mem ]; then
         suspend_state_description="Suspend-to-RAM (s3)"
     elif [ $1 = disk ]; then
