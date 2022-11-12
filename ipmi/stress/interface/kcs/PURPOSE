@@ -1,0 +1,5 @@
+PURPOSE of /kernel/ipmi/stress/interface/kcs
+Description: IPMI kcs hang test
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Print the kcs i/o port in a loop to verify it does not get wedged.
