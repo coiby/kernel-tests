@@ -1,0 +1,9 @@
+[General]
+description=Test for BZ#818168 (The /etc/init.d/bmc-watchdog script does not store)
+name=ipmi/freeipmi/Regression/bz818168-The-etc-init-d-bmc-watchdog-script-does-not-store
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=freeipmi;freeipmi-bmc-watchdog;freeipmi-ipmidetectd
