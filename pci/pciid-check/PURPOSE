@@ -1,0 +1,7 @@
+PURPOSE of /kernel/pci/pciid-check
+Description: Confirm PCI IDs are updated on system
+Author: Evan McNabb <emcnabb@redhat.com>
+
+Verify ID strings for all PCI devices on the system exist (not "Unknown
+device"). Fetch the most recent upstream version and confirm it is set there
+too.
