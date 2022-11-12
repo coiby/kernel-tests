@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/ipmi/OpenIPMI/rmcp_ping/ @ltrivell
 /ipmi/freeipmi/Regression/bz818168-The-etc-init-d-bmc-watchdog-script-does-not-store/ @ltrivell
 /Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log/ @ltrivell
 /ipmi/ipmitool/Regression/bz532445-ipmievd-init-script-s-condrestart-doesn-t-work/ @ltrivell
