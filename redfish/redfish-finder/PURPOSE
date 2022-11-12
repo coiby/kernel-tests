@@ -1,0 +1,5 @@
+Verify redfish-finder service starts successfully and adds
+the redfish-local entry to /etc/hosts
+
+NOTE: This test is only supported on hardware with a BMC which
+supports redfish
