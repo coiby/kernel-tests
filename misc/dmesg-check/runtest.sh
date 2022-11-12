@@ -4,7 +4,7 @@
 #
 #   runtest.sh of /kernel/misc/dmesg-check
 #   Description: Check dmesg log after boot for any bugs. We also check
-#		 for warnings and errors.
+#   for warnings and errors.
 #   Author: William Gomeringer <wgomerin@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,9 +69,9 @@ warning_check()
 
 check_output()
 {
-	grep -w BUG /var/log/dmesg > $LOG
-	grep -i error /var/log/dmesg >> $LOG
-	grep -i warning /var/log/dmesg >> $LOG
+    grep -w BUG /var/log/dmesg > $LOG
+    grep -i error /var/log/dmesg >> $LOG
+    grep -i warning /var/log/dmesg >> $LOG
 }
 
 rlJournalStart
