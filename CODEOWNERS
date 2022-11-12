@@ -18,6 +18,7 @@
 /ipmi/hotmod/ @ltrivell
 /ipmi/sanity/watchdog-sanity-script/ @ltrivell
 /ipmi/sanity/ipmi-sanity-check/ @ltrivell
+/networking/wireless/tests/functional/crda/regdom_verify/ @ltrivell
 /networking/wireless/tests/functional/iw/dev_info_verify/ @ltrivell
 /networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_TLS_AP/ @ltrivell
 /networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell
@@ -50,7 +51,6 @@
 /networking/wireless/tests/functional/suspend_resume/ @ltrivell
 /networking/wireless/tests/utility/ping4/ @ltrivell
 /networking/wireless/tests/utility/beacon_simulator/ @ltrivell
->>>>>>> CODEOWNERS
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
