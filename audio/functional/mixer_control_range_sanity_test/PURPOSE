@@ -1,6 +1,7 @@
 PURPOSE of /kernel/audio_tests/functional/mixer_control_range_sanity_test
 Description: Test that runs through each mixer control and tests the full range of values for that control (also testing values outside of the range).
 Author: Ken Benoit <kbenoit@redhat.com>
+Maintainer: Erik Hamera <ehamera@redhat.com>
 Test steps:
  * Check each mixer control and test the full range of valid values for that control
  * Check each mixer control and test invalid values for that control

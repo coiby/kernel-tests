@@ -3,6 +3,7 @@
 #   Makefile of /kernel/audio/functional
 #   Description: Base audio functional test directory.
 #   Author: Ken Benoit <kbenoit@redhat.com>
+#   Maintainer: Erik Hamera <ehamera@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -40,7 +41,7 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Ken Benoit <kbenoit@redhat.com>" > $(METADATA)
+	@echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
