@@ -3,6 +3,7 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
+/lm_sensors/Sanity/detect/ @ltrivell
 /lm_sensors/Sanity/smoke/ @ltrivell
 /networking/wireless/tests/utility/beacon_simulator/ @ltrivell
 /ipmi/OpenIPMI/ipmitool/ @ltrivell
