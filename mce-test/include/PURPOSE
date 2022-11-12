@@ -1,0 +1,6 @@
+PURPOSE of /kernel/mce-test/include
+Description: Common functions for mce-test tests
+Author: Evan McNabb <emcnabb@redhat.com>
+
+See $Description.
+
