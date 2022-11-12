@@ -33,7 +33,7 @@
 rlJournalStart
     rlPhaseStartSetup
         #rlRun "pwd_old=\$(pwd)"
-        rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
+        #rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         #rlRun "pushd $TmpDir"
     rlPhaseEnd
 
@@ -50,7 +50,7 @@ rlJournalStart
 
     rlPhaseStartCleanup
         #rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+        #rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
