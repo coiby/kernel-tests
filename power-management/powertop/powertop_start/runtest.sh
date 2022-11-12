@@ -39,7 +39,7 @@ rlJournalStart
 
     rlPhaseStartTest
         # Test: Run test via parser
-        rlRun -l "../../include_parser/test_dispatch.sh DEFAULT ../../include_parser/parser1 powertop_start _ RHEL6 ./dummy_test_rh6.sh"
+        rlRun -l "../../include_parser/test_dispatch.sh DEFAULT ../../include_parser/parser1 powertop_start.parser1 _ RHEL6 ./dummy_test_rh6.sh"
 
     rlPhaseEnd
 
