@@ -223,10 +223,10 @@
 /general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
-/kdump-cki/kdump-file-load/ @bgoncalv @emmawu1 @lulinqing
-/kdump-cki/kdump-sysrq-c/ @bgoncalv @emmawu1 @lulinqing @thenzl
-/kdump-cki/kexec-boot/ @bgoncalv @emmawu1 @lulinqing
-/kdump-cki/kexec-file-load/ @bgoncalv @emmawu1 @lulinqing
+/kdump-cki/kdump-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
+/kdump-cki/kdump-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @thenzl
+/kdump-cki/kexec-boot/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
+/kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
 /kselftests/ @bgoncalv @liuhangbin @lulinqing @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
@@ -237,6 +237,7 @@
 /memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /misc/header-test/ @bgoncalv @jbastianrh @lulinqing
+/misc/kernel-fips-mode/ @bgoncalv @lulinqing @omoris
 /misc/module-load/ @bgoncalv @jbastianrh @lulinqing
 /networking/driver/sanity/ @bgoncalv @linville-rh @lulinqing
 /networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
@@ -253,6 +254,8 @@
 /networking/vnic/sriov/ @bgoncalv @lulinqing @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
+/packages/perf/internal-testsuite/ @bgoncalv @lulinqing @mpetlan
+/packages/perf/perftool-testsuite/ @bgoncalv @lulinqing @mpetlan
 /packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @ckalina @lulinqing
 /packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @ckalina @lulinqing
 /packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @ckalina @lulinqing
