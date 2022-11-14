@@ -1,0 +1,38 @@
+{
+    "allowed_hostnames":
+        {
+            "name_type": "hostname",
+            "regex": false,
+            "name_list":
+                [
+
+                ]
+        },
+    "allowed_dnsdomainnames":
+        {
+            "name_type": "dnsdomainname",
+            "regex": false,
+            "name_list":
+                [
+                    "wlan.rhts.eng.bos.redhat.com"
+                ]
+        },
+    "allowed_hostname_regexes":
+        {
+            "name_type": "hostname",
+            "regex": true,
+            "name_list":
+                [
+
+                ]
+        },
+    "allowed_dnsdomainname_regexes":
+        {
+            "name_type": "dnsdomainname",
+            "regex": true,
+            "name_list":
+                [
+
+                ]
+        }
+}

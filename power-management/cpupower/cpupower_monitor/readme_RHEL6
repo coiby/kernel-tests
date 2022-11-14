@@ -1,0 +1,5 @@
+There is no "online" file in the /sys/devices/system/cpu/cpu0/ path in the
+RHEL6. Therefore this test can't work even after installing the cpupower
+which is in the cpupowerutils package.
+
+This test PASS on RHEL6 always to not create false positives.

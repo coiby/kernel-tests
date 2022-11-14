@@ -1,0 +1,12 @@
+PURPOSE of /kernel/ipmi/hotmod
+Description: Tests hot add/remove of IPMI interfaces
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Description:
+This test came about because of a regression Fujitsu ran into with RHEL 6.6. 
+They were one of the vendors that were upset by static linking of ipmi and
+they need to be able to hot mod ipmi because of their hardware partitioning 
+capabilities. Now that ipmi is dynamically linked again, they expect 
+that the pre-6.4 ability to hot mod ipmi should work.
+
+PASS on hot add/remove of IPMI interfaces without kernel panic

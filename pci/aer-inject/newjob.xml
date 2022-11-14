@@ -1,0 +1,44 @@
+<job retention_tag="60days">
+	<whiteboard>
+		pci aer injector test (F16+el7 kernel)
+	</whiteboard>
+	<recipeSet priority="Normal">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="method=nfs" role="None" whiteboard="">
+			<autopick random="false"/>
+			<watchdog panic="None"/>
+			<packages/>
+			<ks_appends/>
+			<repos/>
+			<distroRequires>
+				<and>
+					<distro_family op="=" value="Fedora16"/>
+					<distro_method op="=" value="nfs"/>
+					<distro_variant op="=" value=""/>
+					<distro_arch op="=" value="x86_64"/>
+				</and>
+				<distro_virt op="=" value=""/>
+			</distroRequires>
+			<hostRequires>
+				<and>
+				<system_type value="Machine"/>
+				</and>
+			</hostRequires>
+			<partitions/>
+			<task name="/distribution/install" role="STANDALONE">
+				<params>
+					<param name="AVC_ERROR" value="+no_avc_check"/>
+				</params>
+			</task>
+			<task name="/distribution/kernelinstall" role="STANDALONE">
+				<params>
+					<param name="KERNELARGNAME" value="kernel"/>
+					<param name="KERNELARGVERSION" value="3.1.4-0.2.el7"/>
+					<param name="KERNELARGVARIANT" value="up"/>
+				</params>
+			</task>
+                        <task name="/kernel/pci/aer-inject" role="STANDALONE">
+                                <params/>
+                        </task>
+ 		</recipe>
+	</recipeSet>
+</job>

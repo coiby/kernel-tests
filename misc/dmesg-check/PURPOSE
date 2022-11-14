@@ -1,0 +1,14 @@
+PURPOSE of /kernel/misc/dmesg-check
+Description: Check dmesg log after boot for any bugs, errors, or warnings.
+Author: William Gomeringer <wgomerin@redhat.com>
+
+Description:
+
+PASS if no bugs found during boot. Warn on warnings and errors. 
+The reason for this is that we can get spurious errors, for example:
+
+kernel: ERST: Error Record Serialization Table (ERST) support is initialized.
+
+or harmless warnings. Look at the logs to determine if the warning or error 
+is really a bug.
+
