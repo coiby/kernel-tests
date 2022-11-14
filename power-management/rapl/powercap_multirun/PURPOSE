@@ -1,0 +1,23 @@
+PURPOSE of /kernel/power-management/rapl/powercap_multirun
+Description: Simple test of powercap.
+Author: Erik Hamera <ehamera@redhat.com>
+
+RAPL = Running Average Power Limit
+
+Check RAPL functions. It measures power consumption on idle and on full load on all cores.
+Then it will cap it to the average power and measures power consumption under full load again.
+
+There are two magic constants in it:
+- measure time is 30 seconds
+- 10% maximal difference between measured and capped value until test is going to fail
+
+These constants are __NOT__ emerging from intel's datasheets or something like that. They
+__ARE__ just wild guess which should suppress false alarms due to started daemons and other
+fluctuations. Feel free to change it if your guess is better, than mine.
+
+The powercap test fails on some computers the first time and works properly after that.
+This test is the exact copy of the powercap test, but the testing phase is tripled with
+sleep between 2nd and 3rd test.
+
+It works on RHEL 6.7.
+

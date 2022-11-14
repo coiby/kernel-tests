@@ -1,0 +1,9 @@
+[General]
+description=Verify iw's device info output.
+name=networking/wireless/tests/functional/iw/dev_info_verify
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=iw

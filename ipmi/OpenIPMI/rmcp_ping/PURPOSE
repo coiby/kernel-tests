@@ -1,0 +1,7 @@
+Name: smoke test for rmcp_ping utility
+Author: Milos Malik <mmalik@redhat.com>
+
+Its aim is to test some basic functionality provided by rmcp_ping utility.
+This test is non-destructive.
+
+There are no related bugzillas.
