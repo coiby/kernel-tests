@@ -1,6 +1,17 @@
 [Codeowners]
 /CODEOWNERS @bgoncalv @lulinqing @mh21
 
+[tests]
+/filesystems/xfs/xfs-repair-dryrun/ @jbastianrh
+/general/crc32c-self-check/ @jbastianrh
+/general/time/elapsed/ @jbastianrh
+/hw-enablement/amd-ccp/ @jbastianrh
+/microcode/sanity/ @jbastianrh
+/misc/record-microcode/ @jbastianrh
+/misc/record-proc-interrupts/ @jbastianrh
+/misc/set-hwclock/ @jbastianrh
+/security/rdrand/ @jbastianrh
+
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
 /firmware/linux-firmware/sanity/ @ltrivell
