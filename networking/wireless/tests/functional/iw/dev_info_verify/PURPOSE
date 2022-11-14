@@ -1,0 +1,7 @@
+PURPOSE of /kernel/wireless_tests/functional/iw/dev_info_verify
+Description: Verify iw's device info output.
+Author: Ken Benoit <kbenoit@redhat.com>
+Test steps:
+ * Select a wireless interface to test against
+ * Get wireless interface info from /sys/class/net
+ * Verify the iw dev info output for the wireless interface

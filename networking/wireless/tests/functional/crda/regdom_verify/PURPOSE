@@ -1,0 +1,6 @@
+PURPOSE of /kernel/wireless_tests/functional/crda/regdom_verify
+Description: Verify the regulatory domain rules
+Author: Ken Benoit <kbenoit@redhat.com>
+Test steps:
+ * Determine what version of crda is installed
+ * Verify that the regulatory domain rules are correct

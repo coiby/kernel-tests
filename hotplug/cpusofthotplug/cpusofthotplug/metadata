@@ -1,0 +1,14 @@
+[General]
+description=Test for CPU soft hotplugging
+name=/kernel/hotplug/cpusofthotplug
+owner=William Gomeringer <wgomerin@redhat.com>
+license=GPLv2
+
+[restraint]
+entry_point=./runtest.sh
+max_time=1h
+dependencies=
+TestVersion=1.0
+Requires=kernel
+Path=/kernel/hotplug/cpusofthotplug
+RunFor=kernel

@@ -1,0 +1,712 @@
+#!/bin/bash
+
+#Author Erik hamera
+#licence GNU GPL
+
+# --------------- exit codes ----------------
+PASS=0
+FAIL=1
+TESTERR=2 #todo check exitcodes from commands
+OLDBASH=3
+PARSEERROR=4
+UNDEFINED=255
+#--------------------------------------------
+
+#sysinfo commands abbreviation file
+#the file is supposed to be in the same directory as the parser itself
+#sysinfo is meant to provide very short and fast way (prom test writing point of view) how to gather lots on info about the system
+#for example: You don't want to have hostname in any logs, therefore abbreviation uname should stand for uname -srvm
+#syntax:
+#sysinfo uname lscpu lspci lsusb
+#syntax of the abbreviation file:
+#uname uname -srvm
+#The first word is abbreviation, the rest is command
+sysinfo_abbr="$(dirname "$0")/parser1.sysinfo_default"
+
+# --------------- REQUIRES ----------------
+# bash 4 or newer
+# bc
+# -----------------------------------------
+
+bash --version
+if [ "$(bash --version | head -n 1 | sed 's/.* version \([^ .]*\)[ .].*/\1/')" -lt "4" ]; then
+        echo "BASH 4 or newer is needed to run this script"
+        exit "$OLDBASH"
+fi
+
+#mk tmpdir and cd into
+tmpdir="$(date "+parsertmp_%Y%m%d-%H%M%S")"
+mkdir "$tmpdir"
+cd "$tmpdir"
+
+#declare some variables
+#for whole config file line by line
+declare -a srcarray
+src_len=0
+src_idx=0
+#for actual line obtained from srcarray
+declare -a linearray
+#associative arrays
+#for numbers found by grep in the output of tested commands
+declare -A gresults # $[...
+#for shell return values of these commands
+declare -A retval # $r[...
+#for internal variables declared in the config file
+declare -A intvars # $i[...
+#for implementation of loops in the code
+declare -A loop
+loop[current]="0" #set the curent loop to "no loop"
+#for result of the test
+failed=0
+passed=0
+parseerror=0
+default="pass"
+
+# --------------- functions ----------------
+getvalue() {
+        # $1 describes variable name in the config file
+        # example $[1,cur_cpu_freq,0]
+        var="$1"
+        vartype="gresults"
+        varstart="1"
+        if [ "${w:0:1}" != '$' ]; then
+                echo "parse error: variable name '$var' should start with \$ character."
+                parseerror=1
+                return
+        fi
+
+        if [ "${w:1:1}" = 'i' ]; then
+                vartype="intvars"
+                varstart=2
+        else if [ "${w:1:1}" = 'r' ]; then
+                vartype="retval"
+                varstart=2
+        else if [ "${w:1:1}" = 'p' ]; then
+                vartype="prefixed"
+                varstart=2
+        fi; fi;fi
+
+        if [ "${w:$varstart:1}" != '[' ]; then
+                echo "parse error: expexted '[' in the variable name '$var'."
+                parseerror=1
+                return
+        fi
+        # the last charecter's index is length-1
+        #TODO: find the ']' and use just that part, this would enable using the variable name
+        #without whitespace after it
+        if [ "${w:${#w}-1}" != ']' ]; then
+                echo "parse error: expexted ']' in the variable name '$var'."
+                parseerror=1
+                return
+        fi
+
+        if [ "$vartype" = "prefixed" ]; then
+                #We're going to combine value from gresults and the SI prefix
+                mantisa="${gresults["${w:$varstart+1:${#w}-2-$varstart}"]}"
+                exponent="${gresults["${w:$varstart+1:${#w}-2-$varstart},prefix"]}"
+                echo "$mantisa * $exponent" | bc -l | sed 's/\.00*$//'
+                #Why the sed after the bc? If the number is integer, it will stay usable
+                #in bash numeric expressions too.
+        else
+                ## the slice's/key's length is lower by 3 characters, than $var's length
+                # the slice's/key's length is lower by $varstart+2 characters, than $var's length
+                #echo -n "${gresults["${w:$varstart+1:${#w}-3}"]}" #oldversion for just gresults
+                eval "echo -n \${${vartype}["${w:$varstart+1:${#w}-2-$varstart}"]}"
+                #$vartype is set in this function, so it shouldn't contain any bad code
+                #
+                #how this insanity works?
+                #${#w}-3 is length of $w minus 3 - senght of the key
+                #$varstart+1 is 1 or 2 (depends on type of variable) plus 1 - so the first
+                #symbol of the key for the array
+                #"${w:$varstart+1:${#w}-2-$varstart}" - the key - slice of the $w variable
+                #\${${vartype}["${w:$varstart+1:${#w}-2-$varstart}"]} - it will be evaluated
+                #to something like ${gresults["${w:$varstart+1:${#w}-2-$varstart}"]} by eval
+        fi
+}
+
+SI_prefix_to_number() {
+        # $1 may contain [0-9.]*_ on the start
+        # $1 contains one SI prefix character on the end
+        echo "$1" | sed 's/.*_//;
+                s/y/10^-24/;
+                s/b/10^-21/;
+                s/z/10^-21/;
+                s/a/10^-18/;
+                s/f/10^-15/;
+                s/p/10^-12/;
+                s/n/10^-9/;
+                s/u/10^-6/;
+                s/m/10^-3/;
+                s/k/10^3/;
+                s/M/10^6/;
+                s/G/10^9/;
+                s/T/10^12/;
+                s/P/10^15/;
+                s/E/10^18/;
+                s/Z/10^21/;
+                s/Y/10^24/'
+}
+
+# --------------- main ----------------
+#read the test source code into array first. This will improve handling loops
+while read srcarray["$src_idx"]; do
+        (( src_idx+=1 ))
+done < "../$1"
+src_len="$src_idx"
+src_idx="0"
+
+#while read line; do
+while [ "$src_idx" -lt "$src_len" ] ; do
+        #Loops in the config file will modify $src_idx, therefore for/foreach cycle
+        #wouldn't work here.
+        line="${srcarray["$src_idx"]}"
+        line_idx="$src_idx" #The current line
+        (( src_idx+=1 )) #The next line
+
+        #echo "DEBUG: line=$line"
+        #noglob is a way, how to not convert \* to * here
+        set -o noglob
+        #put the line to the array linearray word by word
+        linearray=($line)
+        set +o noglob
+
+        #just for debug:
+        #for i in `seq 0 ${#linearray[@]}`; do
+        #        echo -n "Element [$i]: ${linearray[$i]}  "
+        #done; echo
+
+        if echo "$line" | grep -q -e '^[[:space:]]*#'; then
+                # -q = quiet, -e is needed to [:space:] be usable
+                #echo "DEBUG: comment"
+                continue
+        fi
+        if echo "$line" | grep -q -e '^[[:space:]]*$'; then
+                #echo "DEBUG: empty line"
+                continue
+        fi
+
+        #for name_of_var length_of_the_loop
+        #The variable name_of_var will go through 0 to length_of_the_loop-1
+        #The config's variable $i[name_of_var,idx] will go through 0 to length_of_the_loop-1
+        #The config's variable $i[name_of_var,count] contains length_of_the_loop
+        if [ "${linearray[0]}" = 'for' ]; then
+                #depth of looping - 0 = no loop
+                (( loop['current']+=1 ))
+                #loop variable name
+                loop[${loop['current']}]="${linearray[1]}"
+                #start of this loop is the next line
+                loop[${loop['current']}",start"]="$src_idx"
+                #loop starts from 0 every times, the value and value index are the same here
+                loop[${loop['current']}",value"]="0"
+                loop[${loop['current']}",value_idx"]="0"
+                #loop type - 'for' means value=value_idx, no values in array
+                loop[${loop['current']}",type"]="for"
+                #the value should be accessible from the config file as $i[name]
+                intvars["${linearray[1]}"]="0"
+                #the parameter of loop is how many loops there will be
+                loop[${loop['current']}",values_count"]="${linearray[2]}"
+                #let's have the value_idx and values-count accessible from the config
+                #example: $i[x] $i[x,idx] $i[x,count]
+                intvars["${linearray[1]},idx"]="${loop[${loop['current']}",value_idx"]}"
+                intvars["${linearray[1]},count"]="${loop[${loop['current']}",values_count"]}"
+
+                continue
+        fi
+
+        #foreach name_of_var string with values
+        #The variable name_of_var will go through all words in the string
+        #The config's variable $i[name_of_var,idx] will go through 0 to length_of_the_loop-1
+        #The config's variable $i[name_of_var,count] contains length_of_the_loop
+        if [ "${linearray[0]}" = 'foreach' ]; then
+                #depth of looping - 0 = no loop
+                (( loop['current']+=1 ))
+                #loop variable name
+                loop[${loop['current']}]="${linearray[1]}"
+                #start of this loop is the next line
+                loop[${loop['current']}",start"]="$src_idx"
+                #values are in string after the loop variable name
+                #initializing the value count - how many loops there will be
+                loop[${loop['current']}",values_count"]="0"
+                for w in ${linearray[@]:2}; do
+                        #The first character from the $w
+                        if [ "${w:0:1}" = "$" ]; then
+                                #TODO: check for whole $[ ... ] format and split it to
+                                #var in [] and the rest
+                                #
+                                #substitute it with data from gresults
+                                loop[${loop['current']}",values,"${loop[${loop['current']}",values_count"]}]="$(getvalue "$w")"
+                        else
+                                loop[${loop['current']}",values,"${loop[${loop['current']}",values_count"]}]="$w"
+                        fi
+                        (( loop[${loop['current']}",values_count"]+=1 ))
+                done
+                #fill the first value
+                loop[${loop['current']}",value"]="${loop[${loop['current']}",values,0"]}"
+                #loop index is numerical value
+                loop[${loop['current']}",value_idx"]="0" #it isn't needed here
+                #loop type - 'for' means value=value_idx, no values in array
+                loop[${loop['current']}",type"]="foreach"
+                #the value should be accessible from the config file as $i[name]
+                intvars["${linearray[1]}"]="${loop[${loop['current']}",value"]}"
+                #let's have the value_idx and values-count accessible from the config
+                #example: $i[x] $i[x,idx] $i[x,count]
+                intvars["${linearray[1]},idx"]="${loop[${loop['current']}",value_idx"]}"
+                intvars["${linearray[1]},count"]="${loop[${loop['current']}",values_count"]}"
+
+                continue
+        fi
+
+        if [ "${linearray[0]}" = 'forend' ]; then
+                #are we in the loop?
+                if [ "${loop['current']}" -le "0" ]; then
+                        #error, we aren't in any loop
+                        echo "ERROR on line $line_idx - too many forends."
+                        (( parseerror+=1 ))
+                        #The program can continue.
+                        continue
+                fi
+                (( loop[${loop['current']}",value_idx"]+=1 ))
+                #is this end of this loop?
+                #loop x 10 goes from 0 to 9 and should be terminated if x is 10 here
+                if [ "${loop[${loop['current']}",value_idx"]}" -ge "${loop[${loop['current']}",values_count"]}" ]; then
+                        #decrease the loop depth
+                        (( loop['current']-=1 ))
+                        #the rest is O.K., values in the loop array will be rewriten at
+                        #the enter of next loop of the same depth
+                        #src_idx is O.K.
+                        continue
+                else
+                        #continue looping with the next value
+                        #we'll read the first line of this loop next time
+                        src_idx="${loop[${loop['current']}",start"]}"
+                        if [ "${loop[${loop['current']}",type"]}" = 'for' ]; then
+                                (( loop[${loop['current']}",value"]+=1 ))
+
+                        else
+                                #                                                                   v--- index to array of values
+                                #    v--- loop number                    v--- loop number                  v--- loop number
+                                loop[${loop['current']}",value"]="${loop[${loop['current']}",values,${loop[${loop['current']}",value_idx"]}"]}"
+                        fi
+
+                        #the value should be accessible from the config file as $i[name]
+                        #      |--- loop (variable) name
+                        #      v      v--- loop number
+                        intvars[${loop[${loop['current']}]}]="${loop[${loop['current']}",value"]}"
+                        intvars[${loop[${loop['current']}]}",idx"]="${loop[${loop['current']}",value_idx"]}"
+
+                fi
+                continue
+        fi
+
+        #run
+        if [ "${linearray[0]}" = 'run' ]; then
+                if ! [ -d "data" ]; then mkdir data; fi
+                echo "executing '${linearray[@]:2}' and storing to file: ${linearray[1]}"
+                ${linearray[@]:2} 2> data/${linearray[1]}.stderr > data/${linearray[1]}
+                retval["${linearray[1]}"]="$?"
+                #The output should end in the log always
+                echo "STDOUT"
+                cat data/${linearray[1]}
+                echo "STDERR"
+                cat data/${linearray[1]}.stderr
+                echo "RETURN VALUE"
+                echo "${retval["${linearray[1]}"]}"
+                continue
+        fi
+
+        #load
+        #load name_of_load 0.5
+        #                  ^^^ load will run on half of CPUs
+        if [ "${linearray[0]}" = 'load' ]; then
+                numcpus="$(lscpu -p=cpu |grep -v '^#'|wc -l)"
+                numcpusloaded="$(echo "$numcpus "'*'"${linearray[2]} + 0.5" | bc -l | sed 's/\.[0-9][0-9]*$//')"
+                echo "executing load on $numcpusloaded and storing pids: \$[${linearray[1]}]"
+                for cpu in `seq 1 "$numcpusloaded"`; do
+                        dd if=/dev/zero of=/dev/null 2>/dev/null &
+                        gresults["${linearray[1]}"]="${gresults["${linearray[1]}"]} $!"
+                done
+                echo "load is running with pids: ${gresults["${linearray[1]}"]}"
+                continue
+        fi
+
+        #load_kill, load_stop, load_cont
+        #load_kill name_of_load
+        if [ "${linearray[0]}" = 'load_kill' -o "${linearray[0]}" = 'load_stop' -o "${linearray[0]}" = 'load_cont' ]; then
+
+                if [ "${linearray[0]}" = 'load_stop' ]; then
+                        signal="SIGSTOP "
+                else if [ "${linearray[0]}" = 'load_cont' ]; then
+                        signal="SIGCONT "
+                else #load_kill
+                        signal=""
+                fi; fi
+
+                echo "killing load ${linearray[1]} ${signal:+by signal $signal} with pids: ${gresults["${linearray[1]}"]}"
+                for pid in ${gresults["${linearray[1]}"]}; do
+                        #echo debug kill ${signal:+-s} $signal "$pid"
+                        kill ${signal:+-s} $signal "$pid"
+                done
+
+                if ! [ "$signal" ]; then
+                        #don't delete pids after SIGSTOP or SIGCONT
+                        gresults["${linearray[1]}"]=""
+                fi
+                continue
+        fi
+
+
+        #grep
+        #is it needed, when ngrep does the same + something extra?
+        if [ "${linearray[0]}" = 'grep' ]; then
+                if ! [ -d "greps" ]; then mkdir greps; fi
+                echo "grepping all files to ${linearray[@]:2} and storing to files ending with: ${linearray[1]}"
+                for file in data/*; do
+                        basefile="$(basename "$file")"
+                        #this isn't preserving whitespaces:
+                        #tmp="${linearray[@]:2}"
+                        #this is using $line which was read on the start of the loop:
+                        tmp1="$(echo "$line" | sed 's/\s*'"${linearray[0]}"'\s*'"${linearray[1]}"'\s//')"
+                        #note: the previous command strips just one \s after the name
+                        #(the second parameter)
+                        #if the parameter for grep is enclosed in "" or in '',
+                        #these are stripped with whitespaces outside them
+                        tmp2="$(echo "$tmp1" | sed 's/\s*"\(.*\)"\s*/\1/')"
+                        tmp="$(echo "$tmp2" | sed "s/\s*'\(.*\)'\s*/\1/")"
+
+
+                        #grep "$tmp" "$file" 2>greps/${basefile}_${linearray[1]}.stderr > greps/${basefile}_${linearray[1]}
+                        grep $tmp "$file" 2>/dev/null > greps/${basefile}_${linearray[1]}
+
+                        #put the whole string into the array to have it available as variable
+                        gresults["$basefile,${linearray[1]}"]="$(cat greps/${basefile}_${linearray[1]})"
+
+                        #put the string into the array by lines and words
+                        #4-dimensional array is emulated here
+                        i=0; j=0 #array indexes
+                        while read xline; do
+                                for xword in $xline; do
+                                        gresults["$basefile,${linearray[1]},$i,$j"]="$xword"
+                                        (( j+=1 ))
+                                done
+                                (( i+=1 ))
+                        done < "greps/${basefile}_${linearray[1]}"
+                done
+                continue
+        fi
+
+        #ngrep, numbers
+        #numbers gets all numbers from the file the same way as ngrep, but without
+        #grepping it first
+        #TODO more grep parameters in series - use | maybe
+        if [ "${linearray[0]}" = 'ngrep' -o "${linearray[0]}" = 'numbers' ]; then
+                if ! [ -d "greps" ]; then mkdir greps; fi
+                echo "grepping all files for numbers to ${linearray[@]:2} and storing to files ending with: ${linearray[1]}"
+                for file in data/*; do
+                        basefile="$(basename "$file")"
+                        #this isn't preserving whitespaces:
+                        #tmp="${linearray[@]:2}"
+                        #this is using $line which was read on the start of the loop:
+                        tmp1="$(echo "$line" | sed 's/\s*'"${linearray[0]}"'\s*'"${linearray[1]}"'\s*//')"
+                        #note: the previous command strips just one \s after the name
+                        #(the second parameter)
+                        #if the parameter for grep is enclosed in "" or in '',
+                        #these are stripped with whitespaces outside them
+                        tmp2="$(echo "$tmp1" | sed 's/\s*"\(.*\)"\s*/\1/')"
+                        tmp="$(echo "$tmp2" | sed "s/\s*'\(.*\)'\s*/\1/")"
+
+
+
+                        if [ "${linearray[0]}" = 'ngrep' ]; then
+                                #echo "DEBUG: tmp: $tmp, file: $file, basefile: $basefile"
+                                #grep "$tmp" "$file" 2>greps/${basefile}_${linearray[1]}.stderr > greps/${basefile}_${linearray[1]}
+                                grep $tmp "$file" 2>/dev/null > greps/${basefile}_${linearray[1]}
+                                #grep "$tmp" "$file" 2>greps/${basefile}_${linearray[1]}.stderr | tr -c '0-9.' ' ' | sed 's/\.[^0-9]//g' | tr -s ' ' | sed 's/^ //' > greps/${basefile}_${linearray[1]}
+                                #version which doesn't handle SI prefixes:
+                                #grep "$tmp" "$file" 2>/dev/null | tr -c '0-9.' ' ' | sed 's/\.[^0-9]//g' | tr -s ' ' | sed 's/^ //' > greps/${basefile}_n_${linearray[1]}
+
+                                 #grep "$tmp" "$file" 2>/dev/null | tr '#@_\n\t' '===  ' | sed 's/  */ /g; s/\([0-9.][0-9.]*\) \([ybzafpnumkMGTPEZY]\)/#\1_\2@/g; s/^[^#]*#//; s/@[^#]*#/ /g; s/@.*$//' > greps/${basefile}_n_${linearray[1]}
+                                #how the extreme tr|sed command on the next line (and just
+                                #after the nearest else) works:
+                                # - characters #@_ will have special meaning, so if there are
+                                #   some, they're changed to meaningless =
+                                # - \t and \n should be handled as space (whitespace)
+                                # - s/\.\.\.*\([^.]\)/ \1/g - .. or ... aren't numbers, but
+                                #   it would go through later commands as number
+                                # - s/  */ /g - sequence of whitespaces is changed to just
+                                #   one space - it will simplify detection of the SI prefix
+                                #   later
+                                # - s/\([0-9.][0-9.]*\) \([ybzafpnumkMGTPEZY]\)/#\1_\2@/g
+                                #   number space SIprefix (just one character) are converted
+                                #   to: #number_SIprefix@
+                                # - s/\([0-9.][0-9.]*\)\([^0-9_.]\)/#\1@\2/g
+                                #   number non-underscore is converted to:
+                                #   @number#non-undersore - it will not touch things
+                                #   converted one step before
+                                # - s/ \.\.* //g - dot or cluster of dots surrounded by
+                                #   whitespaces is deleted as non-number
+                                # - s/^[^#]*#//; s/@[^#]*#/ /g; s/@.*$// - let just numbers
+                                #   between # and @ stay, but delete even these special
+                                #   characters
+                                # - The output contains strings like: 0 1.5 3.6_k 86.12_M
+                                #   Underscores and SI prefixes will be handled later.
+                                grep "$tmp" "$file" 2>/dev/null | tr '#@_\n\t' '===  ' | sed 's/\.\.\.*\([^.]\)/ \1/g; s/  */ /g; s/\([0-9.][0-9.]*\) \([ybzafpnumkMGTPEZY]\)/#\1_\2@/g; s/\([0-9.][0-9.]*\)\([^0-9_.]\)/#\1@\2/g; s/ \.\.* //g; s/^[^#]*#//; s/@[^#]*#/ /g; s/@.*$//' > greps/${basefile}_n_${linearray[1]}
+                        else #numbers
+                                 #cat "$file" | tr '#@_\n\t' '===  ' | sed 's/  */ /g; s/\([0-9.][0-9.]*\) \([ybzafpnumkMGTPEZY]\)/#\1_\2@/g; s/^[^#]*#//; s/@[^#]*#/ /g; s/@.*$//' > greps/${basefile}_n_${linearray[1]}
+                                cat "$file" | tr '#@_\n\t' '===  ' | sed 's/\.\.\.*\([^.]\)/ \1/g; s/  */ /g; s/\([0-9.][0-9.]*\) \([ybzafpnumkMGTPEZY]\)/#\1_\2@/g; s/\([0-9.][0-9.]*\)\([^0-9_.]\)/#\1@\2/g; s/ \.\.* //g; s/^[^#]*#//; s/@[^#]*#/ /g; s/@.*$//' > greps/${basefile}_n_${linearray[1]}
+                        fi
+
+                        i=0 #starting with 0 as usual in bash's arrays
+                        for number in $(cat greps/${basefile}_n_${linearray[1]}); do
+                                if echo "$number" | grep -q '_'; then
+                                        #number with SI prefix
+                                        #to handle thigs like 3.8 GHz > 800 MHz
+                                        gresults["$basefile,${linearray[1]},$i"]="$(echo "$number" | sed 's/_.//')"
+                                        #gresults["$basefile,${linearray[1]},$i,prefix"]="$(echo "$number" | sed 's/.*_//')"
+                                        gresults["$basefile,${linearray[1]},$i,prefix"]="$(SI_prefix_to_number "$number")"
+                                        #Why there is no direct multiplication here?
+                                        #Lets have this example:
+                                        #"CPU usage 81 Memory usage 35 keyboard ..."
+                                        #It would translate to 81*10^6 35*10^3, so tester
+                                        #should decide if using this makes sense.
+                                else
+                                        #plain number
+                                        gresults["$basefile,${linearray[1]},$i"]="$number"
+                                        #It will stay the same after multiplication by prefix
+                                        gresults["$basefile,${linearray[1]},$i,prefix"]="1"
+                                fi
+                                (( i+=1 ))
+                        done
+                        #yeah, this looks like we're in turbopascal, but the array is
+                        #associative instead of multidimensional, so there is no simple
+                        #way how to check the length.
+                        gresults["$basefile,${linearray[1]},length"]="$i"
+                done
+                continue
+        fi
+
+        #echo
+        if [ "${linearray[0]}" = 'echo' ]; then
+                for w in ${linearray[@]:1}; do
+                        #The first character from the $w
+                        if [ "${w:0:1}" = "$" ]; then
+                                #TODO: check for whole $[ ... ] format and split it to
+                                #var in [] and the rest
+                                #
+                                #substitute it with data from gresults
+                                getvalue "$w"
+                                echo -n " "
+                        else
+                                #It's going to loose information in whitespaces.
+                                #I don't think it's so important to solve it now.
+                                echo -n "$w "
+                                #TODO: use '*' for all sub-keys from the "dimension"
+                                #explanation: $[subkey_dimension1,subkey_d2,subkey_d3]
+                        fi
+                done
+                echo
+                continue
+        fi
+
+        #fail, pass, let
+        #TODO maybe add multiline fail/pass-and, fail/pass-or
+        if [ "${linearray[0]}" = 'fail' -o "${linearray[0]}" = 'pass' -o "${linearray[0]}" = 'let' ] ; then
+                if [ "${linearray[0]}" = 'let' ]; then
+                        param_start=2 #the second value is variable name
+                else
+                        param_start=1
+                fi
+                toevaluate=""
+                set -o noglob
+                for w in ${linearray[@]:$param_start}; do
+                        #The first character from the $w
+                        if [ "${w:0:1}" = "$" ]; then
+                                #substitute it with data from the appropriate array
+                                toevaluate="$toevaluate $(getvalue "$w")"
+                        else
+                                toevaluate="$toevaluate $w"
+                                #TODO: use '*' for all sub-keys from the "dimension"
+                                #explanation: $[subkey_dimension1,subkey_d2,subkey_d3]
+                        fi
+                done
+                set +o noglob
+                #Why bc when bash has it's own numeric operators?
+                #Because bash can't do floats.
+                echo "evaluating: $toevaluate"
+                res="$(echo "$toevaluate" | bc -l 2>bc.tmp)"
+                if [ "$(cat bc.tmp)" ]; then
+                        echo "parse error $(cat bc.tmp)"
+                        parseerror=1
+                fi
+
+                if [ "${linearray[0]}" = 'fail' ]; then
+                        if [ "$res" != "0" ]; then
+                                failed=1
+                                echo -n "FAIL: "
+                        else
+                                echo -n "PASS: "
+                        fi
+                else if [ "${linearray[0]}" = 'pass' ]; then
+                        if [ "$res" != "0" ]; then
+                                passed=1
+                                echo -n "PASS: "
+                        else
+                                echo -n "FAIL: "
+                        fi
+                else #let
+                        #${linearray[@]:1:1}=result
+                        intvars["${linearray[@]:1:1}"]="$res"
+                        echo "$res has been assigned to intvar ${linearray[@]:1:1}"
+                        #TODO this will need significant rewrite when * in source
+                        #variables will be added
+                fi;fi
+                echo "${linearray[@]:$param_start}"
+
+                continue
+        fi
+
+
+        #fail_ex, pass_ex, let_ex - execute an external command
+        if [ "${linearray[0]}" = 'fail_ex' -o "${linearray[0]}" = 'pass_ex' -o "${linearray[0]}" = 'let_ex' ] ; then
+                if [ "${linearray[0]}" = 'let_ex' ]; then
+                        param_start=2 #the second value is variable name
+                else
+                        param_start=1
+                fi
+                toevaluate=""
+                echo "DEBUG: ${linearray[@]}"
+                set -o noglob
+                for w in ${linearray[@]:$param_start}; do
+                        #echo "DEBUG: $w"
+                        #The first character from the $w
+                        if [ "${w:0:1}" = "$" ]; then
+                                #substitute it with data from the appropriate array
+                                toevaluate="$toevaluate \"$(getvalue "$w")\""
+                        else
+                                toevaluate="$toevaluate $w"
+                                #TODO: use '*' for all sub-keys from the "dimension"
+                                #explanation: $[subkey_dimension1,subkey_d2,subkey_d3]
+                        fi
+                done
+                set +o noglob
+                echo "evaluating: $toevaluate"
+                result="$(eval $toevaluate)"
+                returnval="$?"
+                echo "STDOUT"
+                echo "$result"
+                echo "RETURN VALUE"
+                echo "$returnval"
+
+                if [ "${linearray[0]}" = 'fail_ex' ]; then
+                        if [ "$returnval" = "0" ]; then
+                                failed=1
+                                echo -n "FAIL: "
+                        else
+                                echo -n "PASS: "
+                        fi
+                else if [ "${linearray[0]}" = 'pass_ex' ]; then
+                        if [ "$returnval" = "0" ]; then
+                                passed=1
+                                echo -n "PASS: "
+                        else
+                                echo -n "FAIL: "
+                        fi
+                else #let_ex
+                        #${linearray[@]:1:1}=result
+                        intvars["${linearray[@]:1:1}"]="$result"
+                        echo "$result has been assigned to intvar ${linearray[@]:1:1}"
+                        #TODO this will need significant rewrite when * in source
+                        #variables will be added
+                fi; fi
+                echo "${linearray[@]:param_start}"
+
+                continue
+        fi
+
+        #writeto
+        #syntax: writeto filename some data to write
+        if [ "${linearray[0]}" = 'writeto' ]; then
+                filename="${linearray[1]}"
+                data="${linearray[@]:2}"
+                if [ "$filename" ]; then
+                        echo "Writing '$data' to file: $filename"
+                        echo "$data" > "$filename"
+                else
+                        echo "parse error: no filename specified"
+                        parseerror=1
+                fi
+                continue
+        fi
+
+        #sysinfo
+        #syntax: sysinfo commandabbreviation1 commandabbreviation2 command3_parameter1_parameter2
+        #underscores will be converted to spaces
+        #one trick: say that uname is defined as 'uname -srvm', but you want to run just uname.
+        #Use uname_ and the underscore will be converted to space which is separator, so everythink will work.
+        #
+        #Known bugs: can't run command with underscore in it's name directly, it must be in the abbreviation file
+        if [ "${linearray[0]}" = 'sysinfo' ]; then
+                for w in ${linearray[@]:1}; do
+                        #the file is in upper directory, because of cd to tmp before the main loop
+                        #The file can't be found when it runs in beaker.
+                        echo "DEBUG pwd:"
+                        pwd
+                        echo "DEBUG ls . ..:"
+                        ls . ..
+
+                        #The sysinfo_abbr contains whole path, but pwd is in the tmp
+                        #directory now, so ../ should be added to relative paths, but
+                        #not to the absolute ones.
+                        if echo "$sysinfo_abbr" | grep -q '^/'; then
+                                sysinfo_abbr_from_tmp="$sysinfo_abbr"
+                        else
+                                sysinfo_abbr_from_tmp="../$sysinfo_abbr"
+                        fi
+                        command="$(grep -e "^${w}[[:space:]]" "../$sysinfo_abbr" | sed "s/^${w}//")"
+                        if [ -z "$command" ]; then
+                                command="$(echo "$w" | tr '_' ' ')"
+                        fi
+                        echo "running: $command"
+                        eval "$command"
+                done
+                continue
+        fi
+
+        #default
+        #syntax: default pass
+        #or: default fail
+        if [ "${linearray[0]}" = 'default' ]; then
+                default="${linearray[1]}"
+                continue
+        fi
+
+done
+
+if [ "$failed" = "0" -a "$passed" = "0" ]; then
+        if [ "$default" = "pass" ]; then
+                passed="1"
+        else
+                failed="1"
+        fi
+fi
+
+#parseerror is resolved before everything else, because if there was error in the config
+#file, all results are unreliable. But is should run whole test, because these data may
+#be usable for debugging.
+if [ "$parseerror" = "1" ]; then
+        echo "RESULT: parse error in config file"
+        exit "$PARSEERROR"
+fi
+
+#failed is resolved before passed, because if anything has failed, it's fail.
+if [ "$failed" = "1" ]; then
+        echo "RESULT: failed"
+        exit "$FAIL"
+fi
+
+if [ "$passed" = "1" ]; then
+        echo "RESULT: passed"
+        exit "$PASS"
+fi
+
+echo "RESULT: undefined"
+exit "$UNDEFINED"
