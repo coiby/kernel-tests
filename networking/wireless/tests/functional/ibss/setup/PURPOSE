@@ -1,0 +1,4 @@
+Test steps:
+ * Choose which wireless interface to use and describe it
+ * Have the server set up an IBSS connection
+ * Configure the test wireless interface

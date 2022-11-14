@@ -1,0 +1,9 @@
+[General]
+description=Simulate wireless access points by sending wireless beacon packets.
+name=networking/wireless/tests/utility/beacon_simulator
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=1h
+dependencies=scapy;nmcli;NetworkManager
