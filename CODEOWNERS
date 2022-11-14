@@ -85,6 +85,7 @@
 /networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_unencrypted_AP/ @ltrivell
 /networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell
 /networking/wireless/rhel7/tests/wireless-connection-to-WEP-key-AP-nl80211/ @ltrivell
+/networking/wireless/rhel7/tests/wireless-connection-to-WPA1-TTLS-EAP-AP-nl80211/ @ltrivell
 /networking/wireless/tests/functional/suspend_resume/ @ltrivell
 /networking/wireless/tests/utility/ping4/ @ltrivell
 /networking/wireless/tests/utility/beacon_simulator/ @ltrivell
