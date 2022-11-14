@@ -1,0 +1,4 @@
+PURPOSE of /desktop/rhel7/kernel/wireless-connection-to-WEP-key-AP
+Description: Establish a wireless connection to a WEP key AP.
+https://tcms.engineering.redhat.com/case/215386
+Author: Zack Cerza <zcerza@redhat.com>
