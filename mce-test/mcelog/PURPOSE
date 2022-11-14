@@ -1,0 +1,11 @@
+PURPOSE of /kernel/mce-test/mcelog
+Description: mcelog functionality test
+Author: Evan McNabb <emcnabb@redhat.com>
+
+Part #1:
+Basic sanity testing for mcelog. Inject MCEs and confirm they are collected
+correctly in daemon (mcelogd), cron, and trigger modes.
+
+Part #2:
+Execute test suite included in mcelog.
+

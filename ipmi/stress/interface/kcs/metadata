@@ -1,0 +1,9 @@
+[General]
+description=IPMI kcs stress test
+name=ipmi/stress/interface/kcs
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=kernel
