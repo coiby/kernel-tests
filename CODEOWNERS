@@ -55,6 +55,7 @@
 /networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell
 /networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_unencrypted_AP/ @ltrivell
 /networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_TLS_AP/ @ltrivell
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_TLS_AP/ @ltrivell
