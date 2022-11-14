@@ -9,6 +9,7 @@
 /lm_sensors/Sanity/smoke/ @ltrivell
 /ipmi/OpenIPMI/ipmitool/ @ltrivell
 /ipmi/OpenIPMI/rmcp_ping/ @ltrivell
+/ipmi/OpenIPMI/Regression/bz311231-ipmitool-does-not-check-input-values/ @ltrivell
 /ipmi/freeipmi/Regression/bz818168-The-etc-init-d-bmc-watchdog-script-does-not-store/ @ltrivell
 /Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log/ @ltrivell
 /ipmi/ipmitool/Regression/bz532445-ipmievd-init-script-s-condrestart-doesn-t-work/ @ltrivell
@@ -18,6 +19,9 @@
 /ipmi/hotmod/ @ltrivell
 /ipmi/sanity/watchdog-sanity-script/ @ltrivell
 /ipmi/sanity/ipmi-sanity-check/ @ltrivell
+/networking/wireless/tests/functional/connection/ @ltrivell
+/networking/wireless/tests/functional/ibss/setup/ @ltrivell
+/networking/wireless/tests/functional/ibss/cleanup/ @ltrivell
 /networking/wireless/tests/functional/crda/regdom_verify/ @ltrivell
 /networking/wireless/tests/functional/iw/dev_info_verify/ @ltrivell
 /networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_TLS_AP/ @ltrivell
