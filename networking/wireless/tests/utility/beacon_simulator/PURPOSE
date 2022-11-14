@@ -1,0 +1,7 @@
+PURPOSE of /kernel/wireless_tests/utility/beacon_simulator
+Description: Simulate wireless access points by sending wireless beacon packets.
+Author: Ken Benoit <kbenoit@redhat.com>
+Test steps:
+ * Check if the work node is allowed to run this script.
+ * Find the wireless interface to use on the work node.
+ * Simulate the requested number of wireless beacons.
