@@ -1,0 +1,6 @@
+PURPOSE of /kernel/ipmi/sanity/watchdog-sanity-check
+Description: IPMI Watchdog Sanity Check
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Quick sanity check to verify ipmi driver is enabled, execute bmc watchdog get in a loop
+to ensure ipmi does not get wedged.
