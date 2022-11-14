@@ -1,0 +1,10 @@
+[Unit]
+Description=IBSS testing server
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/sysconfig/ad_hoc_server
+ExecStart=/usr/bin/python3-gunicorn -w 4 -b 0.0.0.0:${SOCKET} ad_hoc_server:app
+
+[Install]
+WantedBy=multi-user.target

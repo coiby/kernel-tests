@@ -1,0 +1,14 @@
+PURPOSE of /kernel/wireless_tests/functional/radio/radio_toggle/wireless_connection_to_dynamic_WEP_TTLS_AP
+Description: Establish a wireless connection to a dynamic WEP w/ TTLS AP and then toggle the wireless radio.
+Author: Ken Benoit <kbenoit@redhat.com>
+Test steps:
+ * Choose which wireless interface to use and describe it
+ * Disable the wired network interfaces
+ * Configure the test wireless interface
+ * Ping the gateway address to verify connection
+ * Disable the radio for the wireless interface
+ * Attempt to ping the gateway address to verify the wireless radio is disabled
+ * Enable the radio for the wireless interface
+ * Ping the gateway address to verify connection
+ * Disable the wireless interface
+ * Enable the wired network interfaces
