@@ -56,6 +56,7 @@
 /networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_unencrypted_AP/ @ltrivell
 /networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell
 /networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_unencrypted_AP/ @ltrivell
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell
 /networking/wireless/tests/functional/suspend_resume/ @ltrivell
 /networking/wireless/tests/utility/ping4/ @ltrivell
 /networking/wireless/tests/utility/beacon_simulator/ @ltrivell
