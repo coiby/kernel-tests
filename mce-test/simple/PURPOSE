@@ -1,0 +1,6 @@
+PURPOSE of /kernel/mce-test/simple
+Description: mce-test simple test driver
+Author: Evan McNabb <emcnabb@redhat.com>
+
+Use mce-test's simple test driver to loop through all mce injection test cases.
+
