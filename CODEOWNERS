@@ -20,6 +20,7 @@
 /ipmi/sanity/watchdog-sanity-script/ @ltrivell
 /ipmi/sanity/ipmi-sanity-check/ @ltrivell
 /networking/wireless/tests/functional/connection/ @ltrivell
+/networking/wireless/tests/functional/connection/cleanup/ @ltrivell
 /networking/wireless/tests/functional/ibss/setup/ @ltrivell
 /networking/wireless/tests/functional/ibss/cleanup/ @ltrivell
 /networking/wireless/tests/functional/crda/regdom_verify/ @ltrivell
@@ -55,7 +56,6 @@
 /networking/wireless/tests/functional/suspend_resume/ @ltrivell
 /networking/wireless/tests/utility/ping4/ @ltrivell
 /networking/wireless/tests/utility/beacon_simulator/ @ltrivell
->>>>>>> CODEOWNERS
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
