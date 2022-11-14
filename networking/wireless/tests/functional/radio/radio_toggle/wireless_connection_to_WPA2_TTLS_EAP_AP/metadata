@@ -1,0 +1,9 @@
+[General]
+description=Establish a wireless connection to a WPA2 TTLS EAP AP and then toggle the wireless radio.
+name=networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_TTLS_EAP_AP
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=wpa_supplicant

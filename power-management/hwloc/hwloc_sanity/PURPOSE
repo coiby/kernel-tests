@@ -1,0 +1,5 @@
+PURPOSE of /kernel/power-management/hwloc/hwloc_sanity
+Description: Confirm hwloc works
+Author: Erik Hamera <ehamera@redhat.com>
+
+Sanity check.
