@@ -1,0 +1,5 @@
+Test both Suspend-to-RAM (S3) and Hibernate-to-Disk (S4). It
+suspends/hibernates the system, and then uses the RTC (Real Time Clock) alarm
+to wake the system several minutes later. If it successfully resumes it is
+considered PASS.
+

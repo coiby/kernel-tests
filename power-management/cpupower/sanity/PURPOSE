@@ -1,0 +1,8 @@
+PURPOSE of /kernel/power-management/cpupower/sanity
+Description: Check, that output of cpupower looks sane.
+Author: Erik Hamera <ehamera@redhat.com>
+
+Sanity check of basic cpupower frequency-info functions with and without the -n option.
+This failure was seen in:
+
+BZ 1427742 - The Kabylake processor's minimum frequency indication is incorrect.

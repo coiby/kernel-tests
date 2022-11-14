@@ -1,0 +1,6 @@
+Confirm audio hardware is working correctly.
+
+Requires machines to have a loop back cable plugged into the audio-out and
+mic-in.
+
+Uses a predefined sine wav file to match audio out with recorded input.
