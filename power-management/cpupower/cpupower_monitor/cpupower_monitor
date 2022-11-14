@@ -1,0 +1,27 @@
+#kernel-qe-hw
+#This test tests if cpupower monitor presents the same information with one CPU switched off
+#and with all CPUs on
+#Related BZ 1375782
+parser lhc1
+sysinfo uname lscpu bios
+#1 and 3 are names of results intended for logging
+#2 and 4 are names of results modified to be comparable in case of 2-CPU system which omits PKG and CORE
+#columns when just 1 CPU is online
+run 1 cpupower monitor
+run 2 ../cpupower_monitor_wrapper
+writeto /sys/devices/system/cpu/cpu0/online 0
+run 3 cpupower monitor
+run 4 ../cpupower_monitor_wrapper
+writeto /sys/devices/system/cpu/cpu0/online 1
+#results are printed to stdout automatically - you'll need to see then in the logs anyway
+
+#select line describing CPU 1 - use '1|'
+ngrep x " 1|"
+
+#everything is substituted by values and pushed to bc -l
+#if the clause is true, test will fail
+#compare just the modified results ('2' and '4')
+fail $[2,x,length] > $[4,x,length]
+
+#if there isn't decided to pass or fail, there is default
+default pass

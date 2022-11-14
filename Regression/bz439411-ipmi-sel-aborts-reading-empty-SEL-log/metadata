@@ -1,0 +1,9 @@
+[General]
+description=Test for bz439411 (ipmi-sel aborts reading empty SEL log)
+name=Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=freeipmi
