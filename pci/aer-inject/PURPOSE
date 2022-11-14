@@ -1,0 +1,3 @@
+PURPOSE of /kernel/pci/aer-inject
+Description: PCI-E Advanced Error Reporting (AER) software injection testing
+Author: William R. Gomeringer <wgomerin@redhat.com>
