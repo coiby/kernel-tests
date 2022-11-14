@@ -1,0 +1,5 @@
+PURPOSE of /kernel/freeipmi/Regression/bz818168-The-etc-init-d-bmc-watchdog-script-does-not-store
+Description: Test for BZ#818168 (The /etc/init.d/bmc-watchdog script does not store)
+Author: Branislav Blaskovic <bblaskov@redhat.com>
+Bug summary: The /etc/init.d/bmc-watchdog script does not store PID in the PIDFILE
+Bugzilla link: https://bugzilla.redhat.com/show_bug.cgi?id=818168

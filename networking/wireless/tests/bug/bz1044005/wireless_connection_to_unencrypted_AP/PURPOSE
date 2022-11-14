@@ -1,0 +1,3 @@
+PURPOSE of /kernel/wireless_tests/bug/bz1044005/wireless_connection_to_unencrypted_AP
+Description: Establish a wireless connection to an unencrypted AP.
+Author: Ken Benoit <kbenoit@redhat.com>
