@@ -1,0 +1,36 @@
+PURPOSE of /kernel/wireless_tests/utility/ping4
+Decription: Ping (IPv4) test using established connections
+Author: Ken Benoit <kbenoit@redhat.com>
+
+0.Purpose
+=========
+This is meant to perform a ping test. This can be performed in a couple of
+different ways. In a multihost setup where there are SERVERS and CLIENTS defined
+each client will request all the IPv4 addresses on each server and then ping all
+of those addresses one at a time, verifying a minimum amount of packets are
+received back after transmission. In a STANDALONE setup then a default value
+of "beaker.engineering.redhat.com" is used (if PING_TARGET is not defined) and
+that target (or targets) will be pinged making sure that the minimum amount of
+packets are received back after transmission.
+
+1.Files
+=======
+Makefile - used to run the test script.
+runtest.sh - script that performs the setup and install process of the custom
+             kernel.
+PURPOSE - this file.
+
+2.Process
+=========
+Simply run the following command:
+# make run
+
+3.Test params
+=============
+This /kernel/wireless_tests/utility/ping4 test accepts the following parameters
+passed in from Beaker.
+
+$PING_TARGET - a space separated list of IPv4 addresses or hostnames to ping
+               (optional).
+
+-end PURPOSE file
