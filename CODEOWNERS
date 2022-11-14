@@ -19,6 +19,7 @@
 /ipmi/hotmod/ @ltrivell
 /ipmi/sanity/watchdog-sanity-script/ @ltrivell
 /ipmi/sanity/ipmi-sanity-check/ @ltrivell
+/networking/wireless/common/ @ltrivell
 /networking/wireless/tests/functional/connection/ @ltrivell
 /networking/wireless/tests/functional/connection/cleanup/ @ltrivell
 /networking/wireless/tests/functional/ibss/setup/ @ltrivell
