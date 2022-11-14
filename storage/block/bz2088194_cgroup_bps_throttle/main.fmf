@@ -1,0 +1,15 @@
+summary: storage/block/bz2088194_cgroup_bps_throttle
+description: inaccurate bps throttle on cgroup
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+  - kernel
+path: /storage/block/bz2088194_cgroup_bps_throttle
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+duration: 1h
+tier: 1
+extra-summary: /storage/block/bz2088194_cgroup_bps_throttle
+extra-task: /storage/block/bz2088194_cgroup_bps_throttle

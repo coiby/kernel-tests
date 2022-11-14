@@ -1,0 +1,18 @@
+summary: Collect ACPI tables from a system
+description: |
+    Collect ACPI tables from a system so they can be attached to a BZ, plus
+    a couple of other tidbits of info that may be of use.
+contact: Al Stone <ahs3@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: shell
+require:
+  - dmidecode
+  - acpica-tools
+adjust:
+  - enable: false
+    when: arch == s390x or arch == ppc64le
+duration: 1h
+extra-summary: /kernel/acpi/acpi-tables
+extra-task: /kernel/acpi/acpi-tables

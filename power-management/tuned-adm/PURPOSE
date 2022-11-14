@@ -1,0 +1,3 @@
+PURPOSE of /kernel/power-management/tuned-adm
+Description: Cycle tuning profiles to check for power management issues.
+Author: Erico Nunes <ernunes@redhat.com>
