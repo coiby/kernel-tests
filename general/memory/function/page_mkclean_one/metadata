@@ -1,0 +1,18 @@
+[General]
+description=Make sure page_mkclean_one works as it should. Data corruption is bad, mmmkay? (bz220963)
+name=/kernel/general/memory/function/page_mkclean_one
+owner=Jarod Wilson <jwilson@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=30m
+dependencies=kernel gcc
+repoRequires=general/include
+TestVersion=1.0
+Path=/mnt/tests/kernel/general/memory/function/page_mkclean_one
+Type=
+RunFor=kernel
+Priority=Normal
