@@ -1,0 +1,3 @@
+PURPOSE of /kernel/ipmitool/Regression/bz1170266-ipmitool-returns-wrong-version-number
+Description: ipmitool returns wrong version number in ipmitool -V command
+Author: Frantisek Sumsal <fsumsal@redhat.com>

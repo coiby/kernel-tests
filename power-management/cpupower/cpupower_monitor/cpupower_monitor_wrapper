@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#This code is intended to modify 'cpupower monitor' output to be comparable in one specific testcase.
+
+#cpupower monitor may have different output on 2-core systems when one core went offline
+#example:
+#
+# # echo '1' > /sys/devices/system/cpu/cpu0/online
+# # cpupower monitor
+#    | Nehalem                   || SandyBridge        || Mperf              || Idle_Stats
+# PKG|CORE| CPU| C3   | C6   | PC3  | PC6   || C7   | PC2  | PC7   || C0   | Cx   | Freq  || POLL | C1   | C1E  | C3   | C6
+#   0|   0|   0|  0.00| 98.93|  0.00| 76.14||  0.00| 22.75|  0.00||  0.25| 99.75|  1389||  0.00|  0.19|  0.00|  0.00| 99.57
+#   1|   0|   1|  0.01| 96.85|  0.00| 75.63||  0.00| 21.21|  0.00||  0.66| 99.34|  2063||  0.12|  0.18|  0.03|  0.08| 99.09
+# # echo '0' > /sys/devices/system/cpu/cpu0/online
+# WARNING: at least one cpu is offline
+#    | Nehalem                   || SandyBridge        || Mperf              || Idle_Stats
+# CPU| C3   | C6   | PC3  | PC6   || C7   | PC2  | PC7   || C0   | Cx   | Freq  || POLL | C1   | C1E  | C3   | C6
+#   1|  0.01| 98.53|  0.00| 77.79||  0.00| 20.71|  0.00||  0.43| 99.57|  1688||  0.00|  0.00|  0.01|  0.04| 99.54
+
+#let's detect if we're running on system where cpupower monitor reports PKG and CORE
+if cpupower monitor | grep PKG | grep -q CORE; then
+        #just wipe out the first two columns
+        cpupower monitor | cut -d '|' -f 3-
+else
+        #don't touch the output
+        cpupower monitor
+fi

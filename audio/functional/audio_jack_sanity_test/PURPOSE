@@ -1,0 +1,8 @@
+PURPOSE of /kernel/audio_tests/functional/audio_jack_sanity_test
+Description: Test that checks if the soundcards detected show all of the expected audio jacks.
+Author: Ken Benoit <kbenoit@redhat.com>
+Maintainer: Erik Hamera <ehamera@redhat.com>
+Test steps:
+ * Read in the audio jack definition file
+ * Check for any unsupported soundcards present on the work node
+ * Check that only expected audio jack names are present
