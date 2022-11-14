@@ -1,0 +1,5 @@
+PURPOSE of /kernel/power-management/intel_idle/sanity
+Description: Confirm intel_idle is supported
+Author: Evan McNabb <emcnabb@redhat.com>
+
+Sanity check to make sure the intel_idle driver is loading correctly.
