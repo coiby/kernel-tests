@@ -1,0 +1,6 @@
+PURPOSE of /kernel/power-management/cpupower/cpupower_monitor
+Description: Test cpupower monitor behavior when one CPU is offline
+Author: Erik Hamera <ehamera@redhat.com>
+
+Check, that cpupower monitor returns the same amount of information with one CPU offline and with all o them online - related to BZ1375782
+
