@@ -1,0 +1,4 @@
+Record the output of /sys/devices/system/cpu/cpu*/microcode/version and store
+it in the Beaker database.  Useful for running before and after an update
+of the linux-firmware and/or microcode_ctl packages to verify the CPU microcode
+was updated.
