@@ -1,7 +1,7 @@
 [General]
 description=Example sanity script to print pci/usb device id's
 name=hwdata/Sanity/example
-owner=Rachel Sibley <rasibley@redhat.com>
+owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
