@@ -1,0 +1,15 @@
+PURPOSE of /kernel/firmware/linux-firmware/sanity
+Description: Sanity check for linux-firmware files
+Author: Erico Nunes <ernunes@redhat.com>
+
+linux-firmware sanity Introduction
+==================================
+
+This test checks that files in the linux-firmware RHEL package are the
+same ones provided by the linux-firmware upstream repository.
+We check that the files are the same through the use of checksums.
+In case a checksum does not match, we also provide the expected and
+found file(1) output to help in debugging the reason for why the file is
+different.
+This is just a sanity check and it is performed due to past occurences
+of firmware files being shipped incorrectly.

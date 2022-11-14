@@ -1,0 +1,6 @@
+PURPOSE of /kernel/ipmi/sanity/ipmi-sanity-check
+Description: IPMI Sanity Check
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Quick sanity check to verify ipmi related pkgs install without error, modules load, driver is displayed,
+and service starts successfully.  
