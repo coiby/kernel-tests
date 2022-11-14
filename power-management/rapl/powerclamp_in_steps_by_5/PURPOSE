@@ -1,0 +1,18 @@
+PURPOSE of /kernel/power-management/rapl/powerclamp
+Description: Test if clamping of power works.
+Author: Erik Hamera <ehamera@redhat.com>
+
+RAPL = Running Average Power Limit
+
+Check RAPL functions. It checks power consumption for idle and 0 - 49% clamped full load.
+The energy consumption should be higher for lower clampings.
+
+The error range is 20% now - it is __NOT__ wisely choosen magical number emerging
+from intel's datasheets or something like that. It __IS__ just wild guess which
+should suppress false alarms due to started daemons and other fluctuations. Feel
+free to change it if your guess is better, than mine.
+
+It works on RHEL 7 and RHEL 6 both, because it isn't using perf, but reads directly
+from /proc. Therefore overflow must be checked, which complicates timing. Therefore
+energy.sh from this test isn't compatible with energy.sh from my older tests!
+

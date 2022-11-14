@@ -1,0 +1,18 @@
+PURPOSE of /kernel/power-management/rapl/powerclamp
+Description: Test if clamping of power works.
+Author: Erik Hamera <ehamera@redhat.com>
+
+RAPL = Running Average Power Limit
+
+Check RAPL functions. It works with assumption, that CPU under 50% load (51%,
+because 49 is the highest available clamp) will consume approx average power between
+idle and full load.
+
+The error range is 20% now - it is __NOT__ wisely choosen magical number emerging
+from intel's datasheets or something like that. It __IS__ just wild guess which
+should suppress false alarms due to started daemons and other fluctuations. Feel
+free to change it if your guess is better, than mine.
+
+It works on RHEL 7. There is no appropriate event in perf on RHEL 6, so porting would
+be very hard, or impossible.
+

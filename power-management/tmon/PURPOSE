@@ -1,0 +1,8 @@
+PURPOSE of /kernel/power-management/tmon
+Description: Test for the presence of thermal monitoring
+Author: William Gomeringer <wgomerin@redhat.com>
+
+Description:
+Currently this test only checks for the presence of thermal monitoring by checking if the devices exist under /sys/devices/virtual/thermal
+
+Future functionality can include seperating out zones from devices and listing out what each piece of hardware maps to which cooling/thermal device. We will probably  want to also check that tmon can read and write values to each device as well as change values for any relevant sysfs files

@@ -1,0 +1,9 @@
+[General]
+description=Test for bz311231 ([RHEL5]ipmitool configuration does not check input)
+name=ipmi/OpenIPMI/Regression/bz311231-ipmitool-does-not-check-input-values
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=OpenIPMI-tools

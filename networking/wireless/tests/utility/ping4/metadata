@@ -1,0 +1,8 @@
+[General]
+description=Ping (IPv4) test using established connections
+name=networking/wireless/tests/utility/ping4
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=1h

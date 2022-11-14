@@ -1,0 +1,15 @@
+PURPOSE of /kernel/power-management/rapl/multithread_load
+Description: Test if perf (via RAPL) is reporting bigger power consumption for bigger loads.
+Author: Erik Hamera <ehamera@redhat.com>
+
+RAPL = Running Average Power Limit
+
+Check RAPL functions. It works with assumption, that under heavier load the CPU shouldn't
+consume less power (in some error range). The error range is 20% now - it is __NOT__
+wisely choosen magical number emerging from intel's datasheets or something like that.
+It __IS__ just wild guess which should suppress false alarms due to started daemons and
+other fluctuations. Feel free to change it if your guess is better, than mine.
+
+It works on RHEL 7. There is no appropriate event in perf on RHEL 6, so porting would
+be very hard, or impossible.
+
