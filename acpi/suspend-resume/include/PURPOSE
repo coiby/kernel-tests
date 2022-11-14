@@ -1,0 +1,3 @@
+PURPOSE of /kernel/acpi/suspend-resume/include
+Description: Common functions for suspend-resume tests
+Author: John Brier <jbrier@redhat.com>

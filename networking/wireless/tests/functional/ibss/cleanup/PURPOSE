@@ -1,0 +1,4 @@
+Test steps:
+ * Choose which wireless interface to use and describe it
+ * Have the server teardown the IBSS connection
+ * Disable the wireless interface

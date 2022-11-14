@@ -1,0 +1,9 @@
+PURPOSE of /kernel/OpenIPMI/Regression/bz311231-ipmitool-does-not-check-input-values
+Description: Test for bz311231 ([RHEL5]ipmitool configuration does not check input)
+Author: Karel Volny <kvolny@redhat.com>
+Bug summary: [RHEL5]ipmitool configuration does not check input ranges
+Bugzilla link: https://bugzilla.redhat.com/show_bug.cgi?id=311231
+
+Description:
+This test checks various combinations of input values to make sure
+that only valid values are accepted by "ipmitool sol set" commands.
