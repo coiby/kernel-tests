@@ -22,6 +22,7 @@
 /networking/wireless/common/ @ltrivell
 /networking/wireless/tests/bug/bz1044005/wireless_connection_to_unencrypted_AP/ @ltrivell
 /networking/wireless/tests/functional/connection/ @ltrivell
+/networking/wireless/tests/functional/connection/setup/ @ltrivell
 /networking/wireless/tests/functional/connection/cleanup/ @ltrivell
 /networking/wireless/tests/functional/ibss/setup/ @ltrivell
 /networking/wireless/tests/functional/ibss/cleanup/ @ltrivell
