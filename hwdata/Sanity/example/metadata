@@ -1,0 +1,9 @@
+[General]
+description=Example sanity script to print pci/usb device id's
+name=hwdata/Sanity/example
+owner=Rachel Sibley <rasibley@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=hwdata;python-hwdata;beakerlib;beakerlib-redhat
