@@ -36,17 +36,17 @@ export TEST="/kernel/hwdata/Sanity/example"
 rlJournalStart
 # Exit if example.py returns a warning (BZ 1380159)
     rlPhaseStartTest
-        if rlRun -l "python /usr/share/doc/python-hwdata*/example.py" 0 ; then
+        if rlRun -l "python /usr/share/doc/python*-hwdata*/example.py" 0 ; then
                 rlPass "Pass, example.py script returned the id's succssfully"
         else
                 rlFail "Fail, example.py returned a warning"
         fi
     rlPhaseEnd
 
-    # uninstall/install hwdata and python-hwdata pkgs, verify pkgs insalled correctly
+    # uninstall/install hwdata and python3-hwdata pkgs, verify pkgs insalled correctly
     rlPhaseStartTest
-        rlRun -l "yum remove -y hwdata python-hwdata"
-        rlRun -l "yum install -y hwdata python-hwdata"
+        rlRun -l "yum remove -y hwdata python*-hwdata"
+        rlRun -l "yum install -y hwdata python*-hwdata"
         rlCheckRpm hwdata
         rlCheckRpm python-hwdata
     rlPhaseEnd
