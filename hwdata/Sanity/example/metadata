@@ -6,4 +6,4 @@ owner=Laura Trivelloni <ltrivell@redhat.com>
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=5m
-dependencies=hwdata;python-hwdata;beakerlib;beakerlib-redhat
+dependencies=hwdata;python*-hwdata;beakerlib;beakerlib-redhat
