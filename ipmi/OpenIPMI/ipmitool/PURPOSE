@@ -1,0 +1,7 @@
+Name: smoke test for ipmitool utility
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Its aim is to test some basic functionality provided by ipmitool utility.
+This test is non-destructive.
+
+There are no related bugzillas.

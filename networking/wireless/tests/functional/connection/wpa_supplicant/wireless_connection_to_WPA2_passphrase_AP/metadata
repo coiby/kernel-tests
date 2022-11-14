@@ -1,0 +1,9 @@
+[General]
+description=Establish a wireless connection to a WPA2 passphrase AP.
+name=networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_passphrase_AP
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=dhclient;wpa_supplicant;dbus-tools
