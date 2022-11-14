@@ -1,0 +1,6 @@
+PURPOSE of /kernel/lm_sensors/Sanity/detect
+Description: Check drivers supported by sensors-detect
+Author: Petr Splichal <psplicha@redhat.com>
+
+Make sure that all the supported drivers are enabled in the
+sensors-detect script. For now it covers just BZ#473119.

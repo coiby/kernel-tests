@@ -1,0 +1,2 @@
+uname uname -srvm
+bios dmidecode |grep -A 3 'BIOS Information'
