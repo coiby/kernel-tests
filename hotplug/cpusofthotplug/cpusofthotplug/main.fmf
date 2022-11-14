@@ -1,0 +1,27 @@
+summary: Test for CPU soft hotplugging
+description: |
+    Author: William Gomeringer <wgomerin@redhat.com>
+
+    Description:
+
+    This test tries to test CPU soft hotplug - logically online/offline hotplug.
+
+    a) Basic: Tries offline and online each CPU core.
+
+    b) Continous: This test tries to logically offline or online random CPU
+                  core for ~10 min (see CONTIME variable). It's about 600-900
+                  hotplug events (CPU ups/downs).
+
+    PASS on no kernel panic or kernel oops or no cpu core stuck.
+
+    The test is usually able to do ~60-90 hotplug events within 1 minute.
+contact: William Gomeringer <wgomerin@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: shell
+recommend:
+  - kernel
+duration: 1h
+extra-summary: /kernel/hotplug/cpusofthotplug
+extra-task: /kernel/hotplug/cpusofthotplug

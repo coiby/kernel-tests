@@ -1,0 +1,10 @@
+Test Name: lm_sensors smoke test
+Author: Rachel Sibley <rasibley@redhat.com>
+Location: /kernel/lm_sensors/Sanity/smoke
+
+This is just a basic lm_sensors smoke test which checks whether
+some sensors are detected and their values reported.
+
+It backs up lm_sensors config files and restores them when it's
+done so it's safe to run even on stable machines.
+
