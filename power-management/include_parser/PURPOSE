@@ -1,0 +1,6 @@
+PURPOSE of /kernel/power-management/include_parser
+Description: Parser for simple tests
+Author: Erik Hamera <ehamera@redhat.com>
+
+Parser which simplifies writing simple tests.
+
