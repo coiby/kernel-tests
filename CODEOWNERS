@@ -107,7 +107,7 @@
 #     users:
 #       - cki-project
 #     kpet: locations
-#   Maintainers:
+#   kpet-db-maintainers:  # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db
 #     minimum_count: 3  # the original maintainer + the two users below
 #     users:
 #       - bgoncalv
@@ -249,7 +249,7 @@
 /vm/kvm-unit-tests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /watchdog/hw-generic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 
-[Maintainers]
+[kpet-db-maintainers]
 /acpi/acpitable/ @ahs3 @bgoncalv @lulinqing
 /acpi/enabled/ @bgoncalv @jbastianrh @lulinqing
 /container/podman/ @bgoncalv @ftjahjad @lulinqing
