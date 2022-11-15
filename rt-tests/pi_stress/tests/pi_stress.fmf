@@ -6,6 +6,8 @@ component:
 path: /rt-tests/pi_stress
 test: bash -x ./runtest.sh
 framework: shell
+require:
+  - realtime-tests
 duration: 2h
 extra-summary: /rt-tests/pi_stress
 extra-task: /rt-tests/pi_stress

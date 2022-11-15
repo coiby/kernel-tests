@@ -6,6 +6,11 @@ component:
 path: /rt-tests/us/stalld
 test: bash -x ./runtest.sh
 framework: shell
+require:
+  - realtime-tests
+  - python3
+  - stalld
+  - gcc
 duration: 40m
 extra-summary: /rt-tests/us/stalld
 extra-task: /rt-tests/us/stalld
