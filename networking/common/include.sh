@@ -263,8 +263,8 @@ net-sync()
 # We only care the main distro
 GetDistroRelease()
 {
-	#version=`sed 's/[^0-9\.]//g' /etc/redhat-release`
-	cut -f1 -d. /etc/redhat-release | sed 's/[^0-9]//g'
+	source /etc/os-release
+	echo $VERSION_ID | awk -F. '{print $1}'
 }
 
 get_python()
