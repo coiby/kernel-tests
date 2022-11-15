@@ -117,7 +117,7 @@
 # GITLAB-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-GENERATED-BEGIN
-# 53b30a28c9473c5e357905ab7f52ba883d71cb59ff7e92f1fa6f2484026fcfe8
+# ee0cd6ad275eda61f66bd1edeff8eb06a51172d85c0d7cf1d29823f51bc23928
 
 [Infrastructure]
 /.gitlab-ci.yml @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
@@ -334,6 +334,10 @@
 /storage/dm/common/ @bgoncalv @guazhang @lulinqing
 /storage/hba/san-device-stress/ @bgoncalv @lulinqing @mpatalan
 /storage/hw_raid/ @bgoncalv @lulinqing @mpatalan
+/storage/lvm/cache/ @bgoncalv @fsuba @lulinqing
+/storage/lvm/snapper/ @bgoncalv @fsuba @lulinqing
+/storage/lvm/thinp/sanity/ @bgoncalv @fsuba @lulinqing
+/storage/lvm/thinp/stqe/ @bgoncalv @fsuba @lulinqing
 /storage/nvdimm/ndctl-test-suite/ @bgoncalv @lulinqing @yizhanglinux
 /storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
 /storage/swraid/scsi_raid/ @bgoncalv @czhong2 @lulinqing
