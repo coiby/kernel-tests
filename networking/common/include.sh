@@ -467,7 +467,7 @@ else
 
 	set_dmesg_check_key
 
-	rhel_vx=$(rpm -E %rhel)
+	rhel_vx=$(GetDistroRelease)
 	if [ $rhel_vx -ge 9 ];then
 		# avoid ssh "no matching cipher found" issue
 		if ! grep -v ^# /etc/ssh/ssh_config | grep -q Ciphers;then

@@ -220,7 +220,7 @@ scapy_install()
 	local scapy_git="https://github.com/secdev/scapy.git"
 	local scapy_http="http://netqe-bj.usersys.redhat.com/share/tools/scapy.tar.gz"
 
-	local rel=$(rpm -E %rhel)
+	local rel=$(GetDistroRelease)
 	[ $rel -ge 9 ] && dnf install -y scapy
 	scapy -h && return 0
 
