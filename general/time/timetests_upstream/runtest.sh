@@ -3,6 +3,8 @@
 # Author: Qiao Zhao <qzhao@redhat.com>  August 15, 2015
 #
 
+: "${TEST:=general/time/timetests_upstream}"
+
 clone_upstream_code()
 {
     if [ ! -d timetests ]; then
@@ -38,11 +40,18 @@ check_release_version()
     echo $kernbase
 }
 
+ntp_chrony_service_handling()
+{
+    systemctl $* ntpd || service ntpd $* || true
+    systemctl $* chronyd || service chronyd $* || true
+}
+
 runtest()
 {
     check_release_version
     install_depends_package git make gcc psmisc
     clone_upstream_code
+    ntp_chrony_service_handling stop
 
     pushd timetests
     sed -i '1i\set -x' runall.sh
@@ -52,10 +61,12 @@ runtest()
     rstrnt-report-log -l /tmp/timetests.log
     popd
 
+    ntp_chrony_service_handling start
+
     if [[ $(grep "FAILED" /tmp/timetests.log) ]]; then
-        rstrnt-report-result $TEST "FAIL" 1
+        rstrnt-report-result "$TEST" "FAIL" 1
     else
-        rstrnt-report-result $TEST "PASS" 0
+        rstrnt-report-result "$TEST" "PASS" 0
     fi
 }
 
