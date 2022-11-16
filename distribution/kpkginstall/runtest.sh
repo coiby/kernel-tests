@@ -196,14 +196,9 @@ function targz_install()
         sed -i "s/title.*/$title/" "${f}"
         cki_print_success "Removed trailing whitespace in title record of $f"
       done
-
-      # Workaround for BZ 1698363
-      grubby --set-default /boot/vmlinuz-"${KVER}" && zipl
-      cki_print_success "Grubby workaround for s390x completed"
   fi
 
-  # Make sure kernel args doesn't have 'quiet' argument as it silences kernel messages
-  # related https://bugzilla.redhat.com/show_bug.cgi?id=2118292
+  # "quiet" makes us miss important kernel logs which makes debugging harder, remove it if present
   if grep -wq quiet /boot/loader/entries/*-${KVER}.conf; then
     sed -i s/quiet// /boot/loader/entries/*-${KVER}.conf
     cki_print_success "removed 'quiet' from kernel arguments"
@@ -368,7 +363,7 @@ function rpm_install()
     $YUM install -y $FIRMWARE_PKG > /dev/null
     cki_print_success "Kernel firmware package installed"
 
-    # Workaround for BZ 1698363
+    # Workaround for BZ 1698363 - was fixed in 8.3 but not backported to 8.1 nor 8.2
     if [[ "${ARCH}" == s390x ]] ; then
       grubby --set-default /boot/vmlinuz-"${KVER}" && zipl
       cki_print_success "Grubby workaround for s390x completed"
