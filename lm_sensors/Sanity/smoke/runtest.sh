@@ -27,10 +27,8 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-PACKAGE=lm_sensors
 
 # workaround due to https://bugzilla.redhat.com/show_bug.cgi?id=2119594
 if [ "$(uname -i)" != "aarch64" ];then
@@ -38,7 +36,6 @@ if [ "$(uname -i)" != "aarch64" ];then
 EnterGenerator="{ while true; do echo -e '\n'; sleep 1; done; }"
 rlJournalStart
     rlPhaseStartSetup Setup
-        rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "rlFileBackup /etc/sysconfig/lm_sensors"
         rlRun "pushd $TmpDir"
@@ -104,5 +101,5 @@ rlJournalStart
 rlJournalPrintText
 rlJournalEnd
 else
-     rhts-report-result "$TEST" SKIP "$OUTPUTFILE"
+     rstrnt-report-result "/kernel/lm_sensors/Sanity/smoke" SKIP
 fi
