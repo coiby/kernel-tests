@@ -50,13 +50,6 @@ function parse_kpkg_url_variables()
 
 function set_package_name()
 {
-  # We can't do a simple "grep for anything kernel-like" because of packages like
-  # kernel-devel, kernel-tools etc. State all possible kernel packages that aren't
-  # a simple "kernel" and check for them. If none of them is present, set the
-  # package name to kernel. Do NOT do a check for "kernel" because all of those
-  # packages we don't want to match will match!
-  # Please someone come up with a better solution how to determine the package name...
-
   # Recover the saved package name from KPKG_PACKAGE_NAME if it exists.
   if [ -f "/var/tmp/kpkginstall/KPKG_PACKAGE_NAME" ]; then
     PACKAGE_NAME=$(cat /var/tmp/kpkginstall/KPKG_PACKAGE_NAME)
