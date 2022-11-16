@@ -8,7 +8,7 @@
 . ../include/runtest.sh || exit 1
 
 rlJournalStart
-   if [[ -n $FWTSTESTS ]]; then	
+   if [[ -n $FWTSTESTS ]]; then
        rlPhaseStartSetup
        fwtsSetup
        rlPhaseEnd
@@ -17,9 +17,9 @@ rlJournalStart
        rlLog "Running fwts with these tests: $FWTSTESTS"
        rlRun "fwts $FWTSTESTS" 0,1 "run fwts with FWTSTESTS pased from beaker job"
        rlPhaseEnd
-       
+
        fwtsReportResults
-       
+
        rlPhaseStartCleanup
        fwtsCleanup
        rlPhaseEnd
@@ -29,9 +29,3 @@ rlJournalStart
 rlJournalEnd
 rlJournalPrintText
 
-
-    	
-
-
-
-    
