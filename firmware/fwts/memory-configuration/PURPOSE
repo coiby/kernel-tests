@@ -1,0 +1,10 @@
+Run fwts tests recommended [1] for testing Memory configuration
+
+ebda - EBDA region is mapped and reserved in memory map table.
+mcfg - MCFG PCI Express* memory mapped config space.
+mtrr - MTRR validation.
+dmar Check sane DMA Remapping (VT-d). 
+crs - Check PCI host bridge configuration using _CRS.
+maxreadreq - Checks firmware has set PCI Express MaxReadReq to a higher value on non-motherboard devices.
+
+1) https://wiki.ubuntu.com/Kernel/Reference/fwts#Which_Test_to_Run.3F
