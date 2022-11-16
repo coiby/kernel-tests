@@ -1,0 +1,13 @@
+PURPOSE of /kernel/misc/self-poweroff
+Description: Powers itself off
+Author: Erico Nunes <ernunes@redhat.com>
+
+Powers itself off.
+
+This is intended to be used by the Guest in a Beaker job using a
+<guestrecipe>.
+When using it, the Guest powers off to allow the Host machine to safely
+modify the guest settings (such as VM configuration, firmware settings).
+The Host should then power it back on in a separate further task.
+
+See also: /kernel/misc/wait-guest-poweroff
