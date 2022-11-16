@@ -15,18 +15,12 @@ rlJournalStart
     rlPhaseStartTest
     	rlRun "fwts ebda mcfg mtrr dmar crs maxreadreq" 0,1 "run fwts tests for memory config testing"
     rlPhaseEnd
-    
+
     fwtsReportResults
-    
+
     rlPhaseStartCleanup
     	fwtsCleanup
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
 
-
-    	
-
-
-
-    
