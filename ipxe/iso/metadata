@@ -1,0 +1,9 @@
+[General]
+description=ipxe iso boot test
+name=ipxe/iso
+owner=Oliver Gutierrez <ogutierr@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=1h
+dependencies=httpd;virt-install;qemu-kvm;libvirt;ipxe-bootimgs;expect
