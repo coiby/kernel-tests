@@ -1,0 +1,16 @@
+PURPOSE of /kernel/misc/rtc-hwclock
+Description: Test RTC using hwclock
+Author: Erico Nunes <ernunes@redhat.com>
+
+
+
+rtc-hwclock Introduction
+========================
+
+This is a simple test to test RTC functionality using the 'hwclock'
+utility from util-linux.
+The test will check whether setting a new time to the RTC works
+combining different cases, like Daylight Saving and UTC/localtime
+setting.
+It will restore the correct time at the end by using the internal Red
+Hat NTP server.

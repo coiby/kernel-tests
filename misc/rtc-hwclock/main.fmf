@@ -1,0 +1,24 @@
+summary: Test RTC using hwclock
+description: |
+    rtc-hwclock Introduction
+    ========================
+
+    This is a simple test to test RTC functionality using the 'hwclock'
+    utility from util-linux.
+    The test will check whether setting a new time to the RTC works
+    combining different cases, like Daylight Saving and UTC/localtime
+    setting.
+    It will restore the correct time at the end by using the internal Red
+    Hat NTP server.
+contact: Erico Nunes <ernunes@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - util-linux
+# hwclock is not included in the util-linux build for s390x
+adjust:
+  - enable: false
+    when: arch == s390x
+duration: 1h
+extra-summary: /kernel/misc/rtc-hwclock
+extra-task: /kernel/misc/rtc-hwclock
