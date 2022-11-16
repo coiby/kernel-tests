@@ -44,7 +44,7 @@ rlJournalStart
 		rlFileSubmit dmesg.log
 		rlFileSubmit dmidecode.log
 		rlFileSubmit lspci.log
-	rlPhaseEnd #SYSTEMInfo    
+	rlPhaseEnd #SYSTEMInfo
     rlPhaseStartCleanup
     	fwtsCleanup
     rlPhaseEnd
