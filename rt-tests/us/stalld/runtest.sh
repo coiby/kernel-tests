@@ -9,9 +9,9 @@
 
 ###############################################################################
 # I confimed that without stalld running and having the busyloop timeout set
-# to 240s will result in the echo taking 240s to complete.
+# to $MAX_RUNTIME will result in the echo taking $MAX_RUNITME seconds to complete.
 #
-# With stalld running the echo should complete in less than 240s. This tells
+# With stalld running the echo should complete in less than $MAX_RUNTIME. This tells
 # us that the task is indeed being boosted.
 ###############################################################################
 
@@ -29,6 +29,8 @@ export nrcpus=$(grep -c ^processor /proc/cpuinfo)
 export TEST="rt-tests/us/stalld"
 export STALLD_PID=""
 export BUSYLOOP_PID=""
+# Value is in seconds
+export MAX_RUNTIME=90
 
 # Default ACTION=TEST: Is to run the stalld performance test.
 # Non-Default ACTION=START: Is used to start and run stalld daemon  until
@@ -67,7 +69,7 @@ function install_and_start_stalld() {
         # Use a higher runtime ns for boosting, equal to 0.1s
         # With the default boost timing it will take multiple boosts
         # to finish the test and will take much longer
-        stalld -v -t 30 -r 1000000 | tee -a "$OUTPUTFILE" &
+        stalld -v -A -t 30 -r 1000000 | tee -a "$OUTPUTFILE" &
         export STALLD_PID=$!
     }
 }
@@ -83,7 +85,7 @@ function run_test() {
 
         # Run a busy loop to stall cpu 1
         # For some reason this takes 420 seconds to timeout
-        timeout 240s chrt -f 1 taskset -c 1 ./rt_busyloop &
+        timeout "${MAX_RUNTIME}s" chrt -f 1 taskset -c 1 ./rt_busyloop &
         export BUSYLOOP_PID=$!
 
         # Print process info so we can see PIDs and tell if the right process
@@ -96,7 +98,7 @@ function run_test() {
         END=$(date +%s)
         RUNTIME=$((END - START))
 
-        if [[ $RUNTIME -lt 240 ]]; then
+        if [[ $RUNTIME -lt $MAX_RUNTIME ]]; then
             echo "Iteration $ITERS runtime is $RUNTIME : PASS" | tee -a "$OUTPUTFILE"
             rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "PASS" 0
         else
