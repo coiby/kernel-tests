@@ -1,6 +1,6 @@
 [General]
 description=Test RTC using hwclock
-name=/kernel/misc/rtc-hwclock
+name=misc/rtc-hwclock
 owner=Oliver Gutierrez <ogutierr@redhat.com>
 license=GPLv2+
 confidential=no
@@ -11,7 +11,6 @@ entry_point=bash ./runtest.sh
 max_time=1h
 dependencies=util-linux
 TestVersion=1.0
-Path=/kernel/misc/rtc-hwclock
 Type=KernelTier1
 RunFor=kernel
 Priority=Normal

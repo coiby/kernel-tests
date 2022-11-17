@@ -10,8 +10,8 @@ description: |
     setting.
     It will restore the correct time at the end by using the internal Red
     Hat NTP server.
-contact: Erico Nunes <ernunes@redhat.com>
-test: ./runtest.sh
+contact: Oliver Gutierrez <ogutierr@redhat.com>
+test: bash ./runtest.sh
 framework: beakerlib
 require:
   - util-linux
@@ -20,5 +20,5 @@ adjust:
   - enable: false
     when: arch == s390x
 duration: 1h
-extra-summary: /kernel/misc/rtc-hwclock
-extra-task: /kernel/misc/rtc-hwclock
+extra-summary: misc/rtc-hwclock
+extra-task: misc/rtc-hwclock
