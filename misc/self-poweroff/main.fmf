@@ -8,10 +8,10 @@ description: |
     modify the guest settings (such as VM configuration, firmware settings).
     The Host should then power it back on in a separate further task.
 
-    See also: /kernel/misc/wait-guest-poweroff
-contact: Erico Nunes <ernunes@redhat.com>
-test: ./runtest.sh
+    See also: misc/wait-guest-poweroff
+contact: Oliver Gutierrez <ogutierr@redhat.com>
+test: bash ./runtest.sh
 framework: shell
 duration: 1h
-extra-summary: /kernel/misc/self-poweroff
-extra-task: /kernel/misc/self-poweroff
+extra-summary: misc/self-poweroff
+extra-task: misc/self-poweroff

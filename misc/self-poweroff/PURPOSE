@@ -10,4 +10,4 @@ When using it, the Guest powers off to allow the Host machine to safely
 modify the guest settings (such as VM configuration, firmware settings).
 The Host should then power it back on in a separate further task.
 
-See also: /kernel/misc/wait-guest-poweroff
+See also: misc/wait-guest-poweroff
