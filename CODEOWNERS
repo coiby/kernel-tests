@@ -320,6 +320,8 @@
 /rt-tests/us/stalld/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /security/crypto/ltp/ @bgoncalv @denli @lulinqing
 /security/integrity/ltp/ @bgoncalv @denli @lulinqing
+/sound/aloop/ @bgoncalv @jkysela @lulinqing
+/sound/user-ctl-elem/ @bgoncalv @jkysela @lulinqing
 /standards/usex/1.9-29/ @bgoncalv @headrat @lulinqing
 /storage/blktests/blk/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/nvme/nvme-rdma/ @bgoncalv @lulinqing @yizhanglinux
