@@ -1,0 +1,18 @@
+[General]
+name=/kernel/general/memory/function/memeq
+owner=Jiri Vohanka <jvohanka@redhat.com>
+description=Verifies that mem= kernel parameter works.
+license=GPLv2
+_architectures=x86_64;i386;ppc64;s390x;aarch64
+destructive=no
+confidential=no
+Releases=RHEL7
+
+[restraint]
+entry_point=./runtest.sh
+max_time=90m
+dependencies=grubby
+TestVersion=2.0
+Path=kernel/general/memory/function/memeq
+RunFor=kernel
+Priority=Normal
