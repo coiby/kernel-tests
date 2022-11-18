@@ -1,4 +1,4 @@
-PURPOSE of /kernel/misc/wait-guest-poweroff
+PURPOSE of misc/wait-guest-poweroff
 Description: Wait for guest poweroff
 Author: Erico Nunes <ernunes@redhat.com>
 
@@ -11,4 +11,4 @@ to have a chance to safely modify the guest settings (such as VM
 configuration, firmware settings).
 The Host should then power it back on in a separate further task.
 
-See also: /kernel/misc/self-poweroff
+See also: misc/self-poweroff
