@@ -1,16 +1,17 @@
-summary: Kernel self test for userfaultfd mechanism
+summary: KG-VMM userfaultfd2
 description: |
     Source: https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/userfaultfd.c
-    Author: David McDougall <dmcdouga@redhat-com>
-contact: David McDougall <dmcdouga@redhat-com>
+    Author: David McDougall <dmcdouga@redhat-com> 
+enabled: true
+id: 9cb33d26-3ba0-4aad-b85b-efd0055d3e5c
+contact: David McDougall <dmcdouga@redhat-com> 
 component:
   - kernel
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
-recommend:
+require:
   - gcc
-tier: 1
-tag: [tier1]
 duration: 5m
+tier: 1
 extra-summary: /kernel/general/memory/function/userfaultfd2
 extra-task: /kernel/general/memory/function/userfaultfd2
