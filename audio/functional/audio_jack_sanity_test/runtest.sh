@@ -11,6 +11,6 @@ if [ -n "${SKIP_UNSUPPORTED+1}" ]
 then
         command_arguments="$command_arguments --skip_unsupported"
 fi
-sh ../test_launcher.sh $TEST "./test.py $command_arguments $*"
+sh ../test_launcher.sh $TEST "./test.py $command_arguments $*" || exit 1
 touch ${OUTPUTFILE}
 rstrnt-report-log -l ${OUTPUTFILE}

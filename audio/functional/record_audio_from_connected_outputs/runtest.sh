@@ -30,6 +30,6 @@ then
         command_arguments="$command_arguments --test-frequency $frequency"
     done
 fi
-sh ../test_launcher.sh $TEST "./test.py $command_arguments $*"
+sh ../test_launcher.sh $TEST "./test.py $command_arguments $*" || exit 1
 touch ${OUTPUTFILE}
 rstrnt-report-log -l ${OUTPUTFILE}

@@ -10,6 +10,7 @@ destructive=no
 entry_point=bash ./runtest.sh
 max_time=1m
 dependencies=python;alsa-utils;pciutils
+repoRequires=audio/functional
 TestVersion=1.0
 Path=/kernel/audio_tests/functional/audio_jack_sanity_test
 RunFor=kernel
