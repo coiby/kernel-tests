@@ -1,0 +1,83 @@
+summary: Test to play audio over the loopback cable of all connected outputs (Requires
+    properly configured loopback cabling on the test system)
+description: |
+    Maintainer: Erik Hamera <ehamera@redhat.com>
+
+    0.Purpose
+    =========
+    This is meant to test various frequencies over the available channels on all
+    connected outputs. This will work over analog audio jacks, HDMI output jacks,
+    and DisplayPort output jacks as long as they support jack sensing (detecting
+    that a jack is connected).
+
+    1.Files
+    =======
+    Makefile - used to run the test script.
+    runtest.sh - script that starts the Python script to run the frequency testing.
+    PURPOSE - this file
+    test.py - Python script that configures the outputs and inputs for recording as
+              well as starting the audio playback and audio recording.
+    compare_audio.sh - bash script that calls through to
+                       kernel-audio-utils-average_frequency_compare to perform the
+                       actual frequency calculations on the recorded wav files.
+    __init__.py - Python script file that is used for pathing for modules.
+
+    2.Process
+    =========
+    Simply run the following command:
+    # make run
+
+    3.Test params
+    =============
+    This /kernel/audio_tests/functional/record_audio_from_connected_outputs test
+    accepts the following parameters in the XML:
+
+    (OPTIONAL)
+    SEED             - Seed for the pseudo-random number generator.
+    SKIP_CONTROLS    - A comma separated list of jack control ideas to ignore during
+                       testing. Controls are given in the format of:
+                       "<souncard_number>:<control_id>". For example, "0:23,0:25"
+                       would ignore testing the controls with numid 23 and 25 on
+                       soundcard 0. This is mainly used if you have a connected
+                       output jack on a system that is not looped back to an input
+                       jack (such as having an HDMI monitor connected to the system
+                       but not having the audio looped back into an input jack).
+    TEST_FREQUENCIES - A comma separated list of frequencies to test with instead of
+                       using randomly generated frequencies. Frequencies need to be
+                       given as a value in Hz. For example, "500,800" would test
+                       500Hz and 800Hz on each channel on each connected output.
+    DISABLE_ZERO     - Set to 1 to prevent the test from checking that the opposite
+                       channel from that being tested is showing 0 Hz. This is
+                       needed in cases where the audio loopback hardware is not
+                       updated for multi-channel audio testing.
+
+    3.Example xml snippet
+    =====================
+    <task name="/kernel/audio_tests/functional/record_audio_from_connected_outputs" role="STANDALONE">
+        <params>
+            <param name="SKIP_CONTROLS" value="0:23,0:25"/>
+        </params>
+    </task>
+
+
+    <task name="/kernel/audio_tests/functional/record_audio_from_connected_outputs" role="STANDALONE">
+        <params>
+            <param name="TEST_FREQUENCIES" value="500,800"/>
+        </params>
+    </task>
+
+    =================
+    -end PURPOSE file
+contact: Erik Hamera <ehamera@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: shell
+require:
+  - python
+  - alsa-utils
+  - sox
+  - pciutils
+duration: 20m
+extra-summary: /kernel/audio_tests/functional/record_audio_from_connected_outputs
+extra-task: /kernel/audio_tests/functional/record_audio_from_connected_outputs
