@@ -3,106 +3,106 @@
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
-/Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log/ @ltrivell
-/firmware/fwts/acpi/ @olivergs
-/firmware/fwts/batch/ @olivergs
-/firmware/fwts/include/ @olivergs
-/firmware/fwts/info/ @olivergs
-/firmware/fwts/memory-configuration/ @olivergs
-/firmware/fwts/power-management/ @olivergs
-/firmware/fwts/uefi/ @olivergs
-/firmware/fwts/user-specified/ @olivergs
-/firmware/fwts/utils/ @olivergs
-/firmware/linux-firmware/sanity/ @ltrivell
-/ipmi/OpenIPMI/Regression/bz311231-ipmitool-does-not-check-input-values/ @ltrivell
-/ipmi/OpenIPMI/ipmitool/ @ltrivell
-/ipmi/OpenIPMI/rmcp_ping/ @ltrivell
-/ipmi/freeipmi/Regression/bz818168-The-etc-init-d-bmc-watchdog-script-does-not-store/ @ltrivell
-/ipmi/hotmod/ @ltrivell
-/ipmi/ipmitool/Regression/bz1170266-ipmitool-returns-wrong-version-number/ @ltrivell
-/ipmi/ipmitool/Regression/bz532445-ipmievd-init-script-s-condrestart-doesn-t-work/ @ltrivell
-/ipmi/ipmitool/Sanity/smoke-test/ @ltrivell
-/ipmi/sanity/ipmi-sanity-check/ @ltrivell
-/ipmi/sanity/watchdog-sanity-script/ @ltrivell
-/ipmi/stress/interface/kcs/ @ltrivell
-/ipxe/iso/ @olivergs
-/lm_sensors/Sanity/detect/ @ltrivell
-/lm_sensors/Sanity/smoke/ @ltrivell
-/misc/rtc-hwclock/ @olivergs
-/misc/self-poweroff/ @olivergs
-/misc/wait-guest-poweroff/ @olivergs
-/networking/wireless/common/ @ltrivell
-/networking/wireless/rhel7/tests/wireless-connection-to-WEP-key-AP-nl80211/ @ltrivell
-/networking/wireless/rhel7/tests/wireless-connection-to-WPA1-TTLS-EAP-AP-nl80211/ @ltrivell
-/networking/wireless/rhel7/tests/wireless-connection-to-unencrypted-AP-nl80211/ @ltrivell
-/networking/wireless/tests/bug/bz1044005/wireless_connection_to_unencrypted_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/ @ltrivell
-/networking/wireless/tests/functional/connection/cleanup/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WEP_LEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WEP_key_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_TTLS_EAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_unencrypted_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/setup/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WEP_LEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WEP_key_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_TTLS_EAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_unencrypted_AP/ @ltrivell
-/networking/wireless/tests/functional/crda/regdom_verify/ @ltrivell
-/networking/wireless/tests/functional/ibss/cleanup/ @ltrivell
-/networking/wireless/tests/functional/ibss/setup/ @ltrivell
-/networking/wireless/tests/functional/iw/dev_info_verify/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WEP_LEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WEP_key_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_TTLS_EAP_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_unencrypted_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WEP_LEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WEP_key_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA1_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA1_TTLS_EAP_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA1_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell
-/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_unencrypted_AP/ @ltrivell
-/networking/wireless/tests/functional/suspend_resume/ @ltrivell
-/networking/wireless/tests/utility/beacon_simulator/ @ltrivell
-/networking/wireless/tests/utility/ping4/ @ltrivell
-/redfish/redfish-finder/ @ltrivell
+/Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log/ @ltrivell @jbastianrh
+/firmware/fwts/acpi/ @olivergs @jbastianrh
+/firmware/fwts/batch/ @olivergs @jbastianrh
+/firmware/fwts/include/ @olivergs @jbastianrh
+/firmware/fwts/info/ @olivergs @jbastianrh
+/firmware/fwts/memory-configuration/ @olivergs @jbastianrh
+/firmware/fwts/power-management/ @olivergs @jbastianrh
+/firmware/fwts/uefi/ @olivergs @jbastianrh
+/firmware/fwts/user-specified/ @olivergs @jbastianrh
+/firmware/fwts/utils/ @olivergs @jbastianrh
+/firmware/linux-firmware/sanity/ @ltrivell @jbastianrh
+/ipmi/OpenIPMI/Regression/bz311231-ipmitool-does-not-check-input-values/ @ltrivell @jbastianrh
+/ipmi/OpenIPMI/ipmitool/ @ltrivell @jbastianrh
+/ipmi/OpenIPMI/rmcp_ping/ @ltrivell @jbastianrh
+/ipmi/freeipmi/Regression/bz818168-The-etc-init-d-bmc-watchdog-script-does-not-store/ @ltrivell @jbastianrh
+/ipmi/hotmod/ @ltrivell @jbastianrh
+/ipmi/ipmitool/Regression/bz1170266-ipmitool-returns-wrong-version-number/ @ltrivell @jbastianrh
+/ipmi/ipmitool/Regression/bz532445-ipmievd-init-script-s-condrestart-doesn-t-work/ @ltrivell @jbastianrh
+/ipmi/ipmitool/Sanity/smoke-test/ @ltrivell @jbastianrh
+/ipmi/sanity/ipmi-sanity-check/ @ltrivell @jbastianrh
+/ipmi/sanity/watchdog-sanity-script/ @ltrivell @jbastianrh
+/ipmi/stress/interface/kcs/ @ltrivell @jbastianrh
+/ipxe/iso/ @olivergs @jbastianrh
+/lm_sensors/Sanity/detect/ @ltrivell @jbastianrh
+/lm_sensors/Sanity/smoke/ @ltrivell @jbastianrh
+/misc/rtc-hwclock/ @olivergs @jbastianrh
+/misc/self-poweroff/ @olivergs @jbastianrh
+/misc/wait-guest-poweroff/ @olivergs @jbastianrh
+/networking/wireless/common/ @ltrivell @jbastianrh
+/networking/wireless/rhel7/tests/wireless-connection-to-WEP-key-AP-nl80211/ @ltrivell @jbastianrh
+/networking/wireless/rhel7/tests/wireless-connection-to-WPA1-TTLS-EAP-AP-nl80211/ @ltrivell @jbastianrh
+/networking/wireless/rhel7/tests/wireless-connection-to-unencrypted-AP-nl80211/ @ltrivell @jbastianrh
+/networking/wireless/tests/bug/bz1044005/wireless_connection_to_unencrypted_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/cleanup/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WEP_LEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WEP_key_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_TTLS_EAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_unencrypted_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/setup/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WEP_LEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WEP_key_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_TTLS_EAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA1_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/wpa_supplicant/wireless_connection_to_unencrypted_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/crda/regdom_verify/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/ibss/cleanup/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/ibss/setup/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/iw/dev_info_verify/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WEP_LEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WEP_key_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_TTLS_EAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA1_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/kernel_module/kernel_module_reload/wireless_connection_to_unencrypted_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WEP_LEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WEP_key_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA1_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA1_TTLS_EAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA1_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_PEAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_TTLS_EAP_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_WPA2_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_dynamic_WEP_TLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_dynamic_WEP_TTLS_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_hidden_WPA2_passphrase_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/radio/radio_toggle/wireless_connection_to_unencrypted_AP/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/suspend_resume/ @ltrivell @jbastianrh
+/networking/wireless/tests/utility/beacon_simulator/ @ltrivell @jbastianrh
+/networking/wireless/tests/utility/ping4/ @ltrivell @jbastianrh
+/redfish/redfish-finder/ @ltrivell @jbastianrh
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
