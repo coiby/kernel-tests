@@ -1,0 +1,23 @@
+Run fwts tests in the uefi category (as returned by fwts --uefitests).
+These run automatically by default and require no user intervention.
+
+This includes the following tests (based on x86_64, may vary on other arches):
+
+csm             UEFI Compatibility Support Module test.
+esrt            Sanity check UEFI ESRT Table.
+securebootcert  UEFI secure boot test.
+uefibootpath    Sanity check for UEFI Boot Path Boot####.
+uefirtauthvar   Authenticated variable tests.
+uefirtmisc      UEFI miscellaneous runtime service interface tests.
+uefirttime      UEFI Runtime service time interface tests.
+uefirtvariable  UEFI Runtime service variable interface tests.
+
+On aarch64 it currently skips the following unsafe tests:
+uefirtauthvar uefirtmisc uefirttime uefirtvariable
+
+https://wiki.ubuntu.com/Kernel/Reference/fwts
+
+Note:
+
+All tests other than csm will abort on a non-UEFI enabled machine. Uefirt*
+tests may oops, panic or reboot the system on certain implementations.
