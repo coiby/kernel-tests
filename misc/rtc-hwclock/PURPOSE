@@ -1,4 +1,4 @@
-PURPOSE of /kernel/misc/rtc-hwclock
+PURPOSE of misc/rtc-hwclock
 Description: Test RTC using hwclock
 Author: Erico Nunes <ernunes@redhat.com>
 
