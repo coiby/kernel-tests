@@ -117,6 +117,14 @@ function stop_stalld() {
 
 # ----------------------------------------------------------------------------
 
+SELINUX_POP="0"
+
+# Check if selinux is on, and if so disable it
+if getenforce | grep -qi "disabled"; then
+    SELINUX_POP=$(getenforce)
+    setenforce 0
+fi
+
 if [ "$ACTION" == "TEST" ]; then
     echo "Running stalld performance test." | tee -a "$OUTPUTFILE"
     if ! kernel_automotive; then
@@ -132,3 +140,5 @@ elif [ "$ACTION" == "STOP" ]; then
     echo "Stop stalld by running stop." | tee -a "$OUTPUTFILE"
     stop_stalld
 fi
+
+setenforce "$SELINUX_POP"
