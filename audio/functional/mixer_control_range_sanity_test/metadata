@@ -1,0 +1,17 @@
+[General]
+description=Test that runs through each mixer control and tests the full range of values for that control (also testing values outside of the range)
+name=/kernel/audio_tests/functional/mixer_control_range_sanity_test
+owner=Erik Hamera <ehamera@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+dependencies=python;alsa-utils;pciutils
+TestVersion=1.0
+Path=/kernel/audio_tests/functional/mixer_control_range_sanity_test
+Type=KernelTier2
+RunFor=kernel
+Priority=Normal

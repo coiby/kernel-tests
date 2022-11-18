@@ -1,6 +1,7 @@
 #!/bin/bash
 export PYTHONPATH=../../../test-framework:../../../audio_tests:$PYTHONPATH
-. /tmp/test-params.sh
+OUTPUTFILE=test.log
+[ -f /tmp/test-params.sh ] && . /tmp/test-params.sh
 command_arguments=""
 if [ -n "${SEED+1}" ]
 then
@@ -29,5 +30,6 @@ then
         command_arguments="$command_arguments --test-frequency $frequency"
     done
 fi
-sh ../../../test-framework/test_launcher.sh $TEST "./test.py $command_arguments $*"
-rhts-submit-log -l ./test.log
+sh ../test_launcher.sh $TEST "./test.py $command_arguments $*"
+touch ${OUTPUTFILE}
+rstrnt-report-log -l ${OUTPUTFILE}
