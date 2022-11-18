@@ -1,0 +1,16 @@
+[General]
+description=Powers itself off
+name=misc/self-poweroff
+owner=Oliver Gutierrez <ogutierr@redhat.com>
+license=GPLv2+
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=1h
+dependencies=
+TestVersion=1.0
+Type=KernelTier1
+RunFor=kernel
+Priority=Normal
