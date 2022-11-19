@@ -84,13 +84,16 @@ function run_test() {
         START=$(date +%s)
 
         # Run a busy loop to stall cpu 1
-        # For some reason this takes 420 seconds to timeout
         timeout "${MAX_RUNTIME}s" chrt -f 1 taskset -c 1 ./rt_busyloop &
         export BUSYLOOP_PID=$!
 
         # Print process info so we can see PIDs and tell if the right process
         # is getting boosted
         sh -c 'sleep 5; ps aux | tail' &
+
+        # Sleep for a little bit, in case the timeout command is taking
+        # some time to get scheduled
+        sleep 1
 
         # This process blocks, and has to get boosted to finish
         chrt -f 1 taskset -c 1 sh -c "echo \"Finished\""
