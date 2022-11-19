@@ -350,6 +350,7 @@
 /storage/hba/san-device-stress/ @bgoncalv @lulinqing @mpatalan
 /storage/hw_raid/ @bgoncalv @lulinqing @mpatalan
 /storage/lvm/cache/ @bgoncalv @fsuba @lulinqing
+/storage/lvm/device-mapper/ @bgoncalv @lulinqing @snitm
 /storage/lvm/snapper/ @bgoncalv @fsuba @lulinqing
 /storage/lvm/thinp/sanity/ @bgoncalv @fsuba @lulinqing
 /storage/lvm/thinp/stqe/ @bgoncalv @fsuba @lulinqing
