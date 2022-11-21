@@ -30,7 +30,7 @@ export TEST="rt-tests/us/stalld"
 export STALLD_PID=""
 export BUSYLOOP_PID=""
 # Value is in seconds
-export MAX_RUNTIME=90
+export MAX_RUNTIME=120
 
 # Default ACTION=TEST: Is to run the stalld performance test.
 # Non-Default ACTION=START: Is used to start and run stalld daemon  until
