@@ -1,7 +1,7 @@
 [General]
-name=storage/ssd/nvme_mkfs_xfs_bz1443807
+name=storage/ssd/libnvme_unit_tests
 owner=Yi Zhang <yizhan@redhat.com>
-description=NVMe SSD iozone test on xfs filesystem
+description=libnvme unit tests from libnvme
 license=GPLv3
 confidential=no
 destructive=no
@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
-dependencies=nvme-cli
-max_time=5h
+dependencies=rpm-build;meson;gcc;json-c-devel;openssl-devel;cmake
+max_time=30m
 use_pty=false
