@@ -104,6 +104,9 @@ case "$arch" in
 		else
 			MODLIST=modules.default
 		fi
+		if cki_is_kernel_automotive; then
+		  MODLIST=modules.x86_64.rhivos
+		fi
 		;;
 	ia64)
 		if [ -s modules.ia64 ] ; then
@@ -146,6 +149,9 @@ case "$arch" in
 			MODLIST=modules.aarch64
 		else
 			MODLIST=modules.default
+		fi
+		if cki_is_kernel_automotive; then
+		  MODLIST=modules.aarch64.rhivos
 		fi
 		;;
 	*)
@@ -197,8 +203,11 @@ case "$release" in
 		fi
 		;;
 	"release 9"|"el9")
-		if [ -s modules.rhel9 ]; then
+		if [ -s modules.rhel9 ] && ! cki_is_kernel_automotive ; then
 			MODLIST="$MODLIST modules.rhel9"
+		fi
+		if cki_is_kernel_automotive; then
+		  MODLIST="$MODLIST modules.rhivos"
 		fi
 		;;
 
