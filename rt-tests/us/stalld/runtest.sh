@@ -12,7 +12,7 @@
 # to $MAX_RUNTIME will result in the echo taking $MAX_RUNTIME seconds to complete.
 #
 # With stalld running the echo should complete in less than $MAX_RUNTIME. This tells
-# us that the task is indeed being boosted. stalld will also print the PID of the 
+# us that the task is indeed being boosted. stalld will also print the PID of the
 # process being boosted, giving additional confirmation.
 ###############################################################################
 
