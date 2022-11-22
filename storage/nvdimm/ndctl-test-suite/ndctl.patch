@@ -1,0 +1,15 @@
+diff --git a/test/security.sh b/test/security.sh
+index 34c4977..108b4ca 100755
+--- a/test/security.sh
++++ b/test/security.sh
+@@ -241,6 +241,10 @@ test_6_load_keys()
+ }
+ 
+ check_min_kver "5.0" || do_skip "may lack security handling"
++
++# Make sure there is a session and a user keyring linked into it
++keyctl new_session
++keyctl link @u @s
+ uid="$(keyctl show | grep -Eo "_uid.[0-9]+" | head -1 | cut -d. -f2-)"
+ if [ "$uid" -ne 0 ]; then
+ 	do_skip "run as root or with a sudo login shell for test to work"
