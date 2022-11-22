@@ -303,7 +303,7 @@
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing @xmu2
 /networking/netfilter/ @bgoncalv @liuhangbin @lulinqing @yiche
 /networking/route/route_func/ @bgoncalv @liuhangbin @lulinqing
-/networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing
+/networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing @yinxu
 /networking/socket/fuzz/ @bgoncalv @liuhangbin @lulinqing
 /networking/tcp/tcp_keepalive/ @bgoncalv @liuhangbin @lulinqing @xmu2
 /networking/tunnel/geneve/basic/ @bgoncalv @liuhangbin @lulinqing
