@@ -357,6 +357,7 @@
 /storage/nvdimm/ndctl-test-suite/ @bgoncalv @lulinqing @yizhanglinux
 /storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
 /storage/swraid/scsi_raid/ @bgoncalv @czhong2 @lulinqing
+/storage/swraid/simple_reshape/ @FineFan @bgoncalv @lulinqing
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
