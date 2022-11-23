@@ -18,20 +18,21 @@
 
 # Enable TMT testing for RHIVOS
 . ../../../automotive/include/include.sh || exit 1
-: ${OUTPUTFILE:=runtest.log}
+: "${OUTPUTFILE:=runtest.log}"
 
 # Source rt common functions
 . ../../include/runtest.sh || exit 1
 
 # Vars
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
-export nrcpus=$(grep -c ^processor /proc/cpuinfo)
 export TEST="rt-tests/us/stalld"
-export STALLD_PID=""
-export BUSYLOOP_PID=""
+
+rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+nrcpus=$(grep -c ^processor /proc/cpuinfo)
+STALLD_PID=""
+BUSYLOOP_PID=""
 # Value is in seconds
-export MAX_RUNTIME=120
+MAX_RUNTIME=120
 
 # Default ACTION=TEST: Is to run the stalld performance test.
 # Non-Default ACTION=START: Is used to start and run stalld daemon  until
