@@ -298,9 +298,11 @@
 /misc/header-test/ @bgoncalv @jbastianrh @lulinqing
 /misc/kernel-fips-mode/ @bgoncalv @lulinqing @omoris
 /misc/module-load/ @bgoncalv @jbastianrh @lulinqing
+/networking/bridge/sanity_check/ @Feiliu_A @bgoncalv @lulinqing
 /networking/driver/sanity/ @bgoncalv @linville-rh @lulinqing
 /networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing @xmu2
+/networking/macsec/sanity_check/ @Feiliu_A @bgoncalv @lulinqing
 /networking/netfilter/ @bgoncalv @liuhangbin @lulinqing @yiche
 /networking/route/route_func/ @bgoncalv @liuhangbin @lulinqing
 /networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing @yinxu
