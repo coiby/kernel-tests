@@ -84,7 +84,7 @@ if [ ! "${LOCAL_IP[6]}" ];then
     test_fail "NO LOCAL_IP[6] address"
 fi
 
-waitready() { echo "wait for $1"; while ! pgrep -f "$1"; do sleep 0.1; done; sleep 2;}
+waitready() { echo "wait for $1"; while ! pgrep -f "$1"; do sleep 0.1; done; sleep 5;}
 
 rlJournalStart
 for f in $family
