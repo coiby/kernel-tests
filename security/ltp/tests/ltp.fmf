@@ -3,7 +3,7 @@ contact: Linqing Lu <lilu@redhat.com>
 component:
   - kernel
 path: /security/ltp
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
 require:
   - autoconf
@@ -24,9 +24,10 @@ require:
   - lksctp-tools-devel
   - m4
   - make
-  - numactl-devel
   - openssl
   - openssl-devel
   - pkgconf
   - xfsprogs-devel
-duration: 1h
+recommend:
+  - numactl-devel
+duration: 4h
