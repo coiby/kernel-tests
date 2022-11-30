@@ -170,7 +170,7 @@ function knownissue_filter()
 	cki_is_kernel_debug && tskip "futex_cmp_requeue01" unfix
 
 	# These test cases take too long to run on VMs
-	cki_is_vm || cki_is_kernel_debug && tskip "setsockopt06 mtest06 pty03 writev03" fatal
+	cki_is_vm || cki_is_kernel_debug && tskip "fork14 setsockopt06 mtest06 pty03 writev03" fatal
 
 	# ----------------- NOTE: -----------------------------
 	# we have split the knownissue's data from code, better
