@@ -104,7 +104,9 @@ function installDepsYum() {
 
 function installDeps() {
     if stat /run/ostree-booted > /dev/null 2>&1; then
-        rpm-ostree -y -A --idempotent --allow-inactive install "$@"
+        if ! rpm -q --quiet "$@"; then
+            rpm-ostree -y --allow-inactive install "$@" && rstrnt-reboot
+        fi
     elif type yum >/dev/null; then
         installDepsYum yum "$@"
     elif type dnf >/dev/null; then
