@@ -194,7 +194,6 @@
 /networking/tunnel/vxlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /networking/udp/udp_socket/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /networking/vnic/ipvlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
-/networking/vnic/sriov/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /networking/vrf/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
@@ -275,6 +274,7 @@
 /distribution/ltp/lite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
 /distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
 /filesystems/cifs/connectathon/ @bgoncalv @jianhong @lulinqing
+/filesystems/general/pjd-fstest/ @bgoncalv @lulinqing @zrlang
 /filesystems/loopdev/sanity/ @bgoncalv @jencce2002 @lulinqing
 /filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
 /filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing @nstraz
@@ -312,7 +312,6 @@
 /networking/tunnel/gre/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
-/networking/vnic/sriov/ @bgoncalv @lulinqing @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 /packages/perf/internal-testsuite/ @bgoncalv @lulinqing @mpetlan
@@ -351,6 +350,7 @@
 /storage/dm/common/ @bgoncalv @guazhang @lulinqing
 /storage/hba/san-device-stress/ @bgoncalv @lulinqing @mpatalan
 /storage/hw_raid/ @bgoncalv @lulinqing @mpatalan
+/storage/iscsi/params/ @bgoncalv @lulinqing @mhoyer
 /storage/lvm/cache/ @bgoncalv @fsuba @lulinqing
 /storage/lvm/device-mapper/ @bgoncalv @lulinqing @snitm
 /storage/lvm/snapper/ @bgoncalv @fsuba @lulinqing
@@ -360,6 +360,7 @@
 /storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
 /storage/swraid/scsi_raid/ @bgoncalv @czhong2 @lulinqing
 /storage/swraid/simple_reshape/ @FineFan @bgoncalv @lulinqing
+/storage/target/targetcli_basic/ @bgoncalv @lulinqing @mhoyer
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
