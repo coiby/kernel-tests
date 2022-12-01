@@ -58,26 +58,21 @@ function stqe_init {
 
   # Check if we have pip>=20, install 20.3 if not
   if [[ $($pip -V | cut -f 2 -d ' ' | cut -f 1 -d '.') -lt 20 ]]; then
-    cki_run "$pip install -U pip==20.3" ||
+    cki_run "$pip install -U --user pip==20.3" ||
       cki_abort_task "FAIL: Could not install pip==20.3!"
   fi
 
   # Workaround for python-augeas compiling bug on RHEL-7 ppc64le
   if [[ $ARCH == 'ppc64le' ]]; then
-    cki_run "$pip install cffi --no-binary=cffi" ||
+    cki_run "$pip install cffi --no-binary=cffi --user" ||
       cki_abort_task "FAIL: Could not install cffi from source on ppc64le RHEL-7"
   fi
 
-  if [[ -n $LIBSAN_STABLE_VERSION ]]; then
-    cki_run "$pip libsan==$LIBSAN_STABLE_VERSION" ||
-      cki_abort_task "Fail to install libsan==$LIBSAN_STABLE_VERSION"
-  fi
-
   if [[ -n $STQE_STABLE_VERSION ]]; then
-    cki_run "$pip install stqe==$STQE_STABLE_VERSION --no-binary=stqe" ||
+    cki_run "$pip install --user stqe==$STQE_STABLE_VERSION --no-binary=stqe" ||
       cki_abort_task "Fail to install stqe==$STQE_STABLE_VERSION"
   else
-    cki_run "$pip install stqe --no-binary=stqe" ||
+    cki_run "$pip install stqe --no-binary=stqe --user" ||
       cki_abort_task "Fail to install stqe"
   fi
   cki_run "restorecon -Rv /usr/local/lib/python* /usr/lib/python*"
