@@ -324,6 +324,7 @@
 /networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
+/packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 /packages/perf/internal-testsuite/ @bgoncalv @lulinqing @mpetlan
 /packages/perf/perftool-testsuite/ @bgoncalv @lulinqing @mpetlan
