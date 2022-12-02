@@ -1,0 +1,123 @@
+From fd21cdfad7fb8eedb38da79754cf8f1f0f8ee465 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Tue, 20 Sep 2022 10:24:51 +0200
+Subject: [PATCH] syscalls/futex_waitv0[23]: replace TST_THREAD_STATE_WAIT with
+ repeated wake
+
+TST_THREAD_STATE_WAIT isn't reliable to tell that it's safe to
+call futex_wake(). futex_wake() can be called prematurely and
+return 0, which leaves other thread timing out.
+
+Replace it with repeated futex_wake() until it fails or wakes at least 1 waiter.
+Also extend timeout to 5 seconds to avoid false positives from systems with
+high steal time (e.g. overloaded s390x host).
+
+For futex_waitv03 this replaces while loop with TST_RETRY_FUNC.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Acked-by: Andrea Cervesato <andrea.cervesato@suse.de>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ .../kernel/syscalls/futex/futex_waitv02.c     | 21 ++++++-------------
+ .../kernel/syscalls/futex/futex_waitv03.c     | 12 +++--------
+ testcases/kernel/syscalls/futex/futextest.h   | 15 +++++++++++++
+ 3 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/futex/futex_waitv02.c b/testcases/kernel/syscalls/futex/futex_waitv02.c
+index 0a0e2b620..ccea5eb5e 100644
+--- a/testcases/kernel/syscalls/futex/futex_waitv02.c
++++ b/testcases/kernel/syscalls/futex/futex_waitv02.c
+@@ -50,19 +50,13 @@ static void setup(void)
+ 	}
+ }
+ 
+-static void *threaded(void *arg)
++static void *threaded(LTP_ATTRIBUTE_UNUSED void *arg)
+ {
+ 	struct futex_test_variants tv = futex_variant();
+-	int tid = *(int *)arg;
+ 
+-	TST_THREAD_STATE_WAIT(tid, 'S', 0);
+-
+-	TEST(futex_wake(tv.fntype, (void *)(uintptr_t)waitv[numfutex - 1].uaddr,
+-			1, FUTEX_PRIVATE_FLAG));
+-	if (TST_RET < 0) {
+-		tst_brk(TBROK | TTERRNO,
+-			"futex_wake private returned: %ld", TST_RET);
+-	}
++	TST_RETRY_FUNC(futex_wake(tv.fntype,
++		(void *)(uintptr_t)waitv[numfutex - 1].uaddr,
++		1, FUTEX_PRIVATE_FLAG), futex_waked_someone);
+ 
+ 	return NULL;
+ }
+@@ -70,16 +64,13 @@ static void *threaded(void *arg)
+ static void run(void)
+ {
+ 	struct timespec to;
+-	int tid;
+ 	pthread_t t;
+ 
+-	tid = tst_syscall(__NR_gettid);
+-
+-	SAFE_PTHREAD_CREATE(&t, NULL, threaded, (void *)&tid);
++	SAFE_PTHREAD_CREATE(&t, NULL, threaded, NULL);
+ 
+ 	/* setting absolute timeout for futex2 */
+ 	SAFE_CLOCK_GETTIME(CLOCK_MONOTONIC, &to);
+-	to.tv_sec++;
++	to.tv_sec += 5;
+ 
+ 	TEST(futex_waitv(waitv, numfutex, 0, &to, CLOCK_MONOTONIC));
+ 	if (TST_RET < 0) {
+diff --git a/testcases/kernel/syscalls/futex/futex_waitv03.c b/testcases/kernel/syscalls/futex/futex_waitv03.c
+index ee7972847..c674f52d8 100644
+--- a/testcases/kernel/syscalls/futex/futex_waitv03.c
++++ b/testcases/kernel/syscalls/futex/futex_waitv03.c
+@@ -74,15 +74,9 @@ static void *threaded(LTP_ATTRIBUTE_UNUSED void *arg)
+ {
+ 	struct futex_test_variants tv = futex_variant();
+ 
+-	do {
+-		TEST(futex_wake(tv.fntype, (void *)(uintptr_t)waitv[numfutex - 1].uaddr,
+-			1, 0));
+-		if (TST_RET < 0) {
+-			tst_brk(TBROK | TTERRNO,
+-				"futex_wake private returned: %ld", TST_RET);
+-		}
+-		usleep(1000);
+-	} while (TST_RET < 1);
++	TST_RETRY_FUNC(futex_wake(tv.fntype,
++		(void *)(uintptr_t)waitv[numfutex - 1].uaddr,
++		1, 0), futex_waked_someone);
+ 
+ 	return NULL;
+ }
+diff --git a/testcases/kernel/syscalls/futex/futextest.h b/testcases/kernel/syscalls/futex/futextest.h
+index fd10885f3..515b5102d 100644
+--- a/testcases/kernel/syscalls/futex/futextest.h
++++ b/testcases/kernel/syscalls/futex/futextest.h
+@@ -277,4 +277,19 @@ futex_set(futex_t *uaddr, u_int32_t newval)
+ 	return newval;
+ }
+ 
++/**
++ * futex_waked_someone() - ECHCK func for TST_RETRY_FUNC
++ * @ret:	return value of futex_wake
++ *
++ * Return value drives TST_RETRY_FUNC macro.
++ */
++static inline int
++futex_waked_someone(int ret)
++{
++	if (ret < 0)
++		tst_brk(TBROK | TERRNO, "futex_wake returned: %d", ret);
++
++	return ret;
++}
++
+ #endif /* _FUTEXTEST_H */
+-- 
+2.35.3
+
