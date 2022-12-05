@@ -8,3 +8,4 @@ entry_point=bash ./runtest.sh
 max_time=5m
 dependencies=hwdata;python*-hwdata;beakerlib;beakerlib-redhat
 dependencies[RedHatEnterpriseLinux9]=https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm;hwdata;python*-hwdata;beakerlib;beakerlib-redhat
+dependencies[RedHatEnterpriseLinux8]=python3;hwdata;python*-hwdata;beakerlib;beakerlib-redhat
