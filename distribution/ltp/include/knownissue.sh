@@ -189,7 +189,7 @@ function tcase_exclude()
 
 	while read -r skip; do
 		echo "Excluding $skip form LTP runtest file"
-		sed -i "s/^\($skip\)/#disabled, \1/g" "${config}"
+		sed -i "s/^\($skip\)/#disabled, \1/g" ${config}
 	done
 }
 
