@@ -83,7 +83,7 @@ function is_zstream() { uname -r | awk -F. '{if (match($4, "[[:digit:]]") != 1) 
 function is_kvm()
 {
 	if command -v virt-what; then
-		return "$(virt-what | grep -q 'kvm')"
+		{ virt-what | grep -q 'kvm'; } && return 0
 	fi
 	return 1
 }
