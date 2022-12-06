@@ -2,4 +2,3 @@
 --color
 --output junit
 --default-path "**/spec"
---execdir @basedir

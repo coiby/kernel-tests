@@ -2,7 +2,7 @@
 eval "$(shellspec - -c) exit 1"
 
 Describe 'is_kvm'
-    Include knownissue.sh
+    Include distribution/ltp/include/knownissue.sh
     # mock the command used by is_kvm
     # to check if virt-what is installed
     # 'command -v virt-what'
@@ -35,9 +35,9 @@ Describe 'is_kvm'
 End
 
 Describe 'tcase_exclude'
-    Include knownissue.sh
+    Include distribution/ltp/include/knownissue.sh
     exclude() {
-        echo -e "test1\ntest2\ntest3" | tcase_exclude ../lite/configs/RHELKT1LITE*
+        echo -e "test1\ntest2\ntest3" | tcase_exclude distribution/ltp/lite/configs/RHELKT1LITE*
     }
     It 'tcase_exclude multiple config files'
         When call exclude
