@@ -28,14 +28,17 @@
 #
 # Added-by: Li Wang <liwang@redhat.com>
 
-. ../include/kvercmp.sh				|| exit 1
-. ../include/knownissue/upstream_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel_alt_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel9_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel8_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel7_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel6_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel5_knownissue.sh	|| exit 1
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+
+. "$CDIR"/../include/kvercmp.sh				|| exit 1
+. "$CDIR"/../include/knownissue/upstream_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel_alt_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel9_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel8_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel7_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel6_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel5_knownissue.sh	|| exit 1
 
 cver=$(uname -r)
 
