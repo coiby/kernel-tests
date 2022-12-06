@@ -44,7 +44,7 @@ export PYTHON
 rlJournalStart
 # Exit if example.py returns a warning (BZ 1380159)
     rlPhaseStartTest
-	if rlRun -l "$(PYTHON) /usr/share/doc/python*-hwdata*/example.py" 0 ; then
+	if rlRun -l "${PYTHON} /usr/share/doc/python*-hwdata*/example.py" 0 ; then
                 rlPass "Pass, example.py script returned the id's succssfully"
         else
                 rlFail "Fail, example.py returned a warning"
