@@ -33,10 +33,18 @@
 # Set the full test name
 export TEST="/kernel/hwdata/Sanity/example"
 
+# RHEL7 and older use python from $PATH
+# RHEL8 and newer use /usr/libexec/platform-python (which is not in $PATH)
+PYTHON=/usr/libexec/platform-python
+if grep -q "release 7" /etc/redhat-release ; then
+	PYTHON=python
+fi
+export PYTHON
+
 rlJournalStart
 # Exit if example.py returns a warning (BZ 1380159)
     rlPhaseStartTest
-        if rlRun -l "python /usr/share/doc/python*-hwdata*/example.py" 0 ; then
+	if rlRun -l "$(PYTHON) /usr/share/doc/python*-hwdata*/example.py" 0 ; then
                 rlPass "Pass, example.py script returned the id's succssfully"
         else
                 rlFail "Fail, example.py returned a warning"
