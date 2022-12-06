@@ -1,0 +1,9 @@
+[General]
+description=run UEFI tests from Firmware Test Suite (fwts)
+name=firmware/fwts/uefi
+owner=Oliver Gutierrez <ogutierr@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=1h
+dependencies=iasl;wget;acpidump;pciutils;dmidecode;sendmail;pcre-devel;json-c-devel;git;elfutils-libelf-devel;kernel-devel;glib2-devel;beakerlib-redhat;rhts-test-env.noarch;@development-tools;wget;patch;autoconf;automake;gcc;libtool;bison;flex

@@ -107,6 +107,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cpuid.h-Provide-the-macro-definition-__cpuid_count.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-futex_waitv0-23-replace-TST_THREAD_STATE_WA.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-fix-the-broken-case-caused-by-hardcoded-xst.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-when-cpuid.h-is-missing.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-when-not-on-x86.patch
@@ -114,7 +115,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-Revert-ptrace07-Fix-compilation-when-not-on-x86.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cpuid-ptrace07-Only-compile-on-x86_64.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-kconfig-adding-new-config-path.patch
-
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-keyctl02-make-use-of-.max_runtime.patch
     fi
 
     if [ "$TESTVERSION" == "20220527" ]; then

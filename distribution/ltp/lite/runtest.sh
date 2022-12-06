@@ -18,13 +18,13 @@
 # VMs can have slow performance, therefore increase LTP_TIMEOUT_MUL
 if cki_is_vm; then
 	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
-	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-10}
+	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-5}
 fi
 
 # debug kernel is slower increase LTP_TIMEOUT_MUL
 if cki_is_kernel_debug; then
 	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
-	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-10}
+	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-5}
 fi
 
 [ -n "${LTP_TIMEOUT_MUL}" ] && echo "LTP_TIMEOUT_MUL is ${LTP_TIMEOUT_MUL}"

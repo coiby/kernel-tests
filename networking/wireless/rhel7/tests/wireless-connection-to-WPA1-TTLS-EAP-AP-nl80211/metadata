@@ -1,0 +1,9 @@
+[General]
+description=Establish a wireless connection to a WPA1 TTLS EAP AP.
+name=networking/wireless/rhel7/tests/wireless-connection-to-WPA1-TTLS-EAP-AP-nl80211
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+dependencies=kernel;wireless-tools

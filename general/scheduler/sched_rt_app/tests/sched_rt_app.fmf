@@ -6,6 +6,23 @@ component:
 path: /general/scheduler/sched_rt_app
 test: bash -x ./runtest.sh
 framework: beakerlib
+require:
+  - gcc
+  - glibc
+  - wget
+  - bc
+  - json-c
+  - json-c-devel
+  - cmake
+  - autoconf
+  - libgcc
+  - gcc-c++
+  - m4
+  - libtool
+  - git
+  - bzip2
+  - util-linux
+  - stress-ng
 duration: 1h
 extra-summary: /general/scheduler/sched_rt_app
 extra-task: /general/scheduler/sched_rt_app

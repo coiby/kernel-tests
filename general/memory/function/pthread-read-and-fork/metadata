@@ -1,0 +1,20 @@
+[General]
+description=pthread read and fork hugetlb test
+name=/kernel/general/memory/function/pthread-read-and-fork
+owner=Jarod Wilson <jarod@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+Releases=RHELServer5;RHEL6
+
+[restraint]
+entry_point=./runtest.sh
+max_time=35m
+dependencies=gcc;coreutils
+TestVersion=1.0
+Path=/general/memory/function/pthread-read-and-fork
+Type=Regression;Crasher
+RunFor=kernel
+Priority=Normal
+NeedProperty=PROCESSORS > 1
+NeedProperty=MEMORY >= 2048

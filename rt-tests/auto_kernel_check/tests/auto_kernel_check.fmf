@@ -6,6 +6,25 @@ component:
 path: /rt-tests/auto_kernel_check
 test: bash -x ./runtest.sh
 framework: shell
+require:
+  - realtime-tests
+  - stress-ng
+  - stalld
+  - bc
+  - curl
+  - gcc
+  - gdb
+  - git
+  - patch
+  - pciutils
+  - rpm-build
+  - strace
+  - time
+  - unzip
+  - wget
+  - zip
+  - python3
+  - python3-pip
 duration: 20m
 extra-summary: /rt-tests/auto_kernel_check
 extra-task: /rt-tests/auto_kernel_check

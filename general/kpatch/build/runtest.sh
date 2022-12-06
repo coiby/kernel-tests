@@ -36,6 +36,7 @@ KPATCH_REV="${KPATCH_REV:-}"
 KPATCH_REPO="${KPATCH_REPO:-https://github.com/dynup/kpatch.git}"
 KPATCH_BUILD_OPTS="${KPATCH_BUILD_OPTS:-}"
 KPATCH_SKIP_TEST="${KPATCH_SKIP_TEST:-}"
+TEST_PATCH_PATH="test/integration"
 
 rlJournalStart
     rlPhaseStartSetup
@@ -57,8 +58,11 @@ rlJournalStart
         rlRun "kpatch_dependencies"
         rlRun "kpatch_set_ccache_max_size 10G"
         source /etc/os-release
-        [ "${VERSION_ID}" == "8.7" ] && [ ! -d test/integration/${ID}-${VERSION_ID} ] && cp -R test/integration/rhel-8.6 test/integration/${ID}-${VERSION_ID}
-        [ "${VERSION_ID}" == "9.1" ] && [ ! -d test/integration/${ID}-${VERSION_ID} ] && cp -R test/integration/rhel-9.0 test/integration/${ID}-${VERSION_ID}
+        MA=$(cut -d '.' -f 1 <<< $VERSION_ID)
+        MI=$(cut -d '.' -f 2 <<< $VERSION_ID)
+        PREVIOUS_MI=$(( $MI-1 ))
+        PREVIOUS_TARGET="${MA}.${PREVIOUS_MI}"
+        [ ! -d ${TEST_PATCH_PATH}/${ID}-${VERSION_ID} ] && cp -R ${TEST_PATCH_PATH}/${ID}-${PREVIOUS_TARGET} ${TEST_PATCH_PATH}/${ID}-${VERSION_ID}
         if [ ! -z "${KPATCH_SKIP_TEST}" ]; then
             pushd test/integration/${ID}-${VERSION_ID}
             rm -rf ${KPATCH_SKIP_TEST}

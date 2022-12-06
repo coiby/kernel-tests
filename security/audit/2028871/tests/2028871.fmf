@@ -6,6 +6,8 @@ component:
 path: /security/audit/2028871
 test: make run
 framework: beakerlib 
+require:
+  - make
 duration: 12m
 extra-summary: /kernel-tests/security/audit/2028871
 extra-task: /kernel-tests/security/audit/2028871

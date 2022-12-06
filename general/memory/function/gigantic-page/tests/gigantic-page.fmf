@@ -6,6 +6,9 @@ component:
 path: /general/memory/function/gigantic-page
 test: bash -x ./runtest.sh
 framework: beakerlib
+require:
+  - grubby
+  - numactl
 adjust:
   enabled: false
   when: arch != x86_64
