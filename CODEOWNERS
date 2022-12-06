@@ -114,7 +114,7 @@
 /networking/wireless/tests/utility/beacon_simulator/ @ltrivell @jbastianrh
 /networking/wireless/tests/utility/ping4/ @ltrivell @jbastianrh
 /redfish/redfish-finder/ @ltrivell @jbastianrh
-/hwdata/Sanity/example/ @ltrivell
+/hwdata/Sanity/example/ @ltrivell @jbastianrh
 # DDIM-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-CONFIG-BEGIN
