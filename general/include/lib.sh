@@ -48,6 +48,7 @@ KG_NFS_PATH_DUP=$KG_SERVER:$KG_SHARE_DUP_ISO
 
 function download_kernel_srpm()
 {
+	local kernel_name=$(echo $kernel_name | sed "s/-debug//")
 	HOST=$(hostname)
 	case ${HOST} in
 		*pek*) def_url="http://download.eng.pek2.redhat.com/brewroot/packages";;
@@ -60,7 +61,7 @@ function download_kernel_srpm()
 		*) def_url="http://download.eng.bos.redhat.com/brewroot/packages";;
 	esac
 
-	package_prefix="$def_url/kernel"
+	package_prefix="$def_url/$kernel_name"
 	kernel_maj=$(uname -r | cut -d- -f1)
 	tmp=$(uname -r | cut -d- -f2)
 	kernel_min=$(echo ${tmp%.*})
@@ -73,10 +74,17 @@ function download_kernel_srpm()
 function setup_src_repo()
 {
 	local baseurl=$(grep baseurl /etc/yum.repos.d/beaker-BaseOS.repo | awk -F'BaseOS' -vOFS='' '{$1=$1;$2=""}1')
+
+	if [[ $kernel_name =~ "rt" ]]; then
+		local varient="RT"
+	else
+		local varient="BaseOS"
+	fi
+
 cat << EOF > /etc/yum.repos.d/${repo_name:-"beaker-source.repo"}
 [beaker-source]
 name=beaker-source
-${baseurl}BaseOS/source/tree/
+${baseurl}${varient}/source/tree/
 enabled=1
 gpgcheck=0
 skip_if_unavailable=1
@@ -90,7 +98,9 @@ function cleanup_src_repo()
 
 function prepare_running_kernel_src()
 {
-	running_kernel=$(uname -r | sed "s/+debug//" | sed "s/\.`arch`//")
+	local running_kernel=$(uname -r | sed "s/+debug//" | sed "s/\.`arch`//")
+	local kernel_name=$(echo $kernel_name | sed "s/-debug//")
+
 	echo $running_kernel | grep -q -v 'el[0-9]\|fc\|eln'
 	if [ $? -eq 0 ]; then
 		echo "detected upstream kernel..."
