@@ -9,9 +9,10 @@ function get_pkgs
     local metadata_file=${1?"*** metadata file ***"}
     local keyword="$2"
     local pkgs=""
+    local kv
+    kv=$(grep -E "^${keyword}=" "$metadata_file")
 
     typeset _pkgs
-    typeset kv=$(grep -E "^${keyword}=" "$metadata_file")
     if [[ -n "$kv" ]]; then
         # convert ';' to ',' as a new var $keyword will be created via eval
         kv="${kv//;/,}"

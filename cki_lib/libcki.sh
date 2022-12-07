@@ -202,9 +202,10 @@ function cki_main()
 #
 function cki_run()
 {
-    typeset timestamp=$(date +"%H:%M:%S")
+    local timestamp
+    timestamp=$(date +"%H:%M:%S")
     echo "[ $timestamp ] Running: '$*'"
-    eval "$@"
+    eval "$*"
     return $?
 }
 
