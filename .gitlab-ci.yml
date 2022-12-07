@@ -91,6 +91,9 @@ shell check runtests mr:
   rules:
     - !reference [.rules, mr-parent]
 
+shellspec:
+  extends: .shellspec
+
 codeowners check:
   extends: .cki_tools
   script:
