@@ -11,9 +11,9 @@ PACKAGE_NAME=""
 KPKG_VAR_DEBUG_KERNEL="false"
 
 # Bring in library functions.
-FILE=$(readlink -f ${BASH_SOURCE})
-CDIR=$(dirname $FILE)
-source ${CDIR}/../../cki_lib/libcki.sh
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+source "${CDIR}"/../../cki_lib/libcki.sh
 
 function parse_kpkg_url_variables()
 {
@@ -25,7 +25,7 @@ function parse_kpkg_url_variables()
   #   2) Parse those URL variables into shell variables
 
   # Get the params from the end of KPKG_URL
-  KPKG_PARAMS=$(grep -oP "\#\K(.*)$" <<< $KPKG_URL)
+  KPKG_PARAMS=$(grep -oP "\#\K(.*)$" <<< "$KPKG_URL")
 
   # Clean up KPKG_URL so that it contains only the URL without variables.
   KPKG_URL=${KPKG_URL%\#*}
@@ -34,6 +34,7 @@ function parse_kpkg_url_variables()
   #   https://stackoverflow.com/questions/3919755/how-to-parse-query-string-from-a-bash-cgi-script
   saveIFS=$IFS                   # Store the current field separator
   IFS='=&'                       # Set a new field separate for parameter delimiters
+  # shellcheck disable=SC2206
   parm=(${KPKG_PARAMS/&amp;/&})  # Split the variables into their pieces
   IFS=$saveIFS                   # Restore the original field separator
 
@@ -42,7 +43,7 @@ function parse_kpkg_url_variables()
   for ((i=0; i<${#parm[@]}; i+=2))
   do
     cki_print_success "Found URL parameter: ${parm[i]^^}=${parm[i+1]}"
-    readonly KPKG_VAR_${parm[i]^^}=${parm[i+1]}
+    readonly "KPKG_VAR_${parm[i]^^}=${parm[i+1]}"
   done
 }
 
@@ -127,7 +128,7 @@ function targz_install()
     cki_print_success "Kernel version is ${KVER}"
   fi
 
-  if tar xfh ${kpkg} -C / 2>&1; then
+  if tar xfh "${kpkg}" -C / 2>&1; then
     cki_print_success "Extracted kernel package successfully: ${kpkg}"
   else
     cki_abort_recipe "Failed to extract kernel package: ${kpkg}" WARN
@@ -137,10 +138,10 @@ function targz_install()
   case ${ARCH} in
     ppc64|ppc64le)
       if [ -f "/boot/vmlinux-kbuild-${KVER}" ]; then
-        mv /boot/vmlinux-kbuild-${KVER} /boot/vmlinuz-${KVER}
+        mv "/boot/vmlinux-kbuild-${KVER}" "/boot/vmlinuz-${KVER}"
       fi
       # vmlinux shouldn't be necessary and just uses too much space on /boot
-      rm -f /boot/vmlinux-${KVER}
+      rm -f "/boot/vmlinux-${KVER}"
       ;;
     s390x)
       # These steps are required until the following patch is backported into
@@ -150,13 +151,13 @@ function targz_install()
       # has merged)
       if [ -f "/boot/vmlinuz-${KVER}" ]; then
         # Remove the vmlinux from /boot and use only the vmlinuz
-        rm -f /boot/vmlinux-${KVER}
+        rm -f "/boot/vmlinux-${KVER}"
       else
         # Copy over the vmlinux-kbuild binary as a temporary workaround. With
         # newer kernels, this is identical to the missing bzImage. With older
         # (3.10) kernels, the vmlinux-kbuild marks built "image" instead of
         # "bzImage", which is still bootable by s390x.
-        mv /boot/vmlinux-kbuild-${KVER} /boot/vmlinuz-${KVER}
+        mv "/boot/vmlinux-kbuild-${KVER}" "/boot/vmlinuz-${KVER}"
       fi
       ;;
   esac
@@ -164,20 +165,20 @@ function targz_install()
 
   cki_print_info "Finishing boot loader configuration for the new kernel"
   if [ ! -x /sbin/new-kernel-pkg ]; then
-    if kernel-install add ${KVER} /boot/vmlinuz-${KVER} 2>&1; then
+    if kernel-install add "${KVER}" "/boot/vmlinuz-${KVER}" 2>&1; then
       cki_print_success "Kernel installed"
     else
       ls -allh /boot
       cki_abort_recipe "kernel-install failed" FAIL
     fi
-    if grubby --set-default /boot/vmlinuz-${KVER} 2>&1; then
+    if grubby --set-default "/boot/vmlinuz-${KVER}" 2>&1; then
       cki_print_success "updated default kernel"
     else
       ls -allh /boot
       cki_abort_recipe "fail to update default kernel" FAIL
     fi
   else
-    if new-kernel-pkg -v --mkinitrd --dracut --depmod --make-default --host-only --install ${KVER} 2>&1; then
+    if new-kernel-pkg -v --mkinitrd --dracut --depmod --make-default --host-only --install "${KVER}" 2>&1; then
       cki_print_success "new kernel installed correctly"
     else
       cki_abort_recipe "fail to install new kernel" FAIL
@@ -198,8 +199,8 @@ function targz_install()
   fi
 
   # "quiet" makes us miss important kernel logs which makes debugging harder, remove it if present
-  if grep -wq quiet /boot/loader/entries/*-${KVER}.conf; then
-    sed -i s/quiet// /boot/loader/entries/*-${KVER}.conf
+  if grep -wq quiet /boot/loader/entries/*-"${KVER}".conf; then
+    sed -i s/quiet// /boot/loader/entries/*-"${KVER}".conf
     cki_print_success "removed 'quiet' from kernel arguments"
   fi
 }
@@ -261,7 +262,7 @@ function download_install_package()
 {
   if ! cki_is_kernel_automotive; then
     # If download of a package fails, report warn/abort -> infrastructure issue
-    if $YUM install --downloadonly -y $1 > /dev/null || yumdownloader -y $1 > /dev/null; then
+    if $YUM install --downloadonly -y "$1" > /dev/null || yumdownloader -y "$1" > /dev/null; then
       cki_print_success "Downloaded $1 successfully"
     else
       cki_abort_recipe "Failed to download ${1}!" WARN
@@ -269,14 +270,14 @@ function download_install_package()
 
   # If installation of a downloaded package fails, report fail/abort
   # -> distro issue
-    if $YUM install -y $1 > /dev/null; then
+    if $YUM install -y "$1" > /dev/null; then
       cki_print_success "Installed $1 successfully"
     else
       cki_abort_recipe "Failed to install $1!" FAIL
     fi
   else
     # download
-    if $YUM download --resolve $1 > /dev/null; then
+    if $YUM download --resolve "$1" > /dev/null; then
     cki_print_success "Downloaded $1 successfully"
     else
       cki_abort_recipe "Failed to download ${1}!" WARN
@@ -293,9 +294,9 @@ function download_install_package()
     else
       # debug kernel automotive
       if rpm-ostree override remove kernel-automotive kernel-automotive-core kernel-automotive-modules\
-      --install $(pwd)/kernel-automotive-debug-${KVER}.rpm\
-      --install $(pwd)/kernel-automotive-debug-modules-${KVER}.rpm\
-      --install $(pwd)/kernel-automotive-debug-core-${KVER}.rpm > /dev/null; then
+      --install "$(pwd)/kernel-automotive-debug-${KVER}.rpm"\
+      --install "$(pwd)/kernel-automotive-debug-modules-${KVER}.rpm"\
+      --install "$(pwd)/kernel-automotive-debug-core-${KVER}.rpm" > /dev/null; then
         cki_print_success "Installed $1 successfully"
       else
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
@@ -350,7 +351,8 @@ function rpm_install()
       cki_print_success "Installed ${PACKAGE_NAME}-headers-${KVER} successfully"
     else
       cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
-      ALT_HEADERS=$(ls ${PACKAGE_NAME}-headers* | grep -v src.rpm | head -1)
+      # shellcheck disable=SC2010
+      ALT_HEADERS=$(ls "${PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
       if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
           cki_print_success "Installed ${ALT_HEADERS} successfully"
       else
@@ -411,7 +413,8 @@ function ostree_extra_package_install()
     cki_print_success "Installed ${PACKAGE_NAME}-headers-${KVER} successfully"
   else
     cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
-    ALT_HEADERS=$(ls ${PACKAGE_NAME}-headers* | grep -v src.rpm | head -1)
+    # shellcheck disable=SC2010
+    ALT_HEADERS=$(ls "${PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
     if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
         cki_print_success "Installed ${ALT_HEADERS} successfully"
     else
@@ -449,17 +452,19 @@ function io_test() {
 
 function main() {
     cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
-    if [ ${REBOOTCOUNT} -eq 0 ]; then
+    if [ "${REBOOTCOUNT}" -eq 0 ]; then
+      local deps
+      read -ra deps <<< "$TEST_DEPS"
       # set YUM var.
       select_yum_tool
       if [[ -z $RPM_OSTREE ]];then
-          if $YUM install -y $TEST_DEPS; then
+          if $YUM install -y "${deps[@]}"; then
               cki_print_success "Installed test dependencies"
           else
               cki_abort_recipe "Failed to install test dependencies" WARN
           fi
       else
-          if rpm-ostree install -A --idempotent --allow-inactive $TEST_DEPS; then
+          if rpm-ostree install -A --idempotent --allow-inactive "${deps[@]}"; then
               cki_print_success "Installed test dependencies"
           else
               cki_abort_recipe "Failed to install test dependencies" WARN
@@ -469,6 +474,7 @@ function main() {
       # kernel packages only from CKI kernel repo should be used
       # rpm_prepare creates kernel-cki.repo
       _exclude_pkgs="kernel kernel-core kernel-debug kernel-debug-core kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-core kernel-rt-debug-core"
+      # shellcheck disable=SC2010
       _repofiles=$(ls /etc/yum.repos.d/ | grep -v kernel-cki.repo)
 
       # If we haven't rebooted yet, then we shouldn't have the directory present on the system.
@@ -496,29 +502,30 @@ function main() {
       # this can happen when rerunning the test
       cki_print_info "remove kernel exclude from repos"
       for _repo in ${_repofiles}; do
-        sed -i "/^exclude=${_exclude_pkgs}/d" /etc/yum.repos.d/${_repo}
+        sed -i "/^exclude=${_exclude_pkgs}/d" "/etc/yum.repos.d/${_repo}"
       done
 
+      error=0
       if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
-          targz_install
+          targz_install || error=1
       elif [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
-          copr_prepare
-          set_package_name
-          rpm_install
+          copr_prepare || error=1
+          set_package_name || error=1
+          rpm_install || error=1
       else
-          rpm_prepare
-          set_package_name
-          rpm_install
+          rpm_prepare || error=1
+          set_package_name || error=1
+          rpm_install || error=1
       fi
 
-      if [ $? -ne 0 ]; then
+      if [ "$error" -ne 0 ]; then
         cki_abort_recipe "Failed installing kernel ${KVER}" WARN
       fi
 
       # Make sure tests are not able to install other kernels
       cki_print_info "adding kernel exclude from repos"
       for _repo in ${_repofiles}; do
-        sed -i "/^enabled=1/a exclude=${_exclude_pkgs}" /etc/yum.repos.d/${_repo}
+        sed -i "/^enabled=1/a exclude=${_exclude_pkgs}" "/etc/yum.repos.d/${_repo}"
       done
 
       # collect IO perf data on original kernel
@@ -616,24 +623,24 @@ EOF
 
         # Backup the files individually otherwise missing files will abort rstrnt-backup
         for file in $FILES; do
-          rstrnt-backup $file
+          rstrnt-backup "$file"
         done
 
         # Temporarily unset ARCH var defined in libcki to avoid Makefile conflicts
         # otherwise you will see an error about a non-existing arch dir
-        env -u ARCH make -C /usr/src/kernels/$ckver olddefconfig || \
+        env -u ARCH make -C "/usr/src/kernels/$ckver" olddefconfig || \
           cki_abort_recipe "Failed applying cross compiling workaround" WARN
-        env -u ARCH make -C /usr/src/kernels/$ckver modules_prepare || \
+        env -u ARCH make -C "/usr/src/kernels/$ckver" modules_prepare || \
           cki_abort_recipe "Failed applying cross compiling workaround" WARN
-        env -u ARCH make -C /usr/src/kernels/$ckver scripts || \
+        env -u ARCH make -C "/usr/src/kernels/$ckver" scripts || \
           cki_abort_recipe "Failed applying cross compiling workaround" WARN
 
         rstrnt-restore
       fi
 
       # Save configuration used to build the kernel
-      cat /boot/config-${ckver} > kernel_${ckver}_config.log
-      rstrnt-report-log -l kernel_${ckver}_config.log
+      cat "/boot/config-${ckver}" > "kernel_${ckver}_config.log"
+      rstrnt-report-log -l "kernel_${ckver}_config.log"
 
       sysctl kernel.panic_on_oops
 
