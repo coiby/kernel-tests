@@ -317,14 +317,18 @@
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing @xmu2
 /networking/macsec/sanity_check/ @Feiliu_A @bgoncalv @lulinqing
 /networking/netfilter/ @bgoncalv @liuhangbin @lulinqing @yiche
-/networking/route/route_func/ @bgoncalv @liuhangbin @lulinqing
+/networking/route/pmtu/ @bgoncalv @linup2011 @lulinqing
+/networking/route/route_func/ @bgoncalv @linup2011 @liuhangbin @lulinqing
 /networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing @yinxu
 /networking/socket/fuzz/ @bgoncalv @liuhangbin @lulinqing
 /networking/tcp/tcp_keepalive/ @bgoncalv @liuhangbin @lulinqing @xmu2
-/networking/tunnel/geneve/basic/ @bgoncalv @liuhangbin @lulinqing
-/networking/tunnel/gre/basic/ @bgoncalv @liuhangbin @lulinqing
-/networking/tunnel/vxlan/basic/ @bgoncalv @liuhangbin @lulinqing
+/networking/tunnel/geneve/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing
+/networking/tunnel/gre/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing
+/networking/tunnel/l2tp/basic/ @bgoncalv @linup2011 @lulinqing
+/networking/tunnel/tunctl/permtest/ @bgoncalv @linup2011 @lulinqing
+/networking/tunnel/vxlan/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
+/networking/vnic/ipvlan/basic/ @bgoncalv @linup2011 @lulinqing
 /networking/vnic/sriov/ @bgoncalv @lulinqing @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
