@@ -326,7 +326,7 @@ function rpm_install()
   fi
 
   # download & install kernel, or report result
-  download_install_package "${PACKAGE_NAME}-$KVER" "kernel"
+  download_install_package "${PACKAGE_NAME}-$KVER"
 
   if ! cki_is_kernel_automotive ;then
     if $YUM install -y "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
