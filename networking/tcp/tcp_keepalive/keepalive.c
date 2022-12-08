@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
         if ( system("which nft") == 0 ) {
             system("nft add table inet filter");
             system("nft add chain inet filter input '{ type filter hook input priority 0 ; }'");
-            sprintf(command, "nft add rule inet filter input iifname lo ip protocol tcp tcp dport %d 'tcp flags & (fin|syn|rst|psh|ack|urg) == ack' counter drop", port);
+            sprintf(command, "nft add rule inet filter input iifname lo ip protocol tcp tcp dport %d 'tcp flags & (fin|syn|rst|psh|ack|urg) == ack' drop", port);
             system(command);
             system("nft list ruleset");
         } else {
