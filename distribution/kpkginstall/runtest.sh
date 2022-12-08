@@ -1,7 +1,5 @@
 #!/bin/bash
 
-. ../../cki_lib/libcki.sh || exit 1
-
 TEST="distribution/kpkginstall"
 TEST_DEPS="elfutils-libelf-devel flex bison gcc openssl-devel make curl grubby tar binutils"
 ARCH=$(uname -m)
@@ -449,96 +447,97 @@ function io_test() {
   return $total_time
 }
 
-cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
-if [ ${REBOOTCOUNT} -eq 0 ]; then
-  # set YUM var.
-  select_yum_tool
-  if [[ -z $RPM_OSTREE ]];then
-      if $YUM install -y $TEST_DEPS; then
-          cki_print_success "Installed test dependencies"
+function main() {
+    cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
+    if [ ${REBOOTCOUNT} -eq 0 ]; then
+      # set YUM var.
+      select_yum_tool
+      if [[ -z $RPM_OSTREE ]];then
+          if $YUM install -y $TEST_DEPS; then
+              cki_print_success "Installed test dependencies"
+          else
+              cki_abort_recipe "Failed to install test dependencies" WARN
+          fi
       else
-          cki_abort_recipe "Failed to install test dependencies" WARN
+          if rpm-ostree install -A --idempotent --allow-inactive $TEST_DEPS; then
+              cki_print_success "Installed test dependencies"
+          else
+              cki_abort_recipe "Failed to install test dependencies" WARN
+          fi
       fi
-  else
-      if rpm-ostree install -A --idempotent --allow-inactive $TEST_DEPS; then
-          cki_print_success "Installed test dependencies"
+
+      # kernel packages only from CKI kernel repo should be used
+      # rpm_prepare creates kernel-cki.repo
+      _exclude_pkgs="kernel kernel-core kernel-debug kernel-debug-core kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-core kernel-rt-debug-core"
+      _repofiles=$(ls /etc/yum.repos.d/ | grep -v kernel-cki.repo)
+
+      # If we haven't rebooted yet, then we shouldn't have the directory present on the system.
+      rm -rfv /var/tmp/kpkginstall
+      # Make a directory to hold small bits of information for the test.
+      mkdir -p /var/tmp/kpkginstall
+
+      # If the KPKG_URL contains a pound sign, then we have variables on the end
+      # which need to be removed and parsed.
+      if [[ $KPKG_URL =~ \# ]]; then
+          parse_kpkg_url_variables
+      fi
+
+      # If we are installing a debug kernel, make a reminder for us to check for
+      # a debug kernel after the reboot
+      if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"; then
+        echo "true" > /var/tmp/kpkginstall/KPKG_VAR_DEBUG_KERNEL
+      fi
+
+      if [ -z "${KPKG_URL}" ]; then
+        cki_abort_recipe "No KPKG_URL specified" FAIL
+      fi
+
+      # Make sure exclude kernel files from removed from config file
+      # this can happen when rerunning the test
+      cki_print_info "remove kernel exclude from repos"
+      for _repo in ${_repofiles}; do
+        sed -i "/^exclude=${_exclude_pkgs}/d" /etc/yum.repos.d/${_repo}
+      done
+
+      if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+          targz_install
+      elif [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
+          copr_prepare
+          set_package_name
+          rpm_install
       else
-          cki_abort_recipe "Failed to install test dependencies" WARN
+          rpm_prepare
+          set_package_name
+          rpm_install
       fi
-  fi
 
-  # kernel packages only from CKI kernel repo should be used
-  # rpm_prepare creates kernel-cki.repo
-  _exclude_pkgs="kernel kernel-core kernel-debug kernel-debug-core kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-core kernel-rt-debug-core"
-  _repofiles=$(ls /etc/yum.repos.d/ | grep -v kernel-cki.repo)
+      if [ $? -ne 0 ]; then
+        cki_abort_recipe "Failed installing kernel ${KVER}" WARN
+      fi
 
-  # If we haven't rebooted yet, then we shouldn't have the directory present on the system.
-  rm -rfv /var/tmp/kpkginstall
-  # Make a directory to hold small bits of information for the test.
-  mkdir -p /var/tmp/kpkginstall
+      # Make sure tests are not able to install other kernels
+      cki_print_info "adding kernel exclude from repos"
+      for _repo in ${_repofiles}; do
+        sed -i "/^enabled=1/a exclude=${_exclude_pkgs}" /etc/yum.repos.d/${_repo}
+      done
 
-  # If the KPKG_URL contains a pound sign, then we have variables on the end
-  # which need to be removed and parsed.
-  if [[ $KPKG_URL =~ \# ]]; then
-      parse_kpkg_url_variables
-  fi
+      # collect IO perf data on original kernel
+      io_test
+      io_time=$?
+      echo $io_time > io_perf_base_kernel.log
+      rstrnt-report-log -l io_perf_base_kernel.log
 
-  # If we are installing a debug kernel, make a reminder for us to check for
-  # a debug kernel after the reboot
-  if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"; then
-    echo "true" > /var/tmp/kpkginstall/KPKG_VAR_DEBUG_KERNEL
-  fi
+      # force panic on oops
+      # oops can cause system to crash, but restraint fails to detect it
+      # causing in some cases the task to abort by external watchdog
+      # and pipeline to handle this as infra failure.
+      # Hopefully, forcing the panic will help to handle this as test failure.
+      # https://gitlab.com/cki-project/upt/-/issues/49
+      echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf
+      cki_print_success "Set panic_on_oops to 1"
 
-  if [ -z "${KPKG_URL}" ]; then
-    cki_abort_recipe "No KPKG_URL specified" FAIL
-  fi
-
-  # Make sure exclude kernel files from removed from config file
-  # this can happen when rerunning the test
-  cki_print_info "remove kernel exclude from repos"
-  for _repo in ${_repofiles}; do
-    sed -i "/^exclude=${_exclude_pkgs}/d" /etc/yum.repos.d/${_repo}
-  done
-
-  if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
-      targz_install
-  elif [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
-      copr_prepare
-      set_package_name
-      rpm_install
-  else
-      rpm_prepare
-      set_package_name
-      rpm_install
-  fi
-
-  if [ $? -ne 0 ]; then
-    cki_abort_recipe "Failed installing kernel ${KVER}" WARN
-  fi
-
-  # Make sure tests are not able to install other kernels
-  cki_print_info "adding kernel exclude from repos"
-  for _repo in ${_repofiles}; do
-    sed -i "/^enabled=1/a exclude=${_exclude_pkgs}" /etc/yum.repos.d/${_repo}
-  done
-
-  # collect IO perf data on original kernel
-  io_test
-  io_time=$?
-  echo $io_time > io_perf_base_kernel.log
-  rstrnt-report-log -l io_perf_base_kernel.log
-
-  # force panic on oops
-  # oops can cause system to crash, but restraint fails to detect it
-  # causing in some cases the task to abort by external watchdog
-  # and pipeline to handle this as infra failure.
-  # Hopefully, forcing the panic will help to handle this as test failure.
-  # https://gitlab.com/cki-project/upt/-/issues/49
-  echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf
-  cki_print_success "Set panic_on_oops to 1"
-
-  cki_print_success "Installed kernel ${KVER}, rebooting (this may take a while)"
-  cat << EOF
+      cki_print_success "Installed kernel ${KVER}, rebooting (this may take a while)"
+      cat << EOF
 *******************************************************************************
 *******************************************************************************
 ** A reboot is required to boot the new kernel that was just installed.      **
@@ -549,131 +548,138 @@ if [ ${REBOOTCOUNT} -eq 0 ]; then
 *******************************************************************************
 *******************************************************************************
 EOF
-  rstrnt-report-result ${TEST}/kernel-in-place PASS 0
-  rstrnt-reboot
-  # Make sure the script doesn't continue if rstrnt-reboot get's killed
-  # https://github.com/beaker-project/restraint/issues/219
-  exit 0
-else
-  # set YUM var.
-  select_yum_tool
-
-  if [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
-    set_package_name
-  fi
-  cki_print_info "after reboot: Extracting kernel version from ${KPKG_URL}"
-  get_kpkg_ver
-  if [ -z "${KVER}" ]; then
-    cki_abort_recipe  "Failed to extract kernel version from the package after reboot" FAIL
-  fi
-
-  # Make a list of kernel versions we expect to see after reboot.
-  # the debug suffix on kernel names do not apply for kernel builds from tarball
-  if [ -f /var/tmp/kpkginstall/KPKG_VAR_DEBUG_KERNEL ] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
-    valid_kernel_versions=(
-      "${KVER}.debug"           # RHEL 7 style debug kernels
-      "${KVER}+debug"           # RHEL 8 style debug kernels
-    )
-  else
-    KVER=${KVER//.$(uname -i)/}
-    valid_kernel_versions=(
-      "${KVER}"
-      "${KVER}.${ARCH}"
-    )
-  fi
-  ckver=$(uname -r)
-  cki_print_info "Acceptable kernel version strings: ${valid_kernel_versions[*]} "
-  cki_print_info "Running kernel version string:     ${ckver}"
-
-  # Did we get the right kernel running after reboot?
-  if [[ ! " ${valid_kernel_versions[*]} " == *" ${ckver} "* ]]; then
-    cki_abort_recipe "Kernel version after reboot (${ckver}) does not match expected version strings!" FAIL
-  fi
-
-  cki_print_success "Found the correct kernel version running!"
-
-  # rpm-ostree extra packages install has to be after reboot
-  if [[ -n $RPM_OSTREE ]]; then
-    cki_print_info "Install kernel extra packages - rpm-ostree after reboot"
-    ostree_extra_package_install
-  fi
-
-  # save the CKI installed kernel so following tests can check if they are running on correct kernel
-  # this should help detect cases where by mistake the kernel gets updated.
-  # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db/-/issues/56
-  mkdir -p /var/opt/cki/
-  echo "${ckver}" > /var/opt/cki/kernel_version
-
-  # Workaround for cross compiling non x86_64 kernels
-  if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]] && [[ -z $RPM_OSTREE ]]; then
-    # Backup and restore the .config files otherwise regenerated .config
-    # files will be incompatible with the running kernel
-    PREFIX="/usr/src/kernels/$ckver"
-    FILES="$PREFIX/.config
-      $PREFIX/include/config/auto.conf
-      $PREFIX/include/config/auto.conf.cmd
-      $PREFIX/include/config/cc/can/link/static.h
-      $PREFIX/include/generated/autoconf.h"
-
-    # Backup the files individually otherwise missing files will abort rstrnt-backup
-    for file in $FILES; do
-      rstrnt-backup $file
-    done
-
-    # Temporarily unset ARCH var defined in libcki to avoid Makefile conflicts
-    # otherwise you will see an error about a non-existing arch dir
-    env -u ARCH make -C /usr/src/kernels/$ckver olddefconfig || \
-      cki_abort_recipe "Failed applying cross compiling workaround" WARN
-    env -u ARCH make -C /usr/src/kernels/$ckver modules_prepare || \
-      cki_abort_recipe "Failed applying cross compiling workaround" WARN
-    env -u ARCH make -C /usr/src/kernels/$ckver scripts || \
-      cki_abort_recipe "Failed applying cross compiling workaround" WARN
-
-    rstrnt-restore
-  fi
-
-  # Save configuration used to build the kernel
-  cat /boot/config-${ckver} > kernel_${ckver}_config.log
-  rstrnt-report-log -l kernel_${ckver}_config.log
-
-  sysctl kernel.panic_on_oops
-
-  # collect IO perf data on CKI kernel
-  io_test
-  io_time=$?
-  echo $io_time > io_perf_cki_kernel.log
-  rstrnt-report-log -l io_perf_cki_kernel.log
-
-  # We have the right kernel. Do we have any call traces?
-  reboot_status="PASS"
-  dmesg | grep -qi 'Call Trace:'
-  dmesgret=$?
-  if [[ ${dmesgret} -eq 0 ]]; then
-    reboot_status="FAIL"
-    DMESGLOG=/tmp/dmesg.log
-    dmesg > ${DMESGLOG}
-    rstrnt-report-log -l ${DMESGLOG}
-    cki_print_warning "Call trace found in dmesg, see dmesg.log"
-    rstrnt-report-result ${TEST}/dmesg-check WARN 7
-  else
-    rstrnt-report-result ${TEST}/dmesg-check PASS 0
-  fi
-  if which journalctl > /dev/null 2>&1; then
-    journalctl -b | grep -qi 'Call Trace:'
-    journalctlret=$?
-    if [[ ${journalctlret} -eq 0 ]]; then
-      reboot_status="FAIL"
-      JOURNALCTLLOG=/tmp/journalctl.log
-      journalctl -b > ${JOURNALCTLLOG}
-      rstrnt-report-log -l ${JOURNALCTLLOG}
-      cki_print_warning "Call trace found in journalctl, see journalctl.log"
-      rstrnt-report-result ${TEST}journalctl-check WARN 7
+      rstrnt-report-result ${TEST}/kernel-in-place PASS 0
+      rstrnt-reboot
+      # Make sure the script doesn't continue if rstrnt-reboot get's killed
+      # https://github.com/beaker-project/restraint/issues/219
+      return 0
     else
-      rstrnt-report-result ${TEST}/journalctl-check PASS 0
-    fi
-  fi
-  rstrnt-report-result ${TEST}/reboot ${reboot_status}
+      # set YUM var.
+      select_yum_tool
 
-  # Clean up temporary files
-  rm -rfv /var/tmp/kpkginstall
+      if [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+        set_package_name
+      fi
+      cki_print_info "after reboot: Extracting kernel version from ${KPKG_URL}"
+      get_kpkg_ver
+      if [ -z "${KVER}" ]; then
+        cki_abort_recipe  "Failed to extract kernel version from the package after reboot" FAIL
+      fi
+
+      # Make a list of kernel versions we expect to see after reboot.
+      # the debug suffix on kernel names do not apply for kernel builds from tarball
+      if [ -f /var/tmp/kpkginstall/KPKG_VAR_DEBUG_KERNEL ] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
+        valid_kernel_versions=(
+          "${KVER}.debug"           # RHEL 7 style debug kernels
+          "${KVER}+debug"           # RHEL 8 style debug kernels
+        )
+      else
+        KVER=${KVER//.$(uname -i)/}
+        valid_kernel_versions=(
+          "${KVER}"
+          "${KVER}.${ARCH}"
+        )
+      fi
+      ckver=$(uname -r)
+      cki_print_info "Acceptable kernel version strings: ${valid_kernel_versions[*]} "
+      cki_print_info "Running kernel version string:     ${ckver}"
+
+      # Did we get the right kernel running after reboot?
+      if [[ ! " ${valid_kernel_versions[*]} " == *" ${ckver} "* ]]; then
+        cki_abort_recipe "Kernel version after reboot (${ckver}) does not match expected version strings!" FAIL
+      fi
+
+      cki_print_success "Found the correct kernel version running!"
+
+      # rpm-ostree extra packages install has to be after reboot
+      if [[ -n $RPM_OSTREE ]]; then
+        cki_print_info "Install kernel extra packages - rpm-ostree after reboot"
+        ostree_extra_package_install
+      fi
+
+      # save the CKI installed kernel so following tests can check if they are running on correct kernel
+      # this should help detect cases where by mistake the kernel gets updated.
+      # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db/-/issues/56
+      mkdir -p /var/opt/cki/
+      echo "${ckver}" > /var/opt/cki/kernel_version
+
+      # Workaround for cross compiling non x86_64 kernels
+      if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]] && [[ -z $RPM_OSTREE ]]; then
+        # Backup and restore the .config files otherwise regenerated .config
+        # files will be incompatible with the running kernel
+        PREFIX="/usr/src/kernels/$ckver"
+        FILES="$PREFIX/.config
+          $PREFIX/include/config/auto.conf
+          $PREFIX/include/config/auto.conf.cmd
+          $PREFIX/include/config/cc/can/link/static.h
+          $PREFIX/include/generated/autoconf.h"
+
+        # Backup the files individually otherwise missing files will abort rstrnt-backup
+        for file in $FILES; do
+          rstrnt-backup $file
+        done
+
+        # Temporarily unset ARCH var defined in libcki to avoid Makefile conflicts
+        # otherwise you will see an error about a non-existing arch dir
+        env -u ARCH make -C /usr/src/kernels/$ckver olddefconfig || \
+          cki_abort_recipe "Failed applying cross compiling workaround" WARN
+        env -u ARCH make -C /usr/src/kernels/$ckver modules_prepare || \
+          cki_abort_recipe "Failed applying cross compiling workaround" WARN
+        env -u ARCH make -C /usr/src/kernels/$ckver scripts || \
+          cki_abort_recipe "Failed applying cross compiling workaround" WARN
+
+        rstrnt-restore
+      fi
+
+      # Save configuration used to build the kernel
+      cat /boot/config-${ckver} > kernel_${ckver}_config.log
+      rstrnt-report-log -l kernel_${ckver}_config.log
+
+      sysctl kernel.panic_on_oops
+
+      # collect IO perf data on CKI kernel
+      io_test
+      io_time=$?
+      echo $io_time > io_perf_cki_kernel.log
+      rstrnt-report-log -l io_perf_cki_kernel.log
+
+      # We have the right kernel. Do we have any call traces?
+      reboot_status="PASS"
+      dmesg | grep -qi 'Call Trace:'
+      dmesgret=$?
+      if [[ ${dmesgret} -eq 0 ]]; then
+        reboot_status="FAIL"
+        DMESGLOG=/tmp/dmesg.log
+        dmesg > ${DMESGLOG}
+        rstrnt-report-log -l ${DMESGLOG}
+        cki_print_warning "Call trace found in dmesg, see dmesg.log"
+        rstrnt-report-result ${TEST}/dmesg-check WARN 7
+      else
+        rstrnt-report-result ${TEST}/dmesg-check PASS 0
+      fi
+      if which journalctl > /dev/null 2>&1; then
+        journalctl -b | grep -qi 'Call Trace:'
+        journalctlret=$?
+        if [[ ${journalctlret} -eq 0 ]]; then
+          reboot_status="FAIL"
+          JOURNALCTLLOG=/tmp/journalctl.log
+          journalctl -b > ${JOURNALCTLLOG}
+          rstrnt-report-log -l ${JOURNALCTLLOG}
+          cki_print_warning "Call trace found in journalctl, see journalctl.log"
+          rstrnt-report-result ${TEST}journalctl-check WARN 7
+        else
+          rstrnt-report-result ${TEST}/journalctl-check PASS 0
+        fi
+      fi
+      rstrnt-report-result ${TEST}/reboot ${reboot_status}
+
+      # Clean up temporary files
+      rm -rfv /var/tmp/kpkginstall
+    fi
+}
+
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+    main
 fi
