@@ -146,6 +146,7 @@ rlJournalStart
         rlAssertGrep 'psi=1' /proc/cmdline || rlDie "no psi=1 in cmdline..."
         rlLogInfo "PSI Enabled"
         Install_stress_ng
+        rlRun "gcc source/mem_stress.c -o source/mem_stress" 0 "compile mem_stress program"
         create_cg2
         create_cg2_sub
         Plain_psi_test
