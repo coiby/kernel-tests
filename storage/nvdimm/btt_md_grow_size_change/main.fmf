@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/btt_md_grow_size_change
+description: nvdimm extent md raid size with btt
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_md_grow_size_change
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - mdadm
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_md_grow_size_change
+extra-task: /storage/nvdimm/btt_md_grow_size_change
+id: 60fa133d-a728-46f7-b93d-38a71041ec9d

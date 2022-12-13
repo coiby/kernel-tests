@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/btt_md_randio
+description: nvdimm random io on md device with btt
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_md_randio
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - mdadm
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_md_randio
+extra-task: /storage/nvdimm/btt_md_randio
+id: e9ddf092-97ea-4da4-bc67-0de917b34d72

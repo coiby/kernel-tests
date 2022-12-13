@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/fsdax_attributes_write_cache
+description: nvdimm feature test for device cache turn off/on test BZ1457556
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/fsdax_attributes_write_cache
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/fsdax_attributes_write_cache
+extra-task: /storage/nvdimm/fsdax_attributes_write_cache
+id: 1a897302-354f-424b-8dd9-b8e59dca53ce

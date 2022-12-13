@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/btt_blk_device_test
+description: nvdimm btt block device test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_blk_device_test
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_blk_device_test
+extra-task: /storage/nvdimm/btt_blk_device_test
+id: 566a55e9-27dc-4212-be3a-ad0c92b6bfec

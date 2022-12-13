@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/nvdimm_security_testing_intel
+description: intel aep nvdimm security testing
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/nvdimm_security_testing_intel
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/nvdimm_security_testing_intel
+extra-task: /storage/nvdimm/nvdimm_security_testing_intel
+id: 6d056b56-bcad-4db7-8379-6d22fd5082d4

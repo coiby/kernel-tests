@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/devdax_populate_MMUPageSize
+description: nvdimm devdax Populate MMUPage Size, BZ1526251
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/devdax_populate_MMUPageSize
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+  - gcc
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/devdax_populate_MMUPageSize
+extra-task: /storage/nvdimm/devdax_populate_MMUPageSize
+id: ba1bea8f-b5a4-4bf6-a41e-e7264a95eab2

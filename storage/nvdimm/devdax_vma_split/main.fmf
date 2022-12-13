@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/devdax_vma_split
+description: nvdimm devdax vma split testing, BZ1622171
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/devdax_vma_split
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - gcc
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/devdax_vma_split
+extra-task: /storage/nvdimm/devdax_vma_split
+id: 8bb53cbd-a991-4f1d-a546-c7226e044c3f

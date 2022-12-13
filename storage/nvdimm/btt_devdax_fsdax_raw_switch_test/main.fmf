@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/btt_devdax_fsdax_raw_switch_test
+description: nvdimm btt devdax fsdax raw switch test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_devdax_fsdax_raw_switch_test
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_devdax_fsdax_raw_switch_test
+extra-task: /storage/nvdimm/btt_devdax_fsdax_raw_switch_test
+id: f5831f83-443a-4987-a426-53b8a44802fb

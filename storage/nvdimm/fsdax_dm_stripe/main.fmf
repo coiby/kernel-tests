@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/fsdax_dm_stripe
+description: nvdimm fsdax dm_strie test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/fsdax_dm_stripe
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/fsdax_dm_stripe
+extra-task: /storage/nvdimm/fsdax_dm_stripe
+id: 8e38983f-03f7-40fe-bc4e-3bdbe10951d3

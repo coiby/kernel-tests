@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/btt_md_pv_on_md
+description: nvdimm use md as lvm pv with btt
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_md_pv_on_md
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - mdadm
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_md_pv_on_md
+extra-task: /storage/nvdimm/btt_md_pv_on_md
+id: d8cce63c-112f-4602-8422-9a65d7879af6

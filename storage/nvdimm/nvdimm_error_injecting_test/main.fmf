@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/nvdimm_error_injecting_test
+description: nvdimm inject error testing for raw/fsdax/devdax/btt
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/nvdimm_error_injecting_test
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/nvdimm_error_injecting_test
+extra-task: /storage/nvdimm/nvdimm_error_injecting_test
+id: 8ee09fdc-7b35-45f2-b815-3fc076b0169d

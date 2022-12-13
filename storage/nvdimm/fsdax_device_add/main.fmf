@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/fsdax_device_add
+description: nvdimm test adding dax device works and non-dax device should failed
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/fsdax_device_add
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/fsdax_device_add
+extra-task: /storage/nvdimm/fsdax_device_add
+id: 3200d3de-f45f-4f98-aabb-d7270f3566b0

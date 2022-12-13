@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/creat_namespace_simultaneously_on_every_cpu
+description: nvdimm creat namespace simultaneously on every cpu from BZ1492049
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/creat_namespace_simultaneously_on_every_cpu
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - numactl
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/creat_namespace_simultaneously_on_every_cpu
+extra-task: /storage/nvdimm/creat_namespace_simultaneously_on_every_cpu
+id: c421094d-7f6c-4304-9601-ee2781994129

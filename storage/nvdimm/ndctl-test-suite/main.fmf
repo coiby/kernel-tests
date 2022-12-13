@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/ndctl-test-suite
+description: nvdimm ndctl test suite
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/ndctl-test-suite
+test: bash ./runtest.sh
+framework: beakerlib
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/ndctl-test-suite
+extra-task: /storage/nvdimm/ndctl-test-suite
+id: 2399b6f6-f406-4655-a4f8-4dd8ea165aeb

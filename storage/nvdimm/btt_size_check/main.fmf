@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/btt_size_check
+description: nvdimm btt size check
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_size_check
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_size_check
+extra-task: /storage/nvdimm/btt_size_check
+id: 76a20ce6-1070-4563-923d-1e1a0511da01

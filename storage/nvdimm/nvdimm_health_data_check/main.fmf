@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/nvdimm_health_data_check
+description: nvdimm health data check
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/nvdimm_health_data_check
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/nvdimm_health_data_check
+extra-task: /storage/nvdimm/nvdimm_health_data_check
+id: 3f86d121-662f-4e4d-b5cc-1c066f349846
