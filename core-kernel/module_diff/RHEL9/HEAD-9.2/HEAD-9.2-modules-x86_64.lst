@@ -67,6 +67,7 @@ amdgpu.ko
 amd_hsmp.ko
 amd.ko
 amd-pmc.ko
+amd_pstate.ko
 amd-rng.ko
 amd_sfh.ko
 amd-xgbe.ko
@@ -254,6 +255,7 @@ cxgb4i.ko
 cxgb4.ko
 cxgb4vf.ko
 cxgbit.ko
+cxl_mem.ko
 cxl_pci.ko
 cxl_pmem.ko
 cyapatp.ko
@@ -324,6 +326,7 @@ dp83tc811.ko
 dptf_pch_fivr.ko
 dptf_power.ko
 drm_buddy.ko
+drm_display_helper.ko
 drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko
@@ -372,6 +375,7 @@ eeepc-wmi.ko
 eeprom_93cx6.ko
 eeprom.ko
 efa.ko
+efi_secret.ko
 einj.ko
 elan_i2c.ko
 elo.ko
@@ -1013,6 +1017,7 @@ mdio.ko
 mdio-mscc-miim.ko
 mdio-thunder.ko
 megaraid_sas.ko
+mei-gsc.ko
 mei.ko
 mei-me.ko
 mei_wdt.ko
@@ -1271,6 +1276,7 @@ nvmet-fc.ko
 nvmet.ko
 nvmet-rdma.ko
 nvmet-tcp.ko
+nvsw-sn2201.ko
 objagg.ko
 omninet.ko
 opa_vnic.ko
@@ -1463,6 +1469,7 @@ rtc-pcf8583.ko
 rtc-rp5c01.ko
 rtc-rs5c372.ko
 rtc-rv3029c2.ko
+rtc-rv8803.ko
 rtc-rx4581.ko
 rtc-rx8025.ko
 rtc-rx8581.ko
@@ -1636,6 +1643,7 @@ snd-hda-codec-realtek.ko
 snd-hda-codec-si3054.ko
 snd-hda-codec-via.ko
 snd-hda-core.ko
+snd-hda-cs-dsp-ctls.ko
 snd-hda-ext-core.ko
 snd-hda-intel.ko
 snd-hda-scodec-cs35l41-i2c.ko
@@ -1718,6 +1726,7 @@ snd-soc-ehl-rt5660.ko
 snd-soc-es8316.ko
 snd-soc-hdac-hda.ko
 snd-soc-hdac-hdmi.ko
+snd-soc-hda-codec.ko
 snd-soc-intel-hda-dsp-common.ko
 snd-soc-intel-sof-cirrus-common.ko
 snd-soc-intel-sof-maxim-common.ko
@@ -1819,6 +1828,7 @@ snd-sof.ko
 snd-sof-pci-intel-apl.ko
 snd-sof-pci-intel-cnl.ko
 snd-sof-pci-intel-icl.ko
+snd-sof-pci-intel-mtl.ko
 snd-sof-pci-intel-tgl.ko
 snd-sof-pci-intel-tng.ko
 snd-sof-pci.ko
@@ -1848,6 +1858,7 @@ snd-virtuoso.ko
 snd-vx222.ko
 snd-vx-lib.ko
 snd_xen_front.ko
+soc-utils-test.ko
 softdog.ko
 sony-laptop.ko
 soundcore.ko
