@@ -1,0 +1,12 @@
+[General]
+name=storage/block/multipath_mapping
+owner=Changhui Zhong <czhong@redhat.com>
+description=Multipath device mapping display error caused by regression
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=device-mapper-multipath;device-mapper*
+repoRequires=cki_lib
