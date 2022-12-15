@@ -46,6 +46,7 @@
 /networking/wireless/rhel7/tests/wireless-connection-to-WEP-key-AP-nl80211/ @ltrivell @jbastianrh
 /networking/wireless/rhel7/tests/wireless-connection-to-WPA1-TTLS-EAP-AP-nl80211/ @ltrivell @jbastianrh
 /networking/wireless/rhel7/tests/wireless-connection-to-unencrypted-AP-nl80211/ @ltrivell @jbastianrh
+/networking/wireless/tests/bug/bz1044005/ @ltrivell @jbastianrh
 /networking/wireless/tests/bug/bz1044005/wireless_connection_to_unencrypted_AP/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/cleanup/ @ltrivell @jbastianrh
