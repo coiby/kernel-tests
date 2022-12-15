@@ -12,10 +12,13 @@ duration: 2h
 extra-summary: /rt-tests/pi_stress
 extra-task: /rt-tests/pi_stress
 environment:
-  PARAM_SEC: 10
-  PARAM_GROUPS: 1
+    PARAM_SEC: 10
+    PARAM_GROUPS: 1
 tag: NoRHIVOS
 enabled: true
 adjust:
-  enabled: false
-  when: arch != x86_64
+    enabled: false
+    when: arch != x86_64
+id: dfa853b1-3b93-4fac-aca1-4954d901fed0
+link:
+  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291765
