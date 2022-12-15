@@ -48,10 +48,10 @@ echo "$REMOTE_ADDR4	remote_host" >> /etc/hosts
 echo "$REMOTE_ADDR6	remote_host" >> /etc/hosts
 
 ./socket -H remote_host &
+sock_pid=$!
 
 sleep $TEST_TIME
 
-pkill socket
-pkill socket
+kill -9 $sock_pid
 
 test_pass "Socket_fuzz"

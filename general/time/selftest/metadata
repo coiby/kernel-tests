@@ -1,0 +1,15 @@
+[General]
+description=kernel selftest for time
+name=general/ftrace/selftest
+owner=Qiao Zhao <qzhao@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=4h
+dependencies=wget;gcc;make
+repoRequires=general/include
+Path=/kernel-tests/general/time/selftest
+use_pty=false

@@ -1,0 +1,4 @@
+--format documentation
+--color
+--output junit
+--default-path "**/spec"

@@ -6,6 +6,9 @@ component:
 path: /rt-tests/template
 test: bash -x ./runtest.sh
 framework: beakerlib
+require:
+  - wget
+  - gcc
 duration: 1h
 extra-summary: /rt-tests/template
 extra-task: /rt-tests/template

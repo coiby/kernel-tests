@@ -2,7 +2,7 @@
 # This file is used for Real Time kernel related tests configurations.
 
 # Skip kselftests if the running kernel-rt is debug variant
-if uname -r | grep \.rt | grep -q debug; then
+if uname -r | grep rt | grep -q debug; then
     test_skip_exit "Detected kernel-rt-debug: skipping kselftests. Please run against kernel-rt instead."
     return 1
 fi

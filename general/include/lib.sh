@@ -40,10 +40,86 @@ KG_HTTP_CODECOVERAGE_TOOL=$KG_HTTP_SHARE/$KG_LCOV_PACAGE
 KG_NFS_PATH_CODE_COVERAGE_RAW=$KG_SERVER:$KG_SHARE_CODECOVERAGE_RAW
 KG_NFS_PATH_CODE_COVERAGE_PUBLIC=$KG_SERVER:$KG_SHARE_CODECOVERAGE_PUBLIC
 
+kernel_name=$(rpm -q --queryformat '%{name}\n' -qf "/boot/config-$(uname -r)" | sed 's/-core//')
 
 # DUP ISO images
 KG_SHARE_DUP_ISO=/data/dup
 KG_NFS_PATH_DUP=$KG_SERVER:$KG_SHARE_DUP_ISO
+
+function download_kernel_srpm()
+{
+	local kernel_name=$(echo $kernel_name | sed "s/-debug//")
+	HOST=$(hostname)
+	case ${HOST} in
+		*pek*) def_url="http://download.eng.pek2.redhat.com/brewroot/packages";;
+		*rdu*) def_url="http://download.eng.rdu.redhat.com/brewroot/packages";;
+		*bos*) def_url="http://download.eng.bos.redhat.com/brewroot/packages";;
+		*brq*) def_url="http://download.eng.brq.redhat.com/brewroot/packages";;
+		*tlv*) def_url="http://download.eng.tlv.redhat.com/brewroot/packages";;
+		*blr*) def_url="http://download.eng.blr.redhat.com/brewroot/packages";;
+		*pnq*) def_url="http://download.eng.pnq.redhat.com/brewroot/packages";;
+		*) def_url="http://download.eng.bos.redhat.com/brewroot/packages";;
+	esac
+
+	package_prefix="$def_url/$kernel_name"
+	kernel_maj=$(uname -r | cut -d- -f1)
+	tmp=$(uname -r | cut -d- -f2)
+	kernel_min=$(echo ${tmp%.*})
+
+	ksrpm_url=$package_prefix/$kernel_maj/$kernel_min/src/$kernel_name-$kernel_maj-$kernel_min.src.rpm
+	wget -q $ksrpm_url
+	sleep 10
+}
+
+function setup_src_repo()
+{
+	local baseurl=$(grep baseurl /etc/yum.repos.d/beaker-BaseOS.repo | awk -F'BaseOS' -vOFS='' '{$1=$1;$2=""}1')
+
+	if [[ $kernel_name =~ "rt" ]]; then
+		local varient="RT"
+	else
+		local varient="BaseOS"
+	fi
+
+cat << EOF > /etc/yum.repos.d/${repo_name:-"beaker-source.repo"}
+[beaker-source]
+name=beaker-source
+${baseurl}${varient}/source/tree/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=1
+EOF
+}
+
+function cleanup_src_repo()
+{
+	rm -fr /etc/yum.repos.d/${repo_name:-"beaker-source.repo"}
+}
+
+function prepare_running_kernel_src()
+{
+	local running_kernel=$(uname -r | sed "s/+debug//" | sed "s/\.`arch`//")
+	local kernel_name=$(echo $kernel_name | sed "s/-debug//")
+
+	echo $running_kernel | grep -q -v 'el[0-9]\|fc\|eln'
+	if [ $? -eq 0 ]; then
+		echo "detected upstream kernel..."
+		echo "copy /usr/src/kernels/${running_kernel} to linux-${running_kernel}"
+		cp -r /usr/src/kernels/${running_kernel} linux-${running_kernel}
+	else
+		echo "download src package from RH site"
+		setup_src_repo
+		dnf download --source $kernel_name-$running_kernel || download_kernel_srpm
+		cleanup_src_repo
+		if ! test -f $kernel_name-*.src.rpm; then
+			echo "RPM package download failed"
+			rstrnt-report-result "srpm-download" "FAIL" 1
+			exit 1
+		fi
+		rpm -ivh --force $kernel_name-*.src.rpm
+		tar xf /root/rpmbuild/SOURCES/linux-*.tar.xz -C .
+	fi
+}
 
 # Helper functions for mount/umount nfs.
 # The default server is $KG_SERVER, can override it by

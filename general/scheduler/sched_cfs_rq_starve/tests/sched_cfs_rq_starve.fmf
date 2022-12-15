@@ -6,6 +6,10 @@ component:
 path: /general/scheduler/sched_cfs_rq_starve
 test: bash -x ./runtest.sh
 framework: beakerlib
+require:
+  - json-c-devel
+  - gcc
+  - glibc
 duration: 1h
 extra-summary: /general/scheduler/sched_cfs_rq_starve
 extra-task: /general/scheduler/sched_cfs_rq_starve

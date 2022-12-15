@@ -1,0 +1,6 @@
+PURPOSE of /kernel/power-management/powertop/powertop_start
+Description: Test start of powertop service
+Author: Erik Hamera <ehamera@redhat.com>
+
+Check, that powertop service can be started - it's related to BZ1392438
+

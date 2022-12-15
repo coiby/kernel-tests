@@ -1,0 +1,138 @@
+#!/bin/sh
+# Description: smoke test for rmcp_ping utility
+# Author: Milos Malik <mmalik@redhat.com>
+
+##### Variable Declaration #####
+VERSION=1.0
+
+# FAIL unless test explicitly passes
+RESULT=FAIL
+
+# Each pass increases SCORE by 1
+SCORE=0
+TOTAL=10
+
+# Set language so we know what results to test for
+set_lang=0
+old_lang=$LANG
+new_lang=en_US.UTF-8
+
+# Which package and which utility do we test?
+PACKAGE=OpenIPMI
+UTILITY=rmcp_ping
+
+##### Function Declaration #####
+
+log () {
+	printf "\n:: $1 ::\n"
+}
+
+run_exp () {
+	OUTPUT_FILE=`mktemp`
+	printf "== TEST CASE: $1\n"
+
+	$1 >& ${OUTPUT_FILE} &
+	CMD_PID=$!
+	if ps -p ${CMD_PID} >& /dev/null ; then
+		sleep 30
+		kill ${CMD_PID} >& /dev/null
+	fi
+	wait ${CMD_PID}
+	EXIT_STATUS=$?
+	cat ${OUTPUT_FILE}
+
+	if [ ${EXIT_STATUS} -eq $2 ] ; then
+		let "SCORE += 1"
+	fi
+
+	if [ ${EXIT_STATUS} -eq 0 ] ; then
+		ACTUAL_RESULT="PASSED"
+	else
+		ACTUAL_RESULT="FAILED"
+	fi
+
+	if [ $2 -eq 0 ] ; then
+		EXPECTED_RESULT="PASSED"
+	else
+		EXPECTED_RESULT="FAILED"
+	fi
+
+	printf "== Actual result:   ${ACTUAL_RESULT} (status=${EXIT_STATUS})\n"
+	printf "== Expected result: ${EXPECTED_RESULT} (status=$2)\n"
+	printf "== Description:     $3\n\n"
+	rm -f ${OUTPUT_FILE}
+}
+
+##### Begin Test #####
+
+log "[`date +%H:%M:%S`] Begin Test - $TEST-$VERSION"
+
+# Warn if not running as root that test might fail
+e_user=$(whoami)
+if [[ x"${e_user}" != x"root" ]]; then
+        log "Warning, not running as root! This test might fail.\n"
+fi
+
+# Temporarily set LANG to value we can trust results from
+if [[ x"${LANG}" != x"${new_lang}" ]]; then
+        log "Warning, LANG not set to ${new_lang}!"
+        log "Temporarily setting LANG to ${new_lang}, was ${old_lang}"
+
+        set_lang=1
+        export LANG=${new_lang}
+        log "Done, LANG=${new_lang}."
+fi
+
+log "rpm -qa ${PACKAGE}*"
+rpm -qa "${PACKAGE}*"
+
+log "Following test cases should pass"
+
+run_exp "${UTILITY}" 0 "default run"
+
+run_exp "${UTILITY} -p 623" 0 "set port"
+
+run_exp "${UTILITY} -t 1" 0 "set timeout"
+
+run_exp "${UTILITY} -s 128" 0 "set start tag"
+
+run_exp "${UTILITY} -d" 0 "enable debugging"
+
+log "Following test cases should fail"
+
+run_exp "${UTILITY} -p -1" 1 "port number must be between 0 and 65535"
+
+run_exp "${UTILITY} -p 65536" 1 "port number must be between 0 and 65535"
+
+run_exp "${UTILITY} -s -1" 1 "start tag must be between 0 and 255"
+
+run_exp "${UTILITY} -s 256" 1 "start tag must be between 0 and 255"
+
+run_exp "${UTILITY} -t -1" 1 "waiting time cannot be negative"
+
+# Reset LANG to original value
+if [[ ${set_lang} == 1 ]]; then
+        log "Resetting LANG to ${old_lang}."
+        export LANG=${old_lang}
+        log "Done, LANG=${old_lang}."
+fi
+
+log "[`date +%H:%M:%S`] End Test - $TEST-$VERSION"
+
+##### Report Results #####
+
+log "SCORE: ${SCORE}/${TOTAL}"
+
+if [ ${SCORE} -eq ${TOTAL} ]; then
+# everything was OK
+        log "RESULT: PASS"
+        printf "\n\n"
+    exit 0
+else
+# something failed
+        log "RESULT: FAIL"
+        printf "\n\n"
+    exit 1
+fi
+
+##### End Test #####

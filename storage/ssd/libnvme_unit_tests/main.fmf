@@ -1,0 +1,27 @@
+summary: KS-TC:ssd/libnvme_unit_tests
+description: libnvme unit tests from libnvme
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/libnvme_unit_tests
+test: bash ./runtest.sh
+framework: beakerlib
+recommend:
+  - beakerlib-redhat
+require:
+  - rpm-build
+  - meson
+  - gcc
+  - json-c-devel
+  - cmake
+  - openssl-devel
+duration: 30m
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/libnvme_unit_tests
+extra-task: /storage/ssd/libnvme_unit_tests
+adjust:
+    enabled: false
+    when: distro < rhel-9
+id: e2308678-415c-479d-88a3-1c4ccc4e2021

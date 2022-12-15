@@ -1,0 +1,17 @@
+Test the rdrand CPU instruction for creating hardware generated randomized
+data. This feature was first introduced on Intel Ivy Bridge processors.
+
+More details are available in:
+http://software.intel.com/en-us/articles/download-the-latest-bull-mountain-software-implementation-guide/
+https://bugzilla.redhat.com/show_bug.cgi?id=696442 (RHEL6.3 feature request)
+
+Currently the test does the following:
+
+1) Check for CPU flag in /proc/cpuinfo
+
+2) Load custom kernel module (written by fenlason@redhat.com from kernel devel)
+which creates the device file /dev/hwrng. Reading from this outputs data using
+get_random_bytes(), which in turn pulls data using rdrand. It then tests output
+speeds when rdrand is enabled and then is disabled - rdrand should be
+significantly faster.
+

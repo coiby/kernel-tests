@@ -1,0 +1,15 @@
+summary: storage/block/bz2142432_direct_io_mapper_error
+description: direct io device mapper errors on luks raid
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/bz2142432_direct_io_mapper_error
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+duration: 1h
+tier: 1
+extra-summary: /storage/block/bz2142432_direct_io_mapper_error
+extra-task: /storage/block/bz2142432_direct_io_mapper_error

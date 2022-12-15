@@ -1,0 +1,7 @@
+PURPOSE of /kernel/ipxe/iso
+Description: ipxe iso boot test
+Author: Erico Nunes <ernunes@redhat.com>
+
+ipxe test booting ipxe.iso from the ipxe-bootimgs package into a vm.
+It just checks that the VM boots a RHEL kernel going through an ipxe
+script.

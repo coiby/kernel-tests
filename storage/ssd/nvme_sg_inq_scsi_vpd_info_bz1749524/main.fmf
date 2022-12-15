@@ -8,7 +8,9 @@ test: bash ./runtest.sh
 framework: shell
 recommend:
   - beakerlib-redhat
-require: sg3_utils
+require:
+  - sg3_utils
+  - nvme-cli
 duration: 5m
 tag:
   - regression

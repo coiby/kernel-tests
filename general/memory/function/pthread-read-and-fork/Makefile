@@ -48,12 +48,8 @@ $(METADATA):
 	@echo "NeedProperty:	PROCESSORS > 1"	>> $(METADATA)
 	@echo "NeedProperty:	MEMORY >= 2048"	>> $(METADATA)
 	@echo "RunFor:		kernel"		>> $(METADATA)
-	@echo "RunFor:		libhugetlbfs"		>> $(METADATA)
-	@echo "Requires:	libhugetlbfs"	>> $(METADATA)
-	@echo "Requires:	@development-tools"	>> $(METADATA)
 	@echo "Requires:	coreutils"	>> $(METADATA)
-	@echo "Requires:	rpm-build"	>> $(METADATA)
-	@echo "Requires:	procps" >> $(METADATA)
+	@echo "Requires:	gcc"	>> $(METADATA)
 	@echo "License:		GPLv2" >> $(METADATA)
 
 # Include a global make rules file

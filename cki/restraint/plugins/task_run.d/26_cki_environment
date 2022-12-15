@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# based on /usr/share/restraint/plugins/task_run.d/25_environment
+
+. /usr/share/restraint/plugins/helpers
+
+# Don't run from PLUGINS
+if [ -n "$RSTRNT_NOPLUGINS" ]; then
+    exec "$@"
+    exit 0
+fi
+
+rstrnt_info "*** Running Plugin: $0"
+
+# it seems when running restraint as standalone the value can increment
+# even if there was no reboot, like if a connection is interrupted
+# https://gitlab.com/cki-project/upt/-/issues/99
+mkdir -p /var/opt/cki/${RSTRNT_TASKID}
+# saves the boot information everytime the task starts or continues
+who -b >> "/var/opt/cki/${RSTRNT_TASKID}/bootinfo"
+# overwrite RSTRNT_REBOOTCOUNT
+RSTRNT_REBOOTCOUNT=$(cat "/var/opt/cki/${RSTRNT_TASKID}/bootinfo" | uniq | wc -l)
+# start counting from 0
+RSTRNT_REBOOTCOUNT=$((${RSTRNT_REBOOTCOUNT}-1))
+exec "$@"

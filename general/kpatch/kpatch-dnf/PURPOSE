@@ -1,0 +1,3 @@
+PURPOSE of /kernel/general/kpatch/kpatch-dnf
+Description: Test kpatch-dnf function
+Author: Zhijun Wang <zhijwang@redhat.com>

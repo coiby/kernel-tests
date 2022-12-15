@@ -25,4 +25,3 @@ if [ ! -e ${_cki_init_file} ]; then
     curl --silent --show-error --retry 5 "http://${LAB_CONTROLLER}:8000/recipes/${RSTRNT_RECIPEID}/logs/console.log" -o ${_cki_init_file}
 fi
 exec "$@"
-EOF

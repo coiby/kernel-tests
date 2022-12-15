@@ -6,6 +6,8 @@ component:
 path: /rt-tests/rt_ssdd
 test: bash -x ./runtest.sh
 framework: shell
+require:
+  - realtime-tests
 duration: 30m
 extra-summary: /rt-tests/rt_ssdd
 extra-task: /rt-tests/rt_ssdd

@@ -1,0 +1,12 @@
+[General]
+name=/kernel/filesystems/xfs/xfs-repair-dryrun
+owner=Jeffrey Bastian <jbastian@redhat.com>
+description=xfs_repair dry-run
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_type=10m
+dependencies=xfsprogs;util-linux

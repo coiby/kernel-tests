@@ -1,0 +1,21 @@
+#kernel-qe-hw
+#This test tests if powermanagement modules are loaded.
+parser lhc1
+sysinfo uname lscpu bios
+#1 and 2 are names of results
+run 1 lsmod
+#results are printed to stdout automatically - you'll need to see then in the logs anyway
+
+#hwl, nhwl and ncur are names too; ngrep rips numbers from the output
+#both grep and ngrep greps in all results obtained by run commands
+grep rapl intel_rapl
+grep powerclamp intel_powerclamp
+
+echo DATA module for rapl: $[1,rapl]
+echo DATA module for powerclamp: $[1,powerclamp]
+
+fail_ex [ -z $[1,rapl] ]
+fail_ex [ -z $[1,powerclamp] ]
+
+#if there isn't decided to pass or fail, there is default
+default pass

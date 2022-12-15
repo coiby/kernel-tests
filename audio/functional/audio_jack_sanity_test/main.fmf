@@ -1,0 +1,23 @@
+summary: Test that checks if the soundcards detected show all of the expected audio
+    jacks (Jack information must be available in the jack_definitions.json file packaged
+    with this test in order to run correctly)
+description: |
+    Maintainer: Erik Hamera <ehamera@redhat.com>
+    Test steps:
+     * Read in the audio jack definition file
+     * Check for any unsupported soundcards present on the work node
+     * Check that only expected audio jack names are present
+contact: Erik Hamera <ehamera@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: shell
+require:
+  - python
+  - alsa-utils
+  - pciutils
+  - url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
+    name: /audio/functional
+duration: 1m
+extra-summary: /kernel/audio_tests/functional/audio_jack_sanity_test
+extra-task: /kernel/audio_tests/functional/audio_jack_sanity_test
