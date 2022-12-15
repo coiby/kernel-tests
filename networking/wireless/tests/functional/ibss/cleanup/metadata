@@ -1,0 +1,8 @@
+[General]
+description=Clean up an already established wireless ad-hoc (IBSS) connection
+name=networking/wireless/tests/functional/ibss/cleanup
+owner=Laura Trivelloni <ltrivell@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=45m

@@ -53,6 +53,8 @@ rlJournalStart
         else
                 modprobe dummy
         fi
+        # add dummy0 again, casue sometimes add it failed
+        ip link add dev dummy0 type dummy
         for i in `seq 50`; do
             ip link add link dummy0 type macsec sci 0100560212005452 encrypt on
             ip macsec add macsec0 tx sa 0 pn 1024 on key 01 81818181818181818181818181818181
@@ -60,6 +62,7 @@ rlJournalStart
             ip macsec add macsec0 rx port 1234 address c6:19:52:8f:e6:a0 sa 0 pn 1 on key 00 82828282828282828282828282828282
             modprobe -r macsec
         done
+        ip link delete dummy0
         modprobe -r dummy
     rlPhaseEnd
 
@@ -70,7 +73,7 @@ rlJournalStart
         else
                 modprobe dummy
         fi
-
+        ip link add dev dummy0 type dummy
         ip link set dummy0 up
         netperf_install
         # macsec name
@@ -215,6 +218,7 @@ rlJournalStart
 
     rlPhaseStartTest "ip macsec"
         modprobe -r macsec
+        ip link delete dummy0
         modprobe -r dummy
         if [ $(GetDistroRelease) -ge 8 ]; then
                 modprobe dummy numdummies=1
@@ -222,6 +226,7 @@ rlJournalStart
                 modprobe dummy
         fi
 
+        ip link add dev dummy0 type dummy
         ip link set dummy0 up
 
         # basic sample
@@ -263,12 +268,14 @@ rlJournalStart
         # the SecTAG before Secure Data is 16 tytes
         # the ICV after Secure Data is 16 bytes by default, which can be set by icvlen (8..16)
         modprobe -r macsec
+        ip link delete dummy0
         modprobe -r dummy
         if [ $(GetDistroRelease) -ge 8 ]; then
                 modprobe dummy numdummies=1
         else
                 modprobe dummy
         fi
+        ip link add dev dummy0 type dummy
 
         rlRun "ip link add link dummy0 macsec0 type macsec"
         rlAssertEquals "default real_dev MTU is 1500" $(cat /sys/class/net/dummy0/mtu) 1500
@@ -311,12 +318,14 @@ rlJournalStart
             return $ret
         }
         modprobe -r macsec
+        ip link delete dummy0
         modprobe -r dummy
         if [ $(GetDistroRelease) -ge 8 ]; then
                 modprobe dummy numdummies=1
         else
                 modprobe dummy
         fi
+        ip link add dev dummy0 type dummy
 
         # the real device underneath macsec should enter promiscuous mode automatiaclly
         rlRun "ip link add link dummy0 macsec0 type macsec"
@@ -418,8 +427,8 @@ fi
         rlRun "CMD_ARRAY=(
             'modprobe -r macsec'
             'modprobe macsec'
-            'modprobe -r dummy'
-            'modprobe dummy numdummies=1'
+            'ip link delete dummy0'
+            'ip link add dev dummy0 type dummy'
             'ip link add link dummy0 type macsec sci 0100560212005452 encrypt on'
             'ip link add link dummy0 name macsec0 type macsec port 12345'
             'ip link add link dummy0 name macsec0 type macsec replay on window 429496729'

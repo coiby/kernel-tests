@@ -1,0 +1,38 @@
+diff --git a/tsrc/random_offline b/tsrc/random_offline
+index c380a86..bbaecb4 100755
+--- a/tsrc/random_offline
++++ b/tsrc/random_offline
+@@ -107,7 +107,8 @@ cbefore=$(grep HardwareCorrupted /proc/meminfo)
+ 
+ 
+ (( k = 0 ))
+-rm -f offlined unpoison-failed
++rm -f offlined offline-dmesg unpoison-failed
++dmesg -c > /dev/null
+ while true ; do 
+ 	T=$( 
+ 	R=$RANDOM
+@@ -131,6 +132,7 @@ while true ; do
+ 		unpoison
+ 		(( k = 0 ))
+ 		rm offlined
++        dmesg -c >> offline-dmesg
+ 	fi
+ 
+ 	if [ ! -z "$RUNTIME" ] ; then
+@@ -143,10 +145,14 @@ while true ; do
+ 	fi
+ done	
+ 
++dmesg >> offline-dmesg
++undoable=`cat offline-dmesg | grep -e "unknown non LRU page type" -e "page already poisoned" -e "unknown zero refcount page type" | wc -l`
++(( failed -= undoable ))
++
+ if [ -f unpoison-failed ] ; then
+ 	ufailed=$(wc -l unpoison-failed | awk ' {print $1}')
+ fi
+-echo "soft-poison: success $success failed $failed of total $total"
++echo "soft-poison: success $success undoable $undoable failed $failed of total $total"
+ echo "unpoison-failed: success $usuccess failed $ufailed of total $utotal"
+ echo "poisoned before: $cbefore"
+ echo -n "poisoned after: "

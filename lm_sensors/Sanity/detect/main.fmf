@@ -1,0 +1,11 @@
+summary: Check drivers supported by sensors-detect
+description: |
+  Make sure that all the supported drivers are enabled in the
+  sensors-detect script. For now it covers just BZ#473119.
+contact: Laura Trivelloni <ltrivell@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require: 
+  - lm_sensors
+duration: 5m
+extra-task: /kernel/lm_sensors/Sanity/detect

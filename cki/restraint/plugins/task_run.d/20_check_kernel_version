@@ -17,4 +17,3 @@ if [ -e /var/opt/cki/kernel_version ] && [ -n "${RSTRNT_TASKID}" ]; then
     fi
 fi
 exec "$@"
-EOF

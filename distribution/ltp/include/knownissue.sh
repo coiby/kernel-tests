@@ -28,17 +28,19 @@
 #
 # Added-by: Li Wang <liwang@redhat.com>
 
-. ../include/kvercmp.sh				|| exit 1
-. ../include/knownissue/upstream_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel_alt_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel9_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel8_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel7_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel6_knownissue.sh	|| exit 1
-. ../include/knownissue/rhel5_knownissue.sh	|| exit 1
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+
+. "$CDIR"/../include/kvercmp.sh				|| exit 1
+. "$CDIR"/../include/knownissue/upstream_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel_alt_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel9_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel8_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel7_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel6_knownissue.sh	|| exit 1
+. "$CDIR"/../include/knownissue/rhel5_knownissue.sh	|| exit 1
 
 cver=$(uname -r)
-arch=$(uname -m)
 
 function is_fedora() { grep -iq "fedora" /etc/system-release; }
 function is_rhel() { grep -iq "red hat enterprise linux" /etc/system-release; }
@@ -50,16 +52,16 @@ if [ -r /etc/system-release ]; then
 	release=$(cat /etc/system-release)
 
 	if is_fedora; then
-		osver=$(echo $release | cut -d' ' -f3)
+		osver=$(echo "$release" | cut -d' ' -f3)
 	elif is_rhel; then
-		osver=$(echo $release | awk -F' ' '{print int(substr($6, 1,1))*100 + (int(substr($6,3,2)))}')
+		osver=$(echo "$release" | awk -F' ' '{print int(substr($6, 1,1))*100 + (int(substr($6,3,2)))}')
 		if [ "$osver" == "0" ]; then
 			# fallback for format in rhel <= 7
-			osver=$(echo $release | awk -F' ' '{print int(substr($7, 1,1))*100 + (int(substr($7,3,2)))}')
+			osver=$(echo "$release" | awk -F' ' '{print int(substr($7, 1,1))*100 + (int(substr($7,3,2)))}')
 		fi
 	elif is_centos; then
 		# CentOS Stream seems to contain only major release info
-		osver=$(echo $release | awk -F' ' '{print int(substr($4, 1,1))*100}')
+		osver=$(echo "$release" | awk -F' ' '{print int(substr($4, 1,1))*100}')
 	fi
 else
 	# if we don't have system-release, use the old mechanism
@@ -77,20 +79,20 @@ function is_rhel6() { grep -q "release 6" /etc/redhat-release; }
 function is_rhel7() { grep -q "release 7" /etc/redhat-release; }
 function is_rhel8() { grep -q "release 8" /etc/redhat-release; }
 function is_rhel9() { grep -q "release 9" /etc/redhat-release; }
-function is_rhel_alt() { rpm -q --qf "%{sourcerpm}\n" -f /boot/vmlinuz-$(uname -r) | grep -q "alt"; }
+function is_rhel_alt() { rpm -q --qf "%{sourcerpm}\n" -f "/boot/vmlinuz-$(uname -r)" | grep -q "alt"; }
 function is_upstream() { uname -r | grep -q -v 'el[0-9]\|fc'; }
 function is_arch() { [ "$(uname -m)" == "$1" ]; }
 function is_zstream() { uname -r | awk -F. '{if (match($4, "[[:digit:]]") != 1) exit 1}'; }
 function is_kvm()
 {
 	if command -v virt-what; then
-		return $(virt-what | grep -q "kvm")
+		{ virt-what | grep -q 'kvm'; } && return 0
 	fi
 	return 1
 }
 function is_rt() { [ -f /sbin/kernel-is-rt ] && /sbin/kernel-is-rt; }
 # osver_low <= $osver < osver_high
-function osver_in_range() { ! is_upstream && [ "$1" -le "$osver" -a "$osver" -lt "$2" ]; }
+function osver_in_range() { ! is_upstream && { [ "$1" -le "$osver" ] && [ "$osver" -lt "$2" ]; } }
 
 # kernel_low <= $cver < kernel_high
 function kernel_in_range()
@@ -108,7 +110,7 @@ function kernel_in_range()
 # pkg_low <= $pkgver < pkg_high
 function pkg_in_range()
 {
-	pkgver=$(rpm -qa $1 | head -1 | sed 's/\(\w\+-\)//')
+	pkgver=$(rpm -qa "$1" | head -1 | sed 's/\(\w\+-\)//')
 	kvercmp "$2" "$pkgver"
 	if [ $kver_ret -le 0 ]; then
 		kvercmp "$pkgver" "$3"
@@ -137,7 +139,7 @@ function tskip()
 function tback()
 {
 	for tcase in $1; do
-		sed -i "/\b$tcase\b/d" ${kn_fatal} ${kn_unfix} ${kn_fixed}
+		sed -i "/\b$tcase\b/d" "${kn_fatal}" "${kn_unfix}" "${kn_fixed}"
 	done
 }
 
@@ -153,8 +155,8 @@ function knownissue_filter()
 {
 	# -------------------Common Issues ---------------------
 	# skip OOM tests on large boxes since it takes too long
-	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 8 ] && tskip "oom0.*" fatal
-	[ $(free -g | grep "^Mem:" | awk '{print $2}') -gt 32 ] || cki_is_kernel_debug && tskip "ioctl_sg01" fatal
+	[ "$(free -g | grep "^Mem:" | awk '{print $2}')" -gt 8 ] && tskip "oom0.*" fatal
+	[ "$(free -g | grep "^Mem:" | awk '{print $2}')" -gt 32 ] || cki_is_kernel_debug && tskip "ioctl_sg01" fatal
 	# this case always make the beaker task abort with 'incrementing stop' msg
 	tskip "min_free_kbytes" fatal
 	# msgctl10 -> keeps triggerring OOM...(Bug 1162965?), msgctl11 -> too many pids
@@ -170,7 +172,7 @@ function knownissue_filter()
 	cki_is_kernel_debug && tskip "futex_cmp_requeue01" unfix
 
 	# These test cases take too long to run on VMs
-	cki_is_vm || cki_is_kernel_debug && tskip "setsockopt06 mtest06 pty03 writev03" fatal
+	cki_is_vm || cki_is_kernel_debug && tskip "fork14 setsockopt06 mtest06 pty03 writev03" fatal
 
 	# ----------------- NOTE: -----------------------------
 	# we have split the knownissue's data from code, better
@@ -188,9 +190,9 @@ function tcase_exclude()
 {
 	local config="$*"
 
-	while read skip; do
+	while read -r skip; do
 		echo "Excluding $skip form LTP runtest file"
-		sed -i 's/^\('$skip'\)/#disabled, \1/g' ${config}
+		sed -i "s/^\($skip\)/#disabled, \1/g" ${config}
 	done
 }
 
@@ -208,28 +210,28 @@ function knownissue_exclude()
 	shift
 	local runtest="$*"
 
-	rm -f ${kn_fatal} ${kn_unfix} ${kn_fixed} ${kn_issue}
+	rm -f "${kn_fatal} ${kn_unfix} ${kn_fixed} ${kn_issue}"
 
 	knownissue_filter
 
 	case $param in
 	  "all")
-		[ -f ${kn_fatal} ] && cat ${kn_fatal} | tcase_exclude ${runtest}
-		[ -f ${kn_unfix} ] && cat ${kn_unfix} | tcase_exclude ${runtest}
-		[ -f ${kn_fixed} ] && cat ${kn_fixed} | tcase_exclude ${runtest}
+		[ -f "${kn_fatal}" ] && cat "${kn_fatal}" | tcase_exclude "${runtest}"
+		[ -f "${kn_unfix}" ] && cat "${kn_unfix}" | tcase_exclude "${runtest}"
+		[ -f "${kn_fixed}" ] && cat "${kn_fixed}" | tcase_exclude "${runtest}"
 		;;
 	"fatal")
-		[ -f ${kn_fatal} ] && cat ${kn_fatal} | tcase_exclude ${runtest}
-		[ -f ${kn_unfix} ] && cat ${kn_unfix} >> ${kn_issue}
-		[ -f ${kn_fixed} ] && cat ${kn_fixed} >> ${kn_issue}
+		[ -f "${kn_fatal}" ] && cat "${kn_fatal}" | tcase_exclude "${runtest}"
+		[ -f "${kn_unfix}" ] && cat "${kn_unfix}" >> "${kn_issue}"
+		[ -f "${kn_fixed}" ] && cat "${kn_fixed}" >> "${kn_issue}"
 		;;
 	 "none")
-		[ -f ${kn_fatal} ] && cat ${kn_fatal} >> ${kn_issue}
-		[ -f ${kn_unfix} ] && cat ${kn_unfix} >> ${kn_issue}
-		[ -f ${kn_fixed} ] && cat ${kn_fixed} >> ${kn_issue}
+		[ -f "${kn_fatal}" ] && cat "${kn_fatal}" >> "${kn_issue}"
+		[ -f "${kn_unfix}" ] && cat "${kn_unfix}" >> "${kn_issue}"
+		[ -f "${kn_fixed}" ] && cat "${kn_fixed}" >> "${kn_issue}"
 		;;
 	      *)
-		echo "Error, parameter "$1" is incorrect."
+		echo "Error, parameter $1 is incorrect."
 		;;
 	esac
 }

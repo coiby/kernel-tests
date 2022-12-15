@@ -227,7 +227,7 @@ kernel_debug()
 # return 0 when running kernel automotive
 kernel_automotive()
 {
-    if rpm -q "kernel-automotive-$(uname -r)" > /dev/null 2>&1; then
+    if (uname -r | grep -wq "el[0-9]*iv"); then
        return  0
     fi
     return 1

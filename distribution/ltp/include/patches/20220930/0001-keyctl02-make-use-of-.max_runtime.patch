@@ -1,0 +1,63 @@
+From 6246d1d067a505cf4889449cb83b4732111f8cc1 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Fri, 18 Nov 2022 14:57:51 +0800
+Subject: [PATCH] keyctl02: make use of .max_runtime
+
+With setting 60 secs for max_runtime. At the same time exit the
+main LOOP when tst_remaining_time is exhausted.
+
+This fix improves timeout on slower systems:
+
+  # time ./keyctl02
+  tst_test.c:1554: TINFO: Timeout per run is 0h 00m 30s
+  ...
+  keyctl02.c:85: TINFO: debug only: i == 7723
+  keyctl02.c:85: TINFO: debug only: i == 7724
+  Test timeouted, sending SIGKILL!
+  tst_test.c:1607: TINFO: If you are running on slow machine, try exporting LTP_TIMEOUT_MUL > 1
+  tst_test.c:1608: TBROK: Test killed! (timeout?)
+
+  Summary:
+  passed   0
+  failed   0
+  broken   1
+  skipped  0
+  warnings 0
+
+  real	0m30.046s
+  user	0m0.245s
+  sys	0m9.937s
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ testcases/kernel/syscalls/keyctl/keyctl02.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/keyctl/keyctl02.c b/testcases/kernel/syscalls/keyctl/keyctl02.c
+index f4ee03f33..572f34b16 100644
+--- a/testcases/kernel/syscalls/keyctl/keyctl02.c
++++ b/testcases/kernel/syscalls/keyctl/keyctl02.c
+@@ -81,6 +81,11 @@ static void do_test(void)
+ 		SAFE_PTHREAD_JOIN(pth[1], NULL);
+ 		SAFE_PTHREAD_JOIN(pth[2], NULL);
+ 		SAFE_PTHREAD_JOIN(pth[3], NULL);
++
++		if (!tst_remaining_runtime()) {
++			tst_res(TINFO, "Runtime exhausted, exiting after %d loops", i);
++			break;
++		}
+ 	}
+ 
+ 	/*
+@@ -135,6 +140,7 @@ static struct tst_test test = {
+ 	.needs_root = 1,
+ 	.setup = setup,
+ 	.cleanup = cleanup,
++	.max_runtime = 60,
+ 	.test_all = do_test,
+ 	.tags = (const struct tst_tag[]) {
+ 		{"linux-git", "b4a1b4f5047e"},
+-- 
+2.35.3
+

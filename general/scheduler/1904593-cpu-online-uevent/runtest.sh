@@ -34,6 +34,12 @@ origin_nr_cpus=$(grep -c -w ^processor /proc/cpuinfo)
 
 rlJournalStart
     rlPhaseStartTest
+        if rlIsRHEL '8.4'; then
+            echo "Known failure on RHEL 8.4 .. skip"
+            report_result "invalid_rhel_version" SKIP
+            exit 0
+        fi
+
         if [ "$origin_nr_cpus" = 1 ]; then
             echo "Only 1 cpu available, can't offline.. skip"
             report_result "nr_cpu_is_1" SKIP

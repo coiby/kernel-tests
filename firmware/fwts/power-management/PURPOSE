@@ -1,0 +1,16 @@
+Run fwts tests in the power states category (as returned by fwts --power-states).
+These run automatically by default and require no user intervention.
+
+This includes the following tests (based on x86_64, may vary on other arches):
+
+s3              S3 suspend/resume test.
+s3power         S3 power loss during suspend test (takes minimum of 10 minutes to run).
+s4              S4 hibernate/resume test.
+
+Note: s3/s3power may cause crashes if system does not suspend/resume properly.
+s3power will abort on systems with no batter installed. s4 tests hibernate
+(suspend to disk) and may cause crashes, additionally some UEFI based Beaker
+systems may not reboot correctly upon resume from hibernation and will require
+manually setting the boot order or reprovisioning the machine to recover.
+
+https://wiki.ubuntu.com/Kernel/Reference/fwts

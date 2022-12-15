@@ -1,0 +1,45 @@
+PURPOSE of /kernel/wireless_tests/functional/suspend_resume
+Decription: Test to ensure wireless connections are maintained across
+            suspend/resume.
+Author: Ken Benoit <kbenoit@redhat.com>
+
+0.Purpose
+=========
+This is a basic wireless connection test that also performs a suspend and resume
+of the test system. This is meant to ensure that a system can be resumed and
+that the wireless connection can be re-established without user intervention.
+
+1.Files
+=======
+Makefile - used to run the test script.
+runtest.sh - script that starts the wireless connection creation, calls the
+             Python script perform the suspend/resume, and then delete the
+             wireless connection.
+PURPOSE - this file
+test.py - Python script that performs the actual suspend/resume.
+__init__.py - used for Python module pathing.
+
+2.Process
+=========
+Simply run the following command:
+# make run
+
+3.Test params
+=============
+This /distribution/setup_repository test accepts the following parameters in the
+XML:
+
+(OPTIONAL)
+PRESET - Preset defined in the preconfigured_setups.json file provided with
+         /kernel/wireless_tests/functional/connection/setup.
+
+3.Example xml snippet
+=====================
+<task name="/kernel/wireless_tests/functional/suspend_resume" role="STANDALONE">
+    <params>
+        <param name="PRESET" value="unencrypted"/>
+    </params>
+</task>
+
+=================
+-end PURPOSE file

@@ -3,6 +3,10 @@ contact: Linqing Lu <lilu@redhat.com>
 path: /security/key
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - automake
+  - gcc
+  - git
 component:
   - kernel
 duration: 30m

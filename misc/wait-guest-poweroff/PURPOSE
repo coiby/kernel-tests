@@ -1,0 +1,14 @@
+PURPOSE of misc/wait-guest-poweroff
+Description: Wait for guest poweroff
+Author: Erico Nunes <ernunes@redhat.com>
+
+Wait for guest poweroff.
+
+This is intended to be used by the Host in a Beaker job using a
+<guestrecipe>.
+When using it, the Host machine waits for the guest machine to power off
+to have a chance to safely modify the guest settings (such as VM
+configuration, firmware settings).
+The Host should then power it back on in a separate further task.
+
+See also: misc/self-poweroff

@@ -102,10 +102,10 @@ function zswap_test()
 		local pages=$(cat /sys/kernel/debug/zswap/stored_pages)
 		stored_pages_2=$(( $stored_pages_2 + $pages ))
 		if ((i % 20 == 0)); then
-			free -g
-			ps -C stress -o pid,vsz,rsz,etimes
-			free_g=$(free -g | awk '/Mem/ {print $4}')
-			echo "free mem GiB: $free_g"
+			free -m
+			ps -C stress -o pid,vsz,rsz,etimes,cgroup
+			free_m=$(free -m | awk '/Mem/ {print $4}')
+			echo "free mem MiB: $free_m"
 		fi
 		sleep 1
 	done
@@ -140,15 +140,19 @@ function setup_cgroup()
 	free_mem_m=$(free -m | awk '/Mem/ {print $4}')
 	use_swap=$(echo $free_swap_m \* 0.9 | bc | awk -F. '{print $1}')
 	use_mem=2048
-	if ((free_mem_m < 2048)); then
-		use_mem=$free_mem_m
+	# Leave some memory for system processes
+	if ((free_mem_m < 3072)); then
+		use_mem=$(echo $free_mem_m \* 0.5 | bc | awk -F. '{print $1}')
 	fi
 
 	check_cgroup_version
 	cgroup_create zswap_test memory
+	free -m
 	cgroup_set_memory zswap_test ${use_mem}m ${use_swap}m
 	cgroup_set_file zswap_test memory memory.oom_control=1
 	[ $? -ne 0 ] && oom_score_adj=-1000
+	echo -1000 > /proc/self/oom_score_adj
+	cat /proc/self/oom_score_adj
 }
 
 # ----- Test Start ------

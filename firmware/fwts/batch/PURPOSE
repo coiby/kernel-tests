@@ -1,0 +1,97 @@
+Run fwts tests in the batch category (as returned by fwts --batch).
+These run automatically by default and require no user intervention.
+
+This includes the following tests (based on x86_64, may vary on other arches):
+
+acpiinfo        General ACPI information test.
+acpitables      ACPI table headers sanity tests.
+apicedge        APIC edge/level test.
+apicinstance    Test for single instance of APIC/MADT table.
+asf             ASF! Alert Standard Format Table test.
+aspm            PCIe ASPM test.
+aspt            ASPT Table test.
+autobrightness  Automated LCD brightness test.
+bert            BERT Boot Error Record Table test.
+bgrt            BGRT Boot Graphics Resource Table test.
+bios32          BIOS32 Service Directory test.
+bios_info       Gather BIOS DMI information.
+bmc_info        BMC Info
+boot            BOOT Table test.
+checksum        ACPI table checksum test.
+cpep            CPEP Corrected Platform Error Polling Table test.
+cpufreq         CPU frequency scaling tests.
+crs             Test PCI host bridge configuration using _CRS.
+csm             UEFI Compatibility Support Module test.
+csrt            CSRT Core System Resource Table test.
+cstates         Processor C state support test.
+dbg2            DBG2 (Debug Port Table 2) test.
+dbgp            DBGP (Debug Port) Table test.
+dmar            DMA Remapping (VT-d) test.
+dmicheck        DMI/SMBIOS table tests.
+drtm            DRTM D-RTM Resources Table test.
+ebda            Test EBDA region is mapped and reserved in memory map table.
+ecdt            ECDT Embedded Controller Boot Resources Table test.
+einj            EINJ Error Injection Table test.
+erst            ERST Error Record Serialization Table test.
+facs            FACS Firmware ACPI Control Structure test.
+fadt            FADT Fixed ACPI Description Table tests.
+fan             Simple fan tests.
+fpdt            FPDT Firmware Performance Data Table test.
+gtdt            GTDT Generic Timer Description Table test.
+hda_audio       HDA Audio Pin Configuration test.
+hest            HEST Hardware Error Source Table test.
+hpet            HPET IA-PC High Precision Event Timer Table tests.
+iort            IORT IO Remapping Table test.
+klog            Scan kernel log for errors and warnings.
+lpit            LPIT Low Power Idle Table test.
+madt            MADT Multiple APIC Description Table (spec compliant).
+maxfreq         Test max CPU frequencies against max scaling frequency.
+maxreadreq      Test firmware has set PCI Express MaxReadReq to a higher value on non-motherboard devices.
+mcfg            MCFG PCI Express* memory mapped config space test.
+mchi            MCHI Management Controller Host Interface Table test.
+method          ACPI DSDT Method Semantic tests.
+microcode       Test if system is using latest microcode.
+mpcheck         MultiProcessor Tables tests.
+mpst            MPST Memory Power State Table test.
+msct            MSCT Maximum System Characteristics Table test.
+msdm            MSDM Microsoft Data Management Table test.
+msr             MSR register tests.
+mtd_info        OPAL MTD Info
+mtrr            MTRR tests.
+nfit            NFIT NVDIMM Firmware Interface Table test.
+nx              Test if CPU NX is disabled by the BIOS.
+olog            Run OLOG scan and analysis checks.
+oops            Scan kernel log for Oopses.
+osilinux        Disassemble DSDT to check for _OSI("Linux").
+pcc             Processor Clocking Control (PCC) test.
+pcct            PCCT Platform Communications Channel test.
+pciirq          PCI IRQ Routing Table test.
+pmtt            PMTT Memory Topology Table test.
+pnp             BIOS Support Installation structure test.
+prd_info        OPAL Processor Recovery Diagnostics Info
+rsdp            RSDP Root System Description Pointer test.
+rsdt            RSDT Root System Description Table test.
+sbst            SBST Smart Battery Specification Table test.
+securebootcert  UEFI secure boot test.
+slic            SLIC Software Licensing Description Table test.
+slit            SLIT System Locality Distance Information test.
+spcr            SPCR Serial Port Console Redirection Table test.
+spmi            SPMI Service Processor Management Interface Description Table test.
+srat            SRAT System Resource Affinity Table test.
+stao            STAO Status Override Table test.
+syntaxcheck     Re-assemble DSDT and SSDTs to find syntax errors and warnings.
+tcpa            TCPA Trusted Computing Platform Alliance Capabilities Table test.
+tpm2            TPM2 Trusted Platform Module 2 test.
+uefi            UEFI Data Table test.
+uefibootpath    Sanity check for UEFI Boot Path Boot####.
+version         Gather kernel system information.
+virt            CPU Virtualisation Configuration test.
+waet            WAET Windows ACPI Emulated Devices Table test.
+wakealarm       ACPI Wakealarm tests.
+wdat            WDAT Microsoft Hardware Watchdog Action Table test.
+wmi             Extract and analyse Windows Management Instrumentation (WMI).
+wpbt            WPBT Windows Platform Binary Table test.
+xenv            XENV Xen Environment Table tests.
+xsdt            XSDT Extended System Description Table test.
+
+https://wiki.ubuntu.com/Kernel/Reference/fwts

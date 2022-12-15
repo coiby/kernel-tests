@@ -17,7 +17,7 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+modfile=$1
 function needs_hardware() {
     local module=$1
     modinfo $module | awk '/alias:/ { print }' |grep -q 'pci\|usb\|pcmcia\|i2c\|platform\|dmi\|acpi'
@@ -36,13 +36,22 @@ function needs_hardware() {
     return 1
 }
 
-modules=$(find /lib/modules/$(uname -r) -name \*.ko)
-
-for module in $modules; do
-   name=$(basename $module | sed -e 's/.ko$//')
-   if (! needs_hardware "$module" ); then
-       echo $name
-   else
-       echo "$name needs hardware" 1>&2
-   fi
-done
+if [ -n "$modfile" ]; then
+  while read line; do
+    name=$line
+     if ([ -n "$name" ] && ! needs_hardware "$line") ; then
+         echo $name
+     else
+         echo "$name needs hardware" 1>&2
+     fi
+    done < $modfile
+else
+  for module in $modules; do
+     name=$(basename $module | sed -e 's/.ko$//')
+     if (! needs_hardware "$module" ); then
+         echo $name
+     else
+         echo "$name needs hardware" 1>&2
+     fi
+  done
+fi

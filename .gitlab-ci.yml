@@ -62,6 +62,38 @@ shell check runtests:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
 
+shell check runtests mr:
+  extends: .cki_tools
+  before_script:
+    - "# Mock external libraries include files"
+    - mkdir /usr/share/beakerlib
+    - touch /usr/share/beakerlib/beakerlib.sh
+    - mkdir /usr/lib/beakerlib
+    - touch /usr/lib/beakerlib/beakerlib.sh
+    - touch /usr/bin/rhts-environment.sh
+    - touch /usr/bin/rhts_environment.sh
+  script:
+    - |
+      # run full shellcheck on files changed by the MR
+      readarray -t files < <(git diff --name-only "${CI_MERGE_REQUEST_DIFF_BASE_SHA}..${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-${CI_COMMIT_SHA}}" | egrep "\.sh$")
+      error=0
+      for file in "${files[@]}"; do
+          # force to bash to avoid POSIX warnings
+          if ! shellcheck --source-path=SCRIPTDIR --external-sources -f gcc $file; then
+            error=1
+          fi
+      done
+      if [ "${error}" -ne "0" ]; then
+        echo "Please, fix the syntax problems as separate commit if they were not caused by your changes."
+        exit 1
+      fi
+  allow_failure: true
+  rules:
+    - !reference [.rules, mr-parent]
+
+shellspec:
+  extends: .shellspec
+
 codeowners check:
   extends: .cki_tools
   script:

@@ -18,6 +18,23 @@ component:
 path: /misc/module-load
 test: bash -x ./runtest.sh
 framework: beakerlib
+require:
+  - beakerlib
+  - coreutils
+  - wget
+  - git
+  - time
+  - patch
+  - bzip2
+  - autoconf
+  - glib2-devel
+  - make
+  - gettext
+  - automake
+  - gcc
+  - libtool
+  - bison
+  - flex
 recommend:
   - coreutils
 duration: 60m

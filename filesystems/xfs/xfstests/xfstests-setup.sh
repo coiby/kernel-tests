@@ -128,9 +128,9 @@ function setup_test_dev_mkfs()
 {
 	# The TEST_DEV device is expected to be pre-mkfs'd as $FSTYPE
 	# Nfs cannot be dd'd nor mkfs'd
-	if [ "$FSTYPE" != "nfs3" -a "$FSTYPE" != "nfs4" -a "$FSTYPE" != "tmpfs" -a "$FSTYPE" != "cifs" ]; then
+	if ! [[ "$FSTYPE" =~ nfs|tmpfs|cifs ]]; then
 		# check TEST_DEV
-		if [ -z "$TEST_DEV" ] || ! blkid $TEST_DEV; then
+		if [ -z "$TEST_DEV" ] || ! [ -b $TEST_DEV ]; then
 			echoo " * TEST_DEV $TEST_DEV looks invalid"
 			echo " * TEST_DEV $TEST_DEV looks invalid" > /dev/kmsg
 			rstrnt-report-result "xfstests - $FSTYPE" SKIP
@@ -310,7 +310,7 @@ function setup_full
 	sleep 10
 	sync
 	# Check Network filesystems availability
-	check_config
+	[[ $FSTYPE =~ nfs|cifs ]] && check_config
 	# Write the new xfstests config file
 	setup_config
 	sleep 10

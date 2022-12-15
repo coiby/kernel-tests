@@ -1,0 +1,16 @@
+summary: lm_sensors smoke test
+description: |
+  This is just a basic lm_sensors smoke test which checks whether
+  some sensors are detected and their values reported.
+
+  It backs up lm_sensors config files and restores them when it's
+contact: Laura Trivelloni <ltrivell@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - lm_sensors
+adjust:
+  - enable: false
+    when: arch == aarch64
+duration: 5m
+extra-task: /kernel/lm_sensors/Sanity/smoke

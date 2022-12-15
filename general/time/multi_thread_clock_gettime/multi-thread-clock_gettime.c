@@ -7,6 +7,7 @@
 #include <sys/timex.h>
 #include <sys/unistd.h>
 #include <sched.h>
+#include <stdlib.h>
 #include <sys/types.h>
 
 struct timespec t1, t2;

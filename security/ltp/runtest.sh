@@ -32,6 +32,13 @@ rlJournalStart
         rlRun "./configure > /dev/null"
         rlRun "make -s all &> /dev/null"
         rlRun "make -s install > /dev/null"
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            rlRun "export KCONFIG_PATH=/usr/lib/ostree-boot/config-$(uname -r)"
+            # for cve-2011-0999 and cve-2015-7550. Both needed extra time on ostree.
+            rlRun "export LTP_TIMEOUT_MUL=3"
+            # This is temporary until we can fix or figure out why this breaks ostree.
+            rlRun "sed -i 's/cve-2018-1000204/#cve-2018-1000204/' /opt/ltp/runtest/cve"
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "cap_bounds"

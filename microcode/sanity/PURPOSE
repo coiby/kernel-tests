@@ -1,0 +1,14 @@
+PURPOSE of /kernel/microcode/sanity
+Description: Microcode Sanity Check
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Description:
+The purpose of this script is not to verify the update worked, but to
+verify no regressions are found during the update, such as failures in
+the logs, system failing to boot, reinstalling the pkgs, microcode
+service failures, etc. Verifying the microcode was updated on the system
+will continue to be done manually with each new release as it is difficult
+to automate which system requires the update.  RHEL7, the AMD microcode
+has been moved to the linux-firmware package. This script will be wrapped
+around the /distribution/utils/power-cycle task and kick off with every
+new brew build.
