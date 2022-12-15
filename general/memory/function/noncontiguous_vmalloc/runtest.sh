@@ -144,7 +144,7 @@ function vmalloc_test_setup()
 {
     # check if nvr in 4.4.0-5.3.0
     if stat /run/ostree-booted > /dev/null 2>&1; then
-        rlRun "rpm-ostree -A --idempotent --allow-inactive install rpmdevtools"
+        rlRun "rpm-ostree -y -A --idempotent --allow-inactive install rpmdevtools"
     else
         yum install -y rpmdevtools
     fi
@@ -170,13 +170,16 @@ function vmalloc_test_setup()
     fi
 
     # install kernel-devel pkg
-    #yum install -y kernel-general-include
-    #rlRun "yum install -y kernel-devel-$(uname -r) || ../../../include/scripts/wget-kernel.sh --running --devel -i"
-    if ! rpm -q --quiet ${kname}-devel-$(uname -r); then
-        if stat /run/ostree-booted > /dev/null 2>&1; then
-            rlRun "rpm-ostree -A --idempotent --allow-inactive install ${kname}-devel-${kversion}-${krelease}.${karch}"
-        else
-            rlRpmInstall ${kname}-devel ${kversion} ${krelease} ${karch}
+    if ! cki_is_kernel_automotive; then
+        yum install -y kernel-general-include
+        rlRun "yum install -y kernel-devel-$(uname -r) || ../../../include/scripts/wget-kernel.sh --running --devel -i"
+    else
+        if ! rpm -q --quiet ${kname}-devel-$(uname -r | sed -e 's/+debug//'); then
+            if stat /run/ostree-booted > /dev/null 2>&1; then
+                rlRun "rpm-ostree -y -A --idempotent --allow-inactive install ${kname}-devel-${kversion}-${krelease}.${karch}"
+            else
+                rlRpmInstall ${kname}-devel ${kversion} ${krelease} ${karch}
+            fi
         fi
     fi
 
