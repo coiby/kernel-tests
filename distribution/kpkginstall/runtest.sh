@@ -95,6 +95,7 @@ function get_kpkg_ver()
     else
       REPO_NAME='kernel-cki'
     fi
+    cki_print_info "Repo Name set REPO_NAME=$REPO_NAME"
 
     # Grab the kernel version from the provided repo directly
     KVER=$(
@@ -260,7 +261,7 @@ function copr_prepare()
 
 function download_install_package()
 {
-  if [[ -z $RPM_OSTREE ]]; then
+  if ! cki_is_kernel_automotive; then
     # If download of a package fails, report warn/abort -> infrastructure issue
     if $YUM install --downloadonly -y $1 > /dev/null || yumdownloader -y $1 > /dev/null; then
       cki_print_success "Downloaded $1 successfully"
@@ -276,16 +277,31 @@ function download_install_package()
       cki_abort_recipe "Failed to install $1!" FAIL
     fi
   else
+    # download
     if $YUM download --resolve $1 > /dev/null; then
     cki_print_success "Downloaded $1 successfully"
     else
       cki_abort_recipe "Failed to download ${1}!" WARN
     fi
-    cki_print_info "$1 will be installed using rpm-ostree override replace"
-    if rpm-ostree override replace ./kernel*.rpm > /dev/null; then
-      cki_print_success "Installed $1 successfully"
+
+    # install
+    cki_print_info "$1 will be installed using rpm-ostree override"
+    if ! cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"; then
+      if rpm-ostree override replace ./kernel*.rpm > /dev/null; then
+        cki_print_success "Installed $1 successfully"
+      else
+        cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
+      fi
     else
-      cki_abort_recipe "RPM-OSTRE failed to install $1!" FAIL
+      # debug kernel automotive
+      if rpm-ostree override remove kernel-automotive kernel-automotive-core kernel-automotive-modules\
+      --install $(pwd)/kernel-automotive-debug-${KVER}.rpm\
+      --install $(pwd)/kernel-automotive-debug-modules-${KVER}.rpm\
+      --install $(pwd)/kernel-automotive-debug-core-${KVER}.rpm > /dev/null; then
+        cki_print_success "Installed $1 successfully"
+      else
+        cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
+      fi
     fi
   fi
 }
@@ -302,7 +318,7 @@ function rpm_install()
 
   # Ensure that the debug kernel is selected as the default kernel in
   # /boot/grub2/grubenv.
-  if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"; then
+  if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}"&& [[ -z $RPM_OSTREE ]]; then
     echo "Adjusting settings in /etc/sysconfig/kernel to set debug as default"
     echo "UPDATEDEFAULT=yes" > /etc/sysconfig/kernel
     echo "DEFAULTKERNEL=kernel-debug" >> /etc/sysconfig/kernel
@@ -313,7 +329,7 @@ function rpm_install()
   # download & install kernel, or report result
   download_install_package "${PACKAGE_NAME}-$KVER" "kernel"
 
-  if [[ -z $RPM_OSTREE ]];then
+  if ! cki_is_kernel_automotive ;then
     if $YUM install -y "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
       cki_print_success "Installed ${PACKAGE_NAME}-devel-${KVER} successfully"
     else
@@ -374,7 +390,7 @@ function rpm_install()
 
 function ostree_extra_package_install()
 {
-  PKG_CMD="${RPM_OSTREE} -A install --allow-inactive --idempotent "
+  PKG_CMD="${RPM_OSTREE} -A install --allow-inactive --idempotent -y "
   if $PKG_CMD "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
     cki_print_success "Installed ${PACKAGE_NAME}-devel-${KVER} successfully"
   else
@@ -412,7 +428,7 @@ function ostree_extra_package_install()
     FIRMWARE_PKG=linux-firmware
   fi
   cki_print_info "Installing kernel firmware package"
-  $RPM_OSTREE install -A $FIRMWARE_PKG > /dev/null
+  $RPM_OSTREE install -A -y $FIRMWARE_PKG > /dev/null
   cki_print_success "Kernel firmware package installed"
 
   return 0
