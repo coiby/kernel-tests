@@ -50,6 +50,7 @@
 /networking/wireless/tests/bug/bz1044005/wireless_connection_to_unencrypted_AP/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/cleanup/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WEP_LEAP_AP/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WEP_key_AP/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell @jbastianrh
