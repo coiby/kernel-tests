@@ -518,6 +518,16 @@ rlJournalStart
                     if cki_kver_lt "4.18.0-432"; then
                         sed -i '/^video.ko/d;' ${OS}/${Release}/$Release-modules-aarch64.lst
                     fi
+                    if cki_kver_lt "4.18.0-439"; then
+                        sed -i '/^amd_hsmp.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-442"; then
+                        sed -i '/drm_display_helper.ko/d;' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/drm_buddy.ko/d;' ${OS}/${Release}/$Release-modules-{aarch64.ppc64le}.lst
+                    fi
+                    if cki_kver_lt "4.18.0-444"; then
+                        sed -i '/amd_pstate.ko/d;/snd-hda-cs-dsp-ctls.ko/d;/snd-soc-hda-codec.ko/d;/snd-sof-pci-intel-mtl.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then
@@ -562,6 +572,37 @@ rlJournalStart
                     fi
                     if cki_kver_lt "5.14.0-181"; then
                         sed -i '/i2c-imx-lpi2c.ko/d;/i2c-virtio.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-183"; then
+                        sed -i '/efi_secret.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-186"; then
+                        sed -i '/rtc-rv8803.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/^video.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-191"; then
+                        sed -i '/zsmalloc.ko/d' ${OS}/${Release}/$Release-modules-s390x.lst
+                    fi
+                    if cki_kver_lt "5.14.0-198"; then
+                        sed -i '/pseries-wdt.ko/d' ${OS}/${Release}/$Release-modules-ppc64le.lst
+                    fi
+                    if cki_kver_lt "5.14.0-202"; then
+                        sed -i '/nvsw-sn2201.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-204"; then
+                        sed -i '/cxl_mem.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-206"; then
+                        sed -i '/drm_display_helper.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/mei-gsc.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                        sed -i '/drm_buddy.ko/d' ${OS}/${Release}/$Release-modules-{aarch64,ppc64le}.lst
+                        sed -i '/drm_dp_helper.ko/d' ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-207"; then
+                        sed -i '/amd_pstate.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-209"; then
+                        sed -i '/snd-hda-cs-dsp-ctls.ko/d;/snd-soc-hda-codec.ko/d;/snd-sof-pci-intel-mtl.ko/d;/soc-utils-test.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
                     fi
                     ;;
             esac
