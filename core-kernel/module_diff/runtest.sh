@@ -604,6 +604,12 @@ rlJournalStart
                     if cki_kver_lt "5.14.0-209"; then
                         sed -i '/snd-hda-cs-dsp-ctls.ko/d;/snd-soc-hda-codec.ko/d;/snd-sof-pci-intel-mtl.ko/d;/soc-utils-test.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
                     fi
+                    if cki_kver_lt "5.14.0-213"; then
+                        sed -i '/ifcvf.ko/d;/iova.ko/d;/mlx5_vdpa.ko/d;/vdpa.ko/d;
+                                /vdpa_sim_blk.ko/d;/vdpa_sim.ko/d;/vdpa_sim_net.ko/d;
+                                /vhost_vdpa.ko/d;/virtio_pci_modern_dev.ko/d;/virtio_vdpa.ko/d;
+                                /vp_vdpa.ko/d;/vringh.ko/d' ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
+                    fi
                     ;;
             esac
         elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
