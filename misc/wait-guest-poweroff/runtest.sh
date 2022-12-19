@@ -29,6 +29,8 @@
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+WAIT_STATE=${WAIT_STATE:-"shut off"}
+
 # - use remote URI if running on remote node else just run locally as usual.
 if [ ! -z $RECIPE_ROLE_NODE ]; then
 	if [ $RECIPE_ROLE_NODE != $HOSTNAME ];then
@@ -50,9 +52,9 @@ do
 
 	while true
 	do
-		if ! virsh domstate $guest_name | head -n1 | grep -q 'shut off'
+		if ! virsh domstate $guest_name | head -n1 | grep -q "$WAIT_STATE"
 		then
-			echo "$guest_name still up, retrying in $poll_seconds seconds."
+			echo "$guest_name still not "$WAIT_STATE", retrying in $poll_seconds seconds."
 			sleep $poll_seconds
 			continue
 		fi
