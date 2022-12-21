@@ -1,0 +1,18 @@
+summary: KS-TC:lvm/device-mapper-persistent-data
+description: Run DMPD thin provisioning tests from https://gitlab.com/rh-kernel-stqe/python-stqe
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - stratis
+path: /storage/lvm/device-mapper-persistent-data
+test: stqe-test run --fmf --path lvm/device_mapper_persistent_data/thin
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/lvm/thinp/stqe
+extra-task: /storage/lvm/thinp/stqe
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: 60895E1B-F243-42B3-A494-05C92ACD482E

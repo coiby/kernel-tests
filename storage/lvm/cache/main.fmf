@@ -1,0 +1,17 @@
+summary: KS-TC:lvm/cache
+description: Run cache basic test from https://gitlab.com/rh-kernel-stqe/python-stqe
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - stratis
+path: /storage/lvm/cache
+test: stqe-test run -t lvm/cache/cache_basic.py
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/lvm/thinp/stqe
+extra-task: /storage/lvm/thinp/stqe
+adjust:
+    enabled: false
+    when: distro < rhel-7
