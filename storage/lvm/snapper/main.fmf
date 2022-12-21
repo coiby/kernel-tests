@@ -2,7 +2,7 @@ summary: KS-TC:lvm/snapper
 description: Run snapper tests from https://gitlab.com/rh-kernel-stqe/python-stqe
 contact: Filip Suba <fsuba@redhat.com>
 component:
-  - stratis
+  - snapper
 path: /storage/lvm/snapper
 test: stqe-test run -t lvm/snapper/snapper_basic.py
 framework: shell
@@ -10,8 +10,8 @@ duration: 3h
 tag:
   - regression
 tier: 1
-extra-summary: /storage/lvm/thinp/stqe
-extra-task: /storage/lvm/thinp/stqe
+extra-summary: /storage/lvm/snapper
+extra-task: /storage/lvm/snapper
 adjust:
     enabled: false
     when: distro > rhel-7

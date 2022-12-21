@@ -2,7 +2,7 @@ summary: KS-TC:lvm/device-mapper-persistent-data
 description: Run DMPD cache tests from https://gitlab.com/rh-kernel-stqe/python-stqe
 contact: Filip Suba <fsuba@redhat.com>
 component:
-  - stratis
+  - device-mapper-persistent-data
 path: /storage/lvm/device-mapper-persistent-data
 test: stqe-test run --fmf --path lvm/device_mapper_persistent_data/cache
 framework: shell
@@ -10,8 +10,8 @@ duration: 3h
 tag:
   - regression
 tier: 1
-extra-summary: /storage/lvm/thinp/stqe
-extra-task: /storage/lvm/thinp/stqe
+extra-summary: /storage/lvm/device-mapper-persistent-data/cache
+extra-task: /storage/lvm/device-mapper-persistent-data/cache
 adjust:
     enabled: false
     when: distro < rhel-7
