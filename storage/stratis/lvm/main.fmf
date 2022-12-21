@@ -1,0 +1,18 @@
+summary: KS-TC:stratis/lvm
+description: Run set of stratis test cases from https://gitlab.com/rh-kernel-stqe/python-stqe using logical volumes
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - stratis
+path: /storage/stratis/lvm
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/stratis/lvm
+extra-task: /storage/stratis/lvm
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: 12020FBA-2939-4521-BF1D-E88428904B30
