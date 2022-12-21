@@ -1,0 +1,18 @@
+summary: KS-TC:vdo/multipath
+description: Run set of vdo tests from https://gitlab.com/rh-kernel-stqe/python-stqe using available disks
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - vdo
+path: /storage/vdo/multipath
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/vdo/multipath
+extra-task: /storage/vdo/multipath
+adjust:
+    enabled: false
+    when: distro > rhel-8
+id: 413C9AB7-D0A7-49D8-85E8-8FC6E2856C25

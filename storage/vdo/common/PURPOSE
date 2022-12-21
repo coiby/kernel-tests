@@ -1,0 +1,36 @@
+#===========================================================================
+#
+# PURPOSE file for:
+#   /kernel/storage/vdo/common
+#
+# Description:
+#   Test VDO with parameters
+#
+# Bugs related:
+#
+# Author(s):
+#   Filip Suba
+#   <fsuba@redhat.com>
+#
+#===========================================================================
+# Note:
+# As with all VDO tests, at the end of the test it will check
+# for errors on the logs.
+# This check is implemented in python-stqe/host/tc
+#
+# To avoid VDO tests reporting error that were caused before the test
+# started it is recommended to run /kernel/storage/misc/log_checker
+# just before running the test
+#===========================================================================
+# This task requires parameters:
+#    --setup {manual|crypt|iscsi|iscsi_big|fcoe|multipath|raid/0|raid/5|raid/6}
+#
+# This task takes optional parameters:
+#    --filter=$FMF_FILTER (see pydoc fmf.filter for more information on usage)
+#        examples: --filter='tier:1|tier:2'
+#                  --filter='compose:RHEL-$OS'
+#    $COMPONENT  {vdo|kmod-kvdo} (not needed in default, using both)
+#  
+#===========================================================================
+# EndFile
+
