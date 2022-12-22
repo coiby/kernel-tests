@@ -1,0 +1,130 @@
+From 9e2dc181258ea7b3814e2e2f77f2f67f3e788072 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Tue, 4 Oct 2022 09:59:52 +0200
+Subject: [PATCH] lib: introduce safe_write() retry
+
+Turn safe_write() len_strict parameter into 3-way switch, introducing
+one additional mode of operation "retry". On short writes, this
+resumes write() with remainder of the buffer.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Signed-off-by: bgrech <bgrech@redhat.com>
+---
+ include/safe_macros_fn.h    | 16 ++++++++++++--
+ lib/safe_macros.c           | 42 ++++++++++++++++++++++++++++---------
+ lib/tests/tst_safe_macros.c |  6 +++---
+ 3 files changed, 49 insertions(+), 15 deletions(-)
+
+diff --git a/include/safe_macros_fn.h b/include/safe_macros_fn.h
+index 3df952811..114d8fd43 100644
+--- a/include/safe_macros_fn.h
++++ b/include/safe_macros_fn.h
+@@ -24,6 +24,18 @@
+ #include <unistd.h>
+ #include <dirent.h>
+ 
++/* supported values for safe_write() len_strict parameter */
++enum safe_write_opts {
++	/* no length strictness, short writes are ok */
++	SAFE_WRITE_ANY = 0,
++
++	/* strict length, short writes raise TBROK */
++	SAFE_WRITE_ALL = 1,
++
++	/* retry/resume after short write */
++	SAFE_WRITE_RETRY = 2,
++};
++
+ char* safe_basename(const char *file, const int lineno,
+                     void (*cleanup_fn)(void), char *path);
+ 
+@@ -111,8 +123,8 @@ int safe_symlink(const char *file, const int lineno,
+                  const char *newpath);
+ 
+ ssize_t safe_write(const char *file, const int lineno,
+-                   void (cleanup_fn)(void), char len_strict, int fildes,
+-                   const void *buf, size_t nbyte);
++		   void (cleanup_fn)(void), enum safe_write_opts len_strict,
++		   int fildes, const void *buf, size_t nbyte);
+ 
+ long safe_strtol(const char *file, const int lineno,
+                  void (cleanup_fn)(void), char *str, long min, long max);
+diff --git a/lib/safe_macros.c b/lib/safe_macros.c
+index 16e582bc9..d8816631f 100644
+--- a/lib/safe_macros.c
++++ b/lib/safe_macros.c
+@@ -524,20 +524,42 @@ int safe_symlink(const char *file, const int lineno,
+ }
+ 
+ ssize_t safe_write(const char *file, const int lineno, void (cleanup_fn) (void),
+-                   char len_strict, int fildes, const void *buf, size_t nbyte)
++		   enum safe_write_opts len_strict, int fildes, const void *buf,
++		   size_t nbyte)
+ {
+ 	ssize_t rval;
++	const void *wbuf = buf;
++	size_t len = nbyte;
++	int iter = 0;
++
++	do {
++		iter++;
++		rval = write(fildes, wbuf, len);
++		if (rval == -1) {
++			if (len_strict == SAFE_WRITE_RETRY)
++				tst_resm_(file, lineno, TINFO,
++					"write() wrote %zu bytes in %d calls",
++					nbyte-len, iter);
++			tst_brkm_(file, lineno, TBROK | TERRNO,
++				cleanup_fn, "write(%d,%p,%zu) failed",
++				fildes, buf, nbyte);
++		}
+ 
+-	rval = write(fildes, buf, nbyte);
++		if (len_strict == SAFE_WRITE_ANY)
++			return rval;
+ 
+-	if (rval == -1 || (len_strict && (size_t)rval != nbyte)) {
+-		tst_brkm_(file, lineno, TBROK | TERRNO, cleanup_fn,
+-			"write(%d,%p,%zu) failed", fildes, buf, nbyte);
+-	} else if (rval < 0) {
+-		tst_brkm_(file, lineno, TBROK | TERRNO, cleanup_fn,
+-			"Invalid write(%d,%p,%zu) return value %zd", fildes,
+-			buf, nbyte, rval);
+-	}
++		if (len_strict == SAFE_WRITE_ALL) {
++			if ((size_t)rval != nbyte)
++				tst_brkm_(file, lineno, TBROK | TERRNO,
++					cleanup_fn, "short write(%d,%p,%zu) "
++					"return value %zd",
++					fildes, buf, nbyte, rval);
++			return rval;
++		}
++
++		wbuf += rval;
++		len -= rval;
++	} while (len > 0);
+ 
+ 	return rval;
+ }
+diff --git a/lib/tests/tst_safe_macros.c b/lib/tests/tst_safe_macros.c
+index b5809f40d..5c427ee16 100644
+--- a/lib/tests/tst_safe_macros.c
++++ b/lib/tests/tst_safe_macros.c
+@@ -31,9 +31,9 @@ int main(int argc LTP_ATTRIBUTE_UNUSED, char **argv)
+ 	printf("buf: %s\n", buf);
+ 	SAFE_READ(cleanup, 1, fd, buf, 9);
+ 	printf("buf: %s\n", buf);
+-	SAFE_WRITE(cleanup, 0, -1, buf, 9);
+-	SAFE_WRITE(NULL, 0, fd, buf, 9);
+-	SAFE_WRITE(NULL, 1, fd, buf, 9);
++	SAFE_WRITE(cleanup, SAFE_WRITE_ANY, -1, buf, 9);
++	SAFE_WRITE(NULL, SAFE_WRITE_ANY, fd, buf, 9);
++	SAFE_WRITE(NULL, SAFE_WRITE_ALL, fd, buf, 9);
+ 	SAFE_PIPE(NULL, fds);
+ 
+ 	return 0;
+-- 
+2.38.1
+

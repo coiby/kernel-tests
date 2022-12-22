@@ -116,6 +116,11 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cpuid-ptrace07-Only-compile-on-x86_64.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-kconfig-adding-new-config-path.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-keyctl02-make-use-of-.max_runtime.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-introduce-safe_write-retry.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-update-all-call-sites-of-SAFE_WRITE.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-statx01-Fix-reading-64-bit-mnt_id-value-fro.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-statx01-Add-exit-condition-when-parsing-pro.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-statx01-Fix-typo.patch
     fi
 
     if [ "$TESTVERSION" == "20220527" ]; then

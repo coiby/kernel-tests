@@ -1,0 +1,71 @@
+From 1b66eba2eb8049172b4d8d345524b55497a26f56 Mon Sep 17 00:00:00 2001
+From: Yang Xu <xuyang2018.jy@fujitsu.com>
+Date: Thu, 15 Dec 2022 14:19:29 +0800
+Subject: [PATCH] syscalls/statx01: Add exit condition when parsing
+ /proc/self/mountinfo
+
+When using user filesystem such as overlayfs, the current parsing way can't
+work well.
+
+63 66 8:3 / /sysroot rw,relatime - ext4 /dev/sda3 rw,seclabel
+43 66 8:3 /ostree/deploy/rhivos/var /var rw,relatime shared:3 - ext4 /dev/sda3 rw,seclabel
+
+So add the exit condition for statx.mnt_id check so it can skip the
+underflying filesystem and parse the correct user fileystem's mnt_id.
+
+Fixes: #1001
+Reviewed-by: Richard Palethorpe <rpalethorpe@suse.com>
+Signed-off-by: Yang Xu <xuyang2018.jy@fujitsu.com>
+Signed-off-by: bgrech <bgrech@redhat.com>
+---
+ testcases/kernel/syscalls/statx/statx01.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/statx/statx01.c b/testcases/kernel/syscalls/statx/statx01.c
+index 60b50958b..08207f950 100644
+--- a/testcases/kernel/syscalls/statx/statx01.c
++++ b/testcases/kernel/syscalls/statx/statx01.c
+@@ -53,7 +53,7 @@ static void test_mnt_id(struct statx *buf)
+ {
+ 	FILE *file;
+ 	char line[PATH_MAX];
+-	int pid;
++	int pid, falg = 0;
+ 	unsigned int line_mjr, line_mnr;
+ 	uint64_t mnt_id;
+ 
+@@ -68,20 +68,26 @@ static void test_mnt_id(struct statx *buf)
+ 		if (sscanf(line, "%"SCNu64" %*d %d:%d", &mnt_id, &line_mjr, &line_mnr) != 3)
+ 			continue;
+ 
+-		if (line_mjr == buf->stx_dev_major && line_mnr == buf->stx_dev_minor)
+-			break;
++		if (line_mjr == buf->stx_dev_major && line_mnr == buf->stx_dev_minor) {
++			if (buf->stx_mnt_id == mnt_id) {
++				flag = 1;
++				break;
++			}
++			tst_res(TINFO, "%s doesn't contain %"PRIu64" %d:%d",
++				line, (uint64_t)buf->stx_mnt_id, buf->stx_dev_major, buf->stx_dev_minor);
++		}
+ 	}
+ 
+ 	SAFE_FCLOSE(file);
+ 
+-	if (buf->stx_mnt_id == mnt_id)
++	if (flag)
+ 		tst_res(TPASS,
+ 			"statx.stx_mnt_id equals to mount_id(%"PRIu64") in /proc/self/mountinfo",
+ 			mnt_id);
+ 	else
+ 		tst_res(TFAIL,
+-			"statx.stx_mnt_id(%"PRIu64") is different from mount_id(%"PRIu64") in /proc/self/mountinfo",
+-			(uint64_t)buf->stx_mnt_id, mnt_id);
++			"statx.stx_mnt_id(%"PRIu64") doesn't exist in /proc/self/mountinfo",
++			(uint64_t)buf->stx_mnt_id);
+ 
+ 	pid = getpid();
+ 	snprintf(line, PATH_MAX, "/proc/%d/fdinfo/%d", pid, file_fd);
+-- 
+2.38.1
+
