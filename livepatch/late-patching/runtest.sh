@@ -37,8 +37,6 @@ TARGET_MODULE="test_module_late_patching"
 DMESG_SAVED=$(mktemp /tmp/dmesg-XXXXXX)
 dmesg > $DMESG_SAVED
 
-[ "$(uname -m)" = "ppc64le" ] && arch="powerpc" || arch="$(uname -m)"
-
 yum install -y gcc kernel-devel elfutils-libelf-devel
 
 test_fail()
@@ -60,7 +58,7 @@ test_pass()
 
 msg="Build $TARGET_MODULE and $KLP_MODULE modules"
 pushd source
-	make ARCH=$arch || test_log "$msg"
+	make || test_log "$msg"
 popd
 
 echo "Trigger late module patching" | tee -a $OUTPUTFILE
