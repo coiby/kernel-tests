@@ -1,0 +1,18 @@
+summary: KS-TC:vdo/iscsi
+description: Run set of vdo tests from https://gitlab.com/rh-kernel-stqe/python-stqe using available disks
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - stratis
+path: /storage/vdo/iscsi
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/vdo/iscsi
+extra-task: /storage/vdo/iscsi
+adjust:
+    enabled: false
+    when: distro > rhel-8
+id: C8A5933F-DDBA-45B3-B04D-C64449EF7665
