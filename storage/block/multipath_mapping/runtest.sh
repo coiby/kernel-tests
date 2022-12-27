@@ -96,6 +96,7 @@ function cleanup()
     rlRun "mpathconf --disable"
     rlRun "rm -rf /etc/multipath.conf"
     [ -f /tmp/multipath.conf ] && rlRun "cp /tmp/multipath.conf /etc/"
+    sleep 5
     rlRun "rmmod scsi_debug -f"
 }
 
