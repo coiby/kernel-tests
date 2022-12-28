@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=device-mapper-multipath;device-mapper*
+dependencies=device-mapper-multipath;sg3_utils
 repoRequires=cki_lib
