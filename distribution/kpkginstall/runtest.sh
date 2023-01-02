@@ -616,16 +616,34 @@ EOF
         if [[ -n $RPM_OSTREE ]]; then
             cki_print_info "skipping workaround for cross compiling non x86_64 kernels as it is running on rpm-ostree environment"
         else
+          PREFIX="/usr/src/kernels/$ckver"
+
+          # detect the right compiler to use
+          if grep -qFx CONFIG_CC_IS_GCC=y "$PREFIX/.config"; then
+            KCC=gcc
+          elif grep -qFx CONFIG_CC_IS_CLANG=y "$PREFIX/.config"; then
+            KCC=clang
+          else
+            cki_abort_recipe "Kernel built with an unknown compiler" WARN
+          fi
+
+          # detect the right linker to use
+          if grep -qFx CONFIG_LD_IS_BFD=y "$PREFIX/.config"; then
+            KLD=ld.bfd
+          elif grep -qFx CONFIG_LD_IS_LLD=y "$PREFIX/.config"; then
+            KLD=ld.lld
+          else
+            cki_abort_recipe "Kernel built with an unknown linker" WARN
+          fi
+
           # Backup and restore the .config files otherwise regenerated .config
           # files will be incompatible with the running kernel
-          PREFIX="/usr/src/kernels/$ckver"
+          # Backup the files individually otherwise missing files will abort rstrnt-backup
           FILES="$PREFIX/.config
             $PREFIX/include/config/auto.conf
             $PREFIX/include/config/auto.conf.cmd
             $PREFIX/include/config/cc/can/link/static.h
             $PREFIX/include/generated/autoconf.h"
-
-          # Backup the files individually otherwise missing files will abort rstrnt-backup
           for file in $FILES; do
             rstrnt-backup "$file"
           done
@@ -633,12 +651,12 @@ EOF
           error=0
           # Temporarily unset ARCH var defined in libcki to avoid Makefile conflicts
           # otherwise you will see an error about a non-existing arch dir
-          env -u ARCH make -C "/usr/src/kernels/$ckver" olddefconfig || error=1
+          env -u ARCH make -C "$PREFIX" CC="$KCC" LD="$KLD" olddefconfig || error=1
           if [ $error -eq 0 ]; then
-              env -u ARCH make -C "/usr/src/kernels/$ckver" modules_prepare || error=1
+              env -u ARCH make -C "$PREFIX" CC="$KCC" LD="$KLD" modules_prepare || error=1
           fi
           if [ $error -eq 0 ]; then
-            env -u ARCH make -C "/usr/src/kernels/$ckver" scripts || error=1
+            env -u ARCH make -C "$PREFIX" CC="$KCC" LD="$KLD" scripts || error=1
           fi
 
           rstrnt-restore
