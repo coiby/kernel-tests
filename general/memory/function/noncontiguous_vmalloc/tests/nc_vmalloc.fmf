@@ -1,0 +1,24 @@
+summary: Regression test
+description: |
+    Directly use ``vmalloc()`` from kernel module. Allocate at __init and
+    free at __exit.
+
+
+    Parameter(of the module):
+    vm_buf_size:
+            The number of pages to be allocated by vmalloc(), can be used
+            in runtest.sh like ``insmod vmalloc.ko vm_buf_size=256``. On a
+            system of 4kB pagesize, this will allocate 1mB non-contiguous
+            memory.
+contact: Shizhao Chen <shichen@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+path: /general/memory/function/noncontiguous_vmalloc
+require:
+  - make
+  - yum-utils
+recommend:
+  - '@development'
+duration: 1h
+extra-summary: kernel vmalloc sanity test
+extra-task: kernel vmalloc sanity test
