@@ -611,31 +611,36 @@ EOF
       echo "${ckver}" > /var/opt/cki/kernel_version
 
       # Workaround for cross compiling non x86_64 kernels
-      if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]] && [[ -z $RPM_OSTREE ]]; then
-        # Backup and restore the .config files otherwise regenerated .config
-        # files will be incompatible with the running kernel
-        PREFIX="/usr/src/kernels/$ckver"
-        FILES="$PREFIX/.config
-          $PREFIX/include/config/auto.conf
-          $PREFIX/include/config/auto.conf.cmd
-          $PREFIX/include/config/cc/can/link/static.h
-          $PREFIX/include/generated/autoconf.h"
+      if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]]; then
+        cki_print_info "Workaround for cross compiling non x86_64 kernels"
+        if [[ -n $RPM_OSTREE ]]; then
+            cki_print_info "skipping workaround for cross compiling non x86_64 kernels as it is running on rpm-ostree environment"
+        else
+          # Backup and restore the .config files otherwise regenerated .config
+          # files will be incompatible with the running kernel
+          PREFIX="/usr/src/kernels/$ckver"
+          FILES="$PREFIX/.config
+            $PREFIX/include/config/auto.conf
+            $PREFIX/include/config/auto.conf.cmd
+            $PREFIX/include/config/cc/can/link/static.h
+            $PREFIX/include/generated/autoconf.h"
 
-        # Backup the files individually otherwise missing files will abort rstrnt-backup
-        for file in $FILES; do
-          rstrnt-backup "$file"
-        done
+          # Backup the files individually otherwise missing files will abort rstrnt-backup
+          for file in $FILES; do
+            rstrnt-backup "$file"
+          done
 
-        # Temporarily unset ARCH var defined in libcki to avoid Makefile conflicts
-        # otherwise you will see an error about a non-existing arch dir
-        env -u ARCH make -C "/usr/src/kernels/$ckver" olddefconfig || \
-          cki_abort_recipe "Failed applying cross compiling workaround" WARN
-        env -u ARCH make -C "/usr/src/kernels/$ckver" modules_prepare || \
-          cki_abort_recipe "Failed applying cross compiling workaround" WARN
-        env -u ARCH make -C "/usr/src/kernels/$ckver" scripts || \
-          cki_abort_recipe "Failed applying cross compiling workaround" WARN
+          # Temporarily unset ARCH var defined in libcki to avoid Makefile conflicts
+          # otherwise you will see an error about a non-existing arch dir
+          env -u ARCH make -C "/usr/src/kernels/$ckver" olddefconfig || \
+            cki_abort_recipe "Failed applying cross compiling workaround" WARN
+          env -u ARCH make -C "/usr/src/kernels/$ckver" modules_prepare || \
+            cki_abort_recipe "Failed applying cross compiling workaround" WARN
+          env -u ARCH make -C "/usr/src/kernels/$ckver" scripts || \
+            cki_abort_recipe "Failed applying cross compiling workaround" WARN
 
-        rstrnt-restore
+          rstrnt-restore
+        fi
       fi
 
       # Save configuration used to build the kernel
