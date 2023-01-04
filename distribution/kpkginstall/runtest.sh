@@ -32,11 +32,11 @@ function parse_kpkg_url_variables()
 
   # Kudos to Dennis for the inspiration here:
   #   https://stackoverflow.com/questions/3919755/how-to-parse-query-string-from-a-bash-cgi-script
-  saveIFS=$IFS                   # Store the current field separator
-  IFS='=&'                       # Set a new field separate for parameter delimiters
+  saveIFS=$IFS                    # Store the current field separator
+  IFS='=&'                        # Set a new field separate for parameter delimiters
   # shellcheck disable=SC2206
-  parm=(${KPKG_PARAMS/&amp;/&})  # Split the variables into their pieces
-  IFS=$saveIFS                   # Restore the original field separator
+  parm=(${KPKG_PARAMS/&amp;/\&}) # Split the variables into their pieces
+  IFS=$saveIFS                    # Restore the original field separator
 
   # Loop over the variables we found and set KPKG_VAR_"KEY" = VALUE. We make
   # all keys uppercase for consistency.
