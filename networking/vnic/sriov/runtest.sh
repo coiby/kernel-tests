@@ -15388,9 +15388,9 @@ setup() {
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
 		rlRun sriov_install
 		rlRun sriov_cleanup
-		if (( "$rhel_version" >= "9" )); then
-			enable_libvirtd_as_default_rhel9
-		fi
+#		if (( "$rhel_version" >= "9" )); then
+#			enable_libvirtd_as_default_rhel9
+#		fi
 	elif [[ $ENABLE_RT_KERNEL == "yes" ]]; then
 		# stage 0 will install rt kernel, stage 2 will configure memory and cpu tuning, stage 3 will check configure and install.
 		rlLog "REBOOTCOUNT is ${REBOOTCOUNT}"
