@@ -29,15 +29,18 @@
 TEST="misc/reboot-test"
 
 if [[ ! -e kernel_before_reboot.txt ]]; then
-    # save the start time of the test so later on can search journalctl for call traces
-    date +"%F %T" > start_time.txt
     echo "Saving kernel info before reboot"
     uname -r > kernel_before_reboot.txt
-    # if /var/log/journal doesn't exist create it to make logs persistent
-    if [ ! -d /var/log/journal ]; then
-        echo "INFO: enabling persistent storage for journalctl"
-        mkdir -p /var/log/journal
-        journalctl --flush
+    if type -p journalctl > /dev/null; then
+        date +"%F %T" > start_time.txt
+        # save the start time of the test so later on can search journalctl for call traces
+        # if /var/log/journal doesn't exist create it to make logs persistent
+        if [ ! -d /var/log/journal ]; then
+            echo "INFO: enabling persistent storage for journalctl"
+            mkdir -p /var/log/journal
+            journalctl --flush
+        fi
+        journalctl -o short-full > journalctl_before_reboot.log
     fi
     echo "Reboot now!"
     rstrnt-reboot
@@ -64,13 +67,14 @@ else
     rstrnt-report-result ${TEST}/kernel-version-check ${check_version_status} 0
 
     if type -p journalctl > /dev/null; then
+        JOURNALCTLLOG=journalctl.log
+        journalctl -o short-full > journalctl_after_reboot.log
         start_time=$(cat start_time.txt)
         # check if there was any call trace during boot or during reboot
-        echo "INFO: checking journalctl since ${start_time}..."
-        journalctl --since "${start_time}" > /tmp/journalctl.log
-        if grep -qi 'Call Trace:' /tmp/journalctl.log; then
-          JOURNALCTLLOG=/tmp/journalctl.log
-          rstrnt-report-log -l ${JOURNALCTLLOG}
+        echo "INFO: journalctl log should have entries since ${start_time}..."
+        diff --changed-group-format='%>' --unchanged-group-format='' journalctl_before_reboot.log journalctl_after_reboot.log > ${JOURNALCTLLOG}
+        rstrnt-report-log -l ${JOURNALCTLLOG}
+        if grep -qi 'Call Trace:' ${JOURNALCTLLOG}; then
           echo "FAIL: Call trace found in journalctl, see journalctl.log"
         else
           call_trace_status="PASS"
