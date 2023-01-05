@@ -67,14 +67,14 @@ else
     rstrnt-report-result ${TEST}/kernel-version-check ${check_version_status} 0
 
     if type -p journalctl > /dev/null; then
+        JOURNALCTLLOG=journalctl.log
         journalctl -o short-full > journalctl_after_reboot.log
         start_time=$(cat start_time.txt)
         # check if there was any call trace during boot or during reboot
         echo "INFO: journalctl log should have entries since ${start_time}..."
-        diff --changed-group-format='%>' --unchanged-group-format='' journalctl_before_reboot.log journalctl_after_reboot.log > journalctl.log
-        if grep -qi 'Call Trace:' journalctl.log; then
-          JOURNALCTLLOG=journalctl.log
-          rstrnt-report-log -l ${JOURNALCTLLOG}
+        diff --changed-group-format='%>' --unchanged-group-format='' journalctl_before_reboot.log journalctl_after_reboot.log > ${JOURNALCTLLOG}
+        rstrnt-report-log -l ${JOURNALCTLLOG}
+        if grep -qi 'Call Trace:' ${JOURNALCTLLOG}; then
           echo "FAIL: Call trace found in journalctl, see journalctl.log"
         else
           call_trace_status="PASS"
