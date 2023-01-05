@@ -44,7 +44,8 @@ source ${CASE_PATH}/env.sh
 # source rt kernel tuning script
 source ${CASE_PATH}/rt-kernel/set_up.sh
 
-. ${CASE_PATH}/../../common/lib/lib_nc_sync.sh || exit 1
+source ${CASE_PATH}/../../common/lib/lib_nc_sync.sh || exit 1
+source ${CASE_PATH}/../../common/lib/lib_swcfg.sh || exit 1
 #. ${CASE_PATH}/../../common/lib/lib_netperf_all.sh || exit 1
 . ./lib_netperf_all.sh || exit 1
 . ${CASE_PATH}/lib_sriov.sh || exit 1
@@ -9533,6 +9534,7 @@ sriov_test_spoofchk()
 
 	return $result
 }
+
 sriov_test_spoofchk_vlan()
 {
 	#Bug 2118135/Bug 2112335
@@ -9543,227 +9545,224 @@ sriov_test_spoofchk_vlan()
 	local vf_1_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
 	local server_mac="00:de:ad:$(printf %02x $ipaddr):01:21"
 	if  i_am_server; then
-	ip addr flush ${nic_test}
-	ip link set ${nic_test} down
-	sleep 1
-	ip link set ${nic_test} address ${server_mac}
-	ip link set ${nic_test} up
-	ip link set ${nic_test} promisc on
-	ip link show ${nic_test}
-	sync_wait client configure_finished
-	sync_set  client configure_finished
-	for spoof_conf in {on,off}
-	do
-		rlLog "=====Check spoofchk ${spoof_conf}====="
-		ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
-		sleep 5
-		[ -f spoof.cap ] && rm -f spoof.cap
-		ip link set ${nic_test} spoofchk ${spoof_conf}
-		sync_wait client capture_unicast_packet
-		[ -f unicast.pcap ] && rm unicast.pcap
-		tcpdump -i ${nic_test} -enn  -w unicast.pcap &
-
-		sync_wait client stop_capture_unicast_packet
-		pkill -9 tcpdump
-		tcpdump -r unicast.pcap -e -nn | grep "vlan 100"
-		[ $? -ne 0 ] &&	ip addr flush ${nic_test}
-		sync_set client unicast_get_return_from_server
-		rlLog "spoofchk ${spoof_conf}: multicast test start"
-		[ -f multicast.pcap ] && rm multicast.pcap
-		ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
-		sync_wait client capture_multicast_packet
-		tcpdump -i ${nic_test} -enn	-w multicast.pcap &
-		sleep 3
-		sync_wait client stop_capture_multicast_packet
-		pkill -9 tcpdump
-		tcpdump -r multicast.pcap -enn | grep "vlan 100"
-		[ $? -ne 0 ] &&	ip addr flush ${nic_test}
-		sync_set client multicast_get_return_from_server
-		rlLog "spoofchk ${spoof_conf}: broadcast test start"
-		[ -f broadcast.pcap ] && rm broadcast.pcap
-		ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
-		sync_wait client capture_broadcast_packet
-		tcpdump -i ${nic_test} -enn	-w broadcast.pcap  &
-		sync_wait client stop_capture_broadcast_packet
-		pkill -9 tcpdump
-		tcpdump -r broadcast.pcap -enn | grep "vlan 100"
-		[ $? -ne 0 ] &&	ip addr flush ${nic_test}
-		sync_set client broadcast_get_return_from_server
-	done
-	sync_set client test_end
-	sync_wait client test_end
-	#clear config
-	ip addr flush ${nic_test}
-	ip link set ${nic_test} promisc off
+		ip addr flush ${nic_test}
+		ip link set ${nic_test} down
+		sleep 1
+		ip link set ${nic_test} address ${server_mac}
+		ip link set ${nic_test} up
+		ip link set ${nic_test} promisc on
+		ip link show ${nic_test}
+		sync_set  client configure_finished
+		for spoof_conf in {on,off}
+		do
+			rlLog "=====Check spoofchk ${spoof_conf}====="
+			ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
+			sleep 5
+			[ -f spoof.cap ] && rm -f spoof.cap
+			sync_wait client spoof_${spoof_conf}_capture_unicast_packet
+			[ -f unicast.pcap ] && rm unicast.pcap
+			tcpdump -i ${nic_test} -enn  -w unicast.pcap &
+			sync_set client spoof_${spoof_conf}_stop_capture_unicast_packet
+			pkill -9 tcpdump
+			rlRun "tcpdump -r unicast.pcap -e -nn | grep 'vlan 100'"
+			[ $? -ne 0 ] &&  ip addr flush ${nic_test}
+			sync_wait client spoof_${spoof_conf}_unicast_get_return_from_server
+			rlLog "spoofchk ${spoof_conf}: multicast test start"
+			[ -f multicast.pcap ] && rm multicast.pcap
+			ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
+			sync_set client spoof_${spoof_conf}_capture_multicast_packet
+			tcpdump -i ${nic_test} -enn  -w multicast.pcap &
+			sync_wait client spoof_${spoof_conf}_stop_capture_multicast_packet
+			pkill -9 tcpdump
+			rlRun "tcpdump -r multicast.pcap -enn | grep 'vlan 100'"
+			[ $? -ne 0 ] &&  ip addr flush ${nic_test}
+			sync_set client spoof_${spoof_conf}_multicast_get_return_from_server
+			rlLog "spoofchk ${spoof_conf}: broadcast test start"
+			[ -f broadcast.pcap ] && rm broadcast.pcap
+			ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
+			sync_wait client spoof_${spoof_conf}_capture_broadcast_packet
+			tcpdump -i ${nic_test} -enn  -w broadcast.pcap  &
+			sync_set client spoof_${spoof_conf}_stop_capture_broadcast_packet
+			pkill -9 tcpdump
+			rlRun "tcpdump -r broadcast.pcap -enn | grep 'vlan 100'"
+			[ $? -ne 0 ] &&  ip addr flush ${nic_test}
+			sync_wait client spoof_${spoof_conf}_broadcast_get_return_from_server
+		done
+		sync_set  client test_end
+		#clear config
+		ip addr flush ${nic_test}
+		ip link set ${nic_test} promisc off
+		set +x
 	else
 	#Configure host mac and ip addr
-	ip link set ${nic_test} promisc on
-	ethtool --set-priv-flags ${nic_test} vf-true-promisc-support on
-	ip addr add 172.30.${ipaddr}.1/24 dev ${nic_test}
-	# create 2 vf interfaces and attach vf to 1 vm
-	sriov_create_vfs ${nic_test} 0 2
-	sriov_attach_vf_to_vm ${nic_test} 0 1 g1 ${vf_0_mac}
-	sriov_attach_vf_to_vm ${nic_test} 0 2 g1 ${vf_1_mac}
-	#install scapy on vm
-	cmd=(
-		{source /mnt/tests/kernel/networking/common/install.sh}
-		{scapy_install}
-	)
-	vmsh cmd_set g1 "${cmd[*]}"
-	#Configure virtual machine
-	cmd=(
-		{set -x}
-		{ip link show}
-		{systemctl stop NetworkManager}
-		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{ip addr flush \${NIC_TEST_0}}
-		{ip addr flush \${NIC_TEST_1}}
-		{ip addr add 172.30.${ipaddr}.3/24 dev \${NIC_TEST_0}}
-		{ip link set \${NIC_TEST_0} up}
-		{ip link set \${NIC_TEST_1} up}
-		{ip link set \${NIC_TEST_1} promisc on}
-		{set +x}
-	)
-	vmsh cmd_set g1 "${cmd[*]}"
-	[ $? -ne 0 ] && result=1 && rlLog "vf ping server/host ==> failed"
-	sync_set server configure_finished
-	sync_wait server configure_finished
-	cmd=(
-		{ping -c 3 172.30.${ipaddr}.1}
-		{ping -c 3 172.30.${ipaddr}.2}
-	)
-	vmsh cmd_set g1 "${cmd[*]}"
-	# Send packet from g1 vf0
-	for spoof_conf in {on,off}
-	do
-		#config vf "spoof on" on host
-		ip link set ${nic_test} vf 0 spoofchk ${spoof_conf}
-		ip link set ${nic_test} vf 1 spoofchk ${spoof_conf}
-		rlLog "spoofchk ${spoof_conf}: unicast test start"
-		unicast_pkt="Ether(src='${vf_0_mac}', dst='${server_mac}')/Dot1Q(vlan=100)"
-		if [ $(GetDistroRelease) = 8 ];then
+		ip link set ${nic_test} promisc on
+		ethtool --set-priv-flags ${nic_test} vf-true-promisc-support on
+		ip addr add 172.30.${ipaddr}.1/24 dev ${nic_test}
+		# create 2 vf interfaces and attach vf to 1 vm
+		sriov_create_vfs ${nic_test} 0 2
+		sriov_attach_vf_to_vm ${nic_test} 0 1 g1 ${vf_0_mac}
+		sriov_attach_vf_to_vm ${nic_test} 0 2 g1 ${vf_1_mac}
+		#install scapy on vm
+		cmd=(
+			{source /mnt/tests/kernel/networking/common/install.sh}
+			{scapy_install}
+		)
+		vmsh cmd_set g1 "${cmd[*]}"
+		#Configure virtual machine
+		cmd=(
+			{set -x}
+			{ip link show}
+			{systemctl stop NetworkManager}
+			{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{ip addr flush \${NIC_TEST_0}}
+			{ip addr flush \${NIC_TEST_1}}
+			{ip addr add 172.30.${ipaddr}.3/24 dev \${NIC_TEST_0}}
+			{ip link set \${NIC_TEST_0} up}
+			{ip link set \${NIC_TEST_1} up}
+			{ip link set \${NIC_TEST_1} promisc on}
+			{set +x}
+		)
+		vmsh cmd_set g1 "${cmd[*]}"
+		[ $? -ne 0 ]  && result=1 && rlFail "vf ping server/host ==> failed"
+		sync_wait server configure_finished
+		cmd=(
+			{ping -c 3 172.30.${ipaddr}.1}
+			{ping -c 3 172.30.${ipaddr}.2}
+		)
+		vmsh cmd_set g1 "${cmd[*]}"
+		# Send packet from g1 vf0
+		for spoof_conf in {on,off}
+		do
+			#config vf "spoof on" on host
+			ip link set ${nic_test} vf 0 spoofchk ${spoof_conf}
+			ip link set ${nic_test} vf 1 spoofchk ${spoof_conf}
+			rlLog "spoofchk ${spoof_conf}: unicast test start"
+			unicast_pkt="Ether(src='${vf_0_mac}', dst='${server_mac}')/Dot1Q(vlan=100)"
+			if [ $(GetDistroRelease) = 8 ];then
+				cmd=(
+					{set -x}
+					{NIC_TEST_0=\$\(ip link show \| grep \'${vf_0_mac}\' -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{timeout 60 tcpdump -i \${NIC_TEST_1} -enn -w unicast.pcap \&}
+					{/usr/libexec/platform-python -c  \"from scapy.all import *\; sendp\(${unicast_pkt},  iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
+					{bash -c \"sleep 60\"}
+					{tcpdump -r unicast.pcap -enn \| grep \"vlan 100\"}
+					{set +x}
+				)
+			else
+				cmd=(
+					{set -x}
+					{NIC_TEST_0=\$\(ip link show \| grep \'${vf_0_mac}\' -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{timeout 60 tcpdump -i \${NIC_TEST_1} -enn -w unicast.pcap \&}
+					{python -c  \"from scapy.all import *\; sendp\(${unicast_pkt},  iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
+					{bash -c \"sleep 60\"}
+					{tcpdump -r unicast.pcap -enn \| grep \"vlan 100\"}
+					{set +x}
+				)
+			fi
+			sync_set server spoof_${spoof_conf}_capture_unicast_packet
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -eq 0 ] && result=1 && rlFail "spoofchk ${spoof_conf} unicast Failed, there should be no packets captured on vf 1"
+			sync_wait server spoof_${spoof_conf}_stop_capture_unicast_packet
+
 			cmd=(
-		{set -x}
-		{NIC_TEST_0=\$\(ip link show \| grep \'${vf_0_mac}\' -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{timeout 20 tcpdump -i \${NIC_TEST_1} -enn -w unicast.pcap \&}
-		{/usr/libexec/platform-python -c  \"from scapy.all import *\; sendp\(${unicast_pkt},  iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
-		{bash -c \"sleep 20\"}
-		{tcpdump -r unicast.pcap -enn \| grep \"vlan 100\"}
-		{set +x}
-		)
-		else
+				{ping -c 3 172.30.${ipaddr}.2}
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ] && result=1 && rlFail "spoofchk ${spoof_conf} unicast Failed, server did not captured unicast packets"
+			sync_set server spoof_${spoof_conf}_unicast_get_return_from_server
+			rlLog "spoofchk ${spoof_conf}: multicast test start"
+			multicast_pkt="Ether(src='${vf_0_mac}', dst='01:00:5e:00:00:01')/Dot1Q(vlan=100)"
+			if [ $(GetDistroRelease) = 8 ];then
+				cmd=(
+					{set -x}
+					{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{timeout 60 tcpdump -i \${NIC_TEST_1} -enn  -w multicast.pcap \&}
+					{/usr/libexec/platform-python -c  \"from scapy.all import *\; sendp\(${multicast_pkt}, iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
+					{bash -c \"sleep 60\"}
+					{tcpdump -r multicast.pcap -enn \| grep \"vlan 100\"}
+					{set +x}
+				)
+			else
+				cmd=(
+					{set -x}
+					{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{timeout 60 tcpdump -i \${NIC_TEST_1} -enn  -w multicast.pcap \&}
+					{python -c  \"from scapy.all import *\; sendp\(${multicast_pkt}, iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
+					{bash -c \"sleep 60\"}
+					{tcpdump -r multicast.pcap -enn \| grep \"vlan 100\"}
+					{set +x}
+				)
+			fi
+			sync_wait server spoof_${spoof_conf}_capture_multicast_packet
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ] && result=1 && rlFail "spoofchk ${spoof_conf} multicast Failed, there should be  packets captured on vf 1"
+			sync_set server  spoof_${spoof_conf}_stop_capture_multicast_packet
+
 			cmd=(
-		{set -x}
-		{NIC_TEST_0=\$\(ip link show \| grep \'${vf_0_mac}\' -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{timeout 20 tcpdump -i \${NIC_TEST_1} -enn -w unicast.pcap \&}
-		{python -c  \"from scapy.all import *\; sendp\(${unicast_pkt},  iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
-		{bash -c \"sleep 20\"}
-		{tcpdump -r unicast.pcap -enn \| grep \"vlan 100\"}
-		{set +x}
+				{ping -c 3 172.30.${ipaddr}.2}
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ] && result=1 && rlFail "spoofchk ${spoof_conf} multicast Failed, server did not captured multicast packets"
+			sync_wait server spoof_${spoof_conf}_multicast_get_return_from_server
+			rlLog "spoofchk ${spoof_conf}: broadcast test start"
+			broadcast_pkt="Ether(src='${vf_0_mac}', dst='FF:FF:FF:FF:FF:FF')/Dot1Q(vlan=100)"
+			if [ $(GetDistroRelease) = 8 ];then
+				cmd=(
+					{set -x}
+					{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{timeout 60 tcpdump -i \${NIC_TEST_1} -enn  -w broadcast.pcap \&}
+					{/usr/libexec/platform-python -c  \"from scapy.all import *\; sendp\(${broadcast_pkt}, iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
+					{bash -c \"sleep 60\"}
+					{tcpdump -r broadcast.pcap -enn \| grep \"vlan 100\"}
+					{set +x}
+				)
+			else
+				cmd=(
+					{set -x}
+					{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{timeout 60 tcpdump -i \${NIC_TEST_1} -enn  -w broadcast.pcap \&}
+					{python -c  \"from scapy.all import *\; sendp\(${broadcast_pkt}, iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
+					{bash -c \"sleep 60\"}
+					{tcpdump -r broadcast.pcap -enn \| grep \"vlan 100\"}
+					{set +x}
+				)
+			fi
+			sync_set server spoof_${spoof_conf}_capture_broadcast_packet
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ] && result=1 && rlFail "spoofchk ${spoof_conf} broadcast Failed, there should be  packets captured on vf 1"
+			sync_wait server spoof_${spoof_conf}_stop_capture_broadcast_packet
+			cmd=(
+				{ping -c 3 172.30.${ipaddr}.2}
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ] && result=1 && rlFail "spoofchk ${spoof_conf} broadcast Failed, server did not captured broadcast packets"
+			sync_set server spoof_${spoof_conf}_broadcast_get_return_from_server
+		done
+		sync_wait server test_end
+		#clear conf
+		cmds=(
+			{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{ip addr flush \${NIC_TEST_0}}
+			{systemctl start NetworkManager}
 		)
-		fi
-	sync_set server capture_unicast_packet
-	vmsh cmd_set g1 "${cmd[*]}"
-	[ $? -eq 0 ] && result=1 && rlFail "Failed, there should be no packets captured on vf 1"
-	sync_set server stop_capture_unicast_packet
-	sync_wait server unicast_get_return_from_server
-	cmd=(
-		{ping -c 3 172.30.${ipaddr}.2}
-	)
-	vmsh cmd_set g1 "${cmd[*]}"
-	[ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured unicast packets"
-	rlLog "spoofchk ${spoof_conf}: multicast test start"
-	multicast_pkt="Ether(src='${vf_0_mac}', dst='01:00:5e:00:00:01')/Dot1Q(vlan=100)"
-	if [ $(GetDistroRelease) = 8 ];then
-		cmd=(
-		{set -x}
-		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{timeout 20 tcpdump -i \${NIC_TEST_1} -enn  -w multicast.pcap \&}
-		{/usr/libexec/platform-python -c  \"from scapy.all import *\; sendp\(${multicast_pkt}, iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
-		{bash -c \"sleep 20\"}
-		{tcpdump -r multicast.pcap -enn \| grep \"vlan 100\"}
-		{set +x}
-		)
-	else
-		cmd=(
-		{set -x}
-		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{timeout 20 tcpdump -i \${NIC_TEST_1} -enn  -w multicast.pcap \&}
-		{python -c  \"from scapy.all import *\; sendp\(${multicast_pkt}, iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
-		{bash -c \"sleep 20\"}
-		{tcpdump -r multicast.pcap -enn \| grep \"vlan 100\"}
-		{set +x}
-		)
-	fi
-	sync_set server capture_multicast_packet
-	vmsh cmd_set g1 "${cmd[*]}"
-	[ $? -ne 0 ] && result=1 && rlFail "Failed, there should be  packets captured on vf 1"
-	sync_set server  stop_capture_multicast_packet
-	sync_wait server multicast_get_return_from_server
-	cmd=(
-		{ping -c 3 172.30.${ipaddr}.2}
-	)
-	vmsh cmd_set g1 "${cmd[*]}"
-	[ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured multicast packets"
-	rlLog "spoofchk ${spoof_conf}: broadcast test start"
-	broadcast_pkt="Ether(src='${vf_0_mac}', dst='FF:FF:FF:FF:FF:FF')/Dot1Q(vlan=100)"
-	if [ $(GetDistroRelease) = 8 ];then
-		cmd=(
-		{set -x}
-		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{timeout 20 tcpdump -i \${NIC_TEST_1} -enn  -w broadcast.pcap \&}
-		{/usr/libexec/platform-python -c  \"from scapy.all import *\; sendp\(${broadcast_pkt}, iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
-		{bash -c \"sleep 20\"}
-		{tcpdump -r broadcast.pcap -enn \| grep \"vlan 100\"}
-		{set +x}
-		)
-	else
-		cmd=(
-		{set -x}
-		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{timeout 20 tcpdump -i \${NIC_TEST_1} -enn  -w broadcast.pcap \&}
-		{python -c  \"from scapy.all import *\; sendp\(${broadcast_pkt}, iface=\'\"\${NIC_TEST_0}\"\', count=5\)\"}
-		{bash -c \"sleep 20\"}
-		{tcpdump -r broadcast.pcap -enn \| grep \"vlan 100\"}
-		{set +x}
-		)
-	fi
-	sync_set server capture_broadcast_packet
-	vmsh cmd_set g1 "${cmd[*]}"
-	[ $? -ne 0 ] && result=1 && rlFail "Failed, there should be  packets captured on vf 1"
-	sync_set server stop_capture_broadcast_packet
-	sync_wait server broadcast_get_return_from_server
-	cmd=(
-		{ping -c 3 172.30.${ipaddr}.2}
-	)
-	vmsh cmd_set g1 "${cmd[*]}"
-	[ $? -ne 0 ] && result=1 && rlFail "Failed, server did not captured broadcast packets"
-	done
-	sync_wait server test_end
-	sync_set  server  test_end
-	#clear conf
-	cmds=(
-		{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{ip addr flush \${NIC_TEST_0}}
-		{systemctl start NetworkManager}
-	)
-	vmsh cmd_set g1 "${cmds[*]}"
-	sriov_detach_vf_from_vm  ${nic_test} 0 1 g1
-	sriov_detach_vf_from_vm  ${nic_test} 0 2 g1
-	sriov_remove_vfs ${nic_test} 0
-	ip addr flush ${nic_test}
-	ip link set ${nic_test} promisc off
-	ethtool --set-priv-flags ${nic_test} vf-true-promisc-support off
-	return $result
+		vmsh cmd_set g1 "${cmds[*]}"
+		sriov_detach_vf_from_vm  ${nic_test} 0 1 g1
+		sriov_detach_vf_from_vm  ${nic_test} 0 2 g1
+		sriov_remove_vfs ${nic_test} 0
+		ip addr flush ${nic_test}
+		ip link set ${nic_test} promisc off
+		ethtool --set-priv-flags ${nic_test} vf-true-promisc-support off
+		return $result
 	fi
 }
+
 # guest VM unable to communicate when VFs are defined on hosts PF
 #
 sriov_test_bz1493953()
@@ -15389,9 +15388,9 @@ setup() {
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
 		rlRun sriov_install
 		rlRun sriov_cleanup
-		if (( "$rhel_version" >= "9" )); then
-			enable_libvirtd_as_default_rhel9
-		fi
+#		if (( "$rhel_version" >= "9" )); then
+#			enable_libvirtd_as_default_rhel9
+#		fi
 	elif [[ $ENABLE_RT_KERNEL == "yes" ]]; then
 		# stage 0 will install rt kernel, stage 2 will configure memory and cpu tuning, stage 3 will check configure and install.
 		rlLog "REBOOTCOUNT is ${REBOOTCOUNT}"
