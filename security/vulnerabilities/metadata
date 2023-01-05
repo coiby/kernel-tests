@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=./runtest.sh
-dependencies=kernel
+dependencies=kernel;beakerlib;beakerlib-redhat
 Path=/mnt/tests/kernel-tests/security/vulnerabilities
 Type=Function
 RunFor=kernel
