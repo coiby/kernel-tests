@@ -230,6 +230,39 @@ Describe 'kpkginstall: main - install kernel'
     End
 End
 
+uname(){
+    if [ "$1" == "-r" ];then
+        echo "$KERNEL_VERSION"
+    fi
+    if [ "$1" == "-i" ];then
+        echo "s390x"
+    fi
+}
+select_yum_tool() {
+    echo "select_yum_tool"
+    return 0
+}
+get_kpkg_ver() {
+    return 0
+}
+cat(){
+    echo "cat $*"
+}
+io_test(){
+    return 10
+}
+sysctl(){
+    echo "sysctl $*"
+}
+dmesg(){
+    echo "${MOCKED_DMESG:-}"
+}
+journalctl(){
+    echo "${MOCKED_JOURNALCTL:-}"
+}
+which(){
+    return 0
+}
 Describe 'kpkginstall: main - check installed kernel'
     Parameters
         kernel "4.18.0-442.el8.s390x" "$KERNEL_RPM_URL"
@@ -246,39 +279,6 @@ Describe 'kpkginstall: main - check installed kernel'
     }
     BeforeEach 'setup'
     AfterEach 'cleanup'
-    uname(){
-        if [ "$1" == "-r" ];then
-            echo "$KERNEL_VERSION"
-        fi
-        if [ "$1" == "-i" ];then
-            echo "s390x"
-        fi
-    }
-    select_yum_tool() {
-        echo "select_yum_tool"
-        return 0
-    }
-    get_kpkg_ver() {
-        return 0
-    }
-    cat(){
-        echo "cat $*"
-    }
-    io_test(){
-        return 10
-    }
-    sysctl(){
-        echo "sysctl $*"
-    }
-    dmesg(){
-        echo "${MOCKED_DMESG:-}"
-    }
-    journalctl(){
-        echo "${MOCKED_JOURNALCTL:-}"
-    }
-    which(){
-        return 0
-    }
     export REBOOTCOUNT=1
     export ARCH="s390x"
 
@@ -333,5 +333,111 @@ Describe 'kpkginstall: main - check installed kernel'
         The stdout should include "rstrnt-report-result distribution/kpkginstalljournalctl-check WARN 7"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot FAIL"
         The status should be success
+    End
+End
+
+Describe 'kpkginstall: main - check installed kernel with cross compiling'
+    setup(){
+        mkdir -p /var/tmp/kpkginstall
+    }
+    cleanup(){
+        rm -rf /var/tmp/kpkginstall
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+    }
+    BeforeEach 'setup'
+    AfterEach 'cleanup'
+    Parameters
+        kernel "6.1.0-rc7" "$KERNEL_TGZ_URL"
+    End
+    export REBOOTCOUNT=1
+    export ARCH="s390x"
+    # For the workaround from cross-compiling
+    Mock make
+        echo "make $*"
+        if grep -q "olddefconfig" <<< "$*"; then
+            exit "${OLDERCONFIG_EXIT_CODE:=0}"
+        fi
+        if grep -q "modules_prepare" <<< "$*"; then
+            exit "${MODULES_PREPARE_EXIT_CODE:=0}"
+        fi
+        if grep -q "scripts" <<< "$*"; then
+            exit "${SCRIPTS_EXIT_CODE:=0}"
+        fi
+    End
+    # The original cki_abort_recipe has exit 1 and shellspec doesn't like it
+    # and aborts the run
+    cki_abort_recipe(){
+        echo "cki_abort_recipe $*"
+        return 1
+    }
+    It "installed with KPKG_URL=$3 with cross compiling"
+        KVER="$2"
+        #KVER is updated with in the main function
+        KERNEL_VERSION="$2"
+        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        # Make sure it will execute cross compiling path
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        When call main
+        The first line should equal "ℹ️ REBOOTCOUNT is 1"
+        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
+        The stdout should include "sysctl kernel.panic_on_oops"
+        The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
+        The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot PASS"
+        The status should be success
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+    End
+
+    It "installed with KPKG_URL=$3 with cross compiling fails on olddefconfig"
+        KVER="$2"
+        #KVER is updated with in the main function
+        KERNEL_VERSION="$2"
+        export OLDERCONFIG_EXIT_CODE=1
+        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        # Make sure it will execute cross compiling path
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        When call main
+        The first line should equal "ℹ️ REBOOTCOUNT is 1"
+        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
+        The stdout should not include "make -C /usr/src/kernels/$KERNEL_VERSION modules_prepare"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The status should be success
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+    End
+
+    It "installed with KPKG_URL=$3 with cross compiling fails on modules_prepare"
+        KVER="$2"
+        #KVER is updated with in the main function
+        KERNEL_VERSION="$2"
+        export MODULES_PREPARE_EXIT_CODE=1
+        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        # Make sure it will execute cross compiling path
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        When call main
+        The first line should equal "ℹ️ REBOOTCOUNT is 1"
+        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
+        The stdout should not include "make -C /usr/src/kernels/$KERNEL_VERSION scripts"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The status should be success
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+    End
+
+    It "installed with KPKG_URL=$3 with cross compiling fails on scripts"
+        KVER="$2"
+        #KVER is updated with in the main function
+        KERNEL_VERSION="$2"
+        export SCRIPTS_EXIT_CODE=1
+        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        # Make sure it will execute cross compiling path
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        When call main
+        The first line should equal "ℹ️ REBOOTCOUNT is 1"
+        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The status should be success
+        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End
 End
