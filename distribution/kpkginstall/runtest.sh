@@ -630,16 +630,24 @@ EOF
             rstrnt-backup "$file"
           done
 
+          error=0
           # Temporarily unset ARCH var defined in libcki to avoid Makefile conflicts
           # otherwise you will see an error about a non-existing arch dir
-          env -u ARCH make -C "/usr/src/kernels/$ckver" olddefconfig || \
-            cki_abort_recipe "Failed applying cross compiling workaround" WARN
-          env -u ARCH make -C "/usr/src/kernels/$ckver" modules_prepare || \
-            cki_abort_recipe "Failed applying cross compiling workaround" WARN
-          env -u ARCH make -C "/usr/src/kernels/$ckver" scripts || \
-            cki_abort_recipe "Failed applying cross compiling workaround" WARN
+          env -u ARCH make -C "/usr/src/kernels/$ckver" olddefconfig || error=1
+          if [ $error -eq 0 ]; then
+              env -u ARCH make -C "/usr/src/kernels/$ckver" modules_prepare || error=1
+          fi
+          if [ $error -eq 0 ]; then
+            env -u ARCH make -C "/usr/src/kernels/$ckver" scripts || error=1
+          fi
 
-          rstrnt-restore
+        rstrnt-restore
+        if [ $error -ne 0 ]; then
+            # Make sure the file is removed, in case of rerun it doens't skip this step
+            rm -f "/usr/src/kernels/$ckver/scripts/basic/fixdep"
+            cki_abort_recipe "Failed applying cross compiling workaround" WARN
+        fi
+
         fi
       fi
 
