@@ -324,6 +324,9 @@ sriov_setup()
 	systemctl stop firewalld
 	systemctl disable firewalld
 
+	#Restarting libvirtd based on https://access.redhat.com/solutions/6071131
+	systemctl restart libvirtd
+
 	# prepare bridge shared by beaker and vm
 	#local nic_bkr=$(get_default_iface)
 	#echo "nic_bkr=$nic_bkr"
