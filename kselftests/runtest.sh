@@ -25,7 +25,7 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-. /usr/bin/rhts-environment.sh || exit 1
+. ../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 #-------------------- Setup --------------------
 arch=$(uname -i)
@@ -44,23 +44,37 @@ SKIP_TARGETS=${SKIP_TARGETS:-""}
 WAIVE_TARGETS=${WAIVE_TARGETS:-""}
 INCLUDE=${INCLUDE:-""}
 
-. ./include.sh
+. ./include/include.sh
 for file in $INCLUDE; do
     echo "Loading "$file"."
-    . ./$file
+    . ./include/$file
 done
 
 name="kernel"
-if [ -x /usr/sbin/kernel-is-rt ]; then
-        name="kernel-rt"
+if  cki_is_kernel_rt; then
+    name="${name}-rt"
 fi
-
-debug_dash=""
+if cki_is_kernel_automotive; then
+   name="${name}-automotive"
+fi
 debug_dot=""
-if uname -r | grep -q '+debug$'; then
-    debug_dash="-debug"
+if  cki_is_kernel_debug; then
+    name="${name}-debug"
     debug_dot=".debug"
 fi
+function get_pkg_mgr()
+{
+    if [[ -e /run/ostree-booted ]]; then
+      export pkg_mgr="rpm-ostree"
+      echo rpm-ostree
+    elif [[ -e /usr/bin/dnf ]]; then
+      export pkg_mgr="dnf"
+      echo dnf
+    else
+      export pkg_mgr="yum"
+      echo yum
+    fi
+}
 
 mkdir $TMPDIR
 mkdir $EXEC_DIR
@@ -84,7 +98,7 @@ install_packages()
     pushd $TMPDIR
     # for 32 bit support
     if [ "${arch}" == "x86_64" ]; then
-        dnf install -y glibc-devel.*i686
+        $pkg_mgr $pkg_mgr_inst_string glibc-devel.*i686
     fi
     if [ "$UPSTREAM_SOURCE_URL" ]; then
         wget --no-check-certificate $UPSTREAM_SOURCE_URL -O kselftest.tar.gz || test_fail_exit "Fetch Pkg Failed"
@@ -92,10 +106,16 @@ install_packages()
         pushd linux-kselftest-*/
     else
         pkg=${name}-${version}-${release}
-        rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
+        if cki_is_kernel_automotive; then
+            wget --no-check-certificate https://cbs.centos.org/kojifiles/packages/kernel-automotive/${version}/${release}/src/$pkg.src.rpm || test_fail_exit "Fetch Src Failed"
+        else
+           rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
+        fi
         rpm -ivh --define "_topdir $TMPDIR" ${name}-${version}-${release}.src.rpm
         pushd SPECS
-        rlRun "yum-builddep -y ./kernel.spec"
+        rlRun "yum-builddep --downloadonly -y ./kernel.spec --downloaddir $(pwd)"
+
+        $pkg_mgr $pkg_mgr_inst_string *.rpm
         pushd ../SOURCES
         tar Jxf linux-${version}-${release}.tar.xz
         pushd linux-${version}-${release}/
@@ -103,14 +123,16 @@ install_packages()
         sed -i "s/^EXTRAVERSION =.*/EXTRAVERSION = ${extraversion}/" Makefile
     fi
     # to get Module.symvers
-    rlRun "dnf install -y ${name}${debug_dash}-devel-${version}-${release}"
-    symvers=$(rpm -ql "${name}${debug_dash}-devel" | grep '\<Module.symvers\>$')
+    rlRun "$pkg_mgr $pkg_mgr_inst_string ${name}-devel-${version}-${release}"
+    symvers=$(rpm -ql "${name}-devel" | grep '\<Module.symvers\>$')
     rlRun "ln -s "${symvers}" Module.symvers"
     popd
 }
 
 install_kselftests()
 {
+    # Install debug-modules-extra
+    rlRun "$pkg_mgr $pkg_mgr_inst_string ${name}-modules-extra-${version}-${release}"
     # Install the selftests-internal, modules-internal packages by default
     if [ "${CKI_SELFTESTS_URL}" ] ; then
         pushd ${EXEC_DIR}
@@ -123,23 +145,27 @@ install_kselftests()
         if [ "${UPSTREAM_SOURCE_URL}" ]; then
             pushd $TMPDIR/linux-kselftest-*/
         else
-            pushd $TMPDIR/SOURCES/linux-${version}-${release}/
+            pushd $TMPDIR/SOURCES/${linux_package}/
         fi
         yes "" | make config
         # for bpf build
         make -j`nproc` modules_prepare
         sed -i "s/^SKIP_TARGETS.*/#SKIP_TARGETS ?= /" tools/testing/selftests/Makefile
-        # issue with builddep so adding this temporarily till resolved.
-        rlRun "dnf install -y rsync libcap-devel clang llvm python3-docutils numactl-devel"
         make -j`nproc` -C tools/testing/selftests install TARGETS="${TEST_ITEMS}" INSTALL_PATH=${EXEC_DIR}
         rlLog "Compiled ${TEST} installed..."
         popd
         [ -f $TMPDIR/selftests/run_kselftest.sh ] && return 0 || return 1
     else
-        rpm -q ${name}-selftests-internal && rlLog "Delivered ${TEST} installed..." && return 0
-        rlRpmInstall ${name}${debug_dash}-modules-internal ${version} ${release} ${arch}
-        rlRpmInstall ${name}-selftests-internal ${version} ${release} ${arch}
-        if rpm -q ${name}-selftests-internal; then
+        if ! rpm -q ${name}-modules-internal > /dev/null 2>&1; then
+            rlRun "dnf download --resolve ${name}-modules-internal-${version}-${release}.${arch}"
+            rlRun "$pkg_mgr $pkg_mgr_inst_string ./${name}-modules-internal-${version}-${release}.${arch}.rpm"
+        fi
+        selftestsname="${name%-debug}"
+        if ! rpm -q ${selftestsname}-selftests-internal > /dev/null 2>&1; then
+            rlRun "dnf download --resolve ${selftestsname}-selftests-internal-${version}-${release}.${arch}"
+            rlRun "$pkg_mgr $pkg_mgr_inst_string ./${selftestsname}-selftests-internal-${version}-${release}.${arch}.rpm"
+        fi
+        if rpm -q ${selftestsname}-selftests-internal; then
             rlLog "Delivered ${TEST} installed..."
             return 0
         else
@@ -189,6 +215,13 @@ function RunKSelfTest()
 function SetupTest ()
 {
     rlPhaseStartSetup
+    pkg_mgr=$(get_pkg_mgr)
+    if [[ $pkg_mgr == "rpm-ostree" ]]; then
+      echo "pkg_mgr = RPM OSTREE"
+      export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
+    else
+      export pkg_mgr_inst_string="-y install"
+    fi
     if [ "${BUILD_FROM_SRC}" ]; then
         rlRun install_packages
         # do patches

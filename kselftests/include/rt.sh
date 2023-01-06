@@ -27,7 +27,7 @@ do_memfd_config()
     # install fuse package to provide fusermount for memfd:run_fuse_test.sh
     which fusermount && return 0
     echo "=== Installing package dependency: fuse ===" | tee -a $OUTPUTFILE
-    yum install -y fuse
+    $pkg_mgr $pkg_mgr_inst_string fuse
     which fusermount && return 0 || return 1
 }
 
