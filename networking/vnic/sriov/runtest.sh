@@ -15399,9 +15399,9 @@ setup() {
 		rlLog "REBOOTCOUNT is ${REBOOTCOUNT}"
 		if [ x"${REBOOTCOUNT}" == x"0" ]; then
 			rlRun set_preinstall_host
-			if (( "$rhel_version" >= "9" )); then
-				enable_libvirtd_as_default_rhel9
-			fi
+#			if (( "$rhel_version" >= "9" )); then
+#				enable_libvirtd_as_default_rhel9
+#			fi
 			# install rt-test tuned libvirt, configure hugepage and cpu isolation
 			rlLog "###############install rt-test tuned libvirt, configure hugepage and cpu isolation, will reboot system##############"
 			/usr/bin/python3 ${CASE_PATH}/rt-kernel/rt_kernel_paramter.py --os_type="host" --stage="0" || exit 1
