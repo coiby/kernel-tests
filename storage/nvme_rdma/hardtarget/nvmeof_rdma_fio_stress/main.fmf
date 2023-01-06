@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/hardtarget/nvmeof_rdma_fio_stress
+description: nvmeof rdma discover stress testing with NETAPP E5700
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/hardtarget/nvmeof_rdma_fio_stress
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/hardtarget/nvmeof_rdma_fio_stress
+extra-task: /storage/nvme_rdma/hardtarget/nvmeof_rdma_fio_stress
+id: 2e66409f-f44a-412b-a0c1-7bc83b0122d4

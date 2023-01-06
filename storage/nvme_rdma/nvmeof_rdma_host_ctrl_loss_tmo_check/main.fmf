@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_host_ctrl_loss_tmo_check
+description: nvmeof rdma host side ctrl_loss_tmo check
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_host_ctrl_loss_tmo_check
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_host_ctrl_loss_tmo_check
+extra-task: /storage/nvme_rdma/nvmeof_rdma_host_ctrl_loss_tmo_check
+id: a9479da3-65ea-4dde-83fe-002ccea277bc

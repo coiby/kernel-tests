@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmecli_nvmetcli_sanity
+description: nvmeof rdma nvme-cli/nvmetcli sanity
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmecli_nvmetcli_sanity
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmecli_nvmetcli_sanity
+extra-task: /storage/nvme_rdma/nvmecli_nvmetcli_sanity
+id: 30d5dfa0-a095-4401-80bb-f742c219924d

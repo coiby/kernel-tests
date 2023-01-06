@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_fio_stress
+description: nvmeof rdma fio stress test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_fio_stress
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_fio_stress
+extra-task: /storage/nvme_rdma/nvmeof_rdma_fio_stress
+id: 5050093a-2b78-4965-8864-edb680f40cd7
