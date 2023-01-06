@@ -27,7 +27,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. ../../include/include.h
+. ../../include/rhivos.sh
 
 rlJournalStart
     rlPhaseStartSetup
