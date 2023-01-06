@@ -641,13 +641,12 @@ EOF
             env -u ARCH make -C "/usr/src/kernels/$ckver" scripts || error=1
           fi
 
-        rstrnt-restore
-        if [ $error -ne 0 ]; then
-            # Make sure the file is removed, in case of rerun it doens't skip this step
-            rm -f "/usr/src/kernels/$ckver/scripts/basic/fixdep"
-            cki_abort_recipe "Failed applying cross compiling workaround" WARN
-        fi
-
+          rstrnt-restore
+          if [ $error -ne 0 ]; then
+              # Make sure the file is removed, in case of rerun it doens't skip this step
+              rm -f "/usr/src/kernels/$ckver/scripts/basic/fixdep"
+              cki_abort_recipe "Failed applying cross compiling workaround" WARN
+          fi
         fi
       fi
 
