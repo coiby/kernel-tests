@@ -29,7 +29,7 @@ function client {
 	target_ip=$RETURN_STR
 
 	# Connect to target
-	tok "nvme connect-all -t rdma -a $target_ip -s 4420"
+	tok "nvme connect -t rdma -a $target_ip -s 4420 -n testnqn"
 	if [ $? -ne 0 ]; then
 		tlog "INFO: failed to connect to target:$target_ip"
 		return 1
