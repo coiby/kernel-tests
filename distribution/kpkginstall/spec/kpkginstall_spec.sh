@@ -343,6 +343,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
     cleanup(){
         rm -rf /var/tmp/kpkginstall
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        rm -f  /usr/src/kernels/"$KVER"/.config
     }
     BeforeEach 'setup'
     AfterEach 'cleanup'
@@ -377,6 +378,11 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        # Create a dummy config to pass compiler/linker detection
+        {
+            echo "CONFIG_CC_IS_GCC=y"
+            echo "CONFIG_LD_IS_BFD=y"
+        } >/usr/src/kernels/"$KVER"/.config
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel version running!"
@@ -396,6 +402,11 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        # Create a dummy config to pass compiler/linker detection
+        {
+            echo "CONFIG_CC_IS_GCC=y"
+            echo "CONFIG_LD_IS_BFD=y"
+        } >/usr/src/kernels/"$KVER"/.config
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel version running!"
@@ -414,6 +425,11 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        # Create a dummy config to pass compiler/linker detection
+        {
+            echo "CONFIG_CC_IS_GCC=y"
+            echo "CONFIG_LD_IS_BFD=y"
+        } >/usr/src/kernels/"$KVER"/.config
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel version running!"
@@ -432,6 +448,11 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        # Create a dummy config to pass compiler/linker detection
+        {
+            echo "CONFIG_CC_IS_GCC=y"
+            echo "CONFIG_LD_IS_BFD=y"
+        } >/usr/src/kernels/"$KVER"/.config
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel version running!"
