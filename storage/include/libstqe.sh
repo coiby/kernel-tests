@@ -39,7 +39,8 @@ function get_release() {
 
 function stqe_init {
   typeset pip="python3 -m pip"
-  typeset pkg_mgr=$(dnf >/dev/null 2>&1 && echo dnf || echo yum)
+  typeset pkg_mgr
+  pkg_mgr=$(dnf >/dev/null 2>&1 && echo dnf || echo yum)
 
   # augeas-libs needed for RHEL-7, netifaces needed for aarch64
   cki_run "$pkg_mgr install -y --skip-broken python3-pip python3-wheel python3-augeas augeas-libs python3-netifaces" ||
