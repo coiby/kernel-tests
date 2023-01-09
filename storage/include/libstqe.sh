@@ -75,7 +75,7 @@ function stqe_init {
     cki_run "$pip install stqe --no-binary=stqe --user" ||
       cki_abort_task "Fail to install stqe"
   fi
-  cki_run "restorecon -Rv /usr/local/lib/python* /usr/lib/python*"
+  cki_run "restorecon -Rv /usr/local/lib/python* /usr/lib/python* /root/.local/lib/python*"
 
   return 0
 }
