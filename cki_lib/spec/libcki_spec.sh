@@ -40,7 +40,12 @@ Describe 'cki_run'
         export command="touch invalid/path/new_file"
         When call cki_run "$command"
         The stdout should be present
-        The stderr should equal "touch: cannot touch 'invalid/path/new_file': No such file or directory"
+        # on rhel6 it outputs: `invalid/path/new_file'
+        # on rhel7 it outputs: ‘invalid/path/new_file’
+        # on newer bash it outputs: 'invalid/path/new_file'
+        The first line of stderr should include "touch: cannot touch"
+        The first line of stderr should include "invalid/path/new_file"
+        The first line of stderr should include "No such file or directory"
         The status should be failure
     End
 End
