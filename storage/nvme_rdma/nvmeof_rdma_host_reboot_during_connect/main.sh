@@ -14,7 +14,7 @@ start_sm
 function client {
 	if [ -z "${REBOOTCOUNT}" ] || [ "${REBOOTCOUNT}" -eq "0" ]; then
 		tlog "--- wait server to set SERVER_NVMEOF_RDMA_TARGET_SETUP_READY ---"
-		rhts_sync_block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY" ${SERVERS}
+		rstrnt-sync-block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY" ${SERVERS}
 
 		# Get RDMA testing protocol target IP
 		NVMEOF_RDMA_TARGET_IP $test_protocol
@@ -26,10 +26,10 @@ function client {
 		tok nvme list
 		tlog "Rebooting the system after connect the target ...."
 		sync
-		rhts-reboot
+		rstrnt-reboot
 	fi
 	tlog "REBOOTCOUNT:$REBOOTCOUNT, host rebooted, test done"
-	rhts_sync_set -s "CLIENT_CONNECT_TARGET_REBOOT"
+	rstrnt-sync-set -s "CLIENT_CONNECT_TARGET_REBOOT"
 }
 
 function server {
@@ -38,14 +38,14 @@ function server {
 	if [ $? -eq 0 ]; then
 		# target set ready
 		tlog "INFO: NVMEOF_RDMA_Target_Setup pass, test_protocol:$test_protocol"
-		rhts_sync_set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY"
+		rstrnt-sync-set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY"
 	else
 		tlog "INFO: NVMEOF_RDMA_Target_Setup failed, test_protocol:$test_protocol"
 		return 1
 	fi
 
 	tlog "--- wait client to set CLIENT_CONNECT_TARGET_REBOOT---"
-	rhts_sync_block -s "CLIENT_CONNECT_TARGET_REBOOT" ${CLIENTS}
+	rstrnt-sync-block -s "CLIENT_CONNECT_TARGET_REBOOT" ${CLIENTS}
 
 	# Clear target
 	tok nvmetcli clear

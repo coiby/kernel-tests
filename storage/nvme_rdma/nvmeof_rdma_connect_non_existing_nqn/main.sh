@@ -13,7 +13,7 @@ start_sm
 
 function client {
 	tlog "--- wait server to set SERVER_NVMEOF_RDMA_TARGET_SETUP_READY ---"
-	rhts_sync_block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY" ${SERVERS}
+	rstrnt-sync-block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY" ${SERVERS}
 
 	#install fio tool
 	install_fio
@@ -39,7 +39,7 @@ function client {
 
 	tok "nvme discover -t rdma -a $target_ip"
 	tnot "nvme connect -t rdma -n testnqn1 -a $target_ip -s 4420"
-	rhts_sync_set -s "CLIENT_CONNECT_TARGET_DONE"
+	rstrnt-sync-set -s "CLIENT_CONNECT_TARGET_DONE"
 }
 
 function server {
@@ -48,14 +48,14 @@ function server {
 	if [ $? -eq 0 ]; then
 		# target set ready
 		tlog "INFO: NVMEOF_RDMA_Target_Setup pass, test_protocol:$test_protocol"
-		rhts_sync_set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY"
+		rstrnt-sync-set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY"
 	else
 		tlog "INFO: NVMEOF_RDMA_Target_Setup failed, test_protocol:$test_protocol"
 		return 1
 	fi
 
 	tlog "--- wait client to set CLIENT_CONNECT_TARGET_DONE---"
-	rhts_sync_block -s "CLIENT_CONNECT_TARGET_DONE" ${CLIENTS}
+	rstrnt-sync-block -s "CLIENT_CONNECT_TARGET_DONE" ${CLIENTS}
 
 	# Clear target
 	tok nvmetcli clear

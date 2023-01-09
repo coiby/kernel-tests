@@ -17,7 +17,7 @@ start_sm
 function client {
 
 	tlog "--- wait server to set SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1 ---"
-	rhts_sync_block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1" ${SERVERS}
+	rstrnt-sync-block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1" ${SERVERS}
 
 	#install fio tool
 	install_fio
@@ -49,13 +49,13 @@ function client {
 	#fio basic device level testing
 	FIO_Basic_Device_Level_Test "$nvme_device"
 
-	rhts_sync_set -s "CLIENT_FIO_RUNNING"
+	rstrnt-sync-set -s "CLIENT_FIO_RUNNING"
 
 	tlog "--- wait server to set SERVER_TARGET_CLEAR_DONE ---"
-	rhts_sync_block -s "SERVER_TARGET_CLEAR_DONE" ${SERVERS}
+	rstrnt-sync-block -s "SERVER_TARGET_CLEAR_DONE" ${SERVERS}
 
 	tlog "--- wait server to set SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2 ---"
-	rhts_sync_block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2" ${SERVERS}
+	rstrnt-sync-block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2" ${SERVERS}
 
 	sleep 30
 
@@ -66,7 +66,7 @@ function client {
 	#disconnect the target
 	NVMEOF_RDMA_DISCONNECT_TARGET n testnqn
 
-	rhts_sync_set -s "CLIENT_DISCONECT_TARGET_DONE"
+	rstrnt-sync-set -s "CLIENT_DISCONECT_TARGET_DONE"
 }
 
 function server {
@@ -75,14 +75,14 @@ function server {
 	if [ $? -eq 0 ]; then
 		# target set ready
 		tlog "INFO: NVMEOF_RDMA_Target_Setup pass, test_protocol:$test_protocol"
-		rhts_sync_set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1"
+		rstrnt-sync-set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1"
 	else
 		tlog "INFO: NVMEOF_RDMA_Target_Setup failed, test_protocol:$test_protocol"
 		return 1
 	fi
 
 	tlog "--- wait client to set  CLIENT_FIO_RUNNING---"
-	rhts_sync_block -s "CLIENT_FIO_RUNNING" ${CLIENTS}
+	rstrnt-sync-block -s "CLIENT_FIO_RUNNING" ${CLIENTS}
 
 	# clear target
 	tok "nvmetcli clear"
@@ -91,7 +91,7 @@ function server {
 		return 1
 	else
 		tlog "INFO: nvmetcli clear pass"
-		rhts_sync_set -s "SERVER_TARGET_CLEAR_DONE"
+		rstrnt-sync-set -s "SERVER_TARGET_CLEAR_DONE"
 	fi
 
 	sleep 5
@@ -101,14 +101,14 @@ function server {
 	if [ $? -eq 0 ]; then
 		# target set ready
 		tlog "INFO: NVMEOF_RDMA_Target_Setup pass, test_protocol:$test_protocol"
-		rhts_sync_set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2"
+		rstrnt-sync-set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2"
 	else
 		tlog "INFO: NVMEOF_RDMA_Target_Setup failed, test_protocol:$test_protocol"
 		return 1
 	fi
 
 	tlog "--- wait client to set CLIENT_DISCONECT_TARGET_DONE ---"
-	rhts_sync_block -s "CLIENT_DISCONECT_TARGET_DONE" ${CLIENTS}
+	rstrnt-sync-block -s "CLIENT_DISCONECT_TARGET_DONE" ${CLIENTS}
 
 	# Clear target
 	tok "nvmetcli clear"
