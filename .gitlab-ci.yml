@@ -92,7 +92,7 @@ shell check runtests mr:
     - !reference [.rules, mr-parent]
 
 shellspec:
-  extends: .shellspec
+  extends: [.shellspec, .pipeline_images]
 
 codeowners check:
   extends: .cki_tools
