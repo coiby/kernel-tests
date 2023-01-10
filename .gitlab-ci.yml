@@ -93,6 +93,8 @@ shell check runtests mr:
 
 shellspec:
   extends: [.shellspec, .pipeline_images]
+  variables:
+    USE_BASH_ORIG: 'true'
 
 codeowners check:
   extends: .cki_tools
