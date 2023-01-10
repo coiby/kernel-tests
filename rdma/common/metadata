@@ -1,7 +1,7 @@
 [General]
 name=common
 owner=Zhaojuan Guo <zguo@redhat.com>
-description=Common library for RDMA testing
+description=Common library for RDMA testing in Shell
 license=GPLv2
 confidential=no
 destructive=no
