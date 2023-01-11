@@ -64,9 +64,9 @@ function RQA_is_port_normal {
     phys_s=$(RQA_get_hca_phys_state ${_devname} ${_portnum})
     logi_s=$(RQA_get_hca_logical_state ${_devname} ${_portnum})
     if [[ ${phys_s} == "LinkUp" ]] && [[ ${logi_s} == "ACTIVE" ]]; then
-	return 0
+        return 0
     else
-	return 1
+        return 1
     fi
 }
 
@@ -83,7 +83,7 @@ function RQA_get_ports_number {
         echo 0
         exit
     fi
-    for i in `ls $_path`; do
+    for i in "$_path"/* ; do
         port_num=`expr ${port_num} + 1`
     done
     echo ${port_num}
@@ -219,7 +219,7 @@ function RQA_system_info_for_debug {
     cat /proc/cmdline
     rpm -q rdma-core linux-firmware
     tail /sys/class/infiniband/*/fw_ver
-    lspci | grep -i -e ConnectX -e omni -e FastLinQ -e NetXtreme-E -e e810 -e "Ethernet controller: Chelsio" 
+    lspci | grep -i -e ConnectX -e omni -e FastLinQ -e NetXtreme-E -e e810 -e "Ethernet controller: Chelsio"
     lscpu
     ibstat
     ibstatus
