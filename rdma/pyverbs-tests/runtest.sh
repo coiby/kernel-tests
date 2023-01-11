@@ -21,7 +21,7 @@ function run_tests {
     hca_ids=$(RQA_get_hca_id)
     for hca_id in ${hca_ids}; do
         $PYEXEC /usr/share/doc/rdma-core/tests/run_tests.py -v --dev $hca_id
-        let bad++
+	bad=`expr ${bad} + 1`
     done
     return $bad
 }

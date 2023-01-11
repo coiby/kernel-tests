@@ -31,6 +31,65 @@ function RQA_get_hca_id {
 }
 
 ##
+# To get the HCA port physical state
+# $1 - device name, e.g. mlx5_0
+# $2 - port number, e.g. 1
+# return 'LinkUp'
+##
+function RQA_get_hca_phys_state {
+    _devname=$1
+    _portnum=$2
+    ibstatus ${_devname}:${_portnum} | grep 'phys state' | awk '{print $4}'
+}
+
+##
+# To get the HCA port logical state, if it's "Active", means the physical connection is up and working,
+# and the port has been discovered by the subnet manager.  The port is in a normal operational state.
+# $1 - device name, e.g. mlx5_0
+# $2 - port number, e.g. 1
+# return 'ACTIVE'
+##
+function RQA_get_hca_logical_state {
+    _devname=$1
+    _portnum=$2
+    ibstatus ${_devname}:${_portnum} | sed 's/^[ \t]*//g' | grep ^state | awk '{print $3}'
+}
+
+##
+# To check if a HCA port is in a normal operational state
+##
+function RQA_is_port_normal {
+    _devname=$1
+    _portnum=$2    
+    phys_s=$(RQA_get_hca_phys_state ${_devname} ${_portnum})
+    logi_s=$(RQA_get_hca_logical_state ${_devname} ${_portnum})
+    if [[ ${phys_s} == "LinkUp" ]] && [[ ${logi_s} == "ACTIVE" ]]; then
+	return 0
+    else
+	return 1
+    fi
+}
+
+##
+# To get how many ports of a HCA
+# $1 - device name, e.g. mlx5_0
+# return the total number of ports of a HCA
+##
+function RQA_get_ports_number {
+    _devname=$1
+    port_num=0
+    _path="/sys/class/infiniband/${_devname}/ports"
+    if [[ ! -d ${_path} ]]; then
+        echo 0
+        exit
+    fi
+    for i in `ls $_path`; do
+        port_num=`expr ${port_num} + 1`
+    done
+    echo ${port_num}
+}
+
+##
 # This function is to install a package(s) if it isn't already installed
 # Arguments: package name or a list of package names
 # Example: RQA_pkg_install nfs-utils
@@ -43,8 +102,8 @@ function RQA_pkg_install {
         rpm -q "$p" || PKG_LIST="${PKG_LIST} ${p}"
     done
 
-    if [ ! -z "$PKG_LIST" ]; then
-        $PKGINSTALL $PKG_LIST
+    if [ -n "$PKG_LIST" ]; then
+        ${PKGINSTALL} ${PKG_LIST}
     fi
 }
 
@@ -62,7 +121,7 @@ function RQA_get_rhel_release {
 # Arguments: none
 ##
 function RQA_get_rhel_major {
-    echo $(RQA_get_rhel_release) | awk -F "." '{print $1}'
+    RQA_get_rhel_release | awk -F "." '{print $1}'
 }
 
 ##
@@ -71,7 +130,7 @@ function RQA_get_rhel_major {
 # Arguments: none
 ##
 function RQA_get_rhel_minor {
-    echo $(RQA_get_rhel_release) | awk -F "." '{print $2}'
+    RQA_get_rhel_release | awk -F "." '{print $2}'
 }
 
 ##
@@ -116,7 +175,7 @@ function RQA_set_pyexec {
         PYEXEC='python'
     fi
 
-    if [ ! -z "$PYEXEC" ]; then
+    if [ -n "$PYEXEC" ]; then
         # we found a python interpreter - use it
         export PYEXEC
     else
@@ -130,7 +189,7 @@ function RQA_install_packages() {
     # the very core packages available on all release
     $PKGINSTALL rdma-core libibverbs libibverbs-utils libibverbs-devel librdmacm librdmacm-utils librdmacm-devel perftest iperf3 infiniband-diags iscsi-initiator-utils
     hfi1=$(lspci | grep -i Omni-Path)
-    if [ ! -z "$hfi1" ]; then
+    if [ -n "$hfi1" ]; then
         $PKGINSTALL opa-fm opa-fastfabric opa-address-resolution opa-basic-tools libpsm2
         if ! opafabricinfo; then
             systemctl enable opafm --now
