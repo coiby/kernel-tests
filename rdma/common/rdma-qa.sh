@@ -27,7 +27,7 @@ function RQA_exist_RDMA_HCA {
 ##
 function RQA_get_hca_id {
     which ibv_devinfo >/dev/null 2>&1 || $PKGINSTALL libibverbs-utils
-    ibv_devinfo >/dev/null 2>&1 && echo $(ibv_devinfo -l | sed '1d' | tr -s '\n')
+    ibv_devinfo >/dev/null 2>&1 && ibv_devinfo -l | sed '1d' | tr -s '\n'
 }
 
 ##
@@ -83,8 +83,8 @@ function RQA_get_ports_number {
         echo 0
         exit
     fi
-    for i in "$_path"/* ; do
-        port_num=`expr ${port_num} + 1`
+    for _i in "$_path"/* ; do
+        port_num=$((${port_num}+1))
     done
     echo ${port_num}
 }
@@ -248,7 +248,7 @@ function RQA_sys_service {
         shift
     done
 
-    [ -f /lib/systemd/system/$serv.service ] && systemctl $action $serv
+    [ -f /lib/systemd/system/"$serv".service ] && systemctl $action $serv
     SERVICE_RETURN=$?
 
     serv=$(echo $serv | awk -F '.' '{print $1}')
@@ -286,7 +286,7 @@ function RQA_sys_service {
 RQA_set_pyexec
 
 # determine whether to use yum or dnf
-if [[ $(grep -i fedora /etc/redhat-release >/dev/null) || $(RQA_get_rhel_major) -ge 8 ]]; then
+if [[ $(grep -iq fedora /etc/redhat-release) || $(RQA_get_rhel_major) -ge 8 ]]; then
     export PKGINSTALL="dnf install -y --setopt=strict=0 --nogpgcheck"
     export PKGREMOVE="dnf remove --noautoremove -y"
 else
