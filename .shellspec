@@ -2,3 +2,4 @@
 --color
 --output junit
 --default-path "**/spec"
+--shell bash
