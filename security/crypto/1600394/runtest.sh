@@ -31,7 +31,7 @@
 
 rlJournalStart
     rlPhaseStartSetup
-        if [ $(rlIsRHEL 7) ]; then
+        if [ "$(rlIsRHEL 7)" ]; then
             rlRun "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
         fi
         if ! kernel_automotive; then
