@@ -133,8 +133,6 @@ install_packages()
 
 install_kselftests()
 {
-    # Install debug-modules-extra
-    rlRun "$pkg_mgr $pkg_mgr_inst_string ${name}-modules-extra-${version}-${release}"
     # Install the selftests-internal, modules-internal packages by default
     if [ "${CKI_SELFTESTS_URL}" ] ; then
         pushd ${EXEC_DIR}
@@ -144,6 +142,8 @@ install_kselftests()
         rlLog "Upstream ${TEST} installed..."
         popd
     elif [ "${BUILD_FROM_SRC}" ] ; then
+        # Install debug-modules-extra
+        rlRun "$pkg_mgr $pkg_mgr_inst_string ${name}-modules-extra-${version}-${release}"
         if [ "${UPSTREAM_SOURCE_URL}" ]; then
             pushd $TMPDIR/linux-kselftest-*/
         else
@@ -158,6 +158,8 @@ install_kselftests()
         popd
         [ -f $TMPDIR/selftests/run_kselftest.sh ] && return 0 || return 1
     else
+        # Install debug-modules-extra
+        rlRun "$pkg_mgr $pkg_mgr_inst_string ${name}-modules-extra-${version}-${release}"
         if ! rpm -q ${name}-modules-internal > /dev/null 2>&1; then
             rlRun "dnf download --resolve ${name}-modules-internal-${version}-${release}.${arch}"
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${name}-modules-internal-${version}-${release}.${arch}.rpm"
