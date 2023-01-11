@@ -25,7 +25,9 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-. ../cki_lib/libcki.sh || exit 1
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 #-------------------- Setup --------------------
 arch=$(uname -i)
@@ -44,10 +46,10 @@ SKIP_TARGETS=${SKIP_TARGETS:-""}
 WAIVE_TARGETS=${WAIVE_TARGETS:-""}
 INCLUDE=${INCLUDE:-""}
 
-. ./include/include.sh
+. "$CDIR"/include/include.sh
 for file in $INCLUDE; do
     echo "Loading "$file"."
-    . ./include/$file
+    . "$CDIR"/include/$file
 done
 
 name="kernel"
@@ -294,10 +296,15 @@ function CleanupTest ()
     rlPhaseEnd
 }
 
-rlJournalStart
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
 
-SetupTest
-RunTest
-CleanupTest
+    rlJournalStart
 
-rlJournalEnd
+        SetupTest
+        RunTest
+        CleanupTest
+
+    rlJournalEnd
+fi
