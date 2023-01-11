@@ -15,8 +15,8 @@ system_info_for_debug
 start_sm
 
 function client {
-	tlog "--- wait server to set SERVER_NVMEOF_RDMA_TARGET_SETUP_READY ---"
-	rstrnt-sync-block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY" ${SERVERS}
+	tlog "--- wait server to set 4_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY ---"
+	rstrnt-sync-block -s "4_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY" ${SERVERS}
 
 	#install fio tool
 	install_fio
@@ -76,7 +76,7 @@ function client {
 	else
 		tlog "INFO: nvme disconnect $nvme_device pass"
 	fi
-	rstrnt-sync-set -s "CLIENT_CONNECT_DISCONECT_TARGET_DONE"
+	rstrnt-sync-set -s "4_CLIENT_CONNECT_DISCONECT_TARGET_DONE"
 }
 
 function server {
@@ -85,14 +85,14 @@ function server {
 	if [ $? -eq 0 ]; then
 		# target set ready
 		tlog "INFO: NVMEOF_RDMA_Target_Setup pass, test_protocol:$test_protocol"
-		rstrnt-sync-set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY"
+		rstrnt-sync-set -s "4_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY"
 	else
 		tlog "INFO: NVMEOF_RDMA_Target_Setup failed, test_protocol:$test_protocol"
 		return 1
 	fi
 
-	tlog "--- wait client to set CLIENT_CONNECT_DISCONECT_TARGET_DONE---"
-	rstrnt-sync-block -s "CLIENT_CONNECT_DISCONECT_TARGET_DONE" ${CLIENTS}
+	tlog "--- wait client to set 4_CLIENT_CONNECT_DISCONECT_TARGET_DONE---"
+	rstrnt-sync-block -s "4_CLIENT_CONNECT_DISCONECT_TARGET_DONE" ${CLIENTS}
 
 	# Clear target
 	tok nvmetcli clear

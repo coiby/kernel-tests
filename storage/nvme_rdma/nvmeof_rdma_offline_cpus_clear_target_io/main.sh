@@ -13,8 +13,8 @@ start_sm
 
 function client {
 
-	tlog "--- wait server to set SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1 ---"
-	rstrnt-sync-block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1" ${SERVERS}
+	tlog "--- wait server to set 10_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1 ---"
+	rstrnt-sync-block -s "10_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1" ${SERVERS}
 
 	#install fio tool
 	install_fio
@@ -51,13 +51,13 @@ function client {
 	tok "echo 0 > /sys/devices/system/cpu/cpu2/online"
 	tok "echo 0 > /sys/devices/system/cpu/cpu3/online"
 
-	rstrnt-sync-set -s "CLIENT_OFFLINE_CPUS_DONE"
+	rstrnt-sync-set -s "10_CLIENT_OFFLINE_CPUS_DONE"
 
-	tlog "--- wait server to set SERVER_TARGET_CLEAR_DONE ---"
-	rstrnt-sync-block -s "SERVER_TARGET_CLEAR_DONE" ${SERVERS}
+	tlog "--- wait server to set 10_SERVER_TARGET_CLEAR_DONE ---"
+	rstrnt-sync-block -s "10_SERVER_TARGET_CLEAR_DONE" ${SERVERS}
 
-	tlog "--- wait server to set SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2 ---"
-	rstrnt-sync-block -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2" ${SERVERS}
+	tlog "--- wait server to set 10_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2 ---"
+	rstrnt-sync-block -s "10_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2" ${SERVERS}
 
 	sleep 30
 
@@ -69,7 +69,7 @@ function client {
 	#disconnect the target
 	NVMEOF_RDMA_DISCONNECT_TARGET n testnqn
 
-	rstrnt-sync-set -s "CLIENT_DISCONECT_TARGET_DONE"
+	rstrnt-sync-set -s "10_CLIENT_DISCONECT_TARGET_DONE"
 
 	#online cpus
 	tlog "INFO: online cpus"
@@ -84,14 +84,14 @@ function server {
 	if [ $? -eq 0 ]; then
 		# target set ready
 		tlog "INFO: NVMEOF_RDMA_Target_Setup pass, test_protocol:$test_protocol"
-		rstrnt-sync-set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1"
+		rstrnt-sync-set -s "10_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_1"
 	else
 		tlog "INFO: NVMEOF_RDMA_Target_Setup failed, test_protocol:$test_protocol"
 		return 1
 	fi
 
-	tlog "--- wait client to set CLIENT_FIO_RUNNING ---"
-	rstrnt-sync-block -s "CLIENT_OFFLINE_CPUS_DONE" ${CLIENTS}
+	tlog "--- wait client to set 10_CLIENT_FIO_RUNNING ---"
+	rstrnt-sync-block -s "10_CLIENT_OFFLINE_CPUS_DONE" ${CLIENTS}
 
 	# clear target
 	tok "nvmetcli clear"
@@ -100,7 +100,7 @@ function server {
 		return 1
 	else
 		tlog "INFO: nvmetcli clear pass"
-		rstrnt-sync-set -s "SERVER_TARGET_CLEAR_DONE"
+		rstrnt-sync-set -s "10_SERVER_TARGET_CLEAR_DONE"
 	fi
 
 	sleep 2
@@ -110,14 +110,14 @@ function server {
 	if [ $? -eq 0 ]; then
 		# target set ready
 		tlog "INFO: NVMEOF_RDMA_Target_Setup pass, test_protocol:$test_protocol"
-		rstrnt-sync-set -s "SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2"
+		rstrnt-sync-set -s "10_SERVER_NVMEOF_RDMA_TARGET_SETUP_READY_2"
 	else
 		tlog "INFO: NVMEOF_RDMA_Target_Setup failed, test_protocol:$test_protocol"
 		return 1
 	fi
 
-	tlog "--- wait client to set CLIENT_DISCONECT_TARGET_DONE ---"
-	rstrnt-sync-block -s "CLIENT_DISCONECT_TARGET_DONE" ${CLIENTS}
+	tlog "--- wait client to set 10_CLIENT_DISCONECT_TARGET_DONE ---"
+	rstrnt-sync-block -s "10_CLIENT_DISCONECT_TARGET_DONE" ${CLIENTS}
 
 	# Clear target
 	tok "nvmetcli clear"
