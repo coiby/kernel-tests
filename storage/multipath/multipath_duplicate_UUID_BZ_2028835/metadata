@@ -1,0 +1,13 @@
+[General]
+name=storage/multipath/multipath_duplicate_UUID_BZ_2028835
+owner=Lin Li <lilin@redhat.com>
+description=Bug 2028835
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=
+repoRequires=cki_lib
+max_time=1h
