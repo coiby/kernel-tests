@@ -70,7 +70,7 @@ Describe 'multipath_duplicate_UUID_BZ_2028835'
         # make sure it contains the expected value the test uses
         export UDEVADM_OUTPUT="DM_MULTIPATH_DEVICE_PATH=1"
 
-        When call storage/multipath/multipath_duplicate_UUID_BZ_2028835/runtest.sh
+        When run script storage/multipath/multipath_duplicate_UUID_BZ_2028835/runtest.sh
 
         The first line should include "rlJournalStart"
         The second line should include "rlPhaseStartTest"
@@ -105,7 +105,7 @@ Describe 'multipath_duplicate_UUID_BZ_2028835'
     End
 
     It "can detect failure run_test"
-        When call storage/multipath/multipath_duplicate_UUID_BZ_2028835/runtest.sh
+        When run script storage/multipath/multipath_duplicate_UUID_BZ_2028835/runtest.sh
         # make sure fail message is in the log
         The stdout should include "rlFail ------- FAIL, not all paths always return: DM_MULTIPATH_DEVICE_PATH=1 -------"
         # make sure beakerlib end steps are executed
