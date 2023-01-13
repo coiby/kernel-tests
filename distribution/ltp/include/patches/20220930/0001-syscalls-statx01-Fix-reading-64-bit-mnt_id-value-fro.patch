@@ -1,0 +1,38 @@
+From 6c2197179bb8e3417ebbe95d81979bb4eb6b47be Mon Sep 17 00:00:00 2001
+From: Vitaly Chikunov <vt@altlinux.org>
+Date: Fri, 4 Nov 2022 02:30:18 +0300
+Subject: [PATCH] syscalls/statx01: Fix reading 64-bit mnt_id value from
+ mountinfo on i586
+
+Fix sscanf format flag for 'uint64_t mnt_id'. Reading 'uint64_t' as
+'%ld' causes intermittent false positive test error:
+
+  statx01.c:82: TFAIL: statx.stx_mnt_id(23) is different from mount_id(13820440305888919575) in /proc/self/mountinfo
+
+because that way 'mnt_id' is filled incompletely on 32-bit
+architectures.
+
+Reported-by: Dmitry V. Levin <ldv@altlinux.org>
+Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Signed-off-by: bgrech <bgrech@redhat.com>
+---
+ testcases/kernel/syscalls/statx/statx01.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/statx/statx01.c b/testcases/kernel/syscalls/statx/statx01.c
+index 24c5e9758..60b50958b 100644
+--- a/testcases/kernel/syscalls/statx/statx01.c
++++ b/testcases/kernel/syscalls/statx/statx01.c
+@@ -65,7 +65,7 @@ static void test_mnt_id(struct statx *buf)
+ 	file = SAFE_FOPEN("/proc/self/mountinfo", "r");
+ 
+ 	while (fgets(line, sizeof(line), file)) {
+-		if (sscanf(line, "%ld %*d %d:%d", &mnt_id, &line_mjr, &line_mnr) != 3)
++		if (sscanf(line, "%"SCNu64" %*d %d:%d", &mnt_id, &line_mjr, &line_mnr) != 3)
+ 			continue;
+ 
+ 		if (line_mjr == buf->stx_dev_major && line_mnr == buf->stx_dev_minor)
+-- 
+2.38.1
+
