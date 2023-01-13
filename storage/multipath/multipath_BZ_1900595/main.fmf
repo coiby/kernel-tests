@@ -1,0 +1,15 @@
+summary: storage/multipath/multipath_BZ_1900595
+description: Bug 1900595
+contact: Lin Li <lilin@redhat.com>
+component:
+  - kernel
+path: /storage/multipath/multipath_BZ_1900595
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+duration: 1h
+tier: 1
+extra-summary: /storage/multipath/multipath_BZ_1900595
+extra-task: /storage/multipath/multipath_BZ_1900595
