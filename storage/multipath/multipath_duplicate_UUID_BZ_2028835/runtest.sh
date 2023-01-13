@@ -42,19 +42,15 @@ echo "$DM_MULTIPATH_DEVICE_PATH4"
 if [ -n "$DM_MULTIPATH_DEVICE_PATH1" ] && [ -n "$DM_MULTIPATH_DEVICE_PATH2" ] && [ -n "$DM_MULTIPATH_DEVICE_PATH3" ] && [ -n "$DM_MULTIPATH_DEVICE_PATH4" ];then
 	rlPass "------- PASS,all paths always return: DM_MULTIPATH_DEVICE_PATH=1 ------"
 	cleanup
-	return 0
 else
 	rlFail "------- FAIL, not all paths always return: DM_MULTIPATH_DEVICE_PATH=1 -------"
 	cleanup
-	return 255
 fi
 }
 
 rlJournalStart
 	rlPhaseStartTest
 		run_test
-		value=$?
 	rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
-exit $value
