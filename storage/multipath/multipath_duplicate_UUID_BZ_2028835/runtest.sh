@@ -15,7 +15,7 @@ function run_test()
 {
 yum -y install device-mapper-multipath
 rpm -qa | grep multipath
-/sbin/mpathconf --enable
+mpathconf --enable
 rm -rf /etc/multipath/wwids
 service multipathd restart
 
