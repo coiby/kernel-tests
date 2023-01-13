@@ -241,4 +241,6 @@ check_test_exist()
 	return 1
 }
 
-[ ! "$CKI_SELFTESTS_URL" ] && [ ! "$BUILD_FROM_SRC" ] && [ ! "$DELIVERED_TESTS" ] && test_skip_exit "CKI_SELFTESTS_URL/BUILD_FROM_SRC/DELIVERED_TESTS not found. At least one must be set."
+if [ ! "$CKI_SELFTESTS_URL" ] && [ ! "$BUILD_FROM_SRC" ] && [ ! "$DELIVERED_TESTS" ]; then
+	test_skip_exit "CKI_SELFTESTS_URL/BUILD_FROM_SRC/DELIVERED_TESTS not found. At least one must be set."
+fi
