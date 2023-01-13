@@ -16,7 +16,7 @@ Describe 'reboot-test: pre-reboot'
     }
     BeforeEach 'setup'
     It "can reboot"
-        When call bash misc/reboot-test/runtest.sh
+        When run script misc/reboot-test/runtest.sh
         The first line should equal "Saving kernel info before reboot"
         The stdout should include "Reboot now!"
         The stdout should include "rstrnt-reboot"
@@ -39,7 +39,7 @@ Describe 'reboot-test: post-reboot'
 
     It "can boot without errors when there is no journalctl"
         export TYPE_EXIT_CODE=1
-        When call bash misc/reboot-test/runtest.sh
+        When run script misc/reboot-test/runtest.sh
         The first line should equal "Saving kernel info after reboot"
         The stdout should include "diff kernel_before_reboot.txt kernel_after_reboot.txt"
         The stdout should include "Rebooted using correct kernel"
@@ -49,7 +49,7 @@ Describe 'reboot-test: post-reboot'
     End
 
     It "can boot without errors"
-        When call bash misc/reboot-test/runtest.sh
+        When run script misc/reboot-test/runtest.sh
         The first line should equal "Saving kernel info after reboot"
         The stdout should include "diff kernel_before_reboot.txt kernel_after_reboot.txt"
         The stdout should include "Rebooted using correct kernel"
@@ -61,7 +61,7 @@ Describe 'reboot-test: post-reboot'
 
     It "can detect boot using wrong kernel"
         export DIFF_EXIT_CODE=1
-        When call bash misc/reboot-test/runtest.sh
+        When run script misc/reboot-test/runtest.sh
         The first line should equal "Saving kernel info after reboot"
         The stdout should include "FAIL: Rebooted using different kernel"
         The stdout should include "Before reboot:"
@@ -74,7 +74,7 @@ Describe 'reboot-test: post-reboot'
 
     It "can detect Call Traces on journalctl"
         export DIFF_OUTPUT="Call Trace:"
-        When call bash misc/reboot-test/runtest.sh
+        When run script misc/reboot-test/runtest.sh
         The stdout should include "diff kernel_before_reboot.txt kernel_after_reboot.txt"
         The stdout should include "Rebooted using correct kernel"
         The stdout should include "rstrnt-report-result misc/reboot-test/kernel-version-check PASS 0"
