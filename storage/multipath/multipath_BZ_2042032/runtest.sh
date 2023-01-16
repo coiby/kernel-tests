@@ -19,7 +19,7 @@ mpathconf --enable
 service multipathd restart
 
 echo "configure multipath to use the historical-service-time selector"
-rlRun "sed -i '/^defaults/a \    path_selector "historical-service-time 0" ' /etc/multipath.conf"
+sed -i '/^defaults/a \    path_selector "historical-service-time 0"' /etc/multipath.conf
 rlRun "cat /etc/multipath.conf"
 rlRun "service multipathd reload"
 historical_service_time=$(multipath -l 2>&1 | grep -E 'historical-service-time 2')
