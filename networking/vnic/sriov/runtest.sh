@@ -450,7 +450,8 @@ sriov_setup()
 			--graphics vnc,listen=0.0.0.0 \
 			--force \
 			--os-variant=rhel-unknown \
-			--noautoconsole
+			--noautoconsole \
+			--import
 			#--controller type=pci,index=0,model=pci-root \
 			#$pci_str
 		virt-install \
@@ -464,7 +465,8 @@ sriov_setup()
 			--graphics vnc,listen=0.0.0.0 \
 			--force \
 			--os-variant=rhel-unknown \
-			--noautoconsole
+			--noautoconsole \
+			--import
 			#--controller type=pci,index=0,model=pci-root \
 			#$pci_str
 	fi
