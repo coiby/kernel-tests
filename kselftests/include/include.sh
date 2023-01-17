@@ -38,6 +38,24 @@ clean_env()
 	unset SKIP
 }
 
+# set sysctl values and retore it back after testing
+declare -A SYSCTL_ORIG
+sysctl_set()
+{
+	local key=$1; shift
+	local value=$1; shift
+
+	SYSCTL_ORIG[$key]=$(sysctl -n $key)
+	sysctl -qw $key="$value"
+}
+
+sysctl_restore()
+{
+	local key=$1; shift
+
+	sysctl -qw $key="${SYSCTL_ORIG[$key]}"
+}
+
 log()
 {
 	echo -e "\n[$(date '+%T')][$(whoami)@$(uname -r | cut -f 2 -d-)]# " | tee -a $OUTPUTFILE

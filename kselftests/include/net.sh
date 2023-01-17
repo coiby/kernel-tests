@@ -188,10 +188,11 @@ do_net_forwarding_config()
 
 	# RHEL8.6 and 9.0 set this to "0 2147483647", which makes the
 	# router_multipath tests failed
-	reset_ping_group_range=$(sysctl -n net.ipv4.ping_group_range)
-	sysctl -qw net.ipv4.ping_group_range="1 0"
-	sysctl -qw net.bridge.bridge-nf-call-iptables=0
-	sysctl -qw net.bridge.bridge-nf-call-ip6tables=0
+	sysctl_set net.ipv4.ping_group_range "1 0"
+	if lsmod | grep -q br_netfilter; then
+		sysctl_set net.bridge.bridge-nf-call-iptables 0
+		sysctl_set net.bridge.bridge-nf-call-ip6tables 0
+	fi
 
 	cp forwarding.config.sample forwarding.config
 	popd
@@ -199,7 +200,11 @@ do_net_forwarding_config()
 
 do_net_forwarding_reset()
 {
-	sysctl -qw net.ipv4.ping_group_range="${reset_ping_group_range}"
+	sysctl_restore net.ipv4.ping_group_range
+	if lsmod | grep -q br_netfilter; then
+		sysctl_restore net.bridge.bridge-nf-call-iptables
+		sysctl_restore net.bridge.bridge-nf-call-ip6tables
+	fi
 	# forwarding tests created veth pairs and netns, which may affect
 	# later tests when they also want to create veth interfaces.
 	reset_network_env
