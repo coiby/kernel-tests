@@ -1,6 +1,6 @@
 [General]
 name=kernel/distribution/ltp/openposix_testsuite
-owner=Kernel General Test Team <kernel-general-test-team@redhat.com>
+owner=Memory Management QE <mm-qe@redhat.com>
 description=Linux Test Project openposix testsuite KernelTier1
 license=GPLv3
 confidential=no
