@@ -263,8 +263,8 @@ net-sync()
 # We only care the main distro
 GetDistroRelease()
 {
-	#version=`sed 's/[^0-9\.]//g' /etc/redhat-release`
-	cut -f1 -d. /etc/redhat-release | sed 's/[^0-9]//g'
+	source /etc/os-release
+	echo $VERSION_ID | awk -F. '{print $1}'
 }
 
 get_python()
@@ -467,7 +467,7 @@ else
 
 	set_dmesg_check_key
 
-	rhel_vx=$(rpm -E %rhel)
+	rhel_vx=$(GetDistroRelease)
 	if [ $rhel_vx -ge 9 ];then
 		# avoid ssh "no matching cipher found" issue
 		if ! grep -v ^# /etc/ssh/ssh_config | grep -q Ciphers;then
