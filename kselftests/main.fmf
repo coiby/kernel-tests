@@ -1,0 +1,41 @@
+summary: KG-VMM kselftest
+description: <a href="https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/tree/main/kselftests"
+    target="_top" class="descriptionLink">https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/tree/main/kselftests</a> 
+enabled: false
+link:
+  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-288689
+  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-288831
+id: 83986a89-c53a-4ed6-a17b-6c18216168b8
+contact: Hangbin Liu <haliu@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - restraint-rhts
+  - beakerlib
+  - tar
+  - autoconf
+  - automake
+  - wget
+  - bison
+  - bpftool
+  - flex
+  - python3
+  - llvm
+  - iproute-tc
+  - clang
+  - jq
+  - ethtool
+  - net-tools
+  - nmap-ncat
+recommend:
+  - netsniff-ng
+  - valgrind
+  - numactl-libs
+  - socat
+  - iperf3
+  - scapy
+duration: 3h
+extra-summary: kselftests
+extra-task: kselftests
