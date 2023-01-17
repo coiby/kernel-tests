@@ -72,7 +72,6 @@ function scsi_level(){
             rlLog "$major $minor, $disk get disk parameter"
             mpath_name=$(dmsetup deps |grep "$disk" |awk -F : '{print $1}')
             rlLog "$mpath_name,get disk's mp name and rm it"
-            rlRun "multipath -f $mpath_name "
             sleep 5
             rlRun "multipath -f $mpath_name"
         fi
