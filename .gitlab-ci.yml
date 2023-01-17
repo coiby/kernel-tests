@@ -2,6 +2,7 @@
 include:
   - project: cki-project/cki-lib
     file: .gitlab/ci_templates/cki-common.yml
+    ref: production
 
 .rules:
   no-merge-train:
