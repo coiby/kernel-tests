@@ -1,0 +1,13 @@
+[General]
+name=storage/block/bz2149790_reread_partition_table
+owner=Changhui Zhong <czhong@redhat.com>
+description= reread partition table of open device caused partition issue
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=gdisk;mdadm
+repoRequires=cki_lib
+max_time=1h

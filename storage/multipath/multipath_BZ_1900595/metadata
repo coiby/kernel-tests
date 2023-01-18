@@ -1,0 +1,12 @@
+[General]
+name=storage/multipath/multipath_BZ_1900595
+owner=Lin Li <lilin@redhat.com>
+description=Bug 1900595
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=
+max_time=1h

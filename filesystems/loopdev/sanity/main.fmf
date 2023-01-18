@@ -1,0 +1,24 @@
+summary: fs-qe case:cki:/kernel/filesystems/loopdev/sanity
+description: <a href="https://gitlab.com/cki-project/kernel-tests.git" target="_top"
+    class="descriptionLink">https://gitlab.com/cki-project/kernel-tests.git</a>  filesystems/loopdev/sanity<br/>
+enabled: true
+link:
+  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-288850
+  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291756
+id: ca1cabf2-f770-43e4-9474-c0172e838e8b
+contact: Xiong Zhou <xzhou@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: shell
+require:
+  - wget
+  - git
+  - gcc
+  - make
+  - autoconf
+  - tar
+  - bzip2
+  - glibc-static
+extra-summary: filesystems/loopdev/sanity
+extra-task: filesystems/loopdev/sanity

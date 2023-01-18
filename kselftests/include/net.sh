@@ -19,16 +19,16 @@ install_netsniff()
 
 	if [ $(krelease) -eq "8" ] || [ $(krelease) -eq "9" ]; then
 		if ! rpm -q epel-release; then
-			dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(krelease).noarch.rpm
+			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(krelease).noarch.rpm
 			local need_remove=1
 		else
 			local param="--enablerepo=epel"
 		fi
 	fi
 
-	dnf $param install -y jq netsniff-ng
+	$pkg_mgr $pkg_mgr_inst_string  jq netsniff-ng
 
-	[ "${need_remove}" ] && dnf -y remove epel-release
+	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
 	which mausezahn && return 0 || return 1
 }
@@ -37,7 +37,7 @@ install_smcroute()
 {
 	which smcroute && return 0
 	dnf copr -y enable liuhangbin/smcroute
-	dnf install -y smcroute
+	$pkg_mgr $pkg_mgr_inst_string smcroute
 	which smcroute && return 0 || return 1
 }
 
@@ -46,7 +46,7 @@ install_sendip()
 
 	which sendip && return 0
 	dnf -y copr enable cygn/SendIP
-	dnf install -y sendip
+	$pkg_mgr $pkg_mgr_inst_string sendip
 
 	which sendip && return 0 || return 1
 }
@@ -54,14 +54,10 @@ install_sendip()
 install_scapy()
 {
 	scapy -h && return 0
-
 	[ "$(krelease)" -eq "8" ] && \
-		dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-
-	dnf install -y scapy
-
+		$pkg_mgr $pkg_mgr_inst_string https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+	$pkg_mgr $pkg_mgr_inst_string scapy
 	[ "$(krelease)" -eq "8" ] && rpm -e epel-release
-
 	scapy -h && return 0 || return 1
 }
 
@@ -177,7 +173,7 @@ do_net_forwarding_config()
 {
 	set_network_env
 
-	which tc || dnf install -q -y iproute-tc
+	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
 	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
 	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
 
@@ -223,7 +219,7 @@ do_netfilter_config()
 {
 	set_network_env
 
-	which conntrack || dnf install -q -y conntrack-tools
+	which conntrack || $pkg_mgr $pkg_mgr_inst_string conntrack-tools
 	install_sendip
 }
 
@@ -309,7 +305,7 @@ do_tc-testing_config()
 	set_network_env
 
 	# prepare evn
-	dnf install -y clang valgrind
+	$pkg_mgr $pkg_mgr_inst_string clang valgrind
 	install_scapy
 	modprobe -r veth
 

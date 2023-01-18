@@ -1,0 +1,18 @@
+summary: KS-TC:vdo/crypt
+description: Run set of vdo tests from https://gitlab.com/rh-kernel-stqe/python-stqe
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - vdo
+path: /storage/vdo/crypt
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/vdo/crypt
+extra-task: /storage/vdo/crypt
+adjust:
+    enabled: false
+    when: distro > rhel-8
+id: 484C5813-5F7E-40B6-A5C5-5588E9C7C945

@@ -1,0 +1,18 @@
+summary: KS-TC:vdo/fcoe
+description: Run set of vdo tests from https://gitlab.com/rh-kernel-stqe/python-stqe
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - vdo
+path: /storage/vdo/fcoe
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/vdo/fcoe
+extra-task: /storage/stratis/fcoe
+adjust:
+    enabled: false
+    when: distro > rhel-8
+id: 6CFBDFFB-BCEA-40AF-B31F-7F5A2D34A913

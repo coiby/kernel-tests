@@ -1,0 +1,18 @@
+summary: KS-TC:stratis/common
+description: Run set of stratis test cases from https://gitlab.com/rh-kernel-stqe/python-stqe using available disks
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - stratis
+path: /storage/stratis/common
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/stratis/common
+extra-task: /storage/stratis/common
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: 36D34649-2737-4150-845F-D04F0C515D44

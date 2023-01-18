@@ -24,8 +24,8 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-. /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
+. ../../../../cki_lib/libcki.sh
 
 get_vmallocused="grep -i vmallocused /proc/meminfo | tr -cd [:digit:]"
 get_memtotal="grep -i memtotal /proc/meminfo | tr -cd [:digit:]"
@@ -38,6 +38,22 @@ after_removed=0
 used=0
 PAGESIZE=$(getconf PAGESIZE)
 PAGENUM=1024
+
+kname="kernel"
+if cki_is_kernel_rt; then
+    kname="kernel-rt"
+fi
+if cki_is_kernel_automotive; then
+    kname="kernel-automotive"
+fi
+if cki_is_kernel_debug; then
+    kname="${kname}-debug"
+fi
+kversion=$(uname -r | awk -F '-' '{print $1}')
+krelease=$(uname -r | awk -F '-' '{print $2}')
+krelease=${krelease%.*}
+karch=$(uname -i)
+
 (( allocated = PAGESIZE * PAGENUM / 1024 ))
 
 function cat_procfs()
@@ -127,13 +143,17 @@ function assert_allocated()
 function vmalloc_test_setup()
 {
     # check if nvr in 4.4.0-5.3.0
-    yum install -y rpmdevtools
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        rlRun "rpm-ostree -y -A --idempotent --allow-inactive install rpmdevtools"
+    else
+        yum install -y rpmdevtools
+    fi
     newer_than_4=$(rpmdev-vercmp 4.4.0 $(uname -r) 1>/dev/null; echo $?)
     older_than_5=$(rpmdev-vercmp $(uname -r) 5.3.0 1>/dev/null; echo $?)
 
     # skip on non-x86 cki kernel builds
     if ! uname -r | grep -q x86_64 && uname -r | grep -E "mr[0-9]+"; then
-        report_result "vmalloc_cki_module_compile" SKIP
+        rstrnt-report-result "vmalloc_cki_module_compile" SKIP
         rlPhaseEnd
         exit 0
     fi
@@ -141,7 +161,7 @@ function vmalloc_test_setup()
     if [ "$(eval $get_vmallocused)" = "0" ]; then
         cat_procfs 0
         if [ $(( newer_than_4 + older_than_5 )) -eq 24 ]; then
-            report_result "vmallocused_not_supported" SKIP
+            rstrnt-report-result "vmallocused_not_supported" SKIP
             rlPhaseEnd
             exit 0
         else
@@ -150,8 +170,18 @@ function vmalloc_test_setup()
     fi
 
     # install kernel-devel pkg
-    yum install -y kernel-general-include
-    rlRun "yum install -y kernel-devel-$(uname -r) || ../../../include/scripts/wget-kernel.sh --running --devel -i"
+    if ! cki_is_kernel_automotive; then
+        yum install -y kernel-general-include
+        rlRun "yum install -y kernel-devel-$(uname -r) || ../../../include/scripts/wget-kernel.sh --running --devel -i"
+    else
+        if ! rpm -q --quiet ${kname}-devel-$(uname -r | sed -e 's/+debug//'); then
+            if stat /run/ostree-booted > /dev/null 2>&1; then
+                rlRun "rpm-ostree -y -A --idempotent --allow-inactive install ${kname}-devel-${kversion}-${krelease}.${karch}"
+            else
+                rlRpmInstall ${kname}-devel ${kversion} ${krelease} ${karch}
+            fi
+        fi
+    fi
 
     get_pagenum
 }

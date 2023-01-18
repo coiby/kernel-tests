@@ -46,9 +46,11 @@
 /networking/wireless/rhel7/tests/wireless-connection-to-WEP-key-AP-nl80211/ @ltrivell @jbastianrh
 /networking/wireless/rhel7/tests/wireless-connection-to-WPA1-TTLS-EAP-AP-nl80211/ @ltrivell @jbastianrh
 /networking/wireless/rhel7/tests/wireless-connection-to-unencrypted-AP-nl80211/ @ltrivell @jbastianrh
+/networking/wireless/tests/bug/bz1044005/ @ltrivell @jbastianrh
 /networking/wireless/tests/bug/bz1044005/wireless_connection_to_unencrypted_AP/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/cleanup/ @ltrivell @jbastianrh
+/networking/wireless/tests/functional/connection/nmcli/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WEP_LEAP_AP/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WEP_key_AP/ @ltrivell @jbastianrh
 /networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_PEAP_AP/ @ltrivell @jbastianrh
@@ -206,6 +208,7 @@
 /networking/tunnel/vxlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /networking/udp/udp_socket/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /networking/vnic/ipvlan/basic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
+/networking/vnic/sriov/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /networking/vrf/sanity_check/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
@@ -246,6 +249,7 @@
 /storage/block/fio_numa/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /storage/block/fs_fio/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /storage/block/mq_sche/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
+/storage/block/multipath_mapping/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /storage/block/zstd_compression/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /storage/block/zstd_smoke/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
 /storage/dm/common/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @veruu
@@ -276,7 +280,7 @@
 [kpet-db-maintainers]
 /acpi/acpitable/ @ahs3 @bgoncalv @lulinqing
 /acpi/enabled/ @bgoncalv @jbastianrh @lulinqing
-/container/podman/ @bgoncalv @ftjahjad @lulinqing
+/container/podman/ @bgoncalv @lulinqing @yarboa
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
 /cpu/die/ @bgoncalv @darcari @lulinqing
@@ -328,6 +332,7 @@
 /networking/tunnel/vxlan/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
 /networking/vnic/ipvlan/basic/ @bgoncalv @linup2011 @lulinqing
+/networking/vnic/sriov/ @bgoncalv @lulinqing @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
@@ -362,11 +367,12 @@
 /storage/block/fio_numa/ @bgoncalv @lulinqing @yizhanglinux
 /storage/block/fs_fio/ @bgoncalv @czhong2 @lulinqing
 /storage/block/mq_sche/ @bgoncalv @czhong2 @lulinqing
+/storage/block/multipath_mapping/ @bgoncalv @czhong2 @lulinqing
 /storage/block/zstd_compression/ @bgoncalv @czhong2 @lulinqing
 /storage/block/zstd_smoke/ @bgoncalv @czhong2 @lulinqing
 /storage/dm/common/ @bgoncalv @guazhang @lulinqing
-/storage/hba/san-device-stress/ @bgoncalv @lulinqing @mpatalan
-/storage/hw_raid/ @bgoncalv @lulinqing @mpatalan
+/storage/hba/san-device-stress/ @bgoncalv @lilinredhat @lulinqing @mpatalan
+/storage/hw_raid/ @bgoncalv @lilinredhat @lulinqing @mpatalan
 /storage/iscsi/params/ @bgoncalv @lulinqing @mhoyer
 /storage/lvm/cache/ @bgoncalv @fsuba @lulinqing
 /storage/lvm/device-mapper/ @bgoncalv @lulinqing @snitm

@@ -1,0 +1,16 @@
+summary: Ensure tracepoints are working
+description: |
+    SystemTap tracepoint operational tests.
+    SystemTap is a tracing and probing tool that allows users to study and monitor the activities of the operating system (particularly, the kernel) in fine detail.
+    It provides information similar to the output of tools like netstat, ps, top, and iostat; 
+    SystemTap is designed to provide more filtering and analysis options for collected information.
+contact: Jeff Bastian <jbastian@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - systemtap
+extra-summary: tracepoints/operational
+extra-task: tracepoints/operational
+link:
+  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291931
+id: dbea203c-2c8d-4c18-b9a3-40bfa84f9c03

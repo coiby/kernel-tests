@@ -1,0 +1,19 @@
+summary: KS-TC:lvm/snapper
+description: Run snapper tests from https://gitlab.com/rh-kernel-stqe/python-stqe
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - snapper
+path: /storage/lvm/snapper
+test: stqe-test run -t lvm/snapper/snapper_basic.py
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/lvm/snapper
+extra-task: /storage/lvm/snapper
+adjust:
+    enabled: false
+    when: distro > rhel-7
+    because: snapper is not shipped in RHEL from 8.0
+id: 6F445B4F-51E5-4680-9345-E7642BD42387

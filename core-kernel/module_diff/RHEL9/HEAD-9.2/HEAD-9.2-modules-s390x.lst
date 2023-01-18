@@ -83,6 +83,7 @@ crc-itu-t.ko
 csiostor.ko
 ctcm.ko
 cuse.ko
+cxl_mem.ko
 cxl_pci.ko
 cxl_pmem.ko
 dasd_diag_mod.ko
@@ -773,5 +774,6 @@ zcrypt_cex4.ko
 zcrypt.ko
 zfcp.ko
 zram.ko
+zsmalloc.ko
 zstd_compress.ko
 zstd.ko

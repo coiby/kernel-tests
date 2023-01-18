@@ -2,6 +2,7 @@
 include:
   - project: cki-project/cki-lib
     file: .gitlab/ci_templates/cki-common.yml
+    ref: production
 
 .rules:
   no-merge-train:
@@ -92,7 +93,15 @@ shell check runtests mr:
     - !reference [.rules, mr-parent]
 
 shellspec:
-  extends: .shellspec
+  extends: [.shellspec, .pipeline_images]
+  variables:
+    USE_BASH_ORIG: 'true'
+  before_script:
+    # required beakerlib functions should be added as mocked to
+    # spec/support/bin/
+    - "# Mock external libraries include files"
+    - mkdir /usr/share/beakerlib
+    - touch /usr/share/beakerlib/beakerlib.sh
 
 codeowners check:
   extends: .cki_tools

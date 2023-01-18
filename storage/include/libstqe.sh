@@ -39,7 +39,8 @@ function get_release() {
 
 function stqe_init {
   typeset pip="python3 -m pip"
-  typeset pkg_mgr=$(dnf >/dev/null 2>&1 && echo dnf || echo yum)
+  typeset pkg_mgr
+  pkg_mgr=$(dnf >/dev/null 2>&1 && echo dnf || echo yum)
 
   # augeas-libs needed for RHEL-7, netifaces needed for aarch64
   cki_run "$pkg_mgr install -y --skip-broken python3-pip python3-wheel python3-augeas augeas-libs python3-netifaces" ||
@@ -75,7 +76,7 @@ function stqe_init {
     cki_run "$pip install stqe --no-binary=stqe --user" ||
       cki_abort_task "Fail to install stqe"
   fi
-  cki_run "restorecon -Rv /usr/local/lib/python* /usr/lib/python*"
+  cki_run "restorecon -Rv /usr/local/lib/python* /usr/lib/python* /root/.local/lib/python*"
 
   return 0
 }

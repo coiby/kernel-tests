@@ -70,7 +70,7 @@ stop_NetworkManager()
 
 	local beaker_nic=$(get_default_iface)
 	echo DEBUG::: beaker_nic=$beaker_nic
-	rhel_verx=$(rpm -E %rhel)
+	rhel_verx=$(GetDistroRelease)
 	if [ $rhel_verx -ge 9 ];then
 		OLD_IFS=$IFS
 		IFS=$'\n'
@@ -181,7 +181,7 @@ stop_NetworkManager()
 # This configuration could valid even after reloading driver.
 set_nm_unmanage()
 {
-	rhel_ver=$(rpm -E %rhel)
+	rhel_ver=$(GetDistroRelease)
 	[ $rhel_ver -lt 7 ] && return
 
 	default_iface=$(get_default_iface)
@@ -201,7 +201,7 @@ set_nm_unmanage()
 # You'd better restore the configuration at the end of your case.
 unset_nm_unmanage()
 {
-	rhel_ver=$(rpm -E %rhel)
+	rhel_ver=$(GetDistroRelease)
 	[ $rhel_ver -lt 7 ] && return
 
 	sed -i '/\[keyfile\]/d' /etc/NetworkManager/NetworkManager.conf

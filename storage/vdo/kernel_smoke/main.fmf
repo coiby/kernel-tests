@@ -1,0 +1,18 @@
+summary: KS-TC:vdo/kernel_smoke
+description: Run set of stratis test cases from https://gitlab.com/rh-kernel-stqe/python-stqe using available disks
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - vdo
+path: /storage/vdo/kernel_smoke
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/vdo/kernel_smoke
+extra-task: /storage/vdo/kernel_smoke
+adjust:
+    enabled: false
+    when: distro > rhel-8
+id: 9483FA20-7218-41D7-9576-C9FD10BA188E

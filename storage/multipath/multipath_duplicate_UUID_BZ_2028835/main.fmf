@@ -1,0 +1,15 @@
+summary: storage/multipath/multipath_duplicate_UUID_BZ_2028835
+description: Bug 2028835
+contact: Lin Li <lilin@redhat.com>
+component:
+  - kernel
+path: /storage/multipath/multipath_duplicate_UUID_BZ_2028835
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+duration: 1h
+tier: 1
+extra-summary: /storage/multipath/multipath_duplicate_UUID_BZ_2028835
+extra-task: /storage/multipath/multipath_duplicate_UUID_BZ_2028835
