@@ -1,6 +1,8 @@
 #!/bin/bash
 
-[ ! "$RSTRNT_JOBID" ] && rm -rf logs && mkdir logs && export TMPDIR="$PWD/logs"
+TEST="kselftests"
+
+[ ! "$RSTRNT_JOBID" ] && rm -rf logs && mkdir logs && export LOG_DIR="$PWD/logs"
 
 if [ ! "$RSTRNT_JOBID" ]; then
 	RED='\E[1;31m'
@@ -9,11 +11,9 @@ if [ ! "$RSTRNT_JOBID" ]; then
 	RES='\E[0m'
 fi
 
-[ ! "$RSTRNT_JOBID" ] && rm -rf /mnt/testarea && mkdir /mnt/testarea && export TESTAREA="/mnt/testarea"
-
 new_outputfile()
 {
-	[ "$RSTRNT_JOBID" ] && mktemp /mnt/testarea/tmp.XXXXXX || mktemp $TMPDIR/tmp.XXXXXX
+	[ "$RSTRNT_JOBID" ] && mktemp /mnt/testarea/tmp.XXXXXX || mktemp $LOG_DIR/tmp.XXXXXX
 }
 
 setup_env()
@@ -161,13 +161,13 @@ watch()
 	command=$1
 	timeout=$2
 	single=${3:-9}
-	now=$(date '+%s')
-	after=$(date -d "$timeout seconds" '+%s')
+	now=`date '+%s'`
+	after=`date -d "$timeout seconds" '+%s'`
 
 	eval "$command" &
 	pid=$!
 	while true; do
-		now=$(date '+%s')
+		now=`date '+%s'`
 
 		if ps -p $pid; then
 			if [ "$after" -gt "$now" ]; then
@@ -191,68 +191,56 @@ check_skip()
 
 check_result()
 {
-	local test_name=$1
-	local test_result=$2
+	local num=$1
+	local total_num=$2
+	local test_name=$3
+	local test_result=$4
 
-	if [ "$test_result" == "PASS" ]; then
-		test_pass "${test_name} [PASS]"
-	elif [ "$test_result" == "SKIP" ]; then
-		test_skip "${test_name} [SKIP]"
-	elif [ "$test_result" == "WARN" ]; then
-		test_pass "${test_name} [WARN]"
+	if [ "${DEBUG_CMD}" ]; then
+		log "Following are DEBUG commands output"
+		run "${DEBUG_CMD}"
+	fi
+
+	if [ "$test_result" -eq 0 ]; then
+		test_pass "${num}..${total_num} selftests: ${test_name} [PASS]"
+	elif [ "$test_result" -eq $SKIP_CODE ]; then
+		test_skip "${num}..${total_num} selftests: ${test_name} [SKIP]"
+	elif [[ " $WAIVE_TARGETS " = *" ${test_name} "* ]]; then
+		test_pass "${num}..${total_num} selftests: ${test_name} [WAIVE]"
 	else
-		test_fail "${test_name} [FAIL]"
+		test_fail "${num}..${total_num} selftests: ${test_name} [FAIL]"
 	fi
 }
 
-# return 0 when running kernel rt
-kernel_rt()
+# Check if expect test exist, return 0 if exist and 1 if not.
+check_test_exist()
 {
-    if [[ $(uname -r) =~ "rt" ]]; then
-       return  0
-    fi
-    return 1
+	local item=$1
+	local folder
+
+	folder=$(echo "$item" | cut -f1 -d':')
+
+	# Check if the test in kselftest-list.txt and has it's own folder
+	if grep -qE "$folder" "$EXEC_DIR"/kselftest-list.txt; then
+		if [ -d "$EXEC_DIR/$folder" ]; then
+			return 0
+		fi
+	fi
+
+	# Special cases
+	if [ "$item" == "default" ]; then
+		return 0
+	elif [ "$item" == "bpf_test_progs" ]; then
+		if grep -q "bpf:test_progs" "$EXEC_DIR"/kselftest-list.txt; then
+			if [ -f "$EXEC_DIR"/bpf/test_progs ]; then
+				return 0
+			fi
+		fi
+	fi
+
+	return 1
 }
 
-
-# return 0 when running kernel debug
-kernel_debug()
-{
-    if [[ $(uname -r) =~ "debug" ]]; then
-       return  0
-    fi
-    return 1
-}
-
-# return 0 when running kernel automotive
-kernel_automotive()
-{
-    if rpm -q "kernel-automotive-$(uname -r)" > /dev/null 2>&1; then
-       return  0
-    fi
-    return 1
-}
-
-install_repos()
-{
-    kcomp=${COMPOSE} #To create the right repo links later and grab certain packages. not used on automotive builds.
-#    id=$(grep ^ID= /etc/os-release | cut -d = -f 2) #Information about what os we are on, rhel or centos
-#    major=$(grep ^VERSION_ID= /etc/os-release | cut -d = -f 2 | cut -d \" -f 2 | cut -d . -f 1) #Main release e.g. 9
-    id=$(grep ^ID= /etc/os-release | awk -F = '{print $2}') #Information about what os we are on, rhel or centos
-    major=$(grep ^VERSION_ID= /etc/os-release | awk -F = '{print $2}' | sed s/\"//g) #Main release e.g. 9
-    karch=$(uname -i)
-
-    if kernel_automotive; then
-        sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
-        dnf install 'dnf-command(config-manager)' -y
-        dnf config-manager --set-enabled crb
-        dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main
-        dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main/debug
-        dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main
-        dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main/debug
-        sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main.repo
-        sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main_debug.repo
-        sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main.repo
-        sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main_debug.repo
-    fi
-}
+if [ ! "$CKI_SELFTESTS_URL" ] && [ ! "$BUILD_FROM_SRC" ] && [ ! "$DELIVERED_TESTS" ]; then
+	test_skip_exit "CKI_SELFTESTS_URL/BUILD_FROM_SRC/DELIVERED_TESTS not found. At least one must be set."
+fi

@@ -1,0 +1,10 @@
+summary: Storage block fio random write/read with each NUMA CPU
+contact: Yi Zhang <yizhan@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - fio
+  - numactl
+  - bc
+extra-summary: storage/block/fio_numa
+extra-task: storage/block/fio_numa

@@ -1,0 +1,15 @@
+summary: storage/multipath/multipath_BZ_2042032
+description: Bug 2042032
+contact: Lin Li <lilin@redhat.com>
+component:
+  - kernel
+path: /storage/multipath/multipath_BZ_2042032
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+duration: 1h
+tier: 1
+extra-summary: /storage/multipath/multipath_BZ_2042032
+extra-task: /storage/multipath/multipath_BZ_2042032

@@ -331,6 +331,8 @@ dp83822.ko
 dp83848.ko
 dp83867.ko
 dp83tc811.ko
+drm_buddy.ko
+drm_display_helper.ko
 drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko

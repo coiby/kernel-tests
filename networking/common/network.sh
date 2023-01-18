@@ -254,7 +254,7 @@ get_netqe_nic_info()
 	wget --no-check-certificate $NIC_INFO_URL -O $NIC_INFO
 	sed -i '/^#/d' $NIC_INFO
 	# delete unsupported NIC
-	rhel_vx=rhel$(rpm -E %rhel)
+	rhel_vx=rhel$(GetDistroRelease)
 	sed -i "/$rhel_vx/d" $NIC_INFO
 }
 

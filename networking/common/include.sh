@@ -263,8 +263,8 @@ net-sync()
 # We only care the main distro
 GetDistroRelease()
 {
-	#version=`sed 's/[^0-9\.]//g' /etc/redhat-release`
-	cut -f1 -d. /etc/redhat-release | sed 's/[^0-9]//g'
+	source /etc/os-release
+	echo $VERSION_ID | awk -F. '{print $1}'
 }
 
 get_python()
@@ -414,8 +414,13 @@ else
 			make testinfo.desc
 			packages=`awk -F: '/Requires:/ {print $2}' testinfo.desc`
 			$YUM $packages --skip-broken || $YUM $packages
-			yum info kernel-modules-extra && kernel_modules_extra_install
-			yum install kernel-modules-extra -y --skip-broken
+			# Don't try to install kernel-modules-extra pacakges if kernel is not from rpm packages
+			# for exmaple, cki kernel builds for upstream kernel tree are tarball not rpm, in this case
+			# kernel-modules-extra is not available
+			if rpm -qf /boot/config-$(uname -r) > /dev/null 2>&1; then
+				yum info kernel-modules-extra && kernel_modules_extra_install
+				yum install kernel-modules-extra -y --skip-broken
+			fi
 
 			# ssh to switch would fail with error "no matching key exchange method found. Their offer: diffie-hellman-group1-sha1" on rhel8
 			# add extra configuration for ssh
@@ -467,7 +472,7 @@ else
 
 	set_dmesg_check_key
 
-	rhel_vx=$(rpm -E %rhel)
+	rhel_vx=$(GetDistroRelease)
 	if [ $rhel_vx -ge 9 ];then
 		# avoid ssh "no matching cipher found" issue
 		if ! grep -v ^# /etc/ssh/ssh_config | grep -q Ciphers;then
