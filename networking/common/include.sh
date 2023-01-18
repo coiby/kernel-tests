@@ -414,8 +414,13 @@ else
 			make testinfo.desc
 			packages=`awk -F: '/Requires:/ {print $2}' testinfo.desc`
 			$YUM $packages --skip-broken || $YUM $packages
-			yum info kernel-modules-extra && kernel_modules_extra_install
-			yum install kernel-modules-extra -y --skip-broken
+			# Don't try to install kernel-modules-extra pacakges if kernel is not from rpm packages
+			# for exmaple, cki kernel builds for upstream kernel tree are tarball not rpm, in this case
+			# kernel-modules-extra is not available
+			if rpm -qf /boot/config-$(uname -r) > /dev/null 2>&1; then
+				yum info kernel-modules-extra && kernel_modules_extra_install
+				yum install kernel-modules-extra -y --skip-broken
+			fi
 
 			# ssh to switch would fail with error "no matching key exchange method found. Their offer: diffie-hellman-group1-sha1" on rhel8
 			# add extra configuration for ssh
