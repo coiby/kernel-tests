@@ -392,9 +392,6 @@ else
 			rpm-ostree -A --idempotent --allow-inactive install openssh-clients
 			ssh_client_version=`rpm -q openssh-clients --info | grep -o -E "Version.*: [0-9]+" | awk '{print $3}'`
 		else
-			make testinfo.desc
-			packages=`awk -F: '/Requires:/ {print $2}' testinfo.desc`
-			$YUM $packages --skip-broken || $YUM $packages
 			yum install openssh-clients -y
 			ssh_client_version=`yum info openssh-clients | grep -o -E "Version.*: [0-9]+" | awk '{print $3}'`
 		fi
@@ -411,9 +408,6 @@ else
 			ssh_client_version=`rpm -q openssh-clients --info | grep -o -E "Version.*: [0-9]+" | awk '{print $3}'`
 		else
 			# install kernel-module-extra version matching the current running kernel version
-			make testinfo.desc
-			packages=`awk -F: '/Requires:/ {print $2}' testinfo.desc`
-			$YUM $packages --skip-broken || $YUM $packages
 			# Don't try to install kernel-modules-extra pacakges if kernel is not from rpm packages
 			# for exmaple, cki kernel builds for upstream kernel tree are tarball not rpm, in this case
 			# kernel-modules-extra is not available
