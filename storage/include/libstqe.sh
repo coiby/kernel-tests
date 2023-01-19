@@ -17,12 +17,11 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f "${BASH_SOURCE[@]}")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 
 # Include environment and libraries
-source "$CDIR"/../../cki_lib/libcki.sh ||
-  cki_abort_task "fail to include libcki.sh"
+source "$CDIR"/../../cki_lib/libcki.sh || exit 1
 
 # Test parameters to use some specific version of stqe tests or libsan library
 STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-""}
