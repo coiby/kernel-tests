@@ -347,43 +347,8 @@ config_ssh()
 	fi
 }
 
-# source our functions
-pushd $NETWORK_COMMONLIB_DIR > /dev/null
-for lib in *.sh; do
-	# skip self and runtest.sh
-	[ "$lib" = "include.sh" -o "$lib" = "runtest.sh" ] && continue
-	source ./$(basename $lib)
-done
-
-# handle the initial task just once
-if [ -f /dev/shm/network_common_initalized ]
-then
-	# avc_check toggle every time common is called as avc setting may be
-	# reset by beaker or others
-	[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
-else
-	{
-	if [ "$(uname -m)" = "ppc64le" ];
-	then
-		sleep 2;
-	else
-		# This is a workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1920477#c33
-		# install nfp firmware
-		$YUM netronome-firmware
-
-		# update initramfs
-		dracut -f;
-		# The problem is that the zipl bootloaders have a fixed list of blocks on
-		# the device to read during boot. This list is generated every time the
-		# zipl command is run. When now the initramfs is updated this can
-		# add/remove/move blocks. So without running zipl the fixed list will
-		# be out of sync with what is on disk.
-		[[ "$(uname -m)" =~ s390.* ]] && zipl
-		# reload driver
-		modprobe -r nfp;sleep 2;
-		modprobe nfp;sleep 5;
-	fi
-
+install_required_packages()
+{
 	# make sure all required packages are installed
 	if [ -x /usr/sbin/kernel-is-rt ]; then
 		if stat /run/ostree-booted > /dev/null 2>&1; then
@@ -422,6 +387,46 @@ else
 			ssh_client_version=`yum info openssh-clients | grep -o -E "Version.*: [0-9]+" | awk '{print $3}'`
 		fi
 	fi
+}
+
+# source our functions
+pushd $NETWORK_COMMONLIB_DIR > /dev/null
+for lib in *.sh; do
+	# skip self and runtest.sh
+	[ "$lib" = "include.sh" -o "$lib" = "runtest.sh" ] && continue
+	source ./$(basename $lib)
+done
+
+# handle the initial task just once
+if [ -f /dev/shm/network_common_initalized ]
+then
+	# avc_check toggle every time common is called as avc setting may be
+	# reset by beaker or others
+	[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
+else
+	{
+	if [ "$(uname -m)" = "ppc64le" ];
+	then
+		sleep 2;
+	else
+		# This is a workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1920477#c33
+		# install nfp firmware
+		$YUM netronome-firmware
+
+		# update initramfs
+		dracut -f;
+		# The problem is that the zipl bootloaders have a fixed list of blocks on
+		# the device to read during boot. This list is generated every time the
+		# zipl command is run. When now the initramfs is updated this can
+		# add/remove/move blocks. So without running zipl the fixed list will
+		# be out of sync with what is on disk.
+		[[ "$(uname -m)" =~ s390.* ]] && zipl
+		# reload driver
+		modprobe -r nfp;sleep 2;
+		modprobe nfp;sleep 5;
+	fi
+
+	install_required_packages
 
 	ssh_client_version=${ssh_client_version:-5}
 	if [ $ssh_client_version -ge 7 ]
