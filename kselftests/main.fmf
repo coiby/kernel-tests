@@ -1,6 +1,5 @@
 summary: KG-VMM kselftest
-description: <a href="https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/tree/main/kselftests"
-    target="_top" class="descriptionLink">https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/tree/main/kselftests</a> 
+description: test wrapper for kernel selftest
 enabled: false
 link:
   - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-288689
@@ -12,7 +11,6 @@ component:
 test: bash ./runtest.sh
 framework: beakerlib
 require:
-  - restraint-rhts
   - beakerlib
   - tar
   - autoconf
