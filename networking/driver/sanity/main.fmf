@@ -1,0 +1,14 @@
+summary: Networking driver sanity test
+description: |
+    This is a network driver santy test. It queries network devices for associated
+    driver information under /sys/class/net one bye one.
+contact: John Linville <linville@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - ethtool
+extra-summary: networking/driver/sanity
+extra-task: networking/driver/sanity
+link:
+  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291948
+id: 56d777a1-9f9b-4f5a-b5e7-1fed25c71f97
