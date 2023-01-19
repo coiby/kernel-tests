@@ -528,6 +528,14 @@ rlJournalStart
                     if cki_kver_lt "4.18.0-444"; then
                         sed -i '/amd_pstate.ko/d;/snd-hda-cs-dsp-ctls.ko/d;/snd-soc-hda-codec.ko/d;/snd-sof-pci-intel-mtl.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
                     fi
+                    if cki_kver_lt "4.18.0-447"; then
+                        sed -i '/sfc-siena.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-448"; then
+                        sed -i '/nvsw-sn2201.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                        sed -i '/hpwdt.ko/d;' ${OS}/${Release}/$Release-modules-aarch64.lst
+                        sed -i '/amd_pstate.ko/d;' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then
@@ -609,6 +617,24 @@ rlJournalStart
                                 /vdpa_sim_blk.ko/d;/vdpa_sim.ko/d;/vdpa_sim_net.ko/d;
                                 /vhost_vdpa.ko/d;/virtio_pci_modern_dev.ko/d;/virtio_vdpa.ko/d;
                                 /vp_vdpa.ko/d;/vringh.ko/d' ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-214"; then
+                        sed -i '/sfc-siena.ko/d' ${OS}/${Release}/$Release-modules-{x86_64,ppc64le}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-215"; then
+                        sed -i '/gnss.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-217"; then
+                        sed -i '/amd_pstate.ko/d' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-219"; then
+                        sed -i '/^curve25519-generic.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-229"; then
+                        sed -i '/soc-utils-test.ko/d' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-230"; then
+                        sed -i '/hpwdt.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
                     fi
                     ;;
             esac

@@ -190,6 +190,7 @@ crc7.ko
 crc8.ko
 crc-itu-t.ko
 csiostor.ko
+curve25519-generic.ko
 cuse.ko
 cx82310_eth.ko
 cxacru.ko
@@ -337,6 +338,7 @@ gl518sm.ko
 gl520sm.ko
 gl620a.ko
 gm12u320.ko
+gnss.ko
 gpio-pca953x.ko
 gpio-pcf857x.ko
 gpu-sched.ko
@@ -1172,6 +1174,7 @@ serpent_generic.ko
 serport.ko
 ses.ko
 sfc.ko
+sfc-siena.ko
 sg.ko
 sht15.ko
 sht21.ko
