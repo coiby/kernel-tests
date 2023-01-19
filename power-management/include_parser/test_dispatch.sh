@@ -46,9 +46,13 @@ if grep -q '^Red Hat Enterprise Linux release 9\.' /etc/redhat-release; then
         #Prepare system for tests and run tests for RHEL 9
 
         if ! [ "$(rpm -qa python2)" ]; then
-                dnf -y install python2
+                if [ -e /run/ostree-booted ]; then
+                        rpm-ostree -A --idempotent --allow-inactive install python2
+                else
+                        dnf -y install python2
+                fi
         fi
-        if ! [ -L /usr/bin/python ]; then
+        if ! [ -L /usr/bin/python -o -e /run/ostree-booted ]; then
                 ln -s /usr/bin/python2 /usr/bin/python
         fi
 
