@@ -27,7 +27,7 @@ source "$CDIR"/../../cki_lib/libcki.sh || exit 1
 STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-""}
 LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-""}
 
-function get_release() {
+get_release() {
   source /etc/os-release
   export DISTRO_FAMILY=$ID                                # e.g. 'fedora', 'rhel'
   export DISTRO_VERSION=$VERSION_ID                       # e.g. '36', '8.6'
@@ -36,7 +36,8 @@ function get_release() {
   export DISTRO_MAJ                                       # e.g. 'rhel-9', 'fedora-36
 }
 
-function stqe_init {
+stqe_init() {
+  stqe_path="/opt/stqe-venv"
   typeset pip="python3 -m pip"
   typeset pkg_mgr
   pkg_mgr=$(dnf >/dev/null 2>&1 && echo dnf || echo yum)
@@ -50,32 +51,34 @@ function stqe_init {
       cki_abort_task "FAIL: Could not install framework dependencies"
   fi
 
-  # Needed to install ruamel.yaml.clib from source, can be removed if aarch64 wheel is available
-  if [[ $ARCH == 'aarch64' ]]; then
-    cki_run "$pkg_mgr install -y gcc python3-devel" ||
-      cki_abort_task "FAIL: Could not install cffi from source on ppc64le RHEL-7"
-  fi
+  # Create virtualenv
+  trap "deactivate" EXIT
+  cki_run "$pip install virtualenv && python3 -m venv $stqe_path && source $stqe_path/bin/activate" ||
+      cki_abort_task "FAIL: Could not set-up python virtualenv"
 
   # Check if we have pip>=20, install 20.3 if not
   if [[ $($pip -V | cut -f 2 -d ' ' | cut -f 1 -d '.') -lt 20 ]]; then
-    cki_run "$pip install -U --user pip==20.3" ||
+    cki_run "$pip install -U pip==20.3" ||
       cki_abort_task "FAIL: Could not install pip==20.3!"
   fi
 
+  cki_run "$pip install wheel"
+
   # Workaround for python-augeas compiling bug on RHEL-7 ppc64le
   if [[ $ARCH == 'ppc64le' ]]; then
-    cki_run "$pip install cffi --no-binary=cffi --user" ||
+    cki_run "$pip install cffi --no-binary=cffi" ||
       cki_abort_task "FAIL: Could not install cffi from source on ppc64le RHEL-7"
   fi
 
   if [[ -n $STQE_STABLE_VERSION ]]; then
-    cki_run "$pip install --user stqe==$STQE_STABLE_VERSION --no-binary=stqe" ||
+    cki_run "$pip install stqe==$STQE_STABLE_VERSION --no-binary=stqe" ||
       cki_abort_task "Fail to install stqe==$STQE_STABLE_VERSION"
   else
-    cki_run "$pip install stqe --no-binary=stqe --user" ||
+    cki_run "$pip install stqe --no-binary=stqe" ||
       cki_abort_task "Fail to install stqe"
   fi
-  cki_run "restorecon -Rvi /usr/local/lib/python* /usr/lib/python* /root/.local/lib/python*"
+
+  export STQE_PATH=$stqe_path/bin
 
   return 0
 }
