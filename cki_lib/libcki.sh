@@ -225,7 +225,9 @@ function cki_debug()
 
 function cki_get_yum_tool()
 {
-    if [[ -x /usr/bin/dnf ]]; then
+    if [[ -x usr/bin/rpm-ostree ]]; then
+        echo /usr/bin/rpm-ostree
+    elif [[ -x /usr/bin/dnf ]]; then
         echo /usr/bin/dnf
     elif [[ -x /usr/bin/yum ]]; then
         echo /usr/bin/yum
