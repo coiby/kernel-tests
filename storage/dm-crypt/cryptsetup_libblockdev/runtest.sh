@@ -43,10 +43,10 @@ function check_python_env(){
     fi
 }
 
-PY="python3"
-
 # stqe_init will abort the task if fails to run
 stqe_init
+PY="$STQE_PATH/python3"
+
 install_libblockdev
 check_python_env
 $PY luks_main.py

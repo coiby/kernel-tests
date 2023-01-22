@@ -22,7 +22,7 @@ source ../../include/libstqe.sh
 TEST_CASE_PATH="lvm/cache/cache_basic.py"
 function runtest
 {
-    cki_run "stqe-test run -t $TEST_CASE_PATH"
+    cki_run "$STQE_PATH/stqe-test run -t $TEST_CASE_PATH"
     typeset -i rc=$?
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }

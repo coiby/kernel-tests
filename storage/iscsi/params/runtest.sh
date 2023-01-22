@@ -21,7 +21,7 @@ source ../../include/libstqe.sh
 
 function runtest
 {
-    cki_run "stqe-test run -t iscsi/iscsi_params.py"
+    cki_run "$STQE_PATH/stqe-test run -t iscsi/iscsi_params.py"
     typeset -i rc=$?
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }
