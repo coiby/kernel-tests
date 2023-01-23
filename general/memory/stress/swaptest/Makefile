@@ -46,9 +46,7 @@ FILES=$(TENV) $(METADATA) runtest.sh Makefile PURPOSE
 .PHONY: clean
 
 run: $(FILES) build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
-		. runtest.sh )
+	( set +o posix;. /usr/share/beakerlib/beakerlib.sh; . runtest.sh )
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
@@ -57,20 +55,20 @@ clean:
 	rm -fr *~ $(BUILT_FILES) pmbench*
 
 
-include /usr/share/rhts/lib/rhts-make.include
+# include /usr/share/rhts/lib/rhts-make.include
 
-$(METADATA): Makefile
-	@echo "Owner:           Chunyu Hu <chuhu@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     This is a collection for swap stress" >> $(METADATA)
-	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        1h" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	rhts-lint $(METADATA)
+#  $(METADATA): Makefile
+#  	@echo "Owner:           Chunyu Hu <chuhu@redhat.com>" > $(METADATA)
+#  	@echo "Name:            $(TEST)" >> $(METADATA)
+#  	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
+#  	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
+#  	@echo "Description:     This is a collection for swap stress" >> $(METADATA)
+#  	@echo "Type:            Regression" >> $(METADATA)
+#  	@echo "TestTime:        1h" >> $(METADATA)
+#  	@echo "RunFor:          kernel" >> $(METADATA)
+#  	@echo "Requires:        kernel" >> $(METADATA)
+#  	@echo "Priority:        Normal" >> $(METADATA)
+#  	@echo "License:         GPLv2" >> $(METADATA)
+#  	@echo "Confidential:    no" >> $(METADATA)
+#  	@echo "Destructive:     no" >> $(METADATA)
+#  	rhts-lint $(METADATA)

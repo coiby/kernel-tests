@@ -1,0 +1,13 @@
+Owner:           Chunyu Hu <chuhu@redhat.com>
+Name:            /kernel/general/memory/stress/swaptest
+TestVersion:     1.1
+Path:            /mnt/tests/kernel/general/memory/stress/swaptest
+Description:     This is a collection for swap stress
+Type:            Regression
+TestTime:        1h
+RunFor:          kernel
+Requires:        kernel
+Priority:        Normal
+License:         GPLv2
+Confidential:    no
+Destructive:     no
