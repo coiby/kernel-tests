@@ -200,6 +200,7 @@ crc-itu-t.ko
 crct10dif-ce.ko
 crypto_engine.ko
 csiostor.ko
+curve25519-generic.ko
 cuse.ko
 cx82310_eth.ko
 cxacru.ko
@@ -348,6 +349,7 @@ gen_probe.ko
 ghash-ce.ko
 gl620a.ko
 gm12u320.ko
+gnss.ko
 governor_passive.ko
 governor_performance.ko
 governor_powersave.ko
@@ -482,6 +484,7 @@ hns_enet_drv.ko
 hns_mdio.ko
 hpilo.ko
 hpsa.ko
+hpwdt.ko
 hso.ko
 hte-tegra194.ko
 huawei_cdc_ncm.ko

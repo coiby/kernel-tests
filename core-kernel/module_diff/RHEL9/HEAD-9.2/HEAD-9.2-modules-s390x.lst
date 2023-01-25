@@ -82,6 +82,7 @@ crc8.ko
 crc-itu-t.ko
 csiostor.ko
 ctcm.ko
+curve25519-generic.ko
 cuse.ko
 cxl_mem.ko
 cxl_pci.ko
@@ -180,6 +181,7 @@ geneve.ko
 genwqe_card.ko
 gfs2.ko
 ghash_s390.ko
+gnss.ko
 grace.ko
 gre.ko
 hangcheck-timer.ko

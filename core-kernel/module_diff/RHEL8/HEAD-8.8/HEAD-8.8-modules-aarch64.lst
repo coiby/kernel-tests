@@ -442,6 +442,7 @@ hns_enet_drv.ko
 hns_mdio.ko
 hpilo.ko
 hpsa.ko
+hpwdt.ko
 hso.ko
 huawei_cdc_ncm.ko
 hv_netvsc.ko

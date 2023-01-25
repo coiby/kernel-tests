@@ -247,6 +247,7 @@ crc-itu-t.ko
 crct10dif-pclmul.ko
 cs_dsp.ko
 csiostor.ko
+curve25519-generic.ko
 curve25519-x86_64.ko
 cuse.ko
 cx82310_eth.ko
@@ -434,6 +435,7 @@ gl518sm.ko
 gl520sm.ko
 gl620a.ko
 gm12u320.ko
+gnss.ko
 gpio-amdpt.ko
 gpio-generic.ko
 gpio-ich.ko
@@ -1564,6 +1566,7 @@ serport.ko
 ses.ko
 sev-guest.ko
 sfc.ko
+sfc-siena.ko
 sg.ko
 sht15.ko
 sht21.ko

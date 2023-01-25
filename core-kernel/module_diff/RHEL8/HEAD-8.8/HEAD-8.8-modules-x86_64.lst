@@ -1510,6 +1510,7 @@ nvmet-fc.ko
 nvmet.ko
 nvmet-rdma.ko
 nvmet-tcp.ko
+nvsw-sn2201.ko
 nv_tco.ko
 nxt200x.ko
 nxt6000.ko
@@ -1955,6 +1956,7 @@ serpent_generic.ko
 serpent-sse2-x86_64.ko
 ses.ko
 sfc.ko
+sfc-siena.ko
 sg.ko
 sha1-mb.ko
 sha256-mb.ko
