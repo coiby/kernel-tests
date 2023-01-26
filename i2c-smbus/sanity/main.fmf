@@ -1,0 +1,29 @@
+summary: Confirm i2c modules load and buses/devices can be detected
+description: |
+    Author: William Gomeringer <wgomerin@redhat.com>
+
+    This is a sanity check to confirm that i2c is functional.
+
+    The structure of the test is:
+
+    1) Print out relevant debugging information (dmesg, /sys output, etc)
+
+    2) Detect all i2c buses on the system. For each bus, see if there attached
+    devices. If buses aren't detected or nothing is detected on any of them, fail
+    the test.
+
+    For some systems, especially prototypes, there may be no buses or devices. But
+    in general there are.
+contact: William Gomeringer <wgomerin@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - kernel
+duration: 5m
+adjust:
+  duration: 15m
+  when: arch == aarch64
+extra-summary: /kernel/i2c-smbus/sanity
+extra-task: /kernel/i2c-smbus/sanity

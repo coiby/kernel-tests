@@ -1,0 +1,17 @@
+[General]
+description=Confirm i2c modules load and buses/devices can be detected
+owner=William Gomeringer <wgomerin@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+_architecture=x86_64; aarch64
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=15m
+dependencies=kernel;pciutils
+_test_version=1.0
+_path=/kernel/i2c-smbus/sanity
+_type=sanity
+_runfor=kernel
+_priority=normal
