@@ -585,6 +585,7 @@ EOF
         valid_kernel_versions=(
           "${KVER}"
           "${KVER}.${ARCH}"
+          "${KVER}.${ARCH}+64k"
         )
       fi
       ckver=$(uname -r)
