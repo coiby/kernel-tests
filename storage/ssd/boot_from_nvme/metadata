@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+repoRequires=cki_lib;storage/include/bash_modules/lxt
 max_time=10m
 use_pty=false

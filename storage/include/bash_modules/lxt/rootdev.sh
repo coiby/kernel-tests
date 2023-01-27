@@ -66,6 +66,7 @@ get_root_disk ()
         echo "$devname"
     else
         devname=$(echo "$devname" | sed 's/[0-9]$//g')
+        [[ $devname =~ nvme[0-9]n[0-9]p ]] && devname=$(echo "$devname" | sed 's/p$//g')
         test -d /sys/block/"$devname" && echo "$devname"
     fi
 }
