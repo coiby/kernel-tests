@@ -6,6 +6,7 @@ Include distribution/kpkginstall/runtest.sh
 KERNEL_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel"
 KERNEL_RT_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel-rt"
 KERNEL_DEBUG_RPM_URL="https://example.com/job/12345/repo#package_name=kernel&amp;debug_kernel=true"
+KERNEL_64k_RPM_URL="https://example.com/job/12345/repo#package_name=kernel-64k"
 KERNEL_TGZ_URL="https://example.com/715092599/x86_64/artifacts/kernel-mainline.kernel.org-redhat_715092599_x86_64.tar.gz#package_name=kernel"
 
 Describe 'kpkginstall: parse_kpkg_url_variables'
@@ -18,6 +19,7 @@ Describe 'kpkginstall: parse_kpkg_url_variables'
         "kernel" kernel "" rpms "$KERNEL_RPM_URL"
         "kernel-rt" kernel-rt "" rpms "$KERNEL_RT_RPM_URL"
         "kernel-debug" kernel true rpms "$KERNEL_DEBUG_RPM_URL"
+        "kernel-64k" kernel-64k "" rpms "$KERNEL_64k_RPM_URL"
         "kernel" kernel "" tarball "$KERNEL_TGZ_URL"
     End
     It "can parse $1 from $4"
@@ -193,6 +195,7 @@ Describe 'kpkginstall: main - install kernel'
         kernel "$KERNEL_RPM_URL"
         kernel "$KERNEL_TGZ_URL"
         kernel-rt "$KERNEL_RT_RPM_URL"
+        kernel-64k "$KERNEL_64k_RPM_URL"
         kernel "$KERNEL_DEBUG_RPM_URL"
     End
     cleanup(){
@@ -235,7 +238,7 @@ uname(){
         echo "$KERNEL_VERSION"
     fi
     if [ "$1" == "-i" ];then
-        echo "s390x"
+        echo "${ARCH}"
     fi
 }
 select_yum_tool() {
@@ -265,10 +268,12 @@ which(){
 }
 Describe 'kpkginstall: main - check installed kernel'
     Parameters
-        kernel "4.18.0-442.el8.s390x" "$KERNEL_RPM_URL"
-        kernel "6.1.0-rc7" "$KERNEL_TGZ_URL"
-        kernel-rt "4.18.0-442.el8.s390x" "$KERNEL_RT_RPM_URL"
-        kernel-debug "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_RPM_URL"
+        # package name - arch - rpm package name rpm dnf repo query - uname -r - kernel url
+        kernel "x86_64" "4.18.0-442.el8.x86_64" "4.18.0-442.el8.x86_64" "$KERNEL_RPM_URL"
+        kernel "x86_64" "6.1.0-rc7" "6.1.0-rc7" "$KERNEL_TGZ_URL"
+        kernel-rt "x86_64" "4.18.0-442.el8.x86_64" "4.18.0-442.el8.x86_64" "$KERNEL_RT_RPM_URL"
+        kernel-64k "aarch64" "5.14.0-243.1820_756592390.el9.aarch64" "5.14.0-243.1820_756592390.el9.aarch64+64k" "$KERNEL_64k_RPM_URL"
+        kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_RPM_URL"
     End
     setup(){
         mkdir -p /var/tmp/kpkginstall
@@ -280,18 +285,19 @@ Describe 'kpkginstall: main - check installed kernel'
     BeforeEach 'setup'
     AfterEach 'cleanup'
     export REBOOTCOUNT=1
-    export ARCH="s390x"
 
-    It "installed with KPKG_URL=$3"
-        KVER="$2"
+    It "installed with KPKG_URL=$5"
+        ARCH="$2"
+        KVER="$3"
         #KVER is updated with in the main function
-        KERNEL_VERSION="$2"
+        KERNEL_VERSION="$4"
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # skip the workaround from cross-compiling
-        mkdir -p /usr/src/kernels/"$KVER"/scripts/basic/
-        touch /usr/src/kernels/"$KVER"/scripts/basic/fixdep
+        mkdir -p /usr/src/kernels/"$KERNEL_VERSION"/scripts/basic/
+        touch /usr/src/kernels/"$KERNEL_VERSION"/scripts/basic/fixdep
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
+        The stdout should include "Running kernel version string:     ${4}"
         The stdout should include "✅ Found the correct kernel version running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
