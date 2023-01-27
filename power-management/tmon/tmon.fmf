@@ -1,0 +1,18 @@
+summary: Check for the presence of thermal monitoring
+description: |
+    Description:
+    Currently this test only checks for the presence of thermal monitoring by checking if the devices exist under /sys/devices/virtual/thermal
+
+    Future functionality can include seperating out zones from devices and listing out what each piece of hardware maps to which cooling/thermal device. We will probably  want to also check that tmon can read and write values to each device as well as change values for any relevant sysfs files
+contact: Erik Hamera <ehamera@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+recommend:
+  - kernel-tools
+duration: 1h
+extra-summary: /kernel/power-management/tmon
+extra-task: /kernel/power-management/tmon
+id: d43ea239-8939-4800-88e0-073c3e970bd3
+link:
+  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291953
