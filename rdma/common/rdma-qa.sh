@@ -60,7 +60,7 @@ function RQA_get_hca_logical_state {
 ##
 function RQA_is_port_normal {
     _devname=$1
-    _portnum=$2    
+    _portnum=$2
     phys_s=$(RQA_get_hca_phys_state ${_devname} ${_portnum})
     logi_s=$(RQA_get_hca_logical_state ${_devname} ${_portnum})
     if [[ ${phys_s} == "LinkUp" ]] && [[ ${logi_s} == "ACTIVE" ]]; then
