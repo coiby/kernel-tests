@@ -128,7 +128,7 @@ function setup_test_dev_mkfs()
 {
 	# The TEST_DEV device is expected to be pre-mkfs'd as $FSTYPE
 	# Nfs cannot be dd'd nor mkfs'd
-	if ! [[ "$FSTYPE" =~ nfs|tmpfs|cifs ]]; then
+	if ! [[ "$FSTYPE" =~ nfs3|nfs4|tmpfs|cifs|overlay ]]; then
 		# check TEST_DEV
 		if [ -z "$TEST_DEV" ] || ! [ -b $TEST_DEV ]; then
 			echoo " * TEST_DEV $TEST_DEV looks invalid"
@@ -217,14 +217,18 @@ _EOF_
 		echo "SCRATCH_DEV_POOL=\"$SCRATCH_DEV_POOL\"" >> $config
 	fi
 
+	sed -i -e 's/^/export /g' $config
+	rstrnt-report-log -l $config
+
+	# no block device for overlayfs
+	[ "$FSTYPE" == "overlay" ] && return
+
 	echoo "getting blkdev info $TEST_DEV $SCRATCH_DEV $LOGWRITES_DEV"
 	echo "getting blkdev info $TEST_DEV $SCRATCH_DEV $LOGWRITES_DEV" > /dev/kmsg
 	get_blkdev_info $TEST_DEV > blockdev.info
 	get_blkdev_info $SCRATCH_DEV >> blockdev.info
 	get_blkdev_info $LOGWRITES_DEV >> blockdev.info
 
-	sed -i -e 's/^/export /g' $config
-	rstrnt-report-log -l $config
 	rstrnt-report-log -l blockdev.info
 }
 
@@ -287,7 +291,7 @@ function setup_full
 	RUNTESTS="$TEST_PARAM_RUNTESTS"
 	if [ -z "$RUNTESTS" ] ; then
 		case $FSTYPE in
-		xfs|ext4|btrfs) RUNTESTS="$(cat RUNTESTS)" ;;
+		xfs|ext4|btrfs|overlay) RUNTESTS="$(cat RUNTESTS)" ;;
 		# Small set of xfstests are stable for network filesystems
 		cifs|nfs4) RUNTESTS="$(cat RUNTESTS.net)" ;;
 		# Set of tests to run on gfs2

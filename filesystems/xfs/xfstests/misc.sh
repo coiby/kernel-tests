@@ -169,6 +169,11 @@ function system_info()
 	echoo "NO_MKFS=$NO_MKFS"
 	echoo "FSCK=$FSCK"
 	echoo "FSCK_OPTS=$FSCK_OPTS"
+	echoo "OVLBASEFSTYP=$OVLBASEFSTYP"
+	echoo -e "*************************************\n\n"
+	# show mountpoints
+	echoo -e "*********** mount info **************\n\n"
+	mount
 	echoo -e "*************************************\n\n"
 
 	report system_info PASS 0
