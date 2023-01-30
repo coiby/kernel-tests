@@ -21,6 +21,7 @@ tag:
 contact: Jeff Bastian <jbastian@redhat.com>
 component:
   - kernel
+path: /misc/module-load
 test: bash ./runtest.sh
 framework: beakerlib
 require:
