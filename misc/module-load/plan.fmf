@@ -34,4 +34,4 @@ prepare:
               flex,
           ]
 environment-file:
-    - ./misc/module-load/plans/tmt.env
+    - ./misc/module-load/tmt.env
