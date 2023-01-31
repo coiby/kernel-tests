@@ -379,9 +379,23 @@ function rpm_install()
     $YUM install -y $FIRMWARE_PKG > /dev/null
     cki_print_success "Kernel firmware package installed"
 
+    KVER_UNAME="${KVER}"
+    if [[ ${PACKAGE_NAME} =~ "kernel-64k" ]]; then
+      # kernel-64k variant doesn't update the default kernel in grubby
+      # make sure the correct version is set
+
+      # on kernel-64k the kernel version from rpm is a bit different from the uname
+      KVER_UNAME="${KVER}+64k"
+      if grubby --set-default /boot/vmlinuz-"${KVER_UNAME}"; then
+        cki_print_success "Grubby set default kernel to /boot/vmlinuz-${KVER_UNAME}"
+      else
+        cki_abort_recipe "Fail to set default kernel to /boot/vmlinuz-${KVER_UNAME}" FAIL
+      fi
+    fi
+
     # Workaround for BZ 1698363 - was fixed in 8.3 but not backported to 8.1 nor 8.2
     if [[ "${ARCH}" == s390x ]] ; then
-      grubby --set-default /boot/vmlinuz-"${KVER}" && zipl
+      grubby --set-default /boot/vmlinuz-"${KVER_UNAME}" && zipl
       cki_print_success "Grubby workaround for s390x completed"
     fi
   fi
