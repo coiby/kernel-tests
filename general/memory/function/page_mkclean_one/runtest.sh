@@ -1,7 +1,10 @@
 #!/bin/sh
 
 # Source the test script helpers
-. /usr/bin/rhts-environment.sh
+. ../../../../general/include/include.h
+clean_env
+setup_env
+TEST="/kernel/general/memory/function/page_mkclean_one"
 
 # ---------- Start Test -------------
 testver=$(rpm -qf $0)
@@ -21,6 +24,7 @@ echo "***** Current Running Distro = $installeddistro *****" | tee -a $OUTPUTFIL
 result=PASS
 
 echo "Running page_mkclean_one-check..." | tee -a $OUTPUTFILE
+gcc -o page_mkclean_one-check page_mkclean_one-check.c
 ./page_mkclean_one-check | tee -a $OUTPUTFILE
 # Fail if we get "Chunk.*corrupted" in the output
 errors=$(grep -c "Chunk.*corrupted" $OUTPUTFILE)
@@ -31,4 +35,4 @@ fi
 echo "***** End of runtest.sh script *****" | tee -a $OUTPUTFILE
 
 # --- then report the results in the database ---
-report_result $TEST $result $errors
+rstrnt-report-result $TEST $result $errors
