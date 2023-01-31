@@ -75,10 +75,10 @@ function scsi_level(){
             sleep 5
             rlRun "multipath -f $mpath_name"
         fi
-        rlRun "multipath -F"
+        sleep 5
+        rlRun "multipath -F" $g_rc_any
         rlServiceStop multipathd
         rlRun "systemctl disable multipathd"
-        rlRun "multipath -F"
         rlRun "multipath  -l |grep $mpath_name" "$g_rc_any" "test scsi_debug if removed "
         rlRun "rmmod scsi_debug" "$g_rc_any" "remove scsi_debug"
         stat=$?
