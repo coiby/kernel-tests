@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/btt_md_create_assemble
+description: nvdimm create and assemble raid using mdadm with btt
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_md_create_assemble
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - mdadm
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_md_create_assemble
+extra-task: /storage/nvdimm/btt_md_create_assemble
+id: c33c8aff-788f-41d5-98d8-3e1ae58b134f

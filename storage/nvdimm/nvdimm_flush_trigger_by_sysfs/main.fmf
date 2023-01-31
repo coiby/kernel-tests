@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/nvdimm_flush_trigger_by_sysfs
+description: nvdimm feature test for nvdimm_flush trigger by sysfs BZ1457556
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/nvdimm_flush_trigger_by_sysfs
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/nvdimm_flush_trigger_by_sysfs
+extra-task: /storage/nvdimm/nvdimm_flush_trigger_by_sysfs
+id: 2267c476-899f-4644-93e7-033b78ee1c6a

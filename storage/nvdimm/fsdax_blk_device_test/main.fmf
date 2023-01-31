@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/fsdax_blk_device_test
+description: nvdimm fsdax block device test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/fsdax_blk_device_test
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/fsdax_blk_device_test
+extra-task: /storage/nvdimm/fsdax_blk_device_test
+id: 7ca6dce5-de0f-4eae-9ca4-77ca425c25f7

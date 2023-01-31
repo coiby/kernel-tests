@@ -1,0 +1,2 @@
+ 1106  sudo yum -y  install glibc-static
+ 1107  sudo gcc devdax-mmupagesize.c -static -o devdax-mmupagesize

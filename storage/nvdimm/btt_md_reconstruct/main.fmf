@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/btt_md_reconstruct
+description: nvdimm reconstruct raid with btt
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_md_reconstruct
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - mdadm
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_md_reconstruct
+extra-task: /storage/nvdimm/btt_md_reconstruct
+id: 47403067-a166-49dc-ae04-b8d8a88a8ca9

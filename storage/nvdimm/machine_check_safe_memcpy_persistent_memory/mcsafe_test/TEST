@@ -1,0 +1,65 @@
+#!/bin/bash
+
+if [ x"$1" = x ]
+then
+	echo Usage: $0 byteoffset 2>&1
+	exit 1
+fi
+
+case $(id) in
+*root*)
+	echo OK, running as root
+	;;
+*)
+	echo OOPs, need to be root to do this 1>&2
+	exit 1
+	;;
+esac
+
+
+EINJ=/sys/kernel/debug/apei/einj
+
+if [ ! -f $EINJ/notrigger ]
+then
+	modprobe einj
+
+	if [ ! -f $EINJ/notrigger ]
+	then
+		echo "Can't load einj module" 1>&2
+		exit 1
+	fi
+fi
+
+dotest()
+{
+	if insmod mcsafe_test.ko srcoffset=$1
+	then
+		:
+	else
+		echo "Module insert failed" 1>&2
+		exit 1
+	fi
+
+	paddr=$(cat /sys/kernel/debug/mctest/addr)
+
+	case "$paddr" in
+	0x*)
+		echo physical address = $paddr
+		;;
+	*)
+		echo "Didn't get a physical address" 1>&2
+		rmmod mcsafe_test
+		exit 1
+		;;
+	esac
+
+	echo 0x10 > $EINJ/error_type
+	echo $paddr > $EINJ/param1
+	echo 0xfffffffffffff000 > $EINJ/param2
+	echo 1 > $EINJ/notrigger
+	echo 1 > $EINJ/error_inject
+
+	rmmod mcsafe_test
+}
+
+dotest $1

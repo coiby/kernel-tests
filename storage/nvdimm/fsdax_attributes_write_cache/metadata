@@ -1,0 +1,14 @@
+[General]
+name=storage/nvdimm/fsdax_attributes_write_cache
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvdimm feature test for device cache turn off/on test BZ1457556
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
+dependencies=ndctl
+max_time=1h
+use_pty=false

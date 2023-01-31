@@ -1,0 +1,14 @@
+[General]
+name=storage/nvdimm/btt_md_bitmap
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
+dependencies=mdadm;ndctl
+max_time=2h
+use_pty=false

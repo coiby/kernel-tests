@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/btt_md_bitmap
+description: nvdimm btt md bitmap function
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_md_bitmap
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+  - mdadm
+duration: 12h
+tag:
+  - regression
+tier: 2
+extra-summary: /storage/nvdimm/btt_md_bitmap
+extra-task: /storage/nvdimm/btt_md_bitmap
+id: 318276c4-7249-48c4-b4af-1692f6c08769

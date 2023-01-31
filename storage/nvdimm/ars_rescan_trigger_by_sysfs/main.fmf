@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/ars_rescan_trigger_by_sysfs
+description: feature test for ars_rescan trigger by sysfs
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/ars_rescan_trigger_by_sysfs
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/ars_rescan_trigger_by_sysfs
+extra-task: /storage/nvdimm/ars_rescan_trigger_by_sysfs
+id: d07744bf-846b-47d0-9ad9-d83c81492fd6

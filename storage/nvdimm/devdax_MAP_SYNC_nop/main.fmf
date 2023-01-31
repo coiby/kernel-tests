@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/devdax_MAP_SYNC_nop
+description: nvdimm devdax MAP_SYNC nop test, BZ1568236
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/devdax_MAP_SYNC_nop
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - gcc
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/devdax_MAP_SYNC_nop
+extra-task: /storage/nvdimm/devdax_MAP_SYNC_nop
+id: d0c7b754-90d7-418f-a5e9-e6e50283f238

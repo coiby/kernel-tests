@@ -1,0 +1,14 @@
+[General]
+name=storage/nvdimm/ars_rescan_trigger_by_sysfs
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=feature test for ars_rescan trigger by sysfs
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
+dependencies=ndctl
+max_time=2h
+use_pty=false
