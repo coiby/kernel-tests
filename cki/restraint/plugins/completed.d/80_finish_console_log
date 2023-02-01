@@ -4,9 +4,12 @@ if [ -z "${LAB_CONTROLLER}" ] || [ -z "${RSTRNT_RECIPEID}" ] || [ -z "${RSTRNT_T
     # not automated job in beaker
     exit 0
 fi
-_cki_init_file=/var/opt/cki/${RSTRNT_TASKID}/init_console.log
-_cki_end_file=/var/opt/cki/${RSTRNT_TASKID}/end_console.log
-_cki_console_file=/var/opt/cki/${RSTRNT_TASKID}/test_console.log
+
+CURRENT_TASK_PATH="/var/opt/cki/current_task"
+
+_cki_init_file="${CURRENT_TASK_PATH}/${RSTRNT_TASKID}/init_console.log"
+_cki_end_file="${CURRENT_TASK_PATH}/${RSTRNT_TASKID}/end_console.log"
+_cki_console_file="${CURRENT_TASK_PATH}/${RSTRNT_TASKID}/test_console.log"
 if [ ! -e ${_cki_init_file} ]; then
     exit 0
 fi
