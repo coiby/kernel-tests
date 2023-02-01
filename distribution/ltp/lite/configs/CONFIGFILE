@@ -144,14 +144,14 @@
 @AIOSETUP00  mkdir -p $TMPDIR/aiodio/
 @AIOSETUP01  dd if=$BIG_FILE of=$TMPDIR/aiodio/junkfile bs=8192 conv=block,sync
 @
-@ADS1000 aio-stress -I500  -o2 -S -r4        $TMPDIR/aiodio/file1
-@ADS1005 aio-stress -I500  -o3 -S -r4        $TMPDIR/aiodio/junkfile $TMPDIR/file2
-@ADS1008 aio-stress -I500  -o3 -S -r32  -t4  $TMPDIR/aiodio/junkfile $TMPDIR/file2  $TMPDIR/file3  $TMPDIR/file4
-@ADS1014 aio-stress -I500  -o2 -O -r8        $TMPDIR/aiodio/file1 $TMPDIR/file2
-@ADS1020 aio-stress -I500  -o3 -O -r16  -t2  $TMPDIR/aiodio/junkfile $TMPDIR/file2
-@ADS1027 aio-stress -I500  -o0 -S -r8        $TMPDIR/aiodio/file2
-@ADS1031 aio-stress -I500  -o1 -S -r4   -t2  $TMPDIR/aiodio/junkfile $TMPDIR/file2
-@ADS1040 aio-stress -I500  -o1 -O -r8   -t2  -x $TMPDIR/junkfile $TMPDIR/file2
+@ADS1000 aio-stress -I500  -o2 -r4        -f1
+@ADS1005 aio-stress -I500  -o3 -r4        -f2
+@ADS1008 aio-stress -I500  -o3 -r32  -t4  -f4
+@ADS1014 aio-stress -I500  -o2 -O -r8     -f2
+@ADS1020 aio-stress -I500  -o3 -O -r16  -t2  -f2
+@ADS1027 aio-stress -I500  -o0 -r8        -f1
+@ADS1031 aio-stress -I500  -o1 -r4   -t2  -f2
+@ADS1040 aio-stress -I500  -o1 -O -r8   -t2  -f2
 @
 @#ltp-aiodio.part1
 @AIOSETUP01  dd if=$BIG_FILE of=$TMPDIR/aiodio/junkfile bs=8192 conv=block,sync
