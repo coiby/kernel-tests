@@ -1,4 +1,7 @@
 #!/bin/sh
+
+. /usr/share/restraint/plugins/cki_helpers
+
 # add restraint plugins to get console log for each task
 # https://restraint.readthedocs.io/en/latest/plugins.html
 if [ -z "${LAB_CONTROLLER}" ] || [ -z "${RSTRNT_RECIPEID}" ] || [ -z "${RSTRNT_TASKID}" ]; then
@@ -18,7 +21,6 @@ fi
 dmesg -C
 # Add test information to console.log, when running with UPT this information is not there
 echo "Running test [R:${RSTRNT_RECIPEID} T:${RSTRNT_TASKID} - ${RSTRNT_TASKNAME:-unknown} - Kernel: $(uname -r)]" > /dev/kmsg
-CURRENT_TASK_PATH="/var/opt/cki/current_task"
 mkdir -p "${CURRENT_TASK_PATH}/${RSTRNT_TASKID}"
 _cki_init_file="${CURRENT_TASK_PATH}/${RSTRNT_TASKID}/init_console.log"
 if [ ! -e ${_cki_init_file} ]; then

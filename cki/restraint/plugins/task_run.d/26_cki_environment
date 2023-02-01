@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # based on /usr/share/restraint/plugins/task_run.d/25_environment
-
 . /usr/share/restraint/plugins/helpers
+. /usr/share/restraint/plugins/cki_helpers
 
 # Don't run from PLUGINS
 if [ -n "$RSTRNT_NOPLUGINS" ]; then
@@ -11,8 +11,6 @@ if [ -n "$RSTRNT_NOPLUGINS" ]; then
 fi
 
 rstrnt_info "*** Running Plugin: $0"
-
-CURRENT_TASK_PATH="/var/opt/cki/current_task"
 
 # it seems when running restraint as standalone the value can increment
 # even if there was no reboot, like if a connection is interrupted

@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+CURRENT_TASK_PATH="/var/opt/cki/current_task"
