@@ -6,6 +6,6 @@
 rstrnt_info "*** Running Plugin: $0"
 
 # Task finished running remove everything created by cki plugins for this task
-rm -rf "${CURRENT_TASK_PATH}/${RSTRNT_TASKID}"
+rm -rf "${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}"
 
 exec "$@"

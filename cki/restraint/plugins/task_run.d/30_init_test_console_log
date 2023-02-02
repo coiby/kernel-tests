@@ -21,8 +21,8 @@ fi
 dmesg -C
 # Add test information to console.log, when running with UPT this information is not there
 echo "Running test [R:${RSTRNT_RECIPEID} T:${RSTRNT_TASKID} - ${RSTRNT_TASKNAME:-unknown} - Kernel: $(uname -r)]" > /dev/kmsg
-mkdir -p "${CURRENT_TASK_PATH}/${RSTRNT_TASKID}"
-_cki_init_file="${CURRENT_TASK_PATH}/${RSTRNT_TASKID}/init_console.log"
+mkdir -p "${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}"
+_cki_init_file="${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}/init_console.log"
 if [ ! -e ${_cki_init_file} ]; then
     # save the log the first time the task starts. Don't override the file in case of reboot.
     curl --silent --show-error --retry 5 "http://${LAB_CONTROLLER}:8000/recipes/${RSTRNT_RECIPEID}/logs/console.log" -o ${_cki_init_file}
