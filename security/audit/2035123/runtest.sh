@@ -26,7 +26,6 @@
 rlJournalStart
 	rlPhaseStartSetup
 		rlShowRunningKernel
-	
 	rlPhaseEnd
 
 	rlPhaseStartTest
