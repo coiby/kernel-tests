@@ -41,7 +41,7 @@ rlJournalStart
 		rlPass "Process did not hang, test pass."
 	else
 		rlFail "Process hung, test fail."
-		fi
+	fi
 	rlPhaseEnd
 
 	rlPhaseStartCleanup
