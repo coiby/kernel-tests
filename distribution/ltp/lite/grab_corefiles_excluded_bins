@@ -10,6 +10,7 @@ sigtimedwait01
 ptrace07
 shmat01
 prctl04
+prctl10
 fstat03
 waitid10
 select03
