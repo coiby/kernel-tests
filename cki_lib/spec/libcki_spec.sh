@@ -205,3 +205,21 @@ Describe 'cki_kver_lt'
         The status should equal 1
     End
 End
+
+Describe 'cki_is_kernel_64k'
+    Mock uname
+        echo "$VERSION"
+    End
+
+    It 'kernel like 5.14.0-243.1820_756592390.el9.aarch64+64k is 64k kernel'
+        export VERSION="5.14.0-243.1820_756592390.el9.aarch64+64k"
+        When call cki_is_kernel_64k
+        The status should equal 0
+    End
+
+    It 'kernel like 5.14.0-256.el9.aarch64 is not 64k kernel'
+        export VERSION="5.14.0-256.el9.aarch64"
+        When call cki_is_kernel_64k
+        The status should equal 1
+    End
+End

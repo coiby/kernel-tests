@@ -335,6 +335,15 @@ cki_is_kernel_rt()
     return 1
 }
 
+# return 0 when running kernel 64k
+cki_is_kernel_64k()
+{
+    if [[ $(uname -r) =~ \+64k ]]; then
+       return  0
+    fi
+    return 1
+}
+
 # return 0 when running kernel debug
 cki_is_kernel_debug()
 {
