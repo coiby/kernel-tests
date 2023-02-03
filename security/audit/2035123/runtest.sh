@@ -33,7 +33,7 @@ rlJournalStart
 		rlRun "echo -e '--loginuid-immutable\n-w /root/aaa -p wrx' >> /etc/audit/rules.d/audit.rules"
 		rlRun "sed -i 's/^-b.*$/-b 64/g' /etc/audit/rules.d/audit.rules"
 	rlRun "service auditd restart"
-	pid=$(ps auxwww | grep "[s]bin/auditd" | awk '{print $2}')
+	pid=$(pgrep -f "[s]bin/auditd")
 	rlRun "kill -19 $pid"
 	rlRun "chmod +x repro.sh"
 	rlWatchdog "./repro.sh" 15
