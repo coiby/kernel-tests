@@ -1,0 +1,13 @@
+[General]
+description=Security Audit verifier for 2035123
+name=/kernel-tests/security/audit/2035123
+owner=Dennis Li <denli@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=12m
+dependencies=make
+
