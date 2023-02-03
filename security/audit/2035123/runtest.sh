@@ -24,15 +24,15 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
-    rlPhaseStartSetup
-        rlShowRunningKernel
+	rlPhaseStartSetup
+		rlShowRunningKernel
 	
-    rlPhaseEnd
+	rlPhaseEnd
 
-    rlPhaseStartTest
-    	rlRun "cp /etc/audit/rules.d/audit.rules ./audit_original.rules"
-        rlRun "echo -e '--loginuid-immutable\n-w /root/aaa -p wrx' >> /etc/audit/rules.d/audit.rules"
-        rlRun "sed -i 's/^-b.*$/-b 64/g' /etc/audit/rules.d/audit.rules"
+	rlPhaseStartTest
+		rlRun "cp /etc/audit/rules.d/audit.rules ./audit_original.rules"
+		rlRun "echo -e '--loginuid-immutable\n-w /root/aaa -p wrx' >> /etc/audit/rules.d/audit.rules"
+		rlRun "sed -i 's/^-b.*$/-b 64/g' /etc/audit/rules.d/audit.rules"
 	rlRun "service auditd restart"
 	pid=$(ps auxwww | grep "[s]bin/auditd" | awk '{print $2}')
 	rlRun "kill -19 $pid"
@@ -42,14 +42,14 @@ rlJournalStart
 		rlPass "Process did not hang, test pass."
 	else
 		rlFail "Process hung, test fail."
-    	fi
+		fi
 	rlPhaseEnd
 
-    rlPhaseStartCleanup
+	rlPhaseStartCleanup
 	rlRun "cat ./audit_original.rules > /etc/audit/rules.d/audit.rules"
 	rlRun "rm -f ./audit_original.rules"
 	rlRun "kill -18 $pid"
 	rlRun "service auditd restart"
-    rlPhaseEnd
+	rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
