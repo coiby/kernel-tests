@@ -245,12 +245,15 @@ rlJournalStart
         YUM=$(cki_get_yum_tool)
         name="kernel"
         arch=$(uname -m)
-        version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//"`
+        version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//;s/+64k//"`
         version=${version_release%-*}
         release=${version_release#*-}
         kvari=`uname -r | grep -Eo '(debug|PAE|xen)$'`
         if $(cki_is_kernel_rt); then
             name="${name}-rt"
+        fi
+        if $(cki_is_kernel_64k); then
+            name="${name}-64k"
         fi
         if $(cki_is_kernel_debug); then
             name="${name}-debug"
