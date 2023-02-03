@@ -1,0 +1,12 @@
+DESCRIPTION
+Runs a comprehensive log checker to automatically detect known issues
+from a host after completion of RT testing.
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none
