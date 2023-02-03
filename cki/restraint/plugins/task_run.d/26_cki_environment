@@ -26,14 +26,8 @@ if [[ -e "${CURRENT_TASK_PATH}" ]]; then
     fi
 fi
 
-# it seems when running restraint as standalone the value can increment
-# even if there was no reboot, like if a connection is interrupted
-# https://gitlab.com/cki-project/upt/-/issues/99
+# save information about running task
 mkdir -p "${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}"
 # saves the boot information everytime the task starts or continues
 who -b >> "${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}/bootinfo"
-# overwrite RSTRNT_REBOOTCOUNT
-RSTRNT_REBOOTCOUNT=$(cat "${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}/bootinfo" | uniq | wc -l)
-# start counting from 0
-RSTRNT_REBOOTCOUNT=$((${RSTRNT_REBOOTCOUNT}-1))
 exec "$@"
