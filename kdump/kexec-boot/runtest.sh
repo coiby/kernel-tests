@@ -166,9 +166,9 @@ KexecBoot() {
         LogRun "cat /proc/cmdline"
 
         if [ -n "${KEXEC_BOOT_CMDLINE_APPEND}" ]; then
-            cat /proc/cmdline | grep -q "${KEXEC_BOOT_CMDLINE_APPEND}" || test_pass=false
+            grep -q "${KEXEC_BOOT_CMDLINE_APPEND}" < /proc/cmdline || test_pass=false
         else
-            cat /proc/cmdline | grep -q "${KEXEC_BOOT_CMDLINE}" || test_pass=false
+            grep -q "${KEXEC_BOOT_CMDLINE}" < /proc/cmdline || test_pass=false
         fi
 
         if [ "$(uname -r)" != "$KEXEC_VER" ]; then

@@ -24,11 +24,11 @@ NODEBUGINFO=${NODEBUGINFO:-true}
 NOKDUMPRD=${NOKDUMPRD:-true}
 UPGRADE_FC_KDUMP=${UPGRADE_FC_KDUMP:-false}
 # bz1664239 Check unnecessay kdump initramfs img rebuild if needed.
-CHECK_INITRD_REBUILD=${CHECK_INITRD_REBUILD:-"false"}
-ALLOW_SKIP=${ALLOW_SKIP:-true}
+CHECK_INITRD_REBUILD=${CHECK_INITRD_REBUILD:-false}
+ALLOW_SKIP=${ALLOW_SKIP:-"true"}
 
 if [ -z "$OUTPUTFILE" ]; then
-    export OUTPUTFILE=`mktemp ${K_TESTAREA}/tmp.XXXXXX`
+    export OUTPUTFILE=$(mktemp ${K_TESTAREA}/tmp.XXXXXX)
 fi
 
 if [ -z "$ARCH" ]; then
@@ -36,7 +36,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 if [ -z "$FAMILY" ]; then
-    FAMILY=$(cat /etc/redhat-release | sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g')
+    FAMILY=$(sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g' < /etc/redhat-release)
 fi
 
 # Set well-known logname so users can easily find
@@ -83,7 +83,7 @@ K_SRC=$(rpm --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r))
 # Needed
 # - when the kernel rpm comes from of e.g. kernel-pegas src rpm.
 # - kernel-rt rpm comes from kernel src rpm (merged source tree)
-K_SPEC_NAME=${K_SRC%%-${K_VER}*}
+K_SPEC_NAME=${K_SRC%%"-${K_VER}"*}
 
 [[ "$FAMILY" =~ [a-zA-Z]+5 ]] && IS_RHEL5=true || IS_RHEL5=false
 [[ "$FAMILY" =~ [a-zA-Z]+6 ]] && IS_RHEL6=true || IS_RHEL6=false
@@ -127,8 +127,8 @@ VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
 
 # Backup kdump config files
 BackupKdumpConfig(){
-    [ -f "${KDUMP_CONFIG}" -a ! -f "${KDUMP_CONFIG}.bk" ] && cp "${KDUMP_CONFIG}" "${KDUMP_CONFIG}.bk"
-    [ -f "${KDUMP_SYS_CONFIG}" -a ! -f "${KDUMP_SYS_CONFIG}.bk" ] && cp "${KDUMP_SYS_CONFIG}" "${KDUMP_SYS_CONFIG}.bk"
+    [ -f "${KDUMP_CONFIG}" ] && [ ! -f "${KDUMP_CONFIG}.bk" ] && cp "${KDUMP_CONFIG}" "${KDUMP_CONFIG}.bk"
+    [ -f "${KDUMP_SYS_CONFIG}" ] && [ ! -f "${KDUMP_SYS_CONFIG}.bk" ] && cp "${KDUMP_SYS_CONFIG}" "${KDUMP_SYS_CONFIG}.bk"
     [ -f "${FSTAB_FILE}.bk" ] || cp "${FSTAB_FILE}" "${FSTAB_FILE}.bk"
 }
 
@@ -260,7 +260,7 @@ InstallPackages()
 
 UpgradePackages()
 {
-    InstallPackages upgrade $@
+    InstallPackages upgrade "$@"
 }
 
 
@@ -287,7 +287,7 @@ InstallKernel()
     for i in ${pkgs}; do
         rpm -q --quiet $i || tmp="${tmp} $i"
     done
-    [ ! -n "${tmp}" ] && return 0
+    [ -z "${tmp}" ] && return 0
 
     Log "Re-install missing packages from Brew/Koji."
 
@@ -536,7 +536,7 @@ RunSubTests(){
     # Note, there is no handling of system reboot in this runtest.sh.
     for subcase in ${all_tests}; do
         tmp_subcase=$(basename "${subcase}")
-        if [ "${TESTARGS,,}" != "all" ] && ! egrep -q "${TESTARGS}" <<< "${tmp_subcase}"; then
+        if [ "${TESTARGS,,}" != "all" ] && ! grep -E -q "${TESTARGS}" <<< "${tmp_subcase}"; then
             # Not in TESTARGS list.Ignore the test
             continue
         fi
@@ -544,7 +544,7 @@ RunSubTests(){
         Log "============================================="
         Log "  #Sub Test# $subcase"
         Log "============================================="
-        if egrep -q "${SKIP_TESTARGS}" <<< "${tmp_subcase}"; then
+        if grep -E -q "${SKIP_TESTARGS}" <<< "${tmp_subcase}"; then
             Log "Skip test: ${subcase}"
             continue
         elif [ ! -f "testcases/${subcase}" ]; then
@@ -967,13 +967,14 @@ Report() {
 # Upload system logs
 # Params:
 #   $1: Uploading logs of the specific service only
-UploadSystemLogs() {
+UploadJournalLogs() {
+    local service="${1:-""}"
     local file_name="journal.log"
     local extra_cmd=""
 
-    [ -n "$1" ] && {
-        file_name="journal-$1.log"
-        extra_cmd="-u $1"
+    [ -n "${service}" ] && {
+        file_name="journal-${service}.log"
+        extra_cmd="-u ${service}"
     }
 
     if CommandExists journalctl ; then

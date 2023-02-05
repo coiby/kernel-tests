@@ -21,7 +21,7 @@
 
 ConfigFcoe() {
 
-    #  Install package fcoe-utils package. 
+    #  Install package fcoe-utils package.
     #  And start and enable fcoe and lldpad service.
     rpm -q fcoe-utils || InstallPackages fcoe-utils
     systemctl enable fcoe; systemctl restart fcoe

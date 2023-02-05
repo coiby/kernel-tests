@@ -19,7 +19,7 @@
 
 LoadAltSysRqDriver()
 {
-	Log "Build altsysrq module"
+    Log "Build altsysrq module"
     which gcc > /dev/null 2>&1 || InstallDevTools
     MakeModule altsysrq
     LogRun "insmod altsysrq/altsysrq.ko" || MajorError 'Unable to load altsysrq.ko'

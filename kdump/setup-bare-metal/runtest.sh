@@ -31,7 +31,7 @@ SetupKdump()
 
         # In ia64 arch, the path of vmlinuz is /boot/efi/efi/redhat, it different with other arch.
         [[ "${K_ARCH}"  = "ia64" ]] && {
-            /sbin/grubby --set-default=/boot/efi/efi/redhat/vmlinuz-$(uname -r)
+            /sbin/grubby --set-default="/boot/efi/efi/redhat/vmlinuz-$(uname -r)"
         }
 
         # For uncompressed kernel, i.e. vmlinux
@@ -48,7 +48,7 @@ SetupKdump()
 
         # RHEL5 ppc64 kdump need kernel-kdump
         $IS_RHEL5 && [ "${K_ARCH}" = "ppc64" ] && {
-            InstallKernel kernel-kdump-${K_VER}-${K_REL}.${K_ARCH} ||
+            InstallKernel "kernel-kdump-${K_VER}-${K_REL}.${K_ARCH}" ||
             FatalError "Failed installing kernel-kdump!"
         }
 
@@ -63,7 +63,7 @@ SetupKdump()
 
         # Ensure Kdump Kernel memory reservation
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
-            local kdumpMem=$(DefKdumpMem)
+            local kdumpMem="$(DefKdumpMem)"
             [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
 
             if $IS_RHEL5 ; then

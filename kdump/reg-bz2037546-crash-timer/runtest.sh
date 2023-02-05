@@ -72,9 +72,9 @@ EOF
 	#  crash>
 
 	# Get length of clock_base array
-	local exp=$(cat crash.timer.log | grep -o 'clock_base\[[0-9]\+\]' | grep -o '[0-9]\+')
+	local exp=$(grep -o 'clock_base\[[0-9]\+\]' < crash.timer.log | grep -o '[0-9]\+')
 	# Get the number of Clock that command "timer" prints
-	local act=$(cat crash.timer.log | grep "CLOCK:" | wc -l)
+	local act=$(grep -c "CLOCK:" < crash.timer.log)
 
 	if [[ "$exp" -ne "$act" ]];then
 		Error "Failed. Expect to print $exp clocks, but it print $act. Please check crash.timer.log"

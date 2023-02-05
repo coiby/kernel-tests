@@ -36,4 +36,4 @@ analyse()
 
 #+---------------------------+
 
-MultihostStage "$(basename ${0%.*})" analyse
+MultihostStage "$(basename "${0%.*}")" analyse

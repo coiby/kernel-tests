@@ -11,7 +11,6 @@ analyse()
 {
     CheckSkipTest crash 7.2.3-8 && return
 
-    local vmcores
     CheckVmlinux
     GetCorePath
 
@@ -67,5 +66,5 @@ EOF
 
 #+---------------------------+
 # $1 is the test phase name
-MultihostStage "$(basename ${0%.*})" "analyse"
+MultihostStage "$(basename "${0%.*}")" "analyse"
 

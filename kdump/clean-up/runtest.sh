@@ -85,7 +85,7 @@ RestoreRAW(){
     [ -z "$fstype" ] && return
 
     # Reformat and remount the raw disk if it's not yet mounted
-    if mount | egrep -q "\s+$mp\s+"; then
+    if mount | grep -q -E "\s+$mp\s+"; then
         Log "$mp is already mounted"
     else
         LogRun "mkfs.$fstype $dev; mount $dev $mp"

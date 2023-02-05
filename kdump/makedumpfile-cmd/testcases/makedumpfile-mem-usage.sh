@@ -7,13 +7,13 @@ MakedumpfileTest()
 {
     [ -f "mem_usage.log" ] && rm -f "mem_usage.log"
     makedumpfile --mem-usage /proc/kcore | tee mem_usage.log
-    local ret=${PIPESTATUS[0]}
+    local ret="${PIPESTATUS[0]}"
 
     local kernel_nvr
     IFS='.' read -ra kernel_nvr <<<  "${K_VER%%-*}"
     kernel_nvr=$(( kernel_nvr[0] * 100 + kernel_nvr[1] ))
 
-    if [ "${PIPESTATUS[0]}" -ne 0 ] && [ "$kernel_nvr" -lt 411 ]; then
+    if [ "${PIPESTATUS[0]}" -ne 0 ] && [ "${kernel_nvr}" -lt 411 ]; then
         Log "Kernel version is < 4.11, option -f is needed"
         makedumpfile -f --mem-usage /proc/kcore | tee mem_usage.log
         ret=${PIPESTATUS[0]}
@@ -37,4 +37,4 @@ MakedumpfileTest()
 
 #+---------------------------+
 
-MultihostStage "$(basename ${0%.*})" MakedumpfileTest
+MultihostStage "$(basename "${0%.*}")" MakedumpfileTest

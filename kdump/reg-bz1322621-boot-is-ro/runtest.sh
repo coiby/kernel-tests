@@ -39,7 +39,7 @@ RegressionTest() {
     # Backup kdump config
     cp -f "${KDUMP_CONFIG}" kdump_config_bk
     local boot_permission="rw"
-    if ! mount | grep /boot | egrep -q 'rw|ro'; then
+    if ! mount | grep /boot | grep -q -E 'rw|ro'; then
         Warn "System doesn't have the /boot partition."
         return
     else
@@ -133,7 +133,7 @@ RegressionTest() {
     fi
     RestartKdump
 
-    ((error+=${test_result}))
+    ((error+=$test_result))
 }
 
 # --- start ---

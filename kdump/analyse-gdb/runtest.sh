@@ -41,10 +41,10 @@ analyse()
     Log "Skip the following known GDB warnings.
 - 'warning: shared library handler failed to enable breakpoint'"
 
-    Log "Search for the following patterns for potential errors. 
+    Log "Search for the following patterns for potential errors.
 - 'fail'
-- 'error' 
-- 'invalid'" 
+- 'error'
+- 'invalid'"
 
     if grep -v 'warning: shared library handler failed to enable\
  breakpoint' "${K_TESTAREA}/gdb.log" |
@@ -53,7 +53,7 @@ analyse()
                 -e 'invalid' \
        >> "${OUTPUTFILE}" 2>&1; then
 
-        Error "GDB commands reported failures. Read gdb.log for details." 
+        Error "GDB commands reported failures. Read gdb.log for details."
 
     else
         Log "GDB commands succeeded"

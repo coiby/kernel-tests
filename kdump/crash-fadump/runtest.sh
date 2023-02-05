@@ -22,7 +22,7 @@ INITRD_BUILD_WAIT_TIME=${INITRD_BUILD_WAIT_TIME:-30}
 # This test requires "fadump=on" to be added to kernel boot cmdline, which has to be
 # done before this test.
 ConfigFadump() {
-	Log "Check if fadump is enabled"
+    Log "Check if fadump is enabled"
     LogRun "cat /sys/kernel/fadump_enabled" || MajorError "Fadump is not enabled!"
     LogRun "cat /sys/kernel/fadump_registered" || MajorError "Fadump is not registered!"
 

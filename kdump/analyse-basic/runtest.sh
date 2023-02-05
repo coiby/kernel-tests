@@ -28,7 +28,7 @@ analyse()
     #########################
     Log "Run cmd: readelf -a ${vmcore}"
     readelf -a "${vmcore}" 2>&1 | tee ${K_TESTAREA}/readelf.log
-    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    if [ "${PIPESTATUS[0]}" -ne 0 ]; then
         Error "readelf returns errors."
     fi
 
@@ -45,7 +45,7 @@ analyse()
     #########################
     echo "Run cmd: objdump -x ${vmcore}"
     objdump -x "${vmcore}" 2>&1 | tee ${K_TESTAREA}/objdump.log
-    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    if [ "${PIPESTATUS[0]}" -ne 0 ]; then
         Error "objdump returns errors."
     fi
     RhtsSubmit ${K_TESTAREA}/objdump.log
@@ -55,7 +55,7 @@ analyse()
     ############################
     Log "Run cmd: eu-readelf -a ${vmcore}"
     eu-readelf -a "${vmcore}" 2>&1 | tee ${K_TESTAREA}/eu-readelf.log
-    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    if [ "${PIPESTATUS[0]}" -ne 0 ]; then
         Error "eu-readelf returns errors."
     fi
     RhtsSubmit ${K_TESTAREA}/eu-readelf.log

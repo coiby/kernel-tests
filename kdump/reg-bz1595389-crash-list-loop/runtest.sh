@@ -36,7 +36,6 @@ CrashVmcoreCheck() {
     GetCorePath
 
     # run crash command list and list -B tests
-    local vmcores
     CheckVmlinux
 
     cat <<EOF >"crash_list.cmd"

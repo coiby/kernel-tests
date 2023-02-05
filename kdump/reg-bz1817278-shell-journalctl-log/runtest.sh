@@ -43,14 +43,14 @@ TestValidation() {
 	Log "Validating output of kdump scripts"
 	LogRun "ls -la /root/kdump-*.stamp"
 
-	if [ ! -f /root/kdump-pre.stamp -o ! -f /root/kdump-post.stamp ]; then
+	if [ ! -f /root/kdump-pre.stamp ] || [ ! -f /root/kdump-post.stamp ]; then
 		MajorError "No kdump-{pre,post}.stamp generated in /root as exepcted"
 	fi
 
 	local str="No journal files were found"
 	for file in /root/kdump-*.stamp; do
-		RhtsSubmit ${file}
-		grep -i -q "${str}" ${file} && {
+		RhtsSubmit "${file}"
+		grep -i -q "${str}" "${file}" && {
 			Error "journalctl output validation failed. "
 			Error "It should not contain \"${str}\" in ${file}"
 		}
@@ -58,8 +58,8 @@ TestValidation() {
 
 	str="Journal started"
 	for file in /root/kdump-*.stamp; do
-		RhtsSubmit ${file}
-		grep -i -q "${str}" ${file} || {
+		RhtsSubmit "${file}"
+		grep -i -q "${str}" "${file}" || {
 			Error "journalctl output validation failed."
 			Error "It should have \"${str}\" in ${file}"
 		}

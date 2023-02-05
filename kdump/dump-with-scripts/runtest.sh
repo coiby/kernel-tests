@@ -48,9 +48,9 @@ TestValidation()
 	Log "Validating output of kdump scripts"
 	LogRun "ls -la /root/kdump-*.stamp"
 	for file in /root/kdump-*.stamp; do
-		RhtsSubmit ${file}
+		RhtsSubmit "${file}"
 	done
-	if [ ! -f /root/kdump-pre.stamp -o ! -f /root/kdump-post.stamp ]; then
+	if [ ! -f /root/kdump-pre.stamp ] || [ ! -f /root/kdump-post.stamp ]; then
 		Error "No kdump-{pre,post}.stamp generated in /root as exepcted"
 	else
 		grep -i -q memory /root/kdump-post.stamp || {
@@ -58,7 +58,7 @@ TestValidation()
 		}
 	fi
 
-	if [ ! -f /root/kdump-pre_d.stamp -o ! -f /root/kdump-post_d.stamp ]; then
+	if [ ! -f /root/kdump-pre_d.stamp ] && [ ! -f /root/kdump-post_d.stamp ]; then
 		Error "No kdump-{pre_d,post_d}.stamp generated in /root as exepcted"
 	else
 		for scriptdir in pre_d post_d; do

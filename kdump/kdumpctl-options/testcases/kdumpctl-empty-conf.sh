@@ -125,4 +125,4 @@ EmptyConfCheck() {
     RestartKdump
 }
 
-MultihostStage "$(basename ${0%.*})" EmptyConfCheck
+MultihostStage "$(basename "${0%.*}")" EmptyConfCheck

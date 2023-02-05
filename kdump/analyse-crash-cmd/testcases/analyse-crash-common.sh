@@ -129,7 +129,6 @@ EOF
 exit
 EOF
 
-    local vmcores
     CheckVmlinux
     GetCorePath
 
@@ -140,4 +139,4 @@ EOF
 
 #+---------------------------+
 
-MultihostStage "$(basename ${0%.*})" analyse 
+MultihostStage "$(basename "${0%.*}")" analyse

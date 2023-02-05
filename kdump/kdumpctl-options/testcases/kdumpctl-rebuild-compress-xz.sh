@@ -35,11 +35,11 @@ Check_CompressFormat(){
     Log "Check the compress format of initramfs used by dracut."
     if [ "$?" -eq 0 ];then
         LogRun "journalctl -b |grep '/usr/bin/dracut' > ${kdump_mesg_log}"
-	    RhtsSubmit "${kdump_mesg_log}"
+        RhtsSubmit "${kdump_mesg_log}"
         grep -qi 'compress=xz' ${kdump_mesg_log} || Error "Dracut's squash module should be compressed in xz, but it's not. Check ${kdump_mesg_log} for details"
     else
         Error "Failed to rebuild the crash kernel initramfs."
     fi
 }
 
-MultihostStage "$(basename ${0%.*})" Check_CompressFormat
+MultihostStage "$(basename "${0%.*}")" Check_CompressFormat

@@ -41,7 +41,7 @@ ConfigMountOpts()
     local new_opts=""
 
     case ${ACTION,,} in
-        add)           
+        add)
             new_opts="${old_opts},${VALUE1}"
             ;;
         remove)

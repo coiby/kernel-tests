@@ -21,7 +21,7 @@ ConfigStress() {
     # Install stress-ng which is provided in RT compose
     rpm -q --quiet stress-ng || InstallPackages stress-ng
 
-    CPU_COUNT=$(cat /proc/cpuinfo | grep processor | wc -l)
+    CPU_COUNT="$(grep -c processor < /proc/cpuinfo)"
     Log "Processcor count: $CPU_COUNT"
 
     # Running stress-ng

@@ -153,7 +153,7 @@ CheckAutoReservation()
         crashkernel_str="crashkernel=auto"
     fi
 
-    cat /proc/cmdline | grep -q "${crashkernel_str}"
+    grep -q "${crashkernel_str}" < /proc/cmdline
     [ $? -ne 0 ] && {
         Error "Default $crashkernel_str doesn't present in kernel cmdline"
         return 1
@@ -341,7 +341,7 @@ ReportKdumprd()
     # Allow passing kdump initramfs img path
     local kdumprd=$1
 
-    if [ -z "${kdumprd}" ]; then  
+    if [ -z "${kdumprd}" ]; then
         # Submit Kdump initramfs.
         if grep -q -e "fadump=on" -e "fadump=nocma" < /proc/cmdline; then
             kdumprd=${INITRD_IMG_PATH}
@@ -519,27 +519,27 @@ ConfigFS()
         # if $K_RAW exists, use the dev stored in $K_RAW as dump target
         dev=$(cut -d"," -f1 ${K_RAW})
     else
-        dev=`findmnt -kcno SOURCE $MP`
-        fstype=`findmnt -kcno FSTYPE $MP`
+        dev=$(findmnt -kcno SOURCE $MP)
+        fstype=$(findmnt -kcno FSTYPE $MP)
     fi
 
     case ${OPTION,,} in
         uuid)
             # some partitions have both UUID= and PARTUUID=
             # we only want UUID=
-            target=`blkid $dev -o export -c /dev/null | grep '\<UUID='`
+            target=$(blkid $dev -o export -c /dev/null | grep '\<UUID=')
             ;;
         label)
-            target=`blkid $dev -o export -c /dev/null | grep LABEL=`
+            target=$(blkid $dev -o export -c /dev/null | grep LABEL=)
 
             # only label a fs if it hasn't label'd yet.
             if [ -z "$target" ]; then
-                LabelFS $fstype $dev $MP $LABEL
-                target=`blkid $dev -o export -c /dev/null | grep LABEL=`
+                LabelFS "$fstype" "$dev" "$MP" "$LABEL"
+                target=$(blkid $dev -o export -c /dev/null | grep LABEL=)
             fi
             ;;
         softlink)
-            ln -s $dev $dev-softlink
+            ln -s "$dev" "$dev-softlink"
             target=$dev-softlink
             ;;
         *)
@@ -566,7 +566,7 @@ ConfigFS()
         sed -i "/[ \t]${temp_mp}[ \t]/d" ${FSTAB_FILE}
         RhtsSubmit ${FSTAB_FILE}
 
-    elif [ -n "$fstype" -a -n "$target" ]; then
+    elif [ -n "$fstype" ] && [ -n "$target" ]; then
         AppendConfig "$fstype $target" "path $KPATH"
         mkdir -p $MP/$KPATH
         # tell /kdump/analysa-crash where to find vmcore
@@ -616,7 +616,7 @@ ConfigAny()
 {
     config_opt=${1:-"$TESTARGS"}
 
-    config_opt="`Chomp \"${config_opt}\"`"
+    config_opt="$(Chomp "${config_opt}")"
     [ -z "${config_opt}" ] && {
         # Force restarting kdump service and exit
         RestartKdump
@@ -625,7 +625,7 @@ ConfigAny()
     }
 
     local key="${config_opt%%[[:space:]]*}"
-    local values=$(echo "$config_opt" | sed "s/^$key[[:space:]]\+//")
+    local values=$(sed "s/^${key}[[:space:]]\+//" <<< "${config_opt}")
 
     CheckConfig
     AppendConfig "${config_opt}"
@@ -789,10 +789,9 @@ TriggerSysrqCWithBPF(){
         # to workaround Bug 1665024 - bcc doesn't work when ARCH env is set
         local temp_arch=$ARCH
         unset ARCH
-        #Log "# /usr/share/bcc/tools/biotop -C 20 60 &"
         Log "# /usr/share/bcc/tools/slabratetop -C 20 60 &"
-        #/usr/share/bcc/tools/biotop -C 20 60 &
         /usr/share/bcc/tools/slabratetop -C 20 60 &
+        ARCH=$temp_arch
 
         #Log "Wait 10 mins for biotop to be fully up"
         Log "Wait 10 mins for slabratetop to be fully up"

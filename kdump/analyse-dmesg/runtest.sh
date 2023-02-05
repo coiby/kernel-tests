@@ -53,7 +53,7 @@ VerifyPermssion(){
     # Skip verifying access permission for remote dump if it's in the single host mode.
     # Because the file permission on a pre-configured vmcore server is unreliable.
     # It can be changed by server admin.
-    if grep -v "^#" ${KDUMP_CONFIG} | egrep -q "^nfs|^ssh|^dracut_args\s+--mount" && \
+    if grep -v "^#" ${KDUMP_CONFIG} | grep -q -E "^nfs|^ssh|^dracut_args\s+--mount" && \
         [ -z "${CLIENTS}" ]; then
         Log "Skip as it's network dump running in single host mode."
         return

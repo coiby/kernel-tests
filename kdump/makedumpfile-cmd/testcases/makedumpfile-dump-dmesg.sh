@@ -24,4 +24,4 @@ MakedumpfileTest()
 
 #+---------------------------+
 
-MultihostStage "$(basename ${0%.*})" MakedumpfileTest
+MultihostStage "$(basename "${0%.*}")" MakedumpfileTest

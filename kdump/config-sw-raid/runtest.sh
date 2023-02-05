@@ -18,8 +18,6 @@
 # Source Kdump tests common functions.
 . ../include/runtest.sh
 
-set -x
-
 RAID_DEVICE=${RAID_DEVICE:-"/raid1 /raid2"}
 RAID_LEVEL=${RAID_LEVEL:-"0"}
 KPATH=${KPATH:-"$K_DEFAULT_PATH"}
@@ -49,7 +47,7 @@ save_mdadm_config()
 
     # remove old mount point
     cat ${FSTAB_FILE}
-    for i in $RAID_DEVICE; do
+    for i in ${RAID_DEVICE}; do
         sed -i "\#$i#d" ${FSTAB_FILE}
     done
 
@@ -66,7 +64,7 @@ config_software_raid()
     device_name=("")
     count=0
 
-    for i in $RAID_DEVICE; do
+    for i in ${RAID_DEVICE}; do
         device_name[$count]=$(findmnt -kcno SOURCE "$i")
         (( count++ ))
     done
@@ -74,11 +72,11 @@ config_software_raid()
     Log "- The ready disk is ${device_name[*]}"
 
     # Release disk before create raid devices
-    for i in ${device_name[@]}; do
+    for i in "${device_name[@]}"; do
         umount "$i"
     done
 
-    case $RAID_LEVEL in
+    case ${RAID_LEVEL} in
         0)
             Log "- Create raid0 devices."
             check_raid
@@ -99,7 +97,7 @@ config_software_raid()
             ;;
     esac
 
-    [ $? != 0 ] && MajorError "- Create raid$RAID_LEVEL failed."
+    [ $? != 0 ] && MajorError "- Create raid${RAID_LEVEL} failed."
 
     mdadm --detail /dev/md0
     mkfs.ext4 /dev/md0 > /dev/null

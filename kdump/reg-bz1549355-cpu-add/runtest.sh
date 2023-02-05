@@ -39,7 +39,7 @@ CPURemoveAdd() {
 
     # Checking Sockets number and skip
     socket_num=$(lscpu | grep Socket | awk '{print $NF}')
-    if [ $socket_num -lt 2 ]; then
+    if [ "${socket_num}" -lt 2 ]; then
         Warn "Test requires two cpu sockets machine to run"
         Report
     fi
@@ -69,7 +69,7 @@ PanicOnCPU() {
     LogRun "cat /proc/sys/kernel/sysrq"
     sync
     sleep 15 # wait 15 seconds for log records
-    taskset -c ${cpu_num} sh -c "echo c >/proc/sysrq-trigger"
+    taskset -c "${cpu_num}" sh -c "echo c >/proc/sysrq-trigger"
 }
 
 # --- start ---

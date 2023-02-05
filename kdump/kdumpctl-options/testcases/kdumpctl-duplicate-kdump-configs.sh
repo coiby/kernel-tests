@@ -67,4 +67,4 @@ DuplicateConfigsCheck() {
     RestartKdump
 }
 
-MultihostStage "$(basename ${0%.*})" DuplicateConfigsCheck
+MultihostStage "$(basename "${0%.*}")" DuplicateConfigsCheck

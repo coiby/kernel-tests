@@ -64,4 +64,4 @@ KdumpctlRestart() {
     RestartKdump
 }
 
-MultihostStage "$(basename ${0%.*})" KdumpctlRestart
+MultihostStage "$(basename "${0%.*}")" KdumpctlRestart

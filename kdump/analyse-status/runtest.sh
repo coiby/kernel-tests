@@ -72,11 +72,11 @@ case "${TESTARGS,,}" in
             [ $? -ne 0 ] && {
                 Error "Not received fence kdump message from ${CLIENTS}"
                 if which journalctl; then
-                    journalctl -b > "${TESTAREA}/messages.log"
+                    journalctl -b > "messages.log"
                 else
-                    cat /var/log/messages > "${TESTAREA}/messages.log"
+                    cat /var/log/messages > "messages.log"
                 fi
-                RhtsSubmit "${TESTAREA}/messages.log"
+                RhtsSubmit "$(pwd)/messages.log"
             }
             Log "- Done checking fence kdump status"
             rstrnt-sync-set -s "FENCE_CHECK_DONE"

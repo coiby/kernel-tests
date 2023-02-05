@@ -53,7 +53,7 @@ AddAndRemoveMem() {
         LogRun "drmgr -c mem -r -q ${TESTARGS}" || MajorError "Failed to remove mem by drmgr"
         kdumpctl status || {
             MajorError "Kdump is not operational after removing memory"
-            UploadSystemLogs
+            UploadJournalLogs
         }
 
         LogRun "lsmem"
@@ -62,7 +62,7 @@ AddAndRemoveMem() {
         LogRun "drmgr -c mem -a -q ${TESTARGS}" || MajorError "Failed to add mem by drmgr"
         kdumpctl status || {
             MajorError "Kdump is not operational after adding memory"
-            UploadSystemLogs
+            UploadJournalLogs
         }
         LogRun "lsmem"
 
@@ -77,7 +77,7 @@ AddAndRemoveMem() {
     LogRun "drmgr -c mem -r -q ${TESTARGS}" || MajorError "Failed to remove mem by drmgr"
     LogRun "kdumpctl status" || {
         MajorError "Kdump is not operational after removing memory"
-        UploadSystemLogs
+        UploadJournalLogs
     }
     LogRun "lsmem"
 

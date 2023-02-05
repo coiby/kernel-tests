@@ -38,9 +38,9 @@ KexecTest(){
     # 1) Check configuration in kdump sysconfig
     RhtsSubmit "${KDUMP_SYS_CONFIG}"
     if grep 'KEXEC_ARGS' "${KDUMP_SYS_CONFIG}" | grep -q '\-s'; then
-        Log "kdump is configured with KEXEC_ARGS="-s" by default."
+        Log "kdump is configured with KEXEC_ARGS=\"-s\" by default."
     else
-	    Error "kdump is not configured with KEXEC_ARGS="-s" by default."
+        Error "kdump is not configured with KEXEC_ARGS=\"-s\" by default."
         return
     fi
 
@@ -103,7 +103,7 @@ CheckKexecResult(){
 
     RhtsSubmit "$log_file"
     if ! grep -q 'exited with 0' "${log_file}" || ! grep -q "$func" "${log_file}"; then
-        Error "Expect $func to be called in kexec load command. But it didn't or command failed to run. Please check "$log_file""
+        Error "Expect $func to be called in kexec load command. But it didn't or command failed to run. Please check $log_file"
     fi
 }
 

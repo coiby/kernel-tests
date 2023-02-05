@@ -24,11 +24,11 @@ TESTARGS=${TESTARGS:-""}
 
 DUMP_DIR=dump_tracing_dir
 DUMP_M_DIR=${K_TESTAREA}/DUMP_M
-NR_CORE=$(grep processor /proc/cpuinfo | wc -l)
+NR_CORE=$(grep -c processor /proc/cpuinfo)
 DEBUG_PATH=/sys/kernel/debug
 
 for i in ${DUMP_DIR} ${DUMP_M_DIR}; do
-	[ -d "$i" ] && rm -rf $i;
+    [ -d "$i" ] && rm -rf $i;
 done
 
 EnableTracer()
@@ -105,8 +105,8 @@ trace show -c 0 | head
 EOF
 
     if [ ${NR_CORE} -gt 1 ]; then
-        echo "trace show -c 0,$(expr ${NR_CORE} - 1) | head" >> "${K_TESTAREA}/crash.cmd"
-        echo "trace show -c 0-$(expr ${NR_CORE} - 1) | head" >> "${K_TESTAREA}/crash.cmd"
+        echo "trace show -c 0,$((NR_CORE-1)) | head" >> "${K_TESTAREA}/crash.cmd"
+        echo "trace show -c 0-$((NR_CORE-1)) | head" >> "${K_TESTAREA}/crash.cmd"
     fi
 
     echo "extend -u ${tracer}" >> "${K_TESTAREA}/crash.cmd"

@@ -87,7 +87,7 @@ RegressionTest() {
 CPUBroughBackPanic() {
     Log "Will take panic on CPU ${cpu_num}"
     LogRun "cat /proc/sys/kernel/sysrq"
-    taskset -c ${cpu_num} sh -c "echo c >/proc/sysrq-trigger"
+    taskset -c "${cpu_num}" sh -c "echo c >/proc/sysrq-trigger"
 }
 
 # --- start ---
