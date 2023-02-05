@@ -1,0 +1,29 @@
+summary: Crashing system by OOM.
+description: |
+    It crashes the system by OOM.
+    overcommit_memory
+    Defines the conditions that determine whether a large memory request 
+    is accepted or denied. There are three possible values for this parameter:
+      0 — The default setting. The kernel performs heuristic memory overcommit
+      handling by estimating the amount of memory available and failing requests
+      that are blatantly invalid. Unfortunately, since memory is allocated using 
+      a heuristic rather than a precise algorithm, this setting can sometimes 
+      allow available memory on the system to be overloaded.
+      1 — The kernel performs no memory overcommit handling. Under this setting, 
+      the potential for memory overload is increased, but so is performance for 
+      memory-intensive tasks.
+      2 — The kernel denies requests for memory equal to or larger than the sum
+      of total available swap and the percentage of physical RAM specified in 
+      overcommit_ratio. This setting is best if you want a lesser risk of memory 
+      overcommitment.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - gcc
+  - kernel-devel
+  - kernel-headers
+  - elfutils-libelf-devel
+duration: 1h
+extra-summary: /kernel/kdump/crash-oom
+extra-task: /kernel/kdump/crash-oom

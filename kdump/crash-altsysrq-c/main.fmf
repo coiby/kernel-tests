@@ -1,0 +1,13 @@
+summary: Test Kdump by crashing Kernel via Alt+SysRq+C.
+description: |
+    It crashes the system via Alt+SysRq+C
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kernel-devel
+  - elfutils-libelf-devel
+  - gcc
+duration: 1h
+extra-summary: /kernel/kdump/crash-altsysrq-c
+extra-task: /kernel/kdump/crash-altsysrq-c

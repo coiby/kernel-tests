@@ -1,0 +1,19 @@
+This case is to configure kdump sysconfig (/etc/sysconfig/kdump)
+
+Accepted Parameters:
+ - KEY:
+   The key of value to be updated in kdump sysconfig. E.g KDUMP_KERNELVER
+
+ - ACTION:
+   Action will be performed on the sysconfig.
+   Valid values: remove/add/replace/
+
+ - VALUE1:
+   Value will be added/removed/replaced in sysconfig
+
+ - VALUE2:
+   Only applicable when ACTION=replace
+   The value will be used to replace VALUE1
+
+
+

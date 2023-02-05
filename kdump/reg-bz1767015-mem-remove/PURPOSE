@@ -1,0 +1,10 @@
+# This test is applicable to ppc64le powervm only
+
+It tests kdump service status after removing multiple LMB
+
+Accepted Parameters:
+ - TESTARGS:
+    add/remove multiple LMB (by default, 10 LMB = 2.5G)
+
+ - LOOPCOUNT:
+    The times of removing/adding LMB (by default 10 times)

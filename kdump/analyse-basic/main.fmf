@@ -1,0 +1,13 @@
+summary: Use basic ELF utilities to analyse the vmcore from Kdump.
+description: |
+    It uses basic ELF utilites, readelf, objdump and eu-readelf to analyse
+    the vmcore from Kdump.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - binutils
+  - elfutils
+duration: 10m
+extra-summary: /kernel/kdump/analyse-basic
+extra-task: /kernel/kdump/analyse-basic

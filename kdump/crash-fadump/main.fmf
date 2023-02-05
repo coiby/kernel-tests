@@ -1,0 +1,9 @@
+summary: Triggering firmware-assisted dump on power system
+description: |
+    It tests firmware-assisted dump on power systems.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 1h
+extra-summary: /kernel/kdump/crash-fadump
+extra-task: /kernel/kdump/crash-fadump

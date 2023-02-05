@@ -1,0 +1,11 @@
+summary: Test availability for kdumpctl options and kdumpctl regression bugs
+description: |
+    Tests 'kdumpctl' cmds with diff options
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/kdumpctl-options
+extra-task: /kernel/kdump/kdumpctl-options

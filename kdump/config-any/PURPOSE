@@ -1,0 +1,19 @@
+This test is to add a config line in /etc/kdump.conf.
+If the option (e.g. default, kdump_pre) is already defined in kdump.conf, it will overwrite
+the existing line instead of adding a new line.
+
+It would also generate /bin/kdump-pre.sh and /bin/kdump-post.sh scripts for testing purpose.
+
+Accepted Parameters:
+    - TESTARGS:
+        The configuration line will be added to kdump.conf. 
+        e.g 'default shell'
+            'kdump_pre /bin/kdump-pre.sh'
+            'kdump_post /bin/kdump-post.sh'
+        
+    - RESTART_KDUMP:
+        Whether restarting kdump service after updating the kdump.conf. 
+        Possible values: true or false. Default is 'true'
+
+!! Note it won't work properly for options that affect the location of
+dumped vmcore. Use corresponding config-* test cases instead.

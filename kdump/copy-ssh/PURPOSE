@@ -1,0 +1,3 @@
+The testcase it to copy vmcore from the previous Kdump SSH target for later
+vmcore analysis. It can be used in a multihost test or in a single host test
+by specifying your SSH server via param 'SSH_SERVER'.

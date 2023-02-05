@@ -1,0 +1,1 @@
+It tests command `list -B` which is providing an alternative algorithem to detect loop in a linked list.

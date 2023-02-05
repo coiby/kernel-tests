@@ -1,0 +1,13 @@
+summary: Trigger system panic when bpf is started
+description: |+
+    It tests if bpf info can be saved to the vmcore and be avaiable
+    for later crash utilities analysis
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - bcc
+duration: 60m
+extra-summary: /kernel/kdump/crash-bpf
+extra-task: /kernel/kdump/crash-bpf

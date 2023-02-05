@@ -1,0 +1,27 @@
+summary: configure a thinpool kdump target
+description: |
+    This case is to configure thin lvm partition as kdump target.
+    Alert: It will format the partition mounted at $THIN_MP to thin lvm
+
+    Accept Parameters:
+    - THIN_MP: The moint point partition mount at and will be formated to thin LVM
+              It will be configured as Kdump dump target
+              THIN_MP cannot be '/' or '/boot'
+    - THIN_KPATH: The relative path where the vmcore will be dump to.
+              By default: '/var/crash'
+    - THIN_SIZE: The size of thinpool volumn
+              By default: 2G
+    - RESTART_KDUMP: Whether kdump service will be restarted after configuring thin
+              LVM target. Allowed values: true / false
+              Be default: true
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+recommend:
+  - kexec-tools
+require:
+  - lvm2
+duration: 30m
+extra-summary: /kernel/kdump/config-thin
+extra-task: /kernel/kdump/config-thin

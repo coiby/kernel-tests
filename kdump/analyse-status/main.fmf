@@ -1,0 +1,15 @@
+summary: Validate system status after panic test.
+description: |+
+    The test case is to validate various server status after system is restored from a system panic
+
+    Parameters:
+    - TESTARGS
+        Fixed types of system panic. System status will be checked opon system panic types.
+
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 60m
+extra-summary: /kernel/kdump/analyse-status
+extra-task: /kernel/kdump/analyse-status

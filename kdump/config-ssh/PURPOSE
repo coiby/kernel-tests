@@ -1,0 +1,15 @@
+The testcase is to configure Kdump to dump vmcore to a SSH server. It can be
+used in a multihost test to configure Kdump on client side, and setup SSH
+server on server side. Alternatively used in a single host test by specifying
+your SSH server via param 'SSH_SERVER'.
+
+Accepted parameter:
+
+- SSH_SERVER
+	Run as STANDALONE task
+
+- SSH_KEY
+	Corresponding to 'sshkey' in kdump.conf
+
+- RESTRICTED_SHELL
+	Configure a restricted shell login in ssh host

@@ -1,0 +1,1 @@
+Test journalctl -b in kdump shell to make sure display journal logs

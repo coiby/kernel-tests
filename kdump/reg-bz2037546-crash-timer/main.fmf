@@ -1,0 +1,13 @@
+summary: Regression Test for bug 2037456
+description: |
+    Regression test for Bug 2037546
+    Test "timer -r" command to make sure it prints all the per-CPU clocks
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+recommend:
+  - crash
+  - kernel-debuginfo
+duration: 30m
+extra-summary: /kernel/kdump/reg-bz2037546-crash-timer
+extra-task: /kernel/kdump/reg-bz2037546-crash-timer

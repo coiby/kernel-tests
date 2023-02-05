@@ -1,0 +1,87 @@
+#!/bin/sh
+
+if [[ "$FAMILY" =~ [a-zA-Z]+5 ]]; then
+    shbang="msh"
+else
+    shbang="sh"
+fi
+
+devname=$(mount | awk '{ if ($3 == "/") print $1; }')
+root=$(blkid $devname | awk '{print $2}')
+
+cat >/bin/kdump-pre.sh <<EOF
+#!/bin/$shbang
+
+echo "--> kdump-pre.sh: pidstat -l"
+pidstat -l
+
+echo "--> kdump-pre.sh: vmstat -s"
+vmstat -s
+
+echo "--> kdump-pre.sh: Done! Touching /root/kdump-pre.stamp"
+set -x
+dir=\`grep -m1 $root /proc/mounts | cut -d' ' -f2\`
+tdir=/mnt/tmp
+mkdir -p \$tdir
+if [ -z \$dir ]; then
+    mount $root \$tdir
+else
+    mount --rbind \$dir \$tdir
+    mount -o remount,rw \$tdir
+fi
+echo >\$tdir/root/kdump-pre.stamp
+vmstat -s >>\$tdir/root/kdump-pre.stamp
+cat /proc/modules >\$tdir/root/module.stamp
+sync
+umount \$tdir
+sleep 5
+EOF
+
+cat >/bin/kdump-post.sh <<EOF
+#!/bin/$shbang
+
+echo "--> kdump-post.sh: pidstat -l"
+pidstat -l
+
+echo "--> kdump-post.sh: vmstat -s"
+vmstat -s
+
+echo "--> kdump-post.sh: Done! Touching /root/kdump-post.stamp"
+set -x
+dir=\`grep -m1 $root /proc/mounts | cut -d' ' -f2\`
+tdir=/mnt/tmp
+mkdir -p \$tdir
+if [ -z \$dir ]; then
+    mount $root \$tdir
+else
+    mount --rbind \$dir \$tdir
+    mount -o remount,rw \$tdir
+fi
+echo >\$tdir/root/kdump-post.stamp
+vmstat -s >>\$tdir/root/kdump-post.stamp
+echo "result $1" >>\$tdir/root/kdump-post.stamp
+sync
+umount \$tdir
+sleep 5
+EOF
+
+cat >/bin/kdump-post-halt.sh <<EOF
+#!/bin/$shbang
+echo "I'm kdump post script! System drop into halt!"
+/sbin/reboot
+EOF
+
+cat >/bin/kdump-post-poweroff.sh <<EOF
+#!/bin/$shbang
+echo "I'm kdump post script! System drop into poweroff!"
+/sbin/reboot
+EOF
+
+cat >/bin/kdump-post-shell.sh <<EOF
+#!/bin/$shbang
+echo "I'm kdump post script! System drop into shll!"
+/sbin/reboot
+EOF
+
+chmod +x /bin/kdump-{pre,post}.sh
+chmod +x /bin/kdump-post-{halt,poweroff,shell}.sh

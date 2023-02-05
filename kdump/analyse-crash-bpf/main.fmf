@@ -1,0 +1,16 @@
+summary: Crash bpf cmd providing information of BPF programs and maps
+description: |+
+    Test crash bpf command for providing information of loaded BPF programs and maps
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+component:
+  - crash
+test: make run
+framework: shell
+require:
+  - crash
+recommend:
+  - kernel-debuginfo
+duration: 300m
+extra-summary: /kernel/kdump/analyse-crash-bpf
+extra-task: /kernel/kdump/analyse-crash-bpf

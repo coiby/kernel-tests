@@ -1,0 +1,4 @@
+new kernel parameter: panic_on_warn
+bug: 1163852 and 1181604
+
+This parameter can be as the parameter of the system to crash.

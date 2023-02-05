@@ -1,0 +1,17 @@
+This case is to configure local dump target in kdump.conf.
+
+Accepted Parameters:
+ - MP:
+   Mount point of dump device, defaulting to '/'. E.g. /mnt/data
+
+ - KPATH:
+   Specify 'path' in kdump.conf, defaulting to '/var/crash'.
+
+ - OPTION:
+   The valid are 'uuid', 'label' or 'softlink'.
+
+ - LABEL:
+   Only applicable when OPTION=label, specifying a label to the particular fs.
+
+ - RAW:
+   Value 'yes' means doing raw dump, default to 'no'.

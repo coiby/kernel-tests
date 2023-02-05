@@ -1,0 +1,18 @@
+summary: Common functions for Kdump testing
+description: |
+    This is the Shell library including all common functions for Kdump test
+    cases. There is no need to run this test. In each test case, add one
+    line to the main script,
+
+     . ../include/runtest.sh
+
+    and also add RepoRequires to the Makefile,
+
+     RepoRequires:    kdump/include
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 10m
+extra-summary: /kernel/kdump/include
+extra-task: /kernel/kdump/include

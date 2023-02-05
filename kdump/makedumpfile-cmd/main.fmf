@@ -1,0 +1,11 @@
+summary: Test against makedumpfile cmds
+description: |
+    Tests 'makedumpfile' cmds which are not tested in normal kdump process
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 60m
+extra-summary: /kernel/kdump/makedumpfile-cmd
+extra-task: /kernel/kdump/makedumpfile-cmd

@@ -1,0 +1,9 @@
+summary: reload crash kernel image and initramfs
+description: |
+    This case is to test reloading crash kernel image and initramfs without triggering a rebuild
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 30m
+extra-summary: /kernel/kdump/reload-kdump
+extra-task: /kernel/kdump/reload-kdump

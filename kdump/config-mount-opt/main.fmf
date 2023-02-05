@@ -1,0 +1,10 @@
+summary: Config mount options in /etc/fstab
+description: |+
+    It configures mount options /etc/fstab which may affect kdump loading dump targets.
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 30m
+extra-summary: /kernel/kdump/config-mount-opt
+extra-task: /kernel/kdump/config-mount-opt

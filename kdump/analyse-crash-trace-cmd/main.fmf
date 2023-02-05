@@ -1,0 +1,17 @@
+summary: Test for crash trace extension
+description: |
+    Use trace extension for crash to analyse the vmcore
+contact: Kdump QE <kdump-qe-list@redhat.com>
+component:
+  - crash-trace-command
+test: make run
+framework: shell
+require:
+  - crash-trace-command
+  - crash
+  - trace-cmd
+recommend:
+  - kernel-debuginfo
+duration: 1h
+extra-summary: /kernel/kdump/analyse-crash-trace-cmd
+extra-task: /kernel/kdump/analyse-crash-trace-cmd

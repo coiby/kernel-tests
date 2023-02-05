@@ -1,0 +1,96 @@
+#!/bin/sh
+
+if [[ "$FAMILY" =~ [a-zA-Z]+5 ]]; then
+    shbang="msh"
+else
+    shbang="sh"
+fi
+
+root=$(mount | awk '{ if ($3 == "/") print $1; }')
+
+cat >/bin/kdump-pre.sh <<EOF
+#!/bin/$shbang
+
+echo "--> kdump-pre.sh: pidstat -l"
+pidstat -l
+
+echo "--> kdump-pre.sh: vmstat -s"
+vmstat -s
+
+echo "--> kdump-pre.sh: Done! Touching /root/kdump-pre.stamp"
+set -x
+dir=\`grep -m1 $root /proc/mounts | cut -d' ' -f2\`
+tdir=/mnt/tmp
+mkdir -p \$tdir
+if [ -z \$dir ]; then
+    mount $root \$tdir
+else
+    mount --rbind \$dir \$tdir
+    mount -o remount,rw \$tdir
+fi
+echo >\$tdir/root/kdump-pre.stamp
+vmstat -s >>\$tdir/root/kdump-pre.stamp
+cat /proc/modules >\$tdir/root/module.stamp
+sync
+umount \$tdir
+sleep 5
+EOF
+
+cat >/bin/kdump-post.sh <<EOF
+#!/bin/$shbang
+
+echo "--> kdump-post.sh: pidstat -l"
+pidstat -l
+
+echo "--> kdump-post.sh: vmstat -s"
+vmstat -s
+
+echo "--> kdump-post.sh: Done! Touching /root/kdump-post.stamp"
+set -x
+dir=\`grep -m1 $root /proc/mounts | cut -d' ' -f2\`
+tdir=/mnt/tmp
+mkdir -p \$tdir
+if [ -z \$dir ]; then
+    mount $root \$tdir
+else
+    mount --rbind \$dir \$tdir
+    mount -o remount,rw \$tdir
+fi
+echo >\$tdir/root/kdump-post.stamp
+vmstat -s >>\$tdir/root/kdump-post.stamp
+echo "result $1" >>\$tdir/root/kdump-post.stamp
+sync
+umount \$tdir
+sleep 5
+EOF
+
+for idx in 1 2; do
+	for scriptdir in pre_d post_d; do
+		script_name=kdump-${scriptdir}_${idx}
+        [ -f "${file_name}.sh" ] && rm -f "${file_name}.sh"
+
+		cat > ${script_name}.sh <<EOF
+#!/bin/$shbang
+echo "--> ${script_name}.sh: Started"
+
+dir=\`grep -m1 $root /proc/mounts | cut -d' ' -f2\`
+tdir=/mnt/tmp
+mkdir -p \$tdir
+if [ -z \$dir ]; then
+	mount $root \$tdir
+else
+	mount --rbind \$dir \$tdir
+	mount -o remount,rw \$tdir
+fi
+echo -n "${script_name}.sh executed;" >> \$tdir/root/kdump-${scriptdir}.stamp
+echo "--> ${script_name}.sh: Done. Outputted to /root/kdump-${scriptdir}.stamp"
+sync
+umount \$tdir
+sleep 5
+EOF
+	done
+done
+
+chmod +x kdump-{pre_d,post_d}_{1,2}.sh
+chmod +x /bin/kdump-{pre,post}.sh
+

@@ -1,0 +1,3 @@
+PURPOSE of /kernel/kdump/analyse-crash-trace-cmd
+Description: Use trace extension for crash to analyse the vmcore
+Author: Caspar Zhang <czhang@redhat.com>
