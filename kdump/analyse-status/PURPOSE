@@ -1,0 +1,7 @@
+The test case is to validate various server status after system is restored from a system panic
+
+Parameters:
+- TESTARGS
+    Fixed types of system panic. System status will be checked opon system panic types.
+
+

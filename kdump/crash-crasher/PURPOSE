@@ -1,0 +1,9 @@
+It crashes the system by using crasher Kernel module. It could take an
+argument from 0-3,
+
+ * ACP: invoke dump using panic [ panic test 0 ].
+ * ACB: invoke dump using BUG [ panic test 1 ].
+ * ACE: invoke dump using panic_on_oops [ panic test 2 ].
+ * ACL: invoke dump in a hang situation.
+
+By default, it uses 0 (ACP).

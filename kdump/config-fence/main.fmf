@@ -1,0 +1,26 @@
+summary: Configure fence kdump.
+description: |+
+    The test case is to configure 2 cluster nodes for fence kdump
+
+    Parameters:
+    - USE_ALIAS
+        Whether to use host alias or hostname in pacemaker configurations
+        Default is false.
+    - READ_FROM_PCS
+        Whether to read fence kdump nodes from pcs configurations.
+        When it's false, it would set fence_kdump_nodes explicitly in /etc/kdump.conf
+        Default is true.
+
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+    - pcs 
+    - pacemaker 
+    - fence-agents-kdump
+    - expect
+    - kexec-tools
+duration: 90m
+extra-summary: /kernel/kdump/config-fence
+extra-task: /kernel/kdump/config-fence

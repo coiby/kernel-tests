@@ -1,0 +1,3 @@
+It tests if bpf info can be saved to the vmcore and be avaiable
+for later crash utilities analysis
+

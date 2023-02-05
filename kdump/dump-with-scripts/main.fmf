@@ -1,0 +1,13 @@
+summary: Test kdump with pre or post scripts
+description: |
+    Test kdump with pre or post scripts
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+recommend:
+  - sysstat
+duration: 30m
+extra-summary: /kernel/kdump/dump-with-scripts
+extra-task: /kernel/kdump/dump-with-scripts

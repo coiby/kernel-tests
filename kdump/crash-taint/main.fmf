@@ -1,0 +1,9 @@
+summary: Crashing system via panic_on_taint.
+description: |
+    It crashes the system by panic_on_taint
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 1h
+extra-summary: /kernel/kdump/crash-taint
+extra-task: /kernel/kdump/crash-taint

@@ -1,0 +1,13 @@
+summary: Configure bridging network
+description: |
+    It configures Kdump using a bridging network
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+  - nmcli
+  - ip
+duration: 10m
+extra-summary: /kernel/kdump/config-network-bridging
+extra-task: /kernel/kdump/config-network-bridging

@@ -1,0 +1,34 @@
+summary: Configure how Kdump use makedumpfile.
+description: |
+    It configures Kdump using makedumpfile to collect vmcore. The default is
+    to use "-c -d 31". It could be overrided from command line like,
+
+    -t /kernel/kdump/config-filter:'-E'
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/config-filter
+extra-task: /kernel/kdump/config-filter
+
+
+
+/compression_zlib:
+  environment:
+    TESTARGS: "-c -d 31"
+
+/compression_lzo:
+  environment:
+    TESTARGS: "-l -d 31"
+
+/compression_snappy:
+  environment:
+    TESTARGS: "-p -d 31"
+
+/compression_zstd:
+  environment:
+    TESTARGS: "-z -d 31"
+
+

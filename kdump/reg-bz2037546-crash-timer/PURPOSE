@@ -1,0 +1,2 @@
+Regression test for Bug 2037546
+Test "timer -r" command to make sure it prints all the per-CPU clocks

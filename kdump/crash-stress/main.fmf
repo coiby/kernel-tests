@@ -1,0 +1,11 @@
+summary: Trigger kdump under stress testing.
+description: |
+    It tests kdump under stress testing.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - stress-ng
+duration: 1h
+extra-summary: /kernel/kdump/crash-stress
+extra-task: /kernel/kdump/crash-stress

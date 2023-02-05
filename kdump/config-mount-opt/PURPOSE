@@ -1,0 +1,2 @@
+It configures mount options /etc/fstab which may affect kdump loading dump targets.
+

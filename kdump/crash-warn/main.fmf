@@ -1,0 +1,15 @@
+summary: Test kdump by crashing kernel using panic_on_warn.
+description: |
+    Trigger panic based on kernel option panic_on_warn
+    Bug: 1163852 and 1181604
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kernel-devel
+  - elfutils-libelf-devel
+  - gcc
+duration: 1h
+extra-summary: /kernel/kdump/crash-warn
+extra-task: /kernel/kdump/crash-warn

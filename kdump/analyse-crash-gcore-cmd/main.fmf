@@ -1,0 +1,16 @@
+summary: Test for crash gcore extension
+description: |
+    Use gcore extension for crash to dump userspace process core from the vmcore
+contact: Kdump QE <kdump-qe-list@redhat.com>
+component:
+  - crash-gcore-command
+require:
+  - crash-gcore-command
+  - crash
+recommend:
+  - kernel-debuginfo
+test: make run
+framework: shell
+duration: 1h
+extra-summary: /kernel/kdump/analyse-crash-gcore-cmd
+extra-task: /kernel/kdump/analyse-crash-gcore-cmd

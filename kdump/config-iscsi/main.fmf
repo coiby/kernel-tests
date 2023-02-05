@@ -1,0 +1,22 @@
+summary: Config iscsi disks for kdump test.
+description: |
+    Config iscsi devices. Support following args:
+
+    1. TARGET_NAME:
+    	The iscsi target name. The initiator name will be same as the TARGET_NAME.
+    	By default it's iqn.2019-06.com.kdump:server0
+
+    2. FS_TYPE:
+    	Filesystem type the iscsi target will be formatted to.
+    	Formatting is done on the client.
+    	By default it's xfs
+
+    3. MP:
+    	Mount point on client for the iscsi/multipath device.
+    	By default, it's /mnt/iscsi
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 30m
+extra-summary: /kernel/kdump/config-iscsi
+extra-task: /kernel/kdump/config-iscsi

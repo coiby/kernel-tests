@@ -1,0 +1,13 @@
+summary: mount the previous Kdump NFS export.
+description: |
+    The testcase it to mount the previous Kdump NFS export and copy the vmcore
+    for later vmcore analysis. It can be used in a multihost test or in a single
+    host test by specifying your NFS server via param 'NFS_SERVER'.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - nfs-utils
+duration: 90m
+extra-summary: /kernel/kdump/copy-nfs
+extra-task: /kernel/kdump/copy-nfs

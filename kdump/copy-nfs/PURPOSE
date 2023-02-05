@@ -1,0 +1,3 @@
+The testcase it to mount the previous Kdump NFS export for later vmcore
+analysis. It can be used in a multihost test or in a single host test by
+specifying your NFS server via param 'NFS_SERVER'.

@@ -1,0 +1,35 @@
+summary: Configure kdump_pre/kdump_post option.
+description: |+
+    It allows to run a cmd in kdump_pre or kdump_post script. The result of cmd
+    can be output to sysroot and verified in a later step.
+
+    Parameters
+
+    - TESTARGS: the command will be run in kdump_pre or kdump_post script
+
+    - OPTION: kdump_pre or kdump_post. Only these 2 option are allowed.
+
+    - OUTPUT_TO_ROOT: Whether you cmd will save result to sys root (/mnt/tmproot in
+        2n kernel). e.g. TESTARGS="dmesg > /mnt/tmproot/2nd-kernel-dmesg.txt"
+        If yes, sysroot will be mounted explicitly to /mnt/tmproot in 2n kernel.
+        Only 'true' or 'false' is allowed. By default it's 'ture'.
+
+    Note,
+        kdump initrd img contains minimum set of binaries and modules.
+        If you'd like to run some special commands or modules. Make sure they are
+        added through extra_bins or extra_modules by kernel/kdump/config-any test.
+
+
+        Since RHEL-7.5, kdump won't mount /sysroot by default if dump target is a
+        non-root target and 'default dump_to_rootfs' is not specified in kdump.conf.
+        If you'd like to mount root in your script, and you root file system is
+        xfs. Make sure "extra_modules xfs" is set in /etc/kdump.conf
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 10m
+extra-summary: /kernel/kdump/config-script
+extra-task: /kernel/kdump/config-script

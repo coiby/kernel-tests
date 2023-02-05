@@ -1,0 +1,9 @@
+This is the Shell library including all common functions for Kdump test
+cases. There is no need to run this test. In each test case, add one
+line to the main script,
+
+ . ../include/runtest.sh
+
+and also to the Makefile,
+
+ RepoRequires:    kdump/include

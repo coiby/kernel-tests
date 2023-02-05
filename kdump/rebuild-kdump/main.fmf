@@ -1,0 +1,11 @@
+summary: Rebuild kdump initramfs img
+description: |
+    This case is to test rebuilding kdump initramfs img
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/rebuild-kdump
+extra-task: /kernel/kdump/rebuild-kdump

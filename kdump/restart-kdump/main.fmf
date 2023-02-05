@@ -1,0 +1,10 @@
+summary: Restart kdump service
+description: |
+    This case is to restart kdump and submit all kdump service logs
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 30m
+extra-summary: /kernel/kdump/restart-kdump
+extra-task: /kernel/kdump/restart-kdump
+require: kexec-tools

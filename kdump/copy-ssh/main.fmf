@@ -1,0 +1,13 @@
+summary: Copy vmcore from a SSH target.
+description: |
+    The testcase it to copy vmcore from the previous Kdump SSH target for later
+    vmcore analysis. It can be used in a multihost test or in a single host test
+    by specifying your SSH server via param 'SSH_SERVER'.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - openssh-clients
+duration: 90m
+extra-summary: /kernel/kdump/copy-ssh
+extra-task: /kernel/kdump/copy-ssh

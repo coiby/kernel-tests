@@ -1,0 +1,38 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Makefile of /kernel/kdump/kdumpctl-reset-crashkernel
+#   Description: Test availability for kdumpctl reset-crashkernel
+#   Author: Ruowen Qin <ruqin@redhat.com>
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+export TEST        := /kernel/kdump/kdumpctl-reset-crashkernel
+export TESTVERSION := 1.0
+
+# Include Common Makefile
+include /usr/share/rhts/lib/rhts-make.include
+
+.PHONY: build clean run
+
+# All files you want bundled into your rpm.
+FILES := $(METADATA) Makefile PURPOSE runtest.sh
+
+build:
+	chmod a+x runtest.sh
+
+clean:
+	rm -f $(METADATA)
+
+run: $(FILES) build
+	./runtest.sh
+
+$(METADATA): Makefile
+	touch $(METADATA)
+	@echo "Name:          $(TEST)"                           > $(METADATA)
+	@echo "TestVersion:   $(TESTVERSION)"	                >> $(METADATA)
+	@echo "Path:          $(TEST_DIR)"                      >> $(METADATA)
+	@echo "TestTime:      60m"                              >> $(METADATA)
+	@echo "License:       GPLv3"                            >> $(METADATA)
+	@echo "Owner:         Kdump QE <kdump-qe-list@redhat.com>"    >> $(METADATA)
+	@echo "RepoRequires:  kdump/include" >> $(METADATA)
+	@echo "Description:   Test kdumpctl reset-crashkernel"  >> $(METADATA)

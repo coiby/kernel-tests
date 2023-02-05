@@ -1,0 +1,12 @@
+summary: Enabling memstrack for debugging kdump memory usage
+description: |
+    It enables memstrack for debugging memory usage during kdump
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+    - kexec-tools
+    - memstrack
+duration: 30m
+extra-summary: /kernel/kdump/config-memstrack
+extra-task: /kernel/kdump/config-memstrack

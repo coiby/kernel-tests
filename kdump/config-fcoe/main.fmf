@@ -1,0 +1,11 @@
+summary: Config fcoe disks for kdump test.
+description: |
+    Prepare fcoe disks for later kdump test
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+    - fcoe-utils
+duration: 30m
+extra-summary: /kernel/kdump/config-fcoe
+extra-task: /kernel/kdump/config-fcoe

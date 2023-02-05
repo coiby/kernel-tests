@@ -1,0 +1,11 @@
+summary: Configure network to static
+description: |
+    The test is to configure network to static
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - nmcli
+duration: 5m
+extra-summary: /kernel/kdump/config-static-network
+extra-task: /kernel/kdump/config-static-network

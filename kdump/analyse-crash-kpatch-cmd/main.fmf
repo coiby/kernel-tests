@@ -1,0 +1,23 @@
+summary: Use crash utility to analyse the vmcore dumped from kpatched kernel
+description: |+
+    It uses crash commands to analyse vmcore dumped from a kpatched kernel.
+
+    Parameter:
+
+    KPATCH_FUNC_LIST: 
+        Allow passing a list of functions being patched. Functions need to be separated by a space.
+
+
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+component:
+  - crash
+test: make run
+framework: shell
+require:
+  - crash
+recommend:
+  - kernel-debuginfo
+duration: 300m
+extra-summary: /kernel/kdump/analyse-crash-kpatch-cmd
+extra-task: /kernel/kdump/analyse-crash-kpatch-cmd

@@ -1,0 +1,15 @@
+summary: 'Kdump test to dump to a raw target '
+description: |-
+    Kdump test to trigger a crash and dump to a raw target
+
+    Accepted Parameters:
+     - MP:
+       Mount point of dump device, defaulting to '/'. E.g. /mnt/data
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/dump-to-raw
+extra-task: /kernel/kdump/dump-to-raw
