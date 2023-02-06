@@ -277,7 +277,7 @@
 /watchdog/hw-generic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 
 [kpet-db-maintainers]
-/acpi/acpitable/ @ahs3 @bgoncalv @lulinqing
+/acpi/acpitable/ @JiriDluhosRH @bgoncalv @lulinqing
 /acpi/enabled/ @bgoncalv @jbastianrh @lulinqing
 /container/podman/ @bgoncalv @lulinqing @yarboa
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
