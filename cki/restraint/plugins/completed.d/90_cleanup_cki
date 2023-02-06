@@ -1,10 +1,11 @@
 #!/bin/bash
 
 . /usr/share/restraint/plugins/helpers
+. /usr/share/restraint/plugins/cki_helpers
 
 rstrnt_info "*** Running Plugin: $0"
 
 # Task finished running remove everything created by cki plugins for this task
-rm -rf "/var/opt/cki/${RSTRNT_TASKID}"
+rm -rf "${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}"
 
 exec "$@"

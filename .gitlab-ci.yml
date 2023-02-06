@@ -102,6 +102,9 @@ shellspec:
     - "# Mock external libraries include files"
     - mkdir /usr/share/beakerlib
     - touch /usr/share/beakerlib/beakerlib.sh
+    # mock restraint library
+    - mkdir -p /usr/share/restraint/plugins
+    - touch /usr/share/restraint/plugins/helpers
 
 codeowners check:
   extends: .cki_tools
