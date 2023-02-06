@@ -105,6 +105,7 @@ shellspec:
     # mock restraint library
     - mkdir -p /usr/share/restraint/plugins
     - touch /usr/share/restraint/plugins/helpers
+    - touch /usr/bin/rhts_environment.sh
 
 codeowners check:
   extends: .cki_tools

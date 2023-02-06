@@ -347,43 +347,8 @@ config_ssh()
 	fi
 }
 
-# source our functions
-pushd $NETWORK_COMMONLIB_DIR > /dev/null
-for lib in *.sh; do
-	# skip self and runtest.sh
-	[ "$lib" = "include.sh" -o "$lib" = "runtest.sh" ] && continue
-	source ./$(basename $lib)
-done
-
-# handle the initial task just once
-if [ -f /dev/shm/network_common_initalized ]
-then
-	# avc_check toggle every time common is called as avc setting may be
-	# reset by beaker or others
-	[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
-else
-	{
-	if [ "$(uname -m)" = "ppc64le" ];
-	then
-		sleep 2;
-	else
-		# This is a workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1920477#c33
-		# install nfp firmware
-		$YUM netronome-firmware
-
-		# update initramfs
-		dracut -f;
-		# The problem is that the zipl bootloaders have a fixed list of blocks on
-		# the device to read during boot. This list is generated every time the
-		# zipl command is run. When now the initramfs is updated this can
-		# add/remove/move blocks. So without running zipl the fixed list will
-		# be out of sync with what is on disk.
-		[[ "$(uname -m)" =~ s390.* ]] && zipl
-		# reload driver
-		modprobe -r nfp;sleep 2;
-		modprobe nfp;sleep 5;
-	fi
-
+install_required_packages()
+{
 	# make sure all required packages are installed
 	if [ -x /usr/sbin/kernel-is-rt ]; then
 		if stat /run/ostree-booted > /dev/null 2>&1; then
@@ -392,9 +357,6 @@ else
 			rpm-ostree -A --idempotent --allow-inactive install openssh-clients
 			ssh_client_version=`rpm -q openssh-clients --info | grep -o -E "Version.*: [0-9]+" | awk '{print $3}'`
 		else
-			make testinfo.desc
-			packages=`awk -F: '/Requires:/ {print $2}' testinfo.desc`
-			$YUM $packages --skip-broken || $YUM $packages
 			yum install openssh-clients -y
 			ssh_client_version=`yum info openssh-clients | grep -o -E "Version.*: [0-9]+" | awk '{print $3}'`
 		fi
@@ -411,9 +373,6 @@ else
 			ssh_client_version=`rpm -q openssh-clients --info | grep -o -E "Version.*: [0-9]+" | awk '{print $3}'`
 		else
 			# install kernel-module-extra version matching the current running kernel version
-			make testinfo.desc
-			packages=`awk -F: '/Requires:/ {print $2}' testinfo.desc`
-			$YUM $packages --skip-broken || $YUM $packages
 			# Don't try to install kernel-modules-extra pacakges if kernel is not from rpm packages
 			# for exmaple, cki kernel builds for upstream kernel tree are tarball not rpm, in this case
 			# kernel-modules-extra is not available
@@ -428,68 +387,111 @@ else
 			ssh_client_version=`yum info openssh-clients | grep -o -E "Version.*: [0-9]+" | awk '{print $3}'`
 		fi
 	fi
-
-	ssh_client_version=${ssh_client_version:-5}
-	if [ $ssh_client_version -ge 7 ]
-	then
-		if ! grep diffie-hellman-group1-sha1 ~/.ssh/config
-		then
-			[ ! -d ~/.ssh ] && mkdir -p ~/.ssh
-			echo "Host *" >> ~/.ssh/config
-			echo "KexAlgorithms +diffie-hellman-group1-sha1" >> ~/.ssh/config
-		fi
-	fi
-
-	# install customer tools
-	mkdir -p /usr/local/src /usr/local/bin
-	\cp -af src/* /usr/local/src/.
-	\cp -af tools/* /usr/local/bin/.
-	chmod a+x /usr/local/bin/*
-
-	# work around bz883695
-	lsmod | grep mlx4_en || modprobe mlx4_en
-	# work around bz1642795
-	lsmod | grep sctp || modprobe sctp
-
-	if [[ "$PERSISTENT_CONFIG" != "yes" ]]; then
-		if [ "$(GetDistroRelease)" -le 8 ];then
-			[ -d $networkLib/network-scripts.bak ] || \
-				rsync -a --delete /etc/sysconfig/network-scripts/ $networkLib/network-scripts.bak/
-		else
-			[ -d $networkLib/system-connections ] || \
-				rsync -a --delete /etc/NetworkManager/system-connections/ $networkLib/system-connections/
-		fi
-	fi
-
-	# NetworkManger toggle
-	[ "$NM_CTL" = yes ] || stop_NetworkManager
-
-	# firewall toggle
-	[ "$FIREWALL" = yes ] && enable_firewall || disable_firewall
-
-	# avc_check toggle
-	[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
-
-	set_dmesg_check_key
-
-	rhel_vx=$(GetDistroRelease)
-	if [ $rhel_vx -ge 9 ];then
-		# avoid ssh "no matching cipher found" issue
-		if ! grep -v ^# /etc/ssh/ssh_config | grep -q Ciphers;then
-			sed -i '$a Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc' /etc/ssh/ssh_config
-		fi
-	fi
-
-	# install dhcp-client
-	$YUM dhcp-client
-
-	config_ssh
-
-	touch /dev/shm/network_common_initalized
 }
-fi
 
-popd > /dev/null
+main()
+{
+	# source our functions
+	pushd $NETWORK_COMMONLIB_DIR > /dev/null
+	for lib in *.sh; do
+		# skip self and runtest.sh
+		[ "$lib" = "include.sh" -o "$lib" = "runtest.sh" ] && continue
+		source ./$(basename $lib)
+	done
+
+	# handle the initial task just once
+	if [ -f /dev/shm/network_common_initalized ]
+	then
+		# avc_check toggle every time common is called as avc setting may be
+		# reset by beaker or others
+		[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
+	else
+		{
+		if [ "$(uname -m)" = "ppc64le" ];
+		then
+			sleep 2;
+		else
+			# This is a workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1920477#c33
+			# install nfp firmware
+			$YUM netronome-firmware
+
+			# update initramfs
+			dracut -f;
+			# The problem is that the zipl bootloaders have a fixed list of blocks on
+			# the device to read during boot. This list is generated every time the
+			# zipl command is run. When now the initramfs is updated this can
+			# add/remove/move blocks. So without running zipl the fixed list will
+			# be out of sync with what is on disk.
+			[[ "$(uname -m)" =~ s390.* ]] && zipl
+			# reload driver
+			modprobe -r nfp;sleep 2;
+			modprobe nfp;sleep 5;
+		fi
+
+		install_required_packages
+
+		ssh_client_version=${ssh_client_version:-5}
+		if [ $ssh_client_version -ge 7 ]
+		then
+			if ! grep diffie-hellman-group1-sha1 ~/.ssh/config
+			then
+				[ ! -d ~/.ssh ] && mkdir -p ~/.ssh
+				echo "Host *" >> ~/.ssh/config
+				echo "KexAlgorithms +diffie-hellman-group1-sha1" >> ~/.ssh/config
+			fi
+		fi
+
+		# install customer tools
+		mkdir -p /usr/local/src /usr/local/bin
+		\cp -af src/* /usr/local/src/.
+		\cp -af tools/* /usr/local/bin/.
+		chmod a+x /usr/local/bin/*
+
+		# work around bz883695
+		lsmod | grep mlx4_en || modprobe mlx4_en
+		# work around bz1642795
+		lsmod | grep sctp || modprobe sctp
+
+		if [[ "$PERSISTENT_CONFIG" != "yes" ]]; then
+			if [ "$(GetDistroRelease)" -le 8 ];then
+				[ -d $networkLib/network-scripts.bak ] || \
+					rsync -a --delete /etc/sysconfig/network-scripts/ $networkLib/network-scripts.bak/
+			else
+				[ -d $networkLib/system-connections ] || \
+					rsync -a --delete /etc/NetworkManager/system-connections/ $networkLib/system-connections/
+			fi
+		fi
+
+		# NetworkManger toggle
+		[ "$NM_CTL" = yes ] || stop_NetworkManager
+
+		# firewall toggle
+		[ "$FIREWALL" = yes ] && enable_firewall || disable_firewall
+
+		# avc_check toggle
+		[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
+
+		set_dmesg_check_key
+
+		rhel_vx=$(GetDistroRelease)
+		if [ $rhel_vx -ge 9 ];then
+			# avoid ssh "no matching cipher found" issue
+			if ! grep -v ^# /etc/ssh/ssh_config | grep -q Ciphers;then
+				sed -i '$a Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc' /etc/ssh/ssh_config
+			fi
+		fi
+
+		# install dhcp-client
+		$YUM dhcp-client
+
+		config_ssh
+
+		touch /dev/shm/network_common_initalized
+	}
+	fi
+
+	popd > /dev/null
+}
 
 # use our own rhts-sync for manually testing
 if [ ! "$JOBID" ] && [ ! $RSTRNT_JOBID ];then
@@ -538,4 +540,10 @@ rhts-sync-block()
 #	https://www.shellcheck.net/wiki/SC2145
 	echo "rhts-sync-block -s $message $* DONE"
 }
+fi
+
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+	main
 fi
