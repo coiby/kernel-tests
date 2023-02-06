@@ -54,7 +54,7 @@ for DISK in $DISKS; do
 	tok "nvme get-ns-id ${NVME_DISK}"
 	tok "nvme get-log --log-id=2 --log-len=512 ${NVME_DISK}"
 
-	if [[ $MODEL =~ "SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2" ]]; then
 		tok "nvme telemetry-log ${NVME_CHAR} -o telemetry_log.bin"
 	else
 		tnot "nvme telemetry-log ${NVME_CHAR} -o telemetry_log.bin"
@@ -63,7 +63,7 @@ for DISK in $DISKS; do
 	tok "nvme fw-log ${NVME_DISK}"
 
 	# TODO: sforza-2s
-	if [[ $MODEL =~ "Micron_9300_MTFDHAL3T8TDP"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"SAMSUNG MZWLL1T6HAJQ-00005" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"Micron_9300_MTFDHAL3T8TDP"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"SAMSUNG MZWLL1T6HAJQ-00005" ]]; then
 		tok "nvme changed-ns-list-log ${NVME_CHAR}"
 	else
 		tnot "nvme changed-ns-list-log ${NVME_CHAR}"
@@ -91,7 +91,7 @@ for DISK in $DISKS; do
 	tok "nvme get-feature ${NVME_DISK} -f 4"
 	tok "nvme get-feature ${NVME_DISK} -f 5"
 
-	if [[ $MODEL =~ "SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2" ]]; then
 		tok "nvme device-self-test ${NVME_DISK} -s 1"
 	else
 		tnot "nvme device-self-test ${NVME_DISK} -s 1"
@@ -127,13 +127,13 @@ for DISK in $DISKS; do
 
 	tok "nvme format ${NVME_DISK} --lbaf=0 -f"
 
-	if [[ $MODEL =~ "SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2" ]]; then
 		tok "nvme sanitize ${NVME_DISK} -a 0x02"
 	else
 		tnot "nvme sanitize ${NVME_DISK} -a 0x02"
 	fi
 
-	if [[ $MODEL =~ "Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZQL2960HCJR-00A07" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZQL2960HCJR-00A07" ]]; then
 		tok "nvme sanitize-log ${NVME_DISK}"
 	else
 		tnot "nvme sanitize-log ${NVME_DISK}"
@@ -146,7 +146,7 @@ for DISK in $DISKS; do
 	elif [[ $MODEL =~ "INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 " ]]; then
 		tnot "nvme subsystem-reset ${NVME_CHAR}"
 		tlog "nvme subsystem-reset not support on $DISK, MODEL:\"$MODEL\""
-	elif [[ $MODEL =~ "Samsung SSD 983 DCT"|"Dell Ent NVMe v2 AGN RI U.2"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI" ]]; then
+	elif [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"Samsung SSD 983 DCT"|"Dell Ent NVMe v2 AGN RI U.2"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI" ]]; then
 		tlog "nvme subsystem-reset on $DISK lead disk disappeared, BZ2093136"
 	else
 		tok "nvme subsystem-reset ${NVME_CHAR}"
