@@ -3,7 +3,6 @@
 # Source Kdump tests common functions.
 . ../include/runtest.sh
 
-
 REBOOT="./KDUMP-REBOOT"
 SUBMITTER=${SUBMITTER%@*}
 MNT_POINT=${MNT_POINT:-"/var/crash"}
@@ -16,8 +15,6 @@ else
     SUB_DIR=${SUBMITTER:-cki}/$(uname -r)/${RSTRNT_JOBID:-nojobid}/${HOSTNAME:-nohostname}
     CRASH_PATH=$MNT_POINT/$SUB_DIR
 fi
-uname -r | grep -q rt && IS_RT_KEN=yes || IS_RT_KEN=no
-uname -r | grep -q "debug$" && IS_DB_KEN=yes || IS_DB_KEN=no
 
 rpm -q --quiet nfs-utils || InstallPackages nfs-utils
 
@@ -122,25 +119,25 @@ function SetImageType()
     # The installed upstream kernel default is debug kernel.
     if [ -f "/boot/vmlinuz" ]; then
         IMAGETYPE="vmlinuz"
-        IS_DB_KEN=yes
-        IS_UPSTREAM_LINUX=yes
+        IS_DB=true
+        IS_UPSTREAM_LINUX=true
     elif [ -f "/boot/vmlinux" ]; then
         IMAGETYPE="vmlinux"
         NO_COMPRESS=1
-        IS_DB_KEN=yes
-        IS_UPSTREAM_LINUX=yes
+        IS_DB=true
+        IS_UPSTREAM_LINUX=true
     elif [ -f "/boot/bzImage" ]; then
         IMAGETYPE="bzImage"
-        IS_DB_KEN=yes
-        IS_UPSTREAM_LINUX=yes
+        IS_DB=true
+        IS_UPSTREAM_LINUX=true
     elif [ -f "/boot/vmlinuz.gz" ]; then
         IMAGETYPE="vmlinuz.gz"
-        IS_DB_KEN=yes
-        IS_UPSTREAM_LINUX=yes
+        IS_DB=true
+        IS_UPSTREAM_LINUX=true
     elif [ -f "/boot/image" ]; then
         IMAGETYPE="image"
-        IS_DB_KEN=yes
-        IS_UPSTREAM_LINUX=yes
+        IS_DB=true
+        IS_UPSTREAM_LINUX=true
     fi
 
     if [ -n "$IMAGETYPE" ]; then
@@ -175,8 +172,8 @@ function ReserveMem()
         args="crashkernel=$CRASHSIZE"
     elif [ "${kernel_main_ver}" -ge 5 ]; then
         args="crashkernel=1G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        [[ "yes" = "$IS_DB_KEN" ]] && args="crashkernel=1G-2G:384M,2G-3G:512M,3G-4G:768M,4G-16G:1G,16G-64G:2G,64G-128G:2G,128G-:4G"
-        [[ "yes" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        [[ "true" = "$IS_DB" ]] && args="crashkernel=1G-2G:384M,2G-3G:512M,3G-4G:768M,4G-16G:1G,16G-64G:2G,64G-128G:2G,128G-:4G"
+        [[ "true" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         [ "${ARCH}" = aarch64 ] && {
             args="crashkernel=768M"
             # It may fail to reserve memory as if low memory is not big enough. So here
@@ -187,12 +184,12 @@ function ReserveMem()
         }
     elif [ "${kernel_main_ver}" -ge 4 ]; then
         args="crashkernel=1G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        [[ "yes" = "$IS_DB_KEN" ]] && args="crashkernel=1G-2G:384M,2G-3G:512M,3G-4G:768M,4G-16G:1G,16G-64G:2G,64G-128G:2G,128G-:4G"
-        [[ "yes" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        [[ "true" = "$IS_DB" ]] && args="crashkernel=1G-2G:384M,2G-3G:512M,3G-4G:768M,4G-16G:1G,16G-64G:2G,64G-128G:2G,128G-:4G"
+        [[ "true" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         [ "${ARCH}" = aarch64 ] && args="crashkernel=768M"
     elif [ "${kernel_main_ver}" -ge 3 ]; then
         args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        [[ "yes" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        [[ "true" = "$IS_UPSTREAM_LINUX" ]] && [ "${IMAGETYPE}" = "vmlinux" ] && args="crashkernel=1G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         [ "${ARCH}" = aarch64 ] && args="crashkernel=768M"
     elif expr "$(uname -r)" : '2\.6\.32.*'; then
         if [ "${ARCH}" = "ppc64" ]; then
@@ -202,7 +199,7 @@ function ReserveMem()
         else
             args="crashkernel=128M"
         fi
-        [[ "yes" = "$IS_DB_KEN" ]] && args="crashkernel=256M"
+        [[ "true" = "$IS_DB" ]] && args="crashkernel=256M"
     elif expr "$(uname -r)" : '2\.6\.18.*'; then
         if [ "${ARCH}" = "ppc64" ]; then
             args="crashkernel=256M@32M xmon=off"
@@ -210,7 +207,7 @@ function ReserveMem()
             args="crashkernel=512M@256M"
         else
             args="crashkernel=128M@16M"
-            [[ "yes" = "$IS_RT_KEN" ]] && args="crashkernel=128M"
+            [[ "true" = "$IS_RT" ]] && args="crashkernel=128M"
         fi
     fi
 
@@ -218,7 +215,7 @@ function ReserveMem()
         Log "No need to update kernel options"
     else
         Log "Update kernel options"
-        LogRun "grubby --args=\"${args}\" --update-kernel=\"${default}\""
+        UpdateKernelOptions "${args}"
         if [ $? -ne 0 ]; then
             Error "Failed to update boot options"
             rstrnt-report-result "$RSTRNT_TASKNAME/bootloader" "FAIL" "1"

@@ -94,7 +94,6 @@ K_SPEC_NAME=${K_SRC%%"-${K_VER}"*}
 [[ "$FAMILY" =~ CentOSStream ]] && IS_COS=true || IS_COS=false
 [[ "$FAMILY" =~ RedHatEnterpriseLinux ]] && IS_RHEL=true || IS_RHEL=false
 
-
 if $IS_FC || $IS_COS; then
     RELEASE=$(grep -o 'release [^ ]*' /etc/redhat-release  | awk '{print $NF}')
 else
