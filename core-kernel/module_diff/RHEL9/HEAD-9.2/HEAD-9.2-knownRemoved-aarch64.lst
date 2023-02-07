@@ -1,4 +1,5 @@
 drm_dp_helper.ko
+esd_usb2.ko
 ifcvf.ko
 mlx5_vdpa.ko
 vdpa.ko
