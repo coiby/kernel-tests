@@ -38,7 +38,7 @@ if [ ${ARCH} != "ppc64" ] && [ ${ARCH} != "ppc64le" ] && [ ${ARCH} != "s390x" ];
 	TEST="contiguous"
 	RESULT=PASS
 	echo "=== contiguous page alloc ===" | tee -a $OUTPUTFILE
-	kdumpctl status || make -C /mnt/tests/kernel/kdump/setup-bare-metal/ run
+	kdumpctl status || make -C ../../kdump/setup-bare-metal/ run
 	echo " - check cmdline:" | tee -a $OUTPUTFILE
 	grep 'crashkernel' /proc/cmdline | tee -a $OUTPUTFILE
 	if [ ${PIPESTATUS[0]} -ne 0 ]; then
