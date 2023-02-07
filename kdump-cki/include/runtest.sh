@@ -145,13 +145,6 @@ CheckEnv()
     else
         SERVERFILE="Server-${RSTRNT_JOBID}"
     fi
-    # Skip test on ark kernel with debug flag, workaround for issue:
-    # https://gitlab.com/cki-project/pipeline-definition/-/issues/71
-    if uname -r | egrep -q "git.*\.eln"; then
-        echo "Skipping test on ark kernels with debug flags enabled"
-        rstrnt-report-result $TEST SKIP
-        exit
-    fi
 }
 
 PrepareReboot()
