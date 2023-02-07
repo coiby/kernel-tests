@@ -639,6 +639,24 @@ rlJournalStart
                     if cki_kver_lt "5.14.0-230"; then
                         sed -i '/hpwdt.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
                     fi
+                    if cki_kver_lt "5.14.0-237"; then
+                        sed -i '/pcs_xpcs.ko/d' ${OS}/${Release}/$Release-knownRemoved-{s390x,ppc64le}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-247"; then
+                        sed -i '/snd-pci-ps.ko/d;/snd-ps-pdm-dma.ko/d;/snd-soc-ps-mach.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-249"; then
+                        sed -i '/drm_dp_aux_bus.ko/d;/host1x.ko/d;/tegra-drm.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-250"; then
+                        sed -i '/tdx-guest.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-255"; then
+                        sed -i '/esd_usb2.ko/d' ${OS}/${Release}/$Release-knownRemoved-aarch64.lst
+                        sed -i '/ems_usb.ko/d;/esd_usb2.ko/d;/kvaser_usb.ko/d;/m_can.ko/d;
+                                /m_can_pci.ko/d;/mcp251xfd.ko/d;/mcp251x.ko/d;/peak_pciefd.ko/d;
+                                /peak_usb.ko/d;/slcan.ko/d;/usb_8dev.ko/d;' ${OS}/${Release}/$Release-knownRemoved-{ppc64le,x86_64}.lst
+                    fi
                     ;;
             esac
         elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then

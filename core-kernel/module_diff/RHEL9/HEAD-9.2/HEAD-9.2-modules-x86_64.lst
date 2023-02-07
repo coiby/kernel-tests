@@ -1691,9 +1691,11 @@ snd-oxygen.ko
 snd-oxygen-lib.ko
 snd-pci-acp5x.ko
 snd-pci-acp6x.ko
+snd-pci-ps.ko
 snd-pcm.ko
 snd-pcsp.ko
 snd-pcxhr.ko
+snd-ps-pdm-dma.ko
 snd-pt2258.ko
 snd-rawmidi.ko
 snd-rme32.ko
@@ -1751,6 +1753,7 @@ snd-soc-nau8824.ko
 snd-soc-nau8825.ko
 snd-soc-pcm512x-i2c.ko
 snd-soc-pcm512x.ko
+snd-soc-ps-mach.ko
 snd-soc-rl6231.ko
 snd-soc-rl6347a.ko
 snd-soc-rt1011.ko
@@ -1917,6 +1920,7 @@ tcpm.ko
 tcp_nv.ko
 tcp_westwood.ko
 tcrypt.ko
+tdx-guest.ko
 team.ko
 team_mode_activebackup.ko
 team_mode_broadcast.ko

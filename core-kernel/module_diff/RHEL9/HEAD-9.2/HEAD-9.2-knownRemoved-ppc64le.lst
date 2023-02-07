@@ -1,7 +1,17 @@
 drm_dp_helper.ko
+ems_usb.ko
+esd_usb2.ko
 ifcvf.ko
 iova.ko
+kvaser_usb.ko
+m_can.ko
+m_can_pci.ko
 mlx5_vdpa.ko
+pcs_xpcs.ko
+peak_pciefd.ko
+peak_usb.ko
+slcan.ko
+usb_8dev.ko
 vdpa.ko
 vdpa_sim_blk.ko
 vdpa_sim.ko

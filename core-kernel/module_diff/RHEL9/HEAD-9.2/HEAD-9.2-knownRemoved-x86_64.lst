@@ -1,3 +1,14 @@
 amd_pstate.ko
 drm_dp_helper.ko
+ems_usb.ko
+esd_usb2.ko
+kvaser_usb.ko
+m_can.ko
+m_can_pci.ko
+mcp251xfd.ko
+mcp251x.ko
+peak_pciefd.ko
+peak_usb.ko
+slcan.ko
 soc-utils-test.ko
+usb_8dev.ko
