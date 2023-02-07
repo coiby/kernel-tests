@@ -56,7 +56,10 @@ function log_check()
 
 function runtest()
 {
-    log_check "list-general.txt"
+    if ! uname -r | grep -q debug; then
+        # skip general checks on a debug kernel
+        log_check "list-general.txt"
+    fi
     log_check "list-kernel.txt"
     log_check "list-locking.txt"
     log_check "list-hung.txt"
