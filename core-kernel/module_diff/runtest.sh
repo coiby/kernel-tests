@@ -50,7 +50,7 @@ function GetCurrentModuleList ()
     # rpm -q --filesbypkg kernel-2.6.32-220.el6 | grep '\.ko' | awk -F/ '{ print $NF }' | sort
 
     if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
-        PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
+        PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
         if $(cki_is_kernel_rt); then
             PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
         fi
@@ -239,6 +239,11 @@ function chk_inst_kernel_modules_extra ()
     pkg_kms_extra="${name}-modules-extra-${version}-${release}.${arch}"
     rpm -q $pkg_kms_extra || $YUM -y install $pkg_kms_extra || (cki_abort_task "Missing ${name}-modules-extra")
 }
+function chk_inst_kernel_modules_core ()
+{
+    pkg_kms_core="${name}-modules-core-${version}-${release}.${arch}"
+    rpm -q $pkg_kms_core || $YUM -y install $pkg_kms_core || (cki_print_warning "Missing ${name}-modules-core, please check")
+}
 
 rlJournalStart
     rlPhaseStartTest
@@ -259,7 +264,10 @@ rlJournalStart
             name="${name}-debug"
         fi
 
-        if  grep -q "release 8" /etc/redhat-release || grep -q "release 9" /etc/redhat-release ; then
+        if  grep -q "release 9" /etc/redhat-release ; then
+            chk_inst_kernel_modules_extra
+            chk_inst_kernel_modules_core
+        elif grep -q "release 8" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
         fi
         if $(cki_is_kernel_rt); then
