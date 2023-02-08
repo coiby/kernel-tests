@@ -12,6 +12,9 @@
 /misc/set-hwclock/ @jbastianrh
 /security/rdrand/ @jbastianrh
 
+[Kdump]
+/kdump/ @emmawu1 @jieli1 @yiyan1
+
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
 /Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log/ @ltrivell @jbastianrh
