@@ -42,8 +42,13 @@ build: $(BUILT_FILES)
 clean:
 	rm -f *~ $(BUILT_FILES)
 
-
-include /usr/share/rhts/lib/rhts-make.include
+RHTS_INCLUDE=$(strip $(wildcard /usr/share/rhts/lib/rhts-make.include))
+ifeq ($(RHTS_INCLUDE),)
+    export TEST_DIR=/mnt/tests$(TEST)
+    export METADATA=testinfo.desc
+else
+    include /usr/share/rhts/lib/rhts-make.include
+endif
 
 $(METADATA): Makefile
 	@echo "Owner:           Caspar Zhang <czhang@redhat.com>" > $(METADATA)
