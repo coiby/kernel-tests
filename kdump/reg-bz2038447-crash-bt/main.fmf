@@ -1,0 +1,16 @@
+summary: Regression test for bug 2038447
+description: |+
+    RHEL-8: Bug 2038447 - crash segfault with "bt -a" on aarch64 even with latest upstream
+    RHEL-9: Bug 2048266 - crash segfault with "bt -a" on aarch64 even with latest upstream
+
+
+    It tests whether crash segfault exist by "bt -a" with offline cpu. 
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - crash
+duration: 30m
+extra-summary: /kernel/kdump/reg-bz2038447-crash-bt
+extra-task: /kernel/kdump/reg-bz2038447-crash-bt
