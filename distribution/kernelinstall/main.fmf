@@ -1,0 +1,15 @@
+summary: "Reports back on the Kernel \tinstallation that was done"
+contact: Jiri Kastner <jkastner@redhat.com>
+test: chmod a+x ./runtest.sh
+path: /kernelinstall
+framework: shell
+require:
+  - test(/kernel/include)
+recommend:
+  - iproute
+  - ethtool
+environment:
+    KERNELARGNAME: kernel
+duration: 120m
+extra-summary: /distribution/kernelinstall
+extra-task: /distribution/kernelinstall
