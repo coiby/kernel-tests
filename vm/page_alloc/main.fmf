@@ -1,0 +1,15 @@
+summary: 'VMM testcase: physical page alloc'
+contact: Caspar Zhang <czhang@redhat.com>
+component:
+  - kernel
+path: /vm/page_alloc
+test: make run
+framework: shell
+require:
+  - make
+  - kexec-tools
+  - gnuplot
+  - iptables
+recommend:
+  - wget
+duration: 2h
