@@ -639,6 +639,7 @@ ConfigAny()
     RestartKdump
 
     lsinitrd ${INITRD_KDUMP_IMG_PATH} > lsinitrd.log
+
     RhtsSubmit lsinitrd.log    # debug use
 
     # Verify if kdump_pre, kdump_post, extra_bins or extra_modules

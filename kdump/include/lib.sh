@@ -56,34 +56,46 @@ function report_result {
 
 # Kernel Variables
 
-# Example outputs: kernel-core, kernel-rt-core, kernel-rt-debug-core
-K_NAME=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r))
-K_ARCH=$(uname -m)
+if [[ $(rpm -qf /boot/vmlinuz-$(uname -r)) =~ "not owned by any package" ]]; then
+    # kernel config/vmlinuz are installed from tarball, not dnf install
+    # So far test only support "kernel" to be installed via tarball, not other variant.
+    K_NAME=kernel
+    K_ARCH=$(uname -m)
+    K_VER=$(uname -r | cut -d'-' -f1)
+    K_REL=$(uname -r | cut -d'-' -f2-)
+    K_KVARI=$(uname -r | grep -Eo '(debug|rt|rt(-)*debug|64k|64k-debug)$')
+    K_SPEC_NAME=kernel
+else
+    # Example outputs: kernel-core, kernel-rt-core, kernel-rt-debug-core
+    K_NAME=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r))
+    K_ARCH=$(uname -m)
 
-# Kernel version
-# Example outputs: 2.6.32, 4.18.0
-K_VER=$(rpm --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
+    # Kernel version
+    # Example outputs: 2.6.32, 4.18.0
+    K_VER=$(rpm --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
 
-# Kernel release (version variant and arch)
-# Example outputs: 1160.81.1.el7, 226.el9, 5.14.0-226.rt14.227.el9
-K_REL=$(rpm --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
+    # Kernel release (version variant and arch)
+    # Example outputs: 1160.81.1.el7, 226.el9, 5.14.0-226.rt14.227.el9
+    K_REL=$(rpm --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
 
-# Example outputs: debug, xen, vanilla
-# Note, rt kernel (and rt debug kernel) will be treated as variants after
-# rt kernel source is merged to kernel tree.
-K_KVARI=$(uname -r | grep -Eo '(debug|PAE|xen|trace|vanilla|rt|rt(-)*debug|64k|64k-debug)$')
+    # Example outputs: debug, xen, vanilla
+    # Note, rt kernel (and rt debug kernel) will be treated as variants after
+    # rt kernel source is merged to kernel tree.
+    K_KVARI=$(uname -r | grep -Eo '(debug|PAE|xen|trace|vanilla|rt|rt(-)*debug|64k|64k-debug)$')
 
-# Example output: kernel-2.6.32-220.el6.src.rpm
-K_SRC=$(rpm --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r))
+    # Example output: kernel-2.6.32-220.el6.src.rpm
+    K_SRC=$(rpm --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r))
 
-# Example outputs: kernel-rt, kernel
-# This is a little cryptic, in practice it takes the full src rpm file
-# name and strips everything after (including) the version, leaving just
-# the src rpm package name.
-# Needed
-# - when the kernel rpm comes from of e.g. kernel-pegas src rpm.
-# - kernel-rt rpm comes from kernel src rpm (merged source tree)
-K_SPEC_NAME=${K_SRC%%"-${K_VER}"*}
+    # Example outputs: kernel-rt, kernel
+    # This is a little cryptic, in practice it takes the full src rpm file
+    # name and strips everything after (including) the version, leaving just
+    # the src rpm package name.
+    # Needed
+    # - when the kernel rpm comes from of e.g. kernel-pegas src rpm.
+    # - kernel-rt rpm comes from kernel src rpm (merged source tree)
+    K_SPEC_NAME=${K_SRC%%"-${K_VER}"*}
+fi
+
 
 [[ "$FAMILY" =~ [a-zA-Z]+5 ]] && IS_RHEL5=true || IS_RHEL5=false
 [[ "$FAMILY" =~ [a-zA-Z]+6 ]] && IS_RHEL6=true || IS_RHEL6=false
@@ -120,9 +132,17 @@ else
     INITRD_IMG_PATH="$K_BOOT/$INITRD_PREFIX-$(uname -r).img"
 fi
 
-INITRD_KDUMP_IMG_PATH=${INITRD_IMG_PATH/.img/kdump.img}
+# Note, INITRD_KDUMP_IMG_PATH can be system initramfs img if fadump is enabled
+INITRD_KDUMP_IMG_PATH="${INITRD_IMG_PATH/.img/kdump.img}"
+if [ -s "/var/log/kdump.log" ]; then
+    # From RHEL-8.7/9.1 kexec-tools will try using the nondebug kernel img if the file exists
+    # So here we will try to retrieve the kdump img path from kdump.log.
+    # kdump.log contains the exact kexec command called when starting the kdump service.
+    tmp_img="$(grep /kexec /var/log/kdump.log | grep -Eo "initrd=.+ " | tail -n1 | cut -d'=' -f2)"
+    [ -n "${tmp_img}" ] && INITRD_KDUMP_IMG_PATH="${tmp_img/ /}"
+fi
+
 VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
-[ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-$(uname -r)!(*debug*|*64k*|*rt*))
 
 # Backup kdump config files
 BackupKdumpConfig(){
@@ -288,6 +308,12 @@ InstallKernel()
     done
     [ -z "${tmp}" ] && return 0
 
+    # If kernel is installed from tarball.
+    # There is no way to get the corresponding packages from Brew/Koji
+    [[ "$(rpm -qf /boot/vmlinuz-$(uname -r))" =~ "not owned by any package" ]] && {
+        return 1
+    }
+
     Log "Re-install missing packages from Brew/Koji."
 
     local brew_server=""
@@ -340,15 +366,20 @@ InstallKernel()
 # Install kernel debuginfo packages
 InstallDebuginfo()
 {
-    local kvari="$1"
     # kernel name is kernel-core since rhel-8. So explicitly remove "-core"
-    local kern=$(rpm -qf /boot/vmlinuz-$(uname -r) --qf "%{name}-debuginfo-%{version}-%{release}.%{arch}" | sed -e "s/-core//g")
-
-    # If RT kernel is not merged, the debuginfo common packge kernel-rt-debuginfo-common
-    # If RT kernel is merged, the debuginfo common package should be kernel-debuginfo-common
-    local comm="${K_SPEC_NAME}-debuginfo-common-${K_ARCH}-${K_VER}-${K_REL}.${K_ARCH}"
-    if $IS_RHEL5; then
-        comm="${K_SPEC_NAME}-debuginfo-common-${K_VER}-${K_REL}.${K_ARCH}"
+    local kern comm
+    kern=$(rpm -qf /boot/vmlinuz-$(uname -r) --qf "%{name}-debuginfo-%{version}-%{release}.%{arch}" | sed -e "s/-core//g")
+    if [[ "$kern" =~ "not owned by any package" ]]; then
+        # The kernel is installed from tarball, not rpm install
+        kern="kernel-debuginfo-$(uname -r)"
+        comm=""
+    else
+        # If RT kernel is not merged, the debuginfo common packge kernel-rt-debuginfo-common
+        # If RT kernel is merged, the debuginfo common package should be kernel-debuginfo-common
+        comm="${K_SPEC_NAME}-debuginfo-common-${K_ARCH}-${K_VER}-${K_REL}.${K_ARCH}"
+        if $IS_RHEL5; then
+            comm="${K_SPEC_NAME}-debuginfo-common-${K_VER}-${K_REL}.${K_ARCH}"
+        fi
     fi
 
     rpm -q ${comm} ${kern} || InstallKernel ${comm} ${kern} || {
