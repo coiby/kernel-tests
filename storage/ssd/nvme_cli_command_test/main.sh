@@ -2,9 +2,9 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
-. $CDIR/../include/include.sh || exit 200
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../include/include.sh || exit 200
 
 function runtest() {
 
@@ -111,7 +111,7 @@ for DISK in $DISKS; do
 	tlog "TODO: nvme resv-acquire"
 	tlog "TODO: nvme resv-register"
 	tlog "TODO: nvme resv-report"
-	tok "nvme dsm ${NVME_DISK} -n 1 -d -s "100,200,300,400,500,600,700,800,900,1000" -b "10,10,10,10,10,10,10,10,10,10""
+	tok "nvme dsm ${NVME_DISK} -n 1 -d -s \"100,200,300,400,500,600,700,800,900,1000\" -b \"10,10,10,10,10,10,10,10,10,10\""
 	tok "nvme flush ${NVME_DISK}"
 	tlog "TODO: nvme compare"
 	tlog "TODO: nvme read"

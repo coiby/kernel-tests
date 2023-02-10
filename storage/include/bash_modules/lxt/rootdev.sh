@@ -15,12 +15,12 @@
 #
 # Author: Xiaowei Li   <xiaoli@redhat.com>
 
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
 test "$LXT_ROOTDEV" = "" || return
 LXT_ROOTDEV=1
 
-. $CDIR/tc.sh
+. "$CDIR"/tc.sh
 
 #
 # get the root disk of /
@@ -56,6 +56,7 @@ get_root_disk ()
     # /sys/block/dm-3/slaves/dm-2/slaves/dm-0/slaves/sda/...
     while ls /sys/block/"$devname"/slaves/* &>/dev/null
     do
+        # shellcheck disable=SC2012
         devname=$(ls /sys/block/"$devname"/slaves/ | head -n 1)
     done
 
@@ -65,8 +66,9 @@ get_root_disk ()
     then
         echo "$devname"
     else
+        # shellcheck disable=SC2001
         devname=$(echo "$devname" | sed 's/[0-9]$//g')
-        [[ $devname =~ nvme[0-9]n[0-9]p ]] && devname=$(echo "$devname" | sed 's/p$//g')
+        [[ $devname =~ nvme[0-9]n[0-9]p ]] && devname=${devname//p/}
         test -d /sys/block/"$devname" && echo "$devname"
     fi
 }
