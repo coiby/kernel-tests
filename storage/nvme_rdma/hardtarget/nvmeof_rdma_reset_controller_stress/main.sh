@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../include/include.sh || exit 200
 
@@ -12,7 +12,8 @@ function runtest {
 
 	#install fio tool
 	install_fio
-	if [ $? -ne 0 ]; then
+	ret=$?
+	if [ $ret -ne 0 ]; then
 		tlog "INFO: fio install failed"
 		return 1
 	else
@@ -40,7 +41,7 @@ function runtest {
 	do
 		for nvme_dev in $nvme_devs; do
 			#update nvme sysfs
-			if realpath /sys/block/$nvme_dev | grep -qo nvme-subsystem; then
+			if realpath /sys/block/"$nvme_dev" | grep -qo nvme-subsystem; then
 				sysfs="/sys/block/${nvme_dev}/device/${nvme_dev:0:5}"
 			else
 				sysfs="/sys/block/${nvme_dev}/device"

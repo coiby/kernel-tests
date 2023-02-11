@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../include/include.sh || exit 200
 
@@ -14,8 +14,8 @@ function runtest {
 	tok "nvme discover -t rdma -a $IP0"
 	tok "nvme discover -t rdma -a $IP1"
 	tlog "INFO: start to connect with invalid nqn"
-	tnot "nvme connect -t rdma -a "$IP0" -n testnqn -q $HostNQN"
-	tnot "nvme connect -t rdma -a "$IP1" -n testnqn -q $HostNQN"
+	tnot "nvme connect -t rdma -a $IP0 -n testnqn -q $HostNQN"
+	tnot "nvme connect -t rdma -a $IP1 -n testnqn -q $HostNQN"
 }
 
 tlog "running $0"

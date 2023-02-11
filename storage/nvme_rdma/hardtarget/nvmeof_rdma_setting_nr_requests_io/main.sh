@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../include/include.sh || exit 200
 
@@ -12,7 +12,8 @@ function runtest {
 
 	#install fio tool
 	install_fio
-	if [ $? -ne 0 ]; then
+	ret=$?
+	if [ $ret -ne 0 ]; then
 		tlog "INFO: fio install failed"
 		return 1
 	else
@@ -37,10 +38,11 @@ function runtest {
 		FIO_Basic_Device_Level_Test "$nvme_dev"
 	done
 
-	nr_num=`cat /sys/block/${nvme_dev}/queue/nr_requests`
+	nr_num=$(cat /sys/block/"$nvme_dev"/queue/nr_requests)
 	for nvme_dev in $nvme_devs; do
 		tok "echo 127 >/sys/block/${nvme_dev}/queue/nr_requests"
-		if (( $? == 0 )); then
+		ret=$?
+		if (( ret == 0 )); then
 			tlog "INFO: setting nr_requests:127 on $nvme_dev pass"
 		else
 			tlog "INFO: setting nr_requests:127 on $nvme_dev failed"
@@ -50,8 +52,9 @@ function runtest {
 	# setting nr_requests
 	tlog "INFO: restore nr_requests with $nr_num"
 	for nvme_dev in $nvme_devs; do
-		tok "echo $nr_num >/sys/block/"$nvme_dev"/queue/nr_requests"
-		if [ $? -eq 0 ]; then
+		tok "echo $nr_num >/sys/block/$nvme_dev/queue/nr_requests"
+		ret=$?
+		if [ $ret -eq 0 ]; then
 			tlog "INFO: restore nr_requests:$nr_num on $nvme_dev pass"
 		else
 			tlog "INFO: setting nr_requests:$nr_num on $nvme_dev failed"

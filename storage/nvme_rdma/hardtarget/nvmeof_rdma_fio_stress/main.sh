@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../include/include.sh || exit 200
 
@@ -12,7 +12,8 @@ function runtest {
 
 	#install fio tool
 	install_fio
-	if [ $? -ne 0 ]; then
+	ret=$?
+	if [ $ret -ne 0 ]; then
 		tlog "INFO: fio install failed"
 		return 1
 	else

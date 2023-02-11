@@ -1,18 +1,20 @@
 #!/bin/bash
 
-FILE=$(readlink -f $BASH_SOURCE)
-DIR=$(dirname $FILE)
-. $DIR/../../../cki_lib/libcki.sh
-. $DIR/../../include/bash_modules/lxt/include.sh || exit 200
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+DIR=$(dirname "$FILE")
+. "$DIR"/../../../cki_lib/libcki.sh
+. "$DIR"/../../include/bash_modules/lxt/include.sh || exit 200
 
 modprobe nvmet-rdma
 modprobe nvme-rdma
 
 # export NETAPP E5700 configuration
+# shellcheck disable=SC1091
 [ -f "/root/NVME_RDMA_NETAPPE5700_ENV" ] && . /root/NVME_RDMA_NETAPPE5700_ENV
 
 if [ -f "/root/NVME_RDMA_Protocol" ]; then
-	test_protocol=`cat /root/NVME_RDMA_Protocol`
+	test_protocol=$(cat /root/NVME_RDMA_Protocol)
+	tlog "nvmeof rdma testing protocol is $test_protocol"
 else
 	tlog "INFO: nvmeof rdma protocol defined file /root/NVME_RDMA_Protocol doesn't exist"
 	exit 1
@@ -43,7 +45,7 @@ unload_modules()
 	local m
 
 	for m in "$@"; do
-		unload_module $m
+		unload_module "$m"
 	done
 }
 
@@ -52,7 +54,7 @@ load_modules()
 	local m
 
 	for m in "$@"; do
-		load_module $m
+		load_module "$m"
 	done
 }
 
@@ -66,7 +68,7 @@ function nvme_core_multipath_conf
 		tlog "INFO: start to load: nvme_rdma nvme"
 		load_modules nvme_rdma nvme
 		sleep 5
-	elif [ $1 = "disable" ]; then
+	elif [ "$1" = "disable" ]; then
 		tlog "INFO: start to unload: nvme_rdma nvme_fabrics nvme nvme_core"
 		unload_modules nvme_rdma nvme_fabrics nvme nvme_core
 		echo "options nvme_core multipath=N"  > /etc/modprobe.d/nvme.conf
@@ -107,7 +109,7 @@ function update_iopolicy
 {
 	iopolicy=$1
 	nvme_io_policy=$(find /sys | grep iopolicy)
-	echo "$iopolicy" > $nvme_io_policy
+	echo "$iopolicy" > "$nvme_io_policy"
 }
 
 function NVMEOF_RDMA_TARGET_CONNECT_E5700
@@ -115,8 +117,10 @@ function NVMEOF_RDMA_TARGET_CONNECT_E5700
 	local IP=$1
 	local HostNQN=$2
 	tok "nvme discover -t rdma -a $IP"
-	tok "nvme connect -t rdma -a "$IP" -n $TargetNQN -q $HostNQN"
-	if (( $? == 0 )); then
+	# shellcheck disable=SC2154
+	tok nvme connect -t rdma -a "$IP" -n "$TargetNQN" -q "$HostNQN"
+	ret=$?
+	if (( ret == 0 )); then
 		tlog "INFO: connect to $IP with $HostNQN pass"
 	else
 		tlog "INFO: connect to $IP with $HostNQN failed"
@@ -142,12 +146,12 @@ function NVMEOF_RDMA_TARGET_SETUP() {
 	#Change the IP address
 	hn=$(hostname -s)
 	if echo "$SERVERS:$CLIENTS" | grep -q "rdma-perf-06.*rdma-perf-07"; then
-		[ $RDMA_protocol = "ROCE" ] && host_name="$hn-server"
+		[ "$RDMA_protocol" = "ROCE" ] && hn="$hn-server"
 	elif echo "$SERVERS:$CLIENTS" | grep -q "rdma-perf-07.*rdma-perf-06"; then
-		[ $RDMA_protocol = "ROCE" ] && host_name="$hn-server"
+		[ "$RDMA_protocol" = "ROCE" ] && hn="$hn-server"
 	fi
 	target_ip=$(grep "${RDMA_protocol}:${hn}" /root/NVME_RDMA_ENV | awk -F: '{print $4}')
-	cp $DIR/rdma.json /etc/rdma.json
+	cp "$DIR"/rdma.json /etc/rdma.json
 	sed -i "s#TRADDR_REPLACE#${target_ip}#g" /etc/rdma.json
 
 	#change device path
@@ -184,14 +188,15 @@ function NVMEOF_RDMA_TARGET_IP() {
 		exit 1
 	fi
 	#Get target NVMEOF RDMA IP ADDR
-	hn=`hostname -s`
+	hn=$(hostname -s)
 	if echo "$SERVERS:$CLIENTS" | grep -q "rdma-perf-06.*rdma-perf-07"; then
-		[ $RDMA_protocol = "ROCE" ] && host_name="`hostname -s`-client"
+		[ "$RDMA_protocol" = "ROCE" ] && hn="$(hostname -s)-client"
 	elif echo "$SERVERS:$CLIENTS" | grep -q "rdma-perf-07.*rdma-perf-06"; then
-		[ $RDMA_protocol = "ROCE" ] && host_name="`hostname -s`-client"
+		[ "$RDMA_protocol" = "ROCE" ] && hn="$(hostname -s)-client"
 	fi
 	target_ip=$(grep "${RDMA_protocol}:${hn}" /root/NVME_RDMA_ENV | awk -F: '{print $4}')
-	RETURN_STR="${target_ip}"
+	# shellcheck disable=SC2034
+	RETURN_STR="$target_ip"
 }
 
 #Disconnect target
@@ -202,10 +207,10 @@ function NVMEOF_RDMA_DISCONNECT_TARGET() {
 		exit "${EX_USAGE}"
 	fi
 
-	if [ $1 = "n" ]; then
-		tok nvme disconnect -n $2
-	elif [ $1 = "d" ]; then
-		tok nvme disconnect -d /dev/$2
+	if [ "$1" = "n" ]; then
+		tok nvme disconnect -n "$2"
+	elif [ "$1" = "d" ]; then
+		tok nvme disconnect -d /dev/"$2"
 	else
 		tlog "INFO: Wrong parameter for \$1, should be N|B"
 		exit 1
@@ -222,7 +227,7 @@ function NVMEOF_RDMA_DISCONNECT_TARGET() {
 function FIO_Device_Level_Test() {
 	EX_USAGE=64 # Bad arg format
 	if [ $# -lt 1 ]; then
-		echo 'Usage: FIO_Device_Level_Test $test_dev'
+		echo "Usage: FIO_Device_Level_Test $test_dev"
 		exit "${EX_USAGE}"
 	fi
 	# variable definitions
@@ -239,23 +244,27 @@ function FIO_Device_Level_Test() {
 	tlog "INFO: Executing FIO_Device_Level_Test() with device: $test_dev"
 
 	#fio testing
-	tok fio -filename=$test_dev -iodepth=1 -thread -rw=write -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime=$runtime -time_based -size=1G -group_reporting -name=mytest -numjobs=$numjobs
-	if [ $? -ne 0 ]; then
+	tok fio -filename="$test_dev" -iodepth=1 -thread -rw=write -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime="$runtime" -time_based -size=1G -group_reporting -name=mytest -numjobs="$numjobs"
+	ret=$?
+	if [ $ret -ne 0 ]; then
 		tlog "FAIL: fio device level write testing for $test_dev failed"
 		ret=1
 	fi
-	tok fio -filename=$test_dev -iodepth=1 -thread -rw=randwrite -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime=$runtime -time_based -size=1G -group_reporting -name=mytest -numjobs=$numjobs
-	if [ $? -ne 0 ]; then
+	tok fio -filename="$test_dev" -iodepth=1 -thread -rw=randwrite -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime="$runtime" -time_based -size=1G -group_reporting -name=mytest -numjobs="$numjobs"
+	ret=$?
+	if [ $ret -ne 0 ]; then
 		tlog "FAIL: fio device level randwrite testing for $test_dev failed"
 		ret=1
 	fi
-	tok fio -filename=$test_dev -iodepth=1 -thread -rw=read -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime=$runtime -time_based -size=1G -group_reporting -name=mytest -numjobs=$numjobs
-	if [ $? -ne 0 ]; then
+	tok fio -filename="$test_dev" -iodepth=1 -thread -rw=read -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime="$runtime" -time_based -size=1G -group_reporting -name=mytest -numjobs="$numjobs"
+	ret=$?
+	if [ $ret -ne 0 ]; then
 		tlog "FAIL: fio device level read testing for $test_dev failed"
 		ret=1
 	fi
-	tok fio -filename=$test_dev -iodepth=1 -thread -rw=randread -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime=$runtime -time_based -size=1G -group_reporting -name=mytest -numjobs=$numjobs
-	if [ $? -ne 0 ]; then
+	tok fio -filename="$test_dev" -iodepth=1 -thread -rw=randread -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime="$runtime" -time_based -size=1G -group_reporting -name=mytest -numjobs="$numjobs"
+	ret=$?
+	if [ $ret -ne 0 ]; then
 		tlog "FAIL: fio device level randread testing for $test_dev failed"
 		ret=1
 	fi
@@ -266,7 +275,7 @@ function FIO_Device_Level_Test() {
 function FIO_Basic_Device_Level_Test() {
 	EX_USAGE=64 # Bad arg format
 	if [ $# -lt 1 ]; then
-		echo 'Usage: FIO_Basic_Device_Level_Test $test_dev'
+		echo "Usage: FIO_Basic_Device_Level_Test $test_dev"
 		exit "${EX_USAGE}"
 	fi
 	# variable definitions
@@ -281,14 +290,15 @@ function FIO_Basic_Device_Level_Test() {
 	fi
 
 	tlog "INFO: Executing FIO_Basic_Device_Level_Test() with device: $test_dev"
-	trun "fio -filename="$test_dev" -iodepth=1 -thread -rw=randwrite -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -bs_unaligned -runtime=$runtime -time_based -size=1G -group_reporting -name=mytest -numjobs=$numjobs" &
+	trun "fio -filename=$test_dev -iodepth=1 -thread -rw=randwrite -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -bs_unaligned -runtime=$runtime -time_based -size=1G -group_reporting -name=mytest -numjobs=$numjobs" &
 	sleep 3
 }
 
 function install_dt() {
 	#Get dt
 	trun which dt
-	if [ $? -eq 0 ]; then
+	ret=$?
+	if [ $ret -eq 0 ]; then
 		tlog "dt already installed"
 		return
 	else
@@ -301,7 +311,8 @@ function install_dt() {
 function install_fio() {
 
 	trun which fio
-	if [ $? -eq 0 ]; then
+	ret=$?
+	if [ $ret -eq 0 ]; then
 		tlog "Fio already installed"
 		return
 	else
@@ -317,7 +328,8 @@ function install_fio() {
 function install_iozone() {
 
 	trun which iozone
-	if [ $? -eq 0 ]; then
+	ret=$?
+	if [ $ret -eq 0 ]; then
 		tlog "Iozone already installed"
 		return
 	fi
@@ -328,7 +340,7 @@ function install_iozone() {
 	fi
 	tok "wget http://www.iozone.org/src/current/iozone3_490.tar -O iozone3_490.tar"
 	tok "tar xf iozone3_490.tar"
-	pushd iozone3_490/src/current/
+	pushd iozone3_490/src/current/ || return 1
 	tok "make $target"
 	tok "cp iozone /usr/bin/"
 	tlog "Iozone succesfully installed"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../../include/include.sh || exit 200
 
@@ -33,18 +33,18 @@ function runtest()
 	# Output native nvme multipath status
 	tok nvme list
 	tok nvme list-subsys
-	tok nvme list-subsys /dev/$nvme_dev
+	tok nvme list-subsys /dev/"$nvme_dev"
 
 	# Verify 1 optimized and 1 non-optimized paths
-	optimized_paths=$(nvme list-subsys /dev/$nvme_dev | grep " optimized" | wc -l)
-	if (($optimized_paths == 1)); then
+	optimized_paths=$(nvme list-subsys /dev/"$nvme_dev" | grep -c " optimized")
+	if (( optimized_paths == 1)); then
 		tlog "PASS: 1 NVMe Native Multipath path is optimized"
 	else
 		tlog "FAIL: 1 optimized path is expected"
 	fi
 
-	non_optimized_paths=$(nvme list-subsys /dev/$nvme_dev | grep "non-optimized" | wc -l)
-	if (( $non_optimized_paths == 1 )); then
+	non_optimized_paths=$(nvme list-subsys /dev/"$nvme_dev" | grep -c "non-optimized")
+	if (( non_optimized_paths == 1 )); then
 		tlog "PASS: 1 NVMe Native Multipath path is non-optimized"
 	else
 		tlog "FAIL: 1 non-optimized path is expected"
@@ -54,8 +54,9 @@ function runtest()
 
 	#start FIO test
 	tlog "INFO: Will use $nvme_dev for testing"
-	FIO_Device_Level_Test $nvme_dev
-	if (( $? == 0 )); then
+	FIO_Device_Level_Test "$nvme_dev"
+	ret=$?
+	if (( ret == 0 )); then
 		tlog "PASS: fio testing on $nvme_dev passed"
 	else
 		tlog "FAIL: fio testing on $nvme_dev failed"

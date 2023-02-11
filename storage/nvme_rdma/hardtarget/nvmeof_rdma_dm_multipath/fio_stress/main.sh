@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../../include/include.sh || exit 200
 
@@ -46,25 +46,25 @@ function runtest()
 	tok multipath -ll
 	tok nvme list
 	tok nvme list-subsys
-	tok nvme list-subsys /dev/$nvme_dev
+	tok "nvme list-subsys /dev/$nvme_dev"
 
 	# Verify 1 optimized and 1 non-optimized paths
-	optimized_paths=$(nvme list-subsys /dev/$nvme_dev | grep " optimized" | wc -l)
-	if (($optimized_paths == 1)); then
+	optimized_paths=$(nvme list-subsys /dev/"$nvme_dev" | grep -c " optimized")
+	if (( optimized_paths == 1)); then
 		tlog "PASS: 1 nvme dm-multipath path optimized"
 	else
 		tlog "FAIL: 1 nvme dm-multipath optimized path expected"
 	fi
 
-	non_optimized_paths=$(nvme list-subsys /dev/$nvme_dev | grep "non-optimized" | wc -l)
-	if (( $non_optimized_paths == 1 )); then
+	non_optimized_paths=$(nvme list-subsys /dev/"$nvme_dev" | grep -c "non-optimized")
+	if (( non_optimized_paths == 1 )); then
 		tlog "PASS: 1 nvme dm-multipath path non-optimized"
 	else
 		tlog "FAIL: 1 nvme dm-multipath non-optimized path expected"
 	fi
 
-	mpath=$(multipath -ll | grep nvme | grep 'active ready running' | wc -l)
-	if (( $mpath == 2 )); then
+	mpath=$(multipath -ll | grep nvme | grep -c 'active ready running')
+	if (( mpath == 2 )); then
 		tlog "INFO: dm-mpath reports 2 active paths"
 	else
 		tlog "FAIL: dm-mpath reports $mpath active paths, which should be 2"
@@ -73,7 +73,8 @@ function runtest()
 	#start FIO test
 	tlog "INFO: Will use $nvme_dm_mpath_device for testing"
 	FIO_Device_Level_Test "mapper/$nvme_dm_mpath_device"
-	if (( $? == 0 )); then
+	ret=$?
+	if (( ret == 0 )); then
 		tlog "PASS: fio testing on $nvme_dm_mpath_device passed"
 	else
 		tlog "FAIL: fio testing on $nvme_dm_mpath_device failed"

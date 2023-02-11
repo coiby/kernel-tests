@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../include/include.sh || exit 200
 
@@ -25,11 +25,11 @@ function runtest {
 		tok lsblk
 		tok nvme list
 
-		nvme_subsys=$(nvme list-subsys | grep -oE nvme[0-9])
+		nvme_subsys=$(nvme list-subsys | grep -oE "nvme[0-9]")
 		for nvme_sub in $nvme_subsys; do
-			tok "echo "1" > /sys/class/nvme/$nvme_sub/delete_controller"
+			tok "echo 1 > /sys/class/nvme/$nvme_sub/delete_controller"
 			ret=$?
-			if (( $ret == 0 )); then
+			if (( ret == 0 )); then
 				tlog "INFO: delete controller:$nvme_sub pass"
 			else
 				tlog "INFO: delete controller:$nvme_sub failed"
@@ -39,7 +39,7 @@ function runtest {
 		tok "sleep 2"
 		((num++))
 	done
-	if (( $ret != 0 )); then
+	if (( ret != 0 )); then
 		tlog "INFO: nvme connect/delete_controller:$nvme_sub failed at iteration:$num"
 	else
 		tlog "INFO: nvme connect/delete_controller $nvme_sub pass"
