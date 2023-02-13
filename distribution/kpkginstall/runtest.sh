@@ -7,6 +7,12 @@ REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
 PACKAGE_NAME=""
 
+# supported kernel packages
+SUPPORTED_KERNEL_PKGS=(kernel kernel-core kernel-debug kernel-debug-core \
+kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-debug-core \
+kernel-automotive kernel-automotive-debug \
+kernel-64k kernel-64k-debug)
+
 # default values for URL parameters
 KPKG_VAR_DEBUG_KERNEL="false"
 
@@ -232,6 +238,13 @@ function rpm_prepare()
   # Detect if we have yum or dnf and install packages for managing COPR repos.
   select_yum_tool
 
+  _cki_excluded_pkgs=()
+  for pkg in "${SUPPORTED_KERNEL_PKGS[@]}"; do
+     if [[ "${pkg}" != "${PACKAGE_NAME}" ]] && [[ "${pkg}" != "${PACKAGE_NAME}-core" ]]; then
+         _cki_excluded_pkgs+=("${pkg}")
+     fi
+  done
+
   # setup yum repo based on url
   cat > /etc/yum.repos.d/kernel-cki.repo << EOF
 [kernel-cki]
@@ -239,6 +252,7 @@ name=kernel-cki
 baseurl=${KPKG_URL}
 enabled=1
 gpgcheck=0
+exclude=${_cki_excluded_pkgs[*]}
 EOF
   cki_print_success "Kernel repository file deployed"
 
@@ -487,7 +501,7 @@ function main() {
 
       # kernel packages only from CKI kernel repo should be used
       # rpm_prepare creates kernel-cki.repo
-      _exclude_pkgs="kernel kernel-core kernel-debug kernel-debug-core kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-core kernel-rt-debug-core"
+      _exclude_pkgs="${SUPPORTED_KERNEL_PKGS[*]}"
       # shellcheck disable=SC2010
       _repofiles=$(ls /etc/yum.repos.d/ | grep -v kernel-cki.repo)
 
@@ -523,12 +537,12 @@ function main() {
       if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
           targz_install || error=1
       elif [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
-          copr_prepare || error=1
           set_package_name || error=1
+          copr_prepare || error=1
           rpm_install || error=1
       else
-          rpm_prepare || error=1
           set_package_name || error=1
+          rpm_prepare || error=1
           rpm_install || error=1
       fi
 
