@@ -18,18 +18,18 @@ export TEST=$(TOPLEVEL_NAMESPACE)/$(RELATIVE_PATH)
 include /usr/share/rhts/lib/rhts-make.include
 
 # All files you want bundled into your rpm:
-# data files, scripts, and anything needed to either 
+# data files, scripts, and anything needed to either
 # compile the test and/or run it.
 FILES=	$(METADATA) \
-	runtest.sh 
+	runtest.sh
 
-build:	
+build:
 	chmod a+x runtest.sh
 
 run:	$(FILES) build
 	./runtest.sh
-	
-clean:	
+
+clean:
 	$(RM) $(METADATA)
 	$(RM) *~ kernel-kernel-include*
 

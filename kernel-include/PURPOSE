@@ -6,7 +6,7 @@
 #   test(/kernel/include)
 #
 # Description:
-#   This is the Shell library for including common functions 
+#   This is the Shell library for including common functions
 #   and/or variables for Kernel Testing Tasks.
 #
 # Author(s):
@@ -15,11 +15,11 @@
 #
 # ===========================================================
 #
-# Two lines will need be added to each task that will source 
+# Two lines will need be added to each task that will source
 # this "include" file:
 # [1] For each task add the following to the runtest.sh script:
 #     . /mnt/tests/kernel/include/runtest.sh
-# 
+#
 # [2] For each task add the following to the Makefile:
 #     @echo "RhtsRequires:    test(/kernel/include)" >>$(METADATA)
 #

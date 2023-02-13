@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Kernel Testing Include File: 
-#  This include file contains common variables and 
+# Kernel Testing Include File:
+#  This include file contains common variables and
 #  functions for "KT1" and "Secondary" kernel testing tasks.
 
 #
@@ -16,7 +16,7 @@ devnull=0
 DEBUGLOG=`mktemp -p /mnt/testarea -t DeBug.XXXXXX`
 K_DEBUGLOG=`mktemp -p /mnt/testarea -t K_DeBug.XXXXXX`
 
-# In the event your not running automated Beaker job  
+# In the event your not running automated Beaker job
 if [ -z "$OUTPUTFILE" ]; then
     echo ""
     echo "***** \$OUTPUTFILE is not defined "
@@ -26,7 +26,7 @@ if [ -z "$OUTPUTFILE" ]; then
     echo ""
     export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 fi
-# ToDo: $RESULT_SERVER $TESTID also need workaround 
+# ToDo: $RESULT_SERVER $TESTID also need workaround
 
 OUTPUTDIR=/mnt/testarea
 if [ ! -d "$OUTPUTDIR" ]; then
@@ -66,7 +66,7 @@ K_ARCH=$(rpm -q --queryformat '%{arch}' -f /boot/config-$(uname -r))
 #   example output: armv7l
 K_RUNNING=$(uname -r)
 #   example output: 2.6.32-220.el6.x86_64
-#   We removed the dot between release and variant because kernels built 
+#   We removed the dot between release and variant because kernels built
 #   under rhel5 did not include this dot and will make comparing difficult.
 #   Release and variant on fedora kernels can use also + sign,
 #   example input: 3.15.0-0.rc5.git0.1.el7.x86_64+debug
@@ -158,10 +158,10 @@ function EstatusReport ()
 
 function EstatusFail ()
 {
-    
+
     if [ "$?" -ne "0" ]; then
         local problem=$1
-        
+
         DisplayFailandBail "$problem"
     fi
 }
@@ -180,7 +180,7 @@ function DisplayFailandBail ()
 
 function ReportStatus ()
 {
-    # Report test status 
+    # Report test status
     # $3 is optional and enhances functionality
 
     local status=$1
@@ -193,27 +193,27 @@ function ReportStatus ()
     if [ ! -z "$3" ]; then
         local string=/$3
 
-        # Default to FAIL 
+        # Default to FAIL
         if [ "$status" = "Passed" ]; then
             local result="PASS"
         else
             local result="FAIL"
         fi
-   
+
         # Then file the results in the database
         report_result ${TEST}${string} $result
     fi
 }
 
 ######################################################
-# Below is a copy of the functions using new 
+# Below is a copy of the functions using new
 # naming scheme: K_FunctionName
 # If accepted tasks using kernel/include will
 # be updated and old function names removed.
 
 
-# REBOOTCOUNT is a Beaker env variable set equal to 0 
-# Any test that reboots by design needs a workaround 
+# REBOOTCOUNT is a Beaker env variable set equal to 0
+# Any test that reboots by design needs a workaround
 # Suggestion: define ExpectedRebootCount in test
 # then we can update this function to check variables
 function K_CheckRebootCount ()
@@ -298,7 +298,7 @@ function K_ReportResult ()
 
 function K_ReportStatus ()
 {
-    # Report test status 
+    # Report test status
     # $3 is optional, as its inclusion triggers report_result
 
     local status="$1"
@@ -321,8 +321,8 @@ function K_ReportStatus ()
         ;;
         *)
             local result="FAIL"
-        ;; 
-        esac 
+        ;;
+        esac
 
         # Then file the results in the database
         report_result "${TEST}${task}" "$result"

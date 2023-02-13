@@ -47,11 +47,11 @@ function SysReport ()
     OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
     grep -q "release 3 " /etc/redhat-release
     if [ $? -eq 0 ]; then
-	modarg=-d
-	modarg2=
+        modarg=-d
+        modarg2=
     else
-	modarg="-F description"
-	modarg2="-F version"
+        modarg="-F description"
+        modarg2="-F version"
     fi
     sysnode=$(/bin/uname -n)
     syskernel=$(/bin/uname -r)
@@ -69,29 +69,29 @@ function SysReport ()
 #
     syslspci=$(/sbin/lspci -nnD > $OUTPUTDIR/lspci.$kernbase)
     if [ -f /etc/fedora-release ]; then
-	sysrelease=$(/bin/cat /etc/fedora-release)
+        sysrelease=$(/bin/cat /etc/fedora-release)
     else
-	sysrelease=$(/bin/cat /etc/redhat-release)
+        sysrelease=$(/bin/cat /etc/redhat-release)
     fi
     syscmdline=$(/bin/cat /proc/cmdline)
     sysnmiint=$(/bin/cat /proc/interrupts | /bin/grep -i nmi)
     sysmodprobe=$(/bin/cat /etc/modprobe.conf > $OUTPUTDIR/modprobe.$kernbase)
     for x in $(/sbin/lsmod | /bin/cut -f1 -d" " 2>/dev/null | /bin/grep -v Module 2>/dev/null ); do
-	echo "Checking module information $x:" >> $OUTPUTDIR/modinfo.$kernbase
-	/sbin/modinfo $modarg $x >> $OUTPUTDIR/modinfo.$kernbase
-	if [ -n "$modarg2" ]; then
-	    /sbin/modinfo $modarg2 $x >> $OUTPUTDIR/modinfo.$kernbase
-	fi
+        echo "Checking module information $x:" >> $OUTPUTDIR/modinfo.$kernbase
+        /sbin/modinfo $modarg $x >> $OUTPUTDIR/modinfo.$kernbase
+        if [ -n "$modarg2" ]; then
+            /sbin/modinfo $modarg2 $x >> $OUTPUTDIR/modinfo.$kernbase
+        fi
     done
     if [ -x /usr/sbin/sestatus ]; then
-	syssestatus=$(/usr/sbin/sestatus >> $OUTPUTDIR/selinux.$kernbase)
+        syssestatus=$(/usr/sbin/sestatus >> $OUTPUTDIR/selinux.$kernbase)
     fi
     if [ -x /usr/sbin/xm ]; then
-	syshypervisor=$(/usr/sbin/xm info >> $OUTPUTDIR/hypervisor.$kernbase)
+        syshypervisor=$(/usr/sbin/xm info >> $OUTPUTDIR/hypervisor.$kernbase)
     fi
     if [ -x /usr/sbin/semodule ]; then
-	echo "********* SELinux Module list **********" >> $OUTPUTDIR/selinux.$kernbase
-	syssemodulelist=$(/usr/sbin/semodule -l >> $OUTPUTDIR/selinux.$kernbase)
+        echo "********* SELinux Module list **********" >> $OUTPUTDIR/selinux.$kernbase
+        syssemodulelist=$(/usr/sbin/semodule -l >> $OUTPUTDIR/selinux.$kernbase)
     fi
 
     sysderror=$(/bin/cat $OUTPUTDIR/boot.$kernbase | grep -i error | grep -v BIOS >> $OUTPUTDIR/derror.$kernbase)
@@ -130,8 +130,8 @@ function SysReport ()
     echo "********** Module Information **********" >> $OUTPUTFILE
     /bin/cat $OUTPUTDIR/modinfo.$kernbase           >> $OUTPUTFILE
     if [ -x /usr/sbin/sestatus ]; then
-	echo "************ SELinux Status ************" >> $OUTPUTFILE
-	/bin/cat $OUTPUTDIR/selinux.$kernbase       >> $OUTPUTFILE
+        echo "************ SELinux Status ************" >> $OUTPUTFILE
+        /bin/cat $OUTPUTDIR/selinux.$kernbase       >> $OUTPUTFILE
     fi
     echo "********** Interfaces Information **********" > ifcinfo
     echo "-- /etc/resolv.conf --" >> ifcinfo
@@ -151,43 +151,43 @@ function SysReport ()
     cat ifcinfo >> $OUTPUTFILE
     cat ifcinfo > /dev/console
     if [ -x /usr/sbin/xm ]; then
-	echo "*********** Hypervisor info ************" >> $OUTPUTFILE
-	/bin/cat $OUTPUTDIR/hypervisor.$kernbase     >> $OUTPUTFILE
+        echo "*********** Hypervisor info ************" >> $OUTPUTFILE
+        /bin/cat $OUTPUTDIR/hypervisor.$kernbase     >> $OUTPUTFILE
     fi
     FAILURE=FALSE
     # Check dmesg log for issues
     dresult_count=0
     if [ -s $OUTPUTDIR/derror.$kernbase ]; then
-	dresult_count=$(/usr/bin/wc -l $OUTPUTDIR/derror.$kernbase | awk '{print $1}')
-	echo "******** Potential Issues dmesg ********" >> $OUTPUTFILE
-	/bin/cat $OUTPUTDIR/derror.$kernbase        >> $OUTPUTFILE
+        dresult_count=$(/usr/bin/wc -l $OUTPUTDIR/derror.$kernbase | awk '{print $1}')
+        echo "******** Potential Issues dmesg ********" >> $OUTPUTFILE
+        /bin/cat $OUTPUTDIR/derror.$kernbase        >> $OUTPUTFILE
     fi
     # Check dmesg log for failures
     if [ -s $OUTPUTDIR/serror.$kernbase ]; then
-	dresult_count=$(/usr/bin/wc -l $OUTPUTDIR/serror.$kernbase | awk '{print $1}')
-	echo "********** Failures in dmesg ***********" >> $OUTPUTFILE
-	/bin/cat $OUTPUTDIR/serror.$kernbase        >> $OUTPUTFILE
-	FAILURE=TRUE
+        dresult_count=$(/usr/bin/wc -l $OUTPUTDIR/serror.$kernbase | awk '{print $1}')
+        echo "********** Failures in dmesg ***********" >> $OUTPUTFILE
+        /bin/cat $OUTPUTDIR/serror.$kernbase        >> $OUTPUTFILE
+        FAILURE=TRUE
     fi
     # Check dmesg log for avc failures
     if [ -s $FILEAREA/avcerror.$kernbase ]; then
-	echo "********* SElinux AVC Failures *********" >> $OUTPUTFILE
-	/bin/cat $FILEAREA/avcerror.$kernbase       >> $OUTPUTFILE
-	FAILURE=TRUE
+        echo "********* SElinux AVC Failures *********" >> $OUTPUTFILE
+        /bin/cat $FILEAREA/avcerror.$kernbase       >> $OUTPUTFILE
+        FAILURE=TRUE
     fi
     echo "******** End System Information ********" >> $OUTPUTFILE
     if [ -s $OUTPUTDIR/derror.$kernbase -o -s $OUTPUTDIR/serror.$kernbase -o -s $OUTPUTDIR/avcerror.$kernbase ]; then
-	# why is $dresult_count padded with 6 trailing 0s?  dropping them because
-	# this is triggering https://bugzilla.redhat.com/show_bug.cgi?id=1600281
-	#result_count=$(/usr/bin/printf "%03d%03d%03d\n" $dresult_count 0 0)
-	result_count=$(/usr/bin/printf "%03d\n" $dresult_count)
-	if [ $FAILURE = TRUE ]; then
-	    report_result $TEST/Sysinfo FAIL $result_count
-	else
-	    report_result $TEST/Sysinfo PASS $result_count
-	fi
+        # why is $dresult_count padded with 6 trailing 0s?  dropping them because
+        # this is triggering https://bugzilla.redhat.com/show_bug.cgi?id=1600281
+        #result_count=$(/usr/bin/printf "%03d%03d%03d\n" $dresult_count 0 0)
+        result_count=$(/usr/bin/printf "%03d\n" $dresult_count)
+        if [ $FAILURE = TRUE ]; then
+            report_result $TEST/Sysinfo FAIL $result_count
+        else
+            report_result $TEST/Sysinfo PASS $result_count
+        fi
     else
-	report_result $TEST/Sysinfo PASS 0
+        report_result $TEST/Sysinfo PASS 0
     fi
     DeBug "Exit SysReport"
 }
@@ -199,9 +199,9 @@ function DiffDmesg ()
     filelist=`ls $OUTPUTDIR/boot.*`
     hit=0
     for l in $filelist ; do
-	hit=`expr $hit + 1`
-	export FILE$hit=$l
-	DeBug "$FILE$l"
+        hit=`expr $hit + 1`
+        export FILE$hit=$l
+        DeBug "$FILE$l"
     done
     echo "
 ===================================================================
@@ -221,9 +221,9 @@ function DiffLspci ()
     filelist=`ls $OUTPUTDIR/lspci.*`
     hit=0
     for l in $filelist ; do
-	hit=`expr $hit + 1`
-	export FILE$hit=$l
-	DeBug "$FILE$l"
+        hit=`expr $hit + 1`
+        export FILE$hit=$l
+        DeBug "$FILE$l"
     done
     echo "
 ===================================================================
@@ -246,7 +246,7 @@ function RprtRslt ()
     report_result $ONE $TWO $THREE
 
     if [ "$TWO" == "FAIL" ]; then
-	SubmitLog $DEBUGLOG
+        SubmitLog $DEBUGLOG
     fi
 }
 
@@ -261,10 +261,10 @@ function XendLogging ()
     XENDCONF=/etc/sysconfig/xend
     DeBug "Enter XendLogging"
     if [ -e $XENDCONF ]; then
-	DeBug "$XENDCONF exists"
-	sed -i 's/#XENCONSOLED_LOG_HYPERVISOR=no/XENCONSOLED_LOG_HYPERVISOR=yes/g' $XENDCONF
-	sed -i 's/#XENCONSOLED_LOG_GUESTS=no/XENCONSOLED_LOG_GUESTS=yes/g' $XENDCONF
-	sed -i 's/#XENCONSOLED_LOG_DIR/XENCONSOLED_LOG_DIR/g' $XENDCONF
+        DeBug "$XENDCONF exists"
+        sed -i 's/#XENCONSOLED_LOG_HYPERVISOR=no/XENCONSOLED_LOG_HYPERVISOR=yes/g' $XENDCONF
+        sed -i 's/#XENCONSOLED_LOG_GUESTS=no/XENCONSOLED_LOG_GUESTS=yes/g' $XENDCONF
+        sed -i 's/#XENCONSOLED_LOG_DIR/XENCONSOLED_LOG_DIR/g' $XENDCONF
     fi
     DeBug "Exit XendLogging"
 }
@@ -293,8 +293,8 @@ function SelectKernel ()
 
     # If not version or Extra selected then choose the latest installed version
     if [ -z "$EXTRA" -a -z "$VR" ]; then
-	DeBug "ERROR: missing args"
-	return 1
+        DeBug "ERROR: missing args"
+        return 1
     fi
 
     # Workaround for RT kernels
@@ -321,8 +321,8 @@ function SelectKernel ()
 
     # Workaround for UP kernel spec file
     if [ "$EXTRA" = "up" ]; then
-	DeBug "EXTRA=$EXTRA"
-	EXTRA=""
+        DeBug "EXTRA=$EXTRA"
+        EXTRA=""
     fi
 
     echo "***** Attempting to switch boot kernel to ($VR$EXTRA) *****" | tee -a $OUTPUTFILE
@@ -500,19 +500,19 @@ function SelectKernelLegacy ()
     grub_file=/boot/grub/grub.conf
 
     if [ -f $grub_file ]; then
-	DeBug "Using: $grub_file"
-	COUNT=0
-	DEFAULT=undefined
-	for i in $(grep '^title' $grub_file | sed -e 's/.*(\(.*\)).*/\1/' -e "s/\.$(uname -m)*.//g"); do
-	    DeBug "COUNT=$COUNT VR=$VR EXTRA=$EXTRA i=$i"
-	    if [ "$VR$EXTRA" = "$i" ]; then
-		DEFAULT=$COUNT;
-	    fi
-	    COUNT=$(expr $COUNT + 1)
-	done
-	if [ $DEFAULT != "undefined" ]; then
-	    DeBug "DEFAULT=$DEFAULT"
-	    /bin/ed -s $grub_file <<EOF
+        DeBug "Using: $grub_file"
+        COUNT=0
+        DEFAULT=undefined
+        for i in $(grep '^title' $grub_file | sed -e 's/.*(\(.*\)).*/\1/' -e "s/\.$(uname -m)*.//g"); do
+            DeBug "COUNT=$COUNT VR=$VR EXTRA=$EXTRA i=$i"
+            if [ "$VR$EXTRA" = "$i" ]; then
+                DEFAULT=$COUNT;
+            fi
+            COUNT=$(expr $COUNT + 1)
+        done
+        if [ $DEFAULT != "undefined" ]; then
+            DeBug "DEFAULT=$DEFAULT"
+            /bin/ed -s $grub_file <<EOF
 /default/
 d
 i
@@ -521,20 +521,20 @@ default=$DEFAULT
 w
 q
 EOF
-	fi
-	DeBug "$grub_file"
-	cat $grub_file | tee -a $DEBUGLOG
+        fi
+        DeBug "$grub_file"
+        cat $grub_file | tee -a $DEBUGLOG
     fi
 
     elilo_file=/boot/efi/efi/redhat/elilo.conf
 
     if [ -f $elilo_file ]; then
-	DeBug "Using: $elilo_file"
-	DEFAULT=$(grep -A 2 "image=vmlinuz-$VR$EXTRA$" $elilo_file | awk -F= '/label=/ {print $2}')
-	DeBug "DEFAULT=$DEFAULT"
-	if [ -n "$DEFAULT" ]; then
-	    DeBug "DEFAULT=$DEFAULT"
-	    /bin/ed -s $elilo_file <<EOF
+        DeBug "Using: $elilo_file"
+        DEFAULT=$(grep -A 2 "image=vmlinuz-$VR$EXTRA$" $elilo_file | awk -F= '/label=/ {print $2}')
+        DeBug "DEFAULT=$DEFAULT"
+        if [ -n "$DEFAULT" ]; then
+            DeBug "DEFAULT=$DEFAULT"
+            /bin/ed -s $elilo_file <<EOF
 /default/
 d
 i
@@ -543,60 +543,60 @@ default=$DEFAULT
 w
 q
 EOF
-	fi
-	DeBug "$elilo_file"
-	cat $elilo_file | tee -a $DEBUGLOG
+        fi
+        DeBug "$elilo_file"
+        cat $elilo_file | tee -a $DEBUGLOG
     fi
 
     yaboot_file=/boot/etc/yaboot.conf
 
     if [ -f $yaboot_file ] ; then
-	DeBug "Using: $yaboot_file"
-	grep vmlinuz $yaboot_file
-	if [ $? -eq 0 ] ; then
-	    VM=z
-	else
-	    VM=x
-	fi
-	DeBug "VM=$VM"
-	DEFAULT=$(grep -A 1 "image=/vmlinu$VM-$VR.*$EXTRA" $yaboot_file | awk -F= '/label=/ {print $2}')
-	DeBug "DEFAULT=$DEFAULT"
-	if [ -n "$DEFAULT" ] ; then
-	    sed -i 's/label=linux/label=orig-linux/g' $yaboot_file
-	    sed -i 's/label='$DEFAULT'/label=linux/g' $yaboot_file
-	    DeBug "DEFAULT=$DEFAULT"
-	    grep -q label=linux $yaboot_file
-	    if [ $? -ne 0 ] ; then
-		sed -i 's/label=orig-linux/label=linux/g' $yaboot_file
-		DeBug "Reverted back to original kernel"
-	    fi
-	fi
-	DeBug "$yaboot_file"
-	cat $yaboot_file | tee -a $DEBUGLOG
+        DeBug "Using: $yaboot_file"
+        grep vmlinuz $yaboot_file
+        if [ $? -eq 0 ] ; then
+            VM=z
+        else
+            VM=x
+        fi
+        DeBug "VM=$VM"
+        DEFAULT=$(grep -A 1 "image=/vmlinu$VM-$VR.*$EXTRA" $yaboot_file | awk -F= '/label=/ {print $2}')
+        DeBug "DEFAULT=$DEFAULT"
+        if [ -n "$DEFAULT" ] ; then
+            sed -i 's/label=linux/label=orig-linux/g' $yaboot_file
+            sed -i 's/label='$DEFAULT'/label=linux/g' $yaboot_file
+            DeBug "DEFAULT=$DEFAULT"
+            grep -q label=linux $yaboot_file
+            if [ $? -ne 0 ] ; then
+                sed -i 's/label=orig-linux/label=linux/g' $yaboot_file
+                DeBug "Reverted back to original kernel"
+            fi
+        fi
+        DeBug "$yaboot_file"
+        cat $yaboot_file | tee -a $DEBUGLOG
     fi
 
     zipl_file=/etc/zipl.conf
 
     if [ -f $zipl_file ] ; then
-	DeBug "Using: $zipl_file"
-	DEFAULT=$(grep "image=/boot/vmlinuz-$VR.*$EXTRA" $zipl_file | awk -Fvmlinuz- '/vmlinuz/ {printf "%.15s\n",$2}')
-	DeBug "DEFAULT=$DEFAULT"
-	if [ -n "$DEFAULT" ] ; then
-	    DeBug "$VR$EXTRA"
-	    tag=$(grep "\[$DEFAULT\]" $zipl_file)
-	    DeBug "tag=$tag"
-	    if [ -z "$tag" ] ; then
-		# This was added because BZ 426992 was fixed
-		DEFAULT=$(grep "image=/boot/vmlinuz-$VR.*$EXTRA" $zipl_file | awk -Fvmlinuz- '/vmlinuz/ {printf "%s\n",$2}')
-		DeBug "Second DEFAULT=$DEFAULT"
-		tag=$(grep "\[$DEFAULT\]" $zipl_file)
-		DeBug "Second tag=$tag"
-		if [ -z "$tag" ] ; then
-		    DeBug "Setting it back to default"
-		    DEFAULT=linux
-		fi
-	    fi
-	    /bin/ed -s $zipl_file <<EOF
+        DeBug "Using: $zipl_file"
+        DEFAULT=$(grep "image=/boot/vmlinuz-$VR.*$EXTRA" $zipl_file | awk -Fvmlinuz- '/vmlinuz/ {printf "%.15s\n",$2}')
+        DeBug "DEFAULT=$DEFAULT"
+        if [ -n "$DEFAULT" ] ; then
+            DeBug "$VR$EXTRA"
+            tag=$(grep "\[$DEFAULT\]" $zipl_file)
+            DeBug "tag=$tag"
+            if [ -z "$tag" ] ; then
+                # This was added because BZ 426992 was fixed
+                DEFAULT=$(grep "image=/boot/vmlinuz-$VR.*$EXTRA" $zipl_file | awk -Fvmlinuz- '/vmlinuz/ {printf "%s\n",$2}')
+                DeBug "Second DEFAULT=$DEFAULT"
+                tag=$(grep "\[$DEFAULT\]" $zipl_file)
+                DeBug "Second tag=$tag"
+                if [ -z "$tag" ] ; then
+                    DeBug "Setting it back to default"
+                    DEFAULT=linux
+                fi
+            fi
+            /bin/ed -s $zipl_file <<EOF
 /default=/
 d
 i
@@ -605,10 +605,10 @@ default=$DEFAULT
 w
 q
 EOF
-	    zipl
-	fi
-	DeBug "$zipl_file"
-	cat $zipl_file | tee -a $DEBUGLOG
+            zipl
+        fi
+        DeBug "$zipl_file"
+        cat $zipl_file | tee -a $DEBUGLOG
     fi
     return 0
 }
@@ -644,19 +644,19 @@ function CheckKernel ()
 
     # Workaround for UP kernels
     if [[ "$KVAR" = "up" ]]; then
-	DeBug "KVAR=$KVAR"
-	KVAR=""
+        DeBug "KVAR=$KVAR"
+        KVAR=""
     fi
 
     DeBug "After KVER=$KVER KVAR=$KVAR"
 
     if [[ "$KVER$KVAR" == "$runkernel" ]]; then
         DeBug "Requested kernel = Running kernel"
-	DeBug "   $KVER$KVAR = $runkernel"
-	return 0
+        DeBug "   $KVER$KVAR = $runkernel"
+        return 0
     else
         DeBug "Requested kernel != Running kernel"
-	DeBug "   $KVER$KVAR != $runkernel"
+        DeBug "   $KVER$KVAR != $runkernel"
         if [[ -s /mnt/testarea/kernelinstall_kernel_to_boot ]]; then
             DeBug "This can happen with manually built kernel rpms"
             DeBug "Checking against '/mnt/testarea/kernelinstall_kernel_to_boot' file"
@@ -666,7 +666,7 @@ function CheckKernel ()
             if [ "$NVR$KVAR" != "$runkernel" ]; then
                 DeBug "Stored NVR does not match running kernel"
                 DeBug "$NVR$KVAR != $runkernel"
- 	        return 1
+                 return 1
             else
                 DeBug "Stored NVR matches running kernel"
                 DeBug "$NVR$KVAR == $runkernel"
@@ -761,7 +761,7 @@ function YumInstallKernel ()
     $yumcmd list all --showduplicates $testkernbase.$kernarch | grep -q $testkername.$kernarch
     if [ "$?" -eq "0" ]; then
         # Install the kernel from yum repo
-	$yumcmd -y install $testkernbase.$kernarch
+        $yumcmd -y install $testkernbase.$kernarch
         ret=$?
         if [ "$ret" -ne "0" ] && $yumcmd install --help | grep allowerasing >/dev/null; then
             # Try again using --allowerasing.  If this succeeds, report a warning
@@ -773,23 +773,23 @@ function YumInstallKernel ()
                 report_result $TEST/Yum_AllowErasing_Needed WARN 0
             fi
         fi
-	if [ "$ret" -ne "0" ]; then
-	    echo "***** Yum returned an error while trying to install $testkernbase.$kernarch *****" | tee -a $OUTPUTFILE
-	    DeBug "Exit YumInstallPackage FAIL 3 (YUM exited with a failure)"
-	    return 3
-	else
-	    # Check to see if the kernel is now installed, using yum
-	    $yumcmd list installed $testkernbase.$kernarch | grep -q installed
-	    if [ "$?" -ne "0" ]; then
-		# Double check, this time using rpm
-		rpm -qa --queryformat '%{name}-%{version}-%{release}.%{arch}\n' | grep -q $testkernbase.$kernarch
-		if [ "$?" -ne "0" ]; then
-		    echo "***** Failed to find $testkernbase.$kernarch in installed *****" | tee -a $OUTPUTFILE
-		    DeBug "Exit YumInstallPackage FAIL 4 (Thought we installed but can't find it)"
-		    return 4
-		fi
-	    fi
-	fi
+        if [ "$ret" -ne "0" ]; then
+            echo "***** Yum returned an error while trying to install $testkernbase.$kernarch *****" | tee -a $OUTPUTFILE
+            DeBug "Exit YumInstallPackage FAIL 3 (YUM exited with a failure)"
+            return 3
+        else
+            # Check to see if the kernel is now installed, using yum
+            $yumcmd list installed $testkernbase.$kernarch | grep -q installed
+            if [ "$?" -ne "0" ]; then
+                # Double check, this time using rpm
+                rpm -qa --queryformat '%{name}-%{version}-%{release}.%{arch}\n' | grep -q $testkernbase.$kernarch
+                if [ "$?" -ne "0" ]; then
+                    echo "***** Failed to find $testkernbase.$kernarch in installed *****" | tee -a $OUTPUTFILE
+                    DeBug "Exit YumInstallPackage FAIL 4 (Thought we installed but can't find it)"
+                    return 4
+                fi
+            fi
+        fi
         # Install kernel-devel package from yum repo
         echo "***** Install kernel-devel package via yum $testkerndevel.$kernarch *****" | tee -a $OUTPUTFILE
         DeBug "Yum install $testkerndevel.$kernarch"
@@ -806,8 +806,8 @@ function YumInstallKernel ()
             fi
         fi
     else
-	DeBug "Exit YumInstallPackage FAIL 6 (Can't find kernel in repo)"
-	return 6
+        DeBug "Exit YumInstallPackage FAIL 6 (Can't find kernel in repo)"
+        return 6
     fi
     DeBug "Exit YumInstallPackage SUCCESS"
     return 0
@@ -918,28 +918,28 @@ function YumUpgradeKernelHeaders ()
     DeBug "Yum upgrade $KERNELHEADERS"
     $yumcmd list all --showduplicates $KERNELHEADERS | grep -q $testkernver-$testkernrel
     if [ "$?" -eq "0" ]; then
-	# Install the kernel-headers from yum repo
-	$yumcmd -y upgrade $KERNELHEADERS
-	if [ "$?" -ne "0" ]; then
-	    echo "***** Yum returned an error while trying to upgrade $KERNELHEADERS *****" | tee -a $OUTPUTFILE
-	    DeBug "Exit YumUpgradeKernelHeaders FAIL 3 (YUM exited with a failure)"
-	    return 3
-	else
-	    # Check to see if the kernel-headers is now installed, using yum
-	    $yumcmd list installed $KERNELHEADERS | grep -q installed
-	    if [ "$?" -ne "0" ]; then
-		# Double check, this time using rpm
-		rpm -qa --queryformat '%{name}-%{version}-%{release}\n' | grep -q $KERNELHEADERS
-		if [ "$?" -ne "0" ]; then
-		    echo "***** Failed to find $KERNELHEADERS in installed *****" | tee -a $OUTPUTFILE
-		    DeBug "Exit YumInstallPackage FAIL 4 (Thought we installed but can't find it)"
-		    return 4
-		fi
-	    fi
-	fi
+        # Install the kernel-headers from yum repo
+        $yumcmd -y upgrade $KERNELHEADERS
+        if [ "$?" -ne "0" ]; then
+            echo "***** Yum returned an error while trying to upgrade $KERNELHEADERS *****" | tee -a $OUTPUTFILE
+            DeBug "Exit YumUpgradeKernelHeaders FAIL 3 (YUM exited with a failure)"
+            return 3
+        else
+            # Check to see if the kernel-headers is now installed, using yum
+            $yumcmd list installed $KERNELHEADERS | grep -q installed
+            if [ "$?" -ne "0" ]; then
+                # Double check, this time using rpm
+                rpm -qa --queryformat '%{name}-%{version}-%{release}\n' | grep -q $KERNELHEADERS
+                if [ "$?" -ne "0" ]; then
+                    echo "***** Failed to find $KERNELHEADERS in installed *****" | tee -a $OUTPUTFILE
+                    DeBug "Exit YumInstallPackage FAIL 4 (Thought we installed but can't find it)"
+                    return 4
+                fi
+            fi
+        fi
     else
-	DeBug "Exit YumUpgradeKernelHeaders FAIL 5 (Can't find kernel in repo)"
-	return 5
+        DeBug "Exit YumUpgradeKernelHeaders FAIL 5 (Can't find kernel in repo)"
+        return 5
     fi
     DeBug "Exit YumUpgradeKernelHeaders SUCCESS"
     return 0
@@ -952,7 +952,7 @@ function DepmodChk ()
     DeBug "DEPCHKFILE=$DEPCHKFILE"
     /sbin/depmod -ae -F /boot/System.map-`uname -r` `uname -r` > $DEPCHKFILE 2>&1
     if [ -s $DEPCHKFILE ] ; then
-	DeBug "$DEPCHKFILE > 0"
+        DeBug "$DEPCHKFILE > 0"
         total=`cat $DEPCHKFILE | wc -l`
         OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
         echo "***** List of Warnings/Errors reported by depmod *****" | tee -a $OUTPUTFILE
@@ -967,9 +967,9 @@ function NukeRepo ()
 {
     DeBug "Enter NukeRepo"
     if [ -e /etc/yum.repos.d/rhel-beta.repo ] ; then
-	DeBug "beta repo existed, moving it to tmp"
-	mv -f /etc/yum.repos.d/rhel-beta.repo /tmp
-	yum clean all
+        DeBug "beta repo existed, moving it to tmp"
+        mv -f /etc/yum.repos.d/rhel-beta.repo /tmp
+        yum clean all
     fi
     DeBug "Exit NukeRepo"
 }
@@ -1091,6 +1091,7 @@ function wait_for_kvm_setup ()
 
     echo "Waiting a bit for kvm-setup service to start" | tee -a $OUTPUTFILE
     i=0
+    # shellcheck disable=SC2078
     while [ True ]; do
         systemctl status kvm-setup | grep "PID.*exited" && break
         i=$((i+1))
@@ -1231,29 +1232,29 @@ function Main ()
         fi
         # Lets make it our default boot kernel the kernel we want to test
         SelectKernel $KERNELARGVERSION $KERNELARGVARIANT
-	if [ "$?" -ne "0" ]; then
-	    RprtRslt $TEST/SelectKernel FAIL $?
-	else
+        if [ "$?" -ne "0" ]; then
+            RprtRslt $TEST/SelectKernel FAIL $?
+        else
             # Now that the kernel is our default... Let's reboot
-	    echo "***** End of kernel install test *****" | tee -a $OUTPUTFILE
-	    if [ -f $OUTPUTDIR/boot.$kernbase ]; then
-		SubmitLog $OUTPUTDIR/boot.$kernbase
-	    fi
-	    SubmitLog $DEBUGLOG
-	    RprtRslt $TEST/rhts-reboot PASS 0
-	    date --date="$(date --utc)" +%s > /mnt/testarea/kernelinstall_reboottime.log
-	    rhts-reboot
-	fi
+            echo "***** End of kernel install test *****" | tee -a $OUTPUTFILE
+            if [ -f $OUTPUTDIR/boot.$kernbase ]; then
+                SubmitLog $OUTPUTDIR/boot.$kernbase
+            fi
+            SubmitLog $DEBUGLOG
+            RprtRslt $TEST/rhts-reboot PASS 0
+            date --date="$(date --utc)" +%s > /mnt/testarea/kernelinstall_reboottime.log
+            rhts-reboot
+        fi
     else
-	echo "***** The running kernel is the kernel we want to test *****" | tee -a $OUTPUTFILE
-	echo "***** End of kernel install test *****" | tee -a $OUTPUTFILE
-	if [ -f $OUTPUTDIR/boot.$kernbase ]; then
-	    SubmitLog $OUTPUTDIR/boot.$kernbase
-	fi
-	RprtRslt $TEST/$kernbase PASS $REBOOTCOUNT
-	DepmodChk
-	SysReport
-	exit 0
+        echo "***** The running kernel is the kernel we want to test *****" | tee -a $OUTPUTFILE
+        echo "***** End of kernel install test *****" | tee -a $OUTPUTFILE
+        if [ -f $OUTPUTDIR/boot.$kernbase ]; then
+            SubmitLog $OUTPUTDIR/boot.$kernbase
+        fi
+        RprtRslt $TEST/$kernbase PASS $REBOOTCOUNT
+        DepmodChk
+        SysReport
+        exit 0
     fi
     if [ "$KERNELARGVARIANT" == "xen" ]; then
         update_console
@@ -1271,12 +1272,20 @@ testver=$(rpm -qf $0)
 DeBug "$testver"
 
 # Current kernel variables
-runkernel=$K_RUNNING_VR
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}\n' -qf /boot/config-$(uname -r))
 kernver=$(rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
 kernrel=$(rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
 kernarch=$(rpm -q --queryformat '%{arch}\n' -qf /boot/config-$(uname -r))
 kernvariant=$(uname -r | sed -e "s/${kernver}-${kernrel}//g" -e "s/\.$(uname -m).//g")
+
+uname_r=$(uname -r)
+#Fix for aarch64+64k kernels
+if [[ $uname_r =~ aarch64\+64k$ ]]; then
+  arch_string="aarch64+64k"
+else
+  arch_string=$kernarch
+fi
+runkernel=$(sed -e "s/\.${arch_string}[.+]*//" <<<${uname_r})
 
 # drop -core- from name if present, this is to deal with meta-style
 # packaging of kernel RPMs. Removing it here should be OK
@@ -1424,37 +1433,37 @@ if [ -z "$KERNELARGNAME" -o -z "$KERNELARGVARIANT" -o -z "$KERNELARGVERSION" ]; 
     exit 0
 else
     if [ "$REBOOTCOUNT" == "0" ]; then
-	Main
+        Main
     elif [ "$REBOOTCOUNT" == "1" ]; then
-	if [ -f $OUTPUTDIR/boot.$kernbase ]; then
-	    SubmitLog $OUTPUTDIR/boot.$kernbase
-	fi
-	DeBug "Running CheckKernel $OPTIONSCheckKernel"
-	CheckKernel $OPTIONSCheckKernel
-	if [ "$?" = "1" ]; then
-	    DeBug "After reboot we are still not running the correct kernel"
-	    RprtRslt $TEST/$kernbase FAIL $REBOOTCOUNT
-	    RHTSAbort
-	else
-	    DeBug "After reboot we are running the correct kernel"
+        if [ -f $OUTPUTDIR/boot.$kernbase ]; then
+            SubmitLog $OUTPUTDIR/boot.$kernbase
+        fi
+        DeBug "Running CheckKernel $OPTIONSCheckKernel"
+        CheckKernel $OPTIONSCheckKernel
+        if [ "$?" = "1" ]; then
+            DeBug "After reboot we are still not running the correct kernel"
+            RprtRslt $TEST/$kernbase FAIL $REBOOTCOUNT
+            RHTSAbort
+        else
+            DeBug "After reboot we are running the correct kernel"
             # CheckCPU count with test kernel
             CheckCPUcount
-	    YumUpgradeKernelHeaders
-	    REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
-	    DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
-	    if [[ ${DIFF} -gt 480 ]]; then
-	         DeBug "rhts-reboot took ${DIFF} seconds..."
-	         RprtRslt $TEST/${kernbase}_boot WARN $DIFF
-	    fi
-	    RprtRslt $TEST/$kernbase PASS $DIFF
-	    DepmodChk
-	    DiffDmesg
-	    if [ -x /sbin/lspci ]; then
-	        DiffLspci
-	    fi
-	    SysReport
-	fi
-	SubmitLog $DEBUGLOG
+            YumUpgradeKernelHeaders
+            REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
+            DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
+            if [[ ${DIFF} -gt 480 ]]; then
+                 DeBug "rhts-reboot took ${DIFF} seconds..."
+                 RprtRslt $TEST/${kernbase}_boot WARN $DIFF
+            fi
+            RprtRslt $TEST/$kernbase PASS $DIFF
+            DepmodChk
+            DiffDmesg
+            if [ -x /sbin/lspci ]; then
+                DiffLspci
+            fi
+            SysReport
+        fi
+        SubmitLog $DEBUGLOG
         workaround_bug905910
     else
         if [ -f $OUTPUTDIR/boot.$kernbase ]; then
