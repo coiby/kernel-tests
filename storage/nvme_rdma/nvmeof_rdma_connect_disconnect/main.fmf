@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_connect_disconnect
+description: nvmeof rdma connect disconnect stress test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_connect_disconnect
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_connect_disconnect
+extra-task: /storage/nvme_rdma/nvmeof_rdma_connect_disconnect
+id: 593af268-5c05-4811-aaf0-91761c0f3802

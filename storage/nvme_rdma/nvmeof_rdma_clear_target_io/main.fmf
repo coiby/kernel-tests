@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_clear_target_io
+description: nvmeof rdma clear target during io
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_clear_target_io
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_clear_target_io
+extra-task: /storage/nvme_rdma/nvmeof_rdma_clear_target_io
+id: 91b7f195-05f8-4896-b314-03c3844a5e8e

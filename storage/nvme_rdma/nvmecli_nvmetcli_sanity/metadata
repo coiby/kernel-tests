@@ -1,0 +1,14 @@
+[General]
+name=storage/nvme_rdma/nvmecli_nvmetcli_sanity
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvmeof rdma nvme-cli/nvmetcli sanity
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvme_rdma/include
+dependencies=nvme-cli;nvmetcli;fio
+max_time=1h
+use_pty=false

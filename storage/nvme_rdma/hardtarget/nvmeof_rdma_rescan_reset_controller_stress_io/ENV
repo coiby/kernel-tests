@@ -1,0 +1,2 @@
+DESC="nvmeof rdma rescan/reset controller stress during io with NETAPP E5700"
+TIME=2h

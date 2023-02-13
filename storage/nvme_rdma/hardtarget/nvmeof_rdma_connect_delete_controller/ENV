@@ -1,0 +1,2 @@
+DESC="nvmeof rdma connect delete_controller stress test with NETAPP E5700"
+TIME=2h

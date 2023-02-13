@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_reset_controller_stress
+description: nvmeof rdma reset_controller stress test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_reset_controller_stress
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_reset_controller_stress
+extra-task: /storage/nvme_rdma/nvmeof_rdma_reset_controller_stress
+id: 5d3ddad1-b849-4b75-a390-f66dc33a221d

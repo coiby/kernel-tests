@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_host_reboot_during_connect
+description: nvmeof rdma host reboot during connect, BZ1963290
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_host_reboot_during_connect
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_host_reboot_during_connect
+extra-task: /storage/nvme_rdma/nvmeof_rdma_host_reboot_during_connect
+id: 93c7502a-3cc2-4c15-a03b-1ebf0d0cacc4

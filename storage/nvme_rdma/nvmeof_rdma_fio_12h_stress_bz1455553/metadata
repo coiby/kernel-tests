@@ -1,0 +1,14 @@
+[General]
+name=storage/nvme_rdma/nvmeof_rdma_fio_12h_stress_bz1455553
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvmeof rdma fio 12H stress test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvme_rdma/include
+dependencies=nvme-cli;nvmetcli;fio
+max_time=15h
+use_pty=false
