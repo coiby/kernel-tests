@@ -209,19 +209,19 @@ init_vars()
 
 
 function get_alllist(){
-        local pkg_name_list="kernel kernel-debug kernel-debug-debuginfo kernel-debuginfo-common"
-        pkg_name_list+=" kernel-headers perf perf-debuginfo python-perf python-perf-debuginfo"
-        pkg_name_list+=" kernel-devel"
+    local pkg_name_list="kernel kernel-debug kernel-debug-debuginfo kernel-debuginfo-common"
+    pkg_name_list+=" kernel-headers perf perf-debuginfo python-perf python-perf-debuginfo"
+    pkg_name_list+=" kernel-devel"
 
-        local pkg
-        for pkg in $pkg_name_list; do
-            echo $path_prefix/$arch/${pkg}-${version}-${release}.$arch.rpm
-        done
+    local pkg
+    for pkg in $pkg_name_list; do
+        echo $path_prefix/$arch/${pkg}-${version}-${release}.$arch.rpm
+    done
 
-        echo $path_prefix/src/${sub_path}-${version}-${release}.src.rpm
-        echo $path_prefix/noarch/kernel-firmware-${version}-${release}.noarch.rpm
-        echo $path_prefix/noarch/kernel-doc-${version}-${release}.noarch.rpm
-        echo $path_prefix/noarch/kernel-abi-whitelists-${version}-${release}.noarch.rpm
+    echo $path_prefix/src/${sub_path}-${version}-${release}.src.rpm
+    echo $path_prefix/noarch/kernel-firmware-${version}-${release}.noarch.rpm
+    echo $path_prefix/noarch/kernel-doc-${version}-${release}.noarch.rpm
+    echo $path_prefix/noarch/kernel-abi-whitelists-${version}-${release}.noarch.rpm
 }
 
 function switch_to_final_url()
@@ -400,19 +400,19 @@ while true ; do
         # Assume there's a repo ready in /etc/yum.repos.d/ for CKI test kernel.
         --cki) use_cki_kernel=1; shift 1;;
         --)     shift; break;;
-        *)       Usage;exit 1;;
+        *)      Usage;exit 1;;
         esac
 done
 
 if [ -n "${dist// /}" ] && [ "$(echo $dist | sed -n 's/.*el\([0-9]\).*$/\1/p')" -le "9" ] &&
-        [ "${dist}" == "el7a" ] && [ "${version}" == "4.11.0" ]; then
-        echo "el7a to el7"
-        dist="el7"
-        release=${release/a/}
+    [ "${dist}" == "el7a" ] && [ "${version}" == "4.11.0" ]; then
+    echo "el7a to el7"
+    dist="el7"
+    release=${release/a/}
 fi
 
 for a do
-        echo '--> '"\`$a'";
+    echo '--> '"\`$a'";
 done
 
 
@@ -421,8 +421,8 @@ init_vars_repo_brew
 init_vars_repo_cki
 init_vars
 if [ -n "$exec_cmd" ]; then
-        $exec_cmd
+    $exec_cmd
 else
-        download_rpm
+    download_rpm
 fi
 exit 0
