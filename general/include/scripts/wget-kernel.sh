@@ -7,7 +7,7 @@
 # When testing scratch build, we can setup this url.
 # ROOT_URL=http://brew-task-repos.usersys.redhat.com/repos/scratch/llong/
 ROOT_URL=${ROOT_URL:-}
-kernel_names="kernel kernel-rt kernel-alt kernel-pegas kernel-aarch64"
+kernel_names="kernel kernel-rt kernel-alt kernel-pegas kernel-aarch64 kernel-64k"
 
 Usage(){
     echo "Usage"
@@ -123,10 +123,11 @@ init_vars()
     fi
 
     local found=0
+    # folder name may be different from rpm name, like kernel-64k/rt may be in kernel folder.
     for pkg_name in $kernel_names; do
         sub_path=${pkg_name}
         sub_name=${pkg_name}
-        [[ $pkg_name =~ kernel-alt ]] && sub_name=kernel
+        [[ $pkg_name =~ kernel-alt|kernel-64k ]] && sub_path=kernel
         path_prefix=${def_url}/$sub_path/${version}/${release}
         doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
         rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
@@ -149,7 +150,7 @@ init_vars()
             fi
             sub_path=${pkg_name}
             sub_name=${pkg_name}
-            [[ $pkg_name =~ kernel-alt ]] && sub_name=kernel
+            [[ $pkg_name =~ kernel-alt|kernel-64k ]] && sub_path=kernel
             path_prefix=${def_url}/$sub_path/${version}/${release}
             doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
             rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
@@ -312,26 +313,27 @@ while true ; do
         --srpm)  list_url+=" src_url";shift 1;;
         --perf)  list_url+=" perf_url";shift 1;;
         --curr|--running)
-                current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+]debug//')
+                current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+]debug//' -e 's/[.+]64k//')
                 uname -r | grep -q '+debug' && debugkernel=1
+                uname -r | grep -q '+64k' && kernel_64k=1 && kernel_names=kernel-64k
                 version=${current%%-*}
                 release=${current#*-}
                 dist=$(echo $release | grep -Eo "[[:alpha:]].*$")
                  # try cki kernel in there's repo in repos.d
-                uname -r | grep -iEq "test|mr" && grep -iEq "cki.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
+                uname -r | grep -iEq "test|mr|[0-9]{4,}_[0-9]{9,}.el[0-9]" && grep -iEq "/s3.upshift.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
                 grep -iEq "brew.*${version}.*${release}" /etc/yum.repos.d/*.repo && use_brew_kernel=1
                 shift 1;;
         --fw)    list_url+=" fmw_url";shift 1;;
         --arch)  arch=$2;shift 2;;
         -i|--isntall)  install=1; shift 1;;
         --nvr)
-            echo "$2" | grep "^[a-zA-Z]" -qE && kernel_names=${2%%-[0-9]*}
-            version_release=$(echo $2| grep -oE "[[:digit:]].*$")
+            echo "$2" | grep "^[a-zA-Z]" -qE && kernel_names=${2%%-[0-9].*}
+            version_release=$(echo $2| grep -oE "[[:digit:]]\..*$")
             version=${version_release%%-*}
             release=${version_release#*-}
             dist=$(echo $release | grep -Eo "[[:alpha:]].*$")
             # try cki kernel in there's repo in repos.d
-            echo "$release" | grep -iEq "test|mr" && grep -iEq "cki.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
+            echo "$release" | grep -iEq "test|mr|[0-9]{4,}_[0-9]{9,}.el[0-9]" && grep -iEq "cki.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
             grep -iEq "brew.*${version}.*${release}" /etc/yum.repos.d/*.repo && use_brew_kernel=1
             shift 2;;
         --debuginfo|-d) list_url+=" debuginfo_url"; debuginfo=1; shift;;
