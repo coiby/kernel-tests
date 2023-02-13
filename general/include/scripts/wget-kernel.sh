@@ -13,6 +13,9 @@ Usage(){
     echo "Usage"
     echo "        $(basename $0) [ --nvr <version-number> | --running | --ckirepo <ckirepo> ] --arch [arch] [--rpm | --srpm | --debuginfo | --kabi | --kvm | --devel | --print | --internal | --ktest | --extra ]"
     echo "Example"
+    echo "        $(basename $0) --nvr kernel-5.14.0-244.el9 -i"
+    echo "        $(basename $0) --nvr kernel-64k-5.14.0-244.el9 -i"
+    echo "        $(basename $0) --nvr 5.14.0-244.el9 --variant 64k -i"
     echo "        $(basename $0) --nvr 3.10.0-123.el7 --arch x86_64 --rpm"
     echo "        $(basename $0) --nvr 3.10.0-123.el7 --srpm"
     echo "        $(basename $0) --nvr 3.10.0-370.el7 --debuginfo"
@@ -120,6 +123,12 @@ init_vars()
         check_var=debug_rpm_url
     else
         check_var=rpm_url
+    fi
+
+    if [[ "$variant" =~ 64k ]]; then
+        kernel_names="kernel-64k"
+    elif [ -n "$variant" ]; then
+        echo "Unknown kernel variant: $variant!"
     fi
 
     local found=0
@@ -329,7 +338,7 @@ function download_rpm()
 }
 
 # ------- start ------------
-TEMP=$(getopt -o vd:aipt -l cki:,brewrepo:,brew:,ckirepo:,srpm,rpm,kabi,perf,fw,install,arch:,debuginfo,debugkernel,internal,int,extra,ext,ktest,curr,running,nvr:,kvm,devel,print, -n 'example.bash' -- "$@")
+TEMP=$(getopt -o vd:aipt -l cki:,brewrepo:,brew:,ckirepo:,srpm,rpm,kabi,perf,fw,install,arch:,debuginfo,debugkernel,internal,int,extra,ext,ktest,curr,running,nvr:,kvm,devel,print,variant:, -n 'example.bash' -- "$@")
 if [ $? != 0 ]; then echo "Terminating..." >&2; exit 1; fi
 eval set -- "$TEMP"
 
@@ -370,6 +379,7 @@ while true ; do
             shift 2;;
         --debuginfo|-d) list_url+=" debuginfo_url"; debuginfo=1; shift;;
         --debugkernel) debugkernel=1;shift;;
+        --variant) variant=$2;shift 2;;
         --kvm) list_url+=" rt_kvm_url";shift;;
         --ckirepo)
             shopt -s extglob
