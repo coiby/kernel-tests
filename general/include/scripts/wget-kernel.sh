@@ -246,6 +246,28 @@ function switch_to_final_url()
 function download_rpm()
 {
     local url_var
+    declare -A compound_urls
+    local url_dirname
+    local url_basename
+
+    function map_compound_url()
+    {
+        local input_url=$1
+        local comp=0
+        for u in $input_url; do
+            local url_dirname=$(dirname $u)
+            local url_basename=$(basename $u)
+            for ub in ${!compound_urls[*]}; do
+                if [ "$ub" = "$url_dirname" ]; then
+                    comp=1
+                    compound_urls[$url_dirname]+=",$url_basename"
+                    break
+                fi
+            done
+            [ "$comp" = 1 ] || { compound_urls[$url_dirname]="$url_basename"; }
+            comp=0
+        done
+    }
 
     for url_var in ${list_url}; do
         url+="$(switch_to_final_url ${!url_var}) "
@@ -264,7 +286,17 @@ function download_rpm()
         echo  "Don't support "${list_url// /}" in this kernel version"
         exit 0
     fi
-    echo "wgetting $(echo $url | sed 's/^ *//g')"
+    map_compound_url "$url"
+
+    echo -n "wget "
+    for url_dirname in ${!compound_urls[*]}; do
+            local nr_basename=$(echo "${compound_urls[$url_dirname]}" | awk -F, '{print NF}')
+            if ((nr_basename > 1)); then
+                echo $url_dirname/"{"${compound_urls[$url_dirname]}"}"
+            else
+                echo $url_dirname/${compound_urls[$url_dirname]}
+            fi
+    done
     rpm -q wget &>/dev/null || yum -y install wget >/dev/null
     wget -q ${url} && echo "Succeed."
     ret=$?
