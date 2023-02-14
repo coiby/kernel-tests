@@ -1,0 +1,13 @@
+[General]
+name=/kernel/distribution/kernelinstall
+owner=Jeff Bastian <jbastian@redhat.com>
+description=Reports back on the Kernel Installation that was done
+licence=GPL
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=120m
+dependencies=iproute;ethtool;kernel-headers
+repoRequires=kernel-include
