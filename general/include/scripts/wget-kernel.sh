@@ -7,12 +7,15 @@
 # When testing scratch build, we can setup this url.
 # ROOT_URL=http://brew-task-repos.usersys.redhat.com/repos/scratch/llong/
 ROOT_URL=${ROOT_URL:-}
-kernel_names="kernel kernel-rt kernel-alt kernel-pegas kernel-aarch64"
+kernel_names="kernel kernel-rt kernel-alt kernel-pegas kernel-aarch64 kernel-64k"
 
 Usage(){
     echo "Usage"
     echo "        $(basename $0) [ --nvr <version-number> | --running | --ckirepo <ckirepo> ] --arch [arch] [--rpm | --srpm | --debuginfo | --kabi | --kvm | --devel | --print | --internal | --ktest | --extra ]"
     echo "Example"
+    echo "        $(basename $0) --nvr kernel-5.14.0-244.el9 -i"
+    echo "        $(basename $0) --nvr kernel-64k-5.14.0-244.el9 -i"
+    echo "        $(basename $0) --nvr 5.14.0-244.el9 --variant 64k -i"
     echo "        $(basename $0) --nvr 3.10.0-123.el7 --arch x86_64 --rpm"
     echo "        $(basename $0) --nvr 3.10.0-123.el7 --srpm"
     echo "        $(basename $0) --nvr 3.10.0-370.el7 --debuginfo"
@@ -122,11 +125,18 @@ init_vars()
         check_var=rpm_url
     fi
 
+    if [[ "$variant" =~ 64k ]]; then
+        kernel_names="kernel-64k"
+    elif [ -n "$variant" ]; then
+        echo "Unknown kernel variant: $variant!"
+    fi
+
     local found=0
+    # folder name may be different from rpm name, like kernel-64k/rt may be in kernel folder.
     for pkg_name in $kernel_names; do
         sub_path=${pkg_name}
         sub_name=${pkg_name}
-        [[ $pkg_name =~ kernel-alt ]] && sub_name=kernel
+        [[ $pkg_name =~ kernel-alt|kernel-64k ]] && sub_path=kernel
         path_prefix=${def_url}/$sub_path/${version}/${release}
         doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
         rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
@@ -149,7 +159,7 @@ init_vars()
             fi
             sub_path=${pkg_name}
             sub_name=${pkg_name}
-            [[ $pkg_name =~ kernel-alt ]] && sub_name=kernel
+            [[ $pkg_name =~ kernel-alt|kernel-64k ]] && sub_path=kernel
             path_prefix=${def_url}/$sub_path/${version}/${release}
             doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
             rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
@@ -208,19 +218,19 @@ init_vars()
 
 
 function get_alllist(){
-        local pkg_name_list="kernel kernel-debug kernel-debug-debuginfo kernel-debuginfo-common"
-        pkg_name_list+=" kernel-headers perf perf-debuginfo python-perf python-perf-debuginfo"
-        pkg_name_list+=" kernel-devel"
+    local pkg_name_list="kernel kernel-debug kernel-debug-debuginfo kernel-debuginfo-common"
+    pkg_name_list+=" kernel-headers perf perf-debuginfo python-perf python-perf-debuginfo"
+    pkg_name_list+=" kernel-devel"
 
-        local pkg
-        for pkg in $pkg_name_list; do
-            echo $path_prefix/$arch/${pkg}-${version}-${release}.$arch.rpm
-        done
+    local pkg
+    for pkg in $pkg_name_list; do
+        echo $path_prefix/$arch/${pkg}-${version}-${release}.$arch.rpm
+    done
 
-        echo $path_prefix/src/${sub_path}-${version}-${release}.src.rpm
-        echo $path_prefix/noarch/kernel-firmware-${version}-${release}.noarch.rpm
-        echo $path_prefix/noarch/kernel-doc-${version}-${release}.noarch.rpm
-        echo $path_prefix/noarch/kernel-abi-whitelists-${version}-${release}.noarch.rpm
+    echo $path_prefix/src/${sub_path}-${version}-${release}.src.rpm
+    echo $path_prefix/noarch/kernel-firmware-${version}-${release}.noarch.rpm
+    echo $path_prefix/noarch/kernel-doc-${version}-${release}.noarch.rpm
+    echo $path_prefix/noarch/kernel-abi-whitelists-${version}-${release}.noarch.rpm
 }
 
 function switch_to_final_url()
@@ -245,6 +255,28 @@ function switch_to_final_url()
 function download_rpm()
 {
     local url_var
+    declare -A compound_urls
+    local url_dirname
+    local url_basename
+
+    function map_compound_url()
+    {
+        local input_url=$1
+        local comp=0
+        for u in $input_url; do
+            local url_dirname=$(dirname $u)
+            local url_basename=$(basename $u)
+            for ub in ${!compound_urls[*]}; do
+                if [ "$ub" = "$url_dirname" ]; then
+                    comp=1
+                    compound_urls[$url_dirname]+=",$url_basename"
+                    break
+                fi
+            done
+            [ "$comp" = 1 ] || { compound_urls[$url_dirname]="$url_basename"; }
+            comp=0
+        done
+    }
 
     for url_var in ${list_url}; do
         url+="$(switch_to_final_url ${!url_var}) "
@@ -263,7 +295,17 @@ function download_rpm()
         echo  "Don't support "${list_url// /}" in this kernel version"
         exit 0
     fi
-    echo "wgetting $(echo $url | sed 's/^ *//g')"
+    map_compound_url "$url"
+
+    echo -n "wget "
+    for url_dirname in ${!compound_urls[*]}; do
+            local nr_basename=$(echo "${compound_urls[$url_dirname]}" | awk -F, '{print NF}')
+            if ((nr_basename > 1)); then
+                echo $url_dirname/"{"${compound_urls[$url_dirname]}"}"
+            else
+                echo $url_dirname/${compound_urls[$url_dirname]}
+            fi
+    done
     rpm -q wget &>/dev/null || yum -y install wget >/dev/null
     wget -q ${url} && echo "Succeed."
     ret=$?
@@ -296,7 +338,7 @@ function download_rpm()
 }
 
 # ------- start ------------
-TEMP=$(getopt -o vd:aipt -l cki:,brewrepo:,brew:,ckirepo:,srpm,rpm,kabi,perf,fw,install,arch:,debuginfo,debugkernel,internal,int,extra,ext,ktest,curr,running,nvr:,kvm,devel,print, -n 'example.bash' -- "$@")
+TEMP=$(getopt -o vd:aipt -l cki:,brewrepo:,brew:,ckirepo:,srpm,rpm,kabi,perf,fw,install,arch:,debuginfo,debugkernel,internal,int,extra,ext,ktest,curr,running,nvr:,kvm,devel,print,variant:, -n 'example.bash' -- "$@")
 if [ $? != 0 ]; then echo "Terminating..." >&2; exit 1; fi
 eval set -- "$TEMP"
 
@@ -312,30 +354,32 @@ while true ; do
         --srpm)  list_url+=" src_url";shift 1;;
         --perf)  list_url+=" perf_url";shift 1;;
         --curr|--running)
-                current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+]debug//')
+                current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+]debug//' -e 's/[.+]64k//')
                 uname -r | grep -q '+debug' && debugkernel=1
+                uname -r | grep -q '+64k' && kernel_64k=1 && kernel_names=kernel-64k
                 version=${current%%-*}
                 release=${current#*-}
                 dist=$(echo $release | grep -Eo "[[:alpha:]].*$")
                  # try cki kernel in there's repo in repos.d
-                uname -r | grep -iEq "test|mr" && grep -iEq "cki.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
+                uname -r | grep -iEq "test|mr|[0-9]{4,}_[0-9]{9,}.el[0-9]" && grep -iEq "/s3.upshift.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
                 grep -iEq "brew.*${version}.*${release}" /etc/yum.repos.d/*.repo && use_brew_kernel=1
                 shift 1;;
         --fw)    list_url+=" fmw_url";shift 1;;
         --arch)  arch=$2;shift 2;;
         -i|--isntall)  install=1; shift 1;;
         --nvr)
-            echo "$2" | grep "^[a-zA-Z]" -qE && kernel_names=${2%%-[0-9]*}
-            version_release=$(echo $2| grep -oE "[[:digit:]].*$")
+            echo "$2" | grep "^[a-zA-Z]" -qE && kernel_names=${2%%-[0-9].*}
+            version_release=$(echo $2| grep -oE "[[:digit:]]\..*$")
             version=${version_release%%-*}
             release=${version_release#*-}
             dist=$(echo $release | grep -Eo "[[:alpha:]].*$")
             # try cki kernel in there's repo in repos.d
-            echo "$release" | grep -iEq "test|mr" && grep -iEq "cki.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
+            echo "$release" | grep -iEq "test|mr|[0-9]{4,}_[0-9]{9,}.el[0-9]" && grep -iEq "cki.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
             grep -iEq "brew.*${version}.*${release}" /etc/yum.repos.d/*.repo && use_brew_kernel=1
             shift 2;;
         --debuginfo|-d) list_url+=" debuginfo_url"; debuginfo=1; shift;;
         --debugkernel) debugkernel=1;shift;;
+        --variant) variant=$2;shift 2;;
         --kvm) list_url+=" rt_kvm_url";shift;;
         --ckirepo)
             shopt -s extglob
@@ -366,19 +410,19 @@ while true ; do
         # Assume there's a repo ready in /etc/yum.repos.d/ for CKI test kernel.
         --cki) use_cki_kernel=1; shift 1;;
         --)     shift; break;;
-        *)       Usage;exit 1;;
+        *)      Usage;exit 1;;
         esac
 done
 
 if [ -n "${dist// /}" ] && [ "$(echo $dist | sed -n 's/.*el\([0-9]\).*$/\1/p')" -le "9" ] &&
-        [ "${dist}" == "el7a" ] && [ "${version}" == "4.11.0" ]; then
-        echo "el7a to el7"
-        dist="el7"
-        release=${release/a/}
+    [ "${dist}" == "el7a" ] && [ "${version}" == "4.11.0" ]; then
+    echo "el7a to el7"
+    dist="el7"
+    release=${release/a/}
 fi
 
 for a do
-        echo '--> '"\`$a'";
+    echo '--> '"\`$a'";
 done
 
 
@@ -387,8 +431,8 @@ init_vars_repo_brew
 init_vars_repo_cki
 init_vars
 if [ -n "$exec_cmd" ]; then
-        $exec_cmd
+    $exec_cmd
 else
-        download_rpm
+    download_rpm
 fi
 exit 0
