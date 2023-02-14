@@ -71,8 +71,6 @@ KexecBoot() {
     fi
 
     _vmlinuz_path=$(ls ${K_BOOT}/vmlinuz-${KEXEC_VER}!(*debug*|*64k*|*rt*))
-    [ -z "${_vmlinuz_path}" ] && _vmlinuz_path=$(ls ${K_BOOT}/vmlinux-${KEXEC_VER}!(*debug*|*64k*|*rt*))
-
 
     # 'kexec -l' or 'kexec -c' can only be run on a system supporting PSCI
     # Warn and stop the test if it doesn't support PSCI
@@ -143,7 +141,7 @@ KexecBoot() {
         fi
 
         # Prepare kexec cmd and run kexec
-        LogRun "${cmd} ${_vmlinuz_path} --initrd=/${_initrd_img_path} --command-line=\"${boot_cmdline}\""
+        LogRun "${cmd} ${_vmlinuz_path} --initrd=${_initrd_img_path} --command-line=\"${boot_cmdline}\""
         if [ "$?" -ne 0 ] || [ "$(cat /sys/kernel/kexec_loaded)" = "0" ]; then
             # rm -f "${K_REBOOT}"
             Error "Loading kexec kernel ${KEXEC_VER} failed."

@@ -18,11 +18,6 @@ CheckKdumpConfFromInitramfs() {
 
     Log "Check kdump.conf in kdump initramfs img"
     local kdump_initramfs_path="${INITRD_KDUMP_IMG_PATH}"
-    # Kdump uses the nondebug kernel/initramfs img
-    if [ "${option,,}" = "nondebug" ]; then
-        Log "Check the nondebug kdump initramfs, instead of the debug one"
-        kdump_initramfs_path=$(sed -e "s/[+-]debugkdump.img$/kdump.img/" <<< ${kdump_initramfs_path})
-    fi
 
     # Locate the kdump initramfs img
     if [ ! -f "${kdump_initramfs_path}" ]; then
