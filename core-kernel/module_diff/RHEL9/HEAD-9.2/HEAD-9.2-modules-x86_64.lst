@@ -1762,6 +1762,7 @@ snd-soc-rt1015p.ko
 snd-soc-rt1308.ko
 snd-soc-rt1308-sdw.ko
 snd-soc-rt1316-sdw.ko
+snd-soc-rt1318-sdw.ko
 snd-soc-rt286.ko
 snd-soc-rt298.ko
 snd-soc-rt5514.ko

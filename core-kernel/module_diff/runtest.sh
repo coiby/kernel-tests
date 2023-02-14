@@ -130,6 +130,12 @@ function AddRTKnowRemovedList ()
     cat ./${OS}/${Release}/${Release}{-,-rt-}knownRemoved-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_knownRemoved-rt
     \cp ${TESTAREA}/moduleList_knownRemoved-rt ${TESTAREA}/moduleList_knownRemoved
 }
+# Workround for aarch64 64k
+function Add64kKnowRemovedList ()
+{
+    cat ./${OS}/${Release}/${Release}{-,-64k-}knownRemoved-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_knownRemoved-64k
+    \cp ${TESTAREA}/moduleList_knownRemoved-64k ${TESTAREA}/moduleList_knownRemoved
+}
 
 function GetKnownRemovedList ()
 {
@@ -148,6 +154,9 @@ function GetKnownRemovedList ()
 
     if $(cki_is_kernel_rt); then
         AddRTKnowRemovedList
+    fi
+    if $(cki_is_kernel_64k); then
+        Add64kKnowRemovedList
     fi
 
     if [ ! -e "${TESTAREA}/moduleList_knownRemoved" ]; then
@@ -664,6 +673,12 @@ rlJournalStart
                         sed -i '/ems_usb.ko/d;/esd_usb2.ko/d;/kvaser_usb.ko/d;/m_can.ko/d;
                                 /m_can_pci.ko/d;/mcp251xfd.ko/d;/mcp251x.ko/d;/peak_pciefd.ko/d;
                                 /peak_usb.ko/d;/slcan.ko/d;/usb_8dev.ko/d;' ${OS}/${Release}/$Release-knownRemoved-{ppc64le,x86_64}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-263"; then
+                        sed -i '/snd-soc-rt1318-sdw.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-264"; then
+                        sed -i '/dwmac-tegra.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
                     fi
                     ;;
             esac
