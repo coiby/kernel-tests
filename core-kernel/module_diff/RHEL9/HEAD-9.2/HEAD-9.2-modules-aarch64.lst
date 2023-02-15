@@ -274,6 +274,7 @@ dw_dmac_core.ko
 dw_dmac.ko
 dw_dmac_pci.ko
 dwmac-dwc-qos-eth.ko
+dwmac-tegra.ko
 dw_mmc-bluefield.ko
 dw_mmc.ko
 dw_mmc-pltfm.ko
