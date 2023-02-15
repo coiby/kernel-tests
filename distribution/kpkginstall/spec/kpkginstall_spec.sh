@@ -83,6 +83,54 @@ Describe 'kpkginstall: set_package_name read package name'
     End
 End
 
+Describe 'kpkginstall: rpm_prepare'
+    Parameters
+        kernel "$KERNEL_RPM_URL"
+        kernel-debug "$KERNEL_RPM_URL"
+        kernel-rt "$KERNEL_RPM_URL"
+        kernel-64k "$KERNEL_64k_RPM_URL"
+    End
+    It "can prepare cki repo for package $1"
+        export PACKAGE_NAME=$1
+        export KPKG_URL=$2
+        select_yum_tool(){
+            echo ""
+        }
+        excluded_pkgs="error: unset"
+        if [[ "${PACKAGE_NAME}" == "kernel" ]]; then
+            excluded_pkgs=(kernel-debug kernel-debug-core
+                           kernel-rt kernel-rt-core \
+                           kernel-rt-debug kernel-rt-debug-core \
+                           kernel-automotive kernel-automotive-debug \
+                           kernel-64k kernel-64k-debug)
+        fi
+        if [[ "${PACKAGE_NAME}" == "kernel-debug" ]]; then
+            excluded_pkgs=(kernel kernel-core \
+                           kernel-rt kernel-rt-core \
+                           kernel-rt-debug kernel-rt-debug-core
+                           kernel-automotive kernel-automotive-debug \
+                           kernel-64k kernel-64k-debug)
+        fi
+        if [[ "${PACKAGE_NAME}" == "kernel-rt" ]]; then
+            excluded_pkgs=(kernel kernel-core \
+                           kernel-debug kernel-debug-core \
+                           kernel-rt-debug kernel-rt-debug-core
+                           kernel-automotive kernel-automotive-debug \
+                           kernel-64k kernel-64k-debug)
+        fi
+        if [[ "${PACKAGE_NAME}" == "kernel-64k" ]]; then
+            excluded_pkgs=(kernel kernel-core \
+                           kernel-debug kernel-debug-core \
+                           kernel-rt kernel-rt-core \
+                           kernel-rt-debug kernel-rt-debug-core
+                           kernel-automotive kernel-automotive-debug)
+        fi
+        When call rpm_prepare
+        The line 2 should equal "✅ Kernel repository file deployed"
+        The contents of file /etc/yum.repos.d/kernel-cki.repo should include "exclude=${excluded_pkgs[*]}"
+    End
+End
+
 Describe 'kpkginstall: get_kpkg_ver rpms'
     cleanup(){
         rm -rf /var/tmp/kpkginstall
