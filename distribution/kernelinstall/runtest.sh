@@ -1304,6 +1304,11 @@ DeBug "1=$KERNELARGNAME 2=$KERNELARGVARIANT 3=$KERNELARGVERSION 4=$KERNELARGTMPR
 # cases, and will be necessary as a directory name to assemble the brewroot url
 KERNPKGDIRECTORY="$KERNELARGNAME"
 
+if [ "$KERNELARGNAME" = "kernel-64k" ]; then
+    DeBug "substituting kernel-64k brew directory with kernel"
+    KERNPKGDIRECTORY="kernel"
+fi
+
 # Pegas and aarch64 RPMs are named just 'kernel', work around any workflows
 # that parse name out of (brew) package name and pass it here
 if [ "$KERNELARGNAME" = "kernel-pegas" -o "$KERNELARGNAME" = "kernel-aarch64" ]; then
