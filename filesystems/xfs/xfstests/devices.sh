@@ -1199,7 +1199,9 @@ function update_fstab()
 	sed -i "/${dev##*/}[[:blank:]]*/d" /etc/fstab
 	sed -i "/UUID=${uuid}[[:blank:]]*/d" /etc/fstab
 
-	echo "$dev $mnt $type defaults 0 0" >> /etc/fstab
+	# use nofail, in case the device is corrupt and can't be mounted
+	# so a machine doesn't fail to boot as it couldn't mount the device
+	echo "$dev $mnt $type defaults,nofail 0 0" >> /etc/fstab
 	return 0
 }
 
