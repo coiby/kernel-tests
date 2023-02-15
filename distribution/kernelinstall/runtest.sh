@@ -1259,6 +1259,7 @@ function Main ()
         RprtRslt $TEST/$kernbase PASS $REBOOTCOUNT
         DepmodChk
         SysReport
+        [ -s "$DEBUGLOG" ] && SubmitLog "$DEBUGLOG"
         exit 0
     fi
     if [ "$KERNELARGVARIANT" == "xen" ]; then
