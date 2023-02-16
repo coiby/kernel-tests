@@ -147,7 +147,7 @@ install_kselftests()
         if [ "${UPSTREAM_SOURCE_URL}" ]; then
             pushd $TMPDIR/linux-kselftest-*/
         else
-            pushd $TMPDIR/SOURCES/${linux_package}/
+            pushd $TMPDIR/SOURCES/linux-${version}-${release}/
         fi
         yes "" | make config
         # for bpf build
