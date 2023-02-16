@@ -407,25 +407,8 @@ main()
 		[ "$AVC_CHECK" = yes ] && enable_avc_check || disable_avc_check
 	else
 		{
-		if [ "$(uname -m)" = "ppc64le" ];
-		then
+		if [ "$(uname -m)" = "ppc64le" ]; then
 			sleep 2;
-		else
-			# This is a workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1920477#c33
-			# install nfp firmware
-			$YUM netronome-firmware
-
-			# update initramfs
-			dracut -f;
-			# The problem is that the zipl bootloaders have a fixed list of blocks on
-			# the device to read during boot. This list is generated every time the
-			# zipl command is run. When now the initramfs is updated this can
-			# add/remove/move blocks. So without running zipl the fixed list will
-			# be out of sync with what is on disk.
-			[[ "$(uname -m)" =~ s390.* ]] && zipl
-			# reload driver
-			modprobe -r nfp;sleep 2;
-			modprobe nfp;sleep 5;
 		fi
 
 		install_required_packages
