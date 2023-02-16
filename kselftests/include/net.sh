@@ -249,6 +249,7 @@ do_bpf_test_progs_config()
 	echo "=== Setting mmap_low_allowed on ===" | tee -a $OUTPUTFILE
 	setsebool -P mmap_low_allowed on
 	sysctl_set net.mptcp.enabled 1
+	modprobe nf_conntrack
 }
 
 do_bpf_test_progs_run()
@@ -301,6 +302,7 @@ do_bpf_test_progs_reset()
 	echo "=== Setting mmap_low_allowed off ===" | tee -a $OUTPUTFILE
 	setsebool -P mmap_low_allowed off
 	sysctl_restore net.mptcp.enabled
+	modprobe -r nf_conntrack
 	reset_network_env
 }
 
