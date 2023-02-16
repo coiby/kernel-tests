@@ -841,16 +841,25 @@ function BrewInstallKernel ()
           if echo "$KERNELARGVERSION" | grep -Eq '\.(el8|elrdy|el9)'; then
              testkerncore=$testkername-core-$KERNELARGVERSION
              testkernmodules=$testkername-modules-$KERNELARGVERSION
+             testkernmodules_core=$testkername-modules-core-$KERNELARGVERSION
              curl -L -s $httpbase/$kernarch/$testkerncore.$kernarch.rpm -O
              curl -L -s $httpbase/$kernarch/$testkernmodules.$kernarch.rpm -O
+             if curl -L -s --head -f -o /dev/null $httpbase/$kernarch/$testkernmodules_core.$kernarch.rpm; then
+                 curl -L -s $httpbase/$kernarch/$testkernmodules_core.$kernarch.rpm -O
+             fi
+             if test -f $testkernmodules_core.$kernarch.rpm; then
+                 testkernelmodules_rpms="$testkernmodules.$kernarch.rpm $testkernmodules_core.$kernarch.rpm"
+             else
+                 testkernelmodules_rpms="$testkernmodules.$kernarch.rpm"
+             fi
              $yumcmd -y localinstall --nogpgcheck \
                  /tmp/$testkernbase.$kernarch.rpm \
                  $testkerncore.$kernarch.rpm \
-                 $testkernmodules.$kernarch.rpm
+                 $testkernelmodules_rpms
              rpm -qa | grep $testkerncore || rpm -ivh \
                  /tmp/$testkernbase.$kernarch.rpm \
                  $testkerncore.$kernarch.rpm \
-                 $testkernmodules.$kernarch.rpm --force --nodeps
+                 $testkernelmodules_rpms --force --nodeps
              rpm -qa | grep $testkerncore
 
              if [ "$KERNELARGEXTRAMODULES" == "1" ]; then
