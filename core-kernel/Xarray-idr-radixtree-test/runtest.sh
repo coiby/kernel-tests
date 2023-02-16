@@ -64,25 +64,7 @@ function get_running_kernel_src()
 		# Not using rlRun as sometimes the function causes "Segmentation fault"
 		cp -r /usr/src/kernels/${running_kernel} linux-${running_kernel}
 	else
-		kernelpkg="kernel"
-		# check if it is running kernel-rt
-		if  cki_is_kernel_rt; then
-			kernelpkg="kernel-rt"
-		fi
-		dnf_download_options=""
-		if  cki_is_kernel_debug; then
-			dnf_download_options="--disableexcludes kernel-cki"
-		fi
-		rlLog "detected rhel/fedora/ark kernel..."
-		echo $running_kernel | grep -q -v 'fc'
-		if [ $? -ne  0 ]; then
-			rlLog "workaround to find srpm name for ark kernels..."
-			# ARK kernel don't always have disttag correct
-			# workaround to find the srpm version on cki repo
-			running_kernel=$(dnf -q --disablerepo="*" --enablerepo="kernel-cki" list --all "${kernelpkg}.src" --showduplicates \
-				| awk '{print$2}' | tail -1)
-		fi
-		rlRun -l "dnf download ${dnf_download_options} --source ${kernelpkg}-${running_kernel}"
+		cki_download_kernel_src_rpm
 		rpm -ivh kernel-*.src.rpm
 		tar xf /root/rpmbuild/SOURCES/linux-*.tar.xz -C .
 	fi

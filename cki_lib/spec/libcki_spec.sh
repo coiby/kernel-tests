@@ -50,6 +50,33 @@ Describe 'cki_run'
     End
 End
 
+Describe 'cki_download_kernel_src_rpm'
+    dnf(){
+        if [[ "${1}" == "repoquery" ]]; then
+            echo "${MOCK_PACKAGE_NAME}"
+        else
+            echo "dnf $*"
+        fi
+    }
+    uname(){
+        echo "${MOCK_UNAME}"
+    }
+    cki_get_yum_tool(){
+        echo "/usr/bin/dnf"
+    }
+    Parameters
+        "kernel" "4.18.0-372.41.1.el8_6.x86_64" "4.18.0-372.41.1.el8_6"
+        "kernel-rt" "4.18.0-372.45.1.rt7.202.el8_6.4270_779243631.x86_64+debug" "4.18.0-372.45.1.rt7.202.el8_6.4270_779243631"
+        "kernel" "6.0.7-200.fc36" "6.0.7-200.fc36"
+    End
+    It "Can download srpm from ${2}"
+        export MOCK_UNAME="${2}"
+        export MOCK_PACKAGE_NAME="${1}-${3}"
+        When call cki_download_kernel_src_rpm
+        The first line should include "Running: 'dnf download --disableexcludes all --source ${MOCK_PACKAGE_NAME}'"
+    End
+End
+
 Describe 'cki_kernel_version'
     Mock uname
         echo "$VERSION"
