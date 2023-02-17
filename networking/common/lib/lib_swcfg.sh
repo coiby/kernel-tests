@@ -4,8 +4,8 @@
 # ${NETWORK_COMMONLIB_DIR} is only used in Red hat netowrk-qe lab
 # which would never be defined in partner's lab
 
-if [[ ! ${NETWORK_COMMONLIB_DIR+x} ]]
-then
+#if [[ ! ${NETWORK_COMMONLIB_DIR+x} ]]
+#then
 
 rpm -q epel-release &>/dev/null || yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 sshpass -V &>/dev/null || yum -y install sshpass
@@ -189,7 +189,7 @@ get_iface_sw_port()
 	done
 	eval "$2=$SW_NAME; $3='$list_of_swports'"
 }
-fi # end of if [[ ! ${NETWORK_COMMONLIB_DIR+x} ]]
+#fi # end of if [[ ! ${NETWORK_COMMONLIB_DIR+x} ]]
 
 #
 # Enable switch port connected to the interface on linux server
