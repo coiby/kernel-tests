@@ -1,0 +1,11 @@
+summary: pagesize verification
+description: 'Verify kernel variant boots with expected pagesize'
+contact: Eddie Kovsky <ekovsky@redhat.com>
+component:
+  - kernel
+path: /general/memory/function/pagesize
+test: make run
+require:
+  - make
+  - gcc
+duration: 1m

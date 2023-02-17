@@ -1,0 +1,12 @@
+[General]
+name=pagesize verification
+owner=Eddie Kovsky <ekovsky@redhat.com>
+description=Verify kernel variant boots with expected pagesize
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+dependencies=make;gcc
+max_time=1m
