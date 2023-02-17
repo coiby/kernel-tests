@@ -3,11 +3,11 @@ eval "$(shellspec - -c) exit 1"
 
 Include distribution/kpkginstall/runtest.sh
 
-KERNEL_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel"
-KERNEL_RT_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel-rt"
-KERNEL_DEBUG_RPM_URL="https://example.com/job/12345/repo#package_name=kernel&amp;debug_kernel=true"
-KERNEL_64k_RPM_URL="https://example.com/job/12345/repo#package_name=kernel-64k"
-KERNEL_TGZ_URL="https://example.com/715092599/x86_64/artifacts/kernel-mainline.kernel.org-redhat_715092599_x86_64.tar.gz#package_name=kernel"
+KERNEL_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel&amp;source_package_name=kernel"
+KERNEL_RT_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel-rt&amp;source_package_name=kernel-rt"
+KERNEL_DEBUG_RPM_URL="https://example.com/job/12345/repo#package_name=kernel&amp;source_package_name=kernel&amp;debug_kernel=true"
+KERNEL_64k_RPM_URL="https://example.com/job/12345/repo#package_name=kernel-64k&amp;source_package_name=kernel"
+KERNEL_TGZ_URL="https://example.com/715092599/x86_64/artifacts/kernel-mainline.kernel.org-redhat_715092599_x86_64.tar.gz#package_name=kernel&amp;source_package_name=kernel"
 
 Describe 'kpkginstall: parse_kpkg_url_variables'
     __end__() {
@@ -44,23 +44,29 @@ Describe 'kpkginstall: set_package_name set package name'
     BeforeEach 'setup'
     AfterEach 'cleanup'
     Parameters
-        kernel kernel ""
-        kernel-rt kernel-rt ""
-        kernel-debug kernel true
-        kernel-rt-debug kernel-rt true
+        kernel kernel kernel ""
+        kernel-rt kernel-rt kernel-rt ""
+        kernel-debug kernel kernel true
+        kernel-rt-debug kernel-rt kernel-rt true
+        kernel-64k kernel-64k kernel ""
     End
     It "can set $1 as package name"
+        export EXPECTED_PACKAGE_NAME=$1         # package_name + debug (in case of debug kernels)
         export KPKG_VAR_PACKAGE_NAME=$2
-        export KPKG_VAR_DEBUG_KERNEL=$3
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$3
+        export KPKG_VAR_DEBUG_KERNEL=$4
         When call set_package_name
-        The first line should equal "✅ Found package name in URL variables: $2"
-        if [ -z "$3" ]; then
-            The second line should equal "✅ Package name is set: $1 (cached to disk)"
+        The first line should equal "✅ Found package name in URL variables: $KPKG_VAR_PACKAGE_NAME"
+        if [ -z "$KPKG_VAR_DEBUG_KERNEL" ]; then
+            The line 3 should equal "✅ Package name is set: $EXPECTED_PACKAGE_NAME (cached to disk)"
+            The line 4 should equal "✅ Source package name is set: $KPKG_VAR_SOURCE_PACKAGE_NAME (cached to disk)"
         else
-            The second line should equal "ℹ️ Debug kernel was requested -- appending -debug to package name"
-            The third line should equal "✅ Package name is set: $1 (cached to disk)"
+            The line 3 should equal "ℹ️ Debug kernel was requested -- appending -debug to package name"
+            The line 4 should equal "✅ Package name is set: $EXPECTED_PACKAGE_NAME (cached to disk)"
+            The line 5 should equal "✅ Source package name is set: $KPKG_VAR_SOURCE_PACKAGE_NAME (cached to disk)"
         fi
-        The contents of file /var/tmp/kpkginstall/KPKG_PACKAGE_NAME should equal "$1"
+        The contents of file /var/tmp/kpkginstall/KPKG_PACKAGE_NAME should equal "$EXPECTED_PACKAGE_NAME"
+        The contents of file /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME should equal "$SOURCE_PACKAGE_NAME"
     End
 End
 
