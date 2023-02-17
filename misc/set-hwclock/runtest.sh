@@ -26,8 +26,7 @@
 
 # Include rhts environment
 
-. /usr/bin/rhts-environment.sh
-. /usr/share/rhts-library/rhtslib.sh
+. /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
