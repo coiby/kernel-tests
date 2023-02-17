@@ -646,6 +646,8 @@ function CheckKernel ()
     if [[ "$KVAR" = "up" ]]; then
         DeBug "KVAR=$KVAR"
         KVAR=""
+    elif [[ "$KVAR" = "64k-up" ]]; then
+        KVAR="64k"
     fi
 
     DeBug "After KVER=$KVER KVAR=$KVAR"
@@ -1212,8 +1214,11 @@ function Main ()
     # CheckCPU count with base kernel
     CheckCPUcount
 
-    # Check to see if the kernel we want to test is already running
-    CheckKernel $KERNELARGVERSION $KERNELARGVARIANT
+    if [ "$KERNELARGNAME" = "kernel-64k" ]; then
+        CheckKernel $KERNELARGVERSION 64k-$KERNELARGVARIANT
+    else
+        CheckKernel $KERNELARGVERSION $KERNELARGVARIANT
+    fi
     if [ "$?" = "1" ]; then
         # Check to see if the kernel we want to test is already installed
         rpm -qa --queryformat '%{name}-%{version}-%{release}.%{arch}\n' | grep -q $testkernbase.$kernarch
@@ -1263,6 +1268,7 @@ function Main ()
         RprtRslt $TEST/$kernbase PASS $REBOOTCOUNT
         DepmodChk
         SysReport
+        [ -s "$DEBUGLOG" ] && SubmitLog "$DEBUGLOG"
         exit 0
     fi
     if [ "$KERNELARGVARIANT" == "xen" ]; then
@@ -1281,20 +1287,12 @@ testver=$(rpm -qf $0)
 DeBug "$testver"
 
 # Current kernel variables
+runkernel=$K_RUNNING_VR
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}\n' -qf /boot/config-$(uname -r))
 kernver=$(rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
 kernrel=$(rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
 kernarch=$(rpm -q --queryformat '%{arch}\n' -qf /boot/config-$(uname -r))
 kernvariant=$(uname -r | sed -e "s/${kernver}-${kernrel}//g" -e "s/\.$(uname -m).//g")
-
-uname_r=$(uname -r)
-#Fix for aarch64+64k kernels
-if [[ $uname_r =~ aarch64\+64k$ ]]; then
-  arch_string="aarch64+64k"
-else
-  arch_string=$kernarch
-fi
-runkernel=$(sed -e "s/\.${arch_string}[.+]*//" <<<${uname_r})
 
 # drop -core- from name if present, this is to deal with meta-style
 # packaging of kernel RPMs. Removing it here should be OK
@@ -1312,6 +1310,11 @@ DeBug "1=$KERNELARGNAME 2=$KERNELARGVARIANT 3=$KERNELARGVERSION 4=$KERNELARGTMPR
 # Save KERNELARGNAME because it might be modified after this point in some
 # cases, and will be necessary as a directory name to assemble the brewroot url
 KERNPKGDIRECTORY="$KERNELARGNAME"
+
+if [ "$KERNELARGNAME" = "kernel-64k" ]; then
+    DeBug "substituting kernel-64k brew directory with kernel"
+    KERNPKGDIRECTORY="kernel"
+fi
 
 # Pegas and aarch64 RPMs are named just 'kernel', work around any workflows
 # that parse name out of (brew) package name and pass it here
@@ -1387,6 +1390,9 @@ yumcmd="yum"
 
 DeBug "Setting the default CheckKernel Options"
 OPTIONSCheckKernel="$KERNELARGVERSION $KERNELARGVARIANT"
+if [ "$KERNELARGNAME" = "kernel-64k" ]; then
+    OPTIONSCheckKernel="$KERNELARGVERSION 64k-$KERNELARGVARIANT"
+fi
 
 rpm -qf /etc/redhat-release | grep -q "redhat-release-5"
 RHEL5TREE=$?
