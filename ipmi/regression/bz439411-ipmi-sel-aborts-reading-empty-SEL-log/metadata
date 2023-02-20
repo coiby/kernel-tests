@@ -1,6 +1,6 @@
 [General]
 description=Test for bz439411 (ipmi-sel aborts reading empty SEL log)
-name=Regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log
+name=ipmi/regression/bz439411-ipmi-sel-aborts-reading-empty-SEL-log
 owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
