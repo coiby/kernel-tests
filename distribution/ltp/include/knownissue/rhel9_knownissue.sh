@@ -42,6 +42,8 @@ function rhel9_fixed_issues()
 	kernel_in_range "0" "5.14.0-176.el9" && tskip "inotify12" fixed
 	# Bug 2097485 - [RHEL-9.1] execve06_child.c:15: TFAIL: argc is 0, expected 1
 	kernel_in_range "0" "5.14.0-122.el9" && tskip "execve06" fixed
+	# Bug 2128900 - [FJ9.1 Bug]: xfs: setgid is not stripped after setting mask [xfstests: generic/697]
+	kernel_in_range "0" "5.14.0-236.el9" && tskip "openat04" fixed
 }
 
 function rhel9_knownissue_filter()
