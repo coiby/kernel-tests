@@ -1,0 +1,53 @@
+From 3b0d7f6f204e94e92ba2255b90edb36b1852d368 Mon Sep 17 00:00:00 2001
+From: Ping Fang <pifang@redhat.com>
+Date: Thu, 9 Feb 2023 22:20:16 +0800
+Subject: [PATCH] aiocp: remove the check read unnecessary flag
+
+When aiocp executed with -f DIRECT will fail.
+
+<<<test_start>>>
+tag=AD049 stime=1675520824
+cmdline="aiocp -b 8k -n 8 -f DIRECT"
+contacts=""
+analysis=exit
+<<<test_output>>>
+tst_test.c:1560: TINFO: Timeout per run is 0h 30m 30s
+aiocp.c:211: TINFO: Maximum AIO blocks: 65536
+tst_device.c:585: TINFO: Use uevent strategy
+aiocp.c:250: TINFO: Fill srcfile.bin with random data
+aiocp.c:279: TINFO: Copy srcfile.bin -> dstfile.bin
+aiocp.c:291: TINFO: Comparing srcfile.bin with dstfile.bin
+aiocp.c:306: TBROK: read(3,0x7ffcd743abe0,4096) failed, returned -1: EINVAL (22)
+...
+
+The code which checks that the data has been written correctly
+may wrong use the O_DIRECT flag, which may cause a failure like
+the one above.
+
+Signed-off-by: Ping Fang <pifang@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Acked-by: Andrea Cervesato <andrea.cervesato@suse.com>
+Acked-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ testcases/kernel/io/ltp-aiodio/aiocp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/io/ltp-aiodio/aiocp.c b/testcases/kernel/io/ltp-aiodio/aiocp.c
+index bc0e209b2..6212d8ee8 100644
+--- a/testcases/kernel/io/ltp-aiodio/aiocp.c
++++ b/testcases/kernel/io/ltp-aiodio/aiocp.c
+@@ -297,8 +297,8 @@ static void run(void)
+ 		return;
+ 	}
+ 
+-	srcfd = SAFE_OPEN(srcname, srcflags | O_RDONLY, 0666);
+-	dstfd = SAFE_OPEN(dstname, srcflags | O_RDONLY, 0666);
++	srcfd = SAFE_OPEN(srcname, O_RDONLY, 0666);
++	dstfd = SAFE_OPEN(dstname, O_RDONLY, 0666);
+ 
+ 	reads = howmany(filesize, buffsize);
+ 
+-- 
+2.31.1
+

@@ -125,6 +125,8 @@ function rhel8_fixed_issues()
 	is_arch "s390x" && kernel_in_range "0" "4.18.0-362.el8" && tskip "proc01" fixed
 	# Bug 2100955 - [RHEL- 8.7] execve06_child.c:15: TFAIL: argc is 0, expected 1
 	kernel_in_range "0" "4.18.0-407.el8" && tskip "execve06" fixed
+	# Bug 2128904 - [FJ8.7 Bug]: xfs: setgid is not stripped after setting mask [xfstests: generic/697]
+	kernel_in_range "0" "4.18.0-450.el8" && tskip "openat04" fixed
 }
 
 function rhel8_knownissue_filter()
