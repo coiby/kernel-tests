@@ -139,7 +139,7 @@ function setup_nvdimm_swap()
 		return
 	fi
 
-	if ! stat /run/ostree-booted 2&>1 ; then 
+	if ! stat /run/ostree-booted 2&>1 ; then
 		rpm -q ndctl >/dev/null 2>&1
 		[ $? -ne 0 ] && yum -y install ndctl >/dev/null 2>&1
 	fi
@@ -356,7 +356,7 @@ function setup()
 	LOOKASIDE=${LOOKASIDE:-http://download.eng.bos.redhat.com/qa/rhts/lookaside}
 	curl -LkO $LOOKASIDE/pmbench.tar.gz
 	tar -zxf pmbench.tar.gz
-	if ! stat /run/ostree-booted > /dev/null 2&>1; then
+	if ! stat /run/ostree-booted &> /dev/null ; then
 		rpm -q --quiet libxml2-devel || yum -y install libxml2-devel >/dev/null 2>&1
 		rpm -q --quiet libuuid-devel || yum -y install libuuid-devel >/dev/null 2>&1
 	fi
