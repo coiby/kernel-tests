@@ -192,6 +192,10 @@ init_vars()
         rpm_url+=" ${path_prefix}/$arch/${pkg_name}-core-${version}-${release}.$arch.rpm"
         debug_rpm_url+=" ${path_prefix}/$arch/${pkg_name}-debug-modules-${version}-${release}.$arch.rpm"
         debug_rpm_url+=" ${path_prefix}/$arch/${pkg_name}-debug-core-${version}-${release}.$arch.rpm"
+        if check_existence $(switch_to_final_url ${path_prefix}/$arch/${pkg_name}-modules-core-${version}-${release}.$arch.rpm); then
+            rpm_url+=" ${path_prefix}/$arch/${pkg_name}-modules-core-${version}-${release}.$arch.rpm"
+            debug_rpm_url+=" ${path_prefix}/$arch/${pkg_name}-debug-modules-core-${version}-${release}.$arch.rpm"
+        fi
         if ((debugkernel == 1)); then
             internal_module_url="${path_prefix}/$arch/${pkg_name}-debug-modules-internal-${version}-${release}.$arch.rpm"
             extra_module_url="${path_prefix}/$arch/${pkg_name}-debug-modules-extra-${version}-${release}.$arch.rpm"
