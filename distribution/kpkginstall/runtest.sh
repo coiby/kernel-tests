@@ -41,7 +41,7 @@ function parse_kpkg_url_variables()
   saveIFS=$IFS                    # Store the current field separator
   IFS='=&'                        # Set a new field separate for parameter delimiters
   # shellcheck disable=SC2206
-  parm=(${KPKG_PARAMS/&amp;/\&}) # Split the variables into their pieces
+  parm=(${KPKG_PARAMS//&amp;/\&}) # Split the variables into their pieces
   IFS=$saveIFS                    # Restore the original field separator
 
   # Loop over the variables we found and set KPKG_VAR_"KEY" = VALUE. We make
@@ -62,11 +62,25 @@ function set_package_name()
     return
   fi
 
+  # Recover the saved source package name from KPKG_SOURCE_PACKAGE_NAME if it exists.
+  if [ -f "/var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME" ]; then
+    SOURCE_PACKAGE_NAME=$(cat /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME)
+    cki_print_success "Found cached source package name on disk: ${SOURCE_PACKAGE_NAME}"
+    return
+  fi
+
   # If the pipeline provides the package name after the # sign in the URL, we
   # can use that here and be done really fast.
   if [ -n "${KPKG_VAR_PACKAGE_NAME:-}" ]; then
     PACKAGE_NAME=$KPKG_VAR_PACKAGE_NAME
     cki_print_success "Found package name in URL variables: ${PACKAGE_NAME}"
+  fi
+
+  # If the pipeline provides the source package name after the # sign in the URL, we
+  # can use that here and be done really fast.
+  if [ -n "${KPKG_VAR_SOURCE_PACKAGE_NAME:-}" ]; then
+    SOURCE_PACKAGE_NAME=$KPKG_VAR_SOURCE_PACKAGE_NAME
+    cki_print_success "Found source package name in URL variables: ${SOURCE_PACKAGE_NAME}"
   fi
 
   # Append "-debug" if we were asked to install the debug kernel.
@@ -77,7 +91,9 @@ function set_package_name()
 
   # Write the PACKAGE_NAME to a file so we have it after reboot.
   echo -n "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+  echo -n "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
   cki_print_success "Package name is set: ${PACKAGE_NAME} (cached to disk)"
+  cki_print_success "Source package name is set: ${SOURCE_PACKAGE_NAME} (cached to disk)"
 }
 
 function get_kpkg_ver()
@@ -361,16 +377,16 @@ function rpm_install()
       cki_print_warning "No package ${PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
       cki_print_warning "Note that some tests might require the package and can fail!"
     fi
-    if $YUM install -y "${PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${PACKAGE_NAME}-headers-${KVER} successfully"
+    if $YUM install -y "${SOURCE_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
     else
-      cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
+      cki_print_warning "No package ${SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
       # shellcheck disable=SC2010
-      ALT_HEADERS=$(ls "${PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
+      ALT_HEADERS=$(ls "${SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
       if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
           cki_print_success "Installed ${ALT_HEADERS} successfully"
       else
-          cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, skipping!"
+          cki_print_warning "No package ${SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
           cki_print_warning "Note that some tests might require the package and can fail!"
       fi
     fi
