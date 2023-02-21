@@ -15,6 +15,14 @@ function check_status()
     fi
 }
 
+#timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it.
+function disable_admission_control()
+{
+    echo "Disable the admission control" | tee -a $OUTPUTFILE
+    sysctl -w kernel.sched_rt_runtime_us=-1
+    check_status "Disable the admission control"
+}
+
 function runtest()
 {
     if ! ( (( "$rhel_major" == 8 && "$rhel_minor" >= 8 )) || (( "$rhel_major" == 9 && "$rhel_minor" >=2 )) || (( "$rhel_major" >= 10 ))); then
@@ -55,6 +63,7 @@ function runtest()
     check_status "rtla timerlat hist -i 2 -c 0 -n"
 
     echo "-- rtla-timerlat:  rtla-timerlat hist test---------------" | tee -a $OUTPUTFILE
+    disable_admission_control
     rtla timerlat hist -d 30s -c 0 -P d:100us:1ms
     check_status "rtla timerlat hist -d 30s -c 0 -P d:100us:1ms"
 
