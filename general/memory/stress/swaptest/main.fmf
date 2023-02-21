@@ -1,0 +1,25 @@
+summary: This is a collection for swap stress
+description: |
+    swap stress to solid disk and rotational disk
+
+    Description:
+    PARAMETERS
+    * PMBENCH_RUNTIME	- run time for pmbench commands
+    * STRESS_NG_RUNTIME	- run time for stress-ng commands
+
+    Author: Chunyu Hu <chuhu@redhat.com>
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+  - kernel
+test: ( set +o posix; . runtest.sh )
+framework: beakerlib
+require:
+  - gcc
+  - make
+  - ndctl
+  - stress-ng
+  - libxml2-devel
+  - libuuid-devel
+duration: 1h
+extra-summary: /kernel/general/memory/stress/swaptest
+extra-task: /kernel/general/memory/stress/swaptest

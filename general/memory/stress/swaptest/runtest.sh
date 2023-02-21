@@ -26,7 +26,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 swap_test_devices=()
@@ -140,8 +139,10 @@ function setup_nvdimm_swap()
 		return
 	fi
 
-	rpm -q ndctl >/dev/null 2>&1
-	[ $? -ne 0 ] && yum -y install ndctl >/dev/null 2>&1
+	if ! stat /run/ostree-booted 2&>1 ; then
+		rpm -q ndctl >/dev/null 2>&1
+		[ $? -ne 0 ] && yum -y install ndctl >/dev/null 2>&1
+	fi
 
 	rlRun -l "lsblk -D -t" 0 "Get block device rotation info"
 	rlRun "ndctl list" -l 0 "show persistent devices"
@@ -355,8 +356,10 @@ function setup()
 	LOOKASIDE=${LOOKASIDE:-http://download.eng.bos.redhat.com/qa/rhts/lookaside}
 	curl -LkO $LOOKASIDE/pmbench.tar.gz
 	tar -zxf pmbench.tar.gz
-	rpm -q --quiet libxml2-devel || yum -y install libxml2-devel >/dev/null 2>&1
-	rpm -q --quiet libuuid-devel || yum -y install libuuid-devel >/dev/null 2>&1
+	if ! stat /run/ostree-booted &> /dev/null ; then
+		rpm -q --quiet libxml2-devel || yum -y install libxml2-devel >/dev/null 2>&1
+		rpm -q --quiet libuuid-devel || yum -y install libuuid-devel >/dev/null 2>&1
+	fi
 
 	pushd pmbench
 	make
