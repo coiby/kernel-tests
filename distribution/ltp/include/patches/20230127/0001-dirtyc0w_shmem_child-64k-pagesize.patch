@@ -1,0 +1,34 @@
+From 1eda2532d8a7409f591d259e440f4e06f55615f2 Mon Sep 17 00:00:00 2001
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 22 Feb 2023 12:50:05 +0100
+Subject: [PATCH] security/dirtyc0w_shmem: Fix test with host pagesize != 4k
+
+The test can currently fail if the host page size is not 4k, because we
+forgot to replace a hard-coded 4k by the actual page size. So if we end
+up having to trigger a UFFDIO_WAKE, that ioctl will fail because it's
+not aligned to the host page size.
+
+Reported-by: Juri Lelli <juri.lelli@redhat.com>
+Reported-by: Bruno Goncalves <bgoncalv@redhat.com>
+Tested-by: Chunyu Hu <chuhu@redhat.com>
+Cc: Petr Vorel <pvorel@suse.cz>
+Cc: Martin Doucha <mdoucha@suse.cz>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ testcases/kernel/security/dirtyc0w_shmem/dirtyc0w_shmem_child.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/security/dirtyc0w_shmem/dirtyc0w_shmem_child.c b/testcases/kernel/security/dirtyc0w_shmem/dirtyc0w_shmem_child.c
+index 9c2b0399419..2a982347c57 100644
+--- a/testcases/kernel/security/dirtyc0w_shmem/dirtyc0w_shmem_child.c
++++ b/testcases/kernel/security/dirtyc0w_shmem/dirtyc0w_shmem_child.c
+@@ -115,7 +115,7 @@ static void *uffd_thread_fn(void *arg)
+ 		if (ioctl(uffd, UFFDIO_CONTINUE, &uffdio) < 0) {
+ 			if (errno == EEXIST) {
+ 				uffdio_wake.start = (unsigned long) map;
+-				uffdio_wake.len = 4096;
++				uffdio_wake.len = page_size;
+ 				SAFE_IOCTL(uffd, UFFDIO_WAKE, &uffdio_wake);
+ 			}
+ 		}
