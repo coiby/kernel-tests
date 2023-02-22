@@ -3,6 +3,10 @@ description: |
     Regression test for bz1251361
     When using dynamic probe tracer of ftrace, and set the stacktrace option. Will trigger the kernel Warning:  save_stack_trace_regs() not implemented yet.The same issue exit on aarch64 and have been filed as Bug1247190. 
 contact: Ziqian SUN <zsun@redhat.com>
+enabled: true
+id: fe214ea8-2382-41e8-ba05-0679f3ee3f7c
+component:
+  - kernel
 test: ./runtest.sh
 framework: beakerlib
 require:

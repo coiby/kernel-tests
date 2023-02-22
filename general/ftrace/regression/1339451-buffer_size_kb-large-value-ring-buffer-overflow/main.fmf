@@ -2,6 +2,10 @@ summary: Test if large value for buffer_size_kb will cause a overflow or not
 description: |
     Test if large value for buffer_size_kb will cause a overflow or not
 contact: Ziqian SUN <zsun@redhat.com>
+enabled: true
+id: 03a6f87f-3479-4143-9705-61a508b503c2
+component:
+  - kernel
 test: ./runtest.sh
 framework: beakerlib
 duration: 60m
