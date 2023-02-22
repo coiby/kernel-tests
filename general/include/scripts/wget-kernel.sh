@@ -192,6 +192,10 @@ init_vars()
         rpm_url+=" ${path_prefix}/$arch/${pkg_name}-core-${version}-${release}.$arch.rpm"
         debug_rpm_url+=" ${path_prefix}/$arch/${pkg_name}-debug-modules-${version}-${release}.$arch.rpm"
         debug_rpm_url+=" ${path_prefix}/$arch/${pkg_name}-debug-core-${version}-${release}.$arch.rpm"
+        if check_existence $(switch_to_final_url ${path_prefix}/$arch/${pkg_name}-modules-core-${version}-${release}.$arch.rpm); then
+            rpm_url+=" ${path_prefix}/$arch/${pkg_name}-modules-core-${version}-${release}.$arch.rpm"
+            debug_rpm_url+=" ${path_prefix}/$arch/${pkg_name}-debug-modules-core-${version}-${release}.$arch.rpm"
+        fi
         if ((debugkernel == 1)); then
             internal_module_url="${path_prefix}/$arch/${pkg_name}-debug-modules-internal-${version}-${release}.$arch.rpm"
             extra_module_url="${path_prefix}/$arch/${pkg_name}-debug-modules-extra-${version}-${release}.$arch.rpm"
@@ -361,7 +365,7 @@ while true ; do
                 release=${current#*-}
                 dist=$(echo $release | grep -Eo "[[:alpha:]].*$")
                  # try cki kernel in there's repo in repos.d
-                uname -r | grep -iEq "test|mr|[0-9]{4,}_[0-9]{9,}.el[0-9]" && grep -iEq "/s3.upshift.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
+                uname -r | grep -iEq "test|mr|[0-9]{1,}_[0-9]{9,}.el[0-9]" && grep -iEq "/s3.upshift.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
                 grep -iEq "brew.*${version}.*${release}" /etc/yum.repos.d/*.repo && use_brew_kernel=1
                 shift 1;;
         --fw)    list_url+=" fmw_url";shift 1;;
