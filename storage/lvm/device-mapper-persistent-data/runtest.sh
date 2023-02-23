@@ -27,7 +27,7 @@ function runtest
     tc_list+=" lvm/device_mapper_persistent_data/cache"
     typeset tc=""
     for tc in $tc_list; do
-        cki_run "$STQE_PATH/stqe-test run --fmf --path $tc"
+        cki_run "$STQE_TEST_EXE run --fmf --path $tc"
         (( rc += $? ))
     done
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS

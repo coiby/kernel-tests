@@ -21,7 +21,7 @@ source ../../include/libstqe.sh
 
 function runtest
 {
-    cki_run "$STQE_PATH/stqe-test run --fmf --filter component:device-mapper"
+    cki_run "$STQE_TEST_EXE run --fmf --filter component:device-mapper"
     typeset -i rc=$?
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }

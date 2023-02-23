@@ -27,7 +27,7 @@ function runtest
     else
         distro=$DISTRO_MAJ;
     fi
-    cmd="$STQE_PATH/stqe-test run --fmf -f tags:targetcli_basic"
+    cmd="$STQE_TEST_EXE run --fmf -f tags:targetcli_basic"
     if [[ $distro == "rhel-7" ]]; then
         cmd=$cmd" -f distro:$distro"
     fi
