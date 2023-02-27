@@ -302,9 +302,9 @@ function SelectKernel ()
         DeBug "EXTRA=$EXTRA"
         if [[ "$RT_UNIFIED" == "true" ]]; then
             # Unified tree kernel-rt inherits kernel NVR and
-            # appends "+rt" or "+rtdebug"
+            # appends "+rt" or "+rt-debug"
             if [[ "$RT_DEBUG" == "true" ]]; then
-                EXTRA="rtdebug"
+                EXTRA="rt-debug"
             else
                 EXTRA="rt"
             fi
@@ -625,9 +625,9 @@ function CheckKernel ()
         DeBug "KVAR=$KVAR"
         if [[ "$RT_UNIFIED" == "true" ]]; then
             # Unified tree kernel-rt inherits kernel NVR and
-            # appends "+rt" or "+rtdebug"
+            # appends "+rt" or "+rt-debug"
             if [[ "$RT_DEBUG" == "true" ]]; then
-                KVAR="rtdebug"
+                KVAR="rt-debug"
             else
                 KVAR="rt"
             fi
@@ -1342,10 +1342,10 @@ if [[ "$KERNELARGVARIANT" = "rt"* || "$KERNELARGNAME" == "kernel-rt"* ]]; then
     fi
     if [[ "$KERNELARGVERSION" == *".rt"* ]]; then
         # Kernel RT built from the same source tree as kernel uses the same
-        # NVR as kernel but will add "+rt" or "+rtdebug".  When built from
+        # NVR as kernel but will add "+rt" or "+rt-debug".  When built from
         # separate source trees however, kernel-rt has a unique NVR that
         # will include ".rtX.Y" version numbering instead, and does not append
-        # "+rt" or "+rtdebug"
+        # "+rt" or "+rt-debug"
         RT_UNIFIED="false"
         KERNPKGDIRECTORY="kernel-rt"
     fi
@@ -1364,12 +1364,12 @@ if [ "$KERNELARGVARIANT" == "up" ]; then
     DeBug "Test kernel variables"
     DeBug "1=$testkernbase 2=$testkername 3=$testkernver 4=$testkernrel 5=$testkerndevel"
 else
-    if [[ "$RT_REQUESTED" == "true" && "$RT_UNIFIED" == "true" && "$RT_DEBUG" == "true" ]]; then
-        # Debug variant is "kernel-rtdebug" when built from unified source tree,
-        # not "kernel-rt-debug" - manually set following parameters
-        testkernbase=kernel-rtdebug-$KERNELARGVERSION
-        testkername=kernel-rtdebug
-        testkerndevel=kernel-rtdebug-devel-$KERNELARGVERSION
+    if [[ "$RT_REQUESTED" == "true" && "$RT_DEBUG" == "true" ]]; then
+        # Ensure proper name "kernel-rt-debug" is handled regardless of what strings
+        # the user utilized to request kernel-rt-debug
+        testkernbase=kernel-rt-debug-$KERNELARGVERSION
+        testkername=kernel-rt-debug
+        testkerndevel=kernel-rt-debug-devel-$KERNELARGVERSION
     else
         testkernbase=$KERNELARGNAME-$KERNELARGVARIANT-$KERNELARGVERSION
         testkername=$KERNELARGNAME-$KERNELARGVARIANT
