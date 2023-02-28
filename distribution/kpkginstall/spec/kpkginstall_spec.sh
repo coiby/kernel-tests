@@ -5,7 +5,8 @@ Include distribution/kpkginstall/runtest.sh
 
 KERNEL_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel&amp;source_package_name=kernel"
 KERNEL_RT_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel-rt&amp;source_package_name=kernel-rt"
-KERNEL_DEBUG_RPM_URL="https://example.com/job/12345/repo#package_name=kernel&amp;source_package_name=kernel&amp;debug_kernel=true"
+KERNEL_DEBUG_PARAM_RPM_URL="https://example.com/job/12345/repo#package_name=kernel&amp;source_package_name=kernel&amp;debug_kernel=true"
+KERNEL_DEBUG_PKG_RPM_URL="https://example.com/job/12345/x86_64/5.14.0-276.2037_789873082.el9.x86_64#package_name=kernel-debug&source_package_name=kernel"
 KERNEL_64k_RPM_URL="https://example.com/job/12345/repo#package_name=kernel-64k&amp;source_package_name=kernel"
 KERNEL_TGZ_URL="https://example.com/715092599/x86_64/artifacts/kernel-mainline.kernel.org-redhat_715092599_x86_64.tar.gz#package_name=kernel&amp;source_package_name=kernel"
 
@@ -18,7 +19,8 @@ Describe 'kpkginstall: parse_kpkg_url_variables'
     Parameters
         "kernel" kernel "" rpms "$KERNEL_RPM_URL"
         "kernel-rt" kernel-rt "" rpms "$KERNEL_RT_RPM_URL"
-        "kernel-debug" kernel true rpms "$KERNEL_DEBUG_RPM_URL"
+        "kernel-debug" kernel true rpms "$KERNEL_DEBUG_PARAM_RPM_URL"
+        "kernel-debug" kernel-debug "" rpms "$KERNEL_DEBUG_PKG_RPM_URL"
         "kernel-64k" kernel-64k "" rpms "$KERNEL_64k_RPM_URL"
         "kernel" kernel "" tarball "$KERNEL_TGZ_URL"
     End
@@ -47,6 +49,7 @@ Describe 'kpkginstall: set_package_name set package name'
         kernel kernel kernel ""
         kernel-rt kernel-rt kernel-rt ""
         kernel-debug kernel kernel true
+        kernel-debug kernel-debug kernel ""
         kernel-rt-debug kernel-rt kernel-rt true
         kernel-64k kernel-64k kernel ""
     End
@@ -196,6 +199,7 @@ Describe 'kpkginstall: rpm_install'
     Parameters
         kernel kernel "s390x" "4.18.0-442.el8.s390x" "" "$KERNEL_RPM_URL"
         kernel-debug kernel "s390x" "4.18.0-442.el8.s390x" true "$KERNEL_RPM_URL"
+        kernel-debug kernel-debug "s390x" "5.14.0-276.el9.s390x" "true" "$KERNEL_RPM_URL"
         kernel-rt kernel-rt "s390x" "4.18.0-442.el8.s390x" "" "$KERNEL_RPM_URL"
         kernel-64k kernel-64k "aarch64" "5.14.0-243.1820_756592390.el9.aarch64" "" "$KERNEL_64k_RPM_URL"
     End
@@ -209,7 +213,7 @@ Describe 'kpkginstall: rpm_install'
     AfterEach 'cleanup'
     It "can install $1"
         export PACKAGE_NAME="$2"
-        export KPKG_VAR_DEBUG_KERNEL="$5"
+        export IS_DEBUG_KERNEL="$5"
         export KPKG_URL="$6"
         export YUM=dnf
         export ARCH="$3"
@@ -237,7 +241,7 @@ Describe 'kpkginstall: rpm_install'
             The stdout should include "✅ Installed /usr/sbin/kernel-is-rt successfully"
         fi
         # message that is added on debug kernels
-        if [ -n "$KPKG_VAR_DEBUG_KERNEL" ]; then
+        if [ -n "$IS_DEBUG_KERNEL" ]; then
             The stdout should include "✅ Updated /etc/sysconfig/kernel to set debug kernels as default"
             The contents of file /etc/sysconfig/kernel should include "UPDATEDEFAULT=yes"
             The contents of file /etc/sysconfig/kernel should include "DEFAULTKERNEL=kernel-debug"
@@ -258,7 +262,8 @@ Describe 'kpkginstall: main - install kernel'
         kernel "$KERNEL_TGZ_URL"
         kernel-rt "$KERNEL_RT_RPM_URL"
         kernel-64k "$KERNEL_64k_RPM_URL"
-        kernel "$KERNEL_DEBUG_RPM_URL"
+        kernel "$KERNEL_DEBUG_PARAM_RPM_URL"
+        kernel "$KERNEL_DEBUG_PKG_RPM_URL"
     End
     cleanup(){
         rm -rf /var/tmp/kpkginstall
@@ -335,7 +340,8 @@ Describe 'kpkginstall: main - check installed kernel'
         kernel "x86_64" "6.1.0-rc7" "6.1.0-rc7" "$KERNEL_TGZ_URL"
         kernel-rt "x86_64" "4.18.0-442.el8.x86_64" "4.18.0-442.el8.x86_64" "$KERNEL_RT_RPM_URL"
         kernel-64k "aarch64" "5.14.0-243.1820_756592390.el9.aarch64" "5.14.0-243.1820_756592390.el9.aarch64+64k" "$KERNEL_64k_RPM_URL"
-        kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_RPM_URL"
+        kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_PARAM_RPM_URL"
+        kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_PKG_RPM_URL"
     End
     setup(){
         mkdir -p /var/tmp/kpkginstall
