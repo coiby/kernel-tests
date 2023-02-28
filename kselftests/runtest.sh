@@ -30,6 +30,8 @@ CDIR=$(dirname "$FILE")
 . "$CDIR"/../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 #-------------------- Setup --------------------
+rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
 arch=$(uname -i)
 version=$(uname -r | cut -f1 -d'-')
 release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
@@ -165,6 +167,11 @@ install_kselftests()
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${name}-modules-internal-${version}-${release}.${arch}.rpm"
         fi
         selftestsname="${name%-debug}"
+        # Due to bz2171995, since >= 9.3, rhel will merge PREEMPT_RT and build kernel-rt as a variant,
+        # and no package kernel-rt-selftests-internal, see bz2171995#c8 for details
+        if [[ $rhel_major -gt 9 || ( $rhel_major -eq 9 && $rhel_minor -ge 3 ) ]]; then
+            selftestsname="${selftestsname%-rt}"
+        fi
         if ! rpm -q ${selftestsname}-selftests-internal > /dev/null 2>&1; then
             rlRun "dnf download --resolve ${selftestsname}-selftests-internal-${version}-${release}.${arch}"
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${selftestsname}-selftests-internal-${version}-${release}.${arch}.rpm"
