@@ -21,7 +21,7 @@ source ../../../include/libstqe.sh
 
 function runtest
 {
-    cki_run "$STQE_PATH/stqe-test run -c lvm/lvm-thinp-basic.conf"
+    cki_run "$STQE_TEST_EXE run -c lvm/lvm-thinp-basic.conf"
     (( $? != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }
 

@@ -22,7 +22,7 @@ source ../../include/libstqe.sh
 TEST_CASE_PATH="lvm/snapper/snapper_basic.py"
 function runtest
 {
-    cki_run "$STQE_PATH/stqe-test run -t $TEST_CASE_PATH"
+    cki_run "$STQE_TEST_EXE run -t $TEST_CASE_PATH"
     typeset -i rc=$?
     (( rc != 0 )) && return $CKI_FAIL || return $CKI_PASS
 }

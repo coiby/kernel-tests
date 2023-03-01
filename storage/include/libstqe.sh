@@ -37,48 +37,54 @@ get_release() {
 }
 
 stqe_init() {
-  stqe_path="/opt/stqe-venv"
-  typeset pip="python3 -m pip"
-  typeset pkg_mgr
+  get_release
   pkg_mgr=$(dnf >/dev/null 2>&1 && echo dnf || echo yum)
+  stqe_path="/opt/stqe-venv"
+  python='python3'
+  STQE_PYTHON=$stqe_path/bin/python
+  STQE_TEST_EXE=$stqe_path/bin/stqe-test
 
-  # augeas-libs needed for RHEL-7, netifaces needed for aarch64
-  cki_run "$pkg_mgr install -y --skip-broken python3-pip augeas-libs" ||
-    cki_abort_task "FAIL: Could not install framework dependencies"
-  # ppc64, ppc64le, and s390x need to compile some python modules for now
-  if [[ $ARCH != 'x86_64' ]]; then
-    cki_run "$pkg_mgr install -y gcc cmake openssl-devel python3-devel libffi-devel zlib-devel" ||
-      cki_abort_task "FAIL: Could not install framework dependencies"
+  if [[ $DISTRO_MAJ == 'rhel-7' ]]; then
+    $pkg_mgr install -y python3-pip python3-devel gcc
+    # Lightweight versions with minimal dependencies
+    STQE_STABLE_VERSION=0.2.0b3
+    LIBSAN_STABLE_VERSION=0.5.0b5
+
+  # upgrade to python39 when on rhel-8
+  elif [[ $DISTRO_MAJ == 'rhel-8' ]]; then
+    python='python3.9'
+    if ! $STQE_PYTHON -m pip -V >/dev/null 2>&1; then
+      $pkg_mgr install -y python39-devel python39-pip
+    fi
+  else  # assume python>=3.9
+    if ! $STQE_PYTHON -m pip -V >/dev/null 2>&1; then
+      $pkg_mgr install -y python3-devel python3-pip
+    fi
   fi
 
-  # Create virtualenv
-  trap "deactivate" EXIT
-  cki_run "$pip install virtualenv && python3 -m venv $stqe_path && source $stqe_path/bin/activate" ||
-      cki_abort_task "FAIL: Could not set-up python virtualenv"
-
-  # Check if we have pip>=20, install 20.3 if not
-  if [[ $($pip -V | cut -f 2 -d ' ' | cut -f 1 -d '.') -lt 20 ]]; then
-    cki_run "$pip install -U pip==20.3" ||
-      cki_abort_task "FAIL: Could not install pip==20.3!"
+  # if stqe-test executable already works do nothing
+  if ! $STQE_TEST_EXE --help >/dev/null 2>&1; then
+    if [[ $ARCH == 'ppc64le' || $ARCH == 's390x' ]]; then
+      $pkg_mgr install -y gcc  # ruamel.yaml.clib needs compilation
+    fi
+    # create virtualenv
+    $python -m pip install virtualenv
+    $python -m venv $stqe_path --system-site-packages  # site-packages might be needed for some tests
+    $stqe_path/bin/pip install -U pip wheel
+    if [[ -n $LIBSAN_STABLE_VERSION ]]; then
+      $stqe_path/bin/pip install libsan=="$LIBSAN_STABLE_VERSION"
+    fi
+    if [[ -n $STQE_STABLE_VERSION ]]; then
+      cki_run "$stqe_path/bin/pip install stqe==$STQE_STABLE_VERSION" ||
+        cki_abort_task "Fail to install stqe==$STQE_STABLE_VERSION"
+    else
+      cki_run "$stqe_path/bin/pip install stqe" ||
+        cki_abort_task "Fail to install stqe"
+    fi
   fi
 
-  cki_run "$pip install wheel"
-
-  # Workaround for python-augeas compiling bug on RHEL-7 ppc64le
-  if [[ $ARCH == 'ppc64le' ]]; then
-    cki_run "$pip install cffi --no-binary=cffi" ||
-      cki_abort_task "FAIL: Could not install cffi from source on ppc64le RHEL-7"
-  fi
-
-  if [[ -n $STQE_STABLE_VERSION ]]; then
-    cki_run "$pip install stqe==$STQE_STABLE_VERSION --no-binary=stqe" ||
-      cki_abort_task "Fail to install stqe==$STQE_STABLE_VERSION"
-  else
-    cki_run "$pip install stqe --no-binary=stqe" ||
-      cki_abort_task "Fail to install stqe"
-  fi
-
-  export STQE_PATH=$stqe_path/bin
-
-  return 0
+source $stqe_path/bin/activate
+export STQE_PYTHON  # Python interpreter to use with libsan, stqe libs
+export STQE_TEST_EXE  # stqe-test i.e. $STQE_TEST_EXE run -t <test>
+return 0
 }
