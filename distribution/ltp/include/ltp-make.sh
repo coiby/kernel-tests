@@ -108,6 +108,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-aiocp-remove-the-check-read-unnecessary-flag.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-dirtyc0w_shmem_child-64k-pagesize.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-mount03-flip-to-the-next-second-before-doing-the-acc.patch
     fi
     if [ "$TESTVERSION" == "20220930" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
