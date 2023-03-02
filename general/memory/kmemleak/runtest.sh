@@ -45,9 +45,6 @@ export USE_GIT_CLONE=1
 
 # install kernel rpm package
 KERNURL=${KERNURL:-''}
-if [ -z "${KERNURL}" ]; then
-    KERNURL="http://shuwang-pc1.usersys.redhat.com/build/kernel.$(uname -m).rpm"
-fi
 
 # kmemleak target kernel
 KERNTARGET=${KERNTARGET:-'debugkernel'}
@@ -201,6 +198,10 @@ function install_upstream()
 
 function install_kernelurl()
 {
+    if [ -z "$KERNURL" ] && [ "$KERNTARGET" = "rpm" ]; then
+        echo "KERNURL is not provided!"
+        exit 1
+    fi
     if grep -w 1 DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline"
         uname -r | grep '+debug$' || rlLogError "debug kernel running?"
