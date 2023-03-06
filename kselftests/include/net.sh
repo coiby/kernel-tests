@@ -2,11 +2,8 @@
 # This file is used for network related tests configurations.
 
 # use it in a separate shell in case variables tainted
-krelease()
-{
-	source /etc/os-release
-	echo $VERSION_ID | awk -F. '{print $1}'
-}
+# rhel_mjor defined in include.sh
+krelease=$(rhel_major)
 
 get_default_iface()
 {
@@ -17,9 +14,9 @@ install_netsniff()
 {
 	which mausezahn && return 0
 
-	if [ $(krelease) -eq "8" ] || [ $(krelease) -eq "9" ]; then
+	if [ ${krelease} -eq "8" ] || [ ${krelease} -eq "9" ]; then
 		if ! rpm -q epel-release; then
-			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(krelease).noarch.rpm
+			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-${krelease}.noarch.rpm
 			local need_remove=1
 		else
 			local param="--enablerepo=epel"
@@ -54,10 +51,10 @@ install_sendip()
 install_scapy()
 {
 	scapy -h && return 0
-	[ "$(krelease)" -eq "8" ] && \
+	[ "${krelease}" -eq "8" ] && \
 		$pkg_mgr $pkg_mgr_inst_string https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 	$pkg_mgr $pkg_mgr_inst_string scapy
-	[ "$(krelease)" -eq "8" ] && rpm -e epel-release
+	[ "${krelease}" -eq "8" ] && rpm -e epel-release
 	scapy -h && return 0 || return 1
 }
 
@@ -179,7 +176,7 @@ do_net_forwarding_config()
 
 	pushd $EXEC_DIR/net/forwarding
 	# RHEL9 doesn't support meta
-	if [ $(krelease) -eq "9" ]; then
+	if [ ${krelease} -eq "9" ]; then
 		sed -i '0, /ets_test_strict/ {/ets_test_strict/d;}' sch_ets.sh
 		sed -i '0, /ets_test_mixed/ {/ets_test_mixed/d;}' sch_ets.sh
 		sed -i '0, /ets_test_dwrr/ {/ets_test_dwrr/d;}' sch_ets.sh
@@ -375,11 +372,11 @@ do_tc-testing_reset()
 # ----------- init setups -----------
 
 # source skip/waive list
-if [ $(krelease) -eq "8" ] || [ $(krelease) -eq "9" ]; then
+if [ ${krelease} -eq "8" ] || [ ${krelease} -eq "9" ]; then
 	[ ! -f skip_waive.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.$(krelease) -O skip_waive.list
+		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.${krelease} -O skip_waive.list
 	[ ! -f param.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.$(krelease) -O param.list
+		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.${krelease} -O param.list
 else
 	# This list is used for upstream testing
 	[ ! -f skip_waive.list ] && \

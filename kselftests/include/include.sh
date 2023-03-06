@@ -11,6 +11,18 @@ if [ ! "$RSTRNT_JOBID" ]; then
 	RES='\E[0m'
 fi
 
+
+rhel_major()
+{
+	source /etc/os-release
+	echo $VERSION_ID | awk -F. '{print $1}'
+}
+rhel_minor()
+{
+	source /etc/os-release
+	echo $VERSION_ID | awk -F. '{print $2}'
+}
+
 new_outputfile()
 {
 	[ "$RSTRNT_JOBID" ] && mktemp /mnt/testarea/tmp.XXXXXX || mktemp $LOG_DIR/tmp.XXXXXX
