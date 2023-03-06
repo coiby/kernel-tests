@@ -23,6 +23,13 @@ function disable_admission_control()
     check_status "Disable the admission control"
 }
 
+function restore_admission_control()
+{
+    echo "Restore the admission control" | tee -a $OUTPUTFILE
+    sysctl -w kernel.sched_rt_runtime_us=950000
+    check_status "Restore the admission control"
+}
+
 function runtest()
 {
     if ! ( (( "$rhel_major" == 8 && "$rhel_minor" >= 8 )) || (( "$rhel_major" == 9 && "$rhel_minor" >=2 )) || (( "$rhel_major" >= 10 ))); then
@@ -66,6 +73,7 @@ function runtest()
     disable_admission_control
     rtla timerlat hist -d 30s -c 0 -P d:100us:1ms
     check_status "rtla timerlat hist -d 30s -c 0 -P d:100us:1ms"
+    restore_admission_control
 
     if [ $result_r = "PASS" ]; then
         echo "Overall result: PASS" | tee -a $OUTPUTFILE
