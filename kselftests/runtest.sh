@@ -165,6 +165,11 @@ install_kselftests()
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${name}-modules-internal-${version}-${release}.${arch}.rpm"
         fi
         selftestsname="${name%-debug}"
+        # Due to bz2171995, since >= 9.3, rhel will merge PREEMPT_RT and build kernel-rt as a variant,
+        # and no package kernel-rt-selftests-internal, see bz2171995#c8 for details
+        if [[ $(rhel_major) -gt 9 || ( $(rhel_major) -eq 9 && $(rhel_minor) -ge 3 ) ]]; then
+            selftestsname="${selftestsname%-rt}"
+        fi
         if ! rpm -q ${selftestsname}-selftests-internal > /dev/null 2>&1; then
             rlRun "dnf download --resolve ${selftestsname}-selftests-internal-${version}-${release}.${arch}"
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${selftestsname}-selftests-internal-${version}-${release}.${arch}.rpm"
