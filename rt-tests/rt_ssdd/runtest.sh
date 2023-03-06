@@ -16,7 +16,7 @@ NFORKS=${NFORKS:=10}
 NITERS=${NITERS:=10000}
 
 echo "Runing ssdd $NFORKS $NITERS [default]" | tee -a $OUTPUTFILE
-ssdd $NFORKS $NITERS | tee SSDD1.LOG
+ssdd --forks=$NFORKS --iters=$NITERS | tee SSDD1.LOG
 rstrnt-report-log -l SSDD1.LOG
 if grep -q "All tests PASSED" SSDD1.LOG; then
     rstrnt-report-result $TEST "PASS" "0"
@@ -27,7 +27,7 @@ fi
 NFORKS=100
 NITERS=10000
 echo "Running ssdd $NFORKS $NITERS [stress]" | tee -a $OUTPUTFILE
-ssdd $NFORKS $NITERS | tee SSDD2.LOG
+ssdd --forks=$NFORKS --iters=$NITERS | tee SSDD2.LOG
 rstrnt-report-log -l SSDD2.LOG
 if grep -q "All tests PASSED" SSDD2.LOG; then
     rstrnt-report-result "ssdd stress" "PASS" "0"
