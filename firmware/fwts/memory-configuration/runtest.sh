@@ -14,8 +14,8 @@ fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # source fwts include/library
-echo `ls ..`
-.  ../include/runtest.sh || exit 1
+echo `ls ../../`
+.  ../../include/runtest.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
