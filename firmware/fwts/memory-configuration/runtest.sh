@@ -16,7 +16,7 @@ fi
 # source fwts include/library
 echo $(pwd)
 echo `ls .`
-echo 'ls ./..`
+echo `ls ./..`
 sleep 1h
 . ../include/runtest.sh || exit 1
 
