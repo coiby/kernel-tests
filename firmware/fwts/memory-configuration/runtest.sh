@@ -7,6 +7,7 @@ declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 
 # Include rhts environment
 if ! (($is_rhivos)); then
+    echo '+++++++++++++++++++++++++++++++++++"
     . /usr/bin/rhts-environment.sh || exit 1
 fi
 
@@ -14,6 +15,7 @@ fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # source fwts include/library
+echo `ls ..`
 . ../include/runtest.sh || exit 1
 
 rlJournalStart
