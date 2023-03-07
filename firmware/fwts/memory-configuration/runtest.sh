@@ -7,7 +7,7 @@ declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 
 # Include rhts environment
 if ! (($is_rhivos)); then
-    echo '+++++++++++++++++++++++++++++++++++"
+    echo "+++++++++++++++++++++++++++++++++++"
     . /usr/bin/rhts-environment.sh || exit 1
 fi
 
