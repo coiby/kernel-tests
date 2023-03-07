@@ -14,6 +14,7 @@ fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # source fwts include/library
+echo $(pwd)
 . ../include/runtest.sh || exit 1
 
 rlJournalStart
