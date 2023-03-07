@@ -15,6 +15,8 @@ fi
 
 # source fwts include/library
 echo $(pwd)
+echo `ls .`
+echo 'ls ./..`
 . ../include/runtest.sh || exit 1
 
 rlJournalStart
