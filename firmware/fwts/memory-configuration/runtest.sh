@@ -14,10 +14,6 @@ fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # source fwts include/library
-echo $(pwd)
-echo `ls .`
-echo `ls ./..`
-sleep 1h
 . ../include/runtest.sh || exit 1
 
 rlJournalStart
