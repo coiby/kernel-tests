@@ -59,6 +59,83 @@ Describe 'kpkginstall: parse_kpkg_url_variables'
 End
 
 
+Describe 'kpkginstall: clean_kpkg_url_variables'
+    Parameters
+        # KPKG_SOURCE_PACKAGE_NAME KPKG_PACKAGE_NAME KPKG_VAR_DEBUG_KERNEL EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME EXPECTED_KPKG_VAR_PACKAGE_NAME EXPECTED_KPKG_VAR_VARIANT_SUFFIX
+        # kernel source package with variants
+        kernel                     kernel            ""                    kernel                                kernel                         ""
+        kernel                     kernel-64k        ""                    kernel                                kernel-64k                     64k
+        kernel                     kernel-debug      ""                    kernel                                kernel-debug                   debug
+        kernel                     kernel-rt         ""                    kernel                                kernel-rt                      rt
+        # realtime branch
+        kernel-rt                  kernel-rt         ""                    kernel-rt                             kernel-rt                      ""
+        # debug jobs
+        kernel                     kernel            true                  kernel                                kernel-debug                   debug
+        kernel                     kernel-rt         true                  kernel                                kernel-rt-debug                rt-debug
+        # realtime branch debug jobs
+        kernel-rt                  kernel-rt         true                  kernel-rt                             kernel-rt-debug                debug
+    End
+    It "can clean $1/$2/$3"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$2
+        export KPKG_VAR_DEBUG_KERNEL=$3
+        export EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME=$4
+        export EXPECTED_KPKG_VAR_PACKAGE_NAME=$5
+        export EXPECTED_KPKG_VAR_VARIANT_SUFFIX=$6
+        When call clean_kpkg_url_variables
+        The variable KPKG_VAR_SOURCE_PACKAGE_NAME should equal "${EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME}"
+        The variable KPKG_VAR_PACKAGE_NAME should equal "${EXPECTED_KPKG_VAR_PACKAGE_NAME}"
+        The variable KPKG_VAR_VARIANT_SUFFIX should equal "${EXPECTED_KPKG_VAR_VARIANT_SUFFIX}"
+        The variable KPKG_VAR_DEBUG_KERNEL should be undefined
+        The status should be success
+    End
+End
+
+Describe 'kpkginstall: store_kpkg_url_variables'
+    setup() {
+        mkdir -p /var/tmp/kpkginstall/vars
+    }
+    cleanup() {
+        rm -rf /var/tmp/kpkginstall/vars
+    }
+    BeforeEach 'setup'
+    AfterEach 'cleanup'
+    It "can store KPKG_VAR_* variables"
+        export KPKG_VAR_FOO=foo
+        export KPKG_VAR_BAR=bar
+        export KPKG_BAZ=baz
+        When call store_kpkg_url_variables
+        The contents of file /var/tmp/kpkginstall/vars/KPKG_VAR_FOO should equal "${KPKG_VAR_FOO}"
+        The contents of file /var/tmp/kpkginstall/vars/KPKG_VAR_BAR should equal "${KPKG_VAR_BAR}"
+        The file /var/tmp/kpkginstall/vars/KPKG_BAZ should not be exist
+        The status should be success
+    End
+End
+
+Describe 'kpkginstall: load_kpkg_url_variables'
+    setup() {
+        mkdir -p /var/tmp/kpkginstall/vars
+    }
+    cleanup() {
+        rm -rf /var/tmp/kpkginstall/vars
+    }
+    BeforeEach 'setup'
+    AfterEach 'cleanup'
+    It "can load KPKG_VAR_* variables"
+        echo -n "foo" > /var/tmp/kpkginstall/vars/KPKG_VAR_FOO
+        echo -n "bar" > /var/tmp/kpkginstall/vars/KPKG_VAR_BAR
+        When call load_kpkg_url_variables
+        The variable KPKG_VAR_FOO should equal "foo"
+        The variable KPKG_VAR_BAR should equal "bar"
+        The status should be success
+    End
+
+    It "copes with an empty vars directory"
+        When call load_kpkg_url_variables
+        The status should be success
+    End
+End
+
 Describe 'kpkginstall: set_package_name set package name'
     setup() {
         mkdir -p /var/tmp/kpkginstall

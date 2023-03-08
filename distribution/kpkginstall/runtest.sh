@@ -50,7 +50,35 @@ function parse_kpkg_url_variables()
   for ((i=0; i<${#parm[@]}; i+=2))
   do
     cki_print_success "Found URL parameter: ${parm[i]^^}=${parm[i+1]}"
-    readonly "KPKG_VAR_${parm[i]^^}=${parm[i+1]}"
+    export "KPKG_VAR_${parm[i]^^}=${parm[i+1]}"
+  done
+}
+
+function clean_kpkg_url_variables()
+{
+  if [[ -v KPKG_VAR_PACKAGE_NAME ]]; then
+    if cki_is_true "${KPKG_VAR_DEBUG_KERNEL:-false}" && [[ ${KPKG_VAR_PACKAGE_NAME} != *-debug ]] ; then
+      KPKG_VAR_PACKAGE_NAME=${KPKG_VAR_PACKAGE_NAME}-debug
+    fi
+    unset KPKG_VAR_DEBUG_KERNEL
+    export KPKG_VAR_VARIANT_SUFFIX=${KPKG_VAR_PACKAGE_NAME#"${KPKG_VAR_SOURCE_PACKAGE_NAME}"}
+    KPKG_VAR_VARIANT_SUFFIX=${KPKG_VAR_VARIANT_SUFFIX#-}
+  fi
+}
+
+function store_kpkg_url_variables()
+{
+  for name in "${!KPKG_VAR_@}"; do
+    echo -n "${!name}" > "/var/tmp/kpkginstall/vars/${name}"
+  done
+}
+
+function load_kpkg_url_variables()
+{
+  for file in /var/tmp/kpkginstall/vars/*; do
+    if [[ -f ${file} ]]; then
+      export "${file##*/}=$(cat "${file}")"
+    fi
   done
 }
 
@@ -537,7 +565,7 @@ function main() {
       # If we haven't rebooted yet, then we shouldn't have the directory present on the system.
       rm -rfv /var/tmp/kpkginstall
       # Make a directory to hold small bits of information for the test.
-      mkdir -p /var/tmp/kpkginstall
+      mkdir -p /var/tmp/kpkginstall/vars
 
       # If the KPKG_URL contains a pound sign, then we have variables on the end
       # which need to be removed and parsed.
