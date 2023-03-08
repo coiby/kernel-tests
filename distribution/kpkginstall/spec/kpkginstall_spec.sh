@@ -124,49 +124,75 @@ End
 
 Describe 'kpkginstall: rpm_prepare'
     Parameters
-        kernel "$KERNEL_RPM_URL"
-        kernel-debug "$KERNEL_RPM_URL"
-        kernel-rt "$KERNEL_RPM_URL"
-        kernel-64k "$KERNEL_64k_RPM_URL"
+        kernel
+        kernel-64k
+        kernel-debug
+        kernel-rt
+        kernel-automotive
     End
     It "can prepare cki repo for package $1"
         export PACKAGE_NAME=$1
-        export KPKG_URL=$2
-        select_yum_tool(){
+        export KPKG_URL=https://some-url
+        select_yum_tool() {
             echo ""
         }
         excluded_pkgs="error: unset"
-        if [[ "${PACKAGE_NAME}" == "kernel" ]]; then
-            excluded_pkgs=(kernel-debug kernel-debug-core
-                           kernel-rt kernel-rt-core \
-                           kernel-rt-debug kernel-rt-debug-core \
-                           kernel-automotive kernel-automotive-debug \
-                           kernel-64k kernel-64k-debug)
-        fi
-        if [[ "${PACKAGE_NAME}" == "kernel-debug" ]]; then
-            excluded_pkgs=(kernel kernel-core \
-                           kernel-rt kernel-rt-core \
-                           kernel-rt-debug kernel-rt-debug-core
-                           kernel-automotive kernel-automotive-debug \
-                           kernel-64k kernel-64k-debug)
-        fi
-        if [[ "${PACKAGE_NAME}" == "kernel-rt" ]]; then
-            excluded_pkgs=(kernel kernel-core \
-                           kernel-debug kernel-debug-core \
-                           kernel-rt-debug kernel-rt-debug-core
-                           kernel-automotive kernel-automotive-debug \
-                           kernel-64k kernel-64k-debug)
-        fi
-        if [[ "${PACKAGE_NAME}" == "kernel-64k" ]]; then
-            excluded_pkgs=(kernel kernel-core \
-                           kernel-debug kernel-debug-core \
-                           kernel-rt kernel-rt-core \
-                           kernel-rt-debug kernel-rt-debug-core
-                           kernel-automotive kernel-automotive-debug)
-        fi
+        case "${PACKAGE_NAME}" in
+            kernel)
+                excluded_pkgs=(
+                    kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-debug
+                    kernel-rt kernel-rt-core
+                    kernel-rt-debug kernel-rt-debug-core
+                    kernel-automotive kernel-automotive-debug
+                )
+                ;;
+            kernel-64k)
+                excluded_pkgs=(
+                    kernel kernel-core
+                    kernel-debug kernel-debug-core
+                    kernel-rt kernel-rt-core
+                    kernel-rt-debug kernel-rt-debug-core
+                    kernel-automotive kernel-automotive-debug
+                )
+                ;;
+            kernel-debug)
+                excluded_pkgs=(
+                    kernel kernel-core
+                    kernel-64k kernel-64k-debug
+                    kernel-rt kernel-rt-core
+                    kernel-rt-debug kernel-rt-debug-core
+                    kernel-automotive kernel-automotive-debug
+                )
+                ;;
+            kernel-rt)
+                excluded_pkgs=(
+                    kernel kernel-core
+                    kernel-64k kernel-64k-debug
+                    kernel-debug kernel-debug-core
+                    kernel-rt-debug kernel-rt-debug-core
+                    kernel-automotive kernel-automotive-debug
+                )
+                ;;
+            kernel-automotive)
+                excluded_pkgs=(
+                    kernel kernel-core
+                    kernel-64k kernel-64k-debug
+                    kernel-debug kernel-debug-core
+                    kernel-rt kernel-rt-core
+                    kernel-rt-debug kernel-rt-debug-core
+                )
+                ;;
+            *)
+                false
+                ;;
+        esac
         When call rpm_prepare
         The line 2 should equal "✅ Kernel repository file deployed"
-        The contents of file /etc/yum.repos.d/kernel-cki.repo should include "exclude=${excluded_pkgs[*]}"
+        for excluded_pkg in "${excluded_pkgs[@]}"; do
+            The line 6 of contents of file /etc/yum.repos.d/kernel-cki.repo \
+                should match pattern "exclude=* ${excluded_pkg} *|exclude=${excluded_pkg} *|exclude=* ${excluded_pkg}"
+        done
     End
 End
 
