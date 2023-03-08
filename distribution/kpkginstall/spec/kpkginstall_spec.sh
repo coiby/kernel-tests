@@ -60,39 +60,46 @@ End
 
 
 Describe 'kpkginstall: set_package_name set package name'
-    setup(){
+    setup() {
         mkdir -p /var/tmp/kpkginstall
     }
-    cleanup(){
+    cleanup() {
         rm -rf /var/tmp/kpkginstall
     }
     BeforeEach 'setup'
     AfterEach 'cleanup'
     Parameters
-        kernel kernel kernel ""
-        kernel-rt kernel-rt kernel-rt ""
-        kernel-debug kernel kernel true
-        kernel-debug kernel-debug kernel ""
-        kernel-rt-debug kernel-rt kernel-rt true
-        kernel-64k kernel-64k kernel ""
+        # KPKG_SOURCE_PACKAGE_NAME KPKG_PACKAGE_NAME KPKG_VAR_DEBUG_KERNEL EXPECTED_PACKAGE_NAME
+        # kernel source package with variants
+        kernel                     kernel            ""                    kernel
+        kernel                     kernel-64k        ""                    kernel-64k
+        kernel                     kernel-debug      ""                    kernel-debug
+        kernel                     kernel-rt         ""                    kernel-rt
+        # realtime branch
+        kernel-rt                  kernel-rt         ""                    kernel-rt
+        # debug jobs
+        kernel                     kernel            true                  kernel-debug
+        kernel                     kernel-rt         true                  kernel-rt-debug
+        # realtime branch debug jobs
+        kernel-rt                  kernel-rt         true                  kernel-rt-debug
     End
-    It "can set $1 as package name"
-        export EXPECTED_PACKAGE_NAME=$1         # package_name + debug (in case of debug kernels)
+    It "can set $4 as package name"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
         export KPKG_VAR_PACKAGE_NAME=$2
-        export KPKG_VAR_SOURCE_PACKAGE_NAME=$3
-        export KPKG_VAR_DEBUG_KERNEL=$4
+        export KPKG_VAR_DEBUG_KERNEL=$3
+        export EXPECTED_PACKAGE_NAME=$4
         When call set_package_name
-        The first line should equal "✅ Found package name in URL variables: $KPKG_VAR_PACKAGE_NAME"
-        if [ -z "$KPKG_VAR_DEBUG_KERNEL" ]; then
-            The line 3 should equal "✅ Package name is set: $EXPECTED_PACKAGE_NAME (cached to disk)"
-            The line 4 should equal "✅ Source package name is set: $KPKG_VAR_SOURCE_PACKAGE_NAME (cached to disk)"
+        The first line should equal "✅ Found package name in URL variables: ${KPKG_VAR_PACKAGE_NAME}"
+        if [[ -z ${KPKG_VAR_DEBUG_KERNEL} ]]; then
+            The line 3 should equal "✅ Package name is set: ${EXPECTED_PACKAGE_NAME} (cached to disk)"
+            The line 4 should equal "✅ Source package name is set: ${KPKG_VAR_SOURCE_PACKAGE_NAME} (cached to disk)"
         else
             The line 3 should equal "ℹ️ Debug kernel was requested -- appending -debug to package name"
-            The line 4 should equal "✅ Package name is set: $EXPECTED_PACKAGE_NAME (cached to disk)"
-            The line 5 should equal "✅ Source package name is set: $KPKG_VAR_SOURCE_PACKAGE_NAME (cached to disk)"
+            The line 4 should equal "✅ Package name is set: ${EXPECTED_PACKAGE_NAME} (cached to disk)"
+            The line 5 should equal "✅ Source package name is set: ${KPKG_VAR_SOURCE_PACKAGE_NAME} (cached to disk)"
         fi
-        The contents of file /var/tmp/kpkginstall/KPKG_PACKAGE_NAME should equal "$EXPECTED_PACKAGE_NAME"
-        The contents of file /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME should equal "$SOURCE_PACKAGE_NAME"
+        The contents of file /var/tmp/kpkginstall/KPKG_PACKAGE_NAME should equal "${EXPECTED_PACKAGE_NAME}"
+        The contents of file /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME should equal "${SOURCE_PACKAGE_NAME}"
     End
 End
 
