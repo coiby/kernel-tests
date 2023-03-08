@@ -4,6 +4,7 @@ export TEST="rt-tests/us/rtla/rtla-timerlat"
 export result_r="PASS"
 export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+export SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
 
 function check_status()
 {
@@ -26,7 +27,11 @@ function disable_admission_control()
 function restore_admission_control()
 {
     echo "Restore the admission control" | tee -a $OUTPUTFILE
-    sysctl -w kernel.sched_rt_runtime_us=950000
+    if [ -n "$SCHED_RT_RUNTIME" ]; then
+        sysctl -w kernel.sched_rt_runtime_us=$SCHED_RT_RUNTIME
+    else
+        sysctl -w kernel.sched_rt_runtime_us=950000
+    fi
     check_status "Restore the admission control"
 }
 
