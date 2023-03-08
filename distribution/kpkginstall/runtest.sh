@@ -571,6 +571,8 @@ function main() {
       # which need to be removed and parsed.
       if [[ $KPKG_URL =~ \# ]]; then
           parse_kpkg_url_variables
+          clean_kpkg_url_variables
+          store_kpkg_url_variables
       fi
 
       if [ -z "${KPKG_URL}" ]; then
@@ -640,6 +642,8 @@ EOF
       # https://github.com/beaker-project/restraint/issues/219
       return 0
     else
+      load_kpkg_url_variables
+
       # set YUM var.
       select_yum_tool
 
