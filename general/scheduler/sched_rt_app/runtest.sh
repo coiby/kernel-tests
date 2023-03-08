@@ -141,6 +141,34 @@ function setup_rt_cgroup_bw()
 	return 0
 }
 
+function setup_cpu_affinity()
+{
+	local nr_available=$(nproc)
+	local nr_present=$(nproc --all)
+	local isolated=$(cat /sys/devices/system/cpu/isolated)
+
+	if ! grep -q isolcpus /proc/cmdline || ! uname -r | grep -q rt; then
+		# cpu isolation not enabled or not running a rt kernel
+		sed "/cpulist_placeholder/d" -i config/*.json
+		return
+	elif (( nr_available <= 2 )) && (( nr_present > nr_available )); then
+		# cpu isolation enabled and running a rt kernel and so few cores
+		# left for housekeeping
+		rlLog "using cpu affinity in the rt-app config files"
+		rlLog "nr_available: $nr_available, nr_present: $nr_present, isolated: $isolated"
+		for sublist in $(echo $isolated | tr ',' ' '); do
+			cpulist+=",$(seq -s ',' $(echo $sublist | tr '-' ' '))"
+		done
+		sed "s/cpulist_placeholder/${cpulist:1}/g" -i config/*.json
+		rlLog "using isolated cpulist: $cpulist"
+		rlRun "grep -n cpus config/*.json"
+	else
+		# cpu isolation enabled and running a rt kernel and more than 2
+		# cores are available for scheduling
+		sed "/cpulist_placeholder/d" -i config/*.json
+	fi
+}
+
 function test_setup()
 {
 	if ! (($is_rhivos)); then
@@ -239,6 +267,8 @@ function test_setup()
 	echo "checking cgroup hierachy start ..."
 	systemd-cgls | tee cgroups.txt
 	echo "checking cgroup hierachy end ..."
+
+	setup_cpu_affinity
 }
 
 

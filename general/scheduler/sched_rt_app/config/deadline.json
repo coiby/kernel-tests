@@ -8,6 +8,7 @@
 	 */
 	"tasks" : {
 		"thread0" : {
+			"cpus" : [cpulist_placeholder],
 			"instance" : 2,
 			"loop" : -1,
 			"run" :   100000,
@@ -20,6 +21,7 @@
 			"timer" : { "ref" : "unique", "period" : 100000 }
 		},
 		"thread1" : {
+			"cpus" : [cpulist_placeholder],
 			"instance" : 2,
 			"loop" : -1,
 			"run" :   100000,
@@ -41,6 +43,6 @@
 		"logdir" : "./deadline",
 		"log_basename" : "deadline",
 		"gnuplot" : true,
-		"mem_buffer_size" : 1000000000 
+		"mem_buffer_size" : 1000000000
 	}
 }

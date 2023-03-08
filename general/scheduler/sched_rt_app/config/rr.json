@@ -5,12 +5,14 @@
 	 */
 	"tasks" : {
 		"thread0" : {
+			"cpus" : [cpulist_placeholder],
 			"instance" : 1,
 			"loop" : -1,
 			"run" :   10000,
 			"timer" : { "ref" : "unique", "period" : 100000 }
 		},
 		"thread1" : {
+			"cpus" : [cpulist_placeholder],
 			"instance" : 1,
 			"loop" : -1,
 			"run" :   70000,
