@@ -371,7 +371,7 @@ End
 
 uname(){
     if [ "$1" == "-r" ];then
-        echo "$KERNEL_VERSION"
+        echo "${KVER_UNAME}"
     fi
     if [ "$1" == "-i" ];then
         echo "${ARCH}"
@@ -404,37 +404,55 @@ which(){
 }
 Describe 'kpkginstall: main - check installed kernel'
     Parameters
-        # package name - arch - rpm package name rpm dnf repo query - uname -r - kernel url
-        kernel "x86_64" "4.18.0-442.el8.x86_64" "4.18.0-442.el8.x86_64" "$KERNEL_RPM_URL"
-        kernel "x86_64" "6.1.0-rc7" "6.1.0-rc7" "$KERNEL_TGZ_URL"
-        kernel-rt "x86_64" "4.18.0-442.el8.x86_64" "4.18.0-442.el8.x86_64" "$KERNEL_REALTIME_RPM_URL"
-        kernel-64k "aarch64" "5.14.0-243.1820_756592390.el9.aarch64" "5.14.0-243.1820_756592390.el9.aarch64+64k" "$KERNEL_64k_RPM_URL"
-        kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_PARAM_RPM_URL"
-        kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_RPM_URL"
+        # SOURCE_PACKAGE_NAME    PACKAGE_NAME      ARCH     KVER_RPM                                 KVER_UNAME
+        # kernel source package with variants
+        kernel                   kernel            x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64"
+        kernel                   kernel-64k        aarch64  "5.14.0-243.1820_756592390.el9.aarch64"  "5.14.0-243.1820_756592390.el9.aarch64+64k"
+        kernel                   kernel-debug      s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x+debug"
+        ### missing and not working, uname includes +rt
+        # kernel                 kernel-rt         x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64+rt"
+        # realtime branch
+        kernel-rt                kernel-rt         s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
+        # debug jobs
+        ### missing and not working, uname includes +rt-debug
+        # kernel                 kernel-rt-debug   x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.s390x+rt-debug"
+        # realtime branch debug jobs
+        ### missing and not working, uname includes +debug
+        # kernel-rt              kernel-rt-debug   x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.s390x+debug"
+        # tarballs
+        kernel                   kernel            x86_64   "6.1.0-rc7"                              "6.1.0-rc7"
     End
-    setup(){
+    setup() {
         mkdir -p /var/tmp/kpkginstall
     }
-    cleanup(){
+    prepare() {
+        # skip the workaround from cross-compiling
+        mkdir -p "/usr/src/kernels/${KVER_UNAME}/scripts/basic/"
+        touch "/usr/src/kernels/${KVER_UNAME}/scripts/basic/fixdep"
+    }
+    cleanup() {
         rm -rf /var/tmp/kpkginstall
-        rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
+        rm -rf "/usr/src/kernels/${KVER_UNAME}/scripts/basic/"
     }
     BeforeEach 'setup'
     AfterEach 'cleanup'
     export REBOOTCOUNT=1
 
-    It "installed with KPKG_URL=$5"
-        ARCH="$2"
-        KVER="$3"
-        #KVER is updated with in the main function
-        KERNEL_VERSION="$4"
-        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
-        # skip the workaround from cross-compiling
-        mkdir -p /usr/src/kernels/"$KERNEL_VERSION"/scripts/basic/
-        touch /usr/src/kernels/"$KERNEL_VERSION"/scripts/basic/fixdep
+    It "installed with $1/$2/$3"
+        SOURCE_PACKAGE_NAME=$1
+        PACKAGE_NAME=$2
+        ARCH=$3
+        KVER=$4
+        KVER_UNAME=$5
+        echo "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
+        echo "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        if [[ ${PACKAGE_NAME} = *-debug ]]; then
+            echo "true" > /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL
+        fi
+        prepare
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
-        The stdout should include "Running kernel version string:     ${4}"
+        The stdout should include "Running kernel version string:     ${KVER_UNAME}"
         The stdout should include "✅ Found the correct kernel version running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
@@ -442,15 +460,19 @@ Describe 'kpkginstall: main - check installed kernel'
         The status should be success
     End
 
-    It "can detect Call Traces on dmesg with KPKG_URL=$3"
-        KVER="$2"
-        #KVER is updated with in the main function
-        KERNEL_VERSION="$2"
-        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
-        # skip the workaround from cross-compiling
-        mkdir -p /usr/src/kernels/"$KVER"/scripts/basic/
-        touch /usr/src/kernels/"$KVER"/scripts/basic/fixdep
+    It "can detect Call Traces on dmesg with $1/$2/$3"
+        SOURCE_PACKAGE_NAME=$1
+        PACKAGE_NAME=$2
+        ARCH=$3
+        KVER=$4
+        KVER_UNAME=$5
+        echo "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
+        echo "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        if [[ ${PACKAGE_NAME} = *-debug ]]; then
+            echo "true" > /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL
+        fi
         export MOCKED_DMESG="Call Trace:"
+        prepare
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel version running!"
@@ -460,15 +482,19 @@ Describe 'kpkginstall: main - check installed kernel'
         The status should be success
     End
 
-    It "can detect Call Traces on journalctl with KPKG_URL=$3"
-        KVER="$2"
-        #KVER is updated with in the main function
-        KERNEL_VERSION="$2"
-        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
-        # skip the workaround from cross-compiling
-        mkdir -p /usr/src/kernels/"$KVER"/scripts/basic/
-        touch /usr/src/kernels/"$KVER"/scripts/basic/fixdep
+    It "can detect Call Traces on journalctl with $1/$2/$3"
+        SOURCE_PACKAGE_NAME=$1
+        PACKAGE_NAME=$2
+        ARCH=$3
+        KVER=$4
+        KVER_UNAME=$5
+        echo "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
+        echo "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        if [[ ${PACKAGE_NAME} = *-debug ]]; then
+            echo "true" > /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL
+        fi
         export MOCKED_JOURNALCTL="Call Trace:"
+        prepare
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel version running!"
@@ -517,7 +543,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
     It "installed with KPKG_URL=$3 with cross compiling"
         KVER="$2"
         #KVER is updated with in the main function
-        KERNEL_VERSION="$2"
+        KVER_UNAME="$2"
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
@@ -540,7 +566,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
     It "installed with KPKG_URL=$3 with cross compiling fails on olddefconfig"
         KVER="$2"
         #KVER is updated with in the main function
-        KERNEL_VERSION="$2"
+        KVER_UNAME="$2"
         export OLDERCONFIG_EXIT_CODE=1
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # Make sure it will execute cross compiling path
@@ -554,7 +580,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel version running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
-        The stdout should not include "make -C /usr/src/kernels/$KERNEL_VERSION modules_prepare"
+        The stdout should not include "make -C /usr/src/kernels/$KVER_UNAME modules_prepare"
         The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
@@ -563,7 +589,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
     It "installed with KPKG_URL=$3 with cross compiling fails on modules_prepare"
         KVER="$2"
         #KVER is updated with in the main function
-        KERNEL_VERSION="$2"
+        KVER_UNAME="$2"
         export MODULES_PREPARE_EXIT_CODE=1
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # Make sure it will execute cross compiling path
@@ -577,7 +603,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel version running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
-        The stdout should not include "make -C /usr/src/kernels/$KERNEL_VERSION scripts"
+        The stdout should not include "make -C /usr/src/kernels/$KVER_UNAME scripts"
         The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
@@ -586,7 +612,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
     It "installed with KPKG_URL=$3 with cross compiling fails on scripts"
         KVER="$2"
         #KVER is updated with in the main function
-        KERNEL_VERSION="$2"
+        KVER_UNAME="$2"
         export SCRIPTS_EXIT_CODE=1
         echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
         # Make sure it will execute cross compiling path
