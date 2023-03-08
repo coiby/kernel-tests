@@ -79,8 +79,8 @@ function load_kpkg_url_variables()
 
 function print_kpkg_url_variables_rpm()
 {
-  cki_print_success "Source package: ${KPKG_VAR_SOURCE_PACKAGE_NAME}"
-  cki_print_success "Package: ${KPKG_VAR_PACKAGE_NAME}"
+  cki_print_success "Source package name: ${KPKG_VAR_SOURCE_PACKAGE_NAME}"
+  cki_print_success "Package name: ${KPKG_VAR_PACKAGE_NAME}"
   cki_print_success "Variant suffix: ${KPKG_VAR_VARIANT_SUFFIX}"
 }
 
