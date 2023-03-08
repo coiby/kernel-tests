@@ -610,18 +610,14 @@ EOF
       fi
 
       # Make a list of kernel versions we expect to see after reboot.
-      # the debug suffix on kernel names do not apply for kernel builds from tarball
-      if [[ ${KPKG_VAR_PACKAGE_NAME} == *-debug ]] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
+      if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
         valid_kernel_versions=(
-          "${KVER}.debug"           # RHEL 7 style debug kernels
-          "${KVER}+debug"           # RHEL 8 style debug kernels
+          "${KVER//.$(uname -i)/}"
         )
       else
-        KVER=${KVER//.$(uname -i)/}
         valid_kernel_versions=(
-          "${KVER}"
-          "${KVER}.${ARCH}"
-          "${KVER}.${ARCH}+64k"
+          "${KVER}${KPKG_VAR_VARIANT_SUFFIX:+.${KPKG_VAR_VARIANT_SUFFIX}}"           # RHEL 7 style kernel variants
+          "${KVER}${KPKG_VAR_VARIANT_SUFFIX:++${KPKG_VAR_VARIANT_SUFFIX}}"           # RHEL 8 style kernel variants
         )
       fi
       ckver=$(uname -r)

@@ -453,7 +453,11 @@ get_kpkg_ver() {
     return 0
 }
 cat(){
-    echo "cat $*"
+    if [[ $1 == /var/* ]]; then
+        command cat "$@"
+    else
+        echo "cat $*"
+    fi
 }
 io_test(){
     return 10
@@ -472,24 +476,20 @@ which(){
 }
 Describe 'kpkginstall: main - check installed kernel'
     Parameters
-        # SOURCE_PACKAGE_NAME    PACKAGE_NAME      ARCH     KVER_RPM                                 KVER_UNAME
+        # URL                                      SOURCE_PACKAGE_NAME      PACKAGE_NAME      VARIANT_SUFFIX ARCH     KVER_RPM                                 KVER_UNAME
         # kernel source package with variants
-        kernel                   kernel            x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64"
-        kernel                   kernel-64k        aarch64  "5.14.0-243.1820_756592390.el9.aarch64"  "5.14.0-243.1820_756592390.el9.aarch64+64k"
-        ### broken, there are currently no debug jobs on s390x, but the uname includes +debug
-        kernel                   kernel-debug      s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
-        ### missing and not working, uname includes +rt
-        # kernel                 kernel-rt         x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64+rt"
+        "${KERNEL_RPM_URL}"                        kernel                   kernel            ""             x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64"
+        "${KERNEL_64k_RPM_URL}"                    kernel                   kernel-64k        64k            aarch64  "5.14.0-243.1820_756592390.el9.aarch64"  "5.14.0-243.1820_756592390.el9.aarch64+64k"
+        "${KERNEL_DEBUG_RPM_URL}"                  kernel                   kernel-debug      debug          s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x+debug"
+        "${KERNEL_RT_RPM_URL}"                     kernel                   kernel-rt         rt             x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64+rt"
         # realtime branch
-        kernel-rt                kernel-rt         s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
+        "${KERNEL_REALTIME_RPM_URL}"               kernel-rt                kernel-rt         ""             s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
         # debug jobs
-        ### missing and not working, uname includes +rt-debug
-        # kernel                 kernel-rt-debug   x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.s390x+rt-debug"
+        "${KERNEL_DEBUG_PARAM_RPM_URL}"            kernel                   kernel-rt-debug   rt-debug       x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.x86_64+rt-debug"
         # realtime branch debug jobs
-        ### missing and not working, uname includes +debug
-        # kernel-rt              kernel-rt-debug   x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.s390x+debug"
+        "${KERNEL_REALTIME_DEBUG_PARAM_RPM_URL}"   kernel-rt                kernel-rt-debug   debug          x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.x86_64+debug"
         # tarballs
-        kernel                   kernel            x86_64   "6.1.0-rc7"                              "6.1.0-rc7"
+        "${KERNEL_TGZ_URL}"                        kernel                   kernel            ""             x86_64   "6.1.0-rc7"                              "6.1.0-rc7"
     End
     setup() {
         mkdir -p /var/tmp/kpkginstall/vars
@@ -507,14 +507,14 @@ Describe 'kpkginstall: main - check installed kernel'
     AfterEach 'cleanup'
     export REBOOTCOUNT=1
 
-    It "installed with $1/$2/$3"
-        KPKG_VAR_SOURCE_PACKAGE_NAME=$1
-        KPKG_VAR_PACKAGE_NAME=$2
-        ARCH=$3
-        KVER=$4
-        KVER_UNAME=$5
-        echo "${KPKG_VAR_SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/vars/KPKG_VAR_SOURCE_PACKAGE_NAME
-        echo "${KPKG_VAR_PACKAGE_NAME}" > /var/tmp/kpkginstall/vars/KPKG_VAR_PACKAGE_NAME
+    It "installed with $1"
+        KPKG_URL=$1
+        KPKG_VAR_SOURCE_PACKAGE_NAME=$2
+        KPKG_VAR_PACKAGE_NAME=$3
+        KPKG_VAR_VARIANT_SUFFIX=$4
+        ARCH=$5
+        KVER=$6
+        KVER_UNAME=$7
         prepare
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
@@ -526,14 +526,14 @@ Describe 'kpkginstall: main - check installed kernel'
         The status should be success
     End
 
-    It "can detect Call Traces on dmesg with $1/$2/$3"
-        KPKG_VAR_SOURCE_PACKAGE_NAME=$1
-        KPKG_VAR_PACKAGE_NAME=$2
-        ARCH=$3
-        KVER=$4
-        KVER_UNAME=$5
-        echo "${KPKG_VAR_SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/vars/KPKG_VAR_SOURCE_PACKAGE_NAME
-        echo "${KPKG_VAR_PACKAGE_NAME}" > /var/tmp/kpkginstall/vars/KPKG_VAR_PACKAGE_NAME
+    It "can detect Call Traces on dmesg with $1"
+        KPKG_URL=$1
+        KPKG_VAR_SOURCE_PACKAGE_NAME=$2
+        KPKG_VAR_PACKAGE_NAME=$3
+        KPKG_VAR_VARIANT_SUFFIX=$4
+        ARCH=$5
+        KVER=$6
+        KVER_UNAME=$7
         export MOCKED_DMESG="Call Trace:"
         prepare
         When call main
@@ -545,14 +545,14 @@ Describe 'kpkginstall: main - check installed kernel'
         The status should be success
     End
 
-    It "can detect Call Traces on journalctl with $1/$2/$3"
-        KPKG_VAR_SOURCE_PACKAGE_NAME=$1
-        KPKG_VAR_PACKAGE_NAME=$2
-        ARCH=$3
-        KVER=$4
-        KVER_UNAME=$5
-        echo "${KPKG_VAR_SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/vars/KPKG_VAR_SOURCE_PACKAGE_NAME
-        echo "${KPKG_VAR_PACKAGE_NAME}" > /var/tmp/kpkginstall/vars/KPKG_VAR_PACKAGE_NAME
+    It "can detect Call Traces on journalctl with $1"
+        KPKG_URL=$1
+        KPKG_VAR_SOURCE_PACKAGE_NAME=$2
+        KPKG_VAR_PACKAGE_NAME=$3
+        KPKG_VAR_VARIANT_SUFFIX=$4
+        ARCH=$5
+        KVER=$6
+        KVER_UNAME=$7
         export MOCKED_JOURNALCTL="Call Trace:"
         prepare
         When call main
