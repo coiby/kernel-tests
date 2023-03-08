@@ -4,6 +4,7 @@ export TEST="rt-tests/us/rtla/rtla-timerlat"
 export result_r="PASS"
 export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+export SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
 
 function check_status()
 {
@@ -13,6 +14,25 @@ function check_status()
         result_r="FAIL"
         echo ":: $* :: FAIL ::" | tee -a $OUTPUTFILE
     fi
+}
+
+#timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it.
+function disable_admission_control()
+{
+    echo "Disable the admission control" | tee -a $OUTPUTFILE
+    sysctl -w kernel.sched_rt_runtime_us=-1
+    check_status "Disable the admission control"
+}
+
+function restore_admission_control()
+{
+    echo "Restore the admission control" | tee -a $OUTPUTFILE
+    if [ -n "$SCHED_RT_RUNTIME" ]; then
+        sysctl -w kernel.sched_rt_runtime_us=$SCHED_RT_RUNTIME
+    else
+        sysctl -w kernel.sched_rt_runtime_us=950000
+    fi
+    check_status "Restore the admission control"
 }
 
 function runtest()
@@ -55,8 +75,10 @@ function runtest()
     check_status "rtla timerlat hist -i 2 -c 0 -n"
 
     echo "-- rtla-timerlat:  rtla-timerlat hist test---------------" | tee -a $OUTPUTFILE
+    disable_admission_control
     rtla timerlat hist -d 30s -c 0 -P d:100us:1ms
     check_status "rtla timerlat hist -d 30s -c 0 -P d:100us:1ms"
+    restore_admission_control
 
     if [ $result_r = "PASS" ]; then
         echo "Overall result: PASS" | tee -a $OUTPUTFILE
