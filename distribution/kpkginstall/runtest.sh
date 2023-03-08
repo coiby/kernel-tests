@@ -7,10 +7,16 @@ REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
 
 # supported kernel packages
-SUPPORTED_KERNEL_PKGS=(kernel kernel-core kernel-debug kernel-debug-core \
-kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-debug-core \
-kernel-automotive kernel-automotive-debug \
-kernel-64k kernel-64k-debug)
+SUPPORTED_KERNEL_PKGS=(
+  kernel kernel-core
+  kernel-debug kernel-debug-core
+  kernel-64k kernel-64k-core
+  kernel-64k-debug kernel-64k-debug-core
+  kernel-rt kernel-rt-core
+  kernel-rt-debug kernel-rt-debug-core
+  kernel-automotive kernel-automotive-core
+  kernel-automotive-debug kernel-automotive-debug-core
+)
 
 # Bring in library functions.
 FILE=$(readlink -f "${BASH_SOURCE[0]}")

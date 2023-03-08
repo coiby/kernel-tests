@@ -166,9 +166,11 @@ End
 Describe 'kpkginstall: rpm_prepare'
     Parameters
         kernel
-        kernel-64k
         kernel-debug
+        kernel-64k
+        kernel-64k-debug
         kernel-rt
+        kernel-rt-debug
         kernel-automotive
     End
     It "can prepare cki repo for package $1"
@@ -182,46 +184,76 @@ Describe 'kpkginstall: rpm_prepare'
             kernel)
                 excluded_pkgs=(
                     kernel-debug kernel-debug-core
-                    kernel-64k kernel-64k-debug
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
                     kernel-rt kernel-rt-core
                     kernel-rt-debug kernel-rt-debug-core
-                    kernel-automotive kernel-automotive-debug
+                    kernel-automotive kernel-automotive-core
+                    kernel-automotive-debug kernel-automotive-debug-core
+                )
+                ;;
+            kernel-debug)
+                excluded_pkgs=(
+                    kernel kernel-core
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
+                    kernel-rt kernel-rt-core
+                    kernel-rt-debug kernel-rt-debug-core
+                    kernel-automotive kernel-automotive-core
+                    kernel-automotive-debug kernel-automotive-debug-core
                 )
                 ;;
             kernel-64k)
                 excluded_pkgs=(
                     kernel kernel-core
                     kernel-debug kernel-debug-core
+                    kernel-64k-debug kernel-64k-debug-core
                     kernel-rt kernel-rt-core
                     kernel-rt-debug kernel-rt-debug-core
-                    kernel-automotive kernel-automotive-debug
+                    kernel-automotive kernel-automotive-core
+                    kernel-automotive-debug kernel-automotive-debug-core
                 )
                 ;;
-            kernel-debug)
+            kernel-64k-debug)
                 excluded_pkgs=(
                     kernel kernel-core
-                    kernel-64k kernel-64k-debug
+                    kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-core
                     kernel-rt kernel-rt-core
                     kernel-rt-debug kernel-rt-debug-core
-                    kernel-automotive kernel-automotive-debug
+                    kernel-automotive kernel-automotive-core
+                    kernel-automotive-debug kernel-automotive-debug-core
                 )
                 ;;
             kernel-rt)
                 excluded_pkgs=(
                     kernel kernel-core
-                    kernel-64k kernel-64k-debug
                     kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
                     kernel-rt-debug kernel-rt-debug-core
-                    kernel-automotive kernel-automotive-debug
+                    kernel-automotive kernel-automotive-core
+                )
+                ;;
+            kernel-rt-debug)
+                excluded_pkgs=(
+                    kernel kernel-core
+                    kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
+                    kernel-rt kernel-rt-core
+                    kernel-automotive kernel-automotive-core
                 )
                 ;;
             kernel-automotive)
                 excluded_pkgs=(
                     kernel kernel-core
-                    kernel-64k kernel-64k-debug
                     kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
                     kernel-rt kernel-rt-core
                     kernel-rt-debug kernel-rt-debug-core
+                    kernel-automotive-debug kernel-automotive-debug-core
                 )
                 ;;
             *)
