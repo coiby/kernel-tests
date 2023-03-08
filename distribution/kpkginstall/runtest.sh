@@ -6,16 +6,12 @@ ARCH=$(uname -m)
 REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
 PACKAGE_NAME=""
-IS_DEBUG_KERNEL="false"
 
 # supported kernel packages
 SUPPORTED_KERNEL_PKGS=(kernel kernel-core kernel-debug kernel-debug-core \
 kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-debug-core \
 kernel-automotive kernel-automotive-debug \
 kernel-64k kernel-64k-debug)
-
-# default values for URL parameters
-KPKG_VAR_DEBUG_KERNEL="false"
 
 # Bring in library functions.
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
@@ -105,9 +101,6 @@ function set_package_name()
   if [ -n "${KPKG_VAR_PACKAGE_NAME:-}" ]; then
     PACKAGE_NAME=$KPKG_VAR_PACKAGE_NAME
     cki_print_success "Found package name in URL variables: ${PACKAGE_NAME}"
-    if [[ "${PACKAGE_NAME}" =~ "-debug" ]]; then
-        IS_DEBUG_KERNEL="true"
-    fi
   fi
 
   # If the pipeline provides the source package name after the # sign in the URL, we
@@ -117,24 +110,11 @@ function set_package_name()
     cki_print_success "Found source package name in URL variables: ${SOURCE_PACKAGE_NAME}"
   fi
 
-  # Append "-debug" if we were asked to install the debug kernel.
-  if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}" && [[ ! "${PACKAGE_NAME}" =~ "-debug" ]] ; then
-    cki_print_info "Debug kernel was requested -- appending -debug to package name"
-    PACKAGE_NAME=${PACKAGE_NAME}-debug
-    IS_DEBUG_KERNEL="true"
-  fi
-
   # Write the PACKAGE_NAME to a file so we have it after reboot.
   echo -n "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
   echo -n "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
   cki_print_success "Package name is set: ${PACKAGE_NAME} (cached to disk)"
   cki_print_success "Source package name is set: ${SOURCE_PACKAGE_NAME} (cached to disk)"
-
-  # If we are installing a debug kernel, make a reminder for us to check for
-  # a debug kernel after the reboot
-  if cki_is_true "${IS_DEBUG_KERNEL}"; then
-    echo "true" > /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL
-  fi
 }
 
 function get_kpkg_ver()
@@ -356,7 +336,7 @@ function download_install_package()
 
     # install
     cki_print_info "$1 will be installed using rpm-ostree override"
-    if ! cki_is_true "${IS_DEBUG_KERNEL}"; then
+    if ! [[ ${PACKAGE_NAME} == *-debug ]]; then
       if rpm-ostree override replace ./kernel*.rpm > /dev/null; then
         cki_print_success "Installed $1 successfully"
       else
@@ -388,7 +368,7 @@ function rpm_install()
 
   # Ensure that the debug kernel is selected as the default kernel in
   # /boot/grub2/grubenv.
-  if cki_is_true "${IS_DEBUG_KERNEL}" && [[ -z $RPM_OSTREE ]]; then
+  if [[ ${PACKAGE_NAME} == *-debug ]] && [[ -z $RPM_OSTREE ]]; then
     echo "Adjusting settings in /etc/sysconfig/kernel to set debug as default"
     echo "UPDATEDEFAULT=yes" > /etc/sysconfig/kernel
     echo "DEFAULTKERNEL=kernel-debug" >> /etc/sysconfig/kernel
@@ -658,7 +638,7 @@ EOF
 
       # Make a list of kernel versions we expect to see after reboot.
       # the debug suffix on kernel names do not apply for kernel builds from tarball
-      if [ -f /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL ] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
+      if [[ ${PACKAGE_NAME} == *-debug ]] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
         valid_kernel_versions=(
           "${KVER}.debug"           # RHEL 7 style debug kernels
           "${KVER}+debug"           # RHEL 8 style debug kernels
