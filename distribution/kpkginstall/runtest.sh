@@ -385,7 +385,7 @@ function rpm_install()
       fi
     fi
 
-    if [[ ${KPKG_VAR_PACKAGE_NAME} =~ "kernel-rt" ]]; then
+    if [[ ${KPKG_VAR_PACKAGE_NAME} == kernel-rt* ]]; then
       if $YUM install -y "/usr/sbin/kernel-is-rt" > /dev/null; then
         cki_print_success "Installed /usr/sbin/kernel-is-rt successfully"
       else
