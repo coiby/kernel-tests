@@ -253,58 +253,71 @@ End
 
 Describe 'kpkginstall: rpm_install'
     Parameters
-        kernel kernel "s390x" "4.18.0-442.el8.s390x" "" "$KERNEL_RPM_URL"
-        kernel-debug kernel "s390x" "4.18.0-442.el8.s390x" true "$KERNEL_RPM_URL"
-        kernel-debug kernel-debug "s390x" "5.14.0-276.el9.s390x" "true" "$KERNEL_RPM_URL"
-        kernel-rt kernel-rt "s390x" "4.18.0-442.el8.s390x" "" "$KERNEL_RPM_URL"
-        kernel-64k kernel-64k "aarch64" "5.14.0-243.1820_756592390.el9.aarch64" "" "$KERNEL_64k_RPM_URL"
+        # SOURCE_PACKAGE_NAME    PACKAGE_NAME      ARCH     KVER_RPM                                 EXPECTED_KVER_UNAME
+        # kernel source package with variants
+        kernel                   kernel            s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
+        kernel                   kernel-64k        aarch64  "5.14.0-243.1820_756592390.el9.aarch64"  "5.14.0-243.1820_756592390.el9.aarch64+64k"
+        ### broken, there are currently no debug jobs on s390x, but the uname includes +debug
+        kernel                   kernel-debug      s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x"
+        ### missing and not working, the uname is different for variant builds and includes +rt
+        # kernel                 kernel-rt         s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x+rt"
+        # realtime branch
+        kernel-rt                kernel-rt         s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
+        # debug jobs
+        ### missing and not working, the uname is different for variant builds and includes +rt-debug
+        # kernel                 kernel-rt-debug   s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x+rt-debug"
+        # realtime branch debug jobs
+        ### broken, there are currently no debug jobs on s390x, but the uname includes +debug
+        kernel-rt                kernel-rt-debug   s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x"
     End
-    setup(){
+    setup() {
         mkdir -p /var/tmp/kpkginstall
     }
-    cleanup(){
+    cleanup() {
         rm -rf /var/tmp/kpkginstall
     }
     BeforeEach 'setup'
     AfterEach 'cleanup'
-    It "can install $1"
-        export PACKAGE_NAME="$2"
-        export IS_DEBUG_KERNEL="$5"
-        export KPKG_URL="$6"
+    It "can install $1/$2/$3"
+        export SOURCE_PACKAGE_NAME=$1
+        export PACKAGE_NAME=$2
+        export ARCH=$3
+        export KVER_RPM=$4
+        export EXPECTED_KVER_UNAME=$5
         export YUM=dnf
-        export ARCH="$3"
-        export KVER_RPM="$4"
-        export KVER_UNAME="$KVER_RPM"
-        if [ "$PACKAGE_NAME" == "kernel-64k" ]; then
-            KVER_UNAME="${KVER_UNAME}+64k"
+        export KPKG_URL=https://some-url
+        if [[ ${PACKAGE_NAME} = *-debug ]]; then
+            IS_DEBUG_KERNEL=true
+        else
+            IS_DEBUG_KERNEL=
         fi
-        echo  "$KVER_RPM" > /var/tmp/kpkginstall/KPKG_KVER
-        dnf(){
+        echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER
+        dnf() {
             return 0
         }
-        grubby(){
+        grubby() {
             echo "grubby $*"
         }
-        zipl(){
+        zipl() {
             echo "zipl"
         }
         When call rpm_install
-        The first line should equal "ℹ️ rpm_install: Extracting kernel version from $KPKG_URL"
-        The third line should equal "✅ Kernel version is $KVER_RPM"
-        The stdout should include "✅ Downloaded ${PACKAGE_NAME}-$KVER_RPM successfully"
-        The stdout should include "✅ Installed ${PACKAGE_NAME}-$KVER_RPM successfully"
-        if [ "$PACKAGE_NAME" == "kernel-rt" ]; then
+        The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
+        The third line should equal "✅ Kernel version is ${KVER_RPM}"
+        The stdout should include "✅ Downloaded ${PACKAGE_NAME}-${KVER_RPM} successfully"
+        The stdout should include "✅ Installed ${PACKAGE_NAME}-${KVER_RPM} successfully"
+        if [[ ${PACKAGE_NAME} == kernel-rt* ]]; then
             The stdout should include "✅ Installed /usr/sbin/kernel-is-rt successfully"
         fi
         # message that is added on debug kernels
-        if [ -n "$IS_DEBUG_KERNEL" ]; then
+        if [[ -n ${IS_DEBUG_KERNEL} ]]; then
             The stdout should include "✅ Updated /etc/sysconfig/kernel to set debug kernels as default"
             The contents of file /etc/sysconfig/kernel should include "UPDATEDEFAULT=yes"
             The contents of file /etc/sysconfig/kernel should include "DEFAULTKERNEL=kernel-debug"
             The contents of file /etc/sysconfig/kernel should include "DEFAULTDEBUG=yes"
         fi
-        The stdout should include "grubby --set-default /boot/vmlinuz-$KVER_UNAME"
-        if [ "$ARCH" == "s390x" ]; then
+        The stdout should include "grubby --set-default /boot/vmlinuz-${EXPECTED_KVER_UNAME}"
+        if [[ ${ARCH} == s390x ]]; then
             The stdout should include "zipl"
             The stdout should include "✅ Grubby workaround for s390x completed"
         fi
