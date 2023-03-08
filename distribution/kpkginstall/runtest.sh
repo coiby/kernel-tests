@@ -365,16 +365,16 @@ function rpm_install()
       cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
       cki_print_warning "Note that some tests might require the package and can fail!"
     fi
-    if $YUM install -y "${SOURCE_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
+    if $YUM install -y "${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
     else
-      cki_print_warning "No package ${SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
+      cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
       # shellcheck disable=SC2010
-      ALT_HEADERS=$(ls "${SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
+      ALT_HEADERS=$(ls "${KPKG_VAR_SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
       if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
           cki_print_success "Installed ${ALT_HEADERS} successfully"
       else
-          cki_print_warning "No package ${SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
+          cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
           cki_print_warning "Note that some tests might require the package and can fail!"
       fi
     fi
