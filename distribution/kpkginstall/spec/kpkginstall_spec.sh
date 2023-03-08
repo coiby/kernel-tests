@@ -3,38 +3,61 @@ eval "$(shellspec - -c) exit 1"
 
 Include distribution/kpkginstall/runtest.sh
 
+# kernel source package with variants
 KERNEL_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel&amp;source_package_name=kernel"
-KERNEL_RT_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel-rt&amp;source_package_name=kernel-rt"
-KERNEL_DEBUG_PARAM_RPM_URL="https://example.com/job/12345/repo#package_name=kernel&amp;source_package_name=kernel&amp;debug_kernel=true"
-KERNEL_DEBUG_PKG_RPM_URL="https://example.com/job/12345/x86_64/5.14.0-276.2037_789873082.el9.x86_64#package_name=kernel-debug&source_package_name=kernel"
 KERNEL_64k_RPM_URL="https://example.com/job/12345/repo#package_name=kernel-64k&amp;source_package_name=kernel"
+KERNEL_DEBUG_RPM_URL="https://example.com/job/12345/x86_64/5.14.0-276.2037_789873082.el9.x86_64#package_name=kernel-debug&source_package_name=kernel"
+KERNEL_RT_RPM_URL="https://example.com/job/12345/x86_64/5.14.0-276.2037_789873082.el9.x86_64#package_name=kernel-rt&source_package_name=kernel"
+# realtime branch
+KERNEL_REALTIME_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel-rt&amp;source_package_name=kernel-rt"
+# debug jobs
+KERNEL_DEBUG_PARAM_RPM_URL="https://example.com/job/12345/repo#package_name=kernel&amp;source_package_name=kernel&amp;debug_kernel=true"
+KERNEL_RT_DEBUG_PARAM_RPM_URL="https://example.com/job/12345/repo#package_name=kernel-rt&amp;source_package_name=kernel&amp;debug_kernel=true"
+# realtime branch debug jobs
+KERNEL_REALTIME_DEBUG_PARAM_RPM_URL="https://example.com/715398316/x86_64/5.14.0-207.mr1748_715398316.el9.x86_64#package_name=kernel-rt&amp;source_package_name=kernel-rt&amp;debug_kernel=true"
+# tarballs
 KERNEL_TGZ_URL="https://example.com/715092599/x86_64/artifacts/kernel-mainline.kernel.org-redhat_715092599_x86_64.tar.gz#package_name=kernel&amp;source_package_name=kernel"
 
 Describe 'kpkginstall: parse_kpkg_url_variables'
     __end__() {
         # The "run source" is run in a subshell, so you need to use "%preserve"
         # to preserve variables
-        %preserve KPKG_VAR_PACKAGE_NAME KPKG_VAR_DEBUG_KERNEL
+        %preserve KPKG_VAR_SOURCE_PACKAGE_NAME KPKG_VAR_PACKAGE_NAME KPKG_VAR_DEBUG_KERNEL
     }
     Parameters
-        "kernel" kernel "" rpms "$KERNEL_RPM_URL"
-        "kernel-rt" kernel-rt "" rpms "$KERNEL_RT_RPM_URL"
-        "kernel-debug" kernel true rpms "$KERNEL_DEBUG_PARAM_RPM_URL"
-        "kernel-debug" kernel-debug "" rpms "$KERNEL_DEBUG_PKG_RPM_URL"
-        "kernel-64k" kernel-64k "" rpms "$KERNEL_64k_RPM_URL"
-        "kernel" kernel "" tarball "$KERNEL_TGZ_URL"
+        # KPKG_URL                                     KPKG_SOURCE_PACKAGE_NAME KPKG_PACKAGE_NAME KPKG_VAR_DEBUG_KERNEL
+        # kernel source package with variants
+        "${KERNEL_RPM_URL}"                            kernel                   kernel            ""
+        "${KERNEL_64k_RPM_URL}"                        kernel                   kernel-64k        ""
+        "${KERNEL_DEBUG_RPM_URL}"                      kernel                   kernel-debug      ""
+        "${KERNEL_RT_RPM_URL}"                         kernel                   kernel-rt         ""
+        # realtime branch
+        "${KERNEL_REALTIME_RPM_URL}"                   kernel-rt                kernel-rt         ""
+        # debug jobs
+        "${KERNEL_DEBUG_PARAM_RPM_URL}"                kernel                   kernel            true
+        "${KERNEL_RT_DEBUG_PARAM_RPM_URL}"             kernel                   kernel-rt         true
+        # realtime branch debug jobs
+        "${KERNEL_REALTIME_DEBUG_PARAM_RPM_URL}"       kernel-rt                kernel-rt         true
+        # tarballs
+        "${KERNEL_TGZ_URL}"                            kernel                   kernel            ""
     End
-    It "can parse $1 from $4"
-        export KPKG_URL="$5"
+    It "can parse $1"
+        export KPKG_URL=$1
+        export EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME=$2
+        export EXPECTED_KPKG_VAR_PACKAGE_NAME=$3
+        export EXPECTED_KPKG_VAR_DEBUG_KERNEL=$4
         When call parse_kpkg_url_variables
-        The first line should equal "✅ Found URL parameter: PACKAGE_NAME=$2"
-        The variable KPKG_VAR_PACKAGE_NAME should equal "$2"
-        if [ -n "$3" ]; then
-            The variable KPKG_VAR_DEBUG_KERNEL should equal "$3"
+        The second line should equal "✅ Found URL parameter: SOURCE_PACKAGE_NAME=${EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME}"
+        The variable KPKG_VAR_SOURCE_PACKAGE_NAME should equal "${EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME}"
+        The first line should equal "✅ Found URL parameter: PACKAGE_NAME=${EXPECTED_KPKG_VAR_PACKAGE_NAME}"
+        The variable KPKG_VAR_PACKAGE_NAME should equal "${EXPECTED_KPKG_VAR_PACKAGE_NAME}"
+        if [[ -n ${EXPECTED_KPKG_VAR_DEBUG_KERNEL} ]]; then
+            The variable KPKG_VAR_DEBUG_KERNEL should equal "${EXPECTED_KPKG_VAR_DEBUG_KERNEL}"
         fi
         The status should be success
     End
 End
+
 
 Describe 'kpkginstall: set_package_name set package name'
     setup(){
@@ -260,10 +283,10 @@ Describe 'kpkginstall: main - install kernel'
     Parameters
         kernel "$KERNEL_RPM_URL"
         kernel "$KERNEL_TGZ_URL"
-        kernel-rt "$KERNEL_RT_RPM_URL"
+        kernel-rt "$KERNEL_REALTIME_RPM_URL"
         kernel-64k "$KERNEL_64k_RPM_URL"
         kernel "$KERNEL_DEBUG_PARAM_RPM_URL"
-        kernel "$KERNEL_DEBUG_PKG_RPM_URL"
+        kernel "$KERNEL_DEBUG_RPM_URL"
     End
     cleanup(){
         rm -rf /var/tmp/kpkginstall
@@ -338,10 +361,10 @@ Describe 'kpkginstall: main - check installed kernel'
         # package name - arch - rpm package name rpm dnf repo query - uname -r - kernel url
         kernel "x86_64" "4.18.0-442.el8.x86_64" "4.18.0-442.el8.x86_64" "$KERNEL_RPM_URL"
         kernel "x86_64" "6.1.0-rc7" "6.1.0-rc7" "$KERNEL_TGZ_URL"
-        kernel-rt "x86_64" "4.18.0-442.el8.x86_64" "4.18.0-442.el8.x86_64" "$KERNEL_RT_RPM_URL"
+        kernel-rt "x86_64" "4.18.0-442.el8.x86_64" "4.18.0-442.el8.x86_64" "$KERNEL_REALTIME_RPM_URL"
         kernel-64k "aarch64" "5.14.0-243.1820_756592390.el9.aarch64" "5.14.0-243.1820_756592390.el9.aarch64+64k" "$KERNEL_64k_RPM_URL"
         kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_PARAM_RPM_URL"
-        kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_PKG_RPM_URL"
+        kernel-debug "s390x" "4.18.0-442.el8.s390x" "4.18.0-442.el8.s390x" "$KERNEL_DEBUG_RPM_URL"
     End
     setup(){
         mkdir -p /var/tmp/kpkginstall
