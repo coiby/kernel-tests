@@ -6,6 +6,7 @@
 	"tasks" : {
 		"thread0" : {
 			"cpus" : [cpulist_placeholder],
+			"priority" : 1,
 			"instance" : 1,
 			"loop" : -1,
 			"run" :   10000,
@@ -13,6 +14,7 @@
 		},
 		"thread1" : {
 			"cpus" : [cpulist_placeholder],
+			"priority" : 1,
 			"instance" : 1,
 			"loop" : -1,
 			"run" :   70000,
