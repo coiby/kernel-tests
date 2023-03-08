@@ -181,6 +181,8 @@ function test_setup()
 		sched_feature_file="/sys/kernel/debug/sched/features"
 	fi
 
+	uname -r | grep -q rt && load_limit=${load_limit:-"-l 95"}
+
 	echo "Before test: "
 	systemd-cgls | tee cgroups.txt
 	echo "=============================================="
@@ -332,7 +334,7 @@ function test_sched_rr()
 			return
 		fi
 		setup_rt_cgroup_bw 0.7 100000 $select_cgp
-		rlRun "cgexec.sh $cg_dir $cg_controller stress-ng --sched rr --vm 1 -t 130 &"
+		rlRun "cgexec.sh $cg_dir $cg_controller stress-ng --sched rr --vm 1 $load_limit -t 130 &"
 		calc_sched_rt_bw RR "stress-ng-vm" "120"
 		# rt bandwidth control is so coarse, we make it 30% tolerence.
 		check_sched_rt_bw 55.0 85.0
@@ -360,7 +362,7 @@ function test_sched_deadline()
 			return
 		fi
 
-		rlRun "stress-ng --sched deadline  --sched-period 1000000000 --sched-runtime 200000000 --sched-deadline 1000000000 --cpu 1 -t 120 &"
+		rlRun "stress-ng --sched deadline  --sched-period 1000000000 --sched-runtime 500000000 --sched-deadline 1000000000 --cpu 1 $load_limit -t 120 &"
 		calc_sched_rt_bw '#6|DLN' "${proc_name:-stress-ng-cpu}" 120
 		check_sched_rt_bw 18.0 22.0
 		pkill -9 -f stress-ng
@@ -398,7 +400,7 @@ function test_sched_fifo()
 		fi
 		# execute stress-ng and cgexec for testing
 		setup_rt_cgroup_bw 0.4 100000 $select_cgp
-		rlRun "cgexec.sh $cg_dir $cg_controller stress-ng --sched fifo --vm 1 -t 130 &"
+		rlRun "cgexec.sh $cg_dir $cg_controller stress-ng --sched fifo --vm 1 $load_limit -t 130 &"
 		calc_sched_rt_bw FF "${proc_name:-stress-ng-vm}" "120"
 		check_sched_rt_bw 25.0 55.0
 		pkill -9 -f stress-ng
