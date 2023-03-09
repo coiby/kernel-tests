@@ -63,7 +63,6 @@ function clean_kpkg_url_variables()
     fi
     unset KPKG_VAR_DEBUG_KERNEL
     export KPKG_VAR_VARIANT_SUFFIX=${KPKG_VAR_PACKAGE_NAME#"${KPKG_VAR_SOURCE_PACKAGE_NAME}"}
-    KPKG_VAR_VARIANT_SUFFIX=${KPKG_VAR_VARIANT_SUFFIX#-}
   fi
 }
 
@@ -123,6 +122,17 @@ function get_kpkg_ver()
 
   # Write the KVER to a file so we have it after reboot.
   echo -n "${KVER}" > /var/tmp/kpkginstall/KPKG_KVER
+}
+
+function kpkg_release()
+{
+  if [[ ${KPKG_URL} =~ .*\.tar\.gz ]]; then
+    echo "${KVER//.${ARCH}/}"
+  elif [[ ${KVER} == *.el6.* ]] || [[ ${KVER} == *.el7.* ]]; then
+    echo "${KVER}${KPKG_VAR_VARIANT_SUFFIX/#-/.}"
+  else
+    echo "${KVER}${KPKG_VAR_VARIANT_SUFFIX/#-/+}"
+  fi
 }
 
 function targz_install()
@@ -339,16 +349,6 @@ function rpm_install()
     cki_print_success "Kernel version is ${KVER}"
   fi
 
-  # Ensure that the debug kernel is selected as the default kernel in
-  # /boot/grub2/grubenv.
-  if [[ ${KPKG_VAR_PACKAGE_NAME} == *-debug ]] && [[ -z $RPM_OSTREE ]]; then
-    echo "Adjusting settings in /etc/sysconfig/kernel to set debug as default"
-    echo "UPDATEDEFAULT=yes" > /etc/sysconfig/kernel
-    echo "DEFAULTKERNEL=kernel-debug" >> /etc/sysconfig/kernel
-    echo "DEFAULTDEBUG=yes" >> /etc/sysconfig/kernel
-    cki_print_success "Updated /etc/sysconfig/kernel to set debug kernels as default"
-  fi
-
   # download & install kernel, or report result
   download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER}"
 
@@ -403,23 +403,16 @@ function rpm_install()
     $YUM install -y $FIRMWARE_PKG > /dev/null
     cki_print_success "Kernel firmware package installed"
 
-    KVER_UNAME="${KVER}"
-    if [[ ${KPKG_VAR_PACKAGE_NAME} =~ "kernel-64k" ]]; then
-      # kernel-64k variant doesn't update the default kernel in grubby
-      # make sure the correct version is set
-
-      # on kernel-64k the kernel version from rpm is a bit different from the uname
-      KVER_UNAME="${KVER}+64k"
-      if grubby --set-default /boot/vmlinuz-"${KVER_UNAME}"; then
-        cki_print_success "Grubby set default kernel to /boot/vmlinuz-${KVER_UNAME}"
-      else
-        cki_abort_recipe "Fail to set default kernel to /boot/vmlinuz-${KVER_UNAME}" FAIL
-      fi
+    vmlinuz=/boot/vmlinuz-$(kpkg_release)
+    if grubby --set-default "${vmlinuz}"; then
+      cki_print_success "Grubby set default kernel to ${vmlinuz}"
+    else
+      cki_abort_recipe "Fail to set default kernel to ${vmlinuz}" FAIL
     fi
 
     # Workaround for BZ 1698363 - was fixed in 8.3 but not backported to 8.1 nor 8.2
-    if [[ "${ARCH}" == s390x ]] ; then
-      grubby --set-default /boot/vmlinuz-"${KVER_UNAME}" && zipl
+    if [[ ${ARCH} == s390x ]]; then
+      zipl
       cki_print_success "Grubby workaround for s390x completed"
     fi
   fi
@@ -609,27 +602,17 @@ EOF
         cki_abort_recipe  "Failed to extract kernel version from the package after reboot" FAIL
       fi
 
-      # Make a list of kernel versions we expect to see after reboot.
-      if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
-        valid_kernel_versions=(
-          "${KVER//.$(uname -i)/}"
-        )
-      else
-        valid_kernel_versions=(
-          "${KVER}${KPKG_VAR_VARIANT_SUFFIX:+.${KPKG_VAR_VARIANT_SUFFIX}}"           # RHEL 7 style kernel variants
-          "${KVER}${KPKG_VAR_VARIANT_SUFFIX:++${KPKG_VAR_VARIANT_SUFFIX}}"           # RHEL 8 style kernel variants
-        )
-      fi
+      expected_release=$(kpkg_release)
       ckver=$(uname -r)
-      cki_print_info "Acceptable kernel version strings: ${valid_kernel_versions[*]} "
-      cki_print_info "Running kernel version string:     ${ckver}"
+      cki_print_info "Expected kernel release: ${expected_release}"
+      cki_print_info "Running kernel release:  ${ckver}"
 
       # Did we get the right kernel running after reboot?
-      if [[ ! " ${valid_kernel_versions[*]} " == *" ${ckver} "* ]]; then
-        cki_abort_recipe "Kernel version after reboot (${ckver}) does not match expected version strings!" FAIL
+      if [[ ${ckver} != "${expected_release}" ]]; then
+        cki_abort_recipe "Kernel release after reboot (${ckver}) does not match expected release!" FAIL
       fi
 
-      cki_print_success "Found the correct kernel version running!"
+      cki_print_success "Found the correct kernel release running!"
 
       # rpm-ostree extra packages install has to be after reboot
       if [[ -n $RPM_OSTREE ]]; then
