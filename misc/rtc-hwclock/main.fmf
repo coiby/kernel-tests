@@ -15,6 +15,7 @@ test: bash ./runtest.sh
 framework: beakerlib
 require:
   - util-linux
+  - chrony
 # hwclock is not included in the util-linux build for s390x
 adjust:
   - enable: false
