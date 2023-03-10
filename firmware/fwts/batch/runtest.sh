@@ -1,7 +1,14 @@
 #!/bin/bash
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
+# Enable TMT testing for RHIVOS
+. ../../../automotive/include/include.sh
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+
+if ! (($is_rhivos)); then
+    # Include rhts environment
+    . /usr/bin/rhts-environment.sh
+fi
+
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # source fwts include/library

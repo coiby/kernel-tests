@@ -1,0 +1,12 @@
+summary: run "batch" class tests from Firmware Test Suite (fwts)
+description: run "batch" class tests from Firmware Test Suite (fwts)
+contact: Oliver Gutierrez <ogutierr@redhat.com>
+component:
+  - kernel
+path: /firmware/fwts/batch
+test: bash -x ./runtest.sh
+framework: beakerlib
+require: []
+duration: 1h
+extra-summary: /firmware/fwts/batch
+extra-task: /firmware/fwts/batch
