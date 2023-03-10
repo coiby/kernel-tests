@@ -6,4 +6,4 @@ owner=Laura Trivelloni <ltrivell@redhat.com>
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=10m
-dependencies=OpenIPMI-tools
+dependencies=OpenIPMI;OpenIPMI-tools

@@ -78,8 +78,6 @@ PAYLOAD_VALUES[3]="abcd 1000 2x1"
 
 rlJournalStart
     rlPhaseStartSetup
-        rlAssertRpm $PACKAGE
-        rlAssertRpm ${PACKAGE}-tools
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
         # stop the service to make sure /dev/ipmi0 does not exist and we get expected error messages
