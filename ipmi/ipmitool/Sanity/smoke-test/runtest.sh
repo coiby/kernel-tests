@@ -73,6 +73,10 @@ EOF
             rlRun -l "pip install --user future"
         fi
     fi
+
+    # Be sure IPMI service is running to load IPMI kernel modules and see devices /dev/ipmi*
+    rlServiceStart "ipmi"
+
     rlPhaseEnd
 
     rlPhaseStartTest
