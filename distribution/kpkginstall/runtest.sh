@@ -5,17 +5,18 @@ TEST_DEPS="elfutils-libelf-devel flex bison gcc openssl-devel make curl grubby t
 ARCH=$(uname -m)
 REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
-PACKAGE_NAME=""
-IS_DEBUG_KERNEL="false"
 
 # supported kernel packages
-SUPPORTED_KERNEL_PKGS=(kernel kernel-core kernel-debug kernel-debug-core \
-kernel-rt kernel-rt-core kernel-rt-debug kernel-rt-debug-core \
-kernel-automotive kernel-automotive-debug \
-kernel-64k kernel-64k-debug)
-
-# default values for URL parameters
-KPKG_VAR_DEBUG_KERNEL="false"
+SUPPORTED_KERNEL_PKGS=(
+  kernel kernel-core
+  kernel-debug kernel-debug-core
+  kernel-64k kernel-64k-core
+  kernel-64k-debug kernel-64k-debug-core
+  kernel-rt kernel-rt-core
+  kernel-rt-debug kernel-rt-debug-core
+  kernel-automotive kernel-automotive-core
+  kernel-automotive-debug kernel-automotive-debug-core
+)
 
 # Bring in library functions.
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
@@ -50,63 +51,42 @@ function parse_kpkg_url_variables()
   for ((i=0; i<${#parm[@]}; i+=2))
   do
     cki_print_success "Found URL parameter: ${parm[i]^^}=${parm[i+1]}"
-    readonly "KPKG_VAR_${parm[i]^^}=${parm[i+1]}"
+    export "KPKG_VAR_${parm[i]^^}=${parm[i+1]}"
   done
 }
 
-function set_package_name()
+function clean_kpkg_url_variables()
 {
-  # Recover the saved package name from KPKG_PACKAGE_NAME if it exists.
-  if [ -f "/var/tmp/kpkginstall/KPKG_PACKAGE_NAME" ]; then
-    PACKAGE_NAME=$(cat /var/tmp/kpkginstall/KPKG_PACKAGE_NAME)
-    cki_print_success "Found cached package name on disk: ${PACKAGE_NAME}"
-  fi
-
-  # Recover the saved source package name from KPKG_SOURCE_PACKAGE_NAME if it exists.
-  if [ -f "/var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME" ]; then
-    SOURCE_PACKAGE_NAME=$(cat /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME)
-    cki_print_success "Found cached source package name on disk: ${SOURCE_PACKAGE_NAME}"
-  fi
-  if [ -n "${PACKAGE_NAME}" ]; then
-    # already got package name from cache, can return
-    return
-  fi
-
-  # If the pipeline provides the package name after the # sign in the URL, we
-  # can use that here and be done really fast.
-  if [ -n "${KPKG_VAR_PACKAGE_NAME:-}" ]; then
-    PACKAGE_NAME=$KPKG_VAR_PACKAGE_NAME
-    cki_print_success "Found package name in URL variables: ${PACKAGE_NAME}"
-    if [[ "${PACKAGE_NAME}" =~ "-debug" ]]; then
-        IS_DEBUG_KERNEL="true"
+  if [[ -v KPKG_VAR_PACKAGE_NAME ]]; then
+    if cki_is_true "${KPKG_VAR_DEBUG_KERNEL:-false}" && [[ ${KPKG_VAR_PACKAGE_NAME} != *-debug ]] ; then
+      KPKG_VAR_PACKAGE_NAME=${KPKG_VAR_PACKAGE_NAME}-debug
     fi
+    unset KPKG_VAR_DEBUG_KERNEL
+    export KPKG_VAR_VARIANT_SUFFIX=${KPKG_VAR_PACKAGE_NAME#"${KPKG_VAR_SOURCE_PACKAGE_NAME}"}
   fi
+}
 
-  # If the pipeline provides the source package name after the # sign in the URL, we
-  # can use that here and be done really fast.
-  if [ -n "${KPKG_VAR_SOURCE_PACKAGE_NAME:-}" ]; then
-    SOURCE_PACKAGE_NAME=$KPKG_VAR_SOURCE_PACKAGE_NAME
-    cki_print_success "Found source package name in URL variables: ${SOURCE_PACKAGE_NAME}"
-  fi
+function store_kpkg_url_variables()
+{
+  for name in "${!KPKG_VAR_@}"; do
+    echo -n "${!name}" > "/var/tmp/kpkginstall/vars/${name}"
+  done
+}
 
-  # Append "-debug" if we were asked to install the debug kernel.
-  if cki_is_true "${KPKG_VAR_DEBUG_KERNEL}" && [[ ! "${PACKAGE_NAME}" =~ "-debug" ]] ; then
-    cki_print_info "Debug kernel was requested -- appending -debug to package name"
-    PACKAGE_NAME=${PACKAGE_NAME}-debug
-    IS_DEBUG_KERNEL="true"
-  fi
+function load_kpkg_url_variables()
+{
+  for file in /var/tmp/kpkginstall/vars/*; do
+    if [[ -f ${file} ]]; then
+      export "${file##*/}=$(cat "${file}")"
+    fi
+  done
+}
 
-  # Write the PACKAGE_NAME to a file so we have it after reboot.
-  echo -n "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
-  echo -n "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
-  cki_print_success "Package name is set: ${PACKAGE_NAME} (cached to disk)"
-  cki_print_success "Source package name is set: ${SOURCE_PACKAGE_NAME} (cached to disk)"
-
-  # If we are installing a debug kernel, make a reminder for us to check for
-  # a debug kernel after the reboot
-  if cki_is_true "${IS_DEBUG_KERNEL}"; then
-    echo "true" > /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL
-  fi
+function print_kpkg_url_variables_rpm()
+{
+  cki_print_success "Source package name: ${KPKG_VAR_SOURCE_PACKAGE_NAME}"
+  cki_print_success "Package name: ${KPKG_VAR_PACKAGE_NAME}"
+  cki_print_success "Variant suffix: ${KPKG_VAR_VARIANT_SUFFIX}"
 }
 
 function get_kpkg_ver()
@@ -133,7 +113,7 @@ function get_kpkg_ver()
 
     # Grab the kernel version from the provided repo directly
     KVER=$(
-      ${YUM} -q --disablerepo="*" --enablerepo="${REPO_NAME}" list "${ALL}" "${PACKAGE_NAME}" --showduplicates \
+      ${YUM} -q --disablerepo="*" --enablerepo="${REPO_NAME}" list "${ALL}" "${KPKG_VAR_PACKAGE_NAME}" --showduplicates \
         | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" \
         | grep -m 1 "$ARCH.*${REPO_NAME}" \
         | awk -v arch="$ARCH" '{print $2"."arch}'
@@ -142,6 +122,17 @@ function get_kpkg_ver()
 
   # Write the KVER to a file so we have it after reboot.
   echo -n "${KVER}" > /var/tmp/kpkginstall/KPKG_KVER
+}
+
+function kpkg_release()
+{
+  if [[ ${KPKG_URL} =~ .*\.tar\.gz ]]; then
+    echo "${KVER//.${ARCH}/}"
+  elif [[ ${KVER} == *.el6.* ]] || [[ ${KVER} == *.el7.* ]]; then
+    echo "${KVER}${KPKG_VAR_VARIANT_SUFFIX/#-/.}"
+  else
+    echo "${KVER}${KPKG_VAR_VARIANT_SUFFIX/#-/+}"
+  fi
 }
 
 function targz_install()
@@ -269,7 +260,7 @@ function rpm_prepare()
 
   _cki_excluded_pkgs=()
   for pkg in "${SUPPORTED_KERNEL_PKGS[@]}"; do
-     if [[ "${pkg}" != "${PACKAGE_NAME}" ]] && [[ "${pkg}" != "${PACKAGE_NAME}-core" ]]; then
+     if [[ "${pkg}" != "${KPKG_VAR_PACKAGE_NAME}" ]] && [[ "${pkg}" != "${KPKG_VAR_PACKAGE_NAME}-core" ]]; then
          _cki_excluded_pkgs+=("${pkg}")
      fi
   done
@@ -328,7 +319,7 @@ function download_install_package()
 
     # install
     cki_print_info "$1 will be installed using rpm-ostree override"
-    if ! cki_is_true "${IS_DEBUG_KERNEL}"; then
+    if ! [[ ${KPKG_VAR_PACKAGE_NAME} == *-debug ]]; then
       if rpm-ostree override replace ./kernel*.rpm > /dev/null; then
         cki_print_success "Installed $1 successfully"
       else
@@ -358,53 +349,43 @@ function rpm_install()
     cki_print_success "Kernel version is ${KVER}"
   fi
 
-  # Ensure that the debug kernel is selected as the default kernel in
-  # /boot/grub2/grubenv.
-  if cki_is_true "${IS_DEBUG_KERNEL}" && [[ -z $RPM_OSTREE ]]; then
-    echo "Adjusting settings in /etc/sysconfig/kernel to set debug as default"
-    echo "UPDATEDEFAULT=yes" > /etc/sysconfig/kernel
-    echo "DEFAULTKERNEL=kernel-debug" >> /etc/sysconfig/kernel
-    echo "DEFAULTDEBUG=yes" >> /etc/sysconfig/kernel
-    cki_print_success "Updated /etc/sysconfig/kernel to set debug kernels as default"
-  fi
-
   # download & install kernel, or report result
-  download_install_package "${PACKAGE_NAME}-$KVER"
+  download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER}"
 
   if ! cki_is_kernel_automotive ;then
-    if $YUM install -y "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${PACKAGE_NAME}-devel-${KVER} successfully"
+    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
     else
-      cki_print_warning "No package ${PACKAGE_NAME}-devel-${KVER} found, skipping!"
+      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
       cki_print_warning "Note that some tests might require the package and can fail!"
     fi
-    if $YUM install -y "${PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${PACKAGE_NAME}-modules-extra-${KVER} successfully"
+    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} successfully"
     else
-      cki_print_warning "No package ${PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
+      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
       cki_print_warning "Note that some tests might require the package and can fail!"
     fi
-    if $YUM install -y "${PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${PACKAGE_NAME}-modules-internal-${KVER} successfully"
+    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
     else
-      cki_print_warning "No package ${PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
+      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
       cki_print_warning "Note that some tests might require the package and can fail!"
     fi
-    if $YUM install -y "${SOURCE_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
+    if $YUM install -y "${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
     else
-      cki_print_warning "No package ${SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
+      cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
       # shellcheck disable=SC2010
-      ALT_HEADERS=$(ls "${SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
+      ALT_HEADERS=$(ls "${KPKG_VAR_SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
       if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
           cki_print_success "Installed ${ALT_HEADERS} successfully"
       else
-          cki_print_warning "No package ${SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
+          cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
           cki_print_warning "Note that some tests might require the package and can fail!"
       fi
     fi
 
-    if [[ ${PACKAGE_NAME} =~ "kernel-rt" ]]; then
+    if [[ ${KPKG_VAR_PACKAGE_NAME} == kernel-rt* ]]; then
       if $YUM install -y "/usr/sbin/kernel-is-rt" > /dev/null; then
         cki_print_success "Installed /usr/sbin/kernel-is-rt successfully"
       else
@@ -422,23 +403,16 @@ function rpm_install()
     $YUM install -y $FIRMWARE_PKG > /dev/null
     cki_print_success "Kernel firmware package installed"
 
-    KVER_UNAME="${KVER}"
-    if [[ ${PACKAGE_NAME} =~ "kernel-64k" ]]; then
-      # kernel-64k variant doesn't update the default kernel in grubby
-      # make sure the correct version is set
-
-      # on kernel-64k the kernel version from rpm is a bit different from the uname
-      KVER_UNAME="${KVER}+64k"
-      if grubby --set-default /boot/vmlinuz-"${KVER_UNAME}"; then
-        cki_print_success "Grubby set default kernel to /boot/vmlinuz-${KVER_UNAME}"
-      else
-        cki_abort_recipe "Fail to set default kernel to /boot/vmlinuz-${KVER_UNAME}" FAIL
-      fi
+    vmlinuz=/boot/vmlinuz-$(kpkg_release)
+    if grubby --set-default "${vmlinuz}"; then
+      cki_print_success "Grubby set default kernel to ${vmlinuz}"
+    else
+      cki_abort_recipe "Fail to set default kernel to ${vmlinuz}" FAIL
     fi
 
     # Workaround for BZ 1698363 - was fixed in 8.3 but not backported to 8.1 nor 8.2
-    if [[ "${ARCH}" == s390x ]] ; then
-      grubby --set-default /boot/vmlinuz-"${KVER_UNAME}" && zipl
+    if [[ ${ARCH} == s390x ]]; then
+      zipl
       cki_print_success "Grubby workaround for s390x completed"
     fi
   fi
@@ -448,34 +422,34 @@ function rpm_install()
 function ostree_extra_package_install()
 {
   PKG_CMD="${RPM_OSTREE} -A install --allow-inactive --idempotent -y "
-  if $PKG_CMD "${PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
-    cki_print_success "Installed ${PACKAGE_NAME}-devel-${KVER} successfully"
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
   else
-    cki_print_warning "No package ${PACKAGE_NAME}-devel-${KVER} found, skipping!"
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
-    cki_print_success "Installed ${PACKAGE_NAME}-modules-extra-${KVER} successfully"
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} successfully"
   else
-    cki_print_warning "No package ${PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
-    cki_print_success "Installed ${PACKAGE_NAME}-modules-internal-${KVER} successfully"
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
   else
-    cki_print_warning "No package ${PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
-    cki_print_success "Installed ${PACKAGE_NAME}-headers-${KVER} successfully"
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} successfully"
   else
-    cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
     # shellcheck disable=SC2010
-    ALT_HEADERS=$(ls "${PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
+    ALT_HEADERS=$(ls "${KPKG_VAR_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
     if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
         cki_print_success "Installed ${ALT_HEADERS} successfully"
     else
-        cki_print_warning "No package ${PACKAGE_NAME}-headers-${KVER} found, skipping!"
+        cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} found, skipping!"
         cki_print_warning "Note that some tests might require the package and can fail!"
     fi
   fi
@@ -537,12 +511,14 @@ function main() {
       # If we haven't rebooted yet, then we shouldn't have the directory present on the system.
       rm -rfv /var/tmp/kpkginstall
       # Make a directory to hold small bits of information for the test.
-      mkdir -p /var/tmp/kpkginstall
+      mkdir -p /var/tmp/kpkginstall/vars
 
       # If the KPKG_URL contains a pound sign, then we have variables on the end
       # which need to be removed and parsed.
       if [[ $KPKG_URL =~ \# ]]; then
           parse_kpkg_url_variables
+          clean_kpkg_url_variables
+          store_kpkg_url_variables
       fi
 
       if [ -z "${KPKG_URL}" ]; then
@@ -560,11 +536,11 @@ function main() {
       if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
           targz_install || error=1
       elif [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
-          set_package_name || error=1
+          print_kpkg_url_variables_rpm || error=1
           copr_prepare || error=1
           rpm_install || error=1
       else
-          set_package_name || error=1
+          print_kpkg_url_variables_rpm || error=1
           rpm_prepare || error=1
           rpm_install || error=1
       fi
@@ -612,11 +588,13 @@ EOF
       # https://github.com/beaker-project/restraint/issues/219
       return 0
     else
+      load_kpkg_url_variables
+
       # set YUM var.
       select_yum_tool
 
       if [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
-        set_package_name
+        print_kpkg_url_variables_rpm
       fi
       cki_print_info "after reboot: Extracting kernel version from ${KPKG_URL}"
       get_kpkg_ver
@@ -624,31 +602,17 @@ EOF
         cki_abort_recipe  "Failed to extract kernel version from the package after reboot" FAIL
       fi
 
-      # Make a list of kernel versions we expect to see after reboot.
-      # the debug suffix on kernel names do not apply for kernel builds from tarball
-      if [ -f /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL ] && [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]]; then
-        valid_kernel_versions=(
-          "${KVER}.debug"           # RHEL 7 style debug kernels
-          "${KVER}+debug"           # RHEL 8 style debug kernels
-        )
-      else
-        KVER=${KVER//.$(uname -i)/}
-        valid_kernel_versions=(
-          "${KVER}"
-          "${KVER}.${ARCH}"
-          "${KVER}.${ARCH}+64k"
-        )
-      fi
+      expected_release=$(kpkg_release)
       ckver=$(uname -r)
-      cki_print_info "Acceptable kernel version strings: ${valid_kernel_versions[*]} "
-      cki_print_info "Running kernel version string:     ${ckver}"
+      cki_print_info "Expected kernel release: ${expected_release}"
+      cki_print_info "Running kernel release:  ${ckver}"
 
       # Did we get the right kernel running after reboot?
-      if [[ ! " ${valid_kernel_versions[*]} " == *" ${ckver} "* ]]; then
-        cki_abort_recipe "Kernel version after reboot (${ckver}) does not match expected version strings!" FAIL
+      if [[ ${ckver} != "${expected_release}" ]]; then
+        cki_abort_recipe "Kernel release after reboot (${ckver}) does not match expected release!" FAIL
       fi
 
-      cki_print_success "Found the correct kernel version running!"
+      cki_print_success "Found the correct kernel release running!"
 
       # rpm-ostree extra packages install has to be after reboot
       if [[ -n $RPM_OSTREE ]]; then

@@ -59,128 +59,222 @@ Describe 'kpkginstall: parse_kpkg_url_variables'
 End
 
 
-Describe 'kpkginstall: set_package_name set package name'
-    setup() {
-        mkdir -p /var/tmp/kpkginstall
-    }
-    cleanup() {
-        rm -rf /var/tmp/kpkginstall
-    }
-    BeforeEach 'setup'
-    AfterEach 'cleanup'
+Describe 'kpkginstall: clean_kpkg_url_variables'
     Parameters
-        # KPKG_SOURCE_PACKAGE_NAME KPKG_PACKAGE_NAME KPKG_VAR_DEBUG_KERNEL EXPECTED_PACKAGE_NAME
+        # KPKG_SOURCE_PACKAGE_NAME KPKG_PACKAGE_NAME KPKG_VAR_DEBUG_KERNEL EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME EXPECTED_KPKG_VAR_PACKAGE_NAME EXPECTED_KPKG_VAR_VARIANT_SUFFIX
         # kernel source package with variants
-        kernel                     kernel            ""                    kernel
-        kernel                     kernel-64k        ""                    kernel-64k
-        kernel                     kernel-debug      ""                    kernel-debug
-        kernel                     kernel-rt         ""                    kernel-rt
+        kernel                     kernel            ""                    kernel                                kernel                         ""
+        kernel                     kernel-64k        ""                    kernel                                kernel-64k                     -64k
+        kernel                     kernel-debug      ""                    kernel                                kernel-debug                   -debug
+        kernel                     kernel-rt         ""                    kernel                                kernel-rt                      -rt
         # realtime branch
-        kernel-rt                  kernel-rt         ""                    kernel-rt
+        kernel-rt                  kernel-rt         ""                    kernel-rt                             kernel-rt                      ""
         # debug jobs
-        kernel                     kernel            true                  kernel-debug
-        kernel                     kernel-rt         true                  kernel-rt-debug
+        kernel                     kernel            true                  kernel                                kernel-debug                   -debug
+        kernel                     kernel-rt         true                  kernel                                kernel-rt-debug                -rt-debug
         # realtime branch debug jobs
-        kernel-rt                  kernel-rt         true                  kernel-rt-debug
+        kernel-rt                  kernel-rt         true                  kernel-rt                             kernel-rt-debug                -debug
     End
-    It "can set $4 as package name"
+    It "can clean $1/$2/$3"
         export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
         export KPKG_VAR_PACKAGE_NAME=$2
         export KPKG_VAR_DEBUG_KERNEL=$3
-        export EXPECTED_PACKAGE_NAME=$4
-        When call set_package_name
-        The first line should equal "✅ Found package name in URL variables: ${KPKG_VAR_PACKAGE_NAME}"
-        if [[ -z ${KPKG_VAR_DEBUG_KERNEL} ]]; then
-            The line 3 should equal "✅ Package name is set: ${EXPECTED_PACKAGE_NAME} (cached to disk)"
-            The line 4 should equal "✅ Source package name is set: ${KPKG_VAR_SOURCE_PACKAGE_NAME} (cached to disk)"
-        else
-            The line 3 should equal "ℹ️ Debug kernel was requested -- appending -debug to package name"
-            The line 4 should equal "✅ Package name is set: ${EXPECTED_PACKAGE_NAME} (cached to disk)"
-            The line 5 should equal "✅ Source package name is set: ${KPKG_VAR_SOURCE_PACKAGE_NAME} (cached to disk)"
-        fi
-        The contents of file /var/tmp/kpkginstall/KPKG_PACKAGE_NAME should equal "${EXPECTED_PACKAGE_NAME}"
-        The contents of file /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME should equal "${SOURCE_PACKAGE_NAME}"
+        export EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME=$4
+        export EXPECTED_KPKG_VAR_PACKAGE_NAME=$5
+        export EXPECTED_KPKG_VAR_VARIANT_SUFFIX=$6
+        When call clean_kpkg_url_variables
+        The variable KPKG_VAR_SOURCE_PACKAGE_NAME should equal "${EXPECTED_KPKG_VAR_SOURCE_PACKAGE_NAME}"
+        The variable KPKG_VAR_PACKAGE_NAME should equal "${EXPECTED_KPKG_VAR_PACKAGE_NAME}"
+        The variable KPKG_VAR_VARIANT_SUFFIX should equal "${EXPECTED_KPKG_VAR_VARIANT_SUFFIX}"
+        The variable KPKG_VAR_DEBUG_KERNEL should be undefined
+        The status should be success
     End
 End
 
-Describe 'kpkginstall: set_package_name read package name'
-    setup(){
-        mkdir -p /var/tmp/kpkginstall
-        echo "kernel" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+Describe 'kpkginstall: store_kpkg_url_variables'
+    setup() {
+        mkdir -p /var/tmp/kpkginstall/vars
     }
-    cleanup(){
-        rm -rf /var/tmp/kpkginstall
+    cleanup() {
+        rm -rf /var/tmp/kpkginstall/vars
     }
     BeforeEach 'setup'
     AfterEach 'cleanup'
-    It 'set_package_name works after reboot'
-        # Call for the second time as it is done after reboot
-        export REBOOTCOUNT=1
-        When call set_package_name
-        The first line should equal "✅ Found cached package name on disk: kernel"
+    It "can store KPKG_VAR_* variables"
+        export KPKG_VAR_FOO=foo
+        export KPKG_VAR_BAR=bar
+        export KPKG_BAZ=baz
+        When call store_kpkg_url_variables
+        The contents of file /var/tmp/kpkginstall/vars/KPKG_VAR_FOO should equal "${KPKG_VAR_FOO}"
+        The contents of file /var/tmp/kpkginstall/vars/KPKG_VAR_BAR should equal "${KPKG_VAR_BAR}"
+        The file /var/tmp/kpkginstall/vars/KPKG_BAZ should not be exist
         The status should be success
+    End
+End
+
+Describe 'kpkginstall: load_kpkg_url_variables'
+    setup() {
+        mkdir -p /var/tmp/kpkginstall/vars
+    }
+    cleanup() {
+        rm -rf /var/tmp/kpkginstall/vars
+    }
+    BeforeEach 'setup'
+    AfterEach 'cleanup'
+    It "can load KPKG_VAR_* variables"
+        echo -n "foo" > /var/tmp/kpkginstall/vars/KPKG_VAR_FOO
+        echo -n "bar" > /var/tmp/kpkginstall/vars/KPKG_VAR_BAR
+        When call load_kpkg_url_variables
+        The variable KPKG_VAR_FOO should equal "foo"
+        The variable KPKG_VAR_BAR should equal "bar"
+        The status should be success
+    End
+
+    It "copes with an empty vars directory"
+        When call load_kpkg_url_variables
+        The status should be success
+    End
+End
+
+Describe 'kpkginstall: print_kpkg_url_variables_rpm'
+    Parameters
+        # SOURCE_PACKAGE_NAME PACKAGE_NAME VARIANT_SUFFIX
+        # kernel source package with variants
+        kernel                     kernel            ""
+        kernel                     kernel-64k        -64k
+        kernel                     kernel-debug      -debug
+        kernel                     kernel-rt         -rt
+        # realtime branch
+        kernel-rt                  kernel-rt         ""
+        # debug jobs
+        kernel                     kernel            -debug
+        kernel                     kernel-rt         -rt-debug
+        # realtime branch debug jobs
+        kernel-rt                  kernel-rt         -debug
+    End
+    It "can print $1/$2/$3"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$2
+        export KPKG_VAR_VARIANT_SUFFIX=$3
+        When call print_kpkg_url_variables_rpm
+        The line 1 should equal "✅ Source package name: ${KPKG_VAR_SOURCE_PACKAGE_NAME}"
+        The line 2 should equal "✅ Package name: ${KPKG_VAR_PACKAGE_NAME}"
+        The line 3 should equal "✅ Variant suffix: ${KPKG_VAR_VARIANT_SUFFIX}"
+    End
+End
+
+Describe 'kpkginstall: kpkg_release'
+    Parameters
+        # KVER             VARIANT_SUFFIX  URL                          EXPECTED_RELEASE
+        5.14.0.el9.x86_64  ""              https://some-url             5.14.0.el9.x86_64
+        5.14.0.el6.x86_64  -rt-debug       https://some-url             5.14.0.el6.x86_64.rt-debug
+        5.14.0.el7.x86_64  -rt-debug       https://some-url             5.14.0.el7.x86_64.rt-debug
+        5.14.0.el8.x86_64  -rt-debug       https://some-url             5.14.0.el8.x86_64+rt-debug
+        5.14.0.el9.x86_64  -rt-debug       https://some-url             5.14.0.el9.x86_64+rt-debug
+        5.14.0.x86_64      ""              https://some-url/foo.tar.gz  5.14.0
+    End
+
+    It "can determine the release for $1/$2"
+        export KVER=$1
+        export KPKG_VAR_VARIANT_SUFFIX=$2
+        export KPKG_URL=$3
+        export EXPECTED_KPKG_RELEASE=$4
+        When call kpkg_release
+        The stdout should equal "${EXPECTED_KPKG_RELEASE}"
     End
 End
 
 Describe 'kpkginstall: rpm_prepare'
     Parameters
         kernel
-        kernel-64k
         kernel-debug
+        kernel-64k
+        kernel-64k-debug
         kernel-rt
+        kernel-rt-debug
         kernel-automotive
     End
     It "can prepare cki repo for package $1"
-        export PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$1
         export KPKG_URL=https://some-url
         select_yum_tool() {
             echo ""
         }
         excluded_pkgs="error: unset"
-        case "${PACKAGE_NAME}" in
+        case "${KPKG_VAR_PACKAGE_NAME}" in
             kernel)
                 excluded_pkgs=(
                     kernel-debug kernel-debug-core
-                    kernel-64k kernel-64k-debug
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
                     kernel-rt kernel-rt-core
                     kernel-rt-debug kernel-rt-debug-core
-                    kernel-automotive kernel-automotive-debug
+                    kernel-automotive kernel-automotive-core
+                    kernel-automotive-debug kernel-automotive-debug-core
+                )
+                ;;
+            kernel-debug)
+                excluded_pkgs=(
+                    kernel kernel-core
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
+                    kernel-rt kernel-rt-core
+                    kernel-rt-debug kernel-rt-debug-core
+                    kernel-automotive kernel-automotive-core
+                    kernel-automotive-debug kernel-automotive-debug-core
                 )
                 ;;
             kernel-64k)
                 excluded_pkgs=(
                     kernel kernel-core
                     kernel-debug kernel-debug-core
+                    kernel-64k-debug kernel-64k-debug-core
                     kernel-rt kernel-rt-core
                     kernel-rt-debug kernel-rt-debug-core
-                    kernel-automotive kernel-automotive-debug
+                    kernel-automotive kernel-automotive-core
+                    kernel-automotive-debug kernel-automotive-debug-core
                 )
                 ;;
-            kernel-debug)
+            kernel-64k-debug)
                 excluded_pkgs=(
                     kernel kernel-core
-                    kernel-64k kernel-64k-debug
+                    kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-core
                     kernel-rt kernel-rt-core
                     kernel-rt-debug kernel-rt-debug-core
-                    kernel-automotive kernel-automotive-debug
+                    kernel-automotive kernel-automotive-core
+                    kernel-automotive-debug kernel-automotive-debug-core
                 )
                 ;;
             kernel-rt)
                 excluded_pkgs=(
                     kernel kernel-core
-                    kernel-64k kernel-64k-debug
                     kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
                     kernel-rt-debug kernel-rt-debug-core
-                    kernel-automotive kernel-automotive-debug
+                    kernel-automotive kernel-automotive-core
+                )
+                ;;
+            kernel-rt-debug)
+                excluded_pkgs=(
+                    kernel kernel-core
+                    kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
+                    kernel-rt kernel-rt-core
+                    kernel-automotive kernel-automotive-core
                 )
                 ;;
             kernel-automotive)
                 excluded_pkgs=(
                     kernel kernel-core
-                    kernel-64k kernel-64k-debug
                     kernel-debug kernel-debug-core
+                    kernel-64k kernel-64k-core
+                    kernel-64k-debug kernel-64k-debug-core
                     kernel-rt kernel-rt-core
                     kernel-rt-debug kernel-rt-debug-core
+                    kernel-automotive-debug kernel-automotive-debug-core
                 )
                 ;;
             *)
@@ -214,7 +308,7 @@ Describe 'kpkginstall: get_kpkg_ver rpms'
             # to preserve variables
             %preserve REPO_NAME YUM
         }
-        mkdir -p /var/tmp/kpkginstall
+        mkdir -p /var/tmp/kpkginstall/vars
         When call get_kpkg_ver
         The variable REPO_NAME should eq "kernel-cki"
         The contents of file /var/tmp/kpkginstall/KPKG_KVER should equal "4.18.0-442.el8.ppc64le"
@@ -239,7 +333,7 @@ Describe 'kpkginstall: get_kpkg_ver tarball'
         tar(){
             echo "boot/vmlinuz-6.1.0-rc7"
         }
-        mkdir -p /var/tmp/kpkginstall
+        mkdir -p /var/tmp/kpkginstall/vars
         When call get_kpkg_ver
         The contents of file /var/tmp/kpkginstall/KPKG_KVER should equal "6.1.0-rc7"
     End
@@ -253,44 +347,36 @@ End
 
 Describe 'kpkginstall: rpm_install'
     Parameters
-        # SOURCE_PACKAGE_NAME    PACKAGE_NAME      ARCH     KVER_RPM                                 EXPECTED_KVER_UNAME
+        # SOURCE_PACKAGE_NAME    PACKAGE_NAME      VARIANT_SUFFIX ARCH     KVER_RPM                                 EXPECTED_KVER_UNAME
         # kernel source package with variants
-        kernel                   kernel            s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
-        kernel                   kernel-64k        aarch64  "5.14.0-243.1820_756592390.el9.aarch64"  "5.14.0-243.1820_756592390.el9.aarch64+64k"
-        ### broken, there are currently no debug jobs on s390x, but the uname includes +debug
-        kernel                   kernel-debug      s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x"
-        ### missing and not working, the uname is different for variant builds and includes +rt
-        # kernel                 kernel-rt         s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x+rt"
+        kernel                   kernel            ""             s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
+        kernel                   kernel-64k        -64k           aarch64  "5.14.0-243.1820_756592390.el9.aarch64"  "5.14.0-243.1820_756592390.el9.aarch64+64k"
+        kernel                   kernel-debug      -debug         s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x+debug"
+        kernel                   kernel-rt         -rt            s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x+rt"
         # realtime branch
-        kernel-rt                kernel-rt         s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
+        kernel-rt                kernel-rt         ""             s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
         # debug jobs
-        ### missing and not working, the uname is different for variant builds and includes +rt-debug
-        # kernel                 kernel-rt-debug   s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x+rt-debug"
+        kernel                   kernel-rt-debug   -rt-debug      s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x+rt-debug"
         # realtime branch debug jobs
-        ### broken, there are currently no debug jobs on s390x, but the uname includes +debug
-        kernel-rt                kernel-rt-debug   s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x"
+        kernel-rt                kernel-rt-debug   -debug         s390x    "5.14.0-276.el9.s390x"                   "5.14.0-276.el9.s390x+debug"
     End
     setup() {
-        mkdir -p /var/tmp/kpkginstall
+        mkdir -p /var/tmp/kpkginstall/vars
     }
     cleanup() {
         rm -rf /var/tmp/kpkginstall
     }
     BeforeEach 'setup'
     AfterEach 'cleanup'
-    It "can install $1/$2/$3"
-        export SOURCE_PACKAGE_NAME=$1
-        export PACKAGE_NAME=$2
-        export ARCH=$3
-        export KVER_RPM=$4
-        export EXPECTED_KVER_UNAME=$5
+    It "can install $1/$2/$3/$4"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$2
+        export KPKG_VAR_VARIANT_SUFFIX=$3
+        export ARCH=$4
+        export KVER_RPM=$5
+        export EXPECTED_KVER_UNAME=$6
         export YUM=dnf
         export KPKG_URL=https://some-url
-        if [[ ${PACKAGE_NAME} = *-debug ]]; then
-            IS_DEBUG_KERNEL=true
-        else
-            IS_DEBUG_KERNEL=
-        fi
         echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER
         dnf() {
             return 0
@@ -304,17 +390,10 @@ Describe 'kpkginstall: rpm_install'
         When call rpm_install
         The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
         The third line should equal "✅ Kernel version is ${KVER_RPM}"
-        The stdout should include "✅ Downloaded ${PACKAGE_NAME}-${KVER_RPM} successfully"
-        The stdout should include "✅ Installed ${PACKAGE_NAME}-${KVER_RPM} successfully"
-        if [[ ${PACKAGE_NAME} == kernel-rt* ]]; then
+        The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        if [[ ${KPKG_VAR_PACKAGE_NAME} == kernel-rt* ]]; then
             The stdout should include "✅ Installed /usr/sbin/kernel-is-rt successfully"
-        fi
-        # message that is added on debug kernels
-        if [[ -n ${IS_DEBUG_KERNEL} ]]; then
-            The stdout should include "✅ Updated /etc/sysconfig/kernel to set debug kernels as default"
-            The contents of file /etc/sysconfig/kernel should include "UPDATEDEFAULT=yes"
-            The contents of file /etc/sysconfig/kernel should include "DEFAULTKERNEL=kernel-debug"
-            The contents of file /etc/sysconfig/kernel should include "DEFAULTDEBUG=yes"
         fi
         The stdout should include "grubby --set-default /boot/vmlinuz-${EXPECTED_KVER_UNAME}"
         if [[ ${ARCH} == s390x ]]; then
@@ -385,7 +464,11 @@ get_kpkg_ver() {
     return 0
 }
 cat(){
-    echo "cat $*"
+    if [[ $1 == /var/* ]]; then
+        command cat "$@"
+    else
+        echo "cat $*"
+    fi
 }
 io_test(){
     return 10
@@ -404,26 +487,23 @@ which(){
 }
 Describe 'kpkginstall: main - check installed kernel'
     Parameters
-        # SOURCE_PACKAGE_NAME    PACKAGE_NAME      ARCH     KVER_RPM                                 KVER_UNAME
+        # URL                                      SOURCE_PACKAGE_NAME      PACKAGE_NAME      VARIANT_SUFFIX ARCH     KVER_RPM                                 KVER_UNAME
         # kernel source package with variants
-        kernel                   kernel            x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64"
-        kernel                   kernel-64k        aarch64  "5.14.0-243.1820_756592390.el9.aarch64"  "5.14.0-243.1820_756592390.el9.aarch64+64k"
-        kernel                   kernel-debug      s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x+debug"
-        ### missing and not working, uname includes +rt
-        # kernel                 kernel-rt         x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64+rt"
+        "${KERNEL_RPM_URL}"                        kernel                   kernel            ""             x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64"
+        "${KERNEL_64k_RPM_URL}"                    kernel                   kernel-64k        -64k           aarch64  "5.14.0-243.1820_756592390.el9.aarch64"  "5.14.0-243.1820_756592390.el9.aarch64+64k"
+        "${KERNEL_DEBUG_RPM_URL}"                  kernel                   kernel-debug      -debug         s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x+debug"
+        "${KERNEL_RT_RPM_URL}"                     kernel                   kernel-rt         -rt            x86_64   "4.18.0-442.el8.x86_64"                  "4.18.0-442.el8.x86_64+rt"
         # realtime branch
-        kernel-rt                kernel-rt         s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
+        "${KERNEL_REALTIME_RPM_URL}"               kernel-rt                kernel-rt         ""             s390x    "4.18.0-442.el8.s390x"                   "4.18.0-442.el8.s390x"
         # debug jobs
-        ### missing and not working, uname includes +rt-debug
-        # kernel                 kernel-rt-debug   x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.s390x+rt-debug"
+        "${KERNEL_DEBUG_PARAM_RPM_URL}"            kernel                   kernel-rt-debug   -rt-debug      x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.x86_64+rt-debug"
         # realtime branch debug jobs
-        ### missing and not working, uname includes +debug
-        # kernel-rt              kernel-rt-debug   x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.s390x+debug"
+        "${KERNEL_REALTIME_DEBUG_PARAM_RPM_URL}"   kernel-rt                kernel-rt-debug   -debug         x86_64   "5.14.0-276.el9.x86_64"                  "5.14.0-276.el9.x86_64+debug"
         # tarballs
-        kernel                   kernel            x86_64   "6.1.0-rc7"                              "6.1.0-rc7"
+        "${KERNEL_TGZ_URL}"                        kernel                   kernel            ""             x86_64   "6.1.0-rc7"                              "6.1.0-rc7"
     End
     setup() {
-        mkdir -p /var/tmp/kpkginstall
+        mkdir -p /var/tmp/kpkginstall/vars
     }
     prepare() {
         # skip the workaround from cross-compiling
@@ -438,66 +518,57 @@ Describe 'kpkginstall: main - check installed kernel'
     AfterEach 'cleanup'
     export REBOOTCOUNT=1
 
-    It "installed with $1/$2/$3"
-        SOURCE_PACKAGE_NAME=$1
-        PACKAGE_NAME=$2
-        ARCH=$3
-        KVER=$4
-        KVER_UNAME=$5
-        echo "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
-        echo "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
-        if [[ ${PACKAGE_NAME} = *-debug ]]; then
-            echo "true" > /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL
-        fi
+    It "installed with $1"
+        KPKG_URL=$1
+        KPKG_VAR_SOURCE_PACKAGE_NAME=$2
+        KPKG_VAR_PACKAGE_NAME=$3
+        KPKG_VAR_VARIANT_SUFFIX=$4
+        ARCH=$5
+        KVER=$6
+        KVER_UNAME=$7
         prepare
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
-        The stdout should include "Running kernel version string:     ${KVER_UNAME}"
-        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "Running kernel release:  ${KVER_UNAME}"
+        The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot PASS"
         The status should be success
     End
 
-    It "can detect Call Traces on dmesg with $1/$2/$3"
-        SOURCE_PACKAGE_NAME=$1
-        PACKAGE_NAME=$2
-        ARCH=$3
-        KVER=$4
-        KVER_UNAME=$5
-        echo "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
-        echo "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
-        if [[ ${PACKAGE_NAME} = *-debug ]]; then
-            echo "true" > /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL
-        fi
+    It "can detect Call Traces on dmesg with $1"
+        KPKG_URL=$1
+        KPKG_VAR_SOURCE_PACKAGE_NAME=$2
+        KPKG_VAR_PACKAGE_NAME=$3
+        KPKG_VAR_VARIANT_SUFFIX=$4
+        ARCH=$5
+        KVER=$6
+        KVER_UNAME=$7
         export MOCKED_DMESG="Call Trace:"
         prepare
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
-        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check WARN 7"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot FAIL"
         The status should be success
     End
 
-    It "can detect Call Traces on journalctl with $1/$2/$3"
-        SOURCE_PACKAGE_NAME=$1
-        PACKAGE_NAME=$2
-        ARCH=$3
-        KVER=$4
-        KVER_UNAME=$5
-        echo "${SOURCE_PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_SOURCE_PACKAGE_NAME
-        echo "${PACKAGE_NAME}" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
-        if [[ ${PACKAGE_NAME} = *-debug ]]; then
-            echo "true" > /var/tmp/kpkginstall/KPKG_VAR_IS_DEBUG_KERNEL
-        fi
+    It "can detect Call Traces on journalctl with $1"
+        KPKG_URL=$1
+        KPKG_VAR_SOURCE_PACKAGE_NAME=$2
+        KPKG_VAR_PACKAGE_NAME=$3
+        KPKG_VAR_VARIANT_SUFFIX=$4
+        ARCH=$5
+        KVER=$6
+        KVER_UNAME=$7
         export MOCKED_JOURNALCTL="Call Trace:"
         prepare
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
-        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstalljournalctl-check WARN 7"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot FAIL"
@@ -507,7 +578,7 @@ End
 
 Describe 'kpkginstall: main - check installed kernel with cross compiling'
     setup(){
-        mkdir -p /var/tmp/kpkginstall
+        mkdir -p /var/tmp/kpkginstall/vars
     }
     cleanup(){
         rm -rf /var/tmp/kpkginstall
@@ -544,7 +615,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         KVER="$2"
         #KVER is updated with in the main function
         KVER_UNAME="$2"
-        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        echo "$1" > /var/tmp/kpkginstall/vars/KPKG_VAR_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
         # Create a dummy config to pass compiler/linker detection
@@ -554,7 +625,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         } >/usr/src/kernels/"$KVER"/.config
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
-        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
@@ -568,7 +639,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         #KVER is updated with in the main function
         KVER_UNAME="$2"
         export OLDERCONFIG_EXIT_CODE=1
-        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        echo "$1" > /var/tmp/kpkginstall/vars/KPKG_VAR_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
         # Create a dummy config to pass compiler/linker detection
@@ -578,7 +649,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         } >/usr/src/kernels/"$KVER"/.config
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
-        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should not include "make -C /usr/src/kernels/$KVER_UNAME modules_prepare"
         The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
@@ -591,7 +662,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         #KVER is updated with in the main function
         KVER_UNAME="$2"
         export MODULES_PREPARE_EXIT_CODE=1
-        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        echo "$1" > /var/tmp/kpkginstall/vars/KPKG_VAR_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
         # Create a dummy config to pass compiler/linker detection
@@ -601,7 +672,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         } >/usr/src/kernels/"$KVER"/.config
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
-        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should not include "make -C /usr/src/kernels/$KVER_UNAME scripts"
         The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
@@ -614,7 +685,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         #KVER is updated with in the main function
         KVER_UNAME="$2"
         export SCRIPTS_EXIT_CODE=1
-        echo "$1" > /var/tmp/kpkginstall/KPKG_PACKAGE_NAME
+        echo "$1" > /var/tmp/kpkginstall/vars/KPKG_VAR_PACKAGE_NAME
         # Make sure it will execute cross compiling path
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
         # Create a dummy config to pass compiler/linker detection
@@ -624,7 +695,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         } >/usr/src/kernels/"$KVER"/.config
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
-        The stdout should include "✅ Found the correct kernel version running!"
+        The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
         The status should be success
