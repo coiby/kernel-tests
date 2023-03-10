@@ -15,4 +15,7 @@
 #
 # Author: Milos Malik <mmalik@redhat.com>
 
-rhts-run-simple-test "$TEST" ./test-core
+TEST=ipmi-rmcp_ping
+
+chmod +x test-core
+rhts-run-simple-test "$TEST" "./test-core"
