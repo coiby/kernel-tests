@@ -1,0 +1,16 @@
+summary: Test upstream kvm-self-tests suite
+description: |
+    Run the upstream kvm-self-tests suite.
+contact: Marcelo Condotta <mcondotta@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - git
+  - nmap-ncat
+  - qemu-kvm
+duration: 1h
+extra-summary: /kernel/vm/kvm-self-tests
+extra-task: /kernel/vm/kvm-self-tests
