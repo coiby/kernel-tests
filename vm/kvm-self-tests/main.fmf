@@ -7,10 +7,12 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 require:
+  - bc
   - gcc
-  - git
-  - nmap-ncat
-  - qemu-kvm
+  - make
+  - patch
+  - rsync
+  - wget
 duration: 1h
 extra-summary: /kernel/vm/kvm-self-tests
 extra-task: /kernel/vm/kvm-self-tests
