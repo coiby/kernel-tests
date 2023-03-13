@@ -2,7 +2,7 @@
 
 # Include rhts environment
 if ! (($is_rhivos)); then
-	. /usr/bin/rhts-environment.sh || exit 1
+    . /usr/bin/rhts-environment.sh || exit 1
 fi
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
