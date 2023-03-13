@@ -25,7 +25,7 @@ FWTS_VERSION=${FWTS_VERSION:-V21.06.00}
 
 if [ -n "$FwtsGitRemote" -o -n "$FwtsGitBranch" ]; then
     : ${FwtsGitRemote:=git://kernel.ubuntu.com/hwe/fwts.git}
-else 
+else
     : ${FwtsTarBall:=fwts-$FWTS_VERSION.tar.gz}
     : ${FwtsTarBallUrl:=$LOOKASIDE/$FwtsTarBall}
 fi
