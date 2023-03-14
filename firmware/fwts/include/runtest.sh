@@ -1,6 +1,10 @@
 #!/bin/bash
 
-. /usr/bin/rhts-environment.sh || exit 1
+# Include rhts environment
+if ! (($is_rhivos)); then
+    . /usr/bin/rhts-environment.sh || exit 1
+fi
+
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # Task parameters
@@ -18,6 +22,7 @@ LOOKASIDE=${LOOKASIDE:-http://download.eng.bos.redhat.com/qa/rhts/lookaside/}
 FWTS_ON_FAIL_REPORT=${FWTS_ON_FAIL_REPORT:-FAIL}
 FWTS_VERSION=${FWTS_VERSION:-V21.06.00}
 
+
 if [ -n "$FwtsGitRemote" -o -n "$FwtsGitBranch" ]; then
     : ${FwtsGitRemote:=git://kernel.ubuntu.com/hwe/fwts.git}
 else
@@ -25,33 +30,106 @@ else
     : ${FwtsTarBallUrl:=$LOOKASIDE/$FwtsTarBall}
 fi
 
+
 function fwtsSetup()
 {
     # Setup build prerequisites for fwts
     # normally Beaker pre-installs the prereqs, but since this is an "include"
     # task Beaker won't check the rpm-requirements for this task
+
+    # This is for issue "gcc: fatal error: Killed signal terminated program cc1"
+    if (($is_rhivos)); then
+        rlRun "fallocate -l 1G swapfile && \
+               chmod 600 swapfile && \
+               mkswap swapfile && \
+               swapon swapfile && \
+               echo 'swapfile swap swap defaults 0 0' >> /etc/fstab" 0 "create swap memory"
+    fi
+
     if ! rlCheckRpm pcre-devel; then
-        yum install pcre-devel -y
+        if ! (($is_rhivos)); then
+            yum install pcre-devel -y
+        else
+cat >/etc/yum.repos.d/rhel.repo <<EOF
+[baseos-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$(arch)/os
+enabled=1
+gpgcheck=0
+[appstream-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/$(arch)/os/
+enabled=1
+gpgcheck=0
+[crb-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/$(arch)/os/
+enabled=1
+gpgcheck=0
+[baseos-debug-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$(arch)/debug/tree
+enabled=1
+gpgcheck=0
+[appstream-debug-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/$(arch)/debug/tree
+enabled=1
+gpgcheck=0
+[crb-debug-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/$(arch)/debug/tree
+enabled=1
+gpgcheck=0
+EOF
+            rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive pcre-devel
+        fi
         rlAssertRpm pcre-devel
     fi
 
     if ! rlCheckRpm json-c-devel; then
-        yum install json-c-devel -y
+        if ! (($is_rhivos)); then
+            yum install json-c-devel -y
+        else
+            rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive json-c-devel
+        fi
         rlAssertRpm json-c-devel
     fi
 
     if ! rlCheckRpm glib2-devel; then
-        yum install glib2-devel -y
+        if ! (($is_rhivos)); then
+            yum install glib2-devel -y
+        else
+            rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive glib2-devel
+        fi
         rlAssertRpm glib2-devel
     fi
 
     if ! rlCheckRpm elfutils-libelf-devel; then
-        yum install elfutils-libelf-devel -y
+        if ! (($is_rhivos)); then
+            yum install elfutils-libelf-devel -y
+        else
+            rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive elfutils-libelf-devel
+        fi
         rlAssertRpm elfutils-libelf-devel
     fi
 
-    if ! rlCheckRpm kernel-devel $(uname -r); then
-        yum install kernel-devel-$(uname -r) -y
+    local k_name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/-core//')
+
+    if ! rlCheckRpm ${k_name}-devel $(uname -r); then
+        if ! (($is_rhivos)); then
+            yum install ${k_name}-$(uname -r) -y
+        else
+cat > /etc/yum.repos.d/rhivos-outside.repo <<EOF
+[rhivos-external]
+name=RHIVOS - base - outside
+baseurl=https://buildlogs.centos.org/9-stream/automotive/$(arch)/packages-main/
+enabled=1
+gpgcheck=0
+
+[rhivos-autosd-external]
+name=RHIVOS - autosd - outside
+baseurl=https://buildlogs.centos.org/9-stream/autosd/$(arch)/packages-main/
+enabled=1
+gpgcheck=0
+EOF
+             rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive "${k_name}-devel-$(uname -r)"
+        fi
+        rlAssertRpm ${k_name}-devel-$(uname -r)
     fi
 
     # libbsd is a requirement to build.
@@ -65,8 +143,35 @@ baseurl=http://download.eng.bos.redhat.com/qa/rhts/lookaside/fwts-deps/libbsd/
 enabled=1
 gpgcheck=0
 EOF
-        yum install libbsd-devel -y
+        if ! (($is_rhivos)); then
+            yum install libbsd-devel -y
+        else
+            rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive "libbsd-devel"
+        fi
         rlAssertRpm libbsd-devel
+    fi
+
+    #Some packages only need for rhivos
+    if (($is_rhivos)); then
+        if ! rlCheckRpm patch; then
+            rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive patch
+            rlAssertRpm patch
+        fi
+
+        if ! rlCheckRpm autoconf; then
+            rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive autoconf
+            rlAssertRpm autoconf
+        fi
+
+        if ! rlCheckRpm automake; then
+            rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive automake
+            rlAssertRpm automake
+        fi
+
+        if ! rlCheckRpm libtool; then
+            rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive libtool
+            rlAssertRpm libtool
+        fi
     fi
 
     # Skip download/build/installation if it looks like fwts is already installed
@@ -101,6 +206,12 @@ EOF
         # setup efi_runtime module needed by uefirt* tests
         # make modules_install so efi_runtime can be loaded with modprobe as fwts requires
         rlRun "cd efi_runtime" 0 "cd into efi_runtime directory"
+
+        # remount /usr folder as rw access promission
+        if (($is_rhivos)); then
+            rlRun "sudo mount -o remount,rw /dev/vda3 /usr" 0 "remount /usr to rw access promission"
+        fi
+
         # Setting $KVER to the running kernel version should negate the need for  0003-efi_runtime_Makefile_modules_install.patch
         if [ "$(uname -m)" = "aarch64" ] ; then
             rlRun "ARCH=arm64 KVER=$(uname -r) make all install" 0 "make all install inside efi_runtime"

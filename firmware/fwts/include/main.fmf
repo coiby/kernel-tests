@@ -1,0 +1,17 @@
+summary: beaker library for Firmware Test Suite (fwts)
+description: |
+    This is meant to be a library for other tasks that want to use
+    fwts. It provides setup, beaker reporting and cleanup functions.
+
+    For more info see the wiki page:
+    https://wiki.test.redhat.com/Kernel/fwts
+contact: Oliver Gutierrez <ogutierr@redhat.com>
+component:
+  - firmware
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+duration: 60m
+extra-summary: /kernel/firmware/fwts/include
+extra-task: /kernel/firmware/fwts/include
