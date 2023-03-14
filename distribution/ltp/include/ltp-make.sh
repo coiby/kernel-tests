@@ -109,6 +109,8 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-aiocp-remove-the-check-read-unnecessary-flag.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-dirtyc0w_shmem_child-64k-pagesize.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-mount03-flip-to-the-next-second-before-doing-the-acc.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-stop-throwing-failure-when-MADV_WILLNEED-i.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-setfsuid02_16-Fix-uid-1-too-large-for-testing-16-bit.patch
     fi
     if [ "$TESTVERSION" == "20220930" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
