@@ -1,0 +1,40 @@
+From c39c54b65faa8486d59c0de34f66b2dc1fbdcab4 Mon Sep 17 00:00:00 2001
+From: Ping Fang <pifang@redhat.com>
+Date: Thu, 9 Mar 2023 16:54:54 +0800
+Subject: [PATCH] setfsuid02_16: Fix uid -1 too large for testing 16-bit
+ version
+
+__kernel_old_uid_t is not defined as 16bit on s390, ppc64le
+Then -1 will be translated into UINT_MAX fails the size check.
+s390, ppc64le use definition in /usr/include/asm-generic/posix_types.h
+
+typedef unsigned int    __kernel_uid_t;
+...
+typedef __kernel_uid_t  __kernel_old_uid_t;
+
+x86_64, aarch64 use definition in /usr/include/asm/posix_types_64.h
+typedef unsigned short __kernel_old_uid_t;
+
+Reviewed-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Signed-off-by: Ping Fang <pifang@redhat.com>
+---
+ testcases/kernel/syscalls/utils/compat_uid.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/utils/compat_uid.h b/testcases/kernel/syscalls/utils/compat_uid.h
+index 94e54f310..7a345a654 100644
+--- a/testcases/kernel/syscalls/utils/compat_uid.h
++++ b/testcases/kernel/syscalls/utils/compat_uid.h
+@@ -26,7 +26,7 @@
+ #include "tst_common.h"
+ 
+ #ifdef TST_USE_COMPAT16_SYSCALL
+-typedef __kernel_old_uid_t UID_T;
++typedef unsigned short UID_T;
+ int UID_SIZE_CHECK(uid_t uid)
+ {
+ 	/* See high2lowuid in linux/highuid.h
+-- 
+2.38.1
+

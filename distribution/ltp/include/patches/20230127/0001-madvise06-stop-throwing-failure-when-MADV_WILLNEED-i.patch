@@ -1,0 +1,80 @@
+From 6319a9b785a15dbb22e14df49a26f66a733ab3b5 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Thu, 2 Mar 2023 15:41:23 +0800
+Subject: [PATCH] madvise06: stop throwing failure when MADV_WILLNEED is
+ ignored
+
+There is an intermittent failure which we have observed many times whether
+on rhel or mainline kernel. But we're unable to stable reproduce it:
+
+    43	madvise06.c:201: TFAIL: less than 102400 Kb were moved to the swap cache
+    ...
+
+However it does not look like a kernel issue, because SwapCached change is
+not strictly abiding by the principle of MADV_WILLNEED advice. That means it
+all depends on the kernel's specific circumstances. The value of the threshold
+is debatable at least from my point of view, its use 1/4 is not guaranteed
+100% safe.
+
+As MADV_WILLNEED is just advice to the kernel, not a guarantee. The kernel may
+choose to ignore the advice, or may prioritize other memory management tasks
+over pre-loading the advised pages.
+
+This change to report a test result of "TINFO" instead of "TFAIL" when the swap
+cache size is less than expected would be intended to indicate that this is an
+acceptable outcome. Same changes apply to the page_fault counting as well.
+
+In the end, we added kernel taint check in case of no pass/fail result.
+
+Reported-by: Paul Bunyan <pbunyan@redhat.com>
+Cc: Richard Palethorpe <rpalethorpe@suse.de>
+Cc: Yongqiang Liu <liuyongqiang13@huawei.com>
+Cc: Eirik Fuller <efuller@redhat.com>
+Signed-off-by: Li Wang <liwang@redhat.com>
+Acked-by: Petr Vorel <pvorel@suse.cz>
+Reviewed-by: Richard Palethorpe <rpalethorpe@suse.com>
+---
+ testcases/kernel/syscalls/madvise/madvise06.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/madvise/madvise06.c b/testcases/kernel/syscalls/madvise/madvise06.c
+index c7967ae6f..be22318ea 100644
+--- a/testcases/kernel/syscalls/madvise/madvise06.c
++++ b/testcases/kernel/syscalls/madvise/madvise06.c
+@@ -198,7 +198,7 @@ static void test_advice_willneed(void)
+ 
+ 	meminfo_diag("After madvise");
+ 	res = swapcached > swapcached_start + PASS_THRESHOLD_KB;
+-	tst_res(res ? TPASS : TFAIL,
++	tst_res(res ? TPASS : TINFO,
+ 		"%s than %ld Kb were moved to the swap cache",
+ 		res ? "more" : "less", PASS_THRESHOLD_KB);
+ 
+@@ -226,10 +226,15 @@ static void test_advice_willneed(void)
+ 	meminfo_diag("After page access");
+ 
+ 	res = page_fault_num_2 - page_fault_num_1;
+-	tst_res(res == 0 ? TPASS : TFAIL,
++	tst_res(res == 0 ? TPASS : TINFO,
+ 		"%d pages were faulted out of 3 max", res);
+ 
+ 	SAFE_MUNMAP(target, CHUNK_SZ);
++
++	if (tst_taint_check())
++		tst_res(TFAIL, "Kernel tainted");
++	else
++		tst_res(TPASS, "No kernel taints");
+ }
+ 
+ static struct tst_test test = {
+@@ -237,6 +242,7 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.needs_tmpdir = 1,
+ 	.needs_root = 1,
++	.taint_check = TST_TAINT_W | TST_TAINT_D,
+ 	.save_restore = (const struct tst_path_val[]) {
+ 		{"/proc/sys/vm/swappiness", NULL,
+ 			TST_SR_SKIP_MISSING | TST_SR_TCONF_RO},
+-- 
+2.38.1
+
