@@ -4,7 +4,7 @@ description: |
 contact: Marcelo Condotta <mcondotta@redhat.com>
 component:
   - kernel
-test: bash ./runtest.sh
+test: ./runtest.sh
 framework: beakerlib
 require:
   - gcc
