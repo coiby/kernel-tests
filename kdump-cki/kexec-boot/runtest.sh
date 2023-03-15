@@ -26,6 +26,7 @@
 TEST="/kdump/kexec-boot"
 
 KEXEC_VER=${KEXEC_VER:-"$(uname -r)"}
-EXTRA_KEXEC_OPTIONS=${EXTRA_KEXEC_OPTIONS:-"-d"}
+# Specifying "-c" to test kexec_load() call explicitly.
+EXTRA_KEXEC_OPTIONS=${EXTRA_KEXEC_OPTIONS:-"-d -c"}
 
 RunTest "KexecBoot kexecbootoption"
