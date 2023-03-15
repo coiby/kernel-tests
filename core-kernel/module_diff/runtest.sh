@@ -50,7 +50,7 @@ function GetCurrentModuleList ()
     # rpm -q --filesbypkg kernel-2.6.32-220.el6 | grep '\.ko' | awk -F/ '{ print $NF }' | sort
 
     if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
-        PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
+        PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
         if $(cki_is_kernel_rt); then
             PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
         fi
@@ -130,6 +130,12 @@ function AddRTKnowRemovedList ()
     cat ./${OS}/${Release}/${Release}{-,-rt-}knownRemoved-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_knownRemoved-rt
     \cp ${TESTAREA}/moduleList_knownRemoved-rt ${TESTAREA}/moduleList_knownRemoved
 }
+# Workround for aarch64 64k
+function Add64kKnowRemovedList ()
+{
+    cat ./${OS}/${Release}/${Release}{-,-64k-}knownRemoved-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_knownRemoved-64k
+    \cp ${TESTAREA}/moduleList_knownRemoved-64k ${TESTAREA}/moduleList_knownRemoved
+}
 
 function GetKnownRemovedList ()
 {
@@ -148,6 +154,9 @@ function GetKnownRemovedList ()
 
     if $(cki_is_kernel_rt); then
         AddRTKnowRemovedList
+    fi
+    if $(cki_is_kernel_64k); then
+        Add64kKnowRemovedList
     fi
 
     if [ ! -e "${TESTAREA}/moduleList_knownRemoved" ]; then
@@ -239,24 +248,35 @@ function chk_inst_kernel_modules_extra ()
     pkg_kms_extra="${name}-modules-extra-${version}-${release}.${arch}"
     rpm -q $pkg_kms_extra || $YUM -y install $pkg_kms_extra || (cki_abort_task "Missing ${name}-modules-extra")
 }
+function chk_inst_kernel_modules_core ()
+{
+    pkg_kms_core="${name}-modules-core-${version}-${release}.${arch}"
+    rpm -q $pkg_kms_core || $YUM -y install $pkg_kms_core || (cki_print_warning "Missing ${name}-modules-core, please check")
+}
 
 rlJournalStart
     rlPhaseStartTest
         YUM=$(cki_get_yum_tool)
         name="kernel"
         arch=$(uname -m)
-        version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//"`
+        version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//;s/+64k//"`
         version=${version_release%-*}
         release=${version_release#*-}
         kvari=`uname -r | grep -Eo '(debug|PAE|xen)$'`
         if $(cki_is_kernel_rt); then
             name="${name}-rt"
         fi
+        if $(cki_is_kernel_64k); then
+            name="${name}-64k"
+        fi
         if $(cki_is_kernel_debug); then
             name="${name}-debug"
         fi
 
-        if  grep -q "release 8" /etc/redhat-release || grep -q "release 9" /etc/redhat-release ; then
+        if  grep -q "release 9" /etc/redhat-release ; then
+            chk_inst_kernel_modules_extra
+            chk_inst_kernel_modules_core
+        elif grep -q "release 8" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
         fi
         if $(cki_is_kernel_rt); then
@@ -518,6 +538,24 @@ rlJournalStart
                     if cki_kver_lt "4.18.0-432"; then
                         sed -i '/^video.ko/d;' ${OS}/${Release}/$Release-modules-aarch64.lst
                     fi
+                    if cki_kver_lt "4.18.0-439"; then
+                        sed -i '/^amd_hsmp.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-442"; then
+                        sed -i '/drm_display_helper.ko/d;' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/drm_buddy.ko/d;' ${OS}/${Release}/$Release-modules-{aarch64.ppc64le}.lst
+                    fi
+                    if cki_kver_lt "4.18.0-444"; then
+                        sed -i '/amd_pstate.ko/d;/snd-hda-cs-dsp-ctls.ko/d;/snd-soc-hda-codec.ko/d;/snd-sof-pci-intel-mtl.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-447"; then
+                        sed -i '/sfc-siena.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-448"; then
+                        sed -i '/nvsw-sn2201.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                        sed -i '/hpwdt.ko/d;' ${OS}/${Release}/$Release-modules-aarch64.lst
+                        sed -i '/amd_pstate.ko/d;' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then
@@ -562,6 +600,85 @@ rlJournalStart
                     fi
                     if cki_kver_lt "5.14.0-181"; then
                         sed -i '/i2c-imx-lpi2c.ko/d;/i2c-virtio.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-183"; then
+                        sed -i '/efi_secret.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-186"; then
+                        sed -i '/rtc-rv8803.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/^video.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-191"; then
+                        sed -i '/zsmalloc.ko/d' ${OS}/${Release}/$Release-modules-s390x.lst
+                    fi
+                    if cki_kver_lt "5.14.0-198"; then
+                        sed -i '/pseries-wdt.ko/d' ${OS}/${Release}/$Release-modules-ppc64le.lst
+                    fi
+                    if cki_kver_lt "5.14.0-202"; then
+                        sed -i '/nvsw-sn2201.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-204"; then
+                        sed -i '/cxl_mem.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-206"; then
+                        sed -i '/drm_display_helper.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/mei-gsc.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                        sed -i '/drm_buddy.ko/d' ${OS}/${Release}/$Release-modules-{aarch64,ppc64le}.lst
+                        sed -i '/drm_dp_helper.ko/d' ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-207"; then
+                        sed -i '/amd_pstate.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-209"; then
+                        sed -i '/snd-hda-cs-dsp-ctls.ko/d;/snd-soc-hda-codec.ko/d;/snd-sof-pci-intel-mtl.ko/d;/soc-utils-test.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-213"; then
+                        sed -i '/ifcvf.ko/d;/iova.ko/d;/mlx5_vdpa.ko/d;/vdpa.ko/d;
+                                /vdpa_sim_blk.ko/d;/vdpa_sim.ko/d;/vdpa_sim_net.ko/d;
+                                /vhost_vdpa.ko/d;/virtio_pci_modern_dev.ko/d;/virtio_vdpa.ko/d;
+                                /vp_vdpa.ko/d;/vringh.ko/d' ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-214"; then
+                        sed -i '/sfc-siena.ko/d' ${OS}/${Release}/$Release-modules-{x86_64,ppc64le}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-215"; then
+                        sed -i '/gnss.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-217"; then
+                        sed -i '/amd_pstate.ko/d' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-219"; then
+                        sed -i '/^curve25519-generic.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-229"; then
+                        sed -i '/soc-utils-test.ko/d' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-230"; then
+                        sed -i '/hpwdt.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-237"; then
+                        sed -i '/pcs_xpcs.ko/d' ${OS}/${Release}/$Release-knownRemoved-{s390x,ppc64le}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-247"; then
+                        sed -i '/snd-pci-ps.ko/d;/snd-ps-pdm-dma.ko/d;/snd-soc-ps-mach.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-249"; then
+                        sed -i '/drm_dp_aux_bus.ko/d;/host1x.ko/d;/tegra-drm.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-250"; then
+                        sed -i '/tdx-guest.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-255"; then
+                        sed -i '/esd_usb2.ko/d' ${OS}/${Release}/$Release-knownRemoved-aarch64.lst
+                        sed -i '/ems_usb.ko/d;/esd_usb2.ko/d;/kvaser_usb.ko/d;/m_can.ko/d;
+                                /m_can_pci.ko/d;/mcp251xfd.ko/d;/mcp251x.ko/d;/peak_pciefd.ko/d;
+                                /peak_usb.ko/d;/slcan.ko/d;/usb_8dev.ko/d;' ${OS}/${Release}/$Release-knownRemoved-{ppc64le,x86_64}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-263"; then
+                        sed -i '/snd-soc-rt1318-sdw.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-264"; then
+                        sed -i '/dwmac-tegra.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
                     fi
                     ;;
             esac

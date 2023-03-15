@@ -1,0 +1,12 @@
+summary: Regression test for bug 1549355
+description: |
+    # This test is applicable to ppc64le powervm only
+    It tests crashing the system after cpu add operation
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/reg-bz1549355-cpu-add
+extra-task: /kernel/kdump/reg-bz1549355-cpu-add

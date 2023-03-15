@@ -1,0 +1,14 @@
+[General]
+name=storage/nvdimm/btt_data_integrity
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvdimm btt data integrity test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
+dependencies=ndctl
+max_time=2h
+use_pty=false

@@ -1,0 +1,14 @@
+[General]
+name=storage/nvdimm/btt_devdax_fsdax_raw_switch_simultaneously
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvdimm btt devdax fsdax raw switch simultaneously test BZ1472034
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
+dependencies=ndctl
+max_time=2h
+use_pty=false

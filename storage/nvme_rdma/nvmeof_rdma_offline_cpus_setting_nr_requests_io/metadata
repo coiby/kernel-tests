@@ -1,0 +1,14 @@
+[General]
+name=storage/nvme_rdma/nvmeof_rdma_offline_cpus_setting_nr_requests_io
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvmeof rdma offline cpus setting nr_requests during io
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvme_rdma/include
+dependencies=nvme-cli;nvmetcli;fio
+max_time=2h
+use_pty=false

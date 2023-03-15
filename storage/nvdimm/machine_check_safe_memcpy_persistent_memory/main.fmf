@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/machine_check_safe_memcpy_persistent_memory
+description: nvdimm feature test for machine check safe memcpy BZ1437205
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/machine_check_safe_memcpy_persistent_memory
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - gcc
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/machine_check_safe_memcpy_persistent_memory
+extra-task: /storage/nvdimm/machine_check_safe_memcpy_persistent_memory
+id: 20956f64-09f1-49d4-b5d9-bfa153fe2884

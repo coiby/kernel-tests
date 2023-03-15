@@ -25,19 +25,65 @@
 K_TESTAREA="/mnt/testarea"
 K_NFS="${K_TESTAREA}/KDUMP-NFS"
 K_PATH="${K_TESTAREA}/KDUMP-PATH"
+K_REBOOT="${K_TMP_DIR}/KDUMP-REBOOT"
+C_REBOOT="./C_REBOOT"
 
 KDUMP_CONFIG="/etc/kdump.conf"
 KDUMP_SYS_CONFIG="/etc/sysconfig/kdump"
 KDUMP_LOG="/var/log/kdump.log"
+K_DEFAULT_PATH="/var/crash"
 
 K_TMP_DIR="${K_TESTAREA}/tmp"
-K_REBOOT="${K_TMP_DIR}/KDUMP-REBOOT"
-C_REBOOT="./C_REBOOT"
+
+K_DEBUG=${K_DEBUG:-false}
+K_NFSSERVER=${K_NFSSERVER:-""}
+K_VMCOREPATH=${K_VMCOREPATH:-"/var/crash"}
 
 UPGRADE_FC_KDUMP=${UPGRADE_FC_KDUMP:-"true"}
 UPGRADE_FC_CRASH=${UPGRADE_FC_CRASH:-"true"}
 
 mkdir -p ${K_TMP_DIR}
+
+# Kernel Variables
+
+if [[ $(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r)) =~ "not owned by any package" ]]; then
+    # kernel config/vmlinuz are installed from tarball, not dnf install
+    K_NAME=kernel
+    K_ARCH=$(uname -m)
+    K_VER=$(uname -r | cut -d'-' -f1)
+    K_REL=$(uname -r | cut -d'-' -f2-)
+    K_KVARI=$(uname -r | grep -Eo '(debug|rt|rt(-)*debug|64k|64k-debug)$')
+    K_SPEC_NAME=kernel
+else
+    # Example outputs: kernel-core, kernel-rt-core, kernel-rt-debug-core
+    K_NAME=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r))
+    K_ARCH=$(uname -m)
+
+    # Kernel version
+    # Example outputs: 2.6.32, 4.18.0
+    K_VER=$(rpm --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
+
+    # Kernel release
+    # Example outputs: 1160.81.1.el7, 226.el9, 5.14.0-226.rt14.227.el9
+    K_REL=$(rpm --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
+
+    # Example outputs: debug, xen, vanilla
+    # Note, rt kernel (and rt debug kernel) will be treated as variants after
+    # rt kernel source is merged to kernel tree.
+    K_KVARI=$(uname -r | grep -Eo '(debug|PAE|xen|trace|vanilla|rt|rt(-)*debug|64k|64k-debug)$')
+
+    # Example output: kernel-2.6.32-220.el6.src.rpm
+    K_SRC=$(rpm --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r))
+
+    # Example outputs: kernel-rt, kernel
+    # This is a little cryptic, in practice it takes the full src rpm file
+    # name and strips everything after (including) the version, leaving just
+    # the src rpm package name.
+    # Needed
+    # - when the kernel rpm comes from of e.g. kernel-pegas src rpm.
+    # - kernel-rt rpm comes from kernel src rpm (merged source tree)
+    K_SPEC_NAME=${K_SRC%%"-${K_VER}"*}
+fi
 
 rlIsRHEL 5 && IS_RHEL5=true || IS_RHEL5=false
 rlIsRHEL 6 && IS_RHEL6=true || IS_RHEL6=false
@@ -47,6 +93,18 @@ rlIsRHEL 9 && IS_RHEL9=true || IS_RHEL9=false
 rlIsFedora && IS_FC=true || IS_FC=false
 rlIsCentOS 8 && IS_CentOS8=true || IS_CentOS8=false
 rlIsCentOS 9 && IS_CentOS9=true || IS_CentOS9=false
+[[ "$FAMILY" =~ CentOSStream ]] && IS_COS=true || IS_COS=false
+[[ "$FAMILY" =~ RedHatEnterpriseLinux ]] && IS_RHEL=true || IS_RHEL=false
+
+if $IS_FC || $IS_COS; then
+    RELEASE=$(grep -o 'release [^ ]*' /etc/redhat-release  | awk '{print $NF}')
+else
+    RELEASE=$(grep -o 'release [^.]*' /etc/redhat-release | awk '{print $NF}')
+fi
+
+uname -v | grep -q PREEMPT_RT && IS_RT=true || IS_RT=false
+uname -r | grep -qE "[-+]debug" && IS_DB=true || IS_DB=false
+uname -r | grep -qE "[-+]64k" && IS_64K=true || IS_64K=false
 
 if $IS_RHEL5 || $IS_RHEL6; then
     INITRD_PREFIX=initrd
@@ -55,39 +113,23 @@ else
 fi
 INITRD_IMG_PATH="/boot/$INITRD_PREFIX-`uname -r`.img"
 
-# e.g. x86_64
-K_ARCH=`uname -m`
+shopt -s extglob
+if stat /run/ostree-booted > /dev/null 2>&1; then
+    K_BOOT="/usr/lib/ostree-boot"
+    INITRD_IMG_PATH=$(find $K_BOOT -name "${INITRD_PREFIX}-$(uname -r).img-*")
+else
+    [ "${K_ARCH}" = "ia64" ] && K_BOOT="/boot/efi/efi/redhat" || K_BOOT="/boot"
+    INITRD_IMG_PATH="$K_BOOT/$INITRD_PREFIX-$(uname -r).img"
+fi
 
-# e.g 4.18.0-74.el8
-K_KVER=`uname -r | sed "s/\.$K_ARCH//"`
-
-# debug|PAE|xen|trace|vanilla if any
-K_KVARI=`echo $K_KVER | grep -Eo '(debug|PAE|xen|trace|vanilla)$'`
-
-# .e.g kernel-2.6.32-220.el6.src.rpm
-K_KSRC=`rpm -q --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r)`
-
-# In RHEL-8, `uname -r` on a debug kernel returns '4.18.0-40.el8.x86_64+debug'
-# Instead of '3.10.0-957.1.2.el7.x86_64.debug' as it usually is in RHEL-7
-K_KVERS=`echo $K_KVER | sed "s/[.+]*$K_KVARI$//"`
-
-# This is a little cryptic, in practice it takes the full src rpm file
-# name and strips everytihng after (including) the version, leaving just
-# the src rpm package name.
-# Needed when the kernel rpm comes from of e.g. kernel-pegas src rpm.
-K_SPEC_NAME=${K_KSRC%%-${K_KVER}*}
-
-K_DEFAULT_PATH="/var/crash"
-IS_RT_KEN=false
-
-K_DEBUG=${K_DEBUG:-false}
-K_NFSSERVER=${K_NFSSERVER:-""}
-K_VMCOREPATH=${K_VMCOREPATH:-"/var/crash"}
+INITRD_KDUMP_IMG_PATH=${INITRD_IMG_PATH/.img/kdump.img}
+VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
+[ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-$(uname -r)!(*debug*|*64k*|*rt*))
 
 
-[ "${K_ARCH}" = "ia64" ] && K_BOOT="/boot/efi/efi/redhat" || K_BOOT="/boot"
 
 
+# Backup kdump config files
 BackupKdumpConfig()
 {
     [ -f "${KDUMP_CONFIG}" -a ! -f "${KDUMP_CONFIG}.bk" ] && cp "${KDUMP_CONFIG}" "${KDUMP_CONFIG}.bk"
@@ -145,13 +187,6 @@ CheckEnv()
     else
         SERVERFILE="Server-${RSTRNT_JOBID}"
     fi
-    # Skip test on ark kernel with debug flag, workaround for issue:
-    # https://gitlab.com/cki-project/pipeline-definition/-/issues/71
-    if uname -r | egrep -q "git.*\.eln"; then
-        echo "Skipping test on ark kernels with debug flags enabled"
-        rstrnt-report-result $TEST SKIP
-        exit
-    fi
 }
 
 PrepareReboot()
@@ -180,7 +215,6 @@ RunTest()
     warn=0
     error=0
     skip=0
-
     CheckEnv
 
     # Check test type.
@@ -306,15 +340,15 @@ Report() {
     local stage="$1"
     local code
 
-    if (( skip != 0 )); then
-        result="SKIP"
-        code=0
-    elif (( error != 0 )); then
+    if (( error != 0 )); then
         result="FAIL"
         code=${error}
     elif (( warn != 0 )); then
         result="WARN"
         code=${warn}
+    elif (( skip != 0 )); then
+        result="SKIP"
+        code=0
     else
         result="PASS"
         code=0
@@ -322,7 +356,7 @@ Report() {
 
     echo ":::::::::::::::::::::::::::::::::::::::::::::"
     [ -n "${stage}" ] && echo -e ":: PHASE: $stage"
-    echo -e ":: RESULT: ${result} (skip: ${skip} warn: ${warn} error: ${error})"
+    echo -e ":: RESULT: ${result} (skip: ${skip:-0} warn: {warn:-0} error: ${error:-0})"
     echo ":::::::::::::::::::::::::::::::::::::::::::::"
 
 
@@ -463,7 +497,7 @@ SetupKdump()
         }
 
         # For kernel-rt
-        $IS_RT_KEN && [ -f /usr/bin/rt-setup-kdump ] && {
+        $IS_RT && [ -f /usr/bin/rt-setup-kdump ] && {
             Log "Modifying /etc/sysconfig/kdump properly for RT."
             set -x; /usr/bin/rt-setup-kdump -g; set +x
         }
@@ -490,10 +524,7 @@ SetupKdump()
             systemctl enable kdump.service || chkconfig kdump on
             rpm -q --quiet grubby || InstallPackages grubby
             Log "Update boot loader"
-            {
-                LogRun "/sbin/grubby --args=\"${KER1ARGS}\" --update-kernel=\"${default}\"" &&
-                if [ "${K_ARCH}" = "s390x" ]; then zipl; fi
-            } || FatalError "Error changing boot loader."
+            UpdateKernelOptions "${KER1ARGS}" || FatalError "Error changing boot loader."
 
             Report 'pre-reboot'
             Log "Rebooting..."; sync; SafeReboot
@@ -800,17 +831,23 @@ InstallPackages()
         shift
         action=upgrade
     fi
+    local pkgs="$*"
+
     [ $# -eq 0 ] && {
         Error "No package specified for ${action}ing"
         return 1
     }
 
-    if CommandExists dnf ; then
-        LogRun "dnf ${action} -y $*"
-    elif CommandExists yum ; then
-        LogRun "yum ${action} -y $*"
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        LogRun "rpm-ostree install --apply-live --allow-inactive --idempotent -y $pkgs"
     else
-        return 1
+        if CommandExists dnf ; then
+            LogRun "dnf $action -y $pkgs"
+        elif CommandExists yum ; then
+            LogRun "yum $action -y $pkgs"
+        else
+            return 1
+        fi
     fi
 }
 
@@ -827,11 +864,6 @@ InstallDebuginfo()
         return
     fi
 
-    #workaround the kernel name if it's kernel-core
-    if [[ "$kern" == kernel-core-debuginfo-* ]]; then
-        kern=${kern//kernel-core/kernel}
-    fi
-
     Log "Install ${kern}"
     rpm -q ${kern} || {
         InstallPackages ${kern}
@@ -841,6 +873,50 @@ InstallDebuginfo()
         }
     }
 
+}
+
+# Update kernel options
+# Parameters
+#   1: Options. If starting with "-" means it's going to removed.
+#   2: Kernel: The kernel going to be updated. Default to curent running kernel
+UpdateKernelOptions()
+{
+    Log "Updating kernel options"
+
+    options="${1}"
+    kernel="${2:-"${VMLINUZ_PATH}"}"
+
+    if [ -z "${options}" ]; then
+        Error "Empty options provided"
+        return 1
+    fi
+
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        action="--append-if-missing"
+    else
+        action="--args"
+    fi
+    if grep -q ^- <<< "${options}"; then
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            action="--delete-if-present"
+        else
+            action="--remove-args"
+        fi
+        options="$(sed "s/^-//" <<< ${options})"
+    fi
+
+    {
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            LogRun "rpm-ostree kargs ${action}=\"${options}\" --import-proc-cmdline"
+        else
+            LogRun "/sbin/grubby ${action}=\"${options}\" --update-kernel=\"${kernel}\"" &&
+            if [ "${K_ARCH}" = "s390x" ]; then zipl; fi
+        fi
+    } || {
+        Error "Failed to update option: ${options} on kernel ${kernel}"
+        return 1
+    }
+    return 0
 }
 
 LsCore()
@@ -898,12 +974,7 @@ exit
 EOF
 
     Log "Simple crash tests against the vmcore"
-
-    if [ "${K_KVARI}" = 'rt' ]; then
-        CrashCommand "--reloc=12m" "${vmlinux}" "${vmcore}"
-    else
-        CrashCommand "" "${vmlinux}" "${vmcore}"
-    fi
+    CrashCommand "" "${vmlinux}" "${vmcore}"
 }
 
 CrashCommand()
@@ -1053,9 +1124,28 @@ KexecBoot()
         fi
 
         # Prepare kexec cmd and run kexec load
+        local _initrd_img_path _vmlinuz_path
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            _initrd_img_path=$(find $K_BOOT -name "${INITRD_PREFIX}-${KEXEC_VER}.img-*")
+        else
+            _initrd_img_path="$K_BOOT/$INITRD_PREFIX-${KEXEC_VER}.img"
+        fi
+        [ -z "${_initrd_img_path}" ] && {
+            if "$IS_DB"; then
+                # From 8.5, kdump will try using nondebug kernel/initramfs img if it's running on a debug kernel.
+                Log "kdump initramfs img is only built for the nondebug kernel, not the debug kernel. Skip this test."
+            else
+                Error "Failed to find kdump initramfs img. Please check your kernel setup."
+            fi
+            return
+        }
+
+        _vmlinuz_path=$(ls ${K_BOOT}/vmlinuz-${KEXEC_VER}!(*debug*|*64k*|*rt*))
+        [ -z "${_vmlinuz_path}" ] && _vmlinuz_path=$(ls ${K_BOOT}/vmlinux-${KEXEC_VER}!(*debug*|*64k*|*rt*))
+
         cmd="kexec ${EXTRA_KEXEC_OPTIONS} \
-            -l /boot/vmlinuz-${KEXEC_VER} \
-            --initrd=/boot/initramfs-${KEXEC_VER}.img \
+            -l ${_vmlinuz_path} \
+            --initrd=${_initrd_img_path} \
             --command-line=\"$(cat /proc/cmdline) ${test_boot_option}\""
 
         Log "- Running cmd: ${cmd}"

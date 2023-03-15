@@ -1,0 +1,51 @@
+summary: Reboot to new kernel via kexec.
+description: |
+    Test rebooting to new kernel after loading the new kernel by kexec -l
+
+    Accepted Parameters:
+
+    - KEXEC_VER
+      Specify which kernel will be switched to. By default, it's same as current
+      running kernel.
+
+    - EXTRA_KEXEC_OPTIONS
+      Allow passing extra kexec options to kexec command. For example: -d. By default
+      it's empty.
+
+    - USE_FILE_BASED_SYSCALL
+      Whether passing -s to kexec options. By default it's 'false'.
+      If false, it will append -s to kexec options only if secure boot is detected.
+      If true, it will append -s to kexec options anyway.
+
+    - KEXEC_BOOT_CMDLINE
+    - KEXEC_BOOT_CMDLINE_APPEND
+      Allow specifying kernel boot cmdline for kernel it's kexec to.
+      By default, KEXEC_BOOT_CMDLINE will be current kernel boot cmdline
+      If KEXEC_BOOT_CMDLINE_APPEND is provided, it will be appened to $KEXEC_BOOT_CMDLINE
+
+
+    - KEXEC_BOOT_AFTER_CMD
+      The command will be run after a kexec load.
+      By default it's "RhtsReboot" which will prepare next boot sequence and call rhts-reboot.
+      You can set it to other commands, e.g. "kexec -e" or "return" if you don't want to
+      reboot the system
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 30m
+extra-summary: /kernel/kdump/kexec-boot
+extra-task: /kernel/kdump/kexec-boot
+
+
+/basic:
+    environment:
+      KEXEC_BOOT_CMDLINE_APPEND: " newkerneloption"
+
+/exec_live:
+    environment:
+      KEXEC_BOOT_CMDLINE_APPEND: " newkerneloption"
+      KEXEC_BOOT_AFTER_CMD: "kexec -e -d"
+
+/memdebug:
+    environment:
+      KEXEC_BOOT_CMDLINE_APPEND: " rd.memdebug=3 earlyprintk=serial"

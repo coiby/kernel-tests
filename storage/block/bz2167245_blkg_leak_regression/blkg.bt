@@ -1,0 +1,35 @@
+#!/usr/bin/bpftrace --unsafe
+
+#ifndef BPFTRACE_HAVE_BTF
+#include <linux/blkdev.h>
+#include <linux/blk-mq.h>
+#endif
+
+BEGIN {
+		system("sleep 1; modprobe scsi_debug; sleep 2; modprobe -r scsi_debug");
+}
+
+kprobe:blk_alloc_queue
+{
+    @q_alloc_stack[tid]=kstack;
+}
+
+kretprobe:blk_alloc_queue
+{
+    $q = (struct request_queue *)retval;
+    printf("%lu %16s %d %d: %s q_id %d %s", nsecs / 1000, comm, pid, cpu, ksym(reg("ip")),
+				$q->id, @q_alloc_stack[tid]);
+}
+
+kprobe:blk_mq_release
+{
+    $q = (struct request_queue *)arg0;
+
+    printf("%lu %16s %d %d: %s q_id %d %s", nsecs / 1000, comm, pid, cpu, ksym(reg("ip")),
+				$q->id, kstack);
+    exit();
+}
+
+END {
+        printf("\nExiting.\n");
+}

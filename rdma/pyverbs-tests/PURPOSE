@@ -1,0 +1,12 @@
+# Purpose
+
+https://github.com/linux-rdma/rdma-core/blob/master/Documentation/pyverbs.md
+Pyverbs provides a Python API over rdma-core, the Linux userspace C API for the RDMA stack.
+
+# Where to run
+
+Any RDMA HCAs
+
+
+# Known issues
+

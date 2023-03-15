@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_reset_controller_io
+description: nvmeof rdma reset_controller during io
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_reset_controller_io
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_reset_controller_io
+extra-task: /storage/nvme_rdma/nvmeof_rdma_reset_controller_io
+id: 81c68fc4-518a-4638-855a-db78e36443cc

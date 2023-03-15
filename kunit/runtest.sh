@@ -92,10 +92,16 @@ rlJournalStart
 		if  cki_is_kernel_rt; then
 			module_pkg="${module_pkg}-rt"
 		fi
+		if  cki_is_kernel_64k; then
+			module_pkg="${module_pkg}-64k"
+		fi
+		if cki_is_kernel_automotive; then
+			module_pkg="${module_pkg}-automotive"
+		fi
 		if  cki_is_kernel_debug; then
 			module_pkg="${module_pkg}-debug"
 		fi
-		version=$(uname -r | sed s'/\+debug//')
+		version=$(uname -r | sed s'/\+debug//' | sed s'/\+64k//')
 		module_pkg="${module_pkg}-modules-internal-$version"
 
 		if ! rpm -q $module_pkg; then

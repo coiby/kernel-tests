@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/fsdax_dm_linear
+description: nvdimm fsdax dm_linear test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/fsdax_dm_linear
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/fsdax_dm_linear
+extra-task: /storage/nvdimm/fsdax_dm_linear
+id: c27dc441-6280-4b3f-81a8-7fd0351ca3bf

@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/devdax_nvml_daxio
+description: nvdimm devdax daxio test from nvml
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/devdax_nvml_daxio
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - daxio
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/devdax_nvml_daxio
+extra-task: /storage/nvdimm/devdax_nvml_daxio
+id: 61091a18-1fef-4c7d-849a-dd7b53d4cdc4

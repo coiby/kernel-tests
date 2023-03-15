@@ -190,6 +190,7 @@ crc7.ko
 crc8.ko
 crc-itu-t.ko
 csiostor.ko
+curve25519-generic.ko
 cuse.ko
 cx82310_eth.ko
 cxacru.ko
@@ -199,6 +200,7 @@ cxgb4vf.ko
 cxgbit.ko
 cxlflash.ko
 cxl.ko
+cxl_mem.ko
 cxl_pci.ko
 cxl_pmem.ko
 cyapatp.ko
@@ -249,6 +251,8 @@ dp83822.ko
 dp83848.ko
 dp83867.ko
 dp83tc811.ko
+drm_buddy.ko
+drm_display_helper.ko
 drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko
@@ -334,6 +338,7 @@ gl518sm.ko
 gl520sm.ko
 gl620a.ko
 gm12u320.ko
+gnss.ko
 gpio-pca953x.ko
 gpio-pcf857x.ko
 gpu-sched.ko
@@ -1040,6 +1045,7 @@ pptp.ko
 psample.ko
 pseries_energy.ko
 pseries-rng.ko
+pseries-wdt.ko
 psnap.ko
 pulse8-cec.ko
 pwc.ko
@@ -1168,6 +1174,7 @@ serpent_generic.ko
 serport.ko
 ses.ko
 sfc.ko
+sfc-siena.ko
 sg.ko
 sht15.ko
 sht21.ko

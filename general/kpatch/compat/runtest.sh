@@ -36,6 +36,7 @@ KPATCH_MODULE="${KPATCH_MODULE:-}"
 KPATCH_PATH="/home/kpatch-patch-modules"
 GREP_STR="${GREP_STR:-kpatch}"
 TARGET_FILE="${TARGET_FILE:-/proc/cmdline}"
+TARGET_FUNCTION=${TARGET_FUNCTION:-cmdline_proc_show}
 BRWURL="${BREW_URL:-}"
 NFS_SHARE=${NFS_SHARE:-}
 KPATCH_LOCATION=${KPATCH_LOCATION:-"/data/kpatch"}
@@ -82,12 +83,12 @@ function install_deps() {
 }
 
 function setup_ftrace() {
-    rlRun "echo cmdline_proc_show > ${func_filter}"
+    rlRun "echo ${TARGET_FUNCTION} > ${func_filter}"
     rlRun "echo function > ${tracer}"
 }
 
 function setup_crash() {
-    symbol=${1:-cmdline_proc_show}
+    symbol=${1:-${TARGET_FUNCTION}}
     symbol_addr=$(cat /proc/kallsyms | grep ${symbol} | grep ${KPATCH_MODULE//-/_} | awk '{print $1}')
     src_result=~/source
     crash_cmd=crash.cmd
@@ -104,15 +105,15 @@ EOF
 }
 
 function setup_perf() {
-    perf probe --add 'cmdline_proc_show'
+    eval perf probe --add '${TARGET_FUNCTION}'
 }
 
 function setup_kprobe() {
-    rlRun "echo 'p cmdline_proc_show' > ${kprobe_trace}"
+    rlRun "echo \"p ${TARGET_FUNCTION}\" > ${kprobe_trace}"
 }
 
 function setup_stap() {
-    rlRun "stap -ve 'probe kernel.function(\"cmdline_proc_show\") {printf(\"hello\")}' -c 'cat ${TARGET_FILE}' | grep ${GREP_STR}"
+    rlRun "stap -ve 'probe kernel.function(\"${TARGET_FUNCTION}\") {printf(\"hello\")}' -c 'cat ${TARGET_FILE}' | grep ${GREP_STR}"
 }
 
 function reset_trace_probes() {
@@ -154,8 +155,8 @@ rlJournalStart
     rlPhaseStartTest "Kpatch compat with perf"
         setup_perf
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
-        rlRun "perf stat -e probe:cmdline_proc_show  -- cat ${TARGET_FILE} 2>&1| grep '1.*probe:cmd' -o"
-        rlRun "perf probe --del 'probe:cmdline_proc_show'"
+        rlRun "perf stat -e probe:${TARGET_FUNCTION}  -- cat ${TARGET_FILE} 2>&1| grep \"1.*probe:${TARGET_FUNCTION%%_*}\" -o"
+        rlRun "perf probe --del \"probe:${TARGET_FUNCTION}\""
     rlPhaseEnd
 
     rlPhaseStartTest "Kpatch compat with kprobe"
@@ -165,7 +166,7 @@ rlJournalStart
         rlRun "echo 1 > ${kprobe_enable}" 0
         rlRun "cat ${TARGET_FILE} | grep ${GREP_STR}"
         # this should fail as only one of kpatch and kprobe can pin the smae func.
-        rlRun "cat ${trace_res} | grep p_cmdline_" 0
+        rlRun "cat ${trace_res} | grep p_${TARGET_FUNCTION%%_*}_" 0
         > ${trace_res}
     rlPhaseEnd
 
@@ -174,13 +175,13 @@ rlJournalStart
         > ${trace_res}
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
         rlRun "cat ${TARGET_FILE} | grep ${GREP_STR}"
-        rlRun "cat ${trace_res} | grep 'cmdline_proc_show <'"
+        rlRun "cat ${trace_res} | grep \"${TARGET_FUNCTION} <\""
     rlPhaseEnd
 
     rlPhaseStartTest "Kpatch compat with live crash"
         setup_crash
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
-        rlRun "crash -i ${crash_cmd}"
+        rlRun "crash -i ${crash_cmd} /usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
         rlRun "grep ${GREP_STR} ~/source" 0-255
         rlRun -l "cat ~/source" 0-255
     rlPhaseEnd

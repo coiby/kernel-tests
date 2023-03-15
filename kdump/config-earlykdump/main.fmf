@@ -1,0 +1,9 @@
+summary: Triggering firmware-assisted dump on power system
+description: |
+    It tests enabling earlykdump feature during earlyt boot process
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 1h
+extra-summary: /kernel/kdump/config-earlykdump
+extra-task: /kernel/kdump/config-earlykdump

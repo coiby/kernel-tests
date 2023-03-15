@@ -1,6 +1,6 @@
 [General]
 name=kernel/distribution/ltp/openposix_testsuite
-owner=Kernel General Test Team <kernel-general-test-team@redhat.com>
+owner=Memory Management QE <mm-qe@redhat.com>
 description=Linux Test Project openposix testsuite KernelTier1
 license=GPLv3
 confidential=no
@@ -8,6 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
+max_time=180m
 dependencies=git;automake;autoconf;flex;bison;rsyslog;util-linux;rpm-build;bc;time;libaio-devel;libcap-devel;strace;gcc;bzip2
 softDependencies=numactl-devel;ntpdate;chrony;sysklogd;util-linux-ng;numactl;redhat-lsb
 repoRequires=distribution/ltp/include;cki_lib;automotive/include

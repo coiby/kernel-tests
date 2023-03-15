@@ -202,9 +202,10 @@ function cki_main()
 #
 function cki_run()
 {
-    typeset timestamp=$(date +"%H:%M:%S")
+    local timestamp
+    timestamp=$(date +"%H:%M:%S")
     echo "[ $timestamp ] Running: '$*'"
-    eval "$@"
+    eval "$*"
     return $?
 }
 
@@ -224,7 +225,9 @@ function cki_debug()
 
 function cki_get_yum_tool()
 {
-    if [[ -x /usr/bin/dnf ]]; then
+    if [[ -x usr/bin/rpm-ostree ]]; then
+        echo /usr/bin/rpm-ostree
+    elif [[ -x /usr/bin/dnf ]]; then
         echo /usr/bin/dnf
     elif [[ -x /usr/bin/yum ]]; then
         echo /usr/bin/yum
@@ -271,6 +274,25 @@ function cki_is_true()
     else
         return 1
     fi
+}
+
+function cki_download_kernel_src_rpm()
+{
+    if [[ "$(cki_get_yum_tool)" =~ "dnf" ]]; then
+        kernelpkg=$(dnf repoquery "/boot/config-$(uname -r)" --queryformat "%{source_name}-%{version}-%{release}" | tail -1)
+
+        # kpkginstall excludes all kernel packages except the ones related to the
+        # kernel being tested to avoid wrong kernel being installed.
+        # when testing kernel-debug, kernel related packages are
+        # excluded, but the src.rpm is still kernel and not kernel-debug.
+        # The exclude needs to be disabled when trying to download the source rpm
+        cki_run "dnf download --disableexcludes all --source ${kernelpkg}"
+        return $?
+    else
+        echo "FAIL: cki_download_kernel_src_rpm doesn't support $(cki_get_yum_tool)"
+        return 1
+    fi
+
 }
 
 # Check the system under test is bare metal or not
@@ -327,6 +349,15 @@ function cki_kver_gt() { ! cki_kver_le "$1"; }
 cki_is_kernel_rt()
 {
     if [[ $(uname -r) =~ "rt" ]]; then
+       return  0
+    fi
+    return 1
+}
+
+# return 0 when running kernel 64k
+cki_is_kernel_64k()
+{
+    if [[ $(uname -r) =~ \+64k ]]; then
        return  0
     fi
     return 1

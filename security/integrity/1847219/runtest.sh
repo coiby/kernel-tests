@@ -35,14 +35,16 @@ rlJournalStart
 
     rlPhaseStartTest
         grubby --info=DEFAULT
-        if [ ! -f ./REBOOT ]; then
-            grubby --args="ima_appraise=fix" --update-kernel=DEFAULT
-            grubby --args="ima_policy=appraise_tcb" --update-kernel=DEFAULT
+        if [ ! ${RSTRNT_REBOOTCOUNT} -gt 0 ]; then
+            if stat /run/ostree-booted > /dev/null 2>&1; then
+                rpm-ostree kargs --append-if-missing=ima_appraise=fix --append-if-missing=ima_policy=appraise_tcb --import-proc-cmdline
+            else
+                grubby --args="ima_appraise=fix" --update-kernel=DEFAULT
+                grubby --args="ima_policy=appraise_tcb" --update-kernel=DEFAULT
+            fi
             [[ $(uname -i) == "s390x" ]] && zipl
-            touch ./REBOOT
             rhts-reboot
-        else
-            rm -f ./REBOOT
+        elif [ ${RSTRNT_REBOOTCOUNT} -eq 1 ]; then
             rlRun "cat /proc/cmdline | tee proc_cmdline.txt"
             rlFileSubmit proc_cmdline.txt
             rlRun "grep 'ima_appraise=fix' proc_cmdline.txt"
@@ -51,9 +53,16 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup
-        rm -f ./REBOOT
-        grubby --remove-args="ima_appraise=fix" --update-kernel=DEFAULT
-        grubby --remove-args="ima_policy=appraise_tcb" --update-kernel=DEFAULT
+        if [ ! ${RSTRNT_REBOOTCOUNT} -gt 1 ]; then
+            if stat /run/ostree-booted > /dev/null 2>&1; then
+                rpm-ostree kargs --delete-if-present=ima_appraise=fix --delete-if-present=ima_policy=appraise_tcb --import-proc-cmdline
+            else
+                grubby --remove-args="ima_appraise=fix" --update-kernel=DEFAULT
+                grubby --remove-args="ima_policy=appraise_tcb" --update-kernel=DEFAULT
+            fi
+            [[ $(uname -i) == "s390x" ]] && zipl
+            rhts-reboot
+        fi
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText

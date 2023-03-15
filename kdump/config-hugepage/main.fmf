@@ -1,0 +1,10 @@
+summary: Enable and write data to hugepage
+description: |
+    This test is to enable hugepage and write data to hugepage memory
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+
+duration: 60m
+extra-summary: /kernel/kdump/config-hugepage
+extra-task: /kernel/kdump/config-hugepage

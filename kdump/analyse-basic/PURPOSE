@@ -1,0 +1,2 @@
+It uses basic ELF utilites, readelf, objdump and eu-readelf to analyse
+the vmcore from Kdump.

@@ -1,0 +1,9 @@
+[General]
+description=run Power Management tests from Firmware Test Suite (fwts)
+name=firmware/fwts/power-management
+owner=Oliver Gutierrez <ogutierr@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=1h
+# this test only use fwts and it's installed in the include task

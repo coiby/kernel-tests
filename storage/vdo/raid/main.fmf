@@ -1,0 +1,18 @@
+summary: KS-TC:vdo/raid
+description: Run set of vdo tests from https://gitlab.com/rh-kernel-stqe/python-stqe using available disks
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - vdo
+path: /storage/vdo/raid
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/vdo/raid
+extra-task: /storage/vdo/raid
+adjust:
+    enabled: false
+    when: distro > rhel-8
+id: 2BEC4627-0543-4AAF-AF54-12FC41759A0E

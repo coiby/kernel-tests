@@ -1,0 +1,18 @@
+summary: KS-TC:lvm/thinp/stqe
+description: LVM thin provisioning tests from https://gitlab.com/rh-kernel-stqe/python-stqe
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - kernel
+path: /storage/lvm/thinp/stqe
+test: stqe-test run -c lvm/lvm-thinp-basic.conf
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/lvm/thinp/stqe
+extra-task: /storage/lvm/thinp/stqe
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: 32510008-D41C-47CE-A2D4-4CA066367EFC

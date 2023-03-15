@@ -230,6 +230,8 @@ dp83822.ko
 dp83848.ko
 dp83867.ko
 dp83tc811.ko
+drm_buddy.ko
+drm_display_helper.ko
 drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko
@@ -440,6 +442,7 @@ hns_enet_drv.ko
 hns_mdio.ko
 hpilo.ko
 hpsa.ko
+hpwdt.ko
 hso.ko
 huawei_cdc_ncm.ko
 hv_netvsc.ko

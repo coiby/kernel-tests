@@ -1,0 +1,19 @@
+summary: Configure any kdump.conf option.
+description: |
+    It accept a Kdump option from the command line. For example,
+
+    -t /kernel/kdump/config-any:'default shell'
+    -t /kernel/kdump/config-any:'kdump_post /bin/your_script'
+    -t /kernel/kdump/config-any:'extra_bins /usr/bin/crash /usr/sbin/lsmod'
+    -t /kernel/kdump/config-any:'extra_modules twofish bridge'
+
+    However, it won't work properly for options that affect the location of
+    generated vmcore. Use other config-* test cases instead.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 10m
+extra-summary: /kernel/kdump/config-any
+extra-task: /kernel/kdump/config-any

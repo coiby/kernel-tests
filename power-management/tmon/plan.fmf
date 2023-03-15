@@ -1,0 +1,13 @@
+summary: Test tmon
+discover:
+    how: fmf
+    test:
+      - /power-management/tmon
+execute:
+    how: tmt
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./automotive/include/include.sh
+        install_repos

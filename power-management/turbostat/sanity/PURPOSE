@@ -1,0 +1,8 @@
+PURPOSE of /kernel/power-management/turbostat/sanity
+Description: Confirm turbostat is supported
+Author: Evan McNabb <emcnabb@redhat.com>
+
+Sanity check to make sure turbostat basically functions. This failure was seen
+in:
+
+BZ 1037706 - Turbostat produces error message on intel-wildcatpass-02.lab.eng.rdu.redhat.com

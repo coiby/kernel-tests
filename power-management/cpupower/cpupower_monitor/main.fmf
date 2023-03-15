@@ -1,0 +1,22 @@
+summary: Test cpupower monitor behavior when one CPU is offline
+description: |+
+    Check, that cpupower monitor returns the same amount of information with one CPU offline and with all o them online - related to BZ1375782
+
+contact: Erik Hamera <ehamera@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+  - kernel
+  - kernel-tools
+  - dmidecode
+  - bc
+  - beakerlib
+  - kernel-kernel-power-management-include_parser
+duration: 40m
+extra-summary: /kernel/power-management/cpupower/cpupower_monitor
+extra-task: /kernel/power-management/cpupower/cpupower_monitor
+link:
+  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291952
+id: 1c3d9ab5-2139-4e29-bc90-3a4c4a2a60ee

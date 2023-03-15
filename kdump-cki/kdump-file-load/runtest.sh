@@ -33,10 +33,10 @@ Crash()
         SetupKdump
         Cleanup
 
-        # Append -s to KEXEC_ARGS.
-        # Kdump would then load/unload crash kernel by kexec_file_load instead
-        # of kexec_load(). kexec_file_load() will verify kernel key only if
-        # it's in lockdown or key forcing mode
+        # This tests kdump kernel to be loaded with *kexec_file_load* explicitly
+        # no matter what default option is for kexec
+        # kexec_file_load() verifies kernel key if it's in lockdown or key forcing mode
+        AppendSysconfig KEXEC_ARGS remove "-c"
         AppendSysconfig KEXEC_ARGS add "-s"
 
         # This is for debugging purpose in case kdump kernel got OOM on Fedora

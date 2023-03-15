@@ -1,0 +1,16 @@
+summary: Enable PT logging required for ptdump test
+description: |
+    Enable PT logging required for crash-ptdump-command test
+
+    Hardware Dependencies:
+    Intel CPU with Intel PT feature (Broadwell or later) i.e. CPUs has intel_pt flag
+contact: Kdump QE <kdump-qe-list@redhat.com>
+component:
+  - crash-ptdump-command
+test: make run
+framework: beakerlib
+require:
+  - perf
+duration: 10m
+extra-summary: /kernel/kdump/config-ptdump
+extra-task: /kernel/kdump/config-ptdump

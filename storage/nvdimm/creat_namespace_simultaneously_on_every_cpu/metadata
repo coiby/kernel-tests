@@ -1,0 +1,14 @@
+[General]
+name=storage/nvdimm/creat_namespace_simultaneously_on_every_cpu
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvdimm creat namespace simultaneously on every cpu from BZ1492049
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
+dependencies=numactl;ndctl
+max_time=1h
+use_pty=false

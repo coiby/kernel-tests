@@ -1,0 +1,14 @@
+[General]
+description=kernel selftest for ftrace
+name=general/ftrace/sanity/selftest
+owner=Qiao Zhao <qzhao@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=2h
+dependencies=wget;gcc;make
+repoRequires=general/include
+use_pty=false

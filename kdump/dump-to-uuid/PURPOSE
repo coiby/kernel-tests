@@ -1,0 +1,5 @@
+Kdump test to trigger a crash and dump to a target by uuid
+
+Accepted Parameters:
+ - MP:
+   Mount point of dump device, defaulting to '/'. E.g. /mnt/data

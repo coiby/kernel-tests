@@ -1,0 +1,4 @@
+It configures Kdump using makedumpfile to collect vmcore. The default is
+to use "-c -d 31". It could be overrided from command line like,
+
+-t /kernel/kdump/config-filter:'-E'

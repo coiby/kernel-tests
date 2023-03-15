@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/btt_data_integrity
+description: nvdimm btt data integrity test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_data_integrity
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_data_integrity
+extra-task: /storage/nvdimm/btt_data_integrity
+id: a3303160-b7ff-4d3c-a7a0-265c26ddaeb3

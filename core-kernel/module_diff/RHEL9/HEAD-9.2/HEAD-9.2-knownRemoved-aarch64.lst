@@ -1,0 +1,12 @@
+drm_dp_helper.ko
+esd_usb2.ko
+ifcvf.ko
+mlx5_vdpa.ko
+vdpa.ko
+vdpa_sim_blk.ko
+vdpa_sim.ko
+vdpa_sim_net.ko
+vhost_vdpa.ko
+virtio_vdpa.ko
+vp_vdpa.ko
+vringh.ko

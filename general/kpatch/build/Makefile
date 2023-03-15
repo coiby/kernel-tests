@@ -68,7 +68,7 @@ $(METADATA): Makefile
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     kpatch build test for kpatch-patch modules" >> $(METADATA)
-	@echo "TestTime:        360m" >> $(METADATA)
+	@echo "TestTime:        480m" >> $(METADATA)
 	@echo "Releases:        -RHEL5 -RHEL6" >> $(METADATA)
 	@echo "Type:         	Regression"        >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)

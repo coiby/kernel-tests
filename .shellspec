@@ -1,0 +1,6 @@
+--format documentation
+--color
+--output junit
+--default-path "**/spec"
+--shell bash
+--kcov-options "--include-pattern=.sh,/cki/restraint/plugins/"

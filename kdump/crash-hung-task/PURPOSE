@@ -1,0 +1,3 @@
+bug: 1410295
+hung_task: allow hung_task_panic when hung_task_warnings is 0.
+Test hung_task_panic=1 to trigger panic.

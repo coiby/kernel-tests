@@ -1,0 +1,11 @@
+[General]
+name=common
+owner=Zhaojuan Guo <zguo@redhat.com>
+description=Common library for RDMA testing in Shell
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=echo nothing > /dev/null
+dependencies=pciutils

@@ -1,0 +1,11 @@
+summary: Regression test for bug 1467772
+description: |
+    It tests crashing the system after cpu offline/online operation
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/reg-bz1467772-cpu-online
+extra-task: /kernel/kdump/reg-bz1467772-cpu-online

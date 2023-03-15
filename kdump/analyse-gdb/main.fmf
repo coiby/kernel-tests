@@ -1,0 +1,13 @@
+summary: Use GDB to analyse ELF format vmcore from Kdump.
+description: |
+    It uses GDB command to analyse vmcore.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - gdb
+recommend:
+  - kernel-debuginfo
+duration: 20m
+extra-summary: /kernel/kdump/analyse-gdb
+extra-task: /kernel/kdump/analyse-gdb

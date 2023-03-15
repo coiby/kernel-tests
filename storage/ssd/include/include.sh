@@ -107,6 +107,7 @@ EOF
 		TEST_DISKS+=" ${disk}p1"
 	fi
 done
+	udevadm settle
 }
 
 function install_dt() {
@@ -367,7 +368,7 @@ function DT_IO_Test_File_Level() {
 	local ret=0
 	local process_num=1
 	local dt_runtime=60
-	local dt_logfile=/root/dt_"$(date +%Y%m%d_%H%M%S)"_"$1".log
+	local dt_logfile="/root/dt_$(date +%Y%m%d_%H%M%S)_$1.log"
 	local test_dev="/dev/$1"
 	local mountP="/mnt/fortest/$1"
 

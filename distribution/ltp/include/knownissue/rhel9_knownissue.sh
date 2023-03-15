@@ -26,6 +26,8 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "903" && tskip "df01_sh" unfix
 	# Bug 2120448 - [RHEL 9.0] LTP Test failure and crash at fork14 on Sapphire Rapids Platinum 8280+
 	osver_in_range "900" "903" && tskip "fork14" unfix
+	# Bug 2152548 (CVE-2022-4378) - CVE-2022-4378 kernel: a stack overflow in do_proc_dointvec and proc_skip_spaces
+	osver_in_range "900" "904" && tskip "cve-2022-4378" unfix
 }
 
 function rhel9_fixed_issues()
@@ -40,6 +42,8 @@ function rhel9_fixed_issues()
 	kernel_in_range "0" "5.14.0-176.el9" && tskip "inotify12" fixed
 	# Bug 2097485 - [RHEL-9.1] execve06_child.c:15: TFAIL: argc is 0, expected 1
 	kernel_in_range "0" "5.14.0-122.el9" && tskip "execve06" fixed
+	# Bug 2128900 - [FJ9.1 Bug]: xfs: setgid is not stripped after setting mask [xfstests: generic/697]
+	kernel_in_range "0" "5.14.0-236.el9" && tskip "openat04" fixed
 }
 
 function rhel9_knownissue_filter()

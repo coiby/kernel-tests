@@ -1,0 +1,17 @@
+PURPOSE of /kernel/misc/reboot-loop
+Description: Will put the system into a reboot loop
+Author: William Gomeringer <wgomerin@redhat.com>
+
+Description:
+
+This test will simply put the system into a reboot loop to catch intermittent problems that might show up during boot. Created to verify bug https://bugzilla.redhat.com/show_bug.cgi?id=968459
+
+TESTARGSC and TESTARGSS can be used in your xml file to change the number of reboots, which defaults to 25, and to change the search string, which defaults to BUG. For example
+
+<task name="/kernel/misc/reboot-loop" role="STANDALONE">
+	<params>
+		<param name="TESTARGSC" value="50"/>
+		<param name="TESTARGSS" value="kipmi"/>
+	</params>
+</task>
+

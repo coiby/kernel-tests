@@ -1,0 +1,18 @@
+summary: KS-TC:vdo/common
+description: Run set of vdo tests from https://gitlab.com/rh-kernel-stqe/python-stqe using available disks
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - vdo
+path: /storage/vdo/common
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/vdo/common
+extra-task: /storage/vdo/common
+adjust:
+    enabled: false
+    when: distro > rhel-8
+id: 2DD54EAA-163F-4C73-A1BA-9BC006BA0DF2

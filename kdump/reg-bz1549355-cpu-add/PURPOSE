@@ -1,0 +1,3 @@
+# This test is applicable to ppc64le powervm only
+
+It tests crashing the system after cpu add operation

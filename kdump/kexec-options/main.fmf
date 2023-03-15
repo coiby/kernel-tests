@@ -1,0 +1,12 @@
+summary: Test kexec options
+description: |
+    This case is to test diff kexec options
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+  - strace
+duration: 30m
+extra-summary: /kernel/kdump/kexec-options
+extra-task: /kernel/kdump/kexec-options

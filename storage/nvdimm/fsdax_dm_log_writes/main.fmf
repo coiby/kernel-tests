@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/fsdax_dm_log_writes
+description: nvdimm fsdax dm_log_writes test, BZ1539264
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/fsdax_dm_log_writes
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/fsdax_dm_log_writes
+extra-task: /storage/nvdimm/fsdax_dm_log_writes
+id: d1e129c3-5d77-4379-9cf5-6bcfd7ab3c45

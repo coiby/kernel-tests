@@ -1,0 +1,54 @@
+From ff60156bc02f255fa08934b95223e29a6637eb6a Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Mon, 27 Feb 2023 15:21:03 +0800
+Subject: [PATCH] mount03: flip to the next second before doing the access
+
+Mount03 occasionally reports failure on tmpfs:
+
+  170	mount03.c:214: TINFO: Testing flag MS_STRICTATIME
+  171	mount03.c:140: TFAIL: st.st_atime(1677086243) < atime(1677086243)
+  172	mount03.c:151: TFAIL: dir_st.st_atime(1677086243) < dir_atime(1677086243)
+
+From Waiman Long:
+
+  Looking at the mount03.c test, it is reading a directory in tmpfs, sleeping for
+  1 second and read the directory again. The test fails because the reported atime
+  didn't change. Since tmpfs is in memory, access to them can be much faster and I
+  believe that a race condition may happen that the two directory reads can happen
+  within the same atime even though one second is supposed to have passed. The same
+  test pass when applying to a real filesystem. So I believe the assumption made in
+  the test may not be totally correct as the time lag can happen in different
+  subsystems inside the kernel for time tracking. I believe it is more a test problem
+  than a real kernel problem.
+
+  There may be some slight discrepancy in how sleep and the tmpfs file system is
+  keeping track of time. If the first access is right at the beginning of a second
+  from the tmpfs perspective, the 2nd access may be at the end of that second, but
+  not flip to the next second yet. What I would suggest is to sleep a little more
+  like usleep(10 000) to make sure that it will flip to the next second before doing
+  the access.
+
+Suggested-by: Waiman Long <llong@redhat.com>
+Signed-off-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Yang Xu <xuyang2018.jy@fujitsu.com>
+---
+ testcases/kernel/syscalls/mount/mount03.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/mount/mount03.c b/testcases/kernel/syscalls/mount/mount03.c
+index 60f9963da..98d5933b7 100644
+--- a/testcases/kernel/syscalls/mount/mount03.c
++++ b/testcases/kernel/syscalls/mount/mount03.c
+@@ -122,7 +122,7 @@ static void test_file_dir_noatime(int update_fatime, int update_datime)
+ 	SAFE_CLOSEDIR(test_dir);
+ 	dir_atime = dir_st.st_atime;
+ 
+-	sleep(1);
++	usleep(1001000);
+ 
+ 	SAFE_READ(0, otfd, readbuf, sizeof(readbuf));
+ 	SAFE_FSTAT(otfd, &st);
+-- 
+2.38.1
+

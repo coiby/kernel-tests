@@ -1,0 +1,13 @@
+summary: Test journal logs in kdump shell
+description: |
+    Test journalctl -b in kdump shell to make sure display journal logs
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+recommend:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/reg-bz1817278-shell-journalctl-log
+extra-task: /kernel/kdump/reg-bz1817278-shell-journalctl-log

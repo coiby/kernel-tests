@@ -1,0 +1,11 @@
+summary: Test kdumpctl resetcrashkernel
+description: |
+    This case will make sure kdumpctl reset-crashkernel work as expected
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 60m
+extra-summary: /kernel/kdump/kdumpctl-reset-crashkernel
+extra-task: /kernel/kdump/kdumpctl-reset-crashkernel

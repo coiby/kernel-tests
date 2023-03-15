@@ -9,26 +9,30 @@
 
 ###############################################################################
 # I confimed that without stalld running and having the busyloop timeout set
-# to 240s will result in the echo taking 240s to complete.
+# to $MAX_RUNTIME will result in the echo taking $MAX_RUNTIME seconds to complete.
 #
-# With stalld running the echo should complete in less than 240s. This tells
-# us that the task is indeed being boosted.
+# With stalld running the echo should complete in less than $MAX_RUNTIME. This tells
+# us that the task is indeed being boosted. stalld will also print the PID of the
+# process being boosted, giving additional confirmation.
 ###############################################################################
 
 # Enable TMT testing for RHIVOS
 . ../../../automotive/include/include.sh || exit 1
-: ${OUTPUTFILE:=runtest.log}
+: "${OUTPUTFILE:=runtest.log}"
 
 # Source rt common functions
 . ../../include/runtest.sh || exit 1
 
 # Vars
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
-export nrcpus=$(grep -c ^processor /proc/cpuinfo)
 export TEST="rt-tests/us/stalld"
-export STALLD_PID=""
-export BUSYLOOP_PID=""
+
+rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+nrcpus=$(grep -c ^processor /proc/cpuinfo)
+STALLD_PID=""
+BUSYLOOP_PID=""
+# Value is in seconds
+MAX_RUNTIME=120
 
 # Default ACTION=TEST: Is to run the stalld performance test.
 # Non-Default ACTION=START: Is used to start and run stalld daemon  until
@@ -67,7 +71,7 @@ function install_and_start_stalld() {
         # Use a higher runtime ns for boosting, equal to 0.1s
         # With the default boost timing it will take multiple boosts
         # to finish the test and will take much longer
-        stalld -v -t 30 -r 1000000 | tee -a "$OUTPUTFILE" &
+        stalld -v -A -t 30 -r 1000000 | tee -a "$OUTPUTFILE" &
         export STALLD_PID=$!
     }
 }
@@ -82,13 +86,16 @@ function run_test() {
         START=$(date +%s)
 
         # Run a busy loop to stall cpu 1
-        # For some reason this takes 420 seconds to timeout
-        timeout 240s chrt -f 1 taskset -c 1 ./rt_busyloop &
+        timeout "${MAX_RUNTIME}s" chrt -f 1 taskset -c 1 ./rt_busyloop &
         export BUSYLOOP_PID=$!
 
         # Print process info so we can see PIDs and tell if the right process
         # is getting boosted
         sh -c 'sleep 5; ps aux | tail' &
+
+        # Sleep for a little bit, in case the timeout command is taking
+        # some time to get scheduled
+        sleep 1
 
         # This process blocks, and has to get boosted to finish
         chrt -f 1 taskset -c 1 sh -c "echo \"Finished\""
@@ -96,7 +103,7 @@ function run_test() {
         END=$(date +%s)
         RUNTIME=$((END - START))
 
-        if [[ $RUNTIME -lt 240 ]]; then
+        if [[ $RUNTIME -lt $MAX_RUNTIME ]]; then
             echo "Iteration $ITERS runtime is $RUNTIME : PASS" | tee -a "$OUTPUTFILE"
             rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "PASS" 0
         else

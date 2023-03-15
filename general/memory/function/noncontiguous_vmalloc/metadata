@@ -11,4 +11,4 @@ entry_point=make run
 max_time=5m
 dependencies=yum-utils
 softDependencies=@development
-repoRequires=general/include
+repoRequires=general/include;cki_lib

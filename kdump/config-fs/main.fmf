@@ -1,0 +1,27 @@
+summary: dump filesystem and path in /etc/kdump.conf
+description: |
+    This case is to configure local dump target in kdump.conf.
+
+    Accepted Parameters:
+     - MP:
+       Mount point of dump device, defaulting to '/'. E.g. /mnt/data
+
+     - KPATH:
+       Specify 'path' in kdump.conf, defaulting to '/var/crash'.
+
+     - OPTION:
+       The valid are 'uuid', 'label' or 'softlink'.
+
+     - LABEL:
+       Only applicable when OPTION=label, specifying a label to the particular fs.
+
+     - RAW:
+       Value 'yes' means doing raw dump, default to 'no'.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/config-fs
+extra-task: /kernel/kdump/config-fs

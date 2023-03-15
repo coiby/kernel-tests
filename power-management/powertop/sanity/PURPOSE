@@ -1,0 +1,14 @@
+PURPOSE of /kernel/power-management/powertop/sanity
+Description: Confirm powertop is supported
+Author: Evan McNabb <emcnabb@redhat.com>
+Author: Erik Hamera <ehamera@redhat.com>
+
+Sanity check to make sure powertop basically functions. This failure was seen
+in:
+
+BZ 998021 - PowerTOP can fail on some systems due to FDs limit
+
+Other sanity checks has been added:
+- It should generate proper name of csv or html file when asked for.
+  BZ 1039822 powertop: --csv cannot specify filenmae
+- It should do all iterations if they're specified

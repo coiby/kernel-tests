@@ -1,0 +1,12 @@
+[General]
+name=/kernel/general/crc32c-self-check
+owner=Jeffrey Bastian <jbastian@redhat.com>
+description=crc32 self-check
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=15m
+dependencies=gcc;kernel-devel;beakerlib;beakerlib-redhat

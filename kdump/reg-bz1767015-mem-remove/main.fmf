@@ -1,0 +1,19 @@
+summary: Regression test for bug 1767015
+description: |
+      This test is applicable to ppc64le powervm only
+      It tests kdump service status after removing multiple LMB
+
+      Accepted Parameters:
+         - TESTARGS:
+            add/remove multiple LMB (by default, 10 LMB = 2.5G)
+
+         - LOOPCOUNT:
+            The times of removing/adding LMB (by default 10 times)
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/reg-bz1767015-mem-remove
+extra-task: /kernel/kdump/reg-bz1767015-mem-remove

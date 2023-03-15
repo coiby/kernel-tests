@@ -1,0 +1,3 @@
+Regression test bug1966881
+It tests the bash script error when restart kdump service with set 'KDUMP_KERNELVER' in /etc/sysconf/kdump.
+

@@ -4,24 +4,6 @@
 # default URL
 EPEL_BASEURL=${EPEL_BASEURL:-"https://dl.fedoraproject.org/pub/epel/"}
 
-set_proxy(){
-	# When we want to download code from outer net,  We need export https proxy if host is at Beijing lab
-	# Note: Please call unset_proxy after your download, as it may affect all connections from NAY-to-NAY
-	# eg: set_proxy; wget ***; unset_proxy
-	echo $HOSTNAME | grep -q -E "pek2|NAY" && {
-		export https_proxy=squid.apac.redhat.com:3128
-		export http_proxy=squid.corp.redhat.com:3128
-	}
-	return 0
-}
-unset_proxy(){
-	echo $HOSTNAME | grep -q -E "pek2|NAY" && {
-		export https_proxy=
-		export http_proxy=
-	}
-	return 0
-}
-
 
 # The same with task /distribution/command
 exec_cmd()
@@ -189,10 +171,6 @@ lksctp-tools_install()
 	[ -a /usr/local/bin/bindx_test ] && return 0
 
 	pushd ${NETWORK_COMMONLIB_DIR}
-	# We need export https proxy when host is at Beijing lab
-	if hostname | grep -q -E 'pek|nay'; then
-		export https_proxy=squid.corp.redhat.com:3128
-	fi
 	git clone https://github.com/sctp/lksctp-tools
 	pushd lksctp-tools
 	# An interim workaround, will remove this after upstream fix
@@ -220,7 +198,7 @@ scapy_install()
 	local scapy_git="https://github.com/secdev/scapy.git"
 	local scapy_http="http://netqe-bj.usersys.redhat.com/share/tools/scapy.tar.gz"
 
-	local rel=$(rpm -E %rhel)
+	local rel=$(GetDistroRelease)
 	[ $rel -ge 9 ] && dnf install -y scapy
 	scapy -h && return 0
 
@@ -850,12 +828,10 @@ kselftests_install()
 		local karch=$(uname -i)
 		local kver=$(echo ${kernel_ver}| cut -f1 -d'-')
 		local krel=$(echo ${kernel_ver} | cut -f2 -d'-' | sed "s/\.$karch//")
-		set_proxy
 		dnf install  -y ${link}/${kver}/${krel}/${karch}/bpftool-${kver}-${krel}.${karch}.rpm
 		dnf install  -y ${link}/${kver}/${krel}/${karch}/${kname2}-modules-extra-${kver}-${krel}.${karch}.rpm
 		dnf install  -y ${link}/${kver}/${krel}/${karch}/${kname2}-modules-internal-${kver}-${krel}.${karch}.rpm
 		dnf install  -y ${link}/${kver}/${krel}/${karch}/${kname2}-selftests-internal-${kver}-${krel}.${karch}.rpm
-		unset_proxy
 	fi
 	[ -e /usr/libexec/kselftests ] && return 0 || return 1
 }

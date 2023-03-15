@@ -1,0 +1,10 @@
+summary: Check dmesg logs after kdump.
+description: |
+    This test case is to validate dmesg files saved during kdump.
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 10m
+extra-summary: /kernel/kdump/analyse-dmesg
+extra-task: /kernel/kdump/analyse-dmesg

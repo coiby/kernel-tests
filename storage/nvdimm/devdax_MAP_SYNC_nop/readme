@@ -1,0 +1,7 @@
+# ./map_sync /dev/dax13.0 1g
+mmap(MAP_SYNC) on device dax failed with 22
+
+After the fix:
+
+# ./map_sync /dev/dax1.0 1g
+Success!

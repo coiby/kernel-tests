@@ -200,6 +200,7 @@ crc-itu-t.ko
 crct10dif-ce.ko
 crypto_engine.ko
 csiostor.ko
+curve25519-generic.ko
 cuse.ko
 cx82310_eth.ko
 cxacru.ko
@@ -207,6 +208,7 @@ cxgb4i.ko
 cxgb4.ko
 cxgb4vf.ko
 cxgbit.ko
+cxl_mem.ko
 cxl_pci.ko
 cxl_pmem.ko
 cyberjack.ko
@@ -257,6 +259,9 @@ dp83822.ko
 dp83848.ko
 dp83867.ko
 dp83tc811.ko
+drm_buddy.ko
+drm_display_helper.ko
+drm_dp_aux_bus.ko
 drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko
@@ -269,6 +274,7 @@ dw_dmac_core.ko
 dw_dmac.ko
 dw_dmac_pci.ko
 dwmac-dwc-qos-eth.ko
+dwmac-tegra.ko
 dw_mmc-bluefield.ko
 dw_mmc.ko
 dw_mmc-pltfm.ko
@@ -345,6 +351,7 @@ gen_probe.ko
 ghash-ce.ko
 gl620a.ko
 gm12u320.ko
+gnss.ko
 governor_passive.ko
 governor_performance.ko
 governor_powersave.ko
@@ -477,8 +484,10 @@ hns3.ko
 hns_dsaf.ko
 hns_enet_drv.ko
 hns_mdio.ko
+host1x.ko
 hpilo.ko
 hpsa.ko
+hpwdt.ko
 hso.ko
 hte-tegra194.ko
 huawei_cdc_ncm.ko
@@ -1161,6 +1170,7 @@ rtc-rp5c01.ko
 rtc-rs5c348.ko
 rtc-rs5c372.ko
 rtc-rv3029c2.ko
+rtc-rv8803.ko
 rtc-rx4581.ko
 rtc-rx8010.ko
 rtc-rx8025.ko
@@ -1296,6 +1306,7 @@ team_mode_random.ko
 team_mode_roundrobin.ko
 tee.ko
 tegra-bpmp-thermal.ko
+tegra-drm.ko
 tegra-xudc.ko
 teranetics.ko
 tg3.ko
@@ -1390,6 +1401,7 @@ vhost_net.ko
 vhost_vdpa.ko
 vhost_vsock.ko
 via-sdmmc.ko
+video.ko
 virt-dma.ko
 virtio_balloon.ko
 virtio_blk.ko

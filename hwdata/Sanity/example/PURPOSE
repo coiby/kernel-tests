@@ -1,0 +1,9 @@
+PURPOSE of /kernel/hwdata/Sanity/example
+Description: Example sanity script to print pci/usb device id's
+Author: Rachel Sibley <rasibley@redhat.com>
+
+Description:
+This script is used to provide an example of user readable usb and pci
+device id's. This script is a quick sanity check to verify the usb/pci's
+are printed correctly as a result of bz 1380159. In addition, reinstall
+the hwdata and python-hwdata pkgs to ensure there are no failures.

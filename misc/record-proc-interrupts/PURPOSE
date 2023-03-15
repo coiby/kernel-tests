@@ -1,0 +1,3 @@
+Record the output of /proc/interrupts and store it in the Beaker database.
+Useful for running before and after another Beaker task so the results can
+be compared offline later.

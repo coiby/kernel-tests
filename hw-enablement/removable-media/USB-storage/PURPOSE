@@ -1,0 +1,13 @@
+PURPOSE of /kernel/hw-enablement/removable-media/USB-storage
+
+Parameters:
+TEST_PARAM_TEST_DEV - Specify the device/partition to use for testing e.g. "/dev/sdb1". If the whole device is specified the test will attempt to use the largest partition it finds. Devices without partitions are not supported. The partition must be formatted with a supported filesystem (vfat, ext4, xfs ...) Required for USB testing
+TEST_PARAM_TEST_SIZE - Specify the size of the test files to use for testing, default is 1073741824 bytes (1GB).
+
+This test suite tests USB storage devices using either the usb-storage or UASP driver. Please insert the USB device prior to starting the test, do not mount any filesystems on the device. Back up any valuable data on the device before testing. The following tests are performed:
+
+1.) Sequential read/write of data to/from the card using dt
+2.) Random read/write of data to/from the card using dt
+3.) copy and compare of previously written data
+
+dt: http://www.scsifaq.org/RMiller_Tools/dt.html

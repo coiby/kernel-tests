@@ -1,6 +1,7 @@
 #!/bin/bash
 
 TEST="general/time/posix_timer"
+: ${OUTPUTFILE:=runtest.log}
 
 # ---------- Start Test -------------
 
@@ -16,6 +17,7 @@ sed -i /"build: FAILED"/d $OUTPUTFILE
 
 if grep -q 'FAILED' $OUTPUTFILE; then
     echo "Posix Time test Failed:" >>$OUTPUTFILE 2>&1
+    echo "Total number of Failures is $(grep -o FAILED $OUTPUTFILE | wc -l)" >>$OUTPUTFILE 2>&1
     rstrnt-report-result $TEST "FAIL" 1
 else
     echo "Posix Time test Passed:" >>$OUTPUTFILE 2>&1

@@ -1,0 +1,14 @@
+cec.ko
+ifcvf.ko
+iova.ko
+mlx5_vdpa.ko
+pcs_xpcs.ko
+vdpa.ko
+vdpa_sim_blk.ko
+vdpa_sim.ko
+vdpa_sim_net.ko
+vhost_vdpa.ko
+virtio_pci_modern_dev.ko
+virtio_vdpa.ko
+vp_vdpa.ko
+vringh.ko

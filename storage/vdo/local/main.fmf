@@ -1,0 +1,18 @@
+summary: KS-TC:vdo/local
+description: Run set of vdo tests from https://gitlab.com/rh-kernel-stqe/python-stqe using available disks
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - vdo
+path: /storage/vdo/local
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/vdo/local
+extra-task: /storage/vdo/local
+adjust:
+    enabled: false
+    when: distro > rhel-8
+id: BFCA33B4-56ED-4335-B288-B0D636F6FF17

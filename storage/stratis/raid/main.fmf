@@ -1,0 +1,18 @@
+summary: KS-TC:stratis/raid
+description: Run set of stratis test cases from https://gitlab.com/rh-kernel-stqe/python-stqe using md device
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - stratis
+path: /storage/stratis/raid
+test: bash -x runtest.sh
+framework: shell
+duration: 3h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/stratis/raid
+extra-task: /storage/stratis/raid
+adjust:
+    enabled: false
+    when: distro < rhel-7
+id: F1FE3FED-0836-41B1-B574-5FEBF903E726

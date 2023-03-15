@@ -1,0 +1,12 @@
+[General]
+name=rt-tests/log_check
+owner=Mike Stowell <mstowell@redhat.com>
+description=Comprehensive log checker to run after RT test suite execution
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=10m
+use_pty=false

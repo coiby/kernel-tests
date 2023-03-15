@@ -1,0 +1,12 @@
+summary: Test Kdump by crashing kernel via NMI button
+description: |
+    It crashes the system via NMI switch
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - OpenIPMI 
+  - ipmitool
+duration: 30m
+extra-summary: /kernel/kdump/crash-nmi-switch
+extra-task: /kernel/kdump/crash-nmi-switch

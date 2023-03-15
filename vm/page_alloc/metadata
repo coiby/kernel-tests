@@ -1,0 +1,14 @@
+[General]
+name=/kernel/vm/page_alloc
+owner=Kernel Memory Management Test Team <mm-qe@redhat.com>
+description=physical page alloc
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=50m
+dependencies=kexec-tools;iptables
+softDependencies=gnuplot
+repoRequires=/kdump/setup-bare-metal;cki_lib

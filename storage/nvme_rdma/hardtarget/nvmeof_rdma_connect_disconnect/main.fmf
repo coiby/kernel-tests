@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/hardtarget/nvmeof_rdma_connect_disconnect
+description: nvmeof rdma connect disconnect stress testing with NETAPP E5700
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/hardtarget/nvmeof_rdma_connect_disconnect
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/hardtarget/nvmeof_rdma_connect_disconnect
+extra-task: /storage/nvme_rdma/hardtarget/nvmeof_rdma_connect_disconnect
+id: a3fadae0-0afa-4155-9229-74d2b26108f0

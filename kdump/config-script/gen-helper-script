@@ -1,0 +1,48 @@
+#!/bin/sh
+
+if [[ "$FAMILY" =~ [a-zA-Z]+5 ]]; then
+    shbang="msh"
+else
+    shbang="sh"
+fi
+
+root=$(mount | awk '{ if ($3 == "/") print $1; }')
+
+root_fs=$(mount | awk '{ if ($3 == "/") print $5; }')
+
+tdir=/mnt/tmproot
+
+[[ "$root" == /dev/mapper* ]] && dm_path="$(readlink -f $root)"
+
+
+cat >/bin/kdump-1.sh <<EOF
+#!/bin/$shbang
+
+echo "--> Start running kdump script"
+echo "--> Mounting sysroot to $tdir"
+dir=\`grep -m1 $root /proc/mounts | cut -d' ' -f2\`
+mkdir -p $tdir
+if [ -z \$dir ]; then
+    mount -t $root_fs $root $tdir || {
+        echo "--> Mounting sysroot failed. Re-trying by re-activating root lv."
+        lvchange -a y $root
+        mount -t $root_fs $dm_path $tdir
+    }
+else
+    mount --rbind \$dir $tdir
+    mount -o remount,rw $tdir
+fi
+echo "--> Mounted sysroot to $tdir"
+EOF
+
+cat >/bin/kdump-2.sh <<EOF
+sync
+echo "--> Unmounting sysroot from $tdir"
+umount $tdir
+echo "--> Unmounted sysroot from $tdir"
+sleep 5
+EOF
+
+
+
+

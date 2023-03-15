@@ -1,0 +1,16 @@
+summary: storage/block/bz2167245_blkg_leak_regression
+description: request queue won't be freed if the queue/disk is in blk root cgroup
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/bz2167245_blkg_leak_regression
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+    - bpftrace
+duration: 1h
+tier: 1
+extra-summary: /storage/block/bz2167245_blkg_leak_regression
+extra-task: /storage/block/bz2167245_blkg_leak_regression

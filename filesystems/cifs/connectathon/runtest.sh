@@ -118,7 +118,7 @@ function Client()
    pushd cthon04
    smbclient -L //`hostname`/$servpath -N
 
-   echo "y\n" | ./server -o actimeo=0,user=root,password=redhat,domain=EXAMPLE,file_mode=0777,rw,noauto $CTHON_FLAGS -a -f -p ${servpath} -m ${TESTMOUNTPATH} `hostname` -b
+   echo "y\n" | ./server -o actimeo=0,user=root,password=redhat,domain=EXAMPLE,file_mode=0777,rw,noauto,cifsacl,mfsymlinks $CTHON_FLAGS -a -f -p ${servpath} -m ${TESTMOUNTPATH} `hostname` -b
 
    status=$?
    popd

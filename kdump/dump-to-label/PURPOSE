@@ -1,0 +1,10 @@
+Kdump test to trigger a crash and dump to a target by label
+
+Accepted Parameters:
+ - MP:
+   Mount point of dump device, defaulting to '/'. E.g. /mnt/data
+
+ - LABEL:
+   Specifying a label to the particular fs mounted at MP. 
+   By default label is "label-kdump" 
+

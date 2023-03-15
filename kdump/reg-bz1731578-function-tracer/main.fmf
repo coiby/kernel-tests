@@ -1,0 +1,14 @@
+summary: Regression test for bug 1731578
+description: |
+    It tests kdump when function ftracer is enabled
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+  - crash
+recommend:
+  - kernel-debuginfo
+duration: 60m
+extra-summary: /kernel/kdump/reg-bz1731578-function-tracer
+extra-task: /kernel/kdump/reg-bz1731578-function-tracer

@@ -1,0 +1,11 @@
+summary: Regression test for bug 1966881
+description: |
+    It tests the bash script error when restart kdump service with set 'KDUMP_KERNELVER' in /etc/sysconf/kdump.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 30m
+extra-summary: /kernel/kdump/reg-bz1966881-set-kdump-kernelver
+extra-task: /kernel/kdump/reg-bz1966881-set-kdump-kernelver

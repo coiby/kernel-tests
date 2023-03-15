@@ -89,7 +89,7 @@ function fault_injection()
 function get_symbol_addr_snapshot()
 {
 	case $this_arch in
-	x86_64)
+	x86_64|aarch64|s390x|ppc64le)
 		if test -f page_offset_base; then
 			for f in $cmp_file_list; do
 				mv $f ${f}.old
@@ -110,7 +110,8 @@ function get_symbol_addr_snapshot()
 			test -f ${f}.old && echo -e "${f}.old: $(cat ${f}.old)"
 		done
 
-		! test -s page_offset_base && rlDie "failed to get symbol addr"
+		# make sure we get the _text address
+		! test -s _text && rlDie "failed to get symbol addr"
 	;;
 	esac
 }
@@ -137,7 +138,7 @@ function slub_freelist_random()
 	popd
 }
 
-function x86_kaslr_phase_prep()
+function kaslr_phase_prep()
 {
 	current_state="$(sed -n '1p' TEST_STATE)"
 	phase=""
@@ -178,9 +179,19 @@ function check_x86_paging_level()
 	fi
 }
 
-function x86_get_default_addr()
+function get_default_addr()
 {
-	cmp_file_list="_text page_offset_base vmemmap_base Kernel_code Kernel_data Kernel_bss"
+	if uname -r | grep x86_64 && grep CONFIG_RANDOMIZE_MEMORY=y /boot/config-"$(uname -r)"; then
+		cmp_file_list="_text page_offset_base vmemmap_base Kernel_code Kernel_data Kernel_bss"
+	elif uname -r | grep x86_64; then
+		cmp_file_list="_text Kernel_code Kernel_data Kernel_bss"
+	elif uname -r | grep aarch64; then
+		cmp_file_list="_text Kernel_code Kernel_data"
+	elif uname -r | grep s390x; then
+		cmp_file_list="_text Kernel_code Kernel_data Kernel_bss"
+	else
+		cmp_file_list="_text"
+	fi
 	# "drivers/firmware/efi/libstub/x86-stub.c", Kernel_code is determined
 	# by efi firmware calls, not consistant for all machines.
 	stable_file_list="_text"
@@ -194,7 +205,7 @@ function x86_get_default_addr()
 	fi
 }
 
-function x86_kaslr_test()
+function arch_kaslr_test()
 {
 
 	if [[ ! $phase =~ cleanup ]]; then
@@ -247,6 +258,7 @@ function x86_kaslr_test()
 		done
 		slub_freelist_random 1 $i
 		rlRun "grubby --args nokaslr --update-kernel ALL" 0
+		[ "$this_arch" = "s390x" ] && zipl
 		rlPhaseEnd
 		rhts-reboot
 	elif [ "$current_state" = "after_r_kaslr_cleanup" ]; then
@@ -264,7 +276,21 @@ function x86_kaslr_test()
 	fi
 }
 
-function x86_nokaslr_test()
+function verify_symbol_default_addr()
+{
+	case $this_arch in
+		x86_64)
+			for f in $stable_file_list; do
+				rlAssertEquals "$f should be default" "${!f}" "$(cat $f)"
+			done
+			;;
+		*)
+			true
+			;;
+	esac
+}
+
+function arch_nokaslr_test()
 {
 	if [ "$current_state" = "after_r_nokaslr_snapshot" ]; then
 			rlReport "reboot" PASS
@@ -272,9 +298,7 @@ function x86_nokaslr_test()
 
 	if [[ ! $phase =~ cleanup ]]; then
 		get_symbol_addr_snapshot
-		for f in $stable_file_list; do
-			rlAssertEquals "$f should be default" "${!f}" "$(cat $f)"
-		done
+		verify_symbol_default_addr
 	fi
 
 	local i=0
@@ -287,6 +311,7 @@ function x86_nokaslr_test()
 		done
 		slub_freelist_random 0 $i
 		rlRun "grubby --remove-args nokaslr --update-kernel ALL"
+		[ "$this_arch" = "s390x" ] && zipl
 		rlPhaseEnd
 		rhts-reboot
 	elif [ "$current_state" = "after_r_nokaslr_cleanup" ]; then
@@ -304,9 +329,9 @@ function x86_nokaslr_test()
 	fi
 }
 
-function run_kaslr_x8664()
+function run_kaslr()
 {
-	grep CONFIG_RANDOMIZE_MEMORY=y /boot/config-"$(uname -r)" 2>/dev/null || { rlReport "Skip-not-support" PASS; return; }
+	grep CONFIG_RANDOMIZE_BASE=y /boot/config-"$(uname -r)" 2>/dev/null || { rlReport "Skip-not-support" PASS; return; }
 	get_kernel_version
 	if  [ "$kver_major" -lt 3 ]; then
 		rlReport "Skip-not-support" PASS
@@ -321,10 +346,10 @@ function run_kaslr_x8664()
 		rlRun "sed -i '1d' TEST_STATE" 0 "to next state $(sed -n '2p' TEST_STATE)"
 		case "$phase" in
 		kaslr*)
-			x86_kaslr_test
+			arch_kaslr_test
 			;;
 		nokaslr*)
-			x86_nokaslr_test
+			arch_nokaslr_test
 			;;
 		esac
 
@@ -398,10 +423,10 @@ rlJournalStart
 	fi
 
 	case $this_arch in
-		x86_64)
-			x86_kaslr_phase_prep
-			x86_get_default_addr
-			run_kaslr_x8664
+		x86_64|aarch64|s390x|ppc64le)
+			kaslr_phase_prep
+			get_default_addr
+			run_kaslr
 			;;
 		*)
 			rlPhaseStartTest "SKIP"

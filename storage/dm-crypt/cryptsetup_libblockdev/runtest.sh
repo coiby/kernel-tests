@@ -36,19 +36,18 @@ function check_python_env(){
         cki_print_warning "Could not find the luks_main.py file, exit"
         exit 1
     fi
-    $PY -c "import libsan"
+    $STQE_PYTHON -c "import libsan"
     if [[ $? != 0 ]];then
         cki_print_warning "Could not import python module libsan, exit"
         exit 1
     fi
 }
 
-PY="python3"
-
 # stqe_init will abort the task if fails to run
 stqe_init
+
 install_libblockdev
 check_python_env
-$PY luks_main.py
+$STQE_PYTHON luks_main.py
 rc=$?
 exit $rc

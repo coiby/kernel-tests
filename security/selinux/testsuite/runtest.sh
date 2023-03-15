@@ -104,7 +104,9 @@ function installDepsYum() {
 
 function installDeps() {
     if stat /run/ostree-booted > /dev/null 2>&1; then
-        rpm-ostree -A --idempotent --allow-inactive install "$@"
+        if ! rpm -q --quiet "$@"; then
+            rpm-ostree -y --allow-inactive install "$@" && rstrnt-reboot
+        fi
     elif type yum >/dev/null; then
         installDepsYum yum "$@"
     elif type dnf >/dev/null; then
@@ -145,47 +147,6 @@ rlJournalStart
         REQUIRES="
             ${kname}-modules-extra-$PKG_VERSION
             ${kname}-devel-$PKG_VERSION
-            /usr/bin/unbuffer
-            attr
-            audit
-            checkpolicy
-            curl
-            dosfstools
-            e2fsprogs
-            elfutils-libelf-devel
-            expect
-            gcc
-            git
-            grep
-            iptables
-            jfsutils
-            keyutils-libs-devel
-            libbpf-devel
-            libibverbs-devel
-            libselinux-devel
-            libselinux-utils
-            libsepol-devel
-            libuuid-devel
-            lksctp-tools-devel
-            mktemp
-            nc
-            netlabel_tools
-            net-tools
-            nftables
-            nmap-ncat
-            perl-Test
-            perl-Test-Harness
-            perl-Test-Simple
-            policycoreutils
-            policycoreutils-devel
-            policycoreutils-python
-            python2-lxml
-            python3-lxml
-            quota
-            rdma-core-devel
-            selinux-policy-devel
-            setools-console
-            xfsprogs-devel
         "
         rlRun "installDeps \$REQUIRES" 0 "Install requires"
 

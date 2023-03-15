@@ -59,6 +59,16 @@ function set_zswap()
 	rlRun "sed -i '1d' $tmpdir/zswap_parameter.txt"
 }
 
+function show_memory_info()
+{
+	echo -n "memory.current: "
+	cat $cgroup_path/memory.current
+	echo -n "memory.zswap.current: "
+	cat $cgroup_path/memory.zswap.current
+	echo -n "memory.swap.current: "
+	cat $cgroup_path/memory.swap.current
+}
+
 function zswap_test()
 {
 	local mem_limit=$((use_mem + use_swap))
@@ -87,9 +97,9 @@ function zswap_test()
 		exit 1
 	fi
 
+	local cgroup_path=$(cgroup_get_path zswap_test memory)
 	if [ -n "$oom_score_adj" ]; then
 		local spid
-		local cgroup_path=$(cgroup_get_path zswap_test memory)
 		for spid in $(cat $cgroup_path/$CGROUP_TASK_FILE); do
 			echo "$spid: adjusting oom_score_adj to $oom_score_adj"
 			echo $oom_score_adj > /proc/$spid/oom_score_adj
@@ -101,11 +111,20 @@ function zswap_test()
 	for i in $(seq 120); do
 		local pages=$(cat /sys/kernel/debug/zswap/stored_pages)
 		stored_pages_2=$(( $stored_pages_2 + $pages ))
+		if ((i % 60 == 0)) && [ "$CGROUP_VERSION" = 2 ] && test -f $cgroup_path/memory.reclaim; then
+			# 2g memory, trigger 50m reclaim to swap, this is not heavy.
+			local reclaim_mem=50M
+			echo "Before reclaim:"
+			show_memory_info
+			echo $reclaim_mem > $cgroup_path/memory.reclaim
+			echo "After reclaim:"
+			show_memory_info
+		fi
 		if ((i % 20 == 0)); then
-			free -g
-			ps -C stress -o pid,vsz,rsz,etimes
-			free_g=$(free -g | awk '/Mem/ {print $4}')
-			echo "free mem GiB: $free_g"
+			free -m
+			ps -C stress -o pid,vsz,rsz,etimes,cgroup
+			free_m=$(free -m | awk '/Mem/ {print $4}')
+			echo "free mem MiB: $free_m"
 		fi
 		sleep 1
 	done
@@ -140,15 +159,19 @@ function setup_cgroup()
 	free_mem_m=$(free -m | awk '/Mem/ {print $4}')
 	use_swap=$(echo $free_swap_m \* 0.9 | bc | awk -F. '{print $1}')
 	use_mem=2048
-	if ((free_mem_m < 2048)); then
-		use_mem=$free_mem_m
+	# Leave some memory for system processes
+	if ((free_mem_m < 3072)); then
+		use_mem=$(echo $free_mem_m \* 0.5 | bc | awk -F. '{print $1}')
 	fi
 
 	check_cgroup_version
 	cgroup_create zswap_test memory
+	free -m
 	cgroup_set_memory zswap_test ${use_mem}m ${use_swap}m
 	cgroup_set_file zswap_test memory memory.oom_control=1
 	[ $? -ne 0 ] && oom_score_adj=-1000
+	echo -1000 > /proc/self/oom_score_adj
+	cat /proc/self/oom_score_adj
 }
 
 # ----- Test Start ------

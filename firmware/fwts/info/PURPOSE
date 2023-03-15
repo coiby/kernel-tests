@@ -1,0 +1,14 @@
+Run the following fwts tests to get information about the machine
+
+
+ fwts acpiinfo bios_info dmicheck mcfg cmosdump crsdump ebdadump memmapdump mpdump --results-output=biosinfo.log
+ fwts romdump --results-output=romdump.log
+ fwts uefidump --results-output=uefidump.log
+ fwts uefivarinfo --results-output=uefivarinfo.log
+
+ fwts --dump 
+
+kernel dmesg checks (run last)
+ fwts klog oops --results-output=kernelinfo.log
+
+1) https://wiki.ubuntu.com/Kernel/Reference/fwts

@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_setting_nr_requests_io
+description: nvmeof rdma setting nr_requests during io
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_setting_nr_requests_io
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_setting_nr_requests_io
+extra-task: /storage/nvme_rdma/nvmeof_rdma_setting_nr_requests_io
+id: f2705f4b-46a8-4e48-86c0-4b9cb264f2cf

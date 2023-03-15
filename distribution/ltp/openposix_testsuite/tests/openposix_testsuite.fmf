@@ -1,12 +1,44 @@
 summary: Linux Test Project openposix testsuite KernelTier1
-description: Linux Test Project openposix testsuite KernelTier1
-contact: Kernel General Test Team <kernel-general-test-team@redhat.com>
+description: kernel/distribution/ltp/openposix_testsuite
+enabled: true
+link:
+  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-56918
+  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-56927
+  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-56922
+  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-56234
+id: 3e086fed-d2a4-474b-b7cc-a79bfe8e0bb0
+tag:
+  - fmf-export
+contact: Memory Management QE <mm-qe@redhat.com>
 component:
   - kernel
 path: /distribution/ltp/openposix_testsuite
-test: bash -x ./runtest.sh
-framework: beakerlib
-duration: 40m
-extra-summary: /distribution/ltp/openposix_testsuite
-extra-task: /distribution/ltp/openposix_testsuite
-environment:
+test: bash ./runtest.sh
+framework: shell
+require:
+  - git
+  - automake
+  - autoconf
+  - flex
+  - bison
+  - rsyslog
+  - util-linux
+  - rpm-build
+  - bc
+  - time
+  - libaio-devel
+  - libcap-devel
+  - strace
+  - gcc
+  - bzip2
+recommend:
+  - numactl-devel
+  - ntpdate
+  - chrony
+  - sysklogd
+  - util-linux-ng
+  - numactl
+  - redhat-lsb
+duration: 180m
+extra-summary: kernel/distribution/ltp/openposix_testsuite
+extra-task: kernel/distribution/ltp/openposix_testsuite

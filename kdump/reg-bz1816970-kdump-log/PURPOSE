@@ -1,0 +1,27 @@
+Validating debugging feature in the kexec-tools, which help to gather additional information about the kdump service failure.
+
+Accepted Parameters:
+ - KDUMP_STDLOGLVL:
+    The logging level of KDUMP_STDLOGLVL
+
+ - KDUMP_SYSLOGLVL:
+    The logging level of KDUMP_SYSLOGLVL
+
+ - KDUMP_KMSGLOGLVL:
+    The logging level of KDUMP_KMSGLOGLVL
+
+Note: If KDUMP_STDLOGLVL, KDUMP_SYSLOGLVL and KDUMP_KMSGLOGLVL are set, the task will add an additional test round for customer setting.
+
+Logging levels: no logging(0), error(1),warn(2),info(3),debug(4)
+
+
+The task can configure the kdump log level for the first kernel in the /etc/sysconfig/kdump. For example:
+
+KDUMP_STDLOGLVL=3
+KDUMP_SYSLOGLVL=0
+KDUMP_KMSGLOGLVL=0
+
+The above configurations indicate that kdump messages will be printed
+to the console, and the KDUMP_STDLOGLVL is set to 3(info), but the
+KDUMP_SYSLOGLVL and KDUMP_KMSGLOGLVL are set to 0(no logging). This
+is also the current default log levels in the first kernel.

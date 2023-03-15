@@ -33,12 +33,13 @@ Crash()
         SetupKdump
         Cleanup
 
-        # Remove -s from KEXEC_ARGS if it presents in default options.
-        # Kdump would then load/unload crash kernel by kexec_load instead
-        # of kexec_file_load(). kexec_load() will not verify kernel key
-        # This is to make both kexec_load() and kexec_file_load() are tested
-        # no matter what default option is.
+        # This tests kdump kernel to be loaded with *kexec__load* explicitly
+        # no matter what default option is for kexec
+
+        # kexec_load() doesn't not verify kernel key
         AppendSysconfig KEXEC_ARGS remove "-s"
+        AppendSysconfig KEXEC_ARGS add "-c"
+
 
         # This is for debugging purpose in case kdump kernel got OOM on Fedora
         if $IS_FC; then

@@ -1,0 +1,14 @@
+summary: Security Audit verifier for 2035123
+description: ''
+contact: Dennis Li <denli@redhat.com>
+component:
+  - kernel
+path: /security/audit/2035123
+test: make run
+framework: beakerlib 
+require:
+  - make
+duration: 12m
+extra-summary: /kernel-tests/security/audit/2035123
+extra-task: /kernel-tests/security/audit/2035123
+

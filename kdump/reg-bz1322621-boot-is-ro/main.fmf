@@ -1,0 +1,11 @@
+summary: Regression test for bug 1322621
+description: |
+    It tests starting of kdump service when /boot is readonly
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+duration: 60m
+extra-summary: /kernel/kdump/reg-bz1322621-boot-is-ro
+extra-task: /kernel/kdump/reg-bz1322621-boot-is-ro

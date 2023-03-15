@@ -1,0 +1,13 @@
+[General]
+name=storage/block//bz2142432_direct_io_mapper_error
+owner=Changhui Zhong <czhong@redhat.com>
+description=direct io device mapper errors on luks raid
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=kernel-devel;gcc;gcc-c++;cryptsetup;make;mdadm
+repoRequires=cki_lib
+max_time=1h

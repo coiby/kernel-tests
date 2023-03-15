@@ -1,0 +1,43 @@
+summary: Test Kdump by crashing Kernel using crasher Kernel module.
+description: |
+    It crashes the system by using crasher Kernel module. It could take an
+    argument from 0-3,
+
+     * ACP: invoke dump using panic [ panic test 0 ].
+     * ACB: invoke dump using BUG [ panic test 1 ].
+     * ACE: invoke dump using panic_on_oops [ panic test 2 ].
+     * ACL: invoke dump in a hang situation.
+
+    By default, it uses 0 (ACP).
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kernel-devel
+  - elfutils-libelf-devel
+  - gcc
+  - kexec-tools
+duration: 1h
+extra-summary: /kernel/kdump/crash-crasher
+extra-task: /kernel/kdump/crash-crasher
+
+/panic:
+  environment:
+    TESTARGS: 0
+
+/bug:
+  environment:
+    TESTARGS: 1
+
+/panic_on_oops:
+  environment:
+    TESTARGS: 2
+
+/spinlock:
+  environment:
+    TESTARGS: 3
+
+/bug_spinlock:
+  environment:
+    TESTARGS: 4
+

@@ -1,0 +1,10 @@
+summary: Crashing system via SysRq-C.
+description: |
+    It crashes the system by using SysRq-C.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 1h
+extra-summary: /kernel/kdump/crash-sysrq-c
+extra-task: /kernel/kdump/crash-sysrq-c
+require: kexec-tools

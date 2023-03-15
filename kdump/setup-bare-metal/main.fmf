@@ -1,0 +1,29 @@
+summary: Setup bare metal Kernel for Kdump.
+description: |
+    It setups main kernel and kdump kernel parameters and installs necessary Kdump and debuginfo packages for later exercise of Kdump and crash-utility.
+
+    Accepted Parameters
+    - KER1ARGS: a series of additional main kernel boot parameters separated by
+      white spaces.
+      E.g. 'crashkernel=64M@16M intel_iommu=on'
+
+    - NODEBUGINFO: Whether to intall kernel-debuginfo which is required for testing Crash utilities. Setting it to true means it will not install kernel-debuginfo and kernel-debuginfo-common packages. By default, it's true.
+      E.g. NODEBUGINFO=true
+
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+duration: 30m
+extra-summary: /kernel/kdump/setup-bare-metal
+extra-task: /kernel/kdump/setup-bare-metal
+
+require:
+  - kexec-tools
+  - make
+recommend: 
+  - wget
+
+adjust:
+    - when: NODEBUGINFO==true
+      recommend+: 
+        - kernel-debuginfo 

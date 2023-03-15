@@ -17,70 +17,74 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
 
 # Include environment and libraries
-source $CDIR/../../cki_lib/libcki.sh || \
-    cki_abort_task "fail to include libcki.sh"
+source "$CDIR"/../../cki_lib/libcki.sh || exit 1
 
 # Test parameters to use some specific version of stqe tests or libsan library
 STQE_STABLE_VERSION=${STQE_STABLE_VERSION:-""}
 LIBSAN_STABLE_VERSION=${LIBSAN_STABLE_VERSION:-""}
 
-function get_release() {
-    source /etc/os-release
-    export DISTRO_FAMILY=$ID  # e.g. 'fedora', 'rhel'
-    export DISTRO_VERSION=$VERSION_ID  # e.g. '36', '8.6'
-    export DISTRO_MIN=$DISTRO_FAMILY-$DISTRO_VERSION  # e.g. 'rhel-9.1', 'fedora-36'
-    export DISTRO_MAJ=$(echo $DISTRO_MIN | cut -d '.' -f 1)  # e.g. 'rhel-9', 'fedora-36
+get_release() {
+  source /etc/os-release
+  export DISTRO_FAMILY=$ID                                # e.g. 'fedora', 'rhel'
+  export DISTRO_VERSION=$VERSION_ID                       # e.g. '36', '8.6'
+  export DISTRO_MIN=$DISTRO_FAMILY-$DISTRO_VERSION        # e.g. 'rhel-9.1', 'fedora-36'
+  DISTRO_MAJ=$(echo "$DISTRO_MIN" | cut -d '.' -f 1)
+  export DISTRO_MAJ                                       # e.g. 'rhel-9', 'fedora-36
 }
 
-function stqe_init
-{
-    typeset pip="python3 -m pip"
-    typeset pkg_mgr=$(dnf > /dev/null 2>&1 && echo dnf || echo yum)
+stqe_init() {
+  get_release
+  pkg_mgr=$(dnf >/dev/null 2>&1 && echo dnf || echo yum)
+  stqe_path="/opt/stqe-venv"
+  python='python3'
+  STQE_PYTHON=$stqe_path/bin/python
+  STQE_TEST_EXE=$stqe_path/bin/stqe-test
 
-    # augeas-libs needed for RHEL-7, netifaces needed for aarch64
-    cki_run "$pkg_mgr install -y --skip-broken python3-pip python3-wheel python3-augeas augeas-libs python3-netifaces" || \
-        cki_abort_task "FAIL: Could not install framework dependencies"
-    # ppc64, ppc64le, and s390x need to compile some python modules for now
-    if [[ $ARCH == 'ppc64' || $ARCH == 'ppc64le' || $ARCH == 's390x' ]]; then
-      cki_run "$pkg_mgr install -y gcc cmake openssl-devel python3-devel libffi-devel zlib-devel" || \
-          cki_abort_task "FAIL: Could not install framework dependencies"
+  if [[ $DISTRO_MAJ == 'rhel-7' ]]; then
+    $pkg_mgr install -y python3-pip python3-devel gcc
+    # Lightweight versions with minimal dependencies
+    STQE_STABLE_VERSION=0.2.0b3
+    LIBSAN_STABLE_VERSION=0.5.0b5
+
+  # upgrade to python39 when on rhel-8
+  elif [[ $DISTRO_MAJ == 'rhel-8' ]]; then
+    python='python3.9'
+    if ! $STQE_PYTHON -m pip -V >/dev/null 2>&1; then
+      $pkg_mgr install -y python39-devel python39-pip
     fi
-
-    # Needed to install ruamel.yaml.clib from source, can be removed if aarch64 wheel is available
-    if [[ $ARCH == 'aarch64' ]]; then
-        cki_run "$pkg_mgr install -y gcc python3-devel" || \
-            cki_abort_task "FAIL: Could not install cffi from source on ppc64le RHEL-7"
+  else  # assume python>=3.9
+    if ! $STQE_PYTHON -m pip -V >/dev/null 2>&1; then
+      $pkg_mgr install -y python3-devel python3-pip
     fi
+  fi
 
-    # Check if we have pip>=20, install 20.3 if not
-    if [[ $($pip -V | cut -f 2 -d ' ' | cut -f 1 -d '.') -lt 20 ]]; then
-        cki_run "$pip install -U pip==20.3" || \
-            cki_abort_task "FAIL: Could not install pip==20.3!"
+  # if stqe-test executable already works do nothing
+  if ! $STQE_TEST_EXE --help >/dev/null 2>&1; then
+    if [[ $ARCH == 'ppc64le' || $ARCH == 's390x' ]]; then
+      $pkg_mgr install -y gcc  # ruamel.yaml.clib needs compilation
     fi
-
-    # Workaround for python-augeas compiling bug on RHEL-7 ppc64le
-    if [[ $ARCH == 'ppc64le' ]]; then
-        cki_run "$pip install cffi --no-binary=cffi" || \
-            cki_abort_task "FAIL: Could not install cffi from source on ppc64le RHEL-7"
-    fi
-
+    # create virtualenv
+    $python -m pip install virtualenv
+    $python -m venv $stqe_path --system-site-packages  # site-packages might be needed for some tests
+    $stqe_path/bin/pip install -U pip wheel
     if [[ -n $LIBSAN_STABLE_VERSION ]]; then
-        cki_run "$pip libsan==$LIBSAN_STABLE_VERSION" || \
-            cki_abort_task "Fail to install libsan==$LIBSAN_STABLE_VERSION"
+      $stqe_path/bin/pip install libsan=="$LIBSAN_STABLE_VERSION"
     fi
-
     if [[ -n $STQE_STABLE_VERSION ]]; then
-        cki_run "$pip install stqe==$STQE_STABLE_VERSION --no-binary=stqe" || \
-            cki_abort_task "Fail to install stqe==$STQE_STABLE_VERSION"
+      cki_run "$stqe_path/bin/pip install stqe==$STQE_STABLE_VERSION" ||
+        cki_abort_task "Fail to install stqe==$STQE_STABLE_VERSION"
     else
-        cki_run "$pip install stqe --no-binary=stqe" || \
-            cki_abort_task "Fail to install stqe"
+      cki_run "$stqe_path/bin/pip install stqe" ||
+        cki_abort_task "Fail to install stqe"
     fi
+  fi
 
-    return 0
+source $stqe_path/bin/activate
+export STQE_PYTHON  # Python interpreter to use with libsan, stqe libs
+export STQE_TEST_EXE  # stqe-test i.e. $STQE_TEST_EXE run -t <test>
+return 0
 }
-

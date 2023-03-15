@@ -1,0 +1,6 @@
+PURPOSE of /kernel/power-management/rapl/pwrmgmt_modules
+Description: Confirm RAPL-related modules are loaded.
+Author: Erik Hamera <ehamera@redhat.com>
+
+Check, that modules needed by RAPL are loaded automatically.
+

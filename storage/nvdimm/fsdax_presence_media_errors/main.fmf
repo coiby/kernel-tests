@@ -1,0 +1,20 @@
+summary: KS-TC:nvdimm/fsdax_presence_media_errors
+description: nvdimm feature test for enable DAX in the presence of media errors, from
+    BZ1383825
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/fsdax_presence_media_errors
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/fsdax_presence_media_errors
+extra-task: /storage/nvdimm/fsdax_presence_media_errors
+id: 85ad4d13-ebf8-4bfc-b947-5fd07aa1efb8

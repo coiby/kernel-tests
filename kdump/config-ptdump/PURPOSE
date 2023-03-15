@@ -1,0 +1,4 @@
+Enable PT logging required for crash-ptdump-command test
+
+Hardware Dependencies:
+Intel CPU with Intel PT feature (Broadwell or later) i.e. CPUs has intel_pt flag

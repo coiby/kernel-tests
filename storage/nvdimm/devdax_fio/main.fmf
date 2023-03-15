@@ -1,0 +1,19 @@
+summary: KS-TC:nvdimm/devdax_fio
+description: nvdimm devdax fio testing
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/devdax_fio
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - ndctl
+duration: 2h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/devdax_fio
+extra-task: /storage/nvdimm/devdax_fio
+id: 0766d477-3450-43d5-9a71-07a3cd423cad

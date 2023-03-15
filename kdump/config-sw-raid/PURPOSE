@@ -1,0 +1,15 @@
+Please make sure disk is ready before create raid devices.
+
+In XML:
+<partitions>
+ <partition fs="ext4" name="/raid1" size="10" type="part"/>
+ <partition fs="ext4" name="/raid2" size="10" type="part"/>
+ <partition fs="ext4" name="/raid3" size="10" type="part"/>
+</partitions>
+
+<task name="/kernel/kdump/config-sw-raid" role="None">
+ <params>
+  <param name="RAID_DEVICE" value="/raid1 /raid2"/>
+  <param name="RAID_LEVEL" value="0"/>
+ </params>
+</task>

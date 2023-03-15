@@ -73,8 +73,10 @@ amd64_edac_mod.ko
 amd_energy.ko
 amd_freq_sensitivity.ko
 amdgpu.ko
+amd_hsmp.ko
 amd.ko
 amd-pmc.ko
+amd_pstate.ko
 amd-rng.ko
 amd_sfh.ko
 amd-xgbe.ko
@@ -408,6 +410,7 @@ dp83867.ko
 dp83tc811.ko
 dptf_power.ko
 drm_buddy.ko
+drm_display_helper.ko
 drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko
@@ -1507,6 +1510,7 @@ nvmet-fc.ko
 nvmet.ko
 nvmet-rdma.ko
 nvmet-tcp.ko
+nvsw-sn2201.ko
 nv_tco.ko
 nxt200x.ko
 nxt6000.ko
@@ -1952,6 +1956,7 @@ serpent_generic.ko
 serpent-sse2-x86_64.ko
 ses.ko
 sfc.ko
+sfc-siena.ko
 sg.ko
 sha1-mb.ko
 sha256-mb.ko
@@ -2054,6 +2059,7 @@ snd-hda-codec-realtek.ko
 snd-hda-codec-si3054.ko
 snd-hda-codec-via.ko
 snd-hda-core.ko
+snd-hda-cs-dsp-ctls.ko
 snd-hda-ext-core.ko
 snd-hda-intel.ko
 snd-hda-scodec-cs35l41-i2c.ko
@@ -2138,6 +2144,7 @@ snd-soc-ehl-rt5660.ko
 snd-soc-es8316.ko
 snd-soc-hdac-hda.ko
 snd-soc-hdac-hdmi.ko
+snd-soc-hda-codec.ko
 snd-soc-intel-hda-dsp-common.ko
 snd-soc-intel-sof-cirrus-common.ko
 snd-soc-intel-sof-maxim-common.ko
@@ -2238,6 +2245,7 @@ snd-sof.ko
 snd-sof-pci-intel-apl.ko
 snd-sof-pci-intel-cnl.ko
 snd-sof-pci-intel-icl.ko
+snd-sof-pci-intel-mtl.ko
 snd-sof-pci-intel-tgl.ko
 snd-sof-pci-intel-tng.ko
 snd-sof-pci.ko

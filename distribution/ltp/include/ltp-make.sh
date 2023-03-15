@@ -17,7 +17,7 @@ if [ -z ${TESTVERSION} ]; then
         TESTVERSION="20210927"
     else
         # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
-        TESTVERSION="20220930"
+        TESTVERSION="20230127"
     fi
 fi
 
@@ -101,12 +101,24 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
+    if [ "$TESTVERSION" == "20230127" ]; then
+        # Tips: this patch should be applied in single on ltp-next(version > 20180926)
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-aiocp-remove-the-check-read-unnecessary-flag.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-dirtyc0w_shmem_child-64k-pagesize.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-mount03-flip-to-the-next-second-before-doing-the-acc.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-stop-throwing-failure-when-MADV_WILLNEED-i.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-setfsuid02_16-Fix-uid-1-too-large-for-testing-16-bit.patch
+    fi
     if [ "$TESTVERSION" == "20220930" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cpuid.h-Provide-the-macro-definition-__cpuid_count.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-futex_waitv0-23-replace-TST_THREAD_STATE_WA.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-fix-the-broken-case-caused-by-hardcoded-xst.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-when-cpuid.h-is-missing.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ptrace07-Fix-compilation-when-not-on-x86.patch
@@ -114,7 +126,12 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-Revert-ptrace07-Fix-compilation-when-not-on-x86.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cpuid-ptrace07-Only-compile-on-x86_64.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-kconfig-adding-new-config-path.patch
-
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-keyctl02-make-use-of-.max_runtime.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-introduce-safe_write-retry.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-update-all-call-sites-of-SAFE_WRITE.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-statx01-Fix-reading-64-bit-mnt_id-value-fro.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-statx01-Add-exit-condition-when-parsing-pro.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-statx01-Fix-typo.patch
     fi
 
     if [ "$TESTVERSION" == "20220527" ]; then

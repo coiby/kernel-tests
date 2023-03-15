@@ -1,0 +1,29 @@
+From 57c78e4342d8dd7427ffe0cf1f278f8fcbcfc963 Mon Sep 17 00:00:00 2001
+From: Yang Xu <xuyang2018.jy@fujitsu.com>
+Date: Fri, 16 Dec 2022 11:13:22 +0800
+Subject: [PATCH] syscalls/statx01: Fix typo
+
+falg => flag
+
+Signed-off-by: Yang Xu <xuyang2018.jy@fujitsu.com>
+Signed-off-by: bgrech <bgrech@redhat.com>
+---
+ testcases/kernel/syscalls/statx/statx01.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/statx/statx01.c b/testcases/kernel/syscalls/statx/statx01.c
+index 08207f950..68f56549f 100644
+--- a/testcases/kernel/syscalls/statx/statx01.c
++++ b/testcases/kernel/syscalls/statx/statx01.c
+@@ -53,7 +53,7 @@ static void test_mnt_id(struct statx *buf)
+ {
+ 	FILE *file;
+ 	char line[PATH_MAX];
+-	int pid, falg = 0;
++	int pid, flag = 0;
+ 	unsigned int line_mjr, line_mnr;
+ 	uint64_t mnt_id;
+ 
+-- 
+2.38.1
+

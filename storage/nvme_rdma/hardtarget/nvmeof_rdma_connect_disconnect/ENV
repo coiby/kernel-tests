@@ -1,0 +1,2 @@
+DESC="nvmeof rdma connect disconnect stress testing with NETAPP E5700"
+TIME=2h
