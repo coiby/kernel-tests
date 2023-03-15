@@ -1,0 +1,13 @@
+summary: run user specified tests in Firmware Test Suite (fwts)
+description: |
+    Run fwts tests passed from beaker job as paramater FWTSTESTS
+contact: Oliver Gutierrez <ogutierr@redhat.com>
+component:
+  - firmware
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+duration: 60m
+extra-summary: /kernel/firmware/fwts/user-specified
+extra-task: /kernel/firmware/fwts/user-specified
