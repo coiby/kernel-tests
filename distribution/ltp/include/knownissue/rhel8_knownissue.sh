@@ -15,6 +15,9 @@ function rhel8_fatal_issues()
 	osver_in_range "800" "807" && tskip "pty07" fatal
 	# Bug 2101733 - ltp/lite - pty06 fail
 	kernel_in_range "0" "4.18.0-261.el8" && tskip "pty06" fixed
+	# Bug 2156251 - [RHEL8] kernel-rt-debug: BUG: MAX_LOCKDEP_CHAINS too low
+	# Bug 2132005 - [rhel8] call trace qed_ptt_acquire+0x49/0x340 [qed] _qed_get_vport_stats+0x31f/0x4a0 [qed]
+	osver_in_range "800" "810" && cki_is_kernel_debug && tskip "read_all_sys" fatal
 }
 
 function rhel8_unfix_issues()
@@ -85,6 +88,8 @@ function rhel8_unfix_issues()
 
 function rhel8_fixed_issues()
 {
+	# Bug 2154880 - [rhel8] LTP: read_all_sys - RIP: 0010:intel_rps_get_max_frequency+0x5/0x40 [i915]
+	kernel_in_range "0" "4.18.0-456.el8" && tskip "read_all_sys" fixed
 	# Bug 2099510 - LTP lite: move_pages12.c:106: TFAIL: madvise failed: EIO
 	kernel_in_range "0" "4.18.0-408.el8" && tskip "move_pages12" fixed
 	# Bug 1895961 (CVE-2020-25704) - CVE-2020-25704 kernel: perf_event_parse_addr_filter memory
