@@ -40,6 +40,7 @@ rlJournalStart
 
     rlPhaseStartTest "test the bug, phase A"
 # old version behaves differently in the loop
+        # shellcheck disable=SC2034
         for i in $(seq 1 100);do
                 rlRun "ipmi-sel" 0-128 "no segfault"
         done

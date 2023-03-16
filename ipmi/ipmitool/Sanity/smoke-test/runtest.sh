@@ -63,6 +63,7 @@ EOF
             yum install -y rh-python38{,-pip}
         fi
 
+        # shellcheck disable=SC1091
         . scl_source enable rh-python38
 
         # fallback if RHSCL failed
