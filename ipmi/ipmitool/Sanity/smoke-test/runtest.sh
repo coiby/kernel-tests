@@ -63,6 +63,7 @@ EOF
             yum install -y rh-python38{,-pip}
         fi
 
+        # shellcheck disable=SC1091
         . scl_source enable rh-python38
 
         # fallback if RHSCL failed
@@ -73,6 +74,10 @@ EOF
             rlRun -l "pip install --user future"
         fi
     fi
+
+    # Be sure IPMI service is running to load IPMI kernel modules and see devices /dev/ipmi*
+    rlServiceStart "ipmi"
+
     rlPhaseEnd
 
     rlPhaseStartTest
