@@ -21,6 +21,15 @@ TEST="general/time/udelay_test"
 
 UDELAY_PATH=/sys/kernel/debug/udelay_test
 
+k_name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r)|sed -e 's/-core//')
+if ! rpm -q --quiet ${k_name}-devel-$(uname -r); then
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        rpm-ostree -A --idempotent --allow-inactive install -y ${k_name}-devel-$(uname -r)
+    else
+        yum install -y ${k_name}-devel-$(uname -r) || dnf install -y ${k_name}-devel-$(uname -r)
+    fi
+fi
+
 setup()
 {
     /sbin/insmod udelay_test/udelay_test.ko
