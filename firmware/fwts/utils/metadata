@@ -6,4 +6,5 @@ owner=Oliver Gutierrez <ogutierr@redhat.com>
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=1h
+repoRequires=firmware/fwts/include;firmware/fwts/utils/include;automotive/include
 # this test only use fwts and it's installed in the include task
