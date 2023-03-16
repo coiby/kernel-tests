@@ -46,9 +46,17 @@ kernel_name=$(rpm -q --queryformat '%{name}\n' -qf "/boot/config-$(uname -r)" | 
 KG_SHARE_DUP_ISO=/data/dup
 KG_NFS_PATH_DUP=$KG_SERVER:$KG_SHARE_DUP_ISO
 
+rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+
 function download_kernel_srpm()
 {
 	local kernel_name=$(echo $kernel_name | sed "s/-debug//")
+	# Since 9.3 PREEMPT_RT patch merge and build kernel-rt as a variant,
+	# kernel-rt will use the kernel source package to build.
+	if [[ $rhel_major -gt "9" || ( $rhel_major -eq 9 && $rhel_minor -ge 3 ) ]]; then
+		local kernel_name=$(echo $kernel_name | sed "s/-debug//" | sed "s/-rt//")
+	fi
 	HOST=$(hostname)
 	case ${HOST} in
 		*pek*) def_url="http://download.eng.pek2.redhat.com/brewroot/packages";;
@@ -75,7 +83,7 @@ function setup_src_repo()
 {
 	local baseurl=$(grep baseurl /etc/yum.repos.d/beaker-BaseOS.repo | awk -F'BaseOS' -vOFS='' '{$1=$1;$2=""}1')
 
-	if [[ $kernel_name =~ "rt" ]]; then
+	if [[ $kernel_name =~ "rt" && ($rhel_major -lt 9 || ($rhel_major -eq "9" && $rhel_minor -lt 3)) ]]; then
 		local varient="RT"
 	else
 		local varient="BaseOS"
@@ -100,6 +108,10 @@ function prepare_running_kernel_src()
 {
 	local running_kernel=$(uname -r | sed "s/+debug//" | sed "s/\.`arch`//")
 	local kernel_name=$(echo $kernel_name | sed "s/-debug//")
+	if [[ $rhel_major -gt "9" || ( $rhel_major -eq 9 && $rhel_minor -ge 3 ) ]]; then
+		local running_kernel=$(uname -r | sed "s/+rt//" | sed "s/-debug//" | sed "s/\.`arch`//")
+		local kernel_name=$(echo $kernel_name | sed "s/-rt//" | sed "s/-debug//")
+	fi
 
 	echo $running_kernel | grep -q -v 'el[0-9]\|fc\|eln'
 	if [ $? -eq 0 ]; then
