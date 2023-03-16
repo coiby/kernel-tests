@@ -5,9 +5,10 @@
 # - SSL error:FFFFFFFF80000002:system library::No such file or directory: crypto/bio/bss_file.c:67
 # - SSL error:10000080:BIO routines::no such file: crypto/bio/bss_file.c:75
 
+# shellcheck source=/dev/null
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-: ${DeBug:=0} # Set to non-zero value to enable debugging
+: "${DeBug:=0}" # Set to non-zero value to enable debugging
 
 OSARCH="$(uname -m)"
 KVER="$(uname -r)"
@@ -21,7 +22,7 @@ FWTS_DEP_PKGS="autoconf automake libtool flex flex-devel bison dkms libfdt libfd
 EPEL9_PKG=https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 
 function fwtsSetupRepos()
-{   
+{
     rlLog "setup EPEL9 repo"
     rlRun "$YUM install $EPEL9_PKG" 0 "install epel repo"
 
@@ -68,7 +69,7 @@ function fwtsPreSetup()
 }
 
 function fwtsBuild()
-{   
+{
     # build efi_runtime
     # need mount fs to rw, otherwise install kmod will fail
     rlLog "mount /usr as rw to install kmod"
@@ -77,7 +78,7 @@ function fwtsBuild()
     rlRun "pushd efi_runtime"
     rlRun "KVER=$KVER make all install" 0 "build efi_runtime kmod"
     rlRun "popd"
-    
+
     # build fwts
     rlLog "start building fwts"
     rlRun "autoreconf -ivf" 0 "autoreconf"
@@ -98,26 +99,26 @@ function fwtsReportResults()
             return
     fi
 
-    resultSummaryLines=$(cat results.log | awk '/^---------------\+-----\+-----\+-----\+-----\+-----\+-----\+/ { print FNR }')
-    echo $resultSummaryLines
+    resultSummaryLines=$(< results.log awk '/^---------------\+-----\+-----\+-----\+-----\+-----\+-----\+/ { print FNR }')
+    echo "$resultSummaryLines"
 
-    beginTableLine=$(echo $resultSummaryLines | awk '{print $1}')
-    endTableLine=$(echo $resultSummaryLines | awk '{print $2}')
+    beginTableLine=$(echo "$resultSummaryLines" | awk '{print $1}')
+    endTableLine=$(echo "$resultSummaryLines" | awk '{print $2}')
 
     # there is a third summary line after the totals FYI
 
     # Throw away the beginning and end of table
-    beginTableLine=$(( $beginTableLine + 1 ))
-    endTableLine=$(( $endTableLine - 1 ))
+    beginTableLine=$(( beginTableLine + 1 ))
+    endTableLine=$(( endTableLine - 1 ))
 
-    sed -n $beginTableLine\,$endTableLine\p results.log > resultsSummary.out
+    sed -n $beginTableLine\,"$endTableLine\p" results.log > resultsSummary.out
 
     while IFS= read -r line
     do
         fwtsTest=$(echo "$line" | awk -F \| '{print $1}')
-        fwtsTest=$(echo $fwtsTest) # trim trailing whitespaces
+        fwtsTest=$(echo "$fwtsTest") # trim trailing whitespaces
         fwtsFail=$(echo "$line" | awk -F \| '{print $3}')
-        fwtsFail=$(echo $fwtsFail) # trim trailing whitespaces
+        fwtsFail=$(echo "$fwtsFail") # trim trailing whitespaces
 
         ignoretest=0
         for ignore in $FWTS_IGNORE_LIST
@@ -139,11 +140,4 @@ function fwtsReportResults()
         fi
     done < resultsSummary.out
     rlPhaseEnd
-}
-
-function fwtsCleanup()
-{
-    if [ -d "$TmpDir" ] ; then
-        [[ $DeBug = "0" ]] && rlRun "rm -r $TmpDir" 0 "Removing tmp directory" || rlLog "Debugging enabled, keeping $TmpDir"
-    fi
 }
