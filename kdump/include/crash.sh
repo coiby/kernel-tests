@@ -199,6 +199,10 @@ ValidateCrashOutput()
     # failed_resume is normal function name.
     echo "- 'failed_resume'"
 
+    # ffff80000b2a2f40:  ffff09d9882f3980 __event_xfs_inode_free_eofblocks_invalid
+    # __event_xfs_inode_free_eofblocks_invalid: function name
+    echo "- 'event_xfs_inode_free_eofblocks_invalid'"
+
     # crash> bt -t
     # ffff80001865bb20:  0000000000000063 failed_suspend
     # failed_suspend is normal function name.
@@ -389,6 +393,7 @@ ValidateCrashOutput()
          -e 'fail_nth' \
          -e '_fail' \
          -e 'failed_resume' \
+         -e 'event_xfs_inode_free_eofblocks_invalid' \
          -e 'failed_suspend' \
          -e 'failsafe' \
          -e 'failover' \
