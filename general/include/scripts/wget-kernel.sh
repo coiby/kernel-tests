@@ -130,6 +130,9 @@ init_vars()
     elif [ -n "$variant" ]; then
         echo "Unknown kernel variant: $variant!"
     fi
+    kernel_mar=$(echo $version | cut -d. -f1)
+    kernel_mir=$(echo $version | cut -d. -f2)
+    kernel_rma=$(echo $release | cut -d. -f1)
 
     local found=0
     # folder name may be different from rpm name, like kernel-64k/rt may be in kernel folder.
@@ -137,6 +140,10 @@ init_vars()
         sub_path=${pkg_name}
         sub_name=${pkg_name}
         [[ $pkg_name =~ kernel-alt|kernel-64k ]] && sub_path=kernel
+        # after 5.14.0-285.el9, kernel-rt also stores in kernel folder in brew
+        if [ $kernel_mar -gt 5 ] || [ $kernel_mar -eq 5 -a $kernel_rma -ge 285 ]; then
+            sub_path=kernel
+        fi
         path_prefix=${def_url}/$sub_path/${version}/${release}
         doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
         rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
@@ -160,6 +167,10 @@ init_vars()
             sub_path=${pkg_name}
             sub_name=${pkg_name}
             [[ $pkg_name =~ kernel-alt|kernel-64k ]] && sub_path=kernel
+            # after 5.14.0-285.el9, kernel-rt also stores in kernel folder in brew
+            if [ $kernel_mar -gt 5 ] || [ $kernel_mar -eq 5 -a $kernel_rma -ge 285 ]; then
+                sub_path=kernel
+            fi
             path_prefix=${def_url}/$sub_path/${version}/${release}
             doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
             rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
@@ -184,9 +195,6 @@ init_vars()
         debuginfo_url="${path_prefix}/$arch/${sub_name}-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_name}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
     fi
 
-    # RHEL8
-    kernel_mar=$(echo $version | cut -d. -f1)
-    kernel_mir=$(echo $version | cut -d. -f2)
     if [ $kernel_mar -gt 4 ] || [ $kernel_mar -eq 4 -a $kernel_mir -ge 16 ]; then
         rpm_url+=" ${path_prefix}/$arch/${pkg_name}-modules-${version}-${release}.$arch.rpm"
         rpm_url+=" ${path_prefix}/$arch/${pkg_name}-core-${version}-${release}.$arch.rpm"
