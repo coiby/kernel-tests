@@ -5,5 +5,8 @@ owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
+environment=TEST=networking/wireless/tests/functional/connection/nmcli/wireless_connection_to_WPA1_passphrase_AP
 max_time=5m
 dependencies=NetworkManager;dbus-tools
+dependencies[RedHatEnterpriseLinux7]=NetworkManager
+repoRequires=networking/wireless/common;networking/wireless/tests/functional
