@@ -33,13 +33,17 @@ Crash()
         SetupKdump
         Cleanup
 
+        # From RHEL-9.3, kexec uses "-a" as default option.
         # This tests kdump kernel to be loaded with *kexec__load* explicitly
         # no matter what default option is for kexec
 
         # kexec_load() doesn't not verify kernel key
         AppendSysconfig KEXEC_ARGS remove "-s"
-        AppendSysconfig KEXEC_ARGS add "-c"
 
+        # Note, kexec 2.0.15 used in RHEL-7 doesn't support "-c" explicitly.
+        if ! $IS_RHEL || [ "${RELEASE}" -gt 7 ]; then
+            AppendSysconfig KEXEC_ARGS add "-c"
+        fi
 
         # This is for debugging purpose in case kdump kernel got OOM on Fedora
         if $IS_FC; then
