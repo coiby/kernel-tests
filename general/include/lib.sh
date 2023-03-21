@@ -40,7 +40,9 @@ KG_HTTP_CODECOVERAGE_TOOL=$KG_HTTP_SHARE/$KG_LCOV_PACAGE
 KG_NFS_PATH_CODE_COVERAGE_RAW=$KG_SERVER:$KG_SHARE_CODECOVERAGE_RAW
 KG_NFS_PATH_CODE_COVERAGE_PUBLIC=$KG_SERVER:$KG_SHARE_CODECOVERAGE_PUBLIC
 
-kernel_name=$(rpm -q --queryformat '%{name}\n' -qf "/boot/config-$(uname -r)" | sed 's/-core//')
+read -r sourcerpm <<< $(rpm -q --queryformat '%{SOURCERPM}' -f "/boot/config-$(uname -r)")
+kernel_spec=$(echo "${sourcerpm%%-[0-9]*}")
+running_kernel=$(echo $sourcerpm | sed 's/\.src.rpm//' | sed 's/^[^0-9]*//')
 
 # DUP ISO images
 KG_SHARE_DUP_ISO=/data/dup
@@ -51,12 +53,8 @@ rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $
 
 function download_kernel_srpm()
 {
-	local kernel_name=$(echo $kernel_name | sed "s/-debug//")
 	# Since 9.3 PREEMPT_RT patch merge and build kernel-rt as a variant,
 	# kernel-rt will use the kernel source package to build.
-	if [[ $rhel_major -gt "9" || ( $rhel_major -eq 9 && $rhel_minor -ge 3 ) ]]; then
-		local kernel_name=$(echo $kernel_name | sed "s/-debug//" | sed "s/-rt//")
-	fi
 	HOST=$(hostname)
 	case ${HOST} in
 		*pek*) def_url="http://download.eng.pek2.redhat.com/brewroot/packages";;
@@ -69,12 +67,12 @@ function download_kernel_srpm()
 		*) def_url="http://download.eng.bos.redhat.com/brewroot/packages";;
 	esac
 
-	package_prefix="$def_url/$kernel_name"
+	package_prefix="$def_url/$kernel_spec"
 	kernel_maj=$(uname -r | cut -d- -f1)
 	tmp=$(uname -r | cut -d- -f2)
 	kernel_min=$(echo ${tmp%.*})
 
-	ksrpm_url=$package_prefix/$kernel_maj/$kernel_min/src/$kernel_name-$kernel_maj-$kernel_min.src.rpm
+	ksrpm_url=$package_prefix/$kernel_maj/$kernel_min/src/$sourcerpm
 	wget -q $ksrpm_url
 	sleep 10
 }
@@ -83,7 +81,7 @@ function setup_src_repo()
 {
 	local baseurl=$(grep baseurl /etc/yum.repos.d/beaker-BaseOS.repo | awk -F'BaseOS' -vOFS='' '{$1=$1;$2=""}1')
 
-	if [[ $kernel_name =~ "rt" && ($rhel_major -lt 9 || ($rhel_major -eq "9" && $rhel_minor -lt 3)) ]]; then
+	if [[ $kernel_spec =~ "rt" ]]; then
 		local varient="RT"
 	else
 		local varient="BaseOS"
@@ -106,13 +104,6 @@ function cleanup_src_repo()
 
 function prepare_running_kernel_src()
 {
-	local running_kernel=$(uname -r | sed "s/+debug//" | sed "s/\.`arch`//")
-	local kernel_name=$(echo $kernel_name | sed "s/-debug//")
-	if [[ $rhel_major -gt "9" || ( $rhel_major -eq 9 && $rhel_minor -ge 3 ) ]]; then
-		local running_kernel=$(uname -r | sed "s/+rt//" | sed "s/-debug//" | sed "s/\.`arch`//")
-		local kernel_name=$(echo $kernel_name | sed "s/-rt//" | sed "s/-debug//")
-	fi
-
 	echo $running_kernel | grep -q -v 'el[0-9]\|fc\|eln'
 	if [ $? -eq 0 ]; then
 		echo "detected upstream kernel..."
@@ -121,14 +112,16 @@ function prepare_running_kernel_src()
 	else
 		echo "download src package from RH site"
 		setup_src_repo
-		dnf download --source $kernel_name-$running_kernel || download_kernel_srpm
+		# dnf download parameter should not include ".src.rpm"
+		local download_srpm=$(echo $sourcerpm | sed 's/\.src\.rpm//')
+		dnf download --source $download_srpm || download_kernel_srpm
 		cleanup_src_repo
-		if ! test -f $kernel_name-*.src.rpm; then
+		if ! test -f $sourcerpm; then
 			echo "RPM package download failed"
 			rstrnt-report-result "srpm-download" "FAIL" 1
 			exit 1
 		fi
-		rpm -ivh --force $kernel_name-*.src.rpm
+		rpm -ivh --force $sourcerpm
 		tar xf /root/rpmbuild/SOURCES/linux-*.tar.xz -C .
 	fi
 }
