@@ -366,9 +366,10 @@ while true ; do
         --srpm)  list_url+=" src_url";shift 1;;
         --perf)  list_url+=" perf_url";shift 1;;
         --curr|--running)
-                current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+]debug//' -e 's/[.+]64k//')
-                uname -r | grep -q '+debug' && debugkernel=1
+                current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+-]debug//' -e 's/[.+]64k//' -e 's/[.+]rt//')
+                uname -r | grep -Eq '[+.-]debug' && debugkernel=1
                 uname -r | grep -q '+64k' && kernel_64k=1 && kernel_names=kernel-64k
+                uname -r | grep -q '+rt' && kernel_rt=1 && kernel_names=kernel-rt
                 version=${current%%-*}
                 release=${current#*-}
                 dist=$(echo $release | grep -Eo "[[:alpha:]].*$")
