@@ -1,13 +1,11 @@
 #!/bin/bash
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
 
 rlPhaseStartSetup
-rlRun "yum install -y httpd virt-install qemu-kvm libvirt ipxe-bootimgs expect"
 rlRun "systemctl start httpd"
 rlRun "systemctl start libvirtd"
 
