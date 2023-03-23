@@ -101,11 +101,11 @@ rlJournalStart
 		if  cki_is_kernel_debug; then
 			module_pkg="${module_pkg}-debug"
 		fi
-		version=$(uname -r | sed s'/\+debug//' | sed s'/\+64k//')
+		version=$(uname -r | sed s'/\+debug//' | sed s'/\+64k//' | sed s'/\+rt//')
 		module_pkg="${module_pkg}-modules-internal-$version"
 
 		if ! rpm -q $module_pkg; then
-			echo "FAIL: kernel-modules-internal is not installed, aborting test"
+			echo "FAIL: ${module_pkg} is not installed, aborting test"
 			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 			rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 			exit 1
