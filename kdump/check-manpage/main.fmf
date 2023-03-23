@@ -1,0 +1,8 @@
+summary: Check the manpage for kdump related commands
+description: |
+    Check the kdump related commands whether has the corresponding manpage.
+test: make run
+require:
+  - crash
+extra-summary: /kernel/kdump/check-manpage
+extra-task: /kernel/kdump/check-manpage
