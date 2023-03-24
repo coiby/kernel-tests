@@ -86,10 +86,10 @@ URL_REPO_CANDIDATES=(
     ## quite old z-stream releases (e.g., at the time of writing, RHEL 5). ----
 
     # Internal pulp: Extended User Support
-    "http://rhsm-pulp.corp.redhat.com/content/eus/rhel/server/$MAJOR/$VERSION_ID/$BASEARCH/os/"
+    "https://rhsm-pulp.corp.redhat.com/content/eus/rhel/server/$MAJOR/$VERSION_ID/$BASEARCH/os/"
 
     # Internal pulp: AUS
-    "http://rhsm-pulp.corp.redhat.com/content/aus/rhel/server/$MAJOR/$VERSION_ID/$BASEARCH/os/"
+    "https://rhsm-pulp.corp.redhat.com/content/aus/rhel/server/$MAJOR/$VERSION_ID/$BASEARCH/os/"
 )
 
 baseurl=""
