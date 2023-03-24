@@ -434,4 +434,12 @@ function K_VercmpTest ()
     kvercmp `uname -r` '3.1.4-0.1.el7.x86_64'
 }
 
+# K_GetRunningKernelRpmVersionRelease return the rpm version of the running kernel
+# with new kernel variants using just uname -r can be tricky
+# for example uname -r would output something like `5.14.0-290.el9.x86_64+rt-debug`
+# therefore, trying to install kernel-rt-debug-$(uname -r) wouldn't work
+function K_GetRunningKernelRpmVersionRelease ()
+{
+    rpm -q --queryformat '%{version}-%{release}' -qf "/boot/config-$(uname -r)"
+}
 # EndFile
