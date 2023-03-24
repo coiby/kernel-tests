@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-repoRequires=cki_lib
+repoRequires=cki_lib;kernel-include
 dependencies=python3;python3-pip
