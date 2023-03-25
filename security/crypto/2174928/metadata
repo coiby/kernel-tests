@@ -1,0 +1,12 @@
+[General]
+description=Test for BZ#2174928
+name=/kernel-tests/security/crypto/bz2174928
+owner=Dennis Li<denli@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=30m
+dependencies=gcc;make

@@ -1,0 +1,5 @@
+PURPOSE of /kernel-tests/security/crypto/2174928
+Description: Test for BZ#2174928
+Author: Dennis Li <denli@redhat.com>
+Bug summary: Kernel - Significant performance drop for getrandom system call when FIPS is enabled (compared to RHEL 8)
+Bugzilla link: https://bugzilla.redhat.com/show_bug.cgi?id=2174928
