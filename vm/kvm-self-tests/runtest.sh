@@ -298,18 +298,18 @@ function setup
     rlRun "cd $TMPDIR"
     if [ ! "$CKI_SELFTESTS_URL" ] ; then
         if stat /run/ostree-booted > /dev/null 2>&1; then
-            RELEASE=$(uname -r | cut -f 1,2,3,5 -d . | sed s/iv// | sed s/\.arch//)
+            RELEASE="$(uname -r | cut -f 1,2,3,5 -d . | sed s/iv// | sed s/\.arch//)"
             pkg="kernel-${RELEASE}"
-            major_ver=$(uname -r | cut -f 1 -d -)
-            minor_ver=$(uname -r | cut -d - -f 2 | cut -d . -f 1)
-            build=$(uname -r | cut -d - -f 2 | cut -d . -f 3 | sed s/iv//)
+            major_ver="$(uname -r | cut -f 1 -d -)"
+            minor_ver="$(uname -r | cut -d - -f 2 | cut -d . -f 1)"
+            build="$(uname -r | cut -d - -f 2 | cut -d . -f 3 | sed s/iv//)"
             wget https://kojihub.stream.centos.org/kojifiles/packages/kernel/${major_ver}/${minor_ver}.${build}/src/${pkg}.src.rpm
         else
             if [ -x /usr/bin/dnf ]; then
                 dnf download ${pkg} --source > /dev/null 2>&1
             elif [ -x /usr/bin/yum ]; then
                 yum download ${pkg} --source > /dev/null 2>&1
-            fi              
+            fi  
         fi
         if [ ! -f $TMPDIR/${pkg}.src.rpm ]; then
             rlFetchSrcForInstalled $pkg
