@@ -309,7 +309,7 @@ function setup
                 dnf download ${pkg} --source > /dev/null 2>&1
             elif [ -x /usr/bin/yum ]; then
                 yum download ${pkg} --source > /dev/null 2>&1
-            fi  
+            fi
         fi
         if [ ! -f $TMPDIR/${pkg}.src.rpm ]; then
             rlFetchSrcForInstalled $pkg
