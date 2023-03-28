@@ -16,5 +16,5 @@ require:
   - virt-install
 adjust:
   - enable: false
-    when: when: arch != x86_64
+    when: arch != x86_64
 duration: 1h
