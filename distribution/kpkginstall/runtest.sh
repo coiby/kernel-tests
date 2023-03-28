@@ -705,6 +705,8 @@ EOF
       if [[ ${dmesgret} -eq 0 ]]; then
         reboot_status="FAIL"
         cki_print_warning "Call trace found in dmesg, see dmesg.log"
+        # dmesg.log is uploaded by default by rstrnt-report-result
+        # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check#L74
         rstrnt-report-result ${TEST}/dmesg-check WARN 7
       else
         rstrnt-report-result ${TEST}/dmesg-check PASS 0
@@ -717,9 +719,9 @@ EOF
         if [[ ${journalctlret} -eq 0 ]]; then
           reboot_status="FAIL"
           cki_print_warning "Call trace found in journalctl, see journalctl.log"
-          rstrnt-report-result ${TEST}/journalctl-check WARN 7
+          rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check WARN 7
         else
-          rstrnt-report-result ${TEST}/journalctl-check PASS 0
+          rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check PASS 0
         fi
       fi
       rstrnt-report-result ${TEST}/reboot ${reboot_status}

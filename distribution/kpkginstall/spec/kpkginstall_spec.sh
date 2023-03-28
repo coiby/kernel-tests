@@ -533,6 +533,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
+        The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot PASS"
         The status should be success
     End
@@ -570,7 +571,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/journalctl-check WARN 7"
+        The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check WARN 7"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot FAIL"
         The status should be success
     End
@@ -629,6 +630,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
+        The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot PASS"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
