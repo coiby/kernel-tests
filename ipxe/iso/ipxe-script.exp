@@ -13,9 +13,9 @@ if {$force_conservative} {
 }
 
 set timeout 600
-spawn virt-install --name vm1 --memory 1024 --transient --disk none --boot useserial=on --cdrom /usr/share/ipxe/ipxe.iso --nographic
+spawn virt-install --name vm1 --memory 1024 --transient --disk none --boot useserial=on --cdrom /usr/share/ipxe/ipxe.iso --nographic --osinfo detect=on,require=off
 match_max 100000
-expect -exact "\rPress Ctrl-B for the iPXE command line..."
+expect -exact "Press Ctrl-B for the iPXE command line..."
 send -- ""
 expect -exact "iPXE> "
 send -- "ifconf\r"
