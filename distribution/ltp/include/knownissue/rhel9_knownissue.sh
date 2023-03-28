@@ -21,8 +21,6 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "902" && tskip "inotify11" unfix
 	# Bug 2085824 - [RHEL-9.1] /ltp/lite madvise06.c:231: TFAIL: 7 pages were faulted out of 2 max 54
 	osver_in_range "900" "902" && tskip "madvise06" unfix
-	# Bug 2125133 - inotify12.c:85: TFAIL: Incorrect mask 2 in inotify fdinfo (expected 80000002)
-	osver_in_range "900" "902" && tskip "inotify12" unfix
 	# Bug 2128900 - [FJ9.1 Bug]: xfs: setgid is not stripped after setting mask [xfstests: generic/697]
 	osver_in_range "900" "903" && tskip "creat09 cve-2018-13405" unfix
 	# Bug 2137802 - ltp commands df01 xfs failed
