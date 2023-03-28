@@ -82,8 +82,8 @@ function rhel8_unfix_issues()
 	osver_in_range "800" "803" && tskip "fanotify15" unfix
 	# missing linux commit 1639a49ccdce
 	osver_in_range "800" "809" && tskip "creat09 cve-2018-13405" unfix
-	# Bug 2125133 - inotify12.c:85: TFAIL: Incorrect mask 2 in inotify fdinfo (expected 80000002)
-	osver_in_range "800" "809" && tskip "inotify12" unfix
+	# Bug 2163455 - RHEL8.8 - LTP testcase inotify12 fails on LPAR & z/VM
+	osver_in_range "800" "810" && tskip "inotify12" unfix
 }
 
 function rhel8_fixed_issues()
