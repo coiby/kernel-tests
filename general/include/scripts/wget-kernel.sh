@@ -188,11 +188,11 @@ init_vars()
     echo "$(switch_to_final_url ${!check_var}) existed." 1>&2
 
     if ((debugkernel == 1)); then
-        debuginfo_url="${path_prefix}/$arch/${sub_name}-debug-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_name}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
+        debuginfo_url="${path_prefix}/$arch/${sub_name}-debug-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_path}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
         dev_url="${path_prefix}/$arch/${sub_name}-debug-devel-${version}-${release}.$arch.rpm"
     else
         dev_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
-        debuginfo_url="${path_prefix}/$arch/${sub_name}-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_name}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
+        debuginfo_url="${path_prefix}/$arch/${sub_name}-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_path}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
     fi
 
     if [ $kernel_mar -gt 4 ] || [ $kernel_mar -eq 4 -a $kernel_mir -ge 16 ]; then
