@@ -698,26 +698,24 @@ EOF
 
       # We have the right kernel. Do we have any call traces?
       reboot_status="PASS"
-      dmesg | grep -qi 'Call Trace:'
+      DMESGLOG=/tmp/dmesg.log
+      dmesg > ${DMESGLOG}
+      grep -qi 'Call Trace:' "${DMESGLOG}"
       dmesgret=$?
       if [[ ${dmesgret} -eq 0 ]]; then
         reboot_status="FAIL"
-        DMESGLOG=/tmp/dmesg.log
-        dmesg > ${DMESGLOG}
-        rstrnt-report-log -l ${DMESGLOG}
         cki_print_warning "Call trace found in dmesg, see dmesg.log"
         rstrnt-report-result ${TEST}/dmesg-check WARN 7
       else
         rstrnt-report-result ${TEST}/dmesg-check PASS 0
       fi
       if which journalctl > /dev/null 2>&1; then
-        journalctl -b | grep -qi 'Call Trace:'
+        JOURNALCTLLOG=/tmp/journalctl.log
+        journalctl -b > ${JOURNALCTLLOG}
+        grep -qi 'Call Trace:' "${JOURNALCTLLOG}"
         journalctlret=$?
         if [[ ${journalctlret} -eq 0 ]]; then
           reboot_status="FAIL"
-          JOURNALCTLLOG=/tmp/journalctl.log
-          journalctl -b > ${JOURNALCTLLOG}
-          rstrnt-report-log -l ${JOURNALCTLLOG}
           cki_print_warning "Call trace found in journalctl, see journalctl.log"
           rstrnt-report-result ${TEST}/journalctl-check WARN 7
         else
