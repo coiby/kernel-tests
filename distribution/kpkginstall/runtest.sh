@@ -719,7 +719,7 @@ EOF
           journalctl -b > ${JOURNALCTLLOG}
           rstrnt-report-log -l ${JOURNALCTLLOG}
           cki_print_warning "Call trace found in journalctl, see journalctl.log"
-          rstrnt-report-result ${TEST}journalctl-check WARN 7
+          rstrnt-report-result ${TEST}/journalctl-check WARN 7
         else
           rstrnt-report-result ${TEST}/journalctl-check PASS 0
         fi

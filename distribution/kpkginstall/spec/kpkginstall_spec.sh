@@ -570,7 +570,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
-        The stdout should include "rstrnt-report-result distribution/kpkginstalljournalctl-check WARN 7"
+        The stdout should include "rstrnt-report-result distribution/kpkginstall/journalctl-check WARN 7"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot FAIL"
         The status should be success
     End
