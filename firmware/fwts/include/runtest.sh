@@ -1,7 +1,8 @@
 #!/bin/bash
 
+. ../../../cki_lib/libcki.sh
 # Include rhts environment
-if ! (($is_rhivos)); then
+if ! cki_is_kernel_automotive; then
     . /usr/bin/rhts-environment.sh || exit 1
 fi
 
@@ -38,7 +39,7 @@ function fwtsSetup()
     # task Beaker won't check the rpm-requirements for this task
 
     # This is for issue "gcc: fatal error: Killed signal terminated program cc1"
-    if (($is_rhivos)); then
+    if cki_is_kernel_automotive; then
         rlRun "fallocate -l 1G swapfile && \
                chmod 600 swapfile && \
                mkswap swapfile && \
@@ -47,7 +48,7 @@ function fwtsSetup()
     fi
 
     if ! rlCheckRpm pcre-devel; then
-        if ! (($is_rhivos)); then
+        if ! cki_is_kernel_automotive; then
             yum install pcre-devel -y
         else
 cat >/etc/yum.repos.d/rhel.repo <<EOF
@@ -82,7 +83,7 @@ EOF
     fi
 
     if ! rlCheckRpm json-c-devel; then
-        if ! (($is_rhivos)); then
+        if ! cki_is_kernel_automotive; then
             yum install json-c-devel -y
         else
             rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive json-c-devel
@@ -91,7 +92,7 @@ EOF
     fi
 
     if ! rlCheckRpm glib2-devel; then
-        if ! (($is_rhivos)); then
+        if ! cki_is_kernel_automotive; then
             yum install glib2-devel -y
         else
             rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive glib2-devel
@@ -100,7 +101,7 @@ EOF
     fi
 
     if ! rlCheckRpm elfutils-libelf-devel; then
-        if ! (($is_rhivos)); then
+        if ! cki_is_kernel_automotive; then
             yum install elfutils-libelf-devel -y
         else
             rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive elfutils-libelf-devel
@@ -111,7 +112,7 @@ EOF
     local k_name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/-core//')
 
     if ! rlCheckRpm ${k_name}-devel $(uname -r); then
-        if ! (($is_rhivos)); then
+        if ! cki_is_kernel_automotive; then
             yum install ${k_name}-$(uname -r) -y
         else
 cat > /etc/yum.repos.d/rhivos-outside.repo <<EOF
@@ -143,7 +144,7 @@ baseurl=http://download.eng.bos.redhat.com/qa/rhts/lookaside/fwts-deps/libbsd/
 enabled=1
 gpgcheck=0
 EOF
-        if ! (($is_rhivos)); then
+        if ! cki_is_kernel_automotive; then
             yum install libbsd-devel -y
         else
             rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive "libbsd-devel"
@@ -152,7 +153,7 @@ EOF
     fi
 
     #Some packages only need for rhivos
-    if (($is_rhivos)); then
+    if cki_is_kernel_automotive; then
         if ! rlCheckRpm patch; then
             rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive patch
             rlAssertRpm patch
@@ -208,7 +209,7 @@ EOF
         rlRun "cd efi_runtime" 0 "cd into efi_runtime directory"
 
         # remount /usr folder as rw access promission
-        if (($is_rhivos)); then
+        if cki_is_kernel_automotive; then
             rlRun "sudo mount -o remount,rw /dev/vda3 /usr" 0 "remount /usr to rw access promission"
         fi
 
