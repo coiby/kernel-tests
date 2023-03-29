@@ -56,6 +56,8 @@ rlJournalStart
     elif [[ -e /tmp/disable_fips_attempted ]]; then
         rlPhaseStartCleanup
             rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+	    [[ -e /tmp/enable_fips_attempted ]] && rlRun "rm /tmp/enable_fips_attempted"
+	    [[ -e /tmp/disable_fips_attempted ]] && rlRun "rm /tmp/disable_fips_attempted"
             rlRun "fips-mode-setup --is-enabled" 1 && fips_enabled=1
             if [ ${fips_enabled} ]; then
                 rlDie "Failed to disable FIPS, remaining testsuite might be effected"
