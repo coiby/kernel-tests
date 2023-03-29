@@ -77,7 +77,7 @@ function run_sub_tests()
 				rlRun "$reg"
 				rlLog "Sleeping for ${RUN_TIME}s"
 				sleep $RUN_TIME
-				type -f "${reg}_cleanup" && rlRun "${reg}_cleanup" || rlLogInfo "WARN: ${reg}_cleanup is not defined or failed"
+				[ "$(type -t "${reg}_cleanup")" = "function" ] && rlRun "${reg}_cleanup" || rlLogInfo "WARN: ${reg}_cleanup is not defined or failed"
 			rlPhaseEnd
 			popd
 		done
