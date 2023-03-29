@@ -23,7 +23,7 @@ component:
   - kernel
 path: /misc/module-load
 test: bash ./runtest.sh
-framework: beakerlib
+framework: shell
 require:
   - beakerlib
   - coreutils
