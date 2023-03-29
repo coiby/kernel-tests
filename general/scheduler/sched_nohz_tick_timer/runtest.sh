@@ -206,6 +206,7 @@ save_cfg_file=/mnt/save_cfg_nohz_tick_timer
 rlJournalStart
 	if test -f reboot_1392539_2;  then
 		rlPhaseStartTest
+			rlRun -l "lscpu"
 			rlRun "grep nohz_full /proc/cmdline" 1-255
 			rlRun "grep isolcpus /proc/cmdline" 1-255
 			rlLog "Test finished, removed nohz kernel parameters."
@@ -214,6 +215,7 @@ rlJournalStart
 		rlPhaseEnd
 	elif ! test -f reboot_1392539; then
 		rlPhaseStartSetup
+			rlRun -l "lscpu"
 			if ((nr_cpu < 2)) || ! uname -r | grep -q x86_64; then
 				report_result "skip_cpu_$nr_cpu" SKIP
 				rlPhaseEnd
@@ -251,6 +253,7 @@ rlJournalStart
 		rlPhaseEnd
 	else
 		rlPhaseStartSetup
+			rlRun -l "lscpu"
 			if ((nr_cpu < 2)); then
 				report_result "skip_cpu_$(nr_cpu)" SKIP
 				rlPhaseEnd
