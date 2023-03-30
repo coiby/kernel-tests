@@ -17,17 +17,13 @@ function bz2017382()
 	echo isolated_cpus=$isolated_cpus,mask=$mask
 
 	cat /proc/cmdline
-	if ! ((mask & 2)); then
-		report_result "cpu 1 is not isolated" SKIP
-		return 1
-	fi
 
-	local start_user_time=$(awk '/cpu1 / {print $2}' /proc/stat)
+	local start_user_time=$(awk '/cpu'$first_isolated' / {print $2}' /proc/stat)
 
-	taskset -pc 1 $pid &
+	taskset -pc $first_isolated $pid &
 	sleep 3
 
-	local end_user_time=$(awk '/cpu1 / {print $2}' /proc/stat)
+	local end_user_time=$(awk '/cpu'$first_isolated' / {print $2}' /proc/stat)
 	rpm -q bc || yum -y install bc
 
 	[ "$(echo $end_user_time \> $start_user_time | bc)" = 1 ]
