@@ -39,7 +39,6 @@ SKIP_CASE=${SKIP_CASE:-}
 tracing_dir=/sys/kernel/debug/tracing
 nr_cpu=$(cat /proc/cpuinfo | grep -w ^processor | wc -l)
 max=$((nr_cpu - 1))
-mask=2 #cpu 1
 
 RUN_TIME=1
 
@@ -174,11 +173,33 @@ function get_isolated_list()
 	}' <<< $(for range in ${cpu_ranges[*]}; do echo $range; done)
 }
 
+# 0-31, would be bit hex mask, such as cpu31: 80000000
+# 32-, would be bit hex mask, and shift with ",00000000" such as:
+# cpu33: 2,00000000
+# cpu64: 1,00000000,00000000
+function get_cpu_mask()
+{
+	local cpu=${1:-48}
+	local group=$((cpu / 32))
+	local cpu_round=$((cpu % 32))
+	local mask_str=$(printf "%x" $((1 << cpu_round)))
+
+	for ((i=0; i<group; i++)); do
+		mask_str+=",00000000"
+	done
+
+	echo $mask_str
+}
+
 if ((nr_cpu <=4)); then
 	isolated_cpus=$max
 else
 	isolated_cpus=$(get_isolated_list 4)
 fi
+
+first_isolated=$(echo $isolated_cpus | grep -Eo "^[0-9]+")
+mask=$(get_cpu_mask $first_isolated)
+
 cfg_file=/etc/tuned/realtime-virtual-host-variables.conf
 save_cfg_file=/mnt/save_cfg_nohz_tick_timer
 

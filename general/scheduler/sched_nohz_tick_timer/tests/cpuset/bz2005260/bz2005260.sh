@@ -56,7 +56,7 @@ function bz2005260()
 		return 1
 	fi
 
-	local first=$(echo $cpulist | grep -Eo "^[0-9]+")
+	local first=$first_isolated
 
 	set -x
 	timeout 60 $CGROUP_EXEC $FUNCNAME cpuset stress-ng --taskset $first --cpu 1 --sched fifo --sched-prio 50 -t 60 -l 99 --verbose &
