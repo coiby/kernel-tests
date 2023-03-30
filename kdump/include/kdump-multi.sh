@@ -21,7 +21,7 @@ FSTAB_ENTRY=${FSTAB_ENTRY:-"false"}
 FSTAB_ENTRY_OPTS=${FSTAB_ENTRY_OPTS:-"defaults,noauto"}
 
 TARGET_MOUNTED=${TARGET_MOUNTED:-"true"}
-TARGET_MOUNTED_OPTS="${TARGET_MOUNTED_OPTS:-${FSTAB_ENTRY_OPTS}}"
+TARGET_MOUNTED_OPTS="${TARGET_MOUNTED_OPTS:-"defaults"}"
 
 # VMCORE Servers
 
@@ -283,16 +283,19 @@ SetupNFSClient()
     # Mount and create dump path on Server
     # Since kexec-2.0.7, dump path ${export}/${path} must be created
     # on server when starting the kdump service.
-    Log "Mount and create dump path on NFS server"
-    mkdir -p "${MNT_PATH}"
-    LogRun "mount -o \"${TARGET_MOUNTED_OPTS}\" \"${remote_server}:${EXPORT}\" \"${MNT_PATH}\"" || {
-        Error "Failed to mount ${remote_server}:${EXPORT} to ${MNT_PATH}."
-        return
-    }
+    if ! "${NFS_MOUNT_DRACUT_ARGS}"; then
+        Log "create dump path"
+        mkdir -p "${MNT_PATH}"
+        Log "Mount and create dump path on server"
+        LogRun "mount -o \"${TARGET_MOUNTED_OPTS}\" \"${remote_server}:${EXPORT}\" \"${MNT_PATH}\"" || {
+            Error "Failed to mount ${remote_server}:${EXPORT} to ${MNT_PATH}."
+            return
+        }
 
-    mkdir -p "${MNT_PATH}/${DUMP_PATH}"
-    Log "Dump path created"
-    LogRun "ls -la \"${MNT_PATH}/${DUMP_PATH}\""
+        mkdir -p "${MNT_PATH}/${DUMP_PATH}"
+        Log "Dump path created"
+        LogRun "ls -la \"${MNT_PATH}/${DUMP_PATH}\""
+    fi
 
     # Bug 1814121 - RFE: improve kdump service to relax file system pre-mount requirements
     # Kdump allows nfs target to be not mounted at the time of kdumpctl start if
