@@ -26,3 +26,27 @@ Describe 'kernel-include: K_GetRunningKernelRpmVersionRelease'
         The status should be failure
     End
 End
+
+Describe 'kernel-include: K_GetRunningKernelRpmName'
+    Parameters
+        kernel kernel
+        kernel-core kernel
+        kernel-debug kernel-debug
+        kernel-rt kernel-rt
+        kernel-rt-core kernel-rt
+        kernel-rt-debug kernel-rt-debug
+        kernel-64k kernel-64k
+        kernel-64k-core kernel-64k
+        kernel-64k-debug kernel-64k-debug
+    End
+    Mock rpm
+        echo "$PKG_NAME"
+    End
+    It "can get kernel rpm name for $1"
+        export PKG_NAME=$1
+        export KERNEL_NAME=$2
+        When call K_GetRunningKernelRpmName
+        The first line should equal "${KERNEL_NAME}"
+        The status should be success
+    End
+End

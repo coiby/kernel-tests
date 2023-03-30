@@ -446,4 +446,11 @@ function K_GetRunningKernelRpmVersionRelease ()
 {
     rpm -q --queryformat '%{version}-%{release}' -qf "/boot/config-$(uname -r)"
 }
+
+# returns the kernel package name of running kernel.
+# Like: kernel, kernel-debug, kernel-rt, kernel-rt-debug, kernel-64k
+function K_GetRunningKernelRpmName ()
+{
+  rpm -q --queryformat '%{name}' -qf "/boot/config-$(uname -r)" | sed s/-core//
+}
 # EndFile
