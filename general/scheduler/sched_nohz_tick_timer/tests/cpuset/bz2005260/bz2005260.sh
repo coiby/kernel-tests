@@ -58,6 +58,7 @@ function bz2005260()
 
 	local first=$first_isolated
 
+	rlServiceStart stalld
 	set -x
 	timeout 60 $CGROUP_EXEC $FUNCNAME cpuset stress-ng --taskset $first --cpu 1 --sched fifo --sched-prio 50 -t 60 -l 99 --verbose &
 	sleep 2
@@ -68,11 +69,14 @@ function bz2005260()
 	ls -l
 	local exec_end=$(date +%s)
 	local time=$(echo $exec_end - $exec_start | bc)
+	ps -p $pid -o args | grep stress-ng && kill -9 $pid
+	set +x
+	systemctl status stalld
+	rlServiceRestore stalld
 	if ((time > 30)) || dmesg | grep 'blocked for more than'; then
 		rstrnt-report-result  "cpus-stalled" "FAIL"
 		return 1
 	fi
-	set +x
 }
 
 function bz2005260_cleanup()

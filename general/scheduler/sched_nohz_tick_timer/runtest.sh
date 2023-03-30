@@ -227,6 +227,9 @@ rlJournalStart
 			echo "$active" > reboot_1392539
 			rlLogInfo "active tuned profile: $active: $(tuned-adm active)"
 			rpm -q tuned || rlRun "yum -y install tuned"
+			if rlIsRHEL ">=8.4"; then
+				rpm -q stalld || rlRun "yum -y install stalld"
+			fi
 			#rlRun "yum -y install tuned-profiles-realtime" 0-255
 
 			yum -y install bcc-tools bcc-devel --enablerepo beaker-CRB
