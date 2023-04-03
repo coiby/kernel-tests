@@ -1,0 +1,13 @@
+[General]
+name=/kernel/distribution/kpatchinstall
+owner=Yulia Kopkova <ykopkova@redhat.com>
+description=Installs required kernel and kpatch RPMs
+licence=GPL
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=120m
+dependencies=iproute;ethtool;kpatch;yum-utils
+repoRequires=kernel-include
