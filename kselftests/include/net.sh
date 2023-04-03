@@ -360,7 +360,7 @@ do_tc-testing_run()
 
 		local OUTPUTFILE=$LOG_DIR/$(echo "${name}" | tr '/' '_').log
 
-		echo "${tc_tests[$num - 1]}" | grep -qP "tests\.json|concurrency\.json"  && extra_p="-d $DEFAULT_IFACE" || extra_p=""
+		echo "${name}" | grep -qP "tests\.json|concurrency\.json" && extra_p="-d $DEFAULT_IFACE" || extra_p=""
 		./tdc.py -f "${name}" "$extra_p" &> "$OUTPUTFILE"
 		ret=$?
 		if grep -q "not ok" "$OUTPUTFILE"; then
