@@ -332,7 +332,7 @@ do_tc-testing_config()
 
 	pushd "$EXEC_DIR"/tc-testing || exit
 	# extend test timeout
-	sed -i '/TIMEOUT/s/12/180/' tdc_config.py
+	sed -i '/TIMEOUT/s/24/180/' tdc_config.py
 	popd || exit
 }
 
