@@ -8,7 +8,7 @@ set -o pipefail
 OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile}
 TASKID=${TASKID:-UNKNOWN}
 
-tmpdir=$(dirname $OUTPUTFILE)/mem_$TASKID
+tmpdir=$(dirname "$OUTPUTFILE")/mem_$TASKID
 kmem_peak=$(cat /sys/fs/cgroup/memory/memory.kmem.max_usage_in_bytes)
 cur_used=$(free | awk '/Mem/ {print $3}')
 
@@ -19,14 +19,14 @@ function set_mem()
 	# genereal testcase to cover "mem=" parameter in kernel
 	MEM_TOTAL=`free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p"`
 	echo "MEM_TOTAL= $MEM_TOTAL kB"
-	if [ $MEM_TOTAL -ge 1073741824 ]; then
+	if [ "$MEM_TOTAL" -ge 1073741824 ]; then
 	{
 		export MEM="${MEM:-1024G}"
-	} elif [ $MEM_TOTAL -ge 536870912 ]; then
+	} elif [ "$MEM_TOTAL" -ge 536870912 ]; then
 	{
 		export MEM="${MEM:-65536M 128G 0x500000000}"
 
-	} elif [ $MEM_TOTAL -ge 12582912 ]; then
+	} elif [ "$MEM_TOTAL" -ge 12582912 ]; then
 	{
 	# For ppc64le on rhel-alt, 12G caused oom, system with 500G memory.
 	local szlist="12G"
@@ -39,7 +39,7 @@ function set_mem()
 	local nproc=$(nproc)
 	local inG
 
-	if [ $cur_used -gt $comp -a "$kmem_peak" -ne 0 -a $kmem_peak -gt $cur_used ]; then
+	if [ "$cur_used" -gt "$comp" -a "$kmem_peak" -ne 0 -a "$kmem_peak" -gt "$cur_used" ]; then
 		szlist=$((kmem_peak + nproc * 1024 * 1024 * 32))
 		inG=$((szlist /1024/1024/1024 + 1))
 		szlist+=" ${inG}G"
@@ -50,11 +50,11 @@ function set_mem()
 	fi
 	export MEM="${MEM:-${szlist:-12G 0x200000000}}"
 
-	} elif [ $MEM_TOTAL -ge 8388608 ]; then
+	} elif [ "$MEM_TOTAL" -ge 8388608 ]; then
 	{
 		export MEM="${MEM:-4096M 0x200000000}"
 
-	} elif [ $MEM_TOTAL -ge 4194304 ]; then
+	} elif [ "$MEM_TOTAL" -ge 4194304 ]; then
 	{
 		export MEM="${MEM:-4096M}"
 
@@ -86,7 +86,7 @@ function kilobytes()
 
 rlJournalStart
 
-if [ ! -d $tmpdir ]; then
+if [ ! -d "$tmpdir" ]; then
 	rlPhaseStartSetup
 		# setup MEM paramenter
 		rlRun "set_mem"
@@ -98,7 +98,7 @@ if [ ! -d $tmpdir ]; then
 		rlRun "pushd $tmpdir"
 		echo "start" > list
 		for x in $MEM; do
-				echo $x >> list
+				echo "$x" >> list
 		done
 		echo "stop" >> list
 		echo "exit" >> list
