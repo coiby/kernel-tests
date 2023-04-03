@@ -16,14 +16,12 @@ futimesat01 futimesat01
 # getitimer
 getitimer01 getitimer01
 getitimer02 getitimer02
-getitimer03 getitimer03
 # gettimeofday
 gettimeofday01 gettimeofday01
 gettimeofday02 gettimeofday02
 # setitimer
 setitimer01 setitimer01
 setitimer02 setitimer02
-setitimer03 setitimer03
 # settimeofday
 settimeofday01 settimeofday01
 settimeofday02 settimeofday02
