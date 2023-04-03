@@ -64,6 +64,9 @@ function system_check()
 
 	if [ $TESTSKIP -eq 1 ]; then
 		$report_func Test_Skipped PASS 99
+	    rlPhaseEnd
+        rlJournalPrintText
+        rlJournalEnd
 		exit 0
 	fi
 }
