@@ -17,7 +17,7 @@ function set_mem()
 {
 	# added these Memory compare to make sure this case as a
 	# genereal testcase to cover "mem=" parameter in kernel
-	MEM_TOTAL=`free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p"`
+	MEM_TOTAL=$(free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p")
 	echo "MEM_TOTAL= $MEM_TOTAL kB"
 	if [ "$MEM_TOTAL" -ge 1073741824 ]; then
 	{
