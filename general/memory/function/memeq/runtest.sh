@@ -39,11 +39,11 @@ function set_mem()
 	local nproc=$(nproc)
 	local inG
 
-	if [ "$cur_used" -gt "$comp" -a "$kmem_peak" -ne 0 -a "$kmem_peak" -gt "$cur_used" ]; then
+	if [[ "$cur_used" -gt "$comp" && "$kmem_peak" -ne 0 && "$kmem_peak" -gt "$cur_used" ]]; then
 		szlist=$((kmem_peak + nproc * 1024 * 1024 * 32))
 		inG=$((szlist /1024/1024/1024 + 1))
 		szlist+=" ${inG}G"
-	elif [ "$cur_used" -ne 0 -a "$cur_used" -gt $comp ]; then
+	elif [[ "$cur_used" -ne 0 && "$cur_used" -gt $comp ]]; then
 		inG=$((cur_used / 1024 / 1024 / 1024 + nproc * 32 / 1024 + 1))
 		szlist="$((cur_used + nproc * 1024 * 1024 * 32))"
 		szlist+=" ${inG}G"
@@ -131,7 +131,7 @@ rlPhaseStartTest
 	rlLog "Total memory (reported by 'free') $free_total kB"
 	rlRun -l "dmesg_total=\$(dmesg | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
 
-	if [ "$current" != "start" -a "$current" != "stop" ]; then
+	if [[ "$current" != "start" && "$current" != "stop" ]]; then
 		# check if the kernel parameter is set
 		rlRun "cat /proc/cmdline | grep \"mem=$current\""
 		rlLog "mem=$current which is $(kilobytes $current) kB"
