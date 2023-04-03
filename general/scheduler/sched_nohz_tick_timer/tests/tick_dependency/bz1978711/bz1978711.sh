@@ -6,7 +6,10 @@ function bz1978711()
 	pushd rt-tests
 	git checkout stable/v1.0
 	make -j4
-	./cyclictest -a 1 --policy=fifo --priority=10 -t 1 &
+	local cpu=$first_isolated
+	set -x
+	./cyclictest -a $cpu --policy=fifo --priority=10 -t 1 &
+	set +x
 
 	sleep 2
 	rlRun -l "ps -LC cyclictest -o pid,tid,psr,pcpu,etimes,args"
