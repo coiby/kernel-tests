@@ -328,6 +328,7 @@ do_tc-testing_config()
 	$pkg_mgr $pkg_mgr_inst_string clang valgrind
 	install_scapy
 	modprobe -r veth
+	modprobe netdevsim
 
 	pushd "$EXEC_DIR"/tc-testing || exit
 	# extend test timeout
