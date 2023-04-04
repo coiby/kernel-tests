@@ -284,6 +284,9 @@ do_bpf_test_progs_run()
 		# Get more detailed log info with -vv if failed
 		[ ${ret_1} -ne 0 ] && run "./test_progs -vv -t $name"
 
+		# bpf_nf test opened a tcp port, which will be in TIME-WAIT after close.
+		echo "${name}" | grep -q "bpf_nf" && sleep 65
+
 		run "./test_progs-no_alu32 -t $name"
 		ret_2=$?
 
