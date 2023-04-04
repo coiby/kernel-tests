@@ -71,3 +71,52 @@ Describe 'kernel-include: K_GetRunningKernelSrpmName'
         The status should be success
     End
 End
+
+Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
+    Parameters
+        kernel kernel 5.14.0-291.el9 devel kernel-devel-5.14.0-291.el9
+        kernel kernel-rt 5.14.0-291.el9 devel kernel-rt-devel-5.14.0-291.el9
+        kernel kernel-64k 5.14.0-291.el9 devel kernel-64k-devel-5.14.0-291.el9
+        kernel kernel 5.14.0-291.el9 modules-internal kernel-modules-internal-5.14.0-291.el9
+        kernel kernel-rt 5.14.0-291.el9 modules-internal kernel-rt-modules-internal-5.14.0-291.el9
+        kernel kernel 5.14.0-291.el9 selftests kernel-selftests-5.14.0-291.el9
+        kernel kernel-rt 5.14.0-291.el9 selftests kernel-selftests-5.14.0-291.el9
+        kernel kernel 5.14.0-291.el9 tools kernel-tools-5.14.0-291.el9
+        kernel kernel 5.14.0-291.el9 tools-libs kernel-tools-libs-5.14.0-291.el9
+        kernel kernel-rt 5.14.0-291.el9 tools-libs kernel-tools-libs-5.14.0-291.el9
+        kernel kernel 5.14.0-291.el9 debuginfo-common kernel-debuginfo-common-5.14.0-291.el9
+        kernel kernel-rt 5.14.0-291.el9 debuginfo-common kernel-debuginfo-common-5.14.0-291.el9
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 devel kernel-rt-devel-4.18.0-479.rt7.268.el8
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 selftests kernel-rt-selftests-4.18.0-479.rt7.268.el8
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 tools kernel-rt-tools-4.18.0-479.rt7.268.el8
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 tools-libs kernel-rt-tools-libs-4.18.0-479.rt7.268.el8
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 debuginfo-common kernel-rt-debuginfo-common-4.18.0-479.rt7.268.el8
+    End
+    Mock K_GetRunningKernelRpmName
+        echo "$KERNEL_NAME"
+    End
+    Mock K_GetRunningKernelSrpmName
+        echo "$KERNEL_SRPM_NAME"
+    End
+    Mock K_GetRunningKernelRpmVersionRelease
+        echo "$KERNEL_VR"
+    End
+    It "can get $2 sub package nvr for $4"
+        export KERNEL_SRPM_NAME="$1"
+        export KERNEL_NAME="$2"
+        export KERNEL_VR="$3"
+        export KERNEL_SUBPKG="$4"
+        export EXPECTED_OUTPUT="$5"
+        When call K_GetRunningKernelRpmSubPackageNVR "$KERNEL_SUBPKG"
+        The first line should equal "${EXPECTED_OUTPUT}"
+        The status should be success
+    End
+End
+
+Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR missing parameter'
+    It "fails if sub-package name is not provided"
+        When call K_GetRunningKernelRpmSubPackageNVR
+        The first line should equal "FAIL: missing sub-package name parameter"
+        The status should be failure
+    End
+End

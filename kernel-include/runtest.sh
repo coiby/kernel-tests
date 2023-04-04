@@ -461,4 +461,25 @@ function K_GetRunningKernelSrpmName ()
   rpm -q --queryformat '%{sourcerpm}' -qf "/boot/config-$(uname -r)" | sed "s/-$(K_GetRunningKernelRpmVersionRelease).*//"
 }
 
+# Returns a nvr for a derived subpackage of the _binary rpm_
+# Example:
+#    $(K_GetRunningKernelRpmSubPackageNVR modules-internal) -> kernel-64k-modules-internal-5.14.0-291.el9
+function K_GetRunningKernelRpmSubPackageNVR ()
+{
+  if [ -z "$1" ]; then
+    echo "FAIL: missing sub-package name parameter"
+    return 1
+  fi
+  local srpm_subpkgs=(cross-headers debuginfo headers selftests tools)
+  local subpkg="$1"
+  local n=$(K_GetRunningKernelRpmName)
+  for srpm_subpkg in "${srpm_subpkgs[@]}"; do
+    if [[ "${subpkg}" =~ "${srpm_subpkg}".* ]]; then
+        n=$(K_GetRunningKernelSrpmName)
+        break
+    fi
+  done
+  local vr=$(K_GetRunningKernelRpmVersionRelease)
+  echo "${n}-${subpkg}-${vr}"
+}
 # EndFile
