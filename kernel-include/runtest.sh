@@ -453,4 +453,12 @@ function K_GetRunningKernelRpmName ()
 {
   rpm -q --queryformat '%{name}' -qf "/boot/config-$(uname -r)" | sed s/-core//
 }
+
+# returns the kernel source package name of running kernel.
+# Like: kernel, kernel-rt...
+function K_GetRunningKernelSrpmName ()
+{
+  rpm -q --queryformat '%{sourcerpm}' -qf "/boot/config-$(uname -r)" | sed "s/-$(K_GetRunningKernelRpmVersionRelease).*//"
+}
+
 # EndFile

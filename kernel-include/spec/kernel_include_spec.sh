@@ -50,3 +50,24 @@ Describe 'kernel-include: K_GetRunningKernelRpmName'
         The status should be success
     End
 End
+
+Describe 'kernel-include: K_GetRunningKernelSrpmName'
+    Parameters
+        kernel-5.14.0-289.el9.src.rpm 5.14.0-289.el9 kernel
+        kernel-rt-4.18.0-479.rt7.268.el8.src.rpm 4.18.0-479.rt7.268.el8 kernel-rt
+    End
+    Mock rpm
+        echo "$SRPM"
+    End
+    Mock K_GetRunningKernelRpmVersionRelease
+        echo "$KERNEL_VR"
+    End
+    It "can get kernel rpm name for $1"
+        export SRPM="$1"
+        export KERNEL_VR="$2"
+        export KERNEL_NAME="$3"
+        When call K_GetRunningKernelSrpmName
+        The first line should equal "${KERNEL_NAME}"
+        The status should be success
+    End
+End
