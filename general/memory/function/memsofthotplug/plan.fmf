@@ -2,7 +2,7 @@ summary: 'Verifies that mem= kernel parameter works.'
 discover:
     how: fmf
     test:
-        - /
+        - /general/memory/function/memsofthotplug
 prepare:
   - name: Install packages
     how: install
