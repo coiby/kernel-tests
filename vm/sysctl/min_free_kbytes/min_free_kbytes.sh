@@ -36,13 +36,13 @@ function test_run()
         verify_tune_value ${TARGET_FILE} ${min_free_kbytes}
 
         dd_size=$((${mem_free}+1024*${X}))
-        root_size=`df -k / |grep -v "^Filesystem" |cut -d' ' -f 4`
+        root_size=`df -k / |grep -v "^Filesystem" |awk '{print $4}'`
         if [ $dd_size -lt $root_size ]; then
             dd_size=$((${dd_size}/100))
         else
             dd_size=$((${root_size}*2/300))
         fi
-        `dd if=/dev/zero of=${TMP_FILE}${x} bs=${dd_size}k count=100`
+        dd if=/dev/zero of=${TMP_FILE}${x} bs=${dd_size}k count=100
 
         sleep 2
         mem_free=`get_mem_free`
