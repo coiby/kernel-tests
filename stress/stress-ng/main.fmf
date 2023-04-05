@@ -39,6 +39,7 @@ require:
   - flex
   - libcap-devel
   - zlib-devel
+  - coreutils
   - beakerlib
 recommend:
   - dmidecode
