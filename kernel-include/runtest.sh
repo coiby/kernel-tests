@@ -12,78 +12,82 @@
 # devnull = 0 : log to file specified in ${DEBUGLOG}
 devnull=0
 
-# Create debug log
-DEBUGLOG=`mktemp -p /mnt/testarea -t DeBug.XXXXXX`
-K_DEBUGLOG=`mktemp -p /mnt/testarea -t K_DeBug.XXXXXX`
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+    # Create debug log
+    DEBUGLOG=`mktemp -p /mnt/testarea -t DeBug.XXXXXX`
+    K_DEBUGLOG=`mktemp -p /mnt/testarea -t K_DeBug.XXXXXX`
 
-# In the event your not running automated Beaker job
-if [ -z "$OUTPUTFILE" ]; then
-    echo ""
-    echo "***** \$OUTPUTFILE is not defined "
-    echo "***** This is generally do to a "
-    echo "***** manual testing setup  "
-    echo "***** Creating: \$OUTPUTFILE "
-    echo ""
-    export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
-fi
-# ToDo: $RESULT_SERVER $TESTID also need workaround
+    # In the event your not running automated Beaker job
+    if [ -z "$OUTPUTFILE" ]; then
+        echo ""
+        echo "***** \$OUTPUTFILE is not defined "
+        echo "***** This is generally do to a "
+        echo "***** manual testing setup  "
+        echo "***** Creating: \$OUTPUTFILE "
+        echo ""
+        export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+    fi
+    # ToDo: $RESULT_SERVER $TESTID also need workaround
 
-OUTPUTDIR=/mnt/testarea
-if [ ! -d "$OUTPUTDIR" ]; then
+    OUTPUTDIR=/mnt/testarea
+    if [ ! -d "$OUTPUTDIR" ]; then
 
-    echo ""
-    echo "***** OUTPUTDIR is not defined "
-    echo "***** Creating: $OUTPUTDIR  "
-    echo ""
-    mkdir -p $OUTPUTDIR
-fi
+        echo ""
+        echo "***** OUTPUTDIR is not defined "
+        echo "***** Creating: $OUTPUTDIR  "
+        echo ""
+        mkdir -p $OUTPUTDIR
+    fi
 
-# locking to avoid races
-lck=$OUTPUTDIR/$(basename $0).lck
-K_LCK=$OUTPUTDIR/$(basename $0).lck
+    # locking to avoid races
+    lck=$OUTPUTDIR/$(basename $0).lck
+    K_LCK=$OUTPUTDIR/$(basename $0).lck
 
-TESTAREA="/mnt/testarea"
-K_TESTAREA="/mnt/testarea"
-TEST_VER=$(rpm -qf $0)
-K_TEST_VER=$(rpm -qf $0)
+    TESTAREA="/mnt/testarea"
+    K_TESTAREA="/mnt/testarea"
+    TEST_VER=$(rpm -qf $0)
+    K_TEST_VER=$(rpm -qf $0)
 
-# Kernel Variables
-K_NAME=`rpm -q --queryformat '%{name}\n' -qf /boot/config-$(uname -r)`
-#   example output: kernel
-K_VER=`rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r)`
-#   example output: 2.6.32
-K_VARIANT=$(echo $K_NAME | sed -e "s/kernel//g")
-#   are we a DEBUG kernel?
-K_REL=`rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r)`
-#   example output: 220.el6
-K_SRC=`rpm -q --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r)`
-#   example output: kernel-2.6.32-220.el6.src.rpm
-K_BASE=`rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r)`
-#   example output: kernel-2.6.32-220.el6.x86_64
-K_ARCH=$(rpm -q --queryformat '%{arch}' -f /boot/config-$(uname -r))
-#   example output: x86_64
-#   example output: armv7hl
-#   example output: armv7l
-K_RUNNING=$(uname -r)
-#   example output: 2.6.32-220.el6.x86_64
-#   We removed the dot between release and variant because kernels built
-#   under rhel5 did not include this dot and will make comparing difficult.
-#   Release and variant on fedora kernels can use also + sign,
-#   example input: 3.15.0-0.rc5.git0.1.el7.x86_64+debug
-K_RUNNING_VR=$(uname -r | sed -e "s/\.${K_ARCH}[.+]*//")
-#   example output: 3.6.10-8.fc18highbank
-K_DOWNLOAD="http://download.lab.bos.redhat.com/brewroot/packages/kernel/"
-#
-RH_REL=`cat /etc/redhat-release | cut -d" " -f7`
-#   example output: 6.2
-K_CONFIG="kernel-$K_VER-$K_ARCH$K_VARIANT.config"
-#   example output: kernel-2.6.32-x86_64.config
+    # Kernel Variables
+    K_NAME=`rpm -q --queryformat '%{name}\n' -qf /boot/config-$(uname -r)`
+    #   example output: kernel
+    K_VER=`rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r)`
+    #   example output: 2.6.32
+    K_VARIANT=$(echo $K_NAME | sed -e "s/kernel//g")
+    #   are we a DEBUG kernel?
+    K_REL=`rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r)`
+    #   example output: 220.el6
+    K_SRC=`rpm -q --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r)`
+    #   example output: kernel-2.6.32-220.el6.src.rpm
+    K_BASE=`rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r)`
+    #   example output: kernel-2.6.32-220.el6.x86_64
+    K_ARCH=$(rpm -q --queryformat '%{arch}' -f /boot/config-$(uname -r))
+    #   example output: x86_64
+    #   example output: armv7hl
+    #   example output: armv7l
+    K_RUNNING=$(uname -r)
+    #   example output: 2.6.32-220.el6.x86_64
+    #   We removed the dot between release and variant because kernels built
+    #   under rhel5 did not include this dot and will make comparing difficult.
+    #   Release and variant on fedora kernels can use also + sign,
+    #   example input: 3.15.0-0.rc5.git0.1.el7.x86_64+debug
+    K_RUNNING_VR=$(uname -r | sed -e "s/\.${K_ARCH}[.+]*//")
+    #   example output: 3.6.10-8.fc18highbank
+    K_DOWNLOAD="http://download.lab.bos.redhat.com/brewroot/packages/kernel/"
+    #
+    RH_REL=`cat /etc/redhat-release | cut -d" " -f7`
+    #   example output: 6.2
+    K_CONFIG="kernel-$K_VER-$K_ARCH$K_VARIANT.config"
+    #   example output: kernel-2.6.32-x86_64.config
 
-# This is a little cryptic, in practice it takes the full src rpm file
-# name and strips everytihng after (including) the version, leaving just
-# the src rpm package name.
-# Needed when the kernel rpm comes from of e.g. kernel-pegas src rpm.
-K_SPEC_NAME=${K_SRC%%-${K_VER}*}
+    # This is a little cryptic, in practice it takes the full src rpm file
+    # name and strips everytihng after (including) the version, leaving just
+    # the src rpm package name.
+    # Needed when the kernel rpm comes from of e.g. kernel-pegas src rpm.
+    K_SPEC_NAME=${K_SRC%%-${K_VER}*}
+fi # end of if [ ! "${__SOURCED__:+x}" ]
 
 #
 # Functions
@@ -434,4 +438,48 @@ function K_VercmpTest ()
     kvercmp `uname -r` '3.1.4-0.1.el7.x86_64'
 }
 
+# K_GetRunningKernelRpmVersionRelease return the rpm version of the running kernel
+# with new kernel variants using just uname -r can be tricky
+# for example uname -r would output something like `5.14.0-290.el9.x86_64+rt-debug`
+# therefore, trying to install kernel-rt-debug-$(uname -r) wouldn't work
+function K_GetRunningKernelRpmVersionRelease ()
+{
+    rpm -q --queryformat '%{version}-%{release}' -qf "/boot/config-$(uname -r)"
+}
+
+# returns the kernel package name of running kernel.
+# Like: kernel, kernel-debug, kernel-rt, kernel-rt-debug, kernel-64k
+function K_GetRunningKernelRpmName ()
+{
+  rpm -q --queryformat '%{name}' -qf "/boot/config-$(uname -r)" | sed s/-core//
+}
+
+# returns the kernel source package name of running kernel.
+# Like: kernel, kernel-rt...
+function K_GetRunningKernelSrpmName ()
+{
+  rpm -q --queryformat '%{sourcerpm}' -qf "/boot/config-$(uname -r)" | sed "s/-$(K_GetRunningKernelRpmVersionRelease).*//"
+}
+
+# Returns a nvr for a derived subpackage of the _binary rpm_
+# Example:
+#    $(K_GetRunningKernelRpmSubPackageNVR modules-internal) -> kernel-64k-modules-internal-5.14.0-291.el9
+function K_GetRunningKernelRpmSubPackageNVR ()
+{
+  if [ -z "$1" ]; then
+    echo "FAIL: missing sub-package name parameter"
+    return 1
+  fi
+  local srpm_subpkgs=(cross-headers debuginfo headers selftests tools)
+  local subpkg="$1"
+  local n=$(K_GetRunningKernelRpmName)
+  for srpm_subpkg in "${srpm_subpkgs[@]}"; do
+    if [[ "${subpkg}" =~ "${srpm_subpkg}".* ]]; then
+        n=$(K_GetRunningKernelSrpmName)
+        break
+    fi
+  done
+  local vr=$(K_GetRunningKernelRpmVersionRelease)
+  echo "${n}-${subpkg}-${vr}"
+}
 # EndFile
