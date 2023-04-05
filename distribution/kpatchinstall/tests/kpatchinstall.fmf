@@ -11,8 +11,6 @@ require:
 recommend:
   - iproute
   - ethtool
-environment:
-    KERNELARGNAME: kernel
 duration: 120m
 extra-summary: /distribution/kpatchinstall
 extra-task: /distribution/kpatchinstall
