@@ -155,6 +155,10 @@ function customize_param()
     if [ ! -z "$TIMEOUT" ]; then
         sed -i "s/#TIMEOUT#/\"${TIMEOUT}\"/g" *.stressors
     fi
+
+    # limit thread count on memory stressors to half the core count
+    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1425
+    sed -i "s/XXX/$(($(nproc) / 2))/" memory.stressors
 }
 
 # ----- Test Start ------
