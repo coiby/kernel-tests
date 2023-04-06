@@ -73,7 +73,7 @@ function rhel8_unfix_issues()
 	# ptrace08 case issue, tst_kvercmp isn't suitable for rhel8's kernel version
 	osver_in_range "800" "805" && tskip "ptrace08 cve-2018-1000199" unfix
 	# Unable to load BPF programs on s390x kernels built by CKI
-	# https://projects.engineering.redhat.com/browse/FASTMOVING-1825
+	# https://issues.redhat.com/browse/FASTMOVING-1825
 	is_arch "s390x" && tskip "bpf_prog01 bpf_prog02" unfix
 	# Bug 1981743 - RHEL-9-Beta: WARNING: CPU: 3 PID: 0 at kernel/sched/fair.c:401 enqueue_task_fair+0x254/0x5b0
 	osver_in_range "800" "806" && tskip "cfs_bandwidth01" unfix
