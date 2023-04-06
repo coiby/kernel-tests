@@ -91,8 +91,8 @@ Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
         kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 devel kernel-rt-devel-4.18.0-479.rt7.268.el8
         kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 headers kernel-headers-4.18.0-479.el8
         kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 selftests-internal kernel-rt-selftests-internal-4.18.0-479.rt7.268.el8
-        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 tools kernel-rt-tools-4.18.0-479.rt7.268.el8
-        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 tools-libs kernel-rt-tools-libs-4.18.0-479.rt7.268.el8
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 tools kernel-tools-4.18.0-479.el8
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 tools-libs kernel-tools-libs-4.18.0-479.el8
         kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 debuginfo-common kernel-rt-debuginfo-common-4.18.0-479.rt7.268.el8
     End
     Mock K_GetRunningKernelRpmName
