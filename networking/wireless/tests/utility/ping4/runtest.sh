@@ -182,7 +182,7 @@ Standalone()
         if [[ -z $PING_TARGET ]]
         then
             rlLog "Using default value for PING_TARGET"
-            PING_TARGET="beaker.engineering.redhat.com"
+            PING_TARGET="www.redhat.com"
         fi
         rlPhaseStartTest
             ping_targets="$PING_TARGET"
