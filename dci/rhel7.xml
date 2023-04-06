@@ -65,7 +65,7 @@
         </params>
       </task>
       <task name="Trinity Fuzzer - Tier0" role="STANDALONE">
-        <fetch url="git://git.host.prod.eng.bos.redhat.com/kernel-tests#general/process/trinity_git"/>
+        <fetch url="https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/main/kernel-tests-main.zip#general/process/trinity_git"/>
         <params>
           <param name="CKI_NAME" value="Trinity Fuzzer - Tier0"/>
           <param name="CKI_WAIVED" value="True"/>
