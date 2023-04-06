@@ -9,7 +9,7 @@ different ways. In a multihost setup where there are SERVERS and CLIENTS defined
 each client will request all the IPv4 addresses on each server and then ping all
 of those addresses one at a time, verifying a minimum amount of packets are
 received back after transmission. In a STANDALONE setup then a default value
-of "beaker.engineering.redhat.com" is used (if PING_TARGET is not defined) and
+of "www.redhat.com" is used (if PING_TARGET is not defined) and
 that target (or targets) will be pinged making sure that the minimum amount of
 packets are received back after transmission.
 

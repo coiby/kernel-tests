@@ -1,4 +1,3 @@
 PURPOSE of /desktop/rhel7/kernel/wireless-connection-to-unencrypted-AP
 Description: Establish a wireless connection to an unencrypted AP.
-https://tcms.engineering.redhat.com/case/215384
 Author: Zack Cerza <zcerza@redhat.com>
