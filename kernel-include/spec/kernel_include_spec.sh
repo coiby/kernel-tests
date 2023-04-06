@@ -77,17 +77,20 @@ Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
         kernel kernel 5.14.0-291.el9 devel kernel-devel-5.14.0-291.el9
         kernel kernel-rt 5.14.0-291.el9 devel kernel-rt-devel-5.14.0-291.el9
         kernel kernel-64k 5.14.0-291.el9 devel kernel-64k-devel-5.14.0-291.el9
+        kernel kernel 5.14.0-291.el9 headers kernel-headers-5.14.0-291.el9
+        kernel kernel-rt 5.14.0-291.el9 headers kernel-headers-5.14.0-291.el9
         kernel kernel 5.14.0-291.el9 modules-internal kernel-modules-internal-5.14.0-291.el9
         kernel kernel-rt 5.14.0-291.el9 modules-internal kernel-rt-modules-internal-5.14.0-291.el9
-        kernel kernel 5.14.0-291.el9 selftests kernel-selftests-5.14.0-291.el9
-        kernel kernel-rt 5.14.0-291.el9 selftests kernel-selftests-5.14.0-291.el9
+        kernel kernel 5.14.0-291.el9 selftests-internal kernel-selftests-internal-5.14.0-291.el9
+        kernel kernel-rt 5.14.0-291.el9 selftests-internal kernel-selftests-internal-5.14.0-291.el9
         kernel kernel 5.14.0-291.el9 tools kernel-tools-5.14.0-291.el9
         kernel kernel 5.14.0-291.el9 tools-libs kernel-tools-libs-5.14.0-291.el9
         kernel kernel-rt 5.14.0-291.el9 tools-libs kernel-tools-libs-5.14.0-291.el9
         kernel kernel 5.14.0-291.el9 debuginfo-common kernel-debuginfo-common-5.14.0-291.el9
         kernel kernel-rt 5.14.0-291.el9 debuginfo-common kernel-debuginfo-common-5.14.0-291.el9
         kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 devel kernel-rt-devel-4.18.0-479.rt7.268.el8
-        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 selftests kernel-rt-selftests-4.18.0-479.rt7.268.el8
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 headers kernel-headers-4.18.0-479.el8
+        kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 selftests-internal kernel-rt-selftests-internal-4.18.0-479.rt7.268.el8
         kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 tools kernel-rt-tools-4.18.0-479.rt7.268.el8
         kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 tools-libs kernel-rt-tools-libs-4.18.0-479.rt7.268.el8
         kernel-rt kernel-rt 4.18.0-479.rt7.268.el8 debuginfo-common kernel-rt-debuginfo-common-4.18.0-479.rt7.268.el8

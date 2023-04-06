@@ -470,16 +470,37 @@ function K_GetRunningKernelRpmSubPackageNVR ()
     echo "FAIL: missing sub-package name parameter"
     return 1
   fi
-  local srpm_subpkgs=(cross-headers debuginfo headers selftests tools)
-  local subpkg="$1"
-  local n=$(K_GetRunningKernelRpmName)
+
+  declare subpkg="$1"
+  declare k_rpm=$(K_GetRunningKernelRpmName)
+  declare k_srpm=$(K_GetRunningKernelSrpmName)
+  declare n="$k_rpm"
+  declare vr=$(K_GetRunningKernelRpmVersionRelease)
+
+  # the following lists the subpackages certain kernel variants do not package themselves,
+  # and rather rely on the associated kernel srpm subpackage
+  if [[ "$k_rpm" == "kernel-64k" || ( "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel" ) ]]; then
+    local srpm_subpkgs=(cross-headers debuginfo-common headers ipaclones-internal
+                        selftests-internal tools tools-debuginfo tools-libs tools-libs-devel)
+  elif [[ "$k_rpm" == "kernel-automotive" || ( "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel-rt" ) ]]; then
+    local srpm_subpkgs=(cross-headers headers ipaclones-internal tools tools-debuginfo
+                        tools-libs tools-libs-devel)
+    if [[ "$k_rpm" == "kernel-rt" ]]; then
+        # translate kernel-rt VR into corresponding kernel VR by stripping rtX.Y versioning
+        vr=${vr//rt[0-9]*.[0-9]*./}
+    fi
+  else
+    # undefined case - catch kernel-debug or future kernel variants here
+    local srpm_subpkgs=()
+  fi
+
   for srpm_subpkg in "${srpm_subpkgs[@]}"; do
     if [[ "${subpkg}" =~ "${srpm_subpkg}".* ]]; then
         n=$(K_GetRunningKernelSrpmName)
         break
     fi
   done
-  local vr=$(K_GetRunningKernelRpmVersionRelease)
+
   echo "${n}-${subpkg}-${vr}"
 }
 # EndFile
