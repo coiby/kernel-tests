@@ -32,8 +32,6 @@ function set_mem()
 	local szlist="12G"
 	local factor=12
 
-	# https://beaker.engineering.redhat.com/jobs/2545298
-	# ibm-p9b-01.pnr.lab.eng.bos.redhat.com
 	hostname | grep p9b
 	[ $? = 0 ] && szlist="24G" && factor=24
 

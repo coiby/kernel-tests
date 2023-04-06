@@ -26,7 +26,7 @@ Usage(){
     echo "        $(basename $0) --nvr 3.10.0-123.el7 --print"  # print all the pkgs
     echo "        $(basename $0) --devel -i --running " # install the kernel-devel for the running kernel
     echo "        $(basename $0) --kvm -i --running " # install the kernel-rt-kvm for the running kernel-rt
-    echo "        $(basename $0) --ckirepo 'http://cki.apps.ocp4.prod.psi.redhat.com/internal/internal/264829369/\$basearch/3.10.0-1160.21.1.el7.test.\$basearch' --devel -i" # install the kernel-devel for the running kernel from the cki test repo
+    echo "        $(basename $0) --ckirepo 'HTTP_URL/3.10.0-1160.21.1.el7.test.\$basearch' --devel -i" # install the kernel-devel for the running kernel from the cki test repo
     echo "        $(basename $0) --brewrepo htp://brew-task-repos.usersys.redhat.com/repos/scratch/jlelli/kernel-rt/4.18.0/193.48.1.rt13.98.el8_2.mreq230.1/x86_64/ --devel -i " # install the kernel-devel for the running kernel from the cki test repo
     echo
     echo " Provide a non-brew url base link (ROOT_URL):"
@@ -49,7 +49,6 @@ function check_existence()
 # cki test kernel repo is not stored in brew, but in different location and url pattern
 # Assume the repo below is already been put under /etc/yum.repos.d/XXXX.repo by beaker job.
 # Or provide the repo address with '--ckirepo xxxxxxxxxx'
-# Repo addr like: http://cki.apps.ocp4.prod.psi.redhat.com/internal/internal/264829369/$basearch/3.10.0-1160.21.1.el7.test.$basearch
 
 basearch=${arch:-$(uname -m)}
 
