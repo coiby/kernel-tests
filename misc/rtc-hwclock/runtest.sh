@@ -70,7 +70,7 @@ rlJournalStart
     rlPhaseStartCleanup
         # Restore correct time
         rlServiceStop chronyd
-        rlRun "chronyd -q 'pool clock.corp.redhat.com iburst'"
+        rlRun "chronyd -q 'pool clock.redhat.com iburst'"
         rlServiceStart chronyd
         rlRun "hwclock $HWCLOCK_ARG --systohc"
     rlPhaseEnd
