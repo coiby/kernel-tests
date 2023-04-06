@@ -23,15 +23,14 @@ KERNELARGVARIANT is variant: up, xen, debug
 You CAN optionally pass KERNELARGTMPREPO and KERNELARGPERMREPO environment
 variables:
 
+KERNELARGTMPREPO="http://download-node-02.eng.bos.redhat.com/rel-eng/latest-RHEL-7/compose/Server/x86_64/os"
 KERNELARGTMPREPO="baseurl1 baseurl2"
-KERNELARGTMPREPO="http://download-node-02.eng.bos.redhat.com/rel-eng/latest-RHEL-7/compose/Server/x86_64/os http://autobkr.app.eng.bos.redhat.com/repos/kernel/3.10.0/509.el7"
 
 This variable contains a SPACE SEPARATED list of REPO URLS. This task will
 create a TEMPORARY repository just for the purpose of this task.  The
 repository will be disabled at the end of the task.
 
 KERNELARGPERMREPO="baseurl1 baseurl2"
-KERNELARGPERMREPO="http://autobkr.app.eng.bos.redhat.com/repos/kernel/4.8/1.el7.tst_task_11883091"
 
 This variable contains a SPACE SEPARATED list of REPO URLS. In contrast with
 repositories defined with KERNELARGTMPREPO this will create a PERMANENT
