@@ -150,7 +150,7 @@ function setup_yum_repo()
 {
 	local name=${1:-kernel}
 	local vr=${2}
-	local baseurl=${3:-http://autobkr.app.eng.bos.redhat.com/repos}
+	local baseurl=${3:-}
 	if [ -z "$vr" ]; then
 		if uname -r | grep -E "el[0-9]"; then
 			echo "Repo for RHEL kernel $(uname -r)"
