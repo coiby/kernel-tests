@@ -1117,7 +1117,7 @@ function wait_for_kvm_setup ()
 
 function CheckCPUcount ()
 {
-# BZ1050040 http://patchwork.lab.bos.redhat.com/patch/74358/
+# BZ1050040
 # This function checks to see if the CPU count value
 # has changed between the base kernel and test kernel.
 # If the  maxcpu  option is used on the
