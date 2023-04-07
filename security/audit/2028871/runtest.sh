@@ -26,6 +26,14 @@
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
+        if [ ! -f /var/log/audit/audit.log ]; then
+            rlLog "audit.log not found. Skipping test."
+            rstrnt-report-result Test_Skipped PASS 99
+            rlPhaseEnd
+            rlJournalPrintText
+            rlJournalEnd
+            exit 0
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest
