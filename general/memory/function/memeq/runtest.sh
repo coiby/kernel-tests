@@ -149,7 +149,7 @@ rlPhaseStartTest
 
 		rlRun "[ -n \"$free_total\" -a -n \"$dmesg_total\" -a -n \"$current\" ]"
 
-		if [ ! "$(uname -m)" = aarch64 ]; then
+		if [ "$(uname -m)" != aarch64 ]; then
 			retval=0
 		else
 			rlLogInfo "aarch64 bz1666362, skip checking result"
