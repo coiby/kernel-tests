@@ -16,7 +16,7 @@ cur_used=$(free | awk '/Mem/ {print $3}')
 function set_mem()
 {
 	# added these Memory compare to make sure this case as a
-	# genereal testcase to cover "mem=" parameter in kernel
+	# general test case to cover "mem=" parameter in kernel
 	MEM_TOTAL=$(free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p")
 	echo "MEM_TOTAL= $MEM_TOTAL kB"
 	if [ "$MEM_TOTAL" -ge 1073741824 ]; then
@@ -117,7 +117,7 @@ rlPhaseStartTest
 	rlRun -l "echo m > /proc/sysrq-trigger"
 	rlRun -l "cat /proc/zoneinfo"
 
-	# According to the current kmem/mem usage status, help to determin the minimum
+	# According to the current kmem/mem usage status, help to determine the minimum
 	# mem=, otherwise, oom can be seen (on power9 p9b machines)
 	rlRun -l "cat /sys/fs/cgroup/memory/memory.kmem.max_usage_in_bytes" 0-255
 	rlRun -l "free | awk '/Mem/ {print $3}'" 0-255 "Get the current used memory" 0-255
