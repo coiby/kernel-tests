@@ -28,28 +28,30 @@ function set_mem()
 
 	} elif [ "$MEM_TOTAL" -ge 12582912 ]; then
 	{
-	# For ppc64le on rhel-alt, 12G caused oom, system with 500G memory.
-	local szlist="12G"
-	local factor=12
+		# For ppc64le on rhel-alt, 12G caused oom, system with 500G memory.
+		local szlist="12G"
+		local factor=12
 
-	hostname | grep p9b
-	[ $? = 0 ] && szlist="24G" && factor=24
+		hostname | grep p9b
+		[ $? = 0 ] && szlist="24G" && factor=24
 
-	local comp=$((factor * 1024 * 1024 * 1024))
-	local nproc=$(nproc)
-	local inG
+		local comp=$((factor * 1024 * 1024 * 1024))
+		local nproc=$(nproc)
+		local inG
 
-	if [[ "$cur_used" -gt "$comp" && "$kmem_peak" -ne 0 && "$kmem_peak" -gt "$cur_used" ]]; then
-		szlist=$((kmem_peak + nproc * 1024 * 1024 * 32))
-		inG=$((szlist /1024/1024/1024 + 1))
-		szlist+=" ${inG}G"
-	elif [[ "$cur_used" -ne 0 && "$cur_used" -gt $comp ]]; then
-		inG=$((cur_used / 1024 / 1024 / 1024 + nproc * 32 / 1024 + 1))
-		szlist="$((cur_used + nproc * 1024 * 1024 * 32))"
-		szlist+=" ${inG}G"
-	fi
-	export MEM="${MEM:-${szlist:-12G 0x200000000}}"
-
+		if [[ "$cur_used" -gt "$comp" && "$kmem_peak" -ne 0 && "$kmem_peak" -gt "$cur_used" ]]; then
+		{
+			szlist=$((kmem_peak + nproc * 1024 * 1024 * 32))
+			inG=$((szlist /1024/1024/1024 + 1))
+			szlist+=" ${inG}G"
+		} elif [[ "$cur_used" -ne 0 && "$cur_used" -gt $comp ]]; then
+		{
+			inG=$((cur_used / 1024 / 1024 / 1024 + nproc * 32 / 1024 + 1))
+			szlist="$((cur_used + nproc * 1024 * 1024 * 32))"
+			szlist+=" ${inG}G"
+		}
+		fi
+		export MEM="${MEM:-${szlist:-12G 0x200000000}}"
 	} elif [ "$MEM_TOTAL" -ge 8388608 ]; then
 	{
 		export MEM="${MEM:-4096M 0x200000000}"
@@ -98,7 +100,7 @@ if [ ! -d "$tmpdir" ]; then
 		rlRun "pushd $tmpdir"
 		echo "start" > list
 		for x in $MEM; do
-				echo "$x" >> list
+			echo "$x" >> list
 		done
 		echo "stop" >> list
 		echo "exit" >> list
