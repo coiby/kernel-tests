@@ -1,0 +1,11 @@
+[General]
+name=rdma/opa-fm
+owner=Zhaojuan Guo <zguo@redhat.com>
+description=opa-fm test suite
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=rdma/common
