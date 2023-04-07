@@ -25,7 +25,6 @@ function set_mem()
 	} elif [ "$MEM_TOTAL" -ge 536870912 ]; then
 	{
 		export MEM="${MEM:-65536M 128G 0x500000000}"
-
 	} elif [ "$MEM_TOTAL" -ge 12582912 ]; then
 	{
 		# For ppc64le on rhel-alt, 12G caused oom, system with 500G memory.
@@ -55,11 +54,9 @@ function set_mem()
 	} elif [ "$MEM_TOTAL" -ge 8388608 ]; then
 	{
 		export MEM="${MEM:-4096M 0x200000000}"
-
 	} elif [ "$MEM_TOTAL" -ge 4194304 ]; then
 	{
 		export MEM="${MEM:-4096M}"
-
 	} else {
 		echo "Sorry, the system RAM is too low to test."
 		rstrnt-report-result Test_Skipped PASS 99
