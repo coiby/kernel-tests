@@ -116,10 +116,15 @@ uname -r | grep -q rt && IS_RT=true || IS_RT=false
 uname -r | grep -q "debug$" && IS_DB=true || IS_DB=false
 uname -r | grep -q "+64k" && IS_64K=true || IS_64K=false
 
-if $IS_RHEL5 || $IS_RHEL6; then
+if $IS_RHEL5; then
     INITRD_PREFIX=initrd
+    INITRD_KDUMP_PREFIX=initrd
+elif $IS_RHEL6; then
+    INITRD_PREFIX=initramfs
+    INITRD_KDUMP_PREFIX=initrd
 else
     INITRD_PREFIX=initramfs
+    INITRD_KDUMP_PREFIX=initramfs
 fi
 
 shopt -s extglob
