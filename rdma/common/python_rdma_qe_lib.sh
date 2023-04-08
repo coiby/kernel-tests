@@ -22,7 +22,7 @@
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 
-source "$CDIR"/../../cki_lib/libcki.sh || exit 400
+#source "$CDIR"/../../cki_lib/libcki.sh || exit 400
 source "$CDIR"/rdma-qa.sh || exit 400
 
 # set Python interpreter
@@ -36,9 +36,9 @@ rdmaqe_init() {
 	local major=$(cut -d '.' -f 1 <<< $ID-$VERSION_ID)
 	if [[ major == "rhel-7" ]]; then
 		${PKGINSTALL} python3-pip python3-devel gcc
-	elif [[ major == "rhel-8" ]]: then
+	elif [[ major == "rhel-8" ]]; then
 		${PKGINSTALL} python39-devel python39-pip
-	else:
+	else
 		${PKGINSTALL} python3-devel python3-pip
 	fi
 
@@ -47,6 +47,6 @@ rdmaqe_init() {
 	$rdmaqe_path/bin/pip install -U pip wheel
 	$rdmaqe_path/bin/pip install python-rdma-qe
 	source $rdmaqe_path/bin/activate
-	
+
 	export RDMAQE_PYTHON
 }
