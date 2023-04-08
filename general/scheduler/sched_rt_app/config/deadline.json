@@ -15,7 +15,7 @@
 			"sleep" : 0,
 			"dl-deadline" : 100000,
 			"dl-period" : 100000,
-			"dl-runtime" : 50000,
+			"dl-runtime" : 20000,
 			"priority" : 100,
 			"policy" : "SCHED_DEADLINE",
 			"timer" : { "ref" : "unique", "period" : 100000 }
@@ -28,7 +28,7 @@
 			"sleep" : 0,
 			"dl-deadline" : 100000,
 			"dl-period" : 100000,
-			"dl-runtime" : 50000,
+			"dl-runtime" : 20000,
 			"priority" : 100,
 			"policy" : "SCHED_DEADLINE",
 			"timer" : { "ref" : "unique", "period" : 100000 }

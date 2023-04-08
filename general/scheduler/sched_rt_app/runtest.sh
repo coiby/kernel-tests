@@ -393,7 +393,7 @@ function test_sched_deadline()
 			return
 		fi
 
-		rlRun "stress-ng $cpu_affinity --sched deadline  --sched-period 1000000000 --sched-runtime 500000000 --sched-deadline 1000000000 --cpu 1 $load_limit -t 120 &"
+		rlRun "stress-ng $cpu_affinity --sched deadline  --sched-period 1000000000 --sched-runtime 200000000 --sched-deadline 1000000000 --cpu 1 $load_limit -t 120 &"
 		calc_sched_rt_bw '#6|DLN' "${proc_name:-stress-ng-cpu}" 120
 		check_sched_rt_bw 18.0 22.0
 		pkill -9 -f stress-ng
