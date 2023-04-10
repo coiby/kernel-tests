@@ -264,7 +264,7 @@ function run_kernelinstall ()
         echo > $OUTPUTFILE
     fi
     rhts-flush
-    make run
+    chmod a+x runtest.sh ; ./runtest.sh
     echo > $OUTPUTFILE
     logmsg "run_kernelinstall end"
     RprtRslt "kernelinstall/done" PASS 0
