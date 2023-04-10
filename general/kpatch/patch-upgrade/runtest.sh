@@ -45,6 +45,7 @@ KPATCH_REV="${KPATCH_REV:-}"
 KPATCH_REPO="${KPATCH_REPO:-https://github.com/dynup/kpatch.git}"
 KPATCH_BUILD_OPTS="${KPATCH_BUILD_OPTS:-}"
 BUILDS_URL="${BUILDS_URL:-}"
+TEST_PATCH_PATH="test/integration"
 
 PATCH_PATH="test/integration/${ID}-${VERSION_ID}"
 MOD_A_PATCH1="cmdline-string.patch"
@@ -154,8 +155,11 @@ function init_upgrade_test()
     rlRun "kpatch_dependencies"
     rlRun "kpatch_set_ccache_max_size 10G"
     source /etc/os-release
-    [ "${VERSION_ID}" == "8.7" ] && cp -R test/integration/rhel-8.6 test/integration/${ID}-${VERSION_ID}
-    [ "${VERSION_ID}" == "9.1" ] && cp -R test/integration/rhel-9.0 test/integration/${ID}-${VERSION_ID}
+    MA=$(cut -d '.' -f 1 <<< $VERSION_ID)
+    MI=$(cut -d '.' -f 2 <<< $VERSION_ID)
+    PREVIOUS_MI=$(( $MI-1 ))
+    PREVIOUS_TARGET="${MA}.${PREVIOUS_MI}"
+    [ ! -d ${TEST_PATCH_PATH}/${ID}-${VERSION_ID} ] && cp -R ${TEST_PATCH_PATH}/${ID}-${PREVIOUS_TARGET} ${TEST_PATCH_PATH}/${ID}-${VERSION_ID}
     rlRun "make" || rlDie "build kpatch builder failed ..."
     rlRun "[ -f ${PATCH_PATH}/${MOD_A_PATCH1} ] && cat ${PATCH_PATH}/${MOD_A_PATCH1}" || rlDie "Lacking patches"
     rlRun "[ -f ${PATCH_PATH}/${MOD_A_PATCH2} ] && cat ${PATCH_PATH}/${MOD_A_PATCH2}" || rlDie "Lacking patches"
