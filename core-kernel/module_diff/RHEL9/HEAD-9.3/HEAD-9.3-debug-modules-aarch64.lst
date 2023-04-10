@@ -1,0 +1,12 @@
+acpi_configfs.ko
+acpi_dbg.ko
+custom_method.ko
+ec_sys.ko
+erst-dbg.ko
+hte-tegra194-test.ko
+kprobe_event_gen_test.ko
+mailbox-test.ko
+percpu_test.ko
+synth_event_gen_test.ko
+test_min_heap.ko
+test-string_helpers.ko
