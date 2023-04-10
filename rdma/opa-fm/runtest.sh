@@ -29,4 +29,4 @@ RQA_system_info_for_debug
 rdmaqe_init
 
 # run the main.py
-${RDMAQE_PYTHON} opa-fm/main.py
+${RDMAQE_PYTHON} main.py
