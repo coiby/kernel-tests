@@ -19,7 +19,7 @@
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 #. "$CDIR"/../common/rdma-qa.sh || exit 400
-. "$CDIR"/../common/python_rdma_qe_lib.sh || exit 400
+. "$CDIR"/../common/python_rdma_qe_lib.sh || exit 255
 
 # start test
 # show system info
