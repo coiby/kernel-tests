@@ -471,30 +471,26 @@ function K_GetRunningKernelRpmSubPackageNVR ()
     return 1
   fi
 
-  declare subpkg="$1"
-  declare k_rpm=$(K_GetRunningKernelRpmName)
-  declare k_srpm=$(K_GetRunningKernelSrpmName)
-  declare n="$k_rpm"
-  declare vr=$(K_GetRunningKernelRpmVersionRelease)
+  declare -r subpkg="$1" k_rpm=$(K_GetRunningKernelRpmName) k_srpm=$(K_GetRunningKernelSrpmName)
+  declare -a srpm_subpkgs=()
+  declare n="$k_rpm" vr
+  vr=$(K_GetRunningKernelRpmVersionRelease)
 
-  # the following lists the subpackages certain kernel variants do not package themselves,
-  # and rather rely on the associated kernel srpm subpackage
+  # the following are subpackages that belong to the kernel srpm
   if [[ "$k_rpm" == "kernel-64k" || ( "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel" ) ]]; then
-    local srpm_subpkgs=(cross-headers debuginfo-common headers ipaclones selftests tools)
+    srpm_subpkgs=(cross debuginfo-common headers ipaclones selftests tools)
   elif [[ "$k_rpm" == "kernel-automotive" || ( "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel-rt" ) ]]; then
-    local srpm_subpkgs=(cross-headers headers ipaclones tools)
-  else
-    # undefined case - catch kernel-debug or future kernel variants here
-    local srpm_subpkgs=()
+    srpm_subpkgs=(cross headers ipaclones tools)
   fi
 
+  # if requested subpkg is an srpm subpkg, use the srpm instead of rpm name
   for srpm_subpkg in "${srpm_subpkgs[@]}"; do
     if [[ "${subpkg}" =~ "${srpm_subpkg}".* ]]; then
+        n="$k_srpm"
         if [[ "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel-rt" ]]; then
+            # special case: convert non-unified kernel-rt NVR into kernel srpm NVR
             n="kernel"
-            vr=${vr//rt[0-9]*.[0-9]*./}
-        else
-            n=$(K_GetRunningKernelSrpmName)
+            vr="${vr//rt[0-9]*.[0-9]*./}"
         fi
         break
     fi
