@@ -580,12 +580,22 @@ rlJournalStart
                     echo "***** $ARCH: Base release is RHEL-9.1 *****" | tee -a $OUTPUTFILE
                     Release="9.1"
                     ;;
+                284)
+                    # RHEL-9.2
+                    DeBug "Base release is RHEL-9.2"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-9.2 *****" | tee -a $OUTPUTFILE
+                    Release="9.2"
+                    ;;
                 *)
                     # Still in developing phase, need to update in future.
-                    DeBug "Base release is HEAD-RHEL-9.2"
+                    DeBug "Base release is HEAD-RHEL-9.3"
                     echo "" | tee -a $OUTPUTFILE
-                    echo "***** $ARCH: Base release is HEAD-RHEL-9.2 *****" | tee -a $OUTPUTFILE
-                    Release="HEAD-9.2"
+                    echo "***** $ARCH: Base release is HEAD-RHEL-9.3 *****" | tee -a $OUTPUTFILE
+                    Release="HEAD-9.3"
+                    if cki_kver_le "5.14.0-284"; then
+                        Release="9.2"
+                    fi
                     if cki_kver_lt "5.14.0-163"; then
                         sed -i '/gpio-sim.ko/d;/gpio-virtio.ko/d;/hte-tegra194.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
                     fi
@@ -679,6 +689,28 @@ rlJournalStart
                     fi
                     if cki_kver_lt "5.14.0-264"; then
                         sed -i '/dwmac-tegra.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-279.el9"; then
+                        sed -i '/otx2_ptp.ko/d; /rvu_af.ko/d; /rvu_nicpf.ko/d; /rvu_nicvf.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-271.el9"; then
+                        sed -i '/spi-tegra210-quad.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-284.el9"; then
+                        sed -i '/ucsi_ccg.ko/d' ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    #above can be deleted after 9.2 GA
+                    if cki_kver_lt "5.14.0-288.el9"; then
+                        sed -i '/pinctrl-meteorlake.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-292.el9"; then
+                        sed -i '/cxl_acpi.ko/d; /cxl_core.ko/d; /cxl_port.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-295.el9"; then
+                        sed -i '/nd_blk.ko/d' ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
+                    fi
+                    if cki_kver_lt "5.14.0-297.el9"; then
+                        sed -i '/vfio_spapr_eeh.ko/d; /vfio_virqfd.ko/d'  ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
                     fi
                     ;;
             esac
