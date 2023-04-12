@@ -836,19 +836,6 @@ kselftests_install()
 	[ -e /usr/libexec/kselftests ] && return 0 || return 1
 }
 
-install_RH_certificate()
-{
-	rpm -q wget &>/dev/null || $YUM wget
-
-	pushd /etc/pki/ca-trust/source/anchors
-	rm -f legacy.crt\.*
-	rm -f RH-IT-Root-CA.crt\.*
-	wget https://password.corp.redhat.com/legacy.crt --no-check-certificate
-	wget https://password.corp.redhat.com/RH-IT-Root-CA.crt --no-check-certificate
-	update-ca-trust extract
-	popd
-}
-
 brew_install()
 {
 	[[ -z "$brew_list" ]] && return 0
@@ -868,5 +855,4 @@ brew_install()
 	popd
 }
 
-install_RH_certificate
 brew_install
