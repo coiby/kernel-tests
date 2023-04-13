@@ -652,7 +652,7 @@ function CheckKernel ()
 
     DeBug "After KVER=$KVER KVAR=$KVAR"
 
-    Echo "Expecting $KVER$KVAR | Running $runkernel"
+    echo "Expecting $KVER$KVAR | Running $runkernel"
     if [[ "$KVER$KVAR" == "$runkernel" ]]; then
         DeBug "Requested kernel = Running kernel"
         DeBug "   $KVER$KVAR = $runkernel"
