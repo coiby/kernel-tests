@@ -29,6 +29,8 @@
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+TIME_SERVER=${TIME_SERVER:-clock.redhat.com}
+
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm util-linux
@@ -70,7 +72,7 @@ rlJournalStart
     rlPhaseStartCleanup
         # Restore correct time
         rlServiceStop chronyd
-        rlRun "chronyd -q 'pool clock.redhat.com iburst'"
+        rlRun "chronyd -q \"pool $TIME_SERVER iburst\""
         rlServiceStart chronyd
         rlRun "hwclock $HWCLOCK_ARG --systohc"
     rlPhaseEnd
