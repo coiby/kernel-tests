@@ -29,7 +29,7 @@
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-TIME_SERVER=${TIME_SERVER:-clock.redhat.com}
+TIME_SERVER=${TIME_SERVER:-time.nist.gov}
 
 rlJournalStart
     rlPhaseStartSetup
