@@ -30,13 +30,13 @@ BUILT_FILES=
 FILES=$(METADATA) runtest.sh Makefile PURPOSE
 
 run: build
-        ./runtest.sh
+	./runtest.sh
 
 build: $(BUILT_FILES)
-        chmod a+x ./runtest.sh
+	chmod a+x ./runtest.sh
 
 clean:
-        rm -f *~ *.rpm $(BUILT_FILES)
+	rm -f *~ *.rpm $(BUILT_FILES)
 
 # You may need to add other targets e.g. to build executables from source code
 # Add them here:
@@ -47,18 +47,18 @@ include /usr/share/rhts/lib/rhts-make.include
 
 # Generate the testinfo.desc here:
 $(METADATA): Makefile
-        @touch $(METADATA)
-        @echo "Owner:        Erico Nunes <ernunes@redhat.com>"     >$(METADATA)
-        @echo "Name:         $(TEST)"                             >> $(METADATA)
-        @echo "Path:         $(TEST_DIR)"                         >> $(METADATA)
-        @echo "License:      GPLv2"                               >> $(METADATA)
-        @echo "TestVersion:  $(TESTVERSION)"                      >> $(METADATA)
-        @echo "Description:  Cycle tuning profiles to check for power management issues." >> $(METADATA)
-        @echo "TestTime:     1h"                                  >> $(METADATA)
-        @echo "RunFor:       kernel"                              >> $(METADATA)
-        @echo "Releases:     RHEL7"                               >> $(METADATA)
-        @echo "Requires:     tuned"                               >> $(METADATA)
-        @echo "Architectures: x86_64 aarch64"                     >> $(METADATA)
-        @echo "Destructive:  no"                                  >> $(METADATA)
-        @echo "Confidential: no"                                  >> $(METADATA)
-        @echo "Priority:     Normal"                              >> $(METADATA)
+	@touch $(METADATA)
+	@echo "Owner:        Erico Nunes <ernunes@redhat.com>"     >$(METADATA)
+	@echo "Name:         $(TEST)"                             >> $(METADATA)
+	@echo "Path:         $(TEST_DIR)"                         >> $(METADATA)
+	@echo "License:      GPLv2"                               >> $(METADATA)
+	@echo "TestVersion:  $(TESTVERSION)"                      >> $(METADATA)
+	@echo "Description:  Cycle tuning profiles to check for power management issues." >> $(METADATA)
+	@echo "TestTime:     1h"                                  >> $(METADATA)
+	@echo "RunFor:       kernel"                              >> $(METADATA)
+	@echo "Releases:     RHEL7"                               >> $(METADATA)
+	@echo "Requires:     tuned"                               >> $(METADATA)
+	@echo "Architectures: x86_64 aarch64"                     >> $(METADATA)
+	@echo "Destructive:  no"                                  >> $(METADATA)
+	@echo "Confidential: no"                                  >> $(METADATA)
+	@echo "Priority:     Normal"                              >> $(METADATA)
