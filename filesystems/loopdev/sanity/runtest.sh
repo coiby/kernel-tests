@@ -13,14 +13,20 @@ set -x
 storage_path=/mnt/testarea/loopdev_test.img
 mnt_path=/mnt/loopsanity
 
-# skip btrfs for now, since mkfs.btrfs refuses to work on file
-filesystems="ext2 ext3 ext4 xfs"
-declare -A mkfs_args
-mkfs_args[ext2]="-F $storage_path"
-mkfs_args[ext3]="-F $storage_path"
-mkfs_args[ext4]="-F $storage_path"
-mkfs_args[xfs]="-f -d file,size=512m,name=$storage_path"
-mkfs_args[btrfs]="-f $storage_path"
+if cki_is_kernel_automotive; then
+  filesystems="ext4"
+  declare -A mkfs_args
+  mkfs_args[ext4]="-F $storage_path"
+else
+  # skip btrfs for now, since mkfs.btrfs refuses to work on file
+  filesystems="ext2 ext3 ext4 xfs"
+  declare -A mkfs_args
+  mkfs_args[ext2]="-F $storage_path"
+  mkfs_args[ext3]="-F $storage_path"
+  mkfs_args[ext4]="-F $storage_path"
+  mkfs_args[xfs]="-f -d file,size=512m,name=$storage_path"
+  mkfs_args[btrfs]="-f $storage_path"
+fi
 
 RunTest()
 {
