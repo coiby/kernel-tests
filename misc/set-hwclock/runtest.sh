@@ -28,7 +28,14 @@
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-TIME_SERVER=${TIME_SERVER:-time.nist.gov}
+# Define default time server based on machine hostname
+if [[ $(hostname) =~ .*redhat.com ]]; then
+  DEFAULT_TIME_SERVER="clock.redhat.com"
+else
+  DEFAULT_TIME_SERVER="time.nist.gov"
+fi
+
+TIME_SERVER=${TIME_SERVER:-$DEFAULT_TIME_SERVER}
 
 rlJournalStart
     rlPhaseStartSetup
