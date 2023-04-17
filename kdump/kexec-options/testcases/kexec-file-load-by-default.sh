@@ -86,13 +86,13 @@ KexecTest(){
     LogRun "kexec -s -p -u"
 
     # Expect kexec_load() to be called for kexec/kdump without "-s"
-    LogRun "$cmd_load > ${kexec_load} 2>&1"
+    LogRun "$cmd_load -c > ${kexec_load} 2>&1"
     CheckKexecResult "${kexec_load}" "$func_kexec_load"
-    LogRun "kexec -u"
+    LogRun "kexec -c -u"
 
-    LogRun "$cmd_panic > ${kdump_load} 2>&1"
+    LogRun "$cmd_panic -c > ${kdump_load} 2>&1"
     CheckKexecResult "${kdump_load}" "$func_kdump_load"
-    LogRun "kexec -p -u"
+    LogRun "kexec -c -p -u"
 
     LogRun "kdumpctl reload"
 }
