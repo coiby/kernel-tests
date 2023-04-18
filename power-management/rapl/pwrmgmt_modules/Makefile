@@ -33,32 +33,32 @@ FILES=$(METADATA) runtest.sh Makefile PURPOSE pwrmgmt_modules
 .PHONY: all install download clean
 
 run: $(FILES) build
-        ./runtest.sh
+	./runtest.sh
 
 build: $(BUILT_FILES)
-        test -x runtest.sh || chmod a+x runtest.sh
+	test -x runtest.sh || chmod a+x runtest.sh
 
 clean:
-        rm -f *~ $(BUILT_FILES)
+	rm -f *~ $(BUILT_FILES)
 
 
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-        @echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
-        @echo "Name:            $(TEST)" >> $(METADATA)
-        @echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-        @echo "Path:            $(TEST_DIR)" >> $(METADATA)
-        @echo "Description:     Confirm RAPL-related modules are loaded." >> $(METADATA)
-        @echo "Type:            Sanity" >> $(METADATA)
-        @echo "TestTime:        40m" >> $(METADATA)
-        @echo "RunFor:          kernel" >> $(METADATA)
-        @echo "Requires:        kernel" >> $(METADATA)
-        @echo "Requires:        bc" >> $(METADATA)
-        @echo "RhtsRequires:    kernel-kernel-power-management-include_parser" >> $(METADATA)
-        @echo "Priority:        Normal" >> $(METADATA)
-        @echo "License:         GPLv2" >> $(METADATA)
-        @echo "Confidential:    no" >> $(METADATA)
-        @echo "Destructive:     no" >> $(METADATA)
+	@echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
+	@echo "Name:            $(TEST)" >> $(METADATA)
+	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
+	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
+	@echo "Description:     Confirm RAPL-related modules are loaded." >> $(METADATA)
+	@echo "Type:            Sanity" >> $(METADATA)
+	@echo "TestTime:        40m" >> $(METADATA)
+	@echo "RunFor:          kernel" >> $(METADATA)
+	@echo "Requires:        kernel" >> $(METADATA)
+	@echo "Requires:        bc" >> $(METADATA)
+	@echo "RhtsRequires:    kernel-kernel-power-management-include_parser" >> $(METADATA)
+	@echo "Priority:        Normal" >> $(METADATA)
+	@echo "License:         GPLv2" >> $(METADATA)
+	@echo "Confidential:    no" >> $(METADATA)
+	@echo "Destructive:     no" >> $(METADATA)
 
-        rhts-lint $(METADATA)
+	rhts-lint $(METADATA)
