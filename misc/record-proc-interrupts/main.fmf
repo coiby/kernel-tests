@@ -6,7 +6,7 @@ description: |
 contact: Jeffrey Bastian <jbastian@redhat.com>
 component:
   - kernel
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
 duration: 5m
 extra-summary: /kernel/misc/record-proc-interrupts
