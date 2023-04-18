@@ -1,0 +1,13 @@
+summary: record /proc/interrupts output
+description: |
+    Record the output of /proc/interrupts and store it in the Beaker database.
+    Useful for running before and after another Beaker task so the results can
+    be compared offline later.
+contact: Jeffrey Bastian <jbastian@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 5m
+extra-summary: /kernel/misc/record-proc-interrupts
+extra-task: /kernel/misc/record-proc-interrupts
