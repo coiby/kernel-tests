@@ -527,14 +527,24 @@ rlJournalStart
                     echo "***** $ARCH: Base release is RHEL-8.7 *****" | tee -a $OUTPUTFILE
                     Release="8.7"
                     ;;
+                477)
+                    # RHEL-8.8
+                    DeBug "Base release is RHEL-8.8"
+                    echo "" | tee -a $OUTPUTFILE
+                    echo "***** $ARCH: Base release is RHEL-8.8 *****" | tee -a $OUTPUTFILE
+                    Release="8.8"
+                    ;;
                 *)
-                    # We are currently developing RHEL-8.8
-                    # Therefore we test at HEAD-RHEL-8.8
-                    # Need to refresh the list after 8.8 GA
-                    DeBug "Base release is HEAD-RHEL-8.8"
+                    # We are currently developing RHEL-8.9
+                    # Therefore we test at HEAD-RHEL-8.9
+                    # Need to refresh the list after 8.9 GA
+                    DeBug "Base release is HEAD-RHEL-8.9"
                     echo "" | tee -a $OUTPUTFILE
                     echo "***** $ARCH: Base release is HEAD-RHEL-8.8 *****" | tee -a $OUTPUTFILE
-                    Release="HEAD-8.8"
+                    Release="HEAD-8.9"
+                    if cki_kver_le "4.18.0-477"; then
+                        Release="8.8"
+                    fi
                     if cki_kver_lt "4.18.0-432"; then
                         sed -i '/^video.ko/d;' ${OS}/${Release}/$Release-modules-aarch64.lst
                     fi
@@ -556,6 +566,19 @@ rlJournalStart
                         sed -i '/hpwdt.ko/d;' ${OS}/${Release}/$Release-modules-aarch64.lst
                         sed -i '/amd_pstate.ko/d;' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
                     fi
+                    if cki_kver_lt "4.18.0-456.el8"; then
+                        sed -i '/tdx-guest.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-466.el8"; then
+                        sed -i '/sev-guest.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-476.el8"; then
+                        sed -i '/snd-soc-rt1318-sdw.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-477.8.1.el8_8"; then
+                        sed -i '/sfc-siena.ko/d' ${OS}/${Release}/$Release-modules-ppc64le.lst
+                    fi
+                    # need clean up above after 8.8 GA
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then
