@@ -63,7 +63,20 @@ SetupKdump()
 
         # Ensure Kdump Kernel memory reservation
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
-            local kdumpMem="$(DefKdumpMem)"
+            local kdumpMem
+            local ck_opts
+            if kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
+                if grep -q 'fadump' <<< "${KER1ARGS}"; then
+                    ck_opts=$(awk 'match($0, /fadump=\w*/) { print substr($0, RSTART, RLENGTH) }' <<< "${KER1ARGS}")
+                    ck_opts=" --${ck_opts}"
+                else
+                    ck_opts=" "
+                fi
+                LogRun "kdumpctl reset-crashkernel ${ck_opts}"
+                kdumpMem="$(grubby --info=${VMLINUZ_PATH} | awk 'match($0, /crashkernel=.* /) { print substr($0, RSTART, RLENGTH) }')"
+            else # use default value from kdump.sh
+                kdumpMem="$(DefKdumpMem)"
+            fi
             [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
 
             if $IS_RHEL5 ; then
