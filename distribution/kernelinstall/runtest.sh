@@ -652,6 +652,7 @@ function CheckKernel ()
 
     DeBug "After KVER=$KVER KVAR=$KVAR"
 
+    echo "Expecting $KVER$KVAR | Running $runkernel"
     if [[ "$KVER$KVAR" == "$runkernel" ]]; then
         DeBug "Requested kernel = Running kernel"
         DeBug "   $KVER$KVAR = $runkernel"
@@ -1287,12 +1288,12 @@ testver=$(rpm -qf $0)
 DeBug "$testver"
 
 # Current kernel variables
-runkernel=$K_RUNNING_VR
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}\n' -qf /boot/config-$(uname -r))
 kernver=$(rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
 kernrel=$(rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
 kernarch=$(rpm -q --queryformat '%{arch}\n' -qf /boot/config-$(uname -r))
-kernvariant=$(uname -r | sed -e "s/${kernver}-${kernrel}//g" -e "s/\.$(uname -m).//g")
+kernvariant=$(uname -r | awk -F $(uname -m) '{print $2}')
+runkernel="${kernver}-${kernrel}${kernvariant#+}"
 
 # drop -core- from name if present, this is to deal with meta-style
 # packaging of kernel RPMs. Removing it here should be OK
