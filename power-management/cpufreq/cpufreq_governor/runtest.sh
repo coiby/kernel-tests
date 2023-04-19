@@ -71,6 +71,10 @@ function runtest
     rlRun -l "cat $file2" "0-255"
     typeset scaling_governor=$(cat $file2)
 
+    rlLog "stopping tuned"
+    rlRun "systemctl stop tuned" || return $CKI_FAIL
+    rlRun "sleep 20"
+
     typeset file_freq1=$TMPDIR/curfreq1
     typeset file_freq2=$TMPDIR/curfreq2
     rlLog "write 'powersave' to file $file2"
@@ -88,6 +92,9 @@ function runtest
     rlRun -l "cat $file3 > $file_freq2 && cat $file_freq2" "0-255"
     typeset cur_freq_perf=$(cat $file_freq2)
     load_stop
+
+    rlLog "starting tuned"
+    rlRun "systemctl start tuned"
 
     typeset msg_governor="CPU scaling governor"
     typeset msg_freq_pows="CPU scaling frequency with powersave"
