@@ -51,8 +51,46 @@ def test(tc):
     else:
         tc.tfail("Package operation failed with following errors: \n\t'" + "\n\t ".join([str(i) for i in errors_pkg]))
 
-    tc.tok("/usr/sbin/opacapture -d 4 opacapture")
+    # host file
+    _hosts = None
+    if _hosts is None:
+        _hosts = linux.hostname()
+        configure_file("/etc/opa/hosts", _hosts)
 
+    if not is_port_active():
+        # Although there's no active port, these tests still can be run
+        tc.tok("timeout 1m /usr/sbin/opapingall")
+        tc.tok("timeout 1m /usr/sbin/opafindgood")
+        tc.tok("timeout 1m /usr/sbin/opaextractstat /etc/opa/opaff.xml")
+        tc.tok("timeout 1m /usr/sbin/opaexpandfile allhosts")
+        tc.tok("timeout 1m /usr/sbin/opacabletest")
+        tc.tok("timeout 1m /usr/sbin/opashowmc")
+        tc.tok("timeout 1m /usr/sbin/opaswdisableall")
+        tc.tok("timeout 1m /usr/sbin/opaswenableall")
+    else:
+        tc.tok("timeout 1m /usr/sbin/opapingall")
+        tc.tok("timeout 1m /usr/sbin/opafindgood")
+        tc.tok("timeout 1m /usr/sbin/opaswdisableall")
+        tc.tok("timeout 1m /usr/sbin/opaswenableall")
+        tc.tok("timeout 1m /usr/sbin/opareport")
+        tc.tok("timeout 1m /usr/sbin/opareports")
+        tc.tok("timeout 1m /usr/sbin/opascpall /tmp/hello /tmp/hello")
+        tc.tok("timeout 1m /usr/sbin/opashowallports")
+        tc.tok("timeout 1m /usr/sbin/opashowmc")
+        tc.tok("timeout 1m /usr/sbin/opaextractbadlinks")
+        tc.tok("timeout 1m /usr/sbin/opaextractstat /etc/opa/opaff.xml")
+        tc.tok("timeout 1m /usr/sbin/opaextractlids")
+        tc.tok("timeout 1m /usr/sbin/opaextractlink")
+        tc.tok("timeout 1m /usr/sbin/opaextractperf")
+        tc.tok("timeout 1m /usr/sbin/opaextractsellinks")
+        tc.tok("timeout 1m /usr/sbin/opaexpandfile allhosts")
+        tc.tok("timeout 1m /usr/sbin/opacheckload")
+        tc.tok("timeout 1m /usr/sbin/opacmdall 'uname -a'")
+        tc.tok("timeout 1m /usr/sbin/opaswitchadmin -a run info")
+        tc.tok("timeout 1m /usr/sbin/opacabletest")
+        tc.tok("timeout 1m /usr/sbin/opafabricanalysis -b")
+        tc.tok("timeout 1m /usr/sbin/opafabricanalysis")
+        tc.tok("timeout 1m /usr/sbin/opaallanalysis -b")
     # post-test
 
 
