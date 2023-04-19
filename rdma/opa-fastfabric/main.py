@@ -9,8 +9,10 @@ __copyright__ = "Copyright (c) 2023 Red Hat, Inc. All rights reserved."
 from rdmaqe.rdma.general import is_opa_device
 from rdmaqe.common.tc import Test
 from rdmaqe.rdma.opa import opa_setup
+from rdmaqe.common.file_libs import configure_file
 
 import libsan.host.linux as linux
+from libsan.host.cmdline import run
 
 from stqe.host.atomic_run import atomic_run
 
@@ -28,6 +30,11 @@ def test(tc):
         return 2
     # setup for OPA
     opa_setup()
+    # configure host file
+    _hosts = None
+    if _hosts is None:
+        _hosts = linux.hostname()
+        configure_file("/etc/opa/hosts", _hosts)
     # test
     errors_pkg = []
     arguments_pkg = [

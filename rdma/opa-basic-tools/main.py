@@ -44,18 +44,30 @@ def test(tc):
     else:
         tc.tfail("Package operation failed with following errors: \n\t'" + "\n\t ".join([str(i) for i in errors_pkg]))
 
-    tc.tok("/usr/sbin/opacapture -d 4 opacapture")
-    tc.tok("/usr/sbin/opafabricinfo")
-    tc.tok("/usr/sbin/opagetvf")
-    tc.tok("/usr/sbin/opagetvf_env")
-    tc.tok("/usr/sbin/opahfirev")
-    tc.tok("/usr/sbin/opainfo")
-    tc.tok("/usr/sbin/opapmaquery")
-    tc.tok("/usr/sbin/opaportconfig")
-    tc.tok("/usr/sbin/opaportinfo")
-    tc.tok("/usr/sbin/oparesolvehfiport")
-    tc.tok("/usr/sbin/opasaquery")
-    tc.tok("/usr/sbin/opasmaquery")
+    # Remote PMA query.
+    # First get a valid remote LID. The chain below will get the last listed LID in the fabric.
+    # Why the last LID? Because assuming the SM is running on this node, this node will
+    # be listed first. The one that is last should therefore be a remote LID.
+    cmd = "opasaquery | grep 'Type: FI' | tail -1 | awk '{print $2}'"
+    ret, remote_LID = run(cmd, return_output=True)
+    if "Failed" in remote_LID:
+        tc.tfail(remote_LID)
+        tc.tok("timeout 5m /usr/sbin/opacapture -d 4 mycapture.tgz")
+        tc.tok("timeout 5m /usr/sbin/opahfirev")
+        tc.tok("timeout 5m /usr/sbin/opainfo")
+        tc.tok("timeout 5m /usr/sbin/opapmaquery")
+        tc.tok("timeout 5m /usr/sbin/opaportconfig")
+        tc.tok("timeout 5m /usr/sbin/opaportinfo")
+        tc.tok("timeout 5m /usr/sbin/opasmaquery")
+    else:
+        _cmd = "opapmaquery -l " + remote_LID + " -m 0"
+        tc.tok(_cmd)
+        tc.tok("opasaquery")
+        tc.tok("timeout 5m /usr/sbin/opafabricinfo")
+        tc.tok("timeout 5m /usr/sbin/opagetvf")
+        tc.tok("timeout 5m /usr/sbin/opagetvf_env")
+        tc.tok("timeout 5m /usr/sbin/oparesolvehfiport")
+        tc.tok("timeout 5m /usr/sbin/opasaquery")
 
     # post-test
 
