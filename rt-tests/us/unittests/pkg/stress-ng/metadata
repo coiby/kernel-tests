@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/unittests/pkg/stress-ng
+owner=Chang Yin <cyin@redhat.com>
+description=Unittest case for stress-ng
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=python3 test.py
+repoRequires=rt-tests/us/unittests/framework
+dependencies=stress-ng
+max_time=10m
