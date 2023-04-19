@@ -162,10 +162,13 @@ install_kselftests()
         popd
         [ -f $TMPDIR/selftests/run_kselftest.sh ] && return 0 || return 1
     else
-        # Install debug-modules-extra
-        rlRun "$pkg_mgr $pkg_mgr_inst_string ${name}-modules-extra-${version}-${release}"
-        if ! rpm -q ${name}-modules-internal > /dev/null 2>&1; then
-            rlRun "dnf download --resolve ${name}-modules-internal-${version}-${release}.${arch}"
+        if ! rpm --quiet -q ${name}-modules-extra; then
+            # Install debug-modules-extra
+            rlRpmDownload ${name}-modules-extra ${version} ${release} ${arch}
+            rlRun "$pkg_mgr $pkg_mgr_inst_string ./${name}-modules-extra-${version}-${release}.${arch}.rpm"
+        fi
+        if ! rpm --quiet -q ${name}-modules-internal; then
+            rlRpmDownload ${name}-modules-internal ${version} ${release} ${arch}
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${name}-modules-internal-${version}-${release}.${arch}.rpm"
         fi
         selftestsname="${name%-debug}"
@@ -174,8 +177,8 @@ install_kselftests()
         if [[ $(rhel_major) -gt 9 || ( $(rhel_major) -eq 9 && $(rhel_minor) -ge 3 ) ]]; then
             selftestsname="${selftestsname%-rt}"
         fi
-        if ! rpm -q ${selftestsname}-selftests-internal > /dev/null 2>&1; then
-            rlRun "dnf download --resolve ${selftestsname}-selftests-internal-${version}-${release}.${arch}"
+        if ! rpm --quiet -q ${selftestsname}-selftests-internal; then
+            rlRpmDownload ${selftestsname}-selftests-internal ${version} ${release} ${arch}
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${selftestsname}-selftests-internal-${version}-${release}.${arch}.rpm"
         fi
         if rpm -q ${selftestsname}-selftests-internal; then
