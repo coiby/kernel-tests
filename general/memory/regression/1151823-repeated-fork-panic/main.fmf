@@ -1,14 +1,17 @@
-summary: This is a reproducer for bz1151823
-description: ''
-contact: Wang Shu<shuwang@redhat.com>
-component:
-  - kernel
-test: ./runtest.sh
+summary: KG-VMM 1151823-repeated-fork-panic
+description: This is a reproducer for bz1151823 
+enabled: true
+id: d0dd3486-674f-4be3-83fc-e452cb3eda39
+tag: [
+    /kernel/general/memory/regression/1151823-repeated-fork-panic,
+    KG-VMM-TAG
+  ]
+contact: Shu Wang <shuwang@redhat.com>
+test: bash ./runtest.sh
 framework: beakerlib
 require:
   - gcc
-tier: 2
-tag: [tier2]
 duration: 4h
-extra-summary: /kernel/rootworkgitlab_ceelpellecckernel_baregeneral/memory/regression/1151823-repeated-fork-panic
-extra-task: /kernel/rootworkgitlab_ceelpellecckernel_baregeneral/memory/regression/1151823-repeated-fork-panic
+tier: 2
+extra-summary: /kernel/general/memory/regression/1151823-repeated-fork-panic
+extra-task: /kernel/general/memory/regression/1151823-repeated-fork-panic

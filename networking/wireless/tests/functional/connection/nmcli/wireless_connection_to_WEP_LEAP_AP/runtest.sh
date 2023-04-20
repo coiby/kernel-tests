@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# add path to test_launcher script
+export PATH=../../../../../common/:$PATH
+# add path to base and functional modules
+export PYTHONPATH=../../../../../common/:../../../../../tests/:$PYTHONPATH
+
 if [ -z "${PING_ADDRESS}" ]; then
 	sh test_launcher.sh "$TEST" "test.py $*"
 else

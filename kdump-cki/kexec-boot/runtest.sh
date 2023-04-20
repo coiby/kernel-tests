@@ -26,7 +26,15 @@
 TEST="/kdump/kexec-boot"
 
 KEXEC_VER=${KEXEC_VER:-"$(uname -r)"}
-# Specifying "-c" to test kexec_load() call explicitly.
-EXTRA_KEXEC_OPTIONS=${EXTRA_KEXEC_OPTIONS:-"-d -c"}
+
+# From RHEL-9.3, kexec uses "-a" as default option. So here specifying
+# "-c" to test kexec_load() call explicitly.
+# Note, kexec 2.0.15 used in RHEL-7 doesn't support "-c" explicitly.
+
+if $IS_RHEL && [ "${RELEASE}" -le 7 ]; then
+    EXTRA_KEXEC_OPTIONS=${EXTRA_KEXEC_OPTIONS:-"-d"}
+else
+    EXTRA_KEXEC_OPTIONS=${EXTRA_KEXEC_OPTIONS:-"-d -c"}
+fi
 
 RunTest "KexecBoot kexecbootoption"

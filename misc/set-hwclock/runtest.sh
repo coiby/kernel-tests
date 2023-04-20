@@ -28,16 +28,23 @@
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+# Define default time server based on machine hostname
+if [[ $(hostname) =~ .*redhat.com ]]; then
+  DEFAULT_TIME_SERVER="clock.redhat.com"
+else
+  DEFAULT_TIME_SERVER="time.nist.gov"
+fi
+
+TIME_SERVER=${TIME_SERVER:-$DEFAULT_TIME_SERVER}
+
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm chrony
         rlAssertRpm util-linux
-        if ! grep -q clock.redhat.com /etc/chrony.conf ; then
-            echo "server clock.redhat.com iburst" >> /etc/chrony.conf
-        fi
-        rlRun "systemctl restart chronyd.service" 0
-        # 5 minutes should be plenty of time to set the clock
-        sleep 300
+        # Set current time using NTP
+        rlServiceStop chronyd
+        rlRun "chronyd -q \"pool $TIME_SERVER iburst\""
+        rlServiceStart chronyd
     rlPhaseEnd
 
     rlPhaseStartTest

@@ -6,6 +6,9 @@ function rhel9_fatal_issues()
 	osver_in_range "900" "901" && tskip "oom0.*" fatal
 	# BZ2026959, BZ2112284
 	osver_in_range "900" "903" && is_arch "aarch64" && tskip "read_all_sys" fatal
+	# Bug 2178947 - [RHEL9] kernel-rt-debug: BUG: MAX_LOCKDEP_CHAINS too low
+	# Bug 2119055 - [rhel9] call trace qed_ptt_acquire+0x2b/0xd0 [qed] _qed_get_vport_stats+0x141/0x240 [qed]
+	osver_in_range "900" "904" && tskip "read_all_sys" fatal
 }
 
 function rhel9_unfix_issues()
@@ -18,8 +21,6 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "902" && tskip "inotify11" unfix
 	# Bug 2085824 - [RHEL-9.1] /ltp/lite madvise06.c:231: TFAIL: 7 pages were faulted out of 2 max 54
 	osver_in_range "900" "902" && tskip "madvise06" unfix
-	# Bug 2125133 - inotify12.c:85: TFAIL: Incorrect mask 2 in inotify fdinfo (expected 80000002)
-	osver_in_range "900" "902" && tskip "inotify12" unfix
 	# Bug 2128900 - [FJ9.1 Bug]: xfs: setgid is not stripped after setting mask [xfstests: generic/697]
 	osver_in_range "900" "903" && tskip "creat09 cve-2018-13405" unfix
 	# Bug 2137802 - ltp commands df01 xfs failed

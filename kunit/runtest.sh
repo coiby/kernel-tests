@@ -48,6 +48,7 @@ process_results(){
 
 #Include Beaker environment
 . ../cki_lib/libcki.sh || exit 1
+. ../kernel-include/runtest.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # variables used by beakerlib
@@ -57,11 +58,6 @@ PACKAGE="kernel"
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Global parameters
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# When rebasing create a new array at the current release number (eg rhel8.5)
-# Then add a check for the proper tag number
-
-version=$(uname -rm | sed 's/\-*//' | sed 's/\..*//')
 
 # load kunit module names into a array
 readarray -t test_arr < kunit-tests.list
@@ -88,24 +84,10 @@ rlJournalStart
 			exit 0
 		fi
 
-		module_pkg="kernel"
-		if  cki_is_kernel_rt; then
-			module_pkg="${module_pkg}-rt"
-		fi
-		if  cki_is_kernel_64k; then
-			module_pkg="${module_pkg}-64k"
-		fi
-		if cki_is_kernel_automotive; then
-			module_pkg="${module_pkg}-automotive"
-		fi
-		if  cki_is_kernel_debug; then
-			module_pkg="${module_pkg}-debug"
-		fi
-		version=$(uname -r | sed s'/\+debug//' | sed s'/\+64k//')
-		module_pkg="${module_pkg}-modules-internal-$version"
+		module_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-internal)
 
 		if ! rpm -q $module_pkg; then
-			echo "FAIL: kernel-modules-internal is not installed, aborting test"
+			echo "FAIL: ${module_pkg} is not installed, aborting test"
 			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 			rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 			exit 1

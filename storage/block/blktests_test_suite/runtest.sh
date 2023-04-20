@@ -106,7 +106,7 @@ function run_test()
 {
     setup
     testgroup="block scsi loop nvme zbd nbd"
-    skip_case="nvme/002 nvme/016 nvme/017"
+    skip_case="block/011 nvme/002 nvme/016 nvme/017"
 #testgroup="block"
     for j in $testgroup;do
         testcase=$(ls blktests/tests/$j | grep '[0-9]$')

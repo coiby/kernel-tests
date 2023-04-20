@@ -50,7 +50,7 @@ $(METADATA):
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     Kernel Livepatch stress testsuite based on SUSE's qa_test_klp" >> $(METADATA)
 	@echo "Type:            Stress" >> $(METADATA)
-	@echo "TestTime:        10m" >> $(METADATA)
+	@echo "TestTime:        20m" >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2+" >> $(METADATA)

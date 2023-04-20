@@ -8,10 +8,30 @@ description: |
 contact: Oliver Gutierrez <ogutierr@redhat.com>
 component:
   - firmware
-test: ./runtest.sh
-framework: beakerlib
+test: bash ./runtest.sh
+framework: shell
 require:
   - beakerlib
+  - iasl
+  - wget
+  - acpidump
+  - pciutils
+  - sendmail
+  - pcre-devel
+  - json-c-devel
+  - git
+  - elfutils-libelf-devel
+  - glib2-devel
+  - patch
+  - autoconf
+  - automake
+  - gcc
+  - libtool
+  - bison
+  - flex
+recommend:
+  - beakerlib-redhat
+  - dmidecode
 duration: 60m
 extra-summary: /kernel/firmware/fwts/include
 extra-task: /kernel/firmware/fwts/include

@@ -26,7 +26,7 @@ Usage(){
     echo "        $(basename $0) --nvr 3.10.0-123.el7 --print"  # print all the pkgs
     echo "        $(basename $0) --devel -i --running " # install the kernel-devel for the running kernel
     echo "        $(basename $0) --kvm -i --running " # install the kernel-rt-kvm for the running kernel-rt
-    echo "        $(basename $0) --ckirepo 'http://cki.apps.ocp4.prod.psi.redhat.com/internal/internal/264829369/\$basearch/3.10.0-1160.21.1.el7.test.\$basearch' --devel -i" # install the kernel-devel for the running kernel from the cki test repo
+    echo "        $(basename $0) --ckirepo 'HTTP_URL/3.10.0-1160.21.1.el7.test.\$basearch' --devel -i" # install the kernel-devel for the running kernel from the cki test repo
     echo "        $(basename $0) --brewrepo htp://brew-task-repos.usersys.redhat.com/repos/scratch/jlelli/kernel-rt/4.18.0/193.48.1.rt13.98.el8_2.mreq230.1/x86_64/ --devel -i " # install the kernel-devel for the running kernel from the cki test repo
     echo
     echo " Provide a non-brew url base link (ROOT_URL):"
@@ -49,7 +49,6 @@ function check_existence()
 # cki test kernel repo is not stored in brew, but in different location and url pattern
 # Assume the repo below is already been put under /etc/yum.repos.d/XXXX.repo by beaker job.
 # Or provide the repo address with '--ckirepo xxxxxxxxxx'
-# Repo addr like: http://cki.apps.ocp4.prod.psi.redhat.com/internal/internal/264829369/$basearch/3.10.0-1160.21.1.el7.test.$basearch
 
 basearch=${arch:-$(uname -m)}
 
@@ -130,6 +129,9 @@ init_vars()
     elif [ -n "$variant" ]; then
         echo "Unknown kernel variant: $variant!"
     fi
+    kernel_mar=$(echo $version | cut -d. -f1)
+    kernel_mir=$(echo $version | cut -d. -f2)
+    kernel_rma=$(echo $release | cut -d. -f1)
 
     local found=0
     # folder name may be different from rpm name, like kernel-64k/rt may be in kernel folder.
@@ -137,6 +139,10 @@ init_vars()
         sub_path=${pkg_name}
         sub_name=${pkg_name}
         [[ $pkg_name =~ kernel-alt|kernel-64k ]] && sub_path=kernel
+        # after 5.14.0-285.el9, kernel-rt also stores in kernel folder in brew
+        if [ $kernel_mar -gt 5 ] || [ $kernel_mar -eq 5 -a $kernel_rma -ge 285 ]; then
+            sub_path=kernel
+        fi
         path_prefix=${def_url}/$sub_path/${version}/${release}
         doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
         rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
@@ -160,6 +166,10 @@ init_vars()
             sub_path=${pkg_name}
             sub_name=${pkg_name}
             [[ $pkg_name =~ kernel-alt|kernel-64k ]] && sub_path=kernel
+            # after 5.14.0-285.el9, kernel-rt also stores in kernel folder in brew
+            if [ $kernel_mar -gt 5 ] || [ $kernel_mar -eq 5 -a $kernel_rma -ge 285 ]; then
+                sub_path=kernel
+            fi
             path_prefix=${def_url}/$sub_path/${version}/${release}
             doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
             rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
@@ -177,16 +187,13 @@ init_vars()
     echo "$(switch_to_final_url ${!check_var}) existed." 1>&2
 
     if ((debugkernel == 1)); then
-        debuginfo_url="${path_prefix}/$arch/${sub_name}-debug-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_name}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
+        debuginfo_url="${path_prefix}/$arch/${sub_name}-debug-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_path}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
         dev_url="${path_prefix}/$arch/${sub_name}-debug-devel-${version}-${release}.$arch.rpm"
     else
         dev_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
-        debuginfo_url="${path_prefix}/$arch/${sub_name}-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_name}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
+        debuginfo_url="${path_prefix}/$arch/${sub_name}-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_path}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
     fi
 
-    # RHEL8
-    kernel_mar=$(echo $version | cut -d. -f1)
-    kernel_mir=$(echo $version | cut -d. -f2)
     if [ $kernel_mar -gt 4 ] || [ $kernel_mar -eq 4 -a $kernel_mir -ge 16 ]; then
         rpm_url+=" ${path_prefix}/$arch/${pkg_name}-modules-${version}-${release}.$arch.rpm"
         rpm_url+=" ${path_prefix}/$arch/${pkg_name}-core-${version}-${release}.$arch.rpm"
@@ -358,9 +365,10 @@ while true ; do
         --srpm)  list_url+=" src_url";shift 1;;
         --perf)  list_url+=" perf_url";shift 1;;
         --curr|--running)
-                current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+]debug//' -e 's/[.+]64k//')
-                uname -r | grep -q '+debug' && debugkernel=1
+                current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+-]debug//' -e 's/[.+]64k//' -e 's/[.+]rt//')
+                uname -r | grep -Eq '[+.-]debug' && debugkernel=1
                 uname -r | grep -q '+64k' && kernel_64k=1 && kernel_names=kernel-64k
+                uname -r | grep -q '+rt' && kernel_rt=1 && kernel_names=kernel-rt
                 version=${current%%-*}
                 release=${current#*-}
                 dist=$(echo $release | grep -Eo "[[:alpha:]].*$")

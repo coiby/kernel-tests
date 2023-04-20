@@ -1,0 +1,7 @@
+acpi_configfs.ko
+acpi_dbg.ko
+custom_method.ko
+erst-dbg.ko
+rc-loopback.ko
+test_fpu.ko
+test-string_helpers.ko

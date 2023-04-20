@@ -76,7 +76,6 @@ amdgpu.ko
 amd_hsmp.ko
 amd.ko
 amd-pmc.ko
-amd_pstate.ko
 amd-rng.ko
 amd_sfh.ko
 amd-xgbe.ko
@@ -411,7 +410,6 @@ dp83tc811.ko
 dptf_power.ko
 drm_buddy.ko
 drm_display_helper.ko
-drm_dp_helper.ko
 drm_kms_helper.ko
 drm.ko
 drm_shmem_helper.ko
@@ -1955,6 +1953,7 @@ serpent-avx-x86_64.ko
 serpent_generic.ko
 serpent-sse2-x86_64.ko
 ses.ko
+sev-guest.ko
 sfc.ko
 sfc-siena.ko
 sg.ko
@@ -2174,6 +2173,7 @@ snd-soc-rt1015p.ko
 snd-soc-rt1308.ko
 snd-soc-rt1308-sdw.ko
 snd-soc-rt1316-sdw.ko
+snd-soc-rt1318-sdw.ko
 snd-soc-rt286.ko
 snd-soc-rt298.ko
 snd-soc-rt5514.ko
@@ -2379,6 +2379,7 @@ tda826x.ko
 tda827x.ko
 tda8290.ko
 tda9887.ko
+tdx-guest.ko
 tea575x.ko
 tea5761.ko
 tea5767.ko

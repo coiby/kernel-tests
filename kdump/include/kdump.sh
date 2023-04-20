@@ -369,7 +369,9 @@ RestartKdump()
     # TODO: some ppc64 has wrong timestamp, this is a workaround for rhel6
     # BZ: 816831
     touch "${KDUMP_CONFIG}"
-    rm -f "${K_BOOT}/${INITRD_PREFIX}*kdump.img"
+    LogRun "ls -l ${K_BOOT}/${INITRD_KDUMP_PREFIX}*kdump.img"
+    LogRun "rm -f ${K_BOOT}/${INITRD_KDUMP_PREFIX}*kdump.img"
+    LogRun "ls -l ${K_BOOT}/${INITRD_KDUMP_PREFIX}*kdump.img"
 
     local log_file=/tmp/kdump_restart.log
     rm -f ${log_file}

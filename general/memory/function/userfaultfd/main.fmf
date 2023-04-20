@@ -1,14 +1,19 @@
-summary: Demonstrates the use of the userfaultfd mechanism.
-description: ''
-contact: David McDougall <dmcdouga@redhat-com>
+summary: KG-VMM userfaultfd
+description: 'Demonstrates the use of the userfaultfd mechanism.'
+enabled: true
+id: 42cb2bb0-42ab-470c-870d-10135d4a7ed3
 component:
   - kernel
-test: ./runtest.sh
+tag: [
+  /kernel/general/memory/function/page_mkclean_one,
+  KG-VMM-TAG
+  ]
+contact: David McDougall <dmcdouga@redhat-com>
+test: bash ./runtest.sh
 framework: beakerlib
-recommend:
-  - gcc 
-tier: 1
-tag: [tier1]
+require:
+  - gcc
 duration: 5m
-extra-summary: /kernel/general/memory/userfaultfd
-extra-task: /kernel/general/memory/userfaultfd
+tier: 1
+extra-summary: /kernel/general/memory/function/userfaultfd
+extra-task: /kernel/general/memory/function/userfaultfd

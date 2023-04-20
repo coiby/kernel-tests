@@ -2,7 +2,7 @@ summary: Abstract Machine Test Utility
 description: ''
 contact: Jan Stancek <jstancek@redhat.com>
 test: bash ./runtest.sh
-framework: beakerlib
+framework: shell
 require:
   - wget
   - git

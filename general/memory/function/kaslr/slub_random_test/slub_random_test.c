@@ -62,6 +62,6 @@ static void __exit slabtest_cleanup(void)
 }
 
 
-
 module_init(slabtest_init);
 module_exit(slabtest_cleanup);
+MODULE_LICENSE("GPLv3");

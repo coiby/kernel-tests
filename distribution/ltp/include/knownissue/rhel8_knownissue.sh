@@ -15,6 +15,9 @@ function rhel8_fatal_issues()
 	osver_in_range "800" "807" && tskip "pty07" fatal
 	# Bug 2101733 - ltp/lite - pty06 fail
 	kernel_in_range "0" "4.18.0-261.el8" && tskip "pty06" fixed
+	# Bug 2156251 - [RHEL8] kernel-rt-debug: BUG: MAX_LOCKDEP_CHAINS too low
+	# Bug 2132005 - [rhel8] call trace qed_ptt_acquire+0x49/0x340 [qed] _qed_get_vport_stats+0x31f/0x4a0 [qed]
+	osver_in_range "800" "810" && cki_is_kernel_debug && tskip "read_all_sys" fatal
 }
 
 function rhel8_unfix_issues()
@@ -70,7 +73,7 @@ function rhel8_unfix_issues()
 	# ptrace08 case issue, tst_kvercmp isn't suitable for rhel8's kernel version
 	osver_in_range "800" "805" && tskip "ptrace08 cve-2018-1000199" unfix
 	# Unable to load BPF programs on s390x kernels built by CKI
-	# https://projects.engineering.redhat.com/browse/FASTMOVING-1825
+	# https://issues.redhat.com/browse/FASTMOVING-1825
 	is_arch "s390x" && tskip "bpf_prog01 bpf_prog02" unfix
 	# Bug 1981743 - RHEL-9-Beta: WARNING: CPU: 3 PID: 0 at kernel/sched/fair.c:401 enqueue_task_fair+0x254/0x5b0
 	osver_in_range "800" "806" && tskip "cfs_bandwidth01" unfix
@@ -79,12 +82,14 @@ function rhel8_unfix_issues()
 	osver_in_range "800" "803" && tskip "fanotify15" unfix
 	# missing linux commit 1639a49ccdce
 	osver_in_range "800" "809" && tskip "creat09 cve-2018-13405" unfix
-	# Bug 2125133 - inotify12.c:85: TFAIL: Incorrect mask 2 in inotify fdinfo (expected 80000002)
-	osver_in_range "800" "809" && tskip "inotify12" unfix
+	# Bug 2163455 - RHEL8.8 - LTP testcase inotify12 fails on LPAR & z/VM
+	osver_in_range "800" "810" && tskip "inotify12" unfix
 }
 
 function rhel8_fixed_issues()
 {
+	# Bug 2154880 - [rhel8] LTP: read_all_sys - RIP: 0010:intel_rps_get_max_frequency+0x5/0x40 [i915]
+	kernel_in_range "0" "4.18.0-456.el8" && tskip "read_all_sys" fixed
 	# Bug 2099510 - LTP lite: move_pages12.c:106: TFAIL: madvise failed: EIO
 	kernel_in_range "0" "4.18.0-408.el8" && tskip "move_pages12" fixed
 	# Bug 1895961 (CVE-2020-25704) - CVE-2020-25704 kernel: perf_event_parse_addr_filter memory

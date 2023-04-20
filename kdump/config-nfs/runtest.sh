@@ -28,8 +28,9 @@
 #               Default is "/".
 #               Vmcore will be dump to {EXPORT}/${DUMP_PATH}/${SUBMITTER}/${JOBID}/${HOSTNAME}"
 
-#   NFS_MOUNT_DRACUT_ARGS - true of flase. Whether to specify nfs target in dracut_args instead
+#   NFS_MOUNT_DRACUT_ARGS - true or false. Whether to specify nfs target in dracut_args instead
 #                           of the "nfs <nfs mount>"
+#                           Default is "false".
 
 #   FSTAB_ENTRY - true or false. Whether add nfs mount entry to fstab (default is 'false')
 #   FSTAB_ENTRY_OPTS - Specify fstab nfs mount entry options in fstab.

@@ -5,16 +5,12 @@ discover:
         - /security/audit/2028871/tests/2028871
 execute:
     how: tmt
-    framework: beakerlib
 prepare:
   - name: Enable Repos
     how: shell
     script: |
         . ./security/include/rhivos.sh
         install_repos
-  - name: Install packages
-    how: install
-    package: [make]
 environment-file:
         - ./security/audit/2028871/plans/tmt.env
 

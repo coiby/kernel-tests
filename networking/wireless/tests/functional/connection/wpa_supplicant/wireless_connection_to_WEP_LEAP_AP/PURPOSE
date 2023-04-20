@@ -1,5 +1,4 @@
 PURPOSE of /kernel/wireless_tests/functional/connection/wpa_supplicant/wireless_connection_to_WEP_LEAP_AP
 Description: Establish a wireless connection to a WEP LEAP AP.
-https://tcms.engineering.redhat.com/case/215386
 Author: Ken Benoit <kbenoit@redhat.com>
 

@@ -5,7 +5,6 @@ framework: shell
 require:
   - gcc
   - make
-  - kernel-devel
 duration: 30m
 extra-summary: general/time/udelay_test
 extra-task: general/time/udelay_test

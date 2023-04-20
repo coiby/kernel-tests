@@ -141,6 +141,35 @@ function setup_rt_cgroup_bw()
 	return 0
 }
 
+function setup_cpu_affinity()
+{
+	local nr_available=$(nproc)
+	local nr_present=$(nproc --all)
+	local isolated=$(cat /sys/devices/system/cpu/isolated)
+
+	if ! grep -q isolcpus /proc/cmdline || ! uname -r | grep -q rt; then
+		# cpu isolation not enabled or not running a rt kernel
+		sed "/cpulist_placeholder/d" -i config/*.json
+		return
+	elif (( nr_available <= 2 )) && (( nr_present > nr_available )); then
+		# cpu isolation enabled and running a rt kernel and so few cores
+		# left for housekeeping
+		rlLog "using cpu affinity in the rt-app config files"
+		rlLog "nr_available: $nr_available, nr_present: $nr_present, isolated: $isolated"
+		for sublist in $(echo $isolated | tr ',' ' '); do
+			cpulist+=",$(seq -s ',' $(echo $sublist | tr '-' ' '))"
+		done
+		sed "s/cpulist_placeholder/${cpulist:1}/g" -i config/*.json
+		rlLog "using isolated cpulist: $cpulist"
+		rlRun "grep -n cpus config/*.json"
+		cpu_affinity="--taskset ${isolated}"
+	else
+		# cpu isolation enabled and running a rt kernel and more than 2
+		# cores are available for scheduling
+		sed "/cpulist_placeholder/d" -i config/*.json
+	fi
+}
+
 function test_setup()
 {
 	if ! (($is_rhivos)); then
@@ -180,6 +209,8 @@ function test_setup()
 	else
 		sched_feature_file="/sys/kernel/debug/sched/features"
 	fi
+
+	uname -r | grep -q rt && load_limit=${load_limit:-"-l 95"}
 
 	echo "Before test: "
 	systemd-cgls | tee cgroups.txt
@@ -237,6 +268,8 @@ function test_setup()
 	echo "checking cgroup hierachy start ..."
 	systemd-cgls | tee cgroups.txt
 	echo "checking cgroup hierachy end ..."
+
+	setup_cpu_affinity
 }
 
 
@@ -332,7 +365,7 @@ function test_sched_rr()
 			return
 		fi
 		setup_rt_cgroup_bw 0.7 100000 $select_cgp
-		rlRun "cgexec.sh $cg_dir $cg_controller stress-ng --sched rr --vm 1 -t 130 &"
+		rlRun "cgexec.sh $cg_dir $cg_controller stress-ng $cpu_affinity --sched rr --vm 1 $load_limit -t 130 &"
 		calc_sched_rt_bw RR "stress-ng-vm" "120"
 		# rt bandwidth control is so coarse, we make it 30% tolerence.
 		check_sched_rt_bw 55.0 85.0
@@ -360,7 +393,7 @@ function test_sched_deadline()
 			return
 		fi
 
-		rlRun "stress-ng --sched deadline  --sched-period 1000000000 --sched-runtime 200000000 --sched-deadline 1000000000 --cpu 1 -t 120 &"
+		rlRun "stress-ng $cpu_affinity --sched deadline  --sched-period 1000000000 --sched-runtime 200000000 --sched-deadline 1000000000 --cpu 1 $load_limit -t 120 &"
 		calc_sched_rt_bw '#6|DLN' "${proc_name:-stress-ng-cpu}" 120
 		check_sched_rt_bw 18.0 22.0
 		pkill -9 -f stress-ng
@@ -398,7 +431,7 @@ function test_sched_fifo()
 		fi
 		# execute stress-ng and cgexec for testing
 		setup_rt_cgroup_bw 0.4 100000 $select_cgp
-		rlRun "cgexec.sh $cg_dir $cg_controller stress-ng --sched fifo --vm 1 -t 130 &"
+		rlRun "cgexec.sh $cg_dir $cg_controller stress-ng $cpu_affinity --sched fifo --vm 1 $load_limit -t 130 &"
 		calc_sched_rt_bw FF "${proc_name:-stress-ng-vm}" "120"
 		check_sched_rt_bw 25.0 55.0
 		pkill -9 -f stress-ng

@@ -29,6 +29,15 @@
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+# Define default time server based on machine hostname
+if [[ $(hostname) =~ .*redhat.com ]]; then
+  DEFAULT_TIME_SERVER="clock.redhat.com"
+else
+  DEFAULT_TIME_SERVER="time.nist.gov"
+fi
+
+TIME_SERVER=${TIME_SERVER:-$DEFAULT_TIME_SERVER}
+
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm util-linux
@@ -70,7 +79,7 @@ rlJournalStart
     rlPhaseStartCleanup
         # Restore correct time
         rlServiceStop chronyd
-        rlRun "chronyd -q 'pool clock.corp.redhat.com iburst'"
+        rlRun "chronyd -q \"pool $TIME_SERVER iburst\""
         rlServiceStart chronyd
         rlRun "hwclock $HWCLOCK_ARG --systohc"
     rlPhaseEnd

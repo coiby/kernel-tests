@@ -6,7 +6,7 @@ component:
 path: /security/integrity/2063913
 test: make run
 framework: beakerlib
-require: [attr, grubby, make]
+require: [attr, audit, grubby, make]
 duration: 12m
 extra-summary: /kernel-tests/security/integrity/2063913
 extra-task: /kernel-tests/security/integrity/2063913

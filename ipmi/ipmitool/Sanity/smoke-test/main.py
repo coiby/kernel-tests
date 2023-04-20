@@ -38,7 +38,7 @@ for option in options:
 
 # Print SDR records and entity IDs, save to a file, and retrieve by entity ID
 print("********** Dump SDR entity ID to a file, retrieve by ID **********")
-os.system('ipmitool sdr elist | cut -c 31-36 | sort | uniq > sdr-elist.txt')
+os.system('ipmitool sdr elist | awk -F "|" \'{ print $4 }\' | sort | uniq > sdr-elist.txt')
 try:
    f = open('sdr-elist.txt')
    for line in f:

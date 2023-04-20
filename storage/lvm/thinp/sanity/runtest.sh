@@ -133,8 +133,12 @@ for j in `seq 1 4`; do
 	# This is causing an error when creating xfs on 512MB thinvol
 	# in case noalign option would cause some troubles(performance etc.),
 	# thinvol size has to be increased
-	rcmd mkfs.xfs -fd noalign /dev/mapper/myvg-thinvolume$j
-
+	if cki_is_kernel_automotive; then
+		#automotive only support ext4 fs
+		rcmd mkfs.ext4 -F /dev/mapper/myvg-thinvolume$j
+	else
+		rcmd mkfs.xfs -fd noalign /dev/mapper/myvg-thinvolume$j
+	fi
 	rcmd mount /dev/mapper/myvg-thinvolume$j /mnt/testmnt$j
 	rcmd umount /mnt/testmnt$j
 

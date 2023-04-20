@@ -1,18 +1,21 @@
-summary: mmap test
-description: ''
-contact: Bill Peck <bpeck@redhat.com>
+summary: KG-VMM mmap1
+description: /kernel/memory/mmap1
 component:
   - kernel
-test: ./runtest.sh
-path: /memory/mmap1
-framework: shell
-recommend:
-  - gcc
-  - glibc
-  - bzip2
-duration: 5m
 enabled: true
+id: 22ef5d6a-799d-43c5-bb89-6c9f8e7b5f8f
+tag: [
+  /kernel/memory/mmap1,
+  KG-VMM-TAG
+  ]
+contact: Bill Peck <bpeck@redhat.com> 
+test: bash ./runtest.sh
+framework: shell
+require:
+  - bzip2
+  - gcc 
+  - glibc
+duration: 5m
 tier: 1
-tag: [tier1]
 extra-summary: /kernel/memory/mmap1
 extra-task: /kernel/memory/mmap1
