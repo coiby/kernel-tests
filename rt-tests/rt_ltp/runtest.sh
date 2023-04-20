@@ -30,7 +30,7 @@ function check_status()
 
 function runtest()
 {
-    yum install -y wget gcc make automake || {
+    $PKGMGR wget gcc make automake || {
         echo "dependent package install failed" | tee -a "$OUTPUTFILE"
         rstrnt-report-result $TEST WARN 1
         rlLog "Aborting test because dependent package install failed"

@@ -14,6 +14,15 @@ set -x
 
 export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 
+if stat /run/ostree-booted > /dev/null 2>&1; then
+  PKGMGR="rpm-ostree -Ay --idempotent --allow-inactive install"
+elif [[ -x /usr/bin/dnf ]]; then
+  PKGMGR="dnf -y --skip-broken install"
+else
+  PKGMGR="yum -y --skip-broken install"
+fi
+export PKGMGR
+
 function rt_package_install()
 {
     # install RT packages
@@ -30,23 +39,23 @@ function rt_package_install()
         if rpm -q --quiet $i ; then
             continue
         else
-            yum install -y $i
+            $PKGMGR "$i"
         fi
     done
 
     # install additional standard packages
-    yum install -y --skip-broken bc curl gcc gdb git patch pciutils rpm-build strace time unzip wget zip
+    $PKGMGR  bc curl gcc gdb git patch pciutils rpm-build strace time unzip wget zip
     if [ $rhel_major -eq 8 ]; then
-        dnf install -y --skip-broken python36 python3-pip
+        $PKGMGR python36 python3-pip
     elif [ $rhel_major -ge 9 ]; then
-        dnf install -y --skip-broken python3 python3-pip
+        $PKGMGR python3 python3-pip
     fi
 }
 
 function rt_env_setup()
 {
     kernel_name=$(uname -r)
-    if [[ $kernel_name =~ "rt" ]]; then
+    if [[ $kernel_name =~ "rt" ]] || cki_is_kernel_automotive; then
         echo "running the $kernel_name" | tee -a $OUTPUTFILE
         rt_package_install
     else
