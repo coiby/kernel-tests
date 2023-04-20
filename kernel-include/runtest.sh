@@ -502,11 +502,11 @@ function K_GetRunningKernelRpmSubPackageNVR ()
   fi
 
   # special cases: non-unified kernel-rt & kernel-automotive must translate the kernel srpm N/VR
-  if [[ "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel-rt" ]]; then
+  if [[ "$k_rpm" == "kernel-rt"* && "$k_srpm" == "kernel-rt" ]]; then
     # e.g.: kernel-rt-4.18.0-479.rt7.268.el8 --> kernel-4.18.0-479.el8
     k_srpm="kernel"
     k_srpm_vr="${k_srpm_vr//rt[0-9]*.[0-9]*./}"
-  elif [[ "$k_rpm" == "kernel-automotive" ]]; then
+  elif [[ "$k_rpm" == "kernel-automotive"* ]]; then
     # e.g.: kernel-automotive-5.14.0-301.264.el9iv --> kernel-5.14.0-301.el9
     k_srpm="kernel"
     local X=${k_srpm_vr%.[0-9]*.el[0-9]*iv}  # 5.14.0-301
