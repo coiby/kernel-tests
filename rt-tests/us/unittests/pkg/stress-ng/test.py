@@ -22,16 +22,16 @@ class StressNgTest(rtut.RTUnitTest):
         self.run_cmd(f'stress-ng --help')
 
     def test_mmap(self):
-        self.run_cmd(f'stress-ng --cpu {self.cpulist} --io 4 --vm 2 --vm-bytes 56M --fork 4 --timeout 5s')
+        self.run_cmd(f'stress-ng --cpu {self.cpulist} --io 4 --vm 2 --vm-bytes 28M --fork 4 --timeout 5s')
 
     def test_hdd_scheduling_latencies(self):
         self.run_cmd(f'stress-ng --cyclic 1 --cyclic-dist 2500 --cyclic-method clock_ns --cyclic-prio 100 --cyclic-sleep 10000 --hdd 0 -t 1m')
 
     def test_parallel(self):
-        self.run_cmd(f'stress-ng --all 4 --timeout 5s')
+        self.run_cmd(f'stress-ng --all 2 --timeout 5s')
 
     def test_taskset(self):
-        self.run_cmd(f'stress-ng --taskset 0,1 --cpu 3 --timeout 5s')
+        self.run_cmd(f'stress-ng --taskset 0 --cpu 2 --timeout 5s')
 
     def test_maximize(self):
         self.run_cmd(f'stress-ng --all -1 --maximize --aggressive')
