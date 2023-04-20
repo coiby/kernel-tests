@@ -1607,8 +1607,27 @@ unsigned long default_huge_page_size(void)
 	return hps;
 }
 
+#if defined(UFFD_FEATURE_WP_HUGETLBFS_SHMEM)
+#define CHECK_WP_HUGETLBFS_SHMEM_SUPPORT(feature, test) \
+do { \
+		feature = UFFD_FEATURE_WP_HUGETLBFS_SHMEM; \
+		userfaultfd_open(&feature); \
+		if (feature & UFFD_FEATURE_WP_HUGETLBFS_SHMEM) { \
+			test_uffdio_wp = true; \
+			printf("%s\n", #test" wp is supported and test is enabled"); \
+		} else { \
+			uffd_test_ops->expected_ioctls &= ~(1 << _UFFDIO_WRITEPROTECT); \
+			printf("%s\n", #test" wp is not supported and test is disabled"); \
+		} \
+} while (0)
+#else
+#define CHECK_WP_HUGETLBFS_SHMEM_SUPPORT(feature, test)
+#endif
+
 static void set_test_type(const char *type)
 {
+	uint64_t features;
+
 	if (!strcmp(type, "anon")) {
 		test_type = TEST_ANON;
 		uffd_test_ops = &anon_uffd_test_ops;
@@ -1617,17 +1636,20 @@ static void set_test_type(const char *type)
 	} else if (!strcmp(type, "hugetlb")) {
 		test_type = TEST_HUGETLB;
 		uffd_test_ops = &hugetlb_uffd_test_ops;
+		CHECK_WP_HUGETLBFS_SHMEM_SUPPORT(features, hugetlb);
 	} else if (!strcmp(type, "hugetlb_shared")) {
 		map_shared = true;
 		test_type = TEST_HUGETLB;
 		uffd_test_ops = &hugetlb_uffd_test_ops;
 		/* Minor faults require shared hugetlb; only enable here. */
 		test_uffdio_minor = true;
+		CHECK_WP_HUGETLBFS_SHMEM_SUPPORT(features, hugetlb_shared);
 	} else if (!strcmp(type, "shmem")) {
 		map_shared = true;
 		test_type = TEST_SHMEM;
 		uffd_test_ops = &shmem_uffd_test_ops;
 		test_uffdio_minor = true;
+		CHECK_WP_HUGETLBFS_SHMEM_SUPPORT(features, shmem);
 	} else {
 		err("Unknown test type: %s", type);
 	}
