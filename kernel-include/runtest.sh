@@ -511,8 +511,7 @@ function K_GetRunningKernelRpmSubPackageNVR ()
     k_srpm="kernel"
     local X=${k_srpm_vr%.[0-9]*.el[0-9]*iv}  # 5.14.0-301
     local Y=${k_srpm_vr/*.el/el}             # el9iv
-    local Z="${X}.${Y}"                      # 5.14.0-301.el9iv
-    k_srpm_vr=${Z//iv}                       # 5.14.0-301.el9
+    k_srpm_vr="${X}.${Y//iv}"                # 5.14.0-301.el9
   fi
 
   # checks if requested subpkg needs to come from the kernel srpm
