@@ -56,24 +56,24 @@ def test(tc):
     else:         
         tc.tfail("Service operation failed with following errors: \n\t'" + "\n\t ".join([str(i) for i in errors_service]))
 
-        # case 2, change the node description format for all the RDMA devices
-        _, nd_before = run('cat /sys/class/infiniband/*/node_desc | grep $(hostname -s) | wc -l', return_output=True)
-        change_nd_format("%%h")
-        new_hostname = "mynewhostname"
-        _cmd = 'hostname ' + new_hostname
-        run(_cmd)
-        run('cat /sys/class/infiniband/*/node_desc', return_output=True, verbose=True)
-        _, nd_after = run('cat /sys/class/infiniband/*/node_desc | grep $(hostname -s) | wc -l', return_output=True)
+    # case 2, change the node description format for all the RDMA devices
+    _, nd_before = run('cat /sys/class/infiniband/*/node_desc | grep $(hostname -s) | wc -l', return_output=True)
+    change_nd_format("%%h")
+    new_hostname = "mynewhostname"
+    _cmd = 'hostname ' + new_hostname
+    run(_cmd)
+    run('cat /sys/class/infiniband/*/node_desc', return_output=True, verbose=True)
+    _, nd_after = run('cat /sys/class/infiniband/*/node_desc | grep $(hostname -s) | wc -l', return_output=True)
 
-        if nd_before == nd_after:
-            tc.tpass("Changing node_desc format passed")
-        else:
-            tc.tfail("Changing node_desc format failed")
+    if nd_before == nd_after:
+        tc.tpass("Changing node_desc format passed")
+    else:
+        tc.tfail("Changing node_desc format failed")
 
-        # post-test
-        # Change the node_desc format to the default one
-        print("Changing the node_desc format to the default one.")
-        change_nd_format("%h %d")
+    # post-test
+    # Change the node_desc format to the default one
+    print("Changing the node_desc format to the default one.")
+    change_nd_format("%h %d")
 
 
 def main():
