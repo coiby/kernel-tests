@@ -6,7 +6,7 @@
 # - SSL error:10000080:BIO routines::no such file: crypto/bio/bss_file.c:75
 
 function fwtsSetup()
-{   
+{
     OSARCH="$(uname -m)"
     KVER="$(uname -r)"
     YUM="rpm-ostree -y --apply-live --allow-inactive"
@@ -68,7 +68,6 @@ EOF
     rlRun "pushd efi_runtime"
     rlRun "KVER=$KVER make all install" 0 "build efi_runtime kmod"
     rlRun "popd"
-    
     # build fwts
     rlLog "start building fwts"
     rlRun "autoreconf -ivf" 0 "autoreconf"
