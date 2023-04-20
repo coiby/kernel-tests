@@ -242,6 +242,10 @@ EOF
     rlRun -l "modinfo efi_runtime" 0 "Check to see if efi_runtime built/installed properly"
 }
 
+if cki_is_kernel_automotive; then
+    . ../include/fwtsetup4rhivos.sh
+fi
+
 function fwtsReportResults()
 {
     rlPhaseStartTest "Results"
