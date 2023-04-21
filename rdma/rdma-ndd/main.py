@@ -75,12 +75,14 @@ def test(tc):
     print("Changing the node_desc format to the default one.")
     change_nd_format("%h %d")
 
+    return 0
+
 
 def main():
     test_class = Test()
 
-    # ret = test(test_class)
-    # print("Test return code: %s" % ret)
+    ret = test(test_class)
+    print("Test return code: %s" % ret)
 
     if not test_class.tend():
         print("FAIL: test failed")

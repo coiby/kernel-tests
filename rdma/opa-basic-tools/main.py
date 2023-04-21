@@ -11,7 +11,7 @@ from rdmaqe.common.tc import Test
 from rdmaqe.rdma.opa import opa_setup
 
 import libsan.host.linux as linux
-
+from libsan.host.cmdline import run
 from stqe.host.atomic_run import atomic_run
 
 import sys

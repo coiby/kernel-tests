@@ -41,12 +41,13 @@ def test(tc):
     tc.tok("/usr/sbin/ethbw -i 5 -d 100")
     tc.tok("/usr/sbin/ethshmcleanup")
 
+    return 0
+
 
 def main():
     test_class = Test()
-
-    # ret = test(test_class)
-    # print("Test return code: %s" % ret)
+    ret = test(test_class)
+    print("Test return code: %s" % ret)
 
     if not test_class.tend():
         print("FAIL: test failed")
