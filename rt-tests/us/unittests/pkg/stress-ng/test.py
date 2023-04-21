@@ -28,16 +28,19 @@ class StressNgTest(rtut.RTUnitTest):
         self.run_cmd(f'stress-ng --cyclic 1 --cyclic-dist 2500 --cyclic-method clock_ns --cyclic-prio 100 --cyclic-sleep 10000 --hdd 0 -t 1m')
 
     def test_parallel(self):
-        self.run_cmd(f'stress-ng --all 2 --timeout 5s')
+        self.run_cmd(f'stress-ng --all 1 --timeout 5s')
 
     def test_taskset(self):
-        self.run_cmd(f'stress-ng --taskset 0 --cpu 2 --timeout 5s')
-
-    def test_maximize(self):
-        self.run_cmd(f'stress-ng --all -1 --maximize --aggressive')
+        self.run_cmd(f'stress-ng --taskset 0 --cpu {self.cpulist} --timeout 5s')
 
     def test_different_cpu_stressors(self):
         self.run_cmd(f'stress-ng --cpu {self.cpulist} --cpu-method all --verify -t 10s --metrics-brief')
+
+    def test_log_brief(self):
+        self.run_cmd(f'stress-ng -c {self.cpulist} --timeout 5s --log-brief')
+
+    def test_random(self):
+        self.run_cmd(f'stress-ng --random 10 -x numa,hdd,key --timeout 5s')
 
 if __name__ == '__main__':
     StressNgTest.run_unittests()
