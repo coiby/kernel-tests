@@ -8,11 +8,10 @@ __copyright__ = "Copyright (c) 2023 Red Hat, Inc. All rights reserved."
 
 from rdmaqe.rdma.general import is_opa_device
 from rdmaqe.common.tc import Test
-from rdmaqe.rdma.opa import opa_setup
+from rdmaqe.rdma.opa import opa_setup, is_port_active
 from rdmaqe.common.file_libs import configure_file
 
 import libsan.host.linux as linux
-from libsan.host.cmdline import run
 
 from stqe.host.atomic_run import atomic_run
 
