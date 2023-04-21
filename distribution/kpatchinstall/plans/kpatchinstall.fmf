@@ -1,0 +1,9 @@
+summary: Installs required kernel and kpatch RPM
+discover:
+    how: fmf
+    test:
+        - /distribution/kpatchinstall/tests/kpatchinstall
+execute:
+    how: shell
+environment-file:
+        - ./distribution/kpatchinstall/plans/tmt.env

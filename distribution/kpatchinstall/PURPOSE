@@ -1,0 +1,48 @@
+kpatchinstall task is responsible for installing kpatch patches RPMs
+and making sure desired kernel version is running.
+
+Steps:
+1. download kpatch rpm specified by KPATCHNVR parameter
+  at the moment only yum method is supported, downloading rpms directly
+  from brew is not, as kpatch RPMs are currently not built in brew
+2. figure out the desired kernel version
+  by default it is latest supported kernel found in KPATCHNVR rpm
+  It is possible to override kernel version with parameters:
+    KERNELARGNAME
+    KERNELARGVERSION
+    KERNELARGVARIANT
+    ^^ These have identical meaning as in kernelinstall task, please
+       refer to documentation for kernelinstall task
+3. run kernelinstall task to install desired kernel
+4. install kpatch RPMs
+5. verify that kpatch modules are loaded
+
+Parameters:
+  KPATCHNVR - nvr of kpatch RPM (required)
+              Example: kpatch-patch-7.0-1.test_2014_06_13.el7
+  KPATCHURL - optional parameter to provide url to kpatch-patch rpm
+              Example: http://myrepo.com/repos/#name/#version/#release/
+  KERNELREPOTMPL - template for URL leading to kernel repos (optional)
+                   because kernel version might not be known ahead of time,
+                   this parameter will add kernel yum repo at runtime
+                   Example: http://myrepo.com/repos/#name/#version/#release/#arch/#kpatchnvr.#arch.rpm"
+  KERNELARGNAME    \
+  KERNELARGVERSION - please refer to kernelinstall task documentation
+  KERNELARGVARIANT /
+
+Example 1: install kpatch patches and latest supported kernel
+<task name="/distribution/kpatchinstall" role="STANDALONE">
+	<params>
+		<param name="KPATCHNVR" value="kpatch-patch-7.0-1.test_2014_06_13.el7"/>
+		<param name="KERNELREPOTMPL" value="http://myrepo.com/repos/#name/#version/#release"/>
+	</params>
+</task>
+
+Example 2: install kpatch patches and specific kernel selected by parameter
+<task name="/distribution/kpatchinstall" role="STANDALONE">
+	<params>
+		<param name="KERNELARGVERSION" value="3.10.0-121.el7"/>
+		<param name="KPATCHNVR" value="kpatch-patch-7.0-1.test_2014_06_13.el7"/>
+		<param name="KERNELREPOTMPL" value="http://myrepo.com/repos/#name/#version/#release"/>
+	</params>
+</task>

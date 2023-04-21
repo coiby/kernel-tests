@@ -1,0 +1,14 @@
+summary: Installs required kernel and kpatch RPMs
+contact: Yulia Kopkova <ykopkova@redhat.com>
+test: chmod a+x ./runtest.sh; ./runtest.sh
+path: /distribution/kpatchinstall
+framework: shell
+require:
+  - kpatch
+  - yum-utils
+recommend:
+  - iproute
+  - ethtool
+duration: 120m
+extra-summary: /distribution/kpatchinstall
+extra-task: /distribution/kpatchinstall
