@@ -41,10 +41,10 @@ function runtest()
     # Downoad and setup ltp
     download_ltp
 
-    pushd "ltp-full-$ltp_version"
+    pushd "ltp-full-$ltp_version" || exit 1
     ./configure
 
-    pushd "testcases/realtime"
+    pushd "testcases/realtime" || exit 1
     ./configure
 
     # default test-arguments: func, stress, perf, list
@@ -54,6 +54,7 @@ function runtest()
         ./run.sh -t "$case"
         check_status "./run.sh -t $case"
     done <<< "$func_list"
+    # shellcheck disable=SC2164
     popd
 
     if [ $result_r = "PASS" ]; then
