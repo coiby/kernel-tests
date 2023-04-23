@@ -26,6 +26,44 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Enable TMT testing for RHIVOS
+auto_include=../../automotive/include/include.sh
+[ -f $auto_include ] && . $auto_include
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+
+if (($is_rhivos)); then
+    if [[ ! -e "/usr/sbin/grubby" ]]; then
+cat >/etc/yum.repos.d/rhel.repo <<EOF
+[baseos-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$(arch)/os
+enabled=1
+gpgcheck=0
+[appstream-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/$(arch)/os/
+enabled=1
+gpgcheck=0
+[crb-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/$(arch)/os/
+enabled=1
+gpgcheck=0
+[baseos-debug-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$(arch)/debug/tree
+enabled=1
+gpgcheck=0
+[appstream-debug-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/$(arch)/debug/tree
+enabled=1
+gpgcheck=0
+[crb-debug-rhel]
+baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/$(arch)/debug/tree
+enabled=1
+gpgcheck=0
+EOF
+        rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive grubby
+        rstrnt-reboot
+    fi
+fi
+
 # Include libraries
 . ../../cki_lib/libcki.sh || exit 1
 
@@ -37,7 +75,11 @@ DefaultBootOptionsIntel=default-boot-options-intel.txt
 DefaultBootOptionsAMD=default-boot-options-amd.txt
 # file to store current boot options being tested
 CurrentBootOptions=current-boot-options.txt
-cpuvendor=$(grep -m1 vendor_id /proc/cpuinfo | awk '{print $NF}')
+if (($is_rhivos)); then
+    cpuvendor=$(lscpu | grep "^Vendor ID" | awk '{print $NF}')
+else
+    cpuvendor=$(grep -m1 vendor_id /proc/cpuinfo | awk '{print $NF}')
+fi
 dmesgErrors=iommu-dmesg-errors.txt
 dmesgReport=iommu-dmesg-report.txt
 
@@ -150,7 +192,7 @@ if [[ -n $CMDLINEARGS ]]; then
 	bootOptions $CustomBootOptions
 	dmesgErrors
 else
-	if [[ $cpuvendor = "GenuineIntel" ]]; then
+	if [[ $cpuvendor = "GenuineIntel" || $cpuvendor = "ARM" ]]; then
 		bootOptions $DefaultBootOptionsIntel
 		dmesgErrors
 	elif [[ $cpuvendor = "AuthenticAMD" ]]; then
