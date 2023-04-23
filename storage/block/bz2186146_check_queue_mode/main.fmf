@@ -1,0 +1,15 @@
+summary: storage/block/bz2186146_check_queue_mode
+description: system get OOPs when queue mode is set to 1 from configfs
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/bz2186146_check_queue_mode
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+duration: 1h
+tier: 1
+extra-summary: /storage/block/bz2186146_check_queue_mode
+extra-task: /storage/block/bz2186146_check_queue_mode
