@@ -66,7 +66,7 @@ def test(tc):
         "rdma statistic qp mode",
     ]
     for _t in test_cases:
-        t = "timeout --preserve-status " + _t
+        t = "timeout --preserve-status 5 " + _t
         tc.tok(t)
 
     # post-test
