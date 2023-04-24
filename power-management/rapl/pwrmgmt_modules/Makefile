@@ -28,7 +28,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE pwrmgmt_modules
+FILES=$(METADATA) runtest.sh Makefile PURPOSE pwrmgmt_modules metadata
 
 .PHONY: all install download clean
 
