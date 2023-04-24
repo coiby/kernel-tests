@@ -27,8 +27,8 @@ class StressNgTest(rtut.RTUnitTest):
     def test_hdd_scheduling_latencies(self):
         self.run_cmd(f'stress-ng --cyclic 1 --cyclic-dist 2500 --cyclic-method clock_ns --cyclic-prio 100 --cyclic-sleep 10000 --hdd 0 -t 1m')
 
-    def test_parallel(self):
-        self.run_cmd(f'stress-ng --all 1 --timeout 5s')
+    def test_backoff(self):
+        self.run_cmd(f'stress-ng -c {self.cpulist} -b 1 --timeout 5s')
 
     def test_taskset(self):
         self.run_cmd(f'stress-ng --taskset 0 --cpu {self.cpulist} --timeout 5s')
