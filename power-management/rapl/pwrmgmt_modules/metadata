@@ -1,0 +1,12 @@
+[General]
+name=power-management/rapl/pwrmgmt_modules
+owner=Erik Hamera <ehamera@redhat.com>
+description=Sanity test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=bc
+repoRequires=power-management/include_parser
