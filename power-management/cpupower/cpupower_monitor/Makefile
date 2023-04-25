@@ -28,7 +28,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE cpupower_monitor readme_RHEL6 cpupower_monitor_wrapper
+FILES=$(METADATA) runtest.sh Makefile PURPOSE cpupower_monitor readme_RHEL6 cpupower_monitor_wrapper metadata
 
 .PHONY: all install download clean
 
