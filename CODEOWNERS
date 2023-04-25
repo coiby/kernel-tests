@@ -199,7 +199,7 @@
 /kdump-cki/kdump-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @thenzl
 /kdump-cki/kexec-boot/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
 /kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
-/kselftests/ @bgoncalv @liuhangbin @lulinqing @npache @sbertram
+/kselftests/ @bgoncalv @fmaurer-rh @liuhangbin @lulinqing @npache @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
 /legacy/whitelist/ @bgoncalv @ckalina @lulinqing
