@@ -9,4 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=bc
+dependencies=powertop
 repoRequires=power-management/include_parser
