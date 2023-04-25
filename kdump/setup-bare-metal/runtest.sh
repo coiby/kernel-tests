@@ -73,7 +73,6 @@ SetupKdump()
                     ck_opts=" "
                 fi
                 LogRun "kdumpctl reset-crashkernel ${ck_opts}"
-                kdumpMem="$(grubby --info=${VMLINUZ_PATH} | awk 'match($0, /crashkernel=.* /) { print substr($0, RSTART, RLENGTH) }')"
             else # use default value from kdump.sh
                 kdumpMem="$(DefKdumpMem)"
             fi
