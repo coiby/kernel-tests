@@ -28,7 +28,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE powertop_start.parser1 dummy_test_rh6.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE powertop_start.parser1 dummy_test_rh6.sh metadata
 
 .PHONY: all install download clean
 
