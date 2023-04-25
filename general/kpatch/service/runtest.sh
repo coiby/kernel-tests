@@ -32,12 +32,14 @@
 BUILDS_URL="${BUILDS_URL:-}"
 PACKAGE=kpatch
 SERVICE=kpatch
-karch=$(uname -i)
-kver=$(uname -r | cut -f1 -d'-')
-krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//")
+kpackage=$(rpm -qf /boot/config-`uname -r` | sed "s/.`uname -i`//g; s/core-//g;")
+karch=$(rpm -q $kpackage --qf "%{arch}")
+knam=$(rpm -q $kpackage --qf "%{name}")
+kver=$(rpm -q $kpackage --qf "%{version}")
+krel=$(rpm -q $kpackage --qf "%{release}")
 
-dnf install -q -y kernel-modules-internal-${kver}-${krel} \
-       || yum install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/kernel-modules-internal-${kver}-${krel}.${karch}.rpm
+dnf install -q -y ${knam}-modules-internal-${kver}-${krel} \
+       || yum install -q -y ${BUILDS_URL}/${knam}/${kver}/${krel}/${karch}/${knam}-modules-internal-${kver}-${krel}.${karch}.rpm
 
 MOD="test_klp_livepatch"
 MOD_PATH=$(dirname `modinfo --field=filename $MOD`)
