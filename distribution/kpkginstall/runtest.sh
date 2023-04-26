@@ -327,10 +327,12 @@ function download_install_package()
       fi
     else
       # debug kernel automotive
-      if rpm-ostree override remove kernel-automotive kernel-automotive-core kernel-automotive-modules\
+      if rpm-ostree override remove kernel-automotive kernel-automotive-core kernel-automotive-modules \
+        kernel-automotive-modules-core\
       --install "$(pwd)/kernel-automotive-debug-${KVER}.rpm"\
+      --install "$(pwd)/kernel-automotive-debug-core-${KVER}.rpm"\
       --install "$(pwd)/kernel-automotive-debug-modules-${KVER}.rpm"\
-      --install "$(pwd)/kernel-automotive-debug-core-${KVER}.rpm" > /dev/null; then
+      --install "$(pwd)/kernel-automotive-debug-modules-core-${KVER}.rpm" > /dev/null; then
         cki_print_success "Installed $1 successfully"
       else
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
