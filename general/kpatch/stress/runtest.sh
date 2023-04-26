@@ -33,11 +33,7 @@
 #  Include Beaker environment
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-
-
-PACKAGE="kpatch"
-SERVICE="$PACKAGE"
-BUILDS_URL="${BUILDS_URL:-}"
+. ../include/lib.sh
 
 KPATCH_MODULE="${KPATCH_MODULE:-}"
 KPATCH_PATH="${KPATCH_PATH:-}"
@@ -46,13 +42,7 @@ if [ -z "$KPATCH_MODULE" ]; then
         KPATCH_PATH="/usr/lib/kpatch/$(uname -r)"
         KPATCH_MODULE=$(ls $KPATCH_PATH | grep kpatch- | head -n 1 | sed -e 's/.ko//')
     else
-        kpackage=$(rpm -qf /boot/config-`uname -r` | sed "s/.`uname -i`//g; s/core-//g;")
-        karch=$(rpm -q $kpackage --qf "%{arch}")
-        knam=$(rpm -q $kpackage --qf "%{name}")
-        kver=$(rpm -q $kpackage --qf "%{version}")
-        krel=$(rpm -q $kpackage --qf "%{release}")
-        dnf install -q -y ${knam}-modules-internal-${kver}-${krel} \
-            || yum install -q -y ${BUILDS_URL}/${knam%-debug}/${kver}/${krel}/${karch}/${knam}-modules-internal-${kver}-${krel}.${karch}.rpm
+        dnf_install_modules_internal
         KPATCH_MODULE="test_klp_livepatch"
         KPATCH_PATH=$(dirname `modinfo --field=filename $KPATCH_MODULE`)
         xz --decompress $KPATCH_PATH/$KPATCH_MODULE.ko.xz
