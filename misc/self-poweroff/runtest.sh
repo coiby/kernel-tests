@@ -45,21 +45,21 @@ export TEST="misc/self-poweroff"
 # to power off repeatedly.
 
 if (($is_rhivos)); then
-	STAMP_FILE=/tmp/.self-poweroff
+    STAMP_FILE=/tmp/.self-poweroff
 else
-	STAMP_FILE=/.self-poweroff
+    STAMP_FILE=/.self-poweroff
 fi
 
 if [ -f $STAMP_FILE ]; then
-	rm $STAMP_FILE
-	rstrnt-report-result "${TEST}" PASS
-	exit 0
+    rm $STAMP_FILE
+    rstrnt-report-result "${TEST}" PASS
+    exit 0
 fi
 
 touch $STAMP_FILE
 sync
-# Instead of using /sbin/poweroff, it is to add waiting time 
-# before shutdown, if shut down immediately, 
+# Instead of using /sbin/poweroff, it is to add waiting time
+# before shutdown, if shut down immediately,
 # tmt cannot get the test results from the tested host
 /sbin/shutdown -t +1
 rstrnt-report-result "${TEST}" PASS
