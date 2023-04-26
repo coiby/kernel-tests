@@ -54,7 +54,7 @@ Describe 'reboot-test: post-reboot'
         The stdout should include "diff kernel_before_reboot.txt kernel_after_reboot.txt"
         The stdout should include "Rebooted using correct kernel"
         The stdout should include "rstrnt-report-result misc/reboot-test/kernel-version-check PASS 0"
-        The stdout should include "rstrnt-report-result misc/reboot-test/journalctl-check PASS 0"
+        The stdout should include "rstrnt-report-result -o journalctl.log misc/reboot-test/journalctl-check PASS 0"
         The stdout should include "rstrnt-report-result misc/reboot-test PASS"
         The status should be success
     End
@@ -67,7 +67,7 @@ Describe 'reboot-test: post-reboot'
         The stdout should include "Before reboot:"
         The stdout should include "After reboot:"
         The stdout should include "rstrnt-report-result misc/reboot-test/kernel-version-check FAIL 0"
-        The stdout should include "rstrnt-report-result misc/reboot-test/journalctl-check PASS 0"
+        The stdout should include "rstrnt-report-result -o journalctl.log misc/reboot-test/journalctl-check PASS 0"
         The stdout should include "rstrnt-report-result misc/reboot-test FAIL"
         The status should be failure
     End
@@ -79,8 +79,8 @@ Describe 'reboot-test: post-reboot'
         The stdout should include "Rebooted using correct kernel"
         The stdout should include "rstrnt-report-result misc/reboot-test/kernel-version-check PASS 0"
         The stdout should include "FAIL: Call trace found in journalctl, see journalctl.log"
-        The stdout should include "rstrnt-report-log -l journalctl.log"
-        The stdout should include "rstrnt-report-result misc/reboot-test/journalctl-check FAIL 0"
+        #The stdout should include "rstrnt-report-log -l journalctl.log"
+        The stdout should include "rstrnt-report-result -o journalctl.log misc/reboot-test/journalctl-check FAIL 0"
         The stdout should include "rstrnt-report-result misc/reboot-test FAIL"
         The contents of file journalctl.log should include "${MOCKED_JOURNALCTL}"
         The status should be failure
