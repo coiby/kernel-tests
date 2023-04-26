@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/stalld/selftest
+owner=Chang Yin <cyin@redhat.com>
+description=stalld selftest
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+dependencies=gcc
+max_time=10m
+use_pty=false
