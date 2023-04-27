@@ -9,6 +9,7 @@ rlPhaseStartSetup
 rlRun "yum install -y tuned"
 rlAssertRpm "tuned"
 rlShowPackageVersion "tuned"
+rlRun "systemctl enable --now tuned.service"
 rlRun "tuned-adm profile_info" # current profile
 rlRun "tuned-adm active"
 rlRun "tuned-adm list"
