@@ -1,0 +1,23 @@
+#kernel-qe-hw
+parser lhc1
+echo This test gathers data from turbostat run for manual analysis.
+echo Automated analysis is complicated, because turbostat's output differs from CPU to CPU.
+echo THIS TEST ALWAYS PASS! 
+
+sysinfo uname lscpu bios
+
+#1 and 2 are names of results
+run 1 turbostat sleep 60
+
+#load it to 100%
+load l1 1
+
+run tmp sleep 60
+
+run 2 turbostat sleep 60
+#results are printed to stdout automatically
+
+load_kill l1
+
+#if there isn't decided to pass or fail, there is default
+default pass
