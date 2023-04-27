@@ -9,7 +9,7 @@ destructive=no
 [restraint]
 entry_point=make run
 dependencies=gcc;glibc;wget;bc
-softDependencies=json-c-devel
+softDependencies=json-c-devel;virt-what
 repoRequires=general/include;general/scheduler/include;automotive/include
 max_time=1h
 use_pty=false
