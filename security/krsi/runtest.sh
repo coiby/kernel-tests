@@ -40,7 +40,7 @@ rlJournalStart
             rlRun "rpm-ostree -A --idempotent --allow-inactive install kernel-automative-selftests-internal"
         else
             kconfig="/boot/config-$knvr"
-            if [ $knvr =~ rt ]; then
+            if [[ $knvr =~ rt ]]; then
                 kernelVar="kernel-rt"
             else
                 kernelVar="kernel"
