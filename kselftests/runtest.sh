@@ -78,8 +78,8 @@ function get_pkg_mgr()
     fi
 }
 
-mkdir $TMPDIR
-mkdir $EXEC_DIR
+[ ! -d $TMPDIR ] && mkdir $TMPDIR
+[ ! -d $EXEC_DIR ] && mkdir $EXEC_DIR
 
 # Convert parameter line to parameter array
 declare -A TEST_PARAM
