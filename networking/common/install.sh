@@ -333,7 +333,7 @@ iperf_install()
 	$YUM gcc-c++ make gcc
 	# grab sctp-enabled iperf and install it:
 	IPERF_FILE="iperf-2.0.10.tar.gz"
-	wget http://lacrosse.corp.redhat.com/~haliu/${IPERF_FILE}
+	wget http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/${IPERF_FILE}
 	if [[ $? != 0 ]]; then
 		echo "${TEST} fail grabbing iperf source"
 		rstrnt-report-result "${TEST}_get_iperf" FAIL
