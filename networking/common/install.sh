@@ -196,7 +196,7 @@ lksctp-tools_install()
 scapy_install()
 {
 	local scapy_git="https://github.com/secdev/scapy.git"
-	local scapy_http="http://netqe-bj.usersys.redhat.com/share/tools/scapy.tar.gz"
+	local scapy_http="http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/scapy.tar.gz"
 
 	local rel=$(GetDistroRelease)
 	[ $rel -ge 9 ] && dnf install -y scapy
