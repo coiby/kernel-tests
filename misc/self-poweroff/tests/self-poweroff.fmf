@@ -10,8 +10,12 @@ description: |
 
     See also: misc/wait-guest-poweroff
 contact: Oliver Gutierrez <ogutierr@redhat.com>
-test: bash ./runtest.sh
+component:
+  - kernel
+path: /misc/self-poweroff
+test: bash -x ./runtest.sh
 framework: shell
+require: []
 duration: 1h
-extra-summary: misc/self-poweroff
-extra-task: misc/self-poweroff
+extra-summary: /misc/self-poweroff
+extra-task: /misc/self-poweroff

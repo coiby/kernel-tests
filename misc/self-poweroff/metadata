@@ -7,6 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
+repoRequires=automotive/include
 entry_point=bash ./runtest.sh
 max_time=1h
 dependencies=
