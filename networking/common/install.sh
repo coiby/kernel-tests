@@ -248,24 +248,6 @@ scapy_install()
 	popd
 }
 
-socat_install()
-{
-	$YUM socat
-	if [ $? -ne 0 ];then
-		pushd ${NETWORK_COMMONLIB_DIR}
-		socat="latest-socat.$(uname -r| awk -F. '{print $4}').$(uname -m).rpm"
-		wget http://porkchop.devel.redhat.com/qa/rhts/lookaside/socat/$socat
-		if stat /run/ostree-booted > /dev/null 2>&1; then
-			rpm-ostree -A --idempotent --allow-inactive localinstall -y $socat
-		else
-			yum localinstall -y $socat
-		fi
-		popd
-	fi
-	socat -V && return 0 || return 1
-
-}
-
 netperf_install()
 {
 	# rhel7 can't install from epel repo
