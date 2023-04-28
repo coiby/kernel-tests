@@ -189,6 +189,7 @@ if [[ -n $CMDLINEARGS ]]; then
 	bootOptions $CustomBootOptions
 	dmesgErrors
 else
+        echo $cpuvendor
 	if [[ $cpuvendor = "GenuineIntel" ]]; then
 		bootOptions $DefaultBootOptionsIntel
 		dmesgErrors
