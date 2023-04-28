@@ -568,24 +568,6 @@ bfdd_install()
 	which bfdd-beacon && return 0 || return 1
 }
 
-docker_install()
-{
-	which docker && return 0
-	# fedora may enable docker by default
-	$YUM docker && return 0
-	local rhel_version=`rpm -q --qf="%{VERSION}" $(rpm -qf /etc/redhat-release) | sed "s/^\([0-9.]\+\)[^0-9.]\+.*$/\1/" | sed "s/6\.9[0-9]/7/" | cut -d '.' -f 1`
-	cat > /etc/yum.repos.d/extra-rhel.repo <<EOF
-[extras-rhel${rhel_version}]
-name=extras-rhel${rhel_version}
-baseurl=http://pulp.dist.prod.ext.phx2.redhat.com/content/dist/rhel/server/${rhel_version}/${rhel_version}Server/$(uname -p)/extras/os/
-enabled=1
-gpgcheck=0
-EOF
-	$YUM docker || { echo "install docker failed"; rm /etc/yum.repos.d/extra-rhel.repo -f; return 1; }
-	rm /etc/yum.repos.d/extra-rhel.repo -f
-	rpm -q docker
-}
-
 hping3_install()
 {
 	which hping && return 0
