@@ -284,14 +284,6 @@ sriov_config_vm_repo()
 			cat /etc/yum.repos.d/beaker-BaseOS.repo | awk '{system("vmsh run_cmd $vm_name \"echo "$0" >> /etc/yum.repos.d/beaker-BaseOS.repo\"")}'
 		fi
 
-		vmsh run_cmd $vm_name "cat <<-EOF > /etc/yum.repos.d/beaker-tasks.repo
-[beaker-tasks]
-name=beaker-tasks
-baseurl=http://beaker.engineering.redhat.com/rpms
-enabled=1
-gpgcheck=0
-EOF"
-
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/beaker-harness.repo"
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/myrepo_1.repo"
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/beaker-kernel0.repo"
