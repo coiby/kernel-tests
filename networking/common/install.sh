@@ -260,13 +260,7 @@ netperf_install()
 
 	local OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 
-	if hostname | grep "pek2.redhat.com"
-	then
-	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-bj.usersys.redhat.com/share/tools/netperf-20210121.tar.bz2"}
-	else
-#	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
-	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-bj.usersys.redhat.com/share/tools/netperf-20210121.tar.bz2"}
-	fi
+	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
 
 	pushd ${NETWORK_COMMONLIB_DIR} 1>/dev/null
 	wget -nv -N $SRC_NETPERF
