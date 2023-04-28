@@ -193,7 +193,8 @@ if [[ -n $CMDLINEARGS ]]; then
 	bootOptions $CustomBootOptions
 	dmesgErrors
 else
-        echo $cpuvendor
+        a=$(lscpu)
+        echo $a
 	if [[ $cpuvendor =~ "Intel" ]]; then
 		bootOptions $DefaultBootOptionsIntel
 		dmesgErrors
