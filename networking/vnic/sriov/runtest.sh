@@ -574,7 +574,7 @@ sriov_setup_container()
 	do
 		echo "Download container image..."
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos_stream8_aarch64.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
 			podman load --input container_sriov_centos_stream8_aarch64.tar
 			if [ $? -eq 0 ]
 			then
@@ -592,7 +592,7 @@ sriov_setup_container()
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/centos_stream8_ppc64le.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
@@ -610,7 +610,7 @@ sriov_setup_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos8.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
@@ -642,7 +642,7 @@ sriov_setup_pod_container()
 	do
 		echo "Download container image..."
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos8-arm.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8-arm.tar
 			podman load --input container_sriov_centos8-arm.tar
 			if [ $? -eq 0 ]
 			then
@@ -662,7 +662,7 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/centos_stream8_ppc64le.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
@@ -682,7 +682,7 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos8.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
@@ -11101,8 +11101,8 @@ sriov_test_vmvf_testpmd_macswap()
 				{yum install -y bzip2}
 				{yum install -y wget}
 				{yum -y install wget unzip tcpdump automake gcc make}
-				{wget -nv -N http://netqe-bj.usersys.redhat.com/share/tools/netperf-20160222.tar.bz2}
-				{tar xf $(basename http://netqe-bj.usersys.redhat.com/share/tools/netperf-20160222.tar.bz2)}
+				{wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2}
+				{tar xf $(basename http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2)}
 				{pushd netperf-*/}
 				{./autogen.sh}
 				{./configure CFLAGS=-fcommon}
@@ -13951,7 +13951,7 @@ sriov_test_negative_create_vfs_2000180()
 #		local jobid=$(cat /etc/motd | grep JOBID | awk -F "=" '{print $2}' | tr -d '\n' | tr -d " ")
 #		local kernel_version=$(uname -r)
 #		local hostname=$(hostname)
-#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore on http://netqe-bj.usersys.redhat.com/vmcore/${user}/${KERNEL_VERSION}/${jobid}/${hostname}"
+#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore"
 #		local file_list=$(find /var/crash/${user}/${KERNEL_VERSION}/${jobid}/${hostname}/ -name vmcore*)
 #		if [[ ${file_list} != "" ]]; then
 #			rlFail "can find vmcore file, need to check"
@@ -14194,7 +14194,7 @@ sriov_test_reproduce_2021326()
 #		local jobid=$(cat /etc/motd | grep JOBID | awk -F "=" '{print $2}' | tr -d '\n' | tr -d " ")
 #		local kernel_version=$(uname -r)
 #		local hostname=$(hostname)
-#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore on http://netqe-bj.usersys.redhat.com/vmcore/${user}/${KERNEL_VERSION}/${jobid}/${hostname}"
+#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore"
 #		local file_list=$(find /var/crash/${user}/${KERNEL_VERSION}/${jobid}/${hostname}/ -name vmcore*)
 #		if [[ ${file_list} != "" ]]; then
 #			rlFail "can find vmcore file, need to check"
