@@ -1,5 +1,4 @@
 This is meant to be a library for other tasks that want to use
 fwts. It provides setup, beaker reporting and cleanup functions.
 
-For more info see the wiki page:
-https://wiki.test.redhat.com/Kernel/fwts
+For more info see the internal QE wiki page for fwts.
