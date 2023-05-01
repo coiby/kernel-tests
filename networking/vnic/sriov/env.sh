@@ -52,15 +52,8 @@ elif (($rhel_version == 9));then
 	image_name=${image_name:-"rhel9.0.qcow2"}
 fi
 
-#IMG_GUEST=${IMG_GUEST:-"http://netqe-bj.usersys.redhat.com/share/vms/${image_name}"}
-if hostname | grep "pek2.redhat.com"
-then
-	IMG_GUEST=${IMG_GUEST:-"http://netqe-bj.usersys.redhat.com/share/vms/${image_name}"}
-else
-	IMG_GUEST=${IMG_GUEST:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/${image_name}"}
-fi
+IMG_GUEST=${IMG_GUEST:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/${image_name}"}
 
-#SRC_NETPERF=${SRC_NETPERF:-"http://netqe-bj.usersys.redhat.com/share/tools/netperf-20210121.tar.gz"}
 
 kernel_ver="$(uname -r)"
 if [ "$ENABLE_RT_KERNEL" = "no" ]; then

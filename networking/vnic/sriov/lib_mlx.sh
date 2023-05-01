@@ -213,47 +213,5 @@ load_openibd_for_mlnx()
 		/etc/init.d/openibd restart
 		return $?
 	fi
-	local MLNX_OFED_URL="http://netqe-bj.usersys.redhat.com/share/tools/"
-	local MLNX_OFED_PKG_NAME=""
-	local distro=rhel$(cat /etc/redhat-release |awk '{print $7}')
-	case $distro in
-		"rhel6.7")
-			MLNX_OFED_PKG_NAME="MLNX_OFED_LINUX-3.4-2.0.0.0-rhel6.7-x86_64.tgz"
-			;;
-		"rhel6.8")
-			MLNX_OFED_PKG_NAME="MLNX_OFED_LINUX-3.4-1.0.0.0-rhel6.8-x86_64.tgz"
-			;;
-		"rhel6.9")
-			MLNX_OFED_PKG_NAME="MLNX_OFED_LINUX-4.3-1.0.1.0-rhel6.9-x86_64.tgz"
-			;;
-		"rhel6.10")
-			MLNX_OFED_PKG_NAME="MLNX_OFED_LINUX-4.3-1.0.1.0-rhel6.9-x86_64.tgz"
-			distro=rhel6.9
-			;;
-		"rhel6.11")
-			MLNX_OFED_PKG_NAME="MLNX_OFED_LINUX-4.3-1.0.1.0-rhel6.9-x86_64.tgz"
-			distro=rhel6.9
-			;;
-		*)
-			echo "Warn: There are no MLNX_OFED package for $distro, maybe this distro dont need to install it."
-			return 1
-			;;
-	esac
-
-	local workdir="/home/mlnxofed"
-	mkdir $workdir
-	pushd $workdir 1>/dev/null
-	wget -nv -N ${MLNX_OFED_URL}${MLNX_OFED_PKG_NAME}
-	tar -zxv -f ${MLNX_OFED_PKG_NAME}
-
-	local untar_dir=$(echo ${MLNX_OFED_PKG_NAME} | sed s/.tgz//g)
-	pushd $untar_dir
-	yum install tk -y
-	./mlnxofedinstall --distro $distro --without-fw-update --force
-
-	/etc/init.d/openibd restart
-	popd 1>/dev/null
-	popd 1>/dev/null
-	return $?
 }
 
