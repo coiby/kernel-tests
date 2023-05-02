@@ -584,6 +584,10 @@ function main() {
 *******************************************************************************
 *******************************************************************************
 EOF
+      # rstrnt-report-result by default checks dmesg problems. We don't want
+      # this test to fail due to any problem found on the original kernel
+      dmesg -C
+
       rstrnt-report-result ${TEST}/kernel-in-place PASS 0
       rstrnt-reboot
       # Make sure the script doesn't continue if rstrnt-reboot get's killed
