@@ -436,12 +436,17 @@ Describe 'kpkginstall: main - install kernel'
         rpm_install(){
             return 0
         }
+        dmesg(){
+            echo "dmesg $*"
+            return 0
+        }
         io_test(){
             return 10
         }
         When call main
         The first line should equal "ℹ️ REBOOTCOUNT is 0"
         The stdout should include "✅ Found URL parameter: PACKAGE_NAME=$1"
+        The stdout should include "dmesg -C"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/kernel-in-place PASS 0"
         The stdout should include "rstrnt-reboot"
         The status should be success
