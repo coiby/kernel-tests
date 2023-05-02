@@ -47,30 +47,6 @@ echo "$params"
 # Check for the presense of the dt rpm package and install repo and package if necessary
 function install_dt()
 {
-    read -r -d '' rhcert_repo_7 <<'_EOF'
-[rhcert]
-name=rhcert hwcert repo RHEL7
-baseurl=http://hwcert-server.khw.lab.eng.bos.redhat.com/packages/devel/RHEL7/
-enabled=1
-gpgcheck=0
-_EOF
-
-    read -r -d '' rhcert_repo_6 <<'_EOF'
-[rhcert]
-name=rhcert hwcert repo RHEL6
-baseurl=http://hwcert-server.khw.lab.eng.bos.redhat.com/packages/devel/RHEL6/
-enabled=1
-gpgcheck=0
-_EOF
-
-    if [[ $(rlGetDistroRelease) -eq 6 ]] ; then
-        rhcert_repo=$rhcert_repo_6
-    else
-        echo "Assuming a RHEL7 compatibile distro for hwcert repo configuration."
-        echo "If this causes installation problems you will need to install dt manually."
-        rhcert_repo=$rhcert_repo_7
-    fi
-
     echo "Checking for dt..."
     yum list installed dt > /dev/null 2>&1
     if [ $? -eq 0 ] ; then
@@ -78,10 +54,6 @@ _EOF
         return 0
     else
         yum list available dt > /dev/null 2>&1
-        if [ $? -ne 0 ] ; then
-            echo "Adding rhcert repo for dt...."
-            echo "$rhcert_repo" > /etc/yum.repos.d/rhcert.repo
-        fi
         echo "Installing dt..."
         yum -y install dt
         if [ $? -eq 0 ] ; then
