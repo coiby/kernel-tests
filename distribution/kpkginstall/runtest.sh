@@ -311,7 +311,7 @@ function download_install_package()
     fi
   else
     # download
-    if $YUM download --resolve "$1" > /dev/null; then
+    if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" > /dev/null; then
     cki_print_success "Downloaded $1 successfully"
     else
       cki_abort_recipe "Failed to download ${1}!" WARN
@@ -320,19 +320,20 @@ function download_install_package()
     # install
     cki_print_info "$1 will be installed using rpm-ostree override"
     if ! [[ ${KPKG_VAR_PACKAGE_NAME} == *-debug ]]; then
-      if rpm-ostree override replace ./kernel*.rpm > /dev/null; then
+      if rpm-ostree override replace /root/kernel*.rpm > /dev/null; then
         cki_print_success "Installed $1 successfully"
       else
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
       fi
     else
       # debug kernel automotive
-      if rpm-ostree override remove kernel-automotive kernel-automotive-core kernel-automotive-modules \
-        kernel-automotive-modules-core\
-      --install "$(pwd)/kernel-automotive-debug-${KVER}.rpm"\
-      --install "$(pwd)/kernel-automotive-debug-core-${KVER}.rpm"\
-      --install "$(pwd)/kernel-automotive-debug-modules-${KVER}.rpm"\
-      --install "$(pwd)/kernel-automotive-debug-modules-core-${KVER}.rpm" > /dev/null; then
+      kpkg_automotive="kernel-automotive kernel-automotive-core kernel-automotive-modules"
+      rpm --quiet -q kernel-automotive-modules-core && kpkg_automotive="${kpkg_automotive} kernel-automotive-modules-core"
+      if rpm-ostree override remove $kpkg_automotive \
+        --install "/root/kernel-automotive-debug-${KVER}.rpm"\
+        --install "/root/kernel-automotive-debug-core-${KVER}.rpm"\
+        --install "/root/kernel-automotive-debug-modules-${KVER}.rpm"\
+        --install "/root/kernel-automotive-debug-modules-core-${KVER}.rpm" > /dev/null; then
         cki_print_success "Installed $1 successfully"
       else
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
