@@ -921,12 +921,6 @@ function YumUpgradeKernelHeaders ()
     DeBug "Enter YumUpgradeKernelHeaders"
     echo "***** Upgrade $KERNELHEADERS via yum *****" | tee -a $OUTPUTFILE
     REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
-    DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
-        if [[ ${DIFF} -gt 480 ]]; then
-             let DIFF_MIN=$DIFF/60
-             let DIFF_SEC=$DIFF%60
-             echo "***** WARN: Task took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s) to run *****" >> $OUTPUTFILE
-        fi
     DeBug "Yum upgrade $KERNELHEADERS"
     $yumcmd list all --showduplicates $KERNELHEADERS | grep -q $testkernver-$testkernrel
     if [ "$?" -eq "0" ]; then
@@ -1467,8 +1461,10 @@ else
             YumUpgradeKernelHeaders
             REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
             DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
-            if [[ ${DIFF} -gt 480 ]]; then
-                 DeBug "rhts-reboot took ${DIFF} seconds..."
+            if [[ ${DIFF} -gt ${MAX_REBOOT_TIME:-480} ]]; then
+                 let DIFF_MIN=$DIFF/60
+                 let DIFF_SEC=$DIFF%60
+                 echo "***** WARN: rhts-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-480} seconds *****" | tee -a $OUTPUTFILE
                  RprtRslt $TEST/${kernbase}_boot WARN $DIFF
             fi
             RprtRslt $TEST/$kernbase PASS $DIFF
