@@ -25,6 +25,16 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Enable TMT testing for RHIVOS
+auto_include=../../automotive/include/include.sh
+[ -f $auto_include ] && . $auto_include
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+
+if ! (($is_rhivos)); then
+    # Include rhts environment
+    . /usr/bin/rhts-environment.sh
+fi
+
 # Source the common test script helpers
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
@@ -33,36 +43,36 @@ WAIT_STATE=${WAIT_STATE:-"shut off"}
 
 # - use remote URI if running on remote node else just run locally as usual.
 if [ ! -z $RECIPE_ROLE_NODE ]; then
-	if [ $RECIPE_ROLE_NODE != $HOSTNAME ];then
-		export VIRSH_DEFAULT_CONNECT_URI=${VIRSH_DEFAULT_CONNECT_URI:-qemu+ssh://root@${RECIPE_ROLE_NODE}/system}
-	fi
+    if [ $RECIPE_ROLE_NODE != $HOSTNAME ];then
+        export VIRSH_DEFAULT_CONNECT_URI=${VIRSH_DEFAULT_CONNECT_URI:-qemu+ssh://root@${RECIPE_ROLE_NODE}/system}
+    fi
 fi
 
 poll_seconds=10
 
 get_guest_info.py | while IFS=$'\t' read guest_recipeid guest_name \
-	guest_mac guest_loc guest_ks guest_args guest_kernel_options
+    guest_mac guest_loc guest_ks guest_args guest_kernel_options
 do
-	if [ -z $guest_name ]; then
-		echo "No guestname can be found"
-		report_result ${TEST}_noguestname FAIL 1
-		continue
-	fi
-	echo "guest name is : $guest_name "
+    if [ -z $guest_name ]; then
+        echo "No guestname can be found"
+        report_result ${TEST}_noguestname FAIL 1
+        continue
+    fi
+    echo "guest name is : $guest_name "
 
-	while true
-	do
-		if ! virsh domstate $guest_name | head -n1 | grep -q "$WAIT_STATE"
-		then
-			echo "$guest_name still not "$WAIT_STATE", retrying in $poll_seconds seconds."
-			sleep $poll_seconds
-			continue
-		fi
+    while true
+    do
+        if ! virsh domstate $guest_name | head -n1 | grep -q "$WAIT_STATE"
+        then
+    	    echo "$guest_name still not "$WAIT_STATE", retrying in $poll_seconds seconds."
+    	    sleep $poll_seconds
+    	    continue
+        fi
 
-		echo "$guest_name stopped."
-		sleep 60
-		break
-	done
+        echo "$guest_name stopped."
+        sleep 60
+        break
+    done
 done
 
 report_result ${TEST}_stopped PASS 0

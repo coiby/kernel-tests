@@ -4,5 +4,6 @@ name=misc/wait-guest-poweroff
 owner=Oliver Gutierrez <ogutierr@redhat.com>
 
 [restraint]
+repoRequires=automotive/include
 entry_point=bash ./runtest.sh
 max_time=1h
