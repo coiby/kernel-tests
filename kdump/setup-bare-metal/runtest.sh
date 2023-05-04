@@ -99,7 +99,7 @@ SetupKdump()
             fi
         }
 
-        if [ -n "${KER1ARGS}" ] || $reset_flag; then
+        if [ -n "${KER1ARGS}" ]; then
             # Support translating crashkernel=auto test request to crashkernel=XXM for rhel9+
             if grep -q crashkernel=auto <<< "${KER1ARGS}" || \
                     kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
@@ -117,7 +117,10 @@ SetupKdump()
             Log "Changing boot loader."
 
             UpdateKernelOptions "${KER1ARGS}" || FatalError "Error changing boot loader."
+            reset_flag=true
+        fi
 
+        if $reset_flag; then
             Report 'pre-reboot'
             sync
             RhtsReboot
