@@ -65,16 +65,20 @@ SetupKdump()
         # KARGS="" | "<non-fadump-opts>"": no reset-
         #   e.g.: KARGS="amd_iommu=off"
         # KARGS="fadump=xxx"             : do reset-
+        local reset_flag=false
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
             local kdumpMem
             if kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
                 local fadump_opts
 
                 fadump_opts=$(awk 'match($0, /fadump=\w*/) { print substr($0, RSTART, RLENGTH) }' <<< "${KER1ARGS}")
-                [ -z "${fadump_opts}" ] || { # only reset fadump
+                if [ -z "${fadump_opts}" ]; then
+                    kdumpMem="$(DefKdumpMem)"
+                else # only reset fadump 
                     fadump_opts="--${fadump_opts}"
                     LogRun "kdumpctl reset-crashkernel ${fadump_opts}"
-                }
+                    reset_flag=true
+                fi
             else # use default value from kdump.sh
                 kdumpMem="$(DefKdumpMem)"
             fi
@@ -87,6 +91,7 @@ SetupKdump()
                 kdumpctl status > /dev/null 2>&1 || {
                     if kdumpctl -h 2>&1 | grep -q reset-crashkernel && [ "${#kdumpMem}" -gt 1 ]; then
                         LogRun "kdumpctl reset-crashkernel"
+                        reset_flag=true
                     else
                         KER1ARGS+="${kdumpMem}"
                     fi
@@ -94,7 +99,7 @@ SetupKdump()
             fi
         }
 
-        if [ -n "${KER1ARGS}" ]; then
+        if [ -n "${KER1ARGS}" ] || $reset_flag; then
             # Support translating crashkernel=auto test request to crashkernel=XXM for rhel9+
             if grep -q crashkernel=auto <<< "${KER1ARGS}" || \
                     kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
