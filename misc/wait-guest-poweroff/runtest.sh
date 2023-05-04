@@ -25,6 +25,16 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Enable TMT testing for RHIVOS
+auto_include=../../automotive/include/include.sh
+[ -f $auto_include ] && . $auto_include
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+
+if ! (($is_rhivos)); then
+    # Include rhts environment
+    . /usr/bin/rhts-environment.sh
+fi
+
 # Source the common test script helpers
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
