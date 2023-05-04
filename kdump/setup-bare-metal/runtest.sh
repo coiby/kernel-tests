@@ -62,17 +62,19 @@ SetupKdump()
         fi
 
         # Ensure Kdump Kernel memory reservation
+        # KARGS="" | "<non-fadump-opts>"": no reset-
+        #   e.g.: KARGS="amd_iommu=off"
+        # KARGS="fadump=xxx"             : do reset-
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
             local kdumpMem
-            local ck_opts
             if kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
-                if grep -q 'fadump' <<< "${KER1ARGS}"; then
-                    ck_opts=$(awk 'match($0, /fadump=\w*/) { print substr($0, RSTART, RLENGTH) }' <<< "${KER1ARGS}")
-                    ck_opts=" --${ck_opts}"
-                else
-                    ck_opts=" "
-                fi
-                LogRun "kdumpctl reset-crashkernel ${ck_opts}"
+                local fadump_opts
+
+                fadump_opts=$(awk 'match($0, /fadump=\w*/) { print substr($0, RSTART, RLENGTH) }' <<< "${KER1ARGS}")
+                [ -z "${fadump_opts}" ] || { # only reset fadump
+                    fadump_opts="--${fadump_opts}"
+                    LogRun "kdumpctl reset-crashkernel ${fadump_opts}"
+                }
             else # use default value from kdump.sh
                 kdumpMem="$(DefKdumpMem)"
             fi
@@ -80,9 +82,15 @@ SetupKdump()
 
             if $IS_RHEL5 ; then
                 KER1ARGS+="${kdumpMem}"
-            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then
+            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then # for fedora
                 # Check kdump status if it's fadump mode which caused kexec_crash_size is 0
-                kdumpctl status > /dev/null 2>&1 || KER1ARGS+="${kdumpMem}"
+                kdumpctl status > /dev/null 2>&1 || {
+                    if kdumpctl -h 2>&1 | grep -q reset-crashkernel && [ "${#kdumpMem}" -gt 1 ]; then
+                        LogRun "kdumpctl reset-crashkernel"
+                    else
+                        KER1ARGS+="${kdumpMem}"
+                    fi
+                }
             fi
         }
 
