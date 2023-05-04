@@ -310,6 +310,18 @@ function download_install_package()
       cki_abort_recipe "Failed to install $1!" FAIL
     fi
   else
+    cki_print_info "Test automotive installed kernel"
+    expected_release=$(kpkg_release)
+    cki_print_info "Expected: $expected_release"
+    ckver=$(uname -r)
+    cki_print_info "CKver: $ckver"
+    # rerun conditions
+    if [[ "${ckver}" == "${expected_release}" ]]; then
+      cki_print_success "re-run? Correct kernel-automotive release running: $ckver"
+      cki_print_info "Skip installing the kernel again"
+      return
+    fi
+
     # download
     if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" > /dev/null; then
     cki_print_success "Downloaded $1 successfully"
@@ -484,9 +496,7 @@ function io_test() {
   return $total_time
 }
 
-function main() {
-    cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
-    if [ "${REBOOTCOUNT}" -eq 0 ]; then
+function install_kernel() {
       local deps
       read -ra deps <<< "$TEST_DEPS"
       # set YUM var.
@@ -557,6 +567,13 @@ function main() {
       for _repo in ${_repofiles}; do
         sed -i "/^enabled=1/a exclude=${_exclude_pkgs}" "/etc/yum.repos.d/${_repo}"
       done
+}
+
+function main() {
+    cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
+    if [ "${REBOOTCOUNT}" -eq 0 ]; then
+
+      install_kernel
 
       # collect IO perf data on original kernel
       io_test
