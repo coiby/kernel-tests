@@ -74,7 +74,7 @@ SetupKdump()
                 fadump_opts=$(awk 'match($0, /fadump=\w*/) { print substr($0, RSTART, RLENGTH) }' <<< "${KER1ARGS}")
                 if [ -z "${fadump_opts}" ]; then
                     kdumpMem="$(DefKdumpMem)"
-                else # only reset fadump 
+                else # only reset fadump
                     fadump_opts="--${fadump_opts}"
                     LogRun "kdumpctl reset-crashkernel ${fadump_opts}"
                     reset_flag=true
