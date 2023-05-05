@@ -16,14 +16,16 @@ install_netsniff()
 
 	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
 		if ! rpm -q epel-release; then
-			$pkg_mgr "$pkg_mgr_inst_string"  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
+			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
 			local need_remove=1
 		else
 			local param="--enablerepo=epel"
 		fi
 	fi
 
-	$pkg_mgr "$pkg_mgr_inst_string"  jq netsniff-ng
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string  jq netsniff-ng
 
 	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
