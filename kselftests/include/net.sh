@@ -380,35 +380,39 @@ do_tc-testing_reset()
 }
 # ----------- init setups -----------
 
-# source skip/waive list
-if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
-	[ ! -f skip_waive.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive."${krelease}" -O skip_waive.list
-	[ ! -f param.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param."${krelease}" -O param.list
-else
-	# This list is used for upstream testing
-	[ ! -f skip_waive.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.list -O skip_waive.list
-	[ ! -f param.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.list -O param.list
-fi
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+	# source skip/waive list
+	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
+		[ ! -f skip_waive.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive."${krelease}" -O skip_waive.list
+		[ ! -f param.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param."${krelease}" -O param.list
+	else
+		# This list is used for upstream testing
+		[ ! -f skip_waive.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.list -O skip_waive.list
+		[ ! -f param.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.list -O param.list
+	fi
 
-if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
-	submit_log skip_waive.list
-	source skip_waive.list
+	if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
+		submit_log skip_waive.list
+		source skip_waive.list
 
-	SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
-	[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]}"
-	WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]}"
+		SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
+		[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]}"
+		WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]}"
 
-fi
+	fi
 
-if [ $(wc -l param.list | cut -f 1 -d ' ') -ne 0 ]; then
-	submit_log param.list
+	if [ $(wc -l param.list | cut -f 1 -d ' ') -ne 0 ]; then
+		submit_log param.list
 
-	while read -r line; do
-		echo "$line" | grep "^#" && continue
-		TEST_PARAMS="${line};$TEST_PARAMS"
-	done < param.list
+		while read -r line; do
+			echo "$line" | grep "^#" && continue
+			TEST_PARAMS="${line};$TEST_PARAMS"
+		done < param.list
+	fi
 fi
