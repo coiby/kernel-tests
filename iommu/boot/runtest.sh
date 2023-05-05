@@ -77,6 +77,7 @@ DefaultBootOptionsARM=default-boot-options-arm.txt
 # file to store current boot options being tested
 CurrentBootOptions=current-boot-options.txt
 cpuvendor=$(lscpu | grep "^Vendor ID" | awk '{print $NF}')
+echo $cpuvendor
 dmesgErrors=iommu-dmesg-errors.txt
 dmesgReport=iommu-dmesg-report.txt
 
@@ -191,13 +192,13 @@ if [[ -n $CMDLINEARGS ]]; then
 else
         a=$(lscpu)
         echo $a
-	if [[ $cpuvendor =~ "Intel" ]]; then
+	if [[ $cpuvendor = "GenuineIntel" ]]; then
 		bootOptions $DefaultBootOptionsIntel
 		dmesgErrors
-        elif [[ $cpuvendor =~ "Cavium" ]]; then
+        elif [[ $cpuvendor =~ "ARM" || $cpuvendor =~ "Cavium" || $cpuvendor =~ "FUJITSU" ]]; then
                 bootOptions $DefaultBootOptionsARM
                 dmesgErrors
-	elif [[ $cpuvendor =~ "AMD" ]]; then
+	elif [[ $cpuvendor = "AuthenticAMD" ]]; then
 		bootOptions $DefaultBootOptionsAMD
 		dmesgErrors
 	else
