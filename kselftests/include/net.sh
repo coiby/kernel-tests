@@ -25,7 +25,7 @@ install_netsniff()
 	fi
 
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string  jq netsniff-ng
+	$pkg_mgr $pkg_mgr_inst_string $param jq netsniff-ng
 
 	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
