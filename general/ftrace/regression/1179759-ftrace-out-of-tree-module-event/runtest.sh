@@ -29,6 +29,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../../cki_lib/libcki.sh || exit 1
+. ../../../../kernel-include/runtest.sh || exit 1
 
 BUG_INFO="1179759 - Trace event on out of tree module not functional"
 SRC_FILE="ftrace-page-stress.c"
@@ -40,27 +41,16 @@ PROC_FILE=/proc/sys/kernel/traceoff_on_warning
 TRACE_ON=/sys/kernel/debug/tracing/tracing_on
 TRACE_BUFFER=/sys/kernel/debug/tracing/trace
 
-name="kernel"
-
-if  cki_is_kernel_rt; then
-    name="${name}-rt"
-fi
-if cki_is_kernel_automotive; then
-    name="${name}-automotive"
-fi
-if  cki_is_kernel_debug; then
-    name="${name}-debug"
-fi
-
 function setup_phase(){
     rlPhaseStartSetup "Setup $BUG_INFO"
         mount |grep debug || rlRun "mount -t debugfs none /sys/kernel/debug"
+        devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
         if stat /run/ostree-booted > /dev/null 2>&1; then
             rpm -q trace-cmd || rpm-ostree install -A --idempotent --allow-inactive trace-cmd
-            rpm -q ${name}-devel || rpm-ostree install -A --idempotent --allow-inactive ${name}-devel
+            rpm -q ${devel_pkg} || rpm-ostree install -A --idempotent --allow-inactive ${devel_pkg}
         else
             rpm -q trace-cmd || yum -y install trace-cmd
-            rpm -q ${name}-devel || yum -y install ${name}-devel
+            rpm -q ${devel_pkg} || yum -y install ${devel_pkg}
         fi
         [[ ! $(uname -m) =~ x86_64|i386 ]] && unset ARCH
         pushd event_mod
