@@ -76,11 +76,7 @@ DefaultBootOptionsAMD=default-boot-options-amd.txt
 DefaultBootOptionsARM=default-boot-options-arm.txt
 # file to store current boot options being tested
 CurrentBootOptions=current-boot-options.txt
-if (($is_rhivos)); then 
-    cpuvendor=$(lscpu | grep "^Vendor ID" | awk '{print $NF}')
-else
-    cpuvendor=$(lscpu | grep "^Model name")
-fi
+cpuvendor=$(lscpu | grep "^Vendor ID" | awk '{print $NF}')
 dmesgErrors=iommu-dmesg-errors.txt
 dmesgReport=iommu-dmesg-report.txt
 
@@ -198,14 +194,14 @@ else
 	if [[ $cpuvendor =~ "Intel" ]]; then
 		bootOptions $DefaultBootOptionsIntel
 		dmesgErrors
-        elif [[ $cpuvendor =~ "ARM" ]]; then
+        elif [[ $cpuvendor =~ "Cavium" ]]; then
                 bootOptions $DefaultBootOptionsARM
                 dmesgErrors
 	elif [[ $cpuvendor =~ "AMD" ]]; then
 		bootOptions $DefaultBootOptionsAMD
 		dmesgErrors
 	else
-		rstrnt-report-result "${TEST}/nonAMDorIntelProcessor" "SKIP" 0
+		rstrnt-report-result "${TEST}/nonARMorAMDorIntelProcessor" "SKIP" 0
 		exit 0
 	fi
 fi
