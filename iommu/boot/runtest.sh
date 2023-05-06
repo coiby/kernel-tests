@@ -32,7 +32,7 @@ auto_include=../../automotive/include/include.sh
 declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 
 if (($is_rhivos)); then
-    if [[ ! -e "/usr/sbin/grubby" ]]; then
+	if [[ ! -e "/usr/sbin/grubby" ]]; then
 cat >/etc/yum.repos.d/rhel.repo <<EOF
 [baseos-rhel]
 baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$(arch)/os
@@ -59,9 +59,9 @@ baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/c
 enabled=1
 gpgcheck=0
 EOF
-        rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive grubby
-        rstrnt-reboot
-    fi
+		rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive grubby
+		rstrnt-reboot
+	fi
 fi
 
 # Include libraries
@@ -192,9 +192,9 @@ else
 	if [[ $cpuvendor = "GenuineIntel" ]]; then
 		bootOptions $DefaultBootOptionsIntel
 		dmesgErrors
-        elif [[ $cpuvendor =~ "ARM" || $cpuvendor =~ "Cavium" || $cpuvendor =~ "FUJITSU" ]]; then
-                bootOptions $DefaultBootOptionsARM
-                dmesgErrors
+	elif [[ $cpuvendor =~ "ARM" || $cpuvendor =~ "Cavium" || $cpuvendor =~ "FUJITSU" ]]; then
+		bootOptions $DefaultBootOptionsARM
+		dmesgErrors
 	elif [[ $cpuvendor = "AuthenticAMD" ]]; then
 		bootOptions $DefaultBootOptionsAMD
 		dmesgErrors
