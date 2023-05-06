@@ -199,7 +199,7 @@ else
 		bootOptions $DefaultBootOptionsAMD
 		dmesgErrors
 	else
-		rstrnt-report-result "${TEST}/nonARMorAMDorIntelProcessor" "SKIP" 0
+		rstrnt-report-result "${TEST}/nonAMDorARMorIntelProcessor" "SKIP" 0
 		exit 0
 	fi
 fi
