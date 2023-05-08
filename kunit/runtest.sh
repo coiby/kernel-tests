@@ -29,16 +29,19 @@ process_results(){
 	TMPFILE=$(mktemp) || exit 1
 	OUTFILE=$(mktemp) || exit 1
 	rlLog "processing results from test ${1}"
+	sed -i 's/KTAP version 1//g' "$1" #remove KTAP VERSION
 	sed -i '/^$/d' "$1" #remove all empty lines
-	sed -i 's/^    //g' "$1" #remove first tab
+	sed -i 's/    //g' "$1" #remove all tab
 	sed -i '/^#/d' "$1" #remove comments
 	sed -i 's/#.*//' "$1" #remove comments
 	sed -i '$d' "$1" #remove last line.
-	sed -i '/^\(ok\|not ok\|1..\)/!d' "$1" #removeall but 1..N and ok/not ok
+	sed -i '/^\(ok\|not ok\)/!d' "$1" #removeall but 1..N and ok/not ok
 	uniq "$1" > "$TMPFILE"  #remove dup
 
-	tappy "$TMPFILE" &> "$OUTFILE"
-	RESULT_OUTPUT=$(cat "$OUTFILE" |tail -1)
+	lines=$(wc -l "$TMPFILE")
+	echo "1..$lines" | cat - "$TMPFILE" > $OUTFILE
+	tappy "$OUTFILE" &> "$TMPFILE"
+	RESULT_OUTPUT=$(cat "$TMPFILE" |tail -1)
 	if [ "$RESULT_OUTPUT" = "OK" ]; then
 		return 0
 	else
