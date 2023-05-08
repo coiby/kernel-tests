@@ -62,15 +62,36 @@ SetupKdump()
         fi
 
         # Ensure Kdump Kernel memory reservation
+        # KARGS="" | "<non-fadump-opts>"": no reset-
+        #   e.g.: KARGS="amd_iommu=off"
+        # KARGS="fadump=xxx"             : do reset-
+        local reboot_required=false
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
-            local kdumpMem="$(DefKdumpMem)"
+            local kdumpMem
+            local fadump_opts
+            fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
+            if kdumpctl -h 2>&1 | grep -q reset-crashkernel && \
+                    [ -n "${fadump_opts}" ]; then
+                fadump_opts="--${fadump_opts}"
+                LogRun "kdumpctl reset-crashkernel ${fadump_opts}"
+                reboot_required=true
+            else # use default value from kdump.sh
+                kdumpMem="$(DefKdumpMem)"
+            fi
             [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
 
             if $IS_RHEL5 ; then
                 KER1ARGS+="${kdumpMem}"
-            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then
+            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then # for fedora
                 # Check kdump status if it's fadump mode which caused kexec_crash_size is 0
-                kdumpctl status > /dev/null 2>&1 || KER1ARGS+="${kdumpMem}"
+                kdumpctl status > /dev/null 2>&1 || {
+                    if kdumpctl -h 2>&1 | grep -q reset-crashkernel && [ "${#kdumpMem}" -gt 1 ]; then
+                        LogRun "kdumpctl reset-crashkernel"
+                        reboot_required=true
+                    else
+                        KER1ARGS+="${kdumpMem}"
+                    fi
+                }
             fi
         }
 
@@ -92,7 +113,10 @@ SetupKdump()
             Log "Changing boot loader."
 
             UpdateKernelOptions "${KER1ARGS}" || FatalError "Error changing boot loader."
+            reboot_required=true
+        fi
 
+        if $reboot_required; then
             Report 'pre-reboot'
             sync
             RhtsReboot
