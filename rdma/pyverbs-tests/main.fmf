@@ -4,7 +4,7 @@ contact: Zhaojuan Guo <zguo@redhat.com>
 component:
   - rdma
 path: /rdma/pyverbs-tests
-test: ./runtest.sh
+test: bash -x ./runtest.sh
 framework: shell
 duration: 20m
 tag:
