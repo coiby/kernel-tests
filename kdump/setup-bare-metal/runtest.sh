@@ -65,20 +65,16 @@ SetupKdump()
         # KARGS="" | "<non-fadump-opts>"": no reset-
         #   e.g.: KARGS="amd_iommu=off"
         # KARGS="fadump=xxx"             : do reset-
-        local reset_flag=false
+        local reboot_required=false
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
             local kdumpMem
-            if kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
-                local fadump_opts
-
-                fadump_opts=$(awk 'match($0, /fadump=\w*/) { print substr($0, RSTART, RLENGTH) }' <<< "${KER1ARGS}")
-                if [ -z "${fadump_opts}" ]; then
-                    kdumpMem="$(DefKdumpMem)"
-                else # only reset fadump
-                    fadump_opts="--${fadump_opts}"
-                    LogRun "kdumpctl reset-crashkernel ${fadump_opts}"
-                    reset_flag=true
-                fi
+            local fadump_opts
+            fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
+            if kdumpctl -h 2>&1 | grep -q reset-crashkernel && \
+                    [ -n "${fadump_opts}" ]; then
+                fadump_opts="--${fadump_opts}"
+                LogRun "kdumpctl reset-crashkernel ${fadump_opts}"
+                reboot_required=true
             else # use default value from kdump.sh
                 kdumpMem="$(DefKdumpMem)"
             fi
@@ -91,7 +87,7 @@ SetupKdump()
                 kdumpctl status > /dev/null 2>&1 || {
                     if kdumpctl -h 2>&1 | grep -q reset-crashkernel && [ "${#kdumpMem}" -gt 1 ]; then
                         LogRun "kdumpctl reset-crashkernel"
-                        reset_flag=true
+                        reboot_required=true
                     else
                         KER1ARGS+="${kdumpMem}"
                     fi
@@ -117,10 +113,10 @@ SetupKdump()
             Log "Changing boot loader."
 
             UpdateKernelOptions "${KER1ARGS}" || FatalError "Error changing boot loader."
-            reset_flag=true
+            reboot_required=true
         fi
 
-        if $reset_flag; then
+        if $reboot_required; then
             Report 'pre-reboot'
             sync
             RhtsReboot
