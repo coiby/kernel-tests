@@ -6,7 +6,7 @@ component:
 path: /rdma/rdma_tool
 test: ./runtest.sh
 framework: shell
-duration: 30 min
+duration: 2m
 tag:
   - regression
   - functional
