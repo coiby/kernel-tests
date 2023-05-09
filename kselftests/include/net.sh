@@ -36,7 +36,8 @@ install_smcroute()
 {
 	which smcroute && return 0
 	dnf copr -y enable liuhangbin/smcroute
-	$pkg_mgr "$pkg_mgr_inst_string" smcroute
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string smcroute
 	which smcroute && return 0 || return 1
 }
 
@@ -45,7 +46,8 @@ install_sendip()
 
 	which sendip && return 0
 	dnf -y copr enable cygn/SendIP
-	$pkg_mgr "$pkg_mgr_inst_string" sendip
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string sendip
 
 	which sendip && return 0 || return 1
 }
@@ -53,9 +55,11 @@ install_sendip()
 install_scapy()
 {
 	scapy -h && return 0
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	[ "${krelease}" -eq "8" ] && \
-		$pkg_mgr "$pkg_mgr_inst_string" https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-	$pkg_mgr "$pkg_mgr_inst_string" scapy
+		$pkg_mgr $pkg_mgr_inst_string https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string scapy
 	[ "${krelease}" -eq "8" ] && rpm -e epel-release
 	scapy -h && return 0 || return 1
 }
@@ -172,7 +176,8 @@ do_net_forwarding_config()
 {
 	set_network_env
 
-	which tc || $pkg_mgr "$pkg_mgr_inst_string" iproute-tc
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
 	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
 	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
 
@@ -223,7 +228,8 @@ do_netfilter_config()
 {
 	set_network_env
 
-	which conntrack || $pkg_mgr "$pkg_mgr_inst_string" conntrack-tools
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	which conntrack || $pkg_mgr $pkg_mgr_inst_string conntrack-tools
 	install_sendip
 }
 
@@ -318,7 +324,8 @@ do_tc-testing_config()
 	set_network_env
 
 	# prepare evn
-	$pkg_mgr "$pkg_mgr_inst_string" clang valgrind
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string clang valgrind
 	install_scapy
 	modprobe -r veth
 
