@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-repoRequires=cki_lib
+repoRequires=cki_lib;kernel-include
 max_time=1h
 dependencies=attr;audit;checkpolicy;coreutils;curl;dosfstools;e2fsprogs;elfutils-libelf-devel;expect;gcc;git;grep;iptables;keyutils-libs-devel;libbpf-devel;libibverbs-devel;libselinux-devel;libselinux-utils;libsepol-devel;libuuid-devel;lksctp-tools-devel;make;nc;netlabel_tools;net-tools;nftables;nmap-ncat;perl-Test;perl-Test-Harness;perl-Test-Simple;policycoreutils;policycoreutils-devel;python3-lxml;quota;rdma-core-devel;selinux-policy-devel;setools-console;xfsprogs-devel
 softDependencies=policycoreutils-python;python2-lxml;jfsutils

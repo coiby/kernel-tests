@@ -30,6 +30,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../../cki_lib/libcki.sh || exit 1
+. ../../../../kernel-include/runtest.sh || exit 1
 
 BUG_INFO="1149340 - ftrace: add traceoff_on_warning kernel cmdline option"
 SRC_FILE="ftrace-page-stress.c"
@@ -48,18 +49,6 @@ TEST_DONE=/home/1149340_DONE
 SET_BY_CMDLINE=${SET_BY_CMDLINE:-0}
 
 IS_SUPPORTED=1
-
-name="kernel"
-
-if  cki_is_kernel_rt; then
-name="$name}-rt"
-fi
-if cki_is_kernel_automotive; then
-name="${name}-automotive"
-fi
-if  cki_is_kernel_debug; then
-name="${name}-debug"
-fi
 
 function kernel_param_setup(){
     if [ ! -f $REBOOT_TAG ];then
@@ -94,12 +83,13 @@ function setup_phase(){
             return
         fi
 
+        devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
         if stat /run/ostree-booted > /dev/null 2>&1; then
             rpm -q trace-cmd || rpm-ostree install -A --idempotent --allow-inactive trace-cmd
-            rpm -q ${name}-devel || rpm-ostree install -A --idempotent --allow-inactive ${name}-devel
+            rpm -q ${devel_pkg} || rpm-ostree install -A --idempotent --allow-inactive ${devel_pkg}
         else
             rpm -q trace-cmd || yum -y install trace-cmd
-            rpm -q ${name}-devel || yum -y install ${name}-devel
+            rpm -q ${devel_pkg} || yum -y install ${devel_pkg}
         fi
 
         pushd warn_mod
