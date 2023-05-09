@@ -921,12 +921,6 @@ function YumUpgradeKernelHeaders ()
     DeBug "Enter YumUpgradeKernelHeaders"
     echo "***** Upgrade $KERNELHEADERS via yum *****" | tee -a $OUTPUTFILE
     REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
-    DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
-        if [[ ${DIFF} -gt 480 ]]; then
-             let DIFF_MIN=$DIFF/60
-             let DIFF_SEC=$DIFF%60
-             echo "***** WARN: Task took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s) to run *****" >> $OUTPUTFILE
-        fi
     DeBug "Yum upgrade $KERNELHEADERS"
     $yumcmd list all --showduplicates $KERNELHEADERS | grep -q $testkernver-$testkernrel
     if [ "$?" -eq "0" ]; then
@@ -1143,7 +1137,7 @@ fi
 if [ "$maxcpuCheck" -gt "0" ]; then
     # The  maxcpu  option is not in use.
     # Lets check the CPU count.
-    if [ "$REBOOTCOUNT" -eq "0" ]; then
+    if [ "$RSTRNT_REBOOTCOUNT" -eq "0" ]; then
         # Lets get the CPU count for the base kernel.
         # We will save the base kernel variables, in order to survive a reboot.
         /bin/uname -r > /mnt/testarea/base_kernelSaved
@@ -1266,7 +1260,7 @@ function Main ()
         if [ -f $OUTPUTDIR/boot.$kernbase ]; then
             SubmitLog $OUTPUTDIR/boot.$kernbase
         fi
-        RprtRslt $TEST/$kernbase PASS $REBOOTCOUNT
+        RprtRslt $TEST/$kernbase PASS $RSTRNT_REBOOTCOUNT
         DepmodChk
         SysReport
         [ -s "$DEBUGLOG" ] && SubmitLog "$DEBUGLOG"
@@ -1438,8 +1432,8 @@ if [ ! -s $OUTPUTDIR/boot.$kernbase ]; then
     cp $OUTPUTDIR/boot.messages $OUTPUTDIR/boot.$kernbase
 fi
 
-if [ "${REBOOTCOUNT}xx" == "xx" ]; then
-    REBOOTCOUNT=0
+if [ "${RSTRNT_REBOOTCOUNT}xx" == "xx" ]; then
+    RSTRNT_REBOOTCOUNT=0
 fi
 
 if [ -z "$KERNELARGNAME" -o -z "$KERNELARGVARIANT" -o -z "$KERNELARGVERSION" ]; then
@@ -1448,9 +1442,9 @@ if [ -z "$KERNELARGNAME" -o -z "$KERNELARGVARIANT" -o -z "$KERNELARGVERSION" ]; 
     RprtRslt $TEST/$kernbase FAIL 1
     exit 0
 else
-    if [ "$REBOOTCOUNT" == "0" ]; then
+    if [ "$RSTRNT_REBOOTCOUNT" == "0" ]; then
         Main
-    elif [ "$REBOOTCOUNT" == "1" ]; then
+    elif [ "$RSTRNT_REBOOTCOUNT" == "1" ]; then
         if [ -f $OUTPUTDIR/boot.$kernbase ]; then
             SubmitLog $OUTPUTDIR/boot.$kernbase
         fi
@@ -1458,7 +1452,7 @@ else
         CheckKernel $OPTIONSCheckKernel
         if [ "$?" = "1" ]; then
             DeBug "After reboot we are still not running the correct kernel"
-            RprtRslt $TEST/$kernbase FAIL $REBOOTCOUNT
+            RprtRslt $TEST/$kernbase FAIL $RSTRNT_REBOOTCOUNT
             RHTSAbort
         else
             DeBug "After reboot we are running the correct kernel"
@@ -1467,8 +1461,10 @@ else
             YumUpgradeKernelHeaders
             REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
             DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
-            if [[ ${DIFF} -gt 480 ]]; then
-                 DeBug "rhts-reboot took ${DIFF} seconds..."
+            if [[ ${DIFF} -gt ${MAX_REBOOT_TIME:-480} ]]; then
+                 let DIFF_MIN=$DIFF/60
+                 let DIFF_SEC=$DIFF%60
+                 echo "***** WARN: rhts-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-480} seconds *****" | tee -a $OUTPUTFILE
                  RprtRslt $TEST/${kernbase}_boot WARN $DIFF
             fi
             RprtRslt $TEST/$kernbase PASS $DIFF
