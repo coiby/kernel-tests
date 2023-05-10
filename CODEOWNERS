@@ -1,6 +1,9 @@
 [Codeowners]
 /CODEOWNERS @bgoncalv @lulinqing @mh21
 
+[AllowedInternalHosts]
+/.allowed-hosts @bgoncalv @lulinqing @mh21
+
 [tests]
 /filesystems/xfs/xfs-repair-dryrun/ @jbastianrh
 /general/crc32c-self-check/ @jbastianrh
