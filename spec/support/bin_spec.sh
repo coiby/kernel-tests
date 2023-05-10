@@ -25,3 +25,28 @@ Describe 'spec/support/bin/dnf'
         The status should be success
     End
 End
+
+Describe 'spec/support/bin/yum'
+    # arguments
+    # 1 - yum arguments
+    # 2 - yum package name
+    # 3 - expected arguments with globing
+    # 4 - expected arguments when preventing globing
+    Parameters
+        "install -y" "bash" "install -y bash" "'install -y' bash"
+        "install -y" "bash*" "install -y 'bash*'" "'install -y' 'bash*'"
+    End
+    It "can call yum with $1 $2 (intentional globbing and word splitting)"
+        # shellcheck disable=SC2086
+        When call yum $1 $2
+        The line 1 should equal "yum $3"
+        The status should be success
+    End
+    It "can call yum with \"$1\" \"$2\" (prevent globbing and word splitting)"
+        # The yum call is wrong, yum command would fail, but the command call
+        # is the same as would be called in bash
+        When call yum "$1" "$2"
+        The line 1 should equal "yum $4"
+        The status should be success
+    End
+End

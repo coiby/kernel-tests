@@ -21,11 +21,6 @@ Mock service
     exit 0
 End
 
-Mock yum
-    echo "yum $*"
-    exit 0
-End
-
 Mock mpathconf
     echo "mpathconf $*"
     exit 0
