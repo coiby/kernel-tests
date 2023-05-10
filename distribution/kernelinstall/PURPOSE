@@ -63,4 +63,4 @@ bkr workflow-tomorrow --whiteboard "verify migrate_pages [Bug 848473]" \
     --taskparam="KERNELARGNAME=kernel" \
     --taskparam="KERNELARGVARIANT=up" \
     --task="/kernel/distribution/ltp/generic" \
-    --machine="amd-pike-01.lab.bos.redhat.com"
+    --machine="$beaker_machine_hostname"
