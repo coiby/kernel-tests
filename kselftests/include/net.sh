@@ -16,14 +16,16 @@ install_netsniff()
 
 	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
 		if ! rpm -q epel-release; then
-			$pkg_mgr "$pkg_mgr_inst_string"  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
+			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
 			local need_remove=1
 		else
 			local param="--enablerepo=epel"
 		fi
 	fi
 
-	$pkg_mgr "$pkg_mgr_inst_string"  jq netsniff-ng
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string $param jq netsniff-ng
 
 	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
@@ -34,7 +36,8 @@ install_smcroute()
 {
 	which smcroute && return 0
 	dnf copr -y enable liuhangbin/smcroute
-	$pkg_mgr "$pkg_mgr_inst_string" smcroute
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string smcroute
 	which smcroute && return 0 || return 1
 }
 
@@ -43,7 +46,8 @@ install_sendip()
 
 	which sendip && return 0
 	dnf -y copr enable cygn/SendIP
-	$pkg_mgr "$pkg_mgr_inst_string" sendip
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string sendip
 
 	which sendip && return 0 || return 1
 }
@@ -51,9 +55,11 @@ install_sendip()
 install_scapy()
 {
 	scapy -h && return 0
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	[ "${krelease}" -eq "8" ] && \
-		$pkg_mgr "$pkg_mgr_inst_string" https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-	$pkg_mgr "$pkg_mgr_inst_string" scapy
+		$pkg_mgr $pkg_mgr_inst_string https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string scapy
 	[ "${krelease}" -eq "8" ] && rpm -e epel-release
 	scapy -h && return 0 || return 1
 }
@@ -170,7 +176,8 @@ do_net_forwarding_config()
 {
 	set_network_env
 
-	which tc || $pkg_mgr "$pkg_mgr_inst_string" iproute-tc
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
 	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
 	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
 
@@ -221,7 +228,8 @@ do_netfilter_config()
 {
 	set_network_env
 
-	which conntrack || $pkg_mgr "$pkg_mgr_inst_string" conntrack-tools
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	which conntrack || $pkg_mgr $pkg_mgr_inst_string conntrack-tools
 	install_sendip
 }
 
@@ -316,7 +324,8 @@ do_tc-testing_config()
 	set_network_env
 
 	# prepare evn
-	$pkg_mgr "$pkg_mgr_inst_string" clang valgrind
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string clang valgrind
 	install_scapy
 	modprobe -r veth
 
@@ -378,35 +387,39 @@ do_tc-testing_reset()
 }
 # ----------- init setups -----------
 
-# source skip/waive list
-if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
-	[ ! -f skip_waive.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive."${krelease}" -O skip_waive.list
-	[ ! -f param.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param."${krelease}" -O param.list
-else
-	# This list is used for upstream testing
-	[ ! -f skip_waive.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.list -O skip_waive.list
-	[ ! -f param.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.list -O param.list
-fi
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+	# source skip/waive list
+	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
+		[ ! -f skip_waive.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive."${krelease}" -O skip_waive.list
+		[ ! -f param.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param."${krelease}" -O param.list
+	else
+		# This list is used for upstream testing
+		[ ! -f skip_waive.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.list -O skip_waive.list
+		[ ! -f param.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.list -O param.list
+	fi
 
-if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
-	submit_log skip_waive.list
-	source skip_waive.list
+	if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
+		submit_log skip_waive.list
+		source skip_waive.list
 
-	SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
-	[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]}"
-	WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]}"
+		SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
+		[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]}"
+		WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]}"
 
-fi
+	fi
 
-if [ $(wc -l param.list | cut -f 1 -d ' ') -ne 0 ]; then
-	submit_log param.list
+	if [ $(wc -l param.list | cut -f 1 -d ' ') -ne 0 ]; then
+		submit_log param.list
 
-	while read -r line; do
-		echo "$line" | grep "^#" && continue
-		TEST_PARAMS="${line};$TEST_PARAMS"
-	done < param.list
+		while read -r line; do
+			echo "$line" | grep "^#" && continue
+			TEST_PARAMS="${line};$TEST_PARAMS"
+		done < param.list
+	fi
 fi
