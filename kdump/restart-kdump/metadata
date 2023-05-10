@@ -1,0 +1,13 @@
+[General]
+name=kdump/restart-kdump
+owner=Kdump QE <kdump-qe-list@redhat.com>
+description=Restart kdump service
+license=GPLv3
+confidential=TBD_CASE_CONFIDENTIAL
+destructive=TBD_CASE_DESTRUTIVE
+[restraint]
+entry_point=make run
+dependencies=TBD_CASE_PACKAGES
+repoRequires=automotive/include
+max_time=30m
+use_pty=false
