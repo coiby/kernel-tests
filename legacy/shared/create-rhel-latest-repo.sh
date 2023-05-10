@@ -80,16 +80,6 @@ URL_REPO_CANDIDATES=(
     ## There are z-stream releases for which nightlies are not built. In such -
     ## cases, we can use rel-eng as a fallback option as they are second best.-
     "http://download.eng.bos.redhat.com/rhel-$MAJOR/rel-eng/updates/RHEL-$MAJOR/latest-RHEL-$VERSION_ID/compose/Server$COMPOSE/$BASEARCH/os/"
-
-    ## Internal pulp: EUS and AUS ---------------------------------------------
-    ## These definitions are kept around as a fallback, really. They serve ----
-    ## quite old z-stream releases (e.g., at the time of writing, RHEL 5). ----
-
-    # Internal pulp: Extended User Support
-    "https://rhsm-pulp.corp.redhat.com/content/eus/rhel/server/$MAJOR/$VERSION_ID/$BASEARCH/os/"
-
-    # Internal pulp: AUS
-    "https://rhsm-pulp.corp.redhat.com/content/aus/rhel/server/$MAJOR/$VERSION_ID/$BASEARCH/os/"
 )
 
 baseurl=""
