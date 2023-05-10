@@ -50,3 +50,27 @@ Describe 'spec/support/bin/yum'
         The status should be success
     End
 End
+
+Describe 'spec/support/bin/rpm'
+    # arguments
+    # 1 - rpm arguments
+    # 2 - expected arguments with globing
+    # 3 - expected arguments when preventing globing
+    Parameters
+        "-q -qf bash" "-q -qf bash" "'-q -qf bash'"
+        "-ivh kernel-*.src.rpm" "-ivh 'kernel-*.src.rpm'" "'-ivh kernel-*.src.rpm'"
+    End
+    It "can call rpm with $1 (intentional globbing and word splitting)"
+        # shellcheck disable=SC2086
+        When call rpm ${1}
+        The line 1 should equal "rpm $2"
+        The status should be success
+    End
+    It "can call rpm with \"$1\" (prevent globbing and word splitting)"
+        # The rpm call is wrong, rpm command would fail, but the command call
+        # is the same as would be called in bash
+        When call rpm "${1}"
+        The line 1 should equal "rpm $3"
+        The status should be success
+    End
+End

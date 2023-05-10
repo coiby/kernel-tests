@@ -48,11 +48,6 @@ Mock rlRun
     fi
 End
 
-Mock rpm
-    echo "rpm $*"
-    exit 0
-End
-
 Mock rm
     echo "rm $*"
     exit 0
