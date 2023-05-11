@@ -2,6 +2,7 @@ summary: Installs required kernel and kpatch RPM
 discover:
     how: fmf
     test:
+        - /distribution/kernelinstall/tests/kernelinstall
         - /distribution/kpatchinstall/tests/kpatchinstall
 execute:
     how: tmt
