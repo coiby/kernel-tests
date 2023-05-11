@@ -1,3 +1,12 @@
+# Enable TMT testing for RHIVOS
+. ../../automotive/include/include.sh
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+
+if ! (($is_rhivos)); then
+	# Include rhts environment
+	. /usr/bin/rhts-environment.sh || exit 1
+fi
+
 #!/bin/bash
 
 command_arguments=""
