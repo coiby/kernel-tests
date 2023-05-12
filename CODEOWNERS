@@ -53,7 +53,6 @@
 [CKI]
 /acpi/acpitable/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /acpi/enabled/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/autofs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /container/podman/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /core-kernel/module_diff/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
