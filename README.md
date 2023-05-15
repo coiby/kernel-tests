@@ -1,7 +1,7 @@
 # Red Hat Kernel QE and CKI kernel tests repository
 
 The main branch is continuously synced to the [internal
-mirror](https://gitlab.cee.redhat.com/api/v4/projects/kernel-qe%2fkernel-tests-public/repository/archive.zip?sha=refs/heads/main).
+mirror](https://documentation.internal.cki-project.org/docs/test-maintainers/repository-setup/#mirroring-of-kernel-tests).
 
 <details>
 <summary>Click here for an example on how to trigger a Beaker job with it.</summary>
@@ -18,7 +18,7 @@ mirror](https://gitlab.cee.redhat.com/api/v4/projects/kernel-qe%2fkernel-tests-p
       </distroRequires>
       <hostRequires/>
       <task name="/test/misc/machineinfo">
-        <fetch url="https://gitlab.cee.redhat.com/api/v4/projects/kernel-qe%2fkernel-tests-public/repository/archive.zip?sha=refs/heads/main#test/misc/machineinfo"/>
+        <fetch url="https://${internal_gitlab_url}/api/v4/projects/kernel-qe%2fkernel-tests-public/repository/archive.zip?sha=refs/heads/main#test/misc/machineinfo"/>
         <params/>
       </task>
     </recipe>
