@@ -218,7 +218,7 @@ function prepare_for_kernelinstall ()
     fi
 
     if [ -n "$KERNELREPOTMPL" ]; then
-        # example: http://autobkr.app.eng.bos.redhat.com/repos/#name/#version/#release
+        # example: http://${baseurl}/repos/#name/#version/#release
         local repourl=$KERNELREPOTMPL
         logmsg "kernel repourl: $repourl ->"
         repourl=$(echo $repourl | sed "s/#name/kernel/")
