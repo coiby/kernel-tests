@@ -80,6 +80,7 @@ int set_get_opt_test()
 
 #ifdef SO_NO_CHECK
 	printf("== set SO_NO_CHECK on UDPv4 socket ==\n");
+	fflush(NULL);
 	val = 1;
 	ret = setsockopt(sk1, SOL_SOCKET, SO_NO_CHECK, (char *)&val, sizeof(val)); 
 	if (ret != 0){
@@ -101,6 +102,7 @@ int set_get_opt_test()
 
 #ifdef UDP_NO_CHECK6_RX
 	printf("== set UDP_NO_CHECK6_RX on UDPv4 socket ==\n");
+	fflush(NULL);
 	val = 1;
 	ret = setsockopt(sk1, IPPROTO_UDP, UDP_NO_CHECK6_RX, (char *)&val, sizeof(val));
 	if (!ret) { // expect error, ignore error, just print out the msg
@@ -108,6 +110,7 @@ int set_get_opt_test()
 		//exit(1);
 	}
 	printf("== set UDP_NO_CHECK6_RX on UDPv6 socket ==\n");
+	fflush(NULL);
 	val = 1;
 	ret = setsockopt(sk2, IPPROTO_UDP, UDP_NO_CHECK6_RX, (char *)&val, sizeof(val));
 	if (ret == -1) {
@@ -375,11 +378,13 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 		printf("received %d bytes from peer\n", ret);
+		fflush(NULL);
 		if (en_raw_sk) {
 			// On the incoming side UDP seems to treat a checksum of 0 as valid.
 			struct udphdr *uh = (struct udphdr *)buffer;
 			if (uh->check == 0) {
 				printf("udp checksum is 0\n");
+				fflush(NULL);
 			}
 		}
 	}
