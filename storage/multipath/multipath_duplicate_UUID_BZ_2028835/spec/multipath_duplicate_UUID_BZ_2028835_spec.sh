@@ -21,11 +21,6 @@ Mock service
     exit 0
 End
 
-Mock yum
-    echo "yum $*"
-    exit 0
-End
-
 Mock mpathconf
     echo "mpathconf $*"
     exit 0
@@ -51,11 +46,6 @@ Mock rlRun
     if [[ "$1" =~ "multipath -ll" ]]; then
         eval "$*"
     fi
-End
-
-Mock rpm
-    echo "rpm $*"
-    exit 0
 End
 
 Mock rm

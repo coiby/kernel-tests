@@ -8,10 +8,6 @@ Include networking/common/include.sh
 export RPM_KERNEL_VERION="5.14.0-234.el9.x86_64"
 export TARBALL_KERNEL_VERION="6.2.0-rc3"
 
-Mock yum
-    echo "yum $*"
-End
-
 Mock rpm
     if [ "$*" == "-qf /boot/config-${TARBALL_KERNEL_VERION}" ]; then
         # simulate the kernel version is not from rpm

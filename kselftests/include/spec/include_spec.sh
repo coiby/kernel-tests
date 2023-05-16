@@ -7,15 +7,12 @@ Mock rhel_major
 End
 Include kselftests/include/net.sh
 
-Mock which
-    echo "which $1"
-    exit "$WHICH_EXITCODE"
-End
 
-function dnf(){
-    bash -x -c 'echo dnf "$@"' -- "$@" 2>&1 >/dev/null | cut -c 8-
-    # To inform the package is installed on which command
-    WHICH_EXITCODE=0
+function which(){
+    echo "which $1"
+    exit_code=${WHICH_EXITCODES[0]}
+    export WHICH_EXITCODES=${WHICH_EXITCODES[@]:1}
+    return "$exit_code"
 }
 
 export pkg_mgr="dnf"
@@ -27,8 +24,9 @@ Describe 'kselftests/include/net install_netsniff'
         return "${RPM_EPEL:-1}"
     }
 
+    # the function call which command twice
+    export WHICH_EXITCODES=(1 0)
     It "can install_netsniff krelease 7"
-        export WHICH_EXITCODE=1
         export krelease=7
         When call install_netsniff
         The line 1 should equal "which mausezahn"
@@ -38,7 +36,6 @@ Describe 'kselftests/include/net install_netsniff'
     End
 
     It "can install_netsniff krelease 8 no epel"
-        export WHICH_EXITCODE=1
         export krelease=8
         When call install_netsniff
         The line 1 should equal "which mausezahn"
@@ -50,7 +47,6 @@ Describe 'kselftests/include/net install_netsniff'
      End
 
     It "can install_netsniff krelease 9 with epel"
-        export WHICH_EXITCODE=1
         export RPM_EPEL=0
         export krelease=9
         When call install_netsniff
@@ -62,8 +58,9 @@ Describe 'kselftests/include/net install_netsniff'
 End
 
 Describe 'kselftests/include/net install_smcroute'
+    # the function call which command twice
+    export WHICH_EXITCODES=(1 0)
     It "can install_smcroute"
-        export WHICH_EXITCODE=1
         When call install_smcroute
         The line 1 should equal "which smcroute"
         The line 2 should equal "dnf copr -y enable liuhangbin/smcroute"
@@ -74,8 +71,9 @@ Describe 'kselftests/include/net install_smcroute'
 End
 
 Describe 'kselftests/include/net install_sendip'
+    # the function call which command twice
+    export WHICH_EXITCODES=(1 0)
     It "can call install_sendip"
-        export WHICH_EXITCODE=1
         When call install_sendip
         The line 1 should equal "which sendip"
         The line 2 should equal "dnf -y copr enable cygn/SendIP"
@@ -86,22 +84,16 @@ Describe 'kselftests/include/net install_sendip'
 End
 
 Describe 'kselftests/include/net install_scapy'
+    # the function call scapy command twice
+    export SCAPY_EXITCODES=(1 0)
     It "can call install_scapy"
         scapy(){
             echo "scapy $*"
-            return "$SCAPY_EXITCODE"
+            exit_code=${SCAPY_EXITCODES[0]}
+            export SCAPY_EXITCODES=${SCAPY_EXITCODES[@]:1}
+            return "$exit_code"
         }
 
-        function rpm(){
-            echo "rpm $*"
-        }
-
-        function dnf(){
-            bash -x -c 'echo dnf "$@"' -- "$@" 2>&1 >/dev/null | cut -c 8-
-            # To inform the package is installed on which command
-            SCAPY_EXITCODE=0
-        }
-        export SCAPY_EXITCODE=1
         export krelease=8
         When call install_scapy
         The line 1 should equal "scapy -h"
