@@ -1,0 +1,10 @@
+[General]
+name=rdma/eth-tools
+owner=Zhaojuan Guo <zguo@redhat.com>
+description=eth-tools test suite
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+repoRequires=rdma/common

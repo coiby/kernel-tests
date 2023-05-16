@@ -1,0 +1,21 @@
+summary: KS-RDMA-TC:rdma_tool
+description: Test the /usr/sbin/rdma iproute utility
+contact: Zhaojuan Guo <zguo@redhat.com>
+component:
+  - rdma
+path: /rdma/rdma_tool
+test: ./runtest.sh
+framework: shell
+duration: 2m
+tag:
+  - regression
+  - functional
+tier: 2
+enabled: true
+adjust:
+    enabled: false
+    when: distro < rhel-8
+    because: The feature was added in rhel-8
+extra-summary: /rdma/rdma_tool
+extra-task: /rdma/rdma_tool
+id: 7632796c-fb4b-4486-a94c-7d2fdeb1c98c

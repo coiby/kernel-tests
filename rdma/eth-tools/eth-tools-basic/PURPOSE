@@ -1,0 +1,10 @@
+# Purpose
+
+eth-tools-basic functional test
+https://github.com/intel/eth-fast-fabric
+
+# Where to run
+RoCE HCA, including modern mlx5, Intel E810
+
+# Known issues
+

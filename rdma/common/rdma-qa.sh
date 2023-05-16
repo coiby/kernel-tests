@@ -188,23 +188,6 @@ function RQA_set_pyexec {
 function RQA_install_packages() {
     # the very core packages available on all release
     $PKGINSTALL rdma-core libibverbs libibverbs-utils libibverbs-devel librdmacm librdmacm-utils librdmacm-devel perftest iperf3 infiniband-diags iscsi-initiator-utils
-    hfi1=$(lspci | grep -i Omni-Path)
-    if [ -n "$hfi1" ]; then
-        $PKGINSTALL opa-fm opa-fastfabric opa-address-resolution opa-basic-tools libpsm2
-        if ! opafabricinfo; then
-            systemctl enable opafm --now
-            systemctl status opafm
-            opafabricinfo
-        fi
-    else
-        $PKGINSTALL opensm
-        systemctl enable opensm --now
-        systemctl status opensm
-        sminfo
-        ibnodes
-        ibhosts
-        iblinkinfo
-    fi
 }
 
 ##

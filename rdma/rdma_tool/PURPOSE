@@ -1,0 +1,17 @@
+## Purpose
+
+Test the /usr/sbin/rdma in iproute utility.
+$ rdma
+Usage: rdma [ OPTIONS ] OBJECT { COMMAND | help }
+       rdma [ -f[orce] ] -b[atch] filename
+where  OBJECT := { dev | link | resource | system | statistic | help }
+       OPTIONS := { -V[ersion] | -d[etails] | -j[son] | -p[retty] -r[aw]}
+
+## Where to run
+
+All HCAs
+
+## Known issues
+
+Introduced and available in RHEL-8.0+.
+
