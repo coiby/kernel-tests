@@ -18,6 +18,4 @@ framework: beakerlib
 duration: 3h
 extra-summary: container/podman
 extra-task: container/podman
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291930
 id: 79c01611-e568-4fd9-aa3a-fd6803599f80

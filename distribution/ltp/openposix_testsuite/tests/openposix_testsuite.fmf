@@ -1,11 +1,6 @@
 summary: Linux Test Project openposix testsuite KernelTier1
 description: kernel/distribution/ltp/openposix_testsuite
 enabled: true
-link:
-  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-56918
-  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-56927
-  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-56922
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-56234
 id: 3e086fed-d2a4-474b-b7cc-a79bfe8e0bb0
 tag:
   - fmf-export

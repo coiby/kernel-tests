@@ -17,6 +17,4 @@ recommend:
 duration: 40m
 extra-summary: /kernel/power-management/cpupower/cpupower_monitor
 extra-task: /kernel/power-management/cpupower/cpupower_monitor
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291952
 id: 1c3d9ab5-2139-4e29-bc90-3a4c4a2a60ee
