@@ -59,7 +59,7 @@ function set_mem()
 		export MEM="${MEM:-4096M}"
 	} else {
 		echo "Sorry, the system RAM is too low to test."
-		rstrnt-report-result Test_Skipped PASS 99
+		rstrnt-report-result $RSTRNT_TASKNAME SKIP
 		exit 0
 	}
 	fi
