@@ -195,6 +195,7 @@
 /filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing @nstraz
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
 /general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/iommu/boot/ @bgoncalv @lulinqing @wrgrh
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
 /kdump-cki/kdump-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
@@ -234,13 +235,19 @@
 /networking/vnic/sriov/ @bgoncalv @lulinqing @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
+/packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @lulinqing @psklenar1
+/packages/iotop/sanity/ @bgoncalv @lulinqing @xjezda00
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
+/packages/net-snmp/tcp-transport/ @bgoncalv @efedin @lulinqing
 /packages/perf/internal-testsuite/ @bgoncalv @lulinqing @mpetlan
 /packages/perf/perftool-testsuite/ @bgoncalv @lulinqing @mpetlan
 /packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @ckalina @lulinqing
 /packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @ckalina @lulinqing
 /packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @ckalina @lulinqing
-/packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
+/packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @milosmalik @omos
+/packages/tuned/tune-processes-through-perf/ @bgoncalv @lulinqing @psklenar1
+/pciutils/sanity-smoke/ @bgoncalv @lulinqing @wrgrh
+/pciutils/update-pciids/ @bgoncalv @lulinqing @wrgrh
 /power-management/cpufreq/cpufreq_governor/ @Precambrian_horror @bgoncalv @lulinqing
 /rt-tests/latency_perf/oslat_valid/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/latency_perf/rt_cyclic/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
