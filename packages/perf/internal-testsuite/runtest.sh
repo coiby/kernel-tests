@@ -111,12 +111,17 @@ rlJournalStart
 	                INSTALL_CMD="debuginfo-install -y"
 	                if cki_is_kernel_automotive; then
 	                    INSTALL_CMD="rpm-ostree -A --idempotent --allow-inactive install"
-		else
+		        else
 			    # we need to install debuginfo for the proper kernel
 			    # but sometimes, debuginfo-install is not available!
 			    which debuginfo-install || rlRun "yum -y install yum-utils dnf-utils" 0 "Installing {yum,dnf}-utils (it has not been present)"
 	                fi
 	                rlRun "$INSTALL_CMD $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing ($KERNEL_DEBUGINFO_PKG_NAME) via ($INSTALL_CMD)"
+		fi
+		rpmquery $KERNEL_DEBUGINFO_PKG_NAME
+		if [ $? -ne 0 ]; then
+			INSTALL_CMD="yum install -y"
+			rlRun "$INSTALL_CMD $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing ($KERNEL_DEBUGINFO_PKG_NAME) via ($INSTALL_CMD)"
 		fi
 		rlRun "rpmquery $KERNEL_DEBUGINFO_PKG_NAME" 0 "Correct debuginfo is installed ($KERNEL)"
 		# return Skip when correct kernel debug is not installed
