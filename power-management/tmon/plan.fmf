@@ -9,5 +9,5 @@ prepare:
   - name: Enable Repos
     how: shell
     script: |
-        . ./automotive/include/include.sh
+        . ./automotive/include/rhivos.sh
         install_repos
