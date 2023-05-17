@@ -12556,7 +12556,7 @@ sriov_test_cntvf_reboot()
 			ip link set $nic_test vf $i max_tx_rate 200
 		done
 		echo "#########finished vf config#####"
-		ip link show 
+		ip link show
 	}
 
 
@@ -12749,7 +12749,7 @@ sriov_test_podcntvf1_podcntvf2()
 	else
 		local test_iface="$(get_test_nic ${NIC_NUM})"
 	fi
-	if [ $? -ne 0 ];then 
+	if [ $? -ne 0 ];then
 		echo "$test_name get required_iface failed."
 		sync_set server ${test_name}_end
 		return 1
@@ -12762,7 +12762,7 @@ sriov_test_podcntvf1_podcntvf2()
 	local mac1="00:de:a1:$(printf %02x $ipaddr):11:01"
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
-	if ! sriov_create_vfs $iface1 0 2 || 
+	if ! sriov_create_vfs $iface1 0 2 ||
 	   ! sriov_create_vfs $iface2 0 2; then
 	   	rlLog "${test_name} failed:create vfs failed."
 	   	sriov_remove_vfs $iface1 0
