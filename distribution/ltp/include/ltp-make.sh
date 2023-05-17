@@ -17,7 +17,7 @@ if [ -z ${TESTVERSION} ]; then
         TESTVERSION="20210927"
     else
         # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
-        TESTVERSION="20230127"
+        TESTVERSION="20230516"
     fi
 fi
 
@@ -101,6 +101,12 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
+    if [ "$TESTVERSION" == "20230127" ]; then
+        # Tips: this patch should be applied in single on ltp-next(version > 20180926)
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+    fi
     if [ "$TESTVERSION" == "20230127" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
