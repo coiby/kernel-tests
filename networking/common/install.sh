@@ -759,7 +759,7 @@ kernel_modules_extra_install()
 
 kselftests_install()
 {
-	. ../../../automotive/include/rhivos.sh || . /mnt/tests/kernel/automotive/include/rhivos.sh
+	. ../../../automotive/include/rhivos.sh
 	local kname1="kernel"
 	local kname2="${kname1}"
 	local kernel_ver="$(uname -r)"
