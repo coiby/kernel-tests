@@ -84,7 +84,7 @@ See examples below to properly abort or skip in beaker:
 ### Abort task if infrastructure failure is task only related
 ~~~
 if [ $? -ne 0 ]; then
-    rlLog "Aborting test because $reason"
+    echo "Aborting test because $reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 fi
@@ -93,7 +93,7 @@ fi
 ### Abort recipe if infrastructure failure affects the entire recipe
 ~~~
 if [ $? -ne 0 ]; then
-    rlLog "Aborting recipe because $reason"
+    echo "Aborting recipe because $reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     rstrnt-abort recipe
 fi
@@ -102,7 +102,7 @@ fi
 ### Skip the task (e.g. testing with unsupported hardware)
 ~~~
 if [ $? -ne 0 ]; then
-    rlLog "Skipping test because $reason"
+    echo "Skipping test because $reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
     exit 0
 fi
