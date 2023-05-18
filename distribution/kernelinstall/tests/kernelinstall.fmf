@@ -4,7 +4,6 @@ test: chmod a+x ./runtest.sh; ./runtest.sh
 path: /distribution/kernelinstall
 framework: shell
 require:
-  - kernel-headers
   - iproute
   - ethtool
 duration: 120m

@@ -916,7 +916,7 @@ function YumUpgradeKernelHeaders ()
         return 0
     fi
 
-    KERNELHEADERS=kernel-headers-$testkernver-$testkernrel
+    KERNELHEADERS=$(K_GetRunningKernelRpmSubPackageNVR headers)
 
     DeBug "Enter YumUpgradeKernelHeaders"
     echo "***** Upgrade $KERNELHEADERS via yum *****" | tee -a $OUTPUTFILE
