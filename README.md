@@ -38,11 +38,11 @@ $ sudo dnf install -y beaker-client beakerlib restraint-rhts
 ### How to check the tests
 
 Every time a test is pushed it gets automatically checked for syntax or format
-errors with [ShellCheck](https://github.com/koalaman/shellcheck). It's convenient
+errors with [ShellCheck](https://github.com/koalaman/shellcheck) or [yamllint](https://www.redhat.com/sysadmin/check-yaml-yamllint) depending on the file type. It's convenient
 to use it locally before to push the code, to save some time and be able to quickly
 catch misspellings and silly errors.
 
-To check locally for those errors it's recommended to install `ShellCheck` with
+To check locally for those errors for shell scripts it's recommended to install `ShellCheck` with
 the package manager (e.g. `dnf install ShellCheck`) and to run this line in the
 directory of the changed code:
 
@@ -56,6 +56,16 @@ recursively with the following:
 ```shell
 $ find -name '*.sh' -exec shellcheck -S error {} +
 ```
+Also, to check bash lines ending with white spaces use command:
+```shell
+$ grep -ne '\s$' <filename>
+```
+
+To check lint for yaml files, use yamllint:
+ ```shell
+$ yamllint -s <filename>
+```
+
 
 ## Test onboarding
 
