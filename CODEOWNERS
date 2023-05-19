@@ -71,6 +71,8 @@
 /filesystems/nfs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /filesystems/xfs/xfstests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /firmware/user-specified/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/general/memory/function/kaslr/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/general/memory/function/memfd_create/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /general/process/trinity_git/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /iommu/boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /ipmi/stress/driver/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -87,8 +89,6 @@
 /legacy/whitelist/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /livepatch/selftests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /memory/fork_mem/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/memory/function/kaslr/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/memory/function/memfd_create/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /misc/amtu/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /misc/header-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /misc/kernel-fips-mode/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -194,6 +194,8 @@
 /filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
 /filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing @nstraz
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
+/general/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/general/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /iommu/boot/ @bgoncalv @lulinqing @wrgrh
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
@@ -208,8 +210,6 @@
 /legacy/whitelist/ @bgoncalv @ckalina @lulinqing
 /livepatch/selftests/ @bgoncalv @joe.lawrence @lulinqing @ykopkova
 /memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /misc/header-test/ @bgoncalv @jbastianrh @lulinqing
 /misc/kernel-fips-mode/ @bgoncalv @lulinqing @omoris
