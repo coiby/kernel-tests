@@ -20,5 +20,3 @@ adjust:
     enabled: false
     when: arch != x86_64
 id: dfa853b1-3b93-4fac-aca1-4954d901fed0
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291765

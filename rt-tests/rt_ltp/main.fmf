@@ -5,7 +5,4 @@ framework: shell
 duration: 3h
 extra-summary: rt-tests/rt_ltp
 extra-task: rt-tests/rt_ltp
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHIVOS/workitem?id=RHIVOS-585
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291766
 id: fe2088af-8301-448f-9fa5-43f41c1be4f7

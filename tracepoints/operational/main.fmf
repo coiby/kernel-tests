@@ -11,6 +11,4 @@ require:
   - systemtap
 extra-summary: tracepoints/operational
 extra-task: tracepoints/operational
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291931
 id: dbea203c-2c8d-4c18-b9a3-40bfa84f9c03

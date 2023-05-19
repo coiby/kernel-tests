@@ -9,6 +9,4 @@ require:
   - ethtool
 extra-summary: networking/driver/sanity
 extra-task: networking/driver/sanity
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291948
 id: 56d777a1-9f9b-4f5a-b5e7-1fed25c71f97
