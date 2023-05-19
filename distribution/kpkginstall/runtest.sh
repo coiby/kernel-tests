@@ -369,16 +369,21 @@ function rpm_install()
   download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER}"
 
   if ! cki_is_kernel_automotive ;then
-    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
-    else
-      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
-      cki_print_warning "Note that some tests might require the package and can fail!"
-    fi
     if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
       cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} successfully"
     else
       cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
+      cki_print_warning "Note that some tests might require the package and can fail!"
+    fi
+    # Depmod should run with just the modules from common packages installed
+    # as this is expected customer to have installed
+    depmod_check
+
+    # continue installing other kernel rpms
+    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
+      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
+    else
+      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
       cki_print_warning "Note that some tests might require the package and can fail!"
     fi
     if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
@@ -568,6 +573,21 @@ function install_kernel() {
       for _repo in ${_repofiles}; do
         sed -i "/^enabled=1/a exclude=${_exclude_pkgs}" "/etc/yum.repos.d/${_repo}"
       done
+}
+
+function depmod_check() {
+  expected_release=$(kpkg_release)
+  cki_print_info "running depmod to check for problems"
+  DEPMODLOG=/tmp/depmod.log
+  depmod -ae -F "/boot/System.map-${expected_release}" "${expected_release}" > "$DEPMODLOG" 2>&1
+  if [ -s "$DEPMODLOG" ] ; then
+    echo "***** List of Warnings/Errors reported by depmod *****"
+    cat "$DEPMODLOG"
+    echo "***** End of list *****"
+    rstrnt-report-result -o "${DEPMODLOG}" ${TEST}/depmod-check WARN 7
+  else
+    rstrnt-report-result ${TEST}/depmod-check PASS 0
+  fi
 }
 
 function main() {
