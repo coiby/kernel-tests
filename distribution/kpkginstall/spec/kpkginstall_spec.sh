@@ -432,6 +432,35 @@ Describe 'kpkginstall: rpm_install'
     End
 End
 
+Describe 'kpkginstall: rpm_extra_package_install'
+    Parameters
+        # SOURCE_PACKAGE_NAME    PACKAGE_NAME      KVER
+        # kernel source package with variants
+        kernel                   kernel            "4.18.0-442.el8.s390x"
+        kernel                   kernel-64k        "5.14.0-243.1820_756592390.el9.aarch64+64k"
+        kernel                   kernel-debug      "5.14.0-276.el9.s390x+debug"
+        kernel                   kernel-rt         "5.14.0-276.el9.s390x+rt"
+        # realtime branch
+        kernel-rt                kernel-rt         "4.18.0-442.el8.s390x"
+        # debug jobs
+        kernel                   kernel-rt-debug   "5.14.0-276.el9.s390x+rt-debug"
+        # realtime branch debug jobs
+        kernel-rt                kernel-rt-debug   "5.14.0-276.el9.s390x+debug"
+    End
+
+    It "can install extra packages for $2-$3"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$2
+        export KVER=$3
+        export YUM=dnf
+        When call rpm_extra_package_install
+        The line 1 should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
+        The line 2 should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
+        The line 3 should include "✅ Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
+        The status should be success
+    End
+End
+
 Describe 'kpkginstall: main - install kernel'
     Parameters
         kernel "$KERNEL_RPM_URL"
@@ -491,6 +520,10 @@ uname(){
 }
 select_yum_tool() {
     echo "select_yum_tool"
+    return 0
+}
+rpm_extra_package_install() {
+    echo "rpm_extra_package_install"
     return 0
 }
 get_kpkg_ver() {
@@ -564,6 +597,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "Running kernel release:  ${KVER_UNAME}"
         The stdout should include "✅ Found the correct kernel release running!"
+        The stdout should include "rpm_extra_package_install"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
