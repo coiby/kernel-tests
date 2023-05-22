@@ -1,0 +1,10 @@
+[General]
+name=upt-smoke-tests/multihost_client_fast_fail
+owner=Israel Santana <isantana@redhat.com>
+description=UPT smoke multihost test ending with client FAIL fast
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh

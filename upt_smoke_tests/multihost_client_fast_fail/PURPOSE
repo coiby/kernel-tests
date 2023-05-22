@@ -1,0 +1,2 @@
+Run smoke multihost test where client return much fast than server
+regression test for https://gitlab.com/cki-project/upt/-/issues/118
