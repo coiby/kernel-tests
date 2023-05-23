@@ -340,10 +340,9 @@ function download_install_package()
       fi
     else
       # debug kernel automotive
-      kpkg_automotive="kernel-automotive kernel-automotive-core kernel-automotive-modules"
-      rpm --quiet -q kernel-automotive-modules-core && kpkg_automotive="${kpkg_automotive} kernel-automotive-modules-core"
-      # shellcheck disable=SC2086 # disabled on purpose as we want kpkg_automotive to expand
-      if rpm-ostree override remove $kpkg_automotive \
+      kpkg_automotive=(kernel-automotive kernel-automotive-core kernel-automotive-modules)
+      rpm --quiet -q kernel-automotive-modules-core && kpkg_automotive+=(kernel-automotive-modules-core)
+      if rpm-ostree override remove "${kpkg_automotive[@]}" \
         --install "/root/kernel-automotive-debug-${KVER}.rpm"\
         --install "/root/kernel-automotive-debug-core-${KVER}.rpm"\
         --install "/root/kernel-automotive-debug-modules-${KVER}.rpm"\

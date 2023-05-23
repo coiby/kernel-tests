@@ -432,7 +432,53 @@ Describe 'kpkginstall: rpm_install'
     End
 End
 
+Describe 'kpkginstall: rpm_install automotive'
+    Parameters
+        # SOURCE_PACKAGE_NAME    PACKAGE_NAME             VARIANT_SUFFIX ARCH     KVER_RPM                         EXPECTED_KVER_UNAME
+        # kernel source package with variants
+        kernel-automotive        kernel-automotive        ""             aarch64  "5.14.0-298.261.el9iv.aarch64"  "5.14.0-298.261.el9iv.aarch64"
+        kernel-automotive-debug  kernel-automotive-debug  ""             aarch64  "5.14.0-298.261.el9iv.aarch64"  "5.14.0-298.261.el9iv.aarch64"
+    End
+    setup() {
+        mkdir -p /var/tmp/kpkginstall/vars
+    }
+    cleanup() {
+        rm -rf /var/tmp/kpkginstall
+    }
+    BeforeEach 'setup'
+    AfterEach 'cleanup'
+    cki_is_kernel_automotive() {
+        return 0
+    }
+    It "can install $2-$5"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$2
+        export KPKG_VAR_VARIANT_SUFFIX=$3
+        export ARCH=$4
+        export KVER_RPM=$5
+        export EXPECTED_KVER_UNAME=$6
+        export YUM=dnf
+        export RPM_OSTREE=rpm-ostree
+        export KPKG_URL=https://some-url
+        echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER
+        When call rpm_install
+        The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
+        The third line should equal "✅ Kernel version is ${KVER_RPM}"
+        The line 4 should equal "ℹ️ Test automotive installed kernel"
+        The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The status should be success
+    End
+End
 Describe 'kpkginstall: rpm_extra_package_install'
+    setup() {
+        mkdir -p /var/tmp/kpkginstall
+    }
+    cleanup() {
+        rm -rf /var/tmp/kpkginstall
+    }
+    BeforeEach 'setup'
+    AfterEach 'cleanup'
     Parameters
         # SOURCE_PACKAGE_NAME    PACKAGE_NAME      KVER
         # kernel source package with variants

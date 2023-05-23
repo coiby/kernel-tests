@@ -1,0 +1,3 @@
+#!/bin/sh -e
+. "$SHELLSPEC_SUPPORT_BIN"
+bash -x -c 'echo rpm-ostree "$@"' -- "$@" 2>&1 >/dev/null | grep "+ echo rpm-ostree" | cut -c 8-
