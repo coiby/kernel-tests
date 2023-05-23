@@ -23,6 +23,7 @@ SUPPORTED_KERNEL_PKGS=(
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 source "${CDIR}"/../../cki_lib/libcki.sh
+source "${CDIR}"/../../kernel-include/runtest.sh
 
 function parse_kpkg_url_variables()
 {
@@ -417,29 +418,25 @@ function rpm_install()
 
 function rpm_extra_package_install()
 {
-  # continue installing other kernel rpms
-  if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
-  else
-    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
-    cki_print_warning "Note that some tests might require the package and can fail!"
-  fi
-  if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
-  else
-    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
-    cki_print_warning "Note that some tests might require the package and can fail!"
-  fi
-  if $YUM install -y "${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
-  else
-    cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
+  extra_packages=(devel modules-internal headers)
+  for package in "${extra_packages[@]}"; do
+    _nvr="$(K_GetRunningKernelRpmSubPackageNVR "${package}")"
+    if $YUM install -y "${_nvr}" >> ${RPM_INSTALL_LOG}; then
+      cki_print_success "Installed ${_nvr} successfully"
+    else
+      cki_print_warning "package ${_nvr} not found, skipping!"
+      cki_print_warning "Note that some tests might require the package and can fail!"
+    fi
+  done
+  _headers_nvr=$(K_GetRunningKernelRpmSubPackageNVR headers)
+  if ! rpm --quiet -q "${_headers_nvr}"; then
+    cki_print_warning "No package ${_headers_nvr} found, trying without exact ${KVER}"
     # shellcheck disable=SC2010
-    ALT_HEADERS=$(ls "${KPKG_VAR_SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
+    ALT_HEADERS=$(ls "${_headers_nvr}"-headers* | grep -v src.rpm | head -1)
     if $YUM install -y "${ALT_HEADERS}" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed ${ALT_HEADERS} successfully"
     else
-        cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
+        cki_print_warning "No package ${_headers_nvr} found, skipping!"
         cki_print_warning "Note that some tests might require the package and can fail!"
     fi
   fi

@@ -481,18 +481,12 @@ Describe 'kpkginstall: rpm_extra_package_install'
     AfterEach 'cleanup'
     Parameters
         # SOURCE_PACKAGE_NAME    PACKAGE_NAME      KVER
-        # kernel source package with variants
         kernel                   kernel            "4.18.0-442.el8.s390x"
-        kernel                   kernel-64k        "5.14.0-243.1820_756592390.el9.aarch64+64k"
-        kernel                   kernel-debug      "5.14.0-276.el9.s390x+debug"
-        kernel                   kernel-rt         "5.14.0-276.el9.s390x+rt"
-        # realtime branch
-        kernel-rt                kernel-rt         "4.18.0-442.el8.s390x"
-        # debug jobs
-        kernel                   kernel-rt-debug   "5.14.0-276.el9.s390x+rt-debug"
-        # realtime branch debug jobs
-        kernel-rt                kernel-rt-debug   "5.14.0-276.el9.s390x+debug"
     End
+
+    K_GetRunningKernelRpmSubPackageNVR() {
+        echo "K_GetRunningKernelRpmSubPackageNVR $*"
+    }
 
     It "can install extra packages for $2-$3"
         export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
@@ -500,9 +494,9 @@ Describe 'kpkginstall: rpm_extra_package_install'
         export KVER=$3
         export YUM=dnf
         When call rpm_extra_package_install
-        The line 1 should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
-        The line 2 should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
-        The line 3 should include "✅ Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
+        The line 1 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR devel successfully"
+        The line 2 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR modules-internal successfully"
+        The line 3 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR headers successfully"
         The status should be success
     End
 End
