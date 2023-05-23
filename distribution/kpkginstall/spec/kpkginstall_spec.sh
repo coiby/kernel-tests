@@ -368,6 +368,20 @@ Describe 'kpkginstall: rpm_install'
     }
     BeforeEach 'setup'
     AfterEach 'cleanup'
+    dnf() {
+        return 0
+    }
+    grubby() {
+        echo "grubby $*"
+    }
+    zipl() {
+        echo "zipl"
+    }
+    depmod() {
+        if [[ -n "$MOCKED_DEPMOD" ]]; then
+            echo "${MOCKED_DEPMOD}"
+        fi
+    }
     It "can install $1/$2/$3/$4"
         export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
         export KPKG_VAR_PACKAGE_NAME=$2
@@ -378,15 +392,6 @@ Describe 'kpkginstall: rpm_install'
         export YUM=dnf
         export KPKG_URL=https://some-url
         echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER
-        dnf() {
-            return 0
-        }
-        grubby() {
-            echo "grubby $*"
-        }
-        zipl() {
-            echo "zipl"
-        }
         When call rpm_install
         The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
         The third line should equal "✅ Kernel version is ${KVER_RPM}"
@@ -400,6 +405,58 @@ Describe 'kpkginstall: rpm_install'
             The stdout should include "zipl"
             The stdout should include "✅ Grubby workaround for s390x completed"
         fi
+        The stdout should include "ℹ️ running depmod to check for problems"
+        The stdout should include "rstrnt-report-result distribution/kpkginstall/depmod-check PASS 0"
+        The status should be success
+    End
+
+    It "can detect depmod issues with $1"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$2
+        export KPKG_VAR_VARIANT_SUFFIX=$3
+        export ARCH=$4
+        export KVER_RPM=$5
+        export EXPECTED_KVER_UNAME=$6
+        export YUM=dnf
+        export KPKG_URL=https://some-url
+        echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER
+        export MOCKED_DEPMOD="depmod: WARNING: /lib/modules/${EXPECTED_KVER_UNAME}/kernel/sound/soc/soc-utils-test.ko.xz needs unknown symbol kunit_do_failed_assertion"
+        When call rpm_install
+        The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
+        The third line should equal "✅ Kernel version is ${KVER_RPM}"
+        The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The stdout should include "ℹ️ running depmod to check for problems"
+        The stdout should include "rstrnt-report-result -o /tmp/depmod.log distribution/kpkginstall/depmod-check WARN 7"
+        The status should be success
+    End
+End
+
+Describe 'kpkginstall: rpm_extra_package_install'
+    Parameters
+        # SOURCE_PACKAGE_NAME    PACKAGE_NAME      KVER
+        # kernel source package with variants
+        kernel                   kernel            "4.18.0-442.el8.s390x"
+        kernel                   kernel-64k        "5.14.0-243.1820_756592390.el9.aarch64+64k"
+        kernel                   kernel-debug      "5.14.0-276.el9.s390x+debug"
+        kernel                   kernel-rt         "5.14.0-276.el9.s390x+rt"
+        # realtime branch
+        kernel-rt                kernel-rt         "4.18.0-442.el8.s390x"
+        # debug jobs
+        kernel                   kernel-rt-debug   "5.14.0-276.el9.s390x+rt-debug"
+        # realtime branch debug jobs
+        kernel-rt                kernel-rt-debug   "5.14.0-276.el9.s390x+debug"
+    End
+
+    It "can install extra packages for $2-$3"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$2
+        export KVER=$3
+        export YUM=dnf
+        When call rpm_extra_package_install
+        The line 1 should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
+        The line 2 should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
+        The line 3 should include "✅ Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
         The status should be success
     End
 End
@@ -463,6 +520,10 @@ uname(){
 }
 select_yum_tool() {
     echo "select_yum_tool"
+    return 0
+}
+rpm_extra_package_install() {
+    echo "rpm_extra_package_install"
     return 0
 }
 get_kpkg_ver() {
@@ -536,6 +597,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "Running kernel release:  ${KVER_UNAME}"
         The stdout should include "✅ Found the correct kernel release running!"
+        The stdout should include "rpm_extra_package_install"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"

@@ -341,6 +341,7 @@ function download_install_package()
       # debug kernel automotive
       kpkg_automotive="kernel-automotive kernel-automotive-core kernel-automotive-modules"
       rpm --quiet -q kernel-automotive-modules-core && kpkg_automotive="${kpkg_automotive} kernel-automotive-modules-core"
+      # shellcheck disable=SC2086 # disabled on purpose as we want kpkg_automotive to expand
       if rpm-ostree override remove $kpkg_automotive \
         --install "/root/kernel-automotive-debug-${KVER}.rpm"\
         --install "/root/kernel-automotive-debug-core-${KVER}.rpm"\
@@ -368,37 +369,16 @@ function rpm_install()
   download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER}"
 
   if ! cki_is_kernel_automotive ;then
-    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
-    else
-      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
-      cki_print_warning "Note that some tests might require the package and can fail!"
-    fi
     if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
       cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} successfully"
     else
       cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
       cki_print_warning "Note that some tests might require the package and can fail!"
     fi
-    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
-    else
-      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
-      cki_print_warning "Note that some tests might require the package and can fail!"
-    fi
-    if $YUM install -y "${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
-      cki_print_success "Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
-    else
-      cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
-      # shellcheck disable=SC2010
-      ALT_HEADERS=$(ls "${KPKG_VAR_SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
-      if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
-          cki_print_success "Installed ${ALT_HEADERS} successfully"
-      else
-          cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
-          cki_print_warning "Note that some tests might require the package and can fail!"
-      fi
-    fi
+
+    # Depmod should run with just the modules from common packages installed
+    # as this is expected customer to have installed
+    depmod_check
 
     if [[ ${KPKG_VAR_PACKAGE_NAME} == kernel-rt* ]]; then
       if $YUM install -y "/usr/sbin/kernel-is-rt" > /dev/null; then
@@ -432,6 +412,36 @@ function rpm_install()
     fi
   fi
   return 0
+}
+
+function rpm_extra_package_install()
+{
+  # continue installing other kernel rpms
+  if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
+  else
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
+    cki_print_warning "Note that some tests might require the package and can fail!"
+  fi
+  if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
+  else
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
+    cki_print_warning "Note that some tests might require the package and can fail!"
+  fi
+  if $YUM install -y "${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+    cki_print_success "Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
+  else
+    cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
+    # shellcheck disable=SC2010
+    ALT_HEADERS=$(ls "${KPKG_VAR_SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
+    if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
+        cki_print_success "Installed ${ALT_HEADERS} successfully"
+    else
+        cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
+        cki_print_warning "Note that some tests might require the package and can fail!"
+    fi
+  fi
 }
 
 function ostree_extra_package_install()
@@ -569,6 +579,21 @@ function install_kernel() {
       done
 }
 
+function depmod_check() {
+  expected_release=$(kpkg_release)
+  cki_print_info "running depmod to check for problems"
+  DEPMODLOG=/tmp/depmod.log
+  depmod -ae -F "/boot/System.map-${expected_release}" "${expected_release}" > "$DEPMODLOG" 2>&1
+  if [ -s "$DEPMODLOG" ] ; then
+    echo "***** List of Warnings/Errors reported by depmod *****"
+    cat "$DEPMODLOG"
+    echo "***** End of list *****"
+    rstrnt-report-result -o "${DEPMODLOG}" ${TEST}/depmod-check WARN 7
+  else
+    rstrnt-report-result ${TEST}/depmod-check PASS 0
+  fi
+}
+
 function main() {
     cki_print_info "REBOOTCOUNT is ${REBOOTCOUNT}"
     if [ "${REBOOTCOUNT}" -eq 0 ]; then
@@ -638,6 +663,11 @@ EOF
 
       cki_print_success "Found the correct kernel release running!"
 
+      # install kernel packages that shouldn't be needed to boot with,
+      # but we still want have them installed
+      if ! cki_is_kernel_automotive; then
+        rpm_extra_package_install
+      fi
       # rpm-ostree extra packages install has to be after reboot
       if [[ -n $RPM_OSTREE ]]; then
         cki_print_info "Install kernel extra packages - rpm-ostree after reboot"
