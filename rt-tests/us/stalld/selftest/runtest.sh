@@ -50,7 +50,7 @@ function run_test ()
     fi
 
     echo "Running test" | tee -a $OUTPUTFILE
-    ./test | tee -a $OUTPUTFILE
+    ./test -d | tee -a $OUTPUTFILE
     selftest=${PIPESTATUS[0]}
 
     if [ "$selftest" -eq 0 ]; then
