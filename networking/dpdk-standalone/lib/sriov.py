@@ -47,17 +47,17 @@ def get_local_command_object(cmd_string):
 class SRIOV():
     __metaclass__ = ABCMeta
     """
-    This is abstract class , can not be init 
+    This is abstract class , can not be init
     Customer must derive it and implement below method
     """
     def __init__(self):
         pass
-    
+
     @staticmethod
     @abc.abstractmethod
     def get_pf_name_from_pf_bus(pf_bus):
         pass
-        
+
     @staticmethod
     @abc.abstractmethod
     def get_pf_bus_from_pf_name(pf_name):

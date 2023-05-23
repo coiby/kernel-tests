@@ -42,7 +42,7 @@ class LIB_SRIOV(COMMON_SRIOV):
     def __init__(self):
         super(LIB_SRIOV,self).__init__()
         pass
-    
+
     @staticmethod
     def sriov_get_pf_bus_from_pf_name(name):
         if not name:
@@ -80,16 +80,16 @@ class LIB_SRIOV(COMMON_SRIOV):
                 return i.name
 
         return "name-error"
-        
+
     @staticmethod
     def get_random_mac_addr():
         import random
         mac = [
         0x52,
         0x54,
-        0x11, 
-        random.randint(0x00, 0xff), 
-        random.randint(0x00, 0xff), 
+        0x11,
+        random.randint(0x00, 0xff),
+        random.randint(0x00, 0xff),
         random.randint(0x00, 0xff)
         ]
         return ':'.join(map(lambda x: "{:02x}".format(x), mac))
@@ -183,11 +183,11 @@ class LIB_SRIOV(COMMON_SRIOV):
             vf_name_list = COMMON_SRIOV.get_all_vf_list_from_pf_bus(pf_bus)
             all_vf.extend(vf_name_list)
         return all_vf
-    
+
     @staticmethod
     def sriov_get_vf_name_from_pf(pf_name,index=0):
         """
-        Get the special index vf name 
+        Get the special index vf name
         """
         if not pf_name:
             return "vf_name_error"

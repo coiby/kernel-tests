@@ -3,7 +3,7 @@
 #SYSTEM_CONFIG
 ################################################################
 SYSTEM_VERSION=${SYSTEM_VERSION:-"RHEL-8.0-20181029.3"}
-# VM image OVS DPDK BONDING TEST 
+# VM image OVS DPDK BONDING TEST
 IMAGE_GUEST=${IMAGE_GUEST}
 ################################################################
 
@@ -11,7 +11,7 @@ IMAGE_GUEST=${IMAGE_GUEST}
 #BOND_TEST_MODE_IPERF CONFIG
 ##################################################################
 SERVER_VCPUS=${SERVER_VCPUS:-2}
-CLIENT_VCPUS=${CLIENT_VCPUS:-2} 
+CLIENT_VCPUS=${CLIENT_VCPUS:-2}
 CLIENT_GUEST_IP=${CLIENT_GUEST_IP:-192.168.99.200}
 SERVER_GUEST_IP=${SERVER_GUEST_IP:-192.168.99.201}
 # hostname for the machines
@@ -28,7 +28,7 @@ NETSCOUT_HOST=${NETSCOUT_HOST}
 #traffic_type ,can  be xena trex
 TRAFFIC_TYPE=${TRAFFIC_TYPE:-xena}
 ################################################################################
-#TRAFFIC TREX CONFIG 
+#TRAFFIC TREX CONFIG
 #ONLY ENABLED WITH TRAFFIC_TYPE==trex
 #the host ip that  started the t-rex-64 -i with this host
 TREX_SERVER_IP=${TREX_SERVER_IP}
@@ -50,7 +50,7 @@ SERVER_NIC2_MAC=${SERVER_NIC2_MAC}
 CLIENT_NIC1_MAC=${CLIENT_NIC1_MAC}
 CLIENT_NIC2_MAC=${CLIENT_NIC2_MAC}
 
-#OPENVSWITCH AND DPDK CONFIG 
+#OPENVSWITCH AND DPDK CONFIG
 #DPDK_TEST_OPTION select which dpdk type will be tested {rpm|source}
 #The default option is rpm
 DPDK_TEST_OPTION=${DPDK_TEST_OPTION:-"rpm"}

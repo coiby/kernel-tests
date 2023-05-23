@@ -48,7 +48,7 @@ class mlx_sriov(COMMON_SRIOV):
     @staticmethod
     def get_pf_bus_from_pf_name( pf_name):
         return COMMON_SRIOV.get_pf_bus_from_pf_name(pf_name)
-    
+
     @staticmethod
     def get_all_vf_list_from_pf_bus( pf_bus):
         return COMMON_SRIOV.get_all_vf_list_from_pf_bus(pf_bus)

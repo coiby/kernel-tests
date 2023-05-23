@@ -64,7 +64,7 @@ init_all_env()
 #first compile dpdk
 #install dpdk to /usr/lcoal/dpdk
 #enalbe l2fwd,l3fwd app default
-#compile dpdk 
+#compile dpdk
 #app dir /root/dpdk-20.08/build/app
 #usertools dir /root/dpdk-20.08/usertools
 #examples dir /root/dpdk-20.08/build/examples

@@ -454,16 +454,16 @@ def init_test_env():
 def attach_sriov_vf_to_vm(xml_file,vm,vf1_name,vf2_name):
     vf1_bus_info = my_tool.get_bus_from_name(vf1_name)
     vf2_bus_info = my_tool.get_bus_from_name(vf2_name)
-    
+
     vf1_bus_info = vf1_bus_info.replace(":",'_')
     vf1_bus_info = vf1_bus_info.replace(".",'_')
-    
+
     vf2_bus_info = vf2_bus_info.replace(":",'_')
     vf2_bus_info = vf2_bus_info.replace(".",'_')
 
     log(vf1_bus_info)
     log(vf2_bus_info)
-    
+
     vf1_domain = vf1_bus_info.split('_')[0]
     vf1_bus    = vf1_bus_info.split('_')[1]
     vf1_slot   = vf1_bus_info.split('_')[2]
@@ -507,7 +507,7 @@ def attach_sriov_vf_to_vm(xml_file,vm,vf1_name,vf2_name):
     vf2_novlan_item = item.format(*vf2_format_list)
     vf2_novlan_obj = xml.fromstring(vf2_novlan_item)
     vf2_f_obj.write(xml.tostring(vf2_novlan_obj))
-    
+
     cmd = f"""
     sleep 10
     echo "#################################################"
@@ -885,7 +885,7 @@ def update_guest_xml_cpu(xml_file):
     log(f"vm1 numa node is {numa_node} vcpu num is {vcpu_num} vcpus {vcpus}")
     for i in range(vcpu_num):
         xml_tool.update_vcpu(xml_file,i,vcpus[i])
-    
+
     xml_tool.update_vcpu_emulatorpin(xml_file,all_vcpus.split(" ")[vcpu_num+1])
     if system_version_id >= 92:
         xml_tool.remove_item_from_xml(xml_file,"./cputune/emulatorpin")
@@ -8008,7 +8008,7 @@ def dpdk_sriov_bond_vf_test(mode,mac,vf_spoofchk,vf_trust):
     else:
         pass
 
-#skip this 
+#skip this
 # with enter_phase("dpdk_qos_nic_partition_test"):
 #     dpdk_qos_nic_partition_test()
 #     pass

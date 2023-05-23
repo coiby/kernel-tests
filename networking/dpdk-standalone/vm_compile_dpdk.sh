@@ -1,6 +1,6 @@
-#!/bin/bash 
+#!/bin/bash
 
-#compile dpdk 
+#compile dpdk
 #app dir /root/dpdk-20.08/build/app
 #usertools dir /root/dpdk-20.08/usertools
 #examples dir /root/dpdk-20.08/build/examples
@@ -11,7 +11,7 @@ compile_and_install_dpdk()
     local package_name=$1
     local dpdk_src_packge=/root/guest_dpdk_source/${package_name}
     local work_dir=/root/compile-dpdk
-    #install gcc for compile 
+    #install gcc for compile
     rpm -q gcc || yum -y install gcc
     #install numa-devel for numa support
     rpm -q numactl-devel || yum -y install numactl-devel

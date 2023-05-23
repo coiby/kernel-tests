@@ -1,7 +1,7 @@
 /kernel/networking/dpdk-standalone
-TEST PLAN LINK 
+TEST PLAN LINK
 https://wiki.test.redhat.com/Kernel/Testplans/RHEL83DPDK
-All the tests of this case is focus on dpdk standalone test 
-Not include ovs dpdk 
-Not include container related test now 
+All the tests of this case is focus on dpdk standalone test
+Not include ovs dpdk
+Not include container related test now
 **********************************************************************

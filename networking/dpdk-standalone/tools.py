@@ -31,7 +31,7 @@ cmdline=abc=ddd
 """
 
 
-""" 
+"""
 
 """
 
@@ -339,7 +339,7 @@ class Tools(object):
             return ""
         self.sw_os_type = switch_info[str(sw_name)]["ostype"]
         self.sw_info = switch_info[str(sw_name)]
-        """ 		
+        """
 		SUPPORTED_DRIVERS = [
                     "base",
                     "eos",

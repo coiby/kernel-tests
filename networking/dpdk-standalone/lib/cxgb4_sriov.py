@@ -52,7 +52,7 @@ class cxgb4_sriov(COMMON_SRIOV):
     def get_pf_bus_from_pf_name( pf_name):
         if not pf_name:
             return None
-        
+
         bus_info = ethtool.get_businfo(pf_name)
         #driver = ethtool.get_module(pf_name)
         """
@@ -75,7 +75,7 @@ class cxgb4_sriov(COMMON_SRIOV):
         return COMMON_SRIOV.get_all_vf_list_from_pf_bus(pf_bus)
 
     @staticmethod
-    def create_vfs( pf_bus, num):        
+    def create_vfs( pf_bus, num):
         COMMON_SRIOV.create_vfs(pf_bus,num)
         all_vf_name_list = cxgb4_sriov.get_all_vf_list_from_pf_bus(pf_bus)
         pf_name = cxgb4_sriov.get_pf_name_from_pf_bus(pf_bus)
