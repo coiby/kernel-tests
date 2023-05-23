@@ -491,21 +491,6 @@ function ostree_extra_package_install()
   return 0
 }
 
-function io_test() {
-  cki_run "uname -r"
-  sync
-  start_time=$(date +%s)
-  for _ in $(seq 5); do
-      cki_run "dd if=/dev/zero of=/opt/test.img oflag=dsync bs=1M count=500"
-  done
-  sync
-  end_time=$(date +%s)
-  total_time=$(( end_time - start_time ))
-  rm -f /opt/test.img
-  echo "io_test took ${total_time} seconds on kernel $(uname -r)"
-  return $total_time
-}
-
 function install_kernel() {
       local deps
       read -ra deps <<< "$TEST_DEPS"
@@ -599,12 +584,6 @@ function main() {
     if [ "${REBOOTCOUNT}" -eq 0 ]; then
 
       install_kernel
-
-      # collect IO perf data on original kernel
-      io_test
-      io_time=$?
-      echo $io_time > io_perf_base_kernel.log
-      rstrnt-report-log -l io_perf_base_kernel.log
 
       # force panic on oops
       # oops can cause system to crash, but restraint fails to detect it
@@ -743,12 +722,6 @@ EOF
       rstrnt-report-log -l "kernel_${ckver}_config.log"
 
       sysctl kernel.panic_on_oops
-
-      # collect IO perf data on CKI kernel
-      io_test
-      io_time=$?
-      echo $io_time > io_perf_cki_kernel.log
-      rstrnt-report-log -l io_perf_cki_kernel.log
 
       # We have the right kernel. Do we have any call traces?
       reboot_status="PASS"
