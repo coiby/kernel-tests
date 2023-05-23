@@ -11,4 +11,4 @@ entry_point=bash ./runtest.sh
 # Don't set dependencies here. The test installs the required dependencies
 # and aborts the job in case of failure as required by CKI
 softDependencies=yum-utils;llvm;lld;clang
-repoRequires=cki_lib
+repoRequires=cki_lib;kernel-include

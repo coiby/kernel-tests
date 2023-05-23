@@ -432,21 +432,61 @@ Describe 'kpkginstall: rpm_install'
     End
 End
 
+Describe 'kpkginstall: rpm_install automotive'
+    Parameters
+        # SOURCE_PACKAGE_NAME    PACKAGE_NAME             VARIANT_SUFFIX ARCH     KVER_RPM                         EXPECTED_KVER_UNAME
+        # kernel source package with variants
+        kernel-automotive        kernel-automotive        ""             aarch64  "5.14.0-298.261.el9iv.aarch64"  "5.14.0-298.261.el9iv.aarch64"
+        kernel-automotive-debug  kernel-automotive-debug  ""             aarch64  "5.14.0-298.261.el9iv.aarch64"  "5.14.0-298.261.el9iv.aarch64"
+    End
+    setup() {
+        mkdir -p /var/tmp/kpkginstall/vars
+    }
+    cleanup() {
+        rm -rf /var/tmp/kpkginstall
+    }
+    BeforeEach 'setup'
+    AfterEach 'cleanup'
+    cki_is_kernel_automotive() {
+        return 0
+    }
+    It "can install $2-$5"
+        export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
+        export KPKG_VAR_PACKAGE_NAME=$2
+        export KPKG_VAR_VARIANT_SUFFIX=$3
+        export ARCH=$4
+        export KVER_RPM=$5
+        export EXPECTED_KVER_UNAME=$6
+        export YUM=dnf
+        export RPM_OSTREE=rpm-ostree
+        export KPKG_URL=https://some-url
+        echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER
+        When call rpm_install
+        The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
+        The third line should equal "✅ Kernel version is ${KVER_RPM}"
+        The line 4 should equal "ℹ️ Test automotive installed kernel"
+        The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The status should be success
+    End
+End
 Describe 'kpkginstall: rpm_extra_package_install'
+    setup() {
+        mkdir -p /var/tmp/kpkginstall
+    }
+    cleanup() {
+        rm -rf /var/tmp/kpkginstall
+    }
+    BeforeEach 'setup'
+    AfterEach 'cleanup'
     Parameters
         # SOURCE_PACKAGE_NAME    PACKAGE_NAME      KVER
-        # kernel source package with variants
         kernel                   kernel            "4.18.0-442.el8.s390x"
-        kernel                   kernel-64k        "5.14.0-243.1820_756592390.el9.aarch64+64k"
-        kernel                   kernel-debug      "5.14.0-276.el9.s390x+debug"
-        kernel                   kernel-rt         "5.14.0-276.el9.s390x+rt"
-        # realtime branch
-        kernel-rt                kernel-rt         "4.18.0-442.el8.s390x"
-        # debug jobs
-        kernel                   kernel-rt-debug   "5.14.0-276.el9.s390x+rt-debug"
-        # realtime branch debug jobs
-        kernel-rt                kernel-rt-debug   "5.14.0-276.el9.s390x+debug"
     End
+
+    K_GetRunningKernelRpmSubPackageNVR() {
+        echo "K_GetRunningKernelRpmSubPackageNVR $*"
+    }
 
     It "can install extra packages for $2-$3"
         export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
@@ -454,9 +494,9 @@ Describe 'kpkginstall: rpm_extra_package_install'
         export KVER=$3
         export YUM=dnf
         When call rpm_extra_package_install
-        The line 1 should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
-        The line 2 should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
-        The line 3 should include "✅ Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
+        The line 1 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR devel successfully"
+        The line 2 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR modules-internal successfully"
+        The line 3 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR headers successfully"
         The status should be success
     End
 End
