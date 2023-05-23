@@ -5,6 +5,7 @@ TEST_DEPS="elfutils-libelf-devel flex bison gcc openssl-devel make curl grubby t
 ARCH=$(uname -m)
 REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
+RPM_INSTALL_LOG="/var/tmp/kpkginstall/rpm_install.log"
 
 # supported kernel packages
 SUPPORTED_KERNEL_PKGS=(
@@ -296,7 +297,7 @@ function download_install_package()
 {
   if ! cki_is_kernel_automotive; then
     # If download of a package fails, report warn/abort -> infrastructure issue
-    if $YUM install --downloadonly -y "$1" > /dev/null || yumdownloader -y "$1" > /dev/null; then
+    if $YUM install --downloadonly -y "$1" >> ${RPM_INSTALL_LOG} || yumdownloader -y "$1" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Downloaded $1 successfully"
     else
       cki_abort_recipe "Failed to download ${1}!" WARN
@@ -304,7 +305,7 @@ function download_install_package()
 
   # If installation of a downloaded package fails, report fail/abort
   # -> distro issue
-    if $YUM install -y "$1" > /dev/null; then
+    if $YUM install -y "$1" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Installed $1 successfully"
     else
       cki_abort_recipe "Failed to install $1!" FAIL
@@ -323,7 +324,7 @@ function download_install_package()
     fi
 
     # download
-    if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" > /dev/null; then
+    if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Downloaded $1 successfully"
     else
       cki_abort_recipe "Failed to download ${1}!" WARN
@@ -332,7 +333,7 @@ function download_install_package()
     # install
     cki_print_info "$1 will be installed using rpm-ostree override"
     if ! [[ ${KPKG_VAR_PACKAGE_NAME} == *-debug ]]; then
-      if rpm-ostree override replace /root/kernel*.rpm > /dev/null; then
+      if rpm-ostree override replace /root/kernel*.rpm >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
@@ -346,7 +347,7 @@ function download_install_package()
         --install "/root/kernel-automotive-debug-${KVER}.rpm"\
         --install "/root/kernel-automotive-debug-core-${KVER}.rpm"\
         --install "/root/kernel-automotive-debug-modules-${KVER}.rpm"\
-        --install "/root/kernel-automotive-debug-modules-core-${KVER}.rpm" > /dev/null; then
+        --install "/root/kernel-automotive-debug-modules-core-${KVER}.rpm" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
@@ -369,7 +370,7 @@ function rpm_install()
   download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER}"
 
   if ! cki_is_kernel_automotive ;then
-    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
+    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} successfully"
     else
       cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
@@ -381,7 +382,7 @@ function rpm_install()
     depmod_check
 
     if [[ ${KPKG_VAR_PACKAGE_NAME} == kernel-rt* ]]; then
-      if $YUM install -y "/usr/sbin/kernel-is-rt" > /dev/null; then
+      if $YUM install -y "/usr/sbin/kernel-is-rt" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed /usr/sbin/kernel-is-rt successfully"
       else
         cki_print_warning "No package for /usr/sbin/kernel-is-rt found, skipping!"
@@ -395,7 +396,7 @@ function rpm_install()
       FIRMWARE_PKG=linux-firmware
     fi
     cki_print_info "Installing kernel firmware package"
-    $YUM install -y $FIRMWARE_PKG > /dev/null
+    $YUM install -y $FIRMWARE_PKG >> ${RPM_INSTALL_LOG}
     cki_print_success "Kernel firmware package installed"
 
     vmlinuz=/boot/vmlinuz-$(kpkg_release)
@@ -411,67 +412,69 @@ function rpm_install()
       cki_print_success "Grubby workaround for s390x completed"
     fi
   fi
+  rstrnt-report-log -l "${RPM_INSTALL_LOG}"
   return 0
 }
 
 function rpm_extra_package_install()
 {
   # continue installing other kernel rpms
-  if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
+  if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
   else
     cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
+  if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
   else
     cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $YUM install -y "${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+  if $YUM install -y "${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} successfully"
   else
     cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
     # shellcheck disable=SC2010
     ALT_HEADERS=$(ls "${KPKG_VAR_SOURCE_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
-    if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
+    if $YUM install -y "${ALT_HEADERS}" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed ${ALT_HEADERS} successfully"
     else
         cki_print_warning "No package ${KPKG_VAR_SOURCE_PACKAGE_NAME}-headers-${KVER} found, skipping!"
         cki_print_warning "Note that some tests might require the package and can fail!"
     fi
   fi
+  rstrnt-report-log -l "${RPM_INSTALL_LOG}"
 }
 
 function ostree_extra_package_install()
 {
   PKG_CMD="${RPM_OSTREE} -A install --allow-inactive --idempotent -y "
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" > /dev/null; then
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
   else
     cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" > /dev/null; then
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} successfully"
   else
     cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" > /dev/null; then
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
   else
     cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-headers-${KVER}" > /dev/null; then
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-headers-${KVER}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} successfully"
   else
     cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
     # shellcheck disable=SC2010
     ALT_HEADERS=$(ls "${KPKG_VAR_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
-    if $YUM install -y "${ALT_HEADERS}" > /dev/null; then
+    if $YUM install -y "${ALT_HEADERS}" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed ${ALT_HEADERS} successfully"
     else
         cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} found, skipping!"
@@ -485,8 +488,9 @@ function ostree_extra_package_install()
     FIRMWARE_PKG=linux-firmware
   fi
   cki_print_info "Installing kernel firmware package"
-  $RPM_OSTREE install -A -y $FIRMWARE_PKG > /dev/null
+  $RPM_OSTREE install -A -y $FIRMWARE_PKG >> ${RPM_INSTALL_LOG}
   cki_print_success "Kernel firmware package installed"
+  rstrnt-report-log -l "${RPM_INSTALL_LOG}"
 
   return 0
 }
