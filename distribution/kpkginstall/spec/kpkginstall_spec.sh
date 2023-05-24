@@ -175,8 +175,7 @@ Describe 'kpkginstall: kpkg_release'
     End
 
     It "can determine the release for $1/$2"
-        export KVER=$1
-        export KPKG_VAR_VARIANT_SUFFIX=$2
+        export KVER=$4
         export KPKG_URL=$3
         export EXPECTED_KPKG_RELEASE=$4
         When call kpkg_release
@@ -301,7 +300,13 @@ Describe 'kpkginstall: get_kpkg_ver rpms'
         export YUM="dnf"
         export ARCH="ppc64le"
         dnf(){
-            echo "kernel.ppc64le      4.18.0-442.el8        kernel-cki"
+            if [[ "$*" =~ " list " ]]; then
+                echo "kernel-redhat.ppc64le      0.1-5.el9        kernel-cki"
+            elif [[ "$*" =~ " repoquery " ]]; then
+                echo "kernel-redhat-core-uname-r = 6.4.0-5.el9.ppc64le"
+            else
+                echo "dnf $*"
+            fi
         }
         __end__() {
             # The "run source" is run in a subshell, so you need to use "%preserve"
@@ -311,13 +316,15 @@ Describe 'kpkginstall: get_kpkg_ver rpms'
         mkdir -p /var/tmp/kpkginstall/vars
         When call get_kpkg_ver
         The variable REPO_NAME should eq "kernel-cki"
-        The contents of file /var/tmp/kpkginstall/KPKG_KVER should equal "4.18.0-442.el8.ppc64le"
+        The contents of file /var/tmp/kpkginstall/KPKG_KVER should equal "6.4.0-5.el9.ppc64le"
+        The contents of file /var/tmp/kpkginstall/KPKG_KVER_RPM should equal "0.1-5.el9.ppc64le"
         The first line should equal "ℹ️ Repo Name set REPO_NAME=kernel-cki"
     End
     It 'can read kernel version after it was set the first time'
         # Call for the second time as it is done after reboot
         When call get_kpkg_ver
-        The first line should equal "✅ Found kernel version string in cache on disk: 4.18.0-442.el8.ppc64le"
+        The first line should equal "✅ Found kernel rpm version string in cache on disk: 0.1-5.el9.ppc64le"
+        The line 2 should equal "✅ Found kernel version string in cache on disk: 6.4.0-5.el9.ppc64le"
         The status should be success
     End
 End
@@ -391,10 +398,11 @@ Describe 'kpkginstall: rpm_install'
         export EXPECTED_KVER_UNAME=$6
         export YUM=dnf
         export KPKG_URL=https://some-url
-        echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER
+        echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER_RPM
+        echo "${EXPECTED_KVER_UNAME}" > /var/tmp/kpkginstall/KPKG_KVER
         When call rpm_install
         The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
-        The third line should equal "✅ Kernel version is ${KVER_RPM}"
+        The line 4 should equal "✅ Kernel version is ${KVER_RPM}"
         The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         if [[ ${KPKG_VAR_PACKAGE_NAME} == kernel-rt* ]]; then
@@ -419,11 +427,12 @@ Describe 'kpkginstall: rpm_install'
         export EXPECTED_KVER_UNAME=$6
         export YUM=dnf
         export KPKG_URL=https://some-url
-        echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER
+        echo "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER_RPM
+        echo "${EXPECTED_KVER_UNAME}" > /var/tmp/kpkginstall/KPKG_KVER
         export MOCKED_DEPMOD="depmod: WARNING: /lib/modules/${EXPECTED_KVER_UNAME}/kernel/sound/soc/soc-utils-test.ko.xz needs unknown symbol kunit_do_failed_assertion"
         When call rpm_install
         The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
-        The third line should equal "✅ Kernel version is ${KVER_RPM}"
+        The line 4 should equal "✅ Kernel version is ${KVER_RPM}"
         The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "ℹ️ running depmod to check for problems"
@@ -629,7 +638,8 @@ Describe 'kpkginstall: main - check installed kernel'
         KPKG_VAR_PACKAGE_NAME=$3
         KPKG_VAR_VARIANT_SUFFIX=$4
         ARCH=$5
-        KVER=$6
+        KVER_RPM=$6
+        KVER=$7
         KVER_UNAME=$7
         prepare
         When call main
@@ -650,7 +660,8 @@ Describe 'kpkginstall: main - check installed kernel'
         KPKG_VAR_PACKAGE_NAME=$3
         KPKG_VAR_VARIANT_SUFFIX=$4
         ARCH=$5
-        KVER=$6
+        KVER_RPM=$6
+        KVER=$7
         KVER_UNAME=$7
         export MOCKED_DMESG="Call Trace:"
         prepare
@@ -669,7 +680,8 @@ Describe 'kpkginstall: main - check installed kernel'
         KPKG_VAR_PACKAGE_NAME=$3
         KPKG_VAR_VARIANT_SUFFIX=$4
         ARCH=$5
-        KVER=$6
+        KVER_RPM=$6
+        KVER=$7
         KVER_UNAME=$7
         export MOCKED_JOURNALCTL="Call Trace:"
         prepare
