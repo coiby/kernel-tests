@@ -61,7 +61,7 @@ function parse_kpkg_url_variables()
 
 function clean_kpkg_url_variables()
 {
-  if [[ -v KPKG_VAR_PACKAGE_NAME ]]; then
+  if [[ -n ${KPKG_VAR_PACKAGE_NAME:-} ]]; then
     if cki_is_true "${KPKG_VAR_DEBUG_KERNEL:-false}" && [[ ${KPKG_VAR_PACKAGE_NAME} != *-debug ]] ; then
       KPKG_VAR_PACKAGE_NAME=${KPKG_VAR_PACKAGE_NAME}-debug
     fi
