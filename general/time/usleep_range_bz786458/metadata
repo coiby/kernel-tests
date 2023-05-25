@@ -8,6 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash -x ./runtest.sh
-dependencies=gcc;make;kernel-devel;kernel-64k-devel;elfutils-libelf-devel
+dependencies=gcc;make;kernel-devel;elfutils-libelf-devel
+softDependencies=kernel-64k-devel
 max_time=1h
 use_pty=false
