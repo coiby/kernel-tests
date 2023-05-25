@@ -46,7 +46,6 @@ Describe 'cki-restraint: plugins'
 
     It "can run 30_init_test_console_log"
         When run script cki/restraint/plugins/task_run.d/30_init_test_console_log
-        The first line should equal "dmesg -C"
         The stdout should include "curl --silent --show-error --retry 5 http://${LAB_CONTROLLER}:8000/recipes/${RSTRNT_RECIPEID}/logs/console.log -o ${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}/init_console.log"
         The status should be success
     End

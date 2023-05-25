@@ -18,7 +18,8 @@ fi
 # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/782
 # restraint already has report_result.d/30_dmesg_clear that do the same,
 # but as it runs in the end of a task, it might not run in case task gets aborted
-dmesg -C
+# Don't use -C (--clear) option as it doesn't exist on rhel6
+dmesg -c > /dev/null
 # Add test information to console.log, when running with UPT this information is not there
 echo "Running test [R:${RSTRNT_RECIPEID} T:${RSTRNT_TASKID} - ${RSTRNT_TASKNAME:-unknown} - Kernel: $(uname -r)]" > /dev/kmsg
 mkdir -p "${CURRENT_TASK_PATH}/${RSTRNT_RECIPEID}/${RSTRNT_TASKID}"
