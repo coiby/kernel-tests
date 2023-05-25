@@ -117,7 +117,12 @@ function run_test() {
 
 function stop_stalld() {
     echo "Stoping stalld." | tee -a "$OUTPUTFILE"
-    kill "$STALLD_PID"
+    kill "$STALLD_PID" &
+    sleep 10
+    if ps -p $STALLD_PID >/dev/null; then
+        echo "stalld did not respond to SIGTERM - using SIGKILL"
+        kill -9 $STALLD_PID
+    fi
 }
 
 # ----------------------------------------------------------------------------
