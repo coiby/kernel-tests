@@ -1,0 +1,11 @@
+DESCRIPTION
+Create a blocker thread and a starving thread and see if stalld fixes the issue
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none

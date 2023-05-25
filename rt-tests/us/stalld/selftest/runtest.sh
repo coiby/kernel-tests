@@ -1,0 +1,82 @@
+#!/bin/bash
+: ${OUTPUTFILE:=runtest.log}
+
+# Include beaker environment
+. /usr/bin/rhts_environment.sh || exit 1
+
+# Vars
+export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+export TEST="rt-tests/us/stalld/selftest"
+
+function install_and_start_stalld()
+{
+    # Only run on 8.4 and up
+    if ! ( (( "$rhel_major" == 8 && "$rhel_minor" >= 4 )) || (( "$rhel_major" > 8 )) ); then
+        echo "stalld is only supported for RHEL >= 8.4 and up" || tee -a $OUTPUTFILE
+        rstrnt-report-result $TEST "SKIP" 5
+        exit 0
+    fi
+
+    # Verify stalld is installed
+    rpm -q stalld || yum install -y stalld || {
+        echo "Could not install stalld" | tee -a $OUTPUTFILE
+        rstrnt-report-result $TEST "FAIL" 5
+        exit 1
+    }
+
+    # Enable stalld if needed
+    systemctl status stalld.service >>$OUTPUTFILE 2>&1 || {
+        echo "Starting stalld" | tee -a $OUTPUTFILE
+        systemctl start stalld.service || {
+            echo "Stalld failed to start" | tee -a $OUTPUTFILE
+            rstrnt-report-result $TEST "FAIL" 5
+            exit 1
+        }
+    }
+}
+
+function run_test ()
+{
+    echo "Test Start Time: $(date)" | tee -a $OUTPUTFILE
+    selftest=0
+
+    echo "Compile test" | tee -a $OUTPUTFILE
+    gcc -g -Wall -pthread -o test test.c -lpthread
+    if [ $? -ne 0 ]; then
+        echo "compile test binary FAIL." | tee -a $OUTPUTFILE
+        rstrnt-report-result $TEST "FAIL" 5
+        return
+    fi
+
+    echo "Running test" | tee -a $OUTPUTFILE
+    ./test -d | tee -a $OUTPUTFILE
+    selftest=${PIPESTATUS[0]}
+
+    if [ "$selftest" -eq 0 ]; then
+        echo "selftest PASS." | tee -a $OUTPUTFILE
+        rstrnt-report-result $TEST "PASS" 0
+    else
+        echo "selftest FAIL." | tee -a $OUTPUTFILE
+        rstrnt-report-result $TEST "FAIL" 1
+    fi
+
+    echo "Test End Time: $(date)" | tee -a $OUTPUTFILE
+}
+
+function stop_stalld()
+{
+    echo "Stoping stalld." | tee -a $OUTPUTFILE
+    systemctl stop stalld.service || {
+        echo "Stalld failed to stop." | tee -a $OUTPUTFILE
+        rstrnt-report-result $TEST "FAIL" 5
+        exit 1
+    }
+}
+
+# ---------- Start Test -------------
+
+install_and_start_stalld
+run_test
+stop_stalld
+exit 0
