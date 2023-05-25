@@ -173,16 +173,7 @@ done
 
 [ -n "$NIC_INFO" ] || {
 	NIC_INFO=/tmp/nic_info
-	#if uname -r | grep 4.14
-	#then
-	#                NIC_INFO_URL=${NIC_INFO_URL:-https://gitlab.cee.redhat.com/kernel-qe/kernel/raw/master/networking/inventory/nic_info-alt}
-	#elif uname -r | grep "^4"
-	#then
-	#                NIC_INFO_URL=${NIC_INFO_URL:-https://gitlab.cee.redhat.com/kernel-qe/kernel/raw/master/networking/inventory/nic_info-rhel8}
-	#else
-	#                NIC_INFO_URL=${NIC_INFO_URL:-https://gitlab.cee.redhat.com/kernel-qe/kernel/raw/master/networking/inventory/nic_info}
-	#fi
-	NIC_INFO_URL=${NIC_INFO_URL:-https://gitlab.cee.redhat.com/kernel-qe/kernel/raw/master/networking/inventory/nic_info}
+	NIC_INFO_URL=${NIC_INFO_URL:-http://netqe-infra01.knqe.lab.eng.bos.redhat.com/nic_info/nic_info}
 	wget --no-check-certificate -q $NIC_INFO_URL -O $NIC_INFO
 }
 
