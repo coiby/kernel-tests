@@ -87,8 +87,6 @@ function run_test() {
 
         # Run a busy loop to stall cpu 1
         timeout "${MAX_RUNTIME}s" chrt -f 1 taskset -c 1 ./rt_busyloop &
-        BUSYLOOP_PID="$(pgrep rt_busyloop)"
-        export BUSYLOOP_PID
 
         # Print process info so we can see PIDs and tell if the right process
         # is getting boosted
@@ -98,12 +96,16 @@ function run_test() {
         # some time to get scheduled
         sleep 1
 
+        # Get the rt_busyloop PID
+        BUSYLOOP_PID="$(pgrep rt_busyloop)"
+        export BUSYLOOP_PID
+
         # This process blocks, and has to get boosted to finish
         chrt -f 1 taskset -c 1 sh -c "echo \"Finished\""
 
+        # Calculate runtime
         END=$(date +%s)
         RUNTIME=$((END - START))
-
         if [[ $RUNTIME -lt $MAX_RUNTIME ]]; then
             echo "Iteration $ITERS runtime is $RUNTIME : PASS" | tee -a "$OUTPUTFILE"
             rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "PASS" 0
@@ -111,8 +113,12 @@ function run_test() {
             echo "Iteration $ITERS runtime is $RUNTIME : FAIL" | tee -a "$OUTPUTFILE"
             rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "FAIL" 1
         fi
+
+        # Increment iterations run and kill any active busyloop threads
         ITERS=$((ITERS + 1))
-        kill "$BUSYLOOP_PID"
+        for p in $BUSYLOOP_PID; do
+            kill $p
+        done
     done
 }
 
