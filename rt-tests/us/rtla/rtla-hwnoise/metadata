@@ -1,0 +1,12 @@
+[General]
+name=rt-tests/us/rtla/rtla-hwnoise
+owner=Chang Yin <cyin@redhat.com>
+description=Basic/sanity test for rtla-hwnoise
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=10m
+use_pty=false

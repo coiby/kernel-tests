@@ -1,0 +1,13 @@
+DESCRIPTION
+Unit test for the rtla hwnoise userspace package.
+rtla hwnoise collects the periodic summary from the osnoise tracer running with interrupts disabled. By disabling interrupts, and the scheduling of threads as a consequence, only non-maskable interrupts and hardware-related noise is allowed.
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none
+
