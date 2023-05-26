@@ -87,7 +87,7 @@ function run_test() {
 
         # Run a busy loop to stall cpu 1
         timeout "${MAX_RUNTIME}s" chrt -f 1 taskset -c 1 ./rt_busyloop &
-        BUSYLOOP_PID=$(pgrep rt_busyloop)
+        BUSYLOOP_PID="$(pgrep rt_busyloop)"
         export BUSYLOOP_PID
 
         # Print process info so we can see PIDs and tell if the right process
