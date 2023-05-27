@@ -9,7 +9,7 @@ trap 'cleanup_swcfg' HUP TERM EXIT
 
 # variable for configuration files
 SWCFG_UNDO="/mnt/testarea/swcfg_undo.sh"
-NIC_INFO_URL=${NIC_INFO_URL:-https://gitlab.cee.redhat.com/kernel-qe/kernel/raw/master/networking/inventory/nic_info}
+NIC_INFO_URL=${NIC_INFO_URL:-http://netqe-infra01.knqe.lab.eng.bos.redhat.com/nic_info/nic_info}
 #if uname -r | grep 4.14
 #then
 #		NIC_INFO_URL="${NIC_INFO_URL}-alt"
