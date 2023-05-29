@@ -7,6 +7,7 @@ confidential=no
 destructive=no
 [restraint]
 entry_point=make run
+#repoRequires=automotive/include
 repoRequires=kdump/include
 max_time=150m
 use_pty=false
