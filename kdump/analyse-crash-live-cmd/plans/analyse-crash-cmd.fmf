@@ -1,8 +1,8 @@
-summary: Use crash utility to analyse the vmcore
+summary: Use crash utility to analyse a live system
 discover:
     how: fmf
     test:
-        - /kdump/analyse-crash-cmd
+        - /kdump/analyse-crash-live-cmd
 execute:
     how: tmt
     framework: shell
@@ -16,4 +16,4 @@ prepare:
       how: install
       package: [TBD_CASE_PACKAGES]
 environment-file:
-    - ./kdump/analyse-crash-cmd/plans/tmt.env
+    - ./kdump/analyse-crash-live-cmd/plans/tmt.env
