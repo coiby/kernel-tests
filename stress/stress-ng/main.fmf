@@ -53,6 +53,4 @@ recommend:
   - beakerlib-redhat
 extra-summary: stress/stress-ng
 extra-task: stress/stress-ng
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291767
 id: 78648bc2-5de1-4390-b0b8-fbe37d31b064

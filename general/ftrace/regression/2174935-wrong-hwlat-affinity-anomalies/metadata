@@ -1,7 +1,7 @@
 [General]
 name=general/ftrace/regression/2174935-wrong-hwlat-affinity-anomalies
 owner=Qiao Zhao <qzhao@redhat.com>
-description=Bug 2174935 - Wrong hwlat CPU affinity when started from a container
+description=Bug 2174935 - Wrong hwlat CPU affinity when started from a container (9.3 bug 2178234)
 license=GPLv2
 confidential=no
 destructive=no

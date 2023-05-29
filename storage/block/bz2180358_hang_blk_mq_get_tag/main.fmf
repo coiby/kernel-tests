@@ -1,0 +1,18 @@
+summary: storage/block/bz2180358_hang_blk_mq_get_tag
+description: fio hangs on scsi_debug in blk_mq_get_tag
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/bz2180358_hang_blk_mq_get_tag
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+    - fio
+    - libaio
+    - libaio-devel
+duration: 1h
+tier: 1
+extra-summary: /storage/block/bz2180358_hang_blk_mq_get_tag
+extra-task: /storage/block/bz2180358_hang_blk_mq_get_tag

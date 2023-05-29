@@ -71,8 +71,10 @@ function runtest
     rlRun -l "cat $file2" "0-255"
     typeset scaling_governor=$(cat $file2)
 
-    rlLog "stopping tuned"
-    rlRun "systemctl stop tuned" || return $CKI_FAIL
+    rlLog "is tuned running? - just for logs"
+    rlRun "systemctl status tuned" "0-255"
+    rlLog "stopping tuned, ignoring fail if it wasn't running, because we need just to get rid of it for this test"
+    rlRun "systemctl stop tuned" "0-255"
     rlRun "sleep 20"
 
     typeset file_freq1=$TMPDIR/curfreq1
@@ -94,7 +96,7 @@ function runtest
     load_stop
 
     rlLog "starting tuned"
-    rlRun "systemctl start tuned"
+    rlRun "systemctl start tuned" "0-255"
 
     typeset msg_governor="CPU scaling governor"
     typeset msg_freq_pows="CPU scaling frequency with powersave"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Enable TMT testing for RHIVOS
-. ../../automotive/include/include.sh
+. ../../automotive/include/rhivos.sh
 : ${OUTPUTFILE:=runtest.log}
 
 export TEST="rt-tests/rt_ssdd"

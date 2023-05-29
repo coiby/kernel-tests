@@ -57,17 +57,18 @@ rlPhaseStartTest "mtu_expire_$DO_SEC"
 	else
 		rlRun "default_mtu_expire=$(cat /proc/sys/net/ipv4/route/mtu_expires)"
 	fi
-	rlAssertEquals "default ipv4 mtu expire:$default_mtu_expire should equal 600" $default_mtu_expire 600
+	# don't check the default value as the value may be changed by other process
+	#rlAssertEquals "default ipv4 mtu expire:$default_mtu_expire should equal 600" $default_mtu_expire 600
 	if $CLIENTNS sysctl -a | grep net.ipv4.route.mtu_expires
 	then
 		rlRun "$CLIENTNS sysctl -w net.ipv4.route.mtu_expires=30"
-		rlRun "default_mtu_expire=$($CLIENTNS sysctl -n net.ipv4.route.mtu_expires)"
+		rlRun "new_mtu_expire=$($CLIENTNS sysctl -n net.ipv4.route.mtu_expires)"
 	else
 		rlRun "echo 30 > /proc/sys/net/ipv4/route/mtu_expires"
-		rlRun "default_mtu_expire=$(cat /proc/sys/net/ipv4/route/mtu_expires)"
+		rlRun "new_mtu_expire=$(cat /proc/sys/net/ipv4/route/mtu_expires)"
 	fi
 	rlRun "echo 30 > /proc/sys/net/ipv4/route/gc_timeout"
-	rlAssertEquals "ipv4 mtu expire:$default_mtu_expire become 30" $default_mtu_expire 30
+	rlAssertEquals "ipv4 mtu expire:$new_mtu_expire become 30" $new_mtu_expire 30
 	rlRun "$CLIENTNS ping ${veth0_server_ip[4]} -c 1 -s 1400 -M do" "1"
 	rlRun "$CLIENTNS ip route get ${veth0_server_ip[4]} | grep -E \"expires [0-9]*sec mtu 1400\""
 	rlRun "sleep 100"
@@ -77,9 +78,9 @@ rlPhaseStartTest "mtu_expire_$DO_SEC"
 	rlRun "$CLIENTNS ping ${veth0_server_ip[4]} -c 1 -s 1400 -M do"
 	if $CLIENTNS sysctl -a | grep net.ipv4.route.mtu_expires
 	then
-		rlRun "$CLIENTNS sysctl -w net.ipv4.route.mtu_expires=600"
+		rlRun "$CLIENTNS sysctl -w net.ipv4.route.mtu_expires=$default_mtu_expire"
 	else
-		rlRun "$CLIENTNS echo 600 > /proc/sys/net/ipv4/route/mtu_expires"
+		rlRun "$CLIENTNS echo $default_mtu_expire > /proc/sys/net/ipv4/route/mtu_expires"
 	fi
 	rlRun "echo 60 > /proc/sys/net/ipv4/route/gc_timeout"
 

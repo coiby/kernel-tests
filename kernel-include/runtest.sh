@@ -463,6 +463,7 @@ function K_GetRunningKernelSrpmName ()
 
 # Returns a nvr for a derived subpackage of the _binary rpm_
 # Example:
+#    For a system running kernel-64k:
 #    $(K_GetRunningKernelRpmSubPackageNVR modules-internal) -> kernel-64k-modules-internal-5.14.0-291.el9
 function K_GetRunningKernelRpmSubPackageNVR ()
 {
@@ -471,31 +472,68 @@ function K_GetRunningKernelRpmSubPackageNVR ()
     return 1
   fi
 
-  declare -r subpkg="$1" k_rpm=$(K_GetRunningKernelRpmName) k_srpm=$(K_GetRunningKernelSrpmName)
-  declare -a srpm_subpkgs=()
-  declare n="$k_rpm" vr
-  vr=$(K_GetRunningKernelRpmVersionRelease)
+  local subpkg k_rpm k_srpm k_rpm_vr k_srpm_vr
+  subpkg="$1"
+  k_rpm=$(K_GetRunningKernelRpmName)
+  k_rpm_vr=$(K_GetRunningKernelRpmVersionRelease)
+  k_srpm=$(K_GetRunningKernelSrpmName)
+  k_srpm_vr=${k_rpm_vr}
 
-  # the following are subpackages that belong to the kernel srpm
-  if [[ "$k_rpm" == "kernel-64k" || ( "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel" ) ]]; then
-    srpm_subpkgs=(cross debuginfo-common headers ipaclones selftests tools)
-  elif [[ "$k_rpm" == "kernel-automotive" || ( "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel-rt" ) ]]; then
+  # "SRPM subpackages" are the set of subpackages where the running kernel binary
+  # does not build said subpackage, so we must install its respective SRPM's subpackage.
+  #   Example: kernel-rt does not build headers, so we use kernel-headers
+  declare -a srpm_subpkgs=()
+  # "Debug subpackages" represent the set of subpackages that a running kernel[-.*]-debug
+  # binary does not build itself, but rather its corresponding non-debug variant builds,
+  # so we must install the non-debug variant's subpackage.
+  #   Example: kernel-automotive-debug does not build selftests-internal, so
+  #   we use kernel-automotive-selftests-internal
+  declare -a debug_subpkgs=()
+
+  # set kernel srpm/debug subpackages based on the running kernel binary
+  if [[ "$k_rpm" == "kernel-debug" || \
+        "$k_rpm" == "kernel-64k"* || \
+        ("$k_rpm" == "kernel-rt"* && "$k_srpm" == "kernel") ]]; then
+    srpm_subpkgs=(cross headers ipaclones tools debuginfo-common selftests)
+  elif [[ "$k_rpm" == "kernel-automotive"* || \
+          ("$k_rpm" == "kernel-rt"* && "$k_srpm" == "kernel-rt") ]]; then
     srpm_subpkgs=(cross headers ipaclones tools)
+    debug_subpkgs=(debuginfo-common selftests)
   fi
 
-  # if requested subpkg is an srpm subpkg, use the srpm instead of rpm name
+  # special cases: non-unified kernel-rt & kernel-automotive must translate the kernel srpm N/VR
+  if [[ "$k_rpm" == "kernel-rt"* && "$k_srpm" == "kernel-rt" ]]; then
+    # e.g.: kernel-rt-4.18.0-479.rt7.268.el8 --> kernel-4.18.0-479.el8
+    k_srpm="kernel"
+    k_srpm_vr="${k_srpm_vr//rt[0-9]*.[0-9]*./}"
+  elif [[ "$k_rpm" == "kernel-automotive"* ]]; then
+    # e.g.: kernel-automotive-5.14.0-301.264.el9iv --> kernel-5.14.0-301.el9
+    k_srpm="kernel"
+    local X=${k_srpm_vr%.[0-9]*.el[0-9]*iv}  # 5.14.0-301
+    local Y=${k_srpm_vr/*.el/el}             # el9iv
+    k_srpm_vr="${X}.${Y//iv}"                # 5.14.0-301.el9
+  fi
+
+  # checks if requested subpkg needs to come from the kernel srpm
   for srpm_subpkg in "${srpm_subpkgs[@]}"; do
     if [[ "${subpkg}" =~ "${srpm_subpkg}".* ]]; then
-        n="$k_srpm"
-        if [[ "$k_rpm" == "kernel-rt" && "$k_srpm" == "kernel-rt" ]]; then
-            # special case: convert non-unified kernel-rt NVR into kernel srpm NVR
-            n="kernel"
-            vr="${vr//rt[0-9]*.[0-9]*./}"
-        fi
-        break
+      echo "${k_srpm}-${subpkg}-${k_srpm_vr}"
+      return 0
     fi
   done
 
-  echo "${n}-${subpkg}-${vr}"
+  # checks if requested subpkg needs to come from the binary's non-debug variant
+  # note: the running binary may already be a non-debug variant, in which case
+  #       this loop effectively performs the same action as the echo statement
+  #       immediately following this loop
+  for debug_subpkg in "${debug_subpkgs[@]}"; do
+    if [[ "${subpkg}" =~ "${debug_subpkg}".* ]]; then
+      echo "${k_rpm//-debug/}-${subpkg}-${k_rpm_vr}"
+      return 0
+    fi
+  done
+
+  # requested subpkg is built by the running kernel binary
+  echo "${k_rpm}-${subpkg}-${k_rpm_vr}"
 }
 # EndFile

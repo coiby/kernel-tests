@@ -1,0 +1,13 @@
+[General]
+name=power-management/powertop/powertop_start
+owner=Erik Hamera <ehamera@redhat.com>
+description=Sanity test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=bc
+dependencies=powertop
+repoRequires=power-management/include_parser

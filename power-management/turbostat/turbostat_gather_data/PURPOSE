@@ -1,0 +1,3 @@
+PURPOSE of /kernel/power-management/turbostat/turbostat_gather_data
+Description: Gathers data for manual analysis
+Author: Erik Hamera <ehamera@redhat.com>

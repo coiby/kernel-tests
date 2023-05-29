@@ -14,7 +14,6 @@ export vm_name=$1
 #/usr/local/bin/vmsh run_cmd $vm_name "cat <<-EOF > /etc/yum.repos.d/beaker-tasks.repo
 #[beaker-tasks]
 #name=beaker-tasks
-#baseurl=http://beaker.engineering.redhat.com/rpms
 #enabled=1
 #gpgcheck=0
 #skip_if_unavailable=1

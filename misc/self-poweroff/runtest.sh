@@ -25,20 +25,42 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Enable TMT testing for RHIVOS
+auto_include=../../automotive/include/rhivos.sh
+[ -f $auto_include ] && . $auto_include
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+
+if ! (($is_rhivos)); then
+    # Include rhts environment
+    . /usr/bin/rhts-environment.sh
+fi
+
 # Source the common test script helpers
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+
+export TEST="misc/self-poweroff"
 
 # This file will be created to record that this job has already run
 # once. When the guest gets powered on again by the host, we don't want
 # to power off repeatedly.
-STAMP_FILE=/.self-poweroff
+
+if (($is_rhivos)); then
+    STAMP_FILE=/tmp/.self-poweroff
+else
+    STAMP_FILE=/.self-poweroff
+fi
 
 if [ -f $STAMP_FILE ]; then
-	rm $STAMP_FILE
-	rstrnt-report-result ${TEST} PASS 0
-	exit 0
+    rm $STAMP_FILE
+    rstrnt-report-result "${TEST}" PASS
+    exit 0
 fi
 
 touch $STAMP_FILE
 sync
-/sbin/poweroff
+# Instead of using /sbin/poweroff, it is to add waiting time
+# before shutdown, if shut down immediately,
+# tmt cannot get the test results from the tested host
+/sbin/shutdown -t +1
+rstrnt-report-result "${TEST}" PASS
+exit 0

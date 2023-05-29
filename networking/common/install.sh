@@ -196,7 +196,7 @@ lksctp-tools_install()
 scapy_install()
 {
 	local scapy_git="https://github.com/secdev/scapy.git"
-	local scapy_http="http://netqe-bj.usersys.redhat.com/share/tools/scapy.tar.gz"
+	local scapy_http="http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/scapy.tar.gz"
 
 	local rel=$(GetDistroRelease)
 	[ $rel -ge 9 ] && dnf install -y scapy
@@ -248,24 +248,6 @@ scapy_install()
 	popd
 }
 
-socat_install()
-{
-	$YUM socat
-	if [ $? -ne 0 ];then
-		pushd ${NETWORK_COMMONLIB_DIR}
-		socat="latest-socat.$(uname -r| awk -F. '{print $4}').$(uname -m).rpm"
-		wget http://porkchop.devel.redhat.com/qa/rhts/lookaside/socat/$socat
-		if stat /run/ostree-booted > /dev/null 2>&1; then
-			rpm-ostree -A --idempotent --allow-inactive localinstall -y $socat
-		else
-			yum localinstall -y $socat
-		fi
-		popd
-	fi
-	socat -V && return 0 || return 1
-
-}
-
 netperf_install()
 {
 	# rhel7 can't install from epel repo
@@ -278,13 +260,7 @@ netperf_install()
 
 	local OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 
-	if hostname | grep "pek2.redhat.com"
-	then
-	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-bj.usersys.redhat.com/share/tools/netperf-20210121.tar.bz2"}
-	else
-#	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
-	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-bj.usersys.redhat.com/share/tools/netperf-20210121.tar.bz2"}
-	fi
+	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
 
 	pushd ${NETWORK_COMMONLIB_DIR} 1>/dev/null
 	wget -nv -N $SRC_NETPERF
@@ -333,7 +309,7 @@ iperf_install()
 	$YUM gcc-c++ make gcc
 	# grab sctp-enabled iperf and install it:
 	IPERF_FILE="iperf-2.0.10.tar.gz"
-	wget http://lacrosse.corp.redhat.com/~haliu/${IPERF_FILE}
+	wget http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/${IPERF_FILE}
 	if [[ $? != 0 ]]; then
 		echo "${TEST} fail grabbing iperf source"
 		rstrnt-report-result "${TEST}_get_iperf" FAIL
@@ -592,24 +568,6 @@ bfdd_install()
 	which bfdd-beacon && return 0 || return 1
 }
 
-docker_install()
-{
-	which docker && return 0
-	# fedora may enable docker by default
-	$YUM docker && return 0
-	local rhel_version=`rpm -q --qf="%{VERSION}" $(rpm -qf /etc/redhat-release) | sed "s/^\([0-9.]\+\)[^0-9.]\+.*$/\1/" | sed "s/6\.9[0-9]/7/" | cut -d '.' -f 1`
-	cat > /etc/yum.repos.d/extra-rhel.repo <<EOF
-[extras-rhel${rhel_version}]
-name=extras-rhel${rhel_version}
-baseurl=http://pulp.dist.prod.ext.phx2.redhat.com/content/dist/rhel/server/${rhel_version}/${rhel_version}Server/$(uname -p)/extras/os/
-enabled=1
-gpgcheck=0
-EOF
-	$YUM docker || { echo "install docker failed"; rm /etc/yum.repos.d/extra-rhel.repo -f; return 1; }
-	rm /etc/yum.repos.d/extra-rhel.repo -f
-	rpm -q docker
-}
-
 hping3_install()
 {
 	which hping && return 0
@@ -801,7 +759,7 @@ kernel_modules_extra_install()
 
 kselftests_install()
 {
-	. ../../../automotive/include/include.sh || . /mnt/tests/kernel/automotive/include/include.sh
+	. ../../../automotive/include/rhivos.sh
 	local kname1="kernel"
 	local kname2="${kname1}"
 	local kernel_ver="$(uname -r)"

@@ -1,9 +1,6 @@
 summary: KG-VMM kselftest
 description: test wrapper for kernel selftest
 enabled: false
-link:
-  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-288689
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-288831
 id: 83986a89-c53a-4ed6-a17b-6c18216168b8
 contact: Hangbin Liu <haliu@redhat.com>
 component:

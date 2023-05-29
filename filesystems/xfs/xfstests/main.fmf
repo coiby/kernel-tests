@@ -152,6 +152,4 @@ recommend:
   - librbd-devel
 extra-summary: filesystems/xfs/xfstests
 extra-task: filesystems/xfs/xfstests
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291947
 id: 009f8479-5045-4686-b74e-443dc999d34d

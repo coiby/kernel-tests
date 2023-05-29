@@ -1,7 +1,7 @@
 # Red Hat Kernel QE and CKI kernel tests repository
 
 The main branch is continuously synced to the [internal
-mirror](https://gitlab.cee.redhat.com/api/v4/projects/kernel-qe%2fkernel-tests-public/repository/archive.zip?sha=refs/heads/main).
+mirror](https://documentation.internal.cki-project.org/docs/test-maintainers/repository-setup/#mirroring-of-kernel-tests).
 
 <details>
 <summary>Click here for an example on how to trigger a Beaker job with it.</summary>
@@ -18,7 +18,7 @@ mirror](https://gitlab.cee.redhat.com/api/v4/projects/kernel-qe%2fkernel-tests-p
       </distroRequires>
       <hostRequires/>
       <task name="/test/misc/machineinfo">
-        <fetch url="https://gitlab.cee.redhat.com/api/v4/projects/kernel-qe%2fkernel-tests-public/repository/archive.zip?sha=refs/heads/main#test/misc/machineinfo"/>
+        <fetch url="https://${internal_gitlab_url}/api/v4/projects/kernel-qe%2fkernel-tests-public/repository/archive.zip?sha=refs/heads/main#test/misc/machineinfo"/>
         <params/>
       </task>
     </recipe>
@@ -38,11 +38,11 @@ $ sudo dnf install -y beaker-client beakerlib restraint-rhts
 ### How to check the tests
 
 Every time a test is pushed it gets automatically checked for syntax or format
-errors with [ShellCheck](https://github.com/koalaman/shellcheck). It's convenient
+errors with [ShellCheck](https://github.com/koalaman/shellcheck) or [yamllint](https://www.redhat.com/sysadmin/check-yaml-yamllint) depending on the file type. It's convenient
 to use it locally before to push the code, to save some time and be able to quickly
 catch misspellings and silly errors.
 
-To check locally for those errors it's recommended to install `ShellCheck` with
+To check locally for those errors for shell scripts it's recommended to install `ShellCheck` with
 the package manager (e.g. `dnf install ShellCheck`) and to run this line in the
 directory of the changed code:
 
@@ -56,6 +56,16 @@ recursively with the following:
 ```shell
 $ find -name '*.sh' -exec shellcheck -S error {} +
 ```
+Also, to check bash lines ending with white spaces use command:
+```shell
+$ grep -ne '\s$' <filename>
+```
+
+To check lint for yaml files, use yamllint:
+ ```shell
+$ yamllint -s <filename>
+```
+
 
 ## Test onboarding
 
@@ -74,7 +84,7 @@ See examples below to properly abort or skip in beaker:
 ### Abort task if infrastructure failure is task only related
 ~~~
 if [ $? -ne 0 ]; then
-    rlLog "Aborting test because $reason"
+    echo "Aborting test because $reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 fi
@@ -83,7 +93,7 @@ fi
 ### Abort recipe if infrastructure failure affects the entire recipe
 ~~~
 if [ $? -ne 0 ]; then
-    rlLog "Aborting recipe because $reason"
+    echo "Aborting recipe because $reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     rstrnt-abort recipe
 fi
@@ -92,7 +102,7 @@ fi
 ### Skip the task (e.g. testing with unsupported hardware)
 ~~~
 if [ $? -ne 0 ]; then
-    rlLog "Skipping test because $reason"
+    echo "Skipping test because $reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
     exit 0
 fi

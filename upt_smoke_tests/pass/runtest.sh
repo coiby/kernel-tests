@@ -28,6 +28,14 @@ rlJournalStart
         rlRun "echo 'Running our second smoke test'"
     rlPhaseEnd
 
+    # Test 3
+    rlPhaseStartTest Third_test
+        rlLog "Running a test with a space in the log name"
+        rlRun "echo 'Running a test with a space in the log name'"
+        rlRun "touch 'my test.log'"
+        rlFileSubmit 'my test.log'
+    rlPhaseEnd
+
     # Cleanup phase
     rlPhaseStartCleanup
         rlLog "Running our clean stage"

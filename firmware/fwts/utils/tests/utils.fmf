@@ -1,0 +1,32 @@
+summary: run utils tests from Firmware Test Suite (fwts)
+description: |
+    Run fwts tests in the utils category (as returned by fwts --utils).
+    These run automatically by default and require no user intervention.
+
+    This includes the following tests (based on x86_64, may vary on other arches):
+
+    acpidump        Dump ACPI tables.
+    cmosdump        Dump CMOS Memory.
+    crsdump         Dump ACPI _CRS resources.
+    ebdadump        Dump EBDA region.
+    esrtdump        Dump ESRT table.
+    gpedump         Dump GPEs.
+    memmapdump      Dump system memory map.
+    mpdump          Dump MultiProcessor Data.
+    plddump         Dump ACPI _PLD (Physical Device Location).
+    prsdump         Dump ACPI _PRS resources.
+    romdump         Dump ROM data.
+    uefidump        Dump UEFI variables.
+    uefivarinfo     UEFI variable info query.
+
+    https://wiki.ubuntu.com/Kernel/Reference/fwts
+
+contact: Oliver Gutierrez <ogutierr@redhat.com>
+path: /firmware/fwts/utils
+test: bash ./runtest.sh
+require:
+  - beakerlib
+framework: beakerlib
+duration: 1h
+extra-summary: /firmware/fwts/utils
+extra-task: /firmware/fwts/utils

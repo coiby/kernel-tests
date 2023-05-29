@@ -14,16 +14,18 @@ install_netsniff()
 {
 	which mausezahn && return 0
 
-	if [ ${krelease} -eq "8" ] || [ ${krelease} -eq "9" ]; then
+	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
 		if ! rpm -q epel-release; then
-			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-${krelease}.noarch.rpm
+			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
 			local need_remove=1
 		else
 			local param="--enablerepo=epel"
 		fi
 	fi
 
-	$pkg_mgr $pkg_mgr_inst_string  jq netsniff-ng
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string $param jq netsniff-ng
 
 	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
@@ -34,6 +36,7 @@ install_smcroute()
 {
 	which smcroute && return 0
 	dnf copr -y enable liuhangbin/smcroute
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string smcroute
 	which smcroute && return 0 || return 1
 }
@@ -43,6 +46,7 @@ install_sendip()
 
 	which sendip && return 0
 	dnf -y copr enable cygn/SendIP
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string sendip
 
 	which sendip && return 0 || return 1
@@ -51,8 +55,10 @@ install_sendip()
 install_scapy()
 {
 	scapy -h && return 0
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	[ "${krelease}" -eq "8" ] && \
 		$pkg_mgr $pkg_mgr_inst_string https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string scapy
 	[ "${krelease}" -eq "8" ] && rpm -e epel-release
 	scapy -h && return 0 || return 1
@@ -117,7 +123,7 @@ do_net_config()
 {
 	set_network_env
 
-	pushd $EXEC_DIR/net
+	pushd "$EXEC_DIR"/net || exit
 	# Fix some known issues
 	# rm 0x10 for fib_rule_tests.sh due to bz1480136
 	# FIXME: should we restore it back after finishing test?
@@ -149,8 +155,8 @@ do_net_config()
 	sed -i 's/run_test_v4v6 ${args} -R/#run_test_v4v6 ${args} -R/' txtimestamp.sh
 	sed -i 's/run_test_v4v6 ${args} -P/#run_test_v4v6 ${args} -P/' txtimestamp.sh
 	# incase some test not add exec permission
-	chmod +x *.sh
-	popd
+	chmod +x ./*.sh
+	popd || exit
 
 	# install jq for fib_nexthops.sh test
 	install_netsniff || { test_fail "install netsniff for net test failed" && return 1; }
@@ -158,10 +164,10 @@ do_net_config()
 
 do_net_reset()
 {
-	pushd $EXEC_DIR/net
+	pushd "$EXEC_DIR"/net || exit
 	# for test fib-onlink-tests.sh we'd better restore default IPv6 route
 	ip -6 route restore < default_ipv6.route
-	popd
+	popd || exit
 
 	reset_network_env
 }
@@ -170,13 +176,14 @@ do_net_forwarding_config()
 {
 	set_network_env
 
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
 	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
 	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
 
-	pushd $EXEC_DIR/net/forwarding
+	pushd "$EXEC_DIR"/net/forwarding || exit
 	# RHEL9 doesn't support meta
-	if [ ${krelease} -eq "9" ]; then
+	if [ "${krelease}" -eq "9" ]; then
 		sed -i '0, /ets_test_strict/ {/ets_test_strict/d;}' sch_ets.sh
 		sed -i '0, /ets_test_mixed/ {/ets_test_mixed/d;}' sch_ets.sh
 		sed -i '0, /ets_test_dwrr/ {/ets_test_dwrr/d;}' sch_ets.sh
@@ -192,7 +199,7 @@ do_net_forwarding_config()
 	fi
 
 	cp forwarding.config.sample forwarding.config
-	popd
+	popd || exit
 }
 
 do_net_forwarding_reset()
@@ -221,6 +228,7 @@ do_netfilter_config()
 {
 	set_network_env
 
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which conntrack || $pkg_mgr $pkg_mgr_inst_string conntrack-tools
 	install_sendip
 }
@@ -246,9 +254,11 @@ do_bpf_test_progs_config()
 
 	# bz1969582 - the bpf:test_progs tests hit an expected mmap_zero avc
 	# denial, unless we first turn mmap_low_allowed on
-	echo "=== Setting mmap_low_allowed on ===" | tee -a $OUTPUTFILE
+	echo "=== Setting mmap_low_allowed on ===" | tee -a "$OUTPUTFILE"
 	setsebool -P mmap_low_allowed on
 	sysctl_set net.mptcp.enabled 1
+	modprobe nf_conntrack
+	modprobe nf_nat
 }
 
 do_bpf_test_progs_run()
@@ -256,9 +266,9 @@ do_bpf_test_progs_run()
 	local item="bpf_test_progs"
 	local ret ret_1 ret_2
 
-	[ ! -d $EXEC_DIR/bpf ] && test_skip "No $item test, skip" && return 1
+	[ ! -d "$EXEC_DIR"/bpf ] && test_skip "No $item test, skip" && return 1
 
-	pushd $EXEC_DIR/bpf
+	pushd "$EXEC_DIR"/bpf || exit
 	if [ ! -f test_progs ] || [ ! -f test_progs-no_alu32 ] || ! ./test_progs --count; then
 		test_skip "No $item test, skip"
 		return 1
@@ -270,7 +280,7 @@ do_bpf_test_progs_run()
 	local name=""
 
 	for name in ${total_tests}; do
-		num=$(($num + 1))
+		num=$((num + 1))
 
 		check_skip "${item}:${name}" && test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]" && continue
 
@@ -282,25 +292,30 @@ do_bpf_test_progs_run()
 		# Get more detailed log info with -vv if failed
 		[ ${ret_1} -ne 0 ] && run "./test_progs -vv -t $name"
 
+		# bpf_nf test opened a tcp port, which will be in TIME-WAIT after close.
+		echo "${name}" | grep -q "bpf_nf" && sleep 65
+
 		run "./test_progs-no_alu32 -t $name"
 		ret_2=$?
 
-		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
-		dmesg >> $OUTPUTFILE
+		echo -e "\n=== Dmesg result ===" >> "$OUTPUTFILE"
+		dmesg >> "$OUTPUTFILE"
 
 		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
-		check_result $num $total_num "${item}:${name}" $ret
+		check_result $num "$total_num" "${item}:${name}" $ret
 	done
 
-	popd
+	popd || exit
 }
 
 do_bpf_test_progs_reset()
 {
 	# after testing completes, turn mmap_low_allowed off again
-	echo "=== Setting mmap_low_allowed off ===" | tee -a $OUTPUTFILE
+	echo "=== Setting mmap_low_allowed off ===" | tee -a "$OUTPUTFILE"
 	setsebool -P mmap_low_allowed off
 	sysctl_restore net.mptcp.enabled
+	modprobe -r nf_nat
+	modprobe -r nf_conntrack
 	reset_network_env
 }
 
@@ -309,14 +324,16 @@ do_tc-testing_config()
 	set_network_env
 
 	# prepare evn
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string clang valgrind
 	install_scapy
 	modprobe -r veth
+	modprobe netdevsim
 
-	pushd $EXEC_DIR/tc-testing
+	pushd "$EXEC_DIR"/tc-testing || exit
 	# extend test timeout
-	sed -i '/TIMEOUT/s/12/180/' tdc_config.py
-	popd
+	sed -i '/TIMEOUT/s/24/180/' tdc_config.py
+	popd || exit
 }
 
 do_tc-testing_run()
@@ -324,45 +341,45 @@ do_tc-testing_run()
 	# Start tc test
 	local item="tc-testing"
 
-	[ ! -d $EXEC_DIR/${item} ] && test_skip "No $item test, skip" && return 1
+	[ ! -d "$EXEC_DIR"/${item} ] && test_skip "No $item test, skip" && return 1
 
-	pushd $EXEC_DIR/${item}
+	pushd "$EXEC_DIR"/${item} || exit
 
 	local act_tests=$(ls -d tc-tests/actions/*.json)
 	local fil_tests=$(ls -d tc-tests/filters/*.json)
 	local qdi_tests=$(ls -d tc-tests/qdiscs/*.json)
 	local total_tests="$act_tests $fil_tests $qdi_tests"
-	local total_num=$(echo ${total_tests} | wc -w)
+	local total_num=$(echo "${total_tests}" | wc -w)
 	local DEFAULT_IFACE=$(ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}')
 	local fail=0 nskip=0 ret=0
 
 	for name in ${total_tests}; do
-		num=$(($num + 1))
+		num=$((num + 1))
 
 		check_skip "${item}:${name}" && test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]" && continue
 
-		local OUTPUTFILE=$LOG_DIR/$(echo ${name} | tr '/' '_').log
+		local OUTPUTFILE=$LOG_DIR/$(echo "${name}" | tr '/' '_').log
 
-		echo ${tc_tests[$num - 1]} | grep -qP "tests\.json|concurrency\.json"  && extra_p="-d $DEFAULT_IFACE" || extra_p=""
-		./tdc.py -f ${name} $extra_p &> $OUTPUTFILE
+		echo "${name}" | grep -qP "tests\.json|concurrency\.json" && extra_p="-d $DEFAULT_IFACE" || extra_p=""
+		./tdc.py -f "${name}" "$extra_p" &> "$OUTPUTFILE"
 		ret=$?
-		if grep -q "not ok" $OUTPUTFILE; then
-			check_result $num $total_num "${item}:${name}" 1
-			fail=$(($fail+1))
-		elif grep -q "# skipped -" $OUTPUTFILE; then
-			check_result $num $total_num "${item}:${name}" $SKIP_CODE
+		if grep -q "not ok" "$OUTPUTFILE"; then
+			check_result $num "$total_num" "${item}:${name}" 1
+			fail=$((fail+1))
+		elif grep -q "# skipped -" "$OUTPUTFILE"; then
+			check_result $num "$total_num" "${item}:${name}" "$SKIP_CODE"
 			nskip=$((nskip+1))
-		elif grep -q "Traceback" $OUTPUTFILE; then
-			check_result $num $total_num "${item}:${name}" $SKIP_CODE
+		elif grep -q "Traceback" "$OUTPUTFILE"; then
+			check_result $num "$total_num" "${item}:${name}" "$SKIP_CODE"
 			nskip=$((nskip+1))
 		else
-			check_result $num $total_num "${item}:${name}" $ret
+			check_result $num "$total_num" "${item}:${name}" $ret
 		fi
 	done
 
 	echo "${item}: total $total_num, failed $fail, skipped $nskip"
 
-	popd
+	popd || exit
 }
 
 do_tc-testing_reset()
@@ -371,35 +388,39 @@ do_tc-testing_reset()
 }
 # ----------- init setups -----------
 
-# source skip/waive list
-if [ ${krelease} -eq "8" ] || [ ${krelease} -eq "9" ]; then
-	[ ! -f skip_waive.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.${krelease} -O skip_waive.list
-	[ ! -f param.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.${krelease} -O param.list
-else
-	# This list is used for upstream testing
-	[ ! -f skip_waive.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.list -O skip_waive.list
-	[ ! -f param.list ] && \
-		wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.list -O param.list
-fi
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+	# source skip/waive list
+	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
+		[ ! -f skip_waive.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive."${krelease}" -O skip_waive.list
+		[ ! -f param.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param."${krelease}" -O param.list
+	else
+		# This list is used for upstream testing
+		[ ! -f skip_waive.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.list -O skip_waive.list
+		[ ! -f param.list ] && \
+			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.list -O param.list
+	fi
 
-if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
-	submit_log skip_waive.list
-	source skip_waive.list
+	if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
+		submit_log skip_waive.list
+		source skip_waive.list
 
-	SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
-	[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]}"
-	WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]}"
+		SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
+		[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]}"
+		WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]}"
 
-fi
+	fi
 
-if [ $(wc -l param.list | cut -f 1 -d ' ') -ne 0 ]; then
-	submit_log param.list
+	if [ $(wc -l param.list | cut -f 1 -d ' ') -ne 0 ]; then
+		submit_log param.list
 
-	while read line; do
-		echo $line | grep "^#" && continue
-		TEST_PARAMS="${line};$TEST_PARAMS"
-	done < param.list
+		while read -r line; do
+			echo "$line" | grep "^#" && continue
+			TEST_PARAMS="${line};$TEST_PARAMS"
+		done < param.list
+	fi
 fi

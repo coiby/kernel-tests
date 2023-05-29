@@ -1,0 +1,12 @@
+[General]
+name=power-management/turbostat/turbostat_gather_data
+owner=Erik Hamera <ehamera@redhat.com>
+description=Gathers data for manual analysis
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=bc
+repoRequires=power-management/include_parser

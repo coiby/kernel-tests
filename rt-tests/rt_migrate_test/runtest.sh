@@ -9,7 +9,7 @@
 
 # Source rt common functions
 . ../include/runtest.sh || exit 1
-. ../../automotive/include/include.sh || exit 1
+. ../../automotive/include/rhivos.sh || exit 1
 
 TEST="rt-tests/rt_migrate_test"
 

@@ -1,0 +1,19 @@
+summary: Powers itself off
+discover:
+    how: fmf
+    test:
+        - /misc/self-poweroff
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/rhivos.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: []
+environment-file:
+    - ./misc/self-poweroff/plans/tmt.env

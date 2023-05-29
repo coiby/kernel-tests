@@ -284,14 +284,6 @@ sriov_config_vm_repo()
 			cat /etc/yum.repos.d/beaker-BaseOS.repo | awk '{system("vmsh run_cmd $vm_name \"echo "$0" >> /etc/yum.repos.d/beaker-BaseOS.repo\"")}'
 		fi
 
-		vmsh run_cmd $vm_name "cat <<-EOF > /etc/yum.repos.d/beaker-tasks.repo
-[beaker-tasks]
-name=beaker-tasks
-baseurl=http://beaker.engineering.redhat.com/rpms
-enabled=1
-gpgcheck=0
-EOF"
-
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/beaker-harness.repo"
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/myrepo_1.repo"
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/beaker-kernel0.repo"
@@ -582,7 +574,7 @@ sriov_setup_container()
 	do
 		echo "Download container image..."
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos_stream8_aarch64.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
 			podman load --input container_sriov_centos_stream8_aarch64.tar
 			if [ $? -eq 0 ]
 			then
@@ -600,7 +592,7 @@ sriov_setup_container()
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/centos_stream8_ppc64le.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
@@ -618,7 +610,7 @@ sriov_setup_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos8.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
@@ -650,7 +642,7 @@ sriov_setup_pod_container()
 	do
 		echo "Download container image..."
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos8-arm.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8-arm.tar
 			podman load --input container_sriov_centos8-arm.tar
 			if [ $? -eq 0 ]
 			then
@@ -670,7 +662,7 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/centos_stream8_ppc64le.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
@@ -690,7 +682,7 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos8.tar
+			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
@@ -11109,8 +11101,8 @@ sriov_test_vmvf_testpmd_macswap()
 				{yum install -y bzip2}
 				{yum install -y wget}
 				{yum -y install wget unzip tcpdump automake gcc make}
-				{wget -nv -N http://netqe-bj.usersys.redhat.com/share/tools/netperf-20160222.tar.bz2}
-				{tar xf $(basename http://netqe-bj.usersys.redhat.com/share/tools/netperf-20160222.tar.bz2)}
+				{wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2}
+				{tar xf $(basename http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2)}
 				{pushd netperf-*/}
 				{./autogen.sh}
 				{./configure CFLAGS=-fcommon}
@@ -12264,26 +12256,16 @@ sriov_test_cntvf_cntvf()
 	fi
 
 	# setup cntvf1
-	local containerID1=$(podman ps | grep $container1 | awk '{print $1}')
-	local nsID1=$(podman inspect -f '{{.State.Pid}}' $containerID1)
-	ip netns exec $nsID1 ip addr flush $vf1
-	ip netns exec $nsID1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	ip netns exec $nsID1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
-	#podman exec $container1 ip addr flush $vf1
-	#podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	#podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
+	podman exec $container1 ip addr flush $vf1
+	podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
+	podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
 	podman exec $container1 ip link show $vf1
 	podman exec $container1 ip addr show $vf1
 
 	# setup cntvf2
-	local containerID2=$(podman ps | grep $container2 | awk '{print $1}')
-	local nsID2=$(podman inspect -f '{{.State.Pid}}' $containerID2)
-	ip netns exec $nsID2 ip addr flush $vf2
-	ip netns exec $nsID2 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
-	ip netns exec $nsID2 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
-	#podman exec $container2 ip addr flush $vf2
-	#podman exec $container2 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
-	#podman exec $container2 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
+	podman exec $container2 ip addr flush $vf2
+	podman exec $container2 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
+	podman exec $container2 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
 	podman exec $container2 ip link show $vf2
 	podman exec $container2 ip addr show $vf2
 
@@ -12370,24 +12352,20 @@ sriov_test_cntvf_cntvf_vlan()
 	fi
 
 	# setup cntvf1
-	local containerID1=$(podman ps | grep $container1 | awk '{print $1}')
-	local nsID1=$(podman inspect -f '{{.State.Pid}}' $containerID1)
-	ip netns exec $nsID1 ip addr flush $vf1
-	ip netns exec $nsID1 ip link add link $vf1 name $vf1.$vid type vlan id $vid
-	ip netns exec $nsID1 ip link set $vf1.$vid up
-	ip netns exec $nsID1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1.$vid
-	ip netns exec $nsID1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1.$vid
+	podman exec $container1 ip addr flush $vf1
+	podman exec $container1 ip link add link $vf1 name $vf1.$vid type vlan id $vid
+	podman exec $container1 ip link set $vf1.$vid up
+	podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1.$vid
+	podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1.$vid
 	podman exec $container1 ip link show $vf1.$vid
 	podman exec $container1 ip addr show $vf1.$vid
 
 	# setup cntvf2
-	local containerID2=$(podman ps | grep $container2 | awk '{print $1}')
-	local nsID2=$(podman inspect -f '{{.State.Pid}}' $containerID2)
-	ip netns exec $nsID2 ip addr flush $vf2
-	ip netns exec $nsID2 ip link add link $vf2 name $vf2.$vid type vlan id $vid
-	ip netns exec $nsID2 ip link set $vf2.$vid up
-	ip netns exec $nsID2 ip addr add 172.30.${ipaddr}.21/24 dev $vf2.$vid
-	ip netns exec $nsID2 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2.$vid
+	podman exec $container2 ip addr flush $vf2
+	podman exec $container2 ip link add link $vf2 name $vf2.$vid type vlan id $vid
+	podman exec $container2 ip link set $vf2.$vid up
+	podman exec $container2 ip addr add 172.30.${ipaddr}.21/24 dev $vf2.$vid
+	podman exec $container2 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2.$vid
 	podman exec $container2 ip link show $vf2.$vid
 	podman exec $container2 ip addr show $vf2.$vid
 
@@ -12481,27 +12459,22 @@ sriov_test_cntvf_cntvf_jumbo()
 	fi
 
 	# setup cntvf1
-	local containerID1=$(podman ps | grep $container1 | awk '{print $1}')
-	local nsID1=$(podman inspect -f '{{.State.Pid}}' $containerID1)
-	rlLog "NSID1 $nsID1"
-	ip netns exec $nsID1 ip link set dev $vf1 mtu 9000 || { let result+=1; rlFail "failed to set mtu 9000 for VF1"; }
+	podman exec $container1 ip link set dev $vf1 mtu 9000 || { let result+=1; rlFail "failed to set mtu 9000 for VF1"; }
 	sleep 10
-	ip netns exec $nsID1 ip addr flush $vf1
-	ip netns exec $nsID1 ip link set $vf1 up
-	ip netns exec $nsID1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	ip netns exec $nsID1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
+	podman exec $container1 ip addr flush $vf1
+	podman exec $container1 ip link set $vf1 up
+	podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
+	podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
 	podman exec $container1 ip link show $vf1
 	podman exec $container1 ip addr show $vf1
 
 	# setup cntvf2
-	local containerID2=$(podman ps | grep $container2 | awk '{print $1}')
-	local nsID2=$(podman inspect -f '{{.State.Pid}}' $containerID2)
-	ip netns exec $nsID2 ip link set dev $vf2 mtu 9000 || { let result+=1; rlFail "failed to set mtu 9000 for VF2"; }
+	podman exec $container2 ip link set dev $vf2 mtu 9000 || { let result+=1; rlFail "failed to set mtu 9000 for VF2"; }
 	sleep 10
-	ip netns exec $nsID2 ip addr flush $vf2
-	ip netns exec $nsID2 ip link set $vf2 up
-	ip netns exec $nsID2 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
-	ip netns exec $nsID2 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
+	podman exec $container2 ip addr flush $vf2
+	podman exec $container2 ip link set $vf2 up
+	podman exec $container2 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
+	podman exec $container2 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
 	podman exec $container2 ip link show $vf2
 	podman exec $container2 ip addr show $vf2
 
@@ -12551,6 +12524,7 @@ sriov_test_cntvf_reboot()
 		sync_set client test_cntvf__reboot_start 14400
 		sync_wait client test_cntvf_reboot_end 14400
 		ip addr flush ${nic_test}.${vid}
+		ip link del ${nic_test}.${vid}
 		return 0
 	fi
 
@@ -12579,6 +12553,7 @@ sriov_test_cntvf_reboot()
 			ip link set ${vf} mtu 9000
 			ip link set ${vf} allmulticast on
 			ip link set ${vf} up
+			ip link set $nic_test vf $i max_tx_rate 200
 		done
 		echo "#########finished vf config#####"
 		ip link show
@@ -12702,27 +12677,17 @@ sriov_test_podcntvf_podcntvf()
 	fi
 
 	# setup pod1 cntvf
-	local containerID1=$(podman ps | grep $container1 | awk '{print $1}')
-	local nsID1=$(podman inspect -f '{{.State.Pid}}' $containerID1)
-	ip netns exec $nsID1 ip addr flush $vf1
-	ip netns exec $nsID1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	ip netns exec $nsID1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
-	#podman exec $container1 ip addr flush $vf1
-	#podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	#podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
+	podman exec $container1 ip addr flush $vf1
+	podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
+	podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
 	podman exec $container1 ip link show $vf1
 	podman exec $container2 ip link show $vf1
 	podman exec $container1 ip addr show $vf1
 
 	# setup pod2 cntvf
-	local containerID3=$(podman ps | grep $container3 | awk '{print $1}')
-	local nsID3=$(podman inspect -f '{{.State.Pid}}' $containerID3)
-	ip netns exec $nsID3 ip addr flush $vf2
-	ip netns exec $nsID3 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
-	ip netns exec $nsID3 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
-	#podman exec $container3 ip addr flush $vf2
-	#podman exec $container3 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
-	#podman exec $container3 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
+	podman exec $container3 ip addr flush $vf2
+	podman exec $container3 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
+	podman exec $container3 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
 	podman exec $container3 ip link show $vf2
 	podman exec $container4 ip link show $vf2
 	podman exec $container3 ip addr show $vf2
@@ -12798,9 +12763,9 @@ sriov_test_podcntvf1_podcntvf2()
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
 	if ! sriov_create_vfs $iface1 0 2 ||
-		! sriov_create_vfs $iface2 0 2; then
-		rlLog "${test_name} failed:create vfs failed."
-		sriov_remove_vfs $iface1 0
+	   ! sriov_create_vfs $iface2 0 2; then
+	   	rlLog "${test_name} failed:create vfs failed."
+	   	sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
 		sync_set server ${test_name}_end
 		return 1
@@ -12843,27 +12808,17 @@ sriov_test_podcntvf1_podcntvf2()
 	fi
 
 	# setup pod1 cntvf
-	local containerID1=$(podman ps | grep $container1 | awk '{print $1}')
-	local nsID1=$(podman inspect -f '{{.State.Pid}}' $containerID1)
-	ip netns exec $nsID1 ip addr flush $vf1
-	ip netns exec $nsID1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	ip netns exec $nsID1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
-	#podman exec $container1 ip addr flush $vf1
-	#podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	#podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
+	podman exec $container1 ip addr flush $vf1
+	podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
+	podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
 	podman exec $container1 ip link show $vf1
 	podman exec $container2 ip link show $vf1
 	podman exec $container1 ip addr show $vf1
 
 	# setup pod2 cntvf
-	local containerID3=$(podman ps | grep $container3 | awk '{print $1}')
-	local nsID3=$(podman inspect -f '{{.State.Pid}}' $containerID3)
-	ip netns exec $nsID3 ip addr flush $vf2
-	ip netns exec $nsID3 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
-	ip netns exec $nsID3 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
-	#podman exec $container3 ip addr flush $vf2
-	#podman exec $container3 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
-	#podman exec $container3 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
+	podman exec $container3 ip addr flush $vf2
+	podman exec $container3 ip addr add 172.30.${ipaddr}.21/24 dev $vf2
+	podman exec $container3 ip addr add 2021:db8:${ipaddr}::21/64 dev $vf2
 	podman exec $container3 ip link show $vf2
 	podman exec $container4 ip link show $vf2
 	podman exec $container3 ip addr show $vf2
@@ -12944,14 +12899,9 @@ sriov_test_podcntvf_remote()
 	fi
 
 	# setup pod1 cntvf
-	local containerID1=$(podman ps | grep $container1 | awk '{print $1}')
-	local nsID1=$(podman inspect -f '{{.State.Pid}}' $containerID1)
-	ip netns exec $nsID1 ip addr flush $vf1
-	ip netns exec $nsID1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	ip netns exec $nsID1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
-	#podman exec $container1 ip addr flush $vf1
-	#podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
-	#podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
+	podman exec $container1 ip addr flush $vf1
+	podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
+	podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
 	podman exec $container1 ip link show $vf1
 	podman exec $container2 ip link show $vf1
 	podman exec $container1 ip addr show $vf1
@@ -13959,7 +13909,7 @@ sriov_test_negative_create_vfs_2000180()
 #		local jobid=$(cat /etc/motd | grep JOBID | awk -F "=" '{print $2}' | tr -d '\n' | tr -d " ")
 #		local kernel_version=$(uname -r)
 #		local hostname=$(hostname)
-#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore on http://netqe-bj.usersys.redhat.com/vmcore/${user}/${KERNEL_VERSION}/${jobid}/${hostname}"
+#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore"
 #		local file_list=$(find /var/crash/${user}/${KERNEL_VERSION}/${jobid}/${hostname}/ -name vmcore*)
 #		if [[ ${file_list} != "" ]]; then
 #			rlFail "can find vmcore file, need to check"
@@ -14202,7 +14152,7 @@ sriov_test_reproduce_2021326()
 #		local jobid=$(cat /etc/motd | grep JOBID | awk -F "=" '{print $2}' | tr -d '\n' | tr -d " ")
 #		local kernel_version=$(uname -r)
 #		local hostname=$(hostname)
-#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore on http://netqe-bj.usersys.redhat.com/vmcore/${user}/${KERNEL_VERSION}/${jobid}/${hostname}"
+#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore"
 #		local file_list=$(find /var/crash/${user}/${KERNEL_VERSION}/${jobid}/${hostname}/ -name vmcore*)
 #		if [[ ${file_list} != "" ]]; then
 #			rlFail "can find vmcore file, need to check"

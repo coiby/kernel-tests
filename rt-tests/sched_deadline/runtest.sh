@@ -6,7 +6,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Enable TMT testing for RHIVOS
-. ../../automotive/include/include.sh || exit 1
+. ../../automotive/include/rhivos.sh || exit 1
 : ${OUTPUTFILE:=runtest.log}
 
 # Source rt common functions

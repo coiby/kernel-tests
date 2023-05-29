@@ -1,0 +1,21 @@
+summary: Powers itself off
+description: |
+    Powers itself off.
+
+    This is intended to be used by the Guest in a Beaker job using a
+    <guestrecipe>.
+    When using it, the Guest powers off to allow the Host machine to safely
+    modify the guest settings (such as VM configuration, firmware settings).
+    The Host should then power it back on in a separate further task.
+
+    See also: misc/wait-guest-poweroff
+contact: Oliver Gutierrez <ogutierr@redhat.com>
+component:
+  - kernel
+path: /misc/self-poweroff
+test: bash -x ./runtest.sh
+framework: shell
+require: []
+duration: 1h
+extra-summary: /misc/self-poweroff
+extra-task: /misc/self-poweroff

@@ -23,5 +23,6 @@ framework: shell
 recommend:
   - kernel
 duration: 1h
+id: 105e04e5-730f-4218-b8cb-60546ef894fe
 extra-summary: /kernel/hotplug/cpusofthotplug
 extra-task: /kernel/hotplug/cpusofthotplug

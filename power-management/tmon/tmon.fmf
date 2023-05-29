@@ -14,5 +14,3 @@ duration: 1h
 extra-summary: /kernel/power-management/tmon
 extra-task: /kernel/power-management/tmon
 id: d43ea239-8939-4800-88e0-073c3e970bd3
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291953

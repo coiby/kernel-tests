@@ -29,6 +29,8 @@
 # Include Beakerlib environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../cki_lib/libcki.sh || exit 1
+. ../../../kernel-include/runtest.sh || exit 1
+
 export AVC_ERROR="+no_avc_check"
 PACKAGE="selinux-policy"
 
@@ -123,16 +125,6 @@ function boolSet() {
     [ "$(boolGet "$1")" == "$2" ]
 }
 
-kname="kernel"
-if cki_is_kernel_rt; then
-    kname="kernel-rt"
-fi
-if cki_is_kernel_automotive; then
-    kname="kernel-automotive"
-fi
-if cki_is_kernel_debug; then
-    kname="${kname}-debug"
-fi
 rlJournalStart
     rlPhaseStartSetup "Install"
         # We need to install the kernel-* packages by ourselves, since we need
@@ -144,9 +136,11 @@ rlJournalStart
         KERNEL_VERSION="$(uname -r)"
         PKG_VERSION="${KERNEL_VERSION%+debug}"
 
+        modules_extra_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-extra)
+        devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
         REQUIRES="
-            ${kname}-modules-extra-$PKG_VERSION
-            ${kname}-devel-$PKG_VERSION
+            ${modules_extra_pkg}
+            ${devel_pkg}
         "
         rlRun "installDeps \$REQUIRES" 0 "Install requires"
 

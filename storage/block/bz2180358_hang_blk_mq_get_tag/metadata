@@ -1,0 +1,13 @@
+[General]
+name=storage/block/bz2180358_hang_blk_mq_get_tag
+owner=Changhui Zhong <czhong@redhat.com>
+description=fio hangs on scsi_debug in blk_mq_get_tag
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=fio;libaio;libaio-devel
+repoRequires=cki_lib
+max_time=1h

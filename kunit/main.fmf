@@ -7,6 +7,4 @@ require:
   - python3-pip
 extra-summary: KUNIT
 extra-task: KUNIT
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291929
 id: c55dc1bf-96af-4322-987f-ee36eda21b74

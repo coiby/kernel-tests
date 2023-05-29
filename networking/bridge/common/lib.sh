@@ -230,12 +230,10 @@ get_image_file()
 {
     local image_file=$1
     local image_seq=$2
-    if hostname | grep "pek2.redhat.com" &>/dev/null
-    then
-        wget -q http://netqe-bj.usersys.redhat.com/share/vms/$image_file
-    else
-        wget -q http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/vms/RHEL/$image_file
-    fi
+
+
+    wget -q http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/vms/RHEL/$image_file
+
     mv $image_file /var/lib/libvirt/images/$image_seq-$image_file
     if [ -e /var/lib/libvirt/images/$image_seq-$image_file ]; then
         echo "$image_seq-$image_file"

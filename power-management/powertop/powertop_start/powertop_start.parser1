@@ -2,6 +2,7 @@
 #This test tests if powertop service runs - related to BZ1392438
 parser lhc1
 sysinfo uname lscpu bios
+run 0 rpm -qa powertop
 #1, 2 and 3 are names of results
 run 1 systemctl enable powertop.service
 run 2 systemctl start powertop.service

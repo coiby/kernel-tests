@@ -1,0 +1,21 @@
+summary: KS-RDMA-TC:pyverbs-tests
+description: pyverbs-tests
+contact: Zhaojuan Guo <zguo@redhat.com>
+component:
+  - rdma
+path: /rdma/pyverbs-tests
+test: bash -x ./runtest.sh
+framework: shell
+duration: 20m
+tag:
+  - regression
+  - functional
+tier: 2
+enabled: true
+adjust:
+    enabled: false
+    when: distro < rhel-8
+    because: The feature was added in rhel-8
+extra-summary: /rdma/pyverbs-tests
+extra-task: /rdma/pyverbs-tests
+id: b3a960b3-d7af-48f0-ab78-c90476f36027

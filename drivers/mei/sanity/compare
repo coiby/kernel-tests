@@ -39,7 +39,7 @@ rlJournalStart
     # Run mei-amt-version test on kernel 3.10.0-352 and older (uses /dev/mei)
     # Run mei-amt-check test on kernel 3.10.0-353 and newer (uses /dev/mei0)
     #   [misc] mei: move from misc to char device
-    #   http://git.app.eng.bos.redhat.com/git/rhel7.git/commit/?id=dcb23f671cd0
+    #   https://gitlab.com/redhat/rhel/src/kernel/rhel-7/-/commit/dcb23f671cd0
     #
     # mei-amt-version is found in kernel's Documentation/misc-devices/mei
     # mei-amt-check is from https://github.com/mjg59/mei-amt-check

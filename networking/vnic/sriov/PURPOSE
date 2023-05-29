@@ -13,5 +13,5 @@ SRIOV_TOPO=test_name if only the specific test is to run
 
 Macros can be changed if needed.
 pkg_netperf="ftp://ftp.netperf.org/netperf/netperf-2.6.0.tar.bz2"
-img_vm="http://netqe-bj.usersys.redhat.com/share/vms/$image_name"
+img_vm="http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/$image_name"
 

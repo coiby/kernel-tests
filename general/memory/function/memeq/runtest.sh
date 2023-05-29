@@ -8,7 +8,7 @@ set -o pipefail
 OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile}
 TASKID=${TASKID:-UNKNOWN}
 
-tmpdir=$(dirname $OUTPUTFILE)/mem_$TASKID
+tmpdir=$(dirname "$OUTPUTFILE")/mem_$TASKID
 kmem_peak=$(cat /sys/fs/cgroup/memory/memory.kmem.max_usage_in_bytes)
 cur_used=$(free | awk '/Mem/ {print $3}')
 
@@ -16,51 +16,50 @@ cur_used=$(free | awk '/Mem/ {print $3}')
 function set_mem()
 {
 	# added these Memory compare to make sure this case as a
-	# genereal testcase to cover "mem=" parameter in kernel
-	MEM_TOTAL=`free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p"`
+	# general test case to cover "mem=" parameter in kernel
+	MEM_TOTAL=$(free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p")
 	echo "MEM_TOTAL= $MEM_TOTAL kB"
-	if [ $MEM_TOTAL -ge 1073741824 ]; then
+	if [ "$MEM_TOTAL" -ge 1073741824 ]; then
 	{
 		export MEM="${MEM:-1024G}"
-	} elif [ $MEM_TOTAL -ge 536870912 ]; then
+	} elif [ "$MEM_TOTAL" -ge 536870912 ]; then
 	{
 		export MEM="${MEM:-65536M 128G 0x500000000}"
-
-	} elif [ $MEM_TOTAL -ge 12582912 ]; then
+	} elif [ "$MEM_TOTAL" -ge 12582912 ]; then
 	{
-	# For ppc64le on rhel-alt, 12G caused oom, system with 500G memory.
-	local szlist="12G"
-	local factor=12
+		# For ppc64le on rhel-alt, 12G caused oom, system with 500G memory.
+		local szlist="12G"
+		local factor=12
 
-	hostname | grep p9b
-	[ $? = 0 ] && szlist="24G" && factor=24
+		hostname | grep p9b
+		[ $? = 0 ] && szlist="24G" && factor=24
 
-	local comp=$((factor * 1024 * 1024 * 1024))
-	local nproc=$(nproc)
-	local inG
+		local comp=$((factor * 1024 * 1024 * 1024))
+		local nproc=$(nproc)
+		local inG
 
-	if [ $cur_used -gt $comp -a "$kmem_peak" -ne 0 -a $kmem_peak -gt $cur_used ]; then
-		szlist=$((kmem_peak + nproc * 1024 * 1024 * 32))
-		inG=$((szlist /1024/1024/1024 + 1))
-		szlist+=" ${inG}G"
-	elif [ "$cur_used" -ne 0 -a "$cur_used" -gt $comp ]; then
-		inG=$((cur_used / 1024 / 1024 / 1024 + nproc * 32 / 1024 + 1))
-		szlist="$((cur_used + nproc * 1024 * 1024 * 32))"
-		szlist+=" ${inG}G"
-	fi
-	export MEM="${MEM:-${szlist:-12G 0x200000000}}"
-
-	} elif [ $MEM_TOTAL -ge 8388608 ]; then
+		if [[ "$cur_used" -gt "$comp" && "$kmem_peak" -ne 0 && "$kmem_peak" -gt "$cur_used" ]]; then
+		{
+			szlist=$((kmem_peak + nproc * 1024 * 1024 * 32))
+			inG=$((szlist /1024/1024/1024 + 1))
+			szlist+=" ${inG}G"
+		} elif [[ "$cur_used" -ne 0 && "$cur_used" -gt $comp ]]; then
+		{
+			inG=$((cur_used / 1024 / 1024 / 1024 + nproc * 32 / 1024 + 1))
+			szlist="$((cur_used + nproc * 1024 * 1024 * 32))"
+			szlist+=" ${inG}G"
+		}
+		fi
+		export MEM="${MEM:-${szlist:-12G 0x200000000}}"
+	} elif [ "$MEM_TOTAL" -ge 8388608 ]; then
 	{
 		export MEM="${MEM:-4096M 0x200000000}"
-
-	} elif [ $MEM_TOTAL -ge 4194304 ]; then
+	} elif [ "$MEM_TOTAL" -ge 4194304 ]; then
 	{
 		export MEM="${MEM:-4096M}"
-
 	} else {
 		echo "Sorry, the system RAM is too low to test."
-		rstrnt-report-result Test_Skipped PASS 99
+		rstrnt-report-result $RSTRNT_TASKNAME SKIP
 		exit 0
 	}
 	fi
@@ -86,7 +85,7 @@ function kilobytes()
 
 rlJournalStart
 
-if [ ! -d $tmpdir ]; then
+if [ ! -d "$tmpdir" ]; then
 	rlPhaseStartSetup
 		# setup MEM paramenter
 		rlRun "set_mem"
@@ -98,7 +97,7 @@ if [ ! -d $tmpdir ]; then
 		rlRun "pushd $tmpdir"
 		echo "start" > list
 		for x in $MEM; do
-				echo $x >> list
+			echo "$x" >> list
 		done
 		echo "stop" >> list
 		echo "exit" >> list
@@ -115,7 +114,7 @@ rlPhaseStartTest
 	rlRun -l "echo m > /proc/sysrq-trigger"
 	rlRun -l "cat /proc/zoneinfo"
 
-	# According to the current kmem/mem usage status, help to determin the minimum
+	# According to the current kmem/mem usage status, help to determine the minimum
 	# mem=, otherwise, oom can be seen (on power9 p9b machines)
 	rlRun -l "cat /sys/fs/cgroup/memory/memory.kmem.max_usage_in_bytes" 0-255
 	rlRun -l "free | awk '/Mem/ {print $3}'" 0-255 "Get the current used memory" 0-255
@@ -131,7 +130,7 @@ rlPhaseStartTest
 	rlLog "Total memory (reported by 'free') $free_total kB"
 	rlRun -l "dmesg_total=\$(dmesg | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
 
-	if [ "$current" != "start" -a "$current" != "stop" ]; then
+	if [[ "$current" != "start" && "$current" != "stop" ]]; then
 		# check if the kernel parameter is set
 		rlRun "cat /proc/cmdline | grep \"mem=$current\""
 		rlLog "mem=$current which is $(kilobytes $current) kB"
@@ -147,7 +146,7 @@ rlPhaseStartTest
 
 		rlRun "[ -n \"$free_total\" -a -n \"$dmesg_total\" -a -n \"$current\" ]"
 
-		if [ ! "$(uname -m)" = aarch64 ]; then
+		if [ "$(uname -m)" != aarch64 ]; then
 			retval=0
 		else
 			rlLogInfo "aarch64 bz1666362, skip checking result"

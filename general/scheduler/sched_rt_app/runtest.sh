@@ -27,7 +27,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Enable TMT testing for RHIVOS
-auto_include=../../../automotive/include/include.sh
+auto_include=../../../automotive/include/rhivos.sh
 [ -f $auto_include ] && . $auto_include
 declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 declare -F check_result && report_func=check_result || report_func=report_result

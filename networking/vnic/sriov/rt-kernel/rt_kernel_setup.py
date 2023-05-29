@@ -128,7 +128,7 @@ def download_vm_image(vm_names, rhel_image_name=None):
         else:
             try:
                 runcmd(
-                    f'wget -nv -N http://netqe-bj.usersys.redhat.com/share/vms/{rhel_image_name} '
+                    f'wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/{rhel_image_name} '
                     f'-P /var/lib/libvirt/images/')
             except Exception as a:
                 print('rt_kernel_setup.py: \n', a)
@@ -179,7 +179,6 @@ def configure_vm_repo(vm_name, vm_rhel_version, my_repo=None):
             ResilientStorage_url = "http://download.eng.pek2.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/ResilientStorage/x86_64/os/"
             SAP_url = "http://download.eng.pek2.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/SAP/x86_64/os/"
             SAPHANA_url = "http://download.eng.pek2.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/SAPHANA/x86_64/os/"
-            BEAKER_HARNESS = "https://beaker.engineering.redhat.com/harness/RedHatEnterpriseLinux8/"
         elif vm_rhel_version >= "9":
             AppStream_url = "http://download.eng.pek2.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/x86_64/os/"
             BaseOS_url = "http://download.eng.pek2.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/x86_64/os/"
@@ -190,7 +189,6 @@ def configure_vm_repo(vm_name, vm_rhel_version, my_repo=None):
             ResilientStorage_url = "http://download.eng.pek2.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/ResilientStorage/x86_64/os/"
             SAP_url = "http://download.eng.pek2.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/SAP/x86_64/os/"
             SAPHANA_url = "http://download.eng.pek2.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/SAPHANA/x86_64/os/"
-            BEAKER_HARNESS = "https://beaker.engineering.redhat.com/harness/RedHatEnterpriseLinux9/"
     elif 'bos' in hostname:
         if "8" <= vm_rhel_version < "9":
             AppStream_url = "http://download-node-02.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/AppStream/x86_64/os/"
@@ -202,7 +200,6 @@ def configure_vm_repo(vm_name, vm_rhel_version, my_repo=None):
             ResilientStorage_url = "http://download-node-02.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/ResilientStorage/x86_64/os/"
             SAP_url = "http://download-node-02.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/SAP/x86_64/os/"
             SAPHANA_url = "http://download-node-02.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/SAPHANA/x86_64/os/"
-            BEAKER_HARNESS = "https://beaker.engineering.redhat.com/harness/RedHatEnterpriseLinux8/"
         elif vm_rhel_version >= "9":
             AppStream_url = "http://download-node-02.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/x86_64/os/"
             BaseOS_url = "http://download-node-02.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/x86_64/os/"
@@ -213,7 +210,6 @@ def configure_vm_repo(vm_name, vm_rhel_version, my_repo=None):
             ResilientStorage_url = "http://download-node-02.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/ResilientStorage/x86_64/os/"
             SAP_url = "http://download-node-02.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/SAP/x86_64/os/"
             SAPHANA_url = "http://download-node-02.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/SAPHANA/x86_64/os/"
-            BEAKER_HARNESS = "https://beaker.engineering.redhat.com/harness/RedHatEnterpriseLinux9/"
     else:
         print(f'rt_kernel_setup.py: \nconfigure_vm_repo can\'t find suit repo for test server')
         sys.exit(1)
@@ -322,17 +318,6 @@ def configure_vm_repo(vm_name, vm_rhel_version, my_repo=None):
                'gpgcheck=0\n'
                'skip_if_unavailable=1\n'
                'EOF"' % (vm_name, BEAKER_HARNESS))
-    # add custome repo configure
-    runcmd('/usr/local/bin/vmsh run_cmd %s "cat <<-EOF > /etc/yum.repos.d/beaker-tasks.repo\n'
-           '[beaker-tasks]\n'
-           'name=beaker-tasks\n'
-           'baseurl=http://beaker.engineering.redhat.com/rpms\n'
-           'enabled=1\n'
-           'priority=1\n'
-           'gpgcheck=0\n'
-           'sslverify=0\n'
-           'skip_if_unavailable=1\n'
-           'EOF"' % vm_name)
     if my_repo is not None:
         runcmd('/usr/local/bin/vmsh run_cmd %s "cat <<-EOF > /etc/yum.repos.d/my_repo.repo\n'
                '[my_repo]\n'

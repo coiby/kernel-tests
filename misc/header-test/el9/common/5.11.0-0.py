@@ -118,6 +118,9 @@ def setup(exc):
     exc['linux/vm_sockets.h'] = ([SOCKADDR],
                                  OK, 'sockaddr sa_family_t')
 
+    exc['perf/event.h'] = ([],
+                           WARN | DENYLIST, 'no compiler.h or stdbool')
+
     exc['scsi/scsi_bsg_fc.h'] = (['stdint.h'],
                                  OK, 'uint32_t')
 

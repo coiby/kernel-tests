@@ -13,8 +13,6 @@ description: |+
     list.
 
 enabled: true
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291949
 id: 6f4b3c26-4c60-4e7d-8cdc-8a7de9a1da8e
 tag:
   - fmf-export

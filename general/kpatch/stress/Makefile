@@ -60,6 +60,7 @@ $(METADATA): Makefile
 	@echo "License:         GPLv2+" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
 	@echo "Destructive:     no" >> $(METADATA)
+	@echo "RepoRequires:    general/kpatch/include" >> $(METADATA)
 	@echo "Releases:        -RHEL4 -RHELClient5 -RHELServer5 -RHEL6 -RHEL7" >> $(METADATA)
 	@echo "RhtsRequires:    kernel-kernel-general-include" >> $(METADATA)
 

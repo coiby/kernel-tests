@@ -1,0 +1,6 @@
+iommu.passthrough=0
+iommu.passthrough=1
+iommu.strict=0
+iommu.strict=1
+iommu.forcedac=0
+iommu.forcedac=1

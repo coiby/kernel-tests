@@ -1,6 +1,9 @@
 [Codeowners]
 /CODEOWNERS @bgoncalv @lulinqing @mh21
 
+[AllowedInternalHosts]
+/.allowed-hosts @bgoncalv @lulinqing @mh21
+
 [tests]
 /filesystems/xfs/xfs-repair-dryrun/ @jbastianrh
 /general/crc32c-self-check/ @jbastianrh
@@ -53,7 +56,6 @@
 [CKI]
 /acpi/acpitable/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /acpi/enabled/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/autofs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /container/podman/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /core-kernel/module_diff/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -69,6 +71,8 @@
 /filesystems/nfs/connectathon/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /filesystems/xfs/xfstests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /firmware/user-specified/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/general/memory/function/kaslr/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/general/memory/function/memfd_create/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /general/process/trinity_git/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /iommu/boot/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /ipmi/stress/driver/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -85,8 +89,6 @@
 /legacy/whitelist/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /livepatch/selftests/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /memory/fork_mem/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/memory/function/kaslr/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/memory/function/memfd_create/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /misc/amtu/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /misc/header-test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /misc/kernel-fips-mode/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -127,13 +129,13 @@
 /pciutils/update-pciids/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /power-management/cpufreq/cpufreq_governor/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/latency_perf/oslat_valid/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/rt-tests/latency_perf/rt_cyclic/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/pi_stress/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/rt_ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/rt_migrate_test/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/rteval/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/sched_deadline/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/rt-tests/smidetect/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/rt-tests/us/rtla/rtla-osnoise/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/rt-tests/us/rtla/rtla-timerlat/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/us/stalld/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /security/crypto/ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /security/integrity/ltp/ @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -192,21 +194,24 @@
 /filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
 /filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing @nstraz
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
+/general/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/general/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/iommu/boot/ @bgoncalv @lulinqing @wrgrh
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
-/kdump-cki/kdump-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
-/kdump-cki/kdump-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @thenzl
-/kdump-cki/kexec-boot/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
-/kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing
-/kselftests/ @bgoncalv @liuhangbin @lulinqing @npache @sbertram
+/jvm/dacapobench/ @bgoncalv @lulinqing @tstuefe1
+/jvm/jcstress/ @bgoncalv @lulinqing @tstuefe1
+/kdump-cki/kdump-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
+/kdump-cki/kdump-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @thenzl @yiyan1
+/kdump-cki/kexec-boot/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
+/kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
+/kselftests/ @bgoncalv @fmaurer-rh @liuhangbin @lulinqing @npache @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
 /legacy/whitelist/ @bgoncalv @ckalina @lulinqing
 /livepatch/selftests/ @bgoncalv @joe.lawrence @lulinqing @ykopkova
 /memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /misc/header-test/ @bgoncalv @jbastianrh @lulinqing
 /misc/kernel-fips-mode/ @bgoncalv @lulinqing @omoris
@@ -232,22 +237,28 @@
 /networking/vnic/sriov/ @bgoncalv @lulinqing @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
+/packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @lulinqing @psklenar1
+/packages/iotop/sanity/ @bgoncalv @lulinqing @xjezda00
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
+/packages/net-snmp/tcp-transport/ @bgoncalv @efedin @lulinqing
 /packages/perf/internal-testsuite/ @bgoncalv @lulinqing @mpetlan
 /packages/perf/perftool-testsuite/ @bgoncalv @lulinqing @mpetlan
 /packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @ckalina @lulinqing
 /packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @ckalina @lulinqing
 /packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @ckalina @lulinqing
-/packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @omos
+/packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @milosmalik @omos
+/packages/tuned/tune-processes-through-perf/ @bgoncalv @lulinqing @psklenar1
+/pciutils/sanity-smoke/ @bgoncalv @lulinqing @wrgrh
+/pciutils/update-pciids/ @bgoncalv @lulinqing @wrgrh
 /power-management/cpufreq/cpufreq_governor/ @Precambrian_horror @bgoncalv @lulinqing
 /rt-tests/latency_perf/oslat_valid/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/latency_perf/rt_cyclic/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/pi_stress/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/rt_ltp/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/rt_migrate_test/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/rteval/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/sched_deadline/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/smidetect/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/us/rtla/rtla-osnoise/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/us/rtla/rtla-timerlat/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/us/stalld/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /security/crypto/ltp/ @bgoncalv @denli @lulinqing
 /security/integrity/ltp/ @bgoncalv @denli @lulinqing

@@ -124,7 +124,7 @@ ConfigStaticNetwork() {
 
         fi
 
-        ping -I $NIC -c 3 gitlab.cee.redhat.com || {
+        ping -I $NIC -c 3 8.8.8.8 || {
             Log "Fail to restart network"
             Log "Try to restore network"
             for f in ./ifcfg-*-bak; do

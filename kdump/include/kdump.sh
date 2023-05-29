@@ -44,6 +44,7 @@ DefKdumpMem()
         elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
             args="crashkernel=2G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+            [[ "$1" = fadump ]] && args="crashkernel=4G-16G:768M,16G-64G:1G,64G-128G:2G,128G-1T:4G,1T-2T:6G,2T-4T:12G,4T-8T:20G,8T-16T:36G,16T-32T:64G,32T-64T:128G,64T-:180G"
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=1G-4G:256M,4G-64G:320M,64G-:576M"
         fi
 

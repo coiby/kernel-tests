@@ -28,6 +28,4 @@ recommend:
   - audit-libs-devel
 extra-summary: misc/amtu
 extra-task: misc/amtu
-link:
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291932
 id: 8a04ec2e-52e5-4be6-ac80-9d997e80f726
