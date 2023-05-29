@@ -1,0 +1,19 @@
+summary: Use crash utility to analyse the vmcore
+discover:
+    how: fmf
+    test:
+        - /kdump/analyse-crash-cmd
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [TBD_CASE_PACKAGES]
+environment-file:
+    - ./kdump/analyse-crash-cmd/plans/tmt.env
