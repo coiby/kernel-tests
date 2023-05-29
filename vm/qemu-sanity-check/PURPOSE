@@ -1,0 +1,2 @@
+Test if the kernel boots on top of qemu-kvm.
+Test both KVM and TCG (software emulation).
