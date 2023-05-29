@@ -20,3 +20,4 @@ require:
 duration: 30m
 extra-summary: /kernel/audio_tests/functional/mixer_control_range_sanity_test
 extra-task: /kernel/audio_tests/functional/mixer_control_range_sanity_test
+id: cb589b44-ab7a-47dd-93f5-fe1e3be36658
