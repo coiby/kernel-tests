@@ -6,7 +6,7 @@ component:
 path: /kdump/analyse-crash-live-cmd
 test: bash -x ./runtest.sh
 framework: beakerlib
-require: [TBD_CASE_PACKAGES]
+require: []
 duration: 150m
 extra-summary: /kdump/analyse-crash-live-cmd
 extra-task: /kdump/analyse-crash-live-cmd
