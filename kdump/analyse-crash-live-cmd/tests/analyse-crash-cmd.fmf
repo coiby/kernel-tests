@@ -1,12 +1,12 @@
-summary: Use crash utility to analyse the vmcore
-description: Use crash utility to analyse the vmcore
+summary: Use crash utility to analyse a live system
+description: Use crash utility to analyse a live system
 contact: Kdump QE <kdump-qe-list@redhat.com>
 component:
   - kernel
-path: /kdump/analyse-crash-cmd
+path: /kdump/analyse-crash-live-cmd
 test: bash -x ./runtest.sh
 framework: beakerlib
 require: [TBD_CASE_PACKAGES]
-duration: 300m
-extra-summary: /kdump/analyse-crash-cmd
-extra-task: /kdump/analyse-crash-cmd
+duration: 150m
+extra-summary: /kdump/analyse-crash-live-cmd
+extra-task: /kdump/analyse-crash-live-cmd
