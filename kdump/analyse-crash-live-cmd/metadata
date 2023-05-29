@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 [restraint]
 entry_point=make run
-dependencies=TBD_CASE_PACKAGES
+dependencies=no
 repoRequires=automotive/include
 max_time=150m
 use_pty=false
