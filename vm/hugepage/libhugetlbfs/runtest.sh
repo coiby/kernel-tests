@@ -40,6 +40,28 @@ PACKAGE_VERSION="2.21"
 grep -q "release [5-7].*" /etc/redhat-release && PACKAGE_VERSION="2.18"
 TARGET=${PACKAGE_NAME}-${PACKAGE_VERSION}
 PACKAGE_URL="$LOOKASIDE/$PACKAGE_VERSION/$TARGET.tar.gz"
+
+# Some of aarch64 platforms reboot on waiting too long for chrony to
+# synchronize system clock.
+# This proactively correct the system clock to get rid of the wrong
+# time implications in the libhugetlbfs build. If unable to correct,
+# restart the chronyd service completely.
+loop=0
+while [ $loop -lt 10 ]; do
+    chronyc makestep
+    if [ $? -eq 0 ]; then
+        break;
+    fi
+
+    loop=$((loop+1))
+
+    if [ $loop -eq 10 ]; then
+        systemctl restart chronyd
+    fi
+
+    sleep 2
+done
+
 bash $CDIR/utils/build.sh $PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_URL
 if [ $? -ne 0 ]; then
     echo "Oops, failed to build $TARGET"
