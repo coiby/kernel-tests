@@ -1,7 +1,7 @@
 [General]
-name=kdump/analyse-crash-cmd
+name=kdump/analyse-crash-live-cmd
 owner=Kdump QE <kdump-qe-list@redhat.com>
-description=Use crash utility to analyse the vmcore
+description=Use crash utility to analyse a live system
 license=GPLv3
 confidential=no
 destructive=no
@@ -9,5 +9,5 @@ destructive=no
 entry_point=make run
 dependencies=TBD_CASE_PACKAGES
 repoRequires=automotive/include
-max_time=300m
+max_time=150m
 use_pty=false
