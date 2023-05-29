@@ -293,17 +293,26 @@ Describe 'kpkginstall: get_kpkg_ver rpms'
     cleanup(){
         rm -rf /var/tmp/kpkginstall
     }
-    BeforeAll 'cleanup'
-    AfterAll 'cleanup'
-    It 'can set kernel version'
+    BeforeEach 'cleanup'
+    AfterEach 'cleanup'
+    Parameters
+        # PACKAGE_NAME ARCH     KVER_RPM                        DNF_UNAME_R                                     UNAME_R
+        kernel-redhat  ppc64le  0.1-5.el9                       6.4.0-5.el9.ppc64le                             6.4.0-5.el9.ppc64le
+        kerel-rt-debug x86_64   5.14.0-319.2616_881769087.el9   5.14.0-319.2616_881769087.el9.x86_64+rt_debug   5.14.0-319.2616_881769087.el9.x86_64+rt-debug
+    End
+    It "can set kernel version $1-$3.$2"
         export KPKG_URL="$KERNEL_RPM_URL"
         export YUM="dnf"
-        export ARCH="ppc64le"
+        export ARCH="$2"
+        export _PACKAGE_NAME="$1"
+        export _RPM_VER="$3"
+        export _DNF_UNAME="$4"
+        export _UNAME="$5"
         dnf(){
             if [[ "$*" =~ " list " ]]; then
-                echo "kernel-redhat.ppc64le      0.1-5.el9        kernel-cki"
+                echo "$_PACKAGE_NAME.$ARCH      $_RPM_VER        kernel-cki"
             elif [[ "$*" =~ " repoquery " ]]; then
-                echo "kernel-redhat-core-uname-r = 6.4.0-5.el9.ppc64le"
+                echo "kernel-redhat-core-uname-r = $_DNF_UNAME"
             else
                 echo "dnf $*"
             fi
@@ -316,15 +325,22 @@ Describe 'kpkginstall: get_kpkg_ver rpms'
         mkdir -p /var/tmp/kpkginstall/vars
         When call get_kpkg_ver
         The variable REPO_NAME should eq "kernel-cki"
-        The contents of file /var/tmp/kpkginstall/KPKG_KVER should equal "6.4.0-5.el9.ppc64le"
-        The contents of file /var/tmp/kpkginstall/KPKG_KVER_RPM should equal "0.1-5.el9.ppc64le"
+        The contents of file /var/tmp/kpkginstall/KPKG_KVER should equal "$_UNAME"
+        The contents of file /var/tmp/kpkginstall/KPKG_KVER_RPM should equal "$_RPM_VER.$ARCH"
         The first line should equal "ℹ️ Repo Name set REPO_NAME=kernel-cki"
     End
     It 'can read kernel version after it was set the first time'
+        export ARCH="$2"
+        export _PACKAGE_NAME="$1"
+        export _RPM_VER="$3"
+        export _UNAME="$5"
+        mkdir /var/tmp/kpkginstall
+        echo "$_UNAME" > /var/tmp/kpkginstall/KPKG_KVER
+        echo "$_RPM_VER.$ARCH" > /var/tmp/kpkginstall/KPKG_KVER_RPM
         # Call for the second time as it is done after reboot
         When call get_kpkg_ver
-        The first line should equal "✅ Found kernel rpm version string in cache on disk: 0.1-5.el9.ppc64le"
-        The line 2 should equal "✅ Found kernel version string in cache on disk: 6.4.0-5.el9.ppc64le"
+        The first line should equal "✅ Found kernel rpm version string in cache on disk: $_RPM_VER.$ARCH"
+        The line 2 should equal "✅ Found kernel version string in cache on disk: $_UNAME"
         The status should be success
     End
 End
