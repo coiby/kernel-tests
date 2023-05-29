@@ -8,6 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash -x ./runtest.sh
-dependencies=gcc;make;kernel-devel;kernel-64k-devel
+dependencies=gcc;make;kernel-devel
+softDependencies=kernel-64k-devel
 max_time=30m
 use_pty=false

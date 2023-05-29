@@ -55,5 +55,12 @@ function runtest ()
     exit 0
 }
 # echo tsc > /sys/devices/system/clocksource/clocksource0/current_clocksource
+gcc file.c -o file
+if [ $? -ne 0 ]; then
+    echo "file.c compilation fails!"
+    rstrnt-report-result $TEST SKIP
+    exit 0
+fi
+
 runtest
 exit 0

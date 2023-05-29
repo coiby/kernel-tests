@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <time.h>
 
 int master = 0; /* are we the parent process */
 pid_t children[1024]; /* pids of child processes */
