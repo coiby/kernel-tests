@@ -1,0 +1,13 @@
+[General]
+name=kdump/config-nfs
+owner=Kdump QE <kdump-qe-list@redhat.com>
+description=Configure Kdump to NFS target.
+license=GPLv3
+confidential=TBD_CASE_CONFIDENTIAL
+destructive=TBD_CASE_DESTRUTIVE
+[restraint]
+entry_point=make run
+dependencies=kexec-tools;nfs-utils
+repoRequires=automotive/include
+max_time=90m
+use_pty=false
