@@ -296,9 +296,11 @@ Describe 'kpkginstall: get_kpkg_ver rpms'
     BeforeEach 'cleanup'
     AfterEach 'cleanup'
     Parameters
-        # PACKAGE_NAME ARCH     KVER_RPM                        DNF_UNAME_R                                     UNAME_R
-        kernel-redhat  ppc64le  0.1-5.el9                       6.4.0-5.el9.ppc64le                             6.4.0-5.el9.ppc64le
-        kerel-rt-debug x86_64   5.14.0-319.2616_881769087.el9   5.14.0-319.2616_881769087.el9.x86_64+rt_debug   5.14.0-319.2616_881769087.el9.x86_64+rt-debug
+        # PACKAGE_NAME       ARCH     KVER_RPM                        DNF_UNAME_R                                        UNAME_R
+        kernel-redhat        ppc64le  0.1-5.el9                       6.4.0-5.el9.ppc64le                                6.4.0-5.el9.ppc64le
+        kernel-rt-debug      x86_64   5.14.0-319.2616_881769087.el9   5.14.0-319.2616_881769087.el9.x86_64+rt_debug      5.14.0-319.2616_881769087.el9.x86_64+rt-debug
+        kernel-64k-rt        x86_64   5.14.0-319.2616_881769087.el9   5.14.0-319.2616_881769087.el9.x86_64+64k_rt        5.14.0-319.2616_881769087.el9.x86_64+64k-rt
+        kernel-64k-rt-debug  x86_64   5.14.0-319.2616_881769087.el9   5.14.0-319.2616_881769087.el9.x86_64+64k_rt_debug  5.14.0-319.2616_881769087.el9.x86_64+64k-rt-debug
     End
     It "can set kernel version $1-$3.$2"
         export KPKG_URL="$KERNEL_RPM_URL"
