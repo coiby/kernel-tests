@@ -16,7 +16,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Enable TMT testing for RHIVOS
-. ../../automotive/include/include.sh
+# . ../../automotive/include/include.sh
+. ../../automotive/include/rhivos.sh
+
 declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 
 if ! (($is_rhivos)); then
