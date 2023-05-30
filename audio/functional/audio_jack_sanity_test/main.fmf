@@ -21,3 +21,4 @@ require:
 duration: 1m
 extra-summary: /kernel/audio_tests/functional/audio_jack_sanity_test
 extra-task: /kernel/audio_tests/functional/audio_jack_sanity_test
+id: 3e8cf23f-5a9d-42c2-b74e-5c88a7c88ec9
