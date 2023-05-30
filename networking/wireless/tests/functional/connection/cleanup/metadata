@@ -4,6 +4,7 @@ name=networking/wireless/tests/functional/connection/cleanup
 owner=Laura Trivelloni <ltrivell@redhat.com>
 
 [restraint]
+repoRequires=automotive/include
 entry_point=bash ./runtest.sh
 max_time=5m
 dependencies=nmcli;NetworkManager
