@@ -26,7 +26,7 @@ fi
 
 # Source Kdump tests common functions.
 # . ../include/runtest.sh
-. /kdump/include/runtest.sh
+. ../include/runtest.sh
 
 
 CheckUnexpectedReboot
