@@ -142,7 +142,10 @@ function get_kpkg_ver()
     # that's why in the provides we intentionally switch from '-' to '_'
     # uname -r would still output with -
     # therefore switch it back
-    KVER="${KVER/_debug/-debug}"
+    if [[ ${KVER} = *+* ]]; then
+      local kver_variant=${KVER##*+}
+      KVER=${KVER%+*}+${kver_variant//_/-}
+    fi
     if [[ -z "$KVER" ]]; then
         echo "${repoquery_output}"
         cki_abort_recipe "get_kpkg_ver: Failed to extract kernel version from the rpm package" FAIL
