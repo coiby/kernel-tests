@@ -1,0 +1,19 @@
+summary: Configure Kdump to NFS target.
+discover:
+    how: fmf
+    test:
+        - /kdump/config-nfs
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/include.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [kexec-tools, nfs-utils]
+environment-file:
+    - ./kdump/config-nfs/plans/tmt.env
