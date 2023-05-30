@@ -10,6 +10,7 @@
 # Source beaker environment
 set +x
 . "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/../../cki_lib/libcki.sh || exit 1
+. lib.sh
 set -x
 
 # shellcheck disable=SC2155
