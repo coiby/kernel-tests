@@ -81,9 +81,25 @@ echo "Current kernel is: $cver" | tee -a $OUTPUTFILE
 # ---------- Start Test -------------
 if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
     echo "============ Test has already been run, Check logs for possible failures ============" | tee -a $OUTPUTFILE
+    # This can happen, for example, if hit a kernel panic
+    # the panic message might have been saved on journal
+    if type -p journalctl > /dev/null; then
+        JOURNALCTLLOG=/tmp/journalctl.log
+        journalctl > "${JOURNALCTLLOG}"
+        SubmitLog "${JOURNALCTLLOG}"
+    fi
     rstrnt-report-result CHECKLOGS  WARN/ABORTED
     rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
     exit
+fi
+
+if type -p journalctl > /dev/null; then
+    # if /var/log/journal doesn't exist create it to make logs persistent
+    if [ ! -d /var/log/journal ]; then
+        echo "INFO: enabling persistent storage for journalctl"
+        mkdir -p /var/log/journal
+        journalctl --flush
+    fi
 fi
 
 # report patch errors from ltp/include
