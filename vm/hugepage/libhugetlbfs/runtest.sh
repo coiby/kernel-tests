@@ -40,13 +40,33 @@ PACKAGE_VERSION="2.21"
 grep -q "release [5-7].*" /etc/redhat-release && PACKAGE_VERSION="2.18"
 TARGET=${PACKAGE_NAME}-${PACKAGE_VERSION}
 PACKAGE_URL="$LOOKASIDE/$PACKAGE_VERSION/$TARGET.tar.gz"
-if [ ! -e "REBOOTED" ]; then
-    bash $CDIR/utils/build.sh $PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_URL
-    if [ $? -ne 0 ]; then
-        echo "Oops, failed to build $TARGET"
-        rstrnt-report-result Build_${TARGET}_failed FAIL 1
-        exit 0
+
+# Some of aarch64 platforms reboot on waiting too long for chrony to
+# synchronize system clock.
+# This proactively correct the system clock to get rid of the wrong
+# time implications in the libhugetlbfs build. If unable to correct,
+# restart the chronyd service completely.
+loop=0
+while [ $loop -lt 10 ]; do
+    chronyc makestep
+    if [ $? -eq 0 ]; then
+        break;
     fi
+
+    loop=$((loop+1))
+
+    if [ $loop -eq 10 ]; then
+        systemctl restart chronyd
+    fi
+
+    sleep 2
+done
+
+bash $CDIR/utils/build.sh $PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_URL
+if [ $? -ne 0 ]; then
+    echo "Oops, failed to build $TARGET"
+    rstrnt-report-result Build_${TARGET}_failed FAIL 1
+    exit 0
 fi
 
 TESTAREA=/mnt/testarea
@@ -236,7 +256,6 @@ EOF
        if [[ x"${HPSIZE}" == "x512M" && ${free_hugepages} -lt $HPCOUNT && ( -z "${RSTRNT_REBOOTCOUNT}" || ${RSTRNT_REBOOTCOUNT} -eq 0 ) ]]; then
       rlLog "Have ${free_hugepages} free hugepages of ${HPCOUNT} needed.  Rebooting with 2M hugepages"
       grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
-      touch REBOOTED
       rstrnt-reboot
       # Make sure the script doesn't continue if rstrnt-reboot get's killed
       # https://github.com/beaker-project/restraint/issues/219
@@ -271,6 +290,5 @@ EOF
         rlRun "umount -a -t hugetlbfs"
         rlRun "hugeadm --pool-pages-max ${HPSIZE}:0"
         rlRun "mv /etc/sysctl.conf.backup /etc/sysctl.conf"
-        rlRun "rm -fr REBOOTED"
     rlPhaseEnd
 rlJournalEnd
