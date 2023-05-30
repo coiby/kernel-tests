@@ -88,7 +88,7 @@ if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
         journalctl > "${JOURNALCTLLOG}"
         SubmitLog "${JOURNALCTLLOG}"
     fi
-    rstrnt-report-result CHECKLOGS  WARN/ABORTED
+    rstrnt-report-result Abnormal-Reboot  WARN/ABORTED
     rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
     exit
 fi

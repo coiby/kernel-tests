@@ -260,7 +260,7 @@ if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
 		journalctl > "${JOURNALCTLLOG}"
 		SubmitLog "${JOURNALCTLLOG}"
 	fi
-	rstrnt-report-result CHECKLOGS FAIL 99
+	rstrnt-report-result Abnormal-Reboot FAIL 99
 	exit 0
 fi
 
