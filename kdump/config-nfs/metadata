@@ -9,6 +9,6 @@ destructive=TBD_CASE_DESTRUTIVE
 entry_point=make run
 dependencies=kexec-tools;nfs-utils
 #repoRequires=automotive/include
-repoRequires=kdump/include
+repoRequires=kdump/include;automotive/include
 max_time=90m
 use_pty=false
