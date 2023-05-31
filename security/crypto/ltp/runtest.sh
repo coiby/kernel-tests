@@ -25,6 +25,12 @@
 
 rlJournalStart
     rlPhaseStartSetup
+        if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
+            echo "===== Test has already been run,
+            Check logs for possible failures ======"
+            rstrnt-report-result CHECKLOGS FAIL 99
+            exit 0
+        fi
         rlShowRunningKernel
         rlRun "git clone https://github.com/linux-test-project/ltp.git"
         rlRun "cd ltp"
@@ -33,19 +39,17 @@ rlJournalStart
         rlRun "export LTP_TIMEOUT_MUL=2"
     rlPhaseEnd
 
-    if [ -z "$TEST" ]
-    then
-        rlPhaseStartTest "crypto"
+    rlPhaseStartTest "crypto $TEST"
+        if [ -z "$TEST" ]; then
             rlRun "make -s all &> /dev/null"
             rlRun "make -s install > /dev/null"
             rlRun "/opt/ltp/runltp -f crypto"
-    else
-        rlPhaseStartTest $TEST
+        else
             rlRun "cd testcases/kernel/crypto/"
             rlRun "make -s $TEST"
             rlRun "./$TEST"
-    fi
-    rlPhaseEnd
+        fi
+        rlPhaseEnd
 
     rlPhaseStartCleanup
         rlRun "make -s clean > /dev/null"
