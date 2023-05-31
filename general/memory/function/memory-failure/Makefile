@@ -68,7 +68,7 @@ $(METADATA): Makefile
 	@echo "Type:            function" >> $(METADATA)
 	@echo "TestTime:        24h" >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        @development python3 git" >> $(METADATA)
+	@echo "Requires:        python3 git" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
