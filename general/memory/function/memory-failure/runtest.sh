@@ -62,10 +62,9 @@ function test_setup()
 
 		[ ! $ret = 0 ] && return $ret
 
-		echo "Installing mcelog ..."
-		yum -y install mcelog || ret=2
-
-	[ $ret = 0 ] || rlDie "test setup failed, some of git clone failed..."
+	echo "Installing mcelog ..."
+	yum -y install mcelog || ret=2
+	[ $ret = 0 ] || rlDie "Test setup failed: no match for package mcelog"
 
 	uname -m | grep ppc64le && ppc64le_setup
 
