@@ -121,6 +121,10 @@ SetupKdump()
             sync
             RhtsReboot
         fi
+        # needed for automotive SOC devices that dont come with kexec-tools pre installed and have crashkernel built in.
+        if [ -f /sys/devices/soc0/machine ];then
+            LogRun "kdumpctl start"
+        fi
     fi
 
     # Make sure kdumpctl is operational
