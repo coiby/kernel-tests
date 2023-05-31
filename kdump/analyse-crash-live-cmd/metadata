@@ -8,6 +8,6 @@ destructive=no
 [restraint]
 entry_point=make run
 #repoRequires=automotive/include
-repoRequires=kdump/include
+repoRequires=kdump/include;automotive/include
 max_time=150m
 use_pty=false
