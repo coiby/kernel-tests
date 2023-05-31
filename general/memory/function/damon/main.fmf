@@ -9,6 +9,7 @@ require:
   - git
   - make
   - python3
+  - python3-pip
   - perf
 duration: 20m
 extra-summary: /kernel/general/memory/function/damon

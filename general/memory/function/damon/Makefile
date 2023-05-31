@@ -62,7 +62,7 @@ $(METADATA): Makefile
 	@echo "Type:            Function" >> $(METADATA)
 	@echo "TestTime:        20m" >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        gcc make python3 perf" >> $(METADATA)
+	@echo "Requires:        gcc make python3 python3-pip perf" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)

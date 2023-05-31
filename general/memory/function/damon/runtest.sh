@@ -33,7 +33,7 @@ PACKAGE="kernel"
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "dnf install -y perf python3 @development" 0
+        rlRun "dnf install -y perf python3 python3-pip @development" 0
         rlShowRunningKernel
         rlRun "git clone https://github.com/sjp38/masim.git" 0
         rlRun "pip install -U damo" 0
