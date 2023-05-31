@@ -33,22 +33,22 @@ PACKAGE="kernel"
 
 rlJournalStart
     rlPhaseStartSetup
-    	rlRun "dnf install -y perf python3 @development" 0
+        "dnf install -y perf python3 @development" 0
         rlShowRunningKernel
-	rlRun "git clone https://github.com/sjp38/masim.git" 0
-	rlRun "pip install -U damo" 0
-	pushd masim
-	rlRun "make" 0
+        rlRun "git clone https://github.com/sjp38/masim.git" 0
+        rlRun "pip install -U damo" 0
+        pushd masim
+        rlRun "make" 0
     rlPhaseEnd
 
     rlPhaseStartTest
         rlRun "./masim ./configs/zigzag.cfg &" 0
-	rlRun "damo record -o damon.data $(pidof masim)" 0
-	rlRun "damo report heats --heatmap stdout" 0
+        rlRun "damo record -o damon.data $(pidof masim)" 0
+        rlRun "damo report heats --heatmap stdout" 0
     rlPhaseEnd
 
     rlPhaseStartCleanup
-	popd
+        popd
     rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
