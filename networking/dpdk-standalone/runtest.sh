@@ -33,9 +33,9 @@ init_all_env()
 
     update_buildroot_repo
 
-    source /mnt/tests/kernel/networking/common/include.sh || exit 1
-    source /mnt/tests/kernel/networking/common/lib/lib_nc_sync.sh || exit 1
-    source /mnt/tests/kernel/networking/common/lib/lib_netperf_all.sh || exit 1
+    source ../common/include.sh || exit 1
+    source ../common/lib/lib_nc_sync.sh || exit 1
+    source ../common/lib/lib_netperf_all.sh || exit 1
     source ${CASE_PATH}/env.sh || exit 1
 
     set -a

@@ -4,7 +4,7 @@
 ################################################################
 SYSTEM_VERSION=${SYSTEM_VERSION:-"RHEL-8.0-20181029.3"}
 # VM image OVS DPDK BONDING TEST
-IMAGE_GUEST=${IMAGE_GUEST}
+IMG_GUEST=${IMG_GUEST}
 ################################################################
 
 #PLEASE KEEP THE FOLLOW SECTION CONFIG FIXED
