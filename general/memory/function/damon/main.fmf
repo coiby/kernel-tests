@@ -1,0 +1,15 @@
+summary: DAMON: Data Access MONitor verification
+contact: Ping Fang <pifang@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - git
+  - make
+  - python3
+  - perf
+duration: 20m
+extra-summary: /kernel/general/memory/function/damon
+extra-task: /kernel/general/memory/function/damon
