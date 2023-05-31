@@ -38,6 +38,8 @@ rlJournalStart
         rlRun "git clone https://github.com/sjp38/masim.git" 0
         rlRun "pip3 install -U damo" 0
         pushd masim
+        # checkout latest stable commit
+        rlRun "git checkout -q bbeab0c3ca431c4691301197e7ea46312a5a630f" 0
         rlRun "make" 0
     rlPhaseEnd
 
