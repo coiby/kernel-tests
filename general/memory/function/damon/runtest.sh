@@ -33,6 +33,17 @@ PACKAGE="kernel"
 
 rlJournalStart
     rlPhaseStartSetup
+        if [ -f /boot/config-$(uname -r) ]; then
+            if ! grep -q "CONFIG_DAMON=y" /boot/config-$(uname -r); then
+                rlLog "DAMON not supported, Skip"
+                rstrnt-report-result Test_Skipped PASS 99
+                exit 0
+            fi
+        else
+            rlLog "can't confirm DAMON"
+            rstrnt-report-result Test_Skipped PASS 99
+            exit 0
+        fi
         rlRun "dnf install -y perf python3 python3-pip @development" 0
         rlShowRunningKernel
         rlRun "git clone https://github.com/sjp38/masim.git" 0
@@ -51,6 +62,7 @@ rlJournalStart
 
     rlPhaseStartCleanup
         popd
+        rlRun "rm -rf masim" 0
     rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
