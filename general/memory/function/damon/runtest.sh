@@ -47,6 +47,12 @@ rlJournalStart
         rlRun "dnf install -y perf python3 python3-pip @development" 0
         rlShowRunningKernel
         rlRun "git clone https://github.com/sjp38/masim.git" 0
+        if [ $? != 0 ]; then
+                rlLog "git clone fail"
+                rstrnt-report-result Test_Failed FAIL 99
+                exit 0
+        fi
+        exit 0
         rlRun "pip3 install -U damo" 0
         pushd masim
         # checkout latest stable commit

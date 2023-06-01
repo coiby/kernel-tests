@@ -48,7 +48,6 @@ build: $(BUILT_FILES)
 
 clean:
 	rm -fr *~ $(BUILT_FILES)
-	sh -c "unset ARCH; cd sme_module; make clean"
 
 
 include /usr/share/rhts/lib/rhts-make.include
@@ -61,8 +60,7 @@ $(METADATA): Makefile
 	@echo "Description:     DAMON verification" >> $(METADATA)
 	@echo "Type:            Function" >> $(METADATA)
 	@echo "TestTime:        20m" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        gcc make python3 python3-pip perf" >> $(METADATA)
+	@echo "Requires:        gcc git make python3 python3-pip perf" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
