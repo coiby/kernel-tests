@@ -1,0 +1,68 @@
+summary: Configure Kdump to NFS target.
+description: |
+    The testcase it to configure Kdump to dump vmcore to a NFS server. It can be
+    used in a multihost test to configure Kdump on client side, and setup NFS
+    server on server side. Alternatively used in a single host test by specifying
+    your NFS server via param 'NFS_SERVER'.
+
+    There is another param called 'NFSOPT' which can be assigned per below:
+    ---------------------------------
+    Release  | Tell NFS in kdump.conf
+    RHEL5    | net
+    RHEL6    | net, nfs, nfs4
+    RHEL7    | nfs
+    ---------------------------------
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - kexec-tools
+  - nfs-utils
+duration: 90m
+extra-summary: /kernel/kdump/config-nfs
+extra-task: /kernel/kdump/config-nfs
+
+
+
+summary: Use crash utility to analyse a live system
+description: |+
+    A set of test cases to analyse a live system using crash commands.
+
+    Parameters can be passed to analyse a live system. TESTARGS and SKIP_TESTARGS are exclusive options.
+
+    TESTARGS: Default value is analyse-crash-common.sh
+
+    1) Run one particular test in testcases
+          <task name="/kernel/kdump/analyse-crash-cmd" role="None">
+            <params>
+              <param name="TESTARGS" value="analyse-crash-common.sh"/>
+            </params>
+          </task>
+
+    2) Run more than one test scripts in testcases
+          <task name="/kernel/kdump/analyse-crash-cmd" role="None">
+            <params>
+              <param name="TESTARGS" value="analyse-crash-common.sh,analyse-crash-simple.sh"/>
+            </params>
+          </task>
+
+    3) Skip running test scripts matched keywords in testcases
+          <task name="/kernel/kdump/analyse-crash-cmd" role="None">
+            <params>
+              <param name="SKIP_TESTARGS" value="common"/>
+            </params>
+          </task>
+
+    4) Check existence of vmcore only. Not analyzing the vmcore
+          <task name="/kernel/kdump/analyse-crash-cmd" role="None">
+            <params>
+              <param name="TESTARGS" value="simple_check"/>
+            </params>
+          </task>
+
+    5) Run all test scripts in testcases
+          <task name="/kernel/kdump/analyse-crash-cmd" role="None">
+            <params>
+              <param name="TESTARGS" value="all"/>
+            </params>
+          </task>
