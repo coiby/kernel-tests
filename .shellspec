@@ -2,5 +2,5 @@
 --color
 --output junit
 --default-path "**/spec"
---shell bash
+--shell /bin/bash
 --kcov-options "--include-pattern=.sh,/cki/restraint/plugins/"

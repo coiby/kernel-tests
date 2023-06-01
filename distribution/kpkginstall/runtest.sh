@@ -17,6 +17,8 @@ SUPPORTED_KERNEL_PKGS=(
   kernel-rt-debug kernel-rt-debug-core
   kernel-automotive kernel-automotive-core
   kernel-automotive-debug kernel-automotive-debug-core
+  kernel-redhat kernel-redhat-core
+  kernel-redhat-debug kernel-redhat-debug-core
 )
 
 # Bring in library functions.
@@ -59,7 +61,7 @@ function parse_kpkg_url_variables()
 
 function clean_kpkg_url_variables()
 {
-  if [[ -v KPKG_VAR_PACKAGE_NAME ]]; then
+  if [[ -n ${KPKG_VAR_PACKAGE_NAME:-} ]]; then
     if cki_is_true "${KPKG_VAR_DEBUG_KERNEL:-false}" && [[ ${KPKG_VAR_PACKAGE_NAME} != *-debug ]] ; then
       KPKG_VAR_PACKAGE_NAME=${KPKG_VAR_PACKAGE_NAME}-debug
     fi
@@ -93,6 +95,11 @@ function print_kpkg_url_variables_rpm()
 
 function get_kpkg_ver()
 {
+  # Recover the saved package name from KPKG_KVER_RPM if it exists.
+  if [ -f "/var/tmp/kpkginstall/KPKG_KVER_RPM" ]; then
+    KVER_RPM=$(cat /var/tmp/kpkginstall/KPKG_KVER_RPM)
+    cki_print_success "Found kernel rpm version string in cache on disk: ${KVER_RPM}"
+  fi
   # Recover the saved package name from KPKG_KVER if it exists.
   if [ -f "/var/tmp/kpkginstall/KPKG_KVER" ]; then
     KVER=$(cat /var/tmp/kpkginstall/KPKG_KVER)
@@ -114,12 +121,35 @@ function get_kpkg_ver()
     cki_print_info "Repo Name set REPO_NAME=$REPO_NAME"
 
     # Grab the kernel version from the provided repo directly
-    KVER=$(
+    # Some kernels, like kernel-redhat can have the rpm package version different from uname version
+    KVER_RPM=$(
       ${YUM} -q --disablerepo="*" --enablerepo="${REPO_NAME}" list "${ALL}" "${KPKG_VAR_PACKAGE_NAME}" --showduplicates \
         | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" \
         | grep -m 1 "$ARCH.*${REPO_NAME}" \
         | awk -v arch="$ARCH" '{print $2"."arch}'
     )
+    echo -n "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER_RPM
+    if [[ "${YUM}" =~ "yum" ]]; then
+      repoquery_output=$(repoquery -q --disablerepo="*" --enablerepo="${REPO_NAME}" --provides --requires "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}")
+    else
+      repoquery_output=$(
+        dnf -q --disablerepo="*" --enablerepo="${REPO_NAME}" repoquery --requires "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}";
+        dnf -q --disablerepo="*" --enablerepo="${REPO_NAME}" repoquery --provides "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}"
+      )
+    fi
+    KVER=$(sed -n '/uname-r/{s/.*= //p;q}' <<< "${repoquery_output}")
+    # rpm doesn't allow '-' character in the version-release
+    # that's why in the provides we intentionally switch from '-' to '_'
+    # uname -r would still output with -
+    # therefore switch it back
+    if [[ ${KVER} = *+* ]]; then
+      local kver_variant=${KVER##*+}
+      KVER=${KVER%+*}+${kver_variant//_/-}
+    fi
+    if [[ -z "$KVER" ]]; then
+        echo "${repoquery_output}"
+        cki_abort_recipe "get_kpkg_ver: Failed to extract kernel version from the rpm package" FAIL
+    fi
   fi
 
   # Write the KVER to a file so we have it after reboot.
@@ -130,10 +160,8 @@ function kpkg_release()
 {
   if [[ ${KPKG_URL} =~ .*\.tar\.gz ]]; then
     echo "${KVER//.${ARCH}/}"
-  elif [[ ${KVER} == *.el6.* ]] || [[ ${KVER} == *.el7.* ]]; then
-    echo "${KVER}${KPKG_VAR_VARIANT_SUFFIX/#-/.}"
   else
-    echo "${KVER}${KPKG_VAR_VARIANT_SUFFIX/#-/+}"
+    echo "${KVER}"
   fi
 }
 
@@ -344,10 +372,10 @@ function download_install_package()
       kpkg_automotive=(kernel-automotive kernel-automotive-core kernel-automotive-modules)
       rpm --quiet -q kernel-automotive-modules-core && kpkg_automotive+=(kernel-automotive-modules-core)
       if rpm-ostree override remove "${kpkg_automotive[@]}" \
-        --install "/root/kernel-automotive-debug-${KVER}.rpm"\
-        --install "/root/kernel-automotive-debug-core-${KVER}.rpm"\
-        --install "/root/kernel-automotive-debug-modules-${KVER}.rpm"\
-        --install "/root/kernel-automotive-debug-modules-core-${KVER}.rpm" >> ${RPM_INSTALL_LOG}; then
+        --install "/root/kernel-automotive-debug-${KVER_RPM}.rpm"\
+        --install "/root/kernel-automotive-debug-core-${KVER_RPM}.rpm"\
+        --install "/root/kernel-automotive-debug-modules-${KVER_RPM}.rpm"\
+        --install "/root/kernel-automotive-debug-modules-core-${KVER_RPM}.rpm" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
@@ -360,20 +388,20 @@ function rpm_install()
 {
   cki_print_info "rpm_install: Extracting kernel version from ${KPKG_URL}"
   get_kpkg_ver
-  if [ -z "${KVER}" ]; then
-    cki_abort_recipe "rpm_install: Failed to extract kernel version from the package" FAIL
+  if [ -z "${KVER_RPM}" ]; then
+    cki_abort_recipe "rpm_install: Failed to extract kernel rpm version from the package" FAIL
   else
-    cki_print_success "Kernel version is ${KVER}"
+    cki_print_success "Kernel version is ${KVER_RPM}"
   fi
 
   # download & install kernel, or report result
-  download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER}"
+  download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM}"
 
   if ! cki_is_kernel_automotive ;then
-    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" >> ${RPM_INSTALL_LOG}; then
-      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} successfully"
+    if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
+      cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} successfully"
     else
-      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
+      cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} found, skipping!"
       cki_print_warning "Note that some tests might require the package and can fail!"
     fi
 
@@ -430,7 +458,7 @@ function rpm_extra_package_install()
   done
   _headers_nvr=$(K_GetRunningKernelRpmSubPackageNVR headers)
   if ! rpm --quiet -q "${_headers_nvr}"; then
-    cki_print_warning "No package ${_headers_nvr} found, trying without exact ${KVER}"
+    cki_print_warning "No package ${_headers_nvr} found, trying without exact ${KVER_RPM}"
     # shellcheck disable=SC2010
     ALT_HEADERS=$(ls "${_headers_nvr}"-headers* | grep -v src.rpm | head -1)
     if $YUM install -y "${ALT_HEADERS}" >> ${RPM_INSTALL_LOG}; then
@@ -446,34 +474,34 @@ function rpm_extra_package_install()
 function ostree_extra_package_install()
 {
   PKG_CMD="${RPM_OSTREE} -A install --allow-inactive --idempotent -y "
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} successfully"
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM} successfully"
   else
-    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER} found, skipping!"
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} successfully"
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} successfully"
   else
-    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER} found, skipping!"
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} successfully"
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER_RPM} successfully"
   else
-    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER} found, skipping!"
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-modules-internal-${KVER_RPM} found, skipping!"
     cki_print_warning "Note that some tests might require the package and can fail!"
   fi
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-headers-${KVER}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} successfully"
+  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-headers-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
+    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER_RPM} successfully"
   else
-    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} found, trying without exact ${KVER}"
+    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER_RPM} found, trying without exact ${KVER_RPM}"
     # shellcheck disable=SC2010
     ALT_HEADERS=$(ls "${KPKG_VAR_PACKAGE_NAME}"-headers* | grep -v src.rpm | head -1)
     if $YUM install -y "${ALT_HEADERS}" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed ${ALT_HEADERS} successfully"
     else
-        cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER} found, skipping!"
+        cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-headers-${KVER_RPM} found, skipping!"
         cki_print_warning "Note that some tests might require the package and can fail!"
     fi
   fi
@@ -554,7 +582,8 @@ function install_kernel() {
       fi
 
       if [ "$error" -ne 0 ]; then
-        cki_abort_recipe "Failed installing kernel ${KVER}" WARN
+        # print the rpm version if it is set, otherwise default to KVER
+        cki_abort_recipe "Failed installing kernel ${KVER_RPM:-$KVER}" WARN
       fi
 
       # Make sure tests are not able to install other kernels
@@ -594,7 +623,8 @@ function main() {
       echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf
       cki_print_success "Set panic_on_oops to 1"
 
-      cki_print_success "Installed kernel ${KVER}, rebooting (this may take a while)"
+      # print the rpm version if it is set, otherwise default to KVER
+      cki_print_success "Installed kernel ${KVER_RPM:-$KVER}, rebooting (this may take a while)"
       cat << EOF
 *******************************************************************************
 *******************************************************************************

@@ -71,7 +71,7 @@ function install_and_start_stalld() {
         # Use a higher runtime ns for boosting, equal to 0.1s
         # With the default boost timing it will take multiple boosts
         # to finish the test and will take much longer
-        stalld -v -A -t 30 -r 1000000 | tee -a "$OUTPUTFILE" &
+        stalld -v -A -t 30 -r 1000000 > >(tee -a "$OUTPUTFILE") &
         export STALLD_PID=$!
     }
 }
@@ -87,7 +87,6 @@ function run_test() {
 
         # Run a busy loop to stall cpu 1
         timeout "${MAX_RUNTIME}s" chrt -f 1 taskset -c 1 ./rt_busyloop &
-        export BUSYLOOP_PID=$!
 
         # Print process info so we can see PIDs and tell if the right process
         # is getting boosted
@@ -97,12 +96,16 @@ function run_test() {
         # some time to get scheduled
         sleep 1
 
+        # Get the rt_busyloop PID
+        BUSYLOOP_PID="$(pgrep rt_busyloop)"
+        export BUSYLOOP_PID
+
         # This process blocks, and has to get boosted to finish
         chrt -f 1 taskset -c 1 sh -c "echo \"Finished\""
 
+        # Calculate runtime
         END=$(date +%s)
         RUNTIME=$((END - START))
-
         if [[ $RUNTIME -lt $MAX_RUNTIME ]]; then
             echo "Iteration $ITERS runtime is $RUNTIME : PASS" | tee -a "$OUTPUTFILE"
             rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "PASS" 0
@@ -110,14 +113,26 @@ function run_test() {
             echo "Iteration $ITERS runtime is $RUNTIME : FAIL" | tee -a "$OUTPUTFILE"
             rstrnt-report-result "$TEST: iter $ITERS ${RUNTIME}s" "FAIL" 1
         fi
+
+        # Increment iterations run and kill any active busyloop threads
         ITERS=$((ITERS + 1))
-        kill "$BUSYLOOP_PID"
+        for p in $BUSYLOOP_PID; do
+            kill $p
+        done
     done
 }
 
 function stop_stalld() {
+    # first ensure any potential zombie busyloops have been terminated
+    killall -s 9 rt_busyloop
+
     echo "Stoping stalld." | tee -a "$OUTPUTFILE"
     kill "$STALLD_PID"
+    sleep 10
+    if ps -p $STALLD_PID >/dev/null; then
+        echo "stalld did not respond gracefully to SIGTERM - using SIGKILL instead"
+        kill -9 $STALLD_PID
+    fi
 }
 
 # ----------------------------------------------------------------------------

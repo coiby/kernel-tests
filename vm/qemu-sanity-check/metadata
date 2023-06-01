@@ -1,0 +1,11 @@
+[General]
+name=vm/qemu-sanity-check
+owner=Richard W.M. Jones <rjones@redhat.com>
+description=Does the kernel boot on top of qemu-kvm?
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib

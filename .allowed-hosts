@@ -13,7 +13,6 @@ clock.redhat.com
 download.devel.redhat.com
 download[a-zA-Z0-9\\.\\-]*.eng.[a-zA-Z0-9\\-]+.redhat.com
 download.lab.bos.redhat.com
-gitlab.cee.redhat.com
 vmcore.usersys.redhat.com
 
 # public hosts
