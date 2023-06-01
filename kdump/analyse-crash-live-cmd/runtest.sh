@@ -15,20 +15,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Enable TMT testing for RHIVOS
-pwd
-. ../../automotive/include/rhivos.sh
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-
-if ! (($is_rhivos)); then
-    # Include rhts environment
-    . /usr/bin/rhts-environment.sh || exit 1
-fi
-
 # Source Kdump tests common functions.
-# . ../include/runtest.sh
 . ../include/runtest.sh
-
 
 CheckUnexpectedReboot
 
