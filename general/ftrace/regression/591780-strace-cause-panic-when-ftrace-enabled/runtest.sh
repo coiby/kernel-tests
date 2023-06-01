@@ -5,6 +5,7 @@
 #   runtest.sh of /kernel/general/ftrace/regression/591780-strace-cause-panic-when-ftrace-enabled
 #   Description: Bug 591780 - The kernel crashes if strace is executed while ftrace is enabled
 #   Author: Caspar Zhang <czhang@redhat.com>
+#   Update: Qiao Zhao <qzhao@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

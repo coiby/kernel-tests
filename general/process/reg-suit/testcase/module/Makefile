@@ -3,6 +3,7 @@
 #   Makefile of modules
 #   Description:
 #   Author: Wang Shu <shuwang@redhat.com>
+#   Update: MM-QE <mm-qe@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

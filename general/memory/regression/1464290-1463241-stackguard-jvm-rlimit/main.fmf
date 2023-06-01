@@ -6,7 +6,7 @@ tag: [
     /kernel/general/memory/regression/1464290-1463241-stackguard-jvm-rlimit,
     KG-VMM-TAG
   ]
-contact: Shu Wang <shuwang@redhat.com>
+contact: MM-QE <mm-qe@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
 require:

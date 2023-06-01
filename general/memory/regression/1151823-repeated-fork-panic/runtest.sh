@@ -3,6 +3,7 @@
 #
 #   Description: This is a reproducer for bz1151823
 #   Author: Wang Shu <shuwang@redhat.com>
+#   Update: MM-QE <mm-qe@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

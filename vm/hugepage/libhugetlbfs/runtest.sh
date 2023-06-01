@@ -5,6 +5,7 @@
 #   runtest.sh of /kernel/vm/hugepage/libhugetlbfs
 #   Description: Test libhugetlbfs with upstream testsuite
 #   Author: Caspar Zhang <czhang@redhat.com>
+#   Update: MM-QE <mm-qe@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

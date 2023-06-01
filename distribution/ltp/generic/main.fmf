@@ -9,7 +9,7 @@ description: |
     # Notes: SKIP_LEVEL is different to SKIPTESTS. SKIP_LEVEL is based on a script only
     to handle the known issues. And SKIPTESTS is used to skip general case in
     ltp/generic test suit.
-contact: Caspar Zhang <czhang@redhat.com>
+contact: MM-QE <mm-qe@redhat.com>
 component:
   - kernel
   - glibc

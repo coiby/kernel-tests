@@ -5,6 +5,7 @@
 #   runtest.sh of /kernel/distribution/ltp/include
 #   Description: Linux Test Project - include part
 #   Author: Caspar Zhang <czhang@redhat.com>
+#   Update: MM-QE <mm-qe@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

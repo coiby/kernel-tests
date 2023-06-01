@@ -1,6 +1,6 @@
 [General]
 name=vm/hugepage/libhugetlbfs
-owner=Caspar Zhang <czhang@redhat.com>
+owner=MM-QE <mm-qe@redhat.com>
 description=libhugetlbfs tests with upstream
 license=GPLv2
 confidential=no

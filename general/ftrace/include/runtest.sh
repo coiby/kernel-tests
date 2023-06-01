@@ -6,6 +6,7 @@
 #   Description: ftrace include RPM
 #   Author: Caspar Zhang <czhang@redhat.com>
 #   Update: Chunyu Hu <chuhu@redhat.com>
+#   Update: Qiao Zhao <qzhao@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
