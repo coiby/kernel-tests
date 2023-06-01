@@ -46,9 +46,12 @@ if [ ${ARCH} != "ppc64" ] && [ ${ARCH} != "ppc64le" ] && [ ${ARCH} != "s390x" ];
     RESULT=PASS
     echo "=== contiguous page alloc ===" | tee -a $OUTPUTFILE
     kdumpctl status || make -C ../../kdump/setup-bare-metal/ run
-    if [ ! "$RSTRNT_JOBID" ]; then
-        if [ ${RSTRNT_REBOOTCOUNT} -eq 0 ]; then
-            exit 0
+    # Ensure test is run when using tmt
+    if [ -z ${TMT_PLAN_DATA} ]; then
+        if [ ! "$RSTRNT_JOBID" ]; then
+            if [ ${RSTRNT_REBOOTCOUNT} -eq 0 ]; then
+                exit 0
+            fi
         fi
     fi
     echo " - check cmdline:" | tee -a $OUTPUTFILE
