@@ -1,6 +1,6 @@
 summary: ftrace include RPM
 description: ''
-contact: Caspar Zhang <czhang@redhat.com>
+contact: MM-QE <mm-qe@redhat.com>
 component:
   - kernel
 test: ./runtest.sh

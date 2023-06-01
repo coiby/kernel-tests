@@ -1,5 +1,5 @@
 summary: 'VMM testcase: physical page alloc'
-contact: Caspar Zhang <czhang@redhat.com>
+contact: MM-QE <mm-qe@redhat.com>
 component:
   - kernel
 path: /vm/page_alloc

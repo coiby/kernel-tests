@@ -1,6 +1,6 @@
 [General]
 name=general/ftrace/regression/601047-deadlock
-owner=Caspar Zhang <czhang@redhat.com>
+owner=Qiao Zhao <qzhao@redhat.com>
 description=Bug 601047 - Deadlock while using stack tracer(ftrace)
 license=GPLv2
 confidential=no

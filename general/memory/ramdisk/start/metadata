@@ -1,6 +1,6 @@
 [General]
 name=kernel/general/memory/ramdisk/start
-owner=Wang Shu <shuwang@redhat.com>
+owner=MM-QE <mm-qe@redhat.com>
 description=Init and mount ramdisk.
 license=GPLv2
 _architectures=all

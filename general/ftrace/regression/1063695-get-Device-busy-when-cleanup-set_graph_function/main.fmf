@@ -14,7 +14,7 @@ description: |
     	# wc -l set_graph_function
     	32 set_graph_function
     Author: Yahuan Cong <ycong@redhat.com>
-contact: Yahuan Cong<ycong@redhat.com>
+contact: Qiao Zhao <qzhao@redhat.com>
 component:
   - kernel
 test: ./runtest.sh

@@ -1,7 +1,7 @@
 summary: 'Bug 602804 - Panic while using userstacktrace'
 description: |
     This is a ftrace regression testcase for bz602804.
-contact: Caspar Zhang <czhang@redhat.com>
+contact: Qiao Zhao <qzhao@redhat.com>
 test: ./runtest.sh
 framework: beakerlib
 duration: 5m

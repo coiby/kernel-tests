@@ -5,6 +5,7 @@
 #   runtest.sh of /kernel/vm/hugepage/cmdline
 #   Description: hugepages from cmdline
 #   Author: Caspar Zhang <czhang@redhat.com>
+#   Update: MM-QE <mm-qe@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

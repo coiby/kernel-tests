@@ -5,6 +5,7 @@
 #   runtest.sh of /kernel/vm/page_alloc
 #   Description: VMM: physical page alloc
 #   Author: Caspar Zhang <czhang@redhat.com>
+#   Update: MM-QE <mm-qe@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

@@ -1,7 +1,7 @@
 [General]
 description=autotest for bz1063695
 name=/kernel/general/ftrace/regression/1063695-get-Device-busy-when-cleanup-set_graph_function
-owner=Yahuan Cong<ycong@redhat.com>
+owner=Qiao Zhao <qzhao@redhat.com>
 license=GPLv2
 confidential=no
 destructive=no

@@ -6,7 +6,7 @@ tag: [
     /kernel/general/memory/regression/1151823-repeated-fork-panic,
     KG-VMM-TAG
   ]
-contact: Shu Wang <shuwang@redhat.com>
+contact: MM-QE <mm-qe@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
 require:

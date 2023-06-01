@@ -1,6 +1,6 @@
 [General]
 name=general/ftrace/regression/602804-panic-while-using-userstacktrace
-owner=Caspar Zhang <czhang@redhat.com>
+owner=Qiao Zhao <qzhao@redhat.com>
 description=Bug 602804 - Panic while using userstacktrace
 license=GPLv2
 confidential=no
