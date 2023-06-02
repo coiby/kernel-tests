@@ -16,7 +16,6 @@ K_SSH_CONFIG="${HOME}/.ssh/config"
 K_ID_RSA="${SSH_KEY:-/root/.ssh/kdump_id_rsa}"
 K_DEFAULT_PATH="/var/crash"
 
-K_DEBUG=${K_DEBUG:-false}
 K_NFSSERVER=${K_NFSSERVER:-""}
 K_VMCOREPATH=${K_VMCOREPATH:-""}
 
