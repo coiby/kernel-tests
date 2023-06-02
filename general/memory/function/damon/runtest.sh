@@ -36,12 +36,12 @@ rlJournalStart
         if [ -f /boot/config-$(uname -r) ]; then
             if ! grep -q "CONFIG_DAMON=y" /boot/config-$(uname -r); then
                 rlLog "DAMON not supported, Skip"
-                rstrnt-report-result Test_Skipped PASS 99
+                rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
                 exit 0
             fi
         else
             rlLog "can't confirm DAMON"
-            rstrnt-report-result Test_Skipped PASS 99
+            rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
             exit 0
         fi
         rlRun "dnf install -y perf python3 python3-pip @development" 0
@@ -49,7 +49,7 @@ rlJournalStart
         rlRun "git clone https://github.com/sjp38/masim.git" 0
         if [ $? != 0 ]; then
                 rlLog "git clone fail"
-                rstrnt-report-result Test_Failed FAIL 99
+                rstrnt-report-result "$RSTRNT_TASKNAME" FAIL 99
                 exit 0
         fi
         exit 0
