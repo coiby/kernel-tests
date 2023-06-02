@@ -1,0 +1,9 @@
+summary: Installs required kernel
+discover:
+    how: fmf
+    test:
+        - /distribution/kernelinstall/tests/kernelinstall
+execute:
+    how: tmt
+environment-file:
+        - ./distribution/kernelinstall/plans/tmt.env
