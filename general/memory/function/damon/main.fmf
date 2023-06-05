@@ -1,8 +1,8 @@
-summary: DAMON: Data Access MONitor verification
+summary: "DAMON: Data Access MONitor verification"
 contact: Ping Fang <pifang@redhat.com>
 component:
   - kernel
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
 require:
   - gcc
