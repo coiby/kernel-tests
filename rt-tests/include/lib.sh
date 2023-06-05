@@ -233,7 +233,7 @@ function brew_install_debuginfo()
 }
 
 
-if [[ -z "$RSTRNT_JOBID" ]]; then
+if [[ -z "$OUTPUTFILE" ]]; then
     export OUTPUTFILE=$(mktemp)
-    log "OUTPUTFILE not available, using ${OUTPUTFILE} for logging"
+    log "OUTPUTFILE not set, using ${OUTPUTFILE} for logging"
 fi
