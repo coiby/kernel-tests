@@ -92,6 +92,8 @@ rlJournalStart
 	else
 		echo "memory-failure is not supported. skip test."
 		phase="Skip-not-support"
+		rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
+		return
 	fi
 	rlPhaseStartSetup
 	[ "$phase" = Test ] && test_setup
