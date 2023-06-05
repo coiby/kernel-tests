@@ -1,4 +1,4 @@
-summary: DAMON: Data Access MONitor verification
+summary: DAMON (Data Access MONitor verification)
 contact: Ping Fang <pifang@redhat.com>
 component:
   - kernel
