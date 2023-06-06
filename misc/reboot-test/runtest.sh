@@ -40,7 +40,7 @@ if [[ ! -e kernel_before_reboot.txt ]]; then
             mkdir -p /var/log/journal
             journalctl --flush
         fi
-        journalctl -o short-full > journalctl_before_reboot.log
+        journalctl -n0 -q --show-cursor | cut -d ' ' -f3- > cursor.txt
     fi
     echo "Reboot now!"
     rstrnt-reboot
@@ -68,11 +68,11 @@ else
 
     if type -p journalctl > /dev/null; then
         JOURNALCTLLOG=journalctl.log
-        journalctl -o short-full > journalctl_after_reboot.log
         start_time=$(cat start_time.txt)
+        cursor=$(cat cursor.txt)
         # check if there was any call trace during boot or during reboot
         echo "INFO: journalctl log should have entries since ${start_time}..."
-        diff --changed-group-format='%>' --unchanged-group-format='' journalctl_before_reboot.log journalctl_after_reboot.log > ${JOURNALCTLLOG}
+        journalctl -o short-full --after-cursor "${cursor}" > ${JOURNALCTLLOG}
         if grep -qi 'Call Trace:' ${JOURNALCTLLOG}; then
           echo "FAIL: Call trace found in journalctl, see journalctl.log"
         else

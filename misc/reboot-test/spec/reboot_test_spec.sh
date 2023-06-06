@@ -8,6 +8,7 @@ export -f type
 
 Mock journalctl
     echo "journalctl $*"
+    echo "${JOURNAL_OUTPUT:=}"
 End
 
 Describe 'reboot-test: pre-reboot'
@@ -73,7 +74,7 @@ Describe 'reboot-test: post-reboot'
     End
 
     It "can detect Call Traces on journalctl"
-        export DIFF_OUTPUT="Call Trace:"
+        export JOURNAL_OUTPUT="Call Trace:"
         When run script misc/reboot-test/runtest.sh
         The stdout should include "diff kernel_before_reboot.txt kernel_after_reboot.txt"
         The stdout should include "Rebooted using correct kernel"
