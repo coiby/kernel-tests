@@ -1,7 +1,5 @@
 summary: KG-VMM kselftest
 description: test wrapper for kernel selftest
-enabled: false
-id: 83986a89-c53a-4ed6-a17b-6c18216168b8
 contact: Hangbin Liu <haliu@redhat.com>
 component:
   - kernel
@@ -31,6 +29,6 @@ recommend:
   - socat
   - iperf3
   - scapy
-duration: 4h
+duration: 24h
 extra-summary: kselftests
 extra-task: kselftests

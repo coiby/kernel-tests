@@ -139,6 +139,8 @@ install_packages()
 install_kselftests()
 {
     modules_extra_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-extra)
+    modules_internal_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-internal)
+    selftests_pkg=$(K_GetRunningKernelRpmSubPackageNVR selftests-internal)
     # Install the selftests-internal, modules-internal packages by default
     if [ "${CKI_SELFTESTS_URL}" ] ; then
         pushd ${EXEC_DIR}
@@ -149,7 +151,14 @@ install_kselftests()
         popd
     elif [ "${BUILD_FROM_SRC}" ] ; then
         # Install debug-modules-extra
-        rlRun "$pkg_mgr $pkg_mgr_inst_string ${modules_extra_pkg}"
+        if ! rpm --quiet -q "${modules_extra_pkg}"; then
+            rlRpmDownload "${modules_extra_pkg}.${arch}"
+            rlRun "$pkg_mgr $pkg_mgr_inst_string ./${modules_extra_pkg}.${arch}.rpm"
+        fi
+        if ! rpm --quiet -q "${modules_internal_pkg}"; then
+            rlRpmDownload "${modules_internal_pkg}.${arch}"
+            rlRun "$pkg_mgr $pkg_mgr_inst_string ./${modules_internal_pkg}.${arch}.rpm"
+        fi
         if [ "${UPSTREAM_SOURCE_URL}" ]; then
             pushd $TMPDIR/linux-kselftest-*/
         else
@@ -169,12 +178,10 @@ install_kselftests()
             rlRpmDownload "${modules_extra_pkg}.${arch}"
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${modules_extra_pkg}.${arch}.rpm"
         fi
-        modules_internal_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-internal)
         if ! rpm --quiet -q "${modules_internal_pkg}"; then
             rlRpmDownload "${modules_internal_pkg}.${arch}"
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${modules_internal_pkg}.${arch}.rpm"
         fi
-        selftests_pkg=$(K_GetRunningKernelRpmSubPackageNVR selftests-internal)
         if ! rpm --quiet -q "${selftests_pkg}"; then
             rlRpmDownload "${selftests_pkg}.${arch}"
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${selftests_pkg}.${arch}.rpm"
