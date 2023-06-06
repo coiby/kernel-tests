@@ -8,7 +8,7 @@ TDIR=/mnt/kcov
 mkdir -p $TDIR
 KCOV_CONF=$TDIR/kcov.conf
 KCOV_KDIR=
-KCOV_INFO_LIST=$TDIR/kernel_tests_name.lst
+export KCOV_INFO_LIST=$TDIR/kernel_tests_name.lst
 KCOV_COMBINED_NAME=kcov.combined.info
 
 KERNEL_GCOV="kernel-gcov"
@@ -16,11 +16,11 @@ if cki_is_kernel_automotive; then
 	KERNEL_GCOV="kernel-automotive-gcov"
 fi
 
-GCOV_BASEDIR=$(rpm -ql ${KERNEL_GCOV} | head -1)/*/*$(uname -r)*/
+GCOV_BASEDIR=$(rpm -ql ${KERNEL_GCOV} | grep -F -m 1 "$(uname -r)")
 
 log()
 {
-	echo $1 | tee -a $OUTPUTFILE
+	echo "$1" | tee -a "$OUTPUTFILE"
 }
 
 fail()
@@ -30,18 +30,18 @@ fail()
 	fi
 
 	if [ -n "$1" ]; then
-		rstrnt-report-result $TEST/$1 FAIL $SCORE
+		rstrnt-report-result "$TEST"/"$1" FAIL "$SCORE"
 	else
-		rstrnt-report-result $TEST FAIL $SCORE
+		rstrnt-report-result "$TEST" FAIL "$SCORE"
 	fi
 }
 
 pass()
 {
 	if [ -n "$1" ]; then
-		rstrnt-report-result $TEST/$1 PASS $SCORE
+		rstrnt-report-result "$TEST/$1" PASS "$SCORE"
 	else
-		rstrnt-report-result $TEST PASS $SCORE
+		rstrnt-report-result "$TEST" PASS "$SCORE"
 	fi
 }
 
@@ -51,18 +51,18 @@ load_config()
 	KCOV_ONLY_FINAL_INFO=$(awk -F= '$1~/ONLY_FINAL_INFO/{print $2}' $KCOV_CONF)
 	if [ -z "$KCOV_KDIR" ]; then
 		# lcov to collect the results for the test can only use directories currently loaded.
-		KCOV_KDIR=$(ls --format=commas /sys/kernel/debug/gcov/$GCOV_BASEDIR/)
+		KCOV_KDIR=$(ls --format=commas /sys/kernel/debug/gcov/"$GCOV_BASEDIR"/)
 	fi
 	log "collecting coverage from directories: ${KCOV_KDIR}"
-	KDIR_OPT=" --kernel-directory ${KCOV_KDIR//,/ --kernel-directory } "
+	export KDIR_OPT=" --kernel-directory ${KCOV_KDIR//,/ --kernel-directory } "
 
 	KCOV_TEST_NAME=${TEST_NAME:-kernel tests}
 	CLEANED_NAME=${KCOV_TEST_NAME// /-}
 	CLEANED_NAME=${CLEANED_NAME//\//_}
-	KCOV_BASE_INFO=$TDIR/"$CLEANED_NAME".base.info
-	KCOV_TEST_INFO=$TDIR/"$CLEANED_NAME".test.info
-	KCOV_ALL_INFO=$TDIR/"$CLEANED_NAME".info
-	KCOV_COMBINED_INFO=$TDIR/$KCOV_COMBINED_NAME
+	export KCOV_BASE_INFO=$TDIR/"$CLEANED_NAME".base.info
+	export KCOV_TEST_INFO=$TDIR/"$CLEANED_NAME".test.info
+	export KCOV_ALL_INFO=$TDIR/"$CLEANED_NAME".info
+	export KCOV_COMBINED_INFO=$TDIR/$KCOV_COMBINED_NAME
 }
 
 submit_info()
@@ -79,10 +79,11 @@ install_lcov()
 		repo_url="https://github.com/linux-test-project/lcov.git"
 		commit_id="d100e6cdd4c67cbe5322fa26b2ee8aa34ea7ebcf"
 		git clone $repo_url
-		cd lcov
-		git checkout $commit_id
-		make install
-		cd ..
+		(
+			cd lcov || return 1
+			git checkout $commit_id
+			make install
+		)
 	fi
 
 	if ! which lcov; then
@@ -92,10 +93,12 @@ install_lcov()
 
 	# http://ltp.sourceforge.net/coverage/lcov/genhtml.1.php
 	# Show yellow for >=25 < 50, green >= 50
-	echo "genhtml_med_limit = 25" >> /etc/lcovrc
-	echo "genhtml_hi_limit = 50" >> /etc/lcovrc
-	# Enable branch coverage
-	echo "lcov_branch_coverage = 1" >> /etc/lcovrc
+	{
+		echo "genhtml_med_limit = 25"
+		echo "genhtml_hi_limit = 50"
+		# Enable branch coverage
+		echo "lcov_branch_coverage = 1"
+	} >> /etc/lcovrc
 
 	cki_upload_log_file "/etc/lcovrc"
 }
