@@ -16,7 +16,7 @@ if cki_is_kernel_automotive; then
 	KERNEL_GCOV="kernel-automotive-gcov"
 fi
 
-GCOV_BASEDIR=$(rpm -ql ${KERNEL_GCOV} | head -1)/*/*$(uname -r)*/
+GCOV_BASEDIR=$(rpm -ql ${KERNEL_GCOV} | grep -F -m 1 "$(uname -r)")
 
 log()
 {
