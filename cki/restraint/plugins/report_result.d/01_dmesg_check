@@ -24,6 +24,7 @@ clean_up() {
 trap clean_up EXIT
 
 DMESG_FILE=$TMPDIR/dmesg.log
+DMESG_FILE_UPDATED=$TMPDIR/dmesg_updated.log
 OUTPUTFILE=$TMPDIR/outputfile.log
 
 # Order of precedence for FAILURE & FALSESTRINGS:
@@ -85,11 +86,12 @@ for TRACE in "$TMPDIR"/trace*; do
     fi
 done
 
+cp -f "$DMESG_FILE" "$DMESG_FILE_UPDATED"
 # Remove all traces
-sed -i -n '/cut here/,/end trace/!p;' "$DMESG_FILE"
+sed -i -n '/cut here/,/end trace/!p;' "$DMESG_FILE_UPDATED"
 
 # Check for errors
-grep -E -v "$FALSESTRINGS" "$DMESG_FILE" | grep -E "$FAILURESTRINGS" >> "$OUTPUTFILE"
+grep -E -v "$FALSESTRINGS" "$DMESG_FILE_UPDATED" | grep -E "$FAILURESTRINGS" >> "$OUTPUTFILE"
 
 if [ -s "$OUTPUTFILE" ]; then
     # print FAILURE/FALSESTRINGS used at bottom of file
@@ -121,5 +123,5 @@ if [ -s "$OUTPUTFILE" ]; then
         echo -e "FalseStrings file not found." >> "${OUTPUTFILE}"
     fi
     echo -e "====================================================" >> "${OUTPUTFILE}"
-    OUTPUTFILE=$OUTPUTFILE rstrnt-report-result --no-plugins "$TEST"/"$PLUGIN" FAIL 0
+    OUTPUTFILE=$OUTPUTFILE rstrnt-report-result -o "$DMESG_FILE" --no-plugins "$TEST"/"$PLUGIN" FAIL 0
 fi
