@@ -197,10 +197,9 @@ RprtRslt ()
         if [ "$failed_test" == "$logfile_fail" ]; then
             continue
         fi
-        SubmitLog $failed_test
+        # upload the failed test output as part of restraint subtest
         # extract test case name from test case fail log
-        # don't wan't to upload outputfile
-        rstrnt-report-result -o /dev/null "${failed_test%.fail.log}" FAIL
+        rstrnt-report-result -o "$failed_test" "${failed_test%.fail.log}" FAIL
     done
 
     # File the results in the database
