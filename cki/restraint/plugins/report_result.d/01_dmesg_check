@@ -1,0 +1,127 @@
+#!/bin/bash
+
+set -e
+shopt -s nullglob
+
+if [ ! -f /usr/share/restraint/plugins/helpers ]; then
+    . ../helpers # For running tests
+else
+    . /usr/share/restraint/plugins/helpers
+fi
+
+PLUGIN=$(basename "$0")
+
+if [ -z "$RSTRNT_RESULT_URL" ]; then
+    rstrnt_crit "RSTRNT_RESULT_URL is not defined!"
+    exit 1
+fi
+
+TMPDIR=$(mktemp -d)
+
+clean_up() {
+    rm -rf "$TMPDIR"
+}
+trap clean_up EXIT
+
+DMESG_FILE=$TMPDIR/dmesg.log
+DMESG_FILE_UPDATED=$TMPDIR/dmesg_updated.log
+OUTPUTFILE=$TMPDIR/outputfile.log
+
+# Order of precedence for FAILURE & FALSESTRINGS:
+# 1) Use User defined Task variable if present
+# 2) else use content of failure or falsestrings files
+# 3) else use hardcoded defaults.
+FAILUREFILENM=${FAILUREFILENM:-"/usr/share/rhts/failurestrings"}
+if [ ! -s "${FAILUREFILENM}" ]; then
+    if [ -z "${FAILURESTRINGS}" ]; then
+        DMESG_FAIL_SELECTOR="Default FAILURESTRINGS"
+        FAILURESTRINGS="Oops|BUG|NMI appears to be stuck|Badness at"
+    else
+        DMESG_FAIL_SELECTOR="FAILURESTRINGS Environment Variable"
+    fi
+else
+    if [ -z "${FAILURESTRINGS}" ]; then
+        DMESG_FAIL_SELECTOR="failurestrings file"
+        # Remove space filled or empty lines and join lines with "|"
+        FAILURESTRINGS=$(sed '/^ *$/d' "${FAILUREFILENM}" | paste -sd "|")
+    else
+        DMESG_FAIL_SELECTOR="FAILURESTRINGS Environment Variable"
+    fi
+fi
+
+FALSEFILENM=${FALSEFILENM:-"/usr/share/rhts/falsestrings"}
+if [ ! -s "${FALSEFILENM}" ]; then
+    if [ -z "${FALSESTRINGS}" ]; then
+        DMESG_FALSE_SELECTOR="Default FALSESTRINGS"
+        FALSESTRINGS="BIOS BUG|DEBUG|mapping multiple BARs.*IBM System X3250 M4"
+    else
+        DMESG_FALSE_SELECTOR="FALSESTRINGS Environment Variable"
+    fi
+else
+    if [ -z "${FALSESTRINGS}" ]; then
+        DMESG_FALSE_SELECTOR="falsestrings file"
+        # Remove space filled or empty lines and join lines with "|"
+        FALSESTRINGS=$(sed '/^ *$/d' "${FALSEFILENM}" | paste -sd "|")
+    else
+        DMESG_FALSE_SELECTOR="FALSESTRINGS Environment Variable"
+    fi
+fi
+
+# Dump dmesg output into $DMESG_FILE and clear it.
+dmesg > "$DMESG_FILE"
+
+# Submit dmesg log if any output
+if [ -s "$DMESG_FILE" ]; then
+    rstrnt-report-log --server "$RSTRNT_RESULT_URL" -l "$DMESG_FILE"
+fi
+
+# Move 'cut here' traces into their own numbered files trace-*.log
+sed -n '/cut here/,/end trace/p;' "$DMESG_FILE" | \
+    sed '/.*end trace.*/a\\' | \
+    awk -v RS= -v TMPDIR="$TMPDIR" '{print > (TMPDIR"/trace-" NR ".log")}'
+
+for TRACE in "$TMPDIR"/trace*; do
+    if ! paste -s "$TRACE" | grep -q -P "$FALSESTRINGS" ; then
+        cat "$TRACE" >> "$OUTPUTFILE"
+    fi
+done
+
+cp -f "$DMESG_FILE" "$DMESG_FILE_UPDATED"
+# Remove all traces
+sed -i -n '/cut here/,/end trace/!p;' "$DMESG_FILE_UPDATED"
+
+# Check for errors
+grep -E -v "$FALSESTRINGS" "$DMESG_FILE_UPDATED" | grep -E "$FAILURESTRINGS" >> "$OUTPUTFILE"
+
+if [ -s "$OUTPUTFILE" ]; then
+    # print FAILURE/FALSESTRINGS used at bottom of file
+    echo -e "====================================================" >> "${OUTPUTFILE}"
+    echo -e "DMESG Selectors:" >> "${OUTPUTFILE}"
+    echo -e "Used $DMESG_FAIL_SELECTOR and $DMESG_FALSE_SELECTOR" >> "${OUTPUTFILE}"
+    echo -e "====================================================" >> "${OUTPUTFILE}"
+    echo -e "FAILURESTRINGS: ${FAILURESTRINGS}" >> "${OUTPUTFILE}"
+    if [ -f "${FAILUREFILENM}" ]; then
+        if [ -s "${FAILUREFILENM}" ]; then
+            echo -e "FailureStrings file found and contains:" >> "${OUTPUTFILE}"
+            cat "${FAILUREFILENM}" >> "${OUTPUTFILE}"
+        else
+            echo -e "FailureStrings file found but empty." >> "${OUTPUTFILE}"
+        fi
+    else
+        echo -e "FailureStrings file not found." >> "${OUTPUTFILE}"
+    fi
+    echo -e "====================================================" >> "${OUTPUTFILE}"
+    echo -e "FALSESTRINGS: ${FALSESTRINGS}" >> "${OUTPUTFILE}"
+    if [ -f "${FALSEFILENM}" ]; then
+        if [ -s "${FALSEFILENM}" ]; then
+            echo -e "FalseStrings file found and contains:" >> "${OUTPUTFILE}"
+            cat "${FALSEFILENM}" >> "${OUTPUTFILE}"
+        else
+            echo -e "FalseStrings file found but empty." >> "${OUTPUTFILE}"
+        fi
+    else
+        echo -e "FalseStrings file not found." >> "${OUTPUTFILE}"
+    fi
+    echo -e "====================================================" >> "${OUTPUTFILE}"
+    OUTPUTFILE=$OUTPUTFILE rstrnt-report-result -o "$DMESG_FILE" --no-plugins "$TEST"/"$PLUGIN" FAIL 0
+fi
