@@ -49,6 +49,7 @@ function test_setup()
 	echo "Getting mce-test suit ..."
 	git clone git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git
 	pushd mce-test &> /dev/null
+	[ $? == 0 ] || rlDie "Test setup failed: no directory mce-test"
 	make && make install || ret=8
 	popd
 
@@ -57,15 +58,15 @@ function test_setup()
 	echo "Getting mce-inject suit ..."
 	git clone git://git.kernel.org/pub/scm/utils/cpu/mce/mce-inject.git
 	pushd mce-inject &> /dev/null
+	[ $? == 0 ] || rlDie "Test setup failed: no directory mce-inject"
 	make && make install || ret=4
 	popd
 
 		[ ! $ret = 0 ] && return $ret
 
-		echo "Installing mcelog ..."
-		yum -y install mcelog || ret=2
-
-	[ $ret = 0 ] || rlDie "test setup failed, some of git clone failed..."
+	echo "Installing mcelog ..."
+	yum -y install mcelog || ret=2
+	[ $ret = 0 ] || rlDie "Test setup failed: no match for package mcelog"
 
 	uname -m | grep ppc64le && ppc64le_setup
 
@@ -91,6 +92,8 @@ rlJournalStart
 	else
 		echo "memory-failure is not supported. skip test."
 		phase="Skip-not-support"
+		rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
+		return
 	fi
 	rlPhaseStartSetup
 	[ "$phase" = Test ] && test_setup

@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=make run
 max_time=24h
-dependencies=python3
+dependencies=python3;git;gcc;bison;flex
 repoRequires=
