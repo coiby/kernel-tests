@@ -6,35 +6,28 @@ description: |-
 
     TESTARGS: Default value is analyse-crash-common.sh
 
-    1) Upload dumped vmcore if analysis reported a failure or warnning. By default, K_DEBUG = false.
-          <task name="/kernel/kdump/analyse-crash-cmd" role="None">
-            <params>
-              <param name="K_DEBUG" value="true"/>
-            </params>
-          </task>
-
-    2) Run one particular test in testcases
+    1) Run one particular test in testcases
           <task name="/kernel/kdump/analyse-crash-cmd" role="None">
             <params>
               <param name="TESTARGS" value="analyse-crash-common.sh"/>
             </params>
           </task>
 
-    3) Run more than one test scripts in testcases
+    2) Run more than one test scripts in testcases
           <task name="/kernel/kdump/analyse-crash-cmd" role="None">
             <params>
               <param name="TESTARGS" value="analyse-crash-common.sh,analyse-crash-simple.sh"/>
             </params>
           </task>
 
-    4) Skip running test scripts matched keywords in testcases
+    3) Skip running test scripts matched keywords in testcases
           <task name="/kernel/kdump/analyse-crash-cmd" role="None">
             <params>
               <param name="SKIP_TESTARGS" value="common/>
             </params>
           </task>
 
-    5) Check existence of vmcore only. Not analyzing the vmcore
+    4) Check existence of vmcore only. Not analyzing the vmcore
           <task name="/kernel/kdump/analyse-crash-cmd" role="None">
             <params>
               <param name="TESTARGS" value="simple_check/>
