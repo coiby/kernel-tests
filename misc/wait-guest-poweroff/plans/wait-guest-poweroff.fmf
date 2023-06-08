@@ -14,6 +14,6 @@ prepare:
           install_repos
     - name: Install packages
       how: install
-      package: [TBD_CASE_PACKAGES]
+      package: []
 environment-file:
     - ./misc/wait-guest-poweroff/plans/tmt.env

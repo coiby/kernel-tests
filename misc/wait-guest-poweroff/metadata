@@ -2,8 +2,17 @@
 description=Wait for guest poweroff
 name=misc/wait-guest-poweroff
 owner=Oliver Gutierrez <ogutierr@redhat.com>
+license=GPLv2+
+confidential=no
+destructive=no
 
 [restraint]
 repoRequires=automotive/include
 entry_point=bash ./runtest.sh
 max_time=1h
+dependencies=
+TestVersion=1.0
+Type=KernelTier1
+RunFor=kernel
+Priority=Normal
+
