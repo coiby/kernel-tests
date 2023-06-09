@@ -137,7 +137,8 @@ else
 fi
 
 # Note, INITRD_KDUMP_IMG_PATH can be system initramfs img if fadump is enabled
-INITRD_KDUMP_IMG_PATH="${INITRD_IMG_PATH/.img/kdump.img}"
+INITRD_KDUMP_IMG_PATH=$(sed -e "s/\.img$/kdump.img/; s/$INITRD_PREFIX/$INITRD_KDUMP_PREFIX/" <<< "$INITRD_IMG_PATH")
+
 if [ -s "/var/log/kdump.log" ]; then
     # From RHEL-8.7/9.1 kexec-tools will try using the nondebug kernel img if the file exists
     # So here we will try to retrieve the kdump img path from kdump.log.

@@ -723,7 +723,7 @@ SystemCrashTest(){
 
         if [ "${CHECK_INITRD_REBUILD,,}" = true ]; then
             Log "[CHECK_INITRD_REBUILD=true] Check if kdump img is rebuilt unexpectedly"
-            kdumpctl status  # Wait kdump service to be fully started in case kdumpctl rebuild.
+            CheckKdumpStatus  # Wait kdump service to be fully started in case kdumpctl rebuild.
             ls -l --full-time "${INITRD_KDUMP_IMG_PATH}" > "${K_TESTAREA}/KDUMP_INITRD_TIME_NEW"
 
             # Compare the timestamp of kdump initramfs img before/after system reboot.
