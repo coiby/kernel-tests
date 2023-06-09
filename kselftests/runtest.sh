@@ -166,7 +166,10 @@ install_kselftests()
         fi
         yes "" | make config
         # for bpf build
-        make -j`nproc` modules_prepare
+        # Some bpf tests rely on vmlinux need to remove rhel.pem and use "modules" macro
+        # to build both vmlinux and modules_prepare in one command.
+        sed -i "s/CONFIG_SYSTEM_TRUSTED_KEYS=\"certs\/rhel.pem\"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/" .config
+        make -j`nproc` modules
         sed -i "s/^SKIP_TARGETS.*/#SKIP_TARGETS ?= /" tools/testing/selftests/Makefile
         make -j`nproc` -C tools/testing/selftests install TARGETS="${TEST_ITEMS}" INSTALL_PATH=${EXEC_DIR}
         rlLog "Compiled ${TEST} installed..."
