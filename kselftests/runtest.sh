@@ -109,11 +109,8 @@ install_packages()
         pushd linux-kselftest-*/
     else
         pkg=${name}-${version}-${release}
-        if cki_is_kernel_automotive; then
-            wget --no-check-certificate https://cbs.centos.org/kojifiles/packages/kernel-automotive/${version}/${release}/src/$pkg.src.rpm || test_fail_exit "Fetch Src Failed"
-        else
-           rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
-        fi
+        BEAKERLIB_rpm_fetch_base_url+=("https://cbs.centos.org/kojifiles/packages")
+        rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
         rpm -ivh --define "_topdir $TMPDIR" ${name}-${version}-${release}.src.rpm
         pushd SPECS
         # patch for x86_64 systems. Introduction of efiuki causes dependency to break.
