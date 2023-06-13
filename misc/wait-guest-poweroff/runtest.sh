@@ -36,7 +36,6 @@ if ! (($is_rhivos)); then
 fi
 
 # Source the common test script helpers
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 WAIT_STATE=${WAIT_STATE:-"shut off"}

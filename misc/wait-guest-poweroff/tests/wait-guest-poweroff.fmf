@@ -5,8 +5,8 @@ component:
   - kernel
 path: /misc/wait-guest-poweroff
 test: bash -x ./runtest.sh
-framework: beakerlib
-require: [TBD_CASE_PACKAGES]
+framework: shell
+require: []
 duration: 1h
 extra-summary: /misc/wait-guest-poweroff
 extra-task: /misc/wait-guest-poweroff
