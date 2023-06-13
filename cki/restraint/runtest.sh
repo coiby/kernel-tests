@@ -47,6 +47,10 @@ if ! grep -q "\${RSTRNT_TASKNAME} hit test timeout" /usr/share/restraint/plugins
    echo 'echo "${RSTRNT_TASKNAME} hit test timeout, aborting it..." >> /dev/kmsg' >> /usr/share/restraint/plugins/localwatchdog.d/10_localwatchdog
 fi
 
-cp -r plugins /usr/share/restraint/
+if ! cp -rf plugins /usr/share/restraint/; then
+    echo "FAIL to copy plugins"
+    rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL 1
+    rstrnt-abort -t recipe
+fi
 # Make sure the plugins have exec permission
 chmod -R +x /usr/share/restraint/plugins
