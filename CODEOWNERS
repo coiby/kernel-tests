@@ -18,6 +18,9 @@
 [Kdump]
 /kdump/ @emmawu1 @jieli1 @yiyan1
 
+[kdump-cki]
+/kdump-cki/ @emmawu1 @jieli1 @yiyan1
+
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
 
@@ -38,6 +41,8 @@
 #     users:
 #       - cki-project
 #     kpet: locations
+#     paths:
+#       - /kdump-cki/
 #   kpet-db-maintainers:  # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db
 #     minimum_count: 3  # the original maintainer + the two users below
 #     users:
@@ -48,7 +53,7 @@
 # GITLAB-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-GENERATED-BEGIN
-# ee0cd6ad275eda61f66bd1edeff8eb06a51172d85c0d7cf1d29823f51bc23928
+# fee47f0946869e08fea765ba28370103adfddfe3689d1776b40f81d4edd23087
 
 [Infrastructure]
 /.gitlab-ci.yml @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -79,6 +84,7 @@
 /ipmi/stress/ipmitool-loop/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /jvm/dacapobench/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /jvm/jcstress/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/kdump-cki/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /kdump-cki/kdump-file-load/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /kdump-cki/kdump-sysrq-c/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /kdump-cki/kexec-boot/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
