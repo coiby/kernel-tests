@@ -31,8 +31,8 @@
 if [ -f /usr/bin/rhts-environment.sh ]; then
     . /usr/bin/rhts-environment.sh
 fi
-if [ -f ../../security/include/rhivos.sh ]; then
-    . ../../security/include/rhivos.sh
+if [ -f ../../automotive/include/rhivos.sh ]; then
+    . ../../automotive/include/rhivos.sh
     setup_env
 fi
 
