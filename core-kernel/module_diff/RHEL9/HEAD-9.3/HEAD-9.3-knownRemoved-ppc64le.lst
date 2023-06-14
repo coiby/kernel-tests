@@ -1,3 +1,4 @@
 nd_blk.ko
+rtc-v3020.ko
 vfio_spapr_eeh.ko
 vfio_virqfd.ko
