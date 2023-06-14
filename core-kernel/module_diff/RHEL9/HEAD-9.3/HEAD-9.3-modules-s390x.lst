@@ -55,6 +55,7 @@ cast_common.ko
 cb710.ko
 ccwgroup.ko
 cdrom.ko
+cec.ko
 ceph.ko
 cfbcopyarea.ko
 cfbfillrect.ko
@@ -129,6 +130,8 @@ dm-verity.ko
 dm-writecache.ko
 dm-zero.ko
 dns_resolver.ko
+drm_buddy.ko
+drm_display_helper.ko
 drm_kms_helper.ko
 drm.ko
 drm_panel_orientation_quirks.ko
@@ -550,6 +553,7 @@ raid6test.ko
 raid_class.ko
 rbd.ko
 rdma_cm.ko
+rdma_rxe.ko
 rdma_ucm.ko
 reed_solomon.ko
 rfkill.ko
@@ -567,6 +571,7 @@ sch_hfsc.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_mqprio_lib.ko
 sch_multiq.ko
 sch_netem.ko
 sch_prio.ko

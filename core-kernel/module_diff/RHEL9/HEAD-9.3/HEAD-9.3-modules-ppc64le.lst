@@ -1070,6 +1070,7 @@ rainshadow-cec.ko
 ramoops.ko
 rbd.ko
 rdma_cm.ko
+rdma_rxe.ko
 rdma_ucm.ko
 realtek.ko
 reed_solomon.ko
@@ -1139,6 +1140,7 @@ sch_hfsc.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_mqprio_lib.ko
 sch_multiq.ko
 sch_netem.ko
 sch_prio.ko

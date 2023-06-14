@@ -156,7 +156,10 @@ bochs.ko
 bonding.ko
 bpa10x.ko
 br2684.ko
+brcmfmac-bca.ko
+brcmfmac-cyw.ko
 brcmfmac.ko
+brcmfmac-wcc.ko
 brcmsmac.ko
 brcmutil.ko
 brd.ko
@@ -709,6 +712,7 @@ int51x1.ko
 intel-cstate.ko
 intel-gtt.ko
 intel-hid.ko
+intel_ifs.ko
 intel_ips.ko
 intel-ish-ipc.ko
 intel-ishtp-hid.ko
@@ -1408,6 +1412,7 @@ ramoops.ko
 rapl.ko
 rbd.ko
 rdma_cm.ko
+rdma_rxe.ko
 rdma_ucm.ko
 rdmavt.ko
 realtek.ko
@@ -1505,6 +1510,8 @@ rtw88_core.ko
 rtw88_pci.ko
 rtw89_8852ae.ko
 rtw89_8852a.ko
+rtw89_8852be.ko
+rtw89_8852b.ko
 rtw89_core.ko
 rtw89_pci.ko
 s2255drv.ko
@@ -1527,6 +1534,7 @@ sch_hfsc.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_mqprio_lib.ko
 sch_multiq.ko
 sch_netem.ko
 sch_prio.ko
