@@ -87,6 +87,10 @@ msg="Transition force finished"
 [ $(cat $KLP_SYSFS/$KLP_MODULE/transition) -eq 0 ] && \
 	test_pass "$msg ($i sec)" || test_fail "$msg"
 
+msg="$BUSY_MODULE Object patched"
+[[ ! -e "$KLP_SYSFS/$KLP_MODULE/$BUSY_MODULE/patched" ]] && test_pass "object/patched sysfs entry empty" \
+	|| ([ $(cat $KLP_SYSFS/$KLP_MODULE/$BUSY_MODULE/patched) -eq 1 ] && test_pass "$msg" || test_fail "$msg")
+
 echo 0 > $KLP_SYSFS/$KLP_MODULE/enabled
 modprobe -r $BUSY_MODULE
 rmmod $KLP_MODULE
