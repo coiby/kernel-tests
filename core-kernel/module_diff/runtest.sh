@@ -542,6 +542,18 @@ rlJournalStart
                     echo "" | tee -a $OUTPUTFILE
                     echo "***** $ARCH: Base release is HEAD-RHEL-8.8 *****" | tee -a $OUTPUTFILE
                     Release="HEAD-8.9"
+                    if cki_kver_lt "4.18.0-486.el8"; then
+                        sed -i '/pinctrl-meteorlake.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-493.el8"; then
+                        sed -i '/prime_numbers.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/drm_buddy.ko/d; /drm_display_helper.ko/d' ${OS}/${Release}/$Release-modules-s390x.lst
+                        sed -i '/^rational.ko$/d' ${OS}/${Release}/$Release-modules-ppc64le.lst
+                    fi
+                    if cki_kver_lt "4.18.0-495.el8"; then
+                        sed -i '/sch_mqprio_lib.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/brcmfmac-bca.ko/d; / brcmfmac-cyw.ko/d; /brcmfmac-wcc.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then

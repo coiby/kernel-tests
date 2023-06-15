@@ -1284,6 +1284,7 @@ pps-gpio.ko
 pps-ldisc.ko
 pps_parport.ko
 pptp.ko
+prime_numbers.ko
 psample.ko
 pseries_energy.ko
 pseries-rng.ko
@@ -1325,6 +1326,7 @@ raid6test.ko
 raid_class.ko
 rainshadow-cec.ko
 ramoops.ko
+rational.ko
 raw_diag.ko
 rbd.ko
 rc-adstech-dvb-t-pci.ko
@@ -1543,6 +1545,7 @@ sch_hhf.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_mqprio_lib.ko
 sch_multiq.ko
 sch_netem.ko
 sch_pie.ko

@@ -179,7 +179,10 @@ bochs.ko
 bonding.ko
 bpa10x.ko
 br2684.ko
+brcmfmac-bca.ko
+brcmfmac-cyw.ko
 brcmfmac.ko
+brcmfmac-wcc.ko
 brcmsmac.ko
 brcmutil.ko
 brd.ko
@@ -1559,6 +1562,7 @@ pinctrl-emmitsburg.ko
 pinctrl-geminilake.ko
 pinctrl-icelake.ko
 pinctrl-lewisburg.ko
+pinctrl-meteorlake.ko
 pinctrl-sunrisepoint.ko
 pinctrl-tigerlake.ko
 pktcdvd.ko
@@ -1592,6 +1596,7 @@ pps-gpio.ko
 pps-ldisc.ko
 pps_parport.ko
 pptp.ko
+prime_numbers.ko
 processor_thermal_device.ko
 processor_thermal_device_pci.ko
 processor_thermal_device_pci_legacy.ko
@@ -1916,6 +1921,7 @@ sch_hhf.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_mqprio_lib.ko
 sch_multiq.ko
 sch_netem.ko
 sch_pie.ko

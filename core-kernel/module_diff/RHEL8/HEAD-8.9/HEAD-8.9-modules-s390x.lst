@@ -132,6 +132,8 @@ dm-verity.ko
 dm-writecache.ko
 dm-zero.ko
 dns_resolver.ko
+drm_buddy.ko
+drm_display_helper.ko
 drm_kms_helper.ko
 drm.ko
 drm_panel_orientation_quirks.ko
@@ -540,6 +542,7 @@ pnet.ko
 poly1305_generic.ko
 pps-gpio.ko
 pps-ldisc.ko
+prime_numbers.ko
 prng.ko
 psample.ko
 psnap.ko
@@ -583,6 +586,7 @@ sch_hhf.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_mqprio_lib.ko
 sch_multiq.ko
 sch_netem.ko
 sch_pie.ko
