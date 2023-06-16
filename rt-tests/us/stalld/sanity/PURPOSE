@@ -1,0 +1,6 @@
+Measure the time it takes for a stalled thread to be
+boosted. Ensure the the result is consistent with stalld
+taking action to boost the pid. A stalled thread boost
+in under 240 seconds is considered to be a PASS. Without
+stalld the thread will not get boosted and will take the 
+full 240 seconds or more.
