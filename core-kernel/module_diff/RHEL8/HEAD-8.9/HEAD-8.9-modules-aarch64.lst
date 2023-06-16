@@ -988,6 +988,7 @@ ppp_synctty.ko
 pps-gpio.ko
 pps-ldisc.ko
 pptp.ko
+prime_numbers.ko
 psample.ko
 psnap.ko
 pwm_bl.ko
@@ -1109,6 +1110,7 @@ sch_hhf.ko
 sch_htb.ko
 sch_ingress.ko
 sch_mqprio.ko
+sch_mqprio_lib.ko
 sch_multiq.ko
 sch_netem.ko
 sch_pie.ko
