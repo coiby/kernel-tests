@@ -1,0 +1,23 @@
+summary: KS-TC:ssd/nvme_suspend_disk_resume
+description: Test suspend to disk and resume on nvme server
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/nvme_suspend_disk_resume
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - fio
+  - nvme-cli
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_suspend_disk_resume
+extra-task: /storage/ssd/nvme_suspend_disk_resume
+adjust:
+    enabled: false
+    when: distro < rhel-9
+id: 714470fd-44bf-49e8-b149-5af51debdc87
