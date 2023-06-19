@@ -9,7 +9,7 @@ function suspend_resume ()
 	local mode=${1:-"mem"}
 	local seconds=${2:-"180"}
 
-	if [ $# -ge 3 ]; then
+	while [ $# -ge 3 ]; do
 		local test_dev="/dev/$3"
 		local iodepth=64
 		local runtime=240
@@ -18,11 +18,12 @@ function suspend_resume ()
 		tlog "Will start fio write/randwrite/read/randread test with $test_dev"
 		tok "fio -filename=$test_dev -iodepth=$iodepth -thread -rw=randwrite -ioengine=libaio -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -direct=1 -runtime=$runtime -time_based -size=$t_size -group_reporting -name=mytest -numjobs=$numjobs" &
 		shift
-	fi
+	done
 
 	sleep 5
 	tlog "Will enter to rtcwake:$mode mode and resume after $seconds seconds"
 	tok "rtcwake -m $mode -s $seconds"
+	wait
 }
 
 function prepare_reboot()
@@ -46,6 +47,6 @@ function prepare_reboot()
 function add_kernel_option ()
 {
 	#add no_console_suspend to kernel options
-	tok "grubby --args="no_console_suspend=1 loglevel=8" --update-kernel=ALL"
+	tok "grubby --args=\"no_console_suspend=1 loglevel=8\" --update-kernel=ALL"
 	rhts-reboot
 }

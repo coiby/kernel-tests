@@ -1,0 +1,14 @@
+[General]
+name=storage/ssd/nvme_suspend_mem_resume_io
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=Test suspend to mem and resume during nvme io
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=fio;nvme-cli
+max_time=1h
+use_pty=false
