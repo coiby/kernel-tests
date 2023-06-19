@@ -210,29 +210,6 @@ function test_finish()
 }
 
 
-# https://issues.redhat.com/browse/KG-3042
-
-# rt-qe@ don't have a need for installing *-devel/debuginfo packages, I suppose
-# it should be enough to utilize the already available tool.
-function brew_install_debuginfo()
-{
-    dnf install -y kernel-general-include || yum install -y kernel-general-include
-
-    if [[ -f ../general/include/scripts/wget-kernel.sh ]]; then
-        wget_kernel="../../include/scripts/wget-kernel.sh"
-    elif [[ -f /mnt/tests/kernel/general/include/scripts/wget-kernel.sh ]]; then
-        wget_kernel="/mnt/tests/kernel/general/include/scripts/wget-kernel.sh"
-    fi
-    if ! rpm -q "${kname}-debuginfo" | grep "${kver}-${krel}"; then
-        if [[ ${kname} =~ "debug" ]]; then
-            ${wget_kernel} --nvr ${kver}-${krel} --debugkernel --debuginfo -i
-        else
-            ${wget_kernel} --nvr ${kver}-${krel} --debuginfo -i
-        fi
-    fi
-}
-
-
 if [[ -z "$OUTPUTFILE" ]]; then
     export OUTPUTFILE=$(mktemp)
     log "OUTPUTFILE not set, using ${OUTPUTFILE} for logging"
