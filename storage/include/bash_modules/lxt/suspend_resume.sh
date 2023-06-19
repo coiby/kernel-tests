@@ -38,10 +38,10 @@ function prepare_reboot()
 			os_boot_entry=$(</root/EFI_BOOT_ENTRY.TXT)
 			tlog "Updating efibootmgr next boot option to $os_boot_entry according to EFI_BOOT_ENTRY.TXT"
 			tok "efibootmgr -n $os_boot_entry"
-        else
-		tlog "Could not determine value for BootNext!"
-        fi
-    fi
+		else
+			tlog "Could not determine value for BootNext!"
+		fi
+	fi
 }
 
 function add_kernel_option ()
