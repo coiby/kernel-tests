@@ -106,7 +106,7 @@ uname -v | grep -q PREEMPT_RT && IS_RT=true || IS_RT=false
 uname -r | grep -qE "[-+]debug" && IS_DB=true || IS_DB=false
 uname -r | grep -qE "[-+]64k" && IS_64K=true || IS_64K=false
 
-if $IS_RHEL5 || $IS_RHEL6; then
+if $IS_RHEL5; then
     INITRD_PREFIX=initrd
 else
     INITRD_PREFIX=initramfs
@@ -122,7 +122,7 @@ else
     INITRD_IMG_PATH="$K_BOOT/$INITRD_PREFIX-$(uname -r).img"
 fi
 
-INITRD_KDUMP_IMG_PATH=${INITRD_IMG_PATH/.img/kdump.img}
+INITRD_KDUMP_IMG_PATH=$(sed -e "s/\.img$/kdump.img/; s/$INITRD_PREFIX/$INITRD_KDUMP_PREFIX/" <<< "$INITRD_IMG_PATH")
 VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
 [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-$(uname -r)!(*debug*|*64k*|*rt*))
 
