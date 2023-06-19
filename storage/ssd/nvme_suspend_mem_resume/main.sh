@@ -14,6 +14,7 @@ function runtest() {
 	partition_1_primary "$DISKS"
 
 	prepare_reboot
+
 	suspend_resume mem 180
 }
 

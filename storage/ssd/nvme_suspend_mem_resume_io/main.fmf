@@ -20,4 +20,4 @@ extra-task: /storage/ssd/nvme_suspend_mem_resume_io
 adjust:
     enabled: false
     when: distro < rhel-9
-id: fd605ce5-0dde-43aa-b688-1670580954f8
+id: c8c9ef7d-f618-4450-b379-452da8276732
