@@ -1,0 +1,23 @@
+summary: KS-TC:nvdimm/devdax_suspend_mem_resume_io
+description: Test suspend to mem and resume during devdax io
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/devdax_suspend_mem_resume_io
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - fio
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/devdax_suspend_mem_resume_io
+extra-task: /storage/nvdimm/devdax_suspend_mem_resume_io
+adjust:
+    enabled: false
+    when: distro < rhel-8
+id: 132ec82e-7e40-4987-a6f9-101daf1dca0e

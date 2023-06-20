@@ -3,7 +3,7 @@
 function suspend_resume ()
 {
 	if [ $# -lt 2 ]; then
-		echo "Usage: uspend_resume mem|disk 180"
+		echo "Usage: suspend_resume mem|disk 180 test_dev(optional)"
 		exit 1
 	fi
 	local mode=${1:-"mem"}
