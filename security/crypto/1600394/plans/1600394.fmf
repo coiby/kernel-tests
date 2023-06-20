@@ -9,7 +9,7 @@ prepare:
   - name: Enable Repos
     how: shell
     script: |
-        . ./security/include/rhivos.sh
+        . ./automotive/include/rhivos.sh
         install_repos
 environment-file:
         - ./security/crypto/1600394/plans/tmt.env

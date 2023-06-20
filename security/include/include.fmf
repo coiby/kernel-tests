@@ -1,6 +1,6 @@
 summary: Security lib
 contact: Stephen Bertram <sbertram@redhat.com>
-path: /security/include
+path: /automotive/include
 test: . ./rhivos.sh ; install_repos
 framework: shell
 duration: 5m
