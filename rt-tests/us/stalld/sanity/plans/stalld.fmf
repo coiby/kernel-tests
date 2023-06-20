@@ -1,0 +1,19 @@
+summary: Test to verify stalld is boosting processes
+discover:
+    how: fmf
+    test:
+        - /rt-tests/us/stalld/sanity
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/rhivos.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: [realtime-tests, python3, stalld, gcc]
+environment-file:
+    - ./rt-tests/us/stalld/sanity/plans/tmt.env
