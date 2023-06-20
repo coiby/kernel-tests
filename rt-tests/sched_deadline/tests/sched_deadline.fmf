@@ -5,7 +5,7 @@ component:
   - kernel
 path: /rt-tests/sched_deadline
 test: bash -x ./runtest.sh
-framework: beakerlib
+framework: shell
 require:
   - realtime-tests
 duration: 5m

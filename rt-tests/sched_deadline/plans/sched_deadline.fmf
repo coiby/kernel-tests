@@ -5,7 +5,7 @@ discover:
         - /rt-tests/sched_deadline
 execute:
     how: tmt
-    framework: beakerlib
+    framework: shell
 prepare:
     - name: Enable Repos
       how: shell
