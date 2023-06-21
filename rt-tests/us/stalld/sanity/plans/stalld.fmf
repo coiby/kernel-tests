@@ -2,7 +2,7 @@ summary: Test to verify stalld is boosting processes
 discover:
     how: fmf
     test:
-        - /rt-tests/us/stalld
+        - /rt-tests/us/stalld/sanity
 execute:
     how: tmt
     framework: shell
@@ -16,4 +16,4 @@ prepare:
       how: install
       package: [realtime-tests, python3, stalld, gcc]
 environment-file:
-    - ./rt-tests/us/stalld/plans/tmt.env
+    - ./rt-tests/us/stalld/sanity/plans/tmt.env
