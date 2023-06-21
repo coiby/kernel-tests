@@ -4,6 +4,8 @@ description: |
 contact: Ziqian SUN <zsun@redhat.com>
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - lsscsi
 duration: 60m
 extra-summary: /kernel/general/ftrace/sanity/blktrace
 extra-task: /kernel/general/ftrace/sanity/blktrace
