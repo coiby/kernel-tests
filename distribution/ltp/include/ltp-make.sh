@@ -101,11 +101,12 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
-    if [ "$TESTVERSION" == "20230127" ]; then
+    if [ "$TESTVERSION" == "20230516" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tst_fill_fs-drop-safe_macro-from-fill_flat_vec.patch
     fi
     if [ "$TESTVERSION" == "20230127" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)

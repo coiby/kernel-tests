@@ -1,0 +1,72 @@
+From df1b01cc12775af497c3150a85f9475b801bef1c Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Thu, 15 Jun 2023 15:53:07 +0800
+Subject: [PATCH] tst_fill_fs: drop safe_macro from fill_flat_vec
+
+LTP fs_fill is trying to spawn nCPUS thread to create corresponding
+subdirectories and completely fill them. But in the invoke function
+tst_fill_fs(, TST_FILL_BLOCKS) -> fill_flat_vec() which has SAFE_MACROs
+to break the open behavior once fs is filled with ENOSPC return.
+
+The failure like there aren't enough free inodes in the filesystem for
+the tst_fs_fill test program to create it's set of "AOF" data files.
+
+  4108	tst_test.c:1634: TINFO: === Testing on xfs ===
+  4109	tst_test.c:1094: TINFO: Formatting /dev/loop0 with xfs opts='' extra opts=''
+  4110	fs_fill.c:108: TINFO: Running 98 writer threads
+  4111	tst_fill_fs.c:77: TBROK: openat(89</mnt/testarea/ltp-wGg0XNSHcr/LTP_fs_XLxrLh/mntpoint/thread84>, 'AOF', 101, 600): ENOSPC (28)
+  4112	tst_fill_fs.c:77: TBROK: openat(87</mnt/testarea/ltp-wGg0XNSHcr/LTP_fs_XLxrLh/mntpoint/thread83>, 'AOF', 101, 600): ENOSPC (28)
+  4113	tst_fill_fs.c:77: TWARN: openat(85</mnt/testarea/ltp-wGg0XNSHcr/LTP_fs_XLxrLh/mntpoint/thread82>, 'AOF', 101, 600): ENOSPC (28)
+  4114	tst_fill_fs.c:77: TWARN: openat(3</mnt/testarea/ltp-wGg0XNSHcr/LTP_fs_XLxrLh/mntpoint/thread81>, 'AOF', 101, 600): ENOSPC (28)
+
+This patch is just to convert the fill_flat_vec() to ignore ENOSPC like
+fill_randome() in opening subdirectories.
+
+Reported-by: Shizhao Chen <shichen@redhat.com>
+Signed-off-by: Li Wang <liwang@redhat.com>
+Cc: Dave Chinner <dchinner@redhat.com>
+Cc: Richard Palethorpe <rpalethorpe@suse.com>
+Reviewed-by: Murphy Zhou <jencce.kernel@gmail.com>
+---
+ lib/tst_fill_fs.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/lib/tst_fill_fs.c b/lib/tst_fill_fs.c
+index b9d29755a..243eb279f 100644
+--- a/lib/tst_fill_fs.c
++++ b/lib/tst_fill_fs.c
+@@ -73,12 +73,29 @@ void fill_random(const char *path, int verbose)
+ 
+ void fill_flat_vec(const char *path, int verbose)
+ {
+-	int dir = SAFE_OPEN(path, O_PATH | O_DIRECTORY);
+-	int fd = SAFE_OPENAT(dir, "AOF", O_WRONLY | O_CREAT, 0600);
++	int dir, fd;
+ 	struct iovec iov[512];
+ 	int iovcnt = ARRAY_SIZE(iov);
+ 	int retries = 3;
+ 
++	dir = open(path, O_PATH | O_DIRECTORY);
++	if (dir == -1) {
++		if (errno == ENOSPC) {
++			tst_res(TINFO | TERRNO, "open()");
++			return;
++		}
++		tst_brk(TBROK | TERRNO, "open(%s, %d) failed", path, O_PATH | O_DIRECTORY);
++	}
++
++	fd = openat(dir, "AOF", O_WRONLY | O_CREAT, 0600);
++	if (fd == -1) {
++		if (errno == ENOSPC) {
++			tst_res(TINFO | TERRNO, "openat()");
++			return;
++		}
++		tst_brk(TBROK | TERRNO, "openat(%s, %d, 0600) failed", dir, O_PATH | O_DIRECTORY);
++	}
++
+ 	SAFE_CLOSE(dir);
+ 
+ 	for (int i = 0; i < iovcnt; i++) {
+-- 
+2.31.1
+
