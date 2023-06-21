@@ -142,7 +142,7 @@
 /rt-tests/sched_deadline/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/us/rtla/rtla-osnoise/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/us/rtla/rtla-timerlat/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/rt-tests/us/stalld/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/rt-tests/us/stalld/sanity/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /security/crypto/ltp/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /security/integrity/ltp/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /sound/aloop/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -266,7 +266,7 @@
 /rt-tests/sched_deadline/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/us/rtla/rtla-osnoise/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/us/rtla/rtla-timerlat/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/us/stalld/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/us/stalld/sanity/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /security/crypto/ltp/ @bgoncalv @denli @lulinqing
 /security/integrity/ltp/ @bgoncalv @denli @lulinqing
 /sound/aloop/ @bgoncalv @jkysela @lulinqing
