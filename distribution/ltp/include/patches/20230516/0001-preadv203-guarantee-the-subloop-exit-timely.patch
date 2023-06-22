@@ -1,0 +1,32 @@
+From 81c36dff803cfd3d5370f2afe3a2b7ba00b1f1f5 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Thu, 8 Jun 2023 17:14:26 +0800
+Subject: [PATCH] preadv203: guarantee the subloop exit timely
+
+We observed that timeout is still occasionally happening even with
+introducing the tst_remaining_runtime. The likely reason is that
+writer_thread needs more time in subloop.
+
+Here exit it instantly when stop set to 1.
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+---
+ testcases/kernel/syscalls/preadv2/preadv203.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/preadv2/preadv203.c b/testcases/kernel/syscalls/preadv2/preadv203.c
+index 25c6e1c2e..c87deb674 100644
+--- a/testcases/kernel/syscalls/preadv2/preadv203.c
++++ b/testcases/kernel/syscalls/preadv2/preadv203.c
+@@ -159,7 +159,7 @@ static void *writer_thread(void *unused)
+ 	while (!stop) {
+ 		int fd = fds[random() % FILES];
+ 
+-		for (j = 0; j < CHUNKS; j++) {
++		for (j = 0; j < CHUNKS && !stop; j++) {
+ 			memset(buf, '0' + j, sizeof(buf));
+ 
+ 			off_t off = CHUNK_SZ * j;
+-- 
+2.40.1
+
