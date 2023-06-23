@@ -1,0 +1,53 @@
+From db67c0b5aa3343b48ccc07db69bc84b15c2a6777 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 6 Jun 2023 15:19:22 +0800
+Subject: [PATCH] readahead02: set dynamic run time
+
+The readahead time-consuming is quit depending on the platform IO
+speed, test get timeout once the default max_runtime is used up.
+
+  readahead02.c:223: TINFO: Test #1: readahead on overlayfs file
+  ...
+  readahead02.c:286: TINFO: read_testfile(0) took: 63382903 usec
+  readahead02.c:287: TINFO: read_testfile(1) took: 47943122 usec
+  ...
+  readahead02.c:312: TPASS: using cache as expected
+  readahead02.c:223: TINFO: Test #2: POSIX_FADV_WILLNEED on file
+  readahead02.c:128: TINFO: creating test file of size: 67108864
+  readahead02.c:241: TINFO: read_testfile(0)
+  Test timeouted, sending SIGKILL!
+
+Let's raise the maximum runtime dynamically.
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+---
+ testcases/kernel/syscalls/readahead/readahead02.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/readahead/readahead02.c b/testcases/kernel/syscalls/readahead/readahead02.c
+index b6c097b31..dc03c5931 100644
+--- a/testcases/kernel/syscalls/readahead/readahead02.c
++++ b/testcases/kernel/syscalls/readahead/readahead02.c
+@@ -318,6 +318,19 @@ static void test_readahead(unsigned int n)
+ 		tst_res(TCONF, "Page cache on your system is too small "
+ 			"to hold whole testfile.");
+ 	}
++
++	/*
++	 * The time consuming of readahead quite depending on the platform IO
++	 * speed, sometime test timeout when the default max_runtime is used up.
++	 *
++	 *  readahead02.c:221: TINFO: Test #2: POSIX_FADV_WILLNEED on file
++	 *  readahead02.c:285: TINFO: read_testfile(0) took: 26317623 usec
++	 *  readahead02.c:286: TINFO: read_testfile(1) took: 26101484 usec
++	 *
++	 * Here raise the maximum runtime dynamically.
++	 */
++	if ((tc+1)->readahead)
++		tst_set_max_runtime(test.max_runtime + (usec + usec_ra) / 1000000);
+ }
+ 
+ 
+-- 
+2.40.1
+
