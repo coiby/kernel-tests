@@ -11,6 +11,7 @@ rlJournalStart
                 rlRun "dnf install -y trace-cmd"
             else
                 rlRun "yum install -y trace-cmd"
+            fi
         fi
     rlPhaseEnd
     rlPhaseStartTest
