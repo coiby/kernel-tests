@@ -8942,6 +8942,230 @@ sriov_test_trusted_vf_promisc()
 		return $result
 }
 
+sriov_test_trusted_vf_promisc_vlan()
+{
+	log_header "test_trusted_vf_promisc_vlan" $result_file
+	local result=0
+	ip link set ${nic_test} up
+	local vf_0_mac="00:de:ad:$(printf %02x $ipaddr):01:01"
+	local vf_1_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
+	local server_mac="00:de:ad:$(printf %02x $ipaddr):01:21"
+
+	if  i_am_server; then
+		ip addr flush ${nic_test}
+		ip link set ${nic_test} down
+		sleep 1
+		ip link set ${nic_test} address ${server_mac}
+		ip link set ${nic_test} up
+		ip link set ${nic_test} promisc on
+		ip link show ${nic_test}
+		ip addr add 172.30.${ipaddr}.2/24 dev ${nic_test}
+		sync_set client configure_finished
+		for trust_conf in {on,off}
+		do
+			rlLog "=====Check trust ${trust_conf}====="
+			rlLog "Start unicast packets test"
+			#unicast
+			sync_wait client trust_${trust_conf}_send_unicast_packets_start
+			unicast_pkt="Ether(src='${server_mac}', dst='${vf_0_mac}')/Dot1Q(vlan=100)/IP(src='172.30.${ipaddr}.2', dst='172.30.${ipaddr}.3')"
+			if [ $(GetDistroRelease) = 8 ];then
+				/usr/libexec/platform-python -c  "from scapy.all import *; sendp($unicast_pkt, iface='$nic_test', count=10 )"
+			else
+				python -c  "from scapy.all import *; sendp($unicast_pkt, iface='$nic_test', count=10)"
+			fi
+			sleep 60
+			sync_set client trust_${trust_conf}_send_unicast_packets_finished
+			#multicast
+			rlLog "Start multicast packets test"
+			sync_wait  client trust_${trust_conf}_send_multicast_packets_start
+			multicast_pkt="Ether(src='${server_mac}', dst='01:00:5e:00:00:01')/Dot1Q(vlan=100)/IP(src='172.30.${ipaddr}.2', dst='224.1.2.3')"
+			if [ $(GetDistroRelease) = 8 ];then
+				/usr/libexec/platform-python -c  "from scapy.all import *; sendp($multicast_pkt, iface='$nic_test', count=10 )"
+			else
+				python -c  "from scapy.all import *; sendp($multicast_pkt, iface='$nic_test', count=10)"
+			fi
+			sleep 60
+			sync_set client trust_${trust_conf}_send_multicast_packets_finished
+			#broadcast
+			rlLog "Start broadcast packets test"
+			sync_wait  client trust_${trust_conf}_send_broadcast_packets_start
+			broadcast_pkt="Ether(src='${server_mac}', dst='FF:FF:FF:FF:FF:FF')/Dot1Q(vlan=100)/IP(src='172.30.${ipaddr}.2', dst='255.255.255.255')"
+			if [ $(GetDistroRelease) = 8 ];then
+				  /usr/libexec/platform-python -c  "from scapy.all import *; sendp($broadcast_pkt, iface='$nic_test', count=10 )"
+			else
+				python -c  "from scapy.all import *; sendp($broadcast_pkt, iface='$nic_test', count=10)"
+			fi
+			sleep 60
+			sync_set client trust_${trust_conf}_send_broadcast_packets_finished
+		done
+		sync_wait client test_end
+		#clear config
+		rlRun "ip addr flush ${nic_test}"
+		local origin_mac=$(ip link show $nic_test|grep link/ether|awk '{print $6}')
+		rlLog "$nic_test origin mac $origin_mac,recover $nic_test mac address"
+		ip link set $nic_test down
+		sleep 1
+		rlRun "ip link set $nic_test address $origin_mac"
+		ip link set $nic_test up
+		ip link set ${nic_test} promisc off
+	else
+		#Configure host mac and ip addr
+		ip link set ${nic_test} up
+		ip link set ${nic_test} promisc on
+		ethtool --set-priv-flags ${nic_test} vf-true-promisc-support on
+		ip addr add 172.30.${ipaddr}.1/24 dev ${nic_test}
+		# create 2 vf interfaces and attach vf to 1 vm
+		sriov_create_vfs ${nic_test} 0 2
+		sriov_attach_vf_to_vm ${nic_test} 0 1 g1 ${vf_0_mac}
+		sriov_attach_vf_to_vm ${nic_test} 0 2 g1 ${vf_1_mac}
+		#Configure virtual machine
+		cmd=(
+			{set -x}
+			{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{ip link set \${NIC_TEST_0} up}
+			{ip link set \${NIC_TEST_1} up}
+			{ip addr flush \${NIC_TEST_0}}
+			{ip addr flush \${NIC_TEST_1}}
+			{ip addr add 172.30.${ipaddr}.3/24 dev \${NIC_TEST_0}}
+			{ping -c 3 172.30.${ipaddr}.1}
+			{ping -c 3 172.30.${ipaddr}.2}
+			{set +x}
+		)
+		vmsh cmd_set g1 "${cmd[*]}"
+		[ $? -ne 0 ]  && result=1 && rlFail "vf ping server/host ==> failed" && return $result
+		sync_wait server configure_finished
+		for trust_conf in {on,off}
+		do
+			#config vf "trust on/off" on host
+			set -x
+			ip link set ${nic_test} vf 0 trust ${trust_conf}
+			ip link set ${nic_test} vf 1 trust ${trust_conf}
+			set +x
+			sleep 60  #need sometime to make the trust on/off valid
+			local cmd=(
+				{set -x}
+				{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{ip link set \${NIC_TEST_0} promisc on}
+				{ip link set \${NIC_TEST_1} promisc on}
+				{set +x}
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			rlLog "==================trust ${trust_conf}==================="
+			rlLog "Start Unicast packets test"
+			local cmd=(
+				{set -x}
+				{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{\[ -f unicast0.pcap \] \&\& rm -f unicast0.pcap}
+				{\[ -f unicast1.pcap \] \&\& rm -f unicast1.pcap}
+				{nohup tcpdump -i \$NIC_TEST_0 ip src 172.30.${ipaddr}.2 -enn -w unicast0.pcap  \&}
+				{sleep 3}
+				{nohup tcpdump -i \$NIC_TEST_1 ip src 172.30.${ipaddr}.2 -enn -w unicast1.pcap  \&}
+				{sleep 3}
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			sync_set server trust_${trust_conf}_send_unicast_packets_start
+			sync_wait server trust_${trust_conf}_send_unicast_packets_finished
+			local cmd=(
+				{ps -ef \| grep tcpdump}
+				{pkill tcpdump}
+				{sleep 5}
+				{ll}
+				{tcpdump -r unicast0.pcap -enn \| grep \"vlan 100\" }
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ]  && result=1 && rlFail "trust ${trust_conf}: No unicast packets captured on vf 0"
+			if [ ${trust_conf} == "on" ]; then
+				local cmd=(
+				{tcpdump -r unicast1.pcap -enn \| grep \"vlan 100\" }
+				)
+				vmsh cmd_set g1 "${cmd[*]}"
+				[ $? -ne 0 ]  && result=1 && rlFail "trust ${trust_conf}: No unicast packets captured on vf 1"
+			else
+				local cmd=(
+				{tcpdump -r unicast1.pcap -enn \| grep \"vlan 100\" }
+				)
+				vmsh cmd_set g1 "${cmd[*]}"
+				[ $? -eq 0 ]  && result=1 && rlFail "trust ${trust_conf}: Unicast packets captured on vf 1"
+			fi
+			rlLog "Start multicast packets test"
+
+			local cmd=(
+				{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{\[ -f multicast0.pcap \] \&\& rm -f multicast0.pcap}
+				{\[ -f multicast0.pcap \] \&\& rm -f multicast0.pcap}
+				{nohup tcpdump -i \$NIC_TEST_0 -enn ether multicast -w multicast0.pcap \&}
+				{sleep 3}
+				{nohup tcpdump -i \$NIC_TEST_1 -enn ether multicast -w multicast1.pcap \&}
+				{sleep 3}
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			sync_set server trust_${trust_conf}_send_multicast_packets_start
+			sync_wait server trust_${trust_conf}_send_multicast_packets_finished
+			local cmd=(
+				{ps -ef \| grep tcpdump}
+				{pkill tcpdump}
+				{sleep 5}
+				{ll}
+				{tcpdump -r multicast0.pcap -enn \| grep \"vlan 100\" }
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ]  && result=1 && rlFail "trust ${trust_conf}: No multicast packets captured on vf 0"
+			local cmd=(
+				{tcpdump -r multicast1.pcap -enn \| grep \"vlan 100\" }
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ]  && result=1 && rlFail "trust ${trust_conf}: No multicast packets captured on vf 1"
+			rlLog "start broadcast packet test"
+			local cmd=(
+				{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{\[ -f broadcast0.pcap \] \&\& rm -f broadcast.pcap}
+				{\[ -f broadcast0.pcap \] \&\& rm -f broadcast.pcap}
+				{nohup tcpdump -i \$NIC_TEST_0 -enn ether broadcast -w broadcast0.pcap \&}
+				{sleep 3}
+				{nohup tcpdump -i \$NIC_TEST_1 -enn ether broadcast -w broadcast1.pcap \&}
+				{sleep 3}
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			sync_set server trust_${trust_conf}_send_broadcast_packets_start
+			sync_wait server trust_${trust_conf}_send_broadcast_packets_finished
+			local cmd=(
+				{ps -ef \| grep tcpdump}
+				{pkill tcpdump}
+				{sleep 5}
+				{ll}
+				{tcpdump -r broadcast0.pcap -enn \| grep \"vlan 100\" }
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ]  && result=1 && rlFail "trust ${trust_conf}: No broadcast packets captured on vf 0"
+			local cmd=(
+				{tcpdump -r broadcast1.pcap -enn \| grep \"vlan 100\" }
+			)
+			vmsh cmd_set g1 "${cmd[*]}"
+			[ $? -ne 0 ]  && result=1 && rlFail "trust ${trust_conf}: No broadcast packets captured on vf 1"
+		done
+		sync_set server test_end
+		#clear conf
+		local cmd=(
+			{rm -f unicast*.pcap}
+			{rm -f multicast*.pcap}
+			{rm -f broadcast*.pcap}
+		)
+		vmsh cmd_set g1 "${cmd[*]}"
+		sriov_detach_vf_from_vm  ${nic_test} 0 1 g1
+		sriov_detach_vf_from_vm  ${nic_test} 0 2 g1
+		sriov_remove_vfs ${nic_test} 0
+		ip addr flush ${nic_test}
+		ip link set ${nic_test} promisc off
+		ethtool --set-priv-flags ${nic_test} vf-true-promisc-support off
+		return $result
+	fi
+}
+
 #
 # buffer overflow and/or deadlock when VF has more than 32 multicast
 #
