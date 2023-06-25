@@ -27,7 +27,7 @@ DefaultConfigCheck()
 
     LogRun "grep -v '#' ${KDUMP_CONFIG}"
 
-    if ! grep -q -v '#' ${KDUMP_CONFIG} | grep -q 'makedumpfile -c'; then
+    if ! grep -s -v '#' ${KDUMP_CONFIG} | grep -q 'makedumpfile -c'; then
         Error "It did not use zlib as default kdump compression method."
     fi
 }
