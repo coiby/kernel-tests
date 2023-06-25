@@ -47,12 +47,12 @@ function runtest()
     rtla hwnoise -P F:1 -c 0 -r 900000 -d 1M -q
     check_status "rtla hwnoise -P F:1 -c 0 -r 900000 -d 1M -q"
 
-    echo "-- rtla-hwnoise: stop the trace if a single sample is higher than 30 us -------------------" | tee -a $OUTPUTFILE
-    rtla hwnoise -s 30 -T 1 -t
+    echo "-- rtla-hwnoise: stop the trace if a single sample is higher than 1 us -------------------" | tee -a $OUTPUTFILE
+    rtla hwnoise -s 1 -T 1 -t
     check_status "rtla hwnoise -s 30 -T 1 -t"
 
-    echo "-- rtla-hwnoise: stop the trace if a total sample is higher than 30 us -------------------" | tee -a $OUTPUTFILE
-    rtla hwnoise -S 30 -T 1 -t -D
+    echo "-- rtla-hwnoise: stop the trace if a total sample is higher than 1 us -------------------" | tee -a $OUTPUTFILE
+    rtla hwnoise -S 1 -T 1 -t -D
     check_status "rtla hwnoise -S 30 -T 1 -t -D"
 
     echo "-- rtla-hwnoise: enable a trace event trigger -------------------" | tee -a $OUTPUTFILE
