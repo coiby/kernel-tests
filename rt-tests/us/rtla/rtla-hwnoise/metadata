@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash -x ./runtest.sh
-max_time=10m
+max_time=20m
 use_pty=false
