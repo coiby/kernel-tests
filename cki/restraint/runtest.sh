@@ -1,7 +1,7 @@
 #!/bin/sh
 set -xe
 
-if [[ -f /usr/lib/systemd/system/restraintd.service ]]; then
+if [ -f /usr/lib/systemd/system/restraintd.service ]; then
     if grep -qE "^OOMPolicy=continue$" /usr/lib/systemd/system/restraintd.service; then
         echo "restraintd already contains OMPolicy=continue"
     else
@@ -40,13 +40,19 @@ cat /usr/share/rhts/failurestrings
 # 'sed -i 's|rstrnt-reboot|rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status\nrstrnt-reboot|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot'
 # Otherwise you may see "Failed to submit result, status: 400 Message: BAD REQUEST"
 # see: https://bugzilla.redhat.com/show_bug.cgi?id=1716997
+# shellcheck disable=SC2016 # we don't want to expand the variable when writing to the file
 sed -i 's|rstrnt-reboot|rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status\nrstrnt-reboot|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot
 
 # Show information the test aborted due to localwatchdog
+# shellcheck disable=SC2016 # we don't want to expand the variable when writing to the file
 if ! grep -q "\${RSTRNT_TASKNAME} hit test timeout" /usr/share/restraint/plugins/localwatchdog.d/10_localwatchdog; then
    echo 'echo "${RSTRNT_TASKNAME} hit test timeout, aborting it..." >> /dev/kmsg' >> /usr/share/restraint/plugins/localwatchdog.d/10_localwatchdog
 fi
 
-cp -r plugins /usr/share/restraint/
+if ! cp -rf plugins /usr/share/restraint/; then
+    echo "FAIL to copy plugins"
+    rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL 1
+    rstrnt-abort -t recipe
+fi
 # Make sure the plugins have exec permission
 chmod -R +x /usr/share/restraint/plugins

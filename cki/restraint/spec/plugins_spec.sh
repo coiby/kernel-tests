@@ -30,6 +30,31 @@ Mock diff
     echo "diff $*"
 End
 
+Describe 'cki-restraint: runtest.sh'
+    Mock sed
+        echo "sed $*"
+    End
+    Mock grep
+        echo "grep $*"
+    End
+    Mock cp
+        echo "cp $*"
+    End
+    Mock chmod
+        echo "chmod $*"
+    End
+    It 'can run runtest.sh'
+        When run script cki/restraint/runtest.sh
+        # shellcheck disable=SC2016 # we don't wan't to expand the variable when writting to the file
+        The stdout should include 'sed -i s|rstrnt-reboot|rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status\nrstrnt-reboot| /usr/share/restraint/plugins/localwatchdog.d/99_reboot'
+        The stdout should include 'cp -rf plugins /usr/share/restraint/'
+        The stdout should include 'chmod -R +x /usr/share/restraint/plugins'
+        # shellcheck disable=SC2016 # we don't wan't to expand the variable when writting to the file
+        The stderr should include '+ sed -i '\''s|rstrnt-reboot|rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status\nrstrnt-reboot|'\'' /usr/share/restraint/plugins/localwatchdog.d/99_reboot'
+        The status should be success
+    End
+End
+
 Describe 'cki-restraint: plugins'
     cleanup(){
         rm -rf "${CURRENT_TASK_PATH}"
