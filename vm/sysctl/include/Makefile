@@ -52,7 +52,6 @@ $(METADATA): Makefile
 	@echo "Description:  Linux sysctl - include ">> $(METADATA)
 	@echo "TestTime:     50m" >> $(METADATA)
 	@echo "RunFor:       $(PACKAGE_NAME)" >> $(METADATA)  
-	@echo "Requires:     $(PACKAGE_NAME)" >> $(METADATA)  
 	@echo "Releases:     RHELServer5 RHEL6 RHEL7" >>$(METADATA)
 	@echo "Destructive:  no" >>$(METADATA)
 	@echo "Confidential: no" >>$(METADATA)
