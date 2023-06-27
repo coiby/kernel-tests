@@ -53,7 +53,7 @@ function runtest()
 
     echo "-- rtla-hwnoise: enable a trace event trigger -------------------" | tee -a $OUTPUTFILE
     rtla hwnoise -t -e osnoise:irq_noise --trigger="hist:key=desc,duration/1000:sort=desc,duration/1000:vals=hitcount" -d 1m
-    check_status "rtla hwnoise -t -e osnoise:irq_noise --trigger="hist:key=desc,duration/1000:sort=desc,duration/1000:vals=hitcount" -d 1m"
+    check_status "rtla-hwnoise: enable a trace event trigger"
 
     if [ $result_r = "PASS" ]; then
         echo "Overall result: PASS" | tee -a $OUTPUTFILE
