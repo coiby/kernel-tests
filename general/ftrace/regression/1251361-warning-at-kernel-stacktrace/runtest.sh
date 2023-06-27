@@ -7,11 +7,7 @@ rlJournalStart
         if stat /run/ostree-booted > /dev/null 2>&1; then
             rlRun "rpm-ostree install -A --idempotent --allow-inactive trace-cmd"
         else
-            if (type dnf &>/dev/null); then
-                rlRun "dnf install -y trace-cmd"
-            else
-                rlRun "yum install -y trace-cmd"
-            fi
+            rlRun "yum install -y trace-cmd"
         fi
     rlPhaseEnd
     rlPhaseStartTest
