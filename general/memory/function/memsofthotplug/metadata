@@ -11,7 +11,7 @@ _architecture=All
 [restraint]
 entry_point=make run
 max_time=2h
-dependencies=numactl;kernel
+dependencies=numactl
 TestVersion=2.0
 Path=kernel/general/memory/function/memsofthotplug
 Type=KernelTier2
