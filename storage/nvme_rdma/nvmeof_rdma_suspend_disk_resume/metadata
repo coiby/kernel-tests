@@ -1,0 +1,14 @@
+[General]
+name=storage/nvme_rdma/nvmeof_rdma_suspend_disk_resume
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=Test suspend to disk and resume on rdma server
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvme_rdma/include
+dependencies=nvme-cli;nvmetcli;fio
+max_time=1h
+use_pty=false
