@@ -114,42 +114,50 @@ rlJournalStart
 	rlPhaseEnd
 
 #-------------------- Run Tests -----------------
-	rlPhaseStartTest
-		dmesg --clear
-		for TEST in ${test_arr[*]}
-		do
+	dmesg --clear
+	for TEST in ${test_arr[*]}
+	do
+		rlPhaseStartTest "running ${TEST}"
 			if [[ ${SKIP_TESTS} =~ "${TEST}" ]]; then
 				rlLog "Skipping $TEST"
 				continue
 			fi
 
-			rlLog "running test $TEST"
 			modprobe "$TEST" 2>/dev/null
 			if [ $? -ne 0 ]; then
 				rlLog "Could not install $TEST module, skipping this module"
+				continue
 			fi
-		done
+			rlLog "running test $TEST"
+		rlPhaseEnd
+	done
+
 
 #------------------ Collect Output --------------
-		mkdir -p /tmp/kunit_results/
-		cp -r /sys/kernel/debug/kunit/. /tmp/kunit_results/
-		for TEST in /tmp/kunit_results/*
-		do
+	mkdir -p /tmp/kunit_results/
+	cp -r /sys/kernel/debug/kunit/. /tmp/kunit_results/
+	for TEST in /tmp/kunit_results/*
+	do
+		test_name="$(basename "$TEST")"
+		rlPhaseStartTest "process ${test_name}"
 			if [ -d "${TEST}" ]
 			then
-				test_name="$(basename "$TEST")"
 				cp "${TEST}/results" "${TEST}/${test_name}.log"
-				rlRun "process_results \"${TEST}/results\""
+				process_results "${TEST}/results"
 				result=$?
 				if [ $result -eq 0 ]
 				then
-					rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" PASS 0
+					rlPass "process $test_name"
 				else
-					rstrnt-report-result -o "${TEST}/${test_name}.log" "$test_name" FAIL 1
+					rlFail "process $test_name"
 				fi
+				rlFileSubmit "${TEST}/${test_name}.log" "${test_name}.log"
+			else
+				# no result generated, assume it skipped
+				rlLog "no result found, assuming it skipped"
 			fi
-		done
-	rlPhaseEnd
+		rlPhaseEnd
+	done
 
 #-------------------- Clean Up ------------------
 	rlPhaseStartCleanup
