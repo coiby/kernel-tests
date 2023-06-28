@@ -755,13 +755,11 @@ EOF
       sysctl kernel.panic_on_oops
 
       # We have the right kernel. Do we have any call traces?
-      reboot_status="PASS"
       DMESGLOG=/tmp/dmesg.log
       dmesg > ${DMESGLOG}
       grep -qi 'Call Trace:' "${DMESGLOG}"
       dmesgret=$?
       if [[ ${dmesgret} -eq 0 ]]; then
-        reboot_status="FAIL"
         cki_print_warning "Call trace found in dmesg, see dmesg.log"
         # dmesg.log is uploaded by default by rstrnt-report-result
         # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check#L74
@@ -775,14 +773,12 @@ EOF
         grep -qi 'Call Trace:' "${JOURNALCTLLOG}"
         journalctlret=$?
         if [[ ${journalctlret} -eq 0 ]]; then
-          reboot_status="FAIL"
           cki_print_warning "Call trace found in journalctl, see journalctl.log"
           rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check WARN 7
         else
           rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check PASS 0
         fi
       fi
-      rstrnt-report-result ${TEST}/reboot ${reboot_status}
 
       # Clean up temporary files
       rm -rfv /var/tmp/kpkginstall

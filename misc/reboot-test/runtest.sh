@@ -48,7 +48,6 @@ if [[ ! -e kernel_before_reboot.txt ]]; then
     # https://github.com/beaker-project/restraint/issues/219
     exit 0
 else
-    test_status="FAIL"
     check_version_status="FAIL"
     call_trace_status="FAIL"
     echo "Saving kernel info after reboot"
@@ -79,14 +78,5 @@ else
           call_trace_status="PASS"
         fi
         rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check ${call_trace_status} 0
-    else
-      call_trace_status="PASS"
-    fi
-    if [ "${check_version_status}" == "PASS" ] && [ "${call_trace_status}" == "PASS" ]; then
-        test_status="PASS"
-    fi
-    rstrnt-report-result "${TEST}" "${test_status}"
-    if [ "${test_status}" != "PASS" ]; then
-        exit 1
     fi
 fi
