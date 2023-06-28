@@ -107,7 +107,7 @@ function get_kpkg_ver()
     return
   fi
 
-  if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+  if [[ ${KPKG_URL} == *.tar.gz ]] ; then
     declare -r kpkg=${KPKG_URL##*/}
     KVER=$(tar tf "$kpkg" | sed -n 's/^boot\/vmlinu[xz]\(-kbuild\)\?-//p' | head -n 1)
   else
@@ -158,7 +158,7 @@ function get_kpkg_ver()
 
 function kpkg_release()
 {
-  if [[ ${KPKG_URL} =~ .*\.tar\.gz ]]; then
+  if [[ ${KPKG_URL} == *.tar.gz ]]; then
     echo "${KVER//.${ARCH}/}"
   else
     echo "${KVER}"
@@ -569,7 +569,7 @@ function install_kernel() {
       done
 
       error=0
-      if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+      if [[ ${KPKG_URL} == *.tar.gz ]] ; then
           targz_install || error=1
       elif [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
           print_kpkg_url_variables_rpm || error=1
@@ -652,7 +652,7 @@ EOF
       # set YUM var.
       select_yum_tool
 
-      if [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+      if [[ ${KPKG_URL} != *.tar.gz ]] ; then
         print_kpkg_url_variables_rpm
       fi
       cki_print_info "after reboot: Extracting kernel version from ${KPKG_URL}"
@@ -673,7 +673,7 @@ EOF
 
       cki_print_success "Found the correct kernel release running!"
 
-      if [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+      if [[ ${KPKG_URL} != *.tar.gz ]] ; then
         # install kernel packages that shouldn't be needed to boot with,
         # but we still want have them installed
         if ! cki_is_kernel_automotive; then
