@@ -673,15 +673,17 @@ EOF
 
       cki_print_success "Found the correct kernel release running!"
 
-      # install kernel packages that shouldn't be needed to boot with,
-      # but we still want have them installed
-      if ! cki_is_kernel_automotive; then
-        rpm_extra_package_install
-      fi
-      # rpm-ostree extra packages install has to be after reboot
-      if [[ -n $RPM_OSTREE ]]; then
-        cki_print_info "Install kernel extra packages - rpm-ostree after reboot"
-        ostree_extra_package_install
+      if [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+        # install kernel packages that shouldn't be needed to boot with,
+        # but we still want have them installed
+        if ! cki_is_kernel_automotive; then
+          rpm_extra_package_install
+        fi
+        # rpm-ostree extra packages install has to be after reboot
+        if [[ -n $RPM_OSTREE ]]; then
+          cki_print_info "Install kernel extra packages - rpm-ostree after reboot"
+          ostree_extra_package_install
+        fi
       fi
 
       # save the CKI installed kernel so following tests can check if they are running on correct kernel
