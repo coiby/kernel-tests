@@ -1,5 +1,6 @@
 summary: LTP security tests
 contact: Linqing Lu <lilu@redhat.com>
+id: 4df6ea67-424c-4643-a3da-a1760a55477e
 component:
   - kernel
 path: /security/ltp

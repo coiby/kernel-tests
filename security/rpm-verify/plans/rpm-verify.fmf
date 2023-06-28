@@ -5,6 +5,5 @@ discover:
         - /security/rpm-verify/tests/rpm-verify
 execute:
     how: tmt
-    framework: beakerlib
 environment-file:
         - ./security/rpm-verify/plans/tmt.env

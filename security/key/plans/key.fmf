@@ -5,7 +5,6 @@ discover:
         - /security/key/tests/key
 execute:
     how: tmt
-    framework: beakerlib
 prepare:
   - name: Enable Repos
     how: shell

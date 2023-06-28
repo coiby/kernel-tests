@@ -1,6 +1,7 @@
 summary: Security Integrity verifier for 1662947
 description: ''
 contact: Linqing Lu <lilu@redhat.com>
+id: 5b1de58a-c96b-4ef0-83d1-885082c0faf7
 component:
   - kernel
 path: /security/integrity/1662947

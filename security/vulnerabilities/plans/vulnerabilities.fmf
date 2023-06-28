@@ -5,6 +5,5 @@ discover:
         - /security/vulnerabilities/tests/vulnerabilities
 execute:
     how: tmt
-    framework: beakerlib
 environment-file:
         - ./security/vulnerabilities/plans/tmt.env

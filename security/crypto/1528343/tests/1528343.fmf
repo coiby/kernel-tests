@@ -1,6 +1,7 @@
 summary: Security Crypto verifier for 1528343
 description: ''
 contact: Linqing Lu <lilu@redhat.com>
+id: 72e785dd-e196-4279-a220-365853e4e392
 component:
   - kernel
 path: /security/crypto/1528343

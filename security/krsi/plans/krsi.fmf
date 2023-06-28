@@ -5,7 +5,6 @@ discover:
         - /security/krsi/tests/krsi
 execute:
     how: tmt
-    framework: beakerlib
 prepare:
   - name: Enable Repos
     how: shell
