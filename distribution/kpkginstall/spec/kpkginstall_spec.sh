@@ -355,6 +355,8 @@ Describe 'kpkginstall: get_kpkg_ver tarball'
     AfterAll 'cleanup'
     It 'can set kernel version'
         export KPKG_URL="$KERNEL_TGZ_URL"
+        # we assume parse_kpkg_url_variables has been called before get_kpkg_ver is called
+        KPKG_URL=${KPKG_URL%\#*}
         tar(){
             echo "boot/vmlinuz-6.1.0-rc7"
         }
@@ -664,7 +666,9 @@ Describe 'kpkginstall: main - check installed kernel'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "Running kernel release:  ${KVER_UNAME}"
         The stdout should include "✅ Found the correct kernel release running!"
-        The stdout should include "rpm_extra_package_install"
+        if [[ ${KPKG_URL} != *.tar.gz ]] ; then
+            The stdout should include "rpm_extra_package_install"
+        fi
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
