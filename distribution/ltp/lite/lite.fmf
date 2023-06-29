@@ -2,10 +2,11 @@ summary: Linux Test Project
 description: |
     Latest LTP test KernelTier1
 contact: Kernel General Test Team <kernel-general-test-team@redhat.com>
+id: 3e6ec8af-5bd4-4a29-87cb-514d6e0edcc7
 component:
   - kernel
   - glibc
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require:
   - procmail
