@@ -63,7 +63,7 @@ MakedumpfileShowstatsTest()
     rm -f "4-F-l-d_31.log"
     MKPARAM1="-F -l -d 31"
     MKPARAM2="/proc/kcore --dry-run --show-stats"
-    cmdstr="${MKCMD} ${MKPARAM1} ${MKPARAM2}"
+    cmdstr="${MKCMD} ${MKPARAM1} ${MKPARAM2} 2>&1"
     Log "CMD: ${cmdstr}"
     ${cmdstr} | tee -a "4-F-l-d_31.log"
     [ "${PIPESTATUS[0]}" -ne 0 ] && Error "Failed: ${cmdstr}"
