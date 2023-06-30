@@ -16,7 +16,7 @@ MakedumpfileShowstatsTest()
     # makedumpfile --message-level 1 -d 31 /proc/kcore vmcore --dry-run --show-stats
 
     # 4-" -F -l -d 31"
-    # makedumpfile -F -l -d 31 /proc/kcore vmcore --dry-run --show-stats
+    # makedumpfile -F -l -d 31 /proc/kcore --dry-run --show-stats
 
     local MKCMD="makedumpfile"
     local MKPARAM1=""
@@ -62,6 +62,7 @@ MakedumpfileShowstatsTest()
     # 4: " -F -l -d 31"
     rm -f "4-F-l-d_31.log"
     MKPARAM1="-F -l -d 31"
+    MKPARAM2="/proc/kcore --dry-run --show-stats"
     cmdstr="${MKCMD} ${MKPARAM1} ${MKPARAM2}"
     Log "CMD: ${cmdstr}"
     ${cmdstr} | tee -a "4-F-l-d_31.log"
