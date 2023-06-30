@@ -52,7 +52,6 @@ rlJournalStart
                 rstrnt-report-result "$RSTRNT_TASKNAME" FAIL 99
                 exit 0
         fi
-        exit 0
         rlRun "pip3 install -U damo" 0
         pushd masim
         # checkout latest stable commit
