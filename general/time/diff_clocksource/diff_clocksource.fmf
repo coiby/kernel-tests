@@ -1,5 +1,6 @@
 summary: time backward between different clocksource
 contact: Qiao Zhao <qzhao@redhat.com>
+id: 06d53ce6-2907-4098-b48f-e05cb6aa346f
 component:
   - kernel
 test: bash -x ./runtest.sh

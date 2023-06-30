@@ -1,6 +1,7 @@
 summary: kernel syscall gettimeofday()/settimeofday() test
 description: kernel syscall gettimeofday()/settimeofday() test
 contact: Qiao Zhao <qzhao@redhat.com>
+id: d6355209-f0b1-46ab-a4a0-3a154654d6cb
 component:
   - kernel
 path: /general/time/settimeofday

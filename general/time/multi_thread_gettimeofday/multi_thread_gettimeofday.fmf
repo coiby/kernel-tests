@@ -1,5 +1,6 @@
 summary: kernel syscall gettimeofday() test with multi thread
 contact: Qiao Zhao <qzhao@redhat.com>
+id: 090e837b-fa07-437a-bbbe-a2ffb873570b
 component:
   - kernel
 test: bash -x ./runtest.sh

@@ -1,5 +1,6 @@
 summary: kernel parameter hpet_mmap test
 contact: Qiao Zhao <qzhao@redhat.com>
+id: e9075a80-d420-488f-861f-4f276836df45
 test: bash -x ./runtest.sh
 framework: shell
 require:

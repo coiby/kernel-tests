@@ -7,6 +7,7 @@ description: |
     This case developed and tested this on Ubuntu 12.04. Need update.
     To run: ./runall.sh
 contact: Qiao Zhao <qzhao@redhat.com>
+id: 690bc9a4-890f-42fd-bf8b-49e5c32ca964
 test: bash -x ./runtest.sh
 framework: shell
 require:

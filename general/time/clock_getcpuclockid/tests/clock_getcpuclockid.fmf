@@ -1,6 +1,7 @@
 summary: clock_getcpuclockid() returns CPU-time clock for a process
 description: clock_getcpuclockid() returns CPU-time clock for a process
 contact: Qiao Zhao <qzhao@redhat.com>
+id: 153c24f9-acca-4f15-8930-49567126bba3
 component:
   - kernel
 path: /general/time/clock_getcpuclockid

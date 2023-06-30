@@ -1,5 +1,6 @@
 summary: multi-thread kernel syscall clock_gettime() test
 contact: Qiao Zhao <qzhao@redhat.com>
+id: 22b49168-b36c-4d0c-a440-38a11b693ce0
 test: bash -x ./runtest.sh
 framework: shell
 require:

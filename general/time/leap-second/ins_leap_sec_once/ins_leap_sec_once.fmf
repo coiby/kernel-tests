@@ -1,5 +1,6 @@
 summary: Leap second insert once test
 contact: Qiao Zhao <qzhao@redhat.com>
+id: a6186ed8-e869-41a8-89c3-b4a23cf048c7
 test: bash -x ./runtest.sh
 framework: shell
 require:

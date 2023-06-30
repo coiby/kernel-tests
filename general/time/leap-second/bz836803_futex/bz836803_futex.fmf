@@ -1,5 +1,6 @@
 summary: BZ 836803 Potential fix for leapsecond caused futex related load spikes
 contact: Qiao Zhao <qzhao@redhat.com>
+id: a67dd52c-e05a-4dfc-9f99-dd27bdf50b7d
 test: bash -x ./runtest.sh
 framework: shell
 require:
