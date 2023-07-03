@@ -3,9 +3,9 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
-source $CDIR/../../../cki_lib/libcki.sh || exit 1
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+source "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
 function disable_multipath
 {
@@ -36,13 +36,13 @@ function get_test_result
 	typeset test_case=$2
 
 	typeset result_dir="$test_ws/results"
-	typeset result_file="$(find "$result_dir" -type f | grep -E "$test_case$")"
+	result_file="$(find "$result_dir" -type f | grep -E "$test_case$")"
 	typeset out_bad_file="${result_file}.out.bad"
 	typeset out_full_file="${result_file}.full"
 	typeset out_dmesg_file="${result_file}.dmesg"
 	typeset result="UNTESTED"
 	if [[ -n $result_file ]]; then
-		typeset res="$(grep "^status" $result_file)"
+		res=$(grep "^status" "$result_file")
 		if [[ $res == *"pass" ]]; then
 			result="PASS"
 		elif [[ $res == *"fail" ]]; then

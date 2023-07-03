@@ -29,7 +29,7 @@ function do_test
 
 	echo ">>> $(get_timestamp) | Start to run test case $USE_SIW srp: $this_case ..."
 	(cd "$test_ws" && eval "$USE_SIW" ./check "$test_case")
-	typeset result="$(get_test_result "$test_ws" "$test_case")"
+	result=$(get_test_result "$test_ws" "$test_case")
 	echo ">>> $(get_timestamp) | End srp: $this_case | $result"
 
 	typeset -i ret=0

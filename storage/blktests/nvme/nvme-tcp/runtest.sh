@@ -14,7 +14,7 @@ function do_test
 	typeset this_case=$test_ws/tests/$test_case
 	echo ">>> $(get_timestamp) | Start to run test case nvme-$trtype: $this_case ..."
 	(cd "$test_ws" && nvme_trtype="$trtype" ./check "$test_case")
-	typeset result="$(get_test_result "$test_ws" "$test_case")"
+	result=$(get_test_result "$test_ws" "$test_case")
 	echo ">>> $(get_timestamp) | End nvme-$trtype: $this_case | $result"
 
 	typeset -i ret=0
