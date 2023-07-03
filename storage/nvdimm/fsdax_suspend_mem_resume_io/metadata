@@ -1,0 +1,14 @@
+[General]
+name=storage/nvdimm/fsdax_suspend_mem_resume_io
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=Test suspend to mem and resume during fsdax io
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
+dependencies=fio;ndctl
+max_time=1h
+use_pty=false

@@ -1,0 +1,23 @@
+summary: KS-TC:nvdimm/nvdimm_suspend_disk_resume
+description: Test suspend to disk and resume on nvdimm server
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/nvdimm_suspend_disk_resume
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - fio
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/nvdimm_suspend_disk_resume
+extra-task: /storage/nvdimm/nvdimm_suspend_disk_resume
+adjust:
+    enabled: false
+    when: distro < rhel-8
+id: e6ac87c5-7fa2-4495-a3f7-0755ed1de16f
