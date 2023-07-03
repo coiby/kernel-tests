@@ -12,7 +12,8 @@ fi
 
 CheckSquashRoot()
 {
-    # 1.default (+squash):
+    # 1.by default, squash is enabled(+squash); squash-root.img should be
+    #   packed into initrd and compressed with zstd method:
     local confile="${KDUMP_CONFIG}.squashroot"
     cp -f ${KDUMP_CONFIG} ${confile}
     RhtsSubmit "${confile}"
@@ -28,7 +29,9 @@ CheckSquashRoot()
     }
     popd
 
-    # 2.w/o squash
+    # 2.Indicate "dracut_args -o squash" in /etc/kdump.conf to remove
+    #   squash module; squash-root.img should not exist in initrd and
+    #   the initrd should be compressed by gzip(rhel9).
     confile="${KDUMP_CONFIG}.nosquash"
     ConfigAny "dracut_args -o squash"
     file "${INITRD_KDUMP_IMG_PATH}" | grep "gzip compressed" && {

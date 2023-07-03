@@ -3,6 +3,8 @@
 # Source Kdump tests common functions.
 . ../include/runtest.sh
 
+# bz1988894 - [feat]Add makedumpfile support for showstats and zstd compression
+
 if [ "${RELEASE}" -lt 8 ]; then
     Skip "This feature is not supported."
     Report
