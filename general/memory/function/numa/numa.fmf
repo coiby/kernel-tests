@@ -1,8 +1,9 @@
 summary: Numa function test case using STREAM
 contact: Chao Ye <cye@redhat.com>
+id: d4fb20cf-803a-4d9f-9cac-67a9b04410d6
 component:
   - kernel
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
 require:
   - numactl

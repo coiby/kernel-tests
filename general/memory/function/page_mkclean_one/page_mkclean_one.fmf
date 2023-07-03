@@ -6,7 +6,7 @@ tag:
   - /kernel/general/memory/function/page_mkclean_one
   - KG-VMM-TAG
 contact: Shu Wang <shuwang@redhat.com>
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require:
   - gcc

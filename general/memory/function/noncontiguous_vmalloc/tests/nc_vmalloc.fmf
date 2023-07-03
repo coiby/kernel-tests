@@ -11,6 +11,7 @@ description: |
             system of 4kB pagesize, this will allocate 1mB non-contiguous
             memory.
 contact: Shizhao Chen <shichen@redhat.com>
+id: e9e505ad-b4c6-47bb-ac55-53c9b3bba9b4
 test: bash ./runtest.sh
 framework: beakerlib
 path: /general/memory/function/noncontiguous_vmalloc

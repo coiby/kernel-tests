@@ -5,6 +5,7 @@ description: |
     Description:
     Author: Chunyu Hu <chuhu@redhat.com>
 contact: Chunyu Hu <chuhu@redhat.com>
+id: 112e55fb-ae65-43a4-9840-8cb6387ea3b8
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 1h

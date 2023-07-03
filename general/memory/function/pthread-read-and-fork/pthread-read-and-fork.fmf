@@ -1,7 +1,8 @@
 summary: pthread read and fork hugetlb test
 contact: Jarod Wilson <jarod@redhat.com>
+id: cd7fde11-4a1b-43a2-a030-a7abe2268ab4
 component: kernel
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require:
   - coreutils
