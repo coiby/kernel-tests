@@ -5,18 +5,6 @@ TRTYPE=${TRTYPE:-"tcp"}
 
 . ../../include/include.sh || exit 1
 
-function enable_nvme_core_multipath
-{
-	modprobe nvme_core
-	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
-		modprobe -qfr nvme_rdma nvme_fabrics nvme nvme_core
-		echo "options nvme_core multipath=Y"  > /etc/modprobe.d/nvme.conf
-		modprobe nvme
-		#wait enough time for NVMe disk initialized
-		sleep 5
-	fi
-}
-
 function do_test
 {
 	typeset test_ws=$1
@@ -128,7 +116,7 @@ enable_nvme_core_multipath
 
 test_ws=./blktests
 ret=0
-trtype=tcp
+trtype=$TRTYPE
 testcases_default=""
 testcases_default+=" $(get_test_cases_tcp)"
 testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}

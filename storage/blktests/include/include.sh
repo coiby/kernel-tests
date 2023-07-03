@@ -13,6 +13,18 @@ function disable_multipath
 	[ -f /etc/multipath.conf ] && rm -f /etc/multipath.conf
 }
 
+function enable_nvme_core_multipath
+{
+	modprobe nvme_core
+	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
+		modprobe -qfr nvme_rdma nvme_fabrics nvme nvme_core
+		echo "options nvme_core multipath=Y"  > /etc/modprobe.d/nvme.conf
+		modprobe nvme
+		#wait enough time for NVMe disk initialized
+		sleep 5
+	fi
+}
+
 function get_timestamp
 {
 	date +"%Y-%m-%d %H:%M:%S"
