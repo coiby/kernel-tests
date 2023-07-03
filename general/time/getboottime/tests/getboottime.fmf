@@ -1,6 +1,7 @@
 summary: kernel function getboottime testing
 description: kernel function getboottime testing
 contact: Qiao Zhao <qzhao@redhat.com>
+id: ea81bd16-e6a1-4c2d-bf96-0e6b8e1d63b9
 component:
   - kernel
 path: /general/time/getboottime

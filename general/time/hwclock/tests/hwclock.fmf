@@ -1,6 +1,7 @@
 summary: warp_clock function test by using the hwclock command
 description: warp_clock function test by using the hwclock command
 contact: Qiao Zhao <qzhao@redhat.com>
+id: 156b37ac-d550-4dc3-a458-5d03a4f101ea
 component:
   - kernel
 path: /general/time/hwclock

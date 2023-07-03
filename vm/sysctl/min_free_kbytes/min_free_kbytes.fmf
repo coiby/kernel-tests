@@ -13,9 +13,10 @@ description: |
 
     Setting this too high will OOM your machine instantly.
 contact: Zhouping Liu <zliu@redhat.com>
+id: 02b70074-68db-4142-b5fe-9a5336f9867b
 component:
   - vm
-test: ./min_free_kbytes.sh
+test: bash ./min_free_kbytes.sh
 framework: shell
 recommend:
   - vm

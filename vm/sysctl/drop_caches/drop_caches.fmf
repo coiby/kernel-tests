@@ -34,9 +34,10 @@ description: |
     These are informational only.  They do not mean that anything is wrong
     with your system.  To disable them, echo 4 (bit 3) into drop_caches.
 contact: Zhouping Liu <zliu@redhat.com>
+id: 3ce2943d-bb95-4de3-be42-1b5e4cbd79b4
 component:
   - kernel
-test: ./drop_caches.sh
+test: bash ./drop_caches.sh
 framework: shell
 duration: 10m
 tier: 1

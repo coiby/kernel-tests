@@ -1,5 +1,6 @@
 summary: Leap second general hrtimer testing
 contact: Qiao Zhao <qzhao@redhat.com>
+id: e1ffd3a2-11eb-4c53-abfc-063efcbbb4c7
 test: bash -x ./runtest.sh
 framework: shell
 require:
