@@ -4,10 +4,17 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 LOOKASIDE=https://github.com/yizhanglinux/blktests.git
-rlIsRHEL 7 && BR=rhel7 || BR=nvme-rdma-tcp
+if rlIsRHEL 7; then
+	BR=rhel7
+elif rlIsRHEL 8; then
+	BR=nvme-rdma-tcp
+elif rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
+	BR=rhel9-fedora
+fi
+
 rm -rf blktests
 git clone -b $BR $LOOKASIDE
-pushd blktests
+pushd blktests || exit 200
 
 if ! modprobe -qn rdma_rxe; then
 	export USE_SIW="1"
@@ -29,8 +36,9 @@ if rlIsRHEL 7; then
 fi
 
 make
+# shellcheck disable=SC2181
 if (( $? != 0 )); then
 	cki_abort_task "Abort test because build env setup failed"
 fi
 
-popd
+popd || exit 200

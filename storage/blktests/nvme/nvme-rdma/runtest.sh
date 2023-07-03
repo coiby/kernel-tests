@@ -1,25 +1,8 @@
-#!/bin/sh
-#
-# Copyright (c) 2020 Red Hat, Inc. All rights reserved.
-#
-# This copyrighted material is made available to anyone wishing
-# to use, modify, copy, or redistribute it subject to the terms
-# and conditions of the GNU General Public License version 2.
-#
-# This program is distributed in the hope that it will be
-# useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-# PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public
-# License along with this program; if not, write to the Free
-# Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-# Boston, MA 02110-1301, USA.
-#
+#!/bin/bash
 
 TNAME="storage/blktests/nvme/nvme-rdma"
 
-source ../../include/include.sh || exit 1
+. ../../include/include.sh || exit 1
 
 function enable_nvme_core_multipath
 {
@@ -41,15 +24,15 @@ function do_test
 	typeset use_siw=$3
 	typeset USE_SIW
 
-	if (( $use_siw == 0 )); then
+	if (( use_siw == 0 )); then
 		USE_SIW=""
-	elif (($use_siw == 1)); then
+	elif (( use_siw == 1)); then
 		USE_SIW="use_siw=1"
 	fi
 
 	echo ">>> $(get_timestamp) | Start to run test case $USE_SIW nvme-rdma: $this_case ..."
-	(cd $test_ws && eval $USE_SIW nvme_trtype=rdma ./check $test_case)
-	typeset result=$(get_test_result $test_ws $test_case)
+	(cd "$test_ws" && eval $USE_SIW nvme_trtype=rdma ./check "$test_case")
+	typeset result="$(get_test_result "$test_ws" "$test_case")"
 	echo ">>> $(get_timestamp) | End nvme-rdma: $this_case | $result"
 
 	typeset -i ret=0
@@ -73,6 +56,7 @@ function do_test
 function get_test_cases_rdma
 {
 	typeset testcases=""
+
 	if rlIsRHEL 7; then
 		testcases+=" nvme/003" # BZ1872714
 		testcases+=" nvme/004" # BZ1872714
@@ -84,7 +68,7 @@ function get_test_cases_rdma
 		testcases+=" nvme/019"
 		testcases+=" nvme/023"
 		testcases+=" nvme/031"
-	else
+	elif rlIsRHEL 8; then
 		testcases+=" nvme/003"
 		testcases+=" nvme/004"
 		testcases+=" nvme/005"
@@ -112,8 +96,47 @@ function get_test_cases_rdma
 		testcases+=" nvme/029"
 		uname -ri | grep -q "4.18.0-147.*s390x" || testcases+=" nvme/030" # BZ1753057, skip on 8.1.z fixed on 8.2
 		uname -ri | grep "4.18.0-147" | grep -Eq "s390x|ppc64le|aarch64" || testcases+=" nvme/031"
+	elif rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
+		testcases+=" nvme/003"
+		testcases+=" nvme/004"
+		testcases+=" nvme/005"
+		testcases+=" nvme/006"
+		testcases+=" nvme/007"
+		testcases+=" nvme/008"
+		testcases+=" nvme/009"
+		testcases+=" nvme/010"
+		testcases+=" nvme/011"
+		testcases+=" nvme/012"
+		testcases+=" nvme/013"
+		testcases+=" nvme/014"
+		testcases+=" nvme/015"
+		testcases+=" nvme/018"
+		testcases+=" nvme/019"
+		testcases+=" nvme/020"
+		testcases+=" nvme/021"
+		testcases+=" nvme/022"
+		testcases+=" nvme/023"
+		testcases+=" nvme/024"
+		testcases+=" nvme/025"
+		testcases+=" nvme/026"
+		testcases+=" nvme/027"
+		testcases+=" nvme/028"
+		testcases+=" nvme/029"
+		testcases+=" nvme/030"
+		testcases+=" nvme/031"
+		testcases+=" nvme/038"
+		testcases+=" nvme/040"
+		testcases+=" nvme/041"
+		testcases+=" nvme/042"
+		testcases+=" nvme/043"
+		testcases+=" nvme/044"
+		testcases+=" nvme/045"
+		testcases+=" nvme/047"
+		testcases+=" nvme/048"
+
 	fi
-	echo $testcases
+
+	echo "$testcases"
 }
 
 if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release; then
@@ -131,15 +154,15 @@ test_ws=./blktests
 ret=0
 testcases_default=""
 testcases_default+=" $(get_test_cases_rdma)"
-testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
+testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 for testcase in $testcases; do
 	for use_siw in $USE_SIW; do
-		do_test $test_ws $testcase $use_siw
+		do_test "$test_ws" "$testcase" "$use_siw"
 		((ret += $?))
 	done
 done
 
-if (( $ret != 0 )); then
+if (( ret != 0 )); then
 	echo ">> There are failing tests, pls check it"
 fi
 

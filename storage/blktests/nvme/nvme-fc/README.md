@@ -1,6 +1,6 @@
-# storage/blktests/nvme/nvme-rdma test suite
+# storage/blktests/nvme/nvme-fc test suite
 
-Storage: nvme-rdma test
+Storage: blktests nvme-fc test
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.
