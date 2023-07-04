@@ -265,7 +265,7 @@ function select_yum_tool()
 {
   if [ -x /usr/bin/dnf ]; then
     YUM=/usr/bin/dnf
-    ALL="--all"
+    ALL=""
     COPR_PLUGIN_PACKAGE=dnf-plugins-core
     if [[ -e /run/ostree-booted ]]; then
       RPM_OSTREE=/usr/bin/rpm-ostree
