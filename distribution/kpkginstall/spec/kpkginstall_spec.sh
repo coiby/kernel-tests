@@ -790,7 +790,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should not include "make -C /usr/src/kernels/$KVER_UNAME modules_prepare"
-        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround FAIL"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End
@@ -813,7 +813,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should not include "make -C /usr/src/kernels/$KVER_UNAME scripts"
-        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround FAIL"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End
@@ -835,7 +835,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
-        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround FAIL"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End
