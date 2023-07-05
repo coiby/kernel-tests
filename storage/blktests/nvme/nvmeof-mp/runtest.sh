@@ -1,25 +1,8 @@
-#!/bin/sh
-#
-# Copyright (c) 2020 Red Hat, Inc. All rights reserved.
-#
-# This copyrighted material is made available to anyone wishing
-# to use, modify, copy, or redistribute it subject to the terms
-# and conditions of the GNU General Public License version 2.
-#
-# This program is distributed in the hope that it will be
-# useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-# PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public
-# License along with this program; if not, write to the Free
-# Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-# Boston, MA 02110-1301, USA.
-#
+#!/bin/bash
 
 TNAME="storage/blktests/nvme/nvmeof-mp"
 
-source ../../include/include.sh || exit 1
+. ../../include/include.sh || exit 1
 
 function pre_setup
 {
@@ -39,15 +22,15 @@ function do_test
 	typeset use_siw=$3
 	typeset USE_SIW
 
-	if (( $use_siw == 0 )); then
+	if (( use_siw == 0 )); then
 		USE_SIW=""
-	elif (($use_siw == 1)); then
+	elif (( use_siw == 1 )); then
 		USE_SIW="use_siw=1"
 	fi
 
 	echo ">>> $(get_timestamp) | Start to run test case $USE_SIW nvmeof-mp: $this_case ..."
-	(cd $test_ws && eval $USE_SIW ./check $test_case)
-	typeset result=$(get_test_result $test_ws $test_case)
+	(cd "$test_ws" && eval "$USE_SIW" ./check "$test_case")
+	result=$(get_test_result "$test_ws" "$test_case")
 	echo ">>> $(get_timestamp) | End nvmeof-mp: $this_case | $result"
 
 	typeset -i ret=0
@@ -71,7 +54,8 @@ function do_test
 function get_test_cases
 {
 	typeset testcases=""
-	[[ $(ip -4 -o a s | grep -v "127.0.0.1" | wc -l) != 1 ]] || testcases+=" nvmeof-mp/001"
+
+	[[ $(ip -4 -o a s | grep -cv "127.0.0.1") != 1 ]] || testcases+=" nvmeof-mp/001"
 	#RHEL8 aarch64 BZ1919363 BZ1938434, RHEL9 #BZ191296, RHEL-8.2 BZ2058980
 	uname -ri | grep -qE "4.18.0-193|4.18.0.*aarch64|4.18.0.*ppc64le|5.12.*aarch64|el9.ppc64le|5.11.*ppc64le" || testcases+=" nvmeof-mp/002"
 	# testcases+=" nvmeof-mp/004", need legacy device mapper support
@@ -81,7 +65,8 @@ function get_test_cases
 	testcases+=" nvmeof-mp/010"
 	testcases+=" nvmeof-mp/011"
 	testcases+=" nvmeof-mp/012"
-	echo $testcases
+
+	echo "$testcases"
 }
 
 if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release; then
@@ -99,16 +84,16 @@ test_ws=./blktests
 ret=0
 testcases_default=""
 testcases_default+=" $(get_test_cases)"
-testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
+testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 for testcase in $testcases; do
 	for use_siw in $USE_SIW; do
 		disable_multipath
-		do_test $test_ws $testcase $use_siw
+		do_test "$test_ws" "$testcase" "$use_siw"
 		((ret += $?))
 	done
 done
 
-if (( $ret != 0 )); then
+if (( ret != 0 )); then
 	echo ">> There are failing tests, pls check it"
 fi
 

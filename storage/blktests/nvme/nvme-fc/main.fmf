@@ -1,0 +1,14 @@
+summary: Storage blktests nvme-fc tests
+contact: Yi Zhang <yizhan@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - blktrace
+  - fio
+  - gcc
+  - gcc-c++
+  - git
+  - nvme-cli
+  - xfsprogs
+extra-summary: storage/blktests/nvme/nvme-fc
+extra-task: storage/blktests/nvme/nvme-fc
