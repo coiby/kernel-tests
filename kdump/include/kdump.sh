@@ -372,7 +372,7 @@ RestartKdump()
     touch "${KDUMP_CONFIG}"
     LogRun "ls -l ${K_BOOT}/${INITRD_KDUMP_PREFIX}*kdump.img"
     LogRun "rm -f ${K_BOOT}/${INITRD_KDUMP_PREFIX}*kdump.img"
-    LogRun "ls -l ${K_BOOT}/${INITRD_KDUMP_PREFIX}*kdump.img"
+    LogRun "ls -l ${K_BOOT}/${INITRD_KDUMP_PREFIX}*kdump.img 2>/dev/null"
 
     local log_file=/tmp/kdump_restart.log
     rm -f ${log_file}

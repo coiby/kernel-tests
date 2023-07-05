@@ -3,6 +3,8 @@
 # Source Kdump tests common functions.
 . ../include/runtest.sh
 
+# bz1988894 - [feat]Add makedumpfile support for showstats and zstd compression
+
 if [ "${RELEASE}" -lt 8 ]; then
     Skip "This feature is not supported."
     Report
@@ -78,9 +80,9 @@ MakedumpfileShowstatsTest()
     rm -f "${logfile}"
     MKPARAM1="-F -l -d 31"
     MKPARAM2="/proc/kcore --dry-run --show-stats"
-    cmdstr="${MKCMD} ${MKPARAM1} ${MKPARAM2} 2>&1"
-    Log "CMD: ${cmdstr}"
-    ${cmdstr} | tee -a "${logfile}"
+    cmdstr="${MKCMD} ${MKPARAM1} ${MKPARAM2}"
+    Log "CMD: ${cmdstr} 2>&1"
+    ${cmdstr} 2>&1 | tee -a "${logfile}"
     [ "${PIPESTATUS[0]}" -ne 0 ] && Error "Failed: ${cmdstr}, please check log:${logfile}"
     RhtsSubmit "$(pwd)/${logfile}"
 
