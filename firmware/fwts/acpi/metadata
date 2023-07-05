@@ -4,6 +4,7 @@ name=firmware/fwts/acpi
 owner=Oliver Gutierrez <ogutierr@redhat.com>
 
 [restraint]
+repoRequires=firmware/fwts/include;automotive/include
 entry_point=bash ./runtest.sh
 max_time=1h
 # this test only use fwts and it's installed in the include task

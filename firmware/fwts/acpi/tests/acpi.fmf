@@ -1,0 +1,12 @@
+summary: run acpi tests from Firmware Test Suite (fwts)
+description: run acpi tests from Firmware Test Suite (fwts)
+contact: Oliver Gutierrez <ogutierr@redhat.com>
+component:
+  - kernel
+path: /firmware/fwts/acpi
+test: bash -x ./runtest.sh
+framework: beakerlib
+require: []
+duration: 1h
+extra-summary: /firmware/fwts/acpi
+extra-task: /firmware/fwts/acpi
