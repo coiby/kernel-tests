@@ -36,7 +36,7 @@ function memblock_mem_kaslr()
         mem_half=$(cat $DIR_DEBUG/${FUNCNAME}_memhalf)
     fi
 
-    rlWarn "This is bogus, need to take care of crashkernel on s390x, aarch64, and ppc64"
+    rlLogWarning "This is bogus, need to take care of crashkernel on s390x, aarch64, and ppc64"
 
     if ! uname -m | grep x86_64; then
         return
