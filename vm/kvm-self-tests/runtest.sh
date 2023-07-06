@@ -297,7 +297,7 @@ function setup
 
     rlRun "cd $TMPDIR"
     if [ ! "$CKI_SELFTESTS_URL" ] ; then
-        if stat /run/ostree-booted > /dev/null 2>&1; then
+        if [[ $OSVERSION == "ARK" || $OSVERSION == "UPSTREAM" ]]; then
             RELEASE="$(uname -r | cut -f 1,2,3,5 -d . | sed s/iv// | sed s/\.arch//)"
             pkg="kernel-${RELEASE}"
             major_ver="$(uname -r | cut -f 1 -d -)"
