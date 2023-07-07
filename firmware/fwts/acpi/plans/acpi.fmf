@@ -1,0 +1,19 @@
+summary: run acpi tests from Firmware Test Suite (fwts)
+discover:
+    how: fmf
+    test:
+        - /firmware/fwts/acpi
+execute:
+    how: tmt
+    framework: shell
+prepare:
+    - name: Enable Repos
+      how: shell
+      script: |
+          . ./automotive/include/rhivos.sh
+          install_repos
+    - name: Install packages
+      how: install
+      package: []
+environment-file:
+    - ./firmware/fwts/acpi/plans/tmt.env
