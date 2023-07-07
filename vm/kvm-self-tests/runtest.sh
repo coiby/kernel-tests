@@ -303,7 +303,8 @@ function setup
             major_ver="$(uname -r | cut -f 1 -d -)"
             minor_ver="$(uname -r | cut -d - -f 2 | cut -d . -f 1)"
             build="$(uname -r | cut -d - -f 2 | cut -d . -f 3 | sed s/iv//)"
-            wget https://kojihub.stream.centos.org/kojifiles/packages/kernel/${major_ver}/${minor_ver}.${build}/src/${pkg}.src.rpm
+            BEAKERLIB_rpm_fetch_base_url+=("https://cbs.centos.org/kojifiles/packages")
+            BEAKERLIB_rpm_fetch_base_url+=("https://kojihub.stream.centos.org/kojifiles/packages")
         else
             if [ -x /usr/bin/dnf ]; then
                 dnf download ${pkg} --source > /dev/null 2>&1
