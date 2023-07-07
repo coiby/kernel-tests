@@ -5,6 +5,7 @@
 #   runtest.sh of /kernel/firmware/linux-firmware/sanity
 #   Description: Sanity check for linux-firmware files
 #   Author: Erico Nunes <ernunes@redhat.com>
+#   Update: Laura Trivelloni <ltrivell@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -36,6 +37,17 @@ rm -f "$HASHES_FILE"
 rm -f "$FILETYPES_FILE"
 
 pushd /usr/lib/firmware
+
+# Check for broken links
+broken=$(find -L . -type l)
+if [[ $(find -L . -type l) == '' ]]
+then
+	echo "No broken links found."
+else
+	echo "Broken links: $broken"
+fi
+
+
 # We strip the absolute path prefix, so that it is easier to compare later with
 # relative paths
 for f in $( rpm -ql linux-firmware | grep /usr/lib/firmware/ | sed 's@/usr/lib/firmware/@@' )
@@ -43,8 +55,33 @@ do
     # skip directories
     [ -f "$f" ] || continue
 
+    # check if symbolic link
+    if [[ -L "$f" ]]
+    then
+	slink="$f"
+        f=$(readlink -f "$f")
+	# remove /usr/lib/firmware/ from the absolute path
+	f=${f##*firmware/}
+	if [ ! -f "$f" ]
+	then
+		echo "$slink -> $f doesn't exists"
+	fi
+    fi
+
+    if [[ "$f" == *.xz ]]
+    then
+	# decompress to have same filetype found in linux-firmware repository
+	# -k option to keep the original *.xz file
+        xz -d -k $f
+	# remove .xz extension from current filename
+        f="${f%.*}"
+    fi
+
     sha256sum "$f" >> "$HASHES_FILE"
     file -r -F '' "$f" >> "$FILETYPES_FILE"
+
+    # remove extracted file from /usr/lib/firmware
+    rm -f "$f"
 done
 popd
 
