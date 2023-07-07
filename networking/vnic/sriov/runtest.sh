@@ -15030,6 +15030,7 @@ sriov_test_bz2008373() {
 		fi
 		return $result
 }
+
 # vf_intf_garp_check is for bz1938635
 vf_intf_garp_check() {
 	rlLog "vf_intf_garp_check is for bz1938635"
@@ -15065,30 +15066,35 @@ vf_intf_garp_check() {
 		ip link set ${VF_IFACE} addr ${vf_mac}
 		sleep 13
 		ip link show ${VF_IFACE} | grep -i  ${vf_mac}
-		[ $? -eq 0 ] ||  { result=1; rlLog "step 4: configure link mac ${vf_mac} failed"; ip link show ${VF_IFACE}; }
+		[ $? -eq 0 ] ||  { result=1; rlFail "step 4: configure link mac ${vf_mac} failed"; ip link show ${VF_IFACE}; }
 		#check the GARP packets
-		tcpdump -r 1.pcap -enn | grep  -i  ${vf_mac1}
-		[ $? -eq 0 ] || { result=1; tcpdump -r 1.pcap -enn; rlLog "step 4: No garp packets captured for mac ${vf_mac}"; }
-	#5.  set the admin mac for vf and check the GARP
-		rlLog "STEP 5: Set the admin mac for vf and check if the mac is set successfully"
-		vf_mac1=00:11:22:33:44:11
-		ip link set ${nic_test} vf 0 mac ${vf_mac1}
-		sleep 3
-		ip link show ${VF_IFACE} | grep -i  ${vf_mac1}
-		[ $? -eq 0 ] ||  { result=1; rlLog "${vf_mac1} : configure link mac failed"; ip link show ${VF_IFACE}; }
+		tcpdump -r 1.pcap -enn | grep  -i  "${vf_mac} > ff:ff:ff:ff:ff:ff"
+		[ $? -eq 0 ] || { result=1; tcpdump -r 1.pcap -enn; rlFail "step 4: No garp packets captured for mac ${vf_mac}"; }
+		#5.  set the admin mac for vf and check the mac when nic_driver= ice or i40e
+		if  [ "$NIC_DRIVER" = "ice" ] || [ "$NIC_DRIVER" = "i40e" ]; then
 
-		#6.set the effective mac for vf
-		rlLog "STEP 6: Set mac for vf interface and check if the mac is set successfully"
-		vf_mac2=00:11:22:33:44:12
-		ip link set ${VF_IFACE} addr ${vf_mac2}
-		sleep 3
-		ip link show ${VF_IFACE} | grep -i  ${vf_mac2}
-		[ $? -eq 0 ] ||  { result=1; rlLog "step6 : configure link mac ${vf_mac2} failed"; ip link show ${VF_IFACE}; }
+			rlLog "STEP 5: Set the admin mac for vf and check if the mac is set successfully"
+			vf_mac1=00:11:22:33:44:11
+			ip link set ${nic_test} vf 0 mac ${vf_mac1}
+			sleep 3
+			ip link show ${VF_IFACE} | grep -i  ${vf_mac1}
+			[ $? -eq 0 ] ||  { result=1; rlFail "${vf_mac1} : configure link mac failed"; ip link show ${VF_IFACE}; }
+
+			#6.set the effective mac for vf
+			rlLog "STEP 6: Set mac for vf interface and check if the mac is set successfully"
+			vf_mac2=00:11:22:33:44:12
+			info=$(ip link set ${VF_IFACE} addr ${vf_mac2} 2>&1)
+			[[ $info == "RTNETLINK answers: Permission denied" ]] || { result=1; rlFail "There should be error info"; rlLog "The current info is $info"; }
+			sleep 3
+			ip link show ${VF_IFACE} | grep -i  ${vf_mac2}
+			[ $? -ne 0 ] ||  { result=1; rlFail "step6 : configure link mac ${vf_mac2} should  fail"; ip link show ${VF_IFACE}; }
+		fi
 		sriov_remove_vfs $nic_test 0
 		sync_set server  vf_intf_garp_check_end
 	fi
 	return $result
 }
+
 
 sriov_test_vlan_qinq_baisc()
 {
