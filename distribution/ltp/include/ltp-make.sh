@@ -184,9 +184,9 @@ patch-generic()
 
     if  [[ $TESTVERSION =~ '^[0-9]+$' ]] && [[ $TESTVERSION -ge 20170516 ]]; then
         echo " - cron_tests.sh has been rewritten since ltp-20170516" | tee -a $OUTPUTFILE
-    elif [  "$OS_MAJOR_RELEASE"  == "6" ]; then
-        echo " - fix cron01 in RHEL6" | tee -a $OUTPUTFILE
-        ${PATCH} < ${ABS_DIR}/INTERNAL/rhel6-commands-cron-ensure-syslog-enabled.patch
+    #elif [  "$OS_MAJOR_RELEASE"  == "6" ]; then
+        #echo " - fix cron01 in RHEL6" | tee -a $OUTPUTFILE
+        #${PATCH} < ${ABS_DIR}/INTERNAL/rhel6-commands-cron-ensure-syslog-enabled.patch
     fi
 
     if [ "$NXBIT" == "TRUE" ]; then
