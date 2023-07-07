@@ -4,6 +4,7 @@ description: |
     Bug 1260517 - [ftrace] function_graph tracer make /proc hide all pid directories , making ps / top user tool fail to work
     After enabling function_graph tracer by 'trace-cmd start -p function_graph' , the pid directories under /proc becomes invisible. Results in the ps or pidstat and top command failed to gather processes information.
 contact: Ziqian SUN <zsun@redhat.com>
+id: 5734834e-9da1-40a6-8aec-0acdd1371c89
 component:
   - kernel
 test: ./runtest.sh
