@@ -27,7 +27,6 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-#. ../../include/rhivos.sh
 . ../../../cki_lib/libcki.sh
 
 rlJournalStart
