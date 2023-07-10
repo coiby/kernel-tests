@@ -184,9 +184,9 @@ patch-generic()
 
     if  [[ $TESTVERSION =~ '^[0-9]+$' ]] && [[ $TESTVERSION -ge 20170516 ]]; then
         echo " - cron_tests.sh has been rewritten since ltp-20170516" | tee -a $OUTPUTFILE
-    elif [  "$OS_MAJOR_RELEASE"  == "6" ]; then
-        echo " - fix cron01 in RHEL6" | tee -a $OUTPUTFILE
-        ${PATCH} < ${ABS_DIR}/INTERNAL/rhel6-commands-cron-ensure-syslog-enabled.patch
+    #elif [  "$OS_MAJOR_RELEASE"  == "6" ]; then
+        #echo " - fix cron01 in RHEL6" | tee -a $OUTPUTFILE
+        #${PATCH} < ${ABS_DIR}/INTERNAL/rhel6-commands-cron-ensure-syslog-enabled.patch
     fi
 
     if [ "$NXBIT" == "TRUE" ]; then
@@ -318,6 +318,25 @@ configure()
     cat patchinc.log | tee -a $OUTPUTFILE
 
     echo "============ Start configure ============" | tee -a $OUTPUTFILE
+    AUTOCONFIGVER=$(rpm -qa autoconf |cut -f 2 -d "-")
+    AUTOMAKEVER=$(rpm -qa automake |cut -f 2 -d "-"|cut -f 1,2 -d ".")
+    AUTOCONFIGVER_1=$(echo $AUTOCONFIGVER |cut -f 1 -d ".")
+    AUTOCONFIGVER_2=$(echo $AUTOCONFIGVER |cut -f 2 -d ".")
+    DOWNLOAD_URL=$(echo ${LOOKASIDE:-http:\/\/download.devel.redhat.com\/qa\/rhts\/lookaside\/})
+    if [ $AUTOCONFIGVER_1 -lt 1 -o $AUTOCONFIGVER_1 -eq 2 -a $AUTOCONFIGVER_2 -lt 69 ]; then \
+        wget -q $DOWNLOAD_URL/m4-1.4.16.tar.gz ; \
+        tar xzf m4-1.4.16.tar.gz; \
+        pushd  m4-1.4.16; \
+        ./configure --prefix=/usr 2>&1 >/dev/null; \
+        make 2>&1 >/dev/null && make install 2>&1 >/dev/null; \
+        popd ; \
+        wget -q $DOWNLOAD_URL/autoconf-2.69.tar.gz ; \
+        tar xzf autoconf-2.69.tar.gz; \
+        pushd autoconf-2.69; \
+        ./configure --prefix=/usr 2>&1 >/dev/null ; \
+        make 2>&1 >/dev/null && make install 2>&1 >/dev/null ;  \
+        popd ; \
+    fi
     pushd ${TARGET}; make autotools; ./configure --prefix=${TARGET_DIR} &> configlog.txt || cat configlog.txt; popd
 }
 
