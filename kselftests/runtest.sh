@@ -109,9 +109,10 @@ install_packages()
         pushd linux-kselftest-*/
     else
         pkg=${name}-${version}-${release}
-        BEAKERLIB_rpm_fetch_base_url+=("https://cbs.centos.org/kojifiles/packages")
+        BASE_URL=${BASE_URL:-"https://cbs.centos.org/kojifiles/packages"}
+        BEAKERLIB_rpm_fetch_base_url+=(${BASE_URL})
         rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
-        rpm -ivh --define "_topdir $TMPDIR" ${name}-${version}-${release}.src.rpm
+        rpm -ivh --define "_topdir $TMPDIR" ${name/-debug/}-${version}-${release}.src.rpm
         pushd SPECS
         # patch for x86_64 systems. Introduction of efiuki causes dependency to break.
         # per https://issues.redhat.com/browse/ENGCMP-2966 this is only temporary.
