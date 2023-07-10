@@ -668,6 +668,8 @@ Describe 'kpkginstall: main - check installed kernel'
         The stdout should include "✅ Found the correct kernel release running!"
         if [[ ${KPKG_URL} != *.tar.gz ]] ; then
             The stdout should include "rpm_extra_package_install"
+        else
+            The stdout should not include "rpm_extra_package_install"
         fi
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
