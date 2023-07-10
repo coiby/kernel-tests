@@ -79,6 +79,9 @@ function store_kpkg_url_variables()
 
 function load_kpkg_url_variables()
 {
+  # Clean up KPKG_URL so that it contains only the URL without variables.
+  # as all parameters from the URL have been saved already to file
+  KPKG_URL=${KPKG_URL%\#*}
   for file in /var/tmp/kpkginstall/vars/*; do
     if [[ -f ${file} ]]; then
       export "${file##*/}=$(cat "${file}")"
