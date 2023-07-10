@@ -2,9 +2,9 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
-. $CDIR/../include/include.sh || exit 200
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../include/include.sh || exit 200
 
 function runtest() {
 
@@ -55,6 +55,7 @@ for DISK in $DISKS; do
 							fi
 							dmesg -c >/dev/null
 							tok "nvme format /dev/$DISK --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms -r -f"
+							# shellcheck disable=SC2181
 							if [ $? -ne 0 ]; then
 								tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms not support" | tee -a format_fail
 								continue
@@ -68,10 +69,12 @@ for DISK in $DISKS; do
 								fi
 
 							fi
+							# shellcheck disable=SC2181
 							if [ $? -ne 0 ]; then
 								tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms with dd operation failed" | tee -a dd_fail
 							fi
 							tok "fdisk -l /dev/$DISK"
+							# shellcheck disable=SC2181
 							if [ $? -ne 0 ]; then
 								tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms with fdisk -l operation failed" | tee -a fdisk_fail
 							fi
