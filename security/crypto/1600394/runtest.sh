@@ -35,11 +35,7 @@ rlJournalStart
             rlRun "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
         fi
         if ! cki_is_kernel_automotive; then
-	    if [ -x /usr/bin/dnf ]; then
-                rlRun "dnf install -y python3"
-            elif [ -x /usr/bin/yum ]; then
-                rlRun "yum install -y python3"
-            fi
+            rlRun "yum install -y python3"
         fi
         rlRun "ls -l /usr/bin/python3*"
     rlPhaseEnd
