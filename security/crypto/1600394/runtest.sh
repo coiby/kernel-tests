@@ -27,14 +27,14 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. ../../include/rhivos.sh
+. ../../../cki_lib/libcki.sh
 
 rlJournalStart
     rlPhaseStartSetup
         if [ "$(rlIsRHEL 7)" ]; then
             rlRun "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
         fi
-        if ! kernel_automotive; then
+        if ! cki_is_kernel_automotive; then
             rlRun "yum install -y python3"
         fi
         rlRun "ls -l /usr/bin/python3*"
