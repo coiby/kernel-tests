@@ -1,0 +1,34 @@
+summary: Linux Test Project
+description: |
+    Latest LTP test KernelTier1
+contact: Kernel General Test Team <kernel-general-test-team@redhat.com>
+id: 3e6ec8af-5bd4-4a29-87cb-514d6e0edcc7
+component:
+  - kernel
+  - glibc
+test: bash ./runtest.sh
+framework: shell
+require:
+  - procmail
+  - automake
+  - autoconf
+  - flex
+  - bison
+  - rng-tools
+  - rsyslog
+  - util-linux
+  - bc
+  - gcc
+  - bzip2
+  - rpm-build
+  - libaio-devel
+  - libcap-devel
+  - numactl-devel
+  - numactl
+  - strace
+  - wget
+  - python3
+  - ntpsec
+duration: 3h
+extra-summary: /kernel/distribution/ltp/lite
+extra-task: /kernel/distribution/ltp/lite

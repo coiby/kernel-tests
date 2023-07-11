@@ -1,0 +1,11 @@
+summary: Regression testing for bug 1064059
+contact: Qiao Zhao <qzhao@redhat.com>
+id: 823ee9d9-06b6-49f7-a20a-63d8ff6fccef
+test: bash -x ./runtest.sh
+framework: shell
+require:
+  - gcc
+duration: 2h
+tier: 1
+extra-summary: general/time/regression/bz1064059_clock_nanosleep_return_early
+extra-task: general/time/regression/bz1064059_clock_nanosleep_return_early

@@ -1,6 +1,7 @@
 summary: Run elapsed time tests
 description: Run elapsed time tests
 contact: Qiao Zhao <qzhao@redhat.com>
+id: 173edc57-0184-46ac-8a59-1a494d755b5f
 component:
   - kernel
 path: /general/time/elapsed

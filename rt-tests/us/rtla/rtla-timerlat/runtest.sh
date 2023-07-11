@@ -66,6 +66,18 @@ function runtest()
     rtla timerlat top -i 2 -c 0 -n
     check_status "rtla timerlat top -i 2 -c 0 -n"
 
+    echo "-- rtla-timerlat top: Set the automatic trace mode---------------" | tee -a $OUTPUTFILE
+    rtla timerlat top -a 5  --dump-tasks
+    check_status "rtla timerlat top -a 5  --dump-tasks"
+
+    echo "-- rtla-timerlat top: Print the auto-analysis if hits the stop tracing condition---------------" | tee -a $OUTPUTFILE
+    rtla timerlat top --aa-only 5
+    check_status "rtla timerlat top --aa-only 5"
+
+    echo "-- rtla-timerlat top: disable auto-analysis---------------" | tee -a $OUTPUTFILE
+    rtla timerlat top -s 3 -T 10 -t --no-aa
+    check_status "rtla timerlat top -s 3 -T 10 -t --no-aa"
+
     echo "-- rtla-timerlat:  rtla-timerlat hist test---------------" | tee -a $OUTPUTFILE
     rtla timerlat hist -c 0 -d 30s
     check_status "rtla timerlat hist -c 0 -d 30s"

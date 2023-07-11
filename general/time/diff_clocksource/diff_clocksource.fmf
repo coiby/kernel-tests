@@ -1,0 +1,14 @@
+summary: time backward between different clocksource
+contact: Qiao Zhao <qzhao@redhat.com>
+id: 06d53ce6-2907-4098-b48f-e05cb6aa346f
+component:
+  - kernel
+test: bash -x ./runtest.sh
+framework: shell
+duration: 120m
+require:
+  - gcc
+tier: 1
+tag: [tier1]
+extra-summary: /kernel-tests/general/time/diff_clocksource
+extra-task: /kernel-tests/general/time/diff_clocksource

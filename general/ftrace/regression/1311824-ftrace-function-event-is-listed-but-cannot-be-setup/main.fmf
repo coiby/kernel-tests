@@ -2,6 +2,7 @@ summary: Test if events listed in available_events can be setup
 description: |
     Test if events listed in available_events can be setup
 contact: Ziqian SUN <zsun@redhat.com>
+id: 72ec9c16-35ae-45cb-85b8-f2a414aaf041
 test: ./runtest.sh
 framework: beakerlib
 duration: 60m

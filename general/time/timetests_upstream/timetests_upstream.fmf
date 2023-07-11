@@ -1,0 +1,21 @@
+summary: Run upstream timetests in rhel kernel
+description: |
+    Test upstream time case
+    Git site: https://github.com/johnstultz-work/timetests
+    > Since original code was not maintained by anyone, so use the 
+    > downstream code: https://github.com/linuxqiao/timetests
+    This case developed and tested this on Ubuntu 12.04. Need update.
+    To run: ./runall.sh
+contact: Qiao Zhao <qzhao@redhat.com>
+id: 690bc9a4-890f-42fd-bf8b-49e5c32ca964
+test: bash -x ./runtest.sh
+framework: shell
+require:
+  - gcc
+  - git
+  - make
+  - psmisc
+duration: 240m
+tier: 2
+extra-summary: general/time/timetests_upstream
+extra-task: general/time/timetests_upstream

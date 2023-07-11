@@ -1,0 +1,9 @@
+summary: System should be sync per 11 mins when use rtcsync
+contact: Qiao Zhao <qzhao@redhat.com>
+id: 9ed3f259-fa66-4182-8b33-ed736e63ce8b
+test: bash -x ./runtest.sh
+framework: shell
+duration: 30m
+tier: 2
+extra-summary: general/time/rtc_sync
+extra-task: general/time/rtc_sync

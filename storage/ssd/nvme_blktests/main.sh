@@ -2,9 +2,9 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
-. $CDIR/../include/include.sh || exit 200
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../include/include.sh || exit 200
 
 function runtest() {
 
@@ -105,8 +105,8 @@ function runtest() {
 		testcases+=" nvme/013"
 		testcases+=" nvme/014"
 		testcases+=" nvme/015"
-		testcases+=" nvme/016"
-		testcases+=" nvme/017"
+		#testcases+=" nvme/016"
+		#testcases+=" nvme/017"
 		testcases+=" nvme/018"
 		testcases+=" nvme/019"
 		testcases+=" nvme/020"
@@ -130,21 +130,21 @@ function runtest() {
 		testcases+=" scsi/006"
 		tok "cd blktests && ./check $testcases"
 	elif rlIsRHEL 9; then
-		#For RHEL-9.0.0
+		#For RHEL-9
 		testcases+=" block/001"
 		testcases+=" block/002"
 		testcases+=" block/003"
 		testcases+=" block/004"
 		testcases+=" block/005"
 		testcases+=" block/006"
-		#testcases+=" block/007"
+		testcases+=" block/007"
 		testcases+=" block/008"
 		testcases+=" block/009"
 		testcases+=" block/010"
 		#testcases+=" block/011" #disable for normal SSD
 		testcases+=" block/012"
-		#testcases+=" block/014"
-		#testcases+=" block/015"
+		testcases+=" block/014"
+		testcases+=" block/015"
 		testcases+=" block/016"
 		testcases+=" block/017"
 		testcases+=" block/018"
@@ -160,6 +160,15 @@ function runtest() {
 		testcases+=" block/029"
 		testcases+=" block/030"
 		testcases+=" block/031"
+		testcases+=" block/032"
+		#testcases+=" block/033" ublk_drv
+		testcases+=" block/034"
+		testcases+=" scsi/001"
+		testcases+=" scsi/002"
+		testcases+=" scsi/004"
+		testcases+=" scsi/005"
+		testcases+=" scsi/006"
+		testcases+=" scsi/007"
 		testcases+=" loop/001"
 		testcases+=" loop/002"
 		testcases+=" loop/003"
@@ -167,9 +176,18 @@ function runtest() {
 		testcases+=" loop/005"
 		testcases+=" loop/006"
 		testcases+=" loop/007"
-		uname -r | grep -Eq "^5.14|^6." || testcases+=" nvme/002"
+		testcases+=" loop/008"
+		testcases+=" loop/009"
+		testcases+=" zbd/001"
+		testcases+=" zbd/002"
+		testcases+=" zbd/003"
+		testcases+=" zbd/004"
+		testcases+=" zbd/005"
+		testcases+=" zbd/006"
+		testcases+=" zbd/008"
+		testcases+=" nvme/002"
 		testcases+=" nvme/003"
-		hostname | grep -q "rdma-perf-06" || testcases+=" nvme/004"
+		testcases+=" nvme/004"
 		testcases+=" nvme/005"
 		testcases+=" nvme/006"
 		testcases+=" nvme/007"
@@ -181,8 +199,8 @@ function runtest() {
 		testcases+=" nvme/013"
 		testcases+=" nvme/014"
 		testcases+=" nvme/015"
-		uname -r | grep -Eq "^5.14|^6." || testcases+=" nvme/016"
-		uname -r | grep -Eq "^5.14|^6." || testcases+=" nvme/017"
+		testcases+=" nvme/016"
+		testcases+=" nvme/017"
 		testcases+=" nvme/018"
 		testcases+=" nvme/019"
 		testcases+=" nvme/020"
@@ -196,24 +214,24 @@ function runtest() {
 		testcases+=" nvme/029"
 		testcases+=" nvme/030"
 		testcases+=" nvme/031"
-		uname -r | grep -q 5.14 || testcases+=" nvme/032" #BZ2005657
+		#testcases+=" nvme/032" #BZ2005657
+		#testcases+=" nvme/033"
+		#testcases+=" nvme/034"
+		#testcases+=" nvme/035"
+		#testcases+=" nvme/036"
+		#testcases+=" nvme/037"
 		testcases+=" nvme/038"
+		testcases+=" nvme/039" #nvme fault injection on debug kernel
 		testcases+=" nvme/040"
 		cki_kver_ge "5.14.0-179" && testcases+=" nvme/041"
 		cki_kver_ge "5.14.0-179" && testcases+=" nvme/042"
-		testcases+=" scsi/001"
-		testcases+=" scsi/002"
-		testcases+=" scsi/004"
-		testcases+=" scsi/005"
-		testcases+=" scsi/006"
-		testcases+=" zbd/001"
-		testcases+=" zbd/002"
-		testcases+=" zbd/003"
-		testcases+=" zbd/004"
-		testcases+=" zbd/005"
-		testcases+=" zbd/006"
+		cki_kver_ge "5.14.0-179" && testcases+=" nvme/043"
+		cki_kver_ge "5.14.0-179" && testcases+=" nvme/044"
+		cki_kver_ge "5.14.0-179" && testcases+=" nvme/045"
+		#testcases+=" nvme/046" #basic test for unprivileged passthrough on /dev/ngX
+		#testcases+=" nvme/049" #basic test for uring-passthrough I/O on /dev/ngX
 		tok "cd blktests && ./check $testcases"
-	elif rlIsFedora ">29"; then
+	elif rlIsFedora; then
 		#For fedora-29
 #		tok "cd blktests && ./check block/001 block/002 block/003 block/004 block/005 block/006 block/007 block/009 block/010 block/011 block/012 block/013 block/016 block/017 block/018 block/020 block/021 block/023 block/025 loop/001 loop/002 loop/003 loop/004 loop/005 loop/006 nvme/004 nvme/006 nvme/007 nvme/008 nvme/009 nvme/010 nvme/011 nvme/012 nvme/013 nvme/014 nvme/015 nvme/017 nvme/019 nvme/020 nvme/021 nvme/022 nvme/023 nvme/024 nvme/026 nvme/027 nvme/028"
 		testcases+=" block/001"

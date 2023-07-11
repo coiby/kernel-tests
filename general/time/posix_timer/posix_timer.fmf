@@ -1,0 +1,19 @@
+summary: Posix timer/clock test
+description: |
+    Upstream case "Open POSIX Test Suite"
+    Git repo: https://github.com/juj/posixtestsuite
+    Project: http://posixtest.sourceforge.net/
+    For timers/clock: TMR) echo "Executing timers and clocks tests"
+      $ ./run_tests TMR
+contact: Qiao Zhao <qzhao@redhat.com>
+id: 312e51ea-aaf4-4278-a1e6-bf490cec8cb8
+test: bash -x ./runtest.sh
+framework: shell
+require:
+  - gcc
+  - make
+  - wget
+  - tar
+duration: 30m
+extra-summary: general/time/posix_timer
+extra-task: general/time/posix_timer

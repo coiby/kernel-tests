@@ -2,9 +2,17 @@
 
 LOOKASIDE=https://github.com/yizhanglinux/blktests.git
 
+if rlIsRHEL 7; then
+	BR=rhel7
+elif rlIsRHEL 8; then
+	BR=nvme-rdma-tcp
+elif rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
+	BR=rhel9-fedora
+fi
+
 rm -rf blktests
-git clone $LOOKASIDE
-pushd blktests
+git clone -b $BR $LOOKASIDE
+pushd blktests || exit 200
 
 if ! modprobe -qn rdma_rxe; then
 	export USE_SIW="1"
@@ -14,7 +22,6 @@ fi
 
 # modprobe siw on ppc64le with distro less than RHEL8.4 will lead panic, BZ1919502
 # siw srp testing with distro less than RHEL8.4 on x86_64 has issues
-ARCH=$(uname -i)
 ver="4.18.0-305"
 KVER=$(uname -r)
 if [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then
@@ -22,8 +29,9 @@ if [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then
 fi
 
 make
+# shellcheck disable=SC2181
 if (( $? != 0 )); then
 	cki_abort_task "Abort test because build env setup failed"
 fi
 
-popd
+popd || exit 200

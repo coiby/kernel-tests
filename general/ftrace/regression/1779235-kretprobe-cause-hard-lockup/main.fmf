@@ -2,6 +2,10 @@ summary: Regression test for 1779235
 description: |
     Regression test for 1779235 - bpftrace experienced Kernel panic - not syncing: Hard LOCKUP
 contact: Ziqian SUN <zsun@redhat.com>
+enabled: true
+id: 8a4bfa4b-ecda-4651-8fab-8b3d9c558ca5
+component:
+  - kernel
 test: ./runtest.sh
 framework: beakerlib
 duration: 60m

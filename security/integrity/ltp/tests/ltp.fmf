@@ -1,6 +1,7 @@
 summary: Security Integrity ltp
 description: ''
 contact: Linqing Lu <lilu@redhat.com>
+id: d955bc5b-58bb-420a-ae46-5b0f940daae3
 component:
   - kernel
 path: /security/integrity/ltp

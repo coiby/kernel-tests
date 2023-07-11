@@ -1,0 +1,12 @@
+summary: System vaule /proc/sys/kernel/timer_migration testing
+contact: Qiao Zhao <qzhao@redhat.com>
+id: a0a7f69a-2bb3-4dc5-b8d7-114038b12582
+component:
+  - kernel
+test: bash -x ./runtest.sh
+framework: shell
+duration: 10m
+tier: 1
+tag: [tier1]
+extra-summary: /kernel-tests/general/time/timer_migration
+extra-task: /kernel-tests/general/time/timer_migration

@@ -25,7 +25,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-function hugepagesz()
+function default_hugepagesz()
 {
     rlRun "cat /proc/meminfo  | grep '^Huge\|Mem'"
     grep -q pdpe1gb /proc/cpuinfo

@@ -6,7 +6,7 @@ discover:
 prepare:
   - name: Install packages
     how: install
-    package: [numactl, kernel]
+    package: [numactl]
   - name: Install test dependent framework.
     how: install
     package: [beakerlib]

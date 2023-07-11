@@ -1,0 +1,11 @@
+summary: Regression testing for bug 912662
+contact: Qiao Zhao <qzhao@redhat.com>
+id: 5280cbe7-f621-4913-928b-625d5ad1c020
+test: bash -x ./runtest.sh
+framework: shell
+require:
+  - gcc
+duration: 2h
+tier: 1
+extra-summary: general/time/regression/bz912662_stime_stall
+extra-task: general/time/regression/bz912662_stime_stall

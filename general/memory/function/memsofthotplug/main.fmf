@@ -17,7 +17,6 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 recommend:
-  - kernel
   - numactl
 duration: 2h
 tag:

@@ -1,0 +1,35 @@
+summary: KG-VMM kselftest
+description: test wrapper for kernel selftest
+contact: Hangbin Liu <haliu@redhat.com>
+id: 83986a89-c53a-4ed6-a17b-6c18216168b8
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - tar
+  - autoconf
+  - automake
+  - wget
+  - bison
+  - bpftool
+  - flex
+  - python3
+  - llvm
+  - iproute-tc
+  - clang
+  - jq
+  - ethtool
+  - net-tools
+  - nmap-ncat
+recommend:
+  - netsniff-ng
+  - valgrind
+  - numactl-libs
+  - socat
+  - iperf3
+  - scapy
+duration: 24h
+extra-summary: kselftests
+extra-task: kselftests

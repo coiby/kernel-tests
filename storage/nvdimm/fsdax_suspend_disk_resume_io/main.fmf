@@ -1,0 +1,23 @@
+summary: KS-TC:nvdimm/fsdax_suspend_disk_resume_io
+description: Test suspend to disk and resume during fsdax io
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/fsdax_suspend_disk_resume_io
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - fio
+  - ndctl
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/fsdax_suspend_disk_resume_io
+extra-task: /storage/nvdimm/fsdax_suspend_disk_resume_io
+adjust:
+    enabled: false
+    when: distro < rhel-8
+id: 8630f977-b3df-452b-9e0e-7526455169bf

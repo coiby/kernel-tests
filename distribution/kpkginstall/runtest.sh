@@ -79,6 +79,9 @@ function store_kpkg_url_variables()
 
 function load_kpkg_url_variables()
 {
+  # Clean up KPKG_URL so that it contains only the URL without variables.
+  # as all parameters from the URL have been saved already to file
+  KPKG_URL=${KPKG_URL%\#*}
   for file in /var/tmp/kpkginstall/vars/*; do
     if [[ -f ${file} ]]; then
       export "${file##*/}=$(cat "${file}")"
@@ -107,7 +110,7 @@ function get_kpkg_ver()
     return
   fi
 
-  if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+  if [[ ${KPKG_URL} == *.tar.gz ]] ; then
     declare -r kpkg=${KPKG_URL##*/}
     KVER=$(tar tf "$kpkg" | sed -n 's/^boot\/vmlinu[xz]\(-kbuild\)\?-//p' | head -n 1)
   else
@@ -148,7 +151,7 @@ function get_kpkg_ver()
     fi
     if [[ -z "$KVER" ]]; then
         echo "${repoquery_output}"
-        cki_abort_recipe "get_kpkg_ver: Failed to extract kernel version from the rpm package" FAIL
+        cki_abort_recipe "get_kpkg_ver: Failed to extract kernel version from the rpm package" WARN
     fi
   fi
 
@@ -158,7 +161,7 @@ function get_kpkg_ver()
 
 function kpkg_release()
 {
-  if [[ ${KPKG_URL} =~ .*\.tar\.gz ]]; then
+  if [[ ${KPKG_URL} == *.tar.gz ]]; then
     echo "${KVER//.${ARCH}/}"
   else
     echo "${KVER}"
@@ -179,7 +182,7 @@ function targz_install()
   cki_print_info "targz_install: Extracting kernel version from ${KPKG_URL}"
   get_kpkg_ver
   if [ -z "${KVER}" ]; then
-    cki_abort_recipe "targz_install: Failed to extract kernel version from the package" FAIL
+    cki_abort_recipe "targz_install: Failed to extract kernel version from the package" WARN
   else
     cki_print_success "Kernel version is ${KVER}"
   fi
@@ -265,7 +268,7 @@ function select_yum_tool()
 {
   if [ -x /usr/bin/dnf ]; then
     YUM=/usr/bin/dnf
-    ALL="--all"
+    ALL=""
     COPR_PLUGIN_PACKAGE=dnf-plugins-core
     if [[ -e /run/ostree-booted ]]; then
       RPM_OSTREE=/usr/bin/rpm-ostree
@@ -275,7 +278,7 @@ function select_yum_tool()
     ALL="all"
     COPR_PLUGIN_PACKAGE=yum-plugin-copr
   else
-    cki_abort_recipe "No tool to download kernel from a repo" WARN
+    cki_abort_recipe "No tool to download kernel from a repo" FAIL
   fi
 
   cki_print_info "Installing package manager prerequisites"
@@ -337,7 +340,7 @@ function download_install_package()
     if $YUM install -y "$1" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Installed $1 successfully"
     else
-      cki_abort_recipe "Failed to install $1!" FAIL
+      cki_abort_recipe "Failed to install $1!" WARN
     fi
   else
     cki_print_info "Test automotive installed kernel"
@@ -365,7 +368,7 @@ function download_install_package()
       if rpm-ostree override replace /root/kernel*.rpm >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
-        cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
+        cki_abort_recipe "RPM-OSTREE failed to install $1!" WARN
       fi
     else
       # debug kernel automotive
@@ -378,7 +381,7 @@ function download_install_package()
         --install "/root/kernel-automotive-debug-modules-core-${KVER_RPM}.rpm" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
-        cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
+        cki_abort_recipe "RPM-OSTREE failed to install $1!" WARN
       fi
     fi
   fi
@@ -389,7 +392,7 @@ function rpm_install()
   cki_print_info "rpm_install: Extracting kernel version from ${KPKG_URL}"
   get_kpkg_ver
   if [ -z "${KVER_RPM}" ]; then
-    cki_abort_recipe "rpm_install: Failed to extract kernel rpm version from the package" FAIL
+    cki_abort_recipe "rpm_install: Failed to extract kernel rpm version from the package" WARN
   else
     cki_print_success "Kernel version is ${KVER_RPM}"
   fi
@@ -569,7 +572,7 @@ function install_kernel() {
       done
 
       error=0
-      if [[ "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+      if [[ ${KPKG_URL} == *.tar.gz ]] ; then
           targz_install || error=1
       elif [[ "${KPKG_URL}" =~ ^[^/]+/[^/]+$ ]] ; then
           print_kpkg_url_variables_rpm || error=1
@@ -652,7 +655,7 @@ EOF
       # set YUM var.
       select_yum_tool
 
-      if [[ ! "${KPKG_URL}" =~ .*\.tar\.gz ]] ; then
+      if [[ ${KPKG_URL} != *.tar.gz ]] ; then
         print_kpkg_url_variables_rpm
       fi
       cki_print_info "after reboot: Extracting kernel version from ${KPKG_URL}"
@@ -673,15 +676,17 @@ EOF
 
       cki_print_success "Found the correct kernel release running!"
 
-      # install kernel packages that shouldn't be needed to boot with,
-      # but we still want have them installed
-      if ! cki_is_kernel_automotive; then
-        rpm_extra_package_install
-      fi
-      # rpm-ostree extra packages install has to be after reboot
-      if [[ -n $RPM_OSTREE ]]; then
-        cki_print_info "Install kernel extra packages - rpm-ostree after reboot"
-        ostree_extra_package_install
+      if [[ ${KPKG_URL} != *.tar.gz ]] ; then
+        # install kernel packages that shouldn't be needed to boot with,
+        # but we still want have them installed
+        if ! cki_is_kernel_automotive; then
+          rpm_extra_package_install
+        fi
+        # rpm-ostree extra packages install has to be after reboot
+        if [[ -n $RPM_OSTREE ]]; then
+          cki_print_info "Install kernel extra packages - rpm-ostree after reboot"
+          ostree_extra_package_install
+        fi
       fi
 
       # save the CKI installed kernel so following tests can check if they are running on correct kernel
@@ -704,7 +709,7 @@ EOF
           elif grep -qFx CONFIG_CC_IS_CLANG=y "$PREFIX/.config"; then
             KCC=clang
           else
-            cki_abort_recipe "Kernel built with an unknown compiler" WARN
+            cki_abort_recipe "Kernel built with an unknown compiler" FAIL
           fi
 
           # detect the right linker to use
@@ -713,7 +718,7 @@ EOF
           elif grep -qFx CONFIG_LD_IS_LLD=y "$PREFIX/.config"; then
             KLD=ld.lld
           else
-            cki_abort_recipe "Kernel built with an unknown linker" WARN
+            cki_abort_recipe "Kernel built with an unknown linker" FAIL
           fi
 
           # Backup and restore the .config files otherwise regenerated .config
@@ -743,7 +748,7 @@ EOF
           if [ $error -ne 0 ]; then
               # Make sure the file is removed, in case of rerun it doens't skip this step
               rm -f "/usr/src/kernels/$ckver/scripts/basic/fixdep"
-              cki_abort_recipe "Failed applying cross compiling workaround" WARN
+              cki_abort_recipe "Failed applying cross compiling workaround" FAIL
           fi
         fi
       fi
@@ -755,13 +760,11 @@ EOF
       sysctl kernel.panic_on_oops
 
       # We have the right kernel. Do we have any call traces?
-      reboot_status="PASS"
       DMESGLOG=/tmp/dmesg.log
       dmesg > ${DMESGLOG}
       grep -qi 'Call Trace:' "${DMESGLOG}"
       dmesgret=$?
       if [[ ${dmesgret} -eq 0 ]]; then
-        reboot_status="FAIL"
         cki_print_warning "Call trace found in dmesg, see dmesg.log"
         # dmesg.log is uploaded by default by rstrnt-report-result
         # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check#L74
@@ -775,14 +778,12 @@ EOF
         grep -qi 'Call Trace:' "${JOURNALCTLLOG}"
         journalctlret=$?
         if [[ ${journalctlret} -eq 0 ]]; then
-          reboot_status="FAIL"
           cki_print_warning "Call trace found in journalctl, see journalctl.log"
           rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check WARN 7
         else
           rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check PASS 0
         fi
       fi
-      rstrnt-report-result ${TEST}/reboot ${reboot_status}
 
       # Clean up temporary files
       rm -rfv /var/tmp/kpkginstall

@@ -355,6 +355,8 @@ Describe 'kpkginstall: get_kpkg_ver tarball'
     AfterAll 'cleanup'
     It 'can set kernel version'
         export KPKG_URL="$KERNEL_TGZ_URL"
+        # we assume parse_kpkg_url_variables has been called before get_kpkg_ver is called
+        KPKG_URL=${KPKG_URL%\#*}
         tar(){
             echo "boot/vmlinuz-6.1.0-rc7"
         }
@@ -664,11 +666,14 @@ Describe 'kpkginstall: main - check installed kernel'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "Running kernel release:  ${KVER_UNAME}"
         The stdout should include "✅ Found the correct kernel release running!"
-        The stdout should include "rpm_extra_package_install"
+        if [[ ${KPKG_URL} != *.tar.gz ]] ; then
+            The stdout should include "rpm_extra_package_install"
+        else
+            The stdout should not include "rpm_extra_package_install"
+        fi
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot PASS"
         The status should be success
     End
 
@@ -688,7 +693,6 @@ Describe 'kpkginstall: main - check installed kernel'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check WARN 7"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot FAIL"
         The status should be success
     End
 
@@ -708,7 +712,6 @@ Describe 'kpkginstall: main - check installed kernel'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check WARN 7"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot FAIL"
         The status should be success
     End
 End
@@ -767,7 +770,6 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/reboot PASS"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End
@@ -790,7 +792,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should not include "make -C /usr/src/kernels/$KVER_UNAME modules_prepare"
-        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround FAIL"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End
@@ -813,7 +815,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
         The stdout should not include "make -C /usr/src/kernels/$KVER_UNAME scripts"
-        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround FAIL"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End
@@ -835,7 +837,7 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling non x86_64 kernels"
-        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround WARN"
+        The stdout should include "cki_abort_recipe Failed applying cross compiling workaround FAIL"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End

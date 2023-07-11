@@ -3,6 +3,9 @@
 # Source the common test script helpers
 . /usr/bin/rhts_environment.sh
 . ../../kernel-include/runtest.sh
+source /etc/os-release
+
+RHEL_X=$(echo $VERSION_ID | cut -d. -f1)
 
 CUR_TIME=$(date --date="$(date --utc)" +%s)
 # control where to log debug messages to:
@@ -1406,12 +1409,10 @@ if [ "$RHEL6TREE" == "0" ] ; then
 fi
 
 # Generic test variables
-if curl -s http://download-node-02.eng.bos.redhat.com/brewroot/vol/rhel-5/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel/$kernarch/$testkernbase.$kernarch.rpm -o /dev/null -f; then
-        httpbase=http://download-node-02.eng.bos.redhat.com/brewroot/vol/rhel-5/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
-elif curl -s http://download-node-02.eng.bos.redhat.com/brewroot/vol/rhel-6/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel/$kernarch/$testkernbase.$kernarch.rpm -o /dev/null -f; then
-        httpbase=http://download-node-02.eng.bos.redhat.com/brewroot/vol/rhel-6/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
+if curl -s http://download-node-02.eng.bos.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel/$kernarch/$testkernbase.$kernarch.rpm -o /dev/null -f; then
+    httpbase=http://download-node-02.eng.bos.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
 else
-        httpbase=http://download-node-02.eng.bos.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
+    httpbase=http://download-node-02.eng.bos.redhat.com/brewroot/vol/rhel-${RHEL_X}/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
 fi
 archbase=http://download-node-02.eng.bos.redhat.com/brewroot/vol/kernelarchive/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
 

@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_suspend_disk_resume
+description: Test suspend to disk and resume on rdma server
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_suspend_disk_resume
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_suspend_disk_resume
+extra-task: /storage/nvme_rdma/nvmeof_rdma_suspend_disk_resume
+id: 7dc00a03-086a-4322-a7b4-289a2b353479

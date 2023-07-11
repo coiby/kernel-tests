@@ -1,0 +1,14 @@
+summary: kernel syscall gettimeofday() test with multi thread
+contact: Qiao Zhao <qzhao@redhat.com>
+id: 090e837b-fa07-437a-bbbe-a2ffb873570b
+component:
+  - kernel
+test: bash -x ./runtest.sh
+framework: shell
+duration: 120m
+require:
+  - gcc
+tier: 1
+tag: [tier1]
+extra-summary: /kernel-tests/general/time/multi_thread_gettimeofday
+extra-task: /kernel-tests/general/time/multi_thread_gettimeofday

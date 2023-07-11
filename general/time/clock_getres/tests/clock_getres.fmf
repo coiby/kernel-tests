@@ -1,6 +1,7 @@
 summary: clock_getres() function check
 description: clock_getres() function check
 contact: Qiao Zhao <qzhao@redhat.com>
+id: b07227e7-e6de-489e-ac75-676aba365273
 component:
   - kernel
 path: /general/time/clock_getres

@@ -1,0 +1,11 @@
+task: memory/fork_mem
+summary: Avocado Form Memory Test
+id: b2a7f9c5-bde6-4ce2-a9f9-9f10ece6bcbd
+test: bash ./runtest.sh
+framework: beakerlib
+contact: Rachel Sibley <rasibley@redhat.com>
+require:
+  - git
+  - python3-pip
+extra-summary: /kernel/memory/fork_mem
+extra-task: /kernel/memory/fork_mem

@@ -9,7 +9,7 @@ destructive=no
 [restraint]
 entry_point=./runtest.sh
 max_time=30m
-dependencies=kernel gcc
+dependencies=gcc
 repoRequires=general/include
 TestVersion=1.0
 Path=/mnt/tests/kernel/general/memory/function/page_mkclean_one

@@ -1,38 +1,9 @@
-#!/bin/sh
-#
-# Copyright (c) 2020 Red Hat, Inc. All rights reserved.
-#
-# This copyrighted material is made available to anyone wishing
-# to use, modify, copy, or redistribute it subject to the terms
-# and conditions of the GNU General Public License version 2.
-#
-# This program is distributed in the hope that it will be
-# useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-# PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public
-# License along with this program; if not, write to the Free
-# Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-# Boston, MA 02110-1301, USA.
-#
+#!/bin/bash
 
 TNAME="storage/blktests/nvme/nvme-tcp"
 TRTYPE=${TRTYPE:-"tcp"}
 
-source ../../include/include.sh || exit 1
-
-function enable_nvme_core_multipath
-{
-	modprobe nvme_core
-	if [ -e "/sys/module/nvme_core/parameters/multipath" ]; then
-		modprobe -qfr nvme_rdma nvme_fabrics nvme nvme_core
-		echo "options nvme_core multipath=Y"  > /etc/modprobe.d/nvme.conf
-		modprobe nvme
-		#wait enough time for NVMe disk initialized
-		sleep 5
-	fi
-}
+. ../../include/include.sh || exit 1
 
 function do_test
 {
@@ -42,8 +13,8 @@ function do_test
 
 	typeset this_case=$test_ws/tests/$test_case
 	echo ">>> $(get_timestamp) | Start to run test case nvme-$trtype: $this_case ..."
-	(cd $test_ws && nvme_trtype=$trtype ./check $test_case)
-	typeset result=$(get_test_result $test_ws $test_case)
+	(cd "$test_ws" && nvme_trtype="$trtype" ./check "$test_case")
+	result=$(get_test_result "$test_ws" "$test_case")
 	echo ">>> $(get_timestamp) | End nvme-$trtype: $this_case | $result"
 
 	typeset -i ret=0
@@ -67,7 +38,8 @@ function do_test
 function get_test_cases_tcp
 {
 	typeset testcases=""
-	if ! rlIsRHEL 7; then
+
+	if rlIsRHEL 8; then
 		testcases+=" nvme/003"
 		testcases+=" nvme/004"
 		testcases+=" nvme/005"
@@ -96,9 +68,46 @@ function get_test_cases_tcp
 		testcases+=" nvme/029"
 		uname -ri | grep -q "4.18.0-147.*s390x" || testcases+=" nvme/030" # BZ1753057, skip on 8.1.z fixed on 8.2
 		uname -ri | grep "4.18.0-147" | grep -qE "x86_64|s390x|ppc64le" || testcases+=" nvme/031"
-
+	elif rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
+		testcases+=" nvme/003"
+		testcases+=" nvme/004"
+		testcases+=" nvme/005"
+		testcases+=" nvme/006"
+		testcases+=" nvme/007"
+		testcases+=" nvme/008"
+		testcases+=" nvme/009"
+		testcases+=" nvme/010"
+		testcases+=" nvme/011"
+		testcases+=" nvme/012"
+		testcases+=" nvme/013"
+		testcases+=" nvme/014"
+		testcases+=" nvme/015"
+		testcases+=" nvme/018"
+		testcases+=" nvme/019"
+		testcases+=" nvme/020"
+		testcases+=" nvme/021"
+		testcases+=" nvme/022"
+		testcases+=" nvme/023"
+		testcases+=" nvme/024"
+		testcases+=" nvme/025"
+		testcases+=" nvme/026"
+		testcases+=" nvme/027"
+		testcases+=" nvme/028"
+		testcases+=" nvme/029"
+		testcases+=" nvme/030"
+		testcases+=" nvme/031"
+		testcases+=" nvme/038"
+		testcases+=" nvme/040"
+		testcases+=" nvme/041"
+		testcases+=" nvme/042"
+		testcases+=" nvme/043"
+		testcases+=" nvme/044"
+		testcases+=" nvme/045"
+		testcases+=" nvme/047"
+		testcases+=" nvme/048"
 	fi
-	echo $testcases
+
+	echo "$testcases"
 }
 
 . ../include/build.sh
@@ -107,17 +116,16 @@ enable_nvme_core_multipath
 
 test_ws=./blktests
 ret=0
-for trtype in $TRTYPE; do
-	testcases_default=""
-	testcases_default+=" $(get_test_cases_${trtype})"
-	testcases=${_DEBUG_MODE_TESTCASES:-"$(echo $testcases_default)"}
-	for testcase in $testcases; do
-		do_test $test_ws $testcase $trtype
-		((ret += $?))
-	done
+trtype=$TRTYPE
+testcases_default=""
+testcases_default+=" $(get_test_cases_tcp)"
+testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
+for testcase in $testcases; do
+	do_test "$test_ws" "$testcase" "$trtype"
+	((ret += $?))
 done
 
-if (( $ret != 0 )); then
+if (( ret != 0 )); then
 	echo ">> There are failing tests, pls check it"
 fi
 

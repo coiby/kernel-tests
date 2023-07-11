@@ -1,0 +1,11 @@
+summary: kernel function udelay test
+contact: Qiao Zhao <qzhao@redhat.com>
+id: 7df6403f-5699-4949-b0b9-8ef1dd201211
+test: bash -x ./runtest.sh
+framework: shell
+require:
+  - gcc
+  - make
+duration: 30m
+extra-summary: general/time/udelay_test
+extra-task: general/time/udelay_test

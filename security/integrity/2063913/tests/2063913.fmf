@@ -1,6 +1,7 @@
 summary: Security Integrity verifier for 2063913
 description: ''
 contact: Linqing Lu <lilu@redhat.com>
+id: f3c1b1b4-4e14-4ddc-a526-f0dc44baf7a9
 component:
   - kernel
 path: /security/integrity/2063913

@@ -1,6 +1,6 @@
 # storage/blktests/nvme/nvme-rdma test suite
 
-Storage: nvme rdma test
+Storage: nvme-rdma test
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.
