@@ -644,7 +644,7 @@ sriov_setup_pod_container()
 	do
 		echo "####Download container image...####"
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N -c -t 3 http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos_stream8_aarch64.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
 			podman load --input container_sriov_centos_stream8_aarch64.tar
 			if [ $? -eq 0 ]
 			then
@@ -664,7 +664,7 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N -c -t 3 http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/centos_stream8_ppc64le.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
@@ -684,7 +684,7 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N -c -t 3 http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos8.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
