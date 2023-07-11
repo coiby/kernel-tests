@@ -630,48 +630,50 @@ sriov_setup_container()
 
 sriov_setup_pod_container()
 {
+	echo "######sriov_setup_pod_container#######"
 	#create pod
 	podman pod create --name $pod1
 	podman pod create --name $pod2
 
 	#check pod
+	echo "####check the pod via 'podman pod ps'####"
 	podman pod ps
 
 	#get image
 	for time in `seq 0 5`
 	do
-		echo "Download container image..."
+		echo "####Download container image...####"
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8-arm.tar
-			podman load --input container_sriov_centos8-arm.tar
+			wget -nv -N -c -t 3 http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos_stream8_aarch64.tar
+			podman load --input container_sriov_centos_stream8_aarch64.tar
 			if [ $? -eq 0 ]
 			then
-				echo "add container to the pod"
-				podman run -dt --name $container1 --pod $pod1 $c_image_arm sleep infinity
-				podman run -dt --name $container2 --pod $pod1 $c_image_arm sleep infinity
-				podman run -dt --name $container3 --pod $pod2 $c_image_arm sleep infinity
-				podman run -dt --name $container4 --pod $pod2 $c_image_arm sleep infinity
-				echo "check the contaiers"
+				echo "####add container to the pod####"
+				podman run  --privileged -dt --name $container1 --pod $pod1 $c_image_arm sleep infinity
+				podman run  --privileged -dt --name $container2 --pod $pod1 $c_image_arm sleep infinity
+				podman run  --privileged -dt --name $container3 --pod $pod2 $c_image_arm sleep infinity
+				podman run  --privileged -dt --name $container4 --pod $pod2 $c_image_arm sleep infinity
+				echo "####check the contaiers via 'podman ps -a --pod'####"
 				podman ps -a --pod
-				podman exec $container1 yum install -y iproute
-				podman exec $container2 yum install -y iproute
-				podman exec $container3 yum install -y iproute
-				podman exec $container4 yum install -y iproute
+				podman exec $container1 yum install -y iproute iperf3
+				podman exec $container2 yum install -y iproute iperf3
+				podman exec $container3 yum install -y iproute iperf3
+				podman exec $container4 yum install -y iproute iperf3
 				return 0
 			else
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
+			wget -nv -N -c -t 3 http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
-				echo "add container to the pod"
-				podman run -dt --name $container1 --pod $pod1 $c_image_ppc64le sleep infinity
-				podman run -dt --name $container2 --pod $pod1 $c_image_ppc64le sleep infinity
-				podman run -dt --name $container3 --pod $pod2 $c_image_ppc64le sleep infinity
-				podman run -dt --name $container4 --pod $pod2 $c_image_ppc64le sleep infinity
-				echo "check the contaiers"
+				echo "####add container to the pod####"
+				podman run  --privileged -dt --name $container1 --pod $pod1 $c_image_ppc64le sleep infinity
+				podman run  --privileged -dt --name $container2 --pod $pod1 $c_image_ppc64le sleep infinity
+				podman run  --privileged -dt --name $container3 --pod $pod2 $c_image_ppc64le sleep infinity
+				podman run  --privileged -dt --name $container4 --pod $pod2 $c_image_ppc64le sleep infinity
+				echo "####check the contaiers via 'podman ps -a --pod'####"
 				podman ps -a --pod
 				podman exec $container1 yum install -y iproute
 				podman exec $container2 yum install -y iproute
@@ -682,16 +684,16 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
+			wget -nv -N -c -t 3 http://netqe-bj.usersys.redhat.com/share/zhguan/oc_container/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
-				echo "add container to the pod"
-				podman run -dt --name $container1 --pod $pod1 $c_image sleep infinity
-				podman run -dt --name $container2 --pod $pod1 $c_image sleep infinity
-				podman run -dt --name $container3 --pod $pod2 $c_image sleep infinity
-				podman run -dt --name $container4 --pod $pod2 $c_image sleep infinity
-				echo "check the contaiers"
+				echo "####add container to the pod####"
+				podman run  --privileged -dt --name $container1 --pod $pod1 $c_image sleep infinity
+				podman run  --privileged -dt --name $container2 --pod $pod1 $c_image sleep infinity
+				podman run  --privileged -dt --name $container3 --pod $pod2 $c_image sleep infinity
+				podman run  --privileged -dt --name $container4 --pod $pod2 $c_image sleep infinity
+				echo "####check the contaiers via 'podman ps -a --pod'####"
 				podman ps -a --pod
 				return 0
 			else
