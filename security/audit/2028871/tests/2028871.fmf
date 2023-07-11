@@ -1,6 +1,7 @@
 summary: Security Audit verifier for 2028871
 description: ''
 contact: Linqing Lu <lilu@redhat.com>
+id: 9ab543e4-e986-4b7e-b2cf-6b7e0841e32a
 component:
   - kernel
 path: /security/audit/2028871

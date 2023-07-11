@@ -1,6 +1,7 @@
 summary: Security Audit upstream testsuite
 description: ''
 contact: Linqing Lu <lilu@redhat.com>
+id: c7d1dcde-2da1-476e-8865-21c00be2a618
 component:
   - kernel
 path: /security/audit/testsuite

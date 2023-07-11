@@ -1,7 +1,8 @@
 summary: Check /sys/devices/system/cpu/vulnerabilities/* for unmitigated CVEs
 contact: Jeff Bastian <jbastian@redhat.com>
+id: b70fb098-80c4-4a6d-908e-3e7dd045b5b7
 path: /security/vulnerabilities
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
 duration: 5m
 component:

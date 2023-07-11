@@ -1,6 +1,7 @@
 summary: Security Crypto enable_fips
 description: ''
 contact: Linqing Lu <lilu@redhat.com>
+id: 9648b316-0dfe-4083-afc8-ab2b12930b6a
 component:
   - kernel
 path: /security/crypto/enable_fips

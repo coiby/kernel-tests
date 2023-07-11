@@ -1,6 +1,7 @@
 summary: Kernel KRSI selftests
 contact: Linqing Lu <lilu@redhat.com>
-test: ./runtest.sh
+id: b54840dc-08be-41e3-8cd8-7ab0f5ff4fac
+test: bash ./runtest.sh
 path: /security/krsi
 framework: beakerlib
 component:
