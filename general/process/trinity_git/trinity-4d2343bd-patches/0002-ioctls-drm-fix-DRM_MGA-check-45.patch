@@ -1,0 +1,38 @@
+From e71872454d26baf37ae1d12e9b04a73d64179555 Mon Sep 17 00:00:00 2001
+From: chuhu <chuhu@redhat.com>
+Date: Tue, 11 Jul 2023 02:57:35 +0800
+Subject: [PATCH] ioctls/drm: fix DRM_MGA check (#45)
+
+Some IOCTL_NOUVEAU tests are checked under USE_DRM_MGA macro, this is
+not correct, correct it.
+
+Fixes: 6823bacb (ioctls/drm: check i810,mga,r128 and savage support (#44))
+
+Signed-off-by: Chunyu Hu <chuhu@redhat.com>
+---
+ ioctls/drm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ioctls/drm.c b/ioctls/drm.c
+index a07a8436..d938f707 100644
+--- a/ioctls/drm.c
++++ b/ioctls/drm.c
+@@ -403,6 +403,7 @@ static const struct ioctl drm_ioctls[] = {
+ 	IOCTL(DRM_IOCTL_MGA_SET_FENCE),
+ 	IOCTL(DRM_IOCTL_MGA_WAIT_FENCE),
+ 	IOCTL(DRM_IOCTL_MGA_DMA_BOOTSTRAP),
++#endif
+ 
+ 	/* nouveau_drm.h */
+ 	IOCTL(DRM_IOCTL_NOUVEAU_GETPARAM),
+@@ -412,7 +413,6 @@ static const struct ioctl drm_ioctls[] = {
+ 	IOCTL(DRM_IOCTL_NOUVEAU_GROBJ_ALLOC),
+ 	IOCTL(DRM_IOCTL_NOUVEAU_NOTIFIEROBJ_ALLOC),
+ 	IOCTL(DRM_IOCTL_NOUVEAU_GPUOBJ_FREE),
+-#endif
+ #ifdef DRM_IOCTL_NOUVEAU_GEM_NEW
+ 	IOCTL(DRM_IOCTL_NOUVEAU_GEM_NEW),
+ #endif
+-- 
+2.34.1
+
