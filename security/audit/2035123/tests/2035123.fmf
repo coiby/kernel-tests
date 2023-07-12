@@ -1,6 +1,7 @@
 summary: Security Audit verifier for 2035123
 description: ''
 contact: Dennis Li <denli@redhat.com>
+id: 8c633f5d-3f43-423f-b134-c02fb5f2d3b6
 component:
   - kernel
 path: /security/audit/2035123
