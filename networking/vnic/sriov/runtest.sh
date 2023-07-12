@@ -630,48 +630,50 @@ sriov_setup_container()
 
 sriov_setup_pod_container()
 {
+	echo "######sriov_setup_pod_container#######"
 	#create pod
 	podman pod create --name $pod1
 	podman pod create --name $pod2
 
 	#check pod
+	echo "####check the pod via 'podman pod ps'####"
 	podman pod ps
 
 	#get image
 	for time in `seq 0 5`
 	do
-		echo "Download container image..."
+		echo "####Download container image...####"
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8-arm.tar
-			podman load --input container_sriov_centos8-arm.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
+			podman load --input container_sriov_centos_stream8_aarch64.tar
 			if [ $? -eq 0 ]
 			then
-				echo "add container to the pod"
-				podman run -dt --name $container1 --pod $pod1 $c_image_arm sleep infinity
-				podman run -dt --name $container2 --pod $pod1 $c_image_arm sleep infinity
-				podman run -dt --name $container3 --pod $pod2 $c_image_arm sleep infinity
-				podman run -dt --name $container4 --pod $pod2 $c_image_arm sleep infinity
-				echo "check the contaiers"
+				echo "####add container to the pod####"
+				podman run  --privileged -dt --name $container1 --pod $pod1 $c_image_arm sleep infinity
+				podman run  --privileged -dt --name $container2 --pod $pod1 $c_image_arm sleep infinity
+				podman run  --privileged -dt --name $container3 --pod $pod2 $c_image_arm sleep infinity
+				podman run  --privileged -dt --name $container4 --pod $pod2 $c_image_arm sleep infinity
+				echo "####check the contaiers via 'podman ps -a --pod'####"
 				podman ps -a --pod
-				podman exec $container1 yum install -y iproute
-				podman exec $container2 yum install -y iproute
-				podman exec $container3 yum install -y iproute
-				podman exec $container4 yum install -y iproute
+				podman exec $container1 yum install -y iproute iperf3
+				podman exec $container2 yum install -y iproute iperf3
+				podman exec $container3 yum install -y iproute iperf3
+				podman exec $container4 yum install -y iproute iperf3
 				return 0
 			else
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
-				echo "add container to the pod"
-				podman run -dt --name $container1 --pod $pod1 $c_image_ppc64le sleep infinity
-				podman run -dt --name $container2 --pod $pod1 $c_image_ppc64le sleep infinity
-				podman run -dt --name $container3 --pod $pod2 $c_image_ppc64le sleep infinity
-				podman run -dt --name $container4 --pod $pod2 $c_image_ppc64le sleep infinity
-				echo "check the contaiers"
+				echo "####add container to the pod####"
+				podman run  --privileged -dt --name $container1 --pod $pod1 $c_image_ppc64le sleep infinity
+				podman run  --privileged -dt --name $container2 --pod $pod1 $c_image_ppc64le sleep infinity
+				podman run  --privileged -dt --name $container3 --pod $pod2 $c_image_ppc64le sleep infinity
+				podman run  --privileged -dt --name $container4 --pod $pod2 $c_image_ppc64le sleep infinity
+				echo "####check the contaiers via 'podman ps -a --pod'####"
 				podman ps -a --pod
 				podman exec $container1 yum install -y iproute
 				podman exec $container2 yum install -y iproute
@@ -682,16 +684,16 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
-				echo "add container to the pod"
-				podman run -dt --name $container1 --pod $pod1 $c_image sleep infinity
-				podman run -dt --name $container2 --pod $pod1 $c_image sleep infinity
-				podman run -dt --name $container3 --pod $pod2 $c_image sleep infinity
-				podman run -dt --name $container4 --pod $pod2 $c_image sleep infinity
-				echo "check the contaiers"
+				echo "####add container to the pod####"
+				podman run  --privileged -dt --name $container1 --pod $pod1 $c_image sleep infinity
+				podman run  --privileged -dt --name $container2 --pod $pod1 $c_image sleep infinity
+				podman run  --privileged -dt --name $container3 --pod $pod2 $c_image sleep infinity
+				podman run  --privileged -dt --name $container4 --pod $pod2 $c_image sleep infinity
+				echo "####check the contaiers via 'podman ps -a --pod'####"
 				podman ps -a --pod
 				return 0
 			else
@@ -15030,6 +15032,7 @@ sriov_test_bz2008373() {
 		fi
 		return $result
 }
+
 # vf_intf_garp_check is for bz1938635
 vf_intf_garp_check() {
 	rlLog "vf_intf_garp_check is for bz1938635"
@@ -15065,30 +15068,35 @@ vf_intf_garp_check() {
 		ip link set ${VF_IFACE} addr ${vf_mac}
 		sleep 13
 		ip link show ${VF_IFACE} | grep -i  ${vf_mac}
-		[ $? -eq 0 ] ||  { result=1; rlLog "step 4: configure link mac ${vf_mac} failed"; ip link show ${VF_IFACE}; }
+		[ $? -eq 0 ] ||  { result=1; rlFail "step 4: configure link mac ${vf_mac} failed"; ip link show ${VF_IFACE}; }
 		#check the GARP packets
-		tcpdump -r 1.pcap -enn | grep  -i  ${vf_mac1}
-		[ $? -eq 0 ] || { result=1; tcpdump -r 1.pcap -enn; rlLog "step 4: No garp packets captured for mac ${vf_mac}"; }
-	#5.  set the admin mac for vf and check the GARP
-		rlLog "STEP 5: Set the admin mac for vf and check if the mac is set successfully"
-		vf_mac1=00:11:22:33:44:11
-		ip link set ${nic_test} vf 0 mac ${vf_mac1}
-		sleep 3
-		ip link show ${VF_IFACE} | grep -i  ${vf_mac1}
-		[ $? -eq 0 ] ||  { result=1; rlLog "${vf_mac1} : configure link mac failed"; ip link show ${VF_IFACE}; }
+		tcpdump -r 1.pcap -enn | grep  -i  "${vf_mac} > ff:ff:ff:ff:ff:ff"
+		[ $? -eq 0 ] || { result=1; tcpdump -r 1.pcap -enn; rlFail "step 4: No garp packets captured for mac ${vf_mac}"; }
+		#5.  set the admin mac for vf and check the mac when nic_driver= ice or i40e
+		if  [ "$NIC_DRIVER" = "ice" ] || [ "$NIC_DRIVER" = "i40e" ]; then
 
-		#6.set the effective mac for vf
-		rlLog "STEP 6: Set mac for vf interface and check if the mac is set successfully"
-		vf_mac2=00:11:22:33:44:12
-		ip link set ${VF_IFACE} addr ${vf_mac2}
-		sleep 3
-		ip link show ${VF_IFACE} | grep -i  ${vf_mac2}
-		[ $? -eq 0 ] ||  { result=1; rlLog "step6 : configure link mac ${vf_mac2} failed"; ip link show ${VF_IFACE}; }
+			rlLog "STEP 5: Set the admin mac for vf and check if the mac is set successfully"
+			vf_mac1=00:11:22:33:44:11
+			ip link set ${nic_test} vf 0 mac ${vf_mac1}
+			sleep 3
+			ip link show ${VF_IFACE} | grep -i  ${vf_mac1}
+			[ $? -eq 0 ] ||  { result=1; rlFail "${vf_mac1} : configure link mac failed"; ip link show ${VF_IFACE}; }
+
+			#6.set the effective mac for vf
+			rlLog "STEP 6: Set mac for vf interface and check if the mac is set successfully"
+			vf_mac2=00:11:22:33:44:12
+			info=$(ip link set ${VF_IFACE} addr ${vf_mac2} 2>&1)
+			[[ $info == "RTNETLINK answers: Permission denied" ]] || { result=1; rlFail "There should be error info"; rlLog "The current info is $info"; }
+			sleep 3
+			ip link show ${VF_IFACE} | grep -i  ${vf_mac2}
+			[ $? -ne 0 ] ||  { result=1; rlFail "step6 : configure link mac ${vf_mac2} should  fail"; ip link show ${VF_IFACE}; }
+		fi
 		sriov_remove_vfs $nic_test 0
 		sync_set server  vf_intf_garp_check_end
 	fi
 	return $result
 }
+
 
 sriov_test_vlan_qinq_baisc()
 {
