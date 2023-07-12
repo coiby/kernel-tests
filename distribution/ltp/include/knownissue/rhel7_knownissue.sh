@@ -119,6 +119,8 @@ function rhel7_unfix_issues()
 	osver_in_range "700" "710" && tskip "quotactl06" unfix
 	# wontfix bz1366788 in RHEL7 - Missing commit 01ea173e103e ("xfs: fix up non-directory creation in SGID directories") in RHEL7
 	tskip "creat09" unfix
+	# Bug 1432301 - [LTP] futex_wait05 1 TFAIL : futex_wait05.c:66: futex_wait() waited too long 211192us, expected 100010us
+	tskip "futex_wait05" unfix
 }
 
 function rhel7_fixed_issues()
