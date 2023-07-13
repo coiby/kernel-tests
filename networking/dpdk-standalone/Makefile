@@ -32,14 +32,11 @@ FILES=$(METADATA) beaker_cmd.py \
 	client.py \
 	env.sh \
 	guest.xml \
-	kaizi.sh \
 	lib \
 	main.py \
 	Makefile \
 	PURPOSE \
-	rhos-release-13.repo \
 	runtest.sh \
-	settings.cfg \
 	tools.py \
 	trex_sport.py \
 	vm_compile_dpdk.sh \

@@ -1,0 +1,12 @@
+[General]
+name=networking/dpdk-standalone
+owner=Jiying Qiu <jiqiu@redhat.com>
+description=Networking DPDK standalone test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=networking/common
+
