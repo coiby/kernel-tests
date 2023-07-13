@@ -42,5 +42,8 @@ adjust:
   - enable: false
     when: arch == x86_64
 duration: 180m
+environment:
+    TESTARGS: VMMTIER1
+    REPORT_FAILED_RESULT: yes
 extra-summary: /kernel/distribution/ltp/generic
 extra-task: /kernel/distribution/ltp/generic

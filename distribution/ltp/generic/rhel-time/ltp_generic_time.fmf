@@ -42,5 +42,7 @@ adjust:
   - enable: false
     when: arch == x86_64
 duration: 180m
+environment:
+    TESTARGS: RHEL-TIME
 extra-summary: /kernel/distribution/ltp/generic
 extra-task: /kernel/distribution/ltp/generic
