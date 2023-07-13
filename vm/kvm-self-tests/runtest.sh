@@ -297,23 +297,15 @@ function setup
 
     rlRun "cd $TMPDIR"
     if [ ! "$CKI_SELFTESTS_URL" ] ; then
-        if stat /run/ostree-booted > /dev/null 2>&1; then
-            RELEASE="$(uname -r | cut -f 1,2,3,5 -d . | sed s/iv// | sed s/\.arch//)"
-            pkg="kernel-${RELEASE}"
-            major_ver="$(uname -r | cut -f 1 -d -)"
-            minor_ver="$(uname -r | cut -d - -f 2 | cut -d . -f 1)"
-            build="$(uname -r | cut -d - -f 2 | cut -d . -f 3 | sed s/iv//)"
-            wget https://kojihub.stream.centos.org/kojifiles/packages/kernel/${major_ver}/${minor_ver}.${build}/src/${pkg}.src.rpm
-        else
-            if [ -x /usr/bin/dnf ]; then
-                dnf download ${pkg} --source > /dev/null 2>&1
-            elif [ -x /usr/bin/yum ]; then
-                yum download ${pkg} --source > /dev/null 2>&1
-            fi
-        fi
-        if [ ! -f $TMPDIR/${pkg}.src.rpm ]; then
-            rlFetchSrcForInstalled $pkg
-        fi
+        arch=$(arch)
+        name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/\-core//')
+        version=$(uname -r | cut -f1 -d'-')
+        release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
+        pkg=${name}-${version}-${release}
+        BASE_URL=${BASE_URL:-"https://cbs.centos.org/kojifiles/packages https://kojihub.stream.centos.org/kojifiles/packages"}
+        BEAKERLIB_rpm_fetch_base_url+=(${BASE_URL})
+        rlFetchSrcForInstalled $pkg || exit 1
+
         typeset rpmfile=$(ls -1 $TMPDIR/${pkg}.src.rpm)
         rlAssertExists $rpmfile
 
