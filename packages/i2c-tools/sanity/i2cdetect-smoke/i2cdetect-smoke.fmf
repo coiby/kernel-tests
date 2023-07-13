@@ -5,6 +5,7 @@ description: |
 
     Author: Lukas Zachar <lzachar@redhat.com>
 contact: Lukas Zachar <lzachar@redhat.com>
+id: 8640786e-7022-4291-8d1f-47b230ec5693
 test: ./runtest.sh
 framework: beakerlib
 require:
