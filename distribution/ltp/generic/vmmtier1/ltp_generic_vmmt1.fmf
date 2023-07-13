@@ -11,6 +11,7 @@ description: |
     ltp/generic test suit.
 contact: MM-QE <mm-qe@redhat.com>
 id: 23ed4201-ed69-4ee3-b0fd-38c666346954
+path: /distribution/ltp/generic
 component:
   - kernel
   - glibc

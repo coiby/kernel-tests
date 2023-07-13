@@ -1,0 +1,45 @@
+summary: Linux Test Project
+description: |
+    LTP Introduction
+    ================
+    LTP is a famous test suite under Linux, I port LTP to Beaker every
+    4 months (+/-1 month if needed). You can use this testcase for your
+    RHEL testing.
+
+    # Notes: SKIP_LEVEL is different to SKIPTESTS. SKIP_LEVEL is based on a script only
+    to handle the known issues. And SKIPTESTS is used to skip general case in
+    ltp/generic test suit.
+contact: MM-QE <mm-qe@redhat.com>
+path: /distribution/ltp/generic
+component:
+  - kernel
+  - glibc
+test: bash ./runtest.sh
+framework: shell
+require:
+  - procmail
+  - automake
+  - autoconf
+  - flex
+  - bison
+  - rng-tools
+  - rsyslog
+  - util-linux
+  - bc
+  - gcc
+  - bzip2
+  - rpm-build
+  - libaio-devel
+  - libcap-devel
+  - numactl-devel
+  - numactl
+  - strace
+  - wget
+  - python3
+  - ntpsec
+adjust:
+  - enable: false
+    when: arch == x86_64
+duration: 180m
+extra-summary: /kernel/distribution/ltp/generic
+extra-task: /kernel/distribution/ltp/generic
