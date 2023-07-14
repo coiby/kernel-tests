@@ -10,6 +10,7 @@ description: |
     to handle the known issues. And SKIPTESTS is used to skip general case in
     ltp/generic test suit.
 contact: MM-QE <mm-qe@redhat.com>
+id: cba0864d-df37-495c-81f3-bf143dfcc156
 path: /distribution/ltp/generic
 component:
   - kernel
