@@ -7,6 +7,6 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=bash ./runtest.sh
+entry_point=./runtest.sh
 repoRequires=networking/common
 
