@@ -26,7 +26,7 @@ init_all_env()
 {
     set -a
     PACKAGE="kernel"
-    CASE_PATH=${CASE_PATH:-"/mnt/tests/kernel/networking/dpdk-standalone"}
+    CASE_PATH=${CASE_PATH:-"./"}
     source /etc/os-release
     SYSTEM_VERSION_ID=$(echo $VERSION_ID | tr -d '.')
     set +a
