@@ -1072,7 +1072,7 @@ def install_trex_package(trex_url):
 
 @set_check(0)
 def install_trex_and_start(nic1_mac, nic2_mac, trex_url):
-    update_beaker_tasks_repo()
+    # update_beaker_tasks_repo()
     install_dpdk()
     install_driverctl()
     install_trex_package(trex_url)
@@ -3798,6 +3798,7 @@ def dpdk_sriov_single_vf_test(vf_spoofchk,vf_trust,rxq_num=16):
             run("sleep 3")
         with enter_phase(f"{func_name} clear dpdk interface"):
             clear_dpdk_interface_by_driverctl()
+            vf_delete(bus1_info)
             pass
     elif i_am_client():
         sync_wait(server_target,sync_start)
@@ -4197,11 +4198,11 @@ def dpdk_sriov_vf_bug2091552_test(vf_spoofchk=False,vf_trust=True):
             enable_dpdk_by_driverctl(vf22_mac)
             if dpdk_verion > 20:
                 cmd = f"""
-                {testpmd} --log-level=9 --proc-type=primary -n 4 -m 32 -- -i --print-event all --auto-start
+                {testpmd} -a {bus11_info} -a {bus12_info} -a {bus21_info} -a {bus22_info} --log-level=9 --proc-type=primary -n 4 -m 32 -- -i --print-event all --auto-start
                 """
             else:
                 cmd = f"""
-                {testpmd} --log-level=9 --proc-type=primary -n 4 -m 32 -- -i --print-event all --auto-start
+                {testpmd} -w {bus11_info} -w {bus12_info} -w {bus21_info} -w {bus22_info} --log-level=9 --proc-type=primary -n 4 -m 32 -- -i --print-event all --auto-start
                 """
             sp_obj = start_subprocess(cmd)
             cmd = f"""
@@ -4287,20 +4288,20 @@ def dpdk_sriov_vf_bug2091552_test(vf_spoofchk=False,vf_trust=True):
                 print(error.decode())
             print(out.decode())
             if vf_trust == True:
-                m = re.search(r"RX-total: [1-9][0-9]+",out.decode())
-                if None ==  m:
-                    log("xxxxxx")
+                if dpdk_verion > 20:
+                    sys_log = bash("journalctl --no-pager -t dpdk-testpmd").value()
                 else:
-                    print(m.group())
-                    log(f"yyyyy")
+                    sys_log = bash("journalctl --no-pager -t testpmd").value()
+                if "No response" in sys_log  or "cmd 11" in sys_log or "OP_DEL_ETH_ADDR" in sys_log or "OP_ADD_ETH_ADDR" in sys_log:
+                    rl_fail(f"{func_name} result check failed")
+                else:
+                    rl_pass(f"{func_name} result check pass")
                 pass
         with enter_phase(f"{func_name} check result"):
             clear_dpdk_interface_by_driverctl()
             pass
     elif i_am_client():
         cmd = f"""
-        ip link set {nic1_name} mtu 9600
-        ip link set {nic2_name} mtu 9600
         ip link set {nic1_name} up
         ip link set {nic2_name} up
         """
@@ -7743,6 +7744,7 @@ def dpdk_sriov_terminate_container_test(vf_spoofchk,vf_trust):
     clear_dpdk_interface_by_devbind()
     nic1_mac,nic2_mac = get_nic_mac()
     nic1_name = get_nic_name_from_mac(nic1_mac)
+    bus1_info = my_tool.get_bus_from_name(nic1_name)
     if i_am_server():
         vf1_list = vf_create_from_pf_mac(nic1_mac,4,vf_spoofchk,vf_trust)
         log(f"{vf1_list}")
@@ -7827,6 +7829,7 @@ def dpdk_sriov_terminate_container_test(vf_spoofchk,vf_trust):
         with enter_phase(f"{func_name} clear container env"):
             clear_container_env()
             clear_dpdk_interface_by_driverctl()
+            vf_delete(bus1_info)
     elif i_am_client():
         sync_wait(server_target,sync_start)
         sync_set(server_target,sync_end)
@@ -7872,7 +7875,8 @@ def dpdk_sriov_multi_vfs_creation_test(vf_spoofchk,vf_trust):
         from bash import bash
         max_vfs_cmd = "cat /sys/class/net/" + nic1_name + "/device/sriov_totalvfs"
         max_vfs = int(bash(max_vfs_cmd).value())
-        vf1_list = vf_create_from_pf_mac(nic1_mac,max_vfs,vf_spoofchk,vf_trust)
+        vf1_list_without_sort = vf_create_from_pf_mac(nic1_mac,max_vfs,vf_spoofchk,vf_trust)
+        vf1_list = sorted(vf1_list_without_sort, key=lambda info: (info[0:6], int(info[7:])))
         log(f"{vf1_list}")
 
         vf_pci_list = []
@@ -7883,13 +7887,15 @@ def dpdk_sriov_multi_vfs_creation_test(vf_spoofchk,vf_trust):
         log(f"{vf_pci_list}")
 
         for i in range(int(max_vfs)):
-            base_mac = "{:012X}".format(int(base_mac, 16) + 1)
+            base_mac = "{:012x}".format(int(base_mac, 16) + 1)
             new_mac = ":".join(base_mac[i] + base_mac[i + 1] for i in range(0, len(base_mac), 2))
             cmd = f"""
             ip link set {nic1_name} vf {i} mac {new_mac}
+            sleep 1
+            ip link show {vf1_list[i]}
             """
             run(cmd)
-            mac_check_cmd = f"ip link show vf1_list[{i}] | grep link/ether | grep {new_mac}"
+            mac_check_cmd = f"ip link show {vf1_list[i]} | grep link/ether | grep {new_mac}"
             run(mac_check_cmd)
 
         for i in vf_pci_list:
@@ -7899,7 +7905,7 @@ def dpdk_sriov_multi_vfs_creation_test(vf_spoofchk,vf_trust):
         sync_wait(client_target,sync_end)
 
         clear_dpdk_interface_by_driverctl()
-        #vf_delete(bus1_info)
+        vf_delete(bus1_info)
     elif i_am_client():
         sync_wait(server_target,sync_start)
         sync_set(server_target,sync_end)
@@ -7908,7 +7914,7 @@ def dpdk_sriov_multi_vfs_creation_test(vf_spoofchk,vf_trust):
         pass
 
 @test_item_check
-def dpdk_sriov_bond_vf_test(mode,mac,vf_spoofchk,vf_trust):
+def dpdk_sriov_bond_vf_test(mode,mac=False,vf_spoofchk=True,vf_trust=False):
     func_name = inspect.stack()[0][3]
     sync_start = func_name + "_start"
     sync_end = func_name + "_end"
@@ -7917,6 +7923,10 @@ def dpdk_sriov_bond_vf_test(mode,mac,vf_spoofchk,vf_trust):
     nic1_mac,nic2_mac = get_nic_mac()
     nic1_name = get_nic_name_from_mac(nic1_mac)
     nic2_name = get_nic_name_from_mac(nic2_mac)
+    traffic_gen_mac = os.getenv("CLIENT_NIC1_MAC")
+    traffic_spoof_mac = traffic_gen_mac[:3] + "00:00:00:00:00"
+    explicit_mac = mac
+
     if i_am_server():
         vf1_list = vf_create_from_pf_mac(nic1_mac,2,vf_spoofchk,vf_trust)
         vf2_list = vf_create_from_pf_mac(nic2_mac,1,vf_spoofchk,vf_trust)
@@ -7936,13 +7946,16 @@ def dpdk_sriov_bond_vf_test(mode,mac,vf_spoofchk,vf_trust):
         enable_dpdk_by_driverctl(vf0_mac)
         enable_dpdk_by_driverctl(vf1_mac)
         enable_dpdk_by_driverctl(vf2_mac)
+
         rx_port_num = 1 if bus1_info < bus2_info else 2
-        explicit_mac = mac
+
+        spoof_mac = vf1_mac[:15] + "ff"
         if explicit_mac:
-            bond_mac = "aa:bb:cc:dd:ee:ff"
+            bond_mac = spoof_mac
         else:
             bond_mac = vf0_mac
 
+        fwd_mac = traffic_gen_mac
         if system_version_id >= 90:
             image_name = "rhel9-dpdk"
         elif system_version_id >= 80:
@@ -7967,15 +7980,18 @@ def dpdk_sriov_bond_vf_test(mode,mac,vf_spoofchk,vf_trust):
         f"primary={bus0_info}"
         )
 
+        if explicit_mac:
+            vdev_str = f"{vdev_str},mac={bond_mac}"
+
         cmd = f"""
-        nohup podman run -it --name dpdk-bond-con --rm --privileged \
+        podman run -it --name dpdk-bond-con --rm --privileged \
         -v /sys:/sys -v /dev:/dev -v /lib/modules:/lib/modules \
         quay.io/wanghekai/{image_name} \
         dpdk-testpmd -l 0-3 -n 4\
         -a {bus0_info} -a {bus1_info} -a {bus2_info}\
         --vdev {vdev_str} \
         -- --forward-mode=mac --portlist {rx_port_num},3 \
-        --eth-peer 3,dd:cc:bb:aa:33:00
+        --eth-peer 3,{fwd_mac}
         """
         write_cmd_input(obj,cmd,10)
 
@@ -7988,7 +8004,7 @@ def dpdk_sriov_bond_vf_test(mode,mac,vf_spoofchk,vf_trust):
         stop
         quit
         """
-        write_cmd_input(obj1,cmd,10)
+        write_cmd_input(obj,cmd,10)
         out,error = obj.communicate()
         if None != error:
             print(f"{func_name} start testpmd failed")
@@ -8019,8 +8035,8 @@ if __name__ == "__main__":
     send_command("rlJournalStart")
     load_env()
     if not os.path.exists(TEMP_FILE):
-        with enter_phase("update beaker tasks repo"):
-            update_beaker_tasks_repo()
+        with enter_phase("skip update beaker tasks repo"):
+            # update_beaker_tasks_repo()
             pass
         with enter_phase("disable beaker-buildroot repo"):
             disable_beaker_buildroot_repo()
@@ -8104,7 +8120,6 @@ if __name__ == "__main__":
                     dpdk_sriov_vf_bug2091552_test()
             else:
                 dpdk_sriov_vf_bug2091552_test()
-        dpdk_sriov_vf_bug2091552_test()
         dpdk_sriov_vf_multiple_queues_test(False,True)
         # skip test below since bug https://bugzilla.redhat.com/show_bug.cgi?id=2151748
         # dpdk_sriov_vf_multiple_queues_test(False,True,256)
@@ -8117,7 +8132,6 @@ if __name__ == "__main__":
         dpdk_sriov_vf_func_test(False,True,1024)
         dpdk_sriov_vf_func_test(False,False,1024)
         dpdk_sriov_vf_macaddress_test(False,True)
-        dpdk_sriov_single_vf_test(True,True)
         if system_version_id >= 86:
             dpdk_sriov_vf_vlan_without_vlan_filter_test(True,True)
             dpdk_sriov_vf_vlan_without_vlan_filter_test(False,True)
@@ -8173,7 +8187,13 @@ if __name__ == "__main__":
         # dpdk_testpmd_l2_performance_test(4)
         dpdk_sriov_testpmd_in_guest_performance_test(False,True)
         dpdk_sriov_terminate_container_test(True,False)
-        dpdk_sriov_multi_vfs_creation_test(True,False)
+        if "ice" in dut_nic_driver:
+            dpdk_sriov_single_vf_test(True,True)
+            dpdk_sriov_multi_vfs_creation_test(True,False)
+        #dpdk_sriov_bond_vf_test(0,True,True,False)
+        #dpdk_sriov_bond_vf_test(0,False,True,False)
+        #dpdk_sriov_bond_vf_test(1,True,True,False)
+        #dpdk_sriov_bond_vf_test(1,False,True,False)
     send_command("rlJournalEnd")
     basic_send_command("exit")
     exit(0)
