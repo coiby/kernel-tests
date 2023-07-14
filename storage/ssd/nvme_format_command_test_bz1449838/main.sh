@@ -34,6 +34,10 @@ for DISK in $DISKS; do
 						if [[ $MODEL =~ "Micron_9300_MTFDHAL3T8TDP"|"Samsung SSD 983 DCT"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Express Flash NVMe P4600"|"Dell Ent NVMe P5500 RI U.2" ]]; then
 							continue
 						fi
+					elif [[ $pi == 0 && $ses == 1 ]]; then
+						if [[ $MODEL =~ "SAMSUNG MZQL2960HCJR-00A07" ]]; then
+							continue
+						fi
 					fi
 					for pil in 0 1; do
 						if [[ $lbaf == 0 && $pi == 0 && $pil == 1 ]]; then
