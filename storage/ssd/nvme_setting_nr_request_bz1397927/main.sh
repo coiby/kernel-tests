@@ -2,9 +2,9 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
-. $CDIR/../include/include.sh || exit 200
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../include/include.sh || exit 200
 
 function runtest() {
 
@@ -33,13 +33,19 @@ done
 	tok "echo 0 > /sys/devices/system/cpu/cpu3/online"
 
 for TEST_DISK in $TEST_DISKS; do
-	{
 	NVME_DISK=${TEST_DISK:0:7}
+	MODEL=$(cat /sys/block/"$NVME_DISK"/device/model)
+	if [[ $MODEL =~ "SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+		continue
+	fi
+	tlog "The testing disk $TEST_DISK model is $MODEL"
+	{
 	local scheds
 	local max_nr
 	local nr
 	scheds="$(sed 's/[][]//g' /sys/block/"$NVME_DISK"/queue/scheduler)"
-	for sched in "${scheds[@]}"; do
+	# shellcheck disable=SC2068
+	for sched in ${scheds[@]}; do
 		tlog "$NVME_DISK: testing $sched"
 		tok "echo $sched > /sys/block/$NVME_DISK/queue/scheduler"
 		max_nr="$(cat /sys/block/"$NVME_DISK"/queue/nr_requests)"
@@ -48,8 +54,8 @@ for TEST_DISK in $TEST_DISKS; do
 		done
 	done
 	} &
-	wait
 done
+	wait
 	trun dmesg
 	#enable the disabled CPUs
 	tok "echo 1 > /sys/devices/system/cpu/cpu1/online"

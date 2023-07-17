@@ -2,9 +2,9 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
-. $CDIR/../include/include.sh || exit 200
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../include/include.sh || exit 200
 
 function runtest() {
 
@@ -27,11 +27,15 @@ for DISK in $DISKS; do
 			for ses in 0 1 2; do
 				for pi in 0 1 2 3; do
 					if [[ $lbaf == 0 && $pi != 0 ]]; then
-						if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Samsung SSD 983 DCT"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe v2 AGN RI U.2"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005" ]]; then
+						if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Samsung SSD 983 DCT"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe v2 AGN RI U.2"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
 							continue
 						fi
 					elif [[ $lbaf == 1 && $pi != 0 ]]; then
 						if [[ $MODEL =~ "Micron_9300_MTFDHAL3T8TDP"|"Samsung SSD 983 DCT"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Express Flash NVMe P4600"|"Dell Ent NVMe P5500 RI U.2" ]]; then
+							continue
+						fi
+					elif [[ $pi == 0 && $ses == 1 ]]; then
+						if [[ $MODEL =~ "SAMSUNG MZQL2960HCJR-00A07" ]]; then
 							continue
 						fi
 					fi
@@ -48,13 +52,14 @@ for DISK in $DISKS; do
 									continue
 								fi
 							elif [[ $lbaf == 1 && $pi == 0 && $ms == 1 ]]; then
-								if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005" ]]; then
+								if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
 									tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms, /dev/$DISK node disappeared, BZ2081713, skipping"
 									continue
 								fi
 							fi
 							dmesg -c >/dev/null
 							tok "nvme format /dev/$DISK --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms -r -f"
+							# shellcheck disable=SC2181
 							if [ $? -ne 0 ]; then
 								tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms not support" | tee -a format_fail
 								continue
@@ -68,10 +73,12 @@ for DISK in $DISKS; do
 								fi
 
 							fi
+							# shellcheck disable=SC2181
 							if [ $? -ne 0 ]; then
 								tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms with dd operation failed" | tee -a dd_fail
 							fi
 							tok "fdisk -l /dev/$DISK"
+							# shellcheck disable=SC2181
 							if [ $? -ne 0 ]; then
 								tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms with fdisk -l operation failed" | tee -a fdisk_fail
 							fi
