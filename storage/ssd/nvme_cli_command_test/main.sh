@@ -75,7 +75,7 @@ for DISK in $DISKS; do
 	if [[ $MODEL =~ "Dell Express Flash NVMe PM1725" ]]; then
 		tnot "nvme effects-log ${NVME_CHAR}"
 	else
-		tok "nvme effects-log ${NVME_CHAR}"
+		trun "nvme effects-log ${NVME_CHAR}"
 	fi
 
 	tnot "nvme endurance-log ${NVME_CHAR} --output=binary"
