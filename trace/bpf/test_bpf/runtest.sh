@@ -42,7 +42,8 @@ yum=$(cki_get_yum_tool)
 
 rlJournalStart
     rlPhaseStartSetup
-        for i in libgcc glibc-static gcc gcc-c++ kernel-devel elfutils-libelf-devel binutils-devel libcap-devel openssl-devel ; do
+        # soft dependency, don't fail in case a package can't be installed
+        for i in libgcc glibc-static gcc gcc-c++ kernel-devel elfutils-libelf-devel binutils-devel libcap-devel openssl-devel python3; do
             $yum install -y $i
         done
         # nfs-utils git util-linux createrepo genisoimage gcc gcc-c++ rpm-build kernel-abi-whitelists wget python-setuptools
