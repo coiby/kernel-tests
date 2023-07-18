@@ -66,9 +66,9 @@ function get_test_cases
 
 	testcases+=" libndctl"
 	testcases+=" dsm-fail"
-	testcases+=" dpa-alloc"
-	testcases+=" parent-uuid"
-	testcases+=" multi-pmem"
+	uname -r | grep -q "4.18.0" || testcases+=" dpa-alloc"
+	uname -r | grep -q "4.18.0" || testcases+=" parent-uuid"
+	uname -r | grep -q "4.18.0" || testcases+=" multi-pmem"
 	testcases+=" create.sh"
 	testcases+=" clear.sh"
 	testcases+=" pmem-errors.sh"
@@ -76,7 +76,7 @@ function get_test_cases
 	testcases+=" multi-dax.sh"
 	testcases+=" btt-check.sh"
 	testcases+=" label-compat.sh"
-	testcases+=" blk-exhaust.sh"
+	uname -r | grep -q "4.18.0" || testcases+=" blk-exhaust.sh"
 	testcases+=" sector-mode.sh"
 	testcases+=" inject-error.sh"
 	testcases+=" btt-errors.sh"
@@ -133,7 +133,7 @@ function get_timestamp
 
 function do_test
 {
-	export KVER=5.7
+	export KVER=6.0.0
 	typeset test_case=$1
 
 	echo "Start: ndctl test suite: $test_case" >/dev/kmsg
