@@ -1,5 +1,5 @@
 summary: storage/block/bz2208904_regression_leak_blkio
-description: Regression of 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+description: Regression of 3b8cc6298724 (blk-cgroup  Optimize blkcg_rstat_flush())
 contact: Changhui Zhong <czhong@redhat.com>
 component:
     - kernel
