@@ -22,17 +22,6 @@
 # Expected result
 # Apr 25 04:30:10  kernel: test_bpf: Summary: 349 PASSED, 0 FAILED, [0/341 JIT'ed]
 
-
-DistName=`rpm -E %{?dist} | sed 's/[.0-9]//g'`
-DistVer=`rpm -E %{?dist} | sed 's/[^0-9]//g'`
-DUPARCH=`arch`
-KVer=`uname -r | awk -F '-' '{print $1}'`
-KDIST=`uname -r | sed "s/.$(arch)//g;s/\+debug//g" | awk -F '.' '{print "."$NF}'`
-KBUILD=`uname -r | awk -F '-' '{print $2}' | sed "s/.$(arch)//g;s/\+debug//g" | sed "s/${KDIST}//g"`
-KBuild=${KBuild:-${KBUILD}}
-KBuildPrefix=`echo ${KBuild} | awk -F '.' '{print $1}'`
-
-
 yum=$(cki_get_yum_tool)
 
 rlJournalStart
