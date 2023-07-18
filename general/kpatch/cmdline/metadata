@@ -1,0 +1,12 @@
+[General]
+name=/kernel/general/kpatch/cmdline
+owner=Chao Ye <cye@redhat.com>
+description=Kpatch cmdline function test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=60m
+dependencies=kernel;kpatch;redhat-lsb
