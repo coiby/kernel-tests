@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=podman;container-tools
+dependencies=podman
 repoRequires=cki_lib
