@@ -4,6 +4,7 @@ description: |
     Useful for running before and after another Beaker task so the results can
     be compared offline later.
 contact: Jeffrey Bastian <jbastian@redhat.com>
+id: 3b32e408-2b28-41ae-bbe4-28d0b74963ed
 component:
   - kernel
 test: bash ./runtest.sh
