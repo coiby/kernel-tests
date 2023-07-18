@@ -3,6 +3,7 @@ description: |
   Make sure that all the supported drivers are enabled in the
   sensors-detect script. For now it covers just BZ#473119.
 contact: Laura Trivelloni <ltrivell@redhat.com>
+id: be48a701-abf4-4d07-96cd-8a076530f131
 test: bash ./runtest.sh
 framework: beakerlib
 require: 

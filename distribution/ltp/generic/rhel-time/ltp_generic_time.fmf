@@ -10,10 +10,12 @@ description: |
     to handle the known issues. And SKIPTESTS is used to skip general case in
     ltp/generic test suit.
 contact: MM-QE <mm-qe@redhat.com>
+id: c791670c-c33e-4cff-bc3f-3c92a5f94619
+path: /distribution/ltp/generic
 component:
   - kernel
   - glibc
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require:
   - procmail
@@ -40,5 +42,7 @@ adjust:
   - enable: false
     when: arch == x86_64
 duration: 180m
+environment:
+    TESTARGS: RHEL-TIME
 extra-summary: /kernel/distribution/ltp/generic
 extra-task: /kernel/distribution/ltp/generic
