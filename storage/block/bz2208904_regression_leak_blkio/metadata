@@ -1,0 +1,12 @@
+[General]
+name=storage/block/bz2208904_regression_leak_blkio
+owner=Changhui Zhong <czhong@redhat.com>
+description=Regression of 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=podman
+repoRequires=cki_lib
