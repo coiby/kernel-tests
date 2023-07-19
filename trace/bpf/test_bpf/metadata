@@ -9,4 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 softDependencies=libgcc;glibc-static;gcc;gcc-c++;elfutils-libelf-devel;binutils-devel;libcap-devel;openssl-devel;bison;autoconf;automake;binutils;gettext;libtool;pkgconfig;flex;dwarves
-repoRequires=trace/include;cki_lib
+repoRequires=trace/include;cki_lib;kernel-include
