@@ -8,7 +8,6 @@ test: bash ./runtest.sh
 framework: shell
 recommend:
   - beakerlib-redhat
-require:
 duration: 1h
 tier: 1
 extra-summary: /storage/multipath/multipath_duplicate_UUID_BZ_2028835

@@ -8,7 +8,6 @@ test: bash ./runtest.sh
 framework: shell
 recommend:
     - beakerlib-redhat
-require:
 duration: 1h
 tier: 1
 extra-summary: /storage/block/bz2149790_reread_partition_table
