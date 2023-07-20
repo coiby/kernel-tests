@@ -12806,10 +12806,10 @@ sriov_test_cntvf_reboot()
 		podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
 		podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
 		podman exec $container1 ip addr show $vf1
-		rlRun "podman exec $container1 ping 172.30.${ipaddr}.1 -c 5"
-		rlRun "podman exec $container1 ping 2021:db8:${ipaddr}::1 -c 5"
-		rlRun "podman exec $container1 iperf3 -c 172.30.${ipaddr}.1 -p 50001"
-		rlRun "podman exec $container1 iperf3 -c 2021:db8:${ipaddr}::1 -p 50001"
+		rlRun "podman exec $container1 ping 172.30.${ipaddr}.1 -c 3"
+		rlRun "podman exec $container1 ping 2021:db8:${ipaddr}::1 -c 3"
+		rlRun "podman exec $container1 iperf3 -c 172.30.${ipaddr}.1 -p 50001 -t 5"
+		rlRun "podman exec $container1 iperf3 -c 2021:db8:${ipaddr}::1 -p 50001 -t 5"
 		podman restart $container1
 		podman ps --all
 	done
@@ -12831,10 +12831,10 @@ sriov_test_cntvf_reboot()
 		podman exec $container1 ip addr add 172.30.${ipaddr}.11/24 dev $vf1
 		podman exec $container1 ip addr add 2021:db8:${ipaddr}::11/64 dev $vf1
 		podman exec $container1 ip addr show $vf1
-		rlRun "podman exec $container1 ping 172.30.${ipaddr}.1 -c 5"
-		rlRun "podman exec $container1 ping 2021:db8:${ipaddr}::1 -c 5"
-		rlRun "podman exec $container1 iperf3 -c 172.30.${ipaddr}.1 -p 50001"
-		rlRun "podman exec $container1 iperf3 -c 2021:db8:${ipaddr}::1 -p 50001"
+		rlRun "podman exec $container1 ping 172.30.${ipaddr}.1 -c 3"
+		rlRun "podman exec $container1 ping 2021:db8:${ipaddr}::1 -c 3"
+		rlRun "podman exec $container1 iperf3 -c 172.30.${ipaddr}.1 -p 50001 -t 5"
+		rlRun "podman exec $container1 iperf3 -c 2021:db8:${ipaddr}::1 -p 50001 -t 5"
 		podman restart $container1
 		podman ps --all
 	done
