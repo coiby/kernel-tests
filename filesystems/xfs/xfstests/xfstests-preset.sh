@@ -64,6 +64,101 @@ function preset_testparams()
 	if [[ "$(uname -r)" =~ 3.10.0.*el7 ]]; then
 		export GITBRANCH=rhel7
 	fi
+
+	# Run old version of xfstests for old releases on non-gfs2.
+	# gfs2 needs newer version of xfstests.
+	if [ "$TEST_PARAM_FSTYPE" != "gfs2" ]
+	then
+		case `uname -r` in
+		3.10.0-327*el7*)
+			# 7.2.z
+			export GITBRANCH=20150804
+			;;
+		3.10.0-514*el7*)
+			# 7.3.z
+			export GITBRANCH=20170226
+			;;
+		3.10.0-693*el7*)
+			# 7.4.z
+			export GITBRANCH=20170709
+			;;
+		3.10.0-862*el7*)
+			# 7.5.z use the same version with 7.4.z due to build failure
+			export GITBRANCH=20170709
+			;;
+		3.10.0-957*el7*)
+			# 7.6.z
+			export GITBRANCH=20180812
+			;;
+		4.14.0-115*el7a*)
+			# alt-7.6.z
+			export GITBRANCH=20180812
+			;;
+		3.10.0-1062*el7*)
+			# 7.7.z
+			export GITBRANCH=20190331
+			;;
+		3.10.0-1127*el7*)
+			# 7.8.z
+			export GITBRANCH=20200308
+			;;
+		3.10.0-1160*el7*)
+			# 7.9.z
+			export GITBRANCH=20200308
+			;;
+		4.18.0-80*el8*)
+			# 8.0.z
+			export GITBRANCH=20190331
+			;;
+		4.18.0-147*el8*)
+			# 8.1.z
+			export GITBRANCH=20190811
+			;;
+		4.18.0-193*el8*)
+			# 8.2.z
+			export GITBRANCH=20200308
+			;;
+		4.18.0-240*el8*)
+			# 8.3.z
+			export GITBRANCH=20200927
+			;;
+		4.18.0-305*el8*)
+			# 8.4.z
+			export GITBRANCH=20210308
+			;;
+		4.18.0-348*el8*)
+			# 8.5.z
+			export GITBRANCH=20210905
+			;;
+		4.18.0-372*el8*)
+			# 8.6.z
+			export GITBRANCH=20220123
+			;;
+		5.14.0-70*el9*)
+			# 9.0.z
+			export GITBRANCH=20220123
+			;;
+		4.18.0-425*el8*)
+			# 8.7.z
+			export GITBRANCH=20220612
+			;;
+		5.14.0-162*el9*)
+			# 9.1.z
+			export GITBRANCH=20220612
+			;;
+		4.18.0-477*el8*)
+			# 8.8.z
+			export GITBRANCH=20230326
+			;;
+		5.14.0-284*el9*)
+			# 9.2.z
+			export GITBRANCH=20230326
+			;;
+		*)
+			:
+			;;
+		esac
+	fi
 	test -n "${TEST_PARAM_TEST_DEV}" && TEST_DEV="${TEST_PARAM_TEST_DEV}"
 	test -n "${TEST_PARAM_TEST_DIR}" && TEST_DIR="${TEST_PARAM_TEST_DIR}"
 	test -n "${TEST_PARAM_SCRATCH_DEV}" && SCRATCH_DEV="${TEST_PARAM_SCRATCH_DEV}"
