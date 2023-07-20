@@ -160,6 +160,17 @@ check bash lines ending with white spaces:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
 
+check tmt lint:
+  extends: .cki_tools
+  allow_failure: true
+  before_script:
+    - tmt --version
+  script:
+    - tmt lint --outcome-only fail .
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+
 check usage of internal hostnames:
   extends: .cki_tools
   script:
