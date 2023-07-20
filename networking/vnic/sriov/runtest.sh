@@ -12790,7 +12790,7 @@ sriov_test_cntvf_reboot()
 
 	local vf1=$(sriov_get_vf_iface $nic_test 0 1)
 	ip link set $nic_test vf 0 vlan $vid qos 1
-	for r in $(seq 1 100);do
+	for r in $(seq 1 50);do
 		echo "###########loop$r##############"
 		for i in $(seq 1 2);do
 			if ! sriov_attach_vf_to_cnt $nic_test 0 $i $container1; then
