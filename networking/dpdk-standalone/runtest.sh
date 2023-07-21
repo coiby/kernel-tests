@@ -168,13 +168,15 @@ install_python()
 {
     #add epel repo
     dnf -y install curl
-    local url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E '%{rhel}').noarch.rpm"
+    #local url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E '%{rhel}').noarch.rpm"
+    local url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
     local test_reuslt=$(curl -s --head ${url} | head -n 1 | awk '{print $NF}' | tr -d '\r')
     if [[ $test_reuslt == "OK" ]]; then
         rpm -q epel-release || yum -y install ${url}
     else
         yum install dnf-utils
-        local cur_ver=$(rpm -E '%{rhel}')
+        #local cur_ver=$(rpm -E '%{rhel}')
+        local cur_ver=9
         local older_ver=$(( cur_ver - 1))
         local arch_val=$(rpm -E '%{_arch}')
         yum-config-manager --add-repo https://dl.fedoraproject.org/pub/epel/${older_ver}/Everything/${arch_val}/
