@@ -28,6 +28,7 @@ description: |
       that the extra include was used, 'n' means that it was omitted.
       The compliation of DENYLISTED files is also tried.
 contact: Jeff Bastian <jbastian@redhat.com>
+id: 0870c070-b62c-45d3-bf9b-1106a14a0356
 test: bash ./runtest.sh
 tag: header-test
 framework: shell
