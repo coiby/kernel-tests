@@ -554,6 +554,25 @@ rlJournalStart
                         sed -i '/sch_mqprio_lib.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
                         sed -i '/brcmfmac-bca.ko/d; / brcmfmac-cyw.ko/d; /brcmfmac-wcc.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
                     fi
+                    if cki_kver_lt "4.18.0-499.el8"; then
+                        sed -i '/snd-soc-bdw-rt286.ko/d; /snd-soc-es8326.ko/d; /snd-soc-hsw-rt5640.ko/d; \
+                                /snd-soc-nau8315.ko/d; /snd-soc-rt712-sdca.ko/d; /snd-sof-amd-rembrandt.ko/d; \
+                                /snd-sof-intel-hda-mlink.ko/d; /soundwire-amd.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                        sed -i '/snd-soc-sst-broadwell.ko/d; /snd-soc-sst-haswell.ko/d' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-501.el8"; then
+                        sed -i '/mana_ib.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-502.el8"; then
+                        sed -i '/intel_ifs.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-503.el8"; then
+                        sed -i '/intel-uncore-frequency-common.ko/d; /intel-uncore-frequency.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "4.18.0-504.el8"; then
+                        sed -i '/thunderbolt_net.ko/d; /typec_displayport.ko/d; /^uvc.ko$/d' ${OS}/${Release}/$Release-modules-${ARCH}.lst
+                        sed -i '/thunderbolt-net.ko/d' ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                    fi
                     ;;
             esac
         elif [ "${K_VER}" = "5.14.0" ]; then
@@ -638,6 +657,30 @@ rlJournalStart
                     if cki_kver_lt "5.14.0-327.el9"; then
                         sed -i '/rtc-v3020.ko/d' ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
                         sed -i '/rtw89_8852be.ko/d; /rtw89_8852b.ko/d' ${OS}/${Release}/$Release-modules-{aarch64,x86_64}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-332.el9"; then
+                        sed -i '/amd-pstate-ut.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-333.el9"; then
+                        sed -i '/prime_numbers.ko/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
+                        sed -i '/mana_ib.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-335.el9"; then
+                        sed -i '/snd-soc-sst-broadwell.ko/d; /snd-soc-sst-haswell.ko/d' ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                        sed -i '/snd-soc-bdw-rt286.ko/d; /snd-soc-cs42l42-i2c.ko/d; /snd-soc-es8326.ko/d; \
+                                /snd-soc-hsw-rt5640.ko/d; /snd-soc-nau8315.ko/d; /snd-soc-rt712-sdca.ko/d; \
+                                /snd-sof-amd-rembrandt.ko/d; /snd-sof-intel-hda-mlink.ko/d; /soundwire-amd.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-336.el9"; then
+                        for module in $(cat ${OS}/${Release}/aarch64-modules-5.14.0-336.el9)
+                        do
+                            sed -i "/^${module}$/d" ${OS}/${Release}/$Release-modules-aarch64.lst
+                        done
+                    fi
+                    if cki_kver_lt "5.14.0-343.el9"; then
+                        sed -i '/thunderbolt-net.ko/d' ${OS}/${Release}/$Release-knownRemoved-$ARCH.lst
+                        sed -i '/hid-evision.ko/d; /^iosm.ko$/d; /thunderbolt_net.ko/d; \
+                                /wwan_hwsim.ko/d; /^uvc.ko$/d' ${OS}/${Release}/$Release-modules-$ARCH.lst
                     fi
                     ;;
             esac

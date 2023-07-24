@@ -671,6 +671,7 @@ team_mode_random.ko
 team_mode_roundrobin.ko
 tgr192.ko
 thunderbolt-net.ko
+thunderbolt_net.ko
 tipc.ko
 tls.ko
 trusted.ko

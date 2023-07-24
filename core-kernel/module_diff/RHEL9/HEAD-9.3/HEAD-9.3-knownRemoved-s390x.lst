@@ -1,2 +1,3 @@
 nd_blk.ko
+thunderbolt-net.ko
 vfio_virqfd.ko
