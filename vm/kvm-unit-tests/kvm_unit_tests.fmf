@@ -2,6 +2,7 @@ summary: Test upstream kvm-unit-tests suite
 description: |
     Run the upstream kvm-unit-tests suite.
 contact: Marcelo Condotta <mcondotta@redhat.com>
+id: e4ade37d-a0d9-48c2-9a0d-c1afbe1830a9
 component:
   - kernel
 test: bash ./runtest.sh
