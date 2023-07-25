@@ -92,7 +92,6 @@ check_cpu_cgroup ()
         fi
     fi
 }
-check_cpu_cgroup
 
 # Log a message to the ${DEBUGLOG} or to /dev/null.
 DeBug ()
@@ -434,3 +433,5 @@ GetFailureLog ()
         python3 $parser -f $kifile -F -t 0 $logfile
     fi
 }
+
+check_cpu_cgroup
