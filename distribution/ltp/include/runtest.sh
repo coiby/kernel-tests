@@ -7,8 +7,11 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+
 # Source the common test script helpers
-. ../../../cki_lib/libcki.sh || exit 1
+. "${CDIR}"/../../../cki_lib/libcki.sh || exit 1
 
 # Set unique log file.
 OUTPUTDIR=/mnt/testarea
@@ -434,4 +437,8 @@ GetFailureLog ()
     fi
 }
 
-check_cpu_cgroup
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+    check_cpu_cgroup
+fi
