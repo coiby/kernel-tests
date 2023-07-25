@@ -202,16 +202,18 @@ RprtRslt ()
         rstrnt-report-result -o "$failed_test" "${failed_test%.fail.log}" FAIL
     done
 
-    # File the results in the database
-    if [ "$result" = "PASS" ]; then
-        # I want to see the succeeded running log as well
-        SubmitLog $logfile_run
-        rstrnt-report-result $TEST $result
-    else
-        SubmitLog $logfile_run
-        score=$(cat $OUTPUTDIR/$RUNTEST.log | grep "Total Failures:" |cut -d ' ' -f 3)
-        rstrnt-report-result $TEST $result $score
+    # each failure is reported as subtest, always report pass for the summary result
+    SUMMARY_RESULT=PASS
+    # in case result is FAIL, but for some reason there is no subtest fail log
+    # like there is no python3 for GetFailureLog to parse the failures
+    # make sure the summary has fail status, to make sure the test will have failed status
+    if [[ -z "${LS_OUTPUT}" && "${result}" != "PASS" ]]; then
+        SUMMARY_RESULT=FAIL
     fi
+    # I want to see the succeeded running log as well
+    SubmitLog $logfile_run
+    score=$(cat $OUTPUTDIR/$RUNTEST.log | grep "Total Failures:" |cut -d ' ' -f 3)
+    rstrnt-report-result "Summary ($TEST)" $SUMMARY_RESULT $score
 }
 
 SubmitLog ()
