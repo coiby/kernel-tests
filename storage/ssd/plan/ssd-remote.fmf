@@ -3,7 +3,7 @@ discover:
   - name: tier1
     how: fmf
     url: https://gitlab.com/yizhanglinux/kernel-tests
-    ref: dev-220928-storage-ssd-tmt-migrate
+    #ref: dev-220928-storage-ssd-tmt-migrate
     test:
       - /storage/ssd/test_devs_setup
       - /storage/ssd/nvme_blktests

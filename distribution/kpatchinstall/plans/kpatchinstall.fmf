@@ -4,6 +4,6 @@ discover:
     test:
         - /distribution/kpatchinstall/tests/kpatchinstall
 execute:
-    how: shell
+    how: tmt
 environment-file:
         - ./distribution/kpatchinstall/plans/tmt.env
