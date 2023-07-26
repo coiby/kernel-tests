@@ -224,7 +224,7 @@ _trun_ ()
     echo "RETURN:$exit_status"
     echo
 
-    return "$exit_status"
+    return ${exit_status}
 }
 
 #
