@@ -50,6 +50,9 @@ for TEST_DISK in $TEST_DISKS; do
 		tok "echo $sched > /sys/block/$NVME_DISK/queue/scheduler"
 		max_nr="$(cat /sys/block/"$NVME_DISK"/queue/nr_requests)"
 		for ((nr = 4; nr <= max_nr; nr++)); do
+			if [[ "$sched" == "none" && "$nr" == "$max_nr" ]]; then
+				continue
+			fi
 			tok "echo $nr > /sys/block/$NVME_DISK/queue/nr_requests"
 		done
 	done
