@@ -208,6 +208,28 @@ function disableTests
         fi
     fi
 
+    # Disable tests for CentOS stream 9 Kernel
+    if [[ $OSVERSION == "CENTOS_STREAM_9" ]]; then
+        # Disabled x86_64 tests for Intel & AMD machines
+        if [[ $hwpf == "x86_64" ]]; then
+            if [[ $KUT_MACHINE == "pc" ]]; then
+                # Disable test hyperv_synic, hyperv_connections, hyperv_stimer
+                # due to https://bugzilla.redhat.com/show_bug.cgi?id=1668573
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_synic")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_connections")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_stimer")
+            fi
+            if [[ $CPUTYPE == "AMD" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
+            fi
+            if [[ $CPUTYPE == "INTEL" ]]; then
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu")
+                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "msr")
+            fi
+        fi
+    fi
+
     # Disable this test on Upstream testing (5.18.X)
     if [[ $OSVERSION == "ARK" || $OSVERSION == "UPSTREAM" ]]; then
         if [[ $hwpf == "x86_64" ]]; then
@@ -251,6 +273,8 @@ function setup
         OSVERSION="RHEL8"
     elif grep -q "Red Hat Enterprise Linux release 9." /etc/redhat-release; then
         OSVERSION="RHEL9"
+    elif grep -q "CentOS Stream release 9" /etc/redhat-release; then
+        OSVERSION="CENTOS_STREAM_9"
     elif [ ! -z "$CKI_SELFTESTS_URL" ]; then
         OSVERSION="UPSTREAM"
     else
