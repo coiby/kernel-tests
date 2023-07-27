@@ -40,10 +40,6 @@ if [ -z ${ARCH} ]; then
     ARCH=$(uname -i)
 fi
 
-if grep -q "release 4" /etc/redhat-release; then
-    RHEL4=1
-fi
-
 # by jstancek
 check_cpu_cgroup ()
 {
@@ -261,15 +257,7 @@ TimeSyncNTP ()
     logger -p local0.notice -t TEST.INFO: \
         "$timestamp -> Sync time with clock.redhat.com"
 
-    if [ "$RHEL4" ]; then
-        # Avoid AVC denial in RHEL 4.
-        # Required policy modification,
-        # allow ntpd_t initrc_tmp_t:file append;
-        runcon -u root -r system_r -t initrc_t -- \
-            ntpdate clock.redhat.com
-    else
-        ntpdate clock.redhat.com
-    fi
+    ntpdate clock.redhat.com
 }
 
 EnableNTP ()
