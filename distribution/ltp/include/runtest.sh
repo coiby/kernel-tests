@@ -7,8 +7,11 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+
 # Source the common test script helpers
-. ../../../cki_lib/libcki.sh || exit 1
+. "${CDIR}"/../../../cki_lib/libcki.sh || exit 1
 
 # Set unique log file.
 OUTPUTDIR=/mnt/testarea
@@ -35,10 +38,6 @@ lck=$OUTPUTDIR/$(basename $0).lck
 
 if [ -z ${ARCH} ]; then
     ARCH=$(uname -i)
-fi
-
-if grep -q "release 4" /etc/redhat-release; then
-    RHEL4=1
 fi
 
 # by jstancek
@@ -92,7 +91,6 @@ check_cpu_cgroup ()
         fi
     fi
 }
-check_cpu_cgroup
 
 # Log a message to the ${DEBUGLOG} or to /dev/null.
 DeBug ()
@@ -202,16 +200,18 @@ RprtRslt ()
         rstrnt-report-result -o "$failed_test" "${failed_test%.fail.log}" FAIL
     done
 
-    # File the results in the database
-    if [ "$result" = "PASS" ]; then
-        # I want to see the succeeded running log as well
-        SubmitLog $logfile_run
-        rstrnt-report-result $TEST $result
-    else
-        SubmitLog $logfile_run
-        score=$(cat $OUTPUTDIR/$RUNTEST.log | grep "Total Failures:" |cut -d ' ' -f 3)
-        rstrnt-report-result $TEST $result $score
+    # each failure is reported as subtest, always report pass for the summary result
+    SUMMARY_RESULT=PASS
+    # in case result is FAIL, but for some reason there is no subtest fail log
+    # like there is no python3 for GetFailureLog to parse the failures
+    # make sure the summary has fail status, to make sure the test will have failed status
+    if [[ -z "${LS_OUTPUT}" && "${result}" != "PASS" ]]; then
+        SUMMARY_RESULT=FAIL
     fi
+    # I want to see the succeeded running log as well
+    SubmitLog $logfile_run
+    score=$(cat $OUTPUTDIR/$RUNTEST.log | grep "Total Failures:" |cut -d ' ' -f 3)
+    rstrnt-report-result "Summary ($TEST)" $SUMMARY_RESULT $score
 }
 
 SubmitLog ()
@@ -257,15 +257,7 @@ TimeSyncNTP ()
     logger -p local0.notice -t TEST.INFO: \
         "$timestamp -> Sync time with clock.redhat.com"
 
-    if [ "$RHEL4" ]; then
-        # Avoid AVC denial in RHEL 4.
-        # Required policy modification,
-        # allow ntpd_t initrc_tmp_t:file append;
-        runcon -u root -r system_r -t initrc_t -- \
-            ntpdate clock.redhat.com
-    else
-        ntpdate clock.redhat.com
-    fi
+    ntpdate clock.redhat.com
 }
 
 EnableNTP ()
@@ -432,3 +424,9 @@ GetFailureLog ()
         python3 $parser -f $kifile -F -t 0 $logfile
     fi
 }
+
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+    check_cpu_cgroup
+fi
