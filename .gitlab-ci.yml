@@ -162,7 +162,6 @@ check bash lines ending with white spaces:
 
 check tmt lint:
   extends: .cki_tools
-  allow_failure: true
   before_script:
     - tmt --version
   script:
