@@ -282,7 +282,7 @@ EOF
                 echo " + Install rhivos brew repository"
                 local version=$(echo ${compose} | cut -d "-" -f 1)
                 local release=$(echo ${compose} | cut -d "-" -f 2)
-                curl -L https://brew-task-repos.engineering.redhat.com/repos/official/kernel-automotive/${version}/${release}/kernel-automotive-${compose}.repo -o /etc/yum.repos.d/kernel-automotive-${compose}.repo
+                curl -L http://brew-task-repos.usersys.redhat.com/repos/official/kernel-automotive/${version}/${release}/kernel-automotive-${compose}.repo -o /etc/yum.repos.d/kernel-automotive-${compose}.repo
             fi
         else
             sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
