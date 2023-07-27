@@ -78,7 +78,8 @@ require:
   - alsa-utils
   - sox
   - pciutils
-  - url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
+  - type: library
+    url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
     name: /audio/functional
 duration: 20m
 extra-summary: /kernel/audio_tests/functional/record_audio_from_connected_outputs

@@ -12,4 +12,3 @@ prepare:
     package: [beakerlib]
 execute:
     how: tmt
-    framework: beakerlib

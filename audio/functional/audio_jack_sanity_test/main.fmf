@@ -16,7 +16,8 @@ require:
   - python
   - alsa-utils
   - pciutils
-  - url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
+  - type: library
+    url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
     name: /audio/functional
 duration: 1m
 extra-summary: /kernel/audio_tests/functional/audio_jack_sanity_test
