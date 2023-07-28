@@ -233,6 +233,14 @@ kernel_automotive()
     return 1
 }
 
+# return 0 when running in ostree environment
+system_ostree() {
+  if [[ -e /run/ostree-booted ]]; then
+    return 0
+  fi
+  return 1
+}
+
 install_repos()
 {
     id=$(grep ^ID= /etc/os-release | cut -d = -f 2)
@@ -306,4 +314,54 @@ EOF
             sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main_debug.repo
         fi
     fi
+}
+
+install_kernel_automotive_devel()
+{
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        rpm-ostree -A --idempotent --allow-inactive install kernel-automotive-devel-$(uname -r)
+    else
+        dnf install -y kernel-automotive-devel-$(uname -r)
+    fi
+}
+
+install_kernel_automotive_source() {
+  local KVer=$(uname -r | awk -F '-' '{print $1}')
+  local KDIST=$(uname -r | sed "s/.$(arch)//g;s/\+debug//g" | awk -F '.' '{print "."$NF}')
+  local KBuild=$(uname -r | awk -F '-' '{print $2}' | sed "s/.$(arch)//g;s/\+debug//g" | sed "s/${KDIST}//g")
+  local KBuildPrefix=$(echo ${KBuild} | awk -F '.' '{print $1}')
+
+  # $ uname -r
+  # 5.14.0-163.125.el9iv.aarch64
+  # ^^^^^^               KVer (5.14.0)
+  #        ^^^           KBuildPrefix (163)
+  #        ^^^^^^        KBuild (163.125)
+  #                ^^^^^ KDIST (el9iv)
+
+  local kernel_name=kernel-automotive-${KVer}-${KBuild}${KDIST}
+
+  dnf download ${kernel_name} --source || {
+    # Workaround: RHIVOS doesn't offer the source code through dnf repos at this moment
+    type wget || install_packages wget
+    wget --no-check-certificate https://cbs.centos.org/kojifiles/packages/kernel-automotive/${KVer}/${KBuild}${KDIST}/src/${kernel_name}.src.rpm
+  }
+
+  if system_ostree; then
+    rpm-ostree install --apply-live --idempotent --allow-inactive -y ${kernel_name}.src.rpm || {
+      # Workaround: rpm-ostree doesn't support installing source code rpms
+      rpm -ivh --force ${kernel_name}.src.rpm
+    }
+  else
+    # Workaround: `dnf localinstall -y ${kernel_name}.src.rpm`
+    # results in "Error: Will not install a source rpm package"
+    rpm -ivh --force ${kernel_name}.src.rpm
+  fi
+
+  if [[ -f /usr/src/kernels/$(uname -r)/Kconfig ]]; then
+    echo "The source code for ${kernel_name} has been installed."
+    return 0
+  else
+    echo "Failed to install the source code for ${kernel_name}."
+    return 1
+  fi
 }
