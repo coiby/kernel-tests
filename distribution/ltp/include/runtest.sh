@@ -205,7 +205,7 @@ RprtRslt ()
     # in case result is FAIL, but for some reason there is no subtest fail log
     # like there is no python3 for GetFailureLog to parse the failures
     # make sure the summary has fail status, to make sure the test will have failed status
-    if [[ -z "${LS_OUTPUT}" && "${result}" != "PASS" ]]; then
+    if [[ -z "${failed_tests}" && "${result}" != "PASS" ]]; then
         SUMMARY_RESULT=FAIL
     fi
     # I want to see the succeeded running log as well
