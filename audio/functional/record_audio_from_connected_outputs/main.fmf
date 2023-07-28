@@ -73,10 +73,12 @@ component:
   - kernel
 test: ./runtest.sh
 framework: shell
-require:
+recommend:
   - python
-  - alsa-utils
+  - python3
   - sox
+require:
+  - alsa-utils
   - pciutils
   - type: library
     url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
