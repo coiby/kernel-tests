@@ -11,8 +11,11 @@ component:
   - kernel
 test: ./runtest.sh
 framework: shell
-require:
+recommend:
   - python
+  - python3
+  - sox
+require:
   - alsa-utils
   - pciutils
   - type: library
