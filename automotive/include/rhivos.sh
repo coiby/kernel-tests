@@ -332,15 +332,6 @@ install_kernel_automotive_devel()
     fi
 }
 
-install_kernel_automotive_devel()
-{
-    if stat /run/ostree-booted > /dev/null 2>&1; then
-        rpm-ostree -A --idempotent --allow-inactive install kernel-automotive-devel-$(uname -r)
-    else
-        dnf install -y kernel-automotive-devel-$(uname -r)
-    fi
-}
-
 install_kernel_automotive_source() {
   local KVer=$(uname -r | awk -F '-' '{print $1}')
   local KDIST=$(uname -r | sed "s/.$(arch)//g;s/\+debug//g" | awk -F '.' '{print "."$NF}')
