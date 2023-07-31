@@ -1,6 +1,6 @@
 [General]
 name=vm/kvm-self-tests
-owner=Marcelo Condotta <mcondotta@redhat.com>
+owner=Jan Richter <jarichte@redhat.com>
 description=KVM self tests
 license=GPLv3
 confidential=no
