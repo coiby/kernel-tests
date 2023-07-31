@@ -337,6 +337,29 @@ CheckKdumpStatus()
     fi
 }
 
+# This function is to return the path of kernel initrd which will be used in kdump kernel.
+GetKdumprd()
+{
+    local current_version="vmlinuz-$(uname -r)"
+    local kdumprd
+
+    # if fadump is enabled,kdump kernel will always use the system initrd image.
+    # if it is debug system:
+    # (1). if the same version of non-debug kernel exists,the kdump kernel will use non-debug kernel for kdump.
+    # (2). if the same version of non-debug kernel doesn't exist,the kdump kernel will still use the current debug kernel for kdump.
+    # if the system is non-debug kernel,kdump kernel will use this current non-debug kernel for kdump.
+    if grep -q -e "fadump=on" -e "fadump=nocma" < /proc/cmdline; then
+        kdumprd=${INITRD_IMG_PATH}
+    elif $IS_DB && [ -a "$K_BOOT/${current_version%[+-]debug}" ]; then
+        kdumprd="${INITRD_KDUMP_IMG_PATH/[+-]debugkdump.img/kdump.img}"
+    else
+        kdumprd=${INITRD_KDUMP_IMG_PATH}
+    fi
+
+    echo $kdumprd
+}
+
+
 ReportKdumprd()
 {
     # Allow passing kdump initramfs img path
@@ -344,11 +367,7 @@ ReportKdumprd()
 
     if [ -z "${kdumprd}" ]; then
         # Submit Kdump initramfs.
-        if grep -q -e "fadump=on" -e "fadump=nocma" < /proc/cmdline; then
-            kdumprd=${INITRD_IMG_PATH}
-        else
-            kdumprd=${INITRD_KDUMP_IMG_PATH}
-        fi
+        kdumprd=$(GetKdumprd)
     fi
 
     Log "Reporting kdump initramfs image at: $kdumprd"
@@ -803,4 +822,3 @@ TriggerSysrqCWithBPF(){
 
         TriggerSysrqC
 }
-

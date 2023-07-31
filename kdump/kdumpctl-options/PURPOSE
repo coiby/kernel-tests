@@ -5,3 +5,5 @@ Tests 'kdumpctl' cmds, and test regression bugs related to kdumpctl
 - Bug 2004000 - [fence kdump] kdump kernel failed with default crashkernel size that "/bin/sh: error while loading shared libraries: libtinfo.so.6: cannot open shared object file: No such file or directory "
 - Bug 2078461 - [IBM 8.8 FEAT] kdump to use zlib/dfltcc as default to improve compression speed and ratio on IBM z15 and above
 - Bug 2078460 - [IBM 9.2 FEAT] kdump to use zlib/dfltcc as default to improve compression speed and ratio on IBM z15 and above
+- Bug 2006000 - RHEL 8 debug-kernel doesn’t create a vmcore file when it crashes.
+- Bug 2076425 - RHEL 9 debug-kernel doesn’t create a vmcore file when it crashes.
