@@ -285,6 +285,13 @@ EOF
                     dnf install 'dnf-command(config-manager)' -y
                 fi
             fi
+            local compose=$(echo $(uname -r) | sed -e "s/+debug//" -e "s/.$(arch)//")
+            if ! ls /etc/yum.repos.d/kernel-automotive-${compose}.repo > /dev/null 2>&1; then
+                echo " + Install rhivos brew repository"
+                local version=$(echo ${compose} | cut -d "-" -f 1)
+                local release=$(echo ${compose} | cut -d "-" -f 2)
+                curl -L http://brew-task-repos.usersys.redhat.com/repos/official/kernel-automotive/${version}/${release}/kernel-automotive-${compose}.repo -o /etc/yum.repos.d/kernel-automotive-${compose}.repo
+            fi
         else
             sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
             if ! rpm -q dnf-plugins-core > /dev/null 2>&1; then
@@ -295,6 +302,16 @@ EOF
                 fi
             fi
             dnf config-manager --set-enabled crb
+            if ! ls /etc/yum.repos.d/*buildlogs* > /dev/null 2>&1 && ! ls /etc/yum.repos.d/*distro* > /dev/null 2>&1; then
+                dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main
+                dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main/debug
+                dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main
+                dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main/debug
+                sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main.repo
+                sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main_debug.repo
+                sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main.repo
+                sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main_debug.repo
+            fi
         fi
         if ! ls /etc/yum.repos.d/*epel* > /dev/null 2>&1; then
             if stat /run/ostree-booted > /dev/null 2>&1; then
@@ -303,16 +320,15 @@ EOF
                 dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${major}.noarch.rpm https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-${major}.noarch.rpm -y
             fi
         fi
-        if ! ls /etc/yum.repos.d/*buildlogs* > /dev/null 2>&1 && ! ls /etc/yum.repos.d/*distro* > /dev/null 2>&1; then
-            dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main
-            dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/autosd/${karch}/packages-main/debug
-            dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main
-            dnf config-manager --add-repo https://buildlogs.centos.org/${major}-stream/automotive/${karch}/packages-main/debug
-            sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main.repo
-            sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_autosd_${karch}_packages-main_debug.repo
-            sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main.repo
-            sed -i '$ a gpgcheck=0' /etc/yum.repos.d/buildlogs.centos.org_${major}-stream_automotive_${karch}_packages-main_debug.repo
-        fi
+    fi
+}
+
+install_kernel_automotive_devel()
+{
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        rpm-ostree -A --idempotent --allow-inactive install kernel-automotive-devel-$(uname -r)
+    else
+        dnf install -y kernel-automotive-devel-$(uname -r)
     fi
 }
 

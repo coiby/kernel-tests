@@ -1823,6 +1823,7 @@ tg3.ko
 tgr192.ko
 thmc50.ko
 thunderbolt-net.ko
+thunderbolt_net.ko
 tifm_7xx1.ko
 tifm_core.ko
 tifm_ms.ko
@@ -1863,6 +1864,7 @@ tvaudio.ko
 tveeprom.ko
 twofish_common.ko
 twofish_generic.ko
+typec_displayport.ko
 uartlite.ko
 uas.ko
 ubi.ko
@@ -1915,6 +1917,7 @@ usbvision.ko
 usb_wwan.ko
 ushc.ko
 uss720.ko
+uvc.ko
 uvcvideo.ko
 uwb.ko
 v4l2-common.ko

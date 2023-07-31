@@ -1235,6 +1235,7 @@ tg3.ko
 tgr192.ko
 thunder_bgx.ko
 thunderbolt-net.ko
+thunderbolt_net.ko
 thunderx2_pmu.ko
 thunder_xcv.ko
 thunderx_edac.ko
@@ -1262,6 +1263,7 @@ tunnel4.ko
 tunnel6.ko
 twofish_common.ko
 twofish_generic.ko
+typec_displayport.ko
 uas.ko
 ubi.ko
 ucan.ko

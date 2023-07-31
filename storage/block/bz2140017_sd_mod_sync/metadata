@@ -1,0 +1,13 @@
+[General]
+name=storage/block/bz2140017_sd_mod_sync
+owner=Changhui Zhong <czhong@redhat.com>
+description=set kernel parameter to keep disk order consistent
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/block/include
+max_time=3h
+use_pty=false

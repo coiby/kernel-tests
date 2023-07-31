@@ -2,9 +2,9 @@
 
 #SYSTEM_CONFIG
 ################################################################
-SYSTEM_VERSION=${SYSTEM_VERSION:-"RHEL-8.0-20181029.3"}
+#SYSTEM_VERSION=${SYSTEM_VERSION:-"RHEL-8.0-20181029.3"}
 # VM image OVS DPDK BONDING TEST
-IMG_GUEST=${IMG_GUEST}
+IMG_GUEST=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/rhel9.2-vsperf-1Q-viommu.qcow2
 ################################################################
 
 #PLEASE KEEP THE FOLLOW SECTION CONFIG FIXED
@@ -23,7 +23,7 @@ CLIENTS=${CLIENTS}
 
 #NOTICE PLEASE FIX YOUR CONFIG FROM HERE BELOW
 #CONN_TYPE netscout only or null
-CONN_TYPE=${CONN_TYPE}
+CONN_TYPE=
 NETSCOUT_HOST=${NETSCOUT_HOST}
 #traffic_type ,can  be xena trex
 TRAFFIC_TYPE=${TRAFFIC_TYPE:-xena}
@@ -31,8 +31,9 @@ TRAFFIC_TYPE=${TRAFFIC_TYPE:-xena}
 #TRAFFIC TREX CONFIG
 #ONLY ENABLED WITH TRAFFIC_TYPE==trex
 #the host ip that  started the t-rex-64 -i with this host
-TREX_SERVER_IP=${TREX_SERVER_IP}
+TREX_SERVER_IP=${CLIENTS}
 TREX_SERVER_PASSWORD=${TREX_SERVER_PASSWORD}
+TREX_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools/v2.87.tar.gz
 
 #TOPO PORT NAME
 #NOTE: IF Your environment is NOT connect with netscout , do not fill the following item
@@ -44,20 +45,26 @@ CLIENT_PORT_TWO=${CLIENT_PORT_TWO}
 
 ########################################################################################
 #CLIENT AND SERVER HOST NIC CONFIG
-NIC_DRIVER=${NIC_DRIVER:-ixgbe}
-SERVER_NIC1_MAC=${SERVER_NIC1_MAC}
-SERVER_NIC2_MAC=${SERVER_NIC2_MAC}
-CLIENT_NIC1_MAC=${CLIENT_NIC1_MAC}
-CLIENT_NIC2_MAC=${CLIENT_NIC2_MAC}
+NIC_DRIVER=${NIC_DRIVER:-ice}
+SERVER_NIC1_MAC=b4:96:91:a5:c7:96
+SERVER_NIC2_MAC=b4:96:91:a5:c7:97
+CLIENT_NIC1_MAC=b4:96:91:a5:c6:d6
+CLIENT_NIC2_MAC=b4:96:91:a5:c6:d7
 
 #OPENVSWITCH AND DPDK CONFIG
 #DPDK_TEST_OPTION select which dpdk type will be tested {rpm|source}
 #The default option is rpm
 DPDK_TEST_OPTION=${DPDK_TEST_OPTION:-"rpm"}
-DPDK_URL=${DPDK_URL}
-DPDK_TOOL_URL=${DPDK_TOOL_URL}
-DRIVERCTL_URL=${DRIVERCTL_URL}
-DPDK_SOURCE=${DPDK_SOURCE:-"http://fast.dpdk.org/rel/dpdk-20.08.tar.xz"}
+DPDK_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools/dpdk-22.11-3.el9_2.x86_64.rpm
+DPDK_TOOL_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools//dpdk-tools-22.11-3.el9_2.x86_64.rpm
+DRIVERCTL_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools/driverctl-0.111-2.el9.noarch.rpm
+DPDK_SOURCE=${DPDK_SOURCE:-"http://fast.dpdk.org/rel/dpdk-22.11.2.tar.xz"}
+DPDK_VERSION=22.11-3.el9_2
+GUEST_DPDK_VERSION=22.11-3.el9_2
+GUEST_DPDK_URL=${DPDK_URL}
+GUEST_DPDK_TOOL_URL=${DPDK_TOOL_URL}
+
+NAY=yes
 #CONFIG END , DO NOT EDIT THE FOLLOW CODE UNLESS YOU SURE YOU CAN !!!
 ##################################################################################################
 ##################################################################################################

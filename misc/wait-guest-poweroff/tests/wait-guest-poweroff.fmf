@@ -1,6 +1,7 @@
 summary: Wait for guest poweroff
 description: Wait for guest poweroff
 contact: Oliver Gutierrez <ogutierr@redhat.com>
+id: 38d33116-205f-4a86-8be7-18e049bcd80c
 component:
   - kernel
 path: /misc/wait-guest-poweroff

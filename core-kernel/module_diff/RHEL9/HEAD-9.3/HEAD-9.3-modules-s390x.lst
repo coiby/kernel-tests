@@ -208,6 +208,7 @@ ieee802154.ko
 ieee802154_socket.ko
 ifb.ko
 ionic.ko
+iosm.ko
 ip6_gre.ko
 ip6table_filter.ko
 ip6table_mangle.ko
@@ -637,6 +638,7 @@ team_mode_loadbalance.ko
 team_mode_random.ko
 team_mode_roundrobin.ko
 thunderbolt-net.ko
+thunderbolt_net.ko
 tipc.ko
 tls.ko
 trusted.ko
@@ -690,6 +692,7 @@ vx855.ko
 vxlan.ko
 wireguard.ko
 wp512.ko
+wwan_hwsim.ko
 xcbc.ko
 xfrm4_tunnel.ko
 xfrm6_tunnel.ko

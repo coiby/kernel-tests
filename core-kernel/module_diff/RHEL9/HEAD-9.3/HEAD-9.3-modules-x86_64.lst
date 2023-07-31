@@ -67,6 +67,7 @@ amdgpu.ko
 amd_hsmp.ko
 amd.ko
 amd-pmc.ko
+amd-pstate-ut.ko
 amd-rng.ko
 amd_sfh.ko
 amd-xgbe.ko
@@ -522,6 +523,7 @@ hid-dr.ko
 hid-elan.ko
 hid-elecom.ko
 hid-elo.ko
+hid-evision.ko
 hid-ezkey.ko
 hid-gaff.ko
 hid-gembird.ko
@@ -752,6 +754,7 @@ ioatdma.ko
 io_edgeport.ko
 iommu_v2.ko
 ionic.ko
+iosm.ko
 io_ti.ko
 iowarrior.ko
 ip6_gre.ko
@@ -986,6 +989,7 @@ macsec.ko
 mac-turkish.ko
 macvlan.ko
 macvtap.ko
+mana_ib.ko
 mana.ko
 marvell10g.ko
 marvell.ko
@@ -1353,6 +1357,7 @@ pps-gpio.ko
 pps-ldisc.ko
 pps_parport.ko
 pptp.ko
+prime_numbers.ko
 processor_thermal_device.ko
 processor_thermal_device_pci.ko
 processor_thermal_device_pci_legacy.ko
@@ -1715,6 +1720,7 @@ snd-soc-acp6x-mach.ko
 snd-soc-acpi-intel-match.ko
 snd-soc-acpi.ko
 snd-soc-avs.ko
+snd-soc-bdw-rt286.ko
 snd-soc-catpt.ko
 snd-soc-cml_rt1011_rt5682.ko
 snd-soc-core.ko
@@ -1722,6 +1728,7 @@ snd-soc-cs35l41-i2c.ko
 snd-soc-cs35l41.ko
 snd-soc-cs35l41-lib.ko
 snd-soc-cs35l41-spi.ko
+snd-soc-cs42l42-i2c.ko
 snd-soc-cs42l42.ko
 snd-soc-cx2072x.ko
 snd-soc-da7213.ko
@@ -1729,9 +1736,11 @@ snd-soc-da7219.ko
 snd-soc-dmic.ko
 snd-soc-ehl-rt5660.ko
 snd-soc-es8316.ko
+snd-soc-es8326.ko
 snd-soc-hdac-hda.ko
 snd-soc-hdac-hdmi.ko
 snd-soc-hda-codec.ko
+snd-soc-hsw-rt5640.ko
 snd-soc-intel-hda-dsp-common.ko
 snd-soc-intel-sof-cirrus-common.ko
 snd-soc-intel-sof-maxim-common.ko
@@ -1748,6 +1757,7 @@ snd-soc-max98373.ko
 snd-soc-max98373-sdw.ko
 snd-soc-max98390.ko
 snd-soc-max98927.ko
+snd-soc-nau8315.ko
 snd-soc-nau8821.ko
 snd-soc-nau8824.ko
 snd-soc-nau8825.ko
@@ -1782,6 +1792,7 @@ snd-soc-rt5682s.ko
 snd-soc-rt700.ko
 snd-soc-rt711.ko
 snd-soc-rt711-sdca.ko
+snd-soc-rt712-sdca.ko
 snd-soc-rt715.ko
 snd-soc-rt715-sdca.ko
 snd-soc-skl_hda_dsp.ko
@@ -1827,10 +1838,12 @@ snd-sof-acpi-intel-bdw.ko
 snd-sof-acpi-intel-byt.ko
 snd-sof-acpi.ko
 snd-sof-amd-acp.ko
+snd-sof-amd-rembrandt.ko
 snd-sof-amd-renoir.ko
 snd-sof-intel-atom.ko
 snd-sof-intel-hda-common.ko
 snd-sof-intel-hda.ko
+snd-sof-intel-hda-mlink.ko
 snd-sof.ko
 snd-sof-pci-intel-apl.ko
 snd-sof-pci-intel-cnl.ko
@@ -1868,6 +1881,7 @@ snd_xen_front.ko
 softdog.ko
 sony-laptop.ko
 soundcore.ko
+soundwire-amd.ko
 soundwire-bus.ko
 soundwire-cadence.ko
 soundwire-generic-allocation.ko
@@ -1934,6 +1948,7 @@ think-lmi.ko
 thinkpad_acpi.ko
 thmc50.ko
 thunderbolt-net.ko
+thunderbolt_net.ko
 tifm_7xx1.ko
 tifm_core.ko
 tifm_ms.ko
@@ -2005,6 +2020,7 @@ usb_wwan.ko
 ushc.ko
 usnic_verbs.ko
 uss720.ko
+uvc.ko
 uvcvideo.ko
 uv_mmtimer.ko
 uv_sysfs.ko
@@ -2101,6 +2117,7 @@ wmi-bmof.ko
 wmi.ko
 wp512.ko
 wusb3801.ko
+wwan_hwsim.ko
 x38_edac.ko
 x86_pkg_temp_thermal.ko
 xcbc.ko

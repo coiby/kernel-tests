@@ -31,6 +31,8 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "903" && tskip "fork14" unfix
 	# Bug 2152548 (CVE-2022-4378) - CVE-2022-4378 kernel: a stack overflow in do_proc_dointvec and proc_skip_spaces
 	osver_in_range "900" "904" && tskip "cve-2022-4378" unfix
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1670
+	is_rt && pkg_in_range "tuned" "2.19.0" "99" && tskip "numa_testcases" unfix
 }
 
 function rhel9_fixed_issues()

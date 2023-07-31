@@ -224,7 +224,7 @@ ltp_lite_run()
 		service cgconfig stop
 		runtest_prepare $RUNTEST
 		# runtest_prepare created the $RUNTEST.FILTERED
-		RunTest $RUNTEST.FILTERED
+		RunTest $RUNTEST.FILTERED "$OPTS"
 	done
 }
 

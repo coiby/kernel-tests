@@ -168,7 +168,7 @@ function runtest() {
 		testcases+=" scsi/004"
 		testcases+=" scsi/005"
 		testcases+=" scsi/006"
-		testcases+=" scsi/007"
+		#testcases+=" scsi/007" bz2027550
 		testcases+=" loop/001"
 		testcases+=" loop/002"
 		testcases+=" loop/003"

@@ -888,6 +888,7 @@ int51x1.ko
 intel-cstate.ko
 intel-gtt.ko
 intel-hid.ko
+intel_ifs.ko
 intel_ips.ko
 intel-ish-ipc.ko
 intel-ishtp-hid.ko
@@ -916,6 +917,8 @@ intel_th_msu_sink.ko
 intel_th_pci.ko
 intel_th_pti.ko
 intel_th_sth.ko
+intel-uncore-frequency-common.ko
+intel-uncore-frequency.ko
 intel-uncore.ko
 intel-vbtn.ko
 intel_vsec.ko
@@ -1204,6 +1207,7 @@ macsec.ko
 mac-turkish.ko
 macvlan.ko
 macvtap.ko
+mana_ib.ko
 mana.ko
 mantis_core.ko
 mantis.ko
@@ -2134,6 +2138,7 @@ snd-soc-acp6x-mach.ko
 snd-soc-acpi-intel-match.ko
 snd-soc-acpi.ko
 snd-soc-avs.ko
+snd-soc-bdw-rt286.ko
 snd-soc-catpt.ko
 snd-soc-cml_rt1011_rt5682.ko
 snd-soc-core.ko
@@ -2147,9 +2152,11 @@ snd-soc-da7219.ko
 snd-soc-dmic.ko
 snd-soc-ehl-rt5660.ko
 snd-soc-es8316.ko
+snd-soc-es8326.ko
 snd-soc-hdac-hda.ko
 snd-soc-hdac-hdmi.ko
 snd-soc-hda-codec.ko
+snd-soc-hsw-rt5640.ko
 snd-soc-intel-hda-dsp-common.ko
 snd-soc-intel-sof-cirrus-common.ko
 snd-soc-intel-sof-maxim-common.ko
@@ -2166,6 +2173,7 @@ snd-soc-max98373.ko
 snd-soc-max98373-sdw.ko
 snd-soc-max98390.ko
 snd-soc-max98927.ko
+snd-soc-nau8315.ko
 snd-soc-nau8821.ko
 snd-soc-nau8824.ko
 snd-soc-nau8825.ko
@@ -2199,6 +2207,7 @@ snd-soc-rt5682s.ko
 snd-soc-rt700.ko
 snd-soc-rt711.ko
 snd-soc-rt711-sdca.ko
+snd-soc-rt712-sdca.ko
 snd-soc-rt715.ko
 snd-soc-rt715-sdca.ko
 snd-soc-skl_hda_dsp.ko
@@ -2243,10 +2252,12 @@ snd-sof-acpi-intel-bdw.ko
 snd-sof-acpi-intel-byt.ko
 snd-sof-acpi.ko
 snd-sof-amd-acp.ko
+snd-sof-amd-rembrandt.ko
 snd-sof-amd-renoir.ko
 snd-sof-intel-atom.ko
 snd-sof-intel-hda-common.ko
 snd-sof-intel-hda.ko
+snd-sof-intel-hda-mlink.ko
 snd-sof.ko
 snd-sof-pci-intel-apl.ko
 snd-sof-pci-intel-cnl.ko
@@ -2285,6 +2296,7 @@ softdog.ko
 softing.ko
 sony-laptop.ko
 soundcore.ko
+soundwire-amd.ko
 soundwire-bus.ko
 soundwire-cadence.ko
 soundwire-generic-allocation.ko
@@ -2403,6 +2415,7 @@ think-lmi.ko
 thinkpad_acpi.ko
 thmc50.ko
 thunderbolt-net.ko
+thunderbolt_net.ko
 tifm_7xx1.ko
 tifm_core.ko
 tifm_ms.ko
@@ -2456,6 +2469,7 @@ twofish_common.ko
 twofish_generic.ko
 twofish-x86_64-3way.ko
 twofish-x86_64.ko
+typec_displayport.ko
 uas.ko
 ubi.ko
 ucan.ko
@@ -2510,6 +2524,7 @@ usb_wwan.ko
 ushc.ko
 usnic_verbs.ko
 uss720.ko
+uvc.ko
 uvcvideo.ko
 uv_mmtimer.ko
 uv_sysfs.ko

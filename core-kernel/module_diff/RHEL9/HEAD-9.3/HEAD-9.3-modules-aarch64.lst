@@ -70,6 +70,7 @@ ath10k_core.ko
 ath10k_pci.ko
 ath11k.ko
 ath11k_pci.ko
+ath3k.ko
 ath9k_common.ko
 ath9k_htc.ko
 ath9k_hw.ko
@@ -83,6 +84,7 @@ auth_rpcgss.ko
 ax88179_178a.ko
 ax88796b.ko
 bareudp.ko
+bcm203x.ko
 bcm7xxx.ko
 bcm87xx.ko
 bcma.ko
@@ -91,18 +93,22 @@ bcm-phy-lib.ko
 bd718x7-regulator.ko
 be2iscsi.ko
 belkin_sa.ko
+bfusb.ko
 binfmt_misc.ko
 blake2b_generic.ko
 blocklayoutdriver.ko
 blowfish_common.ko
 blowfish_generic.ko
 bluefield_edac.ko
+bluetooth.ko
+bnep.ko
 bnx2.ko
 bnx2x.ko
 bnxt_en.ko
 bnxt_re.ko
 bochs.ko
 bonding.ko
+bpa10x.ko
 br2684.ko
 brcmfmac-bca.ko
 brcmfmac-cyw.ko
@@ -115,7 +121,15 @@ bridge.ko
 br_netfilter.ko
 broadcom.ko
 bsd_comp.ko
+btbcm.ko
 btcoexist.ko
+btintel.ko
+btmrvl.ko
+btmrvl_sdio.ko
+btmtk.ko
+btrtl.ko
+btsdio.ko
+btusb.ko
 caamalg_desc.ko
 caamhash_desc.ko
 caam_jr.ko
@@ -392,6 +406,8 @@ grace.ko
 gre.ko
 gud.ko
 gve.ko
+hci_uart.ko
+hci_vhci.ko
 hclge.ko
 hclgevf.ko
 hdlc_cisco.ko
@@ -419,6 +435,7 @@ hid-dr.ko
 hid-elan.ko
 hid-elecom.ko
 hid-elo.ko
+hid-evision.ko
 hid-ezkey.ko
 hid-gaff.ko
 hid-gembird.ko
@@ -451,6 +468,7 @@ hid-ortek.ko
 hid-penmount.ko
 hid-petalynx.ko
 hid-picolcd.ko
+hidp.ko
 hid-plantronics.ko
 hid-pl.ko
 hid-primax.ko
@@ -587,6 +605,7 @@ int51x1.ko
 intel-xway.ko
 io_edgeport.ko
 ionic.ko
+iosm.ko
 io_ti.ko
 iowarrior.ko
 ip6_gre.ko
@@ -1107,6 +1126,7 @@ ppp_synctty.ko
 pps-gpio.ko
 pps-ldisc.ko
 pptp.ko
+prime_numbers.ko
 psample.ko
 psnap.ko
 ptp_kvm.ko
@@ -1156,6 +1176,7 @@ rdma_ucm.ko
 realtek.ko
 reed_solomon.ko
 regmap-spi.ko
+rfcomm.ko
 rfkill-gpio.ko
 rfkill.ko
 ring_buffer_benchmark.ko
@@ -1402,6 +1423,7 @@ teranetics.ko
 tg3.ko
 thunder_bgx.ko
 thunderbolt-net.ko
+thunderbolt_net.ko
 thunderx2_pmu.ko
 thunder_xcv.ko
 thunderx_edac.ko
@@ -1527,6 +1549,7 @@ whiteheat.ko
 wireguard.ko
 wp512.ko
 wusb3801.ko
+wwan_hwsim.ko
 xcbc.ko
 xfrm4_tunnel.ko
 xfrm6_tunnel.ko

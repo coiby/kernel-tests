@@ -11,11 +11,15 @@ component:
   - kernel
 test: ./runtest.sh
 framework: shell
-require:
+recommend:
   - python
+  - python3
+  - sox
+require:
   - alsa-utils
   - pciutils
-  - url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
+  - type: library
+    url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
     name: /audio/functional
 duration: 30m
 extra-summary: /kernel/audio_tests/functional/mixer_control_range_sanity_test

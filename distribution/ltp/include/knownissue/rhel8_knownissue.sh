@@ -88,6 +88,8 @@ function rhel8_unfix_issues()
 	osver_in_range "800" "809" && tskip "creat09 cve-2018-13405" unfix
 	# Bug 2163455 - RHEL8.8 - LTP testcase inotify12 fails on LPAR & z/VM
 	osver_in_range "800" "810" && tskip "inotify12" unfix
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1670
+	is_rt && pkg_in_range "tuned" "2.19.0" "99" && tskip "numa_testcases" unfix
 }
 
 function rhel8_fixed_issues()

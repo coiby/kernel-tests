@@ -412,6 +412,7 @@ hid-cypress.ko
 hid-dr.ko
 hid-elan.ko
 hid-elecom.ko
+hid-evision.ko
 hid-ezkey.ko
 hid-gaff.ko
 hid-gyration.ko
@@ -533,6 +534,7 @@ int51x1.ko
 intel-xway.ko
 io_edgeport.ko
 ionic.ko
+iosm.ko
 io_ti.ko
 iowarrior.ko
 ip6_gre.ko
@@ -1032,6 +1034,7 @@ ppp_synctty.ko
 pps-gpio.ko
 pps-ldisc.ko
 pptp.ko
+prime_numbers.ko
 psample.ko
 pseries_energy.ko
 pseries-rng.ko
@@ -1333,6 +1336,7 @@ teranetics.ko
 tg3.ko
 thmc50.ko
 thunderbolt-net.ko
+thunderbolt_net.ko
 tifm_7xx1.ko
 tifm_core.ko
 tifm_ms.ko
@@ -1394,6 +1398,7 @@ usb-storage.ko
 usbtmc.ko
 usb_wwan.ko
 ushc.ko
+uvc.ko
 uvcvideo.ko
 v4l2-dv-timings.ko
 vcan.ko
@@ -1466,6 +1471,7 @@ whiteheat.ko
 wireguard.ko
 wp512.ko
 wusb3801.ko
+wwan_hwsim.ko
 xcbc.ko
 xfrm4_tunnel.ko
 xfrm6_tunnel.ko

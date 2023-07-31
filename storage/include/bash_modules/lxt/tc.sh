@@ -34,6 +34,7 @@ tlog ()
 {
     local msg=$1
     local log_level=${2:-INFO}
+    # shellcheck disable=SC2155
     local cur_date=$(tdate)
 
     echo "[$log_level][$cur_date]$msg"
@@ -129,6 +130,7 @@ texit ()
     test $err -lt 1 || err=1
 
     tlog "$msg" "ERROR"
+    # shellcheck disable=SC2086
     exit $2
 }
 
@@ -138,7 +140,9 @@ texit ()
 #
 tend ()
 {
+    # shellcheck disable=SC2155
     local pcount=$(wc -l "$tPASS_FILE" | awk '{print $1}')
+    # shellcheck disable=SC2155
     local fcount=$(wc -l "$tFAIL_FILE" | awk '{print $1}')
     local total=$((pcount+fcount))
 
@@ -190,11 +194,15 @@ _trun_ ()
 {
     local cmd="$1"
     local chk="$2"
+    # shellcheck disable=SC2155
     local cur_date=$(tdate)
 
+    # shellcheck disable=SC2155
     local stdout=$(eval "$cmd" 2>"$tSTDERR_FILE"; echo $? >"$tRETURN_FILE" 2>/dev/null)
 #timeout -- how to set timeout?
+    # shellcheck disable=SC2155
     local exit_status=$(< "$tRETURN_FILE")
+    # shellcheck disable=SC2155
     local stderr=$(< "$tSTDERR_FILE")
     local msg=CMD
 #tnot
@@ -224,7 +232,8 @@ _trun_ ()
     echo "RETURN:$exit_status"
     echo
 
-    return "$exit_status"
+    # shellcheck disable=SC2086
+    return ${exit_status}
 }
 
 #
@@ -239,12 +248,16 @@ _tsetup_ ()
     test -d "$LXT_TMP_DIR" || mkdir -p "$LXT_TMP_DIR" >& /dev/null || exit 1
 
     tSTDERR_FILE="$LXT_TMP_DIR/stderr.$$"
+    # shellcheck disable=SC2188
     test -e "$tSTDERR_FILE" || > "$tSTDERR_FILE" || exit 1
     tRETURN_FILE="$LXT_TMP_DIR/return.$$"
+    # shellcheck disable=SC2188
     test -e "$tRETURN_FILE" || > "$tRETURN_FILE" || exit 1
     tPASS_FILE="$LXT_TMP_DIR/tc.pass.$$"
+    # shellcheck disable=SC2188
     test -e "$tPASS_FILE" || > "$tPASS_FILE" || exit 1
     tFAIL_FILE="$LXT_TMP_DIR/tc.fail.$$"
+    # shellcheck disable=SC2188
     test -e "$tFAIL_FILE" || > "$tFAIL_FILE" || exit 1
 }
 
@@ -255,7 +268,9 @@ _tsetup_ ()
 # global variables
 tIGNORE_STDOUT=0
 tIGNORE_STDERR=0
+# shellcheck disable=SC2034
 tSTDOUT=
+# shellcheck disable=SC2034
 tSTDERR=
 #LXT_TMP_DIR
 # only used in this file

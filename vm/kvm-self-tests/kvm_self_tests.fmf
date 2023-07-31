@@ -2,6 +2,7 @@ summary: Test upstream kvm-self-tests suite
 description: |
     Run the upstream kvm-self-tests suite.
 contact: Marcelo Condotta <mcondotta@redhat.com>
+id: 8753f4e0-5cb3-4353-8b1a-ac2b28667d9f
 component:
   - kernel
 test: bash ./runtest.sh
