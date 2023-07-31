@@ -1,0 +1,14 @@
+summary: storage/block/bz2140017_sd_mod_sync
+description: set kernel parameter to keep disk order consistent
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/bz2140017_sd_mod_sync
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+duration: 3h
+tier: 1
+extra-summary: /storage/block/bz2140017_sd_mod_sync
+extra-task: /storage/block/bz2140017_sd_mod_sync
