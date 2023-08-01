@@ -34,9 +34,12 @@ NPROC=${NPROC:-$n_proc}
 
 prepare() {
 	which sysbench && return
-	rlLog "installing sysbench srpm and compile"
-	../../../include/scripts/sysbench.sh > /dev/null
-	which sysbench > /dev/null
+	rlLog "Trying to install sysbench"
+	if ../../../include/scripts/sysbench.sh; then
+		which sysbench > /dev/null
+	else
+		return 1
+	fi
 }
 
 check_thp_support()
@@ -202,8 +205,13 @@ run_matrix()
 
 rlJournalStart
 	rlPhaseStartSetup
-		prepare || rlDie "benchmark install failed."
-		get_matrix
+		if prepare; then
+			get_matrix
+		else
+			rlLogInfo "sysbench install failed."
+			rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
+			exit 0
+		fi
 	rlPhaseEnd
 
 	if check_thp_support; then
@@ -227,8 +235,8 @@ rlJournalStart
 			rlPhaseEnd
 		fi
 	else
-			rlPhaseStartTest "hugepage-not-support"
-			rlPhaseEnd
+		rlPhaseStartTest "hugepage-not-support"
+		rlPhaseEnd
 	fi
 
 rlJournalEnd
