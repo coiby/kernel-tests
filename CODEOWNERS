@@ -300,8 +300,8 @@
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
 /tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing
 /vm/hugepage/libhugetlbfs/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/vm/kvm-self-tests/ @bgoncalv @lulinqing @mcondotta
-/vm/kvm-unit-tests/ @bgoncalv @lulinqing @mcondotta
+/vm/kvm-self-tests/ @bgoncalv @jarichte @lulinqing
+/vm/kvm-unit-tests/ @bgoncalv @jarichte @lulinqing
 /vm/qemu-sanity-check/ @bgoncalv @lulinqing @rwmjones
 /watchdog/hw-generic/ @bgoncalv @ftjahjad @lulinqing
 
