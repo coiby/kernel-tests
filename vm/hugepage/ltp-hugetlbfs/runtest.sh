@@ -74,6 +74,7 @@ SetupHugetlb()
     # try to allocate as much as we can (leave $MEM_LEFT MB for other use)
     echo " - Calculate memory to be reserved for hugepages" | tee -a ${OUTPUTFILE}
     MemFree=$(echo `grep 'MemFree:' /proc/meminfo | awk '{print $2}'` / 1024 - $MEM_LEFT | bc)
+    MemAlloc="$MemFree"
     if [ "$MemFree" -gt "1024" ]; then
         MemAlloc=1024
     elif [ "$MemFree" -le "0" ]; then
