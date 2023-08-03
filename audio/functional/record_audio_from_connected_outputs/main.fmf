@@ -69,6 +69,7 @@ description: |
     =================
     -end PURPOSE file
 contact: Erik Hamera <ehamera@redhat.com>
+id: e117032c-6696-44c9-8119-707a24521dab
 component:
   - kernel
 test: ./runtest.sh
