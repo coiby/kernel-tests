@@ -26,10 +26,14 @@ Describe 'reboot-test: pre-reboot'
 End
 
 Describe 'reboot-test: post-reboot'
+    init() {
+        touch kernel_before_reboot.txt
+    }
     cleanup(){
         rm -f kernel_before_reboot.txt kernel_after_reboot.txt
         rm -f journalctl_before_reboot.log journalctl_after_reboot.log journalctl.log
     }
+    BeforeEach 'init'
     AfterAll 'cleanup'
 
     Mock diff

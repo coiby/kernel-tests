@@ -63,6 +63,7 @@ else
         echo -n "After reboot: "
         cat kernel_after_reboot.txt
     fi
+    rm -f kernel_before_reboot.txt
     rstrnt-report-result ${TEST}/kernel-version-check ${check_version_status} 0
 
     if type -p journalctl > /dev/null; then
