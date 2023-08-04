@@ -1,25 +1,26 @@
-#!/bin/sh
+#!/bin/bash
 
-if uname -r | grep el7; then
-	yum -y install yum-utils mariadb-devel postgresql-devel libaio-devel
-	wget http://download-node-02.eng.bos.redhat.com/brewroot/packages/sysbench/0.4.12/13.el7ostarch/src/sysbench-0.4.12-13.el7ostarch.src.rpm
-	rpmbuild -bp sysbench-0.4.12-13.el7ostarch.src.rpm
-	yum-builddep -y  sysbench-0.4.12-13.el7ostarch.src.rpm
-	rpmbuild -bb ./sysbench-0.4.12-13.el7ostarch.src.rpm
-	rpmbuild --rebuild -bb  ./sysbench-0.4.12-13.el7ostarch.src.rpm
-	rpm -ivh /root/rpmbuild/RPMS/$(uname -m)/sysbench-0.4.12-13.el7.$(uname -m).rpm
-elif  uname -r | grep el8; then
-	wget http://download-node-02.eng.bos.redhat.com/brewroot/packages/sysbench/0.4.12/14.el8ost/src/sysbench-0.4.12-14.el8ost.src.rpm
-	rpm -ivh sysbench-0.4.12-14.el8ost.src.rpm
-	dnf builddep -y /root/rpmbuild/SPECS/sysbench.spec  --nobest --allowerasing
-	dnf -y install  mariadb-devel postgresql-devel libaio-devel --nobest
-	rpmbuild -bb /root/rpmbuild/SPECS/sysbench.spec
-	rpm -ivh /root/rpmbuild/RPMS/$(uname -m)/sysbench-0.4.12-14.el8.$(uname -m).rpm
+release="$(uname -r)"
+machine="$(uname -m)"
+
+# EPEL7 only builds sysbench for x86_64
+if [[ "$release" =~ el7 && "$machine" =~ x86_64 ]]; then
+	subscription-manager repos --enable rhel-*-optional-rpms \
+				--enable rhel-*-extras-rpms \
+				--enable rhel-ha-for-rhel-*-server-rpms
+	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+	yum -y install sysbench
+# But EPEL8 builds sysbench packages for all architectures
+elif [[ "$release" =~ el8 ]]; then
+	subscription-manager repos --enable "codeready-builder-for-rhel-8-$(arch)-rpms"
+	dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+	dnf -y install sysbench
+# While EPEL9 only builds sysbench for x86_64 and aarch64
+elif [[ "$release" =~ el9 && "$machine" =~ (x86_64)|(aarch64) ]]; then
+	subscription-manager repos --enable "codeready-builder-for-rhel-9-$(arch)-rpms"
+	dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+	dnf -y install sysbench
 else
-	wget http://download-node-02.eng.bos.redhat.com/brewroot/packages/sysbench/0.4.12/14.el8ost/src/sysbench-0.4.12-14.el8ost.src.rpm
-	rpm -ivh sysbench-0.4.12-14.el8ost.src.rpm
-	dnf builddep -y /root/rpmbuild/SPECS/sysbench.spec  --nobest --allowerasing
-	dnf -y install  mariadb-devel postgresql-devel libaio-devel automake libtool --nobest --enablerepo=beaker-CRB
-	rpmbuild -bb /root/rpmbuild/SPECS/sysbench.spec --noclean
-	rpm -ivh /root/rpmbuild/RPMS/$(uname -m)/sysbench-0.4.12-14.el9.$(uname -m).rpm
+	echo "The sysbench package is not available for $(cat /etc/redhat-release) on $machine."
+	exit 1
 fi
