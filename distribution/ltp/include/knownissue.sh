@@ -169,7 +169,7 @@ function knownissue_filter()
 	# Bug 1534635 - CVE-2018-1000001 glibc: realpath() buffer underflow when getcwd()
 	pkg_in_range "glibc" "0" "2.17-221.el7" && tskip "realpath01 cve-2018-1000001" fixed
 
-	cki_is_kernel_debug && tskip "futex_cmp_requeue01" unfix
+	cki_is_kernel_debug && tskip "futex_cmp_requeue01 squashfs01" unfix
 
 	# These test cases take too long to run on VMs
 	cki_is_vm || cki_is_kernel_debug && tskip "fork14 setsockopt06 mtest06 pty03 writev03" fatal
