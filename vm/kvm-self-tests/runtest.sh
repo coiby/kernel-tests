@@ -360,7 +360,7 @@ function setup
 
 function runtest
 {
-    rlPhaseStartTest
+    rlPhaseStartTest prepare
     rlRun "pushd '.'"
 
     # Prepare lists of tests to run
@@ -368,10 +368,16 @@ function runtest
     if [[ "${NODISABLE}" == "NO" ]] ; then
         disableTests
     fi
+    rlPhaseEnd
 
     # Run tests
-    for test in ${ALL_TESTS[*]}; do rlRun "${BINDIR}/${test}" 0,4; done
+    for test in ${ALL_TESTS[*]}; do
+        rlPhaseStartTest "${test}"
+        rlRun "${BINDIR}/${test}" 0,4
+        rlPhaseEnd
+    done
 
+    rlPhaseStartTest completed
     rlRun "popd"
     rlPhaseEnd
 }

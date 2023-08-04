@@ -450,13 +450,14 @@ function cleanupWR
 
 function runtest
 {
-    rlPhaseStartTest
+    rlPhaseStartTest prepare
     rlRun "pushd '.'"
 
     rlRun "cd kvm-unit-tests"
 
     rm -rf $LOGDIR
     mkdir $LOGDIR
+    rlPhaseEnd
 
     i=0
     for repo in ${REPOS[*]}; do
@@ -467,6 +468,7 @@ function runtest
 
             j=0
             for accel in ${ACCELS[*]}; do
+                rlPhaseStartTest "prepare-${mach}-${repo}-${accel}"
                 export ACCEL=$accel
                 make clean > /dev/null 2>&1
                 rlRun "make standalone > /dev/null 2>&1"
@@ -476,8 +478,13 @@ function runtest
                     disableTests
                 fi
                 rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo][$accel] Running tests for ACCEL: $accel"
+                rlPhaseEnd
                 # Run tests
-                for test in ${ALL_TESTS[*]}; do rlRun "yes | $BINDIR/$test > $LOGDIR/${j}_${mach}_${repo}_${accel}_$test.log 2>&1" 0,2,77; done
+                for test in ${ALL_TESTS[*]}; do
+                    rlPhaseStartTest "${mach}-${repo}-${accel}-${test}"
+                    rlRun "yes | $BINDIR/$test > $LOGDIR/${j}_${mach}_${repo}_${accel}_$test.log 2>&1" 0,2,77
+                    rlPhaseEnd
+                done
                 j=$((j+1))
             done
 
@@ -486,6 +493,7 @@ function runtest
         i=$((i+1))
     done
 
+    rlPhaseStartTest completed
     cd $LOGDIR
     logs=$(ls *.log)
     for log in $logs; do rlFileSubmit $log ; done
