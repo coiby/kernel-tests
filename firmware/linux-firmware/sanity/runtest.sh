@@ -5,6 +5,7 @@
 #   runtest.sh of /kernel/firmware/linux-firmware/sanity
 #   Description: Sanity check for linux-firmware files
 #   Author: Erico Nunes <ernunes@redhat.com>
+#   Update: Laura Trivelloni <ltrivell@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -26,61 +27,108 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 HASHES_FILE=/tmp/hashes
 FILETYPES_FILE=/tmp/filetypes
 
-rm -f "$HASHES_FILE"
-rm -f "$FILETYPES_FILE"
+rlJournalStart
 
-pushd /usr/lib/firmware
-# We strip the absolute path prefix, so that it is easier to compare later with
-# relative paths
-for f in $( rpm -ql linux-firmware | grep /usr/lib/firmware/ | sed 's@/usr/lib/firmware/@@' )
-do
-    # skip directories
-    [ -f "$f" ] || continue
+    rlPhaseStartSetup
+        rlShowPackageVersion linux-firmware
+    rlPhaseEnd
 
-    sha256sum "$f" >> "$HASHES_FILE"
-    file -r -F '' "$f" >> "$FILETYPES_FILE"
-done
-popd
+    rlPhaseStartTest "Check for broken links"
+        pushd /usr/lib/firmware || exit
+        set -x
+        # check for broken links
+        broken=$(find -L . -type l)
+        rlRun -l "[ -z $broken ]" 0 "Check for broken links"
+        set +x
+        if [ -z "$broken" ]
+        then
+            rlLog "No broken links found."
+        else
+            rlLog "Broken links: $broken"
+        fi
+        popd || exit
+    rlPhaseEnd
 
-LINUX_FIRMWARE_RELEASE="$(rpm -q --queryformat '%{release}\n' linux-firmware)"
-# This expression strips just the sha1 part between "git" and ".el7".
-UPSTREAM_SHA1="$(sed -e 's/[0-9]\+\.git\([0-9a-z]\+\)\..*/\1/g' - <<< "$LINUX_FIRMWARE_RELEASE")"
+    rlPhaseStartTest "Check sha256sum and file types"
+        # We strip the absolute path prefix, so that it is easier to compare later with
+        # relative paths
+        pushd /usr/lib/firmware || exit
+        for f in $( rpm -ql linux-firmware | grep /usr/lib/firmware/ | sed 's@/usr/lib/firmware/@@' )
+        do
+            # skip directories
+            [ -f "$f" ] || continue
 
-cd /tmp
-git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
-cd linux-firmware
-git checkout "$UPSTREAM_SHA1"
+            # check if symbolic link
+            if [[ -L "$f" ]]
+            then
+                slink="$f"
+                f=$(readlink -f "$f")
+                # remove /usr/lib/firmware/ from the absolute path
+                f=${f##*firmware/}
+                if [ ! -f "$f" ]
+                then
+                    echo "$slink -> $f doesn't exists"
+                fi
+            fi
 
-# Check sha256sum of files. This will check all files.
-if ! sha256sum --quiet -c "$HASHES_FILE"
-then
-    sha256sumresult=FAIL
-else
-    sha256sumresult=PASS
-fi
-report_result "sha256sum" "$sha256sumresult"
+            if [[ "$f" == *.xz ]]
+            then
+                # decompress to have same filetype found in linux-firmware repository
+                # -k option to keep the original *.xz file
+                xz -d -k "$f"
+                # remove .xz extension from current filename
+                f="${f%.*}"
+            fi
 
-# Compare file type for all files.
-# Might be useful information in case we got a mismatch
-fileresult=PASS
-while read -r filetype_line
-do
-    filename="$(cut -d ' ' -f 1  - <<< "$filetype_line")"
-    filetype="$(cut -d ' ' -f 2- - <<< "$filetype_line")"
-    thisfiletype="$(file -r -b "$filename")"
-    if [ "$thisfiletype" != "$filetype" ]
-    then
-        fileresult=FAIL
-        echo "  mismatch on file $filename"
-        echo "  found:    $filetype"
-        echo "  expected: $thisfiletype"
-    fi
-done < "$FILETYPES_FILE"
-report_result "file" "$fileresult"
+            sha256sum "$f" >> "$HASHES_FILE"
+            file -r -F '' "$f" >> "$FILETYPES_FILE"
+
+            # remove extracted file from /usr/lib/firmware
+            rm -f "$f"
+        done
+        popd || exit
+
+        LINUX_FIRMWARE_RELEASE="$(rpm -q --queryformat '%{release}\n' linux-firmware)"
+        # This expression strips just the sha1 part between "git" and ".el7".
+        UPSTREAM_SHA1="$(sed -e 's/[0-9]\+\.git\([0-9a-z]\+\)\..*/\1/g' - <<< "$LINUX_FIRMWARE_RELEASE")"
+
+        cd /tmp || exit
+        git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
+        cd linux-firmware || exit
+        git checkout "$UPSTREAM_SHA1"
+
+        # Check sha256sum of files. This will check all files.
+        rlRun -l "sha256sum --quiet -c \"$HASHES_FILE\"" 0
+        rlFileSubmit "$HASHES_FILE" "hashes"
+
+        # Compare file type for all files.
+        # Might be useful information in case we got a mismatch
+        while read -r filetype_line
+        do
+            filename="$(cut -d ' ' -f 1  - <<< "$filetype_line")"
+            filetype="$(cut -d ' ' -f 2- - <<< "$filetype_line")"
+            thisfiletype="$(file -r -b "$filename")"
+            rlRun -l "[ \"$thisfiletype\" == \"$filetype\" ]" 0
+            if [ "$thisfiletype" != "$filetype" ]
+            then
+                rlLog "  mismatch on file $filename"
+                rlLog "  found:    $filetype"
+                rlLog "  expected: $thisfiletype"
+            fi
+        done < "$FILETYPES_FILE"
+        rlFileSubmit "$FILETYPES_FILE" "filetypes"
+
+    rlPhaseEnd
+
+    rlPhaseStartCleanup
+        rm -f "$HASHES_FILE"
+        rm -f "$FILETYPES_FILE"
+    rlPhaseEnd
+
+rlJournalEnd
 
