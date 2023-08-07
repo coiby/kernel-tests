@@ -260,7 +260,7 @@ function setupRepo
     if [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
         rlRun "./configure --endian=little"
     else
-        rlRun "./configure"
+        rlRun "./configure --arch=$hwpf"
     fi
 }
 
