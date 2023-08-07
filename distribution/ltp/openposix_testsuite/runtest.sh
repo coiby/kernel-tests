@@ -181,7 +181,11 @@ done
 # build
 echo "Building testcases" | tee -a $OUTPUTFILE
 pushd $opt_dir
-env CFLAGS="-g3" time ./configure && make all > buildlog.txt 2>&1
+if [[ "$TESTVERSION" -lt "20220930" ]]; then
+    env CFLAGS="-g3" time make all > buildlog.txt 2>&1
+else
+    env CFLAGS="-g3" time ./configure && make all > buildlog.txt 2>&1
+fi
 if [ $? -ne 0 ]; then
     bzip2 buildlog.txt
     SubmitLog buildlog.txt.bz2
