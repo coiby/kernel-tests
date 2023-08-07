@@ -45,6 +45,12 @@ Crash()
             AppendSysconfig KEXEC_ARGS add "-c"
         fi
 
+        # Add 'KDUMP_STDLOGLVL=4' to /etc/sysconfig/kdump for getting more debug messages which is
+        # useful for analyzing kdump failure
+        Log "- Add 'KDUMP_STDLOGLVL=4' in '${KDUMP_SYS_CONFIG}'"
+        sed -i "/^KDUMP_STDLOGLVL=/d" ${KDUMP_SYS_CONFIG}
+        echo "KDUMP_STDLOGLVL=4" >> ${KDUMP_SYS_CONFIG}
+
         # This is for debugging purpose in case kdump kernel got OOM on Fedora
         if $IS_FC; then
             AppendSysconfig KDUMP_COMMANDLINE_APPEND add "rd.memdebug=1"
@@ -55,7 +61,19 @@ Crash()
         rm -f "${C_REBOOT}"
     else
         rm -f "${C_REBOOT}"
-        GetDumpFile "vmcore-dmesg.txt"
+
+        local log_files="vmcore-dmesg.txt"
+
+        # kexec-dmesg.log is added in RHEL-8.4 (BZ1817042).
+        if ! $IS_RHEL || (( $(bc <<< "${RELEASE}.${RELEASE_MINOR}>8.3") )); then
+            log_files+=" kexec-dmesg.log"
+        fi
+
+        # Get the file path and upload it.
+        for f in ${log_files}; do
+            GetDumpFile "${f}" && RstrntSubmit "${dump_file_path}"
+        done
+
         GetCorePath|| return
 
         # Analyse the vmcore by crash utilities if ANALYZE_VMCORE=true

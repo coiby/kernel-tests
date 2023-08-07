@@ -100,6 +100,7 @@ if $IS_FC || $IS_COS; then
     RELEASE=$(grep -o 'release [^ ]*' /etc/redhat-release  | awk '{print $NF}')
 else
     RELEASE=$(grep -o 'release [^.]*' /etc/redhat-release | awk '{print $NF}')
+    RELEASE_MINOR=$(grep -o 'release [0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $NF}')
 fi
 
 uname -v | grep -q PREEMPT_RT && IS_RT=true || IS_RT=false
