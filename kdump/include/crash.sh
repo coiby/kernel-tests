@@ -346,6 +346,14 @@ ValidateCrashOutput()
     #   bt: WARNING: cannot determine starting stack frame for task
     #   WARNING: cannot find NT_PRSTATUS note for cpu
     #
+    # On RHEL8
+    # crash> foreach bt
+    #   ...skipping...
+    #   PID: 669      TASK: c00000001e683400  CPU: 8    COMMAND: "systemd-journal"
+    #   ....skipping...
+    #   DSISR: 0000000042000000     Syscall Result: 0000000000000000
+    #   cannot find the stack info.
+    #
     # Search for the following words for warnings.
     #   warning
     #   warnings
@@ -365,6 +373,7 @@ ValidateCrashOutput()
          -e "WARNING: page fault at" \
          -e "WARNING: FPU may be inaccurate" \
          -e "WARNING: cannot find NT_PRSTATUS note for cp" \
+         -e "cannot find the stack info." \
          "${cmd_output_file}" |
     if [ -n "${SKIP_WARNING_PAT}" ]; then grep -v -e "${SKIP_WARNING_PAT}"; else cat; fi |
         grep -iw -e 'warning' \
