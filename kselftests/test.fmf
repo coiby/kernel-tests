@@ -30,6 +30,7 @@ recommend:
   - socat
   - iperf3
   - scapy
+  - tcpdump
 duration: 24h
 extra-summary: kselftests
 extra-task: kselftests
