@@ -84,9 +84,19 @@ function run_tests()
     TEST_FAILED=0
     # Bug reports required this information.
     echo "Podman version:"
-    run_cmd_user "podman --version"
+    if run_cmd_user "podman --version"; then
+        rstrnt-report-result "${RSTRNT_TASKNAME}/version" PASS
+    else
+        TEST_FAILED=1
+        rstrnt-report-result "${RSTRNT_TASKNAME}/version" FAIL
+    fi
     echo "Podman debug info:"
-    run_cmd_user "podman info --debug"
+    if run_cmd_user "podman info --debug"; then
+        rstrnt-report-result "${RSTRNT_TASKNAME}/info" PASS
+    else
+        TEST_FAILED=1
+        rstrnt-report-result "${RSTRNT_TASKNAME}/info" FAIL
+    fi
 
     # Clear images
     run_cmd_user "podman system prune --all --force && podman rmi --all"
