@@ -98,6 +98,11 @@ function run_tests()
         rstrnt-report-result "${RSTRNT_TASKNAME}/info" FAIL
     fi
 
+    # return before executing podman-tests
+    echo "WARN: not executing podman tests due to lack of test maintainer capacity"
+    echo "more details: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1502"
+    return $TEST_FAILED
+
     # Clear images
     run_cmd_user "podman system prune --all --force && podman rmi --all"
 
