@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=coreutils-debuginfo;yum-utils;perf;virt-what;elfutils;git;bc;gcc-c++
+dependencies=beakerlib;coreutils-debuginfo;yum-utils;perf;virt-what;elfutils;git;bc;gcc-c++
 softDependencies=dnf-utils;libbpf
 repoRequires=cki_lib
