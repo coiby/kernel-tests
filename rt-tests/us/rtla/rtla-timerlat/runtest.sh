@@ -35,6 +35,15 @@ function restore_admission_control()
     check_status "Restore the admission control"
 }
 
+function skip_auto_analysis_test()
+{
+    if ( (( "$rhel_major" == 8 && "$rhel_minor" <= 8 )) || (( "$rhel_major" == 9 && "$rhel_minor" <=2 ))); then
+        echo "rtla auto_analysis is only supported for RHEL >= 8.9 and >= 9.3"
+        return 0
+    fi
+    return 1
+}
+
 function runtest()
 {
     if ! ( (( "$rhel_major" == 8 && "$rhel_minor" >= 8 )) || (( "$rhel_major" == 9 && "$rhel_minor" >=2 )) || (( "$rhel_major" >= 10 ))); then
@@ -66,17 +75,23 @@ function runtest()
     rtla timerlat top -i 2 -c 0 -n
     check_status "rtla timerlat top -i 2 -c 0 -n"
 
-    echo "-- rtla-timerlat top: Set the automatic trace mode---------------" | tee -a $OUTPUTFILE
-    rtla timerlat top -a 5  --dump-tasks
-    check_status "rtla timerlat top -a 5  --dump-tasks"
+    if ! skip_auto_analysis_test; then
+        echo "-- rtla-timerlat top: Set the automatic trace mode---------------" | tee -a $OUTPUTFILE
+        rtla timerlat top -a 5  --dump-tasks
+        check_status "rtla timerlat top -a 5  --dump-tasks"
+    fi
 
-    echo "-- rtla-timerlat top: Print the auto-analysis if hits the stop tracing condition---------------" | tee -a $OUTPUTFILE
-    rtla timerlat top --aa-only 5
-    check_status "rtla timerlat top --aa-only 5"
+    if ! skip_auto_analysis_test; then
+        echo "-- rtla-timerlat top: Print the auto-analysis if hits the stop tracing condition---------------" | tee -a $OUTPUTFILE
+        rtla timerlat top --aa-only 5
+        check_status "rtla timerlat top --aa-only 5"
+    fi
 
-    echo "-- rtla-timerlat top: disable auto-analysis---------------" | tee -a $OUTPUTFILE
-    rtla timerlat top -s 3 -T 10 -t --no-aa
-    check_status "rtla timerlat top -s 3 -T 10 -t --no-aa"
+    if ! skip_auto_analysis_test; then
+        echo "-- rtla-timerlat top: disable auto-analysis---------------" | tee -a $OUTPUTFILE
+        rtla timerlat top -s 3 -T 10 -t --no-aa
+        check_status "rtla timerlat top -s 3 -T 10 -t --no-aa"
+    fi
 
     echo "-- rtla-timerlat:  rtla-timerlat hist test---------------" | tee -a $OUTPUTFILE
     rtla timerlat hist -c 0 -d 30s
