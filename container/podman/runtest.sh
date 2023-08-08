@@ -84,9 +84,24 @@ function run_tests()
     TEST_FAILED=0
     # Bug reports required this information.
     echo "Podman version:"
-    run_cmd_user "podman --version"
+    if run_cmd_user "podman --version"; then
+        rstrnt-report-result "${RSTRNT_TASKNAME}/version" PASS
+    else
+        TEST_FAILED=1
+        rstrnt-report-result "${RSTRNT_TASKNAME}/version" FAIL
+    fi
     echo "Podman debug info:"
-    run_cmd_user "podman info --debug"
+    if run_cmd_user "podman info --debug"; then
+        rstrnt-report-result "${RSTRNT_TASKNAME}/info" PASS
+    else
+        TEST_FAILED=1
+        rstrnt-report-result "${RSTRNT_TASKNAME}/info" FAIL
+    fi
+
+    # return before executing podman-tests
+    echo "WARN: not executing podman tests due to lack of test maintainer capacity"
+    echo "more details: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1502"
+    return $TEST_FAILED
 
     # Clear images
     run_cmd_user "podman system prune --all --force && podman rmi --all"
@@ -102,11 +117,15 @@ function run_tests()
             rstrnt-report-log -l ${TEST_LOG}
             if grep -qF "[ rc=124 (** EXPECTED 0 **) ]" ${TEST_LOG}; then
                 echo "FAIL: test failed with timeout. Likely infra issue."
-                rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+                rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" WARN
                 cleanup
                 rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 1
+            else
+                rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" FAIL
             fi
+        else
+            rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" PASS
         fi
     done
 
@@ -266,10 +285,8 @@ TEST_FAILED=$?
 
 if [[ ${TEST_FAILED} != 0 ]] ; then
     echo "😭 One or more tests failed."
-    rstrnt-report-result "${TEST}" FAIL
 else
     echo "😎 All tests passed."
-    rstrnt-report-result "${TEST}" PASS
 fi
 
 cleanup
