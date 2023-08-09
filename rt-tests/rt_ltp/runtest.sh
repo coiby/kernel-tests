@@ -14,6 +14,9 @@
 
 TEST="rt-tests/rt_ltp"
 
+TEST_TYPE=${TEST_TYPE:-"func"}
+# TEST_TYPE = "func perf" to enable ./perf/latency
+
 # $TESTVERSION is set in ltp-make.sh
 ltp_version=${ltp_version:-$TESTVERSION}
 result_r="PASS"
@@ -48,7 +51,7 @@ function runtest()
     ./configure
 
     # default test-arguments: func, stress, perf, list
-    func_list=$(./run.sh -t list | grep func)
+    func_list=$(./run.sh -t list | grep "${TEST_TYPE// /\\|}")
     while IFS= read -r case; do
         echo "running $case"
         ./run.sh -t "$case"
