@@ -256,7 +256,7 @@ diff -u $FILE1 $FILE2
 
 function report_result ()
 {
-	rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
+    rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
 }
 
 function RprtRslt ()
