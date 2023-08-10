@@ -20,34 +20,13 @@ if [[ "$1" =~ "repo_setup" ]]; then
 	shift
 fi
 
-success_buildroot=0
-
-buildroot_rhel8=http://download.eng.bos.redhat.com/rhel-8/rel-eng/BUILDROOT-8/BUILDROOT-8.${min_rel}.0-RHEL-${maj_rel}-${pre_distro}.END_DISTRO/compose/Buildroot/$this_arch/os/
-buildroot_rhel8_latest=http://download.eng.bos.redhat.com/rhel-8/rel-eng/BUILDROOT-8/latest-BUILDROOT-8.${min_rel}.0-RHEL-8/compose/Buildroot/$this_arch/os/
-buildroot_rhel9=http://download.eng.bos.redhat.com/rhel-9/composes/BUILDROOT-9/BUILDROOT-9.${min_rel}.0-RHEL-${maj_rel}-${this_distro}/compose/Buildroot/$this_arch/os
-# I don't find latest rhel9 repo url
-buildroot_rhel9_latest=http://download.eng.bos.redhat.com/rhel-9/rel-eng/BUILDROOT-9/latest-BUILDROOT-9.${min_rel}.0-RHEL-9/compose/Buildroot/$this_arch/os/
-# Have to change after it's changed accordingly.
-buildroot_rhel9_latest=http://download.eng.bos.redhat.com/rhel-9/nightly/BUILDROOT-9-Beta/latest-BUILDROOT-9.${min_rel}.0-RHEL-9/compose/Buildroot/$this_arch/os
+buildroot_latest=http://download.eng.bos.redhat.com/rhel-${maj_rel}/nightly/BUILDROOT-${maj_rel}/latest-BUILDROOT-${maj_rel}.${min_rel}.0-RHEL-${maj_rel}/compose/Buildroot/$this_arch/os/
 
 if grep -qi 'Red Hat' /etc/redhat-release && ((maj_rel > 7)); then
-	if echo $this_distro | grep -q '.n'; then
-		choose=nightly
-	else
-		choose=rel-eng
-	fi
-	for ((; end_distro >= 0; end_distro--)) do
-		if [ ! "$success_buildroot" = 1 ]; then
-			repo_buildroot=$(eval echo \$buildroot_rhel$maj_rel | sed 's/END_DISTRO/'$end_distro'/')
-			echo "Trying buildroot option: $repo_buildroot"
-			if curl -s --fail --head $repo_buildroot >/dev/null; then
-				success_buildroot=1
-				break
-			fi
-		fi
-	done
-	if ((success_buildroot == 0)); then
-		repo_buildroot=$(eval echo \$buildroot_rhel${maj_rel}_latest)
+	repo_buildroot=$buildroot_latest
+	if ! curl -s --fail --head $repo_buildroot; then
+		echo "Failed to get buildroot repo, aborting ..."
+		exit 1
 	fi
 
 	echo Using buildroot repo $repo_buildroot
