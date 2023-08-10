@@ -254,7 +254,8 @@ diff -u $FILE1 $FILE2
     DeBug "Exit DiffLspci"
 }
 
-function report_result {
+function report_result ()
+{
 	rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
 }
 

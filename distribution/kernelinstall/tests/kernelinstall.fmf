@@ -6,6 +6,7 @@ framework: shell
 require:
   - iproute
   - ethtool
+  - /kernel-include/runtest.sh
 duration: 120m
 extra-summary: /kernel/distribution/kernelinstall
 extra-task: /kernel/distribution/kernelinstall

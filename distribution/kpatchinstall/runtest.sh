@@ -19,7 +19,8 @@ function RHTSAbort ()
     rhts-abort -t recipe
 }
 
-function report_result {
+function report_result ()
+{
 	rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
 }
 
