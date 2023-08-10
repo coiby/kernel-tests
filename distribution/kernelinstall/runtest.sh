@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # Source the common test script helpers
-. /usr/bin/rhts_environment.sh
 . ../../kernel-include/runtest.sh
 source /etc/os-release
 
@@ -13,8 +12,25 @@ CUR_TIME=$(date --date="$(date --utc)" +%s)
 # devnull = 0 : log to file specified in ${DEBUGLOG}
 devnull=0
 
+if [ -z "$ARCH" ]; then
+        ARCH=$(uname -i)
+fi
+
 # Create debug log
 DEBUGLOG=`mktemp -p /mnt/testarea -t DeBug.XXXXXX`
+
+if [ -z "$OUTPUTFILE" ]; then
+        export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
+touch $OUTPUTFILE
+
+# Set a "well known" log name, so if the localwatchdog triggers
+#  we can still file OUTPUTFILE and get some results.
+if [ -h /mnt/testarea/current.log ]; then
+        ln -sf $OUTPUTFILE /mnt/testarea/current.log
+else
+        ln -s $OUTPUTFILE /mnt/testarea/current.log
+fi
 
 # locking to avoid races
 lck=$OUTPUTDIR/$(basename $0).lck
@@ -47,7 +63,6 @@ function RHTSAbort ()
 function SysReport ()
 {
     DeBug "Enter SysReport"
-    OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
     grep -q "release 3 " /etc/redhat-release
     if [ $? -eq 0 ]; then
         modarg=-d
@@ -237,6 +252,11 @@ diff -u $FILE1 $FILE2
     sleep 3
     SubmitLog $LSPCIDIFFLOG
     DeBug "Exit DiffLspci"
+}
+
+function report_result ()
+{
+    rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
 }
 
 function RprtRslt ()

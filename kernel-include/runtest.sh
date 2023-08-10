@@ -182,6 +182,11 @@ function DisplayFailandBail ()
     RprtRslt
 }
 
+function report_result ()
+{
+    rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
+}
+
 function ReportStatus ()
 {
     # Report test status
