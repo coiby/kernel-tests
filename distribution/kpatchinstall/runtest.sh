@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # Source the common test script helpers
-. /usr/bin/rhts_environment.sh
 . ../../kernel-include/runtest.sh
 
 # PARAMS: KPATCHNVR, KERNELREPOTMPL, KPATCHURL
@@ -18,6 +17,10 @@ function RHTSAbort ()
 {
     logmsg "Aborting recipe: $1"
     rhts-abort -t recipe
+}
+
+function report_result {
+	rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
 }
 
 function RprtRslt ()
