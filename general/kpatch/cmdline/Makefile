@@ -73,5 +73,4 @@ $(METADATA): Makefile
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
 	@echo "Destructive:     no" >> $(METADATA)
-	@echo "RhtsRequires:    kernel-kernel-general-include" >> $(METADATA)
 	rhts-lint $(METADATA)
