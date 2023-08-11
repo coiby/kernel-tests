@@ -69,8 +69,8 @@ function get_test_cases_srp
 	testcases+=" srp/010"
 	uname -ri | grep  -qE "ppc64le|4.18.0.*aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/011"
 	# testcases+=" srp/012", need legacy device mapper support
-	# srp/013 on aarch64/ppc64le BZ1951961
-	uname -ri | grep -qE "4.18.0.*aarch64|4.18.0.*ppc64le" || testcases+=" srp/013"
+	# disable srp/013 for rhel8, BZ1951961
+	uname -r | grep -q "4.18.0" || testcases+=" srp/013"
 	uname -r | grep -q 4.18.0 || testcases+=" srp/014" #BZ1900153
 	uname -ri | grep -qE "ppc64le|4.18.0.*.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/015"
 	echo "$testcases"
