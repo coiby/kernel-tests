@@ -25,6 +25,7 @@ DATAFILE=/tmp/lshw.log
 DFFILE=/tmp/df.log
 MOUNTFILE=/tmp/mount.log
 INSTALLEDPKGSFILE=/tmp/installedpkgs.log
+BUILDINFO=/tmp/buildinfo.log
 
 echo "arch: $(uname -m)" > ${MDESC}
 lshw -class cpu -short >> ${MDESC}
@@ -38,11 +39,14 @@ mount | tee ${MOUNTFILE}
 
 rpm -qa | sort > ${INSTALLEDPKGSFILE}
 
+[ -f /etc/build-info ] && cat /etc/build-info > ${BUILDINFO}
+
 rstrnt-report-log -l ${MDESC}
 rstrnt-report-log -l ${DATAFILE}
 rstrnt-report-log -l ${DFFILE}
 rstrnt-report-log -l ${MOUNTFILE}
 rstrnt-report-log -l ${INSTALLEDPKGSFILE}
+[ -f /etc/build-info ] && rstrnt-report-log -l ${BUILDINFO}
 rstrnt-report-result $TEST PASS 0
 
 rm ${DFFILE}
