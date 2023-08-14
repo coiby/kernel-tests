@@ -436,6 +436,11 @@ k_name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/
 rlJournalStart
     if ! test -f SETUP_FINISH; then
         rlPhaseStartSetup
+            if journalctl -kb | grep -i 'kaslr disabled due to lack of seed'; then
+                rlLog "kaslr is disabled because of no EFI_RNG_PROTOCOL available, skip test"
+                rstrnt-report-result "${TEST}" SKIP
+                exit 0
+            fi
             select_yum_tool
             prepare_state_q
             grep nokaslr /proc/cmdline && rlLogInfo "nokaslr in cmdline: $(cat /proc/cmdline)"
