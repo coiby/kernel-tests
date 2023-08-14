@@ -34,6 +34,6 @@ function default_hugepagesz()
         return 0
     fi
     setup_cmdline_args "default_hugepagesz=1G"
-    rlAssertEquals "Assert 1G default hugepage" `grep Hugepagesize /proc/meminfo | awk '{print $2}'` 100
+    rlAssertEquals "Assert 1G default hugepage" `grep Hugepagesize /proc/meminfo | awk '{print $2}'` 1048576
     cleanup_cmdline_args default_hugepagesz
 }
