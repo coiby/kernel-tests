@@ -1,6 +1,6 @@
 [General]
 name=vm/kvm-unit-tests
-owner=Marcelo Condotta <mcondotta@redhat.com>
+owner=Jan Richter <jarichte@redhat.com>
 description=KVM unit tests
 license=GPLv3
 confidential=no
