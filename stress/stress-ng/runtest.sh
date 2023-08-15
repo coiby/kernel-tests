@@ -158,6 +158,11 @@ function customize_param()
 
     # limit thread count on memory stressors to half the core count
     # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1425
+    # mcontend gets special treatment for large systems
+    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1185
+    if [[ $(nproc) -gt 16 ]]; then
+        sed -i "/mcontend/s/XXX/16/" memory.stressors
+    fi
     sed -i "s/XXX/$(($(nproc) / 2))/" memory.stressors
 }
 
