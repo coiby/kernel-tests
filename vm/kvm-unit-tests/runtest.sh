@@ -416,6 +416,7 @@ function setup
     rlPhaseEnd
 }
 
+# shellcheck disable=SC2317
 function setupDF
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Installing qemu-kvm version from given repository"
@@ -425,11 +426,13 @@ function setupDF
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
 }
 
+# shellcheck disable=SC2317
 function cleanupDF
 {
     return
 }
 
+# shellcheck disable=SC2317
 function setupAV
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Installing qemu-kvm version from given repository"
@@ -440,6 +443,7 @@ function setupAV
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
 }
 
+# shellcheck disable=SC2317
 function cleanupAV
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Removing qemu-kvm version installed from repository"
@@ -448,6 +452,7 @@ function cleanupAV
     dnf module -y enable virt > /dev/null 2>&1
 }
 
+# shellcheck disable=SC2317
 function setupWR
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Installing qemu-kvm version from given repository"
@@ -458,6 +463,7 @@ function setupWR
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
 }
 
+# shellcheck disable=SC2317
 function cleanupWR
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Removing qemu-kvm version installed from repository"
