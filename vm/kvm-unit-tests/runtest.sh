@@ -423,7 +423,7 @@ function setupDF
     dnf module -y reset virt > /dev/null 2>&1
     dnf module -y enable virt > /dev/null 2>&1
     dnf install -y qemu-kvm > /dev/null 2>&1
-    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: $(rpm -q qemu-kvm)"
 }
 
 # shellcheck disable=SC2317
@@ -440,7 +440,7 @@ function setupAV
     dnf module -y reset virt > /dev/null 2>&1
     dnf module -y --enablerepo=rhel8-advvirt enable virt:av  > /dev/null 2>&1
     dnf install -y --enablerepo=rhel8-advvirt qemu-kvm > /dev/null 2>&1
-    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: $(rpm -q qemu-kvm)"
 }
 
 # shellcheck disable=SC2317
@@ -460,7 +460,7 @@ function setupWR
     dnf module -y reset virt > /dev/null 2>&1
     dnf module -y disable virt > /dev/null 2>&1
     dnf install -y --enablerepo=virt-weeklyrebase qemu-kvm > /dev/null 2>&1
-    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: $(rpm -q qemu-kvm)"
 }
 
 # shellcheck disable=SC2317
