@@ -358,7 +358,7 @@ function setup
     KVM_ARCH_SYSFS=/sys/module/$KVM_ARCH/parameters/
 
     # Set the KVM parameters needed for the tests
-    > $KVMPARAMFILE
+    : > $KVMPARAMFILE
     for opt in ${KVM_OPTIONS[*]}; do
         echo -e "options kvm $opt=1\n" >> $KVMPARAMFILE
     done
