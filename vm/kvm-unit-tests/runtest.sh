@@ -74,7 +74,7 @@ function rlSkip
     . ../../cki_lib/libcki.sh || exit 1
 
     rlLog "Skipping test because $*"
-    rstrnt-report-result $TEST SKIP
+    rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
 
     #
     # As we want result="Skip" status="Completed" for all scenarios, right here
@@ -302,10 +302,10 @@ function setup
 
     # tests are currently supported on x86_64, aarch64, ppc64 and s390x
     hwpf=$(uname -m)
-    checkPlatformSupport $hwpf
+    checkPlatformSupport "$hwpf"
     if (( $? == 0 )); then
         # test can only run on hardware that supports virtualization
-        checkVirtSupport $hwpf
+        checkVirtSupport "$hwpf"
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running on supported arch"
         if (( $? == 0 )); then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Hardware supports virtualization, proceeding"
@@ -372,19 +372,19 @@ function setup
     export TIMEOUT=3000s
 
     # Reload the modules
-    for mod in "${KVM_MODULES[@]}"; do rmmod -f $mod > /dev/null 2>&1; done
+    for mod in "${KVM_MODULES[@]}"; do rmmod -f "$mod" > /dev/null 2>&1; done
     modprobe -a kvm $KVM_ARCH
 
     # Test if the KVM parameters were set correctly
     for opt in "${KVM_OPTIONS[@]}"; do
-        if ! cat $KVM_SYSFS/$opt | egrep -q "Y|y|1"; then
+        if ! cat "$KVM_SYSFS/$opt" | egrep -q "Y|y|1"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] kvm module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
         fi
     done
     for opt in "${KVM_ARCH_OPTIONS[@]}"; do
-        if ! cat $KVM_ARCH_SYSFS/$opt | egrep -q "Y|y|1"; then
+        if ! cat "$KVM_ARCH_SYSFS/$opt" | egrep -q "Y|y|1"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] $KVM_ARCH module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt is set"
@@ -516,7 +516,7 @@ function runtest
     rlPhaseStartTest completed
     cd $LOGDIR || return
     logs=$(ls *.log)
-    for log in $logs; do rlFileSubmit $log ; done
+    for log in $logs; do rlFileSubmit "$log" ; done
 
     rlRun "popd"
     rlPhaseEnd
