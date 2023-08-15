@@ -117,45 +117,45 @@ function checkVirtSupport
         else
             MACHINES+=("q35")
         fi
-        if (egrep -q 'vmx' /proc/cpuinfo); then
+        if (grep -q 'vmx' /proc/cpuinfo); then
             CPUTYPE="INTEL"
-        elif (egrep -q 'svm' /proc/cpuinfo); then
+        elif (grep -q 'svm' /proc/cpuinfo); then
             CPUTYPE="AMD"
         fi
-        egrep -q '(vmx|svm)' /proc/cpuinfo
+        grep -qE '(vmx|svm)' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "aarch64" ]]; then
         ACCELS+=("kvm")
-        if journalctl -k | egrep -qi "disabling GICv2" ; then
+        if journalctl -k | grep -qi "disabling GICv2" ; then
             GICVERSION="3"
         else
             GICVERSION="2"
         fi
         CPUTYPE="ARMGICv$GICVERSION"
-        journalctl -k | egrep -iq "kvm.*: (Hyp|VHE) mode initialized successfully"
+        journalctl -k | grep -iqE "kvm.*: (Hyp|VHE) mode initialized successfully"
         return $?
     elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
         ACCELS+=("kvm,cap-ccf-assist=off")
         ACCELS+=("tcg")
-        if (egrep -q 'POWER9' /proc/cpuinfo); then
+        if (grep -q 'POWER9' /proc/cpuinfo); then
             CPUTYPE="POWER9"
         else
             CPUTYPE="POWER8"
         fi
-        grep -q 'platform.*PowerNV' /proc/cpuinfo
+        grep -qE 'platform.*PowerNV' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "s390x" ]]; then
         ACCELS+=("kvm")
-        if (egrep -q 'machine = 2964' /proc/cpuinfo); then
+        if (grep -q 'machine = 2964' /proc/cpuinfo); then
             CPUTYPE="z13"
-        elif (egrep -q 'machine = 3907' /proc/cpuinfo); then
+        elif (grep -q 'machine = 3907' /proc/cpuinfo); then
             CPUTYPE="z14"
-        elif (egrep -q 'machine = 8561' /proc/cpuinfo); then
+        elif (grep -q 'machine = 8561' /proc/cpuinfo); then
             CPUTYPE="z15"
         else
            CPUTYPE="S390X"
         fi
-        grep -q 'features.*sie' /proc/cpuinfo
+        grep -qE 'features.*sie' /proc/cpuinfo
         return $?
     else
         return 1
@@ -318,7 +318,7 @@ function setup
 
     # test should only run on a system with 1 or more cpus
     typeset cpus
-    cpus=$(grep -c ^processor /proc/cpuinfo)
+    cpus=$(grep -cE ^processor /proc/cpuinfo)
     if (( $cpus > 1 )); then
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] You have sufficient CPU's to run the test"
     else
@@ -377,14 +377,14 @@ function setup
 
     # Test if the KVM parameters were set correctly
     for opt in "${KVM_OPTIONS[@]}"; do
-        if ! cat "$KVM_SYSFS/$opt" | egrep -q "Y|y|1"; then
+        if ! cat "$KVM_SYSFS/$opt" | grep -q "Y|y|1"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] kvm module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
         fi
     done
     for opt in "${KVM_ARCH_OPTIONS[@]}"; do
-        if ! cat "$KVM_ARCH_SYSFS/$opt" | egrep -q "Y|y|1"; then
+        if ! cat "$KVM_ARCH_SYSFS/$opt" | grep -q "Y|y|1"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] $KVM_ARCH module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt is set"
