@@ -359,10 +359,10 @@ function setup
 
     # Set the KVM parameters needed for the tests
     : > $KVMPARAMFILE
-    for opt in ${KVM_OPTIONS[*]}; do
+    for opt in "${KVM_OPTIONS[@]}"; do
         echo -e "options kvm $opt=1\n" >> $KVMPARAMFILE
     done
-    for opt in ${KVM_ARCH_OPTIONS[*]}; do
+    for opt in "${KVM_ARCH_OPTIONS[@]}"; do
         echo -e "options $KVM_ARCH $opt=1\n" >> $KVMPARAMFILE
     done
 
@@ -370,18 +370,18 @@ function setup
     export TIMEOUT=3000s
 
     # Reload the modules
-    for mod in ${KVM_MODULES[*]}; do rmmod -f $mod > /dev/null 2>&1; done
+    for mod in "${KVM_MODULES[@]}"; do rmmod -f $mod > /dev/null 2>&1; done
     modprobe -a kvm $KVM_ARCH
 
     # Test if the KVM parameters were set correctly
-    for opt in ${KVM_OPTIONS[*]}; do
+    for opt in "${KVM_OPTIONS[@]}"; do
         if ! cat $KVM_SYSFS/$opt | egrep -q "Y|y|1"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] kvm module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
         fi
     done
-    for opt in ${KVM_ARCH_OPTIONS[*]}; do
+    for opt in "${KVM_ARCH_OPTIONS[@]}"; do
         if ! cat $KVM_ARCH_SYSFS/$opt | egrep -q "Y|y|1"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] $KVM_ARCH module option $opt not set"
         else
@@ -478,14 +478,14 @@ function runtest
     rlPhaseEnd
 
     i=0
-    for repo in ${REPOS[*]}; do
+    for repo in "${REPOS[@]}"; do
         ${SETUPS[$i]}
 
-        for mach in ${MACHINES[*]}; do
+        for mach in "${MACHINES[@]}"; do
             export KUT_MACHINE=$mach
 
             j=0
-            for accel in ${ACCELS[*]}; do
+            for accel in "${ACCELS[@]}"; do
                 rlPhaseStartTest "prepare-${mach}-${repo}-${accel}"
                 export ACCEL=$accel
                 make clean > /dev/null 2>&1
@@ -498,7 +498,7 @@ function runtest
                 rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo][$accel] Running tests for ACCEL: $accel"
                 rlPhaseEnd
                 # Run tests
-                for test in ${ALL_TESTS[*]}; do
+                for test in "${ALL_TESTS[@]}"; do
                     rlPhaseStartTest "${mach}-${repo}-${accel}-${test}"
                     rlRun "yes | $BINDIR/$test > $LOGDIR/${j}_${mach}_${repo}_${accel}_$test.log 2>&1" 0,2,77
                     rlPhaseEnd
