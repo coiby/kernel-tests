@@ -294,7 +294,7 @@ function setup
         OSVERSION="RHEL9"
     elif grep -q "CentOS Stream release 9" /etc/redhat-release; then
         OSVERSION="CENTOS_STREAM_9"
-    elif [ ! -z "$CKI_SELFTESTS_URL" ]; then
+    elif [ -n "$CKI_SELFTESTS_URL" ]; then
         OSVERSION="UPSTREAM"
     else
         OSVERSION="ARK"
