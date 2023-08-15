@@ -38,6 +38,7 @@ source /usr/share/beakerlib/beakerlib.sh
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
+  # shellcheck disable=SC2221,SC2222
   case $1 in
     -u|--upstream)
       UPSTREAM=YES
