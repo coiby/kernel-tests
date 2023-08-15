@@ -110,7 +110,7 @@ function checkVirtSupport
 
     if [[ $hwpf == "x86_64" ]]; then
         ACCELS+=("kvm")
-        if [[ $OSVERSION == "RHEL9" ]]; then
+        if [[ $OSVERSION == "RHEL9" || $OSVERSION == "CENTOS_STREAM_9" ]]; then
             MACHINES=("q35")
         else
             MACHINES+=("q35")
@@ -169,6 +169,11 @@ function getTests
     done < <(find $BINDIR/ -maxdepth 1 -type f -executable -printf "%f\0")
 }
 
+function disableTest
+{
+    mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzwv "$1")
+}
+
 function disableTests
 {
     typeset hwpf=$(uname -i)
@@ -180,17 +185,32 @@ function disableTests
             if [[ $KUT_MACHINE == "pc" ]]; then
                 # Disable test hyperv_synic, hyperv_connections, hyperv_stimer
                 # due to https://bugzilla.redhat.com/show_bug.cgi?id=1668573
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_synic")
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_connections")
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_stimer")
+                disableTest "hyperv_synic"
+                disableTest "hyperv_connections"
+                disableTest "hyperv_stimer"
             fi
             if [[ $CPUTYPE == "AMD" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
+                disableTest "svm"
+                disableTest "msr"
+                disableTest "svm_npt"
+                disableTest "emulator"
             fi
             if [[ $CPUTYPE == "INTEL" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu_lbr")
+                disableTest "emulator"
+                disableTest "msr"
+                disableTest "pmu"
+                disableTest "vmx"
+                disableTest "vmx_pf_exception_test_fep"
             fi
+        fi
+        if [[ $hwpf == "aarch64" ]]; then
+            disableTest "pmu-chained-counters"
+            disableTest "pmu-chained-sw-incr"
+            disableTest "pmu-chain-promotion"
+            disableTest "pmu-overflow-interrupt"
+        fi
+        if [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
+            disableTest "spapr_vpa"
         fi
     fi
 
@@ -199,11 +219,13 @@ function disableTests
         # Disabled x86_64 tests for Intel & AMD machines
         if [[ $hwpf == "x86_64" ]]; then
             if [[ $CPUTYPE == "AMD" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
+                disableTest "svm"
+                disableTest "svm_npt"
             fi
             if [[ $CPUTYPE == "INTEL" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu_lbr")
+                disableTest "pmu"
+                disableTest "vmx"
+                disableTest "vmx_pf_exception_test_fep"
             fi
         fi
     fi
@@ -212,20 +234,14 @@ function disableTests
     if [[ $OSVERSION == "CENTOS_STREAM_9" ]]; then
         # Disabled x86_64 tests for Intel & AMD machines
         if [[ $hwpf == "x86_64" ]]; then
-            if [[ $KUT_MACHINE == "pc" ]]; then
-                # Disable test hyperv_synic, hyperv_connections, hyperv_stimer
-                # due to https://bugzilla.redhat.com/show_bug.cgi?id=1668573
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_synic")
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_connections")
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "hyperv_stimer")
-            fi
             if [[ $CPUTYPE == "AMD" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
+                disableTest "svm"
+                disableTest "svm_npt"
             fi
             if [[ $CPUTYPE == "INTEL" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "pmu")
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "msr")
+                disableTest "pmu"
+                disableTest "vmx"
+                disableTest "vmx_pf_exception_test_fep"
             fi
         fi
     fi
@@ -233,14 +249,14 @@ function disableTests
     # Disable this test on Upstream testing (5.18.X)
     if [[ $OSVERSION == "ARK" || $OSVERSION == "UPSTREAM" ]]; then
         if [[ $hwpf == "x86_64" ]]; then
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "apic-split")
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "apic")
-            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "xsave")
+            disableTest "apic-split"
+            disableTest "apic"
+            disableTest "xsave"
             if [[ $CPUTYPE == "INTEL" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "vmx")
+                disableTest "vmx"
             fi
             if [[ $CPUTYPE == "AMD" ]]; then
-                mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "svm")
+                disableTest "svm"
             fi
         fi
     fi
