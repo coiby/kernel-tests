@@ -375,14 +375,14 @@ function setup
 
     # Test if the KVM parameters were set correctly
     for opt in "${KVM_OPTIONS[@]}"; do
-        if ! cat "$KVM_SYSFS/$opt" | grep -q "Y|y|1"; then
+        if ! grep -q "Y|y|1" "$KVM_SYSFS/$opt"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] kvm module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
         fi
     done
     for opt in "${KVM_ARCH_OPTIONS[@]}"; do
-        if ! cat "$KVM_ARCH_SYSFS/$opt" | grep -q "Y|y|1"; then
+        if ! grep -q "Y|y|1" "$KVM_ARCH_SYSFS/$opt"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] $KVM_ARCH module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt is set"
