@@ -16,6 +16,8 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA 02110-1301, USA.
 #
+
+# shellcheck source=../../cki_lib/libcki.sh
 . ../../cki_lib/libcki.sh || exit 1
 
 BINDIR=./tests
