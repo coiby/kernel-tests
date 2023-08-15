@@ -512,7 +512,7 @@ function runtest
     done
 
     rlPhaseStartTest completed
-    cd $LOGDIR
+    cd $LOGDIR || return
     logs=$(ls *.log)
     for log in $logs; do rlFileSubmit $log ; done
 
