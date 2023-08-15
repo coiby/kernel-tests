@@ -519,7 +519,7 @@ function runtest
 
     rlPhaseStartTest completed
     cd $LOGDIR || return
-    logs=$(ls *.log)
+    logs=$(ls ./*.log)
     for log in $logs; do rlFileSubmit "$log" ; done
 
     rlRun "popd"
