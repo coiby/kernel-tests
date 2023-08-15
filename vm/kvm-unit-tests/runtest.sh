@@ -317,7 +317,7 @@ function setup
     # test should only run on a system with 1 or more cpus
     typeset cpus
     cpus=$(grep -cE ^processor /proc/cpuinfo)
-    if (( $cpus > 1 )); then
+    if (( cpus > 1 )); then
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] You have sufficient CPU's to run the test"
     else
         rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] system requires > 1 CPU"
