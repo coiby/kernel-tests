@@ -176,7 +176,8 @@ function disableTest
 
 function disableTests
 {
-    typeset hwpf=$(uname -m)
+    typeset hwpf
+    hwpf=$(uname -m)
 
     # Disable tests for RHEL8 Kernel (4.18.X)
     if [[ $OSVERSION == "RHEL8" ]]; then
@@ -314,7 +315,8 @@ function setup
     fi
 
     # test should only run on a system with 1 or more cpus
-    typeset cpus=$(grep -c ^processor /proc/cpuinfo)
+    typeset cpus
+    cpus=$(grep -c ^processor /proc/cpuinfo)
     if (( $cpus > 1 )); then
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] You have sufficient CPU's to run the test"
     else
