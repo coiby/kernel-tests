@@ -302,12 +302,10 @@ function setup
 
     # tests are currently supported on x86_64, aarch64, ppc64 and s390x
     hwpf=$(uname -m)
-    checkPlatformSupport "$hwpf"
-    if (( $? == 0 )); then
+    if checkPlatformSupport "$hwpf"; then
         # test can only run on hardware that supports virtualization
-        checkVirtSupport "$hwpf"
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running on supported arch"
-        if (( $? == 0 )); then
+        if checkVirtSupport "$hwpf"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Hardware supports virtualization, proceeding"
         else
             rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] CPU doesn't support virtualization"
