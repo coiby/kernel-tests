@@ -29,7 +29,6 @@ REPOS=("default")
 SETUPS=("setupDF")
 CLEANUPS=("cleanupDF")
 ACCELS=()
-MAJOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $1}')
 MINOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $2}')
 UPSTREAM=NO
 NODISABLE=NO
