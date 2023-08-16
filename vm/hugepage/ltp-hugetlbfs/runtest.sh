@@ -26,8 +26,15 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh				|| exit 1
+# Enable TMT testing for RHIVOS
+. ../../../automotive/include/rhivos.sh
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+
+if ! (($is_rhivos)); then
+    # Include rhts environment
+    . /usr/bin/rhts-environment.sh || exit 1
+fi
+
 . ../../../distribution/ltp/include/runtest.sh		|| exit 1
 . ../../../distribution/ltp/include/ltp-make.sh		|| exit 1
 
