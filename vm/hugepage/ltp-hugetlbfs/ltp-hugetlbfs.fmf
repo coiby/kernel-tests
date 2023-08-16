@@ -1,0 +1,11 @@
+summary: Linux Test Project - hugetlbfs
+description: Linux Test Project - hugetlbfs
+contact: Core Kernel Test Team <kernel-general-test-team@redhat.com>
+component:
+  - kernel
+path: /vm/hugepage/ltp-hugetlbfs
+test: bash -x ./runtest.sh
+framework: shell
+require: [bc, gcc, gcc-c++, autoconf, automake, flex, bison, binutils, glibc-devel, procmail, rsyslog, util-linux, bc, wget, bzip2, virt-what]
+extra-summary: /vm/hugepage/ltp-hugetlbfs
+extra-task: /vm/hugepage/ltp-hugetlbfs
