@@ -252,42 +252,28 @@ install_repos()
             if ! ls /etc/yum.repos.d/rhel.repo > /dev/null 2>&1; then
                 touch /etc/yum.repos.d/rhel.repo
 cat << 'EOF' >> /etc/yum.repos.d/rhel.repo
-[RHEL-9.3.0-BaseOS-rpms]
-name = RHEL-9.3.0-BaseOS-rpms
-baseurl = http://download-node-02.eng.bos.redhat.com/rhel-9/composes/RHEL-9/RHEL-9.3.0-20230809.27/compose/BaseOS/$basearch/os
-enabled = 1
-gpgcheck = 0
-
-[RHEL-9.3.0-AppStream-rpms]
-name = RHEL-9.3.0-AppStream-rpms
-baseurl = http://download-node-02.eng.bos.redhat.com/rhel-9/composes/RHEL-9/RHEL-9.3.0-20230809.27/compose/AppStream/$basearch/os
-enabled = 1
-gpgcheck = 0
-
-[RHEL-9.3.0-CRB-rpms]
-name = RHEL-9.3.0-CRB-rpms
-baseurl = http://download-node-02.eng.bos.redhat.com/rhel-9/composes/RHEL-9/RHEL-9.3.0-20230809.27/compose/CRB/$basearch/os
-enabled = 1
-gpgcheck = 0
-
-[RHEL-9.3.0-HighAvailability-rpms]
-name = RHEL-9.3.0-HighAvailability-rpms
-baseurl = http://download-node-02.eng.bos.redhat.com/rhel-9/composes/RHEL-9/RHEL-9.3.0-20230809.27/compose/HighAvailability/$basearch/os
-enabled = 1
-gpgcheck = 0
-EOF
-                touch /etc/yum.repos.d/rhivos.repo
-cat << 'EOF' >> /etc/yum.repos.d/rhivos.repo
-[nightly-rhel]
-baseurl=http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/RHIVOS0.16/repos/RHIVOS/compose/RHIVOS/aarch64/os/
+[baseos-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$basearch/os
 enabled=1
 gpgcheck=0
-[nightly-debug]
-baseurl=http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/RHIVOS0.16/repos/RHIVOS/compose/RHIVOS/aarch64/debug/tree/
+[appstream-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/$basearch/os/
 enabled=1
 gpgcheck=0
-[nigthly-source]
-baseurl=http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/RHIVOS0.16/repos/RHIVOS/compose/RHIVOS/source/tree/
+[crb-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/$basearch/os/
+enabled=1
+gpgcheck=0
+[baseos-debug-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$basearch/debug/tree
+enabled=1
+gpgcheck=0
+[appstream-debug-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/$basearch/debug/tree
+enabled=1
+gpgcheck=0
+[crb-debug-rhel]
+baseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/$basearch/debug/tree
 enabled=1
 gpgcheck=0
 EOF
@@ -300,12 +286,12 @@ EOF
                 fi
             fi
             local compose=$(echo $(uname -r) | sed -e "s/+debug//" -e "s/.$(arch)//")
-            # if ! ls /etc/yum.repos.d/kernel-automotive-${compose}.repo > /dev/null 2>&1; then
-            #     echo " + Install rhivos brew repository"
-            #     local version=$(echo ${compose} | cut -d "-" -f 1)
-            #     local release=$(echo ${compose} | cut -d "-" -f 2)
-            #     curl -L http://brew-task-repos.usersys.redhat.com/repos/official/kernel-automotive/${version}/${release}/kernel-automotive-${compose}.repo -o /etc/yum.repos.d/kernel-automotive-${compose}.repo
-            # fi
+            if ! ls /etc/yum.repos.d/kernel-automotive-${compose}.repo > /dev/null 2>&1; then
+                echo " + Install rhivos brew repository"
+                local version=$(echo ${compose} | cut -d "-" -f 1)
+                local release=$(echo ${compose} | cut -d "-" -f 2)
+                curl -L http://brew-task-repos.usersys.redhat.com/repos/official/kernel-automotive/${version}/${release}/kernel-automotive-${compose}.repo -o /etc/yum.repos.d/kernel-automotive-${compose}.repo
+            fi
         else
             sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
             if ! rpm -q dnf-plugins-core > /dev/null 2>&1; then
