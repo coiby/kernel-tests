@@ -34,7 +34,7 @@ OUTPUTFILE=$(new_outputfile)
 
 rlPhaseStartSetup
     YUM=$(cki_get_yum_tool)
-    
+
     if cki_is_kernel_automotive; then
         rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive lksctp-tools-devel gcc kernel-automotive-modules-extra
     else
