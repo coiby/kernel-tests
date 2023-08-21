@@ -15,7 +15,7 @@ install_netsniff()
 	which mausezahn && return 0
 
 	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
-		if ! rpm -q epel-release; then
+		if ! rpm -q --quiet epel-release; then
 			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
 			local need_remove=1
@@ -30,6 +30,28 @@ install_netsniff()
 	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
 	which mausezahn && return 0 || return 1
+}
+
+install_iptables_legacy()
+{
+	rpm -q --quiet iptables-legacy && return 0
+
+	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
+		if ! rpm -q --quiet epel-release; then
+			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
+			local need_remove=1
+		else
+			local param="--enablerepo=epel"
+		fi
+	fi
+
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string $param iptables-legacy
+
+	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
+
+	rpm -q --quiet iptables-legacy && return 0 || return 1
 }
 
 install_smcroute()
@@ -259,6 +281,8 @@ do_bpf_test_progs_config()
 	sysctl_set net.mptcp.enabled 1
 	modprobe nf_conntrack
 	modprobe nf_nat
+
+	install_iptables_legacy || test_warn "Install iptables-legacy failed"
 }
 
 do_bpf_test_progs_run()
