@@ -11,11 +11,11 @@ export TESTVERSION=1.2
 # The path of the test below the package
 RELATIVE_PATH=memory/shmget
 
-# The relative path name to the test 
+# The relative path name to the test
 export TEST=$(TOPLEVEL_NAMESPACE)/$(RELATIVE_PATH)
 
 ifndef SYSENV
-SYSENV := $(shell uname -i)
+SYSENV := $(shell uname -m)
 endif
 
 # Binaries to be built
@@ -26,7 +26,7 @@ FILES=	$(METADATA) \
 	tshmget.c   \
 	README      \
 	runtest.sh  \
-	Makefile 
+	Makefile
 build:
 
 clean:

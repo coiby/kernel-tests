@@ -46,7 +46,7 @@ nfail=0
 skip_tests=(
 )
 
-karch=$(uname -i)
+karch=$(uname -m)
 kver=$(uname -r | cut -f1 -d'-')
 krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//")
 

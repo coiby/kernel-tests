@@ -35,7 +35,7 @@ EnterGenerator="{ while true; do echo -e '\n'; sleep 1; done; }"
 rlJournalStart
     # workaround due to https://bugzilla.redhat.com/show_bug.cgi?id=2119594
     # moved the skip inside the beakerlib framework so that tmt would not fail during skip.
-    if [ "$(uname -i)" != "aarch64" ];then
+    if [ "$(uname -m)" != "aarch64" ];then
         rlPhaseStartSetup Setup
             rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
             rlRun "rlFileBackup /etc/sysconfig/lm_sensors"

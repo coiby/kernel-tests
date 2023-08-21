@@ -294,7 +294,7 @@ for (( i = 0; i < $ITERATIONS; i++)); do
 		module=`echo $module | tr '-' '_'`
 
 		# known issues for specific architectures
-		if [ "$(uname -i)" = "aarch64" ]; then
+		if [ "$(uname -m)" = "aarch64" ]; then
 			# sd_mod is builtin to the aarch64 kernel
 			if [ "$module" = "sd_mod" ]; then
 				continue

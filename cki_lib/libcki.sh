@@ -18,7 +18,7 @@ if [ -z "$OUTPUTFILE" ]; then
 fi
 
 if [ -z "$ARCH" ]; then
-    ARCH=$(uname -i)
+    ARCH=$(uname -m)
 fi
 
 if [ -z "$FAMILY" ]; then
