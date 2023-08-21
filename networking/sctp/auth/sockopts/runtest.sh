@@ -38,7 +38,7 @@ rlPhaseStartSetup
     if cki_is_kernel_automotive; then
         rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive lksctp-tools-devel gcc kernel-automotive-modules-extra
     else
-        rlRun "$YUM install -y lksctp-tools-devel gcc kernel-modules-extra" 
+        rlRun "$YUM install -y lksctp-tools-devel gcc kernel-modules-extra"
     fi
 
     rlRun "lsmod | grep sctp || modprobe sctp" "0-255"
