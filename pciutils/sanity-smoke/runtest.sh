@@ -46,7 +46,6 @@ rlJournalStart
     else
         echo "System does not have PCI BUS" | tee -a $OUTPUTFILE
         rstrnt-report-result $TEST SKIP
-        exit 0
     fi
     rlPhaseEnd
 rlJournalPrintText
