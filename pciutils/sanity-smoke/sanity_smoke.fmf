@@ -1,0 +1,14 @@
+summary: test whether lspci works
+description: |
+    List lspci output and do a simple check.
+contact: William Gomeringer <willg@redhat.com>
+id: TC#232211
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - pciutils
+recommend:
+  - python2-lxml
+  - python3-lxml
+extra-summary: pciutils/sanity-smoke
+extra-task: pciutils/sanity-smoke
