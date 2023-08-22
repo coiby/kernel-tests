@@ -20,11 +20,6 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ./common/include.sh || exit 1
 
-# Include rhts environment
-if ! cki_is_kernel_automotive; then
-    . /usr/bin/rhts-environment.sh || exit 1
-fi
-
 export TEST="networking/sctp/auth/sockopts"
 
 rlJournalStart
