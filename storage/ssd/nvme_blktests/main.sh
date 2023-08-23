@@ -91,7 +91,7 @@ function runtest() {
 		testcases+=" loop/005"
 		testcases+=" loop/006"
 		testcases+=" loop/007"
-		testcases+=" nvme/002"
+		#testcases+=" nvme/002" RHEL-1618
 		testcases+=" nvme/003"
 		hostname | grep -q "rdma-perf-06" || testcases+=" nvme/004"
 		testcases+=" nvme/005"
