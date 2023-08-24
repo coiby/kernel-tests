@@ -29,7 +29,13 @@ OUTPUTFILE=$(new_outputfile)
 
 rlPhaseStartSetup
     YUM=$(cki_get_yum_tool)
-    rlRun "$YUM install -y lksctp-tools-devel gcc" 0
+
+    if cki_is_kernel_automotive; then
+        rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive lksctp-tools-devel gcc kernel-automotive-modules-extra
+    else
+        rlRun "$YUM install -y lksctp-tools-devel gcc kernel-modules-extra"
+    fi
+
     rlRun "lsmod | grep sctp || modprobe sctp" "0-255"
     rlRun "sysctl -w net.sctp.auth_enable=1" 0
     rlRun "sysctl -w net.sctp.addip_enable=1" 0

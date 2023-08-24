@@ -9,4 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=bc;bzip2;gcc;git;lksctp-tools;lksctp-tools-devel;patch;rsync;texinfo;wget
-repoRequires=cki_lib
+repoRequires=cki_lib;networking/common;automotive/include

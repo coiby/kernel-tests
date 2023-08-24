@@ -1,0 +1,22 @@
+summary: sctp auth socket ops test
+description: |
+    setsockopts/getsockopts tests of sctp auth function
+contact: Jianwen Ji <jiji@redhat.com>
+test: bash -x ./runtest.sh
+path: /networking/sctp/auth/sockopts
+framework: shell
+require:
+  - beakerlib
+  - bc
+  - wget
+  - bzip2
+  - gcc
+  - git
+  - patch
+  - rsync
+  - texinfo
+  - lksctp-tools
+  - lksctp-tools-devel
+duration: 60m
+extra-summary: /kernel-tests/networking/sctp/auth/sockopts
+extra-task: /kernel-tests/networking/sctp/auth/sockopts
