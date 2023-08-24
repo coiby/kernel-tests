@@ -30,25 +30,50 @@
 
 PACKAGE="pciutils"
 PCI_IDS="/usr/share/hwdata/pci.ids"
+PREFIX=
 
 rlJournalStart
     rlPhaseStartSetup Setup
         rlAssertRpm ${PACKAGE}
-        rlFileBackup ${PCI_IDS}
+        if stat /run/ostree-booted > /dev/null 2>&1; then # Detecting automotive build using ostree
+            rlLog "Automotive build with ostree detected. Using local pciutils build."
+            rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive gcc make
+            git clone https://github.com/pciutils/pciutils
+            cd pciutils || exit 1
+            PREFIX="/opt/pciutils/"
+            PCI_IDS="${PREFIX}share/pci.ids"
+            rlLog "Build and install to ${PREFIX}"
+            make PREFIX=${PREFIX} install
+            cd ../
+            rlLog "Remove source git repository"
+            rlRun "rm -rf pciutils/"
+        else
+            rlFileBackup ${PCI_IDS}
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest Testing
         rlRun "lspci > lspci.old"
         cat lspci.old
-        rlRun "update-pciids" 0 "Successfully ran pciids update"
+        if stat /run/ostree-booted > /dev/null 2>&1; then # Detecting automotive build using ostree
+            rlLog "Running local build of update-pciids"
+            rlRun "${PREFIX}sbin/update-pciids" 0 "Successfully ran pciids update"
+        else
+            rlRun "update-pciids" 0 "Successfully ran pciids update"
+        fi
         rlRun "lspci > lspci.new"
         cat lspci.new
         diff -pruN lspci.old lspci.new
     rlPhaseEnd
 
     rlPhaseStartCleanup Cleanup
-        rlBundleLogs "$PACKAGE-outputs" lspci.old lspci.new /usr/share/hwdata/pci.ids
-        rlFileRestore
+        rlBundleLogs "$PACKAGE-outputs" lspci.old lspci.new $PCI_IDS
+        if stat /run/ostree-booted > /dev/null 2>&1; then # Detecting automotive build using ostree
+            rm -rf $PREFIX
+        else
+            rlFileRestore
+        fi
         rm lspci.old lspci.new
     rlPhaseEnd
-rlJournalPrintText
+    rlJournalPrintText
+rlJournalEnd
