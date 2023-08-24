@@ -1,8 +1,8 @@
 [Codeowners]
-/CODEOWNERS @bgoncalv @lulinqing @mh21
+/CODEOWNERS @bgoncalv @lulinqing @mh21_rh
 
 [AllowedInternalHosts]
-/.allowed-hosts @bgoncalv @lulinqing @mh21
+/.allowed-hosts @bgoncalv @lulinqing @mh21_rh
 
 [tests]
 /filesystems/xfs/xfs-repair-dryrun/ @jbastianrh
