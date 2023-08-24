@@ -1,0 +1,12 @@
+[General]
+name=storage/swraid/upstream
+owner=Xiao Ni <xni@redhat.com>
+description=mdadm upstream test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib
+max_time=5m
