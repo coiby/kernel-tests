@@ -16,7 +16,7 @@ rlJournalStart
         rlRun "modinfo efi_runtime" 0 "This should show efi_runtime is built/installed, if not uefi tests will not work"
         UNSAFETESTS="$(fwts --unsafe --show-tests | tail -n +2 | cut -d ' ' -f 2 | tr '\n' ',')"
         rlLog "Running the following fwts tests: $(fwts --uefitests --show-tests)"
-        if [ "$(uname -i)" = "aarch64" ]; then
+        if [ "$(uname -m)" = "aarch64" ]; then
             rlLog "Skipping the following UNSAFE fwts tests: $UNSAFETESTS"
             SKIPTESTS="--skip-test=$UNSAFETESTS"
         else

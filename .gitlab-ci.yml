@@ -63,6 +63,19 @@ shell check runtests:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
 
+uname with deprecated parameter:
+  extends: .cki_tools
+  script:
+    - |
+      if grep -Er "uname -[ip]"; then
+        echo "please use uname with '-m' parameter instead: https://bugzilla.redhat.com/show_bug.cgi?id=2126206"
+        exit 1
+      fi
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+  allow_failure: true
+
 shell check runtests mr:
   extends: .cki_tools
   before_script:

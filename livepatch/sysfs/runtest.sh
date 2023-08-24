@@ -35,7 +35,7 @@ KLP_MODULE="test_klp_callbacks_demo"
 BUSY_MODULE="test_klp_callbacks_busy"
 BUILDS_URL="${BUILDS_URL:-}"
 
-karch=$(uname -i)
+karch=$(uname -m)
 kver=$(uname -r | cut -f1 -d'-')
 krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//")
 

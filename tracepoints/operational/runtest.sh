@@ -182,11 +182,11 @@ fi
 # not need to check those platforms for gcc support.
 if [ -e /sys/devices/system/cpu/vulnerabilities/spectre_v2 ]; then
   CFLAGS=""
-  if [ "`uname -i`" = "x86_64" ]; then
+  if [ "`uname -m`" = "x86_64" ]; then
     CFLAGS="-mindirect-branch=thunk-extern"
     CFLAGS+=" -mindirect-branch-register"
     MITIGATION="retpoline"
-  elif [ "`uname -i`" = "s390x" ]; then
+  elif [ "`uname -m`" = "s390x" ]; then
     CFLAGS="-mindirect-branch=thunk-extern"
     CFLAGS+=" -mindirect-branch-table"
     CFLAGS+=" -mfunction-return=thunk-extern"

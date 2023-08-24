@@ -20,7 +20,7 @@ rlJournalStart
         fwtsSetup
     rlPhaseEnd
 
-    if [ "$(uname -i)" = "aarch64" ]; then
+    if [ "$(uname -m)" = "aarch64" ]; then
         # the aarch64 kernel has CONFIG_STRICT_DEVMEM=y so tools like acpidump
         # and fwts cannot read the ACPI tables directly from /dev/mem,
         # but they are availble in /sys/firmware/acpi/tables/*
@@ -46,7 +46,7 @@ rlJournalStart
 
     rlPhaseStartCleanup
         fwtsCleanup
-        if [ "$(uname -i)" = "aarch64" ]; then
+        if [ "$(uname -m)" = "aarch64" ]; then
             rlRun "rm -fr $ACPITABLES" 0 "Removing ACPI tables tmp directory"
         fi
     rlPhaseEnd
