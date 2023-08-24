@@ -40,6 +40,9 @@ ENABLE_VM_XML_TUNING=${ENABLE_VM_XML_TUNING:-'yes'}
 CLIENT_INTERFACES=${CLIENT_INTERFACES:-'None'}
 SERVER_INTERFACES=${SERVER_INTERFACES:-'None'}
 
+# workaround for vf attaching to vm failing issue
+SRIOV_USE_HOSTDEV=yes
+
 rhel_version=$(cut -f1 -d. /etc/redhat-release | sed 's/[^0-9]//g')
 KERNEL_VERSION=$(uname -r)
 if (($rhel_version <= 6)); then
@@ -50,6 +53,8 @@ elif (($rhel_version == 8)); then
 	image_name=${image_name:-"rhel8.6.qcow2"}
 elif (($rhel_version == 9));then
 	image_name=${image_name:-"rhel9.0.qcow2"}
+elif (($rhel_version == 39));then
+	image_name=${image_name:-"rhel9.2_cki.qcow2"}
 fi
 
 IMG_GUEST=${IMG_GUEST:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/${image_name}"}
@@ -58,29 +63,35 @@ IMG_GUEST=${IMG_GUEST:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/${im
 kernel_ver="$(uname -r)"
 if [ "$ENABLE_RT_KERNEL" = "no" ]; then
 	if [ -z "$YUM_KERNEL" ]; then
-	YUM_KERNEL="kernel-${kernel_ver}"
+		YUM_KERNEL="kernel-${kernel_ver}"
 	fi
 	if [ -z "$YUM_KERNEL_CORE" ]; then
-	YUM_KERNEL_CORE="kernel-core-${kernel_ver}"
+		YUM_KERNEL_CORE="kernel-core-${kernel_ver}"
 	fi
 	if [ -z "$YUM_KERNEL_MODULES" ]; then
-	YUM_KERNEL_MODULES="kernel-modules-${kernel_ver}"
+		YUM_KERNEL_MODULES="kernel-modules-${kernel_ver}"
+	fi
+	if [ -z "$YUM_KERNEL_MODULES_core" ]; then
+		YUM_KERNEL_MODULES="kernel-modules-core-${kernel_ver}"
 	fi
 	if [ -z "$YUM_KERNEL_MODULES_INTERNAL" ]; then
-	YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-${kernel_ver}"
+		YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-${kernel_ver}"
 	fi
 else
 	if [ -z "$YUM_KERNEL" ]; then
-	YUM_KERNEL="kernel-rt-${kernel_ver}"
+		YUM_KERNEL="kernel-rt-${kernel_ver}"
 	fi
 	if [ -z "$YUM_KERNEL_CORE" ]; then
-	YUM_KERNEL_CORE="kernel-core-rt-${kernel_ver}"
+		YUM_KERNEL_CORE="kernel-core-rt-${kernel_ver}"
 	fi
 	if [ -z "$YUM_KERNEL_MODULES" ]; then
-	YUM_KERNEL_MODULES="kernel-modules-rt-${kernel_ver}"
+		YUM_KERNEL_MODULES="kernel-modules-rt-${kernel_ver}"
+	fi
+	if [ -z "$YUM_KERNEL_MODULES" ]; then
+		YUM_KERNEL_MODULES="kernel-modules-core-rt-${kernel_ver}"
 	fi
 	if [ -z "$YUM_KERNEL_MODULES_INTERNAL" ]; then
-	YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-rt-${kernel_ver}"
+		YUM_KERNEL_MODULES_INTERNAL="kernel-modules-internal-rt-${kernel_ver}"
 	fi
 fi
 
@@ -168,6 +179,18 @@ else
 			} while(i > 0)
 			sub("."s,"",v[2]);
 			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-rt-"v[1]"-"v[2]"."s".rpm"
+		}')
+	fi
+	if [ -z "$RPM_KERNEL_MODULES_CORE" ]; then
+		RPM_KERNEL_MODULES=$(uname -r | awk '{
+		  split($0,v,"-");
+		  s=v[2];
+		  do {
+			  i=index(s,".");
+			  s=substr(s, i+1)
+		  } while(i > 0)
+		  sub("."s,"",v[2]);
+		  print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-core-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES_INTERNAL" ]; then

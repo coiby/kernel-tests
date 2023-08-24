@@ -22,8 +22,8 @@ do_host_netperf()
 	local ipv4=$(echo $1 | awk -F ',' '{ if (NF > 1) { print $2" -L "$1 } else { print $1 } }')
 	local ipv6=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -L "$1 } else { print $1 } }')
 	local result_file=$(echo $3 | awk -F ',' '{ print $1 }')
-	local tcp_result_criteria=$(echo $3 | awk -F ',' '{ if ($2 > 0) { print $2 } else { print 1 } }')
-	local udp_result_criteria=$(echo $3 | awk -F ',' '{ if ($3 > 0) { print $3 } else { print 1 } }')
+	local tcp_result_criteria=$(echo $3 | awk -F ',' '{ if ($2 > 0) { print $2 } else { print 0.1 } }')
+	local udp_result_criteria=$(echo $3 | awk -F ',' '{ if ($3 > 0) { print $3 } else { print 0.1 } }')
 	local options=$4
 	local tcp_msg_size=$(echo $5 | awk -F ',' '{ if ($1 > 0) { print " -- -m "$1 } else { print " -- -m 16384" } }')
 	local udp_msg_size=$(echo $5 | awk -F ',' '{ if ($2 > 0) { print " -- -m "$2 } else { print " -- -m 10000" } }')
@@ -142,8 +142,8 @@ do_vm_netperf()
 	local ipv4=$(echo $2 | awk -F ',' '{ if (NF > 1) { print $2" -L "$1 } else { print $1 } }')
 	local ipv6=$(echo $3 | awk -F ',' '{ if (NF > 1) { print $2" -L "$1 } else { print $1 } }')
 	local result_file=$(echo $4 | awk -F ',' '{ print $1 }')
-	local tcp_result_criteria=$(echo $4 | awk -F ',' '{ if ($2 > 0) { print $2 } else { print 1 } }')
-	local udp_result_criteria=$(echo $4 | awk -F ',' '{ if ($3 > 0) { print $3 } else { print 1 } }')
+	local tcp_result_criteria=$(echo $4 | awk -F ',' '{ if ($2 > 0) { print $2 } else { print 0.1 } }')
+	local udp_result_criteria=$(echo $4 | awk -F ',' '{ if ($3 > 0) { print $3 } else { print 0.1 } }')
 	local options=$5
 	local tcp_msg_size=$(echo $6 | awk -F ',' '{ if ($1 > 0) { print " -- -m "$1 } else { print " -- -m 16384" } }')
 	local udp_msg_size=$(echo $6 | awk -F ',' '{ if ($2 > 0) { print " -- -m "$2 } else { print " -- -m 10000" } }')
@@ -480,4 +480,118 @@ set_affinity()
 	do
 		echo 1 > /proc/irq/$irq/smp_affinity
 	done
+}
+
+
+
+
+do_host_iperf3()
+{
+	local v4Addr=$1
+	local v6Addr=$2
+	local result_file=$(echo $3 | awk -F ',' '{ print $1 }')
+	local ns=$4
+	local test_nic=$5
+	local option=$6
+	local tcp_msg_size=$(echo $7 | awk -F ',' '{ if ($1 > 0) { print " -- -m "$1 } else { print " -- -m 16384" } }')
+	local udp_msg_size=$(echo $7 | awk -F ',' '{ if ($2 > 0) { print " -- -m "$2 } else { print " -- -m 10000" } }')
+	local result=0
+	local TCP_STREAMv4=0
+	local UDP_STREAMv4=0
+	local TCP_STREAMv6=0
+	local UDP_STREAMv6=0
+
+
+	if [ -n "$test_nic" ]; then
+		if [ -n "$ns" ];then
+			nic_speed=$(ip netns exec $ns ethtool  $test_nic|grep Speed|awk '{print $2}')
+		else
+			nic_speed=$(ethtool  $test_nic|grep Speed|awk '{print $2}')
+		fi
+		speed=$(echo ${nic_speed%Mb*})
+		speed_result=$(echo "$speed * 0.05"|bc)
+	else
+		speed_result=100
+	fi
+
+	if [ -n "$ns" ];then
+		command="ip netns exec $ns"
+	fi
+
+	if [[ -n $v4Addr ]]; then
+		$command timeout 120s bash -c "until ping -c3 $v4Addr; do sleep 10; done"
+		if [ $? -eq 0 ];then
+			#tcp
+			$command iperf3 -c $v4Addr -f m  $option > log 2>&1
+			if (( $? )); then
+				TCP_STREAMv4=0
+			else
+				TCP_STREAMv4=$(grep receiver log | awk '{print $7}')
+			fi
+			echo "ipv4 tcp "
+			cat "log"
+
+			#udp
+			$command iperf3 -c $v4Addr -f m -u -b0 $option > log 2>&1
+			if (( $? )); then
+				UDP_STREAMv4=0
+			else
+				UDP_STREAMv4=$(grep receiver log | awk '{print $7}')
+			fi
+			echo "ipv4 udp "
+			cat "log"
+			#check the performance
+			if (($(bc <<< "$TCP_STREAMv4 < $speed_result")))  || (($(bc <<< "$UDP_STREAMv4 < $speed_result")))  ; then
+				echo "ipv4 speed is too low"
+				result=1
+			fi
+
+
+		fi
+	fi
+
+
+
+		if [[ -n $v6Addr ]]; then
+		$command timeout 120s bash -c "until ping -c3 $v6Addr; do sleep 10; done"
+		if [ $? -eq 0 ];then
+			#tcp
+			$command iperf3 -c $v6Addr -f m  $option > log 2>&1
+			if (( $? )); then
+				TCP_STREAMv6=0
+			else
+				TCP_STREAMv6=$(grep receiver log | awk '{print $7}')
+			fi
+			echo "ipv6 tcp "
+			cat "log"
+
+			#udp
+			$command iperf3 -c $v6Addr -f m -u -b0 $option > log 2>&1
+			if (( $? )); then
+				UDP_STREAMv6=0
+			else
+				UDP_STREAMv6=$(grep receiver log | awk '{print $7}')
+			fi
+			echo "ipv6 udp "
+			cat "log"
+			#check the performance
+			if (($(bc <<< "$TCP_STREAMv6 < $speed_result"))) || (($(bc <<< "$UDP_STREAMv6 < $speed_result")))  ; then
+				echo "ipv6 speed is too low"
+				result=1
+			fi
+
+
+		fi
+	fi
+
+	local log_format="||  %-14s||  %-14s||  %-14s||  %-14s|| %s\n"
+	printf "$log_format" "TCP_STREAMv4"  "UDP_STREAMv4"  "TCP_STREAMv6"  "UDP_STREAMv6"  ""| tee -a $result_file
+	printf "$log_format" "------------" "------------" "------------" "------------" "------------" "------------" "------------" "------------" ""| tee -a $result_file
+	if (( $result )); then
+		printf "$log_format" "$TCP_STREAMv4"  "$UDP_STREAMv4"  "$TCP_STREAMv6"  "$UDP_STREAMv6"  "*"| tee -a $result_file
+	else
+		printf "$log_format" "$TCP_STREAMv4"  "$UDP_STREAMv4"  "$TCP_STREAMv6"  "$UDP_STREAMv6"  | tee -a $result_file
+	fi
+
+	return $result
 }

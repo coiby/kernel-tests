@@ -44,9 +44,7 @@ source ${CASE_PATH}/env.sh
 # source rt kernel tuning script
 source ${CASE_PATH}/rt-kernel/set_up.sh
 
-source ${CASE_PATH}/../../common/lib/lib_nc_sync.sh || exit 1
-#source ${CASE_PATH}/../../common/lib/lib_swcfg.sh || exit 1
-source ../../common/lib/lib_swcfg.sh || exit 1
+. ${CASE_PATH}/../../common/lib/lib_nc_sync.sh || exit 1
 #. ${CASE_PATH}/../../common/lib/lib_netperf_all.sh || exit 1
 . ./lib_netperf_all.sh || exit 1
 . ${CASE_PATH}/lib_sriov.sh || exit 1
@@ -55,12 +53,17 @@ source ${CASE_PATH}/sriov_bond.sh
 source ${CASE_PATH}/regression.sh
 # nfp specific setting
 if [ "$NIC_DRIVER" == "nfp" ] && echo $SRIOV_TOPO|grep -v switchdev  && i_am_client;then
-		nfp_change_firmware
+	nfp_change_firmware
 fi
 # cxgb4 specific setting
 if [ "$NIC_DRIVER" == "cxgb4" ] && i_am_client;then
-		SRIOV_USE_HOSTDEV=yes
+	SRIOV_USE_HOSTDEV=yes
 fi
+# ionic specific setting for bug https://bugzilla.redhat.com/show_bug.cgi?id=1995882
+if [ "$NIC_DRIVER" == "ionic" ] && i_am_client;then
+	SRIOV_USE_HOSTDEV=yes
+fi
+
 
 br_bkr=${br_bkr:-br0}
 export vm1=${vm1:-g1}
@@ -92,46 +95,73 @@ fi
 install_pktgen()
 {
 	$dbg_flag
-	local kname1="kernel" && [ -x /usr/sbin/kernel-is-rt ] && kname1="kernel-rt"
-	local kname2="${kname1}"
+	local kname1="kernel" # metadata
+	local kname2="${kname1}" # define download kernel name: kernel/kernel-rt/kernel-debug/kernel-rt-debug
+	local kname3="${kname1}" # define which site, http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel or http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel-rt
+	local kname4="${kname1}" # define selftests package name, debug kernel didn't have selftest package
 	local kernel_ver="$(uname -r)"
-	uname -r|grep "debug" && {
-		local kname2="${kname1}-debug"
-		kernel_ver="$(uname -r| sed 's/.debug//')"
-	}
-
-	modprobe pktgen && { modprobe -r pktgen; return 0; }
-		if [[ $ENABLE_RT_KERNEL == "yes" ]]; then
-			PKTGEN_URL="http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel-rt"
-			PKTGEN_PACKAGE_NAME="kernel-rt-modules-internal"
-		elif [[ $ENABLE_RT_KERNEL == "no" ]]; then
-			PKTGEN_URL="http://download.eng.bos.redhat.com/brewroot/packages/kernel"
-			PKTGEN_PACKAGE_NAME="kernel-modules-internal"
+	local rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+	local rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+	if  /usr/sbin/kernel-is-rt ; then
+		local kname2="${kname1}-rt"
+		# https://bugzilla.redhat.com/show_bug.cgi?id=2171995#c8
+		if [[ $rhel_major -gt "9" || ( $rhel_major -eq 9 && $rhel_minor -ge 3 ) ]]; then
+			local kname4="${kname1}"
+		else
+			local kname4="${kname1}-rt"
 		fi
+	fi
+	if [[ $rhel_major -gt "9" || ( $rhel_major -eq 9 && $rhel_minor -ge 3 ) ]] && /usr/sbin/kernel-is-rt; then
+		# rhel9.3 rt will use http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel
+		local kname3="$kname1"
+	else
+		# rhe9.2 or lower than 9.2 will use http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel-rt
+		local kname3="$kname2"
+	fi
 
-		RPM_MODULES_INTERNAL=$(uname -r | awk -v pktgen_url="$PKTGEN_URL" -v pktgen_package_name="$PKTGEN_PACKAGE_NAME" '{
-			split($0,v,"-");
-			s=v[2];
-			do {
-					i=index(s,".")
-					s=substr(s, i+1)
-			}while(i>0)
-			sub("."s,"",v[2])
-			print pktgen_url"/"v[1]"/"v[2]"/"s"/"pktgen_package_name"-"v[1]"-"v[2]"."s".rpm"
-	}')
-	rpm -ivh $RPM_MODULES_INTERNAL
-	yum install -y  ${kname2}-modules-internal-${kernel_ver}
+	if uname -r|grep "debug" && ! /usr/sbin/kernel-is-rt; then
+		# kernel name shoule be kernel-debug
+		local kname2="${kname3}-debug"
+		local kernel_ver="$(uname -r| sed 's/.debug//')"
+	elif uname -r|grep "debug" && /usr/sbin/kernel-is-rt; then
+		# kernel name shoule be kernel-rt-debug
+		local kname2="${kname2}-debug"
+		local kernel_ver="$(uname -r| sed 's/.debug//')"
+	fi
+	# dnf install -y bpftool-${kernel_ver} ${kname2}-modules-extra-${kernel_ver} ${kname2}-modules-internal-${kernel_ver} ${kname3}-selftests-internal-${kernel_ver} && return 0
+	# package can't find will also let return 0
+	# echo $?
+	#0
+	#workaround for bpftool installation failure on rhel9, due to error kernel verson tag.
+	dnf install -y bpftool-${kernel_ver} || dnf install -y bpftool
+	dnf install -y ${kname2}-modules-extra-${kernel_ver}
+	dnf install -y ${kname2}-modules-internal-${kernel_ver}
+	dnf install -y ${kname4}-selftests-internal-${kernel_ver}
+	if rpm -q ${kname2}-modules-extra-${kernel_ver} &>/dev/null &&\
+		rpm -q ${kname2}-modules-internal-${kernel_ver} &>/dev/null &&\
+		rpm -q ${kname4}-selftests-internal-${kernel_ver} &>/dev/null; then
+			return 0
+	fi
+	local link="http://download-node-02.eng.bos.redhat.com/brewroot/packages/${kname3}"
+	local karch=$(uname -i)
+	local kver=$(echo ${kernel_ver}| cut -f1 -d'-')
+	local krel=$(echo ${kernel_ver} | cut -f2 -d'-' | sed "s/\.$karch.*//")
+	dnf install -y ${link}/${kver}/${krel}/${karch}/bpftool-${kver}-${krel}.${karch}.rpm
+	dnf install -y ${link}/${kver}/${krel}/${karch}/${kname2}-modules-extra-${kver}-${krel}.${karch}.rpm
+	dnf install -y ${link}/${kver}/${krel}/${karch}/${kname2}-modules-internal-${kver}-${krel}.${karch}.rpm
+	dnf install -y ${link}/${kver}/${krel}/${karch}/${kname4}-selftests-internal-${kver}-${krel}.${karch}.rpm
+
 }
 
 # assign IP address for test
 sriov_get_ipaddr()
 {
 	$dbg_flag
-	if [ -z "$JOBID" ]; then
+	if [ -z "$SERVERS" ]; then
 		ipaddr=214
 		ipaddr_vlan=213
 	else
-		ipaddr=$((JOBID % 100 + 20))
+		ipaddr=$(get_static_ip_subnet $SERVERS)
 		ipaddr_vlan=$(($ipaddr + 50))
 	fi
 }
@@ -198,7 +228,7 @@ enable_libvirtd_as_default_rhel9(){
 		rlRun "systemctl enable virt${drv}d{,-ro,-admin}.socket"
 		rlRun "systemctl is-enabled virt${drv}d{,-ro,-admin}.socket"
 		rlRun "systemctl start virt${drv}d.service"
-		rlRun "systemctl status virt${drv}d.service"
+		rlRun "systemctl status virt${drv}d.service --no-pager -l" "0-255"
 	done
 	rlRun "systemctl unmask libvirtd.service"
 	rlRun "systemctl enable libvirtd.service"
@@ -284,6 +314,8 @@ sriov_config_vm_repo()
 			cat /etc/yum.repos.d/beaker-BaseOS.repo | awk '{system("vmsh run_cmd $vm_name \"echo "$0" >> /etc/yum.repos.d/beaker-BaseOS.repo\"")}'
 		fi
 
+	###### rpms repo is needed #####
+
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/beaker-harness.repo"
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/myrepo_1.repo"
 	vmsh run_cmd $vm_name "rm -f /etc/yum.repos.d/beaker-kernel0.repo"
@@ -293,6 +325,7 @@ sriov_config_vm_repo()
 	[ -f "/etc/yum.repos.d/beaker-kernel0.repo" ] && cat /etc/yum.repos.d/beaker-kernel0.repo\
 		| awk '{system("vmsh run_cmd $vm_name \"echo "$0" >> /etc/yum.repos.d/beaker-kernel0.repo\"")}'
 	cat /etc/resolv.conf | grep nameserver | awk '{system("vmsh run_cmd $vm_name \"echo "$2" >> /etc/resolv.conf\"")}'
+	#vmsh run_cmd $vm_name "service network restart;sleep 5;yum install -y kernel-kernel-networking-vnic-sriov.noarch"
 	vmsh run_cmd $vm_name "service network restart;sleep 5;yum install -y kernel-kernel-networking-vnic-sriov.noarch"
 	unset vm_name
 }
@@ -317,9 +350,6 @@ sriov_setup()
 	systemctl stop firewalld
 	systemctl disable firewalld
 
-	#Restarting libvirtd based on https://access.redhat.com/solutions/6071131
-	systemctl restart libvirtd
-
 	# prepare bridge shared by beaker and vm
 	#local nic_bkr=$(get_default_iface)
 	#echo "nic_bkr=$nic_bkr"
@@ -339,12 +369,12 @@ sriov_setup()
 	# prepare VMs
 	echo "Download guest image..."
 	pushd "/var/lib/libvirt/images/" 1>/dev/null
-	[ -e "$IMG_GUEST" ] || wget -nv -N $IMG_GUEST
+	[ -e "$IMG_GUEST" ] || wget -nv -N -c -t 3 $IMG_GUEST
 	cp --remove-destination $(basename $IMG_GUEST) $vm1.qcow2
 	cp --remove-destination $(basename $IMG_GUEST) $vm2.qcow2
 	if [ "$SYS_ARCH" == "aarch" ];then
 		[ -z "$IMG_FD" ] && IMG_FD=`echo $IMG_GUEST | sed 's/.qcow2/_VARS.fd/g'`
-		[ -e "$IMG_FD" ] || wget -nv -N $IMG_FD
+		[ -e "$IMG_FD" ] || wget -nv -N -c -t 3 $IMG_FD
 		cp --remove-destination $(basename $IMG_FD) $vm1.fd
 		cp --remove-destination $(basename $IMG_FD) $vm2.fd
 	fi
@@ -375,6 +405,7 @@ sriov_setup()
 			--disk path=/var/lib/libvirt/images/$vm1.qcow2,device=disk,bus=virtio,format=qcow2 \
 			--network bridge=virbr0,model=virtio,mac=$mac4vm1 \
 			--network bridge=virbr1,model=virtio,mac=$mac4vm1if2 \
+			--import \
 			--boot loader=/usr/share/AAVMF/AAVMF_CODE.fd,loader_ro=yes,loader_type=pflash,nvram=/var/lib/libvirt/images/${vm1}.fd,loader_secure=no \
 			--accelerate \
 			--graphics vnc,listen=0.0.0.0 \
@@ -390,6 +421,7 @@ sriov_setup()
 			--ram=2048 \
 			--disk path=/var/lib/libvirt/images/$vm2.qcow2,device=disk,bus=virtio,format=qcow2 \
 			--network bridge=virbr0,model=virtio,mac=$mac4vm2 \
+			--import \
 			--boot loader=/usr/share/AAVMF/AAVMF_CODE.fd,loader_ro=yes,loader_type=pflash,nvram=/var/lib/libvirt/images/${vm2}.fd,loader_secure=no \
 			--accelerate \
 			--graphics vnc,listen=0.0.0.0 \
@@ -400,35 +432,35 @@ sriov_setup()
 			$pci_str
 	elif [ "$SYS_ARCH" == "ppc64le" ];then
 		pci_str=$(for i in `seq 1 15`;do echo -n "--controller type=pci,index=$i,model=pci-root ";done)
-				virt-install \
-						--name $vm1 \
-						--vcpus=2 \
-						--ram=2048 \
-						--disk path=/var/lib/libvirt/images/$vm1.qcow2,device=disk,bus=virtio,format=qcow2 \
-						--network bridge=virbr0,model=virtio,mac=$mac4vm1 \
-						--network bridge=virbr1,model=virtio,mac=$mac4vm1if2 \
-						--boot hd \
-						--accelerate \
-						--graphics vnc,listen=0.0.0.0 \
-						--force \
-						--os-variant=rhel-unknown \
-						--noautoconsol \
-						--controller type=pci,index=0,model=pci-root \
-						$pci_str
-				virt-install \
-						--name $vm2 \
-						--vcpus=2 \
-						--ram=2048 \
-						--disk path=/var/lib/libvirt/images/$vm2.qcow2,device=disk,bus=virtio,format=qcow2 \
-						--network bridge=virbr0,model=virtio,mac=$mac4vm2 \
-						--boot hd \
-						--accelerate \
-						--graphics vnc,listen=0.0.0.0 \
-						--force \
-						--os-variant=rhel-unknown \
-						--noautoconsol \
-						--controller type=pci,index=0,model=pci-root \
-						$pci_str
+		virt-install \
+			--name $vm1 \
+			--vcpus=2 \
+			--ram=2048 \
+			--disk path=/var/lib/libvirt/images/$vm1.qcow2,device=disk,bus=virtio,format=qcow2 \
+			--network bridge=virbr0,model=virtio,mac=$mac4vm1 \
+			--network bridge=virbr1,model=virtio,mac=$mac4vm1if2 \
+			--import --boot hd \
+			--accelerate \
+			--graphics vnc,listen=0.0.0.0 \
+			--force \
+			--os-variant=rhel-unknown \
+			--noautoconsol \
+			--controller type=pci,index=0,model=pci-root \
+			$pci_str
+		virt-install \
+			--name $vm2 \
+			--vcpus=2 \
+			--ram=2048 \
+			--disk path=/var/lib/libvirt/images/$vm2.qcow2,device=disk,bus=virtio,format=qcow2 \
+			--network bridge=virbr0,model=virtio,mac=$mac4vm2 \
+			--import --boot hd \
+			--accelerate \
+			--graphics vnc,listen=0.0.0.0 \
+			--force \
+			--os-variant=rhel-unknown \
+			--noautoconsol \
+			--controller type=pci,index=0,model=pci-root \
+			$pci_str
 	else
 	#	pci_str=$(for i in `seq 1 15`;do echo -n "--controller type=pci,index=$i,model=pci-root-port ";done)
 		virt-install \
@@ -438,13 +470,12 @@ sriov_setup()
 			--disk path=/var/lib/libvirt/images/$vm1.qcow2,device=disk,bus=virtio,format=qcow2 \
 			--network bridge=virbr0,model=virtio,mac=$mac4vm1 \
 			--network bridge=virbr1,model=virtio,mac=$mac4vm1if2 \
-			--boot hd \
+			--import --boot hd \
 			--accelerate \
 			--graphics vnc,listen=0.0.0.0 \
 			--force \
 			--os-variant=rhel-unknown \
-			--noautoconsole \
-			--import
+			--noautoconsole
 			#--controller type=pci,index=0,model=pci-root \
 			#$pci_str
 		virt-install \
@@ -453,13 +484,12 @@ sriov_setup()
 			--ram=2048 \
 			--disk path=/var/lib/libvirt/images/$vm2.qcow2,device=disk,bus=virtio,format=qcow2 \
 			--network bridge=virbr0,model=virtio,mac=$mac4vm2 \
-			--boot hd \
+			--import --boot hd \
 			--accelerate \
 			--graphics vnc,listen=0.0.0.0 \
 			--force \
 			--os-variant=rhel-unknown \
-			--noautoconsole \
-			--import
+			--noautoconsole
 			#--controller type=pci,index=0,model=pci-root \
 			#$pci_str
 	fi
@@ -471,29 +501,22 @@ sriov_setup()
 	sriov_config_vm_repo $vm2
 
 	# update VM kernel to the same one as host
+	wget -q --spider $RPM_KERNEL_MODULES_CORE || RPM_KERNEL_MODULES_CORE=""
 	local k="rpm -ivh --nodeps --force $RPM_KERNEL"
 	local k_core="rpm -ivh --nodeps --force $RPM_KERNEL_CORE"
 	local k_modules="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES"
+	local k_modules_core="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES_CORE"
 	local k_modules_internal="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES_INTERNAL"
 	local yum_k="yum install -y $YUM_KERNEL"
 	local yum_k_core="yum install -y $YUM_KERNEL_CORE"
 	local yum_k_modules="yum install -y $YUM_KERNEL_MODULES"
+	local yum_k_modules_core="yum install -y $YUM_KERNEL_MODULES_CORE"
 	local yum_k_modules_internal="yum install -y $YUM_KERNEL_MODULES_INTERNAL"
 	if (($rhel_version >= 8)); then
-	vmsh run_cmd $vm1 "$k"
-	vmsh run_cmd $vm1 "$k_core"
-	vmsh run_cmd $vm1 "$k_modules"
-	vmsh run_cmd $vm1 "$yum_k"
-	vmsh run_cmd $vm1 "$yum_k_core"
-	vmsh run_cmd $vm1 "$yum_k_modules"
-	virsh reboot $vm1
-	vmsh run_cmd $vm2 "$k"
-	vmsh run_cmd $vm2 "$k_core"
-	vmsh run_cmd $vm2 "$k_modules"
-	vmsh run_cmd $vm2 "$yum_k"
-	vmsh run_cmd $vm2 "$yum_k_core"
-	vmsh run_cmd $vm2 "$yum_k_modules"
-	virsh reboot $vm2
+		vmsh run_cmd $vm1 "rpm -ivh --nodeps --force $RPM_KERNEL $RPM_KERNEL_CORE $RPM_KERNEL_MODULES $RPM_KERNEL_MODULES_CORE"
+		vmsh run_cmd $vm1 "yum install -y $YUM_KERNEL $YUM_KERNEL_CORE $YUM_KERNEL_MODULES $YUM_KERNEL_MODULES_CORE"
+		vmsh run_cmd $vm2 "rpm -ivh --nodeps --force $RPM_KERNEL $RPM_KERNEL_CORE $RPM_KERNEL_MODULES $RPM_KERNEL_MODULES_CORE"
+		vmsh run_cmd $vm2 "yum install -y $YUM_KERNEL $YUM_KERNEL_CORE $YUM_KERNEL_MODULES $YUM_KERNEL_MODULES_CORE"
 	# In rhel 8.1, modules_internal separate from modules package
 	rhel_version_2=$(cat /etc/redhat-release |awk '{print $6}'| awk  'BEGIN{FS="[.:%]"} {print $2}')
 	if (($rhel_version_2 >= 1 ));then
@@ -503,11 +526,13 @@ sriov_setup()
 		vmsh run_cmd $vm2 "$yum_k_modules_internal"
 	fi
 	else
-	vmsh run_cmd $vm1 "$k"
-	virsh reboot $vm1
-	vmsh run_cmd $vm2 "$k"
-	virsh reboot $vm2
+		vmsh run_cmd $vm1 "$k"
+		virsh reboot $vm1
+		vmsh run_cmd $vm2 "$k"
+		virsh reboot $vm2
 	fi
+	virsh reboot $vm1
+	virsh reboot $vm2
 	sleep 120
 	# when running on rhel8, the vm is "in shutdown" status when get here, so add workaround for this
 	if (($rhel_version == 8)); then
@@ -535,8 +560,11 @@ sriov_setup()
 		{yum install -y automake}
 		{yum install -y nmap-ncat}
 		{yum install -y kernel-kernel-networking-vnic-sriov}
-		{source /mnt/tests/kernel/networking/common/install.sh}
+		{wget https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/main/kernel-tests-main.tar.gz}
+		{tar -xvf kernel-tests-main.tar.gz \&\>/dev/null}
+		{source kernel-tests-main/networking/common/install.sh}
 		{netperf_install}
+		{scapy_install}
 		{pkill netserver\; sleep 2\; netserver}
 		# work around bz883695
 		{lsmod \| grep mlx4_en \|\| modprobe mlx4_en}
@@ -568,13 +596,14 @@ sriov_setup()
 
 sriov_setup_container()
 {
+	echo "######sriov_setup_container#######"
 	$dbg_flag
 	#get image
 	for time in `seq 0 5`
 	do
-		echo "Download container image..."
+		echo "####Download container image...####"
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
 			podman load --input container_sriov_centos_stream8_aarch64.tar
 			if [ $? -eq 0 ]
 			then
@@ -582,6 +611,7 @@ sriov_setup_container()
 				podman run --privileged --name $container1 -it  -d $c_image_arm sleep infinity
 				podman run --privileged --name $container2 -it  -d $c_image_arm sleep infinity
 				#check the contaiers
+				echo "####check the container via 'podman ps'####"
 				podman ps
 				podman exec $container1 yum install -y iproute
 				podman exec $container2 yum install -y iproute
@@ -592,7 +622,7 @@ sriov_setup_container()
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
@@ -600,6 +630,7 @@ sriov_setup_container()
 				podman run --privileged --name $container1 -it  -d $c_image_ppc64le sleep infinity
 				podman run --privileged --name $container2 -it  -d $c_image_ppc64le sleep infinity
 				#check the contaiers
+				echo "####check the container via 'podman ps'####"
 				podman ps
 				podman exec $container1 yum install -y iproute
 				podman exec $container2 yum install -y iproute
@@ -610,7 +641,7 @@ sriov_setup_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
@@ -618,6 +649,7 @@ sriov_setup_container()
 				podman run --privileged --name $container1 -it  -d $c_image sleep infinity
 				podman run --privileged --name $container2 -it  -d $c_image sleep infinity
 				#check the contaiers
+				echo "####check the container via 'podman ps'####"
 				podman ps
 				return 0
 			else
@@ -625,7 +657,7 @@ sriov_setup_container()
 			fi
 		fi
 	done
-		return 1
+	return 1
 }
 
 sriov_setup_pod_container()
@@ -731,13 +763,11 @@ get_test_nic(){
 
 sriov_clean_pod_container()
 {
-	set -x
-	podman pod ps --format '{{.ID}}' | xargs -I {} podman pod stop {}
+	podman pod ps --format '{{.ID}}' | xargs -I {} podman pod kill {}
 	podman pod ps --format '{{.ID}}' | xargs -I {} podman pod rm {}
-	podman ps --all --format '{{.ID}}' | xargs -I {} podman stop {}
+	podman ps --all --format '{{.ID}}' | xargs -I {} podman kill {}
 	podman ps --all --format '{{.ID}}' | xargs -I {} podman rm {}
 	podman image list --format '{{.ID}}' | xargs -I {} podman image rm {}
-	set +x
 }
 
 sriov_config_dpdk()
@@ -767,7 +797,8 @@ sriov_config_dpdk()
 		yum install -y libibverbs
 		echo options mlx4_core log_num_mgm_entry_size=-1  >> /etc/modprobe.d/mlx4.conf
 		dracut -f -v
-		rhts-reboot
+		rstrnt-reboot
+		sleep 300
 	fi
 	[ -e /mnt/huge ] || mkdir /mnt/huge
 	mount -t hugetlbfs nodev /mnt/huge
@@ -816,8 +847,6 @@ sriov_test_pf_remote()
 		ip addr flush $nic_test
 		sriov_remove_vfs $nic_test 0
 	fi
-
-
 	return $result
 }
 
@@ -1004,12 +1033,12 @@ sriov_test_vf_remote_switchdev()
 		ip addr flush $nic_test
 	else
 		#sync_wait server test_vf_remote_switchdev_start
-		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
+		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family)
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]] || [[ "$NIC_DRIVER" == "ice" ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
-						ip link set hostbr0 up
+			ip link set hostbr0 up
 			if [[ "$NIC_DRIVER" == "ice" ]];then
 				ip link set $nic_test master hostbr0
 			fi
@@ -1033,9 +1062,9 @@ sriov_test_vf_remote_switchdev()
 					sleep 2
 				fi
 
-				switchdev_setup_mlx
-				#workaround for bz1877274
-				nic_test=$(get_required_iface)
+				# switchdev_setup_mlx
+				# workaround for bz1877274
+				# nic_test=$(get_required_iface)
 				ip link set $nic_test up
 				sleep 2
 				ip link show $nic_test
@@ -1222,6 +1251,241 @@ sriov_test_vf_vlan_remote()
 		sync_set server test_vf_vlan_remote_end
 	fi
 
+	return $result
+}
+
+sriov_test_create_time_max_vf(){
+	local result=0
+	ip link set ${nic_test} up
+	if i_am_server; then
+		sync_wait client ${FUNCNAME}_start
+		sync_wait client ${FUNCNAME}_end
+	else
+		sync_set server ${FUNCNAME}_start
+		local max_vf=$(sriov_get_max_vf_from_pf ${nic_test} 0)
+		local driver=$(ethtool -i ${nic_test} | grep 'driver' | sed 's/driver: //')
+		local pf_bus_info=$(ethtool -i ${nic_test} | grep 'bus-info'| sed 's/bus-info: //')
+		local iPF=0
+		case ${driver} in
+		mlx4_en)
+			local num_vfs="${max_vf},${max_vf},0"
+			if ! grep CMDLINE_OPTS /etc/modprobe.d/libmlx4.conf 2> /dev/null; then
+				echo 'install mlx4_core /sbin/modprobe --ignore-install mlx4_core  $CMDLINE_OPTS && (if [ -f /usr/libexec/mlx4-setup.sh -a -f /etc/rdma/mlx4.conf ]; then /usr/libexec/mlx4-setup.sh < /etc/rdma/mlx4.conf; fi; /sbin/modprobe mlx4_en; /sbin/modprobe mlx4_ib)' > /etc/modprobe.d/libmlx4.conf
+			fi
+			rlRun "modprobe -r mlx4_en; modprobe -r mlx4_ib;  modprobe -r mlx4_core"
+			rlRun "modprobe mlx4_core num_vfs=${max_vf} probe_vf=${max_vf}"
+		;;
+		cxgb4)
+			local pf_bus_info=$(echo $pf_bus_info | sed "s/\..*$/\.$iPF/")
+			rlRun "echo ${max_vf} > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs"
+		;;
+		mlx5_core)
+			source ${CASE_PATH}/lib_mlx.sh
+			load_openibd_for_mlnx
+			if [ -e /sys/class/infiniband ];then
+				pushd /sys/class/infiniband 1>/dev/null
+				local dir_name=$(ls -al | grep $pf_bus_info | sed "s/.*\///")
+				pushd ./${dir_name}/device 1>/dev/null
+				if [ -f mlx5_num_vfs ];then
+					rlRun "echo ${max_vf} > mlx5_num_vfs"
+				elif [ -f sriov_numvfs ];then
+					rlRun "echo ${max_vf} > sriov_numvfs"
+				fi
+				popd 1>/dev/null
+				popd 1>/dev/null
+			else
+				rlRun "echo ${max_vf} > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs"
+			fi
+		;;
+		*)
+			rlRun "echo ${max_vf} > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs"
+		;;
+		esac
+		for time in {1..60}; do
+			local num=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | wc -l)
+			rlRun "test ${num} -eq ${max_vf}" && rlPass "wait for ${time} sec, vf already onboard" && break
+			sleep 1
+		done
+		test ${num} -lt ${max_vf} && rlFail "wait for 60s, not all VFs were created"
+		rlRun "sriov_remove_vfs ${nic_test} 0"
+		sync_set server ${FUNCNAME}_end
+
+	fi
+}
+
+sriov_test_vf_vlan_transparent(){
+	$dbg_flag
+	log_header "VF VLAN transparent <---> REMOTE" $result_file
+	local result=0
+	local vid=3
+	ip link set $nic_test up
+	if i_am_server; then
+		ip link set ${nic_test} mtu 1500
+		ip link add link $nic_test name ${nic_test}.${vid} type vlan id $vid
+		ip link set ${nic_test}.${vid} mtu 1500
+		ip link set ${nic_test}.${vid} up
+		ip addr flush $nic_test
+		ip addr add 172.30.${ipaddr_vlan}.2/24 dev $nic_test.$vid
+		ip addr add 2021:db8:${ipaddr_vlan}::2/64 dev $nic_test.$vid
+
+		sync_set client ${FUNCNAME}_start
+		sync_wait client ${FUNCNAME}_end
+
+		ip link set ${nic_test}.${vid} down
+		ip link del ${nic_test}.${vid}
+	else
+		sync_wait server ${FUNCNAME}_start
+
+		if ! sriov_create_vfs $nic_test 0 2; then
+			sync_set server test_vf_vlan_remote_end
+			return 1
+		fi
+
+		local vf=$(sriov_get_vf_iface $nic_test 0 1)
+		if [ -z "$vf" ]; then
+			echo "FAIL to get VF interface"
+			result=1
+		else
+			ethtool -i $vf
+
+			if sriov_vfmac_is_zero $nic_test 0 1; then
+				ip link set ${nic_test} vf 0 mac 00:de:ad:$(printf %02x ${ipaddr}):01:01
+				ip link set $vf down
+				sleep 2
+			fi
+			ip link set ${nic_test} mtu 1500
+			ip link set ${vf} mtu 1500
+			ip link set $vf up
+			sleep 5
+			ip link set ${nic_test} vf 0 vlan $vid
+			ip addr add 172.30.${ipaddr_vlan}.1/24 dev ${vf}
+			ip addr add 2021:db8:${ipaddr_vlan}::1/64 dev ${vf}
+			ip link show ${nic_test}
+			ip link show ${vf}
+			ip addr show ${vf}
+
+			do_host_netperf 172.30.${ipaddr_vlan}.2 2021:db8:${ipaddr_vlan}::2 $result_file '-l 10' 1500,1500
+			result=$?
+
+			ip addr flush ${vf}
+		fi
+
+		sriov_remove_vfs $nic_test 0
+
+		sync_set server ${FUNCNAME}_end
+	fi
+	return $result
+}
+
+sriov_test_vf_vlan_transparent_jumbo(){
+	$dbg_flag
+	log_header "VF VLAN transparent <---> REMOTE" $result_file
+	local result=0
+	local vid=3
+	ip link set $nic_test up
+	if i_am_server; then
+		ip link add link $nic_test name ${nic_test}.${vid} type vlan id $vid
+		ip link set ${nic_test}.${vid} up
+		ip link set ${nic_test} mtu 9000
+		ip link set ${nic_test}.${vid} mtu 9000
+		ip addr flush $nic_test
+		ip addr add 172.30.${ipaddr_vlan}.2/24 dev $nic_test.$vid
+		ip addr add 2021:db8:${ipaddr_vlan}::2/64 dev $nic_test.$vid
+
+		sync_set client ${FUNCNAME}_start
+		sync_wait client ${FUNCNAME}_end
+
+		ip link set ${nic_test}.${vid} down
+		ip link del ${nic_test}.${vid}
+		ip link set ${nic_test} mtu 1500
+	else
+		sync_wait server ${FUNCNAME}_start
+
+		if ! sriov_create_vfs $nic_test 0 2; then
+			sync_set server test_vf_vlan_remote_end
+			return 1
+		fi
+
+		local vf=$(sriov_get_vf_iface $nic_test 0 1)
+		if [ -z "$vf" ]; then
+			echo "FAIL to get VF interface"
+			result=1
+		else
+			ethtool -i $vf
+
+			if sriov_vfmac_is_zero $nic_test 0 1; then
+				ip link set ${nic_test} vf 0 mac 00:de:ad:$(printf %02x ${ipaddr}):01:01
+				ip link set $vf down
+				sleep 2
+			fi
+			ip link set $vf up
+			sleep 5
+			ip link set ${nic_test} vf 0 vlan $vid
+			ip link set ${nic_test} mtu 9000
+			ip link set ${vf} mtu 9000
+			ip addr add 172.30.${ipaddr_vlan}.1/24 dev ${vf}
+			ip addr add 2021:db8:${ipaddr_vlan}::1/64 dev ${vf}
+			ip link show ${nic_test}
+			ip link show ${vf}
+			ip addr show ${vf}
+
+			do_host_netperf 172.30.${ipaddr_vlan}.2 2021:db8:${ipaddr_vlan}::2 $result_file '-l 10' 9000,9000
+			result=$?
+
+			ip addr flush ${vf}
+			ip link set ${nic_test} mtu 1500
+		fi
+
+		sriov_remove_vfs $nic_test 0
+
+		sync_set server ${FUNCNAME}_end
+	fi
+	return $result
+}
+sriov_test_unload_load_pf_driver()
+{
+	$dbg_flag
+	log_header "PF($nic_test) <---> REMOTE" $result_file $result_file
+
+	local result=0
+
+	ip link set $nic_test up
+
+	if i_am_server; then
+		ip addr flush $nic_test
+		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
+		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
+
+		sync_set client ${FUNCNAME}_start
+		sync_wait client ${FUNCNAME}_end
+
+		ip addr flush $nic_test
+	else
+		if ! sriov_create_vfs $nic_test 0 2; then
+			sync_wait ${FUNCNAME}_start
+			sync_set server ${FUNCNAME}_end
+			return 1
+		fi
+		rlRun "remodprobe_driver $NIC_DRIVER"
+		if ! sriov_create_vfs $nic_test 0 2; then
+			sync_wait ${FUNCNAME}_start
+			sync_set server ${FUNCNAME}_end
+			return 1
+		fi
+		ip addr flush $nic_test
+		ip addr add 172.30.${ipaddr}.1/24 dev $nic_test
+		ip addr add 2021:db8:${ipaddr}::1/64 dev $nic_test
+		ip -d link show $nic_test
+		ip -d addr show $nic_test
+
+		sync_wait server test_pf_remote_start
+		do_host_netperf 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file
+		result=$?
+		sync_set server ${FUNCNAME}_end
+
+		ip addr flush $nic_test
+		sriov_remove_vfs $nic_test 0
+	fi
 	return $result
 }
 
@@ -1920,10 +2184,10 @@ sriov_test_vmvf_vmvf()
 
 	#ensure netserver is running
 	local cmd=(
-			{iptables -F}
-			{ip6tables -F}
-			{systemctl stop firewalld}
-			{pkill netserver\; sleep 2\; netserver}
+		{iptables -F}
+		{ip6tables -F}
+		{systemctl stop firewalld}
+		{pkill netserver\; sleep 2\; netserver}
 	)
 	vmsh cmd_set $vm1 "${cmd[*]}"
 	vmsh cmd_set $vm2 "${cmd[*]}"
@@ -2024,13 +2288,13 @@ sriov_test_vmvf_vmvf_vlan()
 		return 1
 	fi
 
-		#ensure netserver is running
+	#ensure netserver is running
 	local cmd=(
-			{iptables -F}
-			{ip6tables -F}
-			{systemctl stop firewalld}
-			{pkill netserver\; sleep 2\; netserver}
-			{ip a}
+		{iptables -F}
+		{ip6tables -F}
+		{systemctl stop firewalld}
+		{pkill netserver\; sleep 2\; netserver}
+		{ip a}
 	)
 	vmsh cmd_set $vm1 "${cmd[*]}"
 	vmsh cmd_set $vm2 "${cmd[*]}"
@@ -2091,160 +2355,6 @@ sriov_test_vmvf_vmvf_vlan()
 	sriov_remove_vfs $nic_test 0
 
 	sync_set server test_vmvf_vmvf_vlan_end
-
-	return $result
-}
-
-sriov_test_vmvf_bond_remote()
-{
-	log_header "VMVF_BOND <---> REMOTE" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-
-		sync_set client test_bond_vmvf_remote_start
-		sync_wait client test_vmvf_bond_remote_end
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_vmvf_bond_remote_start
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-
-		if (( $? != 0 )); then
-			sync_set server test_vmvf_bond_remote_end
-			return 1
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		echo "test_ifaces:$iface1,$iface2"
-		# disable DHCP and NetworkManager on the interface
-		cat /etc/sysconfig/network-scripts/ifcfg-${iface1} | \
-			sed 's/BOOTPROTO=dhcp/BOOTPROTO=none/g' | \
-			sed 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g' | \
-			tee  /etc/sysconfig/network-scripts/ifcfg-${iface1}
-		cat /etc/sysconfig/network-scripts/ifcfg-${iface2} | \
-			sed 's/BOOTPROTO=dhcp/BOOTPROTO=none/g' | \
-			sed 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g' | \
-			tee  /etc/sysconfig/network-scripts/ifcfg-${iface2}
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		if ! sriov_create_vfs ${iface1} 0 2; then
-			sync_set server test_vmvf_bond_remote_end
-			return 1
-		fi
-
-		if ! sriov_create_vfs ${iface2} 0 2; then
-			sync_set server test_vmvf_bond_remote_end
-			return 1
-		fi
-
-		ip link set ${iface1} up
-		ip link set ${iface2} up
-
-		ip link set  ${iface1} vf 0 spoofchk off
-		ip link set  ${iface2} vf 1 spoofchk off
-		ip link set  ${iface1} vf 0 trust on
-		ip link set  ${iface2} vf 1 trust on
-		ip link show
-		ip addr show
-
-		if ! sriov_attach_vf_to_vm ${iface1} 0 1 $vm1 $mac1; then
-			result=1
-		else
-			if ! sriov_attach_vf_to_vm ${iface2} 0 2 $vm1 $mac2; then
-				result=1
-			else
-				local cmd=(
-					{export NIC_TEST1=\$\(ip link show \| grep $mac1 -B1 \| sed \'/$mac1/d\' \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-					{export NIC_TEST2=\$\(ip link show \| grep $mac2 -B1 \| sed \'/$mac2/d\' \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-					{ip link set \$NIC_TEST1 down}
-					{ip link set \$NIC_TEST2 down}
-					{modprobe -r bonding}
-					{sleep 2}
-					{modprobe bonding}
-					{sleep 5}
-					{echo +bond1 \> /sys/class/net/bonding_masters}
-					{cat /sys/class/net/bonding_masters}
-					{echo active-backup \> /sys/class/net/bond1/bonding/mode}
-					{echo active \> /sys/class/net/bond1/bonding/fail_over_mac}
-					{echo 100 \> /sys/class/net/bond1/bonding/miimon}
-					{echo +\$NIC_TEST1 \> /sys/class/net/bond1/bonding/slaves}
-					{echo +\$NIC_TEST2 \> /sys/class/net/bond1/bonding/slaves}
-					{ip link set bond1 up}
-					{ip addr flush bond1}
-					{ip addr add 172.30.${ipaddr}.11/24 dev bond1}
-					{ip addr add 2021:db8:${ipaddr}::11/64 dev bond1}
-					{ip link show}
-					{ip addr show}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-
-				# NIC_TEST1 and NIC_TEST2 are all up. NIC_TEST1 is active
-				if ! do_vm_netperf $vm1 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file; then
-					result=1
-				fi
-
-				# NIC_TEST1 is down and NIC_TEST2 is active
-				local cmd=(
-					{export NIC_TEST1=\$\(cat /sys/class/net/bond1/bonding/active_slave\)}
-					{ip link set \$NIC_TEST1 down}
-					{ip link show}
-					{ip addr show}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				if ! do_vm_netperf $vm1 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file; then
-					result=1
-				fi
-
-				# NIC_TEST2 is down and NIC_TEST1 is active
-				local cmd=(
-					{export NIC_TEST2=\$\(cat /sys/class/net/bond1/bonding/active_slave\)}
-					{export NIC_TEST1=\$\(cat /sys/class/net/bond1/bonding/slaves \| sed \"s/\$NIC_TEST2//\" \| sed \'s/ //\'\)}
-					{ip link set \$NIC_TEST1 up}
-					{ip link set \$NIC_TEST2 down}
-					{ip link show}
-					{ip addr show}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				if ! do_vm_netperf $vm1 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file; then
-					result=1
-				fi
-
-				# cleanup
-				local cmd=(
-					{export NIC_TEST1=\$\(ip link show \| grep bond1 \| sed \'/bond1:/d\' \| sed -n 1p \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-					{export NIC_TEST2=\$\(ip link show \| grep bond1 \| sed \'/bond1:/d\' \| sed -n 2p \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-					{ip link set bond1 down}
-					{echo -\$NIC_TEST1 \> /sys/class/net/bond1/bonding/slaves}
-					{echo -\$NIC_TEST2 \> /sys/class/net/bond1/bonding/slaves}
-					{echo -bond1 \> /sys/class/net/bonding_masters}
-					{modprobe -r bonding}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-			fi
-
-			sriov_detach_vf_from_vm ${iface1} 0 1 $vm1
-			sriov_detach_vf_from_vm ${iface2} 0 2 $vm1
-		fi
-
-		sriov_remove_vfs ${iface1} 0
-		sriov_remove_vfs ${iface2} 0
-
-		sync_set server test_vmvf_bond_remote_end
-	fi
 
 	return $result
 }
@@ -2316,10 +2426,9 @@ sriov_test_vmvf1vf2_remote()
 	local mac1="00:de:a1:$(printf %02x $ipaddr):11:01"
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
-	if ! sriov_create_vfs $iface1 0 2 ||
-		! sriov_create_vfs $iface2 0 2; then
-			echo "${test_name} failed:create vfs failed."
-			sriov_remove_vfs $iface1 0
+	if ! sriov_create_vfs $iface1 0 2 || ! sriov_create_vfs $iface2 0 2; then
+		echo "${test_name} failed:create vfs failed."
+		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
 		sync_set server ${test_name}_end
 		return 1
@@ -2328,14 +2437,14 @@ sriov_test_vmvf1vf2_remote()
 	ip link set $iface1 up
 	ip link set $iface2 up
 
-		#ensure netserver is running
-		local cmd=(
+	#ensure netserver is running
+	local cmd=(
 			{iptables -F}
 			{ip6tables -F}
 			{systemctl stop firewalld}
 			{pkill netserver\; sleep 2\; netserver}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
+	)
+	vmsh cmd_set $vm1 "${cmd[*]}"
 
 	# setup vmvf1
 	if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1; then
@@ -2462,8 +2571,7 @@ sriov_test_vmvf1_vmvf2_remote()
 	local mac1="00:de:a1:$(printf %02x $ipaddr):11:01"
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
-	if ! sriov_create_vfs $iface1 0 2 ||
-		! sriov_create_vfs $iface2 0 2; then
+	if ! sriov_create_vfs $iface1 0 2 || ! sriov_create_vfs $iface2 0 2; then
 		echo "${test_name} failed:create vfs failed."
 		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
@@ -2618,8 +2726,7 @@ sriov_test_vmvf1_vmvf2_vlan_remote()
 	local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 	local mac2="00:de:ad:$(printf %02x $ipaddr):02:01"
 
-	if ! sriov_create_vfs $iface1 0 2 ||
-		! sriov_create_vfs $iface2 0 2; then
+	if ! sriov_create_vfs $iface1 0 2 || ! sriov_create_vfs $iface2 0 2; then
 		echo "${test_name} failed:create vfs failed."
 		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
@@ -2734,6 +2841,7 @@ sriov_test_max_vfs()
 	local ip6_mask_len=64
 
 	ip link set $nic_test up
+	ip link set mtu 9000 dev $nic_test || result=1
 
 	if i_am_server;then
 		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
@@ -2741,6 +2849,7 @@ sriov_test_max_vfs()
 		sync_set client ${test_name}_start
 		sync_wait client ${test_name}_end 14400
 		ip addr flush $nic_test
+	ip link set mtu 1500 dev $nic_test
 	else
 		sync_wait server ${test_name}_start
 		#local driver=$(ethtool -i ${nic_test} | grep "driver" | awk '{print $NF}')
@@ -2774,6 +2883,7 @@ sriov_test_max_vfs()
 					local cmd=(
 						{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
 						{ip link set \$NIC_TEST up}
+						{ip link set mtu 9000 \$NIC_TEST}
 						{ip addr add ${vm_ip4_perfix}${i}/${ip4_mask_len} dev \$NIC_TEST}
 						{ip addr add ${vm_ip6_perfix}${i}/${ip6_mask_len} dev \$NIC_TEST}
 						{ip a}
@@ -2785,13 +2895,13 @@ sriov_test_max_vfs()
 						rlFail "ping failed via vm1 vf $i"
 					fi
 					#if [ $i -eq $vm1_attach_vf_nums ];then
-					#	if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file; then
-					#			let result++
-					#	fi
+					#       if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file; then
+					#               let result++
+					#       fi
 					#fi
 					local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{ip addr flush \$NIC_TEST}
+				{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{ip addr flush \$NIC_TEST}
 					)
 					vmsh cmd_set $vm1 "${cmd[*]}"
 					sriov_detach_vf_from_vm $nic_test 0 $i $vm1
@@ -2805,12 +2915,13 @@ sriov_test_max_vfs()
 						rlLog "${test_name} failed: can't attach vf $i to vm2."
 					else
 						local cmd=(
-							{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-							{ip link set \$NIC_TEST up}
-							{ip addr add ${vm_ip4_perfix}${i}/${ip4_mask_len} dev \$NIC_TEST}
-							{ip addr add ${vm_ip6_perfix}${i}/${ip6_mask_len} dev \$NIC_TEST}
-							{ip a}
-							{timeout 60s bash -c \"until ping -c1 ${server_ip4}\; do sleep 5\; done\"}
+				{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{ip link set \$NIC_TEST up}
+				{ip link set mtu 9000 \$NIC_TEST}
+				{ip addr add ${vm_ip4_perfix}${i}/${ip4_mask_len} dev \$NIC_TEST}
+				{ip addr add ${vm_ip6_perfix}${i}/${ip6_mask_len} dev \$NIC_TEST}
+				{ip a}
+				{timeout 60s bash -c \"until ping -c1 ${server_ip4}\; do sleep 5\; done\"}
 						)
 						vmsh cmd_set $vm2 "${cmd[*]}"
 						if [ $? -ne 0 ];then
@@ -2818,13 +2929,13 @@ sriov_test_max_vfs()
 							rlFail "ping failed via vm2 vf $i"
 						fi
 						#if [ $i -eq $total_vfs ];then
-						#		if ! do_vm_netperf $vm2 ${server_ip4} ${server_ip6} $result_file; then
-						#				let result++
-						#		fi
+						#       if ! do_vm_netperf $vm2 ${server_ip4} ${server_ip6} $result_file; then
+						#               let result++
+						#       fi
 						#fi
 						local cmd=(
-							{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-							{ip addr flush \$NIC_TEST}
+				{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{ip addr flush \$NIC_TEST}
 						)
 						vmsh cmd_set $vm2 "${cmd[*]}"
 						sriov_detach_vf_from_vm $nic_test 0 $i $vm2
@@ -2840,6 +2951,7 @@ sriov_test_max_vfs()
 					sriov_detach_vf_from_vm $nic_test 0 $i $vm2
 				done
 				sriov_remove_vfs $nic_test 0
+		ip link set mtu 1500 dev $nic_test
 		fi
 		#sometimes vm will panic. make sure they are start here.
 		virsh list | grep $vm1 || virsh start $vm1
@@ -2877,7 +2989,7 @@ sriov_test_max_vfs_attaching_to_different_vms()
 	else
 		sync_wait server ${test_name}_start
 		#local driver=$(ethtool -i ${nic_test} | grep "driver" | awk '{print $NF}')
-				#local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
+		#local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
 		local total_vfs=$(sriov_get_max_vf_from_pf ${nic_test})
 		rlLog "total_vfs $total_vfs"
 
@@ -2888,9 +3000,8 @@ sriov_test_max_vfs_attaching_to_different_vms()
 		else
 			# prepare VMs
 
-				# define default vnet
-			if ! virsh net-list | grep default &&
-				! virsh net-start default;then
+			# define default vnet
+			if ! virsh net-list | grep default && ! virsh net-start default;then
 				virsh net-define /usr/share/libvirt/networks/default.xml
 				virsh net-start default
 				virsh net-autostart default
@@ -2903,11 +3014,11 @@ sriov_test_max_vfs_attaching_to_different_vms()
 			rlLog "Download guest image..."
 			mkdir -p /home/maxvfstest/images
 			pushd "/home/maxvfstest/images/" 1>/dev/null
-			[ -e $(basename $IMG_GUEST) ] || wget -nv -N $IMG_GUEST
+			[ -e $(basename $IMG_GUEST) ] || wget -nv -N -c -t 3 $IMG_GUEST
 			chmod -R 777 /home/maxvfstest/images/$(basename $IMG_GUEST)
 			if [ "$SYS_ARCH" == "aarch" ];then
 				[ -z "$IMG_FD" ] && IMG_FD=`echo $IMG_GUEST | sed 's/.qcow2/_VARS.fd/g'`
-				[ -e $(basename $IMG_FD) ] || wget -nv -N $IMG_FD
+				[ -e $(basename $IMG_FD) ] || wget -nv -N -c -t 3 $IMG_FD
 				chmod -R 777 /home/maxvfstest/images/$(basename $IMG_FD)
 			fi
 
@@ -2941,6 +3052,7 @@ sriov_test_max_vfs_attaching_to_different_vms()
 						--ram=1024 \
 						--disk path=/home/maxvfstest/images/${vmname}.qcow2,device=disk,bus=virtio,format=qcow2 \
 						--network bridge=virbr0,model=virtio,mac=${vm_mac_perfix}$(printf %02x $i) \
+						--import \
 						--accelerate \
 						--graphics vnc,listen=0.0.0.0 \
 						--force \
@@ -2957,7 +3069,7 @@ sriov_test_max_vfs_attaching_to_different_vms()
 						--ram=1024 \
 						--disk path=/home/maxvfstest/images/${vmname}.qcow2,device=disk,bus=virtio,format=qcow2 \
 						--network bridge=virbr0,model=virtio,mac=${vm_mac_perfix}$(printf %02x $i) \
-						--boot hd \
+						--import --boot hd \
 						--accelerate \
 						--graphics vnc,listen=0.0.0.0 \
 						--force \
@@ -3029,6 +3141,16 @@ sriov_test_max_vfs_attaching_to_different_vms()
 						let result++
 						rlFail "${test_name} failed: can't attach vf $j to $vmname."
 					else
+
+						local cmd=(
+							{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+							{ip link set \$NIC_TEST up}
+						)
+						vmsh cmd_set $vmname "${cmd[*]}"
+						if [ $? -ne 0 ];then
+							rlLog "failed to get the $vmname vf $j interface"
+							sleep 2
+						fi
 						local cmd=(
 							{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
 							{ip link set \$NIC_TEST up}
@@ -3058,7 +3180,6 @@ sriov_test_max_vfs_attaching_to_different_vms()
 					fi
 				done
 			done
-
 			sleep 130
 
 			for((i=1;i<=$vm_num;i++))
@@ -3089,561 +3210,6 @@ sriov_test_max_vfs_attaching_to_different_vms()
 			sriov_remove_vfs $nic_test 0
 		fi
 		sync_set server ${test_name}_end 14400
-	fi
-
-	return $result
-}
-
-#32 vfs
-sriov_test_bz1701191()
-{
-	log_header "sriov_test_bz1701191" $result_file
-	local result=0
-	ip link set $nic_test up
-	if i_am_server;then
-		sync_set client test_bz1701191_start
-		sync_wait client test_bz1701191_end
-	fi
-	if i_am_client;then
-		#if [ "$NIC_DRIVER" = "i40e" ];then
-		sync_wait server test_bz1701191_start
-		if ! sriov_create_vfs $nic_test 0 1; then
-			sync_set server test_bz1701191_end
-			return 1
-		fi
-		pf_bus_info=$(ethtool -i $nic_test | grep 'bus-info'| sed 's/bus-info: //')
-		vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
-		vf_nodedev=pci_$(echo $vf_bus_info | sed 's/[:|.]/_/g')
-		pf_nodedev=pci_$(echo $pf_bus_info | sed 's/[:|.]/_/g')
-		vf_domain=$(echo $vf_bus_info | awk -F '[:|.]' '{print $1}')
-		vf_bus=$(echo $vf_bus_info | awk -F '[:|.]' '{print $2}')
-		vf_slot=$(echo $vf_bus_info | awk -F '[:|.]' '{print $3}')
-		vf_function=$(echo $vf_bus_info | awk -F '[:|.]' '{print $4}')
-		cat <<-EOF > ${vf_nodedev}.xml
-			<interface type="hostdev" managed="no">
-				<source>
-					<address type='pci' domain='0x${vf_domain}' bus='0x${vf_bus}' slot='0x${vf_slot}' function='0x${vf_function}'/>
-				</source>
-				<mac address="00:1a:4a:16:20:81"/>
-			</interface>
-		EOF
-		if virsh nodedev-detach $vf_nodedev && virsh attach-device $vm1 ${vf_nodedev}.xml;then
-			result=0
-			if [[ $ENABLE_RT_KERNEL != "yes" ]]; then
-				virsh detach-device $vm1 ${vf_nodedev}.xml
-			else
-				local rhel_version=$( cat /etc/redhat-release | sed  's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
-				if [[ $(echo "${rhel_version} <= 8.6" | bc) -eq 1 ]]; then
-					virsh detach-device $vm1 ${vf_nodedev}.xml
-					virsh shutdown $vm1
-					sleep 10
-					virsh start $vm1
-					sleep 10
-					local vm_status=$(virsh list --all | grep $vm1 |  awk '{print $3,$4}')
-					rlLog "$vm in $vm_status status"
-				else
-					virsh detach-device $vm1 ${vf_nodedev}.xml
-				fi
-			fi
-			rlRun "virsh nodedev-reattach  $vf_nodedev"
-		else
-			rlLog "failed to attach VF to VM with managed=no"
-			result=1
-		fi
-		rlLog "repeoducer for bz1931779: binding the PF(with a VF) driver to vfio-pci "
-		rlRun "virsh nodedev-detach $pf_nodedev"
-		#add more time to reproduce bug https://bugzilla.redhat.com/show_bug.cgi?id=2016618
-		sleep 120
-		rlRun "virsh nodedev-list | grep $pf_nodedev" "0-999"
-		rlRun "virsh nodedev-reattach  $pf_nodedev" || rlRun "virsh nodedev-reset $pf_nodedev"
-		rlRun "virsh nodedev-reattach  $pf_nodedev"
-		sriov_remove_vfs $nic_test 0
-		sync_set server test_bz1701191_end
-		return $result
-		#else
-			#sync_wait server test_bz1701191_start
-			#sync_set server test_bz1701191_end
-			#echo "skip test"
-		#fi
-	fi
-}
-
-sriov_test_bz1392128()
-{
-	log_header "sriov_test_bz1392128" $result_file
-
-	local result=0
-	local test_name="sriov_test_bz1392128"
-	local server_ip4="192.100.${ipaddr}.1"
-	local vm1_ip4="192.100.${ipaddr}.2"
-	local vm2_ip4="192.100.${ipaddr}.3"
-	local server_ip6="2021:db08:${ipaddr}::1"
-	local vm1_ip6="2021:db08:${ipaddr}::2"
-	local vm2_ip6="2021:db08:${ipaddr}::3"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-	local count_vm1=0
-	local count_vm2=0
-
-	ip link set $nic_test up
-
-	if i_am_server;then
-
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		ip addr show $nic_test
-		sync_set client ${test_name}_start 10800
-		sync_wait client ${test_name}_end
-		ip addr flush $nic_test
-	else
-		sync_wait server ${test_name}_start
-		#local driver=$(ethtool -i ${nic_test} | grep "driver" | awk '{print $NF}')
-		#local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
-		local total_vfs=$(sriov_get_max_vf_from_pf $nic_test 0)
-		if [ $total_vfs -ge 32 ];then
-			total_vfs=32
-		else
-			sync_set server ${test_name}_end 10800
-			return 0
-		fi
-
-		if ! sriov_create_vfs $nic_test 0 $total_vfs;then
-			let result++
-			rlFail "${test_name} failed: create vfs failed."
-
-		else
-			local vm1_mac_perfix="00:de:ad:$(printf %02x $ipaddr):01:"
-			local vm2_mac_perfix="00:de:ad:$(printf %02x $ipaddr):02:"
-
-			local vm1_attach_vf_nums=$((total_vfs/2))
-
-			sleep 30
-
-			for((i=1;i<=$vm1_attach_vf_nums;i++))
-			do
-				local vf_mac="${vm1_mac_perfix}$(printf %02x $i)"
-				if ! sriov_attach_vf_to_vm $nic_test 0 $i $vm1 ${vf_mac};then
-					let result++
-					rlFail "${test_name} failed: can't attach vf $i to vm1."
-				else
-					let count_vm1++
-					rlLog "vm1 attach vf $count_vm1 times"
-					rlLog "`virsh list`"
-					local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{ip addr flush \$NIC_TEST}
-						{ip link set \$NIC_TEST up}
-						{ip addr add ${vm1_ip4}/${ip4_mask_len} dev \$NIC_TEST}
-						{ip addr add ${vm1_ip6}/${ip6_mask_len} dev \$NIC_TEST}
-						{ip a}
-						{ping ${server_ip4} -c3}
-					)
-					vmsh cmd_set $vm1 "${cmd[*]}"
-
-					if [ $? -ne 0 ];then
-						let result++
-						rlFail "ping failed via vm1 vf $i"
-					fi
-					local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{ip addr flush \$NIC_TEST}
-						{ip a}
-					)
-					vmsh cmd_set $vm1 "${cmd[*]}"
-						sriov_detach_vf_from_vm $nic_test 0 $i $vm1
-				fi
-			done
-			for((i=$((vm1_attach_vf_nums+1));i<=$total_vfs;i++))
-			do
-				local vf_mac="${vm2_mac_perfix}$(printf %02x $i)"
-				if ! sriov_attach_vf_to_vm $nic_test 0 $i $vm2 ${vf_mac};then
-					let result++
-					rlFail "${test_name} failed: can't attach vf $i to vm2."
-				else
-					let count_vm2++
-					rlLog "vm2 attach vf $count_vm2 times"
-					rlLog "`virsh list`"
-					local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{ip addr flush \$NIC_TEST}
-						{ip link set \$NIC_TEST up}
-						{ip addr add ${vm2_ip4}/${ip4_mask_len} dev \$NIC_TEST}
-						{ip addr add ${vm2_ip6}/${ip6_mask_len} dev \$NIC_TEST}
-						{ip a}
-						{ping ${server_ip4} -c3}
-					)
-					vmsh cmd_set $vm2 "${cmd[*]}"
-					if [ $? -ne 0 ];then
-						let result++
-						rlFail "ping failed via vm2 vf $i"
-					fi
-					local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{ip addr flush \$NIC_TEST}
-						{ip a}
-					)
-					vmsh cmd_set $vm2 "${cmd[*]}"
-					sriov_detach_vf_from_vm $nic_test 0 $i $vm2
-				fi
-			done
-
-
-			#for((i=1;i<=$vm1_attach_vf_nums;i++))
-			#do
-			#	sriov_detach_vf_from_vm $nic_test 0 $i $vm1
-			#done
-			#for((i=$((vm1_attach_vf_nums+1));i<=$total_vfs;i++))
-			#do
-			#	sriov_detach_vf_from_vm $nic_test 0 $i $vm2
-			#done
-			sriov_remove_vfs $nic_test 0
-		fi
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-
-#create remove vfs 20 times
-sriov_test_bz1212361()
-{
-	log_header "Regresssion: bz1212361" $result_file
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-
-		sync_set client test_bz1212361_start
-		sync_wait client test_bz1212361_end
-
-		ip addr flush $nic_test
-		return 0
-	fi
-
-	sync_wait server test_bz1212361_start
-
-	local cx=0
-	while (( $cx < 20 )); do
-		sriov_create_vfs $nic_test 0 2 || { sync_set server test_bz1212361_end; return 1; }
-		sleep 5
-		sriov_remove_vfs $nic_test 0 || { sync_set server test_bz1212361_end; return 1; }
-
-		let cx=cx+1
-	done
-
-	if ! sriov_create_vfs $nic_test 0 2; then
-		sync_set server test_bz1212361_end
-		return 1
-	fi
-
-	local vf=$(sriov_get_vf_iface $nic_test 0 1)
-	if [ -z "$vf" ]; then
-		rlFail "FAIL to get VF interface"
-		result=1
-	else
-		ethtool -i $vf
-
-		if sriov_vfmac_is_zero $nic_test 0 1; then
-			ip link set $nic_test vf 0 mac 00:de:ad:$(printf %02x $ipaddr):01:01
-		fi
-		ip link set $vf down
-		sleep 2
-		ip link set $vf up
-		sleep 5
-		ip addr flush $vf
-		ip addr add 172.30.${ipaddr}.1/24 dev $vf
-		ip addr add 2021:db8:${ipaddr}::1/64 dev $vf
-		ip -d link show $vf
-		ip -d addr show $vf
-
-		do_host_netperf 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file
-		local result=$?
-
-		ip addr flush $vf
-	fi
-
-	sriov_remove_vfs $nic_test 0 || { sync_set server test_bz1212361_end; return 1; }
-
-	sync_set server test_bz1212361_end
-
-	return $result
-}
-
-#mtu 9000
-sriov_test_bz1145063()
-{
-	log_header "Regresssion: bz1145063" $result_file
-
-	local result=0
-
-	if i_am_server; then
-		ip link set $nic_test up
-		ip link set mtu 9000 dev $nic_test
-
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-
-		sync_set client test_bz1145063_start
-		sync_wait client test_bz1145063_end
-
-		ip link set mtu 1500 dev $nic_test
-		ip addr flush $nic_test
-
-		return 0
-	fi
-
-	sync_wait server test_bz1145063_start
-
-	local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-
-	if ! sriov_create_vfs $nic_test 0 2; then
-		sync_set server test_bz1145063_end
-		return 1
-	fi
-
-	if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
-		sriov_remove_vfs $nic_test 0
-		sync_set server test_bz1145063_end
-		return 1
-	fi
-
-	ip link set mtu 9000 dev $nic_test
-
-	local cmd=(
-		{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		{ip link set \$NIC_TEST up}
-		{ip link set mtu 9000 \$NIC_TEST}
-		{sleep 5}
-		{ip addr flush \$NIC_TEST}
-		{ip addr add 172.30.${ipaddr}.11/24 dev \$NIC_TEST}
-		{ip addr add 2021:db8:${ipaddr}::11/64 dev \$NIC_TEST}
-	)
-	vmsh cmd_set $vm1 "${cmd[*]}"
-
-	do_vm_netperf $vm1 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file
-	result=$?
-
-	sriov_detach_vf_from_vm $nic_test 0 1 $vm1
-
-	sriov_remove_vfs $nic_test 0
-
-	ip link set mtu 1500 dev $nic_test
-
-	sync_set server test_bz1145063_end
-
-	return $result
-}
-
-
-#config space
-# bz1156061 also
-sriov_test_bz1205903()
-{
-	log_header "Regresssion: bz1205903" $result_file
-
-	local result=0
-
-	if i_am_server; then
-
-		sync_set client test_bz1205903
-		sync_wait client test_bz1205903
-
-		return 0
-	fi
-
-	sync_wait server test_bz1205903
-
-	if ! sriov_create_vfs $nic_test 0 2; then
-		sync_set server test_bz1205903
-		return 1
-	fi
-
-	ip link set $nic_test up
-
-	local vf0_bus_info=$(sriov_get_vf_bus_info $nic_test 0 1)
-	local vf0_pci_bus_info="pci_$(echo $vf0_bus_info | sed 's/[:|\.]/_/g')"
-	virsh nodedev-detach ${vf0_pci_bus_info}
-
-	local PREV=$(mktemp)
-	local CUR=$(mktemp)
-
-	local d1=$(date +"%s")
-	lspci -xxx -s ${vf0_bus_info} > $PREV
-	cat $PREV
-	while (true); do
-		lspci -xxx -s $vf0_bus_info > $CUR
-		if ! diff -q $PREV $CUR > /dev/null; then
-			diff -U 0 $PREV $CUR
-			cp $CUR $PREV
-			result=1
-		fi
-		local d2=$(date +"%s");
-		if (( $d2 - $d1 > 300 )); then
-			break
-		fi
-	done
-
-	sriov_remove_vfs $nic_test 0
-
-	sync_set server test_bz1205903
-
-	return $result
-}
-
-sriov_test_bz1794812_excessive_interrupts()
-{
-	log_header "excessive interrupts in hypervisor due to get link settings" $result_file
-
-	local result=0
-
-	if i_am_server; then
-
-		sync_set client test_bz1794812
-		sync_wait client test_bz1794812
-
-		return 0
-	fi
-	if i_am_client;then
-		if [ "$NIC_DRIVER" = "ixgbe" ];then
-			sync_wait server test_bz1794812
-			if ! sriov_create_vfs $nic_test 0 1; then
-				sync_set server test_bz1794812
-				return 1
-			fi
-			#get the cpu core num
-			cpu_cores=$(cat /proc/cpuinfo |grep "processor"|wc -l)
-			#get interrupt
-			get_interrupts()
-			{
-				local $1
-				let num_c=cpu_cores+1
-				for i in `seq 2 $num_c`
-				do
-					interruputs_pf=$(grep $nic_test /proc/interrupts|grep -v "TxRx"|awk '{print $'$i'}')
-					[ ! -z "$interruputs_pf" ] && let interruputs_sum_pf+=$interruputs_pf
-					echo $interruputs_sum_pf > interruputs_sum_pf_$1.log
-				done
-					echo interruputs_sum_pf_$1
-					cat interruputs_sum_pf_$1.log
-			}
-			check_interrupts_increase()
-			{
-				after=$(cat interruputs_sum_pf_after.log)
-				before=$(cat interruputs_sum_pf_before.log)
-				let interrupts_increase=after-before
-				rlAssertGreaterOrEqual "500 >= $interrupts_increase ?" 500 $interrupts_increase
-			}
-			run_ethtool()
-			{
-				local $1
-				for i in `seq 0 1000`
-				do
-					ethtool $1
-				done
-			}
-
-			ip link set $nic_test up
-			local vf=$(sriov_get_vf_iface $nic_test 0 1)
-			if [ -z "$vf" ]; then
-				rlFail "FAIL to get VF interface"
-				result=1
-			else
-				rlLog "get pf interrupts before running ethtool in loop"
-				get_interrupts before
-				rlLog "run ethtool in loop"
-				run_ethtool $vf > /dev/null
-				rlLog "get pf interrupts after running ethtool in loop"
-				get_interrupts after
-				rlLog "check interrupts increase"
-				check_interrupts_increase
-			fi
-			sriov_remove_vfs $nic_test 0
-			sync_set server test_bz1794812
-			return $result
-		else
-			sync_wait server test_bz1794812
-			sync_set server test_bz1794812
-		fi
-	fi
-}
-
-#reproducer for bz2041318
-sriov_test_vf_trust_broadcast()
-{
-	$dbg_flag
-	log_header "VF <---> REMOTE" $result_file
-
-	local result=0
-	ip link set $nic_test up
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-
-		sync_set client test_vf_trust_start
-		sync_wait client test_vf_trust_ready_send_packet
-		local pkt="Ether(src='00:01:02:03:04:05', dst='ff:ff:ff:ff:ff:ff')/Dot1Q(vlan=32)/ARP(hwsrc='00:01:02:03:04:05' , pdst='1.2.3.4')"
-		if [ $(GetDistroRelease) = 8 ];then
-			/usr/libexec/platform-python -c  "from scapy.all import *; sendp($pkt, iface='$nic_test', count=10 )"
-		else
-			python -c  "from scapy.all import *; sendp($pkt, iface='$nic_test', count=10 )"
-		fi
-		sync_set client test_vf_trust_ready_send_packet
-		sync_wait client test_vf_trust_end
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_vf_remote_start
-
-		if ! sriov_create_vfs $nic_test 0 2; then
-			sync_set server test_vf_trust_ready_send_packet
-			sync_wait server test_vf_trust_ready_send_packet
-			sync_set server test_vf_trust_end
-			return 1
-		fi
-
-		local vf=$(sriov_get_vf_iface $nic_test 0 1)
-		if [ -z "$vf" ]; then
-			echo "FAIL to get VF interface"
-			result=1
-		else
-			ethtool -i $vf
-			if sriov_vfmac_is_zero $nic_test 0 1; then
-				ip link set $nic_test vf 0 mac 00:de:ad:$(printf "%02x" $ipaddr):01:01
-				#workaround for ionic bz1914175
-				ip link set dev $vf address 00:de:ad:$(printf "%02x" $ipaddr):01:01
-				ip link set $vf down
-				sleep 2
-			fi
-			ip link set $vf up
-			sleep 5
-			ip link set $nic_test vf 0 trust on spoof off
-			ip link show $nic_test
-			ip addr flush $vf
-			ip addr add 172.30.${ipaddr}.11/24 dev $vf
-			ip addr show $vf
-			ping -c5 172.30.${ipaddr}.2
-			#check the broadcast with trust off spoof on
-			rlRun "tcpdump -i $vf -e vlan and arp -w vlan_broadcast.pcap &"
-			rlRun "tcpdump -i $nic_test -e vlan and arp -w pf_vlan_broadcast.pcap &"
-			sync_set server test_vf_trust_ready_send_packet
-			sync_wait server test_vf_trust_ready_send_packet
-			pkill tcpdump
-			sleep 5
-			rlLog "check the vf whether receive the broadcast"
-			tcpdump -r vlan_broadcast.pcap -enn | grep -i 'vlan 32'
-			local result=$?
-			rlLog "check the pf whether receive the broadcast"
-			tcpdump -r pf_vlan_broadcast.pcap -enn | grep -i 'vlan 32'
-
-		fi
-		sriov_remove_vfs $nic_test 0
-		rm *_broadcast.pcap
-
-		sync_set server test_vf_remote_end
 	fi
 
 	return $result
@@ -3712,7 +3278,7 @@ sriov_test_trusted_vf_allmulticast()
 		#### Test 2
 		rlLog "Test2: PF(host) allmulticast on; VF(guest) allmulticast on; VF trust off"
 		ip link set $nic_test allmulticast on
-		ifconfig $nic_test | grep -e "ALLMULTI" || { ((result += 1)); rlFail 'configure allmulticast failed!'; }
+		ifconfig $nic_test | grep -e "ALLMULTI" || { ((result+=1)); rlFail 'configure allmulticast failed!'; }
 		ip link show $nic_test
 		local cmd=(
 			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -3731,12 +3297,14 @@ sriov_test_trusted_vf_allmulticast()
 		#need detach/attach vf if the vf trust mode is changed
 		sriov_detach_vf_from_vm $nic_test 0 1 $vm1
 
+		sleep 5
+
 		rlLog "Test3: PF(host) allmulticast on; VF(guest) allmulticast off; VF trust on"
 		ip link set $nic_test vf 0 trust on
-		ip link show $nic_test | grep -e "vf 0" | grep -e "trust on" || { ((result += 1)); rlFail 'VF trust may not be supported!'; }
+		ip link show $nic_test | grep -e "vf 0" | grep -e "trust on" || { ((result+=1)); rlFail 'VF trust may not be supported!'; }
 		ip link set $nic_test allmulticast on
 		ip link show $nic_test
-		ifconfig $nic_test | grep -e "ALLMULTI" || { ((result += 1)); rlFail 'configure allmulticast failed!'; }
+		ifconfig $nic_test | grep -e "ALLMULTI" || { ((result+=1)); rlFail 'configure allmulticast failed!'; }
 
 		sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac
 
@@ -3758,7 +3326,7 @@ sriov_test_trusted_vf_allmulticast()
 		##### Test 4
 		rlLog "Test4: PF(host) allmulticast off; VF(guest) allmulticast on; VF trust on"
 		ip link set $nic_test allmulticast off
-		ip link show $nic_test | grep -e "vf 0" | grep -e "trust on" || { ((result += 1)); rlFail 'VF trust may not be supported!'; }
+		ip link show $nic_test | grep -e "vf 0" | grep -e "trust on" || { ((result+=1)); rlFail 'VF trust may not be supported!'; }
 		ip link show $nic_test
 
 		local cmd=(
@@ -3779,7 +3347,7 @@ sriov_test_trusted_vf_allmulticast()
 		rlLog "Test5: PF(host) allmulticast off; VF(guest) allmulticast off; VF trust on"
 		rlLog "guest: set allmulticast on capture multicast package"
 		ip link set $nic_test allmulticast off
-		ip link show $nic_test | grep -e "vf 0" | grep -e "trust on" || { ((result += 1)); rlFail 'VF trust may not be supported!'; }
+		ip link show $nic_test | grep -e "vf 0" | grep -e "trust on" || { ((result+=1)); rlFail 'VF trust may not be supported!'; }
 		ip link show $nic_test
 
 		local cmd=(
@@ -3801,7 +3369,7 @@ sriov_test_trusted_vf_allmulticast()
 		rlLog "Test6: PF(host) allmulticast on; VF(guest) allmulticast on; VF trust on"
 		ip link set $nic_test allmulticast on
 		ip link show $nic_test
-		ifconfig $nic_test | grep -e "ALLMULTI" || { ((result += 1)); rlFail 'configure allmulticast failed!'; }
+		ifconfig $nic_test | grep -e "ALLMULTI" || { ((result+=1)); rlFail 'configure allmulticast failed!'; }
 
 		local cmd=(
 			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -3852,15 +3420,33 @@ sriov_test_link_down_on_close()
 					rlLogWarning "could not set link down on close"
 				fi
 
+				# set nic up
 				rlRun "ip link set ${nic_test} up"
-				local lowerup=$(ip -o link show dev ${nic_test} | grep LOWER_UP)
-				if test "x${lowerup}" == "x"; then
+
+				local i=1 retry=3 lowerup=
+				until [[ $i -gt $retry || -n "$lowerup" ]] ;
+				do
+					# deley seconds to sure completion
+					sleep 10
+					lowerup=$(ip -o link show dev ${nic_test} | grep LOWER_UP)
+					((i++))
+				done
+
+				if test -z "${lowerup}"; then
 					rlFail "lower not up"
 				fi
 
 				# set MTU and verify lower up again
 				rlRun "ip link set ${nic_test} mtu 9000 up"
-				local lowerup=$(ip -o link show dev ${nic_test} | grep LOWER_UP)
+
+				i=1 lowerup=
+				until [[ $i -gt $retry || -n "$lowerup" ]] ;
+				do
+					sleep 10
+					lowerup=$(ip -o link show dev ${nic_test} | grep LOWER_UP)
+					((i++))
+				done
+
 				if test -z "${lowerup}"; then
 					rlFail "lower not up"
 				fi
@@ -3877,7 +3463,8 @@ sriov_test_link_down_on_close()
 				if test -z "${status}"; then
 					rlLog "can't reset nic status, need to reboot test server"
 					rlRun "touch /tmp/sriov_test_link_down_on_close"
-					rhts-reboot
+					rstrnt-reboot
+					sleep 300
 				fi
 
 			fi
@@ -3889,6 +3476,142 @@ sriov_test_link_down_on_close()
 		fi
 	fi
 
+}
+
+sriov_test_vmvf_offload_remote()
+{
+	log_header "VMVF OFFLOAD<---> REMOTE" $result_file
+
+	local result=0
+
+	ip link set $nic_test up
+
+	if i_am_server; then
+		ip link set ${nic_test} up
+		ip addr flush $nic_test
+		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
+		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
+
+		sync_set client test_vmvf_offload_remote_start
+		sync_wait client test_vmvf_offload_remote_end
+
+		ip link set ${nic_test} down
+		ip link del ${nic_test}
+
+	else
+		sync_wait server test_vmvf_offload_remote_start
+
+		local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
+
+		if ! sriov_create_vfs $nic_test 0 2; then
+			sync_set server test_vmvf_offload_remote_end
+			return 1
+		fi
+
+		if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
+			result=1
+			#   sync_set server test_vmvf_offload_remote_end
+		else
+			local cmd=(
+				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{ip link set \$NIC_TEST up}
+				{ip addr flush \$NIC_TEST}
+				{ip addr add 172.30.${ipaddr}.11/24 dev \$NIC_TEST}
+				{ip addr add 2021:db8:${ipaddr}::11/64 dev \$NIC_TEST}
+				{ip link show \$NIC_TEST}
+				{ip addr show \$NIC_TEST}
+			)
+			vmsh cmd_set $vm1 "${cmd[*]}"
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST tso off;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set tso off fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST gso off;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set gso off fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST gro off;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set gro off fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST tx off;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set tx off fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST txvlan off;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set txvlan off fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST rxvlan off;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set rxvlan off fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST rx-vlan-filter off;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set rx-vlan-filter off fail"
+				result=1
+			fi
+			if [ $result -eq 0 ];then
+				if ! do_vm_netperf $vm1 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file; then
+					result=1
+				fi
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST tso on;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set tso on fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST gso on;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set gso on fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST gro on;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set gro on fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST tx on;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set tx on fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST txvlan on;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set txvlan on fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST rxvlan on;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set rxvlan on fail"
+				result=1
+			fi
+			vmsh cmd_set $vm1 "{export NIC_TEST=\`ip link show | grep $mac -B1 | head -n1 | awk -F ':' '{print \$2}'\`;ethtool -K \$NIC_TEST rx-vlan-filter on;ethtool -k \$NIC_TEST}"
+			if [ $? -ne 0 ];then
+				rlFail "set rx-vlan-filter on fail"
+				result=1
+			fi
+			if [ $result -eq 0 ];then
+				if ! do_vm_netperf $vm1 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file; then
+					result=1
+				fi
+			fi
+
+			sriov_detach_vf_from_vm $nic_test 0 1 $vm1
+		fi
+
+		sriov_remove_vfs $nic_test 0
+
+		sync_set server test_vmvf_offload_remote_end
+
+	fi
+	return $result
 }
 
 sriov_test_vmvf_vlan_offload_remote()
@@ -4213,9 +3936,8 @@ sriov_test_trusted_vf_override_macaddr_via_bonding()
 		else
 			local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
 			local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-			if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $nic_test 0 2 $vm1 $mac2;then
-					#sync_set server ${testname}_end
+			if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac1 || ! sriov_attach_vf_to_vm $nic_test 0 2 $vm1 $mac2;then
+				#sync_set server ${testname}_end
 				result=1
 
 			else
@@ -4271,3410 +3993,6 @@ sriov_test_trusted_vf_override_macaddr_via_bonding()
 	return $result
 }
 
-sriov_test_bond_failovermac0()
-{
-local test_name=sriov_test_bond_failovermac0
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#dont test dualport mlx4 now
-				#eval "$test_name"_mlx4en_dualport
-				eval "$test_name"_common
-				result=$?
-			else
-				eval "$test_name"_common
-				result=$?
-			fi
-		else
-			eval "$test_name"_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		eval "$test_name"_common
-		return $?
-	fi
-}
-sriov_test_bond_failovermac0_vlan()
-{
-	local test_name=sriov_test_bond_failovermac0_vlan
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#dont test dualport mlx4 now
-				#eval "$test_name"_mlx4en_dualport
-				eval "$test_name"_common
-				result=$?
-			else
-				eval "$test_name"_common
-				result=$?
-			fi
-		else
-			eval "$test_name"_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		eval "$test_name"_common
-		return $?
-	fi
-}
-
-sriov_test_bond_failovermac1()
-{
-	local test_name=sriov_test_bond_failovermac1
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#dont test dualport mlx4 now
-				#eval "$test_name"_mlx4en_dualport
-				eval "$test_name"_common
-				result=$?
-			else
-				eval "$test_name"_common
-				result=$?
-			fi
-		else
-			eval "$test_name"_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		eval "$test_name"_common
-		return $?
-	fi
-}
-
-sriov_test_bond_failovermac1_pf_down()
-{
-	local test_name=sriov_test_bond_failovermac1_pf_down
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#dont test dualport mlx4 now
-				#eval "$test_name"_mlx4en_dualport
-				eval "$test_name"_common
-				result=$?
-			else
-				eval "$test_name"_common
-				result=$?
-			fi
-		else
-			eval "$test_name"_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		eval "$test_name"_common
-		return $?
-	fi
-}
-
-sriov_test_bond_failovermac1_vlan()
-{
-	local test_name=sriov_test_bond_failovermac1_vlan
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#dont test dualport mlx4 now
-				#eval "$test_name"_mlx4en_dualport
-				eval "$test_name"_common
-				result=$?
-			else
-				eval "$test_name"_common
-				result=$?
-			fi
-		else
-			eval "$test_name"_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		eval "$test_name"_common
-		return $?
-	fi
-}
-
-sriov_test_bond_failovermac2()
-{
-	local test_name=sriov_test_bond_failovermac2
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#dont test dualport mlx4 now
-				#eval "$test_name"_mlx4en_dualport
-				eval "$test_name"_common
-				result=$?
-			else
-				eval "$test_name"_common
-				result=$?
-			fi
-		else
-			eval "$test_name"_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		eval "$test_name"_common
-		return $?
-	fi
-}
-
-sriov_test_bond_failovermac2_swport_down()
-{
-	$dbg_flag
-	local test_name=sriov_test_bond_failovermac2_swport_down
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#dont test dualport mlx4 now
-				#eval "$test_name"_mlx4en_dualport
-				eval "$test_name"_common
-				result=$?
-			else
-				eval "$test_name"_common
-				result=$?
-			fi
-		else
-			eval "$test_name"_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		eval "$test_name"_common
-		return $?
-	fi
-}
-
-sriov_test_bond_failovermac2_vlan()
-{
-	local test_name=sriov_test_bond_failovermac2_vlan
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#dont test dualport mlx4 now
-				#eval "$test_name"_mlx4en_dualport
-				eval "$test_name"_common
-				result=$?
-			else
-				eval "$test_name"_common
-				result=$?
-			fi
-		else
-			eval "$test_name"_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		eval "$test_name"_common
-		return $?
-	fi
-}
-sriov_test_bond_failovermac0_common() {
-
-	log_header "sriov_test_bond_failovermac0_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac0
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db02:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db02:${ipaddr}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i $nic_test src ${client_ip4} and dst ${server_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_ip4} > ${server_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		else
-			rlFail "lose package more than 200"
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		#cxgb4 is different with other NICs when create VFs
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_create_vfs $iface1 0 1 || \
-				! sriov_create_vfs $iface2 1 1;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		else
-			if ! sriov_create_vfs $iface1 0 2 || \
-				! sriov_create_vfs $iface2 0 2;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		fi
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-			! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		else
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-			! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		fi
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=0 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=0, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			# increase sent interval
-			{ping $server_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# Increase waiting time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-			if [ $? -ne 0 ]; then
-			let result++
-				rlFail "failed: failover time is too long"
-			fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-		local cmd=(
-
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{\[ \$\(cat /tmp/bondmac\) = \$NIC_TEST1_MAC \] \&\& \[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 1 1 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 1
-		else
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 0 2 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 0
-		fi
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-
-sriov_test_bond_failovermac0_mlx4en_dualport() {
-
-	log_header "sriov_test_bond_failovermac0_mlx4en_dualport" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac0
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db02:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db02:${ipaddr}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		sync_set client ${test_name}_start
-
-		rm -f failover.cap
-		tcpdump -i $nic_test src ${client_ip4} and dst ${server_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_ip4} > ${server_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-			ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		if ! sriov_create_vfs $iface1 0 1;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-
-		fi
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 0 trust on
-		ip link set $iface2 vf 0 spoofchk off
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_without_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_without_vf; done"
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1;then
-			let result++
-			rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_with_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_with_vf; done"
-		vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs"
-
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 1p /tmp/vfs) down"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 2p /tmp/vfs) down"
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=0 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
-			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=0, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-		# reduce sent package interval
-			{ping $server_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-		# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-			if [ $? -ne 0 ]; then
-			let result++
-				rlFail "failed: failover time is too long"
-			fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-		local cmd=(
-
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{\[ \$\(cat /tmp/bondmac\) = \$NIC_TEST1_MAC \] \&\& \[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_remove_vfs $iface1 0
-
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-
-sriov_test_bond_failovermac0_vlan_common() {
-
-	log_header "sriov_test_bond_failovermac0_vlan_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac0_vlan
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local vlan_id=3
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-			ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		#cxgb4 is different with other NICs when create VFs
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_create_vfs $iface1 0 1 || \
-			! sriov_create_vfs $iface2 1 1;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		else
-			if ! sriov_create_vfs $iface1 0 2 || \
-			! sriov_create_vfs $iface2 0 2;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		else
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		fi
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=0 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=0, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{ip addr show}
-			{ping ${server_vlanif_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			#increase interval time
-			{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after changing active slave"
-		fi
-
-		local cmd=(
-
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{\[ \$\(cat /tmp/bondmac\) = \$NIC_TEST1_MAC \] \&\& \[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		#if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file;then
-		#	let result++
-		#fi
-		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
-		#	let result++
-		#fi
-
-
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 1 1 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 1
-		else
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 0 2 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 0
-		fi
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-sriov_test_bond_failovermac0_vlan_mlx4en_dualport() {
-
-	log_header "sriov_test_bond_failovermac0_vlan_mlx4en_dualport" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac0_vlan
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local vlan_id=3
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		sync_set client ${test_name}_start
-
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		if ! sriov_create_vfs $iface1 0 1;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 0 trust on
-		ip link set $iface2 vf 0 spoofchk off
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_without_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_without_vf; done"
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1;then
-			let result++
-			rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_with_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_with_vf; done"
-		vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs"
-
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 1p /tmp/vfs) down"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 2p /tmp/vfs) down"
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=0 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
-			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=0, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{ip addr show}
-			{ping ${server_vlanif_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			# increase interval time
-			{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after changing active slave"
-		fi
-
-		local cmd=(
-
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{\[ \$\(cat /tmp/bondmac\) = \$NIC_TEST1_MAC \] \&\& \[ \$NIC_TEST1_MAC = \$NIC_TEST2_MAC \] \&\& \[ \$NIC_TEST2_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		#if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file;then
-		#	let result++
-		#fi
-		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
-		#	let result++
-		#fi
-
-
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_remove_vfs $iface1 0
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-
-sriov_test_bond_failovermac1_common() {
-
-	log_header "sriov_test_bond_failovermac1_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac1
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db02:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db02:${ipaddr}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i $nic_test src ${client_ip4} and dst ${server_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_ip4} > ${server_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-			ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip addr flush dev $nic_test
-
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		#cxgb4 is different with other NICs when create VFs
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_create_vfs $iface1 0 1 || \
-			! sriov_create_vfs $iface2 1 1;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		else
-			if ! sriov_create_vfs $iface1 0 2 || \
-			! sriov_create_vfs $iface2 0 2;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		else
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		fi
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=1 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			# increase interval time
-			{ping $server_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 1 1 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 1
-		else
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 0 2 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 0
-		fi
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-
-sriov_test_bond_failovermac1_pf_down_common() {
-
-	log_header "sriov_test_bond_failovermac1_pf_down_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac1_pf_down
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db02:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db02:${ipaddr}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i $nic_test src ${client_ip4} and dst ${server_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_ip4} > ${server_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-			rlRun "ip addr add 192.100.1.1/24 dev $nic_test"
-		fi
-		ip addr show dev $nic_test
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip addr flush dev $nic_test
-
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		#cxgb4 is different with other NICs when create VFs
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_create_vfs $iface1 0 1 || \
-			! sriov_create_vfs $iface2 1 1;then
-					let result++
-					rlFail "${test_name} failed: can't create vfs."
-			fi
-		else
-			if ! sriov_create_vfs $iface1 0 2 || \
-			! sriov_create_vfs $iface2 0 2;then
-					let result++
-					rlFail "${test_name} failed: can't create vfs."
-			fi
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		else
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		fi
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-
-		local cmd=(
-				{modprobe -r bonding}
-				{modprobe -v bonding mode=1 miimon=100 fail_over_mac=1 max_bonds=1}
-				{ip link set bond0 up}
-				{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-				{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = \$ACTIVE_SLAVE_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -eq 0 ];then
-			PF_DOWN=$iface1
-			PF_UP=$iface2
-			echo "PF_DOWN:$PF_DOWN"
-		else
-			PF_DOWN=$iface2
-			PF_UP=$iface1
-			echo "PF_DOWN:$PF_DOWN"
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-
-		vmsh run_cmd $vm1 "ping $server_ip4 -i 0.01 -c 3000 &"
-		#link down the related PF
-		ip link set $PF_DOWN down
-		ip link show $PF_DOWN
-
-		local cmd=(
-			# increase interval time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $PF_UP
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $PF_UP
-		sync_set server ${test_name}_end_feedback_result
-
-
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-			{ip addr show}
-
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 1 1 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 1
-		else
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 0 2 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 0
-		fi
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-	return $result
-
-}
-
-sriov_test_bond_failovermac1_mlx4en_dualport() {
-
-	log_header "sriov_test_bond_failovermac1_mlx4en_dualport" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac1
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db02:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db02:${ipaddr}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		sync_set client ${test_name}_start
-
-		rm -f failover.cap
-		tcpdump -i $nic_test src ${client_ip4} and dst ${server_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_ip4} > ${server_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip addr flush dev $nic_test
-
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		if ! sriov_create_vfs $iface1 0 1;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 0 trust on
-		ip link set $iface2 vf 0 spoofchk off
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_without_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_without_vf; done"
-
-				if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1;then
-						let result++
-						rlFail "${test_name} failed: can't attach vf to vm."
-				fi
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_with_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_with_vf; done"
-				vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 1p /tmp/vfs) down"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 2p /tmp/vfs) down"
-
-		local cmd=(
-				{modprobe -r bonding}
-				{modprobe -v bonding mode=1 miimon=100 fail_over_mac=1 max_bonds=1}
-				{ip link set bond0 up}
-				{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
-				{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		sync_wait server ${test_name}_start_send_packet
-			local cmd=(
-				# increase interval time
-				{ping $server_ip4 -i 0.01 -c 3000 \&}
-				{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-				{ip link set \$ACTIVE_SLAVE down}
-				# increase wait time
-				{sleep 300}
-				{pkill ping}
-				{modprobe -rv pktgen}
-			)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				sync_set server ${test_name}_end_send_packet
-				sync_wait server ${test_name}_start_feedback_result
-				ip addr add 192.100.1.2/24 dev $iface1
-				sleep 5
-				ping 192.100.1.1 -c 5
-				if [ $? -ne 0 ]; then
-					let result++
-					rlFail "failed: failover time is too long"
-				fi
-				ip addr del 192.100.1.2/24 dev $iface1
-				sync_set server ${test_name}_end_feedback_result
-
-
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_remove_vfs $iface1 0
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-
-sriov_test_bond_failovermac1_vlan_common() {
-
-	log_header "sriov_test_bond_failovermac1_vlan_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac1_vlan
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local vlan_id=3
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		#cxgb4 is different with other NICs when create VFs
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_create_vfs $iface1 0 1 || \
-			! sriov_create_vfs $iface2 1 1;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		else
-			if ! sriov_create_vfs $iface1 0 2 || \
-			! sriov_create_vfs $iface2 0 2;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		else
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		fi
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=1 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{ip link show}
-			{ping ${server_vlanif_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			# increase interval time
-			{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after changing active slave"
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		#if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file;then
-		#	let result++
-		#fi
-		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
-		#	let result++
-		#fi
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 1 1 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 1
-		else
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 0 2 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 0
-		fi
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-sriov_test_bond_failovermac1_vlan_mlx4en_dualport() {
-
-	log_header "sriov_test_bond_failovermac1_vlan_mlx4en_dualport" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac1_vlan
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local vlan_id=3
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		sync_set client ${test_name}_start
-
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		if ! sriov_create_vfs $iface1 0 1;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 0 trust on
-		ip link set $iface2 vf 0 spoofchk off
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_without_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_without_vf; done"
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1;then
-			let result++
-			rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_with_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_with_vf; done"
-				vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 1p /tmp/vfs) down"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 2p /tmp/vfs) down"
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=1 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
-			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{ip link show}
-			{ping ${server_vlanif_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-			sync_wait server ${test_name}_start_send_packet
-			local cmd=(
-				# increase interval time
-				{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-				{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-				{ip link set \$ACTIVE_SLAVE down}
-				# increase wait time
-				{sleep 300}
-				{pkill ping}
-				{modprobe -rv pktgen}
-			)
-			vmsh cmd_set $vm1 "${cmd[*]}"
-			sync_set server ${test_name}_end_send_packet
-			sync_wait server ${test_name}_start_feedback_result
-			ip addr add 192.100.1.2/24 dev $iface1
-			sleep 5
-			ping 192.100.1.1 -c 5
-			if [ $? -ne 0 ]; then
-				let result++
-				rlFail "failed: failover time is too long"
-			fi
-			ip addr del 192.100.1.2/24 dev $iface1
-			sync_set server ${test_name}_end_feedback_result
-
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after changing active slave"
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		#if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file;then
-		#	let result++
-		#fi
-		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
-		#	let result++
-		#fi
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_remove_vfs $iface1 0
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-
-sriov_test_bond_failovermac2_common() {
-
-	log_header "sriov_test_bond_failovermac2_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac2
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db02:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db02:${ipaddr}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i $nic_test src ${client_ip4} and dst ${server_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_ip4} > ${server_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		#cxgb4 is different with other NICs when create VFs
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_create_vfs $iface1 0 1 || \
-			! sriov_create_vfs $iface2 1 1;then
-					let result++
-					rlFail "${test_name} failed: can't create vfs."
-			fi
-		else
-			if ! sriov_create_vfs $iface1 0 2 || \
-			! sriov_create_vfs $iface2 0 2;then
-					let result++
-					rlFail "${test_name} failed: can't create vfs."
-			fi
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		else
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		fi
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=2 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(cat /tmp/testiface1\) \]\;then cat /tmp/testiface2\;else cat /tmp/testiface1\;fi\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{echo \$ACTIVE_SLAVE_MAC \| tee /tmp/activeslavemac}
-			{echo \$BACKUP_SLAVE_MAC \| tee /tmp/backupslavemac}
-			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			# increase interval time
-			{ping $server_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-				let result++
-				rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(cat /tmp/testiface1\) \]\;then cat /tmp/testiface2\;else cat /tmp/testiface1\;fi\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			echo "${test_name} failed: check mac failed after changing active slave"
-		fi
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 1 1 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 1
-		else
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 0 2 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 0
-		fi
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-
-sriov_test_bond_failovermac2_swport_down_common() {
-
-	log_header "sriov_test_bond_failovermac2_swport_down_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac2_swport_down
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db02:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db02:${ipaddr}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i $nic_test src ${client_ip4} and dst ${server_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_ip4} > ${server_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		#cxgb4 is different with other NICs when create VFs
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_create_vfs $iface1 0 1 || \
-			! sriov_create_vfs $iface2 1 1;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		else
-			if ! sriov_create_vfs $iface1 0 2 || \
-			! sriov_create_vfs $iface2 0 2;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		else
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		fi
-		get_iface_sw_port $iface1 sw p1 k || { rlFail "failed:get_iface_sw_port failed";let exitcode++; }
-		get_iface_sw_port $iface2 sw p2 k || { rlFail "failed:get_iface_sw_port failed";let exitcode++; }
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-# after add port to bond, active slave mac will change to bond mac
-#		4: enp6s0: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc mq master bond0 state UP group default qlen 1000
-#	link/ether 6e:c3:95:57:2f:7e brd ff:ff:ff:ff:ff:ff permaddr 00:de:ad:23:01:01
-#	5: enp11s0: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc mq master bond0 state UP group default qlen 1000
-#		link/ether 00:de:ad:23:01:02 brd ff:ff:ff:ff:ff:ff
-#	6: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-#		link/ether 6e:c3:95:57:2f:7e brd ff:ff:ff:ff:ff:ff
-#		inet 192.100.35.1/24 scope global bond0
-#		   valid_lft forever preferred_lft forever
-#		inet6 2021:db02:35::1/64 scope global tentative
-#		   valid_lft forever preferred_lft forever
-#		inet6 2001::6cc3:95ff:fe57:2f7e/64 scope global dynamic mngtmpaddr
-#		   valid_lft 86399sec preferred_lft 14399sec
-#		inet6 fe80::6cc3:95ff:fe57:2f7e/64 scope link
-#		   valid_lft forever preferred_lft forever
-
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=2 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(cat /tmp/testiface1\) \]\;then cat /tmp/testiface2\;else cat /tmp/testiface1\;fi\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST1_MAC=\$\(if ip link show \$\(cat /tmp/testiface1\) \| grep "permaddr" \;then echo \"\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "permaddr" \| awk \'\{print \$2}\'\)\" \;else echo \"\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)\" \;fi\)}
-			{export NIC_TEST2_MAC=\$\(if ip link show \$\(cat /tmp/testiface2\) \| grep "permaddr" \;then echo \"\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "permaddr" \| awk \'\{print \$2}\'\)\" \;else echo \"\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)\" \;fi\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BACKUP_SLAVE \| tee /tmp/backupslave}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{echo \$ACTIVE_SLAVE_MAC \| tee /tmp/activeslavemac}
-			{echo \$BACKUP_SLAVE_MAC \| tee /tmp/backupslavemac}
-			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		#			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{\[ \$ACTIVE_SLAVE_MAC = $mac1 \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -eq 0 ];then
-			SW_DOWN=$p1
-			PF_DOWN=$iface1
-			PF_UP=$iface2
-			echo "SW_DOWN:$SW_DOWN"
-			echo "PF_DOWN:$PF_DOWN"
-		else
-			SW_DOWN=$p2
-			PF_DOWN=$iface2
-			PF_UP=$iface1
-			echo "SW_DOWN:$SW_DOWN"
-			echo "PF_DOWN:$PF_DOWN"
-		fi
-
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-		vmsh run_cmd $vm1 "ping $server_ip4 -i 0.01 -c 3000 &"
-		#link down the related SW port
-		swcfg port_down $sw $SW_DOWN
-		ip link show $PF_DOWN
-
-		local cmd=(
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $PF_UP
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $PF_UP
-		sync_set server ${test_name}_end_feedback_result
-
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{\[ \$ACTIVE_SLAVE = \$\(cat /tmp/backupslave\) \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: active backup failed"
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(cat /tmp/testiface1\) \]\;then cat /tmp/testiface2\;else cat /tmp/testiface1\;fi\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 1 1 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 1
-		else
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 0 2 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 0
-		fi
-		swcfg port_up $sw $SW_DOWN
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-
-sriov_test_bond_failovermac2_mlx4en_dualport() {
-
-	log_header "sriov_test_bond_failovermac2_mlx4en_dualport" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac2
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db02:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db02:${ipaddr}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-		sync_set client ${test_name}_start
-
-		rm -f failover.cap
-		tcpdump -i $nic_test src ${client_ip4} and dst ${server_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_ip4} > ${server_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-			ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		if ! sriov_create_vfs $iface1 0 1;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 0 trust on
-		ip link set $iface2 vf 0 spoofchk off
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_without_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_without_vf; done"
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1;then
-			let result++
-			rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_with_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_with_vf; done"
-		vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 1p /tmp/vfs) down"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 2p /tmp/vfs) down"
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=2 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
-			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(cat /tmp/testiface1\) \]\;then cat /tmp/testiface2\;else cat /tmp/testiface1\;fi\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{echo \$ACTIVE_SLAVE_MAC \| tee /tmp/activeslavemac}
-			{echo \$BACKUP_SLAVE_MAC \| tee /tmp/backupslavemac}
-			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ \$NIC_TEST1_MAC = $mac1 \] \&\& \[ \$NIC_TEST2_MAC = $mac2 \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			# increase interval time
-			{ping $server_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(sed -n 1p /tmp/vfs\) \]\;then sed -n 2p /tmp/vfs\;else sed -n 1p /tmp/vfs\;fi\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_remove_vfs $iface1 0
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-
-sriov_test_bond_failovermac2_vlan_common() {
-
-	log_header "sriov_test_bond_failovermac2_vlan_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac2_vlan
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local vlan_id=3
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-			ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		#cxgb4 is different with other NICs when create VFs
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_create_vfs $iface1 0 1 || \
-			! sriov_create_vfs $iface2 1 1;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		else
-			if ! sriov_create_vfs $iface1 0 2 || \
-			! sriov_create_vfs $iface2 0 2;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-			fi
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		else
-			if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-				! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-			fi
-		fi
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-
-		local cmd=(
-				{modprobe -r bonding}
-				{modprobe -v bonding mode=1 miimon=100 fail_over_mac=2 max_bonds=1}
-				{ip link set bond0 up}
-				{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-				{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=2, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(cat /tmp/testiface1\) \]\;then cat /tmp/testiface2\;else cat /tmp/testiface1\;fi\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(cat /tmp/testiface1\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(cat /tmp/testiface2\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{echo \$ACTIVE_SLAVE_MAC \| tee /tmp/activeslavemac}
-			{echo \$BACKUP_SLAVE_MAC \| tee /tmp/backupslavemac}
-			{echo \"if1: \$\(cat /tmp/testiface1\) if2: \$\(cat /tmp/testiface2\) asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ "\$NIC_TEST1_MAC" = "$mac1" \] \&\& \[ "\$NIC_TEST2_MAC" = "$mac2" \] \&\& \[ "\$ACTIVE_SLAVE_MAC" = "\$BOND_MAC" \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{ip link show}
-			{ping ${server_vlanif_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			# increase interval time
-			{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-				let result++
-				rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after changing active slave"
-		fi
-
-
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(cat /tmp/testiface1\) \]\;then cat /tmp/testiface2\;else cat /tmp/testiface1\;fi\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		#if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file;then
-		#	let result++
-		#fi
-		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
-		#	let result++
-		#fi
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		if [ "$NIC_DRIVER" = "cxgb4" ];then
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 1 1 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 1
-		else
-			sriov_detach_vf_from_vm $iface1 0 1 $vm1
-			sriov_detach_vf_from_vm $iface2 0 2 $vm1
-			sriov_remove_vfs $iface1 0
-			sriov_remove_vfs $iface2 0
-		fi
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-sriov_test_bond_failovermac2_vlan_mlx4en_dualport() {
-
-	log_header "sriov_test_bond_failovermac2_vlan_mlx4en_dualport" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_failovermac2_vlan
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local vlan_id=3
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		sync_set client ${test_name}_start
-
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-			sync_set client ${test_name}_start_send_packet
-			sync_wait client ${test_name}_end_send_packet
-			pkill tcpdump
-			sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-			local packet_lost=$((3000-$packet_received))
-			rlLog "packet_lost=$packet_lost"
-			if [ $packet_lost -lt 200 ];then
-					ip addr add 192.100.1.1/24 dev $nic_test
-			fi
-			sync_set client ${test_name}_start_feedback_result
-			sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-		sync_wait server ${test_name}_start
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		if ! sriov_create_vfs $iface1 0 1;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-		fi
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_without_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_without_vf; done"
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1;then
-			let result++
-			rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_with_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_with_vf; done"
-		vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 1p /tmp/vfs) down"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 2p /tmp/vfs) down"
-
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=1 miimon=100 fail_over_mac=2 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
-			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=2, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(cat /tmp/testiface1\) \]\;then cat /tmp/testiface2\;else cat /tmp/testiface1\;fi\)}
-			{export NIC_TEST1_MAC=\$\(ip link show \$\(sed -n 1p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export NIC_TEST2_MAC=\$\(ip link show \$\(sed -n 2p /tmp/vfs\) \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \$BOND_MAC \| tee /tmp/bondmac}
-			{echo \$ACTIVE_SLAVE_MAC \| tee /tmp/activeslavemac}
-			{echo \$BACKUP_SLAVE_MAC \| tee /tmp/backupslavemac}
-			{echo \"if1: \$\(sed -n 1p /tmp/vfs\) if2: \$\(sed -n 2p /tmp/vfs\) asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ "\$NIC_TEST1_MAC" = "$mac1" \] \&\& \[ "\$NIC_TEST2_MAC" = "$mac2" \] \&\& \[ "\$ACTIVE_SLAVE_MAC" = "\$BOND_MAC" \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			rlFail "${test_name} failed: mac addr check failed"
-			let result++
-		fi
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{ip link show}
-			{ping ${server_vlanif_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			# increase interval time
-			{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{ip link set \$ACTIVE_SLAVE down}
-			# increase wait time
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		sleep 5
-		ping 192.100.1.1 -c 5
-		if [ $? -ne 0 ]; then
-				let result++
-				rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after changing active slave"
-		fi
-
-
-		local cmd=(
-			{export ACTIVE_SLAVE=\$\(cat /proc/net/bonding/bond0 \| grep \"Currently Active Slave\" \| awk \'\{print \$NF\}\' \| sed \'s/\*\. //g\'\)}
-			{export BACKUP_SLAVE=\$\(if \[ \$ACTIVE_SLAVE = \$\(sed -n 1p /tmp/vfs\) \]\;then sed -n 2p /tmp/vfs\;else sed -n 1p /tmp/vfs\;fi\)}
-			{export ACTIVE_SLAVE_MAC=\$\(ip link show \$ACTIVE_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BACKUP_SLAVE_MAC=\$\(ip link show \$BACKUP_SLAVE \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{export BOND_MAC=\$\(ip link show bond0 \| grep "link/ether" \| awk \'\{print \$2\}\'\)}
-			{echo \"asl: \$ACTIVE_SLAVE bsl: \$BACKUP_SLAVE activemac: \$ACTIVE_SLAVE_MAC backmac: \$BACKUP_SLAVE_MAC bondmac: \$BOND_MAC tmpbondmac: \$\(cat /tmp/bondmac\) tmpactivemac: \$\(cat /tmp/activeslavemac\) tmpbackmac: \$\(cat /tmp/backupslavemac\)\"}
-			{\[ \$BOND_MAC = \$\(cat /tmp/bondmac\) \] \&\& \[ \$BACKUP_SLAVE_MAC = \$\(cat /tmp/backupslavemac\) \] \&\& \[ \$ACTIVE_SLAVE_MAC = \$BOND_MAC \]}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: check mac failed after changing active slave"
-		fi
-		#if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file;then
-		#	let result++
-		#fi
-		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
-		#	let result++
-		#fi
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_remove_vfs $iface1 0
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-
-}
-
 sriov_test_vmvf_different_vlan()
 {
 	log_header "VMVF DIFFERENT VLAN <---> REMOTE" $result_file
@@ -7683,9 +4001,9 @@ sriov_test_vmvf_different_vlan()
 	local vid1=2
 	local vid2=3
 
-		ip link set $nic_test up
+	ip link set $nic_test up
 
-		if i_am_server; then
+	if i_am_server; then
 			ip link add link $nic_test name ${nic_test}.${vid1} type vlan id $vid1
 			ip link set ${nic_test}.${vid1} up
 			ip addr flush $nic_test
@@ -7697,7 +4015,7 @@ sriov_test_vmvf_different_vlan()
 
 			ip link set ${nic_test}.${vid1} down
 			ip link del ${nic_test}.${vid1}
-		else
+	else
 			sync_wait server test_vmvf_different_vlan_start
 
 			local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
@@ -7726,12 +4044,12 @@ sriov_test_vmvf_different_vlan()
 				vmsh cmd_set $vm1 "${cmd[*]}"
 				sleep 5
 				vmsh run_cmd $vm1 "ping -c10 172.30.${ipaddr_vlan}.2"
-				(( $? )) || { (( result += 1 ));rlFail "fail:ping remote success between different vlan"; }
+				(( $? )) || { (( result+=1 ));rlFail "fail:ping remote success between different vlan"; }
 							vmsh run_cmd $vm1 "ping6 -c10 2021:db8:${ipaddr_vlan}::2"
-				(( $? )) || { (( result += 1 ));rlFail "fail:ping6 remote success between different vlan"; }
+				(( $? )) || { (( result+=1 ));rlFail "fail:ping6 remote success between different vlan"; }
 
 				if ! sriov_attach_vf_to_vm $nic_test 0 2 $vm2 $mac2; then
-							result=1
+					result=1
 				else
 					local cmd=(
 						{export NIC_TEST=\$\(ip link show \| grep $mac2 -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -7748,9 +4066,9 @@ sriov_test_vmvf_different_vlan()
 					vmsh cmd_set $vm2 "${cmd[*]}"
 					sleep 5
 					vmsh run_cmd $vm2 "ping -c10 172.30.${ipaddr_vlan}.11"
-					(( $? )) || { (( result += 1 ));rlFail "fail:ping vm1 success between different vlan"; }
+					(( $? )) || { (( result+=1 ));rlFail "fail:ping vm1 success between different vlan"; }
 					vmsh run_cmd $vm2 "ping6 -c10 2021:db8:${ipaddr_vlan}::11"
-					(( $? )) || { (( result += 1 ));rlFail "fail:ping6 vm1 success between different vlan"; }
+					(( $? )) || { (( result+=1 ));rlFail "fail:ping6 vm1 success between different vlan"; }
 					sriov_detach_vf_from_vm $nic_test 0 2 $vm2
 				fi
 				sriov_detach_vf_from_vm $nic_test 0 1 $vm1
@@ -7829,1121 +4147,154 @@ sriov_test_bz1441909()
 	return $result
 }
 
-sriov_test_bond_lacp()
-{
-	$dbg_flag
-	if i_am_client;then
-		local result=0
-		OLD_NIC_NUM=$NIC_NUM
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test ifs: $iface1 $iface2"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "two ifs belong to a dual port NIC"
-			if [ "$NIC_DRIVER" = "mlx4_en" ];then
-				#don't test dualport mlx4 now
-				#sriov_test_bond_lacp_mlx4en_dualport
-				sriov_test_bond_lacp_common
-				result=$?
-			elif [ "$NIC_DRIVER" = "cxgb4" ];then
-				sriov_test_bond_lacp_cxgb4
-				result=$?
-			else
-				sriov_test_bond_lacp_common
-				result=$?
-			fi
-		else
-			sriov_test_bond_lacp_common
-			result=$?
-		fi
-		NIC_NUM=$OLD_NIC_NUM
-		return $result
-	else
-		sriov_test_bond_lacp_common
-		return $?
-	fi
-}
-
-sriov_test_bond_lacp_common() {
-
-	log_header "sriov_test_bond_lacp_common" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_lacp
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local pf_ip4="192.100.${ipaddr}.3"
-
-	local vlan_id=3
-
-	local server_vlanif_mac="22:22:11:11:11:10"
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		ip link set ${nic_test}.${vlan_id} address $server_vlanif_mac
-		ip addr show $nic_test
-		ip addr show ${nic_test}.${vlan_id}
-		nic_mac=$(get_iface_mac $nic_test)
-		local S_beaker_if=$(get_default_iface)
-		local S_beaker_ip4=$(get_iface_ip4 $S_beaker_if)
-		rlLog "nic_mac: $nic_mac"
-		rlLog "Server_beaker_ip4: $S_beaker_ip4"
-		sync_wait client ${test_name}_ready_to_receive_mac
-		timeout 60s bash -c "until ping  ${pf_ip4} -c 5; do sleep 5; done"
-		echo $nic_mac|nc ${pf_ip4} 1234
-		echo $S_beaker_ip4|nc ${pf_ip4} 1235
-		sync_set client ${test_name}_finish_to_receive_beaker_mac
-		sync_wait client ${test_name}_done_to_receive_beaker_mac
-
-		nc -l 1236 > /tmp/client_beaker_ip &
-		sync_set client ${test_name}_ready_to_receive_beaker_ip
-		sync_wait client ${test_name}_finish_to_receive_beaker_ip
-		local remote_beaker_ip=$(cat /tmp/client_beaker_ip)
-		echo "remote_beaker_ip: $remote_beaker_ip"
-		sync_set client ${test_name}_start
-
-		sync_wait client ${test_name}_ready_send_packet
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-		ping $remote_beaker_ip -c 5
-		echo $packet_received|nc ${remote_beaker_ip} 12345
-		echo "packet_received=$packet_received"
-		sync_set client ${test_name}_nc12345
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local beaker_if=$(get_default_iface)
-		local beaker_ip4=$(get_iface_ip4 $beaker_if)
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		ip link set $iface1 up
-		ip addr add ${pf_ip4}/${ip4_mask_len} dev ${iface1}
-		nc -l 1234 > /tmp/remote_mac &
-		nc -l 1235 > /tmp/remote_beaker_ip &
-		ip addr show $iface1
-		rlLog "beaker_ip: $beaker_ip4"
-		sync_set server ${test_name}_ready_to_receive_mac
-		sync_wait server ${test_name}_finish_to_receive_beaker_mac
-		sync_set server ${test_name}_done_to_receive_beaker_mac
-
-		local remote_ip=$(cat /tmp/remote_beaker_ip)
-		rlLog "remote_ip: $remote_ip"
-		sync_wait server ${test_name}_ready_to_receive_beaker_ip
-		echo $beaker_ip4|nc ${remote_ip} 1236
-		sync_set server ${test_name}_finish_to_receive_beaker_ip
-		sync_wait server ${test_name}_start
-		remote_mac=$(cat /tmp/remote_mac)
-		echo "remote_mac: $remote_mac"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if [ "$if1_bus" = "$if2_bus" ];then
-			rlLog "warning: two ifs belong to a dual port NIC"
-		fi
-		if ! sriov_create_vfs $iface1 0 2 || \
-				! sriov_create_vfs $iface2 0 2;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-
-		fi
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-		local mac3="00:de:ad:$(printf %02x $ipaddr):01:03"
-		local mac4="00:de:ad:$(printf %02x $ipaddr):01:04"
-		local mac5="00:de:ad:$(printf %02x $ipaddr):01:05"
-		local mac6="00:de:ad:$(printf %02x $ipaddr):01:06"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-			! sriov_attach_vf_to_vm $iface2 0 2 $vm1 $mac2;then
-			let result++
-			rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-		get_iface_sw_port "$iface1 $iface2" switch_name port_list kick_list || { rlFail "failed:get_iface_sw_port failed";let exitcode++; }
-		swcfg_port_channel $switch_name "$port_list" "active" || { rlFail "failed:swcfg_port_channel failed";let exitcode++; }
-		if [ -n "$kick_list" ];then
-			rlLog "$kick_list are not on the same switch, kicked."
-		fi
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}' | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}' | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=802.3ad miimon=100 max_bonds=1}
-			{ip link set bond0 up}
-			{ls -l}
-			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-			{sleep 2}
-			{cat \/proc\/net\/bonding\/bond0}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlLog "${test_name} failed:ifenslave failed";let result++; }
-		fi
-#	src_mac_num=$(echo $mac1 | cut -f6 -d ':')
-#	dst_mac_num=$(echo $remote_mac | cut -f6 -d ':')
-#	out_if_idx=$(((16#${src_mac_num} ^ 16#${dst_mac_num} ^ 16#0800) % 2))
-#
-#	vlan_src_mac_num=$(echo $mac1 | cut -f6 -d ':')
-#	vlan_dst_mac_num=$(echo $server_vlanif_mac | cut -f6 -d ':')
-#	vlan_out_if_idx=$(((16#${vlan_src_mac_num} ^ 16#${vlan_dst_mac_num} ^ 16#0800) % 2))
-
-		local cmd=(
-			{ip link set bond0 down}
-			{echo layer2 \> \/sys\/class\/net\/bond0\/bonding\/xmit_hash_policy}
-			{ip link set bond0 up}
-			{ip link set bond0 address $mac3 }
-			{cat \/proc\/net\/bonding\/bond0}
-			{sleep 3}
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{timeout 120s bash -c \"until ping -c 10 $server_ip4\; do sleep 5\; done\"}
-			{timeout 120s bash -c \"until ping -c 10 $server_ip6\; do sleep 5\; done\"}
-			{sleep 3}
-			{ip addr show}
-			{ls -l}
-			{tcpdump -p -i \$\(cat /tmp/testiface1\) \"icmp and dst $server_ip4 \" -w if0.pcap \&}
-			{tcpdump -p -i \$\(cat /tmp/testiface2\) \"icmp and dst $server_ip4 \" -w if1.pcap \&}
-			{sleep 3}
-			{ping -c20 $server_ip4}
-			{pkill tcpdump}
-			{sleep 2}
-			{ls -l \| grep if}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		vmsh cmd_set $vm1 "{tcpdump -r if0.pcap -n | grep -i 'echo request'}"
-		if [ $? -ne 0 ];then # can't capture packages from if0
-			vmsh cmd_set $vm1 "{tcpdump -r if1.pcap -n | grep -i 'echo request'}"
-			if [ $? -ne 0 ]; then # can't capture packages from if1
-				let result++
-				rlFail "${test_name} failed: can't capture packages from all of slave port"
-			else
-				rlLog "capture packages from if1"
-				local stream1_outif=if1
-			fi
-		else # can capture packages from if0
-			vmsh cmd_set $vm1 "{tcpdump -r if1.pcap -n | grep -i 'echo request'}"
-			if [ $? -ne 0 ]; then # can't capture packages from if1
-				rlLog "capture packages from if0"
-				local stream1_outif=if0
-			else
-				let result++
-				rlFail "${test_name} failed: can capture packages from all of slave port"
-			fi
-		fi
-
-		local cmd=(
-			{ip link set bond0 address $mac4}
-			{cat \/proc\/net\/bonding\/bond0}
-			{sleep 3}
-			{rm -rf \/root\/if0.pcap}
-			{rm -rf \/root\/if1.pcap}
-			{ls -l}
-			{tcpdump -p -i \$\(cat /tmp/testiface1\) \"icmp and dst $server_ip4 \" -w if0.pcap \&}
-			{tcpdump -p -i \$\(cat /tmp/testiface2\) \"icmp and dst $server_ip4 \" -w if1.pcap \&}
-			{sleep 3}
-			{ping $server_ip4 -c20}
-			{pkill tcpdump}
-			{sleep 2}
-			{ls -l \| grep if}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		vmsh cmd_set $vm1 "{tcpdump -r if0.pcap -n |grep -i 'echo request'}"
-		if [ $? -ne 0 ];then # can't capture packages from if0
-			vmsh cmd_set $vm1 "{tcpdump -r if1.pcap -n | grep -i 'echo request'}"
-			if [ $? -ne 0 ]; then # can't capture packages from if1
-				let result++
-				rlFail "${test_name} failed: can't capture packages from all of slave port"
-			else
-				rlLog "capture packages from if1"
-				local stream2_outif=if1
-			fi
-		else # can capture packages from if0
-			vmsh cmd_set $vm1 "{tcpdump -r if1.pcap -n | grep -i 'echo request'}"
-			if [ $? -ne 0 ]; then # can't capture packages from if1
-				rlLog "capture packages from if0"
-				local stream2_outif=if0
-			else
-				let result++
-			rlFail "${test_name} failed: can capture packages from all of slave port"
-			fi
-		fi
-		if [ x"${stream1_outif}" == x"${stream2_outif}" ]; then
-			let result++
-			rlFail "${test_name} failed: two streams dispatched to a same interface. ${stream1_outif} vs ${stream2_outif}"
-		else
-			rlLog "${test_name} success: two streams dispatched to different interface. ${stream1_outif} vs ${stream2_outif}"
-		fi
-
-
-		local cmd=(
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id address $mac5}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{cat \/proc\/net\/bonding\/bond0}
-			{timeout 120s bash -c \"until ping -c 10 $server_vlanif_ip4\; do sleep 5\; done\"}
-			{timeout 120s bash -c \"until ping -c 10 $server_vlanif_ip6\; do sleep 5\; done\"}
-			{sleep 3}
-			{ip addr show}
-			{rm -rf \/root\/if0.pcap}
-			{rm -rf \/root\/if1.pcap}
-			{ls -l}
-			#{tcpdump -i \$\(cat /tmp/testiface1\) icmp and src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} -w if0.cap \&}
-			#{tcpdump -i \$\(cat /tmp/testiface2\) icmp and src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} -w if1.cap \&}
-			{tcpdump -p -i \$\(cat /tmp/testiface1\) \"icmp and dst $server_vlanif_ip4 \" -w if0.pcap \&}
-			{tcpdump -p -i \$\(cat /tmp/testiface2\) \"icmp and dst $server_vlanif_ip4 \" -w if1.pcap \&}
-			{sleep 3}
-			{ping $server_vlanif_ip4 -c20}
-			{ pkill tcpdump}
-			{sleep 2}
-			{ls -l \| grep if}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh cmd_set $vm1 "{tcpdump -r if0.pcap -n | grep -i 'echo request'}"
-		if [ $? -ne 0 ];then # can't capture packages from if0
-			vmsh cmd_set $vm1 "{tcpdump -r if1.pcap -n | grep -i 'echo request'}"
-			if [ $? -ne 0 ]; then # can't capture packages from if1
-				let result++
-				rlFail "${test_name} failed: can't capture packages from all of slave port"
-			else
-				rlLog "capture packages from if1"
-				local stream3_outif=if1
-			fi
-		else # can capture packages from if0
-			vmsh cmd_set $vm1 "{tcpdump -r if1.pcap -n | grep -i 'echo request'}"
-			if [ $? -ne 0 ]; then # can't capture packages from if1
-				rlLog "capture packages from if0"
-				local stream3_outif=if0
-			else
-				let result++
-				rlFail "${test_name} failed: can capture packages from all of slave port"
-			fi
-		fi
-		local cmd=(
-			{ip link set bond0\.$vlan_id address $mac6}
-			{cat \/proc\/net\/bonding\/bond0}
-			{sleep 3}
-			{timeout 120s bash -c \"until ping -c 10 $server_vlanif_ip4\; do sleep 5\; done\"}
-			{timeout 120s bash -c \"until ping -c 10 $server_vlanif_ip6\; do sleep 5\; done\"}
-			{sleep 3}
-			{rm -rf \/root\/if0.pcap}
-			{rm -rf \/root\/if1.pcap}
-			{ls -l}
-			{tcpdump -p -i \$\(cat /tmp/testiface1\) \"icmp and dst $server_vlanif_ip4 \" -w if0.pcap \&}
-			{tcpdump -p -i \$\(cat /tmp/testiface2\) \"icmp and dst $server_vlanif_ip4 \" -w if1.pcap \&}
-			{sleep 3}
-			{ping $server_vlanif_ip4 -c20}
-			{pkill tcpdump}
-			{sleep 2}
-			{ls -l \| grep if}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh cmd_set $vm1 "{tcpdump -r if0.pcap -n | grep -i 'echo request'}"
-		if [ $? -ne 0 ];then # can't capture packages from if0
-			vmsh cmd_set $vm1 "{tcpdump -r if1.pcap -n | grep -i 'echo request'}"
-			if [ $? -ne 0 ]; then # can't capture packages from if1
-				let result++
-				rlFail "${test_name} failed: can't capture packages from all of slave port"
-			else
-				rlLog "capture packages from if1"
-				local stream4_outif=if1
-			fi
-		else # can capture packages from if0
-			vmsh cmd_set $vm1 "{tcpdump -r if1.pcap -n | grep -i 'echo request'}"
-			if [ $? -ne 0 ]; then # can't capture packages from if1
-				rlLog "capture packages from if0"
-				local stream4_outif=if0
-			else
-				let result++
-				rlFail "${test_name} failed: can capture packages from all of slave port"
-			fi
-		fi
-		if [ x"${stream3_outif}" == x"${stream4_outif}" ]; then
-			let result++
-			rlFail "${test_name} failed: two streams dispatched to a same interface. ${stream3_outif} vs ${stream4_outif}"
-		else
-			rlLog "two streams dispatched to different interface. ${stream3_outif} vs ${stream4_outif}"
-		fi
-
-#		local cmd=(
-#			{tcpdump -i \$\(cat /tmp/testiface1\) -w if0.cap \&}
-#			{tcpdump -i \$\(cat /tmp/testiface2\) -w if1.cap \&}
-#			{sleep 2}
-#			{ping ${server_ip4} -c3}
-#			{pkill tcpdump}
-#			{sleep 2}
-#			{ls -l \| grep if}
-#		)
-#		vmsh cmd_set $vm1 "${cmd[*]}"
-#		if [ $? -ne 0 ];then
-#			let result++
-#			echo "${test_name} failed: ping failed via bond0"
-#		fi
-#		vmsh cmd_set $vm1 "{tcpdump -r if${out_if_idx}.cap -n|grep \"${client_ip4} > ${server_ip4}\"}"
-#		if [ $? -ne 0 ];then
-#			let result++
-#			echo "${test_name} failed: packet was not sent from if ${out_if_idx}"
-#		fi
-#		vmsh cmd_set $vm1 "{tcpdump -r if$(((${out_if_idx}+1)%2)).cap -n|grep \"${client_ip4} > ${server_ip4}\"}"
-#		if [ $? -eq 0 ];then
-#			let result++
-#			echo "${test_name} failed: packet was sent from wrong if"
-#		fi
-		sync_set server ${test_name}_ready_send_packet
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			#increase interval time
-			{rm -rf \/root\/if0.pcap}
-			{rm -rf \/root\/if1.pcap}
-			{ls -l}
-			{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		rlRun "ip link set $iface1 down"
-		local cmd=(
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		rlLog "start nc on 12345"
-		nc -l 12345 > /tmp/remote_received_packets &
-		sync_set server ${test_name}_end_feedback_result
-		sync_wait server ${test_name}_nc12345
-		local packets_num=$(cat /tmp/remote_received_packets)
-		if [ ! -n "$packets_num" ] ; then
-			let result++
-			rlFail "failed: no packets, or failover time is too long"
-		elif [ $packets_num -lt 2800 ];then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		rlLog "remote_receive_packets_num $packets_num"
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after link down slave"
-		fi
-
-		#if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file;then
-		#	let result++
-		#fi
-		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
-		#	let result++
-		#fi
-		cleanup_swcfg
-
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_detach_vf_from_vm $iface2 0 2 $vm1
-		sriov_remove_vfs $iface1 0
-		sriov_remove_vfs $iface2 0
-
-		ip addr flush $iface1
-		ip addr flush $iface2
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-
-sriov_test_bond_lacp_cxgb4() {
-
-	log_header "sriov_test_bond_lacp_cxgb4" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_lacp
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local pf_ip4="192.100.${ipaddr}.3"
-
-	local vlan_id=3
-
-	local server_vlanif_mac="22:22:11:11:11:10"
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		ip link set ${nic_test}.${vlan_id} address $server_vlanif_mac
-		ip addr show $nic_test
-		ip addr show ${nic_test}.${vlan_id}
-		nic_mac=$(get_iface_mac $nic_test)
-		rlLog "nic_mac: $nic_mac"
-		sync_wait client ${test_name}_ready_to_receive_mac
-		timeout 60s bash -c "until ping  ${pf_ip4} -c 5; do sleep 5; done"
-		echo $nic_mac|nc ${pf_ip4} 1234
-		sync_set client ${test_name}_start
-
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		ip link set $iface1 up
-		ip addr add ${pf_ip4}/${ip4_mask_len} dev ${iface1}
-		nc -l 1234 > /tmp/remote_mac &
-		ip addr show $iface1
-		sync_set server ${test_name}_ready_to_receive_mac
-		sync_wait server ${test_name}_start
-		remote_mac=$(cat /tmp/remote_mac)
-		rlLog "remote_mac: $remote_mac"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		if ! sriov_create_vfs $iface1 0 1 || \
-				! sriov_create_vfs $iface2 1 1;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-
-		fi
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1 || \
-			! sriov_attach_vf_to_vm $iface2 1 1 $vm1 $mac2;then
-			let result++
-			rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-		get_iface_sw_port "$iface1 $iface2" switch_name port_list kick_list || { rlFail "failed:get_iface_sw_port failed";let exitcode++; }
-		swcfg_port_channel $switch_name "$port_list" "active" || { rlFail "failed:swcfg_port_channel failed";let exitcode++; }
-		if [ -n "$kick_list" ];then
-			rlFail "$kick_list are not on the same switch, kicked."
-		fi
-
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=802.3ad miimon=100 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-			{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed:ifenslave failed";let result++; }
-		fi
-		src_mac="0x${mac1//:/}"
-		dst_mac="0x${remote_mac//:/}"
-		out_if_idx=$(((${src_mac}^${dst_mac}^0x0800)%2))
-
-		vlan_src_mac="0x${mac1//:/}"
-		vlan_dst_mac="0x${server_vlanif_mac//:/}"
-		vlan_out_if_idx=$(((${vlan_src_mac}^${vlan_dst_mac}^0x0800)%2))
-
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{sleep 50}
-			{ip addr show}
-			#{tcpdump -i \$\(cat /tmp/testiface1\) icmp and src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} -w if0.cap \&}
-			#{tcpdump -i \$\(cat /tmp/testiface2\) icmp and src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} -w if1.cap \&}
-			{tcpdump -i \$\(cat /tmp/testiface1\) -w if0.cap \&}
-			{tcpdump -i \$\(cat /tmp/testiface2\) -w if1.cap \&}
-			{sleep 2}
-			{ping ${server_vlanif_ip4} -c3}
-			{pkill tcpdump}
-			{sleep 2}
-			{ls -l \| grep if}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		vmsh cmd_set $vm1 "{tcpdump -r if${vlan_out_if_idx}.cap -n|grep \"${client_vlanif_ip4} > ${server_vlanif_ip4}\"}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: packet was not sent from vlan if ${vlan_out_if_idx}"
-		fi
-		vmsh cmd_set $vm1 "{tcpdump -r if$(((${vlan_out_if_idx}+1)%2)).cap -n|grep \"${client_vlanif_ip4} > ${server_vlanif_ip4}\"}"
-		if [ $? -eq 0 ];then
-			let result++
-			rlFail "${test_name} failed: packet was sent from wrong vlan if"
-		fi
-		local cmd=(
-			{tcpdump -i \$\(cat /tmp/testiface1\) -w if0.cap \&}
-			{tcpdump -i \$\(cat /tmp/testiface2\) -w if1.cap \&}
-			{sleep 2}
-			{ping ${server_ip4} -c3}
-			{pkill tcpdump}
-			{sleep 2}
-			{ls -l \| grep if}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-		vmsh cmd_set $vm1 "{tcpdump -r if${out_if_idx}.cap -n|grep \"${client_ip4} > ${server_ip4}\"}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: packet was not sent from if ${out_if_idx}"
-		fi
-		vmsh cmd_set $vm1 "{tcpdump -r if$(((${out_if_idx}+1)%2)).cap -n|grep \"${client_ip4} > ${server_ip4}\"}"
-		if [ $? -eq 0 ];then
-			let result++
-			rlFail "${test_name} failed: packet was sent from wrong if"
-		fi
-
-
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		rlRun "ip link set $iface1 down"
-		local cmd=(
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface2
-		timeout 60s bash -c "until ping 192.100.1.1 -c 5; do sleep 5; done"
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface2
-		sync_set server ${test_name}_end_feedback_result
-
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after link down slave"
-		fi
-
-		#if ! do_vm_netperf $vm1 ${server_ip4} ${server_ip6} $result_file;then
-		#	let result++
-		#fi
-		#if ! do_vm_netperf $vm1 ${server_vlanif_ip4} ${server_vlanif_ip6} $result_file;then
-		#	let result++
-		#fi
-		cleanup_swcfg
-
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_detach_vf_from_vm $iface2 1 1 $vm1
-		sriov_remove_vfs $iface1 0
-		sriov_remove_vfs $iface2 1
-
-		ip addr flush $iface1
-		ip addr flush $iface2
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-sriov_test_bond_lacp_mlx4en_dualport() {
-
-	log_header "sriov_test_bond_lacp_mlx4en_dualport" $result_file
-
-	local result=0
-	local test_name=sriov_test_bond_lacp
-
-	local server_ip4="192.100.${ipaddr}.2"
-	local server_ip6="2021:db01:${ipaddr}::2"
-	local client_ip4="192.100.${ipaddr}.1"
-	local client_ip6="2021:db01:${ipaddr}::1"
-	local server_vlanif_ip4="192.110.${ipaddr_vlan}.2"
-	local server_vlanif_ip6="2021:db10:${ipaddr_vlan}::2"
-	local client_vlanif_ip4="192.110.${ipaddr_vlan}.1"
-	local client_vlanif_ip6="2021:db10:${ipaddr_vlan}::1"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	local pf_ip4="192.100.${ipaddr}.3"
-
-	local vlan_id=3
-
-	local server_vlanif_mac="22:22:11:11:11:10"
-
-	if i_am_server;then
-		ip link set $nic_test up
-		ip addr add ${server_ip4}/${ip4_mask_len} dev ${nic_test}
-		ip addr add ${server_ip6}/${ip6_mask_len} dev ${nic_test}
-		ip link add link $nic_test name ${nic_test}.${vlan_id} type vlan id $vlan_id
-		ip link set ${nic_test}.${vlan_id} up
-		ip addr add ${server_vlanif_ip4}/${ip4_mask_len} dev ${nic_test}.${vlan_id}
-		ip addr add ${server_vlanif_ip6}/${ip6_mask_len} dev ${nic_test}.${vlan_id}
-		ip link set ${nic_test}.${vlan_id} address $server_vlanif_mac
-		ip addr show $nic_test
-		ip addr show ${nic_test}.${vlan_id}
-		nic_mac=$(get_iface_mac $nic_test)
-		rlLog "nic_mac: $nic_mac"
-		sync_wait client ${test_name}_ready_to_receive_mac
-		timeout 60s bash -c "until ping  ${pf_ip4} -c 5; do sleep 5; done"
-		echo $nic_mac|nc ${pf_ip4} 1234
-		sync_set client ${test_name}_start
-
-		rm -f failover.cap
-		tcpdump -i ${nic_test}.${vlan_id} src ${client_vlanif_ip4} and dst ${server_vlanif_ip4} and icmp -w failover.cap &
-		sync_set client ${test_name}_start_send_packet
-		sync_wait client ${test_name}_end_send_packet
-		pkill tcpdump
-		sleep 1
-		local packet_received=`tcpdump -r failover.cap -nn | grep "${client_vlanif_ip4} > ${server_vlanif_ip4}" | wc -l`
-		local packet_lost=$((3000-$packet_received))
-		rlLog "packet_lost=$packet_lost"
-		if [ $packet_lost -lt 200 ];then
-				ip addr add 192.100.1.1/24 dev $nic_test
-		fi
-		sync_set client ${test_name}_start_feedback_result
-		sync_wait client ${test_name}_end_feedback_result
-
-		sync_wait client ${test_name}_end
-		ip link del ${nic_test}.${vlan_id}
-		ip addr flush dev $nic_test
-	else
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		local iface1=$(echo $test_iface | awk '{print $1}')
-		local iface2=$(echo $test_iface | awk '{print $2}')
-		ip link set $iface1 up
-		ip addr add ${pf_ip4}/${ip4_mask_len} dev ${iface1}
-		nc -l 1234 > /tmp/remote_mac &
-		ip addr show $iface1
-		sync_set server ${test_name}_ready_to_receive_mac
-		sync_wait server ${test_name}_start
-		remote_mac=$(cat /tmp/remote_mac)
-		rlLog "remote_mac: $remote_mac"
-		local if1_bus=$(sriov_get_pf_bus_info $iface1 0)
-		local if2_bus=$(sriov_get_pf_bus_info $iface2 0)
-		#vf will be created paired on dual port mlx NIC
-		if ! sriov_create_vfs $iface1 0 1;then
-			let result++
-			rlFail "${test_name} failed: can't create vfs."
-
-		fi
-		ip link set $iface1 up
-		ip link set $iface2 up
-		sleep 10
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 0 trust on
-		ip link set $iface2 vf 0 spoofchk off
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_without_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_without_vf; done"
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm1 $mac1;then
-			let result++
-			rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-
-		vmsh run_cmd $vm1 "rm -f /tmp/nic_list_with_vf;for if in \$(ip link|grep \"<*>\"|awk -F: '{print \$2}'); do echo \$if >> /tmp/nic_list_with_vf; done"
-		vmsh run_cmd $vm1 "diff /tmp/nic_list_without_vf /tmp/nic_list_with_vf|grep \">\"|awk '{print \$2}' | tee /tmp/vfs"
-
-		get_iface_sw_port "$iface1 $iface2" switch_name port_list kick_list || { rlFail "failed:get_iface_sw_port failed";let exitcode++; }
-		swcfg_port_channel $switch_name "$port_list" "active" || { rlFail "failed:swcfg_port_channel failed";let exitcode++; }
-		if [ -n "$kick_list" ];then
-			rlLog "$kick_list are not on the same switch, kicked."
-		fi
-
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 1p /tmp/vfs) down"
-		vmsh run_cmd $vm1 "ip link set \$(sed -n 2p /tmp/vfs) down"
-
-		local cmd=(
-			{modprobe -r bonding}
-			{modprobe -v bonding mode=802.3ad miimon=100 max_bonds=1}
-			{ip link set bond0 up}
-			{ifenslave bond0 \$\(sed -n 1p /tmp/vfs\)}
-			{ifenslave bond0 \$\(sed -n 2p /tmp/vfs\)}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed:ifenslave failed";let result++; }
-		fi
-
-		local cmd=(
-			{ip addr add ${client_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client_ip6}/${ip6_mask_len} dev bond0}
-			{ip link add link bond0 name bond0\.$vlan_id type vlan id $vlan_id}
-			{ip link set bond0\.$vlan_id up}
-			{ip addr add ${client_vlanif_ip4}/${ip4_mask_len} dev bond0\.$vlan_id}
-			{ip addr add ${client_vlanif_ip6}/${ip6_mask_len} dev bond0\.$vlan_id}
-			{sleep 50}
-			{ip addr show}
-			{ping ${server_vlanif_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0.${vlan_id} "
-		fi
-		local cmd=(
-			{ping ${server_ip4} -c3}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0"
-		fi
-
-		sync_wait server ${test_name}_start_send_packet
-		local cmd=(
-			{ping $server_vlanif_ip4 -i 0.01 -c 3000 \&}
-			{ip link set \$\(sed -n 1p /tmp/vfs\) down}
-			{sleep 300}
-			{pkill ping}
-			{modprobe -rv pktgen}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server ${test_name}_end_send_packet
-		sync_wait server ${test_name}_start_feedback_result
-		ip addr add 192.100.1.2/24 dev $iface1
-		timeout 60s bash -c "until ping 192.100.1.1 -c 5; do sleep 5; done"
-		if [ $? -ne 0 ]; then
-			let result++
-			rlFail "failed: failover time is too long"
-		fi
-		ip addr del 192.100.1.2/24 dev $iface1
-		sync_set server ${test_name}_end_feedback_result
-
-
-		vmsh run_cmd $vm1 "ping ${server_ip4} -c3"
-		if [ $? -ne 0 ];then
-			let result++
-			rlFail "${test_name} failed: ping failed via bond0 after link down slave"
-		fi
-
-		cleanup_swcfg
-
-		local cmd=(
-			{ip link del bond0\.${vlan_id}}
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		sriov_detach_vf_from_vm $iface1 0 1 $vm1
-		sriov_remove_vfs $iface1 0
-
-		ip addr flush $iface1
-		ip addr flush $iface2
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-
 # if nic is in promiscuous mode, it can receives all packets no matter if the packet's dst_mac equal nic's mac
 # if the vf is trust on, user can set vf to promiscuous mode on VM, otherwise can't.
 sriov_test_trusted_vf_promisc()
 {
-		log_header "trusted_vf_promisc" $result_file
+	log_header "trusted_vf_promisc" $result_file
 
-		local result=0
+	local result=0
 
-		ip link set $nic_test up
+	ip link set $nic_test up
+	local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
+	local pktgen_dst_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
+
+	if i_am_server; then
+		ip addr flush $nic_test
+		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
+		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
+
+		sync_wait client test_trusted_vf_promisc_start
+
+		rlRun "modprobe pktgen"
+		sleep 5
+		rlRun "echo rem_device_all > /proc/net/pktgen/kpktgend_0"
+		rlRun "echo add_device $nic_test > /proc/net/pktgen/kpktgend_0"
+		rlRun "test -f /proc/net/pktgen/$nic_test"
+		rlRun "echo dst_mac $pktgen_dst_mac > /proc/net/pktgen/$nic_test"
+		rlRun "echo count 360 > /proc/net/pktgen/$nic_test"
+		rlRun "echo delay 1000000000 > /proc/net/pktgen/$nic_test"
+		rlRun "echo pkt_size 1500 > /proc/net/pktgen/$nic_test"
+		rlRun "echo dst 1.1.1.1 > /proc/net/pktgen/$nic_test"
+		sync_set client PROMISC_TEST_SEND 360
+		rlRun "echo start > /proc/net/pktgen/pgctrl"
+		sync_wait client PROMISC_TEST_DONE 360
+		rlRun "echo rem_device_all > /proc/net/pktgen/kpktgend_0"
+		rlRun "modprobe -r pktgen"
+
+		sync_wait client test_trusted_vf_promisc_end
+
+		ip addr flush $nic_test
+	else
+		sync_set server test_trusted_vf_promisc_start
+		ip link set $nic_test promisc off
 		local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local pktgen_dst_mac="00:de:ad:$(printf %02x $ipaddr):01:02"
 
-		if i_am_server; then
-				ip addr flush $nic_test
-				ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-				ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
+		sriov_create_vfs $nic_test 0 1
 
-				sync_wait client test_trusted_vf_promisc_start
+		ip link show $nic_test | grep "trust on" && { result=1;rlFail "failed: vf default trust on"; }
 
-				rlRun "modprobe pktgen"
-				sleep 5
-				rlRun "echo rem_device_all > /proc/net/pktgen/kpktgend_0"
-				rlRun "echo add_device $nic_test > /proc/net/pktgen/kpktgend_0"
-				rlRun "test -f /proc/net/pktgen/$nic_test"
-				rlRun "echo dst_mac $pktgen_dst_mac > /proc/net/pktgen/$nic_test"
-				rlRun "echo count 360 > /proc/net/pktgen/$nic_test"
-				rlRun "echo delay 1000000000 > /proc/net/pktgen/$nic_test"
-				rlRun "echo pkt_size 1500 > /proc/net/pktgen/$nic_test"
-				rlRun "echo dst 1.1.1.1 > /proc/net/pktgen/$nic_test"
-				sync_set client PROMISC_TEST_SEND 360
-				rlRun "echo start > /proc/net/pktgen/pgctrl"
-				sync_wait client PROMISC_TEST_DONE 360
-				rlRun "echo rem_device_all > /proc/net/pktgen/kpktgend_0"
-				rlRun "modprobe -r pktgen"
-
-				sync_wait client test_trusted_vf_promisc_end
-
-				ip addr flush $nic_test
-		else
-				sync_set server test_trusted_vf_promisc_start
-				ip link set $nic_test promisc off
-				local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-
-				sriov_create_vfs $nic_test 0 1
-
-				ip link show $nic_test | grep "trust on" && { result=1;rlFail "failed: vf default trust on"; }
-
-				if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
-						result=1
-				fi
-
-				# trust vf is off by default, promisc should be disabled by default
-				rlLog "Test1: trust vf is off by default, the promisc of vf should be disabled by default on the guest"
-				local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{ip link set \$NIC_TEST up}
-						{sleep 1}
-						{ip addr flush \$NIC_TEST}
-						{sleep 1}
-						{ip addr add 172.30.${ipaddr}.11/24 dev \$NIC_TEST}
-						{sleep 1}
-						{ip addr add 2021:db8:${ipaddr}::11/64 dev \$NIC_TEST}
-						{sleep 1}
-						{ip link show \$NIC_TEST}
-						{sleep 1}
-						{ip addr show \$NIC_TEST}
-						{sleep 1}
-						{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				sync_wait server PROMISC_TEST_SEND
-				local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{test \"\$\(tshark -a duration:10 -nVq -i \$NIC_TEST -f \"ether dst $pktgen_dst_mac\" -c1 -T fields -e ip.dst 2\>/dev/null\)\" = \'1.1.1.1\'}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				if [ $? -eq 0 ];then
-						result=1
-						rlFail "failed: promisc default is off, but still received pktgen_dst_mac"
-				fi
-
-				# trust vf is on, enable vf promisc
-				rlLog "Test2: set trust vf is on, set promisc is on in the guest"
-				rlRun "ip link set $nic_test vf 0 trust on"
-				local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{ip addr show \$NIC_TEST}
-						{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
-						{ip link set \$NIC_TEST promisc on}
-						{sleep 1\;ip link show \$NIC_TEST\;ip -d link show \$NIC_TEST \| grep \"promiscuity 1\"}
-						{sleep 2}
-						{test \"\$\(tshark -a duration:10 -nVq -i \$NIC_TEST -f \"ether dst $pktgen_dst_mac\" -c1 -T fields -e ip.dst 2\>/dev/null\)\" = \'1.1.1.1\'}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				if [ $? -ne 0 ];then
-						result=1
-						rlFail "failed: promisc on, but can't receive pktgen_dst_mac"
-				fi
-				# trust vf is on, disable vf promisc
-				rlLog "Test3: set trust is on, disable vf promisc in the guest"
-				local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
-						{ip link set \$NIC_TEST promisc off}
-						{sleep 1\;ip -d link show \$NIC_TEST \| grep \"promiscuity 0\"}
-						{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				if [ $? -ne 0 ];then
-						result=1
-						rlFail "failed: error when trust vf is on, disable vf promisc"
-				fi
-				local cmd=(
-						{test \"\$\(tshark -a duration:10 -nVpq -i \$NIC_TEST -f \"ether dst $pktgen_dst_mac\" -c1 -T fields -e ip.dst 2\>/dev/null\)\" = \'1.1.1.1\'}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				if [ $? -eq 0 ];then
-						result=1
-						rlFail "failed: promisc off, but still received pktgen_dst_mac"
-				fi
-
-				# disable trust vf
-				rlLog "Test4: disable trust vf, set promisc on in the guest"
-				ip link set $nic_test vf 0 trust off
-				local cmd=(
-						{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-						{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
-						{ip link set \$NIC_TEST promisc on}
-						{sleep 2}
-						{test \"\$\(tshark -a duration:10 -nVq -i \$NIC_TEST -f \"ether dst $pktgen_dst_mac\" -c1 -T fields -e ip.dst 2\>/dev/null\)\" = \'1.1.1.1\'}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-				if [ $? -eq 0 ];then
-						result=1
-						rlFail "failed: trust vf off, but can set vf promisc on in vm"
-				fi
-				sync_set server PROMISC_TEST_DONE
-
-				sriov_detach_vf_from_vm $nic_test 0 1 $vm1
-
-				sriov_remove_vfs $nic_test 0
-
-				sync_set server test_trusted_vf_promisc_end
+		if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
+			result=1
 		fi
 
-		return $result
-}
+		# trust vf is off by default, promisc should be disabled by default
+		rlLog "Test1: trust vf is off by default, the promisc of vf should be disabled by default on the guest"
+		local cmd=(
+			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{ip link set \$NIC_TEST up}
+			{sleep 1}
+			{ip addr flush \$NIC_TEST}
+			{sleep 1}
+			{ip addr add 172.30.${ipaddr}.11/24 dev \$NIC_TEST}
+			{sleep 1}
+			{ip addr add 2021:db8:${ipaddr}::11/64 dev \$NIC_TEST}
+			{sleep 1}
+			{ip link show \$NIC_TEST}
+			{sleep 1}
+			{ip addr show \$NIC_TEST}
+			{sleep 1}
+			{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
+		)
+		vmsh cmd_set $vm1 "${cmd[*]}"
+		sync_wait server PROMISC_TEST_SEND
+		local cmd=(
+			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{test \"\$\(tshark -a duration:10 -nVq -i \$NIC_TEST -f \"ether dst $pktgen_dst_mac\" -c1 -T fields -e ip.dst 2\>/dev/null\)\" = \'1.1.1.1\'}
+		)
+		vmsh cmd_set $vm1 "${cmd[*]}"
+		if [ $? -eq 0 ];then
+			result=1
+			rlFail "failed: promisc default is off, but still received pktgen_dst_mac"
+		fi
 
+		# trust vf is on, enable vf promisc
+		rlLog "Test2: set trust vf is on, set promisc is on in the guest"
+		rlRun "ip link set $nic_test vf 0 trust on"
+		local cmd=(
+			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{ip addr show \$NIC_TEST}
+			{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
+			{ip link set \$NIC_TEST promisc on}
+			{sleep 1\;ip link show \$NIC_TEST\;ip -d link show \$NIC_TEST \| grep \"promiscuity 1\"}
+			{sleep 2}
+			{test \"\$\(tshark -a duration:10 -nVq -i \$NIC_TEST -f \"ether dst $pktgen_dst_mac\" -c1 -T fields -e ip.dst 2\>/dev/null\)\" = \'1.1.1.1\'}
+		)
+		vmsh cmd_set $vm1 "${cmd[*]}"
+		if [ $? -ne 0 ];then
+			result=1
+			rlFail "failed: promisc on, but can't receive pktgen_dst_mac"
+		fi
+		# trust vf is on, disable vf promisc
+		rlLog "Test3: set trust is on, disable vf promisc in the guest"
+		local cmd=(
+			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
+			{ip link set \$NIC_TEST promisc off}
+			{sleep 1\;ip -d link show \$NIC_TEST \| grep \"promiscuity 0\"}
+			{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
+		)
+		vmsh cmd_set $vm1 "${cmd[*]}"
+		if [ $? -ne 0 ];then
+			result=1
+			rlFail "failed: error when trust vf is on, disable vf promisc"
+		fi
+		local cmd=(
+			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{test \"\$\(tshark -a duration:10 -nVpq -i \$NIC_TEST -f \"ether dst $pktgen_dst_mac\" -c1 -T fields -e ip.dst 2\>/dev/null\)\" = \'1.1.1.1\'}
+		)
+		vmsh cmd_set $vm1 "${cmd[*]}"
+		if [ $? -eq 0 ];then
+			result=1
+			rlFail "failed: promisc off, but still received pktgen_dst_mac"
+		fi
+
+		# disable trust vf
+		rlLog "Test4: disable trust vf, set promisc on in the guest"
+		ip link set $nic_test vf 0 trust off
+		local cmd=(
+			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
+			{ip link set \$NIC_TEST promisc on}
+			{sleep 2}
+			{test \"\$\(tshark -a duration:10 -nVq -i \$NIC_TEST -f \"ether dst $pktgen_dst_mac\" -c1 -T fields -e ip.dst 2\>/dev/null\)\" = \'1.1.1.1\'}
+		)
+		vmsh cmd_set $vm1 "${cmd[*]}"
+		if [ $? -eq 0 ];then
+			result=1
+			rlFail "failed: trust vf off, but can set vf promisc on in vm"
+		fi
+		sync_set server PROMISC_TEST_DONE
+
+		sriov_detach_vf_from_vm $nic_test 0 1 $vm1
+
+		sriov_remove_vfs $nic_test 0
+
+		sync_set server test_trusted_vf_promisc_end
+	fi
+
+	return $result
+}
 sriov_test_trusted_vf_promisc_vlan()
 {
 	log_header "test_trusted_vf_promisc_vlan" $result_file
@@ -8993,7 +4344,7 @@ sriov_test_trusted_vf_promisc_vlan()
 			sync_wait  client trust_${trust_conf}_send_broadcast_packets_start
 			broadcast_pkt="Ether(src='${server_mac}', dst='FF:FF:FF:FF:FF:FF')/Dot1Q(vlan=100)/IP(src='172.30.${ipaddr}.2', dst='255.255.255.255')"
 			if [ $(GetDistroRelease) = 8 ];then
-				  /usr/libexec/platform-python -c  "from scapy.all import *; sendp($broadcast_pkt, iface='$nic_test', count=10 )"
+				/usr/libexec/platform-python -c  "from scapy.all import *; sendp($broadcast_pkt, iface='$nic_test', count=10 )"
 			else
 				python -c  "from scapy.all import *; sendp($broadcast_pkt, iface='$nic_test', count=10)"
 			fi
@@ -9168,94 +4519,46 @@ sriov_test_trusted_vf_promisc_vlan()
 	fi
 }
 
-#
-# buffer overflow and/or deadlock when VF has more than 32 multicast
-#
-sriov_test_bz1445814()
-{
-	log_header "sriov_test_bz1445814" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-
-		sync_set client test_bz1445814_start
-		sync_wait client test_bz1445814_end
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_bz1445814_start
-
-		local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-
-		if ! sriov_create_vfs $nic_test 0 1; then
-			sync_set server test_bz1445814_end
-			return 1
-		fi
-
-		vf_name=$(sriov_get_vf_iface $nic_test 0 1)
-		for i in $(seq 2 50); do
-			a="33:33:00:00:00:$(printf "%02x" $i)"
-			rlLog $a
-			ip ma add $a dev $vf_name
-			if [ $? -ne 0 ];then
-				let result+=1
-				rlFail "failed: add ma $a error"
-			fi
-		done
-
-		sriov_remove_vfs $nic_test 0
-
-		sync_set server test_bz1445814_end
-	fi
-
-	return $result
-}
 
 # Description:
-# 	Make sure the vf name in host don't change from distro to distro
+#  Make sure the vf name in host don't change from distro to distro
 #
 # Test method:
 #	0.this test need to use mysql database to store vf name
-#	 	table desc:
-#			   +--------+------------------+------+-----+---------+----------------+
-#			   | Field  | Type			 | Null | Key | Default | Extra		  |
-#			   +--------+------------------+------+-----+---------+----------------+
-#			   | id	 | int(10) unsigned | NO   | PRI | NULL	| auto_increment |
-#			   | distro | varchar(20)	  | YES  |	 | NULL	|				|
-#			   | driver | varchar(20)	  | YES  |	 | NULL	|				|
-#			   | host   | varchar(100)	 | YES  |	 | NULL	|				|
-#			   | mac	| varchar(40)	  | YES  |	 | NULL	|				|
-#			   | vfidx  | varchar(3)	   | YES  |	 | NULL	|				|
-#			   | ifname | varchar(50)	  | YES  |	 | NULL	|				|
-#			   +--------+------------------+------+-----+---------+----------------+
+#		table desc:
+#               +--------+------------------+------+-----+---------+----------------+
+#               | Field  | Type             | Null | Key | Default | Extra          |
+#               +--------+------------------+------+-----+---------+----------------+
+#               | id     | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+#               | distro | varchar(20)      | YES  |     | NULL    |                |
+#               | driver | varchar(20)      | YES  |     | NULL    |                |
+#               | host   | varchar(100)     | YES  |     | NULL    |                |
+#               | mac    | varchar(40)      | YES  |     | NULL    |                |
+#               | vfidx  | varchar(3)       | YES  |     | NULL    |                |
+#               | ifname | varchar(50)      | YES  |     | NULL    |                |
+#               +--------+------------------+------+-----+---------+----------------+
 #	1.this test need to be run one time on a benchmark version to generate the benchmark vf name
 #	2.this test will generate a vf and compare its name with the name stored in database
 #		if can't find vf name from database(you have not generate the benchmark vf name), pass
-#		if equal,						  						  pass
-#		if not eauql,					  						  fail
+#		if equal,												pass
+#		if not eauql,											fail
 #	3.use "distro,driver,host,mac,vfidx" to distinguish ifname in database
 #	4.if have not added vfname related to current "distro,driver,host,mac,vfidx" to database, then will add it to database
 #	5.drivers under testing:
 #		cxgb4,be2net,bnx2x,mlx4_en,ixgbe,i40e,qlcnic,sfc,igb,mlx5_core,bnxt_en
 #	6.some datas in my database:
 #		+----+--------+---------+-----------------------------------------+-------------------+-------+-------------+
-#		| id | distro | driver  | host									| mac			   | vfidx | ifname	  |
+#		| id | distro | driver  | host                                    | mac               | vfidx | ifname      |
 #		+----+--------+---------+-----------------------------------------+-------------------+-------+-------------+
-#		| 16 | 7.4	| mlx4_en | hp-dl380pg8-08.rhts.eng.pek2.redhat.com | 00:02:c9:52:27:26 | 2	 | ens6f2	  |
-#		| 17 | 7.4	| igb	 | hp-dl380g9-04.rhts.eng.pek2.redhat.com  | a0:36:9f:54:bb:2e | 2	 | enp136s16f4 |
-#		| 18 | 7.4	| sfc	 | hp-dl388g8-22.rhts.eng.pek2.redhat.com  | 00:0f:53:21:68:30 | 2	 | ens3f3np0   |
-#		| 19 | 7.4	| be2net  | hp-dl380pg8-15.rhts.eng.pek2.redhat.com | 00:90:fa:2a:65:82 | 2	 | enp7s4f1	|
-#		| 20 | 7.4	| bnx2x   | hp-dl380pg8-08.rhts.eng.pek2.redhat.com | 00:0e:1e:50:f3:a0 | 2	 | enp7s1f1	|
-#		| 21 | 7.4	| ixgbe   | hp-dl380g9-04.rhts.eng.pek2.redhat.com  | 00:1b:21:4a:fe:98 | 2	 | enp132s16f2 |
-#		| 22 | 7.4	| i40e	| hp-dl380g9-04.rhts.eng.pek2.redhat.com  | 68:05:ca:2a:3a:30 | 2	 | enp5s2f1	|
-#		| 23 | 7.4	| qlcnic  | hp-dl388g8-22.rhts.eng.pek2.redhat.com  | 00:0e:1e:14:9b:f0 | 2	 | enp36s2f1   |
-#		| 24 | 7.4	| cxgb4   | hp-dl380pg8-15.rhts.eng.pek2.redhat.com | 00:07:43:2e:04:10 | 2	 | enp33s1f4   |
+#		| 16 | 7.4    | mlx4_en | hp-dl380pg8-08.rhts.eng.pek2.redhat.com | 00:02:c9:52:27:26 | 2     | ens6f2      |
+#		| 17 | 7.4    | igb     | hp-dl380g9-04.rhts.eng.pek2.redhat.com  | a0:36:9f:54:bb:2e | 2     | enp136s16f4 |
+#		| 18 | 7.4    | sfc     | hp-dl388g8-22.rhts.eng.pek2.redhat.com  | 00:0f:53:21:68:30 | 2     | ens3f3np0   |
+#		| 19 | 7.4    | be2net  | hp-dl380pg8-15.rhts.eng.pek2.redhat.com | 00:90:fa:2a:65:82 | 2     | enp7s4f1    |
+#		| 20 | 7.4    | bnx2x   | hp-dl380pg8-08.rhts.eng.pek2.redhat.com | 00:0e:1e:50:f3:a0 | 2     | enp7s1f1    |
+#		| 21 | 7.4    | ixgbe   | hp-dl380g9-04.rhts.eng.pek2.redhat.com  | 00:1b:21:4a:fe:98 | 2     | enp132s16f2 |
+#		| 22 | 7.4    | i40e    | hp-dl380g9-04.rhts.eng.pek2.redhat.com  | 68:05:ca:2a:3a:30 | 2     | enp5s2f1    |
+#		| 23 | 7.4    | qlcnic  | hp-dl388g8-22.rhts.eng.pek2.redhat.com  | 00:0e:1e:14:9b:f0 | 2     | enp36s2f1   |
+#		| 24 | 7.4    | cxgb4   | hp-dl380pg8-15.rhts.eng.pek2.redhat.com | 00:07:43:2e:04:10 | 2     | enp33s1f4   |
 #		+----+--------+---------+-----------------------------------------+-------------------+-------+-------------+
 #
 sriov_test_vfname()
@@ -9283,11 +4586,11 @@ sriov_test_vfname()
 		local RHEL_VERSION=$(cat /etc/redhat-release | grep [0-9].[0-9] -o)
 		RHEL_VERSION_PRE=${RHEL_VERSION_PRE:-$(echo "$RHEL_VERSION-0.1" | bc -l)}
 		#if (($(bc <<< "$RHEL_VERSION>=8")));then
-		#		local dbtools=pymysql
-		#		yum install -y python2-PyMySQL
+		#        local dbtools=pymysql
+		#        yum install -y python2-PyMySQL
 		#else
-		#		local dbtools=MySQLdb
-		#		yum install -y  MySQL-python
+		#        local dbtools=MySQLdb
+		#        yum install -y  MySQL-python
 		#fi
 
 		nic_mac=$(ip link show $nic_test|grep ether|awk '{print $2}')
@@ -9424,8 +4727,7 @@ sriov_test_bz1489964() {
 		iface2=$(echo $test_iface | awk '{print $2}')
 		rlLog "test_ifaces:$iface1,$iface2"
 
-		if ! sriov_create_vfs $iface1 0 4 || \
-			! sriov_create_vfs $iface2 0 4;then
+		if ! sriov_create_vfs $iface1 0 4 || ! sriov_create_vfs $iface2 0 4;then
 			let result++
 			rlFail "${test_name} failed: can't create vfs."
 
@@ -9455,8 +4757,8 @@ sriov_test_bz1489964() {
 				let result++
 				rlFail "${test_name} failed: can't attach vf to vm."
 			else
-				vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-				vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
+				vmsh run_cmd $vm1 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'      | sed 's/://g') | tee /tmp/testiface1"
+				vmsh run_cmd $vm1 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'      | sed 's/://g') | tee /tmp/testiface2"
 				vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface1) down"
 				vmsh run_cmd $vm1 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -9481,8 +4783,8 @@ sriov_test_bz1489964() {
 					{ rlFail "${test_name} failed: ping failed via vm1 bond0";let result++; }
 				fi
 
-				vmsh run_cmd $vm2 "echo \$(ip link | grep $mac3 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-				vmsh run_cmd $vm2 "echo \$(ip link | grep $mac4 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
+				vmsh run_cmd $vm2 "echo \$(ip link | grep $mac3 -B1 | head -n1 | awk '{print \$2}'      | sed 's/://g') | tee /tmp/testiface1"
+				vmsh run_cmd $vm2 "echo \$(ip link | grep $mac4 -B1 | head -n1 | awk '{print \$2}'      | sed 's/://g') | tee /tmp/testiface2"
 				vmsh run_cmd $vm2 "ip link set \$(cat /tmp/testiface1) down"
 				vmsh run_cmd $vm2 "ip link set \$(cat /tmp/testiface2) down"
 
@@ -9583,31 +4885,28 @@ sriov_test_spoofchk()
 		ip link show $nic_test
 		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
 		[ -f spoof.cap ] && rm -f spoof.cap
-		tcpdump -i $nic_test src 172.30.${ipaddr}.11 and dst 172.30.${ipaddr}.2 and dst port 9 -w spoof.cap &
 		sync_set client test_spoofchk_start
-		sync_wait client test_spoofchk_start1
-		sync_set client test_spoofchk_on_non-vf_mac 180
-		sync_wait client test_spoofchk_on_non-vf_mac 180
+		tcpdump -i $nic_test src 172.30.${ipaddr}.11 and dst 172.30.${ipaddr}.2 and dst port 9 -w spoof.cap &
+		sync_wait client test_spoofchk_on_non-vf_mac
 		pkill tcpdump
 		sleep 1
 		tcpdump -r spoof.cap -e -nn | grep "$spoof_mac > $server_mac"
 		if [ $? -eq 0 ];then
 			ip addr flush $nic_test
 		fi
-		sync_set client test_spoofchk_on_vf_mac_start 180
-		sync_wait client test_spoofchk_on_vf_mac_start 180
+		sync_set client test_spoofchk_pktgen_ping1
 		ip addr flush $nic_test
 		ip addr add 172.30.${ipaddr}.4/24 dev $nic_test
-		sync_set client test_spoofchk_on_vf_mac_check 180
-		sync_wait client test_spoofchk_on_vf_mac_check 180
+		[ -f spoof.cap ] && rm -f spoof.cap
+		tcpdump -i $nic_test src 172.30.${ipaddr}.11 and dst 172.30.${ipaddr}.2 and dst port 9 -w spoof.cap &
+		sync_wait client test_spoofchk_on_vf_mac_check
+		pkill tcpdump
+		sleep 1
 		tcpdump -r spoof.cap -e -nn | grep "${vf_mac} > ${server_mac}"
 		if [ $? -ne 0 ];then
 			ip addr flush $nic_test
 		fi
-		sync_set client test_spoofchk_pktgen_setip1 180
-		sync_wait client test_spoofchk_pktgen_ping1 180
-		ip addr flush $nic_test
-		sleep 1
+		sync_set client test_spoofchk_pktgen_ping
 		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
 		rm -f spoof.cap
 		tcpdump -i $nic_test src 172.30.${ipaddr}.11 and dst 172.30.${ipaddr}.2 and dst port 9 -w spoof.cap &
@@ -9631,20 +4930,13 @@ sriov_test_spoofchk()
 		rlLog "ip addr flush $nic_test"
 		ip addr flush $nic_test
 	else
-		sync_wait server test_spoofchk_start
-		sync_set server test_spoofchk_start1
-
 		sriov_create_vfs $nic_test 0 1
 
 		#ip link show $nic_test | grep "spoof checking off" && { result=1;echo "failed: vf default spoofchk off"; }
-
-#		if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $vf_mac; then
-#			result=1
-#		else
 		ip link set $nic_test vf 0 spoofchk on
 		##check whether support
 		sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $vf_mac
-
+		sync_wait server test_spoofchk_start
 		local cmd=(
 			{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
 			{ip link set \$NIC_TEST up}
@@ -9656,7 +4948,6 @@ sriov_test_spoofchk()
 			{timeout 60s bash -c \"until ping 172.30.${ipaddr}.2 -c 5\; do sleep 5\; done\"}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-			sync_wait server test_spoofchk_pktgen_start1 180
 		local cmd=(
 			{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
 			{modprobe pktgen\;sleep 5\;}
@@ -9672,6 +4963,16 @@ sriov_test_spoofchk()
 			{echo \"start\" \> /proc/net/pktgen/pgctrl}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
+		sync_set server test_spoofchk_on_non-vf_mac
+		sync_wait server test_spoofchk_pktgen_ping1
+		local cmd=(
+			{ping 172.30.${ipaddr}.2 -c 5}
+			)
+		vmsh cmd_set $vm1 "${cmd[*]}"
+		if [ $? -eq 0 ];then
+			result=1
+			rlFail "failed: spoofchk on, received src mac=non-vf_mac packets"
+		fi
 		local cmd=(
 			{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
 			{modprobe pktgen\;sleep 5\;}
@@ -9687,20 +4988,8 @@ sriov_test_spoofchk()
 			{echo \"start\" \> /proc/net/pktgen/pgctrl}
 		)
 		vmsh cmd_set $vm1 "${cmd[*]}"
-		sync_set server test_spoofchk_on_non-vf_mac 180
-		sync_wait server test_spoofchk_on_non-vf_mac 180
-		local cmd=(
-			{ping 172.30.${ipaddr}.2 -c 5}
-			)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			result=1
-			rlFail "failed: spoofchk on, received src mac=non-vf_mac packets"
-		fi
-		sync_set server test_spoofchk_on_vf_mac_start 180
-		sync_wait server test_spoofchk_on_vf_mac_start 180
-		sync_set server test_spoofchk_on_vf_mac_check 180
-		sync_wait server test_spoofchk_on_vf_mac_check 180
+		sync_set server test_spoofchk_on_vf_mac_check
+		sync_wait server test_spoofchk_pktgen_ping
 		local cmd=(
 			{ping 172.30.${ipaddr}.4 -c 5}
 			)
@@ -9709,10 +4998,9 @@ sriov_test_spoofchk()
 			result=1
 			rlFail "Failed, spoofchk on, src mac=vf_mac packets are not captured"
 		fi
-		sync_set server test_spoofchk_pkegen_ping1 180
 
 		ip link set $nic_test vf 0 spoofchk off
-			sync_wait server test_spoofchk_pktgen_start2 180
+		sync_wait server test_spoofchk_pktgen_start2 180
 		local cmd=(
 			{export NIC_TEST=\$\(ip link show \| grep $vf_mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
 			{echo \"rem_device_all\" \> /proc/net/pktgen/kpktgend_0}
@@ -9748,7 +5036,6 @@ sriov_test_spoofchk()
 		vmsh cmd_set $vm1 "${cmd[*]}"
 
 		sriov_detach_vf_from_vm $nic_test 0 1 $vm1
-#		fi
 
 		sriov_remove_vfs $nic_test 0
 
@@ -9758,7 +5045,6 @@ sriov_test_spoofchk()
 
 	return $result
 }
-
 sriov_test_spoofchk_vlan()
 {
 	#Bug 2118135/Bug 2112335
@@ -9839,24 +5125,24 @@ sriov_test_spoofchk_vlan()
 		sriov_attach_vf_to_vm ${nic_test} 0 2 g1 ${vf_1_mac}
 		#Configure virtual machine
 		cmd=(
-		  {set -x}
-		  {ip link show}
-		  {export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		  {export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-		  {ip addr flush \${NIC_TEST_0}}
-		  {ip addr flush \${NIC_TEST_1}}
-		  {ip addr add ${vf_0_ip}/24 dev \${NIC_TEST_0}}
-		  {ip link set \${NIC_TEST_0} up}
-		  {ip link set \${NIC_TEST_1} up}
-		  {ip link set \${NIC_TEST_1} promisc on}
-		  {set +x}
+			{set -x}
+			{ip link show}
+			{export NIC_TEST_0=\$\(ip link show \| grep ${vf_0_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{export NIC_TEST_1=\$\(ip link show \| grep ${vf_1_mac} -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+			{ip addr flush \${NIC_TEST_0}}
+			{ip addr flush \${NIC_TEST_1}}
+			{ip addr add ${vf_0_ip}/24 dev \${NIC_TEST_0}}
+			{ip link set \${NIC_TEST_0} up}
+			{ip link set \${NIC_TEST_1} up}
+			{ip link set \${NIC_TEST_1} promisc on}
+			{set +x}
 		)
 		vmsh cmd_set g1 "${cmd[*]}"
 		[ $? -ne 0 ]  && result=1 && rlLog "vf ping server/host ==> failed"
 		sync_wait server configure_finished
 		cmd=(
-		  {ping -c 3 ${host_ip}}
-		  {ping -c 3 ${server_ip}}
+			{ping -c 3 ${host_ip}}
+			{ping -c 3 ${server_ip}}
 		)
 		vmsh cmd_set g1 "${cmd[*]}"
 		# Send packet from g1 vf0
@@ -9985,146 +5271,6 @@ sriov_test_spoofchk_vlan()
 	fi
 }
 
-# guest VM unable to communicate when VFs are defined on hosts PF
-#
-sriov_test_bz1493953()
-{
-	log_header "sriov_test_bz1493953" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-
-		sync_set client test_bz1493953_start
-		sync_wait client test_bz1493953_end
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_bz1493953_start
-
-		ip link add br0 type bridge
-		ip link set br0 up
-		#get the corresponding vnet port
-		#vnetport=$(ip link show | grep vnet | grep virbr0 | awk '{ print $2 }' | sed 's/://g' | head -n1)
-		rlLog "virsh dumpxml ${vm1}| grep -C 5 ${mac4vm1} | grep vnet | awk -F \"dev='\" '{print $2}' | sed \"s/'\/>//g\""
-		vnetport=$(virsh dumpxml ${vm1}| grep -C 5 ${mac4vm1} | grep vnet | awk -F "dev='" '{print $2}' | sed "s/'\/>//g")
-		rlLog "vnet $vnetport"
-		if (($rhel_version <= 6)); then
-			#brctl delif virbr0 vnet0
-			#brctl addif br0 vnet0
-			#brctl addif br0 $nic_test
-			ip link set dev $vnetport nomaster
-			ip link set dev $vnetport master br0
-			ip link set dev $nic_test master br0
-		else
-			ip link set $nic_test master br0
-			ip link set $vnetport master br0
-			ip link show
-		fi
-
-		if ! sriov_create_vfs $nic_test 0 1; then
-			sync_set server test_bz1493953_end
-			ip link del br0
-			return 1
-		fi
-
-		local cmd=(
-			{export NIC_TEST=\$\(ip link show \| grep $mac4vm1 -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-			{ip addr add 172.30.${ipaddr}.11/24 dev \$NIC_TEST}
-			{ip addr add 2021:db8:${ipaddr}::11/64 dev \$NIC_TEST}
-			{ip addr show \$NIC_TEST}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		local cmd=(
-			{timeout 60s bash -c \"until ping -c3 172.30.${ipaddr}.2\; do sleep 5\; done\"}
-			{timeout 60s bash -c \"until ping6 -c3 2021:db8:${ipaddr}::2\; do sleep 5\; done\"}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		result=$?
-
-		if (($rhel_version <= 6)); then
-			#brctl delif br0 vnet0
-			#brctl addif br0 virbr0
-			#brctl delif br0 $nic_test
-			ip link set dev $vnetport nomaster
-			ip link set dev $vnetport master virbr0
-			ip link set dev $nic_test nomaster
-
-		else
-			ip link set $vnetport master virbr0
-			ip link set $nic_test nomaster
-		fi
-		ip link del br0
-		local cmd=(
-			{export NIC_TEST=\$\(ip link show \| grep $mac4vm1 -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-			{ip addr del 172.30.${ipaddr}.11/24 dev \$NIC_TEST}
-			{ip addr del 2021:db8:${ipaddr}::11/64 dev \$NIC_TEST}
-			{ip addr show \$NIC_TEST}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		sriov_remove_vfs $nic_test 0
-
-		sync_set server test_bz1493953_end
-	fi
-
-	return $result
-}
-
-#
-#  ixgbevf takes a long time to update net.ipv6.conf.all.forwarding=1
-#
-sriov_test_bz1483396()
-{
-	log_header "sriov_test_bz1483396" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-		sync_set client test_bz1483396_start
-		sync_wait client test_bz1483396_end
-	else
-		sync_wait server test_bz1483396_start
-
-		if ! sriov_create_vfs $nic_test 0 1; then
-			sync_set server test_bz1483396_end
-			ip link del br0
-			return 1
-		fi
-		local vf=$(sriov_get_vf_iface $nic_test 0 1)
-		ip link set $vf down
-		ip link set $vf name vf0
-		ip link set vf0 up
-		ip link add link vf0 name vf0.100 type vlan proto 802.1ad id 100
-		ip link set dev vf0.100 up
-		for NUM in {1..2048}; do
-			ip link add link vf0.100 name vf0.100.$NUM type vlan proto 802.1q id $NUM
-			ip link set dev vf0.100.$NUM up
-		done
-		#will chech dmesg with param "--param=SET_DMESG_CHECK_KEY=yes" for every Task testing
-		#dmesg -C;dmesg -c
-		time sysctl -w net.ipv6.conf.all.forwarding=1
-		dmesg|grep "BUG: soft lockup" && { result=1; rlFail "failed:soft lockup occur"; }
-		#dmesg -C;dmesg -c
-		time sysctl -w net.ipv6.conf.all.forwarding=0
-		dmesg|grep "BUG: soft lockup" && { result=1; rlFail "failed:soft lockup occur"; }
-
-		ip link del vf0.100
-		sriov_remove_vfs $nic_test 0
-
-		sync_set server test_bz1483396_end
-		fi
-
-	return $result
-}
-
 sriov_test_vmvf_multicast()
 {
 	log_header "VMVF multicast" $result_file
@@ -10166,7 +5312,7 @@ sriov_test_vmvf_multicast()
 				{ip link show \$NIC_TEST}
 				{ip addr show \$NIC_TEST}
 				{cp -u /mnt/tests/kernel/networking/common/src/mtools/join_group.c ./}
-								{gcc -o /usr/local/bin/join_group join_group.c}
+				{gcc -o /usr/local/bin/join_group join_group.c}
 				{join_group -f 4 -g 224.10.10.10 -i \$NIC_TEST \&}
 				{ip maddr sh \$NIC_TEST \| grep 224.10.10.10}
 				{ip maddr sh \$NIC_TEST \| grep 01:00:5e:0a:0a:0a}
@@ -10324,26 +5470,26 @@ sriov_test_vmvf_reg_ureg_multicast_addr()
 #
 #topo of sriov_test_vmpf_vmvf_remote
 #+------------------------------------------+
-#|										  |
-#|   +--------+		+--------+		   |
-#|   |  VM1   |		|  VM2   |		   |
-#|   +--------+		+--------+		   |
-#|	   |virtual		   |			   |
-#|	   |port			  |			   |
-#|   +--------+			 |			   |
-#|   | bridge |			 |			   |
-#|   | virbr1 |			 |			   |
-#|   +--------+			 |			   |
-#|		  |			   |			   |
-#|		  |			   |			   |
-#|		  +--PF--+----VF--+			   |
-#|				 |						|
-#|		   +---------+					|
-#|		   |bnx2x NIC|			 client |
+#|                                          |
+#|   +--------+        +--------+           |
+#|   |  VM1   |        |  VM2   |           |
+#|   +--------+        +--------+           |
+#|       |virtual           |               |
+#|       |port              |               |
+#|   +--------+             |               |
+#|   | bridge |             |               |
+#|   | virbr1 |             |               |
+#|   +--------+             |               |
+#|          |               |               |
+#|          |               |               |
+#|          +--PF--+----VF--+               |
+#|                 |                        |
+#|           +---------+                    |
+#|           |bnx2x NIC|             client |
 #+------------------------------------------+
-#				|
-#				|
-#			 server
+#                |
+#                |
+#             server
 
 sriov_test_vmpf_vmvf_remote()
 {
@@ -10430,179 +5576,6 @@ sriov_test_vmpf_vmvf_remote()
 	return $result
 }
 
-
-#topo of sriov_test_vmpfbond_vmvfbond_remote
-#+----------------------------------------------------+
-#|													|
-#|   +--------+		+--------+			  client |
-#|   |  VM1   |		|  VM2   |					 |
-#|   |		|		|vf bond |					 |
-#|   +--------+		+--------+					 |
-#|	   |virtual	   |	  |					  |
-#|	   |port		  |	  |					  |
-#|   +--------+		 |	  |					  |
-#|   | bridge |	   vf|	  |vf					|
-#|   | virbr1 |		 |	  |					  |
-#|   +--------+		 |	  |					  |
-#|		  |		   |	  +-----------------+	|
-#|		  |   bond	|						|	|
-#|		  +-----------|-------------------+	|	|
-#|		   pf|		|				 pf|	|	|
-#|		   +-----------+			   +---------+  |
-#|		   |	 NIC   |			   |   NIC   |  |
-#+----------------------------------------------------+
-#				|
-#				|
-#			  server
-
-sriov_test_vmpfbond_vmvfbond_remote()
-{
-	log_header "VMPFBOND_VMVFBOND <---> REMOTE" $result_file
-
-	local result=0
-	local test_name=sriov_test_vmpfbond_vmvfbond_remote
-
-	local server_ip4="192.100.${ipaddr}.1"
-	local server_ip6="2021:db02:${ipaddr}::1"
-	local client1_ip4="192.100.${ipaddr}.2"
-	local client1_ip6="2021:db02:${ipaddr}::2"
-	local client2_ip4="192.100.${ipaddr}.3"
-	local client2_ip6="2021:db02:${ipaddr}::3"
-	local ip4_mask_len=24
-	local ip6_mask_len=64
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
-		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
-
-		sync_set client ${test_name}_start
-		sync_wait client ${test_name}_end
-
-		ip addr flush $nic_test
-	else
-		sync_wait server ${test_name}_start
-
-		OLD_NIC_NUM=$NIC_NUM
-		OLD_NIC_DRIVER=$NIC_DRIVER
-		OLD_NIC_MODEL=$NIC_MODEL
-		OLD_NIC_SPEED=$NIC_SPEED
-
-		local NIC_NUM=2
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
-		fi
-		if [ $? -ne 0 ];then
-			rlFail "$test_name get required_iface failed."
-			let result++
-		fi
-		iface1=$(echo $test_iface | awk '{print $1}')
-		iface2=$(echo $test_iface | awk '{print $2}')
-		rlLog "test_ifaces:$iface1,$iface2"
-
-		ip link set $iface1 up
-		ip link set $iface2 up
-		if ! sriov_create_vfs $iface1 0 2 || \
-			! sriov_create_vfs $iface2 0 2;then
-				let result++
-				rlFail "${test_name} failed: can't create vfs."
-		fi
-
-		modprobe -rv bonding
-		modprobe -v bonding mode=1 fail_over_mac=1 miimon=100 max_bonds=1
-		ip link set bond0 up
-		ifenslave bond0 $iface1 $iface2
-		#brctl addif virbr1 bond0
-		ip link set dev bond0 master virbr1
-		local cmd=(
-			{export NIC_TEST=\$\(ip link show \| grep $mac4vm1if2 -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-			{ip link set \$NIC_TEST up}
-			{ip addr flush \$NIC_TEST}
-			{ip addr add $client1_ip4/$ip4_mask_len dev \$NIC_TEST}
-			{ip addr add $client1_ip6/$ip6_mask_len dev \$NIC_TEST}
-			{ip link show \$NIC_TEST}
-			{ip addr show \$NIC_TEST}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
-		local mac2="00:de:ad:$(printf %02x $ipaddr):01:02"
-
-		ip link set $iface1 vf 0 trust on
-		ip link set $iface1 vf 0 spoofchk off
-		ip link set $iface2 vf 1 trust on
-		ip link set $iface2 vf 1 spoofchk off
-
-		if ! sriov_attach_vf_to_vm $iface1 0 1 $vm2 $mac1 || \
-			! sriov_attach_vf_to_vm $iface2 0 2 $vm2 $mac2;then
-				let result++
-				rlFail "${test_name} failed: can't attach vf to vm."
-		fi
-		vmsh run_cmd $vm2 "echo \$(ip link | grep $mac1 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface1"
-		vmsh run_cmd $vm2 "echo \$(ip link | grep $mac2 -B1 | head -n1 | awk '{print \$2}'	  | sed 's/://g') | tee /tmp/testiface2"
-		vmsh run_cmd $vm2 "ip link set \$(cat /tmp/testiface1) down"
-		vmsh run_cmd $vm2 "ip link set \$(cat /tmp/testiface2) down"
-
-		local cmd=(
-				{modprobe -r bonding}
-				{modprobe -v bonding mode=1 miimon=100 fail_over_mac=1 max_bonds=1}
-				{ip link set bond0 up}
-				{ifenslave bond0 \$\(cat /tmp/testiface1\)}
-				{ifenslave bond0 \$\(cat /tmp/testiface2\)}
-		)
-		vmsh cmd_set $vm2 "${cmd[*]}"
-		if [ $? -ne 0 ];then
-			{ rlFail "${test_name} failed: fail_over_mac=1, ifenslave failed";let result++; }
-		fi
-		local cmd=(
-			{ip addr add ${client2_ip4}/${ip4_mask_len} dev bond0}
-			{ip addr add ${client2_ip6}/${ip6_mask_len} dev bond0}
-			{ip addr show}
-		)
-		vmsh cmd_set $vm2 "${cmd[*]}"
-
-		do_vm_netperf $vm2 $server_ip4 $server_ip6 $result_file
-		result=$?
-		do_vm_netperf $vm1 $server_ip4 $server_ip6 $result_file
-		let result+=$?
-		#do_vm_netperf $vm1 ${client2_ip4} ${client2_ip6} $result_file
-		#let result+=$?
-
-		local cmd=(
-			{ip link del bond0}
-			{modprobe -r bonding}
-		)
-		vmsh cmd_set $vm2 "${cmd[*]}"
-		local cmd=(
-			{export NIC_TEST=\$\(ip link show \| grep $mac4vm1if2 -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-			{ip addr flush \$NIC_TEST}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-
-		sriov_detach_vf_from_vm $iface1 0 1 $vm2
-		sriov_detach_vf_from_vm $iface2 0 2 $vm2
-		sriov_remove_vfs $iface1 0
-		sriov_remove_vfs $iface2 0
-
-		#brctl delif virbr0 bond0
-		ip link set dev bond0 nomaster
-		modprobe -rv bonding
-
-		NIC_NUM=$OLD_NIC_NUM
-		NIC_DRIVER=$OLD_NIC_DRIVER
-		NIC_MODEL=$OLD_NIC_MODEL
-		NIC_SPEED=$OLD_NIC_SPEED
-
-		sync_set server ${test_name}_end
-	fi
-
-	return $result
-}
-
 sriov_test_attach_method_is_forward_hostdev()
 {
 	log_header "sriov_test_attach_method_is_forward_hostdev" $result_file
@@ -10638,7 +5611,7 @@ sriov_test_attach_method_is_forward_hostdev()
 		ip addr flush $nic_test
 	else
 		sync_wait server ${test_name}_start
-	modprobe vfio-pci
+		modprobe vfio-pci
 		if ! sriov_create_vfs $nic_test 0 2;then
 			let result++
 			rlFail "${test_name} failed: can't create vfs."
@@ -10864,15 +5837,15 @@ sriov_test_attach_method_is_forward_hostdev_vlan()
 			<network>
 				<name>forward_hostdev</name>
 				<forward mode='hostdev' managed='yes'>
-						<driver name='vfio'/>
-						<address type='pci' domain='0x$vf1_domain' bus='0x$vf1_bus' slot='0x$vf1_slot' function='0x$vf1_function'/>
-						<address type='pci' domain='0x$vf2_domain' bus='0x$vf2_bus' slot='0x$vf2_slot' function='0x$vf2_function'/>
+					<driver name='vfio'/>
+					<address type='pci' domain='0x$vf1_domain' bus='0x$vf1_bus' slot='0x$vf1_slot' function='0x$vf1_function'/>
+					<address type='pci' domain='0x$vf2_domain' bus='0x$vf2_bus' slot='0x$vf2_slot' function='0x$vf2_function'/>
 				</forward>
 			</network>
 		EOF
 		cat <<-EOF > vf1.xml
 			<interface type='network'>
-					<source network='forward_hostdev'/>
+				<source network='forward_hostdev'/>
 					<target dev='vf1'/>
 					<mac address='$mac1'/>
 					<vlan>
@@ -10882,7 +5855,7 @@ sriov_test_attach_method_is_forward_hostdev_vlan()
 		EOF
 		cat <<-EOF > vf2.xml
 			<interface type='network'>
-					<source network='forward_hostdev'/>
+				<source network='forward_hostdev'/>
 					<target dev='vf2'/>
 					<mac address='$mac2'/>
 					<vlan>
@@ -10898,6 +5871,8 @@ sriov_test_attach_method_is_forward_hostdev_vlan()
 			let result++
 			rlFail "${test_name} failed: can't attach vf to vm."
 		fi
+
+		sleep 10
 
 		local cmd=(
 			{export NIC_TEST=\$\(ip link show \| grep $mac1 -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -11010,15 +5985,15 @@ sriov_test_vmvf_max_tx_rate()
 
 	sriov_create_vfs $nic_test 0 2
 
-		#ensure netserver is running
-		local cmd=(
-			{iptables -F}
-			{ip6tables -F}
-			{systemctl stop firewalld}
-			{pkill netserver\; sleep 2\; netserver}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		vmsh cmd_set $vm2 "${cmd[*]}"
+	#ensure netserver is running
+	local cmd=(
+		{iptables -F}
+		{ip6tables -F}
+		{systemctl stop firewalld}
+		{pkill netserver\; sleep 2\; netserver}
+	)
+	vmsh cmd_set $vm1 "${cmd[*]}"
+	vmsh cmd_set $vm2 "${cmd[*]}"
 
 	# setup vmvf1
 	if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac1; then
@@ -11064,22 +6039,22 @@ sriov_test_vmvf_max_tx_rate()
 	local vm2_ipv6_thpt=$(vm_netperf_ipv6 $vm2 2021:db8:${ipaddr}::1)
 	rlLog "$vm1_ipv4_thpt $vm1_ipv6_thpt $vm2_ipv4_thpt $vm2_ipv6_thpt"
 
-		if (($(bc <<< "$vm1_ipv4_thpt>$(bc <<< \"$vm1_max_tx_rate*1.1\")"))); then
+	if (($(bc <<< "$vm1_ipv4_thpt>$(bc <<< \"$vm1_max_tx_rate*1.1\")"))); then
 			((result+=1))
 			rlFail "vm1_ipv4_thpt($vm1_ipv4_thpt) exceed max_rate"
-		fi
-		if (($(bc <<< "$vm1_ipv6_thpt>$(bc <<< \"$vm1_max_tx_rate*1.1\")"))); then
+	fi
+	if (($(bc <<< "$vm1_ipv6_thpt>$(bc <<< \"$vm1_max_tx_rate*1.1\")"))); then
 			((result+=1))
 			rlFail "vm1_ipv6_thpt($vm1_ipv6_thpt) exceed max_rate"
-		fi
-		if (($(bc <<< "$vm2_ipv4_thpt>$(bc <<< \"$vm2_max_tx_rate*1.1\")"))); then
+	fi
+	if (($(bc <<< "$vm2_ipv4_thpt>$(bc <<< \"$vm2_max_tx_rate*1.1\")"))); then
 			((result+=1))
 			rlFail "vm2_ipv4_thpt($vm2_ipv4_thpt) exceed max_rate"
-		fi
-		if (($(bc <<< "$vm2_ipv6_thpt>$(bc <<< \"$vm2_max_tx_rate*1.1\")"))); then
+	fi
+	if (($(bc <<< "$vm2_ipv6_thpt>$(bc <<< \"$vm2_max_tx_rate*1.1\")"))); then
 			((result+=1))
 			rlFail "vm2_ipv6_thpt($vm2_ipv6_thpt) exceed max_rate"
-		fi
+	fi
 
 	# clearnup
 	sriov_detach_vf_from_vm $nic_test 0 1 $vm1
@@ -11088,6 +6063,117 @@ sriov_test_vmvf_max_tx_rate()
 	sriov_remove_vfs $nic_test 0
 
 	sync_set server test_vmvf_max_tx_rate_end
+
+	return $result
+}
+
+sriov_test_vmvf_min_tx_rate()
+{
+	log_header "VMVF min_tx_rate" $result_file
+	local result=0
+
+	if i_am_server; then
+		ip link set $nic_test up
+		ip addr add 172.30.${ipaddr}.1/24 dev $nic_test
+		ip addr add 2021:db8:${ipaddr}::1/64 dev $nic_test
+		sync_set client test_vmvf_min_tx_rate_start
+		sync_wait client test_vmvf_min_tx_rate_end
+		ip addr flush $nic_test
+		return 0
+	fi
+
+	sync_wait server test_vmvf_min_tx_rate_start
+
+	local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
+	local mac2="00:de:ad:$(printf %02x $ipaddr):02:01"
+
+	sriov_create_vfs $nic_test 0 2
+
+	#ensure netserver is running
+	local cmd=(
+			{iptables -F}
+			{ip6tables -F}
+			{systemctl stop firewalld}
+			{pkill netserver\; sleep 2\; netserver}
+	)
+	vmsh cmd_set $vm1 "${cmd[*]}"
+	vmsh cmd_set $vm2 "${cmd[*]}"
+
+	# setup vmvf1
+	if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac1; then
+		result=1
+	fi
+
+	local cmd=(
+		{export NIC_TEST=\$\(ip link show \| grep $mac1 -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+		{ip link set \$NIC_TEST up}
+		{ip addr flush \$NIC_TEST}
+		{ip addr add 172.30.${ipaddr}.11/24 dev \$NIC_TEST}
+		{ip addr add 2021:db8:${ipaddr}::11/64 dev \$NIC_TEST}
+		{ip link show \$NIC_TEST}
+		{ip addr show \$NIC_TEST}
+	)
+	vmsh cmd_set $vm1 "${cmd[*]}"
+
+	# setup vm2vf2
+	if ! sriov_attach_vf_to_vm $nic_test 0 2 $vm2 $mac2; then
+		result=1
+	fi
+
+	local cmd=(
+		{export NIC_TEST=\$\(ip link show \| grep $mac2 -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+		{ip link set \$NIC_TEST up}
+		{ip addr flush \$NIC_TEST}
+		{ip addr add 172.30.${ipaddr}.21/24 dev \$NIC_TEST}
+		{ip addr add 2021:db8:${ipaddr}::21/64 dev \$NIC_TEST}
+		{ip link show \$NIC_TEST}
+		{ip addr show \$NIC_TEST}
+	)
+	vmsh cmd_set $vm2 "${cmd[*]}"
+
+	#verification that min_rate should be < max_rate
+	rlRun "ip link set $nic_test vf 0 min_tx_rate 500 max_tx_rate 400" "1 255"
+	dmesg | tail -10
+
+	local vm1_max_tx_rate=400
+	local vm2_max_tx_rate=500
+	local vm1_min_tx_rate=200
+	local vm2_min_tx_rate=300
+
+	rlRun "ip link set $nic_test vf 0 max_tx_rate $vm1_max_tx_rate min_tx_rate $vm1_min_tx_rate"
+	rlRun "ip link set $nic_test vf 1 max_tx_rate $vm2_max_tx_rate min_tx_rate $vm2_min_tx_rate"
+
+	# test
+	local vm1_ipv4_thpt=$(vm_netperf_ipv4 $vm1 172.30.${ipaddr}.1)
+	local vm2_ipv4_thpt=$(vm_netperf_ipv4 $vm2 172.30.${ipaddr}.1)
+	local vm1_ipv6_thpt=$(vm_netperf_ipv6 $vm1 2021:db8:${ipaddr}::1)
+	local vm2_ipv6_thpt=$(vm_netperf_ipv6 $vm2 2021:db8:${ipaddr}::1)
+	rlLog "$vm1_ipv4_thpt $vm1_ipv6_thpt $vm2_ipv4_thpt $vm2_ipv6_thpt"
+
+	if (($(bc <<< "$vm1_ipv4_thpt<$(bc <<< \"$vm1_min_tx_rate\")"))); then
+			((result+=1))
+			rlFail "vm1_ipv4_thpt($vm1_ipv4_thpt) failed to reach min_rate"
+	fi
+	if (($(bc <<< "$vm1_ipv6_thpt<$(bc <<< \"$vm1_min_tx_rate\")"))); then
+			((result+=1))
+			rlFail "vm1_ipv6_thpt($vm1_ipv6_thpt) failed to reach min_rate"
+	fi
+	if (($(bc <<< "$vm2_ipv4_thpt<$(bc <<< \"$vm2_min_tx_rate\")"))); then
+			((result+=1))
+			rlFail "vm2_ipv4_thpt($vm2_ipv4_thpt) failed to reach min_rate"
+	fi
+	if (($(bc <<< "$vm2_ipv6_thpt<$(bc <<< \"$vm2_min_tx_rate*1.1\")"))); then
+			((result+=1))
+			rlFail "vm2_ipv6_thpt($vm2_ipv6_thpt) failed to reach min_rate"
+	fi
+
+	# clearnup
+	sriov_detach_vf_from_vm $nic_test 0 1 $vm1
+	sriov_detach_vf_from_vm $nic_test 0 2 $vm2
+
+	sriov_remove_vfs $nic_test 0
+
+	sync_set server test_vmvf_min_tx_rate_end
 
 	return $result
 }
@@ -11146,54 +6232,54 @@ sriov_test_vmpf_remote()
 
 sriov_test_create_remove_vfs_memoryleak()
 {
-		log_header "create_remove_vfs_memoryleak" $result_file
+	log_header "create_remove_vfs_memoryleak" $result_file
 
-		local result=0
+	local result=0
 
-		ip link set $nic_test up
+	ip link set $nic_test up
 
-		if i_am_server; then
-			sync_set client test_create_remove_vfs_memoryleak_start
-			sync_wait client test_create_remove_vfs_memoryleak_end
-		else
-			sync_wait server test_create_remove_vfs_memoryleak_start
+	if i_am_server; then
+		sync_set client test_create_remove_vfs_memoryleak_start
+		sync_wait client test_create_remove_vfs_memoryleak_end
+	else
+		sync_wait server test_create_remove_vfs_memoryleak_start
 
-			local total_vfs=$(sriov_get_max_vf_from_pf ${nic_test} 0)
-			local MON_FILE=./memory_monitor_$(uname -n)
+		local total_vfs=$(sriov_get_max_vf_from_pf ${nic_test} 0)
+		local MON_FILE=./memory_monitor_$(uname -n)
 
-			local available_mem_before=$(free|grep Mem:|awk '{print $NF}')
-			date "+%Y-%m-%d %H:%M:%S" > $MON_FILE
-			echo $available_mem_before >> $MON_FILE
-			for i in `seq 0 100`;do
-				rlLog "test$i"
-					echo $total_vfs > /sys/bus/pci/devices/$pf_bus_info/sriov_numvfs
-					sleep 1
-					echo 0 > /sys/bus/pci/devices/$pf_bus_info/sriov_numvfs
-					sleep 1
-					if (( $i % 10 == 0 ));then
-						cat /proc/slabinfo >> $MON_FILE
-					fi
-			done
-			sleep 5
-			local available_mem_after=$(free|grep Mem:|awk '{print $NF}')
-			echo $available_mem_after >> $MON_FILE
-			date "+%Y-%m-%d %H:%M:%S" >> $MON_FILE
-			local mem_grow=$(bc <<< $available_mem_before-$available_mem_after)
-			echo "mem_grow is $mem_grow"
-			#if [ $mem_grow -gt 100000 ];then
-			#	result=1
-			#fi
-			sync_set server test_create_remove_vfs_memoryleak_end
-		fi
+		local available_mem_before=$(free|grep Mem:|awk '{print $NF}')
+		date "+%Y-%m-%d %H:%M:%S" > $MON_FILE
+		echo $available_mem_before >> $MON_FILE
+		for i in `seq 0 100`;do
+			rlLog "test$i"
+			echo $total_vfs > /sys/bus/pci/devices/$pf_bus_info/sriov_numvfs
+			sleep 1
+			echo 0 > /sys/bus/pci/devices/$pf_bus_info/sriov_numvfs
+			sleep 1
+			if (( $i % 10 == 0 ));then
+				cat /proc/slabinfo >> $MON_FILE
+			fi
+		done
+		sleep 5
+		local available_mem_after=$(free|grep Mem:|awk '{print $NF}')
+		echo $available_mem_after >> $MON_FILE
+		date "+%Y-%m-%d %H:%M:%S" >> $MON_FILE
+		local mem_grow=$(bc <<< $available_mem_before-$available_mem_after)
+		echo "mem_grow is $mem_grow"
+		#if [ $mem_grow -gt 100000 ];then
+		#	result=1
+		#fi
+		sync_set server test_create_remove_vfs_memoryleak_end
+	fi
 
-		return $result
+	return $result
 }
 
 sriov_test_vmvf_testpmd_macswap()
 {
-		log_header "sriov_test_vmvf_testpmd_macswap" $result_file
+	log_header "sriov_test_vmvf_testpmd_macswap" $result_file
 	local test_name="sriov_test_vmvf_testpmd_macswap"
-		local result=0
+	local result=0
 	#pktgen dst mac
 	local vf_mac="02:01:01:01:01:01"
 	#pktgen src mac
@@ -11242,8 +6328,8 @@ sriov_test_vmvf_testpmd_macswap()
 				virsh net-start default
 				virsh net-autostart default
 		fi
-#	ip link show | grep virbr0 || ip link add name virbr0 type bridge
-#	ip link set virbr0 up
+#    ip link show | grep virbr0 || ip link add name virbr0 type bridge
+#    ip link set virbr0 up
 
 		ip link show | grep virbr1 || ip link add name virbr1 type bridge
 		ip link set virbr1 up
@@ -11252,12 +6338,12 @@ sriov_test_vmvf_testpmd_macswap()
 		local vmname=vm_testpmd
 		rlLog "Download guest image..."
 		pushd "/var/lib/libvirt/images/" 1>/dev/null
-		[ -e $(basename $IMG_GUEST) ] ||  wget -nv -N $IMG_GUEST
+		[ -e $(basename $IMG_GUEST) ] ||  wget -nv -N -c -t 3 $IMG_GUEST
 		chmod -R 777 $(basename $IMG_GUEST)
 		cp --remove-destination $(basename $IMG_GUEST) ${vmname}.qcow2
 		if [ "$SYS_ARCH" == "aarch" ];then
 			[ -z "$IMG_FD" ] && IMG_FD=`echo $IMG_GUEST | sed 's/.qcow2/_VARS.fd/g'`
-			[ -e $(basename $IMG_FD) ] || wget -nv -N $IMG_FD
+			[ -e $(basename $IMG_FD) ] || wget -nv -N -c -t 3 $IMG_FD
 			chmod -R 777 $(basename $IMG_FD)
 			cp --remove-destination $(basename $IMG_FD) ${vmname}.fd
 		fi
@@ -11294,7 +6380,7 @@ sriov_test_vmvf_testpmd_macswap()
 						--memorybacking hugepages=yes,size=1,unit=G \
 						--disk path=/var/lib/libvirt/images/${vmname}.qcow2,device=disk,bus=virtio,format=qcow2 \
 						--network bridge=virbr0,model=virtio \
-						--boot hd \
+						--import --boot hd \
 						--accelerate \
 						--force \
 						--graphics none \
@@ -11325,7 +6411,7 @@ sriov_test_vmvf_testpmd_macswap()
 				{yum install -y bzip2}
 				{yum install -y wget}
 				{yum -y install wget unzip tcpdump automake gcc make}
-				{wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2}
+				{wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2}
 				{tar xf $(basename http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2)}
 				{pushd netperf-*/}
 				{./autogen.sh}
@@ -11477,113 +6563,6 @@ sriov_test_vf_creation()
 	return $result
 }
 
-sriov_test_vf_vlan_negative()
-{
-
-	#vlan negative testing, like setting vlan -1/0/4096
-	#reproducer for bz1859477, run the command with the VF netdev, should just fail without a kernel panic
-	local result=0
-	local vid="-1 0 4096"
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-
-		sync_set client test_vf_vlan_neg_start
-		sync_wait client test_vf_vlan_neg_end
-
-	else
-		sync_wait server test_vf_vlan_neg_start
-
-		if ! sriov_create_vfs $nic_test 0 2; then
-			sync_set server test_vf_vlan_neg_end
-			return 1
-		fi
-
-		local vf=$(sriov_get_vf_iface $nic_test 0 1)
-		if [ -z "$vf" ]; then
-			rlFail "FAIL to get VF interface"
-			result=1
-		else
-			ethtool -i $vf
-
-			if sriov_vfmac_is_zero $nic_test 0 1; then
-				ip link set $nic_test vf 0 mac 00:de:ad:$(printf %02x ${ipaddr}):01:01
-				ip link set $vf down
-				sleep 2
-			fi
-
-			ip link set $vf up
-			sleep 5
-			for i in $vid;
-			do
-				rlRun "ip link set dev $nic_test vf 0 vlan $i" "0-255"
-				sleep 2
-				ip link show dev $nic_test
-			done
-
-			rlLog "reproducer for bz1859477, run the command with the VF netdev, should just fail without a kernel panic"
-			rlRun "ip link set dev $vf vf 0 vlan 3" "1-255"
-
-		fi
-
-		sriov_remove_vfs $nic_test 0
-
-		sync_set server test_vf_vlan_neg_end
-	fi
-
-	return $result
-}
-
-sriov_test_vf_pf_speed_consistency()
-{
-	#reproducer for 1844598, vf speed and pf speed should be consistent
-	local result=0
-	ip link set $nic_test up
-
-	if i_am_server; then
-
-		sync_set client test_vf_pf_speed_start
-		sync_wait client test_vf_pf_speed_end
-
-	else
-		sync_wait server test_vf_pf_speed_start
-
-		if ! sriov_create_vfs $nic_test 0 2; then
-			sync_set server test_vf_pf_speed_end
-			return 1
-		fi
-
-		local vf=$(sriov_get_vf_iface $nic_test 0 1)
-		if [ -z "$vf" ]; then
-			rlFail "FAIL to get VF interface"
-			result=1
-		else
-			ethtool -i $vf
-
-			if sriov_vfmac_is_zero $nic_test 0 1; then
-				ip link set $nic_test vf 0 mac 00:de:ad:$(printf %02x ${ipaddr}):01:01
-				ip link set $vf down
-				sleep 2
-			fi
-
-			ip link set $vf up
-			sleep 5
-			pf_speed=`ethtool $nic_test | grep -i 'speed' | grep -o '[0-9]\+'`
-			rlLog "pf speed is $pf_speed"
-			vf_speed=`ethtool $vf | grep -i 'speed' | grep -o '[0-9]\+'`
-			rlLog "vf speed is $vf_speed"
-			[ x"$pf_speed" != x"$vf_speed" ] && result=1
-
-		fi
-
-		sriov_remove_vfs $nic_test 0
-		sync_set server test_vf_pf_speed_end
-	fi
-
-	return $result
-}
-
 sriov_test_vf_remote_jumbo_switchdev()
 {
 	log_header "VF <---> REMOTE" $result_file
@@ -11605,12 +6584,12 @@ sriov_test_vf_remote_jumbo_switchdev()
 		ip link set mtu 1500 dev $nic_test
 	else
 		#sync_wait server test_vf_remote_switchdev_start
-		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
+		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family)
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]] || [[ "$NIC_DRIVER" == "ice" ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
-						ip link set hostbr0 up
+			ip link set hostbr0 up
 			if [[ "$NIC_DRIVER" == "ice" ]];then
 				ip link set $nic_test master hostbr0
 			fi
@@ -11710,12 +6689,12 @@ sriov_test_vmvf_remote_switchdev()
 		ip addr flush $nic_test
 	else
 		#sync_wait server test_vmvf_remote_switchdev_start
-		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
+		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family)
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]] || [[ "$NIC_DRIVER" == "ice" ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
-						ip link set hostbr0 up
+			ip link set hostbr0 up
 			if [[ "$NIC_DRIVER" == "ice" ]];then
 				ip link set $nic_test master hostbr0
 			fi
@@ -11816,12 +6795,12 @@ sriov_test_vmvf_remote_jumbo_switchdev()
 		ip link set mtu 1500 dev $nic_test
 	else
 		#sync_wait server test_vmvf_remote_jumbo_switchdev_start
-		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
+		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family)
+		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]] || [[ "$NIC_DRIVER" == "ice" ]];then
 			switchdev_setup_nfp
 			switchdev_setup_ice
 			ip link add name hostbr0 type bridge
-						ip link set hostbr0 up
+			ip link set hostbr0 up
 			if [[ "$NIC_DRIVER" == "ice" ]];then
 				ip link set $nic_test master hostbr0
 			fi
@@ -11906,517 +6885,6 @@ sriov_test_vmvf_remote_jumbo_switchdev()
 			sync_set server test_vmvf_remote_jumbo_switchdev_end
 			nic_test=$(get_required_iface)
 			ip link set mtu 1500 dev $nic_test
-		fi
-	fi
-
-	return $result
-}
-sriov_test_switchdev_bz1870593()
-{
-	log_header "bz1870593" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-
-		sync_set client test_switchdev_1870593_start
-		sync_wait client test_switchdev_1870593_end
-
-		ip addr flush $nic_test
-	else
-		#sync_wait server test_switchdev_1870593_start
-		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
-			switchdev_setup_nfp
-			switchdev_setup_ice
-			ip link add name hostbr0 type bridge
-						ip link set hostbr0 up
-			if [[ "$NIC_DRIVER" == "ice" ]];then
-				ip link set $nic_test master hostbr0
-			fi
-			sync_wait server test_switchdev_1870593_start
-
-			if ! sriov_create_vfs $nic_test 0 1; then
-				sync_set server test_switchdev_1870593_end
-				return 1
-			fi
-
-			switchdev_setup_mlx
-			#workaround for bz1877274
-			nic_test=$(get_required_iface)
-
-			#check the vm state, re-start it if not running
-			g1_state=$(virsh list --all | grep g1 | awk '{print $3}')
-			if [ x"$g1_state" != x"running" ]
-			then
-				virsh start g1
-				sleep 10
-			fi
-
-			local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-			local vf=$(sriov_get_vf_iface $nic_test 0 1)
-			local reps=$(switchdev_get_reps $nic_test)
-			if [ -z "$reps" ]; then
-				rlFail "FAILED to get representor"
-				result=1
-			else
-				ip link set $nic_test master hostbr0
-				rlLog "rep list $reps"
-				for rep in $reps
-				do
-					ip link show $rep
-					ip link set $rep up
-					ip link set $rep master hostbr0
-					rlRun "nmcli device set $rep managed no"
-				done
-				ip link set $vf up
-				sleep 5
-				ip link show
-			fi
-
-			if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
-				result=1
-			else
-				local cmd=(
-					{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-					{ip link set \$NIC_TEST up}
-					{ip addr flush \$NIC_TEST}
-					{ip addr add 172.30.${ipaddr}.11/24 dev \$NIC_TEST}
-					{ip addr add 2021:db8:${ipaddr}::11/64 dev \$NIC_TEST}
-					{ip link show \$NIC_TEST}
-					{ip addr show \$NIC_TEST}
-				)
-				vmsh cmd_set $vm1 "${cmd[*]}"
-
-				#check the packet stats before running netperf
-				rlLog "rep list $reps"
-				for rep in $reps
-				do
-					rlRun "ip -s link show $rep "
-					count_link1_before=`ip -s link show $rep | awk  'NR==4' | awk '{print $2}'`
-				done
-				vmsh run_cmd $vm1 "timeout 40s bash -c \"until ping -c10 172.30.${ipaddr}.2; do sleep 5; done\""
-				result=$?
-				for rep in $reps
-				do
-					rlRun "ip -s link show $rep"
-					count_link1_after=`ip -s link show $rep | awk  'NR==4' | awk '{print $2}'`
-				done
-				rlAssertGreater "packets_after lager than packets_before" $count_link1_after $count_link1_before
-
-			fi
-
-			#clean up
-			sriov_detach_vf_from_vm $nic_test 0 1 $vm1
-			switchdev_cleanup_mlx
-			#workaround for bz1877274
-			nic_test=$(get_required_iface)
-			sriov_remove_vfs $nic_test 0
-			switchdev_cleanup_ice
-			ip link del hostbr0
-
-			sync_set server test_switchdev_1870593_end
-		else
-			sync_wait server test_switchdev_1870593_start
-			sync_set server test_switchdev_1870593_end
-		fi
-	fi
-
-	return $result
-}
-
-sriov_test_vf_not_created_bz1875338()
-{
-	log_header "1875338" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-
-		sync_set client test_1875338_start 30000
-		sync_wait client test_1875338_end 30000
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_1875338_start 30000
-		local vf_num=5
-		for ((i=0; i<1000; i++)); do
-			sleep 1
-			rlLog "--- test $i ---"
-			echo 0 > /sys/class/net/$nic_test/device/sriov_numvfs
-			echo $vf_num > /sys/class/net/$nic_test/device/sriov_numvfs
-			rlRun "vfs_virtfn=$(ls /sys/class/net/$nic_test/device/ | grep virtfn | wc -l)"
-			if [[ $vfs_virtfn != "${vf_num}" ]]; then
-				rlFail "FAIL to create VF func"
-				ls /sys/class/net/$nic_test/device/
-				echo 0 > /sys/class/net/$nic_test/device/sriov_numvfs
-				sync_set server test_1875338_end 30000
-				return 1
-			fi
-			rlRun "VFS=$(ip link show ${nic_test} 2>/dev/null | grep "vf" | wc -l)"
-			if [[ $VFS != "${vf_num}" ]]; then
-				ip link show dev $nic_test
-				ls /sys/class/net/$nic_test/device/
-				rlFail "FAIL to create VFs"
-				echo 0 > /sys/class/net/$nic_test/device/sriov_numvfs
-				sync_set server test_1875338_end 30000
-				result=1
-				return 1
-			fi
-		done
-		sriov_remove_vfs $nic_test 0
-		sync_set server test_1875338_end 30000
-	fi
-	return $result
-}
-
-sriov_test_vf_iface_not_created()
-{
-	log_header "vf_iface_not_created" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-
-		sync_set client test_vf_iface_not_created_start 30000
-		sync_wait client test_vf_iface_not_created_end 30000
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_vf_iface_not_created_start 30000
-		#get vf interface pattern
-		echo 1 > /sys/class/net/$nic_test/device/sriov_numvfs
-		vf=$(sriov_get_vf_iface $nic_test 0 1)
-		vf_if_pattern=${vf%*${vf:(-1)}}
-		echo 0 > /sys/class/net/$nic_test/device/sriov_numvfs
-		#begin to test
-		local vf_num=5
-		for ((i=0; i<1000; i++)); do
-			sleep 1
-			rlLog "--- test $i ---"
-			echo 0 > /sys/class/net/$nic_test/device/sriov_numvfs
-			echo $vf_num > /sys/class/net/$nic_test/device/sriov_numvfs
-			rlRun "vfs_virtfn=$(ls /sys/class/net/$nic_test/device/ | grep virtfn | wc -l)"
-			if [[ $vfs_virtfn != "${vf_num}" ]]; then
-				rlFail "FAIL to create VF func"
-				ls /sys/class/net/$nic_test/device/
-				echo 0 > /sys/class/net/$nic_test/device/sriov_numvfs
-				sync_set server test_vf_iface_not_created_end 30000
-				return 1
-			fi
-			rlRun "VF_IFACES=$(ip link show  2>/dev/null | grep ${vf_if_pattern}  | wc -l)"
-			if [[ $VF_IFACES != "${vf_num}" ]]; then
-				sleep 5
-				ip link show
-				ls /sys/class/net/$nic_test/device/
-				rlRun "VF_IFACES=$(ip link show  2>/dev/null | grep ${vf_if_pattern}  | wc -l)"
-				if [[ $VF_IFACES != "${vf_num}" ]]; then
-					ls /sys/class/net/$nic_test/device/
-					ip link show
-					echo "sleep 5 and check the iface again"
-					sleep 5
-					ip link show
-					rlFail "FAIL to get VF interface"
-					echo 0 > /sys/class/net/$nic_test/device/sriov_numvfs
-					sync_set server test_vf_iface_not_created_end 30000
-					result=1
-					return 1
-				fi
-			fi
-		done
-		sriov_remove_vfs $nic_test 0
-		sync_set server test_vf_iface_not_created_end 30000
-	fi
-	return $result
-}
-
-#reproducer for bz1842896
-sriov_test_vmvf_hibernation()
-{
-	log_header "sriov_test_vmvf_hibernation" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-
-		sync_set client test_vmvf_hibernation_start
-		sync_wait client test_vmvf_hibernation_end
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_vmvf_hibernation_start
-		local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-
-		if ! sriov_create_vfs $nic_test 0 2; then
-			sync_set server test_vmvf_hibernation_end
-			return 1
-		fi
-# need use pre-define to test this case. here is the refer to https://bugzilla.redhat.com/show_bug.cgi?id=2024503#c16
-#- the root cause is that the management of the device was not passed to the vfio-pci driver (the unbind on iavf and bind to vfio-pci was not performed on host); I compared the dmesg outputs of persistent configuration in the domain XML vs hot-plugging.
-#- vfio-pci did not enable the pci device for the virtual machine;
-#
-#Probably the device even though setup as managed='yes' in the xml file will/might not be handled properly by libvirt because the interface was hot-plugged and in the documentation (https://libvirt.org/html/libvirt-libvirt-domain.html) is stated:
-#
-#"Be aware that hotplug changes might not persist across a domain going into S4 state (also known as hibernation) unless you also modify the persistent domain definition."
-#
-#Which means that the device should be defined in the domain XML in order to be restored properly by the libvirt.
-#
-#So the VF interface is still managed by the host and not by the VM because the libvirt failed to enable it for the VM.
-		local vf_interface=$(sriov_get_vf_iface $nic_test 0 1)
-		local vf_businfo=$(ethtool -i $vf_interface | sed -n '/bus-info: / s/bus-info: //p')
-		which virt-xml || yum install -y virt-install
-		virt-xml $vm1 --add-device --hostdev $vf_businfo --print-diff
-		virt-xml $vm1 --add-device --hostdev $vf_businfo
-		virsh shutdown $vm1
-		sleep 60
-		virsh start $vm1
-		sleep 60
-		local cmd=(
-			{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-			{ip link set \$NIC_TEST up}
-			{ip link show \$NIC_TEST}
-			{rm -rf \/var\/crash/\*}
-			{systemctl hibernate}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if virsh list --all | grep $vm1 | grep -v "running"; then
-			rlRun "virsh start $vm1"
-		fi
-		rlRun "virsh list --all"
-		# check no vmcore file on guest
-		local cmd=(
-			{export vmcore=\$\(ls \/var\/crash \| wc -l\)}
-			{test 0 = \$vmcore}
-		)
-		vmsh cmd_set $vm1 "${cmd[*]}"
-		if [ $? != 0 ]; then
-			rlFail "vmcore file on guest, please check it!!!"
-		else
-			rlLog "no vmcore file on guest"
-		fi
-		virt-xml $vm1 --remove-device --hostdev $vf_businfo --print-diff
-		virt-xml $vm1 --remove-device --hostdev $vf_businfo
-		virsh shutdown $vm1
-		sleep 60
-		virsh start $vm1
-		sleep 60
-		sriov_remove_vfs $nic_test 0
-
-		sync_set server test_vmvf_hibernation_end
-	fi
-	return $result
-}
-
-sriov_test_vf_mac_switchdev_bz1814350()
-{
-	log_header "VF MAC <---> REMOTE" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-
-		sync_set client test_vf_mac_remote_switchdev_start
-		sync_wait client test_vf_mac_remote_switchdev_end
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_vf_mac_remote_switchdev_start
-		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family' 'Intel-Ethernet_Controller_E810C_for_QSFP' 'Intel-Ethernet_Controller_E810C_for_SFP' 'Intel-Ethernet_Controller_E810C_for_backplane' 'Intel-Ethernet_Controller_E810XXV_for_SFP)
-		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
-			switchdev_setup_ice
-			ip link add name hostbr0 type bridge
-						ip link set hostbr0 up
-			if [[ "$NIC_DRIVER" == "ice" ]];then
-				ip link set $nic_test master hostbr0
-			fi
-
-			if ! sriov_create_vfs $nic_test 0 1; then
-				sync_set server test_vf_mac_remote_switchdev_end
-				return 1
-			fi
-
-			local vf=$(sriov_get_vf_iface $nic_test 0 1)
-			local mac=00:de:ad:$(printf "%02x" $ipaddr):01:01
-			if [ -z "$vf" ]; then
-				rlFail "FAILED to get VF interface"
-				result=1
-			else
-				ethtool -i $vf
-				rlLog "setting the vf mac via ip link set $nic_test vf 0 mac $mac"
-				ip link set $nic_test vf 0 mac $mac
-				rlLog "checking the vf mac"
-				local mac_g="$(ip link show $nic_test | grep "vf 0" | awk '{ print $4 }')"
-				if [ "$mac_g" != "$mac" ]; then
-					rlFail "FAILED to change vf mac"
-					result=1
-				else
-					rlLog "change the sriov mode to switchdev"
-					switchdev_setup_mlx
-					#workaround for bz1877274
-					nic_test=$(get_required_iface)
-					ip link set $nic_test up
-					sleep 2
-					ip link show $nic_test
-
-					local reps=$(switchdev_get_reps $nic_test)
-					if [ -z "$reps" ]; then
-						rlFail "FAILED to get representor"
-						result=1
-					else
-						rlLog "checking the vf mac with switchdev mode"
-						local mac_g1="$(ip link show $nic_test | grep "vf 0" | awk '{ print $4 }')"
-						if [ "$mac_g1" != "$mac" ]; then
-							rlFail "FAILED: the vf mac reset after moving to switchdev mode"
-							result=1
-						else
-							rlLog "PASS: the vf mac does not reset after moving to switchdev mode"
-							ip link set $nic_test master hostbr0
-							rlLog "rep list $reps"
-							for rep in $reps
-							do
-								ip link show $rep
-								ip link set $rep up
-								ip link set $rep master hostbr0
-								rlRun "nmcli device set $rep managed no"
-							done
-							ip link set $vf up
-							sleep 5
-							ip link show
-							ip addr flush $vf
-							ip addr add 172.30.${ipaddr}.1/24 dev $vf
-							ip addr add 2021:db8:${ipaddr}::1/64 dev $vf
-							ip -d link show $vf
-							ip -d addr show $vf
-
-							do_host_netperf 172.30.${ipaddr}.2 2021:db8:${ipaddr}::2 $result_file
-							local result=$?
-
-							ip addr flush $vf
-						fi
-					fi
-				fi
-			fi
-
-			#clean up
-			switchdev_cleanup_mlx
-			#workaround for bz1877274
-			nic_test=$(get_required_iface)
-			sriov_remove_vfs $nic_test 0
-			switchdev_cleanup_ice
-			ip link del hostbr0
-
-			sync_set server test_vf_mac_remote_switchdev_end
-		else
-			sync_set server test_vf_mac_remote_switchdev_end
-		fi
-	fi
-
-	return $result
-}
-
-sriov_test_pf_steering_switchdev_bz1856660()
-{
-	log_header "PF STEERING <---> REMOTE" $result_file
-
-	local result=0
-
-	ip link set $nic_test up
-
-	if i_am_server; then
-		ip addr flush $nic_test
-		ip addr add 172.30.${ipaddr}.2/24 dev $nic_test
-		ip addr add 2021:db8:${ipaddr}::2/64 dev $nic_test
-
-		sync_set client test_pf_str_remote_switchdev_start
-		sync_wait client test_pf_str_remote_switchdev_end
-
-		ip addr flush $nic_test
-	else
-		sync_wait server test_pf_str_remote_switchdev_start
-		local SUPPORT_MODELS=(Mellanox-MT2892_Family' 'Mellanox-MT2894_Family' 'Mellanox-MT28800_Family' 'Mellanox-MT27800_Family)
-		if [[ "$SUPPORT_MODELS" =~ $NIC_MODEL ]];then
-			if ! sriov_create_vfs $nic_test 0 1; then
-				sync_set server test_pf_str_remote_switchdev_end
-				return 1
-			fi
-
-			local vf=$(sriov_get_vf_iface $nic_test 0 1)
-			local mac=00:de:ad:$(printf "%02x" $ipaddr):01:01
-			if [ -z "$vf" ]; then
-				rlFail "FAILED to get VF interface"
-				result=1
-			else
-				switchdev_setup_mlx
-				#workaround for bz1877274
-				nic_test=$(get_required_iface)
-
-				# add steering rules
-				ip link set $nic_test up
-				sleep 2
-				ip link show $nic_test
-				ip addr flush $nic_test
-				ip addr add 172.30.${ipaddr}.11/24 dev $nic_test
-				ping 172.30.${ipaddr}.2 -c 3
-				sleep 3
-				ethtool -L $nic_test combined 8
-				ethtool -X $nic_test equal 6
-				ethtool -U $nic_test flow-type ip4 src-ip 172.30.${ipaddr}.2 action 7 loc 1
-				ip addr show $nic_test
-				ethtool -u $nic_test
-				ethtool -S $nic_test | grep rx7_by
-				count1_before=`ethtool -S $nic_test | grep rx7_by | awk '{print $NF}'`
-				ping 172.30.${ipaddr}.2 -c 10
-				ethtool -S $nic_test | grep rx7_by
-				count1_after=`ethtool -S $nic_test | grep rx7_by | awk '{print $NF}'`
-				rlAssertGreater "packets_after lager than packets_before" $count1_after $count1_before
-
-				switchdev_cleanup_mlx
-				#workaround for bz1877274
-				nic_test=$(get_required_iface)
-
-				count2_before=`ethtool -S $nic_test | grep rx7_by | awk '{print $2}'`
-				ping 172.30.${ipaddr}.2 -c 10
-				count2_after=`ethtool -S $nic_test | grep rx7_by | awk '{print $2}'`
-				rlAssertEquals "packets_after should equal packets_before" $count2_after $count2_before
-
-			fi
-
-			sriov_remove_vfs $nic_test 0
-			delete_all_rules()
-			{
-				local dev=$1
-				local rule_sum=$(ethtool -u $dev | grep -e "Total [0-9]* rules" | awk '{print $2}')
-				if [ x"$rule_sum" == x"0" ];then
-					return 0
-				fi
-				local rule_ids=$(ethtool -u $dev | grep Filter | awk '{print $2}')
-				for rule in $rule_ids;do
-					ethtool -U $dev delete $rule
-				done
-				return 0
-			}
-
-			delete_all_rules $nic_test
-			ip addr flush $nic_test
-			sync_set server test_pf_str_remote_switchdev_end
-		else
-			sync_set server test_pf_str_remote_switchdev_end
 		fi
 	fi
 
@@ -12637,6 +7105,7 @@ sriov_test_cntvf_cntvf_jumbo()
 	fi
 
 	sync_wait server test_cntvf_cntvf_jumbo_start
+
 
 	sriov_create_vfs $nic_test 0 2
 	local mac1="00:de:ad:$(printf %02x $ipaddr):01:01"
@@ -12986,10 +7455,9 @@ sriov_test_podcntvf1_podcntvf2()
 	local mac1="00:de:a1:$(printf %02x $ipaddr):11:01"
 	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
 
-	if ! sriov_create_vfs $iface1 0 2 ||
-	   ! sriov_create_vfs $iface2 0 2; then
-	   	rlLog "${test_name} failed:create vfs failed."
-	   	sriov_remove_vfs $iface1 0
+	if ! sriov_create_vfs $iface1 0 2 || ! sriov_create_vfs $iface2 0 2; then
+		rlLog "${test_name} failed:create vfs failed."
+		sriov_remove_vfs $iface1 0
 		sriov_remove_vfs $iface2 0
 		sync_set server ${test_name}_end
 		return 1
@@ -13155,168 +7623,6 @@ sriov_test_podcntvf_remote()
 	return $result
 }
 
-#refer to bug https://bugzilla.redhat.com/show_bug.cgi?id=2088787
-sriov_test_podcnts_vfs_remote_bz2088787()
-{
-	log_header "POD_CNTVF1<---> REMOTE" $result_file
-
-	if i_am_server; then
-		ip link set $nic_test up
-		ip link add link ${nic_test} name ${nic_test}.5 type vlan id 5
-		ip link set $nic_test.5 up
-		ip addr add 172.30.${ipaddr}.1/24 dev $nic_test.5
-		ip addr add 2021:db8:${ipaddr}::1/64 dev $nic_test.5
-		rlRun "iperf3_install"
-		rlRun "iperf3 -s -p 50001 -V --logfile ./serverlog &"
-		sync_set client ${test_name}_start
-		sync_wait client ${test_name}_end
-		ip addr flush $nic_test.5
-		return 0
-	fi
-
-	sync_wait server test_podcntvf1_podcntvf2_start
-
-	OLD_NIC_NUM=$NIC_NUM
-	OLD_NIC_DRIVER=$NIC_DRIVER
-	OLD_NIC_MODEL=$NIC_MODEL
-	OLD_NIC_SPEED=$NIC_SPEED
-
-	local NIC_NUM=2
-	if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-		local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
-	else
-		local test_iface="$(get_test_nic ${NIC_NUM})"
-	fi
-	if [ $? -ne 0 ];then
-		echo "$test_name get required_iface failed."
-		sync_set server ${test_name}_end
-		return 1
-	fi
-	iface1=$(echo $test_iface | awk '{print $1}')
-	iface2=$(echo $test_iface | awk '{print $2}')
-	echo "test_ifaces:$iface1,$iface2"
-
-	local vid=3
-	local mac1="00:de:a1:$(printf %02x $ipaddr):11:01"
-	local mac2="00:de:a1:$(printf %02x $ipaddr):12:01"
-
-	if ! sriov_create_vfs $iface1 0 4 ||
-		! sriov_create_vfs $iface2 0 4; then
-		rlLog "${test_name} failed:create vfs failed."
-		sriov_remove_vfs $iface1 0
-		sriov_remove_vfs $iface2 0
-		sync_set server ${test_name}_end
-		return 1
-	fi
-	sriov_setup_pod_container
-
-	ip link set $iface1 up
-	ip link set $iface2 up
-	for i in `seq 1 4`
-	do
-		local pf1vf=$(sriov_get_vf_iface $iface1 0 $i)
-		ip link set $pf1vf up
-		sleep 2
-	done
-	local pf2vf1=$(sriov_get_vf_iface $iface2 0 1)
-	local pf2vf2=$(sriov_get_vf_iface $iface2 0 2)
-	ip link set $pf2vf1 up
-	ip link set $pf2vf2 up
-
-	ip link set ${iface2} vf 0 spoofchk off trust on
-	ip link set ${iface2} vf 1 spoofchk off trust on
-	ip link set ${iface2} vf 0 vlan 5
-	ip link set ${iface2} vf 1 vlan 5
-	ip link set ${iface1} vf 0 vlan 51
-	ip link set ${iface1} vf 0 spoofchk on trust off
-	ip link set ${iface1} vf 1 vlan 52
-	ip link set ${iface1} vf 1 spoofchk off trust on
-	ip link set ${iface1} vf 2 vlan 51
-	ip link set ${iface1} vf 2 spoofchk on trust off
-	ip link set ${iface1} vf 3 vlan 52
-	ip link set ${iface1} vf 3 spoofchk off trust on
-
-
-	if ! sriov_attach_vf_to_cnt $iface1 0 1 $container1; then
-		rlLog 'failed to attach vf to container1'
-		sriov_clean_pod_container
-		sync_set server ${test_name}_end
-		return 1
-	fi
-	if ! sriov_attach_vf_to_cnt $iface1 0 2 $container2; then
-		rlLog 'failed to attach vf to container2'
-		sriov_clean_pod_container
-		sync_set server ${test_name}_end
-		return 1
-	fi
-	if ! sriov_attach_vf_to_cnt $iface1 0 3 $container3; then
-		rlLog 'failed to attach vf to container3'
-		sriov_clean_pod_container
-		sync_set server ${test_name}_end
-		return 1
-	fi
-	if ! sriov_attach_vf_to_cnt $iface1 0 4 $container4; then
-		rlLog 'failed to attach vf to container4'
-		sriov_clean_pod_container
-		sync_set server ${test_name}_end
-		return 1
-	fi
-
-	if ! sriov_attach_vf_to_cnt $iface2 0 1 $container1; then
-		rlLog 'failed to attach vf to container1'
-		sriov_clean_pod_container
-		sync_set server ${test_name}_end
-		return 1
-	fi
-	if ! sriov_attach_vf_to_cnt $iface2 0 2 $container3; then
-		rlLog 'failed to attach vf to container3'
-		sriov_clean_pod_container
-		sync_set server ${test_name}_end
-		return 1
-	fi
-
-	# setup pod1 cntvf
-	local containerID1=$(podman ps | grep $container1 | awk '{print $1}')
-	local nsID1=$(podman inspect -f '{{.State.Pid}}' $containerID1)
-	ip netns exec $nsID1 ip addr flush $pf2vf1
-	ip netns exec $nsID1 ip addr add 172.30.${ipaddr}.11/24 dev $pf2vf1
-	ip netns exec $nsID1 ip addr add 2021:db8:${ipaddr}::11/64 dev $pf2vf1
-	podman exec $container1 ip link show $pf2vf1
-	podman exec $container1 ip addr show $pf2vf1
-
-	# setup pod2 cntvf
-	local containerID3=$(podman ps | grep $container3 | awk '{print $1}')
-	local nsID3=$(podman inspect -f '{{.State.Pid}}' $containerID3)
-	ip netns exec $nsID3 ip addr flush $pf2vf2
-	ip netns exec $nsID3 ip addr add 172.30.${ipaddr}.21/24 dev $pf2vf2
-	ip netns exec $nsID3 ip addr add 2021:db8:${ipaddr}::21/64 dev $pf2vf2
-	podman exec $container4 ip link show $pf2vf2
-	podman exec $container3 ip addr show $pf2vf2
-	# test
-	local result=0
-	rlRun "podman exec $container1 ping 172.30.${ipaddr}.1 -c 5"
-	rlRun "podman exec $container1 ping6 2021:db8:${ipaddr}::1 -c 5"
-	rlRun "podman exec $container3 ping 172.30.${ipaddr}.1 -c 5"
-	rlRun "podman exec $container3 ping6 2021:db8:${ipaddr}::1 -c 5"
-	rlRun "podman exec $container1 iperf3 -c 172.30.${ipaddr}.1 -p 50001"
-		rlRun "podman exec $container1 iperf3 -c 2021:db8:${ipaddr}::1 -p 50001"
-
-	# clearnup
-	sriov_clean_pod_container
-
-	sriov_remove_vfs $iface1 0
-	sriov_remove_vfs $iface2 0
-
-	NIC_NUM=$OLD_NIC_NUM
-	NIC_DRIVER=$OLD_NIC_DRIVER
-	NIC_MODEL=$OLD_NIC_MODEL
-	NIC_SPEED=$OLD_NIC_SPEED
-
-	sync_set server ${test_name}_end
-
-	return $result
-}
-
 sriov_test_vmvf_connectivity_remain()
 {
 	log_header "VF CON REMAIN <---> REMOTE" $result_file
@@ -13387,15 +7693,15 @@ sriov_test_vmvf_connectivity_remain()
 			ip link show | grep virbr1
 
 			pushd /var/lib/libvirt/images/
-			[ -e "$IMG_GUEST" ] || wget -nv -N $IMG_GUEST
+			[ -e "$IMG_GUEST" ] || wget -nv -N -c -t 3 $IMG_GUEST
 			cp --remove-destination $(basename $IMG_GUEST) $vm3.qcow2
 			popd
 
 			virsh net-define /usr/share/libvirt/networks/default.xml
 			virsh net-start default
 			virsh net-autostart default
-#	  ip link show | grep virbr0 || ip link add name virbr0 type bridge
-#	  ip link set virbr0 up
+#      ip link show | grep virbr0 || ip link add name virbr0 type bridge
+#      ip link set virbr0 up
 
 		ip link show | grep virbr1 || ip link add name virbr1 type bridge
 		ip link set virbr1 up
@@ -13406,7 +7712,7 @@ sriov_test_vmvf_connectivity_remain()
 			--disk path=/var/lib/libvirt/images/$vm3.qcow2,device=disk,bus=virtio,format=qcow2 \
 			--network bridge=virbr0,model=virtio \
 			--network bridge=virbr1,model=virtio \
-			--boot hd \
+			--import --boot hd \
 			--accelerate \
 			--force \
 			--graphics vnc,listen=0.0.0.0 \
@@ -13466,1641 +7772,11 @@ sriov_test_vmvf_connectivity_remain()
 		return $result
 }
 
-sriov_test_delete_vm_with_kernel_args()
+sriov_test_vlan_qinq_basic()
 {
-	# reproduce for bug https://bugzilla.redhat.com/show_bug.cgi?id=1835705
-	rlLog "Start sriov_test_delete_vm_with_kernel_args"
-	if i_am_server; then
-		sync_set client test_delete_vm_with_kernel_args_start 14400
-		sync_wait client test_delete_vm_with_kernel_args_end 14400
-		return 0
-	else
-		# install python environment
-		which python &>/dev/null || which python3 &>/dev/null || yum -y install python3
-		which python &>/dev/null || ln -s $(which python3) /usr/bin/python
-		which pip &>/dev/null || which pip3 &>/dev/null || yum install -y python3-pip
-		which pip &>/dev/null || ln -s $(which pip3) /usr/bin/pip
-		lsmod | grep vfio_pci || modprobe vfio_pci
-		# got isolate cpu expect cpu0 and cpu0's sibiling cores, but need nosmt effect after change grub file.
-		if [ "$SYS_ARCH" == "ppc64le" ];then
-			local numa=$(get_info.sh nic_numa_node $nic_test)
-			local isolate_cores=$(get_info.sh isolated_cores $numa)
-		else
-			local isolate_cores=$(get_cpu.py --bug_reproduce_1835705)
-		fi
-		if [ -f /tmp/reboot_num ] && [[ $(cat /tmp/reboot_num) == "1" ]]; then
-			if (grep "default_hugepagesz" /proc/cmdline &>/dev/null || \
-				grep "hugepagesz" /proc/cmdline &>/dev/null || \
-				grep "hugepages" /proc/cmdline &>/dev/null || \
-				grep "isolate_cores=${isolate_cores}" /proc/cmdline &>/dev/null)
-			then
-				rlLog "tunning success"
-				sync_wait server test_delete_vm_with_kernel_args_start 14400
-			else
-				rlFail "modify grub failed"
-				sync_set server test_delete_vm_with_kernel_args_end 14400
-			fi
-		else
-			if [ "$SYS_ARCH" == "ppc64le" ] && (! grep "default_hugepagesz" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz" /proc/cmdline &>/dev/null || \
-			! grep "hugepages" /proc/cmdline &>/dev/null)
-			then
-				setup_bootopts.sh \
-				--hugepagesz=2G \
-				--hugepages=12 \
-				--isolated_cores="$isolate_cores" \
-				--extra="intel_idle.max_cstate=0 processor.max_cstate=0 intel_pstate=disable" \
-				--tuned-profiles=cpu-partitioning
-				echo "1" > /tmp/reboot_num
-				rhts-reboot
-			elif [ "$SYS_ARCH" != "ppc64le" ] && [ ! -f /tmp/reboot_num ] && (\
-			! grep "default_hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=24" /proc/cmdline &>/dev/null || \
-			! grep "intel_iommu=on" /proc/cmdline &>/dev/null || \
-			! grep "iommu=pt" /proc/cmdline &>/dev/null || \
-			! grep "nosmt=force" /proc/cmdline &>/dev/null || \
-			! grep "isolate_cores=${isolate_cores}" /proc/cmdline &>/dev/null)
-			then
-				# set nosmt=force and default hugepage in host
-				grubby --args="default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt nosmt=force" --update-kernel=$(grubby --default-kernel)
-				isolate_cores=$(get_cpu.py --bug_reproduce_1835705)
-				rlLog "isolate core are ${isolate_cores}"
-				# do cpu tunning on host
-				if ! uname -r | grep rt; then
-					rpm -q tuned-profiles-cpu-partitioning || yum install -y tuned tuned-profiles-cpu-partitioning &>/dev/null
-					echo "isolated_cores=${isolate_cores}" > /etc/tuned/cpu-partitioning-variables.conf
-					tuned-adm profile cpu-partitioning || rlFail "enable cpu-partitioning profile failed"
-				elif uname -r | grep rt; then
-					rpm -q tuned-profiles-nfv || yum install -y tuned tuned-profiles-nfv &>/dev/null
-					echo "isolated_cores=${isolate_cores}" > /etc/tuned/realtime-virtual-host-variables.conf
-					echo "isolate_managed_irq=Y" >> /etc/tuned/realtime-virtual-host-variables.conf
-					tuned-adm profile realtime-virtual-host || rlFail "enable realtime-virtual-host failed"
-					systemctl disable irqbalance
-					systemctl stop irqbalance
-				fi
-				rlLog "finish cpu tuning"
-				# set reboot flag to tmp file
-				echo "1" > /tmp/reboot_num
-				rhts-reboot
-			fi
-		fi
-
-		# start test
-		if [ -f /tmp/reboot_num ] && [[ $(cat /tmp/reboot_num) == "1" ]]; then
-			ip link show | grep virbr1 || ip link add name virbr1 type bridge
-			ip link set virbr1 up
-
-			rlLog "Create image folder"
-			[ -f /home/sriov_test_delete_vm_with_kernel_args/images ] || mkdir -p /home/sriov_test_delete_vm_with_kernel_args/images
-
-
-			# ensure default network start as well
-			if ! virsh net-list | grep default &&
-			! virsh net-start default;then
-				virsh net-define /usr/share/libvirt/networks/default.xml
-				virsh net-start default
-				virsh net-autostart default
-			fi
-
-			local vm_num=6
-			local vm_mac_perfix="00:de:aa:05:01:"
-
-			#install VMs
-			for((i=1;i<=$vm_num;i++))
-			do
-				local vmname=test_bug1835705_vm$i
-
-				if virsh list --name | grep -w "$vmname" ||
-					virsh start $vmname;then
-					continue
-				else
-					rlLog "Download guest image..."
-					pushd "/home/sriov_test_delete_vm_with_kernel_args/images/" 1>/dev/null
-					[ -f test_bug1835705_vm$i.qcow2 ] || wget -nv $IMG_GUEST -O test_bug1835705_vm$i.qcow2
-					chmod -R 777 test_bug1835705_vm$i.qcow2
-
-					if [[ $ENABLE_RT_KERNEL == "yes" ]]; then
-					virt-copy-in -a test_bug1835705_vm$i.qcow2 ${CASE_PATH}/../../common/tools/brewkoji_install.sh /root
-					fi
-					popd
-
-					rlLog "Creating guest $vmname..."
-					virt-install \
-					--name $vmname \
-					--vcpus=1 \
-					--ram=1024 \
-					--disk path=/home/sriov_test_delete_vm_with_kernel_args/images/test_bug1835705_vm$i.qcow2,device=disk,bus=virtio,format=qcow2 \
-					--network bridge=virbr0,model=virtio,mac=${vm_mac_perfix}$(printf %02x $i) \
-					--boot hd \
-					--accelerate \
-					--graphics vnc,listen=0.0.0.0 \
-					--force \
-					--os-variant=rhel-unknown \
-					--noautoconsol
-				fi
-				# wait VM bootup
-				sleep 60
-			done
-
-			# test 20 times create vf/ attach to vm and detach
-			for ((h=1;h<=20;h++)); do
-				rlLog "start $h tests"
-				if ! sriov_create_vfs $nic_test 0 $vm_num; then
-					rlFail "ceate VF failed"
-				fi
-				sleep 5
-				for ((i=0;i<=$(expr $vm_num - 1);i++))
-				do
-					ip link set $nic_test vf $i vlan 3
-					sleep 5
-				done
-
-				for ((i=1;i<=$vm_num;i++))
-				do
-					local vf_interface_name=$(sriov_get_vf_iface $nic_test 0 $i)
-					ip addr flush ${vf_interface_name}
-					sleep 1
-				done
-
-				local vm_test_vf_prefix="00:de:ad:02:01:"
-				local pf_bus_info=$(ethtool -i $nic_test | grep 'bus-info' | sed 's/bus-info: //')
-				local vf_bus_info=($(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///'))
-
-				declare -A vf_dict
-				for((i=0;i<=$(expr $vm_num - 1);i++)); do
-					vf_dict[$[i]]=${vf_bus_info[i]}
-				done
-
-				for j in "${!vf_dict[@]}"
-				do
-					virsh attach-interface --domain test_bug1835705_vm$(expr $j + 1) --type hostdev --source ${vf_dict[$j]} --mac ${vm_test_vf_prefix}$(printf %02x $j) --managed --live || rlFail "attach device failed"
-				done
-
-				for((k=1;k<=$vm_num;k++))
-				do
-					virsh detach-interface --domain test_bug1835705_vm$k --type hostdev --mac ${vm_test_vf_prefix}$(printf %02x $(expr $k - 1))  || rlFail "detach device failed"
-					virsh reboot test_bug1835705_vm$k
-				done
-
-				for ((k=1;k<=$vm_num;k++))
-				do
-					vmsh run_cmd test_bug1835705_vm$k "ip link show"
-				done
-
-				sriov_remove_vfs $nic_test
-				rlLog "finish $h tests"
-			done
-			# clean temp guests
-			for ((h=1; h<$vm_num;h++))
-			do
-				virsh destroy test_bug1835705_vm$h
-				sleep 5
-				virsh undefine test_bug1835705_vm$h
-			done
-			rm -rf /home/sriov_test_delete_vm_with_kernel_args/images/*
-
-			# clear cpu isolationg and nosmt parameter after finish test
-			grubby --remove-args="nosmt=force" --update-kernel=$(grubby --default-kernel)
-			tuned-adm off
-			echo "2" > /tmp/reboot_num
-			rhts-reboot
-		elif [ -f /tmp/reboot_num ] && [[ $(cat /tmp/reboot_num) == "2" ]]; then
-			sync_set server test_delete_vm_with_kernel_args_end 14400
-		fi
-		rlRun "rm -rf /tmp/reboot_num"
-	fi
-}
-
-sriov_test_reproduce_2000180()
-{
-	# https://bugzilla.redhat.com/show_bug.cgi?id=2000180
-	# this case only reproduce bug 2000180, keep cpu0 as housekeeping any other cpu will be isolated.
-	# test on rt-kernel will get panic about kernel BUG at drivers/pci/msi.c:375! on i40e driver.
-	# test on stock kernel will get call trace as "NETDEV WATCHDOG: ens1f0v2 (iavf): transmit queue 1 timed out" on i40e
-	# if the first time to create vf, panic will occurred on the first loop. But in this case, The VF will not be
-	# created for the first time after the system is available， so panic will be trigger when run 23 times.
-	rlLog "Setup sriov_test_reproduce_2000180"
-	# /usr/sbin/kernel-is-rt || { echo "test kernel doesn't belong to realtime kernel, skip this case"; return 0; }
-	if [ "$SYS_ARCH" == "ppc64le" ];then
-		rlLogWarning "this case doesn't support to run on ppc64le, due to bug 2082433"
-		return 0
-	fi
-	if i_am_server; then
-		sync_set client sriov_test_reproduce_2000180_start ${SYNC_TIME}
-		[ $? -eq 0 ] && sync_wait client sriov_test_reproduce_2000180_end ${SYNC_TIME}
-		return 0
-	fi
-
-	which python &>/dev/null || which python3 &>/dev/null || yum -y install python3
-	which python &>/dev/null || ln -s $(which python3) /usr/bin/python
-
-	local isolate_cores=$(get_cpu.py --bug_reproduce_2000180)
-	rlLog "isolate core are ${isolate_cores}"
-	if [ ! -f /tmp/sriov_test_reproduce_2000180_phase1 ]; then
-		if ! uname -r | grep rt; then
-			rpm -q tuned-profiles-cpu-partitioning || rlLog "try to install tuned-profiles-cpu-partitioning" && yum install -y tuned tuned-profiles-cpu-partitioning &>/dev/null
-			echo "isolated_cores=${isolate_cores}" > /etc/tuned/cpu-partitioning-variables.conf
-			tuned-adm profile cpu-partitioning || rlFail "enable cpu-partitioning profile failed"
-		elif uname -r | grep rt; then
-			rpm -q tuned-profiles-nfv || rlLog "try to install tuned-profiles-nfv" && yum install -y tuned tuned-profiles-nfv &>/dev/null
-			echo "isolated_cores=${isolate_cores}" > /etc/tuned/realtime-virtual-host-variables.conf
-			echo "isolate_managed_irq=Y" >> /etc/tuned/realtime-virtual-host-variables.conf
-			tuned-adm profile realtime-virtual-host || rlFail "enable realtime-virtual-host failed"
-			systemctl disable irqbalance
-			systemctl stop irqbalance
-			rlLog "finish cpu tuning"
-		fi
-		rlLog "client finish hugepage configuration"
-		echo "1" > /tmp/sriov_test_reproduce_2000180_phase1
-		rhts-reboot
-	else
-		rlRun "lscpu"
-		rlRun "cat /proc/cmdline"
-	fi
-	if [ ! -f /tmp/sriov_test_reproduce_2000180_phase2 ]; then
-		sync_wait server sriov_test_reproduce_2000180_start ${SYNC_TIME}
-		echo 1 > /tmp/sriov_test_reproduce_2000180_phase2
-		rlLog "Start test"
-		rlLog "Configure journalctl"
-		[[ -d /var/log/journal ]] || mkdir /var/log/journal
-		systemd-tmpfiles --create --prefix /var/log/journal
-		echo "SystemMaxUse=100M" >> /etc/systemd/journald.conf
-		systemctl restart systemd-journald.service
-		rlLog "Configure finish"
-		local DRIVER=$(ethtool -i $nic_test | sed -n -e "/driver:/s/driver: //p")
-		rlLog "Test nic driver is ${DRIVER}"
-
-		rlLog "Create 5 vfs and Check vf drive type"
-		local PF_PCI=$(sriov_get_pf_bus_info ${nic_test} 0)
-		local MAX_VFS=$(cat /sys/bus/pci/devices/${PF_PCI}/sriov_totalvfs)
-
-		if [[ ${MAX_VFS} -le 10 ]]; then
-			local test_vfs=${MAX_VFS}
-		else
-			local test_vfs=6
-		fi
-		rlLog "got pf pci address is ${PF_PCI}, got test vf number is ${test_vfs}"
-		rlRun "sriov_remove_vfs ${nic_test} 0"
-		rlLog "try to create ${test_vfs} vfs"
-		rlRun "sriov_create_vfs ${nic_test} 0 6"
-		sleep 10
-
-		local check_vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn0 | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-		local check_vf_name=$(ls /sys/bus/pci/devices/${check_vf_pci}/net 2>/dev/null)
-		local vf_driver_name=$(ethtool -i ${check_vf_name} | sed -n -e "/driver:/s/driver: //p")
-		if [ -z ${vf_driver_name} ]; then
-			rlFail "can't find vf driver"
-			rlRun "sriov_remove_vfs ${nic_test} 0"
-			sync_set server sriov_test_reproduce_2000180_end ${SYNC_TIME}
-			exit 1
-		fi
-		rlLog "check all vfs are created"
-		if [[ $? -ne 0 ]] || [[ x"$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn* | wc -l)" != x"${test_vfs}" ]]; then
-			rlFail "create the test vf of pf failed"
-			rlRun "sriov_remove_vfs ${nic_test} 0"
-			sync_set server sriov_test_reproduce_2000180_end ${SYNC_TIME}
-			exit 1
-		fi
-
-		rlLog "check no mac adress is 00:00:00:00:00:00"
-		for((i=0;i<$(expr $test_vfs); i++)); do
-			local test_vf_mac=$(ip link show ${nic_test} | grep "vf $i" | awk '{print$4}')
-			rlAssertNotEquals "check ${test_vf_mac} mac equal 00:00:00:00:00:00" ${test_vf_mac} "00:00:00:00:00:00"
-		done
-
-		rlLog "got all of vf name on a list"
-		local vf_name_list
-
-		for ((i=1;i<=${test_vfs};i++));do
-			local VF_PCI=$(sriov_get_vf_bus_info ${nic_test} 0 $i)
-			local VF_IFACE=$(sriov_get_vf_iface ${nic_test} 0 $i)
-			local vf_name_list[$(expr $i - 1)]=${VF_IFACE}
-			local vf_pci_list[$(expr $i - 1)]=${VF_PCI}
-		done
-		rlLog "vf_name_list equal is ${vf_name_list[*]}"
-		rlLog "vf pci list equal is ${vf_pci_list[*]}"
-		local sort_vf_name_list=($(echo ${vf_name_list[*]} | tr ' ' '\n'  | sort -n -t 'v' -k 2 ))
-		rlLog "sort_vf_name_list equal is ${sort_vf_name_list[*]}"
-
-		local vf_mac_list
-		for ((i=1;i<=${test_vfs};i++));do
-			vf_mac_list[$(expr $i - 1)]=$(ip link show ${sort_vf_name_list[$(expr $i - 1)]} | grep "link/ether" | cut -d " " -f 6)
-		done
-		local vf_mac_list_length=${#vf_mac_list[@]}
-
-		rlLog "got vf name after sort: ${sort_vf_name_list[*]}"
-		rlLog "got vf mac list: ${vf_mac_list[*]}"
-		rlLog "got vf mac length: ${vf_mac_list_length}"
-		rlLog "clean all vf and start test"
-		rlRun "sriov_remove_vfs ${nic_test} 0"
-		sleep 10
-		rlLog "Beginning test"
-		local MTU=9000
-#		modprobe vfio_pci
-		for ((xx=0; xx<=3; xx++));do
-			echo $xx > /tmp/sriov_test_reproduce_2000180_xx
-
-			for ((yy=0; yy<=10; yy++)); do
-				echo $yy > /tmp/sriov_test_reproduce_2000180_yy
-				# 1. set numvfs
-				echo "1. set numvfs"
-				echo "set ${test_vfs} vfs on ${nic_test}"
-				sriov_remove_vfs ${nic_test} 0
-				sriov_create_vfs ${nic_test} 0 ${test_vfs}
-				# echo 0 > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-				# echo ${test_vfs} > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-				sleep 5
-
-				#2. set vf admin MAC address
-				echo "2. set vf admin MAC address"
-				for ((i=0; i<${vf_mac_list_length}; i++)); do
-					ip link set dev ${nic_test} vf ${i} mac ${vf_mac_list[$i]}
-				done
-
-				# 3. unbind/bind vf driver
-				echo "unbind/bind vf driver"
-				for i in "${vf_pci_list[@]}"; do
-					echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
-					echo > /sys/bus/pci/devices/${vf_pci}/driver_override
-					echo ${i} > /sys/bus/pci/drivers_probe
-				done
-
-				# 4. set pf mtu
-				echo "4. set pf mtu to ${MTU}"
-				echo $MTU > /sys/class/net/${nic_test}/mtu
-
-				#5. bind vf driver (if not already)
-				#6. unbind/bind vf driver (workaround for bz1875338)
-				echo "6. unbind/bind vf driver (workaround for bz1875338)"
-				for i in "${vf_pci_list[@]}"; do
-					echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
-					echo > /sys/bus/pci/devices/${vf_pci}/driver_override
-					echo ${i} > /sys/bus/pci/drivers_probe
-				done
-
-				sleep 2
-				#7. set vf mtu
-				echo "7. set vf mtu to ${MTU}"
-				for i in "${sort_vf_name_list[@]}"; do
-					echo $MTU > /sys/class/net/${i}/mtu
-				done
-
-				#8. set pf up if not already
-				echo "8. set pf up if not already"
-
-				ip link set ${nic_test} up
-				echo "Iteration: xx $xx, yy $yy"
-				sleep 10
-				# echo 0 > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-				sriov_remove_vfs ${nic_test} 0
-				echo "clean vf and reset mtu to 1500"
-				ip link set mtu 1500 dev $nic_test
-			done
-		done
-	fi
-
-	rlLog "Check that the test ends in a normal loop"
-	if [[ $(cat /tmp/sriov_test_reproduce_2000180_xx) -ne 3 ]] || [[ $(cat /tmp/sriov_test_reproduce_2000180_yy) -ne 10 ]]; then
-		rlFail "The test did not end in a normal cycle. please check it!!!"
-	fi
-
-	# recover tunning configuration
-	local isolate_cores=$(get_cpu.py --get_isolate_cpus_str)
-	rlLog "isolate core are ${isolate_cores}"
-	if [ ! -f /tmp/sriov_test_reproduce_2000180_phase3 ]; then
-		if ! uname -r | grep rt; then
-			rpm -q tuned-profiles-cpu-partitioning || rlLog "try to install tuned-profiles-cpu-partitioning" && yum install -y tuned tuned-profiles-cpu-partitioning &>/dev/null
-			echo "isolated_cores=${isolate_cores}" > /etc/tuned/cpu-partitioning-variables.conf
-			tuned-adm profile cpu-partitioning || rlFail "enable cpu-partitioning profile failed"
-		elif uname -r | grep rt; then
-			rpm -q tuned-profiles-nfv || rlLog "try to install tuned-profiles-nfv" && yum install -y tuned tuned-profiles-nfv &>/dev/null
-			echo "isolated_cores=${isolate_cores}" > /etc/tuned/realtime-virtual-host-variables.conf
-			echo "isolate_managed_irq=Y" >> /etc/tuned/realtime-virtual-host-variables.conf
-			tuned-adm profile realtime-virtual-host || rlFail "enable realtime-virtual-host failed"
-			systemctl disable irqbalance
-			systemctl stop irqbalance
-		fi
-		rlLog "finish cpu tuning"
-		echo "1" > /tmp/sriov_test_reproduce_2000180_phase3
-		rhts-reboot
-	fi
-	sync_set server sriov_test_reproduce_2000180_end ${SYNC_TIME}
-	rlLog "finish test and clean tag file"
-	rm -rf /tmp/sriov_test_reproduce_2000180_xx
-	rm -rf /tmp/sriov_test_reproduce_2000180_yy
-	rm -rf /tmp/sriov_test_reproduce_2000180_phase3
-	rm -rf /tmp/sriov_test_reproduce_2000180_phase2
-	rm -rf /tmp/sriov_test_reproduce_2000180_phase1
-	rlLog "check journald boot list"
-	rlRun "journalctl --list-boots"
-	local prevlast=$(journalctl --list-boots | awk '{prevlast = last; last = $0} END {if (NR >= 2) print prevlast}' | awk '{print $1}')
-	rlLog "got prelate record id: ${prevlast}"
-	rlRun "journalctl -o short-precise -k -b ${prevlast} | grep -C 50 -i \"call trace\"" 1
-	rlRun "journalctl -o short-precise -k -b | grep -C 50 -i \"call trace\"" 1
-	rlLog "cleanup journald setting"
-	rlRun "systemd-tmpfiles --clean --prefix /var/log/journal/"
-	rlRun "systemd-tmpfiles --remove --prefix /var/log/journal/"
-	rlRun "systemctl restart systemd-journald.service"
-	rlLog "finish test and clean tag file"
-}
-
-
-sriov_test_negative_create_vfs_2000180()
-{
-	# VFs are fully available when the echo command finishes.
-	# BUT this means that PCI devices that represents VFs are available.
-	# There is a second stage "binding the PCI device to driver" that is executed async.
-	# it will got panic about "general protection fault: 0000 [#1] PREEMPT_RT SMP NOPTI"
-
-	rlLog "Setup sriov_test_reproduce_negative_create_vfs_2000180"
-	if i_am_server; then
-		sync_set client sriov_test_negative_create_vfs_2000180_start ${SYNC_TIME}
-		if	[ $? -eq 0 ]; then
-			sync_wait client sriov_test_negative_create_vfs_2000180_end ${SYNC_TIME}
-		else
-			rlFail "sync timeout with client. Need check it!!!"
-		fi
-	else
-		which python &>/dev/null || which python3 &>/dev/null || yum -y install python3
-		which python &>/dev/null || ln -s $(which python3) /usr/bin/python
-		if [ "$SYS_ARCH" == "ppc64le" ];then
-			local numa=$(get_info.sh nic_numa_node $nic_test)
-			local isolate_cores=$(get_info.sh isolated_cores $numa)
-		else
-			local isolate_cores=$(get_cpu.py --get_isolate_cpus_str)
-		fi
-		rlLog "isolate core are ${isolate_cores}"
-		if [ ! -f /tmp/sriov_test_negative_create_vfs_2000180_phase1 ]; then
-			if ! uname -r | grep rt; then
-				rpm -q tuned-profiles-cpu-partitioning || rlLog "try to install tuned-profiles-cpu-partitioning" && yum install -y tuned tuned-profiles-cpu-partitioning &>/dev/null
-				echo "isolated_cores=${isolate_cores}" > /etc/tuned/cpu-partitioning-variables.conf
-				tuned-adm profile cpu-partitioning || rlFail "enable cpu-partitioning profile failed"
-			elif uname -r | grep rt; then
-				rpm -q tuned-profiles-nfv || rlLog "try to install tuned-profiles-nfv" && yum install -y tuned tuned-profiles-nfv &>/dev/null
-				echo "isolated_cores=${isolate_cores}" > /etc/tuned/realtime-virtual-host-variables.conf
-				echo "isolate_managed_irq=Y" >> /etc/tuned/realtime-virtual-host-variables.conf
-				tuned-adm profile realtime-virtual-host || rlFail "enable realtime-virtual-host failed"
-				systemctl disable irqbalance
-				systemctl stop irqbalance
-				rlLog "finish cpu tuning"
-			fi
-			if [ "$SYS_ARCH" == "ppc64le" ] && (! grep "default_hugepagesz=2G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=2G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=12" /proc/cmdline &>/dev/null)
-			then
-				setup_bootopts.sh \
-				--hugepagesz=2G \
-				--hugepages=12 \
-				--isolated_cores="$isolate_cores" \
-				--extra="intel_idle.max_cstate=0 processor.max_cstate=0 intel_pstate=disable" \
-				--tuned-profiles=cpu-partitioning
-			elif [ "$SYS_ARCH" != "ppc64le" ] && (! grep "default_hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=24" /proc/cmdline &>/dev/null || \
-			! grep "intel_iommu=on" /proc/cmdline &>/dev/null || \
-			! grep "iommu=pt" /proc/cmdline &>/dev/null)
-			# ! grep "rcupdate.rcu_normal_after_boot=0" /proc/cmdline &>/dev/null)
-			then
-				# set nosmt=force and default hugepage in host
-				rlLog "grubby --args=\"default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt\" --update-kernel=$(grubby --default-kernel)"
-				grubby --args="default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt" --update-kernel=$(grubby --default-kernel)
-			else
-				rlLog "client finish hugepage configuration"
-			fi
-			echo "1" > /tmp/sriov_test_negative_create_vfs_2000180_phase1
-			rhts-reboot
-		else
-			rlLog "client finish cpu and hugepage tunning"
-			rlRun "lscpu"
-			rlRun "cat /proc/cmdline"
-		fi
-
-		if [ ! -f /tmp/sriov_test_negative_create_vfs_2000180_phase2 ]; then
-			sync_wait server sriov_test_negative_create_vfs_2000180_start ${SYNC_TIME}
-			rlLog "Start test"
-			rlLog "Configure journalctl"
-			[[ -d /var/log/journal ]] || mkdir /var/log/journal
-			systemd-tmpfiles --create --prefix /var/log/journal
-			echo "SystemMaxUse=100M" >> /etc/systemd/journald.conf
-			systemctl restart systemd-journald.service
-			rlLog "Configure finish"
-			echo 1 > /tmp/sriov_test_negative_create_vfs_2000180_phase2
-			local DRIVER=$(ethtool -i $nic_test | sed -n -e "/driver:/s/driver: //p")
-			rlLog "Test nic driver is ${DRIVER}"
-
-			local PF_PCI=$(sriov_get_pf_bus_info ${nic_test} 0)
-			local MAX_VFS=$(cat /sys/bus/pci/devices/${PF_PCI}/sriov_totalvfs)
-			local test_vfs=${MAX_VFS}
-			rlLog "Create ${test_vfs} vfs and Check vf drive type"
-			rlLog "got pf pci address is ${PF_PCI}, got test vf number is ${test_vfs}"
-
-			rlRun "sriov_remove_vfs ${nic_test} 0"
-			rlLog "try to create ${test_vfs} vfs"
-			rlRun "sriov_create_vfs ${nic_test} 0 ${test_vfs}"
-			sleep 120
-
-			local check_vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn0 | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-			local check_vf_name=$(ls /sys/bus/pci/devices/${check_vf_pci}/net 2>/dev/null)
-			local vf_driver_name=$(ethtool -i ${check_vf_name} | sed -n -e "/driver:/s/driver: //p")
-			if [ -z ${vf_driver_name} ]; then
-				rlFail "can't find vf driver"
-				rlRun "sriov_remove_vfs ${nic_test} 0"
-				sync_set server sriov_test_negative_create_vfs_2000180_end ${SYNC_TIME}
-				exit 1
-			fi
-
-			rlLog "check all vfs are created"
-			if [[ $? -ne 0 ]] || [[ x"$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn* | wc -l)" != x"${test_vfs}" ]]; then
-				rlFail "create the test vf of pf failed"
-				rlRun "sriov_remove_vfs ${nic_test} 0"
-				sync_set server sriov_test_negative_create_vfs_2000180_end ${SYNC_TIME}
-				exit 1
-			fi
-
-			rlLog "check no mac adress is 00:00:00:00:00:00"
-			for((i=1;i<=$(expr $test_vfs); i++)); do
-				sriov_vfmac_is_zero ${nic_test} 0 ${i}
-				local test_result=$?
-				rlAssertNotEquals "check ${test_vf_mac} mac equal 00:00:00:00:00:00" ${test_result} 0
-			done
-
-			rlLog "got all of vf name on a list"
-			local vf_name_list
-
-			for ((i=1;i<=${test_vfs};i++));do
-				local VF_PCI=$(sriov_get_vf_bus_info ${nic_test} 0 $i)
-				local VF_IFACE=$(sriov_get_vf_iface ${nic_test} 0 $i)
-				vf_name_list[$(expr $i - 1)]=${VF_IFACE}
-			done
-
-			local sort_vf_name_list=($(echo ${vf_name_list[*]} | tr ' ' '\n'  | sort -n -t 'v' -k 2 ))
-
-			local vf_mac_list
-			for ((i=1;i<=${test_vfs};i++));do
-				vf_mac_list[$(expr $i - 1)]=$(ip link show ${sort_vf_name_list[$(expr $i - 1)]} | grep "link/ether" | cut -d " " -f 6)
-			done
-			local vf_mac_list_length=${#vf_mac_list[@]}
-			rlLog "got vf name after sort: ${sort_vf_name_list[*]}"
-			rlLog "got vf mac list: ${vf_mac_list[*]}"
-			rlLog "got vf mac length: ${vf_mac_list_length}"
-			rlLog "clean all vf and start test"
-			rlRun "sriov_remove_vfs ${nic_test} 0"
-			sleep 120
-			rlLog "Beginning test"
-			local MTU=9000
-
-			for ((xx=0; xx<=3; xx++));do
-				echo $xx > /tmp/sriov_test_negative_create_vfs_2000180_xx
-				#not unload the VF driver in case the PF driver is the same one.
-				#rmmod ${vf_driver_name}
-				for ((yy=0; yy<=10; yy++)); do
-					echo $yy > /tmp/sriov_test_negative_create_vfs_2000180_yy
-					# 1. set numvfs
-					echo "1. set numvfs"
-					echo "set ${test_vfs} vfs on ${nic_test}"
-					sriov_remove_vfs ${nic_test} 0
-					sriov_create_vfs ${nic_test} 0 ${test_vfs}
-					#2. set vf admin MAC address
-					echo "2. set vf admin MAC address"
-					for ((i=0; i<${vf_mac_list_length}; i++)); do
-						ip link set dev ${sort_vf_name_list[$i]} address ${vf_mac_list[$i]}
-					done
-
-					# 3. unbind/bind vf driver
-					echo "unbind/bind vf driver"
-					for i in "${vf_pci_list[@]}"; do
-						echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
-						echo > /sys/bus/pci/devices/${vf_pci}/driver_override
-						echo ${i} > /sys/bus/pci/drivers_probe
-					done
-
-					# 4. set pf mtu
-					echo "4. set pf mtu to ${MTU}"
-					echo $MTU > /sys/class/net/${nic_test}/mtu
-
-					#5. bind vf driver (if not already)
-					#6. unbind/bind vf driver (workaround for bz1875338)
-					echo "6. unbind/bind vf driver (workaround for bz1875338)"
-					for i in "${vf_pci_list[@]}"; do
-						echo ${i} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
-						echo > /sys/bus/pci/devices/${vf_pci}/driver_override
-						echo ${i} > /sys/bus/pci/drivers_probe
-					done
-
-					#7. set vf mtu
-					echo "7. set vf mtu to ${MTU}"
-					for i in "${sort_vf_name_list[@]}"; do
-						echo $MTU > /sys/class/net/${i}/mtu
-					done
-
-					#8. set pf up if not already
-					echo "8. set pf up if not already"
-
-					ip link set ${nic_test} up
-					echo "Iteration: xx $xx, yy $yy"
-					sriov_remove_vfs ${nic_test} 0
-
-					echo "clean vf and reset mtu to 1500"
-					ip link set mtu 1500 dev $nic_test
-
-				done
-			done
-		fi
-
-		rlLog "Check that the test ends in a normal loop"
-		if [[ $(cat /tmp/sriov_test_negative_create_vfs_2000180_xx) -ne 3 ]] || [[ $(cat /tmp/sriov_test_negative_create_vfs_2000180_yy) -ne 10 ]]; then
-			rlFail "The test did not end in a normal cycle. please check it!!!"
-		fi
-		rlLog "finish test and clean tag file"
-		sync_set server sriov_test_negative_create_vfs_2000180_end ${SYNC_TIME}
-		rm -rf /tmp/sriov_test_negative_create_vfs_2000180_xx
-		rm -rf /tmp/sriov_test_negative_create_vfs_2000180_yy
-		rm -rf /tmp/sriov_test_negative_create_vfs_2000180_phase2
-		rm -rf /tmp/sriov_test_negative_create_vfs_2000180_phase1
-		rlLog "check journald boot list"
-		rlRun "journalctl --list-boots"
-		local prevlast=$(journalctl --list-boots | awk '{prevlast = last; last = $0} END {if (NR >= 2) print prevlast}' | awk '{print $1}')
-		rlLog "got prelate record id: ${prevlast}"
-		rlRun "journalctl -o short-precise -k -b ${prevlast} | grep -C 50 -i \"call trace\"" 1
-		rlRun "journalctl -o short-precise -k -b | grep -C 50 -i \"call trace\"" 1
-		rlLog "cleanup journald setting"
-		rlRun "systemd-tmpfiles --clean --prefix /var/log/journal/"
-		rlRun "systemd-tmpfiles --remove --prefix /var/log/journal/"
-		rlRun "systemctl restart systemd-journald.service"
-		rlLog "finish test and clean tag file"
-#		local user=$(cat /etc/motd | grep SUBMITTER | awk -F "=" '{print $2}' | sed  's/\(.*\)@.*/\1/g')
-#		local jobid=$(cat /etc/motd | grep JOBID | awk -F "=" '{print $2}' | tr -d '\n' | tr -d " ")
-#		local kernel_version=$(uname -r)
-#		local hostname=$(hostname)
-#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore"
-#		local file_list=$(find /var/crash/${user}/${KERNEL_VERSION}/${jobid}/${hostname}/ -name vmcore*)
-#		if [[ ${file_list} != "" ]]; then
-#			rlFail "can find vmcore file, need to check"
-#		else
-#			rlLog "can't find vmcore"
-#		fi
-		return 0
-
-	fi
-}
-
-sriov_test_reproduce_2021326()
-{
-	# should got call trace as Oops: 0000 [#1] SMP NOPTI, only support ice & i40e
-	# reproduce bug 2021326,2009461,1997012
-
-	rlLog "Setup sriov_test_reproduce_2021326"
-	if i_am_server; then
-		sync_set client sriov_test_reproduce_2021326_start ${SYNC_TIME}
-		if	[ $? -eq 0 ]; then
-			sync_wait client sriov_test_reproduce_2021326_end ${SYNC_TIME}
-		else
-			rlFail "sync timeout with client. Need check it!!!"
-		fi
-	else
-		if [ ! -f /tmp/sriov_test_reproduce_2021326_phase1 ]; then
-			local isolate_cores=$(get_cpu.py --get_isolate_cpus_str)
-			rlLog "isolate core are ${isolate_cores}"
-			if ! uname -r | grep rt; then
-				rpm -q tuned-profiles-cpu-partitioning || rlLog "try to install tuned-profiles-cpu-partitioning" && yum install -y tuned tuned-profiles-cpu-partitioning &>/dev/null
-				echo "isolated_cores=${isolate_cores}" > /etc/tuned/cpu-partitioning-variables.conf
-				tuned-adm profile cpu-partitioning || rlFail "enable cpu-partitioning profile failed"
-			elif uname -r | grep rt; then
-				rpm -q tuned-profiles-nfv || rlLog "try to install tuned-profiles-nfv" && yum install -y tuned tuned-profiles-nfv &>/dev/null
-				echo "isolated_cores=${isolate_cores}" > /etc/tuned/realtime-virtual-host-variables.conf
-				echo "isolate_managed_irq=Y" >> /etc/tuned/realtime-virtual-host-variables.conf
-				tuned-adm profile realtime-virtual-host || rlFail "enable realtime-virtual-host failed"
-				systemctl disable irqbalance
-				systemctl stop irqbalance
-				rlLog "finish cpu tuning"
-			fi
-			if [ "$SYS_ARCH" == "ppc64le" ] && (! grep "default_hugepagesz=2G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=2G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=12" /proc/cmdline &>/dev/null)
-			then
-				setup_bootopts.sh \
-				--hugepagesz=2G \
-				--hugepages=12 \
-				--isolated_cores="$isolate_cores" \
-				--extra="intel_idle.max_cstate=0 processor.max_cstate=0 intel_pstate=disable" \
-				--tuned-profiles=cpu-partitioning
-			elif [ "$SYS_ARCH" != "ppc64le" ] && (! grep "default_hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=24" /proc/cmdline &>/dev/null || \
-			! grep "intel_iommu=on" /proc/cmdline &>/dev/null || \
-			! grep "iommu=pt" /proc/cmdline &>/dev/null)
-			# ! grep "rcupdate.rcu_normal_after_boot=0" /proc/cmdline &>/dev/null)
-			then
-				# set nosmt=force and default hugepage in host
-				rlLog "grubby --args=\"default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt\" --update-kernel=$(grubby --default-kernel)"
-				grubby --args="default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt" --update-kernel=$(grubby --default-kernel)
-			else
-				rlLog "client finish hugepage configuration"
-			fi
-			echo "1" > /tmp/sriov_test_reproduce_2021326_phase1
-			rhts-reboot
-		else
-			rlLog "client finish cpu and hugepage tunning"
-			rlRun "lscpu"
-			rlRun "cat /proc/cmdline"
-		fi
-		if [ ! -f /tmp/sriov_test_reproduce_2021326 ]; then
-			sync_wait server sriov_test_reproduce_2021326_start ${SYNC_TIME}
-			rlLog "Start test"
-			rlLog "Configure journalctl"
-			[[ -d /var/log/journal ]] || mkdir /var/log/journal
-			systemd-tmpfiles --create --prefix /var/log/journal
-			echo "SystemMaxUse=100M" >> /etc/systemd/journald.conf
-			systemctl restart systemd-journald.service
-			rlLog "Configure finish"
-			echo 1 > /tmp/sriov_test_reproduce_2021326
-			local DRIVER=$(ethtool -i $nic_test | sed -n -e "/driver:/s/driver: //p")
-			rlLog "Test nic driver is ${DRIVER}"
-
-			rlLog "Create 10 vfs and Check vf drive type"
-			local PF_PCI=$(sriov_get_pf_bus_info ${nic_test} 0)
-			local MAX_VFS=$(cat /sys/bus/pci/devices/${PF_PCI}/sriov_totalvfs)
-			if [[ ${MAX_VFS} -le 10 ]]; then
-				local test_vfs=${MAX_VFS}
-			else
-				local test_vfs=10
-			fi
-			rlLog "got pf pci address is ${PF_PCI}, got test vf number is ${test_vfs}"
-
-			rlRun "sriov_remove_vfs ${nic_test} 0"
-			rlLog "try to create ${test_vfs} vfs"
-			rlRun "sriov_create_vfs ${nic_test} 0 ${test_vfs}"
-			sleep 10
-
-			local check_vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn0 | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-			local check_vf_name=$(ls /sys/bus/pci/devices/${check_vf_pci}/net 2>/dev/null)
-			local vf_driver_name=$(ethtool -i ${check_vf_name} | sed -n -e "/driver:/s/driver: //p")
-			if [ -z ${vf_driver_name} ]; then
-				rlFail "can't find vf driver"
-				rlRun "sriov_remove_vfs ${nic_test} 0"
-				sync_set server sriov_test_reproduce_2021326_end ${SYNC_TIME}
-				exit 1
-			fi
-
-			rlLog "check all vfs are created"
-			if [[ $? -ne 0 ]] || [[ x"$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn* | wc -l)" != x"${test_vfs}" ]]; then
-				rlFail "create the test vf of pf failed"
-				rlRun "sriov_remove_vfs ${nic_test} 0"
-				sync_set server sriov_test_reproduce_2021326_end ${SYNC_TIME}
-				exit 1
-			fi
-
-			rlLog "check no mac adress is 00:00:00:00:00:00"
-			for((i=0;i<$(expr $test_vfs); i++)); do
-				local test_vf_mac=$(ip link show ${nic_test} | grep "vf $i" | awk '{print$4}')
-				rlAssertNotEquals "check ${test_vf_mac} mac equal 00:00:00:00:00:00" ${test_vf_mac} "00:00:00:00:00:00"
-			done
-
-			rlLog "got all of vf name on a list"
-			local vf_name_list
-
-			for ((i=1;i<=${test_vfs};i++));do
-				local VF_PCI=$(sriov_get_vf_bus_info ${nic_test} 0 $i)
-				local VF_IFACE=$(sriov_get_vf_iface ${nic_test} 0 $i)
-				vf_name_list[$(expr $i - 1)]=${VF_IFACE}
-			done
-
-			local sort_vf_name_list=($(echo ${vf_name_list[*]} | tr ' ' '\n'  | sort -n -t 'v' -k 2 ))
-
-			local vf_mac_list
-			for ((i=1;i<=${test_vfs};i++));do
-				vf_mac_list[$(expr $i - 1)]=$(ip link show ${sort_vf_name_list[$(expr $i - 1)]} | grep "link/ether" | cut -d " " -f 6)
-			done
-
-			local vf_mac_list_length=${#vf_mac_list[@]}
-			rlLog "got vf name after sort: ${sort_vf_name_list[*]}"
-			rlLog "got vf mac list: ${vf_mac_list[*]}"
-			rlLog "got vf mac length: ${vf_mac_list_length}"
-			rlLog "clean all vf and start test"
-			rlRun "sriov_remove_vfs ${nic_test} 0"
-
-			rlLog "Beginning test"
-			local MTU=9000
-
-			for ((xx=0; xx<=3; xx++));do
-				echo $xx > /tmp/sriov_test_reproduce_2021326_xx
-				rmmod ${vf_driver_name}
-				sleep 1e-06
-				for ((yy=0; yy<=10; yy++)); do
-					echo $yy > /tmp/sriov_test_reproduce_2021326_yy
-					# 1. set numvfs
-					echo "1. set numvfs"
-					echo "set ${test_vfs} vfs on ${nic_test}"
-					echo 0 > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-					echo ${test_vfs} > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-					sleep 1e-06
-					#2. set vf admin MAC address
-					echo "2. set vf admin MAC address"
-					for ((i=1;i<=${test_vfs};i++)); do
-						local vf_mac=${vf_mac_list[$(expr $i - 1)]}
-						sleep 1e-06
-						ip link set dev $nic_test vf $(expr $i - 1) mac ${vf_mac}
-					done
-
-					# 3. unbind/bind vf driver
-					echo "unbind/bind vf driver"
-					for ((i=1;i<=${test_vfs};i++)); do
-						local vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn$(expr $i - 1) | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-						echo ${vf_pci} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
-						sleep 1
-						echo > /sys/bus/pci/devices/${vf_pci}/driver_override
-						sleep 1
-						echo ${vf_pci} > /sys/bus/pci/drivers_probe
-					done
-
-					# 4. set pf mtu
-					echo "4. set pf mtu to ${MTU}"
-					echo $MTU > /sys/class/net/${nic_test}/mtu
-
-					#5. bind vf driver (if not already)
-					#6. unbind/bind vf driver (workaround for bz1875338)
-					echo "6. unbind/bind vf driver (workaround for bz1875338)"
-					for ((i=1;i<=${test_vfs};i++)); do
-						local vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn$(expr $i - 1) | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-						echo ${vf_pci} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
-						sleep 1e-06
-						echo > /sys/bus/pci/devices/${vf_pci}/driver_override
-						sleep 1e-06
-						echo ${vf_pci} > /sys/bus/pci/drivers_probe
-					done
-					sleep 1e-06
-
-					#7. set vf mtu
-					echo "7. set vf mtu to ${MTU}"
-					for ((i=1;i<=${test_vfs};i++)); do
-						vf_name=${sort_vf_name_list[$(expr $i - 1)]}
-						echo $MTU > /sys/class/net/${vf_name}/mtu
-					done
-
-					#8. set pf up if not already
-					echo "8. set pf up if not already"
-
-					ip link set ${nic_test} up
-					echo "Iteration: xx $xx, yy $yy"
-					echo 0 > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-					sleep 1e-06
-					echo "clean vf and reset mtu to 1500"
-					ip link set mtu 1500 dev $nic_test
-
-				done
-			done
-		fi
-		rlLog "Check that the test ends in a normal loop"
-		if [[ $(cat /tmp/sriov_test_reproduce_2021326_xx) -ne 3 ]] || [[ $(cat /tmp/sriov_test_reproduce_2021326_yy) -ne 10 ]]; then
-			rlFail "The test did not end in a normal cycle. please check it!!!"
-		fi
-
-		sync_set server sriov_test_negative_create_vfs_2000180_end ${SYNC_TIME}
-		rm -rf /tmp/sriov_test_reproduce_2021326
-		rm -rf /tmp/sriov_test_reproduce_2021326_phase1
-		rm -rf /tmp/sriov_test_reproduce_2021326_xx
-		rm -rf /tmp/sriov_test_reproduce_2021326_yy
-		rlLog "finish test and clean tag file"
-		rlLog "check journald boot list"
-		rlRun "journalctl --list-boots"
-		local prevlast=$(journalctl --list-boots | awk '{prevlast = last; last = $0} END {if (NR >= 2) print prevlast}' | awk '{print $1}')
-		rlLog "got prelate record id: ${prevlast}"
-		rlRun "journalctl -o short-precise -k -b ${prevlast} | grep -C 50 -i \"call trace\"" 1
-		rlLog "cleanup journald setting"
-		rlRun "systemd-tmpfiles --clean --prefix /var/log/journal/"
-		rlRun "systemd-tmpfiles --remove --prefix /var/log/journal/"
-		rlRun "systemctl restart systemd-journald.service"
-		rlLog "finish test and clean tag file"
-#		local user=$(cat /etc/motd | grep SUBMITTER | awk -F "=" '{print $2}' | sed  's/\(.*\)@.*/\1/g')
-#		local jobid=$(cat /etc/motd | grep JOBID | awk -F "=" '{print $2}' | tr -d '\n' | tr -d " ")
-#		local kernel_version=$(uname -r)
-#		local hostname=$(hostname)
-#		rlLog "try to use jobid: ${jobid}, kernel verion: ${KERNEL_VERSION}, username: ${user}, hostname: ${hostname} to find vmcore"
-#		local file_list=$(find /var/crash/${user}/${KERNEL_VERSION}/${jobid}/${hostname}/ -name vmcore*)
-#		if [[ ${file_list} != "" ]]; then
-#			rlFail "can find vmcore file, need to check"
-#		else
-#			rlLog "can't find vmcore"
-#		fi
-		return 0
-
-	fi
-}
-
-
-sriov_test_reproduce_2021326_reboot_check()
-{
-	rlLog "Setup sriov_test_reproduce_2021326_reboot_check"
-	if i_am_server; then
-		sync_set client sriov_test_reproduce_2021326_reboot_check_start ${SYNC_TIME}
-		if	[ $? -eq 0 ]; then
-			sync_wait client sriov_test_reproduce_2021326_reboot_check_end ${SYNC_TIME}
-		else
-			rlFail "sync timeout with client. Need check it!!!"
-		fi
-	else
-		if [ ! -f /tmp/sriov_test_reproduce_2021326_reboot_check ]; then
-			sync_wait server sriov_test_reproduce_2021326_reboot_check_start ${SYNC_TIME}
-			rlLog "Start test"
-			rlLog "Configure journalctl"
-			[[ -d /var/log/journal ]] || mkdir /var/log/journal
-			systemd-tmpfiles --create --prefix /var/log/journal
-			echo "SystemMaxUse=100M" >> /etc/systemd/journald.conf
-			systemctl restart systemd-journald.service
-			rlLog "Configure finish"
-			local DRIVER=$(ethtool -i $nic_test | sed -n -e "/driver:/s/driver: //p")
-			rlLog "Test nic driver is ${DRIVER}"
-
-			rlLog "Create 10 vfs and Check vf drive type"
-			local PF_PCI=$(sriov_get_pf_bus_info ${nic_test} 0)
-			local MAX_VFS=$(cat /sys/bus/pci/devices/${PF_PCI}/sriov_totalvfs)
-			if [[ ${MAX_VFS} -le 10 ]]; then
-				local test_vfs=${MAX_VFS}
-			else
-				local test_vfs=10
-			fi
-			rlLog "got pf pci address is ${PF_PCI}, got test vf number is ${test_vfs}"
-
-			rlRun "sriov_remove_vfs ${nic_test} 0"
-			rlLog "try to create ${test_vfs} vfs"
-			rlRun "sriov_create_vfs ${nic_test} 0 ${test_vfs}"
-			sleep 10
-
-			local check_vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn0 | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-			local check_vf_name=$(ls /sys/bus/pci/devices/${check_vf_pci}/net 2>/dev/null)
-			local vf_driver_name=$(ethtool -i ${check_vf_name} | sed -n -e "/driver:/s/driver: //p")
-			if [ -z ${vf_driver_name} ]; then
-				rlFail "can't find vf driver"
-				rlRun "sriov_remove_vfs ${nic_test} 0"
-				sync_set server sriov_test_reproduce_2021326_reboot_check_end
-				exit 1
-			fi
-
-			rlLog "check all vfs are created"
-			if [[ $? -ne 0 ]] || [[ x"$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn* | wc -l)" != x"${test_vfs}" ]]; then
-				rlFail "create the test vf of pf failed"
-				rlRun "sriov_remove_vfs ${nic_test} 0"
-				sync_set server sriov_test_reproduce_2021326_reboot_check_end
-				exit 1
-			fi
-
-			rlLog "check no mac adress is 00:00:00:00:00:00"
-			for((i=0;i<$(expr $test_vfs); i++)); do
-				local test_vf_mac=$(ip link show ${nic_test} | grep "vf $i" | awk '{print$4}')
-				rlAssertNotEquals "check ${test_vf_mac} mac equal 00:00:00:00:00:00" ${test_vf_mac} "00:00:00:00:00:00"
-			done
-
-			rlLog "got all of vf name on a list"
-			local vf_name_list
-			for ((i=1;i<=${test_vfs};i++));do
-				local VF_PCI=$(sriov_get_vf_bus_info ${nic_test} 0 $i)
-				local VF_IFACE=$(sriov_get_vf_iface ${nic_test} 0 $i)
-				vf_name_list[$(expr $i - 1)]=${VF_IFACE}
-			done
-
-			local sort_vf_name_list=($(echo ${vf_name_list[*]} | tr ' ' '\n'  | sort -n -t 'v' -k 2 ))
-
-			local vf_mac_list
-			for ((i=1;i<=${test_vfs};i++));do
-				vf_mac_list[$(expr $i - 1)]=$(ip link show ${sort_vf_name_list[$(expr $i - 1)]} | grep "link/ether" | cut -d " " -f 6)
-			done
-			local vf_mac_list_length=${#vf_mac_list[@]}
-			rlLog "got vf name after sort: ${sort_vf_name_list[*]}"
-			rlLog "got vf mac list: ${vf_mac_list[*]}"
-			rlLog "got vf mac length: ${vf_mac_list_length}"
-			rlLog "clean all vf and start test"
-			rlRun "echo 0 > /sys/class/net/${nic_test}/device/sriov_numvfs"
-
-			rlLog "Beginning test"
-			set -x
-			local MTU=9000
-			modprobe -r vfio-pci
-			sleep 1
-			modprobe -r vfio
-			sleep 1
-			modprobe vfio-pci
-			sleep 1
-			modprobe vfio
-			sleep 1
-			rmmod ${vf_driver_name}
-			sleep 1
-
-			# 1. set numvfs
-			echo "1. set numvfs"
-			echo "set ${test_vfs} vfs on ${nic_test}"
-			echo 0 > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-			echo ${test_vfs} > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-			sleep 5
-
-
-			#2. set vf admin MAC address
-			echo "2. set vf admin MAC address"
-			for ((i=1;i<=${test_vfs};i++)); do
-				local vf_mac=${vf_mac_list[$(expr $i - 1)]}
-				ip link set dev $nic_test vf $(expr $i - 1) mac ${vf_mac}
-			done
-
-
-			# 3. unbind/bind vf driver
-			echo "unbind/bind vf driver"
-			for ((i=1;i<=${test_vfs};i++)); do
-				local vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn$(expr $i - 1) | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-				echo ${vf_pci} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
-				echo > /sys/bus/pci/devices/${vf_pci}/driver_override
-				echo ${vf_pci} > /sys/bus/pci/drivers_probe
-			done
-
-			# 4. set pf mtu
-			echo "4. set pf mtu to ${MTU}"
-			echo $MTU > /sys/class/net/${nic_test}/mtu
-
-			#5. bind vf driver (if not already)
-			#6. unbind/bind vf driver (workaround for bz1875338)
-			echo "6. unbind/bind vf driver (workaround for bz1875338)"
-			for ((i=1;i<=${test_vfs};i++)); do
-				local vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn$(expr $i - 1) | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-				echo ${vf_pci} > /sys/bus/pci/drivers/${vf_driver_name}/unbind
-				echo > /sys/bus/pci/devices/${vf_pci}/driver_override
-				echo ${vf_pci} > /sys/bus/pci/drivers_probe
-			done
-
-			sleep 2
-
-			#7. set vf mtu
-			echo "7. set vf mtu to ${MTU}"
-			for ((i=1;i<=${test_vfs};i++)); do
-				vf_name=${sort_vf_name_list[$(expr $i - 1)]}
-				echo $MTU > /sys/class/net/${vf_name}/mtu
-			done
-
-
-			#8. set pf up if not already
-			echo "8. set pf up if not already"
-			ip link set ${nic_test} up
-			sleep 5
-			echo "clean vf and reset mtu to 1500"
-			echo 0 > /sys/bus/pci/devices/${PF_PCI}/sriov_numvfs
-			sleep 5
-			ip link set mtu 1500 dev $nic_test
-			echo 1 > /tmp/sriov_test_reproduce_2021326_reboot_check
-			rhts-reboot
-		else
-			rlLog "check journald boot list"
-			rlRun "journalctl --list-boots"
-			local prevlast=$(journalctl --list-boots | awk '{prevlast = last; last = $0} END {if (NR >= 2) print prevlast}' | awk '{print $1}')
-			rlLog "got prelate record id: ${prevlast}"
-			rlRun "journalctl -o short-precise -k -b ${prevlast} | grep -C 50 -i \"call trace\"" 1
-			rlLog "cleanup journald setting"
-			rlRun "systemd-tmpfiles --clean --prefix /var/log/journal/"
-			rlRun "systemd-tmpfiles --remove --prefix /var/log/journal/"
-			rlRun "systemctl restart systemd-journald.service"
-			rlLog "finish test and clean tag file"
-			rm -rf /tmp/sriov_test_reproduce_2021326_reboot_check
-
-			sync_set server sriov_test_reproduce_2021326_reboot_check_end ${SYNC_TIME}
-		fi
-		return 0
-
-	fi
-}
-
-sriov_test_vf_cfg_stress()
-{
-	#reproducer for bz1997012 bz1996954, cfg vf in loop, should just fail without a kernel panic
-	ip link set $nic_test up
-	if i_am_server; then
-		sync_set client test_vf_cfg_start ${SYNC_TIME}
-		if	[ $? -eq 0 ]; then
-			sync_wait client test_vf_cfg_end ${SYNC_TIME}
-		else
-			rlFail "sync timeout with client. Need check it!!!"
-		fi
-	else
-		ip link set $nic_test up
-		if [ ! -f /tmp/sriov_test_vf_cfg_stress ]; then
-			sync_wait server test_vf_cfg_start ${SYNC_TIME}
-			rlLog "start sriov_test_vf_cfg_stress test"
-			echo 1 > /tmp/sriov_test_vf_cfg_stress
-			if ! sriov_create_vfs $nic_test 0 1; then
-				sync_set server test_vf_cfg_end ${SYNC_TIME}
-				return 1
-			fi
-
-			local VF=$(sriov_get_vf_iface $nic_test 0 1)
-			if [ -z "$VF" ]; then
-				rlFail "FAIL to get VF interface"
-				result=1
-				sync_set server test_vf_cfg_end ${SYNC_TIME}
-			else
-				ethtool -i $VF
-				change_vf_cfg_in_loop()
-				{
-					# clear dmesg
-					dmesg -C
-					sriov_remove_vfs $nic_test 0
-					for ((i=0; i<500; i++)); do
-						echo "create vf"
-						ip link set $nic_test up
-						sriov_create_vfs $nic_test 0 1
-						# change vf cfg
-						for i in `seq 0 100`;do
-							ip link set $nic_test vf 0 trust on spoofchk on
-							sleep 1
-							ip link set $nic_test vf 0 trust off spoofchk off
-							sleep 1
-							ip link set $nic_test vf 0 trust on spoofchk on
-							sleep 1
-						done
-						echo "remove vf"
-						sriov_remove_vfs $nic_test 0
-						dmesg | grep -i busy && return 1
-					done
-				}
-				vf_in_netns()
-				{
-					# clear netns
-					ip netns del ns1 &>/dev/null
-					# create netns
-					ip netns add ns1
-					ip netns exec ns1 ip link add name br0 type bridge
-					ip netns exec ns1 ip link set br0 up
-					# vf option
-					while :;do
-						[ -z "$VF" ] && { continue; }
-						echo "setup vf in netns"
-						ip link set $VF address "22:00:01:02:03:04" && echo "set mac succeeded 1"
-						ip link set $VF netns ns1
-						ip netns exec ns1 ip link set $VF up
-						ip netns exec ns1 ip link set $VF master br0
-						ip netns exec ns1 ip link set $VF address "22:00:01:02:03:05" && echo "set mac succeeded 2"
-						ip netns exec ns1 ip link set $VF netns 1
-					done
-					# remove netns
-					ip netns del ns1
-				}
-				(
-					change_vf_cfg_in_loop &
-					local child2=$!
-					vf_in_netns &
-					local child1=$!
-					trap -- "" SIGTERM
-					(
-						sleep 3600
-						kill $child1 2> /dev/null
-						kill $child2 2> /dev/null
-					) &
-					wait $child1
-					wait $child2
-				)
-				sync_set server test_vf_cfg_end ${SYNC_TIME}
-			fi
-			sriov_remove_vfs $nic_test 0
-		else
-			rlLog "finish sriov_test_vf_cfg_stress and clean tag file"
-			rm -rf /tmp/sriov_test_vf_cfg_stress
-			sriov_remove_vfs $nic_test 0
-			sync_set server test_vf_cfg_end ${SYNC_TIME}
-		fi
-	fi
-}
-
-sriov_test_2049237_VF_mac_reset_zero()
-{
-	if i_am_server ; then
-		sync_set client test_VF_mac_reset_zero_start ${SYNC_TIME}
-		if	[ $? -eq 0 ]; then
-			sync_wait client test_VF_mac_reset_zero_end ${SYNC_TIME}
-		else
-			rlFail "sync timeout with client. Need check it!!!"
-		fi
-	else
-
-		if [ ! -f /tmp/sriov_test_2049237_VF_mac_reset_zero ]; then
-			# configure hugepage before start test.
-			if [ "$SYS_ARCH" == "ppc64le" ] && (! grep "default_hugepagesz=2G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=2G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=12" /proc/cmdline &>/dev/null)
-			then
-				rlLog "grubby --args=\"default_hugepagesz=2G hugepagesz=2G hugepages=12\" --update-kernel=$(grubby --default-kernel)"
-				grubby --args="default_hugepagesz=2G hugepagesz=2G hugepages=12" --update-kernel=$(grubby --default-kernel)
-				rhts-reboot
-			elif [ "$SYS_ARCH" != "ppc64le" ] && (! grep "default_hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=24" /proc/cmdline &>/dev/null || \
-			! grep "intel_iommu=on" /proc/cmdline &>/dev/null || \
-			! grep "iommu=pt" /proc/cmdline &>/dev/null)
-			then
-				# set nosmt=force and default hugepage in host
-				rlLog "grubby --args=\"default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt\" --update-kernel=$(grubby --default-kernel)"
-				grubby --args="default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt" --update-kernel=$(grubby --default-kernel)
-				rhts-reboot
-			else
-				rlLog "client finish hugepage configuration"
-			fi
-
-			sync_wait server test_VF_mac_reset_zero_start ${SYNC_TIME}
-
-			echo 1 > /tmp/sriov_test_2049237_VF_mac_reset_zero
-			rpm -q dpdk || yum install -y dpdk 2>/dev/null || rlFail "install dpdk failed"
-			rpm -q dpdk-tools || yum install -y dpdk-tools 2>/dev/null || rlFail "install dpdk failed"
-
-			modprobe -r vfio-pci
-			sleep 1
-			modprobe -r vfio
-			sleep 1
-			modprobe vfio-pci
-			sleep 1
-			modprobe vfio
-			sleep 1
-
-			ip link set $nic_test up
-			sriov_create_vfs ${nic_test} 0 8 || { rlFail "Create vf failed on ${nic_test}"; sync_set server test_VF_mac_reset_zero_end; }
-			ip link show ${nic_test}
-			local dpdk_devbind_path=$(rpm -ql dpdk-tools | grep devbind.py$)
-			local testpmd_cmd=$(rpm -ql dpdk | grep testpmd$)
-			local vf1_name=$(sriov_get_vf_iface ${nic_test} 0 1)
-			local vf2_name=$(sriov_get_vf_iface ${nic_test} 0 2)
-			local vf1_pci=$(sriov_get_vf_bus_info ${nic_test} 0 1)
-			local vf2_pci=$(sriov_get_vf_bus_info ${nic_test} 0 2)
-
-			$dpdk_devbind_path --status
-			ip link set ${vf1_name} down
-			ip link set ${vf2_name} down
-			local driver_name=$(ethtool -i ${nic_test}| grep driver | awk '{print $NF}')
-			if [[ ${driver_name} =~ mlx.* ]]; then
-				echo "test nic belong to mlx, do nothing"
-			else
-				rlRun "$dpdk_devbind_path -u $vf1_pci"
-				rlRun "$dpdk_devbind_path -u $vf2_pci"
-				rlRun "$dpdk_devbind_path -b vfio-pci $vf1_pci"
-				rlRun "$dpdk_devbind_path -b vfio-pci $vf2_pci"
-				rlRun "$dpdk_devbind_path --status"
-			fi
-			# workaround https://bugzilla.redhat.com/show_bug.cgi?id=2128171
-			rlLog "full of testpmd cmd is: \"${testpmd_cmd} -a ${vf1_pci} -a ${vf2_pci} -n 4 --iova-mode=va -- -i --nb-cores=1 --forward-mode=mac --port-topology=loop --no-mlockall\""
-			nohup sh -c "(while sleep 1; do echo show port info all; done | ${testpmd_cmd} -a ${vf1_pci} -a ${vf2_pci} -n 4 --iova-mode=va -- -i --nb-cores=1 --forward-mode=mac --port-topology=loop --no-mlockall) &>/tmp/testpmd.log &"
-			sleep 10
-			sed -n '1,500p' /tmp/testpmd.log
-			while [[ $(ps -aux | grep testpmd | grep -v "grep" | wc -l) -ne 0 ]]; do
-				pkill -9 testpmd
-				sleep 5
-			done
-
-			ip link show ${nic_test}
-
-			local vf1_mac=$(ip link show ${nic_test} | grep "vf 0" | awk '{print$4}')
-			local vf2_mac=$(ip link show ${nic_test} | grep "vf 1" | awk '{print$4}')
-			rlAssertNotEquals "check ${vf1_name} mac equal 00:00:00:00:00:00" ${vf1_mac} "00:00:00:00:00:00"
-			rlAssertNotEquals "check ${vf2_name} mac equal 00:00:00:00:00:00" ${vf2_mac} "00:00:00:00:00:00"
-
-			if [[ ${driver_name} =~ mlx.* ]]; then
-				echo "test nic belong to mlx, do nothing"
-			else
-				rlRun "$dpdk_devbind_path -u $vf1_pci"
-				rlRun "$dpdk_devbind_path -u $vf2_pci"
-				rlRun "$dpdk_devbind_path -b iavf $vf1_pci"
-				rlRun "$dpdk_devbind_path -b iavf $vf2_pci"
-				rlRun "$dpdk_devbind_path --status"
-			fi
-			sriov_remove_vfs ${nic_test} 0
-			rm -rf /tmp/sriov_test_2049237_VF_mac_reset_zero
-			sync_set server test_VF_mac_reset_zero_end ${SYNC_TIME}
-		else
-			rm -rf /tmp/sriov_test_2049237_VF_mac_reset_zero
-			sync_set server test_VF_mac_reset_zero_end ${SYNC_TIME}
-		fi
-	fi
-
-}
-
-sriov_test_2049237_VF_mac_reset_zero_reboot_check()
-{
-	if i_am_server ; then
-		sync_set client test_VF_mac_reset_zero_reboot_check_start ${SYNC_TIME}
-		if	[ $? -eq 0 ]; then
-			sync_wait client test_VF_mac_reset_zero_reboot_check_end ${SYNC_TIME}
-		else
-			rlFail "sync timeout with client. Need check it!!!"
-		fi
-	else
-		# after do test, need reboot to check whether call trace occurred.
-		if [ ! -f /tmp/sriov_test_2049237_VF_mac_reset_zero_reboot_check ]; then
-			# configure hugepage before start test.
-			if [ "$SYS_ARCH" == "ppc64le" ] && (! grep "default_hugepagesz=2G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=2G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=24" /proc/cmdline &>/dev/null)
-			then
-				rlLog "grubby --args=\"default_hugepagesz=2G hugepagesz=2G hugepages=24\" --update-kernel=$(grubby --default-kernel)"
-				grubby --args="default_hugepagesz=2G hugepagesz=2G hugepages=24" --update-kernel=$(grubby --default-kernel)
-				rhts-reboot
-			elif [ "$SYS_ARCH" != "ppc64le" ] && (! grep "default_hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepagesz=1G" /proc/cmdline &>/dev/null || \
-			! grep "hugepages=24" /proc/cmdline &>/dev/null || \
-			! grep "intel_iommu=on" /proc/cmdline &>/dev/null || \
-			! grep "iommu=pt" /proc/cmdline &>/dev/null)
-			then
-				# set nosmt=force and default hugepage in host
-				rlLog "grubby --args=\"default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt\" --update-kernel=$(grubby --default-kernel)"
-				grubby --args="default_hugepagesz=1G hugepagesz=1G hugepages=24 intel_iommu=on iommu=pt" --update-kernel=$(grubby --default-kernel)
-				rhts-reboot
-			else
-				rlLog "client finish hugepage configuration"
-			fi
-
-			rlLog "Configure journalctl"
-			[[ -d /var/log/journal ]] || mkdir /var/log/journal
-			systemd-tmpfiles --create --prefix /var/log/journal
-			echo "SystemMaxUse=100M" >> /etc/systemd/journald.conf
-			systemctl restart systemd-journald.service
-			rlLog "Configure finish"
-			rpm -q dpdk || yum install -y dpdk 2>/dev/null || rlFail "install dpdk failed"
-			rpm -q dpdk-tools || yum install -y dpdk-tools 2>/dev/null || rlFail "install dpdk failed"
-
-			rlRun "modprobe -r vfio-pci"
-			sleep 1
-			rlRun "modprobe -r vfio"
-			sleep 1
-			rlRun "modprobe vfio-pci"
-			sleep 1
-			rlRun "modprobe vfio"
-			sleep 1
-			rlRun "lsmod | grep vfio"
-			rlRun "ip link set $nic_test up"
-			sriov_create_vfs ${nic_test} 0 8 || { rlFail "Create vf failed on ${nic_test}"; sync_set server test_VF_mac_reset_zero_reboot_check_end; }
-			rlRun "ip link show ${nic_test}"
-			local dpdk_devbind_path=$(rpm -ql dpdk-tools | grep devbind.py$)
-			local testpmd_cmd=$(rpm -ql dpdk | grep testpmd$)
-			local vf1_name=$(sriov_get_vf_iface ${nic_test} 0 1)
-			local vf2_name=$(sriov_get_vf_iface ${nic_test} 0 2)
-			local vf1_pci=$(sriov_get_vf_bus_info ${nic_test} 0 1)
-			local vf2_pci=$(sriov_get_vf_bus_info ${nic_test} 0 2)
-
-			rlRun "$dpdk_devbind_path --status"
-			rlRun "ip link set ${vf1_name} down"
-			rlRun "ip link set ${vf2_name} down"
-			local driver_name=$(ethtool -i ${nic_test}| grep driver | awk '{print $NF}')
-			if [[ ${driver_name} =~ mlx.* ]]; then
-				rlLog "test nic belong to mlx, do nothing"
-			else
-				rlRun "$dpdk_devbind_path -u $vf1_pci"
-				rlRun "$dpdk_devbind_path -u $vf2_pci"
-				rlRun "$dpdk_devbind_path -b vfio-pci $vf1_pci"
-				rlRun "$dpdk_devbind_path -b vfio-pci $vf2_pci"
-				rlRun "$dpdk_devbind_path --status"
-			fi
-			local dpdk_version=$(rpm -q --queryformat '%{VERSION}' dpdk-tools | awk -F '.' '{print $1}')
-			if (( ${dpdk_version} > 20 )); then
-				local allow_list_option='-a'
-			else
-				local allow_list_option='-w'
-			fi
-			nohup sh -c "(while sleep 1; do echo show port info all; done | ${testpmd_cmd} ${allow_list_option} ${vf1_pci} ${allow_list_option} ${vf2_pci} -n 4 --iova-mode=va -- -i --nb-cores=5 --forward-mode=mac --port-topology=loop --no-mlockall) &>/tmp/testpmd.log &"
-			sleep 10
-			sed -n '1,500p' /tmp/testpmd.log
-			while [[ $(ps -aux | grep testpmd | grep -v "grep" | wc -l) -ne 0 ]]; do
-				pkill -9 testpmd
-				sleep 5
-			done
-
-			ip link show ${nic_test}
-
-			local vf1_mac=$(ip link show ${nic_test} | grep "vf 0" | awk '{print$4}')
-			local vf2_mac=$(ip link show ${nic_test} | grep "vf 1" | awk '{print$4}')
-			rlAssertNotEquals "check ${vf1_name} mac equal 00:00:00:00:00:00" ${vf1_mac} "00:00:00:00:00:00"
-			rlAssertNotEquals "check ${vf2_name} mac equal 00:00:00:00:00:00" ${vf2_mac} "00:00:00:00:00:00"
-
-			if [[ ${driver_name} =~ mlx.* ]]; then
-				rlLog "test nic belong to mlx, do nothing"
-			else
-				rlRun "$dpdk_devbind_path -u $vf1_pci"
-				rlRun "$dpdk_devbind_path -u $vf2_pci"
-				rlRun "$dpdk_devbind_path -b iavf $vf1_pci"
-				rlRun "$dpdk_devbind_path -b iavf $vf2_pci"
-				rlRun "$dpdk_devbind_path --status"
-			fi
-			sync_wait server test_VF_mac_reset_zero_reboot_check_start ${SYNC_TIME}
-			sriov_remove_vfs ${nic_test}
-			echo "1" > /tmp/sriov_test_2049237_VF_mac_reset_zero_reboot_check
-			rhts-reboot
-		else
-			rlLog "check journald boot list"
-			rlRun "journalctl --list-boots"
-			local prevlast=$(journalctl --list-boots | awk '{prevlast = last; last = $0} END {if (NR >= 2) print prevlast}' | awk '{print $1}')
-			rlLog "got prelate record id: ${prevlast}"
-			rlRun "journalctl -o short-precise -k -b ${prevlast} | grep -C 100 -i \"call trace\"" 1
-			rlLog "cleanup journald setting"
-			rlRun "systemd-tmpfiles --clean --prefix /var/log/journal/"
-			rlRun "systemd-tmpfiles --remove --prefix /var/log/journal/"
-			rlRun "systemctl restart systemd-journald.service"
-			rm -rf /tmp/sriov_test_2049237_VF_mac_reset_zero_reboot_check
-			sync_set server test_VF_mac_reset_zero_reboot_check_end ${SYNC_TIME}
-		fi
-	fi
-}
-
-sriov_test_reproduce_2057244_and_2070917_ns(){
-	# for 2057244 should got Invalid message from VF 0, opcode 3, len 4, error -1
-	# for 2070917 should ping failed when first time. ip netns exec sriov_test_reproduce_2057244_ns ping -c3 172.3.${ipaddr}.188
-
-	if i_am_server; then
-		sync_set client sriov_test_reproduce_2057244_and_2070917_ns_start
-		if [ $? -eq 0 ]; then
-			local test_nic=$(get_test_nic)
-			rlLog "test nic is: ${test_nic}"
-			rlRun "ip link set ${test_nic} up"
-			rlRun "ip link add link ${test_nic} name ${test_nic}.3 type vlan id 3" # can use random vlan
-			rlRun "ip addr add 172.3.${ipaddr}.188/24 dev ${test_nic}.3" # can use random vlan
-			rlRun "ip link set ${test_nic}.3 up" # can use random IP address
-			nohup ping -I ${test_nic}.3 172.3.${ipaddr}.111 &
-			sync_wait client sriov_test_reproduce_2057244_and_2070917_ns_end
-			if [ $? -eq 0 ]; then
-				rlLog "finish sriov_test_reproduce_2057244_ns"
-			else
-				rlFail "sync error need to check"
-			fi
-			pkill -9 ping
-			ip addr flush ${test_nic}.3
-			ip link del ${test_nic}.3
-		else
-			rlFail "sync error need to check"
-			exit 1
-		fi
-	else
-		sync_wait server sriov_test_reproduce_2057244_and_2070917_ns_start
-		if [ $? -eq 0 ]; then
-			local test_nic=$(get_test_nic)
-			local random_mac=$(get_mac_prefix $(hostname))
-			local vf_mac="${random_mac}02:02"
-			rlLog "got vf randon mac is: ${vf_mac}"
-			rlRun "ip link set ${test_nic} up"
-			rlLog "test nic is: ${test_nic}"
-			rlLog "try to got vf0 name"
-			local PF_PCI=$(sriov_get_pf_bus_info ${test_nic} 0)
-			rlRun "echo 0 > /sys/class/net/${test_nic}/device/sriov_numvfs"
-			rlLog "try to create 1 vfs"
-			rlRun "echo 1 > /sys/class/net/${test_nic}/device/sriov_numvfs"
-			sleep 10
-			local check_vf_pci=$(ls -l /sys/bus/pci/devices/${PF_PCI}/virtfn0 | awk '{print $NF}' | sed 's/..\///' | sed -n 1p)
-			local check_vf_name=$(ls /sys/bus/pci/devices/${check_vf_pci}/net 2>/dev/null)
-			rlLog "got vf 0 name is: ${check_vf_name}"
-			rlRun "echo 0 > /sys/class/net/${test_nic}/device/sriov_numvfs"
-			sleep 10
-			for i in $(seq 1 100); do
-				rlLog "start $i test"
-				modprobe -r bridge
-				echo 0 > /sys/class/net/${test_nic}/device/sriov_numvfs
-				ip li > /dev/null
-				echo 8 > /sys/class/net/${test_nic}/device/sriov_numvfs
-				sleep 3
-				ip link set ${test_nic} vf 0 vlan 3
-				ip netns add sriov_test_reproduce_2057244_ns
-				ip link set dev ${check_vf_name} netns sriov_test_reproduce_2057244_ns
-				ip netns exec sriov_test_reproduce_2057244_ns ip link add dev br0 type bridge
-				ip netns exec sriov_test_reproduce_2057244_ns ip link set ${check_vf_name} master br0
-				ip netns exec sriov_test_reproduce_2057244_ns ip link set ${check_vf_name} up
-				ip netns exec sriov_test_reproduce_2057244_ns ip link set br0 up
-				ip netns exec sriov_test_reproduce_2057244_ns ip addr flush br0
-				ip netns exec sriov_test_reproduce_2057244_ns ip addr add 172.3.${ipaddr}.111/24 dev br0 # can use random IP address
-				ip netns exec sriov_test_reproduce_2057244_ns ping -c3 172.3.${ipaddr}.188 || {
-					rlFail "Ping failed when run $i cycle"
-				}
-				ip link set ${test_nic} vf 0 mac ${vf_mac}
-				ip netns exec sriov_test_reproduce_2057244_ns ip link set br0 address ${vf_mac}
-				ip netns exec sriov_test_reproduce_2057244_ns ping -c3 172.3.${ipaddr}.188 || {
-					rlFail "Ping failed when run $i cycle"
-				}
-				ip link set ${test_nic} vf 0 vlan 0
-				ip link set ${test_nic} vf 0 trust on
-				ip link set ${test_nic} vf 0 trust off
-				ip link set ${test_nic} vf 0 trust on
-				ip link set ${test_nic} vf 0 trust off
-				ip link set ${test_nic} vf 0 trust on
-				ip netns exec sriov_test_reproduce_2057244_ns ip addr flush br0
-				ip netns exec sriov_test_reproduce_2057244_ns ip link add link br0 name br0.3 type vlan id 3
-				ip netns exec sriov_test_reproduce_2057244_ns ip link set br0.3 up
-				ip netns exec sriov_test_reproduce_2057244_ns ip addr add 172.3.${ipaddr}.111/24 dev br0.3 # can use random IP address
-				ip netns exec sriov_test_reproduce_2057244_ns ping -c5 172.3.${ipaddr}.188 || {
-					rlFail "Ping failed when run $i cycle"
-					rlRun "ip netns exec sriov_test_reproduce_2057244_ns ip link show"
-					rlRun "ip netns exec sriov_test_reproduce_2057244_ns ip link show | grep -w NO-CARRIER" "1-255"
-					break
-				}
-				rlLog "finish $i test"
-				ip netns del sriov_test_reproduce_2057244_ns
-			done
-			rlLog "clean test configuration"
-			rlRun "ip netns del sriov_test_reproduce_2057244_ns" "0,1"
-			rlRun "echo 0 > /sys/class/net/${test_nic}/device/sriov_numvfs"
-			sync_set server sriov_test_reproduce_2057244_and_2070917_ns_end
-		else
-			rlFail "sync error with server"
-			exit 1
-		fi
-	fi
-}
-sriov_test_bz2008373() {
-		if i_am_server ; then
-			sync_set client sriov_test_bz2008373_start  52200
-			sync_wait client sriov_test_bz2008373_end 52200
-		else
-			sync_wait server sriov_test_bz2008373_start  52200
-			rlLog "start to test sriov_test_bz2008373_start"
-			local nic_name=$(get_test_nic 1)
-			PCI=$(ethtool -i ${nic_name} | grep bus | cut -d " " -f 2)
-			vf_max_num=$(cat /sys/class/net/${nic_name}/device/sriov_totalvfs)
-			[ ${vf_max_num} -lt 64 ] && vf_num=${vf_max_num} || vf_num=64
-			echo  ${vf_num} > /sys/bus/pci/devices/$PCI/sriov_numvfs
-			loop_num=$(expr ${vf_num} - 1)
-			for VF in $(seq 0 ${loop_num})
-			do
-				echo "loop time: $VF"
-				vf="vf$VF"
-				echo "vf name: $vf"
-				for i in {1..10001}
-				do
-						{ ip link set ${nic_name} vf $VF trust on;ip link set ${nic_name} vf $VF vlan 10 qos 1;ip link set ${nic_name} vf $VF vlan 0 qos 0; }
-						[ $? -ne 0 ] && echo "bug occur" && result=1 && break 2
-				done
-			done
-			ip -d link show ${nic_name}
-			echo 0 > /sys/bus/pci/devices/$PCI/sriov_numvfs
-
-			sync_set server sriov_test_bz2008373_end  52200
-		fi
-		return $result
-}
-
-# vf_intf_garp_check is for bz1938635
-vf_intf_garp_check() {
-	rlLog "vf_intf_garp_check is for bz1938635"
-	result=0
-	if i_am_server; then
-		sync_set client vf_intf_garp_check_start
-		sync_wait client vf_intf_garp_check_end
-	else
-		rlLog "start to test client vf_intf_arp_check"
-		sync_wait server vf_intf_garp_check_start
-		local nic_test=$(get_test_nic 1)
-		PF_PCI=$(ethtool -i ${nic_test} | grep bus | cut -d " " -f 2)
-		#1.enable sriov
-		rlLog "STEP 1: Enable sriov on client"
-		sriov_create_vfs ${nic_test} 0 1
-		sleep 3
-		#2. set ip addr for vf
-		rlLog "STEP 2: Set IP address for vf interface"
-		local VF_IFACE=$(sriov_get_vf_iface $nic_test 0 1)
-		ip addr add 172.30.${ipaddr}.2/24 dev ${VF_IFACE}
-		ip link set $VF_IFACE up
-		#3.set arp_notify for GARP
-		rlLog "STEP 3: Set arp_notify for PF and vf"
-		pf_garp_status=$(cat /proc/sys/net/ipv4/conf/${nic_test}/arp_notify)
-		vf_garp_status=$(cat /proc/sys/net/ipv4/conf/${VF_IFACE}/arp_notify)
-		[ ${pf_garp_status} -eq 0 ] && echo 1 > /proc/sys/net/ipv4/conf/${nic_test}/arp_notify
-		[ ${vf_garp_status} -eq 0 ] && echo 1 > /proc/sys/net/ipv4/conf/${VF_IFACE}/arp_notify
-		#4. set effective mac for vf and check the effective mac address whether be applied
-		rlLog "STEP 4: set effective mac for vf , then check the effective mac address whether be applied, and if the garp packets are sent"
-		vf_mac=00:11:22:33:44:10
-		timeout 20  tcpdump -Q out  -nn -e  -i  ${VF_IFACE} arp  -w 1.pcap &
-		sleep 8
-		ip link set ${VF_IFACE} addr ${vf_mac}
-		sleep 13
-		ip link show ${VF_IFACE} | grep -i  ${vf_mac}
-		[ $? -eq 0 ] ||  { result=1; rlFail "step 4: configure link mac ${vf_mac} failed"; ip link show ${VF_IFACE}; }
-		#check the GARP packets
-		tcpdump -r 1.pcap -enn | grep  -i  "${vf_mac} > ff:ff:ff:ff:ff:ff"
-		[ $? -eq 0 ] || { result=1; tcpdump -r 1.pcap -enn; rlFail "step 4: No garp packets captured for mac ${vf_mac}"; }
-		#5.  set the admin mac for vf and check the mac when nic_driver= ice or i40e
-		if  [ "$NIC_DRIVER" = "ice" ] || [ "$NIC_DRIVER" = "i40e" ]; then
-
-			rlLog "STEP 5: Set the admin mac for vf and check if the mac is set successfully"
-			vf_mac1=00:11:22:33:44:11
-			ip link set ${nic_test} vf 0 mac ${vf_mac1}
-			sleep 3
-			ip link show ${VF_IFACE} | grep -i  ${vf_mac1}
-			[ $? -eq 0 ] ||  { result=1; rlFail "${vf_mac1} : configure link mac failed"; ip link show ${VF_IFACE}; }
-
-			#6.set the effective mac for vf
-			rlLog "STEP 6: Set mac for vf interface and check if the mac is set successfully"
-			vf_mac2=00:11:22:33:44:12
-			info=$(ip link set ${VF_IFACE} addr ${vf_mac2} 2>&1)
-			[[ $info == "RTNETLINK answers: Permission denied" ]] || { result=1; rlFail "There should be error info"; rlLog "The current info is $info"; }
-			sleep 3
-			ip link show ${VF_IFACE} | grep -i  ${vf_mac2}
-			[ $? -ne 0 ] ||  { result=1; rlFail "step6 : configure link mac ${vf_mac2} should  fail"; ip link show ${VF_IFACE}; }
-		fi
-		sriov_remove_vfs $nic_test 0
-		sync_set server  vf_intf_garp_check_end
-	fi
-	return $result
-}
-
-
-sriov_test_vlan_qinq_baisc()
-{
-	log_header "sriov_test_vlan_qinq_baisc" $result_file
+	log_header "sriov_test_vlan_qinq_basic" $result_file
 	local result=0
-	local test_name=sriov_test_vlan_qinq_baisc
+	local test_name=sriov_test_vlan_qinq_basic
 	local outer_tag=30
 	local inner_tag=31
 	local server_outer_ip4="192.30.${ipaddr}.1"
@@ -15125,6 +7801,11 @@ sriov_test_vlan_qinq_baisc()
 	ip link set $nic_test up
 
 	if i_am_server;then
+		rlRun "get_iface_sw_port $nic_test sw port"
+		if [  $sw = 93180 ] || [ $sw =  9364 ]; then
+			# switch 9364 and 93180 don't support qinq as defualt , set it pass
+			rlRun "swcfg qinq_config $sw $port"
+		fi
 		ip addr add ${server_ip4}/${ip4_mask_len} dev $nic_test
 		ip addr add ${server_ip6}/${ip6_mask_len} dev $nic_test
 		ip link add link $nic_test name $nic_test.$outer_tag type vlan id $outer_tag
@@ -15141,7 +7822,6 @@ sriov_test_vlan_qinq_baisc()
 		ip addr add ${server_inner_sametag_ip6}/${ip6_mask_len} dev $nic_test.$outer_tag.$outer_tag
 		sync_set client 8100_over_8100_start
 		sync_wait client 8100_over_8100_end
-		rlRun "get_iface_sw_port $nic_test sw port"
 		if [ `echo $sw |grep 5200` ]; then
 			# juniper 5200 don't support 88a8 and 8100 at the same time. let 88a8 pass
 			rlRun "swcfg set_interface_88a8 $sw $port"
@@ -15167,6 +7847,9 @@ sriov_test_vlan_qinq_baisc()
 		if [ `echo $sw |grep 5200` ]; then
 			# juniper 5200 don't support 88a8 and 8100 at the same time. delete 88a8 config to let 8100 pass
 			rlRun "swcfg del_interface_88a8 $sw $port"
+		elif [  $sw = 93180 ] || [ $sw =  9364 ]; then
+			# clean up qinq config
+			rlRun "swcfg qinq_delete $sw $port"
 		fi
 		ip link delete $nic_test.$outer_tag.$inner_tag
 		ip link delete $nic_test.$outer_tag.$outer_tag
@@ -15174,24 +7857,28 @@ sriov_test_vlan_qinq_baisc()
 		return 0
 	else
 #if [ "$NIC_DRIVER" = "i40e" ] || [ "$NIC_DRIVER" = "ice" ];then
-		if [ "$NIC_DRIVER" = "ice" ];then
-			sync_wait server 8100_over_8100_start
-			local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
-			if ! sriov_create_vfs $nic_test 0 2; then
-				echo "create vf failed"
-				sync_set server 8100_over_8100_end
-				sync_wait server 8100_over_88a8_start
-				sync_set server 8100_over_88a8_end
-				return 1
-			fi
+		sync_wait server 8100_over_8100_start
+		rlRun "get_iface_sw_port $nic_test sw port" "0-255"
+		if [  $sw = 93180 ] || [ $sw =  9364 ]; then
+			# switch 9364 and 93180 don't support qinq as defualt , set it pass
+			rlRun "swcfg qinq_config $sw $port"
+		fi
+		local mac="00:de:ad:$(printf %02x $ipaddr):01:01"
+		if ! sriov_create_vfs $nic_test 0 2; then
+			echo "create vf failed"
+			sync_set server 8100_over_8100_end
+			sync_wait server 8100_over_88a8_start
+			sync_set server 8100_over_88a8_end
+			return 1
+		fi
 
-			if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
-				echo "attach vf to vm failed"
-				sriov_remove_vfs $nic_test 0
-				sync_set server 8100_over_8100_end
-				sync_wait server 8100_over_88a8_start
-				sync_set server 8100_over_88a8_end
-				return 1
+		if ! sriov_attach_vf_to_vm $nic_test 0 1 $vm1 $mac; then
+			echo "attach vf to vm failed"
+			sriov_remove_vfs $nic_test 0
+			sync_set server 8100_over_8100_end
+			sync_wait server 8100_over_88a8_start
+			sync_set server 8100_over_88a8_end
+			return 1
 		else
 			local cmd=(
 				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -15229,18 +7916,18 @@ sriov_test_vlan_qinq_baisc()
 				rlFail "fail:ping failed via vf  qinq(8100_over_8100)"
 			fi
 
-:<<!
-			#do not run netperf cause bug 2102931
-			if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
-				result += 1
-				echo "double_inner_outer_tag(8100_over_8100) $inner_tag over $outer_tag vf_innter_ip netperf failed"
-			fi
+			if [ "$NIC_DRIVER" = "ice" ];then
+				#do not run netperf cause bug 2222502(mlx5) 2102931(ice)
+				if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
+					result+=1
+					echo "double_inner_outer_tag(8100_over_8100) $inner_tag over $outer_tag vf_innter_ip netperf failed"
+				fi
 
-			if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
-				result +=1
-				echo "double_outer_outer_tag(8100_over_8100) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+				if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
+					result+=1
+					echo "double_outer_outer_tag(8100_over_8100) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+				fi
 			fi
-!
 
 			local cmd=(
 				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -15249,6 +7936,10 @@ sriov_test_vlan_qinq_baisc()
 				{ethtool -K \$NIC_TEST tx-vlan-stag-hw-insert on}
 				{ethtool -K \$NIC_TEST rx-vlan-stag-hw-parse on}
 			)
+			ethtool -K $nic_test rxvlan off
+			ethtool -K $nic_test txvlan off
+			ethtool -K $nic_test tx-vlan-stag-hw-insert on
+			ethtool -K $nic_test rx-vlan-stag-hw-parse on
 			vmsh cmd_set $vm1 "${cmd[*]}"
 
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
@@ -15265,18 +7956,18 @@ sriov_test_vlan_qinq_baisc()
 				rlFail "fail:ping failed via offload on vf qinq(8100_over_8100)"
 			fi
 
-:<<!
-			#do not run the test , cause bug 2102931
-			if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
-				result += 1
-				echo "qinq_offload on double_inner_outer_tag(8100_over_8100) $inner_tag over $outer_tag vf_innter_ip netperf failed"
-			fi
+			if [ "$NIC_DRIVER" = "ice" ];then
+				#do not run the test , cause bug 2102931
+				if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
+					result+=1
+					echo "qinq_offload on double_inner_outer_tag(8100_over_8100) $inner_tag over $outer_tag vf_innter_ip netperf failed"
+				fi
 
-			if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
-				result +=1
-				echo "qinq_offload on double_outer_outer_tag(8100_over_8100) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+				if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
+					result+=1
+					echo "qinq_offload on double_outer_outer_tag(8100_over_8100) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+				fi
 			fi
-!
 
 			ip link set $nic_test vf 0 vlan 0
 			local cmd=(
@@ -15302,6 +7993,10 @@ sriov_test_vlan_qinq_baisc()
 				{ip addr add  $vf_inner_sametag_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag.$outer_tag}
 				{ip addr show }
 			)
+			ethtool -K $nic_test rxvlan on
+			ethtool -K $nic_test txvlan on
+			ethtool -K $nic_test tx-vlan-stag-hw-insert off
+			ethtool -K $nic_test rx-vlan-stag-hw-parse off
 			vmsh cmd_set $vm1 "${cmd[*]}"
 
 			echo "image_vm vlan 8100=================================================================================================================================================================="
@@ -15319,17 +8014,18 @@ sriov_test_vlan_qinq_baisc()
 				rlFail "fail:ping failed via vm_qinq(8100_over_8100)"
 			fi
 
-:<<!
-			if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
-				result += 1
-				echo "vm_qinq double_inner_outer_tag(8100_over_8100) $inner_tag over $outer_tag vf_innter_ip netperf failed"
+			if [ "$NIC_DRIVER" = "ice" ];then
+				if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
+					result+=1
+					echo "vm_qinq double_inner_outer_tag(8100_over_8100) $inner_tag over $outer_tag vf_innter_ip netperf failed"
+				fi
+
+				if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
+					result+=1
+					echo "vm_qinq double_outer_outer_tag(8100_over_8100) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+				fi
 			fi
 
-			if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
-				result +=1
-				echo "vm_qinq double_outer_outer_tag(8100_over_8100) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
-			fi
-!
 
 			local cmd=(
 				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
@@ -15344,117 +8040,153 @@ sriov_test_vlan_qinq_baisc()
 			sync_set server 8100_over_8100_end
 			sync_wait server 8100_over_88a8_start
 
-			rlRun "get_iface_sw_port $nic_test sw port"
+			rlRun "get_iface_sw_port $nic_test sw port" "0-255"
 			if [ `echo $sw |grep 5200` ]; then
 				# 88a8 and 8100 don't support at the same time. let 88a8 pass
 				rlRun "swcfg set_interface_88a8 $sw $port"
 			fi
-			local cmd=(
-				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-				{ip link set \$NIC_TEST up}
-				{ip link add link \$NIC_TEST name \$NIC_TEST.$inner_tag type vlan id $inner_tag}
-				{ip link add link \$NIC_TEST name \$NIC_TEST.$outer_tag type vlan id $outer_tag}
-				{ip link set \$NIC_TEST.$outer_tag up}
-				{ip link set \$NIC_TEST.$inner_tag up}
-				{ip addr add  $vf_outer_ip4/${ip4_mask_len} dev \$NIC_TEST}
-				{ip addr add  $vf_outer_ip6/${ip6_mask_len} dev \$NIC_TEST}
-				{ip addr add  $vf_inner_ip4/${ip4_mask_len} dev \$NIC_TEST.$inner_tag}
-				{ip addr add  $vf_inner_ip6/${ip6_mask_len} dev \$NIC_TEST.$inner_tag}
-				{ip addr add  $vf_inner_sametag_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag}
-				{ip addr add  $vf_inner_sametag_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag}
-				{ip addr show }
-			)
 
-			ip link set $nic_test vf 0 vlan $outer_tag proto 802.1ad
-			vmsh cmd_set $vm1 "${cmd[*]}"
+			if [ "$NIC_DRIVER" = "ice" ];then
+				local cmd=(
+					{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{ip link set \$NIC_TEST up}
+					{ip link add link \$NIC_TEST name \$NIC_TEST.$inner_tag type vlan id $inner_tag}
+					{ip link add link \$NIC_TEST name \$NIC_TEST.$outer_tag type vlan id $outer_tag}
+					{ip link set \$NIC_TEST.$outer_tag up}
+					{ip link set \$NIC_TEST.$inner_tag up}
+					{ip addr add  $vf_outer_ip4/${ip4_mask_len} dev \$NIC_TEST}
+					{ip addr add  $vf_outer_ip6/${ip6_mask_len} dev \$NIC_TEST}
+					{ip addr add  $vf_inner_ip4/${ip4_mask_len} dev \$NIC_TEST.$inner_tag}
+					{ip addr add  $vf_inner_ip6/${ip6_mask_len} dev \$NIC_TEST.$inner_tag}
+					{ip addr add  $vf_inner_sametag_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag}
+					{ip addr add  $vf_inner_sametag_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag}
+					{ip addr show }
+				)
 
-			echo "vf vlan 88a8============================================================================================================================================="
-			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file; then
-				result+=1
-				echo "single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
+				ip link set $nic_test vf 0 vlan $outer_tag proto 802.1ad
+				vmsh cmd_set $vm1 "${cmd[*]}"
+
+				echo "vf vlan 88a8============================================================================================================================================="
+				if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file; then
+					result+=1
+					echo "single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
+				fi
+
+				local cmd=(
+					{ping -c 10 $server_inner_ip4 }
+					{ping -c 10 $server_inner_sametag_ip4}
+				)
+				vmsh cmd_set $vm1 "${cmd[*]}"
+				if [ $? -ne 0 ];then
+					rlFail "fail:ping failed via vf  qinq(8100_over_88a8)"
+				fi
+
+				if [ "$NIC_DRIVER" = "ice" ];then
+					if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file; then
+						result+=1
+						echo "double_innter_outer_tag(8100_over_88a8) $inner_tag over $outer_tag vf_outer_ip netperf failed"
+					fi
+
+					if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
+						result+=1
+						echo "double_outer_outer_tag(8100_over_88a8) $outer_tag over $outer_tag vf_inner_sametag_ip  netperf failed"
+					fi
+				fi
+
+				local cmd=(
+					{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{ethtool -K \$NIC_TEST rxvlan off}
+					{ethtool -K \$NIC_TEST txvlan off}
+					{ethtool -K \$NIC_TEST tx-vlan-stag-hw-insert on}
+					{ethtool -K \$NIC_TEST rx-vlan-stag-hw-parse on}
+				)
+				ethtool -K $nic_test rxvlan off
+				ethtool -K $nic_test txvlan off
+				ethtool -K $nic_test tx-vlan-stag-hw-insert on
+				ethtool -K $nic_test rx-vlan-stag-hw-parse on
+				vmsh cmd_set $vm1 "${cmd[*]}"
+
+				if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
+					result+=1
+					echo "qinq_offload on single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
+				fi
+
+				local cmd=(
+					{ping -c 10 $server_inner_ip4 }
+					{ping -c 10 $server_inner_sametag_ip4}
+				)
+				vmsh cmd_set $vm1 "${cmd[*]}"
+				if [ $? -ne 0 ];then
+					rlFail "fail:ping failed via offload on vf  qinq(8100_over_88a8)"
+				fi
+
+				if [ "$NIC_DRIVER" = "ice" ];then
+					if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
+						result+=1
+						echo "qinq_offload on double_inner_outer_tag(8100_over_88a8) $inner_tag over $outer_tag vf_innter_ip netperf failed"
+					fi
+
+					if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
+						result+=1
+						echo "qinq_offload on double_outer_outer_tag(8100_over_88a8) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+					fi
+				fi
+
+
+				ip link set $nic_test vf 0 vlan 0
+
+				local cmd=(
+					{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{ip link delete \$NIC_TEST.$inner_tag}
+					{ip link delete \$NIC_TEST.$outer_tag}
+					{ip add flush \$NIC_TEST}
+					{ethtool -K \$NIC_TEST rxvlan on}
+					{ethtool -K \$NIC_TEST txvlan on}
+					{ethtool -K \$NIC_TEST tx-vlan-stag-hw-insert off}
+					{ethtool -K \$NIC_TEST rx-vlan-stag-hw-parse off}
+					{ip link add link \$NIC_TEST name \$NIC_TEST.$outer_tag type vlan id $outer_tag protocol 802.1ad}
+					{ip link add link \$NIC_TEST.$outer_tag name \$NIC_TEST.$outer_tag.$inner_tag type vlan id $inner_tag}
+					{ip link add link \$NIC_TEST.$outer_tag name \$NIC_TEST.$outer_tag.$outer_tag type vlan id $outer_tag}
+					{ip link set \$NIC_TEST.$outer_tag up}
+					{ip link set \$NIC_TEST.$outer_tag.$inner_tag up}
+					{ip link set \$NIC_TEST.$outer_tag.$outer_tag up}
+					{ip addr add  $vf_outer_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag}
+					{ip addr add  $vf_outer_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag}
+					{ip addr add  $vf_inner_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag.$inner_tag}
+					{ip addr add  $vf_inner_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag.$inner_tag}
+					{ip addr add  $vf_inner_sametag_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag.$outer_tag}
+					{ip addr add  $vf_inner_sametag_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag.$outer_tag}
+					{ip addr show}
+				)
+				ethtool -K $nic_test rxvlan on
+				ethtool -K $nic_test txvlan on
+				ethtool -K $nic_test tx-vlan-stag-hw-insert off
+				ethtool -K $nic_test rx-vlan-stag-hw-parse off
+				vmsh cmd_set $vm1 "${cmd[*]}"
+			else
+				local cmd=(
+					{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+					{ip add flush \$NIC_TEST}
+					{ip link set \$NIC_TEST up}
+					{ip link add link \$NIC_TEST name \$NIC_TEST.$outer_tag type vlan id $outer_tag protocol 802.1ad}
+					{ip link add link \$NIC_TEST.$outer_tag name \$NIC_TEST.$outer_tag.$inner_tag type vlan id $inner_tag}
+					{ip link add link \$NIC_TEST.$outer_tag name \$NIC_TEST.$outer_tag.$outer_tag type vlan id $outer_tag}
+					{ip link set \$NIC_TEST.$outer_tag up}
+					{ip link set \$NIC_TEST.$outer_tag.$inner_tag up}
+					{ip link set \$NIC_TEST.$outer_tag.$outer_tag up}
+					{ip addr add  $vf_outer_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag}
+					{ip addr add  $vf_outer_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag}
+					{ip addr add  $vf_inner_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag.$inner_tag}
+					{ip addr add  $vf_inner_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag.$inner_tag}
+					{ip addr add  $vf_inner_sametag_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag.$outer_tag}
+					{ip addr add  $vf_inner_sametag_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag.$outer_tag}
+					{ip addr show}
+				)
+				vmsh cmd_set $vm1 "${cmd[*]}"
+
 			fi
 
-			local cmd=(
-				{ping -c 10 $server_inner_ip4 }
-				{ping -c 10 $server_inner_sametag_ip4}
-			)
-			vmsh cmd_set $vm1 "${cmd[*]}"
-			if [ $? -ne 0 ];then
-				rlFail "fail:ping failed via vf  qinq(8100_over_88a8)"
-			fi
 
-:<<!
-			if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file; then
-				result +=1
-				echo "double_innter_outer_tag(8100_over_88a8) $inner_tag over $outer_tag vf_outer_ip netperf failed"
-			fi
-
-			if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
-				result +=1
-				echo "double_outer_outer_tag(8100_over_88a8) $outer_tag over $outer_tag vf_inner_sametag_ip  netperf failed"
-			fi
-!
-			local cmd=(
-				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-				{ethtool -K \$NIC_TEST rxvlan off}
-				{ethtool -K \$NIC_TEST txvlan off}
-				{ethtool -K \$NIC_TEST tx-vlan-stag-hw-insert on}
-				{ethtool -K \$NIC_TEST rx-vlan-stag-hw-parse on}
-			)
-			vmsh cmd_set $vm1 "${cmd[*]}"
-
-			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
-				result+=1
-				echo "qinq_offload on single_outer_tag(88a8) $outer_tag vf_outer_ip netperf failed"
-			fi
-
-			local cmd=(
-				{ping -c 10 $server_inner_ip4 }
-				{ping -c 10 $server_inner_sametag_ip4}
-			)
-			vmsh cmd_set $vm1 "${cmd[*]}"
-			if [ $? -ne 0 ];then
-				rlFail "fail:ping failed via offload on vf  qinq(8100_over_88a8)"
-			fi
-
-:<<!
-			if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
-				result += 1
-				echo "qinq_offload on double_inner_outer_tag(8100_over_88a8) $inner_tag over $outer_tag vf_innter_ip netperf failed"
-			fi
-
-			if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
-				result +=1
-				echo "qinq_offload on double_outer_outer_tag(8100_over_88a8) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
-			fi
-!
-
-			ip link set $nic_test vf 0 vlan 0
-
-			local cmd=(
-				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
-				{ip link delete \$NIC_TEST.$inner_tag}
-				{ip link delete \$NIC_TEST.$outer_tag}
-				{ip add flush \$NIC_TEST}
-				{ethtool -K \$NIC_TEST rxvlan on}
-				{ethtool -K \$NIC_TEST txvlan on}
-				{ethtool -K \$NIC_TEST tx-vlan-stag-hw-insert off}
-				{ethtool -K \$NIC_TEST rx-vlan-stag-hw-parse off}
-				{ip link add link \$NIC_TEST name \$NIC_TEST.$outer_tag type vlan id $outer_tag protocol 802.1ad}
-				{ip link add link \$NIC_TEST.$outer_tag name \$NIC_TEST.$outer_tag.$inner_tag type vlan id $inner_tag}
-				{ip link add link \$NIC_TEST.$outer_tag name \$NIC_TEST.$outer_tag.$outer_tag type vlan id $outer_tag}
-				{ip link set \$NIC_TEST.$outer_tag up}
-				{ip link set \$NIC_TEST.$outer_tag.$inner_tag up}
-				{ip link set \$NIC_TEST.$outer_tag.$outer_tag up}
-				{ip addr add  $vf_outer_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag}
-				{ip addr add  $vf_outer_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag}
-				{ip addr add  $vf_inner_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag.$inner_tag}
-				{ip addr add  $vf_inner_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag.$inner_tag}
-				{ip addr add  $vf_inner_sametag_ip4/${ip4_mask_len} dev \$NIC_TEST.$outer_tag.$outer_tag}
-				{ip addr add  $vf_inner_sametag_ip6/${ip6_mask_len} dev \$NIC_TEST.$outer_tag.$outer_tag}
-				{ip addr show}
-			)
-			vmsh cmd_set $vm1 "${cmd[*]}"
 
 			echo "image_vm vlan 88a8=================================================================================================================================="
 			if ! do_vm_netperf $vm1 $server_outer_ip4 $server_outer_ip6 $result_file;then
@@ -15470,17 +8202,53 @@ sriov_test_vlan_qinq_baisc()
 			if [ $? -ne 0 ];then
 				rlFail "fail:ping failed via offload on vm  qinq(8100_over_88a8)"
 			fi
-:<<!
-			if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
-				result += 1
-				echo "vm_qinq double_inner_outer_tag(8100_over_88a8) $inner_tag over $outer_tag vf_innter_ip netperf failed"
+
+			if [ "$NIC_DRIVER" = "ice" ];then
+				if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
+					result+=1
+					echo "vm_qinq double_inner_outer_tag(8100_over_88a8) $inner_tag over $outer_tag vf_innter_ip netperf failed"
+				fi
+
+				if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
+					result+=1
+					echo "vm_qinq double_outer_outer_tag(8100_over_88a8) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+				fi
 			fi
 
-			if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
-				result +=1
-				echo "vm_qinq double_outer_outer_tag(8100_over_88a8) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+			local cmd=(
+				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+				{ethtool -K \$NIC_TEST rxvlan off}
+				{ethtool -K \$NIC_TEST txvlan off}
+				{ethtool -K \$NIC_TEST tx-vlan-stag-hw-insert on}
+				{ethtool -K \$NIC_TEST rx-vlan-stag-hw-parse on}
+			)
+			ethtool -K $nic_test rxvlan off
+			ethtool -K $nic_test txvlan off
+			ethtool -K $nic_test tx-vlan-stag-hw-insert on
+			ethtool -K $nic_test rx-vlan-stag-hw-parse on
+			vmsh cmd_set $vm1 "${cmd[*]}"
+
+			local cmd=(
+				{ping -c 10 $server_inner_ip4 }
+				{ping -c 10 $server_inner_sametag_ip4}
+			)
+			vmsh cmd_set $vm1 "${cmd[*]}"
+			if [ $? -ne 0 ];then
+				rlFail "fail:ping failed via offload on vm  qinq(8100_over_88a8)"
 			fi
-!
+
+			if [ "$NIC_DRIVER" = "ice" ];then
+				if ! do_vm_netperf $vm1 $server_inner_ip4 $server_inner_ip6 $result_file;then
+					result+=1
+					echo "vm_qinq double_inner_outer_tag(8100_over_88a8) $inner_tag over $outer_tag vf_innter_ip netperf failed"
+				fi
+
+				if ! do_vm_netperf $vm1 $server_inner_sametag_ip4 $server_inner_sametag_ip6 $result_file; then
+					result+=1
+					echo "vm_qinq double_outer_outer_tag(8100_over_88a8) $outer_tag over $outer_tag vf_inner_sametag_ip netperf failed"
+				fi
+			fi
+
 			local cmd=(
 				{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
 				{ip link delete \$NIC_TEST.$outer_tag.$inner_tag}
@@ -15494,79 +8262,449 @@ sriov_test_vlan_qinq_baisc()
 			if [ `echo $sw |grep 5200` ]; then
 				# juniper 5200 update version. 88a8 and 8100 don't support at the same time. delete 88a8 config to let 8100 pass
 				rlRun "swcfg del_interface_88a8 $sw $port"
+			elif [  $sw = 93180 ] || [ $sw =  9364 ]; then
+				# clean up qinq config
+				rlRun "swcfg qinq_delete $sw $port"
 			fi
 		fi
 
 			sriov_remove_vfs $nic_test 0
 			sync_set server 8100_over_88a8_end
-		else
-			sync_wait server 8100_over_8100_start
-			sync_set server 8100_over_8100_end
-			sync_wait server 8100_over_88a8_start
-			sync_set server 8100_over_88a8_end
-		fi
 	fi
 	return $result
 }
 
-sriov_test_bug_reproducer_2103801(){
-	# https://bugzilla.redhat.com/show_bug.cgi?id=2103801#c24
-	if i_am_server; then
-		sync_set client sriov_test_bug_reproducer_2103801_start 14400
-		if [ $? -ne 0 ]; then
-			rlFail "sync timeout with client side!!!" && { return 1; }
-		else
-			sync_wait client sriov_test_bug_reproducer_2103801_end 14400 || { rlFail "sync timeout with client side!!!"; return 1 ; }
+sriov_test_qinq_vlan_insertion_on_singlevlan()
+{
+	log_header "sriov_test_qinq_vlan_insertion_on_singlevlan" $result_file
+	local result=0
+	local test_name=sriov_test_qinq_vlan_insertion_on_singlevlan
+	local outer_tag=30
+	local inner_tag=31
+	local server_ip4="192.30.${ipaddr}.1"
+	local server_qinq_ip4="192.31.${ipaddr}.1"
+	local client_ip4="192.30.${ipaddr}.100"
+	local client_qinq_ip4="192.31.${ipaddr}.100"
+	local ip4_mask_len="24"
+
+	ip link set $nic_test up
+
+
+	if i_am_server;then
+		rlRun "get_iface_sw_port $nic_test sw port"
+		if [  $sw = 93180 ] || [ $sw =  9364 ]; then
+			# switch 9364 and 93180 don't support qinq as defualt , set it pass
+			rlRun "swcfg qinq_config $sw $port"
 		fi
+
+		ip link add link $nic_test name $nic_test.$outer_tag type vlan id $outer_tag
+		ip link add link $nic_test.$outer_tag name $nic_test.$outer_tag.$inner_tag type vlan id $inner_tag
+		ip link set $nic_test.$outer_tag up
+		ip link set $nic_test.$outer_tag.$inner_tag up
+		ip add add $server_ip4/$ip4_mask_len dev $nic_test.$outer_tag
+		ip add add $server_qinq_ip4/$ip4_mask_len dev $nic_test.$outer_tag.$inner_tag
+		tcpdump -i $nic_test.$outer_tag.$inner_tag -w qinq_insert_singlevlan.pcap &
+		sync_set client client_config_finished
+		sync_wait client client_send_done
+		pkill tcpdump
+		sleep 5
+		rlRun "tcpdump -r qinq_insert_singlevlan.pcap|grep udp"
+		test $? -eq 0 && sync_set client "pass" || sync_set client "fail"
+
+		if [  $sw = 93180 ] || [ $sw =  9364 ]; then
+			# clean up qinq config
+			rlRun "swcfg qinq_delete $sw $port"
+		fi
+		ip link delete $nic_test.$outer_tag.$inner_tag
+		ip link delete $nic_test.$outer_tag
+		ip add flush $nic_test
+		rm -rf qinq_insert_singlevlan.pcap
+		return 0
 	else
-		sync_wait server sriov_test_bug_reproducer_2103801_start 14400 || { rlFail "sync timeout with server side!!!"; return 1 ; }
-		local NIC_NUM=1
-		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
-			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[0]})"
-		else
-			local test_iface="$(get_test_nic ${NIC_NUM})"
+		scapy_install
+		rlRun "get_iface_sw_port $nic_test sw port" "0-255"
+		if [  $sw = 93180 ] || [ $sw =  9364 ]; then
+			# switch 9364 and 93180 don't support qinq as defualt , set it pass
+			rlRun "swcfg qinq_config $sw $port"
 		fi
-		rlLog "got test nic is: ${test_iface}"
-		local total_vfs=$(sriov_get_max_vf_from_pf ${test_iface})
-		rlLog "got the total_vfs is: ${total_vfs}"
-		local mac_perfix="$(get_mac_prefix $(hostname))01:" # MAC prefix used for VFs
+		if ! sriov_create_vfs $nic_test 0 2; then
+			echo "create vf failed"
+			sync_wait server client_config_finished
+			sync_set server client_send_done
+			rlRun "sync_wait_choice server 'pass' 'fail'"
+			return 1
+		fi
+		local VF=$(sriov_get_vf_iface $nic_test 0 1)
+		local vf_mac="00:de:ad:$(printf %02x $ipaddr):01:aa"
+		ip netns add ns1
+		ip link set $nic_test vf 0 vlan $outer_tag
+		ip link set $nic_test vf 0 mac $vf_mac
+		ip link set $VF netns ns1
+		ip netns exec ns1 ip link set $VF address $vf_mac
+		ip netns exec ns1 ip link set $VF up
+		ip netns exec ns1 ip add add  $client_ip4/$ip4_mask_len dev $VF
+		sync_wait server client_config_finished
+		rlRun "ip netns exec ns1 ping $server_ip4 -c 5"
+		rlRun "ip netns exec ns1 python -c \"from scapy.all import * ; sendp(Ether(src='$vf_mac', dst='ff:ff:ff:ff:ff:ff')/Dot1Q(vlan=$inner_tag)/IP(src='$client_qinq_ip4', dst='$server_qinq_ip4', proto=17) , iface='$VF' , count=20)\""
+		sync_set server client_send_done
+		#result in server
+		rlRun "sync_wait_choice server 'pass' 'fail'"
+		result=$?
+		if [  $sw = 93180 ] || [ $sw =  9364 ]; then
+			# clean up qinq config
+			rlRun "swcfg qinq_delete $sw $port"
+		fi
+		modprobe -r 8021q
+		ip netns delete ns1
+		sriov_remove_vfs $nic_test 0
 
-		# find vf driver
-		sriov_create_vfs ${test_iface} 0 1
-		local check_vf_name=$(sriov_get_vf_iface ${test_iface} 0 1)
-		local vf_driver_name=$(ethtool -i ${check_vf_name} | sed -n -e "/driver:/s/driver: //p")
-		if [ -z ${vf_driver_name} ]; then
-			rlFail "can't find vf driver"
-			rlRun "sriov_remove_vfs ${nic_test} 0"
-			sync_set server sriov_test_bug_reproducer_2103801_end 14400 || { rlFail "sync timeout with server side!!!"; return 1 ; }
-		fi
-		rlLog "vf driver is: ${vf_driver_name}"
-		sriov_remove_vfs ${test_iface}
-		if [ ! -d /sys/bus/pci/drivers/${vf_driver_name} ]; then
-			sync_set server sriov_test_bug_reproducer_2103801_end 14400 || { rlFail "can't find vf driver in sys file"; return 1 ; }
-		fi
-		# start test
-		dmesg -C
-		sriov_create_vfs ${test_iface} 0 ${total_vfs}
-		for i in $(seq 0 ${total_vfs}); do
-			local mac_suffix=$(printf "%02x" ${i})
-			ip link set ${test_iface} vf ${i} mac ${mac_perfix}${i} # Set VF mac address via PF
-			local vf_bus_info=$(sriov_get_vf_bus_info ${test_iface} 0 ${i})
-			echo "${vf_bus_info}" > /sys/bus/pci/drivers/${vf_driver_name}/unbind # unbind the VF from IAVF
-		done
-		sriov_remove_vfs ${test_iface}
-		if [ $(dmesg | grep -c -i "Never saw reset") -ne 0 ]; then
-			rlFail "got Never saw reset message on dmesg log"
-		fi
 
-		sync_set server sriov_test_bug_reproducer_2103801_end 14400 || { rlFail "sync timeout with server side!!!"; return 1 ; }
 	fi
+	return $result
+
+
+}
+
+#https://bugzilla.redhat.com/show_bug.cgi?id=2169053
+sriov_test_iavf_vfmac_check()
+{
+	local result=0
+	if i_am_client; then
+		sync_set server ${FUNCNAME}_start
+		if [[ ${NIC_DRIVER} =~ i40e|ice|ixgbe|igb ]]; then
+			rlRun "remodprobe_driver ${NIC_DRIVER}"
+			rlRun "set_all_test_nic_down"
+			rlLog "create one vf from test pf"
+			rlRun "echo 1 > /sys/class/net/${nic_test}/device/sriov_numvfs"
+			sleep 1
+			local vf_name=$(sriov_get_vf_iface ${nic_test} 0 1)
+			rlRun "ip link show ${nic_test}"
+			rlRun "ip link show ${vf_name}" || rlFail "can't use ip link to check vf device"
+			rlLog 'Test1: check vf mac should be 00:00:00:00:00:00 when vf/pf is down status'
+			if ip link show ${vf_name}| grep -w -i DOWN; then
+				rlRun "ip link show ${nic_test}"
+				rlRun "ip link show ${vf_name}"
+				local pf_vf_mac=$(ip link show ${nic_test} | grep 'vf 0' | awk '{print $4}')
+				rlAssertEquals "check ${pf_vf_mac} mac equal 00:00:00:00:00:00" ${pf_vf_mac} "00:00:00:00:00:00" || ((result++))
+			else
+				rlLogWarning "pf/vf link status is up!!!"
+			fi
+
+			rlLog 'Test2: check vf mac should not be 00:00:00:00:00:00 when vf/pf is up status'
+			rlRun "ip link set ${nic_test} up"
+			rlRun "ip link set ${vf_name} up"
+			sleep 1
+			local pf_vf_mac=$(ip link show ${nic_test} | grep 'vf 0' | awk '{print $4}')
+			rlAssertNotEquals "check ${pf_vf_mac} mac not 00:00:00:00:00:00" ${pf_vf_mac} "00:00:00:00:00:00" || ((result++))
+
+			rlLog 'Test3: check vf mac should not be 00:00:00:00:00:00 when vf is down status but changed vf mac'
+			rlRun "remodprobe_driver ${NIC_DRIVER}"
+			rlRun "set_all_test_nic_down"
+			rlLog "create one vf from test pf"
+			rlRun "echo 1 > /sys/class/net/${nic_test}/device/sriov_numvfs"
+			local vf_name=$(sriov_get_vf_iface ${nic_test} 0 1)
+			rlRun "ip link set ${nic_test} vf 0 mac 00:de:ad:07:07:07"
+			sleep 1
+			local pf_vf_mac=$(ip link show ${nic_test} | grep 'vf 0' | awk '{print $4}')
+			rlAssertNotEquals "check ${pf_vf_mac} mac not 00:00:00:00:00:00" ${pf_vf_mac} "00:00:00:00:00:00" || ((result++))
+			rlAssertEquals "check ${pf_vf_mac} mac equal 00:de:ad:07:07:07" ${pf_vf_mac} "00:de:ad:07:07:07" || ((result++))
+
+			rlLog 'Test4: check vf mac should not be 00:00:00:00:00:00 when the VF has been brought up and down'
+			rlRun "remodprobe_driver ${NIC_DRIVER}"
+			rlRun "set_all_test_nic_down"
+			rlLog "create one vf from test pf"
+			rlRun "echo 1 > /sys/class/net/${nic_test}/device/sriov_numvfs"
+			local vf_name=$(sriov_get_vf_iface ${nic_test} 0 1)
+			rlRun "ip link set ${vf_name} up"
+			sleep 1
+			rlRun "ip link set ${vf_name} down"
+			sleep 1
+			local pf_vf_mac=$(ip link show ${nic_test} | grep 'vf 0' | awk '{print $4}')
+			rlAssertNotEquals "check ${pf_vf_mac} mac not 00:00:00:00:00:00" ${pf_vf_mac} "00:00:00:00:00:00" || ((result++))
+			rlRun "ip link show ${nic_test}"
+			rlRun "ip link show ${vf_name}"
+
+			rlLog 'cleanup test env'
+			rlRun "echo 0 > /sys/class/net/${nic_test}/device/sriov_numvfs"
+			rlRun "set_all_test_nic_down"
+			rlRun "remodprobe_driver ${NIC_DRIVER}"
+		else
+			rlLogWarning "${FUNCNAME} just test iavf(pf should be i40e/ice/ixgbe/igb) driver. current NIC_DRIVER: ${NIC_DRIVER}"
+		fi
+		sync_set server ${FUNCNAME}_end
+	else
+		sync_wait client ${FUNCNAME}_start
+		sync_wait client ${FUNCNAME}_end
+	fi
+	return ${result}
+}
+
+sriov_test_checkdowntime_uptime_under_maxvf()
+{
+	local result=0
+	rlLog "${FUNCNAME}: perpare test env"
+	if i_am_client; then
+		sync_set server ${FUNCNAME}_start
+		rlRun "rpm -q coreutils || yum install -y coreutils"
+		if [[ x"${NAY}" != x"yes" ]]; then
+			rlLogWarning "${FUNCNAME}: Test should run under switch environment, need set NAY=yes" && ((result++))
+			sync_set server ${FUNCNAME}_end
+			return ${result}
+		fi
+		local switch_line=$(get_iface_sw_port ${nic_test} | awk 'END{print NR}')
+		if [[ ${switch_line} -ne 2 ]]; then
+			rlLogWarning "${FUNCNAME}: got switch information failed!!!"  && ((result++))
+			rlRun "get_iface_sw_port ${nic_test}"
+			sync_set server ${FUNCNAME}_end
+			return  ${result}
+		fi
+		local switch_name=$(get_iface_sw_port ${nic_test} | awk 'NR==1{print}')
+		local switch_port=$(get_iface_sw_port ${nic_test} | awk 'NR==2{print}' | tr -d '"')
+		rlRun "swcfg port_up ${switch_name} ${switch_port}"
+		rlRun "ip link set ${nic_test} up"
+		local max_vf=$(sriov_get_max_vf_from_pf ${nic_test} 0)
+		rlLog "current test nic support max vfs is: ${max_vf}"
+		rlRun "sriov_create_vfs ${nic_test} 0 ${max_vf}"
+		sleep 10
+		rlRun "ip link set ${nic_test} up"
+		local random_vf_num=$(shuf -i 1-${max_vf} -n 1)
+		local vf_name=$(sriov_get_vf_iface ${nic_test} 0 ${random_vf_num})
+		rlRun "ip link set ${vf_name} up"
+		rlRun "ip link show ${nic_test}"
+		if ! ip link show ${nic_test} | grep -i -w UP && ip link show ${vf_name} | grep -i -w UP; then
+			rlFail "${FUNCNAME}: start vf/pf failed, exit test!!!" && ((result++))
+			sync_set server ${FUNCNAME}_end
+			return ${result}
+		fi
+
+		rlLog "${FUNCNAME}: Test1 use ip link to check downtime"
+		rlRun "swcfg port_down ${switch_name} ${switch_port}"
+		local pf_timeout=0
+		while true; do
+			if [[ ${pf_timeout} -lt 180 ]];then
+				if (ip link show ${nic_test} | grep -i -w 'state up' &>/dev/null); then
+					sleep 1
+					(( pf_timeout++ ))
+				elif (ip link show ${nic_test} | grep -i -w 'state down' &>/dev/null); then
+					rlLog "${FUNCNAME}: ${nic_test} port down,downtime is ${pf_timeout}"
+					rlRun "ip link show ${nic_test} | head -n2"
+					local vf_timeout=0
+					while true; do
+						if [[ ${vf_timeout} -lt 180 ]];then
+							if (ip link show ${vf_name} | grep -i -w 'state up' &>/dev/null); then
+								sleep 1
+								(( vf_timeout++ ))
+							elif (ip link show ${vf_name} | grep -i -w 'state down' &>/dev/null); then
+								rlLog "${FUNCNAME}: ${vf_name} port down,${vf_name} time is ${vf_timeout}"
+								rlRun "ip link show ${vf_name}"
+								break 2
+							else
+								sleep 1
+								(( vf_timeout++ ))
+							fi
+						else
+							rlFail "${FUNCNAME}: wait ${vf_timeout} sec, check ${vf_name} status is wrong!!!" && ((result++))
+							break 2
+						fi
+					done
+				else
+					sleep 1
+					(( pf_timeout++ ))
+				fi
+			else
+				rlFail "${FUNCNAME}: wait ${pf_timeout} sec, check ${nic_test} status is wrong!!!" && ((result++))
+				break
+			fi
+		done
+		if [[ -n ${pf_timeout} ]] && [[ ${pf_timeout} -ge 2 ]]; then
+			rlFail "check switchport down and wait ${nic_test} down more than 2 sces!!! downtime is: ${pf_timeout}" && ((result++))
+		fi
+		if [[ -n ${vf_timeout} ]] && [[ ${vf_timeout} -ge 2 ]]; then
+			rlFail "wait ${nic_test} down, then check ${vf_name} down and wait more than 2 sces!!! downtime is:${vf_timeout}"
+		fi
+
+		rlLog "${FUNCNAME}: Test2 use ip link to check uptime"
+		rlRun "swcfg port_up ${switch_name} ${switch_port}"
+		local pf_timeout=0
+		while true; do
+			if [[ ${pf_timeout} -lt 180 ]];then
+				if (ip link show ${nic_test} | grep -i -w 'state up' &>/dev/null); then
+					sleep 1
+					(( pf_timeout++ ))
+				elif (ip link show ${nic_test} | grep -i -w 'state down' &>/dev/null); then
+					rlLog "${FUNCNAME}: ${nic_test} port down,downtime is ${pf_timeout}"
+					rlRun "ip link show ${nic_test} | head -n2"
+					local vf_timeout=0
+					while true; do
+						if [[ ${vf_timeout} -lt 180 ]];then
+							if (ip link show ${vf_name} | grep -i -w 'NO-CARRIER' &>/dev/null); then
+								sleep 1
+								(( vf_timeout++ ))
+							elif (ip link show ${vf_name} | grep -i -w 'state up' &>/dev/null); then
+								rlLog "${FUNCNAME}: ${vf_name} port up, time is ${vf_timeout}"
+								rlRun "ip link show ${vf_name}"
+								break 2
+							else
+								sleep 1
+								(( vf_timeout++ ))
+							fi
+						else
+							rlFail "${FUNCNAME}: wait ${vf_timeout} sec, check ${vf_name} status is wrong" && ((result++))
+							break 2
+						fi
+					done
+				else
+					sleep 1
+					(( pf_timeout++ ))
+				fi
+			else
+				rlFail "${FUNCNAME}: wait ${pf_timeout} sec, check ${nic_test} status is wrong!!!" && ((result++))
+				break
+			fi
+		done
+		if [[ -n ${pf_timeout} ]] && [[ ${pf_timeout} -ge 2 ]]; then
+			rlFail "check switchport up and wait ${nic_test} up more than 2 sces!!! uptime is: ${pf_timeout}" && ((result++))
+		fi
+		if [[ -n ${vf_timeout} ]] && [[ ${vf_timeout} -ge 2 ]]; then
+			rlFail "wait ${nic_test} up then check ${vf_name} up and wait more than 2 sces!!! uptime is: ${vf_timeout}" && ((result++))
+		fi
+# this file only affect after set pf link up from kernel side.e.g:'ip link set $pf up'
+# What:           /sys/class/net/<iface>/carrier
+# Date:           April 2005
+# KernelVersion:  2.6.12
+# Contact:        netdev@vger.kernel.org
+# Description:
+#	Indicates the current physical link state of the interface.
+#	Posssible values are:
+#
+#	========================
+#	0  physical link is down
+#	1  physical link is up
+#	========================
+#
+#	Note: some special devices, e.g: bonding and team drivers will
+#	allow this attribute to be written to force a link state for
+#	operating correctly and designating another fallback interface.
+		rlRun "sriov_remove_vfs ${nic_test} 0"
+		rlRun "remodprobe_driver ${NIC_DRIVER}"
+		rlRun "set_all_test_nic_down"
+		rlRun "sriov_create_vfs ${nic_test} 0 ${max_vf}"
+		sleep 10
+		rlRun "ip link set ${nic_test} up"
+		rlRun "ip link set ${vf_name} up"
+		rlRun "ip link show ${nic_test}"
+		if ! ip link show ${nic_test} | grep -i -w UP && ip link show ${vf_name} | grep -i -w UP; then
+			rlFail "${FUNCNAME}: start vf/pf failed, exit test!!!" && ((result++))
+			sync_set server ${FUNCNAME}_end
+			return ${result}
+		fi
+
+		rlLog "${FUNCNAME}: Test3 use /sys/class/net/${vf_name}/carrier to check downtime"
+		rlRun "swcfg port_down ${switch_name} ${switch_port}"
+		local pf_timeout=0
+		while true; do
+			if [[ ${pf_timeout} -lt 180 ]];then
+				if [[ $(cat /sys/class/net/${nic_test}/carrier) -eq 1 ]]; then
+					sleep 1
+					(( pf_timeout++ ))
+				elif [[ $(cat /sys/class/net/${nic_test}/carrier) -eq 0 ]]; then
+					rlLog "${FUNCNAME}: ${nic_test} port down,downtime is ${pf_timeout}"
+					rlRun "ip link show ${nic_test} | head -n2"
+					local vf_timeout=0
+					while true; do
+						if [[ ${vf_timeout} -lt 180 ]];then
+							if [[ $(cat /sys/class/net/${vf_name}/carrier) -eq 1 ]]; then
+								sleep 1
+								(( vf_timeout++ ))
+							elif [[ $(cat /sys/class/net/${vf_name}/carrier) -eq 0 ]]; then
+								rlLog "${FUNCNAME}: ${vf_name} port down,${vf_name} time is ${vf_timeout}"
+								rlRun "ip link show ${vf_name}"
+								break 2
+							else
+								rlFail "check /sys/class/net/${vf_name}/carrier failed!!!" && ((result++))
+								break 2
+							fi
+						else
+							rlFail "${FUNCNAME}: wait ${vf_timeout} sec, check ${vf_name} status is wrong" && ((result++))
+							break 2
+						fi
+					done
+				else
+					rlFail "check /sys/class/net/${nic_test}/carrier failed!!!" && ((result++))
+					break
+				fi
+			else
+				rlFail "${FUNCNAME}: wait ${pf_timeout} sec, check ${nic_test} status is wrong!!!" && ((result++))
+				break
+			fi
+		done
+		if [[ -n ${pf_timeout} ]] && [[ ${pf_timeout} -ge 2 ]]; then
+			rlFail "switch port down, check ${nic_test} down and wait more than 2 sces!!! downtime is: ${pf_timeout}" && ((result++))
+		fi
+		if [[ -n ${vf_timeout} ]] && [[ ${vf_timeout} -ge 2 ]]; then
+			rlFail "wait ${nic_test} down then check ${vf_name} down and wait more than 2 sces!!! downtime is: ${vf_timeout}" && ((result++))
+		fi
+
+		rlLog "${FUNCNAME}: Test4 use /sys/class/net/${vf_name}/carrier to check uptime"
+		rlRun "swcfg port_up ${switch_name} ${switch_port}"
+		local pf_timeout=0
+		while true; do
+			if [[ ${pf_timeout} -lt 180 ]];then
+				if [[ $(cat /sys/class/net/${nic_test}/carrier) -eq 0 ]]; then
+					sleep 1
+					(( pf_timeout++ ))
+				elif [[ $(cat /sys/class/net/${nic_test}/carrier) -eq 1 ]]; then
+					rlLog "${FUNCNAME}: ${nic_test} port up,uptime is ${pf_timeout}"
+					rlRun "ip link show ${nic_test} | head -n2"
+					local vf_timeout=0
+					while true; do
+						if [[ ${vf_timeout} -lt 180 ]];then
+							if [[ $(cat /sys/class/net/${vf_name}/carrier) -eq 0 ]]; then
+								sleep 1
+								(( vf_timeout++ ))
+							elif [[ $(cat /sys/class/net/${vf_name}/carrier) -eq 1 ]]; then
+								rlLog "${FUNCNAME}: ${vf_name} port up,${vf_name} time is ${vf_timeout}"
+								rlRun "ip link show ${vf_name}"
+								break 2
+							else
+								rlFail "check /sys/class/net/${vf_name}/carrier failed!!!" && ((result++))
+								break 2
+							fi
+						else
+							rlFail "${FUNCNAME}: wait ${vf_timeout} sec, check ${vf_name} status is wrong" && ((result++))
+							break 2
+						fi
+					done
+				else
+					rlFail "check /sys/class/net/${nic_test}/carrier failed!!!" && ((result++))
+					break
+				fi
+			else
+				rlFail "${FUNCNAME}: wait ${pf_timeout} sec, check ${nic_test} status is wrong!!!" && ((result++))
+				break
+			fi
+		done
+		if [[ -n ${pf_timeout} ]] && [[ ${pf_timeout} -ge 2 ]]; then
+			rlFail "switch port up, check ${nic_test} up and wait more than 2 sces!!! downtime is: ${pf_timeout}" && ((result++))
+		fi
+		if [[ -n ${vf_timeout} ]] && [[ ${vf_timeout} -ge 2 ]]; then
+			rlFail "wait ${nic_test} up then check ${vf_name} up and wait more than 2 sces!!! uptime is: ${vf_timeout}" && ((result++))
+		fi
+		rlRun "sriov_remove_vfs ${nic_test} 0"
+		sync_set server ${FUNCNAME}_end
+	else
+		sync_wait client ${FUNCNAME}_start
+		sync_wait client ${FUNCNAME}_end
+	fi
+
 }
 
 setup() {
 	Configuring_NetworkManager_to_ignore_certain_devices
+	configure_journal_service
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
-		rlRun install_pktgen
+		# rlRun install_pktgen
+		rlLog "try skip install_pktgen for now"
 	elif [[ $ENABLE_RT_KERNEL == "yes" ]]; then
 		sleep 1
 	fi
@@ -15574,17 +8712,11 @@ setup() {
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
 		rlRun sriov_install
 		rlRun sriov_cleanup
-#		if (( "$rhel_version" >= "9" )); then
-#			enable_libvirtd_as_default_rhel9
-#		fi
 	elif [[ $ENABLE_RT_KERNEL == "yes" ]]; then
 		# stage 0 will install rt kernel, stage 2 will configure memory and cpu tuning, stage 3 will check configure and install.
 		rlLog "REBOOTCOUNT is ${REBOOTCOUNT}"
 		if [ x"${REBOOTCOUNT}" == x"0" ]; then
 			rlRun set_preinstall_host
-#			if (( "$rhel_version" >= "9" )); then
-#				enable_libvirtd_as_default_rhel9
-#			fi
 			# install rt-test tuned libvirt, configure hugepage and cpu isolation
 			rlLog "###############install rt-test tuned libvirt, configure hugepage and cpu isolation, will reboot system##############"
 			/usr/bin/python3 ${CASE_PATH}/rt-kernel/rt_kernel_paramter.py --os_type="host" --stage="0" || exit 1
@@ -15601,7 +8733,9 @@ setup() {
 		chmod 666 /dev/kvm
 		sriov_cleanup
 	fi
-
+	if (( "$rhel_version" >= "9" )); then
+			enable_libvirtd_as_default_rhel9
+	fi
 	if [ ! -e /usr/bin/python ];then
 		if [ -e "/usr/libexec/platform-python3.6" ];then
 				ln -s /usr/libexec/platform-python3.6 /usr/bin/python
@@ -15612,7 +8746,7 @@ setup() {
 
 	if [[ $ENABLE_RT_KERNEL == "no" ]]; then
 		if i_am_client; then
-			echo "SRIOV_TEST_RESULT($nic_driver/$nic_test):	$(date)" > $result_file
+			echo "SRIOV_TEST_RESULT($nic_driver/$nic_test):    $(date)" > $result_file
 			echo "kernel: $(uname -r)" >> $result_file
 			echo "CLIENTS: $CLIENTS" >> $result_file
 			echo "SERVERS: $SERVERS" >> $result_file
@@ -15621,13 +8755,14 @@ setup() {
 		rlRun "sriov_setup"
 		if (($rhel_version == 7)); then
 			if [ -z "$REBOOTCOUNT" ] || [ "$REBOOTCOUNT" -eq 0 ]; then
-				rhts-reboot
+				rstrnt-reboot
+				sleep 300
 				rlRun "sriov_setup"
 			fi
 		fi
 	elif [[ $ENABLE_RT_KERNEL == "yes" ]]; then
 		if i_am_client; then
-			echo "SRIOV_TEST_RESULT($nic_driver/$nic_test):	$(date)" > $result_file
+			echo "SRIOV_TEST_RESULT($nic_driver/$nic_test):    $(date)" > $result_file
 			echo "kernel: $(uname -r)" >> $result_file
 			echo "CLIENTS: $CLIENTS" >> $result_file
 			echo "SERVERS: $SERVERS" >> $result_file
@@ -15637,7 +8772,7 @@ setup() {
 	fi
 }
 
-preconfiguration() {
+vmpreconfig() {
 
 	#if [[ $ENABLE_RT_KERNEL == "no" ]]; then
 	#  rm -f /usr/local/bin/vmsh
@@ -15650,20 +8785,21 @@ preconfiguration() {
 
 	rlRun "ip link show | grep virbr1 || ip link add name virbr1 type bridge"
 	rlRun "ip link set virbr1 up"
-	ip link show virbr0
-	if [ $? -ne 0 ]; then
+	ip link show virbr0 || rlFail "virbr0 can't start as well"
+	if ! ip link show virbr0; then
 		rlRun "virsh net-list --all"
-		rlRun "virsh net-start default" || rlRun "virsh net-destroy default"
-		rlRun "virsh net-autostart default" && rlRun "virsh net-start default"
+		rlRun "virsh net-destroy default"
+		rlRun "virsh net-autostart default"
+		rlRun "virsh net-start default"
 		if (( $rhel_version < 9 )); then
 			rlRun "systemctl restart libvirtd"
 		else
 			rlRun "systemctl restart virtnetworkd.service"
+			rlRun "systemctl status virtqemud --no-pager -l"
 		fi
 		rlRun "virsh net-list --all"
 		sleep 10
-		rlRun "ip link show virbr0" && rlFail "virbr0 can't start as well"
-		rlRun "systemctl status virtqemud --no-pager -l"
+		rlRun "ip link show virbr0"
 	fi
 	local r_version=$( cat /etc/redhat-release | sed  's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
 #	if [[ $(echo "${r_version} <= 8.6" | bc) -eq 1 ]]; then
@@ -15715,12 +8851,24 @@ Configuring_NetworkManager_to_ignore_certain_devices()
 		echo "doesn't support NM to control network"
 	fi
 }
+
+configure_journal_service()
+{
+	rlLog "Configure journalctl"
+	[[ -d /var/log/journal ]] || mkdir /var/log/journal
+	rlRun "systemd-tmpfiles --create --prefix /var/log/journal"
+	if [[ $(sed -n 's/.*Storage=\(.*\)/\1/p' /etc/systemd/journald.conf | uniq | awk 'END {print}') !=  'persistent' ]]; then
+		rlRun "echo 'Storage=persistent' >> /etc/systemd/journald.conf"
+	fi
+	rlRun "systemctl enable systemd-journald.service"
+	rlRun "systemctl restart systemd-journald.service"
+}
 #######################
 # main
 
 rlJournalStart
 
-rlPhaseStart WARN determin_interface_and_setup
+rlPhaseStart WARN interface_setup
 rlRun sriov_get_ipaddr
 
 if [ "${SRIOV_ENABLE_SELINUX}" = "yes" ];then
@@ -15790,8 +8938,10 @@ else
 		tee  /etc/sysconfig/network-scripts/ifcfg-${nic_test}
 fi
 
-ip link set $nic_test up
-ip link show dev $nic_test
+rlRun "ip link set $nic_test up"
+rlRun "wait_port_up $nic_test 40"
+rlRun "ip link show dev $nic_test"
+pkill netserver; sleep 2; netserver
 
 rlPhaseEnd
 
@@ -15802,8 +8952,8 @@ if [ "$SRIOV_SKIP_SETUP_ENV" != "yes" ] || echo $SRIOV_TOPO | grep -q -E "(sriov
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_pf_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_pf_remote"
 	rlRun "sriov_test_pf_remote"
@@ -15811,8 +8961,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_pf_remote_jumbo\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_pf_remote_jumbo"
 	rlRun "sriov_test_pf_remote_jumbo"
@@ -15820,8 +8970,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_pf_vlan_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_pf_vlan_remote"
 	rlRun "sriov_test_pf_vlan_remote"
@@ -15829,8 +8979,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_remote"
 	rlRun "sriov_test_vf_remote"
@@ -15838,8 +8988,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_remote_switchdev\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_remote_switchdev"
 	rlRun "sriov_test_vf_remote_switchdev"
@@ -15847,8 +8997,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_remote_jumbo\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_remote_jumbo"
 	rlRun "sriov_test_vf_remote_jumbo"
@@ -15856,17 +9006,35 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_vlan_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_vlan_remote"
 	rlRun "sriov_test_vf_vlan_remote"
 	rlPhaseEnd
 fi
 
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_create_time_max_vf\b)"; then
+	rlPhaseStartTest "sriov_test_create_time_max_vf"
+	rlRun "sriov_test_create_time_max_vf"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_vlan_transparent\b)"; then
+	rlPhaseStartTest "sriov_test_vf_vlan_transparent"
+	rlRun "sriov_test_vf_vlan_transparent"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_vlan_transparent_jumbo\b)"; then
+	rlPhaseStartTest "sriov_test_vf_vlan_transparent_jumbo"
+	rlRun "sriov_test_vf_vlan_transparent_jumbo"
+	rlPhaseEnd
+fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_remote"
 	rlRun "sriov_test_vmvf_remote"
@@ -15874,8 +9042,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_1733181_vmvf_remote_pfdown\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_1733181_vmvf_remote_pfdown"
 	rlRun "sriov_test_1733181_vmvf_remote_pfdown"
@@ -15883,8 +9051,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_remote_jumbo\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_remote_jumbo"
 	rlRun "sriov_test_vmvf_remote_jumbo"
@@ -15892,8 +9060,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_vlan_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_vlan_remote"
 	rlRun "sriov_test_vmvf_vlan_remote"
@@ -15901,8 +9069,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_vlan_remote_jumbo\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_vlan_remote_jumbo"
 	rlRun "sriov_test_vmvf_vlan_remote_jumbo"
@@ -15910,8 +9078,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_vlan_remote_1\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_vlan_remote_1"
 	rlRun "sriov_test_vmvf_vlan_remote_1"
@@ -15919,8 +9087,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_pf_vmvf\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_pf_vmvf"
 	rlRun "sriov_test_pf_vmvf"
@@ -15928,8 +9096,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_pf_vmvf_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_pf_vmvf_vlan"
 	rlRun "sriov_test_pf_vmvf_vlan"
@@ -15937,8 +9105,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_vmvf\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_vmvf"
 	rlRun "sriov_test_vmvf_vmvf"
@@ -15946,8 +9114,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_vmvf_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_vmvf_vlan"
 	rlRun "sriov_test_vmvf_vmvf_vlan"
@@ -15955,8 +9123,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_bond_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_bond_remote"
 	rlRun "sriov_test_vmvf_bond_remote"
@@ -15964,8 +9132,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf1_vmvf2_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf1_vmvf2_remote"
 	rlRun "sriov_test_vmvf1_vmvf2_remote"
@@ -15973,8 +9141,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf1_vmvf2_vlan_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf1_vmvf2_vlan_remote"
 	rlRun "sriov_test_vmvf1_vmvf2_vlan_remote"
@@ -15982,8 +9150,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1212361\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1212361"
 	rlRun "sriov_test_bz1212361"
@@ -15994,15 +9162,15 @@ fi
 #if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1145063\b)"; then
 #	rlPhaseStartTest "sriov_test_bz1145063"
 #	if [[ $ENABLE_RT_KERNEL == "yes" ]]; then
-#	rlRun "clear_dmesg_message"
+#    rlRun "clear_dmesg_message"
 #  fi
 #	rlRun "sriov_test_bz1145063"
 #	rlPhaseEnd
 #fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1205903\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1205903"
 	rlRun "sriov_test_bz1205903"
@@ -16010,8 +9178,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_trusted_vf_override_macaddr_via_bonding\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_trusted_vf_override_macaddr_via_bonding"
 	rlRun "sriov_test_trusted_vf_override_macaddr_via_bonding"
@@ -16019,8 +9187,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_failovermac0\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_failovermac0"
 	rlRun "sriov_test_bond_failovermac0"
@@ -16028,8 +9196,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_failovermac1\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_failovermac1"
 	rlRun "sriov_test_bond_failovermac1"
@@ -16037,8 +9205,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_failovermac2\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_failovermac2"
 	rlRun "sriov_test_bond_failovermac2"
@@ -16046,8 +9214,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_failovermac0_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_failovermac0_vlan"
 	rlRun "sriov_test_bond_failovermac0_vlan"
@@ -16055,8 +9223,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_failovermac1_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_failovermac1_vlan"
 	rlRun "sriov_test_bond_failovermac1_vlan"
@@ -16064,8 +9232,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_failovermac2_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_failovermac2_vlan"
 	rlRun "sriov_test_bond_failovermac2_vlan"
@@ -16073,8 +9241,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_failovermac1_pf_down\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_failovermac1_pf_down"
 	rlRun "sriov_test_bond_failovermac1_pf_down"
@@ -16082,8 +9250,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_failovermac2_swport_down\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_failovermac2_swport_down"
 	rlRun "sriov_test_bond_failovermac2_swport_down"
@@ -16091,8 +9259,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_bz1701191\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1701191"
 	rlRun "sriov_test_bz1701191"
@@ -16101,8 +9269,8 @@ fi
 
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1392128\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1392128"
 	rlRun "sriov_test_bz1392128"
@@ -16110,8 +9278,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_trusted_vf_allmulticast\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_trusted_vf_allmulticast"
 	rlRun "sriov_test_trusted_vf_allmulticast"
@@ -16119,8 +9287,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_trust_broadcast\b)"; then
-	rlPhaseStartSetup "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartSetup "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_trust_broadcast"
 	rlRun "sriov_test_vf_trust_broadcast"
@@ -16128,8 +9296,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_max_vfs\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_max_vfs"
 	rlRun "sriov_test_max_vfs"
@@ -16137,17 +9305,26 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_vlan_offload_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_vlan_offload_remote"
 	rlRun "sriov_test_vmvf_vlan_offload_remote"
 	rlPhaseEnd
 fi
 
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_offload_remote\b)"; then
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
+	rlPhaseEnd
+	rlPhaseStartTest "sriov_test_vmvf_offload_remote"
+	rlRun "sriov_test_vmvf_offload_remote"
+	rlPhaseEnd
+fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_trusted_vf_ipv6addr\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_trusted_vf_ipv6addr"
 	rlRun "sriov_test_trusted_vf_ipv6addr"
@@ -16162,8 +9339,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_different_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_different_vlan"
 	rlRun "sriov_test_vmvf_different_vlan"
@@ -16171,8 +9348,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1441909\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1441909"
 	rlRun "sriov_test_bz1441909"
@@ -16180,8 +9357,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_lacp\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_lacp"
 	rlRun "sriov_test_bond_lacp"
@@ -16189,8 +9366,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_trusted_vf_promisc\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_trusted_vf_promisc"
 	rlRun "sriov_test_trusted_vf_promisc"
@@ -16198,8 +9375,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1445814\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1445814"
 	rlRun "sriov_test_bz1445814"
@@ -16208,8 +9385,8 @@ fi
 
 if [ "$SRIOV_RUN_BY_PARTNER" = "no" ];then
 	if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vfname\b)"; then
-		rlPhaseStartTest "preconfiguration"
-		rlRun preconfiguration
+		rlPhaseStartTest "vmpreconfig"
+		rlRun vmpreconfig
 		rlPhaseEnd
 		rlPhaseStartTest "sriov_test_vfname"
 		rlRun "sriov_test_vfname"
@@ -16218,8 +9395,8 @@ if [ "$SRIOV_RUN_BY_PARTNER" = "no" ];then
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_hostdev_vmvf_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_hostdev_vmvf_remote"
 	rlRun "sriov_test_hostdev_vmvf_remote"
@@ -16229,15 +9406,15 @@ fi
 #if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1489964\b)"; then
 #	rlPhaseStartTest "sriov_test_bz1489964"
 #	if [[ $ENABLE_RT_KERNEL == "yes" ]]; then
-#	rlRun "clear_dmesg_message"
+#    rlRun "clear_dmesg_message"
 #  fi
 #	rlRun "sriov_test_bz1489964"
 #	rlPhaseEnd
 #fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf1vf2_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf1vf2_remote"
 	rlRun "sriov_test_vmvf1vf2_remote"
@@ -16245,8 +9422,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf1vf2_same_pf_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf1vf2_same_pf_remote"
 	rlRun "sriov_test_vmvf1vf2_same_pf_remote"
@@ -16254,8 +9431,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_spoofchk\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_spoofchk"
 	rlRun "sriov_test_spoofchk"
@@ -16263,8 +9440,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1493953\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1493953"
 	rlRun "sriov_test_bz1493953"
@@ -16272,8 +9449,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1483396\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1483396"
 	rlRun "sriov_test_bz1483396"
@@ -16281,8 +9458,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz1794812_excessive_interrupts\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz1794812_excessive_interrupts"
 	rlRun "sriov_test_bz1794812_excessive_interrupts"
@@ -16290,72 +9467,86 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_multicast\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_multicast"
 	rlRun "sriov_test_vmvf_multicast"
 	rlPhaseEnd
 fi
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmpf_vmvf_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmpf_vmvf_remote"
 	rlRun "sriov_test_vmpf_vmvf_remote"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmpfbond_vmvfbond_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmpfbond_vmvfbond_remote"
 	rlRun "sriov_test_vmpfbond_vmvfbond_remote"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_attach_method_is_forward_hostdev\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_attach_method_is_forward_hostdev"
 	rlRun "sriov_test_attach_method_is_forward_hostdev"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_attach_method_is_forward_hostdev_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_attach_method_is_forward_hostdev_vlan"
 	rlRun "sriov_test_attach_method_is_forward_hostdev_vlan"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_max_tx_rate\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_max_tx_rate"
 	rlRun "sriov_test_vmvf_max_tx_rate"
 	rlPhaseEnd
 fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_min_tx_rate\b)"; then
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
+	rlPhaseEnd
+	rlPhaseStartTest "sriov_test_vmvf_min_tx_rate"
+	rlRun "sriov_test_vmvf_min_tx_rate"
+	rlPhaseEnd
+fi
 #if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmpf_remote\b)"; then
 #	rlPhaseStartTest "sriov_test_vmpf_remote"
 #	if [[ $ENABLE_RT_KERNEL == "yes" ]]; then
-#	rlRun "clear_dmesg_message"
+#    rlRun "clear_dmesg_message"
 #  fi
 #	rlRun "sriov_test_vmpf_remote"
 #	rlPhaseEnd
 #fi
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_create_remove_vfs_memoryleak\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_create_remove_vfs_memoryleak"
 	rlRun "sriov_test_create_remove_vfs_memoryleak"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_reg_ureg_multicast_addr\b)"; then
-	rlPhaseStartSetup "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartSetup "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_reg_ureg_multicast_addr"
 	rlRun "sriov_test_vmvf_reg_ureg_multicast_addr"
@@ -16363,8 +9554,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_creation\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_creation"
 	rlRun "sriov_test_vf_creation"
@@ -16372,8 +9563,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_vlan_negative\b)"; then
-	rlPhaseStartSetup "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartSetup "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_vlan_negative"
 	rlRun "sriov_test_vf_vlan_negative"
@@ -16381,8 +9572,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_pf_speed_consistency\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_pf_speed_consistency"
 	rlRun "sriov_test_vf_pf_speed_consistency"
@@ -16390,8 +9581,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_remote_switchdev\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_remote_switchdev"
 	rlRun "sriov_test_vmvf_remote_switchdev"
@@ -16399,8 +9590,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_mac_switchdev_bz1814350\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_mac_switchdev_bz1814350"
 	rlRun "sriov_test_vf_mac_switchdev_bz1814350"
@@ -16408,8 +9599,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_switchdev_bz1870593\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_switchdev_bz1870593"
 	rlRun "sriov_test_switchdev_bz1870593"
@@ -16417,24 +9608,26 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_remote_jumbo_switchdev\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_remote_jumbo_switchdev"
 	rlRun "sriov_test_vf_remote_jumbo_switchdev"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_remote_jumbo_switchdev\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_remote_jumbo_switchdev"
 	rlRun "sriov_test_vmvf_remote_jumbo_switchdev"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_cntvf_cntvf\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_cntvf_cntvf"
 	rlRun "sriov_test_cntvf_cntvf"
@@ -16442,8 +9635,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_cntvf_cntvf_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_cntvf_cntvf_vlan"
 	rlRun "sriov_test_cntvf_cntvf_vlan"
@@ -16451,8 +9644,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_cntvf_cntvf_jumbo\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_cntvf_cntvf_jumbo"
 	rlRun "sriov_test_cntvf_cntvf_jumbo"
@@ -16460,8 +9653,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_podcntvf_podcntvf\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_podcntvf_podcntvf"
 	rlRun "sriov_test_podcntvf_podcntvf"
@@ -16469,8 +9662,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_podcntvf1_podcntvf2\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_podcntvf1_podcntvf2"
 	rlRun "sriov_test_podcntvf1_podcntvf2"
@@ -16478,43 +9671,47 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_podcntvf_remote\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_podcntvf_remote"
 	rlRun "sriov_test_podcntvf_remote"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_podcnts_vfs_remote_bz2088787\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_podcnts_vfs_remote_bz2088787"
 	rlRun "sriov_test_podcnts_vfs_remote_bz2088787"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_cntvf_reboot\b)"; then
-		rlPhaseStartTest "sriov_test_cntvf_reboot"
-		rlRun "sriov_test_cntvf_reboot"
-		rlPhaseEnd
+	rlPhaseStartTest "sriov_test_cntvf_reboot"
+	rlRun "sriov_test_cntvf_reboot"
+	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_connectivity_remain\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_connectivity_remain"
 	rlRun "sriov_test_vmvf_connectivity_remain"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_not_created_bz1875338\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_not_created_bz1875338"
 	rlRun "sriov_test_vf_not_created_bz1875338"
 	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_iface_not_created\b)"; then
 	rlPhaseStartTest "sriov_test_vf_iface_not_created"
 	rlRun "sriov_test_vf_iface_not_created"
@@ -16522,8 +9719,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_hibernation\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vmvf_hibernation"
 	rlRun "sriov_test_vmvf_hibernation"
@@ -16531,8 +9728,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_pf_steering_switchdev_bz1856660\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_pf_steering_switchdev_bz1856660"
 	rlRun "sriov_test_pf_steering_switchdev_bz1856660"
@@ -16564,14 +9761,17 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vf_cfg_stress\b)"; then
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
+	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_vf_cfg_stress"
 	rlRun "sriov_test_vf_cfg_stress"
 	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_mode2\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_mode2"
 	sriov_test_bond_mode2
@@ -16579,8 +9779,8 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bond_mode2_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bond_mode2_vlan"
 	sriov_test_bond_mode2_vlan
@@ -16588,42 +9788,36 @@ if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_2049237_VF_mac_reset_zero\b)"; then
-		rlPhaseStartTest "sriov_test_2049237_VF_mac_reset_zero"
-		sriov_test_2049237_VF_mac_reset_zero
-		rlPhaseEnd
+	rlPhaseStartTest "sriov_test_2049237_VF_mac_reset_zero"
+	sriov_test_2049237_VF_mac_reset_zero
+	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_2049237_VF_mac_reset_zero_reboot_check\b)"; then
-		rlPhaseStartTest "sriov_test_2049237_VF_mac_reset_zero_reboot_check"
-		sriov_test_2049237_VF_mac_reset_zero_reboot_check
-		rlPhaseEnd
+	rlPhaseStartTest "sriov_test_2049237_VF_mac_reset_zero_reboot_check"
+	sriov_test_2049237_VF_mac_reset_zero_reboot_check
+	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz2057244_vf_not_up\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_bz2057244_vf_not_up"
 	rlRun "sriov_test_bz2057244_vf_not_up"
 	rlPhaseEnd
 fi
 
-if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz2070917_vlan_bridge_nic\b)"; then
-	rlPhaseStartTest "sriov_test_bz2070917_vlan_bridge_nic"
-	rlRun "sriov_test_bz2070917_vlan_bridge_nic"
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz2055446_no_arp_reply\b)"; then
+	rlPhaseStartTest "sriov_test_bz2055446_no_arp_reply"
+	rlRun "sriov_test_bz2055446_no_arp_reply"
 	rlPhaseEnd
 fi
 
-if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz2055446_no_arp_reply\b)"; then
-		rlPhaseStartTest "sriov_test_bz2055446_no_arp_reply"
-		rlRun "sriov_test_bz2055446_no_arp_reply"
-		rlPhaseEnd
-fi
-
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz2071027_double_tagging\b)"; then
-		rlPhaseStartTest "sriov_test_bz2071027_double_tagging"
-		rlRun "sriov_test_bz2071027_double_tagging"
-		rlPhaseEnd
+	rlPhaseStartTest "sriov_test_bz2071027_double_tagging"
+	rlRun "sriov_test_bz2071027_double_tagging"
+	rlPhaseEnd
 fi
 
 #if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_vmvf_testpmd_macswap\b)"; then
@@ -16632,59 +9826,126 @@ fi
 #	rlPhaseEnd
 #fi
 #if [ "$SRIOV_SKIP_SETUP_ENV" != "yes" ]; then
-#	   sriov_cleanup
+#sriov_cleanup
 #fi
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_bz2008373\b)"; then
-		rlPhaseStartTest "sriov_test_bz2008373"
-		rlRun "sriov_test_bz2008373"
-		rlRun -l "dmesg | grep -c -i 'Invalid message from VF'" 1
-		rlPhaseEnd
+	rlPhaseStartTest "sriov_test_bz2008373"
+	rlRun "sriov_test_bz2008373"
+	rlRun -l "dmesg | grep -c -i 'Invalid message from VF'" 1
+	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|vf_intf_garp_check\b)"; then
-		rlPhaseStartTest "vf_intf_garp_check"
-		rlRun "vf_intf_garp_check"
-		rlPhaseEnd
+	rlPhaseStartTest "vf_intf_garp_check"
+	rlRun "vf_intf_garp_check"
+	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_link_down_on_close\b)"; then
-		rlPhaseStartTest "sriov_test_link_down_on_close"
-		rlRun "sriov_test_link_down_on_close"
-		rlPhaseEnd
+	rlPhaseStartTest "sriov_test_link_down_on_close"
+	rlRun "sriov_test_link_down_on_close"
+	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_reproduce_2000180\b)"; then
-		rlPhaseStartTest "sriov_test_reproduce_2000180"
-		rlRun "sriov_test_reproduce_2000180"
-		rlPhaseEnd
+	rlPhaseStartTest "sriov_test_reproduce_2000180"
+	rlRun "sriov_test_reproduce_2000180"
+	rlPhaseEnd
 fi
 
-if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_vlan_qinq_baisc\b)"; then
-		rlPhaseStartTest "preconfiguration"
-		rlRun preconfiguration
-		rlPhaseEnd
-	rlPhaseStartTest "sriov_test_vlan_qinq_baisc"
-		rlRun "sriov_test_vlan_qinq_baisc"
-		rlPhaseEnd
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_vlan_qinq_basic\b)"; then
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
+	rlPhaseEnd
+	rlPhaseStartTest "sriov_test_vlan_qinq_basic"
+	rlRun "sriov_test_vlan_qinq_basic"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_qinq_vlan_insertion_on_singlevlan\b)"; then
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
+	rlPhaseEnd
+	rlPhaseStartTest "sriov_test_qinq_vlan_insertion_on_singlevlan"
+	rlRun "sriov_test_qinq_vlan_insertion_on_singlevlan"
+	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_bz2080033_re_assign_MACs_to_VFs\b)"; then
 	rlPhaseStartTest "sriov_test_bz2080033_re_assign_MACs_to_VFs"
-		rlRun "sriov_test_bz2080033_re_assign_MACs_to_VFs"
-		rlPhaseEnd
+	rlRun "sriov_test_bz2080033_re_assign_MACs_to_VFs"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_bz2134294_change_MTU_under_load\b)"; then
+	rlPhaseStartTest "sriov_test_bz2134294_change_MTU_under_load"
+	rlRun "sriov_test_bz2134294_change_MTU_under_load"
+	rlPhaseEnd
 fi
 
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_bug_reproducer_2103801\b)"; then
 	rlPhaseStartTest "sriov_test_bug_reproducer_2103801"
-		rlRun "sriov_test_bug_reproducer_2103801"
-		rlPhaseEnd
+	rlRun "sriov_test_bug_reproducer_2103801"
+	rlPhaseEnd
 fi
+
 if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_spoofchk_vlan\b)"; then
-	rlPhaseStartTest "preconfiguration"
-	rlRun preconfiguration
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
 	rlPhaseEnd
 	rlPhaseStartTest "sriov_test_spoofchk_vlan"
 	rlRun "sriov_test_spoofchk_vlan"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_all|sriov_test_trusted_vf_promisc_vlan\b)"; then
+	rlPhaseStartTest "vmpreconfig"
+	rlRun vmpreconfig
+	rlPhaseEnd
+	rlPhaseStartTest "sriov_test_trusted_vf_promisc_vlan"
+	rlRun "sriov_test_trusted_vf_promisc_vlan"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_bz2138215\b)"; then
+	rlPhaseStartTest "sriov_test_bz2138215"
+	rlRun "sriov_test_bz2138215"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_unload_load_pf_driver\b)"; then
+	rlPhaseStartTest "sriov_test_unload_load_pf_driver"
+	rlRun "sriov_test_unload_load_pf_driver"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_iavf_vfmac_check\b)"; then
+	rlPhaseStartTest "sriov_test_iavf_vfmac_check"
+	rlRun "sriov_test_iavf_vfmac_check"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_checkdowntime_uptime_under_maxvf\b)"; then
+	rlPhaseStartTest "sriov_test_checkdowntime_uptime_under_maxvf"
+	rlRun "sriov_test_checkdowntime_uptime_under_maxvf"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_2175775_reboot_with_vfs\b)"; then
+	rlPhaseStartTest "sriov_test_2175775_reboot_with_vfs"
+	rlRun "sriov_test_2175775_reboot_with_vfs"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_2188249\b)"; then
+	rlPhaseStartTest "sriov_test_2188249"
+	rlRun "sriov_test_2188249"
+	rlPhaseEnd
+fi
+
+if [ -z "$SRIOV_TOPO" ] || echo $SRIOV_TOPO | grep -q -E "(sriov_test_bz2171382\b)"; then
+	rlPhaseStartTest "sriov_test_bz2171382"
+	rlRun "sriov_test_bz2171382"
 	rlPhaseEnd
 fi
 

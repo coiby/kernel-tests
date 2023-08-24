@@ -2,7 +2,11 @@
 # vim: sts=8 sw=8 noexpandtab:
 # This is for network operations
 
-#trap 'cleanup_swcfg' HUP TERM KILL EXIT
+pkg_mgr_cmd="yum"
+if ! which yum &> /dev/null; then
+		pkg_mgr_cmd='dnf'
+fi
+
 trap 'cleanup_swcfg' HUP TERM EXIT
 
 # ---------------------- Global variables  ------------------
@@ -105,12 +109,17 @@ reset_network_env()
 		else
 			rsync -a --delete $networkLib/system-connections/ /etc/NetworkManager/system-connections/
 		fi
+
 		systemctl restart network
 		systemctl restart NetworkManager
 
 		# delete it when the device does not exist
 		ip link del $TEAM_NAME
 		ip link del $BOND_NAME
+		if [ "$TEST_IFACE" = br0 ]; then
+			echo "Making sure the bridge is down"
+			nmcli con del br0
+		fi
 	else
 		# remove ovs
 		ovs-vsctl del-br ovsbr0 2>/dev/null && service openvswitch restart
@@ -254,7 +263,7 @@ get_netqe_nic_info()
 	wget --no-check-certificate $NIC_INFO_URL -O $NIC_INFO
 	sed -i '/^#/d' $NIC_INFO
 	# delete unsupported NIC
-	rhel_vx=rhel$(GetDistroRelease)
+	rhel_vx=rhel$(rpm -E %rhel)
 	sed -i "/$rhel_vx/d" $NIC_INFO
 }
 
@@ -267,17 +276,33 @@ mac2name()
 	local name="mac2name-error"
 	local target=""
 	local ethX=""
-	local network_interace_list="$(ls /sys/class/net/)"
 
-	for ethX in $network_interace_list; do
+	#for ethX in `ls /sys/class/net`; do
+	for ethX in /sys/class/net/* ; do
+		ethX=${ethX%*/}
+		ethX=${ethX##*/}
+		# conserve link status
+		# lo device is 'state UNKNOWN' when it is up
+		local link_status="up"
+		ip link show $ethX | grep -qi "state DOWN" && link_status="down"
+
+		# workaround for st_gmac NIC(bz2168806)
+		ip link set $ethX up;sleep 1;
+
 		# skip virtual device
 		if ethtool -i $ethX 2>/dev/null | grep -q "bus-info: [0-9].*"; then
+			#restore link status
+			ip link set $ethX $link_status
 			target=`get_iface_mac $ethX`
+			echo "for $ethX target mac is :- $target" >&2
+			echo "for $ethX mac is:- $mac" >&2
 			if [ "$mac" = "$target" ]; then
-				name=$ethX
-				break
+					name=$ethX
+					break
 			fi
 		fi
+		#restore link status
+		ip link set $ethX $link_status
 	done
 	echo $name
 }
@@ -543,8 +568,11 @@ get_required_iface()
 			swcfg cleanup_port_channel $sw "$port" &> /dev/null
 			swcfg port_up $sw "$port" &> /dev/null || let exitcode++
 			if [ `echo $sw |grep 5200` ]; then
-				# juniper 5200 update version. 88a8 and 8100 don't support at the same time. delete 88a8 config to let 8100 pass
+				# cleanup qinq config on switch 5200n. 88a8 and 8100 don't support at the same time. delete 88a8 config to let 8100 pass
 				swcfg del_interface_88a8 $sw "$port" &> /dev/null
+			elif [  $sw = 93180 ] || [ $sw =  9364 ]; then
+				# cleanup qinq config on switch 93180 and 9364.
+				swcfg qinq_delete $sw $port &> /dev/null
 			fi
 		done
 	elif [ "$PVT" = yes ]; then
@@ -965,11 +993,11 @@ change_iface_mtu()
 			;;
 		bridge)
 			local i
-			pushd /sys/class/net/$iface/brif
-			for i in *; do
+			for i in /sys/class/net/$iface/brif/*/; do
+				i=${i%*/}
+				i=${i##*/}
 				change_iface_mtu $i $value
 			done
-			popd
 			;;
 		openvswitch)
 			local i
@@ -1550,7 +1578,7 @@ exchange_ip_bak()
 	if stat /run/ostree-booted > /dev/null 2>&1; then
 		lsof -v 2>/dev/null || rpm-ostree -A --idempotent --allow-inactive install lsof
 	else
-		lsof -v 2>/dev/null || yum install -y lsof
+		lsof -v 2>/dev/null || $pkg_mgr_cmd install -y lsof
 	fi
 	echo "MAC $(get_iface_mac $iface) @$HOSTNAME" > /tmp/my_ip
 	echo $IPVER | grep -q 4 && {
@@ -1680,7 +1708,7 @@ exchange_ip()
 	if stat /run/ostree-booted > /dev/null 2>&1; then
 		lsof -v 2>/dev/null || rpm-ostree -A --idempotent --allow-inactive install lsof
 	else
-		lsof -v 2>/dev/null || yum install -y lsof
+		lsof -v 2>/dev/null || $pkg_mgr_cmd install -y lsof
 	fi
 	echo "MAC $(get_iface_mac $iface) @$HOSTNAME" > /tmp/my_ip
 	# dislike combination_test, we just get IP addr, no mask
@@ -1810,7 +1838,7 @@ update_ip()
 	if stat /run/ostree-booted > /dev/null 2>&1; then
 		lsof -v 2>/dev/null || rpm-ostree -A --idempotent --allow-inactive install lsof
 	else
-		lsof -v 2>/dev/null || yum install -y lsof
+		lsof -v 2>/dev/null || $pkg_mgr_cmd install -y lsof
 	fi
 	echo "MAC $(get_iface_mac $iface) @$HOSTNAME" > /tmp/my_ip
 	# dislike combination_test, we just get IP addr, no mask
@@ -1878,6 +1906,7 @@ update_ip()
 # @arg2: variable name to save switch_name
 # @arg3: variable name to save port_list
 # @arg4: (optional) variable name to save kicked port_list
+# dict is out of order data type, need add a new list to keep switch port consistence with test interface.
 get_iface_sw_port()
 {
 	[ -f "$NIC_INFO" ] || get_netqe_nic_info
@@ -1885,44 +1914,46 @@ get_iface_sw_port()
 	local _switch_name="$2"
 	local _port_list="$3"
 	local _kick_list="$4"
+	local temp_port_list=()
 	local exitcode=0
-	typeset -A iface_port_array
+	typeset -A local iface_port_array
 
 	# get iface_port_array
-	for i in $iface; do
-		local mac=`get_iface_mac $i`
-		switch_port=`grep "$mac" $NIC_INFO | awk '{print $2}'`
+	for i in "${iface[@]}"; do
+		local mac=$(get_iface_mac $i)
+		local switch_port=$(grep "$mac" $NIC_INFO | awk '{print $2}')
 		[ -n "$switch_port" ] || {
-			switch_port=switch-port-error; let exitcode++
+			local switch_port=switch-port-error; let exitcode++
 		}
-		iface_port_array[$i]=$switch_port
+		local iface_port_array[$i]=$switch_port
 	done
 
 	# find the most switch_name
-	switch_name=`printf '%s\n' "${iface_port_array[@]}" | \
-		sed 's/\([0-9]*\)-[A-Z,a-z].*/\1/' | \
-		uniq -c | sort | awk 'END {print $2}'`
+	local switch_name_local=$(printf '%s\n' "${iface_port_array[@]}" | \
+			sed 's/\([0-9]*\)-[A-Z,a-z].*/\1/' | \
+			uniq -c | sort | awk 'END {print $2}')
 
-	# split switch_name and port_list
-	for i in $iface; do
-		switch_port="${iface_port_array[$i]}"
-		echo "$switch_port" | grep -q "${switch_name}-[A-Z,a-z]" && {
+	# split switch_name_local and port_list
+	for i in "${iface[@]}"; do
+		local switch_port="${iface_port_array[$i]}"
+		echo "$switch_port" | grep -q "${switch_name_local}-[A-Z,a-z]" && {
 			# just save port
-			iface_port_array[$i]="${switch_port#$switch_name-}"
+			local iface_port_array[$i]="${switch_port#$switch_name_local-}"
+			temp_port_list=(${temp_port_list[@]} ${switch_port#$switch_name_local-})
 		} || {
 			# kick switch_port on different switch
 			echo "Warning: $i is on different switch, kick it from the port list" >&2
-			iface_port_array[$i]=""
-			kick_list+="$i "
+			local iface_port_array[$i]=""
+			local kick_list_local+="$i "
 			let exitcode++
 		}
 	done
-	port_list=`echo "${iface_port_array[@]}"` # remove newline
+	local port_list_local="${temp_port_list[*]}" # remove newline
 
 	# save and print results
-	[[ "$_switch_name" ]] && eval $_switch_name="'$switch_name'" || echo $switch_name
-	[[ "$_port_list" ]] && eval $_port_list="'$port_list'" || echo \"$port_list\"
-	[[ "$_kick_list" ]] && eval $_kick_list="'$kick_list'"
+	[[ "$_switch_name" ]] && eval $_switch_name="'$switch_name_local'" || echo $switch_name_local
+	[[ "$_port_list" ]] && eval $_port_list="'$port_list_local'" || echo \"$port_list_local\"
+	[[ "$_kick_list" ]] && eval $_kick_list="'$kick_list_local'"
 	return $exitcode
 }
 
@@ -2046,7 +2077,7 @@ get_reachable_ips()
 		if stat /run/ostree-booted > /dev/null 2>&1; then
 			rpm-ostree -A --idempotent --allow-inactive install nmap
 		else
-			yum install -y nmap
+			$pkg_mgr_cmd install -y nmap
 		fi
 	fi
 	if [[ $(ip a | grep -w inet | grep -w "$subnet_search_string") ]]; then
@@ -2102,40 +2133,45 @@ get_target_ip_addr()
 	return $exitcode
 }
 
+# generate /usr/local/bin/get_static_ip_subnet
+# this function will be called by swcfg so we put it in $PATH for convenience
+cat > /usr/local/bin/get_static_ip_subnet <<- EOF
 # Return a number base on hostname
 # Please use it as the 3rd ip segment to avoid ip conflict(e.g. 172.16.${subnet_return_by_this}.1)
 # If host exist in nic_info(and not be commented out), will return his position in nic_info
 # If host not in nic_info(or be commented out), will return a random number which will less than 255 and big than total host count of nic_info
-get_static_ip_subnet()
-{
-	local host=$1
-	[ -f "$NIC_INFO_WITH_ALL_NIC" ] || {
-		unlink $NIC_INFO_WITH_ALL_NIC 2>/dev/null
-		wget --no-check-certificate $NIC_INFO_URL -O $NIC_INFO_WITH_ALL_NIC &>/dev/null
-		sed -i '/^#/d' $NIC_INFO_WITH_ALL_NIC
-	}
-	local total_host=$(cat $NIC_INFO_WITH_ALL_NIC |awk '{print $3}'|sort|uniq|wc -l)
+_NIC_INFO_WITH_ALL_NIC=$NIC_INFO_WITH_ALL_NIC
+_NIC_INFO_URL=$NIC_INFO_URL
+EOF
+cat >> /usr/local/bin/get_static_ip_subnet <<- 'EOF'
+_host=$1
+[ -f "$_NIC_INFO_WITH_ALL_NIC" ] || {
+	unlink $_NIC_INFO_WITH_ALL_NIC 2>/dev/null
+	wget --no-check-certificate $_NIC_INFO_URL -O $_NIC_INFO_WITH_ALL_NIC &>/dev/null
+	sed -i '/^#/d' $_NIC_INFO_WITH_ALL_NIC
+}
+_total_host=$(cat $_NIC_INFO_WITH_ALL_NIC |awk '{print $3}'|sort|uniq|wc -l)
 
-	# get host position in nic_info
-	local line_num=$(grep -v ^# $NIC_INFO_WITH_ALL_NIC | awk  '{print $3}' | uniq |sed '/^$/d' | grep -n $host | awk -F':' '{print $1}')
+# get host position in nic_info
+_line_num=$(grep -v ^# $_NIC_INFO_WITH_ALL_NIC | awk  '{print $3}' | sort | uniq |sed '/^$/d' | grep -n $_host | awk -F':' '{print $1}')
 
 	# when host not in nic_info
-	if [ -z "$line_num" ];then
-		#if [ $total_host -lt 254 ];then
-		#	local random_ip=$((RANDOM%(254-total_host)+total_host+1))
-		#	echo $random_ip
-		#else
-		#	echo "254"
-		#fi
-		echo "255"
+if [ -z "$_line_num" ];then
+	echo "255"
 	# when host in nic_info and line_num less then 254
-	elif [ $line_num -lt 254 ];then
-		echo $line_num
+elif [ $_line_num -lt 254 ];then
+	echo $_line_num
 	# when line_num big then 254, return fix value 254
 	else
 		echo "254"
 	fi
-}
+unset _host
+unset _total_host
+unset _line_num
+unset _NIC_INFO_WITH_ALL_NIC
+unset _NIC_INFO_URL
+EOF
+chmod +x /usr/local/bin/get_static_ip_subnet
 
 # return a mac prefix including 4 segments base on hostname
 get_mac_prefix()
@@ -2178,4 +2214,27 @@ get_required_iface_by_mac()
 		popd
 	done
 	echo $ports
+}
+
+# usage:
+# $1 : port name
+# $2 : timeout
+# $3 : delay time before return after port is up
+# wait_port_up ens1f0 30 2
+# wait_port_up ens1f0 30
+# wait_port_up ens1f0
+wait_port_up()
+{
+	local port=$1
+	local timeout=10
+	[ $# -ge 2 ] && timeout=$2
+	local sleep_after_up=0
+	[ $# -ge 3 ] && sleep_after_up=$3
+
+	for ((i=0;i<timeout;i++));do
+		ip link show $port | grep -q "state UP" && { sleep $sleep_after_up; return 0; }
+		sleep 1
+	done
+
+	return 1
 }

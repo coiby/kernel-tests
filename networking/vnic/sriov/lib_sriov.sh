@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # helper for SR-IOV
+
 # create VFs for PF
 #
 # *** NOTE:
@@ -10,6 +11,12 @@
 [ -e ./lib_mlx.sh ] && source ./lib_mlx.sh
 [ -e ./lib_chelsio.sh ] && source ./lib_chelsio.sh
 [ -e ./lib_nfp.sh ] && source ./lib_nfp.sh
+
+function RUN_CMD
+{
+	echo "RUN_CMD: $1"
+	eval "$1"
+}
 
 sriov_create_vfs()
 {
@@ -24,7 +31,7 @@ sriov_create_vfs()
 	ip link set $PF up
 
 	echo ----------------------
-	lspci | grep -i ether
+	lspci -s ${pf_bus_info}
 	echo ----------------------
 	case ${driver} in
 		mlx4_en)
@@ -55,7 +62,7 @@ sriov_create_vfs()
 			echo ${num_vfs} > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs
 				sleep 5
 
-				lspci | grep -i ether
+			lspci -s ${pf_bus_info} -vvv | grep -i vf
 				echo ----------------------
 
 				if (( $(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | wc -l) != ${num_vfs} )); then
@@ -83,7 +90,7 @@ sriov_create_vfs_1()
 	ip link set $PF up
 
 	echo ----------------------
-	lspci | grep -i ether
+	lspci -s ${pf_bus_info}
 	echo ----------------------
 	case ${driver} in
 		mlx4_en)
@@ -114,7 +121,7 @@ sriov_create_vfs_1()
 			echo ${num_vfs} > /sys/class/net/$PF/device/sriov_numvfs
 				sleep 5
 
-			lspci | grep -i ether
+			lspci -s ${pf_bus_info} -vvv | grep -i vf
 			echo ----------------------
 			if (( $(ls -l /sys/class/net/$PF/device/virtfn* | wc -l) != ${num_vfs} )); then
 				echo "FAIL to create VFs"
@@ -136,9 +143,10 @@ sriov_remove_vfs()
 
 	local driver=$(ethtool -i $PF | grep 'driver' | sed 's/driver: //')
 	local pf_bus_info=$(ethtool -i $PF | grep 'bus-info'| sed 's/bus-info: //')
+	ip link set $PF up
 
 	echo ----------------------
-	lspci | grep -i ether
+	lspci -s ${pf_bus_info}
 	echo ----------------------
 	case ${driver} in
 		mlx4_en)
@@ -155,7 +163,7 @@ sriov_remove_vfs()
 			echo 0 > /sys/bus/pci/devices/${pf_bus_info}/sriov_numvfs
 				sleep 5
 
-				lspci | grep -i ether
+			lspci -s ${pf_bus_info} -vvv | grep -i vf
 				echo ----------------------
 
 				if (($(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* 2>/dev/null | wc -l) != 0)); then
@@ -259,14 +267,40 @@ sriov_attach_vf_to_vm()
 	cat ${vf_nodedev}.xml
 
 	if virsh attach-device $vm ${vf_nodedev}.xml ; then
-
-		case ${driver} in
-			ice)
-				sleep 4
-				;;
-		esac
+		RUN_CMD "virsh dumpxml ${vm} | grep -A 10 \"domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'\" |\
+				grep -v \"domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'\" |\
+				grep -m 1 'address'"
+		if virsh dumpxml ${vm} | grep -A 10 "domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'" &>/dev/null
+		then
+			local guest_vf_bus=$(virsh dumpxml ${vm} | grep -A 10 "domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'" |\
+					grep -v "domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'" |\
+					grep -m 1 'address' |\
+					sed -n "s/.*bus='0x\([[:alnum:]]\+\)'.*/\1/p")
+			local guest_vf_slot=$(virsh dumpxml ${vm} | grep -A 10 "domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'" |\
+					grep -v "domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'" |\
+					grep -m 1 'address' |\
+					sed -n "s/.*slot='0x\([[:alnum:]]\+\)'.*/\1/p")
+			local guest_vf_function=$(virsh dumpxml ${vm} | grep -A 10 "domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'" |\
+					grep -v "domain='0x${domain}' bus='0x${bus}' slot='0x${slot}' function='0x${function}'" |\
+					grep -m 1 'address' |\
+					sed -n "s/.*function='0x\([[:alnum:]]\+\)'.*/\1/p")
+			vmsh run_cmd ${vm} "lspci | grep ${guest_vf_bus}:${guest_vf_slot}.${guest_vf_function}"
+			for((guest_vf_timeout=1;guest_vf_timeout<=5;guest_vf_timeout++)); do
+				if vmsh run_cmd ${vm} "ip link show | grep \$(grep PCI_SLOT_NAME /sys/class/net/*/device/uevent | grep ${guest_vf_bus}:${guest_vf_slot}.${guest_vf_function} | sed 's/\/sys\/class\/net\/\(.*\)\/device\/uevent.*/\1/g') &>/dev/null"; then
+					break
+				else
+					echo "wait interface ${guest_vf_timeout} sec" && sleep 1
+				fi
+				if [ "${guest_vf_timeout}" -eq 5 ]; then
+					echo "wait for ${guest_vf_timeout} sec still can not find interface"
+					return 1
+				fi
+			done
 			return 0
+		else
+			return 1
 		fi
+	fi
 	return 1
 }
 
@@ -295,38 +329,36 @@ sriov_detach_vf_from_vm()
 		local vf_nodedev=pci_$(echo $vf_bus_info | sed 's/[:|.]/_/g')
 
 	# fix rt-kernel can't detach vf Bug 1887895
-	if [[ $ENABLE_RT_KERNEL != "yes" ]]; then
+#	if [[ $ENABLE_RT_KERNEL != "yes" ]]; then
 		virsh detach-device $vm ${vf_nodedev}.xml
-	else
-		local rhel_version=$( cat /etc/redhat-release | sed	's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
-		if [[ $(echo "${rhel_version} > 8.6" | bc) -eq 1 ]]; then
-			virsh detach-device $vm ${vf_nodedev}.xml
-		else
-			virsh detach-device $vm ${vf_nodedev}.xml
-			virsh shutdown $vm
-			sleep 10
-			virsh start $vm
-			sleep 10
-			local vm_status=$(virsh list --all | grep -w $vm |	awk '{print $3,$4}' | tr -d " ")
-			rlLog "${vm} in ${vm_status} status"
-			if [[ x"${vm_status}" != x"running" ]]; then
-				virsh destroy $vm
-				sleep 10
-				virsh start $vm
-				sleep 10
-				local vm_status=$(virsh list --all | grep -w $vm |	awk '{print $3,$4}' | tr -d " ")
-				rlLog "current ${vm} in ${vm_status} status"
-				return 0
-			fi
-		fi
-	fi
+#	else
+#		local rhel_version=$( cat /etc/redhat-release | sed  's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
+#		if [[ $(echo "${rhel_version} > 8.6" | bc) -eq 1 ]]; then
+#			virsh detach-device $vm ${vf_nodedev}.xml
+#		else
+#			virsh detach-device $vm ${vf_nodedev}.xml
+#			virsh shutdown $vm
+#			sleep 10
+#			virsh start $vm
+#			sleep 10
+#			local vm_status=$(virsh list --all | grep -w $vm |  awk '{print $3,$4}' | tr -d " ")
+#			rlLog "${vm} in ${vm_status} status"
+#			if [[ x"${vm_status}" != x"running" ]]; then
+#				virsh destroy $vm
+#				sleep 10
+#				virsh start $vm
+#				sleep 10
+#				local vm_status=$(virsh list --all | grep -w $vm |  awk '{print $3,$4}' | tr -d " ")
+#				rlLog "current ${vm} in ${vm_status} status"
+#				return 0
+#			fi
+#		fi
+#	fi
 
 	#workaround for arch system https://gitlab.com/libvirt/libvirt/-/issues/72
 	if [ "$SYS_ARCH" == "aarch" ];then
 		sleep 5
 	fi
-
-
 		;;
 	esac
 }
@@ -377,7 +409,7 @@ sriov_detach_pf_from_vm()
 			virsh detach-device $vm ${pf_nodedev}.xml
 			return 0
 	else
-		local rhel_version=$( cat /etc/redhat-release | sed	's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
+		local rhel_version=$( cat /etc/redhat-release | sed  's/\(.*\)\([0-9].[0-9]\)\(.*\)/\2/g')
 		if [[ $(echo "${rhel_version} > 8.6" | bc) -eq 1 ]]; then
 			virsh detach-device $vm ${pf_nodedev}.xml
 		else
@@ -386,14 +418,14 @@ sriov_detach_pf_from_vm()
 			sleep 10
 			virsh start $vm
 			sleep 10
-			local vm_status=$(virsh list --all | grep -w $vm |	awk '{print $3,$4}' | tr -d " ")
+			local vm_status=$(virsh list --all | grep -w $vm |  awk '{print $3,$4}' | tr -d " ")
 			rlLog "${vm} in ${vm_status} status"
 			if [[ x"${vm_status}" != x"running" ]]; then
 				virsh destroy $vm
 				sleep 10
 				virsh start $vm
 				sleep 10
-				local vm_status=$(virsh list --all | grep -w $vm |	awk '{print $3,$4}' | tr -d " ")
+				local vm_status=$(virsh list --all | grep -w $vm |  awk '{print $3,$4}' | tr -d " ")
 				rlLog "current ${vm} in ${vm_status} status"
 				return 0
 			fi
@@ -420,7 +452,8 @@ sriov_get_vf_iface()
 			echo $(chelsio_get_vf_iface "$@")
 			;;
 		*)
-			local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
+						[ -f /sys/bus/pci/devices/"${pf_bus_info}"/virtfn$((iVF-1)) ] || let result++
+			local vf_bus_info=$(ls -l /sys/bus/pci/devices/"${pf_bus_info}"/virtfn$((iVF-1)) | awk '{print $NF}' | sed 's/..\///')
 
 				local vf_iface=()
 				local cx=0
@@ -605,51 +638,41 @@ switchdev_get_reps()
 #		done
 #	fi
 #	echo -n $ifaces
-if [ "$NIC_DRIVER" == "ice" ]; then
-	local PF=$1
-	local vfs_num=$(cat /sys/class/net/$PF/device/sriov_numvfs)
-	local count
-	local interface
-	for count in $(seq 0 $((vfs_num-1))); do
-		for interface in /sys/devices/virtual/net/*; do
-			interface=${interface%*/}
-						ethtool -i $interface | grep -q "driver: ice" || continue
-			local ifaces=$ifaces' '$interface
+		local PF=$1
+		declare -A ifaces_map
+		local phys_switch_id=$(cat /sys/class/net/$PF/phys_switch_id 2>/dev/null)
+		local iface
+		for iface in /sys/class/net/*/; do
+			iface=${iface%*/}
+			iface=${iface##*/}
+			local phys_switch_id1=$(cat /sys/class/net/$iface/phys_switch_id 2>/dev/null)
+			local phys_switch_id1=$(cat /sys/class/net/$iface/phys_switch_id 2>/dev/null)
+			[ -z "$phys_switch_id1" ] && continue
+			[ "$phys_switch_id1" != "$phys_switch_id" ] && continue
+			# Provided by "Alaa Hleihel" <ahleihel@redhat.com> start
+			# ignore non-VF Representors
+			local phys_port_name1=$(cat /sys/class/net/$iface/phys_port_name 2>/dev/null)
+			case "$phys_port_name1" in
+				*pf*vf*) ;;
+				*) continue;;
+			esac
+			# Provided by "Alaa Hleihel" <ahleihel@redhat.com> stop
+			local item
+			# shellcheck disable=SC2068 # Add double quotes would break this code
+			for item in ${ifaces_map[@]}; do
+				[ "$iface" == "$item" ] && continue 2
+			done
+			ifaces_map["$phys_port_name1"]="$iface"
 		done
-	done
-	echo -n $ifaces
-
-else
-	local PF=$1
-	declare -A ifaces_map
-	local phys_switch_id=$(cat /sys/class/net/$PF/phys_switch_id 2>/dev/null)
-	local iface
-	for iface in /sys/class/net/*; do
-		iface=${iface%*/}
-		local phys_switch_id1=$(cat /sys/class/net/$iface/phys_switch_id 2>/dev/null)
-		[ -z "$phys_switch_id1" ] && continue
-		[ "$phys_switch_id1" != "$phys_switch_id" ] && continue
-		# Provided by "Alaa Hleihel" <ahleihel@redhat.com> start
-		# ignore non-VF Representors
-		local phys_port_name1=$(cat /sys/class/net/$iface/phys_port_name 2>/dev/null)
-		case "$phys_port_name1" in
-			*pf*vf*) ;;
-			*) continue;;
-		esac
-		# Provided by "Alaa Hleihel" <ahleihel@redhat.com> stop
-		local item
-		for item in "${ifaces_map[@]}"; do
-			[ "$iface" == "$item" ] && continue 2
+		# shellcheck disable=SC2068 # Add double quotes would break this code
+		local keys=($(echo ${!ifaces_map[@]} | tr " " "\n" | sort | tr "\n" " "))
+		local key; local ifaces=();
+		# shellcheck disable=SC2068 # Add double quotes would break this code
+		for key in ${keys[@]}; do
+			ifaces+=(${ifaces_map[$key]})
 		done
-		ifaces_map["$phys_port_name1"]="$iface"
-	done
-	local keys=($(echo "${!ifaces_map[@]}" | tr " " "\n" | sort | tr "\n" " "))
-	local key; local ifaces=();
-	for key in "${keys[@]}"; do
-		ifaces+=(${ifaces_map[$key]})
-	done
-	echo -n "${ifaces[@]}"
-fi
+		# shellcheck disable=SC2068 # Add double quotes would break this code
+		echo -n ${ifaces[@]}
 
 }
 
@@ -757,11 +780,10 @@ sriov_attach_vf_to_cnt()
 	local containerID=$(podman ps | grep $container | awk '{print $1}')
 	#echo "containerID $containerID"
 	local nsID=$(podman inspect -f '{{.State.Pid}}' $containerID)
-	ln -s /proc/$nsID/ns/net /var/run/netns/$nsID
+	ln -bs /proc/$nsID/ns/net /var/run/netns/$nsID
 	ip link set $vf netns $nsID
 	#link up vf
-	#podman exec $container ip link set $vf up
-	ip netns exec $nsID ip link set $vf up
+	podman exec $container ip link set $vf up
 	if podman exec $container ip link show | grep $vf ; then
 		return 0
 	else
@@ -805,3 +827,68 @@ workaround_swtpm()
 	fi
 }
 
+rmnicdriver()
+{
+	local driver=${1:-"$NIC_DRIVER"}
+	local retval=0
+	[ x"$driver" == x ] && return 0
+	set_all_test_nic_down
+	local dependlib=`lsmod | grep ^$driver | awk 'NF>=4{print $4}'`
+	local libs=$(echo $dependlib | tr ',' ' ')
+	if [ x$NIC_DRIVER == x'nicvf' ];then
+		libs="$libs nicpf"
+	elif [ x$NIC_DRIVER == x'cxgb4' ];then
+		libs="$libs csiostor"
+	fi
+	for lib in $libs;
+	do
+		modprobe -rv $lib
+	done
+	modprobe -rv $driver
+	rlRun "udevadm settle"
+	unset driver
+	return $retval
+}
+
+remodprobe_driver()
+{
+	local driver=${1:-"$NIC_DRIVER"}
+	local retval=0
+	[ x"$driver" == x ] && return 0
+	rmnicdriver $driver
+	retval=$?
+	[ $retval -ne 0 ] && return $retval
+	sleep 5
+	if [ x$NIC_DRIVER == x'nicvf' ];then
+		modprobe -v nicpf
+	elif [ x$NIC_DRIVER == x'cxgb4' ];then
+		modprobe -v csiostor
+		modprobe -v $driver
+	else
+		modprobe -v $driver
+	fi
+	retval=$?
+	rlRun "udevadm settle"
+	unset driver
+	return $retval
+}
+
+set_all_test_nic_down()
+{
+	local target_driver=${1:-"$NIC_DRIVER"}
+	[ x"${target_driver}" == x ] && { echo "test nic driver not be specified, exit!!!"; return 0; }
+	local default_nic=$(ip route | awk '/default/ {print $5}' | awk 'NR==1 {print}')
+	for find_nic in /sys/class/net/*; do
+		local find_dev=$(basename ${find_nic})
+		if [[ x"${find_dev}" == x"${default_nic}" ]] || [[ x"${i}" == x"lo" ]]; then
+			continue
+		fi
+		local find_driver=$(readlink ${find_nic}/device/driver/module)
+		if [ -n "${find_driver}" ]; then
+			local find_driver=$(basename ${find_driver})
+			if [[ x"${find_driver}" == x"${target_driver}" ]]; then
+				ip link set ${find_dev} down
+			fi
+		fi
+	done
+}

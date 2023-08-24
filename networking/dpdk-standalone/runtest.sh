@@ -26,7 +26,7 @@ init_all_env()
 {
     set -a
     PACKAGE="kernel"
-    CASE_PATH=${CASE_PATH:-"./"}
+    CASE_PATH=$(dirname $(readlink -f ${BASH_SOURCE}))
     source /etc/os-release
     SYSTEM_VERSION_ID=$(echo $VERSION_ID | tr -d '.')
     set +a
@@ -187,16 +187,16 @@ install_python()
     yum makecache
     yum -y install sshpass
 
-    if (( $SYSTEM_VERSION_ID < 82 ))
-    then
-        yum -y install python2
-        yum -y install python2-pip
-        yum -y install python2-devel
-        yum -y install python36
-        yum -y install python36-pip
-        yum -y install python36-devel
-        yum -y install python36-setuptools
-    elif (( $SYSTEM_VERSION_ID >= 82 )) && (( $SYSTEM_VERSION_ID < 84 ))
+#    if (( $SYSTEM_VERSION_ID < 82 ))
+#    then
+#        yum -y install python2
+#        yum -y install python2-pip
+#        yum -y install python2-devel
+#        yum -y install python36
+#        yum -y install python36-pip
+#        yum -y install python36-devel
+#        yum -y install python36-setuptools
+    if (( $SYSTEM_VERSION_ID >= 82 )) && (( $SYSTEM_VERSION_ID < 84 ))
     then
         yum -y install python38
         yum -y install python38-pip
@@ -216,12 +216,12 @@ install_python()
         yum -y install python3.11-setuptools
     fi
 
-    if (($SYSTEM_VERSION_ID < 80)); then
-        python2 -m pip install --upgrade pip==20.3.4
-        python2 -m pip install wheel
-        python2 -m pip install netifaces
-        python2 -m pip install six
-    fi
+#    if (($SYSTEM_VERSION_ID < 80)); then
+#        python2 -m pip install --upgrade pip==20.3.4
+#        python2 -m pip install wheel
+#        python2 -m pip install netifaces
+#        python2 -m pip install six
+#    fi
 }
 
 install_python_and_init_env()
@@ -233,18 +233,18 @@ install_python_and_init_env()
     rpm -q telnet || yum -y install telnet
     rpm -q vim || yum -y install vim
     # python3 -m venv ${CASE_PATH}/venv
-    if (( $SYSTEM_VERSION_ID < 82 ))
-    then
-        python3.6 -m venv ${CASE_PATH}/venv
-    elif (( $SYSTEM_VERSION_ID >= 82 )) && (( $SYSTEM_VERSION_ID < 84 ))
-    then
-        python3.8 -m venv ${CASE_PATH}/venv
-    elif (( $SYSTEM_VERSION_ID >= 84 )) && (( $SYSTEM_VERSION_ID < 90 ))
-    then
-        python3.9 -m venv ${CASE_PATH}/venv
-    else
-        python3.11 -m venv ${CASE_PATH}/venv
-    fi
+#    if (( $SYSTEM_VERSION_ID < 82 ))
+#    then
+#        python3.6 -m venv ${CASE_PATH}/venv
+#    elif (( $SYSTEM_VERSION_ID >= 82 )) && (( $SYSTEM_VERSION_ID < 84 ))
+#    then
+#        python3.8 -m venv ${CASE_PATH}/venv
+#    elif (( $SYSTEM_VERSION_ID >= 84 )) && (( $SYSTEM_VERSION_ID < 90 ))
+#    then
+#        python3.9 -m venv ${CASE_PATH}/venv
+#    else
+    python3.11 -m venv ${CASE_PATH}/venv
+#    fi
     source venv/bin/activate
     pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple/
     pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
@@ -401,6 +401,8 @@ start_run_test()
     print_all_parameters
 
     init_all_env
+
+    print_all_parameters
 
     tools_install
 
