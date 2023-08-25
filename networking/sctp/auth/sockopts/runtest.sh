@@ -16,9 +16,12 @@
 # Jianwen Ji: <jiji@redhat.com>
 
 # include common  and Beaker environments
-. ../../../../cki_lib/libcki.sh || exit 1
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "${CDIR}"/../../../../kernel-include/runtest.sh || exit 1
+. "${CDIR}"/../../../../cki_lib/libcki.sh || exit 1
+. "${CDIR}"/common/include.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. ./common/include.sh || exit 1
 
 export TEST="networking/sctp/auth/sockopts"
 
@@ -30,10 +33,11 @@ OUTPUTFILE=$(new_outputfile)
 rlPhaseStartSetup
     YUM=$(cki_get_yum_tool)
 
+    modules_extra_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-extra)
     if cki_is_kernel_automotive; then
-        rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive lksctp-tools-devel gcc kernel-automotive-modules-extra
+        rpm-ostree install --assumeyes --apply-live  --idempotent --allow-inactive lksctp-tools-devel gcc ${modules_extra_pkg}
     else
-        rlRun "$YUM install -y lksctp-tools-devel gcc kernel-modules-extra"
+        rlRun "$YUM install -y lksctp-tools-devel gcc ${modules_extra_pkg}"
     fi
 
     rlRun "lsmod | grep sctp || modprobe sctp" "0-255"
