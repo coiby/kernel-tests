@@ -130,13 +130,7 @@ function install_debugkernel()
         return
     fi
 
-    if test -f ../../include/scripts/wget-kernel.sh; then
-        WGET_KERNEL="../../include/scripts/wget-kernel.sh"
-    else
-        rpm -q --quiet kernel-kernel-general-include || rlRun "yum -y install kernel-general-include"
-        test -f /mnt/tests/kernel/general/include/scripts/wget-kernel.sh && \
-        WGET_KERNEL="/mnt/tests/kernel/general/include/scripts/wget-kernel.sh"
-    fi
+    WGET_KERNEL="../../include/scripts/wget-kernel.sh"
 
     # Remove the +deubg and .arch tail.
     local ver_rel=$(uname -r | sed 's/.'$(uname -m).*$'//')
