@@ -171,8 +171,7 @@ function vmalloc_test_setup()
 
     # install kernel-devel pkg
     if ! cki_is_kernel_automotive; then
-        yum install -y kernel-general-include
-        rlRun "yum install -y kernel-devel-$(uname -r) || ../../../include/scripts/wget-kernel.sh --running --devel -i"
+        rlRun "yum install -y ${kname}-devel-$(uname -r) || ../../../include/scripts/wget-kernel.sh --running --devel -i"
     else
         if ! rpm -q --quiet ${kname}-devel-$(uname -r | sed -e 's/+debug//'); then
             if stat /run/ostree-booted > /dev/null 2>&1; then
