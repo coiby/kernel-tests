@@ -2,6 +2,7 @@ summary: Checks for config differences between releases.
 description: |2
      Check for kconfig changes between releases. The check is done on the config of the system under test against a config of your choosing.
 contact: Stephen Bertram <sbertram@redhat.com>
+id: 4cad03de-5113-4e29-93be-280d1243186e
 test: bash ./runtest.sh
 framework: beakerlib
 require:
