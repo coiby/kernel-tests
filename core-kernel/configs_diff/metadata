@@ -1,0 +1,13 @@
+[General]
+name=/kernel-tests/core-kernel/configs_diff
+owner=Stephen Bertram <sbertram@redhat.com>
+description=Checks for config differences between releases.
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=diffutils
+repoRequires=cki_lib

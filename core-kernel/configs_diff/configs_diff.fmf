@@ -1,0 +1,11 @@
+summary: Checks for config differences between releases.
+description: |2
+     Check for kconfig changes between releases. The check is done on the config of the system under test against a config of your choosing.
+contact: Stephen Bertram <sbertram@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - diffutils
+duration: 10m
+extra-summary: /kernel-tests/core-kernel/configs_diff
+extra-task: /kernel-tests/core-kernel/configs_diff

@@ -1,0 +1,9 @@
+Checks for kconfig changes between releases. The check is done on the config of the system under test against a config of your choosing.
+Takes 3 parameters as input:
+BASE_URL: deafults to "https://cbs.centos.org/kojifiles/packages". Takes 1 to n space separated url's. Goes through the list until the src.rpm is found.
+scratch_build: not set. If it is set, BASE_URL needs an entry that contains the entire path to <nvr>.src.rpm.
+               can be used for any build that does not follow the normal repository rules for RHEL/CentOS releases.
+baseline: defaults to "". This is the base release to compare against the one under test.
+          Examples:
+             rhivos: 354.317.el9iv
+             rhel: 354.el9
