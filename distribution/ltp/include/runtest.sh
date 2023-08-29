@@ -37,7 +37,7 @@ SYSINFO=`mktemp -p /mnt/testarea -t SysInfo.XXXXXX`
 lck=$OUTPUTDIR/$(basename $0).lck
 
 if [ -z ${ARCH} ]; then
-    ARCH=$(uname -i)
+    ARCH=$(uname -m)
 fi
 
 # by jstancek

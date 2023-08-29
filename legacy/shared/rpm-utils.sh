@@ -189,7 +189,7 @@ function rpm_extract_latest()
 
 function rpm_extract()
 {
-	local karch="$(uname -i)"
+	local karch="$(uname -m)"
 	local kver="$(uname -r | cut -f1 -d'-')"
 	local krel="$(uname -r | grep -Po "\-\K[^.]+\.el[^.]+")"
 

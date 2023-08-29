@@ -88,7 +88,7 @@ RunContinous()
 HotPluggable()
 {
     HP=1    # exit status 0 is success, non-0 is error
-    ARCH=$(uname -i)
+    ARCH=$(uname -m)
     if [ -f "$BASE/cpu$1/online" ]
     then
         if [[ "$ARCH" =~ "ppc64" ]]

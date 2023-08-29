@@ -31,7 +31,7 @@ CDIR=$(dirname "$FILE")
 . "$CDIR"/../kernel-include/runtest.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 #-------------------- Setup --------------------
-arch=$(uname -i)
+arch=$(uname -m)
 version=$(uname -r | cut -f1 -d'-')
 release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
 SKIP_CODE=4

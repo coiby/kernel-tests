@@ -53,7 +53,7 @@ DEBUGLOG=`mktemp -p /mnt/testarea -t DeBug.XXXXXX`
 lck=$OUTPUTDIR/$(basename $0).lck
 
 if [ -z ${ARCH} ]; then
-    ARCH=$(uname -i)
+    ARCH=$(uname -m)
 fi
 
 if grep -q "release 4" /etc/redhat-release; then
