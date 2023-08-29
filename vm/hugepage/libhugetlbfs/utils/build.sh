@@ -25,7 +25,7 @@ function install_dependencies
     #      Bug 1567712 - glibc-static needs to be multilib on RHEL 8
     #
     pkgs=""
-    if [[ $(uname -i) == "x86_64" ]]; then
+    if [[ $(uname -m) == "x86_64" ]]; then
         # 32-bit packages
         pkgs+=" libgcc.i686"
         pkgs+=" glibc-devel.i686"
@@ -34,6 +34,10 @@ function install_dependencies
         pkgs+=" libgcc.x86_64"
         pkgs+=" glibc-devel.x86_64"
         pkgs+=" glibc-static.x86_64"
+    elif [[ $(uname -m) == "s390x" ]]; then
+        pkgs+=" libgcc.s390x libgcc.s390"
+        pkgs+=" glibc-devel.s390x glibc-devel.s390"
+        pkgs+=" glibc-static.s390x glibc-static.s390 "
     else
         pkgs+=" libgcc"
         pkgs+=" glibc-devel"
@@ -54,7 +58,7 @@ function build_libhugetlbfs
 {
     typeset target=${1?"*** target, e.g. libhugetlbfs-2.21"}
 
-    typeset arch=$(uname -i)
+    typeset arch=$(uname -m)
     typeset osmr=$(grep -Go 'release [0-9]\+' /etc/redhat-release | \
                    awk '{print $NF}')
     typeset oa=${osmr}_${arch}
