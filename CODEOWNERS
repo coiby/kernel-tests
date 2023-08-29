@@ -37,6 +37,7 @@
 #       - cki-project
 #     paths:
 #       - /.gitlab-ci.yml
+        - /Makefile
 #   CKI:
 #     users:
 #       - cki-project
@@ -53,10 +54,11 @@
 # GITLAB-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-GENERATED-BEGIN
-# fee47f0946869e08fea765ba28370103adfddfe3689d1776b40f81d4edd23087
+# e00e998543cf60356012aba7b9771fbb7e16d649368988d3709bbd737a9a69d4
 
 [Infrastructure]
 /.gitlab-ci.yml @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/Makefile @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 
 [CKI]
 /acpi/acpitable/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
