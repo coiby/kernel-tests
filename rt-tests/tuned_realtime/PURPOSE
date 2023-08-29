@@ -1,0 +1,32 @@
+DESCRIPTION
+Activate or deactivate the realtime TuneD profile, optionally
+supplying the isolated cores to set in /etc/tuned/realtime-variables.conf
+
+Variables:
+  ACTION=<on|off>
+    ACTION=on activates tuned-adm with the realtime profile, and will
+      reboot the machine to ensure isolated_cores in realtime-variables.conf
+      takes effect
+    ACTION=off simply deactivates any active tuned-adm profile and exits
+  ISOLCPUS=<default|""|VALUE>
+    ISOLCPUS=default
+      When activating the realtime tuned profile, leaves whatever default
+      value is set for isolated_cores in realtime-variables.conf.  For
+      tuned >= 2.19, this isolates all cores except for the first per socket
+      for housekeeping.
+    ISOLCPUS=""
+      Deliberately setting ISOLCPUS to an empty string will ensure that
+      realtime-variables.conf sets `isolated_cores=`, so that no cores will
+      be isolated when activating the realtime tuned profile
+    ISOLCPUS=VALUE
+      Sets `isolated_cores=VALUE` in realtime-variables.conf before applying
+      the realtime tuned profile.  VALUE must be a valid CPU isolation string
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+n/a
