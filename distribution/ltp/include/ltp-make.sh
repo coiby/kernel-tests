@@ -29,7 +29,7 @@ echo "Absolute directory of ltp include patches: $ABS_DIR"  | tee -a $OUTPUTFILE
 TARGET_DIR="/mnt/testarea/ltp"
 TARGET="ltp-full-${TESTVERSION}"
 
-SYSENV=$(uname -i)
+SYSENV=$(uname -m)
 ARCH=$SYSENV
 KVER=$(uname -r | cut -d'-' -f 1 | cut -d'.' -f 3)
 KREV=$(uname -r | cut -d'-' -f 2 | cut -d'.' -f 1)

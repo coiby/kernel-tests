@@ -13,7 +13,7 @@ CUR_TIME=$(date --date="$(date --utc)" +%s)
 devnull=0
 
 if [ -z "$ARCH" ]; then
-        ARCH=$(uname -i)
+        ARCH=$(uname -m)
 fi
 
 # Create debug log
@@ -74,7 +74,7 @@ function SysReport ()
     sysnode=$(/bin/uname -n)
     syskernel=$(/bin/uname -r)
     sysmachine=$(/bin/uname -m)
-    sysprocess=$(/bin/uname -p)
+    sysprocess=$(/bin/uname -m)
     sysuname=$(/bin/uname -a)
     sysswap=$(/usr/bin/free -m | /bin/awk '{if($1=="Swap:") {print $2,"MB"}}')
     sysmem=$(/usr/bin/free -m | /bin/awk '{if($1=="Mem:") {print $2,"MB"}}')
