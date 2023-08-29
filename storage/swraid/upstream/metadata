@@ -8,5 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
+dependencies=git;make;systemd-devel
 repoRequires=cki_lib
 max_time=5m
