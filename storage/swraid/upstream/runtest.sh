@@ -38,7 +38,6 @@ rlJournalStart
         rlPhaseEnd
     done
     for log in ./logs/*; do
-        echo "rhts-submit-log -l "${log}""
         rhts-submit-log -l "${log}"
     done
 rlJournalPrintText
