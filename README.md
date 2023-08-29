@@ -66,6 +66,40 @@ To check lint for yaml files, use yamllint:
 $ yamllint -s <filename>
 ```
 
+To check for bash with mixed tabs and spaces:
+ ```shell
+$ comm -12 \
+<(find . -type f -iname '*.sh' -exec grep -lPe '^\t' {} + | sort) \
+<(find . -type f -iname '*.sh' -exec grep -lPe '^ ' {} + | sort)
+```
+
+To check for now allowed internal hostnames
+ ```shell
+readarray -t allowed_hosts < <(sed '/^#/d' .allowed-hosts)
+readarray -t internal_hosts < <(grep -hroE --exclude=.allowed-hosts '([a-zA-Z0-9\\.\\-]+\.redhat.com)' * | sort -u)
+fail=0
+for host in "${internal_hosts[@]}"; do
+  allowed=0
+  for allowed_host in "${allowed_hosts[@]}"; do
+    if grep -E -w -q "${allowed_host}" <<< "${host}"; then
+        allowed=1
+        break
+    fi
+  done
+  if [[ "${allowed}" -eq 0 ]]; then
+      echo "${host} is not allowed according to .allowed-hosts"
+      fail=1
+  fi
+done
+# check if allowed entry should be removed as it is not being used
+for allowed_host in "${allowed_hosts[@]}"; do
+  if ! grep -hroEq --exclude=.allowed-hosts "${allowed_host}"; then
+      echo "${allowed_host} from .allowed-hosts should be removed as it is not used"
+      fail=1
+  fi
+done
+```
+
 
 ## Test onboarding
 
