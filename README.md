@@ -66,12 +66,15 @@ To check lint for yaml files, use yamllint:
 $ yamllint -s <filename>
 ```
 
-To check for bash with mixed tabs and spaces:
- ```shell
+To check for bash with mixed tabs and spaces as indentation.
+```shell
 $ comm -12 \
 <(find . -type f -iname '*.sh' -exec grep -lPe '^\t' {} + | sort) \
 <(find . -type f -iname '*.sh' -exec grep -lPe '^ ' {} + | sort)
 ```
+If the mixed indentation happens: 
+* To use command "grep -nP '^\t' \<filename\>" to list the lines with tab starting.
+* To use command "grep -nP '^ ' \<filename\>" to list the lines with space starting.
 
 To check for now allowed internal hostnames
  ```shell
