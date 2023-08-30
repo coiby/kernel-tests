@@ -3,12 +3,34 @@ eval "$(shellspec - -c) exit 1"
 
 Include "kernel-include/runtest.sh"
 
-Describe 'kernel-include: K_GetRunningKernelRpmVersionRelease'
+Describe 'kernel-include: K_IsKernelRPM'
     Mock rpm
         echo "rpm $*"
-        if [[ -z ${kernel_version:-} ]]; then
-            exit 1
-        fi
+        exit "${rpm_exitcode}"
+    End
+    Mock uname
+        echo "${kernel_version}"
+    End
+    It "can detect it is kernel rpm"
+        export kernel_version="6.0.7-300.fc36.x86_64"
+        export rpm_exitcode="0"
+        When call K_IsKernelRPM
+        The status should be success
+    End
+    It "can detect it is not a kernel rpm"
+        export kernel_version="6.5.0"
+        export rpm_exitcode="1"
+        When call K_IsKernelRPM
+        The status should be failure
+    End
+End
+
+Describe 'kernel-include: K_GetRunningKernelRpmVersionRelease'
+     Mock rpm
+         echo "rpm $*"
+    End
+    Mock K_IsKernelRPM
+        exit "${is_kernelrpm_exitcode:-0}"
     End
     Mock uname
         echo "${kernel_version}"
@@ -19,11 +41,11 @@ Describe 'kernel-include: K_GetRunningKernelRpmVersionRelease'
         The first line should equal "rpm -q --queryformat %{version}-%{release} -qf /boot/config-${kernel_version}"
         The status should be success
     End
-    It "fails if it cannot get the kernel version release"
-        export kernel_version=
+    It "return empty string if it is not an rpm kernel"
+        export kernel_version="6.5.0"
+        export is_kernelrpm_exitcode="1"
         When call K_GetRunningKernelRpmVersionRelease
-        The first line should equal "rpm -q --queryformat %{version}-%{release} -qf /boot/config-${kernel_version}"
-        The status should be failure
+        The status should be success
     End
 End
 
