@@ -58,7 +58,7 @@ $ find -name '*.sh' -exec shellcheck -S error {} +
 ```
 Also, to check bash lines ending with white spaces use command:
 ```shell
-$ grep -ne '\s$' <filename>
+$ make trailing_whitespace
 ```
 
 To check lint for yaml files, use yamllint:
@@ -66,41 +66,19 @@ To check lint for yaml files, use yamllint:
 $ yamllint -s <filename>
 ```
 
-To check for bash with mixed tabs and spaces as indentation.
-```shell
-$ comm -12 \
-<(find . -type f -iname '*.sh' -exec grep -lPe '^\t' {} + | sort) \
-<(find . -type f -iname '*.sh' -exec grep -lPe '^ ' {} + | sort)
+To check for bash with mixed tabs and spaces as indentation:
+ ```shell
+$ make mixed_tab_space
 ```
-If the mixed indentation happens: 
-* To use command "grep -nP '^\t' \<filename\>" to list the lines with tab starting.
-* To use command "grep -nP '^ ' \<filename\>" to list the lines with space starting.
 
 To check for now allowed internal hostnames
  ```shell
-readarray -t allowed_hosts < <(sed '/^#/d' .allowed-hosts)
-readarray -t internal_hosts < <(grep -hroE --exclude=.allowed-hosts '([a-zA-Z0-9\\.\\-]+\.redhat.com)' * | sort -u)
-fail=0
-for host in "${internal_hosts[@]}"; do
-  allowed=0
-  for allowed_host in "${allowed_hosts[@]}"; do
-    if grep -E -w -q "${allowed_host}" <<< "${host}"; then
-        allowed=1
-        break
-    fi
-  done
-  if [[ "${allowed}" -eq 0 ]]; then
-      echo "${host} is not allowed according to .allowed-hosts"
-      fail=1
-  fi
-done
-# check if allowed entry should be removed as it is not being used
-for allowed_host in "${allowed_hosts[@]}"; do
-  if ! grep -hroEq --exclude=.allowed-hosts "${allowed_host}"; then
-      echo "${allowed_host} from .allowed-hosts should be removed as it is not used"
-      fail=1
-  fi
-done
+$ make internal_hostname
+```
+
+To check for deprecated uname parameters:
+ ```shell
+$ make deprecated_uname
 ```
 
 

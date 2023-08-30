@@ -66,11 +66,7 @@ shell check runtests:
 uname with deprecated parameter:
   extends: .cki_tools
   script:
-    - |
-      if grep -Er "uname -[ip]"; then
-        echo "please use uname with '-m' parameter instead: https://bugzilla.redhat.com/show_bug.cgi?id=2126206"
-        exit 1
-      fi
+    - make deprecated_uname
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
@@ -145,15 +141,7 @@ codeowners check:
 check bash with mixed tabs and spaces:
   extends: .cki_tools
   script:
-    - |
-      mixed=$(comm -12 \
-          <(find . -type f -iname '*.sh' -exec grep -lPe '^\t' {} + | sort) \
-          <(find . -type f -iname '*.sh' -exec grep -lPe '^ ' {} + | sort))
-      if [[ -n "${mixed}" ]]; then
-          echo "Files with mixed tabs/spaces:"
-          echo "${mixed}" | sed 's/^/  /'
-          exit 1
-      fi
+    - make mixed_tab_space
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
@@ -161,14 +149,7 @@ check bash with mixed tabs and spaces:
 check bash lines ending with white spaces:
   extends: .cki_tools
   script:
-    - |
-      whitespaces=$((find . -type f -iname '*.sh' -exec grep -lPe '\s$' {} + || true ) | sort)
-      if [[ -n "${whitespaces}" ]]; then
-          echo "Files that have lines ending with whitespaces:"
-          echo "${whitespaces}" | sed 's/^/  /'
-          echo "for more details run: grep -ne '\s$' <filename>"
-          exit 1
-      fi
+    - make trailing_whitespace
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
