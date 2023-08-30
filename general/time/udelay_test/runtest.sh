@@ -59,7 +59,7 @@ true && {
     make
     [ $? != 0 ] && retcode=1
     popd
-    export ARCH=$(uname -i)
+    export ARCH=$(uname -m)
 }
 
 [ ! -e udelay_test/udelay_test.ko ] && {

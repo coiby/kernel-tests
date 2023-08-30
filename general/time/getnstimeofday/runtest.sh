@@ -31,8 +31,8 @@ function runtest()
 # ---------- Start Test -------------
 export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 
-if [[ ! $(uname -i) =~ "86" ]]; then
-    echo "The current architecture is $(uname -i), this cast just support x86 architecture!"
+if [[ ! $(uname -m) =~ "86" ]]; then
+    echo "The current architecture is $(uname -m), this cast just support x86 architecture!"
     rstrnt-report-result $TEST SKIP
     exit 0
 fi

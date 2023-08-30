@@ -49,8 +49,8 @@ function runtest ()
 }
 
 # ---------- Start Test -------------
-[[ ! $(uname -i) =~ "86" ]] && {
-    echo "The current architecture is $(uname -i), this cast just support x86 architecture!"
+[[ ! $(uname -m) =~ "86" ]] && {
+    echo "The current architecture is $(uname -m), this cast just support x86 architecture!"
     rstrnt-report-result $TEST "SKIP"
     exit 0
 }

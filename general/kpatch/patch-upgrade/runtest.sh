@@ -56,7 +56,7 @@ MOD_B_PATCH1="data-new.patch"
 KPATCH_MOD_A="livepatch-cmdline-meminfo"
 KPATCH_MOD_B="livepatch-meminfo-proc"
 
-karch=$(uname -i)
+karch=$(uname -m)
 kver=$(uname -r | cut -f1 -d'-')
 krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//")
 KSRC_RPM=kernel-${kver}-${krel}.src.rpm

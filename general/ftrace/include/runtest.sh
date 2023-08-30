@@ -28,7 +28,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[[ -z $ARCH ]] && ARCH=`uname -i`
+[[ -z $ARCH ]] && ARCH=`uname -m`
 
 T_PATH_SYS_DEBUG=/sys/kernel/debug
 T_PATH_SYS_TRACE=${T_PATH_SYS_DEBUG}/tracing

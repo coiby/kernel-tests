@@ -10,7 +10,7 @@ NR_CPU=$(grep -wo processor /proc/cpuinfo | wc -l)
 # We can start ((NR_CPU * STRESS_FACTOR)) threads in kbuild stress.
 NR_CPU=$((STRESS_FACTOR * NR_CPU))
 
-karch=$(uname -i)
+karch=$(uname -m)
 kver=$(uname -r | cut -f1 -d'-')
 krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//")
 

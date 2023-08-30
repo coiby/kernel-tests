@@ -68,8 +68,8 @@ function runtest ()
 
 # ---------- Start Test -------------
 echo "Test Start" | tee -a $OUTPUTFILE
-[[ ! $(uname -i) =~ "86" ]] && {
-    echo "The current architecture is $(uname -i). This cast just support x86 architecture!" | tee -a $OUTPUTFILE
+[[ ! $(uname -m) =~ "86" ]] && {
+    echo "The current architecture is $(uname -m). This cast just support x86 architecture!" | tee -a $OUTPUTFILE
     rstrnt-report-result $TEST SKIP
     exit 0
 }

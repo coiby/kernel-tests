@@ -52,7 +52,7 @@ fi
 kversion=$(uname -r | awk -F '-' '{print $1}')
 krelease=$(uname -r | awk -F '-' '{print $2}')
 krelease=${krelease%.*}
-karch=$(uname -i)
+karch=$(uname -m)
 
 (( allocated = PAGESIZE * PAGENUM / 1024 ))
 

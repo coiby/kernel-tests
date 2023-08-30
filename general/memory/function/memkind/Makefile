@@ -37,7 +37,7 @@ PATCH_DIR=patches
 
 # System Environment, i.e., architecture
 ifndef SYSENV
-	SYSENV := $(shell uname -i)
+	SYSENV := $(shell uname -m)
 endif
 
 LOOKASIDE=$(shell echo $$LOOKASIDE)
