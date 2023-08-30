@@ -293,6 +293,8 @@ function filter_known_issues()
 	# TODO: fix upstream
 	local cpus=$(nproc)
 	if [ "$cpus" -lt 2 ]; then
+		KNOWNISSUE_32="$KNOWNISSUE_32 -e \"Bad configuration: Atleast online 2 cpus are required\""
+		KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Bad configuration: Atleast online 2 cpus are required\""
 		KNOWNISSUE_32="$KNOWNISSUE_32 -e \"Bad configuration: sched_setaffinity\""
 		KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Bad configuration: sched_setaffinity\""
 	fi
