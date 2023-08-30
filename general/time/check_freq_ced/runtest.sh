@@ -58,7 +58,7 @@ function runtest ()
 }
 
 # ---------- Start Test -------------
-[[ ! $(uname -i) =~ "86" ]] && {
+[[ ! $(uname -m) =~ "86" ]] && {
     echo "Only support x86 arch, skip~" | tee -a $OUTPUTFILE
     rstrnt-report-result $TEST "SKIP" 0
     exit 0

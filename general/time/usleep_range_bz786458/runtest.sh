@@ -22,7 +22,7 @@ function runtest ()
     unset ARCH
     make -C ./usleep_range/
     [ $? != 0 ] && result_fail
-    export ARCH=$(uname -i)
+    export ARCH=$(uname -m)
 
     insmod ./usleep_range/usleep_range.ko
     sleep 2
@@ -65,6 +65,6 @@ function runtest ()
 }
 
 # ---------- Start Test -------------
-[[ ! $(uname -i) =~ "86" ]] && echo "The current architecture is $(uname -i), this cast just support x86 architecture!" && result_pass
+[[ ! $(uname -m) =~ "86" ]] && echo "The current architecture is $(uname -m), this cast just support x86 architecture!" && result_pass
 runtest
 exit 0

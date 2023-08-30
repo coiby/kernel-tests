@@ -238,8 +238,8 @@ install_repos()
     kcomp=${COMPOSE} #To create the right repo links later and grab certain packages. not used on automotive builds.
     id=$(grep ^ID= /etc/os-release | cut -d = -f 2) #Information about what os we are on, rhel or centos
     major=$(grep ^VERSION_ID= /etc/os-release | cut -d = -f 2 | cut -d \" -f 2 | cut -d . -f 1) #Main release e.g. 9
-    karch=$(uname -i)
-    
+    karch=$(uname -m)
+
     if kernel_automotive; then
         sed -i "s/\$stream/9-stream/" /etc/yum.repos.d/centos*.repo
         dnf install 'dnf-command(config-manager)' -y

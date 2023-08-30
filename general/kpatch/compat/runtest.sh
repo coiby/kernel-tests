@@ -63,7 +63,7 @@ kprobe_enable="${trace_dir}/events/kprobes/enable"
 tracer="${trace_dir}/current_tracer"
 
 function install_deps() {
-    local karch=$(uname -i)
+    local karch=$(uname -m)
     local kver=$(uname -r | cut -f1 -d'-')
     local krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.${karch}$//")
     local brew="${BRWURL}/brewroot/packages"

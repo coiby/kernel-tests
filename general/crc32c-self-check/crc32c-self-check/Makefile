@@ -1,6 +1,6 @@
 obj-m  := crc32c-self-check.o
 
-UNAME := $(shell uname -i)
+UNAME := $(shell uname -m)
 ifeq ($(UNAME),aarch64)
   ARCH := arm64
 else ifeq ($(UNAME),ppc64)

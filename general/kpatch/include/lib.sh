@@ -3,7 +3,7 @@
 BUILDS_URL="${BUILDS_URL:-}"
 PACKAGE=kpatch
 SERVICE=kpatch
-kpackage=$(rpm -qf /boot/config-`uname -r` | sed "s/.`uname -i`//g; s/core-//g;")
+kpackage=$(rpm -qf /boot/config-`uname -r` | sed "s/.`uname -m`//g; s/core-//g;")
 karch=$(rpm -q $kpackage --qf "%{arch}")
 knam=$(rpm -q $kpackage --qf "%{name}")
 kver=$(rpm -q $kpackage --qf "%{version}")
