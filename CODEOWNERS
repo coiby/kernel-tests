@@ -172,6 +172,7 @@
 /storage/swraid/scsi_raid/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/swraid/simple_reshape/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/swraid/trim/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/storage/swraid/upstream/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/target/targetcli_basic/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /stress/stress-ng/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /trace/bpf/test_bpf/ @Toaster192 @bgoncalv @calancha @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -294,6 +295,7 @@
 /storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
 /storage/swraid/scsi_raid/ @bgoncalv @czhong2 @lulinqing
 /storage/swraid/simple_reshape/ @FineFan @bgoncalv @lulinqing
+/storage/swraid/upstream/ @bgoncalv @lulinqing @xni1
 /storage/target/targetcli_basic/ @bgoncalv @lulinqing @mhoyer
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
