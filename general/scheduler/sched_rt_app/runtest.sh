@@ -217,6 +217,11 @@ function test_setup()
 	echo "=============================================="
 	rlFileSubmit "cgroups.txt"
 
+	if uname -r | grep rt && virt-what | grep kvm; then
+		$report_func skip_kernel_rt_kvm_guest_${SCHED_NR_CPU} SKIP
+		exit 0
+	fi
+
 	SCHED_NR_CPU=$(nproc)
 	if [ $SCHED_NR_CPU -lt 1 ]; then
 		$report_func test_skip_nr_cpu_${SCHED_NR_CPU} SKIP
