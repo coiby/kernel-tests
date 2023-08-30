@@ -6,4 +6,4 @@ owner=Laura Trivelloni <ltrivell@redhat.com>
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=15m
-dependencies=linux-firmware
+dependencies=linux-firmware;git
