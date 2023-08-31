@@ -67,7 +67,7 @@ function VerboseCupsLog()
 
 # ---------- Start Test -------------
 # verify to not run on s390x
-if [ "$(uname -i)" = "s390x" ]; then
+if [ "$(uname -m)" = "s390x" ]; then
     rstrnt-report-result $TEST SKIP
     exit
 fi

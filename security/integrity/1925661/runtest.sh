@@ -28,7 +28,7 @@ rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         grubby --info=DEFAULT
-#        case `uname -i` in
+#        case `uname -m` in
 #            "ppc64le") export cer_file="kernel-signing-ppc.cer" ;;
 #            "s390x") export cer_file="kernel-signing-s390.cer" ;;
 #            "s390x") exit 0 ;;
@@ -36,7 +36,7 @@ rlJournalStart
 #            "aarch64") exit 0 ;;
 #            *) exit 1 ;;
 #        esac
-        if [[ $(uname -i) != "ppc64le" ]]; then
+        if [[ $(uname -m) != "ppc64le" ]]; then
             echo "[SKIP] support ppc64le only"
             rstrnt-report-result $RSTRNT_TASKNAME SKIP
             exit 0

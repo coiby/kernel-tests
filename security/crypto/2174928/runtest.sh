@@ -41,7 +41,7 @@ rlJournalStart
             rlRun "pushd $TmpDir"
             rlRun "touch before_fips.log"
             rlRun "touch after_fips.log"
-            if [[ $(uname -i) = "x86_64" ]]; then
+            if [[ $(uname -m) = "x86_64" ]]; then
                 rlRun "gcc -pthread -o threaded_getrandom threaded_getrandom.c"
             else
                 rlRun "gcc -pthread -o threaded_getrandom threaded_getrandom_ns.c"

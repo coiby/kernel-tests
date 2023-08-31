@@ -48,7 +48,7 @@ rlJournalStart
 
     rlPhaseStartTest "Checking validity of current path"
         grep kabi_file= /usr/lib/rpm/redhat/find-requires.ksyms
-        rlRun "arch=\$( uname -i | sed 's/i386/i686/' )"
+        rlRun "arch=\$( uname -m | sed 's/i386/i686/' )"
         KABIFILE=`grep 'kabi_file=' /usr/lib/rpm/redhat/find-requires.ksyms | cut -d = -f 2 | sed 's/"//g'`
         echo $KABIFILE
         rlRun "ls `echo $KABIFILE | sed 's/\\\$arch/*/'`"

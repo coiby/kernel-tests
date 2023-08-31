@@ -36,16 +36,16 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest
-        if [[ $(uname -i) == "aarch64" ]] && $(rlIsRHEL 8); then
+        if [[ $(uname -m) == "aarch64" ]] && $(rlIsRHEL 8); then
             echo "[SKIP] no integirty support for aarch64 on RHEL8"
             rstrnt-report-result $RSTRNT_TASKNAME SKIP
             exit 0
         fi
-        if [[ $(uname -i) == "ppc64le" || $(uname -i) == "aarch64" ]]; then
+        if [[ $(uname -m) == "ppc64le" || $(uname -m) == "aarch64" ]]; then
             rlAssertGrep 'CONFIG_HAVE_IMA_KEXEC=y' ${CONFIG}
             rlAssertGrep 'CONFIG_IMA_KEXEC=y' ${CONFIG}
         fi
-        if [[ $(uname -i) == "ppc64le" || $(uname -i) == "x86_64" ]]; then
+        if [[ $(uname -m) == "ppc64le" || $(uname -m) == "x86_64" ]]; then
             rlAssertGrep 'CONFIG_IMA_ARCH_POLICY=y' ${CONFIG}
         fi
         if $(rlIsRHEL 9); then

@@ -26,7 +26,7 @@
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        case `uname -i` in
+        case `uname -m` in
             "x86_64")
                 ;;
             *)
