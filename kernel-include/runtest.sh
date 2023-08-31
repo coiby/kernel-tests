@@ -443,27 +443,39 @@ function K_VercmpTest ()
     kvercmp `uname -r` '3.1.4-0.1.el7.x86_64'
 }
 
+# K_IsKernelRPM returns 0 in running kernel is from rpm and 1 if it is not
+function K_IsKernelRPM ()
+{
+    rpm -qf "/boot/config-$(uname -r)" > /dev/null 2>&1
+}
+
 # K_GetRunningKernelRpmVersionRelease return the rpm version of the running kernel
 # with new kernel variants using just uname -r can be tricky
 # for example uname -r would output something like `5.14.0-290.el9.x86_64+rt-debug`
 # therefore, trying to install kernel-rt-debug-$(uname -r) wouldn't work
 function K_GetRunningKernelRpmVersionRelease ()
 {
-    rpm -q --queryformat '%{version}-%{release}' -qf "/boot/config-$(uname -r)"
+    if K_IsKernelRPM; then
+        rpm -q --queryformat '%{version}-%{release}' -qf "/boot/config-$(uname -r)"
+    fi
 }
 
 # returns the kernel package name of running kernel.
 # Like: kernel, kernel-debug, kernel-rt, kernel-rt-debug, kernel-64k
 function K_GetRunningKernelRpmName ()
 {
-  rpm -q --queryformat '%{name}' -qf "/boot/config-$(uname -r)" | sed s/-core//
+  if K_IsKernelRPM; then
+    rpm -q --queryformat '%{name}' -qf "/boot/config-$(uname -r)" | sed s/-core//
+  fi
 }
 
 # returns the kernel source package name of running kernel.
 # Like: kernel, kernel-rt...
 function K_GetRunningKernelSrpmName ()
 {
-  rpm -q --queryformat '%{sourcerpm}' -qf "/boot/config-$(uname -r)" | sed "s/-$(K_GetRunningKernelRpmVersionRelease).*//"
+  if K_IsKernelRPM; then
+    rpm -q --queryformat '%{sourcerpm}' -qf "/boot/config-$(uname -r)" | sed "s/-$(K_GetRunningKernelRpmVersionRelease).*//"
+  fi
 }
 
 # Returns a nvr for a derived subpackage of the _binary rpm_
@@ -475,6 +487,10 @@ function K_GetRunningKernelRpmSubPackageNVR ()
   if [ -z "$1" ]; then
     echo "FAIL: missing sub-package name parameter"
     return 1
+  fi
+
+  if ! K_IsKernelRPM; then
+    return
   fi
 
   local subpkg k_rpm k_srpm k_rpm_vr k_srpm_vr

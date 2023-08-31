@@ -33,6 +33,9 @@ Describe 'kselftests: install_kselftests from rpms'
     Mock K_GetRunningKernelSrpmName
         echo "${KERNEL_SRPM_NAME}"
     End
+    Mock K_IsKernelRPM
+        exit 0
+    End
 
     Parameters
         # kernel with variants
