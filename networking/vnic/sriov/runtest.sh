@@ -143,7 +143,7 @@ install_pktgen()
 			return 0
 	fi
 	local link="http://download-node-02.eng.bos.redhat.com/brewroot/packages/${kname3}"
-	local karch=$(uname -i)
+	local karch=$(uname -m)
 	local kver=$(echo ${kernel_ver}| cut -f1 -d'-')
 	local krel=$(echo ${kernel_ver} | cut -f2 -d'-' | sed "s/\.$karch.*//")
 	dnf install -y ${link}/${kver}/${krel}/${karch}/bpftool-${kver}-${krel}.${karch}.rpm

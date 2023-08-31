@@ -615,7 +615,7 @@ epel_release_install()
 kernel_install()
 {
 	local karch baseurl rpmpkg rpmpkgs knvr krel kernel pkg pkgs brew_url task_id noarch_id firmurl
-	karch=$(uname -i)
+	karch=$(uname -m)
 
 	# FIXME: if we need to deal with build id and none parent task, see
 	# task distribution/install/brew-build
@@ -783,7 +783,7 @@ kselftests_install()
 		dnf install -y iproute-tc libbpf #dependencies
 		dnf install -y bpftool-${kernel_ver} ${kname2}-modules-extra-${kernel_ver} ${kname2}-modules-internal-${kernel_ver} ${kname2}-selftests-internal-${kernel_ver} && return 0
 		local link="http://download-node-02.eng.bos.redhat.com/brewroot/packages/${kname1}"
-		local karch=$(uname -i)
+		local karch=$(uname -m)
 		local kver=$(echo ${kernel_ver}| cut -f1 -d'-')
 		local krel=$(echo ${kernel_ver} | cut -f2 -d'-' | sed "s/\.$karch//")
 		dnf install  -y ${link}/${kver}/${krel}/${karch}/bpftool-${kver}-${krel}.${karch}.rpm

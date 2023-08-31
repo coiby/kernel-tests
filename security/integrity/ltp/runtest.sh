@@ -29,7 +29,7 @@ rlJournalStart
         if [ ! -f ./REBOOT ]; then
             grubby --args="ima_tcb" --update-kernel=DEFAULT
             grubby --args="ima_appraise=fix" --update-kernel=DEFAULT
-            [[ $(uname -i) == "s390x" ]] && zipl
+            [[ $(uname -m) == "s390x" ]] && zipl
             touch ./REBOOT
             rhts-reboot
         else

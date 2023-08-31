@@ -42,7 +42,7 @@ rlJournalStart
                 grubby --args="ima_policy=tcb" --update-kernel=DEFAULT
                 grubby --args="ima_template_fmt=d" --update-kernel=DEFAULT
             fi
-            [[ $(uname -i) == "s390x" ]] && zipl
+            [[ $(uname -m) == "s390x" ]] && zipl
             rhts-reboot
         elif [ ${RSTRNT_REBOOTCOUNT} -eq 1 ]; then
             rlRun "cat /proc/cmdline | tee proc_cmdline.txt"
@@ -60,7 +60,7 @@ rlJournalStart
                 grubby --remove-args="ima_policy=tcb" --update-kernel=DEFAULT
                 grubby --remove-args="ima_template_fmt=d" --update-kernel=DEFAULT
             fi
-            [[ $(uname -i) == "s390x" ]] && zipl
+            [[ $(uname -m) == "s390x" ]] && zipl
             rhts-reboot
         fi
     rlPhaseEnd
