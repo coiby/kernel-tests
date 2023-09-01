@@ -24,7 +24,7 @@ if ! modprobe -qn rdma_rxe; then
 fi
 
 # modprobe siw on ppc64le with distro less than RHEL8.4 will lead panic, BZ1919502
-ARCH=$(uname -i)
+ARCH=$(uname -m)
 ver="4.18.0-303"
 KVER=$(uname -r)
 if [[ $ARCH == "ppc64le" ]] && [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then

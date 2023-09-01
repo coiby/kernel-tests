@@ -34,7 +34,7 @@ TriggerHungTaskPanic()
     Log "Run hung-task"
     sync;sync;sync; sleep 10
     ./run-hung-task
-    export ARCH=$(uname -i)
+    export ARCH=$(uname -m)
     cd ..
 }
 

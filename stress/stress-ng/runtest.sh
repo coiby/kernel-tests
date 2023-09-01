@@ -113,7 +113,7 @@ function restore_systemd_coredump()
 function filter_excludelist()
 {
     # exclude tests on certain arch, kernel, or distro
-    if [ "$(uname -i)" = "ppc64le" ]; then
+    if [ "$(uname -m)" = "ppc64le" ]; then
         # TODO: open BZ: vforkmany triggers kernel "BUG: soft lockup" on ppc64le
         sed -ie '/vforkmany/d' os.stressors
     fi

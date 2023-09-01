@@ -176,7 +176,7 @@ function disableTest
 
 function disableTests
 {
-    typeset hwpf=$(uname -i)
+    typeset hwpf=$(uname -m)
 
     # Disable tests for RHEL8 Kernel (4.18.X)
     if [[ $OSVERSION == "RHEL8" ]]; then
@@ -298,7 +298,7 @@ function setup
     fi
 
     # tests are currently supported on x86_64, aarch64, ppc64 and s390x
-    hwpf=$(uname -i)
+    hwpf=$(uname -m)
     checkPlatformSupport $hwpf
     if (( $? == 0 )); then
         # test can only run on hardware that supports virtualization
