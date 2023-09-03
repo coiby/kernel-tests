@@ -202,7 +202,7 @@
 /filesystems/general/pjd-fstest/ @bgoncalv @lulinqing @zrlang
 /filesystems/loopdev/sanity/ @bgoncalv @jencce2002 @lulinqing
 /filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
-/filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing @nstraz
+/filesystems/xfs/xfstests/ @bgoncalv @jencce2002 @lulinqing
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
 /general/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /general/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
