@@ -142,7 +142,7 @@ function getTests
 
 function disableTests
 {
-    typeset hwpf=$(uname -i)
+    typeset hwpf=$(uname -m)
 
     # Disable tests for RHEL8 Kernel (4.18.X)
     if [[ $OSVERSION == "RHEL8" ]]; then
@@ -201,7 +201,7 @@ function setup
     fi
 
     # tests are currently supported on x86_64, aarch64, ppc64 and s390x
-    hwpf=$(uname -i)
+    hwpf=$(uname -m)
     checkPlatformSupport $hwpf
     if (( $? == 0 )); then
         # test can only run on hardware that supports virtualization
@@ -321,7 +321,7 @@ function setup
         typeset linux_srcdir=$(find $TMPDIR -type d -a -name "linux-*")
         typeset tests_srcdir="$linux_srcdir/tools/testing/selftests/kvm"
         typeset outputdir="${BINDIR}"
-        typeset hwpf=$(uname -i)
+        typeset hwpf=$(uname -m)
 
         rlAssertExists $tests_srcdir
         rlAssertExists ${BINDIR}

@@ -16,7 +16,7 @@ TriggerWarnCrash()
 {
     unset ARCH
     MakeModule 'crash-warn'
-    export ARCH=$(uname -i)
+    export ARCH=$(uname -m)
 
     # step 1 turn on panic_on_warn
     Log "Enable panic_on_warn"

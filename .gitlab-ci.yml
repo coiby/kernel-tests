@@ -70,7 +70,6 @@ uname with deprecated parameter:
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
-  allow_failure: true
 
 shell check runtests mr:
   extends: .cki_tools

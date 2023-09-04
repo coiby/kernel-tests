@@ -31,7 +31,7 @@ if [ -z "$OUTPUTFILE" ]; then
 fi
 
 if [ -z "$ARCH" ]; then
-        ARCH=$(uname -i)
+        ARCH=$(uname -m)
 fi
 
 if [ -z "$FAMILY" ]; then
@@ -243,7 +243,7 @@ MakeModule()
     #     unset ARCH
     # fi
     LogRun "make -C ${name}" || MajorError "Unable to compile ${name} Kernel module."
-    export ARCH=$(uname -i)
+    export ARCH=$(uname -m)
 }
 
 InstallDevTools()
