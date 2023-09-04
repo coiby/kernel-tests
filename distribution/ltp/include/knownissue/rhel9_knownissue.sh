@@ -8,7 +8,7 @@ function rhel9_fatal_issues()
 	osver_in_range "900" "903" && is_arch "aarch64" && tskip "read_all_sys" fatal
 	# Bug 2178947 - [RHEL9] kernel-rt-debug: BUG: MAX_LOCKDEP_CHAINS too low
 	# Bug 2119055 - [rhel9] call trace qed_ptt_acquire+0x2b/0xd0 [qed] _qed_get_vport_stats+0x141/0x240 [qed]
-	osver_in_range "900" "904" && tskip "read_all_sys" fatal
+	osver_in_range "900" "905" && tskip "read_all_sys" fatal
 	# Bug 1984293 - RHEL9: kernel-rt: WARNING: possible circular locking dependency detected (raw_v6_hashinfo.lock->(softirq_ctrl.lock).lock->raw_v6_hashinfo.lock
 	is_rt && cki_is_kernel_debug && osver_in_range "900" "902" && tskip "read_all_proc" fatal
 }
