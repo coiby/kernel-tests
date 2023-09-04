@@ -17,7 +17,7 @@ function rhel8_fatal_issues()
 	kernel_in_range "0" "4.18.0-261.el8" && tskip "pty06" fixed
 	# Bug 2156251 - [RHEL8] kernel-rt-debug: BUG: MAX_LOCKDEP_CHAINS too low
 	# Bug 2132005 - [rhel8] call trace qed_ptt_acquire+0x49/0x340 [qed] _qed_get_vport_stats+0x31f/0x4a0 [qed]
-	osver_in_range "800" "810" && cki_is_kernel_debug && tskip "read_all_sys" fatal
+	osver_in_range "800" "811" && cki_is_kernel_debug && tskip "read_all_sys" fatal
 	# Bug 2115120 - RHEL8: kernel-rt: WARNING: possible circular locking dependency detected (raw_v6_hashinfo.lock->(softirq_ctrl.lock).lock->raw_v6_hashinfo.lock
 	is_rt && cki_is_kernel_debug && osver_in_range "806" "807" && tskip "read_all_proc" fatal
 	# hang with kmemleak: kmemleak_alloc: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1613
