@@ -140,15 +140,18 @@ rlPhaseStartTest "iptables: Plain NAT test"
 		run server sleep 3
 		# DNAT sctp assert pass
 		run client timeout 5 sctp_test -H $ip_c -P 6013 -h $ip_rc -p 8888 -s -c 1 -x 1 -X 1
-		run router conntrack -L $__NoCheck
-		run router conntrack -F $__NoCheck
-		run router sleep 2
-		pkill tcpdump
-		pkill sctp_test
-		run router sleep 1
-		tcpdump -nnr dnat.pcap
-		rlFileSubmit dnat.pcap
+		run client sleep 2
+		run client pkill -9 sctp_test NoCheck
 	fi
+
+	run router conntrack -L $__NoCheck
+	run router conntrack -F $__NoCheck
+	run router sleep 2
+
+	run router pkill tcpdump
+	run router sleep 1
+	tcpdump -nnr dnat.pcap
+	rlFileSubmit dnat.pcap
 
 	run router iptables -tnat -nvL
 	run router iptables -tnat -F
@@ -177,15 +180,18 @@ rlPhaseStartTest "iptables: Plain NAT test"
 		run server sleep 3
 		# SNAT sctp assert_pass
 		run client timeout 5 sctp_test -H $ip_c -P 6013 -h $ip_s -p 9999 -s -c 1 -x 1 -X 1
-		run router conntrack -L $__NoCheck
-		run router conntrack -F $__NoCheck
-		run router sleep 2
-		pkill tcpdump
-		pkill sctp_test
-		run router sleep 1
-		tcpdump -nnr snat.pcap
-		rlFileSubmit snat.pcap
+		run client sleep 2
+		run client pkill -9 sctp_test NoCheck
 	fi
+
+	run router conntrack -L $__NoCheck
+	run router conntrack -F $__NoCheck
+	run router sleep 2
+	pkill tcpdump
+
+	run router sleep 1
+	tcpdump -nnr snat.pcap
+	rlFileSubmit snat.pcap
 
 	run router iptables -tnat -nvL
 	run router iptables -F
