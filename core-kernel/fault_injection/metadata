@@ -1,0 +1,12 @@
+[General]
+name=/kernel-tests/core-kernel/fault_injection
+owner=Stephen Bertram <sbertram@redhat.com>
+description=Assists with execution of /sys/kernel/debug/fail* injectors.
+license=GPLv3
+confidential=no
+destructive=yes
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=1h
+repoRequires=kernel-include

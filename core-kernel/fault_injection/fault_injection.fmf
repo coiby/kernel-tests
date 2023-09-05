@@ -1,0 +1,8 @@
+summary: Fault injection test wrapper
+description: |2
+     Assists with execution of /sys/kernel/debug/fail* injectors.
+contact: Stephen Bertram <sbertram@redhat.com>
+id: 3513a6ee-3132-41ae-86fd-46f67511582a
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 1h
