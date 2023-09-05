@@ -1,0 +1,38 @@
+Fault injection test wrapper. Uses failcmd.sh from tools/testing in the kernel source to assist with fault injection testing.
+Parameter list (none required):
+    fail_list: Takes 1 to n space seprated fail commands to run serially.
+
+    OPTIONS:
+        -p percent
+        --probability=percent
+            likelihood of failure injection, in percent.
+            Default value is 1
+    
+        -t value
+        --times=value
+            specifies how many times failures may happen at most.
+            Default value is 1
+    
+        --oom-kill-allocating-task=value
+            set /proc/sys/vm/oom_kill_allocating_task to specified value
+            before running the command.
+            Default value is 1
+    
+        -h, --help
+            Display a usage message and exit
+    
+        --interval=value, --space=value, --verbose=value, --task-filter=value,
+        --stacktrace-depth=value, --require-start=value, --require-end=value,
+        --reject-start=value, --reject-end=value, --ignore-gfp-wait=value
+            See Documentation/fault-injection/fault-injection.rst for more
+            information
+    
+        failslab options:
+        --cache-filter=value
+    
+        fail_page_alloc options:
+        --ignore-gfp-highmem=value, --min-order=value
+
+    GCMD: Override the cnd to use to trigger failure.
+
+    BASE_URL: Location of the repository with your kernel source. e.g. "https://cbs.centos.org/kojifiles/packages"
