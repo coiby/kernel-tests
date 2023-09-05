@@ -48,7 +48,7 @@ internal_hostname:
 	exit "$${fail}" ;
 
 deprecated_uname:
-	if grep -Er "uname -[ip]"; then \
+	if grep --exclude-dir .git -Er "uname -[ip]"; then \
 		echo "please use uname with '-m' parameter instead: https://bugzilla.redhat.com/show_bug.cgi?id=2126206" ; \
 		exit 1 ; \
 	fi
