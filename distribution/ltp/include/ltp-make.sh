@@ -45,7 +45,16 @@ MAKE="make -j${NR_CPUS}"
 download_ltp()
 {
     echo "============ Download package ============" | tee -a $OUTPUTFILE
-    curl --fail --retry 5 -s -SLO https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
+    if [ -z "$LTP_DOWNLOAD_URL" ]; then
+        curl --fail --retry 5 -s -SLO https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
+    elif echo $LTP_DOWNLOAD_URL | grep -E "tar.bz2"; then
+        LTP_DOWNLOAD_URL=${LTP_DOWNLOAD_URL//TESTVERSION/"$TESTVERSION"}
+        TARGET=$(basename $(echo $LTP_DOWNLOAD_URL | sed 's/\.tar\.bz2//'))
+        curl --fail --retry 5 -s -SLO $LTP_DOWNLOAD_URL
+    else
+        TARGET=ltp-${TESTVERSION}
+        curl --fail --retry 5 -s -SLO ${LTP_DOWNLOAD_URL}/${TESTVERSION}/ltp-${TESTVERSION}.tar.bz2
+    fi
     if [ $? -ne 0 ]; then
         echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
         echo "Aborting current task: Couldn't download LTP source." | tee -a $OUTPUTFILE
