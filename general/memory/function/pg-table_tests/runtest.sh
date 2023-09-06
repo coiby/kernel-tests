@@ -6,7 +6,6 @@
 
 TESTAREA=/mnt/testarea
 
-EXIT_STATUS=0
 EXPECT_LVL=4
 PLVL=""
 
@@ -77,13 +76,13 @@ function heap_test_malloc()
 	regex="^([0-9]+) GiB allocated."
 	if ! output=$(./heap --malloc | tee -a $testlog) ; then
 		echo "$? FAILED"  | tee -a $testlog
-		EXIT_STATUS=1
+		rlFail "$? FAILED"
 	elif [[ $output =~ $regex ]] ; then
 		alloc="${BASH_REMATCH[1]}"
 		if [[ $alloc -gt $MAX_USER_VM_4LVL_GiB ]] ; then
 			echo "$alloc GiB allocated > $MAX_USER_VM_4LVL_GiB GiB max ${PLVL:0:1}-lvl user VM max" | tee -a $testlog
 			echo -e "FAILED" | tee -a $testlog
-			EXIT_STATUS=1
+			rlFail "$alloc GiB allocated > $MAX_USER_VM_4LVL_GiB GiB max ${PLVL:0:1}-lvl user VM max"
 		else
 			echo "$alloc GiB allocated <= $MAX_USER_VM_4LVL_GiB GiB max ${PLVL:0:1}-lvl user VM max" | tee -a $testlog
 			echo -e "PASSED" | tee -a $testlog
@@ -105,13 +104,13 @@ function heap_test_sbrk()
 	regex="^([0-9]+) GiB allocated."
 	if ! output=$(./heap --sbrk | tee -a $testlog) ; then
 		echo "$? FAILED" | tee -a $testlog
-		EXIT_STATUS=1
+		rlFail "$? FAILED"
 	elif [[ $output =~ $regex ]] ; then
 		alloc="${BASH_REMATCH[1]}"
 		if [[ $alloc -gt $MAX_USER_VM_4LVL_GiB ]] ; then
 			echo "$alloc GiB allocated > $MAX_USER_VM_4LVL_GiB GiB max ${PLVL:0:1}-lvl user VM max" | tee -a $testlog
 			echo -e "FAILED" | tee -a $testlog
-			EXIT_STATUS=1
+			rlFail "$alloc GiB allocated > $MAX_USER_VM_4LVL_GiB GiB max ${PLVL:0:1}-lvl user VM max"
 		else
 			echo "$alloc GiB allocated <= $MAX_USER_VM_4LVL_GiB GiB max ${PLVL:0:1}-lvl user VM max" | tee -a $testlog
 			echo -e "PASSED" | tee -a $testlog
@@ -162,7 +161,7 @@ function mmap_private()
 
 	if [[ $fail -eq 1 ]] ; then
 		echo -e "FAILED" | tee -a $testlog
-		EXIT_STATUS=1
+		rlFail "FAILED"
 
 	else
 		echo -e "PASSED" | tee -a $testlog
@@ -194,7 +193,7 @@ function mmap_private2()
 
 	if [[ $fail -eq 1 ]] ; then
 		echo -e "FAILED" | tee -a $testlog
-		EXIT_STATUS=1
+		rlFail "Failed"
 	else
 		echo -e "PASSED" | tee -a $testlog
 	fi
@@ -222,6 +221,5 @@ rlJournalStart
 		rlPhaseEnd
 
 	rlPhaseStartCleanup
-			rlRun "exit $EXIT_STATUS"
 	rlPhaseEnd
 rlJournalEnd
