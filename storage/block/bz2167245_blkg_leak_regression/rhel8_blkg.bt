@@ -1,0 +1,38 @@
+#!/usr/bin/bpftrace --unsafe
+
+#ifndef BPFTRACE_HAVE_BTF
+#include <linux/blkdev.h>
+#include <linux/blk-cgroup.h>
+#endif
+
+BEGIN {
+        system("sleep 1; modprobe scsi_debug; sleep 2; modprobe -r scsi_debug");
+}
+
+kprobe:blkg_alloc
+{
+    @alloc_stack[tid]=kstack;
+}
+
+kretprobe:blkg_alloc
+{
+    $b = (struct blkcg_gq *)retval;
+    printf("%lu %16s %d %d: %s (qid %d cssid %d) %s", nsecs / 1000, comm, pid, cpu, "blkg_alloc",
+                $b->q->id, $b->blkcg->css.id, @alloc_stack[tid]);
+}
+
+kprobe:blkg_release
+{
+    $b = (struct blkcg_gq *)(arg0 - 64);  //use pahole to figure out offset
+
+    printf("%lu %16s %d %d: %s (qid %d cssid %d) %s", nsecs / 1000, comm, pid, cpu, ksym(reg("ip")),
+                $b->q->id, $b->blkcg->css.id, kstack);
+}
+
+END {
+    clear(@alloc_stack);
+}
+
+interval:s:10 {
+    exit();
+}

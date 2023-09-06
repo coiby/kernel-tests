@@ -23,7 +23,11 @@
 function run_test()
 {
     rlRun "rpm -q podman || yum install -y podman"
-    rlRun "rpm -q container-tools || yum module install -y container-tools"
+    if rlIsRHEL '>=9.0';then
+        rlRun "rpm -q container-tools || yum install -y container-tools"
+    else
+        rlRun "rpm -q container-tools || yum module install -y container-tools"
+    fi
     sleep 5
 
     rlLog "The original num_cgroups value:"
