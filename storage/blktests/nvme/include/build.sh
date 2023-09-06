@@ -14,6 +14,11 @@ fi
 
 rm -rf blktests
 git clone -b $BR $LOOKASIDE
+if [ $? -ne 0 ]; then
+	echo "Aborting test because access $LOOKASIDE failed"
+	rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+	rstrnt-abort --server "$RSTRNT_RECIPE_URL"/tasks/"$RSTRNT_TASKID"/status
+fi
 pushd blktests || exit 200
 
 if ! modprobe -qn rdma_rxe; then
