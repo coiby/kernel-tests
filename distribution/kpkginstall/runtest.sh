@@ -671,6 +671,13 @@ EOF
 
       # Did we get the right kernel running after reboot?
       if [[ ${ckver} != "${expected_release}" ]]; then
+        echo "grubby default kernel is:"
+        grubby --default-kernel
+        echo "show all grubby info"
+        grubby --info=ALL
+        if [[ -f /boot/grub2/grubenv ]]; then
+            cat /boot/grub2/grubenv
+        fi
         cki_abort_recipe "Kernel release after reboot (${ckver}) does not match expected release!" FAIL
       fi
 
