@@ -8,7 +8,10 @@ test: bash ./runtest.sh
 framework: shell
 recommend:
   - beakerlib-redhat
-require: fio
+require:
+  - fio
+  - nvme-cli
+  - wget
 duration: 3h
 tag:
   - regression
