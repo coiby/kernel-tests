@@ -1,0 +1,13 @@
+[General]
+name=kmemleak
+owner=Chunyu Hu <chuhu@redhat.com>
+description=install kmemleak kernel and make report
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=2h
+dependencies=
+softDependencies=rpm-build;expect;@development
+repoRequires=general/include

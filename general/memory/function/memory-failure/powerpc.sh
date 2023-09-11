@@ -10,8 +10,8 @@ function ppc64le_setup()
 	cd tests
 	git checkout python3
 	git pull --rebase origin python3
-	yum -y install kernel-general-include libvirt libvirt-devel
-	sh /mnt/tests/kernel/general/include/scripts/buildroot.sh python3-devel xz-devel numactl policycoreutils-python-utils python2 python2-devel
+	yum -y install libvirt libvirt-devel
+	sh ../../../../include/scripts/buildroot.sh python3-devel xz-devel numactl policycoreutils-python-utils python2 python2-devel
 	touch config/tests/host/memory_test.cfg
 	cat > config/tests/host/memory_test.cfg <<EOF
 avocado-misc-tests/memory/memhotplug.py
