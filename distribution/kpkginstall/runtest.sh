@@ -182,7 +182,7 @@ function targz_install()
   cki_print_info "targz_install: Extracting kernel version from ${KPKG_URL}"
   get_kpkg_ver
   if [ -z "${KVER}" ]; then
-    cki_abort_recipe "targz_install: Failed to extract kernel version from the package" WARN
+    cki_abort_recipe "targz_install: Failed to extract kernel version from the package" FAIL
   else
     cki_print_success "Kernel version is ${KVER}"
   fi
@@ -340,7 +340,7 @@ function download_install_package()
     if $YUM install -y "$1" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Installed $1 successfully"
     else
-      cki_abort_recipe "Failed to install $1!" WARN
+      cki_abort_recipe "Failed to install $1!" FAIL
     fi
   else
     cki_print_info "Test automotive installed kernel"
@@ -368,7 +368,7 @@ function download_install_package()
       if rpm-ostree override replace /root/kernel*.rpm >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
-        cki_abort_recipe "RPM-OSTREE failed to install $1!" WARN
+        cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
       fi
     else
       # debug kernel automotive
@@ -381,7 +381,7 @@ function download_install_package()
         --install "/root/kernel-automotive-debug-modules-core-${KVER_RPM}.rpm" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
-        cki_abort_recipe "RPM-OSTREE failed to install $1!" WARN
+        cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
       fi
     fi
   fi
@@ -586,7 +586,7 @@ function install_kernel() {
 
       if [ "$error" -ne 0 ]; then
         # print the rpm version if it is set, otherwise default to KVER
-        cki_abort_recipe "Failed installing kernel ${KVER_RPM:-$KVER}" WARN
+        cki_abort_recipe "Failed installing kernel ${KVER_RPM:-$KVER}" FAIL
       fi
 
       # Make sure tests are not able to install other kernels
@@ -605,7 +605,7 @@ function depmod_check() {
     echo "***** List of Warnings/Errors reported by depmod *****"
     cat "$DEPMODLOG"
     echo "***** End of list *****"
-    rstrnt-report-result -o "${DEPMODLOG}" ${TEST}/depmod-check WARN 7
+    rstrnt-report-result -o "${DEPMODLOG}" ${TEST}/depmod-check FAIL 7
   else
     rstrnt-report-result ${TEST}/depmod-check PASS 0
   fi
@@ -775,7 +775,7 @@ EOF
         cki_print_warning "Call trace found in dmesg, see dmesg.log"
         # dmesg.log is uploaded by default by rstrnt-report-result
         # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check#L74
-        rstrnt-report-result ${TEST}/dmesg-check WARN 7
+        rstrnt-report-result ${TEST}/dmesg-check FAIL 7
       else
         rstrnt-report-result ${TEST}/dmesg-check PASS 0
       fi
@@ -786,7 +786,7 @@ EOF
         journalctlret=$?
         if [[ ${journalctlret} -eq 0 ]]; then
           cki_print_warning "Call trace found in journalctl, see journalctl.log"
-          rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check WARN 7
+          rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check FAIL 7
         else
           rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check PASS 0
         fi

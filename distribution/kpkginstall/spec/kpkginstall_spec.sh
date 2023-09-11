@@ -456,7 +456,7 @@ Describe 'kpkginstall: rpm_install'
         The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "ℹ️ running depmod to check for problems"
-        The stdout should include "rstrnt-report-result -o /tmp/depmod.log distribution/kpkginstall/depmod-check WARN 7"
+        The stdout should include "rstrnt-report-result -o /tmp/depmod.log distribution/kpkginstall/depmod-check FAIL 7"
         The status should be success
     End
 End
@@ -692,7 +692,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check WARN 7"
+        The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check FAIL 7"
         The status should be success
     End
 
@@ -711,7 +711,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The first line should equal "ℹ️ REBOOTCOUNT is 1"
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
-        The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check WARN 7"
+        The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check FAIL 7"
         The status should be success
     End
 End
