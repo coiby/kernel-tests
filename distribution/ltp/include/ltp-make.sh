@@ -47,6 +47,10 @@ download_ltp()
     echo "============ Download package ============" | tee -a $OUTPUTFILE
     if [ -z "$LTP_DOWNLOAD_URL" ]; then
         curl --fail --retry 5 -s -SLO https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
+        if [ $? -ne 0 ]; then
+            TARGET=ltp-$TESTVERSION
+            curl --fail --retry 5 -s -SLO https://gitlab.com/redhat/centos-stream/tests/ltp/-/archive/$TESTVERSION/ltp-$TESTVERSION.tar.bz2
+        fi
     elif echo $LTP_DOWNLOAD_URL | grep -E "tar.bz2"; then
         LTP_DOWNLOAD_URL=${LTP_DOWNLOAD_URL//TESTVERSION/"$TESTVERSION"}
         TARGET=$(basename $(echo $LTP_DOWNLOAD_URL | sed 's/\.tar\.bz2//'))
