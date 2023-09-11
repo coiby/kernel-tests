@@ -8,7 +8,11 @@ test: bash ./runtest.sh
 framework: shell
 recommend:
   - beakerlib-redhat
-require: xfsprogs
+require:
+  - xfsprogs
+  - fio
+  - nvme-cli
+  - wget
 duration: 5h
 tag:
   - regression
