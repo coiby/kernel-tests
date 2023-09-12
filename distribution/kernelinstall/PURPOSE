@@ -41,7 +41,8 @@ KERNELARGEXTRAMODULES="1"
 
 If this variable is set to 1 then the kernel-modules-extra will be installed
 along with kernel-modules rpm. On RHEL8 and later distributions the extra
-package is not installed by default.
+package is not installed by default. Same for KERNELARGINTERNALMODULES="1",
+kernel-modules-internal will be installed if set to 1.
 
 Sample Beaker job XML:
 
