@@ -39,6 +39,17 @@ src_name=$(K_GetRunningKernelSrpmName)
 version_release=$(K_GetRunningKernelRpmVersionRelease)
 pkg="${name}"-"${version_release}"
 
+function get_pkg_mgr()
+{
+    if [[ -e /run/ostree-booted ]]; then
+      echo rpm-ostree
+    elif [[ -e /usr/bin/dnf ]]; then
+      echo dnf
+    else
+      echo yum
+    fi
+}
+
 execute_fail()
 {
     rlRun "sysctl vm.admin_reserve_kbytes=1048576"
@@ -64,7 +75,7 @@ execute_fail()
                 CMD=${GCMD:-"ls"}
                 ;;
         esac
-        rlRun "env FAILCMD_TYPE=${fail} bash ${FAILCMD} ${OPTIONS} -- ${CMD}"
+        rlRun "env FAILCMD_TYPE=${fail} bash ${FAILCMD} ${OPTIONS} -- ${CMD}" "0-127"
         rlRun "dmesg > '${fail}'.dmesg.log"
         rlAssertGrep "${fail}" "${fail}".dmesg.log -iq
         rlFileSubmit "${fail}".dmesg.log
@@ -78,7 +89,18 @@ rlJournalStart
             # Get running kernel version of failcmd.sh.
             if (rlFetchSrcForInstalled "${pkg}"); then
                 rlRun "rpm -ivh --define '_topdir ${PWD}' ${src_name}-${version_release}.src.rpm"
-                pushd SOURCES || exit 1
+                pushd SPECS || exit 1
+                rlRun "sed -i 's/efiuki 1/efiuki 0/' kernel.spec"
+                rlRun "yum-builddep --downloadonly -y ./kernel.spec --downloaddir $(pwd)"
+                pkg_mgr=$(get_pkg_mgr)
+                if [[ $pkg_mgr == "rpm-ostree" ]]; then
+                    echo "pkg_mgr = RPM OSTREE"
+                    export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
+                else
+                    export pkg_mgr_inst_string="-y install"
+                fi
+                $pkg_mgr "$pkg_mgr_inst_string" ./*.rpm
+                pushd ../SOURCES || exit 1
                 rlRun "tar Jxf linux-${version_release}.tar.xz"
                 pushd linux-"${version_release}"/ || exit 1
                 FAILCMD=tools/testing/fault-injection/failcmd.sh
