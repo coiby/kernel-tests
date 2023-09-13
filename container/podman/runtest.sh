@@ -116,18 +116,17 @@ function run_tests()
         # Save a marker if this test failed.
         if [[ ${PIPESTATUS[0]} != 0 ]]; then
             TEST_FAILED=1
-            rstrnt-report-log -l ${TEST_LOG}
             if grep -qF "[ rc=124 (** EXPECTED 0 **) ]" ${TEST_LOG}; then
                 echo "FAIL: test failed with timeout. Likely infra issue."
-                rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" WARN
+                rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" WARN
                 cleanup
                 rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 1
             else
-                rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" FAIL
+                rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" FAIL
             fi
         else
-            rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" PASS
+            rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" PASS
         fi
     done
 
@@ -293,4 +292,5 @@ fi
 
 cleanup
 
-exit ${TEST_FAILED}
+# If running as restraint job, don't use exit code as failures should be reported as subtest
+[[ -v RSTRNT_JOBID ]] || exit "${TEST_FAILED}"
