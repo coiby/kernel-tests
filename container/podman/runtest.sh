@@ -27,9 +27,9 @@ PODMAN_VERSION=$(podman --version | awk '{print$3}')
 
 function _install_bats ()
 {
-    curl --retry 5 -LO https://github.com/bats-core/bats-core/archive/v1.1.0.tar.gz
-    tar xvf v1.1.0.tar.gz > /dev/null
-    ./bats-core-1.1.0/install.sh "${BATS_DIR}"
+    curl --retry 5 -LO https://github.com/bats-core/bats-core/archive/refs/tags/v1.10.0.tar.gz
+    tar xvf v1.10.0.tar.gz > /dev/null
+    ./bats-core-1.10.0/install.sh "${BATS_DIR}"
     if [ $? -ne 0 ]; then
         echo "FAIL Couldn't install BATS. Aborting test..."
         rstrnt-report-result "${TEST}" WARN
