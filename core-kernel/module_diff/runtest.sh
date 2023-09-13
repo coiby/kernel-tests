@@ -222,7 +222,8 @@ function DisplayModuleFail ()
 function inst_kernel_rt_kvm ()
 {
     rt_kvm="${name}-kvm-${version}-${release}.${arch}"
-    rpm -q $rt_kvm || $YUM -y install $rt_kvm || (cki_abort_task "Missing ${name}-kvm")
+    local rpm_url="${url}/${rt_kvm}.rpm"
+    rpm -q $rt_kvm || $YUM -y install $rt_kvm || $YUM -y install ${rpm_url} || (cki_abort_task "Missing ${name}-kvm")
 
 }
 
@@ -230,12 +231,14 @@ function inst_kernel_rt_kvm ()
 function chk_inst_kernel_modules_extra ()
 {
     pkg_kms_extra="${name}-modules-extra-${version}-${release}.${arch}"
-    rpm -q $pkg_kms_extra > /dev/null || $YUM -y install $pkg_kms_extra || (cki_abort_task "Missing ${name}-modules-extra")
+    local rpm_url="${url}/${pkg_kms_extra}.rpm"
+    rpm -q $pkg_kms_extra > /dev/null || $YUM -y install $pkg_kms_extra || $YUM -y install ${rpm_url} || (cki_abort_task "Missing ${name}-modules-extra")
 }
 function chk_inst_kernel_modules_core ()
 {
     pkg_kms_core="${name}-modules-core-${version}-${release}.${arch}"
-    rpm -q $pkg_kms_core > /dev/null || $YUM -y install $pkg_kms_core || (cki_print_warning "Missing ${name}-modules-core, please check")
+    local rpm_url="${url}/${pkg_kms_core}.rpm"
+    rpm -q $pkg_kms_core > /dev/null || $YUM -y install $pkg_kms_core || ($YUM -y install ${rpm_url} || cki_print_warning "Missing ${name}-modules-core, please check")
 }
 
 rlJournalStart
@@ -243,10 +246,10 @@ rlJournalStart
         YUM=$(cki_get_yum_tool)
         name="kernel"
         arch=$(uname -m)
-        version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//;s/+64k//"`
+        version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//;s/+64k//;s/+rt//"`
         version=${version_release%-*}
         release=${version_release#*-}
-        kvari=`uname -r | grep -Eo '(debug|PAE|xen)$'`
+        baseurl=${BASEURL:-}
         if $(cki_is_kernel_rt); then
             name="${name}-rt"
         fi
@@ -256,7 +259,12 @@ rlJournalStart
         if $(cki_is_kernel_debug); then
             name="${name}-debug"
         fi
-
+        if cki_kver_lt "5.14.0-285.el9"; then
+            path_name=$(sed "s/-debug//;s/-64k//" <<< ${name})
+        else
+            path_name=$(sed "s/-debug//;s/-64k//" <<< ${name%-rt*})
+        fi
+        url="${baseurl}/${path_name}/${version}/${release}/${arch}/"
         if  grep -q "release 9" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
             chk_inst_kernel_modules_core
