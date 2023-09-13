@@ -138,7 +138,7 @@ DisableNTP
 ltp_test_build
 
 # START TEST
-opt_dir="$(pwd)/ltp-full-*/testcases/open_posix_testsuite"
+opt_dir="$(pwd)/ltp-*/testcases/open_posix_testsuite"
 opt_dir="$(ls -1 -d $opt_dir | head -1)"
 echo "Open POSIX testsuite is at: $opt_dir" | tee -a $OUTPUTFILE
 
