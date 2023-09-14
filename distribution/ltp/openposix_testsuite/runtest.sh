@@ -184,6 +184,7 @@ pushd $opt_dir
 if [[ "$TESTVERSION" -lt "20220930" ]]; then
     env CFLAGS="-g3" time make all > buildlog.txt 2>&1
 else
+    echo $opt_dir | grep -q '/ltp-full-' || make autotools
     env CFLAGS="-g3" time ./configure && make all > buildlog.txt 2>&1
 fi
 if [ $? -ne 0 ]; then
