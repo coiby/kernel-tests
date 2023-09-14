@@ -2849,7 +2849,7 @@ sriov_test_max_vfs()
 		sync_set client ${test_name}_start
 		sync_wait client ${test_name}_end 14400
 		ip addr flush $nic_test
-	ip link set mtu 1500 dev $nic_test
+		ip link set mtu 1500 dev $nic_test
 	else
 		sync_wait server ${test_name}_start
 		#local driver=$(ethtool -i ${nic_test} | grep "driver" | awk '{print $NF}')

@@ -203,7 +203,7 @@ sriov_attach_vf_to_vm()
 			;;
 	esac
 
-	local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
+	local vf_bus_info=$(ls -lv /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
 	local vf_nodedev=pci_$(echo $vf_bus_info | sed 's/[:|.]/_/g')
 	local domain=$(echo $vf_bus_info | awk -F '[:|.]' '{print $1}')
 	local bus=$(echo $vf_bus_info | awk -F '[:|.]' '{print $2}')
@@ -211,7 +211,7 @@ sriov_attach_vf_to_vm()
 	local function=$(echo $vf_bus_info | awk -F '[:|.]' '{print $4}')
 
 	if [ "$SRIOV_USE_HOSTDEV" = "yes" ]; then
-		ip link set $PF vf $(($iVF-1)) mac $mac
+		rlRun "ip link set $PF vf $(($iVF-1)) mac $mac"
 		cat <<-EOF > ${vf_nodedev}.xml
 			<hostdev mode='subsystem' type='pci' managed='yes'>
 				<source>
@@ -325,7 +325,7 @@ sriov_detach_vf_from_vm()
 			return $?
 			;;
 		*)
-	local vf_bus_info=$(ls -l /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
+	local vf_bus_info=$(ls -lv /sys/bus/pci/devices/${pf_bus_info}/virtfn* | awk '{print $NF}' | sed 's/..\///' | sed -n ${iVF}p)
 		local vf_nodedev=pci_$(echo $vf_bus_info | sed 's/[:|.]/_/g')
 
 	# fix rt-kernel can't detach vf Bug 1887895
