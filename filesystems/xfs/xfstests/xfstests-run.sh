@@ -67,8 +67,10 @@ function check_tests()
 				# Gather the full diff
 				diff -u <(tr '`' "'" < tests/$XFSTEST.out) results/$XFSTEST.out.bad  > results/$XFSTEST_LOGNAME.out.bad.diff
 				rstrnt-report-log -l results/$XFSTEST_LOGNAME.out.bad.diff
-				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*No space left on device" &&
-				false_alarm=1
+				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*No space left on device" && false_alarm=1
+				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*Input/output error" && false_alarm=1
+				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*I/O error" && false_alarm=1
+				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*not supported" && false_alarm=1
 			fi
 			if [ -f results/$XFSTEST.dmesg ]; then
 				cp results/$XFSTEST.dmesg results/$XFSTEST_LOGNAME.dmesg
