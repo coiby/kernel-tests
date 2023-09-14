@@ -99,7 +99,8 @@ rlJournalStart
                 else
                     export pkg_mgr_inst_string="-y install"
                 fi
-                $pkg_mgr "$pkg_mgr_inst_string" ./*.rpm
+                # shellcheck disable=SC2086
+                $pkg_mgr $pkg_mgr_inst_string ./*.rpm
                 pushd ../SOURCES || exit 1
                 rlRun "tar Jxf linux-${version_release}.tar.xz"
                 pushd linux-"${version_release}"/ || exit 1
