@@ -117,6 +117,16 @@ shellspec:
 
 codeowners check:
   extends: .cki_tools
+  variables:
+    FOOTER_CONFIG: |
+      name: codeowners-check
+      source_code: https://gitlab.com/cki-project/cki-tools/-/blob/main/cki/deployment_tools/gitlab_codeowners_config.py
+      faq_name: CKI FAQ
+      faq_url: https://cki-project.org/devel-faq/
+      documentation_url: https://cki-project.org/docs/background/cki-tools/readme.cki.deployment_tools.gitlab_codeowner_config/
+      slack_name: '#team-kernel-cki'
+      slack_url: https://redhat-internal.slack.com/archives/C04KPCFGDTN
+      new_issue_url: 'https://gitlab.com/cki-project/cki-tools/-/issues/new?issue[title]=kernel-tests codeowners-check issue'
   script:
     - |
       # compare CODEOWNERS
@@ -217,6 +227,14 @@ check if LTP version on DCI matches the default on distribution/ltp/include/ltp-
   stage: 🚀
   variables:
     GIT_DEPTH: 100  # works for MRs <= 100 commits on top of the target branch
+    FOOTER_CONFIG: |
+      name: git-sync
+      source_code: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/blob/main/.gitlab-ci.yml
+      faq_name: CKI FAQ
+      faq_url: https://cki-project.org/devel-faq/
+      slack_name: '#team-kernel-cki'
+      slack_url: https://redhat-internal.slack.com/archives/C04KPCFGDTN
+      new_issue_url: 'https://gitlab.com/cki-project/cki-tools/-/issues/new?issue[title]=kernel-tests git-sync issue'
     COMMENT_TEMPLATE_J2: |
       {% set suite_url = 'https://' +
         env['INTERNAL_GITLAB_HOST'] +
@@ -294,12 +312,13 @@ check if LTP version on DCI matches the default on distribution/ltp/include/ltp-
             --id
         # post a new note with the URL
         body=$(python3 -m cki.deployment_tools.render <<< "${COMMENT_TEMPLATE_J2}")
+        footer=$(python3 -m cki_lib.footer --format gitlab)
         gitlab \
             --private-token "${GITLAB_JOB_MIRROR_KERNEL_TESTS_COMMENT_ACCESS_TOKEN}" \
             project-merge-request-note create \
             --project-id "${CI_MERGE_REQUEST_PROJECT_ID}" \
             --mr-iid "${CI_MERGE_REQUEST_IID}" \
-            --body "${body}"
+            --body "${body}${footer}"
       fi
 
 git-sync-mr:
