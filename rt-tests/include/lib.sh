@@ -214,3 +214,24 @@ if [[ -z "$OUTPUTFILE" ]]; then
     export OUTPUTFILE=$(mktemp)
     log "OUTPUTFILE not set, using ${OUTPUTFILE} for logging"
 fi
+
+# == shared convenience functions ==
+
+function convert_number_range() {
+    # converts a range of cpus, like "1-3,5" to a list, like "1,2,3,5"
+    local cpu_range=$1
+    local cpus_list=""
+    local cpus=""
+    for cpus in ${cpu_range//,/ }; do
+        if echo "$cpus" | grep -q -- "-"; then
+            cpus="${cpus//-/ }"
+            cpus=$(seq $cpus | sed -e 's/ /,/g')
+        fi
+        for cpu in $cpus; do
+            cpus_list="$cpus_list,$cpu"
+        done
+   done
+   # shellcheck disable=SC2001
+   cpus_list=$(echo $cpus_list | sed -e 's/^,//')
+   echo "$cpus_list"
+}
