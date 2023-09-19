@@ -1,10 +1,15 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/rtla/rtla-timerlat"
 export result_r="PASS"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
-export SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
+
+rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
+export rhel_major rhel_minor SCHED_RT_RUNTIME
 
 function check_status()
 {
@@ -16,7 +21,7 @@ function check_status()
     fi
 }
 
-#timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it.
+# timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it.
 function disable_admission_control()
 {
     echo "Disable the admission control" | tee -a $OUTPUTFILE
@@ -115,6 +120,11 @@ function runtest()
         rstrnt-report-result $TEST "FAIL" 1
     fi
 }
+
+if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
+    rt_env_setup
+    enable_tuned_realtime
+fi
 
 runtest
 exit 0

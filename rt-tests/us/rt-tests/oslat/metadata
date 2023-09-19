@@ -1,0 +1,14 @@
+[General]
+name=rt-tests/us/rt-tests/oslat
+owner=Qiao Zhao <qzhao@redhat.com>
+description=Basic test for oslat
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=3h
+use_pty=false
+repoRequires=cki_lib;rt-tests/include;automotive/include
+dependencies=stalld;numactl;numactl-libs;procps-ng

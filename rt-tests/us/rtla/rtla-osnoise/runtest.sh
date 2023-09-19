@@ -1,9 +1,14 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/rtla/rtla-osnoise"
 export result_r="PASS"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+
+rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+export rhel_major rhel_minor
 
 function check_status()
 {
@@ -59,6 +64,11 @@ function runtest()
         rstrnt-report-result $TEST "FAIL" 1
     fi
 }
+
+if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
+    rt_env_setup
+    enable_tuned_realtime
+fi
 
 runtest
 exit 0

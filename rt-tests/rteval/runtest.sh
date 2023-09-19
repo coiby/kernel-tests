@@ -10,13 +10,13 @@
 # Source rt common functions
 . ../include/runtest.sh || exit 1
 
-TEST="rt-tests/rteval"
+export TEST="rt-tests/rteval"
 
 # User Parameters
-DURATION=${DURATION:-900}
-LATCHECK=${LATCHECK:-1}
-MAXLAT=${MAXLAT:-150}
-STDDEVLAT=${STDDEVLAT:-5}
+: "${DURATION:=900}"
+: "${LATCHECK:=1}"
+: "${MAXLAT:=150}"
+: "${STDDEVLAT:=5}"
 
 function RprtRslt ()
 {
@@ -35,10 +35,11 @@ function MeasureLatency()
     which bc >/dev/null || yum install -y bc
 
     # Verify the max and stddev latency fall within tolerable range
-    declare max_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
-                      grep 'Max:' | awk -F ':' '{print $2}' | xargs)
-    declare stddev_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
-                         grep 'Std.dev:' | awk -F ':' '{print $2}' | xargs)
+    declare max_lat stddev_lat
+    max_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
+              grep 'Max:' | awk -F ':' '{print $2}' | xargs)
+    stddev_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
+                 grep 'Std.dev:' | awk -F ':' '{print $2}' | xargs)
 
     echo "rteval max/stddev lat was: ${max_lat} / ${stddev_lat}" | \
         tee -a $OUTPUTFILE
@@ -95,6 +96,9 @@ function RunTest ()
 }
 
 # ---------- Start Test -------------
-rt_env_setup
+if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
+    rt_env_setup
+    ! cki_is_kernel_automotive && enable_tuned_realtime
+fi
 RunTest
 exit 0
