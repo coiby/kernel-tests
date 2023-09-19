@@ -1,0 +1,12 @@
+[General]
+name=upt-smoke-tests/timeout
+owner=Israel Santana <isantana@redhat.com>
+description=UPT smoke test aborted due to a timeout
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib
+max_time=10s
