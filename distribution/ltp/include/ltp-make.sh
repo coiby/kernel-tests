@@ -31,8 +31,9 @@ TARGET="ltp-full-${TESTVERSION}"
 
 SYSENV=$(uname -m)
 ARCH=$SYSENV
-KVER=$(uname -r | cut -d'-' -f 1 | cut -d'.' -f 3)
+KVER=$(uname -r | cut -d'-' -f 1)
 KREV=$(uname -r | cut -d'-' -f 2 | cut -d'.' -f 1)
+KREV2=$(uname -r | cut -d'-' -f 2 | cut -d'.' -f 2)
 OS_MAJOR_RELEASE=$(grep -Go 'release [0-9]\+' /etc/redhat-release | sed 's/release //')
 
 # Whether NXBIT is Set in /proc/cpuinfo
@@ -210,6 +211,11 @@ patch-generic()
 
     if [ "$ARCH" == "aarch64" ]; then
         echo " - no aarch64 patches needed at this time" | tee -a $OUTPUTFILE
+    fi
+
+    if [ "$KVER" == "5.14.0" ] && ([ "$KREV" = "284" ] && [ "$KREV2" -ge "33" ] || [ "$KREV" -ge "362" ]); then
+        echo " - returning ENODEV for empty cpumask stands for reseting user cpu mask" | tee -a $OUTPUTFILE
+        ${PATCH} < ${ABS_DIR}/INTERNAL/sched_setaffinity_ENODEV.patch
     fi
 }
 

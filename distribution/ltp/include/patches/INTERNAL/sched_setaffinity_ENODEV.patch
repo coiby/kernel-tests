@@ -1,0 +1,20 @@
+diff --git a/testcases/kernel/syscalls/sched_setaffinity/sched_setaffinity01.c b/testcases/kernel/syscalls/sched_setaffinity/sched_setaffinity01.c
+index a56ae1f50..ff62071f9 100644
+--- a/testcases/kernel/syscalls/sched_setaffinity/sched_setaffinity01.c
++++ b/testcases/kernel/syscalls/sched_setaffinity/sched_setaffinity01.c
+@@ -75,10 +75,14 @@ static void verify_test(unsigned int n)
+ 		return;
+ 	}
+ 
+-	if (TST_ERR != tc->exp_errno) {
++	if (TST_ERR != tc->exp_errno && tc->exp_errno != EINVAL) {
+ 		tst_res(TFAIL | TTERRNO,
+ 			"sched_setaffinity() should fail with %s, got",
+ 			tst_strerrno(tc->exp_errno));
++	} else if (tc->exp_errno == EINVAL && TST_ERR != EINVAL && TST_ERR != ENODEV) {
++		tst_res(TFAIL | TTERRNO,
++			"sched_setaffinity() should fail with %s or ENODEV, got",
++			tst_strerrno(tc->exp_errno));
+ 	} else {
+ 		tst_res(TPASS | TTERRNO, "sched_setaffinity() failed");
+ 	}
