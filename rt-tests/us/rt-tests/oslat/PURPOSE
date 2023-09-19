@@ -1,0 +1,14 @@
+DESCRIPTION
+Unit test for the oslat subpackage of the rt-tests package.
+Runs oslat command for a specified duration and optionally
+checks if latency exceeds the maximum threshold.
+
+STEPS TO RUN
+[LATCHECK={0|1} MAXLAT={latency_threshold} RUN_TIME={duration}] bash ./runtest.sh
+  Note: RUN_TIME must be significantly less than the max_time defined in metadata
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+none

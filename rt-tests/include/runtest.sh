@@ -10,11 +10,13 @@
 # Source beaker environment
 set +x
 . "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/../../cki_lib/libcki.sh || exit 1
-. lib.sh
+. "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/lib.sh
+. "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/tuned_realtime.sh
 set -x
 
-# shellcheck disable=SC2155
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+export rhel_major rhel_minor
 
 if stat /run/ostree-booted > /dev/null 2>&1; then
   PKGMGR="rpm-ostree -Ay --idempotent --allow-inactive install"
@@ -65,4 +67,16 @@ function rt_env_setup()
         rstrnt-report-result "$TEST" SKIP
         exit
     fi
+}
+
+function get_isolated_cores()
+{
+    declare cpuset
+    # Try to get isolated cores from /cpu/isolated, which should be sufficient
+    # for most baremetal testing.  If empty, try /cpu/nohz_full, which
+    # should be sufficient for OCP/SNO systems.
+    cpuset=$(cat /sys/devices/system/cpu/isolated)
+    [ -z $cpuset ] && cpuset=$(cat /sys/devices/system/cpu/nohz_full)
+    [[ "$cpuset" == *"null"* ]] && cpuset=""
+    echo ${cpuset}
 }
