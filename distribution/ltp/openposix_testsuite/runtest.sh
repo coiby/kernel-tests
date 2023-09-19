@@ -138,7 +138,7 @@ DisableNTP
 ltp_test_build
 
 # START TEST
-opt_dir="$(pwd)/ltp-full-*/testcases/open_posix_testsuite"
+opt_dir="$(pwd)/ltp-*/testcases/open_posix_testsuite"
 opt_dir="$(ls -1 -d $opt_dir | head -1)"
 echo "Open POSIX testsuite is at: $opt_dir" | tee -a $OUTPUTFILE
 
@@ -184,6 +184,7 @@ pushd $opt_dir
 if [[ "$TESTVERSION" -lt "20220930" ]]; then
     env CFLAGS="-g3" time make all > buildlog.txt 2>&1
 else
+    echo $opt_dir | grep -q '/ltp-full-' || make autotools
     env CFLAGS="-g3" time ./configure && make all > buildlog.txt 2>&1
 fi
 if [ $? -ne 0 ]; then
