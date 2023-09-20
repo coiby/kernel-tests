@@ -830,6 +830,10 @@ function YumInstallKernel ()
                 echo "***** Install kernel-modules-extra package via yum ${testkername}-modules-extra-${KERNELARGVERSION}.$kernarch *****" | tee -a $OUTPUTFILE
                 $yumcmd -y install ${testkername}-modules-extra-${KERNELARGVERSION}.$kernarch
             fi
+            if [ "$KERNELARGINTERNALMODULES" == "1" ]; then
+                echo "***** Install kernel-modules-internal package via yum ${testkername}-modules-internal-${KERNELARGVERSION}.$kernarch *****" | tee -a $OUTPUTFILE
+                $yumcmd -y install ${testkername}-modules-internal-${KERNELARGVERSION}.$kernarch
+            fi
         fi
     else
         DeBug "Exit YumInstallPackage FAIL 6 (Can't find kernel in repo)"
@@ -893,6 +897,12 @@ function BrewInstallKernel ()
                 curl -L -s $httpbase/$kernarch/$testkernmodulesextra.$kernarch.rpm -O
                 $yumcmd -y localinstall --nogpgcheck \
                     $testkernmodulesextra.$kernarch.rpm
+             fi
+             if [ "$KERNELARGINTERNALMODULES" == "1" ]; then
+                testkernmodulesinternal=${testkername}-modules-internal-${KERNELARGVERSION}
+                curl -L -s $httpbase/$kernarch/$testkernmodulesinternal.$kernarch.rpm -O
+                $yumcmd -y localinstall --nogpgcheck \
+                    $testkernmodulesinternal.$kernarch.rpm
              fi
           else
              $yumcmd -y localinstall --nogpgcheck /tmp/$testkernbase.$kernarch.rpm
