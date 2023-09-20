@@ -39,7 +39,7 @@ Describe 'kselftests/include/net install_netsniff'
         export krelease=8
         When call install_netsniff
         The line 1 should equal "which mausezahn"
-        The line 2 should equal "rpm -q epel-release"
+        The line 2 should equal "rpm -q --quiet epel-release"
         The line 3 should equal "dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
         The line 4 should equal "dnf -y install jq netsniff-ng"
         The line 5 should equal "dnf -y remove epel-release"
@@ -51,7 +51,7 @@ Describe 'kselftests/include/net install_netsniff'
         export krelease=9
         When call install_netsniff
         The line 1 should equal "which mausezahn"
-        The line 2 should equal "rpm -q epel-release"
+        The line 2 should equal "rpm -q --quiet epel-release"
         The line 3 should equal "dnf -y install --enablerepo=epel jq netsniff-ng"
         The line 4 should equal "which mausezahn"
      End
