@@ -1,0 +1,15 @@
+summary: KG-Sec ima-evm-utils
+description: <code>tests/ima-evm-utils#sanity</code>
+enabled: true
+id: cae321ab-a42e-4d7d-a59a-4e6395cc49f1
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+  - ima-evm-utils
+  - ima-evm-utils-devel
+  - openssl
+extra-summary: /kernel/ima-env-utils/sanity
+extra-task: /kernel/ima-env-utils/sanity
