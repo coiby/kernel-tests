@@ -94,7 +94,7 @@ fi
 echo "RHELVER is $RHELVER" | tee -a $OUTPUTFILE
 
 INFILE=rhtsusex.tcf
-MYARCH=`uname -m`
+MYARCH=$(arch)
 if [ "$MYARCH" = "x86_64" -o "$MYARCH" = "s390x" ]; then
     rm -f /usr/lib/libc.a
     ln -s /usr/lib64/libc.a /usr/lib/libc.a
