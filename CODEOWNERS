@@ -12,7 +12,6 @@
 /microcode/sanity/ @jbastianrh
 /misc/record-microcode/ @jbastianrh
 /misc/record-proc-interrupts/ @jbastianrh
-/misc/set-hwclock/ @jbastianrh
 /security/rdrand/ @jbastianrh
 
 [Kdump]

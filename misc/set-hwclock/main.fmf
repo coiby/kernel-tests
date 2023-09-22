@@ -1,7 +1,7 @@
 summary: Set RTC hardware clock
 description: |
     A job to set the RTC hardware clock after waiting for ntpd/chronyd to set the system clock.
-contact: Jeff Bastian <jbastian@redhat.com>
+contact: Oliver Gutierrez <ogutierr@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
 require:
