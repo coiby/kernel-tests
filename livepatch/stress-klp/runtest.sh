@@ -24,6 +24,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TESTS=${TESTS:-}
+GIT_URL=${GIT_URL:-"https://github.com/SUSE/qa_test_klp.git"}
 
 function run_test()
 {
@@ -42,7 +43,7 @@ IFS="
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        rlRun "git clone https://github.com/SUSE/qa_test_klp.git"
+        rlRun "git clone ${GIT_URL}"
         rlRun "cd qa_test_klp"
     rlPhaseEnd
 
