@@ -99,11 +99,12 @@ function run_tests()
     # Clear images
     run_cmd_user "podman system prune --all --force && podman rmi --all"
 
-    for TEST_FILE in ${TEST_DIR}/*.bats; do
+    TEST_FILES=$(grep -rE "^# bats test_tags=distro-integration" "$TEST_DIR"/ | cut -d ":" -f 1 | sort -u)
+    for TEST_FILE in ${TEST_FILES}; do
         TEST_NAME=$(basename $TEST_FILE)
         TEST_LOG="${LOG_DIR}/${TEST_NAME/bats/log}"
         echo -e "\n[$(date '+%F %T')] $TEST_NAME" | tee "${TEST_LOG}"
-        run_cmd_user "bats $TEST_FILE" |& awk --file timestamp.awk | tee -a "${TEST_LOG}"
+        run_cmd_user "bats --filter-tags distro-integration $TEST_FILE" |& awk --file timestamp.awk | tee -a "${TEST_LOG}"
         # Save a marker if this test failed.
         if [[ ${PIPESTATUS[0]} != 0 ]]; then
             TEST_FAILED=1
