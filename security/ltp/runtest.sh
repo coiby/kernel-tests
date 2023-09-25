@@ -22,11 +22,12 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+GIT_URL=${GIT_URL:-"https://github.com/linux-test-project/ltp.git"}
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        rlRun "git clone https://github.com/linux-test-project/ltp.git"
+        rlRun "git clone $GIT_URL" 0
         rlRun "cd ltp"
         rlRun "make -s autotools"
         rlRun "./configure > /dev/null"
