@@ -164,6 +164,12 @@ if rlIsRHEL || rlIsCentOS '9'; then
     sed -i 's/@test "podman logs - multi journald" {/@test "podman logs - multi journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
     sed -i 's/@test "podman logs - since journald" {/@test "podman logs - since journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
     sed -i 's/@test "podman logs - until journald" {/@test "podman logs - until journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
+    # https://github.com/containers/podman/issues/20087
+    echo "Skipping selinux-policy tests known to fail: https://github.com/containers/podman/issues/20087"
+    sed -i 's/@test "podman selinux: confined container" {/@test "podman selinux: confined container" {\n    skip/' ${TEST_DIR}/410-selinux.bats
+    sed -i 's/@test "podman selinux: container with label=disable" {/@test "podman selinux: container with label=disable" {\n    skip/' ${TEST_DIR}/410-selinux.bats
+    sed -i 's/@test "podman selinux: privileged container" {/@test "podman selinux: privileged container" {\n    skip/' ${TEST_DIR}/410-selinux.bats
+    sed -i 's/@test "podman selinux: pid=host" {/@test "podman selinux: pid=host" {\n    skip/' ${TEST_DIR}/410-selinux.bats
 fi
 
 # Skip 150-logins,420-cgroups.bats,260-sdnotify,200-pod,410-selinux,600-completion,700-play,035-logs for non x86_64, would fail on non x86_64
