@@ -1,0 +1,2 @@
+Regression test for Bug 2211262:
+crash utility results in segmentation fault when non-panicking CPUs fail to get stopped at panic
