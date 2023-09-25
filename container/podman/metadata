@@ -8,5 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
+max_time=60m
 dependencies=podman;podman-tests;buildah;openssl;socat;httpd-tools;nmap-ncat;skopeo;jq;git
 repoRequires=cki_lib

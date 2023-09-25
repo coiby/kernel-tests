@@ -27,9 +27,9 @@ PODMAN_VERSION=$(podman --version | awk '{print$3}')
 
 function _install_bats ()
 {
-    curl --retry 5 -LO https://github.com/bats-core/bats-core/archive/v1.1.0.tar.gz
-    tar xvf v1.1.0.tar.gz > /dev/null
-    ./bats-core-1.1.0/install.sh "${BATS_DIR}"
+    curl --retry 5 -LO https://github.com/bats-core/bats-core/archive/refs/tags/v1.10.0.tar.gz
+    tar xvf v1.10.0.tar.gz > /dev/null
+    ./bats-core-1.10.0/install.sh "${BATS_DIR}"
     if [ $? -ne 0 ]; then
         echo "FAIL Couldn't install BATS. Aborting test..."
         rstrnt-report-result "${TEST}" WARN
@@ -98,10 +98,12 @@ function run_tests()
         rstrnt-report-result "${RSTRNT_TASKNAME}/info" FAIL
     fi
 
-    # return before executing podman-tests
-    echo "WARN: not executing podman tests due to lack of test maintainer capacity"
-    echo "more details: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1502"
-    return $TEST_FAILED
+    if [[ -n "$CKI_NAME" ]]; then
+        # return before executing podman-tests if it is a CKI job
+        echo "WARN: not executing podman tests due to lack of test maintainer capacity"
+        echo "more details: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1502"
+        return $TEST_FAILED
+    fi
 
     # Clear images
     run_cmd_user "podman system prune --all --force && podman rmi --all"
@@ -114,18 +116,17 @@ function run_tests()
         # Save a marker if this test failed.
         if [[ ${PIPESTATUS[0]} != 0 ]]; then
             TEST_FAILED=1
-            rstrnt-report-log -l ${TEST_LOG}
             if grep -qF "[ rc=124 (** EXPECTED 0 **) ]" ${TEST_LOG}; then
                 echo "FAIL: test failed with timeout. Likely infra issue."
-                rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" WARN
+                rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" WARN
                 cleanup
                 rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 1
             else
-                rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" FAIL
+                rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" FAIL
             fi
         else
-            rstrnt-report-result "${RSTRNT_TASKNAME}/${TEST_NAME}" PASS
+            rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" PASS
         fi
     done
 
@@ -291,4 +292,5 @@ fi
 
 cleanup
 
-exit ${TEST_FAILED}
+# If running as restraint job, don't use exit code as failures should be reported as subtest
+[[ -v RSTRNT_JOBID ]] || exit "${TEST_FAILED}"
