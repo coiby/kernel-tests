@@ -156,14 +156,6 @@ if rlIsRHEL '8'; then
 fi
 
 if rlIsRHEL || rlIsCentOS '9'; then
-    # At least for now, it seems same tests can be skipped for RHEL-8, RHEL-9, and CentOS Stream 9
-    # In the future it might be better to check podman version instead of release...
-    # Skip journal related tests due to: https://bugzilla.redhat.com/show_bug.cgi?id=1972780
-    echo "Skipping journald related tests due to BZ1972780..."
-    sed -i 's/@test "podman run --log-driver" {/@test "podman run --log-driver" {\n    skip/' ${TEST_DIR}/030-run.bats
-    sed -i 's/@test "podman logs - multi journald" {/@test "podman logs - multi journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
-    sed -i 's/@test "podman logs - since journald" {/@test "podman logs - since journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
-    sed -i 's/@test "podman logs - until journald" {/@test "podman logs - until journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
     # https://github.com/containers/podman/issues/20087
     echo "Skipping selinux-policy tests known to fail: https://github.com/containers/podman/issues/20087"
     sed -i 's/@test "podman selinux: confined container" {/@test "podman selinux: confined container" {\n    skip/' ${TEST_DIR}/410-selinux.bats
