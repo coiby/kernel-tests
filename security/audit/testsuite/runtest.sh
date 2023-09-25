@@ -22,13 +22,14 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+GIT_URL=${GIT_URL:-"https://github.com/linux-audit/audit-testsuite.git"}
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         rlIsRHEL "<9" && { yum install -y perl-tests; }
         [ "$(uname -m)" = "x86_64" ] && { yum install -y glibc.i686 glibc-devel.i686 libgcc.i686; }
-        rlRun "git clone https://github.com/linux-audit/audit-testsuite.git"
+        rlRun "git clone $GIT_URL" 0
         rlRun "cd audit-testsuite"
         rlIsRHEL "<9" && rlRun "sed -i '/backlog_wait_time_actual_reset/d' tests/Makefile"
         rlRun "sed -i '/io_uring/d' tests/Makefile"
