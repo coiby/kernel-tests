@@ -1,4 +1,5 @@
 dax_pmem.ko
+dec_and_lock.ko
 device_dax.ko
 hid-hyperv.ko
 hv_balloon.ko
