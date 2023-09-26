@@ -23,8 +23,9 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+RPM_FETCH=("https://cbs.centos.org/kojifiles/packages")
 # shellcheck disable=SC2206
-BASE_URL=( ${BASE_URL:-"https://cbs.centos.org/kojifiles/packages"} )
+RPM_FETCH+=(${BASE_URL})
 baseline=${baseline:-""}
 
 name=$(rpm --queryformat '%{name}\n' -qf /boot/config-"$(uname -r)" | sed -e "s/-core//g" -e "s/-debug//g")
@@ -37,7 +38,7 @@ fetch_src()
     scratch=${2}
     pkg=${name}-${version}-${release}
     found=0
-    for URL in "${BASE_URL[@]}"; do
+    for URL in "${RPM_FETCH[@]}"; do
         if [ -z "${scratch}" ]; then
             rlRun "wget ${URL}/${name}/${version}/${release}/src/${pkg}.src.rpm && found=1" "0-127"
         else
