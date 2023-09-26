@@ -1,0 +1,14 @@
+[General]
+name=/kernel-tests/general/scheduler/hung_task_detector
+owner=Chunyu Hu <chuhu@redhat.com>
+description=Test if hung_task detector is fine working.
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+dependencies=gcc;glibc;elfutils-libelf-devel;perf
+softDependencies=rsyslog;stress-ng
+max_time=1h
+repoRequires=kernel-include;general/include

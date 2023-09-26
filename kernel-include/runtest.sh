@@ -16,8 +16,8 @@ devnull=0
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
     # Create debug log
-    DEBUGLOG=`mktemp -p /mnt/testarea -t DeBug.XXXXXX`
-    K_DEBUGLOG=`mktemp -p /mnt/testarea -t K_DeBug.XXXXXX`
+    DEBUGLOG=$(mktemp -p /mnt/testarea -t DeBug.XXXXXX)
+    K_DEBUGLOG=$(mktemp -p /mnt/testarea -t K_DeBug.XXXXXX)
 
     # In the event your not running automated Beaker job
     if [ -z "$OUTPUTFILE" ]; then
@@ -27,7 +27,7 @@ if [ ! "${__SOURCED__:+x}" ]; then
         echo "***** manual testing setup  "
         echo "***** Creating: \$OUTPUTFILE "
         echo ""
-        export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+        export OUTPUTFILE=$(mktemp /mnt/testarea/tmp.XXXXXX)
     fi
     # ToDo: $RESULT_SERVER $TESTID also need workaround
 
@@ -51,17 +51,17 @@ if [ ! "${__SOURCED__:+x}" ]; then
     K_TEST_VER=$(rpm -qf $0)
 
     # Kernel Variables
-    K_NAME=`rpm -q --queryformat '%{name}\n' -qf /boot/config-$(uname -r)`
+    K_NAME=$(rpm -q --queryformat '%{name}\n' -qf /boot/config-$(uname -r))
     #   example output: kernel
-    K_VER=`rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r)`
+    K_VER=$(rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
     #   example output: 2.6.32
     K_VARIANT=$(echo $K_NAME | sed -e "s/kernel//g")
     #   are we a DEBUG kernel?
-    K_REL=`rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r)`
+    K_REL=$(rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
     #   example output: 220.el6
-    K_SRC=`rpm -q --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r)`
+    K_SRC=$(rpm -q --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r))
     #   example output: kernel-2.6.32-220.el6.src.rpm
-    K_BASE=`rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r)`
+    K_BASE=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r))
     #   example output: kernel-2.6.32-220.el6.x86_64
     K_ARCH=$(rpm -q --queryformat '%{arch}' -f /boot/config-$(uname -r))
     #   example output: x86_64
@@ -77,7 +77,7 @@ if [ ! "${__SOURCED__:+x}" ]; then
     #   example output: 3.6.10-8.fc18highbank
     K_DOWNLOAD="http://download.lab.bos.redhat.com/brewroot/packages/kernel/"
     #
-    RH_REL=`cat /etc/redhat-release | cut -d" " -f7`
+    RH_REL=$(cat /etc/redhat-release | cut -d" " -f7)
     #   example output: 6.2
     K_CONFIG="kernel-$K_VER-$K_ARCH$K_VARIANT.config"
     #   example output: kernel-2.6.32-x86_64.config
@@ -96,7 +96,8 @@ fi # end of if [ ! "${__SOURCED__:+x}" ]
 function DeBug ()
 {
     local msg=$1
-    local timestamp=$(date '+%F %T')
+    local timestamp
+    timestamp=$(date '+%F %T')
     if [ "$devnull" = "0" ]; then
         (
             flock -x 200 2>/dev/null
@@ -112,6 +113,7 @@ function RprtRslt ()
 {
     echo "" | tee -a $OUTPUTFILE
     echo "***** End of runtest.sh " | tee -a $OUTPUTFILE
+    local score
 
     local task=$1
 
@@ -122,9 +124,9 @@ function RprtRslt ()
     # If no score is given, default to fail and count the reported fails
     # Then post-process the results to find the regressions
     if [ -z "$2" ]; then
-      local score=`cat $OUTPUTFILE | grep "FAILED: " | wc -l`
+      score=$(grep -c "FAILED: " $OUTPUTFILE)
     else
-      local score=$2
+      score=$2
     fi
 
     if [ ! -s "$OUTPUTFILE" ]; then
@@ -199,7 +201,7 @@ function ReportStatus ()
     echo  "***** $status: $message " | tee -a $OUTPUTFILE
 
     # If $3 is provided, report_result and continue testing
-    if [ ! -z "$3" ]; then
+    if [ -n "$3" ]; then
         local string=/$3
 
         # Default to FAIL
@@ -250,7 +252,8 @@ function checkRebootCount ()
 function K_DeBug ()
 {
     local msg="$1"
-    local timestamp="$(date '+%F %T')"
+    local timestamp
+    timestamp="$(date '+%F %T')"
 
     if [ "$devnull" = "0" ]; then
         (
@@ -272,6 +275,7 @@ function K_SubmitLog ()
 
 function K_ReportResult ()
 {
+    local score
     local task="$1"
 
     # Default result to FAIL
@@ -284,9 +288,9 @@ function K_ReportResult ()
     # If no score is given, default to fail and count the reported fails
     # Then post-process the results to find the regressions
     if [ -z "$2" ]; then
-        local score=`cat $OUTPUTFILE | grep "FAILED: " | wc -l`
+        score=$(grep -c "FAILED: " $OUTPUTFILE)
     else
-        local score="$2"
+        score="$2"
     fi
 
     if [ ! -s "$OUTPUTFILE" ]; then
@@ -317,7 +321,7 @@ function K_ReportStatus ()
     echo "***** $status: $message " | tee -a $OUTPUTFILE
 
     # If $3 is provided, report_result and continue testing
-    if [ ! -z "$3" ]; then
+    if [ -n "$3" ]; then
         local task=/"$3"
 
         # Default result to FAIL
@@ -396,14 +400,14 @@ function K_EstatusWarn ()
 K_KVERCMP_RET=0
 function K_Vercmp ()
 {
-    local ver1=`echo $1 | sed 's/-/./'`
-    local ver2=`echo $2 | sed 's/-/./'`
+    local ver1=$(echo $1 | sed 's/-/./')
+    local ver2=$(echo $2 | sed 's/-/./')
 
     local ret=0
     local i=1
     while [ 1 ]; do
-        local digit1=`echo $ver1 | cut -d . -f $i`
-        local digit2=`echo $ver2 | cut -d . -f $i`
+        local digit1=$(echo $ver1 | cut -d . -f $i)
+        local digit2=$(echo $ver2 | cut -d . -f $i)
 
         if [ -z "$digit1" ]; then
             if [ -z "$digit2" ]; then
@@ -439,8 +443,8 @@ function K_VercmpTest ()
     kvercmp '2.6.32-100.el6' '2.6.32-101.el6'
     kvercmp '2.6.32-101.el6' '2.6.32-100.el6'
     kvercmp '2.6.32-101.el6' '3.1.4-0.2.el7.x86_64'
-    kvercmp '3.1.4-0.2.el7.x86_64' `uname -r`
-    kvercmp `uname -r` '3.1.4-0.1.el7.x86_64'
+    kvercmp '3.1.4-0.2.el7.x86_64' $(uname -r)
+    kvercmp $(uname -r) '3.1.4-0.1.el7.x86_64'
 }
 
 # K_IsKernelRPM returns 0 in running kernel is from rpm and 1 if it is not
@@ -556,5 +560,16 @@ function K_GetRunningKernelRpmSubPackageNVR ()
 
   # requested subpkg is built by the running kernel binary
   echo "${k_rpm}-${subpkg}-${k_rpm_vr}"
+}
+
+function K_GetPkgMgr()
+{
+    if [[ -e /run/ostree-booted ]]; then
+      echo rpm-ostree
+    elif [[ -e /usr/bin/dnf ]]; then
+      echo dnf
+    else
+      echo yum
+    fi
 }
 # EndFile
