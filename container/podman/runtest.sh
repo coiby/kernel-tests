@@ -21,9 +21,7 @@ PODMANUSER=${PODMANUSER:-root}
 BATS_DIR=${BATS_DIR:-/usr}
 LOG_DIR="/tmp/podmantestlog"
 TEST="Podman"
-ret=0
 ARCH=$(uname -m)
-PODMAN_VERSION=$(podman --version | awk '{print$3}')
 
 function _install_bats ()
 {
@@ -98,21 +96,15 @@ function run_tests()
         rstrnt-report-result "${RSTRNT_TASKNAME}/info" FAIL
     fi
 
-    if [[ -n "$CKI_NAME" ]]; then
-        # return before executing podman-tests if it is a CKI job
-        echo "WARN: not executing podman tests due to lack of test maintainer capacity"
-        echo "more details: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1502"
-        return $TEST_FAILED
-    fi
-
     # Clear images
     run_cmd_user "podman system prune --all --force && podman rmi --all"
 
-    for TEST_FILE in ${TEST_DIR}/*.bats; do
+    TEST_FILES=$(grep -rE "^# bats test_tags=distro-integration" "$TEST_DIR"/ | cut -d ":" -f 1 | sort -u)
+    for TEST_FILE in ${TEST_FILES}; do
         TEST_NAME=$(basename $TEST_FILE)
         TEST_LOG="${LOG_DIR}/${TEST_NAME/bats/log}"
         echo -e "\n[$(date '+%F %T')] $TEST_NAME" | tee "${TEST_LOG}"
-        run_cmd_user "bats $TEST_FILE" |& awk --file timestamp.awk | tee -a "${TEST_LOG}"
+        run_cmd_user "bats --filter-tags distro-integration $TEST_FILE" |& awk --file timestamp.awk | tee -a "${TEST_LOG}"
         # Save a marker if this test failed.
         if [[ ${PIPESTATUS[0]} != 0 ]]; then
             TEST_FAILED=1
@@ -134,39 +126,15 @@ function run_tests()
     return $TEST_FAILED
 }
 
-# there was some fixes in podman tests, that were not available on 3.3.1
-if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
-    COMMIT_HASH=02a0d4b7fb8fe99d012e9c8035a063e903eab5b6
-
-    if [ ! -d podman ]; then
-        git clone https://github.com/containers/podman
-        if [ $? -ne 0 ]; then
-            echo "FAIL to clone podman repo. Aborting test..."
-            rstrnt-report-result "${TEST}" WARN
-            rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-            exit 1
-        fi
-        pushd podman
-        git checkout ${COMMIT_HASH}
-        if [ $? -ne 0 ]; then
-            echo "FAIL to checkout ${COMMIT_HASH}. Aborting test..."
-            rstrnt-report-result "${TEST}" WARN
-            rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-            exit 1
-        fi
-        popd
-    fi
-    TEST_DIR="$PWD/podman/test/system"
-else
-    rpm -q podman-tests
-    if [ $? -ne 0 ]; then
-        echo "FAIL: podman-tests is not installed. Aborting test..."
-        rstrnt-report-result "${TEST}" WARN
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-        exit 1
-    fi
-    TEST_DIR=/usr/share/podman/test/system
+rpm -q podman-tests
+if [ $? -ne 0 ]; then
+    echo "FAIL: podman-tests is not installed. Aborting test..."
+    rstrnt-report-result "${TEST}" WARN
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+    exit 1
 fi
+
+TEST_DIR=/usr/share/podman/test/system
 
 # If bats is not install, install it from source
 
@@ -176,13 +144,6 @@ fi
 
 if [ ! -x "${BATS_DIR}"/bin/bats ]; then
     _install_bats
-fi
-
-# NOTE(mhayden): The 'metacopy=on' mount option may be causing issues with
-# podman on RHEL 8. It needs to be disabled per BZ 1734799.
-if rlTestVersion ${PODMAN_VERSION} '<' '1.4.4'; then
-    sed -i 's/,metacopy=on//' /etc/containers/storage.conf || true
-    grep ^mountopt /etc/containers/storage.conf || true
 fi
 
 # patch 070-builds to make test passing
@@ -196,43 +157,12 @@ if rlIsRHEL '8'; then
 fi
 
 if rlIsRHEL || rlIsCentOS '9'; then
-    # At least for now, it seems same tests can be skipped for RHEL-8, RHEL-9, and CentOS Stream 9
-    # In the future it might be better to check podman version instead of release...
-    # Skip journal related tests due to: https://bugzilla.redhat.com/show_bug.cgi?id=1972780
-    echo "Skipping journald related tests due to BZ1972780..."
-    sed -i 's/@test "podman run --log-driver" {/@test "podman run --log-driver" {\n    skip/' ${TEST_DIR}/030-run.bats
-    sed -i 's/@test "podman logs - multi journald" {/@test "podman logs - multi journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
-    sed -i 's/@test "podman logs - since journald" {/@test "podman logs - since journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
-    sed -i 's/@test "podman logs - until journald" {/@test "podman logs - until journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
-fi
-
-if rlTestVersion ${PODMAN_VERSION} '<' '3.4.3'; then
-    # Please refer to https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/807
-    # and https://github.com/containers/podman/pull/12496
-    sed -i 's/@test "podman kill - test signal handling in containers" {/@test "podman kill - test signal handling in containers" {\n    skip/' ${TEST_DIR}/130-kill.bats
-    sed -i 's/@test "podman logs - --follow journald" {/@test "podman logs - --follow journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
-fi
-
-if rlTestVersion ${PODMAN_VERSION} '<=' '3.3.1'; then
-    # https://bugzilla.redhat.com/show_bug.cgi?id=2006678
-    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/622
-    sed -i 's/@test "podman build - global runtime flags test" {/@test "podman build - global runtime flags test" {\n    skip/' ${TEST_DIR}/070-build.bats
-    # Unsupported tests
-    sed -i 's/@test "podman logs - --follow journald" {/@test "podman logs - --follow journald" {\n    skip/' ${TEST_DIR}/035-logs.bats
-    sed -i 's/@test "podman logs - --follow k8s-file" {/@test "podman logs - --follow k8s-file" {\n    skip/' ${TEST_DIR}/035-logs.bats
-    sed -i 's/@test "podman buildx - basic test" {/@test "podman buildx - basic test" {\n    skip/' ${TEST_DIR}/070-build.bats
-    sed -i 's/@test "podman volume import test" {/@test "podman volume import test" {\n    skip/' ${TEST_DIR}/160-volumes.bats
-    sed -i 's/@test "podman generate systemd - restart policy" {/@test "podman generate systemd - restart policy" {\n    skip/' ${TEST_DIR}/250-systemd.bats
-    sed -i 's/@test "podman pass LISTEN environment " {/@test "podman pass LISTEN environment" {\n    skip/' ${TEST_DIR}/250-systemd.bats
-    sed -i 's/@test "podman auto-update - label io.containers.autoupdate=image with rollback" {/@test "podman auto-update - label io.containers.autoupdate=image with rollback" {\n    skip/' ${TEST_DIR}/255-auto-update.bats
-    sed -i 's/@test "podman auto-update - label io.containers.autoupdate=local with rollback" {/@test "podman auto-update - label io.containers.autoupdate=local with rollback" {\n    skip/' ${TEST_DIR}/255-auto-update.bats
-fi
-
-if rlTestVersion ${PODMAN_VERSION} '=' '3.4.0'; then
-    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/774
-    sed -i 's/@test "podman volume import test" {/@test "podman volume import test" {\n    skip/' ${TEST_DIR}/160-volumes.bats
-    # https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/781
-    _disable_test 270-socket-activation.bats
+    # https://github.com/containers/podman/issues/20087
+    echo "Skipping selinux-policy tests known to fail: https://github.com/containers/podman/issues/20087"
+    sed -i 's/@test "podman selinux: confined container" {/@test "podman selinux: confined container" {\n    skip/' ${TEST_DIR}/410-selinux.bats
+    sed -i 's/@test "podman selinux: container with label=disable" {/@test "podman selinux: container with label=disable" {\n    skip/' ${TEST_DIR}/410-selinux.bats
+    sed -i 's/@test "podman selinux: privileged container" {/@test "podman selinux: privileged container" {\n    skip/' ${TEST_DIR}/410-selinux.bats
+    sed -i 's/@test "podman selinux: pid=host" {/@test "podman selinux: pid=host" {\n    skip/' ${TEST_DIR}/410-selinux.bats
 fi
 
 # Skip 150-logins,420-cgroups.bats,260-sdnotify,200-pod,410-selinux,600-completion,700-play,035-logs for non x86_64, would fail on non x86_64
