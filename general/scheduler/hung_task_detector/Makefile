@@ -48,8 +48,7 @@ FILES=$(TENV) $(METADATA) runtest.sh Makefile PURPOSE kmod_hung
 .PHONY: all install download clean
 
 run: $(FILES) build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
+	( set +o posix; . /usr/share/beakerlib/beakerlib.sh; \
 		. runtest.sh )
 
 build: $(BUILT_FILES)
@@ -58,7 +57,13 @@ build: $(BUILT_FILES)
 clean:
 	ls
 
-include /usr/share/rhts/lib/rhts-make.include
+RHTS_INCLUDE=$(strip $(wildcard /usr/share/rhts/lib/rhts-make.include))
+ifeq ($(RHTS_INCLUDE),)
+    export TEST_DIR=/mnt/tests$(TEST)
+    export METADATA=testinfo.desc
+else
+	include /usr/share/rhts/lib/rhts-make.include
+endif
 
 $(METADATA): Makefile
 	@touch $(METADATA)
@@ -71,7 +76,7 @@ $(METADATA): Makefile
 	@echo "Releases:        RHEL6 RHEL7 RHEL8 Fedora" >> $(METADATA)
 	@echo "Type:      		Function"        >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        gcc glibc elfutils-libelf-devel" >> $(METADATA)
+	@echo "Requires:        gcc glibc elfutils-libelf-devel perf rsyslog stress-ng" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         RedHat Internal" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)

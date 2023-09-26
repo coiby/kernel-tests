@@ -1,0 +1,26 @@
+summary: hung_task detector
+description: |
+    Test if hung_task detector is fine working.
+
+    1. Dump stack trace completely
+    2. Dump the registers
+    3. Dump the code
+
+    Try to check nmi stack via sysrq-trigger l option along side.
+    That's because nmi stack can also hit issue.
+
+    [Bug 1518139] hung_task: call trace missing in log.
+
+contact: Chunyu Hu <chuhu@redhat.com>
+test: make run
+framework: beakerlib
+id: 2585039b-b117-483b-93d0-68c0e6d19401
+require:
+    - gcc
+    - glibc
+    - elfutils-libelf-devel
+    - perf
+recommend:
+    - rsyslog
+    - stress-ng
+duration: 1h
