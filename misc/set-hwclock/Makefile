@@ -67,7 +67,7 @@ endif
 # Generate the testinfo.desc here:
 $(METADATA): Makefile
 	@touch $(METADATA)
-	@echo "Owner:        Jeff Bastian <jbastian@redhat.com>" > $(METADATA)
+	@echo "Owner:        Oliver Gutierrez <ogutierr@redhat.com>" > $(METADATA)
 	@echo "Name:         $(TEST)" >> $(METADATA)
 	@echo "Path:         $(TEST_DIR)"	>> $(METADATA)
 	@echo "License:      GPLv2" >> $(METADATA)
