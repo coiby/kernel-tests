@@ -1,6 +1,6 @@
 [General]
 name=networking/udp/udp_socket
-owner=Hangbin Liu <haliu@redhat.com>
+owner=Yi Chen <yiche@redhat.com>
 description=Networking udp socket test
 license=GPLv2
 confidential=no
