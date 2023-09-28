@@ -1,0 +1,12 @@
+summary: Security Integrity verifier for 1925661
+description: ''
+contact: Linqing Lu <lilu@redhat.com>
+component:
+  - kernel
+path: /security/integrity/1925661
+test: make run
+framework: beakerlib
+require: [ima-evm-utils, make]
+duration: 5m
+extra-summary: /kernel-tests/security/integrity/1925661
+extra-task: /kernel-tests/security/integrity/1925661

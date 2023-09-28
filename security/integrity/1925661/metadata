@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=./runtest.sh
-max_time=12m
+max_time=5m
 dependencies=ima-evm-utils
