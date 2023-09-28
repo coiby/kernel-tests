@@ -35,7 +35,7 @@ CDIR=$(dirname $FILE)
 source $CDIR/../../../cki_lib/libcki.sh || exit 1
 source $CDIR/lib/kvercmp.sh
 
-LOOKASIDE=${LOOKASIDE:-"https://gitlab.com/redhat/centos-stream/tests/kernel/libhugetlbfs/-/archive"}
+LOOKASIDE="https://github.com/libhugetlbfs/libhugetlbfs/releases/download"
 PACKAGE_NAME="libhugetlbfs"
 PACKAGE_VERSION="2.21"
 grep -q "release [5-7].*" /etc/redhat-release && PACKAGE_VERSION="2.18"
