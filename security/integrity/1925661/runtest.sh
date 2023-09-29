@@ -39,6 +39,7 @@ rlJournalStart
         if [[ $(uname -m) != "ppc64le" ]]; then
             echo "[SKIP] support ppc64le only"
             rstrnt-report-result $RSTRNT_TASKNAME SKIP
+            rlJournalEnd ; rlJournalPrintText
             exit 0
         fi
         export cer_file="kernel-signing-ppc.cer"
