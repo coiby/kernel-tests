@@ -1,0 +1,12 @@
+[General]
+description=Security Integrity verifier for 1925661
+name=/kernel-tests/security/integrity/1925661
+owner=Linqing Lu <lilu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=5m
+dependencies=ima-evm-utils
