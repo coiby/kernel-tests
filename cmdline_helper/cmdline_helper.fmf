@@ -1,0 +1,10 @@
+summary: boot kernel with specified cmdline.
+contact: Stephen Bertram <sbertram@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+recommend: grubby
+duration: 30m
+extra-summary: /kernel/cmdline
+extra-task: /kernel/cmdline

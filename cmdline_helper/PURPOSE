@@ -1,0 +1,2 @@
+Enable adding or removing of cmdline parameters.
+Also supporting android boot images and ostree images.
