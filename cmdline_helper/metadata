@@ -1,0 +1,13 @@
+[General]
+name=/kernel-tests/cmdline_helper
+owner=Stephen Bertram <sbertram@redhat.com>
+description=Enable adding or removing of cmdline parameters.
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+softDependencies=grubby
+repoRequires=kernel-include
