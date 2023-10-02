@@ -16,6 +16,8 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA 02110-1301, USA.
 #
+
+# shellcheck source=../../cki_lib/libcki.sh
 . ../../cki_lib/libcki.sh || exit 1
 
 BINDIR=./tests
@@ -29,7 +31,6 @@ REPOS=("default")
 SETUPS=("setupDF")
 CLEANUPS=("cleanupDF")
 ACCELS=()
-MAJOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $1}')
 MINOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $2}')
 UPSTREAM=NO
 NODISABLE=NO
@@ -39,6 +40,7 @@ source /usr/share/beakerlib/beakerlib.sh
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
+  # shellcheck disable=SC2221,SC2222
   case $1 in
     -u|--upstream)
       UPSTREAM=YES
@@ -72,7 +74,7 @@ function rlSkip
     . ../../cki_lib/libcki.sh || exit 1
 
     rlLog "Skipping test because $*"
-    rstrnt-report-result $TEST SKIP
+    rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
 
     #
     # As we want result="Skip" status="Completed" for all scenarios, right here
@@ -115,45 +117,45 @@ function checkVirtSupport
         else
             MACHINES+=("q35")
         fi
-        if (egrep -q 'vmx' /proc/cpuinfo); then
+        if (grep -q 'vmx' /proc/cpuinfo); then
             CPUTYPE="INTEL"
-        elif (egrep -q 'svm' /proc/cpuinfo); then
+        elif (grep -q 'svm' /proc/cpuinfo); then
             CPUTYPE="AMD"
         fi
-        egrep -q '(vmx|svm)' /proc/cpuinfo
+        grep -qE '(vmx|svm)' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "aarch64" ]]; then
         ACCELS+=("kvm")
-        if journalctl -k | egrep -qi "disabling GICv2" ; then
+        if journalctl -k | grep -qi "disabling GICv2" ; then
             GICVERSION="3"
         else
             GICVERSION="2"
         fi
         CPUTYPE="ARMGICv$GICVERSION"
-        journalctl -k | egrep -iq "kvm.*: (Hyp|VHE) mode initialized successfully"
+        journalctl -k | grep -iqE "kvm.*: (Hyp|VHE) mode initialized successfully"
         return $?
     elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
         ACCELS+=("kvm,cap-ccf-assist=off")
         ACCELS+=("tcg")
-        if (egrep -q 'POWER9' /proc/cpuinfo); then
+        if (grep -q 'POWER9' /proc/cpuinfo); then
             CPUTYPE="POWER9"
         else
             CPUTYPE="POWER8"
         fi
-        grep -q 'platform.*PowerNV' /proc/cpuinfo
+        grep -qE 'platform.*PowerNV' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "s390x" ]]; then
         ACCELS+=("kvm")
-        if (egrep -q 'machine = 2964' /proc/cpuinfo); then
+        if (grep -q 'machine = 2964' /proc/cpuinfo); then
             CPUTYPE="z13"
-        elif (egrep -q 'machine = 3907' /proc/cpuinfo); then
+        elif (grep -q 'machine = 3907' /proc/cpuinfo); then
             CPUTYPE="z14"
-        elif (egrep -q 'machine = 8561' /proc/cpuinfo); then
+        elif (grep -q 'machine = 8561' /proc/cpuinfo); then
             CPUTYPE="z15"
         else
            CPUTYPE="S390X"
         fi
-        grep -q 'features.*sie' /proc/cpuinfo
+        grep -qE 'features.*sie' /proc/cpuinfo
         return $?
     else
         return 1
@@ -176,7 +178,8 @@ function disableTest
 
 function disableTests
 {
-    typeset hwpf=$(uname -m)
+    typeset hwpf
+    hwpf=$(uname -m)
 
     # Disable tests for RHEL8 Kernel (4.18.X)
     if [[ $OSVERSION == "RHEL8" ]]; then
@@ -291,7 +294,7 @@ function setup
         OSVERSION="RHEL9"
     elif grep -q "CentOS Stream release 9" /etc/redhat-release; then
         OSVERSION="CENTOS_STREAM_9"
-    elif [ ! -z "$CKI_SELFTESTS_URL" ]; then
+    elif [ -n "$CKI_SELFTESTS_URL" ]; then
         OSVERSION="UPSTREAM"
     else
         OSVERSION="ARK"
@@ -299,12 +302,10 @@ function setup
 
     # tests are currently supported on x86_64, aarch64, ppc64 and s390x
     hwpf=$(uname -m)
-    checkPlatformSupport $hwpf
-    if (( $? == 0 )); then
+    if checkPlatformSupport "$hwpf"; then
         # test can only run on hardware that supports virtualization
-        checkVirtSupport $hwpf
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running on supported arch"
-        if (( $? == 0 )); then
+        if checkVirtSupport "$hwpf"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Hardware supports virtualization, proceeding"
         else
             rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] CPU doesn't support virtualization"
@@ -314,8 +315,9 @@ function setup
     fi
 
     # test should only run on a system with 1 or more cpus
-    typeset cpus=$(grep -c ^processor /proc/cpuinfo)
-    if (( $cpus > 1 )); then
+    typeset cpus
+    cpus=$(grep -cE ^processor /proc/cpuinfo)
+    if (( cpus > 1 )); then
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] You have sufficient CPU's to run the test"
     else
         rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] system requires > 1 CPU"
@@ -356,11 +358,11 @@ function setup
     KVM_ARCH_SYSFS=/sys/module/$KVM_ARCH/parameters/
 
     # Set the KVM parameters needed for the tests
-    > $KVMPARAMFILE
-    for opt in ${KVM_OPTIONS[*]}; do
+    : > $KVMPARAMFILE
+    for opt in "${KVM_OPTIONS[@]}"; do
         echo -e "options kvm $opt=1\n" >> $KVMPARAMFILE
     done
-    for opt in ${KVM_ARCH_OPTIONS[*]}; do
+    for opt in "${KVM_ARCH_OPTIONS[@]}"; do
         echo -e "options $KVM_ARCH $opt=1\n" >> $KVMPARAMFILE
     done
 
@@ -368,19 +370,19 @@ function setup
     export TIMEOUT=3000s
 
     # Reload the modules
-    for mod in ${KVM_MODULES[*]}; do rmmod -f $mod > /dev/null 2>&1; done
+    for mod in "${KVM_MODULES[@]}"; do rmmod -f "$mod" > /dev/null 2>&1; done
     modprobe -a kvm $KVM_ARCH
 
     # Test if the KVM parameters were set correctly
-    for opt in ${KVM_OPTIONS[*]}; do
-        if ! cat $KVM_SYSFS/$opt | egrep -q "Y|y|1"; then
+    for opt in "${KVM_OPTIONS[@]}"; do
+        if ! grep -q "Y|y|1" "$KVM_SYSFS/$opt"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] kvm module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
         fi
     done
-    for opt in ${KVM_ARCH_OPTIONS[*]}; do
-        if ! cat $KVM_ARCH_SYSFS/$opt | egrep -q "Y|y|1"; then
+    for opt in "${KVM_ARCH_OPTIONS[@]}"; do
+        if ! grep -q "Y|y|1" "$KVM_ARCH_SYSFS/$opt"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] $KVM_ARCH module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt is set"
@@ -414,20 +416,23 @@ function setup
     rlPhaseEnd
 }
 
+# shellcheck disable=SC2317
 function setupDF
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Installing qemu-kvm version from given repository"
     dnf module -y reset virt > /dev/null 2>&1
     dnf module -y enable virt > /dev/null 2>&1
     dnf install -y qemu-kvm > /dev/null 2>&1
-    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: $(rpm -q qemu-kvm)"
 }
 
+# shellcheck disable=SC2317
 function cleanupDF
 {
     return
 }
 
+# shellcheck disable=SC2317
 function setupAV
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Installing qemu-kvm version from given repository"
@@ -435,9 +440,10 @@ function setupAV
     dnf module -y reset virt > /dev/null 2>&1
     dnf module -y --enablerepo=rhel8-advvirt enable virt:av  > /dev/null 2>&1
     dnf install -y --enablerepo=rhel8-advvirt qemu-kvm > /dev/null 2>&1
-    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: $(rpm -q qemu-kvm)"
 }
 
+# shellcheck disable=SC2317
 function cleanupAV
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Removing qemu-kvm version installed from repository"
@@ -446,6 +452,7 @@ function cleanupAV
     dnf module -y enable virt > /dev/null 2>&1
 }
 
+# shellcheck disable=SC2317
 function setupWR
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Installing qemu-kvm version from given repository"
@@ -453,9 +460,10 @@ function setupWR
     dnf module -y reset virt > /dev/null 2>&1
     dnf module -y disable virt > /dev/null 2>&1
     dnf install -y --enablerepo=virt-weeklyrebase qemu-kvm > /dev/null 2>&1
-    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: `rpm -q qemu-kvm`"
+    rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] QEMU version installed: $(rpm -q qemu-kvm)"
 }
 
+# shellcheck disable=SC2317
 function cleanupWR
 {
     rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo] Removing qemu-kvm version installed from repository"
@@ -476,14 +484,14 @@ function runtest
     rlPhaseEnd
 
     i=0
-    for repo in ${REPOS[*]}; do
+    for repo in "${REPOS[@]}"; do
         ${SETUPS[$i]}
 
-        for mach in ${MACHINES[*]}; do
+        for mach in "${MACHINES[@]}"; do
             export KUT_MACHINE=$mach
 
             j=0
-            for accel in ${ACCELS[*]}; do
+            for accel in "${ACCELS[@]}"; do
                 rlPhaseStartTest "prepare-${mach}-${repo}-${accel}"
                 export ACCEL=$accel
                 make clean > /dev/null 2>&1
@@ -496,7 +504,7 @@ function runtest
                 rlLog "[$OSVERSION][$hwpf][$CPUTYPE][$mach][$repo][$accel] Running tests for ACCEL: $accel"
                 rlPhaseEnd
                 # Run tests
-                for test in ${ALL_TESTS[*]}; do
+                for test in "${ALL_TESTS[@]}"; do
                     rlPhaseStartTest "${mach}-${repo}-${accel}-${test}"
                     rlRun "yes | $BINDIR/$test > $LOGDIR/${j}_${mach}_${repo}_${accel}_$test.log 2>&1" 0,2,77
                     rlPhaseEnd
@@ -510,9 +518,9 @@ function runtest
     done
 
     rlPhaseStartTest completed
-    cd $LOGDIR
-    logs=$(ls *.log)
-    for log in $logs; do rlFileSubmit $log ; done
+    cd $LOGDIR || return
+    logs=$(ls ./*.log)
+    for log in $logs; do rlFileSubmit "$log" ; done
 
     rlRun "popd"
     rlPhaseEnd
