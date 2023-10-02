@@ -382,7 +382,7 @@ function dump_cgroup_info()
 function install_libcgroup()
 {
         local pkg=libcgroup.20210106.tgz
-        [ -z "$LOOKASIDE" ] && LOOKASIDE=http://download-node-02.eng.bos.redhat.com/qa/rhts/lookaside/
+        [ -z "$LOOKASIDE" ] && LOOKASIDE=http://download.devel.redhat.com/qa/rhts/lookaside/
         rpm -q libcgroup-tools || yum -y install libcgroup-tools &>/dev/null
         rpm -q libcgroup-tools && return 0
 

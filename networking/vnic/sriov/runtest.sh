@@ -33,8 +33,8 @@ SYNC_TIME=${SYNC_TIME:-"14000"}
 NAY=${NAY:-yes}
 NIC_DRIVER=${NIC_DRIVER:-any}
 NIC_NUM=${NIC_NUM:-1}
-DPDK_URL=${DPDK_URL:-"http://download-node-02.eng.bos.redhat.com/brewroot/packages/dpdk/17.11/11.el7/x86_64/dpdk-17.11-11.el7.x86_64.rpm"}
-DPDK_TOOLS_URL=${DPDK_TOOLS_URL:-"http://download-node-02.eng.bos.redhat.com/brewroot/packages/dpdk/17.11/11.el7/x86_64/dpdk-tools-17.11-11.el7.x86_64.rpm"}
+DPDK_URL=${DPDK_URL:-"http://download.devel.redhat.com/brewroot/packages/dpdk/17.11/11.el7/x86_64/dpdk-17.11-11.el7.x86_64.rpm"}
+DPDK_TOOLS_URL=${DPDK_TOOLS_URL:-"http://download.devel.redhat.com/brewroot/packages/dpdk/17.11/11.el7/x86_64/dpdk-tools-17.11-11.el7.x86_64.rpm"}
 CASE_PATH=$(dirname $(readlink -f $BASH_SOURCE))
 # Include Beaker environment
 source ${CASE_PATH}/../../common/include.sh || exit 1
@@ -97,7 +97,7 @@ install_pktgen()
 	$dbg_flag
 	local kname1="kernel" # metadata
 	local kname2="${kname1}" # define download kernel name: kernel/kernel-rt/kernel-debug/kernel-rt-debug
-	local kname3="${kname1}" # define which site, http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel or http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel-rt
+	local kname3="${kname1}" # define which site, http://download.devel.redhat.com/brewroot/packages/kernel or http://download.devel.redhat.com/brewroot/packages/kernel-rt
 	local kname4="${kname1}" # define selftests package name, debug kernel didn't have selftest package
 	local kernel_ver="$(uname -r)"
 	local rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
@@ -112,10 +112,10 @@ install_pktgen()
 		fi
 	fi
 	if [[ $rhel_major -gt "9" || ( $rhel_major -eq 9 && $rhel_minor -ge 3 ) ]] && /usr/sbin/kernel-is-rt; then
-		# rhel9.3 rt will use http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel
+		# rhel9.3 rt will use http://download.devel.redhat.com/brewroot/packages/kernel
 		local kname3="$kname1"
 	else
-		# rhe9.2 or lower than 9.2 will use http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel-rt
+		# rhe9.2 or lower than 9.2 will use http://download.devel.redhat.com/brewroot/packages/kernel-rt
 		local kname3="$kname2"
 	fi
 
@@ -142,7 +142,7 @@ install_pktgen()
 		rpm -q ${kname4}-selftests-internal-${kernel_ver} &>/dev/null; then
 			return 0
 	fi
-	local link="http://download-node-02.eng.bos.redhat.com/brewroot/packages/${kname3}"
+	local link="http://download.devel.redhat.com/brewroot/packages/${kname3}"
 	local karch=$(uname -m)
 	local kver=$(echo ${kernel_ver}| cut -f1 -d'-')
 	local krel=$(echo ${kernel_ver} | cut -f2 -d'-' | sed "s/\.$karch.*//")

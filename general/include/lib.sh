@@ -291,7 +291,7 @@ function stress_ng_install()
 
 function bench_sysbench_install()
 {
-	wget http://download-node-02.eng.bos.redhat.com/brewroot/packages/sysbench/0.4.12/13.el7ostarch/src/sysbench-0.4.12-13.el7ostarch.src.rpm
+	wget http://download.devel.redhat.com/brewroot/packages/sysbench/0.4.12/13.el7ostarch/src/sysbench-0.4.12-13.el7ostarch.src.rpm
 	rpmbuild -bp sysbench-0.4.12-13.el7ostarch.src.rpm
 	yum-builddep -y  sysbench-0.4.12-13.el7ostarch.src.rpm
 	rpmbuild -bb ./sysbench-0.4.12-13.el7ostarch.src.rpm

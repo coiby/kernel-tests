@@ -1439,12 +1439,12 @@ if [ "$RHEL6TREE" == "0" ] ; then
 fi
 
 # Generic test variables
-if curl -s http://download-node-02.eng.bos.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel/$kernarch/$testkernbase.$kernarch.rpm -o /dev/null -f; then
-    httpbase=http://download-node-02.eng.bos.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
+if curl -s http://download.devel.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel/$kernarch/$testkernbase.$kernarch.rpm -o /dev/null -f; then
+    httpbase=http://download.devel.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
 else
-    httpbase=http://download-node-02.eng.bos.redhat.com/brewroot/vol/rhel-${RHEL_X}/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
+    httpbase=http://download.devel.redhat.com/brewroot/vol/rhel-${RHEL_X}/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
 fi
-archbase=http://download-node-02.eng.bos.redhat.com/brewroot/vol/kernelarchive/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
+archbase=http://download.devel.redhat.com/brewroot/vol/kernelarchive/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
 
 if [ -z "$OUTPUTDIR" ]; then
     OUTPUTDIR=/mnt/testarea

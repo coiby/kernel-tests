@@ -108,12 +108,12 @@ init_vars()
         *nay*) def_url="http://download.eng.pek2.redhat.com/pub/rhel/brewroot/packages";;
         *pek*) def_url="http://download.eng.pek2.redhat.com/pub/rhel/brewroot/packages";;
         *rdu*) def_url="http://download.eng.rdu.redhat.com/pub/rhel/brewroot/packages";;
-        *bos*) def_url="http://download-node-02.eng.bos.redhat.com/brewroot/packages";;
+        *bos*) def_url="http://download.devel.redhat.com/brewroot/packages";;
         *brq*) def_url="http://download.eng.brq.redhat.com/brewroot/packages";;
         *tlv*) def_url="http://download.eng.tlv.redhat.com/pub/brewroot/packages";;
         *blr*) def_url="http://download.eng.blr.redhat.com/brewroot/packages";;
         *pnq*) def_url="http://download.eng.pnq.redhat.com/brewroot/packages";;
-        *) def_url="http://download-node-02.eng.bos.redhat.com/brewroot/packages";;
+        *) def_url="http://download.devel.redhat.com/brewroot/packages";;
     esac
 
     def_url=${ROOT_URL:-$def_url}
@@ -156,7 +156,7 @@ init_vars()
     # Fall back to bos when package do not exist in local globalsync server.
     if [ "$found" = 0 ]; then
         if [[ $def_url =~ brewroot ]]; then
-            def_url="http://download-node-02.eng.bos.redhat.com/brewroot/packages"
+            def_url="http://download.devel.redhat.com/brewroot/packages"
             echo "Fall back to bos server $def_url"
         fi
         for pkg_name in $kernel_names; do

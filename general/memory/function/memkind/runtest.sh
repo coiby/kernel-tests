@@ -83,7 +83,7 @@ function run_test()
 function run_test_srpm()
 {
 	local arch=$(uname -m)
-	local repo=http://download-node-02.eng.bos.redhat.com/brewroot/packages/memkind
+	local repo=http://download.devel.redhat.com/brewroot/packages/memkind
 	local old_nu="$(cat /proc/sys/kernel/numa_balancing)"
 	local old_tr="$(sed -n 's/.*\[\(.*\)\].*/\1/p' /sys/kernel/mm/transparent_hugepage/enabled)"
 

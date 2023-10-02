@@ -73,7 +73,7 @@ kpatch_version=$(echo $KPATCHNVR | cut -d- -f5)
 kpatch_release=$(echo $KPATCHNVR | cut -d- -f6)
 
 [ -z "$KPATCHURL" ] && \
-    KPATCHURL="http://download-node-02.eng.bos.redhat.com/brewroot/packages/${kpatch_name}/${kpatch_version}/${kpatch_release}/$(uname -m)/${KPATCHNVR}.$(uname -m).rpm"
+    KPATCHURL="http://download.devel.redhat.com/brewroot/packages/${kpatch_name}/${kpatch_version}/${kpatch_release}/$(uname -m)/${KPATCHNVR}.$(uname -m).rpm"
 
 function install_kpatch_brew ()
 {

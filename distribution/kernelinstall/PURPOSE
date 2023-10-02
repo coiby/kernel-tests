@@ -23,7 +23,7 @@ KERNELARGVARIANT is variant: up, xen, debug
 You CAN optionally pass KERNELARGTMPREPO and KERNELARGPERMREPO environment
 variables:
 
-KERNELARGTMPREPO="http://download-node-02.eng.bos.redhat.com/rel-eng/latest-RHEL-7/compose/Server/x86_64/os"
+KERNELARGTMPREPO="http://download.devel.redhat.com/rel-eng/latest-RHEL-7/compose/Server/x86_64/os"
 KERNELARGTMPREPO="baseurl1 baseurl2"
 
 This variable contains a SPACE SEPARATED list of REPO URLS. This task will
