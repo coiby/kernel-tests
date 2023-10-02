@@ -62,7 +62,9 @@ rlJournalStart
             if [ ${fips_enabled} ]; then
                 rlDie "Failed to disable FIPS, remaining testsuite might be effected"
             else
-                rlLog "FIPS mode disabled, end of test" && exit 0
+                rlLog "FIPS mode disabled, end of test"
+                rlJournalEnd ; rlJournalPrintText
+                exit 0
             fi
         rlPhaseEnd
 
@@ -105,6 +107,5 @@ rlJournalStart
         touch /tmp/disable_fips_attempted && sync
         rlRun "rhts-reboot"
     rlPhaseEnd
-
-rlJournalPrintText
 rlJournalEnd
+rlJournalPrintText
