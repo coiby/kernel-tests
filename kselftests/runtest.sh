@@ -166,10 +166,14 @@ install_kselftests()
         # for bpf build
         # Some bpf tests rely on vmlinux need to remove rhel.pem and use "modules" macro
         # to build both vmlinux and modules_prepare in one command.
-        sed -i "s/CONFIG_SYSTEM_TRUSTED_KEYS=\"certs\/rhel.pem\"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/" .config
-        make -j`nproc` modules
+        # sed -i "s/CONFIG_SYSTEM_TRUSTED_KEYS=\"certs\/rhel.pem\"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/" .config
+        #
+        # Reverting changes made previously for bpf module build.
+        # Now using delivered bpf which works well and changes did not completely fix module issue.
+        # Leaving previous comments as a reminder if we need to try to build bpf again.
+        make -j$(nproc) modules_prepare
         sed -i "s/^SKIP_TARGETS.*/#SKIP_TARGETS ?= /" tools/testing/selftests/Makefile
-        make -j`nproc` -C tools/testing/selftests install TARGETS="${TEST_ITEMS}" INSTALL_PATH=${EXEC_DIR}
+        make -j$(nproc) -C tools/testing/selftests install TARGETS="${TEST_ITEMS}" INSTALL_PATH=${EXEC_DIR}
         rlLog "Compiled ${TEST} installed..."
         popd
         [ -f $TMPDIR/selftests/run_kselftest.sh ] && return 0 || return 1
@@ -205,7 +209,7 @@ function NormalizeTestItems()
     grep -qE "^${item}(:|$)" ${EXEC_DIR}/kselftest-list.txt || \
         { test_skip "$item test not found in kselftest-list.txt"; }
     #add echo because += does not add white space to the end or begining of lists it processes.
-    total_tests+=`echo " " $(grep -E "^${item}(:|$)" ${EXEC_DIR}/kselftest-list.txt)`
+    total_tests+=$(echo " " $(grep -E "^${item}(:|$)" ${EXEC_DIR}/kselftest-list.txt))
     TARGETS=${total_tests}
 }
 
@@ -248,7 +252,7 @@ function SetupTest ()
         rlRun install_packages
         # do patches
         for item in $TEST_ITEMS; do
-            _item=`echo $item | tr \/ \_`
+            _item=$(echo $item | tr \/ \_)
             if type do_${_item}_patch >& /dev/null; then
                 rlRun do_${_item}_patch
             fi
@@ -272,7 +276,7 @@ function RunTest ()
         rlPhaseStartTest $item
         rlLog "Test Start Time: $(date)"
         # do setup
-        _item=`echo $item | tr \/ \_`
+        _item=$(echo $item | tr \/ \_)
         if type do_${_item}_config >& /dev/null; then
             rlRun do_${_item}_config
         fi
