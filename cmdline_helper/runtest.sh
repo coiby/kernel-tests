@@ -2,7 +2,11 @@
 
 # Source the common test script helpers
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. ../kernel-include/runtest.sh || exit 1
+
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../kernel-include/runtest.sh || exit 1
+
 
 function add_aboot_param ()
 {
