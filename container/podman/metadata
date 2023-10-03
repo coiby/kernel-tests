@@ -1,6 +1,6 @@
 [General]
 name=container/podman
-owner=Major Hayden <major@redhat.com>
+owner=Alex Jia <ajia@redhat.com>
 description=Podman system test
 license=GPLv2
 confidential=no
@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=60m
-dependencies=podman;podman-tests;buildah;openssl;socat;httpd-tools;nmap-ncat;skopeo;jq;git
+dependencies=podman;podman-tests;buildah;openssl;socat;httpd-tools;nmap-ncat;skopeo;jq;git;aardvark-dns
 repoRequires=cki_lib
