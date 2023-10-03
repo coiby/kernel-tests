@@ -24,7 +24,7 @@ FILE=$(readlink -f $BASH_SOURCE)
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 
-BREWROOT_KERN=http://download-node-02.eng.bos.redhat.com/brewroot/packages/kernel
+BREWROOT_KERN=http://download.devel.redhat.com/brewroot/packages/kernel
 
 # -----------------------------------------------------------------------------
 # PREP: Initialize globals provided they haven't been already -----------------

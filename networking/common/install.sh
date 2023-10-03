@@ -46,14 +46,14 @@ ovs_install()
 			local ovs_el6_ver=${OVS_EL6_VER:-"2.3.1-2.git20150113.el6"}
 			local major_ver=$(echo $ovs_el6_ver | cut -d'-' -f1)
 			local minor_ver=$(echo $ovs_el6_ver | cut -d'-' -f2)
-			local ovs_el6_url="http://download-node-02.eng.bos.redhat.com/brewroot/packages/${ovs}/${major_ver}/${minor_ver}/$(uname -m)/${ovs}-${ovs_el6_ver}.$(uname -m).rpm"
+			local ovs_el6_url="http://download.devel.redhat.com/brewroot/packages/${ovs}/${major_ver}/${minor_ver}/$(uname -m)/${ovs}-${ovs_el6_ver}.$(uname -m).rpm"
 
 			$YUM $ovs_el6_url || test_warn "ovs install fail"
 		else
 			cat - <<EOF > /etc/yum.repos.d/fast-datapath.repo
 [fast-datapath]
 name=fast-datapath
-baseurl=http://download-node-02.eng.bos.redhat.com/brewroot/repos/fast-datapath-rhel-${release}-build/latest/\$basearch/
+baseurl=http://download.devel.redhat.com/brewroot/repos/fast-datapath-rhel-${release}-build/latest/\$basearch/
 enabled=1
 gpgcheck=0
 EOF
@@ -61,7 +61,7 @@ EOF
 				cat - <<EOF > /etc/yum.repos.d/extras-rhel.repo
 [extras-rhel]
 name=extras-rhel
-baseurl=http://download-node-02.eng.bos.redhat.com/brewroot/repos/extras-rhel-7.7-build/latest/\$basearch/
+baseurl=http://download.devel.redhat.com/brewroot/repos/extras-rhel-7.7-build/latest/\$basearch/
 enabled=1
 gpgcheck=0
 EOF
@@ -495,7 +495,7 @@ iproute2_install()
 	local iproute_ver=${IPROUTE_VER:-"2.6.32-130.el6eng.netns.2"}
 	local major_ver=$(echo $iproute_ver | cut -d'-' -f1)
 	local minor_ver=$(echo $iproute_ver | cut -d'-' -f2)
-	local iproute_netns="http://download-node-02.eng.bos.redhat.com/brewroot/packages/iproute/${major_ver}/${minor_ver}/$(uname -m)/iproute-${iproute_ver}.$(uname -m).rpm"
+	local iproute_netns="http://download.devel.redhat.com/brewroot/packages/iproute/${major_ver}/${minor_ver}/$(uname -m)/iproute-${iproute_ver}.$(uname -m).rpm"
 
 	yum -y update $iproute_netns || test_warn "iproute install fail"
 	#check if install pass or not
@@ -647,7 +647,7 @@ kernel_install()
 		if [ "$OWNER" ]; then
 			baseurl="http://brew-task-repos.usersys.redhat.com/repos/scratch/$OWNER"
 		else
-			baseurl="http://download-node-02.eng.bos.redhat.com/brewroot/packages"
+			baseurl="http://download.devel.redhat.com/brewroot/packages"
 		fi
 
 		echo $KERNEL_VERSION | grep -q el7a && \
@@ -746,7 +746,7 @@ kernel_modules_extra_install()
 	kername=$(echo $ker_prefix | sed 's/-debug//')
 	rpm -qa | grep ${ker_prefix}-modules-extra-${kernver}-${kernrel}.${kernarch} && return 0
 	local KERNPKGDIRECTORY="$kername"
-	local httpbase=http://download-node-02.eng.bos.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$kernver/$kernrel
+	local httpbase=http://download.devel.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$kernver/$kernrel
 	local kernmodulesextra=${ker_prefix}-modules-extra-${kernver}-${kernrel}.${kernarch}
 	if stat /run/ostree-booted > /dev/null 2>&1; then
 		rpm-ostree -A --idempotent --allow-inactive install \
@@ -782,7 +782,7 @@ kselftests_install()
 	else
 		dnf install -y iproute-tc libbpf #dependencies
 		dnf install -y bpftool-${kernel_ver} ${kname2}-modules-extra-${kernel_ver} ${kname2}-modules-internal-${kernel_ver} ${kname2}-selftests-internal-${kernel_ver} && return 0
-		local link="http://download-node-02.eng.bos.redhat.com/brewroot/packages/${kname1}"
+		local link="http://download.devel.redhat.com/brewroot/packages/${kname1}"
 		local karch=$(uname -m)
 		local kver=$(echo ${kernel_ver}| cut -f1 -d'-')
 		local krel=$(echo ${kernel_ver} | cut -f2 -d'-' | sed "s/\.$karch//")
@@ -801,7 +801,7 @@ brew_install()
 	local rhel_major=$(sed -n 's/.* \([0-9]\+\)\..*/\1/p' /etc/redhat-release)
 	mkdir brew_install
 	pushd brew_install
-	wget http://download-node-02.eng.bos.redhat.com/rel-eng/RCMTOOLS/rcm-tools-rhel-${rhel_major}-baseos.repo -P /etc/yum.repos.d/
+	wget http://download.devel.redhat.com/rel-eng/RCMTOOLS/rcm-tools-rhel-${rhel_major}-baseos.repo -P /etc/yum.repos.d/
 	$YUM brewkoji --nogpgcheck
 
 	local p=""

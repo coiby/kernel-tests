@@ -71,10 +71,10 @@ URL_REPO_CANDIDATES=(
     ## y-stream and recent z-stream. ------------------------------------------
 
     # y-stream nightly repositories
-    "http://download-node-02.eng.bos.redhat.com/rhel-$MAJOR/nightly/RHEL-$MAJOR/latest-RHEL-$VERSION_ID/compose/$COMPOSE/$BASEARCH/os/"
+    "http://download.devel.redhat.com/rhel-$MAJOR/nightly/RHEL-$MAJOR/latest-RHEL-$VERSION_ID/compose/$COMPOSE/$BASEARCH/os/"
 
     # Some of the more recent z-stream nigthly composes
-    "http://download-node-02.eng.bos.redhat.com/rhel-$MAJOR/nightly/updates/RHEL-$MAJOR/latest-RHEL-$VERSION_ID/compose/$COMPOSE/$BASEARCH/os/"
+    "http://download.devel.redhat.com/rhel-$MAJOR/nightly/updates/RHEL-$MAJOR/latest-RHEL-$VERSION_ID/compose/$COMPOSE/$BASEARCH/os/"
 
     ## rel-eng fallback (alpha, betas, releases) ------------------------------
     ## There are z-stream releases for which nightlies are not built. In such -

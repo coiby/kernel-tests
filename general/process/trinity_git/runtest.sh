@@ -50,7 +50,7 @@ echo "$FALSESTRINGS" >> /usr/share/rhts/falsestrings
 
 function get_lookaside()
 {
-	[ -z "$LOOKASIDE" ] && LOOKASIDE=http://download-node-02.eng.bos.redhat.com/qa/rhts/lookaside/
+	[ -z "$LOOKASIDE" ] && LOOKASIDE=http://download.devel.redhat.com/qa/rhts/lookaside/
 	rpm -q wget || yum -y install wget > /dev/null
 	wget "$LOOKASIDE/$trinity_pkg"
 	if [ $? -ne 0  ]; then

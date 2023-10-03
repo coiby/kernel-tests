@@ -12,7 +12,7 @@ FILE_SKIP_SUMMARY="$DIR_DEBUG/skipped_bugs_summary.txt"
 function install_libcgroup()
 {
 	local pkg=libcgroup.20210106.tgz
-	[ -z "$LOOKASIDE" ] && LOOKASIDE=http://download-node-02.eng.bos.redhat.com/qa/rhts/lookaside/
+	[ -z "$LOOKASIDE" ] && LOOKASIDE=http://download.devel.redhat.com/qa/rhts/lookaside/
 	which cgcreate &>/dev/null && return 0
 	which cgcreate &>/dev/null || yum -y install libcgroup-tools &>/dev/null
 	which cgcreate  && return 0

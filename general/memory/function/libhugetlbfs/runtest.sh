@@ -158,7 +158,7 @@ function build_testsuit_srpm()
 {
 	local name=libhugetlbfs
 	local arch=$(uname -m)
-	local repo=${DOWNLOAD_LINK:-http://download-node-02.eng.bos.redhat.com/brewroot/packages/libhugetlbfs}
+	local repo=${DOWNLOAD_LINK:-http://download.devel.redhat.com/brewroot/packages/libhugetlbfs}
 	local spec_path=/root/rpmbuild/SPECS
 
 	if test -f BUILD_DONE; then

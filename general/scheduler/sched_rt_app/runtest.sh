@@ -244,7 +244,7 @@ function test_setup()
 
 	local pkg=rt-app.20210311.tgz
 	local folder=rt-app.20210311
-	[ -z "$LOOKASIDE" ] && LOOKASIDE=http://download-node-02.eng.bos.redhat.com/qa/rhts/lookaside/
+	[ -z "$LOOKASIDE" ] && LOOKASIDE=http://download.devel.redhat.com/qa/rhts/lookaside/
 	if curl -LkO  $LOOKASIDE/$pkg; then
 		tar -zxf $pkg
 	else
