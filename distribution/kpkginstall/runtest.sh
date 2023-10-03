@@ -293,7 +293,8 @@ function rpm_prepare()
 
   _cki_excluded_pkgs=()
   for pkg in "${SUPPORTED_KERNEL_PKGS[@]}"; do
-     if [[ "${pkg}" != "${KPKG_VAR_PACKAGE_NAME}" ]] && [[ "${pkg}" != "${KPKG_VAR_PACKAGE_NAME}-core" ]]; then
+     # don't exclude kernel, in case we need to download the source rpm as for variants the package is kernel
+     if [[ "${pkg}" != "kernel" ]] && [[ "${pkg}" != "${KPKG_VAR_PACKAGE_NAME}" ]] && [[ "${pkg}" != "${KPKG_VAR_PACKAGE_NAME}-core" ]]; then
          _cki_excluded_pkgs+=("${pkg}")
      fi
   done
