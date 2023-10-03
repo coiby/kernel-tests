@@ -73,7 +73,7 @@ Describe 'cki_download_kernel_src_rpm'
         export MOCK_UNAME="${2}"
         export MOCK_PACKAGE_NAME="${1}-${3}"
         When call cki_download_kernel_src_rpm
-        The first line should include "Running: 'dnf download --disableexcludes all --source ${MOCK_PACKAGE_NAME}'"
+        The first line should include "Running: 'dnf download --source ${MOCK_PACKAGE_NAME}'"
     End
 End
 

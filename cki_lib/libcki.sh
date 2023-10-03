@@ -281,12 +281,7 @@ function cki_download_kernel_src_rpm()
     if [[ "$(cki_get_yum_tool)" =~ "dnf" ]]; then
         kernelpkg=$(dnf repoquery "/boot/config-$(uname -r)" --queryformat "%{source_name}-%{version}-%{release}" | tail -1)
 
-        # kpkginstall excludes all kernel packages except the ones related to the
-        # kernel being tested to avoid wrong kernel being installed.
-        # when testing kernel-debug, kernel related packages are
-        # excluded, but the src.rpm is still kernel and not kernel-debug.
-        # The exclude needs to be disabled when trying to download the source rpm
-        cki_run "dnf download --disableexcludes all --source ${kernelpkg}"
+        cki_run "dnf download --source ${kernelpkg}"
         return $?
     else
         echo "FAIL: cki_download_kernel_src_rpm doesn't support $(cki_get_yum_tool)"

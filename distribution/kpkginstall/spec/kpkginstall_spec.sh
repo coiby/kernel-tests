@@ -214,7 +214,7 @@ Describe 'kpkginstall: rpm_prepare'
                 ;;
             kernel-debug)
                 excluded_pkgs=(
-                    kernel kernel-core
+                    kernel-core
                     kernel-64k kernel-64k-core
                     kernel-64k-debug kernel-64k-debug-core
                     kernel-rt kernel-rt-core
@@ -225,7 +225,7 @@ Describe 'kpkginstall: rpm_prepare'
                 ;;
             kernel-64k)
                 excluded_pkgs=(
-                    kernel kernel-core
+                    kernel-core
                     kernel-debug kernel-debug-core
                     kernel-64k-debug kernel-64k-debug-core
                     kernel-rt kernel-rt-core
@@ -236,7 +236,7 @@ Describe 'kpkginstall: rpm_prepare'
                 ;;
             kernel-64k-debug)
                 excluded_pkgs=(
-                    kernel kernel-core
+                    kernel-core
                     kernel-debug kernel-debug-core
                     kernel-64k kernel-64k-core
                     kernel-rt kernel-rt-core
@@ -247,7 +247,7 @@ Describe 'kpkginstall: rpm_prepare'
                 ;;
             kernel-rt)
                 excluded_pkgs=(
-                    kernel kernel-core
+                    kernel-core
                     kernel-debug kernel-debug-core
                     kernel-64k kernel-64k-core
                     kernel-64k-debug kernel-64k-debug-core
@@ -257,7 +257,7 @@ Describe 'kpkginstall: rpm_prepare'
                 ;;
             kernel-rt-debug)
                 excluded_pkgs=(
-                    kernel kernel-core
+                    kernel-core
                     kernel-debug kernel-debug-core
                     kernel-64k kernel-64k-core
                     kernel-64k-debug kernel-64k-debug-core
@@ -267,7 +267,7 @@ Describe 'kpkginstall: rpm_prepare'
                 ;;
             kernel-automotive)
                 excluded_pkgs=(
-                    kernel kernel-core
+                    kernel-core
                     kernel-debug kernel-debug-core
                     kernel-64k kernel-64k-core
                     kernel-64k-debug kernel-64k-debug-core
