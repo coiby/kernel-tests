@@ -37,7 +37,7 @@ rlJournalStart
 
     rlPhaseStartTest
         rlRun "unset DISTRO"
-        rlRun "cat /proc/self/loginuid && echo $(id -u) > /proc/self/loginuid"
+        rlRun "cat /proc/self/loginuid && echo $(id -u) > /proc/self/loginuid" 0-255
         rlRun "unbuffer make test"
     rlPhaseEnd
 
