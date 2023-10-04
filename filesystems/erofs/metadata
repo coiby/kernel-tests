@@ -1,0 +1,11 @@
+[General]
+name=filesystems/erofs
+owner=Brian Grech <bgrech@redhat.com>
+description=test wrapper for erofs-utils tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=libuuid-devel;automake;libtool;attr
