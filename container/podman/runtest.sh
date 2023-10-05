@@ -99,7 +99,7 @@ function run_tests()
     # Clear images
     run_cmd_user "podman system prune --all --force && podman rmi --all"
 
-    TEST_FILES=$(grep -rE "^# bats test_tags=distro-integration" "$TEST_DIR"/ | cut -d ":" -f 1 | sort -u)
+    TEST_FILES=$(grep -rE "^# bats test_tags=distro-integration" "$TEST_DIR"/*.bats | cut -d ":" -f 1 | sort -u)
     for TEST_FILE in ${TEST_FILES}; do
         TEST_NAME=$(basename $TEST_FILE)
         TEST_LOG="${LOG_DIR}/${TEST_NAME/bats/log}"
