@@ -72,6 +72,7 @@
 /distribution/ltp/lite/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /distribution/ltp/openposix_testsuite/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /filesystems/cifs/connectathon/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/filesystems/erofs/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /filesystems/general/pjd-fstest/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /filesystems/loopdev/sanity/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /filesystems/nfs/connectathon/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -198,6 +199,7 @@
 /distribution/ltp/lite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
 /distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
 /filesystems/cifs/connectathon/ @bgoncalv @jianhong @lulinqing
+/filesystems/erofs/ @bgoncalv @bgrech @lulinqing
 /filesystems/general/pjd-fstest/ @bgoncalv @lulinqing @zrlang
 /filesystems/loopdev/sanity/ @bgoncalv @jencce2002 @lulinqing
 /filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
