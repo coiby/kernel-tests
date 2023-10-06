@@ -135,7 +135,6 @@
 /packages/tuned/tune-processes-through-perf/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /pciutils/sanity-smoke/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /pciutils/update-pciids/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/power-management/cpufreq/cpufreq_governor/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/pi_stress/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/rt_ltp/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /rt-tests/rt_migrate_test/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -261,7 +260,6 @@
 /packages/tuned/tune-processes-through-perf/ @bgoncalv @lulinqing @psklenar1
 /pciutils/sanity-smoke/ @bgoncalv @lulinqing @wrgrh
 /pciutils/update-pciids/ @bgoncalv @lulinqing @wrgrh
-/power-management/cpufreq/cpufreq_governor/ @Precambrian_horror @bgoncalv @lulinqing
 /rt-tests/pi_stress/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/rt_ltp/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/rt_migrate_test/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
