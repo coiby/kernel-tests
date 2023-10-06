@@ -450,7 +450,13 @@ function rpm_install()
 
 function rpm_extra_package_install()
 {
-  extra_packages=(devel modules-internal headers)
+  devel_nvr="$(K_GetRunningKernelRpmSubPackageNVR devel)"
+  # download & install kernel devel, or report result
+  # kernel devel must be installed, otherwise we can't detect if we need to apply
+  # cross compile workaround or not.
+  download_install_package "${devel_nvr}"
+
+  extra_packages=(modules-internal headers)
   for package in "${extra_packages[@]}"; do
     _nvr="$(K_GetRunningKernelRpmSubPackageNVR "${package}")"
     if $YUM install -y "${_nvr}" >> ${RPM_INSTALL_LOG}; then

@@ -523,9 +523,10 @@ Describe 'kpkginstall: rpm_extra_package_install'
         export KVER=$3
         export YUM=dnf
         When call rpm_extra_package_install
-        The line 1 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR devel successfully"
-        The line 2 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR modules-internal successfully"
-        The line 3 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR headers successfully"
+        The line 1 should include "✅ Downloaded K_GetRunningKernelRpmSubPackageNVR devel successfully"
+        The line 2 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR devel successfully"
+        The line 3 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR modules-internal successfully"
+        The line 4 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR headers successfully"
         The status should be success
     End
 End
