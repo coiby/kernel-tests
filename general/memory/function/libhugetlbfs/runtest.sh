@@ -199,11 +199,9 @@ function build_testsuit_srpm()
 
 
 	if rlIsRHEL ">=8" && [[ "aarch64 s390x ppc64le" =~ $(uname -m) ]]; then
-		make -C $WORK_DIR BUILDTYPE=NATIVEONLY
-		make -C $WORK_DIR PREFIX=/usr BUILDTYPE=NATIVEONLY install
+		rlRun "make -C $WORK_DIR BUILDTYPE=NATIVEONLY all install" || rlDie "compile libhugetlbfs"
 	else
-		make -C $WORK_DIR
-		make -C $WORK_DIR PREFIX=/usr install
+		rlRun "make -C $WORK_DIR all install" || rlDie "compile libhugetlbfs"
 	fi
 
 	cp -f $WORK_DIR/huge_page_setup_helper.py /usr/bin/
