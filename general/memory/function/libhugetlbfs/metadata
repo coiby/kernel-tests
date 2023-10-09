@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=make run
 max_time=60m
-dependencies=libgcc;glibc-devel;rpm-build
+dependencies=gcc;libgcc;glibc-devel;rpm-build
 softDependencies=beakerlib
