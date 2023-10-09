@@ -1,4 +1,5 @@
 bitfield_kunit
+checksum_kunit
 clk-gate_test
 clk_test
 cmdline_kunit
@@ -26,8 +27,10 @@ fat_test
 fortify_kunit
 gss_krb5_test
 hashtable_test
+hid-ulogic-test
 iio-test-format
 iio-test-rescale
+input_test
 is_signed_type_kunit
 kasan_test
 kfence_test
@@ -41,11 +44,13 @@ mptcp_token_test
 overflow_kunit
 rational-test
 resource_kunit
+regmap-kunit
 slub_kunit
 soc-topology-test
 soc-utils-test
 siphash_kunit
 stackinit_kunit
+strcat_kunit
 strscpy_kunit
 sysctl-test
 test_bits
