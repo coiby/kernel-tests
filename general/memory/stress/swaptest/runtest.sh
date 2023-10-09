@@ -353,7 +353,7 @@ function setup()
 	rlRun -l "cat /sys/kernel/mm/swap/vma_ra_enabled" 0 "check vma readahead enabled status"
 
 	# pmbench install
-	LOOKASIDE=${LOOKASIDE:-http://download.eng.bos.redhat.com/qa/rhts/lookaside}
+	LOOKASIDE=${LOOKASIDE:-http://download.devel.redhat.com/qa/rhts/lookaside}
 	curl -LkO $LOOKASIDE/pmbench.tar.gz
 	tar -zxf pmbench.tar.gz
 	if ! stat /run/ostree-booted &> /dev/null ; then

@@ -19,7 +19,7 @@ fi
 : ${DeBug:=0} # Set to non-zero value to enable debugging
 FwtsIncludeDir=$(readlink -f "../include/")
 
-LOOKASIDE=${LOOKASIDE:-http://download.eng.bos.redhat.com/qa/rhts/lookaside/}
+LOOKASIDE=${LOOKASIDE:-http://download.devel.redhat.com/qa/rhts/lookaside/}
 FWTS_ON_FAIL_REPORT=${FWTS_ON_FAIL_REPORT:-FAIL}
 FWTS_VERSION=${FWTS_VERSION:-V21.06.00}
 
@@ -140,7 +140,7 @@ EOF
 cat >/etc/yum.repos.d/libbsd.repo <<EOF
 [libbsd]
 name=libbsd
-baseurl=http://download.eng.bos.redhat.com/qa/rhts/lookaside/fwts-deps/libbsd/
+baseurl=http://download.devel.redhat.com/qa/rhts/lookaside/fwts-deps/libbsd/
 enabled=1
 gpgcheck=0
 EOF

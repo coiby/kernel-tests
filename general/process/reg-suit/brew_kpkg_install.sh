@@ -13,9 +13,9 @@ function brew_kpkg_install()
 	local kver=`uname -r | sed "s/\.$karch//"`
 	local kvari=`echo $kver | grep -Eo '(debug|PAE|xen)$'`
 	K_KVERS=`echo $kver | sed "s/[\.+]$kvari$//"`
-	if curl --fail --head -s http://download.eng.bos.redhat.com/rhel-5/brew/packages/kernel/${K_KVERS%-*}/${K_KVERS#*-}/$karch/kernel-`uname -r`.rpm -o /dev/null -f; then
+	if curl --fail --head -s http://download.devel.redhat.com/rhel-5/brew/packages/kernel/${K_KVERS%-*}/${K_KVERS#*-}/$karch/kernel-`uname -r`.rpm -o /dev/null -f; then
 		local url="http://download.devel.redhat.com/rhel-5/brew/packages/kernel"
-	elif curl --fail --head -s http://download.eng.bos.redhat.com/rhel-6/brew/packages/kernel/${K_KVERS%-*}/${K_KVERS#*-}/$karch/kernel-`uname -r`.rpm -o /dev/null -f; then
+	elif curl --fail --head -s http://download.devel.redhat.com/rhel-6/brew/packages/kernel/${K_KVERS%-*}/${K_KVERS#*-}/$karch/kernel-`uname -r`.rpm -o /dev/null -f; then
 		local url="http://download.devel.redhat.com/rhel-6/brew/packages/kernel"
 	else
 		local url="http://download.devel.redhat.com/brewroot/packages/kernel"

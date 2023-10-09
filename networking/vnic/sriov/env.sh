@@ -105,7 +105,7 @@ if [ "$ENABLE_RT_KERNEL" = "no" ]; then
 				s=substr(s, i+1)
 			} while(i > 0)
 			sub("."s,"",v[2]);
-			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-"v[1]"-"v[2]"."s".rpm"
+			print "http://download.devel.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_CORE" ]; then
@@ -117,7 +117,7 @@ if [ "$ENABLE_RT_KERNEL" = "no" ]; then
 				s=substr(s, i+1)
 			} while(i > 0)
 			sub("."s,"",v[2]);
-			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-core-"v[1]"-"v[2]"."s".rpm"
+			print "http://download.devel.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-core-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES" ]; then
@@ -129,7 +129,7 @@ if [ "$ENABLE_RT_KERNEL" = "no" ]; then
 				s=substr(s, i+1)
 			} while(i > 0)
 			sub("."s,"",v[2]);
-			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-modules-"v[1]"-"v[2]"."s".rpm"
+			print "http://download.devel.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-modules-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES_INTERNAL" ]; then
@@ -141,7 +141,7 @@ if [ "$ENABLE_RT_KERNEL" = "no" ]; then
 				s=substr(s, i+1)
 			} while(i > 0)
 			sub("."s,"",v[2]);
-			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-modules-internal-"v[1]"-"v[2]"."s".rpm"
+			print "http://download.devel.redhat.com/brewroot/packages/kernel/"v[1]"/"v[2]"/"s"/kernel-modules-internal-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 else
@@ -154,7 +154,7 @@ else
 				s=substr(s, i+1)
 			} while(i > 0)
 			sub("."s,"",v[2]);
-			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-rt-"v[1]"-"v[2]"."s".rpm"
+			print "http://download.devel.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_CORE" ]; then
@@ -166,7 +166,7 @@ else
 				s=substr(s, i+1)
 			} while(i > 0)
 			sub("."s,"",v[2]);
-			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-core-rt-"v[1]"-"v[2]"."s".rpm"
+			print "http://download.devel.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-core-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES" ]; then
@@ -178,7 +178,7 @@ else
 				s=substr(s, i+1)
 			} while(i > 0)
 			sub("."s,"",v[2]);
-			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-rt-"v[1]"-"v[2]"."s".rpm"
+			print "http://download.devel.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES_CORE" ]; then
@@ -190,7 +190,7 @@ else
 			  s=substr(s, i+1)
 		  } while(i > 0)
 		  sub("."s,"",v[2]);
-		  print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-core-rt-"v[1]"-"v[2]"."s".rpm"
+		  print "http://download.devel.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-core-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 	if [ -z "$RPM_KERNEL_MODULES_INTERNAL" ]; then
@@ -202,7 +202,7 @@ else
 				s=substr(s, i+1)
 			} while(i > 0)
 			sub("."s,"",v[2]);
-			print "http://download.eng.bos.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-internal-rt-"v[1]"-"v[2]"."s".rpm"
+			print "http://download.devel.redhat.com/brewroot/packages/kernel-rt/"v[1]"/"v[2]"/"s"/kernel-modules-internal-rt-"v[1]"-"v[2]"."s".rpm"
 		}')
 	fi
 fi

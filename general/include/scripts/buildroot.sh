@@ -20,7 +20,7 @@ if [[ "$1" =~ "repo_setup" ]]; then
 	shift
 fi
 
-buildroot_latest=http://download.eng.bos.redhat.com/rhel-${maj_rel}/nightly/BUILDROOT-${maj_rel}/latest-BUILDROOT-${maj_rel}.${min_rel}.0-RHEL-${maj_rel}/compose/Buildroot/$this_arch/os/
+buildroot_latest=http://download.devel.redhat.com/rhel-${maj_rel}/nightly/BUILDROOT-${maj_rel}/latest-BUILDROOT-${maj_rel}.${min_rel}.0-RHEL-${maj_rel}/compose/Buildroot/$this_arch/os/
 
 if grep -qi 'Red Hat' /etc/redhat-release && ((maj_rel > 7)); then
 	repo_buildroot=$buildroot_latest
@@ -46,4 +46,3 @@ for pkg in $*; do
 done
 
 ((reserve_repo)) || rm -fr /etc/yum.repos.d/${repo_name:-buildroot.repo}
-

@@ -59,12 +59,12 @@ function download_kernel_srpm()
 	case ${HOST} in
 		*pek*) def_url="http://download.eng.pek2.redhat.com/brewroot/packages";;
 		*rdu*) def_url="http://download.eng.rdu.redhat.com/brewroot/packages";;
-		*bos*) def_url="http://download.eng.bos.redhat.com/brewroot/packages";;
+		*bos*) def_url="http://download.eng.rdu2.redhat.com/brewroot/packages";;
 		*brq*) def_url="http://download.eng.brq.redhat.com/brewroot/packages";;
 		*tlv*) def_url="http://download.eng.tlv.redhat.com/brewroot/packages";;
 		*blr*) def_url="http://download.eng.blr.redhat.com/brewroot/packages";;
 		*pnq*) def_url="http://download.eng.pnq.redhat.com/brewroot/packages";;
-		*) def_url="http://download.eng.bos.redhat.com/brewroot/packages";;
+		*) def_url="http://download.devel.redhat.com/brewroot/packages";;
 	esac
 
 	package_prefix="$def_url/$kernel_spec"
@@ -215,7 +215,7 @@ function stress_ng_install()
 
 		if ((1)); then
 			#  commit id: 0389f3308460 (Tag: V0.12.05 +1) (Date: 20210317)
-			LOOKASIDE=${LOOKASIDE:-http://download.eng.bos.redhat.com/qa/rhts/lookaside}
+			LOOKASIDE=${LOOKASIDE:-http://download.devel.redhat.com/qa/rhts/lookaside}
 			local pkgname=stress-ng.${commit}.tar.gz
 			echo "Trying to get stress-ng from lookaside $LOOKASIDE/$pkgname"
 			curl -LkO $LOOKASIDE/$pkgname
@@ -299,4 +299,3 @@ function bench_sysbench_install()
 	rpm -ivh /root/rpmbuild/RPMS/$(uname -m)/sysbench-0.4.12-13.el7.$(uname -m).rpm
 	which sysbench
 }
-
