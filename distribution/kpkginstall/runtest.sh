@@ -450,7 +450,13 @@ function rpm_install()
 
 function rpm_extra_package_install()
 {
-  extra_packages=(devel modules-internal headers)
+  devel_nvr="$(K_GetRunningKernelRpmSubPackageNVR devel)"
+  # download & install kernel devel, or report result
+  # kernel devel must be installed, otherwise we can't detect if we need to apply
+  # cross compile workaround or not.
+  download_install_package "${devel_nvr}"
+
+  extra_packages=(modules-internal headers)
   for package in "${extra_packages[@]}"; do
     _nvr="$(K_GetRunningKernelRpmSubPackageNVR "${package}")"
     if $YUM install -y "${_nvr}" >> ${RPM_INSTALL_LOG}; then
@@ -703,11 +709,11 @@ EOF
       mkdir -p /var/opt/cki/
       echo "${ckver}" > /var/opt/cki/kernel_version
 
-      # Workaround for cross compiling non x86_64 kernels
+      # Workaround for cross compiling kernels
       if [[ ! -f /usr/src/kernels/$ckver/scripts/basic/fixdep ]]; then
-        cki_print_info "Workaround for cross compiling non x86_64 kernels"
+        cki_print_info "Workaround for cross compiling kernels"
         if [[ -n $RPM_OSTREE ]]; then
-            cki_print_info "skipping workaround for cross compiling non x86_64 kernels as it is running on rpm-ostree environment"
+            cki_print_info "skipping workaround for cross compiling kernels as it is running on rpm-ostree environment"
         else
           PREFIX="/usr/src/kernels/$ckver"
 
