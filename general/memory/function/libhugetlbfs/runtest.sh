@@ -181,12 +181,12 @@ function build_testsuit_srpm()
 	if [[ "$repo" =~ ".rpm" ]]; then
 		echo "Using direct rpm and srpm download urls: $repo"
 		for uri in $repo; do
-			curl -s -O $uri || rlDie "downloading $uri"
+			curl -sLO $uri || rlDie "downloading $uri"
 		done
 	else
-		rlRun "curl -s -O ${repo}/${version}/${release}/src/${name}-${version}-${release}.src.rpm" || rlDie "$name srpm install"
-		rlRun "curl -s -O ${repo}/$version/$release/$arch/${name}-${version}-${release}.${arch}.rpm"
-		rlRun "curl -s -O ${repo}/$version/$release/$arch/libhugetlbfs-utils-${version}-${release}.${arch}.rpm"
+		rlRun "curl -sLO ${repo}/${version}/${release}/src/${name}-${version}-${release}.src.rpm" || rlDie "$name srpm install"
+		rlRun "curl -sLO ${repo}/$version/$release/$arch/${name}-${version}-${release}.${arch}.rpm"
+		rlRun "curl -sLO ${repo}/$version/$release/$arch/libhugetlbfs-utils-${version}-${release}.${arch}.rpm"
 	fi
 
 	install_build_dependency
