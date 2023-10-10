@@ -42,7 +42,7 @@ endif
 
 LOOKASIDE=$(shell echo $$LOOKASIDE)
 ifeq (,$(LOOKASIDE))
-	LOOKASIDE=http://download.eng.bos.redhat.com/qa/rhts/lookaside/
+	LOOKASIDE=http://download.devel.redhat.com/qa/rhts/lookaside/
 endif
 
 FILES=$(METADATA) runtest.sh Makefile PURPOSE $(PATCH_DIR)

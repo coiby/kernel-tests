@@ -9,10 +9,10 @@ rlPhaseStartSetup
 rlRun "systemctl start httpd"
 rlRun "systemctl start libvirtd"
 
-TEST_KERNEL_VERSION=$(curl http://download.eng.bos.redhat.com/qa/rhts/lookaside/ipxe-iso-test/version.txt)
+TEST_KERNEL_VERSION=$(curl http://download.devel.redhat.com/qa/rhts/lookaside/ipxe-iso-test/version.txt)
 
-rlRun "curl http://download.eng.bos.redhat.com/qa/rhts/lookaside/ipxe-iso-test/vmlinuz    >/var/www/html/vmlinuz"
-rlRun "curl http://download.eng.bos.redhat.com/qa/rhts/lookaside/ipxe-iso-test/initrd.img >/var/www/html/initrd.img"
+rlRun "curl http://download.devel.redhat.com/qa/rhts/lookaside/ipxe-iso-test/vmlinuz    >/var/www/html/vmlinuz"
+rlRun "curl http://download.devel.redhat.com/qa/rhts/lookaside/ipxe-iso-test/initrd.img >/var/www/html/initrd.img"
 
 cat >/var/www/html/boot.txt <<EOF
 #!ipxe

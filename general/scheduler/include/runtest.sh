@@ -58,7 +58,7 @@ function _wget_compile_stress()
 {
         local TGT_MD5=2fa99c658db4d7d7adc9748bf2b463cd
         local S_NVR=stress-0.18.8-1.4.el7.src.rpm
-        local STRESS_SRPM=http://download.eng.bos.redhat.com/brewroot/packages/stress/0.18.8/1.4.el7/src/stress-0.18.8-1.4.el7.src.rpm
+        local STRESS_SRPM=http://download.devel.redhat.com/brewroot/packages/stress/0.18.8/1.4.el7/src/stress-0.18.8-1.4.el7.src.rpm
 
         [ -f $S_NVR ] && RL_MD5=$(md5sum $S_NVR | awk '{print $1}')
         # We have gotten the package and md5 is right, return directly.

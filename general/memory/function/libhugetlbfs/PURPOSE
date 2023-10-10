@@ -13,7 +13,7 @@ Parameters
   - TEST_VERSION    For the libhugetlbfs srpm version.  E.G. 2.21-16.el8
   - REPO_URL        For the extra yum repo link, used for installing extra
                     packages in dependency.sh. E.G.
-                    http://download.eng.bos.redhat.com/rel-eng/rhel-8/RHEL-8/latest-RHEL-8.1.0/compose/CRB/x86_64/os/
+                    http://download.devel.redhat.com/rel-eng/rhel-8/RHEL-8/latest-RHEL-8.1.0/compose/CRB/x86_64/os/
   - DOWNLOAD_LINK   For the libhugetlbfs rpm download base url(default is brew), the download
                     address would be $DOWNLOAD_LINK/$version/$release/$arch/libhugetlbfs.rpm
                     If the absolute path of the rpms are defined with like below, rpms will be downlaoded one by one

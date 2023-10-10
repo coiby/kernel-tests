@@ -8,7 +8,7 @@ rlJournalStart
 
 
 ANALYZE_SUSPEND=analyze_suspend.py
-LOOKASIDE=${LOOKASIDE:-http://download.eng.bos.redhat.com/qa/rhts/lookaside/}
+LOOKASIDE=${LOOKASIDE:-http://download.devel.redhat.com/qa/rhts/lookaside/}
 
 rlPhaseStartSetup
     rlLog "Getting ${ANALYZE_SUSPEND} source"

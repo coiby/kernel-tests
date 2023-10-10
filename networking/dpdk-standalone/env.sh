@@ -143,7 +143,7 @@ function advanced_qemu_install()
     pushd /tmp
     rm -f index.html
     if [[ ! $(wget -V) ]]; then yum -y install wget; fi
-    wget -q --execute="robots = off" --convert-links --no-parent --wait=1 http://download.eng.bos.redhat.com/rhel-8/rel-eng/ADVANCED-VIRT-8/
+    wget -q --execute="robots = off" --convert-links --no-parent --wait=1 http://download.devel.redhat.com/rhel-8/rel-eng/ADVANCED-VIRT-8/
     partial_custom_qemu_url=$(grep latest-ADVANCED index.html | grep latest-ADVANCED-VIRT-$VERSION_ID | awk '{print $5}' | awk -F "=" '{print $2}' | awk -F '"' '{print $2}' | tail -1)
     custom_qemu_url="$partial_custom_qemu_url"compose/Advanced-virt/x86_64/os
 

@@ -79,7 +79,7 @@ URL_REPO_CANDIDATES=(
     ## rel-eng fallback (alpha, betas, releases) ------------------------------
     ## There are z-stream releases for which nightlies are not built. In such -
     ## cases, we can use rel-eng as a fallback option as they are second best.-
-    "http://download.eng.bos.redhat.com/rhel-$MAJOR/rel-eng/updates/RHEL-$MAJOR/latest-RHEL-$VERSION_ID/compose/Server$COMPOSE/$BASEARCH/os/"
+    "http://download.devel.redhat.com/rhel-$MAJOR/rel-eng/updates/RHEL-$MAJOR/latest-RHEL-$VERSION_ID/compose/Server$COMPOSE/$BASEARCH/os/"
 )
 
 baseurl=""
