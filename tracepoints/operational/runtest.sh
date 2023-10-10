@@ -175,6 +175,15 @@ if [ $? -eq 0 ]; then
     exit 0
 fi
 
+# Running systemtap always cause "BUG:" reports in kernel-rt-debug, and this
+# issue won't be addressed in a short time, skipping to avoid unnecessary QE
+# efforts: https://issues.redhat.com/browse/RHEL-8761
+if cki_is_kernel_rt && cki_is_kernel_debug; then
+    echo "kernel-rt-debug is problematic with systemtap" | tee -a $OUTPUTFILE
+    rstrnt-report-result $TEST SKIP
+    exit 0
+fi
+
 # Warn if gcc does not have retpoline (x86_64) or expoline (s390x) support.
 # SystemTap cannot find any tracepoints in newer kernels with Spectre v2
 # mitigations without retpoline/expoline support in gcc.
