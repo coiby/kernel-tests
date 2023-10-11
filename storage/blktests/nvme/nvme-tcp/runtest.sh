@@ -104,7 +104,7 @@ function get_test_cases_tcp
 		testcases+=" nvme/044"
 		testcases+=" nvme/045"
 		testcases+=" nvme/047"
-		testcases+=" nvme/048"
+		uname -ri | grep -Eq "el9_0|el9_1|el9_2" || testcases+=" nvme/048"
 	fi
 
 	echo "$testcases"
