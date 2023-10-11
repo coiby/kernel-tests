@@ -44,7 +44,7 @@ rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         rlRun "git clone ${GIT_URL}"
-        rlRun "cd qa_test_klp"
+        rlRun "cd $(basename "${GIT_URL}")"
     rlPhaseEnd
 
     run_test
