@@ -11,3 +11,4 @@ entry_point=bash ./runtest.sh
 dependencies=wget;git;time;patch;bzip2;autoconf;glib2-devel;make;gettext;automake;gcc;libtool;bison;flex;beakerlib
 softDependencies=kernel-utils;coreutils
 repoRequires=cki_lib;automotive/include
+max_time=60m
