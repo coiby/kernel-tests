@@ -45,8 +45,8 @@ rlJournalStart
             else
                 kernelVar="kernel"
             fi
-            kselftests="$(dnf list $kernelVar-selftests-internal --enablerepo=* | grep -Eo kernel.*-selftests-internal)"
-            rlRun "yum install -y $kselftests --enablerepo=* --skip-broken"
+            kselftests="$(dnf --enablerepo=* list $kernelVar-selftests-internal | grep -Eo kernel.*-selftests-internal)"
+            rlRun "yum install -y --enablerepo=* --skip-broken $kselftests"
         fi
     rlPhaseEnd
 
