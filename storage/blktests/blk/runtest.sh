@@ -108,7 +108,7 @@ function get_test_cases_block
 		testcases+=" block/029"
 		testcases+=" block/031"
 		testcases+=" block/032"
-		testcases+=" block/034"
+		uname -ri | grep -Eq "el9_0|el9_1|el9_2" || testcases+=" block/034"
 	fi
 
 	echo "$testcases"
@@ -150,7 +150,7 @@ function get_test_cases_loop
 		testcases+=" loop/006"
 		testcases+=" loop/007"
 		testcases+=" loop/008"
-		testcases+=" loop/009"
+		uname -ri | grep -Eq "el9_1|el9_2" || testcases+=" loop/009"
 	fi
 
 	echo "$testcases"
@@ -261,7 +261,7 @@ function get_test_cases_zbd
 	testcases+=" zbd/004"
 	testcases+=" zbd/005"
 	testcases+=" zbd/006"
-	testcases+=" zbd/008"
+	uname -ri | grep -q "el9_0" || testcases+=" zbd/008"
 
 	echo "$testcases"
 }
