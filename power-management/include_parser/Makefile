@@ -33,31 +33,31 @@ FILES=$(METADATA) runtest.sh Makefile PURPOSE parser1 README parser1.sysinfo_def
 .PHONY: all install download clean
 
 run: $(FILES) build
-        ./runtest.sh
+	./runtest.sh
 
 build: $(BUILT_FILES)
-        test -x runtest.sh || chmod a+x runtest.sh
+	test -x runtest.sh || chmod a+x runtest.sh
 
 clean:
-        rm -f *~ $(BUILT_FILES)
+	rm -f *~ $(BUILT_FILES)
 
 
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-        @echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
-        @echo "Name:            $(TEST)" >> $(METADATA)
-        @echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-        @echo "Path:            $(TEST_DIR)" >> $(METADATA)
-        @echo "Description:     Parser for simple tests" >> $(METADATA)
-        @echo "Type:            library" >> $(METADATA)
-        @echo "TestTime:        10m" >> $(METADATA)
-        @echo "RunFor:          kernel" >> $(METADATA)
-        @echo "Requires:        kernel" >> $(METADATA)
-        @echo "Requires:        bc" >> $(METADATA)
-        @echo "Priority:        Normal" >> $(METADATA)
-        @echo "License:         GPLv2" >> $(METADATA)
-        @echo "Confidential:    no" >> $(METADATA)
-        @echo "Destructive:     no" >> $(METADATA)
+	@echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
+	@echo "Name:            $(TEST)" >> $(METADATA)
+	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
+	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
+	@echo "Description:     Parser for simple tests" >> $(METADATA)
+	@echo "Type:            library" >> $(METADATA)
+	@echo "TestTime:        10m" >> $(METADATA)
+	@echo "RunFor:          kernel" >> $(METADATA)
+	@echo "Requires:        kernel" >> $(METADATA)
+	@echo "Requires:        bc" >> $(METADATA)
+	@echo "Priority:        Normal" >> $(METADATA)
+	@echo "License:         GPLv2" >> $(METADATA)
+	@echo "Confidential:    no" >> $(METADATA)
+	@echo "Destructive:     no" >> $(METADATA)
 
-        rhts-lint $(METADATA)
+	rhts-lint $(METADATA)

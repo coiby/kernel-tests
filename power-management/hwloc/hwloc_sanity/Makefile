@@ -35,33 +35,34 @@ FILES=$(METADATA) runtest.sh Makefile PURPOSE hwloc_sanity.sh
 .PHONY: all install download clean
 
 run: $(FILES) build
-        ./runtest.sh
+	./runtest.sh
 
 build: $(BUILT_FILES)
-        test -x runtest.sh || chmod a+x runtest.sh
+	test -x runtest.sh || chmod a+x runtest.sh
+	test -x hwloc_sanity.sh || chmod a+x hwloc_sanity.sh
 
 clean:
-        rm -f *~ $(BUILT_FILES)
+	rm -f *~ $(BUILT_FILES)
 
 
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-        @echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
-        @echo "Name:            $(TEST)" >> $(METADATA)
-        @echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-        @echo "Path:            $(TEST_DIR)" >> $(METADATA)
-        @echo "Description:     Confirm RAPL is supported" >> $(METADATA)
-        @echo "Type:            Sanity" >> $(METADATA)
-        @echo "TestTime:        5m" >> $(METADATA)
-        @echo "RunFor:          kernel" >> $(METADATA)
-        @echo "Requires:        kernel" >> $(METADATA)
-        @echo "Requires:        hwloc" >> $(METADATA)
-        @echo "Requires:        bc" >> $(METADATA)
-        @echo "Requires:        beakerlib" >> $(METADATA)
-        @echo "Priority:        Normal" >> $(METADATA)
-        @echo "License:         GPLv2" >> $(METADATA)
-        @echo "Confidential:    no" >> $(METADATA)
-        @echo "Destructive:     no" >> $(METADATA)
+	 @echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
+	@echo "Name:            $(TEST)" >> $(METADATA)
+	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
+	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
+	@echo "Description:     Confirm RAPL is supported" >> $(METADATA)
+	@echo "Type:            Sanity" >> $(METADATA)
+	@echo "TestTime:        5m" >> $(METADATA)
+	@echo "RunFor:          kernel" >> $(METADATA)
+	@echo "Requires:        kernel" >> $(METADATA)
+	@echo "Requires:        hwloc" >> $(METADATA)
+	@echo "Requires:        bc" >> $(METADATA)
+	@echo "Requires:        beakerlib" >> $(METADATA)
+	@echo "Priority:        Normal" >> $(METADATA)
+	@echo "License:         GPLv2" >> $(METADATA)
+	@echo "Confidential:    no" >> $(METADATA)
+	@echo "Destructive:     no" >> $(METADATA)
 
-        rhts-lint $(METADATA)
+	rhts-lint $(METADATA)
