@@ -35,33 +35,41 @@ FILES=$(METADATA) runtest.sh Makefile PURPOSE 00_gather_clamp_data__by5.sh 01_co
 .PHONY: all install download clean
 
 run: $(FILES) build
-        ./runtest.sh
+	./runtest.sh
 
 build: $(BUILT_FILES)
-        test -x runtest.sh || chmod a+x runtest.sh
+	test -x runtest.sh || chmod a+x runtest.sh
+	test -x 00_gather_clamp_data__by5.sh || chmod a+x 00_gather_clamp_data__by5.sh
+	test -x 01_compare_loads.sh  || chmod a+x 01_compare_loads.sh
+	chmod a+x 02_compare_idle_and_load.py
+	test -x load1.sh || chmod a+x load1.sh
+	test -x load_m.sh || chmod a+x load_m.sh
+	test -x warn.sh || chmod a+x warn.sh
+	test -x energy.sh || chmod a+x energy.sh
+	test -x init_machine.sh || chmod a+x init_machine.sh
 
 clean:
-        rm -f *~ $(BUILT_FILES)
+	rm -f *~ $(BUILT_FILES)
 
 
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-        @echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
-        @echo "Name:            $(TEST)" >> $(METADATA)
-        @echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-        @echo "Path:            $(TEST_DIR)" >> $(METADATA)
-        @echo "Description:     Confirm RAPL is supported" >> $(METADATA)
-        @echo "Type:            Sanity" >> $(METADATA)
-        @echo "TestTime:        100m" >> $(METADATA)
-        @echo "RunFor:          kernel" >> $(METADATA)
-        @echo "Requires:        kernel" >> $(METADATA)
-        @echo "Requires:        kernel-tools" >> $(METADATA)
-        @echo "Requires:        cpupowerutils" >> $(METADATA)
-        @echo "Requires:        perf" >> $(METADATA)
-        @echo "Priority:        Normal" >> $(METADATA)
-        @echo "License:         GPLv2" >> $(METADATA)
-        @echo "Confidential:    no" >> $(METADATA)
-        @echo "Destructive:     no" >> $(METADATA)
+	@echo "Owner:           Erik Hamera <ehamera@redhat.com>" > $(METADATA)
+	@echo "Name:            $(TEST)" >> $(METADATA)
+	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
+	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
+	@echo "Description:     Confirm RAPL is supported" >> $(METADATA)
+	@echo "Type:            Sanity" >> $(METADATA)
+	@echo "TestTime:        100m" >> $(METADATA)
+	@echo "RunFor:          kernel" >> $(METADATA)
+	@echo "Requires:        kernel" >> $(METADATA)
+	@echo "Requires:        kernel-tools" >> $(METADATA)
+	@echo "Requires:        cpupowerutils" >> $(METADATA)
+	@echo "Requires:        perf" >> $(METADATA)
+	@echo "Priority:        Normal" >> $(METADATA)
+	@echo "License:         GPLv2" >> $(METADATA)
+	@echo "Confidential:    no" >> $(METADATA)
+	@echo "Destructive:     no" >> $(METADATA)
 
-        rhts-lint $(METADATA)
+	rhts-lint $(METADATA)

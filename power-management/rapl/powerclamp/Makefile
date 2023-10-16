@@ -39,6 +39,14 @@ run: $(FILES) build
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
+	test -x 00_gather_clamp_data.sh || chmod a+x 00_gather_clamp_data.sh
+	test -x 01_compare_loads.sh || chmod a+x 01_compare_loads.sh
+	test -x 02_compare_idle_and_load.sh || chmod a+x 02_compare_idle_and_load.sh
+	test -x 03_check_clamped.sh || chmod a+x 03_check_clamped.sh
+	test -x load1.sh || chmod  a+x load1.sh
+	test -x load_m.sh || chmod a+x load_m.sh
+	test -x warn.sh || chmod a+x warn.sh
+	test -x energy.sh || chmod a+x energy.sh
 
 clean:
 	rm -f *~ $(BUILT_FILES)
