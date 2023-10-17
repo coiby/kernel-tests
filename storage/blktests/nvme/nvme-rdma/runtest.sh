@@ -84,7 +84,7 @@ function get_test_cases_rdma
 		testcases+=" nvme/028"
 		testcases+=" nvme/029"
 		uname -ri | grep -q "4.18.0-147.*s390x" || testcases+=" nvme/030" # BZ1753057, skip on 8.1.z fixed on 8.2
-		uname -ri | grep "4.18.0-147" | grep -Eq "s390x|ppc64le|aarch64" || testcases+=" nvme/031"
+		uname -ri | grep -qE "el8_1|el8_6|el8_7" || testcases+=" nvme/031"
 	elif rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
 		testcases+=" nvme/003"
 		testcases+=" nvme/004"
@@ -121,7 +121,7 @@ function get_test_cases_rdma
 		testcases+=" nvme/044"
 		testcases+=" nvme/045"
 		testcases+=" nvme/047"
-		testcases+=" nvme/048"
+		uname -ri | grep -Eq "el9_0|el9_1|el9_2" || testcases+=" nvme/048"
 
 	fi
 

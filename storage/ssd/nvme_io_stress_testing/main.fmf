@@ -12,6 +12,7 @@ require:
   - fio
   - nvme-cli
   - wget
+  - gcc
 duration: 3h
 tag:
   - regression
