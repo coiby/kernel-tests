@@ -62,16 +62,28 @@ function install_bufio
     cki_debug
 
     local bufio_dir
+    local os_version
+    os_version="9"
     bufio_dir=$(basename $BUFIO_REPO)
     if [ -e "/tmp/$bufio_dir" ]; then
         rm -rf "/tmp/$bufio_dir"
     fi
     git clone $BUFIO_REPO /tmp/"$bufio_dir" || return 1
     pushd "/tmp/$bufio_dir" || return 1
-    if [[ -e /etc/redhat-release ]]; then
+    # bufio has only rhel-8 and rhel-9 branches at the moment
+    # use rhel-9 branch for fedora
+    if [ -e "/etc/fedora-release" ]; then
+      os_version="9"
+      echo "Found fedora-release, using rhel-9 branch."
+    elif [ -e "/etc/redhat-release" ]; then
       os_version=$(cut -d" " -f6 /etc/redhat-release | cut -d"." -f1)
-    else
+      echo "Found major version $os_version in redhat-release."
+    elif [ -e "/etc/centos-release" ]; then
       os_version=$(cut -d" " -f4 /etc/centos-release)
+      echo "Found major version $os_version in centos-release."
+    fi
+    if (( os_version > 9 )); then
+        os_version="9"
     fi
     git checkout rhel-"$os_version"
     make -C /lib/modules/"$(uname -r)"/build M="$PWD"
