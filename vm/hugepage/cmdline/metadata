@@ -1,0 +1,13 @@
+[General]
+name=/kernel-tests/vm/hugepages/cmdline
+owner=Shu Wang  <shuwang@redhat.com>
+description=KG-VMM hugepage-cmdline
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+softDependencies=grubby
+repoRequires=cmdline_helper;kernel-include

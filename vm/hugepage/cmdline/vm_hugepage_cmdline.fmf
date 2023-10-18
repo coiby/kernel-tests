@@ -1,0 +1,13 @@
+summary: hugepages from cmdline
+description: KG-VMM hugepage-cmdline
+contact: Shu Wang  <shuwang@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+id: ea2cc455-c489-43e4-b66d-9ca84f2be03d
+framework: beakerlib
+recommend:
+  - grubby
+duration: 30m
+extra-summary: /kernel/vm/hugepage/cmdline
+extra-task: /kernel/vm/hugepage/cmdline
