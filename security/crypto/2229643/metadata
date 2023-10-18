@@ -1,0 +1,13 @@
+[General]
+description=Security Crypto verifier for 2229643
+name=/kernel-tests/security/crypto/2229643
+owner=Dennis Li <denli@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=20m
+dependencies=gcc;strace;make
+

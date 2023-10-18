@@ -1,0 +1,16 @@
+summary: Security Crypto verifier for 2229643
+discover:
+    how: fmf
+    test:
+        - /security/crypto/2229643/tests/2229643
+execute:
+    how: tmt
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./automotive/include/rhivos.sh
+        install_repos
+environment-file:
+        - ./security/crypto/2229643/plans/tmt.env
+
