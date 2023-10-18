@@ -1276,6 +1276,7 @@ function Main ()
         SelectKernel $KERNELARGVERSION $KERNELARGVARIANT
         if [ "$?" -ne "0" ]; then
             RprtRslt $TEST/SelectKernel FAIL $?
+            RHTSAbort
         else
             # Now that the kernel is our default... Let's reboot
             echo "***** End of kernel install test *****" | tee -a $OUTPUTFILE
