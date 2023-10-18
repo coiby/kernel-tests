@@ -1090,6 +1090,7 @@ nf_log_common.ko
 nf_log_ipv4.ko
 nf_log_ipv6.ko
 nf_log_netdev.ko
+nf_log_syslog.ko
 nf_nat_amanda.ko
 nf_nat_ftp.ko
 nf_nat_h323.ko
