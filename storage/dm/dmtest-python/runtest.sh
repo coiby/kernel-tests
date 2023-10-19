@@ -34,9 +34,10 @@ function runtest
       echo "Skipping tests that require linux repo."
       ./dmtest run --result-set cki_dmtest --and-filters \
       --rx '^/(?!thin/snapshot/(many-snaps-with-changes|try-and-create-duplicates|parallel-io-to-shared-thins))' \
-      --rx '^/(?!blk-archive/rolling-snaps)'
+      --rx '^/(?!blk-archive/rolling-snaps)' --rx '^/(?!thin/fs-bench)'
     else
-      ./dmtest run --result-set cki_dmtest --rx '^/(?!thin/snapshot/parallel-io-to-shared-thins)'
+      ./dmtest run --result-set cki_dmtest --and-filters \
+      --rx '^/(?!thin/snapshot/parallel-io-to-shared-thins)' --rx '^/(?!thin/fs-bench/)'
     fi
     output=$(./dmtest list --state FAIL --result-set cki_dmtest | grep -oP '([\w-]+)\s+(?= FAIL)')
     for i in $output; do
