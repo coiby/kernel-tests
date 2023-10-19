@@ -47,7 +47,7 @@ rlJournalStart
         else
             kconfig="/boot/config-$(uname -r)"
             rlRun "yum install -y kernel-selftests-internal-${kver}-${krel} \
-		|| yum install -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/kernel-selftests-internal-${kver}-${krel}.${karch}.rpm"
+                || yum install -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/kernel-selftests-internal-${kver}-${krel}.${karch}.rpm"
         fi
     rlPhaseEnd
 
