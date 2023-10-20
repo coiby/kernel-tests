@@ -1,0 +1,12 @@
+[General]
+name=storage/block/RHEL-11068_failed_to_umount_fs_on_nvme
+owner=Changhui Zhong <czhong@redhat.com>
+description=failed to umount fs when remove nvme disk and dd hang
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+max_time=2h
