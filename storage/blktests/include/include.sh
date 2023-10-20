@@ -3,9 +3,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-FILE=$(readlink -f "${BASH_SOURCE[0]}")
-CDIR=$(dirname "$FILE")
-source "$CDIR"/../../../cki_lib/libcki.sh || exit 1
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/../../../cki_lib/libcki.sh || exit 1
 
 function disable_multipath
 {
