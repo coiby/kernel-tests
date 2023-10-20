@@ -23,6 +23,8 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+BUILDS_URL="${BUILDS_URL:-}"
+
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
@@ -34,19 +36,18 @@ rlJournalStart
                 rstrnt-report-result $RSTRNT_TASKNAME SKIP
                 exit 0 ;;
         esac
-        knvr="$(uname -r)"
+
+        karch=$(uname -m)
+        kver=$(uname -r | cut -f1 -d'-')
+        krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//" -e "s/\.$karch+rt$//" -e "s/\.$karch.rt$//")
+
         if [ -e /run/ostree-booted ]; then
-            kconfig="/usr/lib/ostree-boot/config-$knvr"
+            kconfig="/usr/lib/ostree-boot/config-$(uname -r)"
             rlRun "rpm-ostree -A --idempotent --allow-inactive install kernel-automative-selftests-internal"
         else
-            kconfig="/boot/config-$knvr"
-            if [[ $knvr =~ rt ]]; then
-                kernelVar="kernel-rt"
-            else
-                kernelVar="kernel"
-            fi
-            kselftests="$(dnf --enablerepo=* list $kernelVar-selftests-internal | grep -Eo kernel.*-selftests-internal)"
-            rlRun "yum install -y --enablerepo=* --skip-broken $kselftests"
+            kconfig="/boot/config-$(uname -r)"
+            rlRun "yum install -y kernel-selftests-internal-${kver}-${krel} \
+                || yum install -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/kernel-selftests-internal-${kver}-${krel}.${karch}.rpm"
         fi
     rlPhaseEnd
 
