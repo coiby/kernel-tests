@@ -249,6 +249,11 @@ function get_vdo_dev()
 function get_test_dev()
 {
 	local DEV_TYPE="$1"
+	if [[ $FREE -lt $(( test_size + scratch_size + 1 )) ]]; then
+		echo "Not enough space for approx loop sizes so allocate 35% of FREE for test_dev"
+		test_size=$(("$FREE * 35 / 100"))
+		echo "New test_size : ${test_size}G"
+	fi
 
 	if [ -z "$DEV_TYPE" ]; then
 		# For nfs{,3,4} and tmpfs cifs just set DEV_TYPE variable to FSTYPE
@@ -393,7 +398,7 @@ EOF
 		fi
 		TEST_DEV="$(echo /dev/mapper/*-xfstest)"
 		if ! test -b "$TEST_DEV";then
-			TEST_DEV=$(get_loop_dev testfile.img 6G)
+			TEST_DEV=$(get_loop_dev testfile.img ${test_size}G)
 			DEV_TYPE=loop
 			if ! test -b "$TEST_DEV";then
 				report get_test_dev:any FAIL 0
@@ -404,7 +409,7 @@ EOF
 		fi
 		;;
 	default|loop)
-		TEST_DEV=$(get_loop_dev testfile.img 6G)
+		TEST_DEV=$(get_loop_dev testfile.img ${test_size}G)
 		DEV_TYPE=loop
 		if ! test -b "$TEST_DEV";then
 			report get_test_dev:loop FAIL 0
@@ -483,6 +488,11 @@ function systemd_disable_mount_unit()
 function get_scratch_dev()
 {
 	local DEV_TYPE="$1"
+	if [[ $FREE -lt $(( test_size + scratch_size + 1 )) ]]; then
+		echo "Not enough space for approx loop sizes so allocate 60% of FREE for scratch_dev"
+		scratch_size=$(("$FREE * 6 / 10"))
+		echo "New scratch_size : ${scratch_size}G"
+	fi
 
 	if [ -z "$DEV_TYPE" ]; then
 		# For nfs{,3,4} and tmpfs cifs just set DEV_TYPE variable to FSTYPE
@@ -610,7 +620,7 @@ EOF
 		fi
 		SCRATCH_DEV="$(echo /dev/mapper/*-xfscratch)"
 		if ! test -b "$SCRATCH_DEV";then
-			SCRATCH_DEV=$(get_loop_dev scratchfile.img 12G)
+			SCRATCH_DEV=$(get_loop_dev scratchfile.img ${scratch_size}G)
 			DEV_TYPE=loop
 			if ! test -b "$SCRATCH_DEV";then
 				report get_scratch_dev:loop FAIL 0
@@ -621,7 +631,7 @@ EOF
 		fi
 		;;
 	default|loop)
-		SCRATCH_DEV=$(get_loop_dev scratchfile.img 12G)
+		SCRATCH_DEV=$(get_loop_dev scratchfile.img ${scratch_size}G)
 		DEV_TYPE=loop
 		if ! test -b "$SCRATCH_DEV";then
 			report get_scratch_dev:loop FAIL 0
@@ -1274,4 +1284,13 @@ export FSTYPE=${FSTYPE:-xfs}
 echo "####################"
 lsblk
 df -h
+FREE=$(df -kh --output=avail / | tail -n 1 | sed 's|G||')
+echo "Free Space: $FREE"
+export FREE
+test_size=${XFS_LOOP_TEST_SIZE_G:-6}
+echo "Test_Dev_Loop_G: $test_size"
+export test_size
+scratch_size=${XFS_LOOP_SCRATCH_SIZE_G:-12}
+echo "Scratch_Dev_Loop_G: $scratch_size"
+export scratch_size
 echo "####################"
