@@ -3,36 +3,9 @@
 
 TNAME="storage/blktests"
 
-. ../include/include.sh || exit 1
-
-function do_test
-{
-	typeset test_ws=$1
-	typeset test_case=$2
-
-	typeset this_case=$test_ws/tests/$test_case
-	echo ">>> $(get_timestamp) | Start to run test case $this_case ..."
-	(cd "$test_ws" && ./check "$test_case")
-	result=$(get_test_result "$test_ws" "$test_case")
-	echo ">>> $(get_timestamp) | End $this_case | $result"
-
-	typeset -i ret=0
-	if [[ $result == "PASS" ]]; then
-		rstrnt-report-result "$TNAME/tests/$test_case" PASS 0
-		ret=0
-	elif [[ $result == "FAIL" ]]; then
-		rstrnt-report-result "$TNAME/tests/$test_case" FAIL 1
-		ret=1
-	elif [[ $result == "SKIP" || $result == "UNTESTED" ]]; then
-		rstrnt-report-result "$TNAME/tests/$test_case" SKIP 0
-		ret=0
-	else
-		rstrnt-report-result "$TNAME/tests/$test_case" WARN 2
-		ret=2
-	fi
-
-	return $ret
-}
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../include/include.sh || exit 1
 
 function get_test_cases_block
 {
@@ -266,35 +239,44 @@ function get_test_cases_zbd
 	echo "$testcases"
 }
 
-if cki_has_kernel_debug_flags; then
-	# the test is not supported on debug kernels due to performance issues
-	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/657
-	rstrnt-report-result "$TNAME" SKIP
-	exit 0
-fi
+function main
+{
+	testcases_default=""
+	testcases_default+=" $(get_test_cases_block)"
+	testcases_default+=" $(get_test_cases_loop)"
+	if ! rlIsRHEL 7; then
+		testcases_default+=" $(get_test_cases_nvme)"
+		testcases_default+=" $(get_test_cases_scsi)"
+	fi
+	if rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
+		testcases_default+=" $(get_test_cases_zbd)"
+	fi
+	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
+	test_ws=./blktests
+	ret=0
+	for testcase in $testcases; do
+		do_test "$test_ws" "$testcase"
+		result=$(get_test_result "$test_ws" "$testcase")
+		report_test_result "$result" "$TNAME/tests/$testcase"
+		((ret += $?))
+	done
 
-. ./build.sh
+	if [[ $ret -ne 0 ]]; then
+		echo ">> There are failing tests, pls check it"
+	fi
+}
 
-testcases_default=""
-testcases_default+=" $(get_test_cases_block)"
-testcases_default+=" $(get_test_cases_loop)"
-if ! rlIsRHEL 7; then
-	testcases_default+=" $(get_test_cases_nvme)"
-	testcases_default+=" $(get_test_cases_scsi)"
-fi
-if rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
-	testcases_default+=" $(get_test_cases_zbd)"
-fi
-testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
-test_ws=./blktests
-ret=0
-for testcase in $testcases; do
-	do_test "$test_ws" "$testcase"
-	((ret += $?))
-done
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+	if cki_has_kernel_debug_flags; then
+		# the test is not supported on debug kernels due to performance issues
+		# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/657
+		rstrnt-report-result "$TNAME" SKIP
+		exit 0
+	fi
 
-if [[ $ret -ne 0 ]]; then
-	echo ">> There are failing tests, pls check it"
-fi
+	. "$CDIR"/build.sh
 
-exit 0
+	main
+fi
