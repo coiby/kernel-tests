@@ -58,10 +58,12 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "kselftest"
-        rlRun "/usr/libexec/kselftests/bpf/test_progs -t test_lsm | tee output.txt"
+        rlRun "pushd /usr/libexec/kselftests/bpf"
+        rlRun "./test_progs -t test_lsm | tee output.txt"
         rlRun "grep '0 SKIPPED' output.txt"
         rlRun "grep '0 FAILED' output.txt"
         rlFileSubmit output.txt
+        rlRun "popd"
     rlPhaseEnd
 
     rlPhaseStartCleanup
