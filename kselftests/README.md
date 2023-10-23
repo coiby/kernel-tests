@@ -1,6 +1,8 @@
 # kselftest test
 This is a test wrapper for [kernel selftest](https://github.com/torvalds/linux/tree/master/tools/testing/selftests) to be run in beaker test environment.
 
+You are also encouraged to read the [documentation](https://www.kernel.org/doc/html/latest/dev-tools/kselftest.html) on how to run these tests outside of the wrapper.
+
 ## How to run it
 Please refer to the top-level README.md for common dependencies.
 
@@ -62,8 +64,50 @@ Allowance for custom functions
 - If you need to run the tests specially instead of the global running process, you can define your own running function like `do_<collection>_run`.
 - Patch for all collections is applied before the harness is built. Setup and reset for each collection is executed before and after each collection is executed.
 
-1. - TODO: At this time there is no support for individual tests being part of TEST_ITEMS. A crude workaround would be to add all tests you want to skip to SKIP_TARGETS, leaving only the tests you want to run in the collection not skipped.
-1. - TODO: At this time there is no support for collections being part of SKIP_TARGETS. This is only a potential issue with pre-built package delivered with the kernel. Currently when BUILD_FROM_SRC is set to 2 the script ignores TEST_ITEMS. A crude workaround would be to select all tests from the collection you want to skip and include them in SKIP_TARGETS.
+- TODO: At this time there is no direct support for individual tests being part of TEST_ITEMS. As a workaround you can create a custom function to run only those tests you want in a collection. Below are steps to follow in and a couple of examples.
+    - create an include file or add your function to one of the existing include files in the `kselftests/include` folder.
+    - The function name must include the name of the collection. So for net it would be do_net_run. But for net/forwarding you would change the `/` to `_` making the name do_net_forwarding_run.
+    - You can now add the tests you want to run from that collection executing them with RunKSelfTest.\
+    e.g.
+    ```
+    do_net_forwarding_run()
+    {
+        for test in \
+            net/forwarding:mirror_gre_lag_lacp.sh \
+            net/forwarding:mirror_gre_bridge_1q_lag.sh
+        do
+            RunKSelfTest ${test}
+            ret=$?
+            check_result 1 1 ${test} $ret
+        done
+    }
+   ```   
+    - The `1 1` in check_result represents the current test number and total number of tests run. You can add a count to make this accurate for reporting but in the example above this was for debugging so the count was ignored.
+    - an example where count is added to correctly generate and show the current test and total.
+    ```
+    do_cgroup_run()
+    {
+        pushd ${EXEC_DIR}
+        total=$(grep -c "^cgroup:" kselftest-list.txt)
+        tests="$(grep  "^cgroup:" kselftest-list.txt)"
+        for test in ${tests}
+        do
+            num=$(($num + 1))
+            if [ "${test}" = "cgroup:test_cpuset_prs.sh" ]; then
+                pushd cgroup || exit
+                ./${test##cgroup:} -d 2
+                popd || exit
+            else
+                RunKSelfTest ${test}
+            fi
+            ret=$?
+            check_result ${num} ${total} ${test} $ret
+        done
+    }
+    ```
+    - You would then run selftests as normal, adding the collections in TEST_ITEMS that you want to test.
+    - You will now also have to make sure to include the .sh that has the function you want to run, so `INCLUDE: <your>.sh`.
+    - Adding multiple include files is also supported, but make sure if you do that there isn't another `do_<collection>_xxx` in that include file.
 
 ### General flow
 ```
