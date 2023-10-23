@@ -160,10 +160,10 @@
 /storage/block/zstd_compression/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/block/zstd_smoke/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/dm/common/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/storage/dm/dmtest-python/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/hba/san-device-stress/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/hw_raid/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/iscsi/params/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/storage/lvm/device-mapper/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/lvm/snapper/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/lvm/thinp/sanity/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/lvm/thinp/stqe/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -285,10 +285,10 @@
 /storage/block/zstd_compression/ @bgoncalv @czhong2 @lulinqing
 /storage/block/zstd_smoke/ @bgoncalv @czhong2 @lulinqing
 /storage/dm/common/ @bgoncalv @guazhang @lulinqing
+/storage/dm/dmtest-python/ @bgoncalv @fsuba @lulinqing
 /storage/hba/san-device-stress/ @bgoncalv @lilinredhat @lulinqing @mpatalan
 /storage/hw_raid/ @bgoncalv @lilinredhat @lulinqing @mpatalan
 /storage/iscsi/params/ @bgoncalv @lulinqing @mhoyer
-/storage/lvm/device-mapper/ @bgoncalv @lulinqing @snitm
 /storage/lvm/snapper/ @bgoncalv @fsuba @lulinqing
 /storage/lvm/thinp/sanity/ @bgoncalv @fsuba @lulinqing
 /storage/lvm/thinp/stqe/ @bgoncalv @fsuba @lulinqing
