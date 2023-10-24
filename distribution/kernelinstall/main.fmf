@@ -1,7 +1,6 @@
 summary: Installs required kernel
 contact: Jeff Bastian <jbastian@redhat.com>
 test: chmod a+x ./runtest.sh; ./runtest.sh
-path: /distribution/kernelinstall
 framework: shell
 require:
   - iproute
