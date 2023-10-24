@@ -270,9 +270,29 @@ do_bpf_reset()
 	reset_network_env
 }
 
+# Download upstream bpf DENYLIST and update the waive list
+update_bpf_waive_list()
+{
+	local link="https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git/plain/tools/testing/selftests/bpf/DENYLIST"
+	local arch=$(uname -m)
+	local prog
+
+	if ! wget -q ${link}.${arch} -O /tmp/DENYLIST; then
+		wget -q ${link} -O /tmp/DENYLIST
+	fi
+
+	for prog in $(cat /tmp/DENYLIST | grep -v "^#" | awk '{print $1}' | cut -f 1 -d '/'); do
+		WAIVE_TARGETS="$WAIVE_TARGETS bpf_test_progs:${prog}"
+	done
+
+	log "WAIVE_TARGETS are $WAIVE_TARGETS"
+	submit_log /tmp/DENYLIST
+}
+
 do_bpf_test_progs_config()
 {
 	set_network_env
+	update_bpf_waive_list
 
 	# bz1969582 - the bpf:test_progs tests hit an expected mmap_zero avc
 	# denial, unless we first turn mmap_low_allowed on
