@@ -181,7 +181,7 @@ RunTest()
     r_test=$1
     testlog=${TESTAREA}/$r_test.log
 
-    rlRun "./run_tests.py -t $r_test 2>&1 > $testlog"
+    rlRun "./run_tests.py -t $r_test 2>&1" | tee $testlog
 
     rlLog "========== SHOW RUNNING STATISTICS: =========="
         rlRun "tail -n 13 $testlog" 0
