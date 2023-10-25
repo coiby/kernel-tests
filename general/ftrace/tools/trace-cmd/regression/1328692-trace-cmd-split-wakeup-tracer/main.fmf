@@ -9,3 +9,4 @@ tier: 2
 tag: [tier2]
 extra-summary: /kernel/general/ftrace/tools/trace-cmd/regression/1328692-trace-cmd-split-wakeup-tracer
 extra-task: /kernel/general/ftrace/tools/trace-cmd/regression/1328692-trace-cmd-split-wakeup-tracer
+id: 523ae5fb-6012-4eaf-aac2-97a000b6ed76

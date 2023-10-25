@@ -7,3 +7,4 @@ framework: beakerlib
 duration: 60m
 extra-summary: /kernel/general/ftrace/sanity/stacktrace
 extra-task: /kernel/general/ftrace/sanity/stacktrace
+id: 99407cf8-0d47-4c8d-8a2f-daa1f0626ffd

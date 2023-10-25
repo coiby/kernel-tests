@@ -15,3 +15,4 @@ link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1123102
 extra-summary: /kernel/general/ftrace/regression/1123102-kernel-panic-in-trace_find_cmdline
 extra-task: /kernel/general/ftrace/regression/1123102-kernel-panic-in-trace_find_cmdline
+id: 1a19b96a-a3c4-41a7-9fdc-a025773e8376

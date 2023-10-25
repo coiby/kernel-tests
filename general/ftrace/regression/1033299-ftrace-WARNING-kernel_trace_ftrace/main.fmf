@@ -26,3 +26,4 @@ tier: 2
 tag: [tier2]
 extra-summary: /kernel/general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace
 extra-task: /kernel/general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace
+id: f63b91ce-401d-4c9d-b009-91c0221d4fcb

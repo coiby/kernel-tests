@@ -10,3 +10,4 @@ tier: 2
 tag: [tier2]
 extra-summary: /kernel/general/ftrace/tools/trace-cmd/regression/1389223-seg-fault-if-snapshot-in-wakeup-tracer
 extra-task: /kernel/general/ftrace/tools/trace-cmd/regression/1389223-seg-fault-if-snapshot-in-wakeup-tracer
+id: 99ebfe4a-d4b5-4764-a29e-b54e7f4b5c34
