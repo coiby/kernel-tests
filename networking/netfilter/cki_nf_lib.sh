@@ -180,7 +180,7 @@ libmnl"
 		esac
 		local Ver
 		find_proper_version $name $release Ver
-		wget http://www.netfilter.org/projects/${name}/files/${name}-${Ver}.tar.bz2 || \
+		wget --no-check-certificate http://www.netfilter.org/projects/${name}/files/${name}-${Ver}.tar.bz2 || \
 			{ echo "Download ${name}-${Ver}.tar.bz2 fail"; return 2; }
 		tar jxf ${name}-${Ver}.tar.bz2
 		local retry=true
