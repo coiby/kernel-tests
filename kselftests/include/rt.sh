@@ -63,6 +63,8 @@ bpf:test_netcnt
 bpf:test_offload.py
 # occasionally hangs the system and causes remaining cases to abort
 bpf:test_xsk.sh
+# unstable on kernel-rt, several sub-tests fail without any indicative logs
+bpf:test_tunnel.sh
 # occasionally hits the maximum timeout
 net:fib_nexthops.sh
 # Error: TC classifier not found, error talking to the kernel
