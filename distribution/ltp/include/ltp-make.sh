@@ -416,6 +416,7 @@ build-all()
     if [[ ${res} == "PASSED" ]]; then
         echo "${TESTVERSION}" > ${TARGET_DIR}/ltp_version
     fi
+    SubmitLog ./buildlog.txt
 }
 
 # For manual testing
