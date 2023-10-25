@@ -28,11 +28,11 @@ Describe 'blktests - nvme-rdma - main'
         When call main
 
         The line 1 should equal "enable_nvme_core_multipath"
-        The line 2 should equal "do_test ./blktests nvme/001"
+        The line 2 should equal "do_test ${CDIR}/blktests nvme/001"
         The line 3 should equal "nvme_trtype = rdma"
         The line 4 should equal "use_siw = "
         The line 5 should equal "rstrnt-report-result  nvme-rdma: storage/blktests/nvme/nvme-rdma/tests/nvme/001 PASS 0"
-        The line 6 should equal "do_test ./blktests nvme/001"
+        The line 6 should equal "do_test ${CDIR}/blktests nvme/001"
         The line 7 should equal "nvme_trtype = rdma"
         The line 8 should equal "use_siw = 1"
         The line 9 should equal "rstrnt-report-result use_siw=1 nvme-rdma: storage/blktests/nvme/nvme-rdma/tests/nvme/001 PASS 0"

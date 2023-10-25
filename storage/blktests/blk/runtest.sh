@@ -252,7 +252,7 @@ function main
 		testcases_default+=" $(get_test_cases_zbd)"
 	fi
 	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
-	test_ws=./blktests
+	test_ws="${CDIR}"/blktests
 	ret=0
 	for testcase in $testcases; do
 		do_test "$test_ws" "$testcase"

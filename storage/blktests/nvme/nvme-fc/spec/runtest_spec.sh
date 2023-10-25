@@ -26,7 +26,7 @@ Describe 'blktests - nvme-fc - main'
         When call main
 
         The line 1 should equal "enable_nvme_core_multipath"
-        The line 2 should equal "do_test ./blktests nvme/003"
+        The line 2 should equal "do_test ${CDIR}/blktests nvme/003"
         The line 3 should equal "nvme_trtype = fc"
         The line 4 should equal "rstrnt-report-result nvme-fc: storage/blktests/nvme/nvme-fc/tests/nvme/003 PASS 0"
         The status should be success

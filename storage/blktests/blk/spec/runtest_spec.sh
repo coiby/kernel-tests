@@ -51,9 +51,9 @@ Describe 'blktests - blk - main'
         export _RHEL_VER=7
         When call main
 
-        The line 1 should equal "do_test ./blktests block/001"
+        The line 1 should equal "do_test ${CDIR}/blktests block/001"
         The line 2 should equal "rstrnt-report-result storage/blktests/tests/block/001 PASS 0"
-        The line 3 should equal "do_test ./blktests loop/001"
+        The line 3 should equal "do_test ${CDIR}/blktests loop/001"
         The line 4 should equal "rstrnt-report-result storage/blktests/tests/loop/001 PASS 0"
         The status should be success
     End
@@ -62,13 +62,13 @@ Describe 'blktests - blk - main'
         export _RHEL_VER=8
         When call main
 
-        The line 1 should equal "do_test ./blktests block/001"
+        The line 1 should equal "do_test ${CDIR}/blktests block/001"
         The line 2 should equal "rstrnt-report-result storage/blktests/tests/block/001 PASS 0"
-        The line 3 should equal "do_test ./blktests loop/001"
+        The line 3 should equal "do_test ${CDIR}/blktests loop/001"
         The line 4 should equal "rstrnt-report-result storage/blktests/tests/loop/001 PASS 0"
-        The line 5 should equal "do_test ./blktests nvme/001"
+        The line 5 should equal "do_test ${CDIR}/blktests nvme/001"
         The line 6 should equal "rstrnt-report-result storage/blktests/tests/nvme/001 PASS 0"
-        The line 7 should equal "do_test ./blktests scsi/001"
+        The line 7 should equal "do_test ${CDIR}/blktests scsi/001"
         The line 8 should equal "rstrnt-report-result storage/blktests/tests/scsi/001 PASS 0"
         The status should be success
     End
@@ -77,15 +77,15 @@ Describe 'blktests - blk - main'
         export _RHEL_VER=9
         When call main
 
-        The line 1 should equal "do_test ./blktests block/001"
+        The line 1 should equal "do_test ${CDIR}/blktests block/001"
         The line 2 should equal "rstrnt-report-result storage/blktests/tests/block/001 PASS 0"
-        The line 3 should equal "do_test ./blktests loop/001"
+        The line 3 should equal "do_test ${CDIR}/blktests loop/001"
         The line 4 should equal "rstrnt-report-result storage/blktests/tests/loop/001 PASS 0"
-        The line 5 should equal "do_test ./blktests nvme/001"
+        The line 5 should equal "do_test ${CDIR}/blktests nvme/001"
         The line 6 should equal "rstrnt-report-result storage/blktests/tests/nvme/001 PASS 0"
-        The line 7 should equal "do_test ./blktests scsi/001"
+        The line 7 should equal "do_test ${CDIR}/blktests scsi/001"
         The line 8 should equal "rstrnt-report-result storage/blktests/tests/scsi/001 PASS 0"
-        The line 9 should equal "do_test ./blktests zbd/001"
+        The line 9 should equal "do_test ${CDIR}/blktests zbd/001"
         The line 10 should equal "rstrnt-report-result storage/blktests/tests/zbd/001 PASS 0"
         The status should be success
     End

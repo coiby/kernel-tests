@@ -51,7 +51,7 @@ fi
 function main
 {
 	USE_SIW=${USE_SIW:-"0 1"}
-	test_ws=./blktests
+	test_ws="${CDIR}"/blktests
 	ret=0
 	testcases_default=""
 	testcases_default+=" $(get_test_cases_srp)"
