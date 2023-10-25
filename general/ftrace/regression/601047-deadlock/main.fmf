@@ -15,3 +15,4 @@ link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=601047
 extra-summary: /kernel/general/ftrace/regression/601047-deadlock
 extra-task: /kernel/general/ftrace/regression/601047-deadlock
+id: a14cd1a9-3294-4d58-a3cd-7d6abe8da338

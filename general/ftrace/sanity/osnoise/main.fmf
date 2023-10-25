@@ -8,3 +8,4 @@ framework: beakerlib
 duration: 60m
 extra-summary: /kernel/general/ftrace/sanity/osnoise
 extra-task: /kernel/general/ftrace/sanity/osnoise
+id: 7e6bb7d0-548e-4daf-a91e-7a80f70376b6

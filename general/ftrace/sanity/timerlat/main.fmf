@@ -8,3 +8,4 @@ framework: beakerlib
 duration: 60m
 extra-summary: /kernel/general/ftrace/sanity/timerlat
 extra-task: /kernel/general/ftrace/sanity/timerlat
+id: b54ba68d-b73c-4dc7-9f11-c3e20f2ab132

@@ -9,3 +9,4 @@ tag: [tier2]
 duration: 60m
 extra-summary: /kernel/general/ftrace/regression/1399999-support-advanced-filter-format
 extra-task: /kernel/general/ftrace/regression/1399999-support-advanced-filter-format
+id: e2664020-f726-4a86-b3bb-6044a49d7d0c

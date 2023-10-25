@@ -7,3 +7,4 @@ framework: beakerlib
 duration: 60m
 extra-summary: /kernel/general/ftrace/sanity/hwlat
 extra-task: /kernel/general/ftrace/sanity/hwlat
+id: 1428c83d-9d83-4134-9634-dffb9eb0e749
