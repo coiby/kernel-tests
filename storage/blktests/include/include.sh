@@ -3,9 +3,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-FILE=$(readlink -f "${BASH_SOURCE[0]}")
-CDIR=$(dirname "$FILE")
-source "$CDIR"/../../../cki_lib/libcki.sh || exit 1
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/../../../cki_lib/libcki.sh || exit 1
 
 function disable_multipath
 {
@@ -28,6 +26,19 @@ function enable_nvme_core_multipath
 function get_timestamp
 {
 	date +"%Y-%m-%d %H:%M:%S"
+}
+
+function do_test
+{
+	typeset test_ws=$1
+	typeset test_case=$2
+
+	typeset this_case=$test_ws/tests/$test_case
+	echo ">>> $(get_timestamp) | Start to run test case $this_case ..."
+	cd "$test_ws" || return 1
+	./check "$test_case"
+	echo ">>> $(get_timestamp) | End $this_case"
+	return 0
 }
 
 function get_test_result
@@ -58,4 +69,25 @@ function get_test_result
 	fi
 
 	echo $result
+}
+
+function report_test_result
+{
+	typeset result=$1
+	typeset test_name=$2
+	typeset -i ret=0
+	if [[ $result == "PASS" ]]; then
+		rstrnt-report-result "${test_name}" PASS 0
+		ret=0
+	elif [[ $result == "FAIL" ]]; then
+		rstrnt-report-result "${test_name}" FAIL 1
+		ret=1
+	elif [[ $result == "SKIP" || $result == "UNTESTED" ]]; then
+		rstrnt-report-result "${test_name}" SKIP 0
+		ret=0
+	else
+		rstrnt-report-result "${test_name}" WARN 2
+		ret=2
+	fi
+	return $ret
 }

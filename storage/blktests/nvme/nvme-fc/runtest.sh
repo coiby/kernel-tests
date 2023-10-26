@@ -3,37 +3,9 @@
 TNAME="storage/blktests/nvme/nvme-fc"
 TRTYPE=${TRTYPE:-"fc"}
 
-. ../../include/include.sh || exit 1
-
-function do_test
-{
-	typeset test_ws=$1
-	typeset test_case=$2
-	typeset trtype=$3
-
-	typeset this_case=$test_ws/tests/$test_case
-	echo ">>> $(get_timestamp) | Start to run test case nvme-$trtype: $this_case ..."
-	(cd "$test_ws" && nvme_trtype="$trtype" ./check "$test_case")
-	result=$(get_test_result "$test_ws" "$test_case")
-	echo ">>> $(get_timestamp) | End nvme-$trtype: $this_case | $result"
-
-	typeset -i ret=0
-	if [[ $result == "PASS" ]]; then
-		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" PASS 0
-		ret=0
-	elif [[ $result == "FAIL" ]]; then
-		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" FAIL 1
-		ret=1
-	elif [[ $result == "SKIP" || $result == "UNTESTED" ]]; then
-		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" SKIP 0
-		ret=0
-	else
-		rstrnt-report-result "nvme-$trtype: $TNAME/tests/$test_case" WARN 2
-		ret=2
-	fi
-
-	return $ret
-}
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../../include/include.sh || exit 1
 
 function get_test_cases_fc
 {
@@ -80,23 +52,34 @@ function get_test_cases_fc
 	echo "$testcases"
 }
 
-. ../include/build.sh
+function main
+{
+	enable_nvme_core_multipath
 
-enable_nvme_core_multipath
+	test_ws="${CDIR}"/blktests
+	ret=0
+	trtype=$TRTYPE
+	testcases_default=""
+	testcases_default+=" $(get_test_cases_"$trtype")"
+	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
+	for testcase in $testcases; do
+		nvme_trtype="$trtype" do_test "$test_ws" "$testcase"
+		result=$(get_test_result "$test_ws" "$testcase")
+		report_test_result "$result" "nvme-$trtype: $TNAME/tests/$testcase"
+		((ret += $?))
+	done
 
-test_ws=./blktests
-ret=0
-trtype=$TRTYPE
-testcases_default=""
-testcases_default+=" $(get_test_cases_"$trtype")"
-testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
-for testcase in $testcases; do
-	do_test "$test_ws" "$testcase" "$trtype"
-	((ret += $?))
-done
+	if (( ret != 0 )); then
+		echo ">> There are failing tests, pls check it"
+	fi
 
-if (( ret != 0 )); then
-	echo ">> There are failing tests, pls check it"
+	return
+}
+
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+	. "$CDIR"/../include/build.sh
+
+	main
 fi
-
-exit 0

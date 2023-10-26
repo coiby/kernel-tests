@@ -3,44 +3,9 @@
 TNAME="storage/blktests/nvme/nvme-rdma"
 TRTYPE=${TRTYPE:-"rdma"}
 
-. ../../include/include.sh || exit 1
-
-function do_test
-{
-	typeset test_ws=$1
-	typeset test_case=$2
-	typeset this_case=$test_ws/tests/$test_case
-	typeset use_siw=$3
-	typeset USE_SIW
-
-	if (( use_siw == 0 )); then
-		USE_SIW=""
-	elif (( use_siw == 1)); then
-		USE_SIW="use_siw=1"
-	fi
-
-	echo ">>> $(get_timestamp) | Start to run test case $USE_SIW nvme-rdma: $this_case ..."
-	(cd "$test_ws" && eval $USE_SIW nvme_trtype=rdma ./check "$test_case")
-	result=$(get_test_result "$test_ws" "$test_case")
-	echo ">>> $(get_timestamp) | End nvme-rdma: $this_case | $result"
-
-	typeset -i ret=0
-	if [[ $result == "PASS" ]]; then
-		rstrnt-report-result "$USE_SIW nvme-rdma: $TNAME/tests/$test_case" PASS 0
-		ret=0
-	elif [[ $result == "FAIL" ]]; then
-		rstrnt-report-result "$USE_SIW nvme-rdma: $TNAME/tests/$test_case" FAIL 1
-		ret=1
-	elif [[ $result == "SKIP" || $result == "UNTESTED" ]]; then
-		rstrnt-report-result "$USE_SIW nvme-rdma: $TNAME/tests/$test_case" SKIP 0
-		ret=0
-	else
-		rstrnt-report-result "$USE_SIW nvme-rdma: $TNAME/tests/$test_case" WARN 2
-		ret=2
-	fi
-
-	return $ret
-}
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../../include/include.sh || exit 1
 
 function get_test_cases_rdma
 {
@@ -134,25 +99,36 @@ if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "
 	exit
 fi
 
-. ../include/build.sh
+function main {
+	enable_nvme_core_multipath
 
-enable_nvme_core_multipath
-
-USE_SIW=${USE_SIW:-"0 1"}
-test_ws=./blktests
-ret=0
-testcases_default=""
-testcases_default+=" $(get_test_cases_rdma)"
-testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
-for testcase in $testcases; do
+	USE_SIW=${USE_SIW:-"0 1"}
+	test_ws="${CDIR}"/blktests
+	ret=0
+	testcases_default=""
+	testcases_default+=" $(get_test_cases_rdma)"
+	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 	for use_siw in $USE_SIW; do
-		do_test "$test_ws" "$testcase" "$use_siw"
-		((ret += $?))
+		for testcase in $testcases; do
+			if (( use_siw == 0 )); then
+				USE_SIW=""
+			elif (( use_siw == 1)); then
+				USE_SIW="use_siw=1"
+			fi
+			eval $USE_SIW nvme_trtype=rdma do_test "$test_ws" "$testcase"
+			result=$(get_test_result "$test_ws" "$testcase")
+			report_test_result "$result" "$USE_SIW nvme-rdma: $TNAME/tests/$testcase"
+			((ret += $?))
+		done
 	done
-done
 
-if (( ret != 0 )); then
-	echo ">> There are failing tests, pls check it"
+	if (( ret != 0 )); then
+		echo ">> There are failing tests, pls check it"
+	fi
+}
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+	. "$CDIR"/../include/build.sh
+	main
 fi
-
-exit 0
