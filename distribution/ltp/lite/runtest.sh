@@ -144,6 +144,18 @@ function exclude_disruptive_for_kt1()
 	fi
 }
 
+function audit_rule_setting()
+{
+	# To mask the AVC denied warning from SELinux
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1701
+	auditctl -a always,exclude -F exe=/mnt/testarea/ltp/testcases/bin/fanotify14 -F msgtype=AVC
+}
+
+function audit_rule_delete()
+{
+	auditctl -d always,exclude -F exe=/mnt/testarea/ltp/testcases/bin/fanotify14 -F msgtype=AVC
+}
+
 function runtest_prepare()
 {
 	local runtest_config=$1
@@ -182,6 +194,8 @@ function runtest_prepare()
 
 function ltp_lite_begin()
 {
+	audit_rule_setting
+
 	# disable NTP and chronyd
 	tservice=""
 	pgrep chronyd > /dev/null
@@ -230,6 +244,8 @@ ltp_lite_run()
 
 ltp_lite_end()
 {
+	audit_rule_delete
+
 	echo "$core_pattern" > /proc/sys/kernel/core_pattern
 
 	clean_aiodio_scratchspace
