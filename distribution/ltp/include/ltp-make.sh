@@ -120,6 +120,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-process_madvise01-fix-smaps-scan-and-min_sw.patch
     fi
     if [ "$TESTVERSION" == "20230516" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)

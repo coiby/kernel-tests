@@ -1,0 +1,48 @@
+From a3830bafbe8350be8190d48176321fe79812f4c2 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 19 Oct 2023 10:48:39 +0200
+Subject: [PATCH] syscalls/process_madvise01: fix smaps scan and min_swap_avail
+
+smaps matching can prematurely end, because the comparison to "VmFlags"
+string is not exact. So depending on address on line, it can break
+before it finds Swap line. This makes the test fail on recent aarch64
+kernels.
+
+min_swap_avail per documentation is in MB not KB.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Acked-by: Andrea Cervesato <andrea.cervesato@mailbox.org>
+---
+ testcases/kernel/syscalls/process_madvise/process_madvise.h   | 2 +-
+ testcases/kernel/syscalls/process_madvise/process_madvise01.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/process_madvise/process_madvise.h b/testcases/kernel/syscalls/process_madvise/process_madvise.h
+index c4570e530..5b227ada0 100644
+--- a/testcases/kernel/syscalls/process_madvise/process_madvise.h
++++ b/testcases/kernel/syscalls/process_madvise/process_madvise.h
+@@ -54,7 +54,7 @@ static inline void read_address_mapping(unsigned long address, struct addr_mappi
+ 		if (!found)
+ 			continue;
+ 
+-		if (found && strcmp(line, "VmFlags") >= 0)
++		if (found && strncmp(line, "VmFlags", 7) == 0)
+ 			break;
+ 
+ 		if (sscanf(line, "%31[^:]: %d", label, &value) > 0) {
+diff --git a/testcases/kernel/syscalls/process_madvise/process_madvise01.c b/testcases/kernel/syscalls/process_madvise/process_madvise01.c
+index 322b4cf60..0fd3c1ef4 100644
+--- a/testcases/kernel/syscalls/process_madvise/process_madvise01.c
++++ b/testcases/kernel/syscalls/process_madvise/process_madvise01.c
+@@ -123,7 +123,7 @@ static struct tst_test test = {
+ 	.min_kver = "5.10",
+ 	.needs_checkpoints = 1,
+ 	.needs_root = 1,
+-	.min_swap_avail = MEM_CHILD / TST_KB,
++	.min_swap_avail = MEM_CHILD / TST_MB,
+ 	.needs_kconfigs = (const char *[]) {
+ 		"CONFIG_SWAP=y",
+ 		NULL
+-- 
+2.31.1
+
