@@ -26,10 +26,6 @@
 # Source the common test script helpers
 . ../../cki_lib/libcki.sh || exit 1
 
-TEST="vm/qemu-sanity-check"
-
-fail=0
-
 # qemu-sanity-check comes from EPEL, we may have to install that first.
 if ! rpm -q epel-release; then
     dnf install -y  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"$(rpm -E '%rhel')".noarch.rpm
@@ -46,19 +42,27 @@ dnf install -y $param qemu-sanity-check
 rpm -q qemu-sanity-check ||
     cki_abort_task "qemu-sanity-check is not installed"
 
+# Try to load kvm module
+modprobe kvm || true
+
 # Boot the kernel using KVM.
 if [ -r /dev/kvm ]; then
-    qemu-sanity-check --accel=kvm || fail=1
+    qemu-sanity-check --accel=kvm | tee kvm.log
+    if [[ ${PIPESTATUS[0]} == 0 ]]; then
+        rstrnt-report-result -o kvm.log kvm PASS
+    else
+        rstrnt-report-result -o kvm.log kvm FAIL
+    fi
+else
+    rstrnt-report-result kvm SKIP
 fi
 
 # Boot the kernel using TCG (software emulation).
-qemu-sanity-check --accel=tcg --cpu=max || fail=1
+qemu-sanity-check --accel=tcg --cpu=max | tee tcg.log
+if [[ ${PIPESTATUS[0]} == 0 ]]; then
+    rstrnt-report-result -o tcg.log tcg PASS
+else
+    rstrnt-report-result -o tcg.log tcg FAIL
+fi
 
 echo "Test finished"
-
-if [ $fail != 0 ] ; then
-    rstrnt-report-result $TEST FAIL $fail
-else
-    # all is well
-    rstrnt-report-result $TEST PASS 0
-fi
