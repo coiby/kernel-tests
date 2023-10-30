@@ -26,6 +26,7 @@ Describe 'blktests - include'
         The line 2 should equal "cd blktests"
         The line 3 should equal "running ./check test1"
         The line 4 should include "End blktests/tests/test1"
+        The contents of file "${OUTPUTFILE}" should equal "running ./check test1"
         The status should be success
     End
 End

@@ -5,6 +5,12 @@
 
 source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/../../../cki_lib/libcki.sh || exit 1
 
+# restraint uses $OUTPUTFILE by default when reporting test result.
+# Let's save the test execution output to it.
+if [ -z "$OUTPUTFILE" ]; then
+	OUTPUTFILE=$(mktemp /mnt/testarea/tmp.XXXXXX)
+fi
+
 function disable_multipath
 {
 	pidof multipathd &>/dev/null && pkill -9 multipathd
@@ -36,7 +42,7 @@ function do_test
 	typeset this_case=$test_ws/tests/$test_case
 	echo ">>> $(get_timestamp) | Start to run test case $this_case ..."
 	cd "$test_ws" || return 1
-	./check "$test_case"
+	./check "$test_case" | tee "${OUTPUTFILE}"
 	echo ">>> $(get_timestamp) | End $this_case"
 	return 0
 }
