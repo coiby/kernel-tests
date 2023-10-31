@@ -176,6 +176,12 @@ function disableTest
     mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzwv "$1")
 }
 
+function configureTests
+{
+    # vmx_vmcs_shadow_test takes more time in CKI environment
+    sed -i '/^\[vmx_vmcs_shadow_test\]$/,/^\[/ s/^timeout = 180/timeout = 300/' x86/unittests.cfg
+}
+
 function disableTests
 {
     typeset hwpf
@@ -481,6 +487,7 @@ function runtest
 
     rm -rf $LOGDIR
     mkdir $LOGDIR
+    configureTests
     rlPhaseEnd
 
     i=0
