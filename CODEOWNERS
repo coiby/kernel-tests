@@ -179,7 +179,6 @@
 /trace/bpf/test_bpf/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /trace/ftrace/tracer/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /tracepoints/operational/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/vm/hugepage/libhugetlbfs/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /vm/kvm-self-tests/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /vm/kvm-unit-tests/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /vm/qemu-sanity-check/ @Toaster192 @bgoncalv @bgrech @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -302,7 +301,6 @@
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
 /tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing
-/vm/hugepage/libhugetlbfs/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /vm/kvm-self-tests/ @bgoncalv @jarichte @lulinqing
 /vm/kvm-unit-tests/ @bgoncalv @jarichte @lulinqing
 /vm/qemu-sanity-check/ @bgoncalv @lulinqing @rwmjones
