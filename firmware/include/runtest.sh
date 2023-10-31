@@ -26,7 +26,7 @@
 
 
 : ${DeBug:=0}
-: ${FwtsGitRemote:=git://kernel.ubuntu.com/hwe/fwts.git}
+: ${FwtsGitRemote:=https://github.com/fwts/fwts.git}
 : ${FwtsGitBranch:="V21.02.00"}
 FwtsIncludeDir=$(readlink -f "../include/")
 
