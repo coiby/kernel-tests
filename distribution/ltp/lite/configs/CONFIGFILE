@@ -47,6 +47,8 @@
 %mmap11 mmap11 -i 30000
 %perf_event_open01 perf_event_open01
 %perf_event_open02 perf_event_open02
+# skip prctl10 due to GPF https://bugzilla.redhat.com/2174427
+%prctl10 prctl10
 %statx05 statx05
 %mem01 mem01
 %mmap10 mmap10
