@@ -288,9 +288,12 @@ rlJournalStart
             rlRun "sed -i '/SUBDIRS += bpf/d;/export CFLAGS += -DHAVE_BPF/d' tests/Makefile" 0 \
                 "RHEL < 8.2 doesn't ship libbpf => disable BPF subtests"
         fi
-        if rlIsRHEL "<9"; then
+
+        fips-mode-setup --is-enabled && fips_enabled=1
+        if rlIsRHEL "<9" || [ ${fips_enabled} ] ; then
             # CONFIG_KEY_DH_OPERATIONS not enabled on RHEL-8 :(
             # on RHEL-7, KEYCTL_DH_COMPUTE is not defined in the header
+            # KEYCTL_DH_COMPUTE is unusable in FIPS mode
             exclude_tests+=" keys"
         fi
 
