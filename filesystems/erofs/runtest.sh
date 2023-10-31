@@ -19,7 +19,8 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 WORKING_DIR=/tmp/erofs
-OUTPUTFILE="${WORKING_DIR}/MAKERESULTS.log"
+OUTPUTFILE="/var/tmp/MAKERESULTS.log"
+touch "${OUTPUTFILE}" || exit 1
 rlJournalStart
   rlPhaseStartTest
     git clone https://github.com/erofs/erofs-utils.git "${WORKING_DIR}"
