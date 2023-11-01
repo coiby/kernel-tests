@@ -38,13 +38,8 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest
-        DMESG=/var/log/dmesg
-        # Display relevant log messages
-        rlRun -l "grep intel_idle $DMESG"
-        # Check #1: check for unsupported message
-        rlAssertNotGrep "intel_idle: does not run on family" $DMESG
-        # Check #2: check for supported message
-        rlAssertGrep "acpi_idle yielding to intel_idle" $DMESG
+        # Check #1: check for CPUidle driver
+        rlRun -l "cpupower idle-info | grep intel_idle"
     rlPhaseEnd
 
     rlPhaseStartCleanup
