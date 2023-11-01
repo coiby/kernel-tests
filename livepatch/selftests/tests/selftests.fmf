@@ -1,0 +1,14 @@
+summary: livepatching selftests
+description: |
+    This test is used for running kernel livepatch selftests in internal package
+    kernel-selftests-internal.
+contact: Yulia Kopkova <ykopkova@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: shell
+recommend:
+  - nmap-ncat
+duration: 180m
+extra-summary: /kernel/livepatch/selftests
+extra-task: /kernel/livepatch/selftests
