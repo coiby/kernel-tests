@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 # Prepares data (output of perf with different loads) for next tests. Runs each
 # load for defined time, where maximum is 8 runs to clamp down the time.
 # It runs 0 - (n-1) threads where n is number of CPU cores. If n>8, some numbers
