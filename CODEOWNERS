@@ -187,7 +187,7 @@
 [kpet-db-maintainers]
 /acpi/acpitable/ @JiriDluhosRH @bgoncalv @lulinqing
 /acpi/enabled/ @bgoncalv @jbastianrh @lulinqing
-/container/podman/ @ajia2 @bgoncalv @lulinqing
+/container/podman/ @ajia2 @bgoncalv @lulinqing @ypu2
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
 /cpu/die/ @bgoncalv @darcari @lulinqing
