@@ -41,7 +41,6 @@ rlJournalStart
         #debug
         rlRun -l "find /sys/devices/ -name *rapl*"
         rlRun -l "lsmod"
-        rlRun -l "modprobe intel-rapl"
 
         # Test 1: Check if capping works
         # it should take approx 1.5 - 2 minutes
