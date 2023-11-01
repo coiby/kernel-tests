@@ -38,8 +38,6 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest
-        # Display relevant log messages
-        rlRun -l "dmesg | grep idle"
         # Check #1: check for CPUidle driver
         rlRun -l "cpupower idle-info | grep intel_idle"
     rlPhaseEnd
