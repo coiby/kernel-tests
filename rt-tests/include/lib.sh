@@ -235,3 +235,6 @@ function convert_number_range() {
    cpus_list=$(echo $cpus_list | sed -e 's/^,//')
    echo "$cpus_list"
 }
+
+# ver1 <= rhel <= ver2
+function rhel_in_range() { printf '%s\n' "$1" "${rhel_x}.${rhel_y}" "$2" | sort -VC; }
