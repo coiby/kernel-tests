@@ -1,0 +1,13 @@
+[General]
+description=libevdev tests
+name=libevdev/libevdev/
+owner=Dana Elfassy <delfassy@redhat.com>
+license=GPLv2
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=25m
+dependencies=gcc;meson;check-devel;valgrind;doxygen;cmake;beakerlib;
+TestVersion=0.1
+Path=/libevdev
+RunFor=kernel
