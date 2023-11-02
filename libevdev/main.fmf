@@ -1,0 +1,11 @@
+summary: Execute libevdev tests
+test: bash ./test.sh
+duration: 45m
+framework: beakerlib
+require:
+  - gcc
+  - meson
+  - check-devel
+  - valgrind
+  - doxygen
+  - cmake
