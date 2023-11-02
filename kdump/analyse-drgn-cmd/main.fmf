@@ -1,0 +1,24 @@
+summary: Use drgn to analyse ELF format vmcore from Kdump, or live system.
+description: |
+    It uses drgn script to analyse vmcore or live system.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: make run
+framework: shell
+require:
+  - drgn
+  - python3
+recommend:
+  - kernel-debuginfo
+duration: 30m
+extra-summary: /kernel/kdump/analyse-drgn-cmd
+extra-task: /kernel/kdump/analyse-drgn-cmd
+
+/live:
+    environment:
+      TESTARGS: basic.py
+      TESTTYPE: live
+
+/vmcore:
+    environment:
+      TESTARGS: basic.py
+      TESTTYPE: vmcore

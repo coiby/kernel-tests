@@ -503,6 +503,16 @@ PrepareCrash()
     InstallDebuginfo
 }
 
+PrepareDrgn()
+{
+    Log "Prepare for drgn tests"
+    # install crash package and kernel-debuginfo required for testing crash untilities.
+    rpm -q drgn || InstallPackages drgn || return 1
+
+    InstallDebuginfo
+}
+
+
 PrepareReboot()
 {
     # IA-64 needs nextboot set.
