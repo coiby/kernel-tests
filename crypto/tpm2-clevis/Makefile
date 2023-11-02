@@ -5,7 +5,7 @@ TOPLEVEL_NAMESPACE=kernel
 PACKAGE_NAME=crypto
 
 # The path of the test below the package:
-RELATIVE_PATH=tpm/tpm2-tools
+RELATIVE_PATH=tpm/tpm2-clevis
 
 # Version of the Test. Used with make tag.
 export TESTVERSION=0.1
@@ -53,10 +53,10 @@ $(METADATA): Makefile
 	@echo "Path:         $(TEST_DIR)"	>> $(METADATA)
 	@echo "License:      GPLv3+" >> $(METADATA)
 	@echo "TestVersion:  $(TESTVERSION)"	>> $(METADATA)
-	@echo "Description:  TPM2 tests">> $(METADATA)
+	@echo "Description:  TPM2 Clevis test">> $(METADATA)
 	@echo "TestTime:     20m" >> $(METADATA)
 	@echo "RunFor:       $(PACKAGE_NAME)" >> $(METADATA)  
-	@echo "Requires:     $(PACKAGE_NAME) tpm2-tools tpm2-abrmd beakerlib" >> $(METADATA)  
+	@echo "Requires:     $(PACKAGE_NAME) tpm2-tools tpm2-abrmd beakerlib clevis" >> $(METADATA)  
 	@echo "Releases:     RHEL7" >> $(METADATA)
 # add any other requirements for the script to run here
 
