@@ -21,6 +21,7 @@
 
 # Source  environment
 . ../../cki_lib/libcki.sh || exit 1
+. ../../automotive/include/rhivos.sh
 
 K_TESTAREA="/mnt/testarea"
 K_NFS="${K_TESTAREA}/KDUMP-NFS"
@@ -115,20 +116,22 @@ fi
 INITRD_IMG_PATH="/boot/$INITRD_PREFIX-`uname -r`.img"
 
 shopt -s extglob
-if stat /run/ostree-booted > /dev/null 2>&1; then
+if system_ostree; then
     K_BOOT="/usr/lib/ostree-boot"
+    # kernel-automotive kernel and initramfs img on ostree contains a hash:
+    # kernel image - vmlinuz-$(uname -r)-${commit_hash}
+    # initramfs image - initramfs-$(uname -r).img-${commit_hash}
     INITRD_IMG_PATH=$(find $K_BOOT -name "${INITRD_PREFIX}-$(uname -r).img-*")
+    VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
+    [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-$(uname -r)!(*debug*|*64k*|*rt*))
 else
     [ "${K_ARCH}" = "ia64" ] && K_BOOT="/boot/efi/efi/redhat" || K_BOOT="/boot"
     INITRD_IMG_PATH="$K_BOOT/$INITRD_PREFIX-$(uname -r).img"
+    VMLINUZ_PATH="${K_BOOT}/vmlinuz-$(uname -r)"
+    [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH="${K_BOOT}/vmlinux-$(uname -r)"
 fi
 
 INITRD_KDUMP_IMG_PATH=$(sed -e "s/\.img$/kdump.img/; s/$INITRD_PREFIX/$INITRD_KDUMP_PREFIX/" <<< "$INITRD_IMG_PATH")
-VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
-[ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-$(uname -r)!(*debug*|*64k*|*rt*))
-
-
-
 
 # Backup kdump config files
 BackupKdumpConfig()
@@ -839,7 +842,7 @@ InstallPackages()
         return 1
     }
 
-    if stat /run/ostree-booted > /dev/null 2>&1; then
+    if system_ostree; then
         LogRun "rpm-ostree install --apply-live --allow-inactive --idempotent -y $pkgs"
     else
         if CommandExists dnf ; then
@@ -892,13 +895,13 @@ UpdateKernelOptions()
         return 1
     fi
 
-    if stat /run/ostree-booted > /dev/null 2>&1; then
+    if system_ostree; then
         action="--append-if-missing"
     else
         action="--args"
     fi
     if grep -q ^- <<< "${options}"; then
-        if stat /run/ostree-booted > /dev/null 2>&1; then
+        if system_ostree; then
             action="--delete-if-present"
         else
             action="--remove-args"
@@ -907,7 +910,7 @@ UpdateKernelOptions()
     fi
 
     {
-        if stat /run/ostree-booted > /dev/null 2>&1; then
+        if system_ostree; then
             LogRun "rpm-ostree kargs ${action}=\"${options}\" --import-proc-cmdline"
         else
             LogRun "/sbin/grubby ${action}=\"${options}\" --update-kernel=\"${kernel}\"" &&
@@ -1126,10 +1129,14 @@ KexecBoot()
 
         # Prepare kexec cmd and run kexec load
         local _initrd_img_path _vmlinuz_path
-        if stat /run/ostree-booted > /dev/null 2>&1; then
+        if system_ostree; then
             _initrd_img_path=$(find $K_BOOT -name "${INITRD_PREFIX}-${KEXEC_VER}.img-*")
+            _vmlinuz_path=$(ls ${K_BOOT}/vmlinuz-${KEXEC_VER}!(*debug*|*64k*|*rt*))
+            [ -z "${_vmlinuz_path}" ] && _vmlinuz_path=$(ls ${K_BOOT}/vmlinux-${KEXEC_VER}!(*debug*|*64k*|*rt*))
         else
             _initrd_img_path="$K_BOOT/$INITRD_PREFIX-${KEXEC_VER}.img"
+            _vmlinuz_path="${K_BOOT}/vmlinuz-${KEXEC_VER}"
+            [ -z "${_vmlinuz_path}" ] && _vmlinuz_path="${K_BOOT}/vmlinux-${KEXEC_VER}"
         fi
         [ -z "${_initrd_img_path}" ] && {
             if "$IS_DB"; then
@@ -1140,9 +1147,6 @@ KexecBoot()
             fi
             return
         }
-
-        _vmlinuz_path=$(ls ${K_BOOT}/vmlinuz-${KEXEC_VER}!(*debug*|*64k*|*rt*))
-        [ -z "${_vmlinuz_path}" ] && _vmlinuz_path=$(ls ${K_BOOT}/vmlinux-${KEXEC_VER}!(*debug*|*64k*|*rt*))
 
         cmd="kexec ${EXTRA_KEXEC_OPTIONS} \
             -l ${_vmlinuz_path} \
