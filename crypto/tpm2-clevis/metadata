@@ -1,7 +1,7 @@
 [General]
-name=/kernel/crypto/tpm/tpm2-tools
+name=/kernel/crypto/tpm/tpm2-clevis
 owner=Vilem Marsik <vmarsik@redhat.com>
-description=tpm2-tools tests
+description=tpm clevis tests
 license=GPLv2
 confidential=no
 destructive=no
@@ -9,4 +9,4 @@ destructive=no
 [restraint]
 entry_point=make run
 max_type=20m
-dependencies=tpm2-tools;tpm2-abrmd;beakerlib
+dependencies=tpm2-tools;tpm2-abrmd;beakerlib;clevis
