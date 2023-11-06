@@ -5,7 +5,7 @@ description: |
 contact: Yulia Kopkova <ykopkova@redhat.com>
 component:
   - kernel
-test: ./runtest.sh
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 recommend:
   - nmap-ncat
