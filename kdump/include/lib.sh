@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ../../automotive/include/rhivos.sh
+
 K_TESTAREA="/mnt/testarea"
 K_NFS="${K_TESTAREA}/KDUMP-NFS"
 K_PATH="${K_TESTAREA}/KDUMP-PATH"
@@ -128,12 +130,19 @@ fi
 
 shopt -s extglob
 
-if stat /run/ostree-booted > /dev/null 2>&1; then
+if system_ostree; then
     K_BOOT="/usr/lib/ostree-boot"
+    # kernel-automotive kernel and initramfs image on ostree contains a hash:
+    # kernel image - vmlinuz-$(uname -r)-$(commit_hash)
+    # initramfs image - initramfs-$(uname -r).img-${commit_hash}
     INITRD_IMG_PATH=$(find $K_BOOT -name "${INITRD_PREFIX}-$(uname -r).img-*")
+    VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
+    [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-$(uname -r)!(*debug*|*64k*|*rt*))
 else
     [ "${K_ARCH}" = "ia64" ] && K_BOOT="/boot/efi/efi/redhat" || K_BOOT="/boot"
     INITRD_IMG_PATH="$K_BOOT/$INITRD_PREFIX-$(uname -r).img"
+    VMLINUZ_PATH="${K_BOOT}/vmlinuz-$(uname -r)"
+    [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH="${K_BOOT}/vmlinux-$(uname -r)"
 fi
 
 # Note, INITRD_KDUMP_IMG_PATH can be system initramfs img if fadump is enabled
@@ -146,8 +155,6 @@ if [ -s "/var/log/kdump.log" ]; then
     tmp_img="$(grep /kexec /var/log/kdump.log | grep -Eo "initrd=.+ " | tail -n1 | cut -d'=' -f2)"
     [ -n "${tmp_img}" ] && INITRD_KDUMP_IMG_PATH="${tmp_img/ /}"
 fi
-
-VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
 
 # Backup kdump config files
 BackupKdumpConfig(){
@@ -269,7 +276,7 @@ InstallPackages()
         return 1
     }
 
-    if stat /run/ostree-booted > /dev/null 2>&1; then
+    if system_ostree; then
         LogRun "rpm-ostree install --apply-live --allow-inactive --idempotent -y $pkgs"
     else
         if CommandExists dnf ; then
@@ -297,7 +304,7 @@ InstallKernel()
     [ ! -n "${pkgs}" ] && return 0
 
     Log "Install ${pkgs}"
-    if stat /run/ostree-booted > /dev/null 2>&1; then
+    if system_ostree; then
         LogRun "rpm-ostree install --apply-live --allow-inactive --idempotent -y $pkgs"
     else
         if CommandExists dnf ; then
@@ -428,13 +435,13 @@ UpdateKernelOptions()
         return 1
     fi
 
-    if stat /run/ostree-booted > /dev/null 2>&1; then
+    if system_ostree; then
         action="--append-if-missing"
     else
         action="--args"
     fi
     if grep -q ^- <<< "${options}"; then
-        if stat /run/ostree-booted > /dev/null 2>&1; then
+        if system_ostree; then
             action="--delete-if-present"
         else
             action="--remove-args"
@@ -443,7 +450,7 @@ UpdateKernelOptions()
     fi
 
     {
-        if stat /run/ostree-booted > /dev/null 2>&1; then
+        if system_ostree; then
             LogRun "rpm-ostree kargs ${action}=\"${options}\" --import-proc-cmdline"
         else
             LogRun "/sbin/grubby ${action}=\"${options}\" --update-kernel=\"${kernel}\"" &&

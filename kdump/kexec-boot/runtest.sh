@@ -64,13 +64,18 @@ KexecBoot() {
     DisableAVCCheck
 
     local _initrd_img_path _vmlinuz_path
-    if stat /run/ostree-booted > /dev/null 2>&1; then
+    if system_ostree; then
+        # kernel-automotive kernel and initramfs img on ostree contains a hash:
+        # kernel image - vmlinuz-$(uname -r)-${commit_hash}
+        # initramfs image - initramfs-$(uname -r).img-${commit_hash}
         _initrd_img_path=$(find $K_BOOT -name "${INITRD_PREFIX}-${KEXEC_VER}.img-*")
+        _vmlinuz_path=$(ls ${K_BOOT}/vmlinuz-${KEXEC_VER}!(*debug*|*64k*|*rt*))
+        [ -z "${_vmlinuz_path}" ] && _vmlinuz_path=$(ls ${K_BOOT}/vmlinux-${KEXEC_VER}!(*debug*|*64k*|*rt*))
     else
         _initrd_img_path="$K_BOOT/$INITRD_PREFIX-${KEXEC_VER}.img"
+        _vmlinuz_path="${K_BOOT}/vmlinuz-${KEXEC_VER}"
+        [ -z "${_vmlinuz_path}" ] && _vmlinuz_path="${K_BOOT}/vmlinux-${KEXEC_VER}"
     fi
-
-    _vmlinuz_path=$(ls ${K_BOOT}/vmlinuz-${KEXEC_VER}!(*debug*|*64k*|*rt*))
 
     # 'kexec -l' or 'kexec -c' can only be run on a system supporting PSCI
     # Warn and stop the test if it doesn't support PSCI
