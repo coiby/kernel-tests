@@ -1,0 +1,27 @@
+summary: Run upstream trinity
+description: |
+    run upstream trinity to find broken syscalls
+    This refers Jan stancek's trinity test in in syscalls/rhel7
+
+    To extract code from git to tgz:
+    git archive --format=tgz --output trinity-9f6f9f916da3.tgz --prefix=trinity-9f6f9f916da3/ HEAD
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+  - kernel
+test: |-
+    ( set +o posix; . /usr/bin/rhts_environment.sh; \
+    		. /usr/share/beakerlib/beakerlib.sh; \
+    		. runtest.sh )
+framework: beakerlib
+recommend:
+  - kernel
+  - kernel-headers
+  - json-c-devel
+  - gcc
+  - patch
+  - wget
+environment:
+    AVC_ERROR: +no_avc_check
+duration: 2h
+extra-summary: /kernel/general/process/trinity_git
+extra-task: /kernel/general/process/trinity_git

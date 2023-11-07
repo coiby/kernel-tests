@@ -27,8 +27,12 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
+
+# Enable TMT testing for RHIVOS
+. ../../../automotive/include/rhivos.sh
+declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+
 
 # trinity-9f6f9f916da3 (v1.8)
 # trinity-865ac5d8 (v1.9)
@@ -100,8 +104,8 @@ function test_setup()
 		find "/usr/lib/modules/$(uname -r)/" -name "dlci*" -exec mv {} ./ \;
 	fi
 
-	yum -y install json-c-devel json-c
-	rpm -q util-linux || yum -y install util-linux
+	# yum -y install json-c-devel json-c
+	# rpm -q util-linux || yum -y install util-linux
 	which trinity && return
 	# Can't clone in beaker env when automation. prepare the head into lookaside
 	# rlRun "git clone https://github.com/kernelslacker/trinity.git" 0-255
@@ -110,6 +114,10 @@ function test_setup()
 	rlRun "pushd $testversion"
 	rlRun "./configure"
 	rlRun "make -j $(nproc)" || { rstrnt-report-result "${RSTRNT_TASKNAME}" WARN; rlDie "compile"; }
+	if [ $is_rhivos == 1 ];then
+		#rlRun "echo \"DESTDIR=\"/usr/local\"\" >> /etc/environment"
+		rlRun "export DESTDIR=\"/usr/local\""
+	fi
 	rlRun "make install"
 	rlRun "popd"
 }
