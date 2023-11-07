@@ -1,0 +1,12 @@
+[General]
+name=storage/block/RHEL_2407_reduce_thread_of_multipath
+owner=Changhui Zhong <czhong@redhat.com>
+description= reduce or prevent thousands threads when multipath -ll is run
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+max_time=2h
