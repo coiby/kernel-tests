@@ -307,8 +307,12 @@ ltp_lite_run
 
 ltp_lite_end
 
-if [ "$result_r" = "PASS" ]; then
-	exit 0
-else
-	exit 1
+# if running as restraint job, the test result is already reported as subtests
+# don't exit with values different of 0. Otherwise, restraint reports it as a separate subtest
+if ! [[ -v RSTRNT_TASKID ]]; then
+	if [ "$result_r" = "PASS" ]; then
+		exit 0
+	else
+		exit 1
+	fi
 fi
