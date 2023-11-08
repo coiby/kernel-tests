@@ -1,0 +1,8 @@
+summary: Crashing Kernel using repro.ko Kernel module and test the vmcore it generated
+description: |
+    Regression test for Bug 2211262:
+    crash utility results in segmentation fault when non-panicking CPUs fail to get stopped at panic 
+test: make run
+duration: 2h
+extra-summary: /kernel/kdump/reg-bz2211262-crash-help
+extra-task: /kernel/kdump/reg-bz2211262-crash-help
