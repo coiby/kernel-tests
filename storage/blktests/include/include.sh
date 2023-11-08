@@ -40,7 +40,7 @@ function do_test
 	typeset test_case=$2
 
 	typeset this_case=$test_ws/tests/$test_case
-	echo ">>> $(get_timestamp) | Start to run test case $this_case ..."
+	echo ">>> $(get_timestamp) | Start to run test case $USE_RDMA $this_case ..."
 	cd "$test_ws" || return 1
 	./check "$test_case" | tee "${OUTPUTFILE}"
 	echo ">>> $(get_timestamp) | End $this_case"

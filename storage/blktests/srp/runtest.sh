@@ -27,10 +27,10 @@ function get_test_cases_srp
 	uname -ri | grep -qE "^5.*aarch64|^5.*ppc64le|4.18.0.*aarch64|4.18.0.*x86_64|4.18.0.*ppc64le|5.14.0.*x86_64|5.14.0.*ppc64le" || testcases+=" srp/002"
 	# testcases+=" srp/003", need legacy device mapper support
 	# testcases+=" srp/004", need legacy device mapper support
-	[[ $USE_SIW =~ 0 ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/005"
+	[[ $USE_SW_RDMA =~ RXE ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/005"
 	testcases+=" srp/006"
 	testcases+=" srp/007"
-	[[ $USE_SIW =~ 0 ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/008"
+	[[ $USE_SW_RDMA =~ RXE ]] && uname -ri | grep -qE "^5.*s390x" || testcases+=" srp/008"
 	testcases+=" srp/009"
 	testcases+=" srp/010"
 	uname -ri | grep  -qE "ppc64le|4.18.0.*aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/011"
@@ -38,11 +38,10 @@ function get_test_cases_srp
 	# disable srp/013 for rhel8, BZ1951961
 	uname -r | grep -q "4.18.0" || testcases+=" srp/013"
 	uname -r | grep -q 4.18.0 || testcases+=" srp/014" #BZ1900153
-	uname -ri | grep -qE "ppc64le|4.18.0.*.aarch64|el8.x86_64|el8.ppc64le|el9.x86_64|el9.ppc64le" || testcases+=" srp/015"
 	echo "$testcases"
 }
 
-if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release ; then
+if [[ "$USE_SW_RDMA" =~ RXE ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release ; then
 	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
@@ -50,7 +49,7 @@ fi
 
 function main
 {
-	USE_SIW=${USE_SIW:-"0 1"}
+	USE_SW_RDMA=${USE_SW_RDMA:-"RXE SIW"}
 	test_ws="${CDIR}"/blktests
 	ret=0
 	testcases_default=""
@@ -58,20 +57,19 @@ function main
 	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 	pre_setup
 	disable_multipath
-	for use_siw in $USE_SIW; do
-		if (( use_siw == 0 )); then
-			USE_SIW=""
-		elif (( use_siw == 1 )); then
-			USE_SIW="use_siw=1"
+	for use_sw_rdma in $USE_SW_RDMA; do
+		if [[ "$use_sw_rdma" == "RXE" ]]; then
+			USE_RDMA="use_rxe=1"
+		elif [[ "$use_sw_rdma" == "SIW" ]]; then
+			USE_RDMA=""
 		fi
 		for testcase in $testcases; do
-			eval $USE_SIW do_test "$test_ws" "$testcase"
+			eval $USE_RDMA do_test "$test_ws" "$testcase"
 			result=$(get_test_result "$test_ws" "$testcase")
-			report_test_result "$result" "$USE_SIW srp: $TNAME/tests/$testcase"
+			report_test_result "$result" "$USE_RDMA srp: $TNAME/tests/$testcase"
 			((ret += $?))
 		done
 	done
-
 	if (( ret != 0 )); then
 		echo ">> There are failing tests, pls check it"
 	fi
