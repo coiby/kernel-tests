@@ -19,8 +19,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 WORKING_DIR=/tmp/erofs
-OUTPUTFILE="/var/tmp/MAKERESULTS.log"
-touch "${OUTPUTFILE}" || exit 1
+
 rlJournalStart
   rlPhaseStartTest
     git clone https://github.com/erofs/erofs-utils.git "${WORKING_DIR}"
@@ -31,11 +30,47 @@ rlJournalStart
     ./configure --disable-lz4
     export srcdir="$WORKING_DIR"/tests/erofs
 
-    rlRun "make check > ${OUTPUTFILE}"
-    if grep -q "FAIL: erofs/[0-9]\+" "${OUTPUTFILE}"; then
-      rstrnt-report-result -o "${OUTPUTFILE}" filesystems/erofs FAIL
-    else
-      rstrnt-report-result -o "${OUTPUTFILE}" filesystems/erofs PASS
-    fi
+    make check
+
+    # process results
+    file_list=("$WORKING_DIR/tests/results/erofs"/*)
+    SKIP_LIST="$TEST_PARAM_SKIP_LIST"
+    files_to_chk_status=()
+    for file in "${file_list[@]}"; do
+        filename="$(basename "$file")"
+        chk_status=true
+        for skip_entry in $SKIP_LIST; do
+            if [[ "$filename" == "$skip_entry"* ]]; then
+                rstrnt-report-result -o "$WORKING_DIR/tests/results/erofs/$filename" SKIP_LIST_erofs/"$filename" SKIP
+                chk_status=false
+                break
+            fi
+        done
+        if [ "$chk_status" = true ]; then
+            files_to_chk_status+=("$file")
+        fi
+    done
+
+    for file in "${files_to_chk_status[@]}"; do
+        if [ -f "$file" ]; then
+            filename="$(basename "$file")"
+            extension="${filename##*.}"
+            case "$extension" in
+                bad)
+                    rstrnt-report-result -o "$WORKING_DIR/tests/results/erofs/$filename" erofs/"$filename" FAIL
+                    ;;
+                notrun)
+                    rstrnt-report-result -o "$WORKING_DIR/tests/results/erofs/$filename" erofs/"$filename" SKIP
+                    ;;
+                full)
+                    rstrnt-report-result -o "$WORKING_DIR/tests/results/erofs/$filename" erofs/"$filename" PASS
+                    ;;
+                *)
+                    rstrnt-report-result -o "$WORKING_DIR/tests/results/erofs/$filename" erofs/"$filename" WARN
+                    echo "Unknown file extension: $extension for $filename"
+                    ;;
+            esac
+        fi
+    done
   rlPhaseEnd
 rlJournalEnd
