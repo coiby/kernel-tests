@@ -32,6 +32,9 @@
 set -o pipefail
 
 firstboot=/mnt/testarea/mem_encrypt_firstboot
+kname=$(rpm -qf --qf "%{name}\n" /boot/vmlinuz-$(uname -r) | sed 's/-core//g')
+kversion=$(rpm -qf --qf "%{version}\n" /boot/vmlinuz-$(uname -r))
+krelease=$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))
 
 rlJournalStart
 	rlPhaseStartTest
@@ -43,6 +46,8 @@ rlJournalStart
 		rlRun "touch $firstboot"
 		rhts-reboot
 	fi
+	rpm -q ${kname}-devel-${kversion}-${krelease} || rlRpmInstall ${kname}-devel $kversion $krelease "$(uname -m)"
+	rpm -q ${kname}-devel-${kversion}-${krelease} || rlDie "no ${kname}-devel package available"
 	rlRun "insmod sme_module/sme_test.ko" 1
 	rlRun "dmesg | grep SMEtest | awk '{print \$5,\$6,\$7,\$8,\$9,\$10,\$11,\$12}' | grep -v deadbeef" 0
 	rlRun "dmesg -C"
