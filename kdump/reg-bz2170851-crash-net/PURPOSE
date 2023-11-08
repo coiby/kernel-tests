@@ -1,0 +1,2 @@
+Regression test for Bug 2170851
+[RFE] Display an IPv6 address of a network interface in the output of the 'net' command.
