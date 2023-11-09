@@ -11,11 +11,7 @@ TESTAREA="/mnt/testarea"
 
 # Kernel Variables
 K_NAME=`rpm -q --queryformat '%{name}\n' -qf /boot/config-$(uname -r)`
-#   example output: kernel
 K_VER=`rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r)`
-#   example output: 2.6.32
-K_VARIANT=$(echo $K_NAME | sed -e "s/kernel//g")
-#   are we a DEBUG kernel?
 K_REL=`rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r)`
 K_ARCH=$(rpm -q --queryformat '%{arch}' -f /boot/config-$(uname -r))
 
@@ -221,7 +217,7 @@ function DisplayModuleFail ()
 
 function inst_kernel_rt_kvm ()
 {
-    rt_kvm="${name}-kvm-${version}-${release}.${arch}"
+    rt_kvm="${name}-kvm-${K_VER}-${K_REL}.${K_ARCH}"
     local rpm_url="${url}/${rt_kvm}.rpm"
     rpm -q $rt_kvm || $YUM -y install $rt_kvm || $YUM -y install ${rpm_url} || (cki_abort_task "Missing ${name}-kvm")
 
@@ -230,13 +226,13 @@ function inst_kernel_rt_kvm ()
 # Check if kernel{,-debug}-modules-extra installed
 function chk_inst_kernel_modules_extra ()
 {
-    pkg_kms_extra="${name}-modules-extra-${version}-${release}.${arch}"
+    pkg_kms_extra="${name}-modules-extra-${K_VER}-${K_REL}.${K_ARCH}"
     local rpm_url="${url}/${pkg_kms_extra}.rpm"
     rpm -q $pkg_kms_extra > /dev/null || $YUM -y install $pkg_kms_extra || $YUM -y install ${rpm_url} || (cki_abort_task "Missing ${name}-modules-extra")
 }
 function chk_inst_kernel_modules_core ()
 {
-    pkg_kms_core="${name}-modules-core-${version}-${release}.${arch}"
+    pkg_kms_core="${name}-modules-core-${K_VER}-${K_REL}.${K_ARCH}"
     local rpm_url="${url}/${pkg_kms_core}.rpm"
     rpm -q $pkg_kms_core > /dev/null || $YUM -y install $pkg_kms_core || ($YUM -y install ${rpm_url} || cki_print_warning "Missing ${name}-modules-core, please check")
 }
@@ -245,10 +241,6 @@ rlJournalStart
     rlPhaseStartTest
         YUM=$(cki_get_yum_tool)
         name="kernel"
-        arch=$(uname -m)
-        version_release=`uname -r | sed "s/\.$K_ARCH//;s/+debug//;s/\.debug//;s/+64k//;s/+rt//"`
-        version=${version_release%-*}
-        release=${version_release#*-}
         baseurl=${BASEURL:-}
         if $(cki_is_kernel_rt); then
             name="${name}-rt"
@@ -264,7 +256,7 @@ rlJournalStart
         else
             path_name=$(sed "s/-debug//;s/-64k//" <<< ${name%-rt*})
         fi
-        url="${baseurl}/${path_name}/${version}/${release}/${arch}/"
+        url="${baseurl}/${path_name}/${K_VER}/${K_REL}/${K_ARCH}/"
         if  grep -q "release 9" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
             chk_inst_kernel_modules_core
