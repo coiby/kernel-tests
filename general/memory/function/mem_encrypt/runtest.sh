@@ -38,6 +38,7 @@ krelease=$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))
 
 rlJournalStart
 	rlPhaseStartTest
+	uname -r | grep x86_64 || { report_result "x86_64 only" SKIP; exit 0; }
 	if test -f $firstboot && grep "done" $firstboot; then
 		grep "mem_encrypt=on" /proc/cmdline
 		rlRun "rm -f $firstboot"
