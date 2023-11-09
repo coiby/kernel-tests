@@ -176,6 +176,11 @@ if [ "x${HPSIZE}" == "x512M" ]; then
     KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Page size is too large for configured SEGMENT_SIZE\""
 fi
 
+# skip ptrace-write-hugepage on rt79z debug - test hangs without proceeding from time to time
+if uname -r | grep -q 3\.10\.0-1160.*rt.*\.el7\.x86_64\.debug; then
+    sed 's/do_test("ptrace-write-hugepage")/#do_test("ptrace-write-hugepage")/g' -i "${WORK_DIR}/run_tests.py"
+fi
+
 RunTest()
 {
     r_test=$1
