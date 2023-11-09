@@ -191,6 +191,9 @@ install_kselftests()
             rlRpmDownload "${selftests_pkg}.${arch}"
             rlRun "$pkg_mgr $pkg_mgr_inst_string ./${selftests_pkg}.${arch}.rpm"
         fi
+        if [ $pkg_mgr == "rpm-ostree" ]; then
+            rlRun "cp -r /usr/libexec/kselftests/* ${EXEC_DIR}"
+        fi
         if rpm -q "${selftests_pkg}"; then
             rlLog "Delivered ${TEST} installed..."
             return 0
@@ -245,6 +248,8 @@ function SetupTest ()
     if [[ $pkg_mgr == "rpm-ostree" ]]; then
       echo "pkg_mgr = RPM OSTREE"
       export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
+      export EXEC_DIR="$TMPDIR/selftests"
+      [ -d ${EXEC_DIR} ] || mkdir -p ${EXEC_DIR}
       rlRun "rpm-ostree ex apply-live --allow-replacement"
       if ! rpm -q --quiet epel-release; then
         $pkg_mgr $pkg_mgr_inst_string \
