@@ -90,7 +90,7 @@ test_pass()
 		rstrnt-report-result "${TEST}/$1" "PASS" "$SCORE"
 	else
 		echo -e "::::::::::::::::"
-		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test '"${TEST}/$1"'"
+		rlPass "Test '${TEST}/$1' PASS $SCORE"
 		echo -e "::::::::::::::::\n"
 	fi
 }
@@ -104,7 +104,7 @@ test_fail()
 		rstrnt-report-result "${TEST}/$1" "FAIL" "$SCORE"
 	else
 		echo -e ":::::::::::::::::"
-		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test '"${TEST}/$1"' FAIL $SCORE"
+		rlFail "Test '${TEST}/$1' FAIL $SCORE"
 		echo -e ":::::::::::::::::\n"
 	fi
 }
@@ -118,7 +118,7 @@ test_warn()
 		rstrnt-report-result "${TEST}/$1" "WARN" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
-		echo -e ":: [  ${YEL}WARN${RES}  ] :: Test '"${TEST}/$1"'"
+		rlPass  "Test '${TEST}/$1' WARN $SCORE"
 		echo -e ":::::::::::::::::\n"
 	fi
 }
@@ -132,7 +132,7 @@ test_skip()
 		rstrnt-report-result "${TEST}/$1" "SKIP" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
-		echo -e ":: [  ${YEL}SKIP${RES}  ] :: Test '"${TEST}/$1"'"
+		rlPass "Test '${TEST}/$1' SKIP $SCORE"
 		echo -e ":::::::::::::::::\n"
 	fi
 }
