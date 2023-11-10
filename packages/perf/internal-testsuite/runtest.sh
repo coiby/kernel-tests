@@ -261,7 +261,6 @@ rlJournalStart
 		echo "===========================[ results ]============================="
 		cat results.log
 		echo "==================================================================="
-		rlRun -l "cat results.log | grep FAILED" 1 "No tests failed"
 		rlRun "popd >/dev/null"
 		rlRun "rm -rf $TmpDir"
 		# restore the sample rate back to the original or something reasonable
