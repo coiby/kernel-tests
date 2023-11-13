@@ -231,7 +231,7 @@ ltp_lite_run()
 		RunFiltTest && return
 
 		rm -f /mnt/testarea/$RUNTEST.*
-		rm -f /mnt/testarea/ltp/output/*
+		rm -rf /mnt/testarea/ltp/output/*
 		CleanUp $RUNTEST
 
 		OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
