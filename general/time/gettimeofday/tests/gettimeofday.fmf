@@ -23,18 +23,15 @@ description: |+
   change - see BZs 250708 and 4611184.
 
 contact: Qiao Zhao <qzhao@redhat.com>
+id: ffdfc38a-e1ae-410d-ae94-9d897692365b
 component:
   - kernel
 path: /general/time/gettimeofday
 test: bash -x ./runtest.sh
 framework: shell
 duration: 120m
-recommend:
-  - kernel-devel
-  - gcc
 require:
   - gcc
-  - kernel-devel
 tier: 1
 tag: [tier1]
 extra-summary: /general/time/gettimeofday

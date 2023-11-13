@@ -1,8 +1,18 @@
 #!/bin/bash
 
 . ../../../cki_lib/libcki.sh           || exit 1
+. ../../../kernel-include/runtest.sh || exit 1
 
 TEST="general/time/gettimeofday"
+
+devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
+installer=$(K_GetPkgMgr)
+if [[ ${installer} == "rpm-ostree" ]]; then
+    export install_opts="-A -y --idempotent --allow-inactive install"
+else
+    export install_opts="-y install"
+fi
+${installer} ${install_opts} ${devel_pkg}
 
 function runtest()
 {
