@@ -527,7 +527,7 @@ function runtest
     rlPhaseStartTest completed
     cd $LOGDIR || return
     logs=$(ls ./*.log)
-    for log in $logs; do rlFileSubmit "$log" ; done
+    for log in $logs; do rlFileSubmit "$log" $(basename "$log"); done
 
     rlRun "popd"
     rlPhaseEnd
