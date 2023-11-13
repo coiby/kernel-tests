@@ -5,15 +5,11 @@ discover:
         - /general/time/gettimeofday
 execute:
     how: tmt
-    framework: shell
 prepare:
     - name: Enable Repos
       how: shell
       script: |
           . ./automotive/include/rhivos.sh
           install_repos
-    - name: Install packages
-      how: install
-      package: [kernel-devel, gcc]
 environment-file:
     - ./general/time/gettimeofday/plans/tmt.env
