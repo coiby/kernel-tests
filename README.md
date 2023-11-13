@@ -1,7 +1,7 @@
 # Red Hat Kernel QE and CKI kernel tests repository
 
 The main branch is continuously synced to the [internal
-mirror](https://documentation.internal.cki-project.org/docs/test-maintainers/repository-setup/#mirroring-of-kernel-tests).
+mirror](https://documentation.internal.cki-project.org/l/qe-repository-mirroring).
 
 <details>
 <summary>Click here for an example on how to trigger a Beaker job with it.</summary>

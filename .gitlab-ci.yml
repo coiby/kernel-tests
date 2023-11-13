@@ -122,8 +122,8 @@ codeowners check:
       name: codeowners-check
       source_code: https://gitlab.com/cki-project/cki-tools/-/blob/main/cki/deployment_tools/gitlab_codeowners_config.py
       faq_name: CKI FAQ
-      faq_url: https://cki-project.org/devel-faq/
-      documentation_url: https://cki-project.org/docs/background/cki-tools/readme.cki.deployment_tools.gitlab_codeowner_config/
+      faq_url: https://cki-project.org/l/devel-faq/
+      documentation_url: https://cki-project.org/l/gitlab-codeowners-config-docs
       slack_name: '#team-kernel-cki'
       slack_url: https://redhat-internal.slack.com/archives/C04KPCFGDTN
       new_issue_url: 'https://gitlab.com/cki-project/cki-tools/-/issues/new?issue[title]=kernel-tests codeowners-check issue'
