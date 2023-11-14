@@ -1,0 +1,12 @@
+summary: PRE Verification for Real Time
+description: PRE Verification for Real Time
+contact: Qiao Zhao <qzhao@redhat.com>
+component:
+  - kernel
+path: /rt-tests/rteval
+test: bash -x ./runtest.sh
+framework: shell
+require: rteval
+duration: 10h
+extra-summary: /rt-tests/rteval
+extra-task: /rt-tests/rteval
