@@ -53,6 +53,9 @@ function check_tests()
 		MOUNT_OPTIONS="$MOUNT_OPTS" MKFS_OPTIONS="$MKFS_OPTS" xlog ./check $CHECK_OPTS $XFSTEST
 		ret=$?
 		dmesg > results/$XFSTEST.dmesg
+		# Clear the dmesg ring buffer to avoid rstrnt-report-log also report
+		# the same failure that xfstests _check_dmesg does.
+		dmesg -c >/dev/null
 
 		false_alarm=0
 		if test $ret -ne 0; then
