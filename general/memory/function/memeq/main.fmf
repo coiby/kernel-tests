@@ -21,8 +21,9 @@ description: |+
     https://bugzilla.redhat.com/show_bug.cgi?id=1219838
 
 contact: Jiri Vohanka <jvohanka@redhat.com>
+id: 89873f8c-9dd8-45ab-8868-a4654ae07bfb
 component: kernel
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require:
   - grubby

@@ -4,6 +4,7 @@ contact: Eddie Kovsky <ekovsky@redhat.com>
 component:
   - kernel
 path: /general/memory/function/pagesize
+id: 1389c1aa-2f5c-4328-a3ae-484b43e75ea4
 test: make run
 require:
   - make
