@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # include beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TESTAREA=/mnt/testarea
+mkdir -p $TESTAREA
 
 EXPECT_LVL=4
 PLVL=""
@@ -56,7 +56,7 @@ function detect_configuration()
 		PLVL="3level-paging-$(getconf PAGE_SIZE)"
 		MAX_USER_VM_4LVL_GiB=$MAX_USER_VM_3LVL_GiB
 	else
-		if [[ "`uname -r`" =~ "aarch64" ]]; then
+		if [[ "$(uname -r)" =~ "aarch64" ]]; then
 			MAX_USER_VM_4LVL_GiB=$MAX_USER_VM_3LVL_GiB
 		fi
 		echo "Expecting 4-level pagetables"
@@ -162,7 +162,6 @@ function mmap_private()
 	if [[ $fail -eq 1 ]] ; then
 		echo -e "FAILED" | tee -a $testlog
 		rlFail "FAILED"
-
 	else
 		echo -e "PASSED" | tee -a $testlog
 	fi
@@ -210,11 +209,13 @@ rlJournalStart
 	rlPhaseEnd
 
 		rlPhaseStartTest "heap test $PLVL"
+			rlRun "cc heap.c -o heap"
 			rlRun "heap_test_malloc"
 			rlRun "heap_test_sbrk"
 		rlPhaseEnd
 
 		rlPhaseStartTest "mmap test $PLVL"
+			rlRun "cc mmap+memset+fork.c -o mmap+memset+fork"
 			rlRun "setup_mmap_test"
 			rlRun "mmap_private"
 			rlRun "mmap_private2"

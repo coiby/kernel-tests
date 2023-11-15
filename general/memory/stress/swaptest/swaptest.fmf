@@ -9,6 +9,7 @@ description: |
 
     Author: Chunyu Hu <chuhu@redhat.com>
 contact: Chunyu Hu <chuhu@redhat.com>
+id: e238d6f3-4f60-48e4-98ae-941947dca577
 component:
   - kernel
 test: ( set +o posix; . runtest.sh )

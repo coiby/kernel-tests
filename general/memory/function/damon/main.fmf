@@ -1,5 +1,6 @@
 summary: "DAMON: Data Access MONitor verification"
 contact: Ping Fang <pifang@redhat.com>
+id: 47c3d6cc-0d51-4ac3-b3e3-6a94ec438973
 component:
   - kernel
 test: bash ./runtest.sh

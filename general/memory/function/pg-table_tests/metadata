@@ -1,0 +1,19 @@
+[General]
+description=Verifies 5-level paging feature
+name=/kernel-tests/general/memory/function/pg-table_tests
+owner=Li Wang <liwang@redhat.com>
+license=GPLv2
+_architectures=x86_64
+confidential=no
+destructive=no
+Releases=RHEL8
+
+[restraint]
+entry_point=make run
+max_time=30m
+dependencies=grubby;gcc;glibc;perl;vim;wget;numactl;numactl-devel;
+TestVersion=1.0
+Path=/kernel-tests/general/memory/function/pg-table_tests
+Type=KernelTier2
+RunFor=kernel
+Priority=Normal

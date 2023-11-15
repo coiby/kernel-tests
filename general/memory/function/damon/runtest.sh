@@ -26,7 +26,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
+if [ -f /usr/bin/rhts-environment.sh ]; then
+    . /usr/bin/rhts-environment.sh || exit 1
+fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="kernel"
@@ -53,7 +55,7 @@ rlJournalStart
                 exit 0
         fi
         rlRun "pip3 install -U damo" 0
-        pushd masim
+        pushd masim || exit
         # checkout latest stable commit
         rlRun "git checkout -q bbeab0c3ca431c4691301197e7ea46312a5a630f" 0
         rlRun "make" 0
@@ -66,7 +68,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup
-        popd
+        popd || exit
         rlRun "rm -rf masim" 0
     rlPhaseEnd
 rlJournalPrintText

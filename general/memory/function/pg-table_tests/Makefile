@@ -29,8 +29,6 @@ clean:
 	rm -f heap mmap+memset+fork *~ $(METADATA)
 
 run:
-	cc heap.c -o heap
-	cc mmap+memset+fork.c -o mmap+memset+fork
 	chmod +x ./runtest.sh
 	./runtest.sh
 
