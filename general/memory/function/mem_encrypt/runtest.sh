@@ -32,13 +32,14 @@
 set -o pipefail
 
 firstboot=/mnt/testarea/mem_encrypt_firstboot
-kname=$(rpm -qf --qf "%{name}\n" /boot/vmlinuz-$(uname -r) | sed 's/-core//g')
-kversion=$(rpm -qf --qf "%{version}\n" /boot/vmlinuz-$(uname -r))
-krelease=$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))
+kname="$(rpm -qf --qf "%{name}\n" /boot/vmlinuz-$(uname -r) | sed 's/-core//g')"
+kversion="$(rpm -qf --qf "%{version}\n" /boot/vmlinuz-$(uname -r))"
+krelease="$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))"
 
 rlJournalStart
 	rlPhaseStartTest
 	uname -r | grep x86_64 || { report_result "x86_64 only" SKIP; exit 0; }
+	lscpu | grep -w sme && rlLog "sme is supported / enabled"
 	if test -f $firstboot && grep "done" $firstboot; then
 		grep "mem_encrypt=on" /proc/cmdline
 		rlRun "rm -f $firstboot"
@@ -75,8 +76,8 @@ rlJournalStart
 		rlJournalEnd
 		rhts-reboot
 	fi
-	rpm -q ${kname}-devel-${kversion}-${krelease} || rlRpmInstall ${kname}-devel $kversion $krelease "$(uname -m)"
-	rpm -q ${kname}-devel-${kversion}-${krelease} || rlDie "no ${kname}-devel package available"
+	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlRpmInstall "${kname}-devel" "$kversion" "$krelease" "$(uname -m)"
+	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
 	rlRun "make -C sme_module" 0
 	rlRun "dmesg -C"
 	rlRun "insmod sme_module/sme_test.ko" 1
