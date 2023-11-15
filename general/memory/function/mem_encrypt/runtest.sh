@@ -42,6 +42,8 @@ rlJournalStart
 	if test -f $firstboot && grep "done" $firstboot; then
 		grep "mem_encrypt=on" /proc/cmdline
 		rlRun "rm -f $firstboot"
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	elif grep mem_encrypt=on /proc/cmdline ; then
 		rlLog "already set mem_encrypt=on"
@@ -58,13 +60,19 @@ rlJournalStart
 				rlRun "grubby --remove-args mem_encrypt=on --update-kernel DEFAULT"
 				touch $firstboot
 				echo "done" >> $firstboot
+				rlPhaseEnd
+				rlJournalEnd
 				rhts-reboot
 			}
+			rlPhaseEnd
+			rlJournalEnd
 			exit 0
 		}
 	elif [ ! -e $firstboot ]; then
 		rlRun "grubby --args mem_encrypt=on --update-kernel DEFAULT"
 		rlRun "touch $firstboot"
+		rlPhaseEnd
+		rlJournalEnd
 		rhts-reboot
 	fi
 	rpm -q ${kname}-devel-${kversion}-${krelease} || rlRpmInstall ${kname}-devel $kversion $krelease "$(uname -m)"
@@ -78,6 +86,8 @@ rlJournalStart
 		grep skip_cleanup_cmdline $firstboot && echo "reserve mem_encrypt=on in cmdline" && rm -f $firstboot && exit 0
 		rlRun "grubby --remove-args mem_encrypt=on --update-kernel DEFAULT"
 		rlRun "echo done > $firstboot"
+		rlPhaseEnd
+		rlJournalEnd
 		rhts-reboot
 	fi
 	rlPhaseEnd
