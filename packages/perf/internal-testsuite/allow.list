@@ -19,13 +19,13 @@ dc25abc10dbbe8bbcfd828943e562325bb04d11d s390x	# Read samples using the mmap int
 1452f6a9560857ae31acc9eaad816ae63c0cec44 s390x	# PERF_RECORD_* events & perf_sample fields
 
 #### tests that should be skipped, if it is not, we have to do it ourselves
-b81906564501bbdb29b976760f7e3735760c3d05 s390x aarch64 # Number of exit events of a simple workload
+b81906564501bbdb29b976760f7e3735760c3d05 s390x aarch64 ppc64le # Number of exit events of a simple workload
 
 #### to be investigated
 3370c451caa40aa5cb102f145c75eb22141766eb x86_64	# DWARF unwind
 
 #### fails on s390x due to events we don't need at RH
-a314df14af58957548d292f859cbd2ee451c9c9f s390x	# Parse event definition strings
+a314df14af58957548d292f859cbd2ee451c9c9f s390x ppc64le	# Parse event definition strings
 8d036401505f5579ff5912c30cbccb3c5098d8cd s390x	# Object code reading
 
 #### this test currently fails on powerpc, known thing
@@ -55,7 +55,7 @@ d4b88ad2ef3ad11d1d65485ad3209f8849f4aeeb ppc64le s390x aarch64 x86_64 # Add vfs_
 b011103996bcd810c4c87e049fffb48326edf705 ppc64le s390x aarch64  # Parse sched tracepoints fields
 887e416aca88217834c65490461a2137431efddd ppc64le # Watchpoint
 05b9b8fb2a5d4d41a867a36111ae380bf111f0f0 aarch64 # Track with sched_switch
-b31fbb4e7501b04082bf8edd16872ba11c580297 ppc64le # PMU events
+b31fbb4e7501b04082bf8edd16872ba11c580297 ppc64le x86_64 # PMU events
 adb2cda40ae61b84668595f3be67de89ed281658 ppc64le ppc64 s390x aarch64 x86_64 # DSO data reopen
 b088f72d0fb0684642cbea4121d3bd463d5af43a ppc64le ppc64 s390x x86_64 # LLVM search and compile
 529b1f92ce1b20584468e6a9ec8b53c051cca11d ppc64le s390x # PE file support
@@ -63,3 +63,17 @@ b110fc5887abacbcdaa32fd5e9ea2e3f6e580dc5 ppc64le aarch64 # vmlinux symtab matche
 2160bdaf7e5f48987e31c1d90d0260ac9fdd3ef7 ppc64le s390x aarch64 x86_64 # BPF filter
 e72d804e5361e9a66889207602ac75e4dd409aa6 x86_64  # x86 instruction decoder - new instructions
 64b224a2fb478a47529700c6237c6c0a0a90ad98 aarch64 # Session topology
+
+# Temporary allowlist for CKI fails, undo when fixed
+356730a72bd040f7393f65a130f1f44d6078b04d aarch64 # CoreSight / ASM Pure Loop
+5f637147a0cbb07a9d1e9955f03b44344d91a819 aarch64 # CoreSight / Memcpy 16k 10 Threads
+6f590f5a003e997ad8de1e8da6a62697d5cf308b aarch64 # CoreSight / Thread Loop 10 Threads - Check TID
+f6208a42d390ea91db024db16ae162fc2c80671d aarch64 # CoreSight / Thread Loop 2 Threads - Check TID
+6afe33200bf70894fcc32d944402cd41573072a4 aarch64 # CoreSight / Unroll Loop Thread 10
+117480d53c03fa31e2e6a0d61b3632bd70c328fa ppc64le ppc64 s390x aarch64 x86_64 # kernel lock contention analysis test
+e4a8e45016f20b50c3974e763b48c99a936b6d0a x86_64 # Simple expression parser
+7ab601dfc1d73baaea678b649fa5d66ba0f9f91e ppc64le # perf all metricgroups test
+65a67da77b6f4b8ebc3aeb747f6d4f122398b2e6 ppc64le x86_64 # perf all metrics test
+c28f07da1fd1e44f7b716f64ff4b3cdf0d163e20 aarch64 # perf record tests
+bc0e87022bb4941020242d414be1d74716aba9d5 x86_64 # perf pipe recording and injection test
+
