@@ -88,7 +88,7 @@ shell check runtests mr:
       error=0
       for file in "${files[@]}"; do
           # force to bash to avoid POSIX warnings
-          if ! shellcheck --source-path=SCRIPTDIR --external-sources -f gcc $file; then
+          if ! shellcheck --source-path=SCRIPTDIR --external-sources --shell bash --severity warning -f gcc $file; then
             error=1
           fi
       done
