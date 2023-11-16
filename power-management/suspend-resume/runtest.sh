@@ -317,8 +317,8 @@ fi
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r))
 
 echo "***** Starting the runtest.sh script *****" | tee -a $OUTPUTFILE
-echo "***** Current Running Kernel Package = "$kernbase" *****" | tee -a $OUTPUTFILE
-echo "***** Current Running Distro = "$installeddistro" *****" | tee -a $OUTPUTFILE
+echo "***** Current Running Kernel Package = $kernbase *****" | tee -a $OUTPUTFILE
+echo "***** Current Running Distro = $installeddistro *****" | tee -a $OUTPUTFILE
 
 getdetails
 
