@@ -4,16 +4,16 @@ eval "$(shellspec - -c) exit 1"
 Include distribution/ltp/include/runtest.sh
 
 Describe "distribution/ltp/include: RprtRslt"
+    cleanup() {
+        rm -rf *.fail.log
+    }
+    AfterEach 'cleanup'
     Mock cat
         echo "${CAT_OUTPUT}"
     End
 
     Mock GetFailureLog
         echo "GetFailureLog $*"
-    End
-
-    Mock ls
-        echo "${LS_OUTPUT}"
     End
 
     Parameters
@@ -23,7 +23,10 @@ Describe "distribution/ltp/include: RprtRslt"
         FAIL "" "1"
     End
     It "RprtRslt $1 $2"
-        export LS_OUTPUT="${2}"
+        # Mock the failed test log
+        if [[ -n $2 ]]; then
+            touch $2
+        fi
         export CAT_OUTPUT="Total Failures: ${3}"
         RESULT="${1}"
         SCORE=${3}
