@@ -282,7 +282,7 @@ function runTest ()
 
 	if [[ $NOT_SUPPORT = 1 ]]; then
 		echo "Please Refers to BZ: https://bugzilla.redhat.com/show_bug.cgi?id=891967" | tee -a ${OUTPUTFILE}
-		echo "This is not Supported"| tee -a {OUTPUTFILE}
+		echo "This is not Supported"| tee -a ${OUTPUTFILE}
 		rstrnt-report-result $TEST SKIP 0
 		exit 0
 	fi
