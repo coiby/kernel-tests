@@ -83,15 +83,11 @@ install_kernel_subpackages()
     kernel_vra="${KVer}-${KBuild}${KDIST}.$(arch)"
     allyumrpms=""
     allpkgurl=""
-    if [[ $# -eq 0 ]]; then
-        if [[ ${DistVer} -lt 9 ]]; then
-            # the KPKGS should always have kernel-debuginfo before perf-debuginfo to make sure corresponding kernel*-debuginfo-common* is already installed
-            KPKGS="kernel-debuginfo kernel-headers kernel-abi-whitelists perf perf-debuginfo bpftool kernel-devel"
-        else
-            KPKGS="kernel-debuginfo kernel-headers kernel-abi-stablelists perf perf-debuginfo bpftool kernel-devel"
-        fi
+    if [[ ${DistVer} -lt 9 ]]; then
+        # the KPKGS should always have kernel-debuginfo before perf-debuginfo to make sure corresponding kernel*-debuginfo-common* is already installed
+        KPKGS="kernel-debuginfo kernel-headers kernel-abi-whitelists perf perf-debuginfo bpftool kernel-devel"
     else
-        KPKGS="$@"
+        KPKGS="kernel-debuginfo kernel-headers kernel-abi-stablelists perf perf-debuginfo bpftool kernel-devel"
     fi
     for p in $KPKGS ; do
         pkgurl=""
