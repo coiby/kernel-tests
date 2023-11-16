@@ -29,7 +29,7 @@ function TestHeader ()
 # ---------- Start Test -------------
 uname -m|grep x86_64
 ret1=$?
-uname -m|grep s390x && [ "$(echo $(grep -Eo [0-9]+.[0-9] /etc/redhat-release) \< 8.0 | bc)" = 1 ]
+uname -m|grep s390x && [ "$(echo $(grep -Eo "[0-9]+.[0-9]" /etc/redhat-release) \< 8.0 | bc)" = 1 ]
 ret2=$?
 
 if [ $ret1 -ne 0 -a $ret2 -ne 0 ]; then
