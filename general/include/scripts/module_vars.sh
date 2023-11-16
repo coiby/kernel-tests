@@ -1,9 +1,9 @@
 #!/bin/bash
 # This file contains the shared variables used in various kmod/DUP/ftrace tests
 
-DistName=`rpm -E %{?dist} | sed 's/[.0-9]//g'`
-DistVer=`rpm -E %{?dist} | sed 's/[^0-9]//g'`
-DISTTAG=`rpm -E %{?dist}`
+DistName=`rpm -E '%{?dist}' | sed 's/[.0-9]//g'`
+DistVer=`rpm -E '%{?dist}' | sed 's/[^0-9]//g'`
+DISTTAG=`rpm -E '%{?dist}'`
 DUPARCH=`arch`
 KVer=`uname -r | awk -F '-' '{print $1}'`
 KDIST=`uname -r | sed "s/.$(arch)//g;s/\+debug//g;s/\.debug//g" | awk -F '.' '{print "."$NF}'`
