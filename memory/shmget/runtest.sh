@@ -11,7 +11,7 @@ function CheckMemory ()
 {
 	memttl=$(free -b -t | grep Total: | awk -F: '{print $2}' | awk '{print $3}')
 	if [ $memttl -lt $segment_size ]; then
-	echo "***** Not enough memory to run test = "$segment_size" *****" | tee -a $OUTPUTFILE
+	echo "***** Not enough memory to run test = $segment_size *****" | tee -a $OUTPUTFILE
 	report_result Test_skipped WARN 99
 	exit 0
 	fi
@@ -21,8 +21,8 @@ function TestHeader ()
 {
 	echo "*************************************" | tee -a $OUTPUTFILE
 	echo "***** Starting bz230658 (shmget) runtest.sh script *****" | tee -a $OUTPUTFILE
-	echo "***** Current Running Kernel Package = "$kernbase" *****" | tee -a $OUTPUTFILE
-	echo "***** Current Running Distro = "$installeddistro" *****" | tee -a $OUTPUTFILE
+	echo "***** Current Running Kernel Package = $kernbase *****" | tee -a $OUTPUTFILE
+	echo "***** Current Running Distro = $installeddistro *****" | tee -a $OUTPUTFILE
 	echo "*************************************" | tee -a $OUTPUTFILE
 }
 
