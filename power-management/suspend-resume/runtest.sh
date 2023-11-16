@@ -224,7 +224,7 @@ function startSuspendResume ()
 	while [ $COUNT -ge 0 ]
 	do
 		BOOTTIME_2=`cat /proc/stat | grep "btime" | awk '{print $2}'`
-		if [[ $BOOTTIME_1 != $BOOTTIME_2 ]]; then
+		if [[ "$BOOTTIME_1" != "$BOOTTIME_2" ]]; then
 			printf "FAIL: boottime not stable count = $COUNT\n\t * Before suspend to $i boottime = $BOOTTIME_1\n\t * After  suspend to $i boottime = $BOOTTIME_2\n"
 
 			BOOTTIME_FAIL=1
