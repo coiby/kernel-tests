@@ -81,7 +81,7 @@ rlJournalStart
 	rlRun "make -C sme_module" 0
 	rlRun "dmesg -C"
 	rlRun "insmod sme_module/sme_test.ko" 1
-	rlRun "dmesg | grep SMEtest | awk '{print \$5,\$6,\$7,\$8,\$9,\$10,\$11,\$12}' | grep -v deadbeef" 0
+	rlRun "journalctl -k --no-hostname | grep SMEtest | awk '{print \$5,\$6,\$7,\$8,\$9,\$10,\$11,\$12}' | grep -v deadbeef" 0
 	rlRun "dmesg -C"
 	if [ -e $firstboot ]; then
 		grep skip_cleanup_cmdline $firstboot && echo "reserve mem_encrypt=on in cmdline" && rm -f $firstboot && exit 0
