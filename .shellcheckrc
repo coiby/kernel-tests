@@ -1,7 +1,5 @@
 # This {/} is literal. Check if ; is missing or quote the expression.
 disable=SC1083
-# foo appears unused. Verify it or export it.
-disable=SC2034
 # Quote this to prevent word splitting.
 disable=SC2046
 # Expanding an array without an index only gives the element in the index 0.
