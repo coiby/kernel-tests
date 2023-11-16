@@ -189,8 +189,7 @@ RprtRslt ()
     # Always upload parsed test log for those failed test cases
     GetFailureLog $logfile_run "None" > $logfile_fail
     [ -s $logfile_fail ] && SubmitLog $logfile_fail
-    failed_tests=$(ls *.fail.log)
-    for failed_test in $failed_tests; do
+    for failed_test in *.fail.log; do
         # skip logfile_fail as it is not a test case fail log
         if [ "$failed_test" == "$logfile_fail" ]; then
             continue
@@ -237,11 +236,11 @@ CleanUp ()
 IPCRMCleanup ()
 {
     # Clean up msgid
-    DeBug "******* Start msgmni cleanup $1 *******"
+    DeBug "******* Start msgmni cleanup *******"
     for i in `ipcs -q | cut -f2 -d' '`; do
         ipcrm -q $i
     done
-    DeBug "******* End msgmni cleanup $1 *******"
+    DeBug "******* End msgmni cleanup *******"
     echo >> $DEBUGLOG
 }
 
