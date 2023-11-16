@@ -9,7 +9,7 @@ result=FAIL
 # Helper functions
 function CheckMemory ()
 {
-	memttl=$(free -b -t | grep Total: | awk -F: {'print $2'} | awk {'print $3'})
+	memttl=$(free -b -t | grep Total: | awk -F: '{print $2}' | awk '{print $3}')
 	if [ $memttl -lt $segment_size ]; then
 	echo "***** Not enough memory to run test = "$segment_size" *****" | tee -a $OUTPUTFILE
 	report_result Test_skipped WARN 99
