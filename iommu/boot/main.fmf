@@ -20,5 +20,6 @@ test: ./runtest.sh
 framework: shell
 require:
   - beakerlib
+  - grubby
 extra-summary: /kernel/iommu/boot
 extra-task: /kernel/iommu/boot

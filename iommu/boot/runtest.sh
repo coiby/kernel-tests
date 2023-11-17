@@ -26,63 +26,112 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Enable TMT testing for RHIVOS
-auto_include=../../automotive/include/rhivos.sh
-[ -f $auto_include ] && . $auto_include
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-
-if (($is_rhivos)); then
-	if [[ ! -e "/usr/sbin/grubby" ]]; then
-cat >/etc/yum.repos.d/rhel.repo <<EOF
-[baseos-rhel]
-baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$(arch)/os
-enabled=1
-gpgcheck=0
-[appstream-rhel]
-baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/$(arch)/os/
-enabled=1
-gpgcheck=0
-[crb-rhel]
-baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/$(arch)/os/
-enabled=1
-gpgcheck=0
-[baseos-debug-rhel]
-baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/$(arch)/debug/tree
-enabled=1
-gpgcheck=0
-[appstream-debug-rhel]
-baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/$(arch)/debug/tree
-enabled=1
-gpgcheck=0
-[crb-debug-rhel]
-baseurl=http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/CRB/$(arch)/debug/tree
-enabled=1
-gpgcheck=0
-EOF
-		rpm-ostree install --assumeyes --apply-live --idempotent --allow-inactive grubby
-		rstrnt-reboot
-	fi
-fi
-
 # Include libraries
 . ../../cki_lib/libcki.sh || exit 1
+
+# Source the common test script helpers
+. /usr/share/beakerlib/beakerlib.sh || exit 1
+
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../../kernel-include/runtest.sh || exit 1
 
 TEST="iommu/boot/"
 # file to write custom boot options (from CMDLINEARGS)
 CustomBootOptions=custom-boot-options.txt
 # file to use if no custom boot options passed
-DefaultBootOptionsIntel=default-boot-options-intel.txt
-DefaultBootOptionsAMD=default-boot-options-amd.txt
-DefaultBootOptionsARM=default-boot-options-arm.txt
+DefaultBootOptionsIntel=boot-options-intel.txt
+DefaultBootOptionsAMD=boot-options-amd.txt
+DefaultBootOptionsARM=boot-options-arm.txt
 # file to store current boot options being tested
 CurrentBootOptions=current-boot-options.txt
 cpuvendor=$(lscpu | grep "^Vendor ID" | awk '{print $NF}')
 dmesgErrors=iommu-dmesg-errors.txt
 dmesgReport=iommu-dmesg-report.txt
 
+function add_aboot_param ()
+{
+	CMDLINEARGS=$1
+
+	current_aboot_cmdline=$(abootimg -i /boot/aboot-"${K_VER}"-"${K_REL}"."$(arch)".img | awk  '/cmdline/ {print}' | cut -f 4-"$NR" -d ' ')
+	if [ -n "${current_aboot_cmdline}" ]; then
+		current_aboot_cmdline+=" "
+		current_aboot_cmdline+="${CMDLINEARGS}"
+	else
+		current_aboot_cmdline+="${CMDLINEARGS}"
+	fi
+	rlRun "abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline='${current_aboot_cmdline}'"
+	rlRun "dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a"
+	rlRun "sync"
+}
+
+function remove_aboot_param ()
+{
+	CMDLINEARGS=$1
+
+	# shellcheck disable=SC2207
+	current_aboot_cmdline=($(abootimg -i /boot/aboot-"${K_VER}"-"${K_REL}"."$(arch)".img | awk  '/cmdline/ {print}' | cut -f 4-"$NR" -d ' '))
+	if [ -z "${current_aboot_cmdline[0]}" ]; then
+		rlLog "WARNING: Unable to find parameter in the allowed list."
+		rlPhaseEnd
+		rlJournalEnd
+		rlJournalPrintText
+		exit 0
+	else
+		for i in "${!current_aboot_cmdline[@]}"; do
+			if echo "${CMDLINEARGS##-}" | grep -q "${current_aboot_cmdline[${i}]}"; then
+				rlRun "unset current_aboot_cmdline[${i}]"
+			fi
+		done
+		# want to keep spaces as delimiter
+		# shellcheck disable=SC2124
+		new_aboot_cmdline="${current_aboot_cmdline[@]}"
+		rlRun "abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline='${new_aboot_cmdline}'"
+		rlRun "dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a"
+		rlRun "sync"
+	fi
+}
+
+function change_cmdline ()
+{
+	CMDLINEARGS=$1
+
+	rlLog "Old cmdline:"
+	rlRun "cat /proc/cmdline"
+
+	# Update the boot loader.
+	default=$(/sbin/grubby --default-kernel)
+
+	# If the first character is - in the arguments, we remove them from
+	# the kernel commandline.
+	if echo "${CMDLINEARGS}" | grep -q "^-"; then
+		rlLog "Cmdline to be removed: ${CMDLINEARGS##-}"
+		if [ -e /sys/devices/soc0/machine ]; then
+			rlRun "remove_aboot_param ${CMDLINEARGS}"
+		elif [ -e /run/ostree-booted ]; then
+			rlRun "rpm-ostree kargs --delete-if-present='${CMDLINEARGS##-}' --import-proc-cmdline"
+		else
+			rlRun "/sbin/grubby --remove-args='${CMDLINEARGS##-}' --update-kernel='${default}'"
+		fi
+	else
+		rlLog "Cmdline to be added: ${CMDLINEARGS}"
+		if [ -e /sys/devices/soc0/machine ]; then
+			rlRun "add_aboot_param ${CMDLINEARGS}"
+		elif [ -e /run/ostree-booted ]; then
+			rlRun "rpm-ostree kargs --append-if-missing='${CMDLINEARGS##-}' --import-proc-cmdline"
+		else
+			rlRun "/sbin/grubby --args='${CMDLINEARGS}' --update-kernel='${default}'"
+		fi
+	fi
+
+	# Once more change to s390 and s390x.
+	if [ "$(arch)" = "s390" ] || [ "$(arch)" = "s390x" ]; then
+		/sbin/zipl
+	fi
+}
+
 function bootOptions() {
 	bootOptionsFile=$1
-
 
 	while read -r line; do
 	# Check to see if new options have been set yet
@@ -91,11 +140,7 @@ function bootOptions() {
 			echo "Start test." | tee -a "${OUTPUTFILE}"
 			echo "Old cmdline: $(cat /proc/cmdline)" | tee -a "${OUTPUTFILE}"
 
-			# Update the boot loader.
-			default=$(/sbin/grubby --default-kernel)
-
-			echo "Cmdline to be added: ${line}" | tee -a "${OUTPUTFILE}"
-			/sbin/grubby --args="${line}" --update-kernel="${default}"
+			change_cmdline $line
 			code=$?
 
 			if [ ${code} -ne 0 ]; then
@@ -123,20 +168,14 @@ function bootOptions() {
 			if [ ${code} -ne 0 ]; then
 				echo "Fail: error booting kernel with specified cmdline" |
 				tee -a "${OUTPUTFILE}"
-
 				rstrnt-report-result "${TEST}/$CurrentBootOptionsReport" "FAIL" 0
-				rm $CurrentBootOptions
-				/sbin/grubby --remove-args="${line}" \
-					--update-kernel="${default}"
-				sed -i "/$line\$/d" $bootOptionsFile
 			else
 				echo "boot options persisted through reboot." | tee -a "${OUTPUTFILE}"
 				rstrnt-report-result "${TEST}/$CurrentBootOptionsReport" "PASS" 0
-				rm $CurrentBootOptions
-				/sbin/grubby --remove-args="${line}" \
-					--update-kernel="${default}"
-				sed -i "/$line\$/d" $bootOptionsFile
 			fi
+			rm $CurrentBootOptions
+			change_cmdline "-${line}"
+			sed -i "/$line\$/d" $bootOptionsFile
 		fi
 	done < $bootOptionsFile
 }
@@ -146,19 +185,19 @@ function dmesgErrors() {
 
 	# find any iommu errors in dmesg/messages file
 	while read -r dmesgLine; do
-	dmesgLineNumber=$(($dmesgLineNumber+1))
-	journalctl | grep "$dmesgLine"
-	    code=$?
-	    if [ ${code} -ne 1 ]; then
-		echo "Fail: the following iommu regex matched in dmesg:" |
-		tee -a "${OUTPUTFILE}"
-		echo "$dmesgLine" | tee -a "${OUTPUTFILE}"
-		echo "see TESTOUT.log for actual message or $dmesgReport for report" |
-		tee -a "${OUTPUTFILE}"
-		echo "$dmesgLineNumber FAIL $dmesgLine" >> $dmesgReport
-	    else
-		echo "$dmesgLineNumber PASS $dmesgLine" >> $dmesgReport
-	    fi
+		dmesgLineNumber=$(($dmesgLineNumber+1))
+		journalctl | grep "$dmesgLine"
+		code=$?
+		if [ ${code} -ne 1 ]; then
+			echo "Fail: the following iommu regex matched in dmesg:" |
+			tee -a "${OUTPUTFILE}"
+			echo "$dmesgLine" | tee -a "${OUTPUTFILE}"
+			echo "see TESTOUT.log for actual message or $dmesgReport for report" |
+			tee -a "${OUTPUTFILE}"
+			echo "$dmesgLineNumber FAIL $dmesgLine" >> $dmesgReport
+		else
+			echo "$dmesgLineNumber PASS $dmesgLine" >> $dmesgReport
+		fi
 	done < $dmesgErrors
 
 	# report pass/fail to beaker if errors were found, upload report
