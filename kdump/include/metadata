@@ -11,4 +11,3 @@ entry_point=bash ./runtest.sh
 max_time=5m
 requires=elfutils-libelf-devel
 repoRequires=automotive/include
-

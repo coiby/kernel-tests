@@ -14,6 +14,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Turn off the POSIX to avoid syntax errors
+set +o posix
+
+. ../../automotive/include/rhivos.sh
+
 . ../include/lib.sh
 . ../include/kdump.sh
 . ../include/kdump-multi.sh
