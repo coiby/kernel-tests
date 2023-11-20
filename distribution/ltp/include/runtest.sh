@@ -178,6 +178,40 @@ PrintSysInfo ()
     SubmitLog ./systeminfo.txt
 }
 
+
+DmesgCheck ()
+{
+    if [[ -z ${LTP_DMESG_DIR_PREFIX} ]]; then
+        echo "FAIL: DmesgCheck requires LTP_DMESG_DIR_PREFIX to be set"
+        return
+    fi
+
+    # based on restraint dmesg check
+    # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check
+    LTP_FALSESTRINGS=${LTP_FALSESTRINGS:-"BIOS BUG|DEBUG|mapping multiple BARs.*IBM System X3250 M4"}
+    LTP_FAILURESTRINGS=${LTP_FAILURESTRINGS:-"Oops|BUG|NMI appears to be stuck|Badness at"}
+
+    # get the most recent directory created
+    # shellcheck disable=SC2010
+    dmesg_dir=$(ls -t "$LTPDIR"/output/ | grep "${LTP_DMESG_DIR_PREFIX}" | head -1)
+    if [ -z "$dmesg_dir" ]; then
+        echo "FAIL: it looks like LTP run without saving dmesg for test cases"
+        return
+    fi
+
+    DeBug "Checking for dmesg logs at $dmesg_dir"
+    pushd "$LTPDIR"/output/"$dmesg_dir"
+    for log in *.dmesg.log; do
+        DeBug "Checking for issues on dmesg file $log"
+        if grep -E -v "$LTP_FALSESTRINGS" "$log" | grep -E "$LTP_FAILURESTRINGS" >/dev/null 2>&1; then
+            # report failed result dmesg check as subtest name dmesg_check_$subtestname
+            subtestname=${log%.dmesg.log}
+            rstrnt-report-result -o "$log" "dmesg_check_${subtestname}" FAIL
+        fi
+    done
+    popd
+}
+
 RprtRslt ()
 {
     TEST=$1
@@ -200,6 +234,8 @@ RprtRslt ()
         # extract test case name from test case fail log
         rstrnt-report-result -o "$failed_test" "${failed_test%.fail.log}" FAIL
     done
+
+    DmesgCheck $TEST
 
     # each failure is reported as subtest, always report pass for the summary result
     SUMMARY_RESULT=PASS
@@ -343,20 +379,24 @@ RunTest ()
     # Default result to Fail
     export result_r="FAIL"
 
+    # LTP will save the dmesg for each test in a directory with this prefix
+    # under $LTPDIR/output
+    LTP_DMESG_DIR_PREFIX="DMESG_DIR_$RUNTEST"
+
     # Sync the time with the time server. Tests may change the time
     TimeSyncNTP
 
     if [ -n "$FILTERTESTS" ]; then
         FILTERTESTS="$(echo $FILTERTESTS | sed 's/\w\+/-e &/g')"
         time -p ${LTPDIR}/runltp -p -d $OUTPUTDIR -l $OUTPUTDIR/$RUNTEST.log \
-            -o $OUTPUTDIR/$RUNTEST.run.log $OPTIONS -s "$FILTERTESTS"
+            -o $OUTPUTDIR/$RUNTEST.run.log -K $LTP_DMESG_DIR_PREFIX $OPTIONS -s "$FILTERTESTS"
     else
         DebugInfo Before
         DeBug "Command Line:"
         DeBug "${LTPDIR}/runltp -p -d $OUTPUTDIR -l $OUTPUTDIR/$RUNTEST.log \
-            -o $OUTPUTDIR/$RUNTEST.run.log -f $RUNTEST $OPTIONS"
+            -o $OUTPUTDIR/$RUNTEST.run.log -f $RUNTEST -K $LTP_DMESG_DIR_PREFIX $OPTIONS"
         time -p ${LTPDIR}/runltp -p -d $OUTPUTDIR -l $OUTPUTDIR/$RUNTEST.log \
-            -o $OUTPUTDIR/$RUNTEST.run.log -f $RUNTEST $OPTIONS
+            -o $OUTPUTDIR/$RUNTEST.run.log -f $RUNTEST -K $LTP_DMESG_DIR_PREFIX $OPTIONS
     fi
 
     DebugInfo After
