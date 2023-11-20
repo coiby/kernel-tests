@@ -32,8 +32,8 @@ SETUPS=("setupDF")
 CLEANUPS=("cleanupDF")
 ACCELS=()
 MINOR=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}' | awk -F. '{print $2}')
-UPSTREAM=NO
-NODISABLE=NO
+UPSTREAM=${UPSTREAM:-NO}
+NODISABLE=${NODISABLE:-NO}
 
 source /usr/share/beakerlib/beakerlib.sh
 
