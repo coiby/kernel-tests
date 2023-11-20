@@ -13,16 +13,13 @@ class RtevalTest(rtut.RTUnitTest):
     def setUp(self):
         cwd = os.getcwd()
         self.wrkdir = f"{cwd}/workingdir"
-        self.logdir = f"{cwd}/logdir"
         self.summary = f"{cwd}/workingdir/*/summary.xml"
         self.make_dirs(self.wrkdir)
-        self.make_dirs(self.logdir)
         self.cpulist = "0"
 
     def tearDown(self):
         cwd = os.getcwd()
         self.rm_dirs(self.wrkdir)
-        self.rm_dirs(self.logdir)
         self.rm_dirs(f"{cwd}/rteval-[0-9]*")
         self.rm_dirs(f"{cwd}/rteval-build")
 
@@ -51,11 +48,11 @@ class RtevalTest(rtut.RTUnitTest):
 
     def test_cpu_list(self):
         self.run_cmd(f'rteval -d 10s -w {self.wrkdir} -D --loads-cpulist={self.cpulist} '
-                     f'-L {self.logdir} --cyclictest-priority=90')
+                     f'-L --cyclictest-priority=90')
 
     def test_measurement_cpu_list(self):
         self.run_cmd(f'rteval -d 10s -w {self.wrkdir} -s --measurement-cpulist={self.cpulist} '
-                     f'-L {self.logdir} --cyclictest-priority=90')
+                     f'-L --cyclictest-priority=90')
 
     def test_summarize(self):
         self.run_cmd(f'rteval -d 10s -w {self.wrkdir} && rteval -Z {self.summary}')
