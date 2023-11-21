@@ -1,0 +1,13 @@
+[General]
+name=storage/swraid/bz2066373_reshape_lvl0_to_lvl10
+owner=Nigel Croxon <ncroxon@redhat.com>
+description=Check if mdadm reshape level 0 to level 10
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=git;make;systemd-devel
+repoRequires=cki_lib
+max_time=5m

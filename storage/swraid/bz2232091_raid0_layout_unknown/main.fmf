@@ -1,0 +1,14 @@
+summary: storage/swraid/bz2232091_raid0_layout_unknown
+description: Test the function of RAID 0 default layout is "-unknown-"
+contact: Nigel Croxon <ncroxon@redhat.com>
+component:
+    - kernel
+path: /storage/swraid/bz2232091_raid0_layout_unknown
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+duration: 5m 
+tier: 1
+extra-summary: /storage/swraid/bz2232091_raid0_layout_unknown
+extra-task: /storage/swraid/bz2232091_raid0_layout_unknown
