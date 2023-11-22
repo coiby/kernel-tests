@@ -89,8 +89,10 @@ IfMemoryAboveThreshold()
 {
     # alternative in x86_64:
     # dmidecode -t 17 | grep "Size.*MB" | awk '{s+=$2} END {print s}'
-    local total_mem=$(lshw -short | grep -i "System Memory" | awk '{print $3}')
-    local mem=${total_mem::-3}
+    local total_mem mem
+
+    total_mem=$(lshw -short | grep -i 'System Memory' | awk '{print $3}')
+    mem=${total_mem::-3}
 
     if [[ "$total_mem" =~ "TiB" ]]; then
         mem=$((mem*1024*1024))
@@ -185,10 +187,8 @@ GetConfig() {
 
 CheckConfig()
 {
-    local multi=$1
-
     if [ ! -f "${KDUMP_CONFIG}" ]; then
-        [ -n "${multi}" ] && rstrnt-sync-set -s "DONE"
+        # [ -n "${1}" ] && rstrnt-sync-set -s "DONE"
         FatalError "Unable to find ${KDUMP_CONFIG}"
     fi
 }
@@ -340,8 +340,8 @@ CheckKdumpStatus()
 # This function is to return the path of kernel initrd which will be used in kdump kernel.
 GetKdumprd()
 {
-    local current_version="vmlinuz-$(uname -r)"
-    local kdumprd
+    local current_version kdumprd
+    current_version="vmlinuz-$(uname -r)"
 
     # if fadump is enabled,kdump kernel will always use the system initrd image.
     # if it is debug system:
@@ -362,19 +362,14 @@ GetKdumprd()
 
 ReportKdumprd()
 {
-    # Allow passing kdump initramfs img path
-    local kdumprd=$1
-
-    if [ -z "${kdumprd}" ]; then
-        # Submit Kdump initramfs.
-        kdumprd=$(GetKdumprd)
-    fi
+    # Get the kdump initramfs img path
+    kdumprd=$(GetKdumprd)
 
     Log "Reporting kdump initramfs image at: $kdumprd"
     if [ -f "${kdumprd}" ]; then
         RhtsSubmit "${kdumprd}"
     else
-        Error '- No ĸdumprd generated!'
+        Error 'No Kdump initrafms generated!'
     fi
 
     sync
@@ -537,7 +532,7 @@ ConfigFS()
     local fstype=""
     local target=""
 
-    if [ "$RAW" = "$true" ] && [ -f "${K_RAW}" ]; then
+    if [ "$RAW" == "true" ] && [ -f "${K_RAW}" ]; then
         # if $K_RAW exists, use the dev stored in $K_RAW as dump target
         dev=$(cut -d"," -f1 ${K_RAW})
     else
@@ -545,6 +540,7 @@ ConfigFS()
         fstype=$(findmnt -kcno FSTYPE $MP)
     fi
 
+    export LABEL
     case ${OPTION,,} in
         uuid)
             # some partitions have both UUID= and PARTUUID=
@@ -567,8 +563,8 @@ ConfigFS()
         *)
             # on s390x. dev path like /dev/dasda may change at each boot.
             # use /dev/disk/by-path/ccw-0.0.0121-part1 instead.
-            if [ "$K_ARCH" = "s390x" ] && echo "$dev" |grep -vq "/dev/mapper"; then
-                dev=$(ls -l /dev/disk/by-path/* | grep ${dev##/*/} | awk '{print $9}')
+            if [ "$K_ARCH" = "s390x" ] && echo "$dev" | grep -vq "/dev/mapper"; then
+                dev=$(find /dev/disk/by-path/ -name "${dev##/*/}*")
             fi
             target=$dev
             ;;
@@ -636,9 +632,11 @@ ConfigFilter()
 # RESTART_KDUMP: Whether restart kdump service after updating kdump config. Default 'true'
 ConfigAny()
 {
-    config_opt=${1:-"$TESTARGS"}
+    local config_opt key values
 
+    config_opt=${1:-"$TESTARGS"}
     config_opt="$(Chomp "${config_opt}")"
+
     [ -z "${config_opt}" ] && {
         # Force restarting kdump service and exit
         RestartKdump
@@ -646,13 +644,13 @@ ConfigAny()
         return 0
     }
 
-    local key="${config_opt%%[[:space:]]*}"
-    local values=$(sed "s/^${key}[[:space:]]\+//" <<< "${config_opt}")
+    key="${config_opt%%[[:space:]]*}"
+    values=$(sed "s/^${key}[[:space:]]\+//" <<< "${config_opt}")
 
     CheckConfig
     AppendConfig "${config_opt}"
 
-    if [ "$value" = '/bin/kdump-pre.sh' ] || [ "$value" = '/bin/kdump-post.sh' ]; then
+    if [ "$values" == '/bin/kdump-pre.sh' ] || [ "$values" == '/bin/kdump-post.sh' ]; then
         sh gen-helper-script
     fi
 
@@ -673,7 +671,8 @@ ConfigAny()
     ( $IS_RHEL8 || $IS_RHEL9 ) && return 0
 
     if [ "$key" = kdump_post ] || [ "$key" = kdump_pre ]; then
-        local file=$(awk '{print $2}' <<< "$config_opt" )
+        local file
+        file=$(awk '{print $2}' <<< "$config_opt")
         [ -f "$file" ] && RhtsSubmit "$file"
     fi
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright (c) 2020 Red Hat, Inc. All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,12 +25,15 @@ set +o posix
 . ../include/crash.sh
 
 # This is to allow loading an extra/internal lib file
+
 RESOURCE_URL=${RESOURCE_URL:-""}
 if [ -n "$RESOURCE_URL" ]; then
     lib_file="${RESOURCE_URL##*/}"
     [ ! -f "$lib_file" ] && curl -LO --fail "$RESOURCE_URL"
     if [ -f "$lib_file" ]; then
-        source ./"$lib_file"
+        # To bypass ShellCheck SC1090
+        # shellcheck source=./
+        . ./"$lib_file"
     else
         Warn "Failed to download the lib file $RESOURCE_URL."
     fi
