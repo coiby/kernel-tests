@@ -24,6 +24,7 @@ FILE=$(readlink -f $BASH_SOURCE)
 CDIR=$(dirname $FILE)
 
 source ../../../cki_lib/libcki.sh || exit 1
+source  "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
 function runtest()
 {
@@ -37,7 +38,7 @@ function runtest()
    rlLog "INFO: Successfully created md raid $RETURN_STR"
 
    rlLog "mkfs -t ext4 /dev/md0"
-   mkfs -t ext4 /dev/md0 
+   mkfs -t ext4 /dev/md0
 
    rlRun "mount -t ext4 /dev/md0 /mnt/md_test"
    rlRun "/usr/bin/dd if=/dev/urandom of=/mnt/md_test/testfile bs=1M count=100"

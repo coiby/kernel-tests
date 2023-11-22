@@ -24,7 +24,7 @@ FILE=$(readlink -f $BASH_SOURCE)
 CDIR=$(dirname $FILE)
 
 source ../../../cki_lib/libcki.sh || exit 1
-
+source  "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
 function runtest()
 {
