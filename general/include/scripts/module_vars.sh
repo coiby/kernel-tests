@@ -1,10 +1,7 @@
 #!/bin/bash
 # This file contains the shared variables used in various kmod/DUP/ftrace tests
 
-DistName=`rpm -E %{?dist} | sed 's/[.0-9]//g'`
-DistVer=`rpm -E %{?dist} | sed 's/[^0-9]//g'`
-DISTTAG=`rpm -E %{?dist}`
-DUPARCH=`arch`
+DistVer=`rpm -E '%{?dist}' | sed 's/[^0-9]//g'`
 KVer=`uname -r | awk -F '-' '{print $1}'`
 KDIST=`uname -r | sed "s/.$(arch)//g;s/\+debug//g;s/\.debug//g" | awk -F '.' '{print "."$NF}'`
 KBUILD=`uname -r | awk -F '-' '{print $2}' | sed "s/.$(arch)//g;s/\+debug//g;s/\.debug//g" | sed "s/${KDIST}//g"`
@@ -14,7 +11,6 @@ then
     KDIST=".el7"
 fi
 
-KernelName=`rpm -q --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r) | sed "s/.srpm//g;s/.src.rpm//g;s/-${KVer}-${KBUILD}${KDIST}//g"`
 KSRPMNAME=${KSRPMNAME:-$(rpm -q --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r) | sed "s/.srpm//g;s/.src.rpm//g;s/-${KVer}-${KBUILD}${KDIST}//g")}
 currentvariant=`rpm -qf /boot/config-$(uname -r) | sed "s/.srpm//g;s/.src.rpm//g;s/.rpm//g;s/-${KVer}-${KBUILD}${KDIST}.$(arch)//g;s/^kernel//g;s/-core$//g"`
 
@@ -81,17 +77,13 @@ install_kernel_subpackages()
     fi
     KBuild=${KBuild:-${KBUILD}}
     kernel_vra="${KVer}-${KBuild}${KDIST}.$(arch)"
-    allyumrpms=""
+    allyumrpm=""
     allpkgurl=""
-    if [[ $# -eq 0 ]]; then
-        if [[ ${DistVer} -lt 9 ]]; then
-            # the KPKGS should always have kernel-debuginfo before perf-debuginfo to make sure corresponding kernel*-debuginfo-common* is already installed
-            KPKGS="kernel-debuginfo kernel-headers kernel-abi-whitelists perf perf-debuginfo bpftool kernel-devel"
-        else
-            KPKGS="kernel-debuginfo kernel-headers kernel-abi-stablelists perf perf-debuginfo bpftool kernel-devel"
-        fi
+    if [[ ${DistVer} -lt 9 ]]; then
+        # the KPKGS should always have kernel-debuginfo before perf-debuginfo to make sure corresponding kernel*-debuginfo-common* is already installed
+        KPKGS="kernel-debuginfo kernel-headers kernel-abi-whitelists perf perf-debuginfo bpftool kernel-devel"
     else
-        KPKGS="$@"
+        KPKGS="kernel-debuginfo kernel-headers kernel-abi-stablelists perf perf-debuginfo bpftool kernel-devel"
     fi
     for p in $KPKGS ; do
         pkgurl=""

@@ -224,7 +224,7 @@ function startSuspendResume ()
 	while [ $COUNT -ge 0 ]
 	do
 		BOOTTIME_2=`cat /proc/stat | grep "btime" | awk '{print $2}'`
-		if [[ $BOOTTIME_1 != $BOOTTIME_2 ]]; then
+		if [[ "$BOOTTIME_1" != "$BOOTTIME_2" ]]; then
 			printf "FAIL: boottime not stable count = $COUNT\n\t * Before suspend to $i boottime = $BOOTTIME_1\n\t * After  suspend to $i boottime = $BOOTTIME_2\n"
 
 			BOOTTIME_FAIL=1
@@ -282,7 +282,7 @@ function runTest ()
 
 	if [[ $NOT_SUPPORT = 1 ]]; then
 		echo "Please Refers to BZ: https://bugzilla.redhat.com/show_bug.cgi?id=891967" | tee -a ${OUTPUTFILE}
-		echo "This is not Supported"| tee -a {OUTPUTFILE}
+		echo "This is not Supported"| tee -a ${OUTPUTFILE}
 		rstrnt-report-result $TEST SKIP 0
 		exit 0
 	fi
@@ -317,8 +317,8 @@ fi
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r))
 
 echo "***** Starting the runtest.sh script *****" | tee -a $OUTPUTFILE
-echo "***** Current Running Kernel Package = "$kernbase" *****" | tee -a $OUTPUTFILE
-echo "***** Current Running Distro = "$installeddistro" *****" | tee -a $OUTPUTFILE
+echo "***** Current Running Kernel Package = $kernbase *****" | tee -a $OUTPUTFILE
+echo "***** Current Running Distro = $installeddistro *****" | tee -a $OUTPUTFILE
 
 getdetails
 
