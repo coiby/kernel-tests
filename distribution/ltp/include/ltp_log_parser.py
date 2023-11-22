@@ -11,7 +11,7 @@ VERBOSE = False
 TC_START = "<<<test_start>>>"
 TC_END = "<<<test_end>>>"
 TC_NAME_FLAG = "tag="
-TC_RESULT_FLAG = r'termination_type=exited\s+termination_id=\d+'
+TC_RESULT_FLAG = r'termination_type=(exited|signaled)\s+termination_id=(\d+)'
 #
 # XXX: Right here we define some result code according to source file:
 # https://github.com/linux-test-project/ltp/blob/master/include/tst_res_flags.h
@@ -49,15 +49,14 @@ def get_tc_name(l_tc):
 
 def get_tc_term_id(l_tc):
     term_id = TPASS
-    l_res = []
     for text in l_tc:
         text = text.strip().rstrip()
         l_res = re.findall(TC_RESULT_FLAG, text)
         if l_res:
+            # Select the termination id from the tuple
+            s = l_res[0][1]
+            term_id = int(s)
             break
-    if l_res:
-        s = l_res[0].split('=')[-1]
-        term_id = int(s)
     return term_id
 
 
