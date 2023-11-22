@@ -41,7 +41,7 @@ FILES=$(METADATA) runtest.sh Makefile PURPOSE sme_module
 sme_test:
 	sh -c "unset ARCH; cd sme_module; make"
 
-run: $(FILES) build
+run: $(FILES)
 	( set +o posix; . /usr/bin/rhts_environment.sh; \
 		. /usr/share/beakerlib/beakerlib.sh; \
 		. runtest.sh )
@@ -65,7 +65,7 @@ $(METADATA): Makefile
 	@echo "Type:            Regression" >> $(METADATA)
 	@echo "TestTime:        1h" >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel" >> $(METADATA)
+	@echo "Requires:        gcc" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)

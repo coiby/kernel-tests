@@ -32,23 +32,63 @@
 set -o pipefail
 
 firstboot=/mnt/testarea/mem_encrypt_firstboot
+kname="$(rpm -qf --qf "%{name}\n" /boot/vmlinuz-$(uname -r) | sed 's/-core//g')"
+kversion="$(rpm -qf --qf "%{version}\n" /boot/vmlinuz-$(uname -r))"
+krelease="$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))"
 
 rlJournalStart
 	rlPhaseStartTest
-	if grep mem_encrypt=on /proc/cmdline ; then
-		rlLog "already set"
-		grep "\<SME\>" <(journalctl -kb) || return 0
+	uname -r | grep x86_64 || { report_result "x86_64 only" SKIP; exit 0; }
+	lscpu | grep -w sme && rlLog "sme is supported / enabled"
+	if test -f $firstboot && grep "done" $firstboot; then
+		grep "mem_encrypt=on" /proc/cmdline
+		rlRun "rm -f $firstboot"
+		rlPhaseEnd
+		rlJournalEnd
+		exit 0
+	elif grep mem_encrypt=on /proc/cmdline ; then
+		rlLog "already set mem_encrypt=on"
+		if ! test -f $firstboot; then
+			rlLog "by default"
+			rlRun "touch $firstboot"
+			skip_cleanup_cmdline=1
+			echo "skip_cleanup_cmdline" > $firstboot
+		fi
+		grep "\<SME\>" <(journalctl -kb) || {
+			rlLog "sme not enabled in bios or not supported, skip test ..."
+			report_result "sme not enabled in bios" SKIP
+			((skip_cleanup_cmdline == 1)) || {
+				rlRun "grubby --remove-args mem_encrypt=on --update-kernel DEFAULT"
+				touch $firstboot
+				echo "done" >> $firstboot
+				rlPhaseEnd
+				rlJournalEnd
+				rhts-reboot
+			}
+			rlPhaseEnd
+			rlJournalEnd
+			exit 0
+		}
 	elif [ ! -e $firstboot ]; then
 		rlRun "grubby --args mem_encrypt=on --update-kernel DEFAULT"
 		rlRun "touch $firstboot"
+		rlPhaseEnd
+		rlJournalEnd
 		rhts-reboot
 	fi
+	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlRpmInstall "${kname}-devel" "$kversion" "$krelease" "$(uname -m)"
+	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
+	rlRun "make -C sme_module" 0
+	rlRun "dmesg -C"
 	rlRun "insmod sme_module/sme_test.ko" 1
-	rlRun "dmesg | grep SMEtest | awk '{print \$5,\$6,\$7,\$8,\$9,\$10,\$11,\$12}' | grep -v deadbeef" 0
+	rlRun "journalctl -k --no-hostname | grep SMEtest | awk '{print \$5,\$6,\$7,\$8,\$9,\$10,\$11,\$12}' | grep -v deadbeef" 0
 	rlRun "dmesg -C"
 	if [ -e $firstboot ]; then
+		grep skip_cleanup_cmdline $firstboot && echo "reserve mem_encrypt=on in cmdline" && rm -f $firstboot && exit 0
 		rlRun "grubby --remove-args mem_encrypt=on --update-kernel DEFAULT"
-		rlRun "rm $firstboot"
+		rlRun "echo done > $firstboot"
+		rlPhaseEnd
+		rlJournalEnd
 		rhts-reboot
 	fi
 	rlPhaseEnd
