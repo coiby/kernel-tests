@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=iscsi-initiator-utils;mdadm
+dependencies=git;make;systemd-devel;mdadm
 repoRequires=cki_lib
