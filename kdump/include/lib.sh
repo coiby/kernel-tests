@@ -1,7 +1,5 @@
 #!/bin/bash
 
-. ../../automotive/include/rhivos.sh
-
 K_TESTAREA="/mnt/testarea"
 K_NFS="${K_TESTAREA}/KDUMP-NFS"
 K_PATH="${K_TESTAREA}/KDUMP-PATH"
