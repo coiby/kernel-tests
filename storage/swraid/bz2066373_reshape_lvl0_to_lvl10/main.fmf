@@ -8,7 +8,7 @@ test: bash ./runtest.sh
 framework: shell
 recommend:
     - beakerlib-redhat
-duration: 5m 
+duration: 5m
 tier: 1
 extra-summary: /storage/swraid/bz2066373_reshape_lvl0_to_lvl10
 extra-task: /storage/swraid/bz2066373_reshape_lvl0_to_lvl10
