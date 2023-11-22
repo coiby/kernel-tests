@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=git;make;systemd-devel;mdadm
+dependencies=mdadm
 repoRequires=cki_lib
