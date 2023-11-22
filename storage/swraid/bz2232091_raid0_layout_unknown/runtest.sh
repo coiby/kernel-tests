@@ -28,51 +28,51 @@ source  "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
 function runtest()
 {
-  rlRun "mdadm --create --run /dev/md0 --level 0  --metadata 1.2 \
-       --raid-devices 2 /dev/loop0 /dev/loop1"
-   if [ $? -ne 0 ];then
-	rlFail "FAIL: Failed to create md raid level0"
-	exit
-   fi
-   rlLog "INFO: Successfully created md raid level0"
+rlRun "mdadm --create --run /dev/md0 --level 0  --metadata 1.2 \
+--raid-devices 2 /dev/loop0 /dev/loop1"
+if [ $? -ne 0 ];then
+rlFail "FAIL: Failed to create md raid level0"
+exit
+fi
 
+rlLog "INFO: Successfully created md raid level0"
 
-   layout=$(mdadm -D /dev/md0 | grep 'Layout' | awk '{print $3}')
-   if [[ "$layout" == "-unknown-" ]];then
-	rlFail "FAIL: RAID 0 default layout is -unknown- "
-	cleanup
-	exit 1
-   fi
+layout=$(mdadm -D /dev/md0 | grep 'Layout' | awk '{print $3}')
+if [[ "$layout" == "-unknown-" ]];then
+rlFail "FAIL: RAID 0 default layout is -unknown- "
+cleanup
+exit 1
+fi
 
-   MD_Clean_RAID /dev/md0
-   return $CKI_PASS
+MD_Clean_RAID /dev/md0
+return $CKI_PASS
 
 }
 
 
 function startup
 {
-    if ( ! rpm -q mdadm );then
-        yum -y install mdadm
-    fi
+if ( ! rpm -q mdadm );then
+yum -y install mdadm
+fi
 
-    for i in {0..2};do
-        rlRun "dd if=/dev/urandom of=/opt/loop_$i bs=1M count=500"
-    done
+for i in {0..2};do
+rlRun "dd if=/dev/urandom of=/opt/loop_$i bs=1M count=500"
+done
 
-    for i in {0..2};do
-        rlRun "losetup /dev/loop$i /opt/loop_$i"
-    done
+for i in {0..2};do
+rlRun "losetup /dev/loop$i /opt/loop_$i"
+done
 
-    return $CKI_PASS
+return $CKI_PASS
 }
 
 function cleanup
 {
-    rlRun "mdadm --stop /dev/md0"
-    rlRun "losetup -D"
-    rlRun "rm -f /opt/loop_*"
-    return $CKI_PASS
+rlRun "mdadm --stop /dev/md0"
+rlRun "losetup -D"
+rlRun "rm -f /opt/loop_*"
+return $CKI_PASS
 }
 
 cki_main

@@ -28,48 +28,50 @@ source  "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
 function runtest()
 {
-   rlRun "mdadm -Ss"
-   rlRun "mdadm --create --run /dev/md0 --level 0  --metadata 1.2 \
-       --raid-devices 3 /dev/loop[0-2] --chunk 512 "
-   if [ $? -ne 0 ];then
-	rlFail "FAIL: Failed to create md raid $RETURN_STR"
-	exit
-   fi
-   rlLog "INFO: Successfully created md raid $RETURN_STR"
+rlRun "mdadm -Ss"
+rlRun "mdadm --create --run /dev/md0 --level 0  --metadata 1.2 \
+--raid-devices 3 /dev/loop[0-2] --chunk 512 "
 
-   rlLog "mkfs -t ext4 /dev/md0"
-   mkfs -t ext4 /dev/md0
+if [ $? -ne 0 ];then
+rlFail "FAIL: Failed to create md raid $RETURN_STR"
+exit
+fi
 
-   rlRun "mkdir -p /mnt/md_test"
-   rlRun "mount -t ext4 /dev/md0 /mnt/md_test"
-   rlRun "umount /mnt/md_test"
+rlLog "INFO: Successfully created md raid $RETURN_STR"
 
-   rlRun "mdadm --grow /dev/md0 -l10 -a /dev/loop3 /dev/loop4 /dev/loop5 --backup-file=tmp0"
+rlLog "mkfs -t ext4 /dev/md0"
+mkfs -t ext4 /dev/md0
 
-   return $CKI_PASS
+rlRun "mkdir -p /mnt/md_test"
+rlRun "mount -t ext4 /dev/md0 /mnt/md_test"
+rlRun "umount /mnt/md_test"
+
+rlRun "mdadm --grow /dev/md0 -l10 -a /dev/loop3 /dev/loop4 /dev/loop5 --backup-file=tmp0"
+
+return $CKI_PASS
 }
 
 function startup
 {
-    if ( ! rpm -q mdadm );then
-        yum -y install mdadm
-    fi
+if ( ! rpm -q mdadm );then
+yum -y install mdadm
+fi
 
-    for i in {0..5};do
-        rlRun "dd if=/dev/urandom of=/opt/loop_$i bs=4M count=500"
-        rlRun "losetup /dev/loop$i /opt/loop_$i"
-    done
+for i in {0..5};do
+rlRun "dd if=/dev/urandom of=/opt/loop_$i bs=4M count=500"
+rlRun "losetup /dev/loop$i /opt/loop_$i"
+done
 
-    return $CKI_PASS
+return $CKI_PASS
 }
 
 
 function cleanup
 {
-    rlRun "mdadm --stop /dev/md0"
-    rlRun "losetup -D"
-    rlRun "rm -f /opt/loop_*"
-    return $CKI_PASS
+rlRun "mdadm --stop /dev/md0"
+rlRun "losetup -D"
+rlRun "rm -f /opt/loop_*"
+return $CKI_PASS
 }
 
 
