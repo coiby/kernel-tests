@@ -52,7 +52,8 @@ function check_tests()
 		echo "./checking $XFSTEST" > /dev/kmsg
 		MOUNT_OPTIONS="$MOUNT_OPTS" MKFS_OPTIONS="$MKFS_OPTS" xlog ./check $CHECK_OPTS $XFSTEST
 		ret=$?
-		dmesg > results/$XFSTEST.dmesg.log
+		dmesgfile="$XFSTEST.dmesg.log"
+		dmesg > results/"${dmesgfile}"
 		# Clear the dmesg ring buffer to avoid rstrnt-report-log also report
 		# the same failure that xfstests _check_dmesg does.
 		dmesg -c >/dev/null
@@ -75,12 +76,12 @@ function check_tests()
 				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*I/O error" && false_alarm=1
 				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*not supported" && false_alarm=1
 			fi
-			if [ -f results/$XFSTEST.dmesg ]; then
-				cp results/$XFSTEST.dmesg results/$XFSTEST_LOGNAME.dmesg
-				rstrnt-report-log -l results/$XFSTEST_LOGNAME.dmesg
-				grep "possible circular locking dependency detected" results/$XFSTEST_LOGNAME.dmesg &&
+			if [ -f results/$dmesgfile ]; then
+				cp results/$dmesgfile results/$XFSTEST_LOGNAME.dmesg.log
+				rstrnt-report-log -l results/$XFSTEST_LOGNAME.dmesg.log
+				grep "possible circular locking dependency detected" results/$XFSTEST_LOGNAME.dmesg.log &&
 				false_alarm=1
-				grep "MAX_LOCKDEP_ENTRIES too low" results/$XFSTEST_LOGNAME.dmesg &&
+				grep "MAX_LOCKDEP_ENTRIES too low" results/$XFSTEST_LOGNAME.dmesg.log &&
 				false_alarm=1
 			fi
 			if [ $false_alarm -eq 0 ] ; then
