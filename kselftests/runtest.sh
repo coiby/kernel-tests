@@ -49,7 +49,7 @@ INCLUDE=${INCLUDE:-""}
 
 . "$CDIR"/include/include.sh
 for file in $INCLUDE; do
-    echo "Loading "$file"."
+    echo "Loading $file."
     . "$CDIR"/include/$file
 done
 
@@ -130,7 +130,7 @@ install_packages()
     # to get Module.symvers
     rlRun "$pkg_mgr $pkg_mgr_inst_string ${name}-devel-${version}-${release}"
     symvers=$(rpm -ql "${name}-devel" | grep '\<Module.symvers\>$')
-    rlRun "ln -s "${symvers}" Module.symvers"
+    rlRun "ln -s ${symvers} Module.symvers"
     popd
 }
 
