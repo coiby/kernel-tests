@@ -62,16 +62,16 @@ Describe 'blktests/include: get_test_result'
         echo "status pass" > blktests/results/test1
         echo "status fail" > blktests/results/test11
         echo "status pass" > blktests/results/test111
-        touch blktests/results/test11.out.bad.log
-        touch blktests/results/test11.full.log
-        touch blktests/results/test11.dmesg.log
+        touch blktests/results/test11.out.bad
+        touch blktests/results/test11.full
+        touch blktests/results/test11.dmesg
 
         When call get_test_result blktests test11
         The line 1 should equal "FAIL"
         The status should be success
-        The contents line 1 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.out.bad.log"
-        The contents line 2 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.full.log"
-        The contents line 3 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.dmesg.log"
+        The contents line 1 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.out.bad"
+        The contents line 2 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.full"
+        The contents line 3 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.dmesg"
         The contents lines of file "blktests/cki_upload_log_file.txt" should equal 3
     End
 
