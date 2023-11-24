@@ -243,11 +243,15 @@ rlJournalStart
 	# bz1308907 coverage
 	rlPhaseStartTest "bz1308907 coverage -- FAILED '/usr/libexec/perf-core/tests/attr/test-stat-C0' - match failure"
 		# check if the test is not disabled on this machine
-		TEST_NUMBER="`perf test list |& grep perf_event_attr | perl -ne 'print $1 if /^(\d+):\s/'`"
+		TEST_NUMBER="`perf test list |& grep perf_event_attr | perl -ne 'print $1 if /^\s*(\d+):\s/'`"
 		TEST_DESC="`perf test list |& grep perf_event_attr | perl -pe 's/^\d+:\s//'`"
 		if check_allowlisted "$TEST_DESC"; then
 			rlLog "bz1308907 coverage skipped (allowlisted)"
+		elif [ -z "$TEST_NUMBER" ]; then
+			rlLog "bz1308907 coverage skipped (could not parse the test number)"
 		else
+			# in case max sample rate was lowered by previous tests
+			rlRun "echo $REASONABLE_SAMPLE_RATE > /proc/sys/kernel/perf_event_max_sample_rate" 0 "Updating sample rate to $REASONABLE_SAMPLE_RATE"
 			# the corresponding perf-test should NOT contain the following line in the output:
 			# FAILED '/usr/libexec/perf-core/tests/attr/test-stat-C0' - match failure
 			rlRun "perf test -v $TEST_NUMBER |& grep FAILED" 1 "bz1308907 test (should PASS)" # BUG REPRODUCTION ASSERT
