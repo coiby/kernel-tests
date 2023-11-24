@@ -54,9 +54,9 @@ function get_test_result
 
 	typeset result_dir="$test_ws/results"
 	result_file="$(find "$result_dir" -type f | grep -E "$test_case$")"
-	typeset out_bad_file="${result_file}.out.bad"
-	typeset out_full_file="${result_file}.full"
-	typeset out_dmesg_file="${result_file}.dmesg"
+	typeset out_bad_file="${result_file}.out.bad.log"
+	typeset out_full_file="${result_file}.full.log"
+	typeset out_dmesg_file="${result_file}.dmesg.log"
 	typeset result="UNTESTED"
 	if [[ -n $result_file ]]; then
 		res=$(grep "^status" "$result_file")
