@@ -2,13 +2,16 @@
 
 # ---------------- Crash Utility related Functions ------------------------ #
 
+# Set in GetCorePath()
+export vmcore
+# Set in CheckVmlinux()
+export vmlinux
+
 LsCore()
 {
     LogRun 'ls -l "${vmcore}"'
     [ $? -ne 0 ] && FatalError "ls returns errors."
 }
-
-
 
 GetDumpFile()
 {
@@ -48,6 +51,18 @@ GetCorePath()
         Report
     fi
     vmcore="${dump_file_path}"
+}
+
+CheckVmlinux()
+{
+    vmlinux="/usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
+    [ ! -f "${vmlinux}" ] && MajorError "vmlinux not found."
+
+    # validate kernel-debuginfo file sanity
+    rpm -V "${K_NAME%-core}-debuginfo" || {
+        ls -l "/usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
+        MajorError "${K_NAME%-core}-debuginfo file sanity check failed"
+    }
 }
 
 # Run crash cmd defined in $cmd_file. Only return code is checked.

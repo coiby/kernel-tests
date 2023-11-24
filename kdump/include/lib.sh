@@ -1,41 +1,36 @@
 #!/bin/bash
 
-K_TESTAREA="/mnt/testarea"
-K_NFS="${K_TESTAREA}/KDUMP-NFS"
-K_PATH="${K_TESTAREA}/KDUMP-PATH"
-K_RAW="${K_TESTAREA}/KDUMP-RAW"
-K_RAID="${K_TESTAREA}/KDUMP-RAID"
-K_REBOOT="./KDUMP-REBOOT"
-K_NET_IFCFG="${K_TESTAREA}/KDUMP-CONFIG-NET"
+export K_TESTAREA="/mnt/testarea"
+export K_NFS="${K_TESTAREA}/KDUMP-NFS"
+export K_PATH="${K_TESTAREA}/KDUMP-PATH"
+export K_RAW="${K_TESTAREA}/KDUMP-RAW"
+export K_RAID="${K_TESTAREA}/KDUMP-RAID"
+export K_REBOOT="./KDUMP-REBOOT"
+export K_NET_IFCFG="${K_TESTAREA}/KDUMP-CONFIG-NET"
 
-KDUMP_CONFIG="/etc/kdump.conf"
-KDUMP_SYS_CONFIG="/etc/sysconfig/kdump"
-FSTAB_FILE="/etc/fstab"
-K_NMCLI_PATH="/etc/NetworkManager/system-connections"
-K_SSH_CONFIG="${HOME}/.ssh/config"
-K_ID_RSA="${SSH_KEY:-/root/.ssh/kdump_id_rsa}"
-K_DEFAULT_PATH="/var/crash"
+export KDUMP_CONFIG="/etc/kdump.conf"
+export KDUMP_SYS_CONFIG="/etc/sysconfig/kdump"
+export FSTAB_FILE="/etc/fstab"
+export K_NMCLI_PATH="/etc/NetworkManager/system-connections"
+export K_SSH_CONFIG="${HOME}/.ssh/config"
+export K_ID_RSA="${SSH_KEY:-/root/.ssh/kdump_id_rsa}"
+export K_DEFAULT_PATH="/var/crash"
 
-K_NFSSERVER=${K_NFSSERVER:-""}
-K_VMCOREPATH=${K_VMCOREPATH:-""}
+export K_NFSSERVER=${K_NFSSERVER:-""}
+export K_VMCOREPATH=${K_VMCOREPATH:-""}
 
-NODEBUGINFO=${NODEBUGINFO:-true}
-NOKDUMPRD=${NOKDUMPRD:-true}
-UPGRADE_FC_KDUMP=${UPGRADE_FC_KDUMP:-false}
+export NODEBUGINFO=${NODEBUGINFO:-true}
+export NOKDUMPRD=${NOKDUMPRD:-true}
+export UPGRADE_FC_KDUMP=${UPGRADE_FC_KDUMP:-false}
+
 # bz1664239 Check unnecessay kdump initramfs img rebuild if needed.
-CHECK_INITRD_REBUILD=${CHECK_INITRD_REBUILD:-false}
-ALLOW_SKIP=${ALLOW_SKIP:-"true"}
+export CHECK_INITRD_REBUILD=${CHECK_INITRD_REBUILD:-false}
+export ALLOW_SKIP=${ALLOW_SKIP:-"true"}
 
+# Output and based on which result will be reporting
+export OUTPUTFILE
 if [ -z "$OUTPUTFILE" ]; then
-    export OUTPUTFILE=$(mktemp ${K_TESTAREA}/tmp.XXXXXX)
-fi
-
-if [ -z "$ARCH" ]; then
-        ARCH=$(uname -m)
-fi
-
-if [ -z "$FAMILY" ]; then
-    FAMILY=$(sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g' < /etc/redhat-release)
+    OUTPUTFILE=$(mktemp ${K_TESTAREA}/tmp.XXXXXX)
 fi
 
 # Set well-known logname so users can easily find
@@ -43,19 +38,21 @@ fi
 # used by the local watchdog to upload the log
 # of the current task.
 if [ -h /mnt/testarea/current.log ]; then
-        ln -sf $OUTPUTFILE /mnt/testarea/current.log
+    ln -sf $OUTPUTFILE /mnt/testarea/current.log
 else
-        ln -s $OUTPUTFILE /mnt/testarea/current.log
+    ln -s $OUTPUTFILE /mnt/testarea/current.log
 fi
 
 function report_result {
-        # Pass OUTPUTFILE to rstrnt-report-result in case the variable wasn't exported
-        OUTPUTFILE=$OUTPUTFILE rstrnt-report-result "$@"
+    # Pass OUTPUTFILE to rstrnt-report-result in case the variable wasn't exported
+    OUTPUTFILE=$OUTPUTFILE rstrnt-report-result "$@"
 }
 
-# Kernel Variables
 
-if [[ $(rpm -qf /boot/vmlinuz-$(uname -r)) =~ "not owned by any package" ]]; then
+# Kernel Variables
+export K_NAME K_ARCH K_VER K_REL K_KVARI K_SPEC_NAME
+
+if [[ $(rpm -qf /boot/vmlinuz-"$(uname -r)") =~ "not owned by any package" ]]; then
     # kernel config/vmlinuz are installed from tarball, not dnf install
     # So far test only support "kernel" to be installed via tarball, not other variant.
     K_NAME=kernel
@@ -66,16 +63,16 @@ if [[ $(rpm -qf /boot/vmlinuz-$(uname -r)) =~ "not owned by any package" ]]; the
     K_SPEC_NAME=kernel
 else
     # Example outputs: kernel-core, kernel-rt-core, kernel-rt-debug-core
-    K_NAME=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r))
+    K_NAME=$(rpm --queryformat '%{name}\n' -qf /boot/config-"$(uname -r)")
     K_ARCH=$(uname -m)
 
     # Kernel version
     # Example outputs: 2.6.32, 4.18.0
-    K_VER=$(rpm --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
+    K_VER=$(rpm --queryformat '%{version}\n' -qf /boot/config-"$(uname -r)")
 
     # Kernel release (version variant and arch)
     # Example outputs: 1160.81.1.el7, 226.el9, 5.14.0-226.rt14.227.el9
-    K_REL=$(rpm --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
+    K_REL=$(rpm --queryformat '%{release}\n' -qf /boot/config-"$(uname -r)")
 
     # Example outputs: debug, xen, vanilla
     # Note, rt kernel (and rt debug kernel) will be treated as variants after
@@ -83,7 +80,7 @@ else
     K_KVARI=$(uname -r | grep -Eo '(debug|PAE|xen|trace|vanilla|rt|rt(-)*debug|64k|64k-debug)$')
 
     # Example output: kernel-2.6.32-220.el6.src.rpm
-    K_SRC=$(rpm --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r))
+    K_SRC=$(rpm --queryformat '%{sourcerpm}\n' -qf /boot/config-"$(uname -r)")
 
     # Example outputs: kernel-rt, kernel
     # This is a little cryptic, in practice it takes the full src rpm file
@@ -95,6 +92,14 @@ else
     K_SPEC_NAME=${K_SRC%%"-${K_VER}"*}
 fi
 
+export FAMILY RELEASE ARCH
+export IS_RHEL5 IS_RHEL6 IS_RHEL7 IS_RHEL8 IS_RHEL9
+export IS_FC IS_RHEL IS_COS
+export IS_RT IS_DB IS_64K
+
+if [ -z "$FAMILY" ]; then
+    FAMILY=$(sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g' < /etc/redhat-release)
+fi
 
 [[ "$FAMILY" =~ [a-zA-Z]+5 ]] && IS_RHEL5=true || IS_RHEL5=false
 [[ "$FAMILY" =~ [a-zA-Z]+6 ]] && IS_RHEL6=true || IS_RHEL6=false
@@ -109,6 +114,10 @@ if $IS_FC || $IS_COS; then
     RELEASE=$(grep -o 'release [^ ]*' /etc/redhat-release  | awk '{print $NF}')
 else
     RELEASE=$(grep -o 'release [^.]*' /etc/redhat-release | awk '{print $NF}')
+fi
+
+if [ -z "$ARCH" ]; then
+    ARCH=$(uname -m)
 fi
 
 uname -r | grep -q rt && IS_RT=true || IS_RT=false
@@ -126,6 +135,10 @@ else
     INITRD_KDUMP_PREFIX=initramfs
 fi
 
+export K_BOOT VMLINUZ_PATH
+export INITRD_PREFIX INITRD_IMG_PATH
+export INITRD_KDUMP_PREFIX INITRD_KDUMP_IMG_PATH
+
 shopt -s extglob
 
 if system_ostree; then
@@ -134,8 +147,8 @@ if system_ostree; then
     # kernel image - vmlinuz-$(uname -r)-$(commit_hash)
     # initramfs image - initramfs-$(uname -r).img-${commit_hash}
     INITRD_IMG_PATH=$(find $K_BOOT -name "${INITRD_PREFIX}-$(uname -r).img-*")
-    VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-$(uname -r)!(*debug*|*64k*|*rt*))
-    [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-$(uname -r)!(*debug*|*64k*|*rt*))
+    VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-"$(uname -r)"!(*debug*|*64k*|*rt*))
+    [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-"$(uname -r)"!(*debug*|*64k*|*rt*))
 else
     [ "${K_ARCH}" = "ia64" ] && K_BOOT="/boot/efi/efi/redhat" || K_BOOT="/boot"
     INITRD_IMG_PATH="$K_BOOT/$INITRD_PREFIX-$(uname -r).img"
@@ -248,7 +261,7 @@ MakeModule()
     #     unset ARCH
     # fi
     LogRun "make -C ${name}" || MajorError "Unable to compile ${name} Kernel module."
-    export ARCH=$(uname -m)
+    ARCH="$(uname -m)"
 }
 
 InstallDevTools()
@@ -320,7 +333,7 @@ InstallKernel()
 
     # If kernel is installed from tarball.
     # There is no way to get the corresponding packages from Brew/Koji
-    [[ "$(rpm -qf /boot/vmlinuz-$(uname -r))" =~ "not owned by any package" ]] && {
+    [[ $(rpm -qf /boot/vmlinuz-"$(uname -r)") =~ "not owned by any package" ]] && {
         return 1
     }
 
@@ -348,17 +361,20 @@ InstallKernel()
     }
 
     [ -d "temp" ] || mkdir temp > /dev/null
-    pushd temp
     local retval=0
-    for i in ${tmp}; do
-        Log "Downloading: ${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm"
-        curl -LO --fail "${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm" 2> /dev/null || {
-            retval=$?
-            Log "Downloading ${i}.rpm failed"
-            break
-        }
-    done
-    popd
+    if pushd temp; then
+        for i in ${tmp}; do
+            Log "Downloading: ${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm"
+            curl -LO --fail "${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm" 2> /dev/null || {
+                retval=$?
+                Log "Downloading ${i}.rpm failed"
+                break
+            }
+        done
+        popd || retval=1
+    else
+        retval=1
+    fi
 
     if [ "${retval}" -eq 0 ]; then
         LogRun "rpm -Uvh --nodeps --force temp/*.rpm"
@@ -378,7 +394,7 @@ InstallDebuginfo()
 {
     # kernel name is kernel-core since rhel-8. So explicitly remove "-core"
     local kern comm
-    kern=$(rpm -qf /boot/vmlinuz-$(uname -r) --qf "%{name}-debuginfo-%{version}-%{release}.%{arch}" | sed -e "s/-core//g")
+    kern=$(rpm -qf /boot/vmlinuz-"$(uname -r)" --qf "%{name}-debuginfo-%{version}-%{release}.%{arch}" | sed -e "s/-core//g")
     if [[ "$kern" =~ "not owned by any package" ]]; then
         # The kernel is installed from tarball, not rpm install
         kern="kernel-debuginfo-$(uname -r)"
@@ -403,11 +419,12 @@ InstallDebuginfo()
 InstallKpatchPatchDebuginfo()
 {
     # Example of a kpatch-patch pkg "kpatch-patch-4_18_0-107-0-1.test.el8.x86_64"
-    local kpp_pkg=$(rpm -qa | grep kpatch-patch | grep -v debug)
+    local kpp_pkg kpp_debuginfo_pkg
+    kpp_pkg=$(rpm -qa | grep kpatch-patch | grep -v debug)
     [ -z "${kpp_pkg}" ] && Error "Failed to find kpatch-patch pkg"
 
     # Example of a kpatch-patch debuginfo pkg "kpatch-patch-4_18_0-107-debuginfo-0-1.test.el8.x86_64"
-    local kpp_debuginfo_pkg=$(echo "$kpp_pkg" | sed 's/-/-debuginfo-/4')
+    kpp_debuginfo_pkg=$(echo "$kpp_pkg" | sed 's/-/-debuginfo-/4')
 
     # Kpatch-patch repo is supposed to be ready during test
     rpm -q ${kpp_debuginfo_pkg} || {
@@ -464,6 +481,7 @@ UpdateKernelOptions()
 
 CheckEnv()
 {
+    export SERVERFILE DEVMODE
     # Check test environment.
     if [ -z "${JOBID}" ]; then
         Log "Variable JOBID does not set! Assume developer mode."
@@ -525,7 +543,7 @@ PrepareReboot()
         EFI=$(efibootmgr -v | grep BootCurrent | awk '{ print $2}')
         if [ -n "$EFI" ]; then
             Log "Updating efibootmgr next boot option to $EFI according to BootCurrent"
-            efibootmgr -n $(efibootmgr -v | grep BootCurrent | awk '{ print $2}')
+            efibootmgr -n "$(efibootmgr -v | grep BootCurrent | awk '{ print $2}')"
         elif [[ -z "$EFI" && -f /root/EFI_BOOT_ENTRY.TXT ]] ; then
             os_boot_entry=$(</root/EFI_BOOT_ENTRY.TXT)
             Log "Updating efibootmgr next boot option to $os_boot_entry according to EFI_BOOT_ENTRY.TXT"
@@ -575,7 +593,8 @@ RunSubTests(){
     # if the arg "TESTARGS" is "all", run all sh scripts defined in subdirectory testcases
     # e.g. TESTARGS="analyse-crash-common.sh,analyse-crash-simple.sh"
 
-    local all_tests=$(find testcases/ -name "*.sh" -printf "%f\n")
+    local all_tests
+    all_tests=$(find testcases/ -name "*.sh" -printf "%f\n")
     if [ "TEST${TESTARGS}" == "TEST" ] || [ ${TESTARGS,,} == "all" ]; then
         TESTARGS="all"
     else
@@ -618,24 +637,19 @@ RunSubTests(){
 MultihostStage()
 {
     local stage=$1; shift
-    local func=$@
-
-    if [[ ! -z $func && ${func} != true ]]; then
-        RunBeakerTest ${func}
-        Report $stage
-    fi
+    RunBeakerTest "$@"
+    Report $stage
 }
 
 Multihost()
 {
-    local func=$@
-    RunBeakerTest ${func}
+    RunBeakerTest "$@"
     Report
 }
 
 RunBeakerTest()
 {
-    local func=$@
+    local func=("$@")
 
     skip=0
     warn=0
@@ -646,10 +660,10 @@ RunBeakerTest()
     # or a multi-host test on a SERVER or a CLIENT
 
     if [ -z "${SERVERS}" ] && [ -z "${CLIENTS}" ]; then
-        ${func}
+        "${func[@]}"
     elif echo "${CLIENTS}" | grep -qi "${HOSTNAME}"; then
         TEST="${TEST}/client"
-        ${func}
+        "${func[@]}"
         Log "Client finishes."
     elif echo "${SERVERS}" | grep -qi "${HOSTNAME}"; then
         TEST="${TEST}/server"
@@ -660,18 +674,6 @@ RunBeakerTest()
     fi
 }
 
-
-CheckVmlinux()
-{
-    vmlinux="/usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
-    [ ! -f "${vmlinux}" ] && MajorError "vmlinux not found."
-
-    # validate kernel-debuginfo file sanity
-    rpm -V "${K_NAME%-core}-debuginfo" || {
-        ls -l "/usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
-        MajorError "${K_NAME%-core}-debuginfo file sanity check failed"
-    }
-}
 
 # testing case which forbidden by selinux can offer a selinux's module
 # and this function will try to compile the module and load it into system
@@ -724,8 +726,8 @@ isSecureBootEnforced()
     local secure_boot_file setup_mode_file
     local secure_boot_byte setup_mode_byte
 
-    secure_boot_file=$(find /sys/firmware/efi/efivars -name SecureBoot-* 2>/dev/null)
-    setup_mode_file=$(find /sys/firmware/efi/efivars -name SetupMode-* 2>/dev/null)
+    secure_boot_file=$(find /sys/firmware/efi/efivars -name "SecureBoot-*" 2>/dev/null)
+    setup_mode_file=$(find /sys/firmware/efi/efivars -name "SetupMode-*" 2>/dev/null)
 
     if [ -f "$secure_boot_file" ] && [ -f "$setup_mode_file" ]; then
         secure_boot_byte=$(hexdump -v -e '/1 "%d\ "' $secure_boot_file|cut -d' ' -f 5)
@@ -799,17 +801,17 @@ VerCompare() {
             echo 'Error: invalid input'
             return 255
         }
-        current=(${BASH_REMATCH[1]} ${BASH_REMATCH[3]})
+        current=("${BASH_REMATCH[1]}" "${BASH_REMATCH[3]}")
         # divide target version
         [[ $targ_version =~ $regex ]] || {
             echo 'Error: invalid input'
             return 255
         }
-        target=(${BASH_REMATCH[1]} ${BASH_REMATCH[3]})
+        target=("${BASH_REMATCH[1]}" "${BASH_REMATCH[3]}")
     else
         # for the input like crash 4.11.12-200 without el|fc suffix
-        current=($curr_version)
-        target=($targ_version)
+        current=("$curr_version")
+        target=("$targ_version")
     fi
 
     local curr_arr
@@ -901,7 +903,8 @@ CommandExists()
 declare -i error warn skip
 
 GetLogPrefix() {
-    local timestamp=$(date +%H:%M:%S)
+    local timestamp
+    timestamp=$(date +%H:%M:%S)
     case "${1^^}" in
         LOG)
             echo "[  ${timestamp}  ] :: [  LOG  ] :: "
@@ -1068,7 +1071,7 @@ GetCrashkernelDefault() {
 
     # Load current rhel version from /etc/os-release file
     source /etc/os-release
-    local version_array=(${VERSION_ID//./ })
+    local version_array=("${VERSION_ID//./ }")
 
     local crashkernel_default="../include/crashkernel-default.json"
     local cmd_line=""
@@ -1076,7 +1079,7 @@ GetCrashkernelDefault() {
     local rhel_version
 
     while true; do
-        rhel_version=${1:-"RHEL-"${version_array[0]}"."${version_array[1]}}
+        rhel_version=${1:-"RHEL-${version_array[0]}.${version_array[1]}"}
         if [ "${K_ARCH}" = "ppc64le" ]; then
             if grep -q -e "fadump=on" -e "fadump=nocma" < /proc/cmdline; then
                 cmd_line=$(jq -r '.['\"$rhel_version\"']['\"$K_ARCH\"']["fadump"]' $crashkernel_default)
