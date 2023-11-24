@@ -271,6 +271,12 @@ function disableTests
             fi
         fi
     fi
+    # Disable 'sie' tests until the RHEL-17174 from https://issues.redhat.com/browse/RHEL-17174 will be resolved
+    if [[ $hwpf == "s390x" ]]; then
+        disableTest "sie"
+        disableTest "mvpg-sie"
+        disableTest "spec-ex-sie"
+    fi
 }
 
 function setupRepo
