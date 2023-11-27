@@ -174,7 +174,7 @@ test_fail()
 	echo -e ":: [  FAIL  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "FAIL" "$SCORE"
+		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "FAIL" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
 		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test '"${TEST}/$1"' FAIL $SCORE"
@@ -187,7 +187,7 @@ test_pass()
 	echo -e "\n:: [  PASS  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	# we don't care how many test passed
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "PASS" 0
+		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "PASS" 0
 	else
 		echo -e "\n::::::::::::::::"
 		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test '"${TEST}/$1"'"
@@ -244,6 +244,9 @@ do_livepatch()
 #			echo c > /proc/sysrq-trigger
 #		fi
 
+		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
+		dmesg >> $OUTPUTFILE
+
 		check_result $num $total_num livepatch ${livepatch_tests[$num - 1]} $ret
 		if [ "$ret" -eq 0 ]; then
 			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Pass"
@@ -254,10 +257,6 @@ do_livepatch()
 			nfail=$((nfail+1))
 		fi
 
-		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
-		dmesg >> $OUTPUTFILE
-
-		submit_log $OUTPUTFILE
 	done
 
 	echo "livepatch: total $total_num, failed $nfail"
