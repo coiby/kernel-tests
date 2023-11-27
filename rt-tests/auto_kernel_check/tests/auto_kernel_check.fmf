@@ -28,3 +28,4 @@ require:
 duration: 20m
 extra-summary: /rt-tests/auto_kernel_check
 extra-task: /rt-tests/auto_kernel_check
+id: b57d4d71-f92d-4784-af1d-17fb1fa400e2

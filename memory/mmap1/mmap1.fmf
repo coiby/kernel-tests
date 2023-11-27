@@ -3,7 +3,6 @@ description: /kernel/memory/mmap1
 component:
   - kernel
 enabled: true
-id: 22ef5d6a-799d-43c5-bb89-6c9f8e7b5f8f
 tag: [
   /kernel/memory/mmap1,
   KG-VMM-TAG
@@ -19,3 +18,4 @@ duration: 5m
 tier: 1
 extra-summary: /kernel/memory/mmap1
 extra-task: /kernel/memory/mmap1
+id: 26509e65-352a-4012-b53a-c68632590179

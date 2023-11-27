@@ -8,3 +8,4 @@ duration: 1h
 extra-summary: /kernel/kdump/crash-sysrq-c
 extra-task: /kernel/kdump/crash-sysrq-c
 require: kexec-tools
+id: 763678d7-158c-41b4-a199-3ebbc188dd9b
