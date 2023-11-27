@@ -55,8 +55,9 @@ Describe 'blktests/include: get_test_result'
 
     It "can report fail"
         # Best way I found to make sure the function was called with expected parameters
-        Mock cki_upload_log_file
-            echo "$*" >>  blktests/cki_upload_log_file.txt
+        # the test calls cki_upload_log_file and it uses rstrnt-report-log
+        Mock rstrnt-report-log
+            echo "rstrnt-report-log $*" >>  blktests/cki_upload_log_file.txt
         End
         # To make sure we select the correct test
         echo "status pass" > blktests/results/test1
@@ -69,9 +70,9 @@ Describe 'blktests/include: get_test_result'
         When call get_test_result blktests test11
         The line 1 should equal "FAIL"
         The status should be success
-        The contents line 1 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.out.bad"
-        The contents line 2 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.full"
-        The contents line 3 of file "blktests/cki_upload_log_file.txt" should equal "blktests/results/test11.dmesg"
+        The contents line 1 of file "blktests/cki_upload_log_file.txt" should equal "rstrnt-report-log -l blktests/results/test11.out.bad"
+        The contents line 2 of file "blktests/cki_upload_log_file.txt" should equal "rstrnt-report-log -l blktests/results/test11.full"
+        The contents line 3 of file "blktests/cki_upload_log_file.txt" should equal "rstrnt-report-log -l blktests/results/test11.dmesg"
         The contents lines of file "blktests/cki_upload_log_file.txt" should equal 3
     End
 
