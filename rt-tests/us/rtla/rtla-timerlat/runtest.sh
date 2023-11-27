@@ -103,8 +103,8 @@ function runtest()
     check_status "rtla timerlat hist -c 0 -d 30s"
 
     echo "-- rtla-timerlat:  rtla-timerlat hist test in nanoseconds ---------------" | tee -a $OUTPUTFILE
-    rtla timerlat hist -i 2 -c 0 -n
-    check_status "rtla timerlat hist -i 2 -c 0 -n"
+    rtla timerlat hist -i 2 -c 0 -n -d 30s
+    check_status "rtla timerlat hist -i 2 -c 0 -n -d 30s"
 
     echo "-- rtla-timerlat:  rtla-timerlat hist test---------------" | tee -a $OUTPUTFILE
     disable_admission_control
