@@ -244,9 +244,15 @@ do_livepatch()
 #			echo c > /proc/sysrq-trigger
 #		fi
 
-		check_result $num $total_num livepatch ${livepatch_tests[$num - 1]} $ret && \
-			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Pass" || \
-			{ test_fail "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Fail" && nfail=$((nfail+1)); }
+		check_result $num $total_num livepatch ${livepatch_tests[$num - 1]} $ret
+		if [ "$ret" -eq 0 ]; then
+			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Pass"
+		elif [ "$ret" -eq $SKIP ]; then
+			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Skip"
+		else
+			test_fail "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Fail"
+			nfail=$((nfail+1))
+		fi
 
 		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
 		dmesg >> $OUTPUTFILE
