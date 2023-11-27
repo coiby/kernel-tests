@@ -195,6 +195,18 @@ test_pass()
 	fi
 }
 
+test_skip()
+{
+	echo -e "\n:: [  SKIP  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	if [ $RSTRNT_JOBID ]; then
+		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "SKIP" 0
+	else
+		echo -e "\n::::::::::::::::"
+		echo -e ":: [  SKIP${RES}  ] :: Test '"${TEST}/$1"'"
+		echo -e "::::::::::::::::\n"
+	fi
+}
+
 check_result()
 {
 	local num=$1
@@ -234,7 +246,7 @@ do_livepatch()
 		local OUTPUTFILE="/mnt/testarea/${livepatch_tests[$num - 1]%.*}_result.log"
 
 		check_skipped_tests "${livepatch_tests[$num - 1]}" "${skip_tests[@]}" && \
-			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Skip" && continue
+			test_skip "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Skip" && continue
 
 		./${livepatch_tests[$num - 1]} &> $OUTPUTFILE
 		ret=$?
@@ -251,7 +263,7 @@ do_livepatch()
 		if [ "$ret" -eq 0 ]; then
 			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Pass"
 		elif [ "$ret" -eq $SKIP ]; then
-			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Skip"
+			test_skip "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Skip"
 		else
 			test_fail "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Fail"
 			nfail=$((nfail+1))
