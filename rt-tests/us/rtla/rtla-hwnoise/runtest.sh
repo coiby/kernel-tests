@@ -40,8 +40,8 @@ function runtest()
     check_status "rtla hwnoise -c 0 -T 1 -d 5s -q"
 
     echo "-- rtla-hwnoise: set the automatic trace mode -------------------" | tee -a $OUTPUTFILE
-    rtla hwnoise -a 5
-    check_status "rtla hwnoise -a 5"
+    rtla hwnoise -a 5 -d 30s
+    check_status "rtla hwnoise -a 5 -d 30s"
 
     echo "-- rtla-hwnoise: set scheduling param to the osnoise tracer threads -------------------" | tee -a $OUTPUTFILE
     rtla hwnoise -P F:1 -c 0 -r 900000 -d 1M -q
