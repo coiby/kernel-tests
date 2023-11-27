@@ -280,5 +280,7 @@ for item in $TEST_ITEMS; do
 	do_${item}
 done
 
-exit $nfail
+# if running as restraint job, the test result is already reported as subtests
+# don't exit with values different of 0. Otherwise, restraint reports it as a separate subtest
+[ $RSTRNT_JOBID ] || exit $nfail
 #-------------------- Clean Up --------------------
