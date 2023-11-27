@@ -1,6 +1,5 @@
 summary: 'VMM testcase: physical page alloc'
 contact: MM-QE <mm-qe@redhat.com>
-id: f7801382-0f8c-43cc-b65a-d2aa03feaca5
 component:
   - kernel
 path: /vm/page_alloc
@@ -14,3 +13,4 @@ require:
 recommend:
   - wget
 duration: 2h
+id: 5cec556e-1423-4aae-ace1-d74549043929

@@ -40,12 +40,15 @@ extra-task: /kernel/kdump/kexec-boot
 /basic:
     environment:
       KEXEC_BOOT_CMDLINE_APPEND: " newkerneloption"
+    id: 896b41ea-f80b-4aaf-9641-19e3b5b09627
 
 /exec_live:
     environment:
       KEXEC_BOOT_CMDLINE_APPEND: " newkerneloption"
       KEXEC_BOOT_AFTER_CMD: "kexec -e -d"
+    id: 896b41ea-f80b-4aaf-9641-19e3b5b09627
 
 /memdebug:
     environment:
       KEXEC_BOOT_CMDLINE_APPEND: " rd.memdebug=3 earlyprintk=serial"
+    id: 896b41ea-f80b-4aaf-9641-19e3b5b09627

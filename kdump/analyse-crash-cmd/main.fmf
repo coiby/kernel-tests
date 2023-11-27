@@ -47,15 +47,17 @@ duration: 300m
 extra-summary: /kernel/kdump/analyse-crash-cmd
 extra-task: /kernel/kdump/analyse-crash-cmd
 
-
 /common_analyse:
     environment:
       TESTARGS: analyse-crash-common.sh
+    id: 3454c370-0d0f-494f-aef9-b842a53756d9
 
 /simple_analyse:
     environment:
       TESTARGS: analyse-crash-simple.sh
+    id: 3454c370-0d0f-494f-aef9-b842a53756d9
 
 /simple_check:
     environment:
       TESTARGS: simple_check
+    id: 3454c370-0d0f-494f-aef9-b842a53756d9

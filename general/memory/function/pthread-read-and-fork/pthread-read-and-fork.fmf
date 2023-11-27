@@ -1,6 +1,5 @@
 summary: pthread read and fork hugetlb test
 contact: Jarod Wilson <jarod@redhat.com>
-id: cd7fde11-4a1b-43a2-a030-a7abe2268ab4
 component: kernel
 test: bash ./runtest.sh
 framework: shell
@@ -10,3 +9,4 @@ require:
 duration: 35m
 extra-summary: /kernel/general/memory/function/pthread-read-and-fork
 extra-task: /kernel/general/memory/function/pthread-read-and-fork
+id: c0db59c8-7e08-4572-99ff-cefea47a51da

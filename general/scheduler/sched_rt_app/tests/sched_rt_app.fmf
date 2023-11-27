@@ -26,3 +26,4 @@ require:
 duration: 1h
 extra-summary: /general/scheduler/sched_rt_app
 extra-task: /general/scheduler/sched_rt_app
+id: 7c330edb-08c7-44cd-a727-d9d21ef0810d
