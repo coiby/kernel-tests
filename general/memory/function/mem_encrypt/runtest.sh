@@ -39,7 +39,11 @@ krelease="$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))"
 rlJournalStart
 	rlPhaseStartTest
 	uname -r | grep x86_64 || { report_result "x86_64 only" SKIP; exit 0; }
-	lscpu | grep -w sme && rlLog "sme is supported / enabled"
+	lscpu | grep -w sme && rlLog "sme is supported / enabled" || {
+		report_result "sme not enabled in bios" SKIP
+		report_result "$TEST" SKIP
+		exit 0
+	}
 	if test -f $firstboot && grep "done" $firstboot; then
 		grep "mem_encrypt=on" /proc/cmdline
 		rlRun "rm -f $firstboot"
