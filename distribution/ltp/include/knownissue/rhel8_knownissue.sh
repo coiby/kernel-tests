@@ -63,6 +63,8 @@ function rhel8_unfix_issues()
 	# Bug 1804478 scheduler exceeds prctl timerslack
 	osver_in_range "800" "805" && is_arch "s390x" && tskip "prctl09" unfix
 	osver_in_range "800" "805" && is_arch "ppc64le" && tskip "prctl09 select02 poll02 nanosleep01 futex_wait05 epoll_pwait03 clock_nanosleep02" unfix
+	# Bug 1804478 seems to also affect kernel-rt-debug
+	osver_in_range "800" "805" && is_rt && cki_is_kernel_debug && tskip "select02 poll02 futex_wait05" unfix
 	# Bug 1842025 - ltp: connect02: setsockopt(IPV6_ADDRFORM) failed: ENOPROTOOPT (92)
 	tskip "connect02" unfix
 	# Bug 1842076 - ltp: ptrace09 PANIC: double fault, error_code: 0x0
