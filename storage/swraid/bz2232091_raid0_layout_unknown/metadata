@@ -1,0 +1,12 @@
+[General]
+name=storage/swraid/bz2232091_raid0_layout_unknown
+owner=Nigel Croxon <ncroxon@redhat.com>
+description=Test the function of RAID 0 default layout is "-unknown-"
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=mdadm
+repoRequires=cki_lib

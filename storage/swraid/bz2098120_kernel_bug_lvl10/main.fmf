@@ -1,0 +1,14 @@
+summary: storage/swraid/upstream
+description: mdadm upstream test
+contact: Xiao Ni <xni@redhat.com>
+component:
+- kernel
+path: /storage/swraid/upstream
+test: bash ./runtest.sh
+framework: shell
+recommend:
+- beakerlib-redhat
+duration: 5m
+tier: 1
+extra-summary: /storage/swraid/upstream
+extra-task: /storage/swraid/upstream
