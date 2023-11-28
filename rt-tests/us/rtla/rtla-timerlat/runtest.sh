@@ -77,8 +77,8 @@ function runtest()
     check_status "rtla timerlat top -P F:1 -c 0 -d 1M -q"
 
     echo "-- rtla-timerlat:  rtla-timerlat top test in nanoseconds---------------" | tee -a $OUTPUTFILE
-    rtla timerlat top -i 2 -c 0 -n
-    check_status "rtla timerlat top -i 2 -c 0 -n"
+    rtla timerlat top -i 2 -c 0 -n -d 30s
+    check_status "rtla timerlat top -i 2 -c 0 -n -d 30s"
 
     if ! skip_auto_analysis_test; then
         echo "-- rtla-timerlat top: Set the automatic trace mode---------------" | tee -a $OUTPUTFILE
@@ -103,8 +103,8 @@ function runtest()
     check_status "rtla timerlat hist -c 0 -d 30s"
 
     echo "-- rtla-timerlat:  rtla-timerlat hist test in nanoseconds ---------------" | tee -a $OUTPUTFILE
-    rtla timerlat hist -i 2 -c 0 -n
-    check_status "rtla timerlat hist -i 2 -c 0 -n"
+    rtla timerlat hist -i 2 -c 0 -n -d 30s
+    check_status "rtla timerlat hist -i 2 -c 0 -n -d 30s"
 
     echo "-- rtla-timerlat:  rtla-timerlat hist test---------------" | tee -a $OUTPUTFILE
     disable_admission_control
