@@ -51,7 +51,7 @@ function runtest()
     kill -9 $sleep_pid ; wait $sleep_pid 2>/dev/null
 
     declare num_cpus=$(grep -c ^processor /proc/cpuinfo)
-    if [ $num_cpus -gt 1 ]; then
+    if [ $num_cpus -gt 2 ]; then
         echo "-- ptaskset: start 'sleep 1d' on CPU 1 & 2 ----" | tee -a $OUTPUTFILE
         ptaskset -c 1,2 sleep 1d &
         check_status "ptaskset -c 1,2 sleep 1d &"
@@ -67,7 +67,7 @@ function runtest()
         # kill final 'sleep 1d' prog
         kill -9 $sleep_pid ; wait $sleep_pid 2>/dev/null
     else
-        echo "Only 1 CPU - skipping 'ptaskset -c 1,2 sleep 1d &' test" | tee -a $OUTPUTFILE
+        echo "Only 2 CPU - skipping 'ptaskset -c 1,2 sleep 1d &' test" | tee -a $OUTPUTFILE
     fi
 
     if [ $result_r = "PASS" ]; then
