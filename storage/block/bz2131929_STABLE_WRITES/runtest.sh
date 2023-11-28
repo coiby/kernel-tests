@@ -39,7 +39,7 @@ function run_test()
 	rlRun "modprobe scsi_debug dev_size_mb=$scsi_debug_size"
 	rlRun "lsblk"
 
-	dev=$(lsblk |grep boot | awk '{print $1}' | grep -oE [a-z]{3\,} | sed -n '1p')
+	dev=$(lsblk |grep boot | awk '{print $1}' | grep -oE "[a-z]{3,}" | sed -n '1p')
 	rlRun "cat /sys/kernel/debug/block/$dev/state"
 	rlLog "Original dirty page configuration"
 	rlRun "sysctl -a -r dirty"
