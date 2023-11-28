@@ -174,7 +174,7 @@ test_fail()
 	echo -e ":: [  FAIL  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "FAIL" "$SCORE"
+		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "FAIL" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
 		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test '"${TEST}/$1"' FAIL $SCORE"
@@ -187,10 +187,22 @@ test_pass()
 	echo -e "\n:: [  PASS  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	# we don't care how many test passed
 	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "PASS" 0
+		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "PASS" 0
 	else
 		echo -e "\n::::::::::::::::"
 		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test '"${TEST}/$1"'"
+		echo -e "::::::::::::::::\n"
+	fi
+}
+
+test_skip()
+{
+	echo -e "\n:: [  SKIP  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	if [ $RSTRNT_JOBID ]; then
+		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "SKIP" 0
+	else
+		echo -e "\n::::::::::::::::"
+		echo -e ":: [  SKIP${RES}  ] :: Test '"${TEST}/$1"'"
 		echo -e "::::::::::::::::\n"
 	fi
 }
@@ -234,7 +246,7 @@ do_livepatch()
 		local OUTPUTFILE="/mnt/testarea/${livepatch_tests[$num - 1]%.*}_result.log"
 
 		check_skipped_tests "${livepatch_tests[$num - 1]}" "${skip_tests[@]}" && \
-			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Skip" && continue
+			test_skip "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Skip" && continue
 
 		./${livepatch_tests[$num - 1]} &> $OUTPUTFILE
 		ret=$?
@@ -244,14 +256,19 @@ do_livepatch()
 #			echo c > /proc/sysrq-trigger
 #		fi
 
-		check_result $num $total_num livepatch ${livepatch_tests[$num - 1]} $ret && \
-			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Pass" || \
-			{ test_fail "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Fail" && nfail=$((nfail+1)); }
-
 		echo -e "\n=== Dmesg result ===" >> $OUTPUTFILE
 		dmesg >> $OUTPUTFILE
 
-		submit_log $OUTPUTFILE
+		check_result $num $total_num livepatch ${livepatch_tests[$num - 1]} $ret
+		if [ "$ret" -eq 0 ]; then
+			test_pass "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Pass"
+		elif [ "$ret" -eq $SKIP ]; then
+			test_skip "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Skip"
+		else
+			test_fail "${num}..${total_num} selftests: livepatch: ${livepatch_tests[$num - 1]} Fail"
+			nfail=$((nfail+1))
+		fi
+
 	done
 
 	echo "livepatch: total $total_num, failed $nfail"
@@ -280,5 +297,7 @@ for item in $TEST_ITEMS; do
 	do_${item}
 done
 
-exit $nfail
+# if running as restraint job, the test result is already reported as subtests
+# don't exit with values different of 0. Otherwise, restraint reports it as a separate subtest
+[ $RSTRNT_JOBID ] || exit $nfail
 #-------------------- Clean Up --------------------
