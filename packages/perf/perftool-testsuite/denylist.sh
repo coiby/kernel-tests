@@ -48,10 +48,16 @@ DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        4.18.0      9.99.9      p
 
 ### newly added issues
 DENYLIST+=("FAIL  ppc64le,                             4.18.0      9.99.9      perf_kmem :: test_basic :: stat")
+DENYLIST+=("FAIL  aarch64,                             5.14.0      9.99.9      perf_kmem :: test_basic :: stat --page")
+
+DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        5.14.0      9.99.9      perf_probe :: test_mixed_tp :: record mixed events")
+DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        5.14.0      9.99.9      perf_probe :: test_mixed_tp :: script mixed events")
 
 DENYLIST+=("FAIL  ppc64le,                             4.18.0      9.99.9      perf_sched :: test_basic :: sched replay")
 DENYLIST+=("FAIL  aarch64,ppc64le,s390x,               4.18.0      9.99.9      perf_sched :: test_timehist :: --summary unique tasks count check")
 DENYLIST+=("FAIL  aarch64,ppc64le,s390x,               4.18.0      9.99.9      perf_sched :: test_timehist :: --wakeups (output regexp parsing)")
+DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        5.14.0      9.99.9      perf_sched :: test_timehist :: --summary")
+DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        5.14.0      9.99.9      perf_sched :: test_timehist :: --with-summary")
 
 DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        4.18.0      9.99.9      perf_script :: test_header :: script (output regexp parsing)")
 
