@@ -2,9 +2,6 @@ summary: PRE Verification for Real Time test /kernel/rt-tests/rteval
 description: Details in PURPOSE file
 contact: Qiao Zhao <qzhao@redhat.com>
 enabled: true
-link:
-  - verifies: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=RHEL-176881
-  - implements: https://polarion.engineering.redhat.com/polarion/#/project/RHELKERNEL/workitem?id=KERNEL-291369
 id: bccd3743-d50c-4255-aa95-8cbfa9b7376a
 component:
   - kernel
