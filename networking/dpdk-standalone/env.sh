@@ -67,6 +67,7 @@ DPDK_TOOL_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools//dpdk-tools
 DRIVERCTL_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools/driverctl-0.111-2.el9.noarch.rpm
 DPDK_SOURCE=${DPDK_SOURCE:-"http://fast.dpdk.org/rel/dpdk-22.11.2.tar.xz"}
 DPDK_VERSION=22.11-3.el9_2
+export DPDK_VERSION=$DPDK_VERSION
 GUEST_DPDK_VERSION=22.11-3.el9_2
 GUEST_DPDK_URL=${DPDK_URL}
 GUEST_DPDK_TOOL_URL=${DPDK_TOOL_URL}

@@ -55,31 +55,32 @@ def py3_run(cmd,str_ret_val="0"):
 
 @set_check(0)
 def add_yum_profiles():
-    if system_version_id < 80:
-        epel_url = "http://download.lab.bos.redhat.com/rcm-guest/puddles/OpenStack/rhos-release/rhos-release-latest.noarch.rpm"
-        run(f"rpm -q rhos-release || yum -y install {epel_url}")
-        if not os.path.exists("/etc/yum.repos.d/rhos-release-13.repo"):
-            with pushd(case_path):
-                sh.copy("rhos-release-13.repo", "/etc/yum.repos.d/")
-        run("rpm --import 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF'")
-        data = """
-        [tuned]
-        name=Tuned development repository for RHEL-7
-        baseurl=https://fedorapeople.org/~jskarvad/tuned/devel/repo/
-        enabled=1
-        gpgcheck=0
-        skip_if_unavailable=1
-        [mono-repo]
-        name=mono-repo
-        baseurl=http://download.mono-project.com/repo/centos/
-        enabled=1
-        gpgcheck=0
-        skip_if_unavailable=1
-        """
-        data = "".join([i.strip() + '\n' for i in data.split('\n') if i != ''])
-        local.path("/etc/yum.repos.d/tuned.repo").write(data, mode="w")
-    else:
-        run("advanced_qemu_install")
+#    if system_version_id < 80:
+#        epel_url = "http://download.lab.bos.redhat.com/rcm-guest/puddles/OpenStack/rhos-release/#rhos-release-latest.noarch.rpm"
+#        run(f"rpm -q rhos-release || yum -y install {epel_url}")
+#        if not os.path.exists("/etc/yum.repos.d/rhos-release-13.repo"):
+#            with pushd(case_path):
+#                sh.copy("rhos-release-13.repo", "/etc/yum.repos.d/")
+#        run("rpm --import 'http://keyserver.ubuntu.com/pks/lookup?op=get&#search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF'")
+#        data = """
+#        [tuned]
+#        name=Tuned development repository for RHEL-7
+#        baseurl=https://fedorapeople.org/~jskarvad/tuned/devel/repo/
+#        enabled=1
+#        gpgcheck=0
+#        skip_if_unavailable=1
+#        [mono-repo]
+#        name=mono-repo
+#        baseurl=http://download.mono-project.com/repo/centos/
+#        enabled=1
+#        gpgcheck=0
+#        skip_if_unavailable=1
+#        """
+#        data = "".join([i.strip() + '\n' for i in data.split('\n') if i != ''])
+#        local.path("/etc/yum.repos.d/tuned.repo").write(data, mode="w")
+#    else:
+#        run("advanced_qemu_install")
+    run("advanced_qemu_install")
 
 #czmq-devel
 @set_check(0)
@@ -111,14 +112,17 @@ def install_package():
     for pack in basic_pack:
         check_install(pack)
 
-    if system_version_id < 80:
-        check_install("qemu-img-rhev")
-        check_install("qemu-kvm-common-rhev")
-        check_install("qemu-kvm-rhev")
-        check_install("qemu-kvm-tools-rhev")
-    else:
-        check_install("qemu-kvm")
-        check_install("qemu-img")
+#    if system_version_id < 80:
+#        check_install("qemu-img-rhev")
+#        check_install("qemu-kvm-common-rhev")
+#        check_install("qemu-kvm-rhev")
+#        check_install("qemu-kvm-tools-rhev")
+#    else:
+#        check_install("qemu-kvm")
+#        check_install("qemu-img")
+    check_install("qemu-kvm")
+    check_install("qemu-img")
+
     #for virt packages install
     if system_version_id < 90:
         virt_packs = """

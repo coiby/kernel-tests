@@ -56,7 +56,7 @@ init_all_env()
         X_VERSION=9
     else
         echo "You're not running this on rhel7.9 or rhel8.x or rhel9.x, so may not support yet."
-        exit 1
+#        exit 1
     fi
     set +a
 }
@@ -392,6 +392,7 @@ print_all_parameters()
     echo "CLIENT_NIC2_MAC=$CLIENT_NIC2_MAC"
     echo "TEST_ITEM_LIST=$TEST_ITEM_LIST"
     echo "TREX_URL=$TREX_URL"
+    echo "DPDK_VERSION=$DPDK_VERSION"
     echo "NAY=$NAY"
     echo "================================================"
 }

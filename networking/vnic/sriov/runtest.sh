@@ -500,40 +500,40 @@ sriov_setup()
 	sriov_config_vm_repo $vm1
 	sriov_config_vm_repo $vm2
 
-	# update VM kernel to the same one as host
-	wget -q --spider $RPM_KERNEL_MODULES_CORE || RPM_KERNEL_MODULES_CORE=""
-	local k="rpm -ivh --nodeps --force $RPM_KERNEL"
-	local k_core="rpm -ivh --nodeps --force $RPM_KERNEL_CORE"
-	local k_modules="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES"
-	local k_modules_core="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES_CORE"
-	local k_modules_internal="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES_INTERNAL"
-	local yum_k="yum install -y $YUM_KERNEL"
-	local yum_k_core="yum install -y $YUM_KERNEL_CORE"
-	local yum_k_modules="yum install -y $YUM_KERNEL_MODULES"
-	local yum_k_modules_core="yum install -y $YUM_KERNEL_MODULES_CORE"
-	local yum_k_modules_internal="yum install -y $YUM_KERNEL_MODULES_INTERNAL"
-	if (($rhel_version >= 8)); then
-		vmsh run_cmd $vm1 "rpm -ivh --nodeps --force $RPM_KERNEL $RPM_KERNEL_CORE $RPM_KERNEL_MODULES $RPM_KERNEL_MODULES_CORE"
-		vmsh run_cmd $vm1 "yum install -y $YUM_KERNEL $YUM_KERNEL_CORE $YUM_KERNEL_MODULES $YUM_KERNEL_MODULES_CORE"
-		vmsh run_cmd $vm2 "rpm -ivh --nodeps --force $RPM_KERNEL $RPM_KERNEL_CORE $RPM_KERNEL_MODULES $RPM_KERNEL_MODULES_CORE"
-		vmsh run_cmd $vm2 "yum install -y $YUM_KERNEL $YUM_KERNEL_CORE $YUM_KERNEL_MODULES $YUM_KERNEL_MODULES_CORE"
-	# In rhel 8.1, modules_internal separate from modules package
-	rhel_version_2=$(cat /etc/redhat-release |awk '{print $6}'| awk  'BEGIN{FS="[.:%]"} {print $2}')
-	if (($rhel_version_2 >= 1 ));then
-		vmsh run_cmd $vm1 "$k_modules_internal"
-		vmsh run_cmd $vm2 "$k_modules_internal"
-		vmsh run_cmd $vm1 "$yum_k_modules_internal"
-		vmsh run_cmd $vm2 "$yum_k_modules_internal"
-	fi
-	else
-		vmsh run_cmd $vm1 "$k"
-		virsh reboot $vm1
-		vmsh run_cmd $vm2 "$k"
-		virsh reboot $vm2
-	fi
-	virsh reboot $vm1
-	virsh reboot $vm2
-	sleep 120
+#	# update VM kernel to the same one as host
+#	wget -q --spider $RPM_KERNEL_MODULES_CORE || RPM_KERNEL_MODULES_CORE=""
+#	local k="rpm -ivh --nodeps --force $RPM_KERNEL"
+#	local k_core="rpm -ivh --nodeps --force $RPM_KERNEL_CORE"
+#	local k_modules="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES"
+#	local k_modules_core="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES_CORE"
+#	local k_modules_internal="rpm -ivh --nodeps --force $RPM_KERNEL_MODULES_INTERNAL"
+#	local yum_k="yum install -y $YUM_KERNEL"
+#	local yum_k_core="yum install -y $YUM_KERNEL_CORE"
+#	local yum_k_modules="yum install -y $YUM_KERNEL_MODULES"
+#	local yum_k_modules_core="yum install -y $YUM_KERNEL_MODULES_CORE"
+#	local yum_k_modules_internal="yum install -y $YUM_KERNEL_MODULES_INTERNAL"
+#	if (($rhel_version >= 8)); then
+#		vmsh run_cmd $vm1 "rpm -ivh --nodeps --force $RPM_KERNEL $RPM_KERNEL_CORE $RPM_KERNEL_MODULES $RPM_KERNEL_MODULES_CORE"
+#		vmsh run_cmd $vm1 "yum install -y $YUM_KERNEL $YUM_KERNEL_CORE $YUM_KERNEL_MODULES $YUM_KERNEL_MODULES_CORE"
+#		vmsh run_cmd $vm2 "rpm -ivh --nodeps --force $RPM_KERNEL $RPM_KERNEL_CORE $RPM_KERNEL_MODULES $RPM_KERNEL_MODULES_CORE"
+#		vmsh run_cmd $vm2 "yum install -y $YUM_KERNEL $YUM_KERNEL_CORE $YUM_KERNEL_MODULES $YUM_KERNEL_MODULES_CORE"
+#	# In rhel 8.1, modules_internal separate from modules package
+#	rhel_version_2=$(cat /etc/redhat-release |awk '{print $6}'| awk  'BEGIN{FS="[.:%]"} {print $2}')
+#	if (($rhel_version_2 >= 1 ));then
+#		vmsh run_cmd $vm1 "$k_modules_internal"
+#		vmsh run_cmd $vm2 "$k_modules_internal"
+#		vmsh run_cmd $vm1 "$yum_k_modules_internal"
+#		vmsh run_cmd $vm2 "$yum_k_modules_internal"
+#	fi
+#	else
+#		vmsh run_cmd $vm1 "$k"
+#		virsh reboot $vm1
+#		vmsh run_cmd $vm2 "$k"
+#		virsh reboot $vm2
+#	fi
+#	virsh reboot $vm1
+#	virsh reboot $vm2
+#	sleep 120
 	# when running on rhel8, the vm is "in shutdown" status when get here, so add workaround for this
 	if (($rhel_version == 8)); then
 		virsh destroy $vm1
