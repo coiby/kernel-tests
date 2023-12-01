@@ -18,6 +18,7 @@
 . ../include/runtest.sh
 
 K_AUTO_CHECK=${K_AUTO_CHECK:-false}
+K_FORCE_RESET_CK=${K_FORCE_RESET_CK:-false}
 
 SetupKdump()
 {
@@ -62,32 +63,49 @@ SetupKdump()
         fi
 
         # Ensure Kdump Kernel memory reservation
-        # KARGS="" | "<non-fadump-opts>"": no reset-
-        #   e.g.: KARGS="amd_iommu=off"
-        # KARGS="fadump=xxx"             : do reset-
-        local reboot_required=false
+        #  KARGS is EMPTY or non-"crashkernel":
+        #   - fadump or K_FORCE_RESET_CK will trigger reset-crashkernel,
+        #       - EMPTY will not trigger grubby
+        #       - non-"crashkernel" will trigger extra GRUBBY invokation
+        #   - legacy cases: RHEL5 or fedora:non-fadump
+        #       - reset to default ck, or invoke reset-crashkernel
+        #  note: priority of K_FORCE_RESET_CK is lower than KARGS="crashkernel=xxx"
+        _reboot_required=false
+        _hascmd_reset_crashkernel=false
+        kdumpctl -h 2>&1 | grep -q reset-crashkernel && _hascmd_reset_crashkernel=true
+        _fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
-            local kdumpMem
-            local fadump_opts
-            fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
-            if kdumpctl -h 2>&1 | grep -q reset-crashkernel && \
-                    [ -n "${fadump_opts}" ]; then
-                fadump_opts="--${fadump_opts}"
-                LogRun "kdumpctl reset-crashkernel ${fadump_opts}"
-                reboot_required=true
-            else # use default value from kdump.sh
+            if ${_hascmd_reset_crashkernel} && \
+                    [ -n "${_fadump_opts}" ]; then
+                _fadump_opts="--${_fadump_opts}"
+                Log "Force resetting crashkernel value to default"
+                LogRun "kdumpctl reset-crashkernel ${_fadump_opts} 2>&1 | grep -i reboot" && \
+                    _reboot_required=true
+            elif ${_hascmd_reset_crashkernel} && \
+                    [ "${K_FORCE_RESET_CK}" = "true" ]; then
+                # if current running mode is fadump and not set in the above
+                [ -n "${_fadump_opts}" ] || {
+                    _fadump_opts=$(grep -oE "fadump=\w+" /proc/cmdline)
+                    [ -n "${_fadump_opts}" ] && _fadump_opts="--${_fadump_opts}"
+                }
+                Log "Force resetting crashkernel value to default"
+                LogRun "kdumpctl reset-crashkernel ${_fadump_opts} 2>&1 | grep -i reboot" && \
+                    _reboot_required=true
+            else # for legacy cases: get default value from kdump.sh
                 kdumpMem="$(DefKdumpMem)"
             fi
-            [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
 
+            # legacy cases: RHEL5 or fedora:non-fadump
+            [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
             if $IS_RHEL5 ; then
                 KER1ARGS+="${kdumpMem}"
-            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then # for fedora
+            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then # for fedora:non-fadump
                 # Check kdump status if it's fadump mode which caused kexec_crash_size is 0
                 kdumpctl status > /dev/null 2>&1 || {
-                    if kdumpctl -h 2>&1 | grep -q reset-crashkernel && [ "${#kdumpMem}" -gt 1 ]; then
-                        LogRun "kdumpctl reset-crashkernel"
-                        reboot_required=true
+                    if ${_hascmd_reset_crashkernel} && [ "${#kdumpMem}" -gt 1 ]; then
+                        Log "fedora:non-fadump, reset crashkernel value to default"
+                        LogRun "kdumpctl reset-crashkernel 2>&1 | grep -i reboot" && \
+                            _reboot_required=true
                     else
                         KER1ARGS+="${kdumpMem}"
                     fi
@@ -95,15 +113,31 @@ SetupKdump()
             fi
         }
 
+        # 2nd round checking KARGS, posible values:
+        #   - internal default CK (from DefKdumpMem): for legacy from 1st round check;
+        #   - external "crashkernel=XXX/auto" +/or "other_kernel_cmdline_vars"
+        #       - strip ck=auto when supporting reset-crashkernel
+        #       - or s/crashkernel=auto/$(DefKdumpMem)/
         if [ -n "${KER1ARGS}" ]; then
             # Support translating crashkernel=auto test request to crashkernel=XXM for rhel9+
-            if grep -q crashkernel=auto <<< "${KER1ARGS}" || \
-                    kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
-                KER1ARGS=${KER1ARGS/crashkernel=auto/$(DefKdumpMem)}
+            if grep -q crashkernel=auto <<< "${KER1ARGS}"; then #|| \
+                if ${_hascmd_reset_crashkernel}; then
+                    KER1ARGS=${KER1ARGS/crashkernel=auto/}
+                    # if current running mode is fadump and not set in 1st round
+                    [ -n "${_fadump_opts}" ] || {
+                        _fadump_opts=$(grep -oE "fadump=\w+" /proc/cmdline)
+                        [ -n "${_fadump_opts}" ] && _fadump_opts="--${_fadump_opts}"
+                    }
+                    Log "Strip crashkernel=auto and reset crashkernel value to default"
+                    LogRun "kdumpctl reset-crashkernel ${_fadump_opts} 2>&1 | grep -i reboot" && \
+                        _reboot_required=true
+                else
+                    KER1ARGS=${KER1ARGS/crashkernel=auto/$(DefKdumpMem)}
+                fi
             fi
-
-            # touch "${K_REBOOT}"
-
+        fi
+        # 3rd round checking KARGS, posiblely EMPTY after stripped "crashkernel=auto"
+        if [ -n "${KER1ARGS}" ]; then
             # Kdump service will not be enabled if crashkernel=auto && system
             # memory is less the threshold required by kdump service.
             Log "Preparing to update kernel options: ${KER1ARGS}"
@@ -113,10 +147,10 @@ SetupKdump()
             Log "Changing boot loader."
 
             UpdateKernelOptions "${KER1ARGS}" || FatalError "Error changing boot loader."
-            reboot_required=true
+            _reboot_required=true
         fi
 
-        if $reboot_required; then
+        if ${_reboot_required}; then
             Report 'pre-reboot'
             sync
             RhtsReboot
