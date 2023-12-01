@@ -4,7 +4,6 @@
 . ../../../../cki_lib/libcki.sh || exit 1
 
 TEST="general/time/leap-second/ins_leap_sec"
-RESULT="FAIL"
 
 function runtest ()
 {
@@ -16,12 +15,11 @@ function runtest ()
     else
         nohup ./leap-a-day -s &
     fi
-    RESULT="PASS"
 
-    if [ $result = "PASS" ]; then
-        rstrnt-report-result $TEST $RESULT 0
+    if [ $? -eq 0 ]; then
+        rstrnt-report-result $TEST "PASS" 0
     else
-        rstrnt-report-result $TEST $RESULT 1
+        rstrnt-report-result $TEST "FAIL" 1
     fi
 }
 
