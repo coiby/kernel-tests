@@ -72,7 +72,7 @@ f6208a42d390ea91db024db16ae162fc2c80671d aarch64 # CoreSight / Thread Loop 2 Thr
 6afe33200bf70894fcc32d944402cd41573072a4 aarch64 # CoreSight / Unroll Loop Thread 10
 117480d53c03fa31e2e6a0d61b3632bd70c328fa ppc64le ppc64 s390x aarch64 x86_64 # kernel lock contention analysis test
 e4a8e45016f20b50c3974e763b48c99a936b6d0a x86_64 # Simple expression parser
-7ab601dfc1d73baaea678b649fa5d66ba0f9f91e ppc64le # perf all metricgroups test
+7ab601dfc1d73baaea678b649fa5d66ba0f9f91e ppc64le x86_64 # perf all metricgroups test
 65a67da77b6f4b8ebc3aeb747f6d4f122398b2e6 ppc64le x86_64 # perf all metrics test
 c28f07da1fd1e44f7b716f64ff4b3cdf0d163e20 aarch64 # perf record tests
 bc0e87022bb4941020242d414be1d74716aba9d5 x86_64 # perf pipe recording and injection test
