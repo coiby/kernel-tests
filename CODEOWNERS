@@ -168,6 +168,9 @@
 /storage/lvm/thinp/stqe/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/nvdimm/ndctl-test-suite/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/scsi/vpd/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/storage/swraid/bz2066373_reshape_lvl0_to_lvl10/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/storage/swraid/bz2098120_kernel_bug_lvl10/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/storage/swraid/bz2232091_raid0_layout_unknown/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/swraid/mdadm/raid_module/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/swraid/scsi_raid/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/swraid/simple_reshape/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -291,6 +294,9 @@
 /storage/lvm/thinp/stqe/ @bgoncalv @fsuba @lulinqing
 /storage/nvdimm/ndctl-test-suite/ @bgoncalv @lulinqing @yizhanglinux
 /storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
+/storage/swraid/bz2066373_reshape_lvl0_to_lvl10/ @bgoncalv @lulinqing @ncroxon
+/storage/swraid/bz2098120_kernel_bug_lvl10/ @bgoncalv @lulinqing @ncroxon
+/storage/swraid/bz2232091_raid0_layout_unknown/ @bgoncalv @lulinqing @ncroxon
 /storage/swraid/scsi_raid/ @bgoncalv @czhong2 @lulinqing
 /storage/swraid/simple_reshape/ @FineFan @bgoncalv @lulinqing
 /storage/swraid/upstream/ @bgoncalv @lulinqing @xni1
