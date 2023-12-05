@@ -1916,7 +1916,7 @@ get_iface_sw_port()
 	local _kick_list="$4"
 	local temp_port_list=()
 	local exitcode=0
-	typeset -A local iface_port_array
+	declare -A iface_port_array
 
 	# get iface_port_array
 	for i in "${iface[@]}"; do
