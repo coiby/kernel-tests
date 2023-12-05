@@ -22,6 +22,45 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../kernel-include/runtest.sh || exit 1
+
+function add_aboot_param ()
+{
+    current_aboot_cmdline=$(abootimg -i /boot/aboot-"${K_VER}"-"${K_REL}"."$(arch)".img | awk  '/cmdline/ {print}' | cut -f 4-"$NR" -d ' ')
+    if [ -n "${current_aboot_cmdline}" ]; then
+        current_aboot_cmdline+=" "
+        current_aboot_cmdline+="${CMDLINEARGS}"
+    else
+        current_aboot_cmdline+="${CMDLINEARGS}"
+    fi
+    rlRun "abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline='${current_aboot_cmdline}'"
+    rlRun "dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a"
+    rlRun "sync"
+}
+function remove_aboot_param ()
+{
+    # shellcheck disable=SC2207
+    current_aboot_cmdline=($(abootimg -i /boot/aboot-"${K_VER}"-"${K_REL}"."$(arch)".img | awk  '/cmdline/ {print}' | cut -f 4-"$NR" -d ' '))
+    if [ -z "${current_aboot_cmdline[0]}" ]; then
+        rlLog "WARNING: Unable to find parameter in the allowed list."
+        rlPhaseEnd
+        rlJournalEnd
+        rlJournalPrintText
+        exit 0
+    else
+        for i in "${!current_aboot_cmdline[@]}"; do
+            if echo "${CMDLINEARGS##-}" | grep -q "${current_aboot_cmdline[${i}]}"; then
+                rlRun "unset current_aboot_cmdline[${i}]"
+            fi
+        done
+        # want to keep spaces as delimiter
+        # shellcheck disable=SC2124
+        new_aboot_cmdline="${current_aboot_cmdline[@]}"
+        rlRun "abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline='${new_aboot_cmdline}'"
+        rlRun "dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a"
+        rlRun "sync"
+    fi
+}
 
 rlJournalStart
     rlPhaseStartSetup
