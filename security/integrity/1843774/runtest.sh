@@ -75,7 +75,12 @@ rlJournalStart
     rlPhaseStartTest
         grubby --info=DEFAULT
         if [ ! ${RSTRNT_REBOOTCOUNT} -gt 0 ]; then
-            if stat /run/ostree-booted > /dev/null 2>&1; then
+            if [ -e /sys/devices/soc0/machine ]; then
+                CMDLINEARGS="ima_policy=tcb"
+                rlRun "add_aboot_param"
+                CMDLINEARGS="ima_template_fmt=d"
+                rlRun "add_aboot_param"
+            elif stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm-ostree kargs --append-if-missing=ima_policy=tcb --append-if-missing=ima_template_fmt=d --import-proc-cmdline
             else
                 grubby --args="ima_policy=tcb" --update-kernel=DEFAULT
@@ -93,7 +98,12 @@ rlJournalStart
 
     rlPhaseStartCleanup
         if [ ! ${RSTRNT_REBOOTCOUNT} -gt 1 ]; then
-            if stat /run/ostree-booted > /dev/null 2>&1; then
+        if [ -e /sys/devices/soc0/machine ]; then
+                CMDLINEARGS="ima_policy=tcb"
+                rlRun "remove_aboot_param"
+                CMDLINEARGS="ima_template_fmt=d"
+                rlRun "remove_aboot_param"
+            elif stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm-ostree kargs --delete-if-present=ima_policy=tcb --delete-if-present=ima_template_fmt=d --import-proc-cmdline
             else
                 grubby --remove-args="ima_policy=tcb" --update-kernel=DEFAULT
