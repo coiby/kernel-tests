@@ -41,6 +41,7 @@ rlLog "INFO: Successfully created md raid $RETURN_STR"
 rlLog "mkfs -t ext4 /dev/md0"
 mkfs -t ext4 /dev/md0
 
+rlRun "mkdir -p /mnt/md_test"
 rlRun "mount -t ext4 /dev/md0 /mnt/md_test"
 rlRun "/usr/bin/dd if=/dev/urandom of=/mnt/md_test/testfile bs=1M count=100"
 
