@@ -1,5 +1,15 @@
 #!/bin/bash
 
+. ../../../../kernel-include/runtest.sh || exit 1
+
+pmgr=$(K_GetPkgMgr)
+
+if [ ${pmgr} == "rpm-ostree" ]; then
+    install_opts="-A --idempotent --allow-inactive install -y"
+else
+    install_opts="install -y"
+fi
+
 TEST="general/time/regression/bz676948_not_migrate_high_priority_rt_tasks"
 
 function runtest()
@@ -16,7 +26,7 @@ function runtest()
         echo "SKIP and exiting!!!"
         rstrnt-report-result $TEST "SKIP" 0
     else
-        rpm -q trace-cmd || yum install -y trace-cmd
+        rpm -q trace-cmd || ${pmgr} ${install_opts} trace-cmd || exit 1
         trace-cmd record -e 'sched_wakeup*' -e sched_switch \
             -e 'sched_migrate*' ./migrate | tee -a trace-cmd.log
         rstrnt-report-log -l trace-cmd.log

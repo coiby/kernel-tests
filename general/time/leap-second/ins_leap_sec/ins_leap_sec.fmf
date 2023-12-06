@@ -1,0 +1,11 @@
+summary: Leap second insert test
+contact: Qiao Zhao <qzhao@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - gcc
+  - make
+duration: 48h
+tier: 1
+extra-summary: general/time/leap-second/ins_leap_sec
+extra-task: general/time/leap-second/ins_leap_sec
