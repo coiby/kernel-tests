@@ -22,7 +22,7 @@ Describe 'blktests/include: do_test'
     It "can pass do_test"
         When call do_test blktests test1
 
-        The line 1 should include "Start to run test case blktests/tests/test1"
+        The line 1 should include "Start to run test case  blktests/tests/test1"
         The line 2 should equal "cd blktests"
         The line 3 should equal "running ./check test1"
         The line 4 should include "End blktests/tests/test1"

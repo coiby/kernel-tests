@@ -20,9 +20,7 @@ fi
 pushd blktests || exit 200
 
 if ! modprobe -qn rdma_rxe; then
-	export USE_SIW="1"
-	sed -i "/rdma_rxe/d" ./tests/srp/rc
-	sed -i "/rdma_rxe/d" ./tests/nvmeof-mp/rc
+	export USE_SW_RDMA="SIW"
 fi
 
 # modprobe siw on ppc64le with distro less than RHEL8.4 will lead panic, BZ1919502
@@ -30,7 +28,7 @@ fi
 ver="4.18.0-305"
 KVER=$(uname -r)
 if [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then
-	export USE_SIW="0"
+	export USE_SW_RDMA="RXE"
 fi
 
 make
