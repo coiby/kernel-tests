@@ -1,0 +1,18 @@
+summary: Check that Kernel-Address-Sanitizer (KASAN) is enabled.
+description: |
+    a read-after-free error in the kernels memory space, and then searches "dmesg"
+    for the resulting error message.  KASAN is currently only enabled on:
+     * RHEL-8,
+     * Debug kernels,
+     * x86_64 & aarch64 architectures.
+
+    Author: David McDougall <dmcdouga@redhat.com>
+contact: David McDougall <dmcdouga@redhat.com>
+component:
+  - kernel-debug
+test: bash ./runtest.sh
+id: 126bb37b-17f2-44a4-bff3-d7e4aa3b6195
+framework: beakerlib
+duration: 30m
+extra-summary: /kernel/general/memory/function/kasan
+extra-task: /kernel/general/memory/function/kasan
