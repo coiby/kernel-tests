@@ -14,6 +14,8 @@ include:
     if: $CI_MERGE_REQUEST_ID && $CI_PROJECT_ID != $CI_MERGE_REQUEST_PROJECT_ID
   default-branch:
     if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PROJECT_PATH =~ /^redhat/
+  production-branch:
+    if: $CI_PIPELINE_SOURCE == "pipeline" && $CI_COMMIT_BRANCH == "production" && $CI_PROJECT_PATH =~ /^redhat/
 
 .rules-codeowners:
   extends: .rules
@@ -29,6 +31,7 @@ workflow:
     - !reference [.rules, mr-parent]
     - !reference [.rules, mr-fork]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 default:
   tags:
@@ -54,6 +57,7 @@ shell check cki:
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 shell check runtests:
   extends: .cki_tools
@@ -62,6 +66,7 @@ shell check runtests:
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 uname with deprecated parameter:
   extends: .cki_tools
@@ -70,6 +75,7 @@ uname with deprecated parameter:
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 shell check runtests mr:
   extends: .cki_tools
@@ -146,6 +152,7 @@ codeowners check:
   rules:
     - !reference [.rules-codeowners, mr-parent]
     - !reference [.rules-codeowners, default-branch]
+    - !reference [.rules-codeowners, production-branch]
 
 check bash with mixed tabs and spaces:
   extends: .cki_tools
@@ -154,6 +161,7 @@ check bash with mixed tabs and spaces:
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 check bash lines ending with white spaces:
   extends: .cki_tools
@@ -162,6 +170,7 @@ check bash lines ending with white spaces:
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 check tmt lint:
   extends: .cki_tools
@@ -172,6 +181,7 @@ check tmt lint:
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 check usage of internal hostnames:
   extends: .cki_tools
@@ -204,6 +214,7 @@ check usage of internal hostnames:
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 check if LTP version on DCI matches the default on distribution/ltp/include/ltp-make.sh:
   extends: .cki_tools
@@ -221,6 +232,7 @@ check if LTP version on DCI matches the default on distribution/ltp/include/ltp-
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
 
 .git-sync:
   extends: .cki_tools
@@ -329,9 +341,13 @@ git-sync-mr:
     - !reference [.rules, no-merge-train]
     - !reference [.rules, mr-parent]
 
-git-sync-default-branch:
+git-sync-branches:
   extends: .git-sync
   variables:
     TARGET_BRANCH: $CI_COMMIT_BRANCH
   rules:
     - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
+
+deploy-production:
+  extends: .deploy_production_tag
