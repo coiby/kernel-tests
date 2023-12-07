@@ -9,6 +9,9 @@
 
 TESTAREA="/mnt/testarea"
 
+# Variable used by beakerlib
+export TEST="core-kernel/module_diff"
+
 # Kernel Variables
 K_NAME=`rpm -q --queryformat '%{name}\n' -qf /boot/config-$(uname -r)`
 K_VER=`rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r)`
