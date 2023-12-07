@@ -48,12 +48,12 @@ function GetCurrentModuleList ()
 
     if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
         PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
         fi
     else
         PKG_LIST="${name}-${K_VER}-${K_REL}"
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
         fi
     fi
@@ -94,13 +94,13 @@ function GetBaseModuleList ()
 
     cat ./${OS}/${Release}/${Release}-modules-${ARCH}.lst > ${TESTAREA}/moduleList_base
 
-    if $(cki_is_kernel_debug); then
+    if cki_is_kernel_debug; then
         AddDebugKernelModuleToBase
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             AddRTnDebugBaseList
         fi
     else
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             AddRTBaseList
         fi
     fi
@@ -142,10 +142,10 @@ function GetKnownRemovedList ()
         cat ./${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst > ${TESTAREA}/moduleList_knownRemoved
     fi
 
-    if $(cki_is_kernel_rt); then
+    if cki_is_kernel_rt; then
         AddRTKnowRemovedList
     fi
-    if $(cki_is_kernel_64k); then
+    if cki_is_kernel_64k; then
         Add64kKnowRemovedList
     fi
 
@@ -245,13 +245,13 @@ rlJournalStart
         YUM=$(cki_get_yum_tool)
         name="kernel"
         baseurl=${BASEURL:-}
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             name="${name}-rt"
         fi
-        if $(cki_is_kernel_64k); then
+        if cki_is_kernel_64k; then
             name="${name}-64k"
         fi
-        if $(cki_is_kernel_debug); then
+        if cki_is_kernel_debug; then
             name="${name}-debug"
         fi
         if cki_kver_lt "5.14.0-285.el9"; then
@@ -266,7 +266,7 @@ rlJournalStart
         elif grep -q "release 8" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
         fi
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             inst_kernel_rt_kvm
         fi
         # -----------------------------------
