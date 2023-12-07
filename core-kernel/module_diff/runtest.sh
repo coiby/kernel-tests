@@ -238,7 +238,7 @@ function chk_inst_kernel_modules_core ()
 }
 
 rlJournalStart
-    rlPhaseStartTest
+    rlPhaseStartSetup
         YUM=$(cki_get_yum_tool)
         name="kernel"
         baseurl=${BASEURL:-}
@@ -512,6 +512,9 @@ rlJournalStart
 
         # Lets determine the known removed module list for the base release kernel package
         GetKnownRemovedList
+        rlPhaseEnd
+
+        rlPhaseStartTest
 
         # Lets submit the complete log from the diff of base module list and the current module list
         diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current > ${TESTAREA}/moduleList_base-current_diff
