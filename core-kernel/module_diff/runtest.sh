@@ -195,7 +195,7 @@ function RHEL6_TestBZ839667 ()
 
                 DisplayModuleFail moduleList_missing
                 cp ${TESTAREA}/moduleList_missing ${TESTAREA}/moduleList_missing.log
-                cki_upload_log_file ${TESTAREA}/moduleList_missing.log
+                rlFileSubmit ${TESTAREA}/moduleList_missing.log moduleList_missing.log
                 DeBug "RHEL6_TestBZ839667 fail"
                 cki_print_info "RHEL6_TestBZ839667"
             fi
@@ -519,7 +519,7 @@ rlJournalStart
         # Lets submit the complete log from the diff of base module list and the current module list
         diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current > ${TESTAREA}/moduleList_base-current_diff
         cp ${TESTAREA}/moduleList_base-current_diff ${TESTAREA}/moduleList_base-current_diff.log
-        cki_upload_log_file ${TESTAREA}/moduleList_base-current_diff.log
+        rlFileSubmit ${TESTAREA}/moduleList_base-current_diff.log moduleList_base-current_diff.log
 
         #
         # Compared: Lets compare the base and current module lists
@@ -534,7 +534,7 @@ rlJournalStart
             rlPass "New added modules check PASS"
         else
             cp ${TESTAREA}/moduleList_compare_added ${TESTAREA}/moduleList_compare_added.log
-            cki_upload_log_file ${TESTAREA}/moduleList_compare_added.log
+            rlFileSubmit ${TESTAREA}/moduleList_compare_added.log moduleList_compare_added.log
             rlLogWarning "Existing new module(s), please check log: moduleList_compare_added.log"
             echo "************New modules list start***************" | tee -a $OUTPUTFILE
             cat ${TESTAREA}/moduleList_compare_added | tee -a $OUTPUTFILE
@@ -585,7 +585,7 @@ rlJournalStart
 
             DisplayModuleFail moduleList_missing
             cp ${TESTAREA}/moduleList_missing ${TESTAREA}/moduleList_missing.log
-            cki_upload_log_file ${TESTAREA}/moduleList_missing.log
+            rlFileSubmit ${TESTAREA}/moduleList_missing.log moduleList_missing.log
             rlFail "There are missing modules! Check moduleList_missing.log for more details."
         fi
     rlPhaseEnd
