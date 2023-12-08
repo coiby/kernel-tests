@@ -260,12 +260,13 @@ netperf_install()
 
 	local OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 
-	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
+	#SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
+	SRC_NETPERF=${SRC_NETPERF:-"https://github.com/HewlettPackard/netperf/archive/refs/heads/master.tar.gz"}
 
 	pushd ${NETWORK_COMMONLIB_DIR} 1>/dev/null
 	wget -nv -N $SRC_NETPERF
-	tar xjvf $(basename $SRC_NETPERF)
-	cd $(basename $SRC_NETPERF| awk -F. '{print $1}')
+	tar xvf $(basename $SRC_NETPERF)
+	cd netperf-$(basename $SRC_NETPERF| awk -F. '{print $1}')
 	check_arch
 	./autogen.sh
 	lsmod | grep sctp
