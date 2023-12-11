@@ -8,11 +8,12 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Source beaker environment
-set +x
+[[ "$-" =~ "*x*" ]] && verbose=true || verbose=false
+[[ "${verbose}" == "true" ]] && set +x  # disable debug outputs if set
 . "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/../../cki_lib/libcki.sh || exit 1
 . "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/lib.sh
 . "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/tuned_realtime.sh
-set -x
+[[ "${verbose}" == "true" ]] && set -x  # restore debug outputs if set
 
 rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')

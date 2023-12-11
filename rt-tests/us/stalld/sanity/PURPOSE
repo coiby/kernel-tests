@@ -1,6 +1,18 @@
-Measure the time it takes for a stalled thread to be
-boosted. Ensure the the result is consistent with stalld
-taking action to boost the pid. A stalled thread boost
-in under 240 seconds is considered to be a PASS. Without
-stalld the thread will not get boosted and will take the 
-full 240 seconds or more.
+Start the stalld daemon:
+
+  chrt -f 10 stalld -v -t 30 -r 1000000
+
+  chrt -f 10
+       Start stalld with FIFO:10 to ensure that stalld itself is not blocked, this is also set as default in stalld.service .
+
+  -t 30
+       The startving task will wait 30s before getting boosted.
+
+  -r 1000000
+       The starving task will receive this [ns] of SCHED_DEADLINE runtime.
+
+This test uses stress-ng to monopolize a CPU with a timeout of 120s, then starts
+a non-realtime task and let it starve on the same CPU. It should take no more
+than 120s for the task to finish, otherwise it's considered as a FAIL. In
+practice, one boost cycle is sufficient to finish the task, plus some other time
+costs, tests can usually finish in 60s.
