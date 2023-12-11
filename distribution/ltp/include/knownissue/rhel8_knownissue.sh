@@ -20,6 +20,7 @@ function rhel8_fatal_issues()
 	osver_in_range "800" "811" && cki_is_kernel_debug && tskip "read_all_sys" fatal
 	# Bug 2115120 - RHEL8: kernel-rt: WARNING: possible circular locking dependency detected (raw_v6_hashinfo.lock->(softirq_ctrl.lock).lock->raw_v6_hashinfo.lock
 	is_rt && cki_is_kernel_debug && osver_in_range "806" "807" && tskip "read_all_proc" fatal
+	is_rt && cki_is_kernel_debug && osver_in_range "806" "807" && tskip "proc01" fatal
 	# hang with kmemleak: kmemleak_alloc: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1613
 	is_rt && cki_is_kernel_debug && osver_in_range "800" "805" && tskip "dynamic_debug01" fatal
 }
