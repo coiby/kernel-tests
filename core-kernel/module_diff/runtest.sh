@@ -9,6 +9,9 @@
 
 TESTAREA="/mnt/testarea"
 
+# Variable used by beakerlib
+export TEST="core-kernel/module_diff"
+
 # Kernel Variables
 K_NAME=`rpm -q --queryformat '%{name}\n' -qf /boot/config-$(uname -r)`
 K_VER=`rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r)`
@@ -45,12 +48,12 @@ function GetCurrentModuleList ()
 
     if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
         PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
         fi
     else
         PKG_LIST="${name}-${K_VER}-${K_REL}"
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
         fi
     fi
@@ -91,13 +94,13 @@ function GetBaseModuleList ()
 
     cat ./${OS}/${Release}/${Release}-modules-${ARCH}.lst > ${TESTAREA}/moduleList_base
 
-    if $(cki_is_kernel_debug); then
+    if cki_is_kernel_debug; then
         AddDebugKernelModuleToBase
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             AddRTnDebugBaseList
         fi
     else
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             AddRTBaseList
         fi
     fi
@@ -139,10 +142,10 @@ function GetKnownRemovedList ()
         cat ./${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst > ${TESTAREA}/moduleList_knownRemoved
     fi
 
-    if $(cki_is_kernel_rt); then
+    if cki_is_kernel_rt; then
         AddRTKnowRemovedList
     fi
-    if $(cki_is_kernel_64k); then
+    if cki_is_kernel_64k; then
         Add64kKnowRemovedList
     fi
 
@@ -195,7 +198,7 @@ function RHEL6_TestBZ839667 ()
 
                 DisplayModuleFail moduleList_missing
                 cp ${TESTAREA}/moduleList_missing ${TESTAREA}/moduleList_missing.log
-                cki_upload_log_file ${TESTAREA}/moduleList_missing.log
+                rlFileSubmit ${TESTAREA}/moduleList_missing.log moduleList_missing.log
                 DeBug "RHEL6_TestBZ839667 fail"
                 cki_print_info "RHEL6_TestBZ839667"
             fi
@@ -238,17 +241,17 @@ function chk_inst_kernel_modules_core ()
 }
 
 rlJournalStart
-    rlPhaseStartTest
+    rlPhaseStartSetup
         YUM=$(cki_get_yum_tool)
         name="kernel"
         baseurl=${BASEURL:-}
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             name="${name}-rt"
         fi
-        if $(cki_is_kernel_64k); then
+        if cki_is_kernel_64k; then
             name="${name}-64k"
         fi
-        if $(cki_is_kernel_debug); then
+        if cki_is_kernel_debug; then
             name="${name}-debug"
         fi
         if cki_kver_lt "5.14.0-285.el9"; then
@@ -263,7 +266,7 @@ rlJournalStart
         elif grep -q "release 8" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
         fi
-        if $(cki_is_kernel_rt); then
+        if cki_is_kernel_rt; then
             inst_kernel_rt_kvm
         fi
         # -----------------------------------
@@ -512,11 +515,14 @@ rlJournalStart
 
         # Lets determine the known removed module list for the base release kernel package
         GetKnownRemovedList
+        rlPhaseEnd
+
+        rlPhaseStartTest
 
         # Lets submit the complete log from the diff of base module list and the current module list
         diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current > ${TESTAREA}/moduleList_base-current_diff
         cp ${TESTAREA}/moduleList_base-current_diff ${TESTAREA}/moduleList_base-current_diff.log
-        cki_upload_log_file ${TESTAREA}/moduleList_base-current_diff.log
+        rlFileSubmit ${TESTAREA}/moduleList_base-current_diff.log moduleList_base-current_diff.log
 
         #
         # Compared: Lets compare the base and current module lists
@@ -531,7 +537,7 @@ rlJournalStart
             rlPass "New added modules check PASS"
         else
             cp ${TESTAREA}/moduleList_compare_added ${TESTAREA}/moduleList_compare_added.log
-            cki_upload_log_file ${TESTAREA}/moduleList_compare_added.log
+            rlFileSubmit ${TESTAREA}/moduleList_compare_added.log moduleList_compare_added.log
             rlLogWarning "Existing new module(s), please check log: moduleList_compare_added.log"
             echo "************New modules list start***************" | tee -a $OUTPUTFILE
             cat ${TESTAREA}/moduleList_compare_added | tee -a $OUTPUTFILE
@@ -582,7 +588,7 @@ rlJournalStart
 
             DisplayModuleFail moduleList_missing
             cp ${TESTAREA}/moduleList_missing ${TESTAREA}/moduleList_missing.log
-            cki_upload_log_file ${TESTAREA}/moduleList_missing.log
+            rlFileSubmit ${TESTAREA}/moduleList_missing.log moduleList_missing.log
             rlFail "There are missing modules! Check moduleList_missing.log for more details."
         fi
     rlPhaseEnd
