@@ -7,7 +7,7 @@ LOOKASIDE=https://github.com/yizhanglinux/blktests.git
 if rlIsRHEL 7; then
 	BR=rhel7
 elif rlIsRHEL 8; then
-	BR=nvme-rdma-tcp
+	BR=rhel8
 elif rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
 	BR=rhel9-fedora
 fi
