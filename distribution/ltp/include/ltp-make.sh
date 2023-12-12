@@ -98,17 +98,6 @@ clone_ltp()
 
 }
 
-# Critical patches
-# 1. If a patch fixes installation issue
-# 2. a patch fixes critical issues (causing deadlock, crash, etc), no
-#	matter the test will be executed or not, it should be applied here.
-patch-critical()
-{
-    echo "============ Critical Patch ============" | tee -a $OUTPUTFILE
-    ${PATCH} < ${ABS_DIR}/INTERNAL/rhel-scrashme-remove-fork12-test.patch
-}
-
-
 patch-generic()
 {
     echo "============ General Patch ============" | tee -a $OUTPUTFILE
@@ -254,11 +243,9 @@ patch-cgroups()
 
 patch-inc()
 {
-    patch-critical
     patch-generic
     patch-lite
 }
-
 
 AUTOCONFIGVER=$(rpm -qa autoconf |cut -f 2 -d "-")
 AUTOMAKEVER=$(rpm -qa automake |cut -f 2 -d "-"|cut -f 1,2 -d ".")
