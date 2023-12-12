@@ -25,7 +25,7 @@ PrepareCrash
 if $IS_RHEL8 && [ "$(uname -m)" = "aarch64" ]; then
     CheckSkipTest crash 7.3.2-8 && Report
 elif $IS_RHEL9 && [ "$(uname -m)" = "aarch64" ]; then
-    Warn "This issue will be fixed on RHEL-9.4,tracked by RHEL-10534."
+    CheckSkipTest crash 8.0.4-1 && Report
 else
     Skip "Currently,only aarch64 has no NMI."
     Report

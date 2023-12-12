@@ -7,6 +7,7 @@
 #include <linux/kthread.h>
 #include <linux/moduleparam.h>
 #include <linux/kprobes.h>
+#include <linux/version.h>
 
 int thread_function(void *id)
 {
@@ -16,7 +17,7 @@ int thread_function(void *id)
         return 0;
 }
 
-
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(5,0,0)
 struct kthread {
        unsigned long flags;
        unsigned int cpu;
@@ -50,7 +51,7 @@ struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
        to_kthread(p)->cpu = cpu;
        return p;
 }
-
+#endif
 int my_panic(void *id)
 {
         panic("repro");
