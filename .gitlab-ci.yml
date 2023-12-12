@@ -90,7 +90,7 @@ shell check runtests mr:
   script:
     - |
       # run full shellcheck on files changed by the MR
-      readarray -t files < <(git diff --name-only "${CI_MERGE_REQUEST_DIFF_BASE_SHA}..${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-${CI_COMMIT_SHA}}" | egrep "\.sh$")
+      readarray -t files < <(git diff --name-only "${CI_MERGE_REQUEST_DIFF_BASE_SHA}..${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-${CI_COMMIT_SHA}}" | grep -E "\.sh$")
       error=0
       for file in "${files[@]}"; do
           # force to bash to avoid POSIX warnings
