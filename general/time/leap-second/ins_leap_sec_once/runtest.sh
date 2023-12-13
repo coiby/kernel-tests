@@ -23,6 +23,7 @@ function runtest ()
         RESULT="PASS"
         rstrnt-report-result $TEST $RESULT 0
     fi
+    killall leap-a-day
 }
 
 echo '
