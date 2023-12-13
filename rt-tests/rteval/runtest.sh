@@ -10,95 +10,108 @@
 # Source rt common functions
 . ../include/runtest.sh || exit 1
 
-export TEST="rt-tests/rteval"
-
 # User Parameters
 : "${DURATION:=900}"
 : "${LATCHECK:=1}"
 : "${MAXLAT:=150}"
 : "${STDDEVLAT:=5}"
+: "${LOADS_CPUS:=}"
+: "${MEASURE_CPUS:=}"
 
-function RprtRslt ()
+# Vars
+export TEST="rt-tests/rteval"
+
+
+function measure_latency()
 {
-    declare result=$1
+    which bc >/dev/null || $PKGMGR bc
 
-    # File the results in the database
-    if [ $result = "PASS" ]; then
-        rstrnt-report-result $TEST $result 0
-    else
-        rstrnt-report-result $TEST $result 1
-    fi
-}
-
-function MeasureLatency()
-{
-    which bc >/dev/null || yum install -y bc
-
-    # Verify the max and stddev latency fall within tolerable range
+    # get the max and standard deviation latency from rteval output
     declare max_lat stddev_lat
     max_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
               grep 'Max:' | awk -F ':' '{print $2}' | xargs)
+    max_lat=${max_lat%us}
     stddev_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
                  grep 'Std.dev:' | awk -F ':' '{print $2}' | xargs)
+    stddev_lat=${stddev_lat%us}
 
-    echo "rteval max/stddev lat was: ${max_lat} / ${stddev_lat}" | \
-        tee -a $OUTPUTFILE
+    log "Performing latency threshold check:"
+    log "-> rteval max/stddev lat was: ${max_lat}us / ${stddev_lat}us"
+    log "-> max/stddev lat should be under: ${MAXLAT}us / ${STDDEVLAT}us"
 
-    if ! (( $(echo "${max_lat%us} < $MAXLAT" | bc -l) )); then
-        echo "FAIL: maximum latency of $max_lat exceeds ${MAXLAT}us" | \
-            tee -a $OUTPUTFILE
-        result_r="FAIL"
-    fi
-
-    if ! (( $(echo "${stddev_lat%us} < $STDDEVLAT" | bc -l) )); then
-        echo "FAIL: std.dev latency of $stddev_lat exceeds ${STDDEVLAT}us" | \
-            tee -a $OUTPUTFILE
-        result_r="FAIL"
-    fi
+    # verify the max and stddev latency fall within tolerable range
+    run "(( $(echo "$max_lat < $MAXLAT" | bc -l) ))"
+    run "(( $(echo "$stddev_lat < $STDDEVLAT" | bc -l) ))"
 }
 
-function RunTest ()
+function test_setup ()
 {
-    # Default result to Fail
-    export result_r="FAIL"
+    if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
+        rt_env_setup
+        ! cki_is_kernel_automotive && enable_tuned_realtime
+    fi
 
-    echo "Test Start Time: $(date)" | tee -a $OUTPUTFILE
+    phase_start_setup
 
-    echo "-- INFO -- Default run time: $DURATION seconds" | tee -a $OUTPUTFILE
+    isolated_cpus=$(get_isolated_cores)
+    housekeeping_cpus=$(get_housekeeping_cores)
 
-    echo "-- INFO -- Mounting debugfs to/sys/kernel/debug" | tee -a $OUTPUTFILE
-    mount -t debugfs none /sys/kernel/debug
+    log "System isolated cores: $isolated_cpus"
+    log "System housekeeping cores: $housekeeping_cpus"
 
-    echo "-- INFO -- Using command line: rteval --duration=$DURATION" | \
-        tee -a $OUTPUTFILE
+    FLAG_LOADS=""
+    FLAG_MEASURE=""
 
-    # Lets rock'n'roll
-    rteval --duration=$DURATION -D -L | tee -a $OUTPUTFILE
-    retcode="${PIPESTATUS[0]}"
+    if [ -n "$LOADS_CPUS" ]; then
+        if [[ "$LOADS_CPUS" == "housekeeping" ]]; then
+            FLAG_LOADS="--loads-cpulist $housekeeping_cpus"
+        elif [[ "$LOADS_CPUS" == "isolated" ]]; then
+            FLAG_LOADS="--loads-cpulist $isolated_cpus"
+        else
+            FLAG_LOADS="--loads-cpulist $LOADS_CPUS"
+        fi
+    fi
+
+    if [ -n "$MEASURE_CPUS" ]; then
+        if [[ "$MEASURE_CPUS" == "housekeeping" ]]; then
+            FLAG_MEASURE="--measurement-cpulist $housekeeping_cpus"
+        elif [[ "$MEASURE_CPUS" == "isolated" ]]; then
+            FLAG_MEASURE="--measurement-cpulist $isolated_cpus"
+        else
+            FLAG_MEASURE="--measurement-cpulist $MEASURE_CPUS"
+        fi
+    fi
+
+    export FLAG_LOADS FLAG_MEASURE
+
+    phase_end
+}
+
+function test_run ()
+{
+    phase_start "${TEST}" FAIL
+
+    log "Mounting debugfs to /sys/kernel/debug"
+    run -l "mount -t debugfs none /sys/kernel/debug"
+
+    # let's rock'n'roll
+    run "rteval --duration=$DURATION -D -L $FLAG_LOADS $FLAG_MEASURE"
 
     find . -maxdepth 1 -name "rteval-????????-*.tar.bz2" -print |
         while IFS= read -r rep; do
-            echo "-- INFO -- Attaching report: $rep" | tee -a $OUTPUTFILE
+            log "Attaching report: $rep"
             rstrnt-report-log -l $rep
         done
 
-    if [ ${retcode} -eq 0 ] ; then
-        echo "rteval Passed: " | tee -a $OUTPUTFILE
-        result_r="PASS"
-        [ $LATCHECK -eq 1 ] && MeasureLatency
-    else
-        echo "rteval Failed: " | tee -a $OUTPUTFILE
-        result_r="FAIL"
+    # perform a max and stddev latency check if requested
+    if [ $LATCHECK -eq 1 ]; then
+        measure_latency
     fi
 
-    echo "Test End Time: $(date)" | tee -a $OUTPUTFILE
-    RprtRslt $result_r
+    phase_end
 }
 
+
 # ---------- Start Test -------------
-if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
-    rt_env_setup
-    ! cki_is_kernel_automotive && enable_tuned_realtime
-fi
-RunTest
-exit 0
+test_setup
+test_run
