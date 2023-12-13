@@ -1,12 +1,12 @@
-summary: PRE Verification for Real Time test /kernel/rt-tests/rteval
-description: Details in PURPOSE file
+summary: /kernel/rt-tests/rteval
+description: See PURPOSE file
 contact: Qiao Zhao <qzhao@redhat.com>
 enabled: true
 id: bccd3743-d50c-4255-aa95-8cbfa9b7376a
 component:
   - kernel
 path: /rt-tests/rteval
-test: bash -x ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require: rteval
 duration: 10h

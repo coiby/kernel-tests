@@ -28,3 +28,15 @@ This script takes the following parameters:
   Default: 5
   Standard deviation latency (in microseconds) that this system
   should not exceed.  LATCHECK=1 must be set to check this value.
+
+* LOADS_CPUS
+  Default: "" (empty)
+  If set, will run rteval with --loads-cpulist.  This can either
+  be a CPU string (e.g. 1-9), "housekeeping" to run on housekeeping
+  cores, or "isolated" to run on isolated cores.
+
+* MEASURE_CPUS
+  Default: "" (empty)
+  If set, will run rteval with --measurement-cpulist.  This can
+  either be a CPU string (e.g. 2-4), "housekeeping" to run on
+  housekeeping cores, or "isolated" to run on isolated cores.

@@ -32,6 +32,9 @@ rhel_x=$(echo $VERSION_ID | cut -d. -f1)
 rhel_y=$(echo $VERSION_ID | cut -d. -f2)
 nrcpus=$(grep -c ^processor /proc/cpuinfo)
 
+# export variables not directly used in this lib
+export kname kver krel nrcpus
+
 
 # log [-l, --label] message
 function log()
@@ -114,7 +117,7 @@ function phase_start_cleanup() { phase_start Cleanup WARN ; }
 
 function phase_end()
 {
-    (( PHASE_DURATION = SECONDS - PHASE_START_TIME ))
+    : $(( PHASE_DURATION = SECONDS - PHASE_START_TIME ))
 
     # This is the only place PHASE_TYPE is used
     if [[ "${PHASE_TYPE}" == WARN ]] && [[ "${PHASE_STATUS}" == FAIL ]]; then
@@ -162,10 +165,10 @@ function run()
         # This parameter is used only when "phase" is used, it doesn't
         # (shouldn't) affect the test otherwise
         PHASE_STATUS=FAIL
-        (( PHASE_BAD++ ))
+        : $(( PHASE_BAD++ ))
         log_fail "Command '${commands}' (Expected ${expected}, got ${exit_code})"
     else
-        (( PHASE_GOOD++ ))
+        : $(( PHASE_GOOD++ ))
         log_pass "Command '${commands}' (Expected ${expected}, got ${exit_code})"
     fi
 
@@ -234,6 +237,26 @@ function convert_number_range() {
    # shellcheck disable=SC2001
    cpus_list=$(echo $cpus_list | sed -e 's/^,//')
    echo "$cpus_list"
+}
+
+function get_isolated_cores()
+{
+    declare cpuset
+    # Try to get isolated cores from /cpu/isolated, which should be sufficient
+    # for most baremetal testing.  If empty, try /cpu/nohz_full, which
+    # should be sufficient for OCP/SNO systems.
+    cpuset=$(cat /sys/devices/system/cpu/isolated)
+    [ -z $cpuset ] && cpuset=$(cat /sys/devices/system/cpu/nohz_full)
+    [[ "$cpuset" == *"null"* ]] && cpuset=""
+    echo ${cpuset}
+}
+
+function get_housekeeping_cores()
+{
+    declare cpuset
+    # Get the list of non-isolated CPUs
+    cpuset=$(grep "Cpus_allowed_list:" /proc/self/status | cut -f 2)
+    echo ${cpuset}
 }
 
 # ver1 <= rhel <= ver2
