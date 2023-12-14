@@ -303,6 +303,7 @@ empeg.ko
 ems_usb.ko
 enclosure.ko
 enic.ko
+erofs.ko
 esp4.ko
 esp4_offload.ko
 esp6.ko

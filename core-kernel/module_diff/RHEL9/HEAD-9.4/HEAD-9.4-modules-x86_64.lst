@@ -67,6 +67,7 @@ amdgpu.ko
 amd_hsmp.ko
 amd.ko
 amd-pmc.ko
+amd-pmf.ko
 amd-pstate-ut.ko
 amd-rng.ko
 amd_sfh.ko
@@ -391,6 +392,7 @@ ems_usb.ko
 ena.ko
 enclosure.ko
 enic.ko
+erofs.ko
 esp4.ko
 esp4_offload.ko
 esp6.ko

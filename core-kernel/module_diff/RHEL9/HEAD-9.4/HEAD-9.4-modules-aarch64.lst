@@ -43,6 +43,7 @@ aquantia.ko
 arc_ps2.ko
 ark3116.ko
 arm-cmn.ko
+arm_cspmu_module.ko
 arm_dmc620_pmu.ko
 arm_dsu_pmu.ko
 arm_mhu_db.ko
@@ -90,6 +91,7 @@ bcm87xx.ko
 bcma.ko
 bcm_crypto_spu.ko
 bcm-phy-lib.ko
+bcm-phy-ptp.ko
 bd718x7-regulator.ko
 be2iscsi.ko
 belkin_sa.ko
@@ -348,6 +350,7 @@ empeg.ko
 ems_usb.ko
 ena.ko
 enclosure.ko
+erofs.ko
 error.ko
 esp4.ko
 esp4_offload.ko
@@ -1120,6 +1123,7 @@ platform_lcd.ko
 plusb.ko
 pmbus_core.ko
 poly1305_generic.ko
+polynomial.ko
 powr1220.ko
 ppp_async.ko
 ppp_deflate.ko
