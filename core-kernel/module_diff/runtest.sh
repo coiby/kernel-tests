@@ -373,6 +373,206 @@ function chk_inst_kernel_modules_core ()
     rpm -q $pkg_kms_core > /dev/null || $YUM -y install $pkg_kms_core || ($YUM -y install ${rpm_url} || cki_print_warning "Missing ${name}-modules-core, please check")
 }
 
+
+function SetOSRelease ()
+{
+    OS=""
+    Release=""
+    #
+    # Base: Lets determine base release kernel package
+    #
+    Base=`echo ${K_REL} | cut -d. -f1`
+    if [ "${K_VER}" = "2.6.32" ]; then
+        # This is RHEL6 (Santiago)
+        OS="RHEL6"
+        case ${Base} in
+            71)
+                # RHEL-6.0
+                Release="6.0"
+                ;;
+            131)
+                # Actual RHEL-6.1 is 131.0.15, but 131 will suffice for this case.
+                Release="6.1"
+                ;;
+            220)
+                # RHEL-6.2
+                Release="6.2"
+                ;;
+            279)
+                # RHEL-6.3
+                Release="6.3"
+                ;;
+            358)
+                # RHEL-6.4
+                Release="6.4"
+                ;;
+            431)
+                # RHEL-6.5
+                Release="6.5"
+                ;;
+            504)
+                # RHEL-6.6
+                Release="6.6"
+                ;;
+            573)
+                # RHEL-6.7
+                Release="6.7"
+                ;;
+            642)
+                # RHEL-6.8
+                Release="6.8"
+                ;;
+            696)
+                # RHEL-6.9
+                Release="6.9"
+                ;;
+            *)
+                # We are currently developing RHEL-6.10
+                # Therefore we test at HEAD-RHEL-6.10
+                Release="HEAD-6.10"
+                ;;
+        esac
+    elif [ "${K_VER}" = "3.10.0" ]; then
+        # This is RHEL7 (Maipo)
+        OS="RHEL7"
+        case ${Base} in
+            123)
+                # RHEL-7.0
+                Release="7.0"
+                ;;
+            229)
+                # RHEL-7.1
+                Release="7.1"
+                ;;
+
+            327)
+                # RHEL-7.2
+                Release="7.2"
+                ;;
+            514)
+                # RHEL-7.3
+                Release="7.3"
+                ;;
+            693)
+                # RHEL-7.4
+                Release="7.4"
+                ;;
+            862)
+                # RHEL-7.5
+                Release="7.5"
+                ;;
+            957)
+                # RHEL-7.6
+                Release="7.6"
+                ;;
+            1062)
+                # RHEL-7.7
+                Release="7.7"
+                ;;
+            1127)
+                # RHEL-7.8
+                Release="7.8"
+                ;;
+
+            *)
+                # We are currently developing RHEL-7.9
+                # Therefore we test at HEAD-RHEL-7.9
+                Release="HEAD-7.9"
+                ;;
+        esac
+    elif [ "${K_VER}" = "4.18.0" ]; then
+        # This is RHEL8, Ootpa
+        OS="RHEL8"
+        case ${Base} in
+            80)
+                # RHEL-8.0
+                Release="8.0"
+                ;;
+            147)
+                # RHEL-8.1
+                Release="8.1"
+                ;;
+            193)
+                # RHEL-8.2
+                Release="8.2"
+                ;;
+            240)
+                # RHEL-8.3
+                Release="8.3"
+                ;;
+            305)
+                # RHEL-8.4
+                Release="8.4"
+                ;;
+            348)
+                # RHEL-8.5
+                Release="8.5"
+                ;;
+            372)
+                # RHEL-8.6
+                Release="8.6"
+                ;;
+            425)
+                # RHEL-8.7
+                DeBug "Base release is RHEL-8.7"
+                echo "" | tee -a $OUTPUTFILE
+                echo "***** $ARCH: Base release is RHEL-8.7 *****" | tee -a $OUTPUTFILE
+                Release="8.7"
+                ;;
+            477)
+                # RHEL-8.8
+                Release="8.8"
+                ;;
+            513)
+                Release="8.9"
+                ;;
+            *)
+                # We are currently developing RHEL-8.9
+                # Therefore we test at HEAD-RHEL-8.9
+                # Need to refresh the list after 8.9 GA
+                Release="HEAD-8.10"
+                ;;
+        esac
+    elif [ "${K_VER}" = "5.14.0" ]; then
+        # This is RHEL9
+        OS="RHEL9"
+        case ${Base} in
+            70)
+                # RHEL-9.0
+                Release="9.0"
+                ;;
+            162)
+                # RHEL-9.1
+                Release="9.1"
+                ;;
+            284)
+                # RHEL-9.2
+                Release="9.2"
+                ;;
+            362)
+                Release="9.3"
+                ;;
+            *)
+                # Still in developing phase, need to update in future.
+                Release="HEAD-9.4"
+                ;;
+        esac
+    elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
+        DeBug "Base release is RHEL7/Pegas1, skipping test."
+        OS="RHEL7"
+        Release="Pegas1"
+        cki_print_info "Skipped"
+        exit 0
+    else
+        echo "" | tee -a $OUTPUTFILE
+        echo "***** FAILED: *****" | tee -a $OUTPUTFILE
+        echo "***** Unable to determine base release kernel package. *****" | tee -a $OUTPUTFILE
+        DeBug "Unable to determine base release"
+        cki_print_info "Base"
+        exit 1
+    fi
+}
+
 rlJournalStart
     rlPhaseStartSetup
         YUM=$(cki_get_yum_tool)
@@ -402,255 +602,78 @@ rlJournalStart
         if cki_is_kernel_rt; then
             inst_kernel_rt_kvm
         fi
-        # -----------------------------------
-        # --------   Start Test   -----------
-        # -----------------------------------
 
         echo "***** Currently running kernel: $(uname -r) *****" | tee -a $OUTPUTFILE
-        #
-        # Base: Lets determine base release kernel package
-        #
-        Base=`echo ${K_REL} | cut -d. -f1`
-        if [ "${K_VER}" = "2.6.32" ]; then
-            # This is RHEL6 (Santiago)
-            OS="RHEL6"
-            case ${Base} in
-                71)
-                    # RHEL-6.0
-                    Release="6.0"
-                    ;;
-                131)
-                    # Actual RHEL-6.1 is 131.0.15, but 131 will suffice for this case.
-                    Release="6.1"
-                    ;;
-                220)
-                    # RHEL-6.2
-                    Release="6.2"
-                    ;;
-                279)
-                    # RHEL-6.3
-                    Release="6.3"
-                    ;;
-                358)
-                    # RHEL-6.4
-                    Release="6.4"
-                    ;;
-                431)
-                    # RHEL-6.5
-                    Release="6.5"
-                    ;;
-                504)
-                    # RHEL-6.6
-                    Release="6.6"
-                    ;;
-                573)
-                    # RHEL-6.7
-                    Release="6.7"
-                    ;;
-                642)
-                    # RHEL-6.8
-                    Release="6.8"
-                    ;;
-                696)
-                    # RHEL-6.9
-                    Release="6.9"
-                    ;;
-                *)
-                    # We are currently developing RHEL-6.10
-                    # Therefore we test at HEAD-RHEL-6.10
-                    Release="HEAD-6.10"
-                    ;;
-            esac
-        elif [ "${K_VER}" = "3.10.0" ]; then
-            # This is RHEL7 (Maipo)
-            OS="RHEL7"
-            case ${Base} in
-                123)
-                    # RHEL-7.0
-                    Release="7.0"
-                    ;;
-                229)
-                    # RHEL-7.1
-                    Release="7.1"
-                    ;;
+        SetOSRelease
 
-                327)
-                    # RHEL-7.2
-                    Release="7.2"
-                    ;;
-                514)
-                    # RHEL-7.3
-                    Release="7.3"
-                    ;;
-                693)
-                    # RHEL-7.4
-                    Release="7.4"
-                    ;;
-                862)
-                    # RHEL-7.5
-                    Release="7.5"
-                    ;;
-                957)
-                    # RHEL-7.6
-                    Release="7.6"
-                    ;;
-                1062)
-                    # RHEL-7.7
-                    Release="7.7"
-                    ;;
-                1127)
-                    # RHEL-7.8
-                    Release="7.8"
-                    ;;
-
-                *)
-                    # We are currently developing RHEL-7.9
-                    # Therefore we test at HEAD-RHEL-7.9
-                    Release="HEAD-7.9"
-                    ;;
-            esac
-        elif [ "${K_VER}" = "4.18.0" ]; then
-            # This is RHEL8, Ootpa
-            OS="RHEL8"
-            case ${Base} in
-                80)
-                    # RHEL-8.0
-                    Release="8.0"
-                    ;;
-                147)
-                    # RHEL-8.1
-                    Release="8.1"
-                    ;;
-                193)
-                    # RHEL-8.2
-                    Release="8.2"
-                    ;;
-                240)
-                    # RHEL-8.3
-                    Release="8.3"
-                    ;;
-                305)
-                    # RHEL-8.4
-                    Release="8.4"
-                    if cki_kver_lt "4.18.0-305.8.1.el8_4"; then
-                        sed -i "/pinctrl-emmitsburg\.ko/d"  ${OS}/${Release}/8.4-modules-${ARCH}.lst
-                    fi
-                    #known issue: bz1968381
-                    if cki_kver_lt "4.18.0-305.11.1.el8_4"; then
-                        sed -i "/dptf_power\.ko/d" ${OS}/${Release}/8.4-modules-${ARCH}.lst
-                    fi
-                    if cki_kver_lt "4.18.0-305.109.1.el8_4"; then
-                        sed -i "/nf_log_syslog.ko/d" ${OS}/${Release}/8.4-modules-${ARCH}.lst
-                        sed -i "/nf_log_arp.ko/d; /nf_log_bridge.ko/d; /nf_log_common.ko/d; \
-                                /nf_log_ipv4.ko/d; /nf_log_ipv6.ko/d; /nf_log_netdev.ko/d" \
-                                ${OS}/${Release}/8.4-knownRemoved-${ARCH}.lst
-                    fi
-                    ;;
-                348)
-                    # RHEL-8.5
-                    Release="8.5"
-                    ;;
-                372)
-                    # RHEL-8.6
-                    Release="8.6"
-                    # known issue: bz2129923
-                    if cki_kver_lt "4.18.0-372.32.1.el8_6"; then
-                        sed -i "/hpilo\.ko/d"  ${OS}/${Release}/8.6-modules-aarch64.lst
-                    fi
-                    ;;
-                425)
-                    # RHEL-8.7
-                    DeBug "Base release is RHEL-8.7"
-                    echo "" | tee -a $OUTPUTFILE
-                    echo "***** $ARCH: Base release is RHEL-8.7 *****" | tee -a $OUTPUTFILE
-                    Release="8.7"
-                    ;;
-                477)
-                    # RHEL-8.8
-                    Release="8.8"
-                    ;;
-                513)
-                    Release="8.9"
-                    ;;
-                *)
-                    # We are currently developing RHEL-8.9
-                    # Therefore we test at HEAD-RHEL-8.9
-                    # Need to refresh the list after 8.9 GA
-                    Release="HEAD-8.10"
-                    ;;
-            esac
-        elif [ "${K_VER}" = "5.14.0" ]; then
-            # This is RHEL9
-            OS="RHEL9"
-            case ${Base} in
-                70)
-                    # RHEL-9.0
-                    Release="9.0"
-                    if cki_kver_lt "5.14.0-70.30.1.el9_0"; then
-                        sed -i '/libarc4.ko/d' ${OS}/${Release}/$Release-knownRemoved-s390x.lst
-                        sed -i '/cifs_arc4.ko/d;/cifs_md4.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
-                    fi
-                    ;;
-                162)
-                    # RHEL-9.1
-                    Release="9.1"
-                    ;;
-                284)
-                    # RHEL-9.2
-                    Release="9.2"
-                    ;;
-                362)
-                    Release="9.3"
-                    ;;
-                *)
-                    # Still in developing phase, need to update in future.
-                    Release="HEAD-9.4"
-                    if cki_kver_lt "5.14.0-364.el9"; then
-                        sed -i '/ems_usb.ko/d; /kvaser_usb.ko/d; /m_can.ko/d; /m_can_pci.ko/d; \
-                                /peak_pciefd.ko/d; /peak_usb.ko/d; /slcan.ko/d; /usb_8dev.ko/d' \
-                                ${OS}/${Release}/$Release-modules-{x86_64,ppc64le}.lst
-                        sed -i '/mcp251xfd.ko/d; /mcp251x.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
-                    fi
-                    if cki_kver_lt "5.14.0-365.el9"; then
-                        sed -i '/intel_vsec_tpmi.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
-                    fi
-                    if cki_kver_lt "5.14.0-367.el9"; then
-                        sed -i '/intel_rapl_tpmi.ko/d; /intel-uncore-frequency-common.ko/d; /intel-uncore-frequency-tpmi.ko/d' \
-                                ${OS}/${Release}/$Release-modules-x86_64.lst
-                    fi
-                    if cki_kver_lt "5.14.0-368.el9"; then
-                        sed -i '/isst_tpmi_core.ko/d; /isst_tpmi.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
-                    fi
-                    if cki_kver_lt "5.14.0-372.el9"; then
-                        sed -i '/bcm-phy-ptp.ko/d; /polynomial.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-378.el9"; then
-                        sed -i '/arm_cspmu_module.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
-                    fi
-                    if cki_kver_lt "5.14.0-379.el9"; then
-                        sed -i '/amd-pmf.ko/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
-                    fi
-                    if cki_kver_lt "5.14.0-387.el9"; then
-                        sed -i '/ftdi-elan.ko/d'  ${OS}/${Release}/$Release-knownRemoved-{x86_64,ppc64le,aarch64}.lst
-                    fi
-                    if cki_kver_lt "5.14.0-395.el9"; then
-                        sed -i '/erofs.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
-                    fi
-                    ;;
-            esac
-        elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
-            DeBug "Base release is RHEL7/Pegas1, skipping test."
-            OS="RHEL7"
-            Release="Pegas1"
-            cki_print_info "Skipped"
-            exit 0
-        else
-            echo "" | tee -a $OUTPUTFILE
-            echo "***** FAILED: *****" | tee -a $OUTPUTFILE
-            echo "***** Unable to determine base release kernel package. *****" | tee -a $OUTPUTFILE
-            DeBug "Unable to determine base release"
-            cki_print_info "Base"
+        if [[ "$Release" == "8.4" ]]; then
+            if cki_kver_lt "4.18.0-305.8.1.el8_4"; then
+                sed -i "/pinctrl-emmitsburg\.ko/d"  ${OS}/${Release}/8.4-modules-${ARCH}.lst
+            fi
+            #known issue: bz1968381
+            if cki_kver_lt "4.18.0-305.11.1.el8_4"; then
+                sed -i "/dptf_power\.ko/d" ${OS}/${Release}/8.4-modules-${ARCH}.lst
+            fi
+            if cki_kver_lt "4.18.0-305.109.1.el8_4"; then
+                sed -i "/nf_log_syslog.ko/d" ${OS}/${Release}/8.4-modules-${ARCH}.lst
+                sed -i "/nf_log_arp.ko/d; /nf_log_bridge.ko/d; /nf_log_common.ko/d; \
+                        /nf_log_ipv4.ko/d; /nf_log_ipv6.ko/d; /nf_log_netdev.ko/d" \
+                        ${OS}/${Release}/8.4-knownRemoved-${ARCH}.lst
+            fi
         fi
+
+        if [[ "$Release" == "8.6" ]]; then
+            # known issue: bz2129923
+            if cki_kver_lt "4.18.0-372.32.1.el8_6"; then
+                sed -i "/hpilo\.ko/d"  ${OS}/${Release}/8.6-modules-aarch64.lst
+            fi
+        fi
+
+        if [[ "$Release" == "9.0" ]]; then
+            if cki_kver_lt "5.14.0-70.30.1.el9_0"; then
+                sed -i '/libarc4.ko/d' ${OS}/${Release}/$Release-knownRemoved-s390x.lst
+                sed -i '/cifs_arc4.ko/d;/cifs_md4.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
+        fi
+
+        if [[ "$Release" == "HEAD-9.4" ]]; then
+            if cki_kver_lt "5.14.0-364.el9"; then
+                sed -i '/ems_usb.ko/d; /kvaser_usb.ko/d; /m_can.ko/d; /m_can_pci.ko/d; \
+                        /peak_pciefd.ko/d; /peak_usb.ko/d; /slcan.ko/d; /usb_8dev.ko/d' \
+                        ${OS}/${Release}/$Release-modules-{x86_64,ppc64le}.lst
+                sed -i '/mcp251xfd.ko/d; /mcp251x.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-365.el9"; then
+                sed -i '/intel_vsec_tpmi.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-367.el9"; then
+                sed -i '/intel_rapl_tpmi.ko/d; /intel-uncore-frequency-common.ko/d; /intel-uncore-frequency-tpmi.ko/d' \
+                        ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-368.el9"; then
+                sed -i '/isst_tpmi_core.ko/d; /isst_tpmi.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-372.el9"; then
+                sed -i '/bcm-phy-ptp.ko/d; /polynomial.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
+            fi
+            if cki_kver_lt "5.14.0-378.el9"; then
+                sed -i '/arm_cspmu_module.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
+            fi
+            if cki_kver_lt "5.14.0-379.el9"; then
+                sed -i '/amd-pmf.ko/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-387.el9"; then
+                sed -i '/ftdi-elan.ko/d'  ${OS}/${Release}/$Release-knownRemoved-{x86_64,ppc64le,aarch64}.lst
+            fi
+            if cki_kver_lt "5.14.0-395.el9"; then
+                sed -i '/erofs.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
+            fi
+        fi
+    rlPhaseEnd
+
+    # -----------------------------------
+    # --------   Start Test   -----------
+    # -----------------------------------
 
     rlPhaseStartTest "Loadable module test"
         # Lets determine the module list for the current kernel package
@@ -666,15 +689,15 @@ rlJournalStart
         CompareModuleList loadable
     rlPhaseEnd
 
-    rlPhaseStartTest "Builtin module test"
-        if ! rlIsRHEL 9.4; then
-            rlPASS "Only support RHEL-9.4 now." && rlPhaseEnd
-        fi
-        GetCurrentModuleList builtin
-        GetBaseModuleList builtin
-        GetKnownRemovedList builtin
-        CompareModuleList builtin
-    rlPhaseEnd
+    # Only support RHEL-9.4 now
+    if [[ "$Release" == "HEAD-9.4" ]]; then
+        rlPhaseStartTest "Builtin module test"
+            GetCurrentModuleList builtin
+            GetBaseModuleList builtin
+            GetKnownRemovedList builtin
+            CompareModuleList builtin
+        rlPhaseEnd
+    fi
 rlJournalEnd
 
 rlJournalPrintText
