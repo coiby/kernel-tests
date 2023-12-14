@@ -211,8 +211,12 @@ function _cthon04 ()
     echo "===== Starting '$report_path' test '$name' ====="
     check_cmd_rup && echo "----- Server load `/usr/bin/rup $server` -----"
     echo "----- start: `/bin/date` -----"
+    echo "----- Memory Usage: -----"
+    { free -m|grep Mem:; top -bcn1 -w128 -o %MEM | sed 1,7d | head -8 | cat -n; } | tee -a /mem-usage.log
+
     # log the command we used
     echo ./server $test -N $testRuns -F $fstype ${options} -p $nfspath $server
+
     # retry mount if there is a connection time out
     local mount_timeout_file=`mktemp`
     local counter=1
@@ -493,6 +497,8 @@ function cthon_all ()
 
 function cthon_main ()
 {
+    : > /mem-usage.log
+
     pushd cthon04
     for server_path in $servers; do
         : > result.txt
@@ -579,6 +585,8 @@ function cthon_main ()
         fi
     done
     popd
+
+    rhts-submit-log -l /mem-usage.log
 }
 
 build_nfs_server ()
