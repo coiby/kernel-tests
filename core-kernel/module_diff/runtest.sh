@@ -18,6 +18,9 @@ K_VER=`rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r)`
 K_REL=`rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r)`
 K_ARCH=$(rpm -q --queryformat '%{arch}' -f /boot/config-$(uname -r))
 
+MODULE_PATH="/lib/modules"
+Builtin_File='modules.builtin'
+
 devnull=0
 
 # Functions
@@ -42,26 +45,39 @@ function GetCurrentModuleList ()
 {
     # Lets determine the module list for the current kernel package
 
-
     # This is an example of getting a sorted list of available modules
     # rpm -q --filesbypkg kernel-2.6.32-220.el6 | grep '\.ko' | awk -F/ '{ print $NF }' | sort
+    case $1 in
+        loadable)
+            local moduleList="moduleList_current"
+            if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
+                PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
+                if cki_is_kernel_rt; then
+                    PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
+                fi
+            else
+                PKG_LIST="${name}-${K_VER}-${K_REL}"
+                if cki_is_kernel_rt; then
+                    PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
+                fi
+            fi
+            rpm -q --filesbypkg $PKG_LIST | grep '\.ko' | awk -F/ '{ print $NF }' | sed 's/\.xz$//' | sort > ${TESTAREA}/${moduleList}
+            ;;
+        builtin)
+            local moduleList="moduleList_builtin_current"
+            local FILE="${MODULE_PATH}/$(uname -r)/${Builtin_File}"
+            rm -rf ${TESTAREA:-"/mnt/testarea"}/${moduleList:-"empty"}
+            touch ${TESTAREA}/${moduleList}
+            while read line
+            do
+                echo ${line##*/}
+            done < $FILE | sort >> ${TESTAREA}/${moduleList}
+            ;;
+    esac
 
-    if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
-        PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
-        if cki_is_kernel_rt; then
-            PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
-        fi
-    else
-        PKG_LIST="${name}-${K_VER}-${K_REL}"
-        if cki_is_kernel_rt; then
-            PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
-        fi
-    fi
-    rpm -q --filesbypkg $PKG_LIST | grep '\.ko' | awk -F/ '{ print $NF }' | sed 's/\.xz$//' | sort > ${TESTAREA}/moduleList_current
-
-    if [ ! -s "${TESTAREA}/moduleList_current" ]; then
+    if [ ! -s "${TESTAREA}/${moduleList}" ]; then
         echo "" | tee -a $OUTPUTFILE
-        DeBug "Unable to determine current module list"
+        DeBug "Unable to determine current $1 module list"
         cki_print_info "GetCurrentModuleList"
     fi
 
@@ -69,45 +85,54 @@ function GetCurrentModuleList ()
 
 function AddDebugKernelModuleToBase ()
 {
-    cat ./${OS}/${Release}/${Release}{-,-debug-}modules-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_base_debug
-    \cp ${TESTAREA}/moduleList_base_debug ${TESTAREA}/moduleList_base
+    cat ./${OS}/${Release}/${Release}{-,-debug-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_debug
+    \cp ${TESTAREA}/${2}_debug ${TESTAREA}/$2
 }
 
 function AddRTBaseList ()
 {
-    if [ -f ./${OS}/${Release}/${Release}-rt-modules-${ARCH}.lst ]; then
-        cat ./${OS}/${Release}/${Release}{-,-rt-}modules-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_base_rt
-        \cp ${TESTAREA}/moduleList_base_rt ${TESTAREA}/moduleList_base
+    if [ -f ./${OS}/${Release}/${Release}-rt-$1-${ARCH}.lst ]; then
+        cat ./${OS}/${Release}/${Release}{-,-rt-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_rt
+        \cp ${TESTAREA}/${2}_rt ${TESTAREA}/$2
     fi
 }
 
 function AddRTnDebugBaseList ()
 {
-    cat ${TESTAREA}/moduleList_base_debug ./${OS}/${Release}/${Release}-rt-modules-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_base_rt
-    \cp ${TESTAREA}/moduleList_base_rt ${TESTAREA}/moduleList_base
+    cat ${TESTAREA}/${2}_debug ./${OS}/${Release}/${Release}-rt-$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_rt
+    \cp ${TESTAREA}/${2}_rt ${TESTAREA}/$2
 }
 
 function GetBaseModuleList ()
 {
     # Lets determine the module list for the base release kernel package
+    case $1 in
+        loadable)
+            local moduleList="moduleList_base"
+            local listFile="modules"
+            ;;
+        builtin)
+            local moduleList="moduleList_builtin_base"
+            local listFile="builtin"
+            ;;
+    esac
 
-
-    cat ./${OS}/${Release}/${Release}-modules-${ARCH}.lst > ${TESTAREA}/moduleList_base
+    cat ./${OS}/${Release}/${Release}-${listFile}-${ARCH}.lst > ${TESTAREA}/${moduleList}
 
     if cki_is_kernel_debug; then
-        AddDebugKernelModuleToBase
+        AddDebugKernelModuleToBase ${listFile} ${moduleList}
         if cki_is_kernel_rt; then
-            AddRTnDebugBaseList
+            AddRTnDebugBaseList ${listFile} ${moduleList}
         fi
     else
         if cki_is_kernel_rt; then
-            AddRTBaseList
+            AddRTBaseList ${listFile} ${moduleList}
         fi
     fi
 
-    if [ ! -s "${TESTAREA}/moduleList_base" ]; then
+    if [ ! -s "${TESTAREA}/${moduleList}" ]; then
         echo "" | tee -a $OUTPUTFILE
-        DeBug "Unable to determine base module list"
+        DeBug "Unable to determine $1 base module list"
         cki_print_info "GetBaseModuleList"
     fi
 
@@ -117,43 +142,151 @@ function GetBaseModuleList ()
 # Workround for RT
 function AddRTKnowRemovedList ()
 {
-    cat ./${OS}/${Release}/${Release}{-,-rt-}knownRemoved-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_knownRemoved-rt
-    \cp ${TESTAREA}/moduleList_knownRemoved-rt ${TESTAREA}/moduleList_knownRemoved
+    cat ./${OS}/${Release}/${Release}{-,-rt-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}-rt
+    \cp ${TESTAREA}/${2}-rt ${TESTAREA}/$2
 }
 # Workround for aarch64 64k
 function Add64kKnowRemovedList ()
 {
-    cat ./${OS}/${Release}/${Release}{-,-64k-}knownRemoved-${ARCH}.lst | sort | uniq > ${TESTAREA}/moduleList_knownRemoved-64k
-    \cp ${TESTAREA}/moduleList_knownRemoved-64k ${TESTAREA}/moduleList_knownRemoved
+    cat ./${OS}/${Release}/${Release}{-,-64k-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}-64k
+    \cp ${TESTAREA}/${2}-64k ${TESTAREA}/$2
 }
 
 function GetKnownRemovedList ()
 {
     # Lets determine the "known removed" module list for the base release kernel package
-
-#    echo "" | tee -a $OUTPUTFILE
-#    echo "***** Determining known removed module list: RHEL-${Release}-${ARCH} *****" | tee -a $OUTPUTFILE
+    case $1 in
+        loadable)
+            local moduleList="moduleList_knownRemoved"
+            local listFile="knownRemoved"
+            ;;
+        builtin)
+            local moduleList="moduleList_builtin_knownRemoved"
+            local listFile="knownRemoved-builtin"
+            ;;
+    esac
 
     # RHEL-6.0 and RHEL-7.0 have no "known removed" module list
     if [ "$Release" = "6.0" ] || [ "$Release" = "7.0" ] || [ "$Release" = "8.0" ]; then
         # Lets just create an empty file moduleList_knownRemoved for checking against RHEL-6.0 or RHEL-7.0
-        touch ${TESTAREA}/moduleList_knownRemoved
+        touch ${TESTAREA}/${moduleList}
     else
-        cat ./${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst > ${TESTAREA}/moduleList_knownRemoved
+        cat ./${OS}/${Release}/${Release}-${listFile}-${ARCH}.lst > ${TESTAREA}/${moduleList}
     fi
 
     if cki_is_kernel_rt; then
-        AddRTKnowRemovedList
+        AddRTKnowRemovedList ${listFile} ${moduleList}
     fi
     if cki_is_kernel_64k; then
-        Add64kKnowRemovedList
+        Add64kKnowRemovedList ${listFile} ${moduleList}
     fi
 
-    if [ ! -e "${TESTAREA}/moduleList_knownRemoved" ]; then
-        DeBug "Unable to determine known removed module list"
+    if [ ! -e "${TESTAREA}/${moduleList}" ]; then
+        DeBug "Unable to determine $1 known removed module list"
         cki_print_info "GetKnownRemovedModuleList"
     fi
 
+}
+
+function CrossCheck ()
+{
+    local TYPE=$1
+    local FILE=$2
+    if [ x"$TYPE" == "xloadable" ]; then
+        for m in $(cat ${FILE})
+        do
+            if grep $m ${MODULE_PATH}/$(uname -r)/${Builtin_File} ; then
+                sed -i "/^$m$/d" ${FILE}
+                rlLog "$m change to built-in module"
+            fi
+        done
+    elif [ x"$TYPE" == "xbuiltin" ]; then
+        for m in $(cat ${FILE})
+        do
+            local MOD=$(find /lib/modules/`uname -r` -name "$m*")
+            if grep "/$m" <<< ${MOD}; then
+                sed -i "/^$m$/d" ${FILE}
+                rlLog "$m change to loadable module"
+           fi
+        done
+    fi
+}
+
+function CompareModuleList ()
+{
+    case $1 in
+            loadable)
+                    local moduleList="moduleList"
+                    ;;
+            builtin)
+                    local moduleList="moduleList_builtin"
+                    ;;
+    esac
+    # Lets submit the complete log from the diff of base module list and the current module list
+    diff -u ${TESTAREA}/${moduleList}_base ${TESTAREA}/${moduleList}_current > ${TESTAREA}/${moduleList}_base-current_diff
+    cp ${TESTAREA}/${moduleList}_base-current_diff ${TESTAREA}/${moduleList}_base-current_diff.log
+    rlFileSubmit ${TESTAREA}/${moduleList}_base-current_diff.log ${moduleList}_base-current_diff.log
+
+    #
+    # Compared: Lets compare the base and current module lists
+    #
+
+    # Check new added modules
+    diff -u ${TESTAREA}/${moduleList}_base ${TESTAREA}/${moduleList}_current | grep -e "^+" > ${TESTAREA}/${moduleList}_compare_added
+    FileClean ${moduleList}_compare_added
+
+    if [ ! -s ${TESTAREA}/${moduleList}_compare_added ]; then
+        rlPass "New added modules check PASS"
+    else
+        cp ${TESTAREA}/${moduleList}_compare_added ${TESTAREA}/${moduleList}_compare_added.log
+        rlFileSubmit ${TESTAREA}/${moduleList}_compare_added.log ${moduleList}_compare_added.log
+        rlLogWarning "Existing new module(s), please check log: ${moduleList}_compare_added.log"
+        echo "************New modules list start***************" | tee -a $OUTPUTFILE
+        cat ${TESTAREA}/${moduleList}_compare_added | tee -a $OUTPUTFILE
+        echo "************New modules list end*****************" | tee -a $OUTPUTFILE
+        rlPass "Warn: existing new added modules"
+    fi
+
+    diff -u ${TESTAREA}/${moduleList}_base ${TESTAREA}/${moduleList}_current | grep -e "^-" > ${TESTAREA}/${moduleList}_compare
+
+    # Lets clean up the format of our diff outputfile
+    FileClean ${moduleList}_compare
+
+    if [ ! -s "${TESTAREA}/${moduleList}_compare" ]; then
+        # RHEL6 only: There is one final test for RHEL6
+        if [ "${K_VER}" = "2.6.32" ]; then
+                RHEL6_TestBZ839667 ${moduleList}
+        fi
+
+        # If we get here there are no missing modules
+    fi
+
+    #
+    # Checked: Lets check against the "known removed" list
+    #
+
+    diff -u ${TESTAREA}/${moduleList}_compare ${TESTAREA}/${moduleList}_knownRemoved | grep -e "^-" > ${TESTAREA}/${moduleList}_missing
+
+    # Lets clean up the format of our diff outputfile
+    FileClean ${moduleList}_missing
+
+    if [ -s "${TESTAREA}/${moduleList}_missing" ]; then
+        # RHEL6 only: There is one final test for RHEL6
+        if [ "${K_VER}" = "2.6.32" ]; then
+            RHEL6_TestBZ839667
+        fi
+
+        CrossCheck $1 ${TESTAREA}/${moduleList}_missing
+    fi
+
+    if [ ! -s "${TESTAREA}/${moduleList}_missing" ]; then
+        rlPass "Missing modules check PASS"
+    else
+        DisplayModuleFail ${moduleList}_missing
+        cp ${TESTAREA}/${moduleList}_missing ${TESTAREA}/${moduleList}_missing.log
+        rlFileSubmit ${TESTAREA}/${moduleList}_missing.log ${moduleList}_missing.log
+        rlFail "There are missing modules! Check ${moduleList}_missing.log for more details."
+    fi
 }
 
 function FileClean ()
@@ -178,17 +311,17 @@ function RHEL6_TestBZ839667 ()
 
     echo "" | tee -a $OUTPUTFILE
     echo "***** Testing BZ839667: ${K_NAME}-${K_VER}-${K_REL}-${K_ARCH} *****" | tee -a $OUTPUTFILE
-
+    moduleList=$1
     # The ipw2200.ko is only relevant to the following arches: i386 and x86_64
     if [ "${ARCH}" = "i386" ] || [ "${ARCH}" = "x86_64" ]; then
 
         # Lets see if ipw2200.ko is in the current module list
-        cat ${TESTAREA}/moduleList_current | grep ipw2200.ko > ${TESTAREA}/moduleList_BZ839667
+        cat ${TESTAREA}/${moduleList}_current | grep ipw2200.ko > ${TESTAREA}/${moduleList}_BZ839667
 
-        if [ ! -s "${TESTAREA}/moduleList_BZ839667" ]; then
+        if [ ! -s "${TESTAREA}/${moduleList}_BZ839667" ]; then
             # The ipw2200.ko module is missing from current module list
             # Lets see if the ipw2200.ko module is in the "known removed" modules list
-            cat ${TESTAREA}/moduleList_knownRemoved | grep ipw2200.ko
+            cat ${TESTAREA}/${moduleList}_knownRemoved | grep ipw2200.ko
             if [ "$?" -ne "0" ]; then
                 # The ipw2200.ko module is _not_ in the "known removed" module list
                 # This is a FAIL
@@ -196,9 +329,9 @@ function RHEL6_TestBZ839667 ()
                 # Append the ipw2200.ko module to ${TESTAREA}/moduleList_missing
                 echo "ipw2200.ko" >> ${TESTAREA}/moduleList_missing
 
-                DisplayModuleFail moduleList_missing
-                cp ${TESTAREA}/moduleList_missing ${TESTAREA}/moduleList_missing.log
-                rlFileSubmit ${TESTAREA}/moduleList_missing.log moduleList_missing.log
+                DisplayModuleFail ${moduleList}_missing
+                cp ${TESTAREA}/${moduleList}_missing ${TESTAREA}/${moduleList}_missing.log
+                rlFileSubmit ${TESTAREA}/${moduleList}_missing.log ${moduleList}_missing.log
                 DeBug "RHEL6_TestBZ839667 fail"
                 cki_print_info "RHEL6_TestBZ839667"
             fi
@@ -489,7 +622,19 @@ rlJournalStart
                         sed -i '/isst_tpmi_core.ko/d; /isst_tpmi.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
                     fi
                     if cki_kver_lt "5.14.0-372.el9"; then
-                        sed -i '/bcm-phy-ptp.ko/d; /polynomial.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le}.lst
+                        sed -i '/bcm-phy-ptp.ko/d; /polynomial.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-378.el9"; then
+                        sed -i '/arm_cspmu_module.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-379.el9"; then
+                        sed -i '/amd-pmf.ko/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
+                    fi
+                    if cki_kver_lt "5.14.0-387.el9"; then
+                        sed -i '/ftdi-elan.ko/d'  ${OS}/${Release}/$Release-knownRemoved-{x86_64,ppc64le,aarch64}.lst
+                    fi
+                    if cki_kver_lt "5.14.0-395.el9"; then
+                        sed -i '/erofs.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
                     fi
                     ;;
             esac
@@ -507,90 +652,28 @@ rlJournalStart
             cki_print_info "Base"
         fi
 
+    rlPhaseStartTest "Loadable module test"
         # Lets determine the module list for the current kernel package
-        GetCurrentModuleList
+        GetCurrentModuleList loadable
 
         # Lets determine the module list for the base release kernel package
-        GetBaseModuleList
+        GetBaseModuleList loadable
 
         # Lets determine the known removed module list for the base release kernel package
-        GetKnownRemovedList
-        rlPhaseEnd
-
-        rlPhaseStartTest
+        GetKnownRemovedList loadable
 
         # Lets submit the complete log from the diff of base module list and the current module list
-        diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current > ${TESTAREA}/moduleList_base-current_diff
-        cp ${TESTAREA}/moduleList_base-current_diff ${TESTAREA}/moduleList_base-current_diff.log
-        rlFileSubmit ${TESTAREA}/moduleList_base-current_diff.log moduleList_base-current_diff.log
+        CompareModuleList loadable
+    rlPhaseEnd
 
-        #
-        # Compared: Lets compare the base and current module lists
-        #
-
-        # Check new added modules
-        diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^+" > ${TESTAREA}/moduleList_compare_added
-        FileClean moduleList_compare_added
-
-
-        if [ ! -s ${TESTAREA}/moduleList_compare_added ]; then
-            rlPass "New added modules check PASS"
-        else
-            cp ${TESTAREA}/moduleList_compare_added ${TESTAREA}/moduleList_compare_added.log
-            rlFileSubmit ${TESTAREA}/moduleList_compare_added.log moduleList_compare_added.log
-            rlLogWarning "Existing new module(s), please check log: moduleList_compare_added.log"
-            echo "************New modules list start***************" | tee -a $OUTPUTFILE
-            cat ${TESTAREA}/moduleList_compare_added | tee -a $OUTPUTFILE
-            echo "************New modules list end*****************" | tee -a $OUTPUTFILE
-            rlPass "Warn: existing new added modules"
+    rlPhaseStartTest "Builtin module test"
+        if ! rlIsRHEL 9.4; then
+            rlPASS "Only support RHEL-9.4 now." && rlPhaseEnd
         fi
-
-        diff -u ${TESTAREA}/moduleList_base ${TESTAREA}/moduleList_current | grep -e "^-" > ${TESTAREA}/moduleList_compare
-
-        # Lets clean up the format of our diff outputfile
-        FileClean moduleList_compare
-
-        if [ ! -s "${TESTAREA}/moduleList_compare" ]; then
-            # RHEL6 only: There is one final test for RHEL6
-            if [ "${K_VER}" = "2.6.32" ]; then
-                RHEL6_TestBZ839667
-            fi
-
-            # If we get here there are no missing modules
-        fi
-
-
-        #
-        # Checked: Lets check against the "known removed" list
-        #
-
-        diff -u ${TESTAREA}/moduleList_compare ${TESTAREA}/moduleList_knownRemoved | grep -e "^-" > ${TESTAREA}/moduleList_missing
-
-        # Lets clean up the format of our diff outputfile
-        FileClean moduleList_missing
-
-        if [ ! -s "${TESTAREA}/moduleList_missing" ]; then
-            # RHEL6 only: There is one final test for RHEL6
-            if [ "${K_VER}" = "2.6.32" ]; then
-                RHEL6_TestBZ839667
-            fi
-
-            # If we get here there are no missing modules
-            DeBug "Files checked. There are no missing modules."
-        else
-            # This is a fail. There are missing modules.
-
-            # We still need to do the final RHEL6 test
-            # RHEL6 only: There is one final test for RHEL6
-            if [ "${K_VER}" = "2.6.32" ]; then
-                RHEL6_TestBZ839667
-            fi
-
-            DisplayModuleFail moduleList_missing
-            cp ${TESTAREA}/moduleList_missing ${TESTAREA}/moduleList_missing.log
-            rlFileSubmit ${TESTAREA}/moduleList_missing.log moduleList_missing.log
-            rlFail "There are missing modules! Check moduleList_missing.log for more details."
-        fi
+        GetCurrentModuleList builtin
+        GetBaseModuleList builtin
+        GetKnownRemovedList builtin
+        CompareModuleList builtin
     rlPhaseEnd
 rlJournalEnd
 

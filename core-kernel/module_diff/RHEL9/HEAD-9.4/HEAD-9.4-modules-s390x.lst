@@ -161,6 +161,7 @@ ebt_stp.ko
 ebt_vlan.ko
 echainiv.ko
 enclosure.ko
+erofs.ko
 esp4.ko
 esp4_offload.ko
 esp6.ko
