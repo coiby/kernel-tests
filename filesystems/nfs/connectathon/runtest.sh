@@ -58,7 +58,7 @@ function is_run_byci ()
 function check_cmd_rup ()
 {
     [[ -x /usr/bin/rup ]] && return 0
-    echo "Oops, /usr/bin/rup not found" >&2
+    echo "info: /usr/bin/rup not found" >&2
     echo "$(uname -a)" >&2
     return 1
 }
