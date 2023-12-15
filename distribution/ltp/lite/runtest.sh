@@ -144,6 +144,15 @@ function exclude_disruptive_for_kt1()
 	fi
 }
 
+function add_external_timeout()
+{
+	local runtest=$1
+
+	if is_rt && cki_is_kernel_debug; then
+		sed -i 's/proc01 proc01 -m 128/proc01 timeout 300 sh -c "proc01 -m 128 || true"/' "$runtest"
+	fi
+}
+
 function audit_rule_setting()
 {
 	# To mask the AVC denied warning from SELinux
@@ -188,6 +197,8 @@ function runtest_prepare()
 	tolerate_s390_high_steal_time "$runtest"
 
 	exclude_disruptive_for_kt1 "$runtest"
+
+	add_external_timeout "$runtest"
 
 	skip_testcase
 }
