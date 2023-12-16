@@ -101,6 +101,7 @@
 /misc/kernel-fips-mode/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /misc/module-load/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /networking/bridge/sanity_check/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/networking/dpdk-standalone/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /networking/driver/sanity/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /networking/igmp/conformance/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -227,6 +228,7 @@
 /misc/kernel-fips-mode/ @bgoncalv @lulinqing @omoris
 /misc/module-load/ @bgoncalv @jbastianrh @lulinqing
 /networking/bridge/sanity_check/ @Feiliu_A @bgoncalv @lulinqing
+/networking/dpdk-standalone/ @bgoncalv @lulinqing @zfang1
 /networking/driver/sanity/ @bgoncalv @linville-rh @lulinqing
 /networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing @xmu2
