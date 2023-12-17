@@ -16,6 +16,7 @@ hyperv-keyboard.ko
 i915.ko
 intel-gtt.ko
 kvmgt.ko
+mana_ib.ko
 mana.ko
 oprofile.ko
 pci-hyperv-intf.ko
