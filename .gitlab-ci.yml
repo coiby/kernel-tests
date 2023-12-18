@@ -102,7 +102,6 @@ shell check runtests mr:
         echo "Please, fix the syntax problems as separate commit if they were not caused by your changes."
         exit 1
       fi
-  allow_failure: true
   rules:
     - !reference [.rules, mr-parent]
 
