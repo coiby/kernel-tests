@@ -198,6 +198,7 @@ else
 fi
 
 first_isolated=$(echo $isolated_cpus | grep -Eo "^[0-9]+")
+last_isolated=$(echo $isolated_cpus | grep -Eo "[0-9]+$")
 mask=$(get_cpu_mask $first_isolated)
 
 cfg_file=/etc/tuned/realtime-virtual-host-variables.conf
