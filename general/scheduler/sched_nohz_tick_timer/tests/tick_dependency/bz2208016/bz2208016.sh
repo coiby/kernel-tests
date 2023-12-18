@@ -18,7 +18,7 @@ EOF
 	rlRun "echo function > $tracing_dir/current_tracer"
 
 	# clean the buffer
-	> /sys/kernel/debug/tracing/trace
+	true > /sys/kernel/debug/tracing/trace
 
 	echo "using nohz_full cpu $last_isolated for running the cpu hogger, with cpu cgroup $FUNCNAME 0.5 bandwidth"
 
@@ -41,6 +41,7 @@ EOF
 	rlAssertEquals "pass=1" "$pass" 1
 
 	echo "Killing hogger $pid"
+	# shellcheck disable=SC2034
 	for  i in $(seq 1 5); do
 		ps -p $pid -o args | grep hogger.sh && kill $pid && echo "$pid is killed!"
 		ps -p $pid -o args | grep hogger.sh || break
