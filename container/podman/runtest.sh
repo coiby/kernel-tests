@@ -212,6 +212,11 @@ if [ ! -d ${LOG_DIR} ]; then
 fi
 rm -f "${LOG_DIR}/*.log"
 
+# Increase the test timeout in ppc64le as the build tests need longer time to finish
+if [ "$ARCH" == "ppc64le" ]; then
+        export PODMAN_TIMEOUT=420
+fi
+
 run_tests
 TEST_FAILED=$?
 
