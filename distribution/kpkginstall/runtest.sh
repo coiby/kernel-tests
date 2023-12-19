@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TEST="distribution/kpkginstall"
-TEST_DEPS="elfutils-libelf-devel flex bison gcc openssl-devel make curl grubby tar binutils"
+TEST_DEPS="elfutils-libelf-devel flex bison gcc openssl-devel make curl tar binutils"
 ARCH=$(uname -m)
 REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
