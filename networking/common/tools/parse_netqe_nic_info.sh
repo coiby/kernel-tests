@@ -173,7 +173,7 @@ done
 
 [ -n "$NIC_INFO" ] || {
 	NIC_INFO=/tmp/nic_info
-	NIC_INFO_URL=${NIC_INFO_URL:-http://netqe-infra01.knqe.lab.eng.bos.redhat.com/nic_info/nic_info}
+	NIC_INFO_URL=${NIC_INFO_URL:-http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/nic_info/nic_info}
 	wget --no-check-certificate -q $NIC_INFO_URL -O $NIC_INFO
 }
 

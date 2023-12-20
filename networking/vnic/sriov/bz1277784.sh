@@ -1,5 +1,5 @@
 #!/bin/bash
-IMG_GUEST=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/rhel6.8.qcow2
+IMG_GUEST=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/vm/rhel6.8.qcow2
 
 echo "remove any VM if exist"
 virsh list --all | sed -n 3~1p |

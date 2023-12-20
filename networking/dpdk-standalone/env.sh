@@ -1,10 +1,11 @@
 #!/bin/bash
+# shellcheck disable=SC2034
 
 #SYSTEM_CONFIG
 ################################################################
 #SYSTEM_VERSION=${SYSTEM_VERSION:-"RHEL-8.0-20181029.3"}
 # VM image OVS DPDK BONDING TEST
-IMG_GUEST=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/rhel9.2-vsperf-1Q-viommu.qcow2
+IMG_GUEST=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/vm/rhel9.2-vsperf-1Q-viommu.qcow2
 ################################################################
 
 #PLEASE KEEP THE FOLLOW SECTION CONFIG FIXED
@@ -33,7 +34,7 @@ TRAFFIC_TYPE=${TRAFFIC_TYPE:-xena}
 #the host ip that  started the t-rex-64 -i with this host
 TREX_SERVER_IP=${CLIENTS}
 TREX_SERVER_PASSWORD=${TREX_SERVER_PASSWORD}
-TREX_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools/v2.87.tar.gz
+TREX_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/v2.87.tar.gz
 
 #TOPO PORT NAME
 #NOTE: IF Your environment is NOT connect with netscout , do not fill the following item
@@ -62,9 +63,9 @@ fi
 #DPDK_TEST_OPTION select which dpdk type will be tested {rpm|source}
 #The default option is rpm
 DPDK_TEST_OPTION=${DPDK_TEST_OPTION:-"rpm"}
-DPDK_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools/dpdk-22.11-3.el9_2.x86_64.rpm
-DPDK_TOOL_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools//dpdk-tools-22.11-3.el9_2.x86_64.rpm
-DRIVERCTL_URL=http://netqe-infra01.knqe.lab.eng.bos.redhat.com/tools/driverctl-0.111-2.el9.noarch.rpm
+DPDK_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/dpdk-22.11-3.el9_2.x86_64.rpm
+DPDK_TOOL_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/dpdk-tools-22.11-3.el9_2.x86_64.rpm
+DRIVERCTL_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/driverctl-0.111-2.el9.noarch.rpm
 DPDK_SOURCE=${DPDK_SOURCE:-"http://fast.dpdk.org/rel/dpdk-22.11.2.tar.xz"}
 DPDK_VERSION=22.11-3.el9_2
 export DPDK_VERSION=$DPDK_VERSION
