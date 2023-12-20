@@ -1,5 +1,5 @@
 #!/bin/bash -
-#
+# shellcheck disable=SC2034,SC1090
 
 # ${NETWORK_COMMONLIB_DIR} is only used in Red hat netowrk-qe lab
 # which would never be defined in partner's lab
@@ -34,7 +34,7 @@ swcfg()
 		echo "ERROR: invalid swcfg calling!"
 		return 1
 	fi
-	wget http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/lib_swcfg_list.sh -P $(dirname ${BASH_SOURCE[0]})/
+	wget http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/share/tools/lib_swcfg_list.sh -P $(dirname ${BASH_SOURCE[0]})/
 	source $(dirname ${BASH_SOURCE[0]})/lib_swcfg_list.sh
 
 	shift 3

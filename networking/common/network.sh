@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2120,SC2060,SC2062,SC2188,SC2034
 # vim: sts=8 sw=8 noexpandtab:
 # This is for network operations
 
@@ -13,7 +14,7 @@ trap 'cleanup_swcfg' HUP TERM EXIT
 
 # variable for configuration files
 SWCFG_UNDO="/mnt/testarea/swcfg_undo.sh"
-NIC_INFO_URL=${NIC_INFO_URL:-http://netqe-infra01.knqe.lab.eng.bos.redhat.com/nic_info/nic_info}
+NIC_INFO_URL=${NIC_INFO_URL:-http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/nic_info/nic_info}
 #if uname -r | grep 4.14
 #then
 #		NIC_INFO_URL="${NIC_INFO_URL}-alt"

@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+# shellcheck disable=SC2034
 # Copyright (c) 2013 Red Hat, Inc. All rights reserved.
 #
 # This copyrighted material is made available to anyone wishing
@@ -232,7 +232,7 @@ get_image_file()
     local image_seq=$2
 
 
-    wget -q http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/vms/RHEL/$image_file
+    wget -q http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/share/vms/RHEL/$image_file
 
     mv $image_file /var/lib/libvirt/images/$image_seq-$image_file
     if [ -e /var/lib/libvirt/images/$image_seq-$image_file ]; then
@@ -498,7 +498,7 @@ get_client_vm_ip()
 {
     local name=$1
     local i
-    for i in `seq 0 10`
+    for i in $(seq 0 10)
     do
         client_vm_ipaddr=$(vm_get_default_ip4addr $name)
         if [ -n "$client_vm_ipaddr" ]; then
