@@ -226,7 +226,7 @@
 /misc/kernel-fips-mode/ @bgoncalv @lulinqing @omoris
 /misc/module-load/ @bgoncalv @jbastianrh @lulinqing
 /networking/bridge/sanity_check/ @Feiliu_A @bgoncalv @lulinqing
-/networking/dpdk-standalone/ @bgoncalv @lulinqing @zfang1
+/networking/dpdk-standalone/ @bgoncalv @jiqiu @lulinqing @ralongi @wanghekai @zfang1
 /networking/driver/sanity/ @bgoncalv @linville-rh @lulinqing
 /networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing @xmu2
@@ -244,7 +244,7 @@
 /networking/tunnel/vxlan/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
 /networking/vnic/ipvlan/basic/ @bgoncalv @linup2011 @lulinqing
-/networking/vnic/sriov/ @bgoncalv @lulinqing @zfang1
+/networking/vnic/sriov/ @bgoncalv @jiqiu @lulinqing @ralongi @wanghekai @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @lulinqing @psklenar1
