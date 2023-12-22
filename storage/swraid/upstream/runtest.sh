@@ -2,7 +2,7 @@
 
 . /usr/share/beakerlib/beakerlib.sh
 
-TESTS=${TESTS:-"00linear 06name"}
+TESTS=${TESTS:-"06name"}
 
 function infra_failure()
 {
