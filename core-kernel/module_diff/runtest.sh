@@ -668,6 +668,9 @@ rlJournalStart
             if cki_kver_lt "5.14.0-395.el9"; then
                 sed -i '/erofs.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
             fi
+            if cki_kver_lt "5.14.0-400.el9"; then
+                sed -i '/system_heap.ko/d; /udmabuf.ko/d'  ${OS}/${Release}/$Release-knownRemoved-builtin-${ARCH}.lst
+            fi
         fi
     rlPhaseEnd
 
