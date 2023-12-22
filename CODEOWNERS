@@ -44,16 +44,17 @@
 #     paths:
 #       - /kdump-cki/
 #   kpet-db-maintainers:  # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db
-#     minimum_count: 3  # the original maintainer + the two users below
+#     minimum_count: 4  # the original maintainer + the three users below
 #     users:
 #       - bgoncalv
+#       - idorax
 #       - lulinqing
 #     kpet: maintainers
 #
 # GITLAB-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-GENERATED-BEGIN
-# e00e998543cf60356012aba7b9771fbb7e16d649368988d3709bbd737a9a69d4
+# 58e789a50b05bddf8f8c749745258b4dd0263729b3c09cdbc6672d5e1a55921e
 
 [Infrastructure]
 /.gitlab-ci.yml @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -187,127 +188,127 @@
 /watchdog/hw-generic/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 
 [kpet-db-maintainers]
-/container/podman/ @ajia2 @bgoncalv @lulinqing @ypu2
-/core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
-/cpu/die/ @bgoncalv @darcari @lulinqing
-/cpu/driver/ @bgoncalv @darcari @lulinqing
-/cpu/idle/ @bgoncalv @darcari @lulinqing
-/distribution/kernel-debuginfo/ @bgoncalv @ckalina @lulinqing
-/distribution/ltp/lite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
-/distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
-/filesystems/cifs/connectathon/ @bgoncalv @jianhong @lulinqing
-/filesystems/erofs/ @bgoncalv @bgrech @lulinqing
-/filesystems/general/pjd-fstest/ @bgoncalv @lulinqing @zrlang
-/filesystems/loopdev/sanity/ @bgoncalv @jencce2002 @lulinqing
-/filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
-/filesystems/xfs/xfstests/ @andyprice @bgoncalv @jencce2002 @lulinqing
-/firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
-/general/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/general/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/iommu/boot/ @bgoncalv @lulinqing @wrgrh
-/ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
-/ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
-/jvm/dacapobench/ @bgoncalv @lulinqing @tstuefe1
-/jvm/jcstress/ @bgoncalv @lulinqing @tstuefe1
-/kdump-cki/kdump-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
-/kdump-cki/kdump-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @thenzl @yiyan1
-/kdump-cki/kexec-boot/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
-/kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
-/kselftests/ @bgoncalv @fmaurer-rh @liuhangbin @lulinqing @npache @sbertram
-/kunit/ @bgoncalv @lulinqing @npache
-/legacy/pci_id/ @bgoncalv @ckalina @lulinqing
-/legacy/whitelist/ @bgoncalv @ckalina @lulinqing
-/livepatch/selftests/ @bgoncalv @joe.lawrence @lulinqing @ykopkova
-/memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/misc/header-test/ @bgoncalv @jbastianrh @lulinqing
-/misc/kernel-fips-mode/ @bgoncalv @lulinqing @omoris
-/misc/module-load/ @bgoncalv @jbastianrh @lulinqing
-/networking/bridge/sanity_check/ @Feiliu_A @bgoncalv @lulinqing
-/networking/dpdk-standalone/ @bgoncalv @jiqiu @lulinqing @ralongi @wanghekai @zfang1
-/networking/driver/sanity/ @bgoncalv @linville-rh @lulinqing
-/networking/igmp/conformance/ @bgoncalv @liuhangbin @lulinqing
-/networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing @xmu2
-/networking/macsec/sanity_check/ @Feiliu_A @bgoncalv @lulinqing
-/networking/netfilter/ @bgoncalv @liuhangbin @lulinqing @yiche
-/networking/route/pmtu/ @bgoncalv @linup2011 @lulinqing
-/networking/route/route_func/ @bgoncalv @linup2011 @liuhangbin @lulinqing
-/networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing @yinxu
-/networking/socket/fuzz/ @bgoncalv @liuhangbin @lulinqing
-/networking/tcp/tcp_keepalive/ @bgoncalv @liuhangbin @lulinqing @xmu2
-/networking/tunnel/geneve/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing
-/networking/tunnel/gre/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing
-/networking/tunnel/l2tp/basic/ @bgoncalv @linup2011 @lulinqing
-/networking/tunnel/tunctl/permtest/ @bgoncalv @linup2011 @lulinqing
-/networking/tunnel/vxlan/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing
-/networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
-/networking/vnic/ipvlan/basic/ @bgoncalv @linup2011 @lulinqing
-/networking/vnic/sriov/ @bgoncalv @jiqiu @lulinqing @ralongi @wanghekai @zfang1
-/networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
-/packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
-/packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @lulinqing @psklenar1
-/packages/iotop/sanity/ @bgoncalv @lulinqing @xjezda00
-/packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
-/packages/net-snmp/tcp-transport/ @bgoncalv @efedin @lulinqing
-/packages/perf/internal-testsuite/ @bgoncalv @lulinqing @vmolnaro
-/packages/perf/perftool-testsuite/ @bgoncalv @lulinqing @vmolnaro
-/packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @ckalina @lulinqing
-/packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @ckalina @lulinqing
-/packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @ckalina @lulinqing
-/packages/selinux-policy/serge-testsuite/ @bgoncalv @lulinqing @milosmalik @omos
-/packages/tuned/tune-processes-through-perf/ @bgoncalv @lulinqing @psklenar1
-/pciutils/sanity-smoke/ @bgoncalv @lulinqing @wrgrh
-/pciutils/update-pciids/ @bgoncalv @lulinqing @wrgrh
-/rt-tests/pi_stress/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/rt_ltp/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/rt_migrate_test/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/rteval/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/sched_deadline/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/us/rt-tests/oslat/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/us/rtla/rtla-osnoise/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/us/rtla/rtla-timerlat/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/us/stalld/sanity/ @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/security/crypto/ltp/ @bgoncalv @denli @lulinqing
-/security/integrity/ltp/ @bgoncalv @denli @lulinqing
-/sound/aloop/ @bgoncalv @jkysela @lulinqing
-/sound/user-ctl-elem/ @bgoncalv @jkysela @lulinqing
-/standards/usex/1.9-29/ @bgoncalv @headrat @lulinqing
-/storage/blktests/blk/ @bgoncalv @lulinqing @yizhanglinux
-/storage/blktests/nvme/nvme-rdma/ @bgoncalv @lulinqing @yizhanglinux
-/storage/blktests/nvme/nvme-tcp/ @bgoncalv @lulinqing @yizhanglinux
-/storage/blktests/nvme/nvmeof-mp/ @bgoncalv @lulinqing @yizhanglinux
-/storage/blktests/srp/ @bgoncalv @lulinqing @yizhanglinux
-/storage/block/fs_fio/ @bgoncalv @czhong2 @lulinqing
-/storage/block/mq_sche/ @bgoncalv @czhong2 @lulinqing
-/storage/block/multipath_mapping/ @bgoncalv @czhong2 @lulinqing
-/storage/block/zstd_compression/ @bgoncalv @czhong2 @lulinqing
-/storage/block/zstd_smoke/ @bgoncalv @czhong2 @lulinqing
-/storage/dm/common/ @bgoncalv @guazhang @lulinqing
-/storage/dm/dmtest-python/ @bgoncalv @fsuba @lulinqing
-/storage/hba/san-device-stress/ @bgoncalv @lilinredhat @lulinqing @mpatalan
-/storage/hw_raid/ @bgoncalv @lilinredhat @lulinqing @mpatalan
-/storage/iscsi/params/ @bgoncalv @lulinqing @mhoyer
-/storage/lvm/snapper/ @bgoncalv @fsuba @lulinqing
-/storage/lvm/thinp/sanity/ @bgoncalv @fsuba @lulinqing
-/storage/lvm/thinp/stqe/ @bgoncalv @fsuba @lulinqing
-/storage/nvdimm/ndctl-test-suite/ @bgoncalv @lulinqing @yizhanglinux
-/storage/scsi/vpd/ @bgoncalv @guazhang @lulinqing
-/storage/swraid/bz2066373_reshape_lvl0_to_lvl10/ @bgoncalv @lulinqing @ncroxon
-/storage/swraid/bz2098120_kernel_bug_lvl10/ @bgoncalv @lulinqing @ncroxon
-/storage/swraid/bz2232091_raid0_layout_unknown/ @bgoncalv @lulinqing @ncroxon
-/storage/swraid/scsi_raid/ @bgoncalv @czhong2 @lulinqing
-/storage/swraid/simple_reshape/ @FineFan @bgoncalv @lulinqing
-/storage/swraid/upstream/ @bgoncalv @lulinqing @xni1
-/storage/target/targetcli_basic/ @bgoncalv @lulinqing @mhoyer
-/stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
-/trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
-/trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
-/tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing
-/vm/kvm-self-tests/ @bgoncalv @jarichte @lulinqing
-/vm/kvm-unit-tests/ @bgoncalv @jarichte @lulinqing
-/vm/qemu-sanity-check/ @bgoncalv @lulinqing @rwmjones
-/watchdog/hw-generic/ @bgoncalv @ftjahjad @lulinqing
+/container/podman/ @ajia2 @bgoncalv @idorax @lulinqing @ypu2
+/core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
+/core-kernel/module_diff/ @bgoncalv @idorax @lulinqing @zhijwang
+/cpu/die/ @bgoncalv @darcari @idorax @lulinqing
+/cpu/driver/ @bgoncalv @darcari @idorax @lulinqing
+/cpu/idle/ @bgoncalv @darcari @idorax @lulinqing
+/distribution/kernel-debuginfo/ @bgoncalv @ckalina @idorax @lulinqing
+/distribution/ltp/lite/ @bgoncalv @chuhu @idorax @jstancek @liwan1 @lulinqing @pifang
+/distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @idorax @jstancek @liwan1 @lulinqing @pifang
+/filesystems/cifs/connectathon/ @bgoncalv @idorax @jianhong @lulinqing
+/filesystems/erofs/ @bgoncalv @bgrech @idorax @lulinqing
+/filesystems/general/pjd-fstest/ @bgoncalv @idorax @lulinqing @zrlang
+/filesystems/loopdev/sanity/ @bgoncalv @idorax @jencce2002 @lulinqing
+/filesystems/nfs/connectathon/ @bgoncalv @idorax @jianhong @lulinqing
+/filesystems/xfs/xfstests/ @andyprice @bgoncalv @idorax @jencce2002 @lulinqing
+/firmware/user-specified/ @JiriDluhosRH @bgoncalv @idorax @lulinqing
+/general/memory/function/kaslr/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
+/general/memory/function/memfd_create/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
+/general/process/trinity_git/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
+/iommu/boot/ @bgoncalv @idorax @lulinqing @wrgrh
+/ipmi/stress/driver/ @bgoncalv @ftjahjad @idorax @lulinqing
+/ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @idorax @lulinqing
+/jvm/dacapobench/ @bgoncalv @idorax @lulinqing @tstuefe1
+/jvm/jcstress/ @bgoncalv @idorax @lulinqing @tstuefe1
+/kdump-cki/kdump-file-load/ @baoquan_he @bgoncalv @emmawu1 @idorax @lulinqing @yiyan1
+/kdump-cki/kdump-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @idorax @lulinqing @thenzl @yiyan1
+/kdump-cki/kexec-boot/ @baoquan_he @bgoncalv @emmawu1 @idorax @lulinqing @yiyan1
+/kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @emmawu1 @idorax @lulinqing @yiyan1
+/kselftests/ @bgoncalv @fmaurer-rh @idorax @liuhangbin @lulinqing @npache @sbertram
+/kunit/ @bgoncalv @idorax @lulinqing @npache
+/legacy/pci_id/ @bgoncalv @ckalina @idorax @lulinqing
+/legacy/whitelist/ @bgoncalv @ckalina @idorax @lulinqing
+/livepatch/selftests/ @bgoncalv @idorax @joe.lawrence @lulinqing @ykopkova
+/memory/fork_mem/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
+/misc/amtu/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
+/misc/header-test/ @bgoncalv @idorax @jbastianrh @lulinqing
+/misc/kernel-fips-mode/ @bgoncalv @idorax @lulinqing @omoris
+/misc/module-load/ @bgoncalv @idorax @jbastianrh @lulinqing
+/networking/bridge/sanity_check/ @Feiliu_A @bgoncalv @idorax @lulinqing
+/networking/dpdk-standalone/ @bgoncalv @idorax @jiqiu @lulinqing @ralongi @wanghekai @zfang1
+/networking/driver/sanity/ @bgoncalv @idorax @linville-rh @lulinqing
+/networking/igmp/conformance/ @bgoncalv @idorax @liuhangbin @lulinqing
+/networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @idorax @liuhangbin @lulinqing @xmu2
+/networking/macsec/sanity_check/ @Feiliu_A @bgoncalv @idorax @lulinqing
+/networking/netfilter/ @bgoncalv @idorax @liuhangbin @lulinqing @yiche
+/networking/route/pmtu/ @bgoncalv @idorax @linup2011 @lulinqing
+/networking/route/route_func/ @bgoncalv @idorax @linup2011 @liuhangbin @lulinqing
+/networking/sctp/auth/sockopts/ @bgoncalv @idorax @liuhangbin @lulinqing @yinxu
+/networking/socket/fuzz/ @bgoncalv @idorax @liuhangbin @lulinqing
+/networking/tcp/tcp_keepalive/ @bgoncalv @idorax @liuhangbin @lulinqing @xmu2
+/networking/tunnel/geneve/basic/ @bgoncalv @idorax @linup2011 @liuhangbin @lulinqing
+/networking/tunnel/gre/basic/ @bgoncalv @idorax @linup2011 @liuhangbin @lulinqing
+/networking/tunnel/l2tp/basic/ @bgoncalv @idorax @linup2011 @lulinqing
+/networking/tunnel/tunctl/permtest/ @bgoncalv @idorax @linup2011 @lulinqing
+/networking/tunnel/vxlan/basic/ @bgoncalv @idorax @linup2011 @liuhangbin @lulinqing
+/networking/udp/udp_socket/ @bgoncalv @idorax @liuhangbin @lulinqing @yiche
+/networking/vnic/ipvlan/basic/ @bgoncalv @idorax @linup2011 @lulinqing
+/networking/vnic/sriov/ @bgoncalv @idorax @jiqiu @lulinqing @ralongi @wanghekai @zfang1
+/networking/vrf/sanity_check/ @atenart @bgoncalv @idorax @lulinqing
+/packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @idorax @lulinqing
+/packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @idorax @lulinqing @psklenar1
+/packages/iotop/sanity/ @bgoncalv @idorax @lulinqing @xjezda00
+/packages/libkcapi/af_alg-test/ @bgoncalv @idorax @lulinqing @omos
+/packages/net-snmp/tcp-transport/ @bgoncalv @efedin @idorax @lulinqing
+/packages/perf/internal-testsuite/ @bgoncalv @idorax @lulinqing @vmolnaro
+/packages/perf/perftool-testsuite/ @bgoncalv @idorax @lulinqing @vmolnaro
+/packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @ckalina @idorax @lulinqing
+/packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @ckalina @idorax @lulinqing
+/packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @ckalina @idorax @lulinqing
+/packages/selinux-policy/serge-testsuite/ @bgoncalv @idorax @lulinqing @milosmalik @omos
+/packages/tuned/tune-processes-through-perf/ @bgoncalv @idorax @lulinqing @psklenar1
+/pciutils/sanity-smoke/ @bgoncalv @idorax @lulinqing @wrgrh
+/pciutils/update-pciids/ @bgoncalv @idorax @lulinqing @wrgrh
+/rt-tests/pi_stress/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/rt_ltp/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/rt_migrate_test/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/rteval/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/sched_deadline/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/us/rt-tests/oslat/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/us/rtla/rtla-osnoise/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/us/rtla/rtla-timerlat/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/rt-tests/us/stalld/sanity/ @bgoncalv @cyin2 @idorax @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
+/security/crypto/ltp/ @bgoncalv @denli @idorax @lulinqing
+/security/integrity/ltp/ @bgoncalv @denli @idorax @lulinqing
+/sound/aloop/ @bgoncalv @idorax @jkysela @lulinqing
+/sound/user-ctl-elem/ @bgoncalv @idorax @jkysela @lulinqing
+/standards/usex/1.9-29/ @bgoncalv @headrat @idorax @lulinqing
+/storage/blktests/blk/ @bgoncalv @idorax @lulinqing @yizhanglinux
+/storage/blktests/nvme/nvme-rdma/ @bgoncalv @idorax @lulinqing @yizhanglinux
+/storage/blktests/nvme/nvme-tcp/ @bgoncalv @idorax @lulinqing @yizhanglinux
+/storage/blktests/nvme/nvmeof-mp/ @bgoncalv @idorax @lulinqing @yizhanglinux
+/storage/blktests/srp/ @bgoncalv @idorax @lulinqing @yizhanglinux
+/storage/block/fs_fio/ @bgoncalv @czhong2 @idorax @lulinqing
+/storage/block/mq_sche/ @bgoncalv @czhong2 @idorax @lulinqing
+/storage/block/multipath_mapping/ @bgoncalv @czhong2 @idorax @lulinqing
+/storage/block/zstd_compression/ @bgoncalv @czhong2 @idorax @lulinqing
+/storage/block/zstd_smoke/ @bgoncalv @czhong2 @idorax @lulinqing
+/storage/dm/common/ @bgoncalv @guazhang @idorax @lulinqing
+/storage/dm/dmtest-python/ @bgoncalv @fsuba @idorax @lulinqing
+/storage/hba/san-device-stress/ @bgoncalv @idorax @lilinredhat @lulinqing @mpatalan
+/storage/hw_raid/ @bgoncalv @idorax @lilinredhat @lulinqing @mpatalan
+/storage/iscsi/params/ @bgoncalv @idorax @lulinqing @mhoyer
+/storage/lvm/snapper/ @bgoncalv @fsuba @idorax @lulinqing
+/storage/lvm/thinp/sanity/ @bgoncalv @fsuba @idorax @lulinqing
+/storage/lvm/thinp/stqe/ @bgoncalv @fsuba @idorax @lulinqing
+/storage/nvdimm/ndctl-test-suite/ @bgoncalv @idorax @lulinqing @yizhanglinux
+/storage/scsi/vpd/ @bgoncalv @guazhang @idorax @lulinqing
+/storage/swraid/bz2066373_reshape_lvl0_to_lvl10/ @bgoncalv @idorax @lulinqing @ncroxon
+/storage/swraid/bz2098120_kernel_bug_lvl10/ @bgoncalv @idorax @lulinqing @ncroxon
+/storage/swraid/bz2232091_raid0_layout_unknown/ @bgoncalv @idorax @lulinqing @ncroxon
+/storage/swraid/scsi_raid/ @bgoncalv @czhong2 @idorax @lulinqing
+/storage/swraid/simple_reshape/ @FineFan @bgoncalv @idorax @lulinqing
+/storage/swraid/upstream/ @bgoncalv @idorax @lulinqing @xni1
+/storage/target/targetcli_basic/ @bgoncalv @idorax @lulinqing @mhoyer
+/stress/stress-ng/ @bgoncalv @idorax @jbastianrh @lulinqing
+/trace/bpf/test_bpf/ @bgoncalv @idorax @lulinqing @pity4yeats @sztsian
+/trace/ftrace/tracer/ @bgoncalv @idorax @lulinqing @sztsian @zhaoqiao
+/tracepoints/operational/ @bgoncalv @idorax @jbastianrh @lulinqing
+/vm/kvm-self-tests/ @bgoncalv @idorax @jarichte @lulinqing
+/vm/kvm-unit-tests/ @bgoncalv @idorax @jarichte @lulinqing
+/vm/qemu-sanity-check/ @bgoncalv @idorax @lulinqing @rwmjones
+/watchdog/hw-generic/ @bgoncalv @ftjahjad @idorax @lulinqing
 
 # GITLAB-CODEOWNERS-GENERATED-END
