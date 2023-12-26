@@ -79,7 +79,7 @@ test_setup()
 test_run()
 {
     local test_cpu stress_ng_pid stress_ng_cpu_pids timeout_pid
-    declare -i iters runtime start_sec end_sec
+    declare -i runtime start_sec end_sec
     test_cpu=$(get_test_cpu)
     log "test_cpu: ${test_cpu}"
 
