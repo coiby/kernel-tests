@@ -55,8 +55,6 @@ function restore_hrtick()
 
 function runtest()
 {
-    result_r="PASS"
-
     echo "clean the dmesg log" | tee -a $OUTPUTFILE
     dmesg -c
 
