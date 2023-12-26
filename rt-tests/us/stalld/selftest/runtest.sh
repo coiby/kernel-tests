@@ -41,16 +41,16 @@ function run_test ()
     echo "Test Start Time: $(date)" | tee -a $OUTPUTFILE
     selftest=0
 
-    echo "Compile test" | tee -a $OUTPUTFILE
-    gcc -g -Wall -pthread -o test test.c -lpthread
+    echo "Compile selftest" | tee -a $OUTPUTFILE
+    gcc -g -Wall -pthread -o selftest selftest.c -lpthread
     if [ $? -ne 0 ]; then
-        echo "compile test binary FAIL." | tee -a $OUTPUTFILE
+        echo "compile selftest binary FAIL." | tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "FAIL" 5
         return
     fi
 
-    echo "Running test" | tee -a $OUTPUTFILE
-    ./test -d | tee -a $OUTPUTFILE
+    echo "Running selftest" | tee -a $OUTPUTFILE
+    ./selftest -d | tee -a $OUTPUTFILE
     selftest=${PIPESTATUS[0]}
 
     if [ "$selftest" -eq 0 ]; then
