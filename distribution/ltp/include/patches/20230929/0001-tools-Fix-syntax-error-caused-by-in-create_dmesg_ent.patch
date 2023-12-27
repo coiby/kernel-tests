@@ -1,0 +1,52 @@
+From 25e20ce2f7b5e5396a4cd38bf6c61b222f698a61 Mon Sep 17 00:00:00 2001
+From: Shizhao Chen <shichen@redhat.com>
+Date: Thu, 28 Dec 2023 15:21:09 +0800
+Subject: [PATCH] tools: Fix syntax error caused by ";;" in create_dmesg_entry
+
+When running runltp with both -S and -K provided, tests that are supposed to be
+"skipped" and report TCONF results were failing due to an unexpected semicolon
+at the end of the constructed command.
+
+`-S` replace the test command with `exit 32;`
+`-K` appends another semicolon to the command then we get `exit 32;;`
+
+For example:
+
+  >>> 780:madvise06__with_dmesg_entry BROK <<<
+
+  1  <<<test_start>>>
+  2  tag=madvise06__with_dmesg_entry stime=1703556061
+  3  cmdline="dmesg -c 1>/dev/null 2>&1; exit 32;; dmesg > /mnt/testarea/ltp/output/DMESG_DIR_RHELKT1LITE.FILTERED-dmesg-output-53127-08:48:23PM/madvise06.dmesg.log"
+  4  contacts=""
+  5  analysis=exit
+  6  <<<test_output>>>
+  7  sh: -c: line 1: syntax error near unexpected token `;;'
+  8  sh: -c: line 1: `dmesg -c 1>/dev/null 2>&1; exit 32;; dmesg > /mnt/testarea/ltp/output/DMESG_DIR_RHELKT1LITE.FILTERED-dmesg-output-53127-08:48:23PM/madvise06.dmesg.log'
+  9  <<<execution_status>>>
+ 10  initiation_status="ok"
+ 11  duration=0 termination_type=exited termination_id=2 corefile=no
+ 12  cutime=0 cstime=1
+ 13  <<<test_end>>>
+
+Signed-off-by: Shizhao Chen <shichen@redhat.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ tools/create_dmesg_entries_for_each_test.awk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/create_dmesg_entries_for_each_test.awk b/tools/create_dmesg_entries_for_each_test.awk
+index 25d750a55..ffd807fb4 100644
+--- a/tools/create_dmesg_entries_for_each_test.awk
++++ b/tools/create_dmesg_entries_for_each_test.awk
+@@ -27,6 +27,7 @@ NF && ! /^#/ {
+ 	for (i = 2; i <= NF; i++) {
+ 		s = s " " $i
+ 	}
++	sub(/[;]+$/, "", s)
+ 	s = s "; dmesg > " DMESG_DIR "/" $1 ".dmesg.log"
+ 	print s
+ }
+-- 
+2.43.0
+
