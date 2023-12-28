@@ -368,7 +368,7 @@ function install_fio() {
 	if rlIsRHEL 7; then
 		tok git clone -b fio-3.20 $git_url
 	else
-		tok git clone $git_url
+		tok git clone -b fio-3.33 $git_url
 	fi
 	tlog "Installing Fio"
 	tok "cd fio && ./configure && make && make install"
