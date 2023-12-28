@@ -1,0 +1,5 @@
+BLK="block/001 block/006 block/016 block/018 block/021 block/023 loop/001 loop/003 loop/005 nvme/006 nvme/007 nvme/009 nvme/010 nvme/014 nvme/019 nvme/020 nvme/021 nvme/022 nvme/023 nvme/024 nvme/026 nvme/027 nvme/028 scsi/004 scsi/005 scsi/007"
+#nvme/012 8.1+
+NVME_TCP="nvme/003 nvme/004 nvme/005 nvme/006 nvme/007 nvme/008 nvme/009 nvme/010 nvme/011 nvme/014 nvme/018 nvme/019 nvme/020 nvme/021 nvme/022 nvme/023 nvme/024 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029"
+#nvme/012 8.4+
+#nvme/013 nvme/015 nvme/030 nvme/031 8.2+
