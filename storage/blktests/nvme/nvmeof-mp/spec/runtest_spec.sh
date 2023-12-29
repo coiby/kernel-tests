@@ -8,7 +8,7 @@ Describe 'blktests - nvmeof-mp - main'
         echo "pre_setup"
     End
 
-    Mock get_test_cases
+    Mock get_test_cases_list NVMEOF_MP
         echo "nvmeof-mp/005"
     End
 
@@ -29,9 +29,6 @@ Describe 'blktests - nvmeof-mp - main'
         The line 2 should equal "do_test ${CDIR}/blktests nvmeof-mp/005"
         The line 3 should equal "use_rxe = 1"
         The line 4 should equal "rstrnt-report-result use_rxe=1 nvmeof-mp: storage/blktests/nvme/nvmeof-mp/tests/nvmeof-mp/005 PASS 0"
-        The line 5 should equal "do_test ${CDIR}/blktests nvmeof-mp/005"
-        The line 6 should equal "use_rxe = "
-        The line 7 should equal "rstrnt-report-result  nvmeof-mp: storage/blktests/nvme/nvmeof-mp/tests/nvmeof-mp/005 PASS 0"
         The status should be success
     End
 End
