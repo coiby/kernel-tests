@@ -26,9 +26,9 @@ function ltp_test_build()
     # the exit status (which will be 1 for an error even with --forward)
     if [ ! -n "$TEST_VERSION" ]
     then
-        PATCH="patch -p1 -d ${TARGET}"
+        export PATCH="patch -p1 -d ${TARGET}"
     else
-        PATCH="patch --forward -p1 -d ${TARGET}"
+        export PATCH="patch --forward -p1 -d ${TARGET}"
     fi
 
     #Patch-inc
@@ -175,7 +175,7 @@ for entry in $(cat $DISABLED_LIST); do
         continue
     fi
     echo "Disabling: $entry" | tee -a $OUTPUTFILE
-    rm -rf $opt_dir/$entry >> $OUTPUTFILE 2>&1
+    rm -rf "${opt_dir:?}"/$entry >> $OUTPUTFILE 2>&1
 done
 
 # build
@@ -250,7 +250,7 @@ cp -f grab_corefiles_excluded_bins grab_corefiles_excluded_bins.filtered
 for failed_case in $(cat failed_list); do
     failed_case_dir=$(dirname $failed_case)
     failed_case_name="$(basename $failed_case_dir)/$(basename $failed_case)"
-    sed -i '/failed_case_name[.$]/d' grab_corefiles_excluded_bins.filtered
+    sed -i "/${failed_case_name}[.$]/d" grab_corefiles_excluded_bins.filtered
 done
 
 # some testcases send signals which result in corefiles by design

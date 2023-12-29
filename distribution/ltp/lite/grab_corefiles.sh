@@ -4,7 +4,7 @@
 
 bin_core_list=""
 
-for core_abs in $(ls -1 /mnt/testarea/ltp/cores/core.*); do
+for core_abs in /mnt/testarea/ltp/cores/core.*; do
     echo "Found corefile: $core_abs"
     bin=`file $core_abs | awk -F \' '{print $2}'`
     echo "from binary: $bin"

@@ -37,7 +37,7 @@ runtest_path=$LTPDIR/runtest
 # RHELKT1LITE is the default set of tests to run for RHEL builds
 RUNTESTS=${RUNTESTS:-"RHELKT1LITE"}
 
-PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
+export PATCHDIR=$(dirname ${BASH_SOURCE[0]})"/patches"
 
 function ltp_test_build()
 {

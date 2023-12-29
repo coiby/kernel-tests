@@ -77,6 +77,7 @@ check_cpu_cgroup ()
         if [ -e "$cpu_cgroup_mntpoint/tasks" ]; then
             echo "Found root cpu cgroup tasks at: $cpu_cgroup_mntpoint/tasks" | tee -a $OUTPUTFILE
             echo $$ > $cpu_cgroup_mntpoint/tasks
+            # shellcheck disable=SC2320
             ret=$?
             if [ $ret -eq 0 ]; then
                 echo "Succesfully moved (pid: $$) to root cpu cgroup." | tee -a $OUTPUTFILE
