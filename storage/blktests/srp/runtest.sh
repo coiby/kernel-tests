@@ -2,10 +2,10 @@
 
 TNAME="storage/blktests/srp"
 
-
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 1
+CASE_TYPE=SRP
 
 function pre_setup
 {
@@ -24,14 +24,12 @@ fi
 
 function main
 {
+	pre_setup
+	disable_multipath
+
 	USE_SW_RDMA=${USE_SW_RDMA:-"RXE SIW"}
 	test_ws="${CDIR}"/blktests
 	ret=0
-	testcases_default=""
-	testcases_default+=" $(get_test_cases_srp)"
-	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
-	pre_setup
-	disable_multipath
 	for use_sw_rdma in $USE_SW_RDMA; do
 		if [[ "$use_sw_rdma" == "RXE" ]]; then
 			USE_RDMA="use_rxe=1"
