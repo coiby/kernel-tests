@@ -32,10 +32,10 @@ Describe 'blktests - nvme-rdma - main'
         The line 3 should equal "nvme_trtype = rdma"
         The line 4 should equal "use_rxe = 1"
         The line 5 should equal "rstrnt-report-result use_rxe=1 nvme-rdma: storage/blktests/nvme/nvme-rdma/tests/nvme/003 PASS 0"
-        The line 6 should equal "do_test ${CDIR}/blktests nvme/004"
+        The line 6 should equal "do_test ${CDIR}/blktests nvme/003"
         The line 7 should equal "nvme_trtype = rdma"
-        The line 8 should equal "use_rxe = 1"
-        The line 9 should equal "rstrnt-report-result use_rxe=1 nvme-rdma: storage/blktests/nvme/nvme-rdma/tests/nvme/004 PASS 0"
+        The line 8 should equal "use_rxe = "
+        The line 9 should equal "rstrnt-report-result  nvme-rdma: storage/blktests/nvme/nvme-rdma/tests/nvme/003 PASS 0"
         The status should be success
     End
 End

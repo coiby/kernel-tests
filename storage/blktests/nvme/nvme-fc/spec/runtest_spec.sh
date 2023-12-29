@@ -8,7 +8,7 @@ Describe 'blktests - nvme-fc - main'
         echo "enable_nvme_core_multipath"
     End
 
-    Mock get_test_cases_fc
+    Mock get_test_cases_list NVME_FC
         echo "nvme/003"
     End
 

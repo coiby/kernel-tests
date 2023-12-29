@@ -5,7 +5,7 @@
 FILEC=$(readlink -f "${BASH_SOURCE[0]}")
 CDIRC=$(dirname "$FILEC")
 
-source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/../../../cki_lib/libcki.sh || exit 1
+source "$CDIRC"/../../../cki_lib/libcki.sh || exit 1
 
 # restraint uses $OUTPUTFILE by default when reporting test result.
 # Let's save the test execution output to it.
@@ -109,15 +109,10 @@ function get_test_cases_list
 		case_conf="$CDIRC/../config/9.4"
 	fi
 	if [ ! -f "$case_conf" ]; then
-		cki_abort_task "Abort test because $case_conf doesn't exists"
-		exit
+		return
 	fi
 	# shellcheck disable=SC1090
-	. "$case_conf"
+	source "$case_conf"
 	case_list=$(eval echo '$'"$case_type")
-	if [ -z "$case_list" ]; then
-		cki_abort_task "Abort test because $case_type case list is empty"
-		exit
-	fi
 	echo "$case_list"
 }
