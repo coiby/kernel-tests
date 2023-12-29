@@ -110,12 +110,14 @@ function get_test_cases_list
 	fi
 	if [ ! -f "$case_conf" ]; then
 		cki_abort_task "Abort test because $case_conf doesn't exists"
+		exit
 	fi
 	# shellcheck disable=SC1090
 	. "$case_conf"
 	case_list=$(eval echo '$'"$case_type")
 	if [ -z "$case_list" ]; then
 		cki_abort_task "Abort test because $case_type case list is empty"
+		exit
 	fi
 	echo "$case_list"
 }
