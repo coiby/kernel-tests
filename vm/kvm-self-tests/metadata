@@ -9,4 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=bc;gcc;make;patch;rsync;wget
-repoRequires=cki_lib
+repoRequires=cki_lib;kernel-include

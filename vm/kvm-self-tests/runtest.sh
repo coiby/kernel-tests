@@ -17,6 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 . ../../cki_lib/libcki.sh || exit 1
+. ../../kernel-include/runtest.sh || exit 1
 
 TEST=${TEST:-"$0"}
 RELEASE=$(uname -r | sed s/\.$(arch)//)
@@ -193,7 +194,7 @@ function setup
         OSVERSION="RHEL8"
     elif grep -q "Red Hat Enterprise Linux release 9." /etc/redhat-release; then
         OSVERSION="RHEL9"
-    elif [ -n "$CKI_SELFTESTS_URL" ]; then
+    elif [ -n "$CKI_SELFTESTS_URL" ] || ! K_IsKernelRPM; then
         OSVERSION="UPSTREAM"
     else
         OSVERSION="ARK"
@@ -294,28 +295,34 @@ function setup
 
     rlRun "cd $TMPDIR"
     if [ ! "$CKI_SELFTESTS_URL" ] ; then
-        arch=$(arch)
-        name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/\-core//')
-        version=$(uname -r | cut -f1 -d'-')
-        release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
-        pkg=${name}-${version}-${release}
-        BASE_URL=${BASE_URL:-"https://cbs.centos.org/kojifiles/packages https://kojihub.stream.centos.org/kojifiles/packages"}
-        BEAKERLIB_rpm_fetch_base_url+=(${BASE_URL})
-        rlFetchSrcForInstalled "$pkg" || exit 1
+        if K_IsKernelRPM ; then
+            rlLog "RPM installation"
+            arch=$(arch)
+            name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/\-core//')
+            version=$(uname -r | cut -f1 -d'-')
+            release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
+            pkg=${name}-${version}-${release}
+            BASE_URL=${BASE_URL:-"https://cbs.centos.org/kojifiles/packages https://kojihub.stream.centos.org/kojifiles/packages"}
+            BEAKERLIB_rpm_fetch_base_url+=(${BASE_URL})
+            rlFetchSrcForInstalled "$pkg" || exit 1
 
-        typeset rpmfile=$(ls -1 "$TMPDIR/${pkg}.src.rpm")
-        rlAssertExists "$rpmfile"
+            typeset rpmfile=$(ls -1 "$TMPDIR/${pkg}.src.rpm")
+            rlAssertExists "$rpmfile"
 
-        rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile > /dev/null 2>&1" 0
+            rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile > /dev/null 2>&1" 0
 
-        typeset linux_tarball=$(find "$TMPDIR" -name "linux*.tar.xz")
-        rlAssertExists "$linux_tarball"
+            typeset linux_tarball=$(find "$TMPDIR" -name "linux*.tar.xz")
+            rlAssertExists "$linux_tarball"
 
-        typeset tarball_dirname=$(dirname "$linux_tarball")
-        rlRun "cd $tarball_dirname"
-        rlRun "tar Jxf $linux_tarball > /dev/null 2>&1"
+            typeset tarball_dirname=$(dirname "$linux_tarball")
+            rlRun "cd $tarball_dirname"
+            rlRun "tar Jxf $linux_tarball > /dev/null 2>&1"
 
-        typeset linux_srcdir=$(find "$TMPDIR" -type d -a -name "linux-*")
+            typeset linux_srcdir=$(find "$TMPDIR" -type d -a -name "linux-*")
+        else
+            rlLog "kernel in /usr/src/kernels/$(uname -r)"
+            typeset linux_srcdir="/usr/src/kernels/$(uname -r)"
+        fi
         typeset tests_srcdir="$linux_srcdir/tools/testing/selftests/kvm"
         typeset hwpf=$(uname -m)
 
