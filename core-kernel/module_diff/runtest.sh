@@ -629,6 +629,12 @@ rlJournalStart
             fi
         fi
 
+        if [[ "$Release" == "HEAD-8.10" ]]; then
+            if cki_kver_lt "4.18.0-526.el8"; then
+                sed -i "/ftdi-elan\.ko/d" ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+            fi
+        fi
+
         if [[ "$Release" == "9.0" ]]; then
             if cki_kver_lt "5.14.0-70.30.1.el9_0"; then
                 sed -i '/libarc4.ko/d' ${OS}/${Release}/$Release-knownRemoved-s390x.lst
@@ -693,7 +699,7 @@ rlJournalStart
     rlPhaseEnd
 
     # Only support RHEL-9.4 now
-    if [[ "$Release" == "HEAD-9.4" ]]; then
+    if [[ "$Release" == "HEAD-9.4" ]] || [[ "$Release" == "HEAD-8.10" ]]; then
         rlPhaseStartTest "Builtin module test"
             GetCurrentModuleList builtin
             GetBaseModuleList builtin
