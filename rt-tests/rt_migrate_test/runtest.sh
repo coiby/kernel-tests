@@ -11,8 +11,6 @@
 . ../include/runtest.sh || exit 1
 . ../../automotive/include/rhivos.sh || exit 1
 
-TEST="rt-tests/rt_migrate_test"
-
 function RprtRslt ()
 {
     test_item=$1
@@ -35,7 +33,7 @@ function RunTest ()
 
     echo Test Start Time: `date` >> $OUTPUTFILE
 
-    rt-migrate-test $PROCS 2>&1 >> $OUTPUTFILE
+    { rt-migrate-test $PROCS >> $OUTPUTFILE; } 2>&1
     grep -q " Failed!" $OUTPUTFILE
     if [ $? -eq 0 ]; then
         echo "rt-migrate-test balance Failed: " | tee -a $OUTPUTFILE
@@ -58,7 +56,7 @@ function RunStress ()
 
     echo Test Start Time: `date` >> $OUTPUTFILE
 
-    rt-migrate-test $PROCS -l 1000 2>&1 >> $OUTPUTFILE
+    { rt-migrate-test $PROCS -l 1000 >> $OUTPUTFILE; } 2>&1
     grep -q " Failed!" $OUTPUTFILE
     if [ $? -eq 0 ]; then
         echo "rt_migrate stress Failed: " | tee -a $OUTPUTFILE
