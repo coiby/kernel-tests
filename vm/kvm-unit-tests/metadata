@@ -9,4 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=gcc;git;nmap-ncat;qemu-kvm
-repoRequires=cki_lib
+repoRequires=cki_lib;kernel-include
