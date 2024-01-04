@@ -66,7 +66,11 @@ function test_setup ()
         if [[ "$LOADS_CPUS" == "housekeeping" ]]; then
             FLAG_LOADS="--loads-cpulist $housekeeping_cpus"
         elif [[ "$LOADS_CPUS" == "isolated" ]]; then
-            FLAG_LOADS="--loads-cpulist $isolated_cpus"
+            if [ -n "$isolated_cpus" ]; then
+                FLAG_LOADS="--loads-cpulist $isolated_cpus"
+            else
+                log_warn "No isolated cores are available for loads cpulist"
+            fi
         else
             FLAG_LOADS="--loads-cpulist $LOADS_CPUS"
         fi
@@ -76,7 +80,11 @@ function test_setup ()
         if [[ "$MEASURE_CPUS" == "housekeeping" ]]; then
             FLAG_MEASURE="--measurement-cpulist $housekeeping_cpus"
         elif [[ "$MEASURE_CPUS" == "isolated" ]]; then
-            FLAG_MEASURE="--measurement-cpulist $isolated_cpus"
+            if [ -n "$isolated_cpus" ]; then
+                FLAG_MEASURE="--measurement-cpulist $isolated_cpus"
+            else
+                log_warn "No isolated cores are available for measurement cpulist"
+            fi
         else
             FLAG_MEASURE="--measurement-cpulist $MEASURE_CPUS"
         fi
