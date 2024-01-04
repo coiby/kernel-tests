@@ -279,14 +279,32 @@ function CompareModuleList ()
         CrossCheck $1 ${TESTAREA}/${moduleList}_missing
     fi
 
+}
+
+function ReportMissingModule ()
+{
+    case $1 in
+            loadable)
+                    local moduleList="moduleList"
+                    ;;
+            builtin)
+                    local moduleList="moduleList_builtin"
+                    ;;
+    esac
     if [ ! -s "${TESTAREA}/${moduleList}_missing" ]; then
-        rlPass "Missing modules check PASS"
-    else
-        DisplayModuleFail ${moduleList}_missing
-        cp ${TESTAREA}/${moduleList}_missing ${TESTAREA}/${moduleList}_missing.log
-        rlFileSubmit ${TESTAREA}/${moduleList}_missing.log ${moduleList}_missing.log
-        rlFail "There are missing modules! Check ${moduleList}_missing.log for more details."
+        return
     fi
+    DisplayModuleFail ${moduleList}_missing
+    cp ${TESTAREA}/${moduleList}_missing ${TESTAREA}/${moduleList}_missing.log
+    rlFileSubmit ${TESTAREA}/${moduleList}_missing.log ${moduleList}_missing.log
+    # report each missing module as individual result
+    while IFS= read -r module
+    do
+        rlPhaseStartTest "Missing ${1} module ${module}"
+            rlFail "The ${1} module ${module} is missing! Check ${moduleList}_missing.log for more details."
+        rlPhaseEnd
+    done < "${TESTAREA}/${moduleList}_missing.log"
+
 }
 
 function FileClean ()
@@ -697,6 +715,8 @@ rlJournalStart
         # Lets submit the complete log from the diff of base module list and the current module list
         CompareModuleList loadable
     rlPhaseEnd
+    # ReportMissingModule should be out of rlPhaseStartTest as it uses rlPhaseStartTest in it.
+    ReportMissingModule loadable
 
     # Only support RHEL-9.4 now
     if [[ "$Release" == "HEAD-9.4" ]] || [[ "$Release" == "HEAD-8.10" ]]; then
@@ -706,6 +726,8 @@ rlJournalStart
             GetKnownRemovedList builtin
             CompareModuleList builtin
         rlPhaseEnd
+        # ReportMissingModule should be out of rlPhaseStartTest as it uses rlPhaseStartTest in it.
+        ReportMissingModule builtin
     fi
 rlJournalEnd
 
