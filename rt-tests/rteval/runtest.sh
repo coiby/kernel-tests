@@ -28,10 +28,10 @@ function measure_latency()
 
     # get the max and standard deviation latency from rteval output
     declare max_lat stddev_lat
-    max_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
+    max_lat=$(grep --text -A 11 'System:' $OUTPUTFILE | \
               grep 'Max:' | awk -F ':' '{print $2}' | xargs)
     max_lat=${max_lat%us}
-    stddev_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
+    stddev_lat=$(grep --text -A 11 'System:' $OUTPUTFILE | \
                  grep 'Std.dev:' | awk -F ':' '{print $2}' | xargs)
     stddev_lat=${stddev_lat%us}
 
