@@ -28,10 +28,10 @@ function measure_latency()
 
     # get the max and standard deviation latency from rteval output
     declare max_lat stddev_lat
-    max_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
+    max_lat=$(grep --text -A 11 'System:' $OUTPUTFILE | \
               grep 'Max:' | awk -F ':' '{print $2}' | xargs)
     max_lat=${max_lat%us}
-    stddev_lat=$(grep -A 11 'System:' $OUTPUTFILE | \
+    stddev_lat=$(grep --text -A 11 'System:' $OUTPUTFILE | \
                  grep 'Std.dev:' | awk -F ':' '{print $2}' | xargs)
     stddev_lat=${stddev_lat%us}
 
@@ -80,6 +80,21 @@ function test_setup ()
         else
             FLAG_MEASURE="--measurement-cpulist $MEASURE_CPUS"
         fi
+    fi
+
+    # Check if loads or measurement cpulist were set to an empty string,
+    # indicating there were no system isolated cores despite being
+    # requested. If so, unset both parameters.  In the event the other
+    # parameter utilizes all CPUs on the host, rteval will throw an IndexError
+    if [[ "$FLAG_LOADS" == "--loads-cpulist " ||\
+          "$FLAG_MEASURE" == "--measurement-cpulist " ]]; then
+        log_warn "No isolated cores are set on the system despite being requested"\
+                 "for either load or measurement CPUs."
+        log_warn "Unsetting both load and measurement CPU parameters to avoid"\
+                 "a potential IndexError."
+        FLAG_LOADS=""
+        FLAG_MEASURE=""
+        report_result "${TEST}/no-isolcpus" "WARN" 1
     fi
 
     export FLAG_LOADS FLAG_MEASURE
