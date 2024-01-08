@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1090,SC2207,SC2048,SC2034
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -198,6 +199,7 @@ else
 fi
 
 first_isolated=$(echo $isolated_cpus | grep -Eo "^[0-9]+")
+last_isolated=$(echo $isolated_cpus | grep -Eo "[0-9]+$")
 mask=$(get_cpu_mask $first_isolated)
 
 cfg_file=/etc/tuned/realtime-virtual-host-variables.conf
