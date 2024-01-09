@@ -78,7 +78,7 @@ test_setup()
 
 test_run()
 {
-    local test_cpu stress_ng_pid stress_ng_cpu_pids timeout_pid
+    local test_cpu stress_ng_pid stress_ng_load_pids timeout_pid
     declare -i runtime start_sec end_sec
     test_cpu=$(get_test_cpu)
     log "test_cpu: ${test_cpu}"
@@ -119,15 +119,18 @@ test_run()
         # runtime of each iteration should take no more than the threshold
         run "runtime_lt_threshold $runtime"
 
-        # cleanup stress-ng threads by killing the stress-ng-cpu load thread,
-        # not the main thread.  Killing the main thread alone does not
-        # guarantee that the load thread will also be killed, whereas killing
-        # the load thread will kill both threads effectively
-        stress_ng_cpu_pids="$(pgrep -P $stress_ng_pid stress-ng-cpu)"
-        for pid in $stress_ng_cpu_pids; do
-            run -l "ps $pid"
-            run "kill $pid"
-        done
+        # cleanup stress-ng threads by killing the load thread, not the main
+        # thread.  Killing the main thread alone does not guarantee that the
+        # load thread will also be killed, whereas killing the load thread will
+        # kill both threads effectively
+        stress_ng_load_pids="$(pgrep -P $stress_ng_pid)"
+        if [[ -z $stress_ng_load_pids ]]; then
+            log_warn "didn't found any stress-ng load threads!"
+            run -l "pgrep -a stress-ng"
+        else
+            run -l "ps $stress_ng_load_pids"
+            run "kill $stress_ng_load_pids"
+        fi
 
         kill $timeout_pid  # in case the timeout helper is still running
 
