@@ -16,8 +16,7 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA 02110-1301, USA.
 #
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname $FILE)
 NODES_RW=""
 NODES_RR=""
@@ -38,9 +37,9 @@ source $CDIR/../../../cki_lib/libcki.sh || exit 1
 
 function randwrite_fio()
 {
-    local node=0 filed value
+    local node=0 field value
     FIO_PERF_FIELDS=("write iops")
-    field="${FIO_TERSE_FIELDS["$FIO_PERF_FIELDS"]}"
+    field="${FIO_TERSE_FIELDS["${FIO_PERF_FIELDS[0]}"]}"
     while [ $node -lt $nodes_num ]; do
         cpu=$(eval echo '$'NODE_${node}_CPU)
         cki_run "taskset -c $cpu fio --output=/root/fio_perf_randwrite_$node --output-format=terse --terse-version=4 \
@@ -56,14 +55,14 @@ function randwrite_fio()
 
 function randread_fio()
 {
-    local node=0 filed value
+    local node=0 field value
     TEST_DEV=$(lsblk | grep "/boot$" | grep -oE "sd[a-f]|vda|nvme0n1" | head -1)
     if [ -z $TEST_DEV ]; then
         cki_run "lsblk"
         cki_abort_task "Didn't get the boot disk"
     fi
     FIO_PERF_FIELDS=("read iops")
-    field="${FIO_TERSE_FIELDS["$FIO_PERF_FIELDS"]}"
+    field="${FIO_TERSE_FIELDS["${FIO_PERF_FIELDS[0]}"]}"
     while [ $node -lt $nodes_num ]; do
         cpu=$(eval echo '$'NODE_${node}_CPU)
         cki_run "taskset -c $cpu fio --output=/root/fio_perf_randread_$node --output-format=terse --terse-version=4 \
