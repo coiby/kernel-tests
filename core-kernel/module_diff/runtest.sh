@@ -694,6 +694,23 @@ rlJournalStart
             fi
             if cki_kver_lt "5.14.0-400.el9"; then
                 sed -i '/system_heap.ko/d; /udmabuf.ko/d'  ${OS}/${Release}/$Release-knownRemoved-builtin-${ARCH}.lst
+                sed -i '/cfbcopyarea.ko/d; /cfbfillrect.ko/d; /cfbimgblt.ko/d'  ${OS}/${Release}/$Release-knownRemoved-s390x.lst
+            fi
+            if cki_kver_lt "5.14.0-401.el9"; then
+                sed -i '/^amdxcp.ko$/d; /^drm_exec.ko$/d; /^mt792x-lib.ko$/d; /drm_suballoc_helper.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
+            fi
+            if cki_kver_lt "5.14.0-402.el9"; then
+                sed -i '/snd-soc-sof_da7219_max98373.ko/d'  ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+                for m in `cat ${OS}/${Release}/5.14.0-402`
+                do
+                    sed -i "/^$m$/d" ${OS}/${Release}/$Release-modules-${ARCH}.lst
+                done
+            fi
+            if cki_kver_lt "5.14.0-403.el9"; then
+                sed -i '/^tsm.ko$/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-405.el9"; then
+                sed -i '/^idpf.ko$/d; /^octeon_ep.ko$/'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
             fi
         fi
     rlPhaseEnd
