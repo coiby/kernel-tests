@@ -132,6 +132,7 @@ dm-zero.ko
 dns_resolver.ko
 drm_buddy.ko
 drm_display_helper.ko
+drm_exec.ko
 drm_kms_helper.ko
 drm.ko
 drm_panel_orientation_quirks.ko
@@ -209,6 +210,7 @@ ieee802154_6lowpan.ko
 ieee802154.ko
 ieee802154_socket.ko
 ifb.ko
+iommufd.ko
 ionic.ko
 iosm.ko
 ip6_gre.ko

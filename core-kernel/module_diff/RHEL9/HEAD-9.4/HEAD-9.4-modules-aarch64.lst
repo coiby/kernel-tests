@@ -36,6 +36,7 @@ altera_ps2.ko
 alx.ko
 amdgpu.ko
 amd.ko
+amdxcp.ko
 amd-xgbe.ko
 ansi_cprng.ko
 appledisplay.ko
@@ -298,9 +299,11 @@ dp83tc811.ko
 drm_buddy.ko
 drm_display_helper.ko
 drm_dp_aux_bus.ko
+drm_exec.ko
 drm_kms_helper.ko
 drm.ko
 drm_shmem_helper.ko
+drm_suballoc_helper.ko
 drm_ttm_helper.ko
 drm_vram_helper.ko
 dummy.ko
@@ -589,6 +592,7 @@ ib_uverbs.ko
 ice.ko
 icplus.ko
 idmouse.ko
+idpf.ko
 ifb.ko
 igb.ko
 igbvf.ko
@@ -610,6 +614,7 @@ ina3221.ko
 int51x1.ko
 intel-xway.ko
 io_edgeport.ko
+iommufd.ko
 ionic.ko
 iosm.ko
 io_ti.ko
@@ -898,6 +903,7 @@ mt76x2e.ko
 mt76x2u.ko
 mt7921-common.ko
 mt7921e.ko
+mt792x-lib.ko
 mtd_blkdevs.ko
 mtdblock.ko
 mtd.ko
@@ -1083,6 +1089,7 @@ nvmet.ko
 nvmet-rdma.ko
 nvmet-tcp.ko
 objagg.ko
+octeon_ep.ko
 ofpart.ko
 of_pmem.ko
 omninet.ko
@@ -1185,6 +1192,8 @@ rdma_rxe.ko
 rdma_ucm.ko
 realtek.ko
 reed_solomon.ko
+regmap-ram.ko
+regmap-raw-ram.ko
 regmap-spi.ko
 rfcomm.ko
 rfkill-gpio.ko
