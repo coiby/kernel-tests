@@ -41,12 +41,6 @@ SetupKdump()
             sed -i 's/\(KDUMP_IMG\)=.*/\1="vmlinux"/' ${KDUMP_SYS_CONFIG}
         }
 
-        # For kernel-rt
-        $IS_RT && [ -f /usr/bin/rt-setup-kdump ] && {
-            Log "Modifying ${KDUMP_SYS_CONFIG} properly for RT."
-            set -x; /usr/bin/rt-setup-kdump -g; set +x
-        }
-
         # RHEL5 ppc64 kdump need kernel-kdump
         $IS_RHEL5 && [ "${K_ARCH}" = "ppc64" ] && {
             InstallKernel "kernel-kdump-${K_VER}-${K_REL}.${K_ARCH}" ||
