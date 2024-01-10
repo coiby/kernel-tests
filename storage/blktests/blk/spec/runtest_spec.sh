@@ -19,7 +19,7 @@ Describe 'blktests - blk - main'
         exit 1
     End
 
-    Mock get_test_cases_list BLK
+    Mock get_test_cases_list
         echo "block/001"
     End
 

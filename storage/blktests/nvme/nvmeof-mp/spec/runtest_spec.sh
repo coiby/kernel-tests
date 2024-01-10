@@ -8,7 +8,7 @@ Describe 'blktests - nvmeof-mp - main'
         echo "pre_setup"
     End
 
-    Mock get_test_cases_list NVMEOF_MP
+    Mock get_test_cases_list
         echo "nvmeof-mp/005"
     End
 

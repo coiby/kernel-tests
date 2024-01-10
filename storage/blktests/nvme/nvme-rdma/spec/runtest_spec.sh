@@ -8,7 +8,7 @@ Describe 'blktests - nvme-rdma - main'
         echo "enable_nvme_core_multipath"
     End
 
-    Mock get_test_cases_list NVME_RDMA_RXE
+    Mock get_test_cases_list
         echo "nvme/003"
     End
 

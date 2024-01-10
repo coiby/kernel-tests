@@ -8,7 +8,7 @@ Describe 'blktests - nvme-tcp - main'
         echo "enable_nvme_core_multipath"
     End
 
-    Mock Mock get_test_cases_list NVME_TCP
+    Mock get_test_cases_list
         echo "nvme/003"
     End
 

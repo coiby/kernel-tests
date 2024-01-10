@@ -12,7 +12,7 @@ Describe 'blktests - srp - main'
         echo "disable_multipath"
     End
 
-    Mock get_test_cases_list SRP_RXE
+    Mock get_test_cases_list
         echo "srp/001"
     End
 
