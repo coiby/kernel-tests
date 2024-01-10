@@ -45,7 +45,7 @@ function SetupTest()
     if ! grep -q hugetlbfs /proc/filesystems; then
         # Bug 1143877 - hugetlbfs: disabling because there are no supported hugepage sizes
         rlLog "hugetlbfs not found in /proc/filesystems, skipping test"
-        rstrnt_report_result Test_Skipped PASS 99
+        rstrnt-report-result Test_Skipped PASS 99
         rlPhaseEnd
         rlJournalEnd
         rlJournalPrintText
@@ -83,10 +83,10 @@ function StartTest()
     export TEST=hugepage-cmdline
 
     # From /proc/meminfo
-    rllog " + check results from ${MEMINFO}"
+    rlLog " + check results from ${MEMINFO}"
     rlRun "hp_total=$(awk '/HugePages_Total/ {print $2}' ${MEMINFO})"
     # shellcheck disable=SC2154
-    rllog " |- HugePages_Total = $hp_total"
+    rlLog " |- HugePages_Total = $hp_total"
     rlRun "hp_free=$(awk '/HugePages_Free/ {print $2}' ${MEMINFO})"
     # shellcheck disable=SC2154
     rlLog " |- HugePages_Free = ${hp_free}"
@@ -111,11 +111,11 @@ function StartTest()
     # From sysfs
     if grep -E -q '(release 6|release 7|release 8)' /etc/redhat-release; then
         rlRun "HP_SIZE=$(awk '/Hugepagesize/ {print $2}' ${MEMINFO})"
-        rllog " + check results from ${SYSFS_PATH}/hugepages-${HP_SIZE}kB/"
+        rlLog " + check results from ${SYSFS_PATH}/hugepages-${HP_SIZE}kB/"
         rlRun "hp_total=$(cat ${SYSFS_PATH}/hugepages-"${HP_SIZE}"kB/nr_hugepages)"
-        rllog " |- nr_hugepages = $hp_total"
+        rlLog " |- nr_hugepages = $hp_total"
         rlRun "hp_free=$(cat ${SYSFS_PATH}/hugepages-"${HP_SIZE}"kB/free_hugepages)"
-        rllog " |- free_hugepages = $hp_free"
+        rlLog " |- free_hugepages = $hp_free"
         if [ "x$hp_total" != "x${HP_NR}" ] || [ "x$hp_free" != "x${HP_NR}" ]; then
             rlLog " \`- check ${SYSFS_PATH} failed"
             RESULT=FAIL
@@ -128,9 +128,9 @@ function StartTest()
             HP_SIZE=1048576 # 1GB
             rlLog " + check results from ${SYSFS_PATH}/hugepages-${HP_SIZE}kB/"
             rlRun "hp_total=$(cat ${SYSFS_PATH}/hugepages-${HP_SIZE}kB/nr_hugepages)"
-            rllog " |- nr_hugepages = $hp_total"
+            rlLog " |- nr_hugepages = $hp_total"
             rlRun "hp_free=$(cat ${SYSFS_PATH}/hugepages-${HP_SIZE}kB/free_hugepages)"
-            rllog " |- free_hugepages = $hp_free"
+            rlLog " |- free_hugepages = $hp_free"
             if [ "x$hp_total" != "x1" ] || [ "x$hp_free" != "x1" ]; then
                 rlLog " \`- check ${SYSFS_PATH} failed"
                 RESULT=FAIL
@@ -142,9 +142,9 @@ function StartTest()
 
     if [ "${RESULT}" = "PASS" ]
     then
-        report_result "${TEST}${result_appendix}" ${RESULT}
+        rstrnt-report-result "${TEST}${result_appendix}" ${RESULT}
     else
-        report_result "${TEST}${result_appendix}" ${RESULT} 1
+        rstrnt-report-result "${TEST}${result_appendix}" ${RESULT} 1
     fi
     export RSTRNT_REBOOTCOUNT=0
 }
