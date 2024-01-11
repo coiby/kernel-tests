@@ -1,21 +1,23 @@
 #!/bin/bash
 
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE="$(readlink -f "${BASH_SOURCE[0]}")"
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../../cki_lib/libcki.sh
 . "$CDIR"/../../include/bash_modules/lxt/include.sh || exit 200
 
 trun "rpm -q redhat-rpm-config gcc gcc-c++ git wget ndctl || yum -y install redhat-rpm-config gcc gcc-c++ git wget ndctl"
 
+# shellcheck disable=SC2034
 SECTOR_SIZE_LIST="512 4096"
 
 if [[ $(arch) == "ppc64le" ]]; then
+# shellcheck disable=SC2034
 	ext4_param="-b 65536"
+# shellcheck disable=SC2034
 	xfs_param="-s size=512 -b size=65536"
 	devdax_align="64k 2m"
 else
-	ext4_param=
-	xfs_param=
+# shellcheck disable=SC2034
 	devdax_align="4k 2m 1g"
 fi
 
@@ -53,11 +55,11 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 	tok ndctl destroy-namespace all -r all -f
 
 	# get RAW|BTT|FSDAX|DEVDAX list
-	region_num=`ndctl list -R | grep -o region.*[0-9] | wc -l`
+	region_num=`ndctl list -R | grep -o "region.*[0-9]" | wc -l`
 	if [ $region_num -gt 0 ]; then
 		for((i=0;i<${region_num};i++)); do
 			((tmp=$i+1))
-			region_list[i]=`ndctl list -R | grep -o region.*[0-9] | head -$tmp | tail -1`
+			region_list[i]=`ndctl list -R | grep -o "region.*[0-9]" | head -$tmp | tail -1`
 		done
 	else
 		tlog "INFO: no region avaiable, exit"
@@ -79,6 +81,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 	hn=$(hostname -s)
 	hpe_nvdimm_n="hpe-dl380gen9"
 	st31_nvdimm_n="storageqe-31"
+	# shellcheck disable=SC2034
 	st36_dcpmm="storageqe-36"
 	intel_aep_02_dcpmm="intel-purley-aep-02"
 	p9_nvdimm="ibm-p9z-30"
@@ -87,43 +90,43 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 			if [[ "$device_type" = "RAW" ]]; then
 				tlog "INFO: will create raw device on namespace$i.0"
 				tok "ndctl create-namespace -f -e namespace$i.0 -m raw | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o pmem.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
 			elif [ "$device_type" = "BTT" -a "$s_a_size" != "" ]; then
 				tlog "INFO: will create btt:$s_a_size device on namespace$i.0"
 				tok "ndctl create-namespace -f -e namespace$i.0 -m sector -l $s_a_size | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o pmem.*[0-9]s`
+				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]s"`
 			elif [[ "$device_type" = "FSDAX" ]]; then
 				tlog "INFO: will create fsdax device on namespace$i.0"
 				tok "ndctl create-namespace -f -e namespace$i.0 -m fsdax | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o pmem.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
 			elif [ "$device_type" = "DEVDAX" -a "$s_a_size" != "" ]; then
 				tlog "INFO: will create devdax:$s_a_size device on namespace$i.0"
 				tok "ndctl create-namespace -f -e namespace$i.0 -m devdax -a $s_a_size | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o dax.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "dax.*[0-9]"`
 			fi
 			if [ "${disks[$i]}" = "" ]; then
 				tlog "INFO: get the $i $device_type failed"
 				exit 1
 			fi
 		done
-	elif [[ "$hn" =~ "$st31_nvdimm_n" ]]; then
+	elif [[ "$hn" =~ $st31_nvdimm_n ]]; then
 		for((i=0;i<${dev_num};i++)); do
 			if [[ "$device_type" = "RAW" ]]; then
 				tlog "INFO: will create raw device on region$i"
 				tok "ndctl create-namespace -r region$i -m raw | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o pmem.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
 			elif [ "$device_type" = "BTT" -a "$s_a_size" != "" ]; then
 				tlog "INFO: will create btt:$s_a_size device on region$i"
 				tok "ndctl create-namespace -r region$i -m sector -l $s_a_size -s 12G | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o pmem.*[0-9]s`
+				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]s"`
 			elif [[ "$device_type" = "FSDAX" ]]; then
 				tlog "INFO: will create fsdax device on region$i"
 				tok "ndctl create-namespace -r region$i -m fsdax -s 12G | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o pmem.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
 			elif [ "$device_type" = "DEVDAX" -a "$s_a_size" != "" ]; then
 				tlog "INFO: will create devdax:$s_a_size device on region$i"
 				tok "ndctl create-namespace -r region$i -m devdax -a $s_a_size -s 12G | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o dax.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "dax.*[0-9]"`
 			fi
 			if [ "${disks[$i]}" = "" ]; then
 				tlog "INFO: get the $i $device_type failed"
@@ -142,19 +145,19 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 			if [[ "$device_type" = "RAW" ]]; then
 				tlog "INFO: will create raw device on $region"
 				tok "ndctl create-namespace -r $region -m raw -s $SIZE | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o pmem.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
 			elif [ "$device_type" = "BTT" -a "$s_a_size" != "" ]; then
 				tlog "INFO: will create btt:$s_a_size device on $region"
 				tok "ndctl create-namespace -r $region -m sector -l $s_a_size -s $SIZE | tee OUTPUT"
-				disks[$i]=` cat OUTPUT | grep -o pmem.*[0-9]s`
+				disks[$i]=` cat OUTPUT | grep -o "pmem.*[0-9]s"`
 			elif [[ "$device_type" = "FSDAX" ]]; then
 				tlog "INFO: will create fsdax device on $region"
 				tok "ndctl create-namespace -r $region -m fsdax -s $SIZE  | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o pmem.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
 			elif [ "$device_type" = "DEVDAX" -a "$s_a_size" != "" ]; then
 				tlog "INFO: will create devdax:$s_a_size device on $region"
 				tok "ndctl create-namespace -r $region -m devdax -a $s_a_size -s $SIZE | tee OUTPUT"
-				disks[$i]=`cat OUTPUT | grep -o dax.*[0-9]`
+				disks[$i]=`cat OUTPUT | grep -o "dax.*[0-9]"`
 			fi
 			if [ "${disks[$i]}" = "" ]; then
 				tlog "INFO: get the $i $device_type failed"
@@ -164,7 +167,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 	fi
 
 	# define global variables
-	RETURN_STR="${disks[@]}"
+	RETURN_STR="${disks[*]}"
 	if [ $dev_num -eq $i ]; then
 		tlog "INFO: Get $dev_num $device_type device: $RETURN_STR"
 	fi
@@ -480,9 +483,7 @@ function MD_Create_RAID (){
 	fi
 	trun "mdadm -Ss"
 	tok "mdadm --create --run $md_raid --level $level --metadata $mtdata --raid-devices $raid_dev_num $raid_dev $SPAR_DEV $BITMAP $CHUNK"
-	if [ $? -ne 0 ]; then
-		ret=$?
-	fi
+	ret=$?
 
 	# define global variables
 	MD_DEVS="$raid_dev $spar_dev"
@@ -508,10 +509,7 @@ function MD_Create_RAID (){
 function MD_Save_RAID (){
 	echo "INFO: Executing MD_Save_RAID()"
 	echo "DEVICE $MD_DEVS" > /etc/mdadm.conf
-	if [ $? -ne 0 ]; then
-		echo "FAIL: Failed to save md device info to /etc/mdadm.conf"
-	fi
-	mdadm --detail --scan >> /etc/mdadm.conf
+	tok "mdadm --detail --scan >> /etc/mdadm.conf"
 	if [ $? -ne 0 ]; then
 		echo "FAIL: Failed to save md state info to /etc/mdadm.conf"
 	fi
@@ -536,21 +534,21 @@ function MD_Save_RAID (){
 function MD_Clean_RAID (){
 	EX_USAGE=64 # Bad arg format
 	if [ $# -ne 1 ]; then
-		 echo 'Usage: MD_Clean_RAID $md_name'
+		echo 'Usage: MD_Clean_RAID $md_name'
 		exit "${EX_USAGE}"
 	fi
-	echo "INFO: Executing MD_Clean_RAID() against this md device: $md_name"
+	tlog "INFO: Executing MD_Clean_RAID() against this md device: $md_name"
 	local md_name=$1
-	echo "mdadm --stop $md_name"
-	mdadm --stop $md_name
+	tlog "mdadm --stop $md_name"
+	tok "mdadm --stop $md_name"
 	if [ $? -ne 0 ]; then
 		echo "FAIL: Failed to stop $md_name"
 		exit 1
 	fi
-	echo "clean devs : $MD_DEVS"
+	tlog "clean devs : $MD_DEVS"
 	for dev in $MD_DEVS; do
 		echo "mdadm --zero-superblock $dev"
-		`mdadm --zero-superblock $dev`
+		tok "mdadm --zero-superblock $dev"
 	done
 	#`mdadm --zero-superblock "$MD_DEVS"`
 	echo "ret is $?"
@@ -622,7 +620,7 @@ function MD_IO_Test (){
 	local dt_target=$1
 	local dt_runtime=72
 	local dt_logfile=""
-	test -f /tmp/dt_XXXXXXXX.log || `mktemp /tmp/dt_XXXXXXXX.log`
+	test -f /tmp/dt_XXXXXXXX.log || mktemp /tmp/dt_XXXXXXXX.log
 	dt_logfile="/tmp/dt_XXXXXXXX.log"
 	echo -n "INFO: dt against ${dt_target} is running with "
 	echo "runtime: ${dt_runtime}s, log file is: ${dt_logfile}"
@@ -631,11 +629,11 @@ function MD_IO_Test (){
 	pattern=iot iodir=reverse prefix='%d@%h (pid %p)' \
 	of=${dt_target} log=${dt_logfile} \
 	runtime=${dt_runtime}"
-	`dt  slices=16 disable=eof,pstats flags=direct \
+	dt  slices=16 disable=eof,pstats flags=direct \
 	oncerr=abort min=b max=256k \
 	pattern=iot iodir=reverse prefix='%d@%h (pid %p)' \
 	of=${dt_target} log=${dt_logfile} \
-	runtime=${dt_runtime}`
+	runtime=${dt_runtime}
 	if [ $? -ne 0 ]; then
 		echo "FAIL: Failed to run dt testing against $dt_target"
 		exit 1
@@ -674,6 +672,7 @@ function Create_Loop_Devices (){
 	local count="$1"
 	local size_mib="$2"
 	local loop_dev_list=''
+	# shellcheck disable=SC2034
 	for X in `seq 1 ${count}`;do
 		local loop_file_name=$(mktemp /opt/loop.XXXXXX)
 		#dd if=/dev/zero of=${loop_file_name} count=$size_mib  bs=1M 1>/dev/null 2>&1
