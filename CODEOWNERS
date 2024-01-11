@@ -94,6 +94,7 @@
 /kunit/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /legacy/pci_id/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /legacy/whitelist/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/libevdev/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /livepatch/selftests/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /memory/fork_mem/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /misc/amtu/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -220,6 +221,7 @@
 /kunit/ @bgoncalv @idorax @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @idorax @lulinqing
 /legacy/whitelist/ @bgoncalv @ckalina @idorax @lulinqing
+/libevdev/ @bgoncalv @dangel101 @idorax @lulinqing
 /livepatch/selftests/ @bgoncalv @idorax @joe.lawrence @lulinqing @ykopkova
 /memory/fork_mem/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
 /misc/amtu/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
