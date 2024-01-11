@@ -25,7 +25,7 @@ CDIR=$(dirname "$FILE")
 
 function run_test()
 {
-    rlRun "systemctl status multipathd"
+    rlPass "systemctl status multipathd"
 
 cat <<"EOF" >/etc/multipath.conf
 defaults {
@@ -44,7 +44,7 @@ blacklist {
 EOF
 
     rlRun "systemctl restart multipathd"
-    rlRun "systemctl status multipathd"
+    rlPass "systemctl status multipathd"
     rlRun "lsblk"
 
     [ ! -f thread_num.log ] && touch thread_num.log

@@ -1,0 +1,11 @@
+summary: Regression testing for bug 676948
+contact: Qiao Zhao <qzhao@redhat.com>
+test: bash ./runtest.sh
+id: ad15cd39-f8d2-4f41-85e8-a000bc04d339
+framework: shell
+require:
+  - gcc
+  - make
+duration: 2h
+extra-summary: general/time/regression/bz676948_not_migrate_high_priority_rt_tasks
+extra-task: general/time/regression/bz676948_not_migrate_high_priority_rt_tasks

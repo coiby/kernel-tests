@@ -1,0 +1,13 @@
+[General]
+name=/kernel-tests/general/memory/function/kasan
+owner=David McDougall <dmcdouga@redhat.com>
+description=Check that Kernel-Address-Sanitizer (KASAN) is enabled.
+license=GPLv2+
+confidential=yes
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=elfutils-libelf-devel
+max_time=5m
+repoRequires=kernel-include

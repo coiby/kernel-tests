@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TEST="distribution/kpkginstall"
-TEST_DEPS="elfutils-libelf-devel flex bison gcc openssl-devel make curl grubby tar binutils"
+TEST_DEPS="elfutils-libelf-devel flex bison gcc openssl-devel make curl tar binutils"
 ARCH=$(uname -m)
 REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 YUM=""
@@ -333,6 +333,7 @@ function download_install_package()
     if $YUM install --downloadonly -y "$1" >> ${RPM_INSTALL_LOG} || yumdownloader -y "$1" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Downloaded $1 successfully"
     else
+      rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Failed to download ${1}!" WARN
     fi
 
@@ -341,6 +342,7 @@ function download_install_package()
     if $YUM install -y "$1" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Installed $1 successfully"
     else
+      rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Failed to install $1!" FAIL
     fi
   else
@@ -360,6 +362,7 @@ function download_install_package()
     if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Downloaded $1 successfully"
     else
+      rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Failed to download ${1}!" WARN
     fi
 
@@ -369,6 +372,7 @@ function download_install_package()
       if rpm-ostree override replace /root/kernel*.rpm >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
+        rstrnt-report-log -l "${RPM_INSTALL_LOG}"
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
       fi
     else
@@ -382,6 +386,7 @@ function download_install_package()
         --install "/root/kernel-automotive-debug-modules-core-${KVER_RPM}.rpm" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Installed $1 successfully"
       else
+        rstrnt-report-log -l "${RPM_INSTALL_LOG}"
         cki_abort_recipe "RPM-OSTREE failed to install $1!" FAIL
       fi
     fi
@@ -435,6 +440,7 @@ function rpm_install()
     if grubby --set-default "${vmlinuz}"; then
       cki_print_success "Grubby set default kernel to ${vmlinuz}"
     else
+      rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Fail to set default kernel to ${vmlinuz}" FAIL
     fi
 

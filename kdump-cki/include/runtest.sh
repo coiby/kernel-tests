@@ -47,6 +47,13 @@ mkdir -p ${K_TMP_DIR}
 
 # Kernel Variables
 
+export K_NAME
+export K_ARCH
+export K_VER
+export K_REL
+export K_KVARI
+export K_SPEC_NAME
+
 if [[ $(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r)) =~ "not owned by any package" ]]; then
     # kernel config/vmlinuz are installed from tarball, not dnf install
     K_NAME=kernel
@@ -86,6 +93,9 @@ else
     K_SPEC_NAME=${K_SRC%%"-${K_VER}"*}
 fi
 
+export IS_RHEL
+export RELEASE
+export RELEASE_MINOR
 rlIsRHEL 5 && IS_RHEL5=true || IS_RHEL5=false
 rlIsRHEL 6 && IS_RHEL6=true || IS_RHEL6=false
 rlIsRHEL 7 && IS_RHEL7=true || IS_RHEL7=false
@@ -104,6 +114,9 @@ else
     RELEASE_MINOR=$(grep -o 'release [0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $NF}')
 fi
 
+export IS_RT
+export IS_DB
+export IS_64K
 uname -v | grep -q PREEMPT_RT && IS_RT=true || IS_RT=false
 uname -r | grep -qE "[-+]debug" && IS_DB=true || IS_DB=false
 uname -r | grep -qE "[-+]64k" && IS_64K=true || IS_64K=false
@@ -131,7 +144,7 @@ else
     [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH="${K_BOOT}/vmlinux-$(uname -r)"
 fi
 
-INITRD_KDUMP_IMG_PATH=$(sed -e "s/\.img$/kdump.img/; s/$INITRD_PREFIX/$INITRD_KDUMP_PREFIX/" <<< "$INITRD_IMG_PATH")
+export INITRD_KDUMP_IMG_PATH=$(sed -e "s/\.img$/kdump.img/; s/$INITRD_PREFIX/$INITRD_KDUMP_PREFIX/" <<< "$INITRD_IMG_PATH")
 
 # Backup kdump config files
 BackupKdumpConfig()
@@ -181,6 +194,8 @@ CommandExists()
     fi
 }
 
+export SERVERFILE
+export DEVMODE
 CheckEnv()
 {
     # Check test environment.
@@ -500,12 +515,6 @@ SetupKdump()
             sed -i 's/\(KDUMP_IMG\)=.*/\1="vmlinux"/' /etc/sysconfig/kdump
         }
 
-        # For kernel-rt
-        $IS_RT && [ -f /usr/bin/rt-setup-kdump ] && {
-            Log "Modifying /etc/sysconfig/kdump properly for RT."
-            set -x; /usr/bin/rt-setup-kdump -g; set +x
-        }
-
         # Ensure Kdump Kernel memory reservation
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
             local kdumpMem=$(DefKdumpMem)
@@ -539,14 +548,10 @@ SetupKdump()
     # If kdump service is not started yet, wait for max 5 mins.
     # It may take time to start kdump service.
     Log "Waiting for kdump service to be fully up"
-    local kdump_status=off
-    for i in {1..5}
+    for _ in {1..5}
     do
         kdumpctl status 2>&1 || service kdump status 2>&1
-        [ $? -eq 0 ] && {
-            kdump_status=on
-            break
-        }
+        [ $? -eq 0 ] && break
         sleep 60
     done
 
@@ -786,7 +791,6 @@ RestartKdump()
 {
     local tmp=""
     local kdumprd=""
-    local rc=
     local UPLOADRD=${1:-"false"}
 
     Log "Restarting Kdump service."
@@ -857,7 +861,7 @@ InstallPackages()
 
 UpgradePackages()
 {
-    InstallPackages upgrade $*
+    InstallPackages upgrade "$@"
 }
 
 InstallDebuginfo()
@@ -1046,7 +1050,7 @@ RemoveVmcores()
         df -T "${path}" | tail -n 1 | awk '{print $2}' | grep -q nfs
         if [ "$?" -ne 0 ] && [ -d "${path}" ]; then
             Log "- Remove all files in ${path}"
-            rm -rf "${path}"/*
+            rm -rf "${path:?}"/*
             return
         fi
     }

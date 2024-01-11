@@ -1,12 +1,12 @@
 [General]
 name=rt-tests/rteval
 owner=Qiao Zhao <qzhao@redhat.com>
-description=PRE Verification for Real Time
+description=Latency verification for real time
 license=GPLv2
 confidential=no
 destructive=no
 
 [restraint]
 max_time=10h
-entry_point=bash -x ./runtest.sh
+entry_point=bash ./runtest.sh
 repoRequires=cki_lib;rt-tests/include

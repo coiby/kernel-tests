@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2048
 #
 # A simple wrapper for pre- and post-execution activities for any given
 # openposix test.
@@ -73,7 +74,7 @@ run_test() {
 		5)
 			msg="UNTESTED"
 			;;
-		$TIMEOUT_RET)
+		"$TIMEOUT_RET")
 			msg="HUNG"
 			;;
 		*)
@@ -131,6 +132,7 @@ if TIMEOUT_RET=$(cat "$T0_VAL"); then
 	trap '' INT
 
 	# RUN
+
 	run_test_loop $*
 	exit $NUM_FAIL
 

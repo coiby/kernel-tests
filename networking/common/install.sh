@@ -1,5 +1,6 @@
 #!/bin/bash
 # This is for common install scripts
+# shellcheck disable=SC2034,SC2044,SC2076
 
 # default URL
 EPEL_BASEURL=${EPEL_BASEURL:-"https://dl.fedoraproject.org/pub/epel/"}
@@ -196,7 +197,7 @@ lksctp-tools_install()
 scapy_install()
 {
 	local scapy_git="https://github.com/secdev/scapy.git"
-	local scapy_http="http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/scapy.tar.gz"
+	local scapy_http="http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/share/tools/scapy.tar.gz"
 
 	local rel=$(GetDistroRelease)
 	[ $rel -ge 9 ] && dnf install -y scapy
@@ -260,12 +261,13 @@ netperf_install()
 
 	local OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 
-	SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
+	#SRC_NETPERF=${SRC_NETPERF:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20210121.tar.bz2"}
+	SRC_NETPERF=${SRC_NETPERF:-"https://github.com/HewlettPackard/netperf/archive/refs/heads/master.tar.gz"}
 
 	pushd ${NETWORK_COMMONLIB_DIR} 1>/dev/null
 	wget -nv -N $SRC_NETPERF
-	tar xjvf $(basename $SRC_NETPERF)
-	cd $(basename $SRC_NETPERF| awk -F. '{print $1}')
+	tar xvf $(basename $SRC_NETPERF)
+	cd netperf-$(basename $SRC_NETPERF| awk -F. '{print $1}')
 	check_arch
 	./autogen.sh
 	lsmod | grep sctp
@@ -309,7 +311,7 @@ iperf_install()
 	$YUM gcc-c++ make gcc
 	# grab sctp-enabled iperf and install it:
 	IPERF_FILE="iperf-2.0.10.tar.gz"
-	wget http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/${IPERF_FILE}
+	wget http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/share/tools/${IPERF_FILE}
 	if [[ $? != 0 ]]; then
 		echo "${TEST} fail grabbing iperf source"
 		rstrnt-report-result "${TEST}_get_iperf" FAIL

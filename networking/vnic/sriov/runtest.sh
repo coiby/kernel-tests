@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034,SC2207,SC2010,SC2048,SC1010,SC2167,SC2165,SC1010,SC2062,SC2054,SC2207,SC2128
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /kernel/networking/vnic/sriov
@@ -603,7 +604,7 @@ sriov_setup_container()
 	do
 		echo "####Download container image...####"
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
 			podman load --input container_sriov_centos_stream8_aarch64.tar
 			if [ $? -eq 0 ]
 			then
@@ -622,7 +623,7 @@ sriov_setup_container()
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
@@ -641,7 +642,7 @@ sriov_setup_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
@@ -676,7 +677,7 @@ sriov_setup_pod_container()
 	do
 		echo "####Download container image...####"
 		if [ "$SYS_ARCH" == "aarch" ];then
-			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/container_images/container_sriov_centos_stream8_aarch64.tar
 			podman load --input container_sriov_centos_stream8_aarch64.tar
 			if [ $? -eq 0 ]
 			then
@@ -696,7 +697,7 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		elif [ "$SYS_ARCH" == "ppc64le" ];then
-			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/centos_stream8_ppc64le.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/container_images/centos_stream8_ppc64le.tar
 			podman load --input centos_stream8_ppc64le.tar
 			if [ $? -eq 0 ]
 			then
@@ -716,7 +717,7 @@ sriov_setup_pod_container()
 				sleep 5
 			fi
 		else
-			wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/container_images/container_sriov_centos8.tar
+			wget -nv -N -c -t 3 http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/container_images/container_sriov_centos8.tar
 			podman load --input container_sriov_centos8.tar
 			if [ $? -eq 0 ]
 			then
@@ -6411,8 +6412,8 @@ sriov_test_vmvf_testpmd_macswap()
 				{yum install -y bzip2}
 				{yum install -y wget}
 				{yum -y install wget unzip tcpdump automake gcc make}
-				{wget -nv -N -c -t 3 http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2}
-				{tar xf $(basename http://netqe-infra01.knqe.lab.eng.bos.redhat.com/share/tools/netperf-20160222.tar.bz2)}
+				{wget -nv -N -c -t 3 http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/share/tools/netperf-20160222.tar.bz2}
+				{tar xf $(basename http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/share/tools/netperf-20160222.tar.bz2)}
 				{pushd netperf-*/}
 				{./autogen.sh}
 				{./configure CFLAGS=-fcommon}

@@ -26,35 +26,50 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../../kernel-include/runtest.sh || exit 1
 
+pmgr=$(K_GetPkgMgr)
+
+if [ ${pmgr} == "rpm-ostree" ]; then
+    install_opts="-A --idempotent --allow-inactive install -y"
+else
+    install_opts="install -y"
+fi
+
+devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
+
+# PACKAGE used by test framework, tmt and beaker, and not directly used in script.
+# when set
+# Package       : kernel
+# when not set
+# Package       : unknown
+# shellcheck disable=SC2034
 PACKAGE="kernel"
 
 function RunKasanTest {
     rlPhaseStartSetup
-        if ! [[ "`uname -r`" =~ "debug" ]]; then
+        if ! [[ "$(uname -r)" =~ "debug" ]]; then
             rlLogInfo "Skip Test! KASAN is only enabled for debug kernels."
             rlPhaseEnd
             return
         fi
-        if [[ ! "`uname -r`" =~ "x86_64" ]] && [[ ! "`uname -r`" =~ "aarch64" ]] && rlIsRHEL "<=8";
+        if [[ ! "$(uname -r)" =~ "x86_64" ]] && [[ ! "$(uname -r)" =~ "aarch64" ]] && rlIsRHEL "<=8";
         then
             rlLogInfo "Skip Test! KASAN is only enabled for x86_64 and aarch64."
             rlPhaseEnd
             return
         fi
-
         if ! grep 'CONFIG_KASAN=y' /boot/config-$(uname -r); then
                report_result "SKIP_NOT_SUPPORT" SKIP
                rlPhaseEnd
                return
         fi
 
-        rpm -q kernel-debug-devel || dnf install -y kernel-debug-devel
-        rpm -q elfutils-libelf-devel || dnf install -y elfutils-libelf-devel
+        rpm -q ${devel_pkg} || ${pmgr} ${install_opts} ${devel_pkg}
+        rpm -q elfutils-libelf-devel || ${pmgr} ${install_opts} elfutils-libelf-devel
         unset ARCH
-        rlRun "pushd kasan_test"
+        rlRun "pushd kasan_test || exit"
         rlRun "make"
     rlPhaseEnd
 
@@ -73,7 +88,7 @@ function RunKasanTest {
         rmmod kasan_test
         make clean
         rm -f dmesg.log
-        popd
+        popd || exit
     rlPhaseEnd
 }
 

@@ -36,7 +36,7 @@ export ISOLCPUS
 
 function __tuned_pkg_verify ()
 {
-    for pkg in "tuned" "tuned-profiles-realtime"; do
+    for pkg in "tuned" "tuned-profiles-realtime" "rpmdevtools"; do
         rpm -q $pkg || $PKGMGR $pkg
         if ! rpm -q --quiet $pkg; then
             echo "Failed to install $pkg" | tee -a "$OUTPUTFILE"
@@ -101,19 +101,31 @@ function __check_isolated_cores ()
 
 function __set_isolated_cores ()
 {
+    # erase current set of isolated_cores, if any are set
+    sed -i 's/^isolated_cores.*//g' /etc/tuned/realtime-variables.conf
+
     if [[ "${ISOLCPUS,,}" == "default" ]]; then
-        # Leave default isolated_cores in realtime-variables.conf
-        # shellcheck disable=SC2016
-        sed -i 's/^isolated_cores.*/isolated_cores=${f:calc_isolated_cores:1}/g' \
-          /etc/tuned/realtime-variables.conf
+        declare tuned_ver=$(rpm -q tuned)
+        rpmdev-vercmp "${tuned_ver//tuned-}" "2.19.0"
+        if [ "$?" -eq "11" ]; then
+            # For tuned >= 2.19, the default value is to use the
+            # calc_isolated_cores function with 1 housekeeping core
+            # per node
+            # shellcheck disable=SC2016
+            echo 'isolated_cores=${f:calc_isolated_cores:1}' >> /etc/tuned/realtime-variables.conf
+        else
+            # For tuned < 2.19, isolated_cores is commented out by
+            # default, but must be set to some value in order to enable
+            # tuned-realtime.  Set it to empty isolated cores since
+            # none were specified by the user
+            echo "isolated_cores=" >> /etc/tuned/realtime-variables.conf
+        fi
     elif [ -z $ISOLCPUS ]; then
         # ISOLCPUS="", so set empty isolated_cores
-        sed -i 's/^isolated_cores.*/isolated_cores=/g' \
-          /etc/tuned/realtime-variables.conf
+        echo "isolated_cores=" >> /etc/tuned/realtime-variables.conf
     else
         # User specified isolated cores to set
-        sed -i "s/^isolated_cores.*/isolated_cores=${ISOLCPUS}/g" \
-          /etc/tuned/realtime-variables.conf
+        echo "isolated_cores=${ISOLCPUS}" >> /etc/tuned/realtime-variables.conf
     fi
 
     echo "realtime-variables.conf:" | tee -a "$OUTPUTFILE"

@@ -26,7 +26,6 @@ DATETIME=$(date +"%Y%m%d%H%M%S")
 
 function runtest
 {
-    local result=$CKI_PASS;
     pushd "$DMTS_LOCAL" || return 1
     ./dmtest health
     if [[ -e "$DMTS_LOCAL"/LINUX_REPO_UNAVAILABLE ]]; then
@@ -39,15 +38,26 @@ function runtest
       ./dmtest run --result-set cki_dmtest --and-filters \
       --rx '^/(?!thin/snapshot/parallel-io-to-shared-thins)' --rx '^/(?!thin/fs-bench/)'
     fi
+}
+
+function report_results
+{
+    local result=$CKI_PASS;
     output=$(./dmtest list --state FAIL --result-set cki_dmtest | grep -oP '([\w-]+)\s+(?= FAIL)')
     for i in $output; do
         log_file=/tmp/"$i"-"$DATETIME"-FAIL.log
         ./dmtest log --with-dmesg --result-set cki_dmtest "$i" > "$log_file";
-        cki_upload_log_file "$log_file"
         result=$CKI_FAIL
+        # report resuls as subtests if running with restraint
+        [[ -n $RSTRNT_TASKID ]] && rstrnt-report-result -o "$log_file" "${i}" FAIL
     done
 
     popd || return "$CKI_FAIL"
+    # Only report general results in case of pass, if there are failures
+    # they are reported already individually as restraint subtests
+    if [[ "$result" == "$CKI_PASS" ]]; then
+        [[ -n $RSTRNT_TASKID ]] && rstrnt-report-result "Test" PASS
+    fi
     return "$result"
 }
 
@@ -67,14 +77,17 @@ if ! startup &> setup.log ; then
 fi
 
 echo "INFO: testsuite installed successfully. More information on setup.log"
-cki_upload_log_file setup.log
+[[ -n $RSTRNT_TASKID ]] && rstrnt-report-result -o setup.log "Setup" PASS
 
 runtest
+report_results
 test_status=$?
 
+# if running as restraint job, the test result is already reported as subtests
+# don't exit with values different of 0. Otherwise, restraint reports it as a separate subtest
 if [ $test_status -eq "$CKI_FAIL" ] ; then
-    rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL
-    exit 1
+    # exit with error in case it doesn't run as restraint
+    [[ -n $RSTRNT_TASKID ]] || exit 1
 fi
 
 if [ $test_status -eq "$CKI_UNINITIATED" ] ; then
@@ -83,4 +96,3 @@ if [ $test_status -eq "$CKI_UNINITIATED" ] ; then
     exit "$CKI_STATUS_ABORTED"
 fi
 
-exit 0

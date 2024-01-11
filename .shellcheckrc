@@ -2,8 +2,6 @@
 disable=SC1083
 # Quote this to prevent word splitting.
 disable=SC2046
-# Expanding an array without an index only gives the element in the index 0.
-disable=SC2128
 # var is referenced but not assigned.
 disable=SC2154
 # Declare and assign separately to avoid masking return value.

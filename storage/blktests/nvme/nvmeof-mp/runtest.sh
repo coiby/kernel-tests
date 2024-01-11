@@ -34,7 +34,7 @@ function get_test_cases
 	echo "$testcases"
 }
 
-if [[ "$USE_SIW" =~ 0 ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release; then
+if [[ "$USE_SW_RDMA" =~ RXE ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release; then
 	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
@@ -44,23 +44,23 @@ function main
 {
 	pre_setup
 
-	USE_SIW=${USE_SIW:-"0 1"}
+	USE_SW_RDMA=${USE_SW_RDMA:-"RXE SIW"}
 	test_ws="${CDIR}"/blktests
 	ret=0
 	testcases_default=""
 	testcases_default+=" $(get_test_cases)"
 	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
-	for use_siw in $USE_SIW; do
+	for use_sw_rdma in $USE_SW_RDMA; do
 		for testcase in $testcases; do
 			disable_multipath
-			if (( use_siw == 0 )); then
-				USE_SIW=""
-			elif (( use_siw == 1 )); then
-				USE_SIW="use_siw=1"
+			if [[ "$use_sw_rdma" = "RXE" ]]; then
+				USE_RDMA="use_rxe=1"
+			elif [[ "$use_sw_rdma" = "SIW" ]]; then
+				USE_RDMA=""
 			fi
-			eval "$USE_SIW" do_test "$test_ws" "$testcase"
+			eval "$USE_RDMA" do_test "$test_ws" "$testcase"
 			result=$(get_test_result "$test_ws" "$testcase")
-			report_test_result "$result" "$USE_SIW nvmeof-mp: $TNAME/tests/$testcase"
+			report_test_result "$result" "$USE_RDMA nvmeof-mp: $TNAME/tests/$testcase"
 			((ret += $?))
 		done
 	done

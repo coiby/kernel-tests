@@ -2,8 +2,7 @@
 
 # beaker machines
 [a-zA-Z0-9\\.\\-]+pek2.redhat.com
-[a-zA-Z0-9\\.\\-]+rhts.eng.bos.redhat.com
-[a-zA-Z0-9\\.\\-]+.lab.eng.[a-zA-Z0-9\\-]+.redhat.com
+[a-zA-Z0-9\\.\\-]+.eng.[a-zA-Z0-9\\-]+(.dc)?.redhat.com
 rhts.redhat.com
 
 # others internal hosts

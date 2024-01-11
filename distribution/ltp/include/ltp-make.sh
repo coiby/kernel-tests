@@ -34,12 +34,10 @@ ARCH=$SYSENV
 KVER=$(uname -r | cut -d'-' -f 1)
 KREV=$(uname -r | cut -d'-' -f 2 | cut -d'.' -f 1)
 KREV2=$(uname -r | cut -d'-' -f 2 | cut -d'.' -f 2)
-OS_MAJOR_RELEASE=$(grep -Go 'release [0-9]\+' /etc/redhat-release | sed 's/release //')
 
 # Whether NXBIT is Set in /proc/cpuinfo
 NXBIT=$(grep '^flags' /proc/cpuinfo 2>/dev/null | grep -q " nx " && echo TRUE || echo FALSE)
 NR_CPUS=$(getconf _NPROCESSORS_ONLN || echo 1)
-RELPATH="/"
 
 MAKE="make -j${NR_CPUS}"
 
@@ -98,17 +96,6 @@ clone_ltp()
 
 }
 
-# Critical patches
-# 1. If a patch fixes installation issue
-# 2. a patch fixes critical issues (causing deadlock, crash, etc), no
-#	matter the test will be executed or not, it should be applied here.
-patch-critical()
-{
-    echo "============ Critical Patch ============" | tee -a $OUTPUTFILE
-    ${PATCH} < ${ABS_DIR}/INTERNAL/rhel-scrashme-remove-fork12-test.patch
-}
-
-
 patch-generic()
 {
     echo "============ General Patch ============" | tee -a $OUTPUTFILE
@@ -121,6 +108,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-process_madvise01-fix-smaps-scan-and-min_sw.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tools-Fix-syntax-error-caused-by-in-create_dmesg_ent.patch
     fi
     if [ "$TESTVERSION" == "20230516" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
@@ -197,6 +185,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel_only-migrate_page02-avoid-warning.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tools-Fix-syntax-error-caused-by-in-create_dmesg_ent.patch
     fi
 
     if [ "$ARCH" == "ppc" ] || [ "$ARCH" == "ppc64" ] || [ "$ARCH" == "s390" ] || [ "$ARCH" == "s390x" ]; then
@@ -204,11 +193,8 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/skip-firmware-tests.patch
     fi
 
-    if  [[ $TESTVERSION =~ '^[0-9]+$' ]] && [[ $TESTVERSION -ge 20170516 ]]; then
+    if  [[ $TESTVERSION =~ ^[0-9]+$ ]] && [[ $TESTVERSION -ge 20170516 ]]; then
         echo " - cron_tests.sh has been rewritten since ltp-20170516" | tee -a $OUTPUTFILE
-    #elif [  "$OS_MAJOR_RELEASE"  == "6" ]; then
-        #echo " - fix cron01 in RHEL6" | tee -a $OUTPUTFILE
-        #${PATCH} < ${ABS_DIR}/INTERNAL/rhel6-commands-cron-ensure-syslog-enabled.patch
     fi
 
     if [ "$NXBIT" == "TRUE" ]; then
@@ -254,16 +240,10 @@ patch-cgroups()
 
 patch-inc()
 {
-    patch-critical
     patch-generic
     patch-lite
 }
 
-
-AUTOCONFIGVER=$(rpm -qa autoconf |cut -f 2 -d "-")
-AUTOMAKEVER=$(rpm -qa automake |cut -f 2 -d "-"|cut -f 1,2 -d ".")
-AUTOCONFIGVER_1=$(echo $AUTOCONFIGVER |cut -f 1 -d ".")
-AUTOCONFIGVER_2=$(echo $AUTOCONFIGVER |cut -f 2 -d ".")
 
 # Setup desired filesystem mounted at /mnt/testarea
 # TEST_DEV or TEST_MNT can be set, this useful when testing filesystems in beaker
@@ -346,7 +326,7 @@ configure()
 
     echo "============ Start configure ============" | tee -a $OUTPUTFILE
     AUTOCONFIGVER=$(rpm -qa autoconf |cut -f 2 -d "-")
-    AUTOMAKEVER=$(rpm -qa automake |cut -f 2 -d "-"|cut -f 1,2 -d ".")
+    # AUTOMAKEVER=$(rpm -qa automake |cut -f 2 -d "-"|cut -f 1,2 -d ".")
     AUTOCONFIGVER_1=$(echo $AUTOCONFIGVER |cut -f 1 -d ".")
     AUTOCONFIGVER_2=$(echo $AUTOCONFIGVER |cut -f 2 -d ".")
     DOWNLOAD_URL=$(echo ${LOOKASIDE:-http:\/\/download.devel.redhat.com\/qa\/rhts\/lookaside\/})
@@ -354,14 +334,14 @@ configure()
         wget -q $DOWNLOAD_URL/m4-1.4.16.tar.gz ; \
         tar xzf m4-1.4.16.tar.gz; \
         pushd  m4-1.4.16; \
-        ./configure --prefix=/usr 2>&1 >/dev/null; \
-        make 2>&1 >/dev/null && make install 2>&1 >/dev/null; \
+        ./configure --prefix=/usr > /dev/null 2>&1; \
+        make > /dev/null 2>&1 && make install > /dev/null 2>&1; \
         popd ; \
         wget -q $DOWNLOAD_URL/autoconf-2.69.tar.gz ; \
         tar xzf autoconf-2.69.tar.gz; \
         pushd autoconf-2.69; \
-        ./configure --prefix=/usr 2>&1 >/dev/null ; \
-        make 2>&1 >/dev/null && make install 2>&1 >/dev/null ;  \
+        ./configure --prefix=/usr > /dev/null 2>&1 ; \
+        make > /dev/null 2>&1 && make install > /dev/null 2>&1; \
         popd ; \
     fi
     pushd ${TARGET}; make autotools; ./configure --prefix=${TARGET_DIR} &> configlog.txt || cat configlog.txt; popd

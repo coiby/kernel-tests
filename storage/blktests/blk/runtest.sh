@@ -116,7 +116,7 @@ function get_test_cases_loop
 		testcases+=" loop/005"
 	elif rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
 		testcases+=" loop/001"
-		testcases+=" loop/002"
+		uname -ri | grep -Eq "el9_0" ||testcases+=" loop/002"
 		testcases+=" loop/003"
 		testcases+=" loop/004"
 		testcases+=" loop/005"

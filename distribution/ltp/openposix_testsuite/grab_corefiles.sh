@@ -4,7 +4,7 @@ my_dir=$1
 excluded_list="$2"
 bin_core_list=""
 
-for core_abs in $(find $my_dir -iname 'core.*' -print); do
+while IFS= read -r -d '' core_abs; do
     echo "Found corefile: $core_abs"
     bin_name_=`file $core_abs | awk -F \' '{print $2}'`
     bin_name=`basename $bin_name_`
@@ -24,7 +24,7 @@ for core_abs in $(find $my_dir -iname 'core.*' -print); do
     else
         bin_core_list="$bin_core_list $core_abs"
     fi
-done
+done < <(find $my_dir -iname 'core.*' -print0)
 
 echo "List of files to pack: $bin_core_list"
 if [ -n "$bin_core_list" ]; then

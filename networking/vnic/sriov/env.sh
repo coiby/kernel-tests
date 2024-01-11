@@ -1,5 +1,5 @@
 #!/bin/bash -
-
+# shellcheck disable=SC2034
 set -o nounset
 
 # mandatory
@@ -57,7 +57,7 @@ elif (($rhel_version == 39));then
 	image_name=${image_name:-"rhel9.2_cki.qcow2"}
 fi
 
-IMG_GUEST=${IMG_GUEST:-"http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/${image_name}"}
+IMG_GUEST=${IMG_GUEST:-"http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/vm/${image_name}"}
 
 
 kernel_ver="$(uname -r)"

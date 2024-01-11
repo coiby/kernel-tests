@@ -128,7 +128,7 @@ def download_vm_image(vm_names, rhel_image_name=None):
         else:
             try:
                 runcmd(
-                    f'wget -nv -N http://netqe-infra01.knqe.lab.eng.bos.redhat.com/vm/{rhel_image_name} '
+                    f'wget -nv -N http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/vm/{rhel_image_name} '
                     f'-P /var/lib/libvirt/images/')
             except Exception as a:
                 print('rt_kernel_setup.py: \n', a)

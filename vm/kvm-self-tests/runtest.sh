@@ -17,11 +17,10 @@
 # Boston, MA 02110-1301, USA.
 #
 . ../../cki_lib/libcki.sh || exit 1
+. ../../kernel-include/runtest.sh || exit 1
 
-NAME=$(basename $0)
-CDIR=$(dirname $0)
 TEST=${TEST:-"$0"}
-RELEASE=$(uname -r | sed s/\.`arch`//)
+RELEASE=$(uname -r | sed s/\.$(arch)//)
 PACKAGE="kernel-${RELEASE}"
 TMPDIR=/var/tmp/$(date +"%Y%m%d%H%M%S")
 BINDIR=${TMPDIR}-bin
@@ -36,6 +35,7 @@ source /usr/share/beakerlib/beakerlib.sh
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
+  # shellcheck disable=SC2221,SC2222
   case $1 in
     -n|--nodisable)
       NODISABLE=YES
@@ -65,7 +65,7 @@ function rlSkip
     . ../../cki_lib/libcki.sh || exit 1
 
     rlLog "Skipping test because $*"
-    rstrnt-report-result $TEST SKIP
+    rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
 
     #
     # As we want result="Skip" status="Completed" for all scenarios, right here
@@ -90,24 +90,24 @@ function checkVirtSupport
     typeset hwpf=${1?"*** what hardware-platform?, e.g. x86_64"}
 
     if [[ $hwpf == "x86_64" ]]; then
-        if (egrep -q 'vmx' /proc/cpuinfo); then
+        if (grep -q 'vmx' /proc/cpuinfo); then
             CPUTYPE="INTEL"
-        elif (egrep -q 'svm' /proc/cpuinfo); then
+        elif (grep -q 'svm' /proc/cpuinfo); then
             CPUTYPE="AMD"
         fi
-        egrep -q '(vmx|svm)' /proc/cpuinfo
+        grep -qE '(vmx|svm)' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "aarch64" ]]; then
-        if journalctl -k | egrep -qi "disabling GICv2" ; then
+        if journalctl -k | grep -qi "disabling GICv2" ; then
             GICVERSION="3"
         else
             GICVERSION="2"
         fi
         CPUTYPE="ARMGICv$GICVERSION"
-        journalctl -k | egrep -iq "kvm.*: (Hyp|VHE) mode initialized successfully"
+        journalctl -k | grep -iqE "kvm.*: (Hyp|VHE) mode initialized successfully"
         return $?
     elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
-        if (egrep -q 'POWER9' /proc/cpuinfo); then
+        if (grep -q 'POWER9' /proc/cpuinfo); then
             CPUTYPE="POWER9"
         else
             CPUTYPE="POWER8"
@@ -115,11 +115,11 @@ function checkVirtSupport
         grep -q 'platform.*PowerNV' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "s390x" ]]; then
-        if (egrep -q 'machine = 2964' /proc/cpuinfo); then
+        if (grep -q 'machine = 2964' /proc/cpuinfo); then
             CPUTYPE="z13"
-        elif (egrep -q 'machine = 3907' /proc/cpuinfo); then
+        elif (grep -q 'machine = 3907' /proc/cpuinfo); then
             CPUTYPE="z14"
-        elif (egrep -q 'machine = 8561' /proc/cpuinfo); then
+        elif (grep -q 'machine = 8561' /proc/cpuinfo); then
             CPUTYPE="z15"
         else
            CPUTYPE="S390X"
@@ -137,7 +137,7 @@ function getTests
     ALL_TESTS=()
     while IFS=  read -r -d $'\0'; do
         ALL_TESTS+=("$REPLY")
-    done < <(find ${BINDIR} -maxdepth 1 -type f -executable -printf "%f\0")
+    done < <(find "${BINDIR}" -maxdepth 1 -type f -executable -printf "%f\0")
 }
 
 function disableTests
@@ -194,7 +194,7 @@ function setup
         OSVERSION="RHEL8"
     elif grep -q "Red Hat Enterprise Linux release 9." /etc/redhat-release; then
         OSVERSION="RHEL9"
-    elif [ ! -z "$CKI_SELFTESTS_URL" ]; then
+    elif [ -n "$CKI_SELFTESTS_URL" ] || ! K_IsKernelRPM; then
         OSVERSION="UPSTREAM"
     else
         OSVERSION="ARK"
@@ -202,12 +202,10 @@ function setup
 
     # tests are currently supported on x86_64, aarch64, ppc64 and s390x
     hwpf=$(uname -m)
-    checkPlatformSupport $hwpf
-    if (( $? == 0 )); then
+    if checkPlatformSupport "$hwpf"; then
         # test can only run on hardware that supports virtualization
-        checkVirtSupport $hwpf
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Running on supported arch"
-        if (( $? == 0 )); then
+        if checkVirtSupport "$hwpf"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] Hardware supports virtualization, proceeding"
         else
             rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] CPU doesn't support virtualization"
@@ -218,7 +216,7 @@ function setup
 
     # test should only run on a system with 1 or more cpus
     typeset cpus=$(grep -c ^processor /proc/cpuinfo)
-    if (( $cpus > 1 )); then
+    if (( cpus > 1 )); then
         rlLog "[$OSVERSION][$hwpf][$CPUTYPE] You have sufficient CPU's to run the test"
     else
         rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] system requires > 1 CPU"
@@ -257,11 +255,11 @@ function setup
     KVM_ARCH_SYSFS=/sys/module/$KVM_ARCH/parameters/
 
     # Set the KVM parameters needed for the tests
-    > $KVMPARAMFILE
-    for opt in ${KVM_OPTIONS[*]}; do
+    : > $KVMPARAMFILE
+    for opt in "${KVM_OPTIONS[@]}"; do
         echo -e "options kvm $opt=1\n" >> $KVMPARAMFILE
     done
-    for opt in ${KVM_ARCH_OPTIONS[*]}; do
+    for opt in "${KVM_ARCH_OPTIONS[@]}"; do
         echo -e "options $KVM_ARCH $opt=1\n" >> $KVMPARAMFILE
     done
 
@@ -269,19 +267,19 @@ function setup
     export TIMEOUT=3000s
 
     # Reload the modules
-    for mod in ${KVM_MODULES[*]}; do rmmod -f $mod > /dev/null 2>&1; done
+    for mod in "${KVM_MODULES[@]}"; do rmmod -f "$mod" > /dev/null 2>&1; done
     modprobe -a kvm $KVM_ARCH
 
     # Test if the KVM parameters were set correctly
-    for opt in ${KVM_OPTIONS[*]}; do
-        if ! cat $KVM_SYSFS/$opt | egrep -q "Y|y|1"; then
+    for opt in "${KVM_OPTIONS[@]}"; do
+        if ! grep -qE "Y|y|1" "$KVM_SYSFS/$opt"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] kvm module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] kvm module option $opt is set"
         fi
     done
-    for opt in ${KVM_ARCH_OPTIONS[*]}; do
-        if ! cat $KVM_ARCH_SYSFS/$opt | egrep -q "Y|y|1"; then
+    for opt in "${KVM_ARCH_OPTIONS[@]}"; do
+        if ! grep -qE "Y|y|1" "$KVM_ARCH_SYSFS/$opt"; then
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE][WARNING] $KVM_ARCH module option $opt not set"
         else
             rlLog "[$OSVERSION][$hwpf][$CPUTYPE] $KVM_ARCH module option $opt is set"
@@ -297,34 +295,39 @@ function setup
 
     rlRun "cd $TMPDIR"
     if [ ! "$CKI_SELFTESTS_URL" ] ; then
-        arch=$(arch)
-        name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/\-core//')
-        version=$(uname -r | cut -f1 -d'-')
-        release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
-        pkg=${name}-${version}-${release}
-        BASE_URL=${BASE_URL:-"https://cbs.centos.org/kojifiles/packages https://kojihub.stream.centos.org/kojifiles/packages"}
-        BEAKERLIB_rpm_fetch_base_url+=(${BASE_URL})
-        rlFetchSrcForInstalled $pkg || exit 1
+        if K_IsKernelRPM ; then
+            rlLog "RPM installation"
+            arch=$(arch)
+            name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/\-core//')
+            version=$(uname -r | cut -f1 -d'-')
+            release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
+            pkg=${name}-${version}-${release}
+            BASE_URL=${BASE_URL:-"https://cbs.centos.org/kojifiles/packages https://kojihub.stream.centos.org/kojifiles/packages"}
+            BEAKERLIB_rpm_fetch_base_url+=(${BASE_URL})
+            rlFetchSrcForInstalled "$pkg" || exit 1
 
-        typeset rpmfile=$(ls -1 $TMPDIR/${pkg}.src.rpm)
-        rlAssertExists $rpmfile
+            typeset rpmfile=$(ls -1 "$TMPDIR/${pkg}.src.rpm")
+            rlAssertExists "$rpmfile"
 
-        rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile > /dev/null 2>&1" 0
+            rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile > /dev/null 2>&1" 0
 
-        typeset linux_tarball=$(find $TMPDIR -name "linux*.tar.xz")
-        rlAssertExists $linux_tarball
+            typeset linux_tarball=$(find "$TMPDIR" -name "linux*.tar.xz")
+            rlAssertExists "$linux_tarball"
 
-        typeset tarball_dirname=$(dirname $linux_tarball)
-        rlRun "cd $tarball_dirname"
-        rlRun "tar Jxf $linux_tarball > /dev/null 2>&1"
+            typeset tarball_dirname=$(dirname "$linux_tarball")
+            rlRun "cd $tarball_dirname"
+            rlRun "tar Jxf $linux_tarball > /dev/null 2>&1"
 
-        typeset linux_srcdir=$(find $TMPDIR -type d -a -name "linux-*")
+            typeset linux_srcdir=$(find "$TMPDIR" -type d -a -name "linux-*")
+        else
+            rlLog "kernel in /usr/src/kernels/$(uname -r)"
+            typeset linux_srcdir="/usr/src/kernels/$(uname -r)"
+        fi
         typeset tests_srcdir="$linux_srcdir/tools/testing/selftests/kvm"
-        typeset outputdir="${BINDIR}"
         typeset hwpf=$(uname -m)
 
-        rlAssertExists $tests_srcdir
-        rlAssertExists ${BINDIR}
+        rlAssertExists "$tests_srcdir"
+        rlAssertExists "${BINDIR}"
 
         #
         # XXX: Apply a patch because case 'dirty_log_test' fails to be built, which
@@ -333,8 +336,7 @@ function setup
         #      [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=07a262cc
         #
         # This patch was merged in version 4.18.0-97.el8 only earlier versions need to apply it
-        rlTestVersion "${RELEASE}" "<" "4.18.0-97.el8"
-        if (( $? == 0)); then
+        if rlTestVersion "${RELEASE}" "<" "4.18.0-97.el8"; then
             rlRun "patch -d $linux_srcdir -p1 < patches/bitmap.h.patch" 0 \
                   "Patching via patches/bitmap.h.patch"
         fi
@@ -371,7 +373,7 @@ function runtest
     rlPhaseEnd
 
     # Run tests
-    for test in ${ALL_TESTS[*]}; do
+    for test in "${ALL_TESTS[@]}"; do
         rlPhaseStartTest "${test}"
         rlRun "${BINDIR}/${test}" 0,4
         rlPhaseEnd

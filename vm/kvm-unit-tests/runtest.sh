@@ -19,6 +19,7 @@
 
 # shellcheck source=../../cki_lib/libcki.sh
 . ../../cki_lib/libcki.sh || exit 1
+. ../../kernel-include/runtest.sh || exit 1
 
 BINDIR=./tests
 LOGDIR=./logs
@@ -242,7 +243,7 @@ function disableTests
     fi
 
     # Disable tests for CentOS stream 9 Kernel
-    if [[ $OSVERSION == "CENTOS_STREAM_9" ]]; then
+    if [[ $OSVERSION == "CENTOS_STREAM_9" || $OSVERSION == "UPSTREAM" ]]; then
         # Disabled x86_64 tests for Intel & AMD machines
         if [[ $hwpf == "x86_64" ]]; then
             if [[ $CPUTYPE == "AMD" ]]; then
@@ -258,7 +259,7 @@ function disableTests
     fi
 
     # Disable this test on Upstream testing (5.18.X)
-    if [[ $OSVERSION == "ARK" || $OSVERSION == "UPSTREAM" ]]; then
+    if [[ $OSVERSION == "ARK" ]]; then
         if [[ $hwpf == "x86_64" ]]; then
             disableTest "apic-split"
             disableTest "apic"
@@ -308,7 +309,7 @@ function setup
         OSVERSION="RHEL9"
     elif grep -q "CentOS Stream release 9" /etc/redhat-release; then
         OSVERSION="CENTOS_STREAM_9"
-    elif [ -n "$CKI_SELFTESTS_URL" ]; then
+    elif [ -n "$CKI_SELFTESTS_URL" ] || ! K_IsKernelRPM; then
         OSVERSION="UPSTREAM"
     else
         OSVERSION="ARK"

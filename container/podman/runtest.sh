@@ -46,7 +46,7 @@ function _disable_test()
 
 function _restore_tests()
 {
-    backed_files=$(find ${TEST_DIR} -iname *.bak)
+    backed_files=$(find ${TEST_DIR} -iname '*.bak')
     for test_file in ${backed_files}; do
         orig_name=$(echo ${test_file} | sed 's/.bak//')
         echo "INFO: restoring ${orig_name}"
@@ -73,6 +73,7 @@ function run_cmd_user()
     if  [[ "$PODMANUSER" != "root" ]]; then
         su - "$PODMANUSER" -c "$@"
     else
+        # shellcheck disable=SC2294
         eval "$@"
     fi
 }
@@ -210,6 +211,11 @@ if [ ! -d ${LOG_DIR} ]; then
     mkdir ${LOG_DIR}
 fi
 rm -f "${LOG_DIR}/*.log"
+
+# Increase the test timeout in ppc64le as the build tests need longer time to finish
+if [ "$ARCH" == "ppc64le" ]; then
+        export PODMAN_TIMEOUT=420
+fi
 
 run_tests
 TEST_FAILED=$?

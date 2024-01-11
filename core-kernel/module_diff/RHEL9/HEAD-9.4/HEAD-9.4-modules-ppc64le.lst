@@ -53,6 +53,7 @@ alx.ko
 amc6821.ko
 amdgpu.ko
 amd.ko
+amdxcp.ko
 ansi_cprng.ko
 apds9802als.ko
 apds990x.ko
@@ -256,10 +257,12 @@ dp83867.ko
 dp83tc811.ko
 drm_buddy.ko
 drm_display_helper.ko
+drm_exec.ko
 drm_kms_helper.ko
 drm.ko
 drm_panel_orientation_quirks.ko
 drm_shmem_helper.ko
+drm_suballoc_helper.ko
 drm_ttm_helper.ko
 drm_vram_helper.ko
 ds1621.ko
@@ -303,6 +306,7 @@ empeg.ko
 ems_usb.ko
 enclosure.ko
 enic.ko
+erofs.ko
 esp4.ko
 esp4_offload.ko
 esp6.ko
@@ -524,6 +528,7 @@ ice.ko
 icom.ko
 icplus.ko
 idmouse.ko
+idpf.ko
 ieee802154_6lowpan.ko
 ieee802154.ko
 ieee802154_socket.ko
@@ -536,6 +541,7 @@ ina2xx.ko
 int51x1.ko
 intel-xway.ko
 io_edgeport.ko
+iommufd.ko
 ionic.ko
 iosm.ko
 io_ti.ko
@@ -998,6 +1004,7 @@ nvmet-rdma.ko
 nvmet-tcp.ko
 nvram.ko
 objagg.ko
+octeon_ep.ko
 ocxl.ko
 ofpart.ko
 of_pmem.ko
@@ -1089,6 +1096,8 @@ rdma_ucm.ko
 realtek.ko
 reed_solomon.ko
 regmap-i2c.ko
+regmap-ram.ko
+regmap-raw-ram.ko
 rfcomm.ko
 rfkill.ko
 ring_buffer_benchmark.ko
@@ -1280,9 +1289,11 @@ snd-seq.ko
 snd-seq-midi-emul.ko
 snd-seq-midi-event.ko
 snd-seq-midi.ko
+snd-seq-ump-client.ko
 snd-seq-virmidi.ko
 snd-timer.ko
 snd-ua101.ko
+snd-ump.ko
 snd-usb-6fire.ko
 snd-usb-audio.ko
 snd-usb-caiaq.ko
