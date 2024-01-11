@@ -55,15 +55,15 @@ for DISK in $DISKS; do
 	tok "nvme get-log --log-id=2 --log-len=512 ${NVME_DISK}"
 
 	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 1.6TB"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
-		tok "nvme telemetry-log ${NVME_CHAR} -o telemetry_log.bin"
+		tok "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
 	elif [[ $MODEL =~ "Micron_9300_MTFDHAL3T8TDP"|"Dell Express Flash PM1725a 1.6TB AIC"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600 2.0TB AIC" ]]; then
 		if rlIsRHEL 9; then
-			tok "nvme telemetry-log ${NVME_CHAR} -o telemetry_log.bin"
+			tok "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
 		elif rlIsRHEL 8; then
-			tnot "nvme telemetry-log ${NVME_CHAR} -o telemetry_log.bin"
+			tnot "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
 		fi
 	else
-		tnot "nvme telemetry-log ${NVME_CHAR} -o telemetry_log.bin"
+		tnot "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
 	fi
 
 	tok "nvme fw-log ${NVME_DISK}"
