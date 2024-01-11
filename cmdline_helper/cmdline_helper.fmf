@@ -4,7 +4,9 @@ component:
   - kernel
 test: bash ./runtest.sh
 framework: beakerlib
-recommend: grubby
+recommend: 
+    - grubby
+    - abootimg
 duration: 30m
 extra-summary: /kernel/cmdline
 extra-task: /kernel/cmdline

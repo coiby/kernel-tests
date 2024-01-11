@@ -9,5 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=30m
-softDependencies=grubby
-repoRequires=kernel-include
+softDependencies=grubby;abootimg
