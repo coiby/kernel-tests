@@ -139,10 +139,12 @@ rlJournalStart
 	for TEST in /tmp/kunit_results/*
 	do
 		test_name="$(basename "$TEST")"
+		# rlFileSubmit doesn't seem to like files with whitespace
+		test_name=${test_name// /_}
 		rlPhaseStartTest "process ${test_name}"
 			if [ -d "${TEST}" ]
 			then
-				cp "${TEST}/results" "${TEST}/${test_name}.log"
+				cp "${TEST}/results" "${test_name}.log"
 				process_results "${TEST}/results"
 				result=$?
 				if [ $result -eq 0 ]
@@ -151,7 +153,8 @@ rlJournalStart
 				else
 					rlFail "process $test_name"
 				fi
-				rlFileSubmit "${TEST}/${test_name}.log" "${test_name}.log"
+				rlFileSubmit "${test_name}.log"
+				rm -f "${test_name}.log"
 			else
 				# no result generated, assume it skipped
 				rlLog "no result found, assuming it skipped"
