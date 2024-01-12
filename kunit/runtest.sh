@@ -56,7 +56,7 @@ process_results(){
 
 # variables used by beakerlib
 TEST="KUNIT"
-PACKAGE="kernel"
+export PACKAGE="kernel"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Global parameters
@@ -115,10 +115,10 @@ rlJournalStart
 
 #-------------------- Run Tests -----------------
 	dmesg --clear
-	for TEST in ${test_arr[*]}
+	for TEST in "${test_arr[@]}"
 	do
 		rlPhaseStartTest "running ${TEST}"
-			if [[ ${SKIP_TESTS} =~ "${TEST}" ]]; then
+			if [[ ${SKIP_TESTS} =~ ${TEST} ]]; then
 				rlLog "Skipping $TEST"
 				continue
 			fi
@@ -167,7 +167,7 @@ rlJournalStart
 		# Restore panic on oops value
 		rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
 		#remove installed modules and kunit framework
-		for TEST in ${test_arr[*]}
+		for TEST in "${test_arr[@]}"
 		do
 			rmmod "$TEST" 2>/dev/null
 		done
