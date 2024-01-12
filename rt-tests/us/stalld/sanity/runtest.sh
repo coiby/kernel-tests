@@ -123,7 +123,7 @@ test_run()
         # thread.  Killing the main thread alone does not guarantee that the
         # load thread will also be killed, whereas killing the load thread will
         # kill both threads effectively
-        stress_ng_load_pids="$(pgrep -P $stress_ng_pid)"
+        stress_ng_load_pids="$(pgrep -d ' ' -P $stress_ng_pid)"
         if [[ -z $stress_ng_load_pids ]]; then
             log_warn "didn't found any stress-ng load threads!"
             run -l "pgrep -a stress-ng"
