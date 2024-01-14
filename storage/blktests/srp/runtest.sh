@@ -27,9 +27,9 @@ function main
 	pre_setup
 	disable_multipath
 
-	USE_SW_RDMA=${USE_SW_RDMA:-"RXE SIW"}
-	test_ws="${CDIR}"/blktests
 	ret=0
+	test_ws="${CDIR}"/blktests
+	USE_SW_RDMA=${USE_SW_RDMA:-"RXE SIW"}
 	for use_sw_rdma in $USE_SW_RDMA; do
 		if [[ "$use_sw_rdma" == "RXE" ]]; then
 			USE_RDMA="use_rxe=1"
@@ -40,6 +40,9 @@ function main
 		fi
 		testcases_default="$(get_test_cases_list $case_type)"
 		testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
+		if [ -z "$testcases" ]; then
+			cki_abort_task "Abort test because $case_type case list is empty"
+		fi
 		for testcase in $testcases; do
 			eval $USE_RDMA do_test "$test_ws" "$testcase"
 			result=$(get_test_result "$test_ws" "$testcase")

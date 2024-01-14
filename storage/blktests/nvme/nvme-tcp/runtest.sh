@@ -12,8 +12,8 @@ function main
 {
 	enable_nvme_core_multipath
 
-	test_ws="${CDIR}"/blktests
 	ret=0
+	test_ws="${CDIR}"/blktests
 	trtype=$TRTYPE
 	testcases_default="$(get_test_cases_list $CASE_TYPE)"
 	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}

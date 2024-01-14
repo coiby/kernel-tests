@@ -9,10 +9,13 @@ CASE_TYPE=BLK
 
 function main
 {
+	ret=0
+	test_ws="${CDIR}"/blktests
 	testcases_default="$(get_test_cases_list $CASE_TYPE)"
 	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
-	test_ws="${CDIR}"/blktests
-	ret=0
+	if [ -z "$testcases" ]; then
+		cki_abort_task "Abort test because $case_type case list is empty"
+	fi
 	for testcase in $testcases; do
 		do_test "$test_ws" "$testcase"
 		result=$(get_test_result "$test_ws" "$testcase")
