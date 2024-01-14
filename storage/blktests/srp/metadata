@@ -9,4 +9,4 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=blktrace;fio;gcc;gcc-c++;git;nvme-cli;device-mapper-multipath;sg3_utils;xfsprogs
-repoRequires=cki_lib;storage/blktests/include
+repoRequires=cki_lib;storage/blktests/include;storage/blktests/config
