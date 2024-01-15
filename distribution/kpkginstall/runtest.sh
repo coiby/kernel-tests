@@ -125,20 +125,51 @@ function get_kpkg_ver()
 
     # Grab the kernel version from the provided repo directly
     # Some kernels, like kernel-redhat can have the rpm package version different from uname version
+    for i in $(seq 1 30); do
+      repofiles_output=$(${YUM} -q --disablerepo="*" --enablerepo="${REPO_NAME}" list "${ALL}" "${KPKG_VAR_PACKAGE_NAME}" --showduplicates)
+      if [[ -n $repofiles_output ]]; then
+        break
+      fi
+      cki_print_info "get_kpkg_ver: Failed to get repo files list. Attempt $i/30..."
+      sleep 60
+    done
+    if [[ -z $repofiles_output ]]; then
+      cki_abort_recipe "get_kpkg_ver: Failed to get repo files list." WARN
+    fi
     KVER_RPM=$(
-      ${YUM} -q --disablerepo="*" --enablerepo="${REPO_NAME}" list "${ALL}" "${KPKG_VAR_PACKAGE_NAME}" --showduplicates \
+      echo "${repofiles_output}" \
         | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" \
         | grep -m 1 "$ARCH.*${REPO_NAME}" \
         | awk -v arch="$ARCH" '{print $2"."arch}'
     )
     echo -n "${KVER_RPM}" > /var/tmp/kpkginstall/KPKG_KVER_RPM
     if [[ "${YUM}" =~ "yum" ]]; then
-      repoquery_output=$(repoquery -q --disablerepo="*" --enablerepo="${REPO_NAME}" --provides --requires "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}")
+      for i in $(seq 1 30); do
+        repoquery_output=$(repoquery -q --disablerepo="*" --enablerepo="${REPO_NAME}" --provides --requires "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}")
+        if [[ -n $repoquery_output ]]; then
+          break
+        fi
+        cki_print_info "get_kpkg_ver: Failed to query repo to get provides and requires. Attempt $i/30..."
+        sleep 60
+      done
+      if [[ -z $repoquery_output ]]; then
+        cki_abort_recipe "get_kpkg_ver: Failed to query repo to get provides and requires." WARN
+      fi
     else
-      repoquery_output=$(
-        dnf -q --disablerepo="*" --enablerepo="${REPO_NAME}" repoquery --requires "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}";
-        dnf -q --disablerepo="*" --enablerepo="${REPO_NAME}" repoquery --provides "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}"
-      )
+      for i in $(seq 1 30); do
+        repoquery_output=$(
+          dnf -q --disablerepo="*" --enablerepo="${REPO_NAME}" repoquery --requires "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}";
+          dnf -q --disablerepo="*" --enablerepo="${REPO_NAME}" repoquery --provides "${KPKG_VAR_PACKAGE_NAME}"-"${KVER_RPM}"
+        )
+        if [[ -n $repoquery_output ]]; then
+          break
+        fi
+        cki_print_info "get_kpkg_ver: Failed to query repo to get provides and requires. Attempt $i/30..."
+        sleep 60
+      done
+      if [[ -z $repoquery_output ]]; then
+        cki_abort_recipe "get_kpkg_ver: Failed to query repo to get provides and requires." WARN
+      fi
     fi
     KVER=$(sed -n '/uname-r/{s/.*= //p;q}' <<< "${repoquery_output}")
     # rpm doesn't allow '-' character in the version-release
