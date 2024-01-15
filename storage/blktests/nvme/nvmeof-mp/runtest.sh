@@ -29,12 +29,12 @@ function main
 	ret=0
 	test_ws="${CDIR}"/blktests
 	USE_SW_RDMA=${USE_SW_RDMA:-"RXE SIW"}
-	testcases_default="$(get_test_cases_list $CASE_TYPE)"
-	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
-	if [ -z "$testcases" ]; then
-		cki_abort_task "Abort test because $case_type case list is empty"
-	fi
 	for use_sw_rdma in $USE_SW_RDMA; do
+		testcases_default="$(get_test_cases_list ${CASE_TYPE}_${use_sw_rdma})"
+		testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
+		if [ -z "$testcases" ]; then
+			cki_abort_task "Abort test because $CASE_TYPE_${use_sw_rdma} case list is empty"
+		fi
 		for testcase in $testcases; do
 			disable_multipath
 			if [[ "$use_sw_rdma" = "RXE" ]]; then
