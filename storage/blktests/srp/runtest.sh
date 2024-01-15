@@ -41,7 +41,7 @@ function main
 		testcases_default="$(get_test_cases_list $case_type)"
 		testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 		if [ -z "$testcases" ]; then
-			cki_abort_task "Abort test because $case_type case list is empty"
+			cki_beakerlib_skip_task "Skip test because $case_type case list is empty"
 		fi
 		for testcase in $testcases; do
 			eval $USE_RDMA do_test "$test_ws" "$testcase"
