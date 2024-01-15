@@ -18,7 +18,7 @@ function main
 	testcases_default="$(get_test_cases_list $CASE_TYPE)"
 	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 	if [ -z "$testcases" ]; then
-		cki_abort_task "Abort test because $case_type case list is empty"
+		cki_abort_task "Abort test because $CASE_TYPE case list is empty"
 	fi
 	for testcase in $testcases; do
 		nvme_trtype="$trtype" do_test "$test_ws" "$testcase"
