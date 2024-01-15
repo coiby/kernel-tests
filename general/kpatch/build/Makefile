@@ -72,7 +72,7 @@ $(METADATA): Makefile
 	@echo "Releases:        -RHEL5 -RHEL6" >> $(METADATA)
 	@echo "Type:         	Regression"        >> $(METADATA)
 	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel git make openssl-devel flex" >> $(METADATA)
+	@echo "Requires:        kernel git make openssl-devel flex rpm-build" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         RedHat Internal" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
