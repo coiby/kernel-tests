@@ -19,8 +19,8 @@ component:
 test: ./runtest.sh
 framework: shell
 require:
-  - beakerlib
   - grubby
+  - abootimg
 extra-summary: /kernel/iommu/boot
 extra-task: /kernel/iommu/boot
 id: 2d6ea5ac-b1b8-4f9e-83b6-075d4548177b
