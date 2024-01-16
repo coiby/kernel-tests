@@ -1,4 +1,24 @@
 #!/bin/bash
+# shellcheck disable=SC1083,SC2050,SC2207,SC2034,SC2128
+# In lib_chelsio.sh line 172:
+#						{export NIC_TEST=\$\(ip link show \| grep $mac -B1 \| head -n1 \| awk \'\{print \$2\}\' \| sed \'s/://\'\)}
+#                                                ^-- SC1083: This { is literal. Check expression (missing ;/\n?) or quote it.
+#                                                        ^-------------^ SC2191: The = here is literal. To assign by index, use ( [index]=value ) with no spaces. To keep as literal, quote it.
+#                                                                                          ^--^ SC2206: Quote to prevent word splitting, or split robustly with mapfile or read -a.
+#                                                                                                                                                          ^-- SC1083: This } is literal. Check expression (missing ;/\n?) or quote it.
+
+
+#In lib_chelsio.sh line 173:
+#						{echo 0 \> /proc/sys/net/ipv6/conf/\$\{NIC_TEST\}/accept_dad}
+#                                                ^-- SC1083: This { is literal. Check expression (missing ;/\n?) or quote it.
+#                                                                                                            ^-- SC1083: This } is literal. Check expression (missing ;/\n?) or quote it.
+
+
+#In lib_chelsio.sh line 174:
+#						{echo 0 \> /proc/sys/net/ipv6/conf/\$\{NIC_TEST\}/dad_transmits}
+#                                                ^-- SC1083: This { is literal. Check expression (missing ;/\n?) or quote it.
+#                                                                                                               ^-- SC1083: This } is literal. Check expression (missing ;/\n?) or quote it.
+
 chelsio_create_vfs()
 {
 	local PF=$1
