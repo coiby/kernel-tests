@@ -17,7 +17,7 @@ function pre_setup
 }
 
 if [[ "$USE_SW_RDMA" =~ RXE ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release ; then
-	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
+	echo "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
 fi
@@ -41,8 +41,8 @@ function main
 		testcases_default="$(get_test_cases_list $case_type)"
 		testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 		if [ -z "$testcases" ]; then
-			rlLog "Skip test because $case_type case list is empty"
-			rstrnt-report-result "$TNAME" SKIP
+			echo "Skip test because $case_type case list is empty"
+			rstrnt-report-result "$case_type" SKIP
 		fi
 		for testcase in $testcases; do
 			eval $USE_RDMA do_test "$test_ws" "$testcase"

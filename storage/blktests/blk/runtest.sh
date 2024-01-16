@@ -14,7 +14,7 @@ function main
 	testcases_default="$(get_test_cases_list $CASE_TYPE)"
 	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 	if [ -z "$testcases" ]; then
-		rlLog "Skip test because $CASE_TYPE case list is empty"
+		echo"Skip test because $CASE_TYPE case list is empty"
 		rstrnt-report-result "$TNAME" SKIP
 	fi
 	for testcase in $testcases; do
