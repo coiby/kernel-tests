@@ -33,7 +33,8 @@ function main
 		testcases_default="$(get_test_cases_list ${CASE_TYPE}_${use_sw_rdma})"
 		testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 		if [ -z "$testcases" ]; then
-			cki_abort_task "Abort test because $CASE_TYPE_${use_sw_rdma} case list is empty"
+			rlLog "Skip test because ${CASE_TYPE}_${use_sw_rdma} list is empty"
+			rstrnt-report-result "$TNAME" SKIP
 		fi
 		for testcase in $testcases; do
 			disable_multipath
