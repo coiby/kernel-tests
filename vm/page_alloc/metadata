@@ -10,5 +10,5 @@ destructive=no
 entry_point=bash ./runtest.sh
 max_time=50m
 dependencies=kexec-tools;iptables
-softDependencies=gnuplot
+softDependencies=gnuplot;abootimg
 repoRequires=/kdump/setup-bare-metal;cki_lib
