@@ -10,3 +10,4 @@ destructive=no
 entry_point=./runtest.sh
 max_time=12m
 dependencies=grubby
+repoRequires=kernel-include
