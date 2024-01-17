@@ -12,7 +12,7 @@ fi
 # DeBug - Set to non-zero value to enable debugging
 # FwtsTarBall - name of tarball to use
 # FwtsTarBallUrl - url of the tarball, defaults to $LOOKASIDE/$FwtsTarBall
-# FwtsGitRemote - git repository
+# FwtsGitRemote - git repository, defaults to "http://github.com/fwts/fwts.git"
 # FwtsGitBranch - git branch that will be used
 
 
@@ -21,11 +21,12 @@ FwtsIncludeDir=$(readlink -f "../include/")
 
 LOOKASIDE=${LOOKASIDE:-http://download.devel.redhat.com/qa/rhts/lookaside/}
 FWTS_ON_FAIL_REPORT=${FWTS_ON_FAIL_REPORT:-FAIL}
-FWTS_VERSION=${FWTS_VERSION:-V21.06.00}
+FWTS_VERSION=${FWTS_VERSION:-V23.09.00}
 
 
 if [ -n "$FwtsGitRemote" -o -n "$FwtsGitBranch" ]; then
-    : ${FwtsGitRemote:=git://kernel.ubuntu.com/hwe/fwts.git}
+    : ${FwtsGitRemote:=https://github.com/fwts/fwts.git}
+    : ${FwtsGitBranch:=$FWTS_VERSION}
 else
     : ${FwtsTarBall:=fwts-$FWTS_VERSION.tar.gz}
     : ${FwtsTarBallUrl:=$LOOKASIDE/$FwtsTarBall}
@@ -193,7 +194,7 @@ EOF
         else
             # Get sources from tarball
             local wget_opts="-Nnv"
-            rlRun "wget -Nnv -O $FwtsTarBall $FwtsTarBallUrl" 0 "download fwts tarball"
+            rlRun "wget $wget_opts -O $FwtsTarBall $FwtsTarBallUrl" 0 "download fwts tarball"
             rlRun "mkdir fwts" 0 "create fwts directory for build" # latest tarballs don't have a top fwts dir
             rlRun "tar -xf $FwtsTarBall -C fwts" 0 "untar tarball"
             rlRun "cd fwts" 0 "cd into fwts source directory"
