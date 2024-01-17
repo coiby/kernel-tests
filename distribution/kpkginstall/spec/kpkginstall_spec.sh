@@ -780,8 +780,8 @@ Describe 'kpkginstall: main - check installed kernel'
             The stdout should not include "rpm_extra_package_install"
         fi
         The stdout should include "sysctl kernel.panic_on_oops"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
+        The stdout should not include "dmesg-check"
         The status should be success
     End
 
@@ -794,6 +794,11 @@ Describe 'kpkginstall: main - check installed kernel'
         KVER_RPM=$6
         KVER=$7
         KVER_UNAME=$7
+        # force which journalctl to report false
+        Mock which
+            echo "which $*"
+            exit 1
+        End
         export MOCKED_DMESG="Call Trace:"
         prepare
         When call main
@@ -820,6 +825,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check FAIL 7"
+        The stdout should not include "dmesg-check"
         The status should be success
     End
 End
@@ -876,8 +882,8 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling kernels"
         The stdout should include "sysctl kernel.panic_on_oops"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
+        The stdout should not include "dmesg-check"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End
