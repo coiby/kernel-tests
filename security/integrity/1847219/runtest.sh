@@ -22,7 +22,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. ../../../cmdline_helper/runtest.sh || exit 1
+. ../../../cmdline_helper/libcmd.sh || exit 1
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
