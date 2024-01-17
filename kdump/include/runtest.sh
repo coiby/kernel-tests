@@ -18,7 +18,7 @@
 set +o posix
 
 . ../../automotive/include/rhivos.sh
-
+. ../../cmdline_helper/libcmd.sh
 . ../include/lib.sh
 . ../include/kdump.sh
 . ../include/kdump-multi.sh
