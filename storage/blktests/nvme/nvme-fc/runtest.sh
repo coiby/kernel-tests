@@ -6,62 +6,21 @@ TRTYPE=${TRTYPE:-"fc"}
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../include/include.sh || exit 1
-
-function get_test_cases_fc
-{
-	typeset testcases=""
-
-	if rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
-		testcases+=" nvme/003"
-		testcases+=" nvme/004"
-		testcases+=" nvme/005"
-		testcases+=" nvme/006"
-		testcases+=" nvme/007"
-		testcases+=" nvme/008"
-		testcases+=" nvme/009"
-		testcases+=" nvme/010"
-		testcases+=" nvme/011"
-		testcases+=" nvme/012"
-		testcases+=" nvme/013"
-		testcases+=" nvme/014"
-		testcases+=" nvme/015"
-		testcases+=" nvme/018"
-		testcases+=" nvme/019"
-		testcases+=" nvme/020"
-		testcases+=" nvme/021"
-		testcases+=" nvme/022"
-		testcases+=" nvme/023"
-		testcases+=" nvme/024"
-		testcases+=" nvme/025"
-		testcases+=" nvme/026"
-		testcases+=" nvme/027"
-		testcases+=" nvme/028"
-		testcases+=" nvme/029"
-		testcases+=" nvme/030"
-		testcases+=" nvme/031"
-		testcases+=" nvme/038"
-		testcases+=" nvme/040"
-		testcases+=" nvme/041"
-		testcases+=" nvme/042"
-		testcases+=" nvme/043"
-		testcases+=" nvme/044"
-		testcases+=" nvme/045"
-		testcases+=" nvme/048"
-	fi
-
-	echo "$testcases"
-}
+CASE_TYPE=NVME_FC
 
 function main
 {
 	enable_nvme_core_multipath
 
-	test_ws="${CDIR}"/blktests
 	ret=0
+	test_ws="${CDIR}"/blktests
 	trtype=$TRTYPE
-	testcases_default=""
-	testcases_default+=" $(get_test_cases_"$trtype")"
+	testcases_default="$(get_test_cases_list $CASE_TYPE)"
 	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
+	if [ -z "$testcases" ]; then
+		echo "Skip test because $CASE_TYPE case list is empty"
+		rstrnt-report-result "$TNAME" SKIP
+	fi
 	for testcase in $testcases; do
 		nvme_trtype="$trtype" do_test "$test_ws" "$testcase"
 		result=$(get_test_result "$test_ws" "$testcase")
@@ -72,14 +31,11 @@ function main
 	if (( ret != 0 )); then
 		echo ">> There are failing tests, pls check it"
 	fi
-
-	return
 }
 
 # don't run it if running as part of shellspec
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
-	. "$CDIR"/../include/build.sh
-
+	. "$CDIR"/../../include/build.sh
 	main
 fi

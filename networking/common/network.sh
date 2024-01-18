@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2120,SC2060,SC2062,SC2188,SC2034
+# shellcheck disable=SC2120,SC2060,SC2062,SC2188,SC2034,SC1083
 # vim: sts=8 sw=8 noexpandtab:
 # This is for network operations
 

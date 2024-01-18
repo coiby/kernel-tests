@@ -1,4 +1,5 @@
 #! /bin/bash
+# shellcheck disable=SC1083,SC2128
 source /etc/profile
 source /root/.bash_profile
 

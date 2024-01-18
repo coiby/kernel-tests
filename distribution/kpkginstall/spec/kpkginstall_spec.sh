@@ -347,6 +347,113 @@ Describe 'kpkginstall: get_kpkg_ver rpms'
     End
 End
 
+Describe 'kpkginstall: get_kpkg_ver rpms - retry dnf'
+    cleanup(){
+        rm -rf /var/tmp/kpkginstall
+    }
+    BeforeEach 'cleanup'
+    AfterEach 'cleanup'
+    Parameters
+        # PACKAGE_NAME       ARCH     KVER_RPM                        DNF_UNAME_R                                        UNAME_R
+        kernel-rt-debug      x86_64   5.14.0-319.2616_881769087.el9   5.14.0-319.2616_881769087.el9.x86_64+rt_debug      5.14.0-319.2616_881769087.el9.x86_64+rt-debug
+    End
+    It "can set kernel version $1-$3.$2"
+        export KPKG_URL="$KERNEL_RPM_URL"
+        export YUM="dnf"
+        export ARCH="$2"
+        export _PACKAGE_NAME="$1"
+        export _RPM_VER="$3"
+        export _DNF_UNAME="$4"
+        export _UNAME="$5"
+        mkdir -p /var/tmp/kpkginstall/vars
+        # Retry with 2 attempts
+        export dnf_list_output=("" "$_PACKAGE_NAME.$ARCH      $_RPM_VER        kernel-cki")
+        export dnf_repoquery_output=("" "" "kernel-redhat-core-uname-r = $_DNF_UNAME")
+        echo 0 > /var/tmp/kpkginstall/dnf_list_called
+        echo 0 > /var/tmp/kpkginstall/dnf_repoquery_called
+        dnf(){
+            if [[ "$*" =~ " list " ]]; then
+                attempt=$(cat /var/tmp/kpkginstall/dnf_list_called)
+                echo "${dnf_list_output[${attempt}]}"
+                echo $((attempt+1)) > /var/tmp/kpkginstall/dnf_list_called
+            elif [[ "$*" =~ " repoquery " ]]; then
+                attempt=$(cat /var/tmp/kpkginstall/dnf_repoquery_called)
+                echo "${dnf_repoquery_output[${attempt}]}"
+                echo $((attempt+1)) > /var/tmp/kpkginstall/dnf_repoquery_called
+            else
+                echo "dnf $*"
+            fi
+        }
+        sleep() {
+            echo "sleep $*"
+        }
+        When call get_kpkg_ver
+        The contents of file /var/tmp/kpkginstall/KPKG_KVER should equal "$_UNAME"
+        The contents of file /var/tmp/kpkginstall/KPKG_KVER_RPM should equal "$_RPM_VER.$ARCH"
+        The first line should equal "ℹ️ Repo Name set REPO_NAME=kernel-cki"
+        The line 2 should equal "ℹ️ get_kpkg_ver: Failed to get repo files list. Attempt 1/30..."
+        The line 3 should include "sleep"
+        The line 4 should equal "ℹ️ get_kpkg_ver: Failed to query repo to get provides and requires. Attempt 1/30..."
+        The line 5 should include "sleep"
+    End
+
+    It "can not list files from rpm repo"
+        export KPKG_URL="$KERNEL_RPM_URL"
+        export YUM="dnf"
+        export ARCH="$2"
+        export _PACKAGE_NAME="$1"
+        export _RPM_VER="$3"
+        export _DNF_UNAME="$4"
+        export _UNAME="$5"
+        mkdir -p /var/tmp/kpkginstall/vars
+        dnf(){
+            if [[ "$*" =~ " list " ]]; then
+                echo ""
+            elif [[ "$*" =~ " repoquery " ]]; then
+                echo "kernel-redhat-core-uname-r = $_DNF_UNAME"
+            else
+                echo "dnf $*"
+            fi
+        }
+        sleep() {
+            echo "sleep $*"
+        }
+        Mock cki_abort_recipe
+            echo "cki_abort_recipe $*"
+        End
+        When call get_kpkg_ver
+        The line 62 should equal "cki_abort_recipe get_kpkg_ver: Failed to get repo files list. WARN"
+    End
+
+    It "can not repoquery rpm repo"
+        export KPKG_URL="$KERNEL_RPM_URL"
+        export YUM="dnf"
+        export ARCH="$2"
+        export _PACKAGE_NAME="$1"
+        export _RPM_VER="$3"
+        export _DNF_UNAME="$4"
+        export _UNAME="$5"
+        mkdir -p /var/tmp/kpkginstall/vars
+        dnf(){
+            if [[ "$*" =~ " list " ]]; then
+                echo "echo "$_PACKAGE_NAME.$ARCH      $_RPM_VER        kernel-cki""
+            elif [[ "$*" =~ " repoquery " ]]; then
+                echo ""
+            else
+                echo "dnf $*"
+            fi
+        }
+        sleep() {
+            echo "sleep $*"
+        }
+        Mock cki_abort_recipe
+            echo "cki_abort_recipe $*"
+        End
+        When call get_kpkg_ver
+        The line 62 should equal "cki_abort_recipe get_kpkg_ver: Failed to query repo to get provides and requires. WARN"
+    End
+End
+
 Describe 'kpkginstall: get_kpkg_ver tarball'
     cleanup(){
         rm -rf /var/tmp/kpkginstall
@@ -673,8 +780,8 @@ Describe 'kpkginstall: main - check installed kernel'
             The stdout should not include "rpm_extra_package_install"
         fi
         The stdout should include "sysctl kernel.panic_on_oops"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
+        The stdout should not include "dmesg-check"
         The status should be success
     End
 
@@ -687,6 +794,11 @@ Describe 'kpkginstall: main - check installed kernel'
         KVER_RPM=$6
         KVER=$7
         KVER_UNAME=$7
+        # force which journalctl to report false
+        Mock which
+            echo "which $*"
+            exit 1
+        End
         export MOCKED_DMESG="Call Trace:"
         prepare
         When call main
@@ -713,6 +825,7 @@ Describe 'kpkginstall: main - check installed kernel'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "sysctl kernel.panic_on_oops"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check FAIL 7"
+        The stdout should not include "dmesg-check"
         The status should be success
     End
 End
@@ -769,8 +882,8 @@ Describe 'kpkginstall: main - check installed kernel with cross compiling'
         The stdout should include "✅ Found the correct kernel release running!"
         The stdout should include "ℹ️ Workaround for cross compiling kernels"
         The stdout should include "sysctl kernel.panic_on_oops"
-        The stdout should include "rstrnt-report-result distribution/kpkginstall/dmesg-check PASS 0"
         The stdout should include "rstrnt-report-result -o /tmp/journalctl.log distribution/kpkginstall/journalctl-check PASS 0"
+        The stdout should not include "dmesg-check"
         The status should be success
         rm -rf /usr/src/kernels/"$KVER"/scripts/basic/
     End

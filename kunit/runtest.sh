@@ -56,7 +56,7 @@ process_results(){
 
 # variables used by beakerlib
 TEST="KUNIT"
-PACKAGE="kernel"
+export PACKAGE="kernel"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Global parameters
@@ -115,10 +115,10 @@ rlJournalStart
 
 #-------------------- Run Tests -----------------
 	dmesg --clear
-	for TEST in ${test_arr[*]}
+	for TEST in "${test_arr[@]}"
 	do
 		rlPhaseStartTest "running ${TEST}"
-			if [[ ${SKIP_TESTS} =~ "${TEST}" ]]; then
+			if [[ ${SKIP_TESTS} =~ ${TEST} ]]; then
 				rlLog "Skipping $TEST"
 				continue
 			fi
@@ -139,10 +139,12 @@ rlJournalStart
 	for TEST in /tmp/kunit_results/*
 	do
 		test_name="$(basename "$TEST")"
+		# rlFileSubmit doesn't seem to like files with whitespace
+		test_name=${test_name// /_}
 		rlPhaseStartTest "process ${test_name}"
 			if [ -d "${TEST}" ]
 			then
-				cp "${TEST}/results" "${TEST}/${test_name}.log"
+				cp "${TEST}/results" "${test_name}.log"
 				process_results "${TEST}/results"
 				result=$?
 				if [ $result -eq 0 ]
@@ -151,7 +153,8 @@ rlJournalStart
 				else
 					rlFail "process $test_name"
 				fi
-				rlFileSubmit "${TEST}/${test_name}.log" "${test_name}.log"
+				rlFileSubmit "${test_name}.log"
+				rm -f "${test_name}.log"
 			else
 				# no result generated, assume it skipped
 				rlLog "no result found, assuming it skipped"
@@ -164,7 +167,7 @@ rlJournalStart
 		# Restore panic on oops value
 		rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
 		#remove installed modules and kunit framework
-		for TEST in ${test_arr[*]}
+		for TEST in "${test_arr[@]}"
 		do
 			rmmod "$TEST" 2>/dev/null
 		done

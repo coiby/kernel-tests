@@ -1,0 +1,11 @@
+[General]
+name=guest-poweroff
+owner=Eddie Kovsky <ekovsky@redhat.com>
+description=Verify x86_64 guest successfully powers off
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=5m

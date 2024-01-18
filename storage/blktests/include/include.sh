@@ -2,8 +2,10 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+FILEC=$(readlink -f "${BASH_SOURCE[0]}")
+CDIRC=$(dirname "$FILEC")
 
-source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/../../../cki_lib/libcki.sh || exit 1
+source "$CDIRC"/../../../cki_lib/libcki.sh || exit 1
 
 # restraint uses $OUTPUTFILE by default when reporting test result.
 # Let's save the test execution output to it.
@@ -96,4 +98,21 @@ function report_test_result
 		ret=2
 	fi
 	return $ret
+}
+
+function get_test_cases_list
+{
+	typeset case_type=$1
+	release=$(grep -o "release [0-9]*\.[0-9]*" /etc/redhat-release | awk '{print $2}')
+	case_conf="$CDIRC/../config/$release"
+	if rlIsFedora; then
+		case_conf="$CDIRC/../config/9.4"
+	fi
+	if [ ! -f "$case_conf" ]; then
+		return
+	fi
+	# shellcheck disable=SC1090
+	source "$case_conf"
+	case_list=$(eval echo '$'"$case_type")
+	echo "$case_list"
 }

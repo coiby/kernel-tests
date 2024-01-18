@@ -29,7 +29,7 @@ export ALLOW_SKIP=${ALLOW_SKIP:-"true"}
 
 # Output and based on which result will be reporting
 export OUTPUTFILE
-if [ -z "$OUTPUTFILE" ]; then
+if [ -z "${OUTPUTFILE}" ]; then
     OUTPUTFILE=$(mktemp ${K_TESTAREA}/tmp.XXXXXX)
 fi
 
@@ -38,14 +38,14 @@ fi
 # used by the local watchdog to upload the log
 # of the current task.
 if [ -h /mnt/testarea/current.log ]; then
-    ln -sf $OUTPUTFILE /mnt/testarea/current.log
+    ln -sf "${OUTPUTFILE}" /mnt/testarea/current.log
 else
-    ln -s $OUTPUTFILE /mnt/testarea/current.log
+    ln -s "${OUTPUTFILE}" /mnt/testarea/current.log
 fi
 
 function report_result {
     # Pass OUTPUTFILE to rstrnt-report-result in case the variable wasn't exported
-    OUTPUTFILE=$OUTPUTFILE rstrnt-report-result "$@"
+    OUTPUTFILE="${OUTPUTFILE}" rstrnt-report-result "$@"
 }
 
 
@@ -229,7 +229,7 @@ FindModule()
     local name=$1
 
     #see if module was compiled in
-    modname="$(modprobe -nv $name 2>/dev/null | grep $name.ko)"
+    modname="$(modprobe -nv "$name" 2>/dev/null | grep "$name".ko)"
     if test -n "$modname"; then
         echo "$modname" | sed 's/insmod //'
         return
@@ -327,7 +327,7 @@ InstallKernel()
         fi
     fi
     for i in ${pkgs}; do
-        rpm -q --quiet $i || tmp="${tmp} $i"
+        rpm -q --quiet "$i" || tmp="${tmp} $i"
     done
     [ -z "${tmp}" ] && return 0
 
@@ -408,7 +408,7 @@ InstallDebuginfo()
         fi
     fi
 
-    rpm -q ${comm} ${kern} || InstallKernel ${comm} ${kern} || {
+    rpm -q "${comm}" "${kern}" || InstallKernel "${comm}" "${kern}" || {
         Error "Failed to install kernel debuginfo packages"
         return 1
     }
@@ -427,8 +427,8 @@ InstallKpatchPatchDebuginfo()
     kpp_debuginfo_pkg=$(echo "$kpp_pkg" | sed 's/-/-debuginfo-/4')
 
     # Kpatch-patch repo is supposed to be ready during test
-    rpm -q ${kpp_debuginfo_pkg} || {
-        InstallPackages ${kpp_debuginfo_pkg} || Error "Failed to install ${kpp_debuginfo_pkg}"
+    rpm -q "${kpp_debuginfo_pkg}" || {
+        InstallPackages "${kpp_debuginfo_pkg}" || Error "Failed to install ${kpp_debuginfo_pkg}"
     }
 
 }
@@ -450,22 +450,28 @@ UpdateKernelOptions()
         return 1
     fi
 
-    if system_ostree; then
+    if [ -e /sys/devices/soc0/machine ]; then
+        action=add_aboot_param
+    elif system_ostree; then
         action="--append-if-missing"
     else
         action="--args"
     fi
     if grep -q ^- <<< "${options}"; then
-        if system_ostree; then
+        if [ -e /sys/devices/soc0/machine ]; then
+            action=remove_aboot_param
+        elif system_ostree; then
             action="--delete-if-present"
         else
             action="--remove-args"
         fi
-        options="$(sed "s/^-//" <<< ${options})"
+        options="$(sed "s/^-//" <<< "${options}")"
     fi
 
     {
-        if system_ostree; then
+        if [ -e /sys/devices/soc0/machine ]; then
+            LogRun "${action} ${options}"
+        elif system_ostree; then
             LogRun "rpm-ostree kargs ${action}=\"${options}\" --import-proc-cmdline"
         else
             LogRun "/sbin/grubby ${action}=\"${options}\" --update-kernel=\"${kernel}\"" &&
@@ -547,7 +553,7 @@ PrepareReboot()
         elif [[ -z "$EFI" && -f /root/EFI_BOOT_ENTRY.TXT ]] ; then
             os_boot_entry=$(</root/EFI_BOOT_ENTRY.TXT)
             Log "Updating efibootmgr next boot option to $os_boot_entry according to EFI_BOOT_ENTRY.TXT"
-            efibootmgr -n $os_boot_entry
+            efibootmgr -n "$os_boot_entry"
         else
             Log "Could not determine value for BootNext!"
         fi
@@ -595,12 +601,13 @@ RunSubTests(){
 
     local all_tests
     all_tests=$(find testcases/ -name "*.sh" -printf "%f\n")
+    # shellcheck disable=SC2086
     if [ "TEST${TESTARGS}" == "TEST" ] || [ ${TESTARGS,,} == "all" ]; then
         TESTARGS="all"
     else
-        TESTARGS="$(echo ${TESTARGS} | sed -r 's/[, ]+/|/g;s/\|+$//g;s/^\|+//g')"
+        TESTARGS="$(echo "${TESTARGS}" | sed -r 's/[, ]+/|/g;s/\|+$//g;s/^\|+//g')"
     fi
-    SKIP_TESTARGS="$(echo ${SKIP_TESTARGS} | sed -r 's/[, ]+/|/g;s/\|+$//g;s/^\|+//g')"
+    SKIP_TESTARGS="$(echo "${SKIP_TESTARGS}" | sed -r 's/[, ]+/|/g;s/\|+$//g;s/^\|+//g')"
 
     # Note, there is no handling of system reboot in this runtest.sh.
     for subcase in ${all_tests}; do
@@ -638,7 +645,7 @@ MultihostStage()
 {
     local stage=$1; shift
     RunBeakerTest "$@"
-    Report $stage
+    Report "$stage"
 }
 
 Multihost()
@@ -684,11 +691,11 @@ ByPassSelinux()
     local mod_file=${te_file%.*}.mod
     local pp_file=${te_file%.*}.pp
 
-    [[ ! -e $te_file ]] && { echo $te_file doesn\'t exist...;return 1; }
+    [[ ! -e $te_file ]] && { echo "$te_file" doesn\'t exist...;return 1; }
 
-    checkmodule -M -m -o $mod_file $te_file || { echo checkmodule failed;return 1;}
-    semodule_package -o $pp_file -m $mod_file || { echo semodule_package failed;return 1; }
-    semodule -i $pp_file || { echo semodule failed;return 1; }
+    checkmodule -M -m -o "$mod_file" "$te_file" || { echo checkmodule failed;return 1;}
+    semodule_package -o "$pp_file" -m "$mod_file" || { echo semodule_package failed;return 1; }
+    semodule -i "$pp_file" || { echo semodule failed;return 1; }
 
     return 0
 }
@@ -730,7 +737,9 @@ isSecureBootEnforced()
     setup_mode_file=$(find /sys/firmware/efi/efivars -name "SetupMode-*" 2>/dev/null)
 
     if [ -f "$secure_boot_file" ] && [ -f "$setup_mode_file" ]; then
+        # shellcheck disable=SC2086
         secure_boot_byte=$(hexdump -v -e '/1 "%d\ "' $secure_boot_file|cut -d' ' -f 5)
+        # shellcheck disable=SC2086
         setup_mode_byte=$(hexdump -v -e '/1 "%d\ "' $setup_mode_file|cut -d' ' -f 5)
 
         if [ "$secure_boot_byte" = "1" ] && [ "$setup_mode_byte" = "0" ]; then
@@ -888,7 +897,7 @@ CommandExists()
     local cmd=$1
     if [ -z "$cmd" ]; then
         return 1
-    elif which $cmd > /dev/null 2>&1; then
+    elif which "$cmd" > /dev/null 2>&1; then
         return 0
     else
         return 1
@@ -936,9 +945,9 @@ Log() {
 
 LogRun() {
     echo -e "$(GetLogPrefix RUN)# $1" | tee -a "${OUTPUTFILE}"
-    eval ${1} | tee -a "${OUTPUTFILE}"
+    eval "${1}" | tee -a "${OUTPUTFILE}"
     local ret=${PIPESTATUS[0]}
-    return ${ret}
+    return "${ret}"
 }
 
 Skip() {
@@ -1065,13 +1074,14 @@ RhtsSubmit() {
 # @param1: rhel_version # the specific rhel version e.g. RHEL-8.6
 #                         Note with param1 function will return error if it cannot find request rhel version from json file
 #                         rather than decrease the y-stream number
+# shellcheck disable=SC2120
 GetCrashkernelDefault() {
 
     rpm -q --quiet jq || InstallPackages jq
 
     # Load current rhel version from /etc/os-release file
     source /etc/os-release
-    local version_array=("${VERSION_ID//./ }")
+    local version_array=(${VERSION_ID//./ })
 
     local crashkernel_default="../include/crashkernel-default.json"
     local cmd_line=""
@@ -1082,11 +1092,14 @@ GetCrashkernelDefault() {
         rhel_version=${1:-"RHEL-${version_array[0]}.${version_array[1]}"}
         if [ "${K_ARCH}" = "ppc64le" ]; then
             if grep -q -e "fadump=on" -e "fadump=nocma" < /proc/cmdline; then
+                # shellcheck disable=SC2086
                 cmd_line=$(jq -r '.['\"$rhel_version\"']['\"$K_ARCH\"']["fadump"]' $crashkernel_default)
             else
+                # shellcheck disable=SC2086
                 cmd_line=$(jq -r '.['\"$rhel_version\"']['\"$K_ARCH\"']["kdump"]' $crashkernel_default)
             fi
         else
+            # shellcheck disable=SC2086
             cmd_line=$(jq -r '.['\"$rhel_version\"']['\"$K_ARCH\"']' $crashkernel_default)
         fi
         status=$?
@@ -1110,6 +1123,16 @@ GetCrashkernelDefault() {
         Error "Cannot load RHEL-$VERSION_ID from crashkernel default json file, please check the parameter or json file"
         return 1
     }
-    echo $cmd_line
+    echo "$cmd_line"
 }
 
+ResetCrashkernel() {
+    _fadump_opts=$1
+    if [ -e /sys/devices/soc0/machine ]; then
+        LogRun "add_aboot_param crashkernel=$(GetCrashkernelDefault)" && \
+            _reboot_required=true
+    else
+        LogRun "kdumpctl reset-crashkernel ${_fadump_opts} 2>&1 | grep -i reboot" && \
+            _reboot_required=true
+    fi
+}

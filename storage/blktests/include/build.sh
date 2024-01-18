@@ -1,7 +1,6 @@
 #!/bin/bash
 
 LOOKASIDE=https://github.com/yizhanglinux/blktests.git
-
 if rlIsRHEL 7; then
 	BR=rhel7
 elif rlIsRHEL 8; then
@@ -25,9 +24,7 @@ fi
 
 # modprobe siw on ppc64le with distro less than RHEL8.4 will lead panic, BZ1919502
 # siw srp testing with distro less than RHEL8.4 on x86_64 has issues
-ver="4.18.0-305"
-KVER=$(uname -r)
-if [[ "$ver" == "$(echo -e "$ver\n$KVER" | sort -V | tail -1)" ]]; then
+if rlIsRHEL '<8.4' || rlIsRHEL 7; then
 	export USE_SW_RDMA="RXE"
 fi
 

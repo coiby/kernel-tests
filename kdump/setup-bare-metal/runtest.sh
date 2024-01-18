@@ -25,20 +25,23 @@ SetupKdump()
     if [ "${RSTRNT_REBOOTCOUNT}" -eq 0 ]; then
 
         GetHWInfo
+        # shellcheck disable=SC3010
         [[ "${K_ARCH}" =~ i.86|x86_64 ]] && GetBiosInfo
 
         # Kexec-tools is not installed by default on Fedora
         $IS_FC && PrepareKdump
 
         # In ia64 arch, the path of vmlinuz is /boot/efi/efi/redhat, it different with other arch.
+        # shellcheck disable=SC3010
         [[ "${K_ARCH}"  = "ia64" ]] && {
             /sbin/grubby --set-default="/boot/efi/efi/redhat/vmlinuz-$(uname -r)"
         }
 
         # For uncompressed kernel, i.e. vmlinux
+        # shellcheck disable=SC3010
         [[ "${VMLINUZ_PATH}" == *vmlinux* ]] && {
             Log "Modifying ${KDUMP_SYS_CONFIG} properly for 'vmlinux'."
-            sed -i 's/\(KDUMP_IMG\)=.*/\1="vmlinux"/' ${KDUMP_SYS_CONFIG}
+            sed -i 's/\(KDUMP_IMG\)=.*/\1="vmlinux"/' "${KDUMP_SYS_CONFIG}"
         }
 
         # RHEL5 ppc64 kdump need kernel-kdump
@@ -67,14 +70,15 @@ SetupKdump()
         _reboot_required=false
         _hascmd_reset_crashkernel=false
         kdumpctl -h 2>&1 | grep -q reset-crashkernel && _hascmd_reset_crashkernel=true
+        # shellcheck disable=SC3011
         _fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
+        # shellcheck disable=SC3011
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
             if ${_hascmd_reset_crashkernel} && \
                     [ -n "${_fadump_opts}" ]; then
                 _fadump_opts="--${_fadump_opts}"
                 Log "Force resetting crashkernel value to default"
-                LogRun "kdumpctl reset-crashkernel ${_fadump_opts} 2>&1 | grep -i reboot" && \
-                    _reboot_required=true
+                ResetCrashkernel ${_fadump_opts}
             elif ${_hascmd_reset_crashkernel} && \
                     [ "${K_FORCE_RESET_CK}" = "true" ]; then
                 # if current running mode is fadump and not set in the above
@@ -83,8 +87,7 @@ SetupKdump()
                     [ -n "${_fadump_opts}" ] && _fadump_opts="--${_fadump_opts}"
                 }
                 Log "Force resetting crashkernel value to default"
-                LogRun "kdumpctl reset-crashkernel ${_fadump_opts} 2>&1 | grep -i reboot" && \
-                    _reboot_required=true
+                ResetCrashkernel ${_fadump_opts}
             else # for legacy cases: get default value from kdump.sh
                 kdumpMem="$(DefKdumpMem)"
             fi
@@ -92,15 +95,16 @@ SetupKdump()
             # legacy cases: RHEL5 or fedora:non-fadump
             [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
             if $IS_RHEL5 ; then
+                # shellcheck disable=SC3024
                 KER1ARGS+="${kdumpMem}"
             elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then # for fedora:non-fadump
                 # Check kdump status if it's fadump mode which caused kexec_crash_size is 0
                 kdumpctl status > /dev/null 2>&1 || {
                     if ${_hascmd_reset_crashkernel} && [ "${#kdumpMem}" -gt 1 ]; then
                         Log "fedora:non-fadump, reset crashkernel value to default"
-                        LogRun "kdumpctl reset-crashkernel 2>&1 | grep -i reboot" && \
-                            _reboot_required=true
+                        ResetCrashkernel
                     else
+                        # shellcheck disable=SC3024
                         KER1ARGS+="${kdumpMem}"
                     fi
                 }
@@ -114,8 +118,10 @@ SetupKdump()
         #       - or s/crashkernel=auto/$(DefKdumpMem)/
         if [ -n "${KER1ARGS}" ]; then
             # Support translating crashkernel=auto test request to crashkernel=XXM for rhel9+
+            # shellcheck disable=SC3011
             if grep -q crashkernel=auto <<< "${KER1ARGS}"; then #|| \
                 if ${_hascmd_reset_crashkernel}; then
+                    # shellcheck disable=SC3060
                     KER1ARGS=${KER1ARGS/crashkernel=auto/}
                     # if current running mode is fadump and not set in 1st round
                     [ -n "${_fadump_opts}" ] || {
@@ -123,9 +129,9 @@ SetupKdump()
                         [ -n "${_fadump_opts}" ] && _fadump_opts="--${_fadump_opts}"
                     }
                     Log "Strip crashkernel=auto and reset crashkernel value to default"
-                    LogRun "kdumpctl reset-crashkernel ${_fadump_opts} 2>&1 | grep -i reboot" && \
-                        _reboot_required=true
+                    ResetCrashkernel ${_fadump_opts}
                 else
+                    # shellcheck disable=SC3060
                     KER1ARGS=${KER1ARGS/crashkernel=auto/$(DefKdumpMem)}
                 fi
             fi
@@ -149,17 +155,20 @@ SetupKdump()
             sync
             RhtsReboot
         fi
-        # needed for automotive SOC devices that dont come with kexec-tools pre installed and have crashkernel built in.
-        if [ -f /sys/devices/soc0/machine ];then
-            LogRun "kdumpctl start"
-        fi
     fi
 
+    # Needed for automotive SOC devices that dont come with kexec-tools pre installed and kdump systemd for startup.
+    if [ -f /sys/devices/soc0/machine ];then
+        LogRun "kdumpctl start"
+    fi
     # Make sure kdumpctl is operational
     # If kdump service is not started yet, wait for max 3 mins.
     # It may take time to start kdump service.
     Log "Checking kdump service status"
+    # shellcheck disable=SC3043
     local retval=0
+    # shellcheck disable=SC2034
+    # shellcheck disable=SC3009
     for i in {1..5}
     do
         CheckKdumpStatus
@@ -168,6 +177,7 @@ SetupKdump()
         sleep 60
     done
     # show kexec-tools & crash version after pkginstall
+    # shellcheck disable=SC3060
     LogRun "rpm -q kexec-tools crash ${K_NAME/-core}"
     LogRun "uname -r"
     LogRun "cat /proc/cmdline"
@@ -180,7 +190,8 @@ SetupKdump()
 
     # [ -f "${K_REBOOT}" ] && rm -f "${K_REBOOT}"
 
-    local msg_log=${K_TESTAREA}/kdump.messages.log
+    # shellcheck disable=SC3043
+    local msg_log="${K_TESTAREA}"/kdump.messages.log
     if [ "${retval}" -ne 0 ]; then
         journalctl -b > "${msg_log}"
         # Bug 1754815 Kdump: Building kdump initramfs img may fail with

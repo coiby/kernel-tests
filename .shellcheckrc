@@ -1,5 +1,3 @@
-# This {/} is literal. Check if ; is missing or quote the expression.
-disable=SC1083
 # Quote this to prevent word splitting.
 disable=SC2046
 # var is referenced but not assigned.

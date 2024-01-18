@@ -1,0 +1,12 @@
+PURPOSE of misc/guest-poweroff
+Description: Verify x86_64 guest successfully powers off
+Author: Eddie Kovsky <ekovsky@redhat.com>
+
+Verify x86_64 guest successfully powers off
+
+This test is intended to be used by a host hypervisor to verify that a libvirt
+x86_64 guest named "GuestOne" can shut down successfully when the poweroff command
+is issued from the host. In order for this test to work correctly the guest
+environment must be set up by the test framework. The state of the guest is
+deliberately monitored from the host so that the test does not rely on the
+guest machine to self-report its running state.
