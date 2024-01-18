@@ -394,10 +394,17 @@ build-all()
         res="FAILED"
     fi
     echo "============ ${MAKE} -C ${TARGET} install: ${res}  ============" | tee -a $OUTPUTFILE
+    SubmitLog ./buildlog.txt
     if [[ ${res} == "PASSED" ]]; then
         echo "${TESTVERSION}" > ${TARGET_DIR}/ltp_version
+    else
+        if [[ -n $RSTRNT_TASKID ]]; then
+            rstrnt-report-result "build-all failed" WARN/ABORTED
+            rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        else
+            exit 1
+        fi
     fi
-    SubmitLog ./buildlog.txt
 }
 
 # For manual testing
