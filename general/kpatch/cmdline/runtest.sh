@@ -33,9 +33,8 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # trap 'rlFileRestore; exit' SIGHUP SIGINT SIGQUIT SIGTERM
-trap 'killall make; kill $s_pid; exit 1' SIGHUP SIGINT SIGQUIT SIGTERM
+trap 'killall make; exit 1' SIGHUP SIGINT SIGQUIT SIGTERM
 
-ARCH=$(uname -m)
 MOD=${MOD:-}
 built_kpatch_patch="/home/kpatch-patch-modules"
 NFS_SHARE=${NFS_SHARE:-}
@@ -87,8 +86,6 @@ prepare_patches() {
         echo "Already mounted $(mount | grep kpatch)"
     fi
 
-    kpatch_patch_dir="/usr/lib/kpatch/$(uname -r)/"
-    kpatch_patch_ins_dir="/var/lib/kpatch/$(uname -r)/"
     USE_PATCHES=${USE_PATCHES:-${MOD_PREFIX}-data-new $MOD_PREFIX-COMBINED}
     # kpatch-patch has been installed in previous execution
     # of this function.
@@ -102,7 +99,7 @@ prepare_patches() {
     local ko
     if [ "${USE_PATCHES}" = ALL ]; then
         echo "Use all patches under ${built_kpatch_patch}"
-        find ${built_kpatch_patch} -name ${MOD_PREFIX}-*.ko -exec kpatch install {} \;
+        find ${built_kpatch_patch} -name "${MOD_PREFIX}-*.ko" -exec kpatch install {} \;
         for ko in ${built_kpatch_patch}/${MOD_PREFIX}-*.ko; do
             rlRun "kpatch load ${ko//-/_}"
         done
@@ -176,11 +173,11 @@ function kpatch_patch_testing() {
     fi
 
     if [ -n "${KPATCH_PATCH}" ]; then
-        MODPATH="$(rpm -ql ${KPATCH_PATCH} | grep -E kpatch-.*\.ko)"
+        MODPATH=$(rpm -ql ${KPATCH_PATCH} | grep -E "kpatch-.*\.ko")
     fi
 
     if [ -z "${MODPATH}" ]; then
-        MODPATH="$(ls /usr/lib/kpatch/$(uname -r)/* | grep kpatch- | head -n 1)"
+        MODPATH=$(ls /usr/lib/kpatch/$(uname -r)/kpatch-* | head -n 1)
     fi
 
     MOD="$(modinfo --field=name ${MODPATH})"
@@ -206,13 +203,9 @@ function changed_functions_test() {
     yumdownloader -q -y --source ${KPATCH_PATCH}
     rpm -i ${KPATCH_PATCH}
     pushd  /root/rpmbuild/SOURCES/
-    TEXT_PATCHES="find . -name *.patch"
-    local patch
-    for patch in ${TEXT_PATCHES}; do
-        changed_functions=$(grep -i 'changed function' *.patch | awk '{print $NF}')
-        for c in ${changed_functions}; do
-            rlLogInfo "$c function to be patched"
-        done
+    changed_functions=$(grep -i 'changed function' *.patch | awk '{print $NF}')
+    for c in ${changed_functions}; do
+        rlLogInfo "$c function to be patched"
     done
     popd
 

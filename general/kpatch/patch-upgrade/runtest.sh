@@ -32,7 +32,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # trap 'rlFileRestore; exit' SIGHUP SIGINT SIGQUIT SIGTERM
-trap 'killall make; kill $s_pid' SIGHUP SIGINT SIGQUIT SIGTERM
+trap 'killall make' SIGHUP SIGINT SIGQUIT SIGTERM
 
 # Include variants from release files
 . /etc/os-release
@@ -88,7 +88,7 @@ function module_check_A()
 function module_check_B()
 {
     local RT=1
-    [[ `uname -r` =~ "4.18.0" ]] && RT=0
+    [[ `uname -r` =~ 4.18.0 ]] && RT=0
     rlRun "cat ${TRACE_FUN} | grep meminfo_proc_show" "0"
     rlRun "cat ${TRACE_FUN} | grep cmdline_proc_show" "${RT}"
     rlRun "grep kpatch=1 ${PROC_CMD}" "${RT}"
