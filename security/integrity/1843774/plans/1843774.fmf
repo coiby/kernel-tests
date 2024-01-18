@@ -1,5 +1,5 @@
 summary: Security Integrity verifier for 1843774
-environment+:
+environment:
     SET_BUILDLOGS_REPO: True
 discover:
     how: fmf
