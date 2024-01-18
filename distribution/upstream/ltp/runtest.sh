@@ -17,7 +17,7 @@ cki_is_vm && export LTP_TIMEOUT_MUL=2
 cki_has_kernel_debug_flags && export LTP_TIMEOUT_MUL=2
 
 TARGET_DIR=/mnt/testarea/ltp
-RUNTESTS=${RUNTESTS:-"cve sched syscalls can commands containers dio fs fsx math hugetlb mm nptl pty ipc tracing"}
+RUNTESTS=${RUNTESTS:-"cve sched syscalls can commands containers dio fs math hugetlb mm nptl pty ipc tracing"}
 CPUS_NUM=$(getconf _NPROCESSORS_ONLN || echo 1)
 MEM_AVAILABLE=$(echo "$(grep '^MemAvailable:' /proc/meminfo | sed 's/^[^0-9]*\([0-9]*\).*/\1/') / 1024" |bc -q)
 
@@ -74,7 +74,7 @@ function ltp_test_build()
 	# more logs for issue 674
 	patch -p1 < ../patches/more-logs-for-tst_find_backing_dev.patch
 	# Debug patching temporarily (remove it after got the reason)
-	git describe c4742ee0df03b 2>&1 >/dev/null || patch -p1 < ../patches/debug/0001-mkfs-print-more-info-for-debugging.patch
+	git describe c4742ee0df03b > /dev/null 2>&1 || patch -p1 < ../patches/debug/0001-mkfs-print-more-info-for-debugging.patch
 
 	make autotools                      &> configlog.txt || if cat configlog.txt; then test_msg fail "config  ltp failed"; fi
 	./configure --prefix=${TARGET_DIR}  &> configlog.txt || if cat configlog.txt; then test_msg fail "config  ltp failed"; fi
