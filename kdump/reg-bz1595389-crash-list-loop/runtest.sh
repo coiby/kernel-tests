@@ -66,6 +66,7 @@ EOF
     Log "Efficiency of list commands w/ and w/o -B option is expected to be seen in memory usage, not in execution time."
     for i in "crash_list.cmd" "crash_list_rev.cmd" "crash_list_brent.cmd" "crash_list_brent_rev.cmd"; do
         Log "Run crash command $i"
+        # shellcheck disable=SC2154
         time crash -i "$i" "${vmlinux}" "${vmcore}" > "$i".out
         ret=$?
         RhtsSubmit "$(pwd)/$i.out"

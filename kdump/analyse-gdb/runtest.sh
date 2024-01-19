@@ -27,6 +27,7 @@ analyse()
     # Analyse by gdb
     rpm -q --quiet gdb || InstallPackages gdb
     LogRun "rpm -q gdb"
+    # shellcheck disable=SC2154
     Log "# gdb < gdb.cmd ${vmlinux} ${vmcore} > ${K_TESTAREA}/gdb.log"
     gdb < gdb.cmd ${vmlinux} ${vmcore} > ${K_TESTAREA}/gdb.log 2>&1
     code=$?

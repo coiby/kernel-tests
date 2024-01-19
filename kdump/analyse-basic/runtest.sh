@@ -26,6 +26,7 @@ analyse()
     #########################
     # 1. Analyse by readelf #
     #########################
+    # shellcheck disable=SC2154
     Log "Run cmd: readelf -a ${vmcore}"
     readelf -a "${vmcore}" 2>&1 | tee ${K_TESTAREA}/readelf.log
     if [ "${PIPESTATUS[0]}" -ne 0 ]; then

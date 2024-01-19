@@ -42,6 +42,7 @@ RegressionTest() {
     Log "Take CPU ${cpu_num} offline"
     LogRun "echo 0 >/sys/devices/system/cpu/cpu${cpu_num}/online"
     [ "$(cat /sys/devices/system/cpu/cpu${cpu_num}/online)" != "0" ] && {
+        # shellcheck disable=SC2154
         report_result "Failed to offline cpu" "FAIL" "${error}"
         Error "Failed to offline cpu${cpu_num}"
     }

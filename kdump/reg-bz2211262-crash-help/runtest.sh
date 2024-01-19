@@ -72,6 +72,7 @@ EOF
         CheckVmlinux
         GetCorePath
 
+        # shellcheck disable=SC2154
         crash -i "crash-test.cmd" "${vmlinux}" "${vmcore}" > "crash-test.vmcore.log"
         RhtsSubmit "crash-test.vmcore.log"
 

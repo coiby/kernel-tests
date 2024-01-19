@@ -27,6 +27,7 @@ EOF
     RhtsSubmit "$crash_cmd"
     Log "Run crash bpf against the vmcore. "
 
+    # shellcheck disable=SC2154
     Log "# crash -i \"$crash_cmd\" \"${vmlinux}\" \"${vmcore}\""
     crash -i "$crash_cmd" "${vmlinux}" "${vmcore}" > "$crash_output" 2>&1
 

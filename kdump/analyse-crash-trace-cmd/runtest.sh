@@ -112,6 +112,7 @@ EOF
     echo "extend -u ${tracer}" >> "${K_TESTAREA}/crash.cmd"
     echo "exit" >> "${K_TESTAREA}/crash.cmd"
 
+    # shellcheck disable=SC2154
     CrashCommand "" "${vmlinux}" "${vmcore}"
 
     # unmount debug fs
