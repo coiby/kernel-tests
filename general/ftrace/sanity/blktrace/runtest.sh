@@ -25,7 +25,7 @@ else
     DEVICE_NAME=$(lsscsi -w | awk -F' ' '{print $NF}' | awk -F'/' '{print $3}')
     if [ $(echo $DEVICE_NAME | wc -w) -gt 1 ]; then
         for i in $DEVICE_NAME; do
-            if [[ "$TESTPART" =~ "$i" ]]; then
+            if [[ "$TESTPART" =~ $i ]]; then
                 DEVICE_NAME="$i"
                 break;
             fi
