@@ -51,7 +51,7 @@ krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//
 
 debug_kernel()
 {
-	uname -r | grep -q [.+]debug$
+	uname -r | grep -E -q "[.+]debug$"
 }
 
 # usage: check_skipped_tests test_name "${skip_test[@]}"
@@ -170,38 +170,38 @@ install_selftests()
 test_fail()
 {
 	SCORE=${2:-$FAIL}
-	echo -e ":: [  FAIL  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e ":: [  FAIL  ] :: Test $1" | tee -a $OUTPUTFILE
 
 	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "FAIL" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
-		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test '"${TEST}/$1"' FAIL $SCORE"
+		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test ${TEST}/$1 FAIL $SCORE"
 		echo -e ":::::::::::::::::\n"
 	fi
 }
 
 test_pass()
 {
-	echo -e "\n:: [  PASS  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e "\n:: [  PASS  ] :: Test $1" | tee -a $OUTPUTFILE
 	# we don't care how many test passed
 	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "PASS" 0
 	else
 		echo -e "\n::::::::::::::::"
-		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test '"${TEST}/$1"'"
+		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test ${TEST}/$1"
 		echo -e "::::::::::::::::\n"
 	fi
 }
 
 test_skip()
 {
-	echo -e "\n:: [  SKIP  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e "\n:: [  SKIP  ] :: Test $1" | tee -a $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "SKIP" 0
 	else
 		echo -e "\n::::::::::::::::"
-		echo -e ":: [  SKIP${RES}  ] :: Test '"${TEST}/$1"'"
+		echo -e ":: [  SKIP${RES}  ] :: Test ${TEST}/$1"
 		echo -e "::::::::::::::::\n"
 	fi
 }
