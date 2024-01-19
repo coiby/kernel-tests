@@ -226,13 +226,12 @@ rlJournalStart
 				rlLog "bz1414043 coverage skipped (allowlisted)"
 			else
 				# check if we can disable a cpu (we sometimes cannot on aarch64)
-				echo 0 > /sys/devices/system/cpu/cpu1/online
-				if [ $? -ne 0 ]; then
-					rlLog "bz1414043 coverage skipped (cannot turn cpu1 off)"
-				else
+				if echo 0 > /sys/devices/system/cpu/cpu1/online; then
 					# now it should be OK, so test!
 					rlRun "perf test -v topology" 0 "bz1414043 test (should PASS)" # BUG REPRODUCTION ASSERT
 					rlRun "echo 1 > /sys/devices/system/cpu/cpu1/online" 0 "Turning the cpu1 back on"
+				else
+					rlLog "bz1414043 coverage skipped (cannot turn cpu1 off)"
 				fi
 			fi
 		fi
