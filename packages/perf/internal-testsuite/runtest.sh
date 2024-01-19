@@ -201,6 +201,7 @@ rlJournalStart
 				echo $RESULT | grep -qi FAIL
 				if [ $RETVAL -ne 0 -o $? -eq 0 ]; then
 					rlFail "$TEST_NUMBER: $TEST_DESC"
+					rlFileSubmit "$TEST_NUMBER.log"
 				else
 					rlPass "$TEST_NUMBER: $TEST_DESC"
 				fi
