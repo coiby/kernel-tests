@@ -34,29 +34,42 @@ T_PATH_SYS_DEBUG=/sys/kernel/debug
 T_PATH_SYS_TRACE=${T_PATH_SYS_DEBUG}/tracing
 
 T_PATH_TRACE_DIR_OPTIONS=${T_PATH_SYS_TRACE}/options
+# shellcheck disable=SC2034
 T_PATH_TRACE_PERCPU=${T_PATH_SYS_TRACE}/per_cpu
 
 T_PATH_AVAIL_TRACER=${T_PATH_SYS_TRACE}/available_tracers
 T_PATH_CURR_TRACER=${T_PATH_SYS_TRACE}/current_tracer
 T_PATH_TRACE_TRACE=${T_PATH_SYS_TRACE}/trace
+# shellcheck disable=SC2034
 T_PATH_TRACE_PIPE=${T_PATH_SYS_TRACE}/trace_pipe
+# shellcheck disable=SC2034
 T_PATH_TRACE_ENABLED=${T_PATH_SYS_TRACE}/tracing_enabled
 T_PATH_TRACE_ON=${T_PATH_SYS_TRACE}/tracing_on
+# shellcheck disable=SC2034
 T_PATH_TRACE_FILTER=${T_PATH_SYS_TRACE}/set_ftrace_filter
+# shellcheck disable=SC2034
 T_PATH_TRACE_STACK_TRACE_FILTER=${T_PATH_SYS_TRACE}/stack_trace_filter
+# shellcheck disable=SC2034
 T_PATH_TRACE_STACK_MAXSZ=${T_PATH_SYS_TRACE}/stack_max_size
+# shellcheck disable=SC2034
 T_PATH_TRACE_STACK=${T_PATH_SYS_TRACE}/stack_trace
+# shellcheck disable=SC2034
 T_PATH_TRACE_OPTIONS=${T_PATH_SYS_TRACE}/trace_options
 
+# shellcheck disable=SC2034
 T_PATH_AVAIL_EVENT=${T_PATH_SYS_TRACE}/available_events
 T_PATH_TRACE_EVENTS=${T_PATH_SYS_TRACE}/events
 T_PATH_SET_EVENT=${T_PATH_SYS_TRACE}/set_event
+# shellcheck disable=SC2034
 T_PATH_STACK_TRACE=/proc/sys/kernel/stack_tracer_enabled
+# shellcheck disable=SC2034
 T_PATH_SCSI_DISK=( /sys/block/sd?/trace/enable )
 
 T_PATH_PROC_SYSCTL=/proc/sys/kernel
 
+# shellcheck disable=SC2034
 T_REBOOT="./FTRACE_REBOOT"
+# shellcheck disable=SC2034
 T_RESTORE="./FTRACE_RESTORE"
 
 function Log() {
