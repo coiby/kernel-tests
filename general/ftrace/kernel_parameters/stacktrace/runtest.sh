@@ -5,10 +5,6 @@
 #kernel parameter to test
 KPARAM="stacktrace"
 
-#dependency kernel parameter
-DEPTRACER="function"
-DEPPARAM="ftrace=${DEPTRACER}"
-
 FLAGDIR="/root/.kernel_parameters/${KPARAM}"
 mkdir -p ${FLAGDIR}
 

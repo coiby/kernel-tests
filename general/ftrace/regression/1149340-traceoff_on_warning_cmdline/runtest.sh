@@ -33,10 +33,6 @@
 . ../../../../kernel-include/runtest.sh || exit 1
 
 BUG_INFO="1149340 - ftrace: add traceoff_on_warning kernel cmdline option"
-SRC_FILE="ftrace-page-stress.c"
-BIN_FILE="page-move-stress"
-LOOP_TIMES=${LOOP:-10}
-
 MOD=warn_mod/warn.ko
 PROC_FILE=/proc/sys/kernel/traceoff_on_warning
 TRACE_ON=/sys/kernel/debug/tracing/tracing_on

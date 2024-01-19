@@ -46,7 +46,7 @@ function bz_test()
 
     cd /sys/kernel/debug/tracing
 
-    for i in $(seq 3); do
+    for _ in $(seq 3); do
         rlRun "cat current_tracer"
         rlRun "echo '*open*' > set_graph_function"
         rlRun "origin=$(cat set_graph_function | wc -l)" 0-255

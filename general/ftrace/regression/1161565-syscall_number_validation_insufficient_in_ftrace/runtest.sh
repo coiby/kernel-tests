@@ -35,8 +35,6 @@ SRC_FILE_F="ftrace.c"
 SRC_FILE_P="perf.c"
 BIN_FILE_F="ftrace_syscall"
 BIN_FILE_P="perf_syscall"
-
-LOOP_TIMES=${LOOP:-10}
 IS_SUPPORTED=1
 
 function test_clean(){
