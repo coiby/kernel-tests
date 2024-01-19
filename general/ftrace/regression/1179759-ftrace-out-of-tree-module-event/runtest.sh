@@ -32,13 +32,8 @@
 . ../../../../kernel-include/runtest.sh || exit 1
 
 BUG_INFO="1179759 - Trace event on out of tree module not functional"
-SRC_FILE="ftrace-page-stress.c"
-BIN_FILE="page-move-stress"
-LOOP_TIMES=${LOOP:-10}
 
 MOD=event_mod/pita.ko
-PROC_FILE=/proc/sys/kernel/traceoff_on_warning
-TRACE_ON=/sys/kernel/debug/tracing/tracing_on
 TRACE_BUFFER=/sys/kernel/debug/tracing/trace
 
 function setup_phase(){
