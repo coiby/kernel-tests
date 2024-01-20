@@ -17,6 +17,7 @@ function process_kpp_nvr()
 	local kpatch_patch_version=$(echo $kpatch_patch_nvr | cut -d- -f5)
 	local kpatch_patch_release=$(echo $kpatch_patch_nvr | cut -d- -f6)
 	local kpatch_kmod_name=$(echo kpatch_${kpatch_patch_name//kpatch-patch-}-${kpatch_patch_version}-${kpatch_patch_release//.el*} | sed 's/\.\|-/_/g')
+	# shellcheck disable=SC2154
 	local kpatch_patch_srcbase=${kpatch_url_root}/${kpatch_patch_name}/${kpatch_patch_version}/${kpatch_patch_release}/src
 	local kpatch_patch_rpmbase=${kpatch_url_root}/${kpatch_patch_name}/${kpatch_patch_version}/${kpatch_patch_release}/$arch
 	local kpatch_kernel_vr=$(echo $kpatch_patch_name | cut -d- -f3- | sed 's/_/\./g').${kpatch_patch_release##*.}

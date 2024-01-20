@@ -58,7 +58,8 @@ init_vars_repo_cki()
 
     # For the eval translating '$basearch' in the url.
     basearch=${arch:-$(uname -m)}
-
+    # it's defined below with eval
+    # shellcheck disable=SC2154
     if test -n "$cki_repo"; then
         eval def_url_cki="$cki_repo"
     elif test -n "$CKI_REPO"; then
@@ -66,7 +67,8 @@ init_vars_repo_cki()
     else
         eval def_url_cki="$(awk -F= 'BEGIN{IGNORECASE=1} /baseurl=.*CKI/ {getline l; if (l == "enabled=1") print $2}' /etc/yum.repos.d/*.repo | head -n1)"
     fi
-
+    # it's defined with eval
+    # shellcheck disable=SC2154
     if echo $def_url_cki | grep -q "$(uname -m)-debug"; then
         echo "Using cki repo: $def_url_cki"
         use_debug_repo=1
@@ -87,7 +89,8 @@ init_vars_repo_brew()
     # For the eval translating '$basearch' in the url.
     basearch=${arch:-$(uname -m)}
     ((use_brew_kernel)) || return
-
+    # it's defined with eval expression below
+    # shellcheck disable=SC2154
     if test -z "$brew_repo"; then
         eval brew_repo="$(awk -F= 'BEGIN{IGNORECASE=1} /baseurl=.*brew/ {getline l; if (l == "enabled=1") print $2}' /etc/yum.repos.d/*.repo | head -n1)"
         shopt -s extglob
