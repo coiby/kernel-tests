@@ -31,7 +31,7 @@ function bz1738415()
 
 	rlRun "$CGROUP_EXEC TEST/test1 cpu ./${binary_name} &"
 	local pid_p=$!
-	[ "$pid" = 0 ] && echo "xxxxxxxx no process!" && return 1
+	[ "$pid_p" = 0 ] && echo "xxxxxxxx no process!" && return 1
 	rlRun "./migrate.sh $pid_p &"
 	KILL_PIDS+=" $!"
 	KILL_NAMES+=" $binary_name"
