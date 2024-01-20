@@ -1,5 +1,4 @@
 #!/bin/bash
-# /bin/bash
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -128,6 +127,7 @@ rlJournalStart
         [ -f $REBOOT_DOGFILE ] && rlFail "Unexpected restart detected, please check." || rlRun "touch $REBOOT_DOGFILE"
         init_skip
         rlRun "TmpDir=\$(mktemp -d -p $DIR_ENTRY)" 0 "Creating tmp directory"
+        # shellcheck disable=SC2154
         rlRun "pushd $TmpDir"
         rlRun "ps -AL -o start_time,time,tid,pid,ppid,pcpu,pmem,psr,comm | sort -k6 -rg" 0 "init process states"
     rlPhaseEnd

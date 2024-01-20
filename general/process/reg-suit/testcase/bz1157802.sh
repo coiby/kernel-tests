@@ -39,6 +39,8 @@ last_cpu=
 function test_sched_hackbench(){
 	local loops=8000
 	rlLogInfo "Get the hachbench result of the scheduler."
+	# this is defined in 'rlRun' parameter below Line 193.
+	# shellcheck disable=SC2154
 	rlLogInfo "1. use pipe, $CpuCount groups, loop $loops times."
 	# use pipe
 	for i in $(seq 3);do
@@ -127,7 +129,9 @@ function test_timer_interval(){
 	rlRun "sysctl vm.stat_interval=$interval"
 	# Now run the tests.Let the process run on the last isolated cpu.
 	rlRun -l "taskset -c $last_cpu bash -c \"while true; do :; done;\" &"
-	rlRun "pid=$!"
+	set -x
+	pid=$!
+	set +x
 
 	rlLogInfo "Monitor nonvoluntary_ctxt_switches and timer interupts:"
 	local loop=6
