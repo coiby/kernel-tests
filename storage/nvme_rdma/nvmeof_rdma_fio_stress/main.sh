@@ -26,6 +26,7 @@ function client {
 	fi
 
 	# Get RDMA testing protocol target IP
+	# shellcheck disable=SC2154
 	NVMEOF_RDMA_TARGET_IP "$test_protocol"
 	target_ip="$RETURN_STR"
 
