@@ -74,6 +74,7 @@ rlJournalStart
 		rlRun "yum -y install rt-tests" 0-255 || reason+="(rt-tests)"
 		mount | grep debug || mount -t debugfs dd /sys/kernel/debug
 		rlRun "nr_sockets=$(lscpu |  awk '/Socket/ {print $2}')"  0-255
+		# shellcheck disable=SC2154
 		if ((nr_sockets < 2)); then
 			reason+="(SocketNumber)"
 		fi
@@ -106,6 +107,8 @@ rlJournalStart
 		rlRun "echo 'cpu != 0 && req_cpu == 5120'  > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/filter"
 		rlRun "echo 1 > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/enable"
 		rlRun "echo $package_cpus_mask_hex > /sys/kernel/debug/tracing/tracing_cpumask"
+		# it's defined with rlRun parameter.
+		# shellcheck disable=SC2154
 		rlLogInfo "taskset -c ${package_cpus// /,} cyclictest -- -a ${package_cpus// /,} -t $package_nr_cpus -m -d 30 -D 350 --quiet &"
 		taskset -c ${package_cpus// /,} cyclictest -- -a ${package_cpus// /,} -t $package_nr_cpus -m -d 30 -D 350 --quiet > /dev/null &
 		pid=$!
