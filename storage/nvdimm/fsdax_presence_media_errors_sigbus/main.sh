@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
