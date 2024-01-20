@@ -110,6 +110,7 @@ fi
 rcmd make_loop_dev loopdev1 512M
 rcmd make_loop_dev loopdev2 512M
 
+# shellcheck disable=SC2154
 devs="$loopdev1 $loopdev2"
 
 rcmd pvcreate -ff $devs
