@@ -131,6 +131,8 @@ if [ "$cpus" -lt 2 ]; then
 fi
 
 kvercmp "$cver" '4.3'
+# kver_ret is defined in kvercmp
+# shellcheck disable=SC2154
 if [ $kver_ret -le 0 ]; then
        KNOWNISSUE_32="$KNOWNISSUE_32 -e \"no fallocate support in kernels before 4.3.0\""
        KNOWNISSUE_64="$KNOWNISSUE_64 -e \"no fallocate support in kernels before 4.3.0\""
