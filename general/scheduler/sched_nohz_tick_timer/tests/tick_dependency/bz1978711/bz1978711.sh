@@ -6,6 +6,8 @@ function bz1978711()
 	pushd rt-tests
 	git checkout stable/v1.0
 	make -j4
+	# this is defined in runtest.sh
+	# shellcheck disable=SC2154
 	local cpu=$first_isolated
 	set -x
 	./cyclictest -a $cpu --policy=fifo --priority=10 -t 1 &

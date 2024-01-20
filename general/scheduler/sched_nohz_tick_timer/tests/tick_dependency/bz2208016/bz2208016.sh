@@ -11,8 +11,10 @@ EOF
 	chmod +x hogger.sh
 	echo "kernel command line for nohz_full:"
 	cat /proc/cmdline
-
+	# this is defined in runtest.sh
+	# shellcheck disable=SC2154
 	local mask=$(get_cpu_mask $last_isolated)
+	# shellcheck disable=SC2154
 	rlRun "echo $mask > $tracing_dir/tracing_cpumask"
 	rlRun "echo tick_sched_handle >> $tracing_dir/set_ftrace_filter"
 	rlRun "echo function > $tracing_dir/current_tracer"

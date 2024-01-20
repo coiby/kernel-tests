@@ -8,7 +8,8 @@
 function get_cpuset_cpus()
 {
 	local nr_cpuset_cpus=${1:-4}
-
+	# this is defined in runtest.sh
+	# shellcheck disable=SC2154
 	if echo $isolated_cpus | grep -q '-'; then
 		local range=$(echo $isolated_cpus | awk -F, '{print $1}')
 		local first=$(echo $range | awk -F- '{print $1}')
@@ -36,6 +37,8 @@ function get_cpuset_cpus()
 
 function bz2005260()
 {
+	# this is defined in runtest.sh
+	# shellcheck disable=SC2154
 	if ((nr_cpu < 8)); then
 		report_result "${FUNCNAME}-nr_cpu_${nr_cpu}" SKIP
 		return
@@ -56,6 +59,8 @@ function bz2005260()
 		return 1
 	fi
 
+	# this is defined in runtest.sh
+	# shellcheck disable=SC2154
 	local first=$first_isolated
 
 	rlServiceStart stalld

@@ -14,10 +14,13 @@ function bz2017382()
 	while :; do a=1; done &
 	pid=$!
 
+	# it's defined in runtest.sh as this is sources in it.
+	# shellcheck disable=SC2154
 	echo isolated_cpus=$isolated_cpus,mask=$mask
 
 	cat /proc/cmdline
-
+	# it's defined in runtest.sh
+	# shellcheck disable=SC2154
 	local start_user_time=$(awk '/cpu'$first_isolated' / {print $2}' /proc/stat)
 
 	taskset -pc $first_isolated $pid &
