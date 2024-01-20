@@ -360,8 +360,8 @@ function dump_cgroup_info()
         if test -n "$cgroup"; then
                 echo "[$cgroup_dir] Start $cgroup group info of $cgroup_dir:"
                 local group_dir=$(grep $cgroup /proc/$pid/cgroup | cut -d: -f3)
-                cgroup_get $group_dir $group
-                echo -e "[$cgroup_dir] End $cgroup cgoup info.\n"
+                cgroup_get $group_dir $cgroup
+                echo -e "[$cgroup_dir] End $cgroup cgroup info.\n"
                 echo ---------------------------------------------
                 echo
                 return
@@ -369,8 +369,8 @@ function dump_cgroup_info()
 
         for cgroup in $(awk -F: '{print $2}' /proc/$pid/cgroup); do
                 local group_dir=$(grep $cgroup /proc/$pid/cgroup | cut -d: -f3)
-                echo "[$cgroup_dir] Start $group group info of $cgroup_dir:"
-                cgroup_get $group_dir $group
+                echo "[$cgroup_dir] Start $cgroup group info of $cgroup_dir:"
+                cgroup_get $group_dir $cgroup
                 echo -e "[$group_dir] End $cgroup_dir:$cgroup cgroup info.\n"
                 echo ---------------------------------------------
                 echo
