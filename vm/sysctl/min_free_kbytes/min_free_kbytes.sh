@@ -42,7 +42,7 @@ function test_run()
         else
             dd_size=$((${root_size}*2/300))
         fi
-        dd if=/dev/zero of=${TMP_FILE}${x} bs=${dd_size}k count=100
+        dd if=/dev/zero of=${TMP_FILE}${X} bs=${dd_size}k count=100
 
         sleep 2
         mem_free=`get_mem_free`
