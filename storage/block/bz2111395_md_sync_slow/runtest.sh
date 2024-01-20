@@ -46,6 +46,7 @@ function get_disk()
 function run_test()
 {
 	get_disk
+	# shellcheck disable=SC2154
 	rlRun "mdadm -CR -v /dev/md5 -l 5 -n 6 $dev0 $dev1 $dev2 $dev3 $dev4 $dev5"
 	sleep 60
 	rlRun "cat /proc/mdstat"

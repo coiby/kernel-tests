@@ -45,6 +45,7 @@ function get_disk()
 function run_test()
 {
     get_disk
+    # shellcheck disable=SC2154
     rlLog "disk: $dev0 $dev1"
     rlRun 'mdadm -CR /dev/md0 -l 1 -n 2 /dev/"$dev0" /dev/"$dev1" -e 1.0'
     rlRun "sgdisk -n 0:0:+100MiB /dev/md0"

@@ -47,7 +47,9 @@ function run_test()
 {
 # find local free disk
     get_disk
+    # shellcheck disable=SC2154
     rlRun "parted -s /dev/$dev0 mklabel gpt mkpart xfs 1M 50G"
+    # shellcheck disable=SC2154
     rlRun "parted -s /dev/$dev1 mklabel gpt mkpart xfs 1M 50G"
     rlRun "echo bfq > /sys/block/$dev0/queue/scheduler"
     rlRun "echo bfq > /sys/block/$dev1/queue/scheduler"

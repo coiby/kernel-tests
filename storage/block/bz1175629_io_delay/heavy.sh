@@ -1,5 +1,6 @@
 #!/bin/bash
 echo "#########"
+# shellcheck disable=SC2154
 echo "Now, we are starting heavy async writes to $MNT/data on $target."
 
 for i in `seq 5`; do
