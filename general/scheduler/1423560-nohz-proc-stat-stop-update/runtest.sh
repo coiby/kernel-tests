@@ -39,6 +39,7 @@ isolated_cpus="1-$max"
 
 # default 20m
 export RUN_TIME=${RUN_TIME:-1200}
+trace=0
 
 Cleanup() {
 	killall stress
@@ -127,7 +128,7 @@ rlJournalStart
 
 			# Save the old  config
 			grep "^isolated_cores=" $cfg_file
-			ln=$(grep -n ^isolated_cores $cfg | awk -F: '{print $1; exit}')
+			ln=$(grep -n ^isolated_cores $cfg_file | awk -F: '{print $1; exit}')
 			touch $save_cfg_file && echo $ln > $save_cfg_file
 
 			# comment out the below line

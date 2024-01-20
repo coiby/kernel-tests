@@ -14,7 +14,7 @@ while ((loop --)); do
 	ps -C stress -o psr,pcpu,stime,class,pri,cputime,pid,args 2>&1 | sort -n | grep -wv '0\.0' > ps_new.log
 	taskset -c 0 grep ^cpu /proc/stat  | grep -wv -e ^cpu  -e ^cpu0 -e ^cpu1 > stat_new.log
 	awk '{print $2" "$4" "$5}' stat_new.log > stat_new_f.log
-	awk -v cpu=$cpu -v tm=$tm '
+	awk '
 	{
 		getline l < "stat_new_f.log";
 		getline fl < "stat_new.log";
