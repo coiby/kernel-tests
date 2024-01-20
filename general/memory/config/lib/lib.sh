@@ -189,6 +189,7 @@ get_release()
 function check_knownissues()
 {
 	local i
+	local subfunc=${1}
 	if echo ${KNOWN_ISSUE_LIST[*]} | grep -q $subfunc; then
 		local bug_id=$(echo ${KNOWN_ISSUE_LIST[$REL_ID]} | awk -F: -v RS=' ' '/'$subfunc'/ {split($2,a,",");print a[1]}')
 		# Array elements

@@ -151,7 +151,11 @@ run_diff()
 		thp_state=$(gawk '{match($0, /\[(.*)\]/, a); print a[1]}' /sys/kernel/mm/transparent_hugepage/enabled)
 		rlAssertEquals "should be never" "never" "${thp_state}"
 		run_benchmark ${thp_state}_${hpsz} $thp_state
+		# always and never are defined with 'eval' in run_benchmark
+		# shellcheck disable=SC2154
 		diff=$(echo | awk -v always=$always -v never=$never '{print always-never}')
+		# always and never are defined with 'eval' in run_benchmark
+		# shellcheck disable=SC2154
 		diff_percent="$(echo | awk -v diff=$diff -v always=$always -v mark=$pass_mark '{if (diff < 0) diff=-diff;
 			diff_pct=diff/always; printf("%s",diff_pct);if (diff_pct > mark) printf (" fail\n");}')"
 		rlLog "result diff is always-never=$diff, |diff|/always=$diff_percent"

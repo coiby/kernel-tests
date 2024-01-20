@@ -66,7 +66,7 @@ function run_cases()
         ptype=FAIL
         source $subcase
 
-        check_knownissues
+        check_knownissues $subfunc
 
         rlPhaseStart $ptype "`basename $pathname` $pname"
         rlWatchdog "eval $subfunc" 3600 "9"
@@ -111,6 +111,7 @@ rlJournalStart
         [ ! -d $DIR_BIN ] && rlRun "mkdir -p $DIR_BIN"
         prep_tst_info
         rlRun "TmpDir=\$(mktemp -d -p $DIR_ENTRY)" 0 "Creating tmp directory"
+        # shellcheck disable=SC2154
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 

@@ -296,8 +296,9 @@ function filter_known_issues()
 		KNOWNISSUE_32="$KNOWNISSUE_32 -e \"Bad configuration: sched_setaffinity\""
 		KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Bad configuration: sched_setaffinity\""
 	fi
-
 	kvercmp "$cver" '4.3'
+	# kver_ret is defined in kvercmp
+	# shellcheck disable=SC2154
 	if [ $kver_ret -le 0 ]; then
 		   KNOWNISSUE_32="$KNOWNISSUE_32 -e \"no fallocate support in kernels before 4.3.0\""
 		   KNOWNISSUE_64="$KNOWNISSUE_64 -e \"no fallocate support in kernels before 4.3.0\""
@@ -306,6 +307,8 @@ function filter_known_issues()
 	# Bug 1006253 libhugetlbfs counters testcase occasionally fails on NUMA systems
 	if grep -q "release 7.[0-9]" /etc/redhat-release; then
 		kvercmp "$cver" '4.10'
+		# kver_ret is defined in kvercmp
+		# shellcheck disable=SC2154
 		if [ $kver_ret -le 0 ]; then
 			KNOWNISSUE_32="$KNOWNISSUE_32 -e \"^counters.sh.*Bad HugePages\""
 			KNOWNISSUE_64="$KNOWNISSUE_64 -e \"^counters.sh.*Bad HugePages\""
@@ -315,6 +318,8 @@ function filter_known_issues()
 	# Case isssue. version check is not right for rhel7
 	if grep -q "release 7.[0-9]" /etc/redhat-release; then
 		kvercmp '3.10' "$cver"
+		# kver_ret is defined in kvercmp
+		# shellcheck disable=SC2154
 		if [ $kver_ret -le 0 ]; then
 			KNOWNISSUE_32="$KNOWNISSUE_32 -e \"misalign.*mmap.*succeeded\""
 			KNOWNISSUE_64="$KNOWNISSUE_64 -e \"misalign.*mmap.*succeeded\""

@@ -34,6 +34,8 @@ TESTARG=${TESTARG:-}
 rlJournalStart
     rlPhaseStartSetup
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
+        # it's defined in rlRun parameter
+        # shellcheck disable=SC2154
         rlRun "cp testcases/* $TmpDir"
         rlRun "pushd $TmpDir"
     rlPhaseEnd

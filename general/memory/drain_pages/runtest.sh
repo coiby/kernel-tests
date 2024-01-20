@@ -31,6 +31,7 @@
 
 function install_kernel_devel
 {
+    local kver=$(uname -r)
     echo $kver | grep -q 'debug'
     if [ $? == 0 ]; then
         yum install -y kernel-debug-devel
