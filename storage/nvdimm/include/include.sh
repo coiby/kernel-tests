@@ -47,7 +47,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 
 	tlog "INFO: Executing NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() to get $dev_num $device_type $s_a_size device"
 	if [ $dev_num -gt $total_pmems ]; then
-		tlog "FAIL: Required $dev_num $type devices more than $total_pmems"
+		tlog "FAIL: Required $dev_num $device_type devices more than $total_pmems"
 		exit 1
 	fi
 

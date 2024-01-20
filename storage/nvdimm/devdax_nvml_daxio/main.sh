@@ -14,6 +14,7 @@ function runtest (){
 		tlog "daxio doesn't exists on $(arch), exit 1"
 		exit 1
 	fi
+	# shellcheck disable=SC2154
 	for align in $devdax_align; do
 		NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX 1 DEVDAX $align
 		devlist=$RETURN_STR

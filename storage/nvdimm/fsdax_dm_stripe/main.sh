@@ -33,6 +33,7 @@ function runtest (){
 		tlog "PASS: dmsetup create stripe_dev pass"
 	fi
 
+	# shellcheck disable=SC2154
 	tok "mkfs.ext4 $ext4_param -F /dev/mapper/stripe_dev"
 
 	tok mount -o dax /dev/mapper/stripe_dev $MNT

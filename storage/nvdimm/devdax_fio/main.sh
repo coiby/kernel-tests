@@ -20,6 +20,7 @@ function runtest (){
 	fi
 	num=4
 	[[ $(arch) == "ppc64le" ]] && num=2
+	# shellcheck disable=SC2154
 	for align in $devdax_align; do
 	        NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX $num DEVDAX $align
 	        local test_dev="$RETURN_STR"

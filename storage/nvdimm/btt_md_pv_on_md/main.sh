@@ -59,7 +59,7 @@ function runtest() {
 			fi
 			tok lvcreate -l 100%FREE -n lv_md_test vg_md_test
 			if [ $? -ne 0 ]; then
-				tlog "FAIL: fail to create lv on vg $vg_test"
+				tlog "FAIL: fail to create lv on vg vg_md_test"
 			fi
 			FIO_Device_Level_Test /dev/vg_md_test/lv_md_test
 			sleep 60

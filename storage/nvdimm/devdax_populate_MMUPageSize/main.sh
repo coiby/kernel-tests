@@ -14,6 +14,7 @@ function runtest (){
 		tlog "INFO: no test file devdax-mmupagesize.c"
 		exit 1
 	fi
+	# shellcheck disable=SC2154
 	for align in $devdax_align; do
 	        NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX 1 DEVDAX $align
 	        local test_dev="$RETURN_STR"

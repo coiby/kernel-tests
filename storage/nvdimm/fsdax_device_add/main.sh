@@ -40,6 +40,7 @@ function runtest (){
 	if rlIsRHEL 7; then
 		tok mkfs.xfs -f /dev/mapper/pmem-lv
 	elif rlIsRHEL ">=8"; then
+		# shellcheck disable=SC2154
 		tok mkfs.xfs $xfs_param -m reflink=0 -f /dev/mapper/pmem-lv
 	fi
 

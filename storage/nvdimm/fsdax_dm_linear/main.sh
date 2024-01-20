@@ -33,7 +33,7 @@ $size1 $size2 linear /dev/${pmem_2} 0" | dmsetup create joined
 	else
 		tlog "PASS: dmsetup create joined pass"
 	fi
-
+	# shellcheck disable=SC2154
 	tok "mkfs.ext4 $ext4_param -F /dev/mapper/joined"
 
 	tok mount -o dax /dev/mapper/joined $MNT

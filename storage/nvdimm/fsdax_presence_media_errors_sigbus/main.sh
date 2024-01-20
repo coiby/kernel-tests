@@ -26,6 +26,7 @@ function runtest (){
 	devname=$(basename $DEV)
 	pagesize=$(getconf PAGESIZE)
 
+	# shellcheck disable=SC2154
 	tok mkfs.ext4 $ext4_param -F $DEV
 	tok mount -o dax $DEV $MNT
 
