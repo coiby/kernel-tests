@@ -168,6 +168,7 @@ rlJournalStart
 
 rlPhaseStartTest
     rlAssertEquals "System should reboot successfully" $RSTRNT_REBOOTCOUNT 3
+    # shellcheck disable=SC2128
     rlAssertExists  "$crashDir/vmcore"
 rlPhaseEnd
 rlJournalPrintText

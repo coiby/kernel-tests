@@ -40,7 +40,7 @@ function make_storage_file()
 	local retval="$1"
 	local name="$2"
 	local size="$3"
-	fallocate -l$size $storage_path/$name 2>&1 >> $OUTPUTFILE
+	fallocate -l$size $storage_path/$name &>> $OUTPUTFILE
 	if [ $? -ne 0 ]; then
 		echo "Failed creating $storage_path/$name" | tee -a $OUTPUTFILE
 		return 1

@@ -18,6 +18,7 @@
 #
 
 # TEST is required for beakerlib tests
+# shellcheck disable=SC2034
 TEST=${RSTRNT_TASKNAME}
 
 # Include enviroment and libraries
