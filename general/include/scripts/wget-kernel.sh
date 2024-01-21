@@ -71,12 +71,10 @@ init_vars_repo_cki()
     # shellcheck disable=SC2154
     if echo $def_url_cki | grep -q "$(uname -m)-debug"; then
         echo "Using cki repo: $def_url_cki"
-        use_debug_repo=1
         cki_repo_produ=$(echo $def_url_cki | sed 's/'$(uname -m)'-debug/'$(uname -m)'/')
         cki_repo_debug=$def_url_cki
     else
         echo "Using cki repo: $def_url_cki"
-        use_debug_repo=0
         cki_repo_produ=$def_url_cki
         cki_repo_debug=$(echo $def_url_cki | sed 's/\/'$(uname -m)'\//\/'$(uname -m)'-debug\//')
     fi
@@ -87,6 +85,7 @@ init_vars_repo_cki()
 init_vars_repo_brew()
 {
     # For the eval translating '$basearch' in the url.
+    # shellcheck disable=SC2034
     basearch=${arch:-$(uname -m)}
     ((use_brew_kernel)) || return
     # it's defined with eval expression below
@@ -103,7 +102,6 @@ init_vars_repo_brew()
 
 init_vars()
 {
-    src_folder_names="src noarch $(uname -m)"
     arch=${arch:-$(uname -m)}
 
     HOST=$(hostname)
@@ -173,9 +171,13 @@ init_vars()
             if [ $kernel_mar -gt 5 ] || [ $kernel_mar -eq 5 -a $kernel_rma -ge 285 ]; then
                 sub_path=kernel
             fi
+            # shellcheck disable=SC2034
             path_prefix=${def_url}/$sub_path/${version}/${release}
+            # shellcheck disable=SC2034
             doc_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
+            # shellcheck disable=SC2034
             rpm_url="${path_prefix}/$arch/${sub_name}-${version}-${release}.$arch.rpm"
+            # shellcheck disable=SC2034
             rt_kvm_url="${path_prefix}/$arch/${sub_name}-kvm-${version}-${release}.$arch.rpm"
             debug_rpm_url="${path_prefix}/$arch/${sub_name}-debug-${version}-${release}.$arch.rpm"
             echo "Checking existence of $(switch_to_final_url ${!check_var})" 1>&2
@@ -193,7 +195,9 @@ init_vars()
         debuginfo_url="${path_prefix}/$arch/${sub_name}-debug-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_path}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
         dev_url="${path_prefix}/$arch/${sub_name}-debug-devel-${version}-${release}.$arch.rpm"
     else
+        # shellcheck disable=SC2034
         dev_url="${path_prefix}/$arch/${sub_name}-devel-${version}-${release}.$arch.rpm"
+        # shellcheck disable=SC2034
         debuginfo_url="${path_prefix}/$arch/${sub_name}-debuginfo-${version}-${release}.$arch.rpm ${path_prefix}/$arch/${sub_path}-debuginfo-common-$arch-${version}-${release}.$arch.rpm"
     fi
 
@@ -207,12 +211,18 @@ init_vars()
             debug_rpm_url+=" ${path_prefix}/$arch/${pkg_name}-debug-modules-core-${version}-${release}.$arch.rpm"
         fi
         if ((debugkernel == 1)); then
+            # shellcheck disable=SC2034
             internal_module_url="${path_prefix}/$arch/${pkg_name}-debug-modules-internal-${version}-${release}.$arch.rpm"
+            # shellcheck disable=SC2034
             extra_module_url="${path_prefix}/$arch/${pkg_name}-debug-modules-extra-${version}-${release}.$arch.rpm"
+            # shellcheck disable=SC2034
             kselftest_url="${path_prefix}/$arch/${pkg_name}-debug-selftests-internal-${version}-${release}.$arch.rpm"
         else
+            # shellcheck disable=SC2034
             internal_module_url="${path_prefix}/$arch/${pkg_name}-modules-internal-${version}-${release}.$arch.rpm"
+            # shellcheck disable=SC2034
             extra_module_url="${path_prefix}/$arch/${pkg_name}-modules-extra-${version}-${release}.$arch.rpm"
+            # shellcheck disable=SC2034
             kselftest_url="${path_prefix}/$arch/${pkg_name}-selftests-internal-${version}-${release}.$arch.rpm"
         fi
     fi
@@ -224,9 +234,13 @@ init_vars()
     # Brew scratch build
     [ $? -ne 0 ] && src_url="${path_prefix}/$(uname -m)/${sub_path}-${version}-${release}.src.rpm"
 
+    # shellcheck disable=SC2034
     abi_url=${path_prefix}/noarch/kernel-abi-whitelists-${version}-${release}.noarch.rpm
+    # shellcheck disable=SC2034
     fmw_url="${path_prefix}/noarch/kernel-firmware-${version}-${release}.noarch.rpm"
+    # shellcheck disable=SC2034
     doc_url=${path_prefix}/noarch/kernel-doc-${version}-${release}.noarch.rpm
+    # shellcheck disable=SC2034
     perf_url="${path_prefix}/$arch/perf-${version}-${release}.$arch.rpm"
 }
 
@@ -359,9 +373,9 @@ eval set -- "$TEMP"
 while true ; do
     case "$1" in
         -p|--print) exec_cmd=get_alllist;shift ;;
-        --int|--internal) list_url+=" internal_module_url" ;internal_module=1;shift;;
-        --ext|--extra) list_url+=" extra_module_url" ;extra_module=1;shift;;
-        -t|--ktest) list_url+=" kselftest_url"; kselftest=1;shift;;
+        --int|--internal) list_url+=" internal_module_url" ;shift;;
+        --ext|--extra) list_url+=" extra_module_url" ;shift;;
+        -t|--ktest) list_url+=" kselftest_url"; shift;;
         --kabi)  list_url+=" abi_url";shift;;
         --rpm)   list_url+=" rpm_url";shift 1;;
         --devel) list_url+=" dev_url";shift 1;;
@@ -370,8 +384,8 @@ while true ; do
         --curr|--running)
                 current=$(uname -r | sed -e 's/.'$(uname -m)'//' -e 's/[.+-]debug//' -e 's/[.+]64k//' -e 's/[.+]rt//')
                 uname -r | grep -Eq '[+.-]debug' && debugkernel=1
-                uname -r | grep -q '+64k' && kernel_64k=1 && kernel_names=kernel-64k
-                uname -r | grep -q '+rt' && kernel_rt=1 && kernel_names=kernel-rt
+                uname -r | grep -q '+64k' && kernel_names=kernel-64k
+                uname -r | grep -q '+rt' && kernel_names=kernel-rt
                 version=${current%%-*}
                 release=${current#*-}
                 dist=$(echo $release | grep -Eo "[[:alpha:]].*$")
@@ -392,7 +406,7 @@ while true ; do
             echo "$release" | grep -iEq "test|mr|[0-9]{4,}_[0-9]{9,}.el[0-9]" && grep -iEq "cki.*${version}-${release}" /etc/yum.repos.d/*.repo && use_cki_kernel=1
             grep -iEq "brew.*${version}.*${release}" /etc/yum.repos.d/*.repo && use_brew_kernel=1
             shift 2;;
-        --debuginfo|-d) list_url+=" debuginfo_url"; debuginfo=1; shift;;
+        --debuginfo|-d) list_url+=" debuginfo_url"; shift;;
         --debugkernel) debugkernel=1;shift;;
         --variant) variant=$2;shift 2;;
         --kvm) list_url+=" rt_kvm_url";shift;;
