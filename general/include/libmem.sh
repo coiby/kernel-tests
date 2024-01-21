@@ -430,7 +430,6 @@ function cgroup_destroy()
 # cgexec.sh <dir_name> <controllers> <cmd>
 function gen_cgexec()
 {
-	local pwd=$(pwd)
 	local file=cgexec.sh
 	local path=$(pwd)
 	local res
