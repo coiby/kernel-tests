@@ -60,8 +60,9 @@ function run_regression()
     local ptype=FAIL
     local pname
     findargs=$(echo $BZLIST | awk -v RS=' ' -v ORS=' ' '{print "-o -name bz*"$1".sh"}')
+    # shellcheck disable=SC2044
     for subcase in $(find $DIR_CASE -maxdepth 1 -name notexist $findargs); do
-        ERR_STR=""
+        # shellcheck disable=SC1090
         . $subcase
         # Since 'basename -s' is not supported on rhel6, remove suffix '.sh' with bash parameter expansion.
         #subfunc=$(basename -s .sh $subcase)

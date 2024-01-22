@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2128
 #   vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -134,6 +135,7 @@ function test_timer_interval(){
 	set +x
 
 	rlLogInfo "Monitor nonvoluntary_ctxt_switches and timer interupts:"
+	# shellcheck disable=SC2034
 	local loop=6
 	rlRun -l "while ((--loop>0)); do cat /proc/$(pgrep -f 'while true')/status| grep non;\
 		cat /proc/interrupts| grep \"Local timer\" |\
@@ -142,11 +144,13 @@ function test_timer_interval(){
 
 	timerVal0="$(cat /proc/interrupts| grep "Local timer" |awk '{print $'$((CpuCount+1))'}')"
 	rlLogInfo "timer=$timerVal0"
+	# shellcheck disable=SC2034
 	nv_sched0=\"$(cat /proc/$(pgrep -f 'while true')/status| grep non)\"
 	#the non vulentory scheule times should be not changed.
 	rlRun "sleep $interval" 0-254
 	timerVal1="$(cat /proc/interrupts| grep "Local timer" |awk '{print $'$((CpuCount+1))'}')"
 	rlLogInfo "timer=$timerVal1"
+	# shellcheck disable=SC2034
 	nv_sched1=\"$(cat /proc/$(pgrep -f 'while true')/status| grep non)\"
 	#rlAssertEquals "nv_shecd0 should equal to nv_sched1" "$nv_sched0" "$nv_sched1"
 	rlLogWarning "Local timer part is not fixed."
@@ -214,7 +218,6 @@ function bz1157802()
 				check_smt_clock_source
 				((CpuCount < 4)) && rlLogWarning "Test needs number of cpu >= 4." && return 1;
 				rlLogInfo "Set kernel cmdline to isolabe some cpus and enable adjustive ticks."
-				local n=0
 				rlRun "grubby --args=\"nohz_full=$first_cpu-$last_cpu rcu_nocbs=$first_cpu-$last_cpu nmi_watchdog=0 nohz=on nowatchdog nosoftlockup\"\
 					--update-kernel=$(grubby --default-kernel)"
 				touch $rebootflag_f
