@@ -320,7 +320,7 @@ function download_rpm()
         fi
     fi
     if [ -z "${url// /}" ]; then
-        echo  "Don't support "${list_url// /}" in this kernel version"
+        echo  "Don't support ${list_url// /} in this kernel version"
         exit 0
     fi
     map_compound_url "$url"
@@ -329,7 +329,7 @@ function download_rpm()
     for url_dirname in ${!compound_urls[*]}; do
             local nr_basename=$(echo "${compound_urls[$url_dirname]}" | awk -F, '{print NF}')
             if ((nr_basename > 1)); then
-                echo $url_dirname/"{"${compound_urls[$url_dirname]}"}"
+                echo $url_dirname/"{${compound_urls[$url_dirname]}}"
             else
                 echo $url_dirname/${compound_urls[$url_dirname]}
             fi

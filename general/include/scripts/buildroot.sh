@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2048
 set -x
 
 # For installing packages from buildroot in rhel8+
