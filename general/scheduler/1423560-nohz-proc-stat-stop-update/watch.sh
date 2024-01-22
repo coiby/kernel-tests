@@ -33,6 +33,7 @@ echo $(date +%s) ...
 for log in $(seq 2 $max); do
 	bad_nr=$(grep bad cpu$log | wc -l | awk '{print $1}')
 	if ((bad_nr > 5)); then
+		# shellcheck disable=SC2034
 		for rep in $(seq 1 10); do
 			egrep cpu$log /proc/stat
 			sleep 5
