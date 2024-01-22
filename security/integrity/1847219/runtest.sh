@@ -22,7 +22,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-
+. ../../../cmdline_helper/libcmd.sh || exit 1
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
@@ -36,7 +36,12 @@ rlJournalStart
     rlPhaseStartTest
         grubby --info=DEFAULT
         if [ ! ${RSTRNT_REBOOTCOUNT} -gt 0 ]; then
-            if stat /run/ostree-booted > /dev/null 2>&1; then
+            if [ -e /sys/devices/soc0/machine ]; then
+                CMDLINEARGS="ima_appraise=fix"
+                rlRun "add_aboot_param"
+                CMDLINEARGS="ima_policy=appraise_tcb"
+                rlRun "add_aboot_param"
+            elif stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm-ostree kargs --append-if-missing=ima_appraise=fix --append-if-missing=ima_policy=appraise_tcb --import-proc-cmdline
             else
                 grubby --args="ima_appraise=fix" --update-kernel=DEFAULT
@@ -54,7 +59,12 @@ rlJournalStart
 
     rlPhaseStartCleanup
         if [ ! ${RSTRNT_REBOOTCOUNT} -gt 1 ]; then
-            if stat /run/ostree-booted > /dev/null 2>&1; then
+            if [ -e /sys/devices/soc0/machine ]; then
+                CMDLINEARGS="-ima_appraise=fix"
+                rlRun "remove_aboot_param"
+                CMDLINEARGS="-ima_policy=appraise_tcb"
+                rlRun "remove_aboot_param"
+            elif stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm-ostree kargs --delete-if-present=ima_appraise=fix --delete-if-present=ima_policy=appraise_tcb --import-proc-cmdline
             else
                 grubby --remove-args="ima_appraise=fix" --update-kernel=DEFAULT
@@ -63,6 +73,7 @@ rlJournalStart
             [[ $(uname -m) == "s390x" ]] && zipl
             rhts-reboot
         fi
+
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
