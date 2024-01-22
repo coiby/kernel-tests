@@ -2,7 +2,7 @@
 
 function bz1738415()
 {
-	local binary_name=${1:-$FUNCNAME}
+	local binary_name=${1:-${FUNCNAME[0]}}
 	if ! type -t rlRun; then
 		. /usr/share/beakerlib/beakerlib.sh
 	fi
