@@ -60,7 +60,7 @@ function report_leak()
     if [ ! -f ${LEAKREPORT} ]; then
         touch $LEAKREPORT $LEAKREPORT_OLD
     fi
-    ps -C kmemleak -o pid,state,start_time,etime,args | grep kmemleak || KMEMLEAK_STOPPED=1
+    ps -C kmemleak -o pid,state,start_time,etime,args | grep kmemleak
 
     rlRun -l "echo scan > ${LEAKFILE}" 0-255
     if [ $? -ne 0 ]; then

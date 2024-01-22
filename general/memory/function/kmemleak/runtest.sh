@@ -29,7 +29,6 @@
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-PACKAGE="kernel"
 FLAG_FILE=/mnt/reboot_kmemleak_enable
 
 # Leave the leak data in /sys/kernel/debug/kmemleak without cleanup, used as a
@@ -127,6 +126,7 @@ function run_kmemleak_test()
 	popd
 
 	result=FAIL
+	# shellcheck disable=SC2034
 	for i in $(seq 1 5); do
 		rlRun "echo scan > $LEAK_TRACE_FILE"
 		grep insmod $LEAK_TRACE_FILE &&
