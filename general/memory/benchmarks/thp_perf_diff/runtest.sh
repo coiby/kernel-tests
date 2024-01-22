@@ -59,10 +59,11 @@ check_test_continue()
 
 get_matrix()
 {
-	hugepage_sizes=($(find /sys/devices/system/node/node0 -name hugepages-* -type d  | awk -F/ '{match($NF, /[0-9]+/, a);print a[0]}'))
-	echo hugepage_sizes=${hugepage_sizes[*]}
+	#shellcheck disable=SC2207
+	hugepage_sizes=($(find /sys/devices/system/node/node0 -name "hugepages-*" -type d  | awk -F/ '{match($NF, /[0-9]+/, a);print a[0]}'))
+	echo hugepage_sizes="${hugepage_sizes[*]}"
 	if ! test -f HUGEPAGE_SIZES; then
-		echo ${hugepage_sizes[*]} | sed "s/ /\n/g" > HUGEPAGE_SIZES
+		echo "${hugepage_sizes[*]}" | sed "s/ /\n/g" > HUGEPAGE_SIZES
 		nr_lines=$(wc -l HUGEPAGE_SIZES | awk '{print $1}')
 		default_hpsz=$(awk '/Hugepagesize/ {print $2}' /proc/meminfo)
 		echo "Removing default hugepage size: $default_hpsz from list"
