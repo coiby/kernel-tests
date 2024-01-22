@@ -7,10 +7,10 @@ function bz2017382()
 
 	rlIsRHEL ">=8.7" || rlIsRHEL ">=8.4"
 	if [ ! $? = 0 ]; then
-		report_result "stat_update-$FUNCNAME" SKIP
+		report_result "stat_update-${FUNCNAME[0]}" SKIP
 		return
 	fi
-
+	#shellcheck disable=SC2034
 	while :; do a=1; done &
 	pid=$!
 

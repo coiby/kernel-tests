@@ -22,7 +22,7 @@ EOF
 	# clean the buffer
 	true > /sys/kernel/debug/tracing/trace
 
-	echo "using nohz_full cpu $last_isolated for running the cpu hogger, with cpu cgroup $FUNCNAME 0.5 bandwidth"
+	echo "using nohz_full cpu $last_isolated for running the cpu hogger, with cpu cgroup ${FUNCNAME[0]} 0.5 bandwidth"
 
 	check_cgroup_version
 	cgroup_create bz2208016 cpu
