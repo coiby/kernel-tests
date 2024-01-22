@@ -37,7 +37,6 @@ fi
 
 SCHED_PROCESS_SRC=../include/processes
 SCHED_PROCESS_BIN=$(pwd)/tasks
-SCHED_PROCESS_HOG=1
 export SCHED_NR_CPU=$(grep -wo processor /proc/cpuinfo | wc -l)
 
 # Copy from zswap test
@@ -72,7 +71,6 @@ function _wget_compile_stress()
         if [ ! "$SKIP_DOWNLOAD" = 1 ]; then
                 wget $STRESS_SRPM || { report_result "wget_stress" FAIL; rlDie "wget stress"; }
         fi
-
         rpm -ivh stress-0.18.8-1.4.el7.src.rpm
         rpm -q yum-utils || yum -y install yum-utils
         which rpmbuild || yum -y install rpm-build &>/dev/null
@@ -97,8 +95,8 @@ function source_compile()
         if [ ! -d tasks ]; then
                 mkdir tasks
         fi
-        gcc $SCHED_PROCESS_SRC/cpu_hog.c -lrt -o $SCHED_PROCESS_BIN/cpu_hog || SCHED_PROCESS_HOG=0
-        gcc $SCHED_PROCESS_SRC/life.c -lrt -o $SCHED_PROCESS_BIN/life || SCHED_PROCESS_HOG=0
+        gcc $SCHED_PROCESS_SRC/cpu_hog.c -lrt -o $SCHED_PROCESS_BIN/cpu_hog
+        gcc $SCHED_PROCESS_SRC/life.c -lrt -o $SCHED_PROCESS_BIN/life
 }
 
 #--------------------------------------------------
@@ -153,7 +151,7 @@ function setup_kernel_cmdline()
 {
         local cmdline=$2
         local action=$1
-        if [ "$1" = add  ]; then
+        if [ "$action" = add  ]; then
                 set -x
                 grubby --args "$cmdline" --update-kernel $(grubby --default-kernel)
                 set +x
@@ -165,14 +163,16 @@ function setup_kernel_cmdline()
 #--------------------------------------------------
 # for kernel sysctl operations, scheduler has many
 # sysctls for tunning.
-SYSCTL_ORIGIN=/etc/sysctl.conf
+export SYSCTL_ORIGIN=/etc/sysctl.conf
 function save_sysctl()
 {
+        # shellcheck disable=SC2048
         sysctl_or_debugfs_save $*
 }
 
 function restore_sysctl()
 {
+        # shellcheck disable=SC2048
         sysctl_or_debugfs_restore $*
 }
 
@@ -242,7 +242,7 @@ function sysctl_or_debugfs_set()
 
         if test -f $sysctl_dir/$dir/$file; then
                 echo "Using sysctl interface file: $sysctl_dir/$dir/$file" 1>&2
-                echo "echo \"$setval\\" > $sysctl_dir/$dir/$file"
+                echo "echo \"$setval\" > $sysctl_dir/$dir/$file"
                 echo "$setval" > $sysctl_dir/$dir/$file
                 ret=$?
         elif test -f $sched_dir/${file#sched_}; then
