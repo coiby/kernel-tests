@@ -124,7 +124,7 @@ function get_symbol_addr_snapshot()
 
 function slub_freelist_random()
 {
-    [ "$SLUB_RANDOM" -eq 0 ] && echo "Skip $FUNCNAME" && return
+    [ "$SLUB_RANDOM" -eq 0 ] && echo "Skip ${FUNCNAME[0]}" && return
     uname -r | grep debug && echo "Skip debug kernel" && return
     local kaslr=${1:-0}
     local index=$2

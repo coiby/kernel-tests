@@ -111,9 +111,9 @@ function cgroup_create()
 			local rt_pids=$(ps -AL -o pid,policy,args | grep -E "RR|FF|DL" | grep -Ev "grep|\[" | awk '{print $1}')
 			echo "Killing rt tasks" && kill $rt_pids
 		fi
-
 		for controller in $controllers; do
 			echo "+$controller" >> $CGROUP_ROOT/cgroup.subtree_control
+			# shellcheck disable=SC2320
 			[ $? -ne 0 ] && ((ret++))
 		done
 		cgroup=$CGROUP_ROOT/$cgroup_dir
@@ -145,7 +145,7 @@ function cgroup_create()
 		fi
 	fi
 
-	echo $FUNCNAME: succeed to create cgroup $cgroup
+	echo ${FUNCNAME[0]}: succeed to create cgroup $cgroup
 
 	return $ret
 }

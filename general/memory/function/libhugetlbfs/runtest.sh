@@ -178,7 +178,7 @@ function build_testsuit_srpm()
 	fi
 
 	# If we have defined the rpm urls one by one. We download with the url directly.
-	if [[ "$repo" =~ ".rpm" ]]; then
+	if [[ "$repo" =~ .rpm ]]; then
 		echo "Using direct rpm and srpm download urls: $repo"
 		for uri in $repo; do
 			curl -sLO $uri || rlDie "downloading $uri"
