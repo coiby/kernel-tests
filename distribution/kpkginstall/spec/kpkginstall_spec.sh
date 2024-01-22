@@ -479,6 +479,68 @@ Describe 'kpkginstall: get_kpkg_ver tarball'
     End
 End
 
+Describe 'kpkginstall: download_install_package'
+    cleanup(){
+        rm -rf /var/tmp/kpkginstall
+    }
+    yumdownloader() {
+        echo "yumdownloader $*"
+        # make sure yumdownloader always return failure
+        return 1
+    }
+    sleep() {
+        echo "sleep $*"
+    }
+    Mock cki_abort_recipe
+        echo "cki_abort_recipe $*"
+    End
+    BeforeEach 'cleanup'
+    AfterEach 'cleanup'
+    package="kernel-5.14.0-276.el9.s390x"
+    It 'can download and install - dnf'
+        dnf() {
+            echo "dnf $*"
+        }
+        export YUM=dnf
+        mkdir -p /var/tmp/kpkginstall
+        When call download_install_package "$package"
+        The first line should equal "✅ Downloaded $package successfully"
+        The contents of file "${RPM_INSTALL_LOG}" should include "$YUM install --downloadonly -y $package"
+        The contents of file "${RPM_INSTALL_LOG}" should include "$YUM install -y $package"
+    End
+
+    It 'can download and install - dnf with retry'
+        dnf() {
+            echo "dnf $*"
+            attempt=$(cat /var/tmp/kpkginstall/dnf_list_called)
+            exit_code="${dnf_list_exit_code[${attempt}]}"
+            echo $((attempt+1)) > /var/tmp/kpkginstall/dnf_list_called
+            return "$exit_code"
+        }
+        mkdir -p /var/tmp/kpkginstall
+        # Retry with 2 attempts
+        export dnf_list_exit_code=("1" "0" "0" "0")
+        echo 0 > /var/tmp/kpkginstall/dnf_list_called
+        export YUM=dnf
+        When call download_install_package "$package"
+        The first line should equal "ℹ️ download_install_package: Failed to download package $package. Attempt 1/30..."
+        The line 2 should include "sleep"
+        The line 3 should equal "✅ Downloaded $package successfully"
+        The line 4 should equal "✅ Installed $package successfully"
+    End
+
+    It 'can NOT download and install - dnf'
+        dnf() {
+            echo "dnf $*"
+            return 1
+        }
+        export YUM=dnf
+        mkdir -p /var/tmp/kpkginstall
+        When call download_install_package "$package"
+        The stdout should include "cki_abort_recipe Failed to download $package! WARN"
+    End
+End
+
 Describe 'kpkginstall: rpm_install'
     Parameters
         # SOURCE_PACKAGE_NAME    PACKAGE_NAME      VARIANT_SUFFIX ARCH     KVER_RPM                                 EXPECTED_KVER_UNAME

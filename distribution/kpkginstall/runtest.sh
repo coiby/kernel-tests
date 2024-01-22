@@ -360,10 +360,18 @@ function copr_prepare()
 function download_install_package()
 {
   if ! cki_is_kernel_automotive; then
-    # If download of a package fails, report warn/abort -> infrastructure issue
-    if $YUM install --downloadonly -y "$1" >> ${RPM_INSTALL_LOG} || yumdownloader -y "$1" >> ${RPM_INSTALL_LOG}; then
-      cki_print_success "Downloaded $1 successfully"
-    else
+    downloaded=0
+    for i in $(seq 1 30); do
+      # If download of a package fails, report warn/abort -> infrastructure issue
+      if $YUM install --downloadonly -y "$1" >> ${RPM_INSTALL_LOG} || yumdownloader -y "$1" >> ${RPM_INSTALL_LOG}; then
+        cki_print_success "Downloaded $1 successfully"
+        downloaded=1
+        break
+      fi
+      cki_print_info "download_install_package: Failed to download package $1. Attempt $i/30..."
+      sleep 60
+    done
+    if [[ "$downloaded" -ne "1" ]]; then
       rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Failed to download ${1}!" WARN
     fi
@@ -390,9 +398,17 @@ function download_install_package()
     fi
 
     # download
-    if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Downloaded $1 successfully"
-    else
+    downloaded=0
+    for i in $(seq 1 30); do
+      if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" >> ${RPM_INSTALL_LOG}; then
+        cki_print_success "Downloaded $1 successfully"
+        downloaded=1
+        break
+      fi
+      cki_print_info "download_install_package: Failed to download package $1. Attempt $i/30..."
+      sleep 60
+    done
+    if [[ "$downloaded" -ne "1" ]]; then
       rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Failed to download ${1}!" WARN
     fi
