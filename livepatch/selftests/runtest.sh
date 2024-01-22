@@ -51,7 +51,7 @@ krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//
 
 debug_kernel()
 {
-	uname -r | grep -q [.+]debug$
+	uname -r | grep -E -q "[.+]debug$"
 }
 
 # usage: check_skipped_tests test_name "${skip_test[@]}"
@@ -94,8 +94,7 @@ build_selftests()
 	local backports
 	for path in backports/*; do
 		if [[ -d "$path" ]] ; then
-			kvercmp "$(uname -r)" "$(basename "$path")"
-			[[ $kver_ret -ne -1 ]] && backports="$path"
+			[[ $(kvercmp "$(uname -r)" "$(basename "$path")") -ne "-1" ]] && backports="$path"
 		fi
 	done
 	[[ -n "$backports" ]] && cat "$backports"/*.patch > ~/rpmbuild/SOURCES/linux-kernel-test.patch
@@ -171,38 +170,38 @@ install_selftests()
 test_fail()
 {
 	SCORE=${2:-$FAIL}
-	echo -e ":: [  FAIL  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e ":: [  FAIL  ] :: Test $1" | tee -a $OUTPUTFILE
 
 	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "FAIL" "$SCORE"
 	else
 		echo -e "\n:::::::::::::::::"
-		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test '"${TEST}/$1"' FAIL $SCORE"
+		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test ${TEST}/$1 FAIL $SCORE"
 		echo -e ":::::::::::::::::\n"
 	fi
 }
 
 test_pass()
 {
-	echo -e "\n:: [  PASS  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e "\n:: [  PASS  ] :: Test $1" | tee -a $OUTPUTFILE
 	# we don't care how many test passed
 	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "PASS" 0
 	else
 		echo -e "\n::::::::::::::::"
-		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test '"${TEST}/$1"'"
+		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test ${TEST}/$1"
 		echo -e "::::::::::::::::\n"
 	fi
 }
 
 test_skip()
 {
-	echo -e "\n:: [  SKIP  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e "\n:: [  SKIP  ] :: Test $1" | tee -a $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "SKIP" 0
 	else
 		echo -e "\n::::::::::::::::"
-		echo -e ":: [  SKIP${RES}  ] :: Test '"${TEST}/$1"'"
+		echo -e ":: [  SKIP${RES}  ] :: Test ${TEST}/$1"
 		echo -e "::::::::::::::::\n"
 	fi
 }
@@ -277,14 +276,11 @@ do_livepatch()
 
 #-------------------- Start Test --------------------
 # Test if kernel nvr is in a range with selftests support
-kvercmp `uname -r` '3.10.0-1067.el7'
-cmp_min_rhel7=$kver_ret
-kvercmp `uname -r` '3.10.0-9999.el7'
-cmp_max_rhel7=$kver_ret
-kvercmp `uname -r` '4.18.0-147.3.el8'
-cmp_min_rhel8=$kver_ret
+cmp_min_rhel7=$(kvercmp `uname -r` '3.10.0-1067.el7')
+cmp_max_rhel7=$(kvercmp `uname -r` '3.10.0-9999.el7')
+cmp_min_rhel8=$(kvercmp `uname -r` '4.18.0-147.3.el8')
 
-if [ "$cmp_min_rhel7" -ge "0" -a "$cmp_max_rhel7" -lt "0" ]; then
+if [ "$cmp_min_rhel7" -ge "0" ] && [ "$cmp_max_rhel7" -lt "0" ]; then
 	build_selftests || { test_fail "build selftests failed" && exit 1; }
 elif [ "$cmp_min_rhel8" -ge "0" ]; then
 	install_selftests || { test_fail "install selftests failed" && exit 1; }

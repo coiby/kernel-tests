@@ -29,9 +29,6 @@
 # Include libraries
 . ../../cki_lib/libcki.sh || exit 1
 
-# Source the common test script helpers
-. /usr/share/beakerlib/beakerlib.sh || exit 1
-
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../kernel-include/runtest.sh || exit 1
@@ -60,9 +57,9 @@ function add_aboot_param ()
 	else
 		current_aboot_cmdline+="${CMDLINEARGS}"
 	fi
-	rlRun "abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline='${current_aboot_cmdline}'"
-	rlRun "dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a"
-	rlRun "sync"
+	abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline='${current_aboot_cmdline}'
+	dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a
+	sync
 }
 
 function remove_aboot_param ()
@@ -72,23 +69,21 @@ function remove_aboot_param ()
 	# shellcheck disable=SC2207
 	current_aboot_cmdline=($(abootimg -i /boot/aboot-"${K_VER}"-"${K_REL}"."$(arch)".img | awk  '/cmdline/ {print}' | cut -f 4-"$NR" -d ' '))
 	if [ -z "${current_aboot_cmdline[0]}" ]; then
-		rlLog "WARNING: Unable to find parameter in the allowed list."
-		rlPhaseEnd
-		rlJournalEnd
-		rlJournalPrintText
+		echo "Unable to find parameter in the allowed list."
+		rstrnt-report-result "${TEST}" "FAIL" 0
 		exit 0
 	else
 		for i in "${!current_aboot_cmdline[@]}"; do
 			if echo "${CMDLINEARGS##-}" | grep -q "${current_aboot_cmdline[${i}]}"; then
-				rlRun "unset current_aboot_cmdline[${i}]"
+				unset "current_aboot_cmdline[${i}]"
 			fi
 		done
 		# want to keep spaces as delimiter
 		# shellcheck disable=SC2124
 		new_aboot_cmdline="${current_aboot_cmdline[@]}"
-		rlRun "abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline='${new_aboot_cmdline}'"
-		rlRun "dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a"
-		rlRun "sync"
+		abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline="${new_aboot_cmdline}"
+		dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a
+		sync
 	fi
 }
 
@@ -96,31 +91,28 @@ function change_cmdline ()
 {
 	CMDLINEARGS=$1
 
-	rlLog "Old cmdline:"
-	rlRun "cat /proc/cmdline"
-
 	# Update the boot loader.
 	default=$(/sbin/grubby --default-kernel)
 
 	# If the first character is - in the arguments, we remove them from
 	# the kernel commandline.
 	if echo "${CMDLINEARGS}" | grep -q "^-"; then
-		rlLog "Cmdline to be removed: ${CMDLINEARGS##-}"
+		echo "Cmdline to be removed: ${CMDLINEARGS##-}"
 		if [ -e /sys/devices/soc0/machine ]; then
-			rlRun "remove_aboot_param ${CMDLINEARGS}"
+			remove_aboot_param ${CMDLINEARGS}
 		elif [ -e /run/ostree-booted ]; then
-			rlRun "rpm-ostree kargs --delete-if-present='${CMDLINEARGS##-}' --import-proc-cmdline"
+			rpm-ostree kargs --delete-if-present="${CMDLINEARGS##-}" --import-proc-cmdline
 		else
-			rlRun "/sbin/grubby --remove-args='${CMDLINEARGS##-}' --update-kernel='${default}'"
+			/sbin/grubby --remove-args="${CMDLINEARGS##-}" --update-kernel="${default}"
 		fi
 	else
-		rlLog "Cmdline to be added: ${CMDLINEARGS}"
+		echo "Cmdline to be added: ${CMDLINEARGS}"
 		if [ -e /sys/devices/soc0/machine ]; then
-			rlRun "add_aboot_param ${CMDLINEARGS}"
+			add_aboot_param ${CMDLINEARGS}
 		elif [ -e /run/ostree-booted ]; then
-			rlRun "rpm-ostree kargs --append-if-missing='${CMDLINEARGS##-}' --import-proc-cmdline"
+			rpm-ostree kargs --append-if-missing="${CMDLINEARGS##-}" --import-proc-cmdline
 		else
-			rlRun "/sbin/grubby --args='${CMDLINEARGS}' --update-kernel='${default}'"
+			/sbin/grubby --args="${CMDLINEARGS}" --update-kernel="${default}"
 		fi
 	fi
 
@@ -140,7 +132,7 @@ function bootOptions() {
 			echo "Start test." | tee -a "${OUTPUTFILE}"
 			echo "Old cmdline: $(cat /proc/cmdline)" | tee -a "${OUTPUTFILE}"
 
-			change_cmdline $line
+			change_cmdline "$line"
 			code=$?
 
 			if [ ${code} -ne 0 ]; then

@@ -22,7 +22,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 
 GIT_URL="${GIT_URL:-https://github.com/smuellerDD/libkcapi}"
-GIT_REF="${GIT_REF:-c2af62dcc7a287f3c14f6aaec5724401c1ea470a}"
+GIT_REF="${GIT_REF:-fc937358e71253a6efaa3ba74885364976b040ea}"
 
 function version_le() {
     { echo "$1"; echo "$2"; } | sort -V | tail -n 1 | grep -qx "$2"

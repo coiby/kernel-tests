@@ -1,12 +1,11 @@
 #!/bin/bash
 
-kver_ret=0
 function kvercmp()
 {
     ver1=`echo $1 | sed 's/-/./'`
     ver2=`echo $2 | sed 's/-/./'`
 
-    ret=0
+    local ret=0
     i=1
     while [ 1 ]; do
         digit1=`echo $ver1 | cut -d . -f $i`
@@ -38,7 +37,8 @@ function kvercmp()
 
         i=$((i+1))
     done
-    kver_ret=$ret
+
+    echo "$ret"
 }
 
 function mytest()

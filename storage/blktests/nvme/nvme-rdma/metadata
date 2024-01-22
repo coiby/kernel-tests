@@ -1,7 +1,7 @@
 [General]
 name=storage/blktests/nvme/nvme-rdma
 owner=Yi Zhang <yi.zhang@redhat.com>
-description=Storage nvme rdma test
+description=Storage blktests nvme-rdma test
 license=GPLv2
 confidential=no
 destructive=no
@@ -9,4 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=blktrace;fio;gcc;gcc-c++;git;nvme-cli;xfsprogs
-repoRequires=cki_lib;storage/blktests/nvme/include;storage/blktests/include
+repoRequires=cki_lib;storage/blktests/include;storage/blktests/config
+max_time=1h

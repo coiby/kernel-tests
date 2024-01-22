@@ -360,10 +360,18 @@ function copr_prepare()
 function download_install_package()
 {
   if ! cki_is_kernel_automotive; then
-    # If download of a package fails, report warn/abort -> infrastructure issue
-    if $YUM install --downloadonly -y "$1" >> ${RPM_INSTALL_LOG} || yumdownloader -y "$1" >> ${RPM_INSTALL_LOG}; then
-      cki_print_success "Downloaded $1 successfully"
-    else
+    downloaded=0
+    for i in $(seq 1 30); do
+      # If download of a package fails, report warn/abort -> infrastructure issue
+      if $YUM install --downloadonly -y "$1" >> ${RPM_INSTALL_LOG} || yumdownloader -y "$1" >> ${RPM_INSTALL_LOG}; then
+        cki_print_success "Downloaded $1 successfully"
+        downloaded=1
+        break
+      fi
+      cki_print_info "download_install_package: Failed to download package $1. Attempt $i/30..."
+      sleep 60
+    done
+    if [[ "$downloaded" -ne "1" ]]; then
       rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Failed to download ${1}!" WARN
     fi
@@ -390,9 +398,17 @@ function download_install_package()
     fi
 
     # download
-    if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Downloaded $1 successfully"
-    else
+    downloaded=0
+    for i in $(seq 1 30); do
+      if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" >> ${RPM_INSTALL_LOG}; then
+        cki_print_success "Downloaded $1 successfully"
+        downloaded=1
+        break
+      fi
+      cki_print_info "download_install_package: Failed to download package $1. Attempt $i/30..."
+      sleep 60
+    done
+    if [[ "$downloaded" -ne "1" ]]; then
       rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Failed to download ${1}!" WARN
     fi
@@ -811,18 +827,9 @@ EOF
       sysctl kernel.panic_on_oops
 
       # We have the right kernel. Do we have any call traces?
-      DMESGLOG=/tmp/dmesg.log
-      dmesg > ${DMESGLOG}
-      grep -qi 'Call Trace:' "${DMESGLOG}"
-      dmesgret=$?
-      if [[ ${dmesgret} -eq 0 ]]; then
-        cki_print_warning "Call trace found in dmesg, see dmesg.log"
-        # dmesg.log is uploaded by default by rstrnt-report-result
-        # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check#L74
-        rstrnt-report-result ${TEST}/dmesg-check FAIL 7
-      else
-        rstrnt-report-result ${TEST}/dmesg-check PASS 0
-      fi
+      # all the issues that could be found on dmesg are logged in the journal logs
+      # therefore only check dmesg if journalctl is not available to avoid reporting
+      # duplicated result.
       if which journalctl > /dev/null 2>&1; then
         JOURNALCTLLOG=/tmp/journalctl.log
         journalctl -b > ${JOURNALCTLLOG}
@@ -833,6 +840,19 @@ EOF
           rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check FAIL 7
         else
           rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check PASS 0
+        fi
+      else
+        DMESGLOG=/tmp/dmesg.log
+        dmesg > ${DMESGLOG}
+        grep -qi 'Call Trace:' "${DMESGLOG}"
+        dmesgret=$?
+        if [[ ${dmesgret} -eq 0 ]]; then
+          cki_print_warning "Call trace found in dmesg, see dmesg.log"
+          # dmesg.log is uploaded by default by rstrnt-report-result
+          # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check#L74
+          rstrnt-report-result ${TEST}/dmesg-check FAIL 7
+        else
+          rstrnt-report-result ${TEST}/dmesg-check PASS 0
         fi
       fi
 

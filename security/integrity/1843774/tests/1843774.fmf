@@ -7,7 +7,7 @@ component:
 path: /security/integrity/1843774
 test: make run
 framework: beakerlib
-require: [grubby, make]
+require: [grubby, make, abootimg]
 duration: 12m
 extra-summary: /kernel-tests/security/integrity/1843774
 extra-task: /kernel-tests/security/integrity/1843774

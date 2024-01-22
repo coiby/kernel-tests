@@ -5,6 +5,7 @@ TNAME="storage/blktests/nvme/nvmeof-mp"
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../include/include.sh || exit 1
+CASE_TYPE=NVMEOF_MP
 
 function pre_setup
 {
@@ -15,27 +16,8 @@ function pre_setup
 	fi
 }
 
-
-function get_test_cases
-{
-	typeset testcases=""
-
-	[[ $(ip -4 -o a s | grep -cv "127.0.0.1") != 1 ]] || testcases+=" nvmeof-mp/001"
-	#RHEL8 aarch64 BZ1919363 BZ1938434, RHEL9 #BZ191296, RHEL-8.2 BZ2058980
-	uname -ri | grep -qE "4.18.0-193|4.18.0.*aarch64|4.18.0.*ppc64le|5.12.*aarch64|el9.ppc64le|5.11.*ppc64le" || testcases+=" nvmeof-mp/002"
-	# testcases+=" nvmeof-mp/004", need legacy device mapper support
-	testcases+=" nvmeof-mp/005"
-	testcases+=" nvmeof-mp/006"
-	testcases+=" nvmeof-mp/009"
-	testcases+=" nvmeof-mp/010"
-	testcases+=" nvmeof-mp/011"
-	testcases+=" nvmeof-mp/012"
-
-	echo "$testcases"
-}
-
 if [[ "$USE_SW_RDMA" =~ RXE ]] && grep -q "ipv6.disable=1" /proc/cmdline && grep -qE "8.[0-3]" /etc/redhat-release; then
-	rlLog "Skip test as system doesn't have IPv6, see bz1930263"
+	echo "Skip test as system doesn't have IPv6, see bz1930263"
 	rstrnt-report-result "$TNAME" SKIP
 	exit
 fi
@@ -44,13 +26,16 @@ function main
 {
 	pre_setup
 
-	USE_SW_RDMA=${USE_SW_RDMA:-"RXE SIW"}
-	test_ws="${CDIR}"/blktests
 	ret=0
-	testcases_default=""
-	testcases_default+=" $(get_test_cases)"
-	testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
+	test_ws="${CDIR}"/blktests
+	USE_SW_RDMA=${USE_SW_RDMA:-"RXE SIW"}
 	for use_sw_rdma in $USE_SW_RDMA; do
+		testcases_default="$(get_test_cases_list ${CASE_TYPE}_${use_sw_rdma})"
+		testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
+		if [ -z "$testcases" ]; then
+			echo "Skip test because ${CASE_TYPE}_${use_sw_rdma} list is empty"
+			rstrnt-report-result "$TNAME" SKIP
+		fi
 		for testcase in $testcases; do
 			disable_multipath
 			if [[ "$use_sw_rdma" = "RXE" ]]; then
@@ -75,7 +60,7 @@ function main
 # don't run it if running as part of shellspec
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
-	. "$CDIR"/../include/build.sh
+	. "$CDIR"/../../include/build.sh
 
 	main
 fi
