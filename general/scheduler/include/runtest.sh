@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1083
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -37,7 +38,6 @@ fi
 SCHED_PROCESS_SRC=../include/processes
 SCHED_PROCESS_BIN=$(pwd)/tasks
 SCHED_PROCESS_HOG=1
-SCHED_PROCESS_LIFE=1
 export SCHED_NR_CPU=$(grep -wo processor /proc/cpuinfo | wc -l)
 
 # Copy from zswap test
@@ -47,8 +47,8 @@ function stress_install()
                 wget http://download.eng.rdu2.redhat.com/qa/rhts/lookaside/stress-1.0.4.tar.gz;
         fi
         if ! which stress; then
-                tar xzf stress-1.0.4.tar.gz 2>&1 >/dev/null;
-                pushd stress-1.0.4; ./configure 2>&1 >/dev/null; make 2>&1 >/dev/null && make install 2>&1 >/dev/null; popd
+                tar xzf stress-1.0.4.tar.gz >/dev/null 2>&1
+                pushd stress-1.0.4; ./configure >/dev/null 2>&1 ; make >/dev/null 2>&1 && make install >/dev/null 2>&1;  popd
         fi
         export SCHED_STRESS_PATH=$(dirname $(which stress))
 }
@@ -242,12 +242,12 @@ function sysctl_or_debugfs_set()
 
         if test -f $sysctl_dir/$dir/$file; then
                 echo "Using sysctl interface file: $sysctl_dir/$dir/$file" 1>&2
-                echo "echo "$setval" > $sysctl_dir/$dir/$file"
+                echo "echo \"$setval\\" > $sysctl_dir/$dir/$file"
                 echo "$setval" > $sysctl_dir/$dir/$file
                 ret=$?
         elif test -f $sched_dir/${file#sched_}; then
                 echo "Using debug fs interface file: $sched_dir/${file#sched_}" 1>&2
-                echo "echo "$setval" > $sched_dir/${file#sched_}"
+                echo "echo \"$setval\" > $sched_dir/${file#sched_}"
                 echo "$setval" > $sched_dir/${file#sched_}
                 ret=$?
         fi
@@ -279,7 +279,7 @@ function setup_sys_ctl()
         local file=$(echo $key | awk -F. '{print $2}')
         sysctl_or_debugfs_set $dir $file $value
         ret=$?
-        echo $FUNCNAME: key=$key value=$value ret=$ret
+        echo ${FUNCNAME[0]}: key=$key value=$value ret=$ret
 
         return $ret
 }
@@ -613,7 +613,6 @@ function cgroup_populate_rt_hierachy()
         # as in a separated sibling cpu cgroup of system.slice, we can't get that much bandwidth
         # all used by system.slice-rt_runtime_us
         select_cgp="cpu:$cpu_cgroup/rtbw"
-        select_cgp_other="cpu:$cpu_cgroup/rtbw_other"
         cg_dir="$(echo $select_cgp | awk -F: '{print $2}')"
         cg_controller="$(echo $select_cgp | awk -F: '{print $1}')"
         echo "select_cgp=$select_cgp cg_dir=$cg_dir cg_controller=$cg_controller"
@@ -710,7 +709,7 @@ function cgroup_create()
                 fi
         fi
 
-        echo $FUNCNAME: succeed to create cgroup $cgroup
+        echo ${FUNCNAME[0]}: succeed to create cgroup $cgroup
 
         return $ret
 }
@@ -765,9 +764,9 @@ function cgroup_destroy()
                         fi
                 done
                 if ((ret==0)); then
-                        echo "$FUNCNAME: $success_controllers:$tgt_dir succeed to be removed"
+                        echo "${FUNCNAME[0]}: $success_controllers:$tgt_dir succeed to be removed"
                 else
-                        echo "$FUNCNAME: $success_controllers:$tgt_dir fail to be removed"
+                        echo "${FUNCNAME[0]}: $success_controllers:$tgt_dir fail to be removed"
                 fi
         else
                 # cgroup v2
@@ -777,9 +776,9 @@ function cgroup_destroy()
                 ((nr_tasks > 0)) && echo 1 > $tgt_dir/cgroup.kill
                 rmdir $tgt_dir || ((ret++))
                 if ((ret==0)); then
-                        echo "$FUNCNAME: $tgt_dir succeed to be removed"
+                        echo "${FUNCNAME[0]}: $tgt_dir succeed to be removed"
                 else
-                        echo "$FUNCNAME: $tgt_dir fail to be removed"
+                        echo "${FUNCNAME[0]}: $tgt_dir fail to be removed"
                 fi
         fi
 }
@@ -802,13 +801,13 @@ function v1_v2_file_map()
         if echo "${CGROUP_FILE_MAP[*]}" | grep -qw "$file_name"; then
                 for k in ${!CGROUP_FILE_MAP[*]}; do
                         if [ ${CGROUP_FILE_MAP[$k]} = "$file_name" ]; then
-                                echo "$FUNCNAME: convert v2 file $file_name to v1 file $k" 1>&2
+                                echo "${FUNCNAME[0]}: convert v2 file $file_name to v1 file $k" 1>&2
                                 echo $k
                                 return
                         fi
                 done
         elif echo "${!CGROUP_FILE_MAP[*]}" | grep -qw "$file_name"; then
-                echo "$FUNCNAME: convert v1 file $file_name to v2 file ${CGROUP_FILE_MAP["$file_name"]}" 1>&2
+                echo "${FUNCNAME[0]}: convert v1 file $file_name to v2 file ${CGROUP_FILE_MAP["$file_name"]}" 1>&2
                 echo "${CGROUP_FILE_MAP["$file_name"]}" && return
         fi
 
@@ -840,7 +839,7 @@ function cgroup_set()
                 if ! test -f $file_path; then
                         file_name=$(v1_v2_file_map $file_name $tgt_dir)
                         file_path=$tgt_dir/$file_name
-                        test -f $file_path && ret=0 || echo "$FUNCNAME: No $file_name in $tgt_dir"
+                        test -f $file_path && ret=0 || echo "${FUNCNAME[0]}: No $file_name in $tgt_dir"
                 fi
                 echo $dir: file_name=$file_name, file_value=$file_value
                 echo  "$file_value" > $file_path || ((ret++))
@@ -870,6 +869,7 @@ function cgroup_get()
         if [ "$CGROUP_VERSION" = 1 ]; then
                 for controller in $controllers; do
                         local tgt_dir=$(__fix_cgroup_dir $dir "$controllers")
+                        # shellcheck disable=SC2044
                         for cggf in $(find $tgt_dir $extra_0 -type f $extra); do
                                 nl=$(wc -l $cggf | awk '{print $1}')
                                 if ((nl == 1)); then
@@ -892,6 +892,7 @@ function cgroup_get()
                 done
         elif [ "$CGROUP_VERSION" = 2 ]; then
                 local tgt_dir=$(__fix_cgroup_dir $dir "$controllers")
+                # shellcheck disable=SC2044
                 for cggf in $(find $tgt_dir $extra_0 -type f $extra); do
                         nl=$(wc -l $cggf | awk '{print $1}')
                         if ((nl == 1)); then
@@ -921,7 +922,6 @@ function cgroup_get()
 # cgexec.sh <dir_name> <controllers> <cmd>
 function gen_cgexec()
 {
-        local pwd=$(pwd)
         local file=cgexec.sh
         local path=$(pwd)
         local res
@@ -959,10 +959,10 @@ function cgroup_exec()
                 for controller in $controllers; do
                         local tgt_dir=$(__fix_cgroup_dir "$dir" "$controller")
                         local tgt_file=$tgt_dir/tasks
-                        test -d $tgt_dir || { echo "$FUNCNAME: $tgt_dir doesnt exist" && continue; }
+                        test -d $tgt_dir || { echo "${FUNCNAME[0]}: $tgt_dir doesnt exist" && continue; }
                         cgroup_exec_dirs+="$tgt_dir "
                 done
-                echo "$FUNCNAME: exec command in cgroups: $cgroup_exec_dirs"
+                echo "${FUNCNAME[0]}: exec command in cgroups: $cgroup_exec_dirs"
         elif [ "$CGROUP_VERSION" = 2 ]; then
                 local tgt_dir=$CGROUP_ROOT/$dir/
                 tgt_file=$tgt_dir/cgroup.procs
@@ -985,7 +985,7 @@ EOF
 
         ./cgexec "$@"
         ret=$?
-        echo $FUNCNAME: return=$?
+        echo ${FUNCNAME[0]}: return=$?
 
         return $ret
 }
@@ -1003,7 +1003,7 @@ function cgroup_classify()
         if [ "$CGROUP_VERSION" = 1 ]; then
                 for controller in $controllers; do
                         local tgt_dir=$(__fix_cgroup_dir "$dir" "$controller")
-                        test -d $tgt_dir || { echo "$FUNCNAME: $tgt_dir doesnt exist" && continue; }
+                        test -d $tgt_dir || { echo "${FUNCNAME[0]}: $tgt_dir doesnt exist" && continue; }
                         tgt_dirs+=" $tgt_dir"
                 done
         elif [ "$CGROUP_VERSION" = 2 ]; then
@@ -1035,7 +1035,7 @@ function cgroup_display()
         if [ "$CGROUP_VERSION" = 1 ]; then
                 for controller in $controllers; do
                         local tgt_dir=$(__fix_cgroup_dir "$dir" "$controller")
-                        test -d $tgt_dir || { echo "$FUNCNAME: $tgt_dir doesnt exist" && return 1; }
+                        test -d $tgt_dir || { echo "${FUNCNAME[0]}: $tgt_dir doesnt exist" && return 1; }
                         cgroup_get $dir $controller "$3"
                 done
         else
@@ -1152,17 +1152,21 @@ function ignore_falsepositive_knownissues()
         test -f $filter_cfg || touch $filter_cfg
         test -f $filter_cfg || { echo No $filter_cfg; return 0; }
 
+        # shellcheck disable=SC2034
         local falsepositives_rhel8=(
                 "EDAC DEBUG:"
                 "ODEBUG: Out of memory"
         )
+        # shellcheck disable=SC2034
         local falsepositives_rhel9=(
                 "EDAC DEBUG:"
                 "ODEBUG: Out of memory"
         )
 
+        # shellcheck disable=SC2034
         local known_issues_rhel8=(
         )
+        # shellcheck disable=SC2034
         local known_issues_rhel9=(
         )
 
@@ -1171,7 +1175,6 @@ function ignore_falsepositive_knownissues()
 
         local os=$(awk -F= '/^ID=/ {gsub("\"","",$2);print $2}' /etc/os-release)
         local major=$(awk -F= '/^VERSION_ID=/ {gsub("\"","",$2);split($2,a,".");print a[1]}' /etc/os-release)
-        local minor=$(awk -F= '/^VERSION_ID=/ {gsub("\"","",$2);split($2,a,".");print a[2]}' /etc/os-release)
 
         if [ "$os$major" = "rhel9" -o "$os$major" = "ceontos9" ]; then
                 list_names="falsepositives_rhel9 known_issues_rhel9"
@@ -1186,12 +1189,12 @@ function ignore_falsepositive_knownissues()
 
         for list_name in $list_names; do
                 local i
-                # shellcheck disable=SC1087
+                # shellcheck disable=SC1087,SC1083
                 local nr_items="$(eval echo \${#$list_name[*]})"
                 local line=""
                 echo $list_name: $nr_items items
                 for ((i=0; i<nr_items; i++)); do
-                        # shellcheck disable=SC1087
+                        # shellcheck disable=SC1087,SC1083
                         line="$(eval echo \${$list_name[$i]})"
                         grep -Eq "^$line" $filter_cfg && echo "\"$line\" already in $filter_cfg" && continue
                         echo "$line" >> $filter_cfg
