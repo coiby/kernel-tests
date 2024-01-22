@@ -27,7 +27,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# shellcheck disable=SC2128
 FILE=$(readlink -f $BASH_SOURCE)
+# shellcheck disable=SC2034
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 
@@ -179,7 +181,7 @@ if [ "x${HPSIZE}" == "x512M" ]; then
 fi
 
 # skip ptrace-write-hugepage on rt79z debug - test hangs without proceeding from time to time
-if uname -r | grep -q 3\.10\.0-1160.*rt.*\.el7\.x86_64\.debug; then
+if uname -r | grep -q "3\.10\.0-1160.*rt.*\.el7\.x86_64\.debug"; then
     sed 's/do_test("ptrace-write-hugepage")/#do_test("ptrace-write-hugepage")/g' -i "${WORK_DIR}/run_tests.py"
 fi
 
@@ -284,7 +286,6 @@ EOF
         fi
     else
         mem_total=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
-        hpsize=$(cat /proc/meminfo | grep Hugepagesize | awk '{print $2}')
         if [ ${mem_total} -gt $((1024 * ${HMEMSZ} * 10)) ]; then
             rlLog "Skipping test because need $HPCOUNT hugepages for test, have: $free_hugepages"
             rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
