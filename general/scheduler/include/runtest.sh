@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1083
+# shellcheck disable=SC1083,SC2320
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -1017,7 +1017,8 @@ function cgroup_classify()
                         tgt_file=$tgt_dir/$CGROUP_TASK_FILE
                         set -x
                         echo $move_pid >> $tgt_file
-                        [ $? -ne 0 ] && ret=$? && echo "failed to move $move_pid to $controller:$dir"
+                        ret=$?
+                        [ $ret -ne 0 ] && echo "failed to move $move_pid to $controller:$dir"
                         set +x
                 done
         done
