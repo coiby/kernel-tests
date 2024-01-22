@@ -113,7 +113,6 @@ rlJournalStart
 			fi
 
 			echo "enable tuned service"
-			enabled=$(systemctl status tuned | awk '/Active:/ {print $2}')
 			systemctl enable tuned
 
 			echo "start tuned service"
