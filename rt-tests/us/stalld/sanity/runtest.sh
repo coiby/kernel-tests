@@ -37,6 +37,7 @@ get_test_cpu()
     local cpu_isolated test_cpu
     cpu_isolated="$(cat /sys/devices/system/cpu/isolated)"
     if [[ -z $cpu_isolated ]]; then
+        # shellcheck disable=SC2154
         test_cpu=$(( $nrcpus - 1 ))
     else
         cpu_isolated="$(convert_number_range $cpu_isolated)"

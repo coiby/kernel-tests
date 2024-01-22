@@ -16,7 +16,7 @@ function check_status()
 
 function runtest()
 {
-    if ! ( (( "$rhel_x" == 9 && "$rhel_y" >=3 )) || (( "$rhel_x" >= 10 )) ); then
+    if rhel_in_range 0 9.2; then
         log "rv is only supported for RHEL >= 9.3"
         rstrnt-report-result $TEST "SKIP" 0
         exit 0
