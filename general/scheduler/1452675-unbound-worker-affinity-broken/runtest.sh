@@ -33,8 +33,6 @@
 trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1
 
 tracing_dir=/sys/kernel/debug/tracing
-nr_cpu=$(cat /proc/cpuinfo | grep -w ^processor | wc -l)
-max=$((nr_cpu - 1))
 
 Cleanup() {
 	true
@@ -45,23 +43,22 @@ Cleanup() {
 # result: 1,00fff000
 # then echo 1,00fff000 > /sys/kernel/debug/tracing/tracing_cpumask
 function get_cpumask() {
-	local tmp=""
 	local index=0
 	local mask=""
 	local c
-	declare -a package_cpus_mask
+	declare -a package_cpus_masks
 	local cpu_list=$*
 	for index in $(seq 0 $((1024 / 32))); do
-		package_cpus_mask[$index]=0
+		package_cpus_masks[$index]=0
 	done
 
 	for c in $cpu_list; do
 		index=$((c / 32))
-		package_cpus_mask[$index]=$((package_cpus_mask[$index] | ((1 << (( c - ((32*index)) )) ))))
+		package_cpus_masks[$index]=$((package_cpus_masks[$index] | ((1 << (( c - ((32*index)) )) ))))
 	done
-	for index in ${!package_cpus_mask[*]}; do
-		package_cpus_mask[$index]=$(printf "%08x" ${package_cpus_mask[$index]})
-		mask=${package_cpus_mask[$index]},$mask
+	for index in ${!package_cpus_masks[*]}; do
+		package_cpus_masks[$index]=$(printf "%08x" ${package_cpus_masks[$index]})
+		mask=${package_cpus_masks[$index]},$mask
 	done
 	echo $mask | awk -F, 'BEGIN{i=1;out=""}{while($i == "00000000" && i<NF) i++}END{for (;i<=NF;i++) out=out","$i; gsub("^,|,$","",out);printf("%s\n", out);}'
 }
@@ -92,7 +89,7 @@ rlJournalStart
 		rlRun "tuna -S1 -i"
 		package_cpus="$(sh package.sh 1)"
 		rlLogInfo "$package_cpus"
-		rlRun "package_nr_cpus="$(echo $package_cpus | awk '{print NF}')"" 0-255
+		rlRun "package_nr_cpus=$(echo $package_cpus | awk '{print NF}')" 0-255
 		package_cpus_mask=0
 		# For 1ffffffff such kind, covert to 1,ffffffff with ',' as seperator
 		package_cpus_mask=$(get_cpumask "$package_cpus")
