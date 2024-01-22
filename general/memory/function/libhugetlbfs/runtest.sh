@@ -418,7 +418,6 @@ function run_tests()
 		fi
 	else
 		mem_total=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
-		hpsize=$(awk '/Hugepagesize/ {print $2}' /proc/meminfo)
 		if [ ${mem_total} -gt $((1024 * ${HMEMSZ} * 10)) ]; then
 			rlPhaseStart WARN "not_enough_huge_pages"
 			rlAssertGreaterOrEqual "Need $HPCOUNT hugepages for test, have: $free_hugepages" $free_hugepages $HPCOUNT
