@@ -1,4 +1,5 @@
 #!/bin/sh
+#shellcheck disable=SC2034
 
 # Define of the general test ENV in kernel-general test.
 KG_SERVER=vmcore.usersys.redhat.com

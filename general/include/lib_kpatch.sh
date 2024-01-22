@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 # process_kpp_nvr var_name1 ... var_nameN.
 function process_kpp_nvr()

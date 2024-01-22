@@ -434,7 +434,7 @@ function gen_cgexec()
 	local path=$(pwd)
 	local res
 	local i
-
+	# shellcheck disable=SC2034
 	for i in $(seq 1 10); do
 		test -f $path/include/$file && res=$path/include/$file && break
 		test -f $path/general/include/$file && res=$path/general/include/$file && break
