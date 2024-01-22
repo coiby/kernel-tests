@@ -202,7 +202,7 @@ run_matrix()
 			gsub("G", "*1024*1024", a[1]); gsub("K", "", a[1]);
 			gsub("M", "*1024", a[1]); print a[1]}' /proc/cmdline | bc)
 		rlLogInfo "Default hugepage sizes in cmdline kB: $default_hpsz_cmdline"
-		rlAssertEquals "default hugepage size should be same with cmdline" "${default_hpsz_cmdline}" "$default_hpsz" || abort_test
+		rlAssertEquals "default hugepage size should be same with cmdline" "${default_hpsz_cmdline}" "$default_hpsz" || abort_test "failed hugepage command line"
 		run_diff
 		run_matrix
 	fi
