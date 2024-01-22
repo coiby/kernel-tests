@@ -15,10 +15,10 @@ function bz1978711()
 
 	sleep 2
 	rlRun -l "ps -LC cyclictest -o pid,tid,psr,pcpu,etimes,args"
+	[ $? -ne 0 ] && report_result "cyclictest_compile" FAIL && return
 
 	echo > /sys/kernel/debug/tracing/trace
 
-	[ $? -ne 0 ] && report_result "cyclictest_compile" FAIL && return
 
 	rlRun -l "cat /sys/kernel/debug/tracing/{set_event,tracing_on,current_tracer,set_ftrace_filter,tracing_cpumask}"
 	rlRun "grep tick_sched_handle /sys/kernel/debug/tracing/trace" 1-255

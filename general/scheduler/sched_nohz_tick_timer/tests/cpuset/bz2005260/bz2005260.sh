@@ -44,7 +44,7 @@ function bz2005260()
 		return
 	fi
 
-	local cpulist=$(get_cpuset_cpus)
+	local cpulist=$(get_cpuset_cpus 4)
 
 	check_cgroup_version
 	cgroup_create bz2005260 cpuset
