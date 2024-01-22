@@ -64,7 +64,7 @@ rlJournalStart
                 rlRun "remove_aboot_param"
                 CMDLINEARGS="-ima_policy=appraise_tcb"
                 rlRun "remove_aboot_param"
-            if stat /run/ostree-booted > /dev/null 2>&1; then
+            elif stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm-ostree kargs --delete-if-present=ima_appraise=fix --delete-if-present=ima_policy=appraise_tcb --import-proc-cmdline
             else
                 grubby --remove-args="ima_appraise=fix" --update-kernel=DEFAULT
