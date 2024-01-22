@@ -64,6 +64,7 @@ function run_cases()
         subfunc=$(basename ${subcase%.sh})
         pname=$subfunc
         ptype=FAIL
+		# shellcheck disable=SC1090
         source $subcase
 
         check_knownissues $subfunc
