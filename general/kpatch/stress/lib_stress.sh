@@ -55,12 +55,11 @@ function prep_kbuild()
 {
     unset ARCH
     echo "kbuild" > $STRESSER_FILE
-    CDR=$(pwd)
     local k_srpm=$(ls *.src.rpm)
     local k_spec=${HOME}/rpmbuild/SPECS/kernel.spec
-    k_build=${HOME}/rpmbuild/BUILD/kernel-${kver}-${krel}/linux-*/
-    Info "srpm name is $srpm"
-    rpm -ivh $k_srpm || Error "Install srpm $srpm failed"
+    k_build=$(ls ${HOME}/rpmbuild/BUILD/kernel-${kver}-${krel}/linux-*/ | head -1)
+    Info "srpm name is $k_srpm"
+    rpm -ivh $k_srpm || Error "Install srpm $k_srpm failed"
     yum-builddep -y $k_spec || Error "build dependency can't be solved."
     rpmbuild -bp $k_spec
 }
@@ -180,7 +179,7 @@ function load_trace()
     Info "========== stress trace stress =============="
     prep_trace
     while :; do
-        start_trace
+        start_trace "$@"
         finish_trace
     done
 }
