@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -123,7 +124,7 @@ function get_symbol_addr_snapshot()
 
 function slub_freelist_random()
 {
-    [ "$SLUB_RANDOM" -eq 0 ] && echo "Skip $FUNCNAME" && return
+    [ "$SLUB_RANDOM" -eq 0 ] && echo "Skip ${FUNCNAME[0]}" && return
     uname -r | grep debug && echo "Skip debug kernel" && return
     local kaslr=${1:-0}
     local index=$2
@@ -416,15 +417,12 @@ function select_yum_tool()
 {
     if [ -x /usr/bin/dnf ]; then
         YUM=/usr/bin/dnf
-        ALL="--all"
         ${YUM} install -y dnf-plugins-core
     elif [ -x /usr/bin/yum ]; then
         YUM=/usr/bin/yum
-        ALL="all"
         ${YUM} install -y yum-plugin-copr
     elif stat /run/ostree-booted > /dev/null 2>&1; then
         YUM="rpm-ostree -A --idempotent --allow-inactive"
-        ALL=""
         ${YUM} install -y dnf-plugins-core
     else
         rstrnt-report-result ${TEST} WARN 99

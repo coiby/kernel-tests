@@ -111,9 +111,9 @@ function cgroup_create()
 			local rt_pids=$(ps -AL -o pid,policy,args | grep -E "RR|FF|DL" | grep -Ev "grep|\[" | awk '{print $1}')
 			echo "Killing rt tasks" && kill $rt_pids
 		fi
-
 		for controller in $controllers; do
 			echo "+$controller" >> $CGROUP_ROOT/cgroup.subtree_control
+			# shellcheck disable=SC2320
 			[ $? -ne 0 ] && ((ret++))
 		done
 		cgroup=$CGROUP_ROOT/$cgroup_dir
@@ -145,7 +145,7 @@ function cgroup_create()
 		fi
 	fi
 
-	echo $FUNCNAME: succeed to create cgroup $cgroup
+	echo ${FUNCNAME[0]}: succeed to create cgroup $cgroup
 
 	return $ret
 }
@@ -193,7 +193,7 @@ function cgroup_set_memory()
 
 	if [ "$CGROUP_VERSION" = 1 ]; then
 		set -x
-		if grep -q [56].[0-9] /etc/redhat-release; then
+		if grep -q "[56].[0-9]" /etc/redhat-release; then
 			local mem_size_max=$(echo $(to_bytes $mem_size_max) $(to_bytes $swap_size_max) | awk  '{print $1+$2}')
 		else
 			local mem_swap_max=$(echo | awk -v IGNORECASE=1 -v a=$mem_size_max -v b=$swap_size_max \
@@ -235,13 +235,13 @@ function v1_v2_file_map()
 	if echo "${CGROUP_FILE_MAP[*]}" | grep -qw "$file_name"; then
 		for k in ${!CGROUP_FILE_MAP[*]}; do
 			if [ ${CGROUP_FILE_MAP[$k]} = "$file_name" ]; then
-				echo "$FUNCNAME: convert v2 file $file_name to v1 file $k" 1>&2
+				echo "${FUNCNAME[0]}: convert v2 file $file_name to v1 file $k" 1>&2
 				echo $k
 				return
 			fi
 		done
 	elif echo "${!CGROUP_FILE_MAP[*]}" | grep -qw "$file_name"; then
-		echo "$FUNCNAME: convert v1 file $file_name to v2 file ${CGROUP_FILE_MAP["$file_name"]}" 1>&2
+		echo "${FUNCNAME[0]}: convert v1 file $file_name to v2 file ${CGROUP_FILE_MAP["$file_name"]}" 1>&2
 		echo "${CGROUP_FILE_MAP["$file_name"]}" && return
 	fi
 
@@ -279,6 +279,7 @@ function cgroup_get_file()
 	if [ "$CGROUP_VERSION" = 1 ]; then
 		for controller in $controllers; do
 			local tgt_dir=$(__fix_cgroup_dir $dir "$controllers")
+			# shellcheck disable=SC2044
 			for cggf in $(find $tgt_dir $extra_0 -type f $extra); do
 				nl=$(wc -l $cggf | awk '{print $1}')
 				if ((nl == 1)); then
@@ -301,6 +302,7 @@ function cgroup_get_file()
 		done
 	elif [ "$CGROUP_VERSION" = 2 ]; then
 		local tgt_dir=$(__fix_cgroup_dir $dir "$controllers")
+		# shellcheck disable=SC2044
 		for cggf in $(find $tgt_dir $extra_0 -type f $extra); do
 			nl=$(wc -l $cggf | awk '{print $1}')
 			if ((nl == 1)); then
@@ -350,7 +352,7 @@ function cgroup_set_file()
 		if ! test -f $file_path; then
 			file_name=$(v1_v2_file_map $file_name $tgt_dir)
 			file_path=$tgt_dir/$file_name
-			test -f $file_path && ret=0 || echo "$FUNCNAME: No $file_name in $tgt_dir"
+			test -f $file_path && ret=0 || echo "${FUNCNAME[0]}: No $file_name in $tgt_dir"
 		fi
 		echo $dir: file_name=$file_name, file_value=$file_value
 		echo "$file_value" > $file_path || ((ret++))
@@ -370,7 +372,7 @@ function cgroup_display()
 	if [ "$CGROUP_VERSION" = 1 ]; then
 		for controller in $controllers; do
 			local tgt_dir=$(__fix_cgroup_dir "$dir" "$controller")
-			test -d $tgt_dir || { echo "$FUNCNAME: $tgt_dir doesnt exist" && return 1; }
+			test -d $tgt_dir || { echo "${FUNCNAME[0]}: $tgt_dir doesnt exist" && return 1; }
 			cgroup_get_file $dir $controller "$3"
 		done
 	else
@@ -406,9 +408,9 @@ function cgroup_destroy()
 			fi
 		done
 		if ((ret==0)); then
-			echo "$FUNCNAME: $success_controllers:$tgt_dir succeed to be removed"
+			echo "${FUNCNAME[0]}: $success_controllers:$tgt_dir succeed to be removed"
 		else
-			echo "$FUNCNAME: $success_controllers:$tgt_dir fail to be removed"
+			echo "${FUNCNAME[0]}: $success_controllers:$tgt_dir fail to be removed"
 		fi
 	else
 		# cgroup v2
@@ -418,9 +420,9 @@ function cgroup_destroy()
 		((nr_tasks > 0)) && echo 1 > $tgt_dir/cgroup.kill
 		rmdir $tgt_dir || ((ret++))
 		if ((ret==0)); then
-			echo "$FUNCNAME: $tgt_dir succeed to be removed"
+			echo "${FUNCNAME[0]}: $tgt_dir succeed to be removed"
 		else
-			echo "$FUNCNAME: $tgt_dir fail to be removed"
+			echo "${FUNCNAME[0]}: $tgt_dir fail to be removed"
 		fi
 	fi
 }
@@ -430,12 +432,11 @@ function cgroup_destroy()
 # cgexec.sh <dir_name> <controllers> <cmd>
 function gen_cgexec()
 {
-	local pwd=$(pwd)
 	local file=cgexec.sh
 	local path=$(pwd)
 	local res
 	local i
-
+	# shellcheck disable=SC2034
 	for i in $(seq 1 10); do
 		test -f $path/include/$file && res=$path/include/$file && break
 		test -f $path/general/include/$file && res=$path/general/include/$file && break

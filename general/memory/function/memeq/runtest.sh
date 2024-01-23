@@ -124,9 +124,11 @@ rlPhaseStartTest
 	# mem parameter to be set for next reboot
 	rlRun "next=$(sed -n '2p' list)"
 	rlRun "sed -i '1d' list"
+	# shellcheck disable=SC2154
 	rlLog "current=$current next=$next"
 
 	rlRun -l 'free_total=$(free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p")'
+	# shellcheck disable=SC2154
 	rlLog "Total memory (reported by 'free') $free_total kB"
 	rlRun -l "dmesg_total=\$(dmesg | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
 
@@ -139,6 +141,7 @@ rlPhaseStartTest
 		rlRun -l "dmesg_total=\$(dmesg | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
 		if [ -n "$mem_absent" ]; then
 			rlLog "Absent memory (from dmesg message) $mem_absent kB"
+			# shellcheck disable=SC2154
 			rlRun "dmesg_total=\$(($dmesg_total - $mem_absent))"
 		fi
 

@@ -1,5 +1,4 @@
 #!/bin/bash
-# /bin/bash
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -61,8 +60,9 @@ function run_regression()
     local ptype=FAIL
     local pname
     findargs=$(echo $BZLIST | awk -v RS=' ' -v ORS=' ' '{print "-o -name bz*"$1".sh"}')
+    # shellcheck disable=SC2044
     for subcase in $(find $DIR_CASE -maxdepth 1 -name notexist $findargs); do
-        ERR_STR=""
+        # shellcheck disable=SC1090
         . $subcase
         # Since 'basename -s' is not supported on rhel6, remove suffix '.sh' with bash parameter expansion.
         #subfunc=$(basename -s .sh $subcase)
@@ -128,6 +128,7 @@ rlJournalStart
         [ -f $REBOOT_DOGFILE ] && rlFail "Unexpected restart detected, please check." || rlRun "touch $REBOOT_DOGFILE"
         init_skip
         rlRun "TmpDir=\$(mktemp -d -p $DIR_ENTRY)" 0 "Creating tmp directory"
+        # shellcheck disable=SC2154
         rlRun "pushd $TmpDir"
         rlRun "ps -AL -o start_time,time,tid,pid,ppid,pcpu,pmem,psr,comm | sort -k6 -rg" 0 "init process states"
     rlPhaseEnd

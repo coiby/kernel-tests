@@ -1,9 +1,10 @@
 #!/bin/sh
+#shellcheck disable=SC2034
 
 # Define of the general test ENV in kernel-general test.
 KG_SERVER=vmcore.usersys.redhat.com
 KG_SERVER_ALIAS=vmcore.usersys.redhat.com
-KG_SERVER_USER=test
+KG_SERVER_USER="test"
 
 # The http url for tools/configs. For http, the path
 # /data/ is uased as root, different from nfs path.

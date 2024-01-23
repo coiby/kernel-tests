@@ -1,12 +1,10 @@
 #!/bin/bash
+# shellcheck disable=SC2048
 set -x
 
 # For installing packages from buildroot in rhel8+
 
 this_arch=$(uname -m)
-this_distro=$(awk -F- '/DISTRO/ {gsub("[ \t]",""); print $3}' /etc/motd) # E.G. 20210224.[nd].4 or 20210224.6
-pre_distro=$(echo $this_distro | awk -F. '{if (NF ==2) {print $1} else if (NF==3) {printf("%s.%s\n",$1,$2)}}')
-end_distro=$(echo $this_distro | awk -F. '{print $NF}')
 
 maj_rel=$(grep -oE "[0-9]\.[0-9]" /etc/redhat-release | cut -d. -f1)
 min_rel=$(grep -oE "[0-9]\.[0-9]" /etc/redhat-release | cut -d. -f2)

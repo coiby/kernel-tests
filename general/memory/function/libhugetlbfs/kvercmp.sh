@@ -38,6 +38,8 @@ function kvercmp()
 
 		i=$((i+1))
 	done
+	# it's used by the caller.
+	# shellcheck disable=SC2034
 	kver_ret=$ret
 	echo "kvercmp($1,$2): $ret"
 }

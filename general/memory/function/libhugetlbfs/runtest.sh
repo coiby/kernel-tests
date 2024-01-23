@@ -178,7 +178,7 @@ function build_testsuit_srpm()
 	fi
 
 	# If we have defined the rpm urls one by one. We download with the url directly.
-	if [[ "$repo" =~ ".rpm" ]]; then
+	if [[ "$repo" =~ .rpm ]]; then
 		echo "Using direct rpm and srpm download urls: $repo"
 		for uri in $repo; do
 			curl -sLO $uri || rlDie "downloading $uri"
@@ -296,8 +296,9 @@ function filter_known_issues()
 		KNOWNISSUE_32="$KNOWNISSUE_32 -e \"Bad configuration: sched_setaffinity\""
 		KNOWNISSUE_64="$KNOWNISSUE_64 -e \"Bad configuration: sched_setaffinity\""
 	fi
-
 	kvercmp "$cver" '4.3'
+	# kver_ret is defined in kvercmp
+	# shellcheck disable=SC2154
 	if [ $kver_ret -le 0 ]; then
 		   KNOWNISSUE_32="$KNOWNISSUE_32 -e \"no fallocate support in kernels before 4.3.0\""
 		   KNOWNISSUE_64="$KNOWNISSUE_64 -e \"no fallocate support in kernels before 4.3.0\""
@@ -306,6 +307,8 @@ function filter_known_issues()
 	# Bug 1006253 libhugetlbfs counters testcase occasionally fails on NUMA systems
 	if grep -q "release 7.[0-9]" /etc/redhat-release; then
 		kvercmp "$cver" '4.10'
+		# kver_ret is defined in kvercmp
+		# shellcheck disable=SC2154
 		if [ $kver_ret -le 0 ]; then
 			KNOWNISSUE_32="$KNOWNISSUE_32 -e \"^counters.sh.*Bad HugePages\""
 			KNOWNISSUE_64="$KNOWNISSUE_64 -e \"^counters.sh.*Bad HugePages\""
@@ -315,6 +318,8 @@ function filter_known_issues()
 	# Case isssue. version check is not right for rhel7
 	if grep -q "release 7.[0-9]" /etc/redhat-release; then
 		kvercmp '3.10' "$cver"
+		# kver_ret is defined in kvercmp
+		# shellcheck disable=SC2154
 		if [ $kver_ret -le 0 ]; then
 			KNOWNISSUE_32="$KNOWNISSUE_32 -e \"misalign.*mmap.*succeeded\""
 			KNOWNISSUE_64="$KNOWNISSUE_64 -e \"misalign.*mmap.*succeeded\""
@@ -413,7 +418,6 @@ function run_tests()
 		fi
 	else
 		mem_total=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
-		hpsize=$(awk '/Hugepagesize/ {print $2}' /proc/meminfo)
 		if [ ${mem_total} -gt $((1024 * ${HMEMSZ} * 10)) ]; then
 			rlPhaseStart WARN "not_enough_huge_pages"
 			rlAssertGreaterOrEqual "Need $HPCOUNT hugepages for test, have: $free_hugepages" $free_hugepages $HPCOUNT

@@ -52,6 +52,7 @@ hugepage_support(){
 # Is  huage page supported? Numa supported?
 get_feature(){
 	M_RS_HUGEPAGE=0
+	# shellcheck disable=SC2034
 	hugepage_support && M_RS_HUGEPAGE=1;
 }
 
@@ -85,7 +86,7 @@ get_systeminfo(){
 mark_skip(){
 	local bug="$1"
 	local reason="$2"
-	echo "$bug: $2" >> $FILE_SKIP_SUMMARY
+	echo "$bug: $reason" >> $FILE_SKIP_SUMMARY
 }
 
 # Get the skipped bugs
@@ -182,24 +183,28 @@ get_release()
 	# rhel8 or fedora29
 	RELEASE=${REL_ID}${major}
 	# rhel83
-	MINOR_RELEASE=${REL_ID}${major}
+	MINOR_RELEASE=${REL_ID}${major}${minor}
 	echo "INFO: REL_ID=$REL_ID RELEASE=$RELEASE MINOR_RELEASE=$MINOR_RELEASE"
 }
 
 function check_knownissues()
 {
 	local i
+	local subfunc=${1}
+	# shellcheck disable=SC2048
 	if echo ${KNOWN_ISSUE_LIST[*]} | grep -q $subfunc; then
 		local bug_id=$(echo ${KNOWN_ISSUE_LIST[$REL_ID]} | awk -F: -v RS=' ' '/'$subfunc'/ {split($2,a,",");print a[1]}')
 		# Array elements
-		local kver_since=($(echo ${KNOWN_FILED_BUGS[$bug_id]} | awk -v RS=' ' '{split($0,a,"->");print a[1]}'))
-		local kver_until=($(echo ${KNOWN_FILED_BUGS[$bug_id]} | awk -v RS=' ' '{split($0,a,"->");print a[2]}'))
+		# shellcheck disable=SC2207
+		local kver_since=($(echo "${KNOWN_FILED_BUGS[$bug_id]}" | awk -v RS=' ' '{split($0,a,"->");print a[1]}'))
+		# shellcheck disable=SC2207
+		local kver_until=($(echo "${KNOWN_FILED_BUGS[$bug_id]}" | awk -v RS=' ' '{split($0,a,"->");print a[2]}'))
 		for ((i=0; i<${#kver_since[*]}; i++)); do
 			if kver_ge ${kver_since[$i]}; then
-				if [ "${kver_until[$i]}" = "*" ] || kver_le $kver_until; then
+				if [ "${kver_until[$i]}" = "*" ] || kver_le "${kver_until[$i]}"; then
 					echo "$subfunc: Switching test phase to warning, as there's knownissue $bug_id"
-					ptype=WARN
-					pname=${subfunc}_$(echo ${KNOWN_ISSUE_LIST[$REL_ID]} |\
+					export ptype=WARN
+					export pname=${subfunc}_$(echo ${KNOWN_ISSUE_LIST[$REL_ID]} |\
 					awk -F: -v RS=' ' '/'$subfunc'/ {if (NF>1) {gsub(",","-unfix",$2);\
 					printf("unfix%s",$2)} else {printf("%s", $1)} exit 0}')
 					return 0

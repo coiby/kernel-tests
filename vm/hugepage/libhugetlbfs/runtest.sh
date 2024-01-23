@@ -27,7 +27,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# shellcheck disable=SC2128
 FILE=$(readlink -f $BASH_SOURCE)
+# shellcheck disable=SC2034
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 
@@ -131,6 +133,8 @@ if [ "$cpus" -lt 2 ]; then
 fi
 
 kvercmp "$cver" '4.3'
+# kver_ret is defined in kvercmp
+# shellcheck disable=SC2154
 if [ $kver_ret -le 0 ]; then
        KNOWNISSUE_32="$KNOWNISSUE_32 -e \"no fallocate support in kernels before 4.3.0\""
        KNOWNISSUE_64="$KNOWNISSUE_64 -e \"no fallocate support in kernels before 4.3.0\""
@@ -177,7 +181,7 @@ if [ "x${HPSIZE}" == "x512M" ]; then
 fi
 
 # skip ptrace-write-hugepage on rt79z debug - test hangs without proceeding from time to time
-if uname -r | grep -q 3\.10\.0-1160.*rt.*\.el7\.x86_64\.debug; then
+if uname -r | grep -q "3\.10\.0-1160.*rt.*\.el7\.x86_64\.debug"; then
     sed 's/do_test("ptrace-write-hugepage")/#do_test("ptrace-write-hugepage")/g' -i "${WORK_DIR}/run_tests.py"
 fi
 
@@ -282,7 +286,6 @@ EOF
         fi
     else
         mem_total=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
-        hpsize=$(cat /proc/meminfo | grep Hugepagesize | awk '{print $2}')
         if [ ${mem_total} -gt $((1024 * ${HMEMSZ} * 10)) ]; then
             rlLog "Skipping test because need $HPCOUNT hugepages for test, have: $free_hugepages"
             rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP

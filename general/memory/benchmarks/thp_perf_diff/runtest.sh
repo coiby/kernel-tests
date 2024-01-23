@@ -59,10 +59,11 @@ check_test_continue()
 
 get_matrix()
 {
-	hugepage_sizes=($(find /sys/devices/system/node/node0 -name hugepages-* -type d  | awk -F/ '{match($NF, /[0-9]+/, a);print a[0]}'))
-	echo hugepage_sizes=${hugepage_sizes[*]}
+	#shellcheck disable=SC2207
+	hugepage_sizes=($(find /sys/devices/system/node/node0 -name "hugepages-*" -type d  | awk -F/ '{match($NF, /[0-9]+/, a);print a[0]}'))
+	echo hugepage_sizes="${hugepage_sizes[*]}"
 	if ! test -f HUGEPAGE_SIZES; then
-		echo ${hugepage_sizes[*]} | sed "s/ /\n/g" > HUGEPAGE_SIZES
+		echo "${hugepage_sizes[*]}" | sed "s/ /\n/g" > HUGEPAGE_SIZES
 		nr_lines=$(wc -l HUGEPAGE_SIZES | awk '{print $1}')
 		default_hpsz=$(awk '/Hugepagesize/ {print $2}' /proc/meminfo)
 		echo "Removing default hugepage size: $default_hpsz from list"
@@ -151,7 +152,11 @@ run_diff()
 		thp_state=$(gawk '{match($0, /\[(.*)\]/, a); print a[1]}' /sys/kernel/mm/transparent_hugepage/enabled)
 		rlAssertEquals "should be never" "never" "${thp_state}"
 		run_benchmark ${thp_state}_${hpsz} $thp_state
+		# always and never are defined with 'eval' in run_benchmark
+		# shellcheck disable=SC2154
 		diff=$(echo | awk -v always=$always -v never=$never '{print always-never}')
+		# always and never are defined with 'eval' in run_benchmark
+		# shellcheck disable=SC2154
 		diff_percent="$(echo | awk -v diff=$diff -v always=$always -v mark=$pass_mark '{if (diff < 0) diff=-diff;
 			diff_pct=diff/always; printf("%s",diff_pct);if (diff_pct > mark) printf (" fail\n");}')"
 		rlLog "result diff is always-never=$diff, |diff|/always=$diff_percent"
@@ -197,7 +202,7 @@ run_matrix()
 			gsub("G", "*1024*1024", a[1]); gsub("K", "", a[1]);
 			gsub("M", "*1024", a[1]); print a[1]}' /proc/cmdline | bc)
 		rlLogInfo "Default hugepage sizes in cmdline kB: $default_hpsz_cmdline"
-		rlAssertEquals "default hugepage size should be same with cmdline" "${default_hpsz_cmdline}" "$default_hpsz" || abort_test
+		rlAssertEquals "default hugepage size should be same with cmdline" "${default_hpsz_cmdline}" "$default_hpsz" || abort_test "failed hugepage command line"
 		run_diff
 		run_matrix
 	fi

@@ -16,6 +16,8 @@ function bz1392593()
 	rlRun "grep nohz_full /proc/cmdline"
 	rlRun "grep isolcpus /proc/cmdline"
 	rlRun "sleep 60"
+	# this is defined in runtest.sh
+	# shellcheck disable=SC2154
 	rlRun "grep timer $tracing_dir/trace | grep -v mce" 0-255 "Only mce timer an be there!"
 	pkill stress-ng
 	while ps -C stress-ng; do
