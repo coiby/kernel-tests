@@ -9,6 +9,7 @@
 
 # Source rt common functions
 . ../../../include/runtest.sh || exit 1
+. ../../../include/lib.sh || exit 1
 
 export TEST="rt-tests/us/rt-tests/oslat"
 
@@ -20,7 +21,7 @@ export LATCHECK MAXLAT RUN_TIME
 function oslat_skip_checks()
 {
     # only run in RHEL-8.3+
-    if [[ $rhel_major -lt 8 || ( $rhel_major -eq 8 && $rhel_minor -lt 3 ) ]]; then
+    if rhel_in_range 0 8.2; then
         echo "oslat available in RHEL-8.3+ only - skipping" | tee -a $OUTPUTFILE
         rstrnt-report-result "${TEST}/rhel_version_check" "SKIP" 0
         exit 0
