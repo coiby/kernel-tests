@@ -35,6 +35,7 @@ analyse() {
     CheckVmlinux
     if [ "${testtype}" == "vmcore" ]; then
         GetCorePath
+        # shellcheck disable=SC2154
         ext_opts="-c ${vmcore}"
     fi
 

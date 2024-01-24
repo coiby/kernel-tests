@@ -73,6 +73,7 @@ Analyse()
 bt | grep "PID"
 q
 EOF
+    # shellcheck disable=SC2154
     Log "# crash $vmlinux $vmcore -s -i \"${K_TESTAREA}/pid.cmd\""
     crash $vmlinux $vmcore -s -i "${K_TESTAREA}/pid.cmd" > "${K_TESTAREA}/pid.output" 2>&1
     RhtsSubmit "${K_TESTAREA}/pid.cmd"

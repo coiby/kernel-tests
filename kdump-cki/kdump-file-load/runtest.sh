@@ -65,6 +65,7 @@ Crash()
 
         # Get the file path and upload it.
         for f in ${log_files}; do
+            # shellcheck disable=SC2154
             GetDumpFile "${f}" && RstrntSubmit "${dump_file_path}"
         done
 

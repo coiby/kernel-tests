@@ -10,6 +10,7 @@ VerifyScrub() {
 
     Log "Start VerifyScrub"
     echo > "${verify_log}"
+    # shellcheck disable=SC2154
     crash "${vmlinux}" "${vmcore_file}" <<< "q" > "${verify_log}"
     [ $? -ne 0 ] && {
         RhtsSubmit "$(pwd)/${verify_log}"
@@ -52,6 +53,7 @@ SplitTest(){
     Log "Test makedumpfile split & reassemble with ${options}"
     # Split the vmcore
     rm -f /tmp/dumpfile_*
+    # shellcheck disable=SC2154
     LogRun "makedumpfile --split -d 31 -x ${vmlinux} ${options} ${vmcore} /tmp/${split}" || {
         Error "The makedumpfile split command failed"
         return

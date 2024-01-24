@@ -28,6 +28,7 @@ bt
 exit
 EOF
 
+    # shellcheck disable=SC2154
     crash "${vmlinux}" "${vmcore}" -i "${bt_in}" > "${bt_out}"
     if [[ "$?" -ne "0" ]];then
         Error "Failed to run crash command."

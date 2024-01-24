@@ -59,6 +59,7 @@ ls /root/ptdump
 exit
 EOF
 
+    # shellcheck disable=SC2154
     CrashCommand "" "${vmlinux}" "${vmcore}"
 
     local count

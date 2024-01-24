@@ -133,6 +133,7 @@ EOF
     GetCorePath
 
     [ -f "${K_TESTAREA}/crash.vmcore.log" ] && rm -f "${K_TESTAREA}/crash.vmcore.log"
+    # shellcheck disable=SC2154
     CrashCommand "" "${vmlinux}" "${vmcore}" "crash.cmd"
     rm -f "${K_TESTAREA}/crash.cmd"
 }

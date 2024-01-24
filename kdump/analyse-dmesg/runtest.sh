@@ -80,6 +80,7 @@ AnalyseDmesg(){
 
     Log "Locate the file"
     GetDumpFile ${file_name}
+    # shellcheck disable=SC2154
     if [ $? -ne 0 ]; then
         Error "Couldn't find the dmesg file. Please check kdump process in console log"
         return

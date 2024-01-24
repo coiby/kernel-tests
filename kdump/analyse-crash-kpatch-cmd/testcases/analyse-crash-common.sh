@@ -36,6 +36,7 @@ EOF
     # crash> mod -s kpatch_4_18_0_107_0_1_test
     # BFD: BFD (GNU Binutils) 2.23.52.20130312 assertion fail elf.c:1877
     export SKIP_ERROR_PAT="assertion fail"
+    # shellcheck disable=SC2154
     CrashCommand "" "${vmlinux}" "${vmcore}" "crash.cmd"
     export SKIP_ERROR_PAT=
 
