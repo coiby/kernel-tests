@@ -369,6 +369,7 @@ function download_install_package()
         break
       fi
       cki_print_info "download_install_package: Failed to download package $1. Attempt $i/30..."
+      $YUM clean all
       sleep 60
     done
     if [[ "$downloaded" -ne "1" ]]; then
