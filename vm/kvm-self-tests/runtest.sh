@@ -21,7 +21,6 @@
 
 TEST=${TEST:-"$0"}
 RELEASE=$(uname -r | sed s/\.$(arch)//)
-PACKAGE="kernel-${RELEASE}"
 TMPDIR=/var/tmp/$(date +"%Y%m%d%H%M%S")
 BINDIR=${TMPDIR}-bin
 GICVERSION=""
@@ -188,8 +187,6 @@ function setup
     rlPhaseStartSetup
     rlRun "pushd '.'"
 
-    typeset pkg=$PACKAGE
-
     if grep -q "Red Hat Enterprise Linux release 8." /etc/redhat-release; then
         OSVERSION="RHEL8"
     elif grep -q "Red Hat Enterprise Linux release 9." /etc/redhat-release; then
@@ -297,19 +294,8 @@ function setup
     if [ ! "$CKI_SELFTESTS_URL" ] ; then
         if K_IsKernelRPM ; then
             rlLog "RPM installation"
-            arch=$(arch)
-            name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/\-core//')
-            version=$(uname -r | cut -f1 -d'-')
-            release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
-            pkg=${name}-${version}-${release}
-            BASE_URL=${BASE_URL:-"https://cbs.centos.org/kojifiles/packages https://kojihub.stream.centos.org/kojifiles/packages"}
-            BEAKERLIB_rpm_fetch_base_url+=(${BASE_URL})
-            rlFetchSrcForInstalled "$pkg" || exit 1
-
-            typeset rpmfile=$(ls -1 "$TMPDIR/${pkg}.src.rpm")
-            rlAssertExists "$rpmfile"
-
-            rlRun "rpm -ivh --define '_topdir $TMPDIR' $rpmfile > /dev/null 2>&1" 0
+            cki_download_kernel_src_rpm
+            rlRun "rpm -ivh --define '_topdir $TMPDIR' kernel-*.src.rpm > /dev/null 2>&1" 0
 
             typeset linux_tarball=$(find "$TMPDIR" -name "linux*.tar.xz")
             rlAssertExists "$linux_tarball"
