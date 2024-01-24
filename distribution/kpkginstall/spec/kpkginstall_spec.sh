@@ -524,9 +524,10 @@ Describe 'kpkginstall: download_install_package'
         export YUM=dnf
         When call download_install_package "$package"
         The first line should equal "ℹ️ download_install_package: Failed to download package $package. Attempt 1/30..."
-        The line 2 should include "sleep"
-        The line 3 should equal "✅ Downloaded $package successfully"
-        The line 4 should equal "✅ Installed $package successfully"
+        The line 2 should equal "dnf clean all"
+        The line 3 should include "sleep"
+        The line 4 should equal "✅ Downloaded $package successfully"
+        The line 5 should equal "✅ Installed $package successfully"
     End
 
     It 'can NOT download and install - dnf'
