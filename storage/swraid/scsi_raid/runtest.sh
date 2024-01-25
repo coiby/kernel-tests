@@ -18,6 +18,7 @@
 #
 
 # TEST is required for beakerlib tests
+# shellcheck disable=SC2034
 TEST=${RSTRNT_TASKNAME}
 
 # Include enviroment and libraries
@@ -27,6 +28,7 @@ function create_raid()
 {
         case $R in
                 raid0)
+                        # shellcheck disable=SC2154
                         rlRun "lvcreate --type raid0 --stripesize 64k -i 3 \
                                 -n non_synced_primary_raid_3legs_1 -L 1G \
                                 black_bird $dev0:0-300 $dev1:0-300 \

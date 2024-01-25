@@ -31,7 +31,7 @@ do
 	cnt=$(($cnt+1))
 done
 
-
+# shellcheck disable=SC2154
 /sbin/dmsetup create test_snap --table \
 	"0 1 snapshot $loop_dev1 $loop_dev2 P 32" 2>&1 | \
 	/bin/grep "Input\/output error"

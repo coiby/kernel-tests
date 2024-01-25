@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
@@ -23,6 +23,7 @@ function runtest (){
 	pmem_1=`echo $test_dev | awk '{print $1}'`
 	pmem_2=`echo $test_dev | awk '{print $2}'`
 	size1=`blockdev --getsize /dev/${pmem_1}`
+	# shellcheck disable=SC2034
 	size2=`blockdev --getsize /dev/${pmem_2}`
 
 	tok "echo "0 $size1 log-writes /dev/${pmem_1} /dev/${pmem_2}" | dmsetup create log"
@@ -33,6 +34,7 @@ function runtest (){
 		tlog "PASS: dmsetup create dm-log-writes pass"
 	fi
 
+	# shellcheck disable=SC2154
 	tok "mkfs.ext4 $ext4_param -F /dev/mapper/log"
 	tok mount -o dax /dev/mapper/log $MNT
 	tok "FIO_ENGINE_SUPPORT pmemblk"

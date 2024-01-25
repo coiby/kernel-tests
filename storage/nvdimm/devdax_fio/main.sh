@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
@@ -20,6 +20,7 @@ function runtest (){
 	fi
 	num=4
 	[[ $(arch) == "ppc64le" ]] && num=2
+	# shellcheck disable=SC2154
 	for align in $devdax_align; do
 	        NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX $num DEVDAX $align
 	        local test_dev="$RETURN_STR"

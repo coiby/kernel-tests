@@ -17,11 +17,11 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname $FILE)
 
 # TEST is required for beakerlib tests
+# shellcheck disable=SC2034
 TEST=${RSTRNT_TASKNAME}
 
 # Include enviroment and libraries
@@ -54,6 +54,7 @@ function run_test()
         rlLog "other features"
         rlRun "zstd -t test_zstd.zst" 0 "Test zst file"
         rlRun -s "zstd -d --stdout test_zstd.zst" 0 "Decompress file on stdout"
+        # shellcheck disable=SC2154
         rlRun "diff test_zstd_original $rlRun_LOG" 0
         rlRun "zstd -d -o test_output test_zstd.zst" 0 "Decompres file into test_output"
         rlRun "diff test_zstd_original test_output" 0
@@ -74,6 +75,7 @@ rlJournalStart
         rlRun "rpm -q zstd || yum install -y zstd"
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
+        # shellcheck disable=SC2154
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 

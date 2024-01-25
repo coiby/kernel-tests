@@ -123,8 +123,8 @@ trigger_panic()
 #function to load kernel, gracefully shutdown and restart to loaded kernel
 kexec_boot_graceful()
 {
-    rlRun "unr=$(uname -r)"
-    rlRun "initrd=/boot/initramfs-$unr.img"
+    unr=$(uname -r)
+    initrd=/boot/initramfs-"$unr".img
     rlRun "kexec -l /boot/vmlinuz-$unr --initrd=$initrd --reuse-cmdline"
     rlWatchdog "reboot" 600
 }
@@ -146,14 +146,17 @@ rlJournalStart
             PrepareReboot
             kdump_prepare
             sleep 5
+            # shellcheck disable=SC2154
             FIO_Test "$device"
             sleep 5
             trigger_panic
         elif [ "$RSTRNT_REBOOTCOUNT" -eq 1 ] ; then
+            # shellcheck disable=SC2154
             FIO_Test "$device"
             sleep 5
             kexec_boot_graceful
         elif [ "$RSTRNT_REBOOTCOUNT" -eq 2 ] ; then
+            # shellcheck disable=SC2154
             FIO_Test "$device"
             sleep 5
             kexec_boot_exec
@@ -165,6 +168,7 @@ rlJournalStart
 
 rlPhaseStartTest
     rlAssertEquals "System should reboot successfully" $RSTRNT_REBOOTCOUNT 3
+    # shellcheck disable=SC2128
     rlAssertExists  "$crashDir/vmcore"
 rlPhaseEnd
 rlJournalPrintText

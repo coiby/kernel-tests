@@ -31,6 +31,7 @@ function runtest {
 		done
 		wait
 
+		# shellcheck disable=SC2154
 		tok "nvme disconnect -n $TargetNQN"
 		ret=$?
 		if [ $ret -eq 0 ]; then

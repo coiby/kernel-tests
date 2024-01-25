@@ -17,8 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname $FILE)
 
 # Include enviroment and libraries
@@ -47,13 +46,16 @@ function run_test()
 {
 # find local free disk
     get_disk
+    # shellcheck disable=SC2154
     rlRun "parted -s /dev/$dev0 mklabel gpt mkpart xfs 1M 50G"
+    # shellcheck disable=SC2154
     rlRun "parted -s /dev/$dev1 mklabel gpt mkpart xfs 1M 50G"
     rlRun "echo bfq > /sys/block/$dev0/queue/scheduler"
     rlRun "echo bfq > /sys/block/$dev1/queue/scheduler"
 
 # disk0=/dev/"$dev0"1
 # disk1=/dev/"$dev1"1
+    # shellcheck disable=SC2034
     passwd="123@redhat##"
     rlRun 'echo $passwd | cryptsetup luksFormat --sector-size 4096 /dev/"$dev0"1'
     rlRun 'echo $passwd | cryptsetup luksFormat --sector-size 4096 /dev/"$dev1"1'

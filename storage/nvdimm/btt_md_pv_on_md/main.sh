@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
@@ -19,7 +19,6 @@ function runtest() {
 		for level in 0 1 4 5 6 10; do
 
 			RETURN_STR=''
-			MD_DEV_LIST=''
 			MD_RAID=''
 			spare_num=0
 			raid_num=4
@@ -59,7 +58,7 @@ function runtest() {
 			fi
 			tok lvcreate -l 100%FREE -n lv_md_test vg_md_test
 			if [ $? -ne 0 ]; then
-				tlog "FAIL: fail to create lv on vg $vg_test"
+				tlog "FAIL: fail to create lv on vg vg_md_test"
 			fi
 			FIO_Device_Level_Test /dev/vg_md_test/lv_md_test
 			sleep 60

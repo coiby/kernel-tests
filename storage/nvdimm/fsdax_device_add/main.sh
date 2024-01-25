@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
@@ -40,6 +40,7 @@ function runtest (){
 	if rlIsRHEL 7; then
 		tok mkfs.xfs -f /dev/mapper/pmem-lv
 	elif rlIsRHEL ">=8"; then
+		# shellcheck disable=SC2154
 		tok mkfs.xfs $xfs_param -m reflink=0 -f /dev/mapper/pmem-lv
 	fi
 

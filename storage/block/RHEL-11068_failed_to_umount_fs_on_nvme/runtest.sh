@@ -27,6 +27,7 @@ function run_test()
 {
     get_free_disk nvme
     [ ! -d /mnt/ext4 ] && mkdir /mnt/ext4
+    # shellcheck disable=SC2154
     rlRun "mkfs.ext4 -F ${dev0}"
     rlRun "mount ${dev0} /mnt/ext4"
     rlRun "dd if=/dev/zero of=/mnt/ext4/file.img &"
