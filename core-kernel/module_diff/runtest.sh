@@ -712,6 +712,9 @@ rlJournalStart
             if cki_kver_lt "5.14.0-405.el9"; then
                 sed -i '/^idpf.ko$/d; /^octeon_ep.ko$/'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
             fi
+            if cki_kver_lt "5.14.0-410.el9"; then
+                sed -i '/^freq_table.ko$/d'  ${OS}/${Release}/$Release-knownRemoved-builtin-{x86_64,ppc64le,aarch64}.lst
+            fi
         fi
     rlPhaseEnd
 
