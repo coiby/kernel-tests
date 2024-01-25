@@ -94,9 +94,9 @@ function installDepsYum() {
     local yum="$1"; shift
 
     if "$yum" --help | grep -q -- --skip-broken; then
-        "$yum" install -y --skip-broken $*
+        "$yum" install -y --skip-broken "$@"
     else
-        for req in $*; do
+        for req in "$@"; do
             if ! rpm -q --quiet --whatprovides "$req"; then
                 "$yum" install -y "$req" || true
             fi
@@ -133,15 +133,11 @@ rlJournalStart
         # dependencies here. Thus we don't need to maintain duplicate lists of
         # package requirements in many places (RH repo, Fedora kernel dist-git,
         # CKI).
-        KERNEL_VERSION="$(uname -r)"
-        PKG_VERSION="${KERNEL_VERSION%+debug}"
 
         modules_extra_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-extra)
         devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
-        REQUIRES="
-            ${modules_extra_pkg}
-            ${devel_pkg}
-        "
+        # shellcheck disable=SC2034
+        REQUIRES="${modules_extra_pkg} ${devel_pkg}"
         rlRun "installDeps \$REQUIRES" 0 "Install requires"
 
         # The CRB repo with libbpf-devel might not be enabled on RHEL
@@ -435,7 +431,9 @@ rlJournalStart
         # rlSEBooleanRestore
         # rlSEBooleanRestore allow_domain_fd_use
         # none of above-mentioned commands is able to correctly restore the value in the boolean
+        # shellcheck disable=SC2154
         rlRun "boolSet domain_can_mmap_files $BACKUP_domain_can_mmap_files"
+        # shellcheck disable=SC2154
         rlRun "boolSet allow_domain_fd_use $BACKUP_allow_domain_fd_use"
 
         rlRun "pushd selinux-testsuite"

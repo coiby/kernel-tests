@@ -43,8 +43,9 @@ rlJournalStart
         rlRun "nft list table t"
         rlRun "grep 'type=NETFILTER_CFG' /var/log/audit/audit.log | tee audit.log_new"
         rlRun "diff audit.log_old audit.log_new" 1
-        rlRun "entries=`diff audit.log_old audit.log_new | grep 'type=NETFILTER_CFG' | wc -l`"
-        rlRun "test $entries -eq 1"
+        rlRun "entries=$(diff audit.log_old audit.log_new | grep 'type=NETFILTER_CFG' | wc -l)"
+        # shellcheck disable=SC2154
+        rlAssertEquals "Test pass: only single entry log for all calls" "$entries" 1
     rlPhaseEnd
 
     rlPhaseStartCleanup
