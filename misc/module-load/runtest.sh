@@ -375,6 +375,12 @@ for (( i = 0; i < $ITERATIONS; i++)); do
 			fi
 		fi
 
+		# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1305
+		if [ "$module" = "null_blk" ]; then
+			sleep 10
+			echo "Sleeping 10 seconds to allow null_blk to settle" >> $OUTPUTFILE
+		fi
+
 		mlog "echo \"** Attempting to unload $module... **\"" /dev/console "$OUTPUTFILE"
 		/sbin/modprobe -r $module  >> $OUTPUTFILE 2>&1
 		RC=$?
