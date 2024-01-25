@@ -912,6 +912,7 @@ function BrewInstallKernel ()
           rpm -ivh $httpbase/$kernarch/$testkernbase.$kernarch.rpm
           if [ "$?" -ne "0" ]; then
              DeBug "Forcing the rpm command --force"
+             # shellcheck disable=SC2154
              rpm -ivh --force $NoDeps $httpbase/$kernarch/$testkernbase.$kernarch.rpm
              if [ "$?" -ne "0" ]; then
                 DeBug "Exit BrewInstallPackage FAIL 6"
@@ -926,6 +927,7 @@ function BrewInstallKernel ()
        rpm -ivh $archbase/$kernarch/$testkernbase.$kernarch.rpm
        if [ "$?" -ne "0" ]; then
           DeBug "Forcing the rpm command --force"
+          # shellcheck disable=SC2154
           rpm -ivh --force $NoDeps $archbase/$kernarch/$testkernbase.$kernarch.rpm
           if [ "$?" -ne "0" ]; then
              DeBug "Exit BrewInstallPackage FAIL 6"
