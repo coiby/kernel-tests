@@ -85,6 +85,7 @@ function SysReport ()
     biosRelease=$(dmidecode --type=0 | /bin/grep -i release | /bin/awk -F: '{print $2}')
     biosRevision=$(dmidecode --type=0 | /bin/grep -i revision | /bin/awk -F: '{print $2}')
 #
+    # shellcheck disable=SC2034
     syslspci=$(/sbin/lspci -nnD > $OUTPUTDIR/lspci.$kernbase)
     if [ -f /etc/fedora-release ]; then
         sysrelease=$(/bin/cat /etc/fedora-release)
@@ -93,6 +94,7 @@ function SysReport ()
     fi
     syscmdline=$(/bin/cat /proc/cmdline)
     sysnmiint=$(/bin/cat /proc/interrupts | /bin/grep -i nmi)
+    # shellcheck disable=SC2034
     sysmodprobe=$(/bin/cat /etc/modprobe.conf > $OUTPUTDIR/modprobe.$kernbase)
     for x in $(/sbin/lsmod | /bin/cut -f1 -d" " 2>/dev/null | /bin/grep -v Module 2>/dev/null ); do
         echo "Checking module information $x:" >> $OUTPUTDIR/modinfo.$kernbase
@@ -102,26 +104,39 @@ function SysReport ()
         fi
     done
     if [ -x /usr/sbin/sestatus ]; then
+        # shellcheck disable=SC2034
         syssestatus=$(/usr/sbin/sestatus >> $OUTPUTDIR/selinux.$kernbase)
     fi
     if [ -x /usr/sbin/xm ]; then
+        # shellcheck disable=SC2034
         syshypervisor=$(/usr/sbin/xm info >> $OUTPUTDIR/hypervisor.$kernbase)
     fi
     if [ -x /usr/sbin/semodule ]; then
         echo "********* SELinux Module list **********" >> $OUTPUTDIR/selinux.$kernbase
+        # shellcheck disable=SC2034
         syssemodulelist=$(/usr/sbin/semodule -l >> $OUTPUTDIR/selinux.$kernbase)
     fi
-
+    # shellcheck disable=SC2034
     sysderror=$(/bin/cat $OUTPUTDIR/boot.$kernbase | grep -i error | grep -v BIOS >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror1=$(/bin/grep -i collision $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror2=$(/bin/grep -i fail $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror3=$(/bin/grep -i temperature $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror4=$(/bin/grep BUG: $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror5=$(/bin/grep INFO: $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror6=$(/bin/grep FATAL: $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror7=$(/bin/grep WARNING: $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror8=$(/bin/grep -i "command not found" $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/derror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror9=$(/bin/cat $OUTPUTDIR/boot.$kernbase | grep avc: | grep -v granted >> $OUTPUTDIR/avcerror.$kernbase)
+    # shellcheck disable=SC2034
     sysderror10=$(/bin/grep -i "Unknown symbol" $OUTPUTDIR/boot.$kernbase >> $OUTPUTDIR/serror.$kernbase)
 
     echo "********** System Information **********" >> $OUTPUTFILE
@@ -156,15 +171,15 @@ function SysReport ()
     cat /etc/resolv.conf >> ifcinfo
     echo "-- END of /etc/resolv.conf --" >> ifcinfo
     echo "ip a" >> ifcinfo
-    ip a 2>&1 >> ifcinfo
+    ip a >> ifcinfo 2>&1
     echo "ip route" >> ifcinfo
-    ip route 2>&1 >> ifcinfo
+    ip route >> ifcinfo 2>&1
     echo "ip -6 route" >> ifcinfo
-    ip -6 route 2>&1 >> ifcinfo
+    ip -6 route >> ifcinfo 2>&1
     local interfaces=`ip link show | grep '^[0-9]\+' | sed 's/^[0-9]\+: \([a-zA-Z0-9]\+\):.*/\1/'`
     for i in $interfaces; do
         echo "ethtool -i $i" >> ifcinfo
-        ethtool -i $i 2>&1 >> ifcinfo
+        ethtool -i $i >> ifcinfo 2>&1
     done
     cat ifcinfo >> $OUTPUTFILE
     cat ifcinfo > /dev/console
@@ -713,7 +728,7 @@ function AddTmpRepo ()
         local repo_id=$(echo ${KERNELARGTMPREPO} | md5sum | cut -b -8)
 
         tmprepofile=/etc/yum.repos.d/kernel_install_temporary_${repo_id}.repo
-        if ! >${tmprepofile}; then
+        if ! touch ${tmprepofile}; then
             echo "***** Cannot create file \"${tmprepofile}\". No new repositories will be added. *****" | tee -a $OUTPUTFILE
             unset tmprepofile
             return
@@ -744,7 +759,7 @@ function AddPermRepo ()
         local repo_id=$(echo ${KERNELARGPERMREPO} | md5sum | cut -b -8)
 
         permrepofile=/etc/yum.repos.d/kernel_install_permanent_${repo_id}.repo
-        if ! >${permrepofile}; then
+        if ! touch ${permrepofile}; then
             echo "***** Cannot create file \"${permrepofile}\". No new repositories will be added. *****" | tee -a $OUTPUTFILE
             unset permrepofile
             return
@@ -1041,7 +1056,7 @@ function workaround_bug905918 ()
     local BOOTIF=`echo $cmdline | grep -o "BOOTIF=[0-9a-zA-Z:-]\+" | sed 's/BOOTIF=//'`
 
     # command line
-    echo $cmdline | grep "ip=" 2>&1 >/dev/null
+    echo $cmdline | grep "ip=" >/dev/null 2>&1
     if [ $? -eq 0 ]; then
         echo "ip= present on command line, exiting" >> $OUTPUTFILE
         return
@@ -1065,7 +1080,7 @@ function workaround_bug905918 ()
     BOOTIF=$(fix_bootif "$BOOTIF")
     echo "Fixed up BOOTIF: $BOOTIF" >> $OUTPUTFILE
 
-    ip a s up | grep $BOOTIF 2>&1 >/dev/null
+    ip a s up | grep $BOOTIF >/dev/null 2>&1
     if [ $? -ne 0 ]; then
         echo "Could not find any interface with this MAC, exiting" >> $OUTPUTFILE
         return
@@ -1077,7 +1092,7 @@ function workaround_bug905918 ()
         if [ "$ifc" == "lo" ]; then
             continue
         fi
-        grep -l -i "$BOOTIF" $ifcfg 2>&1 >/dev/null
+        grep -l -i "$BOOTIF" $ifcfg >/dev/null 2>&1
         if [ $? -ne 0 ]; then
             echo "Setting ONBOOT=no for $ifcfg" >> $OUTPUTFILE
             sed -i 's/ONBOOT=.*/ONBOOT=no/' $ifcfg
@@ -1265,8 +1280,9 @@ function Main ()
                 echo "***** Could not install from yum repo trying rpm -ivh from BREW *****" | tee -a $OUTPUTFILE
                 # Install from yum failed lets try direct from brew
                 BrewInstallKernel
-                if [ "$?" -ne "0" ]; then
-                    RprtRslt $TEST/BrewInstallkernel FAIL $?
+                ret=$?
+                if [ "$ret" -ne "0" ]; then
+                    RprtRslt $TEST/BrewInstallkernel FAIL $ret
                     DisableTmpRepo
                     RHTSAbort
                 fi
@@ -1409,6 +1425,7 @@ else
     testkernver=$(echo $KERNELARGVERSION | awk -F- '{print $1}')
     testkernrel=$(echo $KERNELARGVERSION | awk -F- '{print $2}')
     testkernvariant=$KERNELARGVARIANT
+    # shellcheck disable=SC2034
     testkerneluname=$KERNELARGVERSION$KERNELARGVARIANT
     DeBug "Test kernel variables, in the else statement"
     DeBug "1=$testkernbase 2=$testkername 3=$testkernver 4=$testkernrel 5=$testkernvariant 6=$testkerndevel"
