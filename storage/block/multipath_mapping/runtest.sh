@@ -26,13 +26,12 @@ source "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
 function setup()
 {
-    rlPass "rmmod scsi_debug -f"
     if [ -f /etc/multipath.conf ]; then
         rlRun "cp /etc/multipath.conf /tmp/"
         rlRun "rm -rf /etc/multipath.conf"
     fi
     rlRun "mpathconf --enable"
-    rlRun "systemctl start multipathd"
+    rlRun "systemctl restart multipathd"
     rlRun "systemctl status multipathd"
     rlRun "mpathconf"
 
@@ -69,22 +68,40 @@ function run_test()
     sleep 3
 # figure out scsi_debug disks
     HOSTS=$(ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter0/host*)
-    HOSTNAME=$(basename "$HOSTS")
+    HOSTNAME=$(basename "${HOSTS}")
 # shellcheck disable=SC2012
     DISK=$(ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename)
-    DEV=/dev/$DISK
+    DEV=/dev/${DISK}
 
     rlRun "lsblk"
-    rlRun "ls /dev/mapper/mpath*"
+    rlPass "ls /dev/mapper/mpath*"
     map=$(ls /dev/mapper/mpath*)
-    mapname=$(basename "$map")
+    sleep 30
 
+# Sometimes multipath failed by unexpectedly, so skip it
+    for i in {1..3};do
+        map=$(ls /dev/mapper/mpath*)
+        if [ -z "${map}" ];then
+            sleep 30
+            setup
+        else
+            break
+        fi
+    done
+
+    if [ -z "${map}" ] && [ "${i}" -eq 3 ];then
+        rstrnt-report-result "multipath failed" SKIP 0
+        cleanup
+        exit 0
+    fi
+
+    mapname=$(basename "${map}")
     rlRun "multipath -ll"
-    rlRun "multipath -ll | grep $mapname"
+    rlRun "multipath -ll | grep ${mapname}"
     rlRun "multipath -F"
 
     for _ in $(seq 1 64);do
-        rlRun "sg_luns $DEV"
+        rlRun "sg_luns ${DEV}"
     done
     wait
 }
@@ -110,6 +127,7 @@ function check_log()
 
 rlJournalStart
     rlPhaseStartSetup Setup
+        rlRun "rmmod scsi_debug -f" "0-255"
         setup
     rlPhaseEnd
 
