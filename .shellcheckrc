@@ -1,7 +1,5 @@
 # Quote this to prevent word splitting.
 disable=SC2046
-# var is referenced but not assigned.
-disable=SC2154
 # Declare and assign separately to avoid masking return value.
 disable=SC2155
 # Use cd|pushd|popd ... || exit in case cd|pushd|popd fails.
