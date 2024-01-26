@@ -1,0 +1,14 @@
+summary: storage/block/RHEL_22151_loop_dio_failed
+description: loop/dio IO failed in case of being over block device
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/RHEL_22151_loop_dio_failed
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+duration: 2h
+tier: 1
+extra-summary: /storage/block/RHEL_22151_loop_dio_failed
+extra-task: /storage/block/RHEL_22151_loop_dio_failed

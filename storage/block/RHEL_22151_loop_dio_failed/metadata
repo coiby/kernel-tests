@@ -1,0 +1,12 @@
+[General]
+name=storage/block/RHEL_22151_loop_dio_failed
+owner=Changhui Zhong <czhong@redhat.com>
+description=loop/dio IO failed in case of being over block device
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+max_time=2h
