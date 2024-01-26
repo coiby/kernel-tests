@@ -348,6 +348,10 @@ rlJournalStart
                 rlRun "sed -i -E -e '$script1' -e '$script2' -e '$script3' tests/filesystem/test" 0 \
                     "Apply workaround for missing XFS quota checks"
             fi
+            #Excluding tests for automotive
+            if (uname -r | grep -w -q el[0-9]*iv); then
+                exclude_tests+=" filesystem/ext4 fs_filesystem/ext4"
+            fi
         fi
 
         # CKI mainline kernels don't ship with module build infrastructure
