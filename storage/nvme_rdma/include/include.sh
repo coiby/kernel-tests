@@ -91,7 +91,7 @@ function dm_multipath_conf
 	tlog "INFO: start to $1 dm-multipath"
 	if [ "$1" = "enable" ]; then
 		rpm -q device-mapper-multipath || yum -y install device-mapper-multipath
-		cp /mnt/tests/kernel/storage/nvmeof/include/multipath.conf /etc/multipath.conf
+		cp "$DIR"/multipath.conf /etc/multipath.conf
 		tok systemctl enable multipathd
 		tok systemctl start multipathd
 		tok multipath -ll
