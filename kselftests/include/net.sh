@@ -5,6 +5,9 @@
 # rhel_mjor defined in include.sh
 krelease=$(rhel_major)
 
+# These variables are set on runtest.sh, this script should only be run within runtest.sh
+declare pkg_mgr pkg_mgr_inst_string skip_tests
+
 get_default_iface()
 {
 	ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}'
@@ -454,8 +457,8 @@ if [ ! "${__SOURCED__:+x}" ]; then
 		source skip_waive.list
 
 		SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
-		[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]}"
-		WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]}"
+		[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]:-}"
+		WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]:-}"
 
 	fi
 

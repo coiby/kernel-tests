@@ -1,5 +1,7 @@
 #!/bin/bash
 # This file is used for Real Time kernel related tests configurations.
+# These variables are set on runtest.sh, this script should only be run within runtest.sh
+declare pkg_mgr pkg_mgr_inst_string
 
 # Skip kselftests if the running kernel-rt is debug variant
 if uname -r | grep rt | grep -q debug; then
