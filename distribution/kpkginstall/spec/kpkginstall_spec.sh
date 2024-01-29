@@ -701,6 +701,59 @@ Describe 'kpkginstall: rpm_extra_package_install'
     End
 End
 
+Describe 'kpkginstall: targz_install'
+    Mock curl
+        echo "curl $*"
+    End
+    Mock tar
+        echo "tar $*"
+    End
+    Mock kernel-install
+        echo "kernel-install $*"
+    End
+    Mock grubby
+        echo "grubby $*"
+    End
+    Mock grep
+        echo "grep $*"
+    End
+    Mock sed
+        echo "sed $*"
+    End
+    get_kpkg_ver(){
+        echo "get_kpkg_ver"
+        export KVER="6.18.0-rc"
+    }
+    export KPKG_URL=${KERNEL_TGZ_URL%\#*}
+    It "can install kernel from tarball"
+        When call targz_install
+        The line 1 should equal "ℹ️ Fetching kpkg from $KPKG_URL"
+        The line 2 should equal "curl --fail --retry 30 --retry-delay 60 -sOL $KPKG_URL"
+        The line 3 should equal "✅ Downloaded kernel package successfully from $KPKG_URL"
+        The line 4 should equal "ℹ️ targz_install: Extracting kernel version from $KPKG_URL"
+        The line 5 should equal "get_kpkg_ver"
+        The line 6 should equal "✅ Kernel version is $KVER"
+        The line 12 should equal "kernel-install add $KVER /boot/vmlinuz-$KVER"
+        The line 14 should equal "grubby --set-default /boot/vmlinuz-$KVER"
+        The line 16 should equal "✅ Boot loader configuration complete"
+    End
+
+    It "can not download tarball"
+        Mock curl
+            echo "curl $*"
+            exit 1
+        End
+        Mock cki_abort_recipe
+            echo "cki_abort_recipe $*"
+            exit 1
+        End
+        When call targz_install
+        The line 1 should equal "ℹ️ Fetching kpkg from $KPKG_URL"
+        The line 2 should equal "curl --fail --retry 30 --retry-delay 60 -sOL $KPKG_URL"
+        The line 3 should equal "cki_abort_recipe Failed to download package from $KPKG_URL WARN"
+    End
+End
+
 Describe 'kpkginstall: main - install kernel'
     Parameters
         kernel "$KERNEL_RPM_URL"

@@ -204,7 +204,7 @@ function targz_install()
   declare -r kpkg=${KPKG_URL##*/}
   cki_print_info "Fetching kpkg from ${KPKG_URL}"
 
-  if curl -sOL "${KPKG_URL}" 2>&1; then
+  if curl --fail --retry 30 --retry-delay 60 -sOL "${KPKG_URL}" 2>&1; then
     cki_print_success "Downloaded kernel package successfully from ${KPKG_URL}"
   else
     cki_abort_recipe "Failed to download package from ${KPKG_URL}" WARN
