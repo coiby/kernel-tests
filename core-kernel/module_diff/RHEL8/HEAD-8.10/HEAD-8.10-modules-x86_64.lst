@@ -2147,6 +2147,8 @@ snd-soc-cs35l41-i2c.ko
 snd-soc-cs35l41.ko
 snd-soc-cs35l41-lib.ko
 snd-soc-cs35l41-spi.ko
+snd-soc-cs42l42.ko
+snd-soc-cs42l42-sdw.ko
 snd-soc-cx2072x.ko
 snd-soc-da7213.ko
 snd-soc-da7219.ko
@@ -2169,6 +2171,7 @@ snd-soc-kbl_rt5663_max98927.ko
 snd-soc-kbl_rt5663_rt5514_max98927.ko
 snd-soc-max98090.ko
 snd-soc-max98357a.ko
+snd-soc-max98363.ko
 snd-soc-max98373-i2c.ko
 snd-soc-max98373.ko
 snd-soc-max98373-sdw.ko
@@ -2208,6 +2211,7 @@ snd-soc-rt5682s.ko
 snd-soc-rt700.ko
 snd-soc-rt711.ko
 snd-soc-rt711-sdca.ko
+snd-soc-rt712-sdca-dmic.ko
 snd-soc-rt712-sdca.ko
 snd-soc-rt715.ko
 snd-soc-rt715-sdca.ko

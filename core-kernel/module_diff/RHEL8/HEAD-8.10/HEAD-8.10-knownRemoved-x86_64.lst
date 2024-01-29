@@ -1,1 +1,5 @@
 ftdi-elan.ko
+mcryptd.ko
+sha1-mb.ko
+sha256-mb.ko
+sha512-mb.ko
