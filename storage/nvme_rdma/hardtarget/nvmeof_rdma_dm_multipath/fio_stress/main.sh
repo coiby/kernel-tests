@@ -10,6 +10,7 @@ system_info_for_debug
 
 function runtest()
 {
+	nvme_core_multipath_conf disable
 	dm_multipath_conf enable
 
 	# connect to E5700 target
