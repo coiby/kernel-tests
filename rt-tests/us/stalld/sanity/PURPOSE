@@ -1,9 +1,6 @@
 Start the stalld daemon:
 
-  chrt -f 10 stalld -v -t 30 -r 1000000
-
-  chrt -f 10
-       Start stalld with FIFO:10 to ensure that stalld itself is not blocked, this is also set as default in stalld.service .
+  stalld -v -t 30 -r 1000000
 
   -t 30
        The startving task will wait 30s before getting boosted.
