@@ -63,6 +63,8 @@ b110fc5887abacbcdaa32fd5e9ea2e3f6e580dc5 ppc64le aarch64 # vmlinux symtab matche
 2160bdaf7e5f48987e31c1d90d0260ac9fdd3ef7 ppc64le s390x aarch64 x86_64 # BPF filter
 e72d804e5361e9a66889207602ac75e4dd409aa6 x86_64  # x86 instruction decoder - new instructions
 64b224a2fb478a47529700c6237c6c0a0a90ad98 aarch64 # Session topology
+# poorly designed test fails on rhel9.2
+c07970a0464c9337daf18ab2edc53cce0d251cb7 ppc64le # perf stat CSV output linter
 
 # Temporary allowlist for CKI fails, undo when fixed
 356730a72bd040f7393f65a130f1f44d6078b04d aarch64 # CoreSight / ASM Pure Loop
@@ -74,6 +76,9 @@ f6208a42d390ea91db024db16ae162fc2c80671d aarch64 # CoreSight / Thread Loop 2 Thr
 e4a8e45016f20b50c3974e763b48c99a936b6d0a x86_64 # Simple expression parser
 7ab601dfc1d73baaea678b649fa5d66ba0f9f91e ppc64le x86_64 # perf all metricgroups test
 65a67da77b6f4b8ebc3aeb747f6d4f122398b2e6 ppc64le x86_64 # perf all metrics test
-c28f07da1fd1e44f7b716f64ff4b3cdf0d163e20 aarch64 # perf record tests
-bc0e87022bb4941020242d414be1d74716aba9d5 x86_64 # perf pipe recording and injection test
+c28f07da1fd1e44f7b716f64ff4b3cdf0d163e20 aarch64 ppc64le # perf record tests
+bc0e87022bb4941020242d414be1d74716aba9d5 s390x ppc64le x86_64 # perf pipe recording and injection test
+93754cd356c4bd5bc5827422eea5903f66591892 ppc64le x86_64 # Test data symbol
+# happens mostly on KVM
+ed8900cbc1af7881132d775c5101b8010a206012 aarch64 x86_64 # Setup struct perf_event_attr
 
