@@ -1,0 +1,157 @@
+#!/bin/bash
+# Audio test
+# Author: Erik Hamera
+# Licence: GNU GPLv2
+
+# variables sshkey and sshto should be set by the audiotest_loader
+
+remote_workdir="proj/audiotest"
+local_data="tmp-$(hostname)"
+compiled_tools_path="../audio"
+
+#set capture to zero to avoid positive feedback
+echo "amixer set Capture 0%"
+amixer set Capture "$0%"
+
+for volume in `seq 0 5 100`; do
+        echo "amixer set Master playback $volume%"
+        amixer set Master playback "$volume%"
+
+        #test of alsactl
+        if [ "$volume" -eq "45" ]; then
+                alsactl store
+        fi
+
+        #This took about 7.6 seconds of real time
+        speaker-test -c 2 -f 1000 -t sine -l 1 -P 6 &
+
+        sleep 2
+        ssh ${sshkey:+-i $sshkey} "$sshto" "arecord -c 2 -f cd -d 1 $remote_workdir/test_L_$volume.raw"
+        sleep 3
+        ssh ${sshkey:+-i $sshkey} "$sshto" "arecord -c 2 -f cd -d 1 $remote_workdir/test_R_$volume.raw"
+        sleep 5
+done
+#test of alsactl
+alsactl restore
+speaker-test -c 2 -f 1000 -t sine -l 1 -P 6 &
+
+sleep 2
+ssh ${sshkey:+-i $sshkey} "$sshto" "arecord -c 2 -f cd -d 1 $remote_workdir/test_L_45ACTL.raw"
+sleep 3
+ssh ${sshkey:+-i $sshkey} "$sshto" "arecord -c 2 -f cd -d 1 $remote_workdir/test_R_45ACTL.raw"
+sleep 5
+
+mkdir "$local_data"
+scp ${sshkey:+-i $sshkey} "$sshto:$remote_workdir"'/test_[LR]_*.raw' "$local_data"
+
+# speaker test parameter -P
+#
+# -P 6
+# takes real    0m7.639s
+# get Left, sleep, at 2.0 get 1s to 3.0 ... at 3.8 it switches to Right, at 6.0 get 1s 7.0, ends in 7.6, wait long enough
+# sleep2; get; sleep 3; get; sleep 5
+#
+# -P 10
+# real 4.7s,
+# sleep 0; get; sleep 2; get sleep 5
+# it was too fast and the right channel wasn't right sometimes (over flaky Wifi connection simulating traffic)
+
+#set Master playback to zero to avoid positive feedback
+echo "amixer set Master playback 0%"
+amixer set Master playback "0%"
+
+for volume in `seq 0 5 100`; do
+        echo "amixer set Capture $volume%"
+        amixer set Capture "$volume%"
+
+        #test of alsactl
+        if [ "$volume" -eq "45" ]; then
+                alsactl store
+        fi
+
+        /bin/bash -c "ssh ${sshkey:+-i $sshkey} $sshto \"speaker-test -c 1 -f 1000 -t sine -l 1 -P 6\"" &
+        sleep 2
+        arecord -c 2 -f cd -d 1 "$local_data/test_IN_$volume.raw"
+        sleep 9
+done
+#test of alsactl
+alsactl restore
+/bin/bash -c "ssh ${sshkey:+-i $sshkey} $sshto \"speaker-test -c 1 -f 1000 -t sine -l 1 -P 6\"" &
+sleep 2
+arecord -c 2 -f cd -d 1 "$local_data/test_IN_45ACTL.raw"
+sleep 9
+
+# data are gathered
+
+# check if they're right
+
+check_volumes(){
+        declare -a volumes
+        err=0
+
+        for i in `seq 0 5 100`; do
+                ./sqavg "$1$i.raw"
+                volumes[$i]="$(./sqavg $1$i.raw | grep max | sed 's/.*max\t//')"
+        done
+
+        volume_extra_val="$3"
+        volume_extra="$(./sqavg $1$4.raw | grep max | sed 's/.*max\t//')"
+
+        for i in `seq 0 5 100`; do
+                echo -ne "volume: $i%,\tsquare average: ${volumes[$i]}\t"
+                if [ "$i" -gt "0" ]; then
+                        #acceptable difference in volume is 10% --> in integer arithmetics *11/10
+                        new_max="$(( volumes[$i]*11/10 ))"
+                        echo -ne "Acceptable maximum: $new_max,\told value: $old,\t"
+                        if [ "$old" -le "$new_max" ]; then
+                                echo "O.K."
+                        else
+                                (( err+=1 ))
+                        fi
+                else
+                        echo
+                fi
+                old="${volumes[$i]}"
+        done
+
+        #acceptable difference in volume is 10% --> in integer arithmetics *11/10
+        volume_extra_max="$(( volume_extra*11/10 ))"
+        volume_extra_min="$(( volume_extra*9/10 ))"
+        echo -n "Extra volume: $volume_extra, Max: $volume_extra_max, Min: $volume_extra_min, compared with ${volumes[$volume_extra_val]} "
+        if [ "${volumes[$volume_extra_val]}" -le "$volume_extra_max" -a "${volumes[$volume_extra_val]}" -ge "$volume_extra_min" ]; then
+                echo "O.K."
+        else
+                echo "Error: the volume of sound recorded before alsactl store and after alsactl restore doesn't match"
+                (( err+=1 ))
+        fi
+
+        if [ "$err" -eq "0" ]; then
+                echo "No errors in $2, PASS"
+                return 0
+        else
+                echo "$err errors $2, FAIL"
+                return 1
+        fi
+}
+
+
+fails=""
+check_volumes "$local_data/test_L_" "Left channel" 45 45ACTL
+if [ "$?" -ne "0" ]; then
+        fails="$fails, Left channel"
+fi
+check_volumes "$local_data/test_R_" "Right channel" 45 45ACTL
+if [ "$?" -ne "0" ]; then
+        fails="$fails, Right channel"
+fi
+check_volumes "$local_data/test_IN_" "Input channel" 45 45ACTL
+if [ "$?" -ne "0" ]; then
+        fails="$fails, Input channel"
+fi
+if [ "$fails" ]; then
+        echo "FAIL: Test has failed in: $fails"
+        exit 1
+else
+        echo "PASS"
+        exit 0
+fi

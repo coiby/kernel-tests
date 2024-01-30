@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# This program reads parameters from the kernel commandline - that's
+# the "kernel options post" value, if you're using beaker to install
+# the system and run the test.
+#
+# Example:
+# squeek:kuest@somemachine.someplace.crazy.circus/apath/key
+# squeek:guest@something.somewhere.crazy.circus+some.webserver.crazy.circus:8000/somepath/keyname
+#
+# If this program runs with one or more parameters in format
+# user=value system=value keys=value
+# they will be used instead af parameters from the kernel commandline.
+#
+# installgcc=no parameter prevents it from installing it's own gcc compiler
+# compile=no parameter prevents it from compiling the analysis tool
+# keydownload=no parameter prevents it from downloading ssh keys
+#
+# Test will download the ssh keys and use them to ssh to 'user@system'
+# to operate the other side's soundcard.
+
+# Then gcc is installed, needed tools are compiled and variables for
+# the test - sshkey and sshto - are exported.
+
+# At last the test runs.
+
+# Author: Erik Hamera
+# Licence: GNU GPLv2
+
+echo "Debug info: Kernel command line:"
+cat /proc/cmdline
+echo "Test was called with parameters:"
+echo "$*"
+echo "version of alsa utils and alsa-sof-firmware:"
+rpm -qa alsa-utils
+rpm -qa alsa-sof-firmware
+echo "binary files in the alsa utils:"
+rpm -ql alsa-utils | grep bin
+echo "kernel version"
+uname -srvm
+echo
+
+name='squeek'
+kcmd="$(cat /proc/cmdline | tr ' ' '\n' | grep "$name" | tail -n 1 | sed "s/^$name://")"
+if echo "$kcmd" | grep -q '@'; then
+        username="$(echo "$kcmd" | sed 's/^\([^@]*\)@.*/\1/')"
+        kcmd="$(echo "$kcmd" | sed 's/^\([^@]*\)@\(.*\)/\2/')"
+else
+        username="guest"
+fi
+if echo "$kcmd" | grep -q '+'; then
+        system="$(echo "$kcmd" | sed 's/^\([^+/]*\)+.*/\1/')"
+        keys="$(echo "$kcmd" | sed 's/^\([^+]*\)+\(.*\)/\2/')"
+fi
+if echo "$kcmd" | grep -q '/'; then
+        system="$(echo "$kcmd" | sed 's/^\([^\/]*\)\/.*/\1/')"
+        keys="$kcmd"
+else
+        system="$kcmd"
+        keys="$system/audiotest/key"
+fi
+
+# if there are some parameters specified on the commandline, lets use them
+# instead of those from the kernel commandline
+
+cmdparams="$*"
+if echo "$cmdparams" | grep -q 'user='; then
+        username="$(echo "$cmdparams" | tr ' ' '\n' | grep '^user=' | sed 's/^user=\(.*\)/\1/')"
+fi
+if echo "$cmdparams" | grep -q 'system='; then
+        system="$(echo "$cmdparams" | tr ' ' '\n' | grep '^system=' | sed 's/^system=\(.*\)/\1/')"
+fi
+if echo "$cmdparams" | grep -q 'keys='; then
+        keys="$(echo "$cmdparams" | tr ' ' '\n' | grep '^keys=' | sed 's/^keys=\(.*\)/\1/')"
+fi
+
+echo "Log into $system with user $username and download ssh keys from http://$keys and http://$keys.pub"
+
+# installing the c compiler
+if ! echo "$cmdparams" | grep -q 'installgcc=no'; then
+        dnf -y install gcc
+fi
+
+#compiling the analysis tool written in C
+if ! echo "$cmdparams" | grep -q 'compile=no'; then
+        gcc -Wall -o sqavg sqavg.c
+fi
+
+if ! echo "$cmdparams" | grep -q 'keydownload=no'; then
+        if [ "$keys" ]; then
+                wget -O "$HOME/.ssh/audiotestkey" "http://$keys"
+                chmod 600 "$HOME/.ssh/audiotestkey"
+                wget -O "$HOME/.ssh/audiotestkey.pub" "http://$keys.pub"
+                chmod 644 "$HOME/.ssh/audiotestkey.pub"
+                export sshkey="$HOME/.ssh/audiotestkey"
+        fi
+fi
+
+if [ "$username" ]; then
+        export sshto="$username@$system"
+else
+        export sshto="$system"
+fi
+
+./audiotest
