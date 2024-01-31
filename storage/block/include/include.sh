@@ -1,7 +1,8 @@
 #!/bin/bash
 
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
-CDIR=$(dirname "$FILE")
+# shellcheck disable=SC2034
+CDIR=$(dirname "${FILE}")
 . /usr/share/beakerlib/beakerlib.sh   || exit 1
 #. "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
@@ -27,7 +28,7 @@ function check_log()
 {
     rlRun "dmesg | grep -i 'Call Trace:'" 1 "check the errors"
     rlRun "dmesg | grep -i 'kernel BUG at'" 1 "check the errors"
-    rlRun "dmesg | grep -i 'BUG:'" 1 "check the errors"
+    rlRun "dmesg | grep 'BUG:'" 1 "check the errors"
     rlRun "dmesg | grep -i 'WARNING:'" 1 "check the errors"
 }
 

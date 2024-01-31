@@ -1026,6 +1026,7 @@ sriov_test_vmvf_hibernation()
 		fi
 		rlRun "virsh list --all"
 		# check no vmcore file on guest
+		# shellcheck disable=SC2191
 		local cmd=(
 			{export vmcore=\$\(ls \/var\/crash \| wc -l\)}
 			{test 0 = \$vmcore}

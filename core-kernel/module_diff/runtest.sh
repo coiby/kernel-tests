@@ -651,6 +651,13 @@ rlJournalStart
             if cki_kver_lt "4.18.0-526.el8"; then
                 sed -i "/ftdi-elan\.ko/d" ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
             fi
+            if cki_kver_lt "4.18.0-534.el8"; then
+                sed -i "/mcryptd\.ko/d; /sha1-mb\.ko/d; /sha256-mb\.ko/d; /sha512-mb.ko\.ko/d" ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
+            fi
+            if cki_kver_lt "4.18.0-536.el8"; then
+                sed -i "/snd-soc-cs42l42.ko/d; /snd-soc-cs42l42-sdw.ko/d; /snd-soc-max98363.ko/d;
+                        /snd-soc-rt712-sdca-dmic.ko/d" ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
         fi
 
         if [[ "$Release" == "9.0" ]]; then

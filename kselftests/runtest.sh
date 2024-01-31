@@ -50,6 +50,7 @@ INCLUDE=${INCLUDE:-""}
 . "$CDIR"/include/include.sh
 for file in $INCLUDE; do
     echo "Loading $file."
+    # shellcheck source=/dev/null
     . "$CDIR"/include/$file
 done
 
@@ -253,7 +254,7 @@ function SetupTest ()
       rlRun "rpm-ostree ex apply-live --allow-replacement"
       if ! rpm -q --quiet epel-release; then
         $pkg_mgr $pkg_mgr_inst_string \
-        https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
+        https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease:?}".noarch.rpm
       fi
     else
       export pkg_mgr_inst_string="-y install"
