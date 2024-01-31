@@ -47,7 +47,7 @@ DEFAULT_PULLS=""
 DEFAULT_PATCHES=""
 
 # Optional test parameter - location of testuite git.
-GIT_URL=${GIT_URL:-"https://github.com/SELinuxProject/selinux-testsuite"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/selinux-testsuite"}
 
 # Optional test parameter - timeout for detecting lost packets
 NETWORK_TIMEOUT=${NETWORK_TIMEOUT:-4}
