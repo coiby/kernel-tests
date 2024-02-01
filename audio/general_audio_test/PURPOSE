@@ -1,0 +1,12 @@
+PURPOSE of /kernel/audio/general_audio_test
+Description: Check the audiosystem and alsa-utils
+Author: Erik Hamera <ehamera@redhat.com>
+
+
+This audiotest tests audiosubsystem of a Linux computer. It uses utilities from
+alsa-utils package mostly. If the test passes, the audio, mixer, SOF firmware 
+(if the system uses it), aplay, arecord, amixer, alsa-test and alsactl works 
+properly.
+
+Documantation how exactly the test works, how to run it and how to connect the
+HW is described in the file audiotest_documentation.

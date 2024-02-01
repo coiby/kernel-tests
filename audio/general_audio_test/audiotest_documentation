@@ -1,0 +1,151 @@
+Author, etc
+===========
+Author: Erik hamera
+Licence: GPLv2
+Written in 2023-2024
+
+What it does
+============
+Audiotest tests audiosubsystem of a Linux computer. It uses utilities from alsa-utils package mostly.
+If the test passes, the audio, mixer, SOF firmware (if the system uses it), aplay, arecord, amixer,
+alsa-test and alsactl works properly.
+
+It sends sound to left and right output channel (to headphones) and records the sound via soundcard
+with stereo input (ADA-17) on the other computer, via ssh and arecord there. Then it sends mono sound
+from the other computer and records it via local microphone input. All of that is done with various
+level of volume or capture and those signals are compared after.
+
+It stores the mixer setting in middle of testing of every path and restores it after to test the
+alsactl.
+
+
+Hardware configuration
+======================
+Default souncard is used on both sides.
+
+Soundcards are interconnected by two cables with 3-pole jacks on both sides.
+
+----------                                                     -------------
+|        |                                                     |           |
+| System | headphone output <-----cable-----> stereo mic input | Auxiliary |
+| under  |                                                     | system    |
+| test   | mono mic input   <-----cable-----> headphone output |           |
+|        |                                                     |           |
+----------                                                     -------------
+
+If the system under test has 4-poje jack only use 4 pole -> 3 pole + 2 pole converter.
+
+----------                                                                -------------
+|        |                                                                |           |
+| System |            /---headphone output <---cable---> stereo mic input | Auxiliary |
+| under  | 4 pole jack                                                    | system    |
+| test   |            \--- mono mic input  <---cable---> headphone output |           |
+|        |                                                                |           |
+----------                                                                -------------
+
+Proven soundcard for the auxiliary system is USB ADA-17
+
+$ lsusb
+Bus 001 Device 005: ID 0d8c:0043 C-Media Electronics, Inc. USB Advanced Audio Device
+
+https://www.axagon.eu/produkty/ada-17
+
+
+What the test consists of
+=========================
+There are 3 files:
+audiotest
+audiotest_loader
+sqavg.c
+
+The audiotest_loader installs a compilator, compiles the sqavg.c, downloads ssh keys, puts them
+into the system, obtains information about system configuration, and pass it to the audiotest.
+
+All of those operations are configurable and switchable off.
+
+Audiotest just beeps from one souncard to another with different volume settings and checks
+results.
+
+
+How to run the test
+===================
+
+Create ssh keys. For example:
+ssh-keygen -b 2048 -f ./audiotest_key -N '' -t rsa -b 4096
+and put the key par to some webserver to be downloaded. The servery may or may not run on
+the auxiliary system.
+
+Install the auxiliary system, attach proper soundcard and install cables as described in
+the "Hardware configuration" section. Put the public key to the ~/.ssh/authorized_keys2
+on the auxiliary system.
+
+Pass the username on the auxiliary system, the IP or hostname of it and the place where
+the ssh key peir is to the test.
+
+Via kernel commandline
+----------------------
+
+The test is intended to be run by the Beaker. Therefore all off these information can be
+passed via kernel commandline. It's the "kernel options post" value, if you're using
+beaker manually (provision).
+
+The test scans the kernel commandline to the keyword (squeek) and parses the string
+after it. The format is:
+
+squeek:[username@]some.machine.url[+some.webserver.url[:port]][/some/path/sshkeyname]
+
+Example:
+  squeek:noone@somemachine.someplace.crazy.circus/apath/key
+  squeek:guest@something.somewhere.crazy.circus+some.webserver.crazy.circus:8000/somepath/keyname
+  squeek:192.168.375.12+192.168.375.12:8000
+
+Default values (if some are omitted) are: "guest" webserver the same as auxiliary server,
+and "/audiotest/key". There is expected to exist "key" and "key.pub" in the same directory.
+
+Via local commandline
+---------------------
+
+Commandline parameters for the audiotest_loader has higher priority, than the kernel
+commandline or default values.
+
+audiotest_loader user=value1 system=value2 keys=value3
+
+Example:
+./audiotest_loader user=lhc system=192.168.700.61 keys=kanal.ucw.cz/keysforaudiotest/audiotest_key
+
+There are some additional parameters which may be useful:
+
+installgcc=no parameter prevents it from installing it's own gcc compiler
+compile=no parameter prevents it from compiling the analysis tool
+keydownload=no parameter prevents it from downloading ssh keys
+
+If the test runs as user, intead of root, alsactl will not work. A simple shim can be used:
+------------------------------------------------------------------------------------------------
+$ cat ~/bin/alsactl
+# !/bin/bash
+# this is fake command to run audiotest without being root - alsactl restore
+if [ "$1" = "restore" ]; then
+        echo "Running amixer set Master playback 45%"
+        amixer set Master playback "45%"
+        echo "amixer set Capture 45%"
+        amixer set Capture "45%"
+
+fi
+echo "bash: alsactl: command not found -- this is fake command to run audiotest without being root"
+------------------------------------------------------------------------------------------------
+the alsactl is not tested in that scenario obviously. The value 45% is the same as hardcoded in
+the test.
+
+known bugs in the test
+======================
+none
+
+known bugs/problems in the HW
+=============================
+Most soundcards doesn't have stereo input.
+
+All three laptops, I have tried the test on, has problems with an external mic. Two Lenovos just
+plainly doesn't record anything, one HP records only if the 4-pole jack is unplugged and plugged
+back manually after the arecord is started.
+
+One intel NUC with 4-pole jack and three differnet USB soundcards works properly.
