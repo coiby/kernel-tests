@@ -1,0 +1,3 @@
+PURPOSE of storage/dm/dmtest-python
+
+DESCRIPTION: Run basic tests for device mapper kernel targets.

@@ -1,0 +1,14 @@
+[General]
+name=storage/dm/dmtest-thin-fs-bench
+owner=Filip Suba <fsuba@redhat.com>
+description=Device Mapper thin fs bench tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=bc;wget;unzip;gcc;git;curl;make;libaio-devel;lvm2;lsof;clang;cargo;systemd-devel;device-mapper-devel;python3-pip;blktrace;device-mapper-persistent-data;fio
+softDependencies=coreutils;
+repoRequires=cki_lib;storage/include;kernel-include;storage/dm
+max_time=2h

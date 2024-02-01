@@ -26,6 +26,7 @@ LINUX_REPO="https://github.com/torvalds/linux"
 BLK_ARCHIVE_REPO="https://github.com/jthornber/blk-archive"
 DMTS_REPO="https://github.com/jthornber/dmtest-python.git"
 DMTS_LOCAL="/opt/$(basename $DMTS_REPO | sed 's%.git%%')"
+SETUP_FLAG=".SETUP_PASS"
 
 function install_kernel_devel
 {
@@ -137,8 +138,6 @@ function clone_test_suite
     fi
     git clone $DMTS_REPO "$DMTS_LOCAL" || return 1
 
-    clone_linux_repo || touch "$DMTS_LOCAL"/LINUX_REPO_UNAVAILABLE
-
     pushd "$DMTS_LOCAL" || return 1
 
     python3 -m pip install -r requirements.txt || return 1
@@ -207,6 +206,10 @@ function ts_setup
 {
     cki_debug
 
+    if [[ -e "$DMTS_LOCAL/$SETUP_FLAG" ]]; then
+        return "$CKI_PASS"
+    fi
+
     install_kernel_devel || return "$CKI_UNINITIATED"
     install_bufio || return "$CKI_UNINITIATED"
     if ! rpm -q dt; then
@@ -217,6 +220,8 @@ function ts_setup
     clone_test_suite || return "$CKI_UNINITIATED"
 
     ts_config_setup "$DMTS_LOCAL"/config.toml || return "$CKI_UNINITIATED"
+
+    touch "$DMTS_LOCAL/$SETUP_FLAG"
 
     return "$CKI_PASS"
 }
