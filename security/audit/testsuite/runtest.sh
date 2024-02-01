@@ -22,7 +22,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-GIT_URL=${GIT_URL:-"https://github.com/linux-audit/audit-testsuite.git"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/audit-testsuite"}
 GIT_REF=${GIT_REF:-"main"}
 
 rlJournalStart

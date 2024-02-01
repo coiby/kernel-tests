@@ -361,7 +361,9 @@ function runtest
     # Run tests
     for test in "${ALL_TESTS[@]}"; do
         rlPhaseStartTest "${test}"
-        rlRun "${BINDIR}/${test}" 0,4
+        # run using -l option to login the test output
+        # only the last 50 lines are saved on resultoutputfile.log
+        rlRun -l "${BINDIR}/${test}" 0,4
         rlPhaseEnd
     done
 

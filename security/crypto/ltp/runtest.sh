@@ -22,7 +22,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-GIT_URL=${GIT_URL:-"https://github.com/linux-test-project/ltp.git"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/ltp.git"}
 
 rlJournalStart
     rlPhaseStartSetup
