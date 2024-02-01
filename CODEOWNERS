@@ -78,6 +78,7 @@
 /filesystems/xfs/xfstests/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /firmware/user-specified/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /general/memory/function/kaslr/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/general/memory/function/mem_encrypt/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /general/memory/function/memfd_create/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /general/process/trinity_git/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /iommu/boot/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -206,6 +207,7 @@
 /filesystems/xfs/xfstests/ @andyprice @bgoncalv @idorax @jencce2002 @lulinqing
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @idorax @lulinqing
 /general/memory/function/kaslr/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
+/general/memory/function/mem_encrypt/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
 /general/memory/function/memfd_create/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
 /general/process/trinity_git/ @bgoncalv @chuhu @idorax @liwan1 @lulinqing @pifang
 /iommu/boot/ @bgoncalv @idorax @lulinqing @wrgrh
