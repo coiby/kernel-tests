@@ -5,9 +5,9 @@ owner=Dana Elfassy <delfassy@redhat.com>
 license=GPLv2
 
 [restraint]
-entry_point=bash ./runtest.sh
+entry_point=bash ./test.sh
 max_time=25m
-dependencies=gcc;meson;check-devel;valgrind;doxygen;cmake;beakerlib;
+dependencies=git;gcc;meson;check-devel;valgrind;doxygen;cmake;beakerlib;
 TestVersion=0.1
 Path=/libevdev
 RunFor=kernel
