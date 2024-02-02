@@ -93,7 +93,7 @@ case "$arch" in
 	i?86)
 		# shellcheck disable=SC2144
 		if [ -s modules.i?86 ] ; then
-			MODLIST=modules.i?86
+			MODLIST="modules.i?86"
 		else
 			MODLIST=modules.default
 		fi
@@ -118,7 +118,7 @@ case "$arch" in
 	ppc*)
 		# shellcheck disable=SC2144
 		if [ -s modules.ppc* ] ; then
-			MODLIST=modules.ppc*
+			MODLIST="modules.ppc*"
 		else
 			MODLIST=modules.default
 		fi
@@ -171,7 +171,7 @@ else
 fi
 
 if [ -z "$release" ]; then
-	release=$(uname -r | grep -o el[0-9])
+	release=$(uname -r | grep -o 'el[0-9]')
 	echo "Taking release from kernel version: $release" | tee -a $OUTPUTFILE
 fi
 
@@ -387,7 +387,7 @@ for (( i = 0; i < $ITERATIONS; i++)); do
 		if [ $RC -ne 0 ] ; then
 			echo "** Modprobe FAILED, exit: $RC **"  >> $OUTPUTFILE
 			echo "** Mounted filesystems at the moment of failure: " >> $OUTPUTFILE
-			mount 2>&1 >> $OUTPUTFILE
+			mount >> $OUTPUTFILE 2>&1
 
 			# Bug 1031165 - Dependency issue with Intel hw specific serpent crypto modules
 			if [ "$module" = "serpent" ]; then
@@ -398,7 +398,7 @@ for (( i = 0; i < $ITERATIONS; i++)); do
 			fi
 		fi
 
-		for k in $(seq 1 3); do
+		for (( k=1; k<=3; k++ )); do
 			if [ $(/sbin/lsmod | grep -c $module) -eq 0 ] ; then
 				echo "** $module removed sucessfully. **" >> $OUTPUTFILE
 				pass=$(expr $pass + 1)
