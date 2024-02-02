@@ -47,7 +47,7 @@ CLIENT_PORT_TWO=${CLIENT_PORT_TWO}
 ########################################################################################
 #CLIENT AND SERVER HOST NIC CONFIG
 NIC_DRIVER=${NIC_DRIVER:-ice}
-if [ "$SERVERS" == "netqe35.knqe.lab.eng.bos.redhat.com" ]; then
+if [ "$SERVERS" == "netqe35.knqe.eng.rdu2.dc.redhat.com" ]; then
     SERVER_NIC1_MAC=b4:96:91:a5:c7:96
     SERVER_NIC2_MAC=b4:96:91:a5:c7:97
     CLIENT_NIC1_MAC=b4:96:91:a5:c6:d6
