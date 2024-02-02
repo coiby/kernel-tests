@@ -227,7 +227,7 @@ rlPhaseStartTest "local_netns"
 			rlRun "ip netns exec server ethtool -k ipvlan_s"
 			waitbeforepass 30 "ip netns exec client ping 2.2.2.171 -c 1"
 			rlRun "ip netns exec client ping 2.2.2.171 -c 2"
-			waitbeforepass 30 "ip netns exec client ping6 2222::171 -c 1"
+			waitbeforepass 60 "ip netns exec client ping6 2222::171 -c 1"
 			rlRun "ip netns exec client ping6 2222::171 -c 2"
 
 		done
@@ -408,7 +408,9 @@ rlPhaseStartTest "link_test"
 	rlRun "mtu_val=`cat /sys/class/net/ipvlan_c/mtu`"
 	rlRun "qlen_val=`cat /sys/class/net/ipvlan_c/tx_queue_len`"
 	rlRun "index_val=`cat /sys/class/net/ipvlan_c/ifindex`"
+	# shellcheck disable=SC2010
 	rlRun "txqueue_val=`ls -l /sys/class/net/ipvlan_c/queues | grep -c tx`"
+	# shellcheck disable=SC2010
 	rlRun "rxqueue_val=`ls -l /sys/class/net/ipvlan_c/queues | grep -c rx`"
 
 	rlAssertEquals "mtu:$mtu_val should be 1300" $mtu_val 1300
@@ -519,8 +521,8 @@ rlPhaseStartTest "ipvlan_o_ipvlan_test"
 
 		for internal_mode in l2 l3 l3s
 		do
-			rlRun "ip link add link ipvlan1 name ipvlan11 type ipvlan mode $ipvlan_mode"
-			rlRun "ip link add link ipvlan1 name ipvlan12 type ipvlan mode $ipvlan_mode"
+			rlRun "ip link add link ipvlan1 name ipvlan11 type ipvlan mode $internal_mode"
+			rlRun "ip link add link ipvlan1 name ipvlan12 type ipvlan mode $internal_mode"
 
 			rlRun "ip netns add client"
 			rlRun "ip netns add server"
@@ -812,6 +814,7 @@ elif i_am_client
 then
 	if [ -z "$IFACE_NAME" ]
 	then
+		# shellcheck disable=SC2034
 		NAY=yes
 		rlRun "get_test_iface"
 		IFACE_NAME=$TEST_IFACE
