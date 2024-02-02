@@ -348,6 +348,12 @@ rlJournalStart
                 rlRun "sed -i -E -e '$script1' -e '$script2' -e '$script3' tests/filesystem/test" 0 \
                     "Apply workaround for missing XFS quota checks"
             fi
+            #Excluding tests for automotive
+            if cki_is_kernel_automotive; then
+                #Excluded as automotive doesn't support Quota related functionality VROOM-17160
+                #Functionality removed by disabling Configuration Parameter : CONFIG_QUOTA_TREE
+                exclude_tests+=" filesystem/ext4 fs_filesystem/ext4"
+            fi
         fi
 
         # CKI mainline kernels don't ship with module build infrastructure
