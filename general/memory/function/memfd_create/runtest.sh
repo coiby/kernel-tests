@@ -29,7 +29,8 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 gcc t_memfd_create.c -o t_memfd_create &&
-gcc t_get_seals.c -o t_get_seals
+gcc t_get_seals.c -o t_get_seals &&
+gcc t_process_state_wait.c -o t_process_state_wait
 if [ $? != 0 ]; then
     rlLog "memfd_create is not supported."
     report_result Test_Skipped PASS 99
@@ -39,6 +40,7 @@ fi
 function sanity_memfd_create()
 {
     rlRun "./t_memfd_create memf 1024 gswS &"
+    rlRun "./t_process_state_wait $! S"
     rlRun "./t_get_seals /proc/$!/fd/3 > seals"
     rlRun "cat ./seals"
     rlAssertGrep "SEAL GROW WRITE SHRINK" ./seals

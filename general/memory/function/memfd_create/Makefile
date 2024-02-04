@@ -39,7 +39,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE _env t_get_seals.c t_memfd_create.c
+FILES=$(METADATA) runtest.sh Makefile PURPOSE _env t_get_seals.c t_memfd_create.c t_process_state_wait.c
 
 .PHONY: all install download clean
 
