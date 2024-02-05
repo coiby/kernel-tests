@@ -79,6 +79,9 @@ e4a8e45016f20b50c3974e763b48c99a936b6d0a x86_64 # Simple expression parser
 c28f07da1fd1e44f7b716f64ff4b3cdf0d163e20 aarch64 ppc64le # perf record tests
 bc0e87022bb4941020242d414be1d74716aba9d5 s390x ppc64le x86_64 # perf pipe recording and injection test
 93754cd356c4bd5bc5827422eea5903f66591892 ppc64le x86_64 # Test data symbol
+9138e5d509df714f21df03aba8f6e07761a5144a s390x # daemon operations
 # happens mostly on KVM
 ed8900cbc1af7881132d775c5101b8010a206012 aarch64 x86_64 # Setup struct perf_event_attr
+# waive till rhel9.4 where the issue was fixed
+e6b6297934e7798b0aa806d20454c3fc61074af4 all # perf stat metrics (shadow stat) test
 
