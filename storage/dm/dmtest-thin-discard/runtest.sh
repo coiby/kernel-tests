@@ -21,24 +21,14 @@ source ../dmtest-setup/setup.sh
 source ../include/libdmtest.sh
 export PATH="$PATH":~/.cargo/bin
 
-RESULT_SET="cki_dmtest"
+RESULT_SET="cki_dmtest_thindiscard"
 
 function runtest
 {
     pushd "$DMTS_LOCAL" || return 1
     ./dmtest health
-    if ! clone_linux_repo; then
-      echo "Found LINUX_REPO_UNAVAILABLE file!"
-      echo "Skipping tests that require linux repo."
-      ./dmtest run --result-set "$RESULT_SET" --and-filters \
-      --rx '^/(?!thin/snapshot/(many-snaps-with-changes|try-and-create-duplicates|parallel-io-to-shared-thins))' \
-      --rx '^/(?!blk-archive/rolling-snaps)' --rx '^/(?!thin/fs-bench)' --rx '^/(?!thin/discard)'
-    else
-      ./dmtest run --result-set "$RESULT_SET" --and-filters \
-      --rx '^/(?!thin/snapshot/parallel-io-to-shared-thins)' --rx '^/(?!thin/fs-bench/)' --rx '^/(?!thin/discard)'
-    fi
+    ./dmtest run --result-set $RESULT_SET --rx "discard"
 }
-
 
 startup
 runtest
