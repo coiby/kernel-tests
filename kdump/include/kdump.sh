@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 
 ((KD_KDUMP_SH)) && return || KD_KDUMP_SH=1
 
@@ -12,6 +13,8 @@
 #     memory threshold required by crashkernel=auto function.
 # @return:
 #     Crash kernel memory range. e.g. crashkernel=XXXM
+#     For RHEL8 and CentOS8 - the crashkernel value is the same like RHEL-8.10.
+#     For RHEL9 and CentOS9 - the crashkernel value is the same like RHEL-9.4.
 DefKdumpMem()
 {
     local args=""
@@ -30,38 +33,29 @@ DefKdumpMem()
             args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=512M"
         fi
-
-    elif $IS_RHEL8; then
-        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=1G-4G:160M,4G-64G:192M,64G-1T:256M,1T-:512M"
-        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=1G-4G:160M,4G-64G:192M,64G-1T:256M,1T-:512M"
+    elif $IS_RHEL8 || $IS_CentOS8; then
+        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
+        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
-            args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=448M"
+            args="crashkernel=0G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+            [[ "$1" = fadump ]] && args="crashkernel=0G-16G:768M,16G-64G:1G,64G-128G:2G,128G-1T:4G,1T-2T:6G,2T-4T:12G,4T-8T:20G,8T-16T:36G,16T-32T:64G,32T-64T:128G,64T-:180G"
+        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=480M"
         fi
-
-    elif $IS_RHEL9; then
-        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M"
-        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M"
+    elif $IS_RHEL9 || $IS_CentOS9; then
+        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
+        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
-            args="crashkernel=2G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-            [[ "$1" = fadump ]] && args="crashkernel=4G-16G:768M,16G-64G:1G,64G-128G:2G,128G-1T:4G,1T-2T:6G,2T-4T:12G,4T-8T:20G,8T-16T:36G,16T-32T:64G,32T-64T:128G,64T-:180G"
-        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=1G-4G:256M,4G-64G:320M,64G-:576M"
-        fi
-
-    elif $IS_COS; then
-        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M"
-        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M"
-        elif [[ "${K_ARCH}"  = ppc64*  ]]; then
-            args="crashkernel=2G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=1G-4G:256M,4G-64G:320M,64G-:576M"
+            args="crashkernel=0G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+            [[ "$1" = fadump ]] && args="crashkernel=0G-16G:768M,16G-64G:1G,64G-128G:2G,128G-1T:4G,1T-2T:6G,2T-4T:12G,4T-8T:20G,8T-16T:36G,16T-32T:64G,32T-64T:128G,64T-:180G"
+        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=0G-4G:256M,4G-64G:320M,64G-:576M"
         fi
 
     elif $IS_FC; then
-        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=1G-4G:256M,4G-64G:256M,64G-1T:256M,1T-:512M"
-        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=1G-4G:192M,4G-64G:192M,64G-1T:256M,1T-:512M"
+        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
+        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
-            args="crashkernel=1G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=1G-4G:320M,4G-64G:384M,64G-:640M"
+            args="crashkernel=0G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=0G-4G:256M,4G-64G:766M,64G-:1G"
         fi
 
     elif $IS_RHEL5; then
@@ -103,7 +97,7 @@ IfMemoryAboveThreshold()
     local retval=1
     local result="below"
 
-    if $IS_RHEL7 ; then
+    if $IS_RHEL7; then
         if   [[ "${K_ARCH}" = "x86_64" ]] && [ $mem -ge 2048 ]; then
             retval=0
         elif [[ "${K_ARCH}" = "ppc64"  ]] && [ $mem -ge 2048 ]; then
@@ -115,7 +109,7 @@ IfMemoryAboveThreshold()
         elif [[ "${K_ARCH}" = "aarch64" ]] && [ $mem -ge 2048 ]; then
             retval=0
         fi
-    elif $IS_RHEL8 || $IS_RHEL9 ; then
+    elif $IS_RHEL8 || $IS_RHEL9 || $IS_FC; then
         if   [[ "${K_ARCH}" = "x86_64" ]] && [ $mem -ge 1024 ]; then
             retval=0
         elif [[ "${K_ARCH}" = "ppc64"  ]] && [ $mem -ge 2048 ]; then
@@ -163,7 +157,7 @@ CheckAutoReservation()
     }
 
     # Return 1 if no crash memory reserved.
-    if grep -q "fadump=on" /proc/cmdline ; then
+    if grep -qoE "fadump=\w+" /proc/cmdline ; then
         if CommandExists journalctl ; then
             journalctl | grep -i "firmware-assisted" | grep -i -q "Reserved"
         else

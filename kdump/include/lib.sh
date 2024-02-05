@@ -97,6 +97,11 @@ export IS_RHEL5 IS_RHEL6 IS_RHEL7 IS_RHEL8 IS_RHEL9
 export IS_FC IS_RHEL IS_COS
 export IS_RT IS_DB IS_64K
 
+export IS_CentOS9=false
+export IS_CentOS8=false
+
+# On c9s,the info in /etc/redhat-release is 'CentOS Stream release 9'
+# On Centos Linux 8, the info in /etc/redhat-release is 'CentOS Linux release 8.xxx.xxx'
 if [ -z "$FAMILY" ]; then
     FAMILY=$(sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g' < /etc/redhat-release)
 fi
@@ -104,11 +109,16 @@ fi
 [[ "$FAMILY" =~ [a-zA-Z]+5 ]] && IS_RHEL5=true || IS_RHEL5=false
 [[ "$FAMILY" =~ [a-zA-Z]+6 ]] && IS_RHEL6=true || IS_RHEL6=false
 [[ "$FAMILY" =~ [a-zA-Z]+7 ]] && IS_RHEL7=true || IS_RHEL7=false
-[[ "$FAMILY" =~ [a-zA-Z]+8 ]] && IS_RHEL8=true || IS_RHEL8=false
-[[ "$FAMILY" =~ [a-zA-Z]+9 ]] && IS_RHEL9=true || IS_RHEL9=false
+[[ "$FAMILY" =~ RedHatEnterpriseLinux8 ]] && IS_RHEL8=true || IS_RHEL8=false
+[[ "$FAMILY" =~ RedHatEnterpriseLinux9 ]] && IS_RHEL9=true || IS_RHEL9=false
 [[ "$FAMILY" =~ Fedora ]] && IS_FC=true || IS_FC=false
-[[ "$FAMILY" =~ CentOSStream ]] && IS_COS=true || IS_COS=false
+[[ "$FAMILY" =~ CentOS ]] && IS_COS=true || IS_COS=false
 [[ "$FAMILY" =~ RedHatEnterpriseLinux ]] && IS_RHEL=true || IS_RHEL=false
+
+$IS_COS && {
+    rpm -qa | grep glibc | grep -q 'el9' && IS_CentOS9=true
+    rpm -qa | grep glibc | grep -q 'el8' && IS_CentOS8=true
+}
 
 if $IS_FC || $IS_COS; then
     RELEASE=$(grep -o 'release [^ ]*' /etc/redhat-release  | awk '{print $NF}')
@@ -1126,12 +1136,17 @@ GetCrashkernelDefault() {
 }
 
 ResetCrashkernel() {
-    _fadump_opts=$1
+    local fadump_opts="$(grep -oE "fadump=\w+" /proc/cmdline)"
     if cki_is_abd; then
         LogRun "add_aboot_param crashkernel=$(GetCrashkernelDefault)" && \
             _reboot_required=true
+    elif kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
+        [ -n "${fadump_opts}" ] && fadump_opts="--${fadump_opts}"
+        LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'Please reboot the system'" || \
+            _reboot_required=false
+    elif $IS_RHEL7 || $IS_RHEL8; then
+        UpdateKernelOptions "${fadump_opts} crashkernel=auto"
     else
-        LogRun "kdumpctl reset-crashkernel ${_fadump_opts} 2>&1 | grep -i reboot" && \
-            _reboot_required=true
+        UpdateKernelOptions $(DefKdumpMem)
     fi
 }

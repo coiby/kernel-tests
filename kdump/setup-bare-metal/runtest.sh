@@ -1,4 +1,7 @@
 #!/bin/sh
+# shellcheck disable=SC3010
+# shellcheck disable=SC3011
+# shellcheck disable=SC3060
 # Copyright (c) 2020 Red Hat, Inc. All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,20 +28,17 @@ SetupKdump()
     if [ "${RSTRNT_REBOOTCOUNT}" -eq 0 ]; then
 
         GetHWInfo
-        # shellcheck disable=SC3010
         [[ "${K_ARCH}" =~ i.86|x86_64 ]] && GetBiosInfo
 
         # Kexec-tools is not installed by default on Fedora
         $IS_FC && PrepareKdump
 
         # In ia64 arch, the path of vmlinuz is /boot/efi/efi/redhat, it different with other arch.
-        # shellcheck disable=SC3010
         [[ "${K_ARCH}"  = "ia64" ]] && {
             /sbin/grubby --set-default="/boot/efi/efi/redhat/vmlinuz-$(uname -r)"
         }
 
         # For uncompressed kernel, i.e. vmlinux
-        # shellcheck disable=SC3010
         [[ "${VMLINUZ_PATH}" == *vmlinux* ]] && {
             Log "Modifying ${KDUMP_SYS_CONFIG} properly for 'vmlinux'."
             sed -i 's/\(KDUMP_IMG\)=.*/\1="vmlinux"/' "${KDUMP_SYS_CONFIG}"
@@ -60,86 +60,38 @@ SetupKdump()
         fi
 
         # Ensure Kdump Kernel memory reservation
-        #  KARGS is EMPTY or non-"crashkernel":
-        #   - fadump or K_FORCE_RESET_CK will trigger reset-crashkernel,
-        #       - EMPTY will not trigger grubby
-        #       - non-"crashkernel" will trigger extra GRUBBY invokation
-        #   - legacy cases: RHEL5 or fedora:non-fadump
-        #       - reset to default ck, or invoke reset-crashkernel
-        #  note: priority of K_FORCE_RESET_CK is lower than KARGS="crashkernel=xxx"
         _reboot_required=false
-        _hascmd_reset_crashkernel=false
-        kdumpctl -h 2>&1 | grep -q reset-crashkernel && _hascmd_reset_crashkernel=true
-        # shellcheck disable=SC3011
-        _fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
-        # shellcheck disable=SC3011
+        local fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
+
+        # if ${KER1ARGS} has no 'crashkernel=xxx':
+        # (1). RHEL-5 or the memory below the threshold - get the crashkernel value from function DefKdumpMem()
+        # (2). Fedora system - get the crashkernel value from function ResetCrashkernel()
+        # (3). RHEL-8,this is a known bug2111855 that on some aarch64 machines,need to reserve more memory for kdump test.
+        #      for example:ampere-mtsnow-altra%,ampere-mtjade-altra% and arm-kernel%,the model name is Neoverse-N1.
+        #      set the crashkernel=768M to ovoid OOM issue.
         grep -q 'crashkernel' <<< "${KER1ARGS}" || {
-            if ${_hascmd_reset_crashkernel} && \
-                    [ -n "${_fadump_opts}" ]; then
-                _fadump_opts="--${_fadump_opts}"
-                Log "Force resetting crashkernel value to default"
-                ResetCrashkernel ${_fadump_opts}
-            elif ${_hascmd_reset_crashkernel} && \
-                    [ "${K_FORCE_RESET_CK}" = "true" ]; then
-                # if current running mode is fadump and not set in the above
-                [ -n "${_fadump_opts}" ] || {
-                    _fadump_opts=$(grep -oE "fadump=\w+" /proc/cmdline)
-                    [ -n "${_fadump_opts}" ] && _fadump_opts="--${_fadump_opts}"
-                }
-                Log "Force resetting crashkernel value to default"
-                ResetCrashkernel ${_fadump_opts}
-            else # for legacy cases: get default value from kdump.sh
+            if [ -n "${fadump_opts}" ] && [ "${fadump_opts}" != "fadump=off" ]; then
+                kdumpMem="$(DefKdumpMem fadump)"
+            else
                 kdumpMem="$(DefKdumpMem)"
             fi
 
-            # legacy cases: RHEL5 or fedora:non-fadump
+            # legacy cases: RHEL5 or if the memory below the threshold or fedora:non-fadump
             [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
-            if $IS_RHEL5 ; then
-                # shellcheck disable=SC3024
+            if $IS_RHEL5 || ! IfMemoryAboveThreshold; then
                 KER1ARGS+="${kdumpMem}"
-            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ] ; then # for fedora:non-fadump
-                # Check kdump status if it's fadump mode which caused kexec_crash_size is 0
+            elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ]; then
                 kdumpctl status > /dev/null 2>&1 || {
-                    if ${_hascmd_reset_crashkernel} && [ "${#kdumpMem}" -gt 1 ]; then
-                        Log "fedora:non-fadump, reset crashkernel value to default"
-                        ResetCrashkernel
-                    else
-                        # shellcheck disable=SC3024
-                        KER1ARGS+="${kdumpMem}"
-                    fi
+                    ! $IS_FC && FatalError "Kdump is not operational.please check the system."
+                    _reboot_required=true
+                    ResetCrashkernel
                 }
+            elif $IS_RHEL8 && [ "${K_ARCH}" = "aarch64" ] && grep -q "crashkernel=auto" /proc/cmdline; then
+                [ "$(lscpu |grep '^Model name:'| awk '{print $NF}')" = "Neoverse-N1" ] && KER1ARGS+=" crashkernel=768M"
             fi
         }
 
-        # 2nd round checking KARGS, posible values:
-        #   - internal default CK (from DefKdumpMem): for legacy from 1st round check;
-        #   - external "crashkernel=XXX/auto" +/or "other_kernel_cmdline_vars"
-        #       - strip ck=auto when supporting reset-crashkernel
-        #       - or s/crashkernel=auto/$(DefKdumpMem)/
         if [ -n "${KER1ARGS}" ]; then
-            # Support translating crashkernel=auto test request to crashkernel=XXM for rhel9+
-            # shellcheck disable=SC3011
-            if grep -q crashkernel=auto <<< "${KER1ARGS}"; then #|| \
-                if ${_hascmd_reset_crashkernel}; then
-                    # shellcheck disable=SC3060
-                    KER1ARGS=${KER1ARGS/crashkernel=auto/}
-                    # if current running mode is fadump and not set in 1st round
-                    [ -n "${_fadump_opts}" ] || {
-                        _fadump_opts=$(grep -oE "fadump=\w+" /proc/cmdline)
-                        [ -n "${_fadump_opts}" ] && _fadump_opts="--${_fadump_opts}"
-                    }
-                    Log "Strip crashkernel=auto and reset crashkernel value to default"
-                    ResetCrashkernel ${_fadump_opts}
-                else
-                    # shellcheck disable=SC3060
-                    KER1ARGS=${KER1ARGS/crashkernel=auto/$(DefKdumpMem)}
-                fi
-            fi
-        fi
-        # 3rd round checking KARGS, posiblely EMPTY after stripped "crashkernel=auto"
-        if [ -n "${KER1ARGS}" ]; then
-            # Kdump service will not be enabled if crashkernel=auto && system
-            # memory is less the threshold required by kdump service.
             Log "Preparing to update kernel options: ${KER1ARGS}"
             Log "Enable kdump service"
             /bin/systemctl enable kdump.service || /sbin/chkconfig kdump on
@@ -150,6 +102,16 @@ SetupKdump()
             _reboot_required=true
         fi
 
+        # if K_FORCE_RESET_CK is true,force the crashkernel value to the default value.
+        # K_FORCE_RESET_CK has higher priority than KER1ARGS(if it has crashkernel=xxxM)
+        # - Trigger reset-crashkernel (when it supports 'kdumpctl reset-crashkernel')
+        # - Reset crashkernel=auto in /proc/cmdline (when it supports crashkernel=auto,like rhel-7 and rhel-8)
+        # - Get the default value from DefKdumpMem()(when it did not support crashkernel=auto or 'kdumpctl reset-crashkernel',like rhel-5)
+        if [ "${K_FORCE_RESET_CK}" = "true" ]; then
+            _reboot_required=true
+            ResetCrashkernel
+        fi
+
         if ${_reboot_required}; then
             Report 'pre-reboot'
             sync
@@ -158,7 +120,7 @@ SetupKdump()
     fi
 
     # Needed for automotive SOC devices that dont come with kexec-tools pre installed and kdump systemd for startup.
-    if [ -f /sys/devices/soc0/machine ];then
+    if cki_is_abd;then
         LogRun "kdumpctl start"
     fi
     # Make sure kdumpctl is operational
@@ -177,13 +139,12 @@ SetupKdump()
         sleep 60
     done
     # show kexec-tools & crash version after pkginstall
-    # shellcheck disable=SC3060
     LogRun "rpm -q kexec-tools crash ${K_NAME/-core}"
     LogRun "uname -r"
     LogRun "cat /proc/cmdline"
     Log "Total system memory: $(lshw -short | grep -i "System Memory" | awk '{print $3}')"
     LogRun "kdumpctl showmem || cat /sys/kernel/kexec_crash_size"
-    grep "fadump=on" /proc/cmdline > /dev/null && {
+    grep -oE "fadump=\w+" /proc/cmdline > /dev/null && {
         Log "Dump mode is fadump"
         dmesg | grep "firmware-assisted dump" | grep -i "Reserved"
     }
