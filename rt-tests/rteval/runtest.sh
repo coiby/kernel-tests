@@ -106,8 +106,10 @@ function test_run ()
 {
     phase_start "${TEST}" FAIL
 
-    log "Mounting debugfs to /sys/kernel/debug"
-    run -l "mount -t debugfs none /sys/kernel/debug"
+    if ! mount | grep -q debugfs; then
+        log "Mounting debugfs to /sys/kernel/debug"
+        run -l "mount -t debugfs none /sys/kernel/debug"
+    fi
 
     # let's rock'n'roll
     run "rteval --duration=$DURATION -D -L $FLAG_LOADS $FLAG_MEASURE"
