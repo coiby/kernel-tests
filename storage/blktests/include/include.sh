@@ -106,7 +106,7 @@ function get_test_cases_list
 	release=$(grep -o "release [0-9]*\.[0-9]*" /etc/redhat-release | awk '{print $2}')
 	case_conf="$CDIRC/../config/$release"
 	if rlIsFedora; then
-		case_conf="$CDIRC/../config/9.4"
+		case_conf="$CDIRC/../config/fedora"
 	fi
 	if [ ! -f "$case_conf" ]; then
 		return
