@@ -117,15 +117,15 @@ EOF
 
 function install_debugkernel()
 {
-    if grep -w 1 DK_INSTALL; then
+    if grep -w 1 /mnt/DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline"
         uname -r | grep '+debug$' || rlDie "not debug kernel running $(uname -r)"
         rlReport "$(uname -r)" PASS
-        echo 2 > DK_INSTALL
+        echo 2 > /mnt/DK_INSTALL
         return
-    elif grep -w 2 DK_INSTALL; then
+    elif grep -w 2 /mnt/DK_INSTALL; then
         return
-    elif grep -w 3 DK_INSTALL; then
+    elif grep -w 3 /mnt/DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline" 1-255 "cleanup cmdline"
         return
     fi
@@ -153,21 +153,21 @@ function install_debugkernel()
     uname -r | grep -q s390x && zipl
     rlPhaseEnd
 
-    echo 1 > DK_INSTALL
+    echo 1 > /mnt/DK_INSTALL
     rhts-reboot
 }
 
 function install_upstream()
 {
-    if grep -w 1 DK_INSTALL; then
+    if grep -w 1 /mnt/DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline"
         uname -r | grep '+debug$' || rlLogError "debug kernel running?"
         rlReport "$(uname -r)" PASS
-        echo 2 > DK_INSTALL
+        echo 2 > /mnt/DK_INSTALL
         return
-    elif grep -w 2 DK_INSTALL; then
+    elif grep -w 2 /mnt/DK_INSTALL; then
         return
-    elif grep -w 3 DK_INSTALL; then
+    elif grep -w 3 /mnt/DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline" 1-255 "cleanup cmdline"
         return
     fi
@@ -186,7 +186,7 @@ function install_upstream()
     echo $gitinfo > ./gitinfo
     rlPhaseEnd
 
-    echo 1 > DK_INSTALL
+    echo 1 > /mnt/DK_INSTALL
     rhts-reboot
 }
 
@@ -197,15 +197,15 @@ function install_kernelurl()
         echo "KERNURL is not provided!"
         exit 1
     fi
-    if grep -w 1 DK_INSTALL; then
+    if grep -w 1 /mnt/DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline"
         uname -r | grep '+debug$' || rlLogError "debug kernel running?"
         rlReport "$(uname -r)" PASS
-        echo 2 > DK_INSTALL
+        echo 2 > /mnt/DK_INSTALL
         return
-    elif grep -w 2 DK_INSTALL; then
+    elif grep -w 2 /mnt/DK_INSTALL; then
         return
-    elif grep -w 3 DK_INSTALL; then
+    elif grep -w 3 /mnt/DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline" 1-255 "cleanup cmdline"
         return
     fi
@@ -223,25 +223,25 @@ function install_kernelurl()
     uname -r | grep -q s390x && zipl
     rlPhaseEnd
 
-    echo 1 > DK_INSTALL
+    echo 1 > /mnt/DK_INSTALL
     rhts-reboot
 }
 
 function install_brew_or_other()
 {
-    if grep -w 1 DK_INSTALL; then
+    if grep -w 1 /mnt/DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline"
         uname -r | grep '+debug$' || rlLogError "debug kernel running?"
         rlReport "$(uname -r)" PASS
-        echo 2 > DK_INSTALL
+        echo 2 > /mnt/DK_INSTALL
         return
-    elif grep -w 2 DK_INSTALL; then
+    elif grep -w 2 /mnt/DK_INSTALL; then
         true
-    elif grep -w 3 DK_INSTALL; then
+    elif grep -w 3 /mnt/DK_INSTALL; then
         rlRun "grep kmemleak=on /proc/cmdline" 1-255 "cleanup cmdline"
     else
         # for brew build
-        echo 1 > DK_INSTALL
+        echo 1 > /mnt/DK_INSTALL
         rhts-reboot
     fi
 }
@@ -277,7 +277,7 @@ EOF
 
 rlJournalStart
     rlPhaseStartSetup
-        ! test -f DK_INSTALL && touch DK_INSTALL && echo 0 > DK_INSTALL
+        ! test -f /mnt/DK_INSTALL && touch /mnt/DK_INSTALL && echo 0 > /mnt/DK_INSTALL
         if [ "${KERNTARGET}" == "rpm" ]; then
             install_kernelurl
         elif [ "${KERNTARGET}" == "upstream" ]; then
@@ -293,7 +293,7 @@ rlJournalStart
     rlPhaseStartTest Test
         if [ -f ${LEAKFILE} ]; then
             report_leak
-        elif [ -f "./DK_INSTALL" ]; then
+        elif [ -f "/mnt/DK_INSTALL" ]; then
             rlLogError "Didn't find $LEAKFILE for new kernel"
         fi
     rlPhaseEnd
