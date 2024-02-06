@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2002,SC2181,SC2015,SC2153
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Description:
@@ -57,12 +58,14 @@ function report_leak()
     local l1;
     local l2;
 
-    if [ ! -f ${LEAKREPORT} ]; then
-        touch $LEAKREPORT $LEAKREPORT_OLD
+    if [ ! -f "${LEAKREPORT}" ]; then
+        touch "$LEAKREPORT" "$LEAKREPORT_OLD"
     fi
+    # shellcheck disable=SC2009
     ps -C kmemleak -o pid,state,start_time,etime,args | grep kmemleak
 
     rlRun -l "echo scan > ${LEAKFILE}" 0-255
+    # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
         report_result "skip_scan_stopped" SKIP
     fi
@@ -70,8 +73,8 @@ function report_leak()
     sleep 10        # wait a few secs for leak happens
     rlRun "cat ${LEAKFILE} > ${LEAKREPORT}" 0-255
 
-    l1=$(cat ${LEAKREPORT} | wc -l)
-    l2=$(cat ${LEAKREPORT_OLD} | wc -l)
+    l1=$(cat "${LEAKREPORT}" | wc -l)
+    l2=$(cat "${LEAKREPORT_OLD}" | wc -l)
     if [ "${l1}" == "${l2}" ]; then
         echo "Didn't change in $LEAKFILE, saying no new leak in test $TEST"
         return;
@@ -84,9 +87,9 @@ function report_leak()
         return;
     fi
 
-    report_result  $TEST/kmemleak Warn
-    rhts-submit-log -l $LEAKREPORT
-    cat ${LEAKFILE} > ${LEAKREPORT_OLD}
+    report_result  "$TEST/kmemleak" Warn
+    rhts-submit-log -l "$LEAKREPORT"
+    cat "${LEAKFILE}" > "${LEAKREPORT_OLD}"
 
     if [ "${LEAKUPLOAD}" != "yes" ]; then
         return
@@ -137,11 +140,11 @@ function install_debugkernel()
     local kernelpath
     if ! uname -r | grep '+debug$'; then
         rlRun "$WGET_KERNEL --nvr $ver_rel --debugkernel -i"
-        [ $? = 0 ] && kernelpath=$(ls /boot/vmlinuz-${ver_rel}.$(uname -m)+debug) || \
+        [ $? = 0 ] && kernelpath=$(ls /boot/vmlinuz-"${ver_rel}".$(uname -m)+debug) || \
         # This is a fallback debug kernel, just in case wget-kernel failed.
         { rlRun "yum install -y kernel-debug"; kernelpath=$(ls /boot/vmlinuz-*debug); }
     else
-        kernelpath=$(ls /boot/vmlinuz-${ver_rel}.$(uname -m)+debug)
+        kernelpath=$(ls /boot/vmlinuz-"${ver_rel}".$(uname -m)+debug)
     fi
 
     test -z "$kernelpath" && rlDie "no debug vmlinuz path defined!"
@@ -180,10 +183,10 @@ function install_upstream()
     make run
     pushd ./kernel
     gitinfo=$(git describe)
-    report_result  $TEST/$gitinfo Pass
+    report_result  "$TEST/$gitinfo" Pass
     popd
     popd
-    echo $gitinfo > ./gitinfo
+    echo "$gitinfo" > ./gitinfo
     rlPhaseEnd
 
     echo 1 > /mnt/DK_INSTALL
@@ -212,9 +215,9 @@ function install_kernelurl()
 
     rlRun "wget $KERNURL"
 
-    local rpmname=$(basename $KERNURL)
+    local rpmname=$(basename "$KERNURL")
     rlRun "yum install -y ./${rpmname}"
-    local kernelpath=$(rpm -pql ./${rpmname} | grep '/boot/vmlinuz')
+    local kernelpath=$(rpm -pql ./"${rpmname}" | grep '/boot/vmlinuz')
 
     rlRun "grubby --args='kmemleak=on' --update-kernel=ALL"
     rlRun "grubby --args='nokaslr' --update-kernel=ALL"
