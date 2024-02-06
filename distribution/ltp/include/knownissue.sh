@@ -45,7 +45,7 @@ cver=$(uname -r)
 function is_fedora() { grep -iq "fedora" /etc/system-release; }
 function is_rhel() { grep -iq "red hat enterprise linux" /etc/system-release; }
 function is_centos() { grep -iq "CentOS" /etc/system-release; }
-function is_rhivos() { grep -iq "Automotive Stream Distribution release" /etc/system-release; }
+function is_autosd() { grep -iq "Automotive Stream Distribution release" /etc/system-release; }
 
 # Identify OS release
 if [ -r /etc/system-release ]; then
@@ -63,7 +63,7 @@ if [ -r /etc/system-release ]; then
 	elif is_centos; then
 		# CentOS Stream seems to contain only major release info
 		osver=$(echo "$release" | awk -F' ' '{print int(substr($4, 1,1))*100}')
-	elif is_rhivos; then
+	elif is_autosd; then
 		# Automotive seems same to CentOS contain only major release info
 		osver=$(echo "$release" | awk -F' ' '{print int(substr($5, 1,1))*100}')
 	fi
