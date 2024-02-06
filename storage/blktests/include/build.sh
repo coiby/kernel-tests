@@ -5,8 +5,10 @@ if rlIsRHEL 7; then
 	BR=rhel7
 elif rlIsRHEL 8; then
 	BR=rhel8
-elif rlIsRHEL 9 || rlIsFedora || rlIsCentOS 9; then
-	BR=rhel9-fedora
+elif rlIsRHEL 9 || rlIsCentOS 9; then
+	BR=rhel9
+elif rlIsFedora; then
+	BR=fedora
 fi
 
 rm -rf blktests
