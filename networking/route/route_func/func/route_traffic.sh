@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=SC2154,SC2034
 TEST_ITEMS_ALL="$TEST_ITEMS_ALL route_mtu_test route_tos_test route_addr_test route_stress_test route_ioctl_test route_fuzz_test option_realm_test route_part_forward_test route_sport_test route_dport_test route_ipproto_test"
 
 route_tos_test()

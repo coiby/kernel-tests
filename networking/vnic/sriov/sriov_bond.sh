@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1083,SC2048,SC1010,SC2191
+# shellcheck disable=SC1083,SC2048,SC1010,SC2191,SC2154
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /kernel/networking/vnic/sriov_bond

@@ -1,4 +1,5 @@
 #! /bin/bash
+# shellcheck disable=SC2154
 source /etc/profile
 source /root/.bash_profile
 CASE_PATH=${CASE_PATH:-"/mnt/tests/kernel/networking/vnic/sriov"}

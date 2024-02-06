@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154,SC2010,SC2034
 #
 # Copyright (c) 2019 Red Hat, Inc. All rights reserved.
 #

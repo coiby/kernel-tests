@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=SC2154,SC2128,SC2207,SC2178,SC2034,SC2120
 # helper for SR-IOV
 
 # create VFs for PF

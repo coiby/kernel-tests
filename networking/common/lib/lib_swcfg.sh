@@ -1,5 +1,5 @@
 #!/bin/bash -
-# shellcheck disable=SC2034,SC1090
+# shellcheck disable=SC2034,SC1090,SC2154,SC2128
 
 # ${NETWORK_COMMONLIB_DIR} is only used in Red hat netowrk-qe lab
 # which would never be defined in partner's lab
