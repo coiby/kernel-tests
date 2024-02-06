@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1083,SC1010,SC2010,SC2048,SC2034,SC2207,SC2167,SC2165,SC2178,SC2128
+# shellcheck disable=SC1083,SC1010,SC2010,SC2048,SC2034,SC2207,SC2167,SC2165,SC2178,SC2128,SC2154
 sriov_test_bz1701191()
 {
 	log_header "sriov_test_bz1701191" $result_file

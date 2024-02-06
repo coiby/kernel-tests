@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154,SC2120,SC2060,SC2026,SC1083,SC2188,SC2034,SC2048,SC2062
 # vim: sts=8 sw=8 noexpandtab:
 # This is for network operations
 
@@ -1457,7 +1458,7 @@ attach_interface()
 	local guest_name=${GUEST_NAME:-$guest_list}
 	for num in `seq $vnic_num`; do
 		for domain in $guest_name; do
-			log "Check guest $doamin is running ..."
+			log "Check guest $domain is running ..."
 			virsh list | grep -q "$domain"
 			if [ $? -ne 0 ]; then
 				log "Guest $domain is not running."

@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 # This is basic include file
 
 lib_service()

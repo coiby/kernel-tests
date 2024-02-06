@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 
 TEST_ITEMS_ALL="$TEST_ITEMS_ALL rule_test rule_uidrange_test rule_suppress_test"
 

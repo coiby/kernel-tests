@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=SC2154
 # Setup complicated interface(nic/bond vlan bridge)
 # @arg1: inputs NICs
 #
