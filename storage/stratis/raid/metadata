@@ -1,0 +1,13 @@
+[General]
+name=storage/stratis/raid
+owner=Filip Suba <fsuba@redhat.com>
+description=Test Stratis using fmf toolset in python-stqe
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=stratisd;stratis-cli;lvm2;python3-pip;
+repoRequires=cki_lib;storage/include
+max_time=1h

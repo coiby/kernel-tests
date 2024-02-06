@@ -1,0 +1,13 @@
+[General]
+name=storage/vdo/local
+owner=Filip Suba <fsuba@redhat.com>
+description=Test VDO using fmf toolset in python-stqe
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=vdo;kmod-kvdo;lvm2;python3-pip;device-mapper-persistent-data;
+repoRequires=cki_lib;storage/include
+max_time=1h
