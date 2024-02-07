@@ -16,3 +16,4 @@ Priority=Normal
 max_time=90m
 dependencies=autoconf;automake;bison;elfutils-libelf-devel;flex;gcc;git;glibc-headers;kernel-devel;kernel-headers;keyutils-libs-devel;libacl-devel;libcap-devel;libselinux-devel;libtirpc-devel;lksctp-tools-devel;m4;make;openssl-devel;pkgconf;xfsprogs-devel
 softDependencies=numactl-devel
+repoRequires=kernel-include
