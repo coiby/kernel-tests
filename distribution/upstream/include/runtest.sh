@@ -197,11 +197,11 @@ CleanUp ()
 IPCRMCleanup ()
 {
     # Clean up msgid
-    DeBug "******* Start msgmni cleanup $1 *******"
+    DeBug "******* Start msgmni cleanup *******"
     for i in `ipcs -q | cut -f2 -d' '`; do
         ipcrm -q $i
     done
-    DeBug "******* End msgmni cleanup $1 *******"
+    DeBug "******* End msgmni cleanup *******"
     echo >> $DEBUGLOG
 }
 
