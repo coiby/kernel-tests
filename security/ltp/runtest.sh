@@ -22,10 +22,20 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../kernel-include/runtest.sh || exit 1
 GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/ltp.git"}
 
 rlJournalStart
     rlPhaseStartSetup
+        devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
+        installer=$(K_GetPkgMgr)
+        if [[ ${installer} == "rpm-ostree" ]]; then
+            export install_opts="-A -y --idempotent --allow-inactive install"
+        else
+            export install_opts="-y install"
+        fi
+        ${installer} ${install_opts} ${devel_pkg}
+
         rlShowRunningKernel
         rlRun "git clone $GIT_URL" 0
         rlRun "cd ltp"

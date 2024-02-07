@@ -15,7 +15,6 @@ require:
   - gcc
   - git
   - glibc-headers
-  - kernel-devel
   - kernel-headers
   - keyutils-libs-devel
   - libacl-devel
