@@ -2,7 +2,7 @@ summary: Linux Test Project
 description: |
     Latest LTP test KernelTier1
 contact: Kernel General Test Team <kernel-general-test-team@redhat.com>
-id: 3e6ec8af-5bd4-4a29-87cb-514d6e0edcc7
+id: b0206110-a3c2-4d2b-ab75-18c9727f5fcc
 component:
   - kernel
   - glibc
