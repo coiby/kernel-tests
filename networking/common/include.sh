@@ -249,8 +249,6 @@ net_sync()
 		for client in $CLIENTS; do
 			rhts-sync-block -s ${FLAG} $client
 		done
-	# shellcheck disable=2091 # this seems a bug actually,
-	# but to avoid changing the logic now, just disabling the check...
 	elif $(echo $CLIENTS | grep -q -i $HOSTNAME);then
 		for server in $SERVERS; do
 			rhts-sync-block -s ${FLAG} $server
@@ -397,6 +395,7 @@ main()
 {
 	# source our functions
 	pushd $NETWORK_COMMONLIB_DIR > /dev/null
+	# shellcheck disable=SC1090
 	for lib in *.sh; do
 		# skip self and runtest.sh
 		[[ "$lib" = "include.sh" || "$lib" = "runtest.sh" ]] && continue
