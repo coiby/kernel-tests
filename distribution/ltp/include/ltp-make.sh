@@ -224,7 +224,7 @@ patch-lite()
     cki_is_baremetal
     #Patching, if non-baremetal
     if [ $? -ne 0 ]; then
-        if [ "$TESTVERSION" == "20200120" -o "$TESTVERSION" == "20210927" ]; then
+        if [[ "$TESTVERSION" == "20200120" || "$TESTVERSION" == "20210927" ]]; then
             sed -i 's/LL//' ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
         fi
         patch -d ${TARGET} -p1 < ${PATCHDIR}/ltp-include-relax-timer-thresholds-for-non-baremetal.patch
@@ -330,7 +330,7 @@ configure()
     AUTOCONFIGVER_1=$(echo $AUTOCONFIGVER |cut -f 1 -d ".")
     AUTOCONFIGVER_2=$(echo $AUTOCONFIGVER |cut -f 2 -d ".")
     DOWNLOAD_URL=$(echo ${LOOKASIDE:-http:\/\/download.devel.redhat.com\/qa\/rhts\/lookaside\/})
-    if [ $AUTOCONFIGVER_1 -lt 1 -o $AUTOCONFIGVER_1 -eq 2 -a $AUTOCONFIGVER_2 -lt 69 ]; then \
+    if [[ $AUTOCONFIGVER_1 -lt 1 || $AUTOCONFIGVER_1 -eq 2 && $AUTOCONFIGVER_2 -lt 69 ]]; then \
         wget -q $DOWNLOAD_URL/m4-1.4.16.tar.gz ; \
         tar xzf m4-1.4.16.tar.gz; \
         pushd  m4-1.4.16; \

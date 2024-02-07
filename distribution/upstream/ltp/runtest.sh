@@ -51,7 +51,7 @@ function ltp_test_build()
 
 	# workaround for the beaker issue when arch is ppc64:
 	# Makefile:495: /mnt/tests/kernel/distribution/upstream-kernel/install/linux/arch/ppc64/Makefile: No such file or directory
-	if [ ${ARCH} = ppc64 -o ${ARCH} = ppc -o ${ARCH} = s390x -o ${ARCH} = s390 ]; then
+	if [[ ${ARCH} = ppc64 || ${ARCH} = ppc || ${ARCH} = s390x || ${ARCH} = s390 ]]; then
 		unset ARCH
 	fi
 
@@ -164,7 +164,7 @@ function is_baremetal()
 
 	if command -v virt-what >/dev/null; then
 		hv=$(virt-what)
-		[ $? -eq 0 -a "$hv" != "" ] && return 1
+		[[ $? -eq 0 && "$hv" != "" ]] && return 1
 	fi
 
 	return 0

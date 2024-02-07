@@ -346,7 +346,7 @@ RunTest ()
 
     # If REPORT_FAILED_RESULT set to "yes", report every failed test to beaker
     # so that it's easier to see which tests failed.
-    if [ "$REPORT_FAILED_RESULT" == "yes" -a "$result_r" == "FAIL" ]; then
+    if [[ "$REPORT_FAILED_RESULT" == "yes" && "$result_r" == "FAIL" ]]; then
         while read test res ret; do
             if [ "$res" != "FAIL" ]; then
                 continue
