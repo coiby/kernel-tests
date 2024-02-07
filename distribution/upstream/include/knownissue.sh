@@ -33,7 +33,6 @@
 . ../include/kvercmp.sh  || exit 1
 
 cver=$(uname -r)
-arch=$(uname -m)
 
 # Identify OS release
 if [ -r /etc/system-release-cpe ]; then
