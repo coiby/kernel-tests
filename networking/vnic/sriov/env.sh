@@ -207,6 +207,24 @@ else
 	fi
 fi
 
+#CLIENT AND SERVER HOST NIC names
+if [ "$SERVERS" == "netqe35.knqe.eng.rdu2.dc.redhat.com" ]; then
+	SERVER_INTERFACES=(ens802f0np0 ens802f1np1)
+	CLIENT_INTERFACES=(ens801f0np0 ens801f1np1)
+elif [ "$SERVERS" == "netqe36.knqe.eng.rdu2.dc.redhat.com" ]; then
+	SERVER_INTERFACES=(ens801f0np0 ens801f1np1)
+	CLIENT_INTERFACES=(ens802f0np0 ens802f1np1)
+elif [ "$SERVERS" == "hpe-netqe-syn480g10-03.knqe.eng.rdu2.dc.redhat.com" ]; then
+	SERVER_INTERFACES=(ens1f0 ens1f1)
+	CLIENT_INTERFACES=(ens1f0 ens1f1)
+elif [ "$SERVERS" == "hpe-netqe-syn480g10-04.knqe.eng.rdu2.dc.redhat.com" ]; then
+	SERVER_INTERFACES=(ens1f0 ens1f1)
+	CLIENT_INTERFACES=(ens1f0 ens1f1)
+else
+	SERVER_INTERFACES=()
+	CLIENT_INTERFACES=()
+fi
+
 echo "rhel_version=$rhel_version"
 echo "SRIOV_TOPO=$SRIOV_TOPO"
 echo "SRIOV_SKIP_SETUP_ENV=$SRIOV_SKIP_SETUP_ENV"
@@ -220,6 +238,6 @@ echo "ENABLE_DEFAULT_YUM=${ENABLE_DEFAULT_YUM}"
 echo "VM_KERNEL_NAME=${VM_KERNEL_NAME}"
 echo "BREW_TASK_ID=${BREW_TASK_ID}"
 echo "ENABLE_VM_XML_TUNING=${ENABLE_VM_XML_TUNING}"
-echo "CLIENT_INTERFACES=\"${CLIENT_INTERFACES}\""
-echo "SERVER_INTERFACES=\"${SERVER_INTERFACES}\""
+echo "CLIENT_INTERFACES=${CLIENT_INTERFACES[*]}"
+echo "SERVER_INTERFACES=${SERVER_INTERFACES[*]}"
 echo "KERNEL_VERSION=\"${KERNEL_VERSION}\""
