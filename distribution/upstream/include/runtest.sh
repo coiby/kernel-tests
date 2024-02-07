@@ -379,7 +379,7 @@ GetFailureLog ()
 {
     local logfile=${1?"*** log file ***"}
     local kifile=${2?"*** known issue file ***"}
-    local thisdir=$(dirname $(readlink -f $BASH_SOURCE))
+    local thisdir=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))
     local parser=$thisdir/ltp_log_parser.py
     python3 $parser -f $kifile -F -t 0 $logfile
 }
