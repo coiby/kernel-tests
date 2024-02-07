@@ -256,7 +256,7 @@ function knownissue_exclude()
 		[ -f ${kn_fixed} ] && cat ${kn_fixed} >> ${kn_issue}
 		;;
 	      *)
-		echo "Error, parameter "$1" is incorrect."
+		echo "Error, parameter \"$1\" is incorrect."
 		;;
 	esac
 }
