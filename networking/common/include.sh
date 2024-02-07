@@ -395,7 +395,7 @@ main()
 	pushd $NETWORK_COMMONLIB_DIR > /dev/null
 	for lib in *.sh; do
 		# skip self and runtest.sh
-		[ "$lib" = "include.sh" -o "$lib" = "runtest.sh" ] && continue
+		[[ "$lib" = "include.sh" || "$lib" = "runtest.sh" ]] && continue
 		source ./$(basename $lib)
 	done
 
