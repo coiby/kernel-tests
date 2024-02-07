@@ -97,6 +97,8 @@ check_cpu_cgroup ()
         if [ -e "$cpu_cgroup_mntpoint/tasks" ]; then
             echo "Found root cpu cgroup tasks at: $cpu_cgroup_mntpoint/tasks" | tee -a $OUTPUTFILE
             echo $$ > $cpu_cgroup_mntpoint/tasks
+            # shellcheck disable=SC2320 # we want the exit code of the echo command, also
+            # the exit code needs to be stored as it will be used later
             ret=$?
             if [ $ret -eq 0 ]; then
                 echo "Succesfully moved (pid: $$) to root cpu cgroup." | tee -a $OUTPUTFILE
