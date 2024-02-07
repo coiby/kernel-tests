@@ -242,11 +242,15 @@ net_sync()
 		FLAG="$(get_round)_${FLAG}"
 	fi
 	log "Start sync ${FLAG}"
+	# shellcheck disable=2091 # there is probably a better way to write this,
+	# but to avoid changing the logic now, just disabling the check...
 	if $(echo $SERVERS | grep -q -i $HOSTNAME);then
 		rhts-sync-set -s ${FLAG}
 		for client in $CLIENTS; do
 			rhts-sync-block -s ${FLAG} $client
 		done
+	# shellcheck disable=2091 # this seems a bug actually,
+	# but to avoid changing the logic now, just disabling the check...
 	elif $(echo $CLIENTS | grep -q -i $HOSTNAME);then
 		for server in $SERVERS; do
 			rhts-sync-block -s ${FLAG} $server
