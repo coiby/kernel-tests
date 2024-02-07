@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # dynamically get the lib dir
-NETWORK_COMMONLIB_DIR=$(dirname $(readlink -f $BASH_SOURCE))
+NETWORK_COMMONLIB_DIR=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))
 networkLib=$NETWORK_COMMONLIB_DIR
 
 # include beaker default environmnet
