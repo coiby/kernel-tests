@@ -48,7 +48,7 @@ run_test() {
 	complog=$(basename $testname).log.$$
 
 	trace_cmd=""
-	if [ "$1" = "pthread_cond_broadcast_4-1.run-test" -o "$1" = "difftime_1-1.run-test" -o "$1" = "sigtimedwait_1-1.run-test" ]; then
+	if [[ "$1" = "pthread_cond_broadcast_4-1.run-test" || "$1" = "difftime_1-1.run-test" || "$1" = "sigtimedwait_1-1.run-test" ]]; then
 		trace_cmd="strace -tt -v -f"
 	fi
 	sh -c "$SCRIPT_DIR/t0 $TIMEOUT_VAL $trace_cmd ./$1 $(cat ./$(echo "$1" | sed 's,\.[^\.]*,,').args 2>/dev/null)" > $complog 2>&1

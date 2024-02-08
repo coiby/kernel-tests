@@ -97,6 +97,8 @@ check_cpu_cgroup ()
         if [ -e "$cpu_cgroup_mntpoint/tasks" ]; then
             echo "Found root cpu cgroup tasks at: $cpu_cgroup_mntpoint/tasks" | tee -a $OUTPUTFILE
             echo $$ > $cpu_cgroup_mntpoint/tasks
+            # shellcheck disable=SC2320 # we want the exit code of the echo command, also
+            # the exit code needs to be stored as it will be used later
             ret=$?
             if [ $ret -eq 0 ]; then
                 echo "Succesfully moved (pid: $$) to root cpu cgroup." | tee -a $OUTPUTFILE
@@ -195,11 +197,11 @@ CleanUp ()
 IPCRMCleanup ()
 {
     # Clean up msgid
-    DeBug "******* Start msgmni cleanup $1 *******"
+    DeBug "******* Start msgmni cleanup *******"
     for i in `ipcs -q | cut -f2 -d' '`; do
         ipcrm -q $i
     done
-    DeBug "******* End msgmni cleanup $1 *******"
+    DeBug "******* End msgmni cleanup *******"
     echo >> $DEBUGLOG
 }
 
@@ -346,7 +348,7 @@ RunTest ()
 
     # If REPORT_FAILED_RESULT set to "yes", report every failed test to beaker
     # so that it's easier to see which tests failed.
-    if [ "$REPORT_FAILED_RESULT" == "yes" -a "$result_r" == "FAIL" ]; then
+    if [[ "$REPORT_FAILED_RESULT" == "yes" && "$result_r" == "FAIL" ]]; then
         while read test res ret; do
             if [ "$res" != "FAIL" ]; then
                 continue
@@ -379,7 +381,7 @@ GetFailureLog ()
 {
     local logfile=${1?"*** log file ***"}
     local kifile=${2?"*** known issue file ***"}
-    local thisdir=$(dirname $(readlink -f $BASH_SOURCE))
+    local thisdir=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))
     local parser=$thisdir/ltp_log_parser.py
     python3 $parser -f $kifile -F -t 0 $logfile
 }

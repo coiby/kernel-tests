@@ -33,7 +33,6 @@
 . ../include/kvercmp.sh  || exit 1
 
 cver=$(uname -r)
-arch=$(uname -m)
 
 # Identify OS release
 if [ -r /etc/system-release-cpe ]; then
@@ -65,7 +64,7 @@ function is_fedora() { grep -q "Fedora" /etc/redhat-release; }
 function is_upstream() { uname -r | grep -q -v 'el[0-9]\|fc'; }
 function is_arch() { [ "$(uname -m)" == "$1" ]; }
 # osver_low <= $osver < osver_high
-function osver_in_range() { ! is_upstream && [ "$1" -le "$osver" -a "$osver" -lt "$2" ]; }
+function osver_in_range() { ! is_upstream && [[ "$1" -le "$osver" && "$osver" -lt "$2" ]]; }
 
 # kernel_low <= $cver < kernel_high
 function kernel_in_range()
@@ -257,7 +256,7 @@ function knownissue_exclude()
 		[ -f ${kn_fixed} ] && cat ${kn_fixed} >> ${kn_issue}
 		;;
 	      *)
-		echo "Error, parameter "$1" is incorrect."
+		echo "Error, parameter \"$1\" is incorrect."
 		;;
 	esac
 }

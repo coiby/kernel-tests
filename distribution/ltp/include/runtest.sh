@@ -421,7 +421,7 @@ RunTest ()
 
     # If REPORT_FAILED_RESULT set to "yes", report every failed test to beaker
     # so that it's easier to see which tests failed.
-    if [ "$REPORT_FAILED_RESULT" == "yes" -a "$result_r" == "FAIL" ]; then
+    if [[ "$REPORT_FAILED_RESULT" == "yes" && "$result_r" == "FAIL" ]]; then
         while read test res ret; do
             if [ "$res" != "FAIL" ]; then
                 continue
@@ -454,7 +454,7 @@ GetFailureLog ()
 {
     local logfile=${1?"*** log file ***"}
     local kifile=${2?"*** known issue file ***"}
-    local thisdir=$(dirname $(readlink -f $BASH_SOURCE))
+    local thisdir=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))
     local parser=$thisdir/ltp_log_parser.py
     if ! python3 --version > /dev/null 2>&1; then
         echo "python3 is not installed, not parsing failures"
