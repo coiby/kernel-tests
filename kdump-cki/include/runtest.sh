@@ -149,8 +149,8 @@ export INITRD_KDUMP_IMG_PATH=$(sed -e "s/\.img$/kdump.img/; s/$INITRD_PREFIX/$IN
 # Backup kdump config files
 BackupKdumpConfig()
 {
-    [ -f "${KDUMP_CONFIG}" -a ! -f "${KDUMP_CONFIG}.bk" ] && cp "${KDUMP_CONFIG}" "${KDUMP_CONFIG}.bk"
-    [ -f "${KDUMP_SYS_CONFIG}" -a ! -f "${KDUMP_SYS_CONFIG}.bk" ] && cp "${KDUMP_SYS_CONFIG}" "${KDUMP_SYS_CONFIG}.bk"
+    [[ -f "${KDUMP_CONFIG}" && ! -f "${KDUMP_CONFIG}.bk" ]] && cp "${KDUMP_CONFIG}" "${KDUMP_CONFIG}.bk"
+    [[ -f "${KDUMP_SYS_CONFIG}" && ! -f "${KDUMP_SYS_CONFIG}.bk" ]] && cp "${KDUMP_SYS_CONFIG}" "${KDUMP_SYS_CONFIG}.bk"
 }
 
 # back up kdump config files

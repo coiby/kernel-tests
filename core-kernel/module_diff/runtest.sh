@@ -50,7 +50,7 @@ function GetCurrentModuleList ()
     case $1 in
         loadable)
             local moduleList="moduleList_current"
-            if [ "${OS}" = "RHEL8" -o "${OS}" = "RHEL9" ]; then
+            if [[ "${OS}" = "RHEL8" || "${OS}" = "RHEL9" ]]; then
                 PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
                 if cki_is_kernel_rt; then
                     PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
@@ -575,7 +575,7 @@ function SetOSRelease ()
                 Release="HEAD-9.4"
                 ;;
         esac
-    elif [ -n "$(echo ${K_NAME} | grep kernel-pegas)" -a "${K_VER}" = "4.10.0" ]; then
+    elif [[ -n "$(echo ${K_NAME} | grep kernel-pegas)" && "${K_VER}" = "4.10.0" ]]; then
         DeBug "Base release is RHEL7/Pegas1, skipping test."
         OS="RHEL7"
         Release="Pegas1"
