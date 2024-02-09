@@ -241,7 +241,7 @@ function preset_common()
 	# Create the default mount points...
 	xlog mkdir -p $TEST_DIR
 	xlog mkdir -p $SCRATCH_MNT
-	if [ ! -d $TEST_DIR -o ! -d $SCRATCH_MNT ]; then
+	if [[ ! -d $TEST_DIR ]] || [[ ! -d $SCRATCH_MNT ]]; then
 		echoo "Test dir $TEST_DIR or scratch dir $SCRATCH_MNT could not be created."
 		report setup FAIL 0
 		exit 0
