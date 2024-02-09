@@ -79,6 +79,7 @@ function transform_lvm_layout()
 # Params: [ram-disk size], the size you want, or this function will calculate
 #  a suitable size for you
 # Output: RAM_DEV
+# shellcheck disable=SC2120 # the function parameter is optional and currently nothing uses it...
 function get_ram_dev()
 {
 	local RDSIZE=${1}
