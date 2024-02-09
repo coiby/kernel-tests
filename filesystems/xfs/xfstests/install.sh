@@ -363,8 +363,6 @@ function install_xfstests_pkg()
 # Needs GITDATE or GITBRANCH, optionally also GITREPO
 function install_xfstests()
 {
-	local useGit=false;
-
 	if [ "x$GITBRANCH" == "x" -a "x$GITREPO" == "x" ] ; then
 		# GITBRANCH is not set, maybe the user used GITDATE
 		case "$GITDATE" in

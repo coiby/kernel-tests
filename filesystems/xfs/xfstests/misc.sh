@@ -4,13 +4,13 @@
 #   This file includes anything that does not fit in other categories
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-RHEL_NAME="RHEL"
+export RHEL_NAME="RHEL"
 # update the release name for RHEL-ALT
 # /etc/redhat-release doesn't show if it's Pegas|Alt distro, seems we
 # can only know from kernel version string, check if there's elNa,
 # where N is RHEL major release number, e.g. el7a
 if uname -r | grep -q el.a; then
-	RHEL_NAME="RHELALT"
+	export RHEL_NAME="RHELALT"
 fi
 RHEL_VERSION=$(egrep -o "[0-9]*\\.[0-9]* " /etc/redhat-release|tr '.' '_')
 RHEL_MAJOR=$(echo $RHEL_VERSION|cut -d '_' -f 1)
@@ -39,6 +39,7 @@ function set_fsck()
 		;;
 	ext2|ext3|ext4)
 		FSCK_OPTS="-nf"
+		# shellcheck disable=SC2034
 		FSCK_FIXOPTS="-yf"
 		;;
 	esac

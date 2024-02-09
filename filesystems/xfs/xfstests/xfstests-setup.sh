@@ -243,11 +243,6 @@ function setup_skiptests()
 	# SKIP_LEVEL=1 - skip all the tests specified in skipped section
 	# SKIP_LEVEL=2 - skip all the known issues
 
-	local release="${RHEL_NAME}${RHEL_VERSION}"
-	if [ "$KNOWN_ISSUE" != "" ]; then
-	        release=$KNOWN_ISSUE
-	fi
-
 	case "$SKIP_LEVEL" in
 		"0")
 			_SECTIONS=""
@@ -300,7 +295,9 @@ function setup_full
 
 	fi
 	DEV_TYPE="$TEST_PARAM_DEV_TYPE"
+	# shellcheck disable=SC2034
 	FSCK=""
+	# shellcheck disable=SC2034
 	FSCK_OPTS=""
 	# Setup TEST_DEV and SCRATCH_DEV
 	# Handle nfs3/4 specific cases
