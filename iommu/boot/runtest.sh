@@ -57,7 +57,7 @@ function add_aboot_param ()
 	else
 		current_aboot_cmdline+="${CMDLINEARGS}"
 	fi
-	abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline='${current_aboot_cmdline}'
+	abootimg -u /boot/aboot-${K_VER}-${K_REL}.$(arch).img -c cmdline="${current_aboot_cmdline}"
 	dd if=/boot/aboot-${K_VER}-${K_REL}.$(arch).img of=/dev/disk/by-partlabel/boot_a
 	sync
 }
