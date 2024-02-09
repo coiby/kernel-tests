@@ -119,6 +119,7 @@ function get_ram_dev()
 	fi
 	echo $RAM_DEV
 	echo $((${RDSIZE}*1024*1024*1024)) > /sys/class/block/$(basename $RAM_DEV)/disksize
+	# shellcheck disable=SC2320 # it is intentional to return the exit code of the echo command
 	return $?
 }
 
@@ -165,6 +166,7 @@ function get_brd_dev()
 		return 2
 	fi
 	echo $RAM_DEV
+	# shellcheck disable=SC2320 # it is intentional to return the exit code of the echo command
 	return $?
 }
 
