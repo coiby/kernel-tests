@@ -1136,7 +1136,9 @@ function mount_devices()
 	fi
 	# Make sure all scratch pool devices be mounted
 	if [ -n "$SCRATCH_DEV_POOL" -a -n "$SCRATCH_DEV_POOL_MNT" ];then
+		# shellcheck disable=SC2207
 		ARRAY_SCRATCH_DEV_POOL=(`echo $SCRATCH_DEV_POOL`)
+		# shellcheck disable=SC2207
 		ARRAY_SCRATCH_DEV_POOL_MNT=(`echo $SCRATCH_DEV_POOL_MNT`)
 		for (( i=0; i<${#ARRAY_SCRATCH_DEV_POOL[@]}; i++ ));do
 			blkid ${ARRAY_SCRATCH_DEV_POOL[$i]} || mkfs_dev ${ARRAY_SCRATCH_DEV_POOL[$i]}
@@ -1252,7 +1254,9 @@ function localfs_cleanup()
 	fi
 
 	if [ -n "$SCRATCH_DEV_POOL" -a -n "$SCRATCH_DEV_POOL_MNT" ];then
+		# shellcheck disable=SC2207
 		ARRAY_SCRATCH_DEV_POOL=(`echo $SCRATCH_DEV_POOL`)
+		# shellcheck disable=SC2207
 		ARRAY_SCRATCH_DEV_POOL_MNT=(`echo $SCRATCH_DEV_POOL_MNT`)
 		for (( i=0; i<${#ARRAY_SCRATCH_DEV_POOL[@]}; i++ ));do
 			if ! losetup -a | grep -qw ${ARRAY_SCRATCH_DEV_POOL[$i]}; then
