@@ -225,6 +225,7 @@ function preset_common()
 	service crond stop
 
 	# trap exit, please redefine cleanup to proper cleanup function if you use this file in a different test
+	# shellcheck disable=SC2154 # warning: status is referenced but not assigned...
 	trap "cleanup;exit \$status" 0 1 2 3 15
 
 	# Install few utilities [xfsprogs, xfsdump, dbench, fio].
