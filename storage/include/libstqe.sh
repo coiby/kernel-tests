@@ -65,7 +65,7 @@ stqe_init() {
   # if stqe-test executable already works do nothing
   if ! $STQE_TEST_EXE --help >/dev/null 2>&1; then
     if [[ $ARCH == 'ppc64le' || $ARCH == 's390x' ]]; then
-      $pkg_mgr install -y gcc  # ruamel.yaml.clib needs compilation
+      $pkg_mgr install -y gcc python3-ruamel-yaml-clib --skip-broken  # ruamel.yaml.clib needs to either be compiled or an already installed rpm
     fi
     # create virtualenv
     $python -m pip install virtualenv
