@@ -101,7 +101,7 @@ function setup_blksize()
 	test "$BLKSIZE" == "default" && return 0
 	# Deal with BLKSIZE
 	# btrfs has no 'block size'
-	if [ ! -z "${BLKSIZE}" -a $FSTYPE != "btrfs" ];then
+	if [[ ! -z "${BLKSIZE}" ]] && [[ $FSTYPE != "btrfs" ]];then
 		if [ $FSTYPE = "xfs" ];then
 			MKFS_OPTS="-b size=$BLKSIZE $MKFS_OPTS"
 		else
@@ -243,11 +243,6 @@ function setup_skiptests()
 	# SKIP_LEVEL=1 - skip all the tests specified in skipped section
 	# SKIP_LEVEL=2 - skip all the known issues
 
-	local release="${RHEL_NAME}${RHEL_VERSION}"
-	if [ "$KNOWN_ISSUE" != "" ]; then
-	        release=$KNOWN_ISSUE
-	fi
-
 	case "$SKIP_LEVEL" in
 		"0")
 			_SECTIONS=""
@@ -268,7 +263,7 @@ function setup_skiptests()
 	# Currently it is the only exception for skipped tests
 	# 092 - older kernels don't grok inode64 mounts on 32-bit boxes
 	WORDSIZE=$(/var/lib/xfstests/src/feature -w)
-	if [ $RHEL_MAJOR -eq 5 -a $WORDSIZE = 32 ]; then
+	if [[ $RHEL_MAJOR -eq 5 ]] && [[ $WORDSIZE = 32 ]]; then
 		SKIPTESTS="$SKIPTESTS xfs/092"
 	fi
 	echoo "setup_skiptests done"
@@ -300,7 +295,9 @@ function setup_full
 
 	fi
 	DEV_TYPE="$TEST_PARAM_DEV_TYPE"
+	# shellcheck disable=SC2034
 	FSCK=""
+	# shellcheck disable=SC2034
 	FSCK_OPTS=""
 	# Setup TEST_DEV and SCRATCH_DEV
 	# Handle nfs3/4 specific cases

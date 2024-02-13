@@ -152,6 +152,7 @@ function run_full()
 		# setup_blksize will handle this case properly and it won't
 		# modify MKFS_OPTS based on this
 		for BLKSIZE in $BLKSIZES; do
+			export BLKSIZE
 			# Now to the full fs-dependent setup
 			setup_full
 			# Now print the test info

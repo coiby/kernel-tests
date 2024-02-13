@@ -79,6 +79,7 @@ function transform_lvm_layout()
 # Params: [ram-disk size], the size you want, or this function will calculate
 #  a suitable size for you
 # Output: RAM_DEV
+# shellcheck disable=SC2120 # the function parameter is optional and currently nothing uses it...
 function get_ram_dev()
 {
 	local RDSIZE=${1}
@@ -118,6 +119,7 @@ function get_ram_dev()
 	fi
 	echo $RAM_DEV
 	echo $((${RDSIZE}*1024*1024*1024)) > /sys/class/block/$(basename $RAM_DEV)/disksize
+	# shellcheck disable=SC2320 # it is intentional to return the exit code of the echo command
 	return $?
 }
 
@@ -164,6 +166,7 @@ function get_brd_dev()
 		return 2
 	fi
 	echo $RAM_DEV
+	# shellcheck disable=SC2320 # it is intentional to return the exit code of the echo command
 	return $?
 }
 
@@ -970,7 +973,7 @@ function setup_thinp_scratch_dev()
 {
 	local pool_size=0
 
-	if [ -n "$THINP_SCRATCH_SIZE" -a -b "$SCRATCH_DEV" ];then
+	if [[ -n "$THINP_SCRATCH_SIZE" ]] && [[ -b "$SCRATCH_DEV" ]];then
 		echo "Try to create size=$THINP_SCRATCH_SIZE thinp device with $SCRATCH_DEV"
 		pvcreate -ff $SCRATCH_DEV
 		vgcreate thinp_scratch_vg $SCRATCH_DEV
@@ -1011,7 +1014,7 @@ function setup_thinp_test_dev()
 {
 	local pool_size=0
 
-	if [ -n "$THINP_TEST_SIZE" -a -b "$TEST_DEV" ];then
+	if [[ -n "$THINP_TEST_SIZE" ]] && [[ -b "$TEST_DEV" ]];then
 		echo "Try to create size=$THINP_TEST_SIZE thinp device with $TEST_DEV"
 		pvcreate -ff $TEST_DEV
 		vgcreate thinp_test_vg $TEST_DEV
@@ -1117,23 +1120,25 @@ function umount_devices()
 function mount_devices()
 {
 	# Make sure test device is mounted
-	if [ -n "$TEST_DIR" -a -n "$TEST_DEV" ];then
+	if [[ -n "$TEST_DIR" ]] && [[ -n "$TEST_DEV" ]];then
 		blkid $TEST_DEV || mkfs_dev $TEST_DEV
 		findmnt $TEST_DEV >/dev/null || mount $TEST_DEV $TEST_DIR
 	fi
 	# Make sure scratch device is mounted
-	if [ -n "$SCRATCH_MNT" -a -n "$SCRATCH_DEV" ];then
+	if [[ -n "$SCRATCH_MNT" ]] && [[ -n "$SCRATCH_DEV" ]];then
 		blkid $SCRATCH_DEV || mkfs_dev $SCRATCH_DEV
 		findmnt $SCRATCH_DEV >/dev/null || mount $SCRATCH_DEV $SCRATCH_MNT
 	fi
 	# Make sure logwrites device is mounted
-	if [ -n "$LOGWRITES_MNT" -a -n "$LOGWRITES_DEV" ];then
+	if [[ -n "$LOGWRITES_MNT" ]] && [[ -n "$LOGWRITES_DEV" ]];then
 		mkfs_dev $LOGWRITES_DEV
 		findmnt $LOGWRITES_DEV >/dev/null || mount $LOGWRITES_DEV $LOGWRITES_MNT
 	fi
 	# Make sure all scratch pool devices be mounted
-	if [ -n "$SCRATCH_DEV_POOL" -a -n "$SCRATCH_DEV_POOL_MNT" ];then
+	if [[ -n "$SCRATCH_DEV_POOL" ]] && [[ -n "$SCRATCH_DEV_POOL_MNT" ]];then
+		# shellcheck disable=SC2207
 		ARRAY_SCRATCH_DEV_POOL=(`echo $SCRATCH_DEV_POOL`)
+		# shellcheck disable=SC2207
 		ARRAY_SCRATCH_DEV_POOL_MNT=(`echo $SCRATCH_DEV_POOL_MNT`)
 		for (( i=0; i<${#ARRAY_SCRATCH_DEV_POOL[@]}; i++ ));do
 			blkid ${ARRAY_SCRATCH_DEV_POOL[$i]} || mkfs_dev ${ARRAY_SCRATCH_DEV_POOL[$i]}
@@ -1185,12 +1190,12 @@ function update_fstab()
 	local mnt=$2
 	local type=$3
 
-	if [ -z "$dev" -o -z "$mnt" ]; then
+	if [[ -z "$dev" ]] || [[ -z "$mnt" ]]; then
 		echoo "device and directory names are needed"
 		return 1
 	fi
 
-	if [ -z "$type" -a -z "$FSTYPE" ]; then
+	if [[ -z "$type" ]] && [[ -z "$FSTYPE" ]]; then
 		type=`blkid $dev |sed -n 's;.*[ \t]TYPE="\([a-zA-Z0-9_-]*\)".*;\1;p'`
 		echoo "Find filesystem type by blkid: $type"
 		FSTYPE=$type
@@ -1222,7 +1227,7 @@ function update_fstab()
 # to use these test devices again in next case running.
 function localfs_cleanup()
 {
-	if [ -n "$TEST_DEV" -a -n "$TEST_DIR" ];then
+	if [[ -n "$TEST_DEV" ]] && [[ -n "$TEST_DIR" ]];then
 		if ! losetup -a| grep -qw $TEST_DEV; then
 			update_fstab "$TEST_DEV" "$TEST_DIR" || return 1
 		elif [[ "$TEST_DEV" =~ "/dev/mapper/vdo_loop" ]]; then
@@ -1235,7 +1240,7 @@ function localfs_cleanup()
 		fi
 	fi
 
-	if [ -n "$SCRATCH_DEV" -a -n "$SCRATCH_MNT" ];then
+	if [[ -n "$SCRATCH_DEV" ]] && [[ -n "$SCRATCH_MNT" ]];then
 		if ! losetup -a| grep -qw $SCRATCH_DEV; then
 			update_fstab "$SCRATCH_DEV" "$SCRATCH_MNT" || return 1
 		elif [[ "$SCRATCH_DEV" =~ "/dev/mapper/vdo_loop" ]]; then
@@ -1248,8 +1253,10 @@ function localfs_cleanup()
 		fi
 	fi
 
-	if [ -n "$SCRATCH_DEV_POOL" -a -n "$SCRATCH_DEV_POOL_MNT" ];then
+	if [[ -n "$SCRATCH_DEV_POOL" ]] && [[ -n "$SCRATCH_DEV_POOL_MNT" ]];then
+		# shellcheck disable=SC2207
 		ARRAY_SCRATCH_DEV_POOL=(`echo $SCRATCH_DEV_POOL`)
+		# shellcheck disable=SC2207
 		ARRAY_SCRATCH_DEV_POOL_MNT=(`echo $SCRATCH_DEV_POOL_MNT`)
 		for (( i=0; i<${#ARRAY_SCRATCH_DEV_POOL[@]}; i++ ));do
 			if ! losetup -a | grep -qw ${ARRAY_SCRATCH_DEV_POOL[$i]}; then

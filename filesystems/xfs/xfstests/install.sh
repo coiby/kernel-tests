@@ -363,9 +363,7 @@ function install_xfstests_pkg()
 # Needs GITDATE or GITBRANCH, optionally also GITREPO
 function install_xfstests()
 {
-	local useGit=false;
-
-	if [ "x$GITBRANCH" == "x" -a "x$GITREPO" == "x" ] ; then
+	if [[ "x$GITBRANCH" == "x" ]] && [[ "x$GITREPO" == "x" ]] ; then
 		# GITBRANCH is not set, maybe the user used GITDATE
 		case "$GITDATE" in
 		master|stable|testing)
@@ -386,7 +384,7 @@ function install_xfstests()
 		esac
 	fi
 
-	if [ "$GITBRANCH" != "" -o "$GITREPO" != "" ]; then
+	if [[ "$GITBRANCH" != "" ]] || [[ "$GITREPO" != "" ]]; then
 		# GITBRANCH could be set within the previous code block,
 		# so this can't be an "else" branch, but full "if".
 		if [ "$GITREPO" != "" ];then
@@ -405,7 +403,7 @@ function install_xfstests()
 	fi
 
 	# e2fsprogs on RHEL6 doesn't have 64bit feature support, remove it
-	if [ $RHEL_MAJOR -eq 6 -o $RHEL_MAJOR -eq 5 ]; then
+	if [[ $RHEL_MAJOR -eq 6 ]] || [[ $RHEL_MAJOR -eq 5 ]]; then
 		sed -i '/64bit/s/,^64bit//' /var/lib/xfstests/tests/ext4/306
 		if [ $RHEL_MAJOR -eq 5 ]; then
 			sed -i 's/resize2fs/resize4fs/' /var/lib/xfstests/tests/ext4/306
