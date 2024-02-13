@@ -52,7 +52,7 @@ function create_raid()
         esac
 }
 
-function run_test()
+function setup()
 {
         for i in {0..3};do
             rlRun "dd if=/dev/zero bs=1M count=2000 of=file$i.img"
@@ -70,20 +70,25 @@ function run_test()
         rlRun "vgcreate  black_bird $devices"
         rlRun "pvdisplay"
         rlRun "vgdisplay"
+}
 
-        for R in raid0 raid1 raid5 raid10;do
-                rlLog "Create $R"
-                create_raid
-                rlRun "lsblk"
-                rlRun "lvdisplay"
-                rlRun "lvremove /dev/black_bird/non_synced_primary_raid_3legs_1 -y"
-        done
-
+function cleanup()
+{
         rlRun "vgremove black_bird"
         rlRun "pvremove $devices"
         rlRun "losetup -d $devices"
         rlRun "rm -rf file*"
         rlRun "lsblk"
+}
+
+function run_test()
+{
+        rlLog "Create $R"
+        create_raid
+        rlRun "lsblk"
+        rlRun "lvdisplay"
+        rlRun "lvremove /dev/black_bird/non_synced_primary_raid_3legs_1 -y"
+
 }
 
 function check_log()
@@ -92,11 +97,19 @@ function check_log()
 }
 
 rlJournalStart
-    rlPhaseStartTest
+    rlPhaseStartSetup
         rlRun "dmesg -C"
         rlRun "uname -a"
         rlLog "$0"
-        run_test
+        setup
+    rlPhaseEnd
+    for R in raid0 raid1 raid5 raid10;do
+        rlPhaseStartTest "$R"
+            run_test
+        rlPhaseEnd
+    done
+    rlPhaseStartCleanup
+        cleanup
         check_log
     rlPhaseEnd
 rlJournalPrintText
