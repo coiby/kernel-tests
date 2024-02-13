@@ -29,23 +29,23 @@ function create_raid()
         case $R in
                 raid0)
                         # shellcheck disable=SC2154
-                        rlRun "lvcreate --type raid0 --stripesize 64k -i 3 \
+                        rlRun -l "lvcreate --type raid0 --stripesize 64k -i 3 \
                                 -n non_synced_primary_raid_3legs_1 -L 1G \
                                 black_bird $dev0:0-300 $dev1:0-300 \
                                 $dev2:0-300 $dev3:0-300"
                         ;;
                 raid1)
-                        rlRun "lvcreate --type raid1 -m 3 -n non_synced_primary_raid_3legs_1 \
+                        rlRun -l "lvcreate --type raid1 -m 3 -n non_synced_primary_raid_3legs_1 \
                                 -L 1G black_bird $dev0:0-300 $dev1:0-300 \
                                 $dev2:0-300 $dev3:0-300"
                         ;;
                 raid5)
-                        rlRun "lvcreate --type raid5 -i 3 -n non_synced_primary_raid_3legs_1 \
+                        rlRun -l "lvcreate --type raid5 -i 3 -n non_synced_primary_raid_3legs_1 \
                                 -L 1G black_bird $dev0:0-300 $dev1:0-300 \
                                 $dev2:0-300 $dev3:0-300"
                         ;;
                 raid10)
-                        rlRun "lvcreate --type raid10 -i 2 -m 1 \
+                        rlRun -l "lvcreate --type raid10 -i 2 -m 1 \
                                 -n non_synced_primary_raid_3legs_1 -L 1G black_bird \
                                 $dev0:0-300 $dev1:0-300 $dev2:0-300 \
                                 $dev3:0-300"
@@ -55,39 +55,39 @@ function create_raid()
 function setup()
 {
         for i in {0..3};do
-            rlRun "dd if=/dev/zero bs=1M count=2000 of=file$i.img"
+            rlRun -l "dd if=/dev/zero bs=1M count=2000 of=file$i.img"
             sleep 1
             device=$(rlRun -l "losetup -fP --show file$i.img")
             devices+=" $device"
             eval "dev$i=$device"
             sleep 1
-            rlRun "mkfs -t xfs -f $device"
-            rlRun "lsblk"
+            rlRun -l "mkfs -t xfs -f $device"
+            rlRun -l "lsblk"
         done
 
         rlLog "dev list: $dev0 ,$dev1 ,$dev2 ,$dev3"
-        rlRun "pvcreate -y $devices"
-        rlRun "vgcreate  black_bird $devices"
-        rlRun "pvdisplay"
-        rlRun "vgdisplay"
+        rlRun -l "pvcreate -y $devices"
+        rlRun -l "vgcreate  black_bird $devices"
+        rlRun -l "pvdisplay"
+        rlRun -l "vgdisplay"
 }
 
 function cleanup()
 {
-        rlRun "vgremove black_bird"
-        rlRun "pvremove $devices"
-        rlRun "losetup -d $devices"
-        rlRun "rm -rf file*"
-        rlRun "lsblk"
+        rlRun -l "vgremove black_bird"
+        rlRun -l "pvremove $devices"
+        rlRun -l "losetup -d $devices"
+        rlRun -l "rm -rf file*"
+        rlRun -l "lsblk"
 }
 
 function run_test()
 {
         rlLog "Create $R"
         create_raid
-        rlRun "lsblk"
-        rlRun "lvdisplay"
-        rlRun "lvremove /dev/black_bird/non_synced_primary_raid_3legs_1 -y"
+        rlRun -l "lsblk"
+        rlRun -l "lvdisplay"
+        rlRun -l "lvremove /dev/black_bird/non_synced_primary_raid_3legs_1 -y"
 
 }
 
@@ -98,8 +98,8 @@ function check_log()
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "dmesg -C"
-        rlRun "uname -a"
+        rlRun -l "dmesg -C"
+        rlRun -l "uname -a"
         rlLog "$0"
         setup
     rlPhaseEnd
