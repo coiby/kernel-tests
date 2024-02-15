@@ -1,6 +1,6 @@
 [General]
 name=pciutils/sanity-smoke
-owner=William Gomeringer <willg@redhat.com>
+owner=William Gomeringer <wgomerin@redhat.com>
 description=test whether lspci works
 license=GPLv2
 confidential=no
