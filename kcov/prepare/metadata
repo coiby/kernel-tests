@@ -1,6 +1,6 @@
 [General]
 name=kcov/prepare
-owner=Hushan Jia <hjia@redhat.com>
+owner=Bruno Goncalves <bgoncalv@redhat.com>
 description=prepare - install gcov kernel and lcov
 license=GPLv2
 confidential=no

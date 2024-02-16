@@ -1,6 +1,6 @@
 [General]
 name=kcov/end
-owner=Hushan Jia <hjia@redhat.com>
+owner=Bruno Goncalves <bgoncalv@redhat.com>
 description=end - capture cov data
 license=GPLv2
 confidential=no

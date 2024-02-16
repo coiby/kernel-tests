@@ -1,6 +1,6 @@
 [General]
 name=kcov/finalize
-owner=Hushan Jia <hjia@redhat.com>
+owner=Bruno Goncalves <bgoncalv@redhat.com>
 description=finalize - generate and submit cov data
 license=GPLv2
 confidential=no

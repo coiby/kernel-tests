@@ -1,6 +1,6 @@
 [General]
 name=kcov/include
-owner=Hushan Jia <hjia@redhat.com>
+owner=Bruno Goncalves <bgoncalv@redhat.com>
 description=routines to be inclued
 license=GPLv2
 confidential=no

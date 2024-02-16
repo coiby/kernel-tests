@@ -1,6 +1,6 @@
 [General]
 name=kcov/start
-owner=Hushan Jia <hjia@redhat.com>
+owner=Bruno Goncalves <bgoncalv@redhat.com>
 description=start - capture initial cov data and zero the counters
 license=GPLv2
 confidential=no
