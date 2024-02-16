@@ -1,7 +1,7 @@
 [General]
 description=Demonstrates the use of the userfaultfd mechanism
 name=/kernel/general/memory/function/userfaultfd
-owner=David McDougall <dmcdouga@redhat-com>
+owner=mm-qe <mm-qe@redhat.com>
 license=GPLv2+
 confidential=no
 destructive=no

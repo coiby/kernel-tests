@@ -1,7 +1,7 @@
 [General]
 description=Reproducer for stackguard regression, found jvm crash and rlimit problem.
 name=/kernel/general/memory/regression/1464290-1463241-stackguard-jvm-rlimit
-owner=Petr Benas <pbenas@redhat.com>
+owner=mm-qe <mm-qe@redhat.com>
 license=GPLv2
 confidential=no
 destructive=no

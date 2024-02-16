@@ -1,6 +1,6 @@
 [General]
 name=/kernel-tests/vm/hugepages/cmdline
-owner=Shu Wang  <shuwang@redhat.com>
+owner=mm-qe <mm-qe@redhat.com>
 description=KG-VMM hugepage-cmdline
 license=GPLv2
 confidential=no
