@@ -1,7 +1,7 @@
 [General]
 description=Kernel self test for userfaultfd mechanism
 name=/kernel/general/memory/function/userfaultfd2
-owner=David McDougall <dmcdouga@redhat-com>
+owner=mm-qe <mm-qe@redhat.com>
 license=GPLv2+
 confidential=no
 destructive=no

@@ -1,6 +1,6 @@
 [General]
 name=/kernel/general/memory/function/memeq
-owner=Jiri Vohanka <jvohanka@redhat.com>
+owner=mm-qe <mm-qe@redhat.com>
 description=Verifies that mem= kernel parameter works.
 license=GPLv2
 _architectures=x86_64;i386;ppc64;s390x;aarch64

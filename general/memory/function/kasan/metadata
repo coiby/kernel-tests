@@ -1,6 +1,6 @@
 [General]
 name=/kernel-tests/general/memory/function/kasan
-owner=David McDougall <dmcdouga@redhat.com>
+owner=mm-qe <mm-qe@redhat.com>
 description=Check that Kernel-Address-Sanitizer (KASAN) is enabled.
 license=GPLv2+
 confidential=yes
