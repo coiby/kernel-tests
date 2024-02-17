@@ -1,7 +1,7 @@
 [General]
 description=drop caches
 name=/kernel/vm/sysctl/min_free_kbytes
-owner=Zhouping Liu <zliu@redhat.com>
+owner=mm-qe <mm-qe@redhat.com>
 license=GPLv2
 confidential=no
 destructive=no
