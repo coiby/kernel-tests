@@ -17,9 +17,9 @@ index 00ede549d..e96485d9d 100644
  	"ext4",
  	"xfs",
 -	"btrfs",
+ 	"bcachefs",
  	"vfat",
  	"exfat",
- 	"ntfs",
 -- 
 2.21.1
 
