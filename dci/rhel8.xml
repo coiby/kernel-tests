@@ -24,7 +24,7 @@
       <task name="LTP" role="STANDALONE">
         <fetch url="https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/main/kernel-tests-main.zip#distribution/ltp/lite"/>
         <dependencies>
-          <dependency url="https://github.com/linux-test-project/ltp/releases/download/20230929/ltp-full-20230929.tar.bz2"/>
+          <dependency url="https://github.com/linux-test-project/ltp/releases/download/20240129/ltp-full-20240129.tar.bz2"/>
         </dependencies>
         <params>
           <param name="CKI_NAME" value="LTP lite"/>
