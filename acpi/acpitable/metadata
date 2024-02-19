@@ -1,6 +1,6 @@
 [General]
 name=acpi/acpitable
-owner=Al Stone <ahs3@redhat.com>
+owner=Jiri Dluhos <jdluhos@redhat.com >
 description=ACPI table test
 license=GPLv2
 confidential=no
