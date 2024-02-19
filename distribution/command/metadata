@@ -1,6 +1,6 @@
 [General]
 name=/distribution/command
-owner=CAI Qian <caiqian@redhat.com>
+owner=Bruno Goncalves <bgoncalv@redhat.com>
 description=Execute any arbitrary command.
 license=GPL
 confidential=no
