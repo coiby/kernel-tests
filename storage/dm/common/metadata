@@ -1,6 +1,6 @@
 [General]
 name=storage/dm/common
-owner=Jakub Krysl <jkrysl@redhat.com>
+owner=Filip Suba <fsuba@redhat.com>
 description=Device-mapper parameters test
 license=GPLv2
 confidential=no
