@@ -1,6 +1,6 @@
 [General]
 name=jvm/jcstress
-owner=Aleksey Shipilev <shade@redhat.com>
+owner=Thomas Stufe <tstuefe@redhat.com>
 description=Java Concurrency Stress tests
 license=GPLv2
 confidential=no
