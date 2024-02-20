@@ -221,7 +221,7 @@ rlJournalStart
 		else
 			# check if the test is not disabled on this machine
 			TEST_NUMBER="`perf test list |& grep topology | perl -ne 'print $1 if /^(\d+):\s/'`"
-			TEST_DESC="`perf test list |& grep topology | perl -pe 's/^\d+:\s//'`"
+			TEST_DESC="`perf test list |& grep topology | perl -pe 's/^\s*\d+:\s//'`"
 			if check_allowlisted "$TEST_DESC" || check_allowlisted "Session topology with CPU disabled"; then
 				rlLog "bz1414043 coverage skipped (allowlisted)"
 			else
@@ -244,7 +244,7 @@ rlJournalStart
 	rlPhaseStartTest "bz1308907 coverage -- FAILED '/usr/libexec/perf-core/tests/attr/test-stat-C0' - match failure"
 		# check if the test is not disabled on this machine
 		TEST_NUMBER="`perf test list |& grep perf_event_attr | perl -ne 'print $1 if /^\s*(\d+):\s/'`"
-		TEST_DESC="`perf test list |& grep perf_event_attr | perl -pe 's/^\d+:\s//'`"
+		TEST_DESC="`perf test list |& grep perf_event_attr | perl -pe 's/^\s*\d+:\s//'`"
 		if check_allowlisted "$TEST_DESC"; then
 			rlLog "bz1308907 coverage skipped (allowlisted)"
 		elif [ -z "$TEST_NUMBER" ]; then
