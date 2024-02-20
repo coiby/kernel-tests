@@ -1,6 +1,6 @@
 [General]
 name=networking/tunnel/tunctl/permtest
-owner=Hushan Jia <hjia@redhat.com>
+owner=Jianlin Shi <jishi@redhat.com>
 description=Test on user pemissions and previledges of tun interface
 license=GPLv2
 confidential=no
