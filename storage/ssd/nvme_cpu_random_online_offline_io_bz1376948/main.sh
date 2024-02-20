@@ -28,11 +28,9 @@ done
 	sleep 10
 	STATE=0
 	j=1
-	MAXCPUs=$(lscpu | grep '^CPU(s)' | awk '{print $2}')
 	MAXCPUs=$(nproc)
 	((MAXCPUs--))
-	MINCPU=0
-	lscpu | grep -E "Vendor.*AMD" && MINCPU=1
+	MINCPU=1
 	while((j <= 10))
 	do
 		for i in $(seq "$MINCPU" "$MAXCPUs")
