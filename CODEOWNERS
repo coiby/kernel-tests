@@ -289,7 +289,7 @@
 /storage/block/multipath_mapping/ @bgoncalv @czhong2 @idorax @lulinqing
 /storage/block/zstd_compression/ @bgoncalv @czhong2 @idorax @lulinqing
 /storage/block/zstd_smoke/ @bgoncalv @czhong2 @idorax @lulinqing
-/storage/dm/common/ @bgoncalv @guazhang @idorax @lulinqing
+/storage/dm/common/ @bgoncalv @fsuba @idorax @lulinqing
 /storage/dm/dmtest-python/ @bgoncalv @fsuba @idorax @lulinqing
 /storage/hba/san-device-stress/ @bgoncalv @idorax @lilinredhat @lulinqing @mpatalan
 /storage/hw_raid/ @bgoncalv @idorax @lilinredhat @lulinqing @mpatalan
