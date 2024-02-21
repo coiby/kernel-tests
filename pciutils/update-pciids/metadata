@@ -1,6 +1,6 @@
 [General]
 name=pciutils/update-pciids
-owner=William Gomeringer <willg@redhat.com>
+owner=William Gomeringer <wgomerin@redhat.com>
 description=Checks if update-pciids runs successfully
 license=GPLv2
 confidential=no
