@@ -1,0 +1,13 @@
+[General]
+name=general/bpf/libbpf/sanity
+owner=Ziqian SUN <zsun@redhat.com>
+description=Sanity test for libbpf
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+repoRequires=automotive/include
+max_time=30m
+use_pty=false
