@@ -8,11 +8,12 @@ description: |
 contact: Chunyu Hu <chuhu@redhat.com>
 component:
   - kernel
-test: |-
-    ( set +o posix; . /usr/bin/rhts_environment.sh; \
-    		. /usr/share/beakerlib/beakerlib.sh; \
-    		. runtest.sh )
+test: bash ./runtest.sh
 framework: beakerlib
+require:
+  - type: file
+    pattern:
+      - /automotive/include
 recommend:
   - kernel
   - kernel-headers

@@ -65,6 +65,7 @@ function get_lookaside()
 	tar -zxvf "$trinity_pkg"
 }
 
+# shellcheck disable=SC2120
 function patch_apply()
 {
 	local p
@@ -113,7 +114,7 @@ function test_setup()
 	patch_apply
 	rlRun "pushd $testversion"
 	rlRun "./configure"
-	rlRun "make -j $(nproc)" || { rstrnt-report-result "${RSTRNT_TASKNAME}" WARN; rlDie "compile"; }
+	rlRun "make -j ${SCHED_NR_CPU}" || { rstrnt-report-result "${RSTRNT_TASKNAME}" WARN; rlDie "compile"; }
 	if [ $is_rhivos == 1 ];then
 		#rlRun "echo \"DESTDIR=\"/usr/local\"\" >> /etc/environment"
 		rlRun "export DESTDIR=\"/usr/local\""
@@ -138,8 +139,8 @@ rlJournalStart
 	rlPhaseEnd
 	test_syscalls_trinity
 	rlPhaseStartCleanup
-		rlRun "pkill -f trinity" 0-255
-		rlRun "pkill -f trinity -9" 0-255
+		rlRun "pkill -xf trinity" 0-255
+		rlRun "pkill -xf trinity -9" 0-255
 		rlRun "test -d $testversion && rm -fr $testversion" 0-255
 		uname -r | grep s390x && find . -name "dlci*" -exec mv {} "/usr/lib/modules/$(uname -r)/" \;
 	rlPhaseEnd
