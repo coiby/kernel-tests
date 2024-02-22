@@ -280,7 +280,17 @@ function RunTest ()
     for item in $TEST_ITEMS; do
         # Check if test exist before do config and run
         if ! check_test_exist "$item"; then
-            test_warn "$item test not found in kselftest-list.txt"
+            # When CKI does build a kernel, it can happen that for some problem
+            # it fails to build kselftests module, CKI will continue and try to
+            # run all the tests it was planned to run.
+            # Reporting warn in this case will be handled as failure. In this
+            # case we should just skip the test. The problem building the
+            # kselftests module will be reported/tracked at different point.
+            if [ "${CKI_SELFTESTS_URL}" ] ; then
+                test_skip "$item test not found in kselftest-list.txt"
+            else
+                test_warn "$item test not found in kselftest-list.txt"
+            fi
             continue
         fi
 
