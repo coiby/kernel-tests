@@ -15,6 +15,9 @@ if [ -z ${TESTVERSION} ]; then
     elif rlIsRHEL 7; then
         # NOTE: don't forget to update ltp version on dci/rhel7.xml as well
         TESTVERSION="20210927"
+    elif rlIsRHEL '<=8.2'; then
+        # NOTE: rhel82z build failed on newer ltp, fix to 20230929
+        TESTVERSION="20230929"
     else
         # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
         TESTVERSION="20240129"
@@ -385,17 +388,22 @@ build-all()
     if uname -r | grep -q '+debug'; then
         timeout_value=90
     fi
+    res="PASSED"
     timeout "${timeout_value}m" ${MAKE} -C ${TARGET} all &> buildlog.txt
-    if [ $? -eq 124 ]; then
+    build_res=$?
+    if [ ${build_res} -eq 124 ]; then
         echo "Cleaning up ${TARGET_DIR}"
         rm -rf ${TARGET_DIR}
         rstrnt-report-result "build-all build timeout" WARN/ABORTED
         rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
         exit 1
     fi
-    res="PASSED"
-    if [ $? -ne 0 ]; then
+    if [ ${build_res} -ne 0 ]; then
         res="FAILED"
+        SubmitLog ./buildlog.txt
+        rstrnt-report-result "build-all build failed" WARN/ABORTED
+        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        exit 1
     fi
     echo "============ ${MAKE} -C ${TARGET} all: ${res}  ============" | tee -a $OUTPUTFILE
     res="PASSED"
