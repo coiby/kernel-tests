@@ -757,6 +757,7 @@ mac-turkish.ko
 macvlan.ko
 macvtap.ko
 marvell10g.ko
+marvell-88q2xxx.ko
 marvell.ko
 max16064.ko
 max16065.ko
@@ -1344,6 +1345,7 @@ tcp_bic.ko
 tcpci.ko
 tcp_dctcp.ko
 tcp_htcp.ko
+tcp_illinois.ko
 tcpm.ko
 tcp_nv.ko
 tcp_westwood.ko

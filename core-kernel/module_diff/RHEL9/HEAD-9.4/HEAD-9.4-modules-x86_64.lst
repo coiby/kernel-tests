@@ -1006,6 +1006,7 @@ macvtap.ko
 mana_ib.ko
 mana.ko
 marvell10g.ko
+marvell-88q2xxx.ko
 marvell.ko
 max16064.ko
 max16065.ko
@@ -1040,6 +1041,7 @@ mdio-mscc-miim.ko
 mdio-thunder.ko
 megaraid_sas.ko
 mei-gsc.ko
+mei_gsc_proxy.ko
 mei.ko
 mei-me.ko
 mei_wdt.ko
@@ -1981,6 +1983,7 @@ tcp_bic.ko
 tcpci.ko
 tcp_dctcp.ko
 tcp_htcp.ko
+tcp_illinois.ko
 tcpm.ko
 tcp_nv.ko
 tcp_westwood.ko
