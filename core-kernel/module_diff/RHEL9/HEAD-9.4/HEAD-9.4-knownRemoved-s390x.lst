@@ -1,3 +1,4 @@
 cfbcopyarea.ko
 cfbfillrect.ko
 cfbimgblt.ko
+wwan_hwsim.ko

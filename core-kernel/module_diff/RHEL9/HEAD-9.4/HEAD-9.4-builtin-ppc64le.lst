@@ -214,6 +214,7 @@ typec.ko
 typec_ucsi.ko
 udmabuf.ko
 udp_diag.ko
+uhci-hcd.ko
 unix_diag.ko
 unix.ko
 usb-common.ko

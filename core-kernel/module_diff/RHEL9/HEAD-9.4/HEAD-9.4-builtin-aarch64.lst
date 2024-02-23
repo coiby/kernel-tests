@@ -56,6 +56,7 @@ clk-imx8mm.ko
 clk-imx8mn.ko
 clk-imx8mp.ko
 clk-imx8mq.ko
+clk-imx93.ko
 clk-vexpress-osc.ko
 cls_cgroup.ko
 cmac.ko
@@ -158,6 +159,7 @@ i2c-tegra.ko
 icc-core.ko
 imx8m-blk-ctrl.ko
 imx8mp-blk-ctrl.ko
+imx93-blk-ctrl.ko
 imx_earlycon.ko
 imx.ko
 inet_diag.ko
@@ -230,6 +232,7 @@ pinctrl-imx8mm.ko
 pinctrl-imx8mn.ko
 pinctrl-imx8mp.ko
 pinctrl-imx8mq.ko
+pinctrl-imx93.ko
 pinctrl-imx.ko
 pinctrl-max77620.ko
 pkcs7_message.ko
@@ -262,6 +265,7 @@ rtc-efi.ko
 rtc-pl031.ko
 rtc-tegra.ko
 sch_fq_codel.ko
+scmi-core.ko
 scmi-module.ko
 scsi_common.ko
 scsi_dh_alua.ko
@@ -314,6 +318,7 @@ ucsi_acpi.ko
 udc-core.ko
 udmabuf.ko
 udp_diag.ko
+uhci-hcd.ko
 unix_diag.ko
 unix.ko
 usb-common.ko

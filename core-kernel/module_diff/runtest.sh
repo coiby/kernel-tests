@@ -722,6 +722,24 @@ rlJournalStart
             if cki_kver_lt "5.14.0-410.el9"; then
                 sed -i '/^freq_table.ko$/d'  ${OS}/${Release}/$Release-knownRemoved-builtin-{x86_64,ppc64le,aarch64}.lst
             fi
+            if cki_kver_lt "5.14.0-412.el9"; then
+                sed -i '/marvell-88q2xxx.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
+            fi
+            if cki_kver_lt "5.14.0-420.el9"; then
+                sed -i '/^uhci-hcd.ko$/d'  ${OS}/${Release}/$Release-builtin-{x86_64,ppc64le,aarch64}.lst
+            fi
+            if cki_kver_lt "5.14.0-422.el9"; then
+                sed -i '/wwan_hwsim.ko/d'  ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
+                sed -i '/mei_gsc_proxy.ko/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
+                sed -i '/dwmac-imx.ko/d; /imx93-pd.ko/d; /imx93-src.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
+                sed -i '/clk-imx93.ko/d; /imx93-blk-ctrl.ko/d; /pinctrl-imx93.ko/d; /scmi-core.ko/d'  ${OS}/${Release}/$Release-builtin-aarch64.lst
+            fi
+            if cki_kver_lt "5.14.0-423.el9"; then
+                sed -i '/sdhci-of-dwcmshc.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
+            fi
+            if cki_kver_lt "5.14.0-424.el9"; then
+                sed -i '/tcp_illinois.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
+            fi
         fi
     rlPhaseEnd
 

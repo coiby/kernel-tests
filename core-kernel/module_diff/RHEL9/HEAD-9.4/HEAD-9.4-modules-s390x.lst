@@ -633,6 +633,7 @@ tcp_bbr.ko
 tcp_bic.ko
 tcp_dctcp.ko
 tcp_htcp.ko
+tcp_illinois.ko
 tcp_nv.ko
 tcp_westwood.ko
 tcrypt.ko

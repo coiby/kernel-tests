@@ -312,6 +312,7 @@ dw_dmac_core.ko
 dw_dmac.ko
 dw_dmac_pci.ko
 dwmac-dwc-qos-eth.ko
+dwmac-imx.ko
 dwmac-tegra.ko
 dw_mmc-bluefield.ko
 dw_mmc.ko
@@ -604,6 +605,8 @@ imx8mm_thermal.ko
 imx8mn-interconnect.ko
 imx8mp-interconnect.ko
 imx8mq-interconnect.ko
+imx93-pd.ko
+imx93-src.ko
 imx-bus.ko
 imx-cpufreq-dt.ko
 imx-dsp.ko
@@ -808,6 +811,7 @@ macvlan.ko
 macvtap.ko
 mailbox-xgene-slimpro.ko
 marvell10g.ko
+marvell-88q2xxx.ko
 marvell_cn10k_ddr_pmu.ko
 marvell_cn10k_tad_pmu.ko
 marvell.ko
@@ -1346,6 +1350,7 @@ sdhci-acpi.ko
 sdhci-esdhc-imx.ko
 sdhci-iproc.ko
 sdhci.ko
+sdhci-of-dwcmshc.ko
 sdhci-pci.ko
 sdhci-pltfm.ko
 sdhci-tegra.ko
@@ -1425,6 +1430,7 @@ tcp_bic.ko
 tcpci.ko
 tcp_dctcp.ko
 tcp_htcp.ko
+tcp_illinois.ko
 tcpm.ko
 tcp_nv.ko
 tcp_westwood.ko
