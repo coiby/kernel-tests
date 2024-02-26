@@ -27,13 +27,13 @@ for DISK in $DISKS; do
 	tok "nvme id-ctrl ${NVME_DISK}"
 	tok "nvme id-ns ${NVME_DISK}"
 
-	if [[ $MODEL =~ "INTEL SSDPEDMX400G4"|"INTEL SSDPEDMD016T4" ]]; then
+	if [[ $MODEL =~ "INTEL SSDPEDMX400G4"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4800X" ]]; then
 		tnot "nvme list-ns ${NVME_DISK}"
 	else
 		tok "nvme list-ns ${NVME_DISK}"
 	fi
 
-	if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Micron_9300_MTFDHAL3T8TDP"|"Samsung SSD 983 DCT"|"Dell Express Flash NVMe P4600"|"SAMSUNG MZWLL1T6HAJQ-00005" ]]; then
+	if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Micron_9300_MTFDHAL3T8TDP"|"Samsung SSD 983 DCT"|"Dell Express Flash NVMe P4600"|"SAMSUNG MZWLL1T6HAJQ-00005"|"Dell Express Flash PM1725b"|"Dell Express Flash NVMe P4800X"|"Dell Express Flash NVMe P4500" ]]; then
 		tnot "nvme ns-descs ${NVME_DISK} -n 1"
 	else
 		tok "nvme ns-descs ${NVME_DISK} -n 1"
@@ -45,7 +45,7 @@ for DISK in $DISKS; do
 		tnot "nvme id-nvmset ${NVME_DISK}"
 	fi
 
-	if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Dell Express Flash NVMe P4600" ]]; then
+	if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Dell Express Flash NVMe P4600"|"Dell Express Flash PM1725b"|"Dell Express Flash NVMe P4800X"|"Dell Express Flash NVMe P4500" ]]; then
 		tnot "nvme list-ctrl ${NVME_DISK}"
 	else
 		tok "nvme list-ctrl ${NVME_DISK}"
@@ -54,7 +54,7 @@ for DISK in $DISKS; do
 	tok "nvme get-ns-id ${NVME_DISK}"
 	tok "nvme get-log --log-id=2 --log-len=512 ${NVME_DISK}"
 
-	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 1.6TB"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 1.6TB"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Express Flash PM1725b"|"Dell Express Flash NVMe P4800X"|"Dell Ent NVMe v2 AGN FIPS MU U.2"|"Dell Express Flash NVMe P4500"|"Samsung SSD 983 DCT" ]]; then
 		tok "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
 	elif [[ $MODEL =~ "Micron_9300_MTFDHAL3T8TDP"|"Dell Express Flash PM1725a 1.6TB AIC"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600 2.0TB AIC" ]]; then
 		if rlIsRHEL 9; then
@@ -69,7 +69,7 @@ for DISK in $DISKS; do
 	tok "nvme fw-log ${NVME_DISK}"
 
 	# TODO: sforza-2s
-	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"Micron_9300_MTFDHAL3T8TDP"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"Micron_9300_MTFDHAL3T8TDP"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
 		tok "nvme changed-ns-list-log ${NVME_CHAR}"
 	else
 		tnot "nvme changed-ns-list-log ${NVME_CHAR}"
@@ -88,7 +88,7 @@ for DISK in $DISKS; do
 	tok "nvme get-feature ${NVME_DISK} -f 1"
 	tok "nvme get-feature ${NVME_DISK} -f 2"
 
-	if [[ $MODEL =~ "INTEL SSDPEDMX400G4"|"Micron_9300_MTFDHAL3T8TDP"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Dell Ent NVMe P5500 RI U.2" ]]; then
+	if [[ $MODEL =~ "INTEL SSDPEDMX400G4"|"Micron_9300_MTFDHAL3T8TDP"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash PM1725b"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
 		tnot "nvme get-feature ${NVME_DISK} -f 3"
 	else
 		tok "nvme get-feature ${NVME_DISK} -f 3"
@@ -97,21 +97,29 @@ for DISK in $DISKS; do
 	tok "nvme get-feature ${NVME_DISK} -f 4"
 	tok "nvme get-feature ${NVME_DISK} -f 5"
 
-	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Express Flash PM1725b"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
 		tok "nvme device-self-test ${NVME_DISK} -s 1"
 	else
 		tnot "nvme device-self-test ${NVME_DISK} -s 1"
 	fi
 
-	if [[ $MODEL =~ "Dell Express Flash NVMe P4600" ]]; then
+	if [[ $MODEL =~ "Dell Express Flash NVMe P4600"|"Dell Express Flash NVMe P4500" ]]; then
 		tnot "nvme set-feature ${NVME_CHAR} -f 2 -v 0x0"
 	else
 		tok "nvme set-feature ${NVME_CHAR} -f 2 -v 0x0"
 	fi
 
-	tok "nvme format ${NVME_DISK} --lbaf=0 -f"
+	if [[ $MODEL =~ "Dell Express Flash NVMe P4800X" ]]; then
+		tlog "RHEL-26196: skip nvme format for $MODEL"
+	else
+		tok "nvme format ${NVME_DISK} --lbaf=0 -f"
+	fi
 	tok "nvme admin-passthru ${NVME_CHAR} --opcode=06 --data-len=4096 --cdw10=1 -r"
-	tok "nvme io-passthru ${NVME_DISK} --opcode=2 --namespace-id=1 --data-len=4096 --read --cdw10=0 --cdw11=0 --cdw12=0x70000 --raw-binary"
+	if [[ $MODEL =~ "Dell Express Flash NVMe P4800X" ]]; then
+		tnot "nvme io-passthru ${NVME_DISK} --opcode=2 --namespace-id=1 --data-len=4096 --read --cdw10=0 --cdw11=0 --cdw12=0x70000 --raw-binary"
+	else
+		tok "nvme io-passthru ${NVME_DISK} --opcode=2 --namespace-id=1 --data-len=4096 --read --cdw10=0 --cdw11=0 --cdw12=0x70000 --raw-binary"
+	fi
 	tlog "TODO: nvme  security-send"
 	tlog "TODO: nvme security-recv"
 	tlog "TODO: nvme resv-acquire"
@@ -133,13 +141,13 @@ for DISK in $DISKS; do
 
 	tok "nvme format ${NVME_DISK} --lbaf=0 -f"
 
-	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
 		tok "nvme sanitize ${NVME_DISK} -a 0x02"
 	else
 		tnot "nvme sanitize ${NVME_DISK} -a 0x02"
 	fi
 
-	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZQL2960HCJR-00A07"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZQL2960HCJR-00A07"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
 		tok "nvme sanitize-log ${NVME_DISK}"
 	else
 		tnot "nvme sanitize-log ${NVME_DISK}"
@@ -147,13 +155,15 @@ for DISK in $DISKS; do
 
 	tok "nvme reset ${NVME_CHAR}"
 
-	if [[ $MODEL =~ "Dell Express Flash PM1725a"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+	if [[ $MODEL =~ "Dell Express Flash PM1725a"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Express Flash PM1725b" ]]; then
 		tlog "Skip nvme subsystem-reset on $MODEL, Bug 1699599"
-	elif [[ $MODEL =~ "INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 " ]]; then
+	elif [[ $MODEL =~ "INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 "|"Dell Express Flash NVMe P4800X"|"Dell Express Flash NVMe P4500" ]]; then
 		tnot "nvme subsystem-reset ${NVME_CHAR}"
 		tlog "nvme subsystem-reset not support on $DISK, MODEL:\"$MODEL\""
 	elif [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"Samsung SSD 983 DCT"|"Dell Ent NVMe v2 AGN RI U.2"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI" ]]; then
 		tlog "nvme subsystem-reset on $DISK lead disk disappeared, BZ2093136"
+	elif [[ $MODEL =~ "Dell Ent NVMe v2 AGN FIPS MU" ]]; then
+		tlog "Skip nvme subsystem-reset on $MODEL, lead Link Down"
 	else
 		tok "nvme subsystem-reset ${NVME_CHAR}"
 	fi
