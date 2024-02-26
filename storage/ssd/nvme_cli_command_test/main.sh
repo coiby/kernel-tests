@@ -88,7 +88,7 @@ for DISK in $DISKS; do
 	tok "nvme get-feature ${NVME_DISK} -f 1"
 	tok "nvme get-feature ${NVME_DISK} -f 2"
 
-	if [[ $MODEL =~ "INTEL SSDPEDMX400G4"|"Micron_9300_MTFDHAL3T8TDP"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash PM1725b"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
+	if [[ $MODEL =~ "INTEL SSDPEDMX400G4"|"Micron_9300_MTFDHAL3T8TDP"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe P4800X"|"Dell Express Flash NVMe P4500" ]]; then
 		tnot "nvme get-feature ${NVME_DISK} -f 3"
 	else
 		tok "nvme get-feature ${NVME_DISK} -f 3"
