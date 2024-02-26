@@ -53,7 +53,7 @@ elif (($rhel_version == 8)); then
 	image_name=${image_name:-"rhel8.6.qcow2"}
 elif (($rhel_version == 9));then
 	image_name=${image_name:-"rhel9.0.qcow2"}
-elif (($rhel_version == 39));then
+elif (($rhel_version >= 39));then
 	image_name=${image_name:-"rhel9.2_cki.qcow2"}
 fi
 
