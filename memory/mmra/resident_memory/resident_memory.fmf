@@ -1,0 +1,12 @@
+summary: Test that confirms that mlock called from a user process makes the targeted memory resident
+description: |
+  Memory Mamagement Risk Assesment test that checks if an invocation of mlock
+  makes the targeted memory loaded and locked in physical memory.
+contact: Filippo Storniolo <fstornio@redhat.com>
+test: bash ./runtest.sh
+id: 90d8ad45-d83e-43b7-97a8-497880c7b23a
+framework: beakerlib
+require:
+  - gcc
+  - make
+duration: 10m
