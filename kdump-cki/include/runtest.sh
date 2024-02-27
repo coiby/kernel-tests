@@ -575,6 +575,8 @@ SetupKdump()
     [ -f "${K_REBOOT}" ] && rm -f "${K_REBOOT}"
 }
 
+# For RHEL8 and CentOS8 - the define of crashkernel value is the same like RHEL-8.10.
+# For RHEL9 and CentOS9 - the define of crashkernel value is the same like RHEL-9.4.
 DefKdumpMem()
 {
     local args=""
@@ -606,16 +608,16 @@ DefKdumpMem()
         if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
-            args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+            args="crashkernel=0G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=0G-4G:256M,4G-64G:320M,64G-:576M"
         fi
 
     elif $IS_FC; then
-        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:256M,4G-64G:256M,64G-1T:256M,1T-:512M"
-        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:192M,64G-1T:256M,1T-:512M"
+        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
+        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
-            args="crashkernel=0M-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
-        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=1G-4G:256M,4G-64G:766M,64G-:1G"
+            args="crashkernel=0G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
+        elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=0G-4G:256M,4G-64G:766M,64G-:1G"
         fi
 
     elif $IS_RHEL5; then
