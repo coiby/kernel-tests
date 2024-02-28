@@ -2,7 +2,5 @@ rfkill
 net_failover
 failover
 sunrpc
-vfat
-fat
 drm
 fuse
