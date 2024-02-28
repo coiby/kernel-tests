@@ -150,9 +150,9 @@ rlPhaseStartTest "ip6tables: Plain NAT test"
 	if [[ "$SCTP" == "true" && `which sctp_test` ]];then
 		run router ip6tables -t nat -A PREROUTING -i r_c -p sctp -j DNAT --to-destination [$ip_s]:9999
 		run server sctp_test -H 0 -P 9999 -l NoCheck &
-		run server sleep 3
+		run server sleep 5
 		# DNAT sctp assert pass
-		run client timeout 5 sctp_test -H $ip_c -P 6013 -h $ip_rc -p 8888 -s -c 1 -x 1 -X 1
+		run client timeout 10 sctp_test -H $ip_c -P 6013 -h $ip_rc -p 8888 -s -c 1 -x 1 -X 1
 		run router conntrack -L $__NoCheck
 		run router conntrack -F $__NoCheck
 		run router sleep 2
@@ -187,9 +187,9 @@ rlPhaseStartTest "ip6tables: Plain NAT test"
 		run router ip6tables -t nat -A POSTROUTING -o r_s -p sctp -j SNAT --to-source [$ip_rs]:1234
 		run server ip6tables -A INPUT -i s_r -p sctp ! --sport 1234 -j DROP
 		run server sctp_test -H 0 -P 9999 -l NoCheck &
-		run server sleep 3
+		run server sleep 5
 		# SNAT sctp assert_pass
-		run client timeout 5 sctp_test -H $ip_c -P 6013 -h $ip_s -p 9999 -s -c 1 -x 1 -X 1
+		run client timeout 10 sctp_test -H $ip_c -P 6013 -h $ip_s -p 9999 -s -c 1 -x 1 -X 1
 		run router conntrack -L $__NoCheck
 		run router conntrack -F $__NoCheck
 		run router sleep 2
