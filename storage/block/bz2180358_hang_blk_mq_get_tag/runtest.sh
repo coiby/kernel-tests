@@ -36,7 +36,7 @@ function run_test()
         --runtime=100 --numjobs=40 --time_based --name=test \
         --ioengine=libaio'
     wait
-    sleep 3
+    sleep 30
 
     rlRun "rmmod scsi_debug -f"
 }
