@@ -1,0 +1,21 @@
+summary: Test memory access between userspace processes.
+description: |
+    Checks that user processes can't write to others' private memory segments.
+    The program will map 90% of total RAM across a fixed number of forked
+    processes, and each one of these processes will concurrently write an
+    unique byte pattern to its private mapped chunk of address space.
+    After all processes have finish writing to their address space mapped
+    chunk, they will the concurrently read back the map's contents
+    asserting that previously written byte pattern.
+contact: Rafael Aquini <aquini@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - gcc
+  - glibc-devel
+extra-summary: memory/mmra/as-isolation
+extra-task: memory/mmra/as-isolation
+id: 108e0b46-7840-4486-9a6b-c6fe3a495489
+enabled: true
+duration: 1h

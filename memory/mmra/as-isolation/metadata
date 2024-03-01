@@ -1,0 +1,12 @@
+[General]
+name=memory/mmra/as-isolation
+owner=Rafael Aquini <aquini@redhat.com>
+description=Test memory access between userspace processes.
+license=ISC
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;gcc;glibc-devel
+max_time=1h
