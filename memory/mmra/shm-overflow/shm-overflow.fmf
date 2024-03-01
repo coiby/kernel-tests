@@ -1,0 +1,18 @@
+summary: Assert a user process can't write outside it's address space.
+description: |
+  Assert a user process can't write outside it's address space.
+  The test process allocates a PAGE_SIZE shared memory segment. Then it creates
+  a child process that writes bytes to the whole segment + 1. The parent 
+  asserts that the child process is killed by SIGSEGV.
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - gcc
+  - glibc-devel
+extra-summary: memory/mmra/shm-overflow
+extra-task: memory/mmra/shm-overflow
+id: 076fec2c-f51f-4226-9fea-7bd7cf7931ac
+enabled: true
+duration: 10m

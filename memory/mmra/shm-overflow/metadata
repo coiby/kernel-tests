@@ -1,0 +1,12 @@
+[General]
+name=memory/mmra/shm-overflow
+owner=Pablo Ridolfi <pridolfi@redhat.com>
+description=Assert a user process can't write outside it's address space.
+license=ISC
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;gcc;glibc-devel
+max_time=10m
