@@ -1,0 +1,18 @@
+summary: Verifies attempting to violate the kernel memory address space is prevented.
+description: |
+    Verifies attempting to violate the kernel memory address space (e.g. pointers to unmapped addresses, or read-only pages) is prevented and results in a failure (e.g. kernel panic).
+contact: Stephen Bertram <sbertram@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+id: a4f0bd8a-9507-4ce8-8766-1304e59ca590
+framework: beakerlib
+require:
+  - make
+  - iputils
+  - type: file
+    pattern:
+      - /memory/mmra/violate_kernel_memory/src
+      - /automotive/include
+      - /kernel-include
+duration: 10m
