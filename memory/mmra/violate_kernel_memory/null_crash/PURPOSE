@@ -1,0 +1,1 @@
+Verifies attempting to violate the kernel memory address space (e.g. pointers to unmapped addresses, or read-only pages) is prevented and results in a failure (e.g. kernel panic).
