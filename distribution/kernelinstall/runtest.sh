@@ -794,6 +794,29 @@ function DisableTmpRepo ()
     DeBug "Exit DisableTmpRepo"
 }
 
+# Download a url to the current directory, abort if it fails
+function CurlDownload ()
+{
+    local ret
+    local url=${1}
+    # NOTE(ianw) 2024-02 : it's unclear what failures we might get
+    # here; possibly we could increase reliability by retrying even on
+    # a 404 (if, for example, asking brew again might give a different
+    # answer).  The easy way to do this is --retry-all-errors which is
+    # only on >=7.71.0; it's not in RHEL6 so we just do this simple
+    # retry for now.
+    local retries="--retry 5 --retry-max-time 240"
+    DeBug "Dowloading ${url} to $(pwd)"
+    curl ${retries} -L ${url} -O 2>>${DEBUGLOG}
+    ret=$?
+    if [ "${ret}" -ne 0 ]; then
+        DeBug "Download ${url} failed: ${ret}"
+        RprtRslt ${TEST}/CurlDownload FAIL $ret
+        RHTSAbort
+    fi
+    return $?
+}
+
 function YumInstallKernel ()
 {
     DeBug "Enter YumInstallPackage"
@@ -878,8 +901,8 @@ function BrewInstallKernel ()
           # Yum does not work with http urls on RHEL5, so to avoid branching
           # just download the kernel rpms and install
           pushd /tmp
-          curl -L -s $httpbase/$kernarch/$testkernbase.$kernarch.rpm -O
-          curl -L -s $httpbase/$kernarch/$testkerndevel.$kernarch.rpm -O
+          CurlDownload $httpbase/$kernarch/$testkernbase.$kernarch.rpm
+          CurlDownload $httpbase/$kernarch/$testkerndevel.$kernarch.rpm
           popd
           # RHEL8 kernels are now provided by the meta package kernel which
           # requires kernel-core and kernel-modules packages
@@ -887,10 +910,10 @@ function BrewInstallKernel ()
              testkerncore=$testkername-core-$KERNELARGVERSION
              testkernmodules=$testkername-modules-$KERNELARGVERSION
              testkernmodules_core=$testkername-modules-core-$KERNELARGVERSION
-             curl -L -s $httpbase/$kernarch/$testkerncore.$kernarch.rpm -O
-             curl -L -s $httpbase/$kernarch/$testkernmodules.$kernarch.rpm -O
+             CurlDownload $httpbase/$kernarch/$testkerncore.$kernarch.rpm
+             CurlDownload $httpbase/$kernarch/$testkernmodules.$kernarch.rpm
              if curl -L -s --head -f -o /dev/null $httpbase/$kernarch/$testkernmodules_core.$kernarch.rpm; then
-                 curl -L -s $httpbase/$kernarch/$testkernmodules_core.$kernarch.rpm -O
+                 CurlDownload $httpbase/$kernarch/$testkernmodules_core.$kernarch.rpm
              fi
              if test -f $testkernmodules_core.$kernarch.rpm; then
                  testkernelmodules_rpms="$testkernmodules.$kernarch.rpm $testkernmodules_core.$kernarch.rpm"
@@ -909,13 +932,13 @@ function BrewInstallKernel ()
 
              if [ "$KERNELARGEXTRAMODULES" == "1" ]; then
                 testkernmodulesextra=${testkername}-modules-extra-${KERNELARGVERSION}
-                curl -L -s $httpbase/$kernarch/$testkernmodulesextra.$kernarch.rpm -O
+                CurlDownload $httpbase/$kernarch/$testkernmodulesextra.$kernarch.rpm
                 $yumcmd -y localinstall --nogpgcheck \
                     $testkernmodulesextra.$kernarch.rpm
              fi
              if [ "$KERNELARGINTERNALMODULES" == "1" ]; then
                 testkernmodulesinternal=${testkername}-modules-internal-${KERNELARGVERSION}
-                curl -L -s $httpbase/$kernarch/$testkernmodulesinternal.$kernarch.rpm -O
+                CurlDownload $httpbase/$kernarch/$testkernmodulesinternal.$kernarch.rpm
                 $yumcmd -y localinstall --nogpgcheck \
                     $testkernmodulesinternal.$kernarch.rpm
              fi
