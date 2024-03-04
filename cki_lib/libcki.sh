@@ -396,3 +396,16 @@ cki_is_kernel_automotive()
     fi
     return 1
 }
+
+# need to tell which boards are android boot devices.
+# as the list of abd boards increase so will this function.
+
+cki_is_abd()
+{
+    if grep -qi SA8775P /sys/devices/soc0/machine; then
+        return 0
+    else
+        return 1
+    fi
+}
+
