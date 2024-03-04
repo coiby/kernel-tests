@@ -23,26 +23,21 @@
  *  processes, and each one of these processes will concurrently write an
  *  unique byte pattern to its private mapped chunk of address space.
  *  After all processes have finish writing to their address space mapped
- *  chunk, they will the concurrently read back the map's contents
+ *  chunk, they will then concurrently read back the map's contents
  *  asserting that previously written byte pattern.
  */
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <assert.h>
+#include <stdio.h>
 #include <sched.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <semaphore.h>
 #include <sys/mman.h>
 #include <sys/wait.h>
 #include <sys/sysinfo.h>
-#include <stdio.h>
-#include <string.h>
-#include <signal.h>
-#include "common.h"
-
-#ifndef NCHILD
-#define NCHILD	26
-#endif
 
 #ifndef PAGE_SIZE
 #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
@@ -56,8 +51,35 @@ static unsigned long *shared;
 static void *addr;
 static sem_t *sem;
 
-enum index {COUNTER, WAITING};
+enum index {COUNTER, WAITING, NCHILD=26};
 
+#define PRINT_ERROR(msg)						   \
+	do {								   \
+		char *estr;						   \
+		asprintf(&estr, "[%s:%d] %s: %s (%d)",			   \
+			 __FILE__, __LINE__, msg, strerror(errno), errno); \
+		fprintf(stderr, "%s\n", estr);				   \
+		fflush(stderr);						   \
+		free(estr);						   \
+	} while (0)
+
+#define ERROR_EXIT(msg)						\
+	do {							\
+		PRINT_ERROR(msg);				\
+		exit(errno ? errno : EXIT_FAILURE);		\
+	} while (0)
+
+#define ERROR_WARN(msg) do { PRINT_ERROR(msg); } while (0)
+
+#ifdef DEBUG
+#define DPRINTF(...)						\
+	do {							\
+		fprintf(stderr, __VA_ARGS__);			\
+		fflush(stderr);					\
+	} while (0)
+#else
+#define DPRINTF(...)
+#endif
 
 void write_bytes(unsigned long base, unsigned long size, char byte)
 {
@@ -88,7 +110,7 @@ int child(int n)
 	sem_post(sem);
 
 	/* wait for all writers to finish */
-	while(shared[WAITING])
+	while (shared[WAITING])
 		sched_yield();
 
 	printf("PID=%ld is reading \"%c\" from the address range %lx-%lx\n",
@@ -96,7 +118,7 @@ int child(int n)
 
 	read_bytes(base, len, byte);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -161,7 +183,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* wait for all writers to finish */
-	while(shared[COUNTER] < (unsigned long) children)
+	while (shared[COUNTER] < (unsigned long) children)
 		sched_yield();
 
 	shared[WAITING] = 0;
@@ -176,10 +198,17 @@ int main(int argc, char *argv[])
 				ERROR_EXIT("wait");
 			}
 		}
+
 		i++;
-		DPRINTF("PID=%ld  wait() returned child PID %ld (numDead=%d)\n",
-			(long) getpid(), (long) pid, i);
+
+		/* assert we're not looping unboundly */
 		assert(i <= NCHILD);
+
+		DPRINTF("PID=%ld  wait() returned child PID %ld with status %d (numDead=%d)\n",
+			(long) getpid(), (long) pid, WEXITSTATUS(status), i);
+
+		/* assert the child has finished normally */
+		assert(WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS);
 	}
 out:
 	sem_close(sem);

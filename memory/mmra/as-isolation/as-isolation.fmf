@@ -5,7 +5,7 @@ description: |
     processes, and each one of these processes will concurrently write an
     unique byte pattern to its private mapped chunk of address space.
     After all processes have finish writing to their address space mapped
-    chunk, they will the concurrently read back the map's contents
+    chunk, they will then concurrently read back the map's contents
     asserting that previously written byte pattern.
 contact: Rafael Aquini <aquini@redhat.com>
 test: bash ./runtest.sh
