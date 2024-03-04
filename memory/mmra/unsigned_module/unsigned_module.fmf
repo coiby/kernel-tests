@@ -1,0 +1,20 @@
+summary: Verifies that an unsigned kernel module cannot be loaded.
+description: |
+        Verifies that an unsigned kernel module cannot be loaded.
+contact: Stephen Bertram <sbertram@redhat.com>
+id: 38a1445c-97c5-454a-8650-6126804d47a1
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+recommend:
+  - abootimg
+  - grubby
+require:
+  - make
+  - type: file
+    pattern:
+      - /kernel-include
+      - /cmdline_helper
+      - /cki_lib
+duration: 15m
