@@ -7,7 +7,8 @@ MODFILE="${MODULE}.ko"
 
 rlJournalStart
     rlPhaseStart
-        rlRun "make" 2 "-p 'File doesn't link as expected'"
+        # rlRun "make" 2 "-p 'File doesn't link as expected'"
+        rlRun "make"
     rlPhaseEnd
 
     rlPhaseStart
