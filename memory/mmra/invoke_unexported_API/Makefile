@@ -1,7 +1,7 @@
 obj-m += unexported_module.o
 
-KDIR  := /lib/modules/$(shell uname -r)/build
-PWD   := $(shell pwd)
+# KDIR  := /lib/modules/$(shell uname -r)/build
+# PWD   := $(shell pwd)
 
-default:
-	$(MAKE) -C $(KDIR) M=$(PWD) modules
+# default:
+# 	$(MAKE) -C $(KDIR) M=$(PWD) modules
