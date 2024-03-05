@@ -324,12 +324,16 @@ check if LTP version on DCI matches the default on distribution/ltp/include/ltp-
         # post a new note with the URL
         body=$(python3 -m cki.deployment_tools.render <<< "${COMMENT_TEMPLATE_J2}")
         footer=$(python3 -m cki_lib.footer --format gitlab)
-        gitlab \
+        python3 -m cki_lib.gitlab \
+            --gitlab-url "${CI_SERVER_URL}" \
             --private-token "${GITLAB_JOB_MIRROR_KERNEL_TESTS_COMMENT_ACCESS_TOKEN}" \
-            project-merge-request-note create \
-            --project-id "${CI_MERGE_REQUEST_PROJECT_ID}" \
-            --mr-iid "${CI_MERGE_REQUEST_IID}" \
-            --body "${body}${footer}"
+            --graphql-query '
+              mutation($id: NoteableID!, $body: String!) {
+                createNote(input: {noteableId: $id, body:$body, internal: true})
+                { errors }
+              }' \
+            --variables "id=gid://gitlab/MergeRequest/${CI_MERGE_REQUEST_ID}" \
+            --variables "body=$(jq -Rs . <<< "${body}${footer}")"
       fi
 
 git-sync-mr:
