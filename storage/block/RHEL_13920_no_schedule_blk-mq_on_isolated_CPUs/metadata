@@ -1,0 +1,13 @@
+[General]
+name=storage/block/RHEL_13920_no_schedule_blk-mq_on_isolated_CPUs
+owner=Changhui Zhong <czhong@redhat.com>
+description=don't schedule block kworker on isolated CPUs
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+dependencies=bpftrace;numactl;fio;libaio;libaio-devel;tuned-profiles-cpu-partitioning
+max_time=2h
