@@ -433,7 +433,6 @@ InstallKpatchPatchDebuginfo()
 
 }
 
-
 # Update kernel options
 # Parameters
 #   1: Options. If starting with "-" means it's going to removed.
@@ -450,7 +449,7 @@ UpdateKernelOptions()
         return 1
     fi
 
-    if [ -e /sys/devices/soc0/machine ]; then
+    if cki_is_abd; then
         action=add_aboot_param
     elif system_ostree; then
         action="--append-if-missing"
@@ -458,7 +457,7 @@ UpdateKernelOptions()
         action="--args"
     fi
     if grep -q ^- <<< "${options}"; then
-        if [ -e /sys/devices/soc0/machine ]; then
+        if cki_is_abd; then
             action=remove_aboot_param
         elif system_ostree; then
             action="--delete-if-present"
@@ -469,7 +468,7 @@ UpdateKernelOptions()
     fi
 
     {
-        if [ -e /sys/devices/soc0/machine ]; then
+        if cki_is_abd; then
             LogRun "${action} ${options}"
         elif system_ostree; then
             LogRun "rpm-ostree kargs ${action}=\"${options}\" --import-proc-cmdline"
@@ -1128,7 +1127,7 @@ GetCrashkernelDefault() {
 
 ResetCrashkernel() {
     _fadump_opts=$1
-    if [ -e /sys/devices/soc0/machine ]; then
+    if cki_is_abd; then
         LogRun "add_aboot_param crashkernel=$(GetCrashkernelDefault)" && \
             _reboot_required=true
     else

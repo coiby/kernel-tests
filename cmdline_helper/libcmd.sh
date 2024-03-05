@@ -1,6 +1,10 @@
 #!/bin/bash
 
-function add_aboot_param ()
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../cki_lib/libcki.sh || exit 1
+
+function add_aboot_param()
 {
     CMDLINEARGS="$1"
     current_aboot_cmdline=$(abootimg -i /boot/aboot-"$(uname -r)".img | awk  '/cmdline/ {print}' | cut -f 4-"$NR" -d ' ')
@@ -14,7 +18,7 @@ function add_aboot_param ()
     dd if=/boot/aboot-"$(uname -r)".img of=/dev/disk/by-partlabel/boot_a || exit 1
     sync
 }
-function remove_aboot_param ()
+function remove_aboot_param()
 {
     CMDLINEARGS="$1"
     # shellcheck disable=SC2207
@@ -37,7 +41,7 @@ function remove_aboot_param ()
         sync
     fi
 }
-function change_cmdline ()
+function change_cmdline()
 {
     CMDLINEARGS="$1"
     echo "Old cmdline:"
@@ -50,7 +54,7 @@ function change_cmdline ()
     # the kernel commandline.
     if echo "${CMDLINEARGS}" | grep -q "^-"; then
         echo "Cmdline to be removed: ${CMDLINEARGS##-}"
-        if [ -e /sys/devices/soc0/machine ]; then
+        if cki_is_abd; then
             remove_aboot_param "${CMDLINEARGS}"
         elif [ -e /run/ostree-booted ]; then
             rpm-ostree kargs --delete-if-present="${CMDLINEARGS##-}" --import-proc-cmdline
@@ -59,7 +63,7 @@ function change_cmdline ()
         fi
     else
         echo "Cmdline to be added: ${CMDLINEARGS}"
-        if [ -e /sys/devices/soc0/machine ]; then
+        if cki_is_abd; then
             add_aboot_param "${CMDLINEARGS}"
         elif [ -e /run/ostree-booted ]; then
             rpm-ostree kargs --append-if-missing="${CMDLINEARGS##-}" --import-proc-cmdline
@@ -76,7 +80,7 @@ function change_cmdline ()
     echo "Need to reboot before changes take effect."
 }
 
-function verify_cmdline ()
+function verify_cmdline()
 {
     CMDLINEARGS="$1"
     echo "New cmdline:"
