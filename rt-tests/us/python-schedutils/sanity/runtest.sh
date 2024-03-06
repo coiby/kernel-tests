@@ -5,6 +5,7 @@
 
 export TEST="rt-tests/us/python-schedutils/sanity"
 export result_r="PASS"
+export nrcpus rhel_x
 
 function check_status()
 {

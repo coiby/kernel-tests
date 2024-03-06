@@ -15,6 +15,7 @@
 . ../include/runtest.sh || exit 1
 
 export TEST="rt-tests/pi_stress"
+export nrcpus rhel_x
 
 if ! kernel_automotive; then
     rt_env_setup

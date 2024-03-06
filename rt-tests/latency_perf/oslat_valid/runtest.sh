@@ -7,6 +7,7 @@ rt_env_setup
 
 export runtime=${runtime:-5m}
 export LAT_THRES=${LAT_THRES:-40}
+export nrcpus rhel_x
 
 [ -f $TEST ] && TEST="rt-tests/latency_perf/oslat_valid"
 

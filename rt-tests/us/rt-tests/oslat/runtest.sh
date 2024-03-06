@@ -16,6 +16,7 @@ export TEST="rt-tests/us/rt-tests/oslat"
 : "${MAXLAT:=150}"
 : "${RUN_TIME:=10m}"
 export LATCHECK MAXLAT RUN_TIME
+export rhel_x
 
 function oslat_skip_checks()
 {

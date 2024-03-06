@@ -5,6 +5,7 @@
 
 export TEST="rt-tests/us/rt-tests/cyclictest/snapshot"
 export result_r="PASS"
+export rhel_x
 
 function check_status()
 {

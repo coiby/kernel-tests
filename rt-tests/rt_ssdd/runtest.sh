@@ -8,6 +8,7 @@
 . ../include/runtest.sh || exit 1
 
 export TEST="rt-tests/rt_ssdd"
+export rhel_x
 
 if ! kernel_automotive; then
     declare pkg_name="rt-tests" && (( rhel_x >= 9 )) && pkg_name="realtime-tests"

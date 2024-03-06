@@ -23,7 +23,7 @@ elif [[ -x /usr/bin/dnf ]]; then
 else
   PKGMGR="yum -y --skip-broken install"
 fi
-export PKGMGR
+export PKGMGR rhel_x
 
 function rt_package_install()
 {

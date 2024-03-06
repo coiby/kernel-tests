@@ -15,6 +15,7 @@ export result_r="PASS"
     echo "RSTRNT_REBOOTCOUNT not set - setting to 0 for manual run" | tee -a $OUTPUTFILE
     export RSTRNT_REBOOTCOUNT=0
 }
+export rhel_x
 
 function IsolateCPUs()
 {
