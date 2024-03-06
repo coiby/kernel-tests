@@ -15,7 +15,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStart
-        rlRun "make -k"
+        rlRun "make" 0-255
         if [ -f $MODFILE ]; then
             rlRun "insmod $MODFILE" 1 "Loading the module should fail."
             rlRun "dmesg | grep -i 'unresolved symbol'" 0 "Checking dmesg for unresolved symbol error"
