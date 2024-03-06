@@ -1,0 +1,1 @@
+obj-m += unexported_module.o
