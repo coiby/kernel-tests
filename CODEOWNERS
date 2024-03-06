@@ -44,10 +44,9 @@
 #     paths:
 #       - /kdump-cki/
 #   kpet-db-maintainers:  # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db
-#     minimum_count: 4  # the original maintainer + the three users below
+#     minimum_count: 3  # the original maintainer + the two users below
 #     users:
 #       - bgoncalv
-#       - idorax
 #       - lulinqing
 #     kpet: maintainers
 #
