@@ -26,6 +26,7 @@ rlJournalStart
     rlPhaseStart "Compilation"
     if ! make; then
         rlPass "Compilation failed as expected due to unresolved symbols"
+    fi
     rlRun "insmod $MODFILE" 1 "Loading the module should fail."
     rlRun "dmesg | grep -i 'unresolved symbol'" 0 "Checking dmesg for unresolved symbol error"
     rlPhaseEnd
