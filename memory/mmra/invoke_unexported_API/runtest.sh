@@ -6,6 +6,9 @@ MODULE="unexported_module"
 MODFILE="${MODULE}.ko"
 
 rlJournalStart
+    rlPhaseStartSetup
+        rlShowRunningKernel
+    rlPhaseEnd
     rlPhaseStart
         # rlRun "make" 2 "-p 'File doesn't link as expected'"
         rlRun "make"
