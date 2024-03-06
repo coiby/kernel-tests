@@ -359,7 +359,7 @@ function copr_prepare()
 
 function download_install_package()
 {
-  if ! cki_is_kernel_automotive; then
+  if ! cki_is_ostree_booted; then
     downloaded=0
     for i in $(seq 1 30); do
       # If download of a package fails, report warn/abort -> infrastructure issue
@@ -454,7 +454,7 @@ function rpm_install()
   # download & install kernel, or report result
   download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM}"
 
-  if ! cki_is_kernel_automotive ;then
+  if ! cki_is_ostree_booted ;then
     if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} successfully"
     else
@@ -474,28 +474,30 @@ function rpm_install()
       fi
     fi
 
-    # The package was renamed (and temporarily aliased) in Fedora/RHEL"
-    if $YUM search kernel-firmware | grep "^kernel-firmware\.noarch" ; then
-      FIRMWARE_PKG=kernel-firmware
-    else
-      FIRMWARE_PKG=linux-firmware
-    fi
-    cki_print_info "Installing kernel firmware package"
-    $YUM install -y $FIRMWARE_PKG >> ${RPM_INSTALL_LOG}
-    cki_print_success "Kernel firmware package installed"
+    if ! cki_is_kernel_automotive; then
+      # The package was renamed (and temporarily aliased) in Fedora/RHEL"
+      if $YUM search kernel-firmware | grep "^kernel-firmware\.noarch" ; then
+        FIRMWARE_PKG=kernel-firmware
+      else
+        FIRMWARE_PKG=linux-firmware
+      fi
+      cki_print_info "Installing kernel firmware package"
+      $YUM install -y $FIRMWARE_PKG >> ${RPM_INSTALL_LOG}
+      cki_print_success "Kernel firmware package installed"
 
-    vmlinuz=/boot/vmlinuz-$(kpkg_release)
-    if grubby --set-default "${vmlinuz}"; then
-      cki_print_success "Grubby set default kernel to ${vmlinuz}"
-    else
-      rstrnt-report-log -l "${RPM_INSTALL_LOG}"
-      cki_abort_recipe "Fail to set default kernel to ${vmlinuz}" FAIL
-    fi
+      vmlinuz=/boot/vmlinuz-$(kpkg_release)
+      if grubby --set-default "${vmlinuz}"; then
+        cki_print_success "Grubby set default kernel to ${vmlinuz}"
+      else
+        rstrnt-report-log -l "${RPM_INSTALL_LOG}"
+        cki_abort_recipe "Fail to set default kernel to ${vmlinuz}" FAIL
+      fi
 
-    # Workaround for BZ 1698363 - was fixed in 8.3 but not backported to 8.1 nor 8.2
-    if [[ ${ARCH} == s390x ]]; then
-      zipl
-      cki_print_success "Grubby workaround for s390x completed"
+      # Workaround for BZ 1698363 - was fixed in 8.3 but not backported to 8.1 nor 8.2
+      if [[ ${ARCH} == s390x ]]; then
+        zipl
+        cki_print_success "Grubby workaround for s390x completed"
+      fi
     fi
   fi
   rstrnt-report-log -l "${RPM_INSTALL_LOG}"
@@ -747,7 +749,7 @@ EOF
       if [[ ${KPKG_URL} != *.tar.gz ]] ; then
         # install kernel packages that shouldn't be needed to boot with,
         # but we still want have them installed
-        if ! cki_is_kernel_automotive; then
+        if ! cki_is_ostree_booted; then
           rpm_extra_package_install
         fi
         # rpm-ostree extra packages install has to be after reboot
