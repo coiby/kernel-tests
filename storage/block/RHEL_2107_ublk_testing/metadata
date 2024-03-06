@@ -1,0 +1,13 @@
+[General]
+name=storage/block/RHEL_2107_ublk_testing
+owner=Changhui Zhong <czhong@redhat.com>
+description=enable ublk and testing
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+dependencies=bpftrace;fio;libaio;libaio-devel;libtool;automake;autoconf;g++;liburing-devel;qemu-img
+max_time=2h
