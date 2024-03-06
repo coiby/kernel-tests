@@ -204,7 +204,7 @@ DmesgCheck ()
     pushd "$LTPDIR"/output/"$dmesg_dir"
     for log in *.dmesg.log; do
         DeBug "Checking for issues on dmesg file $log"
-        if grep -E -v "$LTP_FALSESTRINGS" "$log" | grep -E "$LTP_FAILURESTRINGS" >/dev/null 2>&1; then
+        if grep -E -v "$LTP_FALSESTRINGS" "$log" | grep -Ew "$LTP_FAILURESTRINGS" >/dev/null 2>&1; then
             # report failed result dmesg check as subtest name dmesg_check_$subtestname
             subtestname=${log%.dmesg.log}
             rstrnt-report-result -o "$log" "dmesg_check_${subtestname}" FAIL
