@@ -34,12 +34,14 @@
 #   Infrastructure:
 #     users:
 #       - cki-project
+#       - lulinqing
 #     paths:
 #       - /.gitlab-ci.yml
         - /Makefile
 #   CKI:
 #     users:
 #       - cki-project
+#       - lulinqing
 #     kpet: locations
 #     paths:
 #       - /kdump-cki/
