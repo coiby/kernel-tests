@@ -1,9 +1,10 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/rtla/rtla-hwnoise"
 export result_r="PASS"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
 
 function check_status()
 {
@@ -18,8 +19,8 @@ function check_status()
 function runtest()
 {
     # rtla hwnoise supports from 8.9 and 9.3
-    if ! ( (( "$rhel_major" == 8 && "$rhel_minor" >= 9 )) || (( "$rhel_major" == 9 && "$rhel_minor" >=3 )) || (( "$rhel_major" >= 10 ))); then
-        echo "rtla is only supported for RHEL >= 8.9 and >= 9.3" || tee -a $OUTPUTFILE
+    if rhel_in_range 0 8.8 || rhel_in_range 9.0 9.2; then
+        echo "rtla hwnoise is only supported for RHEL >= 8.9 and >= 9.3" || tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "SKIP" 0
         exit 0
     fi

@@ -1,8 +1,10 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/rt-setup/sanity"
 export result_r="PASS"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 
 function check_status()
 {
@@ -19,7 +21,7 @@ function runtest()
     echo "Package rt-setup sanity test:" | tee -a $OUTPUTFILE
 
     echo "-- run rt-setup -------------------------------" | tee -a $OUTPUTFILE
-    if [ $rhel_major -ge 9 ]; then
+    if [ $rhel_x -ge 9 ]; then
         /usr/bin/realtime-setup
     else
         /usr/bin/rt-setup
@@ -38,13 +40,13 @@ function runtest()
     check_status "kernel-is-rt"
 
     echo "-- enable net-socket timestamp ----------------" | tee -a $OUTPUTFILE
-    if [ $rhel_major -ge 9 ]; then
+    if [ $rhel_x -ge 9 ]; then
         systemctl restart realtime-entsk
     else
         systemctl restart rt-entsk
     fi
     check_status "systemctl restart rt-entsk"
-    if [ $rhel_major -ge 9 ]; then
+    if [ $rhel_x -ge 9 ]; then
         systemctl status realtime-entsk | grep "active (running)"
     else
         systemctl status rt-entsk | grep "active (running)"

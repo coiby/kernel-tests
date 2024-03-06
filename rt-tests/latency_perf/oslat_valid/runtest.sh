@@ -6,7 +6,6 @@
 rt_env_setup
 
 export runtime=${runtime:-5m}
-export nrcpus=$(grep -c ^processor /proc/cpuinfo)
 export LAT_THRES=${LAT_THRES:-40}
 
 [ -f $TEST ] && TEST="rt-tests/latency_perf/oslat_valid"
@@ -16,7 +15,6 @@ export LAT_THRES=${LAT_THRES:-40}
     echo 0 > $HOME/REBOOT_COUNT
 }
 
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 
 function system_profile()
 {
@@ -31,7 +29,7 @@ function system_profile()
 function runtest()
 {
     # clone oslat program from github. (after 8.3 ES3, oslat built in rt-tests package)
-    if [ $rhel_major -ge 9 ]; then
+    if [ $rhel_x -ge 9 ]; then
         dnf install -y realtime-tests stalld
     else
         dnf install -y rt-tests

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 export RTEVAL_DURATION=${RTEVAL_DURATION:-30s}
 
 export TEST="rt-tests/us/rteval/stress-ng"
@@ -75,10 +78,7 @@ function runtest()
     fi
 }
 
-declare rhel_major=$(grep -o '[0-9]*\.*[0-9]*' /etc/redhat-release | awk -F "." '{print $1}')
-declare rhel_minor=$(grep -o '[0-9]*\.*[0-9]*' /etc/redhat-release | awk -F "." '{print $2}')
-if [[ ( $rhel_major -lt 8 ) ||
-      ( $rhel_major -eq 8 && $rhel_minor -lt 3 ) ]]; then
+if rhel_in_range 0 8.2; then
     echo "Not supported in RHEL-RT < 8.3 -- skipping test case" | tee -a $OUTPUTFILE
     rstrnt-report-result $TEST "SKIP" 0
     exit 0

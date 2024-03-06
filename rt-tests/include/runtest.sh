@@ -15,9 +15,6 @@
 . "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/tuned_realtime.sh
 [[ "${verbose}" == "true" ]] && set -x  # restore debug outputs if set
 
-rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
-export rhel_major rhel_minor
 
 if stat /run/ostree-booted > /dev/null 2>&1; then
   PKGMGR="rpm-ostree -Ay --idempotent --allow-inactive install"
@@ -31,9 +28,9 @@ export PKGMGR
 function rt_package_install()
 {
     # install RT packages
-    if [ "$rhel_major" -eq 7 ]; then
+    if [ "$rhel_x" -eq 7 ]; then
         packages="rt-tests rt-setup rteval rteval-loads rtcheck tuned-profiles-realtime tuna"
-    elif [ "$rhel_major" -eq 8 ]; then
+    elif [ "$rhel_x" -eq 8 ]; then
         packages="rt-tests rt-setup rteval rteval-loads tuned-profiles-realtime tuna"
     else
         packages="realtime-tests realtime-setup rteval rteval-loads tuned-profiles-realtime tuna stress-ng stalld"
@@ -50,9 +47,9 @@ function rt_package_install()
 
     # install additional standard packages
     $PKGMGR  bc curl gcc gdb git patch pciutils rpm-build strace time unzip wget zip
-    if [ "$rhel_major" -eq 8 ]; then
+    if [ "$rhel_x" -eq 8 ]; then
         $PKGMGR python36 python3-pip
-    elif [ "$rhel_major" -ge 9 ]; then
+    elif [ "$rhel_x" -ge 9 ]; then
         $PKGMGR python3 python3-pip
     fi
 }

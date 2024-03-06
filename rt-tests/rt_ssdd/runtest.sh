@@ -4,11 +4,13 @@
 . ../../automotive/include/rhivos.sh
 : ${OUTPUTFILE:=runtest.log}
 
+# Source rt common functions
+. ../include/runtest.sh || exit 1
+
 export TEST="rt-tests/rt_ssdd"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 
 if ! kernel_automotive; then
-    declare pkg_name="rt-tests" && (( rhel_major >= 9 )) && pkg_name="realtime-tests"
+    declare pkg_name="rt-tests" && (( rhel_x >= 9 )) && pkg_name="realtime-tests"
     which ssdd || yum install -y $pkg_name
 fi
 

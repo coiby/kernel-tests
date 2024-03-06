@@ -20,14 +20,11 @@ if ! kernel_automotive; then
     rt_env_setup
 fi
 
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
-declare num_cpus=$(grep -c ^processor /proc/cpuinfo)
 
 echo "--- Test Start ---" | tee -a $OUTPUTFILE
 
 if ! kernel_automotive; then
-    declare pkg_name="rt-tests" && [ $rhel_major -ge 9 ] && pkg_name="realtime-tests"
+    declare pkg_name="rt-tests" && [ $rhel_x -ge 9 ] && pkg_name="realtime-tests"
     which pi_stress || yum install -y $pkg_name
 fi
 
@@ -54,8 +51,8 @@ else
     rstrnt-report-result "pi_stress SCHED_RR" "FAIL" "1"
 fi
 
-echo "Running pi_stress --quiet --groups=$(( num_cpus )) --duration=30" | tee -a $OUTPUTFILE
-pi_stress --quiet --groups=$(( num_cpus )) --duration=30 | tee -a $OUTPUTFILE
+echo "Running pi_stress --quiet --groups=$(( nrcpus )) --duration=30" | tee -a $OUTPUTFILE
+pi_stress --quiet --groups=$(( nrcpus )) --duration=30 | tee -a $OUTPUTFILE
 if [ $? -eq 0 ]; then
     rstrnt-report-result "pi_stress maxcpu" "PASS" "0"
 else

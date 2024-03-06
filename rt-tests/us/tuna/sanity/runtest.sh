@@ -1,9 +1,10 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/tuna/sanity"
 export result_r="PASS"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
 
 function check_status()
 {
@@ -56,7 +57,7 @@ function runtest()
     check_status "install tuna"
 
     # since 9.2 tuna CLI feature changes, detail in bz2062865
-    if [[ $rhel_major -lt 9 || ($rhel_major -eq 9 && $rhel_minor -lt 2) ]]; then
+    if rhel_in_range 0 9.1; then
         tuna_rhel8
     else
         tuna_rhel

@@ -9,7 +9,6 @@
 
 # Source rt common functions
 . ../../../include/runtest.sh || exit 1
-. ../../../include/lib.sh || exit 1
 
 export TEST="rt-tests/us/rt-tests/oslat"
 
@@ -114,7 +113,7 @@ oslat_skip_checks
 if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
     echo "Test Start Time: $(date)" | tee -a $OUTPUTFILE
 
-    declare pkg_name="rt-tests" && [ $rhel_major -ge 9 ] && pkg_name="realtime-tests"
+    declare pkg_name="rt-tests" && [ $rhel_x -ge 9 ] && pkg_name="realtime-tests"
     rpm -q --quiet $pkg_name || yum install -y $pkg_name
 
     if ! which oslat; then
