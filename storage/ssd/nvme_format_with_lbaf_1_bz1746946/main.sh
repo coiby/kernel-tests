@@ -19,8 +19,8 @@ for DISK in $DISKS; do
 	if [[ $MODEL =~ "INTEL SSDPEDMD016T4" ]]; then
 		#BZ2097565
 		tnot "nvme format --lbaf=1 /dev/$DISK -f"
-	elif rlIsRHEL 9 && [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Ent NVMe v2 AGN RI" ]]; then
-		tlog "Will skip $MODEL, this test will lead system panic, BZ2110902"
+	elif [[ $MODEL =~ "Dell Express Flash NVMe P4800X" ]]; then
+		tlog "$DISK: format will take long time, skipping it"
 		continue
 	else
 		tok "nvme format --lbaf=1 /dev/$DISK -f"
