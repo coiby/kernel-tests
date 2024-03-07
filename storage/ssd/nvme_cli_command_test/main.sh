@@ -115,7 +115,13 @@ for DISK in $DISKS; do
 		tok "nvme format ${NVME_DISK} --lbaf=0 -f"
 	fi
 	tok "nvme admin-passthru ${NVME_CHAR} --opcode=06 --data-len=4096 --cdw10=1 -r"
-	tok "nvme io-passthru ${NVME_DISK} --opcode=2 --namespace-id=1 --data-len=4096 --read --cdw10=0 --cdw11=0 --cdw12=0x70000 --raw-binary"
+
+	if [[ $MODEL =~ "Dell Express Flash NVMe P4800X" ]]; then
+		trun "nvme io-passthru ${NVME_DISK} --opcode=2 --namespace-id=1 --data-len=4096 --read --cdw10=0 --cdw11=0 --cdw12=0x70000 --raw-binary"
+	else
+		tok "nvme io-passthru ${NVME_DISK} --opcode=2 --namespace-id=1 --data-len=4096 --read --cdw10=0 --cdw11=0 --cdw12=0x70000 --raw-binary"
+	fi
+
 	tlog "TODO: nvme  security-send"
 	tlog "TODO: nvme security-recv"
 	tlog "TODO: nvme resv-acquire"
