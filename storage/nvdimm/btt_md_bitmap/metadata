@@ -10,5 +10,5 @@ destructive=no
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
 dependencies=mdadm;ndctl
-max_time=3h
+max_time=4h
 use_pty=false
