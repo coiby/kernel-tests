@@ -135,7 +135,11 @@ for DISK in $DISKS; do
 		tok "nvme write-uncor -s 0 -c 512 ${NVME_DISK}"
 	fi
 
-	tok "nvme format ${NVME_DISK} --lbaf=0 -f"
+	if [[ $MODEL =~ "Dell Express Flash NVMe P4800X" ]]; then
+		tlog "RHEL-26196: skip nvme format for $MODEL"
+	else
+		tok "nvme format ${NVME_DISK} --lbaf=0 -f"
+	fi
 
 	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
 		tok "nvme sanitize ${NVME_DISK} -a 0x02"
