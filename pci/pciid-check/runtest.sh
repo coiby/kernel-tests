@@ -8,7 +8,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2022 Red Hat, Inc. All rights reserved.
+#   Copyright (c) 2024 Red Hat, Inc. All rights reserved.
 #
 #   This copyrighted material is made available to anyone wishing
 #   to use, modify, copy, or redistribute it subject to the terms
@@ -70,10 +70,13 @@ echo -e "\n==== Checking default pci-ids file..."
 check_ids default
 
 echo -e "\n==== Fetching upstream pci-ids file..."
-update-pciids
-if [ "$?" -ne 0 ]; then
-    echo "Unable to download pci-ids file, exiting."
-    report_result "$TEST" "FAIL"
+# Workaround for https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1875
+rlRun "update-pciids" 0-255
+ret=$?
+if (( ret != 0 )); then
+    rlLog "Aborting test. Failed to fetch pci-ids. This is an issue with update-pciids"
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 1
 fi
 
