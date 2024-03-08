@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/rt-tests/cyclictest/snapshot"
 export result_r="PASS"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
+export rhel_x
 
 function check_status()
 {
@@ -16,7 +19,7 @@ function check_status()
 
 function runtest()
 {
-    declare rt_tests_pkg="rt-tests" && [ $rhel_major -ge 9 ] && rt_tests_pkg="realtime-tests"
+    declare rt_tests_pkg="rt-tests" && [ $rhel_x -ge 9 ] && rt_tests_pkg="realtime-tests"
 
     rpm -q --quiet $rt_tests_pkg || yum install -y $rt_tests_pkg
     check_status "install ${rt_tests_pkg}"

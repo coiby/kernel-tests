@@ -4,15 +4,16 @@
 # Include beaker environment
 . /usr/bin/rhts_environment.sh || exit 1
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 # Vars
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
 export TEST="rt-tests/us/stalld/selftest"
 
 function install_and_start_stalld()
 {
     # Only run on 8.4 and up
-    if ! ( (( "$rhel_major" == 8 && "$rhel_minor" >= 4 )) || (( "$rhel_major" > 8 )) ); then
+    if rhel_in_range 0 8.3; then
         echo "stalld is only supported for RHEL >= 8.4 and up" || tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "SKIP" 5
         exit 0

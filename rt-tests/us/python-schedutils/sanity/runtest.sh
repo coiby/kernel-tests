@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/python-schedutils/sanity"
 export result_r="PASS"
+export nrcpus rhel_x
 
 function check_status()
 {
@@ -15,16 +19,14 @@ function check_status()
 
 function runtest()
 {
-    declare rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-
     echo "Package python-schedutils sanity test:" | tee -a $OUTPUTFILE
-    if [ $rhel_major -ge 9 ]; then
+    if [ $rhel_x -ge 9 ]; then
         echo "python3-schedutils removed from rhel-9" || tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "SKIP" 5
         exit 0
     fi
 
-    if [ $rhel_major -lt 8 ]; then
+    if [ $rhel_x -lt 8 ]; then
         rpm -q --quiet python-schedutils || yum install -y python-schedutils
         check_status "install python-schedutils"
     else
@@ -50,8 +52,7 @@ function runtest()
     # kill current 'sleep 1d' so we can spawn a new one for the following test
     kill -9 $sleep_pid ; wait $sleep_pid 2>/dev/null
 
-    declare num_cpus=$(grep -c ^processor /proc/cpuinfo)
-    if [ $num_cpus -gt 2 ]; then
+    if [ $nrcpus -gt 2 ]; then
         echo "-- ptaskset: start 'sleep 1d' on CPU 1 & 2 ----" | tee -a $OUTPUTFILE
         ptaskset -c 1,2 sleep 1d &
         check_status "ptaskset -c 1,2 sleep 1d &"

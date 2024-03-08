@@ -7,10 +7,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/rt-tests/sanity"
 export result_r="PASS"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-export rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
+export nrcpus rhel_x
 
 function check_status()
 {
@@ -24,13 +26,11 @@ function check_status()
 
 function runtest()
 {
-    local rt_tests_pkg="rt-tests" && [ $rhel_major -ge 9 ] && rt_tests_pkg="realtime-tests"
+    local rt_tests_pkg="rt-tests" && [ $rhel_x -ge 9 ] && rt_tests_pkg="realtime-tests"
     echo "Package rt-tests sanity test:" | tee -a $OUTPUTFILE
 
     rpm -q --quiet $rt_tests_pkg || yum install -y $rt_tests_pkg
     check_status "install $rt_tests_pkg"
-
-    declare num_cpus=$(grep -c ^processor /proc/cpuinfo)
 
 
     # Note: test changing the runtime/deadline/period parameters of cyclicdeadline's
@@ -53,8 +53,8 @@ function runtest()
     check_status "cyclictest --smp -umq -p95 --duration=30s"
     cyclictest -i 100 -umq -p95 -t 4 -b 1 --tracemark --duration=30s
     check_status "cyclictest -i 100 -umq -p95 -t 4 -b 1 --tracemark --duration=30s"
-    cyclictest -t $(( num_cpus * 2 )) -q --duration=10s
-    check_status "cyclictest -t $(( num_cpus * 2 )) -q --duration=10s"
+    cyclictest -t $(( nrcpus * 2 )) -q --duration=10s
+    check_status "cyclictest -t $(( nrcpus * 2 )) -q --duration=10s"
 
 
     echo "-- deadline_test ------------------------------" | tee -a $OUTPUTFILE
@@ -114,8 +114,8 @@ function runtest()
 
 
     echo "-- rt-migrate-test ----------------------------" | tee -a $OUTPUTFILE
-    rt-migrate-test $num_cpus
-    check_status "rt-migrate-test $num_cpus"
+    rt-migrate-test $nrcpus
+    check_status "rt-migrate-test $nrcpus"
 
 
     # Note: many of the /proc/sys/kernel/* interfaces do not exist in RHEL-8+

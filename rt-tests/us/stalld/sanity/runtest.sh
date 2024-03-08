@@ -27,6 +27,7 @@ export TEST="rt-tests/us/stalld/sanity"
 STALLD_PID=""
 MAX_RUNTIME=120  # seconds
 
+export nrcpus
 
 runtime_lt_threshold() { (( runtime < MAX_RUNTIME )) && return 0 || return 1 ; }
 
