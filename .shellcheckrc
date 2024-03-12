@@ -4,7 +4,5 @@ disable=SC2046
 disable=SC2155
 # Use cd|pushd|popd ... || exit in case cd|pushd|popd fails.
 disable=SC2164
-# Prefer [ p ] && [ q ] as [ p -a q ] is not well defined.
-disable=SC2166
 # Quote to prevent word splitting/globbing, or split robustly with mapfile or read -a.
 disable=SC2206
