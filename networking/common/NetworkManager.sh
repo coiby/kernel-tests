@@ -99,7 +99,7 @@ NM_setup_team()
 
 	# parse team options
 	team_json=${TEAM_JSON}
-	[ -z "$TEAM_JSON" -a -n "$TEAM_OPTS" ] && {
+	[[ -z "$TEAM_JSON" && -n "$TEAM_OPTS" ]] && {
 		local v_runner=$(echo $TEAM_OPTS | \
 			awk '/runner/{match($0,"runner=([^ ]+)",M); print M[1]}')
 		local v_link_watch=$(echo $TEAM_OPTS | \
