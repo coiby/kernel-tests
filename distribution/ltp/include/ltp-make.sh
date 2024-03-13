@@ -106,6 +106,7 @@ patch-generic()
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
     if [ "$TESTVERSION" == "20240129" ]; then
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
@@ -118,6 +119,8 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-process_madvise01-fix-smaps-scan-and-min_sw.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tools-Fix-syntax-error-caused-by-in-create_dmesg_ent.patch
+        # Should be placed after 0001-tools-Fix-syntax-error-caused-by-in-create_dmesg_ent.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
     fi
     if [ "$TESTVERSION" == "20230516" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
@@ -195,6 +198,14 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tools-Fix-syntax-error-caused-by-in-create_dmesg_ent.patch
+        # Should be placed after 0001-tools-Fix-syntax-error-caused-by-in-create_dmesg_ent.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
+    fi
+
+    if [ "$TESTVERSION" == "20200120" ]; then
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tools-Fix-syntax-error-caused-by-in-create_dmesg_ent.patch
+        # Should be placed after 0001-tools-Fix-syntax-error-caused-by-in-create_dmesg_ent.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
     fi
 
     if [ "$ARCH" == "ppc" ] || [ "$ARCH" == "ppc64" ] || [ "$ARCH" == "s390" ] || [ "$ARCH" == "s390x" ]; then
