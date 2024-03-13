@@ -18,9 +18,9 @@ function check_status()
 
 function runtest()
 {
-    # rtla hwnoise supports from 8.9 and 9.3
-    if rhel_in_range 0 8.8 || rhel_in_range 9.0 9.2; then
-        echo "rtla hwnoise is only supported for RHEL >= 8.9 and >= 9.3" || tee -a $OUTPUTFILE
+    # rtla hwnoise supports from 8.9 and 9.2
+    if rhel_in_range 0 8.8 || rhel_in_range 9.0 9.1; then
+        echo "rtla hwnoise is only supported for RHEL >= 8.9 and >= 9.2" || tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "SKIP" 0
         exit 0
     fi

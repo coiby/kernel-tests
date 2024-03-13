@@ -47,8 +47,8 @@ function skip_auto_analysis_test()
 
 function runtest()
 {
-    if rhel_in_range 8.8 8.10 || rhel_in_range 9.2 100; then
-        echo "rtla is only supported for RHEL >= 8.8 and >= 9.2" || tee -a $OUTPUTFILE
+    if rhel_in_range 0 8.7 || rhel_in_range 9.0 9.1; then
+        echo "rtla timerlat is only supported for RHEL >= 8.8 and >= 9.2" || tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "SKIP" 0
         exit 0
     fi
