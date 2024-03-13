@@ -26,7 +26,7 @@
 #
 # -----------------------------------------------------------------------------
 
-SCRIPT_DIR="$(realpath "$(dirname "$BASH_SOURCE")")"
+SCRIPT_DIR="$(readlink -e "$(dirname "$BASH_SOURCE")")"
 
 source "$SCRIPT_DIR/../shared/file-utils.sh"
 source "$SCRIPT_DIR/../shared/vmlinuz.sh"
@@ -63,7 +63,7 @@ function dump_alias()
 
         find $kernel_dir -name "*.ko" -or -name "*.ko.*" -type f \
         | xargs -I KO bash -c '
-                rel_path=$(realpath --relative-to="'$kernel_dir'" "KO");
+                rel_path=$(readlink -e "KO");
                 alias_out=${rel_path%.ko[^\/]*}.alias
 
                 source "'$SCRIPT_DIR'/../shared/file-utils.sh";
@@ -165,7 +165,7 @@ function main()
                 | xargs -I MATCH_LINE bash -c '
                         line="MATCH_LINE";
                         file=${line%%:*};
-                        file=$(realpath --relative-to='$old_alias_dir' $file);
+                        file=$(readlink -e $file);
                         line=${line#*:};
                         file=${file/.alias/.ko};
                         echo $file $line;'
