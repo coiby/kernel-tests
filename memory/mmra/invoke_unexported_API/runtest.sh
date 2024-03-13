@@ -10,7 +10,7 @@ rlJournalStart
         rlShowRunningKernel
     rlPhaseEnd
     rlPhaseStartTest
-    rlRun "make test 2>&1" 
+    rlRun "make test 2>&1" 2
     rlRun "dmesg > dmesg-test.log"
     rlAssertGrep "Unexported symbol" dmesg-test.log
     rlFileSubmit dmesg-test.log

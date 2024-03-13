@@ -22,7 +22,7 @@ clean:
 # 	$(MAKE) -C $(KERNEL_SRC) M=$$PWD modules_install
 
 test:
-	$(MAKE) -C $(KERNEL_SRC) M=$$PWD
+	make -C $(KERNEL_SRC) M=$$PWD
 	dmesg -C
 	insmod unexported_module.ko
 	-rmmod unexported_module
