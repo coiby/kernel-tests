@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source rt common functions
-. ../../../include/runtest.sh || exit 1
+. ../../../include/lib.sh || exit 1
 
 export TEST="rt-tests/us/rtla/rtla-hwnoise"
 export result_r="PASS"
