@@ -49,8 +49,8 @@ function runtest()
     check_status "rtla hwnoise -P F:1 -c 0 -r 900000 -d 1M -q"
 
     echo "-- rtla-hwnoise: stop the trace if a single sample is higher than 1 us -------------------" | tee -a $OUTPUTFILE
-    rtla hwnoise -s 1 -T 1 -t
-    check_status "rtla hwnoise -s 1 -T 1 -t"
+    rtla hwnoise -s 1 -T 1 -t -d 30s
+    check_status "rtla hwnoise -s 1 -T 1 -t -d 30s"
 
     echo "-- rtla-hwnoise: enable a trace event trigger -------------------" | tee -a $OUTPUTFILE
     rtla hwnoise -t -e osnoise:irq_noise --trigger="hist:key=desc,duration/1000:sort=desc,duration/1000:vals=hitcount" -d 1m
