@@ -1,7 +1,7 @@
 #!/bin/bash
 # Include BeakerLib library
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. ../../../../kernel-include/runtest.sh || exit 1
+. ../../../kernel-include/runtest.sh || exit 1
 MODULE="unexported_module"
 MODFILE="${MODULE}.ko"
 
