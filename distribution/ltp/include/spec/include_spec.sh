@@ -86,7 +86,7 @@ Describe "distribution/ltp/include: RprtRslt"
     Parameters
         # results - subtest failed log - total failures
         PASS "" "0"
-        FAIL "prctl09.fail.log" "1"
+        FAIL "prctl09__with_dmesg_entry.fail.log" "1"
         FAIL "" "1"
     End
     It "RprtRslt $1 $2"
