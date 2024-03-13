@@ -10,5 +10,6 @@ test: bash ./runtest.sh
 framework: beakerlib
 require:
   - beakerlib
+  - make
 enabled: true
 duration: 10m
