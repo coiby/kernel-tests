@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+#shellcheck disable=SC2038
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,7 +27,7 @@
 #
 # -----------------------------------------------------------------------------
 
-SCRIPT_DIR="$(readlink -e "$(dirname "$BASH_SOURCE")")"
+SCRIPT_DIR="$(readlink -e "$(dirname "${BASH_SOURCE[0]}")")"
 
 source "$SCRIPT_DIR/../shared/file-utils.sh"
 source "$SCRIPT_DIR/../shared/vmlinuz.sh"
@@ -41,9 +42,6 @@ source "$SCRIPT_DIR/../shared/ksymbols.sh"
 #  - VMLinu{x,z} files in /boot
 # Duplicit sources are here on purpose as it is not guaranteed that all will
 # be present on the system.
-
-NEW_KERNEL_KO=()
-OLD_KERNEL_KO=()
 
 function dump_alias()
 {
@@ -61,12 +59,12 @@ function dump_alias()
         echo "    Per-KO Files: $2"
         echo "    Summary File: $3"
 
-        find $kernel_dir -name "*.ko" -or -name "*.ko.*" -type f \
+        find "$kernel_dir" -name "*.ko" -or -name "*.ko.*" -type f \
         | xargs -I KO bash -c '
                 rel_path=$(readlink -e "KO");
                 alias_out=${rel_path%.ko[^\/]*}.alias
 
-                source "'$SCRIPT_DIR'/../shared/file-utils.sh";
+                source "'"$SCRIPT_DIR"'/../shared/file-utils.sh";
 
                 echo "  * Dumping aliases for KO ...";
 
@@ -75,10 +73,10 @@ function dump_alias()
                 tmpfile="$(mktemp XXXXXX-$basename_ko.ko)"
                 file_contents "KO" > "$tmpfile"
 
-                mkdir -p "$(dirname "'$alias_dir'/${rel_path}")";
+                mkdir -p "$(dirname "'"$alias_dir"'/${rel_path}")";
 
-                modinfo -F alias "$tmpfile" | grep -v "^platform:" >> "'$alias_dir'/$alias_out";
-                modinfo -F alias "$tmpfile" | grep -v "^platform:" >> "'$alias_all'";
+                modinfo -F alias "$tmpfile" | grep -v "^platform:" >> "'"$alias_dir"'/$alias_out";
+                modinfo -F alias "$tmpfile" | grep -v "^platform:" >> "'"$alias_all"'";
 
                 rm $tmpfile;'
 }
@@ -121,9 +119,9 @@ function main()
         mv "$old_alias_all.tmp" "$old_alias_all"
 
         alias_diff=$(mktemp alias-diff-XXXXXX --tmpdir=/tmp)
-        TMP_FILES+=($alias_diff)
+        TMP_FILES+=("$alias_diff")
 
-        comm -13 "$new_alias_all" "$old_alias_all" > $alias_diff
+        comm -13 "$new_alias_all" "$old_alias_all" > "$alias_diff"
 
         # REMARK: While diff is usually sufficient, there are perfectly valid
         # changes such as:
@@ -144,7 +142,7 @@ function main()
                                 if [[ $alias_entry_old =~ $alias_entry_new ]]
                                 then
                                         echo "INFO: Old alias $alias_entry_old covered by $alias_entry_new."
-                                        sed -i '/^'"${alias_entry_old//\*/.\*}"'$/d' $alias_diff
+                                        sed -i '/^'"${alias_entry_old//\*/.\*}"'$/d' "$alias_diff"
                                 fi
                         done 8< "$new_alias_all"
                 done 9< "$alias_diff"
