@@ -20,7 +20,8 @@ rlJournalStart
         ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
     rlPhaseEnd
     rlPhaseStartTest
-    rlRun "make test 2>&1" 2
+    rlRun "make test 2>test.log" 2
+    rlAssertGrep "ERROR: modpost: "unexported_kernel_symbol"" test.log 
     rlRun "dmesg > dmesg-test.log"
     rlAssertGrep "Unexported symbol" dmesg-test.log
     rlFileSubmit dmesg-test.log
