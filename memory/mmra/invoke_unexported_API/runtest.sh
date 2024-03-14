@@ -23,6 +23,7 @@ rlJournalStart
     # rlRun "make test 2>&1" 2
     rlRun "make test 2> test.log" 2
     rlAssertGrep "ERROR: modpost: \"unexported_kernel_symbol\"" test.log
+    rlRun "insmod unexported_module.ko"
     rlRun "dmesg > dmesg-test.log"
     rlAssertGrep "Unexported symbol" dmesg-test.log
     rlFileSubmit dmesg-test.log
