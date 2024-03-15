@@ -16,7 +16,6 @@ rlJournalStart
         else
             export pkg_mgr_inst_string="-y install"
         fi
-        # shellcheck disable=SC2086
         ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
     rlPhaseEnd
     rlPhaseStartTest
@@ -25,13 +24,12 @@ rlJournalStart
     rlRun "insmod unexported_module.ko 2> test.log" 0-255
     # rlRun "dmesg > dmesg-test.log"
     rlAssertGrep "ERROR: could not load module unexported_module.ko: No such file or directory" test.log
-    # rlAssertGrep "Unexported symbol" dmesg-test.log
-    rlFileSubmit dmesg-test.log
+#    rlFileSubmit dmesg-test.log
     rlFileSubmit test.log
     rlPhaseEnd
 
 rlPhaseStartCleanup
-        rlRun "make clean" 0 "Cleaning up"
-        rlRun "rmmod $MODULE" 0-255 "Removing module if it was loaded"
+        rlRun "make clean" 0
+        rlRun "rmmod $MODULE" 0-255
     rlPhaseEnd
 rlJournalEnd

@@ -23,9 +23,5 @@ clean:
 
 test:
 	$(MAKE) -C $(KERNEL_SRC) M=$$PWD
-#	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
 	dmesg -C
-	insmod unexported_module.ko
-	-rmmod unexported_module
-	dmesg
 endif
