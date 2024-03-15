@@ -249,7 +249,7 @@ function install_xfstests_git()
 	cd ~/rpmbuild/SPECS/ || cd /usr/src/redhat/SPECS || return 2
 	cp -f /root/xfstests-dev.tar.bz2 ../SOURCES/xfstests-dev.tar.bz2
 	rpmbuild -bb xfstests.spec 2>&1 | tee build.log
-	RPM=`egrep "Wrote.*$HARNESS_BAS" build.log | awk '{print $NF}'`
+	RPM=`grep -E "Wrote.*$HARNESS_BAS" build.log | awk '{print $NF}'`
 	rpm -e xfstests
 	yum install --nogpgcheck -y $RPM
 	cd -
@@ -276,7 +276,7 @@ function install_xfstests_pkg()
 
 		rpmbuild --rebuild ${HARNESS_SRPM} 2>&1 | tee  build.log
 
-		RPM=`egrep "Wrote.*${HARNESS}-[0-9]" build.log | awk '{print $NF}'`
+		RPM=`grep -E "Wrote.*${HARNESS}-[0-9]" build.log | awk '{print $NF}'`
 
 		# use yum here to resolve dependcies automatically in rhts
 		yum install --nogpgcheck -y $RPM

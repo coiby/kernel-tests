@@ -1064,7 +1064,7 @@ function free_loops()
 function release_loops()
 {
 	# Check that no loop device is blocking TEST_DIR or SCRATCH_MNT
-	loops="$(losetup -a |egrep $TEST_DIR\|$SCRATCH_MNT |cut -d ':' -f 1)"
+	loops="$(losetup -a |grep -E $TEST_DIR\|$SCRATCH_MNT |cut -d ':' -f 1)"
 	if [ -n "$loops" ];then
 		sleep 1
 		for i in $loops
