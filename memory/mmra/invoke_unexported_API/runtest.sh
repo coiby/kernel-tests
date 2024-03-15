@@ -19,13 +19,13 @@ rlJournalStart
         ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
     rlPhaseEnd
     rlPhaseStartTest
-    rlRun "make test 2> test.log" 2
-    rlAssertGrep "ERROR: modpost: \"unexported_kernel_symbol\"" test.log
-    rlRun "insmod unexported_module.ko 2> test.log" 0-255
-    # rlRun "dmesg > dmesg-test.log"
-    rlAssertGrep "ERROR: could not load module unexported_module.ko: No such file or directory" test.log
-#    rlFileSubmit dmesg-test.log
-    rlFileSubmit test.log
+        rlRun "make test 2> test.log" 2
+        rlAssertGrep "ERROR: modpost: \"unexported_kernel_symbol\"" test.log
+        rlRun "insmod unexported_module.ko 2> test.log" 0-255
+        # rlRun "dmesg > dmesg-test.log"
+        rlAssertGrep "ERROR: could not load module unexported_module.ko: No such file or directory" test.log
+        #rlFileSubmit dmesg-test.log
+        rlFileSubmit test.log
     rlPhaseEnd
 
 rlPhaseStartCleanup
