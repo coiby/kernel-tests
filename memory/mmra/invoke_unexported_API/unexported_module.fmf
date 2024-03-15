@@ -11,5 +11,8 @@ framework: beakerlib
 require:
   - beakerlib
   - make
+  - type: file
+    pattern:
+        - /kernel-include
 enabled: true
 duration: 10m
