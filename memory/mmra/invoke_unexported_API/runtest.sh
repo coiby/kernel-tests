@@ -28,7 +28,7 @@ rlJournalStart
         rlFileSubmit test.log
     rlPhaseEnd
 
-rlPhaseStartCleanup
+    rlPhaseStartCleanup
         rlRun "make clean" 0
         rlRun "rmmod $MODULE" 0-255
     rlPhaseEnd
