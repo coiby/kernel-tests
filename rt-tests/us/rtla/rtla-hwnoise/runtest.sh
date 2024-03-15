@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source rt common functions
-. ../../../include/runtest.sh || exit 1
+. ../../../include/lib.sh || exit 1
 
 export TEST="rt-tests/us/rtla/rtla-hwnoise"
 export result_r="PASS"
@@ -18,9 +18,9 @@ function check_status()
 
 function runtest()
 {
-    # rtla hwnoise supports from 8.9 and 9.3
-    if rhel_in_range 0 8.8 || rhel_in_range 9.0 9.2; then
-        echo "rtla hwnoise is only supported for RHEL >= 8.9 and >= 9.3" || tee -a $OUTPUTFILE
+    # rtla hwnoise supports from 8.9 and 9.2
+    if rhel_in_range 0 8.8 || rhel_in_range 9.0 9.1; then
+        echo "rtla hwnoise is only supported for RHEL >= 8.9 and >= 9.2" || tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "SKIP" 0
         exit 0
     fi
@@ -49,8 +49,8 @@ function runtest()
     check_status "rtla hwnoise -P F:1 -c 0 -r 900000 -d 1M -q"
 
     echo "-- rtla-hwnoise: stop the trace if a single sample is higher than 1 us -------------------" | tee -a $OUTPUTFILE
-    rtla hwnoise -s 1 -T 1 -t
-    check_status "rtla hwnoise -s 1 -T 1 -t"
+    rtla hwnoise -s 1 -T 1 -t -d 30s
+    check_status "rtla hwnoise -s 1 -T 1 -t -d 30s"
 
     echo "-- rtla-hwnoise: enable a trace event trigger -------------------" | tee -a $OUTPUTFILE
     rtla hwnoise -t -e osnoise:irq_noise --trigger="hist:key=desc,duration/1000:sort=desc,duration/1000:vals=hitcount" -d 1m
