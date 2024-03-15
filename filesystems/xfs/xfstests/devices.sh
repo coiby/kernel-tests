@@ -1291,8 +1291,8 @@ export FSTYPE=${FSTYPE:-xfs}
 echo "####################"
 lsblk
 df -h
-FREE=$(df -kh --output=avail / | tail -n 1 | sed 's|G||' | sed 's|.||')
-echo "Free Space: $FREE"
+FREE=$(df -BG --output=avail / | tail -n 1 | sed 's|G||' | sed 's|.||')
+echo "Free Space of /: $FREE"
 export FREE
 test_size=${XFS_LOOP_TEST_SIZE_G:-6}
 echo "Test_Dev_Loop_G: $test_size"
