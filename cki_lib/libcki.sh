@@ -402,8 +402,12 @@ cki_is_kernel_automotive()
 
 cki_is_abd()
 {
-    if grep -qi SA8775P /sys/devices/soc0/machine; then
-        return 0
+    if [ -e /sys/devices/soc0/machine ]; then
+        if grep -qi SA8775P /sys/devices/soc0/machine; then
+            return 0
+        else
+            return 1
+        fi
     else
         return 1
     fi
