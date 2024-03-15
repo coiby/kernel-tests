@@ -6,9 +6,6 @@ description: |
   If it is then forcefully linked or linked accidently then the test can try to load the module
   It would then fail with an error message for unresolved symbols which can be grepped from dmes
 contact: George Jacob <gjacob@redhat.com>
-# environmet:
-#   SET_STREAM_REPO: true
-#   SET_BUILD_REPO: true
 test: bash ./runtest.sh
 framework: beakerlib
 require:
