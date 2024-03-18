@@ -12,14 +12,8 @@ KERNEL_SRC ?= /lib/modules/$(KERNEL_VERSION)/build
 default:
 	$(MAKE) -C $(KERNEL_SRC) M=$$PWD
 
-# modules:
-# 	$(MAKE) -C $(KERNEL_SRC) M=$$PWD modules
-
 clean:
 	$(MAKE) -C $(KERNEL_SRC) M=$$PWD clean
-
-# modules_install:
-# 	$(MAKE) -C $(KERNEL_SRC) M=$$PWD modules_install
 
 test:
 	$(MAKE) -C $(KERNEL_SRC) M=$$PWD
