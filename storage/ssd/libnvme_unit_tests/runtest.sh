@@ -29,7 +29,7 @@ function libnvme_setup
 
 function startup
 {
-	if rlIsRHEL ">9.0" || rlIsFedora ||rlIsCentOS ">9.0"; then
+	if rlIsRHEL ">9.0" || rlIsFedora ||rlIsCentOS "9"; then
 		libnvme_setup
 
 	else
