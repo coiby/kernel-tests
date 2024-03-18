@@ -1,0 +1,9 @@
+summary: Test to confirm IOMMU is set to translation mode by default
+description: |
+  Memory Management Risk assesment test to confirm IOMMU is set to
+  translation mode by default, checking dmesg and the files in /sys to
+  assert the translation mode.
+contact: Pablo Martin <pablmart@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 10m
