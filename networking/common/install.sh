@@ -607,7 +607,7 @@ epel_release_install()
 
 	[ "`rpm -qa | grep epel-release`" ] && return 0
 	# We rarely run test on RHEL5, rhel8 epel is available now.
-	if [ "$release" -le 5 -o "$release" -ge 10 ]; then
+	if [[ "$release" -le 5 || "$release" -ge 10 ]]; then
 		return 0
 	fi
 	rpm -ivh --force --nodeps $epel_fullurl && return 0 || return 1

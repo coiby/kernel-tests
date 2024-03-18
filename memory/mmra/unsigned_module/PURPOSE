@@ -1,0 +1,1 @@
+Verifies that an unsigned kernel module cannot be loaded.

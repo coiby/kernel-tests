@@ -19,7 +19,15 @@ for DISK in $DISKS; do
 	tlog "The testing disk $DISK model is $MODEL"
 	if rlIsRHEL ">7" || rlIsFedora; then
 		for lbaf in 0 1; do
-			if [[ $lbaf == 1 ]]; then
+			if [[ $MODEL =~ "Dell Express Flash NVMe P4800X" ]]; then
+				tlog "/dev/$DISK: $MODEL format need long time, skipping"
+				continue
+			fi
+			if [[ $lbaf == 0 ]]; then
+				if [[ $MODEL =~ "Dell Express Flash PM1725b" ]]; then
+					continue
+				fi
+			elif [[ $lbaf == 1 ]]; then
 				if [[ $MODEL =~ "INTEL SSDPEDMD016T4" ]]; then
 					continue
 				fi
@@ -27,15 +35,22 @@ for DISK in $DISKS; do
 			for ses in 0 1 2; do
 				for pi in 0 1 2 3; do
 					if [[ $lbaf == 0 && $pi != 0 ]]; then
-						if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Samsung SSD 983 DCT"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe v2 AGN RI U.2"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+						if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Samsung SSD 983 DCT"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe v2 AGN RI U.2"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
 							continue
 						fi
-					elif [[ $lbaf == 1 && $pi != 0 ]]; then
+					fi
+					if [[ $lbaf == 1 && $pi != 0 ]]; then
 						if [[ $MODEL =~ "Micron_9300_MTFDHAL3T8TDP"|"Samsung SSD 983 DCT"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Express Flash NVMe P4600"|"Dell Ent NVMe P5500 RI U.2" ]]; then
 							continue
 						fi
-					elif [[ $pi == 0 && $ses == 1 ]]; then
+					fi
+					if [[ $pi == 0 && $ses == 1 ]]; then
 						if [[ $MODEL =~ "SAMSUNG MZQL2960HCJR-00A07" ]]; then
+							continue
+						fi
+					fi
+					if [[ $pi != 0 ]]; then
+						if [[ $MODEL =~ "Dell Express Flash NVMe P4500" ]]; then
 							continue
 						fi
 					fi
@@ -54,6 +69,9 @@ for DISK in $DISKS; do
 							elif [[ $lbaf == 1 && $pi == 0 && $ms == 1 ]]; then
 								if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
 									tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms, /dev/$DISK node disappeared, BZ2081713, skipping"
+									continue
+								elif [[ $MODEL =~ "Dell Express Flash PM1725b"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
+									tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms, /dev/$DISK node cannot be used after format, skipping"
 									continue
 								fi
 							fi

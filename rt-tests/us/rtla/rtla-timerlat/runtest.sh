@@ -5,11 +5,7 @@
 
 export TEST="rt-tests/us/rtla/rtla-timerlat"
 export result_r="PASS"
-
-rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
-SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
-export rhel_major rhel_minor SCHED_RT_RUNTIME
+export SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
 
 function check_status()
 {
@@ -42,7 +38,7 @@ function restore_admission_control()
 
 function skip_auto_analysis_test()
 {
-    if ( (( "$rhel_major" == 8 && "$rhel_minor" <= 8 )) || (( "$rhel_major" == 9 && "$rhel_minor" <=2 ))); then
+    if rhel_in_range 8.9 8.10 || rhel_in_range 9.3 100; then
         echo "rtla auto_analysis is only supported for RHEL >= 8.9 and >= 9.3"
         return 0
     fi
@@ -51,8 +47,8 @@ function skip_auto_analysis_test()
 
 function runtest()
 {
-    if ! ( (( "$rhel_major" == 8 && "$rhel_minor" >= 8 )) || (( "$rhel_major" == 9 && "$rhel_minor" >=2 )) || (( "$rhel_major" >= 10 ))); then
-        echo "rtla is only supported for RHEL >= 8.8 and >= 9.2" || tee -a $OUTPUTFILE
+    if rhel_in_range 0 8.7 || rhel_in_range 9.0 9.1; then
+        echo "rtla timerlat is only supported for RHEL >= 8.8 and >= 9.2" || tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "SKIP" 0
         exit 0
     fi

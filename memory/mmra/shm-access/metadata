@@ -1,0 +1,12 @@
+[General]
+name=memory/mmra/shm-access
+owner=Pablo Ridolfi <pridolfi@redhat.com>
+description=Assert a user process can't write to a shared memory without proper privileges.
+license=ISC
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;gcc;glibc-devel;make
+max_time=10m

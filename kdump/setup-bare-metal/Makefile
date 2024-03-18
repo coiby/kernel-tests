@@ -42,4 +42,6 @@ $(METADATA):
 	@echo "License:      GPLv3"                              >>$(METADATA)
 	@echo "Owner:		 Kdump QE <kdump-qe-list@redhat.com>" >>$(METADATA)
 	@echo "RepoRequires: kdump/include"			 >>$(METADATA)
+	@echo "RepoRequires: cmdline_helper"			 >>$(METADATA)
+	@echo "RepoRequires: cki_lib"			 >>$(METADATA)
 	@echo "Description:  Setup bare metal Kernel for Kdump." >>$(METADATA)

@@ -1,0 +1,15 @@
+summary: Assert a non-root user process can't write to a memory mapped device.
+description: |
+  Assert a non-root user process can't write to a memory mapped device.
+  First try to access /dev/mem. If the operation succeeds, mmap the address
+  range of the device, then try a read and a write operation.
+  Either of these open/read/write operations is expected to fail.
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc-devel
+extra-summary: memory/mmra/iomem-access
+extra-task: memory/mmra/iomem-access
+id: d6723b25-77bf-4112-9188-e03eb7491600

@@ -1,0 +1,16 @@
+#!/usr/bin/bpftrace --unsafe
+
+kprobe:nvme_queue_rq
+{
+    @nvme[cpu] = count();
+}
+
+BEGIN
+{
+	system("sleep 50");
+	exit();
+}
+
+END {
+	printf("\nExiting.\n");
+}

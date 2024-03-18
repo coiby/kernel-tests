@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f $BASH_SOURCE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname $FILE)
 . $CDIR/../include/include.sh || exit 200
 
@@ -28,11 +28,9 @@ done
 	sleep 10
 	STATE=0
 	j=1
-	MAXCPUs=$(lscpu | grep '^CPU(s)' | awk '{print $2}')
 	MAXCPUs=$(nproc)
 	((MAXCPUs--))
-	MINCPU=0
-	lscpu | grep -E "Vendor.*AMD" && MINCPU=1
+	MINCPU=1
 	while((j <= 10))
 	do
 		for i in $(seq "$MINCPU" "$MAXCPUs")

@@ -11,3 +11,4 @@ entry_point=bash -x ./runtest.sh
 dependencies=gcc
 max_time=10m
 use_pty=false
+repoRequires=rt-tests/include

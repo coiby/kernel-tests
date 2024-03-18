@@ -6,10 +6,6 @@
 export TEST="rt-tests/us/rtla/rtla-osnoise"
 export result_r="PASS"
 
-rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
-rhel_minor=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $2}')
-export rhel_major rhel_minor
-
 function check_status()
 {
     if [ $? -eq 0 ]; then
@@ -23,8 +19,8 @@ function check_status()
 function runtest()
 {
     # rtla supports from 8.8 and 9.2
-    if ! ( (( "$rhel_major" == 8 && "$rhel_minor" >= 8 )) || (( "$rhel_major" == 9 && "$rhel_minor" >=2 )) || (( "$rhel_major" >= 10 ))); then
-        echo "rtla is only supported for RHEL >= 8.8 and >= 9.2" || tee -a $OUTPUTFILE
+    if rhel_in_range 0 8.7 || rhel_in_range 9.0 9.1; then
+        echo "rtla osnoise is only supported for RHEL >= 8.8 and >= 9.2" || tee -a $OUTPUTFILE
         rstrnt-report-result $TEST "SKIP" 0
         exit 0
     fi

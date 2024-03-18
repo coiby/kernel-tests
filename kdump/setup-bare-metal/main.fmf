@@ -20,8 +20,14 @@ extra-task: /kernel/kdump/setup-bare-metal
 require:
   - kexec-tools
   - make
+  - type: file
+    pattern:
+      - /cmdline_helper
+      - /cki_lib
+      - /kdump/include
 recommend: 
   - wget
+  - abootimg
 
 adjust:
     - when: NODEBUGINFO==true

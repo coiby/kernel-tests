@@ -1,7 +1,9 @@
 #!/bin/bash
 
+# Source rt common functions
+. ../../../../include/runtest.sh || exit 1
+
 export TEST="rt-tests/us/rt-tests/cyclictest/affinity"
-export rhel_major=$(grep -o '[0-9]*\.[0-9]*' /etc/redhat-release | awk -F '.' '{print $1}')
 export profile_file="/tmp/tuned_profile.txt"
 
 # Test Variable
@@ -13,6 +15,7 @@ export result_r="PASS"
     echo "RSTRNT_REBOOTCOUNT not set - setting to 0 for manual run" | tee -a $OUTPUTFILE
     export RSTRNT_REBOOTCOUNT=0
 }
+export rhel_x
 
 function IsolateCPUs()
 {
@@ -48,7 +51,7 @@ function IsolateCPUs()
 
 function RunTest()
 {
-    declare pkg_name="rt-tests" && [ $rhel_major -ge 9 ] && pkg_name="realtime-tests"
+    declare pkg_name="rt-tests" && [ $rhel_x -ge 9 ] && pkg_name="realtime-tests"
     rpm -q --quiet $pkg_name || yum install -y $pkg_name
     echo "-- Begin cyclictest affinity test --" | tee -a $OUTPUTFILE
 
@@ -98,12 +101,7 @@ function RunTest()
 }
 
 # ------ Start Test --------------------------------
-
-rhel_major=$(grep -o '[0-9]*\.*[0-9]*' /etc/redhat-release | awk -F "." '{print $1}')
-rhel_minor=$(grep -o '[0-9]*\.*[0-9]*' /etc/redhat-release | awk -F "." '{print $2}')
-if [[ ( $rhel_major -lt 7 ) ||
-      ( $rhel_major -eq 7 && $rhel_minor -lt 9 ) ||
-      ( $rhel_major -eq 8 && $rhel_minor -lt 3 ) ]]; then
+if rhel_in_range 0 7.8 || rhel_in_range 8.0 8.3; then
     echo "Not supported in RHEL-RT < 7.9 or RHEL-RT < 8.3 -- skipping test case" | tee -a $OUTPUTFILE
     rstrnt-report-result $TEST "SKIP" 0
     exit 0

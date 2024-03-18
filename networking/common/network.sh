@@ -427,14 +427,14 @@ get_iface_mac()
 	fi
 
 	# ethtool -P bond0 return "Permanent address: not set" now, so we need to check if "not" == "$mac" here
-	if [ -z "$mac" -o "00:00:00:00:00:00" = "$mac" -o "not" = "$mac" ]; then
+	if [[ -z "$mac" || "00:00:00:00:00:00" = "$mac" || "not" = "$mac" ]]; then
 		mac=`cat /etc/sysconfig/network-scripts/ifcfg-$input | \
 			awk -F = '/HWADDR=/ {print $2}' | \
 			tr [A-Z] [a-z] | tr -d '"'`
 	fi
 	# For veth, we don't have ethtool support, and we also don't have
 	# ifcfg file, use 'ip link' after all these check
-	if [ -z "$mac" -o "00:00:00:00:00:00" = "$mac" ]; then
+	if [[ -z "$mac" || "00:00:00:00:00:00" = "$mac" ]]; then
 		mac=`ip link show $input | awk '/link\/ether/ {print $2}'`
 	fi
 	mac=${mac:-"get-mac-error"}
@@ -659,7 +659,7 @@ setup_team()
 
 	# parse team options
 	team_json=${TEAM_JSON}
-	[ -z "$TEAM_JSON" -a -n "$TEAM_OPTS" ] && {
+	[[ -z "$TEAM_JSON" && -n "$TEAM_OPTS" ]] && {
 		local v_runner=$(echo $TEAM_OPTS | \
 			awk '/runner/{match($0,"runner=([^ ]+)",M); print M[1]}')
 		local v_link_watch=$(echo $TEAM_OPTS | \
@@ -1179,7 +1179,7 @@ get_test_iface()
 	local _output=$1
 
 	[ -f /tmp/test_iface ] && reset_network_env
-	[ "$TOPO" = nic -a "$NIC_DRIVER" = any -a "$NIC_NUM" -eq 1 ] && \
+	[[ "$TOPO" = nic && "$NIC_DRIVER" = any && "$NIC_NUM" -eq 1 ]] && \
 		NIC_DRIVER=$(get_iface_driver $(get_required_iface))
 
 	local param_list="NAY PVT NIC_DRIVER NIC_MODEL NIC_SPEED NIC_NUM
@@ -1592,7 +1592,7 @@ exchange_ip_bak()
 	}
 	ip addr show $iface
 
-	if [ -n "$TOPO" -a "$TOPO" != "nic" ];then
+	if [[ -n "$TOPO" && "$TOPO" != "nic" ]];then
 		for i in `cat /tmp/test_nic`;do
 			clear_addr $i
 		done
@@ -1723,7 +1723,7 @@ exchange_ip()
 	}
 	ip addr show $iface
 
-	if [ -n "$TOPO" -a "$TOPO" != "nic" ];then
+	if [[ -n "$TOPO" && "$TOPO" != "nic" ]];then
 		for i in `cat /tmp/test_nic`;do
 				clear_addr $i
 		done

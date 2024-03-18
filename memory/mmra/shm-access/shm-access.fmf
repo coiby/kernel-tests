@@ -1,0 +1,19 @@
+summary: Assert a user process can't write to a shared memory without proper privileges.
+description: |
+  Assert a user process can't write to a shared memory without proper privileges.
+  The test first creates a PAGE_SIZE shared memory segment. Then it launches another
+  process as a non-root user that tries to attach and write to that segment. Either of
+  these operations is expected to fail and this process should be terminated properly.
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - gcc
+  - glibc-devel
+  - make
+extra-summary: memory/mmra/shm-access
+extra-task: memory/mmra/shm-access
+enabled: true
+duration: 10m
+id: 2193c17f-ed9b-4a09-84f1-0e114011de8d

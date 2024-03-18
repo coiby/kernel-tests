@@ -1,0 +1,72 @@
+#!/bin/bash
+#
+# Copyright (c) 2020 Red Hat, Inc. All rights reserved.
+#
+# This copyrighted material is made available to anyone wishing
+# to use, modify, copy, or redistribute it subject to the terms
+# and conditions of the GNU General Public License version 2.
+#
+# This program is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+# PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public
+# License along with this program; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
+#
+
+# Include enviroment and libraries
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "${FILE}")
+. "${CDIR}"/../include/include.sh    || exit 1
+. /usr/share/beakerlib/beakerlib.sh     || exit 1
+
+function run_test()
+{
+    uk_flag=0
+    ublk_flag=0
+    kernel_version=$(uname -r)
+    if [[ ${kernel_version} =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?(-rc[0-9]+)?(\+)?$ ]];then
+        rlLog "It's upstream kernel!"
+        uk_flag=1
+    fi
+
+# if (rlIsRHEL '>=10' || ((${uk_flag} == 1))) && grep -q "CONFIG_BLK_DEV_UBLK=y" "/boot/config-${kernel_version}";then
+    if rlIsRHEL '>=10' || [ "${uk_flag}" -eq 1 ];then
+        if grep -q "CONFIG_BLK_DEV_UBLK=y" "/boot/config-${kernel_version}";then
+            ublk_flag=1
+        fi
+    fi
+
+    if [ "${ublk_flag}" -eq 1 ];then
+        rlRun "git clone https://github.com/ming1/ubdsrv.git"
+        pushd ubdsrv
+        rlRun "autoreconf -i&& ./configure&& make -j 4&& make install > tmp.out 2>&1" "0-255"
+        popd
+
+#make test T=all
+        rlRun "cd ubdsrv"
+        rlRun "make test T=null"
+
+        rlRun "make test T=loop"
+
+        rlRun "make test T=generic"
+    else
+        rlLog "ublk drive not enable on this kernel, skip testing"
+        rstrnt-report-result "ublk not enabled" SKIP 0
+    fi
+    wait
+}
+
+rlJournalStart
+    rlPhaseStartTest
+        rlRun "dmesg -C"
+        rlRun "uname -a"
+        rlLog "$0"
+        run_test
+        check_log
+    rlPhaseEnd
+rlJournalPrintText
+rlJournalEnd

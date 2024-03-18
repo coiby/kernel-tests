@@ -204,7 +204,7 @@ DmesgCheck ()
     pushd "$LTPDIR"/output/"$dmesg_dir"
     for log in *.dmesg.log; do
         DeBug "Checking for issues on dmesg file $log"
-        if grep -E -v "$LTP_FALSESTRINGS" "$log" | grep -E "$LTP_FAILURESTRINGS" >/dev/null 2>&1; then
+        if grep -E -v "$LTP_FALSESTRINGS" "$log" | grep -Ew "$LTP_FAILURESTRINGS" >/dev/null 2>&1; then
             # report failed result dmesg check as subtest name dmesg_check_$subtestname
             subtestname=${log%.dmesg.log}
             rstrnt-report-result -o "$log" "dmesg_check_${subtestname}" FAIL
@@ -224,6 +224,11 @@ RprtRslt ()
     # Always upload parsed test log for those failed test cases
     GetFailureLog $logfile_run "None" > $logfile_fail
     [ -s $logfile_fail ] && SubmitLog $logfile_fail
+    # remove the '__with_dmesg_entry' from the test files
+    # shellcheck disable=SC2045
+    for testcase in $(ls *__with_dmesg_entry.* 2>/dev/null); do
+        mv "$testcase" "${testcase//__with_dmesg_entry}"
+    done
     # shellcheck disable=SC2010
     failed_tests=$(ls *.fail.log)
     for failed_test in $failed_tests; do

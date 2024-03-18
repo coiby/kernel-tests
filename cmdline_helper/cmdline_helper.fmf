@@ -7,6 +7,10 @@ framework: beakerlib
 recommend: 
     - grubby
     - abootimg
+require:
+    - type: file
+      pattern:
+        - /cki_lib
 duration: 30m
 extra-summary: /kernel/cmdline
 extra-task: /kernel/cmdline

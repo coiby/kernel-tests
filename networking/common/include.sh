@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # dynamically get the lib dir
-NETWORK_COMMONLIB_DIR=$(dirname $(readlink -f $BASH_SOURCE))
+NETWORK_COMMONLIB_DIR=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))
 networkLib=$NETWORK_COMMONLIB_DIR
 
 # include beaker default environmnet
@@ -77,7 +77,7 @@ test_pass()
 {
 	let PASS++
 	SCORE=${2:-$PASS}
-	echo -e "\n:: [  PASS  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e "\n:: [  PASS  ] :: Test '$1'" | tee -a $OUTPUTFILE
 	# we don't care how many test passed
 	if [ $JOBID ] || [ $RSTRNT_JOBID ]; then
 		report_result "${TEST}/$1" "PASS"
@@ -92,7 +92,7 @@ test_fail()
 {
 	let FAIL++
 	SCORE=${2:-$FAIL}
-	echo -e ":: [  FAIL  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e ":: [  FAIL  ] :: Test '$1'" | tee -a $OUTPUTFILE
 	# we only care how many test failed
 	if [ $JOBID ] || [ $RSTRNT_JOBID ]; then
 		report_result "${TEST}/$1" "FAIL" "$SCORE"
@@ -107,7 +107,7 @@ test_warn()
 {
 	let WARN++
 	SCORE=${2:-$WARN}
-	echo -e "\n:: [  WARN  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e "\n:: [  WARN  ] :: Test '$1'" | tee -a $OUTPUTFILE
 	if [ $JOBID ] || [ $RSTRNT_JOBID ]; then
 		report_result "${TEST}/$1" "WARN" "${SCORE}"
 	else
@@ -121,7 +121,7 @@ test_skip()
 {
 	let SKIP++
 	SCORE=${2:-$SKIP}
-	echo -e "\n:: [  SKIP  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
+	echo -e "\n:: [  SKIP  ] :: Test '$1'" | tee -a $OUTPUTFILE
 	if [ $JOBID ] || [ $RSTRNT_JOBID ]; then
 		report_result "${TEST}/$1" "SKIP" "${SCORE}"
 	else
@@ -173,17 +173,17 @@ run()
 	cmd=$1
 	# FIXME: only support zero or none zero, doesn't support 2-10, or 2,3,4
 	exp=${2:-0}
-	echo -e "\n[$(date '+%T')][$(whoami)@$(uname -r | cut -f 2 -d-)]# '"$cmd"'" | tee -a $OUTPUTFILE
+	echo -e "\n[$(date '+%T')][$(whoami)@$(uname -r | cut -f 2 -d-)]# '$cmd'" | tee -a $OUTPUTFILE
 	# FIXME: how should we handle if there are lots of output for the cmd,
 	# and we only care the return value
 	#eval "$cmd" &> >(tee -a $OUTPUTFILE)
 	eval "$cmd" > >(tee -a $OUTPUTFILE)
 	local ret=$?
 	if [ "$exp" -eq "$ret" ];then
-		echo -e ":: [  ${GRN}PASS${RES}  ] :: Command '"$cmd"' (Expected $exp, got $ret, score $PASS)" | tee -a $OUTPUTFILE
+		echo -e ":: [  ${GRN}PASS${RES}  ] :: Command '$cmd' (Expected $exp, got $ret, score $PASS)" | tee -a $OUTPUTFILE
 		return 0
 	else
-		echo -e ":: [  ${RED}FAIL${RES}  ] :: Command '"$cmd"' (Expected $exp, got $ret, score $FAIL)" | tee -a $OUTPUTFILE
+		echo -e ":: [  ${RED}FAIL${RES}  ] :: Command '$cmd' (Expected $exp, got $ret, score $FAIL)" | tee -a $OUTPUTFILE
 		return 1
 	fi
 }
@@ -242,6 +242,8 @@ net_sync()
 		FLAG="$(get_round)_${FLAG}"
 	fi
 	log "Start sync ${FLAG}"
+	# shellcheck disable=2091 # there is probably a better way to write this,
+	# but to avoid changing the logic now, just disabling the check...
 	if $(echo $SERVERS | grep -q -i $HOSTNAME);then
 		rhts-sync-set -s ${FLAG}
 		for client in $CLIENTS; do
@@ -393,9 +395,10 @@ main()
 {
 	# source our functions
 	pushd $NETWORK_COMMONLIB_DIR > /dev/null
+	# shellcheck disable=SC1090
 	for lib in *.sh; do
 		# skip self and runtest.sh
-		[ "$lib" = "include.sh" -o "$lib" = "runtest.sh" ] && continue
+		[[ "$lib" = "include.sh" || "$lib" = "runtest.sh" ]] && continue
 		source ./$(basename $lib)
 	done
 

@@ -294,7 +294,11 @@ function RunTest ()
             continue
         fi
 
-        rlPhaseStartTest $item
+        if [ -z "$VM_SELFTEST_ITEMS" ]; then
+            rlPhaseStartTest $item
+        else
+            rlPhaseStartTest $item-$VM_SELFTEST_ITEMS
+        fi
         rlLog "Test Start Time: $(date)"
         # do setup
         _item=$(echo $item | tr \/ \_)

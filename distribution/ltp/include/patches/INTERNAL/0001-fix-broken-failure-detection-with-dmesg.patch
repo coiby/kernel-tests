@@ -1,0 +1,92 @@
+From 71f75ca07592850e81b755d0f9e0183deb9ec9b3 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Fri, 15 Mar 2024 16:50:19 +0800
+Subject: [PATCH] tools: fix broken failure-detection when using individual
+ dmesg logs
+
+This patch fixes the issue where the exit code of the test was not
+properly used or reported after creating the dmesg log. By capturing
+the exit code of the test and then using it as the exit status of
+the entire command sequence, the script ensures that any failure in
+the test is correctly propagated and reported.
+
+Error report:
+
+    Testcase                                           Result     Exit Value
+    --------                                           ------     ----------
+    cn_pec_sh__with_dmesg_entry                        PASS       0
+    kmsg01__with_dmesg_entry                           PASS       0
+    rtc02__with_dmesg_entry                            PASS       0
+    umip_basic_test__with_dmesg_entry                  PASS       0
+    abs01__with_dmesg_entry                            PASS       0
+    atof01__with_dmesg_entry                           PASS       0
+    float_bessel__with_dmesg_entry                     PASS       0
+    float_exp_log__with_dmesg_entry                    PASS       0
+    ...
+    proc_sched_rt01__with_dmesg_entry                  PASS       0
+    ...
+
+    -----------------------------------------------
+    Total Tests: 1590
+    Total Skipped Tests: 0
+    Total Failures: 0
+    Kernel Version: 5.14.0-427.el9.x86_64
+    Machine Architecture: x86_64
+
+But proc_sched_rt01 indeed get failed in the test:
+
+     <<<test_start>>>
+     tag=proc_sched_rt01__with_dmesg_entry stime=1709667487
+     cmdline="dmesg -c 1>/dev/null 2>&1; proc_sched_rt01; dmesg >
+     	/mnt/testarea/ltp/output/DMESG_DIR_RHELKT1LITE.FILTERED-dmesg-output-51310-02:08:39PM/proc_sched_rt01.dmesg.log"
+     contacts=""
+     analysis=exit
+     <<<test_output>>>
+     tst_kconfig.c:87: TINFO: Parsing kernel config '/lib/modules/5.14.0-427.el9.x86_64/config'
+     tst_test.c:1709: TINFO: LTP version: 20240129
+     tst_test.c:1593: TINFO: Timeout per run is 0h 01m 00s
+     proc_sched_rt01.c:45: TFAIL: Expect: timeslice_ms > 0 after reset to default
+     proc_sched_rt01.c:51: TPASS: echo 0 > /proc/sys/kernel/sched_rt_period_us : EINVAL (22)
+     proc_sched_rt01.c:53: TFAIL: echo -1 > /proc/sys/kernel/sched_rt_period_us invalid retval 2: SUCCESS (0)
+     proc_sched_rt01.c:59: TPASS: echo -2 > /proc/sys/kernel/sched_rt_runtime_us : EINVAL (22)
+     proc_sched_rt01.c:72: TFAIL: echo rt_period_us+1 > /proc/sys/kernel/sched_rt_runtime_us invalid retval 1: SUCCESS (0)
+
+     HINT: You _MAY_ be missing kernel fixes:
+
+     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c1fc6484e1fb
+     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=079be8fc6309
+
+     Summary:
+     passed   2
+     failed   3
+     broken   0
+     skipped  0
+     warnings 0
+     <<<execution_status>>>
+     initiation_status="ok"
+     duration=0 termination_type=exited termination_id=0 corefile=no
+     cutime=0 cstime=1
+     <<<test_end>>>
+
+Signed-off-by: Bruno Goncalves <bgoncalv@redhat.com>
+CC: Shizhao Chen <shichen@redhat.com>
+Cc: Ping Fang <pifang@redhat.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+---
+ tools/create_dmesg_entries_for_each_test.awk | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/create_dmesg_entries_for_each_test.awk b/tools/create_dmesg_entries_for_each_test.awk
+index ffd807fb433..b21364ae064 100644
+--- a/tools/create_dmesg_entries_for_each_test.awk
++++ b/tools/create_dmesg_entries_for_each_test.awk
+@@ -28,6 +28,8 @@ NF && ! /^#/ {
+ 		s = s " " $i
+ 	}
+ 	sub(/[;]+$/, "", s)
++	s = s "; EXIT_CODE=$?"
+ 	s = s "; dmesg > " DMESG_DIR "/" $1 ".dmesg.log"
++	s = s "; exit $EXIT_CODE"
+ 	print s
+ }
