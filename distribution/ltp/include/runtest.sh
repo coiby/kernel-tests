@@ -224,6 +224,11 @@ RprtRslt ()
     # Always upload parsed test log for those failed test cases
     GetFailureLog $logfile_run "None" > $logfile_fail
     [ -s $logfile_fail ] && SubmitLog $logfile_fail
+    # remove the '__with_dmesg_entry' from the test files
+    # shellcheck disable=SC2045
+    for testcase in $(ls *__with_dmesg_entry.* 2>/dev/null); do
+        mv "$testcase" "${testcase//__with_dmesg_entry}"
+    done
     # shellcheck disable=SC2010
     failed_tests=$(ls *.fail.log)
     for failed_test in $failed_tests; do
