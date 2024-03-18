@@ -40,6 +40,8 @@ function rhel9_unfix_issues()
 	is_arch "x86_64" && osver_in_range "900" "905" && tskip "cve-2017-1000364 stack_clash" unfix
 	# https://issues.redhat.com/browse/RHEL-5767 [RHEL9.3] ltp- fanotify14.c:286: TFAIL: fanotify_mark(fanotify_fd, 0x00000001 | tc->mark.flags, tc->mask.flags, dirfd, path) expected EINVAL: EACCES (13)
 	osver_in_range "900" "905" && tskip "fanotify14" unfix
+	# https://issues.redhat.com/browse/RHEL-29436 LTP proc_sched_rt01 fails
+	osver_in_range "900" "906" && tskip "proc_sched_rt01" unfix
 }
 
 function rhel9_fixed_issues()

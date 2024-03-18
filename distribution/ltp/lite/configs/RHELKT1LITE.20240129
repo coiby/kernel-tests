@@ -2088,8 +2088,8 @@ ADSP056 dio_sparse -w 18192k -s 18192k -n 2
 #ltp-aiodio.part3
 # lower number of ops for KT1
 AIOSETUP01 dd if=$BIG_FILE of=$TMPDIR/aiodio/junkfile bs=8192 conv=block,sync
-FSX032 fsx-linux -l 500000 -r 4096 -t 4096 -w 4096 -N 10000 $TMPDIR/aiodio/junkfile
-FSX042 fsx-linux -N 10000 -o 4096 $TMPDIR/aiodio/junkfile
+FSX032 fsx-linux -l 500000 -r 4096 -t 4096 -w 4096 -N 10000
+FSX042 fsx-linux -N 10000 -o 4096
 
 #proc
 # Read every file in /proc. Not likely to crash, but does enough
