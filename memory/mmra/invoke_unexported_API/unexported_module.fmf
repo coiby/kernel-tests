@@ -1,0 +1,18 @@
+summary: Test case that verifies it is not possible for a kernel mode 
+    driver to invoke an API that is not part of the exported symbol list for the kernel 
+description: |
+  Create a kernel module that attempts to  access an unexported variable.
+  During compile time, linking against the unexported symbol should fail.
+  If it is then forcefully linked or linked accidently then the test can try to load the module
+  It would then fail with an error message for unresolved symbols which can be grepped from dmes
+contact: George Jacob <gjacob@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - make
+  - type: file
+    pattern:
+        - /kernel-include
+enabled: true
+duration: 10m
