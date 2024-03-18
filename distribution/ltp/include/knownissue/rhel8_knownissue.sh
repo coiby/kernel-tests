@@ -96,6 +96,10 @@ function rhel8_unfix_issues()
 	is_arch "x86_64" && osver_in_range "800" "811" && tskip "cve-2017-1000364 stack_clash" unfix
 	# https://issues.redhat.com/browse/RHEL-8429 ltp-starvation test get timed out
 	osver_in_range "800" "811" && tskip "starvation" unfix
+	# https://issues.redhat.com/browse/RHEL-29438 LTP splice07 fails
+	osver_in_range "800" "811" && tskip "splice07" unfix
+	# https://issues.redhat.com/browse/RHEL-29435 LTP proc_sched_rt01 fails
+	osver_in_range "800" "811" && tskip "proc_sched_rt01" unfix
 }
 
 function rhel8_fixed_issues()
