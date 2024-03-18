@@ -477,6 +477,17 @@ function SelectKernelGrubby ()
       rpm -ql $testkername-$KERNELARGVERSION.$kernarch | grep -e /vmlinuz- | grep "$EXTRA" > ./vmlinuz_candidates
       rpm -ql $testkername-core-$KERNELARGVERSION.$kernarch | grep -e /vmlinuz- | grep "$EXTRA" >> ./vmlinuz_candidates
     fi
+
+    # upstream kernel moved copy of the VR file to /boot in %post, so it's not available in rpm file-list anymore
+    # this applies only to kernel rpms built with upstream's `make srcrpm-pkg`
+    if [[ ! -s ./vmlinuz_candidates ]] ; then
+      echo "SelectKernelGrubby - ./vmlinuz_candidates is empty. Falling back to search for '/vmlinuz-' in /boot"
+
+      [ -f /lib/modules/$testkernver/vmlinuz ] && \
+        diff /lib/modules/$testkernver/vmlinuz /boot/vmlinuz-$testkernver && \
+          echo /boot/vmlinuz-$testkernver | grep "$EXTRA" > ./vmlinuz_candidates
+    fi
+
     echo "vmlinuz candidates: " | tee -a $OUTPUTFILE
     cat ./vmlinuz_candidates | tee -a $OUTPUTFILE
 
@@ -1358,9 +1369,15 @@ DeBug "$testver"
 
 # Current kernel variables
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}\n' -qf /boot/config-$(uname -r))
+# upstream kernel since 6.8.0 no longer has /boot/config in file-list
+# this applies only to kernel rpms built with upstream's `make srcrpm-pkg`
+[ $? -ne 0 ] && kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}\n' -qf /lib/modules/$(uname -r)/config)
 kernver=$(rpm -q --queryformat '%{version}\n' -qf /boot/config-$(uname -r))
+[ $? -ne 0 ] && kernver=$(rpm -q --queryformat '%{version}\n' -qf /lib/modules/$(uname -r)/config)
 kernrel=$(rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
+[ $? -ne 0 ] && kernrel=$(rpm -q --queryformat '%{release}\n' -qf /lib/modules/$(uname -r)/config)
 kernarch=$(rpm -q --queryformat '%{arch}\n' -qf /boot/config-$(uname -r))
+[ $? -ne 0 ] && kernarch=$(rpm -q --queryformat '%{arch}\n' -qf /lib/modules/$(uname -r)/config)
 kernvariant=$(uname -r | awk -F $(uname -m) '{print $2}')
 runkernel="${kernver}-${kernrel}${kernvariant#[+.]}"
 
