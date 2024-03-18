@@ -123,7 +123,7 @@ function fwtsSetup()
         rlRun "./configure" 0 "run configure to generate Makefile for fwts"
 
         # run make to build binaries from source for fwts
-        rlRun "make -j$(nproc)" 0 "run make to build binaries from source for fwts"
+        rlRun "make -j1" 0 "run make to build binaries from source for fwts"
 
         # run make install to install files for fwts on system
         rlRun "make install" 0 "run make install to install files for fwts on system"
