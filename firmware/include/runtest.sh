@@ -86,11 +86,11 @@ function fwtsSetup()
     if ! [ -x /usr/local/bin/fwts ] ; then
 
         # Download fwts sources
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        TmpDir=$(mktemp -d)
         rlRun "cd $TmpDir" 0 "change directory to tmpdir"
         if [ -n "$FwtsGitRemote" ]; then
             # Get sources from git
-            if [ -n "$FwtsGitBranch" -a "$FwtsGitBranch" != "HEAD" ]; then
+            if [ -n "$FwtsGitBranch" ] && [ "$FwtsGitBranch" != "HEAD" ]; then
                 rlRun "git clone --branch $FwtsGitBranch $FwtsGitRemote" 0 "clone git repository"
                 if [ $? -ne 0 ]; then
                     cki_abort_task "Failed to clone git $FwtsGitRemote branch $FwtsGitBranch repository"
@@ -123,7 +123,7 @@ function fwtsSetup()
         rlRun "./configure" 0 "run configure to generate Makefile for fwts"
 
         # run make to build binaries from source for fwts
-        rlRun "make -j$(nproc)" 0 "run make to build binaries from source for fwts"
+        rlRun "make -j1" 0 "run make to build binaries from source for fwts"
 
         # run make install to install files for fwts on system
         rlRun "make install" 0 "run make install to install files for fwts on system"
