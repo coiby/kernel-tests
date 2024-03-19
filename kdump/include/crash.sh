@@ -219,6 +219,8 @@ ValidateCrashOutput()
     # ffff800083fabb20: 0000000000000063 failed_freeze+24
     # failed_freeze is normal function name.
     echo "- 'failed_freeze'"
+    # ffff80008cfb3a90:  0000000000000063 failed_prepare+16
+    echo "- 'failed_prepare'"
 
     # ffff80000b2a2f40:  ffff09d9882f3980 __event_xfs_inode_free_eofblocks_invalid
     # __event_xfs_inode_free_eofblocks_invalid: function name
@@ -424,6 +426,7 @@ ValidateCrashOutput()
          -e '_fail' \
          -e 'failed_resume' \
          -e 'failed_freeze' \
+         -e 'failed_prepare' \
          -e 'event_xfs_inode_free_eofblocks_invalid' \
          -e 'failed_suspend' \
          -e 'failsafe' \
