@@ -120,7 +120,7 @@ function ndctl_setup
 	ndctl_srcdir=$(realpath /root/rpmbuild/BUILD/ndctl-*)
 	rlRun "pushd $ndctl_srcdir"
 
-	if rlIsRHEL ">9.1" || rlIsFedora || rlIsCentOS ">9.1"; then
+	if rlIsRHEL ">9.1" || rlIsFedora || rlIsCentOS "9"; then
 		lsmod | grep -q e1000e && rlRun "sed -i \"/firmware-update.sh/d\" test/meson.build"
 		rlRun "patch -p1 < $CDIR/ndctl.patch"
 		rlRun "yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
@@ -179,7 +179,7 @@ function runtest
 	testcases="${_DEBUG_MODE_TESTCASES:-"$testcases_default"}"
 	local ret=0
 	rlRun "pushd $ndctl_srcdir"
-	if rlIsRHEL ">9.1" || rlIsFedora || rlIsCentOS ">9.1"; then
+	if rlIsRHEL ">9.1" || rlIsFedora || rlIsCentOS "9"; then
 		echo "Start: ndctl test suite" >/dev/kmsg
 		rlRun "meson test -C build --no-suite cxl"
 		ret=$?

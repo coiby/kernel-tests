@@ -3,11 +3,9 @@
 
 source ../../../cki_lib/libcki.sh
 
-FILE=$(readlink -f "$BASH_SOURCE")
-NAME=$(basename "$FILE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 YUM=$(cki_get_yum_tool)
-TNAME="storage/ssd/libnvme_unit_tests"
 
 function libnvme_setup
 {
@@ -29,7 +27,7 @@ function libnvme_setup
 
 function startup
 {
-	if rlIsRHEL ">9.0" || rlIsFedora ||rlIsCentOS ">9.0"; then
+	if rlIsRHEL ">9.0" || rlIsFedora ||rlIsCentOS "9"; then
 		libnvme_setup
 
 	else
