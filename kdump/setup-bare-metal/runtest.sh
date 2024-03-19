@@ -61,33 +61,30 @@ SetupKdump()
 
         # Ensure Kdump Kernel memory reservation
         _reboot_required=false
-        local fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
+        _fadump_opts=$(grep -oE "fadump=\w+" <<< "${KER1ARGS}")
 
-        # if ${KER1ARGS} has no 'crashkernel=xxx':
+        # if ${KER1ARGS} has no 'crashkernel=xxx'(could be empty):
+        # fadump:
+        # (0). ResetCrashkernel fadump=xxx
+        # legacy/specific cases:
         # (1). RHEL-5 or the memory below the threshold - get the crashkernel value from function DefKdumpMem()
         # (2). Fedora system - get the crashkernel value from function ResetCrashkernel()
         # (3). RHEL-8,this is a known bug2111855 that on some aarch64 machines,need to reserve more memory for kdump test.
         #      for example:ampere-mtsnow-altra%,ampere-mtjade-altra% and arm-kernel%,the model name is Neoverse-N1.
         #      set the crashkernel=768M to ovoid OOM issue.
-        grep -q 'crashkernel' <<< "${KER1ARGS}" || {
-            if [ -n "${fadump_opts}" ] && [ "${fadump_opts}" != "fadump=off" ]; then
-                kdumpMem="$(DefKdumpMem fadump)"
-            else
-                kdumpMem="$(DefKdumpMem)"
-            fi
-
-            # legacy cases: RHEL5 or if the memory below the threshold or fedora:non-fadump
-            [ -z "${KER1ARGS}" ] || kdumpMem=" ${kdumpMem}"
-            if $IS_RHEL5 || ! IfMemoryAboveThreshold; then
-                KER1ARGS+="${kdumpMem}"
+        grep -q 'crashkernel' <<< "${KER1ARGS}" || { # do some default set on "crashkernel"
+            # - fadump mode;
+            # - legacy cases: RHEL5 or if the memory below the threshold or fedora:non-fadump
+            if [ -n "${_fadump_opts}" ] || $IS_RHEL5 || ! IfMemoryAboveThreshold; then
+                ResetCrashkernel "${_fadump_opts}"
             elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ]; then
+                # for fedora:non-fadump
                 kdumpctl status > /dev/null 2>&1 || {
                     ! $IS_FC && FatalError "Kdump is not operational.please check the system."
-                    _reboot_required=true
                     ResetCrashkernel
                 }
             elif $IS_RHEL8 && [ "${K_ARCH}" = "aarch64" ] && grep -q "crashkernel=auto" /proc/cmdline; then
-                [ "$(lscpu |grep '^Model name:'| awk '{print $NF}')" = "Neoverse-N1" ] && KER1ARGS+=" crashkernel=768M"
+                [ "$(lscpu |grep '^Model name:'| awk '{print $NF}')" = "Neoverse-N1" ] && KER1ARGS="${KER1ARGS} crashkernel=768M"
             fi
         }
 
@@ -108,8 +105,7 @@ SetupKdump()
         # - Reset crashkernel=auto in /proc/cmdline (when it supports crashkernel=auto,like rhel-7 and rhel-8)
         # - Get the default value from DefKdumpMem()(when it did not support crashkernel=auto or 'kdumpctl reset-crashkernel',like rhel-5)
         if [ "${K_FORCE_RESET_CK}" = "true" ]; then
-            _reboot_required=true
-            ResetCrashkernel
+            ResetCrashkernel "${_fadump_opts}"
         fi
 
         if ${_reboot_required}; then
