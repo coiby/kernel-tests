@@ -16,7 +16,9 @@ EOF
 	local mask=$(get_cpu_mask $last_isolated)
 	# shellcheck disable=SC2154
 	rlRun "echo $mask > $tracing_dir/tracing_cpumask"
-	rlRun "echo tick_sched_handle >> $tracing_dir/set_ftrace_filter"
+	#[root@sweetpig-12 ~]# cat /sys/kernel/debug/tracing/set_ftrace_filter
+	#tick_sched_handle.isra.27
+	rlRun "echo tick_sched_handle* >> $tracing_dir/set_ftrace_filter"
 	rlRun "echo function > $tracing_dir/current_tracer"
 
 	# clean the buffer
