@@ -4,7 +4,7 @@ description: |
   Create a kernel module that attempts to  access an unexported variable.
   During compile time, linking against the unexported symbol should fail.
   If it is then forcefully linked or linked accidently then the test can try to load the module
-  It would then fail with an error message for unresolved symbols which can be grepped from dmes
+  It would then fail with an error message for unresolved symbols.
 contact: George Jacob <gjacob@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
@@ -16,3 +16,4 @@ require:
         - /kernel-include
 enabled: true
 duration: 10m
+id: 1cc89932-b982-47b2-b8ae-481b5120c8b6
