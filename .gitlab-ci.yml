@@ -107,6 +107,7 @@ shell check runtests mr:
 
 shellspec:
   extends: [.shellspec, .pipeline_images]
+  image: quay.io/cki/$IMAGE_NAME:production
   variables:
     USE_BASH_ORIG: 'true'
   before_script:
