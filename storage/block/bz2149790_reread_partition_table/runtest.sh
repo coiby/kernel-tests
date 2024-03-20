@@ -42,12 +42,23 @@ function get_disk()
     done
 }
 
-function run_test()
+function setup_md()
 {
     get_disk
     # shellcheck disable=SC2154
     rlLog "disk: $dev0 $dev1"
     rlRun 'mdadm -CR /dev/md0 -l 1 -n 2 /dev/"$dev0" /dev/"$dev1" -e 1.0'
+    md_result=$?
+    if [ ${md_result} != 0 ];then
+        rlRun "lsblk"
+        rstrnt-report-result "md raid create faied!" FAIL 1
+        exit 1
+    fi
+}
+
+function run_test()
+{
+    setup_md
     rlRun "sgdisk -n 0:0:+100MiB /dev/md0"
     rlRun "lsblk"
     rlRun "cat /proc/partitions"
@@ -65,9 +76,13 @@ function run_test()
     rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
     rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
     rlRun "mdadm -S /dev/md0"
+    wait
     rlRun 'mdadm --zero-superblock /dev/"$dev0"'
     rlRun 'mdadm --zero-superblock /dev/"$dev1"'
     rlRun "cat /proc/partitions"
+    while [ -b /dev/md0 ]; do
+        sleep 1
+    done
 }
 
 function check_log()
