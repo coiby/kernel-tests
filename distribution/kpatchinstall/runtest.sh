@@ -276,8 +276,23 @@ function run_kernelinstall ()
 
 function verify_kpatch_loaded ()
 {
+    if [[ $KPATCHNVR =~ "-0-0" ]]; then
+        logmsg "Initial empty kpatch-patch"
+        rpm -qa |grep $KPATCHNVR
+        if [ $? -eq 0 ]; then
+            RprtRslt "done" PASS 0
+        else
+            RprtRslt "done" FAIL 1
+            RHTSAbort "No empty kpatch package found."
+        fi
+        return 0
+    fi
     logmsg "verify_kpatch_loaded start"
-    ls -1 /usr/lib/kpatch/$(uname -r) | grep -v kpatch\.ko | sed 's/\.ko//' | tr - _ | tr . _ > mod_names
+    echo > mod_names
+    for k in /usr/lib/kpatch/$(uname -r)/*
+    do
+        grep -v kpatch\.ko <<< ${k##*/} | sed 's/\.ko//' | tr - _ | tr . _ >> mod_names
+    done
     logmsg "Installed kpatch mod names"
     cat mod_names | tee -a $OUTPUTFILE
 
