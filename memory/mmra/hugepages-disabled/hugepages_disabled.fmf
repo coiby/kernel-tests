@@ -1,0 +1,10 @@
+summary: Verifies that hugepages are disabled.
+description: |
+        Verifies that hugepages are disabled.
+contact: Dana Walker <dawalker@redhat.com>
+id: 699fd412-ab04-46b9-97f5-789f7d44e410
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 10m
