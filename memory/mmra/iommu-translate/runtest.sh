@@ -4,7 +4,7 @@
 
 rlJournalStart
     rlPhaseStartTest "Check kernel logs for default domain type"
-        rlRun "dmesg | grep -q 'iommu: Default domain type: Translated'" 0 "Search dmesg for default domain type" || exit 1
+        rlRun "journalctl --dmesg --grep 'iommu: Default domain type: Translated' > /dev/null" 0 "Search dmesg for default domain type"
     rlPhaseEnd
 
     rlPhaseStartTest "Check all configured iommu groups in current hardware"
