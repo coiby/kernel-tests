@@ -112,6 +112,7 @@ function fwtsSetup()
 
         # setup efi_runtime module needed by uefirt* tests
         # check for compiler to build the module with
+        # shellcheck source=/dev/null
         source /usr/src/kernels/$(uname -r)/.config
         if [[ -n "$CONFIG_CC_IS_CLANG" ]]; then
             MAKEVARS="CC=clang"
