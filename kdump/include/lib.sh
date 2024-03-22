@@ -1136,17 +1136,26 @@ GetCrashkernelDefault() {
 }
 
 ResetCrashkernel() {
-    local fadump_opts="$(grep -oE "fadump=\w+" /proc/cmdline)"
+    # $1: fadump=xxx or empty
+    local fadump_opts=$1
+
     if cki_is_abd; then
         LogRun "add_aboot_param crashkernel=$(GetCrashkernelDefault)" && \
             _reboot_required=true
     elif kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
         [ -n "${fadump_opts}" ] && fadump_opts="--${fadump_opts}"
-        LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'Please reboot the system'" || \
-            _reboot_required=false
-    elif $IS_RHEL7 || $IS_RHEL8; then
-        UpdateKernelOptions "${fadump_opts} crashkernel=auto"
-    else
-        UpdateKernelOptions $(DefKdumpMem)
+        LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'Please reboot the system'" && \
+            _reboot_required=true
+    else # retrieve default CK values and update the boot kernel cmdline
+        if $IS_RHEL7 || $IS_RHEL8; then
+            _ck_args="crashkernel=auto"
+        else
+            _defmem_opts=""
+            [ -n "${fadump_opts}" ] && [ "${fadump_opts}" != "fadump=off" ] && \
+                _defmem_opts="fadump"
+            _ck_args=$(DefKdumpMem "${_defmem_opts}")
+        fi
+        UpdateKernelOptions "${fadump_opts} ${_ck_args}"
+        _reboot_required=true
     fi
 }
