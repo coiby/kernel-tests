@@ -17,7 +17,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
+FILE=$(readlink -f ${BASH_SOURCE[0]})
 NAME=$(basename $FILE)
 CDIR=$(dirname $FILE)
 
