@@ -1,9 +1,9 @@
 #!/bin/bash
 
-FILE=$(readlink -f "${BASH_SOURCE[0]}")
+#FILE=$(readlink -f "${BASH_SOURCE[0]}")
 # shellcheck disable=SC2034
-CDIR=$(dirname "${FILE}")
-. /usr/share/beakerlib/beakerlib.sh   || exit 1
+#CDIR=$(dirname "${FILE}")
+#. /usr/share/beakerlib/beakerlib.sh   || exit 1
 #. "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
 function prepare_reboot()
