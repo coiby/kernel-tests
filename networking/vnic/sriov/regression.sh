@@ -3071,7 +3071,7 @@ sriov_test_bz2008373() {
 		else
 			sync_wait server sriov_test_bz2008373_start  52200
 			rlLog "start to test sriov_test_bz2008373_start"
-			local nic_name=$(get_test_nic 1)
+			local nic_name=${CLIENT_INTERFACES[0]}
 			PCI=$(ethtool -i ${nic_name} | grep bus | cut -d " " -f 2)
 			vf_max_num=$(cat /sys/class/net/${nic_name}/device/sriov_totalvfs)
 			[ ${vf_max_num} -lt 64 ] && vf_num=${vf_max_num} || vf_num=64
@@ -3105,7 +3105,7 @@ vf_intf_garp_check() {
 	else
 		rlLog "start to test client vf_intf_arp_check"
 		sync_wait server vf_intf_garp_check_start
-		local nic_test=$(get_test_nic 1)
+		local nic_test=${CLIENT_INTERFACES[0]}
 		PF_PCI=$(ethtool -i ${nic_test} | grep bus | cut -d " " -f 2)
 		#1.enable sriov
 		rlLog "STEP 1: Enable sriov on client"

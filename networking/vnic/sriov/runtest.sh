@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2034,SC2207,SC2010,SC2048,SC1010,SC2167,SC2165,SC1010,SC2062,SC2054,SC2207,SC2128,SC1083,SC2191
+# shellcheck disable=SC2034,SC2207,SC2010,SC2048,SC1010,SC2167,SC2165,SC1010,SC2062,SC2054,SC2207,SC2128,SC1083,SC2191,SC2166,SC2154
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /kernel/networking/vnic/sriov
@@ -39,6 +39,7 @@ DPDK_TOOLS_URL=${DPDK_TOOLS_URL:-"http://download.devel.redhat.com/brewroot/pack
 CASE_PATH=$(dirname $(readlink -f $BASH_SOURCE))
 # Include Beaker environment
 source ${CASE_PATH}/../../common/include.sh || exit 1
+source ${CASE_PATH}/../../common/network.sh || exit 1
 
 source ${CASE_PATH}/env.sh
 
@@ -8886,7 +8887,7 @@ if i_am_client; then
 		rlRun "ethtool -i $nic_test"
 		rlRun "nic_driver='$(ethtool -i $nic_test | grep driver | awk '{print $2}')'"
 	else
-		CLIENT_INTERFACES=($CLIENT_INTERFACES)
+		#CLIENT_INTERFACES=($CLIENT_INTERFACES)
 		nic_test=${CLIENT_INTERFACES[0]}
 		if [[ -z "${nic_test[*]}" ]]; then
 			rlFail "FATAL ERROR: pci_list or nic_list is not availabe!"
@@ -8900,7 +8901,7 @@ else
 		rlRun "ethtool -i $nic_test"
 		rlRun "nic_driver='$(ethtool -i $nic_test | grep driver | awk '{print $2}')'"
 	else
-		SERVER_INTERFACES=($SERVER_INTERFACES)
+		#SERVER_INTERFACES=($SERVER_INTERFACES)
 		nic_test=${SERVER_INTERFACES[0]}
 		if [[ -z "${nic_test[*]}" ]]; then
 			rlFail "FATAL ERROR: pci_list or nic_list is not availabe!"

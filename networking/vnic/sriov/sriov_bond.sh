@@ -184,6 +184,7 @@ local test_name=sriov_test_bond_failovermac0
 		local result=0
 		OLD_NIC_NUM=$NIC_NUM
 		local NIC_NUM=2
+		echo CLIENT_INTERFACES is ${CLIENT_INTERFACES[*]}
 		if [[ "${CLIENT_INTERFACES[*]}" != 'None' ]]; then
 			local test_iface="$(get_test_nic ${NIC_NUM} ${CLIENT_INTERFACES[*]})"
 		else
