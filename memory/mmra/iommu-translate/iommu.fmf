@@ -4,6 +4,7 @@ description: |
   translation mode by default, checking dmesg and the files in /sys to
   assert the translation mode.
 contact: Pablo Martin <pablmart@redhat.com>
+id: 8c52d126-3121-4587-a833-0de9908f0319 
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 10m
