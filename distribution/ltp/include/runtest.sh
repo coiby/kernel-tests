@@ -236,9 +236,12 @@ RprtRslt ()
         if [ "$failed_test" == "$logfile_fail" ]; then
             continue
         fi
+        testcase_name="${failed_test%.fail.log}"
         # upload the failed test output as part of restraint subtest
         # extract test case name from test case fail log
-        rstrnt-report-result -o "$failed_test" "${failed_test%.fail.log}" FAIL
+        rstrnt-report-result -o "$failed_test" "${testcase_name}" FAIL
+        # upload dmesg log for failed subtests
+        SubmitLog "${testcase_name}.dmesg.log"
     done
 
     DmesgCheck $TEST

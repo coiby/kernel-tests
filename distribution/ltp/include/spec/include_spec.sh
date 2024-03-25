@@ -101,6 +101,7 @@ Describe "distribution/ltp/include: RprtRslt"
         The first line of stdout should include "rstrnt-report-log -l /mnt/testarea/TEST1.fail.log"
         if [[ "${2}" != "" ]]; then
             The line 2 of stdout should include "rstrnt-report-result -o prctl09.fail.log prctl09 FAIL"
+            The line 3 of stdout should include "rstrnt-report-log -l prctl09.dmesg.log"
         else
             The line 1 of stderr should include "ls: cannot access"
         fi
