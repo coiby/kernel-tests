@@ -545,9 +545,6 @@ function SetOSRelease ()
                 Release="8.9"
                 ;;
             *)
-                # We are currently developing RHEL-8.9
-                # Therefore we test at HEAD-RHEL-8.9
-                # Need to refresh the list after 8.9 GA
                 Release="HEAD-8.10"
                 ;;
         esac
@@ -570,9 +567,12 @@ function SetOSRelease ()
             362)
                 Release="9.3"
                 ;;
+            427)
+                Release="9.4"
+                ;;
             *)
                 # Still in developing phase, need to update in future.
-                Release="HEAD-9.4"
+                Release="HEAD-9.5"
                 ;;
         esac
     elif [[ -n "$(echo ${K_NAME} | grep kernel-pegas)" && "${K_VER}" = "4.10.0" ]]; then
@@ -667,6 +667,7 @@ rlJournalStart
             fi
         fi
 
+        # Need to remove this section after 9.4 GA
         if [[ "$Release" == "HEAD-9.4" ]]; then
             if cki_kver_lt "5.14.0-364.el9"; then
                 sed -i '/ems_usb.ko/d; /kvaser_usb.ko/d; /m_can.ko/d; /m_can_pci.ko/d; \
@@ -739,6 +740,34 @@ rlJournalStart
             fi
             if cki_kver_lt "5.14.0-424.el9"; then
                 sed -i '/tcp_illinois.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
+            fi
+            if cki_kver_lt "5.14.0-425.el9"; then
+                sed -i '/pwrseq_emmc.ko/d; /pwrseq_simple.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
+                sed -i '/rtw89_8852ce.ko/d; /rtw89_8852c.ko/d'  ${OS}/${Release}/$Release-modules-{aarch64,x86_64}.lst
+            fi
+            if cki_kver_lt "5.14.0-426.el9"; then
+                sed -i '/ffa-module.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
+            fi
+            if cki_kver_lt "5.14.0-427.el9"; then
+                sed -i '/iaa_crypto.ko/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-427.1.1.el9"; then
+                sed -i '/mt7925-common.ko/d; /mt7925e.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,aarch64}.lst
+            fi
+            if cki_kver_lt "5.14.0-427.4.1.el9"; then
+                sed -i '/gpio-mlxbf3.ko/d; /mlxbf-pmc.ko/d; /pinctrl-mlxbf3.ko/d;
+                /pwr-mlxbf.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
+            fi
+        fi
+
+        if [[ "$Release" == "HEAD-9.5" ]]; then
+            if cki_kver_lt "5.14.0-428.el9"; then
+                sed -i "/mt7925-common.ko/d; /mt7925e.ko/d"  ${OS}/${Release}/${Release}-modules-{x86_64,aarch64}.lst
+                sed -i "/pinctrl-intel-platform.ko/d; /pinctrl-meteorpoint.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-431.el9"; then
+                sed -i "/gpio-mlxbf3.ko/d; /mlxbf-pmc.ko/d; /pinctrl-mlxbf3.ko/d;
+                /pwr-mlxbf.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
             fi
         fi
     rlPhaseEnd
