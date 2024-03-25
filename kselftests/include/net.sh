@@ -23,7 +23,9 @@ install_netsniff()
 			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
 			local need_remove=1
 		else
-			local param="--enablerepo=epel"
+			if [ "$pkg_mgr" != "rpm-ostree" ]; then
+				local param="--enablerepo=epel"
+			fi
 		fi
 	fi
 
