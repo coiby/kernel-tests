@@ -7,13 +7,13 @@ function rhel9_fatal_issues()
 	# BZ2026959, BZ2112284
 	osver_in_range "900" "903" && is_arch "aarch64" && tskip "read_all_sys" fatal
 	# Bug 2178947 - [RHEL9] kernel-rt-debug: BUG: MAX_LOCKDEP_CHAINS too low
-	# Bug 2119055 - [rhel9] call trace qed_ptt_acquire+0x2b/0xd0 [qed] _qed_get_vport_stats+0x141/0x240 [qed]
-	osver_in_range "900" "905" && tskip "read_all_sys" fatal
+	# RHEL-9751 - [rhel9] call trace qed_ptt_acquire+0x2b/0xd0 [qed] _qed_get_vport_stats+0x141/0x240 [qed]
+	osver_in_range "900" "906" && tskip "read_all_sys" fatal
 	# Bug 1984293 - RHEL9: kernel-rt: WARNING: possible circular locking dependency detected (raw_v6_hashinfo.lock->(softirq_ctrl.lock).lock->raw_v6_hashinfo.lock
 	is_rt && cki_is_kernel_debug && osver_in_range "900" "902" && tskip "read_all_proc" fatal
 	is_rt && cki_is_kernel_debug && osver_in_range "900" "902" && tskip "proc01" fatal
 	# RHEL-17195 RHEL-9: RIP: 0010:memset_orig+0x33/0xb0 - intel_pt_interrupt+0x5c/0xf0
-	is_arch "x86_64" && osver_in_range "904" "905" && tskip "pt_ex_user" fatal
+	is_arch "x86_64" && osver_in_range "904" "906" && tskip "pt_ex_user" fatal
 }
 
 function rhel9_unfix_issues()
@@ -37,9 +37,9 @@ function rhel9_unfix_issues()
 	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1670
 	is_rt && pkg_in_range "tuned" "2.19.0" "99" && tskip "numa_testcases" unfix
 	# https://issues.redhat.com/browse/RHEL-8576 [RHEL-9.3.0] "stack_clash" LTP CVE test fails
-	is_arch "x86_64" && osver_in_range "900" "905" && tskip "cve-2017-1000364 stack_clash" unfix
+	is_arch "x86_64" && osver_in_range "900" "906" && tskip "cve-2017-1000364 stack_clash" unfix
 	# https://issues.redhat.com/browse/RHEL-5767 [RHEL9.3] ltp- fanotify14.c:286: TFAIL: fanotify_mark(fanotify_fd, 0x00000001 | tc->mark.flags, tc->mask.flags, dirfd, path) expected EINVAL: EACCES (13)
-	osver_in_range "900" "905" && tskip "fanotify14" unfix
+	osver_in_range "900" "906" && tskip "fanotify14" unfix
 	# https://issues.redhat.com/browse/RHEL-29436 LTP proc_sched_rt01 fails
 	osver_in_range "900" "906" && tskip "proc_sched_rt01" unfix
 }
