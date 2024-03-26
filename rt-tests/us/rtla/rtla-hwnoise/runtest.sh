@@ -27,6 +27,7 @@ function runtest()
     # stop the trace if a single sample is higher than 1 us
     oneliner "rtla hwnoise -s 1 -T 1 -t -d 30s"
     # enable a trace event trigger
+    # shellcheck disable=SC2140
     oneliner "rtla hwnoise -t -e osnoise:irq_noise --trigger="hist:key=desc,duration/1000:sort=desc,duration/1000:vals=hitcount" -d 1m"
 }
 
