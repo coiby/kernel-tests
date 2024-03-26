@@ -111,9 +111,22 @@ function fwtsSetup()
         done
 
         # setup efi_runtime module needed by uefirt* tests
+        # check for compiler to build the module with
+        # shellcheck source=/dev/null
+        source /usr/src/kernels/$(uname -r)/.config
+        if [[ -n "$CONFIG_CC_IS_CLANG" ]]; then
+            MAKEVARS="CC=clang"
+        else
+            MAKEVARS="CC=gcc"
+        fi
+        if [[ -n "$CONFIG_LD_IS_LLD" ]]; then
+            MAKEVARS="${MAKEVARS} LD=ld.lld"
+        else
+            MAKEVARS="${MAKEVARS} LD=ld"
+        fi
         # make modules_install so efi_runtime can be loaded with modprobe as fwts requires
         rlRun "cd efi_runtime" 0 "cd into efi_runtime directory"
-        rlRun "make all install" 0 "make all install inside efi_runtime"
+        rlRun "make ${MAKEVARS} all install" 0 "make all install inside efi_runtime"
         rlRun "cd .." 0 "cd up one directory back into fwts source root"
 
         # run autoreconf to recreate build system files for fwts
