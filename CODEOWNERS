@@ -37,7 +37,7 @@
 #       - lulinqing
 #     paths:
 #       - /.gitlab-ci.yml
-        - /Makefile
+#       - /Makefile
 #   CKI:
 #     users:
 #       - cki-project
@@ -55,7 +55,7 @@
 # GITLAB-CODEOWNERS-CONFIG-END
 
 # GITLAB-CODEOWNERS-GENERATED-BEGIN
-# 63fb74136c176f4afdc205199e7a396780089dfb61e1b22771fcbcd57d8ab0bf
+# 6147a487fcb115a164bae6ef304846b91bfd7082c1472eceec18191e261527ae
 
 [Infrastructure]
 /.gitlab-ci.yml @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
