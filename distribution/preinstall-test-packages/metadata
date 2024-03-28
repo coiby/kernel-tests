@@ -1,0 +1,12 @@
+[General]
+name=distribution/preinstall-test-packages
+owner=Brian Grech <bgrech@redhat.com>
+description=Inspect beaker.xml via pipeline url and install all found dependencies
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=python3 ./runtest.py
+dependencies=python3
+
