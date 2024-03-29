@@ -69,19 +69,29 @@ function nvme_test()
 
 function run_io()
 {
-    rlRun "echo deadline > /sys/block/${DISK}/queue/scheduler"
+    rlRun "cat /proc/cmdline"
+    rlRun "grep Cpus_allowed_list /proc/self/status"
+    rlRun "cat /sys/devices/system/cpu/isolated"
 
+    rlRun "echo deadline > /sys/block/${DISK}/queue/scheduler"
     rlRun "numactl -C0,1 fio --filename=/dev/${DISK} --size=10GB --name=test \
         --direct=0 --rw=rw --bs=16K --ioengine=libaio --iodepth=128 --numjobs=8 \
         --time_based --runtime=60 --ioscheduler=mq-deadline > tmp.out 2>&1 &"
     sleep 3
 
 # bpftrace -e 'kprobe:null_queue_rq { @=count() }'
-    timeout -s INT 50 bpftrace -e 'kprobe:nvme_queue_rq{ @[cpu]=count() }' > ${DISK}_count.log
+    if [[ ${DISK} == *nvme* ]];then
+        timeout -s INT 50 bpftrace -e 'kprobe:nvme_queue_rq{ @[cpu]=count() }' > ${DISK}_count.log
+    elif [[ ${DISK} == *null* ]];then
+        timeout -s INT 50 bpftrace -e 'kprobe:null_queue_rq{ @[cpu]=count() }' > ${DISK}_count.log
+    else
+        rlLog "get none disk for testing,please check"
+    fi
+
     sleep 10
     rlRun "cat ${DISK}_count.log"
 
-#    ./trace.bt | tee ${DISK}_count.log
+# ./trace.bt | tee ${DISK}_count.log
     num=`cat ${DISK}_count.log | grep "@" | wc -l`
 
     if [[ ${num} -ne 2 ]];then
@@ -91,9 +101,23 @@ function run_io()
     fi
 }
 
-function setup()
+function check_result()
+{
+    for file in *count.log;do
+        num=$(grep -c "@" "$file")
+
+        if [[ ${num} -ne 2 ]]; then
+            rlFail "blk-mq kworkers are scheduled on isolated cpus for ${file}, please check"
+        else
+            rlPass "no kworkers are run from isolated cpus for ${file}"
+        fi
+    done
+}
+
+function tuned_setup()
 {
     rlRun "systemctl status tuned" "0-255"
+    rlRun "systemctl enable tuned --now"
     rlRun "systemctl restart tuned"
     rlRun "tuned-adm list"
 
@@ -108,7 +132,7 @@ function setup()
     rlRun "grep Cpus_allowed_list /proc/self/status"
 }
 
-function cleanup()
+function tuned_cleanup()
 {
     rlRun "tuned-adm off"
     rlRun "systemctl stop tuned"
@@ -116,13 +140,53 @@ function cleanup()
     rlRun "grep Cpus_allowed_list /proc/self/status"
 }
 
+function k_param_setup()
+{
+    key_word="isolcpus"
+    cmd_line=$(cat /proc/cmdline)
+    if [[ ${cmd_line} == *"${key_word}"* ]];then
+        rlLog "successfully add isolcpus into kernel parameter"
+    else
+        default_kernel=$(grubby --default-kernel)
+        cpu_num=$(cat /proc/cpuinfo  | grep processor | awk 'END{print}' | awk '{print$3}')
+        param="isolcpus=2-${cpu_num}"
+        grubby --args=${param} --update-kernel=${default_kernel}
+        dracut -f
+        rhts-reboot
+    fi
+}
+
+function k_param_cleanup()
+{
+    key_word="isolcpus"
+    cmd_line=$(cat /proc/cmdline)
+    if [[ ${cmd_line} == *"${key_word}"* ]];then
+        default_kernel=$(grubby --default-kernel)
+        cpu_num=$(cat /proc/cpuinfo  | grep processor | awk 'END{print}' | awk '{print$3}')
+        param="isolcpus=2-${cpu_num}"
+        grubby --remove-args=${param} --update-kernel=${default_kernel}
+        dracut -f
+        rhts-reboot
+    else
+        rlRun "cat /proc/cmdline"
+        rlLog "successfully removed isolcpus kernel parameter"
+    fi
+}
+
 rlJournalStart
     rlPhaseStartTest
         rlRun "uname -a"
         rlLog "$0"
-        setup
-        nvme_test
-        cleanup
+        if [[ -e "${CDIR}/test_done_flage" ]];then
+            k_param_cleanup
+        else
+            k_param_setup
+            nvme_test
+            null_blk_test
+            touch "${CDIR}"/test_done_flage
+            k_param_cleanup
+        fi
+        check_result
         check_log
     rlPhaseEnd
 rlJournalPrintText
