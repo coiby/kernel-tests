@@ -1,0 +1,18 @@
+summary: Security Crypto verifier for 17113
+description: ''
+contact: Dennis Li <denli@redhat.com>
+id: 985f0229-d93c-44d3-8c67-f6b5472bf3d7
+component:
+  - kernel
+path: /security/crypto/17113
+test: bash -x ./runtest.sh
+framework: beakerlib
+require:
+  - make
+  - gcc
+  - type: file
+    pattern:
+      - /kernel-include/runtest.sh
+duration: 10m
+extra-summary: /kernel-tests/security/crypto/17113
+extra-task: /kernel-tests/security/crypto/17113
