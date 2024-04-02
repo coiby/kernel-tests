@@ -1,0 +1,44 @@
+From a3dc45fcdf6c6233f65bbae3070230620cc3e1cd Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Thu, 21 Mar 2024 10:59:51 +0800
+Subject: [PATCH] madvise06: set max_runtime to 60
+
+The madvise06 test includes two loops, each potentially waiting up
+to 10 seconds. In scenarios with slow I/O, these loops can lead to
+the test exceeding the default maximum runtime of 30 seconds.
+
+To prevent the test from failing under these conditions, this patch
+increases the `max_runtime` parameter from 30 seconds to 60 seconds,
+providing ample time for completion even on systems with slow I/O.
+
+   7  tst_test.c:1709: TINFO: LTP version: 20240129
+   8  tst_test.c:1593: TINFO: Timeout per run is 0h 00m 30s
+      ....
+  43  madvise06.c:77: TINFO: memory.swap.current: 289664 Kb
+  44  madvise06.c:201: TINFO: less than 102400 Kb were moved to the swap cache
+  45  Test timeouted, sending SIGKILL!
+  46  tst_test.c:1647: TINFO: If you are running on slow machine, try exporting LTP_TIMEOUT_MUL > 1
+  47  tst_test.c:1649: TBROK: Test killed! (timeout?)
+
+Reported-by: Fendy Tjahjadi <ftjahjad@redhat.com>
+Signed-off-by: Li Wang <liwang@redhat.com>
+Acked-by: Petr Vorel <pvorel@suse.cz>
+---
+ testcases/kernel/syscalls/madvise/madvise06.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testcases/kernel/syscalls/madvise/madvise06.c b/testcases/kernel/syscalls/madvise/madvise06.c
+index be22318ea..b227840df 100644
+--- a/testcases/kernel/syscalls/madvise/madvise06.c
++++ b/testcases/kernel/syscalls/madvise/madvise06.c
+@@ -242,6 +242,7 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.needs_tmpdir = 1,
+ 	.needs_root = 1,
++	.max_runtime = 60,
+ 	.taint_check = TST_TAINT_W | TST_TAINT_D,
+ 	.save_restore = (const struct tst_path_val[]) {
+ 		{"/proc/sys/vm/swappiness", NULL,
+-- 
+2.44.0
+
