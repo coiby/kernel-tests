@@ -92,7 +92,7 @@ function get_test_cases
 	lsmod | grep -q e1000e || testcases+=" firmware-update.sh"  #BZ2123263
 	testcases+=" ack-shutdown-count-set"
 	testcases+=" rescan-partitions.sh"
-	testcases+=" inject-smart.sh"
+	uname -r | grep -qE "el9_0|el9_1|el9_2" || testcases+=" inject-smart.sh" #BZ2048105
 	testcases+=" monitor.sh"
 	testcases+=" max_available_extent_ns.sh"
 	testcases+=" pfn-meta-errors.sh"
