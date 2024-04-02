@@ -111,6 +111,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-set-max_runtime-to-60.patch
     fi
     if [ "$TESTVERSION" == "20230929" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)

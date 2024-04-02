@@ -78,7 +78,7 @@ Reviewed-by: Petr Vorel <pvorel@suse.cz>
  1 file changed, 2 insertions(+)
 
 diff --git a/tools/create_dmesg_entries_for_each_test.awk b/tools/create_dmesg_entries_for_each_test.awk
-index ffd807fb433..b21364ae064 100644
+index ffd807fb4..b21364ae0 100644
 --- a/tools/create_dmesg_entries_for_each_test.awk
 +++ b/tools/create_dmesg_entries_for_each_test.awk
 @@ -28,6 +28,8 @@ NF && ! /^#/ {
@@ -90,3 +90,6 @@ index ffd807fb433..b21364ae064 100644
 +	s = s "; exit $EXIT_CODE"
  	print s
  }
+-- 
+2.44.0
+
