@@ -663,12 +663,12 @@ rlJournalStart
         if [[ "$Release" == "9.0" ]]; then
             if cki_kver_lt "5.14.0-70.30.1.el9_0"; then
                 sed -i '/libarc4.ko/d' ${OS}/${Release}/$Release-knownRemoved-s390x.lst
-                sed -i '/cifs_arc4.ko/d;/cifs_md4.ko/d;' ${OS}/${Release}/$Release-modules-x86_64.lst
+                sed -i '/cifs_arc4.ko/d;/cifs_md4.ko/d;' ${OS}/${Release}/$Release-modules-${ARCH}.lst
             fi
         fi
 
         # Need to remove this section after 9.4 GA
-        if [[ "$Release" == "HEAD-9.4" ]]; then
+        if [[ "$Release" == "9.4" ]]; then
             if cki_kver_lt "5.14.0-364.el9"; then
                 sed -i '/ems_usb.ko/d; /kvaser_usb.ko/d; /m_can.ko/d; /m_can_pci.ko/d; \
                         /peak_pciefd.ko/d; /peak_usb.ko/d; /slcan.ko/d; /usb_8dev.ko/d' \
@@ -792,8 +792,7 @@ rlJournalStart
     # ReportMissingModule should be out of rlPhaseStartTest as it uses rlPhaseStartTest in it.
     ReportMissingModule loadable
 
-    # Only support RHEL-9.4 now
-    if [[ "$Release" == "HEAD-9.4" ]] || [[ "$Release" == "HEAD-8.10" ]]; then
+    if grep -q "$Release" builtin_list; then
         rlPhaseStartTest "Builtin module test"
             GetCurrentModuleList builtin
             GetBaseModuleList builtin
