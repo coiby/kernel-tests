@@ -182,8 +182,9 @@ PrintSysInfo ()
 
 DmesgCheck ()
 {
-    if [[ -z ${LTP_DMESG_DIR_PREFIX} ]]; then
-        echo "FAIL: DmesgCheck requires LTP_DMESG_DIR_PREFIX to be set"
+    dmesg_dir="$1"
+    if [ -z "$dmesg_dir" ]; then
+        echo "FAIL: DmesgCheck it looks like LTP run without saving dmesg for test cases"
         return
     fi
 
@@ -191,14 +192,6 @@ DmesgCheck ()
     # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check
     LTP_FALSESTRINGS=${LTP_FALSESTRINGS:-"BIOS BUG|DEBUG|mapping multiple BARs.*IBM System X3250 M4"}
     LTP_FAILURESTRINGS=${LTP_FAILURESTRINGS:-"Oops|BUG|NMI appears to be stuck|Badness at"}
-
-    # get the most recent directory created
-    # shellcheck disable=SC2010
-    dmesg_dir=$(ls -t "$LTPDIR"/output/ | grep "${LTP_DMESG_DIR_PREFIX}" | head -1)
-    if [ -z "$dmesg_dir" ]; then
-        echo "FAIL: it looks like LTP run without saving dmesg for test cases"
-        return
-    fi
 
     DeBug "Checking for dmesg logs at $dmesg_dir"
     pushd "$LTPDIR"/output/"$dmesg_dir"
@@ -221,6 +214,14 @@ RprtRslt ()
     logfile_run=$OUTPUTDIR/$TEST.run.log
     logfile_fail=$OUTPUTDIR/$TEST.fail.log
 
+    if [[ -z ${LTP_DMESG_DIR_PREFIX} ]]; then
+        dmesg_dir=""
+    else
+        # get the most recent directory created
+        # shellcheck disable=SC2010
+        dmesg_dir=$(ls -t "$LTPDIR"/output/ | grep "${LTP_DMESG_DIR_PREFIX}" | head -1)
+    fi
+
     # Always upload parsed test log for those failed test cases
     GetFailureLog $logfile_run "None" > $logfile_fail
     [ -s $logfile_fail ] && SubmitLog $logfile_fail
@@ -241,10 +242,10 @@ RprtRslt ()
         # extract test case name from test case fail log
         rstrnt-report-result -o "$failed_test" "${testcase_name}" FAIL
         # upload dmesg log for failed subtests
-        SubmitLog "${testcase_name}.dmesg.log"
+        SubmitLog "$LTPDIR"/output/"$dmesg_dir"/"${testcase_name}.dmesg.log"
     done
 
-    DmesgCheck $TEST
+    DmesgCheck "$dmesg_dir"
 
     # each failure is reported as subtest, always report pass for the summary result
     SUMMARY_RESULT=PASS
