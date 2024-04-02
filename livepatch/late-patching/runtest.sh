@@ -38,7 +38,6 @@ DMESG_SAVED=$(mktemp /tmp/dmesg-XXXXXX)
 dmesg > $DMESG_SAVED
 
 knvr=$(uname -r)
-
 yum install -y gcc kernel-devel-${knvr%.*} elfutils-libelf-devel
 
 test_fail()
