@@ -79,7 +79,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ -z "$RHELVER" ]; then
-    kernel_rhelver=$(uname -r | grep -o el[0-9])
+    kernel_rhelver=$(uname -r | grep -o "el[0-9]")
     echo "Taking release from kernel version: $kernel_rhelver" | tee -a $OUTPUTFILE
 
     if [ "$kernel_rhelver" == "el6" ]; then
@@ -95,7 +95,7 @@ echo "RHELVER is $RHELVER" | tee -a $OUTPUTFILE
 
 INFILE=rhtsusex.tcf
 MYARCH=$(arch)
-if [ "$MYARCH" = "x86_64" -o "$MYARCH" = "s390x" ]; then
+if [ "$MYARCH" = "x86_64" ] || [ "$MYARCH" = "s390x" ]; then
     rm -f /usr/lib/libc.a
     ln -s /usr/lib64/libc.a /usr/lib/libc.a
 fi
