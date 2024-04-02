@@ -135,10 +135,11 @@ export result="FAIL"
 # Then post-process the results to find the regressions
 export fail=`cat $OUTPUTDIR/report.out | grep "USEX TEST RESULT: FAIL" | wc -l`
 
+rstrnt-report-log -l $OUTPUTDIR/report.out
+rstrnt-report-log -l $USEX_LOG
+
 if [ "$fail" -gt "0" ]; then
     export result="FAIL"
-    rstrnt-report-log -l $OUTPUTDIR/report.out
-    rstrnt-report-log -l $USEX_LOG
 else
     export result="PASS"
 fi
