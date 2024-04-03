@@ -107,9 +107,15 @@ function get_test_cases_list
 	case_conf="$CDIRC/../config/$release"
 	if rlIsFedora; then
 		case_conf="$CDIRC/../config/fedora"
+	elif rlIsCentOS "9"; then
+		case_conf="$CDIRC/../config/c9s"
 	fi
 	if [ ! -f "$case_conf" ]; then
-		return
+		if rlIsRHEL; then
+			case_conf="$CDIRC/../config/defconf"
+		else
+			return
+		fi
 	fi
 	# shellcheck disable=SC1090
 	source "$case_conf"
