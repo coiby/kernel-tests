@@ -1,0 +1,12 @@
+summary: Sanity test for libbpf-tools
+description: Sanity test for libbpf-tools
+contact: Ziqian SUN <zsun@redhat.com>
+component:
+  - libbpf-tools
+path: /general/bpf/bcc/sanity/libbpf-tools
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - libbpf-tools
+duration: 30m
+id: 56ad67ec-3fd7-4858-b45c-5261629ca860 
