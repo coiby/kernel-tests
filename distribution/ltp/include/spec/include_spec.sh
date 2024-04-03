@@ -9,8 +9,7 @@ Describe "distribution/ltp/include: DmesgCheck"
     End
 
     It "DmesgCheck - No failure"
-        LTP_DMESG_DIR_PREFIX=mock_dir_TEST1
-        dirname=${LTP_DMESG_DIR_PREFIX}_$(date +%X)
+        dirname=mock_dir_TEST1_$(date +%X)
         mkdir -p "${LTPDIR}/output/${dirname}"
         touch "${LTPDIR}/output/${dirname}/subtest0.dmesg.log"
         echo "BIOS BUG" > \
@@ -19,7 +18,7 @@ Describe "distribution/ltp/include: DmesgCheck"
             "${LTPDIR}/output/${dirname}/subtest2.dmesg.log"
         echo "mapping multiple BARs.*IBM System X3250 M4" > \
             "${LTPDIR}/output/${dirname}/subtest3.dmesg.log"
-        When call DmesgCheck TEST1
+        When call DmesgCheck "$dirname"
         The line 1 of stdout should equal "Checking for dmesg logs at ${dirname}"
         The line 2 of stdout should include "${LTPDIR}/output/${dirname}"
         The line 3 of stdout should equal "Checking for issues on dmesg file subtest0.dmesg.log"
@@ -31,8 +30,7 @@ Describe "distribution/ltp/include: DmesgCheck"
     End
 
     It "DmesgCheck - With failure"
-        LTP_DMESG_DIR_PREFIX=mock_dir_TEST1
-        dirname=${LTP_DMESG_DIR_PREFIX}_$(date +%X)
+        dirname=mock_dir_TEST1_$(date +%X)
         mkdir -p "${LTPDIR}/output/${dirname}"
         touch "${LTPDIR}/output/${dirname}/subtest0.dmesg.log"
         echo "Oops " > \
@@ -43,7 +41,7 @@ Describe "distribution/ltp/include: DmesgCheck"
             "${LTPDIR}/output/${dirname}/subtest3.dmesg.log"
         echo "Badness at" > \
             "${LTPDIR}/output/${dirname}/subtest4.dmesg.log"
-        When call DmesgCheck TEST1
+        When call DmesgCheck "$dirname"
         The line 1 of stdout should equal "Checking for dmesg logs at ${dirname}"
         The line 2 of stdout should include "${LTPDIR}/output/${dirname}"
         The line 3 of stdout should equal "Checking for issues on dmesg file subtest0.dmesg.log"
@@ -60,8 +58,8 @@ Describe "distribution/ltp/include: DmesgCheck"
     End
 
     It "DmesgCheck - missing dmesg dir prefix"
-        When call DmesgCheck TEST1
-        The line 1 of stdout should equal "FAIL: DmesgCheck requires LTP_DMESG_DIR_PREFIX to be set"
+        When call DmesgCheck
+        The line 1 of stdout should equal "FAIL: DmesgCheck it looks like LTP run without saving dmesg for test cases"
         The status should be success
     End
 End
@@ -69,6 +67,7 @@ End
 Describe "distribution/ltp/include: RprtRslt"
     cleanup() {
         rm -rf *.fail.log
+        rm -rf "${LTPDIR}/output/"
     }
     AfterEach 'cleanup'
     Mock cat
@@ -89,6 +88,7 @@ Describe "distribution/ltp/include: RprtRslt"
         FAIL "prctl09__with_dmesg_entry.fail.log" "1"
         FAIL "" "1"
     End
+    export LTP_DMESG_DIR_PREFIX=mock_RprtRslt
     It "RprtRslt $1 $2"
         # Mock the failed test log
         if [[ "$2" != "" ]]; then
@@ -97,15 +97,18 @@ Describe "distribution/ltp/include: RprtRslt"
         export CAT_OUTPUT="Total Failures: ${3}"
         RESULT="${1}"
         SCORE=${3}
+        _dirname="${LTP_DMESG_DIR_PREFIX}_$(date +%X)"
+        mkdir -p "${LTPDIR}/output/${_dirname}"
+        touch "${LTPDIR}/output/${_dirname}/prctl09.dmesg.log"
         When call RprtRslt TEST1 "${RESULT}"
         The first line of stdout should include "rstrnt-report-log -l /mnt/testarea/TEST1.fail.log"
         if [[ "${2}" != "" ]]; then
             The line 2 of stdout should include "rstrnt-report-result -o prctl09.fail.log prctl09 FAIL"
-            The line 3 of stdout should include "rstrnt-report-log -l prctl09.dmesg.log"
+            The line 3 of stdout should include "rstrnt-report-log -l ${LTPDIR}/output/${_dirname}/prctl09.dmesg.log"
         else
             The line 1 of stderr should include "ls: cannot access"
         fi
-        The stdout should include "DmesgCheck TEST1"
+        The stdout should include "DmesgCheck ${LTP_DMESG_DIR_PREFIX}"
         SUMMARY_RESULT=PASS
         # in case result is FAIL, but for some reason there is no subtest fail log
         # make sure the summary has fail status, to make sure the test will have failed status
