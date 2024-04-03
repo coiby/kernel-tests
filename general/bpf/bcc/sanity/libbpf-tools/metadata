@@ -1,0 +1,12 @@
+[General]
+name=general/bpf/bcc/sanity/libbpf-tools
+owner=Ziqian SUN <zsun@redhat.com>
+description=Sanity test for libbpf-tools
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=30m
+use_pty=false
