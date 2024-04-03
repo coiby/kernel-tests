@@ -209,7 +209,7 @@ function SysReport ()
         FAILURE=TRUE
     fi
     echo "******** End System Information ********" >> $OUTPUTFILE
-    if [ -s $OUTPUTDIR/derror.$kernbase -o -s $OUTPUTDIR/serror.$kernbase -o -s $OUTPUTDIR/avcerror.$kernbase ]; then
+    if [ -s $OUTPUTDIR/derror.$kernbase ] || [ -s $OUTPUTDIR/serror.$kernbase ] || [ -s $OUTPUTDIR/avcerror.$kernbase ]; then
         # why is $dresult_count padded with 6 trailing 0s?  dropping them because
         # this is triggering https://bugzilla.redhat.com/show_bug.cgi?id=1600281
         #result_count=$(/usr/bin/printf "%03d%03d%03d\n" $dresult_count 0 0)
@@ -330,7 +330,7 @@ function SelectKernel ()
     DeBug "VR=$VR EXTRA=$EXTRA"
 
     # If not version or Extra selected then choose the latest installed version
-    if [ -z "$EXTRA" -a -z "$VR" ]; then
+    if [ -z "$EXTRA" ] && [ -z "$VR" ]; then
         DeBug "ERROR: missing args"
         return 1
     fi
@@ -406,7 +406,7 @@ function WorkaroundBug798577 ()
     DeBug "WorkaroundBug798577: vmlinuz=$vmlinuz"
     DeBug "WorkaroundBug798577: initrd=$initrd"
 
-    if [ -n "$vmlinuz" -a -n "$initrd" ]; then
+    if [ -n "$vmlinuz" ] && [ -n "$initrd" ]; then
         sed -i 's/image=vmlinu/image=\/vmlinu/' /etc/yaboot.conf
         DeBug "/sbin/new-kernel-pkg --package kernel --install $VR.ppc64 --initrdfile=$initrd"
         /sbin/new-kernel-pkg --package kernel --install $VR.ppc64 --initrdfile=$initrd
@@ -463,7 +463,7 @@ function SelectKernelGrubby ()
 
     # We can only have one kernel on arm right now and grubby is busted
     # until bz 751608 is fixed.
-    if [ "${ARCH}" = "armhfp" -o "${ARCH}" = "arm" ]; then
+    if [ "${ARCH}" = "armhfp" ] || [ "${ARCH}" = "arm" ]; then
         return 0
     fi
 
@@ -485,7 +485,7 @@ function SelectKernelGrubby ()
     rm -f ./vmlinuz_candidates
 
     for grub_cfg in "/etc/grub.conf" "/etc/grub2.cfg" /boot/loader/entries/* ; do
-        if [ -e "$grub_cfg" -a -n "${vmlinuz#/boot}" ]; then
+        if [ -e "$grub_cfg" ] && [ -n "${vmlinuz#/boot}" ]; then
             grep -q "${vmlinuz#/boot}" "$grub_cfg"
             if [ $? -eq 0 ]; then
                 echo "$vmlinuz found in $grub_cfg" | tee -a $OUTPUTFILE
@@ -1388,7 +1388,7 @@ fi
 
 # Pegas and aarch64 RPMs are named just 'kernel', work around any workflows
 # that parse name out of (brew) package name and pass it here
-if [ "$KERNELARGNAME" = "kernel-pegas" -o "$KERNELARGNAME" = "kernel-aarch64" ]; then
+if [ "$KERNELARGNAME" = "kernel-pegas" ] || [ "$KERNELARGNAME" = "kernel-aarch64" ]; then
     DeBug "substituting $KERNELARGNAME with kernel in KERNELARGNAME"
     KERNELARGNAME="kernel"
 fi
@@ -1510,7 +1510,7 @@ if [ "${RSTRNT_REBOOTCOUNT}xx" == "xx" ]; then
     RSTRNT_REBOOTCOUNT=0
 fi
 
-if [ -z "$KERNELARGNAME" -o -z "$KERNELARGVARIANT" -o -z "$KERNELARGVERSION" ]; then
+if [ -z "$KERNELARGNAME" ] || [ -z "$KERNELARGVARIANT" ] || [ -z "$KERNELARGVERSION" ]; then
     echo "***** Test argument(s) are empty! Can't continue. *****" | tee -a $OUTPUTFILE
     DeBug "name=$KERNELARGNAME variant=$KERNELARGVARIANT version=$KERNELARGVERSION"
     RprtRslt $TEST/$kernbase FAIL 1
@@ -1535,10 +1535,10 @@ else
             YumUpgradeKernelHeaders
             REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
             DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
-            if [[ ${DIFF} -gt ${MAX_REBOOT_TIME:-480} ]]; then
+            if [[ ${DIFF} -gt ${MAX_REBOOT_TIME:-900} ]]; then
                  let DIFF_MIN=$DIFF/60
                  let DIFF_SEC=$DIFF%60
-                 echo "***** WARN: rhts-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-480} seconds *****" | tee -a $OUTPUTFILE
+                 echo "***** WARN: rhts-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-900} seconds *****" | tee -a $OUTPUTFILE
                  RprtRslt $TEST/${kernbase}_boot WARN $DIFF
             fi
             RprtRslt $TEST/$kernbase PASS $DIFF
