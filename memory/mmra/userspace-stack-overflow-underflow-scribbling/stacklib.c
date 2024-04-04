@@ -3,6 +3,7 @@
  * overflow/underflow/scribbling
  */
 
+static int i;
 
 static void f(void)
 {
@@ -16,8 +17,9 @@ void overflow(void)
 
 void underflow(void)
 {
-    int i;
-
+    /* The index is not declared here as stack manipulation
+       below will reach to it and indirection will cause
+       a misaligned read on aarch64 (Bus error) */
     /* Pop beyond the stack start */
     for (i = 0; i < (256*256); i++) {
         #if defined(__x86_64__)
