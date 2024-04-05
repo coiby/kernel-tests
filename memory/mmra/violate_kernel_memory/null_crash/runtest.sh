@@ -49,7 +49,9 @@ rlJournalStart
             rlRun "nohup echo 1 > /sys/kernel/vkm/null_crash" 139 "(SEGFAULT expected)"
             sleep 1
             rlRun "dmesg > dmesg-crash.log"
-            rlAssertGrep "Unable to handle kernel NULL pointer dereference" dmesg-crash.log
+            K_VARIANT=$(echo "${K_NAME/*debug*}")
+            [ ! "${K_VARIANT}" ] && rlAssertGrep "Unable to handle kernel paging request" dmesg-crash.log && rlAssertGrep "null-ptr-deref" dmesg-crash.log
+            [ "${K_VARIANT}" ] && rlAssertGrep "Unable to handle kernel NULL pointer dereference" dmesg-crash.log
             rlFileSubmit dmesg-crash.log
         rlPhaseEnd
         rlPhaseStartCleanup
