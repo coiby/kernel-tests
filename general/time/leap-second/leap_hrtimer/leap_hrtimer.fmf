@@ -7,6 +7,9 @@ require:
   - gcc
   - make
   - psmisc
+  - type: file
+    pattern:
+        - /cki_lib
 duration: 2h
 tier: 1
 extra-summary: general/time/leap-second/leap_hrtimer

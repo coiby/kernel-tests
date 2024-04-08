@@ -7,14 +7,14 @@ RESULT="PASS"
 
 function runtest ()
 {
-    echo "List current clocksource" | tee -a $OUTPUTFILE
-    echo "$(cat /sys/devices/system/clocksource/clocksource0/current_clocksource)" | tee -a $OUTPUTFILE
+    echo "List current clocksource" | tee -a "$OUTPUTFILE"
+    echo "$(cat /sys/devices/system/clocksource/clocksource0/current_clocksource)" | tee -a "$OUTPUTFILE"
 
     J=0
-    while [ $J -lt 500 ]; do
+    while [ "$J" -lt 500 ]; do
         bash ./hrtimer_on_each_CPU.sh
-        J=`expr $J + 1`
-        echo "count $J:" | tee -a $OUTPUTFILE
+        J=`expr "$J" + 1`
+        echo "count $J:" | tee -a "$OUTPUTFILE"
         ./leap_second
         sleep 10
         killall hrtimer
@@ -26,11 +26,11 @@ function runtest ()
         fi
     done
 
-    if [ $result = "FAIL" ]; then
-        rstrnt-report-result $TEST $RESULT 1
+    if [ "$RESULT" = "FAIL" ]; then
+        rstrnt-report-result $TEST "$RESULT" 1
     else
-        echo "kernel no livelock panic" | tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST $RESULT 0
+        echo "kernel no livelock panic" | tee -a "$OUTPUTFILE"
+        rstrnt-report-result $TEST "$RESULT" 0
     fi
 }
 
