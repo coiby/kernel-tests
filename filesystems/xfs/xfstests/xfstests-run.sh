@@ -82,6 +82,10 @@ function check_tests()
 				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*Input/output error" && false_alarm=1
 				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*I/O error" && false_alarm=1
 				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*not supported" && false_alarm=1
+			else
+				# Sometimes there is not enough disk space to
+				# generate these log files.
+				grep "./common/rc.*No space left on device" results/$XFSTEST_LOGNAME.log && false_alarm=1
 			fi
 			if [ -f results/$dmesgfile ]; then
 				cp results/$dmesgfile results/$XFSTEST_LOGNAME.dmesg.log
@@ -91,6 +95,9 @@ function check_tests()
 				grep "MAX_LOCKDEP_ENTRIES too low" results/$XFSTEST_LOGNAME.dmesg.log &&
 				false_alarm=1
 			fi
+			# Sometimes samba setup is broken.
+			grep "does not support the SMB version" results/$XFSTEST_LOGNAME.log && false_alarm=1
+
 			if [ $false_alarm -eq 0 ] ; then
 				ret=1
 				rstrnt-report-result $XFSTEST FAIL 0
