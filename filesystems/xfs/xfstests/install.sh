@@ -44,49 +44,6 @@ function install_xfsprogs_git_upstream ()
 	return $res
 }
 
-# This's a nearly obsolete function. Only keep it for very old RHEL system.
-# Currently we install xfsprogs from yum repo or git repo mainly, don't need
-# to install from src.rpm package.
-function install_xfsprogs_obsolete()
-{
-	XFSPROGS="xfsprogs"
-	if test $RHEL_MAJOR -eq 6
-	then
-		XFSPROGS_VER="3.1.1-20"
-	fi
-	if test $RHEL_MAJOR -eq 5
-	then
-		XFSPROGS_VER="2.10.2-8"
-	fi
-	XFSPROGS_BAS="${XFSPROGS}-${XFSPROGS_VER}"
-	XFSPROGS_REL="${XFSPROGS_BAS}.el${RHEL_MAJOR}"
-	XFSPROGS_DEV="${XFSPROGS}-devel-${XFSPROGS_VER}"
-
-	rpm -q --quiet ${XFSPROGS} ${XFSPROGS}-devel
-	if test $? -ne 0
-	then
-		xlog wget -N "${SERVER}/${XFSPROGS_REL}.src.rpm"
-		rpmbuild --rebuild "${XFSPROGS_REL}.src.rpm" 2>&1|tee build.log
-		rstrnt-report-log -l build.log
-		RPM=`egrep "Wrote.*${XFSPROGS_BAS}" build.log | awk '{print $NF}'`
-		echoo $RPM
-		xlog yum install --nogpgcheck -y "$RPM"
-		RPM=`egrep "Wrote.*${XFSPROGS_DEV}" build.log | awk '{print $NF}'`
-		echoo $RPM
-		xlog yum install --nogpgcheck -y "$RPM"
-	fi
-
-	rpm -q --quiet ${XFSPROGS} ${XFSPROGS}-devel
-
-	if test $? -ne 0 -a "$(uname -m)" == "ppc64" -a $RHEL_MAJOR -eq 5
-	then
-		# Not very nice workaround, but xfsprogs build on ppc64 in rhel5 is known to be broken
-		xlog wget -N "${SERVER}/xfsprogs-${XFSPROGS_VER}.el5.ppc64.rpm"
-		xlog wget -N "${SERVER}/xfsprogs-devel-${XFSPROGS_VER}.el5.ppc64.rpm"
-		xlog yum install --nogpgcheck -y xfsprogs-${XFSPROGS_VER}.el5.ppc64.rpm xfsprogs-devel-${XFSPROGS_VER}.el5.ppc64.rpm
-	fi
-}
-
 # Install xfsprogs and xfsprogs-devel if they are not already installed in the system
 # optionally can have XFSPROGS_GITREPO to install from a git repository
 function install_xfsprogs()
@@ -99,14 +56,6 @@ function install_xfsprogs()
 	else
 		if ! rpm -q xfsprogs xfsprogs-devel >/dev/null 2>&1;then
 			$YUM_PROG $YUM_OPTS install xfsprogs xfsprogs-devel
-		fi
-
-		if ! rpm -q xfsprogs xfsprogs-devel >/dev/null 2>&1;then
-			# fall back to old method to install xfsprogs, if yum
-			# install fails and RHEL version <= 6.
-			if test $RHEL_MAJOR -le 6; then
-				install_xfsprogs_obsolete
-			fi
 		fi
 
 		rpm -q xfsprogs xfsprogs-devel >/dev/null 2>&1
@@ -128,29 +77,7 @@ function install_xfsdump()
 	XFSDUMP="xfsdump"
 	rpm -q --quiet "${XFSDUMP}"
 
-	if test $? -ne 0 -a "$(uname -m)" == "x86_64" -a $RHEL_MAJOR -le 6
-	then
-		if test $RHEL_MAJOR -eq 6
-		then
-			XFSDUMP_VER="3.0.4-2"
-			XFSDUMP_BAS="${XFSDUMP}-${XFSDUMP_VER}"
-			XFSDUMP_REL="${XFSDUMP_BAS}.el6"
-		fi
-		if test $RHEL_MAJOR -eq 5
-		then
-			XFSDUMP_VER="2.2.48-3"
-			XFSDUMP_BAS="${XFSDUMP}-${XFSDUMP_VER}"
-			XFSDUMP_REL="${XFSDUMP_BAS}.el5"
-		fi
-		xlog wget -N "${SERVER}/${XFSDUMP_REL}.src.rpm"
-		rpmbuild --rebuild "${XFSDUMP_REL}.src.rpm" 2>&1|tee build.log
-		rstrnt-report-log -l build.log
-		RPM=`egrep "Wrote.*${XFSDUMP_BAS}" build.log | awk '{print $NF}'`
-		echoo $RPM
-		xlog yum install --nogpgcheck -y "$RPM"
-	else
-		$YUM_PROG $YUM_OPTS install xfsdump
-	fi
+	$YUM_PROG $YUM_OPTS install xfsdump
 	# To propagate exit code
 	if rpm -q "${XFSDUMP}";then
 		report install_xfsdump PASS 0
@@ -322,7 +249,7 @@ function install_xfstests_git()
 	cd ~/rpmbuild/SPECS/ || cd /usr/src/redhat/SPECS || return 2
 	cp -f /root/xfstests-dev.tar.bz2 ../SOURCES/xfstests-dev.tar.bz2
 	rpmbuild -bb xfstests.spec 2>&1 | tee build.log
-	RPM=`egrep "Wrote.*$HARNESS_BAS" build.log | awk '{print $NF}'`
+	RPM=`grep -E "Wrote.*$HARNESS_BAS" build.log | awk '{print $NF}'`
 	rpm -e xfstests
 	yum install --nogpgcheck -y $RPM
 	cd -
@@ -349,7 +276,7 @@ function install_xfstests_pkg()
 
 		rpmbuild --rebuild ${HARNESS_SRPM} 2>&1 | tee  build.log
 
-		RPM=`egrep "Wrote.*${HARNESS}-[0-9]" build.log | awk '{print $NF}'`
+		RPM=`grep -E "Wrote.*${HARNESS}-[0-9]" build.log | awk '{print $NF}'`
 
 		# use yum here to resolve dependcies automatically in rhts
 		yum install --nogpgcheck -y $RPM
@@ -399,16 +326,8 @@ function install_xfstests()
 			rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 			exit 1
 		fi
-		return 0
 	fi
 
-	# e2fsprogs on RHEL6 doesn't have 64bit feature support, remove it
-	if [[ $RHEL_MAJOR -eq 6 ]] || [[ $RHEL_MAJOR -eq 5 ]]; then
-		sed -i '/64bit/s/,^64bit//' /var/lib/xfstests/tests/ext4/306
-		if [ $RHEL_MAJOR -eq 5 ]; then
-			sed -i 's/resize2fs/resize4fs/' /var/lib/xfstests/tests/ext4/306
-		fi
-	fi
 	report install_xfstests PASS 0
 	return 0
 }

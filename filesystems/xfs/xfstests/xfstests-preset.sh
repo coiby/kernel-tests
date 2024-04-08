@@ -12,9 +12,9 @@ function preset_default()
 	# the -N postfix specifies the release number for the git snapshot date
 	GITDATE=20181015-1
 	# RHEL5/6 almost reaches EOL, stay in fixed xfstests version, no new tests
-	if [ $RHEL_MAJOR -eq 5 ]; then
+	if [[ "$(uname -r)" =~ el5 ]]; then
 		GITDATE=20140212-2
-	elif [ $RHEL_MAJOR -eq 6 ]; then
+	elif [[ "$(uname -r)" =~ el6 ]]; then
 		GITDATE=20160621-1
 	fi
 

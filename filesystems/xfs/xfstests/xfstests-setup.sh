@@ -263,7 +263,7 @@ function setup_skiptests()
 	# Currently it is the only exception for skipped tests
 	# 092 - older kernels don't grok inode64 mounts on 32-bit boxes
 	WORDSIZE=$(/var/lib/xfstests/src/feature -w)
-	if [[ $RHEL_MAJOR -eq 5 ]] && [[ $WORDSIZE = 32 ]]; then
+	if [[ "$(uname -r)" =~ el5 ]] && [[ $WORDSIZE = 32 ]]; then
 		SKIPTESTS="$SKIPTESTS xfs/092"
 	fi
 	echoo "setup_skiptests done"

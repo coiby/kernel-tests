@@ -4,18 +4,6 @@
 #   This file includes anything that does not fit in other categories
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export RHEL_NAME="RHEL"
-# update the release name for RHEL-ALT
-# /etc/redhat-release doesn't show if it's Pegas|Alt distro, seems we
-# can only know from kernel version string, check if there's elNa,
-# where N is RHEL major release number, e.g. el7a
-if uname -r | grep -q el.a; then
-	export RHEL_NAME="RHELALT"
-fi
-RHEL_VERSION=$(egrep -o "[0-9]*\\.[0-9]* " /etc/redhat-release|tr '.' '_')
-RHEL_MAJOR=$(echo $RHEL_VERSION|cut -d '_' -f 1)
-RHEL_MINOR=$(echo $RHEL_VERSION|cut -d '_' -f 2)
-
 # Returns non-zero value if any of the piped commands fails.
 # This is a must for our test framework.
 set -o pipefail
@@ -145,10 +133,7 @@ function system_info()
 	echoo "FIO=$(fio -v)"
 	echoo "GITDATE=$GITDATE"
 	#echoo "XFSTESTS=$(rpm -q xfstests)"
-	echoo "RHEL_VERSION=$RHEL_VERSION"
-	echoo "RHEL_MAJOR=$RHEL_MAJOR"
 	echoo "LOOP=$LOOP"
-	echoo "RHEL_MINOR=$RHEL_MINOR"
 	echoo "FSTYPE=$FSTYPE"
 	echoo "DEV_TYPE=$DEV_TYPE"
 	echoo "TEST_DEV=$TEST_DEV"
