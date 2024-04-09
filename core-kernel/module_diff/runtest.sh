@@ -769,6 +769,9 @@ rlJournalStart
                 sed -i "/gpio-mlxbf3.ko/d; /mlxbf-pmc.ko/d; /pinctrl-mlxbf3.ko/d;
                 /pwr-mlxbf.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
             fi
+            if cki_kver_lt "5.14.0-434.el9"; then
+                sed -i "/libblake2s-x86_64.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-builtin-x86_64.lst
+            fi
         fi
     rlPhaseEnd
 
