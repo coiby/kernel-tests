@@ -26,7 +26,11 @@ function verify_tune_value()
         TUNE_FILE=$1
         TUNE_VALUE=$2
 
-        TEST_TUNE=`cat ${TUNE_FILE}`
+        if [ "${TUNE_FILE}" = "/proc/sys/vm/drop_caches" ]; then
+            TEST_TUNE=$(dmesg | awk -F "drop_caches: "  '/drop_caches/ {print $2}')
+        else
+            TEST_TUNE=$(cat ${TUNE_FILE})
+        fi
         if [ ${TEST_TUNE} -ne ${TUNE_VALUE} ]; then
                 echo "TestError: Set value to ${TUNE_FILE} Failed"
                 echo ${OLD_DROPCACHES} > ${TUNE_FILE}
@@ -57,5 +61,5 @@ function set_tune_value()
 
     TUNE_FILE=$1
     TUNE_VALUE=$2
-    echo $1 > $TUEN_VALUE $TUNE_FILE
+    echo $1 > $TUNE_VALUE $TUNE_FILE
 }

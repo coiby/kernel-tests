@@ -40,6 +40,10 @@ component:
 test: bash ./drop_caches.sh
 framework: shell
 duration: 10m
+require:
+ -  type: file
+    pattern:
+        - /vm/sysctl/include
 tier: 1
 tag: [tier1]
 extra-summary: /kernel/vm/sysctl/drop_caches

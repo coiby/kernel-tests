@@ -19,16 +19,17 @@
 TMP_FILE=`mktemp /tmp/drop_XXXXXX`
 TUNE_FILE=/proc/sys/vm/drop_caches
 
-function free_pagecache()
+free_pagecache()
 {
     sync
 
-    dd if=/dev/zero of=${TMP_FILE} bs=1024k count=100 > /dev/null
+    dd if=/dev/zero of="${TMP_FILE}" bs=1024k count=100 > /dev/null
     sleep 1
     original_cache=`vmstat | awk '{print $6}'| sed -n '3p'`
 
-    echo 1 > ${TUNE_FILE}
-    verify_tune_value ${TUNE_FILE} 1
+    dmesg -C
+    echo 1 > "${TUNE_FILE}"
+    verify_tune_value "${TUNE_FILE}" 1
 
     sleep 1
     new_pagecache=`vmstat | awk '{print $6}'| sed -n '3p'`
@@ -37,70 +38,73 @@ function free_pagecache()
         exit 1
     fi
 
-    rm -rf ${TMP_FILE}
+    rm -rf "${TMP_FILE}"
 }
 
-function free_dentries_inodes()
+free_dentries_inodes()
 {
     sync
 
     for X in `seq 1 20000`; do
-        touch ${TMP_FILE}$X
-        echo "TEST" > ${TMP_FILE}$X
+        touch "${TMP_FILE}""$X"
+        echo "TEST" > "${TMP_FILE}""$X"
     done
     sleep 2
     original_cache=`vmstat | awk '{print $6}'| sed -n '3p'`
 
-    echo 2 > ${TUNE_FILE}
-    verify_tune_value ${TUNE_FILE} 2
+    dmesg -C
+    echo 2 > "${TUNE_FILE}"
+    verify_tune_value "${TUNE_FILE}" 2
     sleep 2
 
-    new_cache=`vmstat | awk '{print $6}'| sed -n '3p'`
+    new_cache=$(vmstat | awk '{print $6}'| sed -n '3p')
     if [ ${new_cache} -gt ${original_cache} ]; then
         echo "TestError: Can't free dentries and inodes"
         exit 1
     fi
 
-    rm -rf ${TMP_FILE}*
+    rm -rf "${TMP_FILE}"*
 }
 
-function free_pagecache_dentries_inodes()
+free_pagecache_dentries_inodes()
 {
     sync
 
-    dd if=/dev/zero of=${TMP_FILE} bs=1024k count=10 > /dev/null
+    dd if=/dev/zero of="${TMP_FILE}" bs=1024k count=10 > /dev/null
     for X in `seq 1 100`; do
-        touch ${TMP_FILE}$X
-        echo "TEST" > ${TMP_FILE}$X
+        touch "${TMP_FILE}""$X"
+        echo "TEST" > "${TMP_FILE}""$X"
     done
     sleep 2
 
-    original_cache=`vmstat | awk '{print $6}'| sed -n '3p'`
+    original_cache=$(vmstat | awk '{print $6}'| sed -n '3p')
 
-    echo 3 > ${TUNE_FILE}
-    verify_tune_value ${TUNE_FILE} 3
+    dmesg -C
+    echo 3 > "${TUNE_FILE}"
+    verify_tune_value "${TUNE_FILE}" 3
     sleep 1
 
-    new_cache=`vmstat | awk '{print $6}'| sed -n '3p'`
+    new_cache=$(vmstat | awk '{print $6}'| sed -n '3p')
     if [ ${new_cache} -gt ${original_cache} ]; then
         echo "TestError: Can't free dentries and inodes and pagecache"
         exit 1
     fi
 
-    rm -rf ${TMP_FILE}*
+    rm -rf "${TMP_FILE}"*
 }
 
-function disable_drop_caches()
+disable_drop_caches()
 {
     sync
 
-    echo 4 > ${TUNE_FILE}
-    verify_tune_value ${TUNE_FILE} 4
+    dmesg -C
+    echo 4 > "${TUNE_FILE}"
+    verify_tune_value "${TUNE_FILE}" 4
 }
 
-function main()
+main()
 {
-    check_file_exist ${TUNE_FILE}
+    check_file_exist "${TUNE_FILE}"
 
     free_pagecache
     free_dentries_inodes
