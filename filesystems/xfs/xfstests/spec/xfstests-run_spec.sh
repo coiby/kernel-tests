@@ -28,6 +28,7 @@ Describe 'filesystems/xfs/xfstests/xfstests-run: check_tests'
         echo "dmesg $*"
     End
     export RUNTESTS="generic/test1 generic/test2"
+    export TEST_ID="xfs"
 
     # Mock check script
     echo "echo $*" > check
@@ -66,19 +67,19 @@ Describe 'filesystems/xfs/xfstests/xfstests-run: check_tests'
             echo "release_loop"s
         End
         mkdir results/generic
-        echo "" > results/generic/generic-test1.dmesg.log
-        echo "" > results/generic/generic-test2.dmesg.log
+        echo "" > results/generic/xfs-generic-test1.dmesg.log
+        echo "" > results/generic/xfs-generic-test2.dmesg.log
         When call check_tests
         The line 1 should equal "Running test generic/test1"
-        The line 3 should equal "rstrnt-report-log -l results/generic/generic-test1.log"
-        The line 4 should equal "cp results/generic/test1.dmesg.log results/generic/generic-test1.dmesg.log"
-        The line 5 should equal "rstrnt-report-log -l results/generic/generic-test1.dmesg.log"
+        The line 3 should equal "rstrnt-report-log -l results/generic/xfs-generic-test1.log"
+        The line 4 should equal "cp results/generic/test1.dmesg.log results/generic/xfs-generic-test1.dmesg.log"
+        The line 5 should equal "rstrnt-report-log -l results/generic/xfs-generic-test1.dmesg.log"
         The line 6 should equal "rstrnt-report-result generic/test1 FAIL 0"
         The line 7 should equal "release_loops"
         The line 8 should equal "Running test generic/test2"
-        The line 10 should equal "rstrnt-report-log -l results/generic/generic-test2.log"
-        The line 11 should equal "cp results/generic/test2.dmesg.log results/generic/generic-test2.dmesg.log"
-        The line 12 should equal "rstrnt-report-log -l results/generic/generic-test2.dmesg.log"
+        The line 10 should equal "rstrnt-report-log -l results/generic/xfs-generic-test2.log"
+        The line 11 should equal "cp results/generic/test2.dmesg.log results/generic/xfs-generic-test2.dmesg.log"
+        The line 12 should equal "rstrnt-report-log -l results/generic/xfs-generic-test2.dmesg.log"
         The line 13 should equal "rstrnt-report-result generic/test2 FAIL 0"
         The line 14 should equal "release_loops"
         The status should be success
@@ -98,19 +99,19 @@ Describe 'filesystems/xfs/xfstests/xfstests-run: check_tests'
             echo "release_loop"s
         End
         mkdir results/generic
-        echo "" > results/generic/generic-test1.dmesg.log
-        echo "possible circular locking dependency detected" > results/generic/generic-test2.dmesg.log
+        echo "" > results/generic/xfs-generic-test1.dmesg.log
+        echo "possible circular locking dependency detected" > results/generic/xfs-generic-test2.dmesg.log
         When call check_tests
         The line 1 should equal "Running test generic/test1"
-        The line 3 should equal "rstrnt-report-log -l results/generic/generic-test1.log"
-        The line 4 should equal "cp results/generic/test1.dmesg.log results/generic/generic-test1.dmesg.log"
-        The line 5 should equal "rstrnt-report-log -l results/generic/generic-test1.dmesg.log"
+        The line 3 should equal "rstrnt-report-log -l results/generic/xfs-generic-test1.log"
+        The line 4 should equal "cp results/generic/test1.dmesg.log results/generic/xfs-generic-test1.dmesg.log"
+        The line 5 should equal "rstrnt-report-log -l results/generic/xfs-generic-test1.dmesg.log"
         The line 6 should equal "rstrnt-report-result generic/test1 FAIL 0"
         The line 7 should equal "release_loops"
         The line 8 should equal "Running test generic/test2"
-        The line 10 should equal "rstrnt-report-log -l results/generic/generic-test2.log"
-        The line 11 should equal "cp results/generic/test2.dmesg.log results/generic/generic-test2.dmesg.log"
-        The line 12 should equal "rstrnt-report-log -l results/generic/generic-test2.dmesg.log"
+        The line 10 should equal "rstrnt-report-log -l results/generic/xfs-generic-test2.log"
+        The line 11 should equal "cp results/generic/test2.dmesg.log results/generic/xfs-generic-test2.dmesg.log"
+        The line 12 should equal "rstrnt-report-log -l results/generic/xfs-generic-test2.dmesg.log"
         The line 13 should equal "possible circular locking dependency detected"
         The line 14 should equal "release_loops"
         The variable false_alarm should equal "1"
