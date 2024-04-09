@@ -69,6 +69,8 @@ Describe 'filesystems/xfs/xfstests/xfstests-run: check_tests'
         mkdir results/generic
         echo "" > results/generic/xfs-generic-test1.dmesg.log
         echo "" > results/generic/xfs-generic-test2.dmesg.log
+        echo "" > results/generic/xfs-generic-test1.log
+        echo "" > results/generic/xfs-generic-test2.log
         When call check_tests
         The line 1 should equal "Running test generic/test1"
         The line 3 should equal "rstrnt-report-log -l results/generic/xfs-generic-test1.log"
@@ -101,6 +103,8 @@ Describe 'filesystems/xfs/xfstests/xfstests-run: check_tests'
         mkdir results/generic
         echo "" > results/generic/xfs-generic-test1.dmesg.log
         echo "possible circular locking dependency detected" > results/generic/xfs-generic-test2.dmesg.log
+        echo "" > results/generic/xfs-generic-test1.log
+        echo "" > results/generic/xfs-generic-test2.log
         When call check_tests
         The line 1 should equal "Running test generic/test1"
         The line 3 should equal "rstrnt-report-log -l results/generic/xfs-generic-test1.log"
