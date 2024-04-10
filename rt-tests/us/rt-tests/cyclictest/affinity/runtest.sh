@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source rt common functions
-. ../../../../include/runtest.sh || exit 1
+. ../../../../include/lib.sh || exit 1
 
 export TEST="rt-tests/us/rt-tests/cyclictest/affinity"
 export profile_file="/tmp/tuned_profile.txt"
