@@ -5,7 +5,7 @@
 . /usr/bin/rhts_environment.sh || exit 1
 
 # Source rt common functions
-. ../../../include/runtest.sh || exit 1
+. ../../../include/lib.sh || exit 1
 
 # Vars
 export TEST="rt-tests/us/stalld/selftest"
