@@ -25,6 +25,7 @@ require:
       - /cmdline_helper
       - /cki_lib
       - /kdump/include
+      - /automotive/include
 recommend: 
   - wget
   - abootimg

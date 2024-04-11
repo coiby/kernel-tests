@@ -72,6 +72,7 @@ SetupKdump()
         # (3). RHEL-8,this is a known bug2111855 that on some aarch64 machines,need to reserve more memory for kdump test.
         #      for example:ampere-mtsnow-altra%,ampere-mtjade-altra% and arm-kernel%,the model name is Neoverse-N1.
         #      set the crashkernel=768M to ovoid OOM issue.
+        # (4). Automotive system - gets the crashkernel value from function ResetCrashkernel()
         grep -q 'crashkernel' <<< "${KER1ARGS}" || { # do some default set on "crashkernel"
             # - fadump mode;
             # - legacy cases: RHEL5 or if the memory below the threshold or fedora:non-fadump
@@ -80,7 +81,7 @@ SetupKdump()
             elif [ "$(cat /sys/kernel/kexec_crash_size)" -eq 0 ]; then
                 # for fedora:non-fadump
                 kdumpctl status > /dev/null 2>&1 || {
-                    ! $IS_FC && FatalError "Kdump is not operational.please check the system."
+                    ! $IS_FC && ! eval cki_is_kernel_automotive && FatalError "Kdump is not operational.please check the system."
                     ResetCrashkernel
                 }
             elif $IS_RHEL8 && [ "${K_ARCH}" = "aarch64" ] && grep -q "crashkernel=auto" /proc/cmdline; then
@@ -116,8 +117,8 @@ SetupKdump()
     fi
 
     # Needed for automotive SOC devices that dont come with kexec-tools pre installed and kdump systemd for startup.
-    if cki_is_abd;then
-        LogRun "kdumpctl start"
+    if cki_is_kernel_automotive; then
+        kdumpctl status > /dev/null 2>&1 || LogRun "kdumpctl start"
     fi
     # Make sure kdumpctl is operational
     # If kdump service is not started yet, wait for max 3 mins.
