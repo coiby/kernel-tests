@@ -34,10 +34,17 @@ function check_tests()
 		# overwriting test logs with the same seq number under different dirs.
 		# e.g. if both generic/300 and ext4/300 fail, log file to be submitted
 		# are both 300.full/300.out.bad
-		# Rename log file by adding dir name prefix, so results/generic/300.full
-		# will be results/generic/generic-300.full, results/ext4/300.full will be
-		# results/ext4/ext4-300.full
-		XFSTEST_LOGNAME=$(dirname $XFSTEST)/${XFSTEST/\//-}
+		# Rename log file by adding TEST_ID and dir name prefix, so results/generic/300.full
+		# will be results/generic/ext4-generic-300.full, results/ext4/300.full will be
+		# results/ext4/ext4-ext4-300.full
+		# Add TEST_ID to avoid the same subtest log accumulating from
+		# one task, for example, "xfstests - nfsv4.2" to another
+		# "xfstests - cifs3.11". There will be 2 separated logs:
+		#   results/generic/nfs4-generic-300.log
+		#   results/generic/cifs-generic-300.log
+		# instead of concatenating 2 tests' log into one.
+		#
+		XFSTEST_LOGNAME=$(dirname $XFSTEST)/${TEST_ID}-${XFSTEST/\//-}
 		OUTPUTFILE="results/${XFSTEST_LOGNAME}.log"
 		mkdir -p $(dirname $OUTPUTFILE)
 		echoo "Running test $XFSTEST"
@@ -75,6 +82,10 @@ function check_tests()
 				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*Input/output error" && false_alarm=1
 				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*I/O error" && false_alarm=1
 				sed -n '3,$ p' results/$XFSTEST_LOGNAME.out.bad.diff | grep "^+.*not supported" && false_alarm=1
+			else
+				# Sometimes there is not enough disk space to
+				# generate these log files.
+				grep "./common/rc.*No space left on device" results/$XFSTEST_LOGNAME.log && false_alarm=1
 			fi
 			if [ -f results/$dmesgfile ]; then
 				cp results/$dmesgfile results/$XFSTEST_LOGNAME.dmesg.log
@@ -84,6 +95,9 @@ function check_tests()
 				grep "MAX_LOCKDEP_ENTRIES too low" results/$XFSTEST_LOGNAME.dmesg.log &&
 				false_alarm=1
 			fi
+			# Sometimes samba setup is broken.
+			grep "does not support the SMB version" results/$XFSTEST_LOGNAME.log && false_alarm=1
+
 			if [ $false_alarm -eq 0 ] ; then
 				ret=1
 				rstrnt-report-result $XFSTEST FAIL 0
