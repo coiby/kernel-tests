@@ -9,7 +9,16 @@ framework: shell
 recommend:
     - beakerlib-redhat
 require:
-    - bpftrace;fio;libaio;libaio-devel;libtool;automake;autoconf;g++;liburing-devel;qemu-img
+    - bpftrace
+    - fio
+    - libaio
+    - libaio-devel
+    - libtool
+    - automake
+    - autoconf
+    - g++
+    - liburing-devel
+    - qemu-img
 duration: 2h
 tier: 1
 extra-summary: /storage/block/RHEL_2107_ublk_testing

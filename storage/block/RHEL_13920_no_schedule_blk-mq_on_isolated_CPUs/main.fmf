@@ -9,7 +9,12 @@ framework: shell
 recommend:
     - beakerlib-redhat
 require:
-    - bpftrace;numactl;fio;libaio;libaio-devel;tuned-profiles-cpu-partitioning
+    - bpftrace
+    - numactl
+    - fio
+    - libaio
+    - libaio-devel
+    - tuned-profiles-cpu-partitioning
 duration: 2h
 tier: 1
 extra-summary: /storage/block/RHEL_13920_no_schedule_blk-mq_on_isolated_CPUs
