@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash -x ./runtest.sh
-dependencies=gcc
+dependencies=gcc;libguestfs-tools-c
 repoRequires=cki_lib
 max_time=1h
 use_pty=false
