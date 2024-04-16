@@ -29,7 +29,7 @@ component:
 path: /general/time/gettimeofday
 test: bash -x ./runtest.sh
 framework: shell
-duration: 120m
+duration: 30m
 require:
   - gcc
 tier: 1

@@ -5,7 +5,7 @@ test: bash -x ./runtest.sh
 framework: shell
 require:
   - gcc
-duration: 6h
+duration: 30m
 tier: 1
 extra-summary: general/time/leap-second/bz836803_futex
 extra-task: general/time/leap-second/bz836803_futex
