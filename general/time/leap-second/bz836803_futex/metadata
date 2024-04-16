@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash -x ./runtest.sh
 dependencies=gcc
-max_time=6h
+max_time=30m
 use_pty=false
