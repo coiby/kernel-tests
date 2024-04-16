@@ -252,7 +252,7 @@ check if LTP version on DCI matches the default on distribution/ltp/include/ltp-
         env['INTERNAL_GITLAB_HOST'] +
         '/api/v4/projects/' +
         (env['INTERNAL_GITLAB_PROJECT_ID']) +
-        '/repository/archive.zip?sha=refs/heads/' +
+        '/repository/archive.tar.gz?sha=refs/heads/' +
         env['TARGET_BRANCH']
       -%}
       {% set mr_url = env['CI_MERGE_REQUEST_PROJECT_URL'] +
