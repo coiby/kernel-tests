@@ -33,6 +33,6 @@ duration: 30m
 require:
   - gcc
 tier: 1
-tag: [tier1]
+tag: [tier1, KernelTier1]
 extra-summary: /general/time/gettimeofday
 extra-task: /general/time/gettimeofday

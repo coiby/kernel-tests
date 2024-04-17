@@ -4,6 +4,7 @@ enabled: true
 id: 3e086fed-d2a4-474b-b7cc-a79bfe8e0bb0
 tag:
   - fmf-export
+  - KernelTier1
 contact: Memory Management QE <mm-qe@redhat.com>
 component:
   - kernel
