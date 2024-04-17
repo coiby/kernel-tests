@@ -100,6 +100,8 @@ function rhel8_unfix_issues()
 	osver_in_range "800" "811" && tskip "splice07" unfix
 	# https://issues.redhat.com/browse/RHEL-29435 LTP proc_sched_rt01 fails
 	osver_in_range "800" "811" && tskip "proc_sched_rt01" unfix
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1906
+	is_arch "aarch64" && is_kvm && osver_in_range "800" "811" && tskip "zram01.sh" unfix
 }
 
 function rhel8_fixed_issues()
