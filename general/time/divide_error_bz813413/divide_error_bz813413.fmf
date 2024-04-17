@@ -3,7 +3,14 @@ contact: Qiao Zhao <qzhao@redhat.com>
 component:
   - kernel
 test: bash -x ./runtest.sh
+require:
+  - gcc
+  - libguestfs-tools-c
+  - type: file
+    pattern:
+        - /cki_lib
 framework: shell
+id: 621f77ec-ff2d-42ad-b7d1-1b81f8d5a4da
 duration: 60m
 extra-summary: /kernel-tests/general/time/divide_error_bz813413
 extra-task: /kernel-tests/general/time/divide_error_bz813413
