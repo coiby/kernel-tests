@@ -8,6 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash -x ./runtest.sh
+repoRequires=cki_lib
 dependencies=gcc;make
-max_time=12h
+max_time=5m
 use_pty=false
