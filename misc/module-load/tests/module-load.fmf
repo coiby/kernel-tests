@@ -16,6 +16,7 @@ enabled: true
 id: 6f4b3c26-4c60-4e7d-8cdc-8a7de9a1da8e
 tag:
   - fmf-export
+  - KernelTier1
 contact: Jeff Bastian <jbastian@redhat.com>
 component:
   - kernel

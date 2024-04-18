@@ -5,6 +5,7 @@ component:
 enabled: true
 tag: [
   /kernel/memory/mmap1,
+  KernelTier1,
   KG-VMM-TAG
   ]
 contact: Bill Peck <bpeck@redhat.com> 

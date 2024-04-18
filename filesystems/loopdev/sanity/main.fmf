@@ -7,8 +7,6 @@ contact: Xiong Zhou <xzhou@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
-tag:
-  - KernelTier1
 framework: shell
 require:
   - wget
