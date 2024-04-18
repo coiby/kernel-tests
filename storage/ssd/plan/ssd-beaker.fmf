@@ -27,8 +27,6 @@ execute:
     how: tmt
 provision:
     how: beaker
-    family: Fedora36
-    tag: released 
     hardware:
         hostname: "storageqe-62.rhts.eng.pek2.redhat.com"
 adjust:

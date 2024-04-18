@@ -5,7 +5,6 @@ discover:
         - /power-management/cpupower/*
 execute:
     how: tmt
-    framework: shell
 prepare:
     - name: Enable Repos
       how: shell
