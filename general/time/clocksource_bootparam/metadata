@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash -x ./runtest.sh
 dependencies=grubby
-repoRequires=cki_lib;automotive/include
+repoRequires=cki_lib;cmdline_helper
 max_time=1h
 use_pty=false

@@ -7,9 +7,14 @@ path: /general/time/clocksource_bootparam
 test: bash -x ./runtest.sh
 framework: shell
 require:
+  - type: file
+    pattern:
+        - /cki_lib
+        - /cmdline_helper
+recommend:
+  - abootimg
   - grubby
 duration: 1h
 extra-summary: /general/time/clocksource_bootparam
 extra-task: /general/time/clocksource_bootparam
-environment:
 id: 6fd01e68-1cf7-46b1-b6bf-e3128489e662
