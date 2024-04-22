@@ -397,6 +397,14 @@ cki_is_kernel_automotive()
     return 1
 }
 
+cki_is_ostree_booted()
+{
+    if stat /run/ostree-booted > /dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
+
 # need to tell which boards are android boot devices.
 # as the list of abd boards increase so will this function.
 
