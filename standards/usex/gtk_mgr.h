@@ -1,9 +1,5 @@
 /*  Author: David Anderson <anderson@redhat.com> */
 
-/*
- *  CVS: $Revision: 1.3 $ $Date: 2016/02/10 19:25:52 $
- */
-
 #define GTK_MGR_RESIZE    (0x1)
 #define SCROLL_TEST_DATA  (0x2)
 #define TRACK_WIDGETS     (0x4)

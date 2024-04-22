@@ -1,5 +1,4 @@
 /*
- *  CVS: $Revision: 1.3 $ $Date: 2006/06/12 18:56:06 $
  *
  */
 
@@ -210,6 +209,15 @@ main()
 }
 #endif
 
+int Proc0();
+int Proc1();
+int Proc2();
+int Proc3();
+int Proc4();
+int Proc5();
+int Proc6();
+int Proc7();
+int Proc8();
 
 /* Package 1  */
 int IntGlob;
@@ -222,6 +230,7 @@ RecordPtr PtrGlb;
 RecordPtr PtrGlbNext;
 
 
+int
 Proc0()
 {
   OneToFifty IntLoc1;
@@ -344,7 +353,7 @@ Proc0()
 
 }
 
-
+int
 Proc1(PtrParIn)
 REG RecordPtr PtrParIn;
 {
@@ -368,7 +377,7 @@ REG RecordPtr PtrParIn;
 #undef   NextRecord
 }
 
-
+int
 Proc2(IntParIO)
 OneToFifty *IntParIO;
 {
@@ -387,7 +396,7 @@ OneToFifty *IntParIO;
   }
 }
 
-
+int
 Proc3(PtrParOut)
 RecordPtr *PtrParOut;
 {
@@ -399,6 +408,7 @@ RecordPtr *PtrParOut;
 }
 
 
+int
 Proc4()
 {
   REG boolean BoolLoc;
@@ -410,6 +420,7 @@ Proc4()
 }
 
 
+int
 Proc5()
 {
   Char1Glob = 'A';
@@ -419,7 +430,7 @@ Proc5()
 
 extern boolean Func3();
 
-
+int
 Proc6(EnumParIn, EnumParOut)
 REG Enumeration EnumParIn;
 REG Enumeration *EnumParOut;
@@ -442,6 +453,7 @@ REG Enumeration *EnumParOut;
 }
 
 
+int
 Proc7(IntParI1, IntParI2, IntParOut)
 OneToFifty IntParI1;
 OneToFifty IntParI2;
@@ -454,7 +466,7 @@ OneToFifty *IntParOut;
   *IntParOut = IntParI2 + IntLoc;
 }
 
-
+int
 Proc8(Array1Par, Array2Par, IntParI1, IntParI2)
 Array1Dim Array1Par;
 Array2Dim Array2Par;
@@ -535,7 +547,7 @@ REG Enumeration EnumParIn;
 
 #ifdef   NOSTRUCTASSIGN
 #ifdef USEX
-static
+static int
 #endif
 _memcpy(d, s, l)
 register char *d;

@@ -1,0 +1,13 @@
+[General]
+name=standards/usex
+owner=Test Team owner <mmenashe@redhat.com>
+description=Usex test
+license=GPL3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=make;gcc;glibc-kernheaders;glibc-static;beakerlib;ncurses-devel
+softDpendencies=xorg-x11-devel;xorg-x11-server-devel
+repoRequires=cki_lib

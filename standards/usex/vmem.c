@@ -13,10 +13,6 @@
  *
  *         Random access is the default -- sequential access is available
  *         by using the -s flag.
- *
- *  BitKeeper ID: @(#)vmem.c 1.3
- *
- *  CVS: $Revision: 1.7 $ $Date: 2016/02/10 19:25:53 $
  */
 
 #include "defs.h"
@@ -190,8 +186,8 @@ vmem(void)
 		        strcpy(tbl->vmem_buffer, tbl->vmembuf);
 
 		        if (++logtime == 10) {
-				char buffer1[STRINGSIZE];
-				char buffer2[STRINGSIZE];
+				char buffer1[STRINGSIZE*2];
+				char buffer2[STRINGSIZE*4];
 				time_t now;
 
 				time(&now);

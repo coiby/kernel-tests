@@ -1,8 +1,5 @@
 /*  Author: David Anderson <anderson@redhat.com> 
  *
- *  BitKeeper ID: @(#)time_mgr.c 1.2
- *
- *  CVS: $Revision: 1.5 $ $Date: 2016/02/10 19:25:52 $
  */
  
 #include "defs.h"
@@ -77,8 +74,8 @@ run_time(char *buffer, ulong *requests)
 	if (!streq(buffer, "000:00:00"))
 		*requests |= TIMER_REQ_REFRESH;
         if (Shm->logfile) {
-            char logbuf[STRINGSIZE];
-	    char timebuf[STRINGSIZE];
+            char logbuf[STRINGSIZE*4];
+	    char timebuf[STRINGSIZE*2];
 	    char datebuf[STRINGSIZE];
 
 	    sys_time(timebuf);

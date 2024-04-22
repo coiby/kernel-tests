@@ -1,0 +1,19 @@
+summary: usex UNIX System Exerciser test
+description: |
+  The usex UNIX System Exerciser gives its user the capability of thoroughly exercising and testing several different kernel subsystems.
+  Usex is a single executable that acts as as test harness controlling one or more test programs.
+contact: Fendy Tjahjadi <ftjahjad@redhat.com>
+test: bash ./runtest.sh
+id: e1807ae2-7de1-47b1-9717-b488ac7709e7
+framework: beakerlib
+require:
+  - ncurses-devel
+  - make
+  - gcc
+  - glibc-static
+  - glibc-kernheaders
+  - restraint-rhts
+extra-summary: standards/usex
+extra-task: standards/usex
+enabled: true
+duration: 60m

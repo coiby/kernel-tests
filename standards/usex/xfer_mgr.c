@@ -7,10 +7,6 @@
  *                 block sizes.  The average, last, high, and low values 
  *                 are calculated each pass; the average is shown on the
  *                 test's display line.
- *
- *  BitKeeper ID: @(#)xfer_mgr.c 1.3
- *
- *  CVS: $Revision: 1.6 $ $Date: 2016/02/10 19:25:53 $
  */
 
 void
