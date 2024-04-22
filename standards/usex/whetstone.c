@@ -1,7 +1,3 @@
-/*
- *  CVS: $Revision: 1.2 $ $Date: 2006/11/17 16:01:39 $
- */
- 
 #include "defs.h"
 
 

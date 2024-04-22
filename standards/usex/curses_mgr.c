@@ -29,10 +29,6 @@
  *              array, waiting for some type of delimiter, either a <RETURN>
  *              or a usex-defined character.  When this happens the user
  *              input array is passed to the input_mgr() for processing.
- *
- *  BitKeeper ID: @(#)window_mgr.c 1.4
- *
- *  CVS: $Revision: 1.8 $ $Date: 2016/02/10 19:25:51 $
  */
 
 WINDOW_TABLE Window;           /* Table of window pointers. */
@@ -695,7 +691,7 @@ static void
 init_screens(void)
 {
     register int i, j, smp; 
-    char buffer1[STRINGSIZE];
+    char buffer1[STRINGSIZE*2];
     char buffer2[STRINGSIZE];
 
     /* Initialize the Standard Screen. */

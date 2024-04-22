@@ -1,9 +1,5 @@
 /*  Author: David Anderson <anderson@redhat.com> */
  
-/*
- *  CVS: $Revision: 1.4 $ $Date: 2016/02/10 19:25:52 $
- */
-
 #include "defs.h"
 
 void 

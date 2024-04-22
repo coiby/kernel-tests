@@ -6,8 +6,6 @@
  *   (1) an #include of the actual display-dependent window manager file.
  *   (2) the window_manager_init() function, called very early on to set up
  *       set up a few key fields in the shm_buf.
- *
- *  CVS: $Revision: 1.6 $ $Date: 2016/02/10 19:25:53 $
  */   
 
 #ifdef _CURSES_

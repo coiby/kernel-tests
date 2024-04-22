@@ -3,13 +3,9 @@
 /*
  *  defs.h: is the master definition header file that is used by all of the
  *          USEX modules.
- *
- *  BitKeeper ID: @(#)defs.h 1.7
- *
- *  CVS: $Revision: 1.45 $ $Date: 2016/02/10 19:25:51 $
  */
 
-#define USEX_VERSION  "1.9-38" 
+#define USEX_VERSION  "1.9-50" 
 #define COMPANY_NAME  "Red Hat, Inc."
 
 #ifndef linux
@@ -54,7 +50,7 @@
 #include <linux/kernel.h>
 //#include <linux/sys.h>
 #endif
-
+#include <semaphore.h>
 
 #undef TRUE
 #define TRUE  (1)
@@ -125,6 +121,8 @@ extern char *sys_errlist[];
 #define BIT38 0x4000000000ULL
 #define BIT39 0x8000000000ULL
 #define BIT40 0x10000000000ULL
+#define BIT41 0x20000000000ULL
+#define BIT42 0x40000000000ULL
 
 #define GIGABYTE (1024*1024*1024)
 #define MEGABYTE (1024*1024)
@@ -479,6 +477,8 @@ struct timer_request {
 #define GINIT           BIT38
 #define SYS_STATS       BIT39
 #define RHTS_HANG_TRACE BIT40
+#define BINCORE         BIT41
+#define POSIX_SEM       BIT42
 
 #define CTRL_C_ENTERED()  (Shm->mode & CTRL_C)
 #define NO_DISPLAY()      (Shm->mode & NODISPLAY)
@@ -810,6 +810,7 @@ typedef struct
         time_t i_timestamp;
         char i_rbuf[I_RINGBUFSIZE];
         char i_fatal_errmsg[FATAL_STRINGSIZE];
+	sem_t rbuf_lock;
 } PROC_TABLE;
 
 typedef struct
@@ -855,6 +856,7 @@ struct shm_buf
     int wake_me[NUMSG];
     volatile int being_read[NUMSG];
     volatile int being_written[NUMSG];
+    sem_t shm_lock; 
     long long heartbeat;          
 #define SEND_HEARTBEAT(id)   Shm->heartbeat |= ((long long)1 << (id))
 #define CLEAR_HEARTBEAT(id)  Shm->heartbeat &= ~((long long)1 << (id))
@@ -946,6 +948,8 @@ void die(int, int, int);
 void quick_die(int);
 void usex_inquiry(FILE *);
 void process_list(int, FILE *);
+int lock(sem_t *);
+int unlock(sem_t *);
 
 /*
  *  gtk_mgr.c
@@ -993,6 +997,7 @@ int pipe_write(int, char *, int);
 char *format_time_string(char *, char *);
 int what_is(char *, struct stat *);
 int file_exists(char *);
+int file_readable(char *);
 nlink_t file_nlinks(char *);
 int is_directory(char *);
 int file_copy(char *, char *);

@@ -19,7 +19,6 @@
  *  This scheme satisfies both USEX and GUI demands as efficiently as 
  *  possible, without burdening the kernel with frivolous system activity.  
  *
- *  CVS: $Revision: 1.12 $ $Date: 2016/02/10 19:25:52 $
  */
 
 #include <gtk/gtk.h>

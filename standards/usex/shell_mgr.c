@@ -4,10 +4,6 @@
 
 /*
  *  shell_mgr:  Repeatedly execute the shell command entered by the user.
- *
- *  BitKeeper ID: @(#)shell_mgr.c 1.5
- *
- *  CVS: $Revision: 1.9 $ $Date: 2016/02/10 19:25:52 $
  */
 
 static void sh_pass(ulong);

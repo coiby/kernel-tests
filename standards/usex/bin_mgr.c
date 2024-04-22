@@ -1,13 +1,11 @@
 /*  Author: David Anderson <anderson@redhat.com> */
 
 #include "defs.h"
+#include <sys/resource.h>
 
 /*
  *  bin_mgr: repeatedly execute a set of commands from various "bin" directories
  *
- *  BitKeeper ID: @(#)bin_mgr.c 1.4
- *
- *  CVS: $Revision: 1.22 $ $Date: 2016/02/10 19:25:51 $
  */
 
 #define IGNORE_EXIT          BIT0
@@ -43,7 +41,7 @@
 #define  BIN              BIT25   /* keep this group witin 32 bits */
 #define  USR_BIN          BIT26
 #define  USR_UCB          BIT27
-#define  USR_SBIN         BIT28 
+#define  USR_SBIN         BIT28
 #define  NOT_FOUND        BIT29
 #define  BIN_EXCLUSIVE    BIT30
 #define  BIN_EXCLUDED     BIT31
@@ -80,8 +78,14 @@ static struct bin_commands bin_commands[] = {
  *  created by usex; the few WAIT'ables make their own temporary files.
  */
     {"a2p", DEV_NULL, 0, 0},
+    {"a2x", DDHELP, 0, 0},
     {"ab -V", 0, 0, 0},
+    {"abs2rel /1/2/3/a/b/c /1/2/3", 0, 0, 0},
+    {"ac", 0, 0, 0},
     {"access -x", USE_ITSELF, 0, 0},
+    {"aclocal", DDHELP, 0, 0},
+    {"addr2line -v", 0, 0, 0},
+    {"alias", 0, 0, 0},
     {"apropos apropos", IGNORE_EXIT, 0, 0},
     {"ar", STDOUT_TO_NULL|CMD_SPECIFIC, 0, 0},
     {"arch", 0, 0, 0},
@@ -89,12 +93,20 @@ static struct bin_commands bin_commands[] = {
     {"at", IGNORE_EXIT, 0, 0},
     {"atq", 0, 0, 0},
     {"atrm", IGNORE_EXIT, 0, 0},
+    {"aulast", IGNORE_EXIT, 0, 0},
+    {"aulastlog", IGNORE_EXIT, 0, 0},
+    {"autoconf", DDHELP, 0, 0},
     {"automount --version", 0, 0, 0},
+    {"auvirt", DDHELP, 0, 0},
     {"awk {print}", STDIN_FROM_NULL, 0, 0},
+    {"base64", USE_ITSELF, 0, 0},
     {"bash", DEV_NULL, 0, 0},
     {"bc", STDIN_FROM_NULL, 0, 0},
     {"basename", USE_ITSELF, 0, 0},
+    {"bison --version", 0, 0, 0},
+    {"bootctl status", IGNORE_EXIT, 0, 0},
     {"cat", DEFAULT_FILE, 0, 0},
+    {"catchsegv --help", 0, 0, 0},
     {"cal", 0, 0, 0},
     {"captoinfo", STDOUT_TO_NULL|IGNORE_EXIT, 0, 0},
     {"cdp -v", 0, 0, 0},
@@ -105,18 +117,22 @@ static struct bin_commands bin_commands[] = {
     {"col", STDIN_FROM_NULL, 0, 0},
     {"colcrt", STDIN_FROM_NULL, 0, 0},
     {"colrm 1", STDIN_FROM_NULL, 0, 0},
+    {"column", STDIN_FROM_NULL, 0, 0},
     {"comm", DEFAULT_FILE_2, 0, 0},
     {"cp", DEFAULT_FILE|DEV_NULL, 0, 0},
     {"cpio -o", STDIN_FROM_NULL|STDOUT_TO_NULL, 0, 0},
+    {"crash -v", 0, 0, 0},
     {"crontab -z", IGNORE_EXIT, 0, 0},     /* to avoid filling cron logs */
+    {"cscope -V", 0, 0, 0},
     {"csh", IGNORE_EXIT|DEV_NULL, 0, 0},
-    {"csplit", IGNORE_EXIT, 0, 0},
+    {"csplit --version", 0, 0, 0},
     {"ctags", DDHELP, 0, 0},
     {"cu", IGNORE_EXIT, 0, 0},
     {"cut -di -f1", DEFAULT_FILE, 0, 0},
     {"cvs -v", 0, 0, 0},
     {"date", 0, 0, 0},
     {"dc", STDIN_FROM_NULL, 0, 0},
+    {"dconf help", 0, 0, 0},
     {"dd of=/dev/null if=", USE_ITSELF|NO_SPACE, 0, 0},
     {"ddate", 0, 0, 0},
     {"dip -v", IGNORE_EXIT, 0, 0},
@@ -124,17 +140,21 @@ static struct bin_commands bin_commands[] = {
     {"dirname", DEFAULT_FILE, 0, 0},
     {"df /", 0, 0, 0},
     {"diff", DEFAULT_FILE_2, 0, 0},
+    {"diff3", DDHELP, 0, 0},
     {"dmesg", 0, 0, 0},
     {"doexec", IGNORE_EXIT|USE_ITSELF, 0, 0},
     {"domainname", 0, 0, 0},
     {"dos --version", IGNORE_EXIT, 0, 0},
+    {"dot", STDIN_FROM_NULL|STDOUT_TO_NULL, 0, 0},
     {"du -s", USE_ITSELF, 0, 0},
-    {"dumpkeys --keys-only", IGNORE_EXIT, 0, 0},
+    {"dumpkeys", DDHELP|IGNORE_EXIT, 0, 0},
     {"echo", USE_ITSELF, 0, 0},
     {"ed", STDIN_FROM_NULL|DEFAULT_FILE, 0, 0},
     {"egrep bin", DEFAULT_FILE, 0, 0},
     {"eject -n", IGNORE_EXIT, 0, 0},
+    {"elfedit", DDHELP, 0, 0},
     {"elmalias nobody", 0, 0, 0},
+    {"emacs", DDHELP, 0, 0},
     {"env", 0, 0, 0},
     {"etags", DDHELP, 0, 0},
     {"etex", DDHELP, 0, 0},
@@ -142,17 +162,25 @@ static struct bin_commands bin_commands[] = {
     {"expand", DEFAULT_FILE, 0, 0},
     {"expr 1+1", 0, 0, 0},
     {"factor 1024", IGNORE_EXIT, 0, 0},
+    {"fallocate -l1", DEFAULT_FILE, 0, 0},
     {"false", IGNORE_EXIT, 0, 0},
     {"fgrep bin", DEFAULT_FILE, 0, 0},
     {"file", USE_ITSELF, 0, 0},
-    {"find /bin -print", STDOUT_TO_NULL, 0, 0},
+    {"filterdiff", DDHELP, 0, 0},
+    {"find /usr/bin", 0, 0, 0},
+    {"find2perl", 0, 0, 0},
+    {"findmnt", 0, 0, 0},
     {"finger", 0, 0, 0},
+    {"fipscheck", USE_ITSELF, 0, 0},
     {"flex", DDHELP, 0, 0},
+    {"flock", DDHELP, 0, 0},
     {"fmt", DEFAULT_FILE, 0, 0},
     {"fold", DEFAULT_FILE, 0, 0},
     {"free", 0, 0, 0},
+    {"ftp", STDIN_FROM_NULL, 0, 0},
     {"funzip", IGNORE_EXIT, 0, 0},
     {"fuser -V", 0, 0, 0},
+    {"fusermount -h", IGNORE_EXIT, 0, 0},
     {"fwhois", IGNORE_EXIT, 0, 0},
     {"gasp", 0, 0, 0},
     {"gawk {print}", DEFAULT_FILE, 0, 0},
@@ -163,7 +191,10 @@ static struct bin_commands bin_commands[] = {
     {"gimp -h", IGNORE_EXIT, 0, 0},
     {"git --help", IGNORE_EXIT, 0, 0},
     {"glib-config --libs --cflags", 0, 0, 0},
+    {"glxinfo", IGNORE_EXIT, 0, 0},
+    {"glxinfo64", IGNORE_EXIT, 0, 0},
     {"gmake", DEV_NULL, 0, 0},
+    {"gpg2", DDHELP, 0, 0},
     {"gprof", IGNORE_EXIT, 0, 0},
     {"grep bin", DEFAULT_FILE, 0, 0},
     {"groups", IGNORE_EXIT, 0, 0},
@@ -179,22 +210,33 @@ static struct bin_commands bin_commands[] = {
     {"gzip", STDIN_FROM_NULL|STDOUT_TO_NULL|CLOSE_STDERR, 0, 0},
     {"head", DEFAULT_FILE, 0, 0},
     {"hexdump", USE_ITSELF, 0, 0},
+    {"hostid", 0, 0, 0},
     {"hostname", 0, 0, 0},
+    {"hostnamectl status", 0, 0, 0},
+    {"hunspell", DEV_NULL, 0, 0},
     {"iconv", STDIN_FROM_NULL|CLOSE_STDERR|IGNORE_EXIT, 0, 0},
     {"id", IGNORE_EXIT, 0, 0},
     {"ident", USE_ITSELF, 0, 0},
+    {"idn", DEV_NULL, 0, 0},
     {"ifnames", DEV_NULL, 0, 0},
     {"inc -v", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
     {"info", DDHELP, 0, 0},
     {"infocmp -C", 0, 0, 0},
+    {"infokey", DDHELP, 0, 0},
+    {"install", DDHELP, 0, 0},
+    {"interdiff", DDHELP, 0, 0},
+    {"ionice", 0, 0, 0},
     {"ipcalc", IGNORE_EXIT, 0, 0},
     {"ipcrm", IGNORE_EXIT, 0, 0},
-    {"ipcs", IGNORE_EXIT|LIMIT_OUTPUT, 0, 0},  
+    {"ipcs", IGNORE_EXIT|LIMIT_OUTPUT, 0, 0},
+    {"isosize", USE_ITSELF|IGNORE_EXIT, 0, 0},
     {"ispell -v", 0, 0, 0},
     {"join", DEFAULT_FILE_2, 0, 0},
+    {"journalctl -n", 0, 0, 0},
     {"jpegtran", DDHELP|IGNORE_EXIT, 0, 0},
     {"kbd_mode", IGNORE_EXIT, 0, 0},
     {"kill -l", 0, 0, 0},
+    {"kmod", DDHELP, 0, 0},
     {"last -n 10", IGNORE_EXIT, 0, 0},
     {"less", DEFAULT_FILE, 0, 0},
     {"lesskey", IGNORE_EXIT|DEV_NULL, 0, 0},
@@ -209,8 +251,14 @@ static struct bin_commands bin_commands[] = {
     {"lpq", IGNORE_EXIT, 0, 0},
     {"lptest", 0, 0, 0},
     {"ls -l", USE_ITSELF, 0, 0},
+    {"lslocks", 0, 0, 0},
+    {"lslogins", 0, 0, 0},
+    {"lsmem", DDHELP, 0, 0},
+    {"lsns", IGNORE_EXIT, 0, 0},
+    {"lsscsi", 0, 0, 0},
     {"lsattr", 0, 0, 0},
     {"lynx -help", 0, 0, 0},
+    {"lz4", DDHELP, 0, 0},
     {"mag 1", IGNORE_EXIT, 0, 0},
     {"man man", IGNORE_EXIT, 0, 0},
     {"m4", DEFAULT_FILE, 0, 0},
@@ -219,10 +267,14 @@ static struct bin_commands bin_commands[] = {
     {"mailstats", IGNORE_EXIT, 0, 0},
     {"make", DEV_NULL, 0, 0},
     {"man -f man", IGNORE_EXIT, 0, 0},
+    {"manpath", 0, 0, 0},
+    {"mcookie", 0, 0, 0},
+    {"md5sum", USE_ITSELF, 0, 0},
     {"merge", DEV_NULL|WAIT|DEFAULT_FILE_2, 0, 0},
-    {"mesg", IGNORE_EXIT, 0, 0}, 
+    {"mesg", IGNORE_EXIT, 0, 0},
     {"more", DEV_NULL, 0, 0},
     {"mount", 0, 0, 0},
+    {"mountpoint /", 0, 0, 0},
     {"mpost -v", 0, 0, 0},
     {"mt status", IGNORE_EXIT, 0, 0},
     {"mutt -v", 0, 0, 0},
@@ -234,24 +286,32 @@ static struct bin_commands bin_commands[] = {
     {"newer", DEFAULT_FILE_2, 0, 0},
     {"next -v", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
     {"nfsstat", IGNORE_EXIT, 0, 0},
+    {"ngettext", DDHELP, 0, 0},
     {"nice", 0, 0, 0},
     {"nl", DEFAULT_FILE, 0, 0},
     {"nmblookup", IGNORE_EXIT, 0, 0},
     {"nohup /bin/ls", STDOUT_TO_NULL, 0, 0},
+    {"nproc", 0, 0, 0},
     {"nroff", DEFAULT_FILE, 0, 0},
+    {"nsenter", DDHELP, 0, 0},
+    {"ntpstat", IGNORE_EXIT, 0, 0},
+    {"numfmt 1", 0, 0, 0},
     {"objcopy", DDHELP, 0, 0},
     {"objdump --section-headers", USE_ITSELF, 0, 0},
     {"od -c", DEFAULT_FILE, 0, 0},
     {"odvips", DDHELP, 0, 0},
+    {"oldfind /usr/bin", 0, 0, 0},
     {"otangle", DDHELP, 0, 0},
     {"paste", DEFAULT_FILE_2, 0, 0},
     {"patch", STDIN_FROM_NULL, 0, 0},
     {"pathchk", USE_ITSELF, 0, 0},
     {"perl -V", 0, 0, 0},
     {"perldoc -h", IGNORE_EXIT, 0, 0},
+    {"pflags", IGNORE_EXIT, 0, 0},
     {"pick -h", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
     {"ping -c 1", LOCALHOST|IGNORE_EXIT, 0, 0},
     {"play -h", IGNORE_EXIT, 0, 0},
+    {"pmap", DDHELP, 0, 0},
     {"pmap_dump", 0, 0, 0},
     {"praliases", 0, 0, 0},
     {"prev -v", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
@@ -259,13 +319,19 @@ static struct bin_commands bin_commands[] = {
     {"printf hello\\n", 0, 0, 0},
     {"pr", DEFAULT_FILE, 0, 0},
     {"printmail", DEV_NULL, 0, 0},
+    {"prlimit", 0, 0, 0},
     {"procmail -v", 0, 0, 0},
     {"prompter -h", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
-    {"ps aux", IGNORE_EXIT, 0, 0},   
-    {"pstree", IGNORE_EXIT, 0, 0},   
+    {"prtstat 1", 0, 0, 0},
+    {"ps aux", IGNORE_EXIT, 0, 0},
+    {"pstree", IGNORE_EXIT, 0, 0},
     {"pwd", 0, 0, 0},
+    {"pwdx 1", IGNORE_EXIT, 0, 0},
+    {"pwmake 1", 0, 0, 0},
+    {"python", STDIN_FROM_NULL, 0, 0},
     {"quota -u root", IGNORE_EXIT, 0, 0},
     {"ranlib", IGNORE_EXIT, 0, 0},
+    {"reset -V", 0, 0, 0},
     {"rcp", DEFAULT_FILE|DEV_NULL, 0, 0},
     {"rcs", IGNORE_EXIT, 0, 0},
     {"rcsdiff", IGNORE_EXIT, 0, 0},
@@ -274,9 +340,14 @@ static struct bin_commands bin_commands[] = {
     {"renice", IGNORE_EXIT, 0, 0},
     {"rdate", IGNORE_EXIT|LOCALHOST, 0, 0},
     {"rdist -V", 0, 0, 0},
-    {"reset", IGNORE_EXIT, 0, 0},
+    {"readelf -a", USE_ITSELF, 0, 0},
+    {"readlink", USE_ITSELF|IGNORE_EXIT, 0, 0},
+    {"realpath", USE_ITSELF, 0, 0},
+    {"red", STDIN_FROM_NULL, 0, 0},
+    {"renice", DDHELP, 0, 0},
     {"refer", DEV_NULL, 0, 0},
     {"refile -v", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
+    {"rename", DDHELP, 0, 0},
     {"renice", IGNORE_EXIT, 0, 0},
     {"repl -v", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
     {"rev", DEFAULT_FILE, 0, 0},
@@ -284,7 +355,11 @@ static struct bin_commands bin_commands[] = {
     {"rlogin", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
     {"rpcgen", IGNORE_EXIT, 0, 0},
     {"rpcinfo -p", IGNORE_EXIT|LOCALHOST, 0, 0},
+    {"rpm --version", 0, 0, 0},
+    {"rpmbuild --version", 0, 0, 0},
     {"rsh", IGNORE_EXIT, 0, 0},
+    {"rsync", DDHELP, 0, 0},
+    {"runcon", 0, 0, 0},
     {"rup", LOCALHOST|IGNORE_EXIT, 0, 0},
     {"ruptime", LOCALHOST|IGNORE_EXIT, 0, 0},
     {"rusers", LOCALHOST|IGNORE_EXIT, 0, 0},
@@ -292,15 +367,23 @@ static struct bin_commands bin_commands[] = {
     {"rx", DDHELP, 0, 0},
     {"rz", DDHELP, 0, 0},
     {"safe_finger", IGNORE_EXIT, 0, 0},
+    {"scp", DEFAULT_FILE|DEV_NULL, 0, 0},
     {"sdiff", DEFAULT_FILE_2, 0, 0},
     {"sed -n -e 1p", DEFAULT_FILE, 0, 0},
-    {"sendmail -bp", IGNORE_EXIT, 0, 0},
+    {"setarch", DDHELP, 0, 0},
     {"setserial -V", 0, 0, 0},
     {"seq", DDHELP, 0, 0},
     {"sh", DEV_NULL, 0, 0},
+    {"shasum", USE_ITSELF, 0, 0},
+    {"sha1sum", USE_ITSELF, 0, 0},
+    {"sha224sum", USE_ITSELF, 0, 0},
+    {"sha256sum", USE_ITSELF, 0, 0},
+    {"sha384sum", USE_ITSELF, 0, 0},
+    {"sha512sum", USE_ITSELF, 0, 0},
     {"show -v", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
     {"showkey", DDHELP|IGNORE_EXIT, 0, 0},
     {"showmount", DDHELP, 0, 0},
+    {"shuf", STDIN_FROM_NULL , 0, 0},
     {"size", USE_ITSELF, 0, 0},
     {"skill -l", 0, 0, 0},
     {"sleep 1", 0, 0, 0},
@@ -311,16 +394,21 @@ static struct bin_commands bin_commands[] = {
     {"sortm -help", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
     {"spell", USE_ITSELF, 0, 0},
     {"splac", IGNORE_EXIT, 0, 0},
+    {"splain", STDIN_FROM_NULL, 0, 0},
     {"splash", IGNORE_EXIT, 0, 0},
     {"sq", STDIN_FROM_NULL, 0, 0},
+    {"stat", USE_ITSELF, 0, 0},
+    {"splac", IGNORE_EXIT, 0, 0},
     {"strace", USE_ITSELF|WAIT|IGNORE_EXIT, 0, 0},
     {"strings", DEFAULT_FILE, 0, 0},
     {"stty -a", IGNORE_EXIT, 0, 0},
     {"suidperl -h", 0, 0, 0},
     {"sum", USE_ITSELF, 0, 0},
+    {"svn help", 0, 0, 0},
     {"sx", DDHELP, 0, 0},
     {"sy", DDHELP, 0, 0},
     {"sync", 0, 0, 0},
+    {"tac", DEFAULT_FILE, 0, 0},
     {"tail", DEFAULT_FILE, 0, 0},
     {"tcl", DEV_NULL, 0, 0},
     {"tee", STDIN_FROM_NULL|STDOUT_TO_NULL, 0, 0},
@@ -330,33 +418,42 @@ static struct bin_commands bin_commands[] = {
     {"tic", IGNORE_EXIT, 0, 0},
     {"tie", IGNORE_EXIT, 0, 0},
     {"time /bin/ls /bin/ls", 0, 0, 0},
+    {"timeout", DDHELP, 0, 0},
     {"tload -V", 0, 0, 0},
     {"toe -V", 0, 0, 0},
     {"tput", IGNORE_EXIT, 0, 0},
     {"tr -d x", STDIN_FROM_NULL, 0, 0},
     {"traceroute", LOCALHOST|IGNORE_EXIT, 0, 0},
     {"true", 0, 0, 0},
-    {"tset", IGNORE_EXIT, 0, 0},
+    {"trust list", 0, 0, 0},
+    {"tset -V", 0, 0, 0},
     {"tsort", DEV_NULL, 0, 0},
     {"tty", IGNORE_EXIT, 0, 0},
+    {"turbostat --version", 0, 0, 0},
     {"ul", DEV_NULL, 0, 0},
+    {"umask", 0, 0, 0},
     {"umount", IGNORE_EXIT, 0, 0},
     {"uname", 0, 0, 0},
     {"unexpand", DEFAULT_FILE, 0, 0},
     {"uniq", DEFAULT_FILE, 0, 0},
     {"unshar", DDHELP, 0, 0},
+    {"unshare", DDHELP, 0, 0},
     {"unsq", STDIN_FROM_NULL, 0, 0},
     {"uuname -l", 0, 0, 0},
     {"uptime", 0, 0, 0},
     {"users", 0, 0, 0},
     {"usleep 1000000", 0, 0, 0},
     {"uuencode", DEFAULT_FILE_2, 0, 0},
+    {"uuidgen", 0, 0, 0},
     {"uux", IGNORE_EXIT, 0, 0},
     {"vdir", IGNORE_EXIT, 0, 0},
     {"viamail -version", IGNORE_EXIT, 0, 0},
     {"vmstat", 0, 0, 0},
+    {"w", 0, 0, 0},
+    {"wait", 0, 0, 0},
     {"wc -l", DEFAULT_FILE, 0, 0},
     {"weave", DDHELP, 0, 0},
+    {"wget", DDHELP, 0, 0},
     {"whatis", DEV_NULL|IGNORE_EXIT, 0, 0},
     {"whatnow -v", STDIN_FROM_NULL|IGNORE_EXIT, 0, 0},
     {"whereis whereis", 0, 0, 0},
@@ -366,7 +463,6 @@ static struct bin_commands bin_commands[] = {
     {"xargs", STDIN_FROM_NULL, 0, 0},
     {"yacc", IGNORE_EXIT, 0, 0},
     {"yes --version", 0, 0, 0},
-    {"ypwhich", DDHELP, 0, 0}, 
     {"zdump eastern", 0, 0, 0},
     {"zcmp", IGNORE_EXIT, 0, 0},
     {"zdiff", IGNORE_EXIT, 0, 0},
@@ -443,7 +539,7 @@ static struct bin_commands bin_commands[] = {
     {END_OF_LIST}
 };
 
-static void kill_child(void); 
+static void kill_child(void);
 static void bin_pass(ulong);
 static int pipe_line(int, char *);
 static int bin_pass_strlen(ulong);
@@ -456,7 +552,7 @@ static void bin_bailout(char *);
 static void fill_action(char *, char *);
 static void bin_fork_failure(PROC_TABLE *, int);
 static int resource_unavailable(char *s, struct bin_commands *, PROC_TABLE *);
-static int search_for_commands(PROC_TABLE *); 
+static int search_for_commands(PROC_TABLE *);
 static int command_location(struct bin_commands *);
 static char *get_command_name(struct bin_commands *, char *);
 static void dump_not_found(PROC_TABLE *, FILE *);
@@ -502,6 +598,13 @@ bin_mgr(int proc)
     if (!streq(Shm->tmpdir, "/tmp"))
     	setenv("TMPDIR", Shm->tmpdir, TRUE);
 
+    if (Shm->mode & BINCORE) {
+	struct rlimit rlimit_core;
+	getrlimit (RLIMIT_CORE, &rlimit_core);
+	rlimit_core.rlim_cur = RLIM_INFINITY;
+	setrlimit (RLIMIT_CORE, &rlimit_core);
+    }
+
     ID = proc;
 
     time(&now);
@@ -517,24 +620,24 @@ bin_mgr(int proc)
     tbl->cur_order = -1;
     tbl->BP = &tbl->null_cmd;
 
-    if (chdir(Shm->tmpdir) != 0) 
+    if (chdir(Shm->tmpdir) != 0)
         fatal(ID, Shm->tmpdir, errno);
 
     /*
      *  Certain files must exist in known locations for the bin_mgr to work.
      */
-    if (!file_exists("/bin/ls")) 
+    if (!file_exists("/bin/ls"))
         fatal(ID, "bin_mgr: /bin/ls", errno);
 
-    if (!file_exists("/bin/cp")) 
+    if (!file_exists("/bin/cp"))
         fatal(ID, "bin_mgr: /bin/cp", errno);
-    
-    if (!file_exists("/bin/mkdir")) 
+
+    if (!file_exists("/bin/mkdir"))
         fatal(ID, "bin_mgr: /bin/mkdir", errno);
-    
-    if (!file_exists("/bin/rm")) 
+
+    if (!file_exists("/bin/rm"))
         fatal(ID, "bin_mgr: /bin/rm", errno);
-    
+
     if (!file_exists("/dev/null"))
         fatal(ID, "bin_mgr: /dev/null", errno);
 
@@ -557,7 +660,7 @@ bin_mgr(int proc)
 
     if ((nullfd = open("/dev/null", O_RDWR)) < 0)
 	fatal(ID, "bin_mgr: cannot open /dev/null", errno);
-	
+
     do_cmd_specific();
 
     if (Shm->mode & IGNORE_BIN_EXIT)
@@ -575,26 +678,26 @@ bin_mgr(int proc)
 	    continue;
         }
 
-	if (strncmp(argv[i], "-", 1) != 0) { 
+	if (strncmp(argv[i], "-", 1) != 0) {
 	    cmdptr = argv[i];
             if (strlen(cmdptr))
 	    	bin_exclusive(cmdptr);
 	    continue;
 	}
 
-        if (strncmp(argv[i], "-v", 2) == 0) 
+        if (strncmp(argv[i], "-v", 2) == 0)
  	    tbl->i_stat &= ~IO_BKGD; /* -v is only way to start verbose */
 
         if (strncmp(argv[i], "-m", 2) == 0) {
             tbl->bin_flags |= BIN_MON;
         }
         if (strncmp(argv[i], "-p", 2) == 0) {
-            if (strlen(argv[i]) > strlen("-p")) 
+            if (strlen(argv[i]) > strlen("-p"))
                 tbl->max_pass = atol(&argv[i][2]);
         }
         if (strncmp(argv[i], "-i", 2) == 0) {
             if (strlen(argv[i]) > strlen("-i")) {
-                if ((bp = find_cmd(&argv[i][2], 0, 0))) 
+                if ((bp = find_cmd(&argv[i][2], 0, 0)))
 		    bp->cmdflags |= IGNORE_EXIT;
             }
             else {
@@ -606,7 +709,7 @@ bin_mgr(int proc)
  	    tbl->bin_flags |= BIN_DEBUG;
         if (strcmp(argv[i], "-k") == 0) {
 	    set_time_of_death(ID);
-            _exit(BIN_MGR_K); 
+            _exit(BIN_MGR_K);
 	}
 	if (strncmp(argv[i], "-nol", 4) == 0)
 	    tbl->i_stat |= IO_NOLOG;
@@ -628,22 +731,22 @@ bin_mgr(int proc)
     if (tbl->bin_flags & BIN_UPDATE)
     	sync_with_window_mgr(tbl);
 
-    if (GTK_DISPLAY()) 
+    if (GTK_DISPLAY())
 	size_command_window(tbl);
 
     bin_pass(tbl->i_pass = 1);
 
-    if (tbl->i_stat & IO_BKGD) 
+    if (tbl->i_stat & IO_BKGD)
         sprintf(tbl->i_msgq.string, "%c%c BKGD ", FSTAT,
             tbl->i_local_pid);
-    else 
+    else
         sprintf(tbl->i_msgq.string, "%c%c  OK  ", FSTAT,
             tbl->i_local_pid);
     bin_send(0);
 
     for (EVER) {
 
-        if (tbl->i_stat & (IO_HOLD|IO_HOLD_PENDING)) 
+        if (tbl->i_stat & (IO_HOLD|IO_HOLD_PENDING))
  	    put_test_on_hold(tbl, ID);
 
 	if (Shm->mode & SYNC_BIN_TESTS) {
@@ -662,7 +765,7 @@ bin_mgr(int proc)
 
 	while ((bp = get_next_bp())) {
 
-            if (bp->cmdflags & BIN_EXCLUDED) 
+            if (bp->cmdflags & BIN_EXCLUDED)
 		continue;
 
 	    if (tbl->bin_flags & BIN_EXCL) {
@@ -682,12 +785,12 @@ bin_mgr(int proc)
             tbl->i_pass++;
             tbl->cmd_cnt = 0;
             bin_pass(tbl->i_pass);
-            if (tbl->max_pass && (tbl->i_pass > tbl->max_pass)) 
+            if (tbl->max_pass && (tbl->i_pass > tbl->max_pass))
                 bin_bailout("reached maximum pass count");
         }
 
         /*
-         *  Force the command to come out of /bin, /usr/bin, 
+         *  Force the command to come out of /bin, /usr/bin,
 	 *  /usr/ccs/bin or /usr/ucb.
          */
         found = FALSE;
@@ -695,30 +798,30 @@ bin_mgr(int proc)
         argc = parse(command, argv);
 
         /*
-         *  If output from a command is to be restricted, the bp->cleanup 
+         *  If output from a command is to be restricted, the bp->cleanup
          *  field is used as a "maximum lines to read" value.
-         */ 
+         */
         max_lines = (bp->cmdflags & LIMIT_OUTPUT) ? MAX_LINES : 0;
 
 	/*
-         *  After the first pass, we know where the command is, 
+         *  After the first pass, we know where the command is,
          *  or if it can't be found at all.
          */
 	switch (bp->cmdflags & LOCATIONS)
 	{
-        case BIN:         
+        case BIN:
 	    sprintf(path, "/bin/%s", argv[0]);
 	    goto bin;
-        case USR_BIN:    
+        case USR_BIN:
 	    sprintf(path, "/usr/bin/%s", argv[0]);
-	    goto usr_bin; 
-        case USR_UCB: 
+	    goto usr_bin;
+        case USR_UCB:
 	    sprintf(path, "/usr/ucb/%s", argv[0]);
-	    goto usr_ucb; 
-        case USR_SBIN:    
+	    goto usr_ucb;
+        case USR_SBIN:
 	    sprintf(path, "/usr/sbin/%s", argv[0]);
 	    goto usr_sbin;
-        case NOT_FOUND:   
+        case NOT_FOUND:
             goto cmd_not_found;
 	}
 
@@ -837,7 +940,7 @@ cmd_not_found:
         if (tbl->bin_flags & BIN_MON) {
             Shm->stderr("\n\r%s %s start...\r\n", bp->cmdpath,
                 bp->cmdflags & WAIT ? "(WAIT)" : "");
-            sleep(1); 
+            sleep(1);
         }
 
 	tbl->i_stat |= IO_FORK;
@@ -872,7 +975,7 @@ bin_fork:
                 dup(nullfd);
 	    }
 
-	    if (bp->cmdflags & CLOSE_STDOUT) 
+	    if (bp->cmdflags & CLOSE_STDOUT)
                 close(1);
 
             if (bp->cmdflags & CLOSE_STDERR)
@@ -897,7 +1000,7 @@ bin_fork:
 
 	tbl->i_stat &= ~(IO_FORK|IO_ADMIN1);
 	tbl->i_stat |= IO_CHILD_RUN;
-    
+
         tbl->bin_child = child;  /* Only parent touches bin_child field. */
 
         close(lp[1]);   /* Close the "write" end of the pipe. */
@@ -917,10 +1020,10 @@ bin_fork:
             buf[j] = (char)NULLCHAR;
 	}
 
-        if (GTK_DISPLAY()) { 
+        if (GTK_DISPLAY()) {
             sprintf(buf, bp->cmdpath);
-            sprintf(tbl->i_msgq.string, 
-	        "%c%c%s", FSIZE, tbl->i_local_pid, 
+            sprintf(tbl->i_msgq.string,
+	        "%c%c%s", FSIZE, tbl->i_local_pid,
 		mkstring(buf, tbl->i_limit, CENTER));
             if (!(bp->cmdflags & NO_SHOW))
                  bin_send(0);
@@ -937,29 +1040,29 @@ bin_fork:
                     59 - (bin_pass_strlen(tbl->i_pass) - 4);
                 sprintf(&buf[k], "]  %4ld", tbl->i_pass);
                 strcpy(tbl->i_msgq.string, buf);
-                tbl->i_msgq.string[0] = FSHELL; 
+                tbl->i_msgq.string[0] = FSHELL;
 	    }
 	    if (GTK_DISPLAY()) {
 		strip_lf(buf);
 		mkstring(buf, 80, TRUNC|LJUST);
-                sprintf(tbl->i_msgq.string, "%c%c%s", FSHELL, 
-                        tbl->i_local_pid, buf); 
+                sprintf(tbl->i_msgq.string, "%c%c%s", FSHELL,
+                        tbl->i_local_pid, buf);
 	    }
 
-            if ((bp->cmdflags & LIMIT_OUTPUT) && (data_lines >= max_lines)) { 
+            if ((bp->cmdflags & LIMIT_OUTPUT) && (data_lines >= max_lines)) {
                 Kill(child, SIGKILL, "B1", K_IO(ID));
                 wait(&cstat);
                 while (Kill(child, 0, "B2", K_IO(ID)) == 0)
                     sleep(1);
             }
 
-            if (tbl->i_stat & IO_BKGD) 
+            if (tbl->i_stat & IO_BKGD)
                     continue;
 
-            if (!(bp->cmdflags & NO_SHOW)) 
+            if (!(bp->cmdflags & NO_SHOW))
                 bin_send(0);
 
-            if (tbl->time_to_die) 
+            if (tbl->time_to_die)
                 break;
         }
         close(lp[0]);
@@ -972,7 +1075,7 @@ bin_fork:
 	tbl->i_stat |= IO_ADMIN2;
 
         if (tbl->bin_flags & BIN_MON) {
-            sleep(1); 
+            sleep(1);
             Shm->stderr("\r%s %s done.\r\n", bp->cmdpath,
                 bp->cmdflags & WAIT ? "(WAIT)" : "");
         }
@@ -1000,7 +1103,7 @@ bin_fork:
          */
         if ((bp->cmdflags & LIMIT_OUTPUT) && (data_lines >= max_lines))
             cstat = 0;
-        if (bp->cmdflags & IGNORE_EXIT) 
+        if (bp->cmdflags & IGNORE_EXIT)
             cstat = 0;
 
         switch (cstat & 0xff)
@@ -1020,7 +1123,7 @@ bin_fork:
     	       	        buf[0] = MANDATORY_FSHELL;
     		    else
     		        buf[0] = MANDATORY_FSHELL;  /* ?? */
-    
+
                     strcpy(tbl->i_msgq.string, buf);
 		}
 		if (GTK_DISPLAY()) {
@@ -1036,9 +1139,9 @@ bin_fork:
                     rm_tmp_files(bp);
                     tbl->bin_flags &= ~BIN_CLEAN;
 
-		    if (bp->cmdflags & LEADER) 
-			get_next_bp();   /* throw away FOLLOWer */    
-		    
+		    if (bp->cmdflags & LEADER)
+			get_next_bp();   /* throw away FOLLOWer */
+
 		    break;
 		}
 
@@ -1115,7 +1218,7 @@ bin_pass_strlen(ulong pass)
 }
 
 /*
- * pipe_line:  Read the child's output from the the common pipe, and 
+ * pipe_line:  Read the child's output from the the common pipe, and
  *             copy the output a line at a time to the mother's buffer.
  */
 
@@ -1133,23 +1236,23 @@ pipe_line(int pipe, char *buffer)
         switch (read(pipe, &c, 1))
         {
             case -1:            /* The read failed */
-		if (errno == EINTR)  
+		if (errno == EINTR)
 			continue;
 		return(-1);
 
             case  0:            /* The pipe was empty. */
                 return(-1);
 
-            default:              
+            default:
 		if (throw_away) {
-		    if (c == (char)NULLCHAR || c == '\n') 
+		    if (c == (char)NULLCHAR || c == '\n')
 			goto stash_message;
 		    else
 			break;
 		}
                                   /* Keep reading characters until a */
                 if (c < ' ') {    /* NULL or a LINEFEED is read. */
-                    switch (c) 
+                    switch (c)
                     {
                     case '\0':
                         *buffer++ = c;
@@ -1181,7 +1284,7 @@ pipe_line(int pipe, char *buffer)
                     count++;
                 }
 
-	        break;	
+	        break;
         }
 
 	if (count >= (MAX_PIPELINE_READ)) {
@@ -1242,7 +1345,9 @@ bin_send(int sync)
 
     case MMAP_MODE:
     case SHMEM_MODE:
+	lock(&Shm->ptbl[ID].rbuf_lock);
         shm_write(RING_IO(ID),tbl->i_msgq.string,strlen(tbl->i_msgq.string)+1);
+	unlock(&Shm->ptbl[ID].rbuf_lock);
 	break;
     }
 
@@ -1274,7 +1379,7 @@ kill_child(void)
 
     if (tbl->bin_child) {
        Kill(tbl->bin_child, SIGKILL, "B3", K_IO(ID)); /* Make sure it's dead. */
-	while ((ret = waitpid(tbl->bin_child, &status, WNOHANG)) != 
+	while ((ret = waitpid(tbl->bin_child, &status, WNOHANG)) !=
 	   tbl->bin_child){
 	   if (Kill(tbl->bin_child, 0, "B4", K_IO(ID)) != 0)
 		break;
@@ -1298,7 +1403,7 @@ kill_child(void)
 /*
  *  Clean up any tmp files that belong to BIN_TEST "i".
  *  This is called from external routines, so the use of "ID" is
- *  inappropriate; 
+ *  inappropriate;
  */
 int
 bin_cleanup(int i, int originator)
@@ -1307,7 +1412,7 @@ bin_cleanup(int i, int originator)
     struct dirent *dp;
     PROC_TABLE *tbl = &Shm->ptbl[i];
     char lookfor[MESSAGE_SIZE];
-    char entry[MESSAGE_SIZE];
+    char entry[MESSAGE_SIZE*2];
     int found = 0;
     int retry = 0;
 
@@ -1343,7 +1448,7 @@ try_again:
         sprintf(entry, "/tmp/%s", dp->d_name);
         if (strncmp(lookfor, entry, strlen(lookfor)) == 0) {
             if (retry++)
-            Shm->stderr("\rbin_cleanup: cannot remove %s; retrying...\r\n", 
+            Shm->stderr("\rbin_cleanup: cannot remove %s; retrying...\r\n",
 		entry);
             delete_file(entry, originator == INTERNAL ? i : NOT_USED);
             break;
@@ -1374,11 +1479,11 @@ static char *
 make_tmp_file(struct bin_commands *bp)
 {
     register int i;
-    char tmp[MESSAGE_SIZE];
+    char tmp[MESSAGE_SIZE*2];
     PROC_TABLE *tbl = &Shm->ptbl[ID];
     char *obj = bp->cmdpath;
 
-    if (!(bp->cmdflags & FOLLOW)) 
+    if (!(bp->cmdflags & FOLLOW))
 	rm_tmp_files(bp);
 
     if (bp->cmdflags & DEFAULT_FILE_2) {
@@ -1387,11 +1492,11 @@ make_tmp_file(struct bin_commands *bp)
          * for potential 3 arg users...
 	 */
 	if (bp->cmdflags & DEFAULT_FILE) {
-	    sprintf(tbl->tmp_concat, "%s %s %s", 
+	    sprintf(tbl->tmp_concat, "%s %s %s",
 		tbl->tmp_default, tbl->tmp_default, tbl->tmp_default);
 	}
 	if (bp->cmdflags & DEV_NULL) {
-            sprintf(tbl->tmp_concat, 
+            sprintf(tbl->tmp_concat,
 		"/dev/null %s %s", tbl->tmp_default, tbl->tmp_default);
 	}
 	return(tbl->tmp_concat);
@@ -1405,7 +1510,7 @@ make_tmp_file(struct bin_commands *bp)
         return(tbl->tmp_default);
     }
 
-    if (bp->cmdflags & DEV_NULL) 
+    if (bp->cmdflags & DEV_NULL)
 	return("/dev/null");
 
     if (bp->cmdflags & DDHELP)
@@ -1478,7 +1583,7 @@ tmpobj2:
             sprintf(tmp, "fopen(%s)", tbl->tmp_C_file);
             fatal(ID, tmp, i);
         }
-        fprintf(fp, "main() {return(0);}\n");
+        fprintf(fp, "int main() {return(0);}\n");
         fclose(fp);
         if (!(bp->cmdflags & (CONCAT_ARGS))) {
             return(tbl->tmp_C_file);
@@ -1497,9 +1602,9 @@ tmpobj2:
     }
 
     if (bp->cmdflags & MAKE_TMP_NAME_TWICE) {
-        sprintf(tbl->tmp_concat, "%s/ux%06d_%02d %s/ux%06d_%02d", 
-	    Shm->tmpdir, Shm->mompid, ID+1, 
-	    Shm->tmpdir, Shm->mompid, ID+1);  
+        sprintf(tbl->tmp_concat, "%s/ux%06d_%02d %s/ux%06d_%02d",
+	    Shm->tmpdir, Shm->mompid, ID+1,
+	    Shm->tmpdir, Shm->mompid, ID+1);
 	return(tbl->tmp_concat);
 
     }
@@ -1518,7 +1623,7 @@ tmpobj2:
 }
 
 /*
- *  Allocate an array of bp's in which a random stuffing of pointers 
+ *  Allocate an array of bp's in which a random stuffing of pointers
  *  to entries in the bin_commands[] is built.  Return the number of
  *  commands.
  */
@@ -1542,11 +1647,11 @@ init_order(void)
         tbl->bin_order[i] = (int)NULLCHAR;
 
     j = k = 0;
-    srand((Shm->mode & SYNC_BIN_TESTS) ? 1 : getpid()); 
+    srand((Shm->mode & SYNC_BIN_TESTS) ? 1 : getpid());
 
     while (j < cnt) {
         i = rand() % cnt;
-        if (tbl->bin_order[i] == (int)NULLCHAR) 
+        if (tbl->bin_order[i] == (int)NULLCHAR)
             tbl->bin_order[i] = j++;
         k++;
     }
@@ -1608,7 +1713,7 @@ get_next_bp(void)
         tbl->cur_order = 0;
     else if (tbl->cur_bp->cmdflags & LEADER)
         return(++(tbl->cur_bp));
-    else if ((tbl->cur_bp->cmdflags & FOLLOW) && 
+    else if ((tbl->cur_bp->cmdflags & FOLLOW) &&
 	((tbl->cur_bp+1)->cmdflags & FOLLOW))      /* double follow??? */
         return(++(tbl->cur_bp));
     else if (++(tbl->cur_order) == tbl->max_cmds)
@@ -1620,7 +1725,7 @@ get_next_bp(void)
             tbl->cur_order = 0;
         tbl->cur_bp = &bin_commands[tbl->bin_order[tbl->cur_order]];
     }
-        
+
     return(tbl->cur_bp);
 }
 
@@ -1631,7 +1736,7 @@ bin_exclude(char *s)
     	struct bin_commands *bp;
 
 	if (!WINDOW_MGR())
-		Shm->ptbl[ID].bin_flags |= BIN_UPDATE;		
+		Shm->ptbl[ID].bin_flags |= BIN_UPDATE;
 
      	while ((bp = find_cmd(s, 0, LEADER))) {
 		bp->cmdflags |= BIN_EXCLUDED;
@@ -1658,13 +1763,13 @@ bin_exclusive(char *s)
 	if (!found && (bp->cmdflags & BIN_EXCLUSIVE)) {
             PROC_TABLE *tbl = &Shm->ptbl[ID];
 	    if (CURSES_DISPLAY()) {
-	        sprintf(tbl->i_msgq.string, 
-		    "%c%c[ERROR: no specified tests found]", 
+	        sprintf(tbl->i_msgq.string,
+		    "%c%c[ERROR: no specified tests found]",
 		    FSIZE, tbl->i_local_pid);
 	    }
 	    if (GTK_DISPLAY()) {
-	        sprintf(tbl->i_msgq.string, 
-		    "%c%cERROR: no specified tests found", 
+	        sprintf(tbl->i_msgq.string,
+		    "%c%cERROR: no specified tests found",
 		    MANDATORY_FSHELL, tbl->i_local_pid);
 	    }
             bin_send(SYNCHRONIZE);
@@ -1675,8 +1780,8 @@ bin_exclusive(char *s)
 	return found;
     }
 
-    if (!WINDOW_MGR()) 
-	Shm->ptbl[ID].bin_flags |= BIN_UPDATE;		
+    if (!WINDOW_MGR())
+	Shm->ptbl[ID].bin_flags |= BIN_UPDATE;
 
     for (found = 0, bp = &bin_commands[0]; bp->cmd != 0; bp++) {
 	if (bp->cmdflags & BIN_EXCLUSIVE)
@@ -1689,13 +1794,13 @@ bin_exclusive(char *s)
     		found++;
     		continue;
     	    }
-    
-    	    if ((bp->cmdflags & (NO_SHOW|LEADER)) == (NO_SHOW|LEADER)) 
+
+    	    if ((bp->cmdflags & (NO_SHOW|LEADER)) == (NO_SHOW|LEADER))
     		continue;
-    	    
+
     	    bp->cmdflags |= BIN_EXCLUSIVE;
     	    found++;
-    
+
             if (bp->cmdflags & LEADER) {
 		bp++;
     		bp->cmdflags |= BIN_EXCLUSIVE;
@@ -1729,13 +1834,13 @@ fill_action(char *buf, char *cmd)
 
     if (CURSES_DISPLAY()) {
         sprintf(buf, "%s  [", cmd);
-        for (j = strlen(buf); j < 58; j++) 
+        for (j = strlen(buf); j < 58; j++)
             buf[j] = ' ';
         buf[j-1] = ']';
         buf[j] = (char)NULLCHAR;
     }
 
-    if (GTK_DISPLAY()) 
+    if (GTK_DISPLAY())
         sprintf(buf, "%s", cmd);
 }
 
@@ -1750,7 +1855,7 @@ bin_fork_failure(PROC_TABLE *tbl, int who)
     char eagain[80];
     int pad;
 
-    sprintf(tbl->i_msgq.string, "%c%c<WARN>", 
+    sprintf(tbl->i_msgq.string, "%c%c<WARN>",
 	MANDATORY_FSTAT, tbl->i_local_pid);
     bin_send(SYNCHRONIZE);
 
@@ -1760,23 +1865,23 @@ bin_fork_failure(PROC_TABLE *tbl, int who)
             pad = bin_pass_strlen(tbl->i_pass) <= 4 ? 58 :
                 58 - (bin_pass_strlen(tbl->i_pass) - 4);
             space_pad(eagain, pad);
-            sprintf(tbl->i_msgq.string, 
-    	        "%c%c%s  %4ld <WARN>", MANDATORY_FSHELL, 
+            sprintf(tbl->i_msgq.string,
+    	        "%c%c%s  %4ld <WARN>", MANDATORY_FSHELL,
 			tbl->i_local_pid, eagain, tbl->i_pass);
 	}
         if (GTK_DISPLAY()) {
             sprintf(tbl->i_msgq.string, "%c%c%s",
                 MANDATORY_FSHELL, tbl->i_local_pid, eagain);
         }
-        bin_send(SYNCHRONIZE); 
+        bin_send(SYNCHRONIZE);
     }
 
     sleep(5);
 
-    sprintf(tbl->i_msgq.string, "%c%c %s ", 
+    sprintf(tbl->i_msgq.string, "%c%c %s ",
 	MANDATORY_FSTAT, tbl->i_local_pid,
 	tbl->i_stat & IO_BKGD ? "BKGD" : " OK ");
-    bin_send(0); 
+    bin_send(0);
 }
 
 static int
@@ -1806,7 +1911,7 @@ resource_unavailable(char *s, struct bin_commands *bp, PROC_TABLE *tbl)
 		    return(TRUE);
             break;
 
-	case 'R':	
+	case 'R':
 	    if (strncmp(p, "Resource temporarily",
 	        strlen("Resource temporarily")) == 0)
 		    return(TRUE);
@@ -1855,7 +1960,7 @@ resource_unavailable(char *s, struct bin_commands *bp, PROC_TABLE *tbl)
             p = tbl->i_last_message[i];
             if (strncmp(p, "Try again", strlen("Try again")) == 0) {
 		if (CURSES_DISPLAY()) {
-	            sprintf(tbl->i_msgq.string, 
+	            sprintf(tbl->i_msgq.string,
                "%c%c/bin/timex  [Try again.                                  ]",
 			 FSIZE, tbl->i_local_pid);
 		}
@@ -1881,24 +1986,24 @@ bin_test_inquiry(int target, FILE *fp)
 	int others;
 
 	fprintf(fp, "\nBIN TEST SPECIFIC:\n");
-	fprintf(fp, 
+	fprintf(fp,
 	    "max_cmds: %d cmds_found: %d cmd_cnt: %d cmds_per_pass: %d\n",
-		tbl->max_cmds, 
-		tbl->cmds_found, tbl->cmd_cnt, tbl->cmds_per_pass);		
+		tbl->max_cmds,
+		tbl->cmds_found, tbl->cmd_cnt, tbl->cmds_per_pass);
 
 	dump_not_found(tbl, fp);
 	dump_excluded(tbl, fp);
 	dump_exclusive(tbl, fp);
 
-	fprintf(fp, 
+	fprintf(fp,
 	"test_mod: %lx test_mod_list: %lx time_to_die: %d max_pass: %ld\n",
 		(ulong)&tbl->test_mod, (ulong)tbl->test_mod_list,
-		tbl->time_to_die, tbl->max_pass); 
+		tbl->time_to_die, tbl->max_pass);
 	fprintf(fp,"bin_order: %lx cur_order: %d cur_bp: %lx bin_child: %d\n",
 		(ulong)tbl->bin_order, tbl->cur_order, (ulong)tbl->cur_bp, tbl->bin_child);
 	fprintf(fp, "null_cmd: %lx BP: %lx (\"%s\") ",
-		(ulong)&tbl->null_cmd, (ulong)tbl->BP, 
-		tbl->BP && (tbl->BP != &tbl->null_cmd) ? 
+		(ulong)&tbl->null_cmd, (ulong)tbl->BP,
+		tbl->BP && (tbl->BP != &tbl->null_cmd) ?
 		get_command_name(tbl->BP, buf) : "");
 	if (count_bits_long(tbl->bin_flags) > 1)
 		fprintf(fp, "\n");
@@ -1935,14 +2040,14 @@ dump_not_found(PROC_TABLE *tbl, FILE *fp)
     	for (others = cnt = 0, bp = &bin_commands[0]; bp->cmd != 0; bp++) {
 		if (bp->cmdflags & NOT_FOUND) {
 			cnt++;
-			fprintf(fp, "%s%s", others++ ? "," : "", 
+			fprintf(fp, "%s%s", others++ ? "," : "",
 				get_command_name(bp, buf));
 		}
 	}
 	fprintf(fp, ")\n");
 }
 
-static void 
+static void
 dump_excluded(PROC_TABLE *tbl, FILE *fp)
 {
 	int others;
@@ -1962,13 +2067,13 @@ dump_excluded(PROC_TABLE *tbl, FILE *fp)
 		delim = (bp->cmdflags & FOLLOW) ? "-" : ",";
 
 		if (bp->cmdflags & BIN_EXCLUDED) {
-			fprintf(fp, "%s%s", others++ ? delim : "", 
+			fprintf(fp, "%s%s", others++ ? delim : "",
 				get_command_name(bp, buf));
 		}
 
         	for (mp = tbl->test_mod_list; mp; mp = mp->next) {
 			if ((mp->bp == bp) && (mp->cmdflag & BIN_EXCLUDED)) {
-				fprintf(fp, "%s%s", others++ ? delim : "", 
+				fprintf(fp, "%s%s", others++ ? delim : "",
 					get_command_name(bp, buf));
 			}
 		}
@@ -2017,7 +2122,7 @@ dump_exclusive(PROC_TABLE *tbl, FILE *fp)
  *  This routine is called twice -- once by the window manager on behalf
  *  of all bin tests (so the command path search only has to be done once),
  *  and then by each test to determine the not_found and excluded counts.
- *  Note that the second per-test call is quick because command_location() 
+ *  Note that the second per-test call is quick because command_location()
  *  only has to return bit-flag settings the second time it is called.
  */
 static int
@@ -2042,7 +2147,7 @@ search_for_commands(PROC_TABLE *tbl)
 
 		default:
 			if (bp->cmdflags & BIN_EXCLUDED) {
-				if (tbl) 
+				if (tbl)
 					tbl->excluded++;
 				break;
 			}
@@ -2080,7 +2185,7 @@ search_for_commands(PROC_TABLE *tbl)
 static int
 command_location(struct bin_commands *bp)
 {
-        char path[STRINGSIZE];
+        char path[STRINGSIZE*2];
         char cmd[STRINGSIZE];
 
 	if (bp->cmdflags & (NOT_FOUND|BIN_EXCLUDED))
@@ -2092,19 +2197,19 @@ command_location(struct bin_commands *bp)
 	get_command_name(bp, cmd);
 
         sprintf(path, "/bin/%s", cmd);
-	if (file_exists(path)) 
+	if (file_exists(path))
 		return BIN;
 
         sprintf(path, "/usr/bin/%s", cmd);
-	if (file_exists(path)) 
+	if (file_exists(path))
 		return USR_BIN;
 
         sprintf(path, "/usr/ucb/%s", cmd);
-	if (file_exists(path)) 
+	if (file_exists(path))
 		return USR_UCB;
 
         sprintf(path, "/usr/sbin/%s", cmd);
-	if (file_exists(path)) 
+	if (file_exists(path))
 		return USR_SBIN;
 
 	return FALSE;
@@ -2118,7 +2223,7 @@ bin_test_exists(char *cmd)
 
         for (bp = &bin_commands[0]; bp->cmd != 0; bp++) {
 		get_command_name(bp, bpcmd);
-		if (streq(cmd, bpcmd)) 
+		if (streq(cmd, bpcmd))
 			if (command_location(bp) & BIN_LOCATION)
 				return TRUE;
 	}
@@ -2155,14 +2260,14 @@ sync_with_window_mgr(PROC_TABLE *tbl)
 		if (bp->cmdflags & BIN_EXCLUSIVE) {
 			tbl->test_mod.bp = bp;
 			tbl->test_mod.cmdflag = BIN_EXCLUSIVE;
-            		sprintf(tbl->i_msgq.string, 
+            		sprintf(tbl->i_msgq.string,
 				"%c%c", BIN_TEST_MOD, tbl->i_local_pid);
 			bin_send(SYNCHRONIZE);
 		}
 		if (bp->cmdflags & BIN_EXCLUDED) {
                         tbl->test_mod.bp = bp;
                         tbl->test_mod.cmdflag = BIN_EXCLUDED;
-            		sprintf(tbl->i_msgq.string, 
+            		sprintf(tbl->i_msgq.string,
 				"%c%c", BIN_TEST_MOD, tbl->i_local_pid);
 			bin_send(SYNCHRONIZE);
 		}
@@ -2179,7 +2284,7 @@ bin_test_mod_callback(PROC_TABLE *tbl)
 	bp = tbl->test_mod.bp;
 	flag = tbl->test_mod.cmdflag;
 
-	if ((bp->cmdflags & flag) == flag) 
+	if ((bp->cmdflags & flag) == flag)
 		return;
 
 	if ((mp = malloc(sizeof(struct bin_test_mod))) == NULL) {
@@ -2227,14 +2332,14 @@ size_command_window(PROC_TABLE *tbl)
 			continue;
 		}
 
-		maxlen = MAX(maxlen, 
+		maxlen = MAX(maxlen,
 			dirsize + strlen(get_command_name(bp, buf)));
 	}
 
 	tbl->i_limit = maxlen;
 }
 
-static void 
+static void
 do_cmd_specific(void)
 {
 	struct bin_commands *bp;
@@ -2243,12 +2348,12 @@ do_cmd_specific(void)
 		if (!(bp->cmdflags & CMD_SPECIFIC))
 			continue;
 		if (streq(bp->cmd, "ar")) {
-			if (file_exists("/usr/lib64/libc.a"))
-				bp->cmd = "ar -tv /usr/lib64/libc.a";		
-			else if (file_exists("/usr/lib/libc.a"))
-				bp->cmd = "ar -tv /usr/lib/libc.a";		
+			if (file_exists("/usr/lib64/libc.a") && file_readable("/usr/lib64/libc.a"))
+				bp->cmd = "ar -tv /usr/lib64/libc.a";
+			else if (file_exists("/usr/lib/libc.a") && file_readable("/usr/lib/libc.a"))
+				bp->cmd = "ar -tv /usr/lib/libc.a";
 			else
-				bp->cmd = "ar --help";		
+				bp->cmd = "ar --help";
 		}
 		console("bp->cmd: [%s]\n", bp->cmd);
 	}

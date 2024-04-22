@@ -1,8 +1,5 @@
 /*  Author: David Anderson <anderson@redhat.com> 
  *
- *  BitKeeper ID: @(#)debug.c 1.2
- *
- *  CVS: $Revision: 1.6 $ $Date: 2016/02/10 19:25:51 $
  */
 
 #include "defs.h"
@@ -12,6 +9,7 @@ static void db_send(char, ulong);
 static void debug_blks(void);
 static void debug_time(void);
 static void debug_spin(void);
+static void debug_locks(void);
 
 
 void
@@ -31,6 +29,9 @@ debug_test(void)
 
     switch (atoi(argv[1]))
     {
+    case 0:
+        debug_locks();
+        break;
     case 1:
 	debug_one();
 	break;
@@ -230,7 +231,9 @@ debug_spin(void)
 
 	io_send (FILENAME, (long)"debug spin ========>end", NOARG, NOARG);
 	for (EVER) {
+		lock(&Shm->shm_lock);
          	io_send(FPASS, ++tbl->i_pass, NOARG, NOARG);
+		unlock(&Shm->shm_lock);
 	}
 }
 
@@ -241,3 +244,18 @@ debug_test_inquiry(int target, FILE *fp)
         fprintf(fp, "\nDEBUG TEST SPECIFIC:\n");
         fprintf(fp, "(unused)\n");   
 }
+
+
+static void 
+debug_locks(void)
+{
+	for (EVER) {
+		db_send(FOPERATION, (ulong)"lock  ");	
+		lock(&Shm->shm_lock);
+		sleep(3);
+		db_send(FOPERATION, (ulong)"unlock");
+		unlock(&Shm->shm_lock);
+		sleep(3);
+	}
+}
+

@@ -3,15 +3,11 @@
 /*
  *  usex.c
  *
- *  main:  The invocation module for USEX as a whole.  It gathers the user 
+ *  main:  The invocation module for USEX as a whole.  It gathers the user
  *         test parameters, and then forks off all of the test processes.
  *         The mother process remains as the window manager, running the
  *         output display's window_manager function.  Currently there are
  *         two output displays, curses and GTK.
- *
- *  BitKeeper ID: @(#)usex.c 1.7
- *
- *  CVS: $Revision: 1.17 $ $Date: 2016/02/10 19:25:53 $
  */
 
 #include "defs.h"
@@ -63,6 +59,8 @@ static struct option long_options[] = {
         {"spec", 0, 0, 0},
         {"version", 0, 0, 0},
         {"rhts", 1, 0, 0},
+        {"bincore", 0, 0, 0},
+        {"locks", 0, 0, 0},
         {0, 0, 0, 0}
 };
 
@@ -80,7 +78,7 @@ int
 main(int argc, char **argv)
 {
     register int i, j;               /* General registers. */
-    int dummy[NUMSG];  
+    int dummy[NUMSG];
     int buffer_location;	     /* shared memory or mmap'd memory      */
     char id = FIRST_ID;              /* Local_pid's kept in ASCII value.    */
     struct shm_buf *shm_tmp;
@@ -88,21 +86,22 @@ main(int argc, char **argv)
     char dash_b = 0;                 /* needed for -T override              */
     int tcnt;                        /* test count for -E or -B             */
     int catch_sigsegv = TRUE;        /* for debugging usex itself           */
+    int bin_tests = 0;
     int option_index = 0;
 
    /*
     *  A temporary "shared memory" buffer is actually not shared at all,
     *  but need during pre- and post-setup of whatever shared scheme is
-    *  eventually put into place. 
+    *  eventually put into place.
     */
     shm_tmp = &shm_tmp_buffer;
     Shm = shm_tmp;
-    Shm->mode = INITIALIZED;        
+    Shm->mode = INITIALIZED;
 
     window_manager_init(&argc, &argv);  /* Initialize the window manager */
 
     resolve_term();     /* Make sure it's worth going ahead at all... */
-    
+
     Shm->procno = -1;
 
     nodisplay_setup(argc, argv);     /* Look for --nodisplay */
@@ -192,9 +191,19 @@ main(int argc, char **argv)
                 }
 
                 if (streq(long_options[option_index].name, "core")) {
-                        Shm->mode |= DROPCORE; 
+                        Shm->mode |= DROPCORE;
                         break;
                 }
+
+                if (streq(long_options[option_index].name, "bincore")) {
+                        Shm->mode |= BINCORE;
+                        break;
+                }
+
+                if (streq(long_options[option_index].name, "locks")) {
+                        Shm->mode |= POSIX_SEM;
+                        break;
+		}
 
                 if (streq(long_options[option_index].name, "nostats")) {
                         Shm->mode |= NO_STATS;
@@ -202,7 +211,7 @@ main(int argc, char **argv)
                 }
 
                 if (streq(long_options[option_index].name, "sys") ||
-		    streq(long_options[option_index].name, "system")) {    
+		    streq(long_options[option_index].name, "system")) {
                         Shm->mode |= SYS_STATS;
                         break;
                 }
@@ -217,7 +226,7 @@ main(int argc, char **argv)
 			_exit(NORMAL_EXIT);
                 }
 
-                if (streq(long_options[option_index].name, "version")) 
+                if (streq(long_options[option_index].name, "version"))
 			goto show_version;
 
                 break;
@@ -290,7 +299,7 @@ show_version:
 		} else
 		    j = 4;
                 if (Shm->directories_found) {
-                    Shm->printf("%d director%s not removed.", 
+                    Shm->printf("%d director%s not removed.",
 		        Shm->directories_found,
                         Shm->directories_found == 1 ? "y was" : "ies were");
                 }
@@ -299,10 +308,10 @@ show_version:
                 break;
 
         case 'c':
-		if (chk_leftovers(QUERY) == 0) 
+		if (chk_leftovers(QUERY) == 0)
 		    Shm->printf("No leftovers detected.  ");
                 if (Shm->directories_found) {
-                    Shm->printf("%d director%s not removed.", 
+                    Shm->printf("%d director%s not removed.",
 			Shm->directories_found,
 		        Shm->directories_found == 1 ? "y was" : "ies were");
                 }
@@ -312,7 +321,7 @@ show_version:
 	case 'h':
 		usage();
 		quick_die(QDIE(3));
-	
+
 	case 'H':
 		if ((Shm->hangtime = atoi(optarg)) == 0)
 			Shm->hangtime = DEFAULT_HANGTIME;
@@ -350,7 +359,7 @@ redo_dash_e:
 		dash_e = (char)i;
                 Shm->infile = Shm->outfile ?
                         Shm->outfile : Shm->default_file;
-                if (!make_usex_input(i, Shm->hanging_tcnt)) 
+                if (!make_usex_input(i, Shm->hanging_tcnt))
                         quick_die(QDIE(5));
                 Shm->mode |= AUTO_INFILE;
 		break;
@@ -367,10 +376,10 @@ redo_dash_e:
                 }
 
 		dash_b = (char)i;
-		Shm->infile = Shm->outfile ? 
+		Shm->infile = Shm->outfile ?
 			Shm->outfile : Shm->default_file;
-		if (!make_usex_input(i, Shm->hanging_tcnt)) 
-		        quick_die(QDIE(7));    
+		if (!make_usex_input(i, Shm->hanging_tcnt))
+		        quick_die(QDIE(7));
 	        Shm->mode |= AUTO_INFILE;
 		break;
 
@@ -393,16 +402,16 @@ redo_dash_e:
 	        Shm->mode |= MESGQ_MODE;
 
 		/*
-                 * Fork off 16 quick-dying processes so that another "usex" 
+                 * Fork off 16 quick-dying processes so that another "usex"
 		 * can run on another terminal without the msg queue id numbers
-		 * conflicting with one another.                    
+		 * conflicting with one another.
 		 *
-		 * NOTE: I've long since forgotten what this is all about... 
+		 * NOTE: I've long since forgotten what this is all about...
 		 *       (Was it a GENICS problem?)
 	 	 */
                 for (i = 0; i < NUMSG; i++)
                     if ((dummy[i] = fork()) == 0)
-                        pause();                
+                        pause();
                 for (i = 0; i < NUMSG; i++) {
                     Kill(dummy[i], SIGKILL, "U1", K_OTHER);
                     wait(NULL);
@@ -430,7 +439,7 @@ redo_dash_e:
 		break;
 
 	case 'w':
-		if (mlockall(MCL_CURRENT|MCL_FUTURE) == 0) 
+		if (mlockall(MCL_CURRENT|MCL_FUTURE) == 0)
 			Shm->mode |= MLOCK_MODE;
 		else {
 			Shm->perror("window manager not wired: mlockall");
@@ -453,7 +462,7 @@ redo_dash_e:
 	if (((optind+1) == argc) && !Shm->hanging_tcnt &&
 	    (decimal(argv[optind], 0) && (tcnt = atoi(argv[optind]))) &&
 	    (dash_b || dash_e)) {
-                if (!make_usex_input(dash_b ? dash_b : dash_e, tcnt)) 
+                if (!make_usex_input(dash_b ? dash_b : dash_e, tcnt))
                         quick_die(dash_e ? QDIE(5) : QDIE(7));
 	} else {
             Shm->printf ("usex: invalid arguments: ");
@@ -519,7 +528,7 @@ redo_dash_e:
                 Shm->perror(Shm->id_file);
                 quick_die(QDIE(12));
             }
-            delete_file(Shm->id_file, NOT_USED);  
+            delete_file(Shm->id_file, NOT_USED);
             if (write(Shm->mmfd, shm_tmp, sizeof(struct shm_buf)) !=
                 sizeof(struct shm_buf)) {
                 Shm->perror(Shm->id_file);
@@ -534,10 +543,17 @@ redo_dash_e:
 	    Shm->mode |= MMAP_FILE;
 	}
 #else
-        Shm->stderr( 
+        Shm->stderr(
             "This machine does not support mmap operations on a file.\n");
 	quick_die(QDIE(15));
 #endif
+    }
+
+    if (Shm->mode & POSIX_SEM) {
+	if (sem_init(&Shm->shm_lock, 1, 1) < 0) {
+	    perror("sem_init");
+	    Shm->mode &= ~POSIX_SEM;
+    	}
     }
 
     /*
@@ -560,7 +576,7 @@ redo_dash_e:
     sigset(SIGBUS, die);
 
     if (catch_sigsegv)
-    	 sigset(SIGSEGV, die); 
+    	 sigset(SIGSEGV, die);
 
     sigset(SIGILL, die);
 
@@ -574,16 +590,16 @@ redo_dash_e:
 
     switch (Shm->mode & IPC_MODE)
     {
-    case PIPE_MODE:                 
-        for (i = 0; i < NUMSG*2; i++) 
+    case PIPE_MODE:
+        for (i = 0; i < NUMSG*2; i++)
 	    Shm->win_pipe[i] = -1;
 
-        for (i = 0; i < Shm->procno; i++) 
-            pipe(&Shm->win_pipe[i*2]); 
+        for (i = 0; i < Shm->procno; i++)
+            pipe(&Shm->win_pipe[i*2]);
 	break;
-    
+
     case MESGQ_MODE:
-        for (i = 0; i < NUMSG; i++) 
+        for (i = 0; i < NUMSG; i++)
             Shm->msgid[i] = -1;
 
         for (i = 0; i < Shm->procno; i++) {
@@ -598,16 +614,16 @@ redo_dash_e:
             }
         }
         break;
- 
+
     case MMAP_MODE:
-    case SHMEM_MODE: 
+    case SHMEM_MODE:
 	ring_init();
         break;
 
     default:
         Shm->stderr("usex: invalid IPC mode: %x\n", Shm->mode);
         die(0, DIE(3), FALSE);
-	
+
     }
 
     uname(&Shm->utsname);   /* Gather this for future reference. */
@@ -623,7 +639,7 @@ redo_dash_e:
      */
     if (Shm->outfile) {
     	if (!file_copy(Shm->outfile, Shm->tmpdir)) {
-            Shm->stderr("\n\nusex: cannot copy %s to %s\n", 
+            Shm->stderr("\n\nusex: cannot copy %s to %s\n",
 		Shm->outfile, Shm->tmpdir);
             die(0, DIE(4), FALSE);
         }
@@ -644,7 +660,7 @@ redo_dash_e:
 
         Shm->ptbl[i].i_local_pid = id++;          /* Insert unique local id. */
 	if (Shm->mode & BKGD_MODE)
-	    Shm->ptbl[i].i_stat |= IO_BKGD; 
+	    Shm->ptbl[i].i_stat |= IO_BKGD;
 
         if (Shm->ptbl[i].i_type == USER_TEST) {
             if ((Shm->ptbl[i].i_pid = fork ()) == 0) {    /* fork it now... */
@@ -677,6 +693,7 @@ redo_dash_e:
                     "fork: %s", strerror(Shm->ptbl[i].i_saved_errno));
 		Shm->ptbl[i].i_stat |= IO_FORK;
             }
+            bin_tests++;
             continue;
         }
 
@@ -692,9 +709,9 @@ redo_dash_e:
 
             if ((Shm->ptbl[i].i_sbuf.st_mode & S_IFMT) == S_IFDIR)
             {
-                sprintf(Shm->ptbl[i].i_file, "%s%sux%06d_%02d", 
+                sprintf(Shm->ptbl[i].i_file, "%s%sux%06d_%02d",
                     Shm->ptbl[i].i_path,
-                    strlen(filename(Shm->ptbl[i].i_path)) == 0 ? "" : "/", 
+                    strlen(filename(Shm->ptbl[i].i_path)) == 0 ? "" : "/",
                     Shm->mompid, i+1);
                 Shm->ptbl[i].i_message = file_exists(Shm->ptbl[i].i_file) ?
                     FILE_EXISTS : (int)NULLCHAR;
@@ -702,13 +719,13 @@ redo_dash_e:
             else
                 sprintf(Shm->ptbl[i].i_file, "%s", Shm->ptbl[i].i_path);
 
-            /* 
+            /*
              * Create the associated ".err" filename; if it already exists
              * and shouldn't be there, unlink it.
              */
-            sprintf(Shm->ptbl[i].i_errfile, "ux%06d_%02d.err", 
+            sprintf(Shm->ptbl[i].i_errfile, "ux%06d_%02d.err",
                 Shm->mompid, i+1);
-            if (Shm->ptbl[i].i_message != FILE_EXISTS && 
+            if (Shm->ptbl[i].i_message != FILE_EXISTS &&
                 file_exists(Shm->ptbl[i].i_errfile))
                 delete_file(Shm->ptbl[i].i_errfile, NOT_USED);
 
@@ -727,6 +744,8 @@ redo_dash_e:
 
     }  /* End of for loop. */
 
+    if ((Shm->mode & BINCORE) && !bin_tests)
+	Shm->mode &= ~BINCORE;
 
     make_IO_record();   /* Make I/O file record for usex -c, if needed. */
 
@@ -734,12 +753,12 @@ redo_dash_e:
     sigset(SIGUSR2, dump_status_signal);
 
     if (Shm->mode & MMAP_MODE && file_exists(Shm->id_file))
-	delete_file(Shm->id_file, NOT_USED);  
+	delete_file(Shm->id_file, NOT_USED);
 
    /*
-    *  Let the output-specific window manager function take it from here. 
+    *  Let the output-specific window manager function take it from here.
     */
-    Shm->window_manager(argc, argv);   
+    Shm->window_manager(argc, argv);
 
     _exit(0);
 }
@@ -789,7 +808,7 @@ wait_for_release(void)
     sigset(SIGSEGV, SIG_DFL);
     sigset(SIGILL, SIG_DFL);
 
-    while (getmode() & CHILD_HOLD) 
+    while (getmode() & CHILD_HOLD)
 	sleep(1);
 }
 
@@ -802,11 +821,11 @@ getmode(void)
 }
 
 /*
- *  prompt: Called upon initialization by usex() in order to establish 
+ *  prompt: Called upon initialization by usex() in order to establish
  *          parameters for the I/O and TRANSFER RATE tests.
  *          It asks for paths, command names, buffer sizes and
- *          limits as required for each I/O TEST requested by the user.  
- *          If none are requested, or after all applicable I/O TEST 
+ *          limits as required for each I/O TEST requested by the user.
+ *          If none are requested, or after all applicable I/O TEST
  *          parameters are entered, it asks for TRANSFER RATE test parameters.
  *          Finally it asks for clock granularity and display mode.
  */
@@ -828,7 +847,7 @@ prompt(void)
     int disk_size = 0;
     int vmem_size = 0;
     int rate_test;
-    int fline = 0;		   
+    int fline = 0;
     int nolog;
     int io_fsync;
 
@@ -837,15 +856,15 @@ prompt(void)
 
     clear_display_screen();
 
-    if (!Shm->outfile) 
+    if (!Shm->outfile)
         Shm->outfile = Shm->default_file;
 
-    if (Shm->infile && (strcmp(Shm->infile, Shm->outfile) == 0)) { 
+    if (Shm->infile && (strcmp(Shm->infile, Shm->outfile) == 0)) {
         if ((fo = fopen("/dev/null", "w")) == NULL) {      /* usex -e or -b */
             Shm->perror(Shm->outfile);
             Shm->outfile = (char *)NULL;
         }
-    } 
+    }
     else if ((fo = fopen(Shm->outfile, "w")) == NULL) {
             Shm->perror(Shm->outfile);
             Shm->outfile = (char *)NULL;
@@ -879,32 +898,32 @@ prompt(void)
     {
         Shm->procno = -1;
 
-        if (!(Shm->mode & SYS_STATS)) 
+        if (!(Shm->mode & SYS_STATS))
             PROMPT("How many tests would you like to run? ==> ");
 
-        if (Shm->mode & SYS_STATS) 
+        if (Shm->mode & SYS_STATS)
 	    input[0] = NULLCHAR;
         else if (Shm->infile)
             {FGETSTRING(input)}
-        else 
+        else
             getstring(input);
 
         if (!decimal(input, 0) || (atoi(input) > Shm->max_tests)) {
-            sprintf(Shm->saved_error_msg, 
-        "\"%s\" is an invalid test count. (%d is maximum on this %s)\n", 
-		    input, Shm->max_tests, 
+            sprintf(Shm->saved_error_msg,
+        "\"%s\" is an invalid test count. (%d is maximum on this %s)\n",
+		    input, Shm->max_tests,
 		    CURSES_DISPLAY() ? Shm->TERM : "display");
-	    if (Shm->infile) 
+	    if (Shm->infile)
 		goto prompt_bailout;
             Shm->printf(Shm->saved_error_msg);
 	}
         else {
             Shm->procno = atoi(input);
-            if (Shm->outfile) 
+            if (Shm->outfile)
                 fprintf(fo, "%d\n", Shm->procno);
             if (Shm->procno <= MIN_IO_LINES)
 		Shm->lines_used = MIN_TEST_LINES;
-            else 
+            else
 		Shm->lines_used = Shm->procno + NON_IO_LINES;
             break;       /* Entry is OK, so break out here. */
 	}
@@ -939,7 +958,7 @@ prompt(void)
 	    testno++);
 	PROMPT("         that was entered, or if no prior selection has been made, the\n");
 	PROMPT("         current directory will be used for an I/O test.\n");
-  
+
         /* Make the "last_input" the current directory for starters. */
 
         strcpy(last_input, "./");
@@ -949,9 +968,9 @@ prompt(void)
         for (NEW_LINE, i = 0; i < Shm->procno;)
         {
             Shm->ptbl[i].i_type = (int)NULLCHAR;  /* Clear for good measure. */
-            Shm->ptbl[i].i_stat = INITIALIZED;  
+            Shm->ptbl[i].i_stat = INITIALIZED;
 
-            PROMPT("Enter directory, device or command for test %d ==> ", 
+            PROMPT("Enter directory, device or command for test %d ==> ",
                 (i + 1));
             if (Shm->infile)
                 {FGETSTRING(input)}
@@ -974,7 +993,7 @@ prompt(void)
                         sprintf(Shm->saved_error_msg,
    "\"%s\"\nis too long.  Please use less than 80 characters per input line\n",
                                 input);
-                        if (Shm->infile) 
+                        if (Shm->infile)
                             goto prompt_bailout;
                         Shm->printf(Shm->saved_error_msg);
                         continue;
@@ -984,7 +1003,7 @@ prompt(void)
 		    sprintf(Shm->saved_error_msg,
     "\"%s\"\nis too long.  Please use less than 60 characters per filename.\n",
                         input);
-                    if (Shm->infile) 
+                    if (Shm->infile)
                         goto prompt_bailout;
 		    Shm->printf(Shm->saved_error_msg);
 		    continue;
@@ -997,7 +1016,7 @@ prompt(void)
                     Shm->ptbl[i].i_type = WHET_TEST;
                     Shm->ptbl[i].i_size = 0;
                     Shm->ptbl[i].i_sbuf.st_mode = EXEMPT;
-                    goto io_bypass;                      
+                    goto io_bypass;
             }
             if (strneq(Shm->ptbl[i].i_path,"debug")) {
                     Shm->ptbl[i].i_type = DEBUG_TEST;
@@ -1016,9 +1035,9 @@ prompt(void)
                     Shm->ptbl[i].i_type = DHRY_TEST;
                     Shm->ptbl[i].i_size = 40;
                     Shm->ptbl[i].i_sbuf.st_mode = EXEMPT;
-                    goto io_bypass;                
+                    goto io_bypass;
             }
-            if (Shm->ptbl[i].i_path[0] == '!' || 
+            if (Shm->ptbl[i].i_path[0] == '!' ||
 		    Shm->ptbl[i].i_path[0] == '^') {
                     Shm->ptbl[i].i_type = USER_TEST;
 		    if (Shm->ptbl[i].i_path[0] == '^')
@@ -1033,8 +1052,8 @@ prompt(void)
 		    while (*ptr && ((*ptr == ' ') || (*ptr == '\t')))
                         ptr++;
                     strcpy(Shm->ptbl[i].i_file, ptr);
-                    Shm->ptbl[i].i_sbuf.st_mode = EXEMPT;    
-                    goto io_bypass;              
+                    Shm->ptbl[i].i_sbuf.st_mode = EXEMPT;
+                    goto io_bypass;
             }
             if (strneq(Shm->ptbl[i].i_path, "bin")) {
                     Shm->ptbl[i].i_type = BIN_TEST;
@@ -1046,7 +1065,7 @@ prompt(void)
 
             if (strneq(Shm->ptbl[i].i_path, "rate")) {
                     Shm->ptbl[i].i_type = RATE_TEST;
-		    shift_string_left(Shm->ptbl[i].i_path, strlen("rate"), 
+		    shift_string_left(Shm->ptbl[i].i_path, strlen("rate"),
 			NULL);
 		    strip_beginning_whitespace(Shm->ptbl[i].i_path);
 		    rate_test = TRUE;
@@ -1083,13 +1102,13 @@ prompt(void)
 		    buffer_required++;
 
                     for (j = 0; j < i; j++) {
-                        if (((Shm->ptbl[j].i_sbuf.st_mode & S_IFMT) == S_IFCHR) 
-			    && (Shm->ptbl[j].i_sbuf.st_rdev == 
+                        if (((Shm->ptbl[j].i_sbuf.st_mode & S_IFMT) == S_IFCHR)
+			    && (Shm->ptbl[j].i_sbuf.st_rdev ==
                             Shm->ptbl[i].i_sbuf.st_rdev)) {
                             sprintf(Shm->saved_error_msg,
               "Character device \"%s\" has already been selected by test %d.\n",
                                     Shm->ptbl[i].i_path, j+1);
-	                    if (Shm->infile) 
+	                    if (Shm->infile)
                                 goto prompt_bailout;
                             Shm->printf(Shm->saved_error_msg);
                             --i;
@@ -1102,10 +1121,10 @@ prompt(void)
 
             case S_IFBLK:
 #ifdef RESTRICT_BLOCK_DEVICES
-                    sprintf(Shm->saved_error_msg, 
+                    sprintf(Shm->saved_error_msg,
 			"\"%s\" is a block device file name.\n",
                         Shm->ptbl[i--].i_path);
-                    if (Shm->infile) 
+                    if (Shm->infile)
                         goto prompt_bailout;
                     Shm->printf(Shm->saved_error_msg);
 #else
@@ -1128,7 +1147,7 @@ prompt(void)
                             sprintf(Shm->saved_error_msg,
                   "Block device \"%s\" has already been selected by test %d.\n",
                                 Shm->ptbl[i].i_path, j+1);
-                            if (Shm->infile) 
+                            if (Shm->infile)
                                 goto prompt_bailout;
                             Shm->printf(Shm->saved_error_msg);
                             --i;
@@ -1148,10 +1167,10 @@ prompt(void)
                         limit_required++;
                         buffer_required++;
 		    } else {
-                        sprintf(Shm->saved_error_msg, 
+                        sprintf(Shm->saved_error_msg,
 		 	    "\"%s\" is a regular file name.\n",
                             Shm->ptbl[i--].i_path);
-                        if (Shm->infile) 
+                        if (Shm->infile)
                             goto prompt_bailout;
                         Shm->printf(Shm->saved_error_msg);
 		    }
@@ -1159,7 +1178,7 @@ prompt(void)
 
             case S_IFDIR:
                     Shm->ptbl[i].i_type = rate_test ? RATE_TEST : DISK_TEST;
-		    if (Shm->ptbl[i].i_type == RATE_TEST && 
+		    if (Shm->ptbl[i].i_type == RATE_TEST &&
 			!is_mount_point(i, NULL, TRUE, NULL))
 			    Shm->ptbl[i].i_stat |= RATE_CREATE;
                     if (nolog)
@@ -1173,7 +1192,7 @@ prompt(void)
             default:
                     sprintf(Shm->saved_error_msg,
                         "\"%s\" is non-existent.\n", Shm->ptbl[i--].i_path);
-                    if (Shm->infile) 
+                    if (Shm->infile)
                         goto prompt_bailout;
                     Shm->printf(Shm->saved_error_msg);
                     break;
@@ -1200,7 +1219,7 @@ io_bypass:
         if (!buffer_required)
             goto buffer_bypass;
 
-       
+
         /* Explain how the buffer size can be entered, and get at least one. */
 
 	PROMPT("\nTest%s ", buffer_required > 1 ? "s" : "");
@@ -1225,7 +1244,7 @@ io_bypass:
 		break;
             }
         }
-	PROMPT(" require%s %sbuffer size%s.", 
+	PROMPT(" require%s %sbuffer size%s.",
 	    buffer_required == 1 ? "s" : "",
 	    buffer_required == 1 ? "a " : "",
 	    buffer_required == 1 ? "" : "s");
@@ -1258,11 +1277,11 @@ PROMPT("     %d) the vmem test requires the number of megabytes to allocate.\n",
 
         for (NEW_LINE, i = j = 0; i < Shm->procno;)
         {
-            switch (Shm->ptbl[i].i_type) 
+            switch (Shm->ptbl[i].i_type)
             {
             case VMEM_TEST:
                 PROMPT("Enter number of megabytes for virtual memory ");
-                PROMPT("test %d ==> ", (i + 1)); 
+                PROMPT("test %d ==> ", (i + 1));
                 break;
             case DHRY_TEST:
             case WHET_TEST:
@@ -1272,12 +1291,12 @@ PROMPT("     %d) the vmem test requires the number of megabytes to allocate.\n",
                 i++;
                 continue;
             case DISK_TEST:
-                PROMPT("Enter a buffer size for I/O test %d (%s) ==> ", (i + 1), 
-                    Shm->ptbl[i].i_path); 
+                PROMPT("Enter a buffer size for I/O test %d (%s) ==> ", (i + 1),
+                    Shm->ptbl[i].i_path);
 	        break;
             case RATE_TEST:
-                PROMPT("Enter a buffer size for transfer rate test %d (%s) ==> ", (i + 1), 
-                    Shm->ptbl[i].i_path); 
+                PROMPT("Enter a buffer size for transfer rate test %d (%s) ==> ", (i + 1),
+                    Shm->ptbl[i].i_path);
                 break;
             }
 
@@ -1300,7 +1319,7 @@ PROMPT("     %d) the vmem test requires the number of megabytes to allocate.\n",
 
                         temp = atoi(input);
 
-                        if ((Shm->ptbl[i].i_size = (int)temp) == 0) 
+                        if ((Shm->ptbl[i].i_size = (int)temp) == 0)
                             j = INVALID;      /* Literal, but foolish... */
 			else if (Shm->ptbl[i].i_type & (DISK_TEST|RATE_TEST))
 			    disk_size = (int)temp;
@@ -1312,9 +1331,9 @@ PROMPT("     %d) the vmem test requires the number of megabytes to allocate.\n",
                     if ((input[j] == 'k' || input[j] == 'K') &&
                         (Shm->ptbl[i].i_type & (DISK_TEST|RATE_TEST)))
                     {
-                        /* Multiply the entry by 1024. */ 
+                        /* Multiply the entry by 1024. */
 
-                        temp = atoi(input) * 1024; 
+                        temp = atoi(input) * 1024;
 
                         if ((Shm->ptbl[i].i_size = (int)temp) == 0)
                             j = INVALID;     /* Short version, but foolish... */
@@ -1334,12 +1353,12 @@ PROMPT("     %d) the vmem test requires the number of megabytes to allocate.\n",
                     Shm->ptbl[i].i_size = disk_size;
                 if ((Shm->ptbl[i].i_type == VMEM_TEST) && vmem_size)
                     Shm->ptbl[i].i_size = vmem_size;
-            }   
+            }
             if (j == INVALID)
             {
                 sprintf(Shm->saved_error_msg,
                     "%s is an invalid size for test %d.\n", input, i+1);
-                if (Shm->infile) 
+                if (Shm->infile)
                     goto prompt_bailout;
                 Shm->printf(Shm->saved_error_msg);
                 j = 0;
@@ -1348,17 +1367,17 @@ PROMPT("     %d) the vmem test requires the number of megabytes to allocate.\n",
                 if (Shm->outfile)
                     fprintf(fo, "%ld\n", (ulong)Shm->ptbl[i].i_size);
                 last_disk_size = (long)Shm->ptbl[i].i_size;
-                i++;                            
+                i++;
             }
-            else 
+            else
             {
-                if (Shm->ptbl[i].i_type == VMEM_TEST) 
+                if (Shm->ptbl[i].i_type == VMEM_TEST)
                     sprintf(Shm->saved_error_msg,
 			"Number of megabytes MUST be entered.\n");
-                else 
+                else
                     sprintf(Shm->saved_error_msg,
 			"At least ONE buffer size MUST be entered.\n");
-                if (Shm->infile)  
+                if (Shm->infile)
                     goto prompt_bailout;
 		Shm->printf(Shm->saved_error_msg);
             }
@@ -1392,11 +1411,11 @@ buffer_bypass:
     		break;
                 }
             }
-    	    PROMPT(" require%s %sfile size limit%s.\n", 
+    	    PROMPT(" require%s %sfile size limit%s.\n",
     	        limit_required == 1 ? "s" : "",
     	        limit_required == 1 ? "a " : "",
     	        limit_required == 1 ? "" : "s");
-    
+
             last_disk_size = last_rate_size = -1;
 
 	    PROMPT("The file size limits must be entered in one of the following ways:\n");
@@ -1426,7 +1445,7 @@ buffer_bypass:
                     continue;
                 }
 
-                if (Shm->infile) 
+                if (Shm->infile)
                     {FGETSTRING(input)}
                 else
                     getstring(input);
@@ -1435,7 +1454,7 @@ buffer_bypass:
 		    if (Shm->ptbl[i].i_type == DISK_TEST) {
                         Shm->ptbl[i].i_limit = 0;
                         last_disk_size = 0;
-                        if (Shm->outfile) 
+                        if (Shm->outfile)
                             fprintf(fo, "0\n");
 		    }
                     if (Shm->ptbl[i].i_type == RATE_TEST) {
@@ -1474,7 +1493,7 @@ buffer_bypass:
                         else {
     			    sprintf(Shm->saved_error_msg,
     			     "At least ONE file size limit must be entered.\n");
-    	                    if (Shm->infile) 
+    	                    if (Shm->infile)
                                 goto prompt_bailout;
     			    Shm->printf(Shm->saved_error_msg);
                             --i;
@@ -1500,10 +1519,10 @@ buffer_bypass:
                         }
                     }
                 }
-                else if (!(Shm->infile) && abs(atoi(input)) == 0 && 
+                else if (!(Shm->infile) && abs(atoi(input)) == 0 &&
                     strlen(input) > 0) {
                     sprintf(Shm->saved_error_msg,
-			"\"%s\" is an invalid file size limit for test %d.\n", 
+			"\"%s\" is an invalid file size limit for test %d.\n",
 			input, i+1);  /* Excuse me? */
 	            if (Shm->infile)
                         goto prompt_bailout;
@@ -1554,8 +1573,8 @@ buffer_bypass:
         PROMPT("\nA <RETURN> implies foreground display mode ==> ");
     }
 
-    if (Shm->mode & SYS_STATS) 
-	input[0] = 'f'; 
+    if (Shm->mode & SYS_STATS)
+	input[0] = 'f';
     else if (Shm->infile) {
         {FGETSTRING(input)}
 	switch (input[0])
@@ -1564,9 +1583,9 @@ buffer_bypass:
 	case 'b':
 	    break;
   	default:
-	    sprintf(Shm->saved_error_msg, 
+	    sprintf(Shm->saved_error_msg,
 		"Display mode must be either \"f\" or \"b\".\n");
-            if (Shm->infile) 
+            if (Shm->infile)
                 goto prompt_bailout;
 	    Shm->printf(Shm->saved_error_msg);
         }
@@ -1628,10 +1647,10 @@ buffer_bypass:
 
     CLEAR_STRING(Shm->saved_error_msg);  /* Clear this -- used later by die() */
 
-   /* 
-    *  If in (curses) debug mode, clear the display screen. 
+   /*
+    *  If in (curses) debug mode, clear the display screen.
     */
-    if (Shm->mode & DEBUG_MODE) 
+    if (Shm->mode & DEBUG_MODE)
         clear_display_screen();
 
     return;
@@ -1648,7 +1667,7 @@ prompt_bailout:
 static void
 getstring(char *line)
 {
-	if (fgets((char *)line, (int)STRINGSIZE, stdin) == (char *)NULL) { 
+	if (fgets((char *)line, (int)STRINGSIZE, stdin) == (char *)NULL) {
 		die(0, DIE(8), FALSE);   /* catches CTRL-D or EOF */
 	}
 	strip_lf(line);
@@ -1678,7 +1697,7 @@ make_IO_record(void)
      *  Create an I/O test record file for any future usex -c operation.
      */
     for (i = cnt = 0; i < Shm->procno; i++) {
-        if (Shm->ptbl[i].i_type & (DISK_TEST|RATE_TEST)) 
+        if (Shm->ptbl[i].i_type & (DISK_TEST|RATE_TEST))
 	    cnt++;
     }
 
@@ -1728,18 +1747,18 @@ make_IO_record(void)
 
 
 /*
- *  die:  Resets the terminal back to the orginal values before exiting from 
- *        USEX.  All I/O test files are deleted UNLESS an associated 
+ *  die:  Resets the terminal back to the orginal values before exiting from
+ *        USEX.  All I/O test files are deleted UNLESS an associated
  *        "ux######_##.err" file exists.  All leftover files that are still
- *        around are deleted.  All of the IPC stuff is cleaned up and the 
+ *        around are deleted.  All of the IPC stuff is cleaned up and the
  *        terminal is restored to normal.
  */
 
-void 
+void
 die(int reason, int caller, int do_return)
 {
-    register int i; 
-    char message[STRINGSIZE];
+    register int i;
+    char message[STRINGSIZE*2];
     int quiet_death = Shm->mode & QUIET_MODE;
 
     Shm->die_caller = caller;
@@ -1767,7 +1786,7 @@ die(int reason, int caller, int do_return)
 	}
 
 	USER_MESSAGE_WAIT(sigrec);
-	sigset(SIGSEGV, SIG_DFL); 
+	sigset(SIGSEGV, SIG_DFL);
 
 	save_screen(SCREEN_SAVED);
     }
@@ -1785,7 +1804,7 @@ die(int reason, int caller, int do_return)
             Kill(Shm->ptbl[i].i_pid, SIGKILL, "U3", K_IO(i));
             post_test_status(i, "KILLED");
         }
-        else 
+        else
             post_test_status(i, "<DEAD>");
 
        /*
@@ -1795,19 +1814,19 @@ die(int reason, int caller, int do_return)
             bin_cleanup(i, EXTERNAL);
 
         if (SPECIAL_FILE(Shm->ptbl[i].i_sbuf.st_mode))  /* Don't touch devs. */
-            continue;            
+            continue;
 
        /*
-        * Delete each I/O TEST file UNLESS there 
-        * is an error file associated with it.  
+        * Delete each I/O TEST file UNLESS there
+        * is an error file associated with it.
         */
 
-        if ((Shm->ptbl[i].i_type == DISK_TEST) && 
+        if ((Shm->ptbl[i].i_type == DISK_TEST) &&
             !(file_exists(Shm->ptbl[i].i_errfile))) {
 		sprintf(message, "deleting %s", Shm->ptbl[i].i_file);
 		if (!reason)
-        	    USER_MESSAGE_WAIT(message); 
-            	delete_file(Shm->ptbl[i].i_file, NOT_USED);  
+        	    USER_MESSAGE_WAIT(message);
+            	delete_file(Shm->ptbl[i].i_file, NOT_USED);
 	}
 
         if ((Shm->ptbl[i].i_type == RATE_TEST) &&
@@ -1815,7 +1834,7 @@ die(int reason, int caller, int do_return)
             !(file_exists(Shm->ptbl[i].i_errfile))) {
 		sprintf(message, "deleting %s", Shm->ptbl[i].i_file);
         	if (!reason) {
-		    USER_MESSAGE_WAIT(message); 
+		    USER_MESSAGE_WAIT(message);
 		}
             	delete_file(Shm->ptbl[i].i_file, NOT_USED);
 	}
@@ -1827,19 +1846,19 @@ die(int reason, int caller, int do_return)
     file_cleanup();  /* Once more for paranoia's sake... */
 
     if (Shm->mode & SAVE_DEFAULT) {
-        if (strcmp(Shm->outfile, Shm->default_file) != 0) 
-            delete_file(Shm->default_file, NOT_USED);  
+        if (strcmp(Shm->outfile, Shm->default_file) != 0)
+            delete_file(Shm->default_file, NOT_USED);
     }
-    else 
-         delete_file(Shm->default_file, NOT_USED);  
+    else
+         delete_file(Shm->default_file, NOT_USED);
 
-    if (!streq(Shm->tmpdir, "/tmp"))
+    if (!streq(Shm->tmpdir, "/tmp") && !(Shm->mode & BINCORE))
 	delete_file(Shm->tmpdir, NOT_USED);
 
     for (i = 0; i < NUMSG && (Shm->mode & MESGQ_MODE); i++) {
         if (Shm->msgid[i] < 0)
             continue;
-        if (msgctl(Shm->msgid[i], IPC_RMID, (struct msqid_ds *)NULL) == -1) 
+        if (msgctl(Shm->msgid[i], IPC_RMID, (struct msqid_ds *)NULL) == -1)
             Shm->perror("die: msgctl");
     }
 
@@ -1855,8 +1874,8 @@ die(int reason, int caller, int do_return)
         "\rusex: FATAL ERROR: \"%s\": incorrect input file format: line %d\n",
             Shm->infile, Shm->bad_fline);
 
-    Shm->stderr("%s\r\n",                       
-	Shm->saved_error_msg ? Shm->saved_error_msg : "");  
+    Shm->stderr("%s\r\n",
+	Shm->saved_error_msg ? Shm->saved_error_msg : "");
 
     dump_screen(stderr);
 
@@ -1882,6 +1901,12 @@ die(int reason, int caller, int do_return)
 
     window_manager_shutdown();
 
+    if (Shm->mode & POSIX_SEM) {
+	sem_destroy(&Shm->shm_lock);
+	for (i = 0; i < MAX_IO_TESTS; i++)
+	    sem_destroy(&Shm->ptbl[i].rbuf_lock);
+    }
+
     if (do_return)
 	return;
 
@@ -1897,16 +1922,16 @@ quick_die(int caller)
         bcopy(Shm, Shm->shm_tmp, sizeof(struct shm_buf));
         Shm = Shm->shm_tmp;
 
-        if (shmdt(Shm->shm_addr) == -1) 
+        if (shmdt(Shm->shm_addr) == -1)
             Shm->perror("usex: shmdt");
-        if (shmctl(Shm->shmid, IPC_RMID, (struct shmid_ds *)NULL) == -1) 
+        if (shmctl(Shm->shmid, IPC_RMID, (struct shmid_ds *)NULL) == -1)
             Shm->perror("usex: shmctl");
     }
 
     if (file_exists(Shm->id_file))
 	delete_file(Shm->id_file, NOT_USED);
 
-    if (file_exists(Shm->infile) && streq(Shm->infile, Shm->default_file)) 
+    if (file_exists(Shm->infile) && streq(Shm->infile, Shm->default_file))
 	delete_file(Shm->infile, NOT_USED);
     if (file_exists(Shm->outfile))
         delete_file(Shm->outfile, NOT_USED);
@@ -1947,13 +1972,31 @@ make_reportfile(void)
                 if (Shm->ptbl[i].i_pid == NOT_RUNNING)
 			continue;
 
+		if ((Shm->ptbl[i].i_type == BIN_TEST) &&
+		    (Shm->ptbl[i].max_pass &&
+		    (Shm->ptbl[i].i_pass > Shm->ptbl[i].max_pass)))
+			continue;
+
+		if (Shm->ptbl[i].i_stat & IO_SUICIDE) {
+			test_failures++;
+			continue;
+		}
+
 		switch (Shm->ptbl[i].i_stat & (EXPLICIT_KILL|HANG))
 		{
 		case EXPLICIT_KILL:
 			break;
 
 		case (EXPLICIT_KILL|HANG):
+			test_failures++;
+			break;
+
 		case 0:
+			if (((Shm->ptbl[i].i_type == BIN_TEST) ||
+		    	    (Shm->ptbl[i].i_type == USER_TEST)) &&
+		    	    !(Shm->ptbl[i].i_stat & IO_CHILD_RUN))
+				break;
+
 			test_failures++;
 			break;
 		}
@@ -1964,10 +2007,10 @@ make_reportfile(void)
 	if (!(Shm->mode & (CINIT|GINIT)))
 		win_mgr_failures++;
 
-	fprintf(fp, "USEX TEST RESULT: %s\n\n", 
+	fprintf(fp, "USEX TEST RESULT: %s\n\n",
 		(test_failures|win_mgr_failures) ? "FAIL" : "PASS");
 
-	if (Shm->mode & CINIT) 
+	if (Shm->mode & CINIT)
 		dump_screen(fp);
 
 	if (tests_run)
@@ -1978,16 +2021,38 @@ make_reportfile(void)
 
 		sprintf(buf, "%s TEST %d: ", test_type(i), i+1);
 
+		if ((Shm->ptbl[i].i_type == BIN_TEST) &&
+		    (Shm->ptbl[i].max_pass &&
+		    (Shm->ptbl[i].i_pass > Shm->ptbl[i].max_pass))) {
+			strcat(buf, "PASS");
+			fprintf(fp, "%22s\n", buf);
+			continue;
+		}
+
+		if (Shm->ptbl[i].i_stat & IO_SUICIDE) {
+			strcat(buf, "FAIL");
+			fprintf(fp, "%22s\n", buf);
+			continue;
+		}
+
                 switch (Shm->ptbl[i].i_stat & (EXPLICIT_KILL|HANG))
                 {
                 case EXPLICIT_KILL:
 			strcat(buf, "PASS");
-                        break;
+			break;
 
                 case (EXPLICIT_KILL|HANG):
-                case 0:
 			strcat(buf, "FAIL");
-                        break;
+			break;
+
+                case 0:
+			if (((Shm->ptbl[i].i_type == BIN_TEST) ||
+			    (Shm->ptbl[i].i_type == USER_TEST)) &&
+			    !(Shm->ptbl[i].i_stat & IO_CHILD_RUN))
+				strcat(buf, "PASS");
+			else
+				strcat(buf, "FAIL");
+			break;
                 }
 
 		fprintf(fp, "%22s\n", buf);
@@ -2068,7 +2133,7 @@ make_usex_input(int arg, int tcount)
 #ifdef NOTDEF
 	fprintf(fp, "0\n");
 #endif
-	if (Shm->time_to_kill) 
+	if (Shm->time_to_kill)
 		fprintf(fp, "%d\n", Shm->time_to_kill);
 	else
 		fprintf(fp, "0\n");
@@ -2076,8 +2141,8 @@ make_usex_input(int arg, int tcount)
 	fprintf(fp, "\n");
 	break;
 
-    case 'E': 
-    case 'e': 
+    case 'E':
+    case 'e':
 	max_tests = MAX(max_tests, 6);  /* at least one of each built-in */
 
         if (option_override.transfer_rate_device)
@@ -2094,7 +2159,7 @@ make_usex_input(int arg, int tcount)
 	random_vmems = vmem_tests - sequential_vmems;
 	float_tests = MAX(max_tests/12, 1);
 	dry_tests = MAX(max_tests/12, 1);
-        bin_tests = max_tests - 
+        bin_tests = max_tests -
 	    (disk_tests + rate_tests + vmem_tests + float_tests + dry_tests);
 	if (!bin_tests)
 	    bin_tests = 1;
@@ -2103,17 +2168,17 @@ make_usex_input(int arg, int tcount)
 	    directory = "/usr/tmp";
 	else if (is_directory("/tmp"))
 	    directory = "/tmp";
-	else 
+	else
 	    directory = ".";
 
 	fprintf(fp, "%d\n", max_tests);
-	for (i = 0; i < disk_tests; i++) 
+	for (i = 0; i < disk_tests; i++)
 	    fprintf(fp, "%s\n", directory);
 	for (i = 0; i < rate_tests; i++) {
 	    if (force_transfer)
 		fprintf(fp, "rate %s\n", option_override.transfer_rate_device);
 	    else if (is_mount_point(NOT_USED, "/usr", TRUE, buf)) {
-		fprintf(fp, "rate %s\n", buf); 
+		fprintf(fp, "rate %s\n", buf);
 	    } else {
 	        fprintf(fp, "rate %s\n", directory);
 	    }
@@ -2135,7 +2200,7 @@ make_usex_input(int arg, int tcount)
 	    else
 	        fprintf(fp, "vmem -s\n");
         }
-	for (i = 0; i < bin_tests; i++) 
+	for (i = 0; i < bin_tests; i++)
 	    fprintf(fp, "bin\n");
 
 	for (i = 0; i < disk_tests; i++)
@@ -2148,14 +2213,14 @@ make_usex_input(int arg, int tcount)
 	    if (Shm->vmem_size)
 		fprintf(fp, "%d\n", Shm->vmem_size);
 	    else {
-		if (memsize) { 
+		if (memsize) {
 			mbs = (memsize) / vmem_tests;
 			fprintf(fp, "%ld\n", mbs ? mbs : 1);
 		} else
 	    		fprintf(fp, "10\n");
 	    }
 	}
-	
+
 	disksize = 1024;
         if ((pp = popen("/bin/df /usr", "r"))) {
             while (fgets(buf, MESSAGE_SIZE*2, pp)) {
@@ -2167,12 +2232,12 @@ make_usex_input(int arg, int tcount)
 		}
             }
 	    pclose(pp);
-        } 
+        }
 
-	for (i = 0; i < disk_tests; i++) 
+	for (i = 0; i < disk_tests; i++)
 	    fprintf(fp, "%ld\n", disksize);
 
-	for (i = 0; i < rate_tests; i++) { 
+	for (i = 0; i < rate_tests; i++) {
 	    ratesize = ((memsize*2)*1048576)/1024;
 	    fprintf(fp, "%ld\n", ratesize);
 	}
@@ -2201,7 +2266,7 @@ start_shell(int argc, char **argv)
 {
     register int i;
     char command[STRINGSIZE*2];
-    char errmsg[STRINGSIZE*2];
+    char errmsg[STRINGSIZE*3];
     char id_file_current[STRINGSIZE];
     FILE *fp;
 
@@ -2212,7 +2277,7 @@ start_shell(int argc, char **argv)
      *      an ID file /tmp/ux[PID].sh is created, and execl("/bin/sh -c usex")
      *      is performed below.
      *  (2) When usex is invoked from the execl("/bin/sh -c usex") below, it
-     *      sees the newly-created ID file (thereby recognizing itself as the 
+     *      sees the newly-created ID file (thereby recognizing itself as the
      *      exec'd usex), sets the parent_shell variable, and returns.
      *
      *  However, depending upon the UNIX used, the exec'd usex may:
@@ -2220,7 +2285,7 @@ start_shell(int argc, char **argv)
      *  (1) be a child of the original usex.
      *  (2) have the same PID as the original usex.
      *
-     *  That being the case, we have to look for ID files that contain 
+     *  That being the case, we have to look for ID files that contain
      *  either the parent's PID or the current PID.  It really doesn't make
      *  a difference, as long as parent_shell is set correctly.  If the
      *  parent_shell dies and orphans the exec'd usex, then the exec'd
@@ -2229,7 +2294,7 @@ start_shell(int argc, char **argv)
      *  NOTE: This kludge was put in place to deal with remote executions
      *  of "xterm -e usex" where the originator was running /bin/csh under
      *  SVR4.  I don't remember what the exact problem was, other than there
-     *  would be "stranded" usex c-shells running remotely after the xterms 
+     *  would be "stranded" usex c-shells running remotely after the xterms
      *  were killed; running from /bin/sh worked fine.  Hence this kludge...
      */
 
@@ -2251,11 +2316,11 @@ start_shell(int argc, char **argv)
         Shm->perror("fopen");
         return;
     }
-    else 
+    else
         fclose(fp);
 
     sprintf(command, "%s",  argv[0]);
-    for (i = 1; i < argc; i++) 
+    for (i = 1; i < argc; i++)
         sprintf(&command[strlen(command)], " %s", argv[i]);
 
     sprintf(errmsg, "execl: FATAL ERROR: [%s]: ", command);
@@ -2276,7 +2341,7 @@ log_death (int id)
 		if (!strlen(Shm->ptbl[id].i_time_of_death))
 			set_time_of_death(id);
 		sprintf(buffer, " %s TEST %d: %s: %s\n",
-                                test_type(id), id+1, 
+                                test_type(id), id+1,
 				Shm->ptbl[id].i_stat & EXPLICIT_KILL ?
 				"EXPLICITLY KILLED AT" : "ABNORMAL DEATH AT",
 				Shm->ptbl[id].i_time_of_death);
@@ -2289,9 +2354,9 @@ void
 log_entry(unsigned long id, unsigned long cmd, unsigned long count, void *s)
 {
         static FILE *logfp = (FILE *)NULL;
-        char buffer1[MESSAGE_SIZE];    
-        char buffer2[MESSAGE_SIZE];    
-        char buffer3[MESSAGE_SIZE];    
+        char buffer1[MESSAGE_SIZE];
+        char buffer2[MESSAGE_SIZE];
+        char buffer3[MESSAGE_SIZE];
 	register int i;
 	int fd;
 	time_t now;
@@ -2318,7 +2383,7 @@ log_entry(unsigned long id, unsigned long cmd, unsigned long count, void *s)
 		break;
 
         case LOG_IO_PASS:
-		if (count == 1) 
+		if (count == 1)
 			return;
 
 		elapsed_time(Shm->ptbl[id].i_timestamp, now, buffer1);
@@ -2327,15 +2392,15 @@ log_entry(unsigned long id, unsigned long cmd, unsigned long count, void *s)
       		switch (Shm->ptbl[id].i_type)
 		{
 		case DHRY_TEST:
-                        fprintf(logfp, 
+                        fprintf(logfp,
                       " %s TEST %ld: PASS: %ld TIME: %s %ld dhrystones/second\n",
                                 test_type(id),
                                 id+1, count-1, buffer1, (ulong)s);
 			break;
 
 		default:
-                	fprintf(logfp, 
-			    " %s TEST %ld: PASS: %ld TIME: %s %s\n", 
+                	fprintf(logfp,
+			    " %s TEST %ld: PASS: %ld TIME: %s %s\n",
 				test_type((int)id),
 				id+1, count-1, buffer1, s ? (char *)s : "");
 			break;
@@ -2361,7 +2426,7 @@ log_entry(unsigned long id, unsigned long cmd, unsigned long count, void *s)
                 sys_time(buffer2);
 		run_time(buffer3, NULL);
 		fprintf(logfp, SEPARATOR);
-		fprintf(logfp, "USEX END: %s@%s  TIME: %s\n", 
+		fprintf(logfp, "USEX END: %s@%s  TIME: %s\n",
 			buffer1, buffer2, buffer3);
 
                 fprintf(logfp, SEPARATOR);
@@ -2450,6 +2515,8 @@ char *usage_lines[] = {
 "                     tests to run.",
 "--exclude cmd,...    Comma-separated list of specified commands to exclude in",
 "                     all bin tests.",
+"--bincore            Set the core-dump rlimit to unlimited for bin tests, and",
+"                     keep the temporary work directory intact at shutdown.",
 "--io fsync,notrunc   Comma-separated list of I/O test arguments, consisting of",
 "                     \"fsync\", which forces an explicit fsync() call after each",
 "                     write() call in the Fill cycle, and/or \"notrunc\", which",
@@ -2464,6 +2531,8 @@ char *usage_lines[] = {
 "--nolog io,bin,vmem, Comma-separated list of test types whose events should NOT",
 "        dhry,whet,   be logged when using the -l option.",
 "        rate,user    ",
+"--locks              Use POSIX semaphores to synchronize access to bin test ",
+"                     message buffers. (experimental)",
 " ",
 "Alternatively, the following options from the list above may be placed in a",
 ".usexrc file located in the current directory or in the user's HOME directory:",
@@ -2622,25 +2691,29 @@ usex_inquiry(FILE *fp)
                 fprintf(fp, "%sLESS", others++ ? "|" : "");
        if (Shm->mode & RHTS_HANG_TRACE)
                 fprintf(fp, "%sRHTS_HANG_TRACE", others++ ? "|" : "");
+       if (Shm->mode & BINCORE)
+                fprintf(fp, "%sBINCORE", others++ ? "|" : "");
+       if (Shm->mode & POSIX_SEM)
+                fprintf(fp, "%sPOSIX_SEM", others++ ? "|" : "");
 	fprintf(fp, ")\n");
 
-	fprintf(fp, "parent_shell: %d mompid: %d\n", 
+	fprintf(fp, "parent_shell: %d mompid: %d\n",
 		Shm->parent_shell, Shm->mompid);
-	fprintf(fp, 
+	fprintf(fp,
             "Shm: %lx shm_tmp: %lx shmid: %d shm_addr: %lx\n",
 		(ulong)Shm, (ulong)Shm->shm_tmp, Shm->shmid, (ulong)Shm->shm_addr);
 
         fprintf(fp,
-            "mmfd: %d max_tests: %d hanging_tcnt: %d die_caller: %d\n",  
+            "mmfd: %d max_tests: %d hanging_tcnt: %d die_caller: %d\n",
 		Shm->mmfd, Shm->max_tests, Shm->hanging_tcnt, Shm->die_caller);
 
-	fprintf(fp, 
+	fprintf(fp,
 	    "TERM: \"%s\" term_LINES: %d term_COLS: %d lines_used: %d\n",
 		Shm->TERM, Shm->term_LINES,
 		Shm->term_COLS, Shm->lines_used);
 
-	fprintf(fp, 
-            "shm_size: %d ptbl[%d]: %lx (see individual test reports)\n", 
+	fprintf(fp,
+            "shm_size: %d ptbl[%d]: %lx (see individual test reports)\n",
 		Shm->shm_size, MAX_IO_TESTS, (ulong)&Shm->ptbl[0]);
 	fprintf(fp, "mom: \"%s\" ", Shm->mom);
 	fprintf(fp, "input: \"%s\" ", Shm->input);
@@ -2656,7 +2729,7 @@ usex_inquiry(FILE *fp)
                         fprintf(fp, "\n                   ");
 			j = 0;
 		} else
-			fprintf(fp, " "); 
+			fprintf(fp, " ");
 	}
 	fprintf(fp, "\n");
 
@@ -2665,7 +2738,7 @@ usex_inquiry(FILE *fp)
 		sprintf(buffer, "%d,%d", Shm->win_pipe[i], Shm->win_pipe[i+1]);
 		fprintf(fp, buffer);
 		j += strlen(buffer) + 1;
-		
+
                 if (j > 50) {
                         fprintf(fp, "\n                   ");
 			j = 0;
@@ -2673,7 +2746,7 @@ usex_inquiry(FILE *fp)
                         fprintf(fp, " ");
 	}
 	fprintf(fp, "\n");
-	
+
 	fprintf(fp, "      wake_me[%d]: ", NUMSG);
 	for (i = 0; i < NUMSG; i++) {
 		fprintf(fp, "%d", Shm->wake_me[i]);
@@ -2705,9 +2778,9 @@ usex_inquiry(FILE *fp)
         fprintf(fp, "\n");
 
 	fprintf(fp, "procno: %d hangtime: %u stallcnt: %lu stallvalue: %lu\n",
-		Shm->procno, Shm->hangtime, Shm->stallcnt, 
+		Shm->procno, Shm->hangtime, Shm->stallcnt,
 		Shm->stallvalue);
-	fprintf(fp, 
+	fprintf(fp,
 	    "bin_sync_delay: %d bin_cmds_found: %d confd: %d ",
 		Shm->bin_sync_delay, Shm->bin_cmds_found, Shm->confd);
 
@@ -2716,16 +2789,16 @@ usex_inquiry(FILE *fp)
 	fprintf(fp, "infile: \"%s\" outfile: \"%s\"\ndefault_file: \"%s\"\n",
 		Shm->infile, Shm->outfile, Shm->default_file);
 
-	fprintf(fp, 
+	fprintf(fp,
 	    "pattern: \"%s\" bad_fline: %d niceval: %d\n",
 		Shm->pattern, Shm->bad_fline, Shm->niceval);
 
-	fprintf(fp, 
+	fprintf(fp,
             "time_to_kill: %d statnum: %d directories_found: %d\n",
-		Shm->time_to_kill, Shm->statnum, 
+		Shm->time_to_kill, Shm->statnum,
 		Shm->directories_found);
-	fprintf(fp, "vmem_size: %d vmem_access: %s ioflags: %x ", 
-		Shm->vmem_size, 
+	fprintf(fp, "vmem_size: %d vmem_access: %s ioflags: %x ",
+		Shm->vmem_size,
 		Shm->vmem_access ? Shm->vmem_access : "(not specified)",
 		Shm->ioflags);
 	if (Shm->ioflags) {
@@ -2739,7 +2812,7 @@ usex_inquiry(FILE *fp)
 	}
 	fprintf(fp, "\n");
 
-	fprintf(fp, 
+	fprintf(fp,
 	    "screen_buf: %lx (see screen dump below)\n",
 		(ulong)&Shm->screen_buf[0][0]);
 	fprintf(fp, "tmpdir: \"%s\" id_file: \"%s\"\n",
@@ -2751,7 +2824,7 @@ usex_inquiry(FILE *fp)
                 Shm->saved_error_msg,
                 strlen(Shm->saved_error_msg) ? "\n" : " ");
         fprintf(fp, "logfile: \"%s\"\n", Shm->logfile);
-	fprintf(fp, "reportfile: \"%s\" origdir: \"%s\"\n", 
+	fprintf(fp, "reportfile: \"%s\" origdir: \"%s\"\n",
 		Shm->reportfile, Shm->origdir);
 	fprintf(fp, "ext_terminal: %s\n", Shm->ext_terminal);
 	fprintf(fp, "utsname: ");
@@ -2761,7 +2834,7 @@ usex_inquiry(FILE *fp)
         fprintf(fp, "         version: %s ", Shm->utsname.version);
         fprintf(fp, "machine: %s\n", Shm->utsname.machine);
 
-	fprintf(fp, "prompt_x: %d debug_message_inuse: %d\n", 
+	fprintf(fp, "prompt_x: %d debug_message_inuse: %d\n",
 		Shm->prompt_x, Shm->debug_message_inuse);
 	fprintf(fp, "prompt: \"%s\"%s", Shm->prompt,
 		strlen(Shm->prompt) ? "\n" : " ");
@@ -2789,7 +2862,7 @@ usex_inquiry(FILE *fp)
                     if (i == (TIMER_CALLBACKS-1))
                         fprintf(fp, "  callbacks[%d]: (unused)\n", i);
                     else
-                        fprintf(fp, "  callbacks[%d-%d]: (unused)\n", i, 
+                        fprintf(fp, "  callbacks[%d-%d]: (unused)\n", i,
 				(j == TIMER_CALLBACKS) || tc1->func ? j-1 : j);
                     i = j-1;
                 } else
@@ -2806,10 +2879,12 @@ usex_inquiry(FILE *fp)
 
 	fprintf(fp, "lockstats[%d]: %lx (not shown) opipe: %lx\n", NUMSG,
 		(ulong)&Shm->lockstats[0], (ulong)Shm->opipe);
+	fprintf(fp, "shm_lock: %s\n",
+		Shm->shm_lock.__align == 0 ? "LOCKED" : "UNLOCKED");
         fprintf(fp, "ps_list: %lx\n", (ulong)Shm->ps_list);
         process_list(PS_LIST_READ, fp);
 
-	fprintf(fp, "window_manager: "); 
+	fprintf(fp, "window_manager: ");
 	if (CURSES_DISPLAY())
 		fprintf(fp, "curses_mgr() ");
 	else if (GTK_DISPLAY())
@@ -2845,14 +2920,14 @@ usex_inquiry(FILE *fp)
 }
 
 
-/* 
+/*
 struct ps_list {
 	char message[MESSAGE_SIZE];
 	struct ps_list *next;
 };
 */
 
-void 
+void
 process_list(int req, FILE *out)
 {
 	register int i;
@@ -2882,7 +2957,7 @@ process_list(int req, FILE *out)
 
 		while (fgets(buf, MESSAGE_SIZE*2, fp)) {
 			if (strstr(buf, " PID "))
-				continue;	
+				continue;
 
 			buf[MESSAGE_SIZE-1] = NULLCHAR;
 			strip_lf(buf);
@@ -2924,7 +2999,7 @@ process_list(int req, FILE *out)
 
                         if (strstr(buf, " PID ") && strstr(buf, "TTY")) {
 				strcpy(hdr, buf);
-                                continue; 
+                                continue;
 			}
 
 			strcpy(workbuf, strip_lf(buf));
@@ -2936,7 +3011,7 @@ process_list(int req, FILE *out)
 				continue;
 
                         if (streq(cmd, "ps") || streq(cmd, "/bin/ps"))
-                                continue; 
+                                continue;
 
 			found = FALSE;
                 	for (ps = &Shm->ps_list; *ps; ps = &(*ps)->next) {
@@ -2950,12 +3025,12 @@ process_list(int req, FILE *out)
 				if (!streq(cmd, "usex")) {
 					if (!bin_test_run)
 						continue;
-					if (!bin_test_exists(cmd)) 
+					if (!bin_test_exists(cmd))
 						continue;
 				}
 
 				if (cnt == 0) {
-					fprintf(out, 
+					fprintf(out,
 "\nusex: WARNING: The following appear to be leftover usex-related processe(s):\n\n");
 					fprintf(out, hdr);
 				}
@@ -2966,7 +3041,7 @@ process_list(int req, FILE *out)
 
 			if (cnt == (MAX_IO_TESTS*2))
 				break;
-                } 
+                }
 
 		if (!cnt)
 			return;
@@ -2992,7 +3067,7 @@ process_list(int req, FILE *out)
 		break;
 
 	case PS_LIST_READ:
-                for (ps = &Shm->ps_list; *ps; ps = &(*ps)->next) { 
+                for (ps = &Shm->ps_list; *ps; ps = &(*ps)->next) {
 			fprintf(out, "  %s\n", (*ps)->ps_line);
 		}
 		break;
@@ -3051,7 +3126,7 @@ do_rhts(char *args)
 			 	Shm->mode |= RHTS_HANG_TRACE;
 				continue;
 			}
-			Shm->stderr("usex: --rhts %s: cannot write to /proc/sysrq-trigger\n", 
+			Shm->stderr("usex: --rhts %s: cannot write to /proc/sysrq-trigger\n",
 				argv[i]);
 			_exit(RHTS_BAD_ARG);
 		}
@@ -3078,7 +3153,7 @@ do_exclude(char *args)
                 argv[0] = args;
         }
 
-        for (i = 0; i < argc; i++) 
+        for (i = 0; i < argc; i++)
         	bin_exclude(argv[i]);
 }
 
@@ -3180,7 +3255,7 @@ get_environment(void)
 	FILE *fp;
 	size_t size;
 
-    	if ((p1 = getenv("USEX_CONSOLE")) != 0 && *p1) 
+    	if ((p1 = getenv("USEX_CONSOLE")) != 0 && *p1)
         	strcpy(Shm->console_device, p1);
 
 #ifdef PR_FPEMU_NOPRINT
@@ -3225,7 +3300,7 @@ cwd_retry:
 	size += STRINGSIZE;
 
 	if ((p1 = (char *)malloc(size)) == NULL) {
-		Shm->stderr( 
+		Shm->stderr(
             "usex: cannot malloc space for current working directory string\n");
 		quick_die(QDIE(22));
 	}
@@ -3236,7 +3311,7 @@ cwd_retry:
 		free(p1);
 		size += STRINGSIZE;
 		goto cwd_retry;
-	} 
+	}
 }
 
 static void
@@ -3256,7 +3331,7 @@ resolve_rc_cmd(char *line)
 	if (strstr(line, "USEX_CONSOLE=") && !strlen(Shm->console_device)) {
 		p1 = strstr(line, "=") + 1;
 		argc = parse(p1, argv);
-		if (argc == 1) 
+		if (argc == 1)
 			strcpy(Shm->console_device, argv[0]);
 		return;
 	}
@@ -3267,7 +3342,7 @@ resolve_rc_cmd(char *line)
 		p1 += strlen("TERMINAL=");
 		strncpy(Shm->ext_terminal, p1, min(strlen(p1), STRINGSIZE-1));
 		return;
-	} 
+	}
 #ifdef PR_FPEMU_NOPRINT
 	if (strstr(line, "USEX_FPEMU_NOPRINT")) {
 		prctl(PR_SET_FPEMU, PR_FPEMU_NOPRINT, 0, 0, 0);
@@ -3379,7 +3454,7 @@ resolve_rc_cmd(char *line)
                 } else
                     i = 4;
                 if (Shm->directories_found) {
-                    Shm->printf("%d director%s not removed.", 
+                    Shm->printf("%d director%s not removed.",
 			Shm->directories_found,
                         Shm->directories_found == 1 ? "y was" : "ies were");
                 }
@@ -3431,10 +3506,10 @@ resolve_rc_cmd(char *line)
 	}
 
         if (streq(argv[0], "-w")) {
-                if (mlockall(MCL_CURRENT|MCL_FUTURE) == 0)  
+                if (mlockall(MCL_CURRENT|MCL_FUTURE) == 0)
                         Shm->mode |= MLOCK_MODE;
                 else {
-                        Shm->perror("window manager not wired: mlockall");      
+                        Shm->perror("window manager not wired: mlockall");
                         sleep(Shm->mode & NOTTY ? 0 : 2);
                 }
 		return;
@@ -3462,7 +3537,7 @@ nodisplay_setup(int argc, char **argv)
 
 	for (i = 0; i < argc; i++) {
 		if (streq(argv[i], "--nodisplay")) {
-			if (GTK_DISPLAY()) 
+			if (GTK_DISPLAY())
 			    	quick_die(QDIE(27));
     			if ((nullfd = open("/dev/null", O_RDWR)) < 0) {
 				Shm->perror("/dev/null");
@@ -3494,13 +3569,13 @@ argv_preview(int argc, char **argv)
 
                 if (strneq(argv[i], "-b") || strneq(argv[i], "-e") ||
                      strneq(argv[i], "-B") || strneq(argv[i], "-E")) {
-			if ((strlen(argv[i]) > 2) && 
-			    decimal(&argv[i][2], 0) && 
+			if ((strlen(argv[i]) > 2) &&
+			    decimal(&argv[i][2], 0) &&
 			    (atoi(&argv[i][2]) > 0)) {
 				Shm->hanging_tcnt = atoi(&argv[i][2]);
 				argv[i][2] = (char)NULLCHAR;
 			}
-	
+
 	                if (argv[i][1] == 'E')
 	                        argv[i][1] = 'e';
 	                if (argv[i][1] == 'B')
@@ -3576,7 +3651,7 @@ static char *quick_die_codes[] = {
     /* 29 */ "attempted -i with -b or -e",
     /* 30 */ "(invalid die code)",
 };
- 
+
 static void
 print_die_code(int code, FILE *fp, int force)
 {
@@ -3594,7 +3669,7 @@ print_die_code(int code, FILE *fp, int force)
                 break;
         default:
 		fprintf(fp, "UNEXPECTED DIE CODE [%d]: %s\n", code,
-			die_codes[code] ?  die_codes[code] : 
+			die_codes[code] ?  die_codes[code] :
 			"(invalid die code)");
                 break;
         }
@@ -3626,11 +3701,11 @@ quick_die:
 	case QDIE(29):
 		if (!force)
 			break;
-	
+
         default:
 		code = abs(code);
 		fprintf(fp, "UNEXPECTED QUICK DIE CODE [%d]: %s\n", code,
-			quick_die_codes[code] ?  quick_die_codes[code] : 
+			quick_die_codes[code] ?  quick_die_codes[code] :
 			"(invalid die code)");
                 break;
 	}
@@ -3652,6 +3727,7 @@ char *spec_file_contents[] = {
 "Vendor: Red Hat, Inc.",
 "Packager: Dave Anderson <anderson@redhat.com>",
 "ExclusiveOS: Linux",
+"BuildRequires: ncurses-devel",
 "Buildroot: /var/tmp/usex",
 "#ExclusiveArch: i386 alpha ia64 ppc",
 "",
@@ -3703,4 +3779,28 @@ make_spec_file(void)
 		else
                 	fprintf(stderr, "%s\n", spec_file_contents[i]);
 	}
+}
+
+int
+lock(sem_t *sem_ptr)
+{
+	if (Shm->mode & POSIX_SEM) {
+		if (sem_wait(sem_ptr) < 0) {
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
+int
+unlock(sem_t *sem_ptr)
+{
+	if (Shm->mode & POSIX_SEM) {
+		if (sem_post(sem_ptr) < 0) {
+			return FALSE;
+		}
+	}
+
+	return TRUE;
 }

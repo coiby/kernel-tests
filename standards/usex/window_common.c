@@ -6,8 +6,6 @@
  *  There are also a number of as GTK-assist functions that are called 
  *  from within gtk_mgr.c, which has no concept of "defs.h" and
  *  therefore the inner workings of usex.
- *
- *  CVS: $Revision: 1.19 $ $Date: 2016/02/10 19:25:53 $
  */
 
 #ifdef _GTK_
@@ -230,7 +228,10 @@ common_kill(int arg1, int arg2)
 	    if (!(Shm->ptbl[i].i_stat & IO_DEAD)) {
 	        sprintf(buf, "killing test %d", i+1);
 		USER_MESSAGE_WAIT(buf);
-		Shm->ptbl[i].i_stat |= EXPLICIT_KILL;	
+		while (!(get_i_stat(&Shm->ptbl[i]) & EXPLICIT_KILL)) {
+			Shm->ptbl[i].i_stat |= EXPLICIT_KILL;	
+                        stall(50000);
+		}
             	if (Shm->ptbl[i].i_pid) {
                     Kill(Shm->ptbl[i].i_pid, SIGUSR1, "W7", K_IO(i));
 		    if (!Shm->ptbl[i].i_internal_kill_source)
@@ -661,7 +662,7 @@ sigchld(int sig)
 void 
 debug_message(ulong arg1, ulong arg2)
 {
-	char buffer1[STRINGSIZE];
+	char buffer1[STRINGSIZE*2];
 #ifdef _CURSES_
 	char buffer2[STRINGSIZE];
 	int len; 
@@ -1656,6 +1657,9 @@ test_inquiry(int target, FILE *fp, int show_messages)
 	fprintf(fp, 
 	    "i_rptr: %d i_wptr: %d i_blkcnt: %d i_lock: %d\n",
 		tbl->i_rptr, tbl->i_wptr, tbl->i_blkcnt, tbl->i_lock); 
+	fprintf(fp, "rbuf_lock: %s\n", 
+		tbl->rbuf_lock.__align == 0 ? "LOCKED" : "UNLOCKED");
+
 	fprintf(fp, "i_timestamp: %s", tbl->i_timestamp ? 
 		ctime(&tbl->i_timestamp) : "(unused)\n");
 

@@ -1,8 +1,5 @@
 /*  Author: David Anderson <anderson@redhat.com>
  *
- *  BitKeeper ID: @(#)utils.c 1.6
- *
- *  CVS: $Revision: 1.9 $ $Date: 2016/02/10 19:25:53 $
  */
 
 #include "defs.h"
@@ -29,7 +26,6 @@ static int link_leftover(char *);
 static int show_leftovers(int);
 static int rm_leftovers(void);
 static int not_in_list(char *);
-static int file_readable(char *);
 
 
 #define ENTER_BACKWARDS 1
@@ -420,7 +416,7 @@ file_exists(char *filename)
 /*
  *  Determine whether a file exists, and if so, if it's readable.
  */
-static int
+int
 file_readable(char *file)
 {
         long tmp;
@@ -868,7 +864,7 @@ delete_contents(char *dirname, int originator)
 {
     DIR *dirp;
     struct dirent *dp;
-    char entry[STRINGSIZE];
+    char entry[STRINGSIZE*3];
 
     dirp = opendir(dirname);
     for (dp = readdir(dirp); dp != (struct dirent *)NULL; dp = readdir(dirp)) {
@@ -990,7 +986,7 @@ chk_leftovers(int query)
     DIR *dirp;
     struct dirent *dp;
     char input[MESSAGE_SIZE];
-    char entry[MESSAGE_SIZE];
+    char entry[MESSAGE_SIZE*2];
     char IO_file[MESSAGE_SIZE];
     int found, pid;
     FILE *fp;
@@ -1411,11 +1407,14 @@ get_usex_message(int queue, char *buffer)
             if (queue >= Shm->procno)
 		return FALSE;
 	
+	    lock(&Shm->ptbl[queue].rbuf_lock);
             if (!(shm_read(queue, buffer))) {
 	        if (!(canned_message(queue, buffer))) {
+	    	    unlock(&Shm->ptbl[queue].rbuf_lock);
                     return FALSE;
 	        }
 	    }
+	    unlock(&Shm->ptbl[queue].rbuf_lock);
             return TRUE;
 
 	default:
@@ -1439,6 +1438,12 @@ ring_init(void)
         Shm->ptbl[i].i_wptr = Shm->ptbl[i].i_rptr = 0;
         Shm->ptbl[i].i_blkcnt = 0;
 	Shm->ptbl[i].i_lock = 0;
+	if (Shm->mode & POSIX_SEM) {
+		if (sem_init(&Shm->ptbl[i].rbuf_lock, 1, 1) < 0) {
+			perror("sem_init");
+			Shm->mode &= ~POSIX_SEM;
+		} 
+	}
     }
 
     for (i = 0; i < NUMSG; i++) {
@@ -1518,7 +1523,9 @@ retry_write:
         *stat |= WAKE_ME;            
         Shm->wake_me[ring] = TRUE;
 	while (TRUE) {
+	    unlock(&Shm->ptbl[ID].rbuf_lock);
             pause();                     
+	    lock(&Shm->ptbl[ID].rbuf_lock);
 	    if (*stat & WAKE_UP)
 	        break;
 	}
@@ -1609,6 +1616,7 @@ shmcpy(char *bp,
 #endif
     }
 
+
 #ifdef LOCKSTATS
     if (!spin)
         Shm->lockstats[ring].first_write_hits++;
@@ -1623,6 +1631,11 @@ shmcpy(char *bp,
 	    UNLOCK(lockptr);
             return(FALSE);
 	}
+    }
+
+    for (i = 0; i < count; i++) {
+	if (buffer[i] && !isprint(buffer[i]))
+	    buffer[i] = '.';
     }
 
 #ifdef ENTER_BACKWARDS

@@ -38,10 +38,6 @@
  *            The test can be interrupted by the user in order to kill the
  *            process or put it in the background (in which case only the pass 
  *            number is updated. 
- *
- *  BitKeeper ID: @(#)io_test.c 1.3
- *
- *  CVS: $Revision: 1.4 $ $Date: 2016/02/10 19:25:52 $
  */
 
 
@@ -64,7 +60,7 @@ io_test (int id)
     ulong file_pointer;
     time_t now;
     int fd_sanity;
-    char workbuf[STRINGSIZE];
+    char workbuf[STRINGSIZE*2];
 
     ID = id;
     tbl = &Shm->ptbl[ID];
@@ -816,7 +812,7 @@ void
 bail_out(int fd, int error, int errnum)
 {
     register PROC_TABLE *tbl;        /* Pointer to process table.   */
-    char buf[STRINGSIZE];
+    char buf[STRINGSIZE*2];
 
     tbl = &Shm->ptbl[ID];
 
