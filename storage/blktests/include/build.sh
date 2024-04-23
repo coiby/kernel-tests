@@ -7,6 +7,8 @@ elif rlIsRHEL 8; then
 	BR=rhel8
 elif rlIsRHEL 9 || rlIsCentOS 9; then
 	BR=rhel9
+elif rlIsRHEL 10 || rlIsCentOS 10; then
+	BR=rhel10
 elif rlIsFedora; then
 	BR=fedora
 fi
