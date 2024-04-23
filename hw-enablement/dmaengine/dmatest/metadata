@@ -1,0 +1,16 @@
+[General]
+name=hw-enablement/dmaengine/dmatest
+owner=Jerry Snitselaar <jsnitsel@redhat.com>
+description=Test dmaengine dma channel based drivers using dmatest module
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+Path=/mnt/tests/kernel/hw-enablement/dmaengine/dmatest
+Priority=Normal
+max_time=20m
+dependencies=grubby;beakerlib;accel-config;pciutils;sed;gawk
+softDependencies=beakerlib-redhat
+repoRequires=general/include;hw-enablement/dmaengine/include;iommu/include

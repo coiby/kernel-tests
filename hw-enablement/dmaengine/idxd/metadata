@@ -1,0 +1,17 @@
+[General]
+name=hw-enablement/dmaengine/idxd
+owner=Jerry Snitselaar <jsnitsel@redhat.com>
+description=Test idxd driver scalable mode config ops
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+Path=/mnt/tests/kernel/hw-enablement/dmaengine/idxd
+Priority=Normal
+max_time=20m
+environment=DMA_MODNAME=idxd
+dependencies=grubby;beakerlib;accel-config;pciutils;sed;gawk
+softDependencies=beakerlib-redhat
+repoRequires=general/include;hw-enablement/dmaengine/include;iommu/include

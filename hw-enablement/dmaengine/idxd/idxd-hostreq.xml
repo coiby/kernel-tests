@@ -1,0 +1,10 @@
+<hostRequires>
+  <and>
+    <device op="=" vendor_id="8086" device_id="0b25"/>
+    <device op="!=" vendor_id="8086" device_id="0cfe"/>
+    <key_value op="=" key="VIRT_IOMMU" value="1"/>
+    <arch op="=" value="x86_64"/>
+    <cpu_count op="&gt;" value="1"/>
+    <hypervisor op="=" value=""/>
+  </and>
+</hostRequires>
