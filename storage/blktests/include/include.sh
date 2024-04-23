@@ -109,6 +109,8 @@ function get_test_cases_list
 		case_conf="$CDIRC/../config/fedora"
 	elif rlIsCentOS "9"; then
 		case_conf="$CDIRC/../config/c9s"
+	elif rlIsCentOS "10"; then
+		case_conf="$CDIRC/../config/c10s"
 	fi
 	if [ ! -f "$case_conf" ]; then
 		if rlIsRHEL; then
