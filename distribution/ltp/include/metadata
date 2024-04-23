@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=gcc;gcc-c++;autoconf;automake;flex;bison;binutils;glibc-devel;procmail;rsyslog;util-linux;bc;wget;bzip2;virt-what;beakerlib
+dependencies=gcc;gcc-c++;gdb;autoconf;automake;flex;bison;binutils;glibc-devel;procmail;rsyslog;util-linux;bc;wget;bzip2;virt-what;beakerlib
 softDependencies=ntpdate;chrony;redhat-lsb;procmail
 dependencies[RedHatEnterpriseLinuxServer5]=procmail;rsyslog;ntpdate;util-linux;util-linux-ng;redhat-lsb;bc;wget;sysklogd
