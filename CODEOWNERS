@@ -151,7 +151,7 @@
 /security/integrity/ltp/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /sound/aloop/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /sound/user-ctl-elem/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
-/standards/usex/1.9-29/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/standards/usex/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/blktests/blk/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/blktests/nvme/nvme-rdma/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /storage/blktests/nvme/nvme-tcp/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -279,7 +279,7 @@
 /security/integrity/ltp/ @bgoncalv @denli @lulinqing
 /sound/aloop/ @bgoncalv @jkysela @lulinqing
 /sound/user-ctl-elem/ @bgoncalv @jkysela @lulinqing
-/standards/usex/1.9-29/ @bgoncalv @headrat @lulinqing
+/standards/usex/ @bgoncalv @ftjahjad @jbastianrh @lulinqing
 /storage/blktests/blk/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/nvme/nvme-rdma/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/nvme/nvme-tcp/ @bgoncalv @lulinqing @yizhanglinux
