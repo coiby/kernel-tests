@@ -649,6 +649,9 @@ Describe 'kpkginstall: rpm_install automotive'
     cki_is_kernel_automotive() {
         return 0
     }
+    cki_is_ostree_booted() {
+        return 0
+    }
     It "can install $2-$5"
         export KPKG_VAR_SOURCE_PACKAGE_NAME=$1
         export KPKG_VAR_PACKAGE_NAME=$2
