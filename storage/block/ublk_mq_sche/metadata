@@ -1,0 +1,13 @@
+[General]
+name=storage/block/ublk_mq_sche
+owner=Changhui Zhong <czhong@redhat.com>
+description=test ublk's I/O under different scheduler
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+dependencies=fio;libaio;libaio-devel;qemu-img
+max_time=3h

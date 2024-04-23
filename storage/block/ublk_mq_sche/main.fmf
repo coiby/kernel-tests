@@ -1,0 +1,19 @@
+summary: storage/block/ublk_mq_sche
+description: test ublk's I/O under different scheduler
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/ublk_mq_sche
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+    - fio
+    - libaio
+    - libaio-devel
+    - qemu-img
+duration: 3h
+tier: 1
+extra-summary: /storage/block/ublk_mq_sche
+extra-task: /storage/block/ublk_mq_sche
