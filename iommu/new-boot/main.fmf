@@ -1,0 +1,25 @@
+summary: new iommu boot test
+description: |
+    This tests booting and initializing of the
+    iommu in various configurations.
+contact: Jerry Snitselaar <jsnitsel@redhat.com>
+component:
+  - kernel
+path: /iommu/new-boot
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - grubby
+  - pciutils
+  - sed
+  - gawk
+recommend:
+  - beakerlib-redhat
+duration: 20m
+enabled: true
+adjust:
+  - enabled: false
+    when: distro < rhel9 or arch != x86_64, aarch64
+extra-summary: /kernel/iommu/new-boot
+extra-task: /kernel/iommu/new-boot
