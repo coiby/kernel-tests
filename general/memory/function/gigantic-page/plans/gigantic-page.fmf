@@ -5,7 +5,6 @@ discover:
         - /general/memory/function/gigantic-page
 execute:
     how: tmt
-    framework: shell
 prepare:
     - name: Enable Repos
       how: shell

@@ -1,5 +1,4 @@
 summary: 'Bug 591780 - The kernel crashes if strace is executed while ftrace is enabled'
-description:
 contact: Yanzhen Ren<yren@redhat.com>
 test: bash -x ./runtest.sh
 framework: beakerlib

@@ -5,7 +5,6 @@ discover:
         - /misc/module-load
 execute:
     how: tmt
-    framework: beakerlib
 prepare:
     - name: Enable Repos
       how: shell

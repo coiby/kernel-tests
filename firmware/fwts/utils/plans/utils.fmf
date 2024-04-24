@@ -11,4 +11,3 @@ prepare:
 
 execute:
     how: tmt
-    framework: shell

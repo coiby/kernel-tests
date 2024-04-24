@@ -32,7 +32,7 @@ report:
     how: polarion
     file: demo.xml
     project-id: RHELKERNEL
-    testrun-title: storage_ssd_testrun_demo
+    title: storage_ssd_testrun_demo
     upload: True
 adjust:
   - environment:

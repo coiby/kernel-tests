@@ -5,7 +5,6 @@ discover:
         - /general/time/elapsed
 execute:
     how: tmt
-    framework: shell
 prepare:
     - name: Enable Repos
       how: shell
