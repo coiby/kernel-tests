@@ -1,0 +1,19 @@
+summary: storage/block/ublk_fs_fio
+description: test ublk's I/O with different filesystem
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/ublk_fs_fio
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+    - fio
+    - libaio
+    - libaio-devel
+    - qemu-img
+duration: 5h
+tier: 1
+extra-summary: /storage/block/ublk_fs_fio
+extra-task: /storage/block/ublk_fs_fio
