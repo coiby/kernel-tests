@@ -30,20 +30,39 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/shm.h>
+#include <sys/mman.h>
+#include <sys/stat.h>        /* For mode constants */
+#include <fcntl.h>           /* For O_* constants */
 
 #ifndef PAGE_SIZE
 #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
 #endif
 
-#define SHMKEY ((key_t)0xDEADBEEF)
 #define SHMSIZE ((size_t)PAGE_SIZE)
 #define SHMFLAGS (0)
-#define SHMATFLAGS (0)
-
 
 int main(int argc, char *argv[])
 {
 	printf("Attempt to open and attach shm segment... ");
+#ifdef USE_POSIX_INTERFACE
+#define SHMNAME "/shm-access-test"
+	int fd = shm_open(SHMNAME, O_RDWR, SHMFLAGS);
+	if (-1 == fd) {
+		perror("shm_open");
+		exit(EXIT_FAILURE);
+	}
+	if (-1 == ftruncate(fd, SHMSIZE)) {
+		perror("ftruncate");
+		exit(EXIT_FAILURE);
+	}
+	unsigned char * shmaddr = mmap(NULL, SHMSIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	if ((unsigned char *)-1 == shmaddr) {
+		perror("mmap");
+		exit(EXIT_FAILURE);
+	}
+#else
+#define SHMKEY ((key_t)0xDEADBEEF)
+#define SHMATFLAGS (0)
 	int shmid = shmget(SHMKEY, SHMSIZE, SHMFLAGS);
 	if (-1 == shmid) {
 		perror("shmget");
@@ -55,8 +74,8 @@ int main(int argc, char *argv[])
 		perror("shmat");
 		exit(EXIT_FAILURE);
 	}
+#endif
 	printf("OK\n");
-
 	printf("Attempt to read shm segment... ");
 	for (int i = 0; i < SHMSIZE; i++) {
 		assert(shmaddr[i] == 0xAA);
@@ -68,6 +87,15 @@ int main(int argc, char *argv[])
 		shmaddr[i] = 0xBB;
 	}
 	printf("OK\n");
-
+#ifdef USE_POSIX_INTERFACE
+	if (-1 == munmap(shmaddr, SHMSIZE)) {
+		perror("munmap");
+		exit(EXIT_FAILURE);
+	}
+	if (-1 == close(fd)) {
+		perror("close");
+		exit(EXIT_FAILURE);
+	}
+#endif
 	exit(EXIT_SUCCESS);
 }

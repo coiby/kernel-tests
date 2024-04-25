@@ -28,15 +28,16 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/shm.h>
+#include <sys/mman.h>
+#include <sys/stat.h>        /* For mode constants */
+#include <fcntl.h>           /* For O_* constants */
 
 #ifndef PAGE_SIZE
 #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
 #endif
 
-#define SHMKEY ((key_t)0xDEADBEEF)
 #define SHMSIZE ((size_t)PAGE_SIZE)
 #define SHMFLAGS (0600)
-#define SHMATFLAGS (0)
 
 void child_main(char * shmaddr)
 {
@@ -52,6 +53,25 @@ int main(void)
 {
 	int wstatus;
 
+#ifdef USE_POSIX_INTERFACE
+#define SHMNAME "/shm-overflow-test"
+	int fd = shm_open(SHMNAME, O_RDWR|O_CREAT|O_EXCL, SHMFLAGS);
+	if (-1 == fd) {
+		perror("shm_open");
+		exit(EXIT_FAILURE);
+	}
+	if (-1 == ftruncate(fd, SHMSIZE)) {
+		perror("ftruncate");
+		exit(EXIT_FAILURE);
+	}
+	char * shmaddr = mmap(NULL, SHMSIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	if ((char *)-1 == shmaddr) {
+		perror("mmap");
+		exit(EXIT_FAILURE);
+	}
+#else
+#define SHMATFLAGS (0)
+#define SHMKEY ((key_t)0xDEADBEEF)
 	int shmid = shmget(SHMKEY, SHMSIZE, IPC_CREAT | IPC_EXCL | SHMFLAGS);
 	if (-1 == shmid) {
 		perror("shmget");
@@ -63,6 +83,7 @@ int main(void)
 		perror("shmat");
 		exit(EXIT_FAILURE);
 	}
+#endif
 
 	pid_t pid = fork();
 	switch (pid) {
@@ -72,9 +93,21 @@ int main(void)
 
 	case -1:
 		perror("fork");
+#ifdef USE_POSIX_INTERFACE
+		if (-1 == munmap(shmaddr, SHMSIZE)) {
+			perror("munmap");
+		}
+		if (-1 == close(fd)) {
+			perror("close");
+		}
+		if (-1 == shm_unlink(SHMNAME)) {
+			perror("shm_unlink");
+		}
+#else
 		if (-1 == shmctl(shmid, IPC_RMID, NULL)) {
 			perror("shmctl");
 		}
+#endif
 		exit(EXIT_FAILURE);
 
 	default:
@@ -86,10 +119,25 @@ int main(void)
 		break;
 	}
 
+#ifdef USE_POSIX_INTERFACE
+	if (-1 == munmap(shmaddr, SHMSIZE)) {
+		perror("munmap");
+		exit(EXIT_FAILURE);
+	}
+	if (-1 == close(fd)) {
+		perror("close");
+		exit(EXIT_FAILURE);
+	}
+	if (-1 == shm_unlink(SHMNAME)) {
+		perror("shm_unlink");
+		exit(EXIT_FAILURE);
+	}
+#else
 	if (-1 == shmctl(shmid, IPC_RMID, NULL)) {
 		perror("shmctl");
 		exit(EXIT_FAILURE);
 	}
+#endif
 
 	printf("Child process terminated with exit status 0x%04X.\n", wstatus);
 
