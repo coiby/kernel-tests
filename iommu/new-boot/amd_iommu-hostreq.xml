@@ -1,0 +1,9 @@
+<hostRequires>
+  <and>
+    <key_value op="=" key="VIRT_IOMMU" value="1"/>
+    <arch op="=" value="x86_64"/>
+    <key_value op="like" key="CPUVENDOR" value="%AMD"/>
+    <cpu_count op="&gt;" value="1"/>
+    <hypervisor op="=" value=""/>
+  </and>
+</hostRequires>

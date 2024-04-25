@@ -1,0 +1,44 @@
+This tests the intel_iommu driver with various possible configurations
+from kernel parameters.
+
+required parameters:
+
+DMA_MODNAME:
+	"intel_iommu"
+	"amd_iommu"
+	"arm_smmu"
+
+
+For Intel:
+
+DMA_IOMMU_CONF:
+	"sm-on-lazy"   (requires an SPR or newer system, basically same hostreq as idxd or iaa. Likely can't enable in kpet-db/cki due to lack of systems for cki)
+	"sm-on-strict" (requires an SPR or newer system, basically same hostreq as idxd or iaa. Likely can't enable in kpet-db/cki due to lack of systems for cki)
+	"sm-on-pt"     (requires an SPR or newer system, basically same hostreq as idxd or iaa. Likely can't enable in kpet-db/cki due to lack of systems for cki)
+	"lazy"
+	"strict"
+	"pt"
+	"forcedac"
+	"sp_off"
+	"igfx_off"
+
+For AMD:
+
+DMA_IOMMU_CONF:
+	"lazy"
+	"strict"
+	"pt"
+	"off"
+	"forcedac"
+	"pgtbl_v2-lazy"
+	"pgtbl_v2-strict"
+	"pgtbl_v2-pt"     # this should fall back to v1 page tables, tests tries to verify that is the case
+
+To be implemented:
+
+For ARM:
+
+DMA_IOMMU_CONF:
+	"lazy"
+	"strict"
+	"pt"

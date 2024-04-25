@@ -1,0 +1,34 @@
+dmatest tests the idxd dmaengine workqueue
+driver using the DMAEngine subsystem's dmatest module.
+
+PARAMS to pass to the test:
+
+required:
+
+DMA_MODNAME:
+	"idxd"
+	"ptdma"
+	"ioatdma"
+
+DMA_IOMMU_CONF:
+	"sm-on-lazy" (idxd only)
+	"sm-on-strict" (idxd only)
+	"sm-on-pt" (idxd only)
+	"lazy"
+	"strict"
+	"pt"
+
+optional (currently shouldn't be used with ptdma):
+
+DMATEST_MULTITHREADS:
+	int
+
+You can find free systems using the beaker command line utility:
+
+For system with only dsa devices:
+
+bkr system-list --free --status=Automated --xml-filter="$(<idxd-hostreq.xml)"
+
+For system with both dsa devices and iax devices:
+
+bkr system-list --free --status=Automated --xml-filter="$(<iaa-hostreq.xml)"

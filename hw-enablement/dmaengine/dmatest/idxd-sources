@@ -1,0 +1,21 @@
+# trigger on changes to this code in the damengine subsystem
+#
+target_sources:
+  - drivers/dma/idxd/.*
+  - drivers/dma/dmaengine.c
+  - include/linux/dmaengine.h
+
+# if something changes with the dma api codepath
+# then make sure we are still functioning
+#
+trigger_sources:
+  # DMA API
+  - include/linux/dma-mapping.h
+  - include/linux/dma-direct.h
+  - kernel/dma/.*
+  # IOMMU core and Intel IOMMU
+  - drivers/iommu/dma-iommu.*
+  - drivers/iommu/intel/.*
+  - drivers/iommu/iommu.c
+  - drivers/iommu/iova.c
+  - drivers/iommu/iommu-sva.c

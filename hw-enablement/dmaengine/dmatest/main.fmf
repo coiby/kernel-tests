@@ -1,0 +1,25 @@
+summary: dmaengine dma channel test with dmatest
+description: |
+    This tests the dma channel based dma engine drivers
+contact: Jerry Snitselaar <jsnitsel@redhat.com>
+component:
+  - kernel
+path: /hw-enablement/dmaengine/dmatest
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - grubby
+  - accel-config
+  - pciutils
+  - sed
+  - gawk
+recommend:
+  - beakerlib-redhat
+duration: 20m
+enabled: true
+adjust:
+  - enabled: false
+    when: distro < rhel9 or arch != x86_64
+extra-summary: /kernel/hw-enablement/dmaengine/dmatest
+extra-task: /kernel/hw-enablement/dmaengine/dmatest

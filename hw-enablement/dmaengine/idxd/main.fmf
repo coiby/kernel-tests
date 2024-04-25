@@ -1,0 +1,28 @@
+summary: idxd dmaengine driver dsa config test
+description: |
+    This tests configuring workqueues and devices
+    for dsa (idxd) devices.
+contact: Jerry Snitselaar <jsnitsel@redhat.com>
+component:
+  - kernel
+path: /hw-enablement/dmaengine/idxd
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - grubby
+  - accel-config
+  - pciutils
+  - sed
+  - gawk
+recommend:
+  - beakerlib-redhat
+environment:
+    DMA_MODNAME: idxd
+duration: 20m
+enabled: true
+adjust:
+  - enabled: false
+    when: distro < rhel9 or arch != x86_64
+extra-summary: /kernel/hw-enablement/dmaengine/idxd
+extra-task: /kernel/hw-enablement/dmaengine/idxd

@@ -1,0 +1,12 @@
+<hostRequires>
+  <and>
+    <device op="=" driver="ioatdma"/>
+    <key_value op="=" key="VIRT_IOMMU" value="1"/>
+    <arch op="=" value="x86_64"/>
+    <cpu_count op="&gt;" value="1"/>
+    <hypervisor op="=" value=""/>
+    <cpu>
+      <vendor op="like" value="%Intel"/>
+    </cpu>
+  </and>
+</hostRequires>
