@@ -1,4 +1,4 @@
-// -*- mode: adoc-mode; coding: utf-8; indent-tabs-mode: t; ruler-mode-tab-stops: t; tab-width: 4 -*-
+// -*- mode: adoc-mode; coding: utf-8-unix; indent-tabs-mode: t; ruler-mode-tab-stops: t; tab-width: 4 -*-
 
 == IOMMU Subsystem testing
 
@@ -13,12 +13,15 @@ The iommu directory contains the following:
 boot:: - Original boot test for iommu.
 include:: - Helper code for implementing involving iommus.
 new-boot:: - New test for testing booting system with iommu in various configurations.
+io/fio:: - Test for running a fio.job against a system with a specific iommu configuration.
 
 .Directory Structure
 ----
 iommu
 ├── boot
 ├── include
+├── io
+│  └── fio
 └── new-boot
 ----
 
@@ -29,10 +32,10 @@ iommu
 
 include:: - Helper code for running new tests involving an iommu 
 new-boot:: - New boot test 
+io/fio:: - Test for running fio jobs against system with iommu in various configurations.
 
 ==== In progress
 
-io/fio:: - Test for running fio jobs against system with iommu in various configurations.
 io/stress-ng:: - Test for running iomix, or arbitrary stressor jobs in stress-ng against various iommu configurations.
 
 ==== Potential Future work
@@ -52,11 +55,27 @@ new-boot: ::
 	DMA_IOMMU_CONF: :::
 		common to all iommus: ::::
 			   *lazy* | *strict* | *pt* | *forcdac*
-		
+
 		intel_iommu: ::::
 			*sm-off-lazy* | *sm-off-strict* | *sm-off-pt* | *sm-on-lazy* | *sm-on-strict* | *sm-on-pt* | *sp_off* | *igfx_off* : _sm denotes Scalable Mode, which is a technology on SPR and later systems_
 		amd_iommu: ::::
 			*pgtbl_v2-lazy* | *pgtbl_v2-strict* | *pgtbl_v2-pt*
+
+io/fio: ::
+	DMA_MODNAME: :::
+		*amd_iommu* | *intel_iommu* | *arm_smmu*
+
+	DMA_IOMMU_CONF: :::
+		common to all iommus: ::::
+			   *lazy* | *strict* | *pt* | *forcdac*
+
+		intel_iommu: ::::
+			*sm-off-lazy* | *sm-off-strict* | *sm-off-pt* | *sm-on-lazy* | *sm-on-strict* | *sm-on-pt* | *sp_off* | *igfx_off* : _sm denotes Scalable Mode, which is a technology on SPR and later systems_
+		amd_iommu: ::::
+			*pgtbl_v2-lazy* | *pgtbl_v2-strict* | *pgtbl_v2-pt*
+
+	DMA_IOMMU_FIO: :::
+		*basic-test.fio* +
 
 
 '''
