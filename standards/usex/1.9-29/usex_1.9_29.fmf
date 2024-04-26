@@ -1,0 +1,14 @@
+summary: Dave Anderson's Usex test 1.9-29
+contact: Kernel General Test Team <kernel-general-test-team@redhat.com>
+test: bash ./runtest.sh
+id: ecc4307b-4a27-4875-928c-6d532ae94981
+framework: shell
+require:
+  - make
+  - gcc
+  - glibc-kernheaders
+  - glibc-static
+  - ncurses-devel
+duration: 1h
+extra-summary: standards/usex/1.9-29
+extra-task: standards/usex/1.9-29
