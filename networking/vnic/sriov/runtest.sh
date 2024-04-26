@@ -8888,6 +8888,7 @@ if i_am_client; then
 		rlRun "nic_driver='$(ethtool -i $nic_test | grep driver | awk '{print $2}')'"
 	else
 		#CLIENT_INTERFACES=($CLIENT_INTERFACES)
+		#IFS=" " read -r -a CLIENT_INTERFACES <<< "${CLIENT_INTERFACES}"
 		nic_test=${CLIENT_INTERFACES[0]}
 		if [[ -z "${nic_test[*]}" ]]; then
 			rlFail "FATAL ERROR: pci_list or nic_list is not availabe!"
@@ -8902,6 +8903,7 @@ else
 		rlRun "nic_driver='$(ethtool -i $nic_test | grep driver | awk '{print $2}')'"
 	else
 		#SERVER_INTERFACES=($SERVER_INTERFACES)
+		#IFS=" " read -r -a SERVER_INTERFACES <<< "${SERVER_INTERFACES}"
 		nic_test=${SERVER_INTERFACES[0]}
 		if [[ -z "${nic_test[*]}" ]]; then
 			rlFail "FATAL ERROR: pci_list or nic_list is not availabe!"

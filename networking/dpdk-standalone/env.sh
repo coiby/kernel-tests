@@ -48,15 +48,15 @@ CLIENT_PORT_TWO=${CLIENT_PORT_TWO}
 #CLIENT AND SERVER HOST NIC CONFIG
 NIC_DRIVER=${NIC_DRIVER:-ice}
 if [ "$SERVERS" == "netqe35.knqe.eng.rdu2.dc.redhat.com" ]; then
-    SERVER_NIC1_MAC='b4:96:91:a5:c7:96'
-    SERVER_NIC2_MAC='b4:96:91:a5:c7:97'
-    CLIENT_NIC1_MAC='b4:96:91:a5:c6:d6'
-    CLIENT_NIC2_MAC='b4:96:91:a5:c6:d7'
+    SERVER_NIC1_MAC='50:7c:6f:62:35:ba'
+    SERVER_NIC2_MAC='50:7c:6f:62:35:bb'
+    CLIENT_NIC1_MAC='50:7c:6f:62:35:a6'
+    CLIENT_NIC2_MAC='50:7c:6f:62:35:a7'
 elif [ "$SERVERS" == "netqe36.knqe.eng.rdu2.dc.redhat.com" ]; then
-    CLIENT_NIC1_MAC='b4:96:91:a5:c7:96'
-    CLIENT_NIC2_MAC='b4:96:91:a5:c7:97'
-    SERVER_NIC1_MAC='b4:96:91:a5:c6:d6'
-    SERVER_NIC2_MAC='b4:96:91:a5:c6:d7'
+    CLIENT_NIC1_MAC='50:7c:6f:62:35:ba'
+    CLIENT_NIC2_MAC='50:7c:6f:62:35:bb'
+    SERVER_NIC1_MAC='50:7c:6f:62:35:a6'
+    SERVER_NIC2_MAC='50:7c:6f:62:35:a7'
 elif [ "$SERVERS" == "hpe-netqe-syn480g10-06.knqe.eng.rdu2.dc.redhat.com" ]; then
     CLIENT_NIC1_MAC='20:67:7c:13:e0:06'
     CLIENT_NIC2_MAC='20:67:7c:13:e0:07'
@@ -68,10 +68,7 @@ elif [ "$SERVERS" == "hpe-netqe-syn480g10-08.knqe.eng.rdu2.dc.redhat.com" ]; the
     SERVER_NIC1_MAC='20:67:7c:13:e0:06'
     SERVER_NIC2_MAC='20:67:7c:13:e0:07'
 else
-    CLIENT_NIC1_MAC=
-    CLIENT_NIC2_MAC=
-    SERVER_NIC1_MAC=
-    SERVER_NIC2_MAC=
+    echo "unknown machine"
 fi
 
 #OPENVSWITCH AND DPDK CONFIG
