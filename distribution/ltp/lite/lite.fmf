@@ -30,7 +30,6 @@ require:
   - strace
   - wget
   - python3
-  - ntpsec
 duration: 6h
 extra-summary: /kernel/distribution/ltp/lite
 extra-task: /kernel/distribution/ltp/lite
