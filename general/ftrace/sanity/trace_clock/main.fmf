@@ -7,4 +7,4 @@ framework: beakerlib
 duration: 60m
 extra-summary: /kernel/general/ftrace/sanity/trace_clock
 extra-task: /kernel/general/ftrace/sanity/trace_clock
-id: 9a89803b-12fe-4177-86e4-a8b1a4aa22de
+id: 3f2b8795-e993-477a-85ed-e33628e8325f
