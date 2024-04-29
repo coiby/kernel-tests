@@ -1,7 +1,7 @@
 [General]
 name=misc/reboot-test
 owner=Bruno Goncalves <bgoncalv@redhat.com>
-description=Basic reboot test
+description=Basic reboot test cb970189-5ba7-477a-b0d0-e241d171b1cf
 license=GPLv3
 confidential=no
 destructive=no
