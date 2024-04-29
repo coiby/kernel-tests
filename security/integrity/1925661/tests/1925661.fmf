@@ -8,5 +8,6 @@ test: make run
 framework: beakerlib
 require: [ima-evm-utils, make]
 duration: 5m
+tag: NoRHIVOS
 extra-summary: /kernel-tests/security/integrity/1925661
 extra-task: /kernel-tests/security/integrity/1925661
