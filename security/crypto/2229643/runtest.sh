@@ -55,6 +55,7 @@ rlJournalStart
     rlPhaseStartCleanup
         rlFileSubmit result.log
         rlFileSubmit dmesg
+        rlRun "kill $PID"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
