@@ -1,0 +1,14 @@
+[General]
+name=softlockup
+owner=Chunyu Hu <chuhu@redhat.com>
+description=softlockup detector is enabled and watchdog could detect softlockup
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=15m
+dependencies=gcc;libgcc;elfutils-libelf-devel;openssl-devel
+softDependencies=git;glibc;bison;flex
+repoRequires=general/include;automotive/include
