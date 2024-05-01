@@ -109,6 +109,30 @@ function run_test()
                 rlRun "ublk del -a"
                 rlRun "rm -rf ublk_qcow2.qcow2"
                 rlRun "lsblk"
+                ;;
+        nvme)
+                get_free_disk nvme
+                # shellcheck disable=SC2154
+                rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
+                rlRun "ublk add -t loop -f ${dev0}p1"
+                rlRun "lsblk"
+                rlRun "ublk list"
+                fio_test
+                rlRun "ublk del -a"
+                rlRun "parted -s ${dev0} rm 1"
+                rlRun "lsblk"
+                ;;
+        ssd)
+                get_free_disk ssd
+                # shellcheck disable=SC2154
+                rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
+                rlRun "ublk add -t loop -f ${dev0}1"
+                rlRun "lsblk"
+                rlRun "ublk list"
+                fio_test
+                rlRun "ublk del -a"
+                rlRun "parted -s ${dev0} rm 1"
+                rlRun "lsblk"
     esac
 }
 
@@ -119,7 +143,7 @@ rlJournalStart
         rlLog "$0"
         run_test
     rlPhaseEnd
-    for R in null loop qcow2;do
+    for R in null loop qcow2 nvme ssd;do
         rlPhaseStartTest "$R"
             run_test
         rlPhaseEnd
