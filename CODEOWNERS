@@ -83,6 +83,7 @@
 /general/memory/function/memfd_create/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /general/process/trinity_git/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /iommu/boot/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/iommu/new-boot/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /ipmi/stress/driver/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /ipmi/stress/ipmitool-loop/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /jvm/dacapobench/ @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -212,6 +213,7 @@
 /general/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /iommu/boot/ @bgoncalv @lulinqing @wrgrh
+/iommu/new-boot/ @bgoncalv @jsnitsel @lulinqing
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
 /jvm/dacapobench/ @bgoncalv @lulinqing @tstuefe1
