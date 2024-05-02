@@ -504,8 +504,7 @@ Describe 'kpkginstall: download_install_package'
         export YUM=dnf
         mkdir -p /var/tmp/kpkginstall
         When call download_install_package "$package"
-        The first line should equal "✅ Downloaded $package successfully"
-        The contents of file "${RPM_INSTALL_LOG}" should include "$YUM install --downloadonly -y $package"
+        The first line should equal "✅ Installed $package successfully"
         The contents of file "${RPM_INSTALL_LOG}" should include "$YUM install -y $package"
     End
 
@@ -519,15 +518,14 @@ Describe 'kpkginstall: download_install_package'
         }
         mkdir -p /var/tmp/kpkginstall
         # Retry with 2 attempts
-        export dnf_list_exit_code=("1" "0" "0" "0")
+        export dnf_list_exit_code=("1" "0" "0")
         echo 0 > /var/tmp/kpkginstall/dnf_list_called
         export YUM=dnf
         When call download_install_package "$package"
-        The first line should equal "ℹ️ download_install_package: Failed to download package $package. Attempt 1/30..."
+        The first line should equal "ℹ️ download_install_package: Failed to install package $package. Attempt 1/30..."
         The line 2 should equal "dnf clean all"
         The line 3 should include "sleep"
-        The line 4 should equal "✅ Downloaded $package successfully"
-        The line 5 should equal "✅ Installed $package successfully"
+        The line 4 should equal "✅ Installed $package successfully"
     End
 
     It 'can NOT download and install - dnf'
@@ -538,7 +536,7 @@ Describe 'kpkginstall: download_install_package'
         export YUM=dnf
         mkdir -p /var/tmp/kpkginstall
         When call download_install_package "$package"
-        The stdout should include "cki_abort_recipe Failed to download $package! WARN"
+        The stdout should include "cki_abort_recipe Failed to install $package! FAIL"
     End
 End
 
@@ -593,7 +591,6 @@ Describe 'kpkginstall: rpm_install'
         When call rpm_install
         The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
         The line 4 should equal "✅ Kernel version is ${KVER_RPM}"
-        The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         if [[ ${KPKG_VAR_PACKAGE_NAME} == kernel-rt* ]]; then
             The stdout should include "✅ Installed /usr/sbin/kernel-is-rt successfully"
@@ -623,7 +620,6 @@ Describe 'kpkginstall: rpm_install'
         When call rpm_install
         The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
         The line 4 should equal "✅ Kernel version is ${KVER_RPM}"
-        The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "ℹ️ running depmod to check for problems"
         The stdout should include "rstrnt-report-result -o /tmp/depmod.log distribution/kpkginstall/depmod-check FAIL 7"
@@ -696,10 +692,9 @@ Describe 'kpkginstall: rpm_extra_package_install'
         export KVER=$3
         export YUM=dnf
         When call rpm_extra_package_install
-        The line 1 should include "✅ Downloaded K_GetRunningKernelRpmSubPackageNVR devel successfully"
-        The line 2 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR devel successfully"
-        The line 3 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR modules-internal successfully"
-        The line 4 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR headers successfully"
+        The line 1 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR devel successfully"
+        The line 2 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR modules-internal successfully"
+        The line 3 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR headers successfully"
         The status should be success
     End
 End
