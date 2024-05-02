@@ -1,0 +1,13 @@
+[General]
+name=security/integrity/rhel-26952
+owner=George Jacob <gjacob@redhat.com>
+description=Reproduce BUG RHEL-26952.
+license=ISC
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=make;golang;gcc;glibc;glibc-common;glibc-devel;gcc-c++;wget;git;patch
+repoRequires=kernel-include;cki_lib
+max_time=120m
