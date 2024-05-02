@@ -1,0 +1,23 @@
+summary: Reproduce BUG RHEL-26952
+contact: George Jacob <gjacob@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+id: 6f4aa9fc-d7ae-476b-8ec3-0ab8b80d5e4c
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+        -  /kernel-include
+        -  /cki_lib
+duration: 24h
