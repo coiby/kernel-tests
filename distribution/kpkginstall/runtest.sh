@@ -360,28 +360,20 @@ function copr_prepare()
 function download_install_package()
 {
   if ! cki_is_ostree_booted; then
-    downloaded=0
+    installed=0
     for i in $(seq 1 30); do
-      # If download of a package fails, report warn/abort -> infrastructure issue
-      if $YUM install --downloadonly -y "$1" >> ${RPM_INSTALL_LOG} || yumdownloader -y "$1" >> ${RPM_INSTALL_LOG}; then
-        cki_print_success "Downloaded $1 successfully"
-        downloaded=1
+      if $YUM install -y "$1" >> ${RPM_INSTALL_LOG}; then
+        cki_print_success "Installed $1 successfully"
+        installed=1
         break
       fi
-      cki_print_info "download_install_package: Failed to download package $1. Attempt $i/30..."
+      cki_print_info "download_install_package: Failed to install package $1. Attempt $i/30..."
       $YUM clean all
       sleep 60
     done
-    if [[ "$downloaded" -ne "1" ]]; then
-      rstrnt-report-log -l "${RPM_INSTALL_LOG}"
-      cki_abort_recipe "Failed to download ${1}!" WARN
-    fi
-
-  # If installation of a downloaded package fails, report fail/abort
-  # -> distro issue
-    if $YUM install -y "$1" >> ${RPM_INSTALL_LOG}; then
-      cki_print_success "Installed $1 successfully"
-    else
+    # If installation of a downloaded package fails, report fail/abort
+    # -> distro issue
+    if [[ "$installed" -ne "1" ]]; then
       rstrnt-report-log -l "${RPM_INSTALL_LOG}"
       cki_abort_recipe "Failed to install $1!" FAIL
     fi
