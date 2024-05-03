@@ -12,6 +12,6 @@ Path=/mnt/tests/kernel/hw-enablement/dmaengine/idxd
 Priority=Normal
 max_time=20m
 environment=DMA_MODNAME=idxd
-dependencies=grubby;beakerlib;accel-config;pciutils;sed;gawk
+dependencies=grubby;beakerlib;accel-config;pciutils;sed;gawk;dmidecode;acpica-tools
 softDependencies=beakerlib-redhat
 repoRequires=general/include;hw-enablement/dmaengine/include;iommu/include

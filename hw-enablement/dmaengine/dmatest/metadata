@@ -11,6 +11,6 @@ entry_point=bash ./runtest.sh
 Path=/mnt/tests/kernel/hw-enablement/dmaengine/dmatest
 Priority=Normal
 max_time=20m
-dependencies=grubby;beakerlib;accel-config;pciutils;sed;gawk
+dependencies=grubby;beakerlib;accel-config;pciutils;sed;gawk;acpica-tools;dmidecode
 softDependencies=beakerlib-redhat
 repoRequires=general/include;hw-enablement/dmaengine/include;iommu/include
