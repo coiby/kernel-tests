@@ -2,7 +2,7 @@
 name=iommu/new-boot
 owner=Jerry Snitselaar <jsnitsel@redhat.com>
 description=Test iommu boot and initialization
-license=GPLv2
+license=GPL-2.0-or-later
 confidential=no
 destructive=no
 

@@ -2,7 +2,7 @@
 name=hw-enablement/dmaengine/idxd
 owner=Jerry Snitselaar <jsnitsel@redhat.com>
 description=Test idxd driver scalable mode config ops
-license=GPLv2
+license=GPL-2.0-or-later
 confidential=no
 destructive=no
 

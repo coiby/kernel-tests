@@ -2,7 +2,7 @@
 name=hw-enablement/dmaengine/dmatest
 owner=Jerry Snitselaar <jsnitsel@redhat.com>
 description=Test dmaengine dma channel based drivers using dmatest module
-license=GPLv2
+license=GPL-2.0-or-later
 confidential=no
 destructive=no
 
