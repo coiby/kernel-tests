@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034,SC2139
 
 export DIR_ENTRY=$(pwd)
 export DIR_DEBUG=$DIR_ENTRY/debug
