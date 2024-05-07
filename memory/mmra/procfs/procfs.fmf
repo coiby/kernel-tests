@@ -1,0 +1,22 @@
+summary: Confirm fuzz testing is being performed on all /proc/sys/vm  entries.
+contact: sbertram <sbertram@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+id: fd99583c-b9e2-4fe3-a093-c67010397f85
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+        -  /kernel-include
+duration: 2h
