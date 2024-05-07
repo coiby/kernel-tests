@@ -1,7 +1,7 @@
 summary: KG-VMM 1464290-1463241-stackguard-jvm-rlimit
 description: Reproducer for stackguard regression, found jvm crash and rlimit problem.
 enabled: true
-id: a24ee56e-f0af-42c9-9b90-3f0583aee967
+id: bdd85a04-27fd-4516-ab87-f2bab4282b28
 tag: [
     /kernel/general/memory/regression/1464290-1463241-stackguard-jvm-rlimit,
     KG-VMM-TAG
