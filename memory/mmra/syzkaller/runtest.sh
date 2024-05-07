@@ -27,21 +27,99 @@
 local_dir=${local_dir:-"/root/tmp"}
 timer=${timer:-3600} # In seconds. Defaults to 1 hour.
 verbose=${verbose:-""}
-# If setting mm_syscalls to leave a trailing comma ,.
-#
+commit=${commit:-"21339d7b9986698282dce93709157dc36907fbf8"}
+
+mm_syscalls_default=${mm_syscalls:-'
+    "brk",
+    "cachestat",
+    "fadvise64_64",
+    "get_mempolicy",
+    "madvise",
+    "mbind",
+    "membarrier",
+    "memfd_create",
+    "memfd_secret",
+    "migrate_pages",
+    "mincore",
+    "mlock",
+    "mlock2",
+    "mlockall",
+    "mmap",
+    "move_pages",
+    "mprotect",
+    "mremap",
+    "msync",
+    "munlock",
+    "munlockall",
+    "munmap",
+    "process_madvise",
+    "process_mrelease",
+    "process_vm_readv",
+    "process_vm_writev",
+    "readahead",
+    "remap_file_pages",
+    "set_mempolicy",
+    "set_mempolicy_home_node",
+    "shmat",
+    "shmctl",
+    "shmdt",
+    "shmget",
+    "swapoff",
+    "swapon"'}
+
 if [ "$(arch)" = "x86_64" ]; then
-    mm_syscalls=${mm_syscalls:-'"mmap", "mprotect", "munmap", "brk", "mremap", "msync", "mincore", "madvise", "mlock", "munlock", "mlockall", "munlockall", "mbind", "membarrier", "mlock2", "shmget", "shmat", "shmctl", "shmdt", "set_mempolicy", "get_mempolicy", "pkey_mprotect", "pkey_alloc", "pkey_free", "process_vm_readv", "process_vm_writev",'}
-else
-    mm_syscalls=${mm_syscalls:-'"mmap", "mprotect", "munmap", "brk", "mremap", "msync", "mincore", "madvise", "mlock", "munlock", "mlockall", "munlockall", "mbind", "membarrier", "mlock2", "shmget", "shmat", "shmctl", "shmdt", "set_mempolicy", "get_mempolicy", "process_vm_readv", "process_vm_writev",'}
+    mm_syscalls_default=${mm_syscalls:-'
+        "${mm_syscalls_default}",
+        "pkey_alloc",
+        "pkey_free",
+        "pkey_mprotect"'}
 fi
+
+mm_syscalls=${mm_syscalls_default}
+
 # shellcheck disable=SC2016
-supportcalls=${suportcalls:-'"clone3", "geteuid", "getresuid", "getegid", "getgid", "getgroups", "getresgid", "getpgid", "getpid", "newfstatat", "memfd_create", "memfd_secret", "mq_open", "io_uring_setup", "perf_event_open", "openat$cgroup", "openat$cgroup_root", "openat$binderfs", "socket$xdp", "syz_open_dev$usbfs", "syz_open_dev$usbmon"'}
+supportcalls=${supportcalls:-'
+    "clone3",
+    "getegid",
+    "geteuid",
+    "getgid",
+    "getgroups",
+    "getpgid",
+    "getpid",
+    "getresgid",
+    "getresuid",
+    "io_uring_setup",
+    "mq_open",
+    "newfstatat",
+    "openat$binderfs",
+    "openat$cgroup",
+    "openat$cgroup_root",
+    "openat$pidfd",
+    "openat$thread_pidfd",
+    "perf_event_open",
+    "pidfd_open",
+    "socket$xdp",
+    "syz_open_dev$usbfs",
+    "syz_open_dev$usbmon"'}
+
+# known unsupported syscalls in mmap
+discalls=${discalls:-'
+    "mmap$DRM_I915",
+    "mmap$DRM_MSM",
+    "mmap$KVM_VCPU",
+    "mmap$bifrost",
+    "mmap$dsp",
+    "mmap$fb",
+    "mmap$qrtrtun",
+    "mmap$snddsp",
+    "mmap$snddsp_control",
+    "mmap$snddsp_status"'}
 
 create-test-cfg()
 {
     local vm_param
     local targets=$(echo "$1" | awk -F' ' '{for(i=1;i<=NF;i++){printf "\"%s\", ", $i}}' | sed 's/, $//')
-    local syscalls="${mm_syscalls} ${supportcalls}"
+    local syscalls="${mm_syscalls}, ${supportcalls}"
     arch=$(uname -m|sed 's/x86_/amd/g'|sed 's/aarch/arm/g')
     vm_param="\"targets\" : [ ${targets} ], \"target_dir\" : \"${local_dir}/syzkaller-client\""
     cat > syzkaller-test.cfg << EOF
@@ -55,10 +133,13 @@ create-test-cfg()
     "enable_syscalls" : [
     ${syscalls}
     ],
+    "disable_syscalls" : [
+    ${discalls}
+    ],
     "no_mutate_syscalls" : [
     ${supportcalls}
     ],
-    "syzkaller": "/root/syzkaller/",
+    "syzkaller": "${syzkaller_root}",
     "sandbox": "none",
     "cover": false,
     "reproduce": false,
@@ -88,9 +169,12 @@ rlJournalStart
         # /usr/bin/ld: read-only segment has dynamic relocations
         # shellcheck disable=SC2086
         rlRun "${pkg_mgr} ${pkg_mgr_rmv_string} glibc-static"
-        rlRun "pushd /root"
         rlRun "git clone https://github.com/google/syzkaller"
         rlRun "pushd syzkaller"
+        syzkaller_root=$(pwd)
+        rlRun "git branch mmra_temp ${commit}"
+        rlRun "git switch mmra_temp"
+        rlRun "git apply ../mmra.patch"
         rlRun "make"
         sut_ip=$(nmcli | grep -A1 "ip4 default" | grep -v "ip4 default" | awk '{print $2}' | awk -F "/" '{print $1}')
         # create config file:
@@ -103,7 +187,7 @@ rlJournalStart
     rlPhaseStartTest
         rlRun "dmesg -C"
         start_time=$(date +%s)
-        rlWatchdog "/root/syzkaller/bin/syz-manager ${verbose} -config /root/syzkaller/syzkaller-test.cfg" "${timer}"
+        rlWatchdog "${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller-test.cfg" "${timer}"
         end_time=$(date +%s)
         duration=$((${end_time}-${start_time}))
         rlLog "Test duration was ${duration} seconds."
@@ -117,7 +201,7 @@ rlJournalStart
         fi
         # Additional verification that all syscalls were executed.
         rlRun "mkdir ${local_dir}/corpus_dir"
-        rlRun "/root/syzkaller/bin/syz-db unpack ${local_dir}/syz-manager-logs/corpus.db ${local_dir}/corpus_dir"
+        rlRun "${syzkaller_root}/bin/syz-db unpack ${local_dir}/syz-manager-logs/corpus.db ${local_dir}/corpus_dir"
         for call in ${mm_syscalls}; do
             syscall=$(echo "${call//\"}" | sed -e 's/,//')
             if grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/* ; then
@@ -132,7 +216,6 @@ rlJournalStart
     rlPhaseStartCleanup
         rlRun "tar cf syzkaller_test_results.tar ${local_dir}"
         rlFileSubmit syzkaller_test_results.tar
-        rlRun "rm -rf /root/syzkaller"
         rlRun "rm -rf /root/go"
         rlRun "rm -rf ${local_dir}" 0,1
     rlPhaseEnd
