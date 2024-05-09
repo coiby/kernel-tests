@@ -82,6 +82,7 @@
 /general/memory/function/mem_encrypt/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /general/memory/function/memfd_create/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /general/process/trinity_git/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
+/hw-enablement/dmaengine/dmatest/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /iommu/boot/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /iommu/new-boot/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
 /ipmi/stress/driver/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @idorax @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @sturivny @tales-aparecida @veruu
@@ -212,6 +213,7 @@
 /general/memory/function/mem_encrypt/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /general/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/hw-enablement/dmaengine/dmatest/ @bgoncalv @jsnitsel @lulinqing
 /iommu/boot/ @bgoncalv @lulinqing @wrgrh
 /iommu/new-boot/ @bgoncalv @jsnitsel @lulinqing
 /ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
