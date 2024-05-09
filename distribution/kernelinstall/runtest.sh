@@ -863,7 +863,7 @@ function YumInstallKernel ()
             DeBug "Exit YumInstallPackage FAIL 5 (YUM exited with a failure)"
         fi
         # Install kernel-modules-extra if running on RHEL8+
-        if echo "$KERNELARGVERSION" | grep -Eq '\.(el8|elrdy|el9|eln)'; then
+        if echo "$KERNELARGVERSION" | grep -Eq '\.(el8|elrdy|el9|eln|el10)'; then
             if [ "$KERNELARGEXTRAMODULES" == "1" ]; then
                 echo "***** Install kernel-modules-extra package via yum ${testkername}-modules-extra-${KERNELARGVERSION}.$kernarch *****" | tee -a $OUTPUTFILE
                 $yumcmd -y install ${testkername}-modules-extra-${KERNELARGVERSION}.$kernarch
@@ -906,7 +906,7 @@ function BrewInstallKernel ()
           popd
           # RHEL8 kernels are now provided by the meta package kernel which
           # requires kernel-core and kernel-modules packages
-          if echo "$KERNELARGVERSION" | grep -Eq '\.(el8|elrdy|el9|eln)'; then
+          if echo "$KERNELARGVERSION" | grep -Eq '\.(el8|elrdy|el9|eln|el10)'; then
              testkerncore=$testkername-core-$KERNELARGVERSION
              testkernmodules=$testkername-modules-$KERNELARGVERSION
              testkernmodules_core=$testkername-modules-core-$KERNELARGVERSION
