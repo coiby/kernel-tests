@@ -311,7 +311,7 @@ do_bpf_test_progs_config()
 do_bpf_test_progs_run()
 {
 	local item="bpf_test_progs"
-	local ret ret_1 ret_2
+	local ret ret_1 ret_2 name_opt
 
 	[ ! -d "$EXEC_DIR"/bpf ] && test_skip "No $item test, skip" && return 1
 
@@ -326,6 +326,9 @@ do_bpf_test_progs_run()
 	local num=0
 	local name=""
 
+	# -t will run tests with names containing any string from NAMES list
+	./test_progs --help | grep -q "allow=NAMES" && name_opt="-a" || name_opt="-t"
+
 	for name in ${total_tests}; do
 		num=$((num + 1))
 
@@ -334,15 +337,15 @@ do_bpf_test_progs_run()
 		local OUTPUTFILE=$LOG_DIR/${item}_${name}.log
 		dmesg -C
 
-		run "./test_progs -t $name"
+		run "./test_progs ${name_opt} $name"
 		ret_1=$?
 		# Get more detailed log info with -vv if failed
-		[ ${ret_1} -ne 0 ] && run "./test_progs -vv -t $name"
+		[ ${ret_1} -ne 0 ] && run "./test_progs -vv ${name_opt} $name"
 
 		# bpf_nf test opened a tcp port, which will be in TIME-WAIT after close.
 		echo "${name}" | grep -q "bpf_nf" && sleep 65
 
-		run "./test_progs-no_alu32 -t $name"
+		run "./test_progs-no_alu32 ${name_opt} $name"
 		ret_2=$?
 
 		echo -e "\n=== Dmesg result ===" >> "$OUTPUTFILE"
