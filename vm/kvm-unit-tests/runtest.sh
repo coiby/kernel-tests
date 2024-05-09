@@ -300,6 +300,10 @@ function setupRepo
 
     if [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
         rlRun "./configure --endian=little"
+    #Need to change page size for arm  due to:
+    #https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/commit/3b3f9a3ef19bfdbfe38f6b4970292b88d458a260
+    elif [[ $hwpf == "aarch64" ]]; then
+        rlRun "./configure --page-size=65536 --arch=$hwpf"
     else
         rlRun "./configure --arch=$hwpf"
     fi
