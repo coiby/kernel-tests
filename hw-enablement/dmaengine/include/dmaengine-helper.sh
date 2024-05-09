@@ -21,7 +21,7 @@
 # DMA_STATEDIR - location where state is kept
 
 if test -z "${DMA_MODNAME}"; then
-	test_complete "SKIP" "${DMA_TESTNAME} requires the environment variable DMA_MODNAME to be set"
+	test_complete "${DMA_TESTNAME}" "SKIP" "requires the environment variable DMA_MODNAME to be set"
 fi
 
 if test -z "${DMA_STATEDIR}"; then
@@ -114,7 +114,7 @@ driverCheck ()
 			;;
 	esac
 
-	test_complete "${failresult}" "${failmsg}"
+	test_complete "${DMA_TESTNAME}-driver-check" "${failresult}" "${failmsg}"
 }
 
 setup_test_env ()
@@ -163,7 +163,7 @@ test_run ()
 	# These channels were free when we started, so
 	# if there are not free now something must be amiss
 	if [ $CHANS -eq 0 ]; then
-		test_complete "FAIL" "${DMA_TESTNAME} dma channels are in_use when they should be free"
+		test_complete "${5}-test-run" "FAIL" "dma channels are in_use when they should be free"
 	fi
 
 	echo "Running ${5} using ${DMA_MODNAME} with ${CHANS} channels and ${4} threads per channel"
@@ -198,9 +198,9 @@ check_dmatest_results ()
 	passes=$(dmesg | grep dmatest | grep summary |	grep -c " 0 failures")
 	check_dma_faults "${1}"
 	if test "${passes}" = "${numres}"; then
-		test_continue "PASS" "${1} dmatest-results"
+		test_continue "${1}-check-dmatest-results" "PASS" "no dmatest failures found"
 	else
-		test_continue "FAIL" "${1} dmatest-results expected passes: ${numres} actual passes: ${passes}"
+		test_continue "${1}-check-dmatest-results" "FAIL" "dmatest expected passes: ${numres} actual passes: ${passes}"
 	fi
 }
 
@@ -240,7 +240,7 @@ accel_config_test_install ()
 	if ! rpm -q --quiet accel-config-test; then
 		grub_exit
 		cleanup_state
-		test_complete "SKIP" "${DMA_TESTNAME} failed to install accel-config-test package"
+		test_complete "${DMA_TESTNAME}-accel-config-test-install" "SKIP" "failed to install accel-config-test package"
 	fi
 }
 
@@ -289,7 +289,7 @@ modules_internal_install ()
 	dnf install -q -y "${link}/${kver}/${krel}/${karch}/${kname2}-modules-internal-${kver}-${krel}.${karch}.rpm"
 
 	if ! rpm --quiet -q "${kname2}-modules-internal-${kver}-${krel}"; then
-		test_complete "SKIP" "Unable to install ${kname2}-modules-internal-${kver}-${krel}"
+		test_complete "${DMA_TESTNAME}-modules-internal-install" "SKIP" "Unable to install ${kname2}-modules-internal-${kver}-${krel}"
 	fi
 
 	return 0

@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+# -*- mode: Shell-script; sh-shell: bash; sh-basic-offset: 4; sh-indentation: 4; coding: utf-8-unix; indent-tabs-mode: t; ruler-mode-show-tab-stops: t; tab-width: 4 -*-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Copyright (c) 2024 Red Hat, Inc
@@ -25,17 +25,21 @@ fi
 
 accel_config_test_run ()
 {
+	declare -i ret=0
 	if test "$(cat /sys/bus/dsa/devices/dsa0/pasid_enabled)" = "1"; then
-		rlRun "${2} > ${1}.log 2>&1" "${3}"
-		rstrnt-report-log -l "${1}.log"
+		eval "${2}" > "${1}.log" 2>&1
+		ret=$?
 		check_dma_faults "${1}"
-	else
-		if journalctl -k | grep -q "feature pasid inconsistent"; then
-			test_complete "SKIP" "${1}: Platform issue: pasid feature inconsistent"
-		elif journalctl -k | grep -q "feature prs inconsistent"; then
-			test_complete "SKIP" "${1}: Platform issue: prs feature inconsistent"
+		if test $ret -eq 0 -o $ret -eq 77; then
+			test_continue "${1}" "PASS" "test script didn't fail" "${1}.log"
 		else
-			test_complete "FAIL" "${1}: pasid is not enabled"
+			test_continue "${1}" "FAIL" "test script failed" "${1}.log"
+		fi
+	else
+		if ! is_intel_pasid_supported; then
+			test_complete "${1}" "SKIP" "Platform issue: pasid not supported"
+		else
+			test_complete "${1}" "FAIL" "pasid is not enabled"
 		fi
 	fi
 }
@@ -43,7 +47,7 @@ accel_config_test_run ()
 idxd_check ()
 {
 	if test "$(lspci -d8086:0b25 | wc -l)" = "0"; then
-		test_complete "SKIP" "No idxd devices on this system"
+		test_complete "${DMA_TESTNAME}-idxd-check" "SKIP" "No idxd devices on this system"
 	fi
 }
 
@@ -52,11 +56,11 @@ iaa_check ()
 	if [ "$(lspci -d8086:0cfe | wc -l)" != "0" ]; then
 		acvers=$(rpm -q --qf="%{VERSION}" accel-config)
 		if test "${acvers}" = "4.1.3"; then
-			test_complete "SKIP" "iax device enabled system needs accel config 4.1.6 for testing"
+			test_complete "${DMA_TESTNAME}-iaa-check" "SKIP" "iax device enabled system needs accel config 4.1.6 for testing"
 		fi
 		touch "${DMA_STATEDIR}/iaa_enabled"
 	else
-		test_complete "SKIP" "No iax devices on this system"
+		test_complete "${DMA_TESTNAME}-iaa-check" "SKIP" "No iax devices on this system"
 	fi
 }
 
@@ -65,11 +69,11 @@ iaa_check ()
 dmaengine_disable ()
 {
 	if ! test -f "/sys/bus/dsa/devices/${2}/state"; then
-		test_complete "FAIL" "sysfs state entry for DSA workqueue ${2} does not exist"
+		test_complete "${DMA_TESTNAME}-dsa-dmaengine-disable" "FAIL" "sysfs state entry for DSA workqueue ${2} does not exist"
 	fi
 
 	if ! test -f "/sys/bus/dsa/devices/${1}/state"; then
-		test_complete "FAIL" "sysfs state entry for DSA device ${1} does not exist"
+		test_complete "${DMA_TESTNAME}-dsa-dmaengine-disable" "FAIL" "sysfs state entry for DSA device ${1} does not exist"
 	fi
 
 	if lsmod | grep -q dmatest; then
@@ -112,10 +116,10 @@ dmaengine_enable ()
 	devstate=$(cat "/sys/bus/dsa/devices/${1}/state")
 
 	if test "${wqstate}" != "enabled"; then
-		test_complete "FAIL" "DSA workqueue ${2} is not enabled"
+		test_complete "${DMA_TESTNAME}-dsa-dmaengine-enable" "FAIL" "DSA workqueue ${2} is not enabled"
 	fi
 	if test "${devstate}" != "enabled"; then
-		test_complete "FAIL" "DSA device ${1} is not enabled"
+		test_complete "${DMA_TESTNAME}-dsa-dmaengine-enable" "FAIL" "DSA device ${1} is not enabled"
 	fi
 
 	return 0
@@ -133,7 +137,7 @@ dmaengine_test ()
 	local dsapci="$(readlink /sys/bus/dsa/devices/${1} | cut -d '/' -f6)"
 
 	if ! exists /sys/class/dma/dma*chan*; then
-		test_complete "FAIL" "No dma channel devices in /sys/class/dma"
+		test_complete "${DMA_TESTNAME}-dsa-dmaengine-test" "FAIL" "No dma channel devices in /sys/class/dma"
 		return
 	fi
 
@@ -151,7 +155,7 @@ dmaengine_test ()
 
 	if test "${#dmachans[@]}" = "0"; then
 		dmaengine_disable "${1}" "${2}"
-		test_complete "FAIL" "${DMA_TESTNAME}: Couldn't find dma channel tied to ${1}"
+		test_complete "${DMA_TESTNAME}-dsa-dmaengine-test" "FAIL" "Couldn't find dma channel tied to ${1}"
 		return
 	fi
 

@@ -2,7 +2,7 @@
 name=iommu/new-boot
 owner=Jerry Snitselaar <jsnitsel@redhat.com>
 description=Test iommu boot and initialization
-license=GPLv2
+license=GPL-2.0-or-later
 confidential=no
 destructive=no
 
@@ -11,6 +11,6 @@ entry_point=bash ./runtest.sh
 Path=/mnt/tests/kernel/iommu/new-boot
 Priority=Normal
 max_time=20m
-dependencies=grubby;beakerlib;pciutils;sed;gawk
+dependencies=grubby;beakerlib;pciutils;sed;gawk;acpica-tools;dmidecode
 softDependencies=beakerlib-redhat
 repoRequires=general/include;iommu/include

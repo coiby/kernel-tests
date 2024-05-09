@@ -1,4 +1,5 @@
 #!/bin/bash
+## -*- mode: Shell-script; sh-shell: bash; sh-basic-offset: 4; sh-indentation: 4; coding: utf-8-unix; indent-tabs-mode: t; ruler-mode-show-tab-stops: t; tab-width: 4 -*-
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -18,15 +19,15 @@
 # DMA_IOMMU_CONF - configuration to test
 
 if test -z "${DMA_MODNAME}"; then
-	test_complete "SKIP" "${RSTRNT_TASKNAME} requires environment variable DMA_MODNAME to be set"
+	test_complete "${RSTRNT_TASKNAME}" "SKIP" "requires environment variable DMA_MODNAME to be set"
 fi
 
 if test -z "${DMA_TESTNAME}"; then
-	test_complete "SKIP" "${RSTRNT_TASKNAME} requires environment variable DMA_TESTNAME to be set"
+	test_complete "${RSTRNT_TASKNAME}" "SKIP" "requires environment variable DMA_TESTNAME to be set"
 fi
 
 if test -z "${DMA_IOMMU_CONF}"; then
-	test_complete "SKIP" "${DMA_TESTNAME} requires environment variable DMA_IOMMU_CONF to be set"
+	test_complete "${DMA_TESTNAME}" "SKIP" "requires environment variable DMA_IOMMU_CONF to be set"
 fi
 
 if test -z "${DMA_STATEDIR}"; then
@@ -83,7 +84,7 @@ next_config_phases=(
 iommu_debug ()
 {
 	if ! test -z "${IOMMU_DEBUG}"; then
-	   echo "${DMA_TESTNAME} ${1} at ${2}: ${3}"
+		echo "${DMA_TESTNAME} ${1} at ${2}: ${3}"
 	fi
 }
 
@@ -105,17 +106,17 @@ check_dma_faults ()
 	case "$(uname -m)" in
 		"x86_64")
 			if is_vendor "intel"; then
-				check_dmar_faults "${1}"
+				check_dmar_faults "${1}-check-dma-faults"
 			elif is_vendor "amd"; then
-				check_amd_dma_faults "${1}"
+				check_amd_dma_faults "${1}-check-dma-faults"
 			fi
 			;;
 		"aarch64")
-			check_smmu_faults "${1}"
+			check_smmu_faults "${1}-check-dma-faults"
 			;;
 		*)
 			;;
-		esac
+	esac
 }
 
 SMMU_V3_FAULTS=(
@@ -154,9 +155,9 @@ check_smmu_faults ()
 	if is_arm_smmu_v3; then
 		# global fault check
 		if dmesg | grep -q "device has entered Service Failure Mode"; then
-			test_complete "FAIL" "${1} Service Failure Mode event detected"
+			test_complete "${1}" "FAIL" "Service Failure Mode event detected"
 		fi
-		if grep -qP -f <(printf "%s\n" "${SMMU_V3_FAULTS[@]}") < <(printf "%s\n" "${DMESG[@]}"); then
+		if grep -qE -f <(printf "%s\n" "${SMMU_V3_FAULTS[@]}") < <(printf "%s\n" "${DMESG[@]}"); then
 			ret+=1
 			echo "${1} arm-smmu-v3 error message found"
 		fi
@@ -170,26 +171,26 @@ check_smmu_faults ()
 					"0x10")
 						echo "${1} translation fault detected"
 						ret+=1
-					;;
+						;;
 					"0x11")
 						echo "${1} address size fault detected"
 						ret+=1
-					;;
+						;;
 					"0x12")
 						echo "${1} access fault detected"
 						ret+=1
-					;;
+						;;
 					"0x13")
 						echo "${1} permission fault detected"
 						ret+=1
-					;;
+						;;
 					*)
-					;;
+						;;
 				esac
 			fi
 		done
 	else
-		if dmesg | grep -qP -f <(printf "%s\n" "${SMMU_V2_FAULTS[@]}") < <(printf "%s\n" "${DMESG[@]}"); then
+		if dmesg | grep -qE -f <(printf "%s\n" "${SMMU_V2_FAULTS[@]}") < <(printf "%s\n" "${DMESG[@]}"); then
 			ret+=1
 			echo "${1} arm-smmu error message found"
 		fi
@@ -212,9 +213,9 @@ check_smmu_faults ()
 	fi
 
 	if test "$ret" -eq 0; then
-		test_continue "PASS" "${1} no smmu transaction faults found"
+		test_continue "${1}" "PASS" "no smmu transaction faults found"
 	else
-		test_continue "FAIL" "${1} smmu transaction faults found"
+		test_continue "${1}" "FAIL" "smmu transaction faults found"
 	fi
 }
 
@@ -432,9 +433,9 @@ check_amd_dma_faults ()
 	done
 
 	if test "$ret" -eq 0; then
-		test_continue "PASS" "${1} no iommu transaction faults found"
+		test_continue "${1}" "PASS" "no iommu transaction faults found"
 	else
-		test_continue "FAIL" "${1} iommu transaction faults found"
+		test_continue "${1}" "FAIL" "iommu transaction faults found"
 	fi
 }
 
@@ -473,13 +474,13 @@ check_dmar_faults ()
 				echo "${1} Unknown Fault Code!"
 			fi
 			dump_iommu_group_info "${1}" "${sbdf}"
-			fi
+		fi
 	done
 
 	if test "${faults}" -eq 0; then
-		test_continue "PASS" "${1} no iommu transaction faults found"
+		test_continue "${1}" "PASS" "no iommu transaction faults found"
 	else
-		test_continue "FAIL" "${1} iommu transaction faults found"
+		test_continue "${1}" "FAIL" "iommu transaction faults found"
 	fi
 }
 
@@ -502,12 +503,24 @@ bad_bios_check ()
 				echo "${1}	 This possibly is an issue with the acpi table presented by the bios"
 				if is_vendor "intel"; then
 					echo "${1}	 There might need to be an RMRR entry added to the DMAR table for the faulting device"
+					dump_sys_fw_ver_info
 				elif is_vendor "amd"; then
 					echo "${1}	 There might need to be an IVMD entry added to the IVRS table for the faulting device"
+					dump_sys_fw_ver_info
 				fi
 				echo ""
 			fi
 		fi
+	done
+}
+
+dump_sys_fw_ver_info ()
+{
+	echo "${DMA_TESTNAME} $(uname -a)"
+	mapfile BIOS < <(dmidecode -t 0)
+	for l in "${BIOS[@]}";
+	do
+		echo -n "${DMA_TESTNAME} ${l}"
 	done
 }
 
@@ -554,52 +567,67 @@ intel_iommu_state_check ()
 {
 	case "$(get_config)" in
 		"sm-on-lazy")
-			if ! is_sm_enabled || ! batched_iotlb_invalidation_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+			if ! is_intel_sm_enabled || ! batched_iotlb_invalidation_enabled; then
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"sm-on-strict")
-			if ! is_sm_enabled || ! strict_iotlb_invalidation_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+			if ! is_intel_sm_enabled || ! strict_iotlb_invalidation_enabled; then
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"sm-on-pt")
-			if ! is_sm_enabled || ! passthrough_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+			if ! is_intel_sm_enabled || ! passthrough_enabled; then
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
+			fi
+			;;
+		"sm-off-lazy")
+			if is_intel_sm_enabled || ! batched_iotlb_invalidation_enabled; then
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
+			fi
+			;;
+		"sm-off-strict")
+			if is_intel_sm_enabled || ! strict_iotlb_invalidation_enabled; then
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
+			fi
+			;;
+		"sm-off-pt")
+			if is_intel_sm_enabled || ! passthrough_enabled; then
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"lazy")
 			if ! batched_iotlb_invalidation_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"strict")
 			if ! strict_iotlb_invalidation_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"pt")
 			if ! passthrough_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"forcedac")
 			if ! is_forcedac_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"sp_off")
 			if ! is_sp_off_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"igfx_off")
 			if ! is_igfx_off_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		*)
-			test_complete "SKIP" "${DMA_TESTNAME} IOMMU configuration $(get_config) is not known"
+			test_complete "${DMA_TESTNAME}-intel-iommu-state-check" "SKIP" "IOMMU configuration $(get_config) is not known"
 			;;
 	esac
 }
@@ -610,64 +638,64 @@ amd_iommu_state_check ()
 		"lazy")
 			if ! batched_iotlb_invalidation_enabled; then
 				if ! is_npcache_capable || ! npcache_strict_check; then
-					test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+					test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 				fi
 			fi
 			;;
 		"strict")
 			if ! strict_iotlb_invalidation_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"pt")
 			if ! passthrough_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"off")
 			# should be supported disabled
 			if amd_iommu_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"forcedac")
 			if ! is_forcedac_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"force_enable")
 			if is_stoney_ridge && ! amd_iommu_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"pgtbl_v1")
 			if ! is_pgtbl_v1_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"pgtbl_v2-lazy")
 			if ! is_pgtbl_v2_enabled || ! batched_iotlb_invalidation_enabled; then
 				pgtbl_v2_cap_fail
 				if ! is_npcache_capable || ! npcache_strict_check; then
-					test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+					test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 				fi
 			fi
 			;;
 		"pgtbl_v2-strict")
 			if ! strict_iotlb_invalidation_enabled || ! is_pgtbl_v2_enabled; then
 				pgtbl_v2_cap_fail
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"pgtbl_v2-pt")
 			# this should fall back to v1 page tables
 			if is_pgtbl_v2_enabled && ! passthrough_enabled && ! v2_passthrough_check; then
 				pgtbl_v2_cap_fail
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		*)
-			test_complete "SKIP" "${DMA_TESTNAME} IOMMU configuration $(get_config) is not known"
+			test_complete "${DMA_TESTNAME}-amd-iommu-state-check" "SKIP" "IOMMU configuration $(get_config) is not known"
 			;;
 	esac
 }
@@ -677,26 +705,26 @@ arm_smmu_state_check ()
 	case "$(get_config)" in
 		"lazy")
 			if ! batched_iotlb_invalidation_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-arm-smmu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"strict")
 			if ! strict_iotlb_invalidation_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-arm-smmu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"pt")
 			if ! passthrough_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-arm-smmu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		"forcedac")
 			if ! is_forcedac_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} IOMMU did not initialize in correct configuration"
+				test_complete "${DMA_TESTNAME}-arm-smmu-state-check" "FAIL" "IOMMU did not initialize in correct configuration"
 			fi
 			;;
 		*)
-			test_complete "SKIP" "${DMA_TESTNAME} IOMMU configuration $(get_config) is not known"
+			test_complete "${DMA_TESTNAME}-arm-smmu-state-check" "SKIP" "IOMMU configuration $(get_config) is not known"
 			;;
 	esac
 }
@@ -723,23 +751,23 @@ iommu_enabled_check ()
 		"x86_64")
 			if is_vendor "intel"; then
 				if ! intel_iommu_enabled; then
-					test_complete "FAIL" "${DMA_TESTNAME} IOMMU didn't initialize"
+					test_complete "${DMA_TESTNAME}-intel-iommu-enabled-check" "FAIL" "IOMMU didn't initialize"
 				fi
 			else
 				if test "$(get_config)" != "off"; then
 					if ! amd_iommu_enabled; then
-						test_complete "FAIL" "${DMA_TESTNAME} IOMMU didn't initialize"
+						test_complete "${DMA_TESTNAME}-amd-iommu-enabled-check" "FAIL" "IOMMU didn't initialize"
 					fi
 				fi
 			fi
 			;;
 		"aarch64")
 			if ! arm_smmu_enabled; then
-				test_complete "FAIL" "${DMA_TESTNAME} SMMU didn't initialize"
+				test_complete "${DMA_TESTNAME}-arm-smmu-enabled-check" "FAIL" "SMMU didn't initialize"
 			fi
 			;;
 		*)
-			test_complete "SKIP" "${DMA_TESTNAME} $(uname -m) is not supported by this test"
+			test_complete "${DMA_TESTNAME}-iommu-enabled-check" "SKIP" "$(uname -m) is not supported by this test"
 			;;
 	esac
 }
@@ -786,29 +814,162 @@ batched_iotlb_invalidation_enabled ()
 arm_smmu_supported ()
 {
 	if ! arm_smmu_bios_enabled; then
-	   test_complete "SKIP" "${DMA_TESTNAME} No IORT table presented by BIOS"
+		test_complete "${DMA_TESTNAME}-arm-smmu-supported" "SKIP" "No IORT table presented by BIOS"
 	fi
+}
+
+arm_smmu_iort_check ()
+{
+	# check for existence of iasl, then dump the IORT table
+	# check for node types 03 or 04 or whichever is passed
+	# by caller
+	if ! test -f /sys/firmware/acpi/tables/IORT; then
+		return 1
+	fi
+
+	cp /sys/firmware/acpi/tables/IORT /mnt/scratchspace/IORT.dat
+
+	# don't waste time decompiling again if we already have done it
+	if ! test -f /mnt/scratchspace/IORT.dsl; then
+		iasl -d /mnt/scratchspace/IORT.dat
+	fi
+
+	if ! test -f /mnt/scratchspace/IORT.dsl; then
+		echo "${DMA_TESTNAME}" "Failure in decompiling the IORT table"
+		dump_sys_fw_ver_info
+		return 1
+	fi
+
+	declare -i match_start=0
+	declare -i match_end=0
+	declare -i ret=1
+	declare node_type=""
+	declare node_revision=""
+	declare mapping_count=""
+	declare base_addr=""
+	declare flags=""
+
+	repat_type="Type : (0[34])"
+	repat_rev="Revision : ([0-9A-F]{2})"
+	repat_mapcnt="Mapping Count : ([0-9A-F]{8})"
+	repat_baseaddr="Base Address : ([0-9A-F]{16})"
+	repat_flags="Flags \(decoded below\) : ([0-9A-F]{8})"
+
+	mapfile IORTINFO < <(grep -E -A2 "Signature :.+IORT" "/mnt/scratchspace/IORT.dsl")
+	for l in "${IORTINFO[@]}";
+	do
+		if [[ ${l} =~ $repat_rev ]]; then
+			iort_rev=$((16#${BASH_REMATCH[1]}))
+		fi
+	done
+
+	mapfile IORTINFO < <(grep -E -A20 "$repat_type" "/mnt/scratchspace/IORT.dsl")
+	for l in "${IORTINFO[@]}";
+	do
+		if [[ ${l} =~ $repat_type  ]]; then
+			match_start=1
+			node_type="${BASH_REMATCH[1]}"
+		elif [[ ${l} =~ $repat_rev	]]; then
+			node_revision="${BASH_REMATCH[1]}"
+		elif [[ ${l} =~ $repat_mapcnt  ]]; then
+			mapping_count="${BASH_REMATCH[1]}"
+		elif [[ ${l} =~ $repat_baseaddr ]]; then
+			base_addr=$((16#${BASH_REMATCH[1]}))
+		elif [[ ${l} =~ $repat_flags ]]; then
+			flags="${BASH_REMATCH[1]}"
+			match_end=1
+		fi
+
+		# we've parsed a node for an smmu
+		if test $match_start -eq 1 -a $match_end -eq 1; then
+
+			# are we searching for a specific type and found one
+			if ! test -z "${1}"; then
+				if test "${1}" = "${node_type}"; then
+
+					echo ""
+					echo "${DMA_TESTNAME} Found Node Type: ${node_type}"
+					echo ""
+					echo "${DMA_TESTNAME} IORT Table Revision: ${iort_rev}"
+					echo "${DMA_TESTNAME} Node Type: ${node_type}"
+					echo "${DMA_TESTNAME} Revision: ${node_revision}"
+					echo "${DMA_TESTNAME} Mapping Count: ${mapping_count}"
+					echo "${DMA_TESTNAME} Base Address: " $(printf "0x%016x" "${base_addr}")
+					echo "${DMA_TESTNAME} Flags: ${flags}"
+					ret=0
+
+					# simple sanity check on base address
+					if ((base_addr == 0)); then
+						echo "${DMA_TESTNAME} Base Address for node type ${node_type} is null!"
+						dump_sys_fw_ver_info
+					fi
+
+					break
+				fi
+			else
+				echo ""
+				echo "${DMA_TESTNAME} IORT Table Revision: ${iort_rev}"
+				echo "${DMA_TESTNAME} Node Type: ${node_type}"
+				echo "${DMA_TESTNAME} Revision: ${node_revision}"
+				echo "${DMA_TESTNAME} Mapping Count: ${mapping_count}"
+				echo "${DMA_TESTNAME} Base Address: " $(printf "0x%016x" "${base_addr}")
+				echo "${DMA_TESTNAME} Flags: ${flags}"
+
+				ret=0
+
+				# simple sanity check on base address
+				if ((base_addr == 0)); then
+					echo "${DMA_TESTNAME} Base Address for node type ${node_type} is null!"
+					dump_sys_fw_ver_info
+				fi
+			fi
+
+			# reset for another possible node match
+			match_start=0
+			match_end=0
+			node_type=""
+			node_revision=""
+			mapping_count=""
+			base_addr=""
+			flags=""
+		fi
+	done
+
+	return $ret
 }
 
 arm_smmu_bios_enabled ()
 {
-	if ! test -f /sys/firmware/acpi/tables/IORT; then
+	if ! arm_smmu_iort_check; then
 		return 1
 	fi
 
 	return 0
 }
 
+sysfs_iommu_count ()
+{
+	declare -i count
+
+	count=$(find /sys/class/iommu -type l -regex "${1}" | wc -l)
+
+	echo "${count}"
+}
+
 arm_smmu_enabled ()
 {
-	if is_arm_smmu_v3; then
-		if ! exists /sys/class/iommu/smmu3.*; then
-			return 1
+	if arm_smmu_bios_enabled; then
+		if is_arm_smmu_v3; then
+			if test $(sysfs_iommu_count ".*/smmu3\.0x[0-9a-fA-F]+") = "0"; then
+				return 1
+			fi
+		else
+			if test $(sysfs_iommu_count ".*/smmu\.0x[0-9a-fA-F]+") = "0"; then
+				return 1
+			fi
 		fi
 	else
-		if ! exists /sys/class/iommu/smmu.*; then
-			return 1
-		fi
+		return 1
 	fi
 
 	return 0
@@ -816,7 +977,7 @@ arm_smmu_enabled ()
 
 is_arm_smmu_v3 ()
 {
-	if ! journalctl -k | grep -q "ACPI: IORT: SMMU-v3"; then
+	if ! arm_smmu_iort_check "04"; then
 		return 1
 	fi
 
@@ -827,11 +988,11 @@ is_arm_smmu_v3 ()
 amd_iommu_supported ()
 {
 	if ! is_vendor "amd"; then
-		test_complete "SKIP" "${DMA_TESTNAME} can only run on AMD platforms"
+		test_complete "${DMA_TESTNAME}-amd-iommu-supported-check" "SKIP" "can only run on AMD platforms"
 	fi
 
 	if ! amd_iommu_bios_enabled; then
-		test_complete "SKIP" "${DMA_TESTNAME} AMD-Vi is not enabled in the BIOS"
+		test_complete "${DMA_TESTNAME}-amd-iommu-supported-check" "SKIP" "AMD-Vi is not enabled in the BIOS"
 	fi
 }
 
@@ -847,9 +1008,9 @@ amd_iommu_bios_enabled ()
 amd_iommu_enabled ()
 {
 	if amd_iommu_bios_enabled; then
-		if journalctl -k | grep -q "AMD-Vi: Found IOMMU cap"; then
+		if test $(sysfs_iommu_count ".*/ivhd[0-9]+") != "0"; then
 			return 0
-		elif journalctl -k | grep -qP "IOMMU[0-9]+: Failed to initalize IOMMU Hardware"; then
+		elif journalctl -k | grep -qE "IOMMU[0-9]+: Failed to initalize IOMMU Hardware"; then
 			return 1
 		fi
 	fi
@@ -877,7 +1038,7 @@ npcache_strict_check ()
 
 is_npcache_capable ()
 {
-	if ! exists /sys/class/iommu/ivhd*; then
+	if test $(sysfs_iommu_count ".*/ivhd[0-9]+") = "0"; then
 		echo "${DMA_TESTNAME} No IVHD devices in sysfs"
 		return 1
 	fi
@@ -886,7 +1047,7 @@ is_npcache_capable ()
 
 	# then check iommu cap see if register shows support
 	for d in /sys/class/iommu/ivhd*; do
-		if test $(("0x$(cat ${d}/amd-iommu/cap)" & NPCACHE)) -eq 0; then
+		if test $((16#$(cat "${d}/amd-iommu/cap") & NPCACHE)) -eq 0; then
 			return 1
 		fi
 	done
@@ -924,13 +1085,13 @@ v2_passthrough_check()
 pgtbl_v2_cap_fail ()
 {
 	if journalctl -k | grep -q "Cannot enable v2 page table for DMA-API. Fallback to v1"; then
-			Test_complete "SKIP" "${DMA_TESTNAME} Platform doesn't have capabilities to support V2 page tables"
+		test_complete "${DMA_TESTNAME}" "SKIP" "Platform doesn't have capabilities to support V2 page tables"
 	fi
 }
 
 is_pgtbl_v2_enabled ()
 {
-	if ! journalctl -k | grep -qP "V2 page table enabled \(Paging mode : [1-6] level\)"; then
+	if ! journalctl -k | grep -qE "V2 page table enabled \(Paging mode : [1-6] level\)"; then
 		return 1
 	fi
 
@@ -940,22 +1101,22 @@ is_pgtbl_v2_enabled ()
 intel_iommu_supported ()
 {
 	if ! is_vendor "intel"; then
-		test_complete "SKIP" "can only run on Intel Platforms"
+		test_complete "${DMA_TESTNAME}-intel-iommu-supported-check" "SKIP" "can only run on Intel Platforms"
 	fi
 
 	if ! intel_iommu_bios_enabled; then
-		test_complete "SKIP" "VT-d is not enabled in BIOS"
+		test_complete "${DMA_TESTNAME}-intel-iommu-supported-check" "SKIP" "VT-d is not enabled in BIOS"
 	fi
 
-	if [[ ${DMA_IOMMU_CONF} =~ "sm-on" ]] && ! is_sm_supported; then
-		test_complete "SKIP" "${DMA_TESTNAME} scalable mode is not supported on this system"
+	if [[ ${DMA_IOMMU_CONF} =~ "sm-on" ]] && ! is_intel_sm_supported; then
+		test_complete "${DMA_TESTNAME}-intel-iommu-supported-check" "SKIP" "scalable mode is not supported on this system"
 	fi
 }
 
 intel_iommu_enabled ()
 {
 	if intel_iommu_bios_enabled; then
-		if journalctl -k | grep -q "DMAR: Intel(R) Virtualization Technology for Directed I/O"; then
+		if test $(sysfs_iommu_count ".*/dmar[0-9]+") != "0"; then
 			return 0
 		fi
 	fi
@@ -990,46 +1151,70 @@ is_forcedac_enabled ()
 	return 0
 }
 
-is_sm_supported ()
+is_intel_feature_supported ()
 {
+	declare -i count=0
 
-	# first look for feature inconsistency
-	if journalctl -k | grep -q "feature smts inconsistent"; then
-		echo "${DMA_TESTNAME} Intel IOMMU feature smts inconsistent"
-		return 1
-	fi
-
-	if ! exists /sys/class/iommu/dmar*; then
+	if test $(sysfs_iommu_count ".*/dmar[0-9]+") = "0"; then
 		echo "${DMA_TESTNAME} No DMAR devices in sysfs"
 		return 1
 	fi
 
-	# scalable mode ecap bit
-	SMTS=$((1 << 43))
-
 	# then check dmar ecap see if register shows support
 	for d in /sys/class/iommu/dmar*; do
-		if test $(("0x$(cat ${d}/intel-iommu/ecap)" & SMTS)) -eq 0; then
-			echo "${DMA_TESTNAME} Intel IOMMU smts feature inconsistent in ecap registers"
-			return 1
+		if test $((16#$(cat "${d}/intel-iommu/ecap") & $2)) -eq "${2}"; then
+			count+=1
+		elif test $((16#$(cat "${d}/intel-iommu/ecap") & $2)) -eq 0; then
+			if test "${count}" -gt 0; then
+				echo "${DMA_TESTNAME} Intel IOMMU ${1} feature inconsistent in ecap registers"
+				return 1
+			fi
 		fi
 	done
+
+	if test "${count}" -eq 0; then
+		echo "${DMA_TESTNAME} Intel IOMMU does not support the ${1} feature"
+		return 1
+	fi
 
 	return 0
 }
 
-is_sm_enabled ()
+# PRS bit is 1 << 29
+is_intel_prs_supported ()
 {
-	if is_sm_supported; then
+	is_intel_feature_supported "prs" $((1 < 29))
+	return $?
+}
+
+# PASID bit is 1 << 40
+is_intel_pasid_supported ()
+{
+	is_intel_feature_supported "pasid" $((1 << 40))
+	return $?
+}
+
+# SM bit is 1 << 43
+is_intel_sm_supported ()
+{
+	is_intel_feature_supported "smts" $((1 << 43))
+	return $?
+}
+
+is_intel_sm_enabled ()
+{
+	if is_intel_sm_supported; then
 		if journalctl -k | grep -q "DMAR: Enable scalable mode if hardware supports"; then
-			if journalctl -k | grep -q "dmar[0-9]+ SVM disabled, incompatible paging mode"; then
-				test_complete "SKIP" "${DMA_TESTNAME} SVM disabled, due to incompatible paging mode"
-			elif journalctl -k | grep -q "dmar[0-9]+ SVM disabled, incompatible 1GB page capability"; then
-				test_complete "SKIP" "${DMA_TESTNAME} SVM disabled, incompatible 1GB page capability"
+			if journalctl -k | grep -qE "dmar[0-9]+ SVM disabled, "; then
+				test_complete "${DMA_TESTNAME}-intel-sm-enabled-check" "SKIP" "SVM disabled, due to platform incompatibility"
 			fi
 			return 0
 		else
 			return 1
+		fi
+	else
+		if journalctl -k | grep -qE "dmar[0-9]+ SVM disabled, "; then
+			test_complete "${DMA_TESTNAME}-intel-sm-enabled-check" "SKIP" "SVM disabled, due to platform incompatibility"
 		fi
 	fi
 
@@ -1050,26 +1235,26 @@ grubby_remove_arg ()
 
 intel_iommu_grub_setup ()
 {
-		case "${1}" in
-			"lazy" | "strict" | "pt" | "forcedac")
-				grubby_update_arg "intel_iommu=on"
-				;;
-			"sm-on-lazy" | "sm-on-strict" | "sm-on-pt")
-				grubby_update_arg "intel_iommu=on,sm_on"
-				;;
-			"sm-off-lazy" | "sm-off-strict" | "sm-off-pt")
-				grubby_update_arg "intel_iommu=on,sm_off"
-				;;
-			"sp_off")
-				grubby_update_arg "intel_iommu=on,sp_off"
-				;;
-			"igfx_off")
-				grubby_update_arg "intel_iommu=on,igfx_off"
-				;;
-			*)
-				test_complete "FAIL" "${DMA_TESTNAME} intel_iommu_grub_setup called with ${1}"
-				;;
-		esac
+	case "${1}" in
+		"lazy" | "strict" | "pt" | "forcedac")
+			grubby_update_arg "intel_iommu=on"
+			;;
+		"sm-on-lazy" | "sm-on-strict" | "sm-on-pt")
+			grubby_update_arg "intel_iommu=on,sm_on"
+			;;
+		"sm-off-lazy" | "sm-off-strict" | "sm-off-pt")
+			grubby_update_arg "intel_iommu=on,sm_off"
+			;;
+		"sp_off")
+			grubby_update_arg "intel_iommu=on,sp_off"
+			;;
+		"igfx_off")
+			grubby_update_arg "intel_iommu=on,igfx_off"
+			;;
+		*)
+			test_complete "${DMA_TESTNAME}-intel-iommu-grub-setup" "FAIL" "intel_iommu_grub_setup called with ${1}"
+			;;
+	esac
 }
 
 intel_iommu_enable ()
@@ -1097,9 +1282,23 @@ amd_iommu_grub_setup ()
 		"lazy" | "strict" | "pt" | "forcedac")
 			;;
 		*)
-			test_complete "FAIL" "${DMA_TESTNAME} amd_iommu_grub_setup called with ${1}"
+			test_complete "${DMA_TESTNAME}-amd-iommu-grub-setup" "FAIL" "amd_iommu_grub_setup called with ${1}"
 			;;
 	esac
+}
+
+arm_smmu_grub_setup ()
+{
+	#check is disable_bypass=n is being used
+	repat="arm-smmu.*disable_bypass=n"
+
+	if ! test -f "${DMA_STATEDIR}/pre_arch_iommu)"; then
+		return
+	fi
+
+	if [[ "$(cat ${DMA_STATEDIR}/pre_arch_iommu)" =~ ${repat} ]]; then
+		grubby_update_arg "$(cat ${DMA_STATEDIR}/pre_arch_iommu)"
+	fi
 }
 
 # $1 - iommu config to setup
@@ -1115,6 +1314,7 @@ grub_setup ()
 			fi
 			;;
 		"aarch64")
+			arm_smmu_grub_setup "${1}"
 			;;
 	esac
 
@@ -1154,10 +1354,6 @@ grub_setup ()
 
 grub_cleanup ()
 {
-	grubby_remove_arg "iommu.passthrough"
-	grubby_remove_arg "iommu.strict"
-	grubby_remove_arg "iommu.forcedac"
-
 	case "$(uname -m)" in
 		"x86_64")
 			if is_vendor "intel"; then
@@ -1174,6 +1370,10 @@ grub_cleanup ()
 			fi
 			;;
 	esac
+
+	grubby_remove_arg "iommu.passthrough"
+	grubby_remove_arg "iommu.strict"
+	grubby_remove_arg "iommu.forcedac"
 }
 
 grub_pre_save ()
@@ -1268,6 +1468,7 @@ cleanup_state ()
 	if test -d "${DMA_STATEDIR}"; then
 		rm -rf "${DMA_STATEDIR}"
 	fi
+	rm -f /mnt/scratchspace/*
 }
 
 # $1 - path to check
@@ -1290,7 +1491,7 @@ get_vendor ()
 {
 	local vendor=""
 
-	vendor="$(lscpu | grep -P '^Vendor ID:' | awk -F':' '{print $2;}' | sed -e 's/^[ \t]*//g' -e 's/[ \t]*$//g')"
+	vendor="$(lscpu | grep -E '^Vendor ID:' | awk -F':' '{print $2;}' | sed -e 's/^[ \t]*//g' -e 's/[ \t]*$//g')"
 	echo "${vendor}"
 }
 
@@ -1303,7 +1504,7 @@ check_rebootcount ()
 check_reboot ()
 {
 	if ! check_rebootcount "${config_reboots[$(get_config)]}"; then
-		fail_abort "Unexpected reboot"
+		fail_abort "${DMA_TESTNAME}-check-reboot" "Unexpected reboot"
 	fi
 }
 
@@ -1350,7 +1551,8 @@ fail_abort ()
 {
 	grub_exit
 	cleanup_state
-	rstrnt-report-result "${DMA_TESTNAME}: ${1}" FAIL
+	echo "${1} FAIL/ABORT reason: ${2}"
+	rstrnt-report-result "${1}" FAIL
 	rstrnt-abort --server "${RSTRNT_RECIPE_URL}/tasks/${RSTRNT_TASKID}/status"
 }
 
@@ -1358,21 +1560,31 @@ warn_abort_recipe ()
 {
 	grub_exit
 	cleanup_state
-	rstrnt-report-result "${DMA_TESTNAME}: ${1}" WARN
+	echo "${1} WARN/ABORT reason: ${2}"
+	rstrnt-report-result "${1}" WARN
 	rstrnt-abort recipe
 }
 
 test_complete ()
 {
-	echo "${DMA_TESTNAME} ${1} reason: ${2}"
+	echo "${1} ${2} reason: ${3}"
 	grub_exit
 	cleanup_state
-	rstrnt-report-result "${DMA_TESTNAME}: ${2}" "${1}"
+	if ! test -z $4; then
+		rstrnt-report-result --outputfile="${4}" "${1}" "${2}"
+	else
+		rstrnt-report-result "${1}" "${2}"
+	fi
+
 	exit 0
 }
 
 test_continue ()
 {
-	echo "${DMA_TESTNAME} ${1} reason: ${2}"
-	rstrnt-report-result "${DMA_TESTNAME}: ${2}" "${1}"
+	echo "${1} ${2} reason: ${3}"
+	if ! test -z $4; then
+		rstrnt-report-result --outputfile="${4}" "${1}" "${2}"
+	else
+		rstrnt-report-result "${1}" "${2}"
+	fi
 }

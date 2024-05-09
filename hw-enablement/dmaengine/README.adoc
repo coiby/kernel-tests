@@ -1,0 +1,152 @@
+// -*- mode: adoc-mode; coding: utf-8; indent-tabs-mode: t; ruler-mode-tab-stops: t; tab-width: 4 -*-
+
+== DMAEngine Subsystem Testing
+
+These are tests that add coverage for drivers within the drivers/dma
+subsystem that we have hardware access for.
+
+
+=== Directory Structure
+
+The dmaengine directory contains the following:
+
+dmatest:: - Test for drivers with a dma channel interface. (ptdma, ioatdma, and the dmaengine workqueue driver for idxd.)
+idxd::    - Test for the Scalable Mode features of Intel DSA and IAA devices.
+include:: - Helper code to make tests quicker/easier to implement with code re-use.
+
+.Directory Structure
+----
+hw-enablement/dmaengine
+├── dmatest
+├── idxd
+└── include
+----
+
+
+=== Current Implementation Status
+
+All currently planned tests have been implemented. More will be added as we support new
+drivers, and/or functionality.
+
+'''
+
+
+=== Test Parameters
+
+common: :: These are common to all of the dmaengine tests
+	DMA_MODNAME: :::
+		*ioatdma* | *ptdma* | *idxd*
+	DMA_IOMMU_CONF: :::
+		*sm-off-lazy* | *sm-off-strict* | *sm-off-pt* | *sm-on-lazy* | *sm-on-strict* | *sm-on-pt* : _Only Intel systems capable of Scalable Mode. For this case, systems with DSA and IAA devices_ +
+		*lazy* | *strict* | *pt*
+
+dmatest: :: dmatest specific parameters
+	DMA_MULTITHREADS: ::: int - ioatdma and idxd drivers only 
+
+idxd: :: idxd specfic parameters
+    IDXD_ACCFG_TEST: :::
+		*dsa_config_test_runner* | *dsa_user_test_runner* | *iaa_user_test_runner*
+
+'''
+
+
+=== Host Requirements
+
+Below are the hostRequires elements that will find a system capable of
+running the test.
+
+idxd: ::
+	intel_iommu with Scalable Mode (dsa devices, no iax devices): :::
+		key_value: ::::
+			op: "=" +
+			name: "*VIRT_IOMMU*" +
+			value: "*1*" +
+		cpu: ::::
+			vendor: ;;
+				op: "like" +
+				value: "*%Intel*"
+		system: ::::
+			arch: ;;
+				op: "=" +
+				value: "*x86_64*"
+		device: ::::
+			op: "=" +
+			vendor_id: "*8086*" +
+			device_id: "*0b25*"
+		device: ::::
+			op: "!=" +
+			vendor_id: "*8086*" +
+			device_id: "*0cfe*"
+
+	intel_iommu with Scalable Mode (dsa devices, and iax devices):::
+		key_value: ::::
+				op: "=" +
+				name: "*VIRT_IOMMU*" +
+				value: "*1*" +
+		cpu: ::::
+			vendor: ;;
+				op: "like" +
+				value: "*%Intel*"
+		system: ::::
+			arch: ;;
+				op: "=" +
+				value: "*x86_64*"
+		device: ::::
+			op: "=" +
+			vendor_id: "*8086*" +
+			device_id: "*0b25*"
+		device: ::::
+			op: "=" +
+			vendor_id: "*8086*" +
+			device_id: "*0cfe*"
+
+	System with ioatdma device:::
+		key_value: ::::
+				op: "=" +
+				name: "*VIRT_IOMMU*" +
+				value: "*1*" +
+		cpu: ::::
+			vendor: ;;
+				op: "like" +
+				value: "*%Intel*"
+		system: ::::
+			arch: ;;
+				op: "=" +
+				value: "*x86_64*"
+		device: ::::
+			op: "=" +
+			driver: "*ioatdma*"
+
+	System with ptdma device:::
+		key_value: ::::
+				op: "=" +
+				name: "*VIRT_IOMMU*" +
+				value: "*1*" +
+		cpu: ::::
+			vendor: ;;
+				op: "like" +
+				value: "*%AMD*"
+		system: ::::
+			arch: ;;
+				op: "=" +
+				value: "*x86_64*"
+		device: ::::
+			op: "=" +
+			driver: "*ptdma*"
+
+
+'''
+
+Included in the test directories are files containing
+beaker-job xml hostRequires snippets that can be passed
+the the beaker command line system-list tool to find
+the systems:
+
+.bkr system-list use
+====
+
+----
+bkr system-list --free --status=Automated --xml-filter="$(<hw-enablement/dmaengine/dmatest/iaa-hostreq.xml)"
+----
+
+====
