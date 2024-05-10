@@ -30,7 +30,10 @@ if ! kernel_automotive; then
 fi
 
 if [ -z "$PARAM_SEC" ]; then
-    PARAM_SEC=300
+    # For details: https://issues.redhat.com/browse/RHEL-34758
+    # Limit the duration to 30s to avoid any rcu starvation warnings, the
+    # default timeout for rcu stall is 60s.
+    PARAM_SEC=30
 fi
 if [ -z "$PARAM_GROUPS" ]; then
     PARAM_GROUPS=1
