@@ -1,0 +1,6 @@
+verify softlockup detector is enabled and working as expected, that is can report the softlockup into the dmesg including the context info.
+
+PARAMETERS
+TIMEOUT - seconds for the hogger thread to run
+SCHEDULER_CLASS -sched class: FIFO, RR or NORMAL
+SCHED_PRIORITY - for FIFO and RR, 1-99
