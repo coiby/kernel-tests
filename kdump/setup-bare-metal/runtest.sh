@@ -30,7 +30,13 @@ SetupKdump()
         GetHWInfo
         [[ "${K_ARCH}" =~ i.86|x86_64 ]] && GetBiosInfo
 
-        # Kexec-tools is not installed by default on Fedora
+        # Check if kexec-tools or kdump-utils is installed by default
+        # Since RHEL-10,kdump-utils is the kdump main package.
+        if $IS_RHEL; then
+            rpm -q --quiet ${MAIN_RPM_PACKAGE} || FatalError "Did not install the kdump main pacakge ${MAIN_RPM_PACKAGE} by default!"
+        fi
+
+        # kdump main package is not installed by default on Fedora
         $IS_FC && PrepareKdump
 
         # In ia64 arch, the path of vmlinuz is /boot/efi/efi/redhat, it different with other arch.
@@ -135,8 +141,10 @@ SetupKdump()
         [ "${retval}" -eq 0 ] && break
         sleep 60
     done
-    # show kexec-tools & crash version after pkginstall
-    LogRun "rpm -q kexec-tools crash ${K_NAME/-core}"
+    # Show kernel,kexec-tools,kdump-utils,crash version after pkginstall
+    # Since RHEL-10,kexec-tools is split into kexec-tools,kdump-utils and makedumpfile.
+    # kdump-utils depends on kexec-tools and makedumpfile.
+    LogRun "rpm -q kexec-tools kdump-utils makedumpfile crash ${K_NAME/-core}"
     LogRun "uname -r"
     LogRun "cat /proc/cmdline"
     Log "Total system memory: $(lshw -short | grep -i "System Memory" | awk '{print $3}')"

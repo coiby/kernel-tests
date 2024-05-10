@@ -93,9 +93,10 @@ else
 fi
 
 export FAMILY RELEASE ARCH
-export IS_RHEL5 IS_RHEL6 IS_RHEL7 IS_RHEL8 IS_RHEL9
+export IS_RHEL5 IS_RHEL6 IS_RHEL7 IS_RHEL8 IS_RHEL9 IS_RHEL10
 export IS_FC IS_RHEL IS_COS
 export IS_RT IS_DB IS_64K
+export MAIN_RPM_PACKAGE
 
 export IS_CentOS9=false
 export IS_CentOS8=false
@@ -111,9 +112,17 @@ fi
 [[ "$FAMILY" =~ [a-zA-Z]+7 ]] && IS_RHEL7=true || IS_RHEL7=false
 [[ "$FAMILY" =~ RedHatEnterpriseLinux8 ]] && IS_RHEL8=true || IS_RHEL8=false
 [[ "$FAMILY" =~ RedHatEnterpriseLinux9 ]] && IS_RHEL9=true || IS_RHEL9=false
+[[ "$FAMILY" =~ RedHatEnterpriseLinux10 ]] && IS_RHEL10=true || IS_RHEL10=false
 [[ "$FAMILY" =~ Fedora ]] && IS_FC=true || IS_FC=false
 [[ "$FAMILY" =~ CentOS ]] && IS_COS=true || IS_COS=false
 [[ "$FAMILY" =~ RedHatEnterpriseLinux ]] && IS_RHEL=true || IS_RHEL=false
+
+# Since RHEL-10,the main kdump package is kdump-utils.
+if $IS_RHEL10 || $IS_FC; then
+    MAIN_RPM_PACKAGE="kdump-utils"
+else
+    MAIN_RPM_PACKAGE="kexec-tools"
+fi
 
 $IS_COS && {
     rpm -qa | grep glibc | grep -q 'el9' && IS_CentOS9=true
@@ -510,18 +519,18 @@ CheckEnv()
 PrepareKdump()
 {
     # install kdump package and related packages required for testing kdump functionalities.
-    rpm -q --quiet kexec-tools || {
-        InstallPackages kexec-tools || return 1
+    rpm -q --quiet ${MAIN_RPM_PACKAGE} || {
+        InstallPackages ${MAIN_RPM_PACKAGE} || return 1
         LogRun "systemctl enable kdump.service" || LogRun "chkconfig kdump on"
         # Back up configurations if kexec-tools is installed for the first time
         BackupKdumpConfig
     }
     if $IS_FC && $UPGRADE_FC_KDUMP; then
-        Log "[UPGRADE_FC_KDUMP=true] Upgrading kexec-tools dracut systemd on Fedora rawhide."
-        UpgradePackages kexec-tools dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
+        Log "[UPGRADE_FC_KDUMP=true] Upgrading ${MAIN_RPM_PACKAGE} dracut systemd on Fedora rawhide."
+        UpgradePackages ${MAIN_RPM_PACKAGE} dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
 
         #It's fine it fails to restart as on FC crashkernel is not reserved by default. Need futher updating kernel options.
-        Log "Rebuild Kdump img in case dracut/systed updated"
+        Log "Rebuild Kdump img in case dracut/systemd updated"
         LogRun "kdumpctl rebuild; kdumpctl restart"
     fi
     return 0
