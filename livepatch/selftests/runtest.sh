@@ -148,6 +148,14 @@ build_selftests()
 	EXEC_DIR=$(pwd)/tools/testing/selftests
 }
 
+build_selftests_modules_rhel10()
+{
+	# Build the test needed modules, on rhel-10 only
+	if grep -q 'Red Hat Enterprise Linux 10' /etc/os-release; then
+		make -C test_modules modules
+	fi
+}
+
 install_selftests()
 {
 	rpm -q kernel-selftests-internal && return 0
@@ -236,6 +244,7 @@ submit_log()
 do_livepatch()
 {
 	[ ! -d $EXEC_DIR/livepatch ] && test_fail "$EXEC_DIR/livepatch does not exist" && return 1 || cd $EXEC_DIR/livepatch
+	build_selftests_modules_rhel10
 
 	# Start livepatch test
 	local livepatch_tests=(test-*.sh)
