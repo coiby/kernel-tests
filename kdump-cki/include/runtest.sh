@@ -95,15 +95,17 @@ fi
 
 export IS_RHEL
 export RELEASE
-export RELEASE_MINOR
+export RELEASE_MINOR MAIN_RPM_PACKAGE
 rlIsRHEL 5 && IS_RHEL5=true || IS_RHEL5=false
 rlIsRHEL 6 && IS_RHEL6=true || IS_RHEL6=false
 rlIsRHEL 7 && IS_RHEL7=true || IS_RHEL7=false
 rlIsRHEL 8 && IS_RHEL8=true || IS_RHEL8=false
 rlIsRHEL 9 && IS_RHEL9=true || IS_RHEL9=false
+rlIsRHEL 10 && IS_RHEL10=true || IS_RHEL10=false
 rlIsFedora && IS_FC=true || IS_FC=false
 rlIsCentOS 8 && IS_CentOS8=true || IS_CentOS8=false
 rlIsCentOS 9 && IS_CentOS9=true || IS_CentOS9=false
+rlIsCentOS 10 && IS_CentOS10=true || IS_CentOS10=false
 [[ "$FAMILY" =~ CentOSStream ]] && IS_COS=true || IS_COS=false
 [[ "$FAMILY" =~ RedHatEnterpriseLinux ]] && IS_RHEL=true || IS_RHEL=false
 
@@ -120,6 +122,14 @@ export IS_64K
 uname -v | grep -q PREEMPT_RT && IS_RT=true || IS_RT=false
 uname -r | grep -qE "[-+]debug" && IS_DB=true || IS_DB=false
 uname -r | grep -qE "[-+]64k" && IS_64K=true || IS_64K=false
+
+# Since RHEL-10,the main kdump package is kdump-utils.
+# kexec-tools is split into kexec-tools,kdump-utils and makedumpfile.
+if $IS_RHEL10 || $IS_FC || $IS_CentOS10; then
+    MAIN_RPM_PACKAGE="kdump-utils"
+else
+    MAIN_RPM_PACKAGE="kexec-tools"
+fi
 
 if $IS_RHEL5; then
     INITRD_PREFIX=initrd
@@ -453,31 +463,35 @@ ClearReport()
 
 #  Common Kdump/Crash Functions
 
-# Install/Upgrade Kexec-tools and related packages
+#  On Fedora,install/Upgrade kdump main package and related packages
 PrepareKdump()
 {
-    Log "Install kexec-tools and related packages"
-    rpm -q --quiet kexec-tools || {
-        # On Fedora, kexec-tools is not installed by default.
-        # Install kexec-tools and enable kdump service.
-        InstallPackages kexec-tools
-        rpm -q kexec-tools || {
-            Log "- Aborting test as kexec-tools couldn't be installed"
-            rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-            rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-            exit 1
-        }
-        systemctl enable kdump.service || chkconfig kdump on
+    Log "Check if installed the kdump main package"
+    rpm -q --quiet ${MAIN_RPM_PACKAGE} || {
+        if $IS_FC; then
+            # On Fedora, kdump main package is not installed by default.
+            # Install kdump main package and enable kdump service.
+            InstallPackages ${MAIN_RPM_PACKAGE}
+            rpm -q ${MAIN_RPM_PACKAGE} || {
+                Log "- Aborting test as ${MAIN_RPM_PACKAGE} couldn't be installed"
+                rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+                exit 1
+            }
+            systemctl enable kdump.service || chkconfig kdump on
 
-        # Back up configurations if kexec-tools is installed for the first time
-        BackupKdumpConfig
-    }
+            # Back up configurations if kexec-tools is installed for the first time
+            BackupKdumpConfig
 
-    # Try upgrading kexec-tools to the latest version if on FC.
-    # If it fails, still use the kexec-tools from the default repo.
-    if $IS_FC && $UPGRADE_FC_KDUMP; then
-        UpgradePackages kexec-tools dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
+            # Try upgrading kdump main package to the latest version if on FC.
+            # If it fails, still use the kdump main package from the default repo.
+            if $IS_FC && $UPGRADE_FC_KDUMP; then
+                UpgradePackages ${MAIN_RPM_PACKAGE} dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
+            fi
+    else
+        FatalError "Did not install the kdump main package ${MAIN_RPM_PACKAGE} by default!"
     fi
+    }
 }
 
 # Install/Upgrade Crash and related packages
@@ -556,8 +570,11 @@ SetupKdump()
     done
 
     ReportSystemInfo
+
+    # Since RHEL-10,kexec-tools is split into kexec-tools,kdump-utils and makedumpfile.
+    # kdump-utils depends on kexec-tools and makedumpfile.
     Log "Packages versions:"
-    uname -r; rpm -q kexec-tools systemd dracut
+    uname -r; rpm -q kdump-utils kexec-tools makedumpfile systemd dracut
 
     Log "Kernel cmdline and crash memory reservation"
     cat /proc/cmdline
