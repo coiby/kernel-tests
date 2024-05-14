@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2076
-#
+# -*- mode: Shell-script; sh-shell: bash; sh-basic-offset: 4; sh-indentation: 4; coding: utf-8-unix; indent-tabs-mode: t; ruler-mode-show-tab-stops: t; tab-width: 4 -*-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Copyright (c) 2024 Red Hat, Inc
@@ -130,7 +130,11 @@ cleanup_test_env ()
 setup_sys ()
 {
 	export dmachans=()
-	modprobe -q dmatest
+	modprobe -q dmatest wait=1
+	if [[ "$(uname -r)" =~ "+debug" ]]; then
+	    # disable pr_debug messages
+	    echo "-p" > /sys/kernel/debug/dynamic_debug/control
+	fi
 }
 
 cleanup_sys ()
@@ -191,8 +195,8 @@ check_dmatest_results ()
 	local numres
 	local passes
 
-	# let the system log settle
-	sleep 2
+	# let the test run finish and settle
+	cat /sys/module/dmatest/parameters/wait
 
 	numres=$(dmesg | grep dmatest | grep -c summary)
 	passes=$(dmesg | grep dmatest | grep summary |	grep -c " 0 failures")
