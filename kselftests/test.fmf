@@ -7,30 +7,31 @@ component:
 test: bash ./runtest.sh
 framework: beakerlib
 require:
-  - beakerlib
-  - tar
   - autoconf
   - automake
-  - wget
+  - beakerlib
   - bison
   - bpftool
-  - flex
-  - python3
-  - llvm
-  - iproute-tc
   - clang
-  - jq
   - ethtool
+  - flex
+  - iproute-tc
+  - jq
+  - llvm
   - net-tools
   - nmap-ncat
+  - python3
+  - tar
+  - wget
 recommend:
-  - netsniff-ng
-  - valgrind
-  - numactl-libs
-  - socat
+  - fusermount
   - iperf3
+  - netsniff-ng
+  - numactl-libs
   - scapy
+  - socat
   - tcpdump
+  - valgrind
 duration: 24h
 extra-summary: kselftests
 extra-task: kselftests
