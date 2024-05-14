@@ -38,10 +38,8 @@ rlJournalStart
         grubby --info=DEFAULT
         if [ ! ${RSTRNT_REBOOTCOUNT} -gt 0 ]; then
             if [ -e /sys/devices/soc0/machine ]; then
-                CMDLINEARGS="ima_policy=tcb"
-                rlRun "add_aboot_param"
-                CMDLINEARGS="ima_template_fmt=d"
-                rlRun "add_aboot_param"
+                rlRun "add_aboot_param ima_policy=tcb"
+                rlRun "add_aboot_param ima_template_fmt=d"
             elif stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm-ostree kargs --append-if-missing=ima_policy=tcb --append-if-missing=ima_template_fmt=d --import-proc-cmdline
             else
@@ -49,7 +47,7 @@ rlJournalStart
                 grubby --args="ima_template_fmt=d" --update-kernel=DEFAULT
             fi
             [[ $(uname -m) == "s390x" ]] && zipl
-            rhts-reboot
+            rstrnt-reboot
         elif [ ${RSTRNT_REBOOTCOUNT} -eq 1 ]; then
             rlRun "cat /proc/cmdline | tee proc_cmdline.txt"
             rlFileSubmit proc_cmdline.txt
@@ -61,10 +59,8 @@ rlJournalStart
     rlPhaseStartCleanup
         if [ ! ${RSTRNT_REBOOTCOUNT} -gt 1 ]; then
         if [ -e /sys/devices/soc0/machine ]; then
-                CMDLINEARGS="ima_policy=tcb"
-                rlRun "remove_aboot_param"
-                CMDLINEARGS="ima_template_fmt=d"
-                rlRun "remove_aboot_param"
+                rlRun "remove_aboot_param ima_policy=tcb"
+                rlRun "remove_aboot_param ima_template_fmt=d"
             elif stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm-ostree kargs --delete-if-present=ima_policy=tcb --delete-if-present=ima_template_fmt=d --import-proc-cmdline
             else
@@ -72,7 +68,7 @@ rlJournalStart
                 grubby --remove-args="ima_template_fmt=d" --update-kernel=DEFAULT
             fi
             [[ $(uname -m) == "s390x" ]] && zipl
-            rhts-reboot
+            rstrnt-reboot
         fi
     rlPhaseEnd
 rlJournalEnd

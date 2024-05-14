@@ -7,7 +7,14 @@ component:
 path: /security/integrity/1847219
 test: make run
 framework: beakerlib
-require: [grubby, make]
+require:
+    - grubby
+    - make
+    - abootimg
+    - type: file
+      pattern:
+          - /kernel-include
+          - /cmdline_helper
 duration: 12m
 extra-summary: /kernel-tests/security/integrity/1847219
 extra-task: /kernel-tests/security/integrity/1847219
