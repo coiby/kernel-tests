@@ -63,6 +63,18 @@ check_skipped_tests()
 	return 1
 }
 
+install_kernel_devel()
+{
+	# Install kernel-devel for its Modules.symvers file
+	if debug_kernel; then
+		devel="kernel-debug-devel"
+	else
+		devel="kernel-devel"
+	fi
+	yum install -q -y ${devel}-${kver}-${krel} \
+	   || yum install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${devel}-${kver}-${krel}.${karch}.rpm
+}
+
 # build test modules from sources and change EXEC_DIR to kernel source tree
 build_selftests()
 {
@@ -78,14 +90,7 @@ build_selftests()
 	fi
 	rpm -ivh kernel-${kver}-${krel}.src.rpm
 
-	# Install kernel-devel for its Modules.symvers file
-	if debug_kernel; then
-		devel="kernel-debug-devel"
-	else
-		devel="kernel-devel"
-	fi
-	yum install -q -y ${devel}-${kver}-${krel} \
-	   || yum install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${devel}-${kver}-${krel}.${karch}.rpm
+	install_kernel_devel
 
 	# Add a backports as needed, backports/* directories hold fixes
 	# for kernels greater or equal to the directory name and only
@@ -146,6 +151,18 @@ build_selftests()
 
 	# change EXEC_DIR to kernel source tree
 	EXEC_DIR=$(pwd)/tools/testing/selftests
+}
+
+build_selftests_modules_rhel10()
+{
+	# Build the test needed modules, on rhel-10 only
+	if grep -q 'Red Hat Enterprise Linux 10' /etc/os-release; then
+		rpm -q kernel-devel-`uname -r` || install_kernel_devel
+		make -C test_modules modules
+		if [ "$?" -ne 0 ]; then
+			test_fail "Build the needed modules failed, abort test." && exit 1
+		fi
+	fi
 }
 
 install_selftests()
@@ -236,6 +253,7 @@ submit_log()
 do_livepatch()
 {
 	[ ! -d $EXEC_DIR/livepatch ] && test_fail "$EXEC_DIR/livepatch does not exist" && return 1 || cd $EXEC_DIR/livepatch
+	build_selftests_modules_rhel10
 
 	# Start livepatch test
 	local livepatch_tests=(test-*.sh)
