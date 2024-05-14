@@ -159,7 +159,7 @@ build_selftests_modules_rhel10()
 	if grep -q 'Red Hat Enterprise Linux 10' /etc/os-release; then
 		rpm -q kernel-devel-`uname -r` || install_kernel_devel
 		make -C test_modules modules
-		if [ ! $? -eq 0 ]; then
+		if [ "$?" -ne 0 ]; then
 			test_fail "Build the needed modules failed, abort test." && exit 1
 		fi
 	fi
