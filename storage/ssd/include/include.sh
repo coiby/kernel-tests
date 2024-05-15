@@ -1,11 +1,12 @@
 #!/bin/bash
 
-FILE=$(readlink -f $BASH_SOURCE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname $FILE)
 . $CDIR/../../../cki_lib/libcki.sh
 . $CDIR/../../include/bash_modules/lxt/include.sh || exit 200
 
 [ -f /root/TEST_DEVS ] && TEST_DEVS=$(cat /root/TEST_DEVS)
+# shellcheck disable=SC2034
 [ -f /root/TEST_DEVS_LIST ] && TEST_DEVS_LIST=$(cat /root/TEST_DEVS_LIST)
 
 if [ -z "$TEST_DEVS" ]; then
