@@ -4,17 +4,6 @@
 . ../../../include/runtest.sh || exit 1
 
 export TEST="rt-tests/us/rtla/rtla-osnoise"
-export result_r="PASS"
-
-function check_status()
-{
-    if [ $? -eq 0 ]; then
-        echo ":: $* :: PASS ::" | tee -a $OUTPUTFILE
-    else
-        result_r="FAIL"
-        echo ":: $* :: FAIL ::" | tee -a $OUTPUTFILE
-    fi
-}
 
 function runtest()
 {
@@ -25,40 +14,19 @@ function runtest()
         exit 0
     fi
 
-    echo "Package rtla-osnoise sanity test:" | tee -a $OUTPUTFILE
-    rpm -q --quiet rtla || yum install -y rtla || {
-        echo "Install rtla failed" | tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST "WARN" 0
-        exit 1
-    }
+    oneliner "yum install -y rtla"
 
-    echo "-- rtla-osnoise: verify help page -------------------" | tee -a $OUTPUTFILE
-    rtla osnoise --help
-    check_status "rtla osnoise --help"
+    # verify help page
+    oneliner "rtla osnoise --help"
 
-    echo "-- rtla-osnoise:  rtla-osnoise top test---------------" | tee -a $OUTPUTFILE
-    rtla osnoise top -P F:1 -c 0 -r 900000 -d 1M -q
-    check_status "rtla osnoise top -P F:1 -c 0 -r 900000 -d 1M -q"
-
-    echo "-- rtla-osnoise:  rtla-osnoise top test---------------" | tee -a $OUTPUTFILE
-    rtla osnoise top -s 30 -T 1 -t
-    check_status "rtla osnoise top -s 30 -T 1 -t"
-
-    echo "-- rtla-osnoise:  rtla-osnoise hist test---------------" | tee -a $OUTPUTFILE
-    rtla osnoise hist -s 30 -T 1 -t
-    check_status "rtla osnoise hist -s 30 -T 1 -t"
-
-    echo "-- rtla-osnoise:  rtla-osnoise hist test---------------" | tee -a $OUTPUTFILE
-    rtla osnoise hist -P F:1 -c 0 -r 900000 -d 1M -b 10 -E 25
-    check_status "rtla osnoise hist -P F:1 -c 0 -r 900000 -d 1M -b 10 -E 25"
-
-    if [ $result_r = "PASS" ]; then
-        echo "Overall result: PASS" | tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST "PASS" 0
-    else
-        echo "Overall result: FAIL" | tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST "FAIL" 1
-    fi
+    # rtla-osnoise top test: verify the --priority/-P param
+    oneliner "rtla osnoise top -P F:1 -c 0 -r 900000 -d 1M -q"
+    # rtla-osnoise top test: verify the --stop/-s param
+    oneliner "rtla osnoise top -s 30 -T 1 -t"
+    # rtla-osnoise hist test: verify the  --trace param
+    oneliner "rtla osnoise hist -s 30 -T 1 -t"
+    # rtla-osnoise hist test: verify the --entries/-E param
+    oneliner "rtla osnoise hist -P F:1 -c 0 -r 900000 -d 1M -b 10 -E 25"
 }
 
 if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
