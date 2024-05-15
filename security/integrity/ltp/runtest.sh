@@ -23,6 +23,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../kernel-include/runtest.sh || exit 1
+. ../../../cmdline_helper/libcmd.sh || exit 1
 GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/ltp.git"}
 
 rlJournalStart
@@ -38,11 +39,18 @@ rlJournalStart
 
         grubby --info=DEFAULT
         if [ ! -f ./REBOOT ]; then
-            grubby --args="ima_tcb" --update-kernel=DEFAULT
-            grubby --args="ima_appraise=fix" --update-kernel=DEFAULT
+            if [ -e /sys/devices/soc0/machine ]; then
+                rlRun "add_aboot_param ima_tcb"
+                rlRun "add_aboot_param ima_appraise=fix"
+            elif stat /run/ostree-booted > /dev/null 2>&1; then
+                rpm-ostree kargs --append-if-missing=ima_tcb --append-if-missing=ima_appraise=fix --import-proc-cmdline
+            else
+                grubby --args="ima_tcb" --update-kernel=DEFAULT
+                grubby --args="ima_appraise=fix" --update-kernel=DEFAULT
+            fi
             [[ $(uname -m) == "s390x" ]] && zipl
             touch ./REBOOT
-            rhts-reboot
+            rstrnt-reboot
         else
             rlRun "cat /proc/cmdline | tee proc_cmdline.txt"
             rlFileSubmit proc_cmdline.txt

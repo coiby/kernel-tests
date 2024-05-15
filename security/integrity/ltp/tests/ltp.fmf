@@ -7,7 +7,35 @@ component:
 path: /security/integrity/ltp
 test: make run
 framework: beakerlib
-require: [autoconf,automake,bison,elfutils-libelf-devel,flex,gcc,git,glibc-headers,kernel-headers,keyutils-libs-devel,libacl-devel,libcap-devel,libselinux-devel,libtirpc-devel,lksctp-tools-devel,m4,make,numactl-devel,openssl,openssl-devel,pkgconf,xfsprogs-devel]
+require: 
+    - autoconf
+    - automake
+    - bison
+    - elfutils-libelf-devel
+    - flex
+    - gcc
+    - git
+    - glibc-headers
+    - kernel-headers
+    - keyutils-libs-devel
+    - libacl-devel
+    - libcap-devel
+    - libselinux-devel
+    - libtirpc-devel
+    - lksctp-tools-devel
+    - m4
+    - make
+    - numactl-devel
+    - openssl
+    - openssl-devel
+    - pkgconf
+    - xfsprogs-devel
+    - abootimg
+    - grubby
+    - type: file
+      pattern:
+          - /kernel-include
+          - /cmdline_helper
 duration: 5h
 extra-summary: /kernel-tests/security/integrity/ltp
 extra-task: /kernel-tests/security/integrity/ltp
