@@ -85,14 +85,19 @@ KexecTest(){
     CheckKexecResult "${kdump_file}" "$func_kdump_file"
     LogRun "kexec -s -p -u"
 
-    # Expect kexec_load() to be called for kexec/kdump without "-s"
-    LogRun "$cmd_load -c > ${kexec_load} 2>&1"
-    CheckKexecResult "${kexec_load}" "$func_kexec_load"
-    LogRun "kexec -c -u"
+    # 'kexec -c' - tested on RHEL8 and RHEL9
+    #  For RHEL9,it is deprecated since RHEL-9.2(bz2113873#2)
+    #  RHEL-7 does not support '-c' option
+    if $IS_RHEL8 || $IS_RHEL9; then
+        # Expect kexec_load() to be called for kexec/kdump without "-s"
+        LogRun "$cmd_load -c > ${kexec_load} 2>&1"
+        CheckKexecResult "${kexec_load}" "$func_kexec_load"
+        LogRun "kexec -c -u"
 
-    LogRun "$cmd_panic -c > ${kdump_load} 2>&1"
-    CheckKexecResult "${kdump_load}" "$func_kdump_load"
-    LogRun "kexec -c -p -u"
+        LogRun "$cmd_panic -c > ${kdump_load} 2>&1"
+        CheckKexecResult "${kdump_load}" "$func_kdump_load"
+        LogRun "kexec -c -p -u"
+    fi
 
     LogRun "kdumpctl reload"
 }

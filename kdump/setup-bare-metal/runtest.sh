@@ -33,7 +33,7 @@ SetupKdump()
         # Check if kexec-tools or kdump-utils is installed by default
         # Since RHEL-10,kdump-utils is the kdump main package.
         if $IS_RHEL; then
-            rpm -q --quiet ${MAIN_RPM_PACKAGE} || FatalError "Did not install the kdump main pacakge ${MAIN_RPM_PACKAGE} by default!"
+            rpm -q --quiet ${MAIN_RPM_PACKAGE} || FatalError "Did not install the kdump main package ${MAIN_RPM_PACKAGE} by default!"
         fi
 
         # kdump main package is not installed by default on Fedora
