@@ -88,33 +88,35 @@ check_dma_faults "${DMA_TESTNAME}-pre-test"
 
 setup_sys
 
-# Test using dma channels and dmatest module
+# Single-threaded test using dma channels and dmatest module
 case "${DMA_MODNAME}" in
 	"idxd")
 		dmaengine_enable "dsa0" "wq0.0" "engine0.0"
 		dmaengine_test "dsa0" "wq0.0" 3000 1000 0 1 "${DMA_TESTNAME}-memcpy-1-thread"
 		dmaengine_disable "dsa0" "wq0.0"
-
-		if ! test -z "${DMATEST_MULTITHREADS}"; then
-			cleanup_sys
-			setup_sys
-
-			dmaengine_enable "dsa0" "wq0.0" "engine0.0"
-			dmaengine_test "dsa0" "wq0.0" 3000 1000 0 "${DMATEST_MULTITHREADS}" "${DMA_TESTNAME}-memcpy-${DMATEST_MULTITHREADS}-threads"
-			dmaengine_disable "dsa0" "wq0.0"
-		fi
 		;;
 	"ioatdma" | "ptdma")
 		driverCheck "${DMA_MODNAME}"
 		dmatest_run 3000 1000 0 1 "${DMA_TESTNAME}-memcpy-1-thread"
-		if ! test -z "${DMATEST_MULTITHREADS}"; then
-			dmatest_run 3000 1000 0 "${DMATEST_MULTITHREADS}" "${DMA_TESTNAME}-memcpy-${DMATEST_MULTITHREADS}-threads"
-		fi
 		;;
 	*)
 		test_complete "${DMA_TESTNAME}" "SKIP" "DMA_MODNAME ${DMA_MODNAME} is not recognized"
 		;;
 esac
+
+# multithreaded test with dmatest for ioatdma and idxd
+if ! test -z "${DMATEST_MULTITHREADS}"; then
+	if test "${DMA_MODNAME}" = "idxd"; then
+		cleanup_sys
+		setup_sys
+
+		dmaengine_enable "dsa0" "wq0.0" "engine0.0"
+		dmaengine_test "dsa0" "wq0.0" 3000 1000 0 "${DMATEST_MULTITHREADS}" "${DMA_TESTNAME}-memcpy-${DMATEST_MULTITHREADS}-threads"
+		dmaengine_disable "dsa0" "wq0.0"
+	elif test "${DMA_MODNAME}" = "ioatdma"; then
+		dmatest_run 3000 1000 0 "${DMATEST_MULTITHREADS}" "${DMA_TESTNAME}-memcpy-${DMATEST_MULTITHREADS}-threads"
+	fi
+fi
 
 cleanup_sys
 grub_cleanup
