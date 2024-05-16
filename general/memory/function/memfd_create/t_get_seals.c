@@ -1,8 +1,27 @@
-#include <linux/fcntl.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#ifndef F_SEAL_SEAL
+# define F_SEAL_SEAL     0x0001  /* prevent further seals from being set */
+#endif
+#ifndef F_SEAL_SHRINK
+# define F_SEAL_SHRINK   0x0002  /* prevent file from shrinking */
+#endif
+#ifndef F_SEAL_GROW
+# define F_SEAL_GROW     0x0004  /* prevent file from growing */
+#endif
+#ifndef F_SEAL_WRITE
+# define F_SEAL_WRITE    0x0008  /* prevent writes */
+#endif
+#ifndef F_ADD_SEALS
+# define F_ADD_SEALS     (1033)
+#endif
+#ifndef F_GET_SEALS
+# define F_GET_SEALS     (1034)
+#endif
 
 #define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
 } while (0)
