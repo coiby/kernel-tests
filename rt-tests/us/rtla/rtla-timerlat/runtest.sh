@@ -25,7 +25,7 @@ function restore_admission_control()
 
 function skip_auto_analysis_test()
 {
-    if rhel_in_range 8.9 8.10 || rhel_in_range 9.3 100; then
+    if rhel_in_range 0 8.8 || rhel_in_range 9.0 9.2; then
         echo "rtla auto_analysis is only supported for RHEL >= 8.9 and >= 9.3"
         return 0
     fi
