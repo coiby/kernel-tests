@@ -9,8 +9,7 @@ function runtest()
 {
     # rtla supports from 8.8 and 9.2
     if rhel_in_range 0 8.7 || rhel_in_range 9.0 9.1; then
-        echo "rtla osnoise is only supported for RHEL >= 8.8 and >= 9.2" || tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST "SKIP" 0
+        rstrnt-report-result "rtla osnoise is only supported for RHEL >= 8.8 and >= 9.2" "SKIP" 0
         exit 0
     fi
 

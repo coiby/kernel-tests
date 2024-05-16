@@ -10,23 +10,23 @@ export SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{prin
 function disable_admission_control()
 {
     log "Disable the admission control"
-    run "sysctl -w kernel.sched_rt_runtime_us=-1"
+    oneliner "sysctl -w kernel.sched_rt_runtime_us=-1"
 }
 
 function restore_admission_control()
 {
     log "Restore the admission control"
     if [ -n "$SCHED_RT_RUNTIME" ]; then
-        run "sysctl -w kernel.sched_rt_runtime_us=$SCHED_RT_RUNTIME"
+        oneliner "sysctl -w kernel.sched_rt_runtime_us=$SCHED_RT_RUNTIME"
     else
-        run "sysctl -w kernel.sched_rt_runtime_us=950000"
+        oneliner "sysctl -w kernel.sched_rt_runtime_us=950000"
     fi
 }
 
 function skip_auto_analysis_test()
 {
     if rhel_in_range 0 8.8 || rhel_in_range 9.0 9.2; then
-        echo "rtla auto_analysis is only supported for RHEL >= 8.9 and >= 9.3"
+        log "rtla auto_analysis is only supported for RHEL >= 8.9 and >= 9.3"
         return 0
     fi
     return 1
@@ -35,8 +35,7 @@ function skip_auto_analysis_test()
 function runtest()
 {
     if rhel_in_range 0 8.7 || rhel_in_range 9.0 9.1; then
-        echo "rtla timerlat is only supported for RHEL >= 8.8 and >= 9.2" || tee -a $OUTPUTFILE
-        rstrnt-report-result $TEST "SKIP" 0
+        rstrnt-report-result "rtla timerlat is only supported for RHEL >= 8.8 and >= 9.2" "SKIP" 0
         exit 0
     fi
 
