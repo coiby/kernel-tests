@@ -29,6 +29,8 @@
 . /usr/bin/rhts-environment.sh
 
 TEST="/kernel/livepatch/sysfs"
+LIVEPATCH_TEST_MODULES="/usr/libexec/kselftests/livepatch/test_modules"
+OS_RELEASE="/etc/os-release"
 
 KLP_SYSFS="/sys/kernel/livepatch"
 KLP_MODULE="test_klp_callbacks_demo"
@@ -56,13 +58,40 @@ test_pass()
 	rstrnt-report-result $TEST "PASS" 0
 }
 
-modules="kernel-modules-internal"
-echo "Install $modules package"
-dnf install -q -y ${modules}-${kver}-${krel} \
-	|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
-rpm -q $modules || { test_fail "Could not install $modules" && exit 1; }
-klp_module_file=$(modinfo $KLP_MODULE | head -n 1 | awk '{print $2}')
-busy_module_file=$(modinfo $BUSY_MODULE | head -n 1 | awk '{print $2}')
+is_rhel9()
+{
+	if grep -q 'Red Hat Enterprise Linux 9' $OS_RELEASE; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+install_internal_packages()
+{
+	local modules="$1"
+	echo "Install $modules package"
+	dnf install -q -y ${modules}-${kver}-${krel} \
+		|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
+	rpm -q $modules || { test_fail "Could not install $modules" && exit 1; }
+}
+
+build_selftest_klp_modules()
+{
+	install_internal_packages kernel-selftests-internal
+	make -C $LIVEPATCH_TEST_MODULES modules
+	[ "$?" -eq 0 ] || { test_fail "Build modules failed" && exit 1; }
+}
+
+if is_rhel9; then
+	install_internal_packages kernel-modules-internal
+	klp_module_file=$(modinfo $KLP_MODULE | head -n 1 | awk '{print $2}')
+	busy_module_file=$(modinfo $BUSY_MODULE | head -n 1 | awk '{print $2}')
+else
+	build_selftest_klp_modules
+	klp_module_file="$LIVEPATCH_TEST_MODULES/$KLP_MODULE.ko"
+	busy_module_file="$LIVEPATCH_TEST_MODULES/$BUSY_MODULE.ko"
+fi
 
 echo "Trigger livepatch stall transition with $klp_module_file" | tee -a $OUTPUTFILE
 insmod $busy_module_file block_transition=Y
