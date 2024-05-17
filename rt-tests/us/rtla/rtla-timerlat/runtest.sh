@@ -6,7 +6,8 @@
 export TEST="rt-tests/us/rtla/rtla-timerlat"
 export SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
 
-# timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it, restore the .
+# timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it.
+# restore the param after the timerlat test.
 function restore_admission_control()
 {
     if [ -n "$SCHED_RT_RUNTIME" ]; then
