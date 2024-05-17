@@ -6,20 +6,13 @@
 export TEST="rt-tests/us/rtla/rtla-timerlat"
 export SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
 
-# timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it.
-function disable_admission_control()
-{
-    log "Disable the admission control"
-    oneliner "sysctl -w kernel.sched_rt_runtime_us=-1"
-}
-
+# timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it, restore the .
 function restore_admission_control()
 {
-    log "Restore the admission control"
     if [ -n "$SCHED_RT_RUNTIME" ]; then
-        oneliner "sysctl -w kernel.sched_rt_runtime_us=$SCHED_RT_RUNTIME"
+        sysctl -w kernel.sched_rt_runtime_us=$SCHED_RT_RUNTIME
     else
-        oneliner "sysctl -w kernel.sched_rt_runtime_us=950000"
+        sysctl -w kernel.sched_rt_runtime_us=950000
     fi
 }
 
@@ -52,7 +45,7 @@ function runtest()
 
     if ! skip_auto_analysis_test; then
         # rtla-timerlat top: Set the automatic trace mode
-        oneliner "rtla timerlat top -a 5  --dump-tasks"
+        oneliner "rtla timerlat top -a 5 --dump-tasks"
         # Print the auto-analysis if hits the stop tracing condition
         oneliner "rtla timerlat top --aa-only 5"
         # disable auto-analysis
@@ -65,10 +58,11 @@ function runtest()
     # rtla-timerlat hist test in nanoseconds
     oneliner "rtla timerlat hist -i 2 -c 0 -n -d 30s"
 
-    log "rtla-timerlat hist test: verify -P/--priority"
-    disable_admission_control
-    oneliner "rtla timerlat hist -d 30s -c 0 -P d:100us:1ms"
-    restore_admission_control
+    phase_start_test "rtla-timerlat hist test: verify -P/--priority"
+    run "sysctl -w kernel.sched_rt_runtime_us=-1" 0 "verify the disabled admission control"
+    run "rtla timerlat hist -d 30s -c 0 -P d:100us:1ms"
+    run "restore_admission_control"
+    phase_end
 }
 
 if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
