@@ -287,6 +287,37 @@ ValidateCrashOutput()
     #0 [c0000001f3a1b810] .creds_are_invalid at c0000000001630c4
     echo "- 'creds_are_invalid'"
 
+    # crash> bt -r
+    # ...
+    # c0000007ed8b2be0:  rmqueue_bulk.constprop.25+192 fail_page_alloc
+    echo "- 'fail_page_alloc'"
+
+    # On Fedora32
+    # crash> help -v
+    # ...
+    # pageflags_data:
+    # ...
+    #   [8] 00000100: error
+    echo "- '00000100: error'"
+
+    # On RHEL10
+    # crash> help -v
+    # ...
+    # pageflags_data:
+    # ...
+    #   [2] 00000400: error
+    echo "- '00000400: error'"
+
+    # On RHEL9
+    # crash> help -n
+    # ...
+    # sub_header_kdump: 562feebe11f0
+    # ...
+    # size_vmcoreinfo: 2972 (0xb9c)
+    #       OFFSET(printk_ringbuffer.fail)=72
+    echo "- 'printk_ringbuffer.fail'"
+
+
     Log "Search patterns for potential errors."
 
     echo "- 'fail'"
@@ -316,29 +347,6 @@ ValidateCrashOutput()
     echo "- 'dev: -D option not supported or applicable on this architecture or kernel'"
     # dev -p is supported on RHEL5 and RHEL8.
     echo "- 'dev: -p option not supported or applicable on this architecture or kernel'"
-
-    # crash> bt -r
-    # ...
-    # c0000007ed8b2be0:  rmqueue_bulk.constprop.25+192 fail_page_alloc
-    echo "- 'fail_page_alloc'"
-
-    # On Fedora32
-    # crash> help -v
-    # ...
-    # pageflags_data:
-    # ...
-    #   [8] 00000100: error
-    echo "- '00000100: error'"
-
-    # On RHEL9
-    # crash> help -n
-    # ...
-    # sub_header_kdump: 562feebe11f0
-    # ...
-    # size_vmcoreinfo: 2972 (0xb9c)
-    #       OFFSET(printk_ringbuffer.fail)=72
-    echo "- 'printk_ringbuffer.fail'"
-
 
     # Skip false warnings.
     #   mod: cannot find or load object file for crasher/altsysrq module
@@ -443,6 +451,7 @@ ValidateCrashOutput()
          -e 'failslab' \
          -e 'creds_are_invalid' \
          -e '00000100: error' \
+         -e '00000400: error' \
          -e 'printk_ringbuffer.fail' \
          "${cmd_output_file}" |
     if [ -n "${SKIP_ERROR_PAT}" ]; then grep -v -e "${SKIP_ERROR_PAT}"; else cat; fi |
