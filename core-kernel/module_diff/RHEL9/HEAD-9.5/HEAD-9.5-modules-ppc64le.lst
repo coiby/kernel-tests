@@ -683,6 +683,7 @@ ledtrig-camera.ko
 ledtrig-default-on.ko
 ledtrig-gpio.ko
 ledtrig-heartbeat.ko
+ledtrig-netdev.ko
 ledtrig-oneshot.ko
 ledtrig-timer.ko
 ledtrig-transient.ko
@@ -989,11 +990,13 @@ nouveau.ko
 nozomi.ko
 ntc_thermistor.ko
 null_blk.ko
+nvme-auth.ko
 nvme-common.ko
 nvme-core.ko
 nvme-fabrics.ko
 nvme-fc.ko
 nvme-fcloop.ko
+nvme-keyring.ko
 nvme.ko
 nvme-loop.ko
 nvme-rdma.ko
@@ -1005,10 +1008,12 @@ nvmet-tcp.ko
 nvram.ko
 objagg.ko
 octeon_ep.ko
+octeon_ep_vf.ko
 ocxl.ko
 ofpart.ko
 of_pmem.ko
 omninet.ko
+onboard_usb_hub.ko
 opal-prd.ko
 openvswitch.ko
 opticon.ko
@@ -1356,6 +1361,7 @@ team_mode_loadbalance.ko
 team_mode_random.ko
 team_mode_roundrobin.ko
 teranetics.ko
+test_lockup.ko
 tg3.ko
 thmc50.ko
 thunderbolt_net.ko

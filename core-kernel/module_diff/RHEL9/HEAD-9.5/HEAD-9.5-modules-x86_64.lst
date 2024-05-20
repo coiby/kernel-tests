@@ -927,6 +927,7 @@ ledtrig-camera.ko
 ledtrig-default-on.ko
 ledtrig-gpio.ko
 ledtrig-heartbeat.ko
+ledtrig-netdev.ko
 ledtrig-oneshot.ko
 ledtrig-timer.ko
 ledtrig-transient.ko
@@ -1293,11 +1294,13 @@ ntb_transport.ko
 ntc_thermistor.ko
 null_blk.ko
 nvidia-wmi-ec-backlight.ko
+nvme-auth.ko
 nvme-common.ko
 nvme-core.ko
 nvme-fabrics.ko
 nvme-fc.ko
 nvme-fcloop.ko
+nvme-keyring.ko
 nvme.ko
 nvme-loop.ko
 nvme-rdma.ko
@@ -1309,6 +1312,7 @@ nvmet-tcp.ko
 nvsw-sn2201.ko
 objagg.ko
 octeon_ep.ko
+octeon_ep_vf.ko
 omninet.ko
 opa_vnic.ko
 openvswitch.ko
@@ -1394,8 +1398,11 @@ processor_thermal_device.ko
 processor_thermal_device_pci.ko
 processor_thermal_device_pci_legacy.ko
 processor_thermal_mbox.ko
+processor_thermal_power_floor.ko
 processor_thermal_rapl.ko
 processor_thermal_rfim.ko
+processor_thermal_wt_hint.ko
+processor_thermal_wt_req.ko
 psample.ko
 psnap.ko
 ptdma.ko
@@ -1408,6 +1415,7 @@ pwc.ko
 pwm-lpss.ko
 pwm-lpss-pci.ko
 pwm-lpss-platform.ko
+qat_420xx.ko
 qat_4xxx.ko
 qat_c3xxx.ko
 qat_c3xxxvf.ko
@@ -2002,6 +2010,7 @@ team_mode_random.ko
 team_mode_roundrobin.ko
 tee.ko
 teranetics.ko
+test_lockup.ko
 tg3.ko
 think-lmi.ko
 thinkpad_acpi.ko

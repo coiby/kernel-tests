@@ -512,11 +512,13 @@ nls_koi8-ru.ko
 nls_koi8-u.ko
 nls_utf8.ko
 null_blk.ko
+nvme-auth.ko
 nvme-common.ko
 nvme-core.ko
 nvme-fabrics.ko
 nvme-fc.ko
 nvme-fcloop.ko
+nvme-keyring.ko
 nvme.ko
 nvme-loop.ko
 nvme-rdma.ko
@@ -592,6 +594,7 @@ scsi_transport_srp.ko
 sctp_diag.ko
 sctp.ko
 sd_mod.ko
+serial_base.ko
 serial_core.ko
 serpent_generic.ko
 ses.ko
@@ -640,6 +643,7 @@ team_mode_broadcast.ko
 team_mode_loadbalance.ko
 team_mode_random.ko
 team_mode_roundrobin.ko
+test_lockup.ko
 thunderbolt_net.ko
 tipc.ko
 tls.ko

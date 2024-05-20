@@ -1,9 +1,13 @@
 8250_base.ko
 8250_dw.ko
 8250_exar.ko
+8250_fsl.ko
 8250.ko
 8250_of.ko
+8250_pci1xxxx.ko
 8250_pci.ko
+8250_pericom.ko
+8250_rt288x.ko
 8250_tegra.ko
 ac.ko
 acpi_mdio.ko
@@ -54,6 +58,7 @@ chromeos_acpi.ko
 clk-hi3519.ko
 clk-imx8mm.ko
 clk-imx8mn.ko
+clk-imx8mp-audiomix.ko
 clk-imx8mp.ko
 clk-imx8mq.ko
 clk-imx93.ko
@@ -266,6 +271,7 @@ rtc-tegra.ko
 sch_fq_codel.ko
 scmi-core.ko
 scmi-module.ko
+scmi_perf_domain.ko
 scsi_common.ko
 scsi_dh_alua.ko
 scsi_dh_emc.ko
@@ -275,6 +281,7 @@ scsi_mod.ko
 sd_mod.ko
 selftests.ko
 seqiv.ko
+serial_base.ko
 serial_core.ko
 serial_mctrl_gpio.ko
 serial-tegra.ko
@@ -288,6 +295,7 @@ skcipher.ko
 soc-imx8m.ko
 spi-amd.ko
 spi-qup.ko
+spi-tegra210-quad.ko
 t10-pi.ko
 tcp_cubic.ko
 tcp_diag.ko

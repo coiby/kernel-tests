@@ -667,99 +667,6 @@ rlJournalStart
             fi
         fi
 
-        # Need to remove this section after 9.4 GA
-        if [[ "$Release" == "9.4" ]]; then
-            if cki_kver_lt "5.14.0-364.el9"; then
-                sed -i '/ems_usb.ko/d; /kvaser_usb.ko/d; /m_can.ko/d; /m_can_pci.ko/d; \
-                        /peak_pciefd.ko/d; /peak_usb.ko/d; /slcan.ko/d; /usb_8dev.ko/d' \
-                        ${OS}/${Release}/$Release-modules-{x86_64,ppc64le}.lst
-                sed -i '/mcp251xfd.ko/d; /mcp251x.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-365.el9"; then
-                sed -i '/intel_vsec_tpmi.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-367.el9"; then
-                sed -i '/intel_rapl_tpmi.ko/d; /intel-uncore-frequency-common.ko/d; /intel-uncore-frequency-tpmi.ko/d' \
-                        ${OS}/${Release}/$Release-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-368.el9"; then
-                sed -i '/isst_tpmi_core.ko/d; /isst_tpmi.ko/d' ${OS}/${Release}/$Release-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-372.el9"; then
-                sed -i '/bcm-phy-ptp.ko/d; /polynomial.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
-            fi
-            if cki_kver_lt "5.14.0-378.el9"; then
-                sed -i '/arm_cspmu_module.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-379.el9"; then
-                sed -i '/amd-pmf.ko/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-387.el9"; then
-                sed -i '/ftdi-elan.ko/d'  ${OS}/${Release}/$Release-knownRemoved-{x86_64,ppc64le,aarch64}.lst
-            fi
-            if cki_kver_lt "5.14.0-395.el9"; then
-                sed -i '/erofs.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-400.el9"; then
-                sed -i '/system_heap.ko/d; /udmabuf.ko/d'  ${OS}/${Release}/$Release-knownRemoved-builtin-${ARCH}.lst
-                sed -i '/cfbcopyarea.ko/d; /cfbfillrect.ko/d; /cfbimgblt.ko/d'  ${OS}/${Release}/$Release-knownRemoved-s390x.lst
-            fi
-            if cki_kver_lt "5.14.0-401.el9"; then
-                sed -i '/^amdxcp.ko$/d; /^drm_exec.ko$/d; /^mt792x-lib.ko$/d; /drm_suballoc_helper.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-402.el9"; then
-                sed -i '/snd-soc-sof_da7219_max98373.ko/d'  ${OS}/${Release}/$Release-knownRemoved-x86_64.lst
-                for m in `cat ${OS}/${Release}/5.14.0-402`
-                do
-                    sed -i "/^$m$/d" ${OS}/${Release}/$Release-modules-${ARCH}.lst
-                done
-            fi
-            if cki_kver_lt "5.14.0-403.el9"; then
-                sed -i '/^tsm.ko$/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-405.el9"; then
-                sed -i '/^idpf.ko$/d; /^octeon_ep.ko$/'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
-            fi
-            if cki_kver_lt "5.14.0-410.el9"; then
-                sed -i '/^freq_table.ko$/d'  ${OS}/${Release}/$Release-knownRemoved-builtin-{x86_64,ppc64le,aarch64}.lst
-            fi
-            if cki_kver_lt "5.14.0-412.el9"; then
-                sed -i '/marvell-88q2xxx.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,ppc64le,aarch64}.lst
-            fi
-            if cki_kver_lt "5.14.0-420.el9"; then
-                sed -i '/^uhci-hcd.ko$/d'  ${OS}/${Release}/$Release-builtin-{x86_64,ppc64le,aarch64}.lst
-            fi
-            if cki_kver_lt "5.14.0-422.el9"; then
-                sed -i '/wwan_hwsim.ko/d'  ${OS}/${Release}/$Release-knownRemoved-${ARCH}.lst
-                sed -i '/mei_gsc_proxy.ko/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
-                sed -i '/dwmac-imx.ko/d; /imx93-pd.ko/d; /imx93-src.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
-                sed -i '/clk-imx93.ko/d; /imx93-blk-ctrl.ko/d; /pinctrl-imx93.ko/d; /scmi-core.ko/d'  ${OS}/${Release}/$Release-builtin-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-423.el9"; then
-                sed -i '/sdhci-of-dwcmshc.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-424.el9"; then
-                sed -i '/tcp_illinois.ko/d'  ${OS}/${Release}/$Release-modules-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-425.el9"; then
-                sed -i '/pwrseq_emmc.ko/d; /pwrseq_simple.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
-                sed -i '/rtw89_8852ce.ko/d; /rtw89_8852c.ko/d'  ${OS}/${Release}/$Release-modules-{aarch64,x86_64}.lst
-            fi
-            if cki_kver_lt "5.14.0-426.el9"; then
-                sed -i '/ffa-module.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-427.el9"; then
-                sed -i '/iaa_crypto.ko/d'  ${OS}/${Release}/$Release-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-427.1.1.el9"; then
-                sed -i '/mt7925-common.ko/d; /mt7925e.ko/d'  ${OS}/${Release}/$Release-modules-{x86_64,aarch64}.lst
-            fi
-            if cki_kver_lt "5.14.0-427.4.1.el9"; then
-                sed -i '/gpio-mlxbf3.ko/d; /mlxbf-pmc.ko/d; /pinctrl-mlxbf3.ko/d;
-                /pwr-mlxbf.ko/d'  ${OS}/${Release}/$Release-modules-aarch64.lst
-            fi
-        fi
-
         if [[ "$Release" == "HEAD-9.5" ]]; then
             if cki_kver_lt "5.14.0-428.el9"; then
                 sed -i "/mt7925-common.ko/d; /mt7925e.ko/d"  ${OS}/${Release}/${Release}-modules-{x86_64,aarch64}.lst
@@ -768,9 +675,41 @@ rlJournalStart
             if cki_kver_lt "5.14.0-431.el9"; then
                 sed -i "/gpio-mlxbf3.ko/d; /mlxbf-pmc.ko/d; /pinctrl-mlxbf3.ko/d;
                 /pwr-mlxbf.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
+                sed -i "/scmi_perf_domain.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
             fi
             if cki_kver_lt "5.14.0-434.el9"; then
                 sed -i "/libblake2s-x86_64.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-builtin-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-438.el9"; then
+                sed -i "/onboard_usb_hub.ko/d"  ${OS}/${Release}/${Release}-modules-{aarch64,ppc64le}.lst
+            fi
+            if cki_kver_lt "5.14.0-439.el9"; then
+                sed -i "/qat_420xx.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-441.el9"; then
+                sed -i "/octeon_ep_vf.ko/d"  ${OS}/${Release}/${Release}-modules-${ARCH}.lst
+                sed -i "/clk-imx8mp-audiomix.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
+            fi
+            if cki_kver_lt "5.14.0-444.el9"; then
+                sed -i "/spi-tegra210-quad.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
+            fi
+            if cki_kver_lt "5.14.0-447.el9"; then
+                sed -i "/ledtrig-netdev.ko/d" ${OS}/${Release}/${Release}-modules-${ARCH}.lst
+            fi
+            if cki_kver_lt "5.14.0-448.el9"; then
+                sed -i "/nvme-auth.ko/d; /nvme-keyring.ko/d; /test_lockup.ko/d" ${OS}/${Release}/${Release}-modules-${ARCH}.lst
+                sed -i "/processor_thermal_power_floor.ko/d; /processor_thermal_wt_hint.ko/d;
+                /processor_thermal_wt_req.ko/d" ${OS}/${Release}/${Release}-modules-x86_64.lst
+                sed -i "/nvme-common.ko/d" ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
+            fi
+            if cki_kver_lt "5.14.0-449.el9"; then
+                sed -i "/zpool.ko/d; /zswap.ko/d" ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
+            fi
+            if cki_kver_lt "5.14.0-450.el9"; then
+                sed -i "/8250_fsl.ko/d" ${OS}/${Release}/${Release}-builtin-{aarch64,ppc64le}.lst
+                sed -i "/8250_pci1xxxx.ko/d; /8250_pericom.ko/d; /serial_base.ko/d" ${OS}/${Release}/${Release}-builtin-${ARCH}.lst
+                sed -i "/8250_rt288x.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
+                sed -i "/serial_core.ko/d" ${OS}/${Release}/${Release}-knownRemoved-builtin-${ARCH}.lst
             fi
         fi
     rlPhaseEnd
