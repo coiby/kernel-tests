@@ -3,7 +3,9 @@
 8250_exar.ko
 8250.ko
 8250_mid.ko
+8250_pci1xxxx.ko
 8250_pci.ko
+8250_pericom.ko
 ac.ko
 acpi_mdio.ko
 aead.ko
@@ -207,6 +209,7 @@ scsi_dh_rdac.ko
 scsi_mod.ko
 selftests.ko
 seqiv.ko
+serial_base.ko
 serial_core.ko
 serial_mctrl_gpio.ko
 serio.ko

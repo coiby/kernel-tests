@@ -1,0 +1,3 @@
+serial_core.ko
+zpool.ko
+zswap.ko

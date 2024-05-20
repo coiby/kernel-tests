@@ -1,7 +1,10 @@
 8250_base.ko
 8250_exar.ko
+8250_fsl.ko
 8250.ko
+8250_pci1xxxx.ko
 8250_pci.ko
+8250_pericom.ko
 842_decompress.ko
 aead.ko
 aes-gcm-p10-crypto.ko
@@ -190,6 +193,7 @@ scsi_dh_rdac.ko
 scsi_mod.ko
 selftests.ko
 seqiv.ko
+serial_base.ko
 serial_core.ko
 serial_mctrl_gpio.ko
 serio.ko
