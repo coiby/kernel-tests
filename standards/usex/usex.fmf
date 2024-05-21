@@ -5,6 +5,8 @@ description: |
 contact: Fendy Tjahjadi <ftjahjad@redhat.com>
 test: bash ./runtest.sh
 id: e1807ae2-7de1-47b1-9717-b488ac7709e7
+tag:
+  - KernelTier1
 framework: beakerlib
 require:
   - ncurses-devel
