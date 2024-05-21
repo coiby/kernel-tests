@@ -109,6 +109,9 @@ for DISK in $DISKS; do
 			done
 		done
 	fi
+	if [[ $MODEL =~ "Dell Express Flash NVMe P4800X" ]]; then
+		tok "nvme format /dev/$DISK --lbaf=3 -f"
+	fi
 done
 }
 

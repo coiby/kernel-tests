@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
-dependencies=rpm-build;meson;gcc;json-c-devel;openssl-devel;cmake
+dependencies=rpm-build;meson;gcc;json-c-devel;openssl-devel;cmake;dbus-devel;keyutils-libs-devel;python3-sphinx;python3-sphinx_rtd_theme;swig
 max_time=30m
 use_pty=false

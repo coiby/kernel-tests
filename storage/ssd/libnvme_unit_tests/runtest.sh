@@ -32,8 +32,8 @@ function startup
 
 	else
 		rlLog "Abort test as $(cat /etc/redhat-release) doesn't support"
-		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
+		exit 0
 	fi
 }
 

@@ -28,7 +28,9 @@ for DISK in $DISKS; do
 	tok "lsblk | grep nvme"
 	tok "nvme reset /dev/${DISK:0:5}"
 	tok "nvme format /dev/$DISK --lbaf=0 -f"
-
+	if [[ $MODEL =~ "Dell Express Flash NVMe P4800X 375GB" ]]; then
+		tok "nvme format --lbaf=3 /dev/$DISK -f"
+	fi
 done
 }
 

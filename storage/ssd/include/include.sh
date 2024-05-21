@@ -1,11 +1,12 @@
 #!/bin/bash
 
-FILE=$(readlink -f $BASH_SOURCE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname $FILE)
 . $CDIR/../../../cki_lib/libcki.sh
 . $CDIR/../../include/bash_modules/lxt/include.sh || exit 200
 
 [ -f /root/TEST_DEVS ] && TEST_DEVS=$(cat /root/TEST_DEVS)
+# shellcheck disable=SC2034
 [ -f /root/TEST_DEVS_LIST ] && TEST_DEVS_LIST=$(cat /root/TEST_DEVS_LIST)
 
 if [ -z "$TEST_DEVS" ]; then
@@ -81,7 +82,7 @@ function get_nvme_pci_id() {
 	NVME_DISK=$1
 	NVME_CHAR=${NVME_DISK:0:5}
 	TEST_DEV_SYSFS=/sys/block/$NVME_DISK/device
-	uname -r | grep -qE "5.[0-9]" && TEST_DEV_SYSFS="$TEST_DEV_SYSFS/$NVME_CHAR"
+	uname -r | grep -qE "el9|el10" && TEST_DEV_SYSFS="$TEST_DEV_SYSFS/$NVME_CHAR"
 	readlink -f "$TEST_DEV_SYSFS" | \
 		grep -Eo '[0-9a-f]{4,5}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]' | \
 		tail -1
