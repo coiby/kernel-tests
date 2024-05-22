@@ -75,7 +75,6 @@
 /filesystems/erofs/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /filesystems/general/pjd-fstest/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /filesystems/loopdev/sanity/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
-/filesystems/nfs/connectathon/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /filesystems/xfs/xfstests/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /firmware/user-specified/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /general/memory/function/kaslr/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
@@ -206,7 +205,6 @@
 /filesystems/erofs/ @bgoncalv @bgrech @lulinqing
 /filesystems/general/pjd-fstest/ @bgoncalv @lulinqing @zrlang
 /filesystems/loopdev/sanity/ @bgoncalv @jencce2002 @lulinqing
-/filesystems/nfs/connectathon/ @bgoncalv @jianhong @lulinqing
 /filesystems/xfs/xfstests/ @andyprice @bgoncalv @jencce2002 @lulinqing
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
 /general/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
