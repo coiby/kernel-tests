@@ -19,7 +19,6 @@ foreach bt
 foreach crash task
 foreach files
 mount
-mount -f
 search -u deadbeef
 search -s _etext -m ffff0000 abcd
 search -p babe0000 -m ffff
@@ -70,7 +69,6 @@ rd jiffies
 task
 extend
 mach
-mach -m
 timer
 EOF
 
@@ -146,6 +144,20 @@ EOF
     if $IS_RHEL8 && [ "$(uname -m)" != "s390x" ]; then
         cat <<EOF >>"${K_TESTAREA}/crash.cmd"
 dev -p
+EOF
+    fi
+
+    # 'mount -f' - only supported on kernels prior to Linux 3.13.
+    if [ "${RELEASE}" -lt 8 ]; then
+        cat <<EOF >>"${K_TESTAREA}/crash.cmd"
+mount -f
+EOF
+    fi
+
+    # 'mach -m' - Display the physical memory map (x86, x86_64 and ia64 only).
+    if [ "${K_ARCH}" = 'x86_64' ]; then
+        cat <<EOF >>"${K_TESTAREA}/crash.cmd"
+mach -m
 EOF
     fi
 
