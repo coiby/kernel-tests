@@ -18,10 +18,8 @@ runq
 foreach bt
 foreach files
 mount
-mount -f
 vm
 net
-mach -m
 search -u deadbeef
 set
 set -p
@@ -122,6 +120,20 @@ EOF
     if ( $IS_RHEL7 || $IS_RHEL8 || $IS_RHEL9 ); then
         cat <<EOF >>"${K_TESTAREA}/crash.cmd"
 list -o task_struct.tasks -h init_task
+EOF
+    fi
+
+    # 'mount -f' - only supported on kernels prior to Linux 3.13.
+    if [ "${RELEASE}" -lt 8 ]; then
+        cat <<EOF >>"${K_TESTAREA}/crash.cmd"
+mount -f
+EOF
+    fi
+
+    # 'mach -m' - Display the physical memory map (x86, x86_64 and ia64 only).
+    if [ "${K_ARCH}" = 'x86_64' ]; then
+        cat <<EOF >>"${K_TESTAREA}/crash.cmd"
+mach -m
 EOF
     fi
 
