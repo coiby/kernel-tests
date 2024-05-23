@@ -313,8 +313,8 @@
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
 /tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing
-/vm/kvm-self-tests/ @bgoncalv @jarichte @lulinqing
-/vm/kvm-unit-tests/ @bgoncalv @jarichte @lulinqing
+/vm/kvm-self-tests/ @bgoncalv @hlynden @jarichte @lulinqing
+/vm/kvm-unit-tests/ @bgoncalv @hlynden @jarichte @lulinqing
 /vm/qemu-sanity-check/ @bgoncalv @lulinqing @rwmjones
 /watchdog/hw-generic/ @bgoncalv @ftjahjad @lulinqing
 
