@@ -23,15 +23,25 @@ function remove_aboot_param()
     CMDLINEARGS="$1"
     # shellcheck disable=SC2207
     current_aboot_cmdline=($(abootimg -i /boot/aboot-"$(uname -r)".img | awk  '/cmdline/ {print}' | cut -f 4-"$NR" -d ' '))
+    remove_from_cmdline=(${CMDLINEARGS##-})
     if [ -z "${current_aboot_cmdline[0]}" ]; then
         echo "WARNING: Unable to find parameter in the allowed list."
         exit 0
     else
         for i in "${!current_aboot_cmdline[@]}"; do
-            if echo "${CMDLINEARGS##-}" | grep -q "${current_aboot_cmdline[${i}]}"; then
-               # shellcheck disable=SC2184
-               unset current_aboot_cmdline["${i}"]
-            fi
+            for j in "${!remove_from_cmdline[@]}";do
+                if [[ "${remove_from_cmdline[${j}]}" =~ "=" ]]; then # remove the exact param and value pair
+                    if echo "${remove_from_cmdline[${j}]}" | grep -q "${current_aboot_cmdline[${i}]}"; then
+                        # shellcheck disable=SC2184
+                        unset current_aboot_cmdline["${i}"]
+                    fi
+                else
+                    if echo "${remove_from_cmdline[${j}]}" | grep -q "${current_aboot_cmdline[${i}]/=*}"; then # remove all occurences of param.
+                        # shellcheck disable=SC2184
+                        unset current_aboot_cmdline["${i}"]
+                    fi
+                fi
+            done
         done
         # want to keep spaces as delimiter
         # shellcheck disable=SC2124

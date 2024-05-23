@@ -25,9 +25,13 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 2
+if [ -e /usr/bin/rhts-environment.sh ]; then
+    . /usr/bin/rhts-environment.sh || exit 2
+fi
 . /usr/share/beakerlib/beakerlib.sh || exit 2
 . ./lib/lib.sh
+. ../../../kernel-include/runtest.sh || exit 2
+
 
 trap 'rlFileRestore; exit' SIGHUP SIGINT SIGQUIT SIGTERM
 
@@ -45,6 +49,21 @@ KNOWN_ISSUE_LIST["rhel"]="admin_reserve_kbytes:bz1908668"
 # To mean bz1908668 exists in several kernel version ranges,'*' repsents infinite value.
 # KNOWN_FILED_BUGS["bz1908668"]="A->B C->D E->*"
 KNOWN_FILED_BUGS["bz1908668"]="4.18.0-220.el8->*"
+
+function install_kernel_devel()
+{
+    rlShowRunningKernel
+    devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
+    pkg_mgr=$(K_GetPkgMgr)
+    rlLog "pkg_mgr = ${pkg_mgr}"
+    if [[ $pkg_mgr == "rpm-ostree" ]]; then
+        export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
+    else
+        export pkg_mgr_inst_string="-y install"
+    fi
+    # shellcheck disable=SC2086
+    ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
+}
 
 function run_cases()
 {
@@ -110,6 +129,7 @@ function prep_tst_info()
 rlJournalStart
     rlPhaseStartSetup
         [ ! -d $DIR_BIN ] && rlRun "mkdir -p $DIR_BIN"
+        install_kernel_devel
         prep_tst_info
         rlRun "TmpDir=\$(mktemp -d -p $DIR_ENTRY)" 0 "Creating tmp directory"
         # shellcheck disable=SC2154

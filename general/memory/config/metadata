@@ -11,4 +11,4 @@ entry_point=make run
 max_time=6h
 dependencies=psmisc;gcc;glibc;sysstat;bc;kernel-devel
 softDependencies=numactl-devel
-repoRequires=general/include
+repoRequires=general/include;kernel-include;cmdline_helper;cki_lib

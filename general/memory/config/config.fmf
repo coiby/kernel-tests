@@ -1,0 +1,36 @@
+summary: KG-VMM config
+description: /kernel/general/memory/config, configuration test suite for proc, sysfs,
+    and kernel cmdline
+contact: MM-QE  <mm-qe@redhat.com>
+enabled: true
+id: aa725424-48ec-45d8-8ddb-eab2b6d5eddb
+test: bash ./runtest.sh
+duration: 2h
+framework: beakerlib
+require:
+    - bc
+    - elfutils-libelf-devel
+    - gcc
+    - glibc
+    - libcgroup
+    - libcgroup-tools
+    - make
+    - numactl
+    - perf
+    - psmisc
+    - python
+    - strace
+    - sysstat
+    - trace-cmd
+    - type: file
+      pattern:
+          - /cki_lib
+          - /cmdline_helper
+          - /kernel-include
+recommend:
+    - abootimg
+    - grubby
+    - numactl-devel
+tag:
+  - /kernel/general/memory/config
+  - KG-VMM-TAG
