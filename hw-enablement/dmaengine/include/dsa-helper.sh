@@ -30,8 +30,10 @@ accel_config_test_run ()
 		eval "${2}" > "${1}.log" 2>&1
 		ret=$?
 		check_dma_faults "${1}"
-		if test $ret -eq 0 -o $ret -eq 77; then
-			test_continue "${1}" "PASS" "test script didn't fail" "${1}.log"
+		if test $ret -eq 0; then
+			test_continue "${1}" "PASS" "test script passed" "${1}.log"
+		elif test $ret -eq 77; then
+			 test_continue "${1}" "SKIP" "test script skipped test" "${1}.log"
 		else
 			test_continue "${1}" "FAIL" "test script failed" "${1}.log"
 		fi
