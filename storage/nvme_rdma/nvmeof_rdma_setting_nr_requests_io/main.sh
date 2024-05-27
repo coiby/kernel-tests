@@ -48,7 +48,7 @@ function client {
 	FIO_Basic_Device_Level_Test "$nvme_device"
 
 	nr_num=$(cat /sys/block/"$nvme_device"/queue/nr_requests)
-	tok echo 127 >/sys/block/"$nvme_device"/queue/nr_requests
+	tok "echo 127 >/sys/block/${nvme_device}/queue/nr_requests"
 	ret=$?
 	if [ $ret -eq 0 ]; then
 		tlog "INFO: setting nr_requests:127 operation pass"
