@@ -1,0 +1,17 @@
+summary: storage/scsi/RHEL_35659_close_removed_sg_device
+description: closing sg device that is removed
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/scsi/RHEL_35659_close_removed_sg_device
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+    - lsscsi
+    - sg3_utils
+duration: 1h
+tier: 1
+extra-summary: /storage/scsi/RHEL_35659_close_removed_sg_device
+extra-task: /storage/scsi/RHEL_35659_close_removed_sg_device

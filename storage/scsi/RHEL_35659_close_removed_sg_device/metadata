@@ -1,0 +1,13 @@
+[General]
+name=storage/scsi/RHEL_35659_close_removed_sg_device
+owner=Changhui Zhong <czhong@redhat.com>
+description=closing sg device that is removed
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+dependencies=lsscsi;sg3_utils
+max_time=1h
