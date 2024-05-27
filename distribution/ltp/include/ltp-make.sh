@@ -18,9 +18,11 @@ if [ -z ${TESTVERSION} ]; then
     elif rlIsRHEL '<=8.2'; then
         # NOTE: rhel82z build failed on newer ltp, fix to 20230929
         TESTVERSION="20230929"
-    else
+    elif rhIsRHEL 8; then
         # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
         TESTVERSION="20240129"
+    else
+        TESTVERSION="20240524"
     fi
 fi
 
@@ -105,6 +107,12 @@ patch-generic()
     echo " === applying general upstream fixes. ===" | tee -a $OUTPUTFILE
     echo " === applying general internal fixes. ===" | tee -a $OUTPUTFILE
 
+    if [ "$TESTVERSION" == "20240524" ]; then
+        # Tips: this patch should be applied in single on ltp-next(version > 20180926)
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
+        ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+    fi
     if [ "$TESTVERSION" == "20240129" ]; then
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
