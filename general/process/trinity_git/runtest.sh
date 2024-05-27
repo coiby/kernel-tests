@@ -37,7 +37,10 @@ declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 # trinity-9f6f9f916da3 (v1.8)
 # trinity-865ac5d8 (v1.9)
 # trinity-80fb6169 (v1.9+ (20220109))
-if rlIsRHEL ">=9" || rlIsCentOS ">=9" || rlIsFedora; then
+# trinity-6a17c218 (20240521)
+if rlIsRHEL ">=9.5" || rlIsCentOS ">=9.5" || rlIsFedora; then
+	testversion=${testversion:-"trinity-6a17c218"}
+elif rlIsRHEL ">=9" || rlIsCentOS ">=9"; then
 	testversion=${testversion:-"trinity-80fb6169"}
 elif rlIsRHEL ">=8" || rlIsCentOS ">=8"; then
 	testversion=${testversion:-"trinity-4d2343bd"}
