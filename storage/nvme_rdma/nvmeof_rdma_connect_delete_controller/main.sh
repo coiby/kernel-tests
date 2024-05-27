@@ -65,7 +65,7 @@ function client {
 			tlog "INFO: got nvme disk:$test_dev failed"
 			break
 		fi
-		tok echo 1 > /sys/class/nvme/"${test_dev}"/delete_controller
+		tok "echo 1 > /sys/class/nvme/${test_dev}/delete_controller"
 		ret=$?
 		if [ $ret -eq 0 ]; then
 			tlog "INFO: delete controller pass"
