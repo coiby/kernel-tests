@@ -8,8 +8,8 @@ CDIR=$(dirname "$FILE")
 
 function runtest (){
 
-	tok "find /sys -name scrub > scrub.txt"
-	SCRUB_PATH=$(cat scrub.txt)
+	tok "find /sys -name scrub"
+	SCRUB_PATH=$(find /sys -name scrub | grep ACPI | tail -1)
 	tok "time ndctl wait-scrub"
 
 	trun ndctl start-scrub
