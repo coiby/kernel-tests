@@ -67,7 +67,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 	fi
 
 	# update region_list when region_num<4 and dev_num=4
-	if [ $region_num -lt 4 -a $dev_num -eq 4 ]; then
+	if [ $region_num -lt 4 ] && [ $dev_num -eq 4 ]; then
 		if [ $region_num -eq 1 ]; then
 			region_list_tmp=(${region_list[0]} ${region_list[0]} ${region_list[0]} ${region_list[0]})
 		elif [ $region_num -eq 2 ]; then
@@ -91,7 +91,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 				tlog "INFO: will create raw device on namespace$i.0"
 				tok "ndctl create-namespace -f -e namespace$i.0 -m raw | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
-			elif [ "$device_type" = "BTT" -a "$s_a_size" != "" ]; then
+			elif [ "$device_type" = "BTT" ] && [ "$s_a_size" != "" ]; then
 				tlog "INFO: will create btt:$s_a_size device on namespace$i.0"
 				tok "ndctl create-namespace -f -e namespace$i.0 -m sector -l $s_a_size | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]s"`
@@ -99,7 +99,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 				tlog "INFO: will create fsdax device on namespace$i.0"
 				tok "ndctl create-namespace -f -e namespace$i.0 -m fsdax | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
-			elif [ "$device_type" = "DEVDAX" -a "$s_a_size" != "" ]; then
+			elif [ "$device_type" = "DEVDAX" ] && [ "$s_a_size" != "" ]; then
 				tlog "INFO: will create devdax:$s_a_size device on namespace$i.0"
 				tok "ndctl create-namespace -f -e namespace$i.0 -m devdax -a $s_a_size | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "dax.*[0-9]"`
@@ -115,7 +115,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 				tlog "INFO: will create raw device on region$i"
 				tok "ndctl create-namespace -r region$i -m raw | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
-			elif [ "$device_type" = "BTT" -a "$s_a_size" != "" ]; then
+			elif [ "$device_type" = "BTT" ] && [ "$s_a_size" != "" ]; then
 				tlog "INFO: will create btt:$s_a_size device on region$i"
 				tok "ndctl create-namespace -r region$i -m sector -l $s_a_size -s 12G | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]s"`
@@ -123,7 +123,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 				tlog "INFO: will create fsdax device on region$i"
 				tok "ndctl create-namespace -r region$i -m fsdax -s 12G | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
-			elif [ "$device_type" = "DEVDAX" -a "$s_a_size" != "" ]; then
+			elif [ "$device_type" = "DEVDAX" ] && [ "$s_a_size" != "" ]; then
 				tlog "INFO: will create devdax:$s_a_size device on region$i"
 				tok "ndctl create-namespace -r region$i -m devdax -a $s_a_size -s 12G | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "dax.*[0-9]"`
@@ -146,7 +146,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 				tlog "INFO: will create raw device on $region"
 				tok "ndctl create-namespace -r $region -m raw -s $SIZE | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
-			elif [ "$device_type" = "BTT" -a "$s_a_size" != "" ]; then
+			elif [ "$device_type" = "BTT" ] && [ "$s_a_size" != "" ]; then
 				tlog "INFO: will create btt:$s_a_size device on $region"
 				tok "ndctl create-namespace -r $region -m sector -l $s_a_size -s $SIZE | tee OUTPUT"
 				disks[$i]=` cat OUTPUT | grep -o "pmem.*[0-9]s"`
@@ -154,7 +154,7 @@ function NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX() {
 				tlog "INFO: will create fsdax device on $region"
 				tok "ndctl create-namespace -r $region -m fsdax -s $SIZE  | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "pmem.*[0-9]"`
-			elif [ "$device_type" = "DEVDAX" -a "$s_a_size" != "" ]; then
+			elif [ "$device_type" = "DEVDAX" ] && [ "$s_a_size" != "" ]; then
 				tlog "INFO: will create devdax:$s_a_size device on $region"
 				tok "ndctl create-namespace -r $region -m devdax -a $s_a_size -s $SIZE | tee OUTPUT"
 				disks[$i]=`cat OUTPUT | grep -o "dax.*[0-9]"`
