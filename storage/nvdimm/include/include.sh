@@ -359,7 +359,7 @@ function install_fio() {
 		return
 	fi
 
-	if rlIsRHEL 9; then
+	if rlIsRHEL 9 || rlIsRHEL 10; then
 		trun "yum -y install fio-engine-pmemblk fio-engine-dev-dax fio-engine-libpmem libpmem-devel libpmemblk-devel --skip-broken"
 	else
 		trun "yum -y module enable pmdk"
