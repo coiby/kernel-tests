@@ -116,7 +116,12 @@ function test_setup()
 	test -d testversion || get_lookaside
 	patch_apply
 	rlRun "pushd $testversion"
-	rlRun "./configure"
+	gcc_version=$(gcc --version | awk '{print $3; exit 0}')
+	if rlTestVersion "$gcc_version" ">=" 14; then
+		rlRun "CFLAGS=-Wno-implicit-function-declaration ./configure"
+	else
+		rlRun "./configure"
+	fi
 	rlRun "make -j ${SCHED_NR_CPU}" || { rstrnt-report-result "${RSTRNT_TASKNAME}" WARN; rlDie "compile"; }
 	if [ $is_rhivos == 1 ];then
 		#rlRun "echo \"DESTDIR=\"/usr/local\"\" >> /etc/environment"
