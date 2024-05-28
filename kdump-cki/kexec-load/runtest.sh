@@ -23,7 +23,7 @@
 . ../../cki_lib/libcki.sh || exit 1
 . ../include/runtest.sh
 
-TEST="/kdump/kexec-boot"
+TEST="/kdump/kexec-load"
 
 KEXEC_VER=${KEXEC_VER:-"$(uname -r)"}
 
