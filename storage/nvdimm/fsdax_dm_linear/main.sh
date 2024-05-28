@@ -37,7 +37,7 @@ $size1 $size2 linear /dev/${pmem_2} 0" | dmsetup create joined
 	tok "mkfs.ext4 $ext4_param -F /dev/mapper/joined"
 
 	tok mount -o dax /dev/mapper/joined $MNT
-	tok "FIO_ENGINE_SUPPORT pmemblk"
+	trun "FIO_ENGINE_SUPPORT pmemblk"
 	if (($? == 0)); then
 		tlog "INFO: Executing fio pmemblk.fio on ${MNT}....."
 		tok fio pmemblk.fio

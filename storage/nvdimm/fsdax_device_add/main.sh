@@ -45,7 +45,7 @@ function runtest (){
 	fi
 
 	tok mount -o dax,noatime /dev/mapper/pmem-lv $MNT
-	tok "FIO_ENGINE_SUPPORT pmemblk"
+	trun "FIO_ENGINE_SUPPORT pmemblk"
 	if (($? == 0)); then
 		tlog "INFO: Executing fio pmemblk.fio on ${MNT} after lvcreated"
 		tok fio pmemblk.fio
@@ -74,7 +74,7 @@ function runtest (){
 	tok mount -o dax,noatime /dev/mapper/pmem-lv ${MNT}
 	tok "mount | grep dax"
 
-	tok "FIO_ENGINE_SUPPORT pmemblk"
+	trun "FIO_ENGINE_SUPPORT pmemblk"
 	if (($? == 0)); then
 		tlog "INFO: Executing fio pmemblk.fio on ${MNT} after lvextend"
 		tok fio pmemblk.fio
@@ -95,7 +95,7 @@ function runtest (){
 		tlog "PASS: lvextend -l +100%FREE /dev/mapper/pmem-lv pass"
 	fi
 
-	tok "FIO_ENGINE_SUPPORT pmemblk"
+	trun "FIO_ENGINE_SUPPORT pmemblk"
 	if (($? == 0)); then
 		tlog "INFO: Executing fio pmemblk.fio on ${MNT} after dax device added"
 		tok fio pmemblk.fio

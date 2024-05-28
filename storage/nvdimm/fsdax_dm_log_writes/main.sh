@@ -37,7 +37,7 @@ function runtest (){
 	# shellcheck disable=SC2154
 	tok "mkfs.ext4 $ext4_param -F /dev/mapper/log"
 	tok mount -o dax /dev/mapper/log $MNT
-	tok "FIO_ENGINE_SUPPORT pmemblk"
+	trun "FIO_ENGINE_SUPPORT pmemblk"
 	if (($? == 0)); then
 		tlog "INFO: Executing fio pmemblk.fio on ${MNT}....."
 		tok fio pmemblk.fio
