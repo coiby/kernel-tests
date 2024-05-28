@@ -129,6 +129,11 @@ function test_setup()
 	fi
 	rlRun "make install"
 	rlRun "popd"
+
+	if (rlIsRHEL 9 || rlIsCentOS 9) && [ "$(uname -m)" = "ppc64le" ]; then
+		export SKIP_TESTS="-x futex"
+		rlLogInfo "skip futex test on ppc64le becuase of RHEL-2006"
+	fi
 }
 
 function test_syscalls_trinity()

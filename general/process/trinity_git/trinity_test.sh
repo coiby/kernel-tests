@@ -14,5 +14,5 @@ if [ "$child_num" -gt 16 ]; then
 	child_num=16
 fi
 
-MALLOC_CHECK_=2 trinity --children $child_num --syslog -q -T DIE
+MALLOC_CHECK_=2 trinity --children $child_num --syslog -q -T DIE $SKIP_TESTS
 popd
