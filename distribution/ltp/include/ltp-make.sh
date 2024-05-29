@@ -15,10 +15,10 @@ if [ -z ${TESTVERSION} ]; then
     elif rlIsRHEL 7; then
         # NOTE: don't forget to update ltp version on dci/rhel7.xml as well
         TESTVERSION="20210927"
-    elif rlIsRHEL '<=8.2'; then
+    elif rlIsRHEL 8 && rlIsRHEL '<=8.2'; then
         # NOTE: rhel82z build failed on newer ltp, fix to 20230929
         TESTVERSION="20230929"
-    elif rhIsRHEL 8; then
+    elif rlIsRHEL 8 && rlIsRHEL '>8.2'; then
         # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
         TESTVERSION="20240129"
     else
