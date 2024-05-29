@@ -20,9 +20,9 @@ function libnvme_setup
 	fi
 	rlRun "rpm -ivh $rpmfile"
 	rlRun "rpmbuild -bp ~/rpmbuild/SPECS/libnvme.spec"
-	libnvme_srcdir=$(realpath /root/rpmbuild/BUILD/libnvme-*)
+	libnvme_srcdir=$(realpath /root/rpmbuild/BUILD/libnvme-* | head -1)
 	rlRun "pushd $libnvme_srcdir"
-	rlRun "meson .build"
+	rlRun "meson setup .build"
 }
 
 function startup
