@@ -37,7 +37,10 @@ declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 # trinity-9f6f9f916da3 (v1.8)
 # trinity-865ac5d8 (v1.9)
 # trinity-80fb6169 (v1.9+ (20220109))
-if rlIsRHEL ">=9" || rlIsCentOS ">=9" || rlIsFedora; then
+# trinity-6a17c218 (20240521)
+if rlIsRHEL ">=9.5" || rlIsCentOS ">=9.5" || rlIsFedora; then
+	testversion=${testversion:-"trinity-6a17c218"}
+elif rlIsRHEL ">=9" || rlIsCentOS ">=9"; then
 	testversion=${testversion:-"trinity-80fb6169"}
 elif rlIsRHEL ">=8" || rlIsCentOS ">=8"; then
 	testversion=${testversion:-"trinity-4d2343bd"}
@@ -113,7 +116,12 @@ function test_setup()
 	test -d testversion || get_lookaside
 	patch_apply
 	rlRun "pushd $testversion"
-	rlRun "./configure"
+	gcc_version=$(gcc --version | awk '{print $3; exit 0}')
+	if rlTestVersion "$gcc_version" ">=" 14; then
+		rlRun "CFLAGS=-Wno-implicit-function-declaration ./configure"
+	else
+		rlRun "./configure"
+	fi
 	rlRun "make -j ${SCHED_NR_CPU}" || { rstrnt-report-result "${RSTRNT_TASKNAME}" WARN; rlDie "compile"; }
 	if [ $is_rhivos == 1 ];then
 		#rlRun "echo \"DESTDIR=\"/usr/local\"\" >> /etc/environment"
@@ -121,6 +129,11 @@ function test_setup()
 	fi
 	rlRun "make install"
 	rlRun "popd"
+
+	if (rlIsRHEL 9 || rlIsCentOS 9) && [ "$(uname -m)" = "ppc64le" ]; then
+		export SKIP_TESTS="-x futex"
+		rlLogInfo "skip futex test on ppc64le becuase of RHEL-2006"
+	fi
 }
 
 function test_syscalls_trinity()
