@@ -23,7 +23,9 @@ if [ -z ${TESTVERSION} ]; then
         TESTVERSION="20240129"
     fi
 fi
-
+if rlIsOS 'autosd'; then
+    export CREATE_ENTRIES=1
+fi
 # the task path may be different under the restraint harness if the task
 # is fetched directly from git, so use a relative path to the include task
 ABS_DIR=$(dirname ${BASH_SOURCE[0]})"/patches"
