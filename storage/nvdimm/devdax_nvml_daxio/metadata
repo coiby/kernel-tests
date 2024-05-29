@@ -9,6 +9,7 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
-dependencies=daxio;ndctl
+dependencies=ndctl
+softDependencies=daxio
 max_time=1h
 use_pty=false
