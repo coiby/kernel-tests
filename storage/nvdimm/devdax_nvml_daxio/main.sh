@@ -9,10 +9,10 @@ CDIR=$(dirname "$FILE")
 function runtest (){
 
 	trun "yum -y install ndctl-devel daxctl-devel daxio"
-	tok which daxio
+	trun which daxio
 	if (($? != 0)); then
-		tlog "daxio doesn't exists on $(arch), exit 1"
-		exit 1
+		tlog "daxio doesn't exists on $(arch), return"
+		return
 	fi
 	# shellcheck disable=SC2154
 	for align in $devdax_align; do

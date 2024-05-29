@@ -13,10 +13,10 @@ function runtest (){
 	if [ $? -ne 0 ]; then
 		install_fio
 	fi
-	tok "FIO_ENGINE_SUPPORT dev-dax"
+	trun "FIO_ENGINE_SUPPORT dev-dax"
 	if (($? != 0)); then
-		tlog "fio engine dev-dax doesn't support on $(arch), exit 1"
-		exit 1
+		tlog "fio engine dev-dax doesn't support on $(arch), return"
+		return
 	fi
 	num=4
 	[[ $(arch) == "ppc64le" ]] && num=2
