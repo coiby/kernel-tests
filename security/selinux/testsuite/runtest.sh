@@ -350,9 +350,11 @@ rlJournalStart
             fi
             #Excluding tests for automotive
             if cki_is_kernel_automotive; then
+                #filesystem/ext4 fs_filesystem/ext4
                 #Excluded as automotive doesn't support Quota related functionality VROOM-17160
                 #Functionality removed by disabling Configuration Parameter : CONFIG_QUOTA_TREE
-                exclude_tests+=" filesystem/ext4 fs_filesystem/ext4"
+                #netlink_socket VROOM-17264
+                exclude_tests+=" filesystem/ext4 fs_filesystem/ext4 netlink_socket"
             fi
         fi
 
