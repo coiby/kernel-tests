@@ -24,6 +24,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../kernel-include/runtest.sh || exit 1
 . ../../../cmdline_helper/libcmd.sh || exit 1
+. ../../../cki_lib/libcki.sh || exit 1
 GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/ltp.git"}
 
 rlJournalStart
@@ -39,7 +40,7 @@ rlJournalStart
 
         grubby --info=DEFAULT
         if [ ! -f ./REBOOT ]; then
-            if [ -e /sys/devices/soc0/machine ]; then
+            if cki_is_abd; then
                 rlRun "add_aboot_param ima_tcb"
                 rlRun "add_aboot_param ima_appraise=fix"
             elif stat /run/ostree-booted > /dev/null 2>&1; then
