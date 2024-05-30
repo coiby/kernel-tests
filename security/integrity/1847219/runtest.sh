@@ -23,6 +23,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../cmdline_helper/libcmd.sh || exit 1
+. ../../../cki_lib/libcki.sh || exit 1
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
@@ -36,7 +37,7 @@ rlJournalStart
     rlPhaseStartTest
         grubby --info=DEFAULT
         if [ ! ${RSTRNT_REBOOTCOUNT} -gt 0 ]; then
-            if [ -e /sys/devices/soc0/machine ]; then
+            if cki_is_abd; then
                 rlRun "add_aboot_param ima_appraise=fix"
                 rlRun "add_aboot_param ima_policy=appraise_tcb"
             elif stat /run/ostree-booted > /dev/null 2>&1; then
@@ -57,7 +58,7 @@ rlJournalStart
 
     rlPhaseStartCleanup
         if [ ! ${RSTRNT_REBOOTCOUNT} -gt 1 ]; then
-            if [ -e /sys/devices/soc0/machine ]; then
+            if cki_is_abd; then
                 rlRun "remove_aboot_param ima_appraise=fix"
                 rlRun "remove_aboot_param ima_policy=appraise_tcb"
             elif stat /run/ostree-booted > /dev/null 2>&1; then
