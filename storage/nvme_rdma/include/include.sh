@@ -78,8 +78,8 @@ function nvme_core_multipath_conf
 	tok sleep 5
 }
 
-# disable nvme_core multipath for RHEL9
-if rlIsRHEL 9; then
+# disable nvme_core multipath for RHEL9/10
+if rlIsRHEL 9 || rlIsRHEL 10; then
 	if [ ! -f /etc/modprobe.d/nvme.conf ]; then
 		nvme_core_multipath_conf disable
 	fi
