@@ -1,0 +1,12 @@
+summary: Security Crypto verifier for rhel-24869
+description: 'Test for rhel-24869'
+contact: Dennis Li <denli@redhat.com>
+component:
+  - kernel
+path: /security/crypto/rhel-24869
+test: make run
+framework: beakerlib
+require: [gcc, make]
+duration: 10m
+extra-summary: /kernel-tests/security/crypto/rhel-24869
+extra-task: /kernel-tests/security/crypto/rhel-24869

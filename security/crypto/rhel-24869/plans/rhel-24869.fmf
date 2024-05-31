@@ -1,0 +1,13 @@
+summary: Security Crypto verifier for rhel-24869
+discover:
+    how: fmf
+    test:
+        - /security/crypto/rhel-24869/tests/rhel-24869
+prepare:
+  - name: Enable Repos
+    how: shell
+    script: |
+        . ./automotive/include/rhivos.sh
+        install_repos
+environment-file:
+        - ./security/crypto/rhel-24869/plans/tmt.env
