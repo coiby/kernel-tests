@@ -84,7 +84,11 @@ function server {
 
 	#nvmetcli sanity
 	tok "yum -y install asciidoc xmlto systemd-devel libuuid-devel yum-utils"
-	tok "uname -r | grep -q el8 && yum -y install python3-devel --nobest --skip-broken || yum -y install python-devel --skip-broken"
+	if rlIsRHEL ">7"; then
+		tok "yum -y install python3-devel python3-setuptools --nobest --skip-broken"
+	else
+		tok "yum -y install python-devel --skip-broken"
+	fi
 	tok "yumdownloader --source nvmetcli"
 	tok "rpm -ivh nvmetcli-*el*.src.rpm"
 	tok "rpmbuild -ba /root/rpmbuild/SPECS/nvmetcli.spec"
