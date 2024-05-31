@@ -1,0 +1,12 @@
+[General]
+name=storage/block/RHEL_37681_null_blk_concurrently_power_submit_queues
+owner=Changhui Zhong <czhong@redhat.com>
+description=Writing 'power' and 'submit_queues' concurrently will trigger kernel panic
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+max_time=1h
