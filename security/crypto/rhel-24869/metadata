@@ -1,0 +1,14 @@
+[General]
+name=security/crypto/rhel-24869
+owner=Dennis Li <denli@redhat.com>
+description= FIPS mode rsa restrict value testing
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=10m
+use_pty=false
+repoRequires=kernel-include
+dependencies=gcc;make
