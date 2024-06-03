@@ -52,9 +52,9 @@ function mm_compaction_test()
 		exit 0
 	fi
 
-	echo "vm.compaction_proactiveness=100" | tee -a $OUTPUTFILE
+	echo "vm.compaction_proactiveness=0"   | tee -a $OUTPUTFILE
 	echo "-------------------------------" | tee -a $OUTPUTFILE
-	set_compaction_proactiveness 100
+	set_compaction_proactiveness 0
 	sleep 60
 	cat /proc/buddyinfo > buddyinfo1 && cat buddyinfo1 | tee -a $OUTPUTFILE
 	list1=$(cat buddyinfo1 | awk '{print $NF}' | tr -d ' ')
@@ -66,9 +66,9 @@ function mm_compaction_test()
 		mem_chunks1=$(( $mem_chunks1 + $i ))
 	done
 
-	echo "vm.compaction_proactiveness=0"   | tee -a $OUTPUTFILE
+	echo "vm.compaction_proactiveness=100" | tee -a $OUTPUTFILE
 	echo "-------------------------------" | tee -a $OUTPUTFILE
-	set_compaction_proactiveness 0
+	set_compaction_proactiveness 100
 	sleep 60
 	cat /proc/buddyinfo > buddyinfo2 && cat buddyinfo2 | tee -a $OUTPUTFILE
 	list1=$(cat buddyinfo2 | awk '{print $NF}' | tr -d ' ')
@@ -80,13 +80,17 @@ function mm_compaction_test()
 		mem_chunks2=$(( $mem_chunks2 + $i ))
 	done
 
-	killall mem-frag-test 2>&1 >/dev/null
+	killall mem-frag-test >/dev/null 2>&1
 
-	if [ "$mem_chunks2" -le "$mem_chunks1" ]; then
+	if [ "$mem_chunks1" -le "$mem_chunks2" ]; then
 		return 0
 	fi
 
 	echo "mem_chunks1 = $mem_chunks1, mem_chunks2 = $mem_chunks2" | tee -a $OUTPUTFILE
+	echo "cat buddyinfo1, vm.compaction_proactiveness=0"
+	cat buddyinfo1
+	echo "cat buddyinfo2, vm.compaction_proactiveness=100"
+	cat buddyinfo2
 	return 1
 }
 
