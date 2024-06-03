@@ -15,6 +15,6 @@ recommend:
   - abootimg
   - grubby
 duration: 1h
+id: 8e55c104-7de6-427d-8645-2e42bade3a55
 extra-summary: /general/time/clocksource_bootparam
 extra-task: /general/time/clocksource_bootparam
-id: 6fd01e68-1cf7-46b1-b6bf-e3128489e662
