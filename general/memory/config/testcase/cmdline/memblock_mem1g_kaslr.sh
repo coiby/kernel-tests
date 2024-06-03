@@ -30,7 +30,7 @@ function memblock_mem1g_kaslr()
     # oom happened when running on ppc64/ppc64le.
     uname -r | grep ppc64 && return 0
     local free_g=$(free -g | awk '/Mem/ {print $2}')
-    local free_M=$(free -m | awk '/Mem/ {print $2}')
+    #local free_M=$(free -m | awk '/Mem/ {print $2}')
     local use_mem=0x40000000
     local limit=1073741824
     local crashkernel_M=$(awk -F= 'BEGIN{RS=" ";crashreserve=0;b[0]="";} /crashkernel/{gsub("\n",""); split($2,a,","); if (length(a) == 1) a[1]=":"a[1]; for (i in a) {split(a[i],b,":"); ret=gsub("M", "", b[2]); ret=gsub("G", "", b[2]);  if (ret) b[2]=b[2]*1024; crashreserve+=b[2]}} END{print (crashreserve);}' /proc/cmdline) # In MiB
@@ -54,10 +54,10 @@ function memblock_mem1g_kaslr()
     fi
 
     setup_cmdline_args "memblock=debug mem=$use_mem"
-    grep memblock_reserve /var/log/dmesg | grep -o '0x[0-9a-z]*-0x[0-9a-z]*' | sed 's/-/ /g' | while read start end
+    journalctl -k | grep memblock_reserve | grep -o '0x[0-9a-z]*-0x[0-9a-z]*' | sed 's/-/ /g' | while read start end
     do
-        mem_start=$(python -c "print $start")
-        mem_end=$(python -c "print $end")
+        mem_start=$(python -c "print($start)")
+        mem_end=$(python -c "print($end)")
         rlAssertGreaterOrEqual "Assert no mem beyond limit: "  $limit ${mem_start}
         rlAssertGreaterOrEqual "Assert no mem beyond limit: " $limit ${mem_end}
     done

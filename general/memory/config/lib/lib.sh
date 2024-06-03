@@ -9,6 +9,12 @@ unset ARCH
 
 FILE_SKIP_SUMMARY="$DIR_DEBUG/skipped_bugs_summary.txt"
 
+# Use cmdline helper to support abd boards for automotive.
+
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../../../../cmdline_helper/libcmd.sh || exit 2
+
 function install_libcgroup()
 {
 	local pkg=libcgroup.20210106.tgz
@@ -105,10 +111,7 @@ setup_cmdline_args(){
 	fi
 
 	echo "Setup cmdline args: $1"
-	grubby --args="$1" --update-kernel="$(grubby --default-kernel)"
-	if [ "$(uname -m)" = "s390x" ]; then
-		zipl
-	fi
+	change_cmdline "$1"
 	touch $DIR_DEBUG/SETUPDONEFLAG_"$2"
 	rhts-reboot
 	sleep 100000
@@ -116,10 +119,7 @@ setup_cmdline_args(){
 
 cleanup_cmdline_args(){
 	echo "Cleanup cmdline args: $1"
-	grubby --remove-args="$1" --update-kernel="$(grubby --default-kernel)"
-	if [ "$(uname -m)" = "s390x" ]; then
-		zipl
-	fi
+	change_cmdline "-$1"
 	rm -vf $DIR_DEBUG/SETUPDONEFLAG_*
 	touch $DIR_DEBUG/REBOOTAFTERDONE
 }
