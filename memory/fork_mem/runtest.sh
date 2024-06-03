@@ -31,8 +31,8 @@
 rlJournalStart
   rlPhaseStartSetup
     # Install avocado framework
-    # Forcing version 93.0 due to https://github.com/avocado-framework-tests/avocado-misc-tests.git
-    pip3 install avocado-framework==93.0
+    # Forcing version to keep it stable
+    pip3 install avocado-framework==105.0
     if [ $? -ne 0 ]; then
       rlLog "Unable to install avocado framework, aborting test"
       rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
