@@ -38,8 +38,10 @@ function set_compaction_proactiveness()
 
 function mm_compaction_test()
 {
-	local mem_chunks1
-	local mem_chunks2
+	local mem_chunks1_head
+	local mem_chunks1_tail
+	local mem_chunks2_head
+	local mem_chunks2_tail
 
 	free -h | tee -a $OUTPUTFILE
 	cat /proc/buddyinfo | tee -a $OUTPUTFILE
@@ -52,46 +54,35 @@ function mm_compaction_test()
 		exit 0
 	fi
 
-	echo "vm.compaction_proactiveness=0"   | tee -a $OUTPUTFILE
-	echo "-------------------------------" | tee -a $OUTPUTFILE
+	echo ""
+	echo "------- vm.compaction_proactiveness=0 --------"   | tee -a $OUTPUTFILE
 	set_compaction_proactiveness 0
 	sleep 60
 	cat /proc/buddyinfo > buddyinfo1 && cat buddyinfo1 | tee -a $OUTPUTFILE
-	list1=$(cat buddyinfo1 | awk '{print $NF}' | tr -d ' ')
-	list2=$(cat buddyinfo1 | awk '{print $(NF-1)}' | tr -d ' ')
-	list3=$(cat buddyinfo1 | awk '{print $(NF-2)}' | tr -d ' ')
-	list4=$(cat buddyinfo1 | awk '{print $(NF-3)}' | tr -d ' ')
-	list5=$(cat buddyinfo1 | awk '{print $(NF-4)}' | tr -d ' ')
-	for i in $list1 $list2 $list3 $list4 $list5; do
-		mem_chunks1=$(( $mem_chunks1 + $i ))
-	done
+	mem_chunks1_head=$(cat buddyinfo1 | awk '{sum += $5} END {print sum}')
+	mem_chunks1_tail=$(cat buddyinfo1 | awk '{sum += $NF + $(NF-1) + $(NF-2) + $(NF-3) + $(NF-4)} END {print sum}')
+	echo "mem_chunks1_head = $mem_chunks1_head, mem_chunks1_tail = $mem_chunks1_tail" | tee -a $OUTPUTFILE
 
-	echo "vm.compaction_proactiveness=100" | tee -a $OUTPUTFILE
-	echo "-------------------------------" | tee -a $OUTPUTFILE
+	echo ""
+
+	echo "------- vm.compaction_proactiveness=100 --------"   | tee -a $OUTPUTFILE
 	set_compaction_proactiveness 100
 	sleep 60
 	cat /proc/buddyinfo > buddyinfo2 && cat buddyinfo2 | tee -a $OUTPUTFILE
-	list1=$(cat buddyinfo2 | awk '{print $NF}' | tr -d ' ')
-	list2=$(cat buddyinfo2 | awk '{print $(NF-1)}' | tr -d ' ')
-	list3=$(cat buddyinfo2 | awk '{print $(NF-2)}' | tr -d ' ')
-	list4=$(cat buddyinfo2 | awk '{print $(NF-3)}' | tr -d ' ')
-	list5=$(cat buddyinfo2 | awk '{print $(NF-4)}' | tr -d ' ')
-	for i in $list1 $list2 $list3 $list4 $list5; do
-		mem_chunks2=$(( $mem_chunks2 + $i ))
-	done
+	mem_chunks2_head=$(cat buddyinfo2 | awk '{sum += $5} END {print sum}')
+	mem_chunks2_tail=$(cat buddyinfo2 | awk '{sum += $NF + $(NF-1) + $(NF-2) + $(NF-3) + $(NF-4)} END {print sum}')
+	echo "mem_chunks2_head = $mem_chunks2_head, mem_chunks2_tail = $mem_chunks2_tail" | tee -a $OUTPUTFILE
+	echo ""
 
 	killall mem-frag-test >/dev/null 2>&1
 
-	if [ "$mem_chunks1" -le "$mem_chunks2" ]; then
+	if [ "$mem_chunks1_head" -lt "$mem_chunks2_head" ]; then
 		return 0
+	elif [ "$mem_chunks1_tail" -gt "$mem_chunks2_tail" ]; then
+		return 0
+	else
+		return 1
 	fi
-
-	echo "mem_chunks1 = $mem_chunks1, mem_chunks2 = $mem_chunks2" | tee -a $OUTPUTFILE
-	echo "cat buddyinfo1, vm.compaction_proactiveness=0"
-	cat buddyinfo1
-	echo "cat buddyinfo2, vm.compaction_proactiveness=100"
-	cat buddyinfo2
-	return 1
 }
 
 
