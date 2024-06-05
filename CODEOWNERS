@@ -89,10 +89,10 @@
 /jvm/dacapobench/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /jvm/jcstress/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /kdump-cki/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
-/kdump-cki/kdump-file-load/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
-/kdump-cki/kdump-sysrq-c/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
-/kdump-cki/kexec-boot/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
+/kdump-cki/crash-file-load/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
+/kdump-cki/crash-sysrq-c/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /kdump-cki/kexec-file-load/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
+/kdump-cki/kexec-load/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /kselftests/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /kunit/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /legacy/pci_id/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21 @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
@@ -218,10 +218,10 @@
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
 /jvm/dacapobench/ @bgoncalv @lulinqing @tstuefe1
 /jvm/jcstress/ @bgoncalv @lulinqing @tstuefe1
-/kdump-cki/kdump-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
-/kdump-cki/kdump-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @thenzl @yiyan1
-/kdump-cki/kexec-boot/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
+/kdump-cki/crash-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
+/kdump-cki/crash-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @thenzl @yiyan1
 /kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
+/kdump-cki/kexec-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
 /kselftests/ @bgoncalv @fmaurer-rh @liuhangbin @lulinqing @npache @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
