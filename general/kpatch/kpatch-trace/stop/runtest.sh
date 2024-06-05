@@ -51,10 +51,10 @@ patched_functions()
 	local f
 
 	# For each /sys/kernel/livepatch/<patch>/<object>/<function,sympos>
-	for f in $SYSFS/livepatch/$module/*,[0-9]*; do
+	for f in $SYSFS/livepatch/$module/*/*,[0-9]*; do
 
-		local file=$(basename "$f")
-		local function="${file%%,*}"
+		file=$(basename "$f")
+		function="${file%%,*}"
 
 		echo "$function"
 	done | sort -u
