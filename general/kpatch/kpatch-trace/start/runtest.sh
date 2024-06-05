@@ -35,11 +35,11 @@ SYSFS=/sys/kernel
 STATS_DIR=/mnt/testarea/kpatch-trace
 
 if [ -n "$KPATCH_PATCH" ]; then
-	KPATCH_FILE="$(rpm -ql $KPATCH_PATCH | grep -E kpatch-.*\.ko)"
+	KPATCH_FILE="$(rpm -ql $KPATCH_PATCH | grep -E 'kpatch-.*\.ko')"
 fi
 
 if [ -z "$KPATCH_FILE" ]; then
-	KPATCH_FILE="$(ls /var/lib/kpatch/$(uname -r)/* | grep kpatch- | head -n 1)"
+	KPATCH_FILE="$(ls /var/lib/kpatch/$(uname -r)/kpatch-* | head -n 1)"
 fi
 
 KPATCH_MODULE="$(modinfo --field=name $KPATCH_FILE)"
@@ -84,11 +84,11 @@ WantedBy=multi-user.target" > /usr/local/lib/systemd/system/kpatch-trace.service
 
 		rlLog "Add cron job to save stats every 1 min"
 		mkdir -p $STATS_DIR
-		> $STATS_DIR/stats
+		:> $STATS_DIR/stats
 		echo "#!/usr/bin/bash
 comm -23 <(sed -e 's/^.*[0-9]:[ ]//' -e 's/[ ].*$//' /sys/kernel/debug/tracing/trace | grep -v '#' | sort -u) <(sort -u $STATS_DIR/stats) >> $STATS_DIR/stats" > /usr/local/bin/kpatch-trace-stats.sh
 		chmod +x /usr/local/bin/kpatch-trace-stats.sh
 		echo "* * * * * root /usr/local/bin/kpatch-trace-stats.sh" > /etc/cron.d/kpatch-trace.job
-            rlPhaseEnd
+	rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd

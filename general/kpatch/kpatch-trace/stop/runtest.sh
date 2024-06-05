@@ -36,11 +36,11 @@ SYSFS=/sys/kernel
 STATS_DIR=/mnt/testarea/kpatch-trace
 
 if [ -n "$KPATCH_PATCH" ]; then
-	KPATCH_FILE="$(rpm -ql $KPATCH_PATCH | grep -E kpatch-.*\.ko)"
+	KPATCH_FILE="$(rpm -ql $KPATCH_PATCH | grep -E 'kpatch-.*\.ko')"
 fi
 
 if [ -z "$KPATCH_FILE" ]; then
-	KPATCH_FILE="$(ls /usr/lib/kpatch/$(uname -r)/* | grep kpatch- | head -n 1)"
+	KPATCH_FILE="$(ls /usr/lib/kpatch/$(uname -r)/kpatch-* | head -n 1)"
 fi
 
 KPATCH_MODULE="$(modinfo --field=name $KPATCH_FILE)"
@@ -51,7 +51,7 @@ patched_functions()
 	local f
 
 	# For each /sys/kernel/livepatch/<patch>/<object>/<function,sympos>
-	for f in $(find "$SYSFS/livepatch/$module" -name '*,[0-9]*'); do
+	for f in $SYSFS/livepatch/$module/*,[0-9]*; do
 
 		local file=$(basename "$f")
 		local function="${file%%,*}"
@@ -77,7 +77,7 @@ rlJournalStart
 		[ -n "$not_ex" ] && ( rlLogWarning "Code that was modified but didn't run:" ; rlLogWarning "$not_ex" ) \
 			|| rlPass "All patched functions were triggered"
 		echo "# Other code that ftrace saw, but is not listed in the sysfs directory:" > $STATS_DIR/other
-		other=$(comm -13 <(echo "$pf") <(echo "$tf") | tee -a $STATS_DIR/other)
+		comm -13 <(echo "$pf") <(echo "$tf") | tee -a $STATS_DIR/other
 		rlFileSubmit $STATS_DIR/other
 	rlPhaseEnd
 rlJournalPrintText
