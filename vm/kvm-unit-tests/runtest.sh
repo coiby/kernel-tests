@@ -185,10 +185,11 @@ function configureTests
     hwpf=$(uname -m)
 
     #Increasing timeout for some test to give them more time in CKI environment
-    sed -i '/^\[vmx_vmcs_shadow_test\]$/,/^\[/ s/^timeout = 180/timeout = 300/' x86/unittests.cfg
+    sed -i '/^\[vmx_vmcs_shadow_test\]$/,/^\[/ s/^timeout = 180/timeout = 400/' x86/unittests.cfg
     sed -i '/^\[vmx_pf_vpid_test\]$/,/^\[/ s/^timeout = 240/timeout = 1000/' x86/unittests.cfg
     sed -i '/^\[vmx_pf_invvpid_test\]$/,/^\[/ s/^timeout = 240/timeout = 1000/' x86/unittests.cfg
     sed -i '/^\[vmx_pf_no_vpid_test\]$/,/^\[/ s/^timeout = 240/timeout = 1000/' x86/unittests.cfg
+    sed -i '/^\[vmx_apicv_test\]$/,/^\[/ s/^timeout = 10/timeout = 20/' x86/unittests.cfg
     sed -i '/^\[access_fep\]$/,/^\[/ s/^timeout = 240/timeout = 500/' x86/unittests.cfg
 }
 
