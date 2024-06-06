@@ -114,27 +114,37 @@ function run_test()
                 ;;
         nvme)
                 get_free_disk nvme
-                # shellcheck disable=SC2154
-                rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
-                rlRun "ublk add -t loop -f ${dev0}p1"
-                rlRun "lsblk"
-                rlRun "ublk list"
-                fio_test
-                rlRun "ublk del -a"
-                rlRun "parted -s ${dev0} rm 1"
-                rlRun "lsblk"
+                if [ -z "${dev0}" ];then
+                    rlLog "Don't get any free disk,skip testing"
+                    rstrnt-report-result "No free disk" SKIP 0
+                else
+                    # shellcheck disable=SC2154
+                    rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
+                    rlRun "ublk add -t loop -f ${dev0}p1"
+                    rlRun "lsblk"
+                    rlRun "ublk list"
+                    fio_test
+                    rlRun "ublk del -a"
+                    rlRun "parted -s ${dev0} rm 1"
+                    rlRun "lsblk"
+                fi
                 ;;
         ssd)
                 get_free_disk ssd
-                # shellcheck disable=SC2154
-                rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
-                rlRun "ublk add -t loop -f ${dev0}1"
-                rlRun "lsblk"
-                rlRun "ublk list"
-                fio_test
-                rlRun "ublk del -a"
-                rlRun "parted -s ${dev0} rm 1"
-                rlRun "lsblk"
+                if [ -z "${dev0}" ];then
+                    rlLog "Don't get any free ssd disk,skip testing"
+                    rstrnt-report-result "No free disk" SKIP 0
+                else
+                    # shellcheck disable=SC2154
+                    rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
+                    rlRun "ublk add -t loop -f ${dev0}1"
+                    rlRun "lsblk"
+                    rlRun "ublk list"
+                    fio_test
+                    rlRun "ublk del -a"
+                    rlRun "parted -s ${dev0} rm 1"
+                    rlRun "lsblk"
+                fi
     esac
 }
 
