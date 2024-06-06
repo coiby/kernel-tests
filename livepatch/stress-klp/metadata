@@ -10,4 +10,4 @@ destructive=no
 entry_point=bash -x ./runtest.sh
 max_time=20m
 use_pty=false
-dependencies=gcc;git;automake;kernel-devel;elfutils-libelf-devel
+dependencies=gcc;git;automake;elfutils-libelf-devel

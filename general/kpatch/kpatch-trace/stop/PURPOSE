@@ -1,0 +1,3 @@
+This script disables kpatch-patch module functions tracing
+and collects statistics on patched/traced/patched&traced 
+functions
