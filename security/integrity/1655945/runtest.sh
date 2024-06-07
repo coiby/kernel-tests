@@ -26,6 +26,16 @@
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
+        rlRun -l "evmctl --version"
+        current_version=$(evmctl --version | awk '{print $NF}')
+        IFS='.' read -r current_major current_minor <<< "$current_version"
+        current_major=$((current_major))
+        current_minor=$((current_minor))
+        if (( current_major > 1 )) || { (( current_major == 1 )) && (( current_minor > 4 )); }; then
+            rlLog "[SKIP] Skipping test for evmctl versions > 1.4"
+            rstrnt-report-result $RSTRNT_TASKNAME SKIP
+            exit 0
+        fi
         rlRun "openssl genrsa -out rsa_private.pem 1024"
         rlRun "openssl rsa -pubout -in rsa_private.pem -out rsa_public.pem"
         rlRun "keyctl show"

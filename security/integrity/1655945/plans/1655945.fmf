@@ -3,8 +3,6 @@ discover:
     how: fmf
     test:
         - /security/integrity/1655945/tests/1655945
-execute:
-    how: tmt
 prepare:
   - name: Enable Repos
     how: shell
