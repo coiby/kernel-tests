@@ -1,7 +1,7 @@
 [General]
-name=kdump-cki/kdump-file-load
+name=kdump-cki/kexec-load
 owner=Kdump QE <kdump-qe-list@redhat.com>
-description=kdump test with kexec_file_load call
+description=kdump kexec load and reboot test
 license=GPLv3
 confidential=no
 destructive=no

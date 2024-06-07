@@ -1,7 +1,7 @@
 [General]
-name=kdump-cki/kexec-boot
+name=kdump-cki/crash-sysrq-c
 owner=Kdump QE <kdump-qe-list@redhat.com>
-description=kdump kexec load and reboot test
+description=kdump sysrq-c test
 license=GPLv3
 confidential=no
 destructive=no

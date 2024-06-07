@@ -1,7 +1,7 @@
 [General]
-name=kdump-cki/kdump-sysrq-c
+name=kdump-cki/crash-file-load
 owner=Kdump QE <kdump-qe-list@redhat.com>
-description=kdump sysrq-c test
+description=kdump test with kexec_file_load call
 license=GPLv3
 confidential=no
 destructive=no

@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2019 Red Hat, Inc.
@@ -23,7 +23,7 @@
 . ../../cki_lib/libcki.sh || exit 1
 . ../include/runtest.sh
 
-TEST="/kdump/kdump-sysrq-c"
+TEST="/kdump/crash-file-load"
 
 ANALYZE_VMCORE="${ANALYZE_VMCORE:-true}"
 
@@ -33,17 +33,11 @@ Crash()
         SetupKdump
         Cleanup
 
-        # From RHEL-9.3, kexec uses "-a" as default option.
-        # This tests kdump kernel to be loaded with *kexec__load* explicitly
+        # This tests kdump kernel to be loaded with *kexec_file_load* explicitly
         # no matter what default option is for kexec
-
-        # kexec_load() doesn't not verify kernel key
-        AppendSysconfig KEXEC_ARGS remove "-s"
-
-        # Note, kexec 2.0.15 used in RHEL-7 doesn't support "-c" explicitly.
-        if ! $IS_RHEL || [ "${RELEASE}" -gt 7 ]; then
-            AppendSysconfig KEXEC_ARGS add "-c"
-        fi
+        # kexec_file_load() verifies kernel key if it's in lockdown or key forcing mode
+        AppendSysconfig KEXEC_ARGS remove "-c"
+        AppendSysconfig KEXEC_ARGS add "-s"
 
         # Add 'KDUMP_STDLOGLVL=4' to /etc/sysconfig/kdump for getting more debug messages which is
         # useful for analyzing kdump failure
@@ -75,7 +69,7 @@ Crash()
             GetDumpFile "${f}" && RstrntSubmit "${dump_file_path}"
         done
 
-        GetCorePath|| return
+        GetCorePath || return
 
         # Analyse the vmcore by crash utilities if ANALYZE_VMCORE=true
         [ "${ANALYZE_VMCORE,,}" == "true" ] && {
