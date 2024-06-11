@@ -13,6 +13,7 @@ download.devel.redhat.com
 download[a-zA-Z0-9\\.\\-]*.eng.[a-zA-Z0-9\\-]+.redhat.com
 download.lab.bos.redhat.com
 vmcore.usersys.redhat.com
+rhivos.auto-toolchain.redhat.com	# Based on INC2968163
 
 # public hosts
 access.redhat.com
