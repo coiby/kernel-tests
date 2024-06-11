@@ -52,12 +52,8 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "cap_bounds"
-        rlRun "/opt/ltp/runltp -f cap_bounds"
-    rlPhaseEnd
-
-    rlPhaseStartTest "filecaps"
-        rlRun "/opt/ltp/runltp -f filecaps"
+    rlPhaseStartTest "capability"
+        rlRun "/opt/ltp/runltp -f capability"
     rlPhaseEnd
 
     rlPhaseStartTest "prot_hsymlinks"
