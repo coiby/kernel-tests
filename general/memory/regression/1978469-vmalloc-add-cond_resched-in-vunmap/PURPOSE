@@ -1,0 +1,1 @@
+Verifies that vfree() doesn't trigger NMI watchdog BUG when freeing a large vmalloc'd area.

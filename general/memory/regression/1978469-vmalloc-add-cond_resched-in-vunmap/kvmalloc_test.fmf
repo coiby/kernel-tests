@@ -1,0 +1,14 @@
+summary: Verifies that vfree() doesn't trigger NMI watchdog BUG when freeing a large vmalloc'd area.
+description: |
+        Verifies that vfree() doesn't trigger NMI watchdog BUG when freeing a large vmalloc'd area.
+contact: mm-qe <mm-qe@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - make
+  - type: file
+    pattern:
+      - /kernel-include
+duration: 10m
