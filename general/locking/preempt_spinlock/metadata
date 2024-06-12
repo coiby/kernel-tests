@@ -1,0 +1,14 @@
+[General]
+name=preempt spinlock
+owner=Chunyu Hu <chuhu@redhat.com>
+description=rtmutex based spinlock() (PREEMPT_RT) could be preempted by high priority task
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=15m
+dependencies=gcc;libgcc;elfutils-libelf-devel;openssl-devel
+softDependencies=git;glibc;bison;flex
+repoRequires=general/include;automotive/include
