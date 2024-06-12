@@ -5,6 +5,7 @@ contact: mm-qe <mm-qe@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
+id: 5139833c-ef77-4a5d-a0d5-be23b2c9136f
 framework: beakerlib
 require:
   - make
