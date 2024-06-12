@@ -1,0 +1,13 @@
+[General]
+name=1978469-vmalloc-add-cond_resched-in-vunmap
+owner=mm-qe <mm-qe@redhat.com>
+description=Verifies that vfree() doesn't trigger NMI watchdog BUG when freeing a large vmalloc'd area.
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=make;kernel-devel
+repoRequires=kernel-include
