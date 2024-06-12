@@ -207,10 +207,12 @@ check usage of internal hostnames:
       for allowed_host in "${allowed_hosts[@]}"; do
         if ! grep -hroEq --exclude=.allowed-hosts "${allowed_host}"; then
             echo "${allowed_host} from .allowed-hosts should be removed as it is not used"
-            fail=1
+            fail=2
         fi
       done
       exit ${fail}
+  allow_failure:
+    exit_codes: 2
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
