@@ -162,18 +162,15 @@ function numactl_move_page()
 			(( i++ ))
 		done
 		# Shink the units of MemFree from kB to GB
-		for (( c=0; c<6; c++ ))
+		for (( i=0; i<$numa_num; i++ ))
 		do
-			for (( i=0; i<$numa_num; i++ ))
-			do
-				node_free[$i]=$( expr ${node_free[$i]} / 10 )
-				if [ "${node_free[$i]}" -ge 1 ]; then
-					continue
-				else
-					sed -i 's/move_pages12 move_pages12/#DISABLE move_pages12 move_pages12/' "$runtest"
-					break
-				fi
-			done
+			node_free[$i]=$( expr ${node_free[$i]} / 1024 / 1024 )
+			if [ "${node_free[$i]}" -ge 1 ]; then
+				continue
+			else
+				sed -i 's/move_pages12 move_pages12/#DISABLE move_pages12 move_pages12/' "$runtest"
+				break
+			fi
 		done
 	fi
 }
