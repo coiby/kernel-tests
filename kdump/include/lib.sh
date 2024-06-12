@@ -98,6 +98,7 @@ export IS_FC IS_RHEL IS_COS
 export IS_RT IS_DB IS_64K
 export MAIN_RPM_PACKAGE
 
+export IS_CentOS10=false
 export IS_CentOS9=false
 export IS_CentOS8=false
 
@@ -125,6 +126,7 @@ else
 fi
 
 $IS_COS && {
+    rpm -qa | grep glibc | grep -q 'el10' && IS_CentOS10=true
     rpm -qa | grep glibc | grep -q 'el9' && IS_CentOS9=true
     rpm -qa | grep glibc | grep -q 'el8' && IS_CentOS8=true
 }
