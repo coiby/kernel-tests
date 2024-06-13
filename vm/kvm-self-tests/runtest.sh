@@ -78,8 +78,6 @@ function checkPlatformSupport
     typeset hwpf=${1?"*** what hardware-platform?, e.g. x86_64"}
     [[ $hwpf == "x86_64" ]] && return 0
     [[ $hwpf == "aarch64" ]] && return 0
-    [[ $hwpf == "ppc64" ]] && return 1
-    [[ $hwpf == "ppc64le" ]] && return 1
     [[ $hwpf == "s390x" ]] && return 0
     return 1
 }
@@ -104,14 +102,6 @@ function checkVirtSupport
         fi
         CPUTYPE="ARMGICv$GICVERSION"
         journalctl -k | grep -iqE "kvm.*: (Hyp|VHE) mode initialized successfully"
-        return $?
-    elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
-        if (grep -q 'POWER9' /proc/cpuinfo); then
-            CPUTYPE="POWER9"
-        else
-            CPUTYPE="POWER8"
-        fi
-        grep -q 'platform.*PowerNV' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "s390x" ]]; then
         if (grep -q 'machine = 2964' /proc/cpuinfo); then
@@ -197,7 +187,7 @@ function setup
         OSVERSION="ARK"
     fi
 
-    # tests are currently supported on x86_64, aarch64, ppc64 and s390x
+    # tests are currently supported on x86_64, aarch64, and s390x
     hwpf=$(uname -m)
     if checkPlatformSupport "$hwpf"; then
         # test can only run on hardware that supports virtualization
@@ -241,10 +231,6 @@ function setup
         KVM_ARCH_OPTIONS+=("nested")
     elif [[ $CPUTYPE == "AMD" ]]; then
         KVM_ARCH="kvm_amd"
-        KVM_ARCH_OPTIONS+=("nested")
-    elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
-        KVM_ARCH="kvm_hv"
-        KVM_MODULES+=("kvm_pr")
         KVM_ARCH_OPTIONS+=("nested")
     fi
     KVM_MODULES+=("$KVM_ARCH")
@@ -330,7 +316,6 @@ function setup
         # Build tests
         [[ $hwpf == "x86_64" ]] && ARCH="x86_64"
         [[ $hwpf == "aarch64" ]] && ARCH="arm64"
-        [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]] && ARCH="powerpc"
         [[ $hwpf == "s390x" ]] && ARCH="s390"
         rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm"
         rlRun "mv ${BINDIR}/x86_64/* ${BINDIR} ; rm -rf ${BINDIR}/x86_64"

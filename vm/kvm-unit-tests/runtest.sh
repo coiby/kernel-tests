@@ -91,8 +91,6 @@ function checkPlatformSupport
     typeset hwpf=${1?"*** what hardware-platform?, e.g. x86_64"}
     [[ $hwpf == "x86_64" ]] && return 0
     [[ $hwpf == "aarch64" ]] && return 0
-    [[ $hwpf == "ppc64" ]] && return 0
-    [[ $hwpf == "ppc64le" ]] && return 0
     [[ $hwpf == "s390x" ]] && return 0
     return 1
 }
@@ -136,16 +134,6 @@ function checkVirtSupport
         fi
         CPUTYPE="ARMGICv$GICVERSION"
         journalctl -k | grep -iqE "kvm.*: (Hyp|VHE) mode initialized successfully"
-        return $?
-    elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
-        ACCELS+=("kvm,cap-ccf-assist=off")
-        ACCELS+=("tcg")
-        if (grep -q 'POWER9' /proc/cpuinfo); then
-            CPUTYPE="POWER9"
-        else
-            CPUTYPE="POWER8"
-        fi
-        grep -qE 'platform.*PowerNV' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "s390x" ]]; then
         ACCELS+=("kvm")
@@ -229,9 +217,6 @@ function disableTests
             disableTest "pmu-chain-promotion"
             disableTest "pmu-overflow-interrupt"
         fi
-        if [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
-            disableTest "spapr_vpa"
-        fi
     fi
 
     # Disable tests for RHEL9 Kernel (5.14.X)
@@ -298,12 +283,9 @@ function setupRepo
       rlRun "git clone --depth=1 --branch=master https://gitlab.com/multi-arch-ci/kvm-unit-tests.git > /dev/null 2>&1"
     fi
     rlRun "cd kvm-unit-tests > /dev/null 2>&1"
-
-    if [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
-        rlRun "./configure --endian=little"
     #Need to change page size for arm  due to:
     #https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/commit/3b3f9a3ef19bfdbfe38f6b4970292b88d458a260
-    elif [[ $hwpf == "aarch64" ]]; then
+    if [[ $hwpf == "aarch64" ]]; then
         rlRun "./configure --page-size=65536 --arch=$hwpf"
     else
         rlRun "./configure --arch=$hwpf"
@@ -327,7 +309,7 @@ function setup
         OSVERSION="ARK"
     fi
 
-    # tests are currently supported on x86_64, aarch64, ppc64 and s390x
+    # tests are currently supported on x86_64, aarch64, and s390x
     hwpf=$(uname -m)
     if checkPlatformSupport "$hwpf"; then
         # test can only run on hardware that supports virtualization
@@ -338,7 +320,7 @@ function setup
             rlSkip "[$OSVERSION][$hwpf][$CPUTYPE] CPU doesn't support virtualization"
         fi
     else
-        rlSkip "[$OSVERSION][$hwpf] test is only supported on x86_64, aarch64, ppc64 or s390x"
+        rlSkip "[$OSVERSION][$hwpf] test is only supported on x86_64, aarch64, or s390x"
     fi
 
     # test should only run on a system with 1 or more cpus
@@ -374,10 +356,6 @@ function setup
         KVM_ARCH_OPTIONS+=("nested")
     elif [[ $CPUTYPE == "AMD" ]]; then
         KVM_ARCH="kvm_amd"
-        KVM_ARCH_OPTIONS+=("nested")
-    elif [[ $hwpf == "ppc64" || $hwpf == "ppc64le" ]]; then
-        KVM_ARCH="kvm_hv"
-        KVM_MODULES+=("kvm_pr")
         KVM_ARCH_OPTIONS+=("nested")
     fi
     KVM_MODULES+=("$KVM_ARCH")
