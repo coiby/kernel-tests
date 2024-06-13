@@ -14,7 +14,6 @@ description: |
 contact: Chunyu Hu <chuhu@redhat.com>
 test: make run
 framework: beakerlib
-id: 2585039b-b117-483b-93d0-68c0e6d19401
 require:
     - gcc
     - glibc
@@ -24,3 +23,4 @@ recommend:
     - rsyslog
     - stress-ng
 duration: 1h
+id: bc07b5d7-c834-4062-a303-e9747ba3b51e
