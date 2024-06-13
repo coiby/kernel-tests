@@ -5,5 +5,7 @@ path: /security/vulnerabilities
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 5m
+tag:
+  - KernelTier1
 component:
   - kernel

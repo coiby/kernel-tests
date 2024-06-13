@@ -30,7 +30,9 @@ description: |
 contact: Jeff Bastian <jbastian@redhat.com>
 id: 0870c070-b62c-45d3-bf9b-1106a14a0356
 test: bash ./runtest.sh
-tag: header-test
+tag:
+  - header-test
+  - KernelTier1
 framework: shell
 extra-summary: misc/header-test
 extra-task: misc/header-test
