@@ -160,6 +160,7 @@ function knownissue_filter()
 	# -------------------Common Issues ---------------------
 	# skip OOM tests on large boxes since it takes too long
 	[ "$(free -g | grep "^Mem:" | awk '{print $2}')" -gt 8 ] && tskip "oom0.*" fatal
+	[ "$(free -g | grep "^Mem:" | awk '{print $2}')" -gt 64 ] && tskip "mtest01w" fatal
 	[ "$(free -g | grep "^Mem:" | awk '{print $2}')" -gt 32 ] || cki_is_kernel_debug && tskip "ioctl_sg01" fatal
 	# this case always make the beaker task abort with 'incrementing stop' msg
 	tskip "min_free_kbytes" fatal
