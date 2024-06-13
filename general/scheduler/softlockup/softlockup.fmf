@@ -12,6 +12,7 @@ require:
   - elfutils-libelf-devel
   - openssl-devel
   - beakerlib
+id: 9ae40ac6-abf2-4aad-8a81-39ad1e99c7a7
 duration: 15m
 extra-summary: /general/scheduler/softlockup
 extra-task: /general/scheduler/softlockup
