@@ -1,0 +1,17 @@
+summary: softlockup detector is enabled and watchdog could detect softlockup
+description: softlockup detector is enabled and watchdog could detect softlockup
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+  - kernel
+path: /general/scheduler/softlockup
+test: bash ./runtest.sh
+framework: shell
+require:
+  - gcc
+  - libgcc
+  - elfutils-libelf-devel
+  - openssl-devel
+  - beakerlib
+duration: 15m
+extra-summary: /general/scheduler/softlockup
+extra-task: /general/scheduler/softlockup
