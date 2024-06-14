@@ -144,6 +144,37 @@ function exclude_disruptive_for_kt1()
 	fi
 }
 
+function numactl_move_page()
+{
+	local runtest=$1
+	local node_path="/sys/devices/system/node"
+
+	declare -A node_free
+	numa_num=$(ls -d -1 $node_path/node* | wc -l)
+
+	if [[ $numa_num -eq 1 ]]; then
+		sed -i 's/move_pages12 move_pages12/#DISABLE move_pages12 move_pages12/' "$runtest"
+	else
+		i=0
+		for n in "$node_path"/node*
+		do
+			node_free[$i]=$(grep MemFree $n/meminfo | awk '{print $4}')
+			(( i++ ))
+		done
+		# Shink the units of MemFree from kB to GB
+		for (( i=0; i<$numa_num; i++ ))
+		do
+			node_free[$i]=$( expr ${node_free[$i]} / 1024 / 1024 )
+			if [ "${node_free[$i]}" -ge 1 ]; then
+				continue
+			else
+				sed -i 's/move_pages12 move_pages12/#DISABLE move_pages12 move_pages12/' "$runtest"
+				break
+			fi
+		done
+	fi
+}
+
 function add_external_timeout()
 {
 	local runtest=$1
@@ -197,6 +228,8 @@ function runtest_prepare()
 	tolerate_s390_high_steal_time "$runtest"
 
 	exclude_disruptive_for_kt1 "$runtest"
+
+	numactl_move_page "$runtest"
 
 	add_external_timeout "$runtest"
 
