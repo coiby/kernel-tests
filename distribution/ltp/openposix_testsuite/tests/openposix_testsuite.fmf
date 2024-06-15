@@ -1,7 +1,7 @@
 summary: Linux Test Project openposix testsuite KernelTier1
 description: kernel/distribution/ltp/openposix_testsuite
 enabled: true
-id: 3e086fed-d2a4-474b-b7cc-a79bfe8e0bb0
+id: 1deb2781-456d-459b-a21f-229a3ba367a1
 tag:
   - fmf-export
 contact: Memory Management QE <mm-qe@redhat.com>
