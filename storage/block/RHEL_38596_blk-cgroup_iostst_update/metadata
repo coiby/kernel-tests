@@ -1,0 +1,12 @@
+[General]
+name=storage/block/RHEL_38596_blk-cgroup_iostst_update
+owner=Changhui Zhong <czhong@redhat.com>
+description=blk-cgroup properly propagate the iostat update up the hierarchy
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+max_time=1h
