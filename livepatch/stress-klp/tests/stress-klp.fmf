@@ -1,0 +1,15 @@
+summary: Livepatch stress test
+description: |
+    Kernel Livepatch stress testsuite based on SUSE's qa_test_klp
+contact: Dennis Li <denli@redhat.com>
+component:
+  - kernel
+path: /livepatch/stress-klp
+test: bash +x runtest.sh
+framework: shell
+recommend:
+  - gcc
+  - git
+  - automake
+  - elfutils-libelf-devel
+duration: 20m
