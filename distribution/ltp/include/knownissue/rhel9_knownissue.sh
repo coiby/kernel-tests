@@ -42,6 +42,8 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "906" && tskip "fanotify14" unfix
 	# https://issues.redhat.com/browse/RHEL-29436 LTP proc_sched_rt01 fails
 	osver_in_range "900" "906" && tskip "proc_sched_rt01" unfix
+	# https://issues.redhat.com/browse/RHELMISC-5339 ltp/swapon03.c:56: TFAIL: swapon(filename, 0) failed: EPERM (1)
+	kernel_in_range "5.14.0-441.el9" "5.14.0-999.el9" && tskip "swapon03" unfix
 }
 
 function rhel9_fixed_issues()

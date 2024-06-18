@@ -14,3 +14,4 @@ prctl10
 fstat03
 waitid10
 select03
+waitpid01
