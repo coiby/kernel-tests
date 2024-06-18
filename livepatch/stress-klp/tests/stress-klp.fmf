@@ -6,7 +6,7 @@ component:
   - kernel
 path: /livepatch/stress-klp
 test: bash +x runtest.sh
-framework: shell
+framework: beakerlib
 recommend:
   - gcc
   - git
