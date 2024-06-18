@@ -216,7 +216,7 @@ function bz1157802()
 			if [ ! -f "$rebootflag_f" ];then
 				test_sched_hackbench
 				check_smt_clock_source
-				((CpuCount < 4)) && rlLogWarning "Test needs number of cpu >= 4." && return 1;
+				((CpuCount < 4)) && rlLogInfo "Test needs number of cpu >= 4." && { echo "SKIP" > "$STATUS_FILE"; return; }
 				rlLogInfo "Set kernel cmdline to isolabe some cpus and enable adjustive ticks."
 				rlRun "grubby --args=\"nohz_full=$first_cpu-$last_cpu rcu_nocbs=$first_cpu-$last_cpu nmi_watchdog=0 nohz=on nowatchdog nosoftlockup\"\
 					--update-kernel=$(grubby --default-kernel)"
