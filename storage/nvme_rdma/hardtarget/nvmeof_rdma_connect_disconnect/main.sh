@@ -14,12 +14,15 @@ function runtest {
 	test_num=100
 	HostNQN1=nvme-rdma-host-1-nqn-1
 	HostNQN2=nvme-rdma-host-2-nqn-1
+	HostID1=$(uuid)
+	HostID2=$(uuid)
+
 	while [ $num -lt $test_num ]
 	do
 		tlog "INFO: connect-disconnect operation:$num"
 
-		NVMEOF_RDMA_TARGET_CONNECT_E5700 "$IP0" "$HostNQN1"
-		NVMEOF_RDMA_TARGET_CONNECT_E5700 "$IP1" "$HostNQN2"
+		NVMEOF_RDMA_TARGET_CONNECT_E5700 "$IP0" "$HostNQN1" "$HostID1"
+		NVMEOF_RDMA_TARGET_CONNECT_E5700 "$IP1" "$HostNQN2" "$HostID2"
 
 		tok "sleep 0.5"
 		tok nvme list

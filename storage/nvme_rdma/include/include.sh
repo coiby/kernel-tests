@@ -116,9 +116,11 @@ function NVMEOF_RDMA_TARGET_CONNECT_E5700
 {
 	local IP=$1
 	local HostNQN=$2
-	tok "nvme discover -t rdma -a $IP"
+	local HostID=$3
+
+	tok "nvme discover --transport=rdma --traddr=$IP --hostid=$HostID --hostnqn=$HostNQN"
 	# shellcheck disable=SC2154
-	tok nvme connect -t rdma -a "$IP" -n "$TargetNQN" -q "$HostNQN"
+	tok "nvme connect --transport=rdma --traddr=$IP --nqn=$TargetNQN --hostnqn=$HostNQN --hostid=$HostID"
 	ret=$?
 	if (( ret == 0 )); then
 		tlog "INFO: connect to $IP with $HostNQN pass"

@@ -10,7 +10,6 @@ recommend:
   - beakerlib-redhat
 require:
   - nvme-cli
-  - nvmetcli
   - fio
 duration: 2h
 tag:
