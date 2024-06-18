@@ -42,6 +42,6 @@ require:
   - flex
 recommend:
   - kernel-utils
-duration: 60m
+duration: 75m
 extra-summary: /misc/module-load
 extra-task: /misc/module-load
