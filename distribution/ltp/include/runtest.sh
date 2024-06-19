@@ -145,6 +145,11 @@ PrintSysInfo ()
     numactl --hardware | tee -a $SYSINFO
     echo "-----" | tee -a $SYSINFO
 
+    echo "cat /proc/cmdline" | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+    cat /proc/cmdline | tee -a $SYSINFO
+    echo "-----" | tee -a $SYSINFO
+
     echo "cat /proc/meminfo" | tee -a $SYSINFO
     echo "-----" | tee -a $SYSINFO
     cat /proc/meminfo | tee -a $SYSINFO
