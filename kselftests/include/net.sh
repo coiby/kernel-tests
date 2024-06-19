@@ -304,6 +304,7 @@ do_bpf_test_progs_config()
 	echo "=== Setting mmap_low_allowed on ===" | tee -a "$OUTPUTFILE"
 	setsebool -P mmap_low_allowed on
 	sysctl_set net.mptcp.enabled 1
+	sysctl_set kernel.io_uring_disabled 0
 	modprobe nf_conntrack
 	modprobe nf_nat
 
@@ -366,6 +367,7 @@ do_bpf_test_progs_reset()
 	echo "=== Setting mmap_low_allowed off ===" | tee -a "$OUTPUTFILE"
 	setsebool -P mmap_low_allowed off
 	sysctl_restore net.mptcp.enabled
+	sysctl_restore kernel.io_uring_disabled
 	modprobe -r nf_nat
 	modprobe -r nf_conntrack
 	reset_network_env
