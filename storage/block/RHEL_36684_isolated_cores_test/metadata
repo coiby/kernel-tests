@@ -1,0 +1,13 @@
+[General]
+name=storage/block/RHEL_36684_isolated_cores_test
+owner=Changhui Zhong <czhong@redhat.com>
+description=isolated cores test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+dependencies=fio;libaio;libaio-devel
+max_time=1h
