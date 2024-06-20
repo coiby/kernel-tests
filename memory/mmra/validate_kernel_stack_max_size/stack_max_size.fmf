@@ -1,0 +1,18 @@
+summary: Verifies that max kernel stack size is less than 16k
+description: |
+    Test for stack_max_size. And this should be ran at the end of
+    a test round but without the machine being rebooted, because
+    we want to find offenders in drivers.
+
+    The test works as follows:
+    	Verifies that max kernel stack size is less than 16k
+
+    See:
+    https://issues.redhat.com/browse/RHELMISC-3967
+contact: mm-qe <mm-qe@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+id: 519bce43-f03c-4345-bad4-b8ec9382257a
+duration: 15m
+extra-summary: validate_kernel_stack_max_size
+extra-task: validate_kernel_stack_max_size
