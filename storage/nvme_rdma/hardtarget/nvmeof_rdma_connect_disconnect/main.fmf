@@ -10,8 +10,8 @@ recommend:
   - beakerlib-redhat
 require:
   - nvme-cli
-  - nvmetcli
   - fio
+  - uuid
 duration: 2h
 tag:
   - regression

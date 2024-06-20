@@ -15,8 +15,10 @@ function runtest()
 
 	# connect to E5700 target
 	HostNQN=nvme-rdma-host-5-nqn-1
-	NVMEOF_RDMA_TARGET_CONNECT_E5700 "$IP0" "$HostNQN"
-	NVMEOF_RDMA_TARGET_CONNECT_E5700 "$IP1" "$HostNQN"
+	HostID1=$(uuid)
+
+	NVMEOF_RDMA_TARGET_CONNECT_E5700 "$IP0" "$HostNQN" "$HostID1"
+	NVMEOF_RDMA_TARGET_CONNECT_E5700 "$IP1" "$HostNQN" "$HostID1"
 
 	# wait 5s to wait connecting
 	sleep 1.5
