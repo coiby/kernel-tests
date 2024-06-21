@@ -4,7 +4,7 @@ contact: Dennis Li <denli@redhat.com>
 component:
   - kernel
 path: /security/crypto/rhel-24869
-test: make run
+test: bash +x runtest.sh
 framework: beakerlib
 require: [gcc, make]
 duration: 10m
