@@ -1,0 +1,8 @@
+In PREEMPT_RT, spin_lock() are coverted on rt_mutex, and could be preempted.
+The test simply verify the behavior.
+
+The writer thread (SCHED_FIFO:1) would preempt the locker thread (SCHED_NORMAL)
+in the test, and they both bind to cpu0.
+
+PARAMETERS
+
