@@ -7,7 +7,7 @@ component:
 path: /security/integrity/ltp
 test: make run
 framework: beakerlib
-require: 
+require:
     - autoconf
     - automake
     - bison
@@ -30,12 +30,13 @@ require:
     - openssl-devel
     - pkgconf
     - xfsprogs-devel
-    - abootimg
     - grubby
     - type: file
       pattern:
           - /kernel-include
           - /cmdline_helper
+recommend:
+    - abootimg
 duration: 5h
 extra-summary: /kernel-tests/security/integrity/ltp
 extra-task: /kernel-tests/security/integrity/ltp
