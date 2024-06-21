@@ -108,7 +108,7 @@ fi
 
 RPM="$(find . -iname "$KERNEL_DEBUGINFO_NVR*.rpm" -type f)"
 
-if [ -z "$RPM" -o ! -e "$RPM" ]
+if [ -z "$RPM" ] || [ ! -e "$RPM" ]
 then
 	echo "ERROR: Unable to find RPM." >&2
 	echo "DEBUG: find ." >&2
@@ -148,7 +148,7 @@ do
 
 	FILENAME="$(find . -iname "*$file" -type f)"
 
-	if [ -z "$FILENAME" -o ! -e "$FILENAME" ]
+	if [ -z "$FILENAME" ] || [ ! -e "$FILENAME" ]
 	then
 		echo "ERROR: Unable to find filename (by glob $file) in RPM's contents." >&2
 		echo "DEBUG: find . output" >&2
