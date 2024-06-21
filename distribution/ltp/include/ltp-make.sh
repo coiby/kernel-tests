@@ -112,6 +112,11 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-configure.ac-Add-_GNU_SOURCE-for-struct-fs_quota_sta.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-quotactl07-add-_GNU_SOURCE-define.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0003-rpc_svc_1-Fix-incompatible-pointer-type-error.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-libswap-Fix-tst_max_swapfiles-for-c9s-latest.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tst_kconfig-Avoid-reporting-buffer-overflow-when-par.patch
     fi
     if [ "$TESTVERSION" == "20240129" ]; then
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
