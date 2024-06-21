@@ -1,0 +1,11 @@
+[General]
+description=csd tracepoint check
+name=/kernel/general/ftrace/sanity/trace_csd
+owner=Qiao Zhao <qzhao@redhat.com>
+license=GPLv2
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=trace-cmd
+max_time=60m
+use_pty=false
