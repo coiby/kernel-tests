@@ -5,6 +5,11 @@ set -x
 
 TEST="distribution/kernel-debuginfo"
 
+if [ "${RSTRNT_REBOOTCOUNT:-0}" -ge 1 ]; then
+	rstrnt-report-result Abnormal-Reboot FAIL 99
+	exit 0
+fi
+
 YUM=$(command -v yum)
 if [ -z "$YUM" ]
 then
