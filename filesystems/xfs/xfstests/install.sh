@@ -21,7 +21,7 @@ if type -P dnf >/dev/null && ! [[ -e /run/ostree-booted ]]; then
 fi
 if type -P dnf5 >/dev/null && ! [[ -e /run/ostree-booted ]]; then
 	YUM_PROG="$(type -P dnf5)"
-	YUM_OPTS="-y --best --allowerasing --setopt=strict=0"
+	YUM_OPTS="-y --best --setopt=strict=0"
 fi
 
 # Install xfsprogs from upstream (or any other) repo
