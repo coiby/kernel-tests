@@ -19,6 +19,7 @@ import socket
 
 case_path = os.environ.get("CASE_PATH")
 system_version_id = int(os.environ.get("SYSTEM_VERSION_ID"))
+system_linux_distro = os.getenv("LINUX_DISTRO")
 my_tool = tools.Tools()
 xml_tool = xmltool.XmlTool()
 client_target = "CLIENT"
@@ -124,7 +125,7 @@ def install_package():
     check_install("qemu-img")
 
     #for virt packages install
-    if system_version_id < 90:
+    if system_version_id < 90 or system_linux_distro == "fedora":
         virt_packs = """
         libvirt
         libvirt-devel
@@ -149,8 +150,8 @@ def install_package():
     if system_version_id >= 90:
         run("rm -f /usr/share/qemu/firmware/50-edk2-ovmf-amdsev.json","0,1")
 
-    if system_version_id >= 90:
-        check_install("guestfs-tools")
+    #if system_version_id >= 90:
+    check_install("guestfs-tools")
 
     # for qemu bug that can not start qemu
     if "hugetlbfs" in open("/etc/group").read():
@@ -6221,7 +6222,9 @@ def dpdk_sriov_vf_bug2088787_test(vf_spoofchk,vf_trust):
     nic1_mac,nic2_mac = get_nic_mac()
     nic1_name = get_nic_name_from_mac(nic1_mac)
     nic2_name = get_nic_name_from_mac(nic2_mac)
-    major_ver = int(os.environ.get("X_VERSION"))
+    #workaround for fedora
+    #major_ver = int(os.environ.get("X_VERSION"))
+    major_ver = 9
     if i_am_server():
         with enter_phase(f"{func_name}_topo_init"):
             init_physical_topo_with_one_pair_ports()
@@ -7551,7 +7554,7 @@ def dpdk_testpmd_in_container_test():
     nic2_bus = my_tool.get_bus_from_name(nic2_name)
     nic_dirver = my_tool.get_nic_driver_from_name(nic1_name)
     if i_am_server():
-        if system_version_id >= 90:
+        if system_version_id >= 90 or system_linux_distro == "fedora":
             image_name = "rhel9-dpdk"
         elif system_version_id >= 80:
             image_name = "rhel8-dpdk21"
@@ -7762,7 +7765,7 @@ def dpdk_sriov_terminate_container_test(vf_spoofchk,vf_trust):
         log(f"{vf_mac_list}")
         log(f"{vf_pci_list}")
 
-        if system_version_id >= 90:
+        if system_version_id >= 90 or system_linux_distro == "fedora":
             image_name = "rhel9-dpdk"
         elif system_version_id >= 80:
             image_name = "rhel8-dpdk21"
@@ -7960,7 +7963,7 @@ def dpdk_sriov_bond_vf_test(mode,mac=False,vf_spoofchk=True,vf_trust=False):
             bond_mac = vf0_mac
 
         fwd_mac = traffic_gen_mac
-        if system_version_id >= 90:
+        if system_version_id >= 90 or system_linux_distro == "fedora":
             image_name = "rhel9-dpdk"
         elif system_version_id >= 80:
             image_name = "rhel8-dpdk21"
@@ -8086,7 +8089,7 @@ if __name__ == "__main__":
         dpdk_port_info_test()
         dpdk_port_blocklist_test()
         #podman only support rhel8.2 and above
-        if system_version_id >= 82:
+        if system_version_id >= 82 or system_linux_distro == "fedora":
             dpdk_testpmd_in_container_test()
             dpdk_sriov_vf_bug2088787_test(False, True)
         if dut_nic_driver == "wpc_ice":
@@ -8111,11 +8114,11 @@ if __name__ == "__main__":
         # https://bugzilla.redhat.com/show_bug.cgi?id=2144728
         dpdk_tunnel_vxlan_test()
         dpdk_tunnel_gre_test()
-        if system_version_id > 82:
+        if system_version_id > 82 or system_linux_distro == "fedora":
             dpdk_virtio_user_as_exceptional_path_ipv4_test()
             dpdk_virtio_user_as_exceptional_path_ipv6_test()
         dpdk_l3_forwarding_test()
-        if system_version_id >= 86:
+        if system_version_id >= 86 or system_linux_distro == "fedora":
             dpdk_sriov_vf_config_vsi_queues_bug2137378_test(False,True)
             dpdk_sriov_vf_vlan_for_bug_2131310_test(False,True)
         if dpdk_verion >= 22:
@@ -8136,7 +8139,7 @@ if __name__ == "__main__":
         dpdk_sriov_vf_func_test(False,True,1024)
         dpdk_sriov_vf_func_test(False,False,1024)
         dpdk_sriov_vf_macaddress_test(False,True)
-        if system_version_id >= 86:
+        if system_version_id >= 86 or system_linux_distro == "fedora":
             dpdk_sriov_vf_vlan_without_vlan_filter_test(True,True)
             dpdk_sriov_vf_vlan_without_vlan_filter_test(False,True)
         # https://bugzilla.redhat.com/show_bug.cgi?id=2079683
@@ -8180,7 +8183,7 @@ if __name__ == "__main__":
         dpdk_sriov_vf_promisc_test(True,False)
         dpdk_sriov_vf_promisc_test(False,True)
         dpdk_sriov_vf_promisc_test(False,False)
-        if system_version_id >= 84:
+        if system_version_id >= 84 or system_linux_distro == "fedora":
             dpdk_sriov_vf_promisc_bug2101710_test(True,True)
         dpdK_sriov_vf_in_guest_test(False,True)
         # dpdK_sriov_vf_in_guest_bug2143985_test(False,True)

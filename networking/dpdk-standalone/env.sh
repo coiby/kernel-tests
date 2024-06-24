@@ -75,13 +75,13 @@ fi
 #DPDK_TEST_OPTION select which dpdk type will be tested {rpm|source}
 #The default option is rpm
 DPDK_TEST_OPTION=${DPDK_TEST_OPTION:-"rpm"}
-DPDK_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/dpdk-22.11-3.el9_2.x86_64.rpm
-DPDK_TOOL_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/dpdk-tools-22.11-3.el9_2.x86_64.rpm
+DPDK_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/dpdk-23.11-1.el9.x86_64.rpm
+DPDK_TOOL_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/dpdk-tools-23.11-1.el9.x86_64.rpm
 DRIVERCTL_URL=http://netqe-infra01.knqe.eng.rdu2.dc.redhat.com/tools/driverctl-0.111-2.el9.noarch.rpm
-DPDK_SOURCE=${DPDK_SOURCE:-"http://fast.dpdk.org/rel/dpdk-22.11.2.tar.xz"}
-DPDK_VERSION=22.11-3.el9_2
+DPDK_SOURCE=${DPDK_SOURCE:-"http://fast.dpdk.org/rel/dpdk-23.11.tar.xz"}
+DPDK_VERSION=23.11-1.el9
 export DPDK_VERSION=$DPDK_VERSION
-GUEST_DPDK_VERSION=22.11-3.el9_2
+GUEST_DPDK_VERSION=23.11-1.el9
 GUEST_DPDK_URL=${DPDK_URL}
 GUEST_DPDK_TOOL_URL=${DPDK_TOOL_URL}
 
