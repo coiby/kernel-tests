@@ -1,0 +1,18 @@
+summary: storage/block/RHEL_36684_isolated_cores_test
+description: isolated cores test
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/RHEL_36684_isolated_cores_test
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+    - fio
+    - libaio
+    - libaio-devel
+duration: 1h
+tier: 1
+extra-summary: /storage/block/RHEL_36684_isolated_cores_test
+extra-task: /storage/block/RHEL_36684_isolated_cores_test
