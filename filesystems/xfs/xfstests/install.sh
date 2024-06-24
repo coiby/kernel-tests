@@ -7,14 +7,21 @@
 . ../../../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-export YUM_PROG=`type -P yum`
-export YUM_OPTS="-y --skip-broken "
+if type -P yum >/dev/null; then
+	YUM_PROG=$(type -P yum)
+	YUM_OPTS="-y --skip-broken"
+fi
 if [[ -e /run/ostree-booted ]];then
 	YUM_PROG="$(type -P rpm-ostree)"
 	YUM_OPTS="--apply-live --idempotent --allow-inactive "
 fi
 if type -P dnf >/dev/null && ! [[ -e /run/ostree-booted ]]; then
-	YUM_PROG="$(type -P dnf) --setopt=strict=0"
+	YUM_PROG="$(type -P dnf)"
+	YUM_OPTS="-y --best --allowerasing --setopt=strict=0"
+fi
+if type -P dnf5 >/dev/null && ! [[ -e /run/ostree-booted ]]; then
+	YUM_PROG="$(type -P dnf5)"
+	YUM_OPTS="-y --best --setopt=strict=0"
 fi
 
 # Install xfsprogs from upstream (or any other) repo
