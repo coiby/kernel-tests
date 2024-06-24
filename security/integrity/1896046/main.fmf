@@ -1,0 +1,38 @@
+summary: Test for BZ#1896046 (Rebuild rpm due to ima-evm-utils (libimaevm))
+description: |
+    Bug summary: Rebuild rpm due to ima-evm-utils (libimaevm) soname bump
+    Bugzilla link: https://bugzilla.redhat.com/show_bug.cgi?id=1896046
+contact: Jan Blazek <jblazek@redhat.com>
+component:
+  - rpm
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+  - rpm
+  - rpm-sign
+  - rpm-build
+  - rpm-plugin-ima
+  - rng-tools
+  - rng-utils
+  - expect
+  - openssl
+  - attr
+  - pinentry
+duration: 10m
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - Tier2
+  - TIPfail
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1896046
+adjust:
+  - enabled: false
+    when: distro == rhel-4, rhel-5, rhel-6, rhel-7
+    continue: false
+extra-nitrate: TC#0609331
+extra-summary: /CoreOS/rpm/Sanity/bz1896046-signfiles
+extra-task: /CoreOS/rpm/Sanity/bz1896046-signfiles
+id: a4fa8a51-ccea-4f0e-9562-c2dbda5c2ade

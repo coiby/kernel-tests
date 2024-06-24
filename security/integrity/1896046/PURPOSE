@@ -1,0 +1,5 @@
+PURPOSE of /CoreOS/rpm/Sanity/bz1896046-signfiles
+Description: Test for BZ#1896046 (Rebuild rpm due to ima-evm-utils (libimaevm))
+Author: Jan Blazek <jblazek@redhat.com>
+Bug summary: Rebuild rpm due to ima-evm-utils (libimaevm) soname bump
+Bugzilla link: https://bugzilla.redhat.com/show_bug.cgi?id=1896046
