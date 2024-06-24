@@ -19,6 +19,8 @@
 # Clear the dmesg, only the new messages are important
 dmesg -c >/dev/null
 
+export LANG=C
+
 # Source the common test script helpers
 . ../../../cki_lib/libcki.sh || exit 1
 
