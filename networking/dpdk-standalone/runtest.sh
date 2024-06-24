@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034,SC2128
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   runtest.sh of /kernel/networking/dpdk-standalone
 #   Author: Hekai Wang <hewang@redhat.com>
@@ -29,6 +30,7 @@ init_all_env()
     CASE_PATH=$(dirname $(readlink -f ${BASH_SOURCE}))
     source /etc/os-release
     SYSTEM_VERSION_ID=$(echo $VERSION_ID | tr -d '.')
+    LINUX_DISTRO=$(echo $ID)
     set +a
 
     update_buildroot_repo
@@ -273,7 +275,7 @@ load_ice_firmware()
     #for rhel9 ice firmware loading
     if (($SYSTEM_VERSION_ID >= 90)) && [[ "$NIC_DRIVER" =~ ice ]]; then
         rm -f /lib/firmware/intel/ice/ddp/ice.pkg.xz
-        xz -d $(rpm -ql linux-firmware | grep -E ice-[0-9]+)
+        xz -d $(rpm -ql linux-firmware | grep -E "ice-[0-9]+")
         ln -s $(ls /lib/firmware/intel/ice/ddp/ice-*) /lib/firmware/intel/ice/ddp/ice.pkg
         ls -lrt /lib/firmware/intel/ice/ddp/
     fi
@@ -308,7 +310,7 @@ clean_previous_runtest()
         do
             if grep -q $i <<< "${my_child_pid[@]}";then
                 continue
-            elif [[ $i == $my_pid ]];then
+            elif [[ $i == "$my_pid" ]];then
                 continue
             else
                 echo "kill ${my_script_name} pid "$i
