@@ -34,7 +34,7 @@ TARGET=$(PACKAGE_NAME)-$(TESTVERSION)
 TARGET_DIR=/mnt/testarea/damon
 
 BUILT_FILES=
-FILES=$(METADATA) runtest.sh Makefile main.fmf
+FILES=$(METADATA) runtest.sh Makefile
 
 .PHONY: all clean build
 
