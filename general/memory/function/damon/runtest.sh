@@ -31,12 +31,18 @@ if [ -f /usr/bin/rhts-environment.sh ]; then
 fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+#shellcheck disable=SC2034
 PACKAGE="kernel"
+if stat /run/ostree-booted > /dev/null 2>&1; then
+    BOOT_CONFIG=/usr/lib/ostree-boot/config-$(uname -r)
+else
+    BOOT_CONFIG=/boot/config-$(uname -r)
+fi
 
 rlJournalStart
     rlPhaseStartSetup
-        if [ -f /boot/config-$(uname -r) ]; then
-            if ! grep -q "CONFIG_DAMON=y" /boot/config-$(uname -r); then
+        if [ -f "${BOOT_CONFIG}" ]; then
+            if ! grep -q "CONFIG_DAMON=y" "${BOOT_CONFIG}"; then
                 rlLog "DAMON not supported, Skip"
                 rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
                 exit 0
@@ -46,7 +52,13 @@ rlJournalStart
             rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
             exit 0
         fi
-        rlRun "dnf install -y perf python3 python3-pip @development" 0
+        if stat /run/ostree-booted > /dev/null 2>&1; then
+            #shellcheck disable=SC2062
+            devel_group="$(dnf groupinfo development | awk '!/:/ {print $1}' | grep ^[a-z])"
+            rlRun "rpm-ostree -A -y --idempotent --allow-inactive install perf python3 python3-pip $(echo ${devel_group})" 0
+        else
+            rlRun "dnf install -y perf python3 python3-pip @development" 0
+        fi
         rlShowRunningKernel
         rlRun "git clone https://github.com/sjp38/masim.git" 0
         if [ $? != 0 ]; then
@@ -54,10 +66,10 @@ rlJournalStart
                 rstrnt-report-result "$RSTRNT_TASKNAME" FAIL 99
                 exit 0
         fi
-        rlRun "pip3 install -U damo" 0
+        rlRun "pip3 install -U damo==2.3.7" 0
         pushd masim || exit
         # checkout latest stable commit
-        rlRun "git checkout -q bbeab0c3ca431c4691301197e7ea46312a5a630f" 0
+        rlRun "git checkout -q d65c1d60326c28f4c2b6665931b3981a47780519" 0
         rlRun "make" 0
     rlPhaseEnd
 
