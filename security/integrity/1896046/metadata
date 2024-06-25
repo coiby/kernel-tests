@@ -1,0 +1,13 @@
+[General]
+name=security/integrity/1896046
+owner=Dennis Li <denli@redhat.com>
+description= Test for BZ#1896046 (Rebuild rpm due to ima-evm-utils (libimaevm))
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+dependencies=rpm;rpm-sign;rpm-build;rpm-plugin-ima;rng-tools;expect;openssl;attr;pinentry
+softDependencies=rng-utils
+max_time=20m
