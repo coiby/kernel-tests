@@ -1,0 +1,14 @@
+[General]
+name=storage/ssd/nvmet_tcp_H2CData_PDU_invalid_len
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvmet_tcp test with invalid len of H2CData_PDU
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=nvmetcli;util-linux
+max_time=1h
+use_pty=false
