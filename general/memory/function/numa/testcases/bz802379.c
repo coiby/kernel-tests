@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+int maps(unsigned long addr1, unsigned long addr2);
 void printf_maps(unsigned long addr1, unsigned long addr2);
 int main() {
 	long int rand;
