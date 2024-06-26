@@ -1,0 +1,22 @@
+diff --git a/shuffle_pages/shuffle_pages.c b/shuffle_pages/shuffle_pages.c
+index b7f4441a..ca1154c1 100644
+--- a/shuffle_pages/shuffle_pages.c
++++ b/shuffle_pages/shuffle_pages.c
+@@ -7,7 +7,7 @@
+ #include <linux/mm.h>
+ 
+ #define MILI_SECS_WAIT (200)
+-#define DRAIN_ORDER (MAX_ORDER - 1)
++#define DRAIN_ORDER (MAX_PAGE_ORDER - 1)
+ 
+ static int debug = 0;
+ static unsigned int shuffle_order = DRAIN_ORDER;
+@@ -75,7 +75,7 @@ static unsigned long alloc_and_free_pages(unsigned int order)
+ {
+ 	unsigned long addr, pfn_num, flag;
+ 
+-	if (order > MAX_ORDER - 1)
++	if (order > MAX_PAGE_ORDER - 1)
+ 		flag = __GFP_NOWARN;
+ 	else
+ 		flag = 0;
