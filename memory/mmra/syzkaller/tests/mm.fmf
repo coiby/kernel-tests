@@ -1,0 +1,23 @@
+summary: Confirm MM system call fuzz testing.
+contact: sbertram <sbertram@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+path: /memory/mmra/syzkaller
+framework: beakerlib
+id: bd5a5909-5250-4427-9192-09bdd6501c26
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+        -  /kernel-include
+duration: 24h
