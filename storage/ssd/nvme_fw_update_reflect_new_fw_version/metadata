@@ -1,0 +1,14 @@
+[General]
+name=storage/ssd/nvme_fw_update_reflect_new_fw_version
+owner=Yi Zhang <yizhan@redhat.com>
+description=test nvme list output reflect new fw version
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+dependencies=nvme-cli;wget
+max_time=1h
+use_pty=false
