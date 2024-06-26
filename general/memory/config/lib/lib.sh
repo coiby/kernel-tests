@@ -29,6 +29,7 @@ function install_libcgroup()
 	tar -zxf $pkg
 	pushd libcgroup
 	sh bootstrap.sh
+	git apply ../fix-libcgroup-incompatible-pointer-types.patch
 	make install -j $(nproc)
 	popd
 }

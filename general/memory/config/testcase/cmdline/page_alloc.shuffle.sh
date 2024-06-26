@@ -33,6 +33,9 @@ function page_alloc_shuffle()
 
 	dmesg -C
 	pushd $DIR_SOURCE/shuffle_pages
+	if rlIsRHEL 10; then
+		patch -p2 < rhel10_shuffle_compile_fix.patch
+	fi
 	rlRun "make"
 	rlRun "insmod shuffle_pages.ko"
 	sleep 10
