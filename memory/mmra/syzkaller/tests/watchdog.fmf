@@ -1,10 +1,11 @@
-summary: Confirm system call fuzz testing is being performed on all MM system calls.
+summary: Confirm watchdog system call fuzz testing.
 contact: sbertram <sbertram@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
+path: /memory/mmra/syzkaller
+id: d20d1992-f989-44e8-a501-d814a516a0a6
 framework: beakerlib
-id: bd5a5909-5250-4427-9192-09bdd6501c26
 require:
   - make
   - golang
@@ -19,4 +20,7 @@ require:
   - type: file
     pattern:
         -  /kernel-include
+environment:
+    mm_syscalls: '"ioctl$WDIOC*"'
+    supportcalls: '"syz_open_dev$watchdog"'
 duration: 24h

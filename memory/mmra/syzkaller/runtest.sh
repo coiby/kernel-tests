@@ -175,6 +175,7 @@ rlJournalStart
         rlRun "git branch mmra_temp ${commit}"
         rlRun "git switch mmra_temp"
         rlRun "git apply ../mmra.patch"
+        rlRun "git apply ../dev_watchdog.patch"
         rlRun "make"
         sut_ip=$(nmcli | grep -A1 "ip4 default" | grep -v "ip4 default" | awk '{print $2}' | awk -F "/" '{print $1}')
         # create config file:
