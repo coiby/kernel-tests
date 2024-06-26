@@ -68,7 +68,7 @@ char *GrabMemoryFromNumaNode(UINT64 len, int nodeid)
     return buf;
 }
 
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
     long long freep;
 
@@ -100,4 +100,5 @@ main(int argc, char** argv)
 
     sleep(300);
 
+    return 0;
 }

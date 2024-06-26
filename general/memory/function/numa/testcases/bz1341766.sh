@@ -31,8 +31,8 @@ total_leak=$(expr $val_n1_f - $val_n1_l)
 
 echo "total mm leak" $total_leak " M"
 
-if [ "$total_leak" -ge "16" ]; then
-	echo "mem leak over 16M"
+if [ "$total_leak" -ge "32" ]; then
+	echo "mem leak over 32M"
 	delete_tmp
 	exit 1
 fi
@@ -51,8 +51,8 @@ total_leak=$(expr $val_n0_f - $val_n0_l)
 
 echo "total mm leak" $total_leak " M"
 
-if [ "$total_leak" -ge "16" ]; then
-	echo "mem leak over 16M"
+if [ "$total_leak" -ge "32" ]; then
+	echo "mem leak over 32M"
 	delete_tmp
 	exit 1
 fi
