@@ -1,0 +1,21 @@
+summary: KS-TC:nvme_rdma/nvmeof_rdma_connect_with_keep_alive_tmo_1
+description: nvmeof rdma connect with --keep-alive-tmo=1
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/nvmeof_rdma_connect_with_keep_alive_tmo_1
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - nvmetcli
+  - fio
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/nvmeof_rdma_connect_with_keep_alive_tmo_1
+extra-task: /storage/nvme_rdma/nvmeof_rdma_connect_with_keep_alive_tmo_1
+id: ba42bb8e-48d2-4929-afb9-c9ab07fdfb8a
