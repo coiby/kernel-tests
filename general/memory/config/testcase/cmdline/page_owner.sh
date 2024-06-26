@@ -30,7 +30,7 @@ function read_page_owner()
     local result_file="/sys/kernel/debug/page_owner"
     rlRun "tail -n 200 $result_file | tee page_owner"
     rlRun "grep \"Page allocated via order\" page_owner" 0
-    rlRun "grep 'PFN [0-9]* .*Block [0-9]* type .* Flags' page_owner" 0
+    rlRun "grep -E 'PFN (0x)?[[:xdigit:]]* .*Block [0-9]* type .* Flags' page_owner" 0
     rlRun "grep -E '[[:alpha:][:alnum:]_]+\+0x[[:alnum:]]+' page_owner" 0
 }
 

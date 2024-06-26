@@ -29,10 +29,13 @@ function page_alloc_shuffle()
 {
 	rlRun "grep Y /sys/module/page_alloc/parameters/shuffle"
 
-	uname -r | grep x86_64 || { report_result ${FUNCNAME} SKIP; return; }
+	uname -r | grep x86_64 || { report_result ${FUNCNAME[0]} SKIP; return; }
 
 	dmesg -C
 	pushd $DIR_SOURCE/shuffle_pages
+	if rlIsRHEL 10; then
+		patch -p2 < rhel10_shuffle_compile_fix.patch
+	fi
 	rlRun "make"
 	rlRun "insmod shuffle_pages.ko"
 	sleep 10
@@ -47,7 +50,7 @@ function page_alloc.shuffle()
 {
 	if ! grep CONFIG_SHUFFLE_PAGE_ALLOCATOR=y /boot/config-$(uname -r); then
 		rlLog "page_allocator shuffle is not supported in this kernel, please check kernel config. skip."
-		report_result  "$FUNCNAME" SKIP
+		report_result  "${FUNCNAME[0]}" SKIP
 		return 0
 	fi
 
