@@ -124,6 +124,7 @@
 /networking/udp/udp_socket/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /networking/vnic/ipvlan/basic/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /networking/vnic/sriov/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
+/networking/vnic/sriov_i40e/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /networking/vrf/sanity_check/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /packages/httpd/mod_ssl-smoke/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
@@ -253,6 +254,7 @@
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @yiche
 /networking/vnic/ipvlan/basic/ @bgoncalv @linup2011 @lulinqing
 /networking/vnic/sriov/ @bgoncalv @jiqiu @lulinqing @ralongi @wanghekai @zfang1
+/networking/vnic/sriov_i40e/ @bgoncalv @jiqiu @lulinqing @ralongi @wanghekai @zfang1
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @lulinqing @psklenar1
