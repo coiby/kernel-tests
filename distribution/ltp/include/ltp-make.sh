@@ -117,6 +117,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0003-rpc_svc_1-Fix-incompatible-pointer-type-error.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-libswap-Fix-tst_max_swapfiles-for-c9s-latest.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tst_kconfig-Avoid-reporting-buffer-overflow-when-par.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-msgstress01-remove-TWARN-from-runtime-remaining.patch
     fi
     if [ "$TESTVERSION" == "20240129" ]; then
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
