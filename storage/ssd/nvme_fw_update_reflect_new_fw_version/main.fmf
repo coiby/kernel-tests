@@ -1,0 +1,22 @@
+summary: KS-TC:ssd/nvme_fw_update_reflect_new_fw_version
+description: test nvme list output reflect new fw version
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/nvme_fw_update_reflect_new_fw_version
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - wget
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/nvme_fw_update_reflect_new_fw_version
+extra-task: /storage/ssd/nvme_fw_update_reflect_new_fw_version
+adjust:
+    enabled: false
+    when: distro < rhel-9
