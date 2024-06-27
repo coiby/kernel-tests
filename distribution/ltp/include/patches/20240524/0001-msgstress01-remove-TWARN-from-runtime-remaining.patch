@@ -1,0 +1,43 @@
+From 072f359ac54395af1d5ade4ca8cc347c5afe6310 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 25 Jun 2024 17:54:14 +0800
+Subject: [PATCH] msgstress01: remove TWARN from runtime remaining
+
+To mask the issue where a warning is being treated as a failure in CI
+logs, we modify the code to change the message type from TWARN to TCONF.
+
+This warning easily happens especaill on debug/slower kernel:
+
+    msgstress01.c:217: TWARN: Out of runtime during forking...
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Suggested-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ testcases/kernel/syscalls/ipc/msgstress/msgstress01.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/ipc/msgstress/msgstress01.c b/testcases/kernel/syscalls/ipc/msgstress/msgstress01.c
+index 8b1e9a8c0..2d9284e9d 100644
+--- a/testcases/kernel/syscalls/ipc/msgstress/msgstress01.c
++++ b/testcases/kernel/syscalls/ipc/msgstress/msgstress01.c
+@@ -214,7 +214,7 @@ static void run(void)
+ 			break;
+ 
+ 		if (!tst_remaining_runtime()) {
+-			tst_res(TWARN, "Out of runtime during forking...");
++			tst_res(TCONF, "Out of runtime during forking...");
+ 			*stop = 1;
+ 			break;
+ 		}
+@@ -243,7 +243,7 @@ static void run(void)
+ 	remove_queues();
+ 
+ 	if (!(*fail))
+-		tst_res(TPASS, "Test passed. All messages have been received");
++		tst_res(TPASS, "Some messages received");
+ }
+ 
+ static void setup(void)
+-- 
+2.45.2
+
