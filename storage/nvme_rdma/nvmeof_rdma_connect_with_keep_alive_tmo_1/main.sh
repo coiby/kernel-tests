@@ -31,7 +31,7 @@ function client {
 	target_ip="$RETURN_STR"
 
 	tok "nvme discover -t rdma -a $target_ip"
-	tok "nvme connect -t rdma -n testnqn1 -a $target_ip -s 4420 -k 1"
+	tok "nvme connect -t rdma -n testnqn -a $target_ip -s 4420 -k 1"
 	tok "nvme list | grep nvme.*Linux"
 	tok "nvme disconnect-all"
 	rstrnt-sync-set -s "5_CLIENT_CONNECT_TARGET_DONE"
