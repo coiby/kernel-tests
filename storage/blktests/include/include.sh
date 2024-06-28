@@ -4,6 +4,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 FILEC=$(readlink -f "${BASH_SOURCE[0]}")
 CDIRC=$(dirname "$FILEC")
+DCLIST="nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028"
 
 source "$CDIRC"/../../../cki_lib/libcki.sh || exit 1
 
@@ -55,6 +56,13 @@ function get_test_result
 	typeset test_case=$2
 
 	typeset result_dir="$test_ws/results"
+	if rlIsRHEL ">9.4" || rlIsRHEL 10 || rlIsCentOS 10 || rlIsCentOS 9 || rlIsFedora; then
+		if [[ "$DCLIST" =~ $test_case ]]; then
+			result_dir="$test_ws/results/nodev_tr_${TRTYPE}_bd_${NVMET_BLKDEV_TYPE}"
+		elif [[ "$test_case" =~ nvme ]]; then
+			result_dir="$test_ws/results/nodev_tr_${TRTYPE}"
+		fi
+	fi
 	result_file="$(find "$result_dir" -type f | grep -E "$test_case$")"
 	typeset out_bad_file="${result_file}.out.bad"
 	typeset out_full_file="${result_file}.full"
