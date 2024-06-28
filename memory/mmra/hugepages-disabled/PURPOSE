@@ -1,0 +1,11 @@
+Verifies that hugepages are disabled.
+
+This test calls rlAssertNotGrep with these input parameters:
+    hugetlbfs
+    /proc/filesystems
+
+Expected result:
+    [   PASS   ] :: File '/proc/filesystems' should not contain 'hugetlbfs'
+
+Results location:
+    output.txt.
