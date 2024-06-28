@@ -117,7 +117,7 @@ rlJournalStart
 	dmesg --clear
 	for TEST in "${test_arr[@]}"
 	do
-		rlPhaseStartTest "running ${TEST}"
+		rlPhaseStartTest "process ${TEST}"
 			if [[ ${SKIP_TESTS} =~ ${TEST} ]]; then
 				rlLog "Skipping $TEST"
 				continue
@@ -129,50 +129,64 @@ rlJournalStart
 				continue
 			fi
 			rlLog "running test $TEST"
+			monitor_dir="/sys/kernel/debug/kunit"
+			# Infinite loop to monitor the directory
+			while true; do
+			    # Check if there are any directories in the monitor directory
+			    if [ "$(find "$monitor_dir" -mindepth 1 -maxdepth 1 -type d | wc -l)" -gt 0 ]; then
+			        all_dirs_have_results=true
+
+			        # Check if all directories have the results file
+			        for dir in "$monitor_dir"/*/; do
+			            if [ ! -f "$dir/results" ]; then
+			                rlLog "Directory $dir found, but no results file yet"
+			                all_dirs_have_results=false
+			                break
+			            fi
+			        done
+
+			        if $all_dirs_have_results; then
+			            # Process each directory that has results
+			            for dir in "$monitor_dir"/*/; do
+			                rlLog "Results found in $dir"
+			                test_name="$(basename "$dir")"
+			                test_name=${test_name// /_}
+			                cp "$dir/results" "${test_name}.log"
+
+			                rlFileSubmit "${test_name}.log"
+			                rlRun -l "cat ${test_name}.log"
+			                process_results "${test_name}.log"
+			                result=$?
+			                if [ $result -eq 0 ]; then
+			                    rlPass "process $test_name"
+			                else
+			                    rlFail "process $test_name"
+			                fi
+			                rm -f "${test_name}.log"
+			            done
+			        fi
+			    else
+			        rlLog "No directories found in $monitor_dir, waiting..."
+			    fi
+
+			    # If all directories have results, break the loop
+			    if $all_dirs_have_results; then
+			        break
+			    fi
+
+			    sleep 1
+			done
+			rmmod "$TEST" 2>/dev/null
 		rlPhaseEnd
 	done
 
-
-#------------------ Collect Output --------------
-	mkdir -p /tmp/kunit_results/
-	cp -r /sys/kernel/debug/kunit/. /tmp/kunit_results/
-	for TEST in /tmp/kunit_results/*
-	do
-		test_name="$(basename "$TEST")"
-		# rlFileSubmit doesn't seem to like files with whitespace
-		test_name=${test_name// /_}
-		rlPhaseStartTest "process ${test_name}"
-			if [ -d "${TEST}" ]
-			then
-				cp "${TEST}/results" "${test_name}.log"
-				process_results "${TEST}/results"
-				result=$?
-				if [ $result -eq 0 ]
-				then
-					rlPass "process $test_name"
-				else
-					rlFail "process $test_name"
-				fi
-				rlFileSubmit "${test_name}.log"
-				rm -f "${test_name}.log"
-			else
-				# no result generated, assume it skipped
-				rlLog "no result found, assuming it skipped"
-			fi
-		rlPhaseEnd
-	done
 
 #-------------------- Clean Up ------------------
 	rlPhaseStartCleanup
 		# Restore panic on oops value
 		rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
 		#remove installed modules and kunit framework
-		for TEST in "${test_arr[@]}"
-		do
-			rmmod "$TEST" 2>/dev/null
-		done
 		rmmod kunit
-		rm -rf /tmp/kunit_results/
 	rlPhaseEnd
 
 rlJournalEnd
