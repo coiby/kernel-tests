@@ -187,7 +187,7 @@ check usage of internal hostnames:
   extends: .cki_tools
   script:
     - |
-      readarray -t allowed_hosts < <(sed '/^#/d' .allowed-hosts)
+      readarray -t allowed_hosts < <(sed -e '/^#/d' -e 's/\s*#.*//' .allowed-hosts)
       readarray -t internal_hosts < <(grep -hroE --exclude=.allowed-hosts '([a-zA-Z0-9\\.\\-]+\.redhat.com)' * | sort -u)
       fail=0
       for host in "${internal_hosts[@]}"; do
