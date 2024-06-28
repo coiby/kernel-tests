@@ -16,8 +16,8 @@ function runtest() {
 
 	FW_2_3_0="Express-Flash-PCIe-SSD_Firmware_637P6_LN64_2.3.0_A04_01.BIN"
 	FW_2_5_0="Express-Flash-PCIe-SSD_Firmware_5V3P7_LN64_2.5.0_A05_01.BIN"
-	FW_2_3_0_URL="https://people.redhat.com/yizhan/fw/${FW_2_3_0}"
-	FW_2_5_0_URL="https://people.redhat.com/yizhan/fw/${FW_2_5_0}"
+	FW_2_3_0_URL="https://s3.amazonaws.com/arr-cki-prod-lookaside/lookaside/static/${FW_2_3_0}"
+	FW_2_5_0_URL="https://s3.amazonaws.com/arr-cki-prod-lookaside/lookaside/static/${FW_2_5_0}"
 	nvme_model="Dell Ent NVMe v2 AGN RI U.2 1.92TB"
 	if [ ! -f "$FW_2_3_0" ]; then
 		tok "wget ${FW_2_3_0_URL}"
