@@ -190,6 +190,7 @@ check usage of internal hostnames:
       readarray -t allowed_hosts < <(sed '/^#/d' .allowed-hosts)
       readarray -t internal_hosts < <(grep -hroE --exclude=.allowed-hosts '([a-zA-Z0-9\\.\\-]+\.redhat.com)' * | sort -u)
       fail=0
+      warn=0
       for host in "${internal_hosts[@]}"; do
         allowed=0
         for allowed_host in "${allowed_hosts[@]}"; do
@@ -207,10 +208,15 @@ check usage of internal hostnames:
       for allowed_host in "${allowed_hosts[@]}"; do
         if ! grep -hroEq --exclude=.allowed-hosts "${allowed_host}"; then
             echo "${allowed_host} from .allowed-hosts should be removed as it is not used"
-            fail=2
+            warn=1
         fi
       done
-      exit ${fail}
+      if [[ "${fail}" -eq "1" ]]; then
+        exit 1
+      fi
+      if [[ "${warn}" -eq "1" ]]; then
+        exit 2
+      fi
   allow_failure:
     exit_codes: 2
   rules:
