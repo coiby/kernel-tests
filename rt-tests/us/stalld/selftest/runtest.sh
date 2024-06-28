@@ -1,13 +1,7 @@
 #!/bin/bash
 
-# Include beaker environment
-. /usr/bin/rhts_environment.sh || exit 1
-
 # Source rt common functions
 . ../../../include/runtest.sh || exit 1
-
-# Vars
-export TEST="rt-tests/us/stalld/selftest"
 
 function install_and_start_stalld()
 {

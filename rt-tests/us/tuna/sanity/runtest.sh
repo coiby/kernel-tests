@@ -3,8 +3,6 @@
 # Source rt common functions
 . ../../../include/runtest.sh || exit 1
 
-export TEST="rt-tests/us/tuna/sanity"
-
 function tuna_rhel()
 {
     # Reviewing the system in the CLI

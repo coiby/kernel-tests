@@ -3,8 +3,6 @@
 # Source rt common functions
 . ../../../include/runtest.sh || exit 1
 
-export TEST="rt-tests/us/rv/sanity"
-
 function runtest()
 {
     if rhel_in_range 0 9.2; then
