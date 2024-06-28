@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source rt common functions
-. ../../../include/runtest.sh || exit 1
+. ../../../include/lib.sh || exit 1
 
 function install_and_start_stalld()
 {
