@@ -89,7 +89,7 @@ function testList ()
         fi
 
         echo "$i" | tr -d '\"' >> $PROBES_NAME_FILE
-        echo 'global p'$COUNT' probe kernel.trace('$i') { if (pid() == 0) p'$COUNT' << 1; } probe end{ printf("p'$COUNT' = %d", @count(p'$COUNT'))}' >> $PROBES_FILE
+        echo 'global p'$COUNT' probe kernel.trace('$i') { if (pid() == 0) p'$COUNT' <<< 1; } probe end{ printf("p'$COUNT' = %d", @count(p'$COUNT'))}' >> $PROBES_FILE
 
 
         if [ $((COUNT % GROUP_SIZE)) == 0 -o $COUNT == $PROBE_COUNT ]; then
@@ -112,7 +112,9 @@ function testList ()
             fi
             local VERBOSETRACELOG=`mktemp -p /mnt/testarea -t $VAR-TraceLog.XXXXXX`
 
-            stap -DSTP_NO_OVERLOAD $XTRA -t -c "sleep 0.25" ${STAP_VERBOSE_FLAG} group.stap > $VERBOSETRACELOG 2>&1
+            # The --suppress-handler-errors helps work around problems with tracepoints reentrancy
+            # That's fine, since we don't actually count hits or so.
+            stap -DSTP_NO_OVERLOAD --suppress-handler-errors $XTRA -t -c "sleep 0.25" ${STAP_VERBOSE_FLAG} group.stap > $VERBOSETRACELOG 2>&1
             local rc=$?
             timeCalc
             if [ $rc -eq 0 ] ; then
