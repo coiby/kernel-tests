@@ -21,6 +21,6 @@ require:
     pattern:
         -  /kernel-include
 environment:
-    mm_syscalls: '"ioctl$WDIOC*"'
+    mm_syscalls: '"ioctl$WDIOC_GETSUPPORT", "ioctl$WDIOC_GETSTATUS", "ioctl$WDIOC_GETBOOTSTATUS", "ioctl$WDIOC_GETTEMP", "ioctl$WDIOC_SETOPTIONS", "ioctl$WDIOC_KEEPALIVE", "ioctl$WDIOC_SETTIMEOUT", "ioctl$WDIOC_GETTIMEOUT", "ioctl$WDIOC_SETPRETIMEOUT", "ioctl$WDIOC_GETPRETIMEOUT", "ioctl$WDIOC_GETTIMELEFT"'
     supportcalls: '"syz_open_dev$watchdog"'
 duration: 24h
