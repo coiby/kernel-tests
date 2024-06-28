@@ -1,51 +1,27 @@
 #!/bin/bash
 
-export TEST="rt-tests/us/rv/sanity"
-export result_r="PASS"
-. ../../../include/lib.sh
+# Source rt common functions
+. ../../../include/runtest.sh || exit 1
 
-function check_status()
-{
-    if [ $? -eq 0 ]; then
-        log_pass ":: $* :: PASS ::"
-    else
-        result_r="FAIL"
-        log_fail ":: $* :: FAIL ::"
-    fi
-}
+export TEST="rt-tests/us/rv/sanity"
 
 function runtest()
 {
     if rhel_in_range 0 9.2; then
-        log "rv is only supported for RHEL >= 9.3"
-        rstrnt-report-result $TEST "SKIP" 0
+        rstrnt-report-result "rv is only supported for RHEL >= 9.3" "SKIP" 0
         exit 0
     fi
 
-    log "Package rv sanity tests"
-    rpm -q --quiet rv || dnf install -y rv || {
-        log "Install rv failed"
-        rstrnt-report-result $TEST "FAIL" 1
-        exit 1
-    }
 
-    log "## rv --help: check rv help page ##"
-    rv --help
-    check_status "rv --help"
+    oneliner "dnf install -y rv"
 
-    log "## rv list: list available monitors ##"
-    rv list
-    check_status "rv list"
+    # check rv help page
+    oneliner "rv --help"
+
+    # check rv list available monitors
+    oneliner "rv list"
     ral=$(rv list | awk -F' ' '{print $1}')
     log "Available monitors: $ral"
-
-    if [ $result_r = "PASS" ]; then
-        log_pass "Overall result: PASS"
-        rstrnt-report-result $TEST "PASS" 0
-    else
-        log_fail "Overall result: FAIL"
-        rstrnt-report-result $TEST "FAIL" 1
-    fi
 }
 
 runtest
