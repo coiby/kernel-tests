@@ -88,7 +88,7 @@ rlJournalStart
 		fi
 
 		module_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-internal)
-
+		dnf install -y "${module_pkg}"
 		if ! rpm -q $module_pkg; then
 			echo "FAIL: ${module_pkg} is not installed, aborting test"
 			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
