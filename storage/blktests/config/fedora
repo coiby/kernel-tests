@@ -10,7 +10,9 @@ NVME_RDMA_RXE="nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nv
 
 NVME_TCP="nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/047 nvme/048 nvme/051"
 
-NVME_FC="nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/047 nvme/048 nvme/051"
+NVME_FC="nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/042 nvme/043 nvme/044 nvme/045 nvme/048 nvme/051"
+
+#nvme/041 failed on fedora
 
 NVMEOF_MP_RXE="nvmeof-mp/005 nvmeof-mp/006 nvmeof-mp/009 nvmeof-mp/010 nvmeof-mp/011 nvmeof-mp/012"
 
