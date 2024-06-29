@@ -1,0 +1,13 @@
+[General]
+name=storage/blktests/nvme/nvme-loop
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=Storage blktests nvme-loop test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=blktrace;fio;gcc;gcc-c++;git;nvme-cli;xfsprogs
+repoRequires=cki_lib;storage/blktests/include;storage/blktests/config
+max_time=1h
