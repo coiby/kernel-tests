@@ -22,17 +22,25 @@ function main
 		rstrnt-report-result "$TNAME" SKIP
 	fi
 	for testcase in $testcases; do
-		nvme_trtype="$trtype" do_test "$test_ws" "$testcase"
-		result=$(get_test_result "$test_ws" "$testcase")
-		report_test_result "$result" "nvme-$trtype: $TNAME/tests/$testcase"
-		((ret += $?))
+		if (rlIsRHEL ">9.4" || rlIsRHEL 10 || rlIsCentOS 10 || rlIsCentOS 9 || rlIsFedora) && [[ "$DCLIST" =~ $testcase ]]; then
+			for NVMET_BLKDEV_TYPE in device file; do
+				nvme_trtype="$trtype" NVMET_BLKDEV_TYPES=$NVMET_BLKDEV_TYPE do_test "$test_ws" "$testcase"
+				result=$(get_test_result "$test_ws" "$testcase")
+				report_test_result "$result" "NVMET_BLKDEV_TYPES=$NVMET_BLKDEV_TYPE nvme-$trtype: $TNAME/tests/$testcase"
+				((ret += $?))
+			done
+		else
+			nvme_trtype="$trtype" do_test "$test_ws" "$testcase"
+			result=$(get_test_result "$test_ws" "$testcase")
+			report_test_result "$result" "nvme-$trtype: $TNAME/tests/$testcase"
+			((ret += $?))
+		fi
 	done
 
 	if (( ret != 0 )); then
 		echo ">> There are failing tests, pls check it"
 	fi
 }
-
 # don't run it if running as part of shellspec
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
