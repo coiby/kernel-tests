@@ -18,6 +18,9 @@ function main
 		rstrnt-report-result "$TNAME" SKIP
 	fi
 	for testcase in $testcases; do
+		if (rlIsRHEL ">9.4") && [[ "$testcase" == "block/035" ]]; then
+			sysctl -w kernel.io_uring_disabled=0
+		fi
 		do_test "$test_ws" "$testcase"
 		result=$(get_test_result "$test_ws" "$testcase")
 		report_test_result "$result" "$TNAME/tests/$testcase"
