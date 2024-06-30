@@ -59,7 +59,7 @@ function get_test_result
 	if rlIsRHEL ">9.4" || rlIsRHEL 10 || rlIsCentOS 10 || rlIsCentOS 9 || rlIsFedora; then
 		if [[ "$DCLIST" =~ $test_case ]]; then
 			result_dir="$test_ws/results/nodev_tr_${TRTYPE}_bd_${NVMET_BLKDEV_TYPE}"
-		elif [[ "$test_case" =~ nvme ]]; then
+		elif [[ "$test_case" =~ "nvme/" ]]; then
 			result_dir="$test_ws/results/nodev_tr_${TRTYPE}"
 		fi
 	fi
