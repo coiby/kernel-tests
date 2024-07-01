@@ -1,0 +1,14 @@
+[General]
+name=rt_throttle
+owner=Chunyu Hu <chuhu@redhat.com>
+description=Test the RT throttle feature
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=15m
+dependencies=gcc
+softDependencies=git;glibc
+repoRequires=
