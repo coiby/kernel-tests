@@ -30,11 +30,17 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../include/lib.sh
 
-dnf_install_modules_internal
-
 MOD="test_klp_livepatch"
-MOD_PATH=$(dirname `modinfo --field=filename $MOD`)
-xz --decompress $MOD_PATH/$MOD.ko.xz
+
+if is_rhel9; then
+    dnf_install_modules_internal
+    MOD_PATH=$(dirname `modinfo --field=filename $MOD`)
+    xz --decompress $MOD_PATH/$MOD.ko.xz
+else
+    install_selftests_internal
+    rhel10_build_selftests_modules
+    MOD_PATH="${LIVEPATCH_TEST_MODULES}/test_modules"
+fi
 
 echo "MOD=$MOD"
 echo "MOD_PATH=$MOD_PATH"

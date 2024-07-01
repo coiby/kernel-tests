@@ -30,6 +30,7 @@
 
 # Include Beaker environment
 . kvercmp.sh
+. ../../general/kpatch/include/lib.sh
 
 set -x
 #-------------------- Setup --------------------
@@ -45,15 +46,6 @@ nfail=0
 skip_tests=(
 )
 
-karch=$(uname -m)
-kver=$(uname -r | cut -f1 -d'-')
-krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//")
-
-debug_kernel()
-{
-	uname -r | grep -E -q "[.+]debug$"
-}
-
 # usage: check_skipped_tests test_name "${skip_test[@]}"
 check_skipped_tests()
 {
@@ -61,18 +53,6 @@ check_skipped_tests()
 	shift
 	for e; do [[ "$e" == "$match" ]] && return 0; done
 	return 1
-}
-
-install_kernel_devel()
-{
-	# Install kernel-devel for its Modules.symvers file
-	if debug_kernel; then
-		devel="kernel-debug-devel"
-	else
-		devel="kernel-devel"
-	fi
-	yum install -q -y ${devel}-${kver}-${krel} \
-	   || yum install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${devel}-${kver}-${krel}.${karch}.rpm
 }
 
 # build test modules from sources and change EXEC_DIR to kernel source tree
@@ -153,76 +133,6 @@ build_selftests()
 	EXEC_DIR=$(pwd)/tools/testing/selftests
 }
 
-build_selftests_modules_rhel10()
-{
-	# Build the test needed modules, on rhel-10 only
-	if grep -q 'Red Hat Enterprise Linux 10' /etc/os-release; then
-		rpm -q kernel-devel-`uname -r` || install_kernel_devel
-		make -C test_modules modules
-		if [ "$?" -ne 0 ]; then
-			test_fail "Build the needed modules failed, abort test." && exit 1
-		fi
-	fi
-}
-
-install_selftests()
-{
-	rpm -q kernel-selftests-internal && return 0
-	if debug_kernel; then
-		modules="kernel-debug-modules-internal"
-	else
-		modules="kernel-modules-internal"
-	fi
-	# These two appease the net test part of kernel-selftests-internal
-	which tc || dnf install -q -y iproute-tc
-	dnf install -q -y bpftool-${kver}-${krel} \
-		|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/bpftool-${kver}-${krel}.${karch}.rpm
-	# Livepatch selftests require both modules and scripts
-	dnf install -q -y ${modules}-${kver}-${krel} \
-		|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/${modules}-${kver}-${krel}.${karch}.rpm
-	dnf install -q -y kernel-selftests-internal-${kver}-${krel} \
-		|| dnf install -q -y ${BUILDS_URL}/kernel/${kver}/${krel}/${karch}/kernel-selftests-internal-${kver}-${krel}.${karch}.rpm
-}
-
-test_fail()
-{
-	SCORE=${2:-$FAIL}
-	echo -e ":: [  FAIL  ] :: Test $1" | tee -a $OUTPUTFILE
-
-	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "FAIL" "$SCORE"
-	else
-		echo -e "\n:::::::::::::::::"
-		echo -e ":: [  ${RED}FAIL${RES}  ] :: Test ${TEST}/$1 FAIL $SCORE"
-		echo -e ":::::::::::::::::\n"
-	fi
-}
-
-test_pass()
-{
-	echo -e "\n:: [  PASS  ] :: Test $1" | tee -a $OUTPUTFILE
-	# we don't care how many test passed
-	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "PASS" 0
-	else
-		echo -e "\n::::::::::::::::"
-		echo -e ":: [  ${GRN}PASS${RES}  ] :: Test ${TEST}/$1"
-		echo -e "::::::::::::::::\n"
-	fi
-}
-
-test_skip()
-{
-	echo -e "\n:: [  SKIP  ] :: Test $1" | tee -a $OUTPUTFILE
-	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "SKIP" 0
-	else
-		echo -e "\n::::::::::::::::"
-		echo -e ":: [  SKIP${RES}  ] :: Test ${TEST}/$1"
-		echo -e "::::::::::::::::\n"
-	fi
-}
-
 check_result()
 {
 	local num=$1
@@ -253,7 +163,7 @@ submit_log()
 do_livepatch()
 {
 	[ ! -d $EXEC_DIR/livepatch ] && test_fail "$EXEC_DIR/livepatch does not exist" && return 1 || cd $EXEC_DIR/livepatch
-	build_selftests_modules_rhel10
+	rhel10_build_selftests_modules
 
 	# Start livepatch test
 	local livepatch_tests=(test-*.sh)
@@ -301,7 +211,7 @@ cmp_min_rhel8=$(kvercmp `uname -r` '4.18.0-147.3.el8')
 if [ "$cmp_min_rhel7" -ge "0" ] && [ "$cmp_max_rhel7" -lt "0" ]; then
 	build_selftests || { test_fail "build selftests failed" && exit 1; }
 elif [ "$cmp_min_rhel8" -ge "0" ]; then
-	install_selftests || { test_fail "install selftests failed" && exit 1; }
+	install_selftests_internal || { test_fail "install selftests failed" && exit 1; }
 else
 	[ $RSTRNT_JOBID ] && rstrnt-report-result "LIVEPATCH_SELFTESTS_UNSUPPORTED" "SKIP" 0
 	exit 0

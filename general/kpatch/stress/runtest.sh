@@ -40,12 +40,23 @@ KPATCH_PATH="${KPATCH_PATH:-}"
 if [ -z "$KPATCH_MODULE" ]; then
     if rpm -qa | grep kpatch-patch ; then
         KPATCH_PATH="/usr/lib/kpatch/$(uname -r)"
-        KPATCH_MODULE=$(ls $KPATCH_PATH | grep kpatch- | head -n 1 | sed -e 's/.ko//')
-    else
+        for m in $KPATCH_PATH/*.ko
+        do
+            if grep -q 'kpatch-' <<< $m ; then
+                KPATCH_MODULE=$(echo ${m##*/} | sed -e 's/.ko//')
+                break
+            fi
+        done
+    elif is_rhel9; then
         dnf_install_modules_internal
         KPATCH_MODULE="test_klp_livepatch"
         KPATCH_PATH=$(dirname `modinfo --field=filename $KPATCH_MODULE`)
         xz --decompress $KPATCH_PATH/$KPATCH_MODULE.ko.xz
+    else
+        install_selftests_internal
+        rhel10_build_selftests_modules
+        KPATCH_MODULE="test_klp_livepatch"
+        KPATCH_PATH="${LIVEPATCH_TEST_MODULES}/test_modules"
     fi
 fi
 
