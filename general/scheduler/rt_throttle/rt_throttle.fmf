@@ -1,0 +1,12 @@
+summary: Test the RT throttle feature
+description: Test the RT throttle feature
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+  - kernel
+path: /general/scheduler/rt_throttle
+test: bash -x ./runtest.sh
+framework: shell
+require: [gcc]
+duration: 15m
+extra-summary: /general/scheduler/rt_throttle
+extra-task: /general/scheduler/rt_throttle
