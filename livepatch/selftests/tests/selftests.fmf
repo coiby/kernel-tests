@@ -10,6 +10,10 @@ test: bash +x runtest.sh
 framework: shell
 recommend:
   - nmap-ncat
+require:
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
 duration: 180m
 extra-summary: /kernel/livepatch/selftests
 extra-task: /kernel/livepatch/selftests

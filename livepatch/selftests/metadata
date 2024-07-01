@@ -11,3 +11,4 @@ entry_point=bash ./runtest.sh
 max_time=180m
 use_pty=false
 dependencies=wget;git;gcc;make;autoconf;tar;bzip2;nmap-ncat
+repoRequires=general/kpatch/include
