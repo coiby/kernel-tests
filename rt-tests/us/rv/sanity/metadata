@@ -11,4 +11,3 @@ entry_point=bash ./runtest.sh
 repoRequires=rt-tests/include
 max_time=20m
 use_pty=false
-repoRequires=rt-tests/include
