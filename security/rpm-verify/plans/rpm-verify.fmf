@@ -1,9 +1,0 @@
-summary: RPM verify on a kernel package
-discover:
-    how: fmf
-    test:
-        - /security/rpm-verify/tests/rpm-verify
-execute:
-    how: tmt
-environment-file:
-        - ./security/rpm-verify/plans/tmt.env
