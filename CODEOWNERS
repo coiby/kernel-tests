@@ -67,7 +67,6 @@
 /core-kernel/module_diff/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /cpu/die/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /cpu/driver/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
-/cpu/idle/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /distribution/kernel-debuginfo/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /distribution/ltp/lite/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /distribution/ltp/openposix_testsuite/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
@@ -198,7 +197,6 @@
 /core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
 /cpu/die/ @bgoncalv @darcari @lulinqing
 /cpu/driver/ @bgoncalv @darcari @lulinqing
-/cpu/idle/ @bgoncalv @darcari @lulinqing
 /distribution/kernel-debuginfo/ @bgoncalv @ckalina @lulinqing
 /distribution/ltp/lite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
 /distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
