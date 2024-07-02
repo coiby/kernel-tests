@@ -28,7 +28,7 @@ function resultPass ()
 function submitLog ()
 {
     LOG=$1
-    if [ -n "$TESTPATH" -o -n "$RSTRNT_TASKPATH" ]; then
+    if [ -n "$TESTPATH" ] || [ -n "$RSTRNT_TASKPATH" ]; then
         rstrnt-report-log -l $LOG
     else
         echo "Running in developer mode"
@@ -92,7 +92,7 @@ function testList ()
         echo 'global p'$COUNT' probe kernel.trace('$i') { if (pid() == 0) p'$COUNT' <<< 1; } probe end{ printf("p'$COUNT' = %d", @count(p'$COUNT'))}' >> $PROBES_FILE
 
 
-        if [ $((COUNT % GROUP_SIZE)) == 0 -o $COUNT == $PROBE_COUNT ]; then
+        if [ $((COUNT % GROUP_SIZE)) == 0 ] || [ $COUNT == $PROBE_COUNT ]; then
 
             testHeader
             echo "------------------------------------------------------------" | tee -a $OUTPUTFILE
@@ -165,7 +165,7 @@ else
     installeddistro=unknown
 fi
 
-yum=$(cki_get_yum_tool)
+# yum=$(cki_get_yum_tool)
 
 kernbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r))
 stapbase=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /usr/bin/stap)
@@ -215,10 +215,10 @@ fi
 
 # Skip test if we are running an earlier distro (Supported in RHEL5.4)
 OSREL=`grep -o 'release [[:digit:]]\+' /etc/redhat-release | awk '{print $2}'`
-KERNVER=`/bin/uname -r | /bin/awk -F- {'print $2'} | /bin/awk -F. {'print $1'}`
+KERNVER=`/bin/uname -r | /bin/awk -F- '{print $2}' | /bin/awk -F. '{print $1}'`
 
 # ensure KERNVER contains only digits
-[[ "$KERNVER" =~ ^[[:digit:]]+$ ]] || KERVER=0
+[[ "$KERNVER" =~ ^[[:digit:]]+$ ]] || KERNVER=0
 
 grep -q "Fedora" /etc/redhat-release
 if [ $? -eq 0 ] ; then  # Check if upstream-Fedora
