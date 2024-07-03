@@ -1,0 +1,16 @@
+summary: kpatch build test for kpatch-patch modules
+description: |
+    kpatch build test for kpatch-patch modules
+contact: Zhijun Wang <zhijwang@redhat.com>
+component:
+  - kernel
+path: /general/kpatch/build
+test: bash +x runtest.sh
+framework: beakerlib
+recommend:
+  - git
+  - make
+  - openssl-devel
+  - flex
+  - rpm-build
+duration: 180m

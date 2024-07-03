@@ -1,0 +1,11 @@
+summary: Kpatch cmdline function test
+description: |
+    Kpatch cmdline function test
+contact: Zhijun Wang <zhijwang@redhat.com>
+component:
+  - kernel
+test: bash +x runtest.sh
+framework: beakerlib
+recommend:
+  - kpatch
+duration: 10m
