@@ -1,5 +1,0 @@
-summary: general memory stress swaptest
-discover:
-    how: fmf
-execute:
-    how: tmt
