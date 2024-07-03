@@ -11,4 +11,4 @@ entry_point=./runtest.sh
 max_time=15m
 dependencies=gcc
 softDependencies=git;glibc
-repoRequires=;automotive/include
+repoRequires=automotive/include
