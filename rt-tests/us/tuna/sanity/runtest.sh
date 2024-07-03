@@ -10,7 +10,7 @@ function tuna_rhel()
     oneliner "tuna show_irqs"
 
     # CPU tuning in the CLI
-    oneliner "tuna run "ps all" --cpus=0,1"
+    oneliner "tuna run 'ps all' --cpus=0,1"
 
     # Task tuning in the CLI
     oneliner "tuna show_threads --threads=1"
@@ -23,7 +23,7 @@ function tuna_rhel8()
     oneliner "tuna --show_irqs"
 
     # CPU tuning in the CLI
-    oneliner "tuna --cpus=0,1 --run="ps all""
+    oneliner "tuna --cpus=0,1 --run='ps all'"
 
     # Task tuning in the CLI
     oneliner "tuna --threads=1 --show_threads"
