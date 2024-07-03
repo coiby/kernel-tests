@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=bash -x ./runtest.sh
+entry_point=bash ./runtest.sh
 dependencies=gcc
 max_time=10m
 use_pty=false
