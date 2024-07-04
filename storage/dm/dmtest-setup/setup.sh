@@ -40,6 +40,18 @@ function install_kernel_devel
     return 0
 }
 
+function load_vdo {
+    # Check if the kernel version is 6.10.0 or higher.
+    # If the kernel version is lower than 6.10.0, skip loading VDO
+    # because the 'dm-vdo' module is not available on older kernels.
+    TARGET_VERSION="6.9.0"
+    if [[ "$(printf '%s\n' "$K_VER" "$TARGET_VERSION" | sort -V | head -n 1)" == "$TARGET_VERSION" ]]; then
+      modprobe dm-vdo || return 1
+      lsmod | grep "dm_vdo"
+    fi
+    return 0
+}
+
 function install_dt
 {
     cki_debug
@@ -216,6 +228,7 @@ function ts_setup
         install_dt || return "$CKI_UNINITIATED"
     fi
     modprobe dm-thin-pool || return "$CKI_UNINITIATED"
+    load_vdo || return "$CKI_UNINITIATED"
     install_blk_archive || return "$CKI_UNINITIATED"
     clone_test_suite || return "$CKI_UNINITIATED"
 
