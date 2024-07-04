@@ -11,3 +11,4 @@ entry_point=bash -x ./runtest.sh
 max_time=5m
 use_pty=false
 softDependencies=kernel-devel
+repoRequires=general/kpatch/include
