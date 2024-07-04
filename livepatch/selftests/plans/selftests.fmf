@@ -1,8 +1,0 @@
-summary: livepatching selftests
-discover:
-    how: fmf
-    test:
-        - /livepatch/selftests/tests/selftests
-execute:
-    how: tmt
-
