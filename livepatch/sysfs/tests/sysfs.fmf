@@ -7,4 +7,8 @@ test: bash +x runtest.sh
 framework: shell
 recommend:
   - kernel-devel
+require:
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
 duration: 5m

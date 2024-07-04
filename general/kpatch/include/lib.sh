@@ -55,11 +55,17 @@ test_skip()
 
 is_rhel9()
 {
-    if grep -q 'Red Hat Enterprise Linux 9' $OS_RELEASE; then
+    rhel_ver=${1:-9}
+    if grep -q "Red Hat Enterprise Linux ${rhel_ver}" $OS_RELEASE; then
         return 0
     else
         return 1
     fi
+}
+
+is_rhel8()
+{
+    return $(is_rhel9 8)
 }
 
 package_manage_tool()
