@@ -10,5 +10,5 @@ destructive=no
 entry_point=bash ./runtest.sh
 # Don't set dependencies here. The test installs the required dependencies
 # and aborts the job in case of failure as required by CKI
-softDependencies=yum-utils;llvm;lld;clang
+softDependencies=yum-utils;llvm;lld;clang;openssl-devel-engine
 repoRequires=cki_lib;kernel-include
