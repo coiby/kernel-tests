@@ -1,0 +1,25 @@
+summary: Kpatch-patch upgrade test
+description: |
+    Verify the livepatch atomic replace.
+
+    Atomic replace allows a new livepatch to completely
+    replace older patch(es).  This is interesting because it allows us to
+    maintain sources for only a single cumulative patch.  e.g
+
+    Patch 1 - updates functions A, B, C
+    Patch 2 - updates functions A,  , C, D
+
+    with atomic replace, when loading Patch 2, the end result will update
+    functions A, C, and D.  Function B will effectively be reverted.
+    (Normal livepatch semantics would overlay Patch 1 and 2 such that A, B,
+    C, and D would be modified).
+contact: Zhijun Wang <zhijwang@redhat.com>
+component:
+  - kernel
+test: bash +x runtest.sh
+framework: beakerlib
+require:
+  - kernel-kernel-general-include
+recommend:
+  - kpatch
+duration: 120m

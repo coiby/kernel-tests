@@ -27,10 +27,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . lib_build.sh
 
+# shellcheck disable=SC2034
 BASIC_DONE=0
 KPATCH_REV="${KPATCH_REV:-}"
 KPATCH_REPO="${KPATCH_REPO:-https://github.com/dynup/kpatch.git}"

@@ -26,7 +26,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 trap 'killall make; kill runtest.sh' SIGHUP SIGINT SIGQUIT SIGTERM
@@ -48,7 +47,7 @@ MOUNT_FLAG=0
 if [ -z "${KPATCH_MODULE}" ]; then
     if rpm -qa | grep kpatch-patch ; then
         KPATCH_PATH="/usr/lib/kpatch/$(uname -r)"
-        KPATCH_MODULE=$(ls ${KPATCH_PATH} | grep kpatch- | head -n 1 | sed -e 's/.ko//')
+        KPATCH_MODULE=$(ls ${KPATCH_PATH}/kpatch-* | head -n 1 | sed -e 's/.ko//')
         yum -y install $(rpm -qa | grep kpatch-patch |grep -v debug | sed "s/-/-debuginfo-/4")
     else
         KPATCH_MODULE="test-cmdline-string"
@@ -87,6 +86,7 @@ function setup_ftrace() {
     rlRun "echo function > ${tracer}"
 }
 
+# shellcheck disable=SC2120
 function setup_crash() {
     symbol=${1:-${TARGET_FUNCTION}}
     symbol_addr=$(cat /proc/kallsyms | grep ${symbol} | grep ${KPATCH_MODULE//-/_} | awk '{print $1}')
@@ -129,7 +129,6 @@ function reset_trace_probes() {
 
 rlJournalStart
     rlPhaseStartSetup
-        test -e /sys/kernel/livepatch && use_livepatch=1
         install_deps
         rlShowPackageVersion ${PACKAGE}
         if [ -d ${KPATCH_PATH} ] && ls ${KPATCH_PATH}/*ko > /dev/null ; then
@@ -171,11 +170,13 @@ rlJournalStart
         rlRun "cat ${TARGET_FILE} | grep ${GREP_STR}"
         # this should fail as only one of kpatch and kprobe can pin the smae func.
         rlRun "cat ${trace_res} | grep p_${TARGET_FUNCTION%%_*}_" 0
+        # shellcheck disable=SC2188
         > ${trace_res}
     rlPhaseEnd
 
     rlPhaseStartTest "Kpatch compat with ftrace"
         setup_ftrace
+        # shellcheck disable=SC2188
         > ${trace_res}
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
         rlRun "cat ${TARGET_FILE} | grep ${GREP_STR}"
