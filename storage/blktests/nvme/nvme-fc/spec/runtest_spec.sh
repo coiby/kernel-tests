@@ -4,6 +4,21 @@ eval "$(shellspec - -c) exit 1"
 Include storage/blktests/nvme/nvme-fc/runtest.sh
 
 Describe 'blktests - nvme-fc - main'
+    Mock rlIsRHEL
+        if [[ "$1" == "${_RHEL_VER}" ]]; then
+            exit 0
+        fi
+        exit 1
+    End
+
+    Mock rlIsFedora
+        exit 1
+    End
+
+    Mock rlIsCentOS
+        exit 1
+    End
+
     Mock enable_nvme_core_multipath
         echo "enable_nvme_core_multipath"
     End
