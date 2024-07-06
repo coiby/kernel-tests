@@ -1,0 +1,33 @@
+Verifies that the IOMMU returns expected error messages while hardware device trying to violate the memory access.
+
+To install the hardware driver during test environment setup, execute insmod `/root/src/edu_driver.ko`. Verify that the dmesg output includes
+"edu_driver module initializing". To uninstall the hardware driver during test environment cleanup, run `rmmod edu_driver` and ensure the dmesg
+output shows "edu_driver module exiting".
+
+This test calls these functions:
+1) Test 1: Cause a hardware device to attempt to access an invalid page of the address space and confirm this results in graceful failure
+	rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_invalid\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
+	rlAssertGrep "TEST: test_write_read_dma_with_fault_on_invalid (page fault is expected)" "$rlRun_LOG"
+	rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0xaabbccddeeff00 \[\]" "$rlRun_LOG"
+2) Test 2: Cause a hardware device to attempt to access an read-only page of the address space and confirm this results in graceful failure
+	rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_read_only\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
+	rlAssertGrep "TEST: test_write_read_dma_with_fault_on_readonly (page fault is expected)" "$rlRun_LOG"
+	rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0x[[:xdigit:]]* \[W\]" "$rlRun_LOG"
+3) Test 3: Cause a hardware device to attempt to access an unmapped page of the address space and confirm this results in graceful failure
+	rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_unmapped\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
+	rlAssertGrep "TEST: test_write_read_dma_with_fault_on_unmapped (page fault is expected)" "$rlRun_LOG"
+	rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0x[[:xdigit:]]* \[\]" "$rlRun_LOG"
+
+Expected result:
+1) Test 1: Cause a hardware device to attempt to access an invalid page of the address space and confirm this results in graceful failure
+	[   PASS   ] :: File '/var/tmp/rlRun_LOG.uXjdQQIQ' should contain 'TEST: test_write_read_dma_with_fault_on_invalid (page fault is expected)'
+	[   PASS   ] :: File '/var/tmp/rlRun_LOG.uXjdQQIQ' should contain 'virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0xaabbccddeeff00 \[\]'
+2) Test 2: Cause a hardware device to attempt to access an read-only page of the address space and confirm this results in graceful failure
+	[   PASS   ] :: File '/var/tmp/rlRun_LOG.9pnKjsJo' should contain 'TEST: test_write_read_dma_with_fault_on_readonly (page fault is expected)'
+	[   PASS   ] :: File '/var/tmp/rlRun_LOG.9pnKjsJo' should contain 'virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0x[[:xdigit:]]* \[W\]'
+3) Test 3: Cause a hardware device to attempt to access an unmapped page of the address space and confirm this results in graceful failure
+    [   PASS   ] :: File '/var/tmp/rlRun_LOG.J5Npnhib' should contain 'TEST: test_write_read_dma_with_fault_on_unmapped (page fault is expected)'
+	[   PASS   ] :: File '/var/tmp/rlRun_LOG.J5Npnhib' should contain 'virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0x[[:xdigit:]]* \[\]'
+
+Results location:
+	output.txt
