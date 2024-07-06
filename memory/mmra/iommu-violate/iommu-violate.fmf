@@ -1,0 +1,21 @@
+summary: Cause a hardware device to violate the IOMMU by accessing an invalid, read-only, or unmapped page.
+description: |
+  This test causes a hardware device to attempt to access an invalid, read-only, or 
+  unmapped page of the address space and confirms that this results in a graceful 
+  failure. The test cases are designed to be part of the standard RHIVOS QE test 
+  suite. QEMU is utilized to customize the devices, and the validation is performed 
+  within the VM.
+contact: Charles Shi <cheshi@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - ninja-build
+  - gcc
+  - make
+  - libslirp
+  - libslirp-devel
+  - libguestfs
+  - edk2-aarch64
+  - screen
+duration: 50m
+id: 3271c39f-ec5e-4ec4-8b3d-ef0b8d2d3054
