@@ -8,9 +8,10 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies[RedHatEnterpriseLinux6]=gcc;bash;python
-dependencies[RedHatEnterpriseLinux7]=gcc;bash;python
-dependencies[RedHatEnterpriseLinux8]=gcc;bash;platform-python;python2;python3
-dependencies[RedHatEnterpriseLinux9]=gcc;bash;platform-python;python3
+dependencies[RedHatEnterpriseLinux6]=gcc;bash;python;kernel-headers
+dependencies[RedHatEnterpriseLinux7]=gcc;bash;python;kernel-headers
+dependencies[RedHatEnterpriseLinux8]=gcc;bash;platform-python;python2;python3;kernel-headers
+dependencies[RedHatEnterpriseLinux9]=gcc;bash;platform-python;python3;kernel-headers
+dependencies[RedHatEnterpriseLinux10]=gcc;bash;platform-python;python3;kernel-headers
 use_pty=false
 repoRequires=cki_lib

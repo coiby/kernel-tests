@@ -71,7 +71,7 @@ def parseVersion(release_str):
          return (0,0,0,0)
 
 def parseRelease(release_str):
-     m = re.search('\.(((el|sa)\d)|aa7a)', release_str)
+     m = re.search('\.(((el|sa)\d+)|aa7a)', release_str)
      if m:
          return m.group(1)
      else:
