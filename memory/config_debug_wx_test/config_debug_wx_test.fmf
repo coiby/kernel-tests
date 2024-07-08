@@ -1,0 +1,11 @@
+summary: Verification of the config_debug_wx variable is only enabled in kernel debug type.
+description: |
+  Test is to verify that config_debug_wx variable is configured in kernel debug and disabled in kernel generic
+contact: Michael Menasherov <mmenashe@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+extra-summary: memory/config_debug_wx_test
+extra-task: memory/config_debug_wx_test
+enabled: true
+duration: 1m
+id: 942f0232-906a-4644-9c5a-10a056845e58

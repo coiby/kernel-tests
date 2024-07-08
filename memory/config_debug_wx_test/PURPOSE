@@ -1,0 +1,14 @@
+Test checks if the kernel type is generic or debug and then checks the next:
+In case that the kernel is generic it verifies that CONFIG_DEBUG_WX is not configured and not shown in the dmesg
+In case that the kernenl is debug it verifies that CONFIG_DEBUG_WX is configured and results and it shown in the dmesg
+
+Expected result:
+    In case the kernel is debug type
+    [   PASS   ] :: File '/boot/config-5.14.0-473.424.el9iv.aarch64+debug' should contain 'CONFIG_DEBUG_WX=y'
+    [   PASS   ] :: File '/tmp/dmesg_temp.txt' should contain 'Checked W+X mappings'
+    In case the kernel is generic type
+    [   PASS   ] :: File '/boot/config-5.14.0-469.421.el9iv.aarch64' should not contain 'CONFIG_DEBUG_WX=y'
+    [   PASS   ] :: File '/tmp/dmesg_temp.txt' should not contain 'Checked W+X mappings'
+
+Results location:
+    /memory/config_debug_wx_test/config_debug_wx_test-1/journal.txt
