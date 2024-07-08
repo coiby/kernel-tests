@@ -1,0 +1,11 @@
+[General]
+name=memory/config_debug_wx_test
+owner=Michael Menasherov <mmenashe@redhat.com>
+description=config_debug_wx_test
+license=GPLv3
+confidential=no
+destructive=no
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;gcc;glibc-devel;make
+max_time=1m
