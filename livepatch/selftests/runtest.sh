@@ -152,14 +152,6 @@ check_result()
 	return $test_result
 }
 
-submit_log()
-{
-	[ ! $RSTRNT_JOBID ] && return 0
-	for file in "$@"; do
-		rstrnt-report-log -l $file
-	done
-}
-
 do_livepatch()
 {
 	[ ! -d $EXEC_DIR/livepatch ] && test_fail "$EXEC_DIR/livepatch does not exist" && return 1 || cd $EXEC_DIR/livepatch
