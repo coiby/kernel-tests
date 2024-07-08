@@ -229,7 +229,6 @@ ip_vti
 ipcomp
 ipcomp6
 ipip
-ipvlan
 ipvtap
 ip_vti
 isofs
