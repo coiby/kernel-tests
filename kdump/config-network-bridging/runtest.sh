@@ -36,7 +36,7 @@ ConfigNetwork()
         LogRun "ip a show"
         Log "Pick up iface ${eth}, bridge ${br}"
 
-        if $IS_RHEL9 || $IS_FC ; then
+        if [ "${RELEASE}" -gt 8 ]; then
             Log "Configuring bridged network by nmcli"
 
             # nmcli connection add type bridge ifname $br stp no
