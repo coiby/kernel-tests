@@ -1,0 +1,24 @@
+summary: Preempt spinlock test
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash runtest.sh
+framework: shell
+duration: 15m
+require:
+  - gcc
+  - libgcc
+  - elfutils-liebelf-devel
+  - openssl-devel
+  - type: file
+    pattern:
+        - /general/include
+        - /automotive/include
+        - /kernel-include
+recommend:
+  - git
+  - glibc
+  - bison
+  - flex
+id: 43375efc-a271-4da3-8136-7aa4a1edf036
+extra-summary: kernel-tests/general/locking/preempt_spinlock
+extra-task: kernel-tests/general/locking/preempt_spinlock
+
