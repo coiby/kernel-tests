@@ -46,5 +46,5 @@ $(METADATA):
 	@echo "Description:   Configure fence kdump." >> $(METADATA)
 	@echo "TestTime:      90m"                              >> $(METADATA)
 	@echo "License:       GPLv3"                            >> $(METADATA)
-	@echo "Owner:         Kdump QE <kdump-qe-list@redhat.com>" >>$(METADATA))
+	@echo "Owner:         Kdump QE <kdump-qe-list@redhat.com>" >>$(METADATA)
 	@echo "RepoRequires:    kdump/include" >> $(METADATA)

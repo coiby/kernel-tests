@@ -31,7 +31,7 @@ CheckUnexpectedReboot
 case "${TESTARGS,,}" in
     fence)
         if [ "${RELEASE}" -lt 7 ]; then
-            SKIP "Fence kdump test is only applicable to RHEL7 or later releases"
+            Skip "Fence kdump test is only applicable to RHEL7 or later releases"
             Report
         elif echo "${CLIENTS}" | grep -qi "${HOSTNAME}"; then
             Log "- Check cluster node"

@@ -24,8 +24,8 @@
 # Basically two cluster nodes are equal. There is no client/master.
 
 
-if ! ( $IS_RHEL7 || $IS_RHEL8 || $IS_RHEL9 ); then
-    SKIP "Fence kdump test is only applicable to RHEL7 or later releases"
+if [ "${RELEASE}" -lt 7 ]; then
+    Skip "Fence kdump test is only applicable to RHEL7 or later releases"
     Report
 fi
 
