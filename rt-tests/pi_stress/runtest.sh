@@ -9,12 +9,10 @@
 
 # Enable TMT testing for RHIVOS
 . ../../automotive/include/rhivos.sh || exit 1
-: ${OUTPUTFILE:=runtest.log}
 
 # Source rt common functions
 . ../include/runtest.sh || exit 1
 
-export TEST="rt-tests/pi_stress"
 export nrcpus rhel_x
 
 if ! kernel_automotive; then
@@ -22,7 +20,7 @@ if ! kernel_automotive; then
 fi
 
 
-echo "--- Test Start ---" | tee -a $OUTPUTFILE
+log "rt-tests/pi_stress Test Start"
 
 if ! kernel_automotive; then
     declare pkg_name="rt-tests" && [ $rhel_x -ge 9 ] && pkg_name="realtime-tests"
@@ -39,37 +37,13 @@ if [ -z "$PARAM_GROUPS" ]; then
     PARAM_GROUPS=1
 fi
 
-echo "Running pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS" | tee -a $OUTPUTFILE
-pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS | tee -a $OUTPUTFILE
-if [ $? -eq 0 ]; then
-    rstrnt-report-result "pi_stress SCHED_FIFO" "PASS" 0
-else
-    rstrnt-report-result "pi_stress SCHED_FIFO" "FAIL" 1
-fi
-
-echo "Running pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS --rr" | tee -a $OUTPUTFILE
-pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS --rr | tee -a $OUTPUTFILE
-if [ $? -eq 0 ]; then
-    rstrnt-report-result "pi_stress SCHED_RR" "PASS" "0"
-else
-    rstrnt-report-result "pi_stress SCHED_RR" "FAIL" "1"
-fi
-
-echo "Running pi_stress --quiet --groups=$(( nrcpus )) --duration=30" | tee -a $OUTPUTFILE
-pi_stress --quiet --groups=$(( nrcpus )) --duration=30 | tee -a $OUTPUTFILE
-if [ $? -eq 0 ]; then
-    rstrnt-report-result "pi_stress maxcpu" "PASS" "0"
-else
-    rstrnt-report-result "pi_stress maxcpu" "FAIL" "1"
-fi
-
-echo "Running pip_stress" | tee -a $OUTPUTFILE
-pip_stress | tee -a $OUTPUTFILE
-if [ $? -eq 0 ]; then
-    rstrnt-report-result "pip_stress" "PASS" "0"
-else
-    rstrnt-report-result "pip_stress" "FAIL" "1"
-fi
-
+# Running pi_stress: suppress running output
+oneliner "pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS"
+# Running pi_stress: use SCHED_RR for test threads
+oneliner "pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS --rr"
+# Running pi_stress: set the number of inversion groups with CPU cores
+oneliner "pi_stress --quiet --groups=$(( nrcpus )) --duration=30"
+# Running pip_stress: used priority inheritance to handle an inversion
+oneliner "pip_stress"
 
 exit 0
