@@ -100,7 +100,7 @@ EOF
     # Run smoke test with gdb
     Log "Run gdb smoke test ."
     LogRun "rpm -q gdb" || InstallPackages gdb
-    gdb core.$pid.$proc --quiet -ex q > "${K_TESTAREA}/gdb.output"
+    gdb $(which bash) core.$pid.$proc --quiet -ex q > "${K_TESTAREA}/gdb.output"
     RhtsSubmit "${K_TESTAREA}/gdb.output"
 
     RemoveTempFiles
