@@ -24,4 +24,4 @@ If the parameter 'VERIFY' is set to 'yes' then:
   includes originate, a list of extra includes and some other informations.
   The list of cases for which the compilation succeeded follows, 'Y' means
   that the extra include was used, 'n' means that it was omitted.
-  The compliation of DENYLISTED files is also tried.
+  The compilation of DENYLISTED files is also tried.
