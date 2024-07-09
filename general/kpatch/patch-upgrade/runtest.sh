@@ -42,7 +42,7 @@ TRACE_FUN="/sys/kernel/debug/tracing/enabled_functions"
 
 KPATCH_REV="${KPATCH_REV:-}"
 KPATCH_REPO="${KPATCH_REPO:-https://github.com/dynup/kpatch.git}"
-KPATCH_BUILD_OPTS="${KPATCH_BUILD_OPTS:-}"
+KPATCH_BUILD_OPTS="${KPATCH_BUILD_OPTS_UPGRADE:-}"
 BUILDS_URL="${BUILDS_URL:-}"
 TEST_PATCH_PATH="test/integration"
 
