@@ -1,6 +1,6 @@
-# storage/blktests/nvme/nvme-rdma test suite
+# storage/blktests/nvme/nvme-loop test suite
 
-Storage: blktests nvme-rdma test
+Storage: blktests nvme-loop test
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

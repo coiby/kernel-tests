@@ -4,6 +4,21 @@ eval "$(shellspec - -c) exit 1"
 Include storage/blktests/include/include.sh
 
 Describe 'blktests/include: do_test'
+    Mock rlIsRHEL
+        if [[ "$1" == "${_RHEL_VER}" ]]; then
+            exit 0
+        fi
+        exit 1
+    End
+
+    Mock rlIsFedora
+        exit 1
+    End
+
+    Mock rlIsCentOS
+        exit 1
+    End
+
     setup() {
         # Mock the check script from blktests
         echo "echo running ./check \$@" > ./check
@@ -32,6 +47,21 @@ Describe 'blktests/include: do_test'
 End
 
 Describe 'blktests/include: get_test_result'
+    Mock rlIsRHEL
+        if [[ "$1" == "${_RHEL_VER}" ]]; then
+            exit 0
+        fi
+        exit 1
+    End
+
+    Mock rlIsFedora
+        exit 1
+    End
+
+    Mock rlIsCentOS
+        exit 1
+    End
+
     setup() {
         mkdir -p blktests/results
     }

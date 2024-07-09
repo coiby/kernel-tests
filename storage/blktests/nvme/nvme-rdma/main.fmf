@@ -1,0 +1,15 @@
+summary: Storage blktests nvme-rdma tests
+contact: Yi Zhang <yizhan@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - blktrace
+  - fio
+  - gcc
+  - gcc-c++
+  - git
+  - nvme-cli
+  - xfsprogs
+extra-summary: storage/blktests/nvme/nvme-rdma
+extra-task: storage/blktests/nvme/nvme-rdma
+id: 27e70a47-660d-4b36-a3d2-69526441f64f

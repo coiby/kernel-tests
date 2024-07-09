@@ -1,12 +1,12 @@
 #!/bin/bash
 
-TNAME="storage/blktests/nvme/nvme-fc"
-TRTYPE=${TRTYPE:-"fc"}
+TNAME="storage/blktests/nvme/nvme-loop"
+TRTYPE=${TRTYPE:-"loop"}
 
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../../include/include.sh || exit 1
-CASE_TYPE=NVME_FC
+CASE_TYPE=NVME_LOOP
 
 function main
 {

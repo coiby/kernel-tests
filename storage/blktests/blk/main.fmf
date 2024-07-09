@@ -13,3 +13,4 @@ require:
   - parted
 extra-summary: storage/blktests/blk
 extra-task: storage/blktests/blk
+id: bc78da7c-808b-4217-9dbe-bd65d344c669

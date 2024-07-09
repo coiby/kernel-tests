@@ -1,0 +1,15 @@
+summary: Storage blktests nvme-loop tests
+contact: Yi Zhang <yizhan@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - blktrace
+  - fio
+  - gcc
+  - gcc-c++
+  - git
+  - nvme-cli
+  - xfsprogs
+extra-summary: storage/blktests/nvme/nvme-loop
+extra-task: storage/blktests/nvme/nvme-loop
+id: 307a82fa-2b95-42fd-84e0-fbc1ad33c0f2

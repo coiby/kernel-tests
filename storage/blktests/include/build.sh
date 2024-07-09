@@ -5,8 +5,12 @@ if rlIsRHEL 7; then
 	BR=rhel7
 elif rlIsRHEL 8; then
 	BR=rhel8
-elif rlIsRHEL 9 || rlIsCentOS 9; then
+elif rlIsRHEL 9 && rlIsRHEL "<=9.4"; then
 	BR=rhel9
+elif rlIsRHEL 9 && rlIsRHEL ">9.4"; then
+	BR=rhel9.5
+elif rlIsCentOS 9; then
+	BR=rhel9.5
 elif rlIsRHEL 10 || rlIsCentOS 10; then
 	BR=rhel10
 elif rlIsFedora; then

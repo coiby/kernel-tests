@@ -32,14 +32,23 @@ function main {
 		testcases_default="$(get_test_cases_list $case_type)"
 		testcases=${_DEBUG_MODE_TESTCASES:-"$testcases_default"}
 		if [ -z "$testcases" ]; then
-			echo "Skip test because $case_type list is empty"
+			echo "Skip test because $case_type case list is empty"
 			rstrnt-report-result "$TNAME" SKIP
 		fi
 		for testcase in $testcases; do
-			eval $USE_RDMA nvme_trtype=rdma do_test "$test_ws" "$testcase"
-			result=$(get_test_result "$test_ws" "$testcase")
-			report_test_result "$result" "$USE_RDMA nvme-rdma: $TNAME/tests/$testcase"
-			((ret += $?))
+			if (rlIsRHEL ">9.4" || rlIsRHEL 10 || rlIsCentOS 10 || rlIsCentOS 9 || rlIsFedora) && [[ "$DCLIST" =~ $testcase ]]; then
+				for NVMET_BLKDEV_TYPE in device file; do
+					eval $USE_RDMA nvme_trtype=$TRTYPE NVMET_BLKDEV_TYPES=$NVMET_BLKDEV_TYPE do_test "$test_ws" "$testcase"
+					result=$(get_test_result "$test_ws" "$testcase")
+					report_test_result "$result" "$USE_RDMA NVMET_BLKDEV_TYPES=$NVMET_BLKDEV_TYPE nvme-rdma: $TNAME/tests/$testcase"
+					((ret += $?))
+					done
+			else
+				eval $USE_RDMA nvme_trtype=$TRTYPE do_test "$test_ws" "$testcase"
+				result=$(get_test_result "$test_ws" "$testcase")
+				report_test_result "$result" "$USE_RDMA nvme-rdma: $TNAME/tests/$testcase"
+				((ret += $?))
+			fi
 		done
 	done
 
