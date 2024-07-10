@@ -30,11 +30,13 @@ rlJournalStart
         rlShowRunningKernel
         rlIsRHEL "<9" && { yum install -y perl-tests; }
         [ "$(uname -m)" = "x86_64" ] && { yum install -y glibc.i686 glibc-devel.i686 libgcc.i686; }
+        rlIsRHEL ">9" && { yum install -y kernel-modules-extra; }
         rlRun "git clone $GIT_URL"
         rlRun "pushd audit-testsuite"
         rlRun "git checkout $GIT_REF"
         rlIsRHEL "<9" && rlRun "sed -i '/backlog_wait_time_actual_reset/d' tests/Makefile"
         rlRun "sed -i '/io_uring/d' tests/Makefile"
+        rlIsRHEL ">9" && rlRun "sed -i 's/-m32//g' tests/syscall_socketcall/Makefile"
     rlPhaseEnd
 
     rlPhaseStartTest
