@@ -22,6 +22,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+set -x
 
 TESTS=${TESTS:-}
 GIT_URL=${GIT_URL:-"https://github.com/SUSE/qa_test_klp.git"}
@@ -34,7 +35,7 @@ IFS="
     for subtest in $TESTS; do
         sed -i '/set -e/d' $subtest
         rlPhaseStartTest $subtest
-        rlRun -l "./$subtest"
+            rlWatchdog "./$subtest" 120
         rlPhaseEnd
     done
 }
@@ -50,6 +51,9 @@ rlJournalStart
     run_test
 
     rlPhaseStartCleanup
+        for mod in $(lsmod | grep -E "^klp_" | awk {'print $1'}); do
+            rmmod -f $mod
+        done
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
