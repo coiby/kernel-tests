@@ -51,7 +51,7 @@ function start_vm() {
         rlLog "The VM is started."
         return 0
     else
-        rlFail "Failed to start the VM."
+        rlLogError "Failed to start the VM."
         return 1
     fi
 }
@@ -75,7 +75,7 @@ function stop_vm() {
         pid=$(pidof "$pname")
     done
     if [[ -n "$pid" ]]; then
-        rlFail "$(date): Failed to stop the VM after 1 minute."
+        rlLogError "$(date): Failed to stop the VM after 1 minute."
         return 1
     else
         rlLog "$(date): Successfully stopped the VM within 1 minute."
@@ -95,7 +95,7 @@ function try_connect_vm() {
         rlLog "$(date): Successfully connected to the VM after $i attempts."
         return 0
     else
-        rlFail "$(date): Failed to connect to the VM after $i attempts."
+        rlLogError "$(date): Failed to connect to the VM after $i attempts."
         return 1
     fi
 }
@@ -115,7 +115,7 @@ function kill_qemu_process() {
         # Check the results
         pid=$(pidof "$pname")
         if [[ -n "$pid" ]]; then
-            rlFail "The $pname process is still running, PID: $pid"
+            rlLogError "The $pname process is still running, PID: $pid"
             return 1
         else
             rlLog "The $pname process has been killed successfully."
@@ -123,22 +123,25 @@ function kill_qemu_process() {
         fi
     else
         rlLog "No $pname process is running, skip."
+        return 0
     fi
 }
 
 rlJournalStart
 
+    # Check if the current kernel version matches the RHIVOS environment pattern
+    rlShowRunningKernel
+    if ! (uname -r | grep -w -q 'el[0-9]*iv'); then
+        rlLog "Skipping $TEST: This test is intended to run only in the RHIVOS environment."
+        rstrnt-report-result "$TEST" SKIP
+        rlJournalEnd
+        exit 0
+    fi
+
     rlPhaseStartSetup
+
         # Create and enter the workspace
         mkdir -p "$WORKSPACE" && cd "$WORKSPACE"
-
-        # Check if the current kernel version matches the RHIVOS environment pattern
-        rlShowRunningKernel
-        if ! (uname -r | grep -w -q 'el[0-9]*iv'); then
-            rlLog "Skipping current task: This test is intended to run only in the RHIVOS environment."
-            rstrnt-report-result "$TEST" SKIP
-            exit 0
-        fi
 
         # Compile the QEMU system (required packages: ninja-build, make, gcc, libslirp, libslirp-devel)
         rlLog "Starting QEMU system compilation process."
@@ -150,25 +153,13 @@ rlJournalStart
             rlLog "QEMU system 'qemu-system-aarch64' is not installed. Compiling now."
             cd "$WORKSPACE"
             rm -rf ./qemu-9.0.0*
-            wget https://download.qemu.org/qemu-9.0.0.tar.xz || {
-                rlFail "Failed to download the source code."
-                exit 1
-            }
+            wget https://download.qemu.org/qemu-9.0.0.tar.xz || rlDie "Failed to download the source code."
             tar -xJf ./qemu-9.0.0.tar.xz
 
             cd qemu-9.0.0
-            ./configure --target-list=$(arch)-softmmu --enable-vhost-user --enable-virtfs --enable-vhost-net --enable-vhost-kernel --enable-slirp || {
-                rlFail "Failed to configure QEMU system."
-                exit 1
-            }
-            make -j $(nproc) || {
-                rlFail "Failed to compile QEMU system."
-                exit 1
-            }
-            make install || {
-                rlFail "Failed to install QEMU system."
-                exit 1
-            }
+            ./configure --target-list=$(arch)-softmmu --enable-vhost-user --enable-virtfs --enable-vhost-net --enable-vhost-kernel --enable-slirp || rlDie "Failed to configure QEMU system."
+            make -j $(nproc) || rlDie "Failed to compile QEMU system."
+            make install || rlDie "Failed to install QEMU system."
 
             rlLog "QEMU system 'qemu-system-aarch64' is now compiled and ready to use."
         fi
@@ -183,8 +174,7 @@ rlJournalStart
             qcow2_image="auto-osbuild-qemu-rhivos9-${IMAGE_NAME}-${IMAGE_TYPE:=regular}-$(arch)-${UUID}.qcow2"
             qcow2_image_url="http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/${RELEASE:=nightly}/sample-images/${qcow2_image}.xz"
         else
-            rlFail "Failed to locate the /etc/bufild-info file."
-            exit 1
+            rlDie "Failed to read the /etc/bufild-info file."
         fi
 
         # Check if the VM image already exists
@@ -193,20 +183,11 @@ rlJournalStart
             rlLog "VM image '$qcow2_image' already exists. Skipping download."
         else
             rlLog "VM image '$qcow2_image' not found. Downloading it now."
-            wget "$qcow2_image_url" || {
-                rlFail "Failed to download the VM image from '$qcow2_image_url'."
-                exit 1
-            }
+            wget "$qcow2_image_url" || rlDie "Failed to download the VM image from '$qcow2_image_url'."
             if wget "${qcow2_image_url}.sha256"; then
-                sha256sum -c "$qcow2_image.xz.sha256" || {
-                    rlFail "SHA256 checksum verification failed."
-                    exit 1
-                }
+                sha256sum -c "$qcow2_image.xz.sha256" || rlDie "SHA256 checksum verification failed."
             fi
-            xz -d "$qcow2_image.xz" || {
-                rlFail "Failed to decompress the xz file."
-                exit 1
-            }
+            xz -d "$qcow2_image.xz" || rlDie "Failed to decompress the xz file."
             rlLog "VM image '$qcow2_image' is downloaded and ready to use."
         fi
 
@@ -248,10 +229,7 @@ rlJournalStart
             exit
 EOF
 
-        if ! guestfish --rw -a "$qcow2_image" -m /dev/sda3 -f guestfish.cmd; then
-            rlFail "Failed to inject the SSH key into the VM image."
-            exit 1
-        fi
+        guestfish --rw -a "$qcow2_image" -m /dev/sda3 -f guestfish.cmd || rlDie "Failed to inject the SSH key into the VM image."
 
         # Prepare the drives for the VM (required packages: edk2-aarch64)
         rlLog "Preparing the drives for the VM."
@@ -266,7 +244,7 @@ EOF
         fi
 
         # Power on the VM (required packages: screen)
-        start_vm || exit 1
+        start_vm || rlDie
 
         # Connect to the VM
         cat <<EOF >/root/.ssh/config
@@ -279,7 +257,7 @@ EOF
             UserKnownHostsFile /dev/null
 EOF
 
-        try_connect_vm || exit 1
+        try_connect_vm || rlDie
 
     rlPhaseEnd
 
@@ -289,7 +267,7 @@ EOF
 
         # Verify the kernel version of the VM
         rlLog "Verifying the VM."
-        rlAssertEquals "The VM should have the same kernel version as the host." "$(ssh vm 'uname -r')" "$(uname -r)" || exit 1
+        rlAssertEquals "The VM should have the same kernel version as the host." "$(ssh vm 'uname -r')" "$(uname -r)" || rlDie
 
         # Verify the IOMMU is running in the Translated mode
         rlLog "Verifying the IOMMU is running in the Translated mode."
@@ -308,8 +286,7 @@ EOF
             if ssh vm '[ -f /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt ]'; then
                 rlLog "The Root Certificate on the VM is ready to use."
             else
-                rlFail "Failed to setup the Root Certificate on the VM."
-                exit 1
+                rlDie "Failed to setup the Root Certificate on the VM."
             fi
         fi
 
@@ -334,13 +311,12 @@ EOF
             rlRun "ssh vm 'dnf install -y grubby'"
             rlRun "ssh vm 'source /root/cmdline_helper/libcmd.sh; change_cmdline \"-module.sig_enforce=1\"'"
             rlRun "ssh vm 'reboot'" 0 "Reboot the VM to make change_cmdline take effect"
-            try_connect_vm || exit 1
+            try_connect_vm || rlDie
         else
             rlLog "Installing unsigned kernel modules on the VM is already enabled, skip."
         fi
         if ssh vm "cat /proc/cmdline" | grep -q "module.sig_enforce=1"; then
-            rlFail "Failed to enable installing unsigned kernel modules on the VM."
-            exit 1
+            rlDie "Failed to enable installing unsigned kernel modules on the VM."
         else
             rlLog "The VM is ready to install unsigned kernel modules."
         fi
@@ -355,7 +331,7 @@ EOF
         # Complile the hardware device driver on the VM
         rlLog "Compliling the hardware device driver on the VM."
         rlRun "ssh vm 'dnf install -y make gcc kernel-automotive-devel-\$(uname -r)'"
-        rlRun "ssh vm 'cd /root/src && make -j \$(nproc)'" || exit 1
+        rlRun "ssh vm 'cd /root/src && make -j \$(nproc)'" || rlDie "Failed to complile the hardware device driver"
 
         # Install the hardware device driver on the VM
         rlLog "Installing the hardware device driver on the VM."
