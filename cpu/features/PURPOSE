@@ -1,0 +1,29 @@
+This test checks the ARM64 CPU feature registers to ensure the values are not changing on new kernel updates or installs.
+These values should be the same provided the hardware has not changed.
+
+User can provide custom feature and value lists through variables:
+FEATURES
+VALUES
+It allows the user to pick which FEATURES to report on.
+NOTE:   It is important to make sure feature and value are at the same index in each list. So the first feature must match the first value and so on to the last.
+        The user must set VAR_BTI, VAR_MIDR_EL1, VAR_MTE_STATE, VAR_SVE, VAR_ZVA_SIZE, VAR_MIDR_EL1_0 and VAR_DCZID_EL0_0 for the test defaults to work.
+
+By default:
+    FEATURES="aarch64.cpu_features.bti aarch64.cpu_features.midr_el1 aarch64.cpu_features.mte_state aarch64.cpu_features.sve aarch64.cpu_features.zva_size aarch64.processor\\[0x0\\].midr_el1 aarch64.processor\\[0x0\\].dczid_el0"
+    VALUES="${VAR_BTI} ${VAR_MIDR_EL1} ${VAR_MTE_STATE} ${VAR_SVE} ${VAR_ZVA_SIZE} ${VAR_MIDR_EL1_0} ${VAR_DCZID_EL0_0}"
+
+Test inputs:
+    mandatory variables: VAR_BTI VAR_MIDR_EL1 VAR_MTE_STATE VAR_SVE VAR_ZVA_SIZE VAR_MIDR_EL1_0 VAR_DCZID_EL0_0
+    ld.so --list-diagnostics
+    optional variables: FEATURES VALUES
+Expected Results (hardware dependent):
+    [   PASS   ] :: Checking value for aarch64.cpu_features.bti (Assert: '<your value>' should equal '<your value>')
+    [   PASS   ] :: Checking value for aarch64.cpu_features.midr_el1 (Assert: '<your value>' should equal '<your value>')
+    [   PASS   ] :: Checking value for aarch64.cpu_features.mte_state (Assert: '<your value>' should equal '<your value>')
+    [   PASS   ] :: Checking value for aarch64.cpu_features.sve (Assert: '<your value>' should equal '<your value>')
+    [   PASS   ] :: Checking value for aarch64.cpu_features.zva_size (Assert: '<your value>' should equal '<your value>')
+    [   PASS   ] :: Checking value for aarch64.processor\[0xn*\].midr_el1 (Assert: '<your value>' should equal '<your value>')
+    [   PASS   ] :: Checking value for aarch64.processor\[0xn*\].dczid_el0 (Assert: '<your value>' should equal '<your value>')
+Results location:
+    output.txt
+*n will be 0 to n proccessors
