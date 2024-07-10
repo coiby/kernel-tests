@@ -6,7 +6,7 @@ duration: 15m
 require:
   - gcc
   - libgcc
-  - elfutils-liebelf-devel
+  - elfutils-libelf-devel
   - openssl-devel
   - type: file
     pattern:
