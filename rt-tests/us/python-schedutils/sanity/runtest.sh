@@ -22,7 +22,7 @@ function runtest()
     log "INFO: Running 'sleep 1d' in background"
     sleep 1d &
     sleep 1
-    run "declare sleep_pid=$(pgrep -f 'sleep 1d')"
+    declare sleep_pid=$(pgrep -f 'sleep 1d')
 
     # pchrt: view sched policy
     oneliner "timeout 1m pchrt -p $sleep_pid"
