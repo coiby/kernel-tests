@@ -51,7 +51,7 @@ rlJournalStart
     run_test
 
     rlPhaseStartCleanup
-        for mod in $(lsmod | grep -E "^klp_" | awk {'print $1'}); do
+        for mod in $(lsmod | grep -E "^klp_" | awk '{ print $1; }'); do
             rmmod -f $mod
         done
     rlPhaseEnd
