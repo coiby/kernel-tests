@@ -22,7 +22,6 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-set -x
 
 TESTS=${TESTS:-}
 GIT_URL=${GIT_URL:-"https://github.com/SUSE/qa_test_klp.git"}
@@ -52,7 +51,7 @@ rlJournalStart
 
     rlPhaseStartCleanup
         for mod in $(lsmod | grep -E "^klp_" | awk '{ print $1; }'); do
-            rmmod -f $mod
+            rlRun "rmmod -f $mod"
         done
     rlPhaseEnd
 rlJournalEnd
