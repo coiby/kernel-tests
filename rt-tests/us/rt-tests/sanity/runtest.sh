@@ -15,10 +15,17 @@ export nrcpus rhel_x
 
 (( rhel_x >= 9 )) && rt_tests_pkgname="realtime-tests" || rt_tests_pkgname="rt-tests"
 
+if stat /run/ostree-booted > /dev/null 2>&1; then
+        PKGMGR="rpm-ostree -Ay --idempotent --allow-inactive install"
+elif [[ -x /usr/bin/dnf ]]; then
+        PKGMGR="dnf -y --skip-broken install"
+else
+        PKGMGR="yum -y --skip-broken install"
+fi
 
 function test_run()
 {
-    oneliner "yum install -y $rt_tests_pkgname"
+    oneliner "$PKGMGR $rt_tests_pkgname"
 
     # Note: test changing the runtime/deadline/period parameters of cyclicdeadline's
     #       current scheduling policy for SCHED_DEADLINE

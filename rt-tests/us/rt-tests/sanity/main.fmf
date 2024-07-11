@@ -1,0 +1,26 @@
+summary: KG-RT /kernel/rt-tests/us/rt-tests/sanity
+description: |
+    DESCRIPTION
+    Functional test for the rt-tests userspace package.
+
+    STEPS TO RUN
+    ./runtest.sh
+
+    SUPPORTED PLATFORMS
+    all
+
+    KNOWN ISSUES
+    none
+contact: Shizhao Chen <shichen@redhat.com>
+enabled: true
+id: 9f732898-ef3f-453d-8f1a-553162f6df9f
+component:
+  - kernel-rt
+test: bash ./runtest.sh
+framework: shell
+require:
+  - procps-ng
+  - psmisc
+duration: 60m
+extra-summary: rt-tests/us/rt-tests/sanity
+extra-task: rt-tests/us/rt-tests/sanity
