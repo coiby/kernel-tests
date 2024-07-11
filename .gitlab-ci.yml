@@ -183,6 +183,22 @@ check tmt lint:
     - !reference [.rules, default-branch]
     - !reference [.rules, production-branch]
 
+no-tmt-plans:
+  extends: .cki_tools
+  before_script:
+    - tmt --version
+  script:
+    - |
+      if (( $(tmt plans ls | wc -l) > 0 )); then
+        echo "FAIL: no tmt plans should be added to this repo."
+        echo "Move the test plans to https://gitlab.com/redhat/centos-stream/tests/kernel/test-plans"
+        exit 1
+      fi
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
+
 check usage of internal hostnames:
   extends: .cki_tools
   script:
