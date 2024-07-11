@@ -46,7 +46,7 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           William R. Gomeringer <wgomerin@redhat.com>" > $(METADATA
+	@echo "Owner:           William R. Gomeringer <wgomerin@redhat.com>" > $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     Test to expose intermittent problems during boot" >> $(METADATA)
