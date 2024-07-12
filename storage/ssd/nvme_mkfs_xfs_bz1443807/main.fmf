@@ -14,7 +14,7 @@ require:
   - nvme-cli
   - wget
   - gcc
-duration: 5h
+duration: 6h
 tag:
   - regression
 tier: 1
