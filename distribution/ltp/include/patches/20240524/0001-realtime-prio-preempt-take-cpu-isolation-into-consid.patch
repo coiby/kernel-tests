@@ -1,0 +1,65 @@
+From 591c56b045b2d44a0f4ba1a13545420b23e909b5 Mon Sep 17 00:00:00 2001
+From: Shizhao Chen <shichen@redhat.com>
+Date: Wed, 10 Jul 2024 21:12:41 +0800
+Subject: [PATCH] realtime/prio-preempt: take cpu isolation into consideration
+
+By default the test starts N-1 busy threads to monopolize N-1 available CPUs,
+where N is the number of all available CPUs. However, when CPU isolation is
+applied, this will lead to a hang scenario where all housekeeping CPUs are
+hogged as isolated CPUs do not share the N-1 busy threads.
+
+Signed-off-by: Shizhao Chen <shichen@redhat.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ .../realtime/func/prio-preempt/prio-preempt.c | 20 ++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/testcases/realtime/func/prio-preempt/prio-preempt.c b/testcases/realtime/func/prio-preempt/prio-preempt.c
+index 9bd5e7ad8..16abc1184 100644
+--- a/testcases/realtime/func/prio-preempt/prio-preempt.c
++++ b/testcases/realtime/func/prio-preempt/prio-preempt.c
+@@ -59,6 +59,7 @@
+  *
+  *****************************************************************************/
+ 
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <signal.h>
+@@ -287,6 +288,19 @@ void *master_thread(void *arg)
+ 	return NULL;
+ }
+ 
++int get_numcpus(void)
++{
++	long numcpus_conf = sysconf(_SC_NPROCESSORS_CONF);
++	size_t size = CPU_ALLOC_SIZE(numcpus_conf);
++	cpu_set_t *cpuset = CPU_ALLOC(numcpus_conf);
++
++	CPU_ZERO_S(size, cpuset);
++	/* Get the number of cpus accessible to the current process */
++	sched_getaffinity(0, size, cpuset);
++
++	return CPU_COUNT_S(size, cpuset);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	int pri_boost, numcpus;
+@@ -295,10 +309,10 @@ int main(int argc, char *argv[])
+ 	pass_criteria = CHECK_LIMIT;
+ 	rt_init("hin:", parse_args, argc, argv);
+ 
+-	numcpus = sysconf(_SC_NPROCESSORS_ONLN);
++	numcpus = get_numcpus();
+ 
+-	/* Max no. of busy threads should always be less than/equal the no. of cpus
+-	   Otherwise, the box will hang */
++	/* Max no. of busy threads should always be less than/equal the no. of
++	   housekeeping cpus. Otherwise, the box will hang */
+ 
+ 	if (rt_threads == -1 || rt_threads > numcpus) {
+ 		rt_threads = numcpus;
+-- 
+2.45.2
+
