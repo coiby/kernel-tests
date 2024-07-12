@@ -177,7 +177,9 @@ check tmt lint:
   before_script:
     - tmt --version
   script:
-    - tmt lint --outcome-only fail --enforce-check C000 .
+    # allow T001 failure - workaround until fix from
+    # https://github.com/teemtee/tmt/pull/3084 is released.
+    - tmt lint --outcome-only fail --enforce-check C000 --disable-check T001 .
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
