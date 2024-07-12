@@ -1,0 +1,17 @@
+description:
+  Test is to verify that config_memtest variable is configured in the kernel when setting memtest=1 and booting the machine
+  memtest will occur
+
+Test inputs:
+    /boot/config-$(uname -r) or /usr/lib/ostree-boot/config-$(uname -r) for ostree
+    /tmp/dmesg_temp.txt
+    CONFIG_MEMTEST=y
+    "early_memtest"
+    "memtest=1"
+
+Expected result:
+    [   PASS   ] :: File '/boot/config-5.14.0-473.424.el9iv.aarch64' should contain 'CONFIG_MEMTEST=y'
+    [   PASS   ] :: File '/tmp/dmesg_temp.txt' should contain 'early_memtest'
+
+Results location:
+    output.txt

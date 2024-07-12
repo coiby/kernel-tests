@@ -1,0 +1,11 @@
+[General]
+name=memory/config_memtest
+owner=Michael Menasherov <mmenashe@redhat.com>
+description=config_memtest
+license=GPLv3
+confidential=no
+destructive=no
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;grubby;abootimg
+max_time=1m

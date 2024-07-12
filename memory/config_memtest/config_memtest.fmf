@@ -1,0 +1,19 @@
+summary: Verification of the config_memtest variable enablement
+description: |
+  Test is to verify that config_memtest variable is configured in the kernel when setting memtest=1 and booting the machine
+  memtest will occur
+contact: Michael Menasherov <mmenashe@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+    - type: file
+      pattern:
+        - /cki_lib/libcki.sh
+        - /cmdline_helper/libcmd.sh
+    - grubby
+    - abootimg
+extra-summary: memory/config_memtest
+extra-task: memory/config_memtest
+enabled: true
+duration: 5m
+id: 942f0232-906a-4644-9c5a-10a056845e58
