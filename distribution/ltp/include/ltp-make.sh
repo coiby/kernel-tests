@@ -325,7 +325,7 @@ setup-testarea()
             echo " - mkfs failed" | tee -a $OUTPUTFILE
             exit 1
         fi
-        if [ "${STYP}" == "overlayfs" ]; then
+        if [ "$FSTYP" == "overlayfs" ]; then
             mkdir -p /mnt/ltp-overlay
             mount ${MOUNT_OPTS} $dev /mnt/ltp-overlay
             mkdir -p /mnt/ltp-overlay/lower
