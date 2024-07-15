@@ -1,0 +1,12 @@
+Test stack overflow, underflow, scribbling handing in the kernel
+
+This test compiles a kernel module that will perform a kernel underflow,
+overflow and scribbling, depending on the parameter passed on insertion.
+
+The test configures the machine to reboot on panic, so the kernel panic()
+resulting from the stack manipulation will restart the system under test.
+
+Expected result:
+    [   PASS   ] :: Insmod stackman.ko underflow testmode (Expected 0, got 0)
+    [   PASS   ] :: Command 'sleep 20' (Expected 0, got 0)
+    RESULT: PASS (Test)

@@ -5,14 +5,22 @@
 
 static int i;
 
-static void f(void)
-{
-    f();
-}
-
 void overflow(void)
 {
-    f();
+    int i;
+
+    /* Pop above the stack end */
+    for (i = 0; i < (256*256); i++) {
+        #if defined(__x86_64__)
+            asm("push %rax");
+        #elif defined(__aarch64__)
+            asm("ldr x0, [sp, #0]");
+            asm("sub sp, sp, 16");
+        #else
+            #error "Architecture not supported by the test"
+        #endif
+    }
+    /* We would never get to this line */
 }
 
 void underflow(void)
