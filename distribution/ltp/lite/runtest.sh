@@ -184,7 +184,7 @@ function add_external_timeout()
 	fi
 
 	# Extend the timeout for specific tests
-	sed -i 's/aslr01 aslr01/aslr01 timeout 120 sh -c "aslr || true"/' "$runtest"
+	sed -i 's/aslr01 aslr01/aslr01 timeout 120 sh -c "aslr01 || true"/' "$runtest"
 	sed -i 's/ptrace07 ptrace07/ptrace07 timeout 120 sh -c "ptrace07 || true"/' "$runtest"
 	sed -i 's/ioctl09 ioctl09/ioctl09 timeout 180 sh -c "ioctl09 || true"/' "$runtest"
 	sed -i 's/madvise06 madvise06/madvise06 timeout 180 sh -c "madvise06 || true"/' "$runtest"
