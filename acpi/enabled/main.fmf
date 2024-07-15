@@ -5,8 +5,6 @@ description: |
     not support DeviceTree, so a failure here indicates a firmware problem
     with the server.
 contact: Jeffrey Bastian <jbastian@redhat.com>
-tag:
-  - KernelTier1
 component:
   - kernel
 test: ./runtest.sh
