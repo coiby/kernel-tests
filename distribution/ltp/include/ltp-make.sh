@@ -308,7 +308,7 @@ setup-testarea()
             umount ${TEST_MNT}
         fi
         if [ "$dev" == "" ] && [ "${TEST_DEV}" != "" ]; then
-            dev=$(TEST_DEV)
+            dev="$TEST_DEV"
         fi
         if [ "$dev" == "" ]; then
             echo " - No suitable test device found" | tee -a $OUTPUTFILE
