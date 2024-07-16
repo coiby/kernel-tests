@@ -6,7 +6,12 @@ overflow and scribbling, depending on the parameter passed on insertion.
 The test configures the machine to reboot on panic, so the kernel panic()
 resulting from the stack manipulation will restart the system under test.
 
+Test inputs:
+    insmod stackman.ko testmode=$mode  <=== where mode will be overflow, underflow, and scribbling
+
 Expected result:
-    [   PASS   ] :: Insmod stackman.ko underflow testmode (Expected 0, got 0)
+    [   PASS   ] :: Insmod stackman.ko $mode testmode (Expected 0, got 0) <=== where mode will be overflow, underflow, and scribbling
     [   PASS   ] :: Command 'sleep 20' (Expected 0, got 0)
     RESULT: PASS (Test)
+Results location:
+    output.txt

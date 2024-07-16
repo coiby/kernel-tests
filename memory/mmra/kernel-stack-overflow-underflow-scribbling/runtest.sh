@@ -1,14 +1,14 @@
 #!/bin/bash
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-. ../../../automotive/include/rhivos.sh || exit 1
+. ../../../kernel-include/runtest.sh || exit 1
 
 run_insert_mode() {
     mode=$1
     expected_restart_count=$2
     rlPhaseStartTest
         if [ $TMT_TEST_RESTART_COUNT -ne $expected_restart_count ]; then
-            echo "Skipping overflow test on this restart"
+            rlLog "Skipping ${mode} test on this restart"
         else
             rlRun "rm /var/tmp/stackman/remove_after_module_insert"
             rlRun "insmod stackman.ko testmode=$mode" 0 "Insmod stackman.ko $mode"
@@ -22,19 +22,25 @@ check_disconnection() {
         rlFail "Disconnection was not caused by reboot. Bailing out"
         exit 1
     else
-        echo "Disconnection caused by reboot"
+        rlLog "Disconnection caused by reboot"
     fi
 }
 
 echo "TMT_TEST_RESTART_COUNT $TMT_TEST_RESTART_COUNT"
 rlJournalStart
     rlPhaseStartSetup
-        # Instalation of kernel-automotive-devel from the .fmf is not persistent
-        # reinstall here
-        kernel_automotive
-        if [ $? -eq 0 ]; then
-            rlRun "install_kernel_automotive_devel"
+        devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
+        pkg_mgr=$(K_GetPkgMgr)
+        rlLog "pkg_mgr = ${pkg_mgr}"
+        if [[ $pkg_mgr == "rpm-ostree" ]]; then
+            export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
+        else
+            export pkg_mgr_inst_string="-y install"
         fi
+        # Install kernel automotive devel
+        # shellcheck disable=SC2086
+        ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
+
         rlRun "if [ -d /var/tmp/stackman ]; then rm -fR /var/tmp/stackman; fi"
         rlRun "mkdir /var/tmp/stackman"
         # Create a flag file to make sure reboot came from the module and it was
@@ -53,6 +59,7 @@ rlJournalStart
     run_insert_mode scribbling 2
 
     rlPhaseStartCleanup
+        rlRun "sysctl kernel.panic=0" 0 "Set kernel back to default, do not reboot on panic"
         rlRun "rm -rf /var/tmp/stackman" 0 "Remove tmp directory"
     rlPhaseEnd
 rlJournalEnd
