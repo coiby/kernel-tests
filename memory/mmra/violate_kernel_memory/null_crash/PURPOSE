@@ -1,1 +1,12 @@
-Verifies attempting to violate the kernel memory address space (e.g. pointers to unmapped addresses, or read-only pages) is prevented and results in a failure (e.g. kernel panic).
+Verifies attempting to violate the kernel memory address space is prevented and results in a failure (e.g. kernel panic).
+This test attempts to dereference a NULL kernel address.
+Test Inputs:
+    module source, violate_kernel_memory.c
+    trigger, echo 1 > /sys/kernel/vkm/null_crash
+    capture, dmesg > dmesg-crash.log
+    check, rlAssertGrep "Unable to handle kernel NULL pointer dereference" dmesg-crash.log
+Expected results:
+    [   PASS   ] :: (SEGFAULT expected) (Expected 139, got 139)
+    [   PASS   ] :: File 'dmesg-crash.log' should contain 'Unable to handle kernel NULL pointer dereference'
+Results location:
+    output.txt
