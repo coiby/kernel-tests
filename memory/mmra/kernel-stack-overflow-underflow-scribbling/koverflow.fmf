@@ -4,12 +4,15 @@ description: |
   a stack overflow, underflow and scribbling (writing to random places in the stack)
 contact: <pablmart@redhat.com>
 id: a9cf65c2-fb45-461d-a697-5cd1b99fc158
-test: ./runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
 require:
   - make
   - gcc
-  - kernel-automotive-devel
+  - type: file
+    pattern:
+      - /kernel-include
+      - /memory/mmra/userspace-stack-overflow-underflow-scribbling/stacklib.c
 duration: 10m
 restart-on-exit-code:
     - 255
