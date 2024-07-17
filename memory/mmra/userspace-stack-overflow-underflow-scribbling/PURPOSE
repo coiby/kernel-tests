@@ -1,0 +1,16 @@
+Test stack overflow, underflow, scribbling handing through a user process.
+
+This test compiles a kernel module that will perform a proces underflow,
+overflow and scribbling, depending on the parameter passed on insertion.
+
+Test inputs:
+    script -O output.log -c \"./stackman $mode\"  <=== where mode will be overflow, underflow, and scribbling
+    rlAssertGrep "Segmentation fault" "output.log"
+    rlAssertGrep "COMMAND_EXIT_CODE=\"139\"" "output.log"
+
+Expected result:
+    [   PASS   ] :: Run overflow program (SEGFAULT expected) (Expected 0, got 0)
+    [   PASS   ] :: File 'output.log' should contain 'Segmentation fault'
+    [   PASS   ] :: File 'output.log' should contain 'COMMAND_EXIT_CODE="139"'
+Results location:
+    output.txt
