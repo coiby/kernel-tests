@@ -115,6 +115,9 @@ discalls=${discalls:-'
     "mmap$snddsp_control",
     "mmap$snddsp_status"'}
 
+git_patches=${git_patches:-'
+    ../mmra.patch'}
+
 create-test-cfg()
 {
     local vm_param
@@ -174,8 +177,9 @@ rlJournalStart
         syzkaller_root=$(pwd)
         rlRun "git branch mmra_temp ${commit}"
         rlRun "git switch mmra_temp"
-        rlRun "git apply ../mmra.patch"
-        rlRun "git apply ../dev_watchdog.patch"
+        for git_patch in $git_patches; do
+            rlRun "git apply $git_patch"
+        done
         rlRun "make"
         sut_ip=$(nmcli | grep -A1 "ip4 default" | grep -v "ip4 default" | awk '{print $2}' | awk -F "/" '{print $1}')
         # create config file:
