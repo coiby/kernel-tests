@@ -1,0 +1,26 @@
+diff --git a/sys/linux/sys.txt b/sys/linux/sys.txt
+index 7b03e851e..5f0dae256 100644
+--- a/sys/linux/sys.txt
++++ b/sys/linux/sys.txt
+@@ -564,6 +564,8 @@ sched_setaffinity(pid pid, cpusetsize len[mask], mask ptr[in, int64])
+ sched_getattr(pid pid, attr ptr[out, sched_attr], size len[attr], flags const[0])
+ sched_setattr(pid pid, attr ptr[in, sched_attr], flags const[0])
+ sched_yield()
++sched_get_priority_max(policy flags[sched_policy])
++sched_get_priority_min(policy flags[sched_policy])
+ getrandom(buf buffer[out], len len[buf], flags flags[getrandom_flags])
+ 
+ membarrier(cmd flags[membarrier_cmd], flags const[0])
+diff --git a/sys/linux/sys.txt.const b/sys/linux/sys.txt.const
+index ba024ae99..06e0e14c0 100644
+--- a/sys/linux/sys.txt.const
++++ b/sys/linux/sys.txt.const
+@@ -795,6 +795,8 @@ __NR_rt_tgsigqueueinfo = 240, 386:335, amd64:297, arm:363, mips64le:5291, ppc64l
+ __NR_sched_getaffinity = 123, 386:arm:242, amd64:204, mips64le:5196, ppc64le:223, s390x:240
+ __NR_sched_getattr = 275, 386:352, amd64:315, arm:381, mips64le:5310, ppc64le:356, s390x:346
+ __NR_sched_getparam = 155, amd64:143, arm64:riscv64:121, mips64le:5140
++__NR_sched_get_priority_max = 386:159, arm64:125
++__NR_sched_get_priority_min = 386:160, arm64:126
+ __NR_sched_getscheduler = 157, amd64:145, arm64:riscv64:120, mips64le:5142
+ __NR_sched_rr_get_interval = 161, amd64:148, arm64:riscv64:127, mips64le:5145
+ __NR_sched_setaffinity = 122, 386:arm:241, amd64:203, mips64le:5195, ppc64le:222, s390x:239
