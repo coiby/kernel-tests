@@ -1,7 +1,8 @@
 summary: Tests that confirms user process stack overflow, underflow and scribbling is handled gracefully
 description: |
-  Memory Mamagement Risk Assesment test that check what happens with a process that perform
-  a stack overflow, underflow and scribbling (writing to random places in the stack)
+    Test stack overflow, underflow, scribbling handing through a user process.
+    This test compiles a kernel module that will perform a proces underflow,
+    overflow and scribbling, depending on the parameter passed on insertion.
 contact: <pablmart@redhat.com>
 id: 8c52d126-3121-4587-a833-0de9908f0319
 test: bash ./runtest.sh
