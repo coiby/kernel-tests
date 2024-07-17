@@ -1,6 +1,22 @@
 summary: Verifies that an unsigned kernel module cannot be loaded.
 description: |
         Verifies that an unsigned kernel module cannot be loaded.
+        First the cmdline argument is set to prohibit unsigned modules.
+        Then a module is built and the test tries to insmod the module.
+        Expectation is this should be rejected based on the cmdline settings.
+        Test Inputs:
+            change_cmdline 'module.sig_enforce=1'
+            reboot
+            module source, hw.c
+            trigger, insmod hw.ko
+            capture, dmesg > dmesg-unsigned.log
+            check, rlAssertGrep "Loading of unsigned module is rejected" dmesg-unsigned.log
+        Expected results:
+            [   PASS   ] :: Command 'change_cmdline 'module.sig_enforce=1'' (Expected 0, got 0)
+            [   PASS   ] :: Command 'make all' (Expected 0, got 0)
+            [   PASS   ] :: File 'dmesg-unsigned.log' should contain 'Loading of unsigned module is rejected'
+        Results location:
+            output.txt
 contact: Stephen Bertram <sbertram@redhat.com>
 id: 38a1445c-97c5-454a-8650-6126804d47a1
 component:
