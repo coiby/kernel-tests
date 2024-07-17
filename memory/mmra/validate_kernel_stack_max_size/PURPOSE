@@ -3,7 +3,29 @@ a test round but without the machine being rebooted, because
 we want to find offenders in drivers.
 
 The test works as follows:
-	Verifies that max kernel stack size is less than 16k
+    Verifies that max kernel stack size is less than 16k
+
+First it checks if the stack tracer is enabled and exits if not.
+
+If enabled it checks the current stack_max_size value, and compares it against a predefined threshold.
+
+If the stack_max_size exceeds the threshold, a warning is logged, and the
+function responsible for the maximum stack usage is identified.
 
 See:
 https://issues.redhat.com/browse/RHELMISC-3967
+
+Test Inputs:
+    THRESHOLD=13312
+    /proc/sys/kernel/stack_tracer_enabled
+    /sys/kernel/tracing/stack_max_size
+    /sys/kernel/tracing/stack_trace
+    current_value=$(cat /sys/kernel/tracing/stack_max_size)
+    compare $current_value to $THRESHOLD
+
+Expected Results:
+    [   PASS   ] :: File '/proc/sys/kernel/stack_tracer_enabled' should contain '1'
+    [   INFO   ] :: stack_max_size ($current_value bytes) is within the acceptable range.
+
+Results location:
+    output.txt
