@@ -36,9 +36,13 @@ function run_test()
     DISK=$(ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename)
     DEV=/dev/${DISK}
 
-    rlRun "losetup -f ${DEV} --direct-io=on" "0-255"
+    if rlIsRHEL '>=10';then
+        rlRun "losetup -f ${DEV} -b 4096 --direct-io=on" "0-255"
+    else
+        rlRun "losetup -f ${DEV} --direct-io=on" "0-255"
+    fi
     rlRun "mkfs.xfs /dev/loop0 2>&1" | tee test.log
-    rlRun "cat test.log | grep -i 'pwrite failed'" 1 "test fail,please check"
+    rlRun "cat test.log | grep -i 'pwrite failed'" 1 "if command failed,please check the error"
 
 # clean loop device
     rlRun "losetup -d /dev/loop0"
