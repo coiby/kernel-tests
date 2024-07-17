@@ -1,0 +1,42 @@
+summary: Confirm scheduler system call fuzz testing.
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+component:
+  - kernel
+test: bash -c 'pushd ../../../memory/mmra/syzkaller; ./runtest.sh; popd'
+id: 4e9c19c4-ef1a-4503-837d-b6d485cb9157
+path: /general/scheduler/scheduler_fuzzing
+framework: beakerlib
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+        -  /kernel-include
+        -  /memory/mmra/syzkaller
+environment:
+    mm_syscalls: |
+      "setpriority",
+      "getpriority",
+      "sched_setscheduler",
+      "sched_setparam",
+      "sched_setattr",
+      "sched_getscheduler",
+      "sched_getparam",
+      "sched_getattr",
+      "sched_setaffinity",
+      "sched_getaffinity",
+      "sched_get_priority_max",
+      "sched_get_priority_min",
+      "sched_rr_get_interval",
+      "membarrier"
+    supportcalls: ''
+    git_patches: '../../../../general/scheduler/scheduler_fuzzing/sched_ra.patch'
+duration: 24h
