@@ -1,7 +1,12 @@
 Confirm system call fuzz testing is being performed on scheduler system calls specified in Scheduler Risk Assessment, section 2.2. 
+The database is checked at the end to ensure each syscall was executed at least once.
+Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
 
 Test inputs:
     Scheduler system call list specified in Scheduler Risk Assessment, section 2.2.
+    syzcaller code: https://github.com/google/syzkaller
+    patch: sched_ra.patch
+    check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
 
 Expected results:
     [   PASS   ] :: setpriority executed. 
