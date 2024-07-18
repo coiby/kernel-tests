@@ -12,6 +12,8 @@
 . ../include/runtest.sh  || exit 1
 . ../../distribution/ltp/include/ltp-make.sh || exit 1
 
+set -x
+
 TEST="rt-tests/rt_ltp"
 
 TEST_TYPE=${TEST_TYPE:-"func"}
@@ -24,7 +26,17 @@ result_r="PASS"
 function check_status()
 {
     if [ $? -eq 0 ]; then
-        echo ":: $* :: PASS ::" | tee -a "$OUTPUTFILE"
+        pushd "logs/" || exit 1
+        casename=$(echo "$1" | awk -F'func/' '{print $2}')
+        log_file=$(readlink -f $(find ./ -name "*$casename*"))
+        if grep "Result: FAIL" "$log_file"; then
+            result_r="FAIL"
+            echo ":: $* :: FAIL ::" | tee -a "$OUTPUTFILE"
+            rstrnt-report-log -l "$log_file"
+        else
+            echo ":: $* :: PASS ::" | tee -a "$OUTPUTFILE"
+        fi
+        popd || exit 1 # "logs/"
     else
         result_r="FAIL"
         echo ":: $* :: FAIL ::" | tee -a "$OUTPUTFILE"
@@ -58,7 +70,8 @@ function runtest()
         check_status "./run.sh -t $case"
     done <<< "$func_list"
     # shellcheck disable=SC2164
-    popd
+    popd || exit # "testcases/realtime"
+    popd || exit # "ltp-full-$ltp_version"
 
     if [ $result_r = "PASS" ]; then
         echo "overall result: PASS" | tee -a "$OUTPUTFILE"
