@@ -15,12 +15,16 @@ description: |
     function responsible for the maximum stack usage is identified.
 
     Inputs:
+        THRESHOLD=13312
         /sys/kernel/tracing/stack_max_size
         /sys/kernel/tracing/stack_trace
         /proc/sys/kernel/stack_tracer_enabled
+        current_value=$(cat /sys/kernel/tracing/stack_max_size)
+        compare $current_value to $THRESHOLD
 
     Expected resluts:
-        [   INFO   ] :: stack_max_size (<size> bytes) is within the acceptable range.
+        [   PASS   ] :: File '/proc/sys/kernel/stack_tracer_enabled' should contain '1'
+        [   INFO   ] :: stack_max_size ($current_value bytes) is within the acceptable range.
 
     Results location:
         output.txt.
