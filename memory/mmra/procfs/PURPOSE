@@ -1,1 +1,192 @@
-Confirm fuzz testing is being performed on all /proc/sys/vm  entries.
+Confirm fuzz testing is being performed on all /proc/sys/vm tunables by using openat and write syscalls to interact with the entries.
+The database is checked at the end to ensure each syscall was executed at least once.
+Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
+Test Inputs:
+    syscalls:
+        openat$ark
+        openat$cm
+        openat$cp
+        openat$cua
+        openat$dc
+        openat$des
+        openat$et
+        openat$lm
+        openat$lrr
+        openat$lvl
+        openat$mfek
+        openat$mfk
+        openat$mfr
+        openat$mma
+        openat$mrb
+        openat$ms_ratio
+        openat$mur
+        openat$nzo
+        openat$odt
+        openat$ok
+        openat$okat
+        openat$om
+        openat$or
+        openat$pc
+        openat$plu
+        openat$poom
+        openat$pphf
+        openat$st
+        openat$statr
+        openat$swap
+        openat$urk
+        openat$uu
+        openat$vcp
+        openat$wbf
+        openat$wsf
+        openat$zrm
+        write$ark
+        write$cm
+        write$cp
+        write$cua
+        write$dc
+        write$des
+        write$et
+        write$lm
+        write$lrr
+        write$lvl
+        write$mfek
+        write$mfk
+        write$mfr
+        write$mma
+        write$mrb
+        write$ms_ratio
+        write$mur
+        write$nzo
+        write$odt
+        write$ok
+        write$okat
+        write$om
+        write$or
+        write$pc
+        write$plu
+        write$poom
+        write$pphf
+        write$st
+        write$statr
+        write$swap
+        write$urk
+        write$uu
+        write$vcp
+        write$wbf
+        write$wsf
+        write$zrm
+    syzcaller code: https://github.com/google/syzkaller
+    patch: procfs.patch
+    check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
+Expected results:
+    [   PASS   ] :: openat$ark executed.
+    [   PASS   ] :: openat$cm executed.
+    [   PASS   ] :: openat$cp executed.
+    [   PASS   ] :: openat$cua executed.
+    [   PASS   ] :: openat$dc executed.
+    [   PASS   ] :: openat$des executed.
+    [   PASS   ] :: openat$et executed.
+    [   PASS   ] :: openat$lm executed.
+    [   PASS   ] :: openat$lrr executed.
+    [   PASS   ] :: openat$lvl executed.
+    [   PASS   ] :: openat$mfek executed.
+    [   PASS   ] :: openat$mfk executed.
+    [   PASS   ] :: openat$mfr executed.
+    [   PASS   ] :: openat$mma executed.
+    [   PASS   ] :: openat$mrb executed.
+    [   PASS   ] :: openat$ms_ratio executed.
+    [   PASS   ] :: openat$mur executed.
+    [   PASS   ] :: openat$nzo executed.
+    [   PASS   ] :: openat$odt executed.
+    [   PASS   ] :: openat$ok executed.
+    [   PASS   ] :: openat$okat executed.
+    [   PASS   ] :: openat$om executed.
+    [   PASS   ] :: openat$or executed.
+    [   PASS   ] :: openat$pc executed.
+    [   PASS   ] :: openat$plu executed.
+    [   PASS   ] :: openat$poom executed.
+    [   PASS   ] :: openat$pphf executed.
+    [   PASS   ] :: openat$st executed.
+    [   PASS   ] :: openat$statr executed.
+    [   PASS   ] :: openat$swap executed.
+    [   PASS   ] :: openat$urk executed.
+    [   PASS   ] :: openat$uu executed.
+    [   PASS   ] :: openat$vcp executed.
+    [   PASS   ] :: openat$wbf executed.
+    [   PASS   ] :: openat$wsf executed.
+    [   PASS   ] :: openat$zrm executed.
+    [   PASS   ] :: write$ark executed.
+    [   PASS   ] :: write$cm executed.
+    [   PASS   ] :: write$cp executed.
+    [   PASS   ] :: write$cua executed.
+    [   PASS   ] :: write$dc executed.
+    [   PASS   ] :: write$des executed.
+    [   PASS   ] :: write$et executed.
+    [   PASS   ] :: write$lm executed.
+    [   PASS   ] :: write$lrr executed.
+    [   PASS   ] :: write$lvl executed.
+    [   PASS   ] :: write$mfek executed.
+    [   PASS   ] :: write$mfk executed.
+    [   PASS   ] :: write$mfr executed.
+    [   PASS   ] :: write$mma executed.
+    [   PASS   ] :: write$mrb executed.
+    [   PASS   ] :: write$ms_ratio executed.
+    [   PASS   ] :: write$mur executed.
+    [   PASS   ] :: write$nzo executed.
+    [   PASS   ] :: write$odt executed.
+    [   PASS   ] :: write$ok executed.
+    [   PASS   ] :: write$okat executed.
+    [   PASS   ] :: write$om executed.
+    [   PASS   ] :: write$or executed.
+    [   PASS   ] :: write$pc executed.
+    [   PASS   ] :: write$plu executed.
+    [   PASS   ] :: write$poom executed.
+    [   PASS   ] :: write$pphf executed.
+    [   PASS   ] :: write$st executed.
+    [   PASS   ] :: write$statr executed.
+    [   PASS   ] :: write$swap executed.
+    [   PASS   ] :: write$urk executed.
+    [   PASS   ] :: write$uu executed.
+    [   PASS   ] :: write$vcp executed.
+    [   PASS   ] :: write$wbf executed.
+    [   PASS   ] :: write$wsf executed.
+    [   PASS   ] :: write$zrm executed.
+    [   LOG    ] :: The following /proc/sys/vm tuneables are covered.
+    [   LOG    ] :: admin_reserve_kbytes
+    [   LOG    ] :: compaction_proactiveness
+    [   LOG    ] :: compact_memory
+    [   LOG    ] :: compact_unevictable_allowed
+    [   LOG    ] :: dirtytime_expire_seconds
+    [   LOG    ] :: drop_caches
+    [   LOG    ] :: extfrag_threshold
+    [   LOG    ] :: laptop_mode
+    [   LOG    ] :: legacy_va_layout
+    [   LOG    ] :: lowmem_reserve_ratio
+    [   LOG    ] :: memory_failure_early_kill
+    [   LOG    ] :: memory_failure_recovery
+    [   LOG    ] :: min_free_kbytes
+    [   LOG    ] :: min_slab_ratio
+    [   LOG    ] :: min_unmapped_ratio
+    [   LOG    ] :: mmap_min_addr
+    [   LOG    ] :: mmap_rnd_bits
+    [   LOG    ] :: numa_zonelist_order
+    [   LOG    ] :: oom_dump_tasks
+    [   LOG    ] :: oom_kill_allocating_task
+    [   LOG    ] :: overcommit_kbytes
+    [   LOG    ] :: overcommit_memory
+    [   LOG    ] :: overcommit_ratio
+    [   LOG    ] :: page-cluster
+    [   LOG    ] :: page_lock_unfairness
+    [   LOG    ] :: panic_on_oom
+    [   LOG    ] :: percpu_pagelist_high_fraction
+    [   LOG    ] :: stat_interval
+    [   LOG    ] :: stat_refresh
+    [   LOG    ] :: swappiness
+    [   LOG    ] :: unprivileged_userfaultfd
+    [   LOG    ] :: user_reserve_kbytes
+    [   LOG    ] :: vfs_cache_pressure
+    [   LOG    ] :: watermark_boost_factor
+    [   LOG    ] :: watermark_scale_factor
+    [   LOG    ] :: zone_reclaim_mode
+Results location:
+    output.txt
