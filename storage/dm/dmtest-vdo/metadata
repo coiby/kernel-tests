@@ -1,0 +1,14 @@
+[General]
+name=storage/dm/dmtest-vdo
+owner=Filip Suba <fsuba@redhat.com>
+description=Device Mapper vdo tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=bc;wget;unzip;gcc;git;curl;make;libaio-devel;lvm2;lsof;clang;cargo;systemd-devel;device-mapper-devel;python3-pip;blktrace;device-mapper-persistent-data;fio;vdo;fio;
+softDependencies=coreutils;kmod-kvdo
+repoRequires=cki_lib;storage/include;kernel-include;storage/dm
+max_time=2h
