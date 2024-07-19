@@ -7,6 +7,14 @@ description: |
     After all processes have finish writing to their address space mapped
     chunk, they will then concurrently read back the map's contents
     asserting that previously written byte pattern.
+    Test input:
+        as-isolation.c, source.
+        /tmp/as-isolation
+    Expected results:
+        [   PASS   ] :: Command 'gcc -o /tmp/as-isolation -D_GNU_SOURCE -lpthread as-isolation.c' (Expected 0, got 0)
+        [   PASS   ] :: Command '/tmp/as-isolation' (Expected 0, got 0)
+    Results location:
+        output.txt
 contact: Rafael Aquini <aquini@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib

@@ -1,9 +1,33 @@
 summary: Assert a user process can't write to a shared memory without proper privileges.
 description: |
-  Assert a user process can't write to a shared memory without proper privileges.
-  The test first creates a PAGE_SIZE shared memory segment. Then it launches another
-  process as a non-root user that tries to attach and write to that segment. Either of
-  these operations is expected to fail and this process should be terminated properly.
+    Assert a user process can't write to a shared memory without proper privileges.
+    The test first creates a PAGE_SIZE shared memory segment. Then it launches another
+    process as a non-root user that tries to attach and write to that segment. Either of
+    these operations is expected to fail and this process should be terminated properly.
+
+    Test input:
+        adduser testuser
+        shm-create.c, source.
+        /tmp/shm-create create
+        su testuser -c /tmp/shm-access
+        /tmp/shm-create read
+        /tmp/shm-create-posix create
+        su testuser -c /tmp/shm-access-posix
+        /tmp/shm-create-posix read
+    Expected results:
+        [   PASS   ] :: Command 'gcc -o /tmp/shm-access -D_GNU_SOURCE shm-access.c' (Expected 0, got 0)
+        shmat: Permission denied
+        Attempt to open and attach shm segment...
+        [   PASS   ] :: Command 'su testuser -c /tmp/shm-access' (Expected 1,139, got 1)
+        [   PASS   ] :: Command '/tmp/shm-create read'
+
+        [   PASS   ] :: Command 'gcc -o /tmp/shm-access-posix -DUSE_POSIX_INTERFACE -D_GNU_SOURCE shm-access.c' (Expected 0, got 0)
+        shm_open: Permission denied
+        Attempt to open and attach shm segment...
+        [   PASS   ] :: Command 'su testuser -c /tmp/shm-access-posix' (Expected 1,139, got 1)
+        [   PASS   ] :: Command '/tmp/shm-create-posix read' (Expected 0, got 0)
+    Results location:
+        output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
