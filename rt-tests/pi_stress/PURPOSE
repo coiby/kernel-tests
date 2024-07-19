@@ -32,6 +32,35 @@ On a multi-processor system, the admin and reporter threads are run
 one one processor while the inversion groups are run on another
 processor.
 
+Utilities:
+    pi_stress - A program used to stress test POSIX Priority Inheritance mutexes.
+    pip_stress - A program used to test priority inheritance between processes.
+
+Test Inputs:
+    $PARAM_SEC, defaults to '30'.
+    $PARAM_GROUPS, defaults to '1'.
+
+    For each execution of pi_stress, expect the configured deadlock of each group to
+    be handled through priority inheritance mutexes and result in an inversion
+    occurring with no reported errors.
+        Execute 'pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS'.
+        Execute 'pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS --rr'.
+        Execute 'pi_stress --quiet --groups=$(( nrcpus )) --duration=30'.
+
+    Execute 'pip_stress' and expect a priority inversion to be handled through
+    priority inheritance.
+
+Expected result:
+    pi_stress:
+        For each execution, no error message entries in the log,
+        and a summary message indicating that inversions occurred.
+            Total inversion performed: xxx
+
+    pip_stress:
+        Successfully used priority inheritance to handle an inversion
+
+Results location:
+    output.txt | taskout.log, log is dependent upon the test executor.
 
 STEPS TO RUN
 
