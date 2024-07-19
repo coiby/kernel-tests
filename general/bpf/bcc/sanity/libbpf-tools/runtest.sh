@@ -17,6 +17,8 @@ function test_setup()
         exit 0
     fi
     rlPhaseStartSetup
+    # required by gethostlatency (to provide libc.so)
+    rlRun "dnf install -y glibc-devel"
     modprobe ext4
     modprobe nfs
     modprobe xfs
@@ -80,6 +82,9 @@ for cmd in $(rpm -ql libbpf-tools| grep bin | awk -F '/' '{print $NF}') ; do
              ;;
         bpf-funclatency)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd vfs_read
+             ;;
+        bpf-gethostlatency)
+             timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd -l /usr/lib64/libc.so.6
              ;;
         *)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd
