@@ -30,7 +30,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 CLONE_ATTEMPTS_COUNT=25
-TmpDir=$(mktemp -d) 
+TmpDir=$(mktemp -d)
 
 rlJournalStart
 	rlPhaseStartSetup
