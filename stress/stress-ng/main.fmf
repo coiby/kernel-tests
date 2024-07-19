@@ -19,6 +19,15 @@ description: |
 
     GIT_BRANCH = version of stress-ng to check out
                  default: see runtest.sh
+
+    Test inputs(Depends on stressor):
+        e.g., stress-ng --sigsegv 0 --timeout 5 --log-file sigsegv.log
+
+    Expected results:
+        [   PASS   ] :: Command '/opt/stress-ng/stress-ng --sigsegv 0 --timeout 5 --log-file sigsegv.log' (Expected 0,2,3, got 0)
+
+    Results location:
+        taskout.log
 contact: Jeff Bastian <jbastian@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
