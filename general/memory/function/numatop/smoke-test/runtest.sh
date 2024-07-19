@@ -29,12 +29,11 @@
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-PACKAGE="numatop"
 CLONE_ATTEMPTS_COUNT=25
+TmpDir=$(mktemp -d) 
 
 rlJournalStart
 	rlPhaseStartSetup
-		rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
 		rlRun "cp mgen.tar.gz $TmpDir/"
 		rlRun "cp 0001-fix-numatop-build-error-on-rhel10.patch $TmpDir/"
 		rlRun "pushd $TmpDir"
@@ -139,7 +138,7 @@ rlJournalStart
 			fi
 		rlPhaseEnd
 	fi
-	
+
 	rlPhaseStartCleanup
 		rlRun "popd"
 		rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
