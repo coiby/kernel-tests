@@ -120,6 +120,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-msgstress01-remove-TWARN-from-runtime-remaining.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-realtime-prio-preempt-take-cpu-isolation-into-consid.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-kallsyms-skip-user-space-mapped-addresses.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-perf_event_open-improve-the-memory-leak-detection.patch
     fi
     if [ "$TESTVERSION" == "20240129" ]; then
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
