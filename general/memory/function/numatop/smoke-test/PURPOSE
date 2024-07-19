@@ -1,0 +1,9 @@
+PURPOSE of /tools/numatop/Sanity/smoke-test
+Description: It generates some NUMA load and checks whether numatop sees it.
+Author: Michael Petlan <mpetlan@redhat.com>
+
+The mgen tool has been taken from numatop source package. It should
+generate some NUMA load,  which should be captured by numatop then.
+
+The test needs at least two NUMA nodes in order to be able to check
+the RMAs and LMAs (Local and Remote Memory Accesses).
