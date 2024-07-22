@@ -1,9 +1,25 @@
 summary: Assert a user process can't write outside it's address space.
 description: |
-  Assert a user process can't write outside it's address space.
-  The test process allocates a PAGE_SIZE shared memory segment. Then it creates
-  a child process that writes bytes to the whole segment + 1. The parent 
-  asserts that the child process is killed by SIGSEGV.
+    Assert a user process can't write outside it's address space.
+    The test process allocates a PAGE_SIZE shared memory segment. Then it creates
+    a child process that writes bytes to the whole segment + 1. The parent
+    asserts that the child process is killed by SIGSEGV.
+
+    Test input:
+        shm-overflow.c, source
+        /tmp/shm-overflow
+    Expected results:
+        [   PASS   ] :: Command 'gcc -o /tmp/shm-overflow -D_GNU_SOURCE shm-overflow.c' (Expected 0, got 0)
+        Child process terminated with exit status 0x008B.
+        Received SIGSEGV as expected.
+        [   PASS   ] :: Command '/tmp/shm-overflow' (Expected 0, got 0)
+
+        [   PASS   ] :: Command 'gcc -o /tmp/shm-overflow-posix -DUSE_POSIX_INTERFACE -D_GNU_SOURCE shm-overflow.c' (Expected 0, got 0)
+        Child process terminated with exit status 0x008B.
+        Received SIGSEGV as expected.
+        [   PASS   ] :: Command '/tmp/shm-overflow-posix' (Expected 0, got 0)
+    Results location:
+        output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
