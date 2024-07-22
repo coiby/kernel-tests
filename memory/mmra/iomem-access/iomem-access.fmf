@@ -4,6 +4,21 @@ description: |
   First try to access /dev/mem. If the operation succeeds, mmap the address
   range of the device, then try a read and a write operation.
   Either of these open/read/write operations is expected to fail.
+
+  Test inputs:
+    A non-root user created as testuser.
+    A hardware device. Default is serial.
+    IO memory range [START_ADDR, END_ADDR] for the device, taken from /proc/iomem.
+    iomem-access.c, source.
+    su testuser -c '/tmp/iomem-access $START_ADDR $END_ADDR'
+
+  Expected results:
+    [   PASS   ] :: Command 'gcc -o /tmp/iomem-access -D_GNU_SOURCE iomem-access.c' (Expected 0, got 0)
+    open /dev/mem: No such file or directory
+    [   PASS   ] :: Command 'su testuser -c '/tmp/iomem-access 0088c000 0088ffff '' (Expected 1,139, got 1)
+
+  Results location:
+    output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
