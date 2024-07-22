@@ -205,7 +205,7 @@ if [ "$cmp_min_rhel7" -ge "0" ] && [ "$cmp_max_rhel7" -lt "0" ]; then
 elif [ "$cmp_min_rhel8" -ge "0" ]; then
 	install_selftests_internal || { test_fail "install selftests failed" && exit 1; }
 else
-	[ $RSTRNT_JOBID ] && rstrnt-report-result "LIVEPATCH_SELFTESTS_UNSUPPORTED" "SKIP" 0
+	rstrnt-report-result "LIVEPATCH_SELFTESTS_UNSUPPORTED" "SKIP" 0
 	exit 0
 fi
 
@@ -213,7 +213,7 @@ for item in $TEST_ITEMS; do
 	do_${item}
 done
 
-# if running as restraint job, the test result is already reported as subtests
-# don't exit with values different of 0. Otherwise, restraint reports it as a separate subtest
-[ $RSTRNT_JOBID ] || exit $nfail
 #-------------------- Clean Up --------------------
+for mod in $(lsmod | grep -E "^test_klp_" | awk '{ print $1; }'); do
+	rmmod -f $mod
+done
