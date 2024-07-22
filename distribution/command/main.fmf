@@ -2,7 +2,4 @@ summary: Execute any arbitrary command.
 contact: Bruno Goncalves <bgoncalv@redhat.com>
 test: bash ./runtest.sh
 framework: shell
-require:
-recommend:
 duration: 60m
-task: /distribution/command
