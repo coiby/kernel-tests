@@ -1,0 +1,5 @@
+summary: Execute any arbitrary command.
+contact: Bruno Goncalves <bgoncalv@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 60m
