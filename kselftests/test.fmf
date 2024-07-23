@@ -23,6 +23,7 @@ require:
   - python3
   - tar
   - wget
+  - pip
 recommend:
   - fuse
   - iperf3

@@ -381,6 +381,7 @@ do_tc-testing_config()
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string clang valgrind
 	install_scapy
+	pip -q install pyroute2 2>/dev/null
 	modprobe -r veth
 	modprobe netdevsim
 
