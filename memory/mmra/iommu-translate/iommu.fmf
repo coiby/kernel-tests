@@ -1,8 +1,17 @@
 summary: Test to confirm IOMMU is set to translation mode by default
 description: |
-  Memory Management Risk assesment test to confirm IOMMU is set to
-  translation mode by default, checking dmesg and the files in /sys to
-  assert the translation mode.
+    Test to confirm IOMMU is set to translation mode by default, 
+    checking dmesg and the files in /sys to assert the translation mode.
+
+    Test inputs:
+        journalctl --dmesg --grep 'iommu: Default domain type: Translated' 
+        file in /sys/kernel/iommu_groups/*/type
+        rlAssertGrep "DMA" "$file"
+    Expected resules:
+        [   PASS   ] :: Search dmesg for default domain type (Expected 0, got 0)
+        [   PASS   ] :: File '/sys/kernel/iommu_groups/*/type' should contain 'DMA' <=== * represents all numbers that exists.
+    Results location:
+        output.txt
 contact: Pablo Martin <pablmart@redhat.com>
 id: db730ccf-6de5-46c0-85a6-9133ef9b5ad2
 test: bash ./runtest.sh
