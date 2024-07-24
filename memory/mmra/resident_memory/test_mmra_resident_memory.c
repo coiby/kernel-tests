@@ -7,57 +7,95 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define BUFFER_SIZE     (1UL<<20) // 1MiB
-#define LINELEN         256
+#define BUFFER_SIZE         (1UL<<20) // 1MiB
+#define BUFFER_SIZE_KIB     BUFFER_SIZE / 1024
+#define LINELEN             256
 
 /**
- * utility function used to retrieve the resident size set of the current process
- * from /proc/self/status. Exit the process when errors arise.
- * @param field_name used to request a field to read
+ * utility function used to retrieve the resident size set and
+ * the amount of locked KiB for a specific memory mapping
+ * from /proc/self/smaps. Returns an error flag when errors arise.
+ * @param desired_mapping_address used to read the desired information from the specified mapping
+ * @param Rss used to return the Rss value (if found) for the specified mapping
+ * @param Locked used to return the Locked value (if found) for the specified mapping
  * @param err_flag set to true if an error occurs, false otherwise.
- * @return returns the requested value. Meaningful when err_flag is set to false
- */
-unsigned long get_proc_status_field(const char *field_name, bool *err_flag)
+*/
+static void get_proc_smaps_info(unsigned long desired_mapping_address, unsigned long *Rss, unsigned long *Locked, bool *err_flag)
 {
+    bool mapping_found = false;
+    bool Locked_found = false;
+    bool Rss_found = false;
     char buffer[LINELEN] = "";
+    FILE *fp = NULL;
     int ret = 0;
-    FILE* file = NULL;
-    unsigned long field_value = 0;
 
-    *err_flag = false;
-
-    file = fopen("/proc/self/status", "r");
-    if (file == NULL) {
-        perror("cannot find file proc/self/status\n");
+    fp = fopen("/proc/self/smaps", "r");
+    if (fp == NULL) {
+        perror("cannot find file proc/self/smaps\n");
         *err_flag = true;
-        return 0;
+        return;
     }
 
-    while (fgets(buffer, LINELEN, file) != NULL) {
-        // find the line that contains the requested field
-        if (strstr(buffer, field_name) != NULL) {
+    while (fgets(buffer, LINELEN, fp) != NULL) {
+        unsigned long mapping_address;
 
-            // extract the value for the requested field
-            ret = sscanf(buffer, "%*[^0-9]%lu%*[^0-9]", &field_value);
-            if (ret != 1) {
-                fprintf(stderr, "%s: read %s failed\n", strerror(errno), field_name);
-                *err_flag = true;
-            }
-
-            fclose(file);
-
-            // convert kB to bytes
-            return field_value * 1024;
+        // find the desired mapping
+        ret = sscanf(buffer, "%lx[^-]", &mapping_address);
+        if ((ret == 1) && (mapping_address == desired_mapping_address)) {
+            mapping_found = true;
+            break;
         }
     }
 
-    // field requested could not be found
-    fprintf(stderr, "cannot find field %s in /proc/pid/status\n", field_name);
+    if (!mapping_found) {
+        fprintf(stderr, "Mapping %lx not found in /proc/self/smaps\n", desired_mapping_address);
+        goto err;
+    }
+
+    while (fgets(buffer, LINELEN, fp) != NULL) {
+        unsigned long possible_starting_mapping;
+        unsigned long possible_ending_mapping;
+
+        // check if the mapping section ended
+        ret = sscanf(buffer, "%lx-%lx", &possible_starting_mapping, &possible_ending_mapping);
+        if (ret == 2)
+            break;
+
+        // check if the current field is Rss
+        if (strncmp(buffer, "Rss", strlen("Rss")) == 0) {
+            ret = sscanf(buffer, "%*[^:]:%lu kB", Rss);
+            if (ret != 1) {
+                fprintf(stderr, "failure occurred while reading field Rss");
+                goto err;
+            }
+
+            Rss_found = true;
+        }
+
+        // check if the current field is Locked
+        if (strncmp(buffer, "Locked", strlen("Locked")) == 0) {
+            ret = sscanf(buffer, "%*[^:]:%lu kB", Locked);
+            if (ret != 1) {
+                fprintf(stderr, "failure occurred while reading field Locked");
+                goto err;
+            }
+
+            Locked_found =  true;
+        }
+
+        if (Rss_found && Locked_found) {
+            fclose(fp);
+            *err_flag = false;
+            return;
+        }
+    }
+
+    fprintf(stderr, "cannot find both Rss and Locked in mapping %lx", desired_mapping_address);
+
+err:
     *err_flag = true;
-
-    fclose(file);
-
-    return 0;
+    fclose(fp);
+    return;
 }
 
 /**
@@ -71,10 +109,8 @@ bool test_resident_memory(void)
     int mlock_ret = 0;
     int munlock_ret = 0;
     uint8_t* buff = NULL;
-    unsigned long VmRSS_before_mlock = 0;
-    unsigned long VmRSS_after_mlock = 0;
-    unsigned long VmLck_before_mlock = 0;
-    unsigned long VmLck_after_mlock = 0;
+    unsigned long Rss = 0;
+    unsigned long Locked = 0;
     bool err_flag = false;
 
     buff = (uint8_t*)mmap(NULL, BUFFER_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -83,45 +119,25 @@ bool test_resident_memory(void)
         return false;
     }
 
-    VmRSS_before_mlock = get_proc_status_field("VmRSS", &err_flag);
-    if (err_flag){
-        fprintf(stderr, "an error occured in get_proc_status_field\n");
-        goto err1;
-    }
-
-    VmLck_before_mlock = get_proc_status_field("VmLck", &err_flag);
-    if (err_flag){
-        fprintf(stderr, "an error occured in get_proc_status_field\n");
-        goto err1;
-    }
-
     mlock_ret = mlock(buff, BUFFER_SIZE);
     if (mlock_ret != 0) {
         perror("cannot lock memory");
         goto err1;
     }
 
-    VmRSS_after_mlock = get_proc_status_field("VmRSS", &err_flag);
-    if (err_flag){
-        fprintf(stderr, "an error occured in get_proc_status_field\n");
-        goto err0;
-    }
-
-    VmLck_after_mlock = get_proc_status_field("VmLck", &err_flag);
-    if (err_flag){
-        fprintf(stderr, "an error occured in get_proc_status_field\n");
-        goto err0;
-    }
+    get_proc_smaps_info((unsigned long)buff, &Rss, &Locked, &err_flag);
+    if (err_flag)
+        return false;
 
     // we expect the buffer to be loaded in physical memory
-    if (VmRSS_after_mlock - VmRSS_before_mlock < BUFFER_SIZE) {
-        fprintf(stderr, "Pre-allocation of PTEs failed\n");
+    if (Rss != BUFFER_SIZE_KIB) {
+        fprintf(stderr, "Pre-allocation of PTEs failed: requested %lu KiB, pre-allocated %lu KiB\n", BUFFER_SIZE_KIB, Rss);
         goto err0;
     }
 
-    // we expect the buffer to be locked in physical memory
-    if (VmLck_after_mlock - VmLck_before_mlock < BUFFER_SIZE) {
-        fprintf(stderr, "Buffer is not locked in memory\n");
+     // we expect the buffer to be locked in physical memory
+    if (Locked != BUFFER_SIZE_KIB) {
+        fprintf(stderr, "Buffer is not locked in memory: requested %lu KiB, locked %lu KiB\n", BUFFER_SIZE_KIB, Locked);
         goto err0;
     }
 
@@ -136,6 +152,7 @@ bool test_resident_memory(void)
         return false;
     }
 
+    printf("SUCCESS: requested %lu KiB, pre-allocated %lu KiB, locked %lu KiB\n", BUFFER_SIZE_KIB, Rss, Locked);
     return true;
 
 err0:
@@ -150,11 +167,7 @@ int main()
     bool ret = false;
     ret = test_resident_memory();
 
-    if (ret) {
-        printf("Success\n");
+    if (ret)
         return EXIT_SUCCESS;
-    } else {
-        printf("Failure\n");
-        return EXIT_FAILURE;
-    }
+    return EXIT_FAILURE;
 }
