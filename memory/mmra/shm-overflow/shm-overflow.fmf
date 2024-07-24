@@ -6,9 +6,13 @@ description: |
     asserts that the child process is killed by SIGSEGV.
 
     Test input:
-        shm-overflow.c, source
-        /tmp/shm-overflow
+        Two versions of the program shm-overlow: one for SysV shm and the other
+        (shm-overflow-posix) for POSIX shm. Input details:
+        - shm-overflow.c, source
+        - /tmp/shm-overflow
     Expected results:
+        If the write operation outside the segment's address space fails as expected,
+        you should expect the following output:
         [   PASS   ] :: Command 'gcc -o /tmp/shm-overflow -D_GNU_SOURCE shm-overflow.c' (Expected 0, got 0)
         Child process terminated with exit status 0x008B.
         Received SIGSEGV as expected.

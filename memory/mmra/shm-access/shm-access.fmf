@@ -6,21 +6,28 @@ description: |
     these operations is expected to fail and this process should be terminated properly.
 
     Test input:
-        adduser testuser
-        shm-create.c, source.
-        /tmp/shm-create create
-        su testuser -c /tmp/shm-access
-        /tmp/shm-create read
-        /tmp/shm-create-posix create
-        su testuser -c /tmp/shm-access-posix
-        /tmp/shm-create-posix read
+        Four programs:
+        - shm-create (using SysV shm) and shm-create-posix (using POSIX
+        shm) that will create the shared memory segment under test.
+        - shm-access (SysV) and shm-access-posix (POSIX) that will run with non-root
+        privileges and assert either of the open/read/write operations fails.
+        Input details:
+        - adduser testuser
+        - shm-create.c, source.
+        - /tmp/shm-create create
+        - su testuser -c /tmp/shm-access
+        - /tmp/shm-create read
+        - /tmp/shm-create-posix create
+        - su testuser -c /tmp/shm-access-posix
+        - /tmp/shm-create-posix read
     Expected results:
+        If the non-root process can't access the shared memory segment as expected,
+        you should expect the following output:
         [   PASS   ] :: Command 'gcc -o /tmp/shm-access -D_GNU_SOURCE shm-access.c' (Expected 0, got 0)
         shmat: Permission denied
         Attempt to open and attach shm segment...
         [   PASS   ] :: Command 'su testuser -c /tmp/shm-access' (Expected 1,139, got 1)
-        [   PASS   ] :: Command '/tmp/shm-create read'
-
+        [   PASS   ] :: Command '/tmp/shm-create read' (Expected 0, got 0)
         [   PASS   ] :: Command 'gcc -o /tmp/shm-access-posix -DUSE_POSIX_INTERFACE -D_GNU_SOURCE shm-access.c' (Expected 0, got 0)
         shm_open: Permission denied
         Attempt to open and attach shm segment...

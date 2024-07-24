@@ -8,9 +8,14 @@ description: |
     chunk, they will then concurrently read back the map's contents
     asserting that previously written byte pattern.
     Test input:
-        as-isolation.c, source.
-        /tmp/as-isolation
+        A program, as-isolation, that will map 90% of the total RAM.
+        Input details:
+        - as-isolation.c, source.
+        - /tmp/as-isolation
     Expected results:
+        If the read back operation of the patterns wrote to memory segments is
+        successful (meaning they didn't interfere with each other) you should
+        expect the following results:
         [   PASS   ] :: Command 'gcc -o /tmp/as-isolation -D_GNU_SOURCE -lpthread as-isolation.c' (Expected 0, got 0)
         [   PASS   ] :: Command '/tmp/as-isolation' (Expected 0, got 0)
     Results location:
