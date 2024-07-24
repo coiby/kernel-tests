@@ -9,8 +9,19 @@ Test inputs:
     rlAssertGrep "COMMAND_EXIT_CODE=\"139\"" "output.log"
 
 Expected result:
+  All tests should cause a segmentation fault as the kernel protects itself and provides the following results.
+  For overflow:
     [   PASS   ] :: Run overflow program (SEGFAULT expected) (Expected 0, got 0)
     [   PASS   ] :: File 'output.log' should contain 'Segmentation fault'
     [   PASS   ] :: File 'output.log' should contain 'COMMAND_EXIT_CODE="139"'
+  For underflow:
+    [   PASS   ] :: Run underflow program (SEGFAULT expected) (Expected 0, got 0)
+    [   PASS   ] :: File 'output.log' should contain 'Segmentation fault'
+    [   PASS   ] :: File 'output.log' should contain 'COMMAND_EXIT_CODE="139"'
+  For scribbling:
+    [   PASS   ] :: Run scribbling program (SEGFAULT expected) (Expected 0, got 0)
+    [   PASS   ] :: File 'output.log' should contain 'Segmentation fault'
+    [   PASS   ] :: File 'output.log' should contain 'COMMAND_EXIT_CODE="139"'
+
 Results location:
     output.txt
