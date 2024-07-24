@@ -1,15 +1,18 @@
-summary: |
+summary: Fuzz scheduler system calls.
+description: |
   Confirm system call fuzz testing is being performed on scheduler system calls specified in Scheduler Risk Assessment, section 2.2.
   The database is checked at the end to ensure each syscall was executed at least once.
   Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
-
   Test inputs:
-      Scheduler system call list specified in Scheduler Risk Assessment, section 2.2.
-      syzcaller code: https://github.com/google/syzkaller
-      patch: sched_ra.patch
-      check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
-
+      A list with the scheduler system calls to be fuzzed, and a fuzzer program
+      called syzkaller. Input details:
+      - Scheduler system call list from RA documentation.
+      - syzkaller code: https://github.com/google/syzkaller
+      - patch: sched_ra.patch
+      - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
   Expected results:
+      If the system calls are executed without incident during the test runtime,
+      the following output should be expected:
       [   PASS   ] :: setpriority executed. 
       [   PASS   ] :: getpriority executed. 
       [   PASS   ] :: sched_setscheduler executed. 
@@ -24,7 +27,6 @@ summary: |
       [   PASS   ] :: sched_get_priority_min executed. 
       [   PASS   ] :: sched_rr_get_interval executed. 
       [   PASS   ] :: membarrier executed. 
-
   Results location:
       output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
