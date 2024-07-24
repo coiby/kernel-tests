@@ -1,0 +1,108 @@
+From 3002dfb4714cc3a06db63c8f0890cb504de5f05b Mon Sep 17 00:00:00 2001
+From: Andrea Cervesato <andrea.cervesato@suse.com>
+Date: Mon, 22 Jul 2024 16:28:44 +0200
+Subject: [PATCH 6/6] Add cachestat04 test
+
+This test verifies cachestat() for all possible file descriptors,
+checking that returned statistics are always zero, unless file
+descriptor is unsupported and EBADF is raised.
+
+Signed-off-by: Andrea Cervesato <andrea.cervesato@suse.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ runtest/syscalls                              |  1 +
+ .../kernel/syscalls/cachestat/.gitignore      |  1 +
+ .../kernel/syscalls/cachestat/cachestat04.c   | 60 +++++++++++++++++++
+ 3 files changed, 62 insertions(+)
+ create mode 100644 testcases/kernel/syscalls/cachestat/cachestat04.c
+
+diff --git a/runtest/syscalls b/runtest/syscalls
+index 8a297429b..9b041b03d 100644
+--- a/runtest/syscalls
++++ b/runtest/syscalls
+@@ -65,6 +65,7 @@ cacheflush01 cacheflush01
+ cachestat01 cachestat01
+ cachestat02 cachestat02
+ cachestat03 cachestat03
++cachestat04 cachestat04
+ 
+ chdir01 chdir01
+ chdir01A symlink01 -T chdir01
+diff --git a/testcases/kernel/syscalls/cachestat/.gitignore b/testcases/kernel/syscalls/cachestat/.gitignore
+index 6cfa3fa10..a3611a533 100644
+--- a/testcases/kernel/syscalls/cachestat/.gitignore
++++ b/testcases/kernel/syscalls/cachestat/.gitignore
+@@ -1,3 +1,4 @@
+ cachestat01
+ cachestat02
+ cachestat03
++cachestat04
+diff --git a/testcases/kernel/syscalls/cachestat/cachestat04.c b/testcases/kernel/syscalls/cachestat/cachestat04.c
+new file mode 100644
+index 000000000..a389c203c
+--- /dev/null
++++ b/testcases/kernel/syscalls/cachestat/cachestat04.c
+@@ -0,0 +1,60 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (C) 2024 SUSE LLC Andrea Cervesato <andrea.cervesato@suse.com>
++ */
++
++/*\
++ * [Description]
++ *
++ * This test verifies cachestat() for all the possible file descriptors,
++ * checking that cache statistics are always zero, except for unsupported file
++ * descriptors which cause EBADF to be raised.
++ */
++
++#include "tst_test.h"
++#include "lapi/mman.h"
++
++#define MNTPOINT "mnt"
++
++static struct cachestat *cs;
++static struct cachestat_range *cs_range;
++
++static void check_cachestat(struct tst_fd *fd_in)
++{
++	int ret;
++
++	memset(cs, 0xff, sizeof(*cs));
++
++	ret = cachestat(fd_in->fd, cs_range, cs, 0);
++	if (ret == -1) {
++		TST_EXP_EQ_LI(errno, EBADF);
++		return;
++	}
++
++	TST_EXP_EQ_LI(cs->nr_cache, 0);
++	TST_EXP_EQ_LI(cs->nr_dirty, 0);
++	TST_EXP_EQ_LI(cs->nr_writeback, 0);
++	TST_EXP_EQ_LI(cs->nr_evicted, 0);
++	TST_EXP_EQ_LI(cs->nr_recently_evicted, 0);
++}
++
++static void run(void)
++{
++	TST_FD_FOREACH(fd) {
++		tst_res(TINFO, "%s -> ...", tst_fd_desc(&fd));
++		check_cachestat(&fd);
++	}
++}
++
++static struct tst_test test = {
++	.test_all = run,
++	.min_kver = "6.5",
++	.mount_device = 1,
++	.mntpoint = MNTPOINT,
++	.bufs = (struct tst_buffers []) {
++		{&cs, .size = sizeof(struct cachestat)},
++		{&cs_range, .size = sizeof(struct cachestat_range)},
++		{}
++	},
++};
++
+-- 
+2.45.2
+
