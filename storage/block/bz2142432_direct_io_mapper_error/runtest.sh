@@ -37,6 +37,10 @@ function get_disk()
     done
 
     echo "free device:" "${disk_list[@]}"
+    if [[ "${#disk_list[@]}" -lt 2 ]]; then
+        echo "not enough free devices to run the test"
+        return 2
+    fi
     for i in $(seq 0 ${#disk_list[@]});do
         eval "dev$i=${disk_list[$i]}"
     done
@@ -46,6 +50,10 @@ function run_test()
 {
 # find local free disk
     get_disk
+    if [[ "$?" == "2" ]]; then
+        echo "skip test as there is no free device"
+        return 2
+    fi
     # shellcheck disable=SC2154
     rlRun "parted -s /dev/$dev0 mklabel gpt mkpart xfs 1M 50G"
     # shellcheck disable=SC2154
@@ -119,14 +127,20 @@ function check_log()
     rlRun "dmesg | grep -i 'WARNING:'" 1 "check the errors"
 }
 
-rlJournalStart
-    rlPhaseStartTest
-        rlRun "dmesg -C"
-        rlRun "uname -a"
-        rlLog "$0"
-        run_test
-        clean_up
-        check_log
-    rlPhaseEnd
-rlJournalPrintText
-rlJournalEnd
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+    rlJournalStart
+        rlPhaseStartTest
+            rlRun "dmesg -C"
+            rlRun "uname -a"
+            rlLog "$0"
+            run_test
+            if [[ "$?" != "2" ]]; then
+                clean_up
+            fi
+            check_log
+        rlPhaseEnd
+    rlJournalPrintText
+    rlJournalEnd
+fi
