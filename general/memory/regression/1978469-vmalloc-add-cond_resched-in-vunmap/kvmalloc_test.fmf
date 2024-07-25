@@ -2,6 +2,7 @@ summary: Verifies that vfree() doesn't trigger NMI watchdog BUG when freeing a l
 description: |
         Verifies that vfree() doesn't trigger NMI watchdog BUG when freeing a large vmalloc'd area.
         Test inputs:
+          This test reads the free memory from /proc/meminfo, converts the free memory to gigabytes, and uses this size as input to the kvmalloc module to reserve memory using vmalloc.
             free=$(cat /proc/meminfo | awk '/MemFree/ {print $2}')
             size=$((free/1024/1024-1))
             source, kvmalloc-test.c
@@ -9,6 +10,7 @@ description: |
             collection, dmesg > dmesg-kvmalloc-test.log
             rlAssertGrep "vmalloc(.*) succeeded" dmesg-kvmalloc-test.log
         Expected Results:
+          If vfree() doesn't trigger NMI watchdog BUG when freeing a large vmalloc'd area, you should expect to see the following result:
             [   PASS   ] :: File 'dmesg-kvmalloc-test.log' should contain 'vmalloc(.*) succeeded'
         Results loocation:
             output.txt
