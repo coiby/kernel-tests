@@ -29,10 +29,10 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 threshold=25
-TmpDir=./tmp
+TmpDir=$(pwd)/tmp
 
 rlJournalStart
-    if ! [[ -e /tmp/enable_fips_attempted ]]; then
+    if ! [[ -e $TmpDir/enable_fips_attempted ]]; then
         rlPhaseStartSetup
             rlShowRunningKernel
             grubby --info=DEFAULT
@@ -53,12 +53,10 @@ rlJournalStart
             rlRun -l "./threaded_getrandom 1000 2> ./before_fips.log" 0
             rlRun -l "./threaded_getrandom 10000 2>> ./before_fips.log" 0
         rlPhaseEnd
-    elif [[ -e /tmp/disable_fips_attempted ]]; then
+    elif [[ -e $TmpDir/disable_fips_attempted ]]; then
         rlPhaseStartCleanup
             rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-        [[ -e /tmp/enable_fips_attempted ]] && rlRun "rm /tmp/enable_fips_attempted"
-        [[ -e /tmp/disable_fips_attempted ]] && rlRun "rm /tmp/disable_fips_attempted"
-            rlRun "fips-mode-setup --is-enabled" 1 && fips_enabled=1
+            fips-mode-setup --is-enabled && fips_enabled=1
             if [ ${fips_enabled} ]; then
                 rlDie "Failed to disable FIPS, remaining testsuite might be effected"
             else
@@ -76,8 +74,8 @@ rlJournalStart
         rlRun "fips-mode-setup --check"
         fips-mode-setup --is-enabled && rlPass "FIPS mode is enabled" && fips_enabled=1
         if [ ! ${fips_enabled} ]; then
-            [[ -e /tmp/enable_fips_attempted ]] && rlDie "Failed to enable FIPS, end of test"
-            touch /tmp/enable_fips_attempted && sync
+            [[ -e $TmpDir/enable_fips_attempted ]] && rlDie "Failed to enable FIPS, end of test"
+            rlRun "touch $TmpDir/enable_fips_attempted" && sync
             if stat /run/ostree-booted > /dev/null 2>&1; then
                 rlRun -l "fips-mode-setup --enable --no-bootcfg"
                 kernel_args=$(fips-mode-setup --enable --no-bootcfg | awk -F\" '/fips=1/ {print $2}')
@@ -104,7 +102,7 @@ rlJournalStart
 
     rlPhaseStartTest "Disabling FIPS mode."
         rlRun -l "fips-mode-setup --disable"
-        touch /tmp/disable_fips_attempted && sync
+        touch $TmpDir/disable_fips_attempted && sync
         rlRun "rhts-reboot"
     rlPhaseEnd
 rlJournalEnd
