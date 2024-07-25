@@ -121,6 +121,11 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-realtime-prio-preempt-take-cpu-isolation-into-consid.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-kallsyms-skip-user-space-mapped-addresses.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-perf_event_open-improve-the-memory-leak-detection.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-Add-cachestat-fallback-definitions.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-Add-cachestat01-test.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0003-Add-cachestat02-test.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0004-Add-cachestat03-test.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0006-Add-cachestat04-test.patch
     fi
     if [ "$TESTVERSION" == "20240129" ]; then
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch

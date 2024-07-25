@@ -1,0 +1,131 @@
+From 1564e8c4700c0bd4b17282f5560d6f1774798005 Mon Sep 17 00:00:00 2001
+From: Andrea Cervesato <andrea.cervesato@suse.com>
+Date: Mon, 22 Jul 2024 16:28:43 +0200
+Subject: [PATCH 4/6] Add cachestat03 test
+
+This test verifies that cachestat() syscall is properly failing with
+relative error codes according to input parameters.
+
+- EFAULT: cstat or cstat_range points to an illegal address
+- EINVAL: invalid flags
+- EBADF: invalid file descriptor
+- EOPNOTSUPP: file descriptor is of a hugetlbfs file
+
+Signed-off-by: Andrea Cervesato <andrea.cervesato@suse.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ runtest/syscalls                              |  1 +
+ .../kernel/syscalls/cachestat/.gitignore      |  1 +
+ .../kernel/syscalls/cachestat/cachestat03.c   | 80 +++++++++++++++++++
+ 3 files changed, 82 insertions(+)
+ create mode 100644 testcases/kernel/syscalls/cachestat/cachestat03.c
+
+diff --git a/runtest/syscalls b/runtest/syscalls
+index 294e3cebf..8a297429b 100644
+--- a/runtest/syscalls
++++ b/runtest/syscalls
+@@ -64,6 +64,7 @@ cacheflush01 cacheflush01
+ 
+ cachestat01 cachestat01
+ cachestat02 cachestat02
++cachestat03 cachestat03
+ 
+ chdir01 chdir01
+ chdir01A symlink01 -T chdir01
+diff --git a/testcases/kernel/syscalls/cachestat/.gitignore b/testcases/kernel/syscalls/cachestat/.gitignore
+index 0f70fb801..6cfa3fa10 100644
+--- a/testcases/kernel/syscalls/cachestat/.gitignore
++++ b/testcases/kernel/syscalls/cachestat/.gitignore
+@@ -1,2 +1,3 @@
+ cachestat01
+ cachestat02
++cachestat03
+diff --git a/testcases/kernel/syscalls/cachestat/cachestat03.c b/testcases/kernel/syscalls/cachestat/cachestat03.c
+new file mode 100644
+index 000000000..35f6bdfb3
+--- /dev/null
++++ b/testcases/kernel/syscalls/cachestat/cachestat03.c
+@@ -0,0 +1,80 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (C) 2024 SUSE LLC Andrea Cervesato <andrea.cervesato@suse.com>
++ */
++
++/*\
++ * [Description]
++ *
++ * This test verifies that cachestat() syscall is properly failing with relative
++ * error codes according to input parameters.
++ *
++ * - EFAULT: cstat or cstat_range points to an illegal address
++ * - EINVAL: invalid flags
++ * - EBADF: invalid file descriptor
++ * - EOPNOTSUPP: file descriptor is of a hugetlbfs file
++ */
++
++#define MNTPOINT "mnt"
++
++#include "cachestat.h"
++
++static int fd;
++static int fd_hugepage;
++static int invalid_fd = -1;
++static struct cachestat *cs;
++static struct cachestat *cs_null;
++static struct cachestat_range *cs_range;
++static struct cachestat_range *cs_range_null;
++
++static struct tcase {
++	int *fd;
++	struct cachestat_range **range;
++	struct cachestat **data;
++	int flags;
++	int exp_errno;
++	char *msg;
++} tcases[] = {
++	{&invalid_fd, &cs_range, &cs, 0, EBADF, "Invalid fd (-1)"},
++	{&fd, &cs_range_null, &cs, 0, EFAULT, "Invalid range (NULL)"},
++	{&fd, &cs_range, &cs_null, 0, EFAULT, "Invalid data (NULL)"},
++	{&fd, &cs_range, &cs, -1, EINVAL, "Invalid args (-1)"},
++	{&fd_hugepage, &cs_range, &cs, 0, EOPNOTSUPP, "Unsupported hugetlbfs"},
++};
++
++static void run(unsigned int i)
++{
++	struct tcase *tc = &tcases[i];
++
++	TST_EXP_FAIL(cachestat(*tc->fd, *tc->range, *tc->data, tc->flags),
++		tc->exp_errno, "%s", tc->msg);
++}
++
++static void setup(void)
++{
++	fd = SAFE_OPEN("test", O_CREAT | O_RDWR, 0700);
++	fd_hugepage = SAFE_OPEN(MNTPOINT"/test", O_CREAT | O_RDWR, 0700);
++}
++
++static void cleanup(void)
++{
++	SAFE_CLOSE(fd);
++	SAFE_CLOSE(fd_hugepage);
++}
++
++static struct tst_test test = {
++	.test = run,
++	.setup = setup,
++	.cleanup = cleanup,
++	.mntpoint = MNTPOINT,
++	.needs_hugetlbfs = 1,
++	.hugepages = {1, TST_NEEDS},
++	.tcnt = ARRAY_SIZE(tcases),
++	.min_kver = "6.5",
++	.needs_tmpdir = 1,
++	.bufs = (struct tst_buffers []) {
++		{&cs, .size = sizeof(struct cachestat)},
++		{&cs_range, .size = sizeof(struct cachestat_range)},
++		{}
++	},
++};
+-- 
+2.45.2
+
