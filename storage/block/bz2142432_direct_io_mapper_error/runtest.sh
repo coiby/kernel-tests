@@ -127,16 +127,20 @@ function check_log()
     rlRun "dmesg | grep -i 'WARNING:'" 1 "check the errors"
 }
 
-rlJournalStart
-    rlPhaseStartTest
-        rlRun "dmesg -C"
-        rlRun "uname -a"
-        rlLog "$0"
-        run_test
-        if [[ "$?" != "2" ]]; then
-            clean_up
-        fi
-        check_log
-    rlPhaseEnd
-rlJournalPrintText
-rlJournalEnd
+# don't run it if running as part of shellspec
+# https://github.com/shellspec/shellspec#__sourced__
+if [ ! "${__SOURCED__:+x}" ]; then
+    rlJournalStart
+        rlPhaseStartTest
+            rlRun "dmesg -C"
+            rlRun "uname -a"
+            rlLog "$0"
+            run_test
+            if [[ "$?" != "2" ]]; then
+                clean_up
+            fi
+            check_log
+        rlPhaseEnd
+    rlJournalPrintText
+    rlJournalEnd
+fi
