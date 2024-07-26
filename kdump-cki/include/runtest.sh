@@ -480,7 +480,7 @@ PrepareKdump()
             }
             systemctl enable kdump.service || chkconfig kdump on
 
-            # Back up configurations if kexec-tools is installed for the first time
+            # Back up configurations if the kdump main package is installed for the first time
             BackupKdumpConfig
 
             # Try upgrading kdump main package to the latest version if on FC.
@@ -488,10 +488,13 @@ PrepareKdump()
             if $IS_FC && $UPGRADE_FC_KDUMP; then
                 UpgradePackages ${MAIN_RPM_PACKAGE} dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
             fi
-    else
-        FatalError "Did not install the kdump main package ${MAIN_RPM_PACKAGE} by default!"
-    fi
+            return 0
+        else
+            Warn "Did not install the kdump main package ${MAIN_RPM_PACKAGE} by default!"
+            return 1
+        fi
     }
+    return 0
 }
 
 # Install/Upgrade Crash and related packages
@@ -518,7 +521,7 @@ SetupKdump()
 
     if [ ! -f "${K_REBOOT}" ]; then
         Log "Prepare Kdump"
-        PrepareKdump
+        PrepareKdump || MajorError "Need install the kdump main package ${MAIN_RPM_PACKAGE}"
 
         local default=/boot/vmlinuz-`uname -r`
         [ ! -s "$default" ] && default=/boot/vmlinux-`uname -r`
@@ -1140,16 +1143,21 @@ KexecBoot()
         Log "$(uname -r)"
         Log "$(cat /proc/cmdline)"
 
-        PrepareKdump
-        # Make sure kdump service is finish loading kexec for panic (i.e. kexec -p)
-        # So `kexec -l`` won't compete resources with kexec -p
-        # Otherwise it may fail with: kexec_load failed: Device or resource busy
-        if command -v kdumpctl &> /dev/null; then
-            kdumpctl status &> /dev/null
+        if [ "${RELEASE}" -le 9 ]; then
+            PrepareKdump || MajorError "Need install the kdump main package ${MAIN_RPM_PACKAGE}"
+            # Make sure kdump service is finish loading kexec for panic (i.e. kexec -p)
+            # So `kexec -l`` won't compete resources with kexec -p
+            # Otherwise it may fail with: kexec_load failed: Device or resource busy
+            if command -v kdumpctl &> /dev/null; then
+                kdumpctl status &> /dev/null
+            else
+                service kdump status &> /dev/null
+            fi
         else
-            service kdump status &> /dev/null
+            # Since RHEL-10,kexec-tools package was split into kexec-tools,kdump-utils and makedumpfile.
+            # For kexec boot function, it only needs install the package kexec-tools.
+            rpm -q --quiet kexec-tools || MajorError "Need install the kexec-tools package."
         fi
-
         # Prepare kexec cmd and run kexec load
         local _initrd_img_path _vmlinuz_path
         if system_ostree; then
