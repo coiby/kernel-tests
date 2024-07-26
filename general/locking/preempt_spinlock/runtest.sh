@@ -25,7 +25,7 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+TEST="/kernel-tests/general/locking/preempt_spinlock"
 # Include rhts environment
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../../../automotive/include/rhivos.sh
@@ -78,4 +78,3 @@ rlJournalStart
 	rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
-
