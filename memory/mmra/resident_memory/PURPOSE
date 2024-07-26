@@ -1,0 +1,13 @@
+Verifies that mmap and mlock together performs pre-allocation of PTEs and makes the allocated memory resident.
+
+Test inputs:
+    This test use mmap() to allocate 1MiB of memory and makes it resident using mlock().
+    It then reads the file /proc/$pid/smaps, finds the mapping for the memory allocation
+    and compare the value of Rss and Locked with the allocation size.
+    ./test_mmra_resident_memory
+
+Expected result:
+    SUCCESS: requested 1024 KiB, pre-allocated 1024 KiB, locked 1024 KiB
+
+Results location:
+    output.txt.
