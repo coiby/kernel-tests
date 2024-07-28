@@ -4,7 +4,7 @@
 . ../../../../include/lib.sh || exit 1
 
 export TEST="rt-tests/us/rt-tests/cyclictest/affinity"
-export profile_file="/tmp/tuned_profile.txt"
+export profile_file="/mnt/testarea/tuned_profile.txt"
 
 # Test Variable
 export ISOL_CPU=${ISOL_CPU:-2}
