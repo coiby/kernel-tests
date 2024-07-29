@@ -209,6 +209,12 @@ else
 	exit 0
 fi
 
+# the test relies on dmesg output, in some cases some other task in the background can
+# clear it. Let's wait a bit for them to finish
+# example: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1967
+echo "INFO: waiting 60 seconds before running the tests..."
+sleep 60
+
 for item in $TEST_ITEMS; do
 	do_${item}
 done
