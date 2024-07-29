@@ -45,7 +45,7 @@ function ltp_test_build()
         cp -fv patches/20120822/pthread_cond_broadcast-1-2.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/pthread_cond_broadcast/1-2.c
         cp -fv patches/20120822/sigset-6-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/sigset/6-1.c
         cp -fv patches/20120822/sigset-7-1.c ${TARGET}/testcases/open_posix_testsuite/conformance/interfaces/sigset/7-1.c
-        cp -fv patches/20120822/pthread_cond_signal-1-1.c $(TARGET)/testcases/open_posix_testsuite/conformance/interfaces/pthread_cond_signal/1-1.c
+        cp -fv patches/20120822/pthread_cond_signal-1-1.c $TARGET/testcases/open_posix_testsuite/conformance/interfaces/pthread_cond_signal/1-1.c
     fi
 
     if [ "$TESTVERSION"  == "20130109" ]; then

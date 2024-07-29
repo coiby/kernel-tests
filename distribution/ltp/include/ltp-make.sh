@@ -318,7 +318,7 @@ setup-testarea()
             umount ${TEST_MNT}
         fi
         if [ "$dev" == "" ] && [ "${TEST_DEV}" != "" ]; then
-            dev=$(TEST_DEV)
+            dev="$TEST_DEV"
         fi
         if [ "$dev" == "" ]; then
             echo " - No suitable test device found" | tee -a $OUTPUTFILE
@@ -335,7 +335,7 @@ setup-testarea()
             echo " - mkfs failed" | tee -a $OUTPUTFILE
             exit 1
         fi
-        if [ "${STYP}" == "overlayfs" ]; then
+        if [ "$FSTYP" == "overlayfs" ]; then
             mkdir -p /mnt/ltp-overlay
             mount ${MOUNT_OPTS} $dev /mnt/ltp-overlay
             mkdir -p /mnt/ltp-overlay/lower
