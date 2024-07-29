@@ -8,6 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
+max_time=1h
 # Don't set dependencies here. The test installs the required dependencies
 # and aborts the job in case of failure as required by CKI
 softDependencies=yum-utils;llvm;lld;clang;openssl-devel-engine
