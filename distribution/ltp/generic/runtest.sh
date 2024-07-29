@@ -86,6 +86,18 @@ function set_timeout_mul()
 	fi
 }
 
+function audit_rule_setting()
+{
+	# To mask the AVC denied warning from SELinux
+	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1701
+	auditctl -a always,exclude -F exe=/mnt/testarea/ltp/testcases/bin/fanotify14 -F msgtype=AVC
+}
+
+function audit_rule_delete()
+{
+	auditctl -d always,exclude -F exe=/mnt/testarea/ltp/testcases/bin/fanotify14 -F msgtype=AVC
+}
+
 function ltp_test_begin()
 {
 	# disable NTP and chronyd
@@ -108,6 +120,7 @@ function ltp_test_begin()
 	skip_testcase
 	set_filesystem
 	set_timeout_mul
+	audit_rule_setting
 }
 
 function ltp_test_run()
@@ -126,6 +139,8 @@ function ltp_test_run()
 
 function ltp_test_end()
 {
+	audit_rule_delete
+
 	# restore either NTP or chronyd
 	if [ -n "$tservice" ]; then
 		service chronyd start

@@ -10,5 +10,5 @@ destructive=no
 entry_point=bash ./runtest.sh
 max_time=180m
 dependencies=automake;autoconf;procmail;flex;bison;rng-tools;rsyslog;util-linux;rpm-build;gcc;wget;bc;libaio-devel;libcap-devel;strace;patch;bzip2
-softDependencies=numactl;numactl-devel;redhat-lsb;ntpdate;chrony;redhat-lsb;libcgroup;python3
+softDependencies=numactl;numactl-devel;redhat-lsb;ntpdate;chrony;redhat-lsb;libcgroup;python3;audit
 repoRequires=distribution/ltp/include;cki_lib
