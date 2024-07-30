@@ -24,6 +24,7 @@ if grep -q "All tests PASSED" SSDD1.LOG; then
 else
     log_fail "ssdd default FAIL"
 fi
+phase_end
 
 NFORKS=100
 NITERS=10000
@@ -35,5 +36,6 @@ if grep -q "All tests PASSED" SSDD2.LOG; then
 else
     log_fail "ssdd stress FAIL"
 fi
+phase_end
 
 exit 0
