@@ -3,10 +3,9 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 rlJournalStart
-    rlPhaseStartSetup
-        rlRun "echo setup..."
+    rlPhaseStartSetup "setup..."
         pin_mem_limit="$(ulimit -l)"
-        rlRun "echo $pin_mem_limit"
+        rlLog "$pin_mem_limit"
         rlRun "ulimit -l unlimited"
         rlRun "ulimit -l"
         rlRun "TESTTMPDIR=$(mktemp -d)"
@@ -16,13 +15,12 @@ rlJournalStart
         rlRun "make"
     rlPhaseEnd
 
-    rlPhaseStartTest
-        rlRun "echo test resident_memory starts..."
-        rlRun "./test_mmra_resident_memory"
+    rlPhaseStartTest "test resident_memory starts..."
+        rlRun "script -O output.log -c \"./test_mmra_resident_memory>&1\"" 0 "Run test_mmra_resident_memory"
+        rlAssertGrep "SUCCESS: requested 1024 KiB, pre-allocated [[:digit:]]* KiB, locked 1024 KiB" "output.log"
     rlPhaseEnd
 
-    rlPhaseStartCleanup
-        rlRun "echo cleanup"
+    rlPhaseStartCleanup "cleanup..."
         rlRun "ulimit -l $pin_mem_limit"
         rlRun "ulimit -l"
         rlRun "popd"
