@@ -16,17 +16,10 @@ function RunTest ()
     PROCS=$1
 
     log "Test Start Time: `date`"
-    log "Running rt-migrate-test balance with $PROCS processors"
+    # Running rt-migrate-test balance with $PROCS processors
     oneliner "rt-migrate-test $PROCS" "rt-migrate-test balance"
-    log "Test End Time: `date`"
-}
 
-function RunStress ()
-{
-    PROCS=$1
-
-    log "Test Start Time: `date`" 
-    log "Running rt-migrate-test stress with $PROCS processors"
+    # Running rt-migrate-test stress with $PROCS processors
     oneliner "rt-migrate-test $PROCS -l 1000" "rt-migrate-test stress"
     log "Test End Time: `date`"
 }
@@ -42,5 +35,4 @@ SYSCPUS=$(expr `/bin/cat /proc/cpuinfo | /bin/grep processor | wc -l` + 1)
 
 log "Number of Procs: $NUMBERPROCS / Running test with Procs: $SYSCPUS"
 RunTest $SYSCPUS
-RunStress $SYSCPUS
 exit 0

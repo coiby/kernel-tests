@@ -16,7 +16,7 @@ fi
 NFORKS=${NFORKS:=10}
 NITERS=${NITERS:=10000}
 
-phase_start_test "Runing ssdd $NFORKS $NITERS [default]"
+log "Runing ssdd $NFORKS $NITERS [default]"
 run "ssdd --forks=$NFORKS --iters=$NITERS | tee SSDD1.LOG"
 rstrnt-report-log -l SSDD1.LOG
 if grep -q "All tests PASSED" SSDD1.LOG; then
@@ -28,7 +28,7 @@ phase_end
 
 NFORKS=100
 NITERS=10000
-phase_start_test "Running ssdd $NFORKS $NITERS [stress]"
+log "Running ssdd $NFORKS $NITERS [stress]"
 run "ssdd --forks=$NFORKS --iters=$NITERS | tee SSDD2.LOG"
 rstrnt-report-log -l SSDD2.LOG
 if grep -q "All tests PASSED" SSDD2.LOG; then
