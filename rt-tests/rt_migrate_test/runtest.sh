@@ -11,63 +11,24 @@
 . ../include/runtest.sh || exit 1
 . ../../automotive/include/rhivos.sh || exit 1
 
-function RprtRslt ()
-{
-    test_item=$1
-    result=$2
-
-    # File the results in the database
-    if [ $result = "PASS" ]; then
-        rstrnt-report-result $test_item $result 0
-    else
-        rstrnt-report-result $test_item $result 1
-    fi
-}
-
 function RunTest ()
 {
-    # Default result to Fail
-    export result_r="FAIL"
-
     PROCS=$1
 
-    echo Test Start Time: `date` >> $OUTPUTFILE
-
-    { rt-migrate-test $PROCS >> $OUTPUTFILE; } 2>&1
-    grep -q " Failed!" $OUTPUTFILE
-    if [ $? -eq 0 ]; then
-        echo "rt-migrate-test balance Failed: " | tee -a $OUTPUTFILE
-        result_r="FAIL"
-    else
-        echo "rt_migrate balance Passed: " | tee -a $OUTPUTFILE
-        result_r="PASS"
-    fi
-
-    echo Test End Time: `date` >> $OUTPUTFILE
-    RprtRslt Balancing $result_r
+    log "Test Start Time: `date`"
+    log "Running rt-migrate-test balance with $PROCS processors"
+    oneliner "rt-migrate-test $PROCS" "rt-migrate-test balance"
+    log "Test End Time: `date`"
 }
 
 function RunStress ()
 {
-    # Default result to Fail
-    export result_r="FAIL"
-
     PROCS=$1
 
-    echo Test Start Time: `date` >> $OUTPUTFILE
-
-    { rt-migrate-test $PROCS -l 1000 >> $OUTPUTFILE; } 2>&1
-    grep -q " Failed!" $OUTPUTFILE
-    if [ $? -eq 0 ]; then
-        echo "rt_migrate stress Failed: " | tee -a $OUTPUTFILE
-        result_r="FAIL"
-    else
-        echo "rt_migrate stress Passed: " | tee -a $OUTPUTFILE
-        result_r="PASS"
-    fi
-
-    echo Test End Time: `date` >> $OUTPUTFILE
-    RprtRslt Stress $result_r
+    log "Test Start Time: `date`" 
+    log "Running rt-migrate-test stress with $PROCS processors"
+    oneliner "rt-migrate-test $PROCS -l 1000" "rt-migrate-test stress"
+    log "Test End Time: `date`"
 }
 
 # ---------- Start Test -------------
@@ -79,7 +40,7 @@ fi
 NUMBERPROCS=$(/bin/cat /proc/cpuinfo | /bin/grep processor | wc -l)
 SYSCPUS=$(expr `/bin/cat /proc/cpuinfo | /bin/grep processor | wc -l` + 1)
 
-echo "Number of Procs: $NUMBERPROCS / Running test with Procs: $SYSCPUS" | tee -a $OUTPUTFILE
+log "Number of Procs: $NUMBERPROCS / Running test with Procs: $SYSCPUS"
 RunTest $SYSCPUS
 RunStress $SYSCPUS
 exit 0
