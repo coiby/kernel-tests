@@ -67,7 +67,7 @@ function install_qemu() {
 
 # Function to download the VM image
 function download_image() {
-    local file image_name
+    local file image_name base_url
 
     # Check if the VM image already exists
     file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2' -print)
@@ -107,12 +107,14 @@ function download_image() {
 
     # Download the qcow2 image
     rlLog "Starting download of the qcow2 image."
-    wget --no-verbose -r -p --level 1 -E -e robots=off --cut-dirs=7 -nH --reject='index.html*' --reject='*.png' --reject='*.gif' \
-        -P "$WORKSPACE" -A "${image_name}.xz" -A "${image_name}.xz.sha256" \
-        "http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/${RELEASE:=nightly}/sample-images" || {
-        rlLogError "Failed to download the qcow2 image files."
-        return 1
-    }
+    base_url="http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/${RELEASE:=nightly}/sample-images"
+    if [[ $image_name =~ \* ]]; then
+        wget --no-verbose -r -p --level 1 -E -e robots=off --cut-dirs=7 -nH --reject='index.html*' --reject='*.png' --reject='*.gif' \
+            -P "$WORKSPACE" -A "${image_name}.xz" -A "${image_name}.xz.sha256" "${base_url}"
+    else
+        wget --no-verbose -P "$WORKSPACE" "${base_url}/${image_name}.xz"
+        wget --no-verbose -P "$WORKSPACE" "${base_url}/${image_name}.xz.sha256"
+    fi
 
     # Verify download and checksum
     file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2.xz' -print)
@@ -398,8 +400,15 @@ rlJournalStart
         cd "$WORKSPACE"
 
         # Verify the kernel version of the VM
-        rlLog "Verifying the VM."
-        rlAssertEquals "The VM should have the same kernel version as the host." "$(ssh vm 'uname -r')" "$(uname -r)" || rlDie
+        rlLog "Verifying the kernel version of the VM."
+        kernel_version_vm="$(ssh vm 'uname -r')"
+        rlLog "Kernel version of the VM   : $kernel_version_vm"
+        rlLog "Kernel version of the Host : $(uname -r)"
+        if [[ "$kernel_version_vm" != "$(uname -r)" ]]; then
+            rlLog "Skipping $TEST: the kernel version in the VM does not match the host's version."
+            rstrnt-report-result "$TEST" SKIP
+            rlDie
+        fi
 
         # Verify the IOMMU is running in Translated mode
         rlLog "Verifying the IOMMU is running in Translated mode."
