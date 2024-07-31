@@ -52,7 +52,7 @@ dma_channel_check ()
 
 	# Look to see if this driver was probed during boot
 	if ! lsmod | grep -q "${1}"; then
-		if journalctl -k | grep -qw "${1}"; then
+		if journalctl -k | grep -q ".+ kernel: ${1}.*:"; then
 			return 1
 		else
 			return 2

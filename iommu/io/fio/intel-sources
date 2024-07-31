@@ -1,0 +1,21 @@
+# trigger on changes to this code in the iommu subsystem
+#
+target_sources:
+  # IOMMU core and Intel IOMMU
+  - drivers/iommu/dma-iommu.*
+  - drivers/iommu/intel/.*
+  - drivers/iommu/iommu.c
+  - drivers/iommu/iova.c
+  - drivers/iommu/iommu-sva.c
+  - drivers/iommu/iommu-priv.h
+  - drivers/iommu/iommu-sysfs.c
+  - drivers/iommu/irq_remapping.*
+
+# if something changes with the dma mapping api
+# codepath then make sure we are still functioning
+#
+trigger_sources:
+  # DMA API
+  - include/linux/dma-mapping.h
+  - include/linux/dma-direct.h
+  - kernel/dma/.*

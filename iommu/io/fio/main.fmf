@@ -1,0 +1,28 @@
+summary: test io through iommu with fio
+description: |
+    This tests running io with fio on systems with
+    the iommu in various configurations.
+contact: Jerry Snitselaar <jsnitsel@redhat.com>
+component:
+  - kernel
+path: /iommu/io/fio
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - beakerlib
+  - grubby
+  - pciutils
+  - sed
+  - gawk
+  - fio
+  - acpica-tools
+  - dmidecode
+recommend:
+  - beakerlib-redhat
+duration: 60m
+enabled: true
+adjust:
+  - enabled: false
+    when: distro < rhel9 or arch != x86_64, aarch64
+extra-summary: /kernel/iommu/io/fio
+extra-task: /kernel/iommu/io/fio

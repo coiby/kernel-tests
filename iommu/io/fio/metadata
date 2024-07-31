@@ -1,0 +1,16 @@
+[General]
+name=iommu/io/fio
+owner=Jerry Snitselaar <jsnitsel@redhat.com>
+description=Test io with iommu in different configurations
+license=GPL-2.0-or-later
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+Path=/mnt/tests/kernel/iommu/io/fio
+Priority=Normal
+max_time=60m
+dependencies=grubby;beakerlib;pciutils;sed;gawk;fio;acpica-tools;dmidecode
+softDependencies=beakerlib-redhat
+repoRequires=general/include;iommu/include
