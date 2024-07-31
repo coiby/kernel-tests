@@ -1,0 +1,13 @@
+[General]
+name=storage/block/RHEL_44613_reporting_EIO_on_slow_tape_device
+owner=Changhui Zhong <czhong@redhat.com>
+description=kernel reporting EIO when add slow tape devices
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+dependencies=mtx;mt-st;elfutils-libelf-devel;lzo;zlib-devel;gcc;sg3_utils;lsscsi
+max_time=1h

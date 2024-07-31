@@ -1,0 +1,23 @@
+summary: storage/block/RHEL_44613_reporting_EIO_on_slow_tape_device
+description: kernel reporting EIO when add slow tape devices
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/RHEL_44613_reporting_EIO_on_slow_tape_device
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+    - mtx
+    - mt-st
+    - lsscsi
+    - sg3_utils
+    - gcc
+    - zlib-devel
+    - lzo
+    - elfutils-libelf-devel
+duration: 1h
+tier: 1
+extra-summary: /storage/block/RHEL_44613_reporting_EIO_on_slow_tape_device
+extra-task: /storage/block/RHEL_44613_reporting_EIO_on_slow_tape_device
