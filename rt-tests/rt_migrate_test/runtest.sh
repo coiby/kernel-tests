@@ -17,10 +17,10 @@ function RunTest ()
 
     log "Test Start Time: `date`"
     # Running rt-migrate-test balance with $PROCS processors
-    oneliner "rt-migrate-test $PROCS" "rt-migrate-test balance"
+    oneliner "rt-migrate-test $PROCS -q" "rt-migrate-test balance"
 
     # Running rt-migrate-test stress with $PROCS processors
-    oneliner "rt-migrate-test $PROCS -l 1000" "rt-migrate-test stress"
+    oneliner "rt-migrate-test $PROCS -l 1000 -q" "rt-migrate-test stress"
     log "Test End Time: `date`"
 }
 
