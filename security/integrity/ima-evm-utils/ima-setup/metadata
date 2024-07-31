@@ -1,0 +1,13 @@
+[General]
+name=security/integrity/ima-evm-utils/ima-setup
+owner=Dennis Li <denli@redhat.com>
+description= ima-setup script testing for ima-evm-util 1.5.2+
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=10m
+use_pty=false
+dependencies=ima-evm-utils;ima-evm-utils-devel;openssl;attr
