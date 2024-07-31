@@ -153,6 +153,7 @@
 /sound/user-ctl-elem/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /standards/usex/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /storage/blktests/blk/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
+/storage/blktests/nvme/nvme-loop/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /storage/blktests/nvme/nvme-rdma/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /storage/blktests/nvme/nvme-tcp/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
 /storage/blktests/nvme/nvmeof-mp/ @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @dzickusrh @ftjahjad @jwilsonrh @kamaxeon @lulinqing @mh21_rh @ptalbert @spbnick @stowellm @sturivny @tales-aparecida @veruu
@@ -281,6 +282,7 @@
 /sound/user-ctl-elem/ @bgoncalv @jkysela @lulinqing
 /standards/usex/ @bgoncalv @ftjahjad @jbastianrh @lulinqing
 /storage/blktests/blk/ @bgoncalv @lulinqing @yizhanglinux
+/storage/blktests/nvme/nvme-loop/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/nvme/nvme-rdma/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/nvme/nvme-tcp/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/nvme/nvmeof-mp/ @bgoncalv @lulinqing @yizhanglinux
