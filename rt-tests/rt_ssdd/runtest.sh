@@ -2,12 +2,10 @@
 
 # Enable TMT testing for RHIVOS
 . ../../automotive/include/rhivos.sh
-: ${OUTPUTFILE:=runtest.log}
 
 # Source rt common functions
 . ../include/lib.sh || exit 1
 
-export TEST="rt-tests/rt_ssdd"
 export rhel_x
 
 if ! kernel_automotive; then
@@ -18,24 +16,26 @@ fi
 NFORKS=${NFORKS:=10}
 NITERS=${NITERS:=10000}
 
-echo "Runing ssdd $NFORKS $NITERS [default]" | tee -a $OUTPUTFILE
-ssdd --forks=$NFORKS --iters=$NITERS | tee SSDD1.LOG
+phase_start_test "Runing ssdd $NFORKS $NITERS [default]"
+run "ssdd --forks=$NFORKS --iters=$NITERS | tee SSDD1.LOG"
 rstrnt-report-log -l SSDD1.LOG
 if grep -q "All tests PASSED" SSDD1.LOG; then
-    rstrnt-report-result $TEST "PASS" "0"
+    log_pass "ssdd default PASS"
 else
-    rstrnt-report-result $TEST "FAIL" "1"
+    log_fail "ssdd default FAIL"
 fi
+phase_end
 
 NFORKS=100
 NITERS=10000
-echo "Running ssdd $NFORKS $NITERS [stress]" | tee -a $OUTPUTFILE
-ssdd --forks=$NFORKS --iters=$NITERS | tee SSDD2.LOG
+phase_start_test "Running ssdd $NFORKS $NITERS [stress]"
+run "ssdd --forks=$NFORKS --iters=$NITERS | tee SSDD2.LOG"
 rstrnt-report-log -l SSDD2.LOG
 if grep -q "All tests PASSED" SSDD2.LOG; then
-    rstrnt-report-result "ssdd stress" "PASS" "0"
+    log_pass "ssdd stress PASS"
 else
-    rstrnt-report-result "ssdd stress" "FAIL" "1"
+    log_fail "ssdd stress FAIL"
 fi
+phase_end
 
 exit 0

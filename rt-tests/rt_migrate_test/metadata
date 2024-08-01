@@ -7,5 +7,5 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=bash -x ./runtest.sh
+entry_point=bash ./runtest.sh
 repoRequires=cki_lib;rt-tests/include;automotive/include
