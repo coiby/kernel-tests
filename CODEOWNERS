@@ -312,7 +312,7 @@
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
-/tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing
+/tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing @zhaoqiao
 /vm/kvm-self-tests/ @bgoncalv @hlynden @jarichte @lulinqing
 /vm/kvm-unit-tests/ @bgoncalv @hlynden @jarichte @lulinqing
 /vm/qemu-sanity-check/ @bgoncalv @lulinqing @rwmjones
