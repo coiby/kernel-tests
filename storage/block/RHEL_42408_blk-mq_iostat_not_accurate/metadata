@@ -1,0 +1,13 @@
+[General]
+name=storage/block/RHEL_42408_blk-mq_iostat_not_accurate
+owner=Changhui Zhong <czhong@redhat.com>
+description=blk-mq iostat/util% is not accurate sometimes
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+dependencies=fio;libaio;libaio-devel;sysstat
+max_time=1h
