@@ -6,3 +6,15 @@ in the test, and they both bind to cpu0.
 
 PARAMETERS
 
+Test Inputs:
+    Execute 'make' to compile preempt_spinlock.ko and expect a return of 0.
+    Execute 'insmod' to install the module preempt_spinlock.ko and expect a return of 0.
+    Execute 'grep PASS' against the test_dmesg.txt file and expect a return of 0.
+
+Expected result:
+    :: [   PASS   ] :: compile the preempt_spinlock.ko (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'insmod preempt_spinlock/preempt_spinlock.ko' (Expected 0, got 0)
+    :: [   PASS   ] :: The module should report PASS in dmesg (Expected 0, got 0)
+
+Results location:
+    output.txt.
