@@ -58,10 +58,10 @@ function getTests
 
 function runtest
 {
-    rlPhaseStartTest
     cd "$TESTS_DIR" || { echo "cannot cd to tests directory"; exit 1; }
     getTests
     for test in "${ALL_TESTS[@]}"; do
+        rlPhaseStartTest "${test}"
         test_exec=$(CK_DEFAULT_TIMEOUT=$TIMEOUT ./"$test")
         test_res=$?
         if [ -n "$test_exec" ]
@@ -76,8 +76,8 @@ function runtest
             rlAssertEquals "Assert $test return code" $test_res 0
         fi
         rlLog "$test return value: $test_res\n"
+        rlPhaseEnd
     done
-    rlPhaseEnd
 }
 
 function main
