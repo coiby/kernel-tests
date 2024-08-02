@@ -570,7 +570,7 @@ ConfigFS()
             # on s390x. dev path like /dev/dasda may change at each boot.
             # use /dev/disk/by-path/ccw-0.0.0121-part1 instead.
             if [ "$K_ARCH" = "s390x" ] && echo "$dev" | grep -vq "/dev/mapper"; then
-                dev=$(udevadm info -q symlink --name $dev -r | sed 's/ /\n/g' | grep 'by-path')
+                dev=$(udevadm info -q symlink --name $dev -r | sed 's/ /\n/g' | grep 'by-path' | grep 'part[0-9]\+')
             fi
             target=$dev
             ;;
