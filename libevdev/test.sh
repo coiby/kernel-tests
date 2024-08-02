@@ -2,24 +2,10 @@
 
 TEST_LINK="test-link"
 COMMON_PACKAGES="meson gcc check-devel valgrind doxygen cmake"
-LOGFILE=$(date +%m%d%y%H%M%S).log
 TIMEOUT=500
 LIBEVDEV_REPO=https://gitlab.freedesktop.org/libevdev/libevdev
 
 source /usr/share/beakerlib/beakerlib.sh || exit 1
-
-function log
-{
-    if [ ! -e "$LOGDIR" ]
-    then
-        mkdir "$LOGDIR"
-    fi
-    if [ -f "$LOGFILE" ]
-    then
-        touch "$LOGFILE"
-    fi
-    echo -e "$1" >> "$LOGDIR"/"$LOGFILE"
-}
 
 function setupRepos
 {
@@ -30,7 +16,7 @@ function setupRepos
         package_exist=$(rpm -qa | grep ^"$package"-)
         if [ -z "$package_exist" ]
         then
-            log "installing package $package"
+            rlLog "installing package $package"
             if stat /run/ostree-booted > /dev/null 2>&1
             then
                 rlRun "rpm-ostree -A install $package"
@@ -42,14 +28,12 @@ function setupRepos
 
     rlRun "git clone $LIBEVDEV_REPO"
     cd libevdev || { echo "cannot cd to libevdev directory"; exit 1; }
-    mkdir logs
-    LOGDIR=$(pwd)/logs
     rlRun "meson setup builddir"
     rlRun "meson compile -C builddir"
 
     TESTS_DIR=$(pwd)/builddir
     echo "test dir: $TESTS_DIR"
-    log "tests dir at $TESTS_DIR\n"
+    rlLog "tests dir at $TESTS_DIR\n"
 }
 
 function setup
@@ -82,7 +66,7 @@ function runtest
         test_res=$?
         if [ -n "$test_exec" ]
         then
-            log "$test_exec"
+            rlLog "$test_exec"
         fi
 
         if [ "$test" == "$TEST_LINK" ]
@@ -91,7 +75,7 @@ function runtest
         else
             rlAssertEquals "Assert $test return code" $test_res 0
         fi
-        log "$test return value: $test_res\n"
+        rlLog "$test return value: $test_res\n"
     done
     rlPhaseEnd
 }
@@ -101,7 +85,6 @@ function main
     rlJournalStart
     setup
     runtest
-    echo "Detailed results can be found in: $LOGDIR/$LOGFILE"
     rlJournalEnd
 }
 
