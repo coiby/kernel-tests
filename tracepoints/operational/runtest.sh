@@ -213,25 +213,4 @@ if [ -e /sys/devices/system/cpu/vulnerabilities/spectre_v2 ]; then
   fi
 fi
 
-# Skip test if we are running an earlier distro (Supported in RHEL5.4)
-OSREL=`grep -o 'release [[:digit:]]\+' /etc/redhat-release | awk '{print $2}'`
-KERNVER=`/bin/uname -r | /bin/awk -F- '{print $2}' | /bin/awk -F. '{print $1}'`
-
-# ensure KERNVER contains only digits
-[[ "$KERNVER" =~ ^[[:digit:]]+$ ]] || KERNVER=0
-
-grep -q "Fedora" /etc/redhat-release
-if [ $? -eq 0 ] ; then  # Check if upstream-Fedora
-    runTest
-elif [[ "$OSREL" = "5" ]] && [[ "$KERNVER" -ge "156" ]] ; then
-    runTest
-elif [[ "$OSREL" =~ [6789] ]] ; then
-    runTest
-else
-    echo "***** tracepoint not enabled in this kernel *****" | tee -a $OUTPUTFILE
-    echo "***** End of runtest.sh *****" | tee -a $OUTPUTFILE
-    echo"" | tee -a $OUTPUTFILE
-    rstrnt-report-result $TEST SKIP
-    exit 0
-
-fi
+runTest
