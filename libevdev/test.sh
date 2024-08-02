@@ -62,20 +62,12 @@ function runtest
     getTests
     for test in "${ALL_TESTS[@]}"; do
         rlPhaseStartTest "${test}"
-        test_exec=$(CK_DEFAULT_TIMEOUT=$TIMEOUT ./"$test")
-        test_res=$?
-        if [ -n "$test_exec" ]
-        then
-            rlLog "$test_exec"
-        fi
-
+        expected_exit_code="0"
         if [ "$test" == "$TEST_LINK" ]
         then
-            rlAssertGreater "Assert $test return code" $test_res 0
-        else
-            rlAssertEquals "Assert $test return code" $test_res 0
+            expected_exit_code="1-255"
         fi
-        rlLog "$test return value: $test_res\n"
+        rlRun -l "CK_DEFAULT_TIMEOUT=$TIMEOUT ./$test" "${expected_exit_code}"
         rlPhaseEnd
     done
 }
