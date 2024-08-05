@@ -1,0 +1,14 @@
+summary: storage/block/bz1691599_io_hang_when_change_state
+description: IO hang during setting device state as blocked and resetting it to running
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/bz1691599_io_hang_when_change_state
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+duration: 1h
+tier: 1
+extra-summary: /storage/block/bz1691599_io_hang_when_change_state
+extra-task: /storage/block/bz1691599_io_hang_when_change_state
