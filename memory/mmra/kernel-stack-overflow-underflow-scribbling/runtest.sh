@@ -9,7 +9,8 @@ testmode=${testmode:-""}
 run_insert_mode() {
     mode=$1
     rlPhaseStartTest
-        rlRun "rm /var/tmp/stackman/remove_after_module_insert"
+        rlRun "rm -f /var/tmp/stackman/remove_after_module_insert"
+        rlRun "sync;sync;sync"  # make sure fs is synced before the crash
         rlRun "insmod stackman.ko testmode=$mode" 0 "Insmod stackman.ko $mode"
         rlRun "sleep 20"
         # If we reach this point the machine did not reboot; the test failed
