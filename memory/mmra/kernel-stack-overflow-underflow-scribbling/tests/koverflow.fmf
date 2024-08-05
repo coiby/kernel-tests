@@ -1,10 +1,11 @@
-summary: Tests that confirms kernel task stack overflow, underflow and scribbling is handled gracefully
+summary: Tests that confirms kernel task stack overflow is handled gracefully
 description: |
   Memory Mamagement Risk Assesment test that check what happens with a kernel task that perform
-  a stack overflow, underflow and scribbling (writing to random places in the stack)
+  a stack overflow
 contact: <pablmart@redhat.com>
 id: a9cf65c2-fb45-461d-a697-5cd1b99fc158
 test: bash ./runtest.sh
+path: /memory/mmra/kernel-stack-overflow-underflow-scribbling
 framework: beakerlib
 require:
   - make
@@ -16,4 +17,6 @@ require:
 duration: 10m
 restart-on-exit-code:
     - 255
-restart-max-count: 3
+restart-max-count: 1
+environment:
+    testmode: 'overflow'
