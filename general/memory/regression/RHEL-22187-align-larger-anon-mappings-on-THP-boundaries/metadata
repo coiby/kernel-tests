@@ -1,0 +1,12 @@
+[General]
+name=cat32-test
+owner=mm-qe <mm-qe@redhat.com>
+description=Verifies that repeatedly reading /proc/self/maps does not create too many mappings.
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=make;gcc;glibc-devel;
