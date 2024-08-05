@@ -1,0 +1,23 @@
+summary: packages/perf/perftool-testsuite
+description: Wrapper to run upstream perftool test suite
+tag:
+  - KernelTier1
+contact: Michael Petlan <mpetlan@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: shell
+require:
+  - bc
+  - beakerlib
+  - coreutils-debuginfo
+  - elfutils
+  - gcc-c++
+  - git
+  - perf
+  - yum-utils
+  - virt-what
+recommend:
+  - dnf-utils
+  - libbpf 
+duration: 60m
