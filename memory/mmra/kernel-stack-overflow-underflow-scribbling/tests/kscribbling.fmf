@@ -1,0 +1,22 @@
+summary: Tests that confirms kernel task stack scribbling is handled gracefully
+description: |
+  Memory Mamagement Risk Assesment test that check what happens with a kernel task that perform
+  a stack scribbling (overriding random locations on the stack)
+contact: <pablmart@redhat.com>
+id: 41305ae6-5ce3-4d3b-ad2c-3a39124d518e
+test: bash ./runtest.sh
+path: /memory/mmra/kernel-stack-overflow-underflow-scribbling
+framework: beakerlib
+require:
+  - make
+  - gcc
+  - type: file
+    pattern:
+      - /kernel-include
+      - /memory/mmra/userspace-stack-overflow-underflow-scribbling/stacklib.c
+duration: 10m
+restart-on-exit-code:
+    - 255
+restart-max-count: 1
+environment:
+    testmode: 'scribbling'
