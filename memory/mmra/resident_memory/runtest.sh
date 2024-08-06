@@ -17,7 +17,7 @@ rlJournalStart
 
     rlPhaseStartTest "test resident_memory starts..."
         rlRun "script -O output.log -c \"./test_mmra_resident_memory>&1\"" 0 "Run test_mmra_resident_memory"
-        rlAssertGrep "SUCCESS: requested 1024 KiB, pre-allocated [[:digit:]]* KiB, locked 1024 KiB" "output.log"
+        rlAssertGrep "SUCCESS: requested 1024 KiB, pre-allocated 1024 KiB, locked 1024 KiB" "output.log"
     rlPhaseEnd
 
     rlPhaseStartCleanup "cleanup..."
