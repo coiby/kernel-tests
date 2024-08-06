@@ -38,11 +38,12 @@ description: |
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
-require:
-  - beakerlib
-  - gcc
-  - glibc-devel
-  - make
+adjust:
+  require:
+    - beakerlib
+    - gcc
+    - glibc-devel
+    - make
 extra-summary: memory/mmra/shm-access
 extra-task: memory/mmra/shm-access
 enabled: true

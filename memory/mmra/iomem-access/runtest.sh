@@ -2,11 +2,17 @@
 
 # Source the common test script helpers
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../cki_lib/libcki.sh
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        rlRun "adduser testuser"
+        if cki_is_kernel_automotive; then
+           rlRun "UserHome=$(mktemp -d /var/home.XXX)" 0 "Creating testuser home dir"
+           rlRun "adduser -d ${UserHome}/testuser -p '' testuser"
+        else
+           rlRun "adduser testuser"
+        fi
         DEVICE=serial
         START_ADDR=$(cat /proc/iomem | grep $DEVICE | head -n1 | cut -d'-' -f1)
         END_ADDR=$(cat /proc/iomem | grep $DEVICE | head -n1 | cut -d'-' -f2 | cut -d':' -f1)

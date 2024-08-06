@@ -2,6 +2,7 @@
 
 # Source the common test script helpers
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../cki_lib/libcki.sh
 
 export TEST=shm-access
 
@@ -9,6 +10,12 @@ rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         rlLog "Create non-root user"
+        if cki_is_kernel_automotive; then
+           rlRun "UserHome=$(mktemp -d /var/home.XXX)" 0 "Creating testuser home dir"
+           rlRun "adduser -d ${UserHome}/testuser -p '' testuser"
+        else
+           rlRun "adduser testuser"
+        fi
         rlRun "adduser testuser"
         rlLog "Create shared memory segment"
         rlRun "gcc -o /tmp/shm-create -D_GNU_SOURCE shm-create.c"
