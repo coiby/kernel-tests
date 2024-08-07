@@ -58,13 +58,6 @@ process_results(){
 TEST="KUNIT"
 export PACKAGE="kernel"
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Global parameters
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# load kunit module names into a array
-readarray -t test_arr < kunit-tests.list
-
 rlJournalStart
 #-------------------- Setup ---------------------
 	rlPhaseStartSetup
@@ -107,6 +100,47 @@ rlJournalStart
 			exit 1
 		fi
 
+		# generate test list from modules-internal
+		# Directory containing the kernel modules
+		MODULE_DIR="/lib/modules/$(uname -r)/internal/"
+
+		# Temporary directory for decompression
+		TEMP_DIR=$(mktemp -d)
+
+		# Function to clean up temporary directory
+		cleanup() {
+				rm -rf "$TEMP_DIR"
+		}
+		trap cleanup EXIT
+
+		# Iterate over each compressed kernel module found
+		find "$MODULE_DIR" -type f -name '*.ko*' | while IFS= read -r module; do
+
+			# Determine the extension to handle decompression
+			if [[ "$module" == *.xz ]]; then
+				unxz -c "$module" > "$TEMP_DIR/$(basename "$module" .xz)"
+			else
+				# If the module is not compressed, copy it to the temp directory
+				cp "$module" "$TEMP_DIR/$(basename "$module")"
+			fi
+
+			# The decompressed or copied module file
+			decompressed_module="$TEMP_DIR/$(basename "$module" .xz)"
+
+			# Check if the module contains 'kunit_test_suites'
+			if objdump -x "$decompressed_module" | grep -q 'kunit_test_suites'; then
+				module_name=$(basename "$module" .ko.xz)
+				echo "$module_name" >> kunit-tests.list
+			fi
+		done
+
+		# Output the result list
+		echo "Modules containing 'kunit_test_suites':"
+		cat kunit-tests.list
+
+		# load kunit module names into a array
+		readarray -t test_arr < kunit-tests.list
+
 		# CKI kernel set panic_on_oops to 1 by default
 		# Disable panic on oops as some kunit tests might trigger oops intentionally
 		panic_on_oops=$(sysctl kernel.panic_on_oops | awk '{print$3}')
@@ -117,6 +151,11 @@ rlJournalStart
 	dmesg --clear
 	for TEST in "${test_arr[@]}"
 	do
+		#the kunit module is not a test
+		if [ $TEST = "kunit" ]; then
+			continue
+		fi
+
 		rlPhaseStartTest "process ${TEST}"
 			if [[ ${SKIP_TESTS} =~ ${TEST} ]]; then
 				rlLog "Skipping $TEST"
@@ -132,49 +171,49 @@ rlJournalStart
 			monitor_dir="/sys/kernel/debug/kunit"
 			# Infinite loop to monitor the directory
 			while true; do
-			    # Check if there are any directories in the monitor directory
-			    if [ "$(find "$monitor_dir" -mindepth 1 -maxdepth 1 -type d | wc -l)" -gt 0 ]; then
-			        all_dirs_have_results=true
+				# Check if there are any directories in the monitor directory
+				if [ "$(find "$monitor_dir" -mindepth 1 -maxdepth 1 -type d | wc -l)" -gt 0 ]; then
+					all_dirs_have_results=true
 
-			        # Check if all directories have the results file
-			        for dir in "$monitor_dir"/*/; do
-			            if [ ! -f "$dir/results" ]; then
-			                rlLog "Directory $dir found, but no results file yet"
-			                all_dirs_have_results=false
-			                break
-			            fi
-			        done
+					# Check if all directories have the results file
+					for dir in "$monitor_dir"/*/; do
+						if [ ! -f "$dir/results" ]; then
+							rlLog "Directory $dir found, but no results file yet"
+							all_dirs_have_results=false
+							break
+						fi
+					done
 
-			        if $all_dirs_have_results; then
-			            # Process each directory that has results
-			            for dir in "$monitor_dir"/*/; do
-			                rlLog "Results found in $dir"
-			                test_name="$(basename "$dir")"
-			                test_name=${test_name// /_}
-			                cp "$dir/results" "${test_name}.log"
+					if $all_dirs_have_results; then
+						# Process each directory that has results
+						for dir in "$monitor_dir"/*/; do
+							rlLog "Results found in $dir"
+							test_name="$(basename "$dir")"
+							test_name=${test_name// /_}
+							cp "$dir/results" "${test_name}.log"
 
-			                rlFileSubmit "${test_name}.log"
-			                rlRun -l "cat ${test_name}.log"
-			                process_results "${test_name}.log"
-			                result=$?
-			                if [ $result -eq 0 ]; then
-			                    rlPass "process $test_name"
-			                else
-			                    rlFail "process $test_name"
-			                fi
-			                rm -f "${test_name}.log"
-			            done
-			        fi
-			    else
-			        rlLog "No directories found in $monitor_dir, waiting..."
-			    fi
+							rlFileSubmit "${test_name}.log"
+							rlRun -l "cat ${test_name}.log"
+							process_results "${test_name}.log"
+							result=$?
+							if [ $result -eq 0 ]; then
+								rlPass "process $test_name"
+							else
+								rlFail "process $test_name"
+							fi
+							rm -f "${test_name}.log"
+						done
+					fi
+				else
+					rlLog "No directories found in $monitor_dir, waiting..."
+				fi
 
-			    # If all directories have results, break the loop
-			    if $all_dirs_have_results; then
-			        break
-			    fi
+				# If all directories have results, break the loop
+				if $all_dirs_have_results; then
+					break
+				fi
 
-			    sleep 1
+				sleep 1
 			done
 			rmmod "$TEST" 2>/dev/null
 		rlPhaseEnd
@@ -185,7 +224,7 @@ rlJournalStart
 	rlPhaseStartCleanup
 		# Restore panic on oops value
 		rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
-		#remove installed modules and kunit framework
+		#remove kunit framework
 		rmmod kunit
 	rlPhaseEnd
 
