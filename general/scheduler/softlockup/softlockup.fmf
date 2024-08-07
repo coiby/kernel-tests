@@ -1,5 +1,27 @@
 summary: softlockup detector is enabled and watchdog could detect softlockup
-description: softlockup detector is enabled and watchdog could detect softlockup
+description: |
+    verify softlockup detector is enabled and working as expected, that is can report the softlockup into the dmesg including the context info.
+
+    Test Inputs:
+        $TIMEOUT, seconds for the hogger thread to run, defaults to '60'.
+        $SCHED_CLASS, -sched class: FIFO, RR or NORMAL, defaults to 'FIFO'.
+        $SCHED_PRIORITY, for FIFO and RR, defaults to '1'.
+
+        Execute grep 'CONFIG_SOFTLOCKUP_DETECTOR=y' against the relevant configuration file and expect a return of 0.
+        Execute the 'make' command to compole to cpu_hogger module and expect a return of 0.
+        Execute the insmod command to insert the cpu_hogger module into the Linux kernel and expect a return of 0.
+        Check the dmesg log for the entry "watchdog: BUG: soft lockup" to ensure that the softlockup had been identified and expect a return of 0.
+        Stop the cpu_hogger module thread from running and expect a return of 0.
+
+    Expected result:
+        :: [   PASS   ] :: check softirq detector is enabled (Expected 0, got 0)
+        :: [   PASS   ] :: compile the cpu_hogger.ko (Expected 0, got 0)
+        :: [   PASS   ] :: Command 'insmod cpu_hogger/cpu_hogger.ko timeout=60 scheduler_class_str=FIFO sched_priority=1 preempt_disable_flag=1' (Expected 0, got 0)
+        :: [   PASS   ] :: softlockup function test pass
+        :: [   PASS   ] :: stop the hogger thread (Expected 0, got 0)
+    
+    Results location:
+        output.txt | taskout.log, log is dependent upon the test executor.
 contact: Chunyu Hu <chuhu@redhat.com>
 component:
   - kernel

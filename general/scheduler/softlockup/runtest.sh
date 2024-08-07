@@ -26,6 +26,8 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+TEST="/kernel-tests/general/scheduler/softlockup"
+
 # Include rhts environment
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../../../automotive/include/rhivos.sh
