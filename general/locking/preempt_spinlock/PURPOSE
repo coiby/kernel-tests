@@ -17,4 +17,4 @@ Expected result:
     :: [   PASS   ] :: The module should report PASS in dmesg (Expected 0, got 0)
 
 Results location:
-    output.txt.
+    output.txt | taskout.log, log is dependent upon the test executor.

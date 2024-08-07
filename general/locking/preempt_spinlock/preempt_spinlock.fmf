@@ -19,12 +19,13 @@ description: |
         :: [   PASS   ] :: The module should report PASS in dmesg (Expected 0, got 0)
 
     Results location:
-        output.txt.
+        output.txt | taskout.log, log is dependent upon the test executor.
 contact: Chunyu Hu <chuhu@redhat.com>
 test: bash runtest.sh
 framework: shell
 duration: 15m
 require:
+  - beakerlib
   - gcc
   - libgcc
   - elfutils-libelf-devel
