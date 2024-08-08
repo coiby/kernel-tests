@@ -25,6 +25,17 @@ else
 fi
 export PKGMGR rhel_x
 
+# sleep 5m to wait the system stabilize on ProLiant DL110 Gen11(rt-qe-12). See RHEL-33989 for detail.
+rpm -q dmidecode || $PKGMGR dmidecode
+model=$(dmidecode -s system-product-name)
+if [[ "$model" == "ProLiant DL110 Gen11" ]]; then
+    uptime="$(awk -F'.' '{print $1}' /proc/uptime)"
+    remains="$(( 300 - uptime ))"
+    if [ $remains -gt 0 ]; then
+        sleep $remains
+    fi
+fi
+
 function rt_package_install()
 {
     # install RT packages
