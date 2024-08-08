@@ -160,6 +160,7 @@ rlLog "pkg_mgr = ${pkg_mgr}"
 if [[ $pkg_mgr == "rpm-ostree" ]]; then
     export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
     export pkg_mgr_rmv_string="-y --idempotent --allow-inactive uninstall"
+    export system_ostree=1
 else
     export pkg_mgr_inst_string="-y install"
     export pkg_mgr_rmv_string="-y remove"
@@ -188,6 +189,18 @@ rlJournalStart
         rlRun "popd"
         rlRun "ssh-keygen -q -t ed25519 -N '' <<< $'\ny' > /dev/null 2>&1"
         rlRun "cat /root/.ssh/id_ed25519.pub >> /root/.ssh/authorized_keys"
+        if [ -e /usr/lib/systemd/coredump.conf.d/10-automotive.conf ]; then
+            if system_ostree; then
+                # need to reboot before using usroverlay after installing packages
+                # see https://github.com/ostreedev/ostree/issues/2369
+                if [ -z "${REBOOTCOUNT}" ] || [ "${REBOOTCOUNT}" -eq 0 ]; then
+                    tmt-reboot
+                fi
+                rpm-ostree usroverlay
+            fi
+            mv /usr/lib/systemd/coredump.conf.d/10-automotive.conf /var/tmp/
+            systemctl daemon-reexec
+        fi
     rlPhaseEnd
     rlPhaseStartTest
         rlRun "dmesg -C"
@@ -221,6 +234,11 @@ rlJournalStart
     rlPhaseStartCleanup
         rlRun "tar cf syzkaller_test_results.tar ${local_dir}"
         rlFileSubmit syzkaller_test_results.tar
+        # restore automotive coredump config
+        if [ -e /var/tmp/10-automotive.conf ]; then
+            mv /var/tmp/10-automotive.conf /usr/lib/systemd/coredump.conf.d/
+            systemctl daemon-reexec
+        fi
         rlRun "rm -rf /root/go"
         rlRun "rm -rf ${local_dir}" 0,1
     rlPhaseEnd
