@@ -1,7 +1,28 @@
-Test the kernel RT throttle feature, that limits the RT rq's cpu runtime, the
-default is 0.95s in 1s. If RT_RUNTIME_SHARE is disabled (default), no-RT tasks
-such as SCHED_NORMAL would get chance to run, this rescue the starvation caused
-by priority preempt and some priority inversion situation such as RT tasks need
-resource from normal task, but normal task don't have chance to run.
+Verifies that the RT throttling feature successfully limits the CPU time of
+realtime tasks to allow non-RT tasks, such as those with SCHED_NORMAL
+scheduling, a chance to run. RT runtime is set to 0.95s per 1.0s period and
+RT_RUNTIME_SHARE is disabled. This rescues the starvation caused by priority
+preempt and some priority inversion situations such as RT tasks needing a
+resource from a normal task when the normal task doesn't have a chance to run.
 
-PARAMETERS
+Test Inputs:
+    rt_throttle.c, source which is compiled by GCC.
+
+    Check the kernel setting at '/proc/sys/kernel/sched_rt_runtime_us' which
+    should contain a value other than '-1' to indicate that RT throttling is
+    enabled.
+
+    Check that schedule features file contains 'NO_RT_RUNTIME_SHARE' to ensure
+    the RT_RUNTIME_SHARE feature is disabled.
+
+    Execute the compiled 'rt_throttle' binary and expect a return code of 0 and
+    all iterations to complete with a result of success.
+
+Expected results:
+    PASS: iterations=10, succeeds=10, failures=0
+    [   PASS   ] :: File '/proc/sys/kernel/sched_rt_runtime_us' should not contain '-1'
+    [   PASS   ] :: make sure rt runtime share is disabled (Expected 0, got 0)
+    [   PASS   ] :: Command './rt_throttle' (Expected 0, got 0)
+
+Results location:
+    output.txt | taskout.log, log is dependent upon the test executor.
