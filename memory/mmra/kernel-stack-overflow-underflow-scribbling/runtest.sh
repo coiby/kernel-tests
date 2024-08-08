@@ -8,7 +8,7 @@ testmode=${testmode:-""}
 
 run_insert_mode() {
     mode=$1
-    rlPhaseStartTest
+    rlPhaseStartTest "$mode"
         rlRun "rm -f /var/tmp/stackman/remove_after_module_insert"
         rlRun "sync;sync;sync"  # make sure fs is synced before the crash
         rlRun "insmod stackman.ko testmode=$mode" 0 "Insmod stackman.ko $mode"
@@ -19,7 +19,8 @@ run_insert_mode() {
 }
 
 check_disconnection() {
-    rlPhaseStartTest
+    mode=$1
+    rlPhaseStartTest "$mode"
         if [ -f /var/tmp/stackman/remove_after_module_insert ]; then
             rlFail "Disconnection was not caused by kernel module. Bailing out"
             exit 1
@@ -60,7 +61,7 @@ rlJournalStart
 
         run_insert_mode $testmode
     else
-        check_disconnection
+        check_disconnection "$testmode"
 
         rlPhaseStartCleanup
             rlRun "sysctl kernel.panic=0" 0 "Set kernel back to default, do not reboot on panic"
