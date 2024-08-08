@@ -33,6 +33,7 @@ mm_syscalls_default=${mm_syscalls:-'
     "brk",
     "cachestat",
     "fadvise64_64",
+    "fallocate",
     "get_mempolicy",
     "madvise",
     "mbind",
@@ -65,7 +66,8 @@ mm_syscalls_default=${mm_syscalls:-'
     "shmdt",
     "shmget",
     "swapoff",
-    "swapon"'}
+    "swapon",
+    "userfaultfd"'}
 
 if [ "$(arch)" = "x86_64" ]; then
     mm_syscalls_default=${mm_syscalls:-'
@@ -190,7 +192,7 @@ rlJournalStart
         rlRun "ssh-keygen -q -t ed25519 -N '' <<< $'\ny' > /dev/null 2>&1"
         rlRun "cat /root/.ssh/id_ed25519.pub >> /root/.ssh/authorized_keys"
         if [ -e /usr/lib/systemd/coredump.conf.d/10-automotive.conf ]; then
-            if system_ostree; then
+            if [ -n "${system_ostree}" ] ; then
                 # need to reboot before using usroverlay after installing packages
                 # see https://github.com/ostreedev/ostree/issues/2369
                 if [ -z "${REBOOTCOUNT}" ] || [ "${REBOOTCOUNT}" -eq 0 ]; then
