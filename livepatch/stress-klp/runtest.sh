@@ -34,7 +34,7 @@ IFS="
     for subtest in $TESTS; do
         sed -i '/set -e/d' $subtest
         rlPhaseStartTest $subtest
-            rlWatchdog "./$subtest" 120
+            rlWatchdog "./$subtest" 300 "15"
         rlPhaseEnd
     done
 }
@@ -53,6 +53,8 @@ rlJournalStart
         for mod in $(lsmod | grep -E "^klp_" | awk '{ print $1; }'); do
             rlRun "rmmod -f $mod"
         done
+        ps ax | tee ps_output.txt
+        rstrnt-report-log -l ps_output.txt
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
