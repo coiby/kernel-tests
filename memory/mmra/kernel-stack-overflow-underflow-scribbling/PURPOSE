@@ -7,11 +7,46 @@ The test configures the machine to reboot on panic, so the kernel panic()
 resulting from the stack manipulation will restart the system under test.
 
 Test inputs:
-    insmod stackman.ko testmode=$mode  <=== where mode will be overflow, underflow, and scribbling
+stacklib.c, stackman.c -> source code for the kernel module
+sysctl kernel.panic=5 -> Set kernel to reboot 5 seconds after a kernel panic
 
 Expected result:
-    [   PASS   ] :: Insmod stackman.ko $mode (Expected 0, got 0) <=== where mode will be overflow, underflow, and scribbling
-    [   PASS   ] :: Command 'sleep 20' (Expected 0, got 0)
-    RESULT: PASS (Test)
+
+Module insertion:
+-------------------------------------------------------------------------------
+:: [ 16:25:53 ] :: [  BEGIN   ] :: Insmod stackman.ko $mode :: actually
+ running 'insmod stackman.ko testmode=$mode'
+                                      ^= mode overflow, underflow or scribbling
+:: [ 16:25:53 ] :: [   PASS   ] :: Insmod stackman.ko $mode
+ (Expected 0, got 0)
+:: [ 16:25:53 ] :: [  BEGIN   ] :: Running 'sleep 20'
+-------------------------------------------------------------------------------
+
+The expected behaviour is for the kernel to detect the stack corruption and, as
+configured, raise a kernel panic and reboot the system under test, preventing
+further corruption. On reboot, tmt logs the SUT disconnection:
+
+--------------------------------------------------------------------------------
+client_loop: send disconnect: Broken pipe
+[...]
+TMT_TEST_RESTART_COUNT 1 
+--------------------------------------------------------------------------------
+
+Then, after the reboot, the test checks if the reboot was caused by the module
+insertion, by testing for the flag file being removed:
+
+--------------------------------------------------------------------------------
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::   Test
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:: [ 16:27:03 ] :: [   LOG    ] :: Disconnection caused by kernel module as
+ expected
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::   Duration: 0s
+::   Assertions: 0 good, 0 bad
+::   RESULT: PASS (Test)
+--------------------------------------------------------------------------------
+
 Results location:
     output.txt
