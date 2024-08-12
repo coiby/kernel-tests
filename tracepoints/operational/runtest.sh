@@ -28,7 +28,8 @@ function resultPass ()
 function submitLog ()
 {
     LOG=$1
-    if [ -n "$TESTPATH" ] || [ -n "$RSTRNT_TASKPATH" ]; then
+    # tmt supports rstrnt-report-log
+    if [ -n "$TESTPATH" ] || [ -n "$RSTRNT_TASKPATH" ] || [ -n "$TMT_TEST_NAME" ]; then
         rstrnt-report-log -l $LOG
     else
         echo "Running in developer mode"
