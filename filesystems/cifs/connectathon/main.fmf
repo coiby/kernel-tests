@@ -1,0 +1,30 @@
+summary: filesystems/cifs/connectathon
+description: Connectathon for CIFS
+contact: Jianhong Yin <jiyin@redhat.com>
+component:
+  - kernel
+tag:
+  - KernelTier1
+test: bash ./runtest.sh
+framework: shell
+require:
+  - wget
+  - git
+  - samba
+  - time
+  - patch
+  - cups
+  - samba-client
+  - cifs-utils
+  - gcc
+  - bzip2
+  - nfs-utils
+  - net-tools
+recommend:
+  - libnsl2
+  - libtirpc-devel
+  - python3-lxml
+  - rusers
+environment:
+    TEST: filesystems/cifs/connectathon
+duration: 90m
