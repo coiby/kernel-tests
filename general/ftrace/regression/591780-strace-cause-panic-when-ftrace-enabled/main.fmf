@@ -6,6 +6,9 @@ require:
   - gcc
   - make
   - trace-cmd
+  - type: file
+    pattern:
+     - /general/ftrace/include
 duration: 10m
 tier: 2
 tag: [tier2]
