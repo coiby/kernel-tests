@@ -28,8 +28,8 @@ function RunTest ()
         --width=500ms \
         --threshold=10us \
         --hardlimit=$HARDLIMIT \
-        --debug \
-        2>&1" | tee -a $OUTPUTFILE
+        --debug" \
+        2>&1 | tee -a $OUTPUTFILE
     log "RET_CODE=${PIPESTATUS[0]}"
 
     if [ $LATCHECK -eq 0 ]; then
