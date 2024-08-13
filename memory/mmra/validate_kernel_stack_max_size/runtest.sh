@@ -30,48 +30,33 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # Define the threshold value (e.g., 13kB in bytes)
-THRESHOLD=13312
-
-STACK_TRACER_ENABLED="/proc/sys/kernel/stack_tracer_enabled"
-STACK_MAX_SIZE="/sys/kernel/tracing/stack_max_size"
-STACK_TRACE="/sys/kernel/tracing/stack_trace"
-
-function validate_kernel_max_stack_size()
-{
-    # Read the current stack_max_size value
-    current_value=$(cat "$STACK_MAX_SIZE")
-    cat "$STACK_TRACE" > STACK_TRACE_LOG
-
-    # Check if the current value exceeds the threshold
-    if [[ $current_value -gt $THRESHOLD ]]; then
-        rlLogError "stack_max_size ($current_value bytes) exceeds the threshold ($THRESHOLD bytes)."
-        rlLogInfo "Function responsible for maximum stack usage:"
-        grep "$current_value" STACK_TRACE_LOG
-    else
-        rlLogInfo "stack_max_size ($current_value bytes) is within the acceptable range."
-    fi
-}
+THRESHOLD=${THRESHOLD:-13312}
 
 # ---------- Start Test -------------
 rlJournalStart
 
-rlPhaseStartSetup
-    rlLogInfo "Confirming stack tracer is enabled."
-    if ! rlAssertGrep 1 "$STACK_TRACER_ENABLED"; then
-        rlLogError "stack tracer is not enabled."
+rlPhaseStart "WARN" "Check if tracer was disabled"
+    stack_results=${TMT_PLAN_DATA}/stack_results.log
+    if [[ -f ${stack_results} ]]; then
+        if ! rlAssertNotGrep "RESULTS: WARN" ${stack_results}; then
+            rlFail "stack tracer was not enabled."
+        fi
+    else
+        rlPass "Stack trace was enabled and no test failures."
         rlPhaseEnd
         rlJournalEnd
-        exit 1
+        exit 0
     fi
 rlPhaseEnd
 
-rlPhaseStartTest
-    validate_kernel_max_stack_size
-rlPhaseEnd
-
-rlPhaseStartCleanup
-    rlLogInfo "Disabling stack tracer"
-    echo 0 > "$STACK_TRACER_ENABLED"
+rlPhaseStartTest "Check if stack size exceeded threshold"
+    if [[ -f ${stack_results} ]]; then
+        if ! rlAssertNotGrep "RESULTS: FAIL" ${stack_results}; then
+            rlFail "stack_max_size exceeds the threshold ($THRESHOLD bytes)."
+        fi
+    else
+        rlPass "Stack trace was enabled and no test failures."
+    fi
 rlPhaseEnd
 
 rlJournalPrintText
