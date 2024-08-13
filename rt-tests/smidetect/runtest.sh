@@ -20,7 +20,7 @@ export HARDLIMIT=${HARDLIMIT:-200us}
 
 function RunTest ()
 {
-    log "Test Start Time: $(date)" | tee -a $OUTPUTFILE
+    log "Test Start Time: $(date)" | tee -a "$OUTPUTFILE"
 
     run "hwlatdetect \
         --duration=$DURATION \
@@ -29,27 +29,28 @@ function RunTest ()
         --threshold=10us \
         --hardlimit=$HARDLIMIT \
         --debug" \
-        2>&1 | tee -a $OUTPUTFILE
-    log "RET_CODE=${PIPESTATUS[0]}"
+        2>&1 | tee -a "$OUTPUTFILE"
+    RET_CODE=${PIPESTATUS[0]}
+    log "RET_CODE=${RET_CODE}"
 
-    if [ $LATCHECK -eq 0 ]; then
-        if ! grep -qE '(Traceback|Error)' $OUTPUTFILE && {
+    if [ "$LATCHECK" -eq 0 ]; then
+        if ! grep -qE '(Traceback|Error)' "$OUTPUTFILE" && {
                 # return code should at least be 0 or 1 to pass functional check
-                [ $RET_CODE -eq 0 ] || [ $RET_CODE -eq 1 ]
+                [ "$RET_CODE" -eq 0 ] || [ "$RET_CODE" -eq 1 ]
             }; then
             rstrnt-report-result "smidetect(hwlatdetect) Passed - functional verification" "PASS" 0
         else
             rstrnt-report-result "smidetect(hwlatdetect) Failed - functional verification" "FAIL" 1
         fi
     else
-        if [ $RET_CODE -eq 0 ]; then
+        if [ "$RET_CODE" -eq 0 ]; then
             rstrnt-report-result "smidetect(hwlatdetect) Passed - latency verification" "PASS" 0
         else
             rstrnt-report-result "smidetect(hwlatdetect) Failed - latency verification" "FAIL" 1
         fi
     fi
 
-    log "Test End Time: $(date)" | tee -a $OUTPUTFILE
+    log "Test End Time: $(date)" | tee -a "$OUTPUTFILE"
 }
 
 # ---------- Start Test -------------
