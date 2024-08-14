@@ -130,6 +130,7 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0006-Add-cachestat04-test.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cachestat-remove-.min_kver-from-cachestat-tests.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cachestat01-Reduce-required-space-on-64kb-page-size.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-execve04-creat07-skip-for-kernels-6.11-and-.patch
     fi
     if [ "$TESTVERSION" == "20240129" ]; then
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
