@@ -11,4 +11,5 @@ NVMEOF_MP_RXE="nvmeof-mp/005 nvmeof-mp/006 nvmeof-mp/009 nvmeof-mp/010 nvmeof-mp
 NVMEOF_MP_SIW="nvmeof-mp/005 nvmeof-mp/006 nvmeof-mp/009 nvmeof-mp/010 nvmeof-mp/011 nvmeof-mp/012"
 NVME_FC=""
 SRP_SIW="srp/001 srp/005 srp/006 srp/007 srp/008 srp/009 srp/010 srp/013 srp/014"
-SRP_RXE="srp/001 srp/006 srp/007 srp/009 srp/010 srp/013 srp/014"
+SRP_RXE="srp/006 srp/007 srp/009 srp/010 srp/013 srp/014"
+#srp/001 RHEL-14071
