@@ -14,47 +14,43 @@
 # Source rt common functions
 . ../include/runtest.sh || exit 1
 
-export TEST="rt-tests/smidetect"
 export DURATION=${DURATION:-10m}
 export LATCHECK=${LATCHECK:-0}
 export HARDLIMIT=${HARDLIMIT:-200us}
 
 function RunTest ()
 {
-    echo "Test Start Time: $(date)" | tee -a $OUTPUTFILE
+    log "Test Start Time: $(date)"
 
-    hwlatdetect \
+    run "hwlatdetect \
         --duration=$DURATION \
         --window=1s \
         --width=500ms \
         --threshold=10us \
         --hardlimit=$HARDLIMIT \
-        --debug \
-        2>&1 | tee -a $OUTPUTFILE
+        --debug" \
+        2>&1 | tee -a "$OUTPUTFILE"
     RET_CODE=${PIPESTATUS[0]}
+    log "RET_CODE=${RET_CODE}"
 
-    if [ $LATCHECK -eq 0 ]; then
-        if ! grep -qE '(Traceback|Error)' $OUTPUTFILE && {
+    if [ "$LATCHECK" -eq 0 ]; then
+        if ! grep -qE '(Traceback|Error)' "$OUTPUTFILE" && {
                 # return code should at least be 0 or 1 to pass functional check
-                [ $RET_CODE -eq 0 ] || [ $RET_CODE -eq 1 ]
+                [ "$RET_CODE" -eq 0 ] || [ "$RET_CODE" -eq 1 ]
             }; then
-            echo "smidetect(hwlatdetect) Passed - functional verification: " | tee -a $OUTPUTFILE
-            rstrnt-report-result "$TEST" "PASS" 0
+            rstrnt-report-result "smidetect(hwlatdetect) Passed - functional verification" "PASS" 0
         else
-            echo "smidetect(hwlatdetect) Failed - functional verification: " | tee -a $OUTPUTFILE
-            rstrnt-report-result "$TEST" "FAIL" 1
+            rstrnt-report-result "smidetect(hwlatdetect) Failed - functional verification" "FAIL" 1
         fi
     else
-        if [ $RET_CODE -eq 0 ]; then
-            echo "smidetect(hwlatdetect) Passed - latency verification: " | tee -a $OUTPUTFILE
-            rstrnt-report-result "$TEST" "PASS" 0
+        if [ "$RET_CODE" -eq 0 ]; then
+            rstrnt-report-result "smidetect(hwlatdetect) Passed - latency verification" "PASS" 0
         else
-            echo "smidetect(hwlatdetect) Failed - latency verification: " | tee -a $OUTPUTFILE
-            rstrnt-report-result "$TEST" "FAIL" 1
+            rstrnt-report-result "smidetect(hwlatdetect) Failed - latency verification" "FAIL" 1
         fi
     fi
 
-    echo "Test End Time: $(date)" | tee -a $OUTPUTFILE
+    log "Test End Time: $(date)"
 }
 
 # ---------- Start Test -------------
