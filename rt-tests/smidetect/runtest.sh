@@ -20,7 +20,7 @@ export HARDLIMIT=${HARDLIMIT:-200us}
 
 function RunTest ()
 {
-    log "Test Start Time: $(date)" | tee -a "$OUTPUTFILE"
+    log "Test Start Time: $(date)"
 
     run "hwlatdetect \
         --duration=$DURATION \
@@ -50,7 +50,7 @@ function RunTest ()
         fi
     fi
 
-    log "Test End Time: $(date)" | tee -a "$OUTPUTFILE"
+    log "Test End Time: $(date)"
 }
 
 # ---------- Start Test -------------
