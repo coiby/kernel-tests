@@ -13,6 +13,8 @@ rlJournalStart
         rlLog "Create shared memory segment"
         rlRun "gcc -o /tmp/shm-create -D_GNU_SOURCE shm-create.c"
         rlRun "gcc -o /tmp/shm-create-posix -DUSE_POSIX_INTERFACE -D_GNU_SOURCE shm-create.c"
+    rlPhaseEnd
+    rlPhaseStartTest "Create shared memory segments"
         rlRun "/tmp/shm-create create"
         rlRun "/tmp/shm-create-posix create"
     rlPhaseEnd
@@ -26,10 +28,12 @@ rlJournalStart
         rlRun "su testuser -c /tmp/shm-access-posix" 1,139
         rlRun "/tmp/shm-create-posix read"
     rlPhaseEnd
+    rlPhaseStartTest "Run shm-create-posix delete"
+        rlRun "/tmp/shm-create-posix delete"
+    rlPhaseEnd
     rlPhaseStartCleanup
         rlRun "userdel -rf testuser"
         rlRun "ipcrm --shmem-key 0xDEADBEEF"
-        rlRun "/tmp/shm-create-posix delete"
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
