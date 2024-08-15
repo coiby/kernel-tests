@@ -30,6 +30,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="rpm"
+export GPG_TTY=$(tty)
 
 rlJournalStart
     rlPhaseStartSetup
