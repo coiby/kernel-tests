@@ -20,13 +20,13 @@ rpm -q --quiet nfs-utils || InstallPackages nfs-utils
 
 function CheckPackage()
 {
-    # Install and upgrade kexec-tools if needed
+    # Install and upgrade the kdump main package if needed
     PrepareKdump || {
-        echo "Install kexec-tools Failed!" | tee -a "$OUTPUTFILE"
+        echo "Install $MAIN_RPM_PACKAGE Failed!" | tee -a "$OUTPUTFILE"
         rstrnt-report-result "$RSTRNT_TASKNAME/CheckPackage" "FAIL" "1"
         return 1
     }
-    LogRun "rpm -q kexec-tools dracut systemd selinux-policy"
+    LogRun "rpm -q kdump-utils makedumpfile kexec-tools dracut systemd selinux-policy"
     return 0
 }
 
