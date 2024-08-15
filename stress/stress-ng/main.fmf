@@ -20,6 +20,8 @@ description: |
     GIT_BRANCH = version of stress-ng to check out
                  default: see runtest.sh
 
+    For more information on stress-ng please see https://wiki.ubuntu.com/Kernel/Reference/stress-ng.
+
     Test inputs(Depends on stressor):
         e.g., stress-ng --sigsegv 0 --timeout 5 --log-file sigsegv.log
 
