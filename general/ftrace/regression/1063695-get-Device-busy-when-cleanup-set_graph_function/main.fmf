@@ -21,6 +21,9 @@ test: ./runtest.sh
 framework: beakerlib
 require:
   - trace-cmd
+  - type: file
+    pattern:
+     - /general/ftrace/include
 duration: 40m
 tier: 2
 tag: [tier2]

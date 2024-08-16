@@ -9,6 +9,10 @@ component:
   - kernel
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - type: file
+    pattern:
+     - /general/ftrace/include
 duration: 5m
 tier: 2
 tag: [tier2]
