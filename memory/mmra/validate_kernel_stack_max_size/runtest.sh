@@ -32,6 +32,10 @@
 # Define the threshold value (e.g., 13kB in bytes)
 THRESHOLD=${THRESHOLD:-13312}
 
+STACK_TRACER_ENABLED="/proc/sys/kernel/stack_tracer_enabled"
+STACK_MAX_SIZE="/sys/kernel/tracing/stack_max_size"
+STACK_TRACE="/sys/kernel/tracing/stack_trace"
+
 # ---------- Start Test -------------
 rlJournalStart
 
@@ -56,6 +60,20 @@ rlPhaseStartTest "Check if stack size exceeded threshold"
         fi
     else
         rlPass "Stack trace was enabled and no test failures."
+    fi
+rlPhaseEnd
+
+rlPhaseStart "WARN" "Final check for tracer enabled"
+    rlAssertGrep 1 "$STACK_TRACER_ENABLED"
+    rlFail "stack tracer is not enabled for final run."
+    rlDie
+rlPhaseEnd
+
+rlPhaseStartTest "Final test of strack trace size"
+    current_value=$(cat "$STACK_MAX_SIZE")
+    if ! rlAssertLesser "Check if the current value exceeds the threshold" $current_value $THRESHOLD; then
+        rlLog "Function responsible for maximum stack usage:"
+        grep "$current_value" "$STACK_TRACE"
     fi
 rlPhaseEnd
 
