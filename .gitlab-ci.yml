@@ -381,3 +381,12 @@ git-sync-branches:
 
 deploy-production:
   extends: .deploy_production_tag
+  script:
+    - !reference [.deploy_tag, script]
+    - git archive
+      --output kernel-tests-production.zip
+      --prefix kernel-tests-production/
+      HEAD
+    - aws s3 cp
+      kernel-tests-production.zip
+      "s3://${S3_BUCKET:?}/${S3_PATH:?}kernel-tests-production.zip"
