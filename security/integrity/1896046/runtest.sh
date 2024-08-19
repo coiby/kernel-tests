@@ -30,7 +30,6 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="rpm"
-export GPG_TTY=$(tty)
 
 rlJournalStart
     rlPhaseStartSetup
@@ -52,6 +51,8 @@ rlJournalStart
         # create expect script for signing packages
         cat > sign.exp <<EOF
 #!/usr/bin/expect -f
+set ::env(TERM) vt100
+
 spawn rpmsign --addsign --signfiles --fskpath privkey_evm.pem $TESTPKG
 expect {
     "Enter pass phrase: " {
