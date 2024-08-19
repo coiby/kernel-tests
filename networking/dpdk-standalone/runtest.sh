@@ -82,6 +82,8 @@ compile_and_install_dpdk()
         yum -y install python3 python2
         yum -y install python3-pip python2-pip
         pip3 install pyelftools
+        pip3 install elftools
+        yum -y install python3-pyelftools
         #install numa-devel for numa support
         rpm -q numactl-devel || yum -y install numactl-devel
         #install for mlx4 and mlx5 support
@@ -150,7 +152,7 @@ update_buildroot_repo()
 tools_install()
 {
     update_buildroot_repo
-    yum install -yq git wget tar go qperf pciutils
+    yum install -yq git wget tar go qperf pciutils beaker-redhat
     yum -y install podman
     touch /etc/containers/nodocker
     yum -y install docker
