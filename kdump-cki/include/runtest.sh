@@ -464,16 +464,20 @@ ClearReport()
 #  Common Kdump/Crash Functions
 
 #  On Fedora,install/Upgrade kdump main package and related packages
+#  On Fedora and RHEL-10, kdump main package is kdump-utils.
+#  On RHEL-9 and before it,kdump main package is kexec-tools.
 PrepareKdump()
 {
-    Log "Check if installed the kdump main package"
-    rpm -q --quiet ${MAIN_RPM_PACKAGE} || {
+    local kdump_package="${1:-"${MAIN_RPM_PACKAGE}"}"
+
+    Log "Check if installed the kdump package ${kdump_package}."
+    rpm -q --quiet ${kdump_package} || {
         if $IS_FC; then
             # On Fedora, kdump main package is not installed by default.
-            # Install kdump main package and enable kdump service.
-            InstallPackages ${MAIN_RPM_PACKAGE}
-            rpm -q ${MAIN_RPM_PACKAGE} || {
-                Log "- Aborting test as ${MAIN_RPM_PACKAGE} couldn't be installed"
+            # Install kdump package and enable kdump service.
+            InstallPackages ${kdump_package}
+            rpm -q ${kdump_package} || {
+                Log "- Aborting test as ${kdump_package} couldn't be installed"
                 rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
                 rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
                 exit 1
@@ -483,14 +487,14 @@ PrepareKdump()
             # Back up configurations if the kdump main package is installed for the first time
             BackupKdumpConfig
 
-            # Try upgrading kdump main package to the latest version if on FC.
-            # If it fails, still use the kdump main package from the default repo.
+            # Try upgrading kdump package to the latest version if on FC.
+            # If it fails, still use the kdump package from the default repo.
             if $IS_FC && $UPGRADE_FC_KDUMP; then
-                UpgradePackages ${MAIN_RPM_PACKAGE} dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
+                UpgradePackages ${kdump_package} dracut systemd selinux-policy --enablerepo=updates-testing --enablerepo=fedora --releasever=rawhide
             fi
             return 0
         else
-            Warn "Did not install the kdump main package ${MAIN_RPM_PACKAGE} by default!"
+            Warn "Did not install the kdump package ${kdump_package} by default!"
             return 1
         fi
     }
@@ -1143,21 +1147,19 @@ KexecBoot()
         Log "$(uname -r)"
         Log "$(cat /proc/cmdline)"
 
-        if [ "${RELEASE}" -le 9 ]; then
-            PrepareKdump || MajorError "Need install the kdump main package ${MAIN_RPM_PACKAGE}"
-            # Make sure kdump service is finish loading kexec for panic (i.e. kexec -p)
-            # So `kexec -l`` won't compete resources with kexec -p
-            # Otherwise it may fail with: kexec_load failed: Device or resource busy
-            if command -v kdumpctl &> /dev/null; then
-                kdumpctl status &> /dev/null
-            else
-                service kdump status &> /dev/null
-            fi
+        # Before RHEL-10,make sure kdump service is finish loading kexec for panic (i.e. kexec -p)
+        # So `kexec -l`` won't compete resources with kexec -p
+        # Otherwise it may fail with: kexec_load failed: Device or resource busy
+        if command -v kdumpctl &> /dev/null; then
+            kdumpctl status &> /dev/null
         else
-            # Since RHEL-10,kexec-tools package was split into kexec-tools,kdump-utils and makedumpfile.
-            # For kexec boot function, it only needs install the package kexec-tools.
-            rpm -q --quiet kexec-tools || MajorError "Need install the kexec-tools package."
+            service kdump status &> /dev/null
         fi
+
+        # Since RHEL-10,kexec-tools package was split into kexec-tools,kdump-utils and makedumpfile.
+        # For kexec boot function, it only needs install the package kexec-tools.
+        PrepareKdump kexec-tools || MajorError "Need install the kexec-tools package."
+
         # Prepare kexec cmd and run kexec load
         local _initrd_img_path _vmlinuz_path
         if system_ostree; then
