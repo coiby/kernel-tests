@@ -43,7 +43,10 @@ require:
   - selinux-policy-devel
   - setools-console
   - xfsprogs-devel
-
+  - type: file
+    pattern:
+        -  /kernel-include
+        -  /cki_lib
 recommend:
   - policycoreutils-python
   - python2-lxml
