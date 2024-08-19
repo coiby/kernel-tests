@@ -56,6 +56,6 @@ rlJournalStart
         ps ax | tee ps_output.txt
         rstrnt-report-log -l ps_output.txt
     rlPhaseEnd
-rlJournalEnd
 rlJournalPrintText
+rlJournalEnd
 

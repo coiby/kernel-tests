@@ -5,7 +5,7 @@ contact: Dennis Li <denli@redhat.com>
 component:
   - kernel
 path: /livepatch/stress-klp
-test: bash +x runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
 recommend:
   - gcc
