@@ -7,7 +7,12 @@ component:
 path: /security/crypto/1600394
 test: make run
 framework: beakerlib
-require: [python3, make]
+require:
+  - python3
+  - make
+  - type: file
+    pattern:
+        -  /cki_lib
 duration: 10m
 extra-summary: /kernel-tests/security/crypto/1600394
 extra-task: /kernel-tests/security/crypto/1600394
