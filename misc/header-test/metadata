@@ -15,3 +15,4 @@ dependencies[RedHatEnterpriseLinux9]=gcc;bash;platform-python;python3;kernel-hea
 dependencies[RedHatEnterpriseLinux10]=gcc;bash;platform-python;python3;kernel-headers
 use_pty=false
 repoRequires=cki_lib
+max_time=10m
