@@ -13,6 +13,7 @@ require:
   - nvme-cli
   - wget
   - gcc
+  - git
 duration: 3h
 tag:
   - regression

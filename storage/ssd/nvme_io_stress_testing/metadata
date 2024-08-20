@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
-dependencies=fio;nvme-cli;wget;gcc
+dependencies=fio;nvme-cli;wget;gcc;git
 max_time=3h
 use_pty=false

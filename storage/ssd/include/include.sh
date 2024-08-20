@@ -423,5 +423,5 @@ function setup_os_boot_entry() {
 	fi
 }
 
-setup_os_boot_entry
+#setup_os_boot_entry
 tok "nvme list"
