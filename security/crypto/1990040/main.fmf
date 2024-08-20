@@ -1,7 +1,6 @@
 summary: Security Crypto verifier for 1990040
 description: ''
 contact: Linqing Lu <lilu@redhat.com>
-id: 985f0229-d93c-44d3-8c67-f6b5472bf3d7
 component:
   - kernel
 path: /security/crypto/1990040

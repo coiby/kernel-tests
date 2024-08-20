@@ -16,4 +16,3 @@ extra-summary: memory/config_memtest
 extra-task: memory/config_memtest
 enabled: true
 duration: 5m
-id: 942f0232-906a-4644-9c5a-10a056845e58
