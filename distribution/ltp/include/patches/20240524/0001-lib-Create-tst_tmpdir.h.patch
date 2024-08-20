@@ -1,0 +1,103 @@
+From f2e10a9ab396762102fbe456e1c6922d3f7f4b88 Mon Sep 17 00:00:00 2001
+From: Petr Vorel <pvorel@suse.cz>
+Date: Thu, 20 Jun 2024 07:42:37 +0200
+Subject: [PATCH] lib: Create tst_tmpdir.h
+
+This fixes our sparse warning:
+
+tst_tmpdir.c:347:6: warning: Symbol 'tst_purge_dir' has no prototype or
+library ('tst_') prefix. Should it be static?
+
+Header needs to be added also to include/tst_test.h (for tests which use
+tst_purge_dir, e.g. creat08.c).
+
+Link: https://lore.kernel.org/ltp/20240712081359.116227-2-pvorel@suse.cz/
+Suggested-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Li Wang <liwang@redhat.com>
+Reviewed-by: Avinesh Kumar <akumar@suse.de>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
+---
+ include/tst_device.h |  6 +-----
+ include/tst_test.h   |  1 +
+ include/tst_tmpdir.h | 19 +++++++++++++++++++
+ lib/tst_tmpdir.c     |  1 +
+ 4 files changed, 22 insertions(+), 5 deletions(-)
+ create mode 100644 include/tst_tmpdir.h
+
+diff --git a/include/tst_device.h b/include/tst_device.h
+index 36258f436..391fb4e56 100644
+--- a/include/tst_device.h
++++ b/include/tst_device.h
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * Copyright (c) 2016-2019 Cyril Hrubis <chrubis@suse.cz>
++ * Copyright (c) Linux Test Project, 2019-2024
+  */
+ 
+ #ifndef TST_DEVICE_H__
+@@ -101,11 +102,6 @@ int tst_dev_sync(int fd);
+  */
+ unsigned long tst_dev_bytes_written(const char *dev);
+ 
+-/*
+- * Wipe the contents of given directory but keep the directory itself
+- */
+-void tst_purge_dir(const char *path);
+-
+ /*
+  * Find the file or path belongs to which block dev
+  * @path       Path to find the backing dev
+diff --git a/include/tst_test.h b/include/tst_test.h
+index eea14469e..a5fd9a00e 100644
+--- a/include/tst_test.h
++++ b/include/tst_test.h
+@@ -46,6 +46,7 @@
+ #include "tst_memutils.h"
+ #include "tst_arch.h"
+ #include "tst_fd.h"
++#include "tst_tmpdir.h"
+ 
+ void tst_res_(const char *file, const int lineno, int ttype,
+               const char *fmt, ...)
+diff --git a/include/tst_tmpdir.h b/include/tst_tmpdir.h
+new file mode 100644
+index 000000000..e6c5d962c
+--- /dev/null
++++ b/include/tst_tmpdir.h
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (c) 2017 Cyril Hrubis <chrubis@suse.cz>
++ * Copyright (c) 2020 Martin Doucha <mdoucha@suse.cz>
++ */
++
++#ifndef TST_TMPDIR_H__
++#define TST_TMPDIR_H__
++
++/**
++ * tst_purge_dir - Wipe the content of given directory.
++ *
++ * Wipe the content of given directory but keep the directory itself.
++ *
++ * @path: Path of the directory to be wiped.
++ */
++void tst_purge_dir(const char *path);
++
++#endif /* TST_TMPDIR_H__ */
+diff --git a/lib/tst_tmpdir.c b/lib/tst_tmpdir.c
+index bcc788390..0f1b15ca4 100644
+--- a/lib/tst_tmpdir.c
++++ b/lib/tst_tmpdir.c
+@@ -72,6 +72,7 @@
+ 
+ #include "test.h"
+ #include "safe_macros.h"
++#include "tst_tmpdir.h"
+ #include "ltp_priv.h"
+ #include "lapi/futex.h"
+ 
+-- 
+2.46.0
+
