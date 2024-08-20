@@ -173,6 +173,8 @@ check bash lines ending with white spaces:
     - !reference [.rules, production-branch]
 
 check tmt lint:
+  # allow failure until https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/merge_requests/3216 gets merged
+  allow_failure: true
   extends: .cki_tools
   before_script:
     - tmt --version
