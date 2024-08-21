@@ -39,43 +39,36 @@ STACK_TRACE="/sys/kernel/tracing/stack_trace"
 # ---------- Start Test -------------
 rlJournalStart
 
-rlPhaseStart "WARN" "Check if tracer was disabled"
     stack_results=${TMT_PLAN_DATA}/stack_results.log
     if [[ -f ${stack_results} ]]; then
-        if ! rlAssertNotGrep "RESULTS: WARN" ${stack_results}; then
-            rlFail "stack tracer was not enabled."
-        fi
-    else
-        rlPass "Stack trace was enabled and no test failures."
+        rlPhaseStart "WARN" "Check if tracer was disabled"
+            if ! rlAssertNotGrep "RESULTS: WARN" ${stack_results}; then
+                rlFail "stack tracer was not enabled."
+            fi
         rlPhaseEnd
-        rlJournalEnd
-        exit 0
-    fi
-rlPhaseEnd
-
-rlPhaseStartTest "Check if stack size exceeded threshold"
-    if [[ -f ${stack_results} ]]; then
-        if ! rlAssertNotGrep "RESULTS: FAIL" ${stack_results}; then
-            rlFail "stack_max_size exceeds the threshold ($THRESHOLD bytes)."
-        fi
+        rlPhaseStartTest "Check if stack size exceeded threshold"
+            if ! rlAssertNotGrep "RESULTS: FAIL" ${stack_results}; then
+                rlFail "stack_max_size exceeds the threshold ($THRESHOLD bytes)."
+            fi
+        rlPhaseEnd
     else
-        rlPass "Stack trace was enabled and no test failures."
+        rlLog "Stack trace was enabled and no test failures."
     fi
-rlPhaseEnd
 
-rlPhaseStart "WARN" "Final check for tracer enabled"
-    rlAssertGrep 1 "$STACK_TRACER_ENABLED"
-    rlFail "stack tracer is not enabled for final run."
-    rlDie
-rlPhaseEnd
+    rlPhaseStart "WARN" "Final check for tracer enabled"
+        if ! rlAssertGrep 1 "$STACK_TRACER_ENABLED"; then
+            rlFail "stack tracer is not enabled for final run."
+            rlDie
+        fi
+    rlPhaseEnd
 
-rlPhaseStartTest "Final test of strack trace size"
-    current_value=$(cat "$STACK_MAX_SIZE")
-    if ! rlAssertLesser "Check if the current value exceeds the threshold" $current_value $THRESHOLD; then
-        rlLog "Function responsible for maximum stack usage:"
-        grep "$current_value" "$STACK_TRACE"
-    fi
-rlPhaseEnd
+    rlPhaseStartTest "Final test of strack trace size"
+        current_value=$(cat "$STACK_MAX_SIZE")
+        if ! rlAssertLesser "Check if the current value exceeds the threshold" $current_value $THRESHOLD; then
+            rlLog "Function responsible for maximum stack usage:"
+            grep "$current_value" "$STACK_TRACE"
+        fi
+    rlPhaseEnd
 
 rlJournalPrintText
 rlJournalEnd
