@@ -12,7 +12,10 @@ require:
   - automake
   - bison
   - elfutils-libelf-devel
-  - flex,gcc,git,glibc-headers
+  - flex
+  - gcc
+  - git
+  - glibc-headers
   - kernel-headers
   - keyutils-libs-devel
   - libacl-devel
