@@ -1,0 +1,35 @@
+summary: check access to the network through testing access to dns servers.
+description: |
+  Test will check if the board can access the network through 2 dns probe tests.
+  1. Will check if there are dns servers configured and test connectivity to them.
+  2. will check access to external dns servers.
+
+  Test inputs:
+  mapfile -t dns_ipv4 < <(nmcli dev show | grep -m2 'IP4.DNS' | awk '{print $2}') ; for getting the array dns_ipv4
+  DNS_EXTERNAL=("8.8.8.8" "1.1.1.1" "208.67.222.222") ; external dns servers
+
+  Expected results:
+  ::   Check if dns servers are configured and accessible on the board
+  ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  :: [ 13:21:42 ] :: [   LOG    ] :: Pinging 10.2.70.215
+  :: [ 13:21:44 ] :: [   PASS   ] :: Pinging 10.2.70.215 (Expected 0, got 0)
+  :: [ 13:21:44 ] :: [   LOG    ] :: Pinging 10.11.5.160
+  :: [ 13:21:47 ] :: [   PASS   ] :: Pinging 10.11.5.160 (Expected 0, got 0)
+
+  ::   Check if can access external dns servers
+  ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  :: [ 13:21:47 ] :: [   LOG    ] :: Pinging 8.8.8.8
+  :: [ 13:21:49 ] :: [   PASS   ] :: Pinging 8.8.8.8 (Expected 0, got 0)
+  :: [ 13:21:49 ] :: [   LOG    ] :: Pinging 1.1.1.1
+  :: [ 13:21:51 ] :: [   PASS   ] :: Pinging 1.1.1.1 (Expected 0, got 0)
+  :: [ 13:21:51 ] :: [   LOG    ] :: Pinging 208.67.222.222
+  :: [ 13:21:53 ] :: [   PASS   ] :: Pinging 208.67.222.222 (Expected 0, got 0)
+  ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+contact: Michael Menasherov <mmenashe@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+extra-summary: networking/basic_network_access
+extra-task: networking/basic_network_access
+enabled: true
+duration: 1m
+id: 131fe67f-e77b-485e-8ad8-d75158f2c610
