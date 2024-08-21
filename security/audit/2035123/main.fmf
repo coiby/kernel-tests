@@ -10,6 +10,7 @@ framework: beakerlib
 require:
   - make
   - audit
+  - initscripts
 duration: 12m
 extra-summary: /kernel-tests/security/audit/2035123
 extra-task: /kernel-tests/security/audit/2035123
