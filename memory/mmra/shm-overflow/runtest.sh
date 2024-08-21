@@ -3,6 +3,7 @@
 # Source the common test script helpers
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+export PACKAGE="${PACKAGE:-kernel}"
 export TEST=shm-overflow
 
 rlJournalStart
@@ -17,5 +18,5 @@ rlJournalStart
         rlRun "gcc -o /tmp/shm-overflow-posix -DUSE_POSIX_INTERFACE -D_GNU_SOURCE shm-overflow.c"
         rlRun "/tmp/shm-overflow-posix"
     rlPhaseEnd
-rlJournalEnd
 rlJournalPrintText
+rlJournalEnd

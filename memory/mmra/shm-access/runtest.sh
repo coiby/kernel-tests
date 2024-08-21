@@ -4,19 +4,26 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../cki_lib/libcki.sh
 
+export PACKAGE="${PACKAGE:-kernel}"
 export TEST=shm-access
+export OUTPUTFILE=""
+
+if cki_is_qm; then
+    TMPDIR=$(mktemp -d /var/tmp/log.XXX)
+    OUTPUTFILE=$TMPDIR/outputfile.log
+fi
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
+        UserHome=""
         rlLog "Create non-root user"
-        if cki_is_kernel_automotive; then
+        if cki_is_qm; then
            rlRun "UserHome=$(mktemp -d /var/home.XXX)" 0 "Creating testuser home dir"
            rlRun "adduser -d ${UserHome}/testuser -p '' testuser"
         else
            rlRun "adduser testuser"
         fi
-        rlRun "adduser testuser"
         rlLog "Create shared memory segment"
         rlRun "gcc -o /tmp/shm-create -D_GNU_SOURCE shm-create.c"
         rlRun "gcc -o /tmp/shm-create-posix -DUSE_POSIX_INTERFACE -D_GNU_SOURCE shm-create.c"
@@ -42,5 +49,5 @@ rlJournalStart
         rlRun "userdel -rf testuser"
         rlRun "ipcrm --shmem-key 0xDEADBEEF"
     rlPhaseEnd
-rlJournalEnd
 rlJournalPrintText
+rlJournalEnd
