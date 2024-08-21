@@ -12,12 +12,11 @@
 
 
 CheckKdumpConfFromInitramfs() {
-    local option=$1
     local squash_file
-    local kdump_bootdir="/boot"
 
     Log "Check kdump.conf in kdump initramfs img"
-    local kdump_initramfs_path="${INITRD_KDUMP_IMG_PATH}"
+    # Get the kdump initramfs img path
+    local kdump_initramfs_path=$(GetKdumprd)
 
     # Locate the kdump initramfs img
     if [ ! -f "${kdump_initramfs_path}" ]; then
@@ -37,11 +36,12 @@ CheckKdumpConfFromInitramfs() {
 
     Log "Unpack initramfs and squashed root img"
     if LogRun "lsinitrd --unpack ${kdump_initramfs_path}"; then
-        if ! ls | grep -qi squash-root.img; then
-            # for RHEL8.4 and older, the root image is in squash folder
-            squash_file="squash/root.img"
+        if $IS_RHEL10; then
+            # On RHEL-10,the root image squashfs-root.img is in current folder
+            squash_file="squashfs-root.img"
         else
-            # for RHEL8.5 and newer, the root image is in current folder
+            # for RHEL8.4 and older,the root image squash/root.img is in squash folder
+            # from RHEL8.5 to RHEL-9.5, the root image squash-root.img is in current folder
             squash_file="squash-root.img"
         fi
         [ -d "./squashfs-root" ] && rm -rf ./squashfs-root
@@ -50,7 +50,7 @@ CheckKdumpConfFromInitramfs() {
         Log "Locate and check content of kdump.conf file in initramfs"
         local kdump_config_insquash=./kdump.conf.insquash
         \cp -f squashfs-root/${KDUMP_CONFIG} ${kdump_config_insquash} || {
-            Error "Failed to find kdump.conf in inistramfs"
+            Error "Failed to find kdump.conf in initramfs"
             return
         }
 
@@ -106,13 +106,7 @@ EmptyConfCheck() {
     }
 
     # Check the file in initramfs
-    # Kdump may use the non-debug kernel/initramfs when system is running on a debug kernel
-    if grep -q "Trying to use" "${restart_log}" && grep -q -v "Fallback" "${restart_log}"; then
-        CheckKdumpConfFromInitramfs nondebug
-    else
-        CheckKdumpConfFromInitramfs
-    fi
-
+    CheckKdumpConfFromInitramfs
 
     # Restore kdump config
     Log "Restore kdump config"
