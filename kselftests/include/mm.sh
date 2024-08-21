@@ -31,8 +31,10 @@
 #
 # Expected Results:
 #   For gup tests-
-#     GUP_FAST_BENCHMARK: Time: get:<time> put:<time> us
-#     PIN_FAST_BENCHMARK: Time: get:<time> put:<time> us
+#     PASS: PIN_FAST_BENCHMARK: Time: get:<time> within threshold:<time> us.
+#     PASS: PIN_FAST_BENCHMARK: Time: put:<time> within threshold:<time> us.
+#     PASS: GUP_FAST_BENCHMARK: Time: get:<time> within threshold:<time> us.
+#     PASS: GUP_FAST_BENCHMARK: Time: put:<time> within threshold:<time> us.
 #     DUMP_USER_PAGES_TEST: done
 #   For process_mrelease-
 #     Success reaping a child with 1MB of memory allocations
@@ -83,16 +85,16 @@ gup_test_pin_fast_benchmark(){
         pin_get_microsecs=\$(echo \$pin_fast_benchmark | awk -F ":" '{print \$4}' | awk '{print \$1}')
         pin_put_microsecs=\$(echo \$pin_fast_benchmark | awk -F ":" '{print \$5}' | awk '{print \$1}')
         if [[ \$pin_get_microsecs -gt \$pin_get_threshold ]]; then
-            echo "FAIL: PIN_FAST_BENCHMARK: Time: get:\$pin_get_microsecs exceeds threshold:\$pin_get_threshold."
+            echo "FAIL: PIN_FAST_BENCHMARK: Time: get:\$pin_get_microsecs exceeds threshold:\$pin_get_threshold us."
             exitcode=1
         else
-            echo "PASS: PIN_FAST_BENCHMARK: Time: get:\$pin_get_microsecs within threshold:\$pin_get_threshold."
+            echo "PASS: PIN_FAST_BENCHMARK: Time: get:\$pin_get_microsecs within threshold:\$pin_get_threshold us."
         fi
         if [[ \$pin_put_microsecs -gt \$pin_put_threshold ]]; then
-            echo "FAIL: PIN_FAST_BENCHMARK: Time: put:\$pin_put_microsecs exceeds threshold:\$pin_put_threshold."
+            echo "FAIL: PIN_FAST_BENCHMARK: Time: put:\$pin_put_microsecs exceeds threshold:\$pin_put_threshold us."
             exitcode=1
         else
-            echo "PASS: PIN_FAST_BENCHMARK: Time: put:\$pin_put_microsecs within threshold:\$pin_put_threshold."
+            echo "PASS: PIN_FAST_BENCHMARK: Time: put:\$pin_put_microsecs within threshold:\$pin_put_threshold us."
         fi
     fi
 }
@@ -114,16 +116,16 @@ gup_test_gup_fast_benchmark(){
         gup_get_microsecs=\$(echo \$gup_fast_benchmark | awk -F ":" '{print \$4}' | awk '{print \$1}')
         gup_put_microsecs=\$(echo \$gup_fast_benchmark | awk -F ":" '{print \$5}' | awk '{print \$1}')
         if [[ \$gup_get_microsecs -gt \$gup_get_threshold ]]; then
-            echo "FAIL: GUP_FAST_BENCHMARK: Time: get:\$gup_get_microsecs exceeds threshold:\$gup_get_threshold."
+            echo "FAIL: GUP_FAST_BENCHMARK: Time: get:\$gup_get_microsecs exceeds threshold:\$gup_get_threshold us."
             exitcode=1
         else
-            echo "PASS: GUP_FAST_BENCHMARK: Time: get:\$gup_get_microsecs within threshold:\$gup_get_threshold."
+            echo "PASS: GUP_FAST_BENCHMARK: Time: get:\$gup_get_microsecs within threshold:\$gup_get_threshold us."
         fi
         if [[ \$gup_put_microsecs -gt \$gup_put_threshold ]]; then
-            echo "FAIL: GUP_FAST_BENCHMARK: Time: put:\$gup_put_microsecs exceeds threshold:\$gup_put_threshold."
+            echo "FAIL: GUP_FAST_BENCHMARK: Time: put:\$gup_put_microsecs exceeds threshold:\$gup_put_threshold us."
             exitcode=1
         else
-            echo "PASS: GUP_FAST_BENCHMARK: Time: put:\$gup_put_microsecs within threshold:\$gup_put_threshold."
+            echo "PASS: GUP_FAST_BENCHMARK: Time: put:\$gup_put_microsecs within threshold:\$gup_put_threshold us."
         fi
     fi
 }
