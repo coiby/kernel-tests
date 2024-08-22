@@ -1,0 +1,11 @@
+[General]
+name=networking/basic_network_access
+owner=Michael Menasherov <mmenashe@redhat.com>
+description=basic_network_access
+license=GPLv3
+confidential=no
+destructive=no
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib
+max_time=1m
