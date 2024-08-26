@@ -5,23 +5,6 @@
 #
 #  SPDX-License-Identifier: GPL-2.0-or-later
 #
-# This script validates the kernel maximum stack size using tracer.
-#
-# First it checks if the stack tracer is enabled and exits if not.
-#
-# If enabled it checks the current stack_max_size value, and compares it against a predefined threshold.
-#
-# If the stack_max_size exceeds the threshold, a warning is logged, and the
-# function responsible for the maximum stack usage is identified.
-#
-# Inputs:
-#   /sys/kernel/tracing/stack_max_size
-#   /sys/kernel/tracing/stack_trace
-#   /proc/sys/kernel/stack_tracer_enabled
-#
-# Expected resluts:
-#   [   INFO   ] :: stack_max_size (<size> bytes) is within the acceptable range.
-#
 # Signed-off-by: Li Wang <liwang@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
