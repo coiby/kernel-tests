@@ -242,6 +242,7 @@ if [ "$failed_no" -gt 0 ]; then
     rstrnt-report-result testcases FAIL 1
 else
     echo "All testcases passed." | tee -a $OUTPUTFILE
+    SubmitLog logfile.runall
     rstrnt-report-result testcases PASS
 fi
 
