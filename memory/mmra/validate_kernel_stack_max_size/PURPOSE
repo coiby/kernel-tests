@@ -1,15 +1,15 @@
-Test for stack_max_size. And this should be ran at the end of
-a test round but without the machine being rebooted, because
-we want to find offenders in drivers.
+This script validates the kernel maximum stack size using tracer.
+It should be run at the end of a test round but without the machine being rebooted, because
+rebooting turns off the tracer.
 
 The test works as follows:
     Verifies that max kernel stack size is less than 16k
 
-First it checks if the stack tracer is enabled and exits if not.
+First it checks if the stack tracer is enabled and logs a warning then exits if not.
 
 If enabled it checks the current stack_max_size value, and compares it against a predefined threshold.
 
-If the stack_max_size exceeds the threshold, a warning is logged, and the
+If the stack_max_size exceeds the threshold, an error is logged, and the
 function responsible for the maximum stack usage is identified.
 
 See:
@@ -24,8 +24,11 @@ Test Inputs:
     compare $current_value to $THRESHOLD
 
 Expected Results:
+    [   PASS   ] :: File '$TMT_PLAN_DATA/stack_results.log' should not contain 'RESULTS: WARN'
+    [   PASS   ] :: File '$TMT_PLAN_DATA/stack_results.log' should not contain 'RESULTS: FAIL'
+    [   LOG    ] :: Stack trace was enabled and no test failures.
     [   PASS   ] :: File '/proc/sys/kernel/stack_tracer_enabled' should contain '1'
-    [   INFO   ] :: stack_max_size ($current_value bytes) is within the acceptable range.
+    [   PASS   ] :: Check if the current value exceeds the threshold (Assert: "$current_value" should be lesser than "$THRESHOLD")
 
 Results location:
     output.txt
