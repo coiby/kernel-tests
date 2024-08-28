@@ -1,6 +1,6 @@
 summary: Installs required kernel and kpatch RPMs
 contact: Yulia Kopkova <ykopkova@redhat.com>
-test: chmod a+x ./runtest.sh; ./runtest.sh
+test: bash ./runtest.sh
 path: /distribution/kpatchinstall
 framework: shell
 require:
