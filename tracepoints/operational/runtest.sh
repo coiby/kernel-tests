@@ -2,6 +2,7 @@
 
 # Source the common test script helpers
 . ../../cki_lib/libcki.sh || exit 1
+. ../../kernel-include/runtest.sh || exit 1
 
 TEST="tracepoints/operational"
 
@@ -213,5 +214,14 @@ if [ -e /sys/devices/system/cpu/vulnerabilities/spectre_v2 ]; then
     fi
   fi
 fi
+
+KPKGS="devel debuginfo"
+for p in $KPKGS; do
+    _nvr="$(K_GetRunningKernelRpmSubPackageNVR "${p}")"
+    rpm -q "${_nvr}" || {
+        echo "Try to install package ${_nvr}"
+        yum install -y ${_nvr} || echo "Package ${_nvr} is not installed, the case maybe failed!"
+    }
+done
 
 runTest
