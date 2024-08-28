@@ -232,19 +232,19 @@ fi
 
 failed_no=$(cat failed_list | wc -l)
 if [ "$failed_no" -gt 0 ]; then
-    SubmitLog logfile.runall
     echo "Failed testcases:" | tee -a $OUTPUTFILE
     cat failed_list | tee -a $OUTPUTFILE
-    # if there is failure, submit all logs
-    SubmitLog $opt_dir/logfile.conformance-test
-    SubmitLog $opt_dir/logfile.functional-test
-    SubmitLog $opt_dir/logfile.stress-test
     rstrnt-report-result testcases FAIL 1
 else
     echo "All testcases passed." | tee -a $OUTPUTFILE
-    SubmitLog logfile.runall
     rstrnt-report-result testcases PASS
 fi
+
+# submit all logs
+SubmitLog logfile.runall
+SubmitLog $opt_dir/logfile.conformance-test
+SubmitLog $opt_dir/logfile.functional-test
+SubmitLog $opt_dir/logfile.stress-test
 
 # if testcase on excluded list failed, remove it, so we get core
 cp -f grab_corefiles_excluded_bins grab_corefiles_excluded_bins.filtered
