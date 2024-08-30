@@ -38,6 +38,10 @@ require:
   - wget
   - python3
   - ntpsec
+  - type: file
+    pattern:
+     - /cki_lib
+     - /distribution/ltp/include
 adjust:
   - enable: false
     when: arch == x86_64
