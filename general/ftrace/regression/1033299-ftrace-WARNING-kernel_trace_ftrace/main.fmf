@@ -23,7 +23,9 @@ test: ./runtest.sh
 framework: beakerlib
 duration: 5m
 tier: 2
-tag: [tier2]
+tag:
+  - tier2
+  - NoRHIVOS
 extra-summary: /kernel/general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace
 extra-task: /kernel/general/ftrace/regression/1033299-ftrace-WARNING-kernel_trace_ftrace
 id: d9ce8944-7f13-4aa3-b01c-5927052cee32
