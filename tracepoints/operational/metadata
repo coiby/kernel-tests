@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=systemtap
-repoRequires=cki_lib
+repoRequires=cki_lib;kernel-include
 max_time=150m
