@@ -11,7 +11,7 @@ Include kselftests/include/net.sh
 function which(){
     echo "which $1"
     exit_code=${WHICH_EXITCODES[0]}
-    export WHICH_EXITCODES=${WHICH_EXITCODES[@]:1}
+    export WHICH_EXITCODES=${WHICH_EXITCODES[*]:1}
     return "$exit_code"
 }
 
@@ -90,7 +90,8 @@ Describe 'kselftests/include/net install_scapy'
         scapy(){
             echo "scapy $*"
             exit_code=${SCAPY_EXITCODES[0]}
-            export SCAPY_EXITCODES=${SCAPY_EXITCODES[@]:1}
+            # shellcheck disable=SC2178
+            export SCAPY_EXITCODES=${SCAPY_EXITCODES[*]:1}
             return "$exit_code"
         }
 
