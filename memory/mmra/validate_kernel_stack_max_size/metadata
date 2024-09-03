@@ -9,7 +9,7 @@ confidential=no
 Releases=RHEL9
 
 [restraint]
-entry_point=./runtest.sh
+entry_point=bash ./runtest.sh
 max_time=15m
 TestVersion=1.0
 Path=/kernel-tests/memory/mmra/validate_kernel_stack_max_size
