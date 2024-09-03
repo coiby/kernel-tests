@@ -11,7 +11,7 @@ Include kselftests/include/net.sh
 function which(){
     echo "which $1"
     exit_code=${WHICH_EXITCODES[0]}
-    export WHICH_EXITCODES=${WHICH_EXITCODES[@]:1}
+    export WHICH_EXITCODES=${WHICH_EXITCODES[*]:1}
     return "$exit_code"
 }
 
@@ -90,7 +90,8 @@ Describe 'kselftests/include/net install_scapy'
         scapy(){
             echo "scapy $*"
             exit_code=${SCAPY_EXITCODES[0]}
-            export SCAPY_EXITCODES=${SCAPY_EXITCODES[@]:1}
+            # shellcheck disable=SC2178
+            export SCAPY_EXITCODES=${SCAPY_EXITCODES[*]:1}
             return "$exit_code"
         }
 
@@ -211,7 +212,8 @@ Describe 'kselftests/include/net do_tc-testing_config'
         The line 5 should equal "modprobe netdevsim"
         The line 6 should equal "pushd"
         The line 7 should equal "sed -i /TIMEOUT/s/24/180/ tdc_config.py"
-        The line 8 should equal "popd"
+        The line 8 should equal "sed -i s/python3 -s/python3/ *.py plugin-lib/*.py"
+        The line 9 should equal "popd"
         The status should be success
     End
 End
