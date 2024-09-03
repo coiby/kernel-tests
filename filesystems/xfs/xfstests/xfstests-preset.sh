@@ -55,9 +55,8 @@ function preset_testparams()
 	# Pick up vars from the workflow/recipe if they're set
 	test -n "${TEST_PARAM_GITDATE}" && export GITDATE="${TEST_PARAM_GITDATE}"
 	test -n "${TEST_PARAM_GITBRANCH}" && export GITBRANCH="${TEST_PARAM_GITBRANCH}"
-	test -n "${TEST_PARAM_GITREPO}" && GITREPO="${TEST_PARAM_GITREPO}"
-	export GITREPO=https://github.com/jencce/xfstests.git
-	export GITREPO_PLANB=https://gitlab.com/jencce2002/xfstests.git
+	export GITREPO=${TEST_PARAM_GITREPO:-https://github.com/jencce/xfstests.git}
+	export GITREPO_PLANB=${TEST_PARAM_GITREPO_PLANB:-https://gitlab.com/jencce2002/xfstests.git}
 	# From Dec 2020, xfstests upstream needs C99 support to build,
 	# which fails on RHEL7. Due to RHEL7 going stablized, do not run
 	# latest xfstests for it.
@@ -152,6 +151,22 @@ function preset_testparams()
 			;;
 		5.14.0-284*el9*)
 			# 9.2.z
+			export GITBRANCH=20230326
+			;;
+		4.18.0-513*el8*)
+			# 8.9.z
+			export GITBRANCH=20230326
+			;;
+		5.14.0-362*el9*)
+			# 9.3.z
+			export GITBRANCH=20230326
+			;;
+		4.18.0-553*el8*)
+			# 8.10.z
+			export GITBRANCH=20230326
+			;;
+		5.14.0-427*el9*)
+			# 9.4.z
 			export GITBRANCH=20230326
 			;;
 		*)
