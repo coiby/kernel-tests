@@ -231,6 +231,8 @@ EOF
 
     kill_qemu_process
     export LIBGUESTFS_BACKEND=direct
+    export SUPERMIN_KERNEL=/boot/vmlinuz-$(uname -r)
+    export SUPERMIN_MODULES=/lib/modules/$(uname -r)
     guestfish --rw -a "$qcow2_image" -m /dev/sda3 -f guestfish.cmd || {
         rlLogError "Failed to inject the SSH key into the VM image."
         return 1
