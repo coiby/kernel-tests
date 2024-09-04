@@ -17,5 +17,5 @@ require:
   - libguestfs
   - edk2-aarch64
   - screen
-duration: 50m
+duration: 2h
 id: 3271c39f-ec5e-4ec4-8b3d-ef0b8d2d3054

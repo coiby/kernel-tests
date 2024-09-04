@@ -107,7 +107,7 @@ function download_image() {
 
     # Download the qcow2 image
     rlLog "Starting download of the qcow2 image."
-    base_url="http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/${RELEASE:=nightly}/sample-images"
+    base_url="http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/RHIVOS-1/${RELEASE_NAME:=latest-RHIVOS-1}/sample-images"
     if [[ $image_name =~ \* ]]; then
         wget --no-verbose -r -p --level 1 -E -e robots=off --cut-dirs=7 -nH --reject='index.html*' --reject='*.png' --reject='*.gif' \
             -P "$WORKSPACE" -A "${image_name}.xz" -A "${image_name}.xz.sha256" "${base_url}"
