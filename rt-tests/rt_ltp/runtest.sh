@@ -11,6 +11,7 @@
 # Source rt common functions
 . ../include/runtest.sh  || exit 1
 . ../../distribution/ltp/include/ltp-make.sh || exit 1
+. ../../cki_lib/libcki.sh || exit 1
 
 set -x
 
@@ -55,6 +56,7 @@ function runtest()
 
     # Downoad and setup ltp
     download_ltp
+    patch-rtltp
 
     pushd "ltp-full-$ltp_version" || exit 1
     ./configure
