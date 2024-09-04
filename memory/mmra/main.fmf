@@ -1,0 +1,5 @@
+require:
+  - type: file
+    pattern:
+      - /cki_lib
+

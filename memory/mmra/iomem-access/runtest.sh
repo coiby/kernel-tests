@@ -2,11 +2,28 @@
 
 # Source the common test script helpers
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../cki_lib/libcki.sh
+
+export PACKAGE="${PACKAGE:-kernel}"
+export TEST=iomem-access
+
+OUTPUTFILE=""
+
+if cki_is_qm; then
+    TMPDIR=$(mktemp -d /var/tmp/log.XXX)
+    OUTPUTFILE=$TMPDIR/outputfile.log
+fi
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        rlRun "adduser testuser"
+        UserHome=""
+        if cki_is_qm; then
+           rlRun "UserHome=$(mktemp -d /var/home.XXX)" 0 "Creating testuser home dir"
+           rlRun "adduser -d ${UserHome}/testuser -p '' testuser"
+        else
+           rlRun "adduser testuser"
+        fi
         DEVICE=serial
         START_ADDR=$(cat /proc/iomem | grep $DEVICE | head -n1 | cut -d'-' -f1)
         END_ADDR=$(cat /proc/iomem | grep $DEVICE | head -n1 | cut -d'-' -f2 | cut -d':' -f1)
@@ -25,5 +42,5 @@ rlJournalStart
     rlPhaseStartCleanup
         rlRun "userdel -rf testuser"
     rlPhaseEnd
-rlJournalEnd
 rlJournalPrintText
+rlJournalEnd

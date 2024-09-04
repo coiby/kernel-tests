@@ -405,6 +405,14 @@ cki_is_ostree_booted()
     return 1
 }
 
+cki_is_qm()
+{
+   if [ "$(hostnamectl chassis)" == "container" ]; then
+       return 0
+   fi
+   return 1
+}
+
 # need to tell which boards are android boot devices.
 # as the list of abd boards increase so will this function.
 

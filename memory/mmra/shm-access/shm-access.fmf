@@ -36,13 +36,20 @@ description: |
     Results location:
         output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
-test: bash ./runtest.sh
+test: |
+    if [ -n "${FFI_QM_SCENARIO}" ]; then
+        podman exec --env TEST_DIR="$(pwd)" --env BEAKERLIB_DIR="$BEAKERLIB_DIR" \
+          -t qm sh -c 'cd "$TEST_DIR"; bash runtest.sh'
+    else
+        bash ./runtest.sh
+    fi
 framework: beakerlib
-require:
-  - beakerlib
-  - gcc
-  - glibc-devel
-  - make
+adjust:
+  require+:
+    - beakerlib
+    - gcc
+    - glibc-devel
+    - make
 extra-summary: memory/mmra/shm-access
 extra-task: memory/mmra/shm-access
 enabled: true

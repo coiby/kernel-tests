@@ -21,11 +21,18 @@ description: |
   Results location:
     output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
-test: bash ./runtest.sh
+test: |
+    if [ -n "${FFI_QM_SCENARIO}" ]; then
+        podman exec --env TEST_DIR="$(pwd)" --env BEAKERLIB_DIR="$BEAKERLIB_DIR" \
+          -t qm sh -c 'cd "$TEST_DIR"; bash runtest.sh'
+    else
+        bash ./runtest.sh
+    fi
 framework: beakerlib
-require:
-  - gcc
-  - glibc-devel
+adjust:
+ require+:
+   - gcc
+   - glibc-devel
 extra-summary: memory/mmra/iomem-access
 extra-task: memory/mmra/iomem-access
 id: d6723b25-77bf-4112-9188-e03eb7491600
