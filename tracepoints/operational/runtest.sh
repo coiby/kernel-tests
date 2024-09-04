@@ -112,7 +112,7 @@ function testList ()
             if [ ! "$firstp" == "$lastp" ]; then
                 local VAR="${firstp}__to__${lastp}"
             fi
-            local VERBOSETRACELOG=`mktemp -p /mnt/testarea -t $VAR-TraceLog.XXXXXX`
+            local VERBOSETRACELOG=`mktemp -p /mnt/testarea -t $VAR-TraceLog.XXXXXX.log`
 
             # The --suppress-handler-errors helps work around problems with tracepoints reentrancy
             # That's fine, since we don't actually count hits or so.
