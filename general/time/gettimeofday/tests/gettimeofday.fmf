@@ -32,6 +32,10 @@ framework: shell
 duration: 30m
 require:
   - gcc
+  - type: file
+    pattern:
+     - /cki_lib
+     - /kernel-include
 tier: 1
 tag: [tier1]
 extra-summary: /general/time/gettimeofday

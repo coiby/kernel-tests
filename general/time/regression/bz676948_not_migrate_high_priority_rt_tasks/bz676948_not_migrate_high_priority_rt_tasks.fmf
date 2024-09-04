@@ -6,6 +6,9 @@ framework: shell
 require:
   - gcc
   - make
+  - type: file
+    pattern:
+     - /kernel-include
 duration: 2h
 extra-summary: general/time/regression/bz676948_not_migrate_high_priority_rt_tasks
 extra-task: general/time/regression/bz676948_not_migrate_high_priority_rt_tasks
