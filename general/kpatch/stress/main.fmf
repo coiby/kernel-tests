@@ -1,0 +1,13 @@
+summary: Kpatch utility stress test
+description: |
+    Loading/unloading kpatch modules under stress
+contact: Yulia Kopkova <ykopkova@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 360m
+require:
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
+extra-summary: /kernel/general/kpatch/stress
+extra-task: /kernel/general/kpatch/stress

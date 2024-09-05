@@ -1,0 +1,12 @@
+[General]
+name=/kernel/general/kpatch/service
+owner=Yulia Kopkova <ykopkova@redhat.com>
+description=Kpatch utility service tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=5m
+repoRequires=general/kpatch/include
