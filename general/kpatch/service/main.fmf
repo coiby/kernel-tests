@@ -1,0 +1,13 @@
+summary: Kpatch utility service tests
+description: |
+    Kpatch utility service tests
+contact: Yulia Kopkova <ykopkova@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 5m
+require:
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
+extra-summary: /kernel/general/kpatch/service
+extra-task: /kernel/general/kpatch/service

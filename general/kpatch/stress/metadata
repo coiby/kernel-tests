@@ -1,0 +1,12 @@
+[General]
+name=/kernel/general/kpatch/stress
+owner=Yulia Kopkova <ykopkova@redhat.com>
+description=Kpatch utility stress test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=360m
+repoRequires=general/kpatch/include
