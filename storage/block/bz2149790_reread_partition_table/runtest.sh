@@ -59,7 +59,13 @@ function setup_md()
 function run_test()
 {
     setup_md
-    rlRun "sgdisk -n 0:0:+100MiB /dev/md0"
+# gdisk removed from rhel10
+    if rlIsRHEL '>=10' ;then
+        rlRun "parted -s /dev/md0 mklabel gpt mkpart xfs 1M 100M"
+    else
+        rlRun "sgdisk -n 0:0:+100MiB /dev/md0"
+    fi
+
     rlRun "lsblk"
     rlRun "cat /proc/partitions"
     rlRun "mdadm -S /dev/md0"
@@ -70,18 +76,24 @@ function run_test()
     rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
     rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
 
-    rlRun "sgdisk --zap-all /dev/md0"
+    if rlIsRHEL '>=10' ;then
+        rlRun "parted -s /dev/md0 rm 1"
+    else
+        rlRun "sgdisk --zap-all /dev/md0"
+    fi
+
     rlRun "lsblk"
     rlRun "cat /proc/partitions"
     rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
     rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
     rlRun "mdadm -S /dev/md0"
+    sleep 3
     wait
     rlRun 'mdadm --zero-superblock /dev/"$dev0"'
     rlRun 'mdadm --zero-superblock /dev/"$dev1"'
     rlRun "cat /proc/partitions"
     while [ -b /dev/md0 ]; do
-        sleep 1
+        sleep 3
     done
 }
 

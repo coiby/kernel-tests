@@ -75,6 +75,7 @@ function run_test()
     rlRun "lsblk"
 
     rlRun "mdadm --create --level=1 --metadata=1.2 --raid-devices=2 /dev/md0 /dev/mapper/raid1 /dev/mapper/raid2"
+    rlRun "sleep 5"
     rlRun "cat /proc/mdstat"
 # wait md raid sync done
     cmd3=$(cat /proc/mdstat | grep resync)

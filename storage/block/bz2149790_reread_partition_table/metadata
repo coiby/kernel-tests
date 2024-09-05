@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=gdisk;mdadm
+dependencies=parted;gdisk;mdadm
 repoRequires=cki_lib
 max_time=1h
