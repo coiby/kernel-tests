@@ -120,9 +120,12 @@ function ndctl_setup
 	ndctl_srcdir=$(realpath /root/rpmbuild/BUILD/ndctl-*)
 	rlRun "pushd $ndctl_srcdir"
 
-	if rlIsRHEL ">9.1" || rlIsFedora || rlIsCentOS "9"; then
+	if rlIsRHEL 9 || rlIsFedora || rlIsCentOS "9"; then
+		if rlIsRHEL "<9.5"; then
+			rlRun "patch -p1 < $CDIR/ndctl.patch"
+		fi
+		rlRun "sed -i \"/nfit_security/d\"  test/meson.build"
 		lsmod | grep -q e1000e && rlRun "sed -i \"/firmware-update.sh/d\" test/meson.build"
-		rlRun "patch -p1 < $CDIR/ndctl.patch"
 		rlRun "yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
 		rlRun "yum -y install asciidoctor"
 		rlRun "meson setup build"
