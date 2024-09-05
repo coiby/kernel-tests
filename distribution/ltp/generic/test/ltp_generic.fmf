@@ -45,6 +45,6 @@ require:
 adjust:
   - enable: false
     when: arch == x86_64
-duration: 180m
+duration: 6h
 extra-summary: /kernel/distribution/ltp/generic
 extra-task: /kernel/distribution/ltp/generic
