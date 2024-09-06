@@ -2,6 +2,7 @@ summary: Podman system test
 contact: Kernel General Test Team <kernel-general-test-team@redhat.com>
 component:
   - kernel
+  - podman
 test: ./runtest.sh
 require:
   - podman
@@ -18,4 +19,8 @@ framework: beakerlib
 duration: 3h
 extra-summary: container/podman
 extra-task: container/podman
-id: 79c01611-e568-4fd9-aa3a-fd6803599f80
+/root:
+  id: 79c01611-e568-4fd9-aa3a-fd6803599f80
+/rootless:
+  environment:
+    PODMANUSER: podmantest
