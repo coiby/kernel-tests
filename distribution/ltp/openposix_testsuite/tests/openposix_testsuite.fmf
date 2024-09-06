@@ -4,6 +4,7 @@ enabled: true
 id: 1deb2781-456d-459b-a21f-229a3ba367a1
 tag:
   - fmf-export
+  - NoRHIVOS
 contact: Memory Management QE <mm-qe@redhat.com>
 component:
   - kernel

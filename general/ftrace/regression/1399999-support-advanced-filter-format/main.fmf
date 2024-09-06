@@ -5,7 +5,9 @@ contact: Ziqian SUN <zsun@redhat.com>
 test: ./runtest.sh
 framework: beakerlib
 tier: 2
-tag: [tier2]
+tag: 
+  - tier2
+  - NoRHIVOS
 duration: 60m
 extra-summary: /kernel/general/ftrace/regression/1399999-support-advanced-filter-format
 extra-task: /kernel/general/ftrace/regression/1399999-support-advanced-filter-format
