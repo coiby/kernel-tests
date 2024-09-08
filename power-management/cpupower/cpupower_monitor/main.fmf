@@ -7,6 +7,9 @@ component:
   - kernel
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - type: file
+    pattern: /power-management/include_parser
 recommend:
   - kernel
   - kernel-tools
