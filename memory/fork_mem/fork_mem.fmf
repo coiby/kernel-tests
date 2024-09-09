@@ -6,5 +6,8 @@ contact: Rachel Sibley <rasibley@redhat.com>
 require:
   - git
   - python3-pip
+  - type: file
+    pattern: /cki_lib
+duration: 30m
 extra-summary: /kernel/memory/fork_mem
 extra-task: /kernel/memory/fork_mem
