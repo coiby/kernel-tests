@@ -40,7 +40,7 @@ rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         DMESG_TEMP_FILE="/tmp/dmesg_temp.txt"
-        dmesg > "$DMESG_TEMP_FILE"
+        journalctl > "$DMESG_TEMP_FILE"
     rlPhaseEnd
 
     rlPhaseStartTest "Check CONFIG_DEBUG_WX status and dmseg log based on kernel type"
