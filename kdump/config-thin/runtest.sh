@@ -77,6 +77,7 @@ EOF
     cat <<EOF > "${thinpool_cmd}"
 set -x
 umount ${dev_name}
+mkfs.xfs -f ${dev_name}
 vgcreate vg00 -f ${dev_name}
 lvcreate -L ${thin_size0} -T vg00/thinpool
 lvcreate -V ${THIN_SIZE} -T vg00/thinpool -n crashvol
