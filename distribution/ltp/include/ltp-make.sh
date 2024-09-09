@@ -284,11 +284,7 @@ patch-lite()
 patch-rtltp()
 {
     echo "============ Patch rt_ltp ============" | tee -a $OUTPUTFILE
-    cki_is_kernel_automotive
-    #Patching, if kernel-automotive
-    if [ $? -eq 0 ]; then
-      patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/RHIVOS_Increase_THRESHOLD_based_on_hardware.patch
-    fi
+    patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/RHIVOS_Increase_THRESHOLD_based_on_hardware.patch
 }
 
 patch-cgroups()
