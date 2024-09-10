@@ -79,7 +79,7 @@ function RunKasanTest {
         rlRun "dmesg -ct > dmesg.log"
         rlFileSubmit dmesg.log
         rlAssertGrep "init kasan test" dmesg.log
-        rlAssertGrep "BUG: KASAN: use-after-free in string" dmesg.log
+        rlAssertGrep "BUG: KASAN: slab-use-after-free in string" dmesg.log
         rlAssertGrep 'Read of size \w+ at addr \w+ by task insmod' dmesg.log -E
         rlAssertGrep "Memory state around the buggy address:" dmesg.log
     rlPhaseEnd
