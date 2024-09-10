@@ -91,7 +91,6 @@ function cki_abort_task()
     [[ -z $reason ]] && reason="unknown reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     cki_log "Aborting current task: $reason"
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit $CKI_STATUS_ABORTED
 }
 
