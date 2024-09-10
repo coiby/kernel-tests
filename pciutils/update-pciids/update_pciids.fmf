@@ -2,11 +2,13 @@ summary: Checks if update-pciids runs successfully
 description: |
     Run pciids update, and check new pciids updated successfully.
 contact: William Gomeringer <willg@redhat.com>
-id: TC#57097 
+id: TC#57097
 test: bash ./runtest.sh
 framework: beakerlib
 require:
   - pciutils
+  - type: file
+    pattern: /cki_lib
 recommend:
   - python2-lxml
   - python3-lxml

@@ -18,9 +18,8 @@ recommend:
 require:
   - alsa-utils
   - pciutils
-  - type: library
-    url: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests.git
-    name: /audio/functional
+  - type: file
+    pattern: /audio/functional
 duration: 30m
 extra-summary: /kernel/audio_tests/functional/mixer_control_range_sanity_test
 extra-task: /kernel/audio_tests/functional/mixer_control_range_sanity_test
