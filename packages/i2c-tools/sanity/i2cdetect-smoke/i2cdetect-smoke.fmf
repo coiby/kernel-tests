@@ -10,5 +10,7 @@ test: ./runtest.sh
 framework: beakerlib
 require:
   - i2c-tools
+  - type: file
+    pattern: /cki_lib
 extra-summary: packages/i2c-tools/sanity/i2cdetect-smoke
 extra-task: packages/i2c-tools/sanity/i2cdetect-smoke
