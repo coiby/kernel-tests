@@ -1,2 +1,3 @@
+amd-pstate-ut.ko
 iommu_v2.ko
 nvme-common.ko

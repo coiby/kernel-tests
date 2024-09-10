@@ -711,6 +711,9 @@ rlJournalStart
                 sed -i "/8250_rt288x.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
                 sed -i "/serial_core.ko/d" ${OS}/${Release}/${Release}-knownRemoved-builtin-${ARCH}.lst
             fi
+            if cki_kver_lt "5.14.0-497.el9"; then
+                sed -i "/amd-pstate-ut.ko/d" ${OS}/${Release}/${Release}-knownRemoved-x86_64.lst
+            fi
         fi
     rlPhaseEnd
 
