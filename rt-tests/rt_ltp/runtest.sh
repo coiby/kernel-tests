@@ -50,7 +50,6 @@ function runtest()
         echo "dependent package install failed" | tee -a "$OUTPUTFILE"
         rstrnt-report-result $TEST WARN 1
         rlLog "Aborting test because dependent package install failed"
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
         exit 1
     }
 
