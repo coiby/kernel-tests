@@ -89,6 +89,7 @@ function run_radixtree()
 
 	case $t_name in
 	"xarray" | "idr-test" | "main")
+		#shellcheck disable=SC2211 # we want command name via glob
 		linux-*/tools/testing/radix-tree/${t_name} 2>&1 | tee ${t_name}.log
 		return ${PIPESTATUS[0]}
 		;;
