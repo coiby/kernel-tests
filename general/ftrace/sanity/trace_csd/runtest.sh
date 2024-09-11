@@ -13,7 +13,8 @@ rlJournalStart
     rlPhaseEnd
     else
     rlPhaseStartTest "No CSD tracepoint on current system"
-        rlRun "SKIP: CSD tracepoints backport since RHEL9.5"
+        rlLog "SKIP: CSD tracepoints backport since RHEL9.5"
+        rstrnt-report-result "trace_csd" "SKIP"
     rlPhaseEnd
     fi
 rlJournalEnd
