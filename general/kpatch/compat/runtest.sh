@@ -109,7 +109,7 @@ function setup_perf() {
 }
 
 function setup_kprobe() {
-    rlRun "echo \"p ${TARGET_FUNCTION}\" > ${kprobe_trace}"
+    rlRun "echo \"p ${KPATCH_MODULE//-/_}:${TARGET_FUNCTION}\" > ${kprobe_trace}"
 }
 
 function setup_stap() {
@@ -169,7 +169,7 @@ rlJournalStart
         rlRun "echo 1 > ${kprobe_enable}" 0
         rlRun "cat ${TARGET_FILE} | grep ${GREP_STR}"
         # this should fail as only one of kpatch and kprobe can pin the smae func.
-        rlRun "cat ${trace_res} | grep p_${TARGET_FUNCTION%%_*}_" 0
+        rlRun "cat ${trace_res} | grep ${TARGET_FUNCTION}" 0
         # shellcheck disable=SC2188
         > ${trace_res}
     rlPhaseEnd

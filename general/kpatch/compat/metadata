@@ -9,4 +9,5 @@ destructive=no
 [restraint]
 entry_point=./runtest.sh
 max_time=30m
-dependencies=kernel;kpatch;redhat-lsb;systemtap
+dependencies=kpatch;systemtap
+softDependencies=redhat-lsb
