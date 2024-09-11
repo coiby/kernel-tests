@@ -55,7 +55,7 @@ function ltp_test_build()
 	if [ $? -ne 0 ]; then
 		echo "FAIL: couldn't copy configs/${RHELKT1LITE_CONFIG}"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	fi
 
 	echo "LTP ($TESTVERSION) has been built and installed at ${LTPDIR}/runltp"

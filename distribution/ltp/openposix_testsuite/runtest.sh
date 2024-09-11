@@ -88,9 +88,8 @@ if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
         journalctl > "${JOURNALCTLLOG}"
         SubmitLog "${JOURNALCTLLOG}"
     fi
-    rstrnt-report-result Abnormal-Reboot  WARN/ABORTED
-    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-    exit
+    rstrnt-report-result Abnormal-Reboot  WARN
+    exit 1
 fi
 
 if type -p journalctl > /dev/null; then
@@ -105,9 +104,8 @@ fi
 # report patch errors from ltp/include
 grep -i -e "FAIL" -e "ERROR" patchinc.log > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-    rstrnt-report-result "ltp-include-patch-errors" WARN/ABORTED
-    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-    exit
+    rstrnt-report-result "ltp-include-patch-errors" WARN
+    exit 1
 fi
 
 # Sometimes it takes too long to waiting for syscalls finish and I want
@@ -190,9 +188,8 @@ fi
 if [ $? -ne 0 ]; then
     bzip2 buildlog.txt
     SubmitLog buildlog.txt.bz2
-    rstrnt-report-result build WARN/ABORTED
-    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-    exit
+    rstrnt-report-result build WARN
+    exit 1
 else
     rstrnt-report-result build PASS
 fi
