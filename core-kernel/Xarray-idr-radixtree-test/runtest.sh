@@ -45,7 +45,7 @@ function install_dependency()
 	if [ $RC -eq 1 ]; then
 		rlLog "Failed to install dependecy packages"
 		rstrnt-report-result "${TEST}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	fi
 
 }
@@ -89,6 +89,7 @@ function run_radixtree()
 
 	case $t_name in
 	"xarray" | "idr-test" | "main")
+		#shellcheck disable=SC2211 # we want command name via glob
 		linux-*/tools/testing/radix-tree/${t_name} 2>&1 | tee ${t_name}.log
 		return ${PIPESTATUS[0]}
 		;;
