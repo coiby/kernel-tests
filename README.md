@@ -84,16 +84,14 @@ $ make deprecated_uname
 
 ## Test onboarding
 
-Currently, all onboarded tests must use the following combinations of
-result/status fields:
+All onboarded tests must use result codes consistent with KCIDB:
 
-* SKIP/COMPLETED if the test requirements aren't fulfilled (eg. test is running
+* SKIP if the test requirements aren't fulfilled (eg. test is running
 on incompatible architecture/hardware)
-* PASS/COMPLETED if the test finished successfully
-* WARN/ABORTED in case of infrastructure issues or other errors (eg. the test
+* PASS if the test finished successfully
+* WARN in case of infrastructure issues or other errors (eg. the test
 checks out a git repo and the git server is unavailable)
-* WARN/COMPLETED or FAIL/COMPLETED in case of any test failures, based on how
-serious they are (left to decide by test authors)
+* FAIL in case of any test failures
 
 See examples below to properly abort or skip in beaker:
 ### Abort task if infrastructure failure is task only related
@@ -101,7 +99,7 @@ See examples below to properly abort or skip in beaker:
 if [ $? -ne 0 ]; then
     echo "Aborting test because $reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+    exit 1
 fi
 ~~~
 
@@ -126,7 +124,7 @@ fi
 When onboarding a test, please check especially the point about infrastructure
 issues: a lot of tests simply report a warning if eg. external server can’t be
 reached and then continue. This kind of situation falls under infrastructure
-issues and the test must use the WARN/ABORTED combination, otherwise the
+issues and the test must be reported as WARN, otherwise the
 infrastructure problem is reported to people as a bug in their code!
 
 The order of Beaker tasks in the XML determines if the task is a preparation for

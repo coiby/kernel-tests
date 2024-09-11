@@ -113,7 +113,6 @@ function run_tests()
                 echo "FAIL: test failed with timeout. Likely infra issue."
                 rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" WARN
                 cleanup
-                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 1
             else
                 rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" FAIL
@@ -131,7 +130,6 @@ rpm -q podman-tests
 if [ $? -ne 0 ]; then
     echo "FAIL: podman-tests is not installed. Aborting test..."
     rstrnt-report-result "${TEST}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 1
 fi
 
