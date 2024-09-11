@@ -45,7 +45,7 @@ function install_dependency()
 	if [ $RC -eq 1 ]; then
 		rlLog "Failed to install dependecy packages"
 		rstrnt-report-result "${TEST}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	fi
 
 }
