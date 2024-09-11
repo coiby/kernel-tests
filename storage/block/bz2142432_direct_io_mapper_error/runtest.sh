@@ -82,6 +82,7 @@ function run_test()
     while [ -n "$cmd3" ];do
         sleep 60
         cmd3=$(cat /proc/mdstat | grep resync)
+        rlRun "cat /proc/mdstat"
     done
     rlRun "cat /proc/mdstat"
     rlRun "pvcreate /dev/md0"
