@@ -286,7 +286,9 @@ else
         systemctl enable kdump.service > /dev/null 2>&1
         Log "Update nfs mount in /etc/fstab"
         echo "$NFSSERVER:$VMCOREPATH $MNT_POINT nfs defaults 0 0" >> /etc/fstab
-        mount $NFSSERVER:$VMCOREPATH $MNT_POINT
+        mount $NFSSERVER:$VMCOREPATH $MNT_POINT || {
+            Error "Failed to mount the nfs server, please contact the maintainer of the vmcore server."
+        }
         mkdir -p $CRASH_PATH
         cki_upload_log_file /etc/fstab
 
@@ -317,7 +319,7 @@ else
         rstrnt-report-result "$RSTRNT_TASKNAME" "PASS" "0"
     else
         Error "Kdump servie is not operational"
-        Error "Fail"
+        Error "Fail to setup nfs kdump."
         rstrnt-report-result "$RSTRNT_TASKNAME" "FAIL" "1"
     fi
 fi
