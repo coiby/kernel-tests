@@ -25,4 +25,4 @@ require:
   - type: file
     pattern:
       - /kernel-include
-duration: 10m
+duration: 50m
