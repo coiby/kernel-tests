@@ -506,7 +506,9 @@ function runtest
                 # Run tests
                 for test in "${ALL_TESTS[@]}"; do
                     rlPhaseStartTest "${mach}-${repo}-${accel}-${test}"
-                    rlRun "yes | $BINDIR/$test > $LOGDIR/${j}_${mach}_${repo}_${accel}_$test.log 2>&1" 0,2,77
+                    test_log_file="${j}_${mach}_${repo}_${accel}_$test.log"
+                    rlRun "yes | $BINDIR/$test > $LOGDIR/${test_log_file} 2>&1" 0,2,77
+                    rlFileSubmit "$LOGDIR/${test_log_file}" $test_log_file;
                     rlPhaseEnd
                 done
                 j=$((j+1))
@@ -518,10 +520,6 @@ function runtest
     done
 
     rlPhaseStartTest completed
-    cd $LOGDIR || return
-    logs=$(ls ./*.log)
-    for log in $logs; do rlFileSubmit "$log" $(basename "$log"); done
-
     rlRun "popd"
     rlPhaseEnd
 }
