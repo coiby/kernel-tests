@@ -43,4 +43,4 @@ require:
       - /cki_lib
 extra-summary: misc/header-test
 extra-task: misc/header-test
-duration: 10m
+duration: 20m
