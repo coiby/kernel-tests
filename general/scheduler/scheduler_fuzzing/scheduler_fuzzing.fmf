@@ -28,6 +28,7 @@ description: |
       [   PASS   ] :: sched_get_priority_max executed.
       [   PASS   ] :: sched_get_priority_min executed.
       [   PASS   ] :: sched_rr_get_interval executed.
+      [   PASS   ] :: sched_yield executed. 
       [   PASS   ] :: membarrier executed.
   Results location:
       output.txt
@@ -69,6 +70,7 @@ environment:
       "sched_get_priority_max",
       "sched_get_priority_min",
       "sched_rr_get_interval",
+      "sched_yield",
       "membarrier"
     supportcalls: ''
     git_patches: '../../../../general/scheduler/scheduler_fuzzing/sched_ra.patch'
