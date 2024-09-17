@@ -39,7 +39,7 @@ component:
   - kernel
 test: bash ./drop_caches.sh
 framework: shell
-duration: 10m
+duration: 30m
 require:
  -  type: file
     pattern:
