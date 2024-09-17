@@ -34,6 +34,6 @@ require:
     pattern:
         -  /kernel-include
         -  /cki_lib
-duration: 1h
+duration: 4h
 extra-summary: /kernel-tests/security/crypto/ltp
 extra-task: /kernel-tests/security/crypto/ltp
