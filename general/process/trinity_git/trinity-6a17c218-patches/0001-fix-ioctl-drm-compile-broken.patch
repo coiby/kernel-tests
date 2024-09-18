@@ -1,0 +1,97 @@
+diff --git a/configure b/configure
+index 93e094e4..9dd6083a 100755
+--- a/configure
++++ b/configure
+@@ -312,6 +312,60 @@ else
+ 	echo "#define USE_MEMFD_CREATE 1" >> $CONFIGH
+ fi
+ 
++#############################################################################################
++# Does header define struct drm_nouveau_notifierobj_alloc
++#
++echo -n "[*] Checking if struct drm_nouveau_notifierobj_alloc is defined"
++rm -f "$TMP" || exit 1
++
++cat >"$TMP.c" << EOF
++#define _GNU_SOURCE
++#include <drm/nouveau_drm.h>
++#include <stdio.h>
++
++void main()
++{
++	struct drm_nouveau_notifierobj_alloc dnna = {0,0,0,0};
++	dnna.size = 64;
++	printf("size=%d\n", dnna.size);
++}
++EOF
++
++${CC} ${CFLAGS} "$TMP.c" -o "$TMP" &>"$TMP.log"
++if [ ! -x "$TMP" ]; then
++	echo $RED "[NO]" $COL_RESET
++else
++	echo $GREEN "[YES]" $COL_RESET
++	echo "#define USE_DEFAULT_STRUCT_DRM_NOUVEAU_NOTIFIEROBJ_ALLOC 1" >> $CONFIGH
++fi
++
++#############################################################################################
++# Does header define struct drm_nouveau_notifierobj_alloc
++#
++echo -n "[*] Checking if struct drm_nouveau_gpuobj_free is defined"
++rm -f "$TMP" || exit 1
++
++cat >"$TMP.c" << EOF
++#define _GNU_SOURCE
++#include <drm/nouveau_drm.h>
++#include <stdio.h>
++
++void main()
++{
++	struct drm_nouveau_gpuobj_free dngf = {0,0};
++	dngf.channel = 64;
++	printf("channel=%d\n", dngf.channel);
++}
++EOF
++
++${CC} ${CFLAGS} "$TMP.c" -o "$TMP" &>"$TMP.log"
++if [ ! -x "$TMP" ]; then
++	echo $RED "[NO]" $COL_RESET
++else
++	echo $GREEN "[YES]" $COL_RESET
++	echo "#define USE_DEFAULT_STRUCT_DRM_NOUVEAU_GPUOBJ_FREE 1" >> $CONFIGH
++fi
++
+ #############################################################################################
+ 
+ check_header linux/caif/caif_socket.h USE_CAIF
+diff --git a/ioctls/drm.c b/ioctls/drm.c
+index d938f707..236f0732 100644
+--- a/ioctls/drm.c
++++ b/ioctls/drm.c
+@@ -129,21 +129,25 @@ struct drm_nouveau_grobj_alloc {
+ #define DRM_IOCTL_NOUVEAU_GROBJ_ALLOC        DRM_IOW (DRM_COMMAND_BASE + DRM_NOUVEAU_GROBJ_ALLOC, struct drm_nouveau_grobj_alloc)
+ #endif
+ 
+-#ifndef DRM_IOCTL_NOUVEAU_NOTIFIEROBJ_ALLOC
++#ifndef USE_DEFAULT_STRUCT_DRM_NOUVEAU_NOTIFIEROBJ_ALLOC
+ struct drm_nouveau_notifierobj_alloc {
+ 	uint32_t channel;
+ 	uint32_t handle;
+ 	uint32_t size;
+ 	uint32_t offset;
+ };
++#endif
++#ifndef DRM_IOCTL_NOUVEAU_NOTIFIEROBJ_ALLOC
+ #define DRM_IOCTL_NOUVEAU_NOTIFIEROBJ_ALLOC  DRM_IOWR(DRM_COMMAND_BASE + DRM_NOUVEAU_NOTIFIEROBJ_ALLOC, struct drm_nouveau_notifierobj_alloc)
+ #endif
+ 
+-#ifndef DRM_IOCTL_NOUVEAU_GPUOBJ_FREE
++#ifndef USE_DEFAULT_STRUCT_DRM_NOUVEAU_GPUOBJ_FREE
+ struct drm_nouveau_gpuobj_free {
+ 	int      channel;
+ 	uint32_t handle;
+ };
++#endif
++#ifndef DRM_IOCTL_NOUVEAU_GPUOBJ_FREE
+ #define DRM_IOCTL_NOUVEAU_GPUOBJ_FREE        DRM_IOW (DRM_COMMAND_BASE + DRM_NOUVEAU_GPUOBJ_FREE, struct drm_nouveau_gpuobj_free)
+ #endif
+ 
