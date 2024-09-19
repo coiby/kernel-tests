@@ -37,6 +37,12 @@ rlJournalStart
                 exit 0 ;;
         esac
 
+        if rlIsRHEL ">=10"; then
+            echo "[SKIP] RHEL10 is not supported at the moment, details in jira RHEL-48593"
+            rstrnt-report-result $RSTRNT_TASKNAME SKIP
+            exit 0 ;;
+        fi
+
         karch=$(uname -m)
         kver=$(uname -r | cut -f1 -d'-')
         krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.$karch$//" -e "s/\.$karch+debug$//" -e "s/\.$karch.debug$//" -e "s/\.$karch+rt$//" -e "s/\.$karch.rt$//")
