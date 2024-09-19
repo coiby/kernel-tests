@@ -40,6 +40,9 @@ rlJournalStart
       else
         rlLog "Error setting custom SELinux RHIVOS mask"
       fi
+    fi
+    if [ -f /etc/build-info ]; then
+      # /etc/build-info automotive builds only
       # RHEL-56385
       echo "(allow qm_t self (capability (ipc_lock)))" > rhel56385.cil
       modules_to_load+=" rhel56385.cil"
