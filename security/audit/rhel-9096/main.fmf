@@ -1,0 +1,12 @@
+summary: Security Audit verifier for rhel-9096
+description: 'Test for audit deamon starting process on limited audit backlog(rhel-9096) (Test should run with limited resource: <cpu><cores op="=" value="1"/></cpu><memory op="&lt;=" value="4096"/>)'
+contact: Dennis Li <denli@redhat.com>
+component:
+  - kernel
+path: /security/audit
+test: bash +x runtest.sh
+framework: beakerlib
+require: [audit]
+duration: 10m
+extra-summary: /kernel-tests/security/audit/rhel-9096
+extra-task: /kernel-tests/security/audit/rhel-9096
