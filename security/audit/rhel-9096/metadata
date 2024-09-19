@@ -1,0 +1,13 @@
+[General]
+name=security/audit/rhel-9096
+owner=Dennis Li <denli@redhat.com>
+description= Test for audit deamon starting process on limited audit backlog(rhel-9096) (Test should run with limited resource: <cpu><cores op="=" value="1"/></cpu><memory op="&lt;=" value="4096"/>)
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=10m
+use_pty=false
+dependencies=audit
