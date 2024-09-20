@@ -201,9 +201,9 @@ cmp_max_rhel7=$(kvercmp `uname -r` '3.10.0-9999.el7')
 cmp_min_rhel8=$(kvercmp `uname -r` '4.18.0-147.3.el8')
 
 if [ "$cmp_min_rhel7" -ge "0" ] && [ "$cmp_max_rhel7" -lt "0" ]; then
-	build_selftests || { test_fail "build selftests failed" && exit 1; }
+	build_selftests || { test_fail "build selftests failed" && exit 0; }
 elif [ "$cmp_min_rhel8" -ge "0" ]; then
-	install_selftests_internal || { test_fail "install selftests failed" && exit 1; }
+	install_selftests_internal || { test_fail "install selftests failed" && exit 0; }
 else
 	rstrnt-report-result "LIVEPATCH_SELFTESTS_UNSUPPORTED" "SKIP" 0
 	exit 0
