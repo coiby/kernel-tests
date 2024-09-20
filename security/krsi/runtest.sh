@@ -40,7 +40,7 @@ rlJournalStart
         if rlIsRHEL ">=10"; then
             echo "[SKIP] RHEL10 is not supported at the moment, details in jira RHEL-48593"
             rstrnt-report-result $RSTRNT_TASKNAME SKIP
-            exit 0 ;;
+            exit 0
         fi
 
         karch=$(uname -m)
