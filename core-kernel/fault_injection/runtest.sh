@@ -26,7 +26,7 @@
 
 # shellcheck disable=SC2206
 fail_list=( ${fail_list:-failslab} )
-OPTIONS=${OPTIONS:-"-p 100 -t 100 --interval=10 --verbose=2"}
+OPTIONS=${OPTIONS:-"-p 100 -t 100 --interval=1 --verbose=2"}
 GCMD=${GCMD:-""}
 
 # shellcheck disable=SC2206
