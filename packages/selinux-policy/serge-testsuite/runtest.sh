@@ -43,7 +43,6 @@ fi
 function __prepare_failed()
 {
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 1
 }
 
@@ -65,5 +64,5 @@ if [ $? -eq 127 ]; then
     # Aborting task due to infrastructure failure.
     echo "Test finished with infrastructure error."
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+    exit 1
 fi

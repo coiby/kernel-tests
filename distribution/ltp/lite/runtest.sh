@@ -343,8 +343,8 @@ fi
 # report patch errors from ltp/include
 grep -i -e "FAIL" -e "ERROR" patchinc.log > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-	rstrnt-report-result "ltp-include-patch-errors" WARN/ABORTED
-	rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+	rstrnt-report-result "ltp-include-patch-errors" WARN
+	exit 1
 fi
 
 # Sometimes it takes too long to waiting for syscalls

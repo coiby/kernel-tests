@@ -21,7 +21,6 @@ if [[ -e "${CURRENT_TASK_PATH}" ]]; then
     if [[ -n "${CURRENT_RECIPE_ID}" ]] && [[ "${CURRENT_RECIPE_ID}" != "${RSTRNT_RECIPEID}" ]]; then
         rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL
         echo "Aborting task $RSTRNT_TASKID from recipe ${RSTRNT_RECIPEID} as system expects to run tests for recipe ${CURRENT_RECIPE_ID}"
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
         exit 1
     fi
 fi
