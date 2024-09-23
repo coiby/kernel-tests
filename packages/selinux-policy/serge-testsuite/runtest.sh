@@ -55,6 +55,7 @@ cd "test-repo"
 git checkout "$git_branch"
 git rev-parse --verify "$git_branch"
 
+# shellcheck disable=SC2064
 trap "cd /; rm -rf '${test_repo_path}'" EXIT ERR
 
 cd "$git_path"
