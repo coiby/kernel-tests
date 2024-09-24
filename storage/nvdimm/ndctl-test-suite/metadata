@@ -10,5 +10,5 @@ destructive=no
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib
 dependencies=openssl
-softDependencies=rpm-build;asciidoc;audit-libs-devel;binutils-devel;bison;dwarves;elfutils-devel;java-devel;kabi-dw;libbabeltrace-devel;libbpf-devel;libcap-devel;libcap-ng-devel;llvm-toolset;ncurses-devel;net-tools;newt-devel;nss-tools;numactl-devel;openssl-devel;pciutils-devel;perl-devel;perl-generators;pesign;python3-devel;python3-docutils;rsync;xz-devel;bc;flex;git;xmlto;perl-ExtUtils-Embed;autoconf;kmod-devel;systemd-devel;libuuid-devel;json-c-devel;bash-completion;keyutils-libs-devel;xmlto;trace-cmd;jq;automake;libtool;vim;ndctl;meson;iniparser-devel;rubygem-asciidoctor
+softDependencies=rpm-build;asciidoc;audit-libs-devel;binutils-devel;bison;dwarves;elfutils-devel;java-devel;kabi-dw;libbabeltrace-devel;libbpf-devel;libcap-devel;libcap-ng-devel;llvm-toolset;ncurses-devel;net-tools;newt-devel;nss-tools;numactl-devel;openssl-devel;pciutils-devel;perl-devel;perl-generators;pesign;python3-devel;python3-docutils;rsync;xz-devel;bc;flex;git;xmlto;perl-ExtUtils-Embed;autoconf;kmod-devel;systemd-devel;libuuid-devel;json-c-devel;bash-completion;keyutils-libs-devel;xmlto;trace-cmd;jq;automake;libtool;vim;ndctl;meson;iniparser-devel;rubygem-asciidoctor;cmake;libtraceevent-devel;libtracefs-devel
 max_time=1h
