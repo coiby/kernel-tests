@@ -22,8 +22,8 @@ description: |
         output.txt | taskout.log, log is dependent upon the test executor.
 contact: Chunyu Hu <chuhu@redhat.com>
 test: bash runtest.sh
-framework: shell
-duration: 15m
+framework: beakerlib
+duration: 45m
 require:
   - beakerlib
   - gcc
@@ -33,7 +33,6 @@ require:
   - type: file
     pattern:
         - /general/include
-        - /automotive/include
         - /kernel-include
 recommend:
   - git
