@@ -30,13 +30,16 @@ TEST="/kernel-tests/general/scheduler/softlockup"
 
 # Include rhts environment
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
-. ../../../automotive/include/rhivos.sh
-declare -F kernel_automotive
+. ../../../kernel-include/runtest.sh || exit 1
 
-# for ostree support
-if stat /run/ostree-booted > /dev/null 2>&1; then
+devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
+pkg_mgr=$(K_GetPkgMgr)
+rlLog "pkg_mgr = ${pkg_mgr}"
+if [[ $pkg_mgr == "rpm-ostree" ]]; then
+	export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
 	CONFIG=/usr/lib/ostree-boot/config-$(uname -r)
 else
+	export pkg_mgr_inst_string="-y install"
 	CONFIG=/boot/config-$(uname -r)
 fi
 
@@ -72,15 +75,10 @@ rlJournalStart
 	fi
 
 	rlPhaseStartSetup
-		if ! kernel_automotive; then
-			kname="$(rpm -qf --qf "%{name}\n" /boot/vmlinuz-$(uname -r) | sed 's/-core//g')"
-			kversion="$(rpm -qf --qf "%{version}\n" /boot/vmlinuz-$(uname -r))"
-			krelease="$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))"
-			rpm -q "${kname}-devel-${kversion}-${krelease}" || rlRpmInstall "${kname}-devel" "$kversion" "$krelease" "$(uname -m)"
-			rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
-		else
-			install_kernel_automotive_devel || { rstrnt-report-result "${kname}-devel" FAIL; exit 1; }
-		fi
+		rlShowRunningKernel
+		# shellcheck disable=SC2086
+		rpm -q "${devel_pkg}" || ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
+		rpm -q "${devel_pkg}" || rlDie "no ${K_NAME/-core}-devel package available"
 	rlPhaseEnd
 
 	rlPhaseStartTest "softlockup detector enabled"
@@ -116,4 +114,3 @@ rlJournalStart
 	rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
-

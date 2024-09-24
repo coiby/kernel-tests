@@ -27,14 +27,18 @@ component:
   - kernel
 path: /general/scheduler/softlockup
 test: bash ./runtest.sh
-framework: shell
+framework: beakerlib
 require:
   - gcc
   - libgcc
   - elfutils-libelf-devel
   - openssl-devel
   - beakerlib
+  - type: file
+    pattern:
+        - /kernel-include
+        - /general/include
 id: 9ae40ac6-abf2-4aad-8a81-39ad1e99c7a7
-duration: 15m
+duration: 45m
 extra-summary: /general/scheduler/softlockup
 extra-task: /general/scheduler/softlockup
