@@ -36,9 +36,9 @@ function kver_gt() { ! kver_le "$1"; }
 function abort() {
     local msg="$1"
 
-    if command -v rstrnt-abort &>/dev/null; then
+    if command -v rstrnt-report-result &>/dev/null; then
         rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+        exit 1
     fi
     rlDie "$msg"
 }

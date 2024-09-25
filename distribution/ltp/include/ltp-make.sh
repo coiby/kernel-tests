@@ -86,14 +86,14 @@ clone_ltp()
     if [ $? -ne 0 ]; then
         echo "Aborting current task: Couldn't clone LTP" | tee -a $OUTPUTFILE
         rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        exit 1
     fi
     if [[ -n ${LTP_COMMIT_ID} && ${LTP_COMMIT_ID} != "latest" ]]; then
         git -C ${TARGET} checkout ${LTP_COMMIT_ID}
         if [ $? -ne 0 ]; then
             echo "Aborting current task: Couldn't checkout ${LTP_COMMIT_ID}" | tee -a $OUTPUTFILE
             rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-            rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+            exit 1
         fi
     fi
     if [[ -z ${LTP_COMMIT_ID} || ${LTP_COMMIT_ID} == "latest" ]]; then
@@ -424,7 +424,7 @@ build-all()
             cat config-maker.txt
             echo "Aborting current task: Couldn't generate test config." | tee -a $OUTPUTFILE
             rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-            rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+            exit 1
         fi
         popd
         echo "RHELKT1LITE.next is generated"
@@ -441,15 +441,13 @@ build-all()
     if [ ${build_res} -eq 124 ]; then
         echo "Cleaning up ${TARGET_DIR}"
         rm -rf ${TARGET_DIR}
-        rstrnt-report-result "build-all build timeout" WARN/ABORTED
-        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        rstrnt-report-result "build-all build timeout" WARN
         exit 1
     fi
     if [ ${build_res} -ne 0 ]; then
         res="FAILED"
         SubmitLog ./buildlog.txt
-        rstrnt-report-result "build-all build failed" WARN/ABORTED
-        rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+        rstrnt-report-result "build-all build failed" WARN
         exit 1
     fi
     echo "============ ${MAKE} -C ${TARGET} all: ${res}  ============" | tee -a $OUTPUTFILE
@@ -464,11 +462,9 @@ build-all()
         echo "${TESTVERSION}" > ${TARGET_DIR}/ltp_version
     else
         if [[ -n $RSTRNT_TASKID ]]; then
-            rstrnt-report-result "build-all failed" WARN/ABORTED
-            rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-        else
-            exit 1
+            rstrnt-report-result "build-all failed" WARN
         fi
+        exit 1
     fi
 }
 

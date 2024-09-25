@@ -115,7 +115,6 @@ Describe 'cki-restraint: plugins concurrent task'
         The first line should equal "rstrnt_info *** Running Plugin: cki/restraint/plugins/task_run.d/26_cki_environment"
         The line 2 should equal "rstrnt-report-result concurrent-test-task FAIL"
         The line 3 should equal "Aborting task ${RSTRNT_TASKID} from recipe ${RSTRNT_RECIPEID} as system expects to run tests for recipe 54321"
-        The line 4 should equal "rstrnt-abort --server http://beaker.test.com:8000/recipes/${RSTRNT_RECIPEID}/tasks/${RSTRNT_TASKID}/status"
         The status should be failure
     End
 End

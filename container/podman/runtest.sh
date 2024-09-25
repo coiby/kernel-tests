@@ -31,7 +31,6 @@ function _install_bats ()
     if [ $? -ne 0 ]; then
         echo "FAIL Couldn't install BATS. Aborting test..."
         rstrnt-report-result "${TEST}" WARN
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
         exit 1
     fi
 }

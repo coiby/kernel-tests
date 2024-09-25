@@ -43,7 +43,6 @@ fi
 function __prepare_failed()
 {
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 1
 }
 
@@ -56,6 +55,7 @@ cd "test-repo"
 git checkout "$git_branch"
 git rev-parse --verify "$git_branch"
 
+# shellcheck disable=SC2064
 trap "cd /; rm -rf '${test_repo_path}'" EXIT ERR
 
 cd "$git_path"
@@ -65,5 +65,5 @@ if [ $? -eq 127 ]; then
     # Aborting task due to infrastructure failure.
     echo "Test finished with infrastructure error."
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+    exit 1
 fi

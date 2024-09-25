@@ -63,7 +63,7 @@ function get_lookaside()
 	if [ $? -ne 0  ]; then
 		rlLog "Aborting test because failed to download the trinit package from lookaside, please check network issue."
 		rstrnt-report-result "${TEST}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 1
 	fi
 	tar -zxvf "$trinity_pkg"
 }
