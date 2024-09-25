@@ -33,14 +33,20 @@ function check_status()
         if grep "Result: FAIL" "$log_file"; then
             result_r="FAIL"
             echo ":: $* :: FAIL ::" | tee -a "$OUTPUTFILE"
-            rstrnt-report-log -l "$log_file"
+            if [[ -s "$log_file" ]]; then
+                rstrnt-report-result "${casename}" "FAIL" 1
+            else
+                rstrnt-report-result -o "$log_file" "${casename}" "FAIL" 1
+            fi
         else
             echo ":: $* :: PASS ::" | tee -a "$OUTPUTFILE"
+            rstrnt-report-result "${casename}" "PASS" 0
         fi
         popd || exit 1 # "logs/"
     else
         result_r="FAIL"
         echo ":: $* :: FAIL ::" | tee -a "$OUTPUTFILE"
+        rstrnt-report-result "${casename}" "FAIL" 1
     fi
 }
 
@@ -75,11 +81,9 @@ function runtest()
     popd || exit # "ltp-full-$ltp_version"
 
     if [ $result_r = "PASS" ]; then
-        echo "overall result: PASS" | tee -a "$OUTPUTFILE"
-        rstrnt-report-result $TEST "PASS" 0
+        echo "overall result: PASS"
     else
-        echo "overall result: FAIL" | tee -a "$OUTPUTFILE"
-        rstrnt-report-result $TEST "FAIL" 1
+        echo "overall result: FAIL"
     fi
 }
 
