@@ -11,4 +11,4 @@ entry_point=./runtest.sh
 max_time=15m
 dependencies=gcc;libgcc;elfutils-libelf-devel;openssl-devel
 softDependencies=git;glibc;bison;flex
-repoRequires=general/include;automotive/include
+repoRequires=general/include;kernel-include
