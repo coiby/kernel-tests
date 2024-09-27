@@ -181,6 +181,8 @@ function setup
         OSVERSION="RHEL8"
     elif grep -q "Red Hat Enterprise Linux release 9." /etc/redhat-release; then
         OSVERSION="RHEL9"
+    elif grep -q "Red Hat Enterprise Linux release 10." /etc/redhat-release; then
+        OSVERSION="RHEL10"
     elif [ -n "$CKI_SELFTESTS_URL" ] || ! K_IsKernelRPM; then
         OSVERSION="UPSTREAM"
     else
@@ -317,7 +319,12 @@ function setup
         [[ $hwpf == "x86_64" ]] && ARCH="x86_64"
         [[ $hwpf == "aarch64" ]] && ARCH="arm64"
         [[ $hwpf == "s390x" ]] && ARCH="s390"
-        rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm"
+        #workaround for RHEL10 issue https://issues.redhat.com/browse/RHEL-58930
+        if [[ $OSVERSION == "RHEL10" ]]; then
+            rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm EXTRA_CFLAGS='-march=x86-64-v2'"
+        else
+            rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm"
+        fi
         rlRun "mv ${BINDIR}/x86_64/* ${BINDIR} ; rm -rf ${BINDIR}/x86_64"
         rlRun "mv ${BINDIR}/s390x/* ${BINDIR} ; rm -rf ${BINDIR}/s390x"
         rlRun "mv ${BINDIR}/aarch64/* ${BINDIR} ; rm -rf ${BINDIR}/aarch64"
