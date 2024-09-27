@@ -9,7 +9,6 @@ component:
 test: bash ./runtest.sh
 tag:
   - KernelTier1
-  - NoRHIVOS
 framework: shell
 require:
   - procmail
