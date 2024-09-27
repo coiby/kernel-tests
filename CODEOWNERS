@@ -166,6 +166,7 @@
 /storage/block/zstd_smoke/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/dm/common/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/dm/dmtest-python/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/storage/dm/dmtest-vdo/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/hba/san-device-stress/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/hw_raid/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/iscsi/params/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @bmarcynk @caringi @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -296,6 +297,7 @@
 /storage/block/zstd_smoke/ @bgoncalv @czhong2 @lulinqing
 /storage/dm/common/ @bgoncalv @fsuba @lulinqing
 /storage/dm/dmtest-python/ @bgoncalv @fsuba @lulinqing
+/storage/dm/dmtest-vdo/ @bgoncalv @fsuba @lulinqing
 /storage/hba/san-device-stress/ @bgoncalv @lilinredhat @lulinqing @mpatalan
 /storage/hw_raid/ @bgoncalv @lilinredhat @lulinqing @mpatalan
 /storage/iscsi/params/ @bgoncalv @lulinqing @mhoyer
