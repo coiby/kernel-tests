@@ -431,9 +431,9 @@ build-all()
     fi
     configure
     echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
-    timeout_value=30
+    timeout_value=${LTP_BUILD_TIMEOUT_M:-30}
     if uname -r | grep -q '+debug'; then
-        timeout_value=90
+        timeout_value=${LTP_BUILD_TIMEOUT_M:-90}
     fi
     res="PASSED"
     timeout "${timeout_value}m" ${MAKE} -C ${TARGET} all &> buildlog.txt
