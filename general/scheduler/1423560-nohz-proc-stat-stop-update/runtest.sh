@@ -41,9 +41,25 @@ isolated_cpus="1-$max"
 export RUN_TIME=${RUN_TIME:-1200}
 trace=0
 
-Cleanup() {
-	killall stress
-	killall watch.sh
+function cleanup()
+{
+	rlRun "sed -i '/^isolated_cores=/d' $cfg_file" 0-255
+	rlRun "sed -i 's/^isolate_managed_irq=.*$/# &/' $cfg_file"
+
+	test -f $save_cfg_file && ln=$(cat $save_cfg_file)
+	echo "restoring default isolated_cores parameters"
+	[ -n "$ln" ] && sed -i ''$ln's/^#//' $cfg_file
+
+	active=$(cat reboot_1423560)
+	if [ "$active" = "" ]; then
+		rlRun "tuned-adm off"
+	else
+		rlRun "tuned-adm profile $active" 0-255
+	fi
+
+	nohz_cleanup_commandline
+	nohz_check_commandline
+	test -f $save_cfg_file && rm -f $save_cfg_file
 }
 
 #cfg_file=/etc/tuned/realtime-variables.conf
@@ -154,9 +170,13 @@ rlJournalStart
 		rlPhaseEnd
 
 		rlPhaseStartTest
-			for p in $(pgrep rcu); do
-				taskset -pc 0-1 $p
-			done
+			rlRun "grep nohz_full /proc/cmdline"
+			if [ $? -ne 0 ]; then
+				report_result "nohz_full_setup" FAIL
+				cleanup
+				rlRun "touch reboot_1423560_2"
+				rhts-reboot
+			fi
 			rlRun "taskset -pc 0-1 $$"
 			# It now needs 2 on each cpu.
 			for processor in $(seq 2 $max); do
@@ -167,7 +187,6 @@ rlJournalStart
 				rlLogInfo "taskset -c $processor chrt -r 1 stress -c 1"
 				taskset -c $processor chrt -r 1 stress -c 1 &
 			done
-			rlRun "grep nohz_full /proc/cmdline"
 			rlLogInfo "taskset -c 0-1 sh watch.sh"
 			taskset -c 0-1 sh watch.sh | tee -a $OUTPUTFILE
 			for log in $(seq 2 $max); do
@@ -177,26 +196,11 @@ rlJournalStart
 		rlPhaseEnd
 
 		rlPhaseStartCleanup
-			if uname -r | grep x86_64; then
-				rlRun "sed -i '/^isolated_cores=/d' $cfg_file" 0-255
-				rlRun "sed -i 's/^isolate_managed_irq=.*$/# &/' $cfg_file"
-
-				test -f $save_cfg_file && ln=$(cat $save_cfg_file)
-				echo "restoring default isolated_cores parameters"
-				[ -n "$ln" ] && sed -i ''$ln's/^#//' $cfg_file
-
-				active=$(cat reboot_1423560)
-				if [ "$active" = "" ]; then
-					rlRun "tuned-adm off"
-				else
-					rlRun "tuned-adm profile $active" 0-255
-				fi
+			if uname -r | grep -Eq "x86_64|aarch64"; then
+				cleanup
 			fi
 
-			nohz_cleanup_commandline
-			nohz_check_commandline
 			rlRun "touch reboot_1423560_2"
-			test -f $save_cfg_file && rm -f $save_cfg_file
 			rhts-reboot
 		rlPhaseEnd
 	fi
