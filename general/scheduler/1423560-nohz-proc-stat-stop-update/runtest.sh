@@ -54,7 +54,7 @@ function cleanup()
 	if [ "$active" = "" ]; then
 		rlRun "tuned-adm off"
 	else
-		rlRun "tuned-adm profile $active" 0-255
+		rlRun "tuned-adm profile $active" 0
 	fi
 
 	nohz_cleanup_commandline
@@ -113,21 +113,17 @@ rlJournalStart
 				rlRun "touch reboot_1423560"
 				grubby --info DEFAULT
 				rhts-reboot
-				return
 			fi
 
-			if systemctl status tuned | grep running -w; then
-				active=$(tuned-adm active | awk '{print $NF}')
-				echo "$active" | grep 'No current active profile' && active=""
-				echo $active > reboot_1423560
-			else
-				rpm -q tuned || rlRun "yum -y install tuned"
+			if ! rpm -q tuned; then
+				rlRun "yum install -y tuned"
+			elif ! systemctl status tuned | grep running -w; then
 				rlRun "systemctl start tuned"
-				active=$(tuned-adm active | awk '{print $NF}')
-				echo "$active" | grep 'No current active profile' && active=""
-				echo $active > reboot_1423560
+			else
+				cat /etc/tuned/active_profile > reboot_1423560
 			fi
 
+			echo "original active tuned provile: $(cat reboot_1423560)"
 			echo "enable tuned service"
 			systemctl enable tuned
 
