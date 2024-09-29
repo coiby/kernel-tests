@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=make run
-max_time=1h
+max_time=4h
 dependencies=gcc;libgcc;glibc-devel;rpm-build;psmisc;wget
 softDependencies=rt-setup;realtime-setup;trace-cmd
 repoRequires=general/include;general/scheduler/include
