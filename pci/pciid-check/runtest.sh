@@ -76,7 +76,6 @@ ret=$?
 if (( ret != 0 )); then
     rlLog "Aborting test. Failed to fetch pci-ids. This is an issue with update-pciids"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 1
 fi
 
