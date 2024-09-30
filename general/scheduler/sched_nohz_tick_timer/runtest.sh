@@ -271,13 +271,17 @@ rlJournalStart
 			which stress-ng &>/dev/null && echo "$(which stress-ng) already installed, skip build" || rlRun "sh stress.sh"
 			popd
 
+			export tick_symb="tick_sched_handle"
+			# the symbol tick_sched_handle is optimized (inclined) during compilation time and not available in tracers
+			rlIsRHEL ">=10" && export tick_symb="tick_nohz_handler"
+
 			rlRun "echo nop > $tracing_dir/current_tracer"
 			rlRun "echo 2 > $tracing_dir/tracing_cpumask"
 			rlRun "echo 1 > $tracing_dir/events/sched/sched_switch/enable"
 			rlRun "echo 1 > $tracing_dir/events/workqueue/enable"
 			rlRun "echo 1 > $tracing_dir/events/timer/timer_expire_entry/enable"
 			rlRun "echo $mask > $tracing_dir/tracing_cpumask"
-			rlRun "echo tick_sched_handle >> $tracing_dir/set_ftrace_filter"
+			rlRun "echo $tick_symb >> $tracing_dir/set_ftrace_filter"
 			rlRun "echo function > $tracing_dir/current_tracer"
 		rlPhaseEnd
 

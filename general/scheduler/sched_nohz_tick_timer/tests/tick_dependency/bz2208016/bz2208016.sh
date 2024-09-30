@@ -2,7 +2,6 @@
 
 function bz2208016()
 {
-
 	cat > hogger.sh << "EOF"
 while :; do
 	:
@@ -18,7 +17,8 @@ EOF
 	rlRun "echo $mask > $tracing_dir/tracing_cpumask"
 	#[root@sweetpig-12 ~]# cat /sys/kernel/debug/tracing/set_ftrace_filter
 	#tick_sched_handle.isra.27
-	rlRun "echo tick_sched_handle* >> $tracing_dir/set_ftrace_filter"
+	# shellcheck disable=SC2154
+	rlRun "echo $tick_symb* >> $tracing_dir/set_ftrace_filter"
 	rlRun "echo function > $tracing_dir/current_tracer"
 
 	# clean the buffer
@@ -37,7 +37,8 @@ EOF
 	local i
 	local pass=0
 	for i in $(seq 1 10); do
-		rlRun "grep tick_sched_handle $tracing_dir/trace &>/dev/null" 0-255 && pass=1
+		# shellcheck disable=SC2154
+		rlRun "grep $tick_symb $tracing_dir/trace &>/dev/null" 0-255 && pass=1
 		sleep 2
 	done
 	head -n 20 $tracing_dir/trace

@@ -19,9 +19,9 @@ function bz1978711()
 
 	echo > /sys/kernel/debug/tracing/trace
 
-
 	rlRun -l "cat /sys/kernel/debug/tracing/{set_event,tracing_on,current_tracer,set_ftrace_filter,tracing_cpumask}"
-	rlRun "grep tick_sched_handle /sys/kernel/debug/tracing/trace" 1-255
+	# shellcheck disable=SC2154
+	rlRun "grep $tick_symb /sys/kernel/debug/tracing/trace" 1-255
 
 	while ps -C cyclictest; do
 		pkill cyclictest
