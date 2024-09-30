@@ -71,7 +71,7 @@ efi_restore()
 	if [ $? -ne 0 ]; then
 		echo -e "\nRESTORE Failed! Please investigate to avoid an incorrect boot order" | tee -a ${OUTPUTFILE} ${kmsg}
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	fi
 	rm $FILE
 	sync;sync
@@ -83,7 +83,7 @@ efi_set()
 	if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
 		echo "Invalid command: $1" | tee -a ${OUTPUTFILE} ${kmsg}
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	fi
 
 	[ "$1" = "save" ] && efi_save || efi_restore
@@ -117,7 +117,7 @@ chk_support() {
 	if [ ! -x watchdog-simple ] ; then
 		echo "Failed to build tests, exiting!" | tee -a ${OUTPUTFILE} ${kmsg}
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		exit 1
 	else
 		echo "Compiled successfully." | tee -a ${OUTPUTFILE} ${kmsg}
 	fi

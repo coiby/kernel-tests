@@ -19,7 +19,6 @@ function setup()
     if [ $? -ne 0 ]; then
         echo "fail to nake the file. Aborting test..."
         rstrnt-report-result "${TEST}" WARN
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
         exit 1
     fi
 }

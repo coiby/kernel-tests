@@ -45,7 +45,7 @@ if [ ${VERSION%%.*} -gt 7 ]; then
     elif ! rpm -ql kernel-rpm-macros; then
         rlLog "ERROR: dependency not met, missing kernel-rpm-macros."
         rstrnt-report-result "$RSTRNT_TASKNAME" WARN
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+        exit 1
     fi
 fi
 
@@ -53,6 +53,7 @@ rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
+        # shellcheck disable=SC2154 # variable is assigned
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
