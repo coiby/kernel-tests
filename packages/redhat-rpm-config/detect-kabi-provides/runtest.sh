@@ -53,6 +53,7 @@ rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
+        # shellcheck disable=SC2154 # variable is assigned
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
