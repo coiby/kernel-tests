@@ -8,7 +8,7 @@ echo "- run command:"
 echo "- eval ${TESTARGS:-${CMDS_TO_RUN}}"
 
 eval ${TESTARGS:-${CMDS_TO_RUN}}
-code=${$?}
+code="$?"
 if [ ${code} -ne 0 ]; then
     echo "- fail: unexpected error code ${code}."
     result="FAIL"
