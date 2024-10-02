@@ -51,12 +51,11 @@ TestsDir=""
 TmpDir=""
 
 # make sure the arguments all lower
-FSTYPES=$(echo ${FSTYPES}|tr [:upper:] [:lower:])
-FSOPTS=$(echo ${FSOPTS}|tr [:upper:] [:lower:])
+FSTYPES=$(echo ${FSTYPES}|tr '[:upper:]' '[:lower:]')
+FSOPTS=$(echo ${FSOPTS}|tr '[:upper:]' '[:lower:]')
 
 RHEL_DISTRO=$(rlGetDistroRelease)
 RHEL_DISTRO=${RHEL_DISTRO:0:1}
-LOCAL_ARCH=`uname -m`
 
 
 check_supported_fs() {
