@@ -36,7 +36,7 @@ rlJournalStart
     if [ $? -ne 0 ]; then
       rlLog "Unable to install avocado framework, aborting test"
       rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-      rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+      exit 0
     fi
   rlPhaseEnd
 
@@ -46,7 +46,7 @@ rlJournalStart
     if [ $? -ne 0 ]; then
       rlLog "Unable to clone avocado-framework-tests, aborting test"
       rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-      rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+      exit 0
     fi
   rlPhaseEnd
 

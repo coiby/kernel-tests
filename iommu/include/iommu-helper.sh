@@ -1553,7 +1553,7 @@ fail_abort ()
 	cleanup_state
 	echo "${1} FAIL/ABORT reason: ${2}"
 	rstrnt-report-result "${1}" FAIL
-	rstrnt-abort --server "${RSTRNT_RECIPE_URL}/tasks/${RSTRNT_TASKID}/status"
+	exit 0
 }
 
 warn_abort_recipe ()

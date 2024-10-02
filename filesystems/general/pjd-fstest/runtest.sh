@@ -68,7 +68,6 @@ check_supported_fs() {
 		rlReport "Can't support $FSTYPE filesystem test" WARN
 		rstrnt-report-result $TEST WARN
 		# Abort the task
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 		exit 0
 		;;
 	esac
@@ -85,7 +84,6 @@ build_pjd_fstest()
 		echo "WARN : Failed cloning pjd-fstest" | tee -a $OUTPUTFILE
 		rstrnt-report-result $TEST WARN
 		# Abort the task
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 		exit 0
 	fi
 	rlRun "pushd pjd-fstest"
@@ -94,7 +92,6 @@ build_pjd_fstest()
 		echo "WARN : Failed compiling pjd-fstest" | tee -a $OUTPUTFILE
 		rstrnt-report-result $TEST WARN
 		# Abort the task
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 		exit 0
 	fi
 	rlRun "popd"

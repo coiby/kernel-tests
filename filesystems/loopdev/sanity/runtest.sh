@@ -73,7 +73,6 @@ if [ $? -ne 0 ]; then
       echo "Failed installing iozone" | tee -a $OUTPUTFILE
       rstrnt-report-result setup WARN
       # Abort the task
-      rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
       exit 0
 fi
 
@@ -83,7 +82,6 @@ if [ $? -ne 0 ]; then
     echo "Failed creating $storage_path" | tee -a $OUTPUTFILE
     rstrnt-report-result setup WARN
     # Abort the task
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 0
 fi
 

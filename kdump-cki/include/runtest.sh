@@ -479,8 +479,7 @@ PrepareKdump()
             rpm -q ${kdump_package} || {
                 Log "- Aborting test as ${kdump_package} couldn't be installed"
                 rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-                exit 1
+                exit 0
             }
             systemctl enable kdump.service || chkconfig kdump on
 
