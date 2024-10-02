@@ -99,7 +99,7 @@ See examples below to properly abort or skip in beaker:
 if [ $? -ne 0 ]; then
     echo "Aborting test because $reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    exit 1
+    exit 0
 fi
 ~~~
 
