@@ -3,7 +3,6 @@
 # Source the common test script helpers
 . ../../../cki_lib/libcki.sh || exit 1
 
-TEST="filesystems/loopdev/sanity"
 LOOKASIDE="http://www.iozone.org/src/current"
 TARGET="iozone3_490"
 
@@ -77,7 +76,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Test is starting." | tee -a $OUTPUTFILE
-fallocate -l512M $storage_path 2>&1 >> $OUTPUTFILE
+fallocate -l512M $storage_path >> $OUTPUTFILE 2>&1
 if [ $? -ne 0 ]; then
     echo "Failed creating $storage_path" | tee -a $OUTPUTFILE
     rstrnt-report-result setup WARN
@@ -104,7 +103,7 @@ for fs in $filesystems; do
     fi
 done
 
-rm -f $storage_path 2>&1 >> $OUTPUTFILE
+rm -f $storage_path >> $OUTPUTFILE 2>&1
 
 echo "Test finished" | tee -a $OUTPUTFILE
 rstrnt-report-result finished PASS 0
