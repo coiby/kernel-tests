@@ -24,6 +24,6 @@ rlJournalStart
     rlPhaseStartCleanup
         rlRun "echo 0 > /sys/kernel/debug/tracing/events/uprobes/true_entry/enable"
         rlRun "echo '' > /sys/kernel/debug/tracing/uprobe_events"
-        umount overlay/merge
+        rlRun "umount merge"
     rlPhaseEnd
 rlJournalEnd
