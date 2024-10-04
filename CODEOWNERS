@@ -216,8 +216,8 @@
 /iommu/boot/ @bgoncalv @lulinqing @wrgrh
 /iommu/io/fio/ @bgoncalv @jsnitsel @lulinqing
 /iommu/new-boot/ @bgoncalv @jsnitsel @lulinqing
-/ipmi/stress/driver/ @bgoncalv @ftjahjad @lulinqing
-/ipmi/stress/ipmitool-loop/ @bgoncalv @ftjahjad @lulinqing
+/ipmi/stress/driver/ @bgoncalv @ltrivell @lulinqing
+/ipmi/stress/ipmitool-loop/ @bgoncalv @ltrivell @lulinqing
 /jvm/dacapobench/ @bgoncalv @lulinqing @tstuefe1
 /jvm/jcstress/ @bgoncalv @lulinqing @tstuefe1
 /kdump-cki/crash-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
