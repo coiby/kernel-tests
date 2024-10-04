@@ -91,7 +91,9 @@ function cki_abort_task()
     [[ -z $reason ]] && reason="unknown reason"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     cki_log "Aborting current task: $reason"
-    exit $CKI_STATUS_ABORTED
+    # exit 0 as we want to abort with error and not have restraint to add
+    # an exit_code subtest with result FAIL
+    exit 0
 }
 
 function cki_beakerlib_skip_task()
