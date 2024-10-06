@@ -442,12 +442,16 @@ check_amd_dma_faults ()
 check_dmar_faults ()
 {
 	declare -i faults=0
+	declare -i pte_set=0
 	# 1 - pcibdf
 	# 2 - pci seg, if exists (currently intel doesn't display the segment here, but this should future proof)
 	# 3 - fault address
 	# 4 - fault reason code
 	# 5 - fault reason string
 	repat="DMAR.*\] Request device \[(([0-9a-f]{4}:){0,1}[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]{1})\] fault addr (0x[0-9a-f]{4,16}) \[fault reason (0x[0-9a-f]{2})\] (.*)"
+
+	# Trying to set PTE that is currently set
+	repat_PTE_set="DMAR: ERROR: DMA PTE for vPFN 0x[0-9a-f]{5,13} already set"
 
 	mapfile DMESG < <(dmesg)
 	for l in "${DMESG[@]}";
@@ -474,13 +478,20 @@ check_dmar_faults ()
 				echo "${1} Unknown Fault Code!"
 			fi
 			dump_iommu_group_info "${1}" "${sbdf}"
+		elif [[ ${l} =~ ${repat_PTE_set} ]]; then
+			echo "${l}"
+			pte_set+=1
 		fi
 	done
 
-	if test "${faults}" -eq 0; then
+	if test "${faults}" -eq 0 -a "${pte_set}" -eq 0; then
 		test_continue "${1}" "PASS" "no iommu transaction faults found"
 	else
-		test_continue "${1}" "FAIL" "iommu transaction faults found"
+		if test "${pte_set}" -ne 0; then
+			test_continue "${1}" "FAIL" "attempted to set PTE that was already set"
+		else
+			test_continue "${1}" "FAIL" "iommu transaction faults found"
+		fi
 	fi
 }
 
