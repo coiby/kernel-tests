@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib;rt-tests/include;distribution/ltp/include
-max_time=3h
+max_time=4h
 use_pty=false
