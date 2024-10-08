@@ -173,7 +173,6 @@ check bash lines ending with white spaces:
     - !reference [.rules, production-branch]
 
 check tmt lint:
-  allow_failure: true
   extends: .cki_tools
   before_script:
     - tmt --version
