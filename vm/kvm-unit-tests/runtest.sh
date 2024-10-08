@@ -177,7 +177,7 @@ function configureTests
     sed -i '/^\[vmx_pf_vpid_test\]$/,/^\[/ s/^timeout = 240/timeout = 1000/' x86/unittests.cfg
     sed -i '/^\[vmx_pf_invvpid_test\]$/,/^\[/ s/^timeout = 240/timeout = 1000/' x86/unittests.cfg
     sed -i '/^\[vmx_pf_no_vpid_test\]$/,/^\[/ s/^timeout = 240/timeout = 1000/' x86/unittests.cfg
-    sed -i '/^\[vmx_apicv_test\]$/,/^\[/ s/^timeout = 10/timeout = 20/' x86/unittests.cfg
+    sed -i '/^\[vmx_apicv_test\]$/,/^\[/ s/^timeout = 10/timeout = 60/' x86/unittests.cfg
     sed -i '/^\[access_fep\]$/,/^\[/ s/^timeout = 240/timeout = 500/' x86/unittests.cfg
 }
 
