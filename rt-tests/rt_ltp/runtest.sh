@@ -7,9 +7,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+# shellcheck disable=SC1091
 # Source rt common functions
-. ../include/runtest.sh  || exit 1
+. ../include/runtest.sh || exit 1
 . ../../distribution/ltp/include/ltp-make.sh || exit 1
 . ../../cki_lib/libcki.sh || exit 1
 
@@ -24,12 +24,12 @@ TEST_TYPE=${TEST_TYPE:-"func"}
 ltp_version=${ltp_version:-$TESTVERSION}
 result_r="PASS"
 
-function check_status()
-{
+function check_status() {
     if [ $? -eq 0 ]; then
         pushd "logs/" || exit 1
         casename=$(echo "$1" | awk -F'func/' '{print $2}')
         log_file=$(readlink -f $(find ./ -name "*$casename*"))
+
         if grep "Result: FAIL" "$log_file"; then
             result_r="FAIL"
             echo ":: $* :: FAIL ::" | tee -a "$OUTPUTFILE"
@@ -42,6 +42,7 @@ function check_status()
             echo ":: $* :: PASS ::" | tee -a "$OUTPUTFILE"
             rstrnt-report-result "${casename}" "PASS" 0
         fi
+
         popd || exit 1 # "logs/"
     else
         result_r="FAIL"
@@ -50,8 +51,7 @@ function check_status()
     fi
 }
 
-function runtest()
-{
+function runtest() {
     $PKGMGR wget gcc make automake || {
         echo "dependent package install failed" | tee -a "$OUTPUTFILE"
         rstrnt-report-result $TEST WARN 1
@@ -75,7 +75,8 @@ function runtest()
         echo "running $case"
         ./run.sh -t "$case"
         check_status "./run.sh -t $case"
-    done <<< "$func_list"
+    done <<<"$func_list"
+
     # shellcheck disable=SC2164
     popd || exit # "testcases/realtime"
     popd || exit # "ltp-full-$ltp_version"
