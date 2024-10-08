@@ -90,7 +90,7 @@ function check_status() {
         fi
 
         # Upload the log file
-        rhts-submit-log -l "$log_file"
+        rstrnt-report-log -l "$log_file"
     done
 
     if [[ "$casestat" = "PASS" ]]; then
