@@ -1,2 +1,7 @@
 Check /proc/stat to see if it still keep updating when nohz_full
 is setup.
+
+the time cost on checking the cpu stat is scaled by  processor
+number, extend the max_runtime when running large-cpu machine.
+it's rather slow on kernel-rt-debug, a 64 processor will cost 15s
+each loop.
