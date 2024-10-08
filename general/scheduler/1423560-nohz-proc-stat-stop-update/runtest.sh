@@ -115,19 +115,22 @@ rlJournalStart
 				rhts-reboot
 			fi
 
-			if ! rpm -q tuned; then
-				rlRun "yum install -y tuned"
-			elif ! systemctl status tuned | grep running -w; then
-				rlRun "systemctl start tuned"
-			else
-				cat /etc/tuned/active_profile > reboot_1423560
-			fi
+			# this file won't exist when tuned is not installed, the
+			# reboot file will be empty; when tuned has already been
+			# started, throughput-performance will be the default
+			# profile, and be present in active_profile; otherwise
+			# the reboot file will contain whatever profile the user
+			# has set.
+			cat /etc/tuned/active_profile > reboot_1423560
+			rlLog "original active tuned provile: $(cat reboot_1423560)"
 
-			echo "original active tuned provile: $(cat reboot_1423560)"
-			echo "enable tuned service"
-			systemctl enable tuned
+			rlRun "yum install -y tuned"
+			rlRun "systemctl start tuned"
 
-			echo "start tuned service"
+			rlLog "enable tuned service"
+			rlRun "systemctl enable tuned"
+
+			rlLog "start tuned service"
 			rlRun "systemctl start tuned"
 
 			rlRun "systemctl status tuned" -l 0-255
@@ -158,10 +161,10 @@ rlJournalStart
 			mount | grep debug || mount -t debugfs dd /sys/kernel/debug
 			rlRun "source_compile"
 			if ((trace)); then
-			        rlRun "echo nop > $tracing_dir/current_tracer"
-			        rlRun "echo 1 > $tracing_dir/events/sched/sched_switch/enable"
-			        rlRun "echo 1 > $tracing_dir/events/workqueue/enable"
-			        rlRun "echo 1 > $tracing_dir/events/timer/timer_expire_entry/enable"
+				rlRun "echo nop > $tracing_dir/current_tracer"
+				rlRun "echo 1 > $tracing_dir/events/sched/sched_switch/enable"
+				rlRun "echo 1 > $tracing_dir/events/workqueue/enable"
+				rlRun "echo 1 > $tracing_dir/events/timer/timer_expire_entry/enable"
 			fi
 		rlPhaseEnd
 
