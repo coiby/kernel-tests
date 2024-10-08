@@ -69,14 +69,23 @@ function check_status() {
     fi
 
     # Collect all the related log files
-    local log_files=$(find ./logs/ -name "*$casename*" -exec readlink -f {} \;)
+    local keywords=$casename
+    [[ $casename = pi-tests ]] && keywords="testpi sbrk_mutex"
+    [[ $casename = measurement ]] && keywords="rdtsc-latency preempt_timing"
+    [[ $casename = thread_clock ]] && keywords=tc-2
+    [[ $casename = latency ]] && keywords=pthread_cond_many
+
+    local log_files=""
+    for k in $keywords; do
+        log_files+=$(find ./logs/ -name "*${k}*" -exec readlink -f {} \;)" "
+    done
 
     if [[ -z "$log_files" ]]; then
-        echo "No log files containing '$casename' were found in $PWD/logs."
+        echo "No log files containing '$keywords' were found in $PWD/logs."
         rstrnt-report-result "${casename}" "WARN" 2
         return 2
     else
-        echo "Found the log file(s) containing '$casename':"
+        echo "Found $(echo "$log_files" | wc -w) log file(s) containing '$keywords':"
         for log_file in $log_files; do echo ">> $log_file"; done
     fi
 
