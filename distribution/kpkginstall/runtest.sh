@@ -392,8 +392,14 @@ function download_install_package()
 
     # download
     downloaded=0
+    # Temporary workaround for RHEL-61745 - blocks download on ostree imgs
+    DOWNLOAD_COMMAND="install -y --downloadonly --allowerasing --destdir /root/"
+    if cki_is_ostree_booted; then
+      DOWNLOAD_COMMAND="download --resolve --destdir /root/"
+    fi
     for i in $(seq 1 30); do
-      if $YUM install -y --downloadonly --allowerasing --destdir /root/ "$1" >> ${RPM_INSTALL_LOG}; then
+      # shellcheck disable=SC2086
+      if $YUM $DOWNLOAD_COMMAND "$1" >> ${RPM_INSTALL_LOG}; then
         cki_print_success "Downloaded $1 successfully"
         downloaded=1
         break
