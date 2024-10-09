@@ -31,6 +31,8 @@ rlJournalStart
         rlIsRHEL "<9" && { yum install -y perl-tests; }
         [ "$(uname -m)" = "x86_64" ] && { yum install -y glibc.i686 glibc-devel.i686 libgcc.i686; }
         rlIsRHEL ">9" && { yum install -y kernel-modules-extra; }
+        rlRun "perl -MCPAN -e 'install Socket::Netlink' > perlCPAN.log 2>&1"
+        rlFileSubmit perlCPAN.log
         rlRun "git clone $GIT_URL"
         rlRun "pushd audit-testsuite"
         rlRun "git checkout $GIT_REF"
@@ -49,6 +51,7 @@ rlJournalStart
         rlRun "make clean"
         rlRun "popd"
         rlRun "rm -rf audit-testsuite"
+        rlRun "rm -f perlCPAN.log"
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
