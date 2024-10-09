@@ -80,12 +80,13 @@ function check_status() {
         log_files+=$(find ./logs/ -name "*${k}*" -exec readlink -f {} \;)" "
     done
 
-    if [[ -z "$log_files" ]]; then
+    local count=$(echo "$log_files" | wc -w)
+    if [[ $count -eq 0 ]]; then
         echo "No log files containing '$keywords' were found in $PWD/logs."
         rstrnt-report-result "${casename}" "WARN" 2
         return 2
     else
-        echo "Found $(echo "$log_files" | wc -w) log file(s) containing '$keywords':"
+        echo "Found $count log file(s) containing '$keywords':"
         for log_file in $log_files; do echo ">> $log_file"; done
     fi
 
