@@ -5,7 +5,7 @@
 #include <sys/time.h>
 
 
-#define USECREQ 1
+#define MSECREQ 1000
 
 void event_handler (int signum)
 {
@@ -22,9 +22,9 @@ int main (int argc, char **argv)
     sigaction (SIGALRM, &sa, NULL);
 
     timer.it_value.tv_sec = 0;
-    timer.it_value.tv_usec = USECREQ;
+    timer.it_value.tv_usec = MSECREQ;
     timer.it_interval.tv_sec = 0;
-    timer.it_interval.tv_usec = USECREQ;
+    timer.it_interval.tv_usec = MSECREQ;
 
     setitimer (ITIMER_REAL, &timer, NULL);
 
