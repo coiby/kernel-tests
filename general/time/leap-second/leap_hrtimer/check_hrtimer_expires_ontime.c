@@ -15,10 +15,10 @@
 #define NSEC_PER_SEC 1000000000ULL
 #define COUNT 1000
 
-int *p; 
+int *p;
 
 struct timespec timespec_add(struct timespec ts, unsigned long long ns)
-{      
+{
         ts.tv_nsec += ns;
         while(ts.tv_nsec >= NSEC_PER_SEC) {
                 ts.tv_nsec -= NSEC_PER_SEC;
@@ -30,19 +30,19 @@ struct timespec timespec_add(struct timespec ts, unsigned long long ns)
 
 /* returns 1 if a <= b, 0 otherwise */
 static inline int in_order(struct timespec a, struct timespec b)
-{      
+{
         if(a.tv_sec < b.tv_sec)
                 return 1;
         if(a.tv_sec > b.tv_sec)
-                return 0;                                                                                                                                  
-        if(a.tv_nsec > b.tv_nsec)                                                                                                                          
+                return 0;
+        if(a.tv_nsec > b.tv_nsec)
                 return 0;
         return 1;
 }
 
 
 void test_hrtimer_failure(void * arg)
-{       
+{
 	int i = 0;
 	int cpu_number = *((int *)arg);
 
@@ -114,10 +114,10 @@ int main(int argc, const char *argv[])
 
 			return 2;
 		}
-		
+
 	}
-	
- 
+
+
 	printf("PASS");
 
 	return 0;
