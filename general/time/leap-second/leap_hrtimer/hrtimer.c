@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 
 #define MSECREQ 1000
@@ -28,5 +29,7 @@ int main (int argc, char **argv)
 
     setitimer (ITIMER_REAL, &timer, NULL);
 
-    while (1);
+    while (1) {
+        pause();
+    }
 }
