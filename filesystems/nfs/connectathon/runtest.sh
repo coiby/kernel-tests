@@ -124,9 +124,8 @@ function checkServers ()
             if [[ -z $servers ]]; then
                 # Not found online nfs servers
                 echo "Not found online nfs server from the list, aborting the task" | tee -a $OUTPUTFILE
-                rstrnt-report-result $TEST WARN/ABORTED
+                rstrnt-report-result $TEST WARN
                 # Abort the task
-                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 0
             else
                 # Found online nfs servers
@@ -151,19 +150,19 @@ function checkServers ()
                 fi
             fi
        else
-          rstrnt-report-result $TEST WARN/ABORTED
+          rstrnt-report-result $TEST WARN
        fi
     else
         local s390chk=$(/bin/hostname | awk -F. '{print $2}')
         if [ $s390chk = "z900" ]; then
             rstrnt-report-result $TEST PASS
         else
-            rstrnt-report-result $TEST WARN/ABORTED
+            rstrnt-report-result $TEST WARN
             if  is_run_byci ; then
                 # nfs server list is empty
                 echo "nfs server list is empty, aborting the task" | tee -a $OUTPUTFILE
                 # Abort the task
-                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+                exit 0
             fi
         fi
         exit 0
@@ -313,7 +312,7 @@ function get_supported_client_versions ()
     # since RHEL7 kernels do not support NFSv2 as client
     # Bug 989238 - Remove NFS v2 support from RHEL 7 - kernel
     K_Vercmp "$(uname -r)" "3.10.0"
-    if [ "$K_KVERCMP_RET" -ge 0 -a -e /boot/config-`uname -r` ]; then
+    if [ "$K_KVERCMP_RET" -ge 0 ] && [ -e /boot/config-`uname -r` ]; then
         grep "CONFIG_NFS_V2=" /boot/config-`uname -r`
         if [ $? -ne 0 ]; then
             echo "This kernel does not support NFSv2" | tee -a $OUTPUTFILE
@@ -380,10 +379,9 @@ function get_supported_server_versions ()
             else
                 echo "Unexpected error from v41 mount of $server" | tee -a $OUTPUTFILE
                 cat $mount_pnfs_err_file | tee -a $OUTPUTFILE
-                rstrnt-report-result server_unexpected_v41_mount_err WARN/ABORTED
+                rstrnt-report-result server_unexpected_v41_mount_err WARN
                 if  is_run_byci ; then
                     # Abort the task
-                   rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                    exit 0
                 fi
 
@@ -394,10 +392,9 @@ function get_supported_server_versions ()
     echo "$server supports: $_nfsvers" | tee -a $OUTPUTFILE
     if [ -z "$_nfsvers" ]; then
             echo "No supported NFS versions for $server?" | tee -a $OUTPUTFILE
-            rstrnt-report-result NoSupportedNFSVersions WARN/ABORTED
+            rstrnt-report-result NoSupportedNFSVersions WARN
             if  is_run_byci ; then
                 # Abort the task
-                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 0
             fi
     fi
@@ -418,6 +415,8 @@ function get_ip_types ()
     # Unless, of course, a param has been passed.
     # UDP and UDP6 are still filtered out of CTHONPROTOCOL parameter unless
     # CTHONPOVERRIDE parameter is also set.
+    # shellcheck disable=SC2034 # the variable seems unused, but likely the
+    # comment above should also be updated.
     local special_server=${server%-*}
 
     if [ -z "$CTHONPROTOCOL" ]; then
@@ -459,8 +458,10 @@ function cthon_all ()
 
     for nfsver in $client_nfsvers; do
         # check if server supports this nfsver
+        # shellcheck disable=SC2154 # server_nfsvers is referenced but not assigned
         echo "$server_nfsvers" | grep "$nfsver" > /dev/null
-        if [ -z "$NFS_VERS" -a $? -ne 0 ]; then
+        local found_ver=$?
+        if [ -z "$NFS_VERS" ] && [ "$found_ver" -ne 0 ]; then
             echo "$server does not support NFS:$nfsver"
             continue
         fi
@@ -519,7 +520,6 @@ function cthon_main ()
         local server=$(echo $server_path| cut -f1 -d:)
         local nfspath=$(echo $server_path| cut -f2 -d:)
         local SCORE=0
-        local server_is_pnfs=0
         local now=`date`
         local ipv6=0
 
@@ -541,7 +541,6 @@ function cthon_main ()
             ipv6=1
             ping6 -c 3 $server >> $OUTPUTFILE 2>&1
             if [ $? -ne 0 ]; then
-                local servertype=${server%-*}
                 ipv6=0
                 echo "" | tee -a $OUTPUTFILE
                 echo " ===== cthon_main: $server is not reachable with ipv6 =====" | tee -a $OUTPUTFILE
@@ -614,7 +613,6 @@ if [ $? -ne 0 ]; then
     echo "WARN : Failed cloning $LOOKASIDE_DEFAULT" | tee -a $OUTPUTFILE
     rstrnt-report-result $TEST WARN
     # Abort the task
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 0
 fi
 
@@ -630,7 +628,6 @@ if [ $? -ne 0 ]; then
     echo "WARN : Failed patching/compiling $CONNECTATHON_SRCDIR" | tee -a $OUTPUTFILE
     rstrnt-report-result $TEST WARN
     # Abort the task
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
     exit 0
 fi
 popd

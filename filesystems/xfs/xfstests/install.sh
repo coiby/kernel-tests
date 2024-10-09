@@ -311,7 +311,6 @@ function install_xfstests()
 			xlog install_xfstests_pkg
 			if test $? -ne 0;then
 				report install_xfstests FAIL 0
-				rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 				exit 1
 			fi
 			;;
@@ -330,7 +329,6 @@ function install_xfstests()
 		fi
 		if test $? -ne 0;then
 			report install_xfstests FAIL 0
-			rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
 			exit 1
 		fi
 	fi
