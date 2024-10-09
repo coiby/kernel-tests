@@ -46,19 +46,18 @@ function __prepare_failed()
     exit 0
 }
 
-trap "__prepare_failed" ERR
-
 test_repo_path=$(readlink -f test-repo)
 
 git clone "$git_url" "test-repo"
-cd "test-repo"
-git checkout "$git_branch"
-git rev-parse --verify "$git_branch"
 
 # shellcheck disable=SC2064
 trap "cd /; rm -rf '${test_repo_path}'" EXIT ERR
 
-cd "$git_path"
+cd "test-repo"
+git checkout "$git_branch" || __prepare_failed
+git rev-parse --verify "$git_branch" || __prepare_failed
+
+cd "$git_path" || __prepare_failed
 
 set +e
 ./runtest.sh
