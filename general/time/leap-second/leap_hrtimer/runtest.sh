@@ -18,7 +18,7 @@ function runtest ()
         ./leap_second
         sleep 10
         killall hrtimer
-        ./check_hrtimer_exprie_ontime
+        ./check_hrtimer_expires_ontime
         RC=$?
         if [ $RC -ne 0 ];then
             RESULT="FAIL"
@@ -37,7 +37,7 @@ function runtest ()
 # compile
 gcc -o hrtimer hrtimer.c
 gcc -o leap_second leap_second.c
-gcc -o check_hrtimer_exprie_ontime check_hrtimer_exprie_ontime.c -pthread -lrt
+gcc -o check_hrtimer_expires_ontime check_hrtimer_expires_ontime.c -pthread -lrt
 
 # disable ntpd or chronyd and run the test, RHEL6 EOL.
 # In rhel6 or old system, ntpd
