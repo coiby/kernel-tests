@@ -205,8 +205,8 @@
 /filesystems/cifs/connectathon/ @bgoncalv @jianhong @lulinqing
 /filesystems/erofs/ @bgoncalv @bgrech @lulinqing
 /filesystems/general/pjd-fstest/ @bgoncalv @lulinqing @zrlang
-/filesystems/loopdev/sanity/ @bgoncalv @jencce2002 @lulinqing
-/filesystems/xfs/xfstests/ @andyprice @bgoncalv @jencce2002 @lulinqing
+/filesystems/loopdev/sanity/ @bgoncalv @lulinqing @yoyang
+/filesystems/xfs/xfstests/ @andyprice @bgoncalv @lulinqing @yoyang
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
 /general/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /general/memory/function/mem_encrypt/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
