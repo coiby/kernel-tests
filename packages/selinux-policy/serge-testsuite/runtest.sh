@@ -60,6 +60,7 @@ trap "cd /; rm -rf '${test_repo_path}'" EXIT ERR
 
 cd "$git_path"
 
+set +e
 ./runtest.sh
 if [ $? -eq 127 ]; then
     # Aborting task due to infrastructure failure.
