@@ -37,7 +37,8 @@ TARGET_MODULE="test_module_late_patching"
 DMESG_SAVED=$(mktemp /tmp/dmesg-XXXXXX)
 dmesg > $DMESG_SAVED
 
-yum install -y gcc kernel-devel elfutils-libelf-devel
+knvr=$(uname -r)
+yum install -y gcc kernel-devel-${knvr%.*} elfutils-libelf-devel
 
 test_fail()
 {
