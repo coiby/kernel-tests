@@ -71,6 +71,7 @@ int main(int argc, const char *argv[])
 	int cpu_count = sysconf(_SC_NPROCESSORS_CONF);
 
 	pthread_t tid[cpu_count];
+	pthread_attr_t attr;
 	cpu_set_t mask[cpu_count];
 
 	printf("\t * Hrtimer Expire Testing start -> ");
@@ -79,13 +80,30 @@ int main(int argc, const char *argv[])
 		CPU_ZERO(&mask[i]);
 		CPU_SET(i, &mask[i]);
 
-		ret = pthread_create(&tid[i], NULL, (void *)test_hrtimer_failure, NULL);
+		ret = pthread_attr_init(&attr);
+		if (ret) {
+			printf("pthread_attr_init() for %d failed: %s\n", i, strerror(ret));
+
+			return 2;
+		}
+		ret = pthread_attr_setaffinity_np(&attr, sizeof(mask[i]), &mask[i]);
+		if (ret) {
+			printf("pthread_attr_setaffinity_np() for %d failed: %s\n", i, strerror(ret));
+
+			return 2;
+		}
+		ret = pthread_create(&tid[i], &attr, test_hrtimer_failure, NULL);
 		if (ret != 0) {
 			printf("pthread create thread %d error \n",i);
 
 			return 2;
 		}
-		pthread_setaffinity_np(tid[i], sizeof(cpu_set_t), &mask[i]);
+		ret = pthread_attr_destroy(&attr);
+		if (ret) {
+			printf("pthread_attr_destroy() for %d failed: %s\n", i, strerror(ret));
+
+			return 2;
+		}
         }
 
 	for (i = 0; i < cpu_count; i++) {
