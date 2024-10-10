@@ -1,8 +1,8 @@
 #!/bin/bash
 
-FILE=$(readlink -f $BASH_SOURCE)
-CDIR=$(dirname $FILE)
-. $CDIR/../../include/bash_modules/lxt/include.sh || exit 200
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../../include/bash_modules/lxt/include.sh || exit 200
 
 TEST_DEVS=${TEST_DEVS:-""}
 TEST_DEVS_LIST=${TEST_DEVS_LIST:-""}
@@ -23,7 +23,7 @@ fi
 if [ -z "$TEST_DEVS" ]; then
 	tlog "Abort test as no TEST_DEVS avaiable for testing"
 	rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+	exit 0
 fi
 TEST_DEVS_TMP="$TEST_DEVS"
 for dev in $TEST_DEVS_TMP; do

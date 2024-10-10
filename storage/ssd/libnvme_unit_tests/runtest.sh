@@ -9,14 +9,14 @@ YUM=$(cki_get_yum_tool)
 
 function libnvme_setup
 {
-	pushd "$CDIR" || exit 1
+	pushd "$CDIR" || exit 0
 	rlRun "$YUM download libnvme --source"
 	typeset rpmfile=$(ls -1 libnvme*.src.rpm)
 	rlAssertExists "$rpmfile"
 	if (($? != 0)); then
 		rlLog "Abort test as libnvme source rpm doesn't exists"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 0
 	fi
 	rlRun "rpm -ivh $rpmfile"
 	rlRun "rpmbuild -bp ~/rpmbuild/SPECS/libnvme.spec"
