@@ -75,13 +75,9 @@ int main(int argc, const char *argv[])
 
 	printf("\t * Hrtimer Expire Testing start -> ");
 
-        for (i = 0; i < cpu_count; i++)
-		CPU_ZERO(&mask[i]);
-
-	for (i = 0; i < cpu_count; i++)
-		CPU_SET(i, &mask[i]);
-
         for (i = 0; i < cpu_count; i++) {
+		CPU_ZERO(&mask[i]);
+		CPU_SET(i, &mask[i]);
 
 		ret = pthread_create(&tid[i], NULL, (void *)test_hrtimer_failure, NULL);
 		if (ret != 0) {
