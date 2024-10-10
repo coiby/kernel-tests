@@ -10,6 +10,11 @@ require:
   - json-c-devel
   - gcc
   - glibc
+  - type: file
+    pattern:
+      - /general/include
+      - /general/scheduler/include
+      - /automotive/include
 duration: 1h
 extra-summary: /general/scheduler/sched_cfs_rq_starve
 extra-task: /general/scheduler/sched_cfs_rq_starve
