@@ -46,24 +46,48 @@ function __prepare_failed()
     exit 0
 }
 
-trap "__prepare_failed" ERR
-
 test_repo_path=$(readlink -f test-repo)
 
 git clone "$git_url" "test-repo"
-cd "test-repo"
-git checkout "$git_branch"
-git rev-parse --verify "$git_branch"
 
 # shellcheck disable=SC2064
 trap "cd /; rm -rf '${test_repo_path}'" EXIT ERR
 
-cd "$git_path"
+cd "test-repo"
+git checkout "$git_branch" || __prepare_failed
+git rev-parse --verify "$git_branch" || __prepare_failed
 
-./runtest.sh
-if [ $? -eq 127 ]; then
+cd "$git_path" || __prepare_failed
+
+set +e
+# NOTE: the timeout needs to be sufficiently lower than
+# max_duration_seconds in kpet-db.
+timeout -s KILL 2400 ./runtest.sh
+test_exit_code=$?
+
+# Clean up stuff that could cause errors later; errors are ignored.
+if [ -e "/root/selinux-testsuite" ]; then
+    for script in /root/selinux-testsuite/tests/*/*-flush; do
+        if [ "$(head -n 1 "$script")" = "#!/bin/sh" ]; then
+            sh "$script"
+        elif command -v nft &>/dev/null; then
+            nft -f "$script"
+        fi
+    done
+    make -C "/root/selinux-testsuite/policy" unload
+fi
+
+case $test_exit_code in
+127)
     # Aborting task due to infrastructure failure.
     echo "Test finished with infrastructure error."
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     exit 0
-fi
+    ;;
+124)
+    # Aborting task due to timeout.
+    echo "Test timed out."
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+    exit 0
+    ;;
+esac
