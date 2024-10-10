@@ -26,7 +26,7 @@ function nvdimm_test_module_setup
 	if (( ret != 0)); then
 		rlLog "Abort test as kernel source rpm doesn't exists"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 0
 	fi
 
 	rlRun "rpm -ivh $rpmfile"
@@ -39,7 +39,7 @@ function nvdimm_test_module_setup
 	if ((ret != 0)); then
 		rlLog "Abort test as kernel source doesn't exists after rpmbuild -bp"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 0
 	fi
 
 	#RHEL9 need revert one patch to make compiling pass
@@ -54,15 +54,14 @@ function nvdimm_test_module_setup
 	if (( ret != 0 )); then
 		rlLog "Abort test as make under test dir failed"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-		exit 1
+		exit 0
 	fi
 	rlRun "make -C /lib/modules/$(uname -r)/build M=$PWD modules_install"
 	ret=$?
 	if (( ret != 0 )); then
 		rlLog "Abort test as make modules_install under test dir failed"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 0
 	fi
 	rlRun "popd"
 }
@@ -113,7 +112,7 @@ function ndctl_setup
 	if ((ret != 0)); then
 		rlLog "Abort test as ndctl source rpm doesn't exists"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 0
 	fi
 	rlRun "rpm -ivh $rpmfile"
 	rlRun "rpmbuild -bp ~/rpmbuild/SPECS/ndctl.spec"
@@ -138,7 +137,7 @@ function ndctl_setup
 	if (( ret != 0 )); then
 		rlLog "Abort test as ndctl setup failed"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 0
 	fi
 }
 

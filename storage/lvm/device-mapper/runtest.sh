@@ -93,8 +93,7 @@ if ! startup &> setup.log ; then
     cat setup.log
     echo "Aborting test as it failed to setup test suite."
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-    exit $CKI_STATUS_ABORTED
+    exit 0 
 fi
 
 echo "INFO: testsuite installed successfully. More information on setup.log"
@@ -107,13 +106,12 @@ cleanup
 
 if [ $test_status -eq $CKI_FAIL ] ; then
     rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL
-    exit 1
+    exit 0
 fi
 
 if [ $test_status -eq $CKI_UNINITIATED ] ; then
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-    exit $CKI_STATUS_ABORTED
+    exit 0
 fi
 
 exit 0

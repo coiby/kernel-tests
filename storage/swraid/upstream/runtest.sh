@@ -9,8 +9,7 @@ function infra_failure()
     reason="$*"
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     echo "Aborting task due to ${reason}"
-    rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-    exit 1
+    exit 0
 }
 
 function run_setup()

@@ -23,7 +23,7 @@ fi
 if [ -z "$TEST_DEVS" ]; then
 	tlog "Abort test as no TEST_DEVS avaiable for testing"
 	rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-	rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+	exit 0
 fi
 TEST_DEVS_TMP="$TEST_DEVS"
 for dev in $TEST_DEVS_TMP; do

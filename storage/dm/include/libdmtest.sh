@@ -33,8 +33,7 @@ function report_results
 
     if [ "$result" -eq "$CKI_UNINITIATED" ] ; then
         rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-        exit "$CKI_STATUS_ABORTED"
+        exit 0 
     fi
 }
 
@@ -45,8 +44,7 @@ function startup
       cat setup.log
       echo "Aborting test as it failed to setup test suite."
       rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-      rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
-      exit "$CKI_STATUS_ABORTED"
+      exit 0 
     fi
 
     echo "INFO: testsuite installed successfully. More information on setup.log"

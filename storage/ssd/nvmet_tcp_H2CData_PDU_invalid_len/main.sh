@@ -14,11 +14,11 @@ function runtest() {
 	tok "modprobe nvmet"
 	if [ ! -f target.conf ]; then
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 0
 	fi
 	if [ ! -f test1 ] && [ ! -f test2 ] && [ ! -f test3 ]; then
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+		exit 0
 	fi
 	tok "nvmetcli restore ./target.conf"
 	tok "chmod +x test1 test2 test3"
