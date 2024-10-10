@@ -77,6 +77,7 @@ function runtest
 
 function startup
 {
+    # shellcheck disable=SC2174
     [[ ! -d $TMPDIR ]] && mkdir -p -m 0755 $TMPDIR
     echo "INFO: Going to install testsuite"
     ts_setup || return $?
@@ -93,7 +94,7 @@ if ! startup &> setup.log ; then
     cat setup.log
     echo "Aborting test as it failed to setup test suite."
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-    exit 0 
+    exit 0
 fi
 
 echo "INFO: testsuite installed successfully. More information on setup.log"
