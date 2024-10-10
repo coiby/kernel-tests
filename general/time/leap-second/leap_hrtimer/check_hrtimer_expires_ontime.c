@@ -13,6 +13,7 @@
 
 
 #define NSEC_PER_SEC 1000000000ULL
+#define NS_PER_MS 1000000ULL
 #define COUNT 1000
 
 int *p;
@@ -51,7 +52,7 @@ void test_hrtimer_failure(void * arg)
 	while(i < COUNT){
 		clock_gettime(CLOCK_REALTIME, &now);
 		//target = timespec_add(now, NSEC_PER_SEC/2);
-		target = timespec_add(now, NSEC_PER_SEC/1000);
+		target = timespec_add(now, NS_PER_MS);
 		clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &target, NULL);
 		clock_gettime(CLOCK_REALTIME, &now);
 
