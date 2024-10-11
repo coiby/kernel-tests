@@ -26,7 +26,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set -ex
+set -x
 
 git_url=${WRAPPER_GIT_URL:-"https://src.fedoraproject.org/tests/selinux.git"}
 git_branch=${WRAPPER_GIT_BRANCH:-"main"}
@@ -59,7 +59,6 @@ git rev-parse --verify "$git_branch" || __prepare_failed
 
 cd "$git_path" || __prepare_failed
 
-set +e
 # NOTE: the timeout needs to be sufficiently lower than
 # max_duration_seconds in kpet-db.
 timeout -s KILL 2400 ./runtest.sh
