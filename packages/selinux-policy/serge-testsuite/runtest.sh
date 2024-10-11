@@ -77,16 +77,24 @@ if [ -e "/root/selinux-testsuite" ]; then
 fi
 
 case $test_exit_code in
+0)
+    # Test finished execution without errors.
+    exit 0
+    ;;
 127)
     # Aborting task due to infrastructure failure.
     echo "Test finished with infrastructure error."
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     exit 0
     ;;
-124)
+124|137)
     # Aborting task due to timeout.
     echo "Test timed out."
     rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     exit 0
     ;;
+*)
+    echo "Test terminated with exit code: ${test_exit_code}."
+    rstrnt-report-result "${RSTRNT_TASKNAME}/error:${test_exit_code}" WARN
+    exit 0
 esac
