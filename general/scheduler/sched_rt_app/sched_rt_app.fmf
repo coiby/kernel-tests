@@ -23,6 +23,11 @@ require:
   - bzip2
   - util-linux
   - stress-ng
+  - type: file
+    pattern:
+      - /general/include
+      - /general/scheduler/include
+      - /automotive/include
 duration: 1h
 extra-summary: /general/scheduler/sched_rt_app
 extra-task: /general/scheduler/sched_rt_app

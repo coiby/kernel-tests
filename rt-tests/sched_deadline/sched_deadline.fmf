@@ -8,6 +8,11 @@ test: bash -x ./runtest.sh
 framework: shell
 require:
   - realtime-tests
+  - type: file
+    pattern:
+      - /rt-tests/include
+      - /cki_lib
+      - /automotive/include
 duration: 5m
 extra-summary: /rt-tests/sched_deadline
 extra-task: /rt-tests/sched_deadline

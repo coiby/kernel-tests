@@ -25,6 +25,9 @@ require:
   - zip
   - python3
   - python3-pip
+  - type: file
+    pattern:
+      - /automotive/include
 duration: 20m
 extra-summary: /rt-tests/auto_kernel_check
 extra-task: /rt-tests/auto_kernel_check
