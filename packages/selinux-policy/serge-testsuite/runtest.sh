@@ -48,12 +48,12 @@ function __prepare_failed()
 
 test_repo_path=$(readlink -f test-repo)
 
-git clone "$git_url" "test-repo"
+git clone "$git_url" "test-repo" || __prepare_failed
 
 # shellcheck disable=SC2064
 trap "cd /; rm -rf '${test_repo_path}'" EXIT ERR
 
-cd "test-repo"
+cd "test-repo" || __prepare_failed
 git checkout "$git_branch" || __prepare_failed
 git rev-parse --verify "$git_branch" || __prepare_failed
 
