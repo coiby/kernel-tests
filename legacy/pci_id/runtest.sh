@@ -33,7 +33,7 @@ trap "__cleanup" 0 1 15
 # - Invoke rpm_extract_path [PACKAGE_NAME] to obtain the path to the extracted
 #   files.
 
-SCRIPT_DIR__RUNTEST="$(realpath "$(dirname "$0")")"
+SCRIPT_DIR__RUNTEST="$(readlink -e "$(dirname "$0")")"
 
 source "$SCRIPT_DIR__RUNTEST/../shared/rpm-utils.sh"
 

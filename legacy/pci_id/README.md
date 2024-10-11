@@ -19,7 +19,7 @@ present in most RHEL systems. But to be pedantic:
 |---------------|------------------------------------------------------------|
 | kmod          | modinfo                                                    |
 | grep          | grep                                                       |
-| coreutils     | comm, mktemp, realpath, basename, dirname, sort, uniq, cat |
+| coreutils     | comm, mktemp, readlink, basename, dirname, sort, uniq, cat |
 | rpm           | rpm, rpm2cpio                                              |
 | sed           | sed                                                        |
 | findutils     | find, xargs                                                |
