@@ -11,3 +11,4 @@ entry_point=bash -x ./runtest.sh
 dependencies=gcc;make;psmisc
 max_time=2h
 use_pty=false
+repoRequires=cki_lib
