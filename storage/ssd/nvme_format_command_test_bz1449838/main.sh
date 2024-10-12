@@ -67,7 +67,7 @@ for DISK in $DISKS; do
 									continue
 								fi
 							elif [[ $lbaf == 1 && $pi == 0 && $ms == 1 ]]; then
-								if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007" ]]; then
+								if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007"|"SAMSUNG MZWLO1T9HCJR-00A07" ]]; then
 									tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms, /dev/$DISK node disappeared, BZ2081713, skipping"
 									continue
 								elif [[ $MODEL =~ "Dell Express Flash PM1725b"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
