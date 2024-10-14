@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2128,SC2034,SC2166
 #
 # Copyright (c) 2013 Red Hat, Inc. All rights reserved.
 #
@@ -41,7 +42,9 @@ rlJournalStart
         if (( $? == 0 )); then
                 rlLog "Aborting test because 'ip macsec' not found"
                 rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-                rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
+                #    comment out rstrnt-abort below based on
+                #    https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+                # rstrnt-abort --server "$RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status"
                 exit 0
         fi
     rlPhaseEnd

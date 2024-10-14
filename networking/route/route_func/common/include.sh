@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=SC2128,SC2027,SC2091,SC2166,SC1090
 # dynamically get the lib dir
 NETWORK_COMMONLIB_DIR=$(dirname $(readlink -f $BASH_SOURCE))
 networkLib=$NETWORK_COMMONLIB_DIR
@@ -109,8 +109,11 @@ test_warn()
 	echo -e "\n:: [  WARN  ] :: Test '"$1"'" | tee -a $OUTPUTFILE
 	if [ $RSTRNT_JOBID ]; then
 		rstrnt-report-result "${TEST}/$1" "WARN"
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-		exit 1
+		#    comment out rstrnt-abort below based on
+		#    https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+		# rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		# exit 1
+		exit 0
 	else
 		echo -e "\n:::::::::::::::::"
 		echo -e ":: [  ${YEL}WARN${RES}  ] :: Test '"${TEST}/$1"'"
@@ -225,11 +228,15 @@ net_sync()
 	fi
 	log "Start sync ${FLAG}"
 	if $(echo $SERVERS | grep -q -i $HOSTNAME);then
+	#  https://www.shellcheck.net/wiki/SC2091 suggests
+	#  if echo $SERVERS | grep -q -i $HOSTNAME; then
 		rstrnt-sync-set -s ${FLAG}
 		for client in $CLIENTS; do
 			rstrnt-sync-block -s ${FLAG} $client
 		done
 	elif $(echo $CLIENTS | grep -q -i $HOSTNAME);then
+	#  https://www.shellcheck.net/wiki/SC2091 suggests
+	#  elif echo $CLIENTS | grep -q -i $HOSTNAME; then
 		for server in $SERVERS; do
 			rstrnt-sync-block -s ${FLAG} $server
 		done
