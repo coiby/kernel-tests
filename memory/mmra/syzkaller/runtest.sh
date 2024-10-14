@@ -175,6 +175,18 @@ rlJournalStart
         # /usr/bin/ld: read-only segment has dynamic relocations
         # shellcheck disable=SC2086
         rlRun "${pkg_mgr} ${pkg_mgr_rmv_string} glibc-static"
+        if [ -e /usr/lib/systemd/coredump.conf.d/10-automotive.conf ]; then
+            if [ -n "${system_ostree}" ] ; then
+                # need to reboot before using usroverlay after installing packages
+                # see https://github.com/ostreedev/ostree/issues/2369
+                if [ -z "${REBOOTCOUNT}" ] || [ "${REBOOTCOUNT}" -eq 0 ]; then
+                    tmt-reboot
+                fi
+                rpm-ostree usroverlay
+            fi
+            mv /usr/lib/systemd/coredump.conf.d/10-automotive.conf /var/tmp/
+            systemctl daemon-reexec
+        fi
         rlRun "git clone https://github.com/google/syzkaller"
         rlRun "pushd syzkaller"
         syzkaller_root=$(pwd)
@@ -191,18 +203,6 @@ rlJournalStart
         rlRun "popd"
         rlRun "ssh-keygen -q -t ed25519 -N '' <<< $'\ny' > /dev/null 2>&1"
         rlRun "cat /root/.ssh/id_ed25519.pub >> /root/.ssh/authorized_keys"
-        if [ -e /usr/lib/systemd/coredump.conf.d/10-automotive.conf ]; then
-            if [ -n "${system_ostree}" ] ; then
-                # need to reboot before using usroverlay after installing packages
-                # see https://github.com/ostreedev/ostree/issues/2369
-                if [ -z "${REBOOTCOUNT}" ] || [ "${REBOOTCOUNT}" -eq 0 ]; then
-                    tmt-reboot
-                fi
-                rpm-ostree usroverlay
-            fi
-            mv /usr/lib/systemd/coredump.conf.d/10-automotive.conf /var/tmp/
-            systemctl daemon-reexec
-        fi
     rlPhaseEnd
     rlPhaseStartTest
         rlRun "dmesg -C"
