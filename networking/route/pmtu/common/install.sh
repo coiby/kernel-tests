@@ -65,8 +65,11 @@ lksctp-tools_install()
     if ! [ -a /usr/local/bin/bindx_test ];then
        echo "WARN : lksctp-tools install fail"
        test_warn "lksctp-tools_install_fail"
-       rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-       exit 1
+       #    comment out rstrnt-abort below based on
+       #    https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+       # rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+       # exit 1
+       exit 0
     fi
 
     test_pass "lksctp-tools_install_pass"
@@ -100,8 +103,11 @@ netperf_install()
         if ! netperf -V;then
                 echo "WARN : Netperf install fail" | tee -a $OUTPUTFILE
                 test_warn "Netperf_install_fail"
-                rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-                exit 1
+                #   comment out rstrnt-abort below based on
+                #   https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+                # rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+                # exit 1
+                exit 0
         fi
 
         test_pass "Netperf_install_pass"

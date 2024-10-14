@@ -160,8 +160,11 @@ setup_net_default()
 	if [ $? -ne 0 ]; then
 		echo -e "\nNo SERVER IFACE"
 		rstrnt-report-result $TEST WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-		exit 1
+		#    comment out rstrnt-abort below based on
+		#    https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+		# rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		# exit 1
+		exit 0
 	fi
 	SERVER_ADDR4="192.168.1.1"
 	SERVER_ADDR6="2001::1"

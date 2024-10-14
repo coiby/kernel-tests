@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# shellcheck disable=SC2010,SC2034
+
 ### Gloable parameter setting for ipsec
 IPSEC_PARA_LOG="/tmp/ipsec-setting.log"
 
@@ -38,7 +40,10 @@ while getopts "hm:p:s:S:k:a:t:e:A:c:6" opt; do
 	A)	AEALGO=$OPTARG ;;
 	c)	CALGO=$OPTARG ;;
 	6)	TEST_VER=6 ;;
-	*)	echo "Error: unknown option: $opt" | tee $IPSEC_PARA_LOG; rstrnt-report-result $RSTRNT_TASKNAME WARN; rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status; exit 1 ;;
+	#    remove rstrnt-abort below based on
+	#    https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+	# *)	echo "Error: unknown option: $opt" | tee $IPSEC_PARA_LOG; rstrnt-report-result $RSTRNT_TASKNAME WARN; rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status; exit 1 ;;
+	*)	echo "Error: unknown option: $opt" | tee $IPSEC_PARA_LOG; rstrnt-report-result $RSTRNT_TASKNAME WARN; exit 0 ;;
 	esac
 done
 
@@ -112,8 +117,11 @@ ah)
 	else
 		echo "Error: ah protocol doesn't set authentication" | tee $IPSEC_PARA_LOG
 		rstrnt-report-result $TEST WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-		exit 1
+		#    comment out rstrnt-abort below based on
+		#    https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+		# rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		# exit 1
+		exit 0
 	fi
 	;;
 esp)
@@ -127,8 +135,11 @@ esp)
 	else
 		echo "Error: esp protocol doesn't set encryption" | tee $IPSEC_PARA_LOG
 		rstrnt-report-result $TEST WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-		exit 1
+		#    comment out rstrnt-abort below based on
+		#    https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+		# rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		# exit 1
+		exit 0
 	fi
 	;;
 esp_aead)
@@ -150,8 +161,11 @@ comp)
 *)
 	echo "Error: tst_ipsec protocol mismatch" | tee $IPSEC_PARA_LOG
 	rstrnt-report-result $TEST WARN
-	rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-	exit 1
+	#    comment out rstrnt-abort below based on
+	#    https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/2007
+	# rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+	# exit 1
+	exit 0
 	;;
 esac
 
