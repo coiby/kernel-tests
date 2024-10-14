@@ -1,4 +1,23 @@
 summary: Leap second insert once test
+description: |
+    This test signals the kernel to insert a leap second
+    10 seconds of midnight GMT. This allows for stessing the
+    kernel's leap-second behavior.
+    The test then checks to make sure TIME_WAIT is present at the time of change.
+    States:
+        TIME_OK, synchronized, no leap second warning
+        TIME_INS, synchronized, leap second insertion warning
+        TIME_DEL, synchronized, leap second deletion warning
+        TIME_OOP, leap second in progress
+        TIME_WAIT, leap second has occurred
+        TIME_ERROR, clock not synchronized
+    Test Inputs:
+        leap-a-day.c is source that is compiled and enables testing of this issue. 
+    Expected results:
+        + RESULT=PASS
+        + rstrnt-report-result general/time/leap-second/ins_leap_sec_once PASS 0
+    Results location:
+        output.txt
 contact: Qiao Zhao <qzhao@redhat.com>
 id: a6186ed8-e869-41a8-89c3-b4a23cf048c7
 test: bash -x ./runtest.sh

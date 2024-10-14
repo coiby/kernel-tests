@@ -1,4 +1,13 @@
 summary: BZ 836803 Potential fix for leapsecond caused futex related load spikes
+description: |
+    Regression test to ensure that leapsecond does not cause futex related load spikes.
+    Test Inputs:
+        leap-a-day.c is source that is compiled and enables testing of this issue. 
+    Expected results:
+        PASS:
+        + rstrnt-report-result general/time/leap-second/bz836803_futex PASS 0
+    Results location:
+        output.txt
 contact: Qiao Zhao <qzhao@redhat.com>
 id: a67dd52c-e05a-4dfc-9f99-dd27bdf50b7d
 test: bash -x ./runtest.sh
