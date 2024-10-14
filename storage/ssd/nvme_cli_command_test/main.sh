@@ -54,30 +54,7 @@ for DISK in $DISKS; do
 	tok "nvme get-ns-id ${NVME_DISK}"
 	tok "nvme get-log --log-id=2 --log-len=512 ${NVME_DISK}"
 
-	# shellcheck disable=SC2076
-	if [[ $MODEL =~ "SAMSUNG MZ1L21T9HCLS-00A07"|"SAMSUNG MZQL21T9HCJR-00A07"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"Dell Express Flash NVMe PM1725 1.6TB"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Express Flash NVMe P4800X"|"Dell Ent NVMe v2 AGN FIPS MU U.2"|"SAMSUNG MZWLO1T9HCJR-00A07" ]]; then
-		tok "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
-	elif [[ $MODEL =~ "Dell Express Flash PM1725b"|"Dell Express Flash NVMe P4500" ]]; then
-		if rlIsRHEL 9 || rlIsRHEL 10; then
-			tok "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
-		elif rlIsRHEL 8; then
-			tnot "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
-		fi
-	elif [[ $MODEL =~ "Dell Express Flash PM1725a 1.6TB AIC"|"INTEL SSDPEDMD016T4"|"Micron_9300_MTFDHAL3T8TDP"|"Samsung SSD 983 DCT" ]]; then
-		if (rlIsRHEL 9 && rlIsRHEL "<9.5") || rlIsRHEL 10; then
-			tok "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
-		elif rlIsRHEL 8 || (rlIsRHEL 9 && rlIsRHEL ">=9.5"); then
-			tnot "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
-		fi
-	elif [[ $MODEL =~ "Dell Express Flash NVMe P4600 2.0TB AIC" ]]; then
-		if rlIsRHEL 9 && rlIsRHEL "<9.5"; then
-			tok "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
-		elif rlIsRHEL 8 || (rlIsRHEL 9 && rlIsRHEL ">=9.5") || rlIsRHEL 10; then
-			tnot "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
-		fi
-	else
-		tnot "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
-	fi
+	trun "nvme telemetry-log ${NVME_CHAR} --output-file=telemetry_log.bin"
 
 	tok "nvme fw-log ${NVME_DISK}"
 
