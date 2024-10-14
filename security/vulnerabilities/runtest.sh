@@ -47,6 +47,14 @@ rlJournalStart
           "Log vulnerabilities status"
 
       for v in * ; do
+        # Reference from mmio_stale_data, but other files have similar information.
+        # https://docs.kernel.org/admin-guide/hw-vuln/processor_mmio_stale_data.html
+        # This is done to address virtualization scenarios where the host has the microcode update applied,
+        # but the hypervisor is not yet updated to expose the CPUID to the guest.
+        if grep -q "Vulnerable: Clear CPU buffers attempted, no microcode" /sys/devices/system/cpu/vulnerabilities/$v; then
+            # Ignore this as it is likely a problem on hypervisor and not on guest side.
+            continue
+        fi
         rlAssertNotGrep Vulnerable /sys/devices/system/cpu/vulnerabilities/$v
       done
     popd
