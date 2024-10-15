@@ -1,0 +1,61 @@
+summary: Fuzz clocks and timers related API system calls.
+description: |
+  Confirm system call fuzz testing is being performed on clocks and timer system calls specified in Clocks and Timers Risk Assessment.
+  The database is checked at the end to ensure each syscall was executed at least once.
+  Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
+  Test inputs:
+      A list with the system calls to be fuzzed, and a fuzzer program
+      called syzkaller. Input details:
+      - System call list from RA documentation.
+      - syzkaller code: https://github.com/google/syzkaller
+      - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
+  Expected results:
+      If the system calls are executed without incident during the test runtime,
+      the following output should be expected:
+      [   PASS   ] :: No crash results found.
+      [   PASS   ] :: clock_getres executed.
+      [   PASS   ] :: clock_gettime executed.
+      [   PASS   ] :: clock_settime executed.
+      [   PASS   ] :: clock_nanosleep executed.
+      [   PASS   ] :: gettimeofday executed.
+      [   PASS   ] :: settimeofday executed.
+      [   PASS   ] :: adjtimex executed.
+      [   PASS   ] :: nanosleep executed.
+  Results location:
+      output.txt
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+path: /memory/mmra/syzkaller
+framework: beakerlib
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+        -  /kernel-include
+        -  /memory/mmra/syzkaller
+        -  /general/time/time_fuzzing_test
+environment:
+    mm_syscalls: |
+      "clock_getres",
+      "clock_gettime",
+      "clock_settime",
+      "clock_nanosleep",
+      "gettimeofday",
+      "settimeofday",
+      "adjtimex",
+      "nanosleep"
+    supportcalls: ''
+    git_patches: '../../../../general/time/time_fuzzing_test/time.patch'
+duration: 2h
+id: 286e1009-37f1-48b9-82cf-31dce5f30270

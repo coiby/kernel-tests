@@ -1,0 +1,40 @@
+diff --git a/sys/linux/sys.txt b/sys/linux/sys.txt
+index a48d38c0b..d3c60b3f8 100644
+--- a/sys/linux/sys.txt
++++ b/sys/linux/sys.txt
+@@ -522,6 +522,9 @@ clock_settime(id flags[clock_id], tp ptr[in, timespec])
+ clock_adjtime(id flags[clock_id], tx ptr[in, timex])
+ clock_getres(id flags[clock_id], tp ptr[out, timespec])
+ clock_nanosleep(id flags[clock_id], flags flags[timer_flags], rqtp ptr[in, timespec], rmtp ptr[out, timespec, opt])
++gettimeofday(tv ptr[out, timeval], tz ptr[out, timezone])
++settimeofday(tv ptr[in, timeval], tz ptr[in, timezone])
++adjtimex(buf ptr[inout, timex])
+ rt_sigaction(sig signalno, act ptr[in, sigaction], oact ptr[out, sigaction, opt], sigsetsize len[fake], fake ptr[out, sigset_t])
+ rt_sigprocmask(how flags[sigprocmask_how], nset ptr[in, sigset_t], oset ptr[out, sigset_t, opt], sigsetsize len[nset])
+ rt_sigreturn()
+@@ -823,6 +826,11 @@ timeval {
+ 	usec	time_usec
+ }
+ 
++timezone {
++	tz_minuteswest int32
++	tz_dsttime int32
++}
++
+ statx_timestamp {
+ 	sec		int64
+ 	nsec		int32
+diff --git a/sys/linux/sys.txt.const b/sys/linux/sys.txt.const
+index 9062f1e9f..4b643f564 100644
+--- a/sys/linux/sys.txt.const
++++ b/sys/linux/sys.txt.const
+@@ -631,6 +631,9 @@ __NR_clock_getres = 114, 386:266, amd64:229, arm:264, mips64le:5223, ppc64le:247
+ __NR_clock_gettime = 113, 386:265, amd64:228, arm:263, mips64le:5222, ppc64le:246, s390x:260
+ __NR_clock_nanosleep = 115, 386:267, amd64:230, arm:265, mips64le:5224, ppc64le:248, s390x:262
+ __NR_clock_settime = 112, 386:264, amd64:227, arm:262, mips64le:5221, ppc64le:245, s390x:259
++__NR_gettimeofday = arm64:169
++__NR_settimeofday = arm64:170
++__NR_adjtimex = arm64:171
+ __NR_clone = 120, amd64:56, arm64:riscv64:220, mips64le:5055
+ __NR_clone3 = 435, mips64le:5435
+ __NR_close = 6, amd64:3, arm64:riscv64:57, mips64le:5003
