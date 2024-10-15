@@ -89,7 +89,7 @@ if [ "${RSTRNT_REBOOTCOUNT}" -ge 1 ]; then
         SubmitLog "${JOURNALCTLLOG}"
     fi
     rstrnt-report-result Abnormal-Reboot  WARN
-    exit 1
+    exit 0
 fi
 
 if type -p journalctl > /dev/null; then
@@ -105,7 +105,7 @@ fi
 grep -i -e "FAIL" -e "ERROR" patchinc.log > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     rstrnt-report-result "ltp-include-patch-errors" WARN
-    exit 1
+    exit 0
 fi
 
 # Sometimes it takes too long to waiting for syscalls finish and I want
@@ -189,7 +189,7 @@ if [ $? -ne 0 ]; then
     bzip2 buildlog.txt
     SubmitLog buildlog.txt.bz2
     rstrnt-report-result build WARN
-    exit 1
+    exit 0
 else
     rstrnt-report-result build PASS
 fi

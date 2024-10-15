@@ -55,7 +55,7 @@ function ltp_test_build()
 	if [ $? -ne 0 ]; then
 		echo "FAIL: couldn't copy configs/${RHELKT1LITE_CONFIG}"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		exit 1
+		exit 0
 	fi
 
 	echo "LTP ($TESTVERSION) has been built and installed at ${LTPDIR}/runltp"
@@ -344,7 +344,7 @@ fi
 grep -i -e "FAIL" -e "ERROR" patchinc.log > /dev/null 2>&1
 if [ $? -eq 0 ]; then
 	rstrnt-report-result "ltp-include-patch-errors" WARN
-	exit 1
+	exit 0
 fi
 
 # Sometimes it takes too long to waiting for syscalls

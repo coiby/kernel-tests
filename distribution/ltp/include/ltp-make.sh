@@ -69,7 +69,7 @@ download_ltp()
         echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
         echo "Aborting current task: Couldn't download LTP source." | tee -a $OUTPUTFILE
         rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        exit 1
+        exit 0
     fi
 
     rm -rf ${TARGET}
@@ -86,14 +86,14 @@ clone_ltp()
     if [ $? -ne 0 ]; then
         echo "Aborting current task: Couldn't clone LTP" | tee -a $OUTPUTFILE
         rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-        exit 1
+        exit 0
     fi
     if [[ -n ${LTP_COMMIT_ID} && ${LTP_COMMIT_ID} != "latest" ]]; then
         git -C ${TARGET} checkout ${LTP_COMMIT_ID}
         if [ $? -ne 0 ]; then
             echo "Aborting current task: Couldn't checkout ${LTP_COMMIT_ID}" | tee -a $OUTPUTFILE
             rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-            exit 1
+            exit 0
         fi
     fi
     if [[ -z ${LTP_COMMIT_ID} || ${LTP_COMMIT_ID} == "latest" ]]; then
@@ -424,7 +424,7 @@ build-all()
             cat config-maker.txt
             echo "Aborting current task: Couldn't generate test config." | tee -a $OUTPUTFILE
             rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-            exit 1
+            exit 0
         fi
         popd
         echo "RHELKT1LITE.next is generated"
@@ -442,13 +442,13 @@ build-all()
         echo "Cleaning up ${TARGET_DIR}"
         rm -rf ${TARGET_DIR}
         rstrnt-report-result "build-all build timeout" WARN
-        exit 1
+        exit 0
     fi
     if [ ${build_res} -ne 0 ]; then
         res="FAILED"
         SubmitLog ./buildlog.txt
         rstrnt-report-result "build-all build failed" WARN
-        exit 1
+        exit 0
     fi
     echo "============ ${MAKE} -C ${TARGET} all: ${res}  ============" | tee -a $OUTPUTFILE
     res="PASSED"
@@ -464,7 +464,7 @@ build-all()
         if [[ -n $RSTRNT_TASKID ]]; then
             rstrnt-report-result "build-all failed" WARN
         fi
-        exit 1
+        exit 0
     fi
 }
 
