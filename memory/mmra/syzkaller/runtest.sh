@@ -187,10 +187,10 @@ rlJournalStart
             mv /usr/lib/systemd/coredump.conf.d/10-automotive.conf /var/tmp/
             systemctl daemon-reexec
         fi
-        rlRun "git clone https://github.com/google/syzkaller"
+        rlRun "git clone https://github.com/google/syzkaller" 0,128
         rlRun "pushd syzkaller"
         syzkaller_root=$(pwd)
-        rlRun "git branch mmra_temp ${commit}"
+        rlRun "git branch mmra_temp ${commit}" 0,128
         rlRun "git switch mmra_temp"
         for git_patch in $git_patches; do
             rlRun "git apply $git_patch"
