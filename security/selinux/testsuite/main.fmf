@@ -54,3 +54,11 @@ recommend:
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 1h
+adjust:
+  description: Run the test using specific version of the testsuite.
+  id: ""
+  tag+:
+   - KernelTier1
+  environment+:
+   GIT_BRANCH: d75675eb0da2906780557ec8cd139d328c81777e
+  when: KernelTier1 == 1
