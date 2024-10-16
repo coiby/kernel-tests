@@ -228,7 +228,6 @@
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
 /legacy/whitelist/ @bgoncalv @ckalina @lulinqing
-/libevdev/ @bgoncalv @dangel101 @lulinqing
 /livepatch/selftests/ @bgoncalv @joe.lawrence @lulinqing @ykopkova
 /memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
