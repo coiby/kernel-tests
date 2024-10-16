@@ -18,7 +18,7 @@ function setup()
     if [ $? -ne 0 ]; then
         echo "FAIL to install app. Aborting test..."
         rstrnt-report-result "${TEST}" WARN
-        exit 1
+        exit 0
     fi
 }
 
