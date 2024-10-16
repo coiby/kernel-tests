@@ -13,7 +13,7 @@ if [ -e /var/opt/cki/kernel_version ] && [ -n "${RSTRNT_TASKID}" ]; then
         echo "aborting as system is running kernel $kernel_version and not the expected $cki_kernel_version"
         rstrnt-report-result "${RSTRNT_TASKNAME}" "WARN"
         rstrnt-abort -t recipe
-        exit 1
+        exit 0
     fi
 fi
 exec "$@"
