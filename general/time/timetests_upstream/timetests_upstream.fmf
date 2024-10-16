@@ -1,11 +1,31 @@
 summary: Run upstream timetests in rhel kernel
 description: |
-    Test upstream time case
-    Git site: https://github.com/johnstultz-work/timetests
-    > Since original code was not maintained by anyone, so use the 
-    > downstream code: https://github.com/linuxqiao/timetests
-    This case developed and tested this on Ubuntu 12.04. Need update.
-    To run: ./runall.sh
+    These are a collection of timekeeping tests assembled to try to provide
+    some basic sanity testing of the timekeeping code.
+    Areas covered include:
+        Consistency check
+        Raw skew check
+        Nanosleep timers check
+        Nanosleep latency check
+        set_timer latency check
+        Mqueue latency check
+        Alarmtimer suspend check 
+        Adjtimex basic validation tests
+        Adjtimex freq adjustment tests
+        Adjtimex tick adjustment tests
+        Clocksource changing tests
+        Leap second tests
+        TAI setting tests
+        Settimeofday edge cases
+    Test Inputs:
+        Original git site: https://github.com/johnstultz-work/timetests
+        Downstream fork we use: https://github.com/linuxqiao/timetests
+    Expected results:
+        ++ grep FAILED /tmp/timetests.log
+        + [[ -n '' ]]
+        + rstrnt-report-result general/time/timetests_upstream PASS 0
+    Results location:
+        output.txt
 contact: Qiao Zhao <qzhao@redhat.com>
 id: 690bc9a4-890f-42fd-bf8b-49e5c32ca964
 test: bash -x ./runtest.sh
