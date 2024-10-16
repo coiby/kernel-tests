@@ -42,7 +42,7 @@ cat /usr/share/rhts/failurestrings
 # see: https://bugzilla.redhat.com/show_bug.cgi?id=1716997
 # also if the task has ABORT_RECIPE_ON_LWD parameter set to 1 it will abort the whole recipe (For example, a boot test task should abort the whole recipe if hits lwd)
 # shellcheck disable=SC2016 # we don't want to expand the variable when writing to the file
-sed -i 's|rstrnt-reboot|if [ "${CKI_ABORT_RECIPE_ON_LWD:-0}" -eq "1" ]; then rstrnt-abort recipe; else rstrnt-report-result "${RSTRNT_TASKNAME}" WARN\nexit 1\nrstrnt-reboot;fi|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot
+sed -i 's|rstrnt-reboot|if [ "${CKI_ABORT_RECIPE_ON_LWD:-0}" -eq "1" ]; then rstrnt-abort recipe; else rstrnt-report-result "${RSTRNT_TASKNAME}" WARN\nexit 0\nrstrnt-reboot;fi|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot
 
 # Show information the test aborted due to localwatchdog
 # shellcheck disable=SC2016 # we don't want to expand the variable when writing to the file

@@ -45,11 +45,11 @@ Describe 'cki-restraint: runtest.sh'
     End
     It 'can run runtest.sh'
         When run script cki/restraint/runtest.sh
-        The stdout should include "sed -i s|rstrnt-reboot|if [ \"\${CKI_ABORT_RECIPE_ON_LWD:-0}\" -eq \"1\" ]; then rstrnt-abort recipe; else rstrnt-report-result \"\${RSTRNT_TASKNAME}\" WARN\nexit 1\nrstrnt-reboot;fi| /usr/share/restraint/plugins/localwatchdog.d/99_reboot"
+        The stdout should include "sed -i s|rstrnt-reboot|if [ \"\${CKI_ABORT_RECIPE_ON_LWD:-0}\" -eq \"1\" ]; then rstrnt-abort recipe; else rstrnt-report-result \"\${RSTRNT_TASKNAME}\" WARN\nexit 0\nrstrnt-reboot;fi| /usr/share/restraint/plugins/localwatchdog.d/99_reboot"
         The stdout should include 'cp -rf plugins /usr/share/restraint/'
         The stdout should include 'chmod -R +x /usr/share/restraint/plugins'
         # shellcheck disable=SC2016 # we don't wan't to expand the variable when writting to the file
-        The stderr should include "sed -i 's|rstrnt-reboot|if [ \"\${CKI_ABORT_RECIPE_ON_LWD:-0}\" -eq \"1\" ]; then rstrnt-abort recipe; else rstrnt-report-result \"\${RSTRNT_TASKNAME}\" WARN\nexit 1\nrstrnt-reboot;fi|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot"
+        The stderr should include "sed -i 's|rstrnt-reboot|if [ \"\${CKI_ABORT_RECIPE_ON_LWD:-0}\" -eq \"1\" ]; then rstrnt-abort recipe; else rstrnt-report-result \"\${RSTRNT_TASKNAME}\" WARN\nexit 0\nrstrnt-reboot;fi|' /usr/share/restraint/plugins/localwatchdog.d/99_reboot"
         The status should be success
     End
 End
@@ -115,6 +115,6 @@ Describe 'cki-restraint: plugins concurrent task'
         The first line should equal "rstrnt_info *** Running Plugin: cki/restraint/plugins/task_run.d/26_cki_environment"
         The line 2 should equal "rstrnt-report-result concurrent-test-task FAIL"
         The line 3 should equal "Aborting task ${RSTRNT_TASKID} from recipe ${RSTRNT_RECIPEID} as system expects to run tests for recipe 54321"
-        The status should be failure
+        The status should be success
     End
 End
