@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=blktrace;fio;gcc;gcc-c++;git;nvme-cli;xfsprogs;parted;dosfstools
-softDependencies=nbd;libnl3-cli
+softDependencies=nbd;libnl3-cli;cryptsetup
 repoRequires=cki_lib;storage/blktests/include;storage/blktests/config
 max_time=1h
