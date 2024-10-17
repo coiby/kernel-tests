@@ -1,0 +1,10 @@
+[General]
+name=distribution/verify-automotive-img
+owner=Brian Grech <bgrech@redhat.com>
+description=Validate booted automotive image release
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
