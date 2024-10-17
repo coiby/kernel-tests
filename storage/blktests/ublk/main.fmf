@@ -1,0 +1,18 @@
+summary: Storage blktests ublk tests
+contact: Yi Zhang <yizhan@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - blktrace
+  - fio
+  - gcc
+  - gcc-c++
+  - git
+  - nvme-cli
+  - xfsprogs
+  - parted
+  - liburing
+  - liburing-devel
+extra-summary: storage/blktests/ublk
+extra-task: storage/blktests/ublk
+id: 91460c9a-7683-4bc2-8d9f-5483bbcd4d1b
