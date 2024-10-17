@@ -16,7 +16,7 @@ description: |
     - RESTRICTED_SHELL
     	Configure a restricted shell login in ssh host
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 require:
   - kexec-tools

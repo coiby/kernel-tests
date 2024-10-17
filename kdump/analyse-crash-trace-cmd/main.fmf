@@ -4,7 +4,7 @@ description: |
 contact: Kdump QE <kdump-qe-list@redhat.com>
 component:
   - crash-trace-command
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 require:
   - crash-trace-command

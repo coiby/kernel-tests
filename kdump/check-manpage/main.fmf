@@ -1,7 +1,7 @@
 summary: Check the manpage for kdump related commands
 description: |
     Check the kdump related commands whether has the corresponding manpage.
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 require:
   - crash
 extra-summary: /kernel/kdump/check-manpage

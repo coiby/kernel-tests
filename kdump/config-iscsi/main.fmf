@@ -15,7 +15,7 @@ description: |
     	Mount point on client for the iscsi/multipath device.
     	By default, it's /mnt/iscsi
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 duration: 30m
 extra-summary: /kernel/kdump/config-iscsi

@@ -2,7 +2,7 @@ summary: Enable and write data to hugepage
 description: |
     This test is to enable hugepage and write data to hugepage memory
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 
 duration: 60m

@@ -10,7 +10,7 @@ description: |
     However, it won't work properly for options that affect the location of
     generated vmcore. Use other config-* test cases instead.
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 require:
   - kexec-tools

@@ -26,7 +26,7 @@ description: |+
         xfs. Make sure "extra_modules xfs" is set in /etc/kdump.conf
 
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 require:
   - kexec-tools
