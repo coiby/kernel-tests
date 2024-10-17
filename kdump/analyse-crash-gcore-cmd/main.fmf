@@ -9,7 +9,7 @@ require:
   - crash
 recommend:
   - kernel-debuginfo
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 duration: 1h
 extra-summary: /kernel/kdump/analyse-crash-gcore-cmd

@@ -3,7 +3,7 @@ description: |
     This test case is to validate dmesg files saved during kdump.
 
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 duration: 10m
 extra-summary: /kernel/kdump/analyse-dmesg

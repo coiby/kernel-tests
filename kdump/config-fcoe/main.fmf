@@ -2,7 +2,7 @@ summary: Config fcoe disks for kdump test.
 description: |
     Prepare fcoe disks for later kdump test
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 require:
     - fcoe-utils

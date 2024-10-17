@@ -3,7 +3,7 @@ description: |
     It uses basic ELF utilites, readelf, objdump and eu-readelf to analyse
     the vmcore from Kdump.
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 require:
   - binutils

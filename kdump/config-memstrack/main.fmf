@@ -2,7 +2,7 @@ summary: Enabling memstrack for debugging kdump memory usage
 description: |
     It enables memstrack for debugging memory usage during kdump
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 require:
     - kexec-tools

@@ -2,7 +2,7 @@ summary: Use GDB to analyse ELF format vmcore from Kdump.
 description: |
     It uses GDB command to analyse vmcore.
 contact: Kdump QE <kdump-qe-list@redhat.com>
-test: make run
+test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
 require:
   - gdb
