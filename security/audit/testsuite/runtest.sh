@@ -41,10 +41,21 @@ rlJournalStart
         rlIsRHEL ">9" && rlRun "sed -i 's/-m32//g' tests/syscall_socketcall/Makefile"
     rlPhaseEnd
 
-    rlPhaseStartTest
+    rlPhaseStartTest "Audit testsuite"
         rlRun "unset DISTRO"
         rlRun "cat /proc/self/loginuid && echo $(id -u) > /proc/self/loginuid" 0-255
-        rlRun "unbuffer make test"
+        rlRun "unbuffer make test |& tee results.log" 0-255
+        while IFS= read -r line; do
+            if [[ "$line" =~ ^[a-zA-Z0-9_]+/test[[:space:]]*\.\. ]]; then
+                if [[ "$line" =~ ok ]]; then
+                    rlReport "$(echo "$line" | awk '{print $1}')" PASS
+                else
+                    rlReport "$(echo "$line" | awk '{print $1}')" FAIL
+                fi
+            fi
+        done < "results.log"
+        rlLog "See test detail in results.log"
+        rlFileSubmit results.log
     rlPhaseEnd
 
     rlPhaseStartCleanup
