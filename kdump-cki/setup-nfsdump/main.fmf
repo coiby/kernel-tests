@@ -1,0 +1,9 @@
+summary: Setup kdump to NFS target.
+contact: Kdump QE <kdump-qe-list@redhat.com>
+test: ./runtest.sh
+framework: shell
+duration: 30m
+require:
+  - type: file
+    pattern:
+      - kdump-cki/include
