@@ -112,7 +112,7 @@ main() {
         rm -rf "${repo_directory}"
         rm -f "${repo_file_path}"
 
-        if [[ "$(dnf needs-restarting -r)" -eq "1" ]]; then
+        if ! dnf needs-restarting -r; then
             touch ./needs_reboot
             rstrnt-reboot
         else
