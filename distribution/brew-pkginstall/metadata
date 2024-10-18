@@ -1,0 +1,11 @@
+[General]
+name=/kernel/distribution/brew-pkginstall
+owner=Bruno Goncalves <bgoncalv@redhat.com>
+description=Install rpms from a brew build
+licence=GPL
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
