@@ -1,0 +1,5 @@
+summary: Install rpms from a brew build
+contact: Bruno Goncalves <bgoncalv@redhat.com>
+test: ./runtest.sh
+framework: shell
+duration: 30m
