@@ -24,6 +24,10 @@ require:
   - tar
   - wget
   - pip
+  - type: file
+    pattern:
+        - /cki_lib
+        - /kernel-include
 recommend:
   - fuse
   - iperf3
