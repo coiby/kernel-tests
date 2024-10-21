@@ -98,7 +98,7 @@ rlJournalStart
 	elif ! test -f reboot_1423560; then
 		rlPhaseStartSetup
 			if ((nr_cpu < 2)) || ! uname -r | grep -Eq "x86_64|aarch64"; then
-				report_result "skip_cpu_$(nr_cpu)" SKIP
+				report_result "skip_cpu_${nr_cpu}" SKIP
 				rlPhaseEnd
 				rlJournalEnd
 				exit 0
