@@ -1,0 +1,5 @@
+summary: Validates booted automotive image release
+contact: Brian Grech <bgrech@redhat.com>
+test: chmod a+x ./runtest.sh; ./runtest.sh
+framework: shell
+duration: 5m
