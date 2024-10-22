@@ -1274,6 +1274,39 @@ fi
 DeBug "Exit CheckCPUcount"
 }
 
+function CheckCallTrace ()
+{
+    # We have the right kernel. Do we have any call traces?
+    # all the issues that could be found on dmesg are logged in the journal logs
+    # therefore only check dmesg if journalctl is not available to avoid reporting
+    # duplicated result.
+    if which journalctl > /dev/null 2>&1; then
+        JOURNALCTLLOG=/tmp/journalctl.log
+        journalctl -b > ${JOURNALCTLLOG}
+        grep -qi 'Call Trace:' "${JOURNALCTLLOG}"
+        journalctlret=$?
+        if [[ ${journalctlret} -eq 0 ]]; then
+            echo "Call trace found in journalctl, see journalctl.log"
+            rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check FAIL 7
+        else
+            rstrnt-report-result -o "${JOURNALCTLLOG}" ${TEST}/journalctl-check PASS 0
+        fi
+    else
+        DMESGLOG=/tmp/dmesg.log
+        dmesg > ${DMESGLOG}
+        grep -qi 'Call Trace:' "${DMESGLOG}"
+        dmesgret=$?
+        if [[ ${dmesgret} -eq 0 ]]; then
+            echo "Call trace found in dmesg, see dmesg.log"
+            # dmesg.log is uploaded by default by rstrnt-report-result
+            # https://github.com/restraint-harness/restraint/blob/master/plugins/report_result.d/01_dmesg_check#L74
+            rstrnt-report-result ${TEST}/dmesg-check FAIL 7
+        else
+            rstrnt-report-result ${TEST}/dmesg-check PASS 0
+        fi
+    fi
+}
+
 function Main ()
 {
     DeBug "Enter Main"
@@ -1568,6 +1601,9 @@ else
         fi
         SubmitLog $DEBUGLOG
         workaround_bug905910
+        if [[ "${CHECK_CALLTRACE:-}" -eq "1" ]]; then
+            CheckCallTrace
+        fi
     else
         if [ -f $OUTPUTDIR/boot.$kernbase ]; then
             SubmitLog $OUTPUTDIR/boot.$kernbase
