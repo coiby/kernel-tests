@@ -19,6 +19,10 @@ require:
     - glibc
     - elfutils-libelf-devel
     - perf
+    - type: file
+      pattern:
+          - /kernel-include
+          - /general/include
 recommend:
     - rsyslog
     - stress-ng
