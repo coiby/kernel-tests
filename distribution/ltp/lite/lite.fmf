@@ -30,6 +30,10 @@ require:
   - strace
   - wget
   - python3
+  - type: file
+    pattern:
+      - /cki_lib
+      - /distribution/ltp/include
 duration: 6h
 extra-summary: /kernel/distribution/ltp/lite
 extra-task: /kernel/distribution/ltp/lite
