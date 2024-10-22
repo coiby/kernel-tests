@@ -1,87 +1,87 @@
 summary: KG-RT /kernel/rt-tests/us/rt-tests/sanity
 description: |
-  Functional test for the rt-tests userspace package.
+    Functional test for the rt-tests userspace package.
 
-  Utilities:
-  cyclicdeadline - A program used to test the deadline scheduler (SCHED_DEADLINE) using a cyclictest style program.
-  chrt - A program used to manipulate the real-time attributes of a process
-  cyclictest - A program used to accurately and repeatedly measure the difference between a thread's intended wake-up time and the time at which it actually wakes up in order to provide statistics about the system's latencies. 
-  deadline_test - A program used to test the deadline scheduler (SCHED_DEADLINE tasks).
-  hackbench - A program used to benchmark and stress test the Linux kernel scheduler.
-  hwlatdetect - A program used to control the kernel hardware latency detector module (hwlat_detector.ko).
-  pi_stress - A program  used  to  stress  the priority-inheritance code paths for POSIX mutexes, in both the Linux kernel and the C library.
-  pmqtest - A program used to measure the latency between sent and received time of a message dispatched from pairs of threads that are synchronized via mq_send/mw_receive().
-  ptsematest - A program used to measure the latency between releasing and getting a lock from two threads that are synchronized via pthread_mutex_unlock()/pthread_mutex_lock().
-  queuelat - A program used to simulate a network queue and check for latency violations in packet processing.
-  rt-migrate-test - A program used to test real-time multiprocessor scheduling of tasks to ensure the highest priority tasks are running on all available CPUs.
-  signaltest - A program used to test a signal roundtrip.
-  svsematest - A program used to measure the latency of SYSV semaphores from two threads or two forked processes that are synchronized via SYSV semaphores.
+    Utilities:
+    cyclicdeadline - A program used to test the deadline scheduler (SCHED_DEADLINE) using a cyclictest style program.
+    chrt - A program used to manipulate the real-time attributes of a process
+    cyclictest - A program used to accurately and repeatedly measure the difference between a thread's intended wake-up time and the time at which it actually wakes up in order to provide statistics about the system's latencies. 
+    deadline_test - A program used to test the deadline scheduler (SCHED_DEADLINE tasks).
+    hackbench - A program used to benchmark and stress test the Linux kernel scheduler.
+    hwlatdetect - A program used to control the kernel hardware latency detector module (hwlat_detector.ko).
+    pi_stress - A program  used  to  stress  the priority-inheritance code paths for POSIX mutexes, in both the Linux kernel and the C library.
+    pmqtest - A program used to measure the latency between sent and received time of a message dispatched from pairs of threads that are synchronized via mq_send/mw_receive().
+    ptsematest - A program used to measure the latency between releasing and getting a lock from two threads that are synchronized via pthread_mutex_unlock()/pthread_mutex_lock().
+    queuelat - A program used to simulate a network queue and check for latency violations in packet processing.
+    rt-migrate-test - A program used to test real-time multiprocessor scheduling of tasks to ensure the highest priority tasks are running on all available CPUs.
+    signaltest - A program used to test a signal roundtrip.
+    svsematest - A program used to measure the latency of SYSV semaphores from two threads or two forked processes that are synchronized via SYSV semaphores.
 
-  Test Inputs:
-  Execute cyclicdeadline and expect to get 0.
-  Execute chrt to manipulate the process attributes and expect to get 0.
-  Execute cyclictest for standard testing on SMP systems and expect to get 0.
-  Execute cyclictest to test tracemark when latency is exceeded and expect to get 0.
-  Execute cyclictest to test scenario where thread count is greater than cpu count and expect to get 0.
-  Execute deadline_test and expect to get 0.
-  Execute hackbench and expect to get 0.
-  Execute hwlatdetect and expect to get 0.
-  Execute pi_stress and expect to get 0.
-  Execute pmqtest and expect to get 0.
-  Execute ptsematest and expect to get 0.
-  Execute queuelat and expect to get 0.
-  Execute rt-migrate-test and expect to get 0.
-  Execute signaltest and expect to get 0.
-  Execute svsematest and expect to get 0.
+    Test Inputs:
+    Execute cyclicdeadline and expect to get 0.
+    Execute chrt to manipulate the process attributes and expect to get 0.
+    Execute cyclictest for standard testing on SMP systems and expect to get 0.
+    Execute cyclictest to test tracemark when latency is exceeded and expect to get 0.
+    Execute cyclictest to test scenario where thread count is greater than cpu count and expect to get 0.
+    Execute deadline_test and expect to get 0.
+    Execute hackbench and expect to get 0.
+    Execute hwlatdetect and expect to get 0.
+    Execute pi_stress and expect to get 0.
+    Execute pmqtest and expect to get 0.
+    Execute ptsematest and expect to get 0.
+    Execute queuelat and expect to get 0.
+    Execute rt-migrate-test and expect to get 0.
+    Execute signaltest and expect to get 0.
+    Execute svsematest and expect to get 0.
 
-  STEPS TO RUN
-  ./runtest.sh
+    STEPS TO RUN
+    ./runtest.sh
 
-  Results location:
-  output.txt | taskout.log, log is dependent upon the test executor.
+    Results location:
+    output.txt | taskout.log, log is dependent upon the test executor.
 
-  Expected results:
-  :: [   END    ] :: Command 'cyclicdeadline 1>/dev/null 2>&1 &' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'chrt -T 580000 -P $(pgrep cyclicdeadline) -D 990000 -d -p 0 1217' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'chrt -a -p "$(pgrep cyclicdeadline)"' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'chrt -a -p "$(pgrep cyclicdeadline)" | grep '580000/990000/990000'' (Expected 0, got 0)
-  :: [   END    ] :: Command 'pkill -9 cyclicdeadline' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'cyclictest --smp -umq -p95 --duration=30s' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'cyclictest -i 100 -umq -p95 -t 4 -b 1 --tracemark --duration=30s' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'cyclictest -t $(( nrcpus * 2 )) -q --duration=10s' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'deadline_test -i 1000' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'hackbench --process --groups 36 --loops 1000 --datasize 1000' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'hwlatdetect --duration=30s --threshold=2000' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'oslat --cpu-list 1 --rtprio 1 --duration 30s' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'pi_stress --quiet --duration=30' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'timeout 5m pip_stress' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'pmqtest --loops=1000 --interval=1000 --prio=99' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'ptsematest --affinity --loops=1000 --interval=1000 --prio=99 --threads' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'queuelat -m 20us -c 100 -p 100 -f 1000 -t 60s' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'rt-migrate-test 8' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'signaltest -b 20us -l 100 -q -t 10 -m -v' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'timeout --preserve-status -k 60s -s SIGINT -v 40s ssdd 10 10000' (Expected 0, got 0)
-  :: [   PASS   ] :: Command 'svsematest -a -b 20us -f -i 100 -l 100 -S' (Expected 0, got 0)
+    Expected results:
+    :: [   END    ] :: Command 'cyclicdeadline 1>/dev/null 2>&1 &' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'chrt -T 580000 -P $(pgrep cyclicdeadline) -D 990000 -d -p 0 1217' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'chrt -a -p "$(pgrep cyclicdeadline)"' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'chrt -a -p "$(pgrep cyclicdeadline)" | grep '580000/990000/990000'' (Expected 0, got 0)
+    :: [   END    ] :: Command 'pkill -9 cyclicdeadline' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'cyclictest --smp -umq -p95 --duration=30s' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'cyclictest -i 100 -umq -p95 -t 4 -b 1 --tracemark --duration=30s' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'cyclictest -t $(( nrcpus * 2 )) -q --duration=10s' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'deadline_test -i 1000' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'hackbench --process --groups 36 --loops 1000 --datasize 1000' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'hwlatdetect --duration=30s --threshold=2000' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'oslat --cpu-list 1 --rtprio 1 --duration 30s' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'pi_stress --quiet --duration=30' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'timeout 5m pip_stress' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'pmqtest --loops=1000 --interval=1000 --prio=99' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'ptsematest --affinity --loops=1000 --interval=1000 --prio=99 --threads' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'queuelat -m 20us -c 100 -p 100 -f 1000 -t 60s' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'rt-migrate-test 8' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'signaltest -b 20us -l 100 -q -t 10 -m -v' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'timeout --preserve-status -k 60s -s SIGINT -v 40s ssdd 10 10000' (Expected 0, got 0)
+    :: [   PASS   ] :: Command 'svsematest -a -b 20us -f -i 100 -l 100 -S' (Expected 0, got 0)
 
-  SUPPORTED PLATFORMS
-  all
+    SUPPORTED PLATFORMS
+    all
 
-  KNOWN ISSUES
-  none
+    KNOWN ISSUES
+    none
 contact: Shizhao Chen <shichen@redhat.com>
 enabled: true
 id: 9f732898-ef3f-453d-8f1a-553162f6df9f
 component:
-  - kernel-rt
+    - kernel-rt
 test: bash ./runtest.sh
 framework: shell
 require:
-  - procps-ng
-  - psmisc
-  - realtime-tests
-  - type: file
-    pattern:
-      - /rt-tests/include
+    - procps-ng
+    - psmisc
+    - realtime-tests
+    - type: file
+      pattern:
+          - /rt-tests/include
 duration: 60m
 extra-summary: rt-tests/us/rt-tests/sanity
 extra-task: rt-tests/us/rt-tests/sanity

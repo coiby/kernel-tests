@@ -1,77 +1,77 @@
 summary: Fuzz scheduler system calls.
 description: |
-  Confirm system call fuzz testing is being performed on scheduler system calls specified in Scheduler Risk Assessment, section 2.2.
-  The database is checked at the end to ensure each syscall was executed at least once.
-  Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
-  Test inputs:
-      A list with the scheduler system calls to be fuzzed, and a fuzzer program
-      called syzkaller. Input details:
-      - Scheduler system call list from RA documentation.
-      - syzkaller code: https://github.com/google/syzkaller
-      - patch: sched_ra.patch
-      - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
-  Expected results:
-      If the system calls are executed without incident during the test runtime,
-      the following output should be expected:
-      [   LOG    ] :: Test duration was 3601 seconds.
-      [   PASS   ] :: No crash results found.
-      [   PASS   ] :: setpriority executed.
-      [   PASS   ] :: getpriority executed.
-      [   PASS   ] :: sched_setscheduler executed.
-      [   PASS   ] :: sched_setparam executed.
-      [   PASS   ] :: sched_setattr executed.
-      [   PASS   ] :: sched_getscheduler executed.
-      [   PASS   ] :: sched_getparam executed.
-      [   PASS   ] :: sched_getattr executed.
-      [   PASS   ] :: sched_setaffinity executed.
-      [   PASS   ] :: sched_getaffinity executed.
-      [   PASS   ] :: sched_get_priority_max executed.
-      [   PASS   ] :: sched_get_priority_min executed.
-      [   PASS   ] :: sched_rr_get_interval executed.
-      [   PASS   ] :: sched_yield executed. 
-      [   PASS   ] :: membarrier executed.
-  Results location:
-      output.txt
+    Confirm system call fuzz testing is being performed on scheduler system calls specified in Scheduler Risk Assessment, section 2.2.
+    The database is checked at the end to ensure each syscall was executed at least once.
+    Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
+    Test inputs:
+        A list with the scheduler system calls to be fuzzed, and a fuzzer program
+        called syzkaller. Input details:
+        - Scheduler system call list from RA documentation.
+        - syzkaller code: https://github.com/google/syzkaller
+        - patch: sched_ra.patch
+        - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
+    Expected results:
+        If the system calls are executed without incident during the test runtime,
+        the following output should be expected:
+        [   LOG    ] :: Test duration was 3601 seconds.
+        [   PASS   ] :: No crash results found.
+        [   PASS   ] :: setpriority executed.
+        [   PASS   ] :: getpriority executed.
+        [   PASS   ] :: sched_setscheduler executed.
+        [   PASS   ] :: sched_setparam executed.
+        [   PASS   ] :: sched_setattr executed.
+        [   PASS   ] :: sched_getscheduler executed.
+        [   PASS   ] :: sched_getparam executed.
+        [   PASS   ] :: sched_getattr executed.
+        [   PASS   ] :: sched_setaffinity executed.
+        [   PASS   ] :: sched_getaffinity executed.
+        [   PASS   ] :: sched_get_priority_max executed.
+        [   PASS   ] :: sched_get_priority_min executed.
+        [   PASS   ] :: sched_rr_get_interval executed.
+        [   PASS   ] :: sched_yield executed. 
+        [   PASS   ] :: membarrier executed.
+    Results location:
+        output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 component:
-  - kernel
+    - kernel
 test: bash ./runtest.sh
 path: /memory/mmra/syzkaller
 id: 4e9c19c4-ef1a-4503-837d-b6d485cb9157
 framework: beakerlib
 require:
-  - make
-  - golang
-  - gcc
-  - glibc
-  - glibc-common
-  - glibc-devel
-  - gcc-c++
-  - wget
-  - git
-  - patch
-  - type: file
-    pattern:
-        -  /kernel-include
-        -  /memory/mmra/syzkaller
-        -  /general/scheduler/scheduler_fuzzing
+    - make
+    - golang
+    - gcc
+    - glibc
+    - glibc-common
+    - glibc-devel
+    - gcc-c++
+    - wget
+    - git
+    - patch
+    - type: file
+      pattern:
+          - /kernel-include
+          - /memory/mmra/syzkaller
+          - /general/scheduler/scheduler_fuzzing
 environment:
     mm_syscalls: |
-      "setpriority",
-      "getpriority",
-      "sched_setscheduler",
-      "sched_setparam",
-      "sched_setattr",
-      "sched_getscheduler",
-      "sched_getparam",
-      "sched_getattr",
-      "sched_setaffinity",
-      "sched_getaffinity",
-      "sched_get_priority_max",
-      "sched_get_priority_min",
-      "sched_rr_get_interval",
-      "sched_yield",
-      "membarrier"
-    supportcalls: ''
-    git_patches: '../../../../general/scheduler/scheduler_fuzzing/sched_ra.patch'
+        "setpriority",
+        "getpriority",
+        "sched_setscheduler",
+        "sched_setparam",
+        "sched_setattr",
+        "sched_getscheduler",
+        "sched_getparam",
+        "sched_getattr",
+        "sched_setaffinity",
+        "sched_getaffinity",
+        "sched_get_priority_max",
+        "sched_get_priority_min",
+        "sched_rr_get_interval",
+        "sched_yield",
+        "membarrier"
+    supportcalls: ""
+    git_patches: "../../../../general/scheduler/scheduler_fuzzing/sched_ra.patch"
 duration: 24h

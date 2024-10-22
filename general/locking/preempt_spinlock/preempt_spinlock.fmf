@@ -25,21 +25,20 @@ test: bash runtest.sh
 framework: beakerlib
 duration: 45m
 require:
-  - beakerlib
-  - gcc
-  - libgcc
-  - elfutils-libelf-devel
-  - openssl-devel
-  - type: file
-    pattern:
-        - /general/include
-        - /kernel-include
+    - beakerlib
+    - gcc
+    - libgcc
+    - elfutils-libelf-devel
+    - openssl-devel
+    - type: file
+      pattern:
+          - /general/include
+          - /kernel-include
 recommend:
-  - git
-  - glibc
-  - bison
-  - flex
+    - git
+    - glibc
+    - bison
+    - flex
 id: 43375efc-a271-4da3-8136-7aa4a1edf036
 extra-summary: kernel-tests/general/locking/preempt_spinlock
 extra-task: kernel-tests/general/locking/preempt_spinlock
-

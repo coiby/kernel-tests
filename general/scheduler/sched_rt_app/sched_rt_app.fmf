@@ -2,32 +2,32 @@ summary: Test schedule deadline with rt-app
 description: Test schedule deadline with rt-app
 contact: Chunyu Hu <chuhu@redhat.com>
 component:
-  - kernel
+    - kernel
 path: /general/scheduler/sched_rt_app
 test: bash -x ./runtest.sh
 framework: beakerlib
 require:
-  - gcc
-  - glibc
-  - wget
-  - bc
-  - json-c
-  - json-c-devel
-  - cmake
-  - autoconf
-  - libgcc
-  - gcc-c++
-  - m4
-  - libtool
-  - git
-  - bzip2
-  - util-linux
-  - stress-ng
-  - type: file
-    pattern:
-      - /general/include
-      - /general/scheduler/include
-      - /automotive/include
+    - gcc
+    - glibc
+    - wget
+    - bc
+    - json-c
+    - json-c-devel
+    - cmake
+    - autoconf
+    - libgcc
+    - gcc-c++
+    - m4
+    - libtool
+    - git
+    - bzip2
+    - util-linux
+    - stress-ng
+    - type: file
+      pattern:
+          - /general/include
+          - /general/scheduler/include
+          - /automotive/include
 duration: 1h
 extra-summary: /general/scheduler/sched_rt_app
 extra-task: /general/scheduler/sched_rt_app

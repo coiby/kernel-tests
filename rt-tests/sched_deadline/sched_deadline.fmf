@@ -2,20 +2,20 @@ summary: Special deadline_test on rt kernel
 description: Special deadline_test on rt kernel
 contact: Qiao Zhao <qzhao@redhat.com>
 component:
-  - kernel
+    - kernel
 path: /rt-tests/sched_deadline
 test: bash -x ./runtest.sh
 framework: shell
 require:
-  - realtime-tests
-  - type: file
-    pattern:
-      - /rt-tests/include
-      - /cki_lib
-      - /automotive/include
+    - realtime-tests
+    - type: file
+      pattern:
+          - /rt-tests/include
+          - /cki_lib
+          - /automotive/include
 duration: 5m
 extra-summary: /rt-tests/sched_deadline
 extra-task: /rt-tests/sched_deadline
 environment:
-  ENABLE_HRTICK: 0
+    ENABLE_HRTICK: 0
 id: 04375c0a-d389-4935-b015-31155fa7daa6
