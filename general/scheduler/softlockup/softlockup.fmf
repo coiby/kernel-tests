@@ -19,25 +19,25 @@ description: |
         :: [   PASS   ] :: Command 'insmod cpu_hogger/cpu_hogger.ko timeout=60 scheduler_class_str=FIFO sched_priority=1 preempt_disable_flag=1' (Expected 0, got 0)
         :: [   PASS   ] :: softlockup function test pass
         :: [   PASS   ] :: stop the hogger thread (Expected 0, got 0)
-    
+
     Results location:
         output.txt | taskout.log, log is dependent upon the test executor.
 contact: Chunyu Hu <chuhu@redhat.com>
 component:
-  - kernel
+    - kernel
 path: /general/scheduler/softlockup
 test: bash ./runtest.sh
 framework: beakerlib
 require:
-  - gcc
-  - libgcc
-  - elfutils-libelf-devel
-  - openssl-devel
-  - beakerlib
-  - type: file
-    pattern:
-        - /kernel-include
-        - /general/include
+    - gcc
+    - libgcc
+    - elfutils-libelf-devel
+    - openssl-devel
+    - beakerlib
+    - type: file
+      pattern:
+          - /kernel-include
+          - /general/include
 id: 9ae40ac6-abf2-4aad-8a81-39ad1e99c7a7
 duration: 45m
 extra-summary: /general/scheduler/softlockup

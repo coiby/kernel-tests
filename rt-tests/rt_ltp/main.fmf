@@ -1,48 +1,48 @@
 summary: RT ltp test
 description: |
-  Execute Linux Test Project (LTP) realtime tests, an open-source testsuite for testing real-time Linux. 
+    Execute Linux Test Project (LTP) realtime tests, an open-source testsuite for testing real-time Linux. 
 
-  Project link: https://github.com/linux-test-project/ltp
+    Project link: https://github.com/linux-test-project/ltp
 
-  Test Inputs:
-      $TEST_TYPE, defaults to "func", and can be a list.
-      $ltp_version, defaults to $TEST_VERSION.
-      If $TEST_VERSION is not specified, a default based upon test environment RHEL version will be set.
+    Test Inputs:
+        $TEST_TYPE, defaults to "func", and can be a list.
+        $ltp_version, defaults to $TEST_VERSION.
+        If $TEST_VERSION is not specified, a default based upon test environment RHEL version will be set.
 
-      Execute 'testcases/realtime/run.sh -t list' to compile a list of test cases to provide coverage for all items specified in the $TEST_TYPES variable.
-      Iterate through the compiled list of tests, execute 'testcases/realtime/run.sh -t' for each $case, and expect a return code of 0 and that no failure entry is detected in the case specific log for each iteration.
+        Execute 'testcases/realtime/run.sh -t list' to compile a list of test cases to provide coverage for all items specified in the $TEST_TYPES variable.
+        Iterate through the compiled list of tests, execute 'testcases/realtime/run.sh -t' for each $case, and expect a return code of 0 and that no failure entry is detected in the case specific log for each iteration.
 
-  Expected result:
-      For each $case within the list of relevant tests compiled for the specified $TEST_TYPES variable, the execution begins with the log entry: 
-      "running $case"
+    Expected result:
+        For each $case within the list of relevant tests compiled for the specified $TEST_TYPES variable, the execution begins with the log entry: 
+        "running $case"
 
-      The check_status function ensures that the execution of the case returned a 0.
-      The case specific log file is checked to ensure that a failure has not been reported.
-      If a failure was reported in the case specific log, it is saved for future analysis and the following entry appears in the executor log:
-      :: ./run.sh -t  $case :: FAIL ::
+        The check_status function ensures that the execution of the case returned a 0.
+        The case specific log file is checked to ensure that a failure has not been reported.
+        If a failure was reported in the case specific log, it is saved for future analysis and the following entry appears in the executor log:
+        :: ./run.sh -t  $case :: FAIL ::
 
-      Execution of a case with a pass result will have the following entry in the executor log.
-      :: ./run.sh -t  $case :: PASS ::
+        Execution of a case with a pass result will have the following entry in the executor log.
+        :: ./run.sh -t  $case :: PASS ::
 
-      If all cases executed with a result of pass then the following entry shall appear in the executor log.
-      overall result: PASS
+        If all cases executed with a result of pass then the following entry shall appear in the executor log.
+        overall result: PASS
 
-  Results location:
-      output.txt. | taskout.log, log is dependent upon the test executor.
+    Results location:
+        output.txt. | taskout.log, log is dependent upon the test executor.
 contact: Qiao Zhao <qzhao@redhat.com>
 test: bash -x ./runtest.sh
 framework: shell
 duration: 4h
 require:
-  - wget
-  - gcc
-  - make
-  - automake
-  - type: file
-    pattern:
-      - /rt-tests/include
-      - /cki_lib
-      - /distribution/ltp/include
+    - wget
+    - gcc
+    - make
+    - automake
+    - type: file
+      pattern:
+          - /rt-tests/include
+          - /cki_lib
+          - /distribution/ltp/include
 extra-summary: rt-tests/rt_ltp
 extra-task: rt-tests/rt_ltp
 id: 0e4c6f26-c0cd-4d3d-8f64-8597fdd1909c

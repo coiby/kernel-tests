@@ -2,22 +2,22 @@ summary: Test to detect System Management Interrupts (SMIs)
 description: Test to detect System Management Interrupts (SMIs)
 contact: Qiao Zhao <qzhao@redhat.com>
 component:
-  - kernel
+    - kernel
 path: /rt-tests/smidetect
 test: bash -x ./runtest.sh
 framework: shell
 require:
-  - realtime-tests
-  - type: file
-    pattern:
-      - /rt-tests/include
-      - /cki_lib
-      - /automotive/include
+    - realtime-tests
+    - type: file
+      pattern:
+          - /rt-tests/include
+          - /cki_lib
+          - /automotive/include
 duration: 3h
 extra-summary: /rt-tests/smidetect
 extra-task: /rt-tests/smidetect
 environment:
-  DURATION: 1m
-  LATCHECK: 1
-  HARDLIMIT: 4000us
+    DURATION: 1m
+    LATCHECK: 1
+    HARDLIMIT: 4000us
 id: b59e5d25-b7f1-4d5a-a1fb-59f7df7a1b42

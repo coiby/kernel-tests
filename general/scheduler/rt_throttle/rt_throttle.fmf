@@ -30,7 +30,7 @@ description: |
         output.txt | taskout.log, log is dependent upon the test executor.
 contact: Chunyu Hu <chuhu@redhat.com>
 component:
-  - kernel
+    - kernel
 path: /general/scheduler/rt_throttle
 test: bash -x ./runtest.sh
 framework: shell

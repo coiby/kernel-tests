@@ -2,32 +2,32 @@ summary: RHIVOS test environment setup and kernel check for rt-tests
 description: RHIVOS test environment setup and kernel check for rt-tests
 contact: Charles Shi <cheshi@redhat.com>
 component:
-  - kernel
+    - kernel
 path: /rt-tests/auto_kernel_check
 test: bash -x ./runtest.sh
 framework: shell
 require:
-  - realtime-tests
-  - stress-ng
-  - stalld
-  - bc
-  - curl
-  - gcc
-  - gdb
-  - git
-  - patch
-  - pciutils
-  - rpm-build
-  - strace
-  - time
-  - unzip
-  - wget
-  - zip
-  - python3
-  - python3-pip
-  - type: file
-    pattern:
-      - /automotive/include
+    - realtime-tests
+    - stress-ng
+    - stalld
+    - bc
+    - curl
+    - gcc
+    - gdb
+    - git
+    - patch
+    - pciutils
+    - rpm-build
+    - strace
+    - time
+    - unzip
+    - wget
+    - zip
+    - python3
+    - python3-pip
+    - type: file
+      pattern:
+          - /automotive/include
 duration: 20m
 extra-summary: /rt-tests/auto_kernel_check
 extra-task: /rt-tests/auto_kernel_check
