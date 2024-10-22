@@ -220,10 +220,10 @@
 /ipmi/stress/ipmitool-loop/ @bgoncalv @ltrivell @lulinqing
 /jvm/dacapobench/ @bgoncalv @lulinqing @tstuefe1
 /jvm/jcstress/ @bgoncalv @lulinqing @tstuefe1
-/kdump-cki/crash-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
-/kdump-cki/crash-sysrq-c/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @thenzl @yiyan1
-/kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
-/kdump-cki/kexec-load/ @baoquan_he @bgoncalv @emmawu1 @lulinqing @yiyan1
+/kdump-cki/crash-file-load/ @baoquan_he @bgoncalv @lulinqing @yiyan1
+/kdump-cki/crash-sysrq-c/ @baoquan_he @bgoncalv @lulinqing @thenzl @yiyan1
+/kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @lulinqing @yiyan1
+/kdump-cki/kexec-load/ @baoquan_he @bgoncalv @lulinqing @yiyan1
 /kselftests/ @bgoncalv @fmaurer-rh @liuhangbin @lulinqing @npache @sbertram
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
