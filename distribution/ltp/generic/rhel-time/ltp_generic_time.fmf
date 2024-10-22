@@ -17,7 +17,7 @@ component:
   - glibc
 test: bash ./runtest.sh
 framework: shell
-require:
+require+:
   - procmail
   - automake
   - autoconf
