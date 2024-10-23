@@ -1,5 +1,20 @@
 summary: clock_getcpuclockid() returns CPU-time clock for a process
-description: clock_getcpuclockid() returns CPU-time clock for a process
+description: |
+    General test that clock_getcpuclockid() returns CPU-time clock for a
+    process.The process chosen is the current process.
+    Test input:
+        Input details:
+        - clock_getcpuclockid.c, source.
+    Expected results:
+        If the process described by pid exists and the calling
+        process has permission, the clock ID of
+        this clock shall be returned in clock_id.
+         Output details:
+           systemctl is /usr/bin/systemctl
+           Test PASSED
+           CPU-time clock for PID 1 (init process)is 8.461075865 seconds
+    Results location:
+        output.txt
 contact: Qiao Zhao <qzhao@redhat.com>
 id: 153c24f9-acca-4f15-8930-49567126bba3
 component:
