@@ -47,7 +47,7 @@ rlJournalStart
     if [ "${REBOOTCOUNT}" -eq 1 ]; then
         rlPhaseStartTest "Check that config_memtest is enable and dmseg log for the memtest result"
             DMESG_TEMP_FILE="/tmp/dmesg_temp.txt"
-            dmesg > "$DMESG_TEMP_FILE"
+            journalctl -k > "$DMESG_TEMP_FILE"
             rlAssertGrep "CONFIG_MEMTEST=y" "${BOOT_CONFIG}" -i
             rlAssertGrep "early_memtest" "${DMESG_TEMP_FILE}" -i
         rlPhaseEnd
