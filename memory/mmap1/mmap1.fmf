@@ -16,6 +16,9 @@ require:
   - bzip2
   - gcc 
   - glibc
+  - type: file
+    pattern:
+        - /general/include
 duration: 5m
 tier: 1
 extra-summary: /kernel/memory/mmap1
