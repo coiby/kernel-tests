@@ -1,0 +1,16 @@
+summary: storage/block/RHEL_60811_atomic_write
+description: enable block atomic write test
+contact: Changhui Zhong <czhong@redhat.com>
+component:
+    - kernel
+path: /storage/block/RHEL_60811_atomic_write
+test: bash ./runtest.sh
+framework: shell
+recommend:
+    - beakerlib-redhat
+require:
+    - nvme-cli
+duration: 2h
+tier: 1
+extra-summary: /storage/block/RHEL_60811_atomic_write
+extra-task: /storage/block/RHEL_60811_atomic_write
