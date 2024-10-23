@@ -1,0 +1,24 @@
+summary: KS-TC:nvdimm/btt_fsdax_raw_blktests
+description: nvdimm blktests with btt fsdax raw devices
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvdimm/btt_fsdax_raw_blktests
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - git
+  - ndctl
+  - gcc
+  - gcc-c++
+  - fio
+  - blktrace
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvdimm/btt_fsdax_raw_blktests
+extra-task: /storage/nvdimm/btt_fsdax_raw_blktests
+id: 08362148-45b3-4455-b39f-f5f5b98dd77b
