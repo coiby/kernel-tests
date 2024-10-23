@@ -103,7 +103,11 @@ main() {
             PACKAGES_NAMES="${BUILD_NVR}"
         fi
 
-        if ! dnf install --disablerepo=* --repofrompath="brewrpm,${repo_directory}" -y ${PACKAGES_NAMES}; then
+        repofrompath="brewrpm,${repo_directory}"
+
+        packages_nvr=$(dnf repoquery --nvr --quiet  --disablerepo=* --repofrompath="${repofrompath}" ${PACKAGES_NAMES})
+
+        if ! dnf install --disablerepo=* --repofrompath="${repofrompath}" -y ${packages_nvr}; then
                 echo "ERROR: couldn't install package rpms."
                 rstrnt-report-result "install-rpms" WARN
                 rstrnt-abort recipe
@@ -111,6 +115,13 @@ main() {
         fi
         rm -rf "${repo_directory}"
         rm -f "${repo_file_path}"
+
+        if ! rpm -q ${packages_nvr}; then
+            echo "ERROR: packages not installed properly."
+            rstrnt-report-result "install-rpms" WARN
+            rstrnt-abort recipe
+            exit 0
+        fi
 
         if ! dnf needs-restarting -r; then
             touch ./needs_reboot
