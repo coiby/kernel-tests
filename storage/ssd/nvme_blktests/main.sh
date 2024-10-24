@@ -22,6 +22,10 @@ function runtest() {
 	[ ! -d "blktests" ] && tok "git clone https://github.com/osandov/blktests"
 	tok "cd blktests && make && echo TEST_DEVS=\($test_devs\) > config"
 
+	if rlIsRHEL 9; then
+		trun dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+		trun yum -y install nbd
+	fi
 	testcases=""
 	if rlIsRHEL 7; then
 		#RHEL-7.6
