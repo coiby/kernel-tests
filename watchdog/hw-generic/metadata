@@ -1,6 +1,6 @@
 [General]
 name=watchdog/hw-generic
-owner=Rachel Sibley <rasibley@redhat.com>
+owner=Fendy Tjahjadi <ftjahjad@redhat.com>
 description=Watchdog test
 license=GPLv3
 confidential=no

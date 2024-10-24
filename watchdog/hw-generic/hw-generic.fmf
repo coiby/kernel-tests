@@ -1,0 +1,30 @@
+summary: Generic hardware watchdog test
+description: |
+  Confirm that the hardware watchdog (/dev/watchdog) triggers a system reset after writing '\0' to it.
+  
+  Test inputs:
+    - /dev/watchdog is accessible
+
+  Expected results:
+    - System reboots 30 to 60 seconds after stop feeding the watchdog.
+    - Log output:
+      [   LOG    ] :: Disabling watchdog successfully triggered a reboot!
+      [   PASS   ] :: Command 'disable_wdt_test' (Expected 0, got 0)
+      [...]
+      RESULT: PASS (Trigger watchdog reboot)
+
+  Results location:
+      output.txt
+contact: Fendy Tjahjadi <ftjahjad@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+path: /watchdog/hw-generic
+framework: beakerlib
+require:
+  - gcc
+  - type: file
+    pattern:
+        -  /cki_lib
+duration: 30m
+id: fb6af978-83eb-46fc-8381-a3f6f3099654
