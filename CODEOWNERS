@@ -319,6 +319,6 @@
 /vm/kvm-self-tests/ @bgoncalv @hlynden @jarichte @lulinqing
 /vm/kvm-unit-tests/ @bgoncalv @hlynden @jarichte @lulinqing
 /vm/qemu-sanity-check/ @bgoncalv @lulinqing @rwmjones
-/watchdog/hw-generic/ @bgoncalv @ftjahjad @lulinqing
+/watchdog/hw-generic/ @bgoncalv @ftjahjad @lulinqing @pridolfi1
 
 # GITLAB-CODEOWNERS-GENERATED-END
