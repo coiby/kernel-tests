@@ -8,5 +8,5 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=bc;bind-utils;bzip2;ethtool;expect;gcc;git;iproute;libteam;libtool;nc;net-tools;nmap;nmap-ncat;patch;rsync;socat;tcpdump;teamd;traceroute;wget
-softDependencies=pexpect;python3-pexpect;bridge-utils
+dependencies=bc;bind-utils;bzip2;ethtool;expect;gcc;git;iproute;libtool;nc;net-tools;nmap;nmap-ncat;patch;rsync;socat;tcpdump;traceroute;wget
+softDependencies=pexpect;python3-pexpect;bridge-utils;libteam;teamd;
