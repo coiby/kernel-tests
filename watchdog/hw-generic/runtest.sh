@@ -28,7 +28,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TEST="watchdog/hw-generic"
+export TEST="watchdog/hw-generic"
 
 # Source the common test script helpers
 . ../../cki_lib/libcki.sh || exit 1
@@ -40,19 +40,16 @@ touch "$TEST_STATUS"
 # File to backup/restore bootorder
 FILE=/tmp/watchdog_boot_order
 
-# /dev/kmsg file
-kmsg=/dev/kmsg
-
 efi_save()
 {
 	order=$(efibootmgr | awk '/BootOrder/ {print $2}')
 	curr=$(efibootmgr | awk '/BootCurrent/ {print $2}')
 	first=$(echo $order | cut -d ',' -f 1 )
 	if [ "$first" = "$curr" ]; then
-		echo -e "\nSAVE: boot order is *already* correct" | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "SAVE: boot order is *already* correct"
 		return
 	fi
-	echo -e "\nSAVE BootOrder" | tee -a ${OUTPUTFILE} ${kmsg}
+	rlLog "SAVE BootOrder"
 	new="$curr,$order"
 	efibootmgr -o "$new"
 	echo "$order" > $FILE
@@ -62,14 +59,14 @@ efi_save()
 efi_restore()
 {
 	if [ ! -e $FILE ]; then
-		echo "RESTORE: boot order is correct" | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "RESTORE: boot order is correct"
 		return
 	fi
 	order=$(cat $FILE)
-	echo -e "\nRESTORE BootOrder" | tee -a ${OUTPUTFILE} ${kmsg}
+	rlLog "RESTORE BootOrder"
 	efibootmgr -o "$order"
 	if [ $? -ne 0 ]; then
-		echo -e "\nRESTORE Failed! Please investigate to avoid an incorrect boot order" | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "RESTORE Failed! Please investigate to avoid an incorrect boot order"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		exit 0
 	fi
@@ -81,7 +78,7 @@ efi_restore()
 efi_set()
 {
 	if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
-		echo "Invalid command: $1" | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "Invalid command: $1"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		exit 0
 	fi
@@ -95,31 +92,31 @@ chk_support() {
 		return 0
 	fi
 
-	echo -e "\n========== Checking Hardware Support ============" | tee -a ${OUTPUTFILE} ${kmsg}
+	rlLog "Checking Hardware Support"
 
 	# Check that either iTCO or wdat is enabled in the logs
-	echo -e "\n== Related dmesg output:" | tee -a ${OUTPUTFILE} ${kmsg}
-	egrep -i 'itco|wdat' /var/log/messages || echo "*** Warning, no related dmesg output! ***" | tee -a ${OUTPUTFILE} ${kmsg}
+	rlLog "Related dmesg output:"
+	egrep -i 'itco|wdat' /var/log/messages || rlLog "*** Warning, no related dmesg output! ***"
 
-	echo -e "\n== Checking that /dev/watchdog exists:" | tee -a ${OUTPUTFILE} ${kmsg}
+	rlLog "Checking that /dev/watchdog exists:"
 	if [ -c /dev/watchdog ]; then
-		echo "/dev/watchdog exists" | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "/dev/watchdog exists"
 		ls -l /dev/watchdog
 	else
-		echo "/dev/watchdog does not exist! Skipping test and existing !" | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "/dev/watchdog does not exist! Skipping test and existing !"
 		rstrnt-report-result $TEST SKIP
 		exit 0
 	fi
 
 	# Compile watchdog-simple test
-	echo -e "\n== Checking that watchdog-simple.c compiled successfully:" | tee -a ${OUTPUTFILE} ${kmsg}
+	rlLog "Checking that watchdog-simple.c compiled successfully:"
 	gcc -o watchdog-simple watchdog-simple.c
 	if [ ! -x watchdog-simple ] ; then
-		echo "Failed to build tests, exiting!" | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "Failed to build tests, exiting!"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
 		exit 0
 	else
-		echo "Compiled successfully." | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "Compiled successfully."
 	fi
 
 	echo chk_support >> "$TEST_STATUS"
@@ -127,18 +124,15 @@ chk_support() {
 }
 
 cleanup() {
-	echo -e "\n========== Clean up =============================" | tee -a ${OUTPUTFILE} ${kmsg}
-	echo 'Remove status file' | tee -a ${OUTPUTFILE} ${kmsg}
+	rlLog 'Remove status file'
 	rm -f "$TEST_STATUS"
 }
 
 disable_wdt_test() {
-	echo -e "\n========== Trigger watchdog reboot ============" | tee -a ${OUTPUTFILE} ${kmsg}
-
 	# Check if we've already executed this function. If so, this indicates the
 	# the system rebooted (almost surely due to the watchdog). Report as PASS.
 	if grep -q disable_wdt_test "$TEST_STATUS" ; then
-		echo "== Disabling watchdog successfully triggered a reboot:" | tee -a ${OUTPUTFILE} ${kmsg}
+		rlLog "Disabling watchdog successfully triggered a reboot!"
 		rstrnt-report-result $TEST/disable_wdt_test PASS
 		return 0
 	fi
@@ -148,32 +142,45 @@ disable_wdt_test() {
 	# Start watchdog "daemon" in the background (which writes 1's into
 	# /dev/watchdog and keeps the box up). After several seconds, kill
 	# the program which should then cause the box to reboot.
-	echo "Disabling writes to /dev/watchdog... System should reboot in 30 - 60 seconds" | tee -a ${OUTPUTFILE} ${kmsg}
+	rlLog "Disabling writes to /dev/watchdog... System should reboot in 30 - 60 seconds"
 	sync;sync
 	sleep 3
 	./watchdog-simple &
 	sleep 5
 	killall watchdog-simple
-
-	# If we get here it didn't reboot, so report as FAIL
+	rlLog "Inform tmt that we're rebooting using rstrnt-reboot with a custom non-reboot command."
+	rstrnt-reboot -c "echo 'reboot using watchdog'"
 	sleep 65
-	echo "The system didn't reboot, reporting FAIL!" | tee -a ${OUTPUTFILE} ${kmsg}
+	# If we get here it didn't reboot, so report as FAIL
+	rlLog "The system didn't reboot, reporting FAIL!"
 	rstrnt-report-result $TEST/disable_wdt_test FAIL
+	return 1
 }
 
-chk_support
-# Set the boot order correctly for UEFI systems
-which efibootmgr &> /dev/null
-if [ $? -eq 0 ]; then
-	if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
-		echo -e "\n========== Setting the BootOrder correcty for UEFI system ============" | tee -a ${OUTPUTFILE} ${kmsg}
-		echo "== Original BootOrder:" | tee -a ${OUTPUTFILE} ${kmsg}
-		efibootmgr
-		efi_set save
-	else
-		echo -e "\n========== Restoring the BootOrder correcty for UEFI system ============" | tee -a ${OUTPUTFILE} ${kmsg}
-		efi_set restore
-	fi
-fi
-disable_wdt_test
-cleanup
+rlJournalStart
+	rlPhaseStartSetup
+		rlShowRunningKernel
+		rlRun chk_support
+		# Set the boot order correctly for UEFI systems
+		if efibootmgr; then
+			if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then
+				rlLog "Setting the BootOrder correcty for UEFI system"
+				rlLog "Original BootOrder:"
+				rlRun efibootmgr
+				rlRun "efi_set save"
+			else
+				rlLog "Restoring the BootOrder correcty for UEFI system"
+				rlRun "efi_set restore"
+			fi
+		else
+			rlLog "Not a UEFI system. Skipping UEFI boot order setup."
+		fi
+	rlPhaseEnd
+	rlPhaseStartTest "Trigger watchdog reboot"
+		rlRun disable_wdt_test
+	rlPhaseEnd
+	rlPhaseStartCleanup
+		rlRun cleanup
+	rlPhaseEnd
+rlJournalPrintText
+rlJournalEnd
