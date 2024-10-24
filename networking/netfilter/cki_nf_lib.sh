@@ -21,6 +21,7 @@
 # Include Beaker environment
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || . /usr/lib/beakerlib/beakerlib.sh || exit 1
+. ../../kernel-include/runtest.sh || exit 1
 
 typeset -a pkgs
 #--------------------------
@@ -31,6 +32,11 @@ dependences=( \
 	tcpdump conntrack-tools \
 	nftables ipset ipvsadm \
 )
+
+if uname -r | grep -q "\.el10"; then
+	dependences+=( "$(K_GetRunningKernelRpmSubPackageNVR modules-extra)" )
+fi
+
 left=()
 WORK_PATH=$(pwd)
 
