@@ -35,7 +35,7 @@ function run_test()
 
 # if (rlIsRHEL '>=10' || ((${uk_flag} == 1))) && grep -q "CONFIG_BLK_DEV_UBLK=y" "/boot/config-${kernel_version}";then
     if rlIsRHEL '>=10' || [ "${uk_flag}" -eq 1 ];then
-        if grep -q "CONFIG_BLK_DEV_UBLK=y" "/boot/config-${kernel_version}";then
+        if grep -q "CONFIG_BLK_DEV_UBLK=m" "/boot/config-${kernel_version}";then
             ublk_flag=1
         fi
     fi

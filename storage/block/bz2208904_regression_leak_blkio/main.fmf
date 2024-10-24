@@ -10,7 +10,7 @@ recommend:
     - beakerlib-redhat
 require:
     - podman
-duration: 1h
+duration: 3h
 tier: 1
 extra-summary: /storage/block/bz2208904_regression_leak_blkio
 extra-task: /storage/block/bz2208904_regression_leak_blkio
