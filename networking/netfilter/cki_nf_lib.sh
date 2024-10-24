@@ -23,7 +23,6 @@
 . /usr/share/beakerlib/beakerlib.sh || . /usr/lib/beakerlib/beakerlib.sh || exit 1
 . ../../kernel-include/runtest.sh || exit 1
 
-typeset -a pkgs
 #--------------------------
 #Put Required packages here
 #--------------------------
@@ -137,6 +136,7 @@ EOF
 #
 # Usage: <Pkgname> [Pkgname] ...
 #--------------------------------------------------------------------------
+# shellcheck disable=SC1083
 netfilter_install()
 {
 	if [[ -z $1 ]];then
@@ -236,6 +236,7 @@ install_dependence()
 	[[ ${#left[*]} -ne 0 ]] && echo "Packege ${left[*]} need to be installed..."
 
 	# Install the tools that failed with yum.
+	# shellcheck disable=SC2048
 	netfilter_install ${left[*]}
 	[[ "${left[*]}" =~ .*ipvsadm.* ]] && ipvsadm_install
 	# Expect nothing left to install
@@ -365,7 +366,9 @@ do_setup()
 
 run()
 {
-	local ns=$1; shift; local cmd=$@;
+	local ns=$1; shift;
+	# shellcheck disable=SC2124
+	local cmd=$@;
 	if [[ "$cmd" =~ "NoCheck" ]];then
 		cmd=${cmd//NoCheck/}
 		rlRun "ip netns exec $ns $cmd" 0-255 "NoCheck"
