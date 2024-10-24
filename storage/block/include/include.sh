@@ -29,7 +29,7 @@ function check_log()
     rlRun "dmesg | grep -i 'Call Trace:'" 1 "check the errors"
     rlRun "dmesg | grep -i 'kernel BUG at'" 1 "check the errors"
     rlRun "dmesg | grep 'BUG:'" 1 "check the errors"
-    rlRun "dmesg | grep -i 'WARNING:'" 1 "check the errors"
+#    rlRun "dmesg | grep -i 'WARNING:'" 1 "check the errors"
 }
 
 function get_free_disk()

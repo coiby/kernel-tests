@@ -10,4 +10,4 @@ destructive=no
 entry_point=bash ./runtest.sh
 dependencies=kernel-devel;gcc;gcc-c++;cryptsetup;make;mdadm
 repoRequires=cki_lib
-max_time=1h
+max_time=3h

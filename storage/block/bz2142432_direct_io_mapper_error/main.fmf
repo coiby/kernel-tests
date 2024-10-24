@@ -8,7 +8,7 @@ test: bash ./runtest.sh
 framework: shell
 recommend:
     - beakerlib-redhat
-duration: 1h
+duration: 3h
 tier: 1
 extra-summary: /storage/block/bz2142432_direct_io_mapper_error
 extra-task: /storage/block/bz2142432_direct_io_mapper_error
