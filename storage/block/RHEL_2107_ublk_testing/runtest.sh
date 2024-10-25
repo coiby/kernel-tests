@@ -46,6 +46,7 @@ function run_test()
         rlRun "autoreconf -i&& ./configure&& make -j 4&& make install > tmp.out 2>&1" "0-255"
         popd
 
+        rlRun "modprobe ublk_drv"
 #make test T=all
         rlRun "cd ubdsrv"
         rlRun "make test T=null"

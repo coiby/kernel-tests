@@ -82,7 +82,8 @@ function fio_test()
 
 function run_test()
 {
-    # shellcheck disable=SC2034
+    rlRun "modprobe ublk_drv"
+# shellcheck disable=SC2034
     if ! output=$(ls /dev/ublk-control); then
         rlLog "not load ublk module,skip UBLK test"
         rstrnt-report-result "not enable UBLK driver" SKIP 0
