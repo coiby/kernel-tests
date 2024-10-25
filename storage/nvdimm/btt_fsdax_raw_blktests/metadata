@@ -1,0 +1,14 @@
+[General]
+name=storage/nvdimm/btt_fsdax_raw_blktests
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvdimm blktests with btt fsdax raw devices
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvdimm/include
+dependencies=git;ndctl;gcc;gcc-c++;fio;blktrace
+max_time=1h
+use_pty=false
