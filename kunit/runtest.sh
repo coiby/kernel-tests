@@ -26,26 +26,14 @@
 
 #processes a test result from the debug/sysfs
 process_results(){
-	TMPFILE=$(mktemp) || exit 1
-	OUTFILE=$(mktemp) || exit 1
 	rlLog "processing results from test ${1}"
-	sed -i 's/KTAP version 1//g' "$1" #remove KTAP VERSION
-	sed -i '/^$/d' "$1" #remove all empty lines
-	sed -i 's/    //g' "$1" #remove all tab
-	sed -i '/^#/d' "$1" #remove comments
-	sed -i 's/#.*//' "$1" #remove comments
-	sed -i '$d' "$1" #remove last line.
-	sed -i '/^\(ok\|not ok\)/!d' "$1" #removeall but 1..N and ok/not ok
-	uniq "$1" > "$TMPFILE"  #remove dup
-
-	lines=$(wc -l "$TMPFILE")
-	echo "1..$lines" | cat - "$TMPFILE" > $OUTFILE
-	tappy "$OUTFILE" &> "$TMPFILE"
-	RESULT_OUTPUT=$(cat "$TMPFILE" |tail -1)
-	if [ "$RESULT_OUTPUT" = "OK" ]; then
-		return 0
-	else
+	rlFileSubmit "${1}"
+	rlLog "$(cat ${test_name}.log)"
+	if grep -q "not ok" $1; then
+		grep "not ok" $1 >> not_ok.log
 		return 1
+	else
+		return 0
 	fi
 }
 
@@ -68,12 +56,7 @@ rlJournalStart
 	rlPhaseEnd
 #-------------------- Setup ---------------------
 	rlPhaseStartSetup
-		#install tappy
-		pip3 install tap.py
-		if [ $? -ne 0 ]; then
-			rlDie "Pip unable to install tap.py, aborting test"
-		fi
-
+		touch not_ok.log
 		# kunit module was added on kernel 4.18.0-279 (BZ#1900119)
 		if cki_kver_lt "4.18.0-279"; then
 			# kernel is too old to support kunit module
@@ -188,9 +171,6 @@ rlJournalStart
 							test_name=${test_name// /_}
 							cp "$dir/results" "${test_name}.log"
 
-							rlFileSubmit "${test_name}.log"
-							# use rlLog instead of `rlRun -l` to avoid the 50 lines limit
-							rlLog "$(cat ${test_name}.log)"
 							process_results "${test_name}.log"
 							result=$?
 							if [ $result -eq 0 ]; then
@@ -218,12 +198,14 @@ rlJournalStart
 
 
 #-------------------- Clean Up ------------------
+	rlFileSubmit not_ok.log
 	rlPhaseStartCleanup
 		# Restore panic on oops value
 		rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
 		#remove kunit framework
 		rmmod kunit
 		rm -f kunit-tests.list
+		rm -f not_ok.log
 	rlPhaseEnd
 
 rlJournalEnd
