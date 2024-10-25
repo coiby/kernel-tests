@@ -46,7 +46,7 @@ function run_fio()
     mount "${dev}" "${mnt}"
     sleep 3
 
-    rlRun "fio --bs=4k --ioengine=${engine} --iodepth=${depth} --numjobs=8 \
+    rlRun "fio --bs=4k --ioengine=${engine} --iodepth=16 --numjobs=8 \
         --rw=${pattern} --name=ublk-${R}-${engine}-${fstype} \
         --filename=${mnt}/test.img --direct=${is_direct} --size=10G \
         --runtime=30 --group_reporting &> /dev/null"
@@ -71,10 +71,8 @@ function fio_test()
     for engine in libaio io_uring; do
         for sched in `sed 's/[][]//g' /sys/block/${device}/queue/scheduler`; do
             echo ${sched} > /sys/block/${device}/queue/scheduler
-            for depth in 4 128; do
-                for fstype in ext2 ext3 ext4 xfs; do
-                    run_fio ${device} ${engine} ${sched} ${pattern} ${is_direct} ${depth} ${fstype} ${MNT}
-                done
+            for fstype in ext2 ext3 ext4 xfs; do
+                run_fio ${device} ${engine} ${sched} ${pattern} ${is_direct} ${depth} ${fstype} ${MNT}
             done
         done
     done

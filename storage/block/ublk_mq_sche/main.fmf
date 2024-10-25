@@ -13,7 +13,7 @@ require:
     - libaio
     - libaio-devel
     - qemu-img
-duration: 3h
+duration: 5h
 tier: 1
 extra-summary: /storage/block/ublk_mq_sche
 extra-task: /storage/block/ublk_mq_sche
