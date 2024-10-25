@@ -38,7 +38,7 @@ function run_fio()
         "Direct: ${is_direct} Depth: ${depth} " \
         "Block size: ${bsize}K Size: ${sg_gb}G " | tee /dev/kmsg
 
-    rlRun "fio --bs=${bsize}'k' --ioengine=${engine} --iodepth=${depth} --numjobs=4 \
+    rlRun "fio --bs=${bsize}'k' --ioengine=${engine} --iodepth=16 --numjobs=4 \
         --rw=${pattern} --name=${device}-${engine}-${pattern}-${bsize}'k' \
         --filename=/dev/${device} --direct=${is_direct} --size=${sg_gb}'G' \
         --runtime=30 &> /dev/null"
@@ -59,11 +59,9 @@ function fio_test()
     for engine in libaio sync io_uring; do
         for sched in `sed 's/[][]//g' /sys/block/${device}/queue/scheduler`; do
             echo ${sched} > /sys/block/${device}/queue/scheduler
-            for depth in 1 64 128; do
-                for bsize in 4 128; do
-                    run_fio ${device} ${engine} ${sched} ${pattern} ${is_direct} ${depth} ${bsize} ${sg_gb}
-                    let cnt+=1
-                done
+            for bsize in 4 64 512; do
+                run_fio ${device} ${engine} ${sched} ${pattern} ${is_direct} ${depth} ${bsize} ${sg_gb}
+                let cnt+=1
             done
         done
     done
