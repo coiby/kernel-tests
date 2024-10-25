@@ -27,6 +27,7 @@ require:
   - strace
   - gcc
   - bzip2
+  - initscripts-service
 recommend:
   - numactl-devel
   - ntpdate

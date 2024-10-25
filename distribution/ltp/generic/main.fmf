@@ -1,4 +1,5 @@
 require:
+  - initscripts-service
   - type: file
     pattern:
       - /cki_lib
