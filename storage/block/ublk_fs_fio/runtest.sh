@@ -30,13 +30,12 @@ function run_fio()
     sched=$3
     pattern=$4
     is_direct=$5
-    depth=$6
-    fstype=$7
-    mnt=$8
+    fstype=$6
+    mnt=$7
     dev=/dev/${device}
 
     echo "Dev: ublk-${R}  Engine: ${engine} Sched: ${sched} Pattern: ${pattern} " \
-        "Depth: ${depth} Fstype: ${fstype}" | tee /dev/kmsg
+        "Depth: 16 Fstype: ${fstype}" | tee /dev/kmsg
 
     if [[ ${fstype} == "xfs" ]];then
         mkfs -t "${fstype}" -f "${dev}"
@@ -72,7 +71,7 @@ function fio_test()
         for sched in `sed 's/[][]//g' /sys/block/${device}/queue/scheduler`; do
             echo ${sched} > /sys/block/${device}/queue/scheduler
             for fstype in ext2 ext3 ext4 xfs; do
-                run_fio ${device} ${engine} ${sched} ${pattern} ${is_direct} ${depth} ${fstype} ${MNT}
+                run_fio ${device} ${engine} ${sched} ${pattern} ${is_direct} ${fstype} ${MNT}
             done
         done
     done

@@ -30,12 +30,11 @@ function run_fio()
     sched=$3
     pattern=$4
     is_direct=$5
-    depth=$6
-    bsize=$7
-    sg_gb=$8
+    bsize=$6
+    sg_gb=$7
 
     echo "Dev: ublk-${R}  Engine: ${engine} Sched: ${sched} Pattern: ${pattern} " \
-        "Direct: ${is_direct} Depth: ${depth} " \
+        "Direct: ${is_direct} Depth: 16 " \
         "Block size: ${bsize}K Size: ${sg_gb}G " | tee /dev/kmsg
 
     rlRun "fio --bs=${bsize}'k' --ioengine=${engine} --iodepth=16 --numjobs=4 \
@@ -60,7 +59,7 @@ function fio_test()
         for sched in `sed 's/[][]//g' /sys/block/${device}/queue/scheduler`; do
             echo ${sched} > /sys/block/${device}/queue/scheduler
             for bsize in 4 64 512; do
-                run_fio ${device} ${engine} ${sched} ${pattern} ${is_direct} ${depth} ${bsize} ${sg_gb}
+                run_fio ${device} ${engine} ${sched} ${pattern} ${is_direct} ${bsize} ${sg_gb}
                 let cnt+=1
             done
         done
@@ -111,27 +110,37 @@ function run_test()
                 ;;
         nvme)
                 get_free_disk nvme
-                # shellcheck disable=SC2154
-                rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
-                rlRun "ublk add -t loop -f ${dev0}p1"
-                rlRun "lsblk"
-                rlRun "ublk list"
-                fio_test
-                rlRun "ublk del -a"
-                rlRun "parted -s ${dev0} rm 1"
-                rlRun "lsblk"
+                if [ -n "$dev0" ];then
+                    # shellcheck disable=SC2154
+                    rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
+                    rlRun "ublk add -t loop -f ${dev0}p1"
+                    rlRun "lsblk"
+                    rlRun "ublk list"
+                    fio_test
+                    rlRun "ublk del -a"
+                    rlRun "parted -s ${dev0} rm 1"
+                    rlRun "lsblk"
+                else
+                    rlLog "Don't get any free disk,skip testing"
+                    rstrnt-report-result "no free nvme,skip test" SKIP 0
+                fi
                 ;;
         ssd)
                 get_free_disk ssd
-                # shellcheck disable=SC2154
-                rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
-                rlRun "ublk add -t loop -f ${dev0}1"
-                rlRun "lsblk"
-                rlRun "ublk list"
-                fio_test
-                rlRun "ublk del -a"
-                rlRun "parted -s ${dev0} rm 1"
-                rlRun "lsblk"
+                if [ -n "$dev0" ];then
+                    # shellcheck disable=SC2154
+                    rlRun "parted -s ${dev0} mklabel gpt mkpart primary 1M 60G"
+                    rlRun "ublk add -t loop -f ${dev0}1"
+                    rlRun "lsblk"
+                    rlRun "ublk list"
+                    fio_test
+                    rlRun "ublk del -a"
+                    rlRun "parted -s ${dev0} rm 1"
+                    rlRun "lsblk"
+                else
+                    rlLog "Don't get any free disk,skip testing"
+                    rstrnt-report-result "no free ssd,skip test" SKIP 0
+                fi
     esac
 }
 
