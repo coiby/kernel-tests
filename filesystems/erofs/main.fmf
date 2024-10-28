@@ -1,0 +1,13 @@
+summary: test wrapper for erofs-utils tests
+contact: Brian Grech <bgrech@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - libuuid-devel
+  - automake
+  - libtool
+  - attr
+extra-summary: filesystems/erofs
+extra-task: filesystems/erofs
+tag: KernelAutomotiveTier1
+duration: 5m

@@ -3,6 +3,9 @@ contact: Yi Zhang <yizhan@redhat.com>
 test: bash ./runtest.sh
 framework: shell
 require:
+  - type: file
+    pattern:
+      - storage/blktests/include
   - blktrace
   - fio
   - gcc
@@ -14,3 +17,4 @@ require:
 extra-summary: storage/blktests/blk
 extra-task: storage/blktests/blk
 id: bc78da7c-808b-4217-9dbe-bd65d344c669
+tag: KernelAutomotiveTier1

@@ -1,0 +1,14 @@
+summary: Functional tests for the LSM-based SELinux security module
+description: |+
+    This TC runs a functional test suite for the LSM-based SELinux security module.
+
+contact: Milos Malik <mmalik@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - git
+  - rpm
+extra-summary: packages/selinux-policy/serge-testsuite
+extra-task: packages/selinux-policy/serge-testsuite
+tag: KernelAutomotiveTier1
+duration: 5m
