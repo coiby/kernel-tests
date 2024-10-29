@@ -116,7 +116,7 @@ rlJournalStart
 		# Output the result list
 		echo "Modules containing 'kunit_test_suites':"
 		cat kunit-tests.list
-
+		rlFileSubmit kunit-tests.list
 		# load kunit module names into a array
 		readarray -t test_arr < kunit-tests.list
 
