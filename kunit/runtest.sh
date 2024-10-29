@@ -37,6 +37,43 @@ process_results(){
 	fi
 }
 
+# detect what kunit modules are available in the running release
+generate_test_list(){
+	# generate test list from modules-internal
+	# Directory containing the kernel modules
+	MODULE_DIR="/lib/modules/$(uname -r)/internal/"
+
+	# Temporary directory for decompression
+	TEMP_DIR=$(mktemp -d)
+
+	# Function to clean up temporary directory
+	cleanup() {
+			rm -rf "$TEMP_DIR"
+	}
+	trap cleanup EXIT
+
+	# Iterate over each compressed kernel module found
+	find "$MODULE_DIR" -type f -name '*.ko*' | while IFS= read -r module; do
+
+		# Determine the extension to handle decompression
+		if [[ "$module" == *.xz ]]; then
+			unxz -c "$module" > "$TEMP_DIR/$(basename "$module" .xz)"
+		else
+			# If the module is not compressed, copy it to the temp directory
+			cp "$module" "$TEMP_DIR/$(basename "$module")"
+		fi
+
+		# The decompressed or copied module file
+		decompressed_module="$TEMP_DIR/$(basename "$module" .xz)"
+
+		# Check if the module contains 'kunit_test_suites'
+		if objdump -x "$decompressed_module" | grep -q 'kunit_test_suites'; then
+			module_name=$(basename "$module" .ko.xz)
+			echo "$module_name" >> kunit-tests.list
+		fi
+	done
+}
+
 #Include Beaker environment
 . ../cki_lib/libcki.sh || exit 1
 . ../kernel-include/runtest.sh || exit 1
@@ -79,39 +116,7 @@ rlJournalStart
 			rlDie "Could not load KUNIT module, aborting test"
 		fi
 
-		# generate test list from modules-internal
-		# Directory containing the kernel modules
-		MODULE_DIR="/lib/modules/$(uname -r)/internal/"
-
-		# Temporary directory for decompression
-		TEMP_DIR=$(mktemp -d)
-
-		# Function to clean up temporary directory
-		cleanup() {
-				rm -rf "$TEMP_DIR"
-		}
-		trap cleanup EXIT
-
-		# Iterate over each compressed kernel module found
-		find "$MODULE_DIR" -type f -name '*.ko*' | while IFS= read -r module; do
-
-			# Determine the extension to handle decompression
-			if [[ "$module" == *.xz ]]; then
-				unxz -c "$module" > "$TEMP_DIR/$(basename "$module" .xz)"
-			else
-				# If the module is not compressed, copy it to the temp directory
-				cp "$module" "$TEMP_DIR/$(basename "$module")"
-			fi
-
-			# The decompressed or copied module file
-			decompressed_module="$TEMP_DIR/$(basename "$module" .xz)"
-
-			# Check if the module contains 'kunit_test_suites'
-			if objdump -x "$decompressed_module" | grep -q 'kunit_test_suites'; then
-				module_name=$(basename "$module" .ko.xz)
-				echo "$module_name" >> kunit-tests.list
-			fi
-		done
+		generate_test_list
 
 		# Output the result list
 		echo "Modules containing 'kunit_test_suites':"
