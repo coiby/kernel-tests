@@ -1,0 +1,11 @@
+[General]
+name=networking/netfilter/upstream_test_wrapper/iptables
+OWNER=Yi Chen <yiche@redhat.com>
+description=The wrapper of iptables upstream tests.
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=2h
