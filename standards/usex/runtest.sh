@@ -17,9 +17,7 @@ function setup()
 {
     make all
     if [ $? -ne 0 ]; then
-        echo "fail to nake the file. Aborting test..."
-        rstrnt-report-result "${TEST}" WARN
-        exit 0
+        rldie "fail to make the file. Aborting test..."
     fi
 }
 
@@ -68,8 +66,8 @@ function TestUsexMain ()
 {
     # verify to not run on s390x
     if [ "$(uname -m)" = "s390x" ]; then
-        rstrnt-report-result $TEST SKIP
-        exit
+        rlLog "s390x is not supported arch"
+        return
     fi
 
     RHELVER=""
