@@ -107,7 +107,7 @@ main() {
 
         packages_nvr=$(dnf repoquery --nvr --quiet  --disablerepo=* --repofrompath="${repofrompath}" ${PACKAGES_NAMES})
 
-        if ! dnf install --disablerepo=* --repofrompath="${repofrompath}" -y ${packages_nvr}; then
+        if ! dnf install --repofrompath="${repofrompath}" -y ${packages_nvr}; then
                 echo "ERROR: couldn't install package rpms."
                 rstrnt-report-result "install-rpms" WARN
                 rstrnt-abort recipe
