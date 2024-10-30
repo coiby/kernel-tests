@@ -1,6 +1,7 @@
 summary: KUNIT Test
 contact: Nico Pache <npache@redhat.com>
 test: bash ./runtest.sh
+duration: 1h
 framework: beakerlib
 tag:
   - KernelTier1
