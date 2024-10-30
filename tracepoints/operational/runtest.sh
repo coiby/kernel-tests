@@ -151,6 +151,12 @@ function runTest ()
         TESTLIST=$(echo "$TESTLIST" | sed '/xen:xen_cpu_write_idt_entry/d')
     fi
 
+    # issue RHEL-16610, missing sound/soc/sof/sof-audio.h
+    if grep -q "release 9.5" /etc/redhat-release; then
+        TESTLIST=$(echo "$TESTLIST" | sed '/sof:sof/d')
+        TESTLIST=$(echo "$TESTLIST" | sed '/sof_intel:sof_intel/d')
+    fi
+
     # Additional argumewnt to stap if Family is RHEL5 and CPU/Family/Model match
     [ "$FAMILY" == "RedHatEnterpriseLinuxServer5" ] && isCpuFamilyModel AuthenticAMD 21 2
     if [ "$?" == 0 ]; then
