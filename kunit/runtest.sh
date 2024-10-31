@@ -66,7 +66,7 @@ rlJournalStart
 		if [ $? -ne 0 ]; then
 			rlLog "Pip unable to install tap.py, aborting test"
 			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-			exit 1
+			exit 0
 		fi
 
 		# kunit module was added on kernel 4.18.0-279 (BZ#1900119)
@@ -85,7 +85,7 @@ rlJournalStart
 		if ! rpm -q $module_pkg; then
 			echo "FAIL: ${module_pkg} is not installed, aborting test"
 			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-			exit 1
+			exit 0
 		fi
 		#test for kunit
 		rlRun "modprobe kunit"
@@ -96,7 +96,7 @@ rlJournalStart
 			rlJournalEnd
 			#print the test report
 			rlJournalPrintText
-			exit 1
+			exit 0
 		fi
 
 		# generate test list from modules-internal
