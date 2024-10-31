@@ -79,8 +79,8 @@ ipset_install()
 
 rlJournalStart
 	rlPhaseStartSetup "ipset upstream test installing"
-		rlRun "dnf -y --skip-broken install libmnl-devel libtool-ltdl-devel automake autoconf libtool elfutils-libelf-devel git"
-		rlRun "dnf -y --skip-broken install kernel-modules-extra-$(uname -r) kernel-devel-$(uname -r)"
+		rlRun "dnf -y install libmnl-devel libtool-ltdl-devel automake autoconf libtool elfutils-libelf-devel git"
+		rlRun "dnf -y install kernel-modules-extra-$(uname -r) kernel-devel-$(uname -r)"
 		which sendip || rlRun "sendip_install"
 		which netmask || rlRun "netmask_install"
 		test -e libmnl/install/lib/libmnl.so.0 || rlRun "libmnl_install"
