@@ -189,7 +189,8 @@ rlJournalStart
 							cp "$dir/results" "${test_name}.log"
 
 							rlFileSubmit "${test_name}.log"
-							rlRun -l "cat ${test_name}.log"
+							# use rlLog instead of `rlRun -l` to avoid the 50 lines limit
+							rlLog "$(cat ${test_name}.log)"
 							process_results "${test_name}.log"
 							result=$?
 							if [ $result -eq 0 ]; then
