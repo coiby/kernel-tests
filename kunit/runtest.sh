@@ -59,6 +59,13 @@ TEST="KUNIT"
 export PACKAGE="kernel"
 
 rlJournalStart
+	# Clean start is a test phase as we want report this as test failure
+	# in the setup phase this would be reported as WARN/ERROR
+	rlPhaseStartTest "clean-start"
+		if [[ -f kunit-tests.list ]]; then
+			rlDie "kunit-tests.list already exists. Is this due to reboot after panic?"
+		fi
+	rlPhaseEnd
 #-------------------- Setup ---------------------
 	rlPhaseStartSetup
 		#install tappy
@@ -215,6 +222,7 @@ rlJournalStart
 		rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
 		#remove kunit framework
 		rmmod kunit
+		rm -f kunit-tests.list
 	rlPhaseEnd
 
 rlJournalEnd
