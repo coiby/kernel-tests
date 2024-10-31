@@ -59,14 +59,19 @@ TEST="KUNIT"
 export PACKAGE="kernel"
 
 rlJournalStart
+	# Clean start is a test phase as we want report this as test failure
+	# in the setup phase this would be reported as WARN/ERROR
+	rlPhaseStartTest "clean-start"
+		if [[ -f kunit-tests.list ]]; then
+			rlDie "kunit-tests.list already exists. Is this due to reboot after panic?"
+		fi
+	rlPhaseEnd
 #-------------------- Setup ---------------------
 	rlPhaseStartSetup
 		#install tappy
 		pip3 install tap.py
 		if [ $? -ne 0 ]; then
-			rlLog "Pip unable to install tap.py, aborting test"
-			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-			exit 1
+			rlDie "Pip unable to install tap.py, aborting test"
 		fi
 
 		# kunit module was added on kernel 4.18.0-279 (BZ#1900119)
@@ -83,20 +88,12 @@ rlJournalStart
 		module_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-internal)
 		dnf install -y "${module_pkg}"
 		if ! rpm -q $module_pkg; then
-			echo "FAIL: ${module_pkg} is not installed, aborting test"
-			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-			exit 1
+			rlDie "${module_pkg} is not installed, aborting test"
 		fi
 		#test for kunit
 		rlRun "modprobe kunit"
 		if [ $? -ne 0 ]; then
-			rlFail "Could not load KUNIT module, aborting test"
-			rstrnt-report-result $TEST FAIL
-			rlPhaseEnd
-			rlJournalEnd
-			#print the test report
-			rlJournalPrintText
-			exit 1
+			rlDie "Could not load KUNIT module, aborting test"
 		fi
 
 		# generate test list from modules-internal
@@ -225,6 +222,7 @@ rlJournalStart
 		rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
 		#remove kunit framework
 		rmmod kunit
+		rm -f kunit-tests.list
 	rlPhaseEnd
 
 rlJournalEnd
