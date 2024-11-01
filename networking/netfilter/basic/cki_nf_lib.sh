@@ -21,7 +21,7 @@
 # Include Beaker environment
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || . /usr/lib/beakerlib/beakerlib.sh || exit 1
-. ../../kernel-include/runtest.sh || exit 1
+. ${PWD%%networking*}/kernel-include/runtest.sh || exit 1
 
 #--------------------------
 #Put Required packages here
