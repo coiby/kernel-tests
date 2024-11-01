@@ -1,0 +1,13 @@
+[General]
+name=storage/block/RHEL_61200_multipath_device_show_100%_util_even_idle
+owner=Changhui Zhong <czhong@redhat.com>
+description=I/O stats for paths under multipath device show 100% utilization even while idle
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=storage/block/include
+dependencies=device-mapper-multipath;sysstat
+max_time=2h
