@@ -111,7 +111,10 @@
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/macsec/sanity_check/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/netfilter/basic/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
-/networking/netfilter/upstream_test_wrapper/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/networking/netfilter/upstream_test_wrapper/ipset/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/networking/netfilter/upstream_test_wrapper/iptables/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/networking/netfilter/upstream_test_wrapper/kselftests/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/networking/netfilter/upstream_test_wrapper/nftables/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/route/pmtu/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/route/route_func/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/sctp/auth/sockopts/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -242,7 +245,10 @@
 /networking/ipsec/ipsec_basic/ipsec_basic_netns/ @bgoncalv @liuhangbin @lulinqing @xmu2
 /networking/macsec/sanity_check/ @Feiliu_A @bgoncalv @lulinqing
 /networking/netfilter/basic/ @bgoncalv @liuhangbin @lulinqing @yiche
-/networking/netfilter/upstream_test_wrapper/ @bgoncalv @egarver @fwestpha @lulinqing @psutter1 @yiche
+/networking/netfilter/upstream_test_wrapper/ipset/ @bgoncalv @egarver @fwestpha @lulinqing @psutter1 @yiche
+/networking/netfilter/upstream_test_wrapper/iptables/ @bgoncalv @egarver @fwestpha @lulinqing @psutter1 @yiche
+/networking/netfilter/upstream_test_wrapper/kselftests/ @bgoncalv @egarver @fwestpha @lulinqing @psutter1 @yiche
+/networking/netfilter/upstream_test_wrapper/nftables/ @bgoncalv @egarver @fwestpha @lulinqing @psutter1 @yiche
 /networking/route/pmtu/ @bgoncalv @linup2011 @lulinqing
 /networking/route/route_func/ @bgoncalv @linup2011 @liuhangbin @lulinqing
 /networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing @yinxu
