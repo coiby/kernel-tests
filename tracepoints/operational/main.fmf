@@ -9,7 +9,7 @@ duration: 1h
 test: bash ./runtest.sh
 tag:
   - KernelTier1
-framework: beakerlib
+framework: shell
 require:
   - systemtap
 extra-summary: tracepoints/operational
