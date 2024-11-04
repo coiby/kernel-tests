@@ -21,6 +21,6 @@ bash ./runtest.sh
 ### Configure Enviornment Variables
 ```
 SKIP_TESTS: allows for a list of tests to skip (module name)
-
+SKIP_BROKEN: defaults to 0 (no), cki wants this set to 1 to avoid running broken tests
 ```
 

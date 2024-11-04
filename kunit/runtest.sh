@@ -37,6 +37,59 @@ process_results(){
 	fi
 }
 
+# a list of known broken modules
+# used to skip tests that wont be fixed in zstream
+is_broken(){
+    local test_name=$1
+    local skip_string=""
+
+    if rlIsRHEL "8.4"; then
+        skip_string="test_kasan kasan_test slub_kunit"
+    fi
+
+    if rlIsRHEL "8.6"; then
+        skip_string="test_kasan kasan_test slub_kunit"
+    fi
+
+    if rlIsRHEL "8.8"; then
+        skip_string="test_kasan kasan_test slub_kunit"
+    fi
+
+    if rlIsRHEL "9.0"; then
+        skip_string="test_kasan kasan_test slub_kunit"
+    fi
+
+    if rlIsRHEL "9.2"; then
+        skip_string="test_kasan kasan_test slub_kunit"
+    fi
+
+    if rlIsRHEL "9.3"; then
+        skip_string="slub_kunit"
+    fi
+
+    if rlIsRHEL "9.4"; then
+        skip_string="slub_kunit handshake_test drm_gem_shmem_test"
+    fi
+
+    if rlIsRHEL "9.5"; then
+        skip_string="drm_gem_shmem_test"
+    fi
+
+    if rlIsRHEL ">=9.6" || rlIsCentOS "9"; then
+        skip_string="drm_gem_shmem_test"
+    fi
+
+    if rlIsRHEL ">=10.0" || rlIsCentOS "10"; then
+        skip_string="drm_gem_shmem_test drm_format_helper_test drm_hdmi_state_helper_test usercopy_kunit fortify_kunit"
+    fi
+
+    if [[ -n "$skip_string" && "$skip_string" =~ $test_name ]]; then
+        return 0 # zero indicates true
+    fi
+
+    return 1
+}
+
 # detect what kunit modules are available in the running release
 generate_test_list(){
 	# generate test list from modules-internal
@@ -78,6 +131,14 @@ generate_test_list(){
 . ../cki_lib/libcki.sh || exit 1
 . ../kernel-include/runtest.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+
+
+# parse SKIP_BROKEN
+if [[ -n "${SKIP_BROKEN}" && "${SKIP_BROKEN}" -eq 1 ]]; then
+	KUNIT_SKIP_BROKEN=1
+else
+	KUNIT_SKIP_BROKEN=0
+fi
 
 # variables used by beakerlib
 TEST="KUNIT"
@@ -143,6 +204,11 @@ rlJournalStart
 		rlPhaseStartTest "process ${TEST}"
 			if [[ ${SKIP_TESTS} =~ ${TEST} ]]; then
 				rlLog "Skipping $TEST"
+				continue
+			fi
+			
+			if [[ $KUNIT_SKIP_BROKEN -eq 1 ]] && is_broken "$TEST"; then
+				rlLog "Skipping broken test: $TEST"
 				continue
 			fi
 
