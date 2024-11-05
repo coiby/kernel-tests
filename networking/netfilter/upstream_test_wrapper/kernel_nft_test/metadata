@@ -1,7 +1,7 @@
 [General]
-name=networking/netfilter/upstream_test_wrapper/kselftests
+name=networking/netfilter/upstream_test_wrapper/kernel_nft_test
 OWNER=Yi Chen <yiche@redhat.com>
-description=Run upstream tests
+description=Run netfilter upstream kselftest
 license=GPLv2
 confidential=no
 destructive=no
