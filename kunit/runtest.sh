@@ -28,9 +28,9 @@
 process_results(){
 	rlLog "processing results from test ${1}"
 	rlFileSubmit "${1}"
-	rlLog "$(cat ${test_name}.log)"
-	if grep -q "not ok" $1; then
-		grep "not ok" $1 >> not_ok.log
+	rlLog "$(cat "${test_name}".log)"
+	if grep -q "not ok" "$1"; then
+		grep "not ok" "$1" >> not_ok.log
 		return 1
 	else
 		return 0
@@ -168,7 +168,7 @@ rlJournalStart
 
 		module_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-internal)
 		dnf install -y "${module_pkg}"
-		if ! rpm -q $module_pkg; then
+		if ! rpm -q "$module_pkg"; then
 			rlDie "${module_pkg} is not installed, aborting test"
 		fi
 		#test for kunit
@@ -197,7 +197,7 @@ rlJournalStart
 	for TEST in "${test_arr[@]}"
 	do
 		#the kunit module is not a test
-		if [ $TEST = "kunit" ]; then
+		if [ "$TEST" = "kunit" ]; then
 			continue
 		fi
 
