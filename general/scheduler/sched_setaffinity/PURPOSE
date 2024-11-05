@@ -1,0 +1,14 @@
+verify sched_setaffinity intersect with cpuset controller works as expected.
+
+The test will create cgroup with cpuset controler enabled, and run the syscall
+within the cpuset controller, and check the return value, errno, and cpumask in
+/proc/[pid]/status.
+
+1. return -1 and errno EINVAL when the sched_setaffinity(cpumask is all zero)
+2. return -1 and errno EINVAL when the sched_setaffinity(cpumask) cpu is all
+   beyond the cpuset controller. the cpumask in status file keep unchanged
+   as cpuset cpus.
+3. return 0 when the sched_setaffinity (cpumask) cpu is partially in the cpuset
+   controller. the cpumask is (cpuset cpu & sched_setaffinity cpu).
+4. return 0 when the sched_setaffinity (cpumask) cpu is subset in the cpuset
+   controller. the cpumask is (cpuset cpu & sched_setaffinity cpu).
