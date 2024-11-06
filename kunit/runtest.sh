@@ -26,33 +26,120 @@
 
 #processes a test result from the debug/sysfs
 process_results(){
-	TMPFILE=$(mktemp) || exit 1
-	OUTFILE=$(mktemp) || exit 1
 	rlLog "processing results from test ${1}"
-	sed -i 's/KTAP version 1//g' "$1" #remove KTAP VERSION
-	sed -i '/^$/d' "$1" #remove all empty lines
-	sed -i 's/    //g' "$1" #remove all tab
-	sed -i '/^#/d' "$1" #remove comments
-	sed -i 's/#.*//' "$1" #remove comments
-	sed -i '$d' "$1" #remove last line.
-	sed -i '/^\(ok\|not ok\)/!d' "$1" #removeall but 1..N and ok/not ok
-	uniq "$1" > "$TMPFILE"  #remove dup
-
-	lines=$(wc -l "$TMPFILE")
-	echo "1..$lines" | cat - "$TMPFILE" > $OUTFILE
-	tappy "$OUTFILE" &> "$TMPFILE"
-	RESULT_OUTPUT=$(cat "$TMPFILE" |tail -1)
-	if [ "$RESULT_OUTPUT" = "OK" ]; then
-		return 0
-	else
+	rlFileSubmit "${1}"
+	# use rlLog instead of `rlRun -l` to avoid the 50 lines limit
+	rlLog "$(cat "${test_name}".log)"
+	if grep -q "not ok" "$1"; then
+		grep "not ok" "$1" >> not_ok.log
 		return 1
+	else
+		return 0
 	fi
+}
+
+# a list of known broken modules
+# used to skip tests that wont be fixed in zstream
+is_broken(){
+	local test_name=$1
+	local skip_string=""
+
+	if rlIsRHEL "8.4"; then
+		skip_string="test_kasan kasan_test slub_kunit"
+	fi
+
+	if rlIsRHEL "8.6"; then
+		skip_string="test_kasan kasan_test slub_kunit"
+	fi
+
+	if rlIsRHEL "8.8"; then
+		skip_string="test_kasan kasan_test slub_kunit"
+	fi
+
+	if rlIsRHEL "9.0"; then
+		skip_string="test_kasan kasan_test slub_kunit"
+	fi
+
+	if rlIsRHEL "9.2"; then
+		skip_string="test_kasan kasan_test slub_kunit"
+	fi
+
+	if rlIsRHEL "9.3"; then
+		skip_string="slub_kunit"
+	fi
+
+	if rlIsRHEL "9.4"; then
+		skip_string="slub_kunit handshake_test drm_gem_shmem_test"
+	fi
+
+	if rlIsRHEL "9.5"; then
+		skip_string="drm_gem_shmem_test"
+	fi
+
+	if rlIsRHEL ">=9.6" || rlIsCentOS "9"; then
+		skip_string="drm_gem_shmem_test"
+	fi
+
+	if rlIsRHEL ">=10.0" || rlIsCentOS "10"; then
+		skip_string="drm_gem_shmem_test drm_format_helper_test drm_hdmi_state_helper_test usercopy_kunit fortify_kunit"
+	fi
+
+	if [[ -n "$skip_string" && "$skip_string" =~ $test_name ]]; then
+		return 0 # zero indicates true
+	fi
+
+	return 1
+}
+
+# detect what kunit modules are available in the running release
+generate_test_list(){
+	# generate test list from modules-internal
+	# Directory containing the kernel modules
+	MODULE_DIR="/lib/modules/$(uname -r)/internal/"
+
+	# Temporary directory for decompression
+	TEMP_DIR=$(mktemp -d)
+
+	# Function to clean up temporary directory
+	cleanup() {
+			rm -rf "$TEMP_DIR"
+	}
+	trap cleanup EXIT
+
+	# Iterate over each compressed kernel module found
+	find "$MODULE_DIR" -type f -name '*.ko*' | while IFS= read -r module; do
+
+		# Determine the extension to handle decompression
+		if [[ "$module" == *.xz ]]; then
+			unxz -c "$module" > "$TEMP_DIR/$(basename "$module" .xz)"
+		else
+			# If the module is not compressed, copy it to the temp directory
+			cp "$module" "$TEMP_DIR/$(basename "$module")"
+		fi
+
+		# The decompressed or copied module file
+		decompressed_module="$TEMP_DIR/$(basename "$module" .xz)"
+
+		# Check if the module contains 'kunit_test_suites'
+		if objdump -x "$decompressed_module" | grep -q 'kunit_test_suites'; then
+			module_name=$(basename "$module" .ko.xz)
+			echo "$module_name" >> kunit-tests.list
+		fi
+	done
 }
 
 #Include Beaker environment
 . ../cki_lib/libcki.sh || exit 1
 . ../kernel-include/runtest.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+
+
+# parse SKIP_BROKEN
+if [[ -n "${SKIP_BROKEN}" && "${SKIP_BROKEN}" -eq 1 ]]; then
+	KUNIT_SKIP_BROKEN=1
+else
+	KUNIT_SKIP_BROKEN=0
+fi
 
 # variables used by beakerlib
 TEST="KUNIT"
@@ -68,12 +155,7 @@ rlJournalStart
 	rlPhaseEnd
 #-------------------- Setup ---------------------
 	rlPhaseStartSetup
-		#install tappy
-		pip3 install tap.py
-		if [ $? -ne 0 ]; then
-			rlDie "Pip unable to install tap.py, aborting test"
-		fi
-
+		touch not_ok.log
 		# kunit module was added on kernel 4.18.0-279 (BZ#1900119)
 		if cki_kver_lt "4.18.0-279"; then
 			# kernel is too old to support kunit module
@@ -87,7 +169,7 @@ rlJournalStart
 
 		module_pkg=$(K_GetRunningKernelRpmSubPackageNVR modules-internal)
 		dnf install -y "${module_pkg}"
-		if ! rpm -q $module_pkg; then
+		if ! rpm -q "$module_pkg"; then
 			rlDie "${module_pkg} is not installed, aborting test"
 		fi
 		#test for kunit
@@ -96,44 +178,12 @@ rlJournalStart
 			rlDie "Could not load KUNIT module, aborting test"
 		fi
 
-		# generate test list from modules-internal
-		# Directory containing the kernel modules
-		MODULE_DIR="/lib/modules/$(uname -r)/internal/"
-
-		# Temporary directory for decompression
-		TEMP_DIR=$(mktemp -d)
-
-		# Function to clean up temporary directory
-		cleanup() {
-				rm -rf "$TEMP_DIR"
-		}
-		trap cleanup EXIT
-
-		# Iterate over each compressed kernel module found
-		find "$MODULE_DIR" -type f -name '*.ko*' | while IFS= read -r module; do
-
-			# Determine the extension to handle decompression
-			if [[ "$module" == *.xz ]]; then
-				unxz -c "$module" > "$TEMP_DIR/$(basename "$module" .xz)"
-			else
-				# If the module is not compressed, copy it to the temp directory
-				cp "$module" "$TEMP_DIR/$(basename "$module")"
-			fi
-
-			# The decompressed or copied module file
-			decompressed_module="$TEMP_DIR/$(basename "$module" .xz)"
-
-			# Check if the module contains 'kunit_test_suites'
-			if objdump -x "$decompressed_module" | grep -q 'kunit_test_suites'; then
-				module_name=$(basename "$module" .ko.xz)
-				echo "$module_name" >> kunit-tests.list
-			fi
-		done
+		generate_test_list
 
 		# Output the result list
 		echo "Modules containing 'kunit_test_suites':"
 		cat kunit-tests.list
-
+		rlFileSubmit kunit-tests.list
 		# load kunit module names into a array
 		readarray -t test_arr < kunit-tests.list
 
@@ -148,13 +198,18 @@ rlJournalStart
 	for TEST in "${test_arr[@]}"
 	do
 		#the kunit module is not a test
-		if [ $TEST = "kunit" ]; then
+		if [ "$TEST" = "kunit" ]; then
 			continue
 		fi
 
 		rlPhaseStartTest "process ${TEST}"
 			if [[ ${SKIP_TESTS} =~ ${TEST} ]]; then
 				rlLog "Skipping $TEST"
+				continue
+			fi
+
+			if [[ $KUNIT_SKIP_BROKEN -eq 1 ]] && is_broken "$TEST"; then
+				rlLog "Skipping broken test: $TEST"
 				continue
 			fi
 
@@ -188,9 +243,6 @@ rlJournalStart
 							test_name=${test_name// /_}
 							cp "$dir/results" "${test_name}.log"
 
-							rlFileSubmit "${test_name}.log"
-							# use rlLog instead of `rlRun -l` to avoid the 50 lines limit
-							rlLog "$(cat ${test_name}.log)"
 							process_results "${test_name}.log"
 							result=$?
 							if [ $result -eq 0 ]; then
@@ -218,12 +270,14 @@ rlJournalStart
 
 
 #-------------------- Clean Up ------------------
+	rlFileSubmit not_ok.log
 	rlPhaseStartCleanup
 		# Restore panic on oops value
 		rlRun "sysctl kernel.panic_on_oops=${panic_on_oops}"
 		#remove kunit framework
 		rmmod kunit
 		rm -f kunit-tests.list
+		rm -f not_ok.log
 	rlPhaseEnd
 
 rlJournalEnd
