@@ -28,6 +28,7 @@
 process_results(){
 	rlLog "processing results from test ${1}"
 	rlFileSubmit "${1}"
+	# use rlLog instead of `rlRun -l` to avoid the 50 lines limit
 	rlLog "$(cat "${test_name}".log)"
 	if grep -q "not ok" "$1"; then
 		grep "not ok" "$1" >> not_ok.log
