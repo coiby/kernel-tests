@@ -7,7 +7,6 @@ rlJournalStart
 		if [[ ! -x ./iptables/install/sbin/xtables-nft-multi ]];then
 			rlRun "bash -x full_rebuild.sh"
 		fi
-		rlRun "dnf -y install kernel-modules-extra-$(uname -r)"
 		rlRun "dnf -y install valgrind"
 	rlPhaseEnd
 
