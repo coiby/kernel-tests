@@ -99,11 +99,11 @@ void get_affinity_status(pid_t pid, char *affinity)
 
 void check_errno_retval(int exp_errno, int exp_retval)
 {
-	if (errno != expect_errno) {
+	if (errno != exp_errno) {
 		test_result += FAIL_ERR;
 		fprintf(stderr, "FAIL: errno: expect %d got %d\n", exp_errno, errno);
 	}
-	if (retval != expect_retval) {
+	if (retval != exp_retval) {
 		test_result += FAIL_RET;
 		fprintf(stderr, "FAIL: retval: expect %d got %d\n", exp_retval, retval);
 	}
