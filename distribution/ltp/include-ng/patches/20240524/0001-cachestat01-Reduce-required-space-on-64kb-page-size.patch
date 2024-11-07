@@ -1,0 +1,59 @@
+From 8422d4680b21e6576da63c677b5d49f46b477df0 Mon Sep 17 00:00:00 2001
+From: Petr Vorel <pvorel@suse.cz>
+Date: Tue, 30 Jul 2024 00:16:03 +0200
+Subject: [PATCH] cachestat01: Reduce required space on 64kb page size
+
+ppc64le (6.10.1 on Tumbleweed) fails due 64kb page size requiring more
+space:
+
+cachestat01.c:39: TINFO: Number of pages: 4096
+cachestat01.c:56: TPASS: cachestat(fd, cs_range, cs, 0) passed
+cachestat01.c:59: TPASS: cs->nr_cache + cs->nr_evicted == num_pages (4096)
+cachestat01.c:38: TINFO: Disable file synchronization
+cachestat01.c:39: TINFO: Number of pages: 8192
+cachestat01.c:46: TBROK: write(3,0x1000ddb0aa0,65536) failed: ENOSPC (28)
+
+Therefore use calculation, which enables maximum number of pages 1 << 14
+only for 4kb page size, for 64kb set the maximum number of pages 1 << 11
+(13 would trigger ENOSPC on XFS and Btrfs, 12 would work, but using 11
+to be future proof in case of metadata size changes or page size
+increases).
+
+Link: https://lore.kernel.org/ltp/20240731073403.1406035-1-pvorel@suse.cz/
+Fixes: 93b28ee69d ("Add cachestat01 test")
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
+---
+ testcases/kernel/syscalls/cachestat/cachestat01.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/cachestat/cachestat01.c b/testcases/kernel/syscalls/cachestat/cachestat01.c
+index f7f6275cbd4..2dca688854d 100644
+--- a/testcases/kernel/syscalls/cachestat/cachestat01.c
++++ b/testcases/kernel/syscalls/cachestat/cachestat01.c
+@@ -26,7 +26,7 @@
+ #define MNTPOINT "mntpoint"
+ #define FILENAME MNTPOINT "/myfile.bin"
+ 
+-static int page_size;
++static int page_size, num_shift;
+ static char *page_data;
+ static struct cachestat *cs;
+ static struct cachestat_range *cs_range;
+@@ -67,14 +67,14 @@ static void test_cached_pages(const unsigned int use_sync, const int num_pages)
+ 
+ static void run(unsigned int use_sync)
+ {
+-	for (int i = 0; i < 15; i++)
++	for (int i = 0; i < num_shift; i++)
+ 		test_cached_pages(use_sync, 1 << i);
+ }
+ 
+ static void setup(void)
+ {
+ 	page_size = (int)sysconf(_SC_PAGESIZE);
+-
++	num_shift = MIN(tst_device->size*1024*2.5/page_size, 15);
+ 	page_data = SAFE_MALLOC(page_size);
+ 	memset(page_data, 'a', page_size);
+ }

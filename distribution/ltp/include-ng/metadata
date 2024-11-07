@@ -1,0 +1,13 @@
+[General]
+name=kernel/distribution/ltp/include
+owner=Kernel General Test Team <kernel-general-test-team@redhat.com>
+description=Linux Test Project - include
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=gcc;gcc-c++;gdb;autoconf;automake;flex;bison;binutils;glibc-devel;procmail;rsyslog;util-linux;bc;wget;bzip2;virt-what;beakerlib
+softDependencies=ntpdate;chrony;redhat-lsb;procmail
+dependencies[RedHatEnterpriseLinuxServer5]=procmail;rsyslog;ntpdate;util-linux;util-linux-ng;redhat-lsb;bc;wget;sysklogd

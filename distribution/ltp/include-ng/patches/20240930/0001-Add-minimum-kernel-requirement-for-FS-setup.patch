@@ -1,0 +1,146 @@
+From 62b11b1e0106777226500f592d6e25e6d524ea8a Mon Sep 17 00:00:00 2001
+From: Andrea Cervesato <andrea.cervesato@suse.com>
+Date: Tue, 1 Oct 2024 14:26:42 +0200
+Subject: [PATCH] Add minimum kernel requirement for FS setup
+
+In some cases, a filesystem that is going to be created and mounted
+by LTP can't be supported by certain kernel versions. This is the case
+of the CoW support: mkfs creates a CoW filesystem, while underlying
+kernel can't mount it.
+
+To cover this scenario, a new flag called .min_kver has been
+introduced in the tst_fs structure, giving the user a possibility to
+filter out certain kernels not supporting certain FS features.
+
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Signed-off-by: Andrea Cervesato <andrea.cervesato@suse.com>
+---
+ include/tst_test.h            |  5 +++++
+ lib/tst_test.c                | 27 +++++++++++++++++++++------
+ testcases/lib/tst_run_shell.c |  5 +++++
+ 3 files changed, 31 insertions(+), 6 deletions(-)
+
+diff --git a/include/tst_test.h b/include/tst_test.h
+index 38d24f48c..8d1819f74 100644
+--- a/include/tst_test.h
++++ b/include/tst_test.h
+@@ -270,6 +270,9 @@ struct tst_ulimit_val {
+  *
+  * @mnt_data: The data passed to mount(2) when the test library mounts a device
+  *            in the case of 'tst_test.mount_device'.
++ *
++ * @min_kver: A minimum kernel version supporting the filesystem which has been
++ *            created with mkfs.
+  */
+ struct tst_fs {
+ 	const char *type;
+@@ -280,6 +283,8 @@ struct tst_fs {
+ 
+ 	unsigned int mnt_flags;
+ 	const void *mnt_data;
++
++	const char *min_kver;
+ };
+ 
+ /**
+diff --git a/lib/tst_test.c b/lib/tst_test.c
+index 9015f28e3..8d205a42f 100644
+--- a/lib/tst_test.c
++++ b/lib/tst_test.c
+@@ -950,20 +950,29 @@ static void do_exit(int ret)
+ 	exit(ret);
+ }
+ 
+-void check_kver(void)
++int check_kver(const char *min_kver, const int brk_nosupp)
+ {
++	char *msg;
+ 	int v1, v2, v3;
+ 
+-	if (tst_parse_kver(tst_test->min_kver, &v1, &v2, &v3)) {
++	if (tst_parse_kver(min_kver, &v1, &v2, &v3)) {
+ 		tst_res(TWARN,
+ 			"Invalid kernel version %s, expected %%d.%%d.%%d",
+-			tst_test->min_kver);
++			min_kver);
+ 	}
+ 
+ 	if (tst_kvercmp(v1, v2, v3) < 0) {
+-		tst_brk(TCONF, "The test requires kernel %s or newer",
+-			tst_test->min_kver);
++		msg = "The test requires kernel %s or newer";
++
++		if (brk_nosupp)
++			tst_brk(TCONF, msg, min_kver);
++		else
++			tst_res(TCONF, msg, min_kver);
++
++		return 1;
+ 	}
++
++	return 0;
+ }
+ 
+ static int results_equal(struct results *a, struct results *b)
+@@ -1288,7 +1297,7 @@ static void do_setup(int argc, char *argv[])
+ 		tst_brk(TCONF, "Test needs to be run as root");
+ 
+ 	if (tst_test->min_kver)
+-		check_kver();
++		check_kver(tst_test->min_kver, 1);
+ 
+ 	if (tst_test->supported_archs && !tst_is_on_arch(tst_test->supported_archs))
+ 		tst_brk(TCONF, "This arch '%s' is not supported for test!", tst_arch.name);
+@@ -1419,6 +1428,9 @@ static void do_setup(int argc, char *argv[])
+ 			if (tst_test->filesystems->mkfs_ver)
+ 				tst_check_cmd(tst_test->filesystems->mkfs_ver, 1);
+ 
++			if (tst_test->filesystems->min_kver)
++				check_kver(tst_test->filesystems->min_kver, 1);
++
+ 			prepare_device(tst_test->filesystems);
+ 		}
+ 	}
+@@ -1812,6 +1824,9 @@ static int run_tcase_on_fs(struct tst_fs *fs, const char *fs_type)
+ 	if (fs->mkfs_ver && tst_check_cmd(fs->mkfs_ver, 0))
+ 		return TCONF;
+ 
++	if (fs->min_kver && check_kver(fs->min_kver, 0))
++		return TCONF;
++
+ 	prepare_device(fs);
+ 
+ 	ret = fork_testrun();
+diff --git a/testcases/lib/tst_run_shell.c b/testcases/lib/tst_run_shell.c
+index ee029b666..95cac0d60 100644
+--- a/testcases/lib/tst_run_shell.c
++++ b/testcases/lib/tst_run_shell.c
+@@ -151,6 +151,7 @@ static const char *const *parse_strarr(ujson_reader *reader, ujson_val *val)
+ }
+ 
+ enum fs_ids {
++	FS_MIN_KVER,
+ 	MKFS_OPTS,
+ 	MKFS_SIZE_OPT,
+ 	MKFS_VER,
+@@ -159,6 +160,7 @@ enum fs_ids {
+ };
+ 
+ static ujson_obj_attr fs_attrs[] = {
++	UJSON_OBJ_ATTR_IDX(FS_MIN_KVER, "min_kver", UJSON_STR),
+ 	UJSON_OBJ_ATTR_IDX(MKFS_OPTS, "mkfs_opts", UJSON_ARR),
+ 	UJSON_OBJ_ATTR_IDX(MKFS_SIZE_OPT, "mkfs_size_opt", UJSON_STR),
+ 	UJSON_OBJ_ATTR_IDX(MKFS_VER, "mkfs_ver", UJSON_STR),
+@@ -235,6 +237,9 @@ static struct tst_fs *parse_filesystems(ujson_reader *reader, ujson_val *val)
+ 			case TYPE:
+ 				ret[i].type = strdup(val->val_str);
+ 			break;
++			case FS_MIN_KVER:
++				ret[i].min_kver = strdup(val->val_str);
++			break;
+ 			}
+ 
+ 		}
+-- 
+2.47.0
+

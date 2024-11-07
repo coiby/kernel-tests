@@ -1,0 +1,25 @@
+From ecac41bdcc0858cd6119970119d0d2673042342f Mon Sep 17 00:00:00 2001
+From: Ping Fang <pifang@redhat.com>
+Date: Wed, 15 Apr 2020 11:01:00 +0800
+Subject: [PATCH] Disable btrfs, as we don't support it anymore.
+
+Signed-off-by: Ping Fang <pifang@redhat.com>
+---
+ lib/tst_supported_fs_types.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lib/tst_supported_fs_types.c b/lib/tst_supported_fs_types.c
+index 00ede549d..e96485d9d 100644
+--- a/lib/tst_supported_fs_types.c
++++ b/lib/tst_supported_fs_types.c
+@@ -18,7 +18,6 @@ static const char *const fs_type_whitelist[] = {
+ 	"ext3",
+ 	"ext4",
+ 	"xfs",
+-	"btrfs",
+ 	"vfat",
+ 	"exfat",
+ 	"ntfs",
+-- 
+2.21.1
+

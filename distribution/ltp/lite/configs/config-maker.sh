@@ -15,7 +15,7 @@
 #  '?' - test will be tweaked
 #  '@' - test will be added-in
 
-LTP_VERSION=${LTP_VERSION:-20240524}
+LTP_VERSION=${LTP_VERSION:-20240930}
 SOURCEDIR=$PWD
 DOWNLOAD=${DOWNLOAD:-https://github.com/linux-test-project/ltp}
 
