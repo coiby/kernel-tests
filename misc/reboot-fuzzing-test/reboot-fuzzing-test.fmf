@@ -1,0 +1,48 @@
+summary: Fuzz clocks and timers related API system calls.
+description: |
+  Confirm reboot system call fuzz testing is being performed as specified in Startup / Shutdown Risk Assessment.
+  The database is checked at the end to ensure each syscall was executed at least once.
+  Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
+  Test inputs:
+      A list with the system calls to be fuzzed, and a fuzzer program
+      called syzkaller. Input details:
+      - System call list from RA documentation.
+      - syzkaller code: https://github.com/google/syzkaller
+      - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
+  Expected results:
+      If the system calls are executed without incident during the test runtime,
+      the following output should be expected:
+      [   LOG    ] :: Test duration was 3601 seconds.
+      [   PASS   ] :: No crash results found.
+      [   PASS   ] :: reboot executed.
+  Results location:
+      output.txt
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+path: /memory/mmra/syzkaller
+framework: beakerlib
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+        -  /kernel-include
+        -  /memory/mmra/syzkaller
+        -  /misc/reboot-fuzzing-test
+environment:
+    mm_syscalls: |
+      "reboot"
+    supportcalls: ''
+    git_patches: '../../../../misc/reboot-fuzzing-test/reboot.patch'
+duration: 2h
+id: 86dc5c06-50d9-4c08-a64b-a4091e8ad9b9
