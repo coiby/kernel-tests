@@ -1,0 +1,46 @@
+From 4dcae172a2569cd97032a10226bb245248c0393b Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Mon, 17 Jun 2024 11:33:56 +0800
+Subject: [PATCH 2/3] quotactl07: add _GNU_SOURCE define
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+To get rid of error on implicit declaration (glibc-2.39):
+
+ /usr/include/xfs/linux.h:188:15: error: implicit declaration of function
+ ‘fallocate’; did you mean ‘alloca’? [-Wimplicit-function-declaration]
+ 188 |         ret = fallocate(fd, FALLOC_FL_ZERO_RANGE, start, len);
+     |               ^~~~~~~~~
+     |               alloca
+ make: *** [../../../../include/mk/rules.mk:45: quotactl07]
+ Error 1
+
+[ pvorel: This is a workaround for xfsprogs issue, can be removed once
+fix widely adopted
+https://lore.kernel.org/linux-xfs/be7f0845-5d5f-4af5-9ca9-3e4370b47d97@sandeen.net/
+]
+Link: https://lore.kernel.org/ltp/20240617033356.299491-1-liwang@redhat.com/
+Reviewed-by: Wei Gao <wegao@suse.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Signed-off-by: Li Wang <liwang@redhat.com>
+---
+ testcases/kernel/syscalls/quotactl/quotactl07.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/quotactl/quotactl07.c b/testcases/kernel/syscalls/quotactl/quotactl07.c
+index 34ff2705d..d8ad3760a 100644
+--- a/testcases/kernel/syscalls/quotactl/quotactl07.c
++++ b/testcases/kernel/syscalls/quotactl/quotactl07.c
+@@ -13,6 +13,8 @@
+  * ("xfs: Sanity check flags of Q_XQUOTARM call").
+  */
+ 
++#define _GNU_SOURCE
++#include <fcntl.h>
+ #include <errno.h>
+ #include <unistd.h>
+ #include <stdio.h>
+-- 
+2.45.2
+

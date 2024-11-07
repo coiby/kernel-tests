@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=180m
-dependencies=git;automake;autoconf;flex;bison;rsyslog;util-linux;rpm-build;bc;time;libaio-devel;libcap-devel;strace;gcc;bzip2
+dependencies=git;automake;autoconf;flex;bison;rsyslog;util-linux;rpm-build;bc;time;libaio-devel;libcap-devel;strace;gcc;bzip2;python3-pip
 softDependencies=numactl-devel;ntpdate;chrony;sysklogd;util-linux-ng;numactl;redhat-lsb;initscripts-service
-repoRequires=distribution/ltp/include;cki_lib;automotive/include
+repoRequires=distribution/ltp/include;cki_lib;automotive/include;distribution/ltp/include-ng;distribution/ltp/kirk

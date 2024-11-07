@@ -1,0 +1,45 @@
+From 181bf3806f68e95e90dea07696dbe759b59f2732 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Mon, 17 Jun 2024 11:13:24 +0800
+Subject: [PATCH] libswap: Fix tst_max_swapfiles() for c9s-latest
+
+Code change (merged in -441.el9) removes the `CONFIG_PTE_MARKER`,
+so that configuration impacts the 'SWP_PTE_MAKER_NUM' judgement
+inside that testcase, so we need to do is adjust the swapon03
+testcase to get correct numbers of MAX_SWAPFILES to test.
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Acked-by: Petr Vorel <pvorel@suse.cz>
+---
+ libs/libltpswap/libswap.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/libs/libltpswap/libswap.c b/libs/libltpswap/libswap.c
+index ce419a76e..5edc848a3 100644
+--- a/libs/libltpswap/libswap.c
++++ b/libs/libltpswap/libswap.c
+@@ -255,6 +255,12 @@ int tst_max_swapfiles(void)
+ 		{ NULL, NULL},
+ 	};
+ 
++	struct tst_kern_exv kvers_marker_migration2[] = {
++		/* RHEL9 kernel has patch ca92ea3dc5a since 5.14.0-441 */
++		{ "RHEL9", "5.14.0-441" },
++		{ NULL, NULL},
++	};
++
+ 	struct tst_kern_exv kvers_device[] = {
+ 		/* SLES12-SP4 has patch 5042db43cc26 since 4.12.14-5.5 */
+ 		{ "SLES", "4.12.14-5.5" },
+@@ -285,7 +291,7 @@ int tst_max_swapfiles(void)
+ 
+ 	if ((marker.choice == 'y' &&
+ 	     tst_kvercmp2(5, 19, 0, kvers_marker_migration) >= 0)
+-	    || tst_kvercmp(6, 2, 0) >= 0) {
++	    || tst_kvercmp2(6, 2, 0, kvers_marker_migration2) >= 0) {
+ 		swp_pte_marker_num = 1;
+ 	}
+ 
+-- 
+2.45.2
+

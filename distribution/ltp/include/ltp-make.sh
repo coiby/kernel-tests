@@ -76,6 +76,7 @@ download_ltp()
 
     echo "============ Unzip package ============" | tee -a $OUTPUTFILE
     tar xjf ${TARGET}.tar.bz2 | tee -a $OUTPUTFILE
+
 }
 
 clone_ltp()
@@ -403,7 +404,7 @@ configure()
     pushd ${TARGET}; make autotools; ./configure --prefix=${TARGET_DIR} &> configlog.txt || cat configlog.txt; popd
 }
 
-build-all()
+build_all()
 {
     setup-testarea
     if [[ -z ${LTP_COMMIT_ID} ]]; then
@@ -484,5 +485,5 @@ testconfigure()
 
 testfullbuild()
 {
-    build-all
+    build_all
 }

@@ -8,9 +8,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 . ../../../cki_lib/libcki.sh || exit 1
-. ../include/runtest.sh      || exit 1
-. ../include/knownissue.sh   || exit 1
-. ../include/ltp-make.sh     || exit 1
+. ../include-ng/include.sh   || exit 1
 
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
@@ -44,7 +42,7 @@ function ltp_test_build()
 	# The test could be running on different path
 	# Just skip the build, but make sure the config is copied
 	if [[ ! -f ${LTPDIR}/runltp ]] || ! grep -q "${TESTVERSION}" ${TARGET_DIR}/ltp_version; then
-		build-all
+		build_all
 	fi
 	if [[ -z ${LTP_COMMIT_ID} ]]; then
 		RHELKT1LITE_CONFIG=RHELKT1LITE.${TESTVERSION}
@@ -90,6 +88,11 @@ function prepare_aiodio_scratchspace()
 		export BUF_ALIGN=$block_size
 	else
 		export BUF_ALIGN=4096
+	fi
+
+	# kirk need -e option to pass environment variable
+	if [ "${TESTVERSION}" -ge 20240930 ]; then
+		OPTS="$OPTS -e='SCRATCH_MNT=$SCRATCH_MNT:BIG_FILE=$BIG_FILE:BUF_ALIGN=$BUF_ALIGN'"
 	fi
 
 	echo "SCRATCH_MNT: $SCRATCH_MNT" | tee -a $OUTPUTFILE

@@ -12,6 +12,7 @@ CDIR=$(dirname "$FILE")
 
 # Source the common test script helpers
 . "${CDIR}"/../../../cki_lib/libcki.sh || exit 1
+. "${CDIR}"/../kirk/kirk.sh || exit 1
 
 # Set unique log file.
 OUTPUTDIR=/mnt/testarea
