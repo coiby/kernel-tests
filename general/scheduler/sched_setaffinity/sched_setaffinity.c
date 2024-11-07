@@ -128,9 +128,7 @@ int main(int argc, char *argv[])
 {
 	cpu_set_t set;
 	cpu_set_t input_set;
-	long lret;
 	pid_t pid;
-	int ret;
 	char old_status[256];
 
 	if (argc != 5) {
@@ -140,7 +138,6 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	CPU_ZERO(&set);
 	CPU_ZERO(&input_set);
 
 	parse_cpu_list(argv[1], &input_set);
