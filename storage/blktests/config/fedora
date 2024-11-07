@@ -24,3 +24,5 @@ SRP_SIW="srp/001 srp/002 srp/005 srp/006 srp/007 srp/008 srp/009 srp/010 srp/011
 SRP_RXE="srp/001 srp/005 srp/006 srp/007 srp/008 srp/009 srp/010 srp/011 srp/012 srp/013 srp/014 srp/016"
 
 UBLK="ublk/001 ublk/002 ublk/003 ublk/004 ublk/005 ublk/006"
+
+THROTL="throtl/001 throtl/002 throtl/003 throtl/004 throtl/005"
