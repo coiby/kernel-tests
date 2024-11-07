@@ -43,12 +43,13 @@ packetdrill_install()
 	cp -f /tmp/packetdrill/gtests/net/packetdrill/packetdrill /tmp/packetdrill/gtests/net/common/defaults.sh /usr/local/bin/
 }
 
-pktgen_install()
-{
-	rlRun "cp -r /usr/libexec/ksamples/pktgen selftests/net/netfilter/"
-	rlRun "modprobe --dry-run pktgen"
-}
 
+stop_auditd()
+{
+	rlRun "sed -i 's/RefuseManualStop=yes/RefuseManualStop=no/g' /usr/lib/systemd/system/auditd.service"
+	rlRun "systemctl daemon-reload"
+	rlRun "systemctl stop auditd"
+}
 
 rlJournalStart
 rlPhaseStartSetup
@@ -65,23 +66,9 @@ rlPhaseStartSetup
 	rlRun "which sendip                           || sendip_install"
 	rlRun "which packetdrill                      || packetdrill_install"
 	rlRun "test -d selftests                      || kselftest_install"
-	rlRun "rpm -q kernel-modules-internal         || dnf -y install kernel-modules-internal-$(uname -r)"
-	rlRun "rpm -q kernel-selftests-internal       || dnf -y install kernel-selftests-internal-$(uname -r)"
-	rlRun "test -e selftests/net/netfilter/pktgen || pktgen_install"
 	rlRun "pushd selftests/net/netfilter/"
 	rlRun "make"
-rlPhaseEnd
-
-stop_auditd()
-{
-	rlRun "sed -i 's/RefuseManualStop=yes/RefuseManualStop=no/g' /usr/lib/systemd/system/auditd.service"
-	rlRun "systemctl daemon-reload"
-	rlRun "systemctl stop auditd"
-}
-
-rlPhaseStartSetup
-	stop_auditd
-	tainted_backup=0
+	rlRun "stop_auditd"
 rlPhaseEnd
 
 if [ "${ITEMS}x" == "x" ]
@@ -89,12 +76,13 @@ then
 	ITEMS=$(find . -maxdepth 1 -name "*.sh")
 fi
 
+tainted_backup=0
 for i in ${ITEMS}
 do
-	realpath=$(realpath $i)
-	rlPhaseStartTest "${realpath##$prefix}"
+	rlPhaseStartTest "${i}"
 		rlRun "read tainted_backup < /proc/sys/kernel/tainted"
 		rlRun -l "bash ./$i" 0,4 # Pass or SKIP
+		[ $? == 4 ] && rlLogWarning "WARN: $i skipped"
 		rlRun "diff -u <(echo ${tainted_backup}) <(cat /proc/sys/kernel/tainted)" 0 "Kernel tainted check"
 	rlPhaseEnd
 done
