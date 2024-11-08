@@ -77,6 +77,7 @@ kn_issue=${LTPDIR}/KNOWNISSUE
 function is_rhel7() { grep -q "release 7" /etc/redhat-release; }
 function is_rhel9() { grep -q "release 9" /etc/redhat-release; }
 function is_rhel10() { grep -q "release 10" /etc/redhat-release; }
+function is_ark() { uname -r | grep -q -e 'test.el' -e 'eln'; }
 function is_upstream() { uname -r | grep -q -v 'el[0-9]\|fc'; }
 function is_arch() { [ "$(uname -m)" == "$1" ]; }
 function is_zstream() { uname -r | awk -F. '{if (match($4, "[[:digit:]]") != 1) exit 1}'; }
@@ -175,6 +176,7 @@ function knownissue_filter()
 	# ----------------- NOTE: -----------------------------
 	# we have split the knownissue's data from code, better
 	# to add new issues in knownissue/* file from now on.
+	is_ark && ark_knownissue_filter;
 	is_upstream && upstream_knownissue_filter;
 	is_rhel9 && rhel9_knownissue_filter;
 	is_rhel10 && rhel10_knownissue_filter;
