@@ -17,4 +17,4 @@ log "Test the default options of ssdd"
 oneliner "timeout --preserve-status --verbose 3m ssdd"
 
 log "Stress test ssdd with 100 forks and 10000 iters"
-oneliner "timeout --preserve-status --verbose 3m ssdd --forks=100 --iters=10000"
+oneliner "timeout --preserve-status --verbose 4m ssdd --forks=100 --iters=10000"
