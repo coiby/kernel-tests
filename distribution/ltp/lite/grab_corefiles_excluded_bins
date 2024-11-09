@@ -15,3 +15,5 @@ fstat03
 waitid10
 select03
 waitpid01
+getcpu02
+seccomp01
