@@ -38,7 +38,7 @@ if ! [[ "${TESTVERSION}" =~ ^[0-9]+$ ]]; then
 	exit 1
 fi
 
-if [ "${TESTVERSION}" -ge 20240930 ]; then
+if [ "${TESTVERSION}" -ge 20240930 ] || [ -n "${LTP_COMMIT_ID}" ]; then
 	. "$CDIR"/../include-ng/defs.sh			|| exit 1
 	. "$CDIR"/../include-ng/patch.sh		|| exit 1
 	. "$CDIR"/../include-ng/build.sh		|| exit 1
