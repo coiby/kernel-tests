@@ -1,0 +1,16 @@
+summary: Storage blktests throtl tests
+contact: Yi Zhang <yizhan@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - blktrace
+  - fio
+  - gcc
+  - gcc-c++
+  - git
+  - nvme-cli
+  - xfsprogs
+  - parted
+extra-summary: storage/blktests/throtl
+extra-task: storage/blktests/throtl
+id: 07794efd-f69f-44d5-81a7-f09ee9acda1c

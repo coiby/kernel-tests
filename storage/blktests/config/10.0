@@ -11,3 +11,5 @@ NVME_FC="nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014
 #nvme/041 failed on RHEL10.0
 
 UBLK="ublk/001 ublk/002 ublk/003 ublk/004 ublk/005 ublk/006"
+
+THROTL="throtl/001 throtl/002 throtl/003 throtl/004 throtl/005"
