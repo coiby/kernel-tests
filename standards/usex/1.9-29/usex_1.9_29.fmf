@@ -9,6 +9,9 @@ require:
   - glibc-kernheaders
   - glibc-static
   - ncurses-devel
+  - type: file
+    pattern:
+    - /cki_lib
 duration: 1h
 extra-summary: standards/usex/1.9-29
 extra-task: standards/usex/1.9-29
