@@ -163,6 +163,8 @@
 /storage/blktests/nvme/nvme-tcp/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/blktests/nvme/nvmeof-mp/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/blktests/srp/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/storage/blktests/throtl/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/storage/blktests/ublk/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/block/fs_fio/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/block/mq_sche/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/block/multipath_mapping/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -297,6 +299,8 @@
 /storage/blktests/nvme/nvme-tcp/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/nvme/nvmeof-mp/ @bgoncalv @lulinqing @yizhanglinux
 /storage/blktests/srp/ @bgoncalv @lulinqing @yizhanglinux
+/storage/blktests/throtl/ @bgoncalv @lulinqing @yizhanglinux
+/storage/blktests/ublk/ @bgoncalv @lulinqing @yizhanglinux
 /storage/block/fs_fio/ @bgoncalv @czhong2 @lulinqing
 /storage/block/mq_sche/ @bgoncalv @czhong2 @lulinqing
 /storage/block/multipath_mapping/ @bgoncalv @czhong2 @lulinqing
