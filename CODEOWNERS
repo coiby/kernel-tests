@@ -15,10 +15,10 @@
 /security/rdrand/ @jbastianrh
 
 [Kdump]
-/kdump/ @jieli1 @yiyan1
+/kdump/ @jieli1 @yiyan1 @baoquan_he @ruyang
 
 [kdump-cki]
-/kdump-cki/ @jieli1 @yiyan1
+/kdump-cki/ @jieli1 @yiyan1 @baoquan_he @ruyang
 
 [DDIM]
 # DDIM-CODEOWNERS-CONFIG-BEGIN
