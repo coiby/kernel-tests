@@ -28,6 +28,8 @@
 
 TEST="misc/reboot-test"
 
+set -x
+
 if [[ ! -e kernel_before_reboot.txt ]]; then
     echo "Saving kernel info before reboot"
     uname -r > kernel_before_reboot.txt
