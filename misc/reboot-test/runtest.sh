@@ -28,6 +28,8 @@
 
 TEST="misc/reboot-test"
 
+set -x
+
 if [[ ! -e kernel_before_reboot.txt ]]; then
     echo "Saving kernel info before reboot"
     uname -r > kernel_before_reboot.txt
@@ -72,7 +74,7 @@ else
         cursor=$(cat cursor.txt)
         # check if there was any call trace during boot or during reboot
         echo "INFO: journalctl log should have entries since ${start_time}..."
-        journalctl -o short-full --after-cursor "${cursor}" > ${JOURNALCTLLOG}
+        journalctl --after-cursor "${cursor}" > ${JOURNALCTLLOG}
         if grep -qi 'Call Trace:' ${JOURNALCTLLOG}; then
           echo "FAIL: Call trace found in journalctl, see journalctl.log"
         else
