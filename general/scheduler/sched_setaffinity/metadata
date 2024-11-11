@@ -1,0 +1,14 @@
+[General]
+name=sched_setaffinity
+owner=Chunyu Hu <chuhu@redhat.com>
+description=sched_setaffinity api test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=15m
+dependencies=gcc;libgcc
+softDependencies=glibc
+repoRequires=general/include;kernel-include
