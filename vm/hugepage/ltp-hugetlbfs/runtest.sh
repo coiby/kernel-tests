@@ -35,8 +35,7 @@ if ! (($is_rhivos)); then
     . /usr/bin/rhts-environment.sh || exit 1
 fi
 
-. ../../../distribution/ltp/include/runtest.sh		|| exit 1
-. ../../../distribution/ltp/include/ltp-make.sh		|| exit 1
+. ../../../distribution/ltp/include-ng/include.sh	|| exit 1
 
 trap 'trap "" EXIT; TearDown' EXIT
 HPAGE=/proc/sys/vm/nr_hugepages
