@@ -35,13 +35,6 @@ function main
 # don't run it if running as part of shellspec
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
-	if cki_has_kernel_debug_flags; then
-		# the test is not supported on debug kernels due to performance issues
-		# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/657
-		rstrnt-report-result "$TNAME" SKIP
-		exit 0
-	fi
-
 	. "$CDIR"/../include/build.sh
 	main
 fi
