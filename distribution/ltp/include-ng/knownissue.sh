@@ -33,6 +33,7 @@ CDIR=$(dirname "$FILE")
 
 . "$CDIR"/../include-ng/utils.sh				|| exit 1
 . "$CDIR"/../include-ng/knownissue/upstream_knownissue.sh	|| exit 1
+. "$CDIR"/../include-ng/knownissue/ark_knownissue.sh		|| exit 1
 . "$CDIR"/../include-ng/knownissue/rhel9_knownissue.sh		|| exit 1
 . "$CDIR"/../include-ng/knownissue/rhel10_knownissue.sh		|| exit 1
 
