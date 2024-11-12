@@ -57,7 +57,7 @@ function TestBuild()
                 return
         fi
 
-        build-all
+        build_all
 }
 
 SetupHugetlb()
