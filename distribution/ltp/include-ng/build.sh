@@ -135,14 +135,14 @@ build_all()
 	if [ ${build_res} -eq 124 ]; then
 		echo "Cleaning up ${TARGET_DIR}"
 		rm -rf ${TARGET_DIR}
-		rstrnt-report-result "build_all build timeout" WARN/ABORTED
+		rstrnt-report-result "build_all build timeout" WARN
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 		exit 1
 	fi
 	if [ ${build_res} -ne 0 ]; then
 		res="FAILED"
 		SubmitLog ./buildlog.txt
-		rstrnt-report-result "build_all build failed" WARN/ABORTED
+		rstrnt-report-result "build_all build failed" WARN
 		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 		exit 1
 	fi
@@ -158,7 +158,7 @@ build_all()
 		echo "${TESTVERSION}" > ${TARGET_DIR}/ltp_version
 	else
 		if [[ -n $RSTRNT_TASKID ]]; then
-			rstrnt-report-result "build_all failed" WARN/ABORTED
+			rstrnt-report-result "build_all failed" WARN
 			rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
 		else
 			exit 1
