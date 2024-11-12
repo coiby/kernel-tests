@@ -126,7 +126,7 @@ build_all()
 	configure
 	echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
 	timeout_value=30
-	if uname -r | grep -q '+debug'; then
+	if uname -r | grep -q 'debug'; then
 		timeout_value=90
 	fi
 	res="PASSED"
