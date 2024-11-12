@@ -1,0 +1,40 @@
+summary: Verifies that the kernel command line parsing is robust.
+description: |
+        Verifies that the kernel command line parsing is robust.
+        An unknown kernel paramter is added to the cmdline.
+        After reboot checks are made to ensure on boot the kernel
+        identifies this undefined parameter and passes it to the user
+        space, if appropriate. In cases where the parameter contains
+        a period, '.', the kernel should only add the parameter to /proc/cmdline.
+        See https://docs.kernel.org/admin-guide/kernel-parameters.html for details.
+        Test Inputs:
+            change_cmdline 'undefined_test=0 no_values_test undefined.test=0 no.values.test'
+        Expected results:
+            [   PASS   ] :: Command 'journalctl -k | grep -q 'Unknown kernel command line parameters ".*undefined_test=0.*", will be passed to user space.'' (Expected 0, got 0)
+            [   PASS   ] :: Command 'journalctl -k | grep -q 'Unknown kernel command line parameters ".*no_values_test.*", will be passed to user space.'' (Expected 0, got 0)
+            [   PASS   ] :: File '/proc/cmdline' should contain 'undefined_test=0'
+            [   PASS   ] :: File '/proc/cmdline' should contain 'no_values_test'
+            [   PASS   ] :: File '/proc/cmdline' should contain 'undefined\.test=0'
+            [   PASS   ] :: File '/proc/cmdline' should contain 'no\.values\.test'
+            [   PASS   ] :: File '/proc/1/cmdline' should contain 'no_values_test'
+            [   PASS   ] :: File '/proc/1/environ' should contain 'undefined_test=0'
+            [   PASS   ] :: File '/proc/1/cmdline' should not contain 'no\.values\.test'
+            [   PASS   ] :: File '/proc/1/environ' should not contain 'undefined\.test=0'
+        Results location:
+            output.txt
+contact: Stephen Bertram <sbertram@redhat.com>
+id: d3cd2427-bfd0-4d6e-a128-51ad96fc389e
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+recommend:
+  - abootimg
+  - grubby
+require:
+  - make
+  - type: file
+    pattern:
+      - /cmdline_helper
+      - /cki_lib
+duration: 15m
