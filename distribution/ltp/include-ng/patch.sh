@@ -24,8 +24,6 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-move_pages04-remove-special-casing-for-kernels-4.3.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-move_pages04-convert-to-new-test-API.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-read_all-limit-sysfs-tpm-entries-to-single-worker.patch
-		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tcp_cmds-Remove-ftp01.sh-test-binary-data-files.patch
-		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-Refactor-regen.sh-script-to-generate-syscalls.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-Fallback-landlock-network-support.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-Network-helpers-in-landlock-suite-common-functions.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0003-Add-landlock08-test.patch
