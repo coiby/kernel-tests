@@ -33,6 +33,12 @@ Crash()
         SetupKdump
         Cleanup
 
+        # for RHEL-66065:
+        # Dave has concerns about the conflict between this fix and a workaround for IBM infiniband.
+        # To step around the CKI kdump-failure reporting, a better solution should be to set the
+        # following in kdump.conf "dracut_args --omit rdma" in CKI test script
+        AppendConfig "dracut_args --omit rdma"
+
         # This tests kdump kernel to be loaded with *kexec_file_load* explicitly
         # no matter what default option is for kexec
         # kexec_file_load() verifies kernel key if it's in lockdown or key forcing mode
