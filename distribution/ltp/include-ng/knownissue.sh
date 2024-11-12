@@ -51,17 +51,17 @@ if [ -r /etc/system-release ]; then
 	if is_fedora; then
 		osver=$(echo "$release" | cut -d' ' -f3)
 	elif is_rhel; then
-		osver=$(echo "$release" | awk -F' ' '{print int(substr($6, 1,1))*100 + (int(substr($6,3,2)))}')
+		osver=$(echo "$release" | awk -F' ' '{print int(substr($6, 1,2))*100 + (int(substr($6,3,2)))}')
 		if [ "$osver" == "0" ]; then
 			# fallback for format in rhel <= 7
 			osver=$(echo "$release" | awk -F' ' '{print int(substr($7, 1,1))*100 + (int(substr($7,3,2)))}')
 		fi
 	elif is_centos; then
 		# CentOS Stream seems to contain only major release info
-		osver=$(echo "$release" | awk -F' ' '{print int(substr($4, 1,1))*100}')
+		osver=$(echo "$release" | awk -F' ' '{print int(substr($4, 1,2))*100}')
 	elif is_autosd; then
 		# Automotive seems same to CentOS contain only major release info
-		osver=$(echo "$release" | awk -F' ' '{print int(substr($5, 1,1))*100}')
+		osver=$(echo "$release" | awk -F' ' '{print int(substr($5, 1,2))*100}')
 	fi
 else
 	# if we don't have system-release, use the old mechanism
