@@ -422,6 +422,8 @@ cki_is_abd()
     if [ -e /sys/devices/soc0/machine ]; then
         if grep -qi SA8775P /sys/devices/soc0/machine; then
             return 0
+        elif grep -qi "Renesas Spider CPU and Breakout boards based on r8a779f0" /sys/devices/soc0/machine; then
+            return 0
         else
             return 1
         fi
