@@ -64,6 +64,8 @@ expect {
 }
 expect eof
 EOF
+        gpgconf -K keyboxd
+        gpgconf -K gpg-agent
         # remove previous gpg keys (they are backed up)
         rm -rf /root/.gnupg
         # create gpg key settings
