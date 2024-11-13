@@ -3,6 +3,12 @@ contact: Yulia Kopkova <ykopkova@redhat.com>
 component:
   - kernel
 path: /livepatch/late-patching
-test: bash +x runtest.sh
+test: bash ./runtest.sh
 framework: shell
 duration: 5m
+require:
+  - make
+  - gcc
+  - elfutils-libelf-devel
+recommend:
+  - kernel-devel
