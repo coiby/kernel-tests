@@ -15,7 +15,7 @@ CDIR=$(dirname "$FILE")
 . "${CDIR}"/../../../cki_lib/libcki.sh || exit 1
 . "${CDIR}"/../kirk/kirk.sh || exit 1
 
-if rlIsOS 'autosd'; then
+if grep -iq "Automotive Stream Distribution release" /etc/system-release; then
 	export CREATE_ENTRIES=1
 fi
 # the task path may be different under the restraint harness if the task
