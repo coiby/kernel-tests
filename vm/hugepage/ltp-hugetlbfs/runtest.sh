@@ -72,7 +72,11 @@ SetupHugetlb()
     cat /proc/meminfo
     echo "========================="
 
-    cat hugetlb.inc > HUGEPAGE
+    if [ "${TESTVERSION}" -ge 20240930 ]; then
+	    cat hugetlb.inc.new > HUGEPAGE
+    else
+	    cat hugetlb.inc > HUGEPAGE
+    fi
 
     Hugepagesize=$(echo `grep 'Hugepagesize:' /proc/meminfo | awk '{print $2}'` / 1024 | bc)
     # Calculate nr_hugepages to allocate
