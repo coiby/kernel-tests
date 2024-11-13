@@ -8,6 +8,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
+TESTVERSION=${TEST_VERSION:-$TESTVERSION}
+
 if grep -iq "Automotive Stream Distribution release" /etc/system-release; then
     export CREATE_ENTRIES=1
 fi

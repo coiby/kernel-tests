@@ -73,9 +73,9 @@ SetupHugetlb()
     echo "========================="
 
     if [ "${TESTVERSION}" -ge 20240930 ]; then
-	    cat hugetlb.inc.new > HUGEPAGE
+        cat hugetlb.inc.new > HUGEPAGE
     else
-	    cat hugetlb.inc > HUGEPAGE
+        cat hugetlb.inc > HUGEPAGE
     fi
 
     Hugepagesize=$(echo `grep 'Hugepagesize:' /proc/meminfo | awk '{print $2}'` / 1024 | bc)
@@ -158,7 +158,5 @@ EnableNTP
 echo "============================="
 cat /proc/meminfo
 echo "============================="
-
-SubmitLog $DEBUGLOG
 
 exit 0
