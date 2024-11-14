@@ -15,7 +15,6 @@ recommend:
   - rpm-plugin-ima
   - rng-tools
   - rng-utils
-  - expect
   - openssl
   - attr
   - pinentry

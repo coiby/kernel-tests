@@ -48,40 +48,10 @@ rlJournalStart
         TESTPKG=$(basename $TESTPKG)
         pidof rngd && ENTROPY=false || ENTROPY=true
         $ENTROPY && rlRun "rngd -r /dev/urandom -o /dev/random" 0 "Start rngd to generate random numbers"
-        # create expect script for signing packages
-        cat > sign.exp <<EOF
-#!/usr/bin/expect -f
-set ::env(TERM) vt100
-
-spawn rpmsign --addsign --signfiles --fskpath privkey_evm.pem $TESTPKG
-expect {
-    "Enter pass phrase: " {
-        send -- "abc\r"
-    }
-    "Passphrase: " {
-        send -- "abc\r"
-    }
-}
-expect eof
-EOF
         gpgconf -K keyboxd
         gpgconf -K gpg-agent
         # remove previous gpg keys (they are backed up)
         rm -rf /root/.gnupg
-        # create gpg key settings
-        cat >foo <<EOF
-%echo Generating a basic OpenPGP key
-Key-Type: RSA
-Key-Length: 2048
-Name-Real: Joe Tester
-Name-Comment: with stupid passphrase
-Name-Email: joe@foo.bar
-Expire-Date: 0
-Passphrase: abc
-# Do a commit here, so that we can later print "done" :-)
-%commit
-%echo done
-EOF
 
         cat >x509_evm.genkey <<EOF
 [ req ]
@@ -103,16 +73,16 @@ subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid
 EOF
         # create gpg key
-        rlRun "gpg --batch --gen-key foo" 0 "Create gpg key"
+        rlRun "gpg --batch --quick-gen-key --passphrase '' joe@foo.bar" 0 "Create gpg key"
         # add gpg key to rpm macros
-        echo "%_gpg_name Joe Tester (with stupid passphrase) <joe@foo.bar>" > ~/.rpmmacros
+        echo "%_gpg_name joe@foo.bar" > ~/.rpmmacros
         rlRun "gpg --export --armor joe@foo.bar > pub.key" 0 "Create gpg public key"
         rlRun "rpm --import pub.key" 0 "Import the key"
         rlRun "openssl req -new -nodes -utf8 -sha256 -days 36500 -batch  -x509 -config x509_evm.genkey -outform DER -out x509_evm.der -keyout privkey_evm.pem" 0 "Generate file signing key"
     rlPhaseEnd
 
     rlPhaseStartTest
-        rlRun "expect sign.exp" 0 "Sign $TESTPKG"
+        rlRun "rpmsign --addsign --signfiles --fskpath privkey_evm.pem $TESTPKG" 0 "Sign $TESTPKG"
         rlRun "rpm -ivh $TESTPKG" 0 "Install $TESTPKG"
         for FILE in $(rpm -ql --noconfig signfiles); do
             rlRun -s "getfattr -m security.ima -d $FILE"
