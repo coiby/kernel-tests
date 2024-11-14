@@ -26,10 +26,6 @@
 TESTS=${TESTS:-}
 GIT_URL=${GIT_URL:-"https://github.com/SUSE/qa_test_klp.git"}
 
-
-knvr=$(uname -r)
-yum install -y kernel-devel-${knvr%.*}
-
 function run_test()
 {
     [ -z "$TESTS" ] && TESTS=$(ls klp_tc_*[0-9].sh)

@@ -25,9 +25,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh
-
 TEST="/kernel/livepatch/late-patching"
 
 KLP_SYSFS="/sys/kernel/livepatch"
@@ -36,9 +33,6 @@ TARGET_MODULE="test_module_late_patching"
 
 DMESG_SAVED=$(mktemp /tmp/dmesg-XXXXXX)
 dmesg > $DMESG_SAVED
-
-knvr=$(uname -r)
-yum install -y gcc kernel-devel-${knvr%.*} elfutils-libelf-devel
 
 test_fail()
 {
