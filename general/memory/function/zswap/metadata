@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=bash ./runtest.sh
 max_time=120m
 dependencies=gcc;libgcc;glibc-devel;bc;wget
 softDependencies=

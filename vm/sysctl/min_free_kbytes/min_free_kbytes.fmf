@@ -20,8 +20,16 @@ test: bash ./min_free_kbytes.sh
 framework: shell
 recommend:
   - vm
-tier: 1
-tag: [tier1]
 duration: 30m
 extra-summary: /kernel/vm/sysctl/min_free_kbytes
 extra-task: /kernel/vm/sysctl/min_free_kbytes
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tier: 1
+
+tag: 
+  - tier1
+  - VMM_FUNCTION

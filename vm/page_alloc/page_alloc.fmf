@@ -15,3 +15,11 @@ recommend:
   - abootimg
 duration: 2h
 id: c1477610-3a4c-4339-8772-cc8922487aab
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION
+

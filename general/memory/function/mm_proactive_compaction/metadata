@@ -1,0 +1,14 @@
+[General]
+name=mm-proactive-compaction
+owner=Li Wang <liwang@redhat.com>
+description=mm-proactive-compaction test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=20m
+repoRequires=general/include
+dependencies=grubby;psmisc;gcc;glibc;beakerlib
+use_pty=false

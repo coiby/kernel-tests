@@ -4,11 +4,6 @@ component:
   - kernel
 enabled: true
 id: b808398d-e79b-415b-9f87-2dc55c99f135
-tag: [
-  /kernel/memory/mmap1,
-  KernelTier1,
-  KG-VMM-TAG
-  ]
 contact: Bill Peck <bpeck@redhat.com> 
 test: bash ./runtest.sh
 framework: shell
@@ -20,6 +15,18 @@ require:
     pattern:
         - /general/include
 duration: 5m
-tier: 1
 extra-summary: /kernel/memory/mmap1
 extra-task: /kernel/memory/mmap1
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tier: 1
+
+tag: 
+  - /kernel/memory/mmap1
+  - KernelTier1
+  - KG-VMM-TAG
+  - VMM_FUNCTION
+

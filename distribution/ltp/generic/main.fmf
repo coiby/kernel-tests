@@ -8,3 +8,10 @@ require:
       - /distribution/ltp/kirk
 recommend:
   - python3-click
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

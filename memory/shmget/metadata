@@ -1,0 +1,14 @@
+[General]
+name=memory/shmget
+owner=Rachel Sibley <rasibley@redhat.com>
+description=shmget memory test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=gcc
+softDependencies=kernel-devel;glibc-devel;glibc-devel.i386;glibc-devel.i686;glibc-devel.s390;libgcc.i386;libgcc.i686;libgcc.s390
+repoRequires=cki_lib
+

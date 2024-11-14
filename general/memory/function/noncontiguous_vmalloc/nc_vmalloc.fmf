@@ -23,3 +23,10 @@ recommend:
 duration: 1h
 extra-summary: kernel vmalloc sanity test
 extra-task: kernel vmalloc sanity test
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

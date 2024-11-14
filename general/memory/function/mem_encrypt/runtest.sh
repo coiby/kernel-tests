@@ -37,10 +37,18 @@ krelease="$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))"
 
 rlJournalStart
 	rlPhaseStartTest
-	uname -r | grep x86_64 || { rstrnt-report-result "x86_64 only" SKIP; exit 0; }
+	uname -r | grep x86_64 || {
+		rstrnt-report-result "x86_64 only" SKIP;
+	        rlLog "x86_64 test only, skipping";
+		rlPhaseEnd
+		rlJournalEnd
+		exit 0; }
 	lscpu | grep -w sme && rlLog "sme is supported / enabled" || {
 		rstrnt-report-result "sme not enabled in bios" SKIP
 		rstrnt-report-result "$TEST" SKIP
+		rlLog "SME not enabled in BIOS, skipping test..."
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	}
 	if test -f $firstboot && grep "done" $firstboot; then

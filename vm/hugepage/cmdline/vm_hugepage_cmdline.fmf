@@ -11,3 +11,11 @@ recommend:
 duration: 30m
 extra-summary: /kernel/vm/hugepage/cmdline
 extra-task: /kernel/vm/hugepage/cmdline
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION
+

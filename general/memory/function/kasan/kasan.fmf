@@ -16,3 +16,10 @@ framework: beakerlib
 duration: 30m
 extra-summary: /kernel/general/memory/function/kasan
 extra-task: /kernel/general/memory/function/kasan
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

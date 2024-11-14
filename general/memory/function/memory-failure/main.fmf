@@ -1,0 +1,25 @@
+summary: hardware poison for memory failure handle
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+  - kernel
+test: |-
+    ( set +o posix; bash ./runtest.sh )
+framework: beakerlib
+require:
+  - bison
+  - make
+  - gcc
+  - flex
+recommend:
+  - python3
+  - git
+duration: 24h
+extra-summary: /kernel/general/memory/function/memory-failure
+extra-task: /kernel/general/memory/function/memory-failure
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

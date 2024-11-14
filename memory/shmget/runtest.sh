@@ -100,3 +100,4 @@ echo "Test result: $result"
 rstrnt-report-result $TEST $result 100
 
 exit 0
+

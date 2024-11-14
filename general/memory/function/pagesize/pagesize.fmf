@@ -10,3 +10,10 @@ require:
   - make
   - gcc
 duration: 1m
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION
