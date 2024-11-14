@@ -35,8 +35,7 @@ if ! (($is_rhivos)); then
     . /usr/bin/rhts-environment.sh || exit 1
 fi
 
-. ../../../distribution/ltp/include/runtest.sh		|| exit 1
-. ../../../distribution/ltp/include/ltp-make.sh		|| exit 1
+. ../../../distribution/ltp/include-ng/include.sh	|| exit 1
 
 trap 'trap "" EXIT; TearDown' EXIT
 HPAGE=/proc/sys/vm/nr_hugepages
@@ -57,7 +56,7 @@ function TestBuild()
                 return
         fi
 
-        build-all
+        build_all
 }
 
 SetupHugetlb()
@@ -73,7 +72,11 @@ SetupHugetlb()
     cat /proc/meminfo
     echo "========================="
 
-    cat hugetlb.inc > HUGEPAGE
+    if [ "${TESTVERSION}" -ge 20240930 ]; then
+        cat hugetlb.inc.new > HUGEPAGE
+    else
+        cat hugetlb.inc > HUGEPAGE
+    fi
 
     Hugepagesize=$(echo `grep 'Hugepagesize:' /proc/meminfo | awk '{print $2}'` / 1024 | bc)
     # Calculate nr_hugepages to allocate
@@ -155,7 +158,5 @@ EnableNTP
 echo "============================="
 cat /proc/meminfo
 echo "============================="
-
-SubmitLog $DEBUGLOG
 
 exit 0

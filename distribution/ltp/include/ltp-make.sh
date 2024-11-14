@@ -7,25 +7,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#TEST_VERSION can override the default
-TESTVERSION=$TEST_VERSION
-if [ -z ${TESTVERSION} ]; then
-    if rlIsRHEL 6; then
-        TESTVERSION="20200120"
-    elif rlIsRHEL 7; then
-        # NOTE: don't forget to update ltp version on dci/rhel7.xml as well
-        TESTVERSION="20210927"
-    elif rlIsRHEL 8 && rlIsRHEL '<=8.2'; then
-        # NOTE: rhel82z build failed on newer ltp, fix to 20230929
-        TESTVERSION="20230929"
-    elif rlIsRHEL 8 || rlIsRHEL '<=9.4'; then
-        # NOTE: don't forget to update ltp version on dci/rhel8.xml as well
-        TESTVERSION="20240129"
-    else
-        TESTVERSION="20240524"
-    fi
-fi
-if rlIsOS 'autosd'; then
+
+TESTVERSION=${TEST_VERSION:-$TESTVERSION}
+
+if grep -iq "Automotive Stream Distribution release" /etc/system-release; then
     export CREATE_ENTRIES=1
 fi
 # the task path may be different under the restraint harness if the task
