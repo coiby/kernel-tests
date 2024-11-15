@@ -3,7 +3,6 @@ description: reread partition table of open device caused partition issue
 contact: Changhui Zhong <czhong@redhat.com>
 component:
     - kernel
-path: /storage/block/bz2149790_reread_partition_table
 test: bash ./runtest.sh
 framework: shell
 recommend:

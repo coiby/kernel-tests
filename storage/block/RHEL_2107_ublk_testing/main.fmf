@@ -16,9 +16,9 @@ require:
     - libtool
     - automake
     - autoconf
-    - g++
     - liburing-devel
     - qemu-img
+    - g++
 duration: 2h
 tier: 1
 extra-summary: /storage/block/RHEL_2107_ublk_testing
