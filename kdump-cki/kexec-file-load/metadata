@@ -5,6 +5,7 @@ description=kdump kexec load via kexec_file_load() and reboot test
 license=GPLv3
 confidential=no
 destructive=no
+softDependencies=kexec-tools
 
 [restraint]
 entry_point=bash ./runtest.sh
