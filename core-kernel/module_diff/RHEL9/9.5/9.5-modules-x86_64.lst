@@ -62,15 +62,16 @@ altera-stapl.ko
 alx.ko
 amc6821.ko
 amd64_edac.ko
+amd_atl.ko
 amd_freq_sensitivity.ko
 amdgpu.ko
 amd_hsmp.ko
 amd.ko
 amd-pmc.ko
 amd-pmf.ko
-amd-pstate-ut.ko
 amd-rng.ko
 amd_sfh.ko
+amdtee.ko
 amdxcp.ko
 amd-xgbe.ko
 amilo-rfkill.ko
@@ -269,6 +270,7 @@ cxl_core.ko
 cxl_mem.ko
 cxl_pci.ko
 cxl_pmem.ko
+cxl_pmu.ko
 cxl_port.ko
 cyapatp.ko
 cyberjack.ko
@@ -335,11 +337,13 @@ dp83822.ko
 dp83848.ko
 dp83867.ko
 dp83tc811.ko
+dp83tg720.ko
 dptf_pch_fivr.ko
 dptf_power.ko
 drm_buddy.ko
 drm_display_helper.ko
 drm_exec.ko
+drm_gpuvm.ko
 drm_kms_helper.ko
 drm.ko
 drm_shmem_helper.ko
@@ -416,12 +420,12 @@ fakelb.ko
 fam15h_power.ko
 fat.ko
 faulty.ko
-fb_sys_fops.ko
 fcrypt.ko
 ff-memless.ko
 firmware_attributes_class.ko
 fjes.ko
 fm10k.ko
+fmpm.ko
 fnic.ko
 fsa4480.ko
 fscache.ko
@@ -764,7 +768,6 @@ intel-xway.ko
 ioatdma.ko
 io_edgeport.ko
 iommufd.ko
-iommu_v2.ko
 ionic.ko
 iosm.ko
 io_ti.ko
@@ -852,7 +855,6 @@ ipvtap.ko
 ip_vti.ko
 ipw.ko
 irdma.ko
-irqbypass.ko
 ir-usb.ko
 iscsi_boot_sysfs.ko
 iscsi_ibft.ko
@@ -1064,6 +1066,7 @@ mlx4_core.ko
 mlx4_en.ko
 mlx4_ib.ko
 mlx5_core.ko
+mlx5_dpll.ko
 mlx5_ib.ko
 mlx5_vdpa.ko
 mlx5-vfio-pci.ko
@@ -1295,7 +1298,6 @@ ntc_thermistor.ko
 null_blk.ko
 nvidia-wmi-ec-backlight.ko
 nvme-auth.ko
-nvme-common.ko
 nvme-core.ko
 nvme-fabrics.ko
 nvme-fc.ko
@@ -1423,7 +1425,10 @@ qat_c62x.ko
 qat_c62xvf.ko
 qat_dh895xcc.ko
 qat_dh895xccvf.ko
+qca808x.ko
+qca83xx.ko
 qcaux.ko
+qcom-phy-lib.ko
 qcserial.ko
 qede.ko
 qedf.ko
@@ -1550,10 +1555,12 @@ rtw88_8821ce.ko
 rtw88_8821c.ko
 rtw88_8822be.ko
 rtw88_8822b.ko
+rtw88_8822bu.ko
 rtw88_8822ce.ko
 rtw88_8822c.ko
 rtw88_core.ko
 rtw88_pci.ko
+rtw88_usb.ko
 rtw89_8852ae.ko
 rtw89_8852a.ko
 rtw89_8852be.ko
@@ -1652,6 +1659,7 @@ snd-ak4114.ko
 snd-ak4xxx-adda.ko
 snd-ali5451.ko
 snd-aloop.ko
+snd-amd-sdw-acpi.ko
 snd-asihpi.ko
 snd-atiixp.ko
 snd-atiixp-modem.ko
@@ -1699,6 +1707,7 @@ snd-hda-core.ko
 snd-hda-cs-dsp-ctls.ko
 snd-hda-ext-core.ko
 snd-hda-intel.ko
+snd-hda-scodec-component.ko
 snd-hda-scodec-cs35l41-i2c.ko
 snd-hda-scodec-cs35l41.ko
 snd-hda-scodec-cs35l41-spi.ko
@@ -1787,6 +1796,7 @@ snd-soc-cs42l42.ko
 snd-soc-cs42l42-sdw.ko
 snd-soc-cs42l43.ko
 snd-soc-cs42l43-sdw.ko
+snd-soc-cs-amp-lib.ko
 snd-soc-cx2072x.ko
 snd-soc-da7213.ko
 snd-soc-da7219.ko
@@ -1794,11 +1804,13 @@ snd-soc-dmic.ko
 snd-soc-ehl-rt5660.ko
 snd-soc-es8316.ko
 snd-soc-es8326.ko
+snd-soc-es83xx-dsm-common.ko
 snd-soc-hdac-hda.ko
 snd-soc-hdac-hdmi.ko
 snd-soc-hda-codec.ko
 snd-soc-hsw-rt5640.ko
 snd-soc-intel-hda-dsp-common.ko
+snd-soc-intel-sof-board-helpers.ko
 snd-soc-intel-sof-cirrus-common.ko
 snd-soc-intel-sof-maxim-common.ko
 snd-soc-intel-sof-nuvoton-common.ko
@@ -1979,9 +1991,6 @@ symbolserial.ko
 synaptics_i2c.ko
 synaptics_usb.ko
 synclink_gt.ko
-syscopyarea.ko
-sysfillrect.ko
-sysimgblt.ko
 t10-pi.ko
 tap.ko
 target_core_file.ko
@@ -2100,6 +2109,7 @@ vdpa.ko
 vdpa_sim_blk.ko
 vdpa_sim.ko
 vdpa_sim_net.ko
+vduse.ko
 veth.ko
 vfat.ko
 vfio_iommu_type1.ko

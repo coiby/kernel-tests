@@ -85,6 +85,7 @@ cxl_core.ko
 cxl_mem.ko
 cxl_pci.ko
 cxl_pmem.ko
+cxl_pmu.ko
 cxl_port.ko
 dasd_diag_mod.ko
 dasd_eckd_mod.ko
@@ -235,6 +236,7 @@ ipcomp6.ko
 ipcomp.ko
 ip_gre.ko
 ipip.ko
+ipr.ko
 ip_set_bitmap_ip.ko
 ip_set_bitmap_ipmac.ko
 ip_set_bitmap_port.ko
@@ -350,6 +352,7 @@ mlx4_core.ko
 mlx4_en.ko
 mlx4_ib.ko
 mlx5_core.ko
+mlx5_dpll.ko
 mlx5_ib.ko
 mlx5-vfio-pci.ko
 mlxfw.ko
@@ -513,7 +516,6 @@ nls_koi8-u.ko
 nls_utf8.ko
 null_blk.ko
 nvme-auth.ko
-nvme-common.ko
 nvme-core.ko
 nvme-fabrics.ko
 nvme-fc.ko
@@ -595,7 +597,6 @@ sctp_diag.ko
 sctp.ko
 sd_mod.ko
 serial_base.ko
-serial_core.ko
 serpent_generic.ko
 ses.ko
 sg.ko
@@ -643,6 +644,7 @@ team_mode_broadcast.ko
 team_mode_loadbalance.ko
 team_mode_random.ko
 team_mode_roundrobin.ko
+test_klp_syscall.ko
 test_lockup.ko
 thunderbolt_net.ko
 tipc.ko
@@ -771,8 +773,6 @@ xt_TEE.ko
 xt_TPROXY.ko
 xt_TRACE.ko
 xxhash_generic.ko
-zcrypt_cex2a.ko
-zcrypt_cex2c.ko
 zcrypt_cex4.ko
 zcrypt.ko
 zfcp.ko

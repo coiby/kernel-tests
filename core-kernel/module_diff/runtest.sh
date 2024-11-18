@@ -570,9 +570,12 @@ function SetOSRelease ()
             427)
                 Release="9.4"
                 ;;
+            503)
+                Release="9.5"
+                ;;
             *)
                 # Still in developing phase, need to update in future.
-                Release="HEAD-9.5"
+                Release="HEAD-9.6"
                 ;;
         esac
     elif [[ -n "$(echo ${K_NAME} | grep kernel-pegas)" && "${K_VER}" = "4.10.0" ]]; then
@@ -667,52 +670,15 @@ rlJournalStart
             fi
         fi
 
-        if [[ "$Release" == "HEAD-9.5" ]]; then
-            if cki_kver_lt "5.14.0-428.el9"; then
-                sed -i "/mt7925-common.ko/d; /mt7925e.ko/d"  ${OS}/${Release}/${Release}-modules-{x86_64,aarch64}.lst
-                sed -i "/pinctrl-intel-platform.ko/d; /pinctrl-meteorpoint.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+        if [[ "$Release" == "HEAD-9.6" ]]; then
+            if cki_kver_lt "5.14.0-508.el9"; then
+                sed -i "/gpio-regulator.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
             fi
-            if cki_kver_lt "5.14.0-431.el9"; then
-                sed -i "/gpio-mlxbf3.ko/d; /mlxbf-pmc.ko/d; /pinctrl-mlxbf3.ko/d;
-                /pwr-mlxbf.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
-                sed -i "/scmi_perf_domain.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
+            if cki_kver_lt "5.14.0-527.el9"; then
+                sed -i "/onboard_usb_hub.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-{aarch64,ppc64le}.lst
             fi
-            if cki_kver_lt "5.14.0-434.el9"; then
-                sed -i "/libblake2s-x86_64.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-builtin-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-438.el9"; then
-                sed -i "/onboard_usb_hub.ko/d"  ${OS}/${Release}/${Release}-modules-{aarch64,ppc64le}.lst
-            fi
-            if cki_kver_lt "5.14.0-439.el9"; then
-                sed -i "/qat_420xx.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-441.el9"; then
-                sed -i "/octeon_ep_vf.ko/d"  ${OS}/${Release}/${Release}-modules-${ARCH}.lst
-                sed -i "/clk-imx8mp-audiomix.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-444.el9"; then
-                sed -i "/spi-tegra210-quad.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-447.el9"; then
-                sed -i "/ledtrig-netdev.ko/d" ${OS}/${Release}/${Release}-modules-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-448.el9"; then
-                sed -i "/nvme-auth.ko/d; /nvme-keyring.ko/d; /test_lockup.ko/d" ${OS}/${Release}/${Release}-modules-${ARCH}.lst
-                sed -i "/processor_thermal_power_floor.ko/d; /processor_thermal_wt_hint.ko/d;
-                /processor_thermal_wt_req.ko/d" ${OS}/${Release}/${Release}-modules-x86_64.lst
-                sed -i "/nvme-common.ko/d" ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-449.el9"; then
-                sed -i "/zpool.ko/d; /zswap.ko/d" ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-450.el9"; then
-                sed -i "/8250_fsl.ko/d" ${OS}/${Release}/${Release}-builtin-{aarch64,ppc64le}.lst
-                sed -i "/8250_pci1xxxx.ko/d; /8250_pericom.ko/d; /serial_base.ko/d" ${OS}/${Release}/${Release}-builtin-${ARCH}.lst
-                sed -i "/8250_rt288x.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
-                sed -i "/serial_core.ko/d" ${OS}/${Release}/${Release}-knownRemoved-builtin-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-497.el9"; then
-                sed -i "/amd-pstate-ut.ko/d" ${OS}/${Release}/${Release}-knownRemoved-x86_64.lst
+            if cki_kver_lt "5.14.0-520.el9"; then
+                sed -i "/^t10-pi.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
             fi
         fi
     rlPhaseEnd
