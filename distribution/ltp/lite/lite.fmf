@@ -30,7 +30,6 @@ require:
   - strace
   - wget
   - python3
-  - python3-click
   - initscripts-service
   - type: file
     pattern:
@@ -38,6 +37,8 @@ require:
       - /distribution/ltp/include
       - /distribution/ltp/include-ng
       - /distribution/ltp/kirk
+recommend:
+  - python3-click
 duration: 6h
 extra-summary: /kernel/distribution/ltp/lite
 extra-task: /kernel/distribution/ltp/lite
