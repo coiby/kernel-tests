@@ -42,6 +42,10 @@ require:
     pattern:
      - /cki_lib
      - /distribution/ltp/include
+     - /distribution/ltp/include-ng
+     - /distribution/ltp/kirk
+recommend:
+  - python3-click
 adjust:
   - enable: false
     when: arch == x86_64
