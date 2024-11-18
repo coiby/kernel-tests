@@ -118,7 +118,9 @@ evdev.ko
 exportfs.ko
 extcon-core.ko
 fan.ko
+fb_io_fops.ko
 fb.ko
+fb_sys_fops.ko
 firmware_class.ko
 fixed.ko
 fixed_phy.ko
@@ -135,6 +137,7 @@ glob.ko
 gpio-max77620.ko
 gpio-pl061.ko
 gpio-poweroff.ko
+gpio-regulator.ko
 gpio-restart.ko
 gpio-tegra186.ko
 gpio-tegra.ko
@@ -250,6 +253,7 @@ pstore.ko
 ptp.ko
 public_key.ko
 pwm-bcm-iproc.ko
+pwm-regulator.ko
 pwm-tegra.ko
 qcom-scm.ko
 qemu_fw_cfg.ko
@@ -260,6 +264,7 @@ raw_diag.ko
 regmap-i2c.ko
 regmap-mmio.ko
 reset-imx7.ko
+reset-scmi.ko
 restart-poweroff.ko
 rng-core.ko
 rng.ko
@@ -267,7 +272,6 @@ roles.ko
 rsa_generic.ko
 rtc-efi.ko
 rtc-pl031.ko
-rtc-tegra.ko
 sch_fq_codel.ko
 scmi-core.ko
 scmi-module.ko
@@ -282,7 +286,6 @@ sd_mod.ko
 selftests.ko
 seqiv.ko
 serial_base.ko
-serial_core.ko
 serial_mctrl_gpio.ko
 serial-tegra.ko
 serio.ko
@@ -296,6 +299,9 @@ soc-imx8m.ko
 spi-amd.ko
 spi-qup.ko
 spi-tegra210-quad.ko
+syscopyarea.ko
+sysfillrect.ko
+sysimgblt.ko
 t10-pi.ko
 tcp_cubic.ko
 tcp_diag.ko
@@ -360,7 +366,5 @@ xz_dec.ko
 zbud.ko
 zlib_deflate.ko
 zlib_inflate.ko
-zpool.ko
 zsmalloc.ko
 zstd_decompress.ko
-zswap.ko

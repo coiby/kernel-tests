@@ -1,9 +1,13 @@
 8250_base.ko
 8250_dw.ko
 8250_exar.ko
+8250_fsl.ko
 8250.ko
 8250_of.ko
+8250_pci1xxxx.ko
 8250_pci.ko
+8250_pericom.ko
+8250_rt288x.ko
 8250_tegra.ko
 ac.ko
 acpi_mdio.ko
@@ -54,8 +58,10 @@ chromeos_acpi.ko
 clk-hi3519.ko
 clk-imx8mm.ko
 clk-imx8mn.ko
+clk-imx8mp-audiomix.ko
 clk-imx8mp.ko
 clk-imx8mq.ko
+clk-imx93.ko
 clk-vexpress-osc.ko
 cls_cgroup.ko
 cmac.ko
@@ -112,12 +118,13 @@ evdev.ko
 exportfs.ko
 extcon-core.ko
 fan.ko
+fb_io_fops.ko
 fb.ko
+fb_sys_fops.ko
 firmware_class.ko
 fixed.ko
 fixed_phy.ko
 font.ko
-freq_table.ko
 fsl_imx8_ddr_perf.ko
 fsl_lpuart.ko
 fwnode_mdio.ko
@@ -130,6 +137,7 @@ glob.ko
 gpio-max77620.ko
 gpio-pl061.ko
 gpio-poweroff.ko
+gpio-regulator.ko
 gpio-restart.ko
 gpio-tegra186.ko
 gpio-tegra.ko
@@ -158,6 +166,7 @@ i2c-tegra.ko
 icc-core.ko
 imx8m-blk-ctrl.ko
 imx8mp-blk-ctrl.ko
+imx93-blk-ctrl.ko
 imx_earlycon.ko
 imx.ko
 inet_diag.ko
@@ -230,6 +239,7 @@ pinctrl-imx8mm.ko
 pinctrl-imx8mn.ko
 pinctrl-imx8mp.ko
 pinctrl-imx8mq.ko
+pinctrl-imx93.ko
 pinctrl-imx.ko
 pinctrl-max77620.ko
 pkcs7_message.ko
@@ -243,6 +253,7 @@ pstore.ko
 ptp.ko
 public_key.ko
 pwm-bcm-iproc.ko
+pwm-regulator.ko
 pwm-tegra.ko
 qcom-scm.ko
 qemu_fw_cfg.ko
@@ -253,6 +264,7 @@ raw_diag.ko
 regmap-i2c.ko
 regmap-mmio.ko
 reset-imx7.ko
+reset-scmi.ko
 restart-poweroff.ko
 rng-core.ko
 rng.ko
@@ -260,9 +272,10 @@ roles.ko
 rsa_generic.ko
 rtc-efi.ko
 rtc-pl031.ko
-rtc-tegra.ko
 sch_fq_codel.ko
+scmi-core.ko
 scmi-module.ko
+scmi_perf_domain.ko
 scsi_common.ko
 scsi_dh_alua.ko
 scsi_dh_emc.ko
@@ -272,7 +285,7 @@ scsi_mod.ko
 sd_mod.ko
 selftests.ko
 seqiv.ko
-serial_core.ko
+serial_base.ko
 serial_mctrl_gpio.ko
 serial-tegra.ko
 serio.ko
@@ -285,7 +298,10 @@ skcipher.ko
 soc-imx8m.ko
 spi-amd.ko
 spi-qup.ko
-system_heap.ko
+spi-tegra210-quad.ko
+syscopyarea.ko
+sysfillrect.ko
+sysimgblt.ko
 t10-pi.ko
 tcp_cubic.ko
 tcp_diag.ko
@@ -312,8 +328,8 @@ typec_ucsi.ko
 ucs2_string.ko
 ucsi_acpi.ko
 udc-core.ko
-udmabuf.ko
 udp_diag.ko
+uhci-hcd.ko
 unix_diag.ko
 unix.ko
 usb-common.ko
@@ -350,7 +366,5 @@ xz_dec.ko
 zbud.ko
 zlib_deflate.ko
 zlib_inflate.ko
-zpool.ko
 zsmalloc.ko
 zstd_decompress.ko
-zswap.ko

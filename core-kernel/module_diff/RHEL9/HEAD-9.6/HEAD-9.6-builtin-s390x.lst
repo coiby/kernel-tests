@@ -72,6 +72,7 @@ hmac.ko
 hwspinlock_core.ko
 inet_diag.ko
 input-core.ko
+iova.ko
 ipv6.ko
 iucv.ko
 jitterentropy_rng.ko
@@ -140,6 +141,7 @@ sha512_generic.ko
 sha512_s390.ko
 sha_common.ko
 skcipher.ko
+t10-pi.ko
 tcp_cubic.ko
 tcp_diag.ko
 test-kstrtox.ko
