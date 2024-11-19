@@ -1,6 +1,6 @@
 [General]
 name=storage/iscsi/params
-owner=Martin Hoyer <mhoyer@redhat.com>
+owner=Zhaojuan Guo <zguo@redhat.com>
 description=iSCSI parameters test
 license=GPLv2
 confidential=no
