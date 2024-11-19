@@ -1,6 +1,6 @@
 [General]
 name=storage/target/targetcli_basic
-owner=Martin Hoyer <mhoyer@redhat.com>
+owner=Zhaojuan Guo <zguo@redhat.com>
 description=Testing various functions of targetcli including use of supported backstore types or CHAP authentication
 license=GPLv2
 confidential=no
