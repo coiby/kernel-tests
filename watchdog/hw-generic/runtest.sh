@@ -68,6 +68,8 @@ efi_restore()
 	if [ $? -ne 0 ]; then
 		rlLog "RESTORE Failed! Please investigate to avoid an incorrect boot order"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	fi
 	rm $FILE
@@ -80,6 +82,8 @@ efi_set()
 	if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
 		rlLog "Invalid command: $1"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	fi
 
@@ -105,6 +109,8 @@ chk_support() {
 	else
 		rlLog "/dev/watchdog does not exist! Skipping test and existing !"
 		rstrnt-report-result $TEST SKIP
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	fi
 
@@ -114,6 +120,8 @@ chk_support() {
 	if [ ! -x watchdog-simple ] ; then
 		rlLog "Failed to build tests, exiting!"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	else
 		rlLog "Compiled successfully."
@@ -125,6 +133,8 @@ chk_support() {
 	if [ ! -x watchdog-set-custom-timeout ] ; then
 		rlLog "Failed to build tests, exiting!"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	else
 		rlLog "Compiled successfully."
