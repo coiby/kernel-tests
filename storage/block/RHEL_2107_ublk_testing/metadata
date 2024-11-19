@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 repoRequires=storage/block/include
-dependencies=bpftrace;fio;libaio;libaio-devel;libtool;automake;autoconf;g++;liburing-devel;qemu-img
+dependencies=bpftrace;fio;libaio;libaio-devel;libtool;automake;autoconf;liburing-devel;qemu-img;g++
 max_time=2h

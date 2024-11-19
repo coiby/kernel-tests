@@ -35,9 +35,8 @@ function run_test()
 
 # if (rlIsRHEL '>=10' || ((${uk_flag} == 1))) && grep -q "CONFIG_BLK_DEV_UBLK=y" "/boot/config-${kernel_version}";then
     if rlIsRHEL '>=10' || [ "${uk_flag}" -eq 1 ];then
-        if grep -q "CONFIG_BLK_DEV_UBLK=m" "/boot/config-${kernel_version}";then
-            ublk_flag=1
-        fi
+# if grep -q "CONFIG_BLK_DEV_UBLK=m" "/boot/config-${kernel_version}";then
+        ublk_flag=1
     fi
 
     if [ "${ublk_flag}" -eq 1 ];then
@@ -56,7 +55,8 @@ function run_test()
         rlRun "make test T=generic"
     else
         rlLog "ublk drive not enable on this kernel, skip testing"
-        rstrnt-report-result "ublk not enabled" SKIP 0
+        rstrnt-report-result "not enable UBLK driver" SKIP 0
+        exit 0
     fi
     wait
 }
