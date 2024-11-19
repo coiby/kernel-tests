@@ -75,6 +75,10 @@ patch_generic()
 		echo " - returning ENODEV for empty cpumask stands for reseting user cpu mask" | tee -a $OUTPUTFILE
 		${PATCH} < ${ABS_DIR}/INTERNAL/sched_setaffinity_ENODEV.patch
 	fi
+
+	if [[ $KVER =~ ^6 ]]; then
+		${PATCH} < ${ABS_DIR}/INTERNAL/build-cve-2015-3290.patch
+	fi
 }
 
 patch_lite()
