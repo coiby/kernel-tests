@@ -5,7 +5,7 @@ description: |
 contact: Zhijun Wang <zhijwang@redhat.com>
 component:
   - kernel
-test: bash +x runtest.sh
+test: bash ./runtest.sh
 framework: beakerlib
 recommend:
   - kpatch
