@@ -31,5 +31,8 @@ require:
   - type: file
     pattern:
         -  /cki_lib
+adjust:
+    enabled: false
+    when: hw_target == ridesx4 or hw_target == j784s4xevm
 duration: 30m
 id: fb6af978-83eb-46fc-8381-a3f6f3099654
