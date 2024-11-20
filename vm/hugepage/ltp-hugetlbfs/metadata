@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=bc;gcc;gcc-c++;autoconf;automake;flex;bison;binutils;glibc-devel;procmail;rsyslog;util-linux;bc;wget;bzip2;virt-what;patch;python3-pip
+dependencies=bc;gcc;gcc-c++;autoconf;automake;flex;bison;binutils;glibc-devel;procmail;rsyslog;util-linux;bc;wget;bzip2;virt-what;patch;python3-pip;git
 softDependencies=ntpdate;chrony;redhat-lsb
 dependencies[RedHatEnterpriseLinuxServer5]=procmail;rsyslog;ntpdate;util-linux;util-linux-ng;redhat-lsb;bc;wget;sysklogd
 repoRequires=distribution/ltp/include;cki_lib;automotive/include;distribution/ltp/include-ng
