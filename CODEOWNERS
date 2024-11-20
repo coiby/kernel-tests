@@ -311,7 +311,7 @@
 /storage/dm/dmtest-vdo/ @bgoncalv @fsuba @lulinqing
 /storage/hba/san-device-stress/ @bgoncalv @lilinredhat @lulinqing @mpatalan
 /storage/hw_raid/ @bgoncalv @lilinredhat @lulinqing @mpatalan
-/storage/iscsi/params/ @bgoncalv @lulinqing @mhoyer
+/storage/iscsi/params/ @ZhaojuanGuo @bgoncalv @lulinqing
 /storage/lvm/snapper/ @bgoncalv @fsuba @lulinqing
 /storage/lvm/thinp/sanity/ @bgoncalv @fsuba @lulinqing
 /storage/lvm/thinp/stqe/ @bgoncalv @fsuba @lulinqing
@@ -323,7 +323,7 @@
 /storage/swraid/scsi_raid/ @bgoncalv @czhong2 @lulinqing
 /storage/swraid/simple_reshape/ @FineFan @bgoncalv @lulinqing
 /storage/swraid/upstream/ @bgoncalv @lulinqing @xni1
-/storage/target/targetcli_basic/ @bgoncalv @lulinqing @mhoyer
+/storage/target/targetcli_basic/ @ZhaojuanGuo @bgoncalv @lulinqing
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
 /trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
