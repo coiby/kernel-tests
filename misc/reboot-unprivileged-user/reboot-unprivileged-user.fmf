@@ -1,0 +1,11 @@
+summary: Test that confirms that user without the CAP_SYS_BOOT capability cannot use the reboot API
+description: |
+  HW Risk Assesment test that checks that a new unprivileged user,
+  e.g. without the CAP_SYS_BOOT privilege, is not able to reboot/shutdown
+  the system.
+contact: Filippo Storniolo <fstornio@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 10m
+enabled: true
+id: db47e04e-1418-47ba-9d00-1292c8b4aa43

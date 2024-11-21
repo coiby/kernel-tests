@@ -1,0 +1,28 @@
+verify that unprivileged users can't use the reboot API.
+
+This test create a new user "unprivileged_user" and checks that the user
+has no cap_sys_boot privilege. If it has it, test fails.
+It then tries to reboot the system as "unprivileged_user" using "rstrnt-reboot".
+This operation is expected to fail. If the user is able to reboot the system,
+the test fails.
+
+Test inputs:
+    rlRun "su - unprivileged_user -c \"rstrnt-reboot\"" 1 "Expected to fail: unprivileged   users should not be able to reboot the system"
+
+Expected result:
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [...] :: [   PASS   ] :: Command 'useradd unprivileged_user' (Expected 0, got 0)
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::   Test
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [...] :: [   LOG    ] :: trying reboot from unprivileged_user
+:: [...] :: [   PASS   ] :: Expected to fail: unprivileged users should not be able to reboot the system (Expected 1, got 1)
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::   Duration: 1s
+::   Assertions: 1 good, 0 bad
+::   RESULT: PASS (Test)
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::   Cleanup
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [...] :: [   PASS   ] :: Command 'userdel -r unprivileged_user' (Expected 0, got 0)
+::   OVERALL RESULT: PASS (/misc/reboot-unprivileged-user/reboot-unprivileged-user)
