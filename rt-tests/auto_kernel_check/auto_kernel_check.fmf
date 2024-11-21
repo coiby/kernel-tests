@@ -4,7 +4,7 @@ contact: Charles Shi <cheshi@redhat.com>
 component:
     - kernel
 path: /rt-tests/auto_kernel_check
-test: bash -x ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require:
     - realtime-tests

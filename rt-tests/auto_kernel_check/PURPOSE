@@ -4,7 +4,7 @@ kernel is running for rt-tests.
 
 STEPS TO RUN
 To execute, use:
-  bash -x runtest.sh
+  bash runtest.sh
 
 SUPPORTED PLATFORMS
 all
