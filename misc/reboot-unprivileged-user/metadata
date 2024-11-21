@@ -1,0 +1,10 @@
+[General]
+name=misc/reboot-unprivileged-user
+owner=Filippo Storniolo <fstornio@redhat.com>
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib
