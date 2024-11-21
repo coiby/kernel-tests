@@ -117,3 +117,10 @@ patch_inc()
 	patch_generic
 	patch_lite
 }
+
+patch-rtltp()
+{
+    echo "============ Patch rt_ltp ============" | tee -a $OUTPUTFILE
+    patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0001-rhivos-increase-threshold-based-on-hardware.patch
+    find ${TARGET} -type f -name run_auto.sh -exec chmod a+x {} \;  # Solve VROOM-23546
+}

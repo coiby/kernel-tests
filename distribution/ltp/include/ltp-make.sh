@@ -271,6 +271,7 @@ patch-rtltp()
 {
     echo "============ Patch rt_ltp ============" | tee -a $OUTPUTFILE
     patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/RHIVOS_Increase_THRESHOLD_based_on_hardware.patch
+    find ${TARGET} -type f -name run_auto.sh -exec chmod a+x {} \;  # Solve VROOM-23546
 }
 
 patch-cgroups()
