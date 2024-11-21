@@ -1,7 +1,4 @@
 #!/bin/sh
-# Source the common test script helpers
-. /usr/bin/rhts-environment.sh || exit 1
-
 
 # Assume the test will fail.
 result=FAIL
@@ -12,7 +9,7 @@ function CheckMemory ()
 	memttl=$(free -b -t | grep Total: | awk -F: '{print $2}' | awk '{print $3}')
 	if [ $memttl -lt $segment_size ]; then
 	echo "***** Not enough memory to run test = $segment_size *****" | tee -a $OUTPUTFILE
-	report_result Test_skipped WARN 99
+	rstrnt-report-result Test_skipped WARN 99
 	exit 0
 	fi
 }
@@ -27,13 +24,19 @@ function TestHeader ()
 }
 
 # ---------- Start Test -------------
+if grep 'release 10\.' /etc/redhat-release; then
+	# https://issues.redhat.com/browse/RHELBU-1937
+	rstrnt-report-result "32bit unsupported on el10" SKIP 0
+	exit 0
+fi
+
 uname -m|grep x86_64
 ret1=$?
 uname -m|grep s390x && [ "$(echo $(grep -Eo "[0-9]+.[0-9]" /etc/redhat-release) \< 8.0 | bc)" = 1 ]
 ret2=$?
 
-if [ $ret1 -ne 0 -a $ret2 -ne 0 ]; then
-	report_result Test_Skipped PASS 99
+if [ $ret1 -ne 0 ] && [ $ret2 -ne 0 ]; then
+	rstrnt-report-result Test_Skipped PASS 99
 	exit 0
 fi
 
@@ -90,6 +93,6 @@ fi
 
 echo "Test result: $result" | tee -a $OUTPUTFILE
 
-report_result $TEST $result 100
+rstrnt-report-result $TEST $result 100
 
 exit 0
