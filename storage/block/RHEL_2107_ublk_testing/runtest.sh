@@ -42,7 +42,7 @@ function run_test()
     if [ "${ublk_flag}" -eq 1 ];then
         rlRun "git clone https://github.com/ming1/ubdsrv.git"
         pushd ubdsrv
-        rlRun "autoreconf -i&& ./configure&& make -j 4&& make install > tmp.out 2>&1" "0-255"
+        rlRun "autoreconf -i && ./configure && make -j 4 && make install > tmp.out 2>&1" "0-255"
         popd
 
         rlRun "modprobe ublk_drv"
