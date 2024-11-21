@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2166
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /kernel/stress/stress-ng
@@ -33,8 +34,8 @@ TEST="stress/stress-ng"
 BUILDDIR="/opt/stress-ng"
 
 # task parameters
-# stress-ng git location
-GIT_URL=${GIT_URL:-"https://github.com/ColinIanKing/stress-ng.git"}
+# stress-ng git location, mirroring from https://github.com/ColinIanKing/stress-ng.git
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/stress-ng.git"}
 # current release
 GIT_BRANCH=${GIT_BRANCH:-"tags/V0.13.00"}
 # test 'random' or 'sequential' class only by parameter passing
