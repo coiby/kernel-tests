@@ -10,19 +10,8 @@ Test inputs:
     rlRun "su - unprivileged_user -c \"rstrnt-reboot\"" 1 "Expected to fail: unprivileged   users should not be able to reboot the system"
 
 Expected result:
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: [...] :: [   PASS   ] :: Command 'useradd unprivileged_user' (Expected 0, got 0)
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::   Test
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: [...] :: [   LOG    ] :: trying reboot from unprivileged_user
-:: [...] :: [   PASS   ] :: Expected to fail: unprivileged users should not be able to reboot the system (Expected 1, got 1)
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::   Duration: 1s
-::   Assertions: 1 good, 0 bad
-::   RESULT: PASS (Test)
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::   Cleanup
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: [...] :: [   PASS   ] :: Command 'userdel -r unprivileged_user' (Expected 0, got 0)
-::   OVERALL RESULT: PASS (/misc/reboot-unprivileged-user/reboot-unprivileged-user)
+    [   PASS   ] :: Command 'useradd unprivileged_user' (Expected 0, got 0)
+    [   LOG    ] :: trying reboot from unprivileged_user
+    [   PASS   ] :: Expected to fail: unprivileged users should not be able to reboot the system (Expected 1, got 1)
+    [   PASS   ] :: Command 'userdel -r unprivileged_user' (Expected 0, got 0)
+    OVERALL RESULT: PASS (/misc/reboot-unprivileged-user/reboot-unprivileged-user)
