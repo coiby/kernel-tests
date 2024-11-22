@@ -29,13 +29,14 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../kernel-include/runtest.sh || exit 1
+. ../enable_fips/lib.sh || exit 1
 
 devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
 
 rlJournalStart
 	rlPhaseStartSetup
 		rlShowRunningKernel
-		fips-mode-setup --is-enabled && rlPass "FIPS mode is enabled" && fips_enabled=0
+		rlRun "fipsIsEnabled" 0 && rlPass "FIPS mode is enabled" && fips_enabled=0
 		if [ ! ${fips_enabled} ]; then
 			echo "[SKIP] Test should run under FIPS mode"
 			rstrnt-report-result $RSTRNT_TASKNAME SKIP

@@ -2,7 +2,13 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2016 Red Hat, Inc.
+#   runtest.sh of /distribution/Library/fips
+#   Description: A set of helpers for FIPS 140 testing.
+#   Author: Ondrej Moris <omoris@redhat.com>
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright (c) 2018 Red Hat, Inc. All rights reserved.
 #
 #   This copyrighted material is made available to anyone wishing
 #   to use, modify, copy, or redistribute it subject to the terms
@@ -25,30 +31,44 @@
 
 rlJournalStart
     rlPhaseStartSetup
-        rlShowRunningKernel
-        grubby --info=DEFAULT
+        rlRun "source lib.sh"
+        rlRun "fipsLibraryLoaded"
     rlPhaseEnd
 
-    rlPhaseStartTest
-        rlRun "fips-mode-setup --check"
-        rlRun "fips-mode-setup --is-enabled" && rlPass "FIPS mode is enabled" && fips_enabled=1
-        if [ ! ${fips_enabled} ]; then
-            [[ -e /tmp/enable_fips_attempted ]] && rlDie "Failed to enable FIPS"
-            touch /tmp/enable_fips_attempted && sync
-            if stat /run/ostree-booted > /dev/null 2>&1; then
-                rlRun "fips-mode-setup --enable --no-bootcfg"
-                kernel_args=$(fips-mode-setup --enable --no-bootcfg | awk -F\" '/fips=1/ {print $2}')
-                kernel_current=$(grubby --info=DEFAULT | awk -F\" '/kernel=/ {print $2}')
-                grubby --update-kernel="${kernel_current}" --args="${kernel_args}"
-            else
-                rlRun "fips-mode-setup --enable"
+    if ! [ -e /var/tmp/fips-reboot ]; then
+        rlPhaseStartTest
+
+            # Check that FIPS 140 mode is supported.
+            rlRun "fipsIsSupported" 0,1
+            if [ $? -eq 0 ]; then
+
+                # Initially, FIPS mode is disabled.
+                rlRun "fipsIsEnabled" 1
+
+                # Enable it.
+                rlRun "fipsEnable" 0
+
+                # Before completing setup by restart, system is misconfigured.
+                rlRun "fipsIsEnabled" 2
+
+                rlRun "touch /var/tmp/fips-reboot" 0
+
+            rlPhaseEnd
+
+            rhts-reboot
             fi
-            rlRun "rhts-reboot"
-        fi
-    rlPhaseEnd
+    else
+        rlPhaseStartTest
+
+            # Now, FIPS mode is enabled.
+            rlRun "fipsIsEnabled" 0
+
+            rlRun "rm -f /var/tmp/fips-reboot" 0
+
+        rlPhaseEnd
+    fi
 
     rlPhaseStartCleanup
-    [[ -e /tmp/enable_fips_attempted ]] && rlRun "rm /tmp/enable_fips_attempted"
     rlPhaseEnd
-rlJournalEnd
 rlJournalPrintText
+rlJournalEnd
