@@ -10,4 +10,4 @@ destructive=no
 entry_point=bash ./runtest.sh
 dependencies=iasl;wget;acpidump;pciutils;dmidecode;sendmail;pcre-devel;patch;autoconf;json-c-devel;git;elfutils-libelf-devel;glib2-devel;make;gettext;automake;gcc;libtool;bison;flex;openssl-devel
 softDependencies=beakerlib-redhat
-repoRequires=cki_lib
+repoRequires=cki_lib;kernel-include
