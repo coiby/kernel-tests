@@ -19,6 +19,8 @@
 # Include cki library
 . ../../cki_lib/libcki.sh || exit 1
 
+. ../../kernel-include/runtest.sh || exit 1
+
 # Task parameters
 # DeBug - Set to non-zero value to enable debugging
 # FwtsGitRemote - git repository
@@ -63,6 +65,10 @@ function fwtsSetup()
         cki_abort_task "Required test dependencies couldn't be installed"
     fi
 
+    devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
+    if ! rlCheckRpm "${devel_pkg}"; then
+        $YUM install "${devel_pkg}" -y
+    fi
     # libbsd is a requirement to build.
     if ! rlCheckRpm libbsd-devel; then
         $YUM install libbsd-devel -y
