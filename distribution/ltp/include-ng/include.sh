@@ -23,10 +23,10 @@ function determine_test_version()
 	elif osver_in_range "800" "803"; then
 		# NOTE: rhel82z build failed on newer ltp, fix to 20230929
 		echo "20230929"
-	elif osver_in_range "803" "905"; then
+	elif is_rhel && osver_in_range "803" "905"; then
 		# NOTE: don't forget to update ltp version on dci/rhel8.xml as well
 		echo "20240129"
-	elif osver_in_range "905" "906"; then
+	elif is_rhel && osver_in_range "905" "906"; then
 		echo "20240524"
 	else
 		echo "20240930"
