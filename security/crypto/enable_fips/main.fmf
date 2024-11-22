@@ -1,13 +1,54 @@
-summary: Security Crypto enable_fips
-description: ''
-contact: Linqing Lu <lilu@redhat.com>
-id: 9648b316-0dfe-4083-afc8-ab2b12930b6a
-component:
-  - kernel
-path: /security/crypto/enable_fips
-test: make run
+summary: A set of helpers for FIPS 140 testing
+description: |+
+    NAME
+        distribution/fips - a set of helpers for FIPS 140 testing
+
+    DESCRIPTION
+        This is a library intended for FIPS 140 testing. It can check status of
+        FIPS 140 mode and it can enable FIPS 140 mode. Importing this library
+        with misconfigured (neither fully disabled nor fully enabled) FIPS 140
+        mode will produce an error.
+
+    VARIABLES
+      fipsMode
+        This variable holds state of FIPS mode at the time when library is
+        loaded.
+
+    FUNCTIONS
+      fipsIsEnabled
+        Function check current state of FIPS 140 mode. Returns 0 if it is
+        correctly enabled, 1 if disabled and 2 otherwise (misconfiguration).
+
+      fipsIsSupported
+        Function verifies whether the FIPS 140 product is supported on the
+        current platform. Returns 0 if FIPS mode is supported, 1 if not.
+
+      fipsEnable
+        Function enables FIPS 140 mode. Enablement must be completed by system
+        restart. Returns 0 if enabling was successful, 1 otherwise.
+
+      fipsLibraryLoaded
+        Initialization callback. Importing this library with misconfigured
+        (neither fully disabled nor fully enabled) FIPS 140 mode will produce an
+        error.
+
+    AUTHORS
+        *   Ondrej Moris <omoris@redhat.com>
+
+contact: Ondrej Moris <omoris@redhat.com>
+enabled: true
+tag: []
+component: []
+test: ./runtest.sh
 framework: beakerlib
-require: [grubby, make, crypto-policies-scripts]
-duration: 10m
-extra-summary: /kernel-tests/security/crypto/enable_fips
+recommend:
+  - coreutils
+  - crypto-policies
+  - crypto-policies-scripts
+  - fips-mode-setup
+  - grubby
+duration: 30m
+extra-nitrate: TC#0384317
+extra-summary: '[fips] a set of helpers for FIPS 140 testing (distribution/fips)'
 extra-task: /kernel-tests/security/crypto/enable_fips
+id: a7a036c6-b7f1-4c52-82be-c2f87ca6c2ff
