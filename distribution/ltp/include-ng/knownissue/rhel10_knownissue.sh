@@ -17,6 +17,8 @@ function rhel10_unfix_issues()
 	osver_in_range "1000" "1001" && tskip "logrotate_sh" unfix
 	# pty01 and ptem01 failed with kirk
 	osver_in_range "1000" "1001" && tskip "pty01 ptem01" unfix
+	# RHEL-65409: ltp/lite fanotify22 test failed
+	osver_in_range "1000" "1001" && tskip "fanotify22" unfix
 }
 
 function rhel10_fixed_issues()
