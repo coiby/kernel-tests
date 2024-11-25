@@ -4,7 +4,7 @@ contact: Waylon Cude <wcude@redhat.com>
 component:
   - kernel
 path: /rt-tests/us/stalld/sanity
-test: bash -x ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require:
   - realtime-tests

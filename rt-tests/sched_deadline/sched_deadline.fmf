@@ -4,7 +4,7 @@ contact: Qiao Zhao <qzhao@redhat.com>
 component:
     - kernel
 path: /rt-tests/sched_deadline
-test: bash -x ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 require:
     - realtime-tests

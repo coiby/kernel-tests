@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=bash -x ./runtest.sh
+entry_point=bash ./runtest.sh
 repoRequires=cki_lib;rt-tests/include
 max_time=1h
 use_pty=false
