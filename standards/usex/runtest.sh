@@ -147,10 +147,10 @@ function TestUsexMain ()
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        rlRun setup
+        setup
     rlPhaseEnd
     rlPhaseStartTest "Usex test run"
-        rlRun TestUsexMain
+        TestUsexMain
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
