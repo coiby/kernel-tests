@@ -129,7 +129,7 @@ skip_testcase ()
         echo -e ${SKIPTESTS// /"\n"} > ${LTPDIR}/SKIPTESTS
         # skip file needs to be an absolute path or path relative to $LTPROOT
         # use absolute path here
-        OPTS="$OPTS -S ${LTPDIR}/SKIPTESTS"
+        OPTS="$OPTS --skip-file ${LTPDIR}/SKIPTESTS"
     fi
 }
 
@@ -156,8 +156,8 @@ RunTest ()
 
     ipc_debug_info Before
     debug "Command Line:"
-    debug "kirk $RUNTEST $OUTPUTDIR $OPTIONS"
-    kirk_run $RUNTEST $OUTPUTDIR $OPTIONS
+    debug "kirk $RUNTEST $OUTPUTDIR \"$OPTIONS\""
+    kirk_run $RUNTEST $OUTPUTDIR "$OPTIONS"
 
     ipc_debug_info After
     if [ $RUNTEST = "ipc" ]; then
