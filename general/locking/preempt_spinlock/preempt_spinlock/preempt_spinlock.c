@@ -6,7 +6,7 @@
 static int cpu = 0;
 static int flag = 0;
 /* runtime 1s by default */
-static int max_runtime= 1 * HZ;
+static const unsigned long max_runtime = msecs_to_jiffies(1000);
 static unsigned long start_time = 0;
 
 static struct task_struct *thread_locker;
@@ -19,23 +19,23 @@ static int thread_locker_func(void *data)
 	spin_lock(&test_spinlock);
 	/* wakeup writer thread to preempt current locker thread*/
 	wake_up_process(thread_writer);
-	while (!kthread_should_stop() && time_before(jiffies, start_time + max_runtime)) {
-		if (flag) {
-			pr_info("thread-writer successfully preempted the thread-locker");
-			break;
-		}
+	while (!flag && time_before(jiffies, start_time + max_runtime)) {
 		cpu_relax();
 	}
 	spin_unlock(&test_spinlock);
+	while (!kthread_should_stop()) {
+		schedule_timeout(msecs_to_jiffies(1000));
+	}
 
 	return 0;
 }
 
 static int thread_writer_func(void *data)
 {
-	while (!kthread_should_stop() && time_before(jiffies, start_time + max_runtime)) {
-		flag = 1;
-		break;
+	flag = 1;
+	pr_info("thread-writer successfully preempted the thread-locker");
+	while (!kthread_should_stop()) {
+		schedule_timeout(msecs_to_jiffies(1000));
 	}
 
 	return 0;
@@ -49,8 +49,8 @@ static int __init spinlock_preempt_test_init(void)
 		.sched_policy = SCHED_FIFO,
 		.sched_priority = 1,
 		.sched_flags    = 0,
-		.sched_nice = 0,
-		.sched_runtime  =  0,
+		.sched_nice     = 0,
+		.sched_runtime  = 0,
 		.sched_deadline = 0,
 		.sched_period   = 0,
 	};
@@ -80,8 +80,8 @@ static int __init spinlock_preempt_test_init(void)
 	ret = sched_setattr_nocheck(thread_writer, &attr);
 	if (ret) {
 		pr_warn("Failed to set thread_writer with SCHED_FIFO:1");
-		kthread_stop(thread_locker);
 		kthread_stop(thread_writer);
+		kthread_stop(thread_locker);
 		thread_locker = NULL;
 		thread_writer = NULL;
 		return 0;
@@ -95,13 +95,10 @@ static int __init spinlock_preempt_test_init(void)
 	}
 
 	if (!flag) {
-		pr_info("FAIL: spin lock is not preempted in %d seconds by the high priority task\n", max_runtime/HZ);
+		pr_info("FAIL: spin lock is not preempted in %u seconds by the high priority task\n", jiffies_to_msecs(max_runtime));
 	} else {
-		pr_info("PASS: spin lock is preempted in %d seconds by the high priority task\n", max_runtime/HZ);
+		pr_info("PASS: spin lock is preempted in %u seconds by the high priority task\n", jiffies_to_msecs(max_runtime));
 	}
-
-	kthread_stop(thread_writer);
-	kthread_stop(thread_locker);
 
 	return 0;
 }
@@ -109,6 +106,9 @@ static int __init spinlock_preempt_test_init(void)
 static void __exit spinlock_preempt_test_exit(void)
 {
 	pr_info("spin_lock() preempt test module exiting\n");
+
+	kthread_stop(thread_writer);
+	kthread_stop(thread_locker);
 }
 
 module_init(spinlock_preempt_test_init);
