@@ -13,9 +13,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-# Source the common test script helpers
-. /usr/share/beakerlib/beakerlib.sh || exit 1
-
 # Global variables
 PODMANUSER=${PODMANUSER:-root}
 BATS_DIR=${BATS_DIR:-/usr}
@@ -147,14 +144,18 @@ fi
 # patch 070-builds to make test passing
 sed -i -e '/io.buildah.version/d' $TEST_DIR/070-build.bats
 
+
+rhel_centos_release=$(rpm -E '%rhel')
+
 # Add container-tools module for rhel8 through Appstreams:
 #   rhel8 -> fast rolling stream that closes to upstream/latest
 #   1.0, 2.0, ....  -> stable stream for production
-if rlIsRHEL '8'; then
+if [[ "$rhel_centos_release" == "8" ]]; then
     dnf module install -y container-tools:rhel8
 fi
 
-if rlIsRHEL || rlIsCentOS '9'; then
+
+if [[ "$rhel_centos_release" == "8" ]] || [[ "$rhel_centos_release" == "9" ]]; then
     # https://github.com/containers/podman/issues/20087
     echo "Skipping selinux-policy tests known to fail: https://github.com/containers/podman/issues/20087"
     sed -i 's/@test "podman selinux: confined container" {/@test "podman selinux: confined container" {\n    skip/' ${TEST_DIR}/410-selinux.bats
