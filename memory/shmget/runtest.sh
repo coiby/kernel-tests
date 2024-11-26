@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Assume the test will fail.
 result=FAIL
@@ -8,7 +8,7 @@ function CheckMemory ()
 {
 	memttl=$(free -b -t | grep Total: | awk -F: '{print $2}' | awk '{print $3}')
 	if [ $memttl -lt $segment_size ]; then
-	echo "***** Not enough memory to run test = $segment_size *****" | tee -a $OUTPUTFILE
+	echo "***** Not enough memory to run test = $segment_size *****"
 	rstrnt-report-result Test_skipped WARN 99
 	exit 0
 	fi
@@ -16,11 +16,11 @@ function CheckMemory ()
 
 function TestHeader ()
 {
-	echo "*************************************" | tee -a $OUTPUTFILE
-	echo "***** Starting bz230658 (shmget) runtest.sh script *****" | tee -a $OUTPUTFILE
-	echo "***** Current Running Kernel Package = $kernbase *****" | tee -a $OUTPUTFILE
-	echo "***** Current Running Distro = $installeddistro *****" | tee -a $OUTPUTFILE
-	echo "*************************************" | tee -a $OUTPUTFILE
+	echo "*************************************"
+	echo "***** Starting bz230658 (shmget) runtest.sh script *****"
+	echo "***** Current Running Kernel Package = $kernbase *****"
+	echo "***** Current Running Distro = $installeddistro *****"
+	echo "*************************************"
 }
 
 # ---------- Start Test -------------
@@ -41,10 +41,10 @@ if [ $ret1 -ne 0 ] && [ $ret2 -ne 0 ]; then
 fi
 
 if [ $ret2 -eq 0 ];  then
-	echo "Building for s390x environment" ;
-	gcc -o tshmget -m31 tshmget.c ;
+	echo "Building for s390x environment"
+	gcc -o tshmget -m31 tshmget.c
 else
-	gcc -o tshmget -m32 tshmget.c ;
+	gcc -o tshmget -m32 tshmget.c
 fi
 
 
@@ -64,34 +64,38 @@ segment_size=2147483649
 
 CheckMemory
 
-echo "Attempting to set shmmax to $segment_size..." | tee -a $OUTPUTFILE
+echo "Attempting to set shmmax to $segment_size..."
 echo $segment_size > /proc/sys/kernel/shmmax
-echo -n "Contents of /proc/sys/kernel/shmmax now " | tee -a $OUTPUTFILE
-cat /proc/sys/kernel/shmmax | tee -a $OUTPUTFILE
-echo | tee -a $OUTPUTFILE
+echo -n "Contents of /proc/sys/kernel/shmmax now "
+cat /proc/sys/kernel/shmmax
+echo
 
 basearch=$(uname -m)
-echo "Making sure needed 32-bit deps are installed..." | tee -a $OUTPUTFILE
+echo "Making sure needed 32-bit deps are installed..."
 case $basearch in
 	x86_64*)
-		yum -y install glibc-devel.i386 libgcc.i386 >> $OUTPUTFILE 2>&1
+		yum -y install glibc-devel.i386 libgcc.i386
 		# for rhel6 and later
-		yum -y install glibc-devel.i686 libgcc.i686 >> $OUTPUTFILE 2>&1
+		yum -y install glibc-devel.i686 libgcc.i686
 		;;
-	s390x* ) yum -y install glibc-devel.s390 libgcc.s390 >> $OUTPUTFILE 2>&1 ;;
-	*	  ) echo "This test is for x86_64 and s390x only..." | tee -a $OUTPUTFILE ;;
+	s390x*)
+		yum -y install glibc-devel.s390 libgcc.s390
+		;;
+	*)
+		echo "This test is for x86_64 and s390x only..."
+		;;
 esac
-echo | tee -a $OUTPUTFILE
-echo "Making sure the test app is actually built..." | tee -a $OUTPUTFILE
+echo
+echo "Making sure the test app is actually built..."
 
-./tshmget $segment_size >> $OUTPUTFILE 2>&1
+./tshmget $segment_size
 if [ "$?" -eq "0" ]; then
 	export result=PASS
 else
 	export result=FAIL
 fi
 
-echo "Test result: $result" | tee -a $OUTPUTFILE
+echo "Test result: $result"
 
 rstrnt-report-result $TEST $result 100
 
