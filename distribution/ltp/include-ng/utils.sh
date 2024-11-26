@@ -294,12 +294,20 @@ DisableNTP ()
 protect_harness_from_OOM()
 {
 	for pid in $(pgrep systemd) $(pgrep restraintd) $(pgrep beah) $(pgrep rhts) $(pgrep ltp) $(pgrep dhclient) $(pgrep NetworkManager); do
-		echo -16 > /proc/$pid/oom_adj
+		if [ -f /proc/$pid/oom_score_adj ]; then
+			echo -937 > /proc/$pid/oom_score_adj
+		else
+			echo -16 > /proc/$pid/oom_adj
+		fi
 	done
 
 	# make sure children of this process are not protected
 	# as those include also OOM tests
-	echo 0 > /proc/self/oom_adj
+	if [ -f /proc/self/oom_score_adj ]; then
+		echo 0 > /proc/self/oom_score_adj
+	else
+		echo 0 > /proc/self/oom_adj
+	fi
 }
 
 # don't run it if running as part of shellspec
