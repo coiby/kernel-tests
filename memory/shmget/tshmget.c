@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	}
 
 	printf("Segment of size %lu (0x%lx) successfully allocated. shmid: %i\n", (long)sz, (long)sz, shmid);
-	
+
 	if( shmctl(shmid, IPC_RMID, &buf) ){
 		perror("shmctl");
 		exit(1);
