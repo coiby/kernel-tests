@@ -61,7 +61,7 @@ cd "$git_path" || __prepare_failed
 
 # NOTE: the timeout needs to be sufficiently lower than
 # max_duration_seconds in kpet-db.
-timeout -s KILL 2400 ./runtest.sh
+timeout -s KILL 3300 ./runtest.sh
 test_exit_code=$?
 
 # Clean up stuff that could cause errors later; errors are ignored.
