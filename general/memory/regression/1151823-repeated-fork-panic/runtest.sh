@@ -34,6 +34,7 @@ STRESS=${STRESS:-no}
 WAITTIME=${WAITTIME:-300}
 TIMEFRAME=${TIMEFRAME:-60}
 REPRODUCER="fork_snake"
+OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile.$(pwd | md5sum | awk '{print $1}' | cut -c 1-8)}
 
 
 setup_env()

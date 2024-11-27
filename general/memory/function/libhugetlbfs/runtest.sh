@@ -28,6 +28,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ./kvercmp.sh
 
+OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile.$(pwd | md5sum | awk '{print $1}' | cut -c 1-8)}
 if rlIsRHEL 7 && rlIsRHEL "<=7.8"; then
 	TEST_VERSION=${TEST_VERSION:-2.16-13.el7}
 elif rlIsRHEL "8" && rlIsRHEL "<=8.2"; then
