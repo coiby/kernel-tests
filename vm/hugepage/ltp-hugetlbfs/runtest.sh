@@ -89,7 +89,7 @@ SetupHugetlb()
         MemAlloc=1024
     elif [ "$MemFree" -le "0" ]; then
         echo "[SKIP] No enough memory for testing" | tee -a ${OUTPUTFILE}
-        report_result Test_Skipped PASS 99
+        rstrnt-report-result Test_Skipped PASS 99
         exit 0
     fi
     if [ "${ARCH}" = "s390x" ]; then
@@ -97,7 +97,7 @@ SetupHugetlb()
             MemAlloc=128 # only allocate 128MB on s390x
         else
             echo "the MemFree is too small to test"
-                report_result Test_Skipped PASS 99
+                rstrnt-report-result Test_Skipped PASS 99
                 exit 0
         fi
     fi
@@ -131,14 +131,14 @@ cat /proc/filesystems | grep -q hugetlbfs
 if [ $? -ne 0 ]; then
     # Bug 1143877 - hugetlbfs: disabling because there are no supported hugepage sizes
     echo "hugetlbfs not found in /proc/filesystems, skipping test"
-    report_result Test_Skipped PASS 99
+    rstrnt-report-result Test_Skipped PASS 99
     exit 0
 fi
 
 TestBuild
 SetupHugetlb
 
-report_result "${TEST}/Setup" "${RESULT}"
+rstrnt-report-result "${TEST}/Setup" "${RESULT}"
 
 DisableNTP
 
