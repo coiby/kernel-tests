@@ -88,7 +88,7 @@ function report_leak()
     fi
 
     rstrnt-report-result  "$TEST/kmemleak" WARN
-    rhts-submit-log -l "$LEAKREPORT"
+    rstrnt-submit-log -l "$LEAKREPORT"
     cat "${LEAKFILE}" > "${LEAKREPORT_OLD}"
 
     if [ "${LEAKUPLOAD}" != "yes" ]; then
@@ -267,7 +267,7 @@ if test -f "${LEAKFILE}" && test -f "${LEAKREPORT}" && test -f "${LEAKREPORT_OLD
         exit 0
     fi
     rstrnt-report-result  $TEST/kmemleak.before_reboot WARN
-    rhts-submit-log -l $LEAKREPORT
+    rstrnt-submit-log -l $LEAKREPORT
     cat /dev/null > ${LEAKREPORT_OLD}
 fi
 EOF
