@@ -67,7 +67,7 @@ function report_leak()
     rlRun -l "echo scan > ${LEAKFILE}" 0-255
     # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
-        report_result "skip_scan_stopped" SKIP
+        rstrnt-report-result "skip_scan_stopped" SKIP
     fi
 
     sleep 10        # wait a few secs for leak happens
@@ -87,7 +87,7 @@ function report_leak()
         return;
     fi
 
-    report_result  "$TEST/kmemleak" Warn
+    rstrnt-report-result  "$TEST/kmemleak" WARN
     rhts-submit-log -l "$LEAKREPORT"
     cat "${LEAKFILE}" > "${LEAKREPORT_OLD}"
 
@@ -183,7 +183,7 @@ function install_upstream()
     make run
     pushd ./kernel
     gitinfo=$(git describe)
-    report_result  "$TEST/$gitinfo" Pass
+    rstrnt-report-result  "$TEST/$gitinfo" PASS
     popd
     popd
     echo "$gitinfo" > ./gitinfo
@@ -266,7 +266,7 @@ if test -f "${LEAKFILE}" && test -f "${LEAKREPORT}" && test -f "${LEAKREPORT_OLD
     if [ "\${l1}" == "\${l2}" ]; then
         exit 0
     fi
-    report_result  $TEST/kmemleak.before_reboot Warn
+    rstrnt-report-result  $TEST/kmemleak.before_reboot WARN
     rhts-submit-log -l $LEAKREPORT
     cat /dev/null > ${LEAKREPORT_OLD}
 fi

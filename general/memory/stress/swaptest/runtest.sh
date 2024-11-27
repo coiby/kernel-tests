@@ -277,7 +277,7 @@ function run_swap_sress_file()
 
 	rlRun "$cgexec $cgroup_version $cgroup timeout $((STRESS_NG_RUNTIME + 20)) stress-ng --vm $(nproc) --vm-bytes ${workingset_size}m -t ${STRESS_NG_RUNTIME}" 0-255
 
-	test -f ./pmbench/pmbench || { skip_pmbench=1; report_result "pmbench_no_binary" SKIP; }
+	test -f ./pmbench/pmbench || { skip_pmbench=1; rstrnt-report-result "pmbench_no_binary" SKIP; }
 	for j in $(seq 1 5); do
 		((skip_pmbench)) && break
 		local probe_time=20
@@ -318,12 +318,12 @@ function run_swap_stress()
 			dmesg | grep -E "WARNING:|BUG:|Oops" && result=FAIL
 		fi
 
-		report_result "${result_names[$i]}" $result
+		rstrnt-report-result "${result_names[$i]}" $result
 
 		result=PASS
 		run_swap_sress_file
 		dmesg | grep -E "WARNING:|BUG:|Oops" && result=FAIL && echo "Please check dmesg.log or console.log"
-		report_result "${result_names[$i]}_file" $result
+		rstrnt-report-result "${result_names[$i]}_file" $result
 	done
 
 	swapon -a

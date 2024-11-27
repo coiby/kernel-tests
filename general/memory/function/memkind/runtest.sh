@@ -62,7 +62,7 @@ function system_check()
 	fi
 
 	if [ $TESTSKIP -eq 1 ]; then
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	fi
 }

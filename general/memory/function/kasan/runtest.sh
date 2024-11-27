@@ -61,7 +61,7 @@ function RunKasanTest {
             return
         fi
         if ! grep 'CONFIG_KASAN=y' /boot/config-$(uname -r); then
-               report_result "SKIP_NOT_SUPPORT" SKIP
+               rstrnt-report-result "SKIP_NOT_SUPPORT" SKIP
                rlPhaseEnd
                return
         fi

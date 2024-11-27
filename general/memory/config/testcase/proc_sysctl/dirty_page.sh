@@ -68,10 +68,10 @@ function test_dirty_ratio1()
     local watermark_high="$((memtotal/100*30))"
 
     if ! test_get_diskfreek; then
-        report_result "$FUNCNAME-disk_unknown" SKIP
+        rstrnt-report-result "$FUNCNAME-disk_unknown" SKIP
         return
     elif (($(test_get_diskfreek) < memtotal)); then
-        report_result "$FUNCNAME-disk_space" SKIP
+        rstrnt-report-result "$FUNCNAME-disk_space" SKIP
         return
     fi
 
@@ -97,10 +97,10 @@ function test_dirty_ratio2()
     local watermark_high="$((memtotal/100*30))"
 
     if ! test_get_diskfreek; then
-        report_result "$FUNCNAME-disk_unknown" SKIP
+        rstrnt-report-result "$FUNCNAME-disk_unknown" SKIP
         return
     elif (($(test_get_diskfreek) < memtotal)); then
-        report_result "$FUNCNAME-disk_space" SKIP
+        rstrnt-report-result "$FUNCNAME-disk_space" SKIP
         return
     fi
 

@@ -32,7 +32,7 @@ rlJournalStart
     rlPhaseStartSetup
         if uname -m | grep -v x86_64; then
             echo "Test skip from ${ARCH}"
-            report_result Test_Skipped PASS 99
+            rstrnt-report-result Test_Skipped PASS 99
             exit 0
         fi
         cat << 'EOF' > cat32.c

@@ -249,12 +249,12 @@ EOF
 		# is too fragmented. Skip the test and exit with PASS.
 		if [ $? -eq 0 -a $mem_free -lt $(($HMEMSZ * 1024 * 10)) ]; then
 			cat /proc/meminfo | tee -a $OUTPUTFILE
-			report_result Test_Skipped_Lowmem PASS 99
+			rstrnt-report-result Test_Skipped_Lowmem PASS 99
 			exit 0
 		fi
 
 		# If we fail for any other reason, report FAIL and exit.
-		report_result huge_page_setup FAIL $ret
+		rstrnt-report-result huge_page_setup FAIL $ret
 		exit $ret
 	fi
 
@@ -423,7 +423,7 @@ function run_tests()
 			rlAssertGreaterOrEqual "Need $HPCOUNT hugepages for test, have: $free_hugepages" $free_hugepages $HPCOUNT
 			rlPhaseEnd
 		else
-			report_result Test_Skipped_HPCOUNT PASS 99
+			rstrnt-report-result Test_Skipped_HPCOUNT PASS 99
 		fi
 	fi
 

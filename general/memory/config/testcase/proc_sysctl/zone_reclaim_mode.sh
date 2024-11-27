@@ -41,10 +41,10 @@ zone_reclaim_mode()
     total_freemem=`numactl -H | grep 'node 0 free' | awk '{print $4}'`
 
     if ! test_get_diskfreem; then
-        report_result "$FUNCNAME-disk_unknown" SKIP
+        rstrnt-report-result "$FUNCNAME-disk_unknown" SKIP
         return
     elif (( $(test_get_diskfreem) < total_freemem)); then
-        report_result "$FUNCNAME-disk_space" SKIP
+        rstrnt-report-result "$FUNCNAME-disk_space" SKIP
         return
     fi
 

@@ -7,7 +7,7 @@
 # Enable TMT testing for RHIVOS
 . ../../../../automotive/include/rhivos.sh
 declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-declare -F check_result && report_func=check_result || report_func=report_result
+declare -F check_result && report_func=check_result || report_func=rstrnt-report-result
 
 # include beaker environment
 if ! (($is_rhivos)); then

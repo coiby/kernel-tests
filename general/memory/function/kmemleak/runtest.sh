@@ -135,7 +135,7 @@ function run_kmemleak_test()
 		result=PASS && break
 	done
 	rlRun "cat $LEAK_TRACE_FILE" -l
-	report_result slub_leak $result
+	rstrnt-report-result slub_leak $result
 
 	if [ "$result" = PASS ]; then
 		obj_addr=$(awk '/unreferenced object/ {print $3; exit(0)}' $LEAK_TRACE_FILE)

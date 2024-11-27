@@ -38,10 +38,10 @@ krelease="$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))"
 
 rlJournalStart
 	rlPhaseStartTest
-	uname -r | grep x86_64 || { report_result "x86_64 only" SKIP; exit 0; }
+	uname -r | grep x86_64 || { rstrnt-report-result "x86_64 only" SKIP; exit 0; }
 	lscpu | grep -w sme && rlLog "sme is supported / enabled" || {
-		report_result "sme not enabled in bios" SKIP
-		report_result "$TEST" SKIP
+		rstrnt-report-result "sme not enabled in bios" SKIP
+		rstrnt-report-result "$TEST" SKIP
 		exit 0
 	}
 	if test -f $firstboot && grep "done" $firstboot; then
@@ -60,7 +60,7 @@ rlJournalStart
 		fi
 		grep "\<SME\>" <(journalctl -kb) || {
 			rlLog "sme not enabled in bios or not supported, skip test ..."
-			report_result "sme not enabled in bios" SKIP
+			rstrnt-report-result "sme not enabled in bios" SKIP
 			((skip_cleanup_cmdline == 1)) || {
 				rlRun "grubby --remove-args mem_encrypt=on --update-kernel DEFAULT"
 				touch $firstboot
