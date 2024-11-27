@@ -10,6 +10,9 @@ framework: shell
 duration: 2h
 require:
   - gcc
+  - type: file
+    pattern:
+        -  /cki_lib
 tier: 1
 tag: [tier1]
 extra-summary: /general/time/hwclock
