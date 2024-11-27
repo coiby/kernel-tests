@@ -27,7 +27,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 
@@ -258,7 +257,6 @@ function hack_reboot()
 
     cat > /usr/bin/kmemleakreport.sh <<EOF
 if test -f "${LEAKFILE}" && test -f "${LEAKREPORT}" && test -f "${LEAKREPORT_OLD}"; then
-    . /usr/bin/rhts-environment.sh
     echo scan > ${LEAKFILE}
     cat ${LEAKFILE} > ${LEAKREPORT}
     l1=\$(cat ${LEAKREPORT} | wc -l)

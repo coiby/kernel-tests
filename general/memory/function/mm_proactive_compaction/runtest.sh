@@ -4,7 +4,6 @@
 # Summary: mm proactive_compaction feature test
 # Author: Li Wang <liwang@redhat.com>
 
-. /usr/bin/rhts-environment.sh      || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 set -o pipefail

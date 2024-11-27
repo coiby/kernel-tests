@@ -30,11 +30,6 @@
 . ../../../automotive/include/rhivos.sh
 declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 
-if ! (($is_rhivos)); then
-    # Include rhts environment
-    . /usr/bin/rhts-environment.sh || exit 1
-fi
-
 . ../../../distribution/ltp/include-ng/include.sh	|| exit 1
 
 trap 'trap "" EXIT; TearDown' EXIT
