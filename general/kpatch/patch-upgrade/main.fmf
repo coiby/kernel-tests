@@ -14,12 +14,24 @@ description: |
     (Normal livepatch semantics would overlay Patch 1 and 2 such that A, B,
     C, and D would be modified).
 contact: Zhijun Wang <zhijwang@redhat.com>
-component:
-  - kernel
 test: bash ./runtest.sh
 framework: beakerlib
+component:
+  - kernel
 require:
-  - kernel-kernel-general-include
+  - wget
+  - git
+  - gcc
+  - make
+  - autoconf
+  - tar
+  - bzip2
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
 recommend:
   - kpatch
+  - nmap-ncat
 duration: 240m
+extra-summary: /kernel/general/kpatch/patch-upgrade
+extra-task: /kernel/general/kpatch/patch-upgrade

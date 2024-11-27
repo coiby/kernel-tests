@@ -36,9 +36,7 @@ trap 'killall make' SIGHUP SIGINT SIGQUIT SIGTERM
 # Include variants from release files
 . /etc/os-release
 
-PROC_CMD="/proc/cmdline"
-PROC_MEM="/proc/meminfo"
-TRACE_FUN="/sys/kernel/debug/tracing/enabled_functions"
+TRACE_FUNC="/sys/kernel/debug/tracing/enabled_functions"
 
 KPATCH_REV="${KPATCH_REV:-}"
 KPATCH_REPO="${KPATCH_REPO:-https://github.com/dynup/kpatch.git}"
@@ -47,13 +45,13 @@ BUILDS_URL="${BUILDS_URL:-}"
 TEST_PATCH_PATH="test/integration"
 
 PATCH_PATH="test/integration/${ID}-${VERSION_ID}"
-MOD_A_PATCH1="cmdline-string.patch"
-MOD_A_PATCH2="meminfo-string.patch"
+MOD_A_PATCH1="syscall.patch"
+MOD_A_PATCH2="new-globals.patch"
 MOD_B_PATCH1="data-new.patch"
 
 # Module A/B
-KPATCH_MOD_A="livepatch-cmdline-meminfo"
-KPATCH_MOD_B="livepatch-meminfo-proc"
+KPATCH_MOD_A="kpatch-syscall-meminfo"
+KPATCH_MOD_B="kpatch-meminfo-proc"
 
 karch=$(uname -m)
 kver=$(uname -r | cut -f1 -d'-')
@@ -63,7 +61,7 @@ KSRC_RPM=kernel-${kver}-${krel}.src.rpm
 function download_src()
 {
     URL=${BUILDS_URL}/kernel/${kver}/${krel}/src/${KSRC_RPM}
-    rlRun "curl -o ${KSRC_RPM} ${URL}"
+    rlRun "wget -O ${KSRC_RPM} ${URL}"
 }
 
 function compile_module()
@@ -78,22 +76,24 @@ function compile_module()
 # Modules check after loading
 function module_check_A()
 {
-    rlRun "cat ${TRACE_FUN} | grep -e cmdline_proc_show -e meminfo_proc_show" "0"
-    rlRun "grep kpatch=1 ${PROC_CMD}" "0" "kpatch=1 should exiting in ${PROC_CMD}"
-    rlRun "grep VMALLOCCHUNK ${PROC_MEM}" "0" "VMALLOCCHUNK in ${PROC_MEM}"
-    rlRun "grep kpatch ${PROC_MEM}" "1" "No kpatch in ${PROC_MEM}"
+    rlRun "grep -P \"sys_newuname\" ${TRACE_FUNC}" 0
+    rlRun "grep -P \"meminfo_proc_show\" ${TRACE_FUNC}" 0
+    rlRun "uname -s | grep -q kpatch" 0 "kpatch should be added to kernel name"
+    rlRun "grep kpatch /proc/meminfo" 1 "kpatch: 5 shows in /proc/meminfo"
+    rlRun "dmesg -c | tee dmesg-module_check_A.log | grep \"hello there!\"" 0 "dmesg entry \"hello there!\" found"
+    rlFileSubmit dmesg-module_check_A.log
 }
 
 function module_check_B()
 {
     local RT=1
     [[ `uname -r` =~ 4.18.0 ]] && RT=0
-    rlRun "cat ${TRACE_FUN} | grep meminfo_proc_show" "0"
-    rlRun "cat ${TRACE_FUN} | grep cmdline_proc_show" "${RT}"
-    rlRun "grep kpatch=1 ${PROC_CMD}" "${RT}"
-    rlRun "grep VMALLOCCHUNK ${PROC_MEM}" "1"
-    rlRun "grep VmallocChunk ${PROC_MEM}" "0" "VMALLOCCHUNK reverted to lowercase in ${PROC_MEM}"
-    rlRun "grep kpatch ${PROC_MEM}" "0" "kpatch: 5 shows in ${PROC_MEM}"
+    rlRun "grep -P \"sys_newuname\" ${TRACE_FUNC}" ${RT}
+    rlRun "grep -P \"meminfo_proc_show\" ${TRACE_FUNC}" 0
+    rlRun "uname -s | grep -q kpatch" ${RT} "kpatch should be added to kernel name"
+    rlRun "grep kpatch /proc/meminfo" 0 "kpatch: 5 shows in /proc/meminfo"
+    rlRun "dmesg | tee dmesg-module_check_B.log | grep \"hello there!\"" ${RT} "dmesg entry \"hello there!\" found"
+    rlFileSubmit dmesg-module_check_B.log
 }
 
 # Kpatch install and load modules
@@ -178,6 +178,7 @@ rlJournalStart
         rlRun "pushd kpatch"
         rlRun "mkdir atomic"
         rlRun "combinediff -q --combine ${PATCH_PATH}/${MOD_A_PATCH1} ${PATCH_PATH}/${MOD_A_PATCH2} > atomic/${KPATCH_MOD_A}.patch"
+        rlRun "sed -i \"s/if (\!jiffies)//\" atomic/${KPATCH_MOD_A}.patch"
         rlRun "cp ${PATCH_PATH}/${MOD_B_PATCH1} atomic/${KPATCH_MOD_B}.patch"
         rlRun "unset ARCH" 0-255 "power64 can't parse ppc64le when kernel build"
         rlRun "compile_module ${KPATCH_MOD_A} atomic/${KPATCH_MOD_A}.patch"
