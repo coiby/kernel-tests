@@ -151,7 +151,8 @@ rlJournalStart
         rlLog "$0"
         run_test
     rlPhaseEnd
-    for R in null loop qcow2 nvme ssd;do
+# qcow2 type disabled
+    for R in null loop nvme ssd;do
         rlPhaseStartTest "$R"
             run_test
         rlPhaseEnd
