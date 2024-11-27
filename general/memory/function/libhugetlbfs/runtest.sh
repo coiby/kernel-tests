@@ -271,7 +271,7 @@ EOF
 			mv /etc/sysctl.conf.backup /etc/sysctl.conf
 			grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
 			touch $ORIG_DIR/CHANGED_DEFHPSZ
-			rhts-reboot
+			rstrnt-reboot
 		fi
 	fi
 }
@@ -414,7 +414,7 @@ function run_tests()
 				grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
 				# setup step has made the backup file, restore it the original before next setup.
 				mv /etc/sysctl.conf.backup /etc/sysctl.conf
-				rhts-reboot
+				rstrnt-reboot
 			fi
 		fi
 	else
@@ -442,7 +442,7 @@ function test_cleanup()
 		if test -f $ORIG_DIR/CHANGED_DEFHPSZ; then
 			rlRun "grubby --remove-args default_hugepagesz=2M --update-kernel ALL"
 			echo finish > $ORIG_DIR/CHANGED_DEFHPSZ
-			rhts-reboot
+			rstrnt-reboot
 		fi
 	rlPhaseEnd
 }

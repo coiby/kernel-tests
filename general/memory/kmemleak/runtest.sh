@@ -157,7 +157,7 @@ function install_debugkernel()
     rlPhaseEnd
 
     echo 1 > /mnt/DK_INSTALL
-    rhts-reboot
+    rstrnt-reboot
 }
 
 function install_upstream()
@@ -190,7 +190,7 @@ function install_upstream()
     rlPhaseEnd
 
     echo 1 > /mnt/DK_INSTALL
-    rhts-reboot
+    rstrnt-reboot
 }
 
 
@@ -227,7 +227,7 @@ function install_kernelurl()
     rlPhaseEnd
 
     echo 1 > /mnt/DK_INSTALL
-    rhts-reboot
+    rstrnt-reboot
 }
 
 function install_brew_or_other()
@@ -245,14 +245,14 @@ function install_brew_or_other()
     else
         # for brew build
         echo 1 > /mnt/DK_INSTALL
-        rhts-reboot
+        rstrnt-reboot
     fi
 }
 
 function hack_reboot()
 {
-    if grep -q kmemleakreport /usr/bin/rhts-reboot; then
-        rlRun "echo rhts-reboot has already been hacked"
+    if grep -q kmemleakreport /usr/bin/rstrnt-reboot; then
+        rlRun "echo rstrnt-reboot has already been hacked"
         return 0;
     fi
 
@@ -273,8 +273,8 @@ fi
 EOF
     rlRun "chmod +x /usr/bin/kmemleakreport.sh"
 
-    rlRun "echo hookup kmemleak report with rhts-reboot"
-    sed -i "/shutdown -r/ikmemleakreport.sh" /usr/bin/rhts-reboot
+    rlRun "echo hookup kmemleak report with rstrnt-reboot"
+    sed -i "/shutdown -r/ikmemleakreport.sh" /usr/bin/rstrnt-reboot
 }
 
 

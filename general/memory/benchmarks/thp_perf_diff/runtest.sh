@@ -193,7 +193,7 @@ run_matrix()
 		grubby --info DEFAULT
 		touch ${hpsz}_REBOOT
 		echo "Rebooting start ..."
-		rhts-reboot
+		rstrnt-reboot
 	else
 		rpm -q bc || yum -y install bc
 		verify_hpsz
@@ -231,7 +231,7 @@ rlJournalStart
 				grubby --remove-args default_hugepagesz --update-kernel DEFAULT
 				grubby --info DEFAULT
 				touch TEST_DONE
-				rhts-reboot
+				rstrnt-reboot
 			rlPhaseEnd
 		else
 			rlPhaseStartCleanup hugepage-cleanup

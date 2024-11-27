@@ -94,7 +94,7 @@ function run_cases()
         rlPhaseEnd
 
         [ ! -f $DIR_DEBUG/DEBUG ] && mv $subcase ${subcase}.done
-        [ -f $DIR_DEBUG/REBOOTAFTERDONE ] && rm -vf $DIR_DEBUG/REBOOTAFTERDONE && rhts-reboot && sleep 10000
+        [ -f $DIR_DEBUG/REBOOTAFTERDONE ] && rm -vf $DIR_DEBUG/REBOOTAFTERDONE && rstrnt-reboot && sleep 10000
     done
 }
 

@@ -272,7 +272,7 @@ rlPhaseStartTest
 rlPhaseEnd
 
 if [ "$ZSWAP" != "exit" ]; then
-	rhts-reboot
+	rstrnt-reboot
 fi
 
 rlPhaseStartCleanup

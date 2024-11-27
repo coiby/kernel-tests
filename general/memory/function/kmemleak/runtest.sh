@@ -56,7 +56,7 @@ function enable_kmemleak()
 	grubby --args kmemleak=on --update-kernel DEFAULT
 	uname -r | grep -q s390x && zipl
 	touch $FLAG_FILE
-	rhts-reboot
+	rstrnt-reboot
 }
 
 function reset_kmemleak()
@@ -67,7 +67,7 @@ function reset_kmemleak()
 			echo finish >> $FLAG_FILE
 			if [ "$RESERVE_LEAK_REBOOT" = 1 ]; then
 				[ "$result" = PASS ] || rlDie "Failed to generate kmemleak, can't be used as leak input for /kernel/general/memory/kmemleak"
-				rhts-reboot
+				rstrnt-reboot
 			elif [ "$RESERVE_LEAK" = "1" ]; then
 				[ "$result" = PASS ] || rlDie "Failed to generate kmemleak, can't be used as leak input for /kernel/general/memory/kmemleak"
 			else
@@ -78,7 +78,7 @@ function reset_kmemleak()
 			grubby --remove-args kmemleak=on --update-kernel DEFAULT
 			uname -r | grep s390x -q && zipl
 			echo finish > $FLAG_FILE
-			rhts-reboot
+			rstrnt-reboot
 		fi
 	fi
 }

@@ -67,7 +67,7 @@ rlJournalStart
 				echo "done" >> $firstboot
 				rlPhaseEnd
 				rlJournalEnd
-				rhts-reboot
+				rstrnt-reboot
 			}
 			rlPhaseEnd
 			rlJournalEnd
@@ -78,7 +78,7 @@ rlJournalStart
 		rlRun "touch $firstboot"
 		rlPhaseEnd
 		rlJournalEnd
-		rhts-reboot
+		rstrnt-reboot
 	fi
 	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlRpmInstall "${kname}-devel" "$kversion" "$krelease" "$(uname -m)"
 	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
@@ -93,7 +93,7 @@ rlJournalStart
 		rlRun "echo done > $firstboot"
 		rlPhaseEnd
 		rlJournalEnd
-		rhts-reboot
+		rstrnt-reboot
 	fi
 	rlPhaseEnd
 rlJournalPrintText
