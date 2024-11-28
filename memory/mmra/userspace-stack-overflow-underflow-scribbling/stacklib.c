@@ -1,21 +1,18 @@
+#include "stacklib.h"
+
 /*
  * Functions used by both userspace and kernelspace testing of stack
  * overflow/underflow/scribbling
  */
 
-static int i;
-
 void overflow(void)
 {
-    int i;
-
     /* Pop above the stack end */
-    for (i = 0; i < (256*256); i++) {
+    for (int i = 0; i < (256*256); i++) {
         #if defined(__x86_64__)
-            asm("push %rax");
+            asm volatile("push %rax");
         #elif defined(__aarch64__)
-            asm("ldr x0, [sp, #0]");
-            asm("sub sp, sp, 16");
+            asm volatile("str x0, [sp, #-16]!");
         #else
             #error "Architecture not supported by the test"
         #endif
@@ -29,12 +26,25 @@ void underflow(void)
        below will reach to it and indirection will cause
        a misaligned read on aarch64 (Bus error) */
     /* Pop beyond the stack start */
-    for (i = 0; i < (256*256); i++) {
+    for (int i = 0; i < (256*256); i++) {
         #if defined(__x86_64__)
-            asm("pop %rax");
+            asm volatile("pop %rax");
         #elif defined(__aarch64__)
-            asm("ldr x0, [sp, #0]");
-            asm("add sp, sp, 16");
+	    /*
+	     * Subtract 16 bytes from the current stack pointer. However,
+	     * with the debug kernel, sometimes this operation doesn't
+	     * lead to a 16-bit-aligned value, and this will cause a
+	     * bus error. So let's do the following three instructions:
+	     * - Take the value of sp - 16 and store the result in x0
+	     * - Do a bitwise or to clear the least 16 significant bits
+	     * - Copy the value of x0 into the sp register.
+	     * The assembler doesn't like it if we do the orr operation
+	     * against the sp register, so that's why it needs to be
+	     * done against x0.
+	     */
+            asm volatile("sub x0, sp, #16\n" \
+                         "orr x0, x0, #-16\n" \
+                         "mov sp, x0");
         #else
             #error "Architecture not supported by the test"
         #endif
@@ -42,30 +52,21 @@ void underflow(void)
     /* We would never get to this line */
 }
 
-static int scribbling_iter(int iteration)
+#ifndef __KERNEL__
+#define noinline __attribute__((noinline))
+#endif
+
+static noinline void do_scribbling(char *buf, int size)
 {
-    /* Write a random value to the previous position in the stack */
-    #if defined(__x86_64__)
-        asm("movq $0x12345679, 16(%rsp)");
-    #elif defined(__aarch64__)
-        asm("mov x0, #1234");
-        asm("str x0, [sp, #48]");
-    #else
-        #error "Architecture not supported by the test"
-    #endif
-    /* SEGFAULT will happen when retrieving the return value and trying
-     * to set ip to it */
-    if (!iteration) {
-        return 0;
+    for (int i = 0; i < size; i++) {
+        buf[i] = 'a';
     }
-    /* Or when trying to call another function */
-    scribbling_iter(iteration--);
-    return 0;
-
 }
 
-void scribbling(void)
+void scribbling()
 {
-	scribbling_iter(1);
-}
+    char buf[10];
 
+    // Intentionally overflow the buffer and overwrite the return address.
+    do_scribbling(buf, 20);
+}

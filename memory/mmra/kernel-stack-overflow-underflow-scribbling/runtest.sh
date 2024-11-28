@@ -13,8 +13,12 @@ run_insert_mode() {
         rlRun "sync;sync;sync"  # make sure fs is synced before the crash
         rlRun "insmod stackman.ko testmode=$mode" 0 "Insmod stackman.ko $mode"
         rlRun "sleep 20"
-        # If we reach this point the machine did not reboot; the test failed
-        rlFail "System did not reboot (test fail)"
+
+        if (dmesg | grep -q "BUG: KASAN: stack-out-of-bounds") ; then
+            rlPass "Stack corruption captured by KASAN"
+        else
+            rlFail "System did not reboot (test fail)"
+        fi
     rlPhaseEnd
 }
 
@@ -51,7 +55,7 @@ rlJournalStart
             # Create a flag file to make sure reboot came from the module and it was
             # not a random network disconnection
             rlRun "touch /var/tmp/stackman/remove_after_module_insert"
-            rlRun "cp stackman.c stacklib.c Makefile /var/tmp/stackman"
+            rlRun "cp main.c stacklib.c stacklib.h Makefile /var/tmp/stackman"
             rlRun "pushd /var/tmp/stackman"
             rlRun "set -o pipefail"
             rlRun "make"

@@ -4,12 +4,10 @@
 
 #include <linux/delay.h>
 #include <linux/interrupt.h>
-
+#include "stacklib.h"
 
 #define DRIVER_AUTHOR "RHIVOS QE"
 #define DRIVER_DESC   "Stack manipulation (underflow/overflow/scribbling) test KMOD"
-
-#include "stacklib.c"
 
 static char *testmode = "unset";
 module_param(testmode, charp, 0660);
