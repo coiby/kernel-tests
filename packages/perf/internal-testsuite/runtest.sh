@@ -196,14 +196,14 @@ rlJournalStart
 				perf test -F -vv $TEST_NUMBER &> $TEST_NUMBER.log
 				RETVAL=$?
 				cat $TEST_NUMBER.log
-				RESULT=`grep "^$TEST_DESC" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
+				RESULT=`grep "$TEST_DESC" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
 				printf "%8s -- %s\n" $RESULT "$line" | tee -a results.log
-				echo $RESULT | grep -qi FAIL
-				if [ $RETVAL -ne 0 -o $? -eq 0 ]; then
+				echo $RESULT | grep -qi -e "Ok" -e "Skip"
+				if [ $RETVAL -eq 0 -a $? -eq 0 ]; then
+					rlPass "$TEST_NUMBER: $TEST_DESC"
+				else
 					rlFail "$TEST_NUMBER: $TEST_DESC"
 					rlFileSubmit "$TEST_NUMBER.log"
-				else
-					rlPass "$TEST_NUMBER: $TEST_DESC"
 				fi
 
 				# restore original sample rate to ensure the tests dependent on it pass
