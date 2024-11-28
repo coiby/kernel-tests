@@ -680,6 +680,9 @@ rlJournalStart
             if cki_kver_lt "5.14.0-520.el9"; then
                 sed -i "/^t10-pi.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
             fi
+            if cki_kver_lt "5.14.0-534.el9"; then
+                sed -i "/^rtsx_pci_ms.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-{ppc64le,x86_64}.lst
+            fi
         fi
     rlPhaseEnd
 
