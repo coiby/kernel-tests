@@ -1,0 +1,35 @@
+summary: Basic sanity test for leds_gpio device driver.
+description: |
+  This test confirms that the leds_gpio module is loaded and performs a basic
+  sanity check by writing to and reading from 
+  /sys/class/leds/green:indicator-7/brightness.
+
+  Test inputs:
+    Hardware platform is Renesas R-Car S4.
+    leds_gpio module is available and loaded.
+    /sys/class/leds/green:indicator-7/brightness is available.
+
+  Expected results:
+    leds_gpio module is loaded and brightness value previously written is read back properly.
+    [   PASS   ] :: File '/proc/modules' should contain 'leds_gpio' 
+    [   PASS   ] :: Command 'original_value=0' (Expected 0, got 0)
+    [   PASS   ] :: Command 'echo 1 > /sys/class/leds/green:indicator-7/brightness' (Expected 0, got 0)
+    [   PASS   ] :: Command 'new_value=1' (Expected 0, got 0)
+    [   PASS   ] :: Assert brightness can be written. (Assert: '1' should equal '1')
+    [   PASS   ] :: Command 'echo 0 > /sys/class/leds/green:indicator-7/brightness' (Expected 0, got 0)
+    [   PASS   ] :: Command 'new_value=0' (Expected 0, got 0)
+    [   PASS   ] :: Assert brightness was restored. (Assert: '0' should equal '0')
+
+  Results location:
+      output.txt
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+enabled: false
+adjust:
+    enabled: true
+    when: hw_target == rcar_s4
+duration: 15m
+id: 49d78336-43ab-4f94-a677-ced32103350e
