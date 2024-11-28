@@ -28,8 +28,6 @@
 
 # Enable TMT testing for RHIVOS
 . ../../../automotive/include/rhivos.sh
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-
 . ../../../distribution/ltp/include-ng/include.sh	|| exit 1
 
 trap 'trap "" EXIT; TearDown' EXIT

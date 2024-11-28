@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2166
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Description: libhugetlbfs package test

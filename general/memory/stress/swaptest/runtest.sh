@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2207,SC2210,SC2034
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -311,10 +312,10 @@ function run_swap_stress()
 		rlRun "${run_tests[$i]}"
 		# No runtest for this disk/partition, it's nope test, mark SKIP
 		if [ "${run_tests[$i]}" = "true" ]; then
-			echo "No test runner for "${swap_test_devices[$i]}" type:${swap_dev_types[$i]} mnt:${swap_dev_mnts[$i]}"
+			echo "No test runner for ${swap_test_devices[$i]} type:${swap_dev_types[$i]} mnt:${swap_dev_mnts[$i]}"
 			result=SKIP
 		else
-			echo "Test runner:${run_tests[$i]} for "${swap_test_devices[$i]}" type:${swap_dev_types[$i]} mnt:${swap_dev_mnts[$i]}"
+			echo "Test runner:${run_tests[$i]} for ${swap_test_devices[$i]} type:${swap_dev_types[$i]} mnt:${swap_dev_mnts[$i]}"
 			dmesg | grep -E "WARNING:|BUG:|Oops" && result=FAIL
 		fi
 
