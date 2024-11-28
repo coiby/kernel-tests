@@ -43,7 +43,7 @@ PACKAGE="perf"
 PERFTESTS_ENABLE_DENYLIST=${PERFTESTS_ENABLE_DENYLIST:-0}
 
 # hook, someone likes using "True" there, we like 1, 0 values more
-if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" -o "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
+if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" ] || [ "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
 	PERFTESTS_ENABLE_DENYLIST=1
 fi
 
