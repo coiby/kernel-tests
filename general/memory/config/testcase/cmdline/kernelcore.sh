@@ -49,7 +49,7 @@ function kernelcore()
 	fi
 	membase=$(cat ${DIR_DEBUG}/MEMSIZE)
 
-	rstrnt-report-result "${FUNCNAME}-unfixed-bz2008722" SKIP
+	rstrnt-report-result "${FUNCNAME[0]}-unfixed-bz2008722" SKIP
 
 	return
 
