@@ -8,6 +8,20 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
+install_kirk()
+{
+	echo "============ Download kirk ============" | tee -a $OUTPUTFILE
+	if ! rpm -q python3-click; then
+		# install python3-click from epel
+		source /etc/os-release
+		rhel_x=$(echo $VERSION_ID | cut -d. -f1)
+		yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
+		yum -y install python3-click
+	fi
+	git clone -b v1.4 https://github.com/linux-test-project/kirk.git
+	cp -r kirk /mnt/testarea/
+}
+
 download_ltp()
 {
 	echo "============ Download package ============" | tee -a $OUTPUTFILE
@@ -37,17 +51,6 @@ download_ltp()
 	echo "============ Unzip package ============" | tee -a $OUTPUTFILE
 	tar xjf ${TARGET}.tar.bz2 | tee -a $OUTPUTFILE
 
-	echo "============ Download kirk ============" | tee -a $OUTPUTFILE
-	if ! rpm -q python3-click; then
-		# install python3-click from epel
-		source /etc/os-release
-		rhel_x=$(echo $VERSION_ID | cut -d. -f1)
-		yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
-		yum -y install python3-click
-	fi
-	git clone -b v1.4 https://github.com/linux-test-project/kirk.git
-	cp -r kirk /mnt/testarea/
-	pip install -U pip click
 }
 
 clone_ltp()
@@ -130,6 +133,9 @@ build_all()
 		popd
 		echo "RHELKT1LITE.next is generated"
 	fi
+
+	install_kirk
+
 	configure
 	echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
 	timeout_value=30
