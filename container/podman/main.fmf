@@ -15,7 +15,7 @@ require:
   - skopeo
   - jq
   - git
-framework: beakerlib
+framework: shell
 duration: 3h
 extra-summary: container/podman
 extra-task: container/podman
