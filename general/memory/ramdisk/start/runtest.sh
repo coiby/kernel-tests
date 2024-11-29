@@ -72,7 +72,7 @@ function ramdisk_setup()
     zipl > /dev/null 2>&1
 
     touch ./RAMDISK_REBOOTFLAG
-    rhts-reboot
+    rstrnt-reboot
     sleep 100
 }
 

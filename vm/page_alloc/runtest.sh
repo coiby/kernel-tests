@@ -67,12 +67,12 @@ if [ "${ARCH}" != "ppc64" ] && [ "${ARCH}" != "ppc64le" ] && [ "${ARCH}" != "s39
         echo " - No 'Crash kernel' segment found!" | tee -a "${OUTPUTFILE}"
         RESULT=FAIL
     fi
-    rhts_submit_log -l /proc/iomem
+    rstrnt-report-log -l /proc/iomem
     #Workaround until https://github.com/teemtee/tmt/issues/2592 is resolved.
     if [ -z "${TMT_PLAN_DATA}" ]; then
-        rhts-report-result $TEST $RESULT "${OUTPUTFILE}"
+        rstrnt-report-result $TEST $RESULT "${OUTPUTFILE}"
     else
-        rhts-report-result $TEST $RESULT "${OUTPUTFILE}" 1
+        rstrnt-report-result $TEST $RESULT "${OUTPUTFILE}" 1
     fi
     rm -f "${OUTPUTFILE}"
     touch "${OUTPUTFILE}"
@@ -120,10 +120,10 @@ plot "$plotfile"
 EOF
 echo " - please see the attached image!" | tee -a "${OUTPUTFILE}"
 
-rhts_submit_log -l $plotfile.jpg
+rstrnt-report-log -l $plotfile.jpg
 #Workaround until https://github.com/teemtee/tmt/issues/2592 is resolved.
 if [ -z "${TMT_PLAN_DATA}" ]; then
-    rhts-report-result $TEST $RESULT "${OUTPUTFILE}"
+    rstrnt-report-result $TEST $RESULT "${OUTPUTFILE}"
 else
-    rhts-report-result $TEST $RESULT "${OUTPUTFILE}" 1
+    rstrnt-report-result $TEST $RESULT "${OUTPUTFILE}" 1
 fi

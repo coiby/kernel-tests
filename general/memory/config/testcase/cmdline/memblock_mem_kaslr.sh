@@ -29,11 +29,11 @@ function memblock_mem_kaslr()
 {
     local mem_half;
 
-    if [ ! -f $DIR_DEBUG/${FUNCNAME}_memhalf ]; then
+    if [ ! -f $DIR_DEBUG/${FUNCNAME[0]}_memhalf ]; then
         mem_half=$(cat /proc/meminfo  | grep MemTotal | awk '{print $2}')
         mem_half=$((mem_half / 2))
     else
-        mem_half=$(cat $DIR_DEBUG/${FUNCNAME}_memhalf)
+        mem_half=$(cat $DIR_DEBUG/${FUNCNAME[0]}_memhalf)
     fi
 
     rlLogWarning "This is bogus, need to take care of crashkernel on s390x, aarch64, and ppc64"
@@ -46,7 +46,7 @@ function memblock_mem_kaslr()
         rlRun "echo memory is too low, $((mem_half*2))K"
         return 0
     fi
-    rlRun "echo $mem_half > $DIR_DEBUG/${FUNCNAME}_memhalf"
+    rlRun "echo $mem_half > $DIR_DEBUG/${FUNCNAME[0]}_memhalf"
 
     setup_cmdline_args "memblock=debug mem=${mem_half}K"
     mem_half=$((mem_half*1024))
@@ -59,5 +59,5 @@ function memblock_mem_kaslr()
     done
 
     cleanup_cmdline_args "memblock mem"
-    rm -f $DIR_DEBUG/${FUNCNAME}_memhalf
+    rm -f $DIR_DEBUG/${FUNCNAME[0]}_memhalf
 }

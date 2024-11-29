@@ -45,7 +45,7 @@ function main()
 	local rhel=$(grep -Eo '[0-9]+.[0-9]+' /etc/redhat-release)
 	if (echo ${rhel} "9.0" | awk '($1<$2){exit 1}') then
 		echo "block_dump has been dropped from RHEL9" | tee -a $OUTPUTFILE
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	fi
 

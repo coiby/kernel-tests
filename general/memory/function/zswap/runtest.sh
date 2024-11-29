@@ -1,9 +1,9 @@
 #!/bin/bash
+# shellcheck disable=SC2166,SC2320
 
 # Summary: zswap feature test
 # Author: Li Wang <liwang@redhat.com>
 
-. /usr/bin/rhts-environment.sh      || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../include/libmem.sh || exit 1
 
@@ -18,7 +18,7 @@ function arch_check()
 {
 	if [ ${ARCH} = s390x -o ${ARCH} = i386 -o  ${ARCH} = aarch64 ]; then
 		echo " zswap has not been supported on ${ARCH}" | tee -a $OUTPUTFILE
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	fi
 }
@@ -38,7 +38,7 @@ function dist_check()
 	local rhel=$(grep -Eo '[0-9]+.[0-9]+' /etc/redhat-release)
 	if (echo ${rhel} "7.0" | awk '($1>$2){exit 1}') then
 		echo "zswap is now only supported on RHEL7" | tee -a $OUTPUTFILE
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	fi
 }
@@ -47,8 +47,8 @@ function stress_install()
 {
 	if [ ! -d stress-1.0.4 ]; then
 		wget http://download.eng.rdu2.redhat.com/qa/rhts/lookaside/stress-1.0.4.tar.gz;
-		tar xzf stress-1.0.4.tar.gz 2>&1 >/dev/null;
-		pushd stress-1.0.4; ./configure 2>&1 >/dev/null; make 2>&1 >/dev/null && make install 2>&1 >/dev/null; popd
+		tar xzf stress-1.0.4.tar.gz >/dev/null 2>&1
+		pushd stress-1.0.4; ./configure >/dev/null 2>&1; make >/dev/null 2>&1 && make install >/dev/null 2>&1; popd
 	fi
 }
 
@@ -91,7 +91,7 @@ function zswap_test()
 		per_task_mem=$(echo $mem_test / $nproc | bc -q)
 	fi
 
-	rlRun "cgexec.sh zswap_test memory stress --vm $nproc --vm-bytes $per_task_mem"M" --timeout 240s >/dev/null &"
+	rlRun "cgexec.sh zswap_test memory stress --vm $nproc --vm-bytes ${per_task_mem}M --timeout 240s >/dev/null &"
 	if [ $? -ne 0 ]; then
 		echo "failed to run the process in background."
 		exit 1
@@ -134,7 +134,7 @@ function zswap_test()
 	rlRun -l "cat /sys/kernel/debug/zswap/stored_pages" 0-255
 
 	# Kill the stress process
-	killall stress 2>&1 >/dev/null
+	killall stress >/dev/null 2>&1
 
 	if [ "$stored_pages_2" -le "$stored_pages_1" ]; then
 		return 1
@@ -272,7 +272,7 @@ rlPhaseStartTest
 rlPhaseEnd
 
 if [ "$ZSWAP" != "exit" ]; then
-	rhts-reboot
+	rstrnt-reboot
 fi
 
 rlPhaseStartCleanup

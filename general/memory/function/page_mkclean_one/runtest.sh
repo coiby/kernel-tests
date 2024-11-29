@@ -5,6 +5,7 @@
 clean_env
 setup_env
 TEST="/kernel/general/memory/function/page_mkclean_one"
+OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile.$(pwd | md5sum | awk '{print $1}' | cut -c 1-8)}
 
 # ---------- Start Test -------------
 testver=$(rpm -qf $0)

@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2166
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Description: libhugetlbfs package test
@@ -24,10 +25,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ./kvercmp.sh
 
+OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile.$(pwd | md5sum | awk '{print $1}' | cut -c 1-8)}
 if rlIsRHEL 7 && rlIsRHEL "<=7.8"; then
 	TEST_VERSION=${TEST_VERSION:-2.16-13.el7}
 elif rlIsRHEL "8" && rlIsRHEL "<=8.2"; then
@@ -249,12 +250,12 @@ EOF
 		# is too fragmented. Skip the test and exit with PASS.
 		if [ $? -eq 0 -a $mem_free -lt $(($HMEMSZ * 1024 * 10)) ]; then
 			cat /proc/meminfo | tee -a $OUTPUTFILE
-			report_result Test_Skipped_Lowmem PASS 99
+			rstrnt-report-result Test_Skipped_Lowmem PASS 99
 			exit 0
 		fi
 
 		# If we fail for any other reason, report FAIL and exit.
-		report_result huge_page_setup FAIL $ret
+		rstrnt-report-result huge_page_setup FAIL $ret
 		exit $ret
 	fi
 
@@ -270,7 +271,7 @@ EOF
 			mv /etc/sysctl.conf.backup /etc/sysctl.conf
 			grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
 			touch $ORIG_DIR/CHANGED_DEFHPSZ
-			rhts-reboot
+			rstrnt-reboot
 		fi
 	fi
 }
@@ -413,7 +414,7 @@ function run_tests()
 				grubby --args="default_hugepagesz=2M" --update-kernel /boot/vmlinuz-$(uname -r)
 				# setup step has made the backup file, restore it the original before next setup.
 				mv /etc/sysctl.conf.backup /etc/sysctl.conf
-				rhts-reboot
+				rstrnt-reboot
 			fi
 		fi
 	else
@@ -423,7 +424,7 @@ function run_tests()
 			rlAssertGreaterOrEqual "Need $HPCOUNT hugepages for test, have: $free_hugepages" $free_hugepages $HPCOUNT
 			rlPhaseEnd
 		else
-			report_result Test_Skipped_HPCOUNT PASS 99
+			rstrnt-report-result Test_Skipped_HPCOUNT PASS 99
 		fi
 	fi
 
@@ -441,7 +442,7 @@ function test_cleanup()
 		if test -f $ORIG_DIR/CHANGED_DEFHPSZ; then
 			rlRun "grubby --remove-args default_hugepagesz=2M --update-kernel ALL"
 			echo finish > $ORIG_DIR/CHANGED_DEFHPSZ
-			rhts-reboot
+			rstrnt-reboot
 		fi
 	rlPhaseEnd
 }
