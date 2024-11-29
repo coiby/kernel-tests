@@ -91,7 +91,7 @@ function prepare_aiodio_scratchspace()
 	fi
 
 	# kirk need -e option to pass environment variable
-	if [ "${TESTVERSION}" -ge 20240930 ]; then
+	if [ "${TESTVERSION}" -ge 20240930 ] || [ -n "${LTP_COMMIT_ID}" ]; then
 		OPTS="$OPTS -e='SCRATCH_MNT=$SCRATCH_MNT:BIG_FILE=$BIG_FILE:BUF_ALIGN=$BUF_ALIGN'"
 	fi
 
