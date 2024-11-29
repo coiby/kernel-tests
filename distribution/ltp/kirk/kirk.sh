@@ -19,6 +19,6 @@ function kirk_run()
 	local thisdir=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))
 	local kirk_results=$thisdir/kirk_results.py
 
-	time -p ${KIRKDIR}/kirk -f ltp:root=${LTPDIR} -r $RUNTEST -v -j $OUTPUTDIR/$RUNTEST.json $OPTIONS
+	time -p ${KIRKDIR}/kirk -f ltp:root=${LTPDIR} -r $RUNTEST -v -j $OUTPUTDIR/$RUNTEST.json $OPTIONS | sed -r 's/\x1b\[[0-9;]*m//g'
 	python3 $kirk_results --resfile $OUTPUTDIR/$RUNTEST.json --sumfile $OUTPUTDIR/$RUNTEST.log --runfile $OUTPUTDIR/$RUNTEST.run.log --failfile $OUTPUTDIR/$RUNTEST.fail.log
 }
