@@ -71,6 +71,7 @@ function fio_test()
 
 function run_test()
 {
+    rlRun "echo 0 > /proc/sys/kernel/io_uring_disabled"
     rlRun "modprobe ublk_drv"
 # shellcheck disable=SC2034
     if ! output=$(ls /dev/ublk-control); then

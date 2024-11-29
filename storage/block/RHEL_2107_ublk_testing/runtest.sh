@@ -45,6 +45,7 @@ function run_test()
         rlRun "autoreconf -i && ./configure && make -j 4 && make install > tmp.out 2>&1" "0-255"
         popd
 
+        rlRun "echo 0 > /proc/sys/kernel/io_uring_disabled"
         rlRun "modprobe ublk_drv"
 #make test T=all
         rlRun "cd ubdsrv"
@@ -53,6 +54,12 @@ function run_test()
         rlRun "make test T=loop"
 
         rlRun "make test T=generic"
+
+        rlRun "echo 2 > /proc/sys/kernel/io_uring_disabled"
+        rlRun "modprobe ublk_drv"
+        rlRun "ublk list"
+        rlRun "ublk del -a"
+        rlRun "rmmod ublk_drv"
     else
         rlLog "ublk drive not enable on this kernel, skip testing"
         rstrnt-report-result "not enable UBLK driver" SKIP 0
