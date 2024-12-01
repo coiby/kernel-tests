@@ -38,10 +38,12 @@ require:
     - gcc
     - make
     - automake
+    - dmidecode
     - type: file
       pattern:
           - /rt-tests/include
           - /cki_lib
+          - /distribution/ltp/include
           - /distribution/ltp/include-ng
           - /distribution/ltp/kirk
 extra-summary: rt-tests/rt_ltp
