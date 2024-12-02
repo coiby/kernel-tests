@@ -59,7 +59,10 @@ function run_test()
         rlRun "modprobe ublk_drv"
         rlRun "ublk list"
         rlRun "ublk del -a"
+        wait
+        sleep 5
         rlRun "rmmod ublk_drv"
+        rlRun "echo 0 > /proc/sys/kernel/io_uring_disabled"
     else
         rlLog "ublk drive not enable on this kernel, skip testing"
         rstrnt-report-result "not enable UBLK driver" SKIP 0
