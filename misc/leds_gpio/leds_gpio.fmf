@@ -19,6 +19,8 @@ description: |
     [   PASS   ] :: Command 'echo 0 > /sys/class/leds/green:indicator-7/brightness' (Expected 0, got 0)
     [   PASS   ] :: Command 'new_value=0' (Expected 0, got 0)
     [   PASS   ] :: Assert brightness was restored. (Assert: '0' should equal '0')
+    [   PASS   ] :: File '/sys/kernel/tracing/trace' should contain 'gpio_led_set'
+    [   PASS   ] :: File '/sys/kernel/tracing/trace' should contain 'leds_gpio'
 
   Results location:
       output.txt

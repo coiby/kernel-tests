@@ -28,6 +28,11 @@ brightness_path=/sys/class/leds/green\:indicator-7/brightness
 rlJournalStart
 	rlPhaseStartSetup
 		rlShowRunningKernel
+		rlLog "Setup ftrace for gpio_led_set"
+		rlRun "echo gpio_led_set > /sys/kernel/tracing/set_ftrace_filter"
+		rlRun "echo function_graph > /sys/kernel/tracing/current_tracer"
+		rlRun "echo 1 > /sys/kernel/tracing/tracing_on"
+		rlRun "echo '' > /sys/kernel/tracing/trace"
 	rlPhaseEnd
 	rlPhaseStartTest "Test module is loaded"
 		rlAssertGrep "leds_gpio" /proc/modules
@@ -43,6 +48,16 @@ rlJournalStart
 		rlRun "echo $original_value > $brightness_path"
 		rlRun "new_value=$(cat $brightness_path)"
 		rlAssertEquals "Assert brightness was restored." $new_value $original_value
+	rlPhaseEnd
+	rlPhaseStartTest "Test gpio_led_set is called"
+		rlAssertGrep "gpio_led_set" /sys/kernel/tracing/trace
+		rlAssertGrep "leds_gpio" /sys/kernel/tracing/trace
+	rlPhaseEnd
+	rlPhaseStartCleanup
+		rlRun "echo 0 > /sys/kernel/tracing/tracing_on"
+		rlRun "echo nop > /sys/kernel/tracing/current_tracer"
+		rlRun "echo '' > /sys/kernel/tracing/set_ftrace_filter"
+		rlRun "echo '' > /sys/kernel/tracing/trace"
 	rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
