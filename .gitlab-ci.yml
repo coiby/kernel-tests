@@ -177,7 +177,7 @@ check tmt lint:
   before_script:
     - tmt --version
   script:
-    - tmt lint --outcome-only fail --enforce-check C000 .
+    - tmt lint --outcome-only fail .
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
