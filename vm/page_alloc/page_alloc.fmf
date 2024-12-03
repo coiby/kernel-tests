@@ -10,6 +10,13 @@ require:
   - kexec-tools
   - gnuplot
   - iptables
+  - type: file
+    pattern:
+      - /kdump/setup-bare-metal
+      - /kdump/include
+      - /automotive/include
+      - /cmdline_helper
+      - /cki_lib
 recommend:
   - wget
   - abootimg
