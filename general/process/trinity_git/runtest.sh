@@ -52,8 +52,8 @@ trinity_pkg=${testversion}.tgz
 trap 'pkill -f trinity -9; pkill -f make' SIGINT SIGQUIT SIGTERM
 
 # ignore this message from restraint dmesg detector (this is in rhel9)
-export FALSESTRINGS="WARNING: The mand mount option has been deprecated and"
-echo "$FALSESTRINGS" >> /usr/share/rhts/falsestrings
+export FALSESTRINGS="${FALSESTRINGS:+$FALSESTRINGS|}WARNING: The mand mount option has been deprecated and"
+rlLog "FALSESTRINGS: $FALSESTRINGS"
 
 function get_lookaside()
 {
