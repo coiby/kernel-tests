@@ -70,6 +70,8 @@ function rlSkip
     # As we want result="Skip" status="Completed" for all scenarios, right here
     # we always exit 0, otherwise the test will skip/abort
     #
+    rlPhaseEnd
+    rlJournalEnd
     exit 0
 }
 
