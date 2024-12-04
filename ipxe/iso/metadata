@@ -1,7 +1,7 @@
 [General]
 description=ipxe iso boot test
 name=ipxe/iso
-owner=Oliver Gutierrez <ogutierr@redhat.com>
+owner=Jiri Dluhos <jdluhos@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
