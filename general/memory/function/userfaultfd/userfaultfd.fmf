@@ -19,7 +19,6 @@ extra-task: /kernel/general/memory/function/userfaultfd
 # ---------------------
 
 tag: 
-  - /kernel/general/memory/function/page_mkclean_one
   - KG-VMM-TAG
   - VMM_FUNCTION
 

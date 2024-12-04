@@ -17,6 +17,5 @@ extra-task: /kernel/general/memory/function/page_mkclean_one
 # ---------------------
 
 tag:
-  - /kernel/general/memory/function/page_mkclean_one
   - KG-VMM-TAG
   - VMM_FUNCTION

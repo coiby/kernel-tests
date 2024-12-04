@@ -25,7 +25,6 @@ extra-task: /kernel/memory/mmap1
 tier: 1
 
 tag: 
-  - /kernel/memory/mmap1
   - KernelTier1
   - KG-VMM-TAG
   - VMM_FUNCTION
