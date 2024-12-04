@@ -87,7 +87,7 @@ function report_leak()
     fi
 
     rstrnt-report-result  "$TEST/kmemleak" WARN
-    rstrnt-submit-log -l "$LEAKREPORT"
+    rstrnt-report-log -l "$LEAKREPORT"
     cat "${LEAKFILE}" > "${LEAKREPORT_OLD}"
 
     if [ "${LEAKUPLOAD}" != "yes" ]; then
@@ -106,7 +106,7 @@ function report_leak()
 
     /usr/bin/expect <<EOF
 set timeout -1
-spawn scp ${LEAKREPORT} kgqe@vmcore.usersys.redhat.com:/data/kgqe/kmemleak/$leakname
+spawn scp ${LEAKREPORT} ${KG_SERVER_USER}@vmcore.usersys.redhat.com:/data/kgqe/kmemleak/$leakname
 expect {
 "*yes/no" { send "yes\r"; exp_continue }
 "*password:" { send "redhat\r"; exp_continue }
@@ -265,7 +265,7 @@ if test -f "${LEAKFILE}" && test -f "${LEAKREPORT}" && test -f "${LEAKREPORT_OLD
         exit 0
     fi
     rstrnt-report-result  $TEST/kmemleak.before_reboot WARN
-    rstrnt-submit-log -l $LEAKREPORT
+    rstrnt-report-log -l $LEAKREPORT
     cat /dev/null > ${LEAKREPORT_OLD}
 fi
 EOF
