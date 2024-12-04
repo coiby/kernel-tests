@@ -70,7 +70,7 @@ function report_leak()
     fi
 
     sleep 10        # wait a few secs for leak happens
-    rlRun "cat ${LEAKFILE} > ${LEAKREPORT}" 0-255
+    rlRun "cat ${LEAKFILE} | tee ${LEAKREPORT}" 0-255
 
     l1=$(cat "${LEAKREPORT}" | wc -l)
     l2=$(cat "${LEAKREPORT_OLD}" | wc -l)
