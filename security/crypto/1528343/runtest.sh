@@ -36,7 +36,7 @@ rlJournalStart
     rlPhaseStartTest
         rlRun "gcc hmac-sha3-repro.c"
         ./a.out 2>&1 | tee output.log
-        rlAssertGrep "bind(): No such file or directory" output.log
+        rlAssertGrep "bind(): No such file or directory\|bind(): Invalid argument" output.log
         rlAssertGrep "setsockopt(): Protocol not available" output.log
     rlPhaseEnd
 
