@@ -100,6 +100,8 @@ test_run()
         # runtime of each iteration should take no more than the threshold
         run "runtime_lt_threshold $runtime"
 
+        run "sleep 10s"  # give the killing process some time to cleanup
+
         # cleanup stress-ng threads by killing the load thread, not the main
         # thread.  Killing the main thread alone does not guarantee that the
         # load thread will also be killed, whereas killing the load thread will
