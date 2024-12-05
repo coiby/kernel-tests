@@ -15,8 +15,14 @@ install_kirk()
 		# install python3-click from epel
 		source /etc/os-release
 		rhel_x=$(echo $VERSION_ID | cut -d. -f1)
-		yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
-		yum -y install python3-click
+		pkg_mgr=$(command -v dnf &>/dev/null && echo dnf || echo yum)
+		if [[ -e /run/ostree-booted ]]; then
+			rpm-ostree -Ay --idempotent --allow-inactive install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
+			rpm-ostree -Ay --idempotent --allow-inactive install python3-click
+		else
+			$pkg_mgr -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
+			$pkg_mgr -y install python3-click
+		fi
 	fi
 	git clone -b v1.4 https://github.com/linux-test-project/kirk.git
 	cp -r kirk /mnt/testarea/
