@@ -43,6 +43,6 @@ adjust:
     when: arch == x86_64
 duration: 180m
 environment:
-    FILTERTESTS: madvise* timerfd_settime02 setsockopt05 connect02
+    TESTARGS: RHIVOS
 extra-summary: /kernel/distribution/ltp/generic
 extra-task: /kernel/distribution/ltp/generic
