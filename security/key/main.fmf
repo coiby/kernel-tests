@@ -10,4 +10,4 @@ require:
   - git
 component:
   - kernel
-duration: 30m
+duration: 90m
