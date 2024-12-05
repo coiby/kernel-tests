@@ -46,12 +46,8 @@ function rhel9_unfix_issues()
 	kernel_in_range "5.14.0-441.el9" "5.14.0-999.el9" && tskip "swapon03" unfix
 	# fanotify09 failures on rhel9
 	osver_in_range "900" "907" && tskip "fanotify09" unfix
-	# setpgid01 failures on rhel9
-	osver_in_range "900" "907" && tskip "setpgid01" unfix
 	# RHEL-65410: ltp/lite move_pages04 test failed
 	osver_in_range "900" "907" && tskip "move_pages04" unfix
-	# pty01, ptem01 failed with kirk
-	osver_in_range "900" "907" && tskip "pty01 ptem01" unfix
 }
 
 function rhel9_fixed_issues()
