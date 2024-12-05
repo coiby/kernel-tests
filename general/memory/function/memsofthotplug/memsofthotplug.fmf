@@ -19,9 +19,16 @@ framework: beakerlib
 recommend:
   - numactl
 duration: 2h
-tag:
-    - tier2
-    - NoRHIVOS
-tier: '2'
 extra-summary: /kernel/general/memory/function/memsofthotplug
 extra-task: /kernel/general/memory/function/memsofthotplug
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tier: '2'
+
+tag:
+  - tier2
+  - NoRHIVOS
+  - VMM_FUNCTION

@@ -47,3 +47,10 @@ environment:
     REPORT_FAILED_RESULT: yes
 extra-summary: /kernel/distribution/ltp/generic
 extra-task: /kernel/distribution/ltp/generic
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

@@ -89,6 +89,8 @@ function mm_compaction_test()
 rlJournalStart
 
 rlPhaseStartSetup
+	# Build the test program
+	rlRun "gcc mem-frag-test.c -o mem-frag-test" || rlDie "Failed to build mem-frag-test"
 	# remove the ballon driver and disable swap so there is no help
 	# coming to compaction when fragmentation sets in
 	vb_module=0 && lsmod | grep -q virtio_balloon && vb_module=1

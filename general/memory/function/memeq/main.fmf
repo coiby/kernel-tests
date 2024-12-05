@@ -30,3 +30,10 @@ require:
 duration: 90m
 extra-summary: /kernel/general/memory/function/memeq
 extra-task: /kernel/general/memory/function/memeq
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

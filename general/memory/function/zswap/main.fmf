@@ -1,0 +1,56 @@
+summary: Verifies that zswap kernel parameter works.
+description: |
+    Testcase for zswap on rhel7/8 kernel.
+
+    The test works as follows:
+
+    1. The 'zswap.enabled=1' 'zswap.max_pool_percent=' 'zswap.compressor=lzo #deflate #lz4' parameter is set with 'grubby'.
+
+    2. It is verified that the realted modules was loaded in the
+    	# dmesg |grep "zswap*"
+    	[    0.000000] Kernel command line: BOOT_IMAGE=/vmlinuz-3.10.0-302.el7.x86_64 root=/dev/mapper/rhel_ibm--x3950x6--01-root ro
+    	crashkernel=auto rd.lvm.lv=rhel_ibm-x3950x6-01/root rd.lvm.lv=rhel_ibm-x3950x6-01/swap console=ttyS0,115200n81 LANG=en_US.UTF-8 zswap.enabled=1
+    	[   22.065671] zswap: loading zswap
+    	[   22.077898] zswap: using zbud pool
+    	[   22.081729] zswap: using lzo compressor
+
+    3. It is checked that values of below during memory eaten progress runing
+       /sys/kernel/debug/zswap> grep . *
+       duplicate_entry:0
+       pool_limit_hit:0
+       pool_pages:0
+       reject_alloc_fail:0
+       reject_compress_poor:0
+       reject_kmemcache_fail:0
+       reject_reclaim_fail:0
+       stored_pages:0
+       written_back_pages:0 
+       
+    See
+    https://bugzilla.redhat.com/show_bug.cgi?id=731499
+    https://bugzilla.redhat.com/show_bug.cgi?id=1141434
+contact: Li Wang <liwang@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: shell
+require:
+  - type: file
+    pattern:
+      - /kernel-include/runtest.sh
+recommend:
+  - general/memory/function
+  - grubby
+  - wget
+  - gcc
+  - bc
+duration: 60m
+extra-summary: /kernel/general/memory/function/zswap
+extra-task: /kernel/general/memory/function/zswap
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

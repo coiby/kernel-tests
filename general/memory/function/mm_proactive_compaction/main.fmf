@@ -1,0 +1,100 @@
+summary: Verifies that mm proactive_compaction works.
+description: |
+    Testcase for mm proactive_compaction from rhel8.4 kernel.
+    This feature is to fight against the memory fragmental and compact the chunk of memory.
+
+    The test works as follows:
+
+    1) Before running memfrag(without setting vm.compaction_proactiveness):
+
+    # cat /proc/buddyinfo
+    Node 0, zone      DMA      0      0      0      0      0      0      0      0      1      1      3
+    Node 0, zone    DMA32   1142    703    432    332    180     96     40     23     14     16     76
+    Node 1, zone   Normal     39     49     55     52     40     56     32     28     20     13    731
+
+
+    2) After running memfrag in the background:
+
+    vm.compaction_proactiveness=100
+    -------------------------------
+    # cat /proc/buddyinfo
+    Node 0, zone      DMA    264     27      3      2      2      1      3      1      3      3      0
+    Node 0, zone    DMA32    815    256    344    299    190    104     58     43     21     36    200
+    Node 1, zone   Normal  15112      3     49     54     47     45     27     23     14      1    355
+
+
+    vm.compaction_proactiveness=80
+    ------------------------------
+
+    # cat /proc/buddyinfo
+    Node 0, zone      DMA    258     94      1      1      2      1      2      2      2      3      0
+    Node 0, zone    DMA32   2334   2025    488    397    303    176    119     72     54     74    133
+    Node 1, zone   Normal  73325     18      6      4      5     47     30     27     18      1    296
+
+
+    vm.compaction_proactiveness=60
+    ------------------------------
+
+    # cat /proc/buddyinfo
+    Node 0, zone      DMA     16    215      1      1      2      1      2      2      1      2      1
+    Node 0, zone    DMA32     13  34113    361    253    174    104     61     42     31     32    130
+    Node 1, zone   Normal     30  75717     50     53     45     45     27     23     14      2    222
+
+
+    vm.compaction_proactiveness=40
+    ------------------------------
+
+    # cat /proc/buddyinfo
+    Node 0, zone      DMA    258     93      0      2      2      1      2      2      2      3      0
+    Node 0, zone    DMA32 118289   5274    179    164    125     72     47     28     20     18     79
+    Node 1, zone   Normal 232710     55      5      4      2      2      2     23     16      0    144
+
+
+    vm.compaction_proactiveness=20
+    ------------------------------
+
+    # cat /proc/buddyinfo
+    Node 0, zone      DMA    258     93      0      2      2      1      2      2      2      3      0
+    Node 0, zone    DMA32 170542   7744     62     49     41     26     20     10     11     11     37
+    Node 1, zone   Normal 308146    402      6      4     14      8      7     23     16      0     69
+
+
+    vm.compaction_proactiveness=0
+    -----------------------------
+
+    # cat /proc/buddyinfo
+    Node 0, zone      DMA    535      1      1      1      2      1      3      2      2      3      0
+    Node 0, zone    DMA32 125430  38064    597      4      2      2      0      2      1      0      0
+    Node 1, zone   Normal 374003   1728      4      0      0      0      0      0      0      0      0
+
+    See:
+    https://bugzilla.redhat.com/show_bug.cgi?id=1848427
+contact: Li Wang <liwang@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - type: file
+    pattern:
+      - /general/include
+
+recommend:
+  - general/memory/function
+  - grubby
+  - psmisc
+  - gcc
+  - glibc
+  - beakerlib
+
+duration: 20m
+
+extra-summary: /kernel/general/memory/function/mm_proactive_compaction
+extra-task: /kernel/general/memory/function/mm_proactive_compaction
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag: 
+  - VMM_FUNCTION

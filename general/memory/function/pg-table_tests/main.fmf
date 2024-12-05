@@ -27,8 +27,17 @@ require:
   - numactl
   - numactl-devel
 duration: 30m
-tier: 2
-tag: [tier2]
 extra-summary: /kernel/general/memory/function/pg-table_tests
 extra-task: /kernel/general/memory/function/pg-table_tests
 id: 8946833a-14ee-4469-917b-1a4c2deb9fb0
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tier: 2
+
+tag: 
+  - tier2
+  - VMM_FUNCTION
+

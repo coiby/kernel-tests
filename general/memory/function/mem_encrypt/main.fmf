@@ -1,0 +1,27 @@
+summary: This is a general regression test for VM
+description: ''
+contact: Ping Fang <pifang@redhat.com>
+component:
+  - kernel
+test: |-
+    ( set +o posix; bash ./runtest.sh )
+
+framework: beakerlib
+require:
+  - type: file
+    pattern:
+      - /general/include/libmem.sh     
+recommend:
+  - gcc
+  - elfutils-libelf-devel
+duration: 1h
+extra-summary: /kernel/general/memory/function/mem_encrypt
+extra-task: /kernel/general/memory/function/mem_encrypt
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION
+

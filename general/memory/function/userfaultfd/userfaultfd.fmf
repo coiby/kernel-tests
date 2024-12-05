@@ -5,16 +5,21 @@ enabled: true
 id: bcd699f4-4a08-43d8-ae06-8068a4730a8a
 component:
   - kernel
-tag: [
-  /kernel/general/memory/function/page_mkclean_one,
-  KG-VMM-TAG
-  ]
 contact: David McDougall <dmcdouga@redhat-com>
 test: bash ./runtest.sh
 framework: beakerlib
 require:
   - gcc
 duration: 5m
-tier: 1
 extra-summary: /kernel/general/memory/function/userfaultfd
 extra-task: /kernel/general/memory/function/userfaultfd
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag: 
+  - KG-VMM-TAG
+  - VMM_FUNCTION
+
+tier: 1

@@ -1,0 +1,17 @@
+[General]
+description=general regression test for VM
+name=/general/memory/function/mem_encrypt
+owner=Ping Fang <pifang@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=1h
+dependencies=gcc;elfutils-libelf-devel
+repoRequires=general/include
+TestVersion=1.3
+Type=Regression
+RunFor=kernel
+Priority=Normal

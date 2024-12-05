@@ -10,3 +10,10 @@ require:
 duration: 35m
 extra-summary: /kernel/general/memory/function/pthread-read-and-fork
 extra-task: /kernel/general/memory/function/pthread-read-and-fork
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

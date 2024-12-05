@@ -16,7 +16,7 @@ tmpdir=$(dirname $OUTPUTFILE)/zsawp_$TASKID
 
 function arch_check()
 {
-	if [ ${ARCH} = s390x -o ${ARCH} = i386 -o  ${ARCH} = aarch64 ]; then
+	if [ ${ARCH} = s390x ] || [ ${ARCH} = i386 ] || [ ${ARCH} = aarch64 ]; then
 		echo " zswap has not been supported on ${ARCH}" | tee -a $OUTPUTFILE
 		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
@@ -102,8 +102,8 @@ function zswap_test()
 		local spid
 		for spid in $(cat $cgroup_path/$CGROUP_TASK_FILE); do
 			echo "$spid: adjusting oom_score_adj to $oom_score_adj"
-			echo $oom_score_adj > /proc/$spid/oom_score_adj
-			[ $? -ne 0 ] && echo "$spid: failed to adjust oom_score_adj"
+			ret=$(echo $oom_score_adj > /proc/$spid/oom_score_adj)
+			[ $ret -ne 0 ] && echo "$spid: failed to adjust oom_score_adj"
 		done
 	fi
 
@@ -212,7 +212,7 @@ rlPhaseStartTest
 	fi
 	major_r=$(uname -r | cut -d. -f 1)
 	minor_r=$(uname -r | cut -d. -f 2)
-	if [ "$major_r" -le 3 ] || [ "$major_r" -eq 4 -a "$minor_r" -lt 17 ]; then
+	if [ "$major_r" -le 3 ] || ( [ "$major_r" -eq 4 ] && [ "$minor_r" -lt 17 ] ); then
 		rlLog "Don't support runtime update!"
 		ls /sys/module/zswap/parameters/ -l
 		skip_runtime=1

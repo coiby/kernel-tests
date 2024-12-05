@@ -5,8 +5,16 @@ component:
   - kernel
 path: /vm/hugepage/ltp-hugetlbfs
 test: bash -x ./runtest.sh
+duration: 25m
 framework: shell
 id: 0d91c803-5c66-4203-b53c-719617dc7c20
 require: [bc, gcc, gcc-c++, autoconf, automake, flex, bison, binutils, glibc-devel, procmail, rsyslog, util-linux, bc, wget, bzip2, virt-what]
 extra-summary: /vm/hugepage/ltp-hugetlbfs
 extra-task: /vm/hugepage/ltp-hugetlbfs
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION
