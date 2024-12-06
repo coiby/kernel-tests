@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=./runtest.sh
+entry_point=bash ./runtest.sh
 max_time=1h
 dependencies=gcc;elfutils-libelf-devel
 repoRequires=general/include
