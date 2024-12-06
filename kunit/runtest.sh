@@ -49,7 +49,7 @@ is_broken(){
 	fi
 
 	if rlIsRHEL "9.4"; then
-		skip_string="slub_kunit test_kasan handshake-test drm_gem_shmem_test"
+		skip_string="slub_kunit test_kasan kasan_test handshake-test drm_gem_shmem_test"
 	fi
 
 	if rlIsRHEL "9.5"; then
