@@ -27,6 +27,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../include/lib.sh
 
 trap 'killall make; kill runtest.sh' SIGHUP SIGINT SIGQUIT SIGTERM
 
@@ -36,7 +37,7 @@ KPATCH_PATH="/home/kpatch-patch-modules"
 TEST_CMD="${TEST_CMD:-cat /proc/meminfo}"
 GREP_STR="${GREP_STR:-kpatch:         5}"
 TARGET_FUNCTION=${TARGET_FUNCTION:-meminfo_proc_show}
-BRWURL="${BREW_URL:-}"
+BUILDS_URL="${BUILDS_URL:-}"
 NFS_SHARE=${NFS_SHARE:-}
 KPATCH_LOCATION=${KPATCH_LOCATION:-"/data/kpatch"}
 KPATCH_SHARE="${NFS_SHARE}:${KPATCH_LOCATION}"
@@ -62,22 +63,13 @@ kprobe_enable="${trace_dir}/events/kprobes/enable"
 tracer="${trace_dir}/current_tracer"
 
 function install_deps() {
-    local karch=$(uname -m)
-    local kver=$(uname -r | cut -f1 -d'-')
-    local krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.${karch}$//")
-    local brew="${BRWURL}/brewroot/packages"
-
-    yum -y install perf-${kver}-${krel} \
-        || yum -y install $brew/kernel/${kver}/${krel}/${karch}/perf-${kver}-${krel}.${karch}.rpm
-
-    yum -y install kernel-debuginfo-${kver}-${krel} \
-        || yum -y install $brew/kernel/${kver}/${krel}/${karch}/kernel-debuginfo-${kver}-${krel}.${karch}.rpm
-
-    yum -y install kernel-devel-${kver}-${krel} \
-        || yum -y install $brew/kernel/${kver}/${krel}/${karch}/kernel-devel-${kver}-${krel}.${karch}.rpm
+    # need to pass brew url to BUILDS_URL
+    package_install perf-${kver}-${krel}
+    package_install kernel-debuginfo-${kver}-${krel}
+    install_kernel_devel
 
     for i in $PACKAGE; do
-        yum -y install $i
+        package_install $i
     done
 }
 

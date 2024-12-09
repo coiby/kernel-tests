@@ -1,6 +1,6 @@
 [General]
 name=/kernel/general/kpatch/compat
-owner=Chunyu Hu <chuhu@redhat.com>
+owner=Yulia Kopkova <ykopkova@redhat.com>
 description=kpatch-patch compat with ftrace, kprobe, crash test
 license=GPLv2
 confidential=no
@@ -11,3 +11,4 @@ entry_point=bash ./runtest.sh
 max_time=10m
 dependencies=kpatch;systemtap
 softDependencies=redhat-lsb
+repoRequires=general/kpatch/include
