@@ -37,7 +37,6 @@ KPATCH_REV="${KPATCH_REV:-}"
 KPATCH_REPO="${KPATCH_REPO:-https://github.com/dynup/kpatch.git}"
 KPATCH_BUILD_OPTS="${KPATCH_BUILD_OPTS:-}"
 KPATCH_SKIP_TEST="${KPATCH_SKIP_TEST:-}"
-TEST_PATCH_PATH="test/integration"
 
 rlJournalStart
     rlPhaseStartSetup
