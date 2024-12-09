@@ -43,7 +43,7 @@ PACKAGE="perf"
 PERFTESTS_ENABLE_DENYLIST=${PERFTESTS_ENABLE_DENYLIST:-0}
 
 # hook, someone likes using "True" there, we like 1, 0 values more
-if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" -o "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
+if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" ] || [ "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
 	PERFTESTS_ENABLE_DENYLIST=1
 fi
 
@@ -184,11 +184,31 @@ rlJournalStart
 		rlRun "perf test list |& tee tests.list" 0 "We will run the following tests:"
 	rlPhaseEnd
 
-	while read line; do
-		TEST_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
-		TEST_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
-		# skip the incompatible lines (basically the subtests)
-		test -n "$TEST_NUMBER" || continue
+	read line < tests.list
+	NEXT_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
+	NEXT_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
+
+	# skip the first line as it was already parsed
+	tail -n +2 tests.list | while true; do
+		CURRENT_TEST="$line"
+		# we found the end of the file
+		test -n "$CURRENT_TEST" || break
+
+		# take the parsed data
+		TEST_NUMBER="$NEXT_NUMBER"
+		TEST_DESC="$NEXT_DESC"
+		TEST_PATTERNS='-e "$TEST_DESC"'
+
+		# parse the possibile subtests for pattern matching, store the next test
+		while read line; do
+			NEXT_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
+			NEXT_DESC="`echo $line | perl -pe 's/^(:?\d+:)+\s//'`"
+
+			# we found a testcase, not the subtest
+			test -z "$NEXT_NUMBER" || break
+			TEST_PATTERNS+=' -e "$NEXT_DESC"'
+		done
+
 		rlPhaseStart FAIL "TEST #$TEST_NUMBER : $TEST_DESC"
 			if check_allowlisted "$TEST_DESC"; then
 				rlLog "[ ALLOWLISTED ] :: $TEST_NUMBER: $TEST_DESC  (known issue)"
@@ -196,14 +216,17 @@ rlJournalStart
 				perf test -F -vv $TEST_NUMBER &> $TEST_NUMBER.log
 				RETVAL=$?
 				cat $TEST_NUMBER.log
-				RESULT=`grep "^$TEST_DESC" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
-				printf "%8s -- %s\n" $RESULT "$line" | tee -a results.log
-				echo $RESULT | grep -qi FAIL
-				if [ $RETVAL -ne 0 -o $? -eq 0 ]; then
+				# use eval to correctly interpret the patters, -F to not match regex characters
+				RESULT=`eval grep -F "$TEST_PATTERNS" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
+				printf "%8s -- %s\n" $RESULT "$CURRENT_TEST" | tee -a results.log
+
+				# search for successful report, not fail for testcase with subtests
+				echo $RESULT | grep -iE "Ok|Skip" | grep -qiv "FAIL"
+				if [ $? -eq 0 ] && [ $RETVAL -eq 0 ]; then
+					rlPass "$TEST_NUMBER: $TEST_DESC"
+				else
 					rlFail "$TEST_NUMBER: $TEST_DESC"
 					rlFileSubmit "$TEST_NUMBER.log"
-				else
-					rlPass "$TEST_NUMBER: $TEST_DESC"
 				fi
 
 				# restore original sample rate to ensure the tests dependent on it pass
@@ -211,7 +234,7 @@ rlJournalStart
 				sysctl kernel.perf_event_max_sample_rate=$ORIGINAL_SAMPLE_RATE
 			fi
 		rlPhaseEnd
-	done < tests.list
+	done
 
 	# bz1414043 coverage
 	rlPhaseStartTest "bz1414043 coverage -- \"Session topology\" test fails with some CPUs disabled"
