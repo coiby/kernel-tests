@@ -25,9 +25,9 @@ __author__ = 'Ken Benoit'
 PING_ADDRESS = 'www.redhat.com'
 
 # URLs
-CA_CERT_URL = 'http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem'
-CLIENT_CERT_URL = 'http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/client.pem'
-PRIVATE_KEY_URL = 'http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/client.pem'
+CA_CERT_URL = 'http://tools.lab.eng.brq2.redhat.com:8080/ca.pem'
+CLIENT_CERT_URL = 'http://tools.lab.eng.brq2.redhat.com:8080/client.pem'
+PRIVATE_KEY_URL = 'http://tools.lab.eng.brq2.redhat.com:8080/client.pem'
 
 # File names
 LOCAL_CERT_DIR = '/etc/pki/wireless/'
