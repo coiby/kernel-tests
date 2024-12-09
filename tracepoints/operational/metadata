@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=systemtap
+dependencies=kernel-devel;systemtap
 repoRequires=cki_lib;kernel-include
 max_time=150m

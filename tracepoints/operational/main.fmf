@@ -8,10 +8,19 @@ contact: Jeff Bastian <jbastian@redhat.com>
 duration: 1h
 test: bash ./runtest.sh
 tag:
+  - KT1-9
   - KernelTier1
 framework: shell
 require:
+  - kernel-devel
   - systemtap
+  - type: file
+    pattern:
+      - /automotive/include
+      - /general/include
+  - type: library
+    pattern:
+      - /cki_lib/libcki.sh
 extra-summary: tracepoints/operational
 extra-task: tracepoints/operational
 id: dbea203c-2c8d-4c18-b9a3-40bfa84f9c03
