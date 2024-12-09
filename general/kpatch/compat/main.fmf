@@ -2,11 +2,15 @@ summary: kpatch-patch compatibility test
 description: |
     kpatch-patch compatibility test with ftrace, kprobes,
     systemtap and crash
-contact: Zhijun Wang <zhijwang@redhat.com>
+contact: Yulia Kopkova <ykopkova@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
 framework: beakerlib
+require:
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
 recommend:
   - kpatch
   - systemtap
