@@ -23,6 +23,7 @@ set +o posix
 . ../include/kdump.sh
 . ../include/kdump-multi.sh
 . ../include/crash.sh
+. ../include/tmt.sh
 
 # This is to allow loading an extra/internal lib file
 
