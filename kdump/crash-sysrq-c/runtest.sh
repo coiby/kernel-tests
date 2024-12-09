@@ -18,4 +18,6 @@
 . ../include/runtest.sh
 
 # --- start ---
+if [ -z "$TMT_TEST_RESTART_COUNT" ] || [ "$TMT_TEST_RESTART_COUNT" = 0 ]; then
 Multihost SystemCrashTest TriggerSysrqC
+fi
