@@ -29,6 +29,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../include/lib.sh
 
 # trap 'rlFileRestore; exit' SIGHUP SIGINT SIGQUIT SIGTERM
 trap 'killall make' SIGHUP SIGINT SIGQUIT SIGTERM
@@ -137,28 +138,9 @@ function install_dependency()
 # Download kpatch git repo
 function init_upgrade_test()
 {
-    if [ ! -e "kpatch/.git" ]; then
-        if [ ! -z "$KPATCH_REV" ]; then
-            rlRun "git clone -b $KPATCH_REV $KPATCH_REPO" || rlDie
-        else
-            rlRun "git clone $KPATCH_REPO" || rlDie
-            pushd kpatch
-            KPATCH_REV=$(git describe --tags --abbrev=0)
-            rlRun "git checkout $KPATCH_REV" || rlDie
-            popd
-        fi
-    fi
-    pushd kpatch
-    rlRun "git describe --tags"
-    rlRun "source test/integration/lib.sh"
-    rlRun "kpatch_dependencies"
-    rlRun "kpatch_set_ccache_max_size 10G"
-    source /etc/os-release
-    MA=$(cut -d '.' -f 1 <<< $VERSION_ID)
-    MI=$(cut -d '.' -f 2 <<< $VERSION_ID)
-    PREVIOUS_MI=$(( $MI-1 ))
-    PREVIOUS_TARGET="${MA}.${PREVIOUS_MI}"
-    [ ! -d ${TEST_PATCH_PATH}/${ID}-${VERSION_ID} ] && cp -R ${TEST_PATCH_PATH}/${ID}-${PREVIOUS_TARGET} ${TEST_PATCH_PATH}/${ID}-${VERSION_ID}
+    download_kpatch_repo ${KPATCH_REPO} ${KPATCH_REV}
+    build_kpatch_setup
+    check_test_target
     rlRun "make" || rlDie "build kpatch builder failed ..."
     rlRun "[ -f ${PATCH_PATH}/${MOD_A_PATCH1} ] && cat ${PATCH_PATH}/${MOD_A_PATCH1}" || rlDie "Lacking patches"
     rlRun "[ -f ${PATCH_PATH}/${MOD_A_PATCH2} ] && cat ${PATCH_PATH}/${MOD_A_PATCH2}" || rlDie "Lacking patches"

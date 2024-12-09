@@ -13,7 +13,7 @@ description: |
     functions A, C, and D.  Function B will effectively be reverted.
     (Normal livepatch semantics would overlay Patch 1 and 2 such that A, B,
     C, and D would be modified).
-contact: Zhijun Wang <zhijwang@redhat.com>
+contact: Yulia Kopkova <ykopkova@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
 component:

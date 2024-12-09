@@ -1,6 +1,6 @@
 [General]
 name=/kernel/general/kpatch/patch-upgrade
-owner=Zhijun Wang <zhijwang@redhat.com>
+owner=Yulia Kopkova <ykopkova@redhat.com>
 description=Kpatch-patch upgrade test
 license=GPLv2
 confidental=no
