@@ -133,6 +133,41 @@ build_selftests_modules()
     return $ret
 }
 
+download_kpatch_repo()
+{
+    KPATCH_REPO=$1
+    KPATCH_REV=$2
+    if [ ! -e "kpatch/.git" ]; then
+        if [ ! -z "${KPATCH_REV}" ]; then
+            rlRun "git clone -b ${KPATCH_REV} ${KPATCH_REPO}" || rlDie
+        else
+            rlRun "git clone ${KPATCH_REPO}" || rlDie
+            pushd kpatch
+            KPATCH_REV=$(git describe --tags --abbrev=0)
+            rlRun "git checkout ${KPATCH_REV}" || rlDie
+            popd
+        fi
+    fi
+}
+
+build_kpatch_setup()
+{
+    rlRun "git describe --tags"
+    rlRun "source test/integration/lib.sh"
+    rlRun "kpatch_dependencies"
+    rlRun "kpatch_set_ccache_max_size 10G" "0,1"
+}
+
+check_test_target()
+{
+    source /etc/os-release
+    MA=$(cut -d '.' -f 1 <<< $VERSION_ID)
+    MI=$(cut -d '.' -f 2 <<< $VERSION_ID)
+    PREVIOUS_MI=$(( $MI-1 ))
+    PREVIOUS_TARGET="${MA}.${PREVIOUS_MI}"
+    [ ! -d ${TEST_PATCH_PATH}/${ID}-${VERSION_ID} ] && cp -R ${TEST_PATCH_PATH}/${ID}-${PREVIOUS_TARGET} ${TEST_PATCH_PATH}/${ID}-${VERSION_ID}
+}
+
 install_selftests_internal()
 {
     rpm -q kernel-selftests-internal && return 0
