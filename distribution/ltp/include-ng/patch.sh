@@ -28,6 +28,7 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-Network-helpers-in-landlock-suite-common-functions.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0003-Add-landlock08-test.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0004-Add-error-coverage-for-landlock-network-support.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-getrandom05-add-test-variants.patch
 	fi
 
 	if [ "$TESTVERSION" == "20240524" ]; then
