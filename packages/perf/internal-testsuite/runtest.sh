@@ -215,7 +215,7 @@ rlJournalStart
 			else
 				perf test -F -vv $TEST_NUMBER &> $TEST_NUMBER.log
 				RETVAL=$?
-				cat $TEST_NUMBER.log
+				rlLog "$(cat $TEST_NUMBER.log)"
 				# use eval to correctly interpret the patters, -F to not match regex characters
 				RESULT=`eval grep -F "$TEST_PATTERNS" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
 				printf "%8s -- %s\n" $RESULT "$CURRENT_TEST" | tee -a results.log
