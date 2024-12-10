@@ -197,7 +197,7 @@ rlJournalStart
 		# take the parsed data
 		TEST_NUMBER="$NEXT_NUMBER"
 		TEST_DESC="$NEXT_DESC"
-		TEST_PATTERNS='-e "$TEST_DESC"'
+		TEST_PATTERNS="-e \"$TEST_DESC\""
 
 		# parse the possibile subtests for pattern matching, store the next test
 		while read line; do
@@ -206,7 +206,7 @@ rlJournalStart
 
 			# we found a testcase, not the subtest
 			test -z "$NEXT_NUMBER" || break
-			TEST_PATTERNS+=' -e "$NEXT_DESC"'
+			TEST_PATTERNS+=" -e \"$NEXT_DESC\""
 		done
 
 		rlPhaseStart FAIL "TEST #$TEST_NUMBER : $TEST_DESC"
