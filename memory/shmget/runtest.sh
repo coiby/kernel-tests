@@ -2,6 +2,7 @@
 
 # Assume the test will fail.
 result=FAIL
+TEST="$PWD"
 
 # Helper functions
 function CheckMemory ()
