@@ -36,6 +36,7 @@ SCI_PEER=0100567${PEER}12005452
 
 rlJournalStart
     rlPhaseStartSetup
+        rlRun "yum install iperf3 -y"
         rlRun -l "modinfo macsec"
         rlRun "modprobe macsec"
         rlRun -l "ip macsec help" 255
@@ -78,7 +79,6 @@ rlJournalStart
         fi
         ip link add dev dummy0 type dummy
         ip link set dummy0 up
-        netperf_install
         # macsec name
         rlRun "ip link add link dummy0 type macsec"
         rlRun "ip link del macsec0"
@@ -349,7 +349,7 @@ Zversion=`cat /etc/os-release|grep VERSION_ID|awk -F= '{print $2}'|sed 's/\"//g'
 if  [ "$Xversion" -eq 8 ] && [ "$Zversion" -eq 0 -o  "$Zversion" -eq 1 ] ;then
                 echo "skip test,cause bz1745880 is not fixed in rhel8.0 and rhel8.1"
 else
-    rlPhaseStartTest "Setup masec between 2 netns, do ping/netperf test"
+    rlPhaseStartTest "Setup masec between 2 netns, do ping/iperf3 test"
         netid=100
         ip link add br0 type bridge
         ip link set br0 up
@@ -366,14 +366,14 @@ else
         ip netns exec ns0 ip link set veth0 up
         ip netns exec ns0 ip addr add 192.168.${netid}.11/24 dev veth0
         ip netns exec ns0 ip addr add 2001:db8:${netid}::11/64 dev veth0
-        ip netns exec ns0 netserver
+        ip netns exec ns0 iperf3 -sD
 
         ip netns add ns1
         ip link set veth2 netns ns1
         ip netns exec ns1 ip link set veth2 up
         ip netns exec ns1 ip addr add 192.168.${netid}.21/24 dev veth2
         ip netns exec ns1 ip addr add 2001:db8:${netid}::21/64 dev veth2
-        ip netns exec ns1 netserver
+        ip netns exec ns1 iperf3 -sD
 
         bridge link show
         ip netns exec ns0 ifconfig -a
@@ -407,10 +407,13 @@ else
         rlRun "ip netns exec ns1 ping 192.168.9.1 -c 5"
         rlRun "ip netns exec ns1 ping6 2009::01 -c 5"
 
-        rlRun "ip netns exec ns1 netperf -H 192.168.9.1 -t TCP_STREAM -l 30"
-        rlRun "ip netns exec ns1 netperf -H 2009::01 -t TCP_STREAM -l 30"
-        rlRun "ip netns exec ns1 netperf -H 192.168.9.1 -t UDP_STREAM -l 30"
-        rlRun "ip netns exec ns1 netperf -H 2009::01 -t UDP_STREAM -l 30"
+        iperf3 -v
+        if [ $? -eq 0 ];then
+            rlRun "ip netns exec ns1 iperf3 -c 192.168.9.1"
+            rlRun "ip netns exec ns1 iperf3 -c 2009::01"
+            rlRun "ip netns exec ns1 iperf3 -c 192.168.9.1 -u"
+            rlRun "ip netns exec ns1 iperf3 -c 2009::01 -u"
+        fi
 
         ip netns exec ns0 ip link set veth0 netns 1
         ip netns exec ns1 ip link set veth2 netns 1
@@ -423,6 +426,7 @@ else
         ip link del br0
         ip link del veth0
         ip link del veth2
+        pkill iperf3
     rlPhaseEnd
 fi
 
