@@ -44,7 +44,7 @@ rlJournalStart
         $yum install -y kmod
 
         tar Jxf ~/rpmbuild/SOURCES/linux-"${running_kernel}"*.tar.xz
-        ksrcdir=`ls | grep linux-"${running_kernel}" | grep -v tar`
+        ksrcdir=`find . -maxdepth 1 -name linux-"${running_kernel}"`
         rm -rf test_bpf
         mkdir test_bpf
         find . -name test_bpf.c -exec cp {} test_bpf \;
