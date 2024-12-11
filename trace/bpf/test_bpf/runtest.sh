@@ -58,6 +58,12 @@ rlJournalStart
         pushd test_bpf
         BEAHARCH=${ARCH}
         unset ARCH
+        if [ -f /boot/symvers-"${running_kernel}".$(arch).xz ]; then
+            xzcat /boot/symvers-"${running_kernel}".$(arch).xz > ../"${ksrcdir}"/Module.symvers
+        elif [ -f /boot/symvers-"${running_kernel}".$(arch).gz ]; then
+            gunzip -c /boot/symvers-"${running_kernel}".$(arch).gz > ../"${ksrcdir}"/Module.symvers
+        fi
+
         make -C ../"${ksrcdir}"/ M=`pwd` modules
         popd
         rmmod test_bpf
