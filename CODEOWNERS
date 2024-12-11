@@ -216,7 +216,7 @@
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing
 /general/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /general/memory/function/mem_encrypt/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
-/general/memory/function/memfd_create/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
+/general/memory/function/memfd_create/ @aubaker @bgoncalv @chuhu @liwan1 @lulinqing @pifang @raquini
 /general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /hw-enablement/dmaengine/dmatest/ @bgoncalv @jsnitsel @lulinqing
 /iommu/boot/ @bgoncalv @lulinqing @wrgrh
@@ -230,7 +230,7 @@
 /kdump-cki/crash-sysrq-c/ @baoquan_he @bgoncalv @jieli1 @lulinqing @thenzl @yiyan1
 /kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @jieli1 @lulinqing @yiyan1
 /kdump-cki/kexec-load/ @baoquan_he @bgoncalv @jieli1 @lulinqing @yiyan1
-/kselftests/ @bgoncalv @fmaurer-rh @liuhangbin @lulinqing @npache @sbertram
+/kselftests/ @bgoncalv @fmaurer-rh @liuhangbin @lulinqing @npache @sbertram @vmalikrh
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
 /legacy/whitelist/ @bgoncalv @ckalina @lulinqing
