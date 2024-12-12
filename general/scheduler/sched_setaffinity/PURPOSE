@@ -1,14 +1,83 @@
-verify sched_setaffinity intersect with cpuset controller works as expected.
+Description:
 
-The test will create cgroup with cpuset controler enabled, and run the syscall
-within the cpuset controller, and check the return value, errno, and cpumask in
-/proc/[pid]/status.
+   Verify that sched_setaffinity intersects with the cpuset controller as expected.
+   
+   This test will create a cgroup with the cpuset controller enabled and execute
+   the sched_setaffinity syscall within this controller. The test will check the
+   return value, errno, and the cpumask in /proc/[pid]/status to verify the correct
+   behavior based on the interactions between the sched_setaffinity cpumask and
+   the cpuset configuration.
 
-1. return -1 and errno EINVAL when the sched_setaffinity(cpumask is all zero)
-2. return -1 and errno EINVAL when the sched_setaffinity(cpumask) cpu is all
-   beyond the cpuset controller. the cpumask in status file keep unchanged
-   as cpuset cpus.
-3. return 0 when the sched_setaffinity (cpumask) cpu is partially in the cpuset
-   controller. the cpumask is (cpuset cpu & sched_setaffinity cpu).
-4. return 0 when the sched_setaffinity (cpumask) cpu is subset in the cpuset
-   controller. the cpumask is (cpuset cpu & sched_setaffinity cpu).
+Test Scenarios, Inputs, and Expectations:
+   
+   Test 1 - Invalid cpumask (all zero):
+      Scenario:
+         When the sched_setaffinity syscall is called with a cpumask where all CPUs
+         are set to zero (i.e., no CPUs are allowed), the test expects the cpumask
+         in /proc/[pid]/status to remain unchanged, reflecting the original cpuset
+         configuration.
+      Inputs:
+         - syscall cpumask: an empty bitmask
+      Expectations:
+         - Return value: -1
+         - errno: 22 EINVAL (Invalid argument)
+         - cpumask in status: remain unchanged
+
+   Test 2 - Cpumask beyond cpuset limitation:
+      Scenario:
+         When the sched_setaffinity syscall is called with a cpumask that specifies
+         CPUs entirely outside the cpuset's allowable CPUs, the test expects the
+         cpumask in /proc/[pid]/status to remain unchanged, reflecting the cpuset
+         configuration.
+         This verifies that setting a cpumask beyond the cpuset’s defined CPUs does
+         not affect the system's CPU allocation.
+      Inputs:
+         - cgroup cpuset: cpu-0
+         - syscall cpumask: cpu-1
+      Expectations:
+         - Return value: -1
+         - errno: 22 EINVAL (Invalid argument)
+         - cpumask in status: cpu-0
+  
+   Test 3 - Partial intersection of cpumask and cpuset:
+      Scenario:
+         When the sched_setaffinity syscall is called with a cpumask that partially
+         intersects with the cpuset (i.e., some of the CPUs are within the cpuset),
+         the test expects the cpumask in /proc/[pid]/status to be the intersection
+         of the cpuset CPUs and the specified cpumask. This ensures that the cpumask
+         is adjusted to match both the cpuset’s allowed CPUs and the requested CPUs
+         in the syscall.
+      Inputs:
+         - cgroup cpuset: cpu-0
+         - syscall cpumask: cpu-0,cpu-1
+      Expectations:
+         - Return value: 0 (successful execution)
+         - errno: 0
+         - cpumask in status: cpu-0
+
+   Test 4 - Cpumask is a subset of cpuset:
+      Scenario:
+         When the sched_setaffinity syscall is called with a cpumask that is a
+         subset of the cpuset (i.e., the requested CPUs are all part of the cpuset),
+         the test expects the cpumask in /proc/[pid]/status to reflect the
+         intersection, which, in this case, will be the same as the cpumask passed
+         to the syscall since the requested CPUs are within the cpuset.
+      Inputs:
+         - cgroup cpuset: cpu-0,cpu-1
+         - syscall cpumask: cpu-1
+      Expectations:
+         - Return value: 0 (successful execution)
+         - errno: 0
+         - cpumask in status: cpu-1
+
+Expected result:
+   1. `out: ::   RESULT: PASS (Setup)`
+   2. `out: ::   RESULT: PASS (zero cpumask)`
+   3. `out: ::   RESULT: PASS (beyond cpuset limitation)`
+   4. `out: ::   RESULT: PASS (intersect cpuset limitation)`
+   5. `out: ::   RESULT: PASS (within cpuset limitation)`
+   6. `out: ::   RESULT: PASS (Cleanup)`
+   7. `out: ::   OVERALL RESULT: PASS (/kernel-tests/general/scheduler/sched_setaffinity)`
+
+Results location:
+   output.txt.
