@@ -31,7 +31,7 @@ void parse_cpu_list(const char *cpu_affinity, cpu_set_t *cpus)
 	char *str = strdup(cpu_affinity); // Duplicate the CPU list string to tokenize
 	char *ptr = str;
 
-	// If the CPU list is invalid (negative), reset the cpu_set_t and return
+	// For a negative cpu_affinity, return an empty cpu_set_t bitmask
 	if (atoi(cpu_affinity) < 0) {
 		CPU_ZERO(cpus);
 		return;

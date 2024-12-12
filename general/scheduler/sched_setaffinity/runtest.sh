@@ -101,7 +101,7 @@ rlJournalStart
 	# Test 2 - Beyond cpuset limitation (testing cpumask beyond the cpuset limit)
 	rlPhaseStartTest "beyond cpuset limitation"
 		# Run the sched_setaffinity syscall with cpumask set to an invalid CPU outside of the cpuset
-		# Expect failure due to cpus beyond the cpuset boundaries, cpumask should remain unchanged
+		# Expect failure due to cpus beyond the cpuset boundaries, cpumask should remain as cpuset cpus
 		rlRun -l "cgexec.sh sched_setaffinity cpuset ./sched_setaffinity 1 -1 22 0" 0 "cpuset_cpu, retval, errno, cpumask"
 	rlPhaseEnd
 
