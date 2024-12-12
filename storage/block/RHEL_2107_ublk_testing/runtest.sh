@@ -55,13 +55,17 @@ function run_test()
 
         rlRun "make test T=generic"
 
+        rlRun "ublk list"
+        sleep 100
+        rlRun "ublk del -a"
+        rlRun "rmmod ublk_drv -f"
+
         rlRun "echo 2 > /proc/sys/kernel/io_uring_disabled"
         rlRun "modprobe ublk_drv"
         rlRun "ublk list"
+        sleep 100
         rlRun "ublk del -a"
-        wait
-        sleep 5
-        rlRun "rmmod ublk_drv"
+        rlRun "rmmod ublk_drv -f"
         rlRun "echo 0 > /proc/sys/kernel/io_uring_disabled"
     else
         rlLog "ublk drive not enable on this kernel, skip testing"
