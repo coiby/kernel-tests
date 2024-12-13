@@ -1,6 +1,5 @@
-# NVIDIA OpenGPU driver build
-NVIDIA OpenGPU driver building task
-
+# NVIDIA OpenRM driver sanity tests
+NVIDIA OpenRM driver sanity tests
 
 ## How to run it
 Please refer to the top-level README.md for common dependencies.

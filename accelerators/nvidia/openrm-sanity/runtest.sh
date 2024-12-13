@@ -21,15 +21,15 @@
 
 rlJournalStart
     rlPhaseStartSetup
-        rlLog "Setting up OpenGPU build"
+        rlLog "Setting up OpenRM testing"
     rlPhaseEnd
 
     rlPhaseStartTest
-        rlLog "Building OpenGPU driver"
+        rlLog "Testing OpenRM driver"
     rlPhaseEnd
 
     rlPhaseStartCleanup
-        rlLog "Cleaning up OpenGPU build"
+        rlLog "Cleaning up OpenRM testing"
     rlPhaseEnd
 rlJournalEnd
 

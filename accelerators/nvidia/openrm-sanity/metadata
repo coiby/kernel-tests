@@ -1,7 +1,7 @@
 [General]
-name=accelerators/nvidia-opengpu-sanity
+name=accelerators/nvidia-openrm-sanity
 owner=Oliver Gutiérrez <ogutierr@redhat.com>
-description=NVIDIA OpenGPU driver sanity tests
+description=NVIDIA OpenRM driver sanity tests
 license=GPLv2
 confidential=no
 destructive=no
