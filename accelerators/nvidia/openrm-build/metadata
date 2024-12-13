@@ -1,13 +1,13 @@
 [General]
-name=accelerators/nvidia-opengpu-build
+name=accelerators/nvidia-openrm-build
 owner=Oliver Gutiérrez <ogutierr@redhat.com>
-description=NVIDIA OpenGPU driver building task
+description=NVIDIA OpenRM driver building task
 license=GPLv2
 confidential=no
 destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=
+dependencies=git;kernel-devel;rpm-build
 softDependencies=beakerlib-redhat
 
