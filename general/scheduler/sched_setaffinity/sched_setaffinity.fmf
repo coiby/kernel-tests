@@ -16,3 +16,4 @@ require:
 duration: 15m
 extra-summary: /general/scheduler/sched_setaffinity
 extra-task: /general/scheduler/sched_setaffinity
+id: 0829ad9f-7e2b-4858-95b2-d5893b90b2ce
