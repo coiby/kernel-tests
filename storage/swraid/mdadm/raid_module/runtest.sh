@@ -40,6 +40,8 @@ function startup
     rlRun -l "rpm -q mdadm"
     rlRun -l "lsblk"
     rlRun -l "lsmod | grep raid" "0-255"
+
+    return 0
 }
 
 function cleanup
