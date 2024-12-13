@@ -18,6 +18,7 @@ require:
     - liburing-devel
     - qemu-img
     - gcc-c++
+    - nbdkit
 duration: 2h
 tier: 1
 extra-summary: /storage/block/RHEL_2107_ublk_testing
