@@ -183,6 +183,19 @@ check tmt lint:
     - !reference [.rules, default-branch]
     - !reference [.rules, production-branch]
 
+check tmt discover:
+  # tmt lint not always catch all problem when discovery tests/plans
+  # https://github.com/teemtee/tmt/issues/3429
+  extends: .cki_tools
+  before_script:
+    - tmt --version
+  script:
+    - tmt run discover
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
+
 no-tmt-plans:
   extends: .cki_tools
   before_script:
