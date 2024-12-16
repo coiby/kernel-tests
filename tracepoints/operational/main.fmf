@@ -18,7 +18,7 @@ require:
     pattern:
       - /automotive/include
       - /general/include
-  - type: library
+  - type: file
     pattern:
       - /cki_lib/libcki.sh
 extra-summary: tracepoints/operational
