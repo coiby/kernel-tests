@@ -62,6 +62,8 @@
 /Makefile @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 
 [CKI]
+/accelerators/nvidia/openrm-build/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/accelerators/nvidia/openrm-sanity/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /container/podman/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /core-kernel/Xarray-idr-radixtree-test/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /core-kernel/module_diff/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -200,6 +202,8 @@
 /watchdog/hw-generic/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 
 [kpet-db-maintainers]
+/accelerators/nvidia/openrm-build/ @bgoncalv @lulinqing @olivergs
+/accelerators/nvidia/openrm-sanity/ @bgoncalv @lulinqing @olivergs
 /container/podman/ @ajia2 @bgoncalv @lulinqing @ypu2
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
