@@ -44,6 +44,15 @@ is_rhel()
     fi
 }
 
+is_fedora()
+{
+    if grep -q "Fedora Linux" $OS_RELEASE; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 is_rhel9()
 {
     local ret=0

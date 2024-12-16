@@ -115,7 +115,7 @@ do_livepatch()
 
 #-------------------- Start Test --------------------
 install_selftests_internal || { test_fail "install selftests failed" && exit 0; }
-if is_rhel "10" ; then
+if is_rhel "10" || is_fedora ; then
 	build_selftests_modules || { test_fail "build selftests modules failed" && exit 0; }
 fi
 
