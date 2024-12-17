@@ -25,6 +25,9 @@ BASE_URL='https://us.download.nvidia.com/tesla'
 SPECFILE_REPO='https://github.com/NVIDIA/yum-packaging-precompiled-kmod'
 DRIVER_VERSION="550.90.07"
 DRIVER_STREAM=$(echo ${DRIVER_VERSION} | cut -d '.' -f 1)
+CUDA_VERSION='12.4.1'
+CUDA_VERSION_ARRAY=(${CUDA_VERSION//./ })
+CUDA_DASHED_VERSION=${CUDA_VERSION_ARRAY[0]}-${CUDA_VERSION_ARRAY[1]}
 
 
 # Environment information
@@ -83,6 +86,20 @@ rlJournalStart
 
         rlLog "Installing OpenRM driver"
         rlRun "rpm -ivh RPMS/x86_64/kmod-nvidia-${DRIVER_VERSION}-${KVER}-${KREL}-${DRIVER_VERSION}-3${KDIST}.${BUILD_ARCH}.rpm"
+
+        rlLog "Installing CUDA"
+        rlRun "dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel${OS_VERSION_MAJOR}/${TARGET_ARCH}/cuda-rhel${OS_VERSION_MAJOR}.repo"
+        rlRun "dnf -y module enable nvidia-driver:${DRIVER_STREAM}/default"
+        rlRun "dnf install -y \
+            nvidia-driver-${DRIVER_VERSION} \
+            nvidia-driver-cuda-${DRIVER_VERSION} \
+            nvidia-driver-libs-${DRIVER_VERSION} \
+            nvidia-driver-NVML-${DRIVER_VERSION} \
+            cuda-compat-${CUDA_DASHED_VERSION} \
+            cuda-cudart-${CUDA_DASHED_VERSION} \
+            nvidia-persistenced-${DRIVER_VERSION} \
+            nvidia-container-toolkit"
+
     rlPhaseEnd
 
 rlJournalEnd
