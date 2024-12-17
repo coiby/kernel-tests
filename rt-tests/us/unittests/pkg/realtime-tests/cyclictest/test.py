@@ -4,11 +4,15 @@ Unittest for cyclictest of realtime-tests
 """
 import os
 import rtut
+import subprocess
 
 class CyclictestTest(rtut.RTUnitTest):
 
     def setUp(self):
+        is_longname = subprocess.getstatusoutput("rpm -q realtime-tests")[0]
         self.tmp_file = f"{os.getcwd()}/output_or_pipe"
+        self.pkgname = "realtime-tests" if is_longname == 0 else "rt-tests"
+        self.pkgnvr = subprocess.getoutput(f"rpm -q {self.pkgname}")
 
     def tearDown(self):
         if os.path.exists(self.tmp_file):
@@ -66,6 +70,14 @@ class CyclictestTest(rtut.RTUnitTest):
 
     def test_fifo_long(self):
         self.run_cmd(f'cyclictest --fifo {self.tmp_file} --duration 5')
+
+    def test_cpupower(self):
+        # https://issues.redhat.com/browse/RHEL-65487
+        ret = subprocess.getstatusoutput(f"rpmdev-vercmp "
+                                         f"{self.pkgnvr} "
+                                         f"realtime-tests-2.8-2")[0]
+        if ret == 11:
+            self.run_cmd(f"cyclictest --deepest-idle-state=1 --duration=1")
 
 if __name__ == '__main__':
     CyclictestTest.run_unittests()
