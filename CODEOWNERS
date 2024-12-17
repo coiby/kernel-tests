@@ -193,7 +193,6 @@
 /storage/swraid/upstream/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /storage/target/targetcli_basic/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /stress/stress-ng/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
-/trace/bpf/test_bpf/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /trace/ftrace/tracer/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /tracepoints/operational/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /vm/kvm-self-tests/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -329,7 +328,6 @@
 /storage/swraid/upstream/ @bgoncalv @lulinqing @xni1
 /storage/target/targetcli_basic/ @ZhaojuanGuo @bgoncalv @lulinqing
 /stress/stress-ng/ @bgoncalv @jbastianrh @lulinqing
-/trace/bpf/test_bpf/ @bgoncalv @lulinqing @pity4yeats @sztsian
 /trace/ftrace/tracer/ @bgoncalv @lulinqing @sztsian @zhaoqiao
 /tracepoints/operational/ @bgoncalv @jbastianrh @lulinqing @zhaoqiao
 /vm/kvm-self-tests/ @bgoncalv @hlynden @jarichte @lulinqing
