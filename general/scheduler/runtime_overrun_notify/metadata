@@ -1,0 +1,14 @@
+[General]
+name=runtime_overrun_notify
+owner=Chunyu Hu <chuhu@redhat.com>
+description=SIGXCPU send to SCHED_DEADLINE process when runtime overruns
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=5m
+dependencies=gcc;libgcc
+softDependencies=glibc
+repoRequires=kernel-include

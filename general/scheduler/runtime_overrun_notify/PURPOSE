@@ -1,0 +1,10 @@
+Runtime overrun happens when the SCHED_DEADLINE runs more than expected
+and will be throttled until next period.
+
+1. when SCHED_FLAG_DL_OVERRUN is enabled, SIGXCPU should be sent to the
+running process when runtime overrun  happens. In the signal handler, increase
+the counter which record how many times the signal is received.
+
+2. when SCHED_FLAG_DL_OVERRUN is not enabled, SIGXCPU should not be sent
+to the running process when runtime overrun happens. The counter which record
+how many times the signal is received should be 0.
