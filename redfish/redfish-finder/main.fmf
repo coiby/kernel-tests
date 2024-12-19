@@ -1,0 +1,10 @@
+summary: Run redfish-finder tests
+description: redfish-finder sanity check
+contact: Jeff Bastian <jbastian@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - redfish-finder
+duration: 10m
+extra-summary: redfish/redfish-finder
+extra-task: redfish/redfish-finder

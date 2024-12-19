@@ -1,7 +1,7 @@
 [General]
 description=redfish-finder sanity check
 name=redfish/redfish-finder
-owner=Laura Trivelloni <ltrivell@redhat.com>
+owner=Jeff Bastian <jbastian@redhat.com>
 
 [restraint]
 entry_point=bash ./runtest.sh
