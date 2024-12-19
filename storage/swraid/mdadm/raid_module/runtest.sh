@@ -36,7 +36,7 @@ function startup
 {
     clean_all_loop_md
     rlRun -l "uname -r"
-    rlRun -l "rpm -q kernel"
+    rlRun -l "rpm -qa | grep kernel"
     rlRun -l "rpm -q mdadm"
     rlRun -l "lsblk"
     rlRun -l "lsmod | grep raid" "0-255"
