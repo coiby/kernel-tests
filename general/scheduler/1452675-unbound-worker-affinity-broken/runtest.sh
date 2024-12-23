@@ -26,9 +26,11 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
+
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
 
 trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1
 
@@ -76,7 +78,7 @@ rlJournalStart
 			reason+="(SocketNumber)"
 		fi
 		if [ -n "$reason" ]; then
-			report_result "Skipped$reason" PASS
+			rstrnt-report-result "Skipped$reason" PASS
 			rlPhaseEnd
 			rlJournalPrintText
 			exit 0

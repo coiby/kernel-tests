@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/scheduler/1452675-unbound-worker-affinity-broken
+owner=Chunyu Hu <chuhu@redhat.com>
+description=1452675 regression test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+dependencies=gcc;glibc
+softDependencies=
+repoRequires=
