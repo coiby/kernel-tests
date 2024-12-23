@@ -26,9 +26,11 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
 
 origin_nr_cpus=$(grep -c -w ^processor /proc/cpuinfo)
 
@@ -36,13 +38,13 @@ rlJournalStart
     rlPhaseStartTest
         if rlIsRHEL '8.4'; then
             echo "Known failure on RHEL 8.4 .. skip"
-            report_result "invalid_rhel_version" SKIP
+            rstrnt-report-result "invalid_rhel_version" SKIP
             exit 0
         fi
 
         if [ "$origin_nr_cpus" = 1 ]; then
             echo "Only 1 cpu available, can't offline.. skip"
-            report_result "nr_cpu_is_1" SKIP
+            rstrnt-report-result "nr_cpu_is_1" SKIP
             # rlPhaseEnd
             exit 0
         fi
@@ -50,7 +52,7 @@ rlJournalStart
         if ! [[ -w /sys/devices/system/cpu/cpu1/online \
             && -r /sys/devices/system/cpu/cpu1/online  ]] ; then
             echo "/sys/devices/system/cpu/cpu1/online is not writeable, skipping"
-            report_result "cpu1_not_writeable" SKIP
+            rstrnt-report-result "cpu1_not_writeable" SKIP
             exit 0
         fi
 
