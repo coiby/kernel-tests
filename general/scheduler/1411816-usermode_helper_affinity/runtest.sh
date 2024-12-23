@@ -26,10 +26,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
 . ../include/runtest.sh
 
 rlJournalStart
@@ -54,12 +54,12 @@ rlJournalStart
 
 	rlPhaseStartTest $phasename
 		! test -f /sys/devices/virtual/workqueue/cpumask && \
-			report_result "SKIPPED_UNSUPPORTED" && exit 0
+			rstrnt-report-result "SKIPPED_UNSUPPORTED" SKIP && exit 0
 		rlRun "echo 1 > /sys/devices/virtual/workqueue/cpumask"
 
 		mount | grep debugfs || mount -t debugfs d /sys/kernel/debug
 		! grep function /sys/kernel/debug/tracing/available_tracers && \
-			report_result "SKIPPED_UNSUPPORTED" && exit 0
+			rstrnt-report-result "SKIPPED_UNSUPPORTED" SKIP && exit 0
 
 		FILTER=/sys/kernel/debug/tracing/set_ftrace_filter
 		rlRun "echo $trace_func >  $FILTER"

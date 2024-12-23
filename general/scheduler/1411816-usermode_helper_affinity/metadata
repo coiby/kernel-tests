@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/scheduler/1411816-usermode_helper_affinity
+owner=Chunyu Hu <chuhu@redhat.com>
+description=user mode helper affinity test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+dependencies=gcc;glibc
+softDependencies=
+repoRequires=general/scheduler/include;general/include
