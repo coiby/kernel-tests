@@ -26,8 +26,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
+
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../include/runtest.sh
 
@@ -82,7 +84,7 @@ function nohz_check_commandline()
 	local grep_param=${nohz_params// / -e }
 	set -x
 	grubby --info DEFAULT
-	grubby --info DEFAULT | grep $grep_param && report_result nohz_cleanp FAIL
+	grubby --info DEFAULT | grep $grep_param && rstrnt-report-result nohz_cleanp FAIL
 	set +x
 }
 
@@ -98,7 +100,7 @@ rlJournalStart
 	elif ! test -f reboot_1423560; then
 		rlPhaseStartSetup
 			if ((nr_cpu < 2)) || ! uname -r | grep -Eq "x86_64|aarch64"; then
-				report_result "skip_cpu_${nr_cpu}" SKIP
+				rstrnt-report-result "skip_cpu_${nr_cpu}" SKIP
 				rlPhaseEnd
 				rlJournalEnd
 				exit 0
@@ -112,7 +114,7 @@ rlJournalStart
 				rlRun "grubby --args \"nohz=on isolcpus=$isolated_cpus nohz_full=$isolated_cpus rcu_nocbs=$isolated_cpus mce=ignore_ce nosoftlockup intel_idle.max_cstate=1 intel_pstate=disable\" --update-kernel DEFAULT"
 				rlRun "touch reboot_1423560"
 				grubby --info DEFAULT
-				rhts-reboot
+				rstrnt-reboot
 			fi
 
 			# this file won't exist when tuned is not installed, the
@@ -154,7 +156,7 @@ rlJournalStart
 			rlRun "tuned-adm profile realtime-virtual-host" 0-255 || rlDie "failed to start readltime-virtual-host"
 			rlRun "touch reboot_1423560"
 			grubby --info DEFAULT
-			rhts-reboot
+			rstrnt-reboot
 		rlPhaseEnd
 	else
 		rlPhaseStartSetup
@@ -171,10 +173,10 @@ rlJournalStart
 		rlPhaseStartTest
 			rlRun "grep nohz_full /proc/cmdline"
 			if [ $? -ne 0 ]; then
-				report_result "nohz_full_setup" FAIL
+				rstrnt-report-result "nohz_full_setup" FAIL
 				cleanup
 				rlRun "touch reboot_1423560_2"
-				rhts-reboot
+				rstrnt-reboot
 			fi
 			rlRun "taskset -pc 0-1 $$"
 			# It now needs 2 on each cpu.
@@ -200,7 +202,7 @@ rlJournalStart
 			fi
 
 			rlRun "touch reboot_1423560_2"
-			rhts-reboot
+			rstrnt-reboot
 		rlPhaseEnd
 	fi
 rlJournalEnd
