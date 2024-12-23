@@ -26,8 +26,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
+
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../include/runtest.sh
 
@@ -51,14 +53,14 @@ function test_setup()
 	test -f KERNEL_VR && return
 
 	if uname -r | grep 'debug$'; then
-		report_result "test debug kernel" SKIP
+		rstrnt-report-result "test debug kernel" SKIP
 		exit 0
 	fi
 
 	rlPhaseStartSetup "Setup Test"
 		rlLogInfo "Adding baseline: $BASELINE"
 		sh ../../include/scripts/wget-kernel.sh --nvr $BASELINE --arch $(uname -m) ||
-		report_result "download $BASELINE" "FAIL"
+		rstrnt-report-result "download $BASELINE" "FAIL"
 		# Firmware
 		rlIsRHEL 6 && sh ../include/scripts/wget-kernel.sh --nvr $BASELINE --arch $(uname -m) --fw
 		local kernel_vr=$(uname -r | grep -E .*el[0-9]+ -o)
@@ -188,13 +190,13 @@ rlJournalStart
 		test_main
 		# Reboot to baseline, to get the baseline result.
 		touch reboot_$(cat KERNEL_VR)
-		rhts-reboot
+		rstrnt-reboot
 	else
 		# Loadavg of the Test kernel.
 		test_main
 		# Reboot to baseline, to get the baseline result.
 		touch reboot_${BASELINE}
-		((AVG_DIFF)) && rhts-reboot
+		((AVG_DIFF)) && rstrnt-reboot
 	fi
 rlJournalEnd
 rlJournalPrintText
