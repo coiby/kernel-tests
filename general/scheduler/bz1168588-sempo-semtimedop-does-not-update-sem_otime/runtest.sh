@@ -17,7 +17,7 @@
 
 export OUTPUTFILE=/mnt/testarea/get_sem_otime.log
 if [ -e $OUTPUTFILE ]; then
-	rm -f $OUTPUTFILE
+    rm -f $OUTPUTFILE
 fi
 TEST=/kernel/general/scheduler/bz1168588-sempo-semtimedop-does-not-update-sem_otime
 RESULT=PASS

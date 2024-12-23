@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -63,11 +64,11 @@ function test_setup()
 		rstrnt-report-result "download $BASELINE" "FAIL"
 		# Firmware
 		rlIsRHEL 6 && sh ../include/scripts/wget-kernel.sh --nvr $BASELINE --arch $(uname -m) --fw
-		local kernel_vr=$(uname -r | grep -E .*el[0-9]+ -o)
+		local kernel_vr=$(uname -r | grep -E ".*el[0-9]+" -o)
 		[ -z "$kernel_vr" ] && kernel_vr=$(uname -r)
 		local rpm_name=$(ls kernel*${BASELINE}.$(uname -m).rpm)
 		local fw_rpm_name=$(ls kernel*${BASELINE}.$(uname -m).rpm)
-		[ -z "$rpm_name" -o -z "$fw_rpm_name" ] && rlDie "Can't install rpm since non-name!"
+		[ -z "$rpm_name" ] || [ -z "$fw_rpm_name" ] && rlDie "Can't install rpm since non-name!"
 		rlIsRHEL 6 && rpm -ivh $fw_rpm_name
 		# run the new kernel first.
 		rlRun "grubby --set-default /boot/vmlinuz-${BASELINE}.$(uname -m)"
@@ -93,7 +94,7 @@ function test()
 	rlPhaseStartTest "run-sleep 100us-10us"
 	rlLogInfo "Case2: life 100us(run)-10us(sleep) duration 1h"
 	rlLogInfo "Expect 63.5% more or less"
-	local logfile=$(uname -r)-${FUNCNAME}.100-10.loadavg
+	local logfile=$(uname -r)-${FUNCNAME[0]}.100-10.loadavg
 	for i in $(seq 1 $PROCESS_CNT); do
 		rlRun "./life 1000 10 &"
 	done
@@ -116,7 +117,7 @@ function testN()
 	rlLogInfo "CaseN: life ${THIS_RUN}us(run)-${THIS_SLEEP}us(sleep) duration 1h"
 	# Fix me. not sure how to calculate now.
 	rlLogInfo "Expect ?% more or less per cpu consumption"
-	local logfile=$(uname -r)-${FUNCNAME}.${THIS_RUN}-${THIS_SLEEP}.loadavg
+	local logfile=$(uname -r)-${FUNCNAME[0]}.${THIS_RUN}-${THIS_SLEEP}.loadavg
 	for i in $(seq 1 $PROCESS_CNT); do
 		rlRun "./life $THIS_RUN $THIS_SLEEP &"
 	done

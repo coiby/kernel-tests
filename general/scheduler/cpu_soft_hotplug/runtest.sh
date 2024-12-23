@@ -29,7 +29,7 @@
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
 if [ -z "$OUTPUTFILE" ]; then
-	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+    export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 fi
 
 origin_nr_cpus=$(cat /proc/cpuinfo | grep -w ^processor | wc -l)

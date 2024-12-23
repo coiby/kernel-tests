@@ -28,10 +28,9 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 if [ -z "$OUTPUTFILE" ]; then
-	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+    export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 fi
 
-PACKAGE="sched_psi"
 #python
 if rlIsRHEL ">=8"; then
     PYTHON="/usr/libexec/platform-python"
@@ -137,13 +136,13 @@ rlJournalStart
     grep CONFIG_PSI=y /boot/config-$(uname -r) && support=1 || support=0
     status=$(cat status)
 
-    if [ $support -eq 1 -a $status -eq 0 ]; then
+    if [ $support -eq 1 ] && [ $status -eq 0 ]; then
         rlLogInfo "Set PSI"
         rlRun "grubby --args='psi=1 cgroup_no_v1=all' --update-kernel=$DEFAULT_KERNEL" 0 "Add kernel boot options: psi=1, cgroup_no_v1=all"
         s390_zipl
         echo 1 > status
         rlRun "rstrnt-reboot" 0 "Reboot"
-    elif [ $support -eq 1 -a $status -eq 1 ]; then
+    elif [ $support -eq 1 ] && [ $status -eq 1 ]; then
         rpm -q gcc || yum install -y gcc
         rlAssertGrep 'psi=1' /proc/cmdline || rlDie "no psi=1 in cmdline..."
         rlLogInfo "PSI Enabled"
@@ -157,7 +156,7 @@ rlJournalStart
         Trigger
         echo 2 > status
         rlRun "rstrnt-reboot" 0 "Reboot"
-    elif [ $support -eq 1 -a $status -eq 2 ]; then
+    elif [ $support -eq 1 ] && [ $status -eq 2 ]; then
         rlLogInfo "Clean up started"
         rlRun "grubby --remove-args='psi=1 cgroup_no_v1=all' --update-kernel=$DEFAULT_KERNEL" 0 "Remove kernel boot options: psi=1, cgroup_no_v1=all"
         s390_zipl
@@ -165,7 +164,7 @@ rlJournalStart
         rlLogInfo "Clean up Finished"
         echo 3 > status
         rlRun "rstrnt-reboot" 0 "Reboot to clean cgroup"
-    elif [ $support -eq 1 -a $status -eq 3 ]; then
+    elif [ $support -eq 1 ] && [ $status -eq 3 ]; then
         rlReport "PSI test finised." "PASS"
     elif [ $support -eq 0 ]; then
         rlReport "PSI not available." "PASS"

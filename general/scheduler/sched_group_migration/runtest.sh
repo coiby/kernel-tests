@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1090
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -42,7 +43,6 @@ KILL_NAMES=""
 
 function test_setup()
 {
-	local pname
 	dump_cgroup_info $$
 }
 

@@ -35,9 +35,6 @@ fi
 export TEST=/kernel/general/scheduler/1388158-panic-by-use-freed-autogroup
 trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1
 
-tracing_dir=/sys/kernel/debug/tracing
-nr_cpu=$(cat /proc/cpuinfo | grep -w ^processor | wc -l)
-max=$((nr_cpu - 1))
 
 rlJournalStart
 	rlPhaseStartSetup

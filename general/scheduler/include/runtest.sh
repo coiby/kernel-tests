@@ -33,7 +33,7 @@ declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 if [ -z "$OUTPUTFILE" ]; then
-	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+    export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 fi
 
 SCHED_PROCESS_SRC=../include/processes
@@ -1178,9 +1178,9 @@ function ignore_falsepositive_knownissues()
         local os=$(awk -F= '/^ID=/ {gsub("\"","",$2);print $2}' /etc/os-release)
         local major=$(awk -F= '/^VERSION_ID=/ {gsub("\"","",$2);split($2,a,".");print a[1]}' /etc/os-release)
 
-        if [ "$os$major" = "rhel9" -o "$os$major" = "ceontos9" ]; then
+        if [ "$os$major" = "rhel9" ] || [ "$os$major" = "ceontos9" ]; then
                 list_names="falsepositives_rhel9 known_issues_rhel9"
-        elif [ "$os$major" = "rhel8" -o "$os$major" = "ceontos8" ]; then
+        elif [ "$os$major" = "rhel8" ] || [ "$os$major" = "ceontos8" ]; then
                 list_names="falsepositives_rhel8 known_issues_rhel8"
         fi
 
