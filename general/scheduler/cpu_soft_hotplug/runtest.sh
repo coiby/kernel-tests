@@ -26,10 +26,11 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
 
 origin_nr_cpus=$(cat /proc/cpuinfo | grep -w ^processor | wc -l)
 last_cpu=$((origin_nr_cpus - 1))
@@ -70,7 +71,7 @@ rlJournalStart
                 rlRun "numactl -H"
                 if [ "$origin_nr_cpus" = 1 ]; then
                         echo "Only 1 cpu available, can't offline.. skip"
-                        report_result "nr_cpu_is_1" SKIP
+                        rstrnt-report-result "nr_cpu_is_1" SKIP
                         rlPhaseEnd
                         exit 0
                 fi
@@ -81,7 +82,7 @@ rlJournalStart
                 if ! [[ -w /sys/devices/system/cpu/cpu1/online \
                     && -r /sys/devices/system/cpu/cpu1/online  ]] ; then
                         echo "/sys/devices/system/cpu/cpu1/online is not writeable, skipping"
-                        report_result "cpu1_not_writeable" SKIP
+                        rstrnt-report-result "cpu1_not_writeable" SKIP
                         exit 0
                 fi
         rlPhaseEnd
