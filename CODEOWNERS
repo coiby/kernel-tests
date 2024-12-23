@@ -6,12 +6,16 @@
 
 [tests]
 /filesystems/xfs/xfs-repair-dryrun/ @jbastianrh
+/firmware/linux-firmware/ @ltrivell
 /general/crc32c-self-check/ @jbastianrh
 /general/time/elapsed/ @jbastianrh
 /hw-enablement/amd-ccp/ @jbastianrh
+/ipmi/ @ltrivell
+/lm_sensors/ @ltrivell
 /microcode/sanity/ @jbastianrh
 /misc/record-microcode/ @jbastianrh
 /misc/record-proc-interrupts/ @jbastianrh
+/networking/wireless/ @ltrivell
 /security/rdrand/ @jbastianrh
 
 [Kdump]
