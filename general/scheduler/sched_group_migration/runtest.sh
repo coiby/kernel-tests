@@ -26,11 +26,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
+
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../include/runtest.sh
-. ./lib.sh
 
 # run time for each sub test in tests/type/bug
 RUN_TIME=${RUN_TIME:-120}
