@@ -31,9 +31,8 @@ auto_include=../../../automotive/include/rhivos.sh
 [ -f $auto_include ] && . $auto_include
 declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 
-if ! (($is_rhivos)); then
-	# Include rhts environment
-	. /usr/bin/rhts-environment.sh || exit 1
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 fi
 
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
