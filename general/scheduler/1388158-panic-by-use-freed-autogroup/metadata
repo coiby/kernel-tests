@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/scheduler/1388158-panic-by-use-freed-autogroup
+owner=Chunyu Hu <chuhu@redhat.com>
+description=sched cpu autogroup free panic test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=gcc;glibc
+softDependencies=
+repoRequires=

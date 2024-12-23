@@ -26,10 +26,13 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
+
+export TEST=/kernel/general/scheduler/1388158-panic-by-use-freed-autogroup
 trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1
 
 tracing_dir=/sys/kernel/debug/tracing
