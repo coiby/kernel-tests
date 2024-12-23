@@ -27,8 +27,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
+if [ -z "$OUTPUTFILE" ]; then
+	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
+fi
+
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../include/runtest.sh
 
@@ -63,12 +65,12 @@ function run_sub_tests()
 		for reg in ${sub_dirs2}; do
 			if [ -n "$SKIP_CASE" ] && echo "$SKIP_CASE" | grep "$reg"; then
 				echo "SKIP test $t-$reg"
-				report_result "${t}-${reg}" SKIP
+				rstrnt-report-result "${t}-${reg}" SKIP
 				continue
 			fi
 			if [ -n "$CASE_LIST" ] && ! echo "$CASE_LIST" | grep -q "$reg"; then
 				echo "SKIP test $t-$reg"
-				report_result "${t}-${reg}" SKIP
+				rstrnt-report-result "${t}-${reg}" SKIP
 				continue
 			fi
 			pushd "$reg"
@@ -95,7 +97,7 @@ function nohz_check_commandline()
 	local grep_param=${nohz_params// / -e }
 	set -x
 	cat /proc/cmdline
-	grubby --info DEFAULT | grep "$grep_param" && report_result nohz_cleanp FAIL
+	grubby --info DEFAULT | grep "$grep_param" && rstrnt-report-result nohz_cleanp FAIL
 	set +x
 }
 
@@ -219,7 +221,7 @@ rlJournalStart
 		rlPhaseStartSetup
 			rlRun -l "lscpu"
 			if ((nr_cpu < 2)) || ! uname -r | grep -q x86_64; then
-				report_result "skip_cpu_$nr_cpu" SKIP
+				rstrnt-report-result "skip_cpu_$nr_cpu" SKIP
 				rlPhaseEnd
 				rlJournalEnd
 				exit 0
@@ -252,7 +254,7 @@ rlJournalStart
 			rlRun "systemctl restart tuned"
 			rlRun "touch reboot_1392539"
 			grubby --info DEFAULT
-			rhts-reboot
+			rstrnt-reboot
 		rlPhaseEnd
 		rlPhaseStartCleanup
 		rlPhaseEnd
@@ -260,7 +262,7 @@ rlJournalStart
 		rlPhaseStartSetup
 			rlRun -l "lscpu"
 			if ((nr_cpu < 2)); then
-				report_result "skip_cpu_$(nr_cpu)" SKIP
+				rstrnt-report-result "skip_cpu_$(nr_cpu)" SKIP
 				rlPhaseEnd
 				rlJournalEnd
 				exit 0
@@ -307,7 +309,7 @@ rlJournalStart
 			nohz_check_commandline
 			grubby --info DEFAULT
 			test -f $save_cfg_file && rm -f $save_cfg_file
-			rhts-reboot
+			rstrnt-reboot
 		rlPhaseEnd
 	fi
 rlJournalEnd
