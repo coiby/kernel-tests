@@ -1,0 +1,5 @@
+summary: linux-firmware sanity test
+contact: Laura Trivelloni <ltrivell@redhat.com>
+test: bash ./runtest.sh
+duration: 10m
+framework: beakerlib
