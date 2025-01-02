@@ -44,7 +44,7 @@ rlPhaseStartSetup
     rlRun "sysctl -w net.sctp.auth_enable=1" 0
     rlRun "sysctl -w net.sctp.addip_enable=1" 0
     rlRun "bash ./make_register_tests.sh test_cases.c test_sctp_sockopts.c" 0
-    rlRun "gcc -I ./lib -o api_tests ./lib/sctp_utilities.c test_sctp_sockopts.c test_cases.c api_tests.c -lsctp" 0
+    rlRun "gcc -std=gnu89 -I ./lib -o api_tests ./lib/sctp_utilities.c test_sctp_sockopts.c test_cases.c api_tests.c -lsctp" 0
 rlPhaseEnd
 
 ##################### Start Test #################################
