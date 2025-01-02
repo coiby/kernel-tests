@@ -70,7 +70,9 @@ rlJournalStart
 		reason=""
 		rlRun "yum -y install tuna" || reason="(tuna)"
 		# Only x86_64 have this
-		rlRun "yum -y install rt-tests" 0-255 || reason+="(rt-tests)"
+		tst=rt-tests
+		rlIsRHEL ">=9" && tst=realtime-tests
+		rlRun "yum -y install $tst" 0-255 || reason+="(rt-tests)"
 		mount | grep debug || mount -t debugfs dd /sys/kernel/debug
 		rlRun "nr_sockets=$(lscpu |  awk '/Socket/ {print $2}')"  0-255
 		# shellcheck disable=SC2154
