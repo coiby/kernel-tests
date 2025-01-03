@@ -39,8 +39,6 @@ this_arch=$(uname -m)
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "unset ARCH"
-
         installer=$(K_GetPkgMgr)
         if [[ ${installer} == "rpm-ostree" ]]; then
             export install_opts="-A -y --idempotent --allow-inactive install"
@@ -61,7 +59,8 @@ rlJournalStart
         popd || exit 1
         if ! which stress-ng > /dev/null; then
             rlRun "pushd ../../include/scripts/"
-            rlRun "sh stress.sh; popd"
+            rlRun "sh stress.sh"
+            rlRun "popd"
         fi
     rlPhaseEnd
 
