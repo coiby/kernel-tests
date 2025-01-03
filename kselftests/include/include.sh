@@ -7,7 +7,7 @@ TEST="kselftests"
 if [ ! "$RSTRNT_JOBID" ]; then
 	RED='\E[1;31m'
 	GRN='\E[1;32m'
-	YEL='\E[1;33m'
+	# YEL='\E[1;33m'
 	RES='\E[0m'
 fi
 
