@@ -77,7 +77,7 @@ log()
 submit_log()
 {
 	for file in "$@"; do
-		[ "$RSTRNT_JOBID" ] && rstrnt-report-log -l $file || echo $file
+		rlFileSubmit $file
 	done
 }
 
