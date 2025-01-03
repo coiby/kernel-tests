@@ -86,13 +86,9 @@ test_pass()
 	let PASS++
 	SCORE=${2:-$PASS}
 	echo -e "\n:: [  PASS  ] :: Test '$1'" >> $OUTPUTFILE
-	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "PASS" "$SCORE"
-	else
-		echo -e "::::::::::::::::"
-		rlPass "Test '${TEST}/$1' PASS $SCORE"
-		echo -e "::::::::::::::::\n"
-	fi
+	echo -e "::::::::::::::::"
+	rlPass "Test '${TEST}/$1' PASS $SCORE"
+	echo -e "::::::::::::::::\n"
 }
 
 test_fail()
@@ -100,13 +96,9 @@ test_fail()
 	let FAIL++
 	SCORE=${2:-$FAIL}
 	echo -e ":: [  FAIL  ] :: Test '$1'" >> $OUTPUTFILE
-	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "FAIL" "$SCORE"
-	else
-		echo -e ":::::::::::::::::"
-		rlFail "Test '${TEST}/$1' FAIL $SCORE"
-		echo -e ":::::::::::::::::\n"
-	fi
+	echo -e ":::::::::::::::::"
+	rlFail "Test '${TEST}/$1' FAIL $SCORE"
+	echo -e ":::::::::::::::::\n"
 }
 
 test_warn()
@@ -114,13 +106,9 @@ test_warn()
 	let WARN++
 	SCORE=${2:-$WARN}
 	echo -e "\n:: [  WARN  ] :: Test '$1'" | tee -a $OUTPUTFILE
-	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "WARN" "$SCORE"
-	else
-		echo -e "\n:::::::::::::::::"
-		rlPass  "Test '${TEST}/$1' WARN $SCORE"
-		echo -e ":::::::::::::::::\n"
-	fi
+	echo -e "\n:::::::::::::::::"
+	rlFail  "Test '${TEST}/$1' WARN $SCORE"
+	echo -e ":::::::::::::::::\n"
 }
 
 test_skip()
@@ -128,13 +116,9 @@ test_skip()
 	let SKIP++
 	SCORE=${2:-$SKIP}
 	echo -e "\n:: [  SKIP  ] :: Test '$1'" | tee -a $OUTPUTFILE
-	if [ $RSTRNT_JOBID ]; then
-		rstrnt-report-result "${TEST}/$1" "SKIP" "$SCORE"
-	else
-		echo -e "\n:::::::::::::::::"
-		rlPass "Test '${TEST}/$1' SKIP $SCORE"
-		echo -e ":::::::::::::::::\n"
-	fi
+	echo -e "\n:::::::::::::::::"
+	rlLog "Test '${TEST}/$1' SKIP $SCORE"
+	echo -e ":::::::::::::::::\n"
 }
 
 test_pass_exit()
