@@ -27,10 +27,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if [ -z "$OUTPUTFILE" ]; then
-	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
-fi
-
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../include/runtest.sh
 

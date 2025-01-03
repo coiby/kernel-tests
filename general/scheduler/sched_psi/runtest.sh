@@ -27,10 +27,6 @@
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-if [ -z "$OUTPUTFILE" ]; then
-    export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
-fi
-
 #python
 if rlIsRHEL ">=8"; then
     PYTHON="/usr/libexec/platform-python"

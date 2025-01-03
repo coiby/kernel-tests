@@ -32,10 +32,6 @@ declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-if [ -z "$OUTPUTFILE" ]; then
-    export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
-fi
-
 SCHED_PROCESS_SRC=../include/processes
 SCHED_PROCESS_BIN=$(pwd)/tasks
 export SCHED_NR_CPU=$(grep -wo processor /proc/cpuinfo | wc -l)

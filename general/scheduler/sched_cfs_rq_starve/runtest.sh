@@ -31,10 +31,6 @@
 auto_include=../../../automotive/include/rhivos.sh
 [ -f $auto_include ] && . $auto_include
 
-if [ -z "$OUTPUTFILE" ]; then
-	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
-fi
-
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../include/runtest.sh || exit 1
 

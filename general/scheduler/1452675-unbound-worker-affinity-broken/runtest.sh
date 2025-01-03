@@ -28,10 +28,6 @@
 
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
-if [ -z "$OUTPUTFILE" ]; then
-	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
-fi
-
 trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1
 
 tracing_dir=/sys/kernel/debug/tracing

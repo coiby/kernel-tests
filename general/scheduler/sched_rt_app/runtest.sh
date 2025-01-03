@@ -27,10 +27,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if [ -z "$OUTPUTFILE" ]; then
-	export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
-fi
-
 # Enable TMT testing for RHIVOS
 auto_include=../../../automotive/include/rhivos.sh
 [ -f $auto_include ] && . $auto_include
