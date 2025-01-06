@@ -237,6 +237,8 @@ function RunKSelfTest()
     pushd $EXEC_DIR/${test_folder}
     ./${test_case} ${TEST_PARAM[${testscript}]} |& tee $OUTPUTFILE
     ret=${PIPESTATUS[0]}
+    # use rlLog instead of `rlRun -l` to avoid the 50 lines limit
+    rlLog "$(cat "${OUTPUTFILE}")"
     popd
 
     return $ret
@@ -280,6 +282,8 @@ function RunTest ()
     for item in $TEST_ITEMS; do
         # Check if test exist before do config and run
         if ! check_test_exist "$item"; then
+            # Use Setup phase so failures are reported as error
+            rlPhaseStartSetup "check_test_exist_${item}"
             # When CKI does build a kernel, it can happen that for some problem
             # it fails to build kselftests module, CKI will continue and try to
             # run all the tests it was planned to run.
@@ -291,6 +295,7 @@ function RunTest ()
             else
                 test_warn "$item test not found in kselftest-list.txt"
             fi
+            rlPhaseEnd
             continue
         fi
 
@@ -319,10 +324,13 @@ function RunTest ()
             num=0
             # Run self-tests
             for t in ${TARGETS}; do
+                # report results as a subphase
+                rlPhaseStartTest "${num}..${total_num} selftests: ${t}"
                 num=$(($num + 1))
                 RunKSelfTest ${t}
                 ret=$?
                 check_result $num $total_num ${t} $ret
+                rlPhaseEnd
             done
         fi
 
