@@ -1,14 +1,14 @@
 [General]
-name=kernel/general/scheduler/cpu_soft_hotplug
+name=/kernel/general/scheduler/sched_load_avg
 owner=Chunyu Hu <chuhu@redhat.com>
-description=excercise scheduler by online offline cpus operations
+description=sched load avg check
 license=GPLv3
 confidential=no
 destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-max_time=1h
-dependencies=gcc;libgcc;glibc-devel;psmisc;numactl
+max_time=720m
+dependencies=gcc;glibc
 softDependencies=
 repoRequires=general/include;general/scheduler/include

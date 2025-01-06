@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -26,8 +27,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../include/runtest.sh
 
@@ -51,21 +50,21 @@ function test_setup()
 	test -f KERNEL_VR && return
 
 	if uname -r | grep 'debug$'; then
-		report_result "test debug kernel" SKIP
+		rstrnt-report-result "test debug kernel" SKIP
 		exit 0
 	fi
 
 	rlPhaseStartSetup "Setup Test"
 		rlLogInfo "Adding baseline: $BASELINE"
 		sh ../../include/scripts/wget-kernel.sh --nvr $BASELINE --arch $(uname -m) ||
-		report_result "download $BASELINE" "FAIL"
+		rstrnt-report-result "download $BASELINE" "FAIL"
 		# Firmware
 		rlIsRHEL 6 && sh ../include/scripts/wget-kernel.sh --nvr $BASELINE --arch $(uname -m) --fw
-		local kernel_vr=$(uname -r | grep -E .*el[0-9]+ -o)
+		local kernel_vr=$(uname -r | grep -E ".*el[0-9]+" -o)
 		[ -z "$kernel_vr" ] && kernel_vr=$(uname -r)
 		local rpm_name=$(ls kernel*${BASELINE}.$(uname -m).rpm)
 		local fw_rpm_name=$(ls kernel*${BASELINE}.$(uname -m).rpm)
-		[ -z "$rpm_name" -o -z "$fw_rpm_name" ] && rlDie "Can't install rpm since non-name!"
+		[ -z "$rpm_name" ] || [ -z "$fw_rpm_name" ] && rlDie "Can't install rpm since non-name!"
 		rlIsRHEL 6 && rpm -ivh $fw_rpm_name
 		# run the new kernel first.
 		rlRun "grubby --set-default /boot/vmlinuz-${BASELINE}.$(uname -m)"
@@ -91,7 +90,7 @@ function test()
 	rlPhaseStartTest "run-sleep 100us-10us"
 	rlLogInfo "Case2: life 100us(run)-10us(sleep) duration 1h"
 	rlLogInfo "Expect 63.5% more or less"
-	local logfile=$(uname -r)-${FUNCNAME}.100-10.loadavg
+	local logfile=$(uname -r)-${FUNCNAME[0]}.100-10.loadavg
 	for i in $(seq 1 $PROCESS_CNT); do
 		rlRun "./life 1000 10 &"
 	done
@@ -114,7 +113,7 @@ function testN()
 	rlLogInfo "CaseN: life ${THIS_RUN}us(run)-${THIS_SLEEP}us(sleep) duration 1h"
 	# Fix me. not sure how to calculate now.
 	rlLogInfo "Expect ?% more or less per cpu consumption"
-	local logfile=$(uname -r)-${FUNCNAME}.${THIS_RUN}-${THIS_SLEEP}.loadavg
+	local logfile=$(uname -r)-${FUNCNAME[0]}.${THIS_RUN}-${THIS_SLEEP}.loadavg
 	for i in $(seq 1 $PROCESS_CNT); do
 		rlRun "./life $THIS_RUN $THIS_SLEEP &"
 	done
@@ -188,13 +187,13 @@ rlJournalStart
 		test_main
 		# Reboot to baseline, to get the baseline result.
 		touch reboot_$(cat KERNEL_VR)
-		rhts-reboot
+		rstrnt-reboot
 	else
 		# Loadavg of the Test kernel.
 		test_main
 		# Reboot to baseline, to get the baseline result.
 		touch reboot_${BASELINE}
-		((AVG_DIFF)) && rhts-reboot
+		((AVG_DIFF)) && rstrnt-reboot
 	fi
 rlJournalEnd
 rlJournalPrintText

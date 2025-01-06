@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/scheduler/nl_process_stats
+owner=Chunyu Hu <chuhu@redhat.com>
+description=through netlink interface to get taskstats
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+dependencies=gcc;glibc
+softDependencies=
+repoRequires=general/scheduler/include

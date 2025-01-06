@@ -26,7 +26,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
 trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1

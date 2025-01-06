@@ -30,9 +30,6 @@
 export is_rhivos=0
 declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
 
-if ! (($is_rhivos)); then
-        . /usr/bin/rhts-environment.sh || exit 1
-fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 SCHED_PROCESS_SRC=../include/processes
@@ -69,7 +66,7 @@ function _wget_compile_stress()
         fi
 
         if [ ! "$SKIP_DOWNLOAD" = 1 ]; then
-                wget $STRESS_SRPM || { report_result "wget_stress" FAIL; rlDie "wget stress"; }
+                wget $STRESS_SRPM || { rstrnt-report-result "wget_stress" FAIL; rlDie "wget stress"; }
         fi
         rpm -ivh stress-0.18.8-1.4.el7.src.rpm
         rpm -q yum-utils || yum -y install yum-utils
@@ -83,10 +80,10 @@ function _wget_compile_stress()
                 rpmbuild -bi /root/rpmbuild/SPECS/stress.spec
         fi
         if [ ! -f $SCHED_STRESS_PATH/stress ]; then
-                report_result "compile_stress" FAIL
+                rstrnt-report-result "compile_stress" FAIL
                 return
         fi
-        report_result "compile_stress" PASS
+        rstrnt-report-result "compile_stress" PASS
 }
 
 function source_compile()
@@ -115,7 +112,7 @@ function load_avg_sum()
         echo $avg_15 > avg_15_$(uname -r)
 
         local nr_cpus=$(nproc)
-        report_result "cpu${nr_cpus}:loadavg:$avg_1_5_15"
+        rstrnt-report-result "cpu${nr_cpus}:loadavg:$avg_1_5_15"
 }
 
 function print_system_info()
@@ -1177,9 +1174,9 @@ function ignore_falsepositive_knownissues()
         local os=$(awk -F= '/^ID=/ {gsub("\"","",$2);print $2}' /etc/os-release)
         local major=$(awk -F= '/^VERSION_ID=/ {gsub("\"","",$2);split($2,a,".");print a[1]}' /etc/os-release)
 
-        if [ "$os$major" = "rhel9" -o "$os$major" = "ceontos9" ]; then
+        if [ "$os$major" = "rhel9" ] || [ "$os$major" = "ceontos9" ]; then
                 list_names="falsepositives_rhel9 known_issues_rhel9"
-        elif [ "$os$major" = "rhel8" -o "$os$major" = "ceontos8" ]; then
+        elif [ "$os$major" = "rhel8" ] || [ "$os$major" = "ceontos8" ]; then
                 list_names="falsepositives_rhel8 known_issues_rhel8"
         fi
 

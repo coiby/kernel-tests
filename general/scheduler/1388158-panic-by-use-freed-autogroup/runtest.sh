@@ -26,15 +26,11 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
+export TEST=/kernel/general/scheduler/1388158-panic-by-use-freed-autogroup
 trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1
 
-tracing_dir=/sys/kernel/debug/tracing
-nr_cpu=$(cat /proc/cpuinfo | grep -w ^processor | wc -l)
-max=$((nr_cpu - 1))
 
 rlJournalStart
 	rlPhaseStartSetup

@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=bash ./runtest.sh
 dependencies=gcc;glibc;wget;bc
 softDependencies=json-c-devel
 repoRequires=general/include;general/scheduler/include

@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of regression
+#   Makefile of sched_load_avg
 #	Description: check the loadavg value. And compare with the baseline.
 #   Author: Chunyu Hu <cye@redhat.com>
 #
@@ -24,31 +24,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TENV=_env
-ifeq ($(PKG_TOP_DIR),)
-	export PKG_TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -e $$p/env.mk -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	export _TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -d $$p/.git -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	-include $(PKG_TOP_DIR)/env.mk
-endif
-include $(TENV)
-ifeq ($(_TOP_DIR),)
-	_TOP_DIR=/mnt/tests/$(TOPLEVEL_NAMESPACE)
-endif
-
-export TESTVERSION=1.0
-
 BUILT_FILES=
 
-FILES=$(TENV) $(METADATA) runtest.sh Makefile PURPOSE
-
-.PHONY: all install download clean
-
-run: $(FILES) build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
-		. runtest.sh )
+run: build
+	./runtest.sh
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
@@ -57,26 +36,4 @@ clean:
 	rm -fr *~ $(BUILT_FILES) tmp.* RS_*\.[0-9]* debug *.loadavg
 	-rm -fr life cpu_hog tasks
 	-killall life cpu_hog
-
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Chunyu Hu <chuhu@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     "Scheduler Loadavg statistics test >> $(METADATA)
-	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        720h" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel" >> $(METADATA)
-	@echo "Requires:        sysstat perf trace-cmd" >> $(METADATA)
-	@echo "RhtsRequires:    kernel-kernel-general-scheduler-include" >> $(METADATA)
-	@echo "RhtsRequires:    kernel-kernel-general-include" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	rhts-lint $(METADATA)
 

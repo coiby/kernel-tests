@@ -15,11 +15,11 @@
 #
 # Author: Li Wang <liwang@redhat.com>
 
-OUTPUTFILE=get_sem_otime.log
+export OUTPUTFILE=/mnt/testarea/get_sem_otime.log
 if [ -e $OUTPUTFILE ]; then
-        rm -f $OUTPUTFILE
+    rm -f $OUTPUTFILE
 fi
-
+TEST=/kernel/general/scheduler/bz1168588-sempo-semtimedop-does-not-update-sem_otime
 RESULT=PASS
 SEMID=
 GET_SEM_OTIMES=
@@ -76,7 +76,5 @@ set -x
 ipcrm -s "$SEMID"
 set +x
 
-. /usr/bin/rhts_environment.sh
-
-report_result "$TEST" $RESULT
-rhts-submit-log -l "${OUTPUTFILE}"
+rstrnt-report-result $TEST $RESULT
+rstrnt-report-log -l ${OUTPUTFILE}

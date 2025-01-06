@@ -25,11 +25,8 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-PACKAGE="sched_psi"
 #python
 if rlIsRHEL ">=8"; then
     PYTHON="/usr/libexec/platform-python"
@@ -135,13 +132,13 @@ rlJournalStart
     grep CONFIG_PSI=y /boot/config-$(uname -r) && support=1 || support=0
     status=$(cat status)
 
-    if [ $support -eq 1 -a $status -eq 0 ]; then
+    if [ $support -eq 1 ] && [ $status -eq 0 ]; then
         rlLogInfo "Set PSI"
         rlRun "grubby --args='psi=1 cgroup_no_v1=all' --update-kernel=$DEFAULT_KERNEL" 0 "Add kernel boot options: psi=1, cgroup_no_v1=all"
         s390_zipl
         echo 1 > status
-        rlRun "rhts-reboot" 0 "Reboot"
-    elif [ $support -eq 1 -a $status -eq 1 ]; then
+        rlRun "rstrnt-reboot" 0 "Reboot"
+    elif [ $support -eq 1 ] && [ $status -eq 1 ]; then
         rpm -q gcc || yum install -y gcc
         rlAssertGrep 'psi=1' /proc/cmdline || rlDie "no psi=1 in cmdline..."
         rlLogInfo "PSI Enabled"
@@ -154,16 +151,16 @@ rlJournalStart
         cg2_parallel
         Trigger
         echo 2 > status
-        rlRun "rhts-reboot" 0 "Reboot"
-    elif [ $support -eq 1 -a $status -eq 2 ]; then
+        rlRun "rstrnt-reboot" 0 "Reboot"
+    elif [ $support -eq 1 ] && [ $status -eq 2 ]; then
         rlLogInfo "Clean up started"
         rlRun "grubby --remove-args='psi=1 cgroup_no_v1=all' --update-kernel=$DEFAULT_KERNEL" 0 "Remove kernel boot options: psi=1, cgroup_no_v1=all"
         s390_zipl
         rlRun "rm -rf /mnt/cgroup2/" 0 "remove mount point"
         rlLogInfo "Clean up Finished"
         echo 3 > status
-        rlRun "rhts-reboot" 0 "Reboot to clean cgroup"
-    elif [ $support -eq 1 -a $status -eq 3 ]; then
+        rlRun "rstrnt-reboot" 0 "Reboot to clean cgroup"
+    elif [ $support -eq 1 ] && [ $status -eq 3 ]; then
         rlReport "PSI test finised." "PASS"
     elif [ $support -eq 0 ]; then
         rlReport "PSI not available." "PASS"

@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1090
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -30,12 +31,8 @@
 auto_include=../../../automotive/include/rhivos.sh
 [ -f $auto_include ] && . $auto_include
 declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-declare -F check_result && report_func=check_result || report_func=report_result
+declare -F check_result && report_func=check_result || report_func=rstrnt-report-result
 
-# Include rhts environment
-if ! (($is_rhivos)); then
-	. /usr/bin/rhts-environment.sh || exit 1
-fi
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../../include/lib.sh
 . ../include/runtest.sh || exit 1
@@ -105,7 +102,6 @@ function setup_rt_cgroup_bw()
 	local rt_period_current=$(cgroup_get $group_dir cpu cpu.rt_period_us)
 	# in us unit
 	local rt_period_target=${2:-$rt_period_current}
-	local rt_runtime_current=$(cgroup_get $group_dir cpu cpu.rt_runtime_us)
 	local rt_runtime_target=$(echo $rt_period_target \* $bandwidth_one_cpu | bc | cut -d. -f1)
 
 	# If we don't support rt group schedule, don't setup to get false positive.
@@ -116,17 +112,17 @@ function setup_rt_cgroup_bw()
 		return 1
 	fi
 
-	echo "${FUNCNAME}: before set: checking cgroup hierachy"
+	echo "${FUNCNAME[0]}: before set: checking cgroup hierachy"
 	systemd-cgls | tee cgroups.txt
-	echo "${FUNCNAME}: before set: checking cgroup hierachy end ."
+	echo "${FUNCNAME[0]}: before set: checking cgroup hierachy end ."
 
 	rlRun "cgroup_get $group_dir cpu" -l 0 "current rt cgroup config"
 	rlRun "cgroup_set $group_dir cpu cpu.rt_period_us=$rt_period_target cpu.rt_runtime_us=$rt_runtime_target" -l 0 "set period/runtime"
 	rlRun "cgroup_get $group_dir cpu cpu.rt_runtime_us,cpu.rt_period_us 1" -l 0 "new runtime"
 
-	echo "${FUNCNAME} after set: checking cgroup hierachy"
+	echo "${FUNCNAME[0]} after set: checking cgroup hierachy"
 	systemd-cgls | tee cgroups.txt
-	echo "${FUNCNAME} after set: checking cgroup hierachy end ."
+	echo "${FUNCNAME[0]} after set: checking cgroup hierachy end ."
 
 	local rt_runtime_new=$(cgroup_get $group_dir cpu cpu.rt_runtime_us)
 	if [ "$rt_runtime_new" != "$rt_runtime_target" ]; then
@@ -286,7 +282,7 @@ function calc_sched_rt_bw()
 	local interval=3
 	# unexpected thread appeared in statistics, caused by incomplete cleanups.
 	# this is for debug as cpu usage is higher than shown with the intended policy/command.
-	local wild=""
+	# local wild=""
 
 	match=0
 	old_match=0
@@ -301,7 +297,7 @@ function calc_sched_rt_bw()
 		if ((match > old_match)); then
 			if [ $((i % 10)) = 1 ]; then
 				rlLogInfo "checking policy ($policy) for $comm ..."
-				rlRun "ps -L -C "$comm" -o pid,pcpu,tid,cls,comm | egrep '$policy'" 0-255
+				rlRun "ps -L -C $comm -o pid,pcpu,tid,cls,comm | egrep '$policy'" 0-255
 			fi
 			pcpu_new=$(ps -L -C "$comm" -o pid,pcpu,cls,args  | awk 'BEGIN{a=0.0}/'$policy'/{a=a+$2}END{printf "%0.2f", a}')
 			echo pcpu_new $pcpu_new
@@ -319,7 +315,7 @@ function calc_sched_rt_bw()
 # check bandwidth
 function check_sched_rt_bw()
 {
-	if [ "$match" = "" -o "$match" = "0" ]; then
+	if [ "$match" = "" ] || [ "$match" = "0" ]; then
 		rlFail "bandwidth check failed (no matched policy)"
 		return 1;
 	fi
@@ -446,7 +442,6 @@ function test_sched_fifo()
 
 function test_sched_rt()
 {
-	local tgt_cpu=$((SCHED_NR_CPU - 1))
 	pid=
 	match=0
 	old_match=0
@@ -459,7 +454,7 @@ function test_sched_rt()
 		test_sched_fifo
 	else
 
-		uname -r | grep -q s390x && rlLogInfo "Skip test ${FUNCNAME} on s390x ..." && return
+		uname -r | grep -q s390x && rlLogInfo "Skip test ${FUNCNAME[0]} on s390x ..." && return
 	fi
 	restore_runtime_share
 }
@@ -467,7 +462,7 @@ function test_sched_rt()
 # Run test with RUN_TIME_SHARE enabled.
 function test_rt_runtime_share()
 {
-	uname -r | grep -q s390x && rlLogInfo "Skip test ${FUNCNAME} on s390x ..." && return
+	uname -r | grep -q s390x && rlLogInfo "Skip test ${FUNCNAME[0]} on s390x ..." && return
 
 	if [ "$CGROUP_VERSION" = 2 ]; then
 		$report_func "rt_runtime_not_support" SKIP

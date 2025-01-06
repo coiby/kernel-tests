@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/scheduler/bz1168588-sempo-semtimedop-does-not-update-sem_otime
+owner=Li Wang <liwang@redhat.com>
+description=bz1168588 regression test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=10m
+dependencies=gcc;glibc;gcc-c++;glibc-devel
+softDependencies=
+repoRequires=

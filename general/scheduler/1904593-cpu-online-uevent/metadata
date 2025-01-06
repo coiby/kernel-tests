@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/scheduler/1904593-cpu-online-uevent
+owner=Waylon Cude <wcude@redhat.com>
+description=spam cpu online/offline events to test for regression
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+dependencies=gcc;glibc
+softDependencies=libudev-devel
+repoRequires=general/include;general/scheduler/include

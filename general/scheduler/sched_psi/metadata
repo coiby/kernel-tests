@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/schedular/sched_psi
+owner=Chunyu Hu <chuhu@redhat.com>
+description=check if PSI featrue works
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=90m
+dependencies=gcc;glibc
+softDependencies=
+repoRequires=general/include
