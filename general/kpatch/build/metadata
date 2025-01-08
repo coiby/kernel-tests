@@ -7,7 +7,7 @@ confidental=no
 destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=bash ./runtest.sh
 max_time=480m
 dependencies=beakerlib;beakerlib-redhat;git;make;openssl-devel;gcc-plugin-devel;flex;openssl;rpm-build
 softDependencies=platform-python-devel;bison;python36;python3-devel;redhat-sb-certs;libtraceevent-devel;dwarves
