@@ -35,6 +35,11 @@ rlJournalStart
             rstrnt-report-result Test_Skipped PASS 99
             exit 0
         fi
+        if rlIsRHEL ">=10"; then
+            echo "Test skip for no glibc m32 support"
+            rstrnt-report-result Test_Skipped SKIP 99
+            exit 0
+        fi
         cat << 'EOF' > cat32.c
 #include <unistd.h>
 #include <stdlib.h>
