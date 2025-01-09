@@ -27,6 +27,14 @@ mirror](https://documentation.internal.cki-project.org/l/qe-repository-mirroring
 ```
 </details>
 
+## TMT specifics
+
+When running a test/plan using tmt some test adjustment are done based on [context](https://tmt.readthedocs.io/en/stable/spec/context.html#dimension).
+
+For kernel in some cases we want to adjust the test/plan based on package name, like `kernel`, `kernel-rt`, `kernel-debug`...
+
+For this cases we set our own dimension called `package-name`.
+
 ## How to run tests
 Here is a list of common prerequisites for all beaker tests. Test-specific dependencies and steps can be found in the README.md within each test's directory.
 ~~~
