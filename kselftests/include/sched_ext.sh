@@ -20,6 +20,21 @@ do_sched_ext_run()
 
     # run the tests individually to keep the dmesg separate
     pushd ${EXEC_DIR}
+
+    rlPhaseStartTest "sched_ext: enable_seq"
+    f_enable_seq=/sys/kernel/sched_ext/enable_seq
+    dmesg -C
+    enable_seq_0=$(cat $f_enable_seq)
+    rlLog "enable_seq_0: ${enable_seq_0}"
+    rlLog "Loading a minimal sched, count of enabled_seq should plus 1"
+    rlRun "sched_ext/runner -t minimal"
+    enable_seq_1=$(cat $f_enable_seq)
+    rlLog "enabled_seq_1: ${enable_seq_0}"
+    rlAssertEquals "Check the count of enable_seq has been incremented by 1" \
+                   "$enable_seq_1" "$((enable_seq_0 + 1))"
+    rlRun "dmesg"
+    rlPhaseEnd
+
     for _test in $(grep '^sched_ext' kselftest-list.txt); do
         rlPhaseStartTest "$_test"
         dmesg -C
