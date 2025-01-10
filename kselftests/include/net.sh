@@ -335,7 +335,13 @@ do_bpf_test_progs_run()
 	for name in ${total_tests}; do
 		num=$((num + 1))
 
-		check_skip "${item}:${name}" && test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]" && continue
+		# report results as a subphase
+		rlPhaseStartTest "${num}..${total_num} selftests: ${item}:${name}"
+		if check_skip "${item}:${name}"; then
+			test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]"
+			rlPhaseEnd
+			continue
+		fi
 
 		local OUTPUTFILE=$LOG_DIR/${item}_${name}.log
 		dmesg -C
@@ -356,6 +362,7 @@ do_bpf_test_progs_run()
 
 		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
 		check_result $num "$total_num" "${item}:${name}" $ret
+		rlPhaseEnd
 	done
 
 	popd || exit
@@ -412,7 +419,13 @@ do_tc-testing_run()
 	for name in ${total_tests}; do
 		num=$((num + 1))
 
-		check_skip "${item}:${name}" && test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]" && continue
+		# report results as a subphase
+		rlPhaseStartTest "${num}..${total_num} selftests: ${item}:${name}"
+		if check_skip "${item}:${name}"; then
+			test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]"
+			rlPhaseEnd
+			continue
+		fi
 
 		local OUTPUTFILE=$LOG_DIR/$(echo "${name}" | tr '/' '_').log
 
@@ -431,6 +444,7 @@ do_tc-testing_run()
 		else
 			check_result $num "$total_num" "${item}:${name}" $ret
 		fi
+		rlPhaseEnd
 	done
 
 	echo "${item}: total $total_num, failed $fail, skipped $nskip"
