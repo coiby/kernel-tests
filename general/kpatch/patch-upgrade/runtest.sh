@@ -139,6 +139,7 @@ function install_dependency()
 function init_upgrade_test()
 {
     download_kpatch_repo ${KPATCH_REPO} ${KPATCH_REV}
+    pushd kpatch
     build_kpatch_setup
     check_test_target
     rlRun "make" || rlDie "build kpatch builder failed ..."
