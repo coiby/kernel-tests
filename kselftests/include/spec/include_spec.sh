@@ -18,45 +18,6 @@ function which(){
 export pkg_mgr="dnf"
 export pkg_mgr_inst_string="-y install"
 
-Describe 'kselftests/include/net install_netsniff'
-    function rpm(){
-        echo "rpm $*"
-        return "${RPM_EPEL:-1}"
-    }
-
-    # the function call which command twice
-    export WHICH_EXITCODES=(1 0)
-    It "can install_netsniff krelease 7"
-        export krelease=7
-        When call install_netsniff
-        The line 1 should equal "which mausezahn"
-        The line 2 should equal "dnf -y install jq netsniff-ng"
-        The line 3 should equal "which mausezahn"
-        The status should be success
-    End
-
-    It "can install_netsniff krelease 8 no epel"
-        export krelease=8
-        When call install_netsniff
-        The line 1 should equal "which mausezahn"
-        The line 2 should equal "rpm -q --quiet epel-release"
-        The line 3 should equal "dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
-        The line 4 should equal "dnf -y install jq netsniff-ng"
-        The line 5 should equal "dnf -y remove epel-release"
-        The line 6 should equal "which mausezahn"
-     End
-
-    It "can install_netsniff krelease 9 with epel"
-        export RPM_EPEL=0
-        export krelease=9
-        When call install_netsniff
-        The line 1 should equal "which mausezahn"
-        The line 2 should equal "rpm -q --quiet epel-release"
-        The line 3 should equal "dnf -y install --enablerepo=epel jq netsniff-ng"
-        The line 4 should equal "which mausezahn"
-     End
-End
-
 Describe 'kselftests/include/net install_smcroute'
     # the function call which command twice
     export WHICH_EXITCODES=(1 0)
@@ -124,9 +85,6 @@ Describe 'kselftests/include/net do_net_forwarding_config'
         function set_network_env(){
             echo "set_network_env"
         }
-        function install_netsniff(){
-            echo "install_netsniff"
-        }
         function install_smcroute(){
             echo "install_smcroute"
         }
@@ -161,7 +119,7 @@ Describe 'kselftests/include/net do_net_forwarding_config'
         The line 1 should equal "set_network_env"
         The line 2 should equal "which tc"
         The line 3 should equal "dnf -y install iproute-tc"
-        The line 4 should equal "install_netsniff"
+        The line 4 should equal "rpm -q --quiet netsniff-ng"
         The line 5 should equal "install_smcroute"
         The line 6 should equal "install_mtools"
         The line 7 should equal "pushd"
