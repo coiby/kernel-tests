@@ -11,4 +11,4 @@ entry_point=bash ./runtest.sh
 max_time=10m
 dependencies=kpatch;systemtap
 softDependencies=redhat-lsb
-repoRequires=general/kpatch/include
+repoRequires=general/kpatch/include;security/crypto/enable_fips

@@ -11,6 +11,7 @@ require:
   - type: file
     pattern:
       - /general/kpatch/include/lib.sh
+      - /security/crypto/enable_fips/lib.sh
 recommend:
   - kpatch
   - systemtap
