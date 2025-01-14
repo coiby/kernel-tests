@@ -2,8 +2,7 @@ summary: Verifies that lockdown mode prevents the loading of an unsigned kernel 
 description: |
         Checks the current state of lockdown. Sets to 'integrity', if not already set.
         Ensure that Alt+SysRq+x, when sent to the console, does not alter the lockdown state.
-        If SELinux is 'enforcing', then ensures it blocks unsigned kernel module loading.
-        Disables SELinux, if necessary, and ensures that lockdown mode prevents unsigned kernel module loading.
+        Ensure that lockdown mode prevents unsigned kernel module loading.
         Test Inputs:
             change_cmdline 'lockdown=integrity'
             reboot
@@ -11,14 +10,7 @@ description: |
             run python module evdev-sysrq.py
             If Python module was successful, then log success and ensure lockdown status remains as 'integrity'.
             If Python module was not successful, then log failure.
-            Export current SELinux mode to a file. 
             module source, hw.c
-            trigger, insmod hw.ko
-            capture, dmesg > dmesg-unsigned.log
-            check, rlAssertGrep "audit.*.avc:  denied  { module_load }.*.comm="insmod".*.hw.ko" dmesg-unsigned.log
-            Change SELinux mode to 'disabled'
-            Create the selinux_state_changed file.
-            reboot
             trigger, insmod hw.ko
             capture, dmesg > dmesg-unsigned.log
             check, rlAssertGrep "Lockdown: insmod: unsigned module loading is restricted" dmesg-unsigned.log
@@ -30,11 +22,8 @@ description: |
                 [   LOG    ] :: Alt+SysRq+x key clicks submitted, checking lockdown status.
             Python module failure log statement
                 [   LOG    ] :: Alt+SysRq+x key clicks were not submitted. Skipping lockdown status check.
-            [   PASS   ] :: Command 'echo Enforcing > selinux_orig_state' (Expected 0, got 0)
-            [   PASS   ] :: File 'dmesg-unsigned.log' should contain 'audit.*.avc:  denied  { module_load }.*.comm="insmod".*.hw.ko'
-            [   PASS   ] :: Command 'sed -i s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config' (Expected 0, got 0)
-            [   PASS   ] :: Command 'touch selinux_state_changed' (Expected 0, got 0)
             [   PASS   ] :: Command 'make all' (Expected 0, got 0)
+            [   PASS   ] :: Command 'make test' (Expected 0, got 0)
             [   PASS   ] :: File 'dmesg-unsigned.log' should contain 'Loading of unsigned module is rejected'
         Results location:
             output.txt | taskout.log, log is dependent upon the test executor.
