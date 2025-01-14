@@ -28,6 +28,7 @@
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../include/lib.sh
+. ../../../security/crypto/enable_fips/lib.sh
 
 trap 'killall make; kill runtest.sh' SIGHUP SIGINT SIGQUIT SIGTERM
 
