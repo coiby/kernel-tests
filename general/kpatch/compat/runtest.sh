@@ -105,7 +105,7 @@ function setup_kprobe() {
 }
 
 function setup_stap() {
-    if fips-mode-setup --is-enabled; then
+    if fipsIsEnabled; then
         export STAP_FIPS_OVERRIDE=1;
         rlLog "Run SystemTap with enabled FIPS mode."
     fi
