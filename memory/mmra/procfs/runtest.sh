@@ -202,7 +202,7 @@ rlJournalStart
         syzkaller_root=$(pwd)
         rlRun "git branch mmra_temp ${commit}"
         rlRun "git switch mmra_temp"
-        rlRun "git apply ../procfs.patch"
+        rlRun "git apply ${git_patch:-'../procfs.patch'}"
         rlRun "make"
         sut_ip=$(nmcli | grep -A1 "ip4 default" | grep -v "ip4 default" | awk '{print $2}' | awk -F "/" '{print $1}')
         # create config file:
@@ -238,7 +238,7 @@ rlJournalStart
                rlFail "${syscall} not executed."
             fi
         done
-        rlLog "The following /proc/sys/vm tuneables are covered."
+        rlLog "The following tuneables are covered."
         for call in ${procfs_entry}; do
             entry=$(echo "${call//\"}" | sed -e 's/,//')
             rlLog "${entry}"
