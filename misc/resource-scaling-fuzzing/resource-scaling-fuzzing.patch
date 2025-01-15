@@ -1,0 +1,1647 @@
+diff --git a/sys/linux/sysfs.txt b/sys/linux/sysfs.txt
+new file mode 100644
+index 000000000..98a282490
+--- /dev/null
++++ b/sys/linux/sysfs.txt
+@@ -0,0 +1,1641 @@
++include <linux/fcntl.h>
++
++resource fd_sysfs[fd]
++
++openat$cpu0_cache_index0_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index0/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index0_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index0_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index0/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index0_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index0_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index0/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index0_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index0_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index0/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index0_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index1_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index1/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index1_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index1_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index1/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index1_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index1_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index1/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index1_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index1_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index1/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index1_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index2_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index2/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index2_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index2_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index2/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index2_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index2_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index2/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index2_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cache_index2_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cache/index2/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cache_index2_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpu_capacity(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpu_capacity"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpu_capacity(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_crash_notes(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/crash_notes"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_crash_notes(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_crash_notes_size(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/crash_notes_size"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_crash_notes_size(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_regs_identification_midr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/regs/identification/midr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_regs_identification_midr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_regs_identification_revidr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/regs/identification/revidr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_regs_identification_revidr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_topology_core_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/topology/core_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_topology_core_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_topology_core_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/topology/core_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_topology_core_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_topology_core_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/topology/core_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_topology_core_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_topology_physical_package_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/topology/physical_package_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_topology_physical_package_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_topology_thread_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/topology/thread_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_topology_thread_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_topology_thread_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/topology/thread_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_topology_thread_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index0_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index0/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index0_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index0_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index0/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index0_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index0_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index0/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index0_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index0_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index0/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index0_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index1_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index1/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index1_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index1_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index1/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index1_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index1_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index1/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index1_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index1_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index1/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index1_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index2_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index2/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index2_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index2_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index2/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index2_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index2_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index2/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index2_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cache_index2_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cache/index2/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cache_index2_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpu_capacity(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpu_capacity"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpu_capacity(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_crash_notes(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/crash_notes"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_crash_notes(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_crash_notes_size(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/crash_notes_size"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_crash_notes_size(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_regs_identification_midr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/regs/identification/midr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_regs_identification_midr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_regs_identification_revidr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/regs/identification/revidr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_regs_identification_revidr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_topology_core_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/topology/core_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_topology_core_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_topology_core_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/topology/core_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_topology_core_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_topology_core_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/topology/core_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_topology_core_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_topology_physical_package_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/topology/physical_package_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_topology_physical_package_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_topology_thread_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/topology/thread_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_topology_thread_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_topology_thread_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/topology/thread_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_topology_thread_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index0_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index0/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index0_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index0_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index0/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index0_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index0_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index0/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index0_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index0_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index0/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index0_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index1_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index1/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index1_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index1_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index1/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index1_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index1_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index1/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index1_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index1_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index1/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index1_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index2_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index2/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index2_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index2_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index2/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index2_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index2_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index2/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index2_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cache_index2_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cache/index2/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cache_index2_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpu_capacity(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpu_capacity"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpu_capacity(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_crash_notes(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/crash_notes"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_crash_notes(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_crash_notes_size(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/crash_notes_size"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_crash_notes_size(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_regs_identification_midr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/regs/identification/midr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_regs_identification_midr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_regs_identification_revidr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/regs/identification/revidr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_regs_identification_revidr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_topology_core_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/topology/core_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_topology_core_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_topology_core_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/topology/core_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_topology_core_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_topology_core_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/topology/core_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_topology_core_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_topology_physical_package_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/topology/physical_package_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_topology_physical_package_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_topology_thread_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/topology/thread_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_topology_thread_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_topology_thread_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/topology/thread_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_topology_thread_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index0_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index0/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index0_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index0_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index0/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index0_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index0_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index0/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index0_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index0_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index0/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index0_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index1_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index1/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index1_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index1_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index1/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index1_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index1_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index1/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index1_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index1_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index1/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index1_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index2_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index2/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index2_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index2_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index2/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index2_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index2_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index2/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index2_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cache_index2_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cache/index2/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cache_index2_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpu_capacity(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpu_capacity"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpu_capacity(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_crash_notes(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/crash_notes"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_crash_notes(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_crash_notes_size(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/crash_notes_size"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_crash_notes_size(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_regs_identification_midr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/regs/identification/midr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_regs_identification_midr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_regs_identification_revidr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/regs/identification/revidr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_regs_identification_revidr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_topology_core_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/topology/core_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_topology_core_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_topology_core_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/topology/core_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_topology_core_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_topology_core_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/topology/core_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_topology_core_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_topology_physical_package_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/topology/physical_package_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_topology_physical_package_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_topology_thread_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/topology/thread_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_topology_thread_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_topology_thread_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/topology/thread_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_topology_thread_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index0_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index0/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index0_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index0_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index0/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index0_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index0_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index0/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index0_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index0_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index0/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index0_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index1_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index1/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index1_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index1_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index1/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index1_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index1_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index1/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index1_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index1_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index1/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index1_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index2_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index2/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index2_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index2_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index2/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index2_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index2_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index2/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index2_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cache_index2_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cache/index2/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cache_index2_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpu_capacity(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpu_capacity"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpu_capacity(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_crash_notes(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/crash_notes"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_crash_notes(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_crash_notes_size(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/crash_notes_size"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_crash_notes_size(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_regs_identification_midr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/regs/identification/midr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_regs_identification_midr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_regs_identification_revidr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/regs/identification/revidr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_regs_identification_revidr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_topology_core_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/topology/core_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_topology_core_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_topology_core_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/topology/core_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_topology_core_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_topology_core_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/topology/core_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_topology_core_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_topology_physical_package_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/topology/physical_package_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_topology_physical_package_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_topology_thread_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/topology/thread_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_topology_thread_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_topology_thread_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/topology/thread_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_topology_thread_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index0_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index0/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index0_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index0_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index0/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index0_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index0_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index0/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index0_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index0_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index0/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index0_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index1_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index1/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index1_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index1_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index1/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index1_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index1_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index1/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index1_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index1_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index1/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index1_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index2_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index2/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index2_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index2_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index2/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index2_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index2_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index2/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index2_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cache_index2_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cache/index2/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cache_index2_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpu_capacity(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpu_capacity"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpu_capacity(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_crash_notes(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/crash_notes"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_crash_notes(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_crash_notes_size(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/crash_notes_size"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_crash_notes_size(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_regs_identification_midr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/regs/identification/midr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_regs_identification_midr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_regs_identification_revidr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/regs/identification/revidr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_regs_identification_revidr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_topology_core_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/topology/core_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_topology_core_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_topology_core_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/topology/core_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_topology_core_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_topology_core_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/topology/core_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_topology_core_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_topology_physical_package_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/topology/physical_package_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_topology_physical_package_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_topology_thread_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/topology/thread_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_topology_thread_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_topology_thread_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/topology/thread_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_topology_thread_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index0_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index0/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index0_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index0_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index0/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index0_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index0_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index0/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index0_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index0_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index0/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index0_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index1_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index1/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index1_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index1_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index1/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index1_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index1_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index1/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index1_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index1_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index1/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index1_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index2_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index2/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index2_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index2_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index2/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index2_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index2_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index2/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index2_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cache_index2_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cache/index2/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cache_index2_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpu_capacity(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpu_capacity"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpu_capacity(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_crash_notes(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/crash_notes"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_crash_notes(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_crash_notes_size(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/crash_notes_size"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_crash_notes_size(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_regs_identification_midr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/regs/identification/midr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_regs_identification_midr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_regs_identification_revidr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/regs/identification/revidr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_regs_identification_revidr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_topology_core_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/topology/core_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_topology_core_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_topology_core_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/topology/core_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_topology_core_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_topology_core_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/topology/core_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_topology_core_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_topology_physical_package_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/topology/physical_package_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_topology_physical_package_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_topology_thread_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/topology/thread_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_topology_thread_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_topology_thread_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/topology/thread_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_topology_thread_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index0_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index0/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index0_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index0_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index0/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index0_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index0_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index0/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index0_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index0_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index0/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index0_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index1_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index1/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index1_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index1_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index1/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index1_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index1_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index1/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index1_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index1_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index1/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index1_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index2_level(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index2/level"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index2_level(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index2_shared_cpu_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index2/shared_cpu_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index2_shared_cpu_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index2_shared_cpu_map(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index2/shared_cpu_map"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index2_shared_cpu_map(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cache_index2_uevent(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cache/index2/uevent"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cache_index2_uevent(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpu_capacity(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpu_capacity"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpu_capacity(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_crash_notes(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/crash_notes"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_crash_notes(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_crash_notes_size(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/crash_notes_size"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_crash_notes_size(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_regs_identification_midr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/regs/identification/midr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_regs_identification_midr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_regs_identification_revidr_el1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/regs/identification/revidr_el1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_regs_identification_revidr_el1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_topology_core_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/topology/core_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_topology_core_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_topology_core_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/topology/core_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_topology_core_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_topology_core_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/topology/core_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_topology_core_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_topology_physical_package_id(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/topology/physical_package_id"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_topology_physical_package_id(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_topology_thread_siblings(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/topology/thread_siblings"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_topology_thread_siblings(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_topology_thread_siblings_list(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/topology/thread_siblings_list"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_topology_thread_siblings_list(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$kernel_max(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/kernel_max"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$kernel_max(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$offline(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/offline"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$offline(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$online(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/online"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$online(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$possible(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/possible"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$possible(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$present(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/present"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$present(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$smt_active(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/smt/active"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$smt_active(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$smt_control(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/smt/control"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$smt_control(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_gather_data_sampling(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/gather_data_sampling"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_gather_data_sampling(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_itlb_multihit(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/itlb_multihit"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_itlb_multihit(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_l1tf(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/l1tf"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_l1tf(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_mds(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/mds"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_mds(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_meltdown(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/meltdown"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_meltdown(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_mmio_stale_data(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/mmio_stale_data"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_mmio_stale_data(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_reg_file_data_sampling(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/reg_file_data_sampling"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_reg_file_data_sampling(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_retbleed(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/retbleed"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_retbleed(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_spec_store_bypass(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/spec_store_bypass"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_spec_store_bypass(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_spectre_v1(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/spectre_v1"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_spectre_v1(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_spectre_v2(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/spectre_v2"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_spectre_v2(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_srbds(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/srbds"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_srbds(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$vulnerabilities_tsx_async_abort(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/vulnerabilities/tsx_async_abort"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$vulnerabilities_tsx_async_abort(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_0_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_0_num_users(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.0/num_users"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_0_num_users(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_0_requested_microamps(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.0/requested_microamps"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_0_requested_microamps(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_0_suspend_mem_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.0/suspend_mem_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_0_suspend_mem_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_0_suspend_disk_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.0/suspend_disk_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_0_suspend_disk_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_0_suspend_standby_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.0/suspend_standby_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_0_suspend_standby_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_1_microvolts(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.1/microvolts"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_1_microvolts(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_1_num_users(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.1/num_users"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_1_num_users(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_1_requested_microamps(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.1/requested_microamps"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_1_requested_microamps(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_1_suspend_mem_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.1/suspend_mem_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_1_suspend_mem_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_1_suspend_disk_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.1/suspend_disk_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_1_suspend_disk_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_1_suspend_standby_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.1/suspend_standby_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_1_suspend_standby_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_2_microvolts(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.2/microvolts"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_2_microvolts(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_2_name(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.2/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_2_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_2_num_users(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.2/num_users"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_2_num_users(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_2_requested_microamps(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.2/requested_microamps"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_2_requested_microamps(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_2_suspend_mem_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.2/suspend_mem_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_2_suspend_mem_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_2_suspend_disk_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.2/suspend_disk_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_2_suspend_disk_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$regulator_2_suspend_standby_state(fd const[AT_FDCWD], file ptr[in, string["/sys/class/regulator/regulator.2/suspend_standby_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$regulator_2_suspend_standby_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_type(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_temp(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/temp"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_temp(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_mode(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/mode"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_mode(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_policy(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/policy"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_policy(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_available_policies(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/available_policies"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_available_policies(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_k_d(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/k_d"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_k_d(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_k_i(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/k_i"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_k_i(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_k_po(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/k_po"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_k_po(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_k_pu(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/k_pu"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_k_pu(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_integral_cutoff(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/integral_cutoff"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_integral_cutoff(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_slope(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/slope"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_slope(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_offset(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/offset"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_offset(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone0_sustainable_power(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone0/sustainable_power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone0_sustainable_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_type(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_temp(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/temp"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_temp(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_mode(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/mode"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_mode(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_policy(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/policy"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_policy(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_available_policies(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/available_policies"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_available_policies(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_k_d(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/k_d"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_k_d(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_k_i(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/k_i"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_k_i(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_k_po(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/k_po"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_k_po(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_k_pu(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/k_pu"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_k_pu(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_integral_cutoff(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/integral_cutoff"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_integral_cutoff(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_slope(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/slope"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_slope(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_offset(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/offset"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_offset(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone1_sustainable_power(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone1/sustainable_power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone1_sustainable_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_type(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/type"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_type(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_temp(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/temp"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_temp(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_mode(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/mode"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_mode(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_policy(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/policy"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_policy(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_available_policies(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/available_policies"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_available_policies(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_k_d(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/k_d"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_k_d(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_k_i(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/k_i"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_k_i(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_k_po(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/k_po"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_k_po(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_k_pu(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/k_pu"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_k_pu(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_integral_cutoff(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/integral_cutoff"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_integral_cutoff(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_slope(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/slope"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_slope(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_offset(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/offset"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_offset(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$thermal_zone2_sustainable_power(fd const[AT_FDCWD], file ptr[in, string["/sys/class/thermal/thermal_zone2/sustainable_power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$thermal_zone2_sustainable_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_scaling_min_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_scaling_min_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_scaling_available_governors(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_scaling_available_governors(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_cpuinfo_cur_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_cpuinfo_cur_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_scaling_governor(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/scaling_governor"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_scaling_governor(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_cpuinfo_max_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_max_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_cpuinfo_max_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_scaling_available_frequencies(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_scaling_available_frequencies(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_related_cpus(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/related_cpus"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_related_cpus(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_scaling_cur_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_scaling_cur_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_scaling_setspeed(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/scaling_setspeed"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_scaling_setspeed(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_stats_reset(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/stats/reset"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_stats_reset(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_stats_trans_table(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/stats/trans_table"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_stats_trans_table(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_stats_total_trans(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/stats/total_trans"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_stats_total_trans(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_stats_time_in_state(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/stats/time_in_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_stats_time_in_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_affected_cpus(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/affected_cpus"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_affected_cpus(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_scaling_max_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_scaling_max_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_cpuinfo_transition_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_transition_latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_cpuinfo_transition_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_scaling_driver(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/scaling_driver"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_scaling_driver(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy0_cpuinfo_min_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy0_cpuinfo_min_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_scaling_min_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/scaling_min_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_scaling_min_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_scaling_available_governors(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/scaling_available_governors"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_scaling_available_governors(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_cpuinfo_cur_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/cpuinfo_cur_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_cpuinfo_cur_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_scaling_governor(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/scaling_governor"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_scaling_governor(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_cpuinfo_max_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/cpuinfo_max_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_cpuinfo_max_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_scaling_available_frequencies(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/scaling_available_frequencies"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_scaling_available_frequencies(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_related_cpus(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/related_cpus"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_related_cpus(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_scaling_cur_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/scaling_cur_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_scaling_cur_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_scaling_setspeed(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/scaling_setspeed"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_scaling_setspeed(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_stats_reset(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/stats/reset"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_stats_reset(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_stats_trans_table(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/stats/trans_table"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_stats_trans_table(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_stats_total_trans(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/stats/total_trans"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_stats_total_trans(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_stats_time_in_state(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/stats/time_in_state"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_stats_time_in_state(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_affected_cpus(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/affected_cpus"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_affected_cpus(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_scaling_max_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/scaling_max_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_scaling_max_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_cpuinfo_transition_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/cpuinfo_transition_latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_cpuinfo_transition_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_scaling_driver(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/scaling_driver"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_scaling_driver(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpufreq_policy4_cpuinfo_min_freq(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpufreq/policy4/cpuinfo_min_freq"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpufreq_policy4_cpuinfo_min_freq(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpuidle_current_governor_ro(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpuidle/current_governor_ro"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpuidle_current_governor_ro(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpuidle_current_driver(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpuidle/current_driver"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpuidle_current_driver(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpuidle_available_governors(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpuidle/available_governors"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpuidle_available_governors(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpuidle_current_governor(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpuidle/current_governor"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpuidle_current_governor(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_s2idle_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/s2idle/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_s2idle_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state1_s2idle_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state1/s2idle/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state1_s2idle_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_driver_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/driver/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_driver_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu0_cpuidle_state0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu0/cpuidle/state0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu0_cpuidle_state0_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_s2idle_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/s2idle/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_s2idle_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state1_s2idle_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state1/s2idle/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state1_s2idle_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_driver_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/driver/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_driver_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu1_cpuidle_state0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu1/cpuidle/state0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu1_cpuidle_state0_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_s2idle_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/s2idle/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_s2idle_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state1_s2idle_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state1/s2idle/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state1_s2idle_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_driver_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/driver/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_driver_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu2_cpuidle_state0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu2/cpuidle/state0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu2_cpuidle_state0_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_s2idle_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/s2idle/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_s2idle_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state1_s2idle_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state1/s2idle/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state1_s2idle_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_driver_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/driver/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_driver_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu3_cpuidle_state0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu3/cpuidle/state0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu3_cpuidle_state0_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_s2idle_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/s2idle/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_s2idle_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state1_s2idle_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state1/s2idle/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state1_s2idle_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_driver_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/driver/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_driver_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu4_cpuidle_state0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu4/cpuidle/state0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu4_cpuidle_state0_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_s2idle_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/s2idle/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_s2idle_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state1_s2idle_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state1/s2idle/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state1_s2idle_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_driver_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/driver/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_driver_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu5_cpuidle_state0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu5/cpuidle/state0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu5_cpuidle_state0_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_s2idle_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/s2idle/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_s2idle_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state1_s2idle_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state1/s2idle/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state1_s2idle_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_driver_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/driver/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_driver_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu6_cpuidle_state0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu6/cpuidle/state0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu6_cpuidle_state0_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_s2idle_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/s2idle/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_s2idle_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state1_s2idle_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state1/s2idle/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state1_s2idle_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_driver_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/driver/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_driver_name(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_disable(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/disable"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_disable(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_above(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/above"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_above(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_time(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/time"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_time(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_rejected(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/rejected"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_rejected(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_power(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/power"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_power(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_residency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/residency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_residency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_latency(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/latency"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_latency(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_usage(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/usage"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_usage(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_desc(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/desc"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_desc(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_below(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/below"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_below(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_default_status(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/default_status"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_default_status(fd fd_sysfs, buf buffer[in], count len[buf])
++
++openat$cpu7_cpuidle_state0_name(fd const[AT_FDCWD], file ptr[in, string["/sys/devices/system/cpu/cpu7/cpuidle/state0/name"]], flags flags[open_flags], mode const[0]) fd_sysfs
++write$cpu7_cpuidle_state0_name(fd fd_sysfs, buf buffer[in], count len[buf])
