@@ -1,0 +1,14 @@
+summary: ima-evm-utils setup test
+description: 'ima-setup script testing for ima-evm-util 1.5.2+'
+contact: Dennis Li <denli@redhat.com>
+component:
+  - kernel
+path: /security/integrity/ima-evm-utils/ima-setup
+test: bash +x runtest.sh
+framework: beakerlib
+require:
+  - ima-evm-utils
+  - ima-evm-utils-devel
+  - openssl
+  - attr
+duration: 30m
