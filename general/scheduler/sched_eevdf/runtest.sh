@@ -64,6 +64,7 @@ function run_tests()
 rlJournalStart
 	rlPhaseStartSetup
 		rlRun "cat caselist" -l
+		rlRun "sh ../../include/scripts/wget-kernel.sh --running --header -i"
 	rlPhaseEnd
 
 	if ! check_support_eevdf; then

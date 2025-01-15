@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=10m
-dependencies=gcc;glibc;kernel-headers
+dependencies=gcc;glibc
 softDependencies=
-repoRequires=general/scheduler/include
+repoRequires=general/scheduler/include;general/include
