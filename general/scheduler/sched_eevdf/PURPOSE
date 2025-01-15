@@ -1,0 +1,2 @@
+Test sched eevdf related syscalls, for now sched_setattr syscall.
+TODO: verify the slice from the function perspective.
