@@ -138,6 +138,7 @@ function test_syscalls_trinity()
 {
 	rlPhaseStartTest trinity
 		trinity_duration=${trinity_duration:-3600}
+		rlRun "chmod +x ./trinity_as_user.sh"
 		rlRun "timeout --signal=SIGTERM $trinity_duration ./trinity_as_user.sh" 0-255
 	rlPhaseEnd
 }
