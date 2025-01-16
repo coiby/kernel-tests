@@ -61,9 +61,7 @@ function get_lookaside()
 	rpm -q wget || yum -y install wget > /dev/null
 	wget "$LOOKASIDE/$trinity_pkg"
 	if [ $? -ne 0  ]; then
-		rlLog "Aborting test because failed to download the trinit package from lookaside, please check network issue."
-		rstrnt-report-result "${TEST}" WARN
-		exit 1
+		rlDie "Aborting test because failed to download the trinit package from lookaside, please check network issue."
 	fi
 	tar -zxvf "$trinity_pkg"
 }
@@ -122,7 +120,7 @@ function test_setup()
 	else
 		rlRun "./configure"
 	fi
-	rlRun "make -j ${SCHED_NR_CPU}" || { rstrnt-report-result "${RSTRNT_TASKNAME}" WARN; rlDie "compile"; }
+	rlRun "make -j ${SCHED_NR_CPU}" || rlDie "compile"
 	if [ $is_rhivos == 1 ];then
 		#rlRun "echo \"DESTDIR=\"/usr/local\"\" >> /etc/environment"
 		rlRun "export DESTDIR=\"/usr/local\""
