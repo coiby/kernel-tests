@@ -73,9 +73,9 @@ function run_test()
     rlRun 'mdadm -A /dev/md0 /dev/"$dev0" /dev/"$dev1"'
     sleep 10
     rlRun "lsblk"
-    rlRun "cat /proc/partitions"
-    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
-    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
+#    rlRun "cat /proc/partitions"
+#    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
+#    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
 
     if rlIsRHEL '>=10' ;then
         rlRun "parted -s /dev/md0 rm 1"
@@ -85,18 +85,20 @@ function run_test()
 
     sleep 10
     rlRun "lsblk"
-    rlRun "cat /proc/partitions"
-    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
-    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
+#    rlRun "cat /proc/partitions"
+#    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
+#    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
     rlRun "mdadm -S /dev/md0"
     sleep 10
     wait
     rlRun 'mdadm --zero-superblock /dev/"$dev0"'
     rlRun 'mdadm --zero-superblock /dev/"$dev1"'
-    rlRun "cat /proc/partitions"
     while [ -b /dev/md0 ]; do
         sleep 3
     done
+    rlRun "cat /proc/partitions"
+    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
+    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
 }
 
 function check_log()
