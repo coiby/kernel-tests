@@ -402,6 +402,13 @@ deploy-production:
       --output kernel-tests-production.zip
       --prefix kernel-tests-production/
       HEAD
+    - git archive
+      --output kernel-tests-production.tar.gz
+      --prefix kernel-tests-production/
+      HEAD
     - aws s3 cp
       kernel-tests-production.zip
       "s3://${S3_BUCKET:?}/${S3_PATH:?}kernel-tests-production.zip"
+    - aws s3 cp
+      kernel-tests-production.tar.gz
+      "s3://${S3_BUCKET:?}/${S3_PATH:?}kernel-tests-production.tar.gz"
