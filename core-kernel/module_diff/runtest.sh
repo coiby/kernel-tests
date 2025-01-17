@@ -404,49 +404,8 @@ function SetOSRelease ()
         # This is RHEL6 (Santiago)
         OS="RHEL6"
         case ${Base} in
-            71)
-                # RHEL-6.0
-                Release="6.0"
-                ;;
-            131)
-                # Actual RHEL-6.1 is 131.0.15, but 131 will suffice for this case.
-                Release="6.1"
-                ;;
-            220)
-                # RHEL-6.2
-                Release="6.2"
-                ;;
-            279)
-                # RHEL-6.3
-                Release="6.3"
-                ;;
-            358)
-                # RHEL-6.4
-                Release="6.4"
-                ;;
-            431)
-                # RHEL-6.5
-                Release="6.5"
-                ;;
-            504)
-                # RHEL-6.6
-                Release="6.6"
-                ;;
-            573)
-                # RHEL-6.7
-                Release="6.7"
-                ;;
-            642)
-                # RHEL-6.8
-                Release="6.8"
-                ;;
-            696)
-                # RHEL-6.9
-                Release="6.9"
-                ;;
             *)
-                # We are currently developing RHEL-6.10
-                # Therefore we test at HEAD-RHEL-6.10
+                # Last stream on RHEL-6
                 Release="HEAD-6.10"
                 ;;
         esac
@@ -454,47 +413,12 @@ function SetOSRelease ()
         # This is RHEL7 (Maipo)
         OS="RHEL7"
         case ${Base} in
-            123)
-                # RHEL-7.0
-                Release="7.0"
-                ;;
-            229)
-                # RHEL-7.1
-                Release="7.1"
-                ;;
-
-            327)
-                # RHEL-7.2
-                Release="7.2"
-                ;;
-            514)
-                # RHEL-7.3
-                Release="7.3"
-                ;;
-            693)
-                # RHEL-7.4
-                Release="7.4"
-                ;;
-            862)
-                # RHEL-7.5
-                Release="7.5"
-                ;;
-            957)
-                # RHEL-7.6
-                Release="7.6"
-                ;;
             1062)
                 # RHEL-7.7
                 Release="7.7"
                 ;;
-            1127)
-                # RHEL-7.8
-                Release="7.8"
-                ;;
-
             *)
-                # We are currently developing RHEL-7.9
-                # Therefore we test at HEAD-RHEL-7.9
+                # Last stream on RHEL-7
                 Release="HEAD-7.9"
                 ;;
         esac
@@ -502,47 +426,21 @@ function SetOSRelease ()
         # This is RHEL8, Ootpa
         OS="RHEL8"
         case ${Base} in
-            80)
-                # RHEL-8.0
-                Release="8.0"
-                ;;
-            147)
-                # RHEL-8.1
-                Release="8.1"
-                ;;
             193)
                 # RHEL-8.2
                 Release="8.2"
-                ;;
-            240)
-                # RHEL-8.3
-                Release="8.3"
                 ;;
             305)
                 # RHEL-8.4
                 Release="8.4"
                 ;;
-            348)
-                # RHEL-8.5
-                Release="8.5"
-                ;;
             372)
                 # RHEL-8.6
                 Release="8.6"
                 ;;
-            425)
-                # RHEL-8.7
-                DeBug "Base release is RHEL-8.7"
-                echo "" | tee -a $OUTPUTFILE
-                echo "***** $ARCH: Base release is RHEL-8.7 *****" | tee -a $OUTPUTFILE
-                Release="8.7"
-                ;;
             477)
                 # RHEL-8.8
                 Release="8.8"
-                ;;
-            513)
-                Release="8.9"
                 ;;
             *)
                 Release="HEAD-8.10"
@@ -556,16 +454,9 @@ function SetOSRelease ()
                 # RHEL-9.0
                 Release="9.0"
                 ;;
-            162)
-                # RHEL-9.1
-                Release="9.1"
-                ;;
             284)
                 # RHEL-9.2
                 Release="9.2"
-                ;;
-            362)
-                Release="9.3"
                 ;;
             427)
                 Release="9.4"
@@ -694,16 +585,16 @@ rlJournalStart
     # -----------------------------------
 
     rlPhaseStartTest "Loadable module test"
-        # Lets determine the module list for the current kernel package
+        # The module list for the current kernel package
         GetCurrentModuleList loadable
 
-        # Lets determine the module list for the base release kernel package
+        # The module list for the base release kernel package
         GetBaseModuleList loadable
 
-        # Lets determine the known removed module list for the base release kernel package
+        # The known removed module list for the base release kernel package
         GetKnownRemovedList loadable
 
-        # Lets submit the complete log from the diff of base module list and the current module list
+        # Compare the base module list and the current module list
         CompareModuleList loadable
     rlPhaseEnd
     # ReportMissingModule should be out of rlPhaseStartTest as it uses rlPhaseStartTest in it.
