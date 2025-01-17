@@ -1,7 +1,0 @@
-ib_ipath.ko
-ir-common.ko
-raid6test.ko
-snd-hda-codec-atihdmi.ko
-snd-hda-codec-intelhdmi.ko
-snd-hda-codec-nvhdmi.ko
-zram.ko

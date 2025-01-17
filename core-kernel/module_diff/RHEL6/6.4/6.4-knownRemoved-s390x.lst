@@ -1,4 +1,0 @@
-dm-registry.ko
-dm-replicator.ko
-dm-repl-log-ringbuffer.ko
-dm-repl-slink-blockdev.ko
