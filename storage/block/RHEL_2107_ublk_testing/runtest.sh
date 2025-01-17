@@ -62,9 +62,10 @@ function run_test()
 
         rlRun "echo 2 > /proc/sys/kernel/io_uring_disabled"
         rlRun "modprobe ublk_drv"
-        rlRun "ublk list"
+# ublk operation will failed when io_uring disabled
+        rlRun "ublk list" "0-255"
         sleep 100
-        rlRun "ublk del -a"
+        rlRun "ublk del -a" "0-255"
         rlRun "rmmod ublk_drv -f"
         rlRun "echo 0 > /proc/sys/kernel/io_uring_disabled"
     else
