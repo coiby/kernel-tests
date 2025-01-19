@@ -14,6 +14,13 @@ function runtest() {
 
 	get_nvme_disk
 
+	if rlIsRHEL "9" || rlIsRHEL "8"; then
+		tlog "Tesing NVMe FW update on RHEL8 and RHEL9"
+	else
+		tlog "Skip test because NVMe FW update only support on RHEL8 and RHEL9"
+		rstrnt-report-result "$TNAME" SKIP
+	fi
+
 	FW_2_3_0="Express-Flash-PCIe-SSD_Firmware_637P6_LN64_2.3.0_A04_01.BIN"
 	FW_2_5_0="Express-Flash-PCIe-SSD_Firmware_5V3P7_LN64_2.5.0_A05_01.BIN"
 	FW_2_3_0_URL="https://s3.amazonaws.com/arr-cki-prod-lookaside/lookaside/static/${FW_2_3_0}"
