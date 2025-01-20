@@ -33,6 +33,8 @@ description: |
 contact: Jeff Bastian <jbastian@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
+tag:
+  - KernelTier1
 require:
   - wget
   - git

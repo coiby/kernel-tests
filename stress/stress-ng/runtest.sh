@@ -196,7 +196,7 @@ rlPhaseStartSetup
     if systemctl list-unit-files | grep -q systemd-zram-setup ; then
             rlRun "systemctl disable --now systemd-zram-setup@zram0" 0 "disable zram for os class tests"
             if [ -e /etc/systemd/zram-generator.conf ]; then
-                rstrnt-backup /etc/systemd/zram-generator.conf
+                rlFileBackup /etc/systemd/zram-generator.conf
             fi
             cat /dev/null > /etc/systemd/zram-generator.conf
          fi
@@ -234,7 +234,7 @@ rlPhaseStartCleanup
 
         if systemctl list-unit-files | grep -q systemd-zram-setup ; then
             rm -f /etc/systemd/zram-generator.conf
-            rstrnt-restore
+            rlFileRestore
             rlRun "systemctl enable --now systemd-zram-setup@zram0" 0 "re-enable zram"
 
         fi
