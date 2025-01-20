@@ -71,6 +71,8 @@ rlJournalStart
         # checkout latest stable commit
         rlRun "git checkout -q d65c1d60326c28f4c2b6665931b3981a47780519" 0
         rlRun "make" 0
+        # Increase proc-map-timeout for slower servers. See VROOM-25628.
+        rlRun "perf config core.proc-map-timeout=2000" 0
     rlPhaseEnd
 
     rlPhaseStartTest
