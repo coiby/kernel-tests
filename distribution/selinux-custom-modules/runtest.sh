@@ -4,7 +4,8 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 # Set the full test name
-TEST="/kernel/distribution/selinux-custom-modules"
+# TEST variable is used by beakerlib
+export TEST="/kernel/distribution/selinux-custom-modules"
 
 rlJournalStart
 
@@ -59,8 +60,6 @@ rlJournalStart
     elif ! grep "ipv6.disable=1" /proc/cmdline ; then
       if ! [[ -e /run/ostree-booted ]]; then
         rlLog "No custom SELinux modules required, skipping"
-        rstrnt-report-result $TEST SKIP
-        exit
       fi
     fi
   rlPhaseEnd
