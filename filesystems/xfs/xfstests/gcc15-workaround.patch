@@ -1,0 +1,28 @@
+Date: Fri Jan 17 12:37:09 PM CST 2025
+From: Zorro Lang <zlang@kernel.org>
+To: fstests@vger.kernel.org
+Subject: [PATCH] fstests: workaround for gcc-15
+
+GCC-15 does a big change, it changes the default language version for
+C compilation from -std=gnu17 to -std=gnu23. That cause lots of "old
+style" C codes hit build errors. On the other word, current xfstests
+can't be used with GCC-15. So -std=gnu11 can help that.
+
+Signed-off-by: Zorro Lang <zlang@kernel.org>
+---
+ include/builddefs.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/builddefs.in b/include/builddefs.in
+index 7274cde..631e5d8 100644
+--- a/include/builddefs.in
++++ b/include/builddefs.in
+@@ -75,7 +75,7 @@ HAVE_RLIMIT_NOFILE = @have_rlimit_nofile@
+ NEED_INTERNAL_XFS_IOC_EXCHANGE_RANGE =@need_internal_xfs_ioc_exchange_range@
+ HAVE_FICLONE = @have_ficlone@
+
+-GCCFLAGS = -funsigned-char -fno-strict-aliasing -Wall
++GCCFLAGS = -funsigned-char -fno-strict-aliasing -std=gnu11 -Wall
+
+ ifeq ($(PKG_PLATFORM),linux)
+ PCFLAGS = -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 $(GCCFLAGS)
