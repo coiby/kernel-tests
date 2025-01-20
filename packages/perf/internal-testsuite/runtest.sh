@@ -50,13 +50,85 @@ fi
 check_allowlisted()
 {
 	HASH=`echo -n "$1" | sha1sum | awk '{print $1}'`
-	cat allow.list | perl -pe 's/#.*$//' | grep $HASH | grep -q -e "all" -e "$MY_ARCH"
-	return $?
+	MATCH=`cat allow.list | perl -pe 's/#.*$//' | perl -pe 's/#\s*$/ /' | grep $HASH`
+
+	if [ -z "$VIRT" ]; then			# skip KVM whitelist if the system is no a KVM
+		MATCH=`echo -n $MATCH | grep -v KVM`
+	fi
+
+	if [[ -z "$MATCH" ]]; then
+		return 1;
+	fi
+
+	# need a for loop for multiple matches
+	set -- $MATCH
+	while [[ $1 != "" ]]
+	do
+		shift;	# skip the hash
+		local denylist_arch=$1; shift
+		local denylist_kernel_version_start=$1; shift
+		local denylist_kernel_version_end=$1; shift
+		# TODO fix checking/skipping the KVM flag
+
+		grep -q -e "all" -e "$MY_ARCH," <<<"$denylist_arch" || continue
+		K_Vercmp $KERNEL $denylist_kernel_version_start
+		[[ $K_KVERCMP_RET -ge "0" ]] || continue
+		K_Vercmp $KERNEL $denylist_kernel_version_end
+		[[ $K_KVERCMP_RET -lt "0" ]] || continue
+		return 0
+	done
+
+	return 1
 }
 
 prepare_allowlists()
 {
 	rlRun "cp allow.list $TmpDir/" 0 "ALLOWLIST: adding basic allowlist"
+}
+
+# K_Vercmp() returns one of the following values in the global K_KVERCMP_RET:
+#   -1 if kernel version from argument $1 is older
+#    0 if kernel version from argument $1 is the same as $2
+#    1 if kernel version from argument $1 is newer
+K_KVERCMP_RET=0 # NOT CURRENTLY WORKING FOR THE KERNEL SUB VERSION starting with 0 TODO FIX
+function K_Vercmp ()
+{
+	local ver1=`echo $1 | sed 's/-/./'`
+	local ver2=`echo $2 | sed 's/-/./'`
+
+	local ret=0
+	local i=1
+	while [ 1 ]; do
+		local digit1=`echo $ver1 | cut -d . -f $i`
+		local digit2=`echo $ver2 | cut -d . -f $i`
+
+		if [ -z "$digit1" ]; then
+			if [ -z "$digit2" ]; then
+				ret=0
+				break
+			else
+				ret=-1
+				break
+			fi
+		fi
+
+		if [ -z "$digit2" ]; then
+			ret=1
+			break
+		fi
+
+		if [ "$digit1" != "$digit2" ]; then
+			if [ "$digit1" -lt "$digit2" ]; then
+				ret=-1
+				break
+			fi
+			ret=1
+			break
+		fi
+
+		i=$((i+1))
+	done
+	K_KVERCMP_RET=$ret
 }
 
 # return 0 when running kernel rt
@@ -77,6 +149,7 @@ rlJournalStart
 		rlCheckRpm python3-perf || yum -y install python3-perf
 		export MY_ARCH=`arch`
 		export KERNEL=`uname -r`
+		export VIRT=`virt-what`
 		# unset ARCH variable in case it is set to something
 		# (wrongly set ARCH variable breaks LLVM tests!!)
 		unset ARCH
