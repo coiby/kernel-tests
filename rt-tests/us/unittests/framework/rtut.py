@@ -49,7 +49,7 @@ class RTUnitTest(unittest.TestCase):
     def run_unittests(cls):
         """ Class method for running the unittest main function """
         print(f"Running unittest for {cls.__name__}")
-        unittest.main()
+        unittest.main(verbosity=2)
 
 if __name__ == '__main__':
     raise RuntimeError(f"{__file__.rsplit('/', 1)[-1]} to be imported "

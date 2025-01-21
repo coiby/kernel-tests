@@ -64,4 +64,4 @@ class StalldTest(rtut.RTUnitTest):
         self.run_cmd('timeout --preserve-status 2 stalld -f -l -O')
 
 if __name__ == '__main__':
-    StalldTest.run_unittests(verbosity=2)
+    StalldTest.run_unittests()
