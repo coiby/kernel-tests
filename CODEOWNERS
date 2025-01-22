@@ -277,8 +277,8 @@
 /packages/iotop/sanity/ @bgoncalv @lulinqing @xjezda00
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 /packages/net-snmp/tcp-transport/ @bgoncalv @efedin @lulinqing
-/packages/perf/internal-testsuite/ @bgoncalv @lulinqing @vmolnaro @zhaoqiao
-/packages/perf/perftool-testsuite/ @bgoncalv @lulinqing @vmolnaro @zhaoqiao
+/packages/perf/internal-testsuite/ @bgoncalv @lulinqing @zhaoqiao
+/packages/perf/perftool-testsuite/ @bgoncalv @lulinqing @zhaoqiao
 /packages/redhat-rpm-config/detect-kabi-provides/ @bgoncalv @ckalina @lulinqing
 /packages/redhat-rpm-config/kabi-whitelist-not-found/ @bgoncalv @ckalina @lulinqing
 /packages/redhat-rpm-config/kernel-module-symbol-requires/ @bgoncalv @ckalina @lulinqing
