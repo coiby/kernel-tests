@@ -4,8 +4,6 @@ component:
   - kernel
   - lvm2
 test: bash ./runtest.sh
-tag:
-  - KernelTier1
 framework: shell
 require:
   - augeas
