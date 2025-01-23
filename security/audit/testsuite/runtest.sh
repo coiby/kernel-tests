@@ -37,7 +37,8 @@ rlJournalStart
         rlRun "pushd audit-testsuite"
         rlRun "git checkout $GIT_REF"
         rlIsRHEL "<9" && rlRun "sed -i '/backlog_wait_time_actual_reset/d' tests/Makefile"
-        rlIsRHEL ">9" && rlRun "sed -i '/syscall_socketcall/d' tests/Makefile" || rlRun "sed -i '/io_uring/d' tests/Makefile"
+        rlIsRHEL ">9" && rlRun "sed -i '/syscall_socketcall/d' tests/Makefile"
+        rlRun "sysctl kernel.io_uring_disabled | grep -q 'kernel.io_uring_disabled = 0'" 0-1 || rlRun "sed -i '/io_uring/d' tests/Makefile"
     rlPhaseEnd
 
     rlPhaseStartTest "Audit testsuite"
