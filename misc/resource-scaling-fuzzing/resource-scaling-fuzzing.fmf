@@ -1127,6 +1127,10 @@ require:
         - /misc/resource-scaling-fuzzing
 duration: 2h
 id: e5f27f7c-f987-42b2-bacd-db93ff4ff0a4
+enabled: false  # this test targets Renesas R-Car S4 specific hardware
+adjust:
+    enabled: true
+    when: hw_target == rcar_s4
 environment:
     git_patch: '../../../../misc/resource-scaling-fuzzing/resource-scaling-fuzzing.patch'
     syscalls: |
