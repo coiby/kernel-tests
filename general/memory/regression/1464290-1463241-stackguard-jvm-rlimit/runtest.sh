@@ -64,9 +64,15 @@ rlJournalStart
 
         LIBPATH=$(find /usr/lib/jvm/java-${java_version}/jre/lib -name libjvm.so | grep server)
         LIBPATH=$(dirname $LIBPATH)
-        rlRun "gcc -fPIC -I/usr/lib/jvm/java-${java_version}/include/ -I/usr/lib/jvm/java-${java_version}/include/linux/  -L $LIBPATH -ljvm jni-sanity.c -o jni-sanity"
-        rlRun "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${LIBPATH} ./jni-sanity"
-
+        LIBFFIPATH=$(find /usr/lib/jvm/java-${java_version}/jre/lib -name libffi.so.6 | head -1)
+        LIBFFIPATH=$(dirname $LIBFFIPATH)
+        if [ -n "${LIBFFIPATH}" ]; then
+            rlRun "gcc -fPIC -I/usr/lib/jvm/java-${java_version}/include/ -I/usr/lib/jvm/java-${java_version}/include/linux/  -L $LIBPATH -Wl,-rpath=${LIBFFIPATH} -ljvm jni-sanity.c -o jni-sanity"
+            rlRun "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${LIBPATH}:${LIBFFIPATH} ./jni-sanity"
+        else
+            rlRun "gcc -fPIC -I/usr/lib/jvm/java-${java_version}/include/ -I/usr/lib/jvm/java-${java_version}/include/linux/  -L $LIBPATH -ljvm jni-sanity.c -o jni-sanity"
+            rlRun "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${LIBPATH} ./jni-sanity"
+        fi
     rlPhaseEnd
 
     rlPhaseStartCleanup
