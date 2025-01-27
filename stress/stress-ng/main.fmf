@@ -67,3 +67,4 @@ recommend:
 extra-summary: stress/stress-ng
 extra-task: stress/stress-ng
 id: 78648bc2-5de1-4390-b0b8-fbe37d31b064
+duration: 1h
