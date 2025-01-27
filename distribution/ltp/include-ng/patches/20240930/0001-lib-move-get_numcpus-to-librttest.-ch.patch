@@ -1,0 +1,79 @@
+From 2bdf8ee116668c7b2b884760cfb5a15c013784a7 Mon Sep 17 00:00:00 2001
+From: Attila Fazekas <afazekas@redhat.com>
+Date: Fri, 17 Jan 2025 14:57:44 +0100
+Subject: [PATCH 1/2] lib: move get_numcpus to librttest.[ch]
+
+get_numcpus() can be used by other tests therefore it is
+better to move it to a shared place.
+
+Link: https://lore.kernel.org/ltp/20250117135745.909549-2-afazekas@redhat.com/
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Signed-off-by: Attila Fazekas <afazekas@redhat.com>
+---
+ testcases/realtime/func/prio-preempt/prio-preempt.c | 13 -------------
+ testcases/realtime/include/librttest.h              |  4 ++++
+ testcases/realtime/lib/librttest.c                  | 13 +++++++++++++
+ 3 files changed, 17 insertions(+), 13 deletions(-)
+
+diff --git a/testcases/realtime/func/prio-preempt/prio-preempt.c b/testcases/realtime/func/prio-preempt/prio-preempt.c
+index 272833763..5dd717d1f 100644
+--- a/testcases/realtime/func/prio-preempt/prio-preempt.c
++++ b/testcases/realtime/func/prio-preempt/prio-preempt.c
+@@ -288,19 +288,6 @@ void *master_thread(void *arg)
+ 	return NULL;
+ }
+ 
+-int get_numcpus(void)
+-{
+-	long numcpus_conf = sysconf(_SC_NPROCESSORS_CONF);
+-	size_t size = CPU_ALLOC_SIZE(numcpus_conf);
+-	cpu_set_t *cpuset = CPU_ALLOC(numcpus_conf);
+-
+-	CPU_ZERO_S(size, cpuset);
+-	/* Get the number of cpus accessible to the current process */
+-	sched_getaffinity(0, size, cpuset);
+-
+-	return CPU_COUNT_S(size, cpuset);
+-}
+-
+ int main(int argc, char *argv[])
+ {
+ 	int pri_boost, numcpus;
+diff --git a/testcases/realtime/include/librttest.h b/testcases/realtime/include/librttest.h
+index 0a1bb0540..39538c47c 100644
+--- a/testcases/realtime/include/librttest.h
++++ b/testcases/realtime/include/librttest.h
+@@ -355,4 +355,8 @@ int trace_marker_write(char *buf, int len);
+  */
+ int atrace_marker_write(char *tag, char *msg);
+ 
++/* get_numcpus: get the number of cpus accessible to the current process
++ */
++int get_numcpus(void);
++
+ #endif /* LIBRTTEST_H */
+diff --git a/testcases/realtime/lib/librttest.c b/testcases/realtime/lib/librttest.c
+index 764398179..03566f36d 100644
+--- a/testcases/realtime/lib/librttest.c
++++ b/testcases/realtime/lib/librttest.c
+@@ -763,3 +763,16 @@ int atrace_marker_write(char *tag, char *msg)
+ 	return trace_marker_write(trace_buf,
+ 				  strnlen(trace_buf, TRACE_BUF_LEN));
+ }
++
++int get_numcpus(void)
++{
++	long numcpus_conf = sysconf(_SC_NPROCESSORS_CONF);
++	size_t size = CPU_ALLOC_SIZE(numcpus_conf);
++	cpu_set_t *cpuset = CPU_ALLOC(numcpus_conf);
++
++	CPU_ZERO_S(size, cpuset);
++	/* Get the number of cpus accessible to the current process */
++	sched_getaffinity(0, size, cpuset);
++
++	return CPU_COUNT_S(size, cpuset);
++}
+-- 
+2.47.1
+

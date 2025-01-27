@@ -29,6 +29,8 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0003-Add-landlock08-test.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0004-Add-error-coverage-for-landlock-network-support.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-getrandom05-add-test-variants.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-move-get_numcpus-to-librttest.-ch.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0002-sched_football-use-get_numcpus.patch
 	fi
 
 	if [ "$TESTVERSION" == "20240524" ]; then

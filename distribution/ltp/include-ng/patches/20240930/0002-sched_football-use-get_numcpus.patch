@@ -1,0 +1,33 @@
+From a2e7865cbc99452d1951d20f801b3a422be3e6b2 Mon Sep 17 00:00:00 2001
+From: Attila Fazekas <afazekas@redhat.com>
+Date: Fri, 17 Jan 2025 14:57:45 +0100
+Subject: [PATCH 2/2] sched_football: use get_numcpus()
+
+sched_football can hang in systems where not all CPU cores
+are available, using get_numcpus() to account
+for things like isolated cores.
+
+Link: https://lore.kernel.org/ltp/20250117135745.909549-3-afazekas@redhat.com/
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Signed-off-by: Attila Fazekas <afazekas@redhat.com>
+---
+ testcases/realtime/func/sched_football/sched_football.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/realtime/func/sched_football/sched_football.c b/testcases/realtime/func/sched_football/sched_football.c
+index 763b41f23..5ffc1ff46 100644
+--- a/testcases/realtime/func/sched_football/sched_football.c
++++ b/testcases/realtime/func/sched_football/sched_football.c
+@@ -140,7 +140,7 @@ static void do_test(void)
+ 	int i;
+ 
+ 	if (players_per_team == 0)
+-		players_per_team = sysconf(_SC_NPROCESSORS_ONLN);
++		players_per_team = get_numcpus();
+ 
+ 	tst_atomic_store(0, &players_ready);
+ 
+-- 
+2.47.1
+
