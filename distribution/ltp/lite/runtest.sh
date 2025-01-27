@@ -45,11 +45,11 @@ function ltp_test_build()
 		build_all
 	fi
 	if [[ -z ${LTP_COMMIT_ID} ]]; then
-		RHELKT1LITE_CONFIG=RHELKT1LITE.${TESTVERSION}
+		RHELKT1LITE_CONFIG=$RUNTESTS.${TESTVERSION}
 	else
-		RHELKT1LITE_CONFIG=RHELKT1LITE.next
+		RHELKT1LITE_CONFIG=$RUNTESTS.next
 	fi
-	cp -vf configs/${RHELKT1LITE_CONFIG} ${runtest_path}/RHELKT1LITE
+	cp -vf configs/${RHELKT1LITE_CONFIG} ${runtest_path}/$RUNTESTS
 	if [ $? -ne 0 ]; then
 		echo "FAIL: couldn't copy configs/${RHELKT1LITE_CONFIG}"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN

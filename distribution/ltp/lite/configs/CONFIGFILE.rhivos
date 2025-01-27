@@ -1,0 +1,254 @@
+
+# This is a CONFIGFILE for RHIVOSLITE.${LTP_VERSION} generating.
+# changelog:
+# 1/20/2025 Initial creation from RHEL CONFIGFILE.
+#   modifications:
+#       %eventfd06 eventfd06    # CONFIG_AIO disabled in RHIVOS
+#       %getxattr04 getxattr04  # CONFIG_XFS_FS disabled in RHIVOS
+#
+# Testcase with prefix [%|?|@] will be modified in new runtest
+#  '%' - test will be kicked-out from runtest
+#  '?' - test will be tweaked with new parameter
+#  '@' - test will be added in runtest directly
+
+# #######################################
+# Test with prefix '%' will be kicked out
+# #######################################
+%fw_load fw_load
+%rtc01 rtc01
+%block_dev block_dev
+%tpci tpci
+%tbio tbio
+%ltp_acpi ltp_acpi
+%cpufreq_boost cpufreq_boost
+%uaccess uaccess
+%rcu_torture rcu_torture.sh
+%lock_torture lock_torture.sh
+%zram01 zram01.sh
+%zram02 zram02.sh
+%zram03 zram03
+%fsx-ext2 fsxtest $SCRATCHDEV ext2 10000
+%fsx-ext3 fsxtest $SCRATCHDEV ext3 10000
+%fsx-jfs fsxtest $SCRATCHDEV jfs 10000
+%fsx-xfs  fsxtest $SCRATCHDEV xfs 10000
+%fsx-reiserfs fsxtest $SCRATCHDEV reiserfs 10000
+%delete_module01 delete_module01
+%delete_module02 delete_module02
+%delete_module03 delete_module03
+%eventfd06 eventfd06
+%getxattr04 getxattr04
+%getxattr05 getxattr05
+%ioctl01 ioctl01 -D /dev/tty0
+%ioctl02 ioctl02 -D /dev/tty0
+%msgstress03 msgstress03
+%msgstress04 msgstress04
+%preadv201 preadv201
+%preadv201_64 preadv201_64
+%preadv202 preadv202
+%preadv202_64 preadv202_64
+%request_key05 request_key05
+%ulimit01 ulimit01
+%membarrier01 membarrier01
+%epoll_wait02 epoll_wait02
+%move_pages08 move_pages08
+%move_pages09 move_pages09
+%mmap11 mmap11 -i 30000
+%perf_event_open01 perf_event_open01
+%perf_event_open02 perf_event_open02
+# skip prctl10 due to GPF https://bugzilla.redhat.com/2174427
+%prctl10 prctl10
+%statx05 statx05
+%mem01 mem01
+%mmap10 mmap10
+%mmap10_1 mmap10 -a
+%mmap10_2 mmap10 -s
+%mmap10_3 mmap10 -a -s
+%mmap10_4 mmap10 -a -s -i 60
+%ksm01 ksm01
+%ksm01_1 ksm01 -u 128
+%ksm02 ksm02
+%ksm02_1 ksm02 -u 128
+%ksm03 ksm03
+%ksm03_1 ksm03 -u 128
+%ksm04 ksm04
+%ksm04_1 ksm04 -u 128
+%ksm05 ksm05 -I 10
+%ksm06 ksm06
+%ksm06_1 ksm06 -n 10
+%ksm06_2 ksm06 -n 10000
+%oom01 oom01
+%oom02 oom02
+%oom03 oom03
+%oom04 oom04
+%oom05 oom05
+%swapping01 swapping01 -i 5
+%thp01 thp01 -I 120
+%thp02 thp02
+%thp03 thp03
+%overcommit_memory01 overcommit_memory
+%overcommit_memory02 overcommit_memory -R 0
+%overcommit_memory03 overcommit_memory -R 30
+%overcommit_memory04 overcommit_memory -R 80
+%overcommit_memory05 overcommit_memory -R 100
+%overcommit_memory06 overcommit_memory -R 200
+%max_map_count max_map_count -i 10
+%min_free_kbytes min_free_kbytes
+%time-schedule01		time-schedule
+%trace_sched01		trace_sched -c 1
+%hackbench01 hackbench 50 process 1000
+%hackbench02 hackbench 20 thread 1000
+%sched_cli_serv run_sched_cliserv.sh
+%sched_stress sched_stress.sh
+%autogroup01 autogroup01
+%ftrace_regression01	ftrace_regression01.sh
+%ftrace_regression02	ftrace_regression02.sh
+%ftrace-stress-test	ftrace_stress_test.sh 90
+%pt_full_trace_basic pt_test
+%iogen01 export LTPROOT; rwtest -N iogen01 -i 120s -s read,write -Da -Dv -n 2 500b:$TMPDIR/doio.f1.$$ 1000b:$TMPDIR/doio.f2.$$
+%fs_inod01 fs_inod $TMPDIR 10 10 10
+%linker01 linktest.sh 1000 1000
+%openfile01 openfile -f10 -t10
+%inode01 inode01
+%inode02 inode02
+%stream01 stream01
+%stream02 stream02
+%stream03 stream03
+%stream04 stream04
+%stream05 stream05
+%ftest01 ftest01
+%ftest02 ftest02
+%ftest03 ftest03
+%ftest04 ftest04
+%ftest05 ftest05
+%ftest06 ftest06
+%ftest07 ftest07
+%ftest08 ftest08
+%lftest01	lftest 100
+%writetest01	writetest
+%fs_di fs_di -d $TMPDIR
+%fs_racer fs_racer.sh -t 5
+%quota_remount_test01 quota_remount_test01.sh
+%isofs isofs.sh
+%fs_fill fs_fill
+%proc01 proc01 -m 128
+
+
+# #######################################################
+# Test with prefix '?' will be tweaked with new parameter
+# #######################################################
+?getrusage04 sh -c "getrusage04 || true"
+?pselect01 sh -c "pselect01 || true"
+?pselect01_64 sh -c "pselect01_64 || true"
+
+
+# #######################################################
+# Test with prefix '@' will be added-in directly
+# #######################################################
+@#cve tests
+@cve-2014-0196 cve-2014-0196
+@cve-2015-3290 cve-2015-3290
+@cve-2016-7042 cve-2016-7042
+@cve-2016-7117 cve-2016-7117
+@cve-2016-10044 cve-2016-10044
+@cve-2017-2618 cve-2017-2618
+@cve-2017-2671 cve-2017-2671
+@cve-2017-16939 cve-2017-16939
+@cve-2017-17052 cve-2017-17052
+@cve-2017-17053 cve-2017-17053
+@cve-2017-1000364 stack_clash
+@cve-2020-25705 icmp_rate_limit01
+@cve-2022-4378 cve-2022-4378
+
+@
+@#aio/dio tests
+@# setup scratch space
+@SETUP01 dd if=/dev/urandom of=$BIG_FILE bs=4096 count=4096
+@
+@#ltp-aio-stress
+@# added -s 128M, guests have limited disk space
+@AIOSETUP00  mkdir -p $TMPDIR/aiodio/
+@AIOSETUP01  dd if=$BIG_FILE of=$TMPDIR/aiodio/junkfile bs=8192 conv=block,sync
+@
+@ADS1000 aio-stress -I500  -o2 -r4        -f1
+@ADS1005 aio-stress -I500  -o3 -r4        -f2
+@ADS1008 aio-stress -I500  -o3 -r32  -t4  -f4
+@ADS1014 aio-stress -I500  -o2 -O -r8     -f2
+@ADS1020 aio-stress -I500  -o3 -O -r16  -t2  -f2
+@ADS1027 aio-stress -I500  -o0 -r8        -f1
+@ADS1031 aio-stress -I500  -o1 -r4   -t2  -f2
+@ADS1040 aio-stress -I500  -o1 -O -r8   -t2  -f2
+@
+@#ltp-aiodio.part1
+@AIOSETUP01  dd if=$BIG_FILE of=$TMPDIR/aiodio/junkfile bs=8192 conv=block,sync
+@AIOSETUP02  dd if=$BIG_FILE of=$TMPDIR/aiodio/fff      bs=4096 conv=block,sync
+@AIOSETUP03  dd if=$BIG_FILE of=$TMPDIR/aiodio/ff1      bs=2048 conv=block,sync
+@AIOSETUP04  dd if=$BIG_FILE of=$TMPDIR/aiodio/ff2      bs=1024 conv=block,sync
+@AIOSETUP05  dd if=$BIG_FILE of=$TMPDIR/aiodio/ff3      bs=512  conv=block,sync
+@
+@AD056 aiocp -b 8k -n 64 -f SYNC
+@AD057 aiocp -b 16k -n 1 -f DIRECT
+@AD058 aiocp -b 16k -n 1 -f SYNC
+@AD130 aiocp -b 512k -n 2 -f SYNC
+@AD131 aiocp -b 512k -n 4 -f DIRECT
+@AD132 aiocp -b 512k -n 4 -f SYNC
+@AD106 aiocp -b 128k -n 8 -f SYNC
+@AD107 aiocp -b 128k -n 16 -f DIRECT
+@AD108 aiocp -b 128k -n 16 -f SYNC
+@AD109 aiocp -b 128k -n 32 -f DIRECT
+@AD110 aiocp -b 128k -n 32 -f SYNC
+@AD111 aiocp -b 128k -n 64 -f DIRECT
+@AD112 aiocp -b 128k -n 64 -f SYNC
+@AD123 aiocp -b 256k -n 32 -f DIRECT
+@AD124 aiocp -b 256k -n 32 -f SYNC
+@AD125 aiocp -b 256k -n 64 -f DIRECT
+@AD126 aiocp -b 256k -n 64 -f SYNC
+@AD131 aiocp -b 512k -n 4 -f DIRECT
+@AD132 aiocp -b 512k -n 4 -f SYNC
+@AD133 aiocp -b 512k -n 8 -f DIRECT
+@AD134 aiocp -b 512k -n 8 -f SYNC
+@AD135 aiocp -b 512k -n 16 -f DIRECT
+@AD136 aiocp -b 512k -n 16 -f SYNC
+@AD137 aiocp -b 512k -n 32 -f DIRECT
+@AD138 aiocp -b 512k -n 32 -f SYNC
+@AD139 aiocp -b 512k -n 64 -f DIRECT
+@AD140 aiocp -b 512k -n 64 -f SYNC
+@
+@#ltp-aiodio.part2
+@ADSP005 aiodio_sparse -o 2 -w 4k -s 8k -n 2
+@ADSP006 aiodio_sparse -o 4 -w 8k -s 32k -n 2
+@ADSP007 aiodio_sparse -o 4 -w 8k -s 32k -n 2
+@ADSP008 aiodio_sparse -o 4 -w 16k -s 64k -n 2
+@ADSP009 aiodio_sparse -o 4 -w 32k -s 128k -n 2
+@ADSP010 aiodio_sparse -o 4 -w 64k -s 256k -n 2
+@ADSP011 aiodio_sparse -o 4 -w 128k -s 512k -n 2
+@ADSP012 aiodio_sparse -o 4 -w 256k -s 1024k -n 2
+@ADSP013 aiodio_sparse -o 4 -w 512k -s 2048k -n 2
+@ADSP014 aiodio_sparse -o 4 -w 1024k -s 4096k -n 2
+@ADSP015 aiodio_sparse -o 4 -w 2048k -s 8192k -n 2
+@ADSP016 aiodio_sparse -o 4 -w 4096k -s 16384k -n 2
+@ADSP017 aiodio_sparse -o 4 -w 8192k -s 32768k -n 2
+@ADSP018 aiodio_sparse -o 4 -w 16384k -s 65536k -n 2
+@ADSP045 dio_sparse  -w 4k -s 4k -n 2
+@ADSP046 dio_sparse  -w 16k -s 16k -n 2
+@ADSP047 dio_sparse  -w 32k -s 32k -n 2
+@ADSP048 dio_sparse  -w 64k -s 64k -n 2
+@ADSP049 dio_sparse  -w 128k -s 128k -n 2
+@ADSP050 dio_sparse  -w 256k -s 256k -n 2
+@ADSP051 dio_sparse  -w 512k -s 512k -n 2
+@ADSP052 dio_sparse  -w 1024k -s 1024k -n 2
+@ADSP053 dio_sparse  -w 2048k -s 2048k -n 2
+@ADSP054 dio_sparse  -w 4096k -s 4096k -n 2
+@ADSP055 dio_sparse  -w 8192k -s 8192k -n 2
+@ADSP056 dio_sparse  -w 18192k -s 18192k -n 2
+@
+@#ltp-aiodio.part3
+@# lower number of ops for KT1
+@AIOSETUP01  dd if=$BIG_FILE of=$TMPDIR/aiodio/junkfile bs=8192 conv=block,sync
+@FSX032 fsx-linux -l 500000 -r 4096 -t 4096 -w 4096 -N 10000
+@FSX042 fsx-linux -N 10000 -o 4096
+@
+@#proc
+@# Read every file in /proc. Not likely to crash, but does enough
+@# to disturb the kernel. A good kernel latency killer too.
+@# Was not sure why it should reside in runtest/crashme and won´t get tested ever
+@proc01 proc01 -m 128
