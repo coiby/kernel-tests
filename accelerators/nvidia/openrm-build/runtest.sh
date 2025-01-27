@@ -21,11 +21,13 @@
 
 # Test configuration
 # TODO: Make it customizable so we can test different driver versions
+# RHEL AI versions info: https://gitlab.com/redhat/rhel-ai/containers/nvidia-bootc/-/blob/main/argfile.conf?ref_type=heads
+DRIVER_VERSION="550.144.03"
+CUDA_VERSION='12.4.1'
 BASE_URL='https://us.download.nvidia.com/tesla'
 SPECFILE_REPO='https://github.com/NVIDIA/yum-packaging-precompiled-kmod'
-DRIVER_VERSION="550.90.07"
+
 DRIVER_STREAM=$(echo ${DRIVER_VERSION} | cut -d '.' -f 1)
-CUDA_VERSION='12.4.1'
 CUDA_VERSION_ARRAY=(${CUDA_VERSION//./ })
 CUDA_DASHED_VERSION=${CUDA_VERSION_ARRAY[0]}-${CUDA_VERSION_ARRAY[1]}
 
@@ -33,7 +35,7 @@ CUDA_DASHED_VERSION=${CUDA_VERSION_ARRAY[0]}-${CUDA_VERSION_ARRAY[1]}
 # Environment information
 KCORE_PACKAGE="kernel-core-$(uname -r)"
 KVER=$(rpm -q --qf "%{VERSION}" ${KCORE_PACKAGE})
-KREL=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | sed 's/\.el.\(_.\)*$//')
+KREL=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | sed 's/\.el.\(_.\)*$//' | cut -d '.' -f 1)
 KDIST=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | awk -F '.' '{ print "."$NF}')
 OS_VERSION=$(grep "^VERSION=" /etc/os-release)
 OS_VERSION_MAJOR=$(grep "^VERSION=" /etc/os-release | cut -d '=' -f 2 | sed 's/"//g' | cut -d '.' -f 1)
@@ -54,7 +56,12 @@ rlJournalStart
         rlLog "Target arch: ${TARGET_ARCH}"
 
         rlLog "Setting up OpenRM build"
+        # Install kernel-devel package for current kernel if not present
+        dnf install -y kernel-devel-${KVER}-${KREL}${KDIST}
+        # Install openssl as it is not installed by default
+        dnf install -y openssl
         git clone --depth 1 --single-branch -b rhel${OS_VERSION_MAJOR} ${SPECFILE_REPO}
+
         cd yum-packaging-precompiled-kmod
         mkdir BUILD BUILDROOT RPMS SRPMS SOURCES SPECS
         mkdir nvidia-kmod-${DRIVER_VERSION}-${BUILD_ARCH}
@@ -85,7 +92,6 @@ rlJournalStart
             --define "vendor ${VENDOR:-undefined}" \
             --define "_buildhost ${RPM_HOST:-${HOSTNAME}}" \
             -v -bb SPECS/kmod-nvidia.spec'
-
         rlLog "Installing OpenRM driver"
         rlRun "rpm -ivh RPMS/x86_64/kmod-nvidia-${DRIVER_VERSION}-${KVER}-${KREL}-${DRIVER_VERSION}-3${KDIST}.${BUILD_ARCH}.rpm"
 
