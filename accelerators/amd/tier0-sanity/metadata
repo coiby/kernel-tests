@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=git;kernel-devel;rpm-build
+dependencies=
 softDependencies=beakerlib-redhat
 
