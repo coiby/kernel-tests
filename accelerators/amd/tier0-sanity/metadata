@@ -1,0 +1,13 @@
+[General]
+name=accelerators/amd/tier0-sanity
+owner=Oliver Gutiérrez <ogutierr@redhat.com>
+description=Sanity testing of the AMD in-tree driver
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=git;kernel-devel;rpm-build
+softDependencies=beakerlib-redhat
+
