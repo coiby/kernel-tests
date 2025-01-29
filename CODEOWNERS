@@ -73,6 +73,7 @@
 /core-kernel/module_diff/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /cpu/die/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /cpu/driver/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/distribution/command/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /distribution/kernel-debuginfo/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /distribution/ltp/lite/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /distribution/ltp/openposix_testsuite/ @IamEld3st @Toaster192 @bgoncalv @bgrech @bkhomuts @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
