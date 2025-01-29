@@ -12,7 +12,7 @@ do_cgroup_run()
     do
         num=$((num + 1))
         # report results as a subphase
-        rlPhaseStartTest "${num}..${total} selftests: ${test}"
+        rlPhaseStartTest "selftests: ${test}"
         if [ "${test}" = "cgroup:test_cpuset_prs.sh" ]; then
             pushd cgroup || exit
             ./"${test##cgroup:}" -d 2

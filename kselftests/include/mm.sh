@@ -55,7 +55,7 @@ do_mm_run()
     do
         num=$((num + 1))
         # report results as a subphase
-        rlPhaseStartTest "${num}..${total} selftests: ${test}"
+        rlPhaseStartTest "selftests: ${test}"
         if [ "${test}" = "mm:run_vmtests.sh" ]; then
             if cki_is_kernel_automotive ; then
                 sed -i "s/mm:run_vmtests.sh/mm:run_mm_tests.sh/" kselftest-list.txt

@@ -28,7 +28,7 @@ do_bpf_run()
     for test in "${tests[@]}"; do
         num=$((num + 1))
         # report results as a subphase
-        rlPhaseStartTest "${num}..${total_num} selftests: ${test}"
+        rlPhaseStartTest "selftests: ${test}"
         RunKSelfTest "${test}"
         ret=$?
         check_result "$num" "$total_num" "${test}" "$ret"

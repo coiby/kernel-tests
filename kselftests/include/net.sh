@@ -336,7 +336,7 @@ do_bpf_test_progs_run()
 		num=$((num + 1))
 
 		# report results as a subphase
-		rlPhaseStartTest "${num}..${total_num} selftests: ${item}:${name}"
+		rlPhaseStartTest "selftests: ${item}:${name}"
 		if check_skip "${item}:${name}"; then
 			test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]"
 			rlPhaseEnd
@@ -420,7 +420,7 @@ do_tc-testing_run()
 		num=$((num + 1))
 
 		# report results as a subphase
-		rlPhaseStartTest "${num}..${total_num} selftests: ${item}:${name}"
+		rlPhaseStartTest "selftests: ${item}:${name}"
 		if check_skip "${item}:${name}"; then
 			test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]"
 			rlPhaseEnd
