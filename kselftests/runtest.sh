@@ -325,7 +325,7 @@ function RunTest ()
             # Run self-tests
             for t in ${TARGETS}; do
                 # report results as a subphase
-                rlPhaseStartTest "${num}..${total_num} selftests: ${t}"
+                rlPhaseStartTest "selftests: ${t}"
                 num=$(($num + 1))
                 RunKSelfTest ${t}
                 ret=$?
