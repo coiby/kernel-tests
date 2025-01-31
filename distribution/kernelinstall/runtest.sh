@@ -343,9 +343,9 @@ function SelectKernel ()
             # Unified tree kernel-rt inherits kernel NVR and
             # appends "+rt" or "+rt-debug"
             if [[ "$RT_DEBUG" == "true" ]]; then
-                EXTRA="rt-debug"
+                EXTRA="rt$RT_SUBTYPE-debug"
             else
-                EXTRA="rt"
+                EXTRA="rt$RT_SUBTYPE"
             fi
         else
             # Non-unified tree kernel-rt has unique NVR and
@@ -677,9 +677,9 @@ function CheckKernel ()
             # Unified tree kernel-rt inherits kernel NVR and
             # appends "+rt" or "+rt-debug"
             if [[ "$RT_DEBUG" == "true" ]]; then
-                KVAR="rt-debug"
+                KVAR="rt$RT_SUBTYPE-debug"
             else
-                KVAR="rt"
+                KVAR="rt$RT_SUBTYPE"
             fi
         else
             # Non-unified tree kernel-rt has unique NVR and
@@ -1452,6 +1452,7 @@ fi
 # Handle RT kernels built from both a unified source tree and separate main-rt tree
 RT_REQUESTED="false"
 RT_DEBUG="false"
+RT_SUBTYPE=""
 RT_UNIFIED="true"
 if [[ "$KERNELARGVARIANT" = "rt"* || "$KERNELARGNAME" == "kernel-rt"* ]]; then
     RT_REQUESTED="true"
@@ -1461,6 +1462,11 @@ if [[ "$KERNELARGVARIANT" = "rt"* || "$KERNELARGNAME" == "kernel-rt"* ]]; then
         # as well as if user requested KERNELARGNAME = kernel-rt-debug or kernel-rtdebug
         RT_DEBUG="true"
     fi
+
+    if [[ "$KERNELARGVARIANT" == *"64k"* || "$KERNELARGNAME" == *"-64k"* ]]; then
+        RT_SUBTYPE="-64k"
+    fi
+
     if [[ "$KERNELARGVERSION" == *".rt"* ]]; then
         # Kernel RT built from the same source tree as kernel uses the same
         # NVR as kernel but will add "+rt" or "+rt-debug".  When built from
@@ -1470,7 +1476,7 @@ if [[ "$KERNELARGVARIANT" = "rt"* || "$KERNELARGNAME" == "kernel-rt"* ]]; then
         RT_UNIFIED="false"
         KERNPKGDIRECTORY="kernel-rt"
     fi
-    DeBug "RT Variables: RT_REQUESTED=$RT_REQUESTED RT_DEBUG=$RT_DEBUG RT_UNIFIED=$RT_UNIFIED KERNPKGDIRECTORY=$KERNPKGDIRECTORY"
+    DeBug "RT Variables: RT_REQUESTED=$RT_REQUESTED RT_DEBUG=$RT_DEBUG RT_SUBTYPE=$RT_SUBTYPE RT_UNIFIED=$RT_UNIFIED KERNPKGDIRECTORY=$KERNPKGDIRECTORY"
 fi
 
 # New kernel variables
