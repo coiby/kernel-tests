@@ -48,9 +48,9 @@ rlJournalStart
         while IFS= read -r line; do
             if [[ "$line" =~ ^[a-zA-Z0-9_]+/test[[:space:]]*\.\. ]]; then
                 if [[ "$line" =~ ok ]]; then
-                    rlReport "$(echo "$line" | awk '{print $1}')" PASS
+                    rlReport "$(echo "$line" | awk '{print $1}')" PASS "" results.log
                 else
-                    rlReport "$(echo "$line" | awk '{print $1}')" FAIL
+                    rlReport "$(echo "$line" | awk '{print $1}')" FAIL "" results.log
                 fi
             fi
         done < "results.log"
