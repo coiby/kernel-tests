@@ -1,3 +1,5 @@
+# SUMMARY
+
 Runtime overrun happens when the SCHED_DEADLINE runs more than expected
 and will be throttled until next period.
 
@@ -8,3 +10,26 @@ the counter which record how many times the signal is received.
 2. when SCHED_FLAG_DL_OVERRUN is not enabled, SIGXCPU should not be sent
 to the running process when runtime overrun happens. The counter which record
 how many times the signal is received should be 0.
+
+# Test Implementation
+
+1. Signal Handling: Registers a handler to track SIGXCPU occurrences.
+2. Scheduler Configuration: Sets the task to SCHED_DEADLINE with:
+   - Runtime: 10 ms
+   - Deadline: 20 ms
+   - Period: 20 ms
+3. Workload Execution: Runs a CPU-intensive loop for 5 seconds, intentionally exceeding the allocated runtime.
+4. Validation: Checks if SIGXCPU was received and prints the result, confirming expected behavior based on the flag setting.
+
+# Expected results
+
+1. `out: Running SCHED_DEADLINE task with overruns notification enabled.`
+2. `out: Running workload that exceeds the runtime limitation for 5s.`
+3. `out: PASS: SIGXCPU received while overrun notification enabled. Overrun count: <non-zero>.`
+4. `out: Running SCHED_DEADLINE task with overruns notification disabled.`
+5. `out: Running workload that exceeds the runtime limitation for 5s.`
+6. `out: PASS: SIGXCPU not received while overrun notification disabled. Overrun count: 0.`
+
+# Results location
+
+output.txt.
