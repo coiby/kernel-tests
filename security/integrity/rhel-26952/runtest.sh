@@ -29,6 +29,7 @@ IMAGE=${IMAGE:-""}
 SANDBOX=${SANDBOX:-"none"}
 cover=${cover:-"false"}
 timer=${timer:-3600}
+commit=${commit:-"21339d7b9986698282dce93709157dc36907fbf8"}
 repro=${repro:-"false"}
 syscalls=${syscalls:-'"lsetxattr$security_ima", "geteuid", "getresuid", "getegid", "getgid", "getgroups", "getresgid", "newfstatat"'}
 
@@ -110,7 +111,7 @@ rlJournalStart
         if [ "${duration}" -lt "${timer}" ]; then
             rlFail "Command ended before timer expired."
         fi
-        if [ "$(ls -l "${local_dir}"/syz-manager-logs/crashes)" != "total 0" ]; then
+        if [ -d "${local_dir}/syz-manager-logs/crashes" ] && [ "$(ls -l "${local_dir}/syz-manager-logs/crashes")" != "total 0" ]; then
             rlFail "Crash results found."
         else
             rlPass "No crash results found."
