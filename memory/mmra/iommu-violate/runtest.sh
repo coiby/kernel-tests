@@ -255,7 +255,7 @@ function start_vm() {
     fi
 
     local pname=qemu-system-aarch64
-    local qemucmd="$pname -machine virt -cpu cortex-a53 -smp 4 -m 8G -nographic \
+    local qemucmd="$pname -machine virt -cpu cortex-a53 -smp 4 -m 1G -nographic \
                     -drive if=pflash,format=raw,file=efi.img,readonly=on \
                     -drive if=pflash,format=raw,file=varstore.img \
                     -drive file=${qcow2_image},index=0,media=disk,format=qcow2,if=virtio,snapshot=off \
