@@ -26,7 +26,7 @@ static int test_continue(void)
 	unsigned long elapsed_time;
 
 	if (clock_gettime(CLOCK_MONOTONIC, &now) == -1) {
-		perror("clock_gettime start");
+		perror("clock_gettime now");
 		exit(1);
 	}
 	if (now.tv_sec - start_sec > duration)
