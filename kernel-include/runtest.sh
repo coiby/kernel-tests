@@ -45,9 +45,13 @@ if [ ! "${__SOURCED__:+x}" ]; then
     lck=$OUTPUTDIR/$(basename $0).lck
     K_LCK=$OUTPUTDIR/$(basename $0).lck
 
+    # shellcheck disable=SC2034
     TESTAREA="/mnt/testarea"
+    # shellcheck disable=SC2034
     K_TESTAREA="/mnt/testarea"
+    # shellcheck disable=SC2034
     TEST_VER=$(rpm -qf $0)
+    # shellcheck disable=SC2034
     K_TEST_VER=$(rpm -qf $0)
 
     # Kernel Variables
@@ -57,28 +61,35 @@ if [ ! "${__SOURCED__:+x}" ]; then
     #   example output: 2.6.32
     K_VARIANT=$(echo $K_NAME | sed -e "s/kernel//g")
     #   are we a DEBUG kernel?
+    # shellcheck disable=SC2034
     K_REL=$(rpm -q --queryformat '%{release}\n' -qf /boot/config-$(uname -r))
     #   example output: 220.el6
     K_SRC=$(rpm -q --queryformat '%{sourcerpm}\n' -qf /boot/config-$(uname -r))
     #   example output: kernel-2.6.32-220.el6.src.rpm
+    # shellcheck disable=SC2034
     K_BASE=$(rpm -q --queryformat '%{name}-%{version}-%{release}.%{arch}\n' -qf /boot/config-$(uname -r))
     #   example output: kernel-2.6.32-220.el6.x86_64
     K_ARCH=$(rpm -q --queryformat '%{arch}' -f /boot/config-$(uname -r))
     #   example output: x86_64
     #   example output: armv7hl
     #   example output: armv7l
+    # shellcheck disable=SC2034
     K_RUNNING=$(uname -r)
     #   example output: 2.6.32-220.el6.x86_64
     #   We removed the dot between release and variant because kernels built
     #   under rhel5 did not include this dot and will make comparing difficult.
     #   Release and variant on fedora kernels can use also + sign,
     #   example input: 3.15.0-0.rc5.git0.1.el7.x86_64+debug
+    # shellcheck disable=SC2034
     K_RUNNING_VR=$(uname -r | sed -e "s/\.${K_ARCH}[.+]*//")
     #   example output: 3.6.10-8.fc18highbank
+    # shellcheck disable=SC2034
     K_DOWNLOAD="http://download.lab.bos.redhat.com/brewroot/packages/kernel/"
     #
+    # shellcheck disable=SC2034
     RH_REL=$(cat /etc/redhat-release | cut -d" " -f7)
     #   example output: 6.2
+    # shellcheck disable=SC2034
     K_CONFIG="kernel-$K_VER-$K_ARCH$K_VARIANT.config"
     #   example output: kernel-2.6.32-x86_64.config
 
@@ -86,6 +97,7 @@ if [ ! "${__SOURCED__:+x}" ]; then
     # name and strips everytihng after (including) the version, leaving just
     # the src rpm package name.
     # Needed when the kernel rpm comes from of e.g. kernel-pegas src rpm.
+    # shellcheck disable=SC2034
     K_SPEC_NAME=${K_SRC%%-${K_VER}*}
 fi # end of if [ ! "${__SOURCED__:+x}" ]
 
@@ -109,6 +121,7 @@ function DeBug ()
     fi
 }
 
+# shellcheck disable=SC2120
 function RprtRslt ()
 {
     echo "" | tee -a $OUTPUTFILE
@@ -435,6 +448,7 @@ function K_Vercmp ()
 
         i=$((i+1))
     done
+    # shellcheck disable=SC2034
     K_KVERCMP_RET=$ret
 }
 function K_VercmpTest ()
@@ -571,5 +585,24 @@ function K_GetPkgMgr()
     else
       echo yum
     fi
+}
+
+# Usage: git_retry_clone <mandatory:repository to clone> <optional:how man times to retry> <optional: how long to wait before retry>
+# e.g.: git_retry_clone https://github.com/google/someproject 5 3
+# e.g.: git_retry_clone https://github.com/google/someproject
+function git_retry_clone() {
+TARGET_URL=${1}
+RETRIES_NO=${2:-5}
+RETRY_DELAY=${3:-3}
+echo "Target url $TARGET_URL"
+echo "Retry times $RETRIES_NO"
+echo "Retry delay $RETRY_DELAY"
+for i in $(seq 1 $RETRIES_NO); do
+    git clone ${TARGET_URL} && break
+    [[ $i -eq $RETRIES_NO ]] && echo "Failed to execute git clone after $RETRIES_NO retries" && exit 1
+    echo "retrying after $RETRY_DELAY"
+    sleep ${RETRY_DELAY}
+done
+echo "success"
 }
 # EndFile
