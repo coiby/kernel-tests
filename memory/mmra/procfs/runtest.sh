@@ -197,7 +197,7 @@ rlJournalStart
         # /usr/bin/ld: read-only segment has dynamic relocations
         # shellcheck disable=SC2086
         rlRun "${pkg_mgr} ${pkg_mgr_rmv_string} glibc-static"
-        rlRun "git clone https://github.com/google/syzkaller"
+        rlRun "git_retry_clone https://github.com/google/syzkaller" 0,128
         rlRun "pushd syzkaller"
         syzkaller_root=$(pwd)
         rlRun "git branch mmra_temp ${commit}"
