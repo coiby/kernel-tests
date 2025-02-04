@@ -41,6 +41,14 @@ rlJournalStart
         rlRun "free=$(cat /proc/meminfo | awk '/MemFree/ {print $2}')"
         # shellcheck disable=SC2154
         rlRun "size=$((free/1024/1024-1))"
+        # shellcheck disable=SC2154
+        if [[ ${size} -le 0 ]]; then
+            rlLog "Insuffecient free memory to run this test."
+            rstrnt-report-result "Insuffecient free memory to run this test." SKIP
+            rlPhaseEnd
+            rlJournalEnd
+            exit 0
+        fi
     rlPhaseEnd
     rlPhaseStartTest
         rlRun "pushd src"
