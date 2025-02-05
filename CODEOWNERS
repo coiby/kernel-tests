@@ -72,7 +72,6 @@
 /core-kernel/Xarray-idr-radixtree-test/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /core-kernel/module_diff/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /cpu/die/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
-/cpu/driver/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /distribution/command/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /distribution/kernel-debuginfo/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /distribution/ltp/lite/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -212,7 +211,6 @@
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang
 /core-kernel/module_diff/ @bgoncalv @lulinqing @zhijwang
 /cpu/die/ @bgoncalv @darcari @lulinqing
-/cpu/driver/ @bgoncalv @darcari @lulinqing
 /distribution/kernel-debuginfo/ @bgoncalv @ckalina @lulinqing
 /distribution/ltp/lite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
 /distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang
