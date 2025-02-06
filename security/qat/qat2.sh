@@ -47,9 +47,15 @@ rlPhaseStart FAIL "Functionality"
 	rlLogInfo "selinug "$(getenforce)
 	rlRun "systemctl start qat"
 	rlRun "cpa_sample_code"
-	rlRun "openssl speed -engine qatengine -elapsed -async_jobs 72 rsa2048"
-	rlRun "openssl speed -engine qatengine -elapsed ecdhx25519"
-	rlRun "openssl engine -t -c -v qatengine"
+	if rlIsRHEL "<10"; then
+		rlRun "openssl speed -engine qatengine -elapsed -async_jobs 72 rsa2048"
+		rlRun "openssl speed -engine qatengine -elapsed ecdhx25519"
+		rlRun "openssl engine -t -c -v qatengine"
+	else
+		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 72 rsa2048"
+		rlRun "openssl speed -provider qatprovider -elapsed ecdhx25519"
+		rlRun "openssl list -providers -provider qatprovider"
+	fi
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip"
