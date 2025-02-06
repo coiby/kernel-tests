@@ -19,7 +19,8 @@ function run_setup()
         infra_failure "couldn't clone repo"
     fi
 
-    rlRun "make -C mdadm everything" || infra_failure "couldn't build tests"
+    rlRun "make -C mdadm everything" || infra_failure "couldn't build mdadm"
+    rlRun "make -C mdadm install" || infra_failure "couldn't install mdadm"
 }
 
 rlJournalStart
