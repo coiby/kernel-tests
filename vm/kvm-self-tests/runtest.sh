@@ -322,7 +322,7 @@ function setup
         [[ $hwpf == "aarch64" ]] && ARCH="arm64"
         [[ $hwpf == "s390x" ]] && ARCH="s390"
         #workaround for RHEL10 issue https://issues.redhat.com/browse/RHEL-58930
-        if [[ $OSVERSION == "RHEL10" ]]; then
+        if [[ $OSVERSION == "RHEL10" && $hwpf == "x86_64" ]]; then
             rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm EXTRA_CFLAGS='-march=x86-64-v2'"
         else
             rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm"
