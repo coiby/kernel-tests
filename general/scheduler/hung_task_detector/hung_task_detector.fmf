@@ -12,7 +12,7 @@ description: |
     [Bug 1518139] hung_task: call trace missing in log.
 
 contact: Chunyu Hu <chuhu@redhat.com>
-test: make run
+test: bash ./runtest.sh
 framework: beakerlib
 require:
     - gcc
