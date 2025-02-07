@@ -45,7 +45,7 @@ if ! [ -d $OUTPUTDIR ]; then
 	mkdir -p $OUTPUTDIR
 fi
 LTPDIR=$OUTPUTDIR/ltp
-export OPTS=""
+export OPTS="${OPTS:-}"
 
 # Helper functions
 

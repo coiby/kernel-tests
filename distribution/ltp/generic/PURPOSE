@@ -28,3 +28,5 @@ SKIP_LEVEL		0) - none of the knownissues will be skiped, only change
 # Notes: SKIP_LEVEL is different to SKIPTESTS. SKIP_LEVEL is based on a script only
 	 to handle the known issues. And SKIPTESTS is used to skip general case in
 	 ltp/generic test suit.
+OPTS		provide extra parameter to kirk command line
+			e.g. OPTS="--suite-timeout 36000"
