@@ -25,6 +25,25 @@
 GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/audit-testsuite"}
 GIT_REF=${GIT_REF:-"main"}
 
+report_subtests() {
+    local subtest=""
+    local results_log=$1
+
+    subtest_regex="[a-zA-Z0-9_]+/test[[:space:]]*\.+[[:space:]]*"
+    while IFS= read -r line; do
+        if [[ "$line" =~ ${subtest_regex} ]]; then
+            subtest="$(echo $line | sed 's/^[[:space:]]*//;s/test.*/test/')"
+            if [[ "$line" =~ ok ]]; then
+                rlReport "$subtest" PASS 0 results.log
+                rlPass "$subtest"
+            elif [[ "$line" =~ Failed ]]; then
+                rlReport "$subtest" FAIL 1 results.log
+                rlFail "$subtest"
+            fi
+        fi
+    done < "$results_log"
+}
+
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
@@ -45,15 +64,7 @@ rlJournalStart
         rlRun "unset DISTRO"
         rlRun "cat /proc/self/loginuid && echo $(id -u) > /proc/self/loginuid" 0-255
         rlRun "unbuffer make test |& tee results.log" 0-255
-        while IFS= read -r line; do
-            if [[ "$line" =~ ^[a-zA-Z0-9_]+/test[[:space:]]*\.\. ]]; then
-                if [[ "$line" =~ ok ]]; then
-                    rlReport "$(echo "$line" | awk '{print $1}')" PASS "" results.log
-                else
-                    rlReport "$(echo "$line" | awk '{print $1}')" FAIL "" results.log
-                fi
-            fi
-        done < "results.log"
+        report_subtests results.log
         rlLog "See test detail in results.log"
         rlFileSubmit results.log
     rlPhaseEnd
