@@ -37,47 +37,35 @@ function check_hwpoison_support()
 function check_mce_support()
 {
 	grep -E 'CONFIG_MEMORY_FAILURE=[y|m]' /boot/config-$(uname -r)
-	#grep -E 'CONFIG_X86_MCE=[y|m]' /boot/config-$(uname -r) &&
-	#grep -E 'CONFIG_X86_MCE_INJECT=[ym]' /boot/config-$(uname -r)
 }
 
 function test_setup()
 {
-	local ret=0
-	test -d mce-test && rm -fr mce-test
-	echo "Getting mce-test suit ..."
-	git clone git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git
+	rlRun "rm -rf mce-test" 0 "Cleanup mce-test if exists"
+	rlRun "git clone git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git"
+	rlAssertExists "mce-test" || rlDie "Failed to fetch mce-test!"
 	pushd mce-test &> /dev/null
-	[ $? == 0 ] || rlDie "Test setup failed: no directory mce-test"
-	make && make install || ret=8
+	rlRun "make & make install"
 	popd
 
-	[ ! $ret = 0 ] && return $ret
-
-	echo "Getting mce-inject suit ..."
-	git clone git://git.kernel.org/pub/scm/utils/cpu/mce/mce-inject.git
+	rlRun "git clone git://git.kernel.org/pub/scm/utils/cpu/mce/mce-inject.git"
+	rlAssertExists "mce-inject" || rlDie "Failed to fetch mce-inject!"
 	pushd mce-inject &> /dev/null
-	[ $? == 0 ] || rlDie "Test setup failed: no directory mce-inject"
-	make && make install || ret=4
+	rlRun "make && make install"
 	popd
 
-		[ ! $ret = 0 ] && return $ret
-
-	echo "Installing mcelog ..."
-	yum -y install mcelog || ret=2
-	[ $ret = 0 ] || rlDie "Test setup failed: no match for package mcelog"
+	if uname -m | grep x86_64; then
+		if ! rlRun "yum -y install mcelog"; then
+	        	rlDie "Failed to install mcelog!"
+		fi
+	fi
 
 	uname -m | grep ppc64le && ppc64le_setup
-
-	return $ret
 }
 
 # Cover most memory-failure.c functions.
 function test_hwpoison()
 {
-	# run x86 mce_test in non-x86
-	[ "$FORCE_MCE_TEST" = 1 ] || uname -m | grep x86 || return
-	[[ "$phase" =~ Skip ]] && return
 	rlPhaseStartTest "hwpoison-inject"
 		pushd mce-test
 		rlRun "./runmcetest -t ./work/ -s ./summary -o ./results -b ./bin -l ../taskfiles/hwpoison-func -r 1" 0
@@ -86,24 +74,28 @@ function test_hwpoison()
 }
 
 rlJournalStart
-	if check_mce_support && check_hwpoison_support; then
-		phase="Test"
-	else
-		echo "memory-failure is not supported. skip test."
-		phase="Skip-not-support"
-		rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
-		return
+	if ! check_mce_support; then
+		rstrnt-report-result "CONFIG_MEMORY_FAILURE disabled" SKIP
+		exit 0
+	elif ! check_hwpoison_support; then
+		rstrnt-report-result "CONFIG_HWPOISON_INJECT disabled" SKIP
+		exit 0
+	elif ! uname -m | grep -E "ppc64le|x86_64"; then
+		rstrnt-report-result "test only support ppc64le and x86_64" SKIP
+		exit 0
 	fi
+
 	rlPhaseStartSetup
-	[ "$phase" = Test ] && test_setup
+		test_setup
 	rlPhaseEnd
 
-	rlPhaseStartTest $phase
-		uname -m | grep ppc64le || test_hwpoison
-		# If this still can happen? If so, i'll try to file a new defect/bug.
-		# https://bugzilla.redhat.com/show_bug.cgi?id=1706088
-		uname -m | grep ppc64le && ppc64le_run
-	rlPhaseEnd
+	if uname -m | grep x86_64; then
+		test_hwpoison
+	elif uname -m | grep ppc64le; then
+		rlPhaseStartTest "bz1706088"
+			ppc64le_run
+		rlPhaseEnd
+	fi
 
 	rlPhaseStartCleanup
 	rlPhaseEnd
