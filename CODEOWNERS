@@ -66,6 +66,8 @@
 /Makefile @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 
 [CKI]
+/accelerators/amd/build-setup/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/accelerators/amd/tier0-sanity/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /accelerators/nvidia/openrm-build/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /accelerators/nvidia/openrm-sanity/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /container/podman/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -205,6 +207,8 @@
 /watchdog/hw-generic/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 
 [kpet-db-maintainers]
+/accelerators/amd/build-setup/ @bgoncalv @lulinqing @olivergs
+/accelerators/amd/tier0-sanity/ @bgoncalv @lulinqing @olivergs
 /accelerators/nvidia/openrm-build/ @bgoncalv @lulinqing @olivergs
 /accelerators/nvidia/openrm-sanity/ @bgoncalv @lulinqing @olivergs
 /container/podman/ @ajia2 @bgoncalv @lulinqing @ypu2
@@ -236,7 +240,7 @@
 /kdump-cki/crash-sysrq-c/ @baoquan_he @bgoncalv @jieli1 @lulinqing @thenzl @yiyan1
 /kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @jieli1 @lulinqing @yiyan1
 /kdump-cki/kexec-load/ @baoquan_he @bgoncalv @jieli1 @lulinqing @yiyan1
-/kselftests/ @bgoncalv @chuhu @fmaurer-rh @liuhangbin @liwan1 @lulinqing @npache @pifang @sbertram @vmalikrh
+/kselftests/ @bgoncalv @chuhu @fmaurer-rh @liuhangbin @liwan1 @lulinqing @pifang @sbertram @vmalikrh
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
 /legacy/whitelist/ @bgoncalv @ckalina @lulinqing
