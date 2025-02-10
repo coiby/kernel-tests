@@ -16,7 +16,7 @@ class TunaTest(rtut.RTUnitTest):
         self.pidplay = self.thrdplay.pid
         self.tmp_file = f"{os.getcwd()}/output.txt"
         f = open("/etc/redhat-release", "r")
-        self.rhel_version = float(re.findall(r"\d+\.\d+", f.read().rstrip())[0])
+        self.rhel_version = float(re.findall(r"\d+\.\d+|\d+", f.read().rstrip())[0])
         f.close()
 
     def tearDown(self):
