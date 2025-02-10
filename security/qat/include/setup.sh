@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install dependencies
-dnf install -y gcc clang wget unzip vim git automake libtool openssl-devel numactl-devel nasm zlib-devel pip bzip2 && pip install -y prettytable
+dnf install -y gcc clang wget unzip vim git automake libtool openssl-devel numactl-devel nasm zlib-devel pip bzip2 && pip install prettytable
 
 # Get libzstd.a from source
 git clone https://github.com/facebook/zstd.git
