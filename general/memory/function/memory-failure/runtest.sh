@@ -60,7 +60,8 @@ function test_setup()
 		fi
 	fi
 
-	uname -m | grep ppc64le && ppc64le_setup
+	# skip powerpc as the dedicated branch looks to be obsolete upstream
+	# uname -m | grep ppc64le && ppc64le_setup
 }
 
 # Cover most memory-failure.c functions.
@@ -80,8 +81,8 @@ rlJournalStart
 	elif ! check_hwpoison_support; then
 		rstrnt-report-result "CONFIG_HWPOISON_INJECT disabled" SKIP
 		exit 0
-	elif ! uname -m | grep -E "ppc64le|x86_64"; then
-		rstrnt-report-result "test only support ppc64le and x86_64" SKIP
+	elif ! uname -m | grep -E "x86_64"; then
+		rstrnt-report-result "test only supports x86_64" SKIP
 		exit 0
 	fi
 
@@ -89,13 +90,7 @@ rlJournalStart
 		test_setup
 	rlPhaseEnd
 
-	if uname -m | grep x86_64; then
-		test_hwpoison
-	elif uname -m | grep ppc64le; then
-		rlPhaseStartTest "bz1706088"
-			ppc64le_run
-		rlPhaseEnd
-	fi
+	test_hwpoison
 
 	rlPhaseStartCleanup
 	rlPhaseEnd
