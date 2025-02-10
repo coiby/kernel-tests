@@ -3,7 +3,7 @@
 # Get all necessary includes
 git clone https://github.com/intel/qatlib.git
 cd qatlib
-./autogen
+./autogen.sh
 ./configure --enable-service
 make -j$(nproc)
 make install
