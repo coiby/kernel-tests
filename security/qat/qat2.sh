@@ -84,7 +84,7 @@ rlPhaseStart FAIL "QATzip"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QAT-ZSTD-Plugin"
-	rlRun "./include/setup_qat_zstd_plugin.sh" 0 "setting up zstd plugin testing environment"
+	rlRun "./kernel-tests/security/qat/include/setup_qat_zstd_plugin.sh" 0 "setting up zstd plugin testing environment"
 	rlRun "./QAT-ZSTD-Plugin/test/test dickens" 0 "compressing and decompressing dickens"
 rlPhaseEnd
 
