@@ -19,6 +19,7 @@ function runtest() {
 	else
 		tlog "Skip test because NVMe FW update only support on RHEL8 and RHEL9"
 		rstrnt-report-result "$TNAME" SKIP
+		exit 0
 	fi
 
 	FW_2_3_0="Express-Flash-PCIe-SSD_Firmware_637P6_LN64_2.3.0_A04_01.BIN"
