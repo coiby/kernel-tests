@@ -60,5 +60,5 @@ adjust:
   tag+:
    - KernelTier1
   environment+:
-   GIT_BRANCH: d75675eb0da2906780557ec8cd139d328c81777e
+   GIT_BRANCH: 6aba9eb5ba78bcabe8abb5e3809f3680dc0403a1
   when: KernelTier1 == 1
