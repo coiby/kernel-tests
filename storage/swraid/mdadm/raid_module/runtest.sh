@@ -21,7 +21,6 @@
 # This case just test raid modules loading and unloading for several times.
 #
 
-source /usr/share/beakerlib/beakerlib.sh || exit 1
 source ../../../../cki_lib/libcki.sh || exit 1
 
 function clean_all_loop_md
