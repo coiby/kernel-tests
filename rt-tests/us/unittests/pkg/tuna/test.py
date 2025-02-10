@@ -79,7 +79,7 @@ class TunaTest(rtut.RTUnitTest):
 
     def test_isolate(self):
         if self.rhel_version >= 9.2:
-            self.run_cmd(f'tuna isolate --cpus 0')
+            self.run_cmd('tuna isolate --cpus 0')
         else:
             self.run_cmd(f'tuna --threads={self.pidplay} --cpus=0 --isolate')
 
