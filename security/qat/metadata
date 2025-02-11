@@ -1,0 +1,11 @@
+[General]
+name=/kernel-tests/seurity/qat
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=Tests for QAT userspace packages
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+dependencies=beakerlib;qatlib;qatlib-service;qatengine;qatlib-tests;qatzip;gcc;clang;wget;unzip;git;automake;libtool;openssl-devel;numactl-devel;nasm;zlib-devel;pip;bzip2
