@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #   Copyright (c) 2018 Red Hat, Inc.
 #
 #   This program is free software: you can redistribute it and/or
@@ -17,7 +19,7 @@
 # may need to set kernel options intel_iommu=on,sm_on module_blacklist=idxd
 #
 # Original script written by Vilem Marsik <vmarsik@redhat.com>
-# found at https://gitlab.cee.redhat.com/vmarsik/bkrjobs 
+# found at https://gitlab.cee.redhat.com/vmarsik/bkrjobs
 
 dnf install -y beakerlib qatlib qatlib-service qatengine qatlib-tests qatzip
 
