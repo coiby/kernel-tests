@@ -104,8 +104,35 @@ rlPhaseStart FAIL "QATzip"
 	rm ${TMP}
 rlPhaseEnd
 
+rlPhaseStartSetup
+	# Get all necessary includes
+	rlRun "git clone https://github.com/intel/qatlib.git"
+	rlRun "cd qatlib"
+	rlRun "./autogen.sh" 0 "generating necessary include files"
+	rlRun "./configure --enable-service" 0 "configuring include files"
+	rlRun "make -j$(nproc)" 0 "making include files"
+	rlRun "make install" 0 "installing necessary include files"
+	rlRun "cd .."
+	rlRun "dnf reinstall -y qatlib qatengine"
+
+	# Run the Intel QAT configuration script
+	rlRun "pip install pretytable"
+	rlRun "python3 qat --config" 0 "reconfiguring QAT devices"
+
+	# Get the baseline QAT ZSTD Plugin tests
+	rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
+
+	# Get a file to test on, recommended in the QAT ZSTD Plugin repo
+	rlRun "wget https://sun.aei.polsl.pl//~sdeor/corpus/dickens.bz2"
+	rlRun "bunzip2 dickens.bz2"
+
+	# Compile
+	rlRun "cd QAT-ZSTD-Plugin/"
+	rlRun "make test"
+	rlRun "cd .."
+rlPhaseEnd
+
 rlPhaseStart FAIL "QAT-ZSTD-Plugin"
-	rlRun "./kernel-tests/security/qat/include/setup_qat_zstd_plugin.sh" 0 "setting up zstd plugin testing environment"
 	rlRun "./QAT-ZSTD-Plugin/test/test dickens" 0 "compressing and decompressing dickens"
 rlPhaseEnd
 
