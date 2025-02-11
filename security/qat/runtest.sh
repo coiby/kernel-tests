@@ -19,7 +19,6 @@
 # may need to set kernel options intel_iommu=on,sm_on module_blacklist=idxd
 #
 # Original script written by Vilem Marsik <vmarsik@redhat.com>
-# found at https://gitlab.cee.redhat.com/vmarsik/bkrjobs
 
 # Include Beaker environment
 . /usr/bin/rhts-environment.sh || exit 1
