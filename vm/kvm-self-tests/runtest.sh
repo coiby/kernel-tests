@@ -97,13 +97,13 @@ function checkVirtSupport
         grep -qE '(vmx|svm)' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "aarch64" ]]; then
-        if journalctl -k | grep -qi "disabling GICv2" ; then
+        if journalctl -k | grep -qi "disabling GICv2" || journalctl -k | grep -qi "GICv3"; then
             GICVERSION="3"
         else
             GICVERSION="2"
         fi
         CPUTYPE="ARMGICv$GICVERSION"
-        journalctl -k | grep -iqE "kvm.*: (Hyp|VHE) mode initialized successfully"
+        journalctl -k | grep -iqE "kvm.*: (Hyp|VHE|Hyp nVHE) mode initialized successfully"
         return $?
     elif [[ $hwpf == "s390x" ]]; then
         if (grep -q 'machine = 2964' /proc/cpuinfo); then
