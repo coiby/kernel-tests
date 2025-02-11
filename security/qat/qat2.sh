@@ -21,8 +21,6 @@
 # Original script written by Vilem Marsik <vmarsik@redhat.com>
 # found at https://gitlab.cee.redhat.com/vmarsik/bkrjobs
 
-dnf install -y beakerlib qatlib qatlib-service qatengine qatlib-tests qatzip
-
 # Include Beaker environment
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
@@ -35,13 +33,34 @@ fi
 
 rlJournalStart
 
-#rlPhaseStartSetup
-#	if ! grubby --info=DEFAULT | grep intel_iommu > /dev/null
-#	then
-#		rlRun "grubby --args=intel_iommu=on --update-kernel=ALL"
-#		rlRun "rhts-reboot"
-#	fi
-#rlPhaseEnd
+# Setting up environment for qatlib, qatengine, and qatzip testing
+rlPhaseStartSetup
+	# Get libzstd.a from source
+	rlRun "git clone https://github.com/facebook/zstd.git"
+	rlRun "zstd"
+	rlRun "make -j$(nproc) && make install"
+	rlRun "cd .."
+
+	# Set kernel boot parameters for firmware and to reboot back
+	# into test execution
+	rlRun "grubby --update-kernel=ALL --args=\"intel_iommu=on sm_on ima_appraise=log\""
+
+	# Decompress the qat_4xxx firmware and reboot
+	if ls /lib/firmware/qat_4*.bin.xz > /dev/null 2>&1; then
+		rlRun "unxz /lib/firmware/qat_4*.bin.xz"
+	elif ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
+		echo "QAT firmware is active"
+	else
+		# Download the firmware packages if they are not present on the machine
+		rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx.bin"
+		rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx_mmp.bin"
+		rlRun "mv qat_4xxx.bin /lib/firmware"
+		rlRun "mv qat_4xxx_mmp.bin /lib/firmware"
+	fi
+
+	# Reboot to active the firmware (Beaker safe)
+	rlRun "rstrnt-reboot"
+rlPhaseEnd
 
 rlPhaseStart FAIL "Functionality"
 	rlLogInfo "$DISTRO"
