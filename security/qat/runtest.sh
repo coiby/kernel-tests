@@ -129,7 +129,7 @@ rlPhaseStartSetup
 	rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
 
 	# Get a file to test on, recommended in the QAT ZSTD Plugin repo
-	rlRun "wget https://github.com/yewq/Silesia-compression-corpus/blob/main/dickens.bz2"
+	rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
 	rlRun "bunzip2 dickens.bz2"
 
 	# Compile
