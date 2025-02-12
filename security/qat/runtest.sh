@@ -65,6 +65,8 @@ rlPhaseStartSetup
 	else
 		# If already enabled firmware and rebooted, continue
 		rlRun "rm -f /var/tmp/qat-reboot"
+		# Get a file to test on, recommended in the QAT ZSTD Plugin repo
+		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
 	fi
 rlPhaseEnd
 
@@ -88,7 +90,7 @@ rlPhaseEnd
 rlPhaseStart FAIL "QATzip"
 	rlLogInfo $(rpm -q qatzip)
 	TMP=`mktemp`
-	rlRun "dd if=/dev/random of=/tmp/data bs=1M count=1024" 0 "preparing data"
+	rlRun "bunzip2 dickens.bz2 -c > /tmp/data" 0 "preparing data"
 	cp /tmp/data /tmp/in
 	rlRun "/bin/time -f '%e' qzip /tmp/in 2>\"$TMP\"" 0 "QAT zip"
 	QZIP_TIME=$(cat "$TMP")
@@ -128,8 +130,7 @@ rlPhaseStartSetup
 	# Get the baseline QAT ZSTD Plugin tests
 	rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
 
-	# Get a file to test on, recommended in the QAT ZSTD Plugin repo
-	rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
+	# Decompress test file
 	rlRun "bunzip2 dickens.bz2"
 
 	# Compile
