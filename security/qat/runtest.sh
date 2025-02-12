@@ -122,7 +122,7 @@ rlPhaseStartSetup
 	rlRun "dnf reinstall -y qatlib qatengine"
 
 	# Run the Intel QAT configuration script
-	rlRun "pip install pretytable"
+	rlRun "pip install prettytable"
 	rlRun "python3 qat --config" 0 "reconfiguring QAT devices"
 
 	# Get the baseline QAT ZSTD Plugin tests
