@@ -53,7 +53,7 @@ rlJournalStart
         for mod in $(lsmod | grep -E "^klp_" | awk '{ print $1; }'); do
             rlRun "rmmod -f $mod"
         done
-        ps ax | tee ps_output.txt
+        ps -ef --forest | tee ps_output.txt
         rstrnt-report-log -l ps_output.txt
     rlPhaseEnd
 rlJournalPrintText
