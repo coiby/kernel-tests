@@ -36,7 +36,7 @@ rlJournalStart
 rlPhaseStartSetup
 	# Get libzstd.a from source
 	rlRun "git clone https://github.com/facebook/zstd.git"
-	rlRun "zstd"
+	rlRun "cd zstd"
 	rlRun "make -j$(nproc) && make install"
 	rlRun "cd .."
 
@@ -57,7 +57,7 @@ rlPhaseStartSetup
 		rlRun "mv qat_4xxx_mmp.bin /lib/firmware"
 	fi
 
-	# Reboot to active the firmware (Beaker safe)
+	# Reboot to activate the firmware (Beaker safe)
 	rlRun "rstrnt-reboot"
 rlPhaseEnd
 
