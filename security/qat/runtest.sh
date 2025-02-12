@@ -34,31 +34,38 @@ rlJournalStart
 
 # Setting up environment for qatlib, qatengine, and qatzip testing
 rlPhaseStartSetup
-	# Get libzstd.a from source
-	rlRun "git clone https://github.com/facebook/zstd.git"
-	rlRun "cd zstd"
-	rlRun "make -j$(nproc) && make install"
-	rlRun "cd .."
+	# Start setup, including reboot
+	if ! [ -e /var/tmp/qat-reboot ]; then
+		# Get libzstd.a from source
+		rlRun "git clone https://github.com/facebook/zstd.git"
+		rlRun "cd zstd"
+		rlRun "make -j$(nproc) && make install"
+		rlRun "cd .."
 
-	# Set kernel boot parameters for firmware and to reboot back
-	# into test execution
-	rlRun "grubby --update-kernel=ALL --args=\"intel_iommu=on sm_on ima_appraise=log\""
+		# Set kernel boot parameters for firmware and to reboot back
+		# into test execution
+		rlRun "grubby --update-kernel=ALL --args=\"intel_iommu=on sm_on\""
 
-	# Decompress the qat_4xxx firmware and reboot
-	if ls /lib/firmware/qat_4*.bin.xz > /dev/null 2>&1; then
-		rlRun "unxz /lib/firmware/qat_4*.bin.xz"
-	elif ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
-		echo "QAT firmware is active"
+		# Decompress the qat_4xxx firmware and reboot
+		if ls /lib/firmware/qat_4*.bin.xz > /dev/null 2>&1; then
+			rlRun "unxz /lib/firmware/qat_4*.bin.xz"
+		elif ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
+			echo "QAT firmware is active"
+		else
+			# Download the firmware packages if they are not present on the machine
+			rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx.bin"
+			rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx_mmp.bin"
+			rlRun "mv qat_4xxx.bin /lib/firmware"
+			rlRun "mv qat_4xxx_mmp.bin /lib/firmware"
+		fi
+
+		rlRun "touch /var/tmp/qat-reboot"
+		# Reboot to activate the firmware (Beaker safe)
+		rlRun "rstrnt-reboot"
 	else
-		# Download the firmware packages if they are not present on the machine
-		rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx.bin"
-		rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx_mmp.bin"
-		rlRun "mv qat_4xxx.bin /lib/firmware"
-		rlRun "mv qat_4xxx_mmp.bin /lib/firmware"
+		# If already enabled firmware and rebooted, continue
+		rlRun "rm -f /var/tmp/qat-reboot"
 	fi
-
-	# Reboot to activate the firmware (Beaker safe)
-	rlRun "rstrnt-reboot"
 rlPhaseEnd
 
 rlPhaseStart FAIL "Functionality"
