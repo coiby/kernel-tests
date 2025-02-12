@@ -195,7 +195,7 @@ function report_result()
     local test_status=$2
     local test_score=${3:-0}
 
-    if [[ -n "$RSTRNT_JOBID" ]]; then
+    if [[ -n "$RSTRNT_JOBID" ]] || [[ -n ${TMT_TEST_NAME} ]]; then
         rstrnt-report-result "${test_name}" "${test_status}" "${test_score}"
     fi
 
