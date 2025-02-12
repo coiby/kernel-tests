@@ -139,7 +139,6 @@
 /networking/vrf/sanity_check/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /packages/httpd/mod_ssl-smoke/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
-/packages/iotop/sanity/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /packages/libkcapi/af_alg-test/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /packages/net-snmp/tcp-transport/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /packages/perf/internal-testsuite/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -277,7 +276,6 @@
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @lulinqing @psklenar1
-/packages/iotop/sanity/ @bgoncalv @lulinqing @xjezda00
 /packages/libkcapi/af_alg-test/ @bgoncalv @lulinqing @omos
 /packages/net-snmp/tcp-transport/ @bgoncalv @efedin @lulinqing
 /packages/perf/internal-testsuite/ @bgoncalv @lulinqing @zhaoqiao
