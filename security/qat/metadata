@@ -9,4 +9,3 @@ destructive=no
 [restraint]
 entry_point=./runtest.sh
 dependencies=beakerlib;qatlib;qatlib-service;qatengine;qatlib-tests;qatzip;gcc;clang;wget;unzip;git;automake;libtool;openssl-devel;numactl-devel;nasm;zlib-devel;pip;bzip2
-max_time=45m
