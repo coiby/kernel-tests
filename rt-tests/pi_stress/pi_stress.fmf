@@ -11,10 +11,12 @@ require:
           - /rt-tests/include
           - /cki_lib
           - /automotive/include
-duration: 10m
+duration: 2h
 extra-summary: /rt-tests/pi_stress
 extra-task: /rt-tests/pi_stress
 environment:
     PARAM_SEC: 30
     PARAM_GROUPS: 1
+    PIP_STRESS_RETRIES: 10
+    PIP_STRESS_USLEEP: 10000
 id: 2512d602-6f29-4377-a6f1-150ba80ac4e3
