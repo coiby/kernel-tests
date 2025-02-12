@@ -243,6 +243,7 @@ rlJournalStart
         fi
         rlRun "rm -rf /root/go"
         rlRun "rm -rf ${local_dir}" 0,1
+        rlRun "rm -rf ${syzkaller_root}"
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
