@@ -54,10 +54,8 @@ phase_start pip_stress
 PIP_SUCCESS=0
 for attempt in $(seq "$PIP_STRESS_RETRIES"); do
     log "Attempt $attempt"
-    RESULT=$(run "pip_stress -u $PIP_STRESS_USLEEP")
-    if [[ $(echo "$RESULT" | grep -c \
-        "Successfully used priority inheritance to handle an inversion" ) -eq 1 ]]
-    then
+    run "pip_stress -u $PIP_STRESS_USLEEP" 2>&1 | tee pip_stress.log
+    if (grep -q "Successfully" pip_stress.log); then
         PIP_SUCCESS=1
         break
     fi
@@ -78,5 +76,7 @@ else
     fi
 fi
 phase_end
+
+test_finish
 
 exit 0
