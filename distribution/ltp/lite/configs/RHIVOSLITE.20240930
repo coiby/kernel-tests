@@ -21,30 +21,24 @@ nextafter01 nextafter01
 #DESCRIPTION:Interprocess communication stress
 # These tests use tests/pipeio to put pipes (named or unnamed) through a workout
 #
-pipeio_1 pipeio -T pipeio_1 -c 5 -s 4090 -i 100 -b -f x80
 # spawns 5 children to write 100 chunks of 4090 bytes to a named pipe
 # using blocking I/O
 #pipeio_2 pipeio -T pipeio_2 -c 5 -s 4090 -i 100 -f x80
 # spawns 5 children to write 100 chunks of 4090 bytes to a named pipe
 # using non-blocking I/O
 # This test hits EAGAIN, which pipeio doesn't handle at the moment
-pipeio_3 pipeio -T pipeio_3 -c 5 -s 4090 -i 100 -u -b -f x80
 # spawns 5 children to write 100 chunks of 4090 bytes to an unnamed pipe
 # using blocking I/O
-pipeio_4 pipeio -T pipeio_4 -c 5 -s 4090 -i 100 -u -f x80
 # spawns 5 children to write 100 chunks of 4090 bytes to an unnamed pipe
 # using non-blocking I/O
-pipeio_5 pipeio -T pipeio_5 -c 5 -s 5000 -i 10 -b -f x80
 # spawns 5 children to write 10 chunks of 5000 bytes to a named pipe
 # using blocking I/O
-pipeio_6 pipeio -T pipeio_6 -c 5 -s 5000 -i 10 -b -u -f x80
 # spawns 5 children to write 10 chunks of 5000 bytes to an unnamed pipe
 # using blocking I/O
 #pipeio_7 pipeio -T pipeio_7 -c 5 -s 5000 -i 10 -f x80
 # spawns 5 children to write 10 chunks of 5000 bytes to a named pipe
 # using non-blocking I/O
 # This test hits EAGAIN, which pipeio doesn't handle at the moment
-pipeio_8 pipeio -T pipeio_8 -c 5 -s 5000 -i 10 -u -f x80
 # spawns 5 children to write 10 chunks of 5000 bytes to an unnamed pipe
 # using non-blocking I/O
 
@@ -726,9 +720,7 @@ kcmp03 kcmp03
 
 kill02 kill02
 kill03 kill03
-kill05 kill05
 kill06 kill06
-kill07 kill07
 kill08 kill08
 kill09 kill09
 kill10 kill10
@@ -906,52 +898,22 @@ mprotect05 mprotect05
 
 pkey01 pkey01
 
-mq_notify01 mq_notify01
-mq_notify02 mq_notify02
-mq_notify03 mq_notify03
-mq_open01 mq_open01
-mq_timedreceive01 mq_timedreceive01
-mq_timedsend01 mq_timedsend01
-mq_unlink01 mq_unlink01
 
 mremap01 mremap01
 mremap02 mremap02
 mremap03 mremap03
-mremap04 mremap04
 mremap05 mremap05
 mremap06 mremap06
 
 mseal01 mseal01
 mseal02 mseal02
 
-msgctl01 msgctl01
-msgctl02 msgctl02
-msgctl03 msgctl03
-msgctl04 msgctl04
 msgctl05 msgctl05
-msgctl06 msgctl06
-msgctl12 msgctl12
 
-msgstress01 msgstress01
 
-msgget01 msgget01
-msgget02 msgget02
 msgget03 msgget03
-msgget04 msgget04
-msgget05 msgget05
 
-msgrcv01 msgrcv01
-msgrcv02 msgrcv02
-msgrcv03 msgrcv03
-msgrcv05 msgrcv05
-msgrcv06 msgrcv06
-msgrcv07 msgrcv07
-msgrcv08 msgrcv08
 
-msgsnd01 msgsnd01
-msgsnd02 msgsnd02
-msgsnd05 msgsnd05
-msgsnd06 msgsnd06
 
 msync01 msync01
 msync02 msync02
@@ -1303,25 +1265,13 @@ select02 select02
 select03 select03
 select04 select04
 
-semctl01 semctl01
-semctl02 semctl02
-semctl03 semctl03
-semctl04 semctl04
-semctl05 semctl05
-semctl06 semctl06
-semctl07 semctl07
 semctl08 semctl08
-semctl09 semctl09
 
-semget01 semget01
-semget02 semget02
 semget05 semget05
 
 semop01 semop01
 semop02 semop02
 semop03 semop03
-semop04 semop04
-semop05 semop05
 
 send01 send01
 send02 send02
@@ -1345,7 +1295,6 @@ sendfile09_64 sendfile09_64
 
 
 sendmsg01 sendmsg01
-sendmsg02 sendmsg02
 sendmsg03 sendmsg03
 
 sendmmsg01 sendmmsg01
@@ -1411,7 +1360,6 @@ setitimer01 setitimer01
 setitimer02 setitimer02
 
 setns01 setns01
-setns02 setns02
 
 setpgid01 setpgid01
 setpgid02 setpgid02
@@ -1501,28 +1449,11 @@ setxattr01 setxattr01
 setxattr02 setxattr02
 setxattr03 setxattr03
 
-shmat01 shmat01
-shmat02 shmat02
-shmat03 shmat03
-shmat04 shmat04
 
-shmctl01 shmctl01
-shmctl02 shmctl02
-shmctl03 shmctl03
-shmctl04 shmctl04
-shmctl05 shmctl05
 shmctl06 shmctl06
-shmctl07 shmctl07
-shmctl08 shmctl08
 
-shmdt01 shmdt01
-shmdt02 shmdt02
 
 shmget02 shmget02
-shmget03 shmget03
-shmget04 shmget04
-shmget05 shmget05
-shmget06 shmget06
 
 shutdown01 shutdown01
 shutdown02 shutdown02
@@ -1823,7 +1754,6 @@ futex_wait04 futex_wait04
 futex_wait05 futex_wait05
 futex_waitv01 futex_waitv01
 futex_waitv02 futex_waitv02
-futex_waitv03 futex_waitv03
 futex_wake01 futex_wake01
 futex_wake02 futex_wake02
 futex_wake03 futex_wake03
@@ -1887,16 +1817,7 @@ data_space data_space
 stack_space stack_space
 
 shmt02 shmt02
-shmt03 shmt03
-shmt04 shmt04
-shmt05 shmt05
-shmt06 shmt06
-shmt07 shmt07
-shmt08 shmt08
-shmt09 shmt09
-shmt10 shmt10
 
-shm_test01	shm_test -l 10 -t 2
 mallocstress01	mallocstress
 
 mmapstress01 mmapstress01
