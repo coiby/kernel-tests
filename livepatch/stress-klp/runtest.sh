@@ -53,6 +53,7 @@ rlJournalStart
         for mod in $(lsmod | grep -E "^klp_" | awk '{ print $1; }'); do
             rlRun "rmmod -f $mod"
         done
+        rlRun "killall ./hiworkload/src/chimem"
         ps -ef --forest | tee ps_output.txt
         rstrnt-report-log -l ps_output.txt
     rlPhaseEnd
