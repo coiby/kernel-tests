@@ -105,8 +105,8 @@ rlPhaseStart FAIL "QATzip"
 	rlRun "/bin/time -f '%e' gzip -d /tmp/data.gz 2>\"$TMP\"" 0 "gunzip"
 	GUNZIP_TIME=$(cat "$TMP")
 	rlLogInfo "Time: ${GUNZIP_TIME} s"
-	ZIP_RATIO=$(echo ${GZIP_TIME}/${QZIP_TIME} | bc -l)
-	UNZIP_RATIO=$(echo ${GUNZIP_TIME}/${QUNZIP_TIME} | bc -l)
+	ZIP_RATIO=$(echo ${QZIP_TIME}/${GZIP_TIME} | bc -l)
+	UNZIP_RATIO=$(echo ${QUNZIP_TIME}/${GUNZIP_TIME} | bc -l)
 	rlLogInfo "qzip/gzip speed: ${ZIP_RATIO}"
 	rlLogInfo "qunzip/gunzip speed: ${UNZIP_RATIO}"
 	rm ${TMP}
