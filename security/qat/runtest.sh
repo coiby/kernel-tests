@@ -24,11 +24,11 @@
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-DISTRO=$(grep DISTRO /etc/motd | cut -d= -f2)
+'''DISTRO=$(grep DISTRO /etc/motd | cut -d= -f2)
 if [ -z "$DISTRO" ]
 then
 	DISTRO=$(cat /etc/redhat-release)
-fi
+fi'''
 
 rlJournalStart
 
@@ -71,7 +71,7 @@ rlPhaseStartSetup
 rlPhaseEnd
 
 rlPhaseStart FAIL "Functionality"
-	rlLogInfo "$DISTRO"
+	rlLogInfo rlGetDistroRelease
 	rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
 	rlLogInfo "selinug "$(getenforce)
 	rlRun "systemctl start qat"
@@ -144,14 +144,7 @@ rlPhaseStart FAIL "QAT-ZSTD-Plugin"
 rlPhaseEnd
 
 rlPhaseStartCleanup
-#	rlRun "popd"
-#	rlRun "rm -rf $GITDIR"
 	rlRun "systemctl stop qat"
-#	if cat /etc/default/grub | grep intel_iommu > /dev/null
-#	then
-#		rlRun "sed -ie 's/ intel_iommu=on//' /etc/default/grub"
-#		rlRun "grub2-mkconfig -o /etc/grub2-efi.cfg"
-#	fi
 rlPhaseEnd
 
 rlJournalPrintText
