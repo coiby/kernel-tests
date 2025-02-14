@@ -24,12 +24,6 @@
 . /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-'''DISTRO=$(grep DISTRO /etc/motd | cut -d= -f2)
-if [ -z "$DISTRO" ]
-then
-	DISTRO=$(cat /etc/redhat-release)
-fi'''
-
 rlJournalStart
 
 # Setting up environment for qatlib, qatengine, and qatzip testing
