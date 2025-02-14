@@ -26,6 +26,7 @@ install_kirk()
 	fi
 	git clone -b v1.4 https://github.com/linux-test-project/kirk.git
 	patch --forward -p1 -d kirk/ < ${ABS_DIR}/kirk-v1.4/0001-host-remove-preexec_fn-from-process-run.patch
+	patch --forward -p1 -d kirk/ < ${ABS_DIR}/kirk-v1.4/0001-libkirk-events-register-the-event-handler-for-suite_.patch
 	cp -r kirk /mnt/testarea/
 }
 

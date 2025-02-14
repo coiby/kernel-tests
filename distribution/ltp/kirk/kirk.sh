@@ -21,4 +21,6 @@ function kirk_run()
 
 	time -p ${KIRKDIR}/kirk -f ltp:root=${LTPDIR} -r $RUNTEST -v -j $OUTPUTDIR/$RUNTEST.json --suite-timeout 10800 $OPTIONS | sed -r 's/\x1b\[[0-9;]*m//g'
 	python3 $kirk_results --resfile $OUTPUTDIR/$RUNTEST.json --sumfile $OUTPUTDIR/$RUNTEST.log --runfile $OUTPUTDIR/$RUNTEST.run.log --failfile $OUTPUTDIR/$RUNTEST.fail.log
+	# shellcheck disable=SC2034
+	KIRK_DEBUG=$(find /tmp/kirk.$(whoami) -name debug.log -type f -exec stat --format '%W %n' {} + | sort -n | awk '{print $2}' | tail -1)
 }

@@ -87,6 +87,10 @@ report_result ()
     SubmitLog $logfile_run
     SubmitLog $logfile_json
     score=$(cat $OUTPUTDIR/$RUNTEST.log | grep "failed" | awk '{print $2}')
+    if test -f "$KIRK_DEBUG" && grep -E "Testing suite timed out: $RUNTEST" $KIRK_DEBUG; then
+        echo "Some of the tests are not run. Please extend suite-timeout."
+        rstrnt-report-result ${TEST}_suite_timeout WARN
+    fi
     rstrnt-report-result "Summary ($TEST)" $SUMMARY_RESULT $score
 }
 
