@@ -174,6 +174,9 @@ function knownissue_filter()
 	# These test cases take too long to run on VMs
 	cki_is_vm || cki_is_kernel_debug && tskip "fork14 setsockopt06 mtest06 pty03 writev03" fatal
 
+	# permanent issue with this HW: https://bugzilla.redhat.com/show_bug.cgi?id=1975018
+	{ hostname | grep -E "hpe-appollo-80|fujitsu-fx700" >/dev/null; } && tskip "rtc02" unfix
+
 	# ----------------- NOTE: -----------------------------
 	# we have split the knownissue's data from code, better
 	# to add new issues in knownissue/* file from now on.
