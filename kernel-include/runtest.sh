@@ -591,18 +591,32 @@ function K_GetPkgMgr()
 # e.g.: git_retry_clone https://github.com/google/someproject 5 3
 # e.g.: git_retry_clone https://github.com/google/someproject
 function git_retry_clone() {
-TARGET_URL=${1}
-RETRIES_NO=${2:-5}
-RETRY_DELAY=${3:-3}
-echo "Target url $TARGET_URL"
-echo "Retry times $RETRIES_NO"
-echo "Retry delay $RETRY_DELAY"
-for i in $(seq 1 $RETRIES_NO); do
-    git clone ${TARGET_URL} && break
-    [[ $i -eq $RETRIES_NO ]] && echo "Failed to execute git clone after $RETRIES_NO retries" && exit 1
-    echo "retrying after $RETRY_DELAY"
-    sleep ${RETRY_DELAY}
-done
-echo "success"
+    local TARGET_URL="$1"
+    local RETRIES_NO="${2:-5}"
+    local RETRY_DELAY="${3:-3}"
+    local FUNCTION_NAME="git_retry_clone"
+
+    # Check if TARGET_URL is empty
+    if [[ -z "$TARGET_URL" ]]; then
+        echo "[$FUNCTION_NAME] Error: TARGET_URL is required." >&2
+        return 1
+    fi
+
+    echo "[$FUNCTION_NAME] Target URL: $TARGET_URL"
+    echo "[$FUNCTION_NAME] Max Retry Attempts: $RETRIES_NO"
+    echo "[$FUNCTION_NAME] Retry Delay: $RETRY_DELAY seconds"
+
+    for i in $(seq 1 "$RETRIES_NO"); do
+        if git clone "$TARGET_URL"; then
+            echo "[$FUNCTION_NAME] Git clone succeeded."
+            return 0 # Successful clone
+        fi
+
+        echo "[$FUNCTION_NAME] Attempt $i/$RETRIES_NO failed. Retrying in $RETRY_DELAY seconds..."
+        sleep "$RETRY_DELAY"
+    done
+
+    echo "[$FUNCTION_NAME] Error: Failed to clone $TARGET_URL after $RETRIES_NO attempts." >&2
+    return 1
 }
 # EndFile
