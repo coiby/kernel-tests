@@ -23,8 +23,21 @@ install_kirk()
 			$pkg_mgr -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
 			$pkg_mgr -y install python3-click
 		fi
+
+		# install python3 click module from pip
+		pip3 show click --quiet || pip3 install click
+		if [ $? -ne 0 ]; then
+			echo "Aborting current task: Couldn't install click" | tee -a $OUTPUTFILE
+			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+			rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		fi
 	fi
 	git clone -b v1.4 https://github.com/linux-test-project/kirk.git
+	if [ $? -ne 0 ]; then
+		echo "Aborting current task: Couldn't clone kirk" | tee -a $OUTPUTFILE
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+	fi
 	patch --forward -p1 -d kirk/ < ${ABS_DIR}/kirk-v1.4/0001-host-remove-preexec_fn-from-process-run.patch
 	patch --forward -p1 -d kirk/ < ${ABS_DIR}/kirk-v1.4/0001-libkirk-events-register-the-event-handler-for-suite_.patch
 	cp -r kirk /mnt/testarea/
