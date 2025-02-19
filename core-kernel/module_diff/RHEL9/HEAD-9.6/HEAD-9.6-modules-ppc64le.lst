@@ -47,6 +47,7 @@ ahci.ko
 ahci_platform.ko
 aiptek.ko
 aircable.ko
+air_en8811h.ko
 altera_ps2.ko
 altera-stapl.ko
 alx.ko
@@ -127,6 +128,7 @@ bsd_comp.ko
 bsr.ko
 btbcm.ko
 btintel.ko
+btintel_pcie.ko
 btmrvl.ko
 btmrvl_sdio.ko
 btmtk.ko
@@ -704,8 +706,10 @@ libcurve25519.ko
 libcxgbi.ko
 libcxgb.ko
 libdes.ko
+libeth.ko
 libfc.ko
 libfcoe.ko
+libie.ko
 libiscsi.ko
 libiscsi_tcp.ko
 libnvdimm.ko
@@ -1511,6 +1515,7 @@ xfrm_interface.ko
 xfrm_ipcomp.ko
 xfs.ko
 xilinx_gmii2rgmii.ko
+xr_serial.ko
 xsens_mt.ko
 xsk_diag.ko
 xt_addrtype.ko

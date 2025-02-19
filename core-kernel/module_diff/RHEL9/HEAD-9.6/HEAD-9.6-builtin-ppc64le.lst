@@ -64,6 +64,7 @@ crypto_hash.ko
 crypto.ko
 cryptomgr.ko
 crypto_null.ko
+crypto_simd.ko
 crypto_user.ko
 ctr.ko
 cts.ko
@@ -244,6 +245,7 @@ xfrm_algo.ko
 xfrm_user.ko
 xhci-hcd.ko
 xhci-pci.ko
+xhci-pci-renesas.ko
 xor.ko
 x_tables.ko
 xts.ko
