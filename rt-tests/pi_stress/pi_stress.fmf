@@ -6,6 +6,7 @@ test: bash ./runtest.sh
 framework: shell
 require:
     - realtime-tests
+    - rpmdevtools
     - type: file
       pattern:
           - /rt-tests/include

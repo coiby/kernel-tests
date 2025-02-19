@@ -30,6 +30,18 @@ if ! kernel_automotive; then
     which pi_stress || yum install -y $pkg_name
 fi
 
+if (( rhel_x == 9 )); then
+    # https://issues.redhat.com/browse/RHEL-77110
+    rpmdev-vercmp "$(rpm -q --qf '%{V}-%{R}' realtime-tests)" 2.8-4.el9 > /dev/null
+elif (( rhel_x == 10 )); then
+    # https://issues.redhat.com/browse/RHEL-77111
+    rpmdev-vercmp "$(rpm -q --qf '%{V}-%{R}' realtime-tests)" 2.8-5.el10 > /dev/null
+fi
+
+if (( $? != 12 )); then
+    OPT_USLEEP="-u $PIP_STRESS_USLEEP"
+fi
+
 if [ -z "$PARAM_SEC" ]; then
     # For details: https://issues.redhat.com/browse/RHEL-34758
     # Limit the duration to 30s to avoid any rcu starvation warnings, the
@@ -54,7 +66,7 @@ phase_start pip_stress
 PIP_SUCCESS=0
 for attempt in $(seq "$PIP_STRESS_RETRIES"); do
     log "Attempt $attempt"
-    run "pip_stress -u $PIP_STRESS_USLEEP" 2>&1 | tee pip_stress.log
+    run "pip_stress $OPT_USLEEP" 2>&1 | tee pip_stress.log
     if (grep -q "Successfully" pip_stress.log); then
         PIP_SUCCESS=1
         break
