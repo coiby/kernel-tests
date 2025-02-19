@@ -68,6 +68,7 @@ cmac.ko
 cn.ko
 configfs.ko
 cpufreq_conservative.ko
+cpufreq-dt-platdev.ko
 cpufreq_ondemand.ko
 cpufreq_performance.ko
 cpufreq_powersave.ko
@@ -156,6 +157,7 @@ hisi_uncore_l3c_pmu.ko
 hisi_uncore_pa_pmu.ko
 hisi_uncore_pmu.ko
 hisi_uncore_sllc_pmu.ko
+hisi_uncore_uc_pmu.ko
 hmac.ko
 hwmon.ko
 hwspinlock_core.ko
@@ -256,6 +258,7 @@ pwm-bcm-iproc.ko
 pwm-regulator.ko
 pwm-tegra.ko
 qcom-scm.ko
+qcom_tzmem.ko
 qemu_fw_cfg.ko
 quota_tree.ko
 quota_v2.ko
@@ -355,6 +358,7 @@ xfrm_algo.ko
 xfrm_user.ko
 xhci-hcd.ko
 xhci-pci.ko
+xhci-pci-renesas.ko
 xhci-plat-hcd.ko
 xor.ko
 xor-neon.ko

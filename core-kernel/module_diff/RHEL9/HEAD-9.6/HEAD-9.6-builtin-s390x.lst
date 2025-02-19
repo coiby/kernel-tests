@@ -69,6 +69,7 @@ gf128mul.ko
 ghash-generic.ko
 glob.ko
 hmac.ko
+hmac_s390.ko
 hwspinlock_core.ko
 inet_diag.ko
 input-core.ko

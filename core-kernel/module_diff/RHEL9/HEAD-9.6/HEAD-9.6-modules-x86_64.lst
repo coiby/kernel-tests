@@ -57,6 +57,7 @@ ahci.ko
 ahci_platform.ko
 aiptek.ko
 aircable.ko
+air_en8811h.ko
 altera_ps2.ko
 altera-stapl.ko
 alx.ko
@@ -111,6 +112,7 @@ ath10k_core.ko
 ath10k_pci.ko
 ath11k.ko
 ath11k_pci.ko
+ath12k.ko
 ath3k.ko
 ath9k_common.ko
 ath9k_htc.ko
@@ -175,6 +177,7 @@ bsd_comp.ko
 btbcm.ko
 btcoexist.ko
 btintel.ko
+btintel_pcie.ko
 btmrvl.ko
 btmrvl_sdio.ko
 btmtk.ko
@@ -735,6 +738,7 @@ intel-lpss.ko
 intel-lpss-pci.ko
 intel_oaktrail.ko
 intel_pch_thermal.ko
+intel_plr_tpmi.ko
 intel_pmc_core.ko
 intel_pmc_core_pltdrv.ko
 intel_powerclamp.ko
@@ -747,6 +751,7 @@ intel-rng.ko
 intel-rst.ko
 intel_sdsi.ko
 intel_soc_dts_iosf.ko
+intel_tcc_cooling.ko
 intel_th_acpi.ko
 intel_th_gth.ko
 intel_th.ko
@@ -755,6 +760,7 @@ intel_th_msu_sink.ko
 intel_th_pci.ko
 intel_th_pti.ko
 intel_th_sth.ko
+intel_tpmi_power_domains.ko
 intel-uncore-frequency-common.ko
 intel-uncore-frequency.ko
 intel-uncore-frequency-tpmi.ko
@@ -947,8 +953,10 @@ libcurve25519.ko
 libcxgbi.ko
 libcxgb.ko
 libdes.ko
+libeth.ko
 libfc.ko
 libfcoe.ko
+libie.ko
 libiscsi.ko
 libiscsi_tcp.ko
 libnvdimm.ko
@@ -1047,6 +1055,7 @@ mei-gsc.ko
 mei_gsc_proxy.ko
 mei.ko
 mei-me.ko
+mei_pxp.ko
 mei_wdt.ko
 memstick.ko
 mgag200.ko
@@ -1352,6 +1361,7 @@ pinctrl-alderlake.ko
 pinctrl-broxton.ko
 pinctrl-cannonlake.ko
 pinctrl-cedarfork.ko
+pinctrl-cs42l43.ko
 pinctrl-denverton.ko
 pinctrl-elkhartlake.ko
 pinctrl-emmitsburg.ko
@@ -1532,6 +1542,7 @@ rtl8188ee.ko
 rtl8192c-common.ko
 rtl8192ce.ko
 rtl8192cu.ko
+rtl8192d-common.ko
 rtl8192de.ko
 rtl8192ee.ko
 rtl8192se.ko
@@ -1551,6 +1562,7 @@ rtsx_usb_ms.ko
 rtsx_usb_sdmmc.ko
 rtw88_8723de.ko
 rtw88_8723d.ko
+rtw88_8723x.ko
 rtw88_8821ce.ko
 rtw88_8821c.ko
 rtw88_8822be.ko
@@ -1563,6 +1575,7 @@ rtw88_pci.ko
 rtw88_usb.ko
 rtw89_8852ae.ko
 rtw89_8852a.ko
+rtw89_8852b_common.ko
 rtw89_8852be.ko
 rtw89_8852b.ko
 rtw89_8852ce.ko
@@ -1651,8 +1664,21 @@ snd-acp3x-pdm-dma.ko
 snd-acp3x-rn.ko
 snd-acp5x-i2s.ko
 snd-acp5x-pcm-dma.ko
+snd-acp63.ko
 snd-acp6x-pdm-dma.ko
+snd-acp70.ko
 snd-acp-config.ko
+snd-acp-i2s.ko
+snd-acp-legacy-common.ko
+snd-acp-legacy-mach.ko
+snd-acp-mach.ko
+snd-acp-pci.ko
+snd-acp-pcm.ko
+snd-acp-pdm.ko
+snd-acp-rembrandt.ko
+snd-acp-renoir.ko
+snd-acp-sdw-sof-mach.ko
+snd-acp-sof-mach.ko
 snd-ad1889.ko
 snd-ak4113.ko
 snd-ak4114.ko
@@ -1701,6 +1727,7 @@ snd-hda-codec-hdmi.ko
 snd-hda-codec-idt.ko
 snd-hda-codec.ko
 snd-hda-codec-realtek.ko
+snd-hda-codec-senarytech.ko
 snd-hda-codec-si3054.ko
 snd-hda-codec-via.ko
 snd-hda-core.ko
@@ -1715,6 +1742,7 @@ snd-hda-scodec-cs35l56-i2c.ko
 snd-hda-scodec-cs35l56.ko
 snd-hda-scodec-cs35l56-spi.ko
 snd-hda-scodec-tas2781-i2c.ko
+snd-hda-scodec-tas2781-spi.ko
 snd-hdmi-lpe-audio.ko
 snd-hdsp.ko
 snd-hdspm.ko
@@ -1766,6 +1794,7 @@ snd-rme32.ko
 snd-rme9652.ko
 snd-rme96.ko
 snd-rn-pci-acp3x.ko
+snd-rpl-pci-acp6x.ko
 snd-seq-device.ko
 snd-seq-dummy.ko
 snd-seq.ko
@@ -1777,6 +1806,7 @@ snd-seq-virmidi.ko
 snd-skl_nau88l25_max98357a.ko
 snd-soc-acp5x-mach.ko
 snd-soc-acp6x-mach.ko
+snd-soc-acpi-amd-match.ko
 snd-soc-acpi-intel-match.ko
 snd-soc-acpi.ko
 snd-soc-avs.ko
@@ -1791,6 +1821,7 @@ snd-soc-cs35l41-spi.ko
 snd-soc-cs35l56.ko
 snd-soc-cs35l56-sdw.ko
 snd-soc-cs35l56-shared.ko
+snd-soc-cs35l56-spi.ko
 snd-soc-cs42l42-i2c.ko
 snd-soc-cs42l42.ko
 snd-soc-cs42l42-sdw.ko
@@ -1842,10 +1873,12 @@ snd-soc-rl6347a.ko
 snd-soc-rt1011.ko
 snd-soc-rt1015.ko
 snd-soc-rt1015p.ko
+snd-soc-rt1019.ko
 snd-soc-rt1308.ko
 snd-soc-rt1308-sdw.ko
 snd-soc-rt1316-sdw.ko
 snd-soc-rt1318-sdw.ko
+snd-soc-rt1320-sdw.ko
 snd-soc-rt286.ko
 snd-soc-rt298.ko
 snd-soc-rt5514.ko
@@ -1870,6 +1903,7 @@ snd-soc-rt712-sdca.ko
 snd-soc-rt715.ko
 snd-soc-rt715-sdca.ko
 snd-soc-rt722-sdca.ko
+snd-soc-sdw-utils.ko
 snd-soc-skl_hda_dsp.ko
 snd-soc-skl.ko
 snd-soc-skl_nau88l25_ssm4567.ko
@@ -1912,12 +1946,15 @@ snd-soc-wm-adsp.ko
 snd-sof-acpi-intel-bdw.ko
 snd-sof-acpi-intel-byt.ko
 snd-sof-acpi.ko
+snd-sof-amd-acp63.ko
+snd-sof-amd-acp70.ko
 snd-sof-amd-acp.ko
 snd-sof-amd-rembrandt.ko
 snd-sof-amd-renoir.ko
 snd-sof-amd-vangogh.ko
 snd-sof-intel-atom.ko
 snd-sof-intel-hda-common.ko
+snd-sof-intel-hda-generic.ko
 snd-sof-intel-hda.ko
 snd-sof-intel-hda-mlink.ko
 snd-sof.ko
@@ -1926,6 +1963,7 @@ snd-sof-pci-intel-cnl.ko
 snd-sof-pci-intel-icl.ko
 snd-sof-pci-intel-lnl.ko
 snd-sof-pci-intel-mtl.ko
+snd-sof-pci-intel-ptl.ko
 snd-sof-pci-intel-tgl.ko
 snd-sof-pci-intel-tng.ko
 snd-sof-pci.ko
@@ -2200,6 +2238,7 @@ wusb3801.ko
 x38_edac.ko
 x86_pkg_temp_thermal.ko
 xcbc.ko
+xe.ko
 xen-blkfront.ko
 xen-evtchn.ko
 xen-front-pgdir-shbuf.ko
@@ -2217,6 +2256,7 @@ xilinx_gmii2rgmii.ko
 xpc.ko
 xp.ko
 xpnet.ko
+xr_serial.ko
 xsens_mt.ko
 xsk_diag.ko
 xt_addrtype.ko

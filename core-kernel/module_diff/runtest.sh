@@ -41,6 +41,30 @@ function DeBug ()
 
 # Functions
 
+function GetVariant ()
+{
+    if [ ${ARCH} == "aarch64" ] && cki_is_kernel_rt && grep -q 64k <<< ${K_NAME}; then
+        variant_name="rt-64k"
+    elif cki_is_kernel_rt; then
+        variant_name="rt"
+    elif grep -q 64k <<< ${K_NAME}; then
+        variant_name="64k"
+    else
+        variant_name=""
+    fi
+}
+
+function GetVariantDebug ()
+{
+    if cki_is_kernel_debug && [ -n "$variant_name" ]; then
+        variant_name+="-debug"
+    elif cki_is_kernel_debug; then
+        variant_name="debug"
+    else
+        variant_name=$variant_name
+    fi
+}
+
 function GetCurrentModuleList ()
 {
     # Lets determine the module list for the current kernel package
@@ -50,7 +74,7 @@ function GetCurrentModuleList ()
     case $1 in
         loadable)
             local moduleList="moduleList_current"
-            if [[ "${OS}" = "RHEL8" || "${OS}" = "RHEL9" ]]; then
+            if [[ "${OS}" = "RHEL8" || "${OS}" = "RHEL9" || "${OS}" = "RHEL10" ]]; then
                 PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
                 if cki_is_kernel_rt; then
                     PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
@@ -83,24 +107,22 @@ function GetCurrentModuleList ()
 
 }
 
-function AddDebugKernelModuleToBase ()
+function AddDebug2List ()
 {
-    cat ./${OS}/${Release}/${Release}{-,-debug-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_debug
-    \cp ${TESTAREA}/${2}_debug ${TESTAREA}/$2
+    local debug_variant=$3
+    cat ${TESTAREA}/$2 ./${OS}/${Release}/${Release}-${debug_variant}-$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_temp
+    \cp ${TESTAREA}/${2}_temp ${TESTAREA}/$2
 }
 
-function AddRTBaseList ()
+function AddVariant2List ()
 {
-    if [ -f ./${OS}/${Release}/${Release}-rt-$1-${ARCH}.lst ]; then
-        cat ./${OS}/${Release}/${Release}{-,-rt-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_rt
-        \cp ${TESTAREA}/${2}_rt ${TESTAREA}/$2
+    local variant=$3
+    if [ -n "$variant" ]; then
+        cat ./${OS}/${Release}/${Release}{-,-${variant}-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_temp
+    else
+        cat ./${OS}/${Release}/${Release}-$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_temp
     fi
-}
-
-function AddRTnDebugBaseList ()
-{
-    cat ${TESTAREA}/${2}_debug ./${OS}/${Release}/${Release}-rt-$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_rt
-    \cp ${TESTAREA}/${2}_rt ${TESTAREA}/$2
+    \cp ${TESTAREA}/${2}_temp ${TESTAREA}/$2
 }
 
 function GetBaseModuleList ()
@@ -117,17 +139,12 @@ function GetBaseModuleList ()
             ;;
     esac
 
-    cat ./${OS}/${Release}/${Release}-${listFile}-${ARCH}.lst > ${TESTAREA}/${moduleList}
+    GetVariant
+    AddVariant2List $listFile $moduleList $variant_name
 
-    if cki_is_kernel_debug; then
-        AddDebugKernelModuleToBase ${listFile} ${moduleList}
-        if cki_is_kernel_rt; then
-            AddRTnDebugBaseList ${listFile} ${moduleList}
-        fi
-    else
-        if cki_is_kernel_rt; then
-            AddRTBaseList ${listFile} ${moduleList}
-        fi
+    GetVariantDebug
+    if cki_is_kernel_debug ; then
+        AddDebug2List $listFile $moduleList $variant_name
     fi
 
     if [ ! -s "${TESTAREA}/${moduleList}" ]; then
@@ -136,20 +153,6 @@ function GetBaseModuleList ()
         cki_print_info "GetBaseModuleList"
     fi
 
-#    echo "***** Stored base module list: ${TESTAREA}/moduleList_base *****" | tee -a $OUTPUTFILE
-}
-
-# Workround for RT
-function AddRTKnowRemovedList ()
-{
-    cat ./${OS}/${Release}/${Release}{-,-rt-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}-rt
-    \cp ${TESTAREA}/${2}-rt ${TESTAREA}/$2
-}
-# Workround for aarch64 64k
-function Add64kKnowRemovedList ()
-{
-    cat ./${OS}/${Release}/${Release}{-,-64k-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}-64k
-    \cp ${TESTAREA}/${2}-64k ${TESTAREA}/$2
 }
 
 function GetKnownRemovedList ()
@@ -174,13 +177,13 @@ function GetKnownRemovedList ()
         cat ./${OS}/${Release}/${Release}-${listFile}-${ARCH}.lst > ${TESTAREA}/${moduleList}
     fi
 
-    if cki_is_kernel_rt; then
-        AddRTKnowRemovedList ${listFile} ${moduleList}
-    fi
-    if cki_is_kernel_64k; then
-        Add64kKnowRemovedList ${listFile} ${moduleList}
-    fi
+    GetVariant
+    AddVariant2List ${listFile} ${moduleList} ${variant_name}
+    GetVariantDebug
+    if cki_is_kernel_debug ; then
+        AddDebug2List $listFile $moduleList $variant_name
 
+    fi
     if [ ! -e "${TESTAREA}/${moduleList}" ]; then
         DeBug "Unable to determine $1 known removed module list"
         cki_print_info "GetKnownRemovedModuleList"
@@ -469,6 +472,15 @@ function SetOSRelease ()
                 Release="HEAD-9.6"
                 ;;
         esac
+    elif [[ "${K_VER}" = "6.12.0" ]];then
+        # RHEL10
+        OS="RHEL10"
+        case ${Base} in
+            *)
+                # RHEL-10.0, developing phase
+                Release="HEAD-10.0"
+                ;;
+        esac
     elif [[ -n "$(echo ${K_NAME} | grep kernel-pegas)" && "${K_VER}" = "4.10.0" ]]; then
         DeBug "Base release is RHEL7/Pegas1, skipping test."
         OS="RHEL7"
@@ -493,7 +505,7 @@ rlJournalStart
         if cki_is_kernel_rt; then
             name="${name}-rt"
         fi
-        if cki_is_kernel_64k; then
+        if grep -q 64k <<< ${K_NAME}; then
             name="${name}-64k"
         fi
         if cki_is_kernel_debug; then
@@ -504,8 +516,12 @@ rlJournalStart
         else
             path_name=$(sed "s/-debug//;s/-64k//" <<< ${name%-rt*})
         fi
+        # 9.6 and 10.0 kernel, not accurate kernel version
+        if cki_kver_gt "5.14.0-565.el9" || cki_kver_gt "6.12.0-50.el10"; then
+            path_name="kernel"
+        fi
         url="${baseurl}/${path_name}/${K_VER}/${K_REL}/${K_ARCH}/"
-        if  grep -q "release 9" /etc/redhat-release ; then
+        if  grep -q "release 9\|release 10" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
             chk_inst_kernel_modules_core
         elif grep -q "release 8" /etc/redhat-release ; then
