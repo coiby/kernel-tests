@@ -28,15 +28,23 @@ install_kirk()
 		pip3 show click --quiet || pip3 install click
 		if [ $? -ne 0 ]; then
 			echo "Aborting current task: Couldn't install click" | tee -a $OUTPUTFILE
-			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-			rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+			if [[ -n $RSTRNT_TASKNAME ]]; then
+				rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+				exit 0
+			else
+				exit 1
+			fi
 		fi
 	fi
 	git clone -b v1.4 https://github.com/linux-test-project/kirk.git
 	if [ $? -ne 0 ]; then
 		echo "Aborting current task: Couldn't clone kirk" | tee -a $OUTPUTFILE
-		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		if [[ -n $RSTRNT_TASKNAME ]]; then
+			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+			exit 0
+		else
+			exit 1
+		fi
 	fi
 	patch --forward -p1 -d kirk/ < ${ABS_DIR}/kirk-v1.4/0001-host-remove-preexec_fn-from-process-run.patch
 	patch --forward -p1 -d kirk/ < ${ABS_DIR}/kirk-v1.4/0001-libkirk-events-register-the-event-handler-for-suite_.patch
@@ -63,8 +71,12 @@ download_ltp()
 	if [ $? -ne 0 ]; then
 		echo "upstream download failed, giving up" | tee -a $OUTPUTFILE
 		echo "Aborting current task: Couldn't download LTP source." | tee -a $OUTPUTFILE
-		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		if [[ -n $RSTRNT_TASKNAME ]]; then
+			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+			exit 0
+		else
+			exit 1
+		fi
 	fi
 
 	rm -rf ${TARGET}
@@ -81,15 +93,23 @@ clone_ltp()
 	git clone https://github.com/linux-test-project/ltp ${TARGET}
 	if [ $? -ne 0 ]; then
 		echo "Aborting current task: Couldn't clone LTP" | tee -a $OUTPUTFILE
-		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+		if [[ -n $RSTRNT_TASKNAME ]]; then
+			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+			exit 0
+		else
+			exit 1
+		fi
 	fi
 	if [[ -n ${LTP_COMMIT_ID} && ${LTP_COMMIT_ID} != "latest" ]]; then
 		git -C ${TARGET} checkout ${LTP_COMMIT_ID}
 		if [ $? -ne 0 ]; then
 			echo "Aborting current task: Couldn't checkout ${LTP_COMMIT_ID}" | tee -a $OUTPUTFILE
-			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-			rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+			if [[ -n $RSTRNT_TASKNAME ]]; then
+				rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+				exit 0
+			else
+				exit 1
+			fi
 		fi
 	fi
 	if [[ -z ${LTP_COMMIT_ID} || ${LTP_COMMIT_ID} == "latest" ]]; then
@@ -148,8 +168,12 @@ build_all()
 		if [ $? -ne 0 ]; then
 			cat config-maker.txt
 			echo "Aborting current task: Couldn't generate test config." | tee -a $OUTPUTFILE
-			rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-			rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+			if [[ -n $RSTRNT_TASKNAME ]]; then
+				rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+				exit 0
+			else
+				exit 1
+			fi
 		fi
 		popd
 		echo "RHELKT1LITE.next is generated"
@@ -169,16 +193,22 @@ build_all()
 	if [ ${build_res} -eq 124 ]; then
 		echo "Cleaning up ${TARGET_DIR}"
 		rm -rf ${TARGET_DIR}
-		rstrnt-report-result "build_all build timeout" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-		exit 1
+		if [[ -n $RSTRNT_TASKID ]]; then
+			rstrnt-report-result "build_all build timeout" WARN
+			exit 0
+		else
+			exit 1
+		fi
 	fi
 	if [ ${build_res} -ne 0 ]; then
 		res="FAILED"
 		SubmitLog ./buildlog.txt
-		rstrnt-report-result "build_all build failed" WARN
-		rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
-		exit 1
+		if [[ -n $RSTRNT_TASKID ]]; then
+			rstrnt-report-result "build_all build failed" WARN
+			exit 0
+		else
+			exit 1
+		fi
 	fi
 	echo "============ ${MAKE} -C ${TARGET} all: ${res}  ============" | tee -a $OUTPUTFILE
 	res="PASSED"
@@ -193,7 +223,7 @@ build_all()
 	else
 		if [[ -n $RSTRNT_TASKID ]]; then
 			rstrnt-report-result "build_all failed" WARN
-			rstrnt-abort --server $RSTRNT_RECIPE_URL/tasks/$RSTRNT_TASKID/status
+			exit 0
 		else
 			exit 1
 		fi
