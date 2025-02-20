@@ -8,6 +8,12 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
+# workaround for https://github.com/teemtee/tmt/issues/3041
+# tmt supports rstrnt-report-result
+if [[ -z $RSTRNT_TASKNAME ]] && [[ -n $TMT_TEST_NAME ]]; then
+	RSTRNT_TASKNAME="${TMT_TEST_NAME}"
+fi
+
 install_kirk()
 {
 	echo "============ Download kirk ============" | tee -a $OUTPUTFILE
@@ -193,7 +199,7 @@ build_all()
 	if [ ${build_res} -eq 124 ]; then
 		echo "Cleaning up ${TARGET_DIR}"
 		rm -rf ${TARGET_DIR}
-		if [[ -n $RSTRNT_TASKID ]]; then
+		if [[ -n $RSTRNT_TASKNAME ]]; then
 			rstrnt-report-result "build_all build timeout" WARN
 			exit 0
 		else
@@ -203,7 +209,7 @@ build_all()
 	if [ ${build_res} -ne 0 ]; then
 		res="FAILED"
 		SubmitLog ./buildlog.txt
-		if [[ -n $RSTRNT_TASKID ]]; then
+		if [[ -n $RSTRNT_TASKNAME ]]; then
 			rstrnt-report-result "build_all build failed" WARN
 			exit 0
 		else
@@ -221,7 +227,7 @@ build_all()
 	if [[ ${res} == "PASSED" ]]; then
 		echo "${TESTVERSION}" > ${TARGET_DIR}/ltp_version
 	else
-		if [[ -n $RSTRNT_TASKID ]]; then
+		if [[ -n $RSTRNT_TASKNAME ]]; then
 			rstrnt-report-result "build_all failed" WARN
 			exit 0
 		else
