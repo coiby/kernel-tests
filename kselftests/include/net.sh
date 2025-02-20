@@ -17,7 +17,7 @@ install_netsniff()
 {
 	which mausezahn && return 0
 
-	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
+	if [[ "$krelease" =~ ^(8|9|10)$ ]]; then
 		if ! rpm -q --quiet epel-release; then
 			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
@@ -29,6 +29,10 @@ install_netsniff()
 		fi
 	fi
 
+	if [ "${krelease}" -eq "10" ]; then
+		# epel10 doesn't have netsniff-ng yet, use Felix's repo first
+		$pkg_mgr copr enable fmaurer/netsniff
+	fi
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string $param jq netsniff-ng
 
@@ -41,7 +45,7 @@ install_iptables_legacy()
 {
 	rpm -q --quiet iptables-legacy && return 0
 
-	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
+	if [[ "$krelease" =~ ^(8|9|10)$ ]]; then
 		if ! rpm -q --quiet epel-release; then
 			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
@@ -209,8 +213,8 @@ do_net_forwarding_config()
 	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
 
 	pushd "$EXEC_DIR"/net/forwarding || exit
-	# RHEL9 doesn't support meta
-	if [ "${krelease}" -eq "9" ]; then
+	# RHEL9/10 doesn't support meta
+	if [[ "$krelease" =~ ^(9|10)$ ]]; then
 		sed -i '0, /ets_test_strict/ {/ets_test_strict/d;}' sch_ets.sh
 		sed -i '0, /ets_test_mixed/ {/ets_test_mixed/d;}' sch_ets.sh
 		sed -i '0, /ets_test_dwrr/ {/ets_test_dwrr/d;}' sch_ets.sh
