@@ -12,7 +12,7 @@ class CyclicDeadlineTest(rtut.RTUnitTest):
         is_longname = subprocess.getstatusoutput("rpm -q realtime-tests")[0]
         self.tmp_file = f"{os.getcwd()}/output.json"
         self.pkgname = "realtime-tests" if is_longname == 0 else "rt-tests"
-        self.pkgnvr = subprocess.getoutput(f"rpm -q {self.pkgname}")
+        self.pkgvr = subprocess.getoutput(f"rpm -q --qf '%{{V}}-%{{R}}' {self.pkgname}")
         self.nrcpus = int(subprocess.getoutput(f"grep -c processor /proc/cpuinfo"))
         self.opt_affinity = "0" if self.nrcpus == 1 else "0,1"
 
@@ -33,9 +33,7 @@ class CyclicDeadlineTest(rtut.RTUnitTest):
 
     def test_hist(self):
         # https://issues.redhat.com/browse/RHEL-9910
-        ret = subprocess.getstatusoutput(f"rpmdev-vercmp "
-                                         f"{self.pkgnvr} "
-                                         f"realtime-tests-2.6-2.el9")[0]
+        ret = subprocess.getstatusoutput(f"rpmdev-vercmp {self.pkgvr} 2.6-2.el9")[0]
         if ret == 11:
             self.run_cmd(f"cyclicdeadline --histogram=5us --histfile={self.tmp_file} --duration=10")
 
