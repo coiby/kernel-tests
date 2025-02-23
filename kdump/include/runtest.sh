@@ -33,7 +33,7 @@ set +o posix
 RESOURCE_URL=${RESOURCE_URL:-""}
 if [ -n "$RESOURCE_URL" ]; then
     lib_file="${RESOURCE_URL##*/}"
-    [ ! -f "$lib_file" ] && curl -LO --fail "$RESOURCE_URL"
+    [ ! -f "$lib_file" ] && curl -LOk --fail "$RESOURCE_URL"
     if [ -f "$lib_file" ]; then
         # To bypass ShellCheck SC1090
         # shellcheck source=./
