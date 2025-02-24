@@ -295,14 +295,14 @@
 @AIOSETUP00  mkdir -p $TMPDIR/aiodio/
 @AIOSETUP01  dd if=$BIG_FILE of=$TMPDIR/aiodio/junkfile bs=8192 conv=block,sync
 @
-#@ADS1000 aio-stress -I500  -o2 -r4        -f1
-#@ADS1005 aio-stress -I500  -o3 -r4        -f2
-#@ADS1008 aio-stress -I500  -o3 -r32  -t4  -f4
-#@ADS1014 aio-stress -I500  -o2 -O -r8     -f2
-#@ADS1020 aio-stress -I500  -o3 -O -r16  -t2  -f2
-#@ADS1027 aio-stress -I500  -o0 -r8        -f1
-#@ADS1031 aio-stress -I500  -o1 -r4   -t2  -f2
-#@ADS1040 aio-stress -I500  -o1 -O -r8   -t2  -f2
+@ADS1000 aio-stress -o2 -r4k -f1
+@ADS1005 aio-stress -o3 -r4k -f2
+@ADS1008 aio-stress -o3 -r32k -f4
+@ADS1014 aio-stress -o2 -O -r8k -f2
+@ADS1020 aio-stress -o3 -O -r16k -t2 -f2
+@ADS1027 aio-stress -o0 -r8k -f1
+@ADS1031 aio-stress -o1 -r4k -t2 -f1
+@ADS1040 aio-stress -o1 -O -r8k -t2 -f2
 @
 @#ltp-aiodio.part1
 @AIOSETUP01  dd if=$BIG_FILE of=$TMPDIR/aiodio/junkfile bs=8192 conv=block,sync

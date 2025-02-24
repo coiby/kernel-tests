@@ -29,7 +29,7 @@ function determine_test_version()
 	elif is_rhel && osver_in_range "905" "906"; then
 		echo "20240524"
 	else
-		echo "20240930"
+		echo "20250130"
 	fi
 }
 

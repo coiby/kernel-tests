@@ -1,0 +1,51 @@
+From 5bb0c6bc553a3393627b371275b2e34b0099de19 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 6 Feb 2025 10:42:31 +0100
+Subject: [PATCH] syscalls/mallinfo02: introduce LTP_VAR_USED to avoid
+ optimization
+
+gcc 15 is a bit more clever and noticed that 'buf' isn't used
+for anything so it optimized it out, including call to malloc.
+So, there's also no mmap() call behind it and test fails,
+because nothing was allocated.
+
+Since __attribute__((used)) is ignored for local variables,
+introduce LTP_VAR_USED macro, that makes compiler aware of the
+variable and doesn't optimize it out.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ include/tst_common.h                               | 2 ++
+ testcases/kernel/syscalls/mallinfo2/mallinfo2_01.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/tst_common.h b/include/tst_common.h
+index b14bbae04..3de826acd 100644
+--- a/include/tst_common.h
++++ b/include/tst_common.h
+@@ -13,6 +13,8 @@
+ #define LTP_ATTRIBUTE_UNUSED		__attribute__((unused))
+ #define LTP_ATTRIBUTE_UNUSED_RESULT	__attribute__((warn_unused_result))
+ 
++#define LTP_VAR_USED(p) asm volatile("" :: "m"(p)); p
++
+ #ifndef ARRAY_SIZE
+ # define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+ #endif
+diff --git a/testcases/kernel/syscalls/mallinfo2/mallinfo2_01.c b/testcases/kernel/syscalls/mallinfo2/mallinfo2_01.c
+index 90cf4fcb3..51783fc22 100644
+--- a/testcases/kernel/syscalls/mallinfo2/mallinfo2_01.c
++++ b/testcases/kernel/syscalls/mallinfo2/mallinfo2_01.c
+@@ -26,7 +26,7 @@ void test_mallinfo2(void)
+ 	char *buf;
+ 	size_t size = 2UL * 1024UL * 1024UL * 1024UL;
+ 
+-	buf = malloc(size);
++	LTP_VAR_USED(buf) = malloc(size);
+ 
+ 	if (!buf)
+ 		tst_brk(TCONF, "Current system can not malloc 2G space, skip it");
+-- 
+2.48.1
+

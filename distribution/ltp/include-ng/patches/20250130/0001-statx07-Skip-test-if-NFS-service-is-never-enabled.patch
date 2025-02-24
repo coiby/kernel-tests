@@ -1,0 +1,45 @@
+From 0dc6850e8f2ca889734221daa056b3944ee7bb69 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 11 Feb 2025 11:24:57 +0800
+Subject: [PATCH] statx07: Skip test if NFS service is never enabled
+
+The statx07 test requires an active NFS service, as it relies on
+exportfs, which reads from '/var/lib/nfs/etab'. By default, etab
+file does not exist unless the NFS server is started at least once
+(since new version nfs-utils-2.5.4-32.el9).
+
+This causing the test to fail when etab is missing:
+
+  tst_test.c:1722: TINFO: Overall timeout per run is 0h 00m 30s
+  tst_buffers.c:57: TINFO: Test is using guarded buffers
+  exportfs: can't open /var/lib/nfs/etab for reading
+  statx07.c:136: TBROK: failed to exportfs
+
+This patch adds a check using access("/var/lib/nfs/etab", F_OK)
+before running the test. If the file does not exist, the test
+is skipped (TCONF) instead of failing, preventing misleading
+test failures.
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Cc: Yongcheng Yang <yoyang@redhat.com>
+---
+ testcases/kernel/syscalls/statx/statx07.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/statx/statx07.c b/testcases/kernel/syscalls/statx/statx07.c
+index 968174330..bc8e6fd65 100644
+--- a/testcases/kernel/syscalls/statx/statx07.c
++++ b/testcases/kernel/syscalls/statx/statx07.c
+@@ -115,6 +115,9 @@ static void setup(void)
+ 	int ret;
+ 	char server_path[BUFF_SIZE];
+ 
++	if (access("/var/lib/nfs/etab", F_OK) < 0)
++		tst_brk(TCONF, "nfs-server might not set up");
++
+ 	mode_t old_umask = umask(0);
+ 
+ 	SAFE_MKDIR(SERV_PATH, DEFAULT_MODE);
+-- 
+2.48.1
+
