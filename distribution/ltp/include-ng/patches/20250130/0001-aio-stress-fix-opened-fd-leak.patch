@@ -1,0 +1,50 @@
+From 7f3922a2499ebff6134c37a17a0de6012a318fb4 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 16 Jan 2025 13:10:35 +0100
+Subject: [PATCH] aio-stress: fix opened fd leak
+
+In cases where worker completes specified number of `iterations` before
+oper completes all `total_ios`, such oper remains on active_list.
+This is a problem because cleanup only walks over finished list,
+and closes fds only for items on this list. So it's possible for
+test to exhaust ulimit for open files and fail:
+
+$ ./aio-stress -a1 -I100 -o2 -r4 -f1 -d1^
+aio-stress.c:1347: TPASS: Test passed
+aio-stress.c:1285: TINFO: starting with random write
+aio-stress.c:1296: TINFO: file size 1024MB, record size 0KB, depth 1, I/O per iteration 1
+aio-stress.c:1298: TINFO: max io_submit 1, buffer alignment set to 4KB
+aio-stress.c:1300: TINFO: threads 1 files 1 contexts 1 context offset 2MB verification off
+aio-stress.c:1314: TBROK: open(file0.bin,1052738,0600) failed: EMFILE (24)
+
+Clean/free also items from active_list. Also don't let `status` from cleanup
+be set to zero once it becomes non-zero.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Acked-by: Andrea Cervesato <andrea.cervesato@suse.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ testcases/kernel/io/ltp-aiodio/aio-stress.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/io/ltp-aiodio/aio-stress.c b/testcases/kernel/io/ltp-aiodio/aio-stress.c
+index 419fc2cd2..e84308d1d 100644
+--- a/testcases/kernel/io/ltp-aiodio/aio-stress.c
++++ b/testcases/kernel/io/ltp-aiodio/aio-stress.c
+@@ -1122,7 +1122,12 @@ restart:
+ 	while (t->finished_opers) {
+ 		oper = t->finished_opers;
+ 		oper_list_del(oper, &t->finished_opers);
+-		status = finish_oper(t, oper);
++		status = finish_oper(t, oper) ? : status;
++	}
++	while (t->active_opers) {
++		oper = t->active_opers;
++		oper_list_del(oper, &t->active_opers);
++		status = finish_oper(t, oper) ? : status;
+ 	}
+ 
+ 	if (t->num_global_pending)
+-- 
+2.48.1
+

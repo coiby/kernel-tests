@@ -17,7 +17,7 @@
 
 RHELKT1LITE=${RHELKT1LITE:-RHELKT1LITE}
 CONFIGFILE=${CONFIGFILE:-CONFIGFILE}
-LTP_VERSION=${LTP_VERSION:-20240930}
+LTP_VERSION=${LTP_VERSION:-20250130}
 SOURCEDIR=$PWD
 DOWNLOAD=${DOWNLOAD:-https://github.com/linux-test-project/ltp}
 
@@ -38,7 +38,7 @@ function rhelkt1lite_preparing()
 
 	[ -d $SOURCEDIR/ltp-full-${LTP_VERSION}/ ] && \
 		pushd $SOURCEDIR/ltp-full-${LTP_VERSION}/runtest/ >/dev/null;
-		cat kernel_misc math fsx ipc syscalls mm sched nptl pty tracing fs > $SOURCEDIR/$RHELKT1LITE.${LTP_VERSION}
+		cat kernel_misc math ltp-aiodio.part3 ipc syscalls mm sched nptl pty tracing fs > $SOURCEDIR/$RHELKT1LITE.${LTP_VERSION}
 		popd >/dev/null;
 
 	rm -fr $SOURCEDIR/ltp-full-* $SOURCEDIR/ltp.zip

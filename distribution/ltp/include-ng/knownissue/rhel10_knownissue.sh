@@ -19,6 +19,8 @@ function rhel10_unfix_issues()
 	osver_in_range "1000" "1001" && tskip "pty01 ptem01" unfix
 	# RHEL-65409: ltp/lite fanotify22 test failed
 	osver_in_range "1000" "1001" && tskip "fanotify22" unfix
+	# RHELTEST-324: ltp/starvation.c:148: TFAIL: Scheduller starvation reproduced.
+	is_arch "aarch64" && osver_in_range "1000" "1001" && tskip "starvation" unfix
 }
 
 function rhel10_fixed_issues()
