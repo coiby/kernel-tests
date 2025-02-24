@@ -1,5 +1,6 @@
-BLK="block/001 block/002 block/006 block/007 block/009 block/010 block/016 block/017 block/018 block/020 block/021 block/022 block/023 block/024 block/025 block/027 block/028 block/029 block/031 block/032 block/034 block/035 block/037 block/038 loop/001 loop/002 loop/003 loop/004 loop/005 loop/006 loop/007 loop/008 loop/009 scsi/004 scsi/005 scsi/007 zbd/001 zbd/002 zbd/003 zbd/004 zbd/005 zbd/006 zbd/008 nbd/001 nbd/002 nbd/003 nbd/004"
+BLK="block/001 block/002 block/006 block/007 block/009 block/010 block/016 block/017 block/018 block/020 block/021 block/022 block/023 block/024 block/025 block/027 block/028 block/029 block/031 block/032 block/035 block/037 block/038 loop/001 loop/002 loop/003 loop/004 loop/005 loop/006 loop/007 loop/008 loop/009 scsi/004 scsi/005 scsi/007 zbd/001 zbd/002 zbd/003 zbd/004 zbd/005 zbd/006 zbd/008 nbd/001 nbd/002 nbd/003 nbd/004"
 
+#block/034 it may cause false positive since kernel may use memory for lots of reasons such as page cache, buffer cache, ...dentry cache, all these may reduce MemFree
 #block/035 sysctl -w kernel.io_uring_disabled=0
 #loop/010 loop/011 failed on rhel9.5
 #scsi/008 scsi_debug does not support group number statistics
