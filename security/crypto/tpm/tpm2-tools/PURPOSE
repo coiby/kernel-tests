@@ -1,1 +1,2 @@
-Runs different tpm2-tools tests against a TPM2 HW.
+Description: Runs different tpm2-tools tests against TPM2 HW.
+Authors: Vilem Marsik <vmarsik@redhat.com> and Denis Aleksandrov <daleksan@redhat.com>
