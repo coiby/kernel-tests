@@ -2,8 +2,10 @@ summary: Baseline tests for QAT userspace packages to be run with Testing Farm
 contact: Denis Aleksandrov <daleksan@redhat.com>
 path: /security/qat
 test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
 require:
-  - beakerlib
   - qatlib
   - qatlib-service
   - qatengine
