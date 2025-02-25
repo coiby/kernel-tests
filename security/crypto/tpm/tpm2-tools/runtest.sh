@@ -34,7 +34,6 @@ else
 fi
 
 # Source the common test script helpers
-. /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 
 RHEL_MAJOR=`perl -ne 'print $1 if $_=~/release\s*(\d+)/' /etc/redhat-release`
@@ -105,8 +104,8 @@ rlJournalStart
 		then
 			NUM_SHA1=`tpm2_pcrread $COM_OPTS sha1 2>/dev/null | wc -l`
 			NUM_SHA256=`tpm2_pcrread $COM_OPTS sha256 2>/dev/null | wc -l`
-			NUM_SHA512=`tpm2_pcrread $COM_OPTS sha512 2>/dev/null | wc -l`
-			NUM_SM3_256=`tpm2_pcrread $COM_OPTS sm3_256 2>/dev/null | wc -l`
+			#NUM_SHA512=`tpm2_pcrread $COM_OPTS sha512 2>/dev/null | wc -l`
+			#NUM_SM3_256=`tpm2_pcrread $COM_OPTS sm3_256 2>/dev/null | wc -l`
 			ORIGINAL=`tpm2_pcrread $COM_OPTS | grep ' 4 *:' | head -n 1`
 			if [ $NUM_SHA1 -gt 1 ]
 			then
