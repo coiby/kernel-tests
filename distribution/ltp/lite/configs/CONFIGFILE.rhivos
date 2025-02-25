@@ -1,6 +1,9 @@
 
 # This is a CONFIGFILE for RHIVOSLITE.${LTP_VERSION} generating.
 # changelog:
+# 2/25/2025 Rollback changes made because of https://issues.redhat.com/browse/RHEL-78195
+#   modification:
+#       rollback https://issues.redhat.com/browse/VROOM-26543.
 # 2/12/2025 Remove other unsupported tests.i
 #   modifications:
 #       see https://issues.redhat.com/browse/VROOM-26543
@@ -57,87 +60,6 @@
 # #######################################
 # Test with prefix '%' will be kicked out
 # #######################################
-# exclude because of https://issues.redhat.com/browse/RHEL-78195
-%futex_waitv03 futex_waitv03
-%kill05 kill05
-%kill07 kill07
-%mq_notify01 mq_notify01
-%mq_notify02 mq_notify02
-%mq_notify03 mq_notify03
-%mq_open01 mq_open01
-%mq_timedreceive01 mq_timedreceive01
-%mq_timedsend01 mq_timedsend01
-%mq_unlink01 mq_unlink01
-%mremap04 mremap04
-%msgctl01 msgctl01
-%msgctl02 msgctl02
-%msgctl03 msgctl03
-%msgctl04 msgctl04
-%msgctl06 msgctl06
-%msgctl12 msgctl12
-%msgget01 msgget01
-%msgget02 msgget02
-%msgget04 msgget04
-%msgget05 msgget05
-%msgrcv01 msgrcv01
-%msgrcv02 msgrcv02
-%msgrcv03 msgrcv03
-%msgrcv05 msgrcv05
-%msgrcv06 msgrcv06
-%msgrcv07 msgrcv07
-%msgrcv08 msgrcv08
-%msgsnd01 msgsnd01
-%msgsnd02 msgsnd02
-%msgsnd05 msgsnd05
-%msgsnd06 msgsnd06
-%msgstress01 msgstress01
-%pipeio_1 pipeio -T pipeio_1 -c 5 -s 4090 -i 100 -b -f x80
-%pipeio_3 pipeio -T pipeio_3 -c 5 -s 4090 -i 100 -u -b -f x80
-%pipeio_4 pipeio -T pipeio_4 -c 5 -s 4090 -i 100 -u -f x80
-%pipeio_5 pipeio -T pipeio_5 -c 5 -s 5000 -i 10 -b -f x80
-%pipeio_6 pipeio -T pipeio_6 -c 5 -s 5000 -i 10 -b -u -f x80
-%pipeio_8 pipeio -T pipeio_8 -c 5 -s 5000 -i 10 -u -f x80
-%semctl01 semctl01
-%semctl02 semctl02
-%semctl03 semctl03
-%semctl04 semctl04
-%semctl05 semctl05
-%semctl06 semctl06
-%semctl07 semctl07
-%semctl09 semctl09
-%semget01 semget01
-%semget02 semget02
-%semop04 semop04
-%semop05 semop05
-%sendmsg02 sendmsg02
-%setns02 setns02
-%shmat01 shmat01
-%shmat02 shmat02
-%shmat03 shmat03
-%shmat04 shmat04
-%shmctl01 shmctl01
-%shmctl02 shmctl02
-%shmctl03 shmctl03
-%shmctl04 shmctl04
-%shmctl05 shmctl05
-%shmctl07 shmctl07
-%shmctl08 shmctl08
-%shmdt01 shmdt01
-%shmdt02 shmdt02
-%shmget03 shmget03
-%shmget04 shmget04
-%shmget05 shmget05
-%shmget06 shmget06
-%shmt03 shmt03
-%shmt04 shmt04
-%shmt05 shmt05
-%shmt06 shmt06
-%shmt07 shmt07
-%shmt08 shmt08
-%shmt09 shmt09
-%shmt10 shmt10
-%shm_test01	shm_test -l 10 -t 2
-####
 %fw_load fw_load
 %rtc01 rtc01
 %block_dev block_dev
@@ -310,34 +232,6 @@
 @AIOSETUP03  dd if=$BIG_FILE of=$TMPDIR/aiodio/ff1      bs=2048 conv=block,sync
 @AIOSETUP04  dd if=$BIG_FILE of=$TMPDIR/aiodio/ff2      bs=1024 conv=block,sync
 @AIOSETUP05  dd if=$BIG_FILE of=$TMPDIR/aiodio/ff3      bs=512  conv=block,sync
-@
-#@AD056 aiocp -b 8k -n 64 -f SYNC
-#@AD057 aiocp -b 16k -n 1 -f DIRECT
-#@AD058 aiocp -b 16k -n 1 -f SYNC
-#@AD130 aiocp -b 512k -n 2 -f SYNC
-#@AD131 aiocp -b 512k -n 4 -f DIRECT
-#@AD132 aiocp -b 512k -n 4 -f SYNC
-#@AD106 aiocp -b 128k -n 8 -f SYNC
-#@AD107 aiocp -b 128k -n 16 -f DIRECT
-#@AD108 aiocp -b 128k -n 16 -f SYNC
-#@AD109 aiocp -b 128k -n 32 -f DIRECT
-#@AD110 aiocp -b 128k -n 32 -f SYNC
-#@AD111 aiocp -b 128k -n 64 -f DIRECT
-#@AD112 aiocp -b 128k -n 64 -f SYNC
-#@AD123 aiocp -b 256k -n 32 -f DIRECT
-#@AD124 aiocp -b 256k -n 32 -f SYNC
-#@AD125 aiocp -b 256k -n 64 -f DIRECT
-#@AD126 aiocp -b 256k -n 64 -f SYNC
-#@AD131 aiocp -b 512k -n 4 -f DIRECT
-#@AD132 aiocp -b 512k -n 4 -f SYNC
-#@AD133 aiocp -b 512k -n 8 -f DIRECT
-#@AD134 aiocp -b 512k -n 8 -f SYNC
-#@AD135 aiocp -b 512k -n 16 -f DIRECT
-#@AD136 aiocp -b 512k -n 16 -f SYNC
-#@AD137 aiocp -b 512k -n 32 -f DIRECT
-#@AD138 aiocp -b 512k -n 32 -f SYNC
-#@AD139 aiocp -b 512k -n 64 -f DIRECT
-#@AD140 aiocp -b 512k -n 64 -f SYNC
 @
 @#ltp-aiodio.part2
 @ADSP005 aiodio_sparse -o 2 -w 4k -s 8k -n 2
