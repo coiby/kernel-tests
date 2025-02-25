@@ -35,7 +35,7 @@ CUDA_DASHED_VERSION=${CUDA_VERSION_ARRAY[0]}-${CUDA_VERSION_ARRAY[1]}
 # Environment information
 KCORE_PACKAGE="kernel-core-$(uname -r)"
 KVER=$(rpm -q --qf "%{VERSION}" ${KCORE_PACKAGE})
-KREL=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | sed 's/\.el.\(_.\)*$//' | cut -d '.' -f 1)
+KREL=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | sed 's/\.el.\(_.\)*$//')
 KDIST=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | awk -F '.' '{ print "."$NF}')
 OS_VERSION=$(grep "^VERSION=" /etc/os-release)
 OS_VERSION_MAJOR=$(grep "^VERSION=" /etc/os-release | cut -d '=' -f 2 | sed 's/"//g' | cut -d '.' -f 1)
