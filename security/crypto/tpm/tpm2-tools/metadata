@@ -1,12 +1,11 @@
 [General]
-name=/kernel/crypto/tpm/tpm2-tools
-owner=Vilem Marsik <vmarsik@redhat.com>
-description=tpm2-tools tests
+name=/kernel/security/crypto/tpm/tpm2-tools
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=Tests for TPM2 tools
 license=GPLv2
 confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
-max_type=20m
-dependencies=tpm2-tools;tpm2-abrmd;beakerlib
+entry_point=bash runtest.sh
+dependencies=beakerlib;tpm2-tools;tpm2-abrmd;tpm2-tss
