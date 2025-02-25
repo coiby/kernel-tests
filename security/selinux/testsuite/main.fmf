@@ -55,10 +55,12 @@ test: bash ./runtest.sh
 framework: beakerlib
 duration: 1h
 adjust:
-  description: Run the test using specific version of the testsuite.
-  id: ""
-  tag+:
-   - KernelTier1
-  environment+:
-   GIT_BRANCH: 6aba9eb5ba78bcabe8abb5e3809f3680dc0403a1
-  when: KernelTier1 == 1
+  - when: KernelTier1 == 1
+    description: Run the test using specific version of the testsuite.
+    id: ""
+    tag+:
+     - KernelTier1
+    environment+:
+     GIT_BRANCH: 6aba9eb5ba78bcabe8abb5e3809f3680dc0403a1
+  - when: stream is defined and stream != ystream
+    enabled: false
