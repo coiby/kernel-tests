@@ -1,0 +1,12 @@
+summary: Tests for TPM2 tools
+contact: Denis Aleksandrov <daleksan@tredhat.com>
+path: /security/crypto/tpm/tpm2-tools
+test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
+require:
+  - tpm2-tools
+  - tpm2-abrmd
+  - tpm2-tss
+duration: 20m
