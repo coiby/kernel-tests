@@ -1,12 +1,11 @@
 [General]
-name=/kernel/crypto/tpm/tpm2-clevis
-owner=Vilem Marsik <vmarsik@redhat.com>
-description=tpm clevis tests
+name=/kernel/security/crypto/tpm/tpm2-clevis
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=tpm clevis encryption/decryption tests
 license=GPLv2
 confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
-max_type=20m
+entry_point=bash runtest.sh
 dependencies=tpm2-tools;tpm2-abrmd;beakerlib;clevis
