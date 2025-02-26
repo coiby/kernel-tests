@@ -1,1 +1,2 @@
-Clevis/TPM encryption/decryption test.
+Description: Clevis/TPM encryption/decryption test.
+Authors: Vilem Marsik <vmarsik@redhat.com> and Denis Aleksandrov <daleksan@redhat.com>
