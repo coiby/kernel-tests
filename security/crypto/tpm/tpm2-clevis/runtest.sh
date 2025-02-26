@@ -25,15 +25,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PACKAGES="beakerlib tpm2-tools clevis"
-if which dnf 2>/dev/null >/dev/null
-then
-    dnf install -y $PACKAGES
-else
-    yum install -y $PACKAGES
-fi
-
-
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
