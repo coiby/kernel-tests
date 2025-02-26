@@ -299,17 +299,18 @@ function RunTest ()
             continue
         fi
 
-        if [ -z "$VM_SELFTEST_ITEMS" ]; then
-            rlPhaseStartTest $item
-        else
-            rlPhaseStartTest $item-$VM_SELFTEST_ITEMS
-        fi
-        rlLog "Test Start Time: $(date)"
         # do setup
         _item=$(echo $item | tr \/ \_)
+        if [ -z "$VM_SELFTEST_ITEMS" ]; then
+            rlPhaseStartSetup do_${_item}_config
+        else
+            rlPhaseStartSetup do_${_item}_config-$VM_SELFTEST_ITEMS
+        fi
+        rlLog "Test Start Time: $(date)"
         if type do_${_item}_config >& /dev/null; then
             rlRun do_${_item}_config
         fi
+        rlPhaseEnd
 
         if type do_${_item}_run >& /dev/null; then
             rlRun do_${_item}_run
@@ -335,6 +336,7 @@ function RunTest ()
         fi
 
         # do reset
+        rlPhaseStartCleanup do_${_item}_reset
         if type do_${_item}_reset >& /dev/null; then
             rlRun do_${_item}_reset
         fi
