@@ -1,0 +1,11 @@
+summary: Tests for TPM2 Clevis encryption/decryption
+contact: Denis Aleksandrov <daleksan@redhat.com>
+path: /security/crypto/tpm/tpm2-clevis
+test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
+require:
+  - tpm2-tools
+  - clevis
+  - tpm2-abrmd
