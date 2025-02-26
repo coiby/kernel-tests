@@ -366,6 +366,9 @@ do_bpf_test_progs_run()
 		echo -e "\n=== Dmesg result ===" >> "$OUTPUTFILE"
 		dmesg >> "$OUTPUTFILE"
 
+		# submit logs
+		rlLog "$(cat ${OUTPUTFILE})"
+
 		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
 		check_result $num "$total_num" "${item}:${name}" $ret
 		rlPhaseEnd
@@ -438,6 +441,10 @@ do_tc-testing_run()
 		echo "${name}" | grep -qP "tests\.json|concurrency\.json" && extra_p="-d $DEFAULT_IFACE" || extra_p=""
 		./tdc.py -f "${name}" "$extra_p" &> "$OUTPUTFILE"
 		ret=$?
+
+		# submit logs
+		rlLog "$(cat ${OUTPUTFILE})"
+
 		if grep -q "not ok" "$OUTPUTFILE"; then
 			check_result $num "$total_num" "${item}:${name}" 1
 			fail=$((fail+1))
