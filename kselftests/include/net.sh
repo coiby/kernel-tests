@@ -72,6 +72,15 @@ install_smcroute()
 	which smcroute && return 0 || return 1
 }
 
+install_mtools()
+{
+	which msend && return 0
+	dnf copr -y enable liuhangbin/mtools
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string mcast-tools
+	which msend && return 0 || return 1
+}
+
 install_sendip()
 {
 
@@ -211,8 +220,9 @@ do_net_forwarding_config()
 
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
-	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
-	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
+	install_netsniff || { test_warn "install netsniff for forwarding test failed" && return 1; }
+	install_smcroute || { test_warn "install smcrouted for forwarding test failed" && return 1; }
+	install_mtools || { test_warn "install mtools for forwarding test failed" && return 1; }
 
 	pushd "$EXEC_DIR"/net/forwarding || exit
 	# RHEL9/10 doesn't support meta

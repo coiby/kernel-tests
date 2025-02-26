@@ -70,6 +70,19 @@ Describe 'kselftests/include/net install_smcroute'
     End
 End
 
+Describe 'kselftests/include/net install_mtools'
+    # the function call which command twice
+    export WHICH_EXITCODES=(1 0)
+    It "can install_mtools"
+        When call install_mtools
+        The line 1 should equal "which msend"
+        The line 2 should equal "dnf copr -y enable liuhangbin/mtools"
+        The line 3 should equal "dnf -y install mcast-tools"
+        The line 4 should equal "which msend"
+        The status should be success
+    End
+End
+
 Describe 'kselftests/include/net install_sendip'
     # the function call which command twice
     export WHICH_EXITCODES=(1 0)
@@ -117,6 +130,9 @@ Describe 'kselftests/include/net do_net_forwarding_config'
         function install_smcroute(){
             echo "install_smcroute"
         }
+        function install_mtools(){
+            echo "install_mtools"
+        }
         function which(){
             echo "which $*"
             return 1
@@ -147,16 +163,17 @@ Describe 'kselftests/include/net do_net_forwarding_config'
         The line 3 should equal "dnf -y install iproute-tc"
         The line 4 should equal "install_netsniff"
         The line 5 should equal "install_smcroute"
-        The line 6 should equal "pushd"
-        The line 7 should equal "sed -i 0, /ets_test_strict/ {/ets_test_strict/d;} sch_ets.sh"
-        The line 8 should equal "sed -i 0, /ets_test_mixed/ {/ets_test_mixed/d;} sch_ets.sh"
-        The line 9 should equal "sed -i 0, /ets_test_dwrr/ {/ets_test_dwrr/d;} sch_ets.sh"
-        The line 10 should equal "sed -i /classifier_mode/d sch_ets.sh"
-        The line 11 should equal "sysctl_set net.ipv4.ping_group_range 1 0"
-        The line 12 should equal "sysctl_set net.bridge.bridge-nf-call-iptables 0"
-        The line 13 should equal "sysctl_set net.bridge.bridge-nf-call-ip6tables 0"
-        The line 14 should equal "cp forwarding.config.sample forwarding.config"
-        The line 15 should equal "popd"
+        The line 6 should equal "install_mtools"
+        The line 7 should equal "pushd"
+        The line 8 should equal "sed -i 0, /ets_test_strict/ {/ets_test_strict/d;} sch_ets.sh"
+        The line 9 should equal "sed -i 0, /ets_test_mixed/ {/ets_test_mixed/d;} sch_ets.sh"
+        The line 10 should equal "sed -i 0, /ets_test_dwrr/ {/ets_test_dwrr/d;} sch_ets.sh"
+        The line 11 should equal "sed -i /classifier_mode/d sch_ets.sh"
+        The line 12 should equal "sysctl_set net.ipv4.ping_group_range 1 0"
+        The line 13 should equal "sysctl_set net.bridge.bridge-nf-call-iptables 0"
+        The line 14 should equal "sysctl_set net.bridge.bridge-nf-call-ip6tables 0"
+        The line 15 should equal "cp forwarding.config.sample forwarding.config"
+        The line 16 should equal "popd"
         The status should be success
     End
 End
