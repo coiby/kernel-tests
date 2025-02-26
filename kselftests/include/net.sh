@@ -13,9 +13,10 @@ get_default_iface()
 	ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}'
 }
 
-install_netsniff()
+install_epel_pkg()
 {
-	which mausezahn && return 0
+	pkg=$1
+	rpm -q --quiet $pkg && return 0
 
 	if [[ "$krelease" =~ ^(8|9|10)$ ]]; then
 		if ! rpm -q --quiet epel-release; then
@@ -34,33 +35,11 @@ install_netsniff()
 		$pkg_mgr copr enable fmaurer/netsniff
 	fi
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string $param jq netsniff-ng
+	$pkg_mgr $pkg_mgr_inst_string $param $pkg
 
 	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
-	which mausezahn && return 0 || return 1
-}
-
-install_iptables_legacy()
-{
-	rpm -q --quiet iptables-legacy && return 0
-
-	if [[ "$krelease" =~ ^(8|9|10)$ ]]; then
-		if ! rpm -q --quiet epel-release; then
-			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
-			local need_remove=1
-		else
-			local param="--enablerepo=epel"
-		fi
-	fi
-
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string $param iptables-legacy
-
-	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
-
-	rpm -q --quiet iptables-legacy && return 0 || return 1
+	rpm -q --quiet $pkg && return 0 || return 1
 }
 
 install_smcroute()
@@ -201,7 +180,8 @@ do_net_config()
 	popd || exit
 
 	# install jq for fib_nexthops.sh test
-	install_netsniff || { test_fail "install netsniff for net test failed" && return 1; }
+	install_epel_pkg netsniff-ng || { test_fail "install netsniff for net test failed" && return 1; }
+	install_epel_pkg netperf || { test_fail "install netperf for net test failed" && return 1; }
 }
 
 do_net_reset()
@@ -220,7 +200,7 @@ do_net_forwarding_config()
 
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
-	install_netsniff || { test_warn "install netsniff for forwarding test failed" && return 1; }
+	install_epel_pkg netsniff-ng || { test_warn "install netsniff for forwarding test failed" && return 1; }
 	install_smcroute || { test_warn "install smcrouted for forwarding test failed" && return 1; }
 	install_mtools || { test_warn "install mtools for forwarding test failed" && return 1; }
 
@@ -324,7 +304,7 @@ do_bpf_test_progs_config()
 	modprobe nf_conntrack
 	modprobe nf_nat
 
-	install_iptables_legacy || test_warn "Install iptables-legacy failed"
+	install_epel_pkg iptables_legacy || test_warn "Install iptables-legacy failed"
 }
 
 do_bpf_test_progs_run()
