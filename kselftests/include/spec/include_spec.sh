@@ -212,7 +212,7 @@ Describe 'kselftests/include/net do_tc-testing_config'
         The line 5 should equal "modprobe netdevsim"
         The line 6 should equal "pushd"
         The line 7 should equal "sed -i /TIMEOUT/s/24/180/ tdc_config.py"
-        The line 8 should equal "sed -i s/python3 -s/python3/ *.py plugin-lib/*.py"
+        The line 8 should equal "sed -i s/python3 -sP\?/python3/ *.py plugin-lib/*.py"
         The line 9 should equal "popd"
         The status should be success
     End
