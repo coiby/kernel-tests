@@ -8,4 +8,4 @@ destructive=no
 
 [restraint]
 entry_point=bash runtest.sh
-dependencies=trousers;tpm-tools;rhts-test-env;beakerlib
+dependencies=trousers;tpm-tools;beakerlib

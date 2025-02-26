@@ -25,10 +25,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-dnf install -y beakerlib
-
 # Source the common test script helpers
-. /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 
 
@@ -37,7 +34,6 @@ CONTENT="testcontent$$"
 rlJournalStart
 	# first start tcsd, all calls need it
 	rlPhaseStartSetup
-		rlRun "dnf install -y trousers tpm-tools"
 		rlRun "service tcsd start" 0 "starting tcsd"
 		sleep 1
 	rlPhaseEnd
