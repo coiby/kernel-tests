@@ -1,0 +1,11 @@
+summary: Tests for TPM1.2 tools
+contact: Denis Aleksandrov <daleksan@redhat.com>
+path: /security/crypto/tpm/tpm12
+test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
+require:
+  - trousers
+  - tpm-tools
+duration: 20m
