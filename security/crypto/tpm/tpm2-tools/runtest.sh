@@ -2,7 +2,7 @@
 # vim: ai si dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /kernel/crypto/tmp/tpmtest
+#   runtest.sh of /kernel/security/crypto/tmp/tpm2-tools
 #   Description: TPM2-TSS testsuite wrapper
 #   Author: Vilem Marsik <vmarsik@redhat.com>
 #
@@ -25,19 +25,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PACKAGES="beakerlib tpm2-tools tpm2-abrmd perl"
-if which dnf 2>/dev/null >/dev/null
-then
-	dnf install -y $PACKAGES
-else
-	yum install -y $PACKAGES
-fi
-
 # Source the common test script helpers
-. /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 
-RHEL_MAJOR=`perl -ne 'print $1 if $_=~/release\s*(\d+)/' /etc/redhat-release`
 COM_OPTS="-T tabrmd"
 HASH_OPTS="-C n"
 
@@ -46,16 +36,10 @@ rlJournalStart
 	rlPhaseStartSetup
 
 		# Detect RHEL major to know what we can do
-		if [ -z "$RHEL_MAJOR" ]
-		then
-			rlLogWarning "Could not detect RHEL version"
-		elif [ "$RHEL_MAJOR" -eq "7" ]
-		then
+		if rlIsRHEL "<8"; then
 				COM_OPTS=""
 				HASH_OPTS=""
-				rlLogInfo "Old RHEL version $RHEL_MAJOR detected, testing limited"
-		else
-			rlLogInfo "Detected RHEL version $RHEL_MAJOR"
+				rlLogInfo "Old RHEL version detected, testing limited"
 		fi
 
 
@@ -67,13 +51,11 @@ rlJournalStart
 		then
 			rlRun "systemctl start tpm2-abrmd" 0 "starting tpm2-abrmd"
 		fi
-		#rlRun "screen -S tpm2-abrmd -d -m tpm2-abrmd" 0 "starting tpm2-abrmd"
 		sleep 1
 	rlPhaseEnd
 
 	rlPhaseStart FAIL "Presence"
-		if [ $RHEL_MAJOR -gt 7 ]
-		then
+		if rlIsRHEL ">7"; then
 			rlRun "tpm2_pcrread $COM_OPTS"
 			COUNT=`tpm2_pcrread $COM_OPTS | grep '^ \+[0-9]\+ *: ' | wc -l`
 			rlAssertGreaterOrEqual "24 PCRS" "$COUNT" 24
@@ -82,8 +64,7 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStart FAIL "Functionality"
-		if [ $RHEL_MAJOR -gt 7 ]
-		then
+		if rlIsRHEL ">7"; then
 			rlRun "tpm2_nvreadpublic $COM_OPTS"
 		fi
 		DATA=`mktemp`
@@ -95,18 +76,12 @@ rlJournalStart
 		rlRun "tpm2_hash $COM_OPTS $HASH_OPTS -g 0x0004 -o $HASHED -t $TICKET $DATA" 0 "hashing"
 		rm -f $DATA $HASHED $TICKET
 
-		# need to define persistent objects first
-		#rlRun "tpm2_listpersistent"
-		#COUNT=`tpm2_listpersistent | grep key-alg | wc -l`
-		#rlAssertGreater "persistent objects defined" "$COUNT" 0
-
 		# extending PCRs, not available in RHEL7
-		if [ $RHEL_MAJOR -gt 7 ]
-		then
+		if rlIsRHEL ">7"; then
 			NUM_SHA1=`tpm2_pcrread $COM_OPTS sha1 2>/dev/null | wc -l`
 			NUM_SHA256=`tpm2_pcrread $COM_OPTS sha256 2>/dev/null | wc -l`
-			NUM_SHA512=`tpm2_pcrread $COM_OPTS sha512 2>/dev/null | wc -l`
-			NUM_SM3_256=`tpm2_pcrread $COM_OPTS sm3_256 2>/dev/null | wc -l`
+			#NUM_SHA512=`tpm2_pcrread $COM_OPTS sha512 2>/dev/null | wc -l`
+			#NUM_SM3_256=`tpm2_pcrread $COM_OPTS sm3_256 2>/dev/null | wc -l`
 			ORIGINAL=`tpm2_pcrread $COM_OPTS | grep ' 4 *:' | head -n 1`
 			if [ $NUM_SHA1 -gt 1 ]
 			then
@@ -137,11 +112,6 @@ rlJournalStart
 			rm -f key.priv key.pub primary.ctx priv.pem pub.pem
 		fi
 	rlPhaseEnd
-
-	# stop resourcemgr
-	#rlPhaseStartCleanup
-		#rlRun "screen -X -S tpm2-abrmd quit" 0 "stopping tpm2-abrmd"
-	#rlPhaseEnd
 
 	rlJournalPrintText
 rlJournalEnd

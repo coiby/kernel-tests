@@ -1,0 +1,11 @@
+[General]
+name=/kernel/security/crypto/tpm/tpm2-tools
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=Tests for TPM2 tools
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash runtest.sh
+dependencies=beakerlib;tpm2-tools;tpm2-abrmd;tpm2-tss

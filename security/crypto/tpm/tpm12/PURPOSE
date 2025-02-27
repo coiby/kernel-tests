@@ -1,0 +1,2 @@
+Description: Runs different possible tests against a TPM1.2 HW.
+Author: Vilem Marsik <vmarsik@redhat.com> and Denis Aleksandrov <daleksan@redhat.com>

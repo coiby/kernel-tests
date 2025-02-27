@@ -1,0 +1,11 @@
+[General]
+name=/kernel/security/crypto/tpm/tpm12
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=TPM1.2 tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash runtest.sh
+dependencies=trousers;tpm-tools;beakerlib

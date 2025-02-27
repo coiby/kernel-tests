@@ -25,15 +25,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PACKAGES="beakerlib tpm2-tools clevis"
-if which dnf 2>/dev/null >/dev/null
-then
-    dnf install -y $PACKAGES
-else
-    yum install -y $PACKAGES
-fi
-
-
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
@@ -43,10 +34,10 @@ FMT="%{name}-%{version}-%{release}\n"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm ${PACKAGE}
-        rlRun "packageVersion=$(rpm -q ${PACKAGE} --qf ${FMT})"
+        packageVersion=$(rpm -q ${PACKAGE} --qf ${FMT})
         rlTestVersion "${packageVersion}" '>=' 'clevis-7-6' || rlDie "Tested functionality is not in old version ${packageVersion}"
 
-        rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
+        TmpDir="mktemp -d"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
