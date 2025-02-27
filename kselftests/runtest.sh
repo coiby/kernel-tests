@@ -313,7 +313,7 @@ function RunTest ()
         rlPhaseEnd
 
         if type do_${_item}_run >& /dev/null; then
-            rlRun do_${_item}_run
+            do_${_item}_run
         else
             # create list of tests to run
             if [ "${TEST_ITEMS}" == "default" ]; then
