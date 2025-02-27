@@ -239,7 +239,7 @@
 /kdump-cki/crash-sysrq-c/ @baoquan_he @bgoncalv @jieli1 @lulinqing @thenzl @yiyan1
 /kdump-cki/kexec-file-load/ @baoquan_he @bgoncalv @jieli1 @lulinqing @yiyan1
 /kdump-cki/kexec-load/ @baoquan_he @bgoncalv @jieli1 @lulinqing @yiyan1
-/kselftests/ @bgoncalv @chuhu @ezulian @fmaurer-rh @liuhangbin @liwan1 @lulinqing @pifang @sbertram @vmalikrh
+/kselftests/ @bgoncalv @chuhu @ezulian @fmaurer-rh @liuhangbin @liwan1 @lulinqing @pifang @sbertram @shuali @vmalikrh @xmu2 @yiche
 /kunit/ @bgoncalv @lulinqing @npache
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing
 /legacy/whitelist/ @bgoncalv @ckalina @lulinqing
