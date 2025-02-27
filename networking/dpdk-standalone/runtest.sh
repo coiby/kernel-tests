@@ -365,6 +365,7 @@ start_bash_cmd()
     all_cmd_file="/tmp/all_cmd_file"
     pushd ${CASE_PATH} > /dev/null
     source venv/bin/activate
+    source /usr/share/beakerlib/beakerlib.sh || exit 1
     while true
     do
         cmd=`python ${CASE_PATH}/client.py`
