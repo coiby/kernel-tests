@@ -70,7 +70,7 @@ function download_image() {
     local file image_name base_url
 
     # Check if the VM image already exists
-    file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2' -print)
+    file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2' -print)
     if [[ $(echo "$file" | wc -w) -eq 1 ]]; then
         qcow2_image=$file
         rlLog "The image '$qcow2_image' already exists. Skipping download."
@@ -79,7 +79,7 @@ function download_image() {
 
     # Remove all related files and start over
     rlLog "Removing existing VM images and related files."
-    find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2*' -exec rm -rfv {} \;
+    find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2*' -exec rm -rfv {} \;
 
     # Gather image information
     rlLog "Gathering image information from '/etc/build-info'."
@@ -100,9 +100,10 @@ function download_image() {
     # shellcheck disable=SC1091
     source /etc/build-info
 
-    IMAGE_NAME=developer              # Always use developer images
+    IMAGE_NAME=qa                     # ATC only provide qa regular images
+    IMAGE_TYPE=regular
     [[ ${#UUID} -gt 16 ]] && UUID='*' # Support non-toolchain images
-    image_name="auto-osbuild-qemu-rhivos9-${IMAGE_NAME}-${IMAGE_TYPE:=regular}-$(arch)-${UUID}.qcow2"
+    image_name="auto-osbuild-qemu-rhivos-${IMAGE_NAME}-${IMAGE_TYPE:=regular}-$(arch)-${UUID}.qcow2"
     rlLog "The image name to be downloaded is '$image_name'."
 
     # Download the qcow2 image
@@ -117,7 +118,7 @@ function download_image() {
     fi
 
     # Verify download and checksum
-    file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2.xz' -print)
+    file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2.xz' -print)
     if [[ $(echo "$file" | wc -w) -ne 1 ]]; then
         rlLog "Downloaded zero or multiple images. Please check the workspace content:"
         ls -la "$WORKSPACE"
@@ -125,20 +126,20 @@ function download_image() {
     fi
 
     # Verify SHA256 checksum
-    find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2.xz.sha256' -execdir sha256sum -c {} \; || {
+    find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2.xz.sha256' -execdir sha256sum -c {} \; || {
         rlLogError "SHA256 checksum verification failed."
         return 1
     }
 
     # Decompress the qcow2.xz file
     rlLog "Decompressing the qcow2.xz image file."
-    find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2.xz' -execdir xz -d {} \; || {
+    find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2.xz' -execdir xz -d {} \; || {
         rlLogError "Failed to decompress the xz file."
         return 1
     }
 
     # Locate the qcow2 image
-    file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2' -print)
+    file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2' -print)
     if [[ $(echo "$file" | wc -w) -eq 1 ]]; then
         rlLog "VM image '$file' is downloaded and ready to use."
         return 0
@@ -174,7 +175,7 @@ function prepare_vm_drives() {
 function configure_vm_credential() {
     rlLog "Configuring the credentials for the VM."
 
-    local qcow2_image=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2' -print)
+    local qcow2_image=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2' -print)
     if [[ $(echo "$qcow2_image" | wc -w) -ne 1 ]]; then
         rlLogError "Failed to locate the qcow2 image."
         return 1
@@ -248,7 +249,7 @@ EOF
 function start_vm() {
     rlLog "Starting the VM."
 
-    local qcow2_image=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos9-*.qcow2' -print)
+    local qcow2_image=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2' -print)
     if [[ $(echo "$qcow2_image" | wc -w) -ne 1 ]]; then
         rlLogError "Failed to locate the qcow2 image."
         return 1
@@ -358,168 +359,168 @@ function kill_qemu_process() {
 
 rlJournalStart
 
-    # Check if the current kernel version matches the RHIVOS environment pattern
-    rlShowRunningKernel
-    if ! (uname -r | grep -w -q 'el[0-9]*iv'); then
-        rlLog "Skipping $TEST: This test is intended to run only in the RHIVOS environment."
-        rstrnt-report-result "$TEST" SKIP
-        rlJournalEnd
-        exit 0
+# Check if the current kernel version matches the RHIVOS environment pattern
+rlShowRunningKernel
+if ! (uname -r | grep -w -q 'el[0-9]*iv'); then
+    rlLog "Skipping $TEST: This test is intended to run only in the RHIVOS environment."
+    rstrnt-report-result "$TEST" SKIP
+    rlJournalEnd
+    exit 0
+fi
+
+rlPhaseStartSetup
+
+# Create and enter the workspace
+mkdir -p "$WORKSPACE" && cd "$WORKSPACE"
+
+error_msg="$WORKSPACE/error_msg.txt"
+rm -rf "$error_msg"
+
+# Install the QEMU system (required packages: ninja-build, make, gcc, libslirp, libslirp-devel)
+(install_qemu || echo "Failed to install the QEMU system." >>"$error_msg") &
+
+# Download the VM image
+(download_image || echo "Failed to download the VM image." >>"$error_msg") &
+
+# Prepare the drives for the VM (required packages: edk2-aarch64)
+(prepare_vm_drives || echo "Failed to prepare the drives for the VM." >>"$error_msg") &
+
+# Wait for above processes to complete
+wait && [[ -f $error_msg ]] && rlDie "$(cat "$error_msg")"
+
+# Configure the credentials (required packages: libguestfs)
+configure_vm_credential || rlDie "Failed to configure the credentials."
+
+# Power on the VM (required packages: screen)
+start_vm || rlDie
+
+try_connect_vm || rlDie
+
+rlPhaseEnd
+
+rlPhaseStartTest
+
+cd "$WORKSPACE"
+
+# Verify the kernel version of the VM
+rlLog "Verifying the kernel version of the VM."
+kernel_version_vm="$(ssh vm 'uname -r')"
+rlLog "Kernel version of the VM   : $kernel_version_vm"
+rlLog "Kernel version of the Host : $(uname -r)"
+if [[ "$kernel_version_vm" != "$(uname -r)" ]]; then
+    rlLog "Skipping $TEST: the kernel version in the VM does not match the host's version."
+    rstrnt-report-result "$TEST" SKIP
+    rlDie
+fi
+
+# Verify the IOMMU is running in Translated mode
+rlLog "Verifying the IOMMU is running in Translated mode."
+rlRun "ssh vm 'dmesg | grep \"iommu: Default domain type: Translated\"'" 0 "IOMMU should run in Translated Mode on the VM."
+rlRun "ssh vm 'grep -w DMA /sys/kernel/iommu_groups/*/type'" 0 "IOMMU should run in Translated Mode on the VM."
+
+# Setup the Root Certificate on the VM
+rlLog "Setting up the Root Certificate on the VM."
+if ssh vm '[ -f /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt ]'; then
+    rlLog "The Root Certificate already exists on the VM, skipping setup."
+else
+    rlLog "Setting up the Root Certificate on the VM."
+    rlAssertExists "/etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt"
+    rlRun "scp /etc/pki/ca-trust/source/anchors/* vm:/etc/pki/ca-trust/source/anchors/"
+    rlRun "ssh vm 'update-ca-trust extract'"
+    if ssh vm '[ -f /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt ]'; then
+        rlLog "The Root Certificate on the VM is ready for use."
+    else
+        rlDie "Failed to set up the Root Certificate on the VM."
     fi
+fi
 
-    rlPhaseStartSetup
+# Setup the DNF Repositories on the VM
+rlLog "Setting up the DNF Repositories on the VM."
+if ssh vm "ls /etc/yum.repos.d/synced &>/dev/null"; then
+    rlLog "DNF repositories on the VM are already synced with the host, skipping setup."
+else
+    rlRun "ssh vm 'rm -rf /etc/yum.repos.d/*.repo'"
+    rlRun "scp /etc/yum.repos.d/*.repo vm:/etc/yum.repos.d/"
+    rlRun "ssh vm 'dnf clean all && dnf makecache --nogpgcheck && touch /etc/yum.repos.d/synced'"
+fi
 
-        # Create and enter the workspace
-        mkdir -p "$WORKSPACE" && cd "$WORKSPACE"
+# Upload the cmdline_helper to the VM
+rlLog "Uploading the cmdline_helper to the VM."
+rlAssertExists "$TESTPATH/../../../cmdline_helper/libcmd.sh"
+rlAssertExists "$TESTPATH/../../../cki_lib/libcki.sh"
+rlRun "ssh vm 'mkdir -p /root/cmdline_helper/ /root/cki_lib/'"
+rlRun "scp $TESTPATH/../../../cmdline_helper/libcmd.sh vm:/root/cmdline_helper/"
+rlRun "scp $TESTPATH/../../../cki_lib/libcki.sh vm:/root/cki_lib/"
 
-        error_msg="$WORKSPACE/error_msg.txt"
-        rm -rf "$error_msg"
+# Enable installing unsigned kernel modules on the VM
+rlLog "Enabling installation of unsigned kernel modules on the VM."
+if ssh vm "cat /proc/cmdline" | grep -q "module.sig_enforce=1"; then
+    rlLog "Enabling installation of unsigned kernel modules on the VM."
+    rlRun "ssh vm 'dnf install -y grubby'"
+    rlRun "ssh vm 'source /root/cmdline_helper/libcmd.sh; change_cmdline \"-module.sig_enforce=1\"'"
+    rlRun "ssh vm 'reboot'" 0 "Rebooting the VM to apply cmdline changes."
+    try_connect_vm || rlDie
+else
+    rlLog "Installation of unsigned kernel modules on the VM is already enabled, skipping."
+fi
+if ssh vm "cat /proc/cmdline" | grep -q "module.sig_enforce=1"; then
+    rlDie "Failed to enable installation of unsigned kernel modules on the VM."
+else
+    rlLog "The VM is ready to install unsigned kernel modules."
+fi
 
-        # Install the QEMU system (required packages: ninja-build, make, gcc, libslirp, libslirp-devel)
-        (install_qemu || echo "Failed to install the QEMU system." >>"$error_msg") &
+# Upload the hardware device driver to the VM
+rlLog "Uploading the hardware device driver to the VM."
+rlAssertExists "$TESTPATH/src/edu_driver.c"
+rlAssertExists "$TESTPATH/src/Kbuild"
+rlAssertExists "$TESTPATH/src/Makefile"
+rlRun "scp -r $TESTPATH/src vm:/root/"
 
-        # Download the VM image
-        (download_image || echo "Failed to download the VM image." >>"$error_msg") &
+# Compile the hardware device driver on the VM
+rlLog "Compiling the hardware device driver on the VM."
+rlRun "ssh vm 'dnf install -y make gcc kernel-automotive-devel-\$(uname -r)'"
+rlRun "ssh vm 'cd /root/src && make -j \$(nproc)'" || rlDie "Failed to compile the hardware device driver"
 
-        # Prepare the drives for the VM (required packages: edk2-aarch64)
-        (prepare_vm_drives || echo "Failed to prepare the drives for the VM." >>"$error_msg") &
+# Install the hardware device driver on the VM
+rlLog "Installing the hardware device driver on the VM."
+rlRun -l -s "ssh vm 'dmesg -C; insmod /root/src/edu_driver.ko; dmesg'"
+# shellcheck disable=SC2154
+rlAssertGrep "edu_driver module initializing" "$rlRun_LOG"
 
-        # Wait for above processes to complete
-        wait && [[ -f $error_msg ]] && rlDie "$(cat "$error_msg")"
+# Test 1: Cause a hardware device to attempt to access an invalid page of the address space and confirm this results in graceful failure
+rlLog "Test 1: Access an invalid page of the address space and confirm graceful failure."
+rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_invalid\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
+rlAssertGrep "TEST: test_write_read_dma_with_fault_on_invalid (page fault is expected)" "$rlRun_LOG"
+rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0xaabbccddeeff00 \[\]" "$rlRun_LOG"
 
-        # Configure the credentials (required packages: libguestfs)
-        configure_vm_credential || rlDie "Failed to configure the credentials."
+# Test 2: Cause a hardware device to attempt to access a read-only page of the address space and confirm this results in graceful failure
+rlLog "Test 2: Access a read-only page of the address space and confirm graceful failure."
+rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_read_only\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
+rlAssertGrep "TEST: test_write_read_dma_with_fault_on_readonly (page fault is expected)" "$rlRun_LOG"
+rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0x[[:xdigit:]]* \[W\]" "$rlRun_LOG"
 
-        # Power on the VM (required packages: screen)
-        start_vm || rlDie
+# Test 3: Cause a hardware device to attempt to access an unmapped page of the address space and confirm this results in graceful failure
+rlLog "Test 3: Access an unmapped page of the address space and confirm graceful failure."
+rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_unmapped\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
+rlAssertGrep "TEST: test_write_read_dma_with_fault_on_unmapped (page fault is expected)" "$rlRun_LOG"
+rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0x[[:xdigit:]]* \[\]" "$rlRun_LOG"
 
-        try_connect_vm || rlDie
+# Remove the hardware device driver on the VM
+rlLog "Removing the hardware device driver from the VM."
+rlRun -l -s "ssh vm 'dmesg -C; rmmod edu_driver; dmesg'"
+rlAssertGrep "edu_driver module exiting" "$rlRun_LOG"
 
-    rlPhaseEnd
+rlPhaseEnd
 
-    rlPhaseStartTest
+rlPhaseStartCleanup
 
-        cd "$WORKSPACE"
+# Power off the VM
+stop_vm || kill_qemu_process
 
-        # Verify the kernel version of the VM
-        rlLog "Verifying the kernel version of the VM."
-        kernel_version_vm="$(ssh vm 'uname -r')"
-        rlLog "Kernel version of the VM   : $kernel_version_vm"
-        rlLog "Kernel version of the Host : $(uname -r)"
-        if [[ "$kernel_version_vm" != "$(uname -r)" ]]; then
-            rlLog "Skipping $TEST: the kernel version in the VM does not match the host's version."
-            rstrnt-report-result "$TEST" SKIP
-            rlDie
-        fi
+# Submit the QEMU log file
+rlFileSubmit ./qemu.log
 
-        # Verify the IOMMU is running in Translated mode
-        rlLog "Verifying the IOMMU is running in Translated mode."
-        rlRun "ssh vm 'dmesg | grep \"iommu: Default domain type: Translated\"'" 0 "IOMMU should run in Translated Mode on the VM."
-        rlRun "ssh vm 'grep -w DMA /sys/kernel/iommu_groups/*/type'" 0 "IOMMU should run in Translated Mode on the VM."
-
-        # Setup the Root Certificate on the VM
-        rlLog "Setting up the Root Certificate on the VM."
-        if ssh vm '[ -f /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt ]'; then
-            rlLog "The Root Certificate already exists on the VM, skipping setup."
-        else
-            rlLog "Setting up the Root Certificate on the VM."
-            rlAssertExists "/etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt"
-            rlRun "scp /etc/pki/ca-trust/source/anchors/* vm:/etc/pki/ca-trust/source/anchors/"
-            rlRun "ssh vm 'update-ca-trust extract'"
-            if ssh vm '[ -f /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt ]'; then
-                rlLog "The Root Certificate on the VM is ready for use."
-            else
-                rlDie "Failed to set up the Root Certificate on the VM."
-            fi
-        fi
-
-        # Setup the DNF Repositories on the VM
-        rlLog "Setting up the DNF Repositories on the VM."
-        if ssh vm "ls /etc/yum.repos.d/synced &>/dev/null"; then
-            rlLog "DNF repositories on the VM are already synced with the host, skipping setup."
-        else
-            rlRun "ssh vm 'rm -rf /etc/yum.repos.d/*.repo'"
-            rlRun "scp /etc/yum.repos.d/*.repo vm:/etc/yum.repos.d/"
-            rlRun "ssh vm 'dnf clean all && dnf makecache --nogpgcheck && touch /etc/yum.repos.d/synced'"
-        fi
-
-        # Upload the cmdline_helper to the VM
-        rlLog "Uploading the cmdline_helper to the VM."
-        rlAssertExists "$TESTPATH/../../../cmdline_helper/libcmd.sh"
-        rlAssertExists "$TESTPATH/../../../cki_lib/libcki.sh"
-        rlRun "ssh vm 'mkdir -p /root/cmdline_helper/ /root/cki_lib/'"
-        rlRun "scp $TESTPATH/../../../cmdline_helper/libcmd.sh vm:/root/cmdline_helper/"
-        rlRun "scp $TESTPATH/../../../cki_lib/libcki.sh vm:/root/cki_lib/"
-
-        # Enable installing unsigned kernel modules on the VM
-        rlLog "Enabling installation of unsigned kernel modules on the VM."
-        if ssh vm "cat /proc/cmdline" | grep -q "module.sig_enforce=1"; then
-            rlLog "Enabling installation of unsigned kernel modules on the VM."
-            rlRun "ssh vm 'dnf install -y grubby'"
-            rlRun "ssh vm 'source /root/cmdline_helper/libcmd.sh; change_cmdline \"-module.sig_enforce=1\"'"
-            rlRun "ssh vm 'reboot'" 0 "Rebooting the VM to apply cmdline changes."
-            try_connect_vm || rlDie
-        else
-            rlLog "Installation of unsigned kernel modules on the VM is already enabled, skipping."
-        fi
-        if ssh vm "cat /proc/cmdline" | grep -q "module.sig_enforce=1"; then
-            rlDie "Failed to enable installation of unsigned kernel modules on the VM."
-        else
-            rlLog "The VM is ready to install unsigned kernel modules."
-        fi
-
-        # Upload the hardware device driver to the VM
-        rlLog "Uploading the hardware device driver to the VM."
-        rlAssertExists "$TESTPATH/src/edu_driver.c"
-        rlAssertExists "$TESTPATH/src/Kbuild"
-        rlAssertExists "$TESTPATH/src/Makefile"
-        rlRun "scp -r $TESTPATH/src vm:/root/"
-
-        # Compile the hardware device driver on the VM
-        rlLog "Compiling the hardware device driver on the VM."
-        rlRun "ssh vm 'dnf install -y make gcc kernel-automotive-devel-\$(uname -r)'"
-        rlRun "ssh vm 'cd /root/src && make -j \$(nproc)'" || rlDie "Failed to compile the hardware device driver"
-
-        # Install the hardware device driver on the VM
-        rlLog "Installing the hardware device driver on the VM."
-        rlRun -l -s "ssh vm 'dmesg -C; insmod /root/src/edu_driver.ko; dmesg'"
-        # shellcheck disable=SC2154
-        rlAssertGrep "edu_driver module initializing" "$rlRun_LOG"
-
-        # Test 1: Cause a hardware device to attempt to access an invalid page of the address space and confirm this results in graceful failure
-        rlLog "Test 1: Access an invalid page of the address space and confirm graceful failure."
-        rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_invalid\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
-        rlAssertGrep "TEST: test_write_read_dma_with_fault_on_invalid (page fault is expected)" "$rlRun_LOG"
-        rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0xaabbccddeeff00 \[\]" "$rlRun_LOG"
-
-        # Test 2: Cause a hardware device to attempt to access a read-only page of the address space and confirm this results in graceful failure
-        rlLog "Test 2: Access a read-only page of the address space and confirm graceful failure."
-        rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_read_only\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
-        rlAssertGrep "TEST: test_write_read_dma_with_fault_on_readonly (page fault is expected)" "$rlRun_LOG"
-        rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0x[[:xdigit:]]* \[W\]" "$rlRun_LOG"
-
-        # Test 3: Cause a hardware device to attempt to access an unmapped page of the address space and confirm this results in graceful failure
-        rlLog "Test 3: Access an unmapped page of the address space and confirm graceful failure."
-        rlRun -l -s "ssh vm 'dmesg -C; echo -n \"test_unmapped\" > /sys/kernel/debug/edu_driver/edu_driver_test_1; dmesg'"
-        rlAssertGrep "TEST: test_write_read_dma_with_fault_on_unmapped (page fault is expected)" "$rlRun_LOG"
-        rlAssertGrep "virtio_iommu virtio0: page fault from EP [[:digit:]]* at 0x[[:xdigit:]]* \[\]" "$rlRun_LOG"
-
-        # Remove the hardware device driver on the VM
-        rlLog "Removing the hardware device driver from the VM."
-        rlRun -l -s "ssh vm 'dmesg -C; rmmod edu_driver; dmesg'"
-        rlAssertGrep "edu_driver module exiting" "$rlRun_LOG"
-
-    rlPhaseEnd
-
-    rlPhaseStartCleanup
-
-        # Power off the VM
-        stop_vm || kill_qemu_process
-
-        # Submit the QEMU log file
-        rlFileSubmit ./qemu.log
-
-    rlPhaseEnd
+rlPhaseEnd
 
 rlJournalEnd
 
