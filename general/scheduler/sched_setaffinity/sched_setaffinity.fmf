@@ -5,7 +5,7 @@ component:
     - kernel
 path: /general/scheduler/sched_setaffinity
 test: bash -x ./runtest.sh
-framework: shell
+framework: beakerlib
 require:
     - gcc
     - libgcc
