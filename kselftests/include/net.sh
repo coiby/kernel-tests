@@ -389,7 +389,6 @@ do_tc-testing_config()
 	install_scapy
 	pip -q install pyroute2 2>/dev/null
 	modprobe -r veth
-	modprobe netdevsim
 
 	pushd "$EXEC_DIR"/tc-testing || exit
 	# extend test timeout
@@ -427,11 +426,13 @@ do_tc-testing_run()
 		fi
 
 		local OUTPUTFILE=$LOG_DIR/$(echo "${name}" | tr '/' '_').log
+		modprobe netdevsim
 
 		echo "${name}" | grep -qP "tests\.json|concurrency\.json" && extra_p="-d $DEFAULT_IFACE" || extra_p=""
 		./tdc.py -f "${name}" "$extra_p" &> "$OUTPUTFILE"
 		ret=$?
 
+		modprobe -r netdevsim
 		# submit logs
 		rlLog "$(cat ${OUTPUTFILE})"
 
@@ -447,6 +448,7 @@ do_tc-testing_run()
 		else
 			check_result $num "$total_num" "${item}:${name}" $ret
 		fi
+
 		rlPhaseEnd
 	done
 
