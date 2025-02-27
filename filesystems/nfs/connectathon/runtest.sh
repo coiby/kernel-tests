@@ -585,7 +585,7 @@ function cthon_main ()
     done
     popd
 
-    rhts-submit-log -l /mem-usage.log
+    rstrnt-report-log -l /mem-usage.log
 }
 
 build_nfs_server ()

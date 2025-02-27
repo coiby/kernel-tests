@@ -1,5 +1,4 @@
 #!/bin/bash
-# vim: dict=/usr/share/rhts-library/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /kernel/filesystems/general/pjd-fstest
