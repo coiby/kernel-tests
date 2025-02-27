@@ -28,8 +28,6 @@
 # Source the common test script helpers
 . /usr/share/beakerlib/beakerlib.sh
 
-
-SECTION=""
 CONTENT="testcontent$$"
 rlJournalStart
 	# first start tcsd, all calls need it
