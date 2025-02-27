@@ -12,6 +12,14 @@ framework: beakerlib
 require:
   - gcc
 duration: 5m
-tier: 1
 extra-summary: /kernel/general/memory/function/userfaultfd2
 extra-task: /kernel/general/memory/function/userfaultfd2
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tier: 1
+
+tag:
+  - VMM_FUNCTION

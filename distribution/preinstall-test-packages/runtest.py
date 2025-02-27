@@ -1,8 +1,6 @@
-"""
-Python test dependency pre-install script.
-"""
 import re
 import os
+import tarfile
 import zipfile
 import subprocess
 import sys
@@ -10,21 +8,22 @@ import urllib.request
 import requests
 
 
-def download_zip(zip_url, local_dir):
+def download_archive(archive_url, local_dir):
     """
     Download the zip file from the given URL to a local directory.
 
     Args:
-    - zip_url (str): URL of the zip file to download.
+    - archive_url (str): URL of the  file to download.
     - local_dir (str): Directory to save the downloaded zip file locally.
     """
-    local_file_name = os.path.join(local_dir, os.path.basename(zip_url))
+    local_file_name = os.path.join(local_dir, os.path.basename(archive_url))
     if not os.path.exists(local_file_name):
-        with requests.get(zip_url, verify=False, stream=True) as req:
+        with requests.get(archive_url, verify=False, stream=True) as req:
             req.raise_for_status()
             with open(local_file_name, 'wb') as file:
                 for chunk in req.iter_content(chunk_size=8192):
                     file.write(chunk)
+    print(f"Downloaded archive to {local_file_name}")
 
 
 def find_tests(xml_data):
@@ -48,12 +47,12 @@ def find_tests(xml_data):
 
         # Extract zip URL and test name from the URL
         if url.endswith('.zip'):
-            zip_url = url
+            archive_url = url
             test_name = path.split('/')[-1] if '/' in path else path
         else:
             # Handle sha URLs
             parts = url.split('#')
-            zip_url = parts[0]
+            archive_url = parts[0]
             test_name = path.split('/')[-1] if '/' in path else path
 
         # Check if test is already processed
@@ -63,12 +62,54 @@ def find_tests(xml_data):
         unique_tests.add((path, test_name))
 
         extracted_data.append({
-            'zip_url': zip_url,
+            'archive_url': archive_url,
             'path': path,
             'test_name': test_name,
         })
 
+    print(f"Found {len(extracted_data)} tests")
     return extracted_data
+
+
+def extract_metadata(archive_ref, path, is_zip, dependencies_pattern, soft_dependencies_pattern, dependencies_set, soft_dependencies_set):
+    """
+    Extract metadata from an archive and update dependency sets.
+
+    Args:
+    - archive_ref: Reference to the opened archive file (zipfile.ZipFile or tarfile.TarFile).
+    - path (str): Path within the archive to look for the metadata file.
+    - is_zip (bool): True if the archive is a ZIP file, False if it is a TAR file.
+    - dependencies_pattern (re.Pattern): Compiled regex pattern to find dependencies in the metadata content.
+    - soft_dependencies_pattern (re.Pattern): Compiled regex pattern to find soft dependencies in the metadata content.
+    - dependencies_set (set): Set to update with found dependencies.
+    - soft_dependencies_set (set): Set to update with found soft dependencies.
+    """
+    if is_zip:
+        namelist = archive_ref.namelist()
+    else:
+        namelist = archive_ref.getnames()
+
+    if [i for i in namelist if path in i]:
+        metadata_file = os.path.join(path, 'metadata')
+        metafile = [i for i in namelist if metadata_file in i]
+        if metafile:
+            if is_zip:
+                with archive_ref.open(metafile[0]) as metadata:
+                    metadata_content = metadata.read().decode('utf-8')
+            else:
+                metadata = archive_ref.extractfile(metafile[0])
+                if metadata:
+                    metadata_content = metadata.read().decode('utf-8')
+            dependencies_match = dependencies_pattern.search(metadata_content)
+            soft_dependencies_match = soft_dependencies_pattern.search(metadata_content)
+            if dependencies_match:
+                dependencies_set.update(dependencies_match.group(1).split(';'))
+            if soft_dependencies_match:
+                soft_dependencies_set.update(soft_dependencies_match.group(1).split(';'))
+        else:
+            print(f"{path} :: No metadata file found.")
+    else:
+        print("No directory found for the test.")
 
 
 def retrieve_metadata(test_data, local_dir):
@@ -86,36 +127,26 @@ def retrieve_metadata(test_data, local_dir):
     soft_dependencies_set = set()
     dependencies_pattern = re.compile(r'dependencies=([\w;-]+)')
     soft_dependencies_pattern = re.compile(r'softDependencies=([\w;-]+)')
-    # Process each test and retrieve metadata content
     for test_entry in test_data:
-        zip_url = test_entry['zip_url']
+        archive_url = test_entry['archive_url']
         path = test_entry['path']
+        archive_path = os.path.join(local_dir, os.path.basename(archive_url))
+        download_archive(archive_url, local_dir)
 
-        # Download the zip file locally
-        download_zip(zip_url, local_dir)
+        if archive_url.endswith('.zip'):
+            with zipfile.ZipFile(archive_path, 'r') as archive_ref:
+                extract_metadata(archive_ref, path, True, dependencies_pattern, soft_dependencies_pattern,
+                                 dependencies_set, soft_dependencies_set)
+        elif archive_url.endswith(('.tar', '.tar.gz', '.tar.bz2')):
+            with tarfile.open(archive_path, 'r:*') as archive_ref:
+                extract_metadata(archive_ref, path, False, dependencies_pattern, soft_dependencies_pattern,
+                                 dependencies_set, soft_dependencies_set)
+        else:
+            print(f"Unsupported archive format: {archive_url[archive_url.find('com'):]}")
 
-        # Extract the zip file
-        with zipfile.ZipFile(os.path.join(local_dir, os.path.basename(zip_url)), 'r') as zip_ref:
-            if [i for i in zip_ref.namelist() if path in i]:
-                # Extract the 'metadata' file from the directory
-                metadata_file = os.path.join(path, 'metadata')
-                metafile = [i for i in zip_ref.namelist() if metadata_file in i]
-                if metafile:
-                    with zip_ref.open(metafile[0]) as metadata:
-                        dependencies_match = dependencies_pattern.search(
-                            metadata.read().decode('utf-8'))
-                        soft_dependencies_match = soft_dependencies_pattern.search(
-                            metadata.read().decode('utf-8'))
-                        if dependencies_match:
-                            dependencies_set.update(dependencies_match.group(1).split(';'))
-                        if soft_dependencies_match:
-                            soft_dependencies_set.update(
-                                soft_dependencies_match.group(1).split(';'))
-                else:
-                    print(f"{path} :: No metadata file found.")
-            else:
-                print("No directory found for the test.")
-
+    soft_dependencies_set.difference_update(dependencies_set)
+    print(f"Dependencies: {dependencies_set}")
+    print(f"Soft dependencies: {soft_dependencies_set}")
     return list(dependencies_set), list(soft_dependencies_set)
 
 
@@ -146,13 +177,13 @@ def check_installed(package_name):
     Returns:
     - True or False
     """
+    print(f"Checking if package {package_name} is installed")
     try:
         subprocess.run(['dnf', 'list', 'installed', package_name], check=True,
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return True  # Package is installed
+        return True
     except subprocess.CalledProcessError:
-        return False  # Package is not installed
-
+        return False
 
 def check_available(package_name):
     """
@@ -161,13 +192,13 @@ def check_available(package_name):
     Args:
     - package_name (str): single package.
     """
+    print(f"Checking if package {package_name} is available")
     try:
         subprocess.run(['dnf', 'info', package_name], check=True,
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return True  # Package is available
+        return True
     except subprocess.CalledProcessError:
-        return False  # Package is not available
-
+        return False
 
 def filter_packages(packages):
     """
@@ -179,8 +210,8 @@ def filter_packages(packages):
     Returns:
         None
     """
+    print("Filtering packages based on installation and availability")
     return [pkg for pkg in packages if not check_installed(pkg) and check_available(pkg)]
-
 
 def install_packages(pkgmgr, packages):
     """
@@ -190,6 +221,7 @@ def install_packages(pkgmgr, packages):
     - pkgmgr (str): Package manager command with args.
     - packages (list): List of packages to be installed.
     """
+    print(f"Installing packages: {packages}")
     try:
         if packages:
             command = pkgmgr + ' ' + ' '.join(packages)
@@ -197,11 +229,11 @@ def install_packages(pkgmgr, packages):
             print("Packages installed successfully.")
 
     except subprocess.CalledProcessError as err:
-        print("Error installing packages:", err)
+        print(f"Error installing packages: {err}")
 
 
 def main():
-    local_dir = '/var/tmp' # working dir
+    local_dir = '/var/tmp'
     xml_file_url = os.environ.get('BEAKERXML_URL')
     with urllib.request.urlopen(xml_file_url) as response:
         xml_data = response.read().decode('utf-8')

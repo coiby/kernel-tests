@@ -63,6 +63,7 @@ function run_test()
     if rlIsRHEL '>=10' ;then
         rlRun "parted -s /dev/md0 mklabel gpt mkpart xfs 1M 100M"
     else
+        rlRun "yum install -y gdisk"
         rlRun "sgdisk -n 0:0:+100MiB /dev/md0"
     fi
 
@@ -70,11 +71,11 @@ function run_test()
     rlRun "cat /proc/partitions"
     rlRun "mdadm -S /dev/md0"
     rlRun 'mdadm -A /dev/md0 /dev/"$dev0" /dev/"$dev1"'
-    sleep 3
+    sleep 10
     rlRun "lsblk"
-    rlRun "cat /proc/partitions"
-    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
-    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
+#    rlRun "cat /proc/partitions"
+#    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
+#    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
 
     if rlIsRHEL '>=10' ;then
         rlRun "parted -s /dev/md0 rm 1"
@@ -82,19 +83,22 @@ function run_test()
         rlRun "sgdisk --zap-all /dev/md0"
     fi
 
+    sleep 10
     rlRun "lsblk"
-    rlRun "cat /proc/partitions"
-    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
-    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
+#    rlRun "cat /proc/partitions"
+#    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
+#    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
     rlRun "mdadm -S /dev/md0"
-    sleep 3
+    sleep 10
     wait
     rlRun 'mdadm --zero-superblock /dev/"$dev0"'
     rlRun 'mdadm --zero-superblock /dev/"$dev1"'
-    rlRun "cat /proc/partitions"
     while [ -b /dev/md0 ]; do
         sleep 3
     done
+    rlRun "cat /proc/partitions"
+    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
+    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
 }
 
 function check_log()

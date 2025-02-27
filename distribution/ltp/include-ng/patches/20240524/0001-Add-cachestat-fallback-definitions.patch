@@ -1,0 +1,272 @@
+From 5d35e26b1ff70ebd0edec47f9ab4f02957a1defc Mon Sep 17 00:00:00 2001
+From: Andrea Cervesato <andrea.cervesato@suse.com>
+Date: Mon, 22 Jul 2024 16:28:40 +0200
+Subject: [PATCH 1/6] Add cachestat fallback definitions
+
+Signed-off-by: Andrea Cervesato <andrea.cervesato@suse.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ configure.ac                       |  4 +++
+ include/lapi/mman.h                | 44 ++++++++++++++++++++++++++++++
+ include/lapi/syscalls/aarch64.in   |  1 +
+ include/lapi/syscalls/arc.in       |  1 +
+ include/lapi/syscalls/arm.in       |  1 +
+ include/lapi/syscalls/hppa.in      |  1 +
+ include/lapi/syscalls/i386.in      |  1 +
+ include/lapi/syscalls/ia64.in      |  1 +
+ include/lapi/syscalls/loongarch.in |  1 +
+ include/lapi/syscalls/mips_n32.in  |  1 +
+ include/lapi/syscalls/mips_n64.in  |  1 +
+ include/lapi/syscalls/mips_o32.in  |  1 +
+ include/lapi/syscalls/powerpc.in   |  1 +
+ include/lapi/syscalls/powerpc64.in |  1 +
+ include/lapi/syscalls/s390.in      |  1 +
+ include/lapi/syscalls/s390x.in     |  1 +
+ include/lapi/syscalls/sh.in        |  1 +
+ include/lapi/syscalls/sparc.in     |  1 +
+ include/lapi/syscalls/sparc64.in   |  1 +
+ include/lapi/syscalls/x86_64.in    |  1 +
+ 20 files changed, 66 insertions(+)
+ create mode 100644 include/lapi/mman.h
+
+diff --git a/configure.ac b/configure.ac
+index 1f8796c87..cbcf308e5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -91,6 +91,7 @@ AC_SUBST(HAVE_FTS_H, $have_fts)
+ AC_CHECK_HEADERS(linux/vm_sockets.h, [], [], [#include <sys/socket.h>])
+ 
+ AC_CHECK_FUNCS_ONCE([ \
++    cachestat \
+     clone3 \
+     close_range \
+     copy_file_range \
+@@ -243,6 +244,9 @@ AC_CHECK_TYPES([struct mount_attr],,,[
+ #endif
+ ])
+ 
++AC_CHECK_TYPES([struct cachestat_range],,,[#include <sys/mman.h>])
++AC_CHECK_TYPES([struct cachestat],,,[#include <sys/mman.h>])
++
+ # Tools knobs
+ 
+ # Bash
+diff --git a/include/lapi/mman.h b/include/lapi/mman.h
+new file mode 100644
+index 000000000..244ad9f31
+--- /dev/null
++++ b/include/lapi/mman.h
+@@ -0,0 +1,44 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (C) 2024 SUSE LLC Andrea Cervesato <andrea.cervesato@suse.com>
++ */
++
++#ifndef LAPI_MMAN_H__
++#define LAPI_MMAN_H__
++
++#include <stdint.h>
++#include <sys/mman.h>
++#include "config.h"
++#include "syscalls.h"
++
++#ifndef HAVE_STRUCT_CACHESTAT_RANGE
++struct cachestat_range {
++	uint64_t off;
++	uint64_t len;
++};
++#endif
++
++#ifndef HAVE_STRUCT_CACHESTAT
++struct cachestat {
++	uint64_t nr_cache;
++	uint64_t nr_dirty;
++	uint64_t nr_writeback;
++	uint64_t nr_evicted;
++	uint64_t nr_recently_evicted;
++};
++#endif
++
++#ifndef HAVE_CACHESTAT
++/*
++ * cachestat: wrapper function of cachestat
++ *
++ * Returns: It returns status of cachestat syscall
++ */
++static inline int cachestat(int fd, struct cachestat_range *cstat_range,
++	struct cachestat *cstat, unsigned int flags)
++{
++	return tst_syscall(__NR_cachestat, fd, cstat_range, cstat, flags);
++}
++#endif
++
++#endif /* LAPI_MMAN_H__ */
+diff --git a/include/lapi/syscalls/aarch64.in b/include/lapi/syscalls/aarch64.in
+index 3e7797718..ef0aa04a3 100644
+--- a/include/lapi/syscalls/aarch64.in
++++ b/include/lapi/syscalls/aarch64.in
+@@ -300,4 +300,5 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+ _sysctl 1078
+diff --git a/include/lapi/syscalls/arc.in b/include/lapi/syscalls/arc.in
+index 7fde1d263..3eaa6a8f1 100644
+--- a/include/lapi/syscalls/arc.in
++++ b/include/lapi/syscalls/arc.in
+@@ -320,3 +320,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/arm.in b/include/lapi/syscalls/arm.in
+index 8e76ad164..b52a32b6b 100644
+--- a/include/lapi/syscalls/arm.in
++++ b/include/lapi/syscalls/arm.in
+@@ -399,3 +399,4 @@ landlock_add_rule (__NR_SYSCALL_BASE+445)
+ landlock_restrict_self (__NR_SYSCALL_BASE+446)
+ memfd_secret (__NR_SYSCALL_BASE+447)
+ futex_waitv (__NR_SYSCALL_BASE+449)
++cachestat (__NR_SYSCALL_BASE+451)
+diff --git a/include/lapi/syscalls/hppa.in b/include/lapi/syscalls/hppa.in
+index 60c02aff2..4919ee65d 100644
+--- a/include/lapi/syscalls/hppa.in
++++ b/include/lapi/syscalls/hppa.in
+@@ -47,3 +47,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/i386.in b/include/lapi/syscalls/i386.in
+index 31ec1ecb2..cff40957a 100644
+--- a/include/lapi/syscalls/i386.in
++++ b/include/lapi/syscalls/i386.in
+@@ -434,3 +434,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/ia64.in b/include/lapi/syscalls/ia64.in
+index 2e56da7f9..11d4b46f4 100644
+--- a/include/lapi/syscalls/ia64.in
++++ b/include/lapi/syscalls/ia64.in
+@@ -347,3 +347,4 @@ landlock_create_ruleset 1468
+ landlock_add_rule 1469
+ landlock_restrict_self 1470
+ futex_waitv 1473
++cachestat 1475
+diff --git a/include/lapi/syscalls/loongarch.in b/include/lapi/syscalls/loongarch.in
+index 301f611f6..9bf6a7deb 100644
+--- a/include/lapi/syscalls/loongarch.in
++++ b/include/lapi/syscalls/loongarch.in
+@@ -305,3 +305,4 @@ memfd_secret 447
+ process_mrelease 448
+ futex_waitv 449
+ set_mempolicy_home_node 450
++cachestat 451
+diff --git a/include/lapi/syscalls/mips_n32.in b/include/lapi/syscalls/mips_n32.in
+index 5f0fe65eb..a76c82593 100644
+--- a/include/lapi/syscalls/mips_n32.in
++++ b/include/lapi/syscalls/mips_n32.in
+@@ -374,3 +374,4 @@ landlock_create_ruleset 6444
+ landlock_add_rule 6445
+ landlock_restrict_self 6446
+ futex_waitv 6449
++cachestat 6451
+diff --git a/include/lapi/syscalls/mips_n64.in b/include/lapi/syscalls/mips_n64.in
+index f81c60e66..df991efd5 100644
+--- a/include/lapi/syscalls/mips_n64.in
++++ b/include/lapi/syscalls/mips_n64.in
+@@ -350,3 +350,4 @@ landlock_create_ruleset 5444
+ landlock_add_rule 5445
+ landlock_restrict_self 5446
+ futex_waitv 5449
++cachestat 5451
+diff --git a/include/lapi/syscalls/mips_o32.in b/include/lapi/syscalls/mips_o32.in
+index c2beffb75..826b7d66e 100644
+--- a/include/lapi/syscalls/mips_o32.in
++++ b/include/lapi/syscalls/mips_o32.in
+@@ -420,3 +420,4 @@ landlock_create_ruleset 4444
+ landlock_add_rule 4445
+ landlock_restrict_self 4446
+ futex_waitv 4449
++cachestat 4451
+diff --git a/include/lapi/syscalls/powerpc.in b/include/lapi/syscalls/powerpc.in
+index 5460e4197..798ed9050 100644
+--- a/include/lapi/syscalls/powerpc.in
++++ b/include/lapi/syscalls/powerpc.in
+@@ -427,3 +427,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/powerpc64.in b/include/lapi/syscalls/powerpc64.in
+index 5460e4197..798ed9050 100644
+--- a/include/lapi/syscalls/powerpc64.in
++++ b/include/lapi/syscalls/powerpc64.in
+@@ -427,3 +427,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/s390.in b/include/lapi/syscalls/s390.in
+index 275b27f47..126938095 100644
+--- a/include/lapi/syscalls/s390.in
++++ b/include/lapi/syscalls/s390.in
+@@ -414,3 +414,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/s390x.in b/include/lapi/syscalls/s390x.in
+index c200d02b2..18f2496a0 100644
+--- a/include/lapi/syscalls/s390x.in
++++ b/include/lapi/syscalls/s390x.in
+@@ -362,3 +362,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/sh.in b/include/lapi/syscalls/sh.in
+index 6f482a77b..ae6f26050 100644
+--- a/include/lapi/syscalls/sh.in
++++ b/include/lapi/syscalls/sh.in
+@@ -408,3 +408,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/sparc.in b/include/lapi/syscalls/sparc.in
+index 7181e80a0..409fa2729 100644
+--- a/include/lapi/syscalls/sparc.in
++++ b/include/lapi/syscalls/sparc.in
+@@ -413,3 +413,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/sparc64.in b/include/lapi/syscalls/sparc64.in
+index c96ab2021..e13cf163e 100644
+--- a/include/lapi/syscalls/sparc64.in
++++ b/include/lapi/syscalls/sparc64.in
+@@ -378,3 +378,4 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+diff --git a/include/lapi/syscalls/x86_64.in b/include/lapi/syscalls/x86_64.in
+index 3082ca110..05b1bee55 100644
+--- a/include/lapi/syscalls/x86_64.in
++++ b/include/lapi/syscalls/x86_64.in
+@@ -355,6 +355,7 @@ landlock_create_ruleset 444
+ landlock_add_rule 445
+ landlock_restrict_self 446
+ futex_waitv 449
++cachestat 451
+ rt_sigaction 512
+ rt_sigreturn 513
+ ioctl 514
+-- 
+2.45.2
+

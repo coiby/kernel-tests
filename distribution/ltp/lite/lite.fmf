@@ -8,6 +8,7 @@ component:
   - glibc
 test: bash ./runtest.sh
 tag:
+  - KT1-9
   - KernelTier1
 framework: shell
 require:
@@ -30,11 +31,16 @@ require:
   - strace
   - wget
   - python3
+  - python3-pip
   - initscripts-service
   - type: file
     pattern:
       - /cki_lib
       - /distribution/ltp/include
+      - /distribution/ltp/include-ng
+      - /distribution/ltp/kirk
+recommend:
+  - python3-click
 duration: 6h
 extra-summary: /kernel/distribution/ltp/lite
 extra-task: /kernel/distribution/ltp/lite

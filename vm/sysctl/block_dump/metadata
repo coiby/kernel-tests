@@ -1,0 +1,15 @@
+[General]
+name=block-dump
+owner=Zhouping Liu <zliu@redhat.com>
+description=block-dump tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=15m
+dependencies=rh-tests-kernel-vm-sysctl-include
+#repoRequires=general/include
+repoRequires=vm/sysctl/include
+

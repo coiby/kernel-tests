@@ -1,0 +1,52 @@
+summary: Linux Test Project openposix testsuite KernelTier1
+description: kernel/distribution/ltp/openposix_testsuite
+enabled: true
+id: 1deb2781-456d-459b-a21f-229a3ba367a1
+tag:
+  - KernelTier1
+  - fmf-export
+  - NoRHIVOS
+contact: Memory Management QE <mm-qe@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: shell
+require:
+  - git
+  - automake
+  - autoconf
+  - flex
+  - bison
+  - rsyslog
+  - util-linux
+  - rpm-build
+  - bc
+  - time
+  - libaio-devel
+  - libcap-devel
+  - strace
+  - gcc
+  - bzip2
+  - initscripts-service
+  - type: file
+    pattern:
+        - /automotive/include
+        - /cki_lib
+        - /distribution/ltp/kirk
+        - /distribution/ltp/include
+        - /distribution/ltp/include-ng
+recommend:
+  - numactl-devel
+  - ntpdate
+  - chrony
+  - sysklogd
+  - util-linux-ng
+  - numactl
+  - redhat-lsb
+duration: 180m
+adjust:
+    # numactl is not available for s390x/rhel7
+    - when: distro == rhel-7 and arch == s390x
+      enabled: false
+extra-summary: kernel/distribution/ltp/openposix_testsuite
+extra-task: kernel/distribution/ltp/openposix_testsuite

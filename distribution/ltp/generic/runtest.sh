@@ -8,9 +8,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 . ../../../cki_lib/libcki.sh || exit 1
-. ../include/runtest.sh      || exit 1
-. ../include/knownissue.sh   || exit 1
-. ../include/ltp-make.sh     || exit 1
+. ../include-ng/include.sh   || exit 1
 
 function fetch_testcase()
 {
@@ -114,7 +112,7 @@ function ltp_test_begin()
 
 	PrintSysInfo
 
-	build-all
+	build_all
 	fetch_testcase
 	knownissue_handle
 	skip_testcase

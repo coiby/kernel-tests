@@ -9,10 +9,7 @@
 
 # Source the common test script helpers
 . ../../../cki_lib/libcki.sh || exit 1
-. ../include/runtest.sh      || exit 1
-. ../include/kvercmp.sh      || exit 1
-. ../include/ltp-make.sh     || exit 1
-. ../include/knownissue.sh   || exit 1
+. ../include-ng/include.sh   || exit 1
 
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=

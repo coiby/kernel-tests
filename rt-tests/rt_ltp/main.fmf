@@ -30,7 +30,7 @@ description: |
     Results location:
         output.txt. | taskout.log, log is dependent upon the test executor.
 contact: Qiao Zhao <qzhao@redhat.com>
-test: bash -x ./runtest.sh
+test: bash ./runtest.sh
 framework: shell
 duration: 4h
 require:
@@ -38,11 +38,14 @@ require:
     - gcc
     - make
     - automake
+    - dmidecode
     - type: file
       pattern:
           - /rt-tests/include
           - /cki_lib
           - /distribution/ltp/include
+          - /distribution/ltp/include-ng
+          - /distribution/ltp/kirk
 extra-summary: rt-tests/rt_ltp
 extra-task: rt-tests/rt_ltp
 id: 0e4c6f26-c0cd-4d3d-8f64-8597fdd1909c

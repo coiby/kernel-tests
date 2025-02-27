@@ -49,7 +49,7 @@ admin_reserve_kbytes()
 
     if rlIsRHEL ">=8" || rlIsFedora; then
         rlLogInfo "admin_reserve_kbytes is not supported any more since rhel9"
-        report_result ${FUNCNAME} SKIP
+        rstrnt-report-result ${FUNCNAME[0]} SKIP
         return 0
     fi
 

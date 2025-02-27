@@ -14,6 +14,10 @@ require:
   - patch
   - rsync
   - wget
+  - type: file
+    pattern:
+      - /cki_lib
+      - /kernel-include
 duration: 1h
 extra-summary: /kernel/vm/kvm-self-tests
 extra-task: /kernel/vm/kvm-self-tests

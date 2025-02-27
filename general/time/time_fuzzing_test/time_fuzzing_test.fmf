@@ -27,7 +27,7 @@ contact: Pablo Ridolfi <pridolfi@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
-path: /memory/mmra/syzkaller
+path: /general/time/time_fuzzing_test
 framework: beakerlib
 require:
   - make

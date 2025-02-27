@@ -1,9 +1,0 @@
-acpi_configfs.ko
-acpi_dbg.ko
-custom_method.ko
-erst-dbg.ko
-locktorture.ko
-rc-loopback.ko
-rcutorture.ko
-test-string_helpers.ko
-torture.ko

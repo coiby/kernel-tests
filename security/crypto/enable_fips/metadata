@@ -1,11 +1,12 @@
 [General]
-description=Security Crypto enable_fips
+description=Security Crypto fips library and enabling fips
 name=/kernel-tests/security/crypto/enable_fips
-owner=Linqing Lu <lilu@redhat.com>
+owner=Dennis Li <denli@redhat.com>
 license=GPLv2
 confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
-max_time=10m
+entry_point=./runtest.sh
+max_time=20m
+dependencies=coreutils;crypto-policies;crypto-policies-scripts;fips-mode-setup;grubby

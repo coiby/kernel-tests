@@ -26,7 +26,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 FLAG_FILE=/mnt/reboot_kmemleak_enable
@@ -56,7 +55,7 @@ function enable_kmemleak()
 	grubby --args kmemleak=on --update-kernel DEFAULT
 	uname -r | grep -q s390x && zipl
 	touch $FLAG_FILE
-	rhts-reboot
+	rstrnt-reboot
 }
 
 function reset_kmemleak()
@@ -67,7 +66,7 @@ function reset_kmemleak()
 			echo finish >> $FLAG_FILE
 			if [ "$RESERVE_LEAK_REBOOT" = 1 ]; then
 				[ "$result" = PASS ] || rlDie "Failed to generate kmemleak, can't be used as leak input for /kernel/general/memory/kmemleak"
-				rhts-reboot
+				rstrnt-reboot
 			elif [ "$RESERVE_LEAK" = "1" ]; then
 				[ "$result" = PASS ] || rlDie "Failed to generate kmemleak, can't be used as leak input for /kernel/general/memory/kmemleak"
 			else
@@ -78,7 +77,7 @@ function reset_kmemleak()
 			grubby --remove-args kmemleak=on --update-kernel DEFAULT
 			uname -r | grep s390x -q && zipl
 			echo finish > $FLAG_FILE
-			rhts-reboot
+			rstrnt-reboot
 		fi
 	fi
 }
@@ -135,7 +134,7 @@ function run_kmemleak_test()
 		result=PASS && break
 	done
 	rlRun "cat $LEAK_TRACE_FILE" -l
-	report_result slub_leak $result
+	rstrnt-report-result slub_leak $result
 
 	if [ "$result" = PASS ]; then
 		obj_addr=$(awk '/unreferenced object/ {print $3; exit(0)}' $LEAK_TRACE_FILE)

@@ -41,6 +41,30 @@ function DeBug ()
 
 # Functions
 
+function GetVariant ()
+{
+    if [ ${ARCH} == "aarch64" ] && cki_is_kernel_rt && grep -q 64k <<< ${K_NAME}; then
+        variant_name="rt-64k"
+    elif cki_is_kernel_rt; then
+        variant_name="rt"
+    elif grep -q 64k <<< ${K_NAME}; then
+        variant_name="64k"
+    else
+        variant_name=""
+    fi
+}
+
+function GetVariantDebug ()
+{
+    if cki_is_kernel_debug && [ -n "$variant_name" ]; then
+        variant_name+="-debug"
+    elif cki_is_kernel_debug; then
+        variant_name="debug"
+    else
+        variant_name=$variant_name
+    fi
+}
+
 function GetCurrentModuleList ()
 {
     # Lets determine the module list for the current kernel package
@@ -50,7 +74,7 @@ function GetCurrentModuleList ()
     case $1 in
         loadable)
             local moduleList="moduleList_current"
-            if [[ "${OS}" = "RHEL8" || "${OS}" = "RHEL9" ]]; then
+            if [[ "${OS}" = "RHEL8" || "${OS}" = "RHEL9" || "${OS}" = "RHEL10" ]]; then
                 PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
                 if cki_is_kernel_rt; then
                     PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
@@ -83,24 +107,22 @@ function GetCurrentModuleList ()
 
 }
 
-function AddDebugKernelModuleToBase ()
+function AddDebug2List ()
 {
-    cat ./${OS}/${Release}/${Release}{-,-debug-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_debug
-    \cp ${TESTAREA}/${2}_debug ${TESTAREA}/$2
+    local debug_variant=$3
+    cat ${TESTAREA}/$2 ./${OS}/${Release}/${Release}-${debug_variant}-$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_temp
+    \cp ${TESTAREA}/${2}_temp ${TESTAREA}/$2
 }
 
-function AddRTBaseList ()
+function AddVariant2List ()
 {
-    if [ -f ./${OS}/${Release}/${Release}-rt-$1-${ARCH}.lst ]; then
-        cat ./${OS}/${Release}/${Release}{-,-rt-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_rt
-        \cp ${TESTAREA}/${2}_rt ${TESTAREA}/$2
+    local variant=$3
+    if [ -n "$variant" ]; then
+        cat ./${OS}/${Release}/${Release}{-,-${variant}-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_temp
+    else
+        cat ./${OS}/${Release}/${Release}-$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_temp
     fi
-}
-
-function AddRTnDebugBaseList ()
-{
-    cat ${TESTAREA}/${2}_debug ./${OS}/${Release}/${Release}-rt-$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}_rt
-    \cp ${TESTAREA}/${2}_rt ${TESTAREA}/$2
+    \cp ${TESTAREA}/${2}_temp ${TESTAREA}/$2
 }
 
 function GetBaseModuleList ()
@@ -117,17 +139,12 @@ function GetBaseModuleList ()
             ;;
     esac
 
-    cat ./${OS}/${Release}/${Release}-${listFile}-${ARCH}.lst > ${TESTAREA}/${moduleList}
+    GetVariant
+    AddVariant2List $listFile $moduleList $variant_name
 
-    if cki_is_kernel_debug; then
-        AddDebugKernelModuleToBase ${listFile} ${moduleList}
-        if cki_is_kernel_rt; then
-            AddRTnDebugBaseList ${listFile} ${moduleList}
-        fi
-    else
-        if cki_is_kernel_rt; then
-            AddRTBaseList ${listFile} ${moduleList}
-        fi
+    GetVariantDebug
+    if cki_is_kernel_debug ; then
+        AddDebug2List $listFile $moduleList $variant_name
     fi
 
     if [ ! -s "${TESTAREA}/${moduleList}" ]; then
@@ -136,20 +153,6 @@ function GetBaseModuleList ()
         cki_print_info "GetBaseModuleList"
     fi
 
-#    echo "***** Stored base module list: ${TESTAREA}/moduleList_base *****" | tee -a $OUTPUTFILE
-}
-
-# Workround for RT
-function AddRTKnowRemovedList ()
-{
-    cat ./${OS}/${Release}/${Release}{-,-rt-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}-rt
-    \cp ${TESTAREA}/${2}-rt ${TESTAREA}/$2
-}
-# Workround for aarch64 64k
-function Add64kKnowRemovedList ()
-{
-    cat ./${OS}/${Release}/${Release}{-,-64k-}$1-${ARCH}.lst | sort | uniq > ${TESTAREA}/${2}-64k
-    \cp ${TESTAREA}/${2}-64k ${TESTAREA}/$2
 }
 
 function GetKnownRemovedList ()
@@ -174,13 +177,13 @@ function GetKnownRemovedList ()
         cat ./${OS}/${Release}/${Release}-${listFile}-${ARCH}.lst > ${TESTAREA}/${moduleList}
     fi
 
-    if cki_is_kernel_rt; then
-        AddRTKnowRemovedList ${listFile} ${moduleList}
-    fi
-    if cki_is_kernel_64k; then
-        Add64kKnowRemovedList ${listFile} ${moduleList}
-    fi
+    GetVariant
+    AddVariant2List ${listFile} ${moduleList} ${variant_name}
+    GetVariantDebug
+    if cki_is_kernel_debug ; then
+        AddDebug2List $listFile $moduleList $variant_name
 
+    fi
     if [ ! -e "${TESTAREA}/${moduleList}" ]; then
         DeBug "Unable to determine $1 known removed module list"
         cki_print_info "GetKnownRemovedModuleList"
@@ -404,49 +407,8 @@ function SetOSRelease ()
         # This is RHEL6 (Santiago)
         OS="RHEL6"
         case ${Base} in
-            71)
-                # RHEL-6.0
-                Release="6.0"
-                ;;
-            131)
-                # Actual RHEL-6.1 is 131.0.15, but 131 will suffice for this case.
-                Release="6.1"
-                ;;
-            220)
-                # RHEL-6.2
-                Release="6.2"
-                ;;
-            279)
-                # RHEL-6.3
-                Release="6.3"
-                ;;
-            358)
-                # RHEL-6.4
-                Release="6.4"
-                ;;
-            431)
-                # RHEL-6.5
-                Release="6.5"
-                ;;
-            504)
-                # RHEL-6.6
-                Release="6.6"
-                ;;
-            573)
-                # RHEL-6.7
-                Release="6.7"
-                ;;
-            642)
-                # RHEL-6.8
-                Release="6.8"
-                ;;
-            696)
-                # RHEL-6.9
-                Release="6.9"
-                ;;
             *)
-                # We are currently developing RHEL-6.10
-                # Therefore we test at HEAD-RHEL-6.10
+                # Last stream on RHEL-6
                 Release="HEAD-6.10"
                 ;;
         esac
@@ -454,47 +416,12 @@ function SetOSRelease ()
         # This is RHEL7 (Maipo)
         OS="RHEL7"
         case ${Base} in
-            123)
-                # RHEL-7.0
-                Release="7.0"
-                ;;
-            229)
-                # RHEL-7.1
-                Release="7.1"
-                ;;
-
-            327)
-                # RHEL-7.2
-                Release="7.2"
-                ;;
-            514)
-                # RHEL-7.3
-                Release="7.3"
-                ;;
-            693)
-                # RHEL-7.4
-                Release="7.4"
-                ;;
-            862)
-                # RHEL-7.5
-                Release="7.5"
-                ;;
-            957)
-                # RHEL-7.6
-                Release="7.6"
-                ;;
             1062)
                 # RHEL-7.7
                 Release="7.7"
                 ;;
-            1127)
-                # RHEL-7.8
-                Release="7.8"
-                ;;
-
             *)
-                # We are currently developing RHEL-7.9
-                # Therefore we test at HEAD-RHEL-7.9
+                # Last stream on RHEL-7
                 Release="HEAD-7.9"
                 ;;
         esac
@@ -502,47 +429,21 @@ function SetOSRelease ()
         # This is RHEL8, Ootpa
         OS="RHEL8"
         case ${Base} in
-            80)
-                # RHEL-8.0
-                Release="8.0"
-                ;;
-            147)
-                # RHEL-8.1
-                Release="8.1"
-                ;;
             193)
                 # RHEL-8.2
                 Release="8.2"
-                ;;
-            240)
-                # RHEL-8.3
-                Release="8.3"
                 ;;
             305)
                 # RHEL-8.4
                 Release="8.4"
                 ;;
-            348)
-                # RHEL-8.5
-                Release="8.5"
-                ;;
             372)
                 # RHEL-8.6
                 Release="8.6"
                 ;;
-            425)
-                # RHEL-8.7
-                DeBug "Base release is RHEL-8.7"
-                echo "" | tee -a $OUTPUTFILE
-                echo "***** $ARCH: Base release is RHEL-8.7 *****" | tee -a $OUTPUTFILE
-                Release="8.7"
-                ;;
             477)
                 # RHEL-8.8
                 Release="8.8"
-                ;;
-            513)
-                Release="8.9"
                 ;;
             *)
                 Release="HEAD-8.10"
@@ -556,23 +457,28 @@ function SetOSRelease ()
                 # RHEL-9.0
                 Release="9.0"
                 ;;
-            162)
-                # RHEL-9.1
-                Release="9.1"
-                ;;
             284)
                 # RHEL-9.2
                 Release="9.2"
                 ;;
-            362)
-                Release="9.3"
-                ;;
             427)
                 Release="9.4"
                 ;;
+            503)
+                Release="9.5"
+                ;;
             *)
                 # Still in developing phase, need to update in future.
-                Release="HEAD-9.5"
+                Release="HEAD-9.6"
+                ;;
+        esac
+    elif [[ "${K_VER}" = "6.12.0" ]];then
+        # RHEL10
+        OS="RHEL10"
+        case ${Base} in
+            *)
+                # RHEL-10.0, developing phase
+                Release="HEAD-10.0"
                 ;;
         esac
     elif [[ -n "$(echo ${K_NAME} | grep kernel-pegas)" && "${K_VER}" = "4.10.0" ]]; then
@@ -599,7 +505,7 @@ rlJournalStart
         if cki_is_kernel_rt; then
             name="${name}-rt"
         fi
-        if cki_is_kernel_64k; then
+        if grep -q 64k <<< ${K_NAME}; then
             name="${name}-64k"
         fi
         if cki_is_kernel_debug; then
@@ -610,8 +516,12 @@ rlJournalStart
         else
             path_name=$(sed "s/-debug//;s/-64k//" <<< ${name%-rt*})
         fi
+        # 9.6 and 10.0 kernel, not accurate kernel version
+        if cki_kver_gt "5.14.0-565.el9" || cki_kver_gt "6.12.0-50.el10"; then
+            path_name="kernel"
+        fi
         url="${baseurl}/${path_name}/${K_VER}/${K_REL}/${K_ARCH}/"
-        if  grep -q "release 9" /etc/redhat-release ; then
+        if  grep -q "release 9\|release 10" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
             chk_inst_kernel_modules_core
         elif grep -q "release 8" /etc/redhat-release ; then
@@ -667,52 +577,21 @@ rlJournalStart
             fi
         fi
 
-        if [[ "$Release" == "HEAD-9.5" ]]; then
-            if cki_kver_lt "5.14.0-428.el9"; then
-                sed -i "/mt7925-common.ko/d; /mt7925e.ko/d"  ${OS}/${Release}/${Release}-modules-{x86_64,aarch64}.lst
-                sed -i "/pinctrl-intel-platform.ko/d; /pinctrl-meteorpoint.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+        if [[ "$Release" == "HEAD-9.6" ]]; then
+            if cki_kver_lt "5.14.0-508.el9"; then
+                sed -i "/gpio-regulator.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
             fi
-            if cki_kver_lt "5.14.0-431.el9"; then
-                sed -i "/gpio-mlxbf3.ko/d; /mlxbf-pmc.ko/d; /pinctrl-mlxbf3.ko/d;
-                /pwr-mlxbf.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
-                sed -i "/scmi_perf_domain.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
+            if cki_kver_lt "5.14.0-527.el9"; then
+                sed -i "/onboard_usb_hub.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-{aarch64,ppc64le}.lst
             fi
-            if cki_kver_lt "5.14.0-434.el9"; then
-                sed -i "/libblake2s-x86_64.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-builtin-x86_64.lst
+            if cki_kver_lt "5.14.0-520.el9"; then
+                sed -i "/^t10-pi.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
             fi
-            if cki_kver_lt "5.14.0-438.el9"; then
-                sed -i "/onboard_usb_hub.ko/d"  ${OS}/${Release}/${Release}-modules-{aarch64,ppc64le}.lst
+            if cki_kver_lt "5.14.0-534.el9"; then
+                sed -i "/^rtsx_pci_ms.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-{ppc64le,x86_64}.lst
             fi
-            if cki_kver_lt "5.14.0-439.el9"; then
-                sed -i "/qat_420xx.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
-            fi
-            if cki_kver_lt "5.14.0-441.el9"; then
-                sed -i "/octeon_ep_vf.ko/d"  ${OS}/${Release}/${Release}-modules-${ARCH}.lst
-                sed -i "/clk-imx8mp-audiomix.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-444.el9"; then
-                sed -i "/spi-tegra210-quad.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-447.el9"; then
-                sed -i "/ledtrig-netdev.ko/d" ${OS}/${Release}/${Release}-modules-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-448.el9"; then
-                sed -i "/nvme-auth.ko/d; /nvme-keyring.ko/d; /test_lockup.ko/d" ${OS}/${Release}/${Release}-modules-${ARCH}.lst
-                sed -i "/processor_thermal_power_floor.ko/d; /processor_thermal_wt_hint.ko/d;
-                /processor_thermal_wt_req.ko/d" ${OS}/${Release}/${Release}-modules-x86_64.lst
-                sed -i "/nvme-common.ko/d" ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-449.el9"; then
-                sed -i "/zpool.ko/d; /zswap.ko/d" ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-450.el9"; then
-                sed -i "/8250_fsl.ko/d" ${OS}/${Release}/${Release}-builtin-{aarch64,ppc64le}.lst
-                sed -i "/8250_pci1xxxx.ko/d; /8250_pericom.ko/d; /serial_base.ko/d" ${OS}/${Release}/${Release}-builtin-${ARCH}.lst
-                sed -i "/8250_rt288x.ko/d" ${OS}/${Release}/${Release}-builtin-aarch64.lst
-                sed -i "/serial_core.ko/d" ${OS}/${Release}/${Release}-knownRemoved-builtin-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-497.el9"; then
-                sed -i "/amd-pstate-ut.ko/d" ${OS}/${Release}/${Release}-knownRemoved-x86_64.lst
+            if cki_kver_lt "5.14.0-537.el9"; then
+                sed -i "/^tegra-ahb.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-builtin-aarch64.lst
             fi
         fi
     rlPhaseEnd
@@ -722,16 +601,16 @@ rlJournalStart
     # -----------------------------------
 
     rlPhaseStartTest "Loadable module test"
-        # Lets determine the module list for the current kernel package
+        # The module list for the current kernel package
         GetCurrentModuleList loadable
 
-        # Lets determine the module list for the base release kernel package
+        # The module list for the base release kernel package
         GetBaseModuleList loadable
 
-        # Lets determine the known removed module list for the base release kernel package
+        # The known removed module list for the base release kernel package
         GetKnownRemovedList loadable
 
-        # Lets submit the complete log from the diff of base module list and the current module list
+        # Compare the base module list and the current module list
         CompareModuleList loadable
     rlPhaseEnd
     # ReportMissingModule should be out of rlPhaseStartTest as it uses rlPhaseStartTest in it.

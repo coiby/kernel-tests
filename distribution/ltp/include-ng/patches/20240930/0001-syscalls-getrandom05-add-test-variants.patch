@@ -1,0 +1,122 @@
+From 7bb960cc4f736d8860b6b266119e71e761e22b32 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Fri, 6 Dec 2024 14:27:21 +0100
+Subject: [PATCH] syscalls/getrandom05: add test variants
+
+And skip EFAULT for glibc as it can segfault in VDSO:
+  #0  __arch_chacha20_blocks_nostack () at arch/x86/entry/vdso/vgetrandom-chacha.S:146
+  146             movups          state0,0x00(output)
+
+  (gdb) bt
+  #0  __arch_chacha20_blocks_nostack () at arch/x86/entry/vdso/vgetrandom-chacha.S:146
+  #1  0x00007fcd3ce6417a in __cvdso_getrandom_data (rng_info=0x7fcd3ce5f280, buffer=0xffffffffffffffff, len=64, flags=1, opaque_state=0x7fcd3ce5df00,
+      opaque_len=<optimized out>) at arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c:237
+  #2  __cvdso_getrandom (buffer=<optimized out>, len=64, flags=1, opaque_state=0x7fcd3ce5df00, opaque_len=<optimized out>)
+      at arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c:259
+  #3  __vdso_getrandom (buffer=0xffffffffffffffff, len=64, flags=1, opaque_state=0x7fcd3ce5df00, opaque_len=<optimized out>)
+      at arch/x86/entry/vdso/vgetrandom.c:11
+  #4  0x00007fcd3cc7faf3 in getrandom_vdso (buffer=0xffffffffffffffff, length=64, flags=0, cancel=<optimized out>)
+      at ../sysdeps/unix/sysv/linux/getrandom.c:204
+  #5  0x0000000000401ff7 in verify_getrandom (i=0) at getrandom05.c:40
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Li Wang <liwang@redhat.com>
+---
+ .../kernel/syscalls/getrandom/getrandom05.c   | 16 +++++++-
+ .../kernel/syscalls/getrandom/getrandom_var.h | 41 +++++++++++++++++++
+ 2 files changed, 56 insertions(+), 1 deletion(-)
+ create mode 100644 testcases/kernel/syscalls/getrandom/getrandom_var.h
+
+diff --git a/testcases/kernel/syscalls/getrandom/getrandom05.c b/testcases/kernel/syscalls/getrandom/getrandom05.c
+index 92098deb7..c4886b886 100644
+--- a/testcases/kernel/syscalls/getrandom/getrandom05.c
++++ b/testcases/kernel/syscalls/getrandom/getrandom05.c
+@@ -16,6 +16,7 @@
+ 
+ #include "tst_test.h"
+ #include "lapi/getrandom.h"
++#include "getrandom_var.h"
+ 
+ static char buff_efault[64];
+ static char buff_einval[64];
+@@ -32,15 +33,28 @@ static struct test_case_t {
+ 	{buff_einval, sizeof(buff_einval), -1, EINVAL, "flag is invalid"},
+ };
+ 
++static void setup(void)
++{
++	getrandom_info();
++}
++
+ static void verify_getrandom(unsigned int i)
+ {
+ 	struct test_case_t *tc = &tcases[i];
+ 
+-	TST_EXP_FAIL2(getrandom(tc->buff, tc->size, tc->flag),
++	/* EFAULT test can segfault on recent glibc, skip it */
++	if (tst_variant == 1 && tc->expected_errno == EFAULT) {
++		tst_res(TCONF, "Skipping EFAULT test for libc getrandom()");
++		return;
++	}
++
++	TST_EXP_FAIL2(do_getrandom(tc->buff, tc->size, tc->flag),
+ 		tc->expected_errno, "%s", tc->desc);
+ }
+ 
+ static struct tst_test test = {
+ 	.tcnt = ARRAY_SIZE(tcases),
+ 	.test = verify_getrandom,
++	.test_variants = TEST_VARIANTS,
++	.setup = setup,
+ };
+diff --git a/testcases/kernel/syscalls/getrandom/getrandom_var.h b/testcases/kernel/syscalls/getrandom/getrandom_var.h
+new file mode 100644
+index 000000000..b19b0ebc0
+--- /dev/null
++++ b/testcases/kernel/syscalls/getrandom/getrandom_var.h
+@@ -0,0 +1,41 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Copyright (C) 2024 Jan Stancek <jstancek@redhat.com>
++ */
++
++#ifndef GETRANDOM_VAR__
++#define GETRANDOM_VAR__
++
++#include "lapi/syscalls.h"
++
++static inline int do_getrandom(void *buf, size_t buflen, unsigned int flags)
++{
++	switch (tst_variant) {
++	case 0:
++		return tst_syscall(__NR_getrandom, buf, buflen, flags);
++	case 1:
++		return getrandom(buf, buflen, flags);
++	}
++	return -1;
++}
++
++static void getrandom_info(void)
++{
++	switch (tst_variant) {
++	case 0:
++		tst_res(TINFO, "Testing SYS_getrandom syscall");
++		break;
++	case 1:
++		tst_res(TINFO, "Testing libc getrandom()");
++		break;
++	}
++}
++
++/* if we don't have libc getrandom() test only syscall version */
++#ifdef HAVE_SYS_RANDOM_H
++# define TEST_VARIANTS 2
++#else
++# define TEST_VARIANTS 1
++#endif
++
++#endif /* GETRANDOM_VAR__ */
+-- 
+2.47.0
+

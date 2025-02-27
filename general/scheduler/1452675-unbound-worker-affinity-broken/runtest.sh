@@ -26,8 +26,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
 trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1
@@ -68,7 +66,9 @@ rlJournalStart
 		reason=""
 		rlRun "yum -y install tuna" || reason="(tuna)"
 		# Only x86_64 have this
-		rlRun "yum -y install rt-tests" 0-255 || reason+="(rt-tests)"
+		tst=rt-tests
+		rlIsRHEL ">=9" && tst=realtime-tests
+		rlRun "yum -y install $tst" 0-255 || reason+="(rt-tests)"
 		mount | grep debug || mount -t debugfs dd /sys/kernel/debug
 		rlRun "nr_sockets=$(lscpu |  awk '/Socket/ {print $2}')"  0-255
 		# shellcheck disable=SC2154
@@ -76,7 +76,7 @@ rlJournalStart
 			reason+="(SocketNumber)"
 		fi
 		if [ -n "$reason" ]; then
-			report_result "Skipped$reason" PASS
+			rstrnt-report-result "Skipped$reason" PASS
 			rlPhaseEnd
 			rlJournalPrintText
 			exit 0
@@ -85,8 +85,21 @@ rlJournalStart
 
 	rlPhaseStartTest
 		old_cpumask=$(cat /sys/devices/virtual/workqueue/cpumask)
-		old_numa=$(cat /sys/bus/workqueue/devices/writeback/numa)
-		rlRun "tuna -S1 -i"
+		# older release
+		if test -f /sys/bus/workqueue/devices/writeback/numa; then
+			numa_affinity_f=/sys/bus/workqueue/devices/writeback/numa
+			numa_affinity_v=0
+		# rhel10
+		elif test -f /sys/devices/virtual/workqueue/writeback/affinity_scope; then
+			numa_affinity_f=/sys/devices/virtual/workqueue/writeback/affinity_scope
+			numa_affinity_v=system
+		fi
+		old_numa=$(awk '{print $1}' $numa_affinity_f)
+		if rlIsRHEL ">8"; then
+			rlRun "tuna isolate -S1"
+		else
+			rlRun "tuna -S1 -i"
+		fi
 		package_cpus="$(sh package.sh 1)"
 		rlLogInfo "$package_cpus"
 		rlRun "package_nr_cpus=$(echo $package_cpus | awk '{print NF}')" 0-255
@@ -98,7 +111,7 @@ rlJournalStart
 		package_cpus_mask_hex=$(echo | awk -v e=$package_cpus_mask '{printf "%x\n", e}')
 		rlLogInfo "cpumask hex: $package_cpus_mask_hex"
 		rlRun "echo 1 >  /sys/devices/virtual/workqueue/cpumask"
-		rlRun "echo 0 >   /sys/bus/workqueue/devices/writeback/numa"
+		rlRun "echo $numa_affinity_v > $numa_affinity_f"
 		# clean the buffer
 		rlRun "> /sys/kernel/debug/tracing/trace"
 		rlRun "echo 'cpu != 0 && req_cpu == 5120'  > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/filter"
@@ -118,10 +131,14 @@ rlJournalStart
 		rlRun "echo 0 > $tracing_dir/events/enable"
 		rlRun "echo nop > $tracing_dir/current_tracer"
 		rlRun "echo '!cpu != 0 && req_cpu == 5120'  > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/filter" 0-255
-		rlRun "tuna -S1 -I" 0-255 "include the isolated socket"
+		if rlIsRHEL ">8"; then
+			rlRun "tuna include -S1" 0-255 "include the isolated socket"
+		else
+			rlRun "tuna -S1 -I" 0-255 "include the isolated socket"
+		fi
 		rlRun "ps -p $pid -o args | grep cyclictest && kill $pid" 0-255
 		rlRun "echo $old_cpumask > /sys/devices/virtual/workqueue/cpumask" 0-255
-		rlRun "echo $old_numa > /sys/bus/workqueue/devices/writeback/numa" 0-255
+		rlRun "echo $old_numa > $numa_affinity_f" 0-255
 	rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText

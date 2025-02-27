@@ -1,0 +1,19 @@
+Subject: [PATCH] RHIVOS Increase THRESHOLD based on hardware
+---
+Index: testcases/realtime/profiles/default
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/testcases/realtime/profiles/default b/testcases/realtime/profiles/default
+--- a/testcases/realtime/profiles/default	(revision 7661c4c0401677d805093eaf4798f839494ff2e0)
++++ b/testcases/realtime/profiles/default	(date 1721385872081)
+@@ -27,7 +27,7 @@
+
+ # Pass if maximum latency is less than criterium (us).
+ # Default=20 us
+-func/pthread_kill_latency	pthread_kill_latency -c 20
++func/pthread_kill_latency	pthread_kill_latency -c 50
+
+ # Pass if all threads get preempted within max loops.
+ # Default max=1

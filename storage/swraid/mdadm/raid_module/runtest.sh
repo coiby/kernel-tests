@@ -21,7 +21,6 @@
 # This case just test raid modules loading and unloading for several times.
 #
 
-source /usr/share/beakerlib/beakerlib.sh || exit 1
 source ../../../../cki_lib/libcki.sh || exit 1
 
 function clean_all_loop_md
@@ -35,6 +34,13 @@ function clean_all_loop_md
 function startup
 {
     clean_all_loop_md
+    rlRun -l "uname -r"
+    rlRun -l "rpm -qa | grep kernel"
+    rlRun -l "rpm -q mdadm"
+    rlRun -l "lsblk"
+    rlRun -l "lsmod | grep raid" "0-255"
+
+    return 0
 }
 
 function cleanup
@@ -46,14 +52,17 @@ function runtest
 {
     typeset i
     for i in 0 1 456 10; do
+        rlRun -l "lsmod | grep raid" "0-255"
         rlRun -l "modprobe -r raid$i" "0-255"
         sleep 5
         rlRun -l "modprobe raid$i"
         sleep 5
+        rlRun -l "lsmod | grep raid" "0-255"
         rlRun -l "modprobe -r raid$i"
         sleep 5
         rlRun -l "modprobe raid$i"
         sleep 5
+        rlRun -l "lsmod | grep raid" "0-255"
         rlRun -l "modprobe -r raid$i"
     done
 }

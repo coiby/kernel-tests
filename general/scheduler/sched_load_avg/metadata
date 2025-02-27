@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/scheduler/sched_load_avg
+owner=Chunyu Hu <chuhu@redhat.com>
+description=sched load avg check
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=720m
+dependencies=gcc;glibc
+softDependencies=
+repoRequires=general/include;general/scheduler/include

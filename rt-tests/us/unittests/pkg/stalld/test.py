@@ -51,7 +51,15 @@ class StalldTest(rtut.RTUnitTest):
     def test_pidfile(self):
         self.run_cmd(f'timeout --preserve-status 2 stalld -f --pidfile {self.tmp_file}')
 
+    # -S/--systemd: running as systemd service, don't fiddle with RT throttling
+    # Note: The -S option does not modify RT throttling settings, and stalld will fail to run if throttling is active.
     def test_systemd(self):
+        rt_runtime_file = "/proc/sys/kernel/sched_rt_runtime_us"
+        if os.path.exists(rt_runtime_file):
+            with open(rt_runtime_file, 'r') as f:
+                rt_runtime_value = f.read().strip()
+            if rt_runtime_value == "950000":
+                self.skipTest("RT throttling is enabled (value is 950000), skipping test.")
         self.run_cmd('timeout --preserve-status 2 stalld -f -S')
 
     def test_logging_single(self):

@@ -1,0 +1,16 @@
+summary: block_dump debugging when set to a nonzero value
+description: |
+    block_dump enables block I/O debugging when set to a nonzero value.
+    the case is desinged to test the tune's feature.
+contact: John Doe <jdoe@redhat.com>
+component:
+  - kernel
+test: ./runtest.sh
+framework: shell
+require:
+  - type: file
+    pattern:
+      - /vm/sysctl/include/runtest.sh
+duration: 15m
+extra-summary: /kernel/vm/sysctl/block_dump
+extra-task: /kernel/vm/sysctl/block_dump

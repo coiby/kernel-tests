@@ -177,7 +177,20 @@ check tmt lint:
   before_script:
     - tmt --version
   script:
-    - tmt lint --outcome-only fail --enforce-check C000 .
+    - tmt lint --outcome-only fail .
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
+
+check tmt discover:
+  # tmt lint not always catch all problem when discovery tests/plans
+  # https://github.com/teemtee/tmt/issues/3429
+  extends: .cki_tools
+  before_script:
+    - tmt --version
+  script:
+    - tmt run discover
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
@@ -240,13 +253,17 @@ check usage of internal hostnames:
     - !reference [.rules, default-branch]
     - !reference [.rules, production-branch]
 
-check if LTP version on DCI matches the default on distribution/ltp/include/ltp-make.sh:
+check if LTP version on DCI matches the default on distribution/ltp/include-ng/include.sh:
   extends: .cki_tools
   script:
     - |
       # Check the DCI test versions
       for rhel_version in 7 8; do
-          function rlIsRHEL() { [[ "$1" = "${rhel_version}" ]]; }; source distribution/ltp/include/ltp-make.sh
+          if [ "$rhel_version" -eq 7 ]; then
+              TESTVERSION=$(grep -A2 'osver_in_range "700" "711"' distribution/ltp/include-ng/include.sh | grep -Eo '20[0-9]{6}')
+          elif [ "$rhel_version" -eq 8 ]; then
+              TESTVERSION=$(grep -A2 'osver_in_range "803" "905"' distribution/ltp/include-ng/include.sh | grep -Eo '20[0-9]{6}')
+          fi
           dci_xml="dci/rhel${rhel_version}.xml"
           if ! grep -q ltp-full-${TESTVERSION}.tar.bz2 "${dci_xml}"; then
               echo "FAIL: needs to update LTP version on ${dci_xml} to ${TESTVERSION}"
@@ -385,6 +402,13 @@ deploy-production:
       --output kernel-tests-production.zip
       --prefix kernel-tests-production/
       HEAD
+    - git archive
+      --output kernel-tests-production.tar.gz
+      --prefix kernel-tests-production/
+      HEAD
     - aws s3 cp
       kernel-tests-production.zip
       "s3://${S3_BUCKET:?}/${S3_PATH:?}kernel-tests-production.zip"
+    - aws s3 cp
+      kernel-tests-production.tar.gz
+      "s3://${S3_BUCKET:?}/${S3_PATH:?}kernel-tests-production.tar.gz"

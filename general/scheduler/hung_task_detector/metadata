@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=bash ./runtest.sh
 dependencies=gcc;glibc;elfutils-libelf-devel;perf
 softDependencies=rsyslog;stress-ng
 max_time=1h

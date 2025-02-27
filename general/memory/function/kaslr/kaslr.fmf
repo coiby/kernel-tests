@@ -26,3 +26,10 @@ require:
   - flex
 extra-summary: memory/function/kaslr
 extra-task: memory/function/kaslr
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

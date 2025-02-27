@@ -10,7 +10,6 @@
 TEST="standards/usex"
 
 # Source the common test script helpers
-. /usr/bin/rhts_environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 function setup()
@@ -24,17 +23,18 @@ function setup()
 function SysStats()
 {
     # Collect some stats prior to running the test
-    echo "***** System stats *****" >> $OUTPUTFILE
-    vmstat >> $OUTPUTFILE
-    echo "---" >> $OUTPUTFILE
-    free -m >> $OUTPUTFILE
-    echo "---" >> $OUTPUTFILE
-    cat /proc/meminfo >> $OUTPUTFILE
-    echo "---" >> $OUTPUTFILE
-    cat /proc/slabinfo >> $OUTPUTFILE
-    echo "***** System stats *****" >> $OUTPUTFILE
+    echo "***** System stats *****"
+    vmstat
+    echo "---"
+    free -m
+    echo "---"
+    cat /proc/meminfo
+    echo "---"
+    cat /proc/slabinfo
+    echo "***** System stats *****"
 
-    logger -t USEXINFO -f $OUTPUTFILE
+    touch $OUTPUTDIR/logger.txt
+    logger -t USEXINFO -f $OUTPUTDIR/logger.txt
 }
 
 function VerboseCupsLog()
@@ -42,24 +42,24 @@ function VerboseCupsLog()
    # This funnction was added Nov 2010 in hopes of assisting in resoltion of bugzilla 452305
    # See comment #31 https://bugzilla.redhat.com/show_bug.cgi?id=452305
    # Provide more verbose debug logging in /var/log/cups/error_log
-   echo "-------------------------------------------------------------------------" | tee -a ${OUTPUTFILE}
-   echo "Setting up verbose debug logging in /var/log/cups/error_log for BZ452305." | tee -a ${OUTPUTFILE}
-   echo "-------------------------------------------------------------------------" | tee -a ${OUTPUTFILE}
-   rstrnt-backup /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-   sed -i -e 's,^LogLevel.*,LogLevel debug2,' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-   sed -i -e '/^MaxLogSize/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-   echo MaxLogSize 0 | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
-   sed -i -e '/^Browsing/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-   sed -i -e '/^DefaultShared/d' /etc/cups/cupsd.conf | tee -a ${OUTPUTFILE}
-   echo "Browsing No" | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
-   echo "DefaultShared No" | tee -a /etc/cups/cupsd.conf ${OUTPUTFILE}
+   echo "-------------------------------------------------------------------------"
+   echo "Setting up verbose debug logging in /var/log/cups/error_log for BZ452305."
+   echo "-------------------------------------------------------------------------"
+   rstrnt-backup /etc/cups/cupsd.conf
+   sed -i -e 's,^LogLevel.*,LogLevel debug2,' /etc/cups/cupsd.conf
+   sed -i -e '/^MaxLogSize/d' /etc/cups/cupsd.conf
+   echo MaxLogSize 0 | tee -a /etc/cups/cupsd.conf
+   sed -i -e '/^Browsing/d' /etc/cups/cupsd.conf
+   sed -i -e '/^DefaultShared/d' /etc/cups/cupsd.conf
+   echo "Browsing No" | tee -a /etc/cups/cupsd.conf
+   echo "DefaultShared No" | tee -a /etc/cups/cupsd.conf
    # sed will create temporary file in /etc/cups and rename it to cupds.conf
    # so file ends up with wrong label
    restorecon /etc/cups/cupsd.conf
    # start service before using cupsctl
-   (rlServiceStop cups && rlServiceStart cups) | tee -a ${OUTPUTFILE}
-   echo "cupsctl: " | tee -a ${OUTPUTFILE}
-   cupsctl | tee -a ${OUTPUTFILE}
+   (rlServiceStop cups && rlServiceStart cups)
+   echo "cupsctl: "
+   cupsctl
 }
 
 function TestUsexMain ()
@@ -78,7 +78,7 @@ function TestUsexMain ()
 
     if [ -z "$RHELVER" ]; then
         kernel_rhelver=$(uname -r | grep -o "el[0-9]")
-        echo "Taking release from kernel version: $kernel_rhelver" | tee -a $OUTPUTFILE
+        echo "Taking release from kernel version: $kernel_rhelver"
 
         if [ "$kernel_rhelver" == "el6" ]; then
             RHELVER="release 6"
@@ -89,7 +89,7 @@ function TestUsexMain ()
         fi
     fi
 
-    echo "RHELVER is $RHELVER" | tee -a $OUTPUTFILE
+    echo "RHELVER is $RHELVER"
 
     INFILE=rhtsusex.tcf
     MYARCH=$(arch)
@@ -129,28 +129,29 @@ function TestUsexMain ()
     # Then post-process the results to find the regressions
     export fail=`cat $OUTPUTDIR/report.out | grep "USEX TEST RESULT: FAIL" | wc -l`
 
-    rstrnt-report-log -l $OUTPUTDIR/report.out
-    rstrnt-report-log -l $USEX_LOG
+    rlFileSubmit $OUTPUTDIR/report.out
+    rlFileSubmit $OUTPUTDIR/logger.txt
+    rlFileSubmit $USEX_LOG
 
     if [ "$fail" -gt "0" ]; then
         export result="FAIL"
+        rlFail "$TEST $result $fail"
     else
         export result="PASS"
+        rlPass "$TEST $result $fail"
     fi
     echo 'Test' $TEST
     echo 'Result' $result
     echo 'fail' $fail
-    rstrnt-report-result $TEST $result $fail
-    return $fail
 }
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        rlRun setup
+        setup
     rlPhaseEnd
     rlPhaseStartTest "Usex test run"
-        rlRun TestUsexMain
+        TestUsexMain
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText

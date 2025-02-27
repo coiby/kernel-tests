@@ -1,0 +1,34 @@
+From 8dad37c36bfbe5475931e5390e3c4bf8cc81ab0f Mon Sep 17 00:00:00 2001
+From: Andrea Cervesato <andrea.cervesato@suse.com>
+Date: Wed, 4 Dec 2024 14:53:51 +0100
+Subject: [PATCH] host: remove preexec_fn from process run
+
+According to documentation, to use setsid() before process.Popen via
+preexec_fn is a bad practice. The documentation suggests to use the
+start_new_session=True parameter in order to start a new session with a
+new group ID.
+
+Reference:
+https://docs.python.org/3/library/subprocess.html#popen-constructor
+
+Signed-off-by: Andrea Cervesato <andrea.cervesato@suse.com>
+---
+ libkirk/host.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libkirk/host.py b/libkirk/host.py
+index b43df68..a52e853 100644
+--- a/libkirk/host.py
++++ b/libkirk/host.py
+@@ -146,7 +146,7 @@ class HostSUT(SUT):
+                 "stdout": asyncio.subprocess.PIPE,
+                 "stderr": asyncio.subprocess.STDOUT,
+                 "cwd": cwd,
+-                "preexec_fn": os.setsid
++                "start_new_session": True
+             }
+ 
+             if env:
+-- 
+2.47.0
+

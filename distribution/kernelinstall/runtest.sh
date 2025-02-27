@@ -53,11 +53,12 @@ function DeBug ()
     fi
 }
 
-function RHTSAbort ()
+function Abort ()
 {
     # Abort the rhts recipe if we are running the wrong kernel
     DeBug "Abort recipe"
-    rhts-abort -t recipe
+    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+    rstrnt-abort recipe
 }
 
 function SysReport ()
@@ -271,7 +272,7 @@ diff -u $FILE1 $FILE2
 
 function report_result ()
 {
-    rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
+    rstrnt-report-result -o "$OUTPUTFILE" "$1" "$2"  "$3"
 }
 
 function RprtRslt ()
@@ -291,7 +292,7 @@ function RprtRslt ()
 function SubmitLog ()
 {
     LOG=$1
-    rhts_submit_log -l $LOG
+    rstrnt-report-log -l $LOG
 }
 
 function XendLogging ()
@@ -342,9 +343,9 @@ function SelectKernel ()
             # Unified tree kernel-rt inherits kernel NVR and
             # appends "+rt" or "+rt-debug"
             if [[ "$RT_DEBUG" == "true" ]]; then
-                EXTRA="rt-debug"
+                EXTRA="rt$RT_SUBTYPE-debug"
             else
-                EXTRA="rt"
+                EXTRA="rt$RT_SUBTYPE"
             fi
         else
             # Non-unified tree kernel-rt has unique NVR and
@@ -676,9 +677,9 @@ function CheckKernel ()
             # Unified tree kernel-rt inherits kernel NVR and
             # appends "+rt" or "+rt-debug"
             if [[ "$RT_DEBUG" == "true" ]]; then
-                KVAR="rt-debug"
+                KVAR="rt$RT_SUBTYPE-debug"
             else
-                KVAR="rt"
+                KVAR="rt$RT_SUBTYPE"
             fi
         else
             # Non-unified tree kernel-rt has unique NVR and
@@ -823,7 +824,7 @@ function CurlDownload ()
     if [ "${ret}" -ne 0 ]; then
         DeBug "Download ${url} failed: ${ret}"
         RprtRslt ${TEST}/CurlDownload FAIL $ret
-        RHTSAbort
+        Abort
     fi
     return $?
 }
@@ -1161,7 +1162,7 @@ function workaround_bug905910 ()
             echo "Exiting workaround_bug905910" >> $OUTPUTFILE
             RprtRslt $TEST/set-hwclock WARN $ret
             if [ $ret -eq 0 ]; then
-                rhts-reboot
+                rstrnt-reboot
             fi
         else
             echo "Kernel seems happy about Cert start date, not doing anything" | tee -a $OUTPUTFILE
@@ -1351,7 +1352,7 @@ function Main ()
                 if [ "$ret" -ne "0" ]; then
                     RprtRslt $TEST/BrewInstallkernel FAIL $ret
                     DisableTmpRepo
-                    RHTSAbort
+                    Abort
                 fi
             fi
             DisableTmpRepo
@@ -1361,7 +1362,7 @@ function Main ()
         SelectKernel $KERNELARGVERSION $KERNELARGVARIANT
         if [ "$?" -ne "0" ]; then
             RprtRslt $TEST/SelectKernel FAIL $?
-            RHTSAbort
+            Abort
         else
             # Now that the kernel is our default... Let's reboot
             echo "***** End of kernel install test *****" | tee -a $OUTPUTFILE
@@ -1369,9 +1370,9 @@ function Main ()
                 SubmitLog $OUTPUTDIR/boot.$kernbase
             fi
             SubmitLog $DEBUGLOG
-            RprtRslt $TEST/rhts-reboot PASS 0
+            RprtRslt $TEST/rstrnt-reboot PASS 0
             date --date="$(date --utc)" +%s > /mnt/testarea/kernelinstall_reboottime.log
-            rhts-reboot
+            rstrnt-reboot
         fi
     else
         echo "***** The running kernel is the kernel we want to test *****" | tee -a $OUTPUTFILE
@@ -1451,6 +1452,7 @@ fi
 # Handle RT kernels built from both a unified source tree and separate main-rt tree
 RT_REQUESTED="false"
 RT_DEBUG="false"
+RT_SUBTYPE=""
 RT_UNIFIED="true"
 if [[ "$KERNELARGVARIANT" = "rt"* || "$KERNELARGNAME" == "kernel-rt"* ]]; then
     RT_REQUESTED="true"
@@ -1460,6 +1462,11 @@ if [[ "$KERNELARGVARIANT" = "rt"* || "$KERNELARGNAME" == "kernel-rt"* ]]; then
         # as well as if user requested KERNELARGNAME = kernel-rt-debug or kernel-rtdebug
         RT_DEBUG="true"
     fi
+
+    if [[ "$KERNELARGVARIANT" == *"64k"* || "$KERNELARGNAME" == *"-64k"* ]]; then
+        RT_SUBTYPE="-64k"
+    fi
+
     if [[ "$KERNELARGVERSION" == *".rt"* ]]; then
         # Kernel RT built from the same source tree as kernel uses the same
         # NVR as kernel but will add "+rt" or "+rt-debug".  When built from
@@ -1469,7 +1476,7 @@ if [[ "$KERNELARGVARIANT" = "rt"* || "$KERNELARGNAME" == "kernel-rt"* ]]; then
         RT_UNIFIED="false"
         KERNPKGDIRECTORY="kernel-rt"
     fi
-    DeBug "RT Variables: RT_REQUESTED=$RT_REQUESTED RT_DEBUG=$RT_DEBUG RT_UNIFIED=$RT_UNIFIED KERNPKGDIRECTORY=$KERNPKGDIRECTORY"
+    DeBug "RT Variables: RT_REQUESTED=$RT_REQUESTED RT_DEBUG=$RT_DEBUG RT_SUBTYPE=$RT_SUBTYPE RT_UNIFIED=$RT_UNIFIED KERNPKGDIRECTORY=$KERNPKGDIRECTORY"
 fi
 
 # New kernel variables
@@ -1577,7 +1584,7 @@ else
         if [ "$?" = "1" ]; then
             DeBug "After reboot we are still not running the correct kernel"
             RprtRslt $TEST/$kernbase FAIL $RSTRNT_REBOOTCOUNT
-            RHTSAbort
+            Abort
         else
             DeBug "After reboot we are running the correct kernel"
             # CheckCPU count with test kernel
@@ -1588,7 +1595,7 @@ else
             if [[ ${DIFF} -gt ${MAX_REBOOT_TIME:-900} ]]; then
                  let DIFF_MIN=$DIFF/60
                  let DIFF_SEC=$DIFF%60
-                 echo "***** WARN: rhts-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-900} seconds *****" | tee -a $OUTPUTFILE
+                 echo "***** WARN: rstrnt-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-900} seconds *****" | tee -a $OUTPUTFILE
                  RprtRslt $TEST/${kernbase}_boot WARN $DIFF
             fi
             RprtRslt $TEST/$kernbase PASS $DIFF

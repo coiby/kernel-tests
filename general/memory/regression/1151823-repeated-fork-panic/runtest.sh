@@ -34,6 +34,7 @@ STRESS=${STRESS:-no}
 WAITTIME=${WAITTIME:-300}
 TIMEFRAME=${TIMEFRAME:-60}
 REPRODUCER="fork_snake"
+OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile.$(pwd | md5sum | awk '{print $1}' | cut -c 1-8)}
 
 
 setup_env()
@@ -53,7 +54,7 @@ setup_env()
     rlRun "gcc ${REPRODUCER}.c -o ${REPRODUCER}"
     if [ $STRESS == "yes" ]; then
         rlRun "grubby --args=mem=500M --update-kernel=`grubby --default-kernel`"
-        zipl 2>&1 > /dev/null
+        zipl > /dev/null 2>&1
         rstrnt-reboot
     fi
     rlPhaseEnd
@@ -73,7 +74,7 @@ cleanup_env()
     rlAssertExists ./TESTDONE_FLAG
     if [ $STRESS == "yes" ]; then
         rlRun "grubby --remove-args=mem --update-kernel=`grubby --default-kernel`"
-        zipl 2>&1 > /dev/null
+        zipl > /dev/null 2>&1
         rstrnt-reboot
     fi
 

@@ -108,20 +108,20 @@ function cma()
 
     if rlIsRHEL "<9"; then
         rlLog "Only for RHEL9+."
-        report_result "cma" SKIP
+        rstrnt-report-result "cma" SKIP
         return
     fi
 
     if [ "$(rlGetPrimaryArch)" != "x86_64" ]; then
         rlLog "Only for x86_64."
-        report_result "cma" SKIP
+        rstrnt-report-result "cma" SKIP
         return
     fi
 
     # This case tests 2G hugapeges' alloc. Lower limit set to 4096.
     if [ $free_mem -lt 4096 ]; then
         rlLog "Memory too small, should be more than 4096MB."
-        report_result "cma" SKIP
+        rstrnt-report-result "cma" SKIP
         return
     fi
 
@@ -134,13 +134,13 @@ function cma()
 
     if ! grep CONFIG_CMA=y /boot/config-*; then
         rlLog "CONFIG_CMA not enabled."
-        report_result "cma" SKIP
+        rstrnt-report-result "cma" SKIP
         return
     fi
 
     if ! lscpu | grep pdpe1gb 1>/dev/null; then
         rlLog "This CPU doesn't support 1G hugepages."
-        report_result "cma" SKIP
+        rstrnt-report-result "cma" SKIP
         return
     fi
 

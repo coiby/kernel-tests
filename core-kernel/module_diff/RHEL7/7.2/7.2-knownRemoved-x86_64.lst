@@ -1,5 +1,0 @@
-acpi_i2c.ko
-drm_usb.ko
-sha1-ssse3.ko
-sha256-ssse3.ko
-snd-hda-controller.ko

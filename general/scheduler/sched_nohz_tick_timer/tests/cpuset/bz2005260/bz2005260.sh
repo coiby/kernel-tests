@@ -40,7 +40,7 @@ function bz2005260()
 	# this is defined in runtest.sh
 	# shellcheck disable=SC2154
 	if ((nr_cpu < 8)); then
-		report_result "${FUNCNAME[0]}-nr_cpu_${nr_cpu}" SKIP
+		rstrnt-report-result "${FUNCNAME[0]}-nr_cpu_${nr_cpu}" SKIP
 		return
 	fi
 

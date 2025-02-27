@@ -28,6 +28,8 @@ description: |
 contact: Michael Menasherov <mmenashe@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
+require:
+  - iputils
 extra-summary: networking/basic_network_access
 extra-task: networking/basic_network_access
 enabled: true

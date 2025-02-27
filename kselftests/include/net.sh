@@ -13,11 +13,12 @@ get_default_iface()
 	ip route | awk '/default/{match($0,"dev ([^ ]+)",M); print M[1]; exit}'
 }
 
-install_netsniff()
+install_epel_pkg()
 {
-	which mausezahn && return 0
+	pkg=$1
+	rpm -q --quiet $pkg && return 0
 
-	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
+	if [[ "$krelease" =~ ^(8|9|10)$ ]]; then
 		if ! rpm -q --quiet epel-release; then
 			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
@@ -29,34 +30,16 @@ install_netsniff()
 		fi
 	fi
 
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string $param jq netsniff-ng
-
-	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
-
-	which mausezahn && return 0 || return 1
-}
-
-install_iptables_legacy()
-{
-	rpm -q --quiet iptables-legacy && return 0
-
-	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
-		if ! rpm -q --quiet epel-release; then
-			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
-			local need_remove=1
-		else
-			local param="--enablerepo=epel"
-		fi
+	if [ "${krelease}" -eq "10" ]; then
+		# epel10 doesn't have netsniff-ng yet, use Felix's repo first
+		$pkg_mgr copr -y enable fmaurer/netsniff
 	fi
-
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string $param iptables-legacy
+	$pkg_mgr $pkg_mgr_inst_string $param $pkg
 
 	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
-	rpm -q --quiet iptables-legacy && return 0 || return 1
+	rpm -q --quiet $pkg && return 0 || return 1
 }
 
 install_smcroute()
@@ -66,6 +49,15 @@ install_smcroute()
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string smcroute
 	which smcroute && return 0 || return 1
+}
+
+install_mtools()
+{
+	which msend && return 0
+	dnf copr -y enable liuhangbin/mtools
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	$pkg_mgr $pkg_mgr_inst_string mcast-tools
+	which msend && return 0 || return 1
 }
 
 install_sendip()
@@ -175,6 +167,8 @@ do_net_config()
 	cp nettest /usr/local/bin/
 	# for l2tp.sh
 	modprobe -a l2tp_eth l2tp_ip6 l2tp_ip
+	# for net:txtimestamp.sh
+	modprobe sch_netem
 	# for msg_zerocopy.sh, we don't have UDP zero copy support yet
 	sed -i 's/$0 4 udp -t 1/#$0 4 udp -t 1/' msg_zerocopy.sh
 	sed -i 's/$0 6 udp -t 1/#$0 6 udp -t 1/' msg_zerocopy.sh
@@ -186,7 +180,8 @@ do_net_config()
 	popd || exit
 
 	# install jq for fib_nexthops.sh test
-	install_netsniff || { test_fail "install netsniff for net test failed" && return 1; }
+	install_epel_pkg netsniff-ng || { test_fail "install netsniff for net test failed" && return 1; }
+	install_epel_pkg netperf || { test_fail "install netperf for net test failed" && return 1; }
 }
 
 do_net_reset()
@@ -205,12 +200,13 @@ do_net_forwarding_config()
 
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
-	install_netsniff || { test_fail "install netsniff for forwarding test failed" && return 1; }
-	install_smcroute || { test_fail "install smcrouted for forwarding test failed" && return 1; }
+	install_epel_pkg netsniff-ng || { test_warn "install netsniff for forwarding test failed" && return 1; }
+	install_smcroute || { test_warn "install smcrouted for forwarding test failed" && return 1; }
+	install_mtools || { test_warn "install mtools for forwarding test failed" && return 1; }
 
 	pushd "$EXEC_DIR"/net/forwarding || exit
-	# RHEL9 doesn't support meta
-	if [ "${krelease}" -eq "9" ]; then
+	# RHEL9/10 doesn't support meta
+	if [[ "$krelease" =~ ^(9|10)$ ]]; then
 		sed -i '0, /ets_test_strict/ {/ets_test_strict/d;}' sch_ets.sh
 		sed -i '0, /ets_test_mixed/ {/ets_test_mixed/d;}' sch_ets.sh
 		sed -i '0, /ets_test_dwrr/ {/ets_test_dwrr/d;}' sch_ets.sh
@@ -308,7 +304,7 @@ do_bpf_test_progs_config()
 	modprobe nf_conntrack
 	modprobe nf_nat
 
-	install_iptables_legacy || test_warn "Install iptables-legacy failed"
+	install_epel_pkg iptables-legacy || test_warn "Install iptables-legacy failed"
 }
 
 do_bpf_test_progs_run()
@@ -335,7 +331,13 @@ do_bpf_test_progs_run()
 	for name in ${total_tests}; do
 		num=$((num + 1))
 
-		check_skip "${item}:${name}" && test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]" && continue
+		# report results as a subphase
+		rlPhaseStartTest "selftests: ${item}:${name}"
+		if check_skip "${item}:${name}"; then
+			test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]"
+			rlPhaseEnd
+			continue
+		fi
 
 		local OUTPUTFILE=$LOG_DIR/${item}_${name}.log
 		dmesg -C
@@ -354,8 +356,12 @@ do_bpf_test_progs_run()
 		echo -e "\n=== Dmesg result ===" >> "$OUTPUTFILE"
 		dmesg >> "$OUTPUTFILE"
 
+		# submit logs
+		rlLog "$(cat ${OUTPUTFILE})"
+
 		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
 		check_result $num "$total_num" "${item}:${name}" $ret
+		rlPhaseEnd
 	done
 
 	popd || exit
@@ -388,7 +394,7 @@ do_tc-testing_config()
 	pushd "$EXEC_DIR"/tc-testing || exit
 	# extend test timeout
 	sed -i '/TIMEOUT/s/24/180/' tdc_config.py
-	sed -i 's/python3 -s/python3/' *.py plugin-lib/*.py
+	sed -i 's/python3 -sP\?/python3/' *.py plugin-lib/*.py
 	popd || exit
 }
 
@@ -412,13 +418,23 @@ do_tc-testing_run()
 	for name in ${total_tests}; do
 		num=$((num + 1))
 
-		check_skip "${item}:${name}" && test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]" && continue
+		# report results as a subphase
+		rlPhaseStartTest "selftests: ${item}:${name}"
+		if check_skip "${item}:${name}"; then
+			test_skip "${num}..${total_num} selftests: ${item}:${name} [SKIP]"
+			rlPhaseEnd
+			continue
+		fi
 
 		local OUTPUTFILE=$LOG_DIR/$(echo "${name}" | tr '/' '_').log
 
 		echo "${name}" | grep -qP "tests\.json|concurrency\.json" && extra_p="-d $DEFAULT_IFACE" || extra_p=""
 		./tdc.py -f "${name}" "$extra_p" &> "$OUTPUTFILE"
 		ret=$?
+
+		# submit logs
+		rlLog "$(cat ${OUTPUTFILE})"
+
 		if grep -q "not ok" "$OUTPUTFILE"; then
 			check_result $num "$total_num" "${item}:${name}" 1
 			fail=$((fail+1))
@@ -431,6 +447,7 @@ do_tc-testing_run()
 		else
 			check_result $num "$total_num" "${item}:${name}" $ret
 		fi
+		rlPhaseEnd
 	done
 
 	echo "${item}: total $total_num, failed $fail, skipped $nskip"

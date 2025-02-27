@@ -43,20 +43,92 @@ PACKAGE="perf"
 PERFTESTS_ENABLE_DENYLIST=${PERFTESTS_ENABLE_DENYLIST:-0}
 
 # hook, someone likes using "True" there, we like 1, 0 values more
-if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" -o "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
+if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" ] || [ "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
 	PERFTESTS_ENABLE_DENYLIST=1
 fi
 
 check_allowlisted()
 {
 	HASH=`echo -n "$1" | sha1sum | awk '{print $1}'`
-	cat allow.list | perl -pe 's/#.*$//' | grep $HASH | grep -q -e "all" -e "$MY_ARCH"
-	return $?
+	MATCH=`cat allow.list | perl -pe 's/#.*$//' | perl -pe 's/#\s*$/ /' | grep $HASH`
+
+	if [ -z "$VIRT" ]; then			# skip KVM whitelist if the system is no a KVM
+		MATCH=`echo -n $MATCH | grep -v KVM`
+	fi
+
+	if [[ -z "$MATCH" ]]; then
+		return 1;
+	fi
+
+	# need a for loop for multiple matches
+	set -- $MATCH
+	while [[ $1 != "" ]]
+	do
+		shift;	# skip the hash
+		local denylist_arch=$1; shift
+		local denylist_kernel_version_start=$1; shift
+		local denylist_kernel_version_end=$1; shift
+		# TODO fix checking/skipping the KVM flag
+
+		grep -q -e "all" -e "$MY_ARCH," <<<"$denylist_arch" || continue
+		K_Vercmp $KERNEL $denylist_kernel_version_start
+		[[ $K_KVERCMP_RET -ge "0" ]] || continue
+		K_Vercmp $KERNEL $denylist_kernel_version_end
+		[[ $K_KVERCMP_RET -lt "0" ]] || continue
+		return 0
+	done
+
+	return 1
 }
 
 prepare_allowlists()
 {
 	rlRun "cp allow.list $TmpDir/" 0 "ALLOWLIST: adding basic allowlist"
+}
+
+# K_Vercmp() returns one of the following values in the global K_KVERCMP_RET:
+#   -1 if kernel version from argument $1 is older
+#    0 if kernel version from argument $1 is the same as $2
+#    1 if kernel version from argument $1 is newer
+K_KVERCMP_RET=0 # NOT CURRENTLY WORKING FOR THE KERNEL SUB VERSION starting with 0 TODO FIX
+function K_Vercmp ()
+{
+	local ver1=`echo $1 | sed 's/-/./'`
+	local ver2=`echo $2 | sed 's/-/./'`
+
+	local ret=0
+	local i=1
+	while [ 1 ]; do
+		local digit1=`echo $ver1 | cut -d . -f $i`
+		local digit2=`echo $ver2 | cut -d . -f $i`
+
+		if [ -z "$digit1" ]; then
+			if [ -z "$digit2" ]; then
+				ret=0
+				break
+			else
+				ret=-1
+				break
+			fi
+		fi
+
+		if [ -z "$digit2" ]; then
+			ret=1
+			break
+		fi
+
+		if [ "$digit1" != "$digit2" ]; then
+			if [ "$digit1" -lt "$digit2" ]; then
+				ret=-1
+				break
+			fi
+			ret=1
+			break
+		fi
+
+		i=$((i+1))
+	done
+	K_KVERCMP_RET=$ret
 }
 
 # return 0 when running kernel rt
@@ -77,6 +149,7 @@ rlJournalStart
 		rlCheckRpm python3-perf || yum -y install python3-perf
 		export MY_ARCH=`arch`
 		export KERNEL=`uname -r`
+		export VIRT=`virt-what`
 		# unset ARCH variable in case it is set to something
 		# (wrongly set ARCH variable breaks LLVM tests!!)
 		unset ARCH
@@ -184,26 +257,49 @@ rlJournalStart
 		rlRun "perf test list |& tee tests.list" 0 "We will run the following tests:"
 	rlPhaseEnd
 
-	while read line; do
-		TEST_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
-		TEST_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
-		# skip the incompatible lines (basically the subtests)
-		test -n "$TEST_NUMBER" || continue
+	read line < tests.list
+	NEXT_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
+	NEXT_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
+
+	# skip the first line as it was already parsed
+	tail -n +2 tests.list | while true; do
+		CURRENT_TEST="$line"
+		# we found the end of the file
+		test -n "$CURRENT_TEST" || break
+
+		# take the parsed data
+		TEST_NUMBER="$NEXT_NUMBER"
+		TEST_DESC="$NEXT_DESC"
+		TEST_PATTERNS="-e \"$TEST_DESC\""
+
+		# parse the possibile subtests for pattern matching, store the next test
+		while read line; do
+			NEXT_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
+			NEXT_DESC="`echo $line | perl -pe 's/^(:?\d+:)+\s//'`"
+
+			# we found a testcase, not the subtest
+			test -z "$NEXT_NUMBER" || break
+			TEST_PATTERNS+=" -e \"$NEXT_DESC\""
+		done
+
 		rlPhaseStart FAIL "TEST #$TEST_NUMBER : $TEST_DESC"
 			if check_allowlisted "$TEST_DESC"; then
 				rlLog "[ ALLOWLISTED ] :: $TEST_NUMBER: $TEST_DESC  (known issue)"
 			else
 				perf test -F -vv $TEST_NUMBER &> $TEST_NUMBER.log
 				RETVAL=$?
-				cat $TEST_NUMBER.log
-				RESULT=`grep "^$TEST_DESC" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
-				printf "%8s -- %s\n" $RESULT "$line" | tee -a results.log
-				echo $RESULT | grep -qi FAIL
-				if [ $RETVAL -ne 0 -o $? -eq 0 ]; then
+				rlLog "$(cat $TEST_NUMBER.log)"
+				# use eval to correctly interpret the patters, -F to not match regex characters
+				RESULT=`eval grep -F "$TEST_PATTERNS" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
+				printf "%8s -- %s\n" $RESULT "$CURRENT_TEST" | tee -a results.log
+
+				# search for successful report, not fail for testcase with subtests
+				echo $RESULT | grep -iE "Ok|Skip" | grep -qiv "FAIL"
+				if [ $? -eq 0 ] && [ $RETVAL -eq 0 ]; then
+					rlPass "$TEST_NUMBER: $TEST_DESC"
+				else
 					rlFail "$TEST_NUMBER: $TEST_DESC"
 					rlFileSubmit "$TEST_NUMBER.log"
-				else
-					rlPass "$TEST_NUMBER: $TEST_DESC"
 				fi
 
 				# restore original sample rate to ensure the tests dependent on it pass
@@ -211,7 +307,7 @@ rlJournalStart
 				sysctl kernel.perf_event_max_sample_rate=$ORIGINAL_SAMPLE_RATE
 			fi
 		rlPhaseEnd
-	done < tests.list
+	done
 
 	# bz1414043 coverage
 	rlPhaseStartTest "bz1414043 coverage -- \"Session topology\" test fails with some CPUs disabled"

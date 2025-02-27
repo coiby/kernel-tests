@@ -8,7 +8,8 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-max_time=180m
+max_time=30m
 use_pty=false
-dependencies=wget;git;gcc;make;autoconf;tar;bzip2;nmap-ncat
+dependencies=gcc;make;elfutils-libelf-devel
+softDependencies=nmap-ncat;kernel-devel
 repoRequires=general/kpatch/include

@@ -1,9 +1,0 @@
-dm-registry.ko
-dm-replicator.ko
-dm-repl-log-ringbuffer.ko
-dm-repl-slink-blockdev.ko
-ipmi_msghandler.ko
-ipmi_si.ko
-iwl-legacy.ko
-snd-hifier.ko
-snd-usb-lib.ko

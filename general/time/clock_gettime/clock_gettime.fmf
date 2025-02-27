@@ -1,5 +1,21 @@
 summary: Test time backward for clock_gettime()
-description: Test time backward for clock_gettime()
+description: |
+   This test reads clock_gettime rapidly and compares the results.  If
+   clock_gettime returns decreasing values, ie time went backwards, then
+   return an error
+    Test input:
+        Input details:
+        - gtod_backwards.c, source.
+    Expected results:
+      The runtest script compiles and runs the test gtod_backwards for 1,000 iterations.
+      The test returns an error if any one iteration fails.
+      The runtime of the gtod_backwards test will be monitored, with a
+      warning if it exceeds 480 minutes.
+         Output details:
+            "Time test Passed: "
+            "rstrnt-report-result general/time/clock_gettime PASS 0"
+    Results location:
+        output.txt
 contact: Qiao Zhao <qzhao@redhat.com>
 id: 9603fdff-19d4-4552-9808-60a63de1fd07
 component:

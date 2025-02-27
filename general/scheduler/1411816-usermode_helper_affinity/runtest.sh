@@ -26,10 +26,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-
 . ../include/runtest.sh
 
 rlJournalStart
@@ -38,9 +35,7 @@ rlJournalStart
 
 		kver_major=$(uname -r | cut -d- -f1 | cut -d. -f 1) # 3
 		kver_minor=$(uname -r | cut -d- -f1 | cut -d. -f 2) # 10
-		kver_mminor=$(uname -r | cut -d- -f1 | cut -d. -f 3) # 0
-		krel_major=$(uname -r | cut -d- -f2 | cut -d. -f 1) # 514
-		phasename="Test ${FUNCNAME}"
+		phasename="Test ${FUNCNAME[0]}"
 
 		# From 4.3, the __call_usermodehelper is dropped and renamed to
 		# call_usermodehelper_exec_async with commit :
@@ -54,19 +49,19 @@ rlJournalStart
 
 	rlPhaseStartTest $phasename
 		! test -f /sys/devices/virtual/workqueue/cpumask && \
-			report_result "SKIPPED_UNSUPPORTED" && exit 0
+			rstrnt-report-result "SKIPPED_UNSUPPORTED" SKIP && exit 0
 		rlRun "echo 1 > /sys/devices/virtual/workqueue/cpumask"
 
 		mount | grep debugfs || mount -t debugfs d /sys/kernel/debug
 		! grep function /sys/kernel/debug/tracing/available_tracers && \
-			report_result "SKIPPED_UNSUPPORTED" && exit 0
+			rstrnt-report-result "SKIPPED_UNSUPPORTED" SKIP && exit 0
 
 		FILTER=/sys/kernel/debug/tracing/set_ftrace_filter
 		rlRun "echo $trace_func >  $FILTER"
 		rlRun "echo function > /sys/kernel/debug/tracing/current_tracer"
 		runner=./start_helper.sh
 		[ "$CGROUP_VERSION" != 1 ] && runner=./start_helper_cgroupv2.sh
-		for l in $(seq 1 10); do
+		for _ in $(seq 1 10); do
 			rlRun "$runner"
 		done
 		TRACE=/sys/kernel/debug/tracing/trace

@@ -31,6 +31,6 @@ TEST PARAM
 2) RESERVE_LEAK_REBOOT=[1|0] (This is rarely used, as it's a testcase for another testcase)
    When set to 1, used as a test case for '/kernel/general/memory/kmemleak', to make sure
    the task can report the leak info correctly. Note. /kernel/general/memory/kmemleak hacked
-   rhts-reboot to do a scan and save the data before the real reboot. This parameter
+   rstrnt-reboot to do a scan and save the data before the real reboot. This parameter
 
 Author: Chunyu Hu <chuhu@redhat.com>

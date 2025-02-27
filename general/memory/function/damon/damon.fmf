@@ -15,3 +15,10 @@ require:
 duration: 20m
 extra-summary: /kernel/general/memory/function/damon
 extra-task: /kernel/general/memory/function/damon
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

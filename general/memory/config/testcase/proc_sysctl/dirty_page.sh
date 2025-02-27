@@ -26,7 +26,7 @@
 
 function test_dirty_bytes1()
 {
-    rlLog "Start $FUNCNAME"
+    rlLog "Start ${FUNCNAME[0]}"
     rlRun "sysctl -w vm.dirty_background_bytes=500000000"
     rlRun "sysctl -w vm.dirty_bytes=500000000"
     rlAssert0 "dirty_background_ratio" $(sysctl -n vm.dirty_background_ratio)
@@ -41,7 +41,7 @@ function test_dirty_bytes1()
 
 function test_dirty_bytes2()
 {
-    rlLog "Start $FUNCNAME"
+    rlLog "Start ${FUNCNAME[0]}"
     rlRun "sysctl -w vm.dirty_background_bytes=1000000"
     rlRun "sysctl -w vm.dirty_bytes=1000000"
     rlAssert0 "dirty_background_ratio" $(sysctl -n vm.dirty_background_ratio)
@@ -56,7 +56,7 @@ function test_dirty_bytes2()
 
 function test_dirty_ratio1()
 {
-    rlLog "Start $FUNCNAME"
+    rlLog "Start ${FUNCNAME[0]}"
     rlRun "sysctl -w vm.dirty_background_ratio=20"
     rlRun "sysctl -w vm.dirty_ratio=20"
     rlAssert0 "dirty_background_bytes" $(sysctl -n vm.dirty_background_bytes)
@@ -68,10 +68,10 @@ function test_dirty_ratio1()
     local watermark_high="$((memtotal/100*30))"
 
     if ! test_get_diskfreek; then
-        report_result "$FUNCNAME-disk_unknown" SKIP
+        rstrnt-report-result "${FUNCNAME[0]}-disk_unknown" SKIP
         return
     elif (($(test_get_diskfreek) < memtotal)); then
-        report_result "$FUNCNAME-disk_space" SKIP
+        rstrnt-report-result "${FUNCNAME[0]}-disk_space" SKIP
         return
     fi
 
@@ -84,7 +84,7 @@ function test_dirty_ratio1()
 
 function test_dirty_ratio2()
 {
-    rlLog "Start $FUNCNAME"
+    rlLog "Start ${FUNCNAME[0]}"
     rlRun "sysctl -w vm.dirty_background_ratio=20"
     rlRun "sysctl -w vm.dirty_ratio=20"
     rlAssert0 "dirty_background_bytes" $(sysctl -n vm.dirty_background_bytes)
@@ -97,10 +97,10 @@ function test_dirty_ratio2()
     local watermark_high="$((memtotal/100*30))"
 
     if ! test_get_diskfreek; then
-        report_result "$FUNCNAME-disk_unknown" SKIP
+        rstrnt-report-result "${FUNCNAME[0]}-disk_unknown" SKIP
         return
     elif (($(test_get_diskfreek) < memtotal)); then
-        report_result "$FUNCNAME-disk_space" SKIP
+        rstrnt-report-result "${FUNCNAME[0]}-disk_space" SKIP
         return
     fi
 
@@ -114,7 +114,7 @@ function test_dirty_ratio2()
 
 function test_dirty_expire_centisecs1()
 {
-    rlLog "Start $FUNCNAME"
+    rlLog "Start ${FUNCNAME[0]}"
     rlRun "sysctl -w vm.dirty_expire_centisecs=1000"
     rlRun "sysctl -w vm.dirty_writeback_centisecs=100"
 

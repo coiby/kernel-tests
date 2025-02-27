@@ -7,9 +7,11 @@ component:
 path: /livepatch/stress-klp
 test: bash ./runtest.sh
 framework: beakerlib
-recommend:
-  - gcc
-  - git
+require:
   - automake
   - elfutils-libelf-devel
+  - gcc
+  - git
+recommend:
+  - kernel-devel
 duration: 20m

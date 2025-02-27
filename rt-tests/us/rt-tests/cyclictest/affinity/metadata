@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=bash -x ./runtest.sh
+entry_point=bash ./runtest.sh
 dependencies=procps-ng;psmisc
 max_time=60m
 use_pty=false

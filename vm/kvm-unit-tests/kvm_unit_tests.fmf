@@ -12,6 +12,10 @@ require:
   - git
   - nmap-ncat
   - qemu-kvm
+  - type: file
+    pattern:
+      - /cki_lib
+      - /kernel-include
 duration: 1h
 extra-summary: /kernel/vm/kvm-unit-tests
 extra-task: /kernel/vm/kvm-unit-tests

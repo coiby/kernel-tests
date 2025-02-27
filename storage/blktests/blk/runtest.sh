@@ -18,7 +18,7 @@ function main
 		rstrnt-report-result "$TNAME" SKIP
 	fi
 	for testcase in $testcases; do
-		if (rlIsRHEL ">9.4") && [[ "$testcase" == "block/035" ]]; then
+		if (rlIsRHEL ">9.4" || rlIsCentOS 9) && [[ "$testcase" == "block/035" ]]; then
 			sysctl -w kernel.io_uring_disabled=0
 		fi
 		do_test "$test_ws" "$testcase"
@@ -35,13 +35,6 @@ function main
 # don't run it if running as part of shellspec
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
-	if cki_has_kernel_debug_flags; then
-		# the test is not supported on debug kernels due to performance issues
-		# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/657
-		rstrnt-report-result "$TNAME" SKIP
-		exit 0
-	fi
-
 	. "$CDIR"/../include/build.sh
 	main
 fi

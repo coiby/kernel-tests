@@ -13,9 +13,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-# Source the common test script helpers
-. /usr/share/beakerlib/beakerlib.sh || exit 1
-
 # Global variables
 PODMANUSER=${PODMANUSER:-root}
 BATS_DIR=${BATS_DIR:-/usr}
@@ -30,7 +27,7 @@ function _install_bats ()
     ./bats-core-1.10.0/install.sh "${BATS_DIR}"
     if [ $? -ne 0 ]; then
         echo "FAIL Couldn't install BATS. Aborting test..."
-        rstrnt-report-result "${TEST}" WARN
+        rstrnt-report-result install-BATS WARN
         exit 1
     fi
 }
@@ -83,17 +80,17 @@ function run_tests()
     # Bug reports required this information.
     echo "Podman version:"
     if run_cmd_user "podman --version"; then
-        rstrnt-report-result "${RSTRNT_TASKNAME}/version" PASS
+        rstrnt-report-result "version" PASS
     else
         TEST_FAILED=1
-        rstrnt-report-result "${RSTRNT_TASKNAME}/version" FAIL
+        rstrnt-report-result "version" FAIL
     fi
     echo "Podman debug info:"
     if run_cmd_user "podman info --debug"; then
-        rstrnt-report-result "${RSTRNT_TASKNAME}/info" PASS
+        rstrnt-report-result "info" PASS
     else
         TEST_FAILED=1
-        rstrnt-report-result "${RSTRNT_TASKNAME}/info" FAIL
+        rstrnt-report-result "info" FAIL
     fi
 
     # Clear images
@@ -110,14 +107,14 @@ function run_tests()
             TEST_FAILED=1
             if grep -qF "[ rc=124 (** EXPECTED 0 **) ]" ${TEST_LOG}; then
                 echo "FAIL: test failed with timeout. Likely infra issue."
-                rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" WARN
+                rstrnt-report-result -o "${TEST_LOG}" "${TEST_NAME}" WARN
                 cleanup
                 exit 1
             else
-                rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" FAIL
+                rstrnt-report-result -o "${TEST_LOG}" "${TEST_NAME}" FAIL
             fi
         else
-            rstrnt-report-result -o "${TEST_LOG}" "${RSTRNT_TASKNAME}/${TEST_NAME}" PASS
+            rstrnt-report-result -o "${TEST_LOG}" "${TEST_NAME}" PASS
         fi
     done
 
@@ -147,14 +144,18 @@ fi
 # patch 070-builds to make test passing
 sed -i -e '/io.buildah.version/d' $TEST_DIR/070-build.bats
 
+
+rhel_centos_release=$(rpm -E '%rhel')
+
 # Add container-tools module for rhel8 through Appstreams:
 #   rhel8 -> fast rolling stream that closes to upstream/latest
 #   1.0, 2.0, ....  -> stable stream for production
-if rlIsRHEL '8'; then
+if [[ "$rhel_centos_release" == "8" ]]; then
     dnf module install -y container-tools:rhel8
 fi
 
-if rlIsRHEL || rlIsCentOS '9'; then
+
+if [[ "$rhel_centos_release" == "8" ]] || [[ "$rhel_centos_release" == "9" ]]; then
     # https://github.com/containers/podman/issues/20087
     echo "Skipping selinux-policy tests known to fail: https://github.com/containers/podman/issues/20087"
     sed -i 's/@test "podman selinux: confined container" {/@test "podman selinux: confined container" {\n    skip/' ${TEST_DIR}/410-selinux.bats

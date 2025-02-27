@@ -25,8 +25,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-. /usr/bin/rhts-environment.sh
 . ../../general/kpatch/include/lib.sh
 
 TEST="/kernel/livepatch/sysfs"
@@ -53,13 +51,13 @@ test_pass()
 	rstrnt-report-result $TEST "PASS" 0
 }
 
-if is_rhel9 || is_rhel8; then
+if is_rhel "8" || is_rhel "9" ; then
 	dnf_install_modules_internal
 	klp_module_file=$(modinfo $KLP_MODULE | head -n 1 | awk '{print $2}')
 	busy_module_file=$(modinfo $BUSY_MODULE | head -n 1 | awk '{print $2}')
 else
 	install_selftests_internal
-	rhel10_build_selftests_modules
+	build_selftests_modules
 	klp_module_file="$LIVEPATCH_TEST_MODULES/test_modules/$KLP_MODULE.ko"
 	busy_module_file="$LIVEPATCH_TEST_MODULES/test_modules/$BUSY_MODULE.ko"
 fi

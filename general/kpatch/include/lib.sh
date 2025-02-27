@@ -5,7 +5,7 @@ BUILDS_URL="${BUILDS_URL:-}"
 PACKAGE=kpatch
 # shellcheck disable=SC2034
 SERVICE=kpatch
-kpackage=$(rpm -qf /boot/config-`uname -r` | sed "s/.`uname -m`//g; s/core-//g;")
+kpackage=$(rpm -qf /boot/config-$(uname -r) | sed "s/.\$(uname -m)//g; s/core-//g;")
 karch=$(rpm -q $kpackage --qf "%{arch}")
 knam=$(rpm -q $kpackage --qf "%{name}")
 kver=$(rpm -q $kpackage --qf "%{version}")
@@ -34,9 +34,9 @@ test_skip()
     rstrnt-report-result -o "$OUTPUTFILE" "${TEST}/$1" "SKIP" 0
 }
 
-is_rhel9()
+is_rhel()
 {
-    rhel_ver=${1:-9}
+    local rhel_ver=${1:-NULL}
     if grep -q "Red Hat Enterprise Linux ${rhel_ver}" $OS_RELEASE; then
         return 0
     else
@@ -44,9 +44,31 @@ is_rhel9()
     fi
 }
 
+is_fedora()
+{
+    if grep -q "Fedora Linux" $OS_RELEASE; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+is_rhel9()
+{
+    local ret=0
+
+    is_rhel "9"
+    ret=$?
+    return $ret
+}
+
 is_rhel8()
 {
-    return $(is_rhel9 8)
+    local ret=0
+
+    is_rhel "8"
+    ret=$?
+    return $ret
 }
 
 package_manage_tool()
@@ -98,23 +120,61 @@ install_kernel_devel()
 
 rhel10_build_selftests_modules()
 {
-    # Build the test needed modules, for rhel-10 only
-    if grep -q 'Red Hat Enterprise Linux 10' /etc/os-release; then
-        rpm -q kernel-devel-`uname -r` || install_kernel_devel
-        pushd ${LIVEPATCH_TEST_MODULES}
-        if [ "${karch}" == "s390x" ]; then
-            OPT="SRCARCH=s390"
-        elif [ "${karch}" == "ppc64le" ]; then
-            OPT="SRCARCH=powerpc"
-        else
-            OPT=""
-        fi
-        make -C test_modules ${OPT} modules
-        if [ "$?" -ne 0 ]; then
-             test_fail "Build the needed modules failed, abort test." && exit 1
-        fi
-        popd
+    is_rhel "10" && build_selftests_modules
+}
+
+build_selftests_modules()
+{
+    local ret=0
+
+    rpm -q kernel-devel-$(uname -r) || install_kernel_devel
+    pushd ${LIVEPATCH_TEST_MODULES}
+    if [ "${karch}" == "s390x" ]; then
+        OPT="SRCARCH=s390"
+    elif [ "${karch}" == "ppc64le" ]; then
+        OPT="SRCARCH=powerpc"
+    else
+        OPT=""
     fi
+    make -C test_modules ${OPT} modules
+    ret=$?
+    popd
+    return $ret
+}
+
+download_kpatch_repo()
+{
+    KPATCH_REPO=$1
+    KPATCH_REV=$2
+    if [ ! -e "kpatch/.git" ]; then
+        if [ ! -z "${KPATCH_REV}" ]; then
+            rlRun "git clone -b ${KPATCH_REV} ${KPATCH_REPO}" || rlDie
+        else
+            rlRun "git clone ${KPATCH_REPO}" || rlDie
+            pushd kpatch
+            KPATCH_REV=$(git describe --tags --abbrev=0)
+            rlRun "git checkout ${KPATCH_REV}" || rlDie
+            popd
+        fi
+    fi
+}
+
+build_kpatch_setup()
+{
+    rlRun "git describe --tags"
+    rlRun "source test/integration/lib.sh"
+    rlRun "kpatch_dependencies"
+    rlRun "kpatch_set_ccache_max_size 10G" "0,1"
+}
+
+check_test_target()
+{
+    source /etc/os-release
+    MA=$(cut -d '.' -f 1 <<< $VERSION_ID)
+    MI=$(cut -d '.' -f 2 <<< $VERSION_ID)
+    PREVIOUS_MI=$(( $MI-1 ))
+    PREVIOUS_TARGET="${MA}.${PREVIOUS_MI}"
+    [ ! -d ${TEST_PATCH_PATH}/${ID}-${VERSION_ID} ] && cp -R ${TEST_PATCH_PATH}/${ID}-${PREVIOUS_TARGET} ${TEST_PATCH_PATH}/${ID}-${VERSION_ID}
 }
 
 install_selftests_internal()

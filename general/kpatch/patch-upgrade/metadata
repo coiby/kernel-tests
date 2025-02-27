@@ -1,6 +1,6 @@
 [General]
 name=/kernel/general/kpatch/patch-upgrade
-owner=Zhijun Wang <zhijwang@redhat.com>
+owner=Yulia Kopkova <ykopkova@redhat.com>
 description=Kpatch-patch upgrade test
 license=GPLv2
 confidental=no
@@ -9,5 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=240m
-dependencies=wget;git;gcc;make;autoconf;tar;bzip2;nmap-ncat
+dependencies=wget;git;gcc;make;autoconf;tar;bzip2
+softDependencies=nmap-ncat;kpatch
 repoRequires=general/kpatch/include

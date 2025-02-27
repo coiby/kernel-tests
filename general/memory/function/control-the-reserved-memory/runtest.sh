@@ -25,7 +25,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="kernel"
@@ -43,7 +42,7 @@ rlJournalStart
 	elif rlIsRHEL 6; then
 		rlRun "./check-admin_reserve_kbytes.sh" 0,2 "Executing Testing, return 2 means skipped."
 	else
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	fi
 	rlPhaseEnd

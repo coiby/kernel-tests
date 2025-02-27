@@ -10,8 +10,23 @@ require:
   - kexec-tools
   - gnuplot
   - iptables
+  - type: file
+    pattern:
+      - /kdump/setup-bare-metal
+      - /kdump/include
+      - /automotive/include
+      - /cmdline_helper
+      - /cki_lib
 recommend:
   - wget
   - abootimg
 duration: 2h
 id: c1477610-3a4c-4339-8772-cc8922487aab
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION
+

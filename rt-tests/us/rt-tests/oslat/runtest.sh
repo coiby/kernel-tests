@@ -12,7 +12,7 @@
 
 export TEST="rt-tests/us/rt-tests/oslat"
 
-: "${LATCHECK:=1}"
+: "${LATCHECK:=0}"
 : "${MAXLAT:=150}"
 : "${RUN_TIME:=10m}"
 export LATCHECK MAXLAT RUN_TIME

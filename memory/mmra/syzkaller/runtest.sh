@@ -187,7 +187,7 @@ rlJournalStart
             mv /usr/lib/systemd/coredump.conf.d/10-automotive.conf /var/tmp/
             systemctl daemon-reexec
         fi
-        rlRun "git clone https://github.com/google/syzkaller" 0,128
+        rlRun "git_retry_clone https://github.com/google/syzkaller" 0,128
         rlRun "pushd syzkaller"
         syzkaller_root=$(pwd)
         rlRun "git branch mmra_temp ${commit}" 0,128
@@ -243,6 +243,7 @@ rlJournalStart
         fi
         rlRun "rm -rf /root/go"
         rlRun "rm -rf ${local_dir}" 0,1
+        rlRun "rm -rf ${syzkaller_root}"
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText

@@ -27,16 +27,18 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../include/lib.sh
+. ../../../security/crypto/enable_fips/lib.sh
 
 trap 'killall make; kill runtest.sh' SIGHUP SIGINT SIGQUIT SIGTERM
 
 #  When using rpm
 KPATCH_MODULE="${KPATCH_MODULE:-}"
 KPATCH_PATH="/home/kpatch-patch-modules"
-GREP_STR="${GREP_STR:-kpatch}"
-TARGET_FILE="${TARGET_FILE:-/proc/cmdline}"
-TARGET_FUNCTION=${TARGET_FUNCTION:-cmdline_proc_show}
-BRWURL="${BREW_URL:-}"
+TEST_CMD="${TEST_CMD:-cat /proc/meminfo}"
+GREP_STR="${GREP_STR:-kpatch:         5}"
+TARGET_FUNCTION=${TARGET_FUNCTION:-meminfo_proc_show}
+BUILDS_URL="${BUILDS_URL:-}"
 NFS_SHARE=${NFS_SHARE:-}
 KPATCH_LOCATION=${KPATCH_LOCATION:-"/data/kpatch"}
 KPATCH_SHARE="${NFS_SHARE}:${KPATCH_LOCATION}"
@@ -50,7 +52,7 @@ if [ -z "${KPATCH_MODULE}" ]; then
         KPATCH_MODULE=$(ls ${KPATCH_PATH}/kpatch-* | head -n 1 | sed -e 's/.ko//')
         yum -y install $(rpm -qa | grep kpatch-patch |grep -v debug | sed "s/-/-debuginfo-/4")
     else
-        KPATCH_MODULE="test-cmdline-string"
+        KPATCH_MODULE="test-data-new"
     fi
 fi
 
@@ -62,22 +64,13 @@ kprobe_enable="${trace_dir}/events/kprobes/enable"
 tracer="${trace_dir}/current_tracer"
 
 function install_deps() {
-    local karch=$(uname -m)
-    local kver=$(uname -r | cut -f1 -d'-')
-    local krel=$(uname -r | cut -f2 -d'-' | sed -e "s/\.${karch}$//")
-    local brew="${BRWURL}/brewroot/packages"
-
-    yum -y install perf-${kver}-${krel} \
-        || yum -y install $brew/kernel/${kver}/${krel}/${karch}/perf-${kver}-${krel}.${karch}.rpm
-
-    yum -y install kernel-debuginfo-${kver}-${krel} \
-        || yum -y install $brew/kernel/${kver}/${krel}/${karch}/kernel-debuginfo-${kver}-${krel}.${karch}.rpm
-
-    yum -y install kernel-devel-${kver}-${krel} \
-        || yum -y install $brew/kernel/${kver}/${krel}/${karch}/kernel-devel-${kver}-${krel}.${karch}.rpm
+    # need to pass brew url to BUILDS_URL
+    package_install perf-${kver}-${krel}
+    package_install kernel-debuginfo-${kver}-${krel}
+    install_kernel_devel
 
     for i in $PACKAGE; do
-        yum -y install $i
+        package_install $i
     done
 }
 
@@ -113,11 +106,11 @@ function setup_kprobe() {
 }
 
 function setup_stap() {
-    if fips-mode-setup --is-enabled; then
+    if fipsIsEnabled; then
         export STAP_FIPS_OVERRIDE=1;
         rlLog "Run SystemTap with enabled FIPS mode."
     fi
-    rlRun "stap -ve 'probe kernel.function(\"${TARGET_FUNCTION}\") {printf(\"hello\")}' -c 'cat ${TARGET_FILE}' | grep ${GREP_STR}"
+    rlRun "stap -ve 'probe kernel.function(\"${TARGET_FUNCTION}\") {printf(\"hello\")}' -c '${TEST_CMD}' | grep \"${GREP_STR}\""
 }
 
 function reset_trace_probes() {
@@ -158,7 +151,7 @@ rlJournalStart
     rlPhaseStartTest "Kpatch compat with perf"
         setup_perf
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
-        rlRun "perf stat -e probe:${TARGET_FUNCTION}  -- cat ${TARGET_FILE} 2>&1| grep \"1.*probe:${TARGET_FUNCTION%%_*}\" -o"
+        rlRun "perf stat -e probe:${TARGET_FUNCTION}  -- ${TEST_CMD} 2>&1| grep \"1.*probe:${TARGET_FUNCTION%%_*}\" -o"
         rlRun "perf probe --del \"probe:${TARGET_FUNCTION}\""
     rlPhaseEnd
 
@@ -167,7 +160,7 @@ rlJournalStart
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
         # this should fail as only one of kpatch and kprobe can pin the smae func.
         rlRun "echo 1 > ${kprobe_enable}" 0
-        rlRun "cat ${TARGET_FILE} | grep ${GREP_STR}"
+        rlRun "${TEST_CMD} | grep \"${GREP_STR}\""
         # this should fail as only one of kpatch and kprobe can pin the smae func.
         rlRun "cat ${trace_res} | grep ${TARGET_FUNCTION}" 0
         # shellcheck disable=SC2188
@@ -179,7 +172,7 @@ rlJournalStart
         # shellcheck disable=SC2188
         > ${trace_res}
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
-        rlRun "cat ${TARGET_FILE} | grep ${GREP_STR}"
+        rlRun "${TEST_CMD} | grep \"${GREP_STR}\""
         rlRun "cat ${trace_res} | grep \"${TARGET_FUNCTION} <\""
     rlPhaseEnd
 
@@ -187,7 +180,7 @@ rlJournalStart
         setup_crash
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
         rlRun "crash -i ${crash_cmd} /usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
-        rlRun "grep ${GREP_STR} ~/source" 0-255
+        rlRun "grep \"${GREP_STR}\" ~/source" 0-255
         rlRun -l "cat ~/source" 0-255
     rlPhaseEnd
 

@@ -70,6 +70,8 @@ function rlSkip
     # As we want result="Skip" status="Completed" for all scenarios, right here
     # we always exit 0, otherwise the test will skip/abort
     #
+    rlPhaseEnd
+    rlJournalEnd
     exit 0
 }
 
@@ -95,13 +97,13 @@ function checkVirtSupport
         grep -qE '(vmx|svm)' /proc/cpuinfo
         return $?
     elif [[ $hwpf == "aarch64" ]]; then
-        if journalctl -k | grep -qi "disabling GICv2" ; then
+        if journalctl -k | grep -qi "disabling GICv2" || journalctl -k | grep -qi "GICv3"; then
             GICVERSION="3"
         else
             GICVERSION="2"
         fi
         CPUTYPE="ARMGICv$GICVERSION"
-        journalctl -k | grep -iqE "kvm.*: (Hyp|VHE) mode initialized successfully"
+        journalctl -k | grep -iqE "kvm.*: (Hyp|VHE|Hyp nVHE) mode initialized successfully"
         return $?
     elif [[ $hwpf == "s390x" ]]; then
         if (grep -q 'machine = 2964' /proc/cpuinfo); then
@@ -320,7 +322,7 @@ function setup
         [[ $hwpf == "aarch64" ]] && ARCH="arm64"
         [[ $hwpf == "s390x" ]] && ARCH="s390"
         #workaround for RHEL10 issue https://issues.redhat.com/browse/RHEL-58930
-        if [[ $OSVERSION == "RHEL10" ]]; then
+        if [[ $OSVERSION == "RHEL10" && $hwpf == "x86_64" ]]; then
             rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm EXTRA_CFLAGS='-march=x86-64-v2'"
         else
             rlRun "make -C ${tests_srcdir} OUTPUT=${BINDIR} ARCH=${ARCH} TARGETS=kvm"

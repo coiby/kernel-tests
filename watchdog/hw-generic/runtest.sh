@@ -38,7 +38,7 @@ TEST_STATUS=/var/tmp/watchdog.status
 touch "$TEST_STATUS"
 
 # File to backup/restore bootorder
-FILE=/tmp/watchdog_boot_order
+FILE=/var/tmp/watchdog_boot_order
 
 efi_save()
 {
@@ -68,6 +68,8 @@ efi_restore()
 	if [ $? -ne 0 ]; then
 		rlLog "RESTORE Failed! Please investigate to avoid an incorrect boot order"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	fi
 	rm $FILE
@@ -80,6 +82,8 @@ efi_set()
 	if [[ "$1" != "save" ]] && [[ "$1" != "restore" ]]; then
 		rlLog "Invalid command: $1"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	fi
 
@@ -105,6 +109,8 @@ chk_support() {
 	else
 		rlLog "/dev/watchdog does not exist! Skipping test and existing !"
 		rstrnt-report-result $TEST SKIP
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	fi
 
@@ -114,6 +120,21 @@ chk_support() {
 	if [ ! -x watchdog-simple ] ; then
 		rlLog "Failed to build tests, exiting!"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rlPhaseEnd
+		rlJournalEnd
+		exit 0
+	else
+		rlLog "Compiled successfully."
+	fi
+
+	# Compile watchdog-set-custom-timeout test
+	rlLog "Checking that watchdog-set-custom-timeout.c compiled successfully:"
+	gcc -o watchdog-set-custom-timeout watchdog-set-custom-timeout.c
+	if [ ! -x watchdog-set-custom-timeout ] ; then
+		rlLog "Failed to build tests, exiting!"
+		rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	else
 		rlLog "Compiled successfully."
@@ -142,7 +163,7 @@ disable_wdt_test() {
 	# Start watchdog "daemon" in the background (which writes 1's into
 	# /dev/watchdog and keeps the box up). After several seconds, kill
 	# the program which should then cause the box to reboot.
-	rlLog "Disabling writes to /dev/watchdog... System should reboot in 30 - 60 seconds"
+	rlLog "Disabling writes to /dev/watchdog... System should reboot in 60 seconds"
 	sync;sync
 	sleep 3
 	./watchdog-simple &
@@ -151,6 +172,36 @@ disable_wdt_test() {
 	rlLog "Inform tmt that we're rebooting using rstrnt-reboot with a custom non-reboot command."
 	rstrnt-reboot -c "echo 'reboot using watchdog'"
 	sleep 65
+	# If we get here it didn't reboot, so report as FAIL
+	rlLog "The system didn't reboot, reporting FAIL!"
+	rstrnt-report-result $TEST/disable_wdt_test FAIL
+	return 1
+}
+
+disable_wdt_test_custom_timeout() {
+	# Check if we've already executed this function. If so, this indicates the
+	# the system rebooted (almost surely due to the watchdog). Report as PASS.
+	if grep -q disable_wdt_test_custom_timeout "$TEST_STATUS" ; then
+		rlLog "Disabling watchdog with custom timeout successfully triggered a reboot!"
+		rstrnt-report-result $TEST/disable_wdt_test PASS
+		return 0
+	fi
+	# Record we've run the test so on reboot we don't run it again
+	echo disable_wdt_test_custom_timeout >> "$TEST_STATUS"
+
+	# Start watchdog "daemon" in the background (which writes 1's into
+	# /dev/watchdog and keeps the box up). After several seconds, kill
+	# the program which should then cause the box to reboot.
+	rlLog "Disabling writes to /dev/watchdog... System should reboot in 30 seconds"
+	sync;sync
+	sleep 3
+	./watchdog-set-custom-timeout
+	./watchdog-simple &
+	sleep 5
+	killall watchdog-simple
+	rlLog "Inform tmt that we're rebooting using rstrnt-reboot with a custom non-reboot command."
+	rstrnt-reboot -c "echo 'reboot using watchdog with custom timeout'"
+	sleep 30
 	# If we get here it didn't reboot, so report as FAIL
 	rlLog "The system didn't reboot, reporting FAIL!"
 	rstrnt-report-result $TEST/disable_wdt_test FAIL
@@ -168,10 +219,7 @@ rlJournalStart
 				rlLog "Original BootOrder:"
 				rlRun efibootmgr
 				rlRun "efi_set save"
-			else
-				rlLog "Restoring the BootOrder correcty for UEFI system"
-				rlRun "efi_set restore"
-			fi
+			fi;
 		else
 			rlLog "Not a UEFI system. Skipping UEFI boot order setup."
 		fi
@@ -179,8 +227,17 @@ rlJournalStart
 	rlPhaseStartTest "Trigger watchdog reboot"
 		rlRun disable_wdt_test
 	rlPhaseEnd
+	rlPhaseStartTest "Trigger watchdog reboot with custom timeout"
+		rlRun disable_wdt_test_custom_timeout
+	rlPhaseEnd
 	rlPhaseStartCleanup
 		rlRun cleanup
+		if efibootmgr; then
+			rlLog "Restoring the BootOrder correcty for UEFI system"
+			rlRun "efi_set restore"
+		else
+			rlLog "Not a UEFI system. Skipping UEFI boot order restore."
+		fi;
 	rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd

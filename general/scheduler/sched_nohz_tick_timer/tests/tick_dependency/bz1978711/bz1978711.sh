@@ -15,7 +15,7 @@ function bz1978711()
 
 	sleep 2
 	rlRun -l "ps -LC cyclictest -o pid,tid,psr,pcpu,etimes,args"
-	[ $? -ne 0 ] && report_result "cyclictest_compile" FAIL && return
+	[ $? -ne 0 ] && rstrnt-report-result "cyclictest_compile" FAIL && return
 
 	echo > /sys/kernel/debug/tracing/trace
 

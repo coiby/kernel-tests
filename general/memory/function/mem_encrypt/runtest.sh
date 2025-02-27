@@ -26,7 +26,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include rhts environment
-. /usr/bin/rhts-environment.sh      || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 set -o pipefail
@@ -38,10 +37,18 @@ krelease="$(rpm -qf --qf "%{release}\n" /boot/vmlinuz-$(uname -r))"
 
 rlJournalStart
 	rlPhaseStartTest
-	uname -r | grep x86_64 || { report_result "x86_64 only" SKIP; exit 0; }
+	uname -r | grep x86_64 || {
+		rstrnt-report-result "x86_64 only" SKIP;
+	        rlLog "x86_64 test only, skipping";
+		rlPhaseEnd
+		rlJournalEnd
+		exit 0; }
 	lscpu | grep -w sme && rlLog "sme is supported / enabled" || {
-		report_result "sme not enabled in bios" SKIP
-		report_result "$TEST" SKIP
+		rstrnt-report-result "sme not enabled in bios" SKIP
+		rstrnt-report-result "$TEST" SKIP
+		rlLog "SME not enabled in BIOS, skipping test..."
+		rlPhaseEnd
+		rlJournalEnd
 		exit 0
 	}
 	if test -f $firstboot && grep "done" $firstboot; then
@@ -60,14 +67,14 @@ rlJournalStart
 		fi
 		grep "\<SME\>" <(journalctl -kb) || {
 			rlLog "sme not enabled in bios or not supported, skip test ..."
-			report_result "sme not enabled in bios" SKIP
+			rstrnt-report-result "sme not enabled in bios" SKIP
 			((skip_cleanup_cmdline == 1)) || {
 				rlRun "grubby --remove-args mem_encrypt=on --update-kernel DEFAULT"
 				touch $firstboot
 				echo "done" >> $firstboot
 				rlPhaseEnd
 				rlJournalEnd
-				rhts-reboot
+				rstrnt-reboot
 			}
 			rlPhaseEnd
 			rlJournalEnd
@@ -78,7 +85,7 @@ rlJournalStart
 		rlRun "touch $firstboot"
 		rlPhaseEnd
 		rlJournalEnd
-		rhts-reboot
+		rstrnt-reboot
 	fi
 	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlRpmInstall "${kname}-devel" "$kversion" "$krelease" "$(uname -m)"
 	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
@@ -93,7 +100,7 @@ rlJournalStart
 		rlRun "echo done > $firstboot"
 		rlPhaseEnd
 		rlJournalEnd
-		rhts-reboot
+		rstrnt-reboot
 	fi
 	rlPhaseEnd
 rlJournalPrintText

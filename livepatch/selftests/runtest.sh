@@ -29,12 +29,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. kvercmp.sh
 . ../../general/kpatch/include/lib.sh
 
 set -x
 #-------------------- Setup --------------------
-EXEC_DIR=/usr/libexec/kselftests/
 SKIP=4
 BUILDS_URL="${BUILDS_URL:-}"
 
@@ -53,84 +51,6 @@ check_skipped_tests()
 	shift
 	for e; do [[ "$e" == "$match" ]] && return 0; done
 	return 1
-}
-
-# build test modules from sources and change EXEC_DIR to kernel source tree
-build_selftests()
-{
-	local devel
-	local config
-	local extraversion
-
-	# Download (if necessary) and install kernel source rpm
-	if [[ ! -e "kernel-${kver}-${krel}.src.rpm" ]]; then
-		# Download and install kernel source rpm
-		yumdownloader -q -y --source kernel-${kver}-${krel} \
-		  || wget ${BUILDS_URL}/kernel/${kver}/${krel}/src/kernel-${kver}-${krel}.src.rpm
-	fi
-	rpm -ivh kernel-${kver}-${krel}.src.rpm
-
-	install_kernel_devel
-
-	# Add a backports as needed, backports/* directories hold fixes
-	# for kernels greater or equal to the directory name and only
-	# the latest directory applies.
-	local path
-	local backports
-	for path in backports/*; do
-		if [[ -d "$path" ]] ; then
-			[[ $(kvercmp "$(uname -r)" "$(basename "$path")") -ne "-1" ]] && backports="$path"
-		fi
-	done
-	[[ -n "$backports" ]] && cat "$backports"/*.patch > ~/rpmbuild/SOURCES/linux-kernel-test.patch
-
-	# Install kernel build dependencies
-	cd ~/rpmbuild/SPECS
-	yum-builddep -y ./kernel.spec
-
-	# Prep kernel sources
-	rpmbuild -bp kernel.spec
-	cd ~/rpmbuild/BUILD/kernel-${kver}-${krel}/linux-${kver}-${krel}.${karch}/
-
-	# Copy appropriate kernel config and doctor the Makefile with
-	# the RHEL release string
-	if debug_kernel; then
-		config="kernel-${kver}-${karch}-debug.config"
-		extraversion="-${krel}.${karch}.debug"
-	else
-		config="kernel-${kver}-${karch}.config"
-		extraversion="-${krel}.${karch}"
-	fi
-	rm -f .config
-	cp "configs/${config}" .config
-	sed -i "s/^EXTRAVERSION =.*/EXTRAVERSION = ${extraversion}/" Makefile
-
-	# Enable Livepatch tests, turn off module signing
-	./scripts/config --set-val CONFIG_TEST_LIVEPATCH m
-
-	# Skip vmlinux build...
-
-	# Without building kernel, we need to link to kernel-devel's
-	# Modules.symvers file,
-	symvers=$(rpm -ql "${devel}-${kver}-${krel}" | grep '\<Module.symvers\>$')
-	ln -s "${symvers}" Module.symvers
-
-	# Without building the kernel, we don't have module signing keys
-	# and modules_install's depmod will complain that it "Can't read
-	# private key".  This seems to be benign and worth the noise to
-	# skip building the kernel.
-
-	# Build and install livepatch kernel modules
-	[ "${karch}" = "ppc64le" ] && build_arch="powerpc" || \
-		build_arch=${karch}
-	make ARCH=$build_arch modules_prepare
-	[ "$build_arch" = "powerpc" ] && make ARCH=$build_arch arch/powerpc/lib/crtsavres.o
-	make -j$(nproc) ARCH=$build_arch M=lib/livepatch
-	make ARCH=$build_arch M=lib/livepatch modules_install
-	depmod # redundant, but seemingly required
-
-	# change EXEC_DIR to kernel source tree
-	EXEC_DIR=$(pwd)/tools/testing/selftests
 }
 
 check_result()
@@ -154,8 +74,7 @@ check_result()
 
 do_livepatch()
 {
-	[ ! -d $EXEC_DIR/livepatch ] && test_fail "$EXEC_DIR/livepatch does not exist" && return 1 || cd $EXEC_DIR/livepatch
-	rhel10_build_selftests_modules
+	[ ! -d $LIVEPATCH_TEST_MODULES ] && test_fail "$LIVEPATCH_TEST_MODULES does not exist" && return 1 || cd $LIVEPATCH_TEST_MODULES
 
 	# Start livepatch test
 	local livepatch_tests=(test-*.sh)
@@ -195,18 +114,9 @@ do_livepatch()
 }
 
 #-------------------- Start Test --------------------
-# Test if kernel nvr is in a range with selftests support
-cmp_min_rhel7=$(kvercmp `uname -r` '3.10.0-1067.el7')
-cmp_max_rhel7=$(kvercmp `uname -r` '3.10.0-9999.el7')
-cmp_min_rhel8=$(kvercmp `uname -r` '4.18.0-147.3.el8')
-
-if [ "$cmp_min_rhel7" -ge "0" ] && [ "$cmp_max_rhel7" -lt "0" ]; then
-	build_selftests || { test_fail "build selftests failed" && exit 0; }
-elif [ "$cmp_min_rhel8" -ge "0" ]; then
-	install_selftests_internal || { test_fail "install selftests failed" && exit 0; }
-else
-	rstrnt-report-result "LIVEPATCH_SELFTESTS_UNSUPPORTED" "SKIP" 0
-	exit 0
+install_selftests_internal || { test_fail "install selftests failed" && exit 0; }
+if is_rhel "10" || is_fedora ; then
+	build_selftests_modules || { test_fail "build selftests modules failed" && exit 0; }
 fi
 
 # the test relies on dmesg output, in some cases some other task in the background can

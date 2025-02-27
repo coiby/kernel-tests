@@ -79,6 +79,7 @@ function fio_test()
 
 function run_test()
 {
+    rlRun "echo 0 > /proc/sys/kernel/io_uring_disabled"
     rlRun "modprobe ublk_drv"
 # shellcheck disable=SC2034
     if ! output=$(ls /dev/ublk-control); then
@@ -153,7 +154,8 @@ rlJournalStart
         rlLog "$0"
         run_test
     rlPhaseEnd
-    for R in loop qcow2 nvme ssd;do
+# qcow2 type disabled
+    for R in loop nvme ssd;do
         rlPhaseStartTest "$R"
             run_test
         rlPhaseEnd

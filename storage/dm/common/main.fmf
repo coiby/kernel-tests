@@ -1,0 +1,28 @@
+summary: Device-mapper parameters test
+contact: Filip Suba <fsuba@redhat.com>
+component:
+  - kernel
+  - lvm2
+test: bash ./runtest.sh
+framework: shell
+require:
+  - augeas
+  - git
+  - python3
+  - wget
+  - type: file
+    pattern:
+      - /cki_lib
+      - /storage/include
+recommend:
+  - platform-python-devel
+  - python-devel
+  - python3-devel
+duration: 1h
+adjust:
+    - when: distro < rhel-7
+      enabled: false
+    - when: distro == rhel-7 and distro < rhel-7.7
+      enabled: false
+    - when: distro == rhel-8 and distro < rhel-8.4
+      enabled: false

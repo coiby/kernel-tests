@@ -26,9 +26,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if [ -e /usr/bin/rhts-environment.sh ]; then
-    . /usr/bin/rhts-environment.sh || exit 1
-fi
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../../../kernel-include/runtest.sh || exit 1
 
@@ -42,8 +39,6 @@ this_arch=$(uname -m)
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "unset ARCH"
-
         installer=$(K_GetPkgMgr)
         if [[ ${installer} == "rpm-ostree" ]]; then
             export install_opts="-A -y --idempotent --allow-inactive install"
@@ -64,7 +59,8 @@ rlJournalStart
         popd || exit 1
         if ! which stress-ng > /dev/null; then
             rlRun "pushd ../../include/scripts/"
-            rlRun "sh stress.sh; popd"
+            rlRun "sh stress.sh"
+            rlRun "popd"
         fi
     rlPhaseEnd
 

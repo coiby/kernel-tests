@@ -1,87 +1,96 @@
 # FORMAT:
-#   sha1sum arch1 arch2 arch3  # comment (test name)
+#   sha1sum arch1,arch2,arch3, kernel_version_start  kernel_version_end KVM_flag  # comment (test name)
 #
 # where archs might be also "all"
 #
 #  testcases listed here will be skipped
 #  everything from the '#' sign to the end of line is ignored
 
+############################################
+#### GENERAL FAILURES FOR SPECIFIC ARCH ####
+############################################
+
 #### s390x does not have syscall tracepoints, only raw syscalls
-04a274b4bcd3b75f2c514964b7782c836864d631 s390x	# Detect openat syscall event
-8d735cfd56f7d85dc83eba589af9ec15736f5b1a s390x  # Detect openat syscall event on all cpus
-2b05df303eaa71ff64f21a705a2232428d79cf41 s390x  # Detect open syscall event
-e2b405038028fad78e4b440fee4615c9e3105437 s390x	# Detect open syscall event on all cpus
-c40b1c8154d00b7e0a191e18721a2310236f1ca9 s390x	# syscalls:sys_enter_openat event fields
-6a42a33ddab2bb2e5f06c68dae1f01317f2d3687 s390x	# syscalls:sys_enter_open event fields
-dc25abc10dbbe8bbcfd828943e562325bb04d11d s390x	# Read samples using the mmap interface
-
-### s390x does not have cycles and 'dummy' event is not on RHEL6
-1452f6a9560857ae31acc9eaad816ae63c0cec44 s390x	# PERF_RECORD_* events & perf_sample fields
-
-#### tests that should be skipped, if it is not, we have to do it ourselves
-b81906564501bbdb29b976760f7e3735760c3d05 s390x aarch64 ppc64le # Number of exit events of a simple workload
-
-#### to be investigated
-3370c451caa40aa5cb102f145c75eb22141766eb x86_64	# DWARF unwind
-
-#### fails on s390x due to events we don't need at RH
-a314df14af58957548d292f859cbd2ee451c9c9f s390x ppc64le	# Parse event definition strings
-8d036401505f5579ff5912c30cbccb3c5098d8cd s390x	# Object code reading
-
-#### this test currently fails on powerpc, known thing
-64b224a2fb478a47529700c6237c6c0a0a90ad98 ppc64le ppc64	# Session topology
-
-#### this should be blacklisted on all non-x86_64, it goes slowly, so blacklisting here
-#    (bz1432652 fixes s390x only, not aarch64...)
-b549be0430aa3df45cf25675e2cad1b50d710435 aarch64 s390x # Breakpoint overflow signal handler
-4a3f54aad1d4f9f5a613f72c20a12273533f438f aarch64 s390x # Breakpoint overflow sampling
-
-#### GENERALLY UNSTABLE ####
-
-8d036401505f5579ff5912c30cbccb3c5098d8cd aarch64 s390x x86_64 ppc64le # Object code reading
-3370c451caa40aa5cb102f145c75eb22141766eb aarch64 s390x x86_64 ppc64le # DWARF unwind
-aba5be59b8476eb15178828406fa0d307fb794b9 aarch64 s390x x86_64 ppc64le # Test dwarf unwind
-b549be0430aa3df45cf25675e2cad1b50d710435 aarch64 s390x x86_64 ppc64le # Breakpoint overflow signal handler
+04a274b4bcd3b75f2c514964b7782c836864d631    s390x,                              4.18.0          9.99.9              # Detect openat syscall event
+8d735cfd56f7d85dc83eba589af9ec15736f5b1a    s390x,                              4.18.0          9.99.9              # Detect openat syscall event on all cpus
+c40b1c8154d00b7e0a191e18721a2310236f1ca9    s390x,                              4.18.0          9.99.9              # syscalls:sys_enter_openat event fields
+dc25abc10dbbe8bbcfd828943e562325bb04d11d    s390x,                              4.18.0          9.99.9 	            # Read samples using the mmap interface
 
 #### PMU might not work on KVM guests
-30d384952b664d5c4f5b81753b0edffc0b003695 x86_64 # x86 rdpmc
-24a8cd476d3077c41e5795428ea7820d88d12309 x86_64 # Convert perf time to TSC
+30d384952b664d5c4f5b81753b0edffc0b003695    x86_64,                             4.18.0          9.99.9      KVM     # x86 rdpmc
+24a8cd476d3077c41e5795428ea7820d88d12309    x86_64,                             4.18.0          9.99.9      KVM     # Convert perf time to TSC
 
-# Known bugs
-9e14b86f572e9d058f59302cfa8759e5afb20017 ppc64le s390x aarch64 x86_64 # probe libc's inet_pton & backtrace it with ping
-90ae3743ecb512bf3d9956df1d6ea8cbb3f63dc6 ppc64le s390x aarch64 x86_64 # Use vfs_getname probe to get syscall args filenames
-0e5b27841d80bf495ebfbfb1a446f7ca08fe5e97 ppc64le s390x aarch64 x86_64 # Check open filename arg using perf trace + vfs_getname
-d4b88ad2ef3ad11d1d65485ad3209f8849f4aeeb ppc64le s390x aarch64 x86_64 # Add vfs_getname probe to get syscall args filenames
-b011103996bcd810c4c87e049fffb48326edf705 ppc64le s390x aarch64  # Parse sched tracepoints fields
-887e416aca88217834c65490461a2137431efddd ppc64le # Watchpoint
-05b9b8fb2a5d4d41a867a36111ae380bf111f0f0 aarch64 # Track with sched_switch
-b31fbb4e7501b04082bf8edd16872ba11c580297 ppc64le x86_64 # PMU events
-adb2cda40ae61b84668595f3be67de89ed281658 ppc64le ppc64 s390x aarch64 x86_64 # DSO data reopen
-b088f72d0fb0684642cbea4121d3bd463d5af43a ppc64le ppc64 s390x x86_64 # LLVM search and compile
-529b1f92ce1b20584468e6a9ec8b53c051cca11d ppc64le s390x # PE file support
-b110fc5887abacbcdaa32fd5e9ea2e3f6e580dc5 ppc64le aarch64 # vmlinux symtab matches kallsyms
-2160bdaf7e5f48987e31c1d90d0260ac9fdd3ef7 ppc64le s390x aarch64 x86_64 # BPF filter
-e72d804e5361e9a66889207602ac75e4dd409aa6 x86_64  # x86 instruction decoder - new instructions
-64b224a2fb478a47529700c6237c6c0a0a90ad98 aarch64 # Session topology
-# poorly designed test fails on rhel9.2
-c07970a0464c9337daf18ab2edc53cce0d251cb7 ppc64le # perf stat CSV output linter
+#### Skip for Intel, not possible to parse the data for KVM
+e4a8e45016f20b50c3974e763b48c99a936b6d0a    x86_64,                             5.14.0-250      9.99.9      KVM     # Simple expression parser
 
-# Temporary allowlist for CKI fails, undo when fixed
-356730a72bd040f7393f65a130f1f44d6078b04d aarch64 # CoreSight / ASM Pure Loop
-5f637147a0cbb07a9d1e9955f03b44344d91a819 aarch64 # CoreSight / Memcpy 16k 10 Threads
-6f590f5a003e997ad8de1e8da6a62697d5cf308b aarch64 # CoreSight / Thread Loop 10 Threads - Check TID
-f6208a42d390ea91db024db16ae162fc2c80671d aarch64 # CoreSight / Thread Loop 2 Threads - Check TID
-6afe33200bf70894fcc32d944402cd41573072a4 aarch64 # CoreSight / Unroll Loop Thread 10
-117480d53c03fa31e2e6a0d61b3632bd70c328fa ppc64le ppc64 s390x aarch64 x86_64 # kernel lock contention analysis test
-e4a8e45016f20b50c3974e763b48c99a936b6d0a x86_64 # Simple expression parser
-7ab601dfc1d73baaea678b649fa5d66ba0f9f91e ppc64le x86_64 # perf all metricgroups test
-65a67da77b6f4b8ebc3aeb747f6d4f122398b2e6 ppc64le x86_64 # perf all metrics test
-c28f07da1fd1e44f7b716f64ff4b3cdf0d163e20 aarch64 ppc64le # perf record tests
-bc0e87022bb4941020242d414be1d74716aba9d5 s390x ppc64le x86_64 # perf pipe recording and injection test
-93754cd356c4bd5bc5827422eea5903f66591892 ppc64le x86_64 # Test data symbol
-9138e5d509df714f21df03aba8f6e07761a5144a s390x # daemon operations
-# happens mostly on KVM
-ed8900cbc1af7881132d775c5101b8010a206012 aarch64 x86_64 # Setup struct perf_event_attr
-# waive till rhel9.4 where the issue was fixed
-e6b6297934e7798b0aa806d20454c3fc61074af4 all # perf stat metrics (shadow stat) test
+#### Watchpoints disabled on POWER9
+887e416aca88217834c65490461a2137431efddd    ppc64le,                            4.18.0          9.99.9              # Watchpoint
+
+
+#########################################################
+#### Fixed issues, skip for affected kernel versions ####
+#########################################################
+
+### RHEL-8 ###
+
+b110fc5887abacbcdaa32fd5e9ea2e3f6e580dc5    aarch64,                            4.18.0-250      4.18.0-360          # vmlinux symtab matches kallsyms
+e72d804e5361e9a66889207602ac75e4dd409aa6    x86_64,                             4.18.0-200      4.18.0-300          # x86 instruction decoder - new instructions
+
+b011103996bcd810c4c87e049fffb48326edf705    ppc64le,s390x,                      4.18.0-110      4.18.0-160          # Parse sched tracepoints fields
+b31fbb4e7501b04082bf8edd16872ba11c580297    ppc64le,x86_64,                     4.18.0-260      4.18.0-330          # PMU events
+adb2cda40ae61b84668595f3be67de89ed281658    all                                 4.18.0-140      4.18.0-340          # DSO data reopen
+a314df14af58957548d292f859cbd2ee451c9c9f    x86_64,                             4.18.0-180      4.18.0-370          # Parse event definition strings
+
+### RHEL-9 ###
+
+356730a72bd040f7393f65a130f1f44d6078b04d    aarch64,                            5.14.0-280      5.14.0-400          # CoreSight / ASM Pure Loop
+5f637147a0cbb07a9d1e9955f03b44344d91a819    aarch64,                            5.14.0-280      5.14.0-400          # CoreSight / Memcpy 16k 10 Threads;
+6f590f5a003e997ad8de1e8da6a62697d5cf308b    aarch64,                            5.14.0-280      5.14.0-400          # CoreSight / Thread Loop 10 Threads - Check TID;
+f6208a42d390ea91db024db16ae162fc2c80671d    aarch64,                            5.14.0-280      5.14.0-400          # CoreSight / Thread Loop 2 Threads - Check TID
+6afe33200bf70894fcc32d944402cd41573072a4    aarch64,                            5.14.0-280      5.14.0-400          # CoreSight / Unroll Loop Thread 10
+632fdd3420de7bb26230f39a3c988702e4a90c01    x86_64,                             5.14.0-400      5.14.0-500          # perf list tests
+b31fbb4e7501b04082bf8edd16872ba11c580297    x86_64,                             5.14.0-250      5.14.0-330          # PMU events
+
+bc0e87022bb4941020242d414be1d74716aba9d5    s390x,ppc64le,x86_64,               5.14.0-330      5.14.0-420          # perf pipe recording and injection test
+64b224a2fb478a47529700c6237c6c0a0a90ad98    all                                 4.18.0-100      4.18.0-330          # Session topology
+e6b6297934e7798b0aa806d20454c3fc61074af4    all                                 5.14.0-200      5.14.0-400          # perf stat metrics (shadow stat) test
+c28f07da1fd1e44f7b716f64ff4b3cdf0d163e20    all                                 5.14.0-350      5.14.0-530          # perf record tests
+c07970a0464c9337daf18ab2edc53cce0d251cb7    all                                 5.14.0-200      5.14.0-400          # perf stat CSV output linter
+117480d53c03fa31e2e6a0d61b3632bd70c328fa    all                                 5.14.0-200      5.14.0-400          # kernel lock contention analysis test
+467b4575131cc49df2591dcd52ac524e71de7925    all                                 5.14.0-400      5.14.0-500          # perf stat --bpf-counters test
+a314df14af58957548d292f859cbd2ee451c9c9f    all                                 5.14.0-200      5.14.0-500          # Parse event definition strings
+8c95b0f59c6e176ff4d12aa75c45c1a90f928a46    all                                 6.11.0-0.rc0    6.11.0-0.rc7        # Sysfs PMU tests
+
+
+
+##############################################
+#### Generally unstable and hard to debug ####
+##############################################
+
+9138e5d509df714f21df03aba8f6e07761a5144a    s390x,                              4.18.0-400      5.14.0-510          # daemon operations
+45f2181b931aed2bfbe8c8749de65ad9650bea7c    x86_64,                             5.14.0-170      5.14.0-990          # Sigtrap
+
+### Intel has too many events added too quickly which causes the failures
+7ab601dfc1d73baaea678b649fa5d66ba0f9f91e    x86_64,ppc64le,                     5.14.0          9.99.9              # perf all metricgroups test
+65a67da77b6f4b8ebc3aeb747f6d4f122398b2e6    x86_64,ppc64le,                     5.14.0          9.99.9              # perf all metrics test
+7e19b11d535ba4d93467b5645e25ee37f6c12e83    x86_64,ppc64le,                     5.14.0          9.99.9              # perf all PMU test
+
+529b1f92ce1b20584468e6a9ec8b53c051cca11d    ppc64le,s390x,                      4.18.0-280      4.18.0-990           # PE file support
+93754cd356c4bd5bc5827422eea5903f66591892    ppc64le,x86_64,                     5.14.0-300      5.14.0-990           # Test data symbol
+b0417b9d569ddf9f5daa6a86b654d87edc60c9c4    x86_64,ppc64le,                     5.14.0-200      5.14.0-990           # Check branch stack sampling
+
+
+9e14b86f572e9d058f59302cfa8759e5afb20017    all                                 4.18.0-000      4.18.0-150           # probe libc's inet_pton & backtrace it with ping
+2160bdaf7e5f48987e31c1d90d0260ac9fdd3ef7    all                                 4.18.0-000      4.18.0-990           # BPF filter
+d4b88ad2ef3ad11d1d65485ad3209f8849f4aeeb    all                                 4.18.0-000      4.18.0-990           # Add vfs_getname probe to get syscall args filenames
+90ae3743ecb512bf3d9956df1d6ea8cbb3f63dc6    all                                 4.18.0-000      4.18.0-990           # Use vfs_getname probe to get syscall args filenames
+0e5b27841d80bf495ebfbfb1a446f7ca08fe5e97    all                                 4.18.0-000      4.18.0-990           # Check open filename arg using perf trace + vfs_getname
+b549be0430aa3df45cf25675e2cad1b50d710435    all                                 4.18.0-000      4.18.0-990           # Breakpoint overflow signal handler
+3370c451caa40aa5cb102f145c75eb22141766eb    all                                 4.18.0-000      4.18.0-990           # DWARF unwind
+aba5be59b8476eb15178828406fa0d307fb794b9    all                                 4.18.0-000      4.18.0-990           # Test dwarf unwind
+
+9e14b86f572e9d058f59302cfa8759e5afb20017    all                                 5.14.0-200      5.14.0-990          # probe libc's inet_pton & backtrace it with ping
+b81906564501bbdb29b976760f7e3735760c3d05    all                                 4.18.0          5.14.0-990          # Number of exit events of a simple workload
+ed8900cbc1af7881132d775c5101b8010a206012    all                                 4.18.0          9.99.9              # Setup struct perf_event_attr
+8d036401505f5579ff5912c30cbccb3c5098d8cd    all                                 4.18.0          9.99.9              # Object code reading
 

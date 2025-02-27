@@ -472,30 +472,28 @@ function rpm_install()
       fi
     fi
 
-    if ! cki_is_kernel_automotive; then
-      # The package was renamed (and temporarily aliased) in Fedora/RHEL"
-      if $YUM search kernel-firmware | grep "^kernel-firmware\.noarch" ; then
-        FIRMWARE_PKG=kernel-firmware
-      else
-        FIRMWARE_PKG=linux-firmware
-      fi
-      cki_print_info "Installing kernel firmware package"
-      $YUM install -y $FIRMWARE_PKG >> ${RPM_INSTALL_LOG}
-      cki_print_success "Kernel firmware package installed"
+    # The package was renamed (and temporarily aliased) in Fedora/RHEL"
+    if $YUM search kernel-firmware | grep "^kernel-firmware\.noarch" ; then
+      FIRMWARE_PKG=kernel-firmware
+    else
+      FIRMWARE_PKG=linux-firmware
+    fi
+    cki_print_info "Installing kernel firmware package"
+    $YUM install -y $FIRMWARE_PKG >> ${RPM_INSTALL_LOG}
+    cki_print_success "Kernel firmware package installed"
 
-      vmlinuz=/boot/vmlinuz-$(kpkg_release)
-      if grubby --set-default "${vmlinuz}"; then
-        cki_print_success "Grubby set default kernel to ${vmlinuz}"
-      else
-        rstrnt-report-log -l "${RPM_INSTALL_LOG}"
-        cki_abort_recipe "Fail to set default kernel to ${vmlinuz}" FAIL
-      fi
+    vmlinuz=/boot/vmlinuz-$(kpkg_release)
+    if grubby --set-default "${vmlinuz}"; then
+      cki_print_success "Grubby set default kernel to ${vmlinuz}"
+    else
+      rstrnt-report-log -l "${RPM_INSTALL_LOG}"
+      cki_abort_recipe "Fail to set default kernel to ${vmlinuz}" FAIL
+    fi
 
-      # Workaround for BZ 1698363 - was fixed in 8.3 but not backported to 8.1 nor 8.2
-      if [[ ${ARCH} == s390x ]]; then
-        zipl
-        cki_print_success "Grubby workaround for s390x completed"
-      fi
+    # Workaround for BZ 1698363 - was fixed in 8.3 but not backported to 8.1 nor 8.2
+    if [[ ${ARCH} == s390x ]]; then
+      zipl
+      cki_print_success "Grubby workaround for s390x completed"
     fi
   fi
   rstrnt-report-log -l "${RPM_INSTALL_LOG}"

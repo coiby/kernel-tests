@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1090
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -26,11 +27,8 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../include/runtest.sh
-. ./lib.sh
 
 # run time for each sub test in tests/type/bug
 RUN_TIME=${RUN_TIME:-120}
@@ -41,7 +39,6 @@ KILL_NAMES=""
 
 function test_setup()
 {
-	local pname
 	dump_cgroup_info $$
 }
 

@@ -4,7 +4,6 @@
 # Summary: mm proactive_compaction feature test
 # Author: Li Wang <liwang@redhat.com>
 
-. /usr/bin/rhts-environment.sh      || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 set -o pipefail
@@ -17,7 +16,7 @@ function supporting_check()
 	local rhel=$(grep -Eo '[0-9]+.[0-9]+' /etc/redhat-release)
 	if (echo ${rhel} "8.4" | awk '($1>=$2){exit 1}') then
 		echo "mm proactive_compaction has not been supported on rhel${rhel}" | tee -a $OUTPUTFILE
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	fi
 
@@ -50,7 +49,7 @@ function mm_compaction_test()
 	pid=$(pidof mem-frag-test)
 	if [ -z "$pid" ]; then
 		echo "mem-frag-test didn't run, let's skip the test" | tee -a $OUTPUTFILE
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	fi
 
@@ -90,6 +89,8 @@ function mm_compaction_test()
 rlJournalStart
 
 rlPhaseStartSetup
+	# Build the test program
+	rlRun "gcc mem-frag-test.c -o mem-frag-test" || rlDie "Failed to build mem-frag-test"
 	# remove the ballon driver and disable swap so there is no help
 	# coming to compaction when fragmentation sets in
 	vb_module=0 && lsmod | grep -q virtio_balloon && vb_module=1

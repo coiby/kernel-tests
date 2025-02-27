@@ -114,7 +114,7 @@ setup_cmdline_args(){
 	echo "Setup cmdline args: $1"
 	change_cmdline "$1"
 	touch $DIR_DEBUG/SETUPDONEFLAG_"$2"
-	rhts-reboot
+	rstrnt-reboot
 	sleep 100000
 }
 

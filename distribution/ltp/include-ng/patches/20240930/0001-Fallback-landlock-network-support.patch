@@ -1,0 +1,465 @@
+From 0dc92a70b54dd90270853e174b81c2e82b73970d Mon Sep 17 00:00:00 2001
+From: Andrea Cervesato <andrea.cervesato@suse.com>
+Date: Mon, 4 Nov 2024 14:25:11 +0100
+Subject: [PATCH 1/4] Fallback landlock network support
+
+Landlock network support has been added in the ABI v4, adding features
+for bind() and connect() syscalls. It also defined one more member in
+the landlock_ruleset_attr struct, breaking our LTP fallbacks, used to
+build landlock testing suite. For this reason, we introduce
+tst_landlock_ruleset_attr_abi[14] struct(s) which fallback ABI v1 and v4
+ruleset_attr definitions.
+
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Li Wang <liwang@redhat.com>
+Signed-off-by: Andrea Cervesato <andrea.cervesato@suse.com>
+---
+ configure.ac                                  |  5 ++--
+ include/lapi/capability.h                     |  4 +++
+ include/lapi/landlock.h                       | 28 ++++++++++---------
+ .../kernel/syscalls/landlock/landlock01.c     | 15 ++++------
+ .../kernel/syscalls/landlock/landlock02.c     |  8 +++---
+ .../kernel/syscalls/landlock/landlock03.c     |  6 ++--
+ .../kernel/syscalls/landlock/landlock04.c     |  6 ++--
+ .../kernel/syscalls/landlock/landlock05.c     | 10 +++----
+ .../kernel/syscalls/landlock/landlock06.c     | 14 +++-------
+ .../kernel/syscalls/landlock/landlock07.c     |  6 ++--
+ .../syscalls/landlock/landlock_common.h       | 12 ++++----
+ 11 files changed, 53 insertions(+), 61 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index cd1233d19..6992d75ca 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -34,6 +34,8 @@ m4_ifndef([PKG_CHECK_EXISTS],
+ AC_PREFIX_DEFAULT(/opt/ltp)
+ 
+ AC_CHECK_DECLS([IFLA_NET_NS_PID],,,[#include <linux/if_link.h>])
++AC_CHECK_DECLS([LANDLOCK_RULE_PATH_BENEATH],,,[#include <linux/landlock.h>])
++AC_CHECK_DECLS([LANDLOCK_RULE_NET_PORT],,,[#include <linux/landlock.h>])
+ AC_CHECK_DECLS([MADV_MERGEABLE],,,[#include <sys/mman.h>])
+ AC_CHECK_DECLS([NFTA_CHAIN_ID, NFTA_VERDICT_CHAIN_ID],,,[#include <linux/netfilter/nf_tables.h>])
+ AC_CHECK_DECLS([PR_CAPBSET_DROP, PR_CAPBSET_READ],,,[#include <sys/prctl.h>])
+@@ -158,7 +160,6 @@ AC_CHECK_FUNCS_ONCE([ \
+ AC_CHECK_FUNCS(mkdtemp,[],AC_MSG_ERROR(mkdtemp() not found!))
+ 
+ AC_CHECK_MEMBERS([struct fanotify_event_info_fid.fsid.__val],,,[#include <sys/fanotify.h>])
+-AC_CHECK_MEMBERS([struct landlock_ruleset_attr.handled_access_net],,,[#include <linux/landlock.h>])
+ AC_CHECK_MEMBERS([struct perf_event_mmap_page.aux_head],,,[#include <linux/perf_event.h>])
+ AC_CHECK_MEMBERS([struct sigaction.sa_sigaction],[],[],[#include <signal.h>])
+ AC_CHECK_MEMBERS([struct statx.stx_mnt_id, struct statx.stx_dio_mem_align],,,[
+@@ -172,7 +173,6 @@ AC_CHECK_MEMBERS([struct utsname.domainname],,,[
+ ])
+ 
+ AC_CHECK_TYPES([enum kcmp_type],,,[#include <linux/kcmp.h>])
+-AC_CHECK_TYPES([enum landlock_rule_type],,,[#include <linux/landlock.h>])
+ AC_CHECK_TYPES([struct acct_v3],,,[#include <sys/acct.h>])
+ AC_CHECK_TYPES([struct af_alg_iv, struct sockaddr_alg],,,[# include <linux/if_alg.h>])
+ AC_CHECK_TYPES([struct fanotify_event_info_fid, struct fanotify_event_info_error,
+@@ -194,7 +194,6 @@ AC_CHECK_TYPES([struct if_nextdqblk],,,[#include <linux/quota.h>])
+ AC_CHECK_TYPES([struct iovec],,,[#include <sys/uio.h>])
+ AC_CHECK_TYPES([struct ipc64_perm],,,[#include <sys/ipcbuf.h>])
+ AC_CHECK_TYPES([struct loop_config],,,[#include <linux/loop.h>])
+-AC_CHECK_TYPES([struct landlock_ruleset_attr],,,[#include <linux/landlock.h>])
+ AC_CHECK_TYPES([struct landlock_path_beneath_attr],,,[#include <linux/landlock.h>])
+ AC_CHECK_TYPES([struct landlock_net_port_attr],,,[#include <linux/landlock.h>])
+ 
+diff --git a/include/lapi/capability.h b/include/lapi/capability.h
+index 0f317d6d7..14d2d3c12 100644
+--- a/include/lapi/capability.h
++++ b/include/lapi/capability.h
+@@ -20,6 +20,10 @@
+ # endif
+ #endif
+ 
++#ifndef CAP_NET_BIND_SERVICE
++# define CAP_NET_BIND_SERVICE 10
++#endif
++
+ #ifndef CAP_NET_RAW
+ # define CAP_NET_RAW          13
+ #endif
+diff --git a/include/lapi/landlock.h b/include/lapi/landlock.h
+index 211d171eb..b3c8c548e 100644
+--- a/include/lapi/landlock.h
++++ b/include/lapi/landlock.h
+@@ -7,6 +7,7 @@
+ #define LAPI_LANDLOCK_H__
+ 
+ #include "config.h"
++#include <stdint.h>
+ 
+ #ifdef HAVE_LINUX_LANDLOCK_H
+ # include <linux/landlock.h>
+@@ -14,13 +15,16 @@
+ 
+ #include "lapi/syscalls.h"
+ 
+-#ifndef HAVE_STRUCT_LANDLOCK_RULESET_ATTR
+-struct landlock_ruleset_attr
++struct tst_landlock_ruleset_attr_abi1
++{
++	uint64_t handled_access_fs;
++};
++
++struct tst_landlock_ruleset_attr_abi4
+ {
+ 	uint64_t handled_access_fs;
+ 	uint64_t handled_access_net;
+ };
+-#endif
+ 
+ #ifndef HAVE_STRUCT_LANDLOCK_PATH_BENEATH_ATTR
+ struct landlock_path_beneath_attr
+@@ -30,12 +34,12 @@ struct landlock_path_beneath_attr
+ } __attribute__((packed));
+ #endif
+ 
+-#ifndef HAVE_ENUM_LANDLOCK_RULE_TYPE
+-enum landlock_rule_type
+-{
+-	LANDLOCK_RULE_PATH_BENEATH = 1,
+-	LANDLOCK_RULE_NET_PORT,
+-};
++#if !HAVE_DECL_LANDLOCK_RULE_PATH_BENEATH
++# define LANDLOCK_RULE_PATH_BENEATH 1
++#endif
++
++#if !HAVE_DECL_LANDLOCK_RULE_NET_PORT
++# define LANDLOCK_RULE_NET_PORT 2
+ #endif
+ 
+ #ifndef HAVE_STRUCT_LANDLOCK_NET_PORT_ATTR
+@@ -123,8 +127,7 @@ struct landlock_net_port_attr
+ #endif
+ 
+ static inline int safe_landlock_create_ruleset(const char *file, const int lineno,
+-	const struct landlock_ruleset_attr *attr,
+-	size_t size , uint32_t flags)
++	const void *attr, size_t size , uint32_t flags)
+ {
+ 	int rval;
+ 
+@@ -143,8 +146,7 @@ static inline int safe_landlock_create_ruleset(const char *file, const int linen
+ }
+ 
+ static inline int safe_landlock_add_rule(const char *file, const int lineno,
+-	int ruleset_fd, enum landlock_rule_type rule_type,
+-	const void *rule_attr, uint32_t flags)
++	int ruleset_fd, int rule_type, const void *rule_attr, uint32_t flags)
+ {
+ 	int rval;
+ 
+diff --git a/testcases/kernel/syscalls/landlock/landlock01.c b/testcases/kernel/syscalls/landlock/landlock01.c
+index 083685c64..d0d68c8e4 100644
+--- a/testcases/kernel/syscalls/landlock/landlock01.c
++++ b/testcases/kernel/syscalls/landlock/landlock01.c
+@@ -17,14 +17,14 @@
+ 
+ #include "landlock_common.h"
+ 
+-static struct landlock_ruleset_attr *ruleset_attr;
+-static struct landlock_ruleset_attr *null_attr;
++static struct tst_landlock_ruleset_attr_abi1 *ruleset_attr;
++static struct tst_landlock_ruleset_attr_abi1 *null_attr;
+ static size_t rule_size;
+ static size_t rule_small_size;
+ static size_t rule_big_size;
+ 
+ static struct tcase {
+-	struct landlock_ruleset_attr **attr;
++	struct tst_landlock_ruleset_attr_abi1 **attr;
+ 	uint64_t access_fs;
+ 	size_t *size;
+ 	uint32_t flags;
+@@ -60,13 +60,8 @@ static void setup(void)
+ {
+ 	verify_landlock_is_enabled();
+ 
+-	rule_size = sizeof(struct landlock_ruleset_attr);
+-
+-#ifdef HAVE_STRUCT_LANDLOCK_RULESET_ATTR_HANDLED_ACCESS_NET
+-	rule_small_size = rule_size - sizeof(uint64_t) - 1;
+-#else
++	rule_size = sizeof(struct tst_landlock_ruleset_attr_abi1);
+ 	rule_small_size = rule_size - 1;
+-#endif
+ 
+ 	rule_big_size = SAFE_SYSCONF(_SC_PAGESIZE) + 1;
+ }
+@@ -77,7 +72,7 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.needs_root = 1,
+ 	.bufs = (struct tst_buffers []) {
+-		{&ruleset_attr, .size = sizeof(struct landlock_ruleset_attr)},
++		{&ruleset_attr, .size = sizeof(struct tst_landlock_ruleset_attr_abi1)},
+ 		{},
+ 	},
+ 	.caps = (struct tst_cap []) {
+diff --git a/testcases/kernel/syscalls/landlock/landlock02.c b/testcases/kernel/syscalls/landlock/landlock02.c
+index 1a3df69c9..8566d407f 100644
+--- a/testcases/kernel/syscalls/landlock/landlock02.c
++++ b/testcases/kernel/syscalls/landlock/landlock02.c
+@@ -20,7 +20,7 @@
+ 
+ #include "landlock_common.h"
+ 
+-static struct landlock_ruleset_attr *ruleset_attr;
++static struct tst_landlock_ruleset_attr_abi1 *ruleset_attr;
+ static struct landlock_path_beneath_attr *path_beneath_attr;
+ static struct landlock_path_beneath_attr *rule_null;
+ static int ruleset_fd;
+@@ -93,7 +93,7 @@ static void run(unsigned int n)
+ 	}
+ 
+ 	TST_EXP_FAIL(tst_syscall(__NR_landlock_add_rule,
+-			*tc->fd, tc->rule_type, *tc->attr, tc->flags),
++		*tc->fd, tc->rule_type, *tc->attr, tc->flags),
+ 		tc->exp_errno,
+ 		"%s",
+ 		tc->msg);
+@@ -106,7 +106,7 @@ static void setup(void)
+ 	ruleset_attr->handled_access_fs = LANDLOCK_ACCESS_FS_EXECUTE;
+ 
+ 	ruleset_fd = TST_EXP_FD_SILENT(tst_syscall(__NR_landlock_create_ruleset,
+-		ruleset_attr, sizeof(struct landlock_ruleset_attr), 0));
++		ruleset_attr, sizeof(struct tst_landlock_ruleset_attr_abi1), 0));
+ }
+ 
+ static void cleanup(void)
+@@ -122,7 +122,7 @@ static struct tst_test test = {
+ 	.cleanup = cleanup,
+ 	.needs_root = 1,
+ 	.bufs = (struct tst_buffers []) {
+-		{&ruleset_attr, .size = sizeof(struct landlock_ruleset_attr)},
++		{&ruleset_attr, .size = sizeof(struct tst_landlock_ruleset_attr_abi1)},
+ 		{&path_beneath_attr, .size = sizeof(struct landlock_path_beneath_attr)},
+ 		{},
+ 	},
+diff --git a/testcases/kernel/syscalls/landlock/landlock03.c b/testcases/kernel/syscalls/landlock/landlock03.c
+index 224482255..150c8cc4e 100644
+--- a/testcases/kernel/syscalls/landlock/landlock03.c
++++ b/testcases/kernel/syscalls/landlock/landlock03.c
+@@ -21,7 +21,7 @@
+ 
+ #define MAX_STACKED_RULESETS 16
+ 
+-static struct landlock_ruleset_attr *ruleset_attr;
++static struct tst_landlock_ruleset_attr_abi1 *ruleset_attr;
+ static int ruleset_fd = -1;
+ static int ruleset_invalid = -1;
+ static int file_fd = -1;
+@@ -89,7 +89,7 @@ static void setup(void)
+ 	ruleset_attr->handled_access_fs = LANDLOCK_ACCESS_FS_EXECUTE;
+ 
+ 	ruleset_fd = TST_EXP_FD_SILENT(tst_syscall(__NR_landlock_create_ruleset,
+-		ruleset_attr, sizeof(struct landlock_ruleset_attr), 0));
++		ruleset_attr, sizeof(struct tst_landlock_ruleset_attr_abi1), 0));
+ 
+ 	file_fd = SAFE_OPEN("junk.bin", O_CREAT, 0777);
+ }
+@@ -112,7 +112,7 @@ static struct tst_test test = {
+ 	.needs_root = 1,
+ 	.forks_child = 1,
+ 	.bufs = (struct tst_buffers []) {
+-		{&ruleset_attr, .size = sizeof(struct landlock_ruleset_attr)},
++		{&ruleset_attr, .size = sizeof(struct tst_landlock_ruleset_attr_abi1)},
+ 		{},
+ 	},
+ 	.caps = (struct tst_cap []) {
+diff --git a/testcases/kernel/syscalls/landlock/landlock04.c b/testcases/kernel/syscalls/landlock/landlock04.c
+index e9dedd450..2485591e2 100644
+--- a/testcases/kernel/syscalls/landlock/landlock04.c
++++ b/testcases/kernel/syscalls/landlock/landlock04.c
+@@ -15,7 +15,7 @@
+ #include "landlock_tester.h"
+ #include "tst_safe_stdio.h"
+ 
+-static struct landlock_ruleset_attr *ruleset_attr;
++static struct tst_landlock_ruleset_attr_abi1 *ruleset_attr;
+ static struct landlock_path_beneath_attr *path_beneath_attr;
+ static int ruleset_fd = -1;
+ 
+@@ -153,7 +153,7 @@ static void setup(void)
+ 	ruleset_attr->handled_access_fs = tester_get_all_fs_rules();
+ 
+ 	ruleset_fd = SAFE_LANDLOCK_CREATE_RULESET(
+-		ruleset_attr, sizeof(struct landlock_ruleset_attr), 0);
++		ruleset_attr, sizeof(struct tst_landlock_ruleset_attr_abi1), 0);
+ 
+ 	/* since our binary is dynamically linked, we need to enable dependences
+ 	 * to be read and executed
+@@ -192,7 +192,7 @@ static struct tst_test test = {
+ 		NULL,
+ 	},
+ 	.bufs = (struct tst_buffers []) {
+-		{&ruleset_attr, .size = sizeof(struct landlock_ruleset_attr)},
++		{&ruleset_attr, .size = sizeof(struct tst_landlock_ruleset_attr_abi1)},
+ 		{&path_beneath_attr, .size = sizeof(struct landlock_path_beneath_attr)},
+ 		{},
+ 	},
+diff --git a/testcases/kernel/syscalls/landlock/landlock05.c b/testcases/kernel/syscalls/landlock/landlock05.c
+index 703f7d81c..3d5048f0a 100644
+--- a/testcases/kernel/syscalls/landlock/landlock05.c
++++ b/testcases/kernel/syscalls/landlock/landlock05.c
+@@ -28,7 +28,7 @@
+ #define FILENAME2 DIR2"/file"
+ #define FILENAME3 DIR3"/file"
+ 
+-static struct landlock_ruleset_attr *ruleset_attr;
++static struct tst_landlock_ruleset_attr_abi1 *ruleset_attr;
+ static struct landlock_path_beneath_attr *path_beneath_attr;
+ 
+ static void run(void)
+@@ -68,15 +68,15 @@ static void setup(void)
+ 		LANDLOCK_ACCESS_FS_REFER;
+ 
+ 	ruleset_fd = SAFE_LANDLOCK_CREATE_RULESET(
+-		ruleset_attr, sizeof(struct landlock_ruleset_attr), 0);
++		ruleset_attr, sizeof(struct tst_landlock_ruleset_attr_abi1), 0);
+ 
+-	apply_landlock_rule(
++	apply_landlock_fs_rule(
+ 		path_beneath_attr,
+ 		ruleset_fd,
+ 		LANDLOCK_ACCESS_FS_REFER,
+ 		DIR1);
+ 
+-	apply_landlock_rule(
++	apply_landlock_fs_rule(
+ 		path_beneath_attr,
+ 		ruleset_fd,
+ 		LANDLOCK_ACCESS_FS_REFER,
+@@ -93,7 +93,7 @@ static struct tst_test test = {
+ 	.needs_root = 1,
+ 	.forks_child = 1,
+ 	.bufs = (struct tst_buffers []) {
+-		{&ruleset_attr, .size = sizeof(struct landlock_ruleset_attr)},
++		{&ruleset_attr, .size = sizeof(struct tst_landlock_ruleset_attr_abi1)},
+ 		{&path_beneath_attr, .size = sizeof(struct landlock_path_beneath_attr)},
+ 		{},
+ 	},
+diff --git a/testcases/kernel/syscalls/landlock/landlock06.c b/testcases/kernel/syscalls/landlock/landlock06.c
+index 1a6e59241..74237d116 100644
+--- a/testcases/kernel/syscalls/landlock/landlock06.c
++++ b/testcases/kernel/syscalls/landlock/landlock06.c
+@@ -18,7 +18,7 @@
+ #define MNTPOINT "sandbox"
+ #define FILENAME MNTPOINT"/fifo"
+ 
+-static struct landlock_ruleset_attr *ruleset_attr;
++static struct tst_landlock_ruleset_attr_abi1 *ruleset_attr;
+ static struct landlock_path_beneath_attr *path_beneath_attr;
+ static int file_fd = -1;
+ static int dev_fd = -1;
+@@ -42,8 +42,6 @@ static void run(void)
+ 
+ static void setup(void)
+ {
+-	int ruleset_fd;
+-
+ 	if (verify_landlock_is_enabled() < 5)
+ 		tst_brk(TCONF, "LANDLOCK_ACCESS_FS_IOCTL_DEV is not supported");
+ 
+@@ -56,17 +54,13 @@ static void setup(void)
+ 
+ 	ruleset_attr->handled_access_fs = LANDLOCK_ACCESS_FS_IOCTL_DEV;
+ 
+-	ruleset_fd = SAFE_LANDLOCK_CREATE_RULESET(
+-		ruleset_attr, sizeof(struct landlock_ruleset_attr), 0);
+-
+-	apply_landlock_layer(
++	apply_landlock_fs_layer(
+ 		ruleset_attr,
++		sizeof(struct tst_landlock_ruleset_attr_abi1),
+ 		path_beneath_attr,
+ 		MNTPOINT,
+ 		LANDLOCK_ACCESS_FS_IOCTL_DEV
+ 	);
+-
+-	SAFE_CLOSE(ruleset_fd);
+ }
+ 
+ static void cleanup(void)
+@@ -85,7 +79,7 @@ static struct tst_test test = {
+ 	.needs_root = 1,
+ 	.forks_child = 1,
+ 	.bufs = (struct tst_buffers []) {
+-		{&ruleset_attr, .size = sizeof(struct landlock_ruleset_attr)},
++		{&ruleset_attr, .size = sizeof(struct tst_landlock_ruleset_attr_abi1)},
+ 		{&path_beneath_attr, .size = sizeof(struct landlock_path_beneath_attr)},
+ 		{},
+ 	},
+diff --git a/testcases/kernel/syscalls/landlock/landlock07.c b/testcases/kernel/syscalls/landlock/landlock07.c
+index 6115ad538..8ee614856 100644
+--- a/testcases/kernel/syscalls/landlock/landlock07.c
++++ b/testcases/kernel/syscalls/landlock/landlock07.c
+@@ -25,7 +25,7 @@
+ #include "lapi/prctl.h"
+ #include "landlock_common.h"
+ 
+-static struct landlock_ruleset_attr *ruleset_attr;
++static struct tst_landlock_ruleset_attr_abi1 *ruleset_attr;
+ static int ruleset_fd;
+ 
+ static pid_t spawn_houdini(void)
+@@ -77,7 +77,7 @@ static void setup(void)
+ 	ruleset_attr->handled_access_fs = LANDLOCK_ACCESS_FS_WRITE_FILE;
+ 	ruleset_fd = SAFE_LANDLOCK_CREATE_RULESET(
+ 		ruleset_attr,
+-		sizeof(struct landlock_ruleset_attr),
++		sizeof(struct tst_landlock_ruleset_attr_abi1),
+ 		0);
+ }
+ 
+@@ -93,7 +93,7 @@ static struct tst_test test = {
+ 	.cleanup = cleanup,
+ 	.forks_child = 1,
+ 	.bufs = (struct tst_buffers []) {
+-		{&ruleset_attr, .size = sizeof(struct landlock_ruleset_attr)},
++		{&ruleset_attr, .size = sizeof(struct tst_landlock_ruleset_attr_abi1)},
+ 		{},
+ 	},
+ 	.caps = (struct tst_cap []) {
+diff --git a/testcases/kernel/syscalls/landlock/landlock_common.h b/testcases/kernel/syscalls/landlock/landlock_common.h
+index da91daeab..f3096f4bf 100644
+--- a/testcases/kernel/syscalls/landlock/landlock_common.h
++++ b/testcases/kernel/syscalls/landlock/landlock_common.h
+@@ -33,7 +33,7 @@ static inline int verify_landlock_is_enabled(void)
+ 	return abi;
+ }
+ 
+-static inline void apply_landlock_rule(
++static inline void apply_landlock_fs_rule(
+ 	struct landlock_path_beneath_attr *path_beneath_attr,
+ 	const int ruleset_fd,
+ 	const int access,
+@@ -57,21 +57,19 @@ static inline void enforce_ruleset(const int ruleset_fd)
+ 	SAFE_LANDLOCK_RESTRICT_SELF(ruleset_fd, 0);
+ }
+ 
+-static inline void apply_landlock_layer(
+-	struct landlock_ruleset_attr *ruleset_attr,
++static inline void apply_landlock_fs_layer(
++	void *ruleset_attr, size_t attr_size,
+ 	struct landlock_path_beneath_attr *path_beneath_attr,
+ 	const char *path,
+ 	const int access)
+ {
+ 	int ruleset_fd;
+ 
+-	ruleset_fd = SAFE_LANDLOCK_CREATE_RULESET(
+-		ruleset_attr, sizeof(struct landlock_ruleset_attr), 0);
++	ruleset_fd = SAFE_LANDLOCK_CREATE_RULESET(ruleset_attr, attr_size, 0);
+ 
+-	apply_landlock_rule(path_beneath_attr, ruleset_fd, access, path);
++	apply_landlock_fs_rule(path_beneath_attr, ruleset_fd, access, path);
+ 	enforce_ruleset(ruleset_fd);
+ 
+ 	SAFE_CLOSE(ruleset_fd);
+ }
+-
+ #endif /* LANDLOCK_COMMON_H__ */
+-- 
+2.47.0
+

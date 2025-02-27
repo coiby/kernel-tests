@@ -32,32 +32,27 @@ def get_test(option):
         return psi_cpu_large
 
 def beakerlog(string):
-    cmd = ''' . /usr/bin/rhts-environment.sh
-            . /usr/share/beakerlib/beakerlib.sh
+    cmd = ''' . /usr/share/beakerlib/beakerlib.sh
             rlLogInfo "%s"  '''%(string)
     os.system(cmd)
 
 def beakereport(name,result):
-    cmd = ''' . /usr/bin/rhts-environment.sh
-            . /usr/share/beakerlib/beakerlib.sh
+    cmd = ''' . /usr/share/beakerlib/beakerlib.sh
             rlReport "%s" "%s" '''%(name,result)
     os.system(cmd)
 
 def beakereportscore(name,result,score):
-    cmd = ''' . /usr/bin/rhts-environment.sh
-            . /usr/share/beakerlib/beakerlib.sh
+    cmd = ''' . /usr/share/beakerlib/beakerlib.sh
             rlReport "%s" "%s" %d '''%(name,result,score)
     os.system(cmd)
 
 def beakersubmitfile(path,name):
-    cmd = ''' . /usr/bin/rhts-environment.sh
-            . /usr/share/beakerlib/beakerlib.sh
+    cmd = ''' . /usr/share/beakerlib/beakerlib.sh
             rlFileSubmit "%s" "%s" '''%(path,name)
     os.system(cmd)
 
 def beakerwatchdog(cmd,timeout):
-    cmd = ''' . /usr/bin/rhts-environment.sh
-            . /usr/share/beakerlib/beakerlib.sh
+    cmd = ''' . /usr/share/beakerlib/beakerlib.sh
             rlWatchdog "%s" %d '''%(cmd,int(timeout))
     return os.system(cmd)
 

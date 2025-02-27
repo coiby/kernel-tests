@@ -1,4 +1,5 @@
 obj-m += stackman.o
+stackman-y := main.o stacklib.o
 CFLAGS=-O0
 
 all:

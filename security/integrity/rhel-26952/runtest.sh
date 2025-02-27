@@ -29,6 +29,8 @@ IMAGE=${IMAGE:-""}
 SANDBOX=${SANDBOX:-"none"}
 cover=${cover:-"false"}
 timer=${timer:-3600}
+verbose=${verbose:-""}
+commit=${commit:-"21339d7b9986698282dce93709157dc36907fbf8"}
 repro=${repro:-"false"}
 syscalls=${syscalls:-'"lsetxattr$security_ima", "geteuid", "getresuid", "getegid", "getgid", "getgroups", "getresgid", "newfstatat"'}
 
@@ -90,8 +92,11 @@ rlJournalStart
         # /usr/bin/ld: read-only segment has dynamic relocations
         rlRun "${pkg_mgr} ${pkg_mgr_rmv_string} glibc-static"
         rlRun "pushd /root"
-        rlRun "git clone https://github.com/google/syzkaller"
+        rlRun "git_retry_clone https://github.com/google/syzkaller" 0,128
         rlRun "pushd syzkaller"
+        syzkaller_root=$(pwd)
+        rlRun "git branch rhel_26952_temp ${commit}"
+        rlRun "git switch rhel_26952_temp"
         rlRun "make"
         soc_ip=$(nmcli | grep -A1 "ip4 default" | grep -v "ip4 default" | awk '{print $2}' | awk -F "/" '{print $1}')
         # create config file:
@@ -103,21 +108,21 @@ rlJournalStart
     rlPhaseEnd
     rlPhaseStartTest
         start_time=$(date +%s)
-        rlWatchdog "/root/syzkaller/bin/syz-manager -config /root/syzkaller/syzkaller-test.cfg" "${timer}"
+        rlWatchdog "${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller-test.cfg" "${timer}"
         end_time=$(date +%s)
         duration=$((${end_time}-${start_time}))
                 rlLog "Test duration was ${duration} seconds."
         if [ "${duration}" -lt "${timer}" ]; then
             rlFail "Command ended before timer expired."
         fi
-        if [ "$(ls -l "${local_dir}"/syz-manager-logs/crashes)" != "total 0" ]; then
+        if [ -d "${local_dir}/syz-manager-logs/crashes" ] && [ "$(ls -l "${local_dir}/syz-manager-logs/crashes")" != "total 0" ]; then
             rlFail "Crash results found."
         else
             rlPass "No crash results found."
         fi
         # Additional verification that all syscalls were executed.
         rlRun "mkdir ${local_dir}/corpus_dir"
-        rlRun "/root/syzkaller/bin/syz-db unpack ${local_dir}/syz-manager-logs/corpus.db ${local_dir}/corpus_dir"
+        rlRun "${syzkaller_root}/bin/syz-db unpack ${local_dir}/syz-manager-logs/corpus.db ${local_dir}/corpus_dir"
         for call in ${syscalls}; do
             syscall=$(echo "${call//\"}" | sed -e 's/,//')
             if grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/* ; then

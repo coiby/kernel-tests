@@ -1,0 +1,312 @@
+From 257394e4e356f5e9aad37715370a0fc5e3dc20bf Mon Sep 17 00:00:00 2001
+From: Andrea Cervesato <andrea.cervesato@suse.com>
+Date: Tue, 1 Oct 2024 10:18:06 +0200
+Subject: [PATCH] Filter mkfs version in tst_fs
+
+Introduce mkfs_ver attribute in the tst_fs declaration, in order to
+filter specific mkfs.* tools versions.
+
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Signed-off-by: Andrea Cervesato <andrea.cervesato@suse.com>
+---
+ include/tst_private.h         |   6 +-
+ include/tst_test.h            |   4 ++
+ lib/tst_cmd.c                 | 131 +++++++++++++++-------------------
+ lib/tst_test.c                |  11 ++-
+ testcases/lib/tst_run_shell.c |   5 ++
+ 5 files changed, 79 insertions(+), 78 deletions(-)
+
+diff --git a/include/tst_private.h b/include/tst_private.h
+index 6f4f39b15..4c6479f4b 100644
+--- a/include/tst_private.h
++++ b/include/tst_private.h
+@@ -40,11 +40,11 @@ char tst_kconfig_get(const char *confname);
+ 
+ /*
+  * If cmd argument is a single command, this function just checks command
+- * whether exists. If not, case skips.
++ * whether exists. If not, case breaks if brk_nosupp is defined.
+  * If cmd argument is a complex string ie 'mkfs.ext4 >= 1.43.0', this
+  * function checks command version whether meets this requirement.
+- * If not, case skips.
++ * If not, case breaks if brk_nosupp is defined.
+  */
+-void tst_check_cmd(const char *cmd);
++int tst_check_cmd(const char *cmd, const int brk_nosupp);
+ 
+ #endif
+diff --git a/include/tst_test.h b/include/tst_test.h
+index d0fa84a71..38d24f48c 100644
+--- a/include/tst_test.h
++++ b/include/tst_test.h
+@@ -262,6 +262,9 @@ struct tst_ulimit_val {
+  *                 passed to mkfs after the device path and can be used to
+  *                 limit the file system not to use the whole block device.
+  *
++ * @mkfs_ver: mkfs tool version. The string format supports relational
++ *            operators such as < > <= >= ==.
++ *
+  * @mnt_flags: MS_* flags passed to mount(2) when the test library mounts a
+  *             device in the case of 'tst_test.mount_device'.
+  *
+@@ -273,6 +276,7 @@ struct tst_fs {
+ 
+ 	const char *const *mkfs_opts;
+ 	const char *mkfs_size_opt;
++	const char *mkfs_ver;
+ 
+ 	unsigned int mnt_flags;
+ 	const void *mnt_data;
+diff --git a/lib/tst_cmd.c b/lib/tst_cmd.c
+index b3f8a95ab..82d60497a 100644
+--- a/lib/tst_cmd.c
++++ b/lib/tst_cmd.c
+@@ -34,16 +34,6 @@
+ #define OPEN_MODE	(S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
+ #define OPEN_FLAGS	(O_WRONLY | O_APPEND | O_CREAT)
+ 
+-enum cmd_op {
+-	OP_GE, /* >= */
+-	OP_GT, /* >  */
+-	OP_LE, /* <= */
+-	OP_LT, /* <  */
+-	OP_EQ, /* == */
+-	OP_NE, /* != */
+-};
+-
+-
+ int tst_cmd_fds_(void (cleanup_fn)(void),
+ 		const char *const argv[],
+ 		int stdout_fd,
+@@ -210,7 +200,7 @@ static int mkfs_ext4_version_parser(void)
+ 	return major * 10000 +  minor * 100 + patch;
+ }
+ 
+-static int mkfs_ext4_version_table_get(char *version)
++static int mkfs_generic_version_table_get(char *version)
+ {
+ 	int major, minor, patch;
+ 	int len;
+@@ -228,23 +218,44 @@ static int mkfs_ext4_version_table_get(char *version)
+ 	return major * 10000 + minor * 100 + patch;
+ }
+ 
++static int mkfs_xfs_version_parser(void)
++{
++	FILE *f;
++	int rc, major, minor, patch;
++
++	f = popen("mkfs.xfs -V 2>&1", "r");
++	if (!f) {
++		tst_resm(TWARN, "Could not run mkfs.xfs -V 2>&1 cmd");
++		return -1;
++	}
++
++	rc = fscanf(f, "mkfs.xfs version %d.%d.%d", &major, &minor, &patch);
++	pclose(f);
++	if (rc != 3) {
++		tst_resm(TWARN, "Unable to parse mkfs.xfs version");
++		return -1;
++	}
++
++	return major * 10000 +  minor * 100 + patch;
++}
++
+ static struct version_parser {
+ 	const char *cmd;
+ 	int (*parser)(void);
+ 	int (*table_get)(char *version);
+ } version_parsers[] = {
+-	{"mkfs.ext4", mkfs_ext4_version_parser, mkfs_ext4_version_table_get},
++	{"mkfs.ext4", mkfs_ext4_version_parser, mkfs_generic_version_table_get},
++	{"mkfs.xfs", mkfs_xfs_version_parser, mkfs_generic_version_table_get},
+ 	{},
+ };
+ 
+-void tst_check_cmd(const char *cmd)
++int tst_check_cmd(const char *cmd, const int brk_nosupp)
+ {
+ 	struct version_parser *p;
+ 	char *cmd_token, *op_token, *version_token, *next, *str;
+ 	char path[PATH_MAX];
+ 	char parser_cmd[100];
+ 	int ver_parser, ver_get;
+-	int op_flag = 0;
+ 
+ 	strcpy(parser_cmd, cmd);
+ 
+@@ -257,22 +268,7 @@ void tst_check_cmd(const char *cmd)
+ 		tst_brkm(TCONF, NULL, "Couldn't find '%s' in $PATH", cmd_token);
+ 
+ 	if (!op_token)
+-		return;
+-
+-	if (!strcmp(op_token, ">="))
+-		op_flag = OP_GE;
+-	else if (!strcmp(op_token, ">"))
+-		op_flag = OP_GT;
+-	else if (!strcmp(op_token, "<="))
+-		op_flag = OP_LE;
+-	else if (!strcmp(op_token, "<"))
+-		op_flag = OP_LT;
+-	else if (!strcmp(op_token, "=="))
+-		op_flag = OP_EQ;
+-	else if (!strcmp(op_token, "!="))
+-		op_flag = OP_NE;
+-	else
+-		tst_brkm(TCONF, NULL, "Invalid op(%s)", op_token);
++		return 0;
+ 
+ 	if (!version_token || str) {
+ 		tst_brkm(TCONF, NULL,
+@@ -300,48 +296,37 @@ void tst_check_cmd(const char *cmd)
+ 	if (ver_get < 0)
+ 		tst_brkm(TBROK, NULL, "Failed to get %s version", p->cmd);
+ 
+-	switch (op_flag) {
+-	case OP_GE:
+-		if (ver_parser < ver_get) {
+-			tst_brkm(TCONF, NULL, "%s required >= %d, but got %d, "
+-				"the version is required in order run the test.",
+-				cmd, ver_get, ver_parser);
+-		}
+-		break;
+-	case OP_GT:
+-		if (ver_parser <= ver_get) {
+-			tst_brkm(TCONF, NULL, "%s required > %d, but got %d, "
+-				"the version is required in order run the test.",
+-				cmd, ver_get, ver_parser);
+-		}
+-		break;
+-	case OP_LE:
+-		if (ver_parser > ver_get) {
+-			tst_brkm(TCONF, NULL, "%s required <= %d, but got %d, "
+-				"the version is required in order run the test.",
+-				cmd, ver_get, ver_parser);
+-		}
+-		break;
+-	case OP_LT:
+-		if (ver_parser >= ver_get) {
+-			tst_brkm(TCONF, NULL, "%s required < %d, but got %d, "
+-				"the version is required in order run the test.",
+-				cmd, ver_get, ver_parser);
+-		}
+-		break;
+-	case OP_EQ:
+-		if (ver_parser != ver_get) {
+-			tst_brkm(TCONF, NULL, "%s required == %d, but got %d, "
+-				"the version is required in order run the test.",
+-				cmd, ver_get, ver_parser);
+-		}
+-		break;
+-	case OP_NE:
+-		if (ver_parser == ver_get) {
+-			tst_brkm(TCONF, NULL, "%s required != %d, but got %d, "
+-				"the version is required in order run the test.",
+-				cmd, ver_get, ver_parser);
+-		}
+-		break;
++	if (!strcmp(op_token, ">=")) {
++		if (ver_parser < ver_get)
++			goto error;
++	} else if (!strcmp(op_token, ">")) {
++		if (ver_parser <= ver_get)
++			goto error;
++	} else if (!strcmp(op_token, "<=")) {
++		if (ver_parser > ver_get)
++			goto error;
++	} else if (!strcmp(op_token, "<")) {
++		if (ver_parser >= ver_get)
++			goto error;
++	} else if (!strcmp(op_token, "==")) {
++		if (ver_parser != ver_get)
++			goto error;
++	} else if (!strcmp(op_token, "!=")) {
++		if (ver_parser == ver_get)
++			goto error;
++	} else {
++		tst_brkm(TCONF, NULL, "Invalid op(%s)", op_token);
+ 	}
++
++	return 0;
++error:
++	if (brk_nosupp) {
++		tst_brkm(TCONF, NULL, "%s requires %s %d, but got %d",
++			cmd, op_token, ver_get, ver_parser);
++	} else {
++		tst_resm(TCONF, "%s requires %s %d, but got %d",
++			cmd, op_token, ver_get, ver_parser);
++	}
++
++	return 1;
+ }
+diff --git a/lib/tst_test.c b/lib/tst_test.c
+index ae3fc4084..9015f28e3 100644
+--- a/lib/tst_test.c
++++ b/lib/tst_test.c
+@@ -1310,7 +1310,7 @@ static void do_setup(int argc, char *argv[])
+ 		int i;
+ 
+ 		for (i = 0; (cmd = tst_test->needs_cmds[i]); ++i)
+-			tst_check_cmd(cmd);
++			tst_check_cmd(cmd, 1);
+ 	}
+ 
+ 	if (tst_test->needs_drivers) {
+@@ -1415,8 +1415,12 @@ static void do_setup(int argc, char *argv[])
+ 
+ 		tdev.fs_type = default_fs_type();
+ 
+-		if (!tst_test->all_filesystems && count_fs_descs() <= 1)
++		if (!tst_test->all_filesystems && count_fs_descs() <= 1) {
++			if (tst_test->filesystems->mkfs_ver)
++				tst_check_cmd(tst_test->filesystems->mkfs_ver, 1);
++
+ 			prepare_device(tst_test->filesystems);
++		}
+ 	}
+ 
+ 	if (tst_test->needs_overlay && !tst_test->mount_device)
+@@ -1805,6 +1809,9 @@ static int run_tcase_on_fs(struct tst_fs *fs, const char *fs_type)
+ 	tst_res(TINFO, "=== Testing on %s ===", fs_type);
+ 	tdev.fs_type = fs_type;
+ 
++	if (fs->mkfs_ver && tst_check_cmd(fs->mkfs_ver, 0))
++		return TCONF;
++
+ 	prepare_device(fs);
+ 
+ 	ret = fork_testrun();
+diff --git a/testcases/lib/tst_run_shell.c b/testcases/lib/tst_run_shell.c
+index 8ed0f21b6..ee029b666 100644
+--- a/testcases/lib/tst_run_shell.c
++++ b/testcases/lib/tst_run_shell.c
+@@ -153,6 +153,7 @@ static const char *const *parse_strarr(ujson_reader *reader, ujson_val *val)
+ enum fs_ids {
+ 	MKFS_OPTS,
+ 	MKFS_SIZE_OPT,
++	MKFS_VER,
+ 	MNT_FLAGS,
+ 	TYPE,
+ };
+@@ -160,6 +161,7 @@ enum fs_ids {
+ static ujson_obj_attr fs_attrs[] = {
+ 	UJSON_OBJ_ATTR_IDX(MKFS_OPTS, "mkfs_opts", UJSON_ARR),
+ 	UJSON_OBJ_ATTR_IDX(MKFS_SIZE_OPT, "mkfs_size_opt", UJSON_STR),
++	UJSON_OBJ_ATTR_IDX(MKFS_VER, "mkfs_ver", UJSON_STR),
+ 	UJSON_OBJ_ATTR_IDX(MNT_FLAGS, "mnt_flags", UJSON_ARR),
+ 	UJSON_OBJ_ATTR_IDX(TYPE, "type", UJSON_STR),
+ };
+@@ -224,6 +226,9 @@ static struct tst_fs *parse_filesystems(ujson_reader *reader, ujson_val *val)
+ 			case MKFS_SIZE_OPT:
+ 				ret[i].mkfs_size_opt = strdup(val->val_str);
+ 			break;
++			case MKFS_VER:
++				ret[i].mkfs_ver = strdup(val->val_str);
++			break;
+ 			case MNT_FLAGS:
+ 				ret[i].mnt_flags = parse_mnt_flags(reader, val);
+ 			break;
+-- 
+2.47.0
+

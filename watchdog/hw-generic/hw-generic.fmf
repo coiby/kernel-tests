@@ -1,18 +1,23 @@
 summary: Generic hardware watchdog test
 description: |
   Confirm that the hardware watchdog (/dev/watchdog) triggers a system reset after writing '\0' to it.
+  Confirm that the hardware watchdog accepts a custom timeout.
   
   Test inputs:
     - /dev/watchdog is accessible
 
   Expected results:
-    - System reboots 30 to 60 seconds after stop feeding the watchdog.
+    - Test case 'Trigger watchdog reboot': System reboots 60 seconds after stop feeding the watchdog.
+    - Test case 'Trigger watchdog reboot with custom timeout': System reboots 30 seconds after stop feeding the watchdog.
     - Log output:
       [   LOG    ] :: Disabling watchdog successfully triggered a reboot!
       [   PASS   ] :: Command 'disable_wdt_test' (Expected 0, got 0)
       [...]
       RESULT: PASS (Trigger watchdog reboot)
-
+      [   LOG    ] :: Disabling watchdog with custom timeout successfully triggered a reboot!
+      [   PASS   ] :: Command 'disable_wdt_test_custom_timeout' (Expected 0, got 0)
+      [...]
+      RESULT: PASS (Trigger watchdog reboot with custom timeout)
   Results location:
       output.txt
 contact: Fendy Tjahjadi <ftjahjad@redhat.com>
@@ -26,5 +31,8 @@ require:
   - type: file
     pattern:
         -  /cki_lib
+adjust:
+    enabled: false
+    when: hw_target == ridesx4 or hw_target == j784s4xevm
 duration: 30m
 id: fb6af978-83eb-46fc-8381-a3f6f3099654

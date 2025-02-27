@@ -1,0 +1,71 @@
+From c354ba291da3e255c135ef78da0c7b8c5556da07 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Fri, 26 Jul 2024 10:44:47 +0800
+Subject: [PATCH] cachestat: remove .min_kver from cachestat tests
+
+Removing the kernel version check (.min_kver) from the cachestat
+tests to allow the test to run on distributions that backport the
+cachestat syscall.
+
+With no support just skip as TCONF:
+  ../../../../include/lapi/mman.h:40: TCONF: syscall(451) __NR_cachestat not supported on your arch
+
+Suggested-by: Stephen Bertram <sbertram@redhat.com>
+Signed-off-by: Li Wang <liwang@redhat.com>
+Acked-by: Andrea Cervesato <andrea.cervesato@suse.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+---
+ testcases/kernel/syscalls/cachestat/cachestat01.c | 1 -
+ testcases/kernel/syscalls/cachestat/cachestat02.c | 1 -
+ testcases/kernel/syscalls/cachestat/cachestat03.c | 1 -
+ testcases/kernel/syscalls/cachestat/cachestat04.c | 1 -
+ 4 files changed, 4 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/cachestat/cachestat01.c b/testcases/kernel/syscalls/cachestat/cachestat01.c
+index f3730d7736e..19ae9655e2d 100644
+--- a/testcases/kernel/syscalls/cachestat/cachestat01.c
++++ b/testcases/kernel/syscalls/cachestat/cachestat01.c
+@@ -90,7 +90,6 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.needs_tmpdir = 1,
+-	.min_kver = "6.5",
+ 	.mount_device = 1,
+ 	.mntpoint = MNTPOINT,
+ 	.all_filesystems = 1,
+diff --git a/testcases/kernel/syscalls/cachestat/cachestat02.c b/testcases/kernel/syscalls/cachestat/cachestat02.c
+index 2bb94f13358..e168de5a53f 100644
+--- a/testcases/kernel/syscalls/cachestat/cachestat02.c
++++ b/testcases/kernel/syscalls/cachestat/cachestat02.c
+@@ -82,7 +82,6 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.needs_tmpdir = 1,
+-	.min_kver = "6.5",
+ 	.bufs = (struct tst_buffers []) {
+ 		{&cs, .size = sizeof(struct cachestat)},
+ 		{&cs_range, .size = sizeof(struct cachestat_range)},
+diff --git a/testcases/kernel/syscalls/cachestat/cachestat03.c b/testcases/kernel/syscalls/cachestat/cachestat03.c
+index 35f6bdfb3ad..139745c3491 100644
+--- a/testcases/kernel/syscalls/cachestat/cachestat03.c
++++ b/testcases/kernel/syscalls/cachestat/cachestat03.c
+@@ -70,7 +70,6 @@ static struct tst_test test = {
+ 	.needs_hugetlbfs = 1,
+ 	.hugepages = {1, TST_NEEDS},
+ 	.tcnt = ARRAY_SIZE(tcases),
+-	.min_kver = "6.5",
+ 	.needs_tmpdir = 1,
+ 	.bufs = (struct tst_buffers []) {
+ 		{&cs, .size = sizeof(struct cachestat)},
+diff --git a/testcases/kernel/syscalls/cachestat/cachestat04.c b/testcases/kernel/syscalls/cachestat/cachestat04.c
+index a389c203c50..a59494451a0 100644
+--- a/testcases/kernel/syscalls/cachestat/cachestat04.c
++++ b/testcases/kernel/syscalls/cachestat/cachestat04.c
+@@ -48,7 +48,6 @@ static void run(void)
+ 
+ static struct tst_test test = {
+ 	.test_all = run,
+-	.min_kver = "6.5",
+ 	.mount_device = 1,
+ 	.mntpoint = MNTPOINT,
+ 	.bufs = (struct tst_buffers []) {

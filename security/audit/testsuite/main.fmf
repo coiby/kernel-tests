@@ -5,7 +5,7 @@ id: c7d1dcde-2da1-476e-8865-21c00be2a618
 component:
   - kernel
 path: /security/audit/testsuite
-test: bash +x runtest.sh
+test: bash ./runtest.sh
 require: [audit, gcc, perl, perl-Test, perl-Test-Harness, perl-File-Which, perl-Time-HiRes, nmap-ncat, psmisc, git, expect, strace, iputils]
 recommend: [perl-tests,glibc.i686,glibc-devel.i686,libgcc.i686]
 framework: beakerlib

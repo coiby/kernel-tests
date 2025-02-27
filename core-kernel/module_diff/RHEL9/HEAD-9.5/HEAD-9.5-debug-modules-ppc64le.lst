@@ -1,4 +1,0 @@
-kprobe_event_gen_test.ko
-synth_event_gen_test.ko
-test_min_heap.ko
-test-string_helpers.ko

@@ -356,14 +356,25 @@ static void userfaultfd_open(uint64_t *features)
 
 	uffdio_api.api = UFFD_API;
 	uffdio_api.features = *features;
-	if (ioctl(uffd, UFFDIO_API, &uffdio_api))
+	printf("features=%lx\n", uffdio_api.features);
+	// 6.10 commit 1723f04caa (Fix userfaultfd_api to return EINVAL as expected)
+	// EINVAL is a valid when the feature is not supported, and the
+	// uffdio_api would be zeroed.
+	if (ioctl(uffd, UFFDIO_API, &uffdio_api) && errno != EINVAL) {
 		err("UFFDIO_API failed.\nPlease make sure to "
 		    "run with either root or ptrace capability.");
+	} else {
+		perror("UFFDIO_API returns EINVAL.\nThere is unsupported feature from kernel");
+		*features = uffdio_api.features;
+		return;
+	}
+
 	if (uffdio_api.api != UFFD_API)
 		err("UFFDIO_API error: %" PRIu64, (uint64_t)uffdio_api.api);
 
 	*features = uffdio_api.features;
 }
+
 
 static inline void munmap_area(void **area)
 {

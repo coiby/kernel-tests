@@ -1,0 +1,24 @@
+diff --git a/sys/linux/sys.txt b/sys/linux/sys.txt
+index a48d38c0b..4da64e29e 100644
+--- a/sys/linux/sys.txt
++++ b/sys/linux/sys.txt
+@@ -544,6 +544,7 @@ waitid(which flags[waitid_which], pid pid, infop ptr[out, siginfo, opt], options
+ waitid$P_PIDFD(which const[P_PIDFD], pidfd fd_pidfd, infop ptr[out, siginfo, opt], options flags[wait_options], ru ptr[out, rusage, opt])
+ wait4(pid pid, status ptr[out, int32, opt], options flags[wait_options], ru ptr[out, rusage, opt])
+ times(buf ptr[out, tms])
++reboot(magic1 int32, magic2 int32, cmd int32, arg ptr[in, void])
+ # Can send signals to all processes (pid=-1).
+ #kill(pid pid, sig signalno)
+ 
+diff --git a/sys/linux/sys.txt.const b/sys/linux/sys.txt.const
+index 9062f1e9f..ad422f460 100644
+--- a/sys/linux/sys.txt.const
++++ b/sys/linux/sys.txt.const
+@@ -776,6 +776,7 @@ __NR_readahead = 213, 386:arm:225, amd64:187, mips64le:5179, ppc64le:191, s390x:
+ __NR_readlink = 85, amd64:89, arm64:riscv64:???, mips64le:5087
+ __NR_readlinkat = 78, 386:305, amd64:267, arm:332, mips64le:5257, ppc64le:296, s390x:298
+ __NR_readv = 145, amd64:19, arm64:riscv64:65, mips64le:5018
++__NR_reboot = arm64:142
+ __NR_remap_file_pages = 234, 386:257, amd64:216, arm:253, mips64le:5210, ppc64le:239, s390x:267
+ __NR_rename = 38, amd64:82, arm64:riscv64:???, mips64le:5080
+ __NR_renameat = 386:302, amd64:264, arm:329, arm64:38, mips64le:5254, ppc64le:293, riscv64:???, s390x:295

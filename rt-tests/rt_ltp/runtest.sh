@@ -10,7 +10,7 @@
 # shellcheck disable=SC1091
 # Source rt common functions
 . ../include/runtest.sh || exit 1
-. ../../distribution/ltp/include/ltp-make.sh || exit 1
+. ../../distribution/ltp/include-ng/include.sh || exit 1
 . ../../cki_lib/libcki.sh || exit 1
 
 set -x

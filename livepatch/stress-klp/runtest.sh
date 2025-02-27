@@ -26,10 +26,6 @@
 TESTS=${TESTS:-}
 GIT_URL=${GIT_URL:-"https://github.com/SUSE/qa_test_klp.git"}
 
-
-knvr=$(uname -r)
-yum install -y kernel-devel-${knvr%.*}
-
 function run_test()
 {
     [ -z "$TESTS" ] && TESTS=$(ls klp_tc_*[0-9].sh)
@@ -57,7 +53,8 @@ rlJournalStart
         for mod in $(lsmod | grep -E "^klp_" | awk '{ print $1; }'); do
             rlRun "rmmod -f $mod"
         done
-        ps ax | tee ps_output.txt
+        rlRun "killall ./hiworkload/src/chimem" 0-255
+        ps -ef --forest | tee ps_output.txt
         rstrnt-report-log -l ps_output.txt
     rlPhaseEnd
 rlJournalPrintText

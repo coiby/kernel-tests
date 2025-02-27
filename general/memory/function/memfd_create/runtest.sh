@@ -33,7 +33,7 @@ gcc t_get_seals.c -o t_get_seals &&
 gcc t_process_state_wait.c -o t_process_state_wait
 if [ $? != 0 ]; then
     rlLog "memfd_create is not supported."
-    report_result Test_Skipped PASS 99
+    rstrnt-report-result Test_Skipped PASS 99
     exit 0
 fi
 

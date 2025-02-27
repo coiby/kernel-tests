@@ -1,0 +1,13 @@
+[General]
+name=accelerators/nvidia-openrm-sanity
+owner=Oliver Gutiérrez <ogutierr@redhat.com>
+description=NVIDIA OpenRM driver sanity tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=
+softDependencies=beakerlib-redhat
+

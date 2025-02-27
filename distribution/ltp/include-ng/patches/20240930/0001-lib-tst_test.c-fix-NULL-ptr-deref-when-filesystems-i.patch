@@ -1,0 +1,33 @@
+From c946f9e48cdf34a52c32f92531a21170307a6955 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Sat, 12 Oct 2024 17:59:47 +0200
+Subject: [PATCH] lib/tst_test.c: fix NULL ptr deref when "filesystems" is not
+ defined
+
+Fixes: 66d09dd631e6 ("lib/tst_test.c: Make use of the run_tcase_on_fs() return value")
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+---
+ lib/tst_test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/tst_test.c b/lib/tst_test.c
+index 8d205a42f..d942a91f1 100644
+--- a/lib/tst_test.c
++++ b/lib/tst_test.c
+@@ -1425,10 +1425,10 @@ static void do_setup(int argc, char *argv[])
+ 		tdev.fs_type = default_fs_type();
+ 
+ 		if (!tst_test->all_filesystems && count_fs_descs() <= 1) {
+-			if (tst_test->filesystems->mkfs_ver)
++			if (tst_test->filesystems && tst_test->filesystems->mkfs_ver)
+ 				tst_check_cmd(tst_test->filesystems->mkfs_ver, 1);
+ 
+-			if (tst_test->filesystems->min_kver)
++			if (tst_test->filesystems && tst_test->filesystems->min_kver)
+ 				check_kver(tst_test->filesystems->min_kver, 1);
+ 
+ 			prepare_device(tst_test->filesystems);
+-- 
+2.47.0
+

@@ -15,7 +15,9 @@
 #  '?' - test will be tweaked
 #  '@' - test will be added-in
 
-LTP_VERSION=${LTP_VERSION:-20240524}
+RHELKT1LITE=${RHELKT1LITE:-RHELKT1LITE}
+CONFIGFILE=${CONFIGFILE:-CONFIGFILE}
+LTP_VERSION=${LTP_VERSION:-20250130}
 SOURCEDIR=$PWD
 DOWNLOAD=${DOWNLOAD:-https://github.com/linux-test-project/ltp}
 
@@ -36,7 +38,7 @@ function rhelkt1lite_preparing()
 
 	[ -d $SOURCEDIR/ltp-full-${LTP_VERSION}/ ] && \
 		pushd $SOURCEDIR/ltp-full-${LTP_VERSION}/runtest/ >/dev/null;
-		cat kernel_misc math fsx ipc syscalls mm sched nptl pty tracing fs > $SOURCEDIR/RHELKT1LITE.${LTP_VERSION}
+		cat kernel_misc math ltp-aiodio.part3 ipc syscalls mm sched nptl pty tracing fs > $SOURCEDIR/$RHELKT1LITE.${LTP_VERSION}
 		popd >/dev/null;
 
 	rm -fr $SOURCEDIR/ltp-full-* $SOURCEDIR/ltp.zip
@@ -47,7 +49,7 @@ function block_issue_kickout()
 	while read tst_case; do
 		read -a cname <<<${tst_case#%}
 		[ -n "${cname[0]}" ] && \
-			sed -i "/^${cname[0]}/d" $SOURCEDIR/RHELKT1LITE.${LTP_VERSION}
+			sed -i "/^${cname[0]}/d" $SOURCEDIR/$RHELKT1LITE.${LTP_VERSION}
 	done
 }
 
@@ -56,7 +58,7 @@ function tweak_issue_hacking()
 	while read tst_case; do
 		read -a cname <<<${tst_case#?}
 		[ -n "${cname[0]}" ] && \
-			sed -i "s/^${cname[0]}\b.*$/${tst_case#?}/" $SOURCEDIR/RHELKT1LITE.${LTP_VERSION}
+			sed -i "s/^${cname[0]}\b.*$/${tst_case#?}/" $SOURCEDIR/$RHELKT1LITE.${LTP_VERSION}
 	done
 }
 
@@ -64,17 +66,17 @@ function aiodio_issue_adding()
 {
 	while read tst_case; do
 		echo ${tst_case#@}
-	done >> $SOURCEDIR/RHELKT1LITE.${LTP_VERSION}
+	done >> $SOURCEDIR/$RHELKT1LITE.${LTP_VERSION}
 }
 
-[ -f $SOURCEDIR/CONFIGFILE ] && {
+[ -f $SOURCEDIR/$CONFIGFILE ] && {
 	rhelkt1lite_preparing
 
-	grep "^%" $SOURCEDIR/CONFIGFILE | block_issue_kickout
+	grep "^%" $SOURCEDIR/$CONFIGFILE | block_issue_kickout
 
-	grep "^?" $SOURCEDIR/CONFIGFILE | tweak_issue_hacking
+	grep "^?" $SOURCEDIR/$CONFIGFILE | tweak_issue_hacking
 
-	grep "^@" $SOURCEDIR/CONFIGFILE | aiodio_issue_adding
+	grep "^@" $SOURCEDIR/$CONFIGFILE | aiodio_issue_adding
 }
 
-[ -f $SOURCEDIR/RHELKT1LITE.${LTP_VERSION} ] && echo "Lucky: RHELKT1LITE.${LTP_VERSION} has been generated!"
+[ -f $SOURCEDIR/$RHELKT1LITE.${LTP_VERSION} ] && echo "Lucky: $RHELKT1LITE.${LTP_VERSION} has been generated!"

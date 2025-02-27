@@ -1,0 +1,19 @@
+summary: sched_setaffinity api test
+description: sched_setaffinity api test
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+    - kernel
+path: /general/scheduler/sched_setaffinity
+test: bash -x ./runtest.sh
+framework: shell
+require:
+    - gcc
+    - libgcc
+    - type: file
+      pattern:
+          - /general/include
+          - /kernel-include
+duration: 15m
+extra-summary: /general/scheduler/sched_setaffinity
+extra-task: /general/scheduler/sched_setaffinity
+id: 0829ad9f-7e2b-4858-95b2-d5893b90b2ce

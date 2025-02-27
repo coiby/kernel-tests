@@ -7,8 +7,8 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=bash ./runtest.sh
 max_time=1h
-dependencies=gcc;libgcc;glibc-devel;rpm-build;psmisc;numactl
-softDependencies=rt-setup;trace-cmd
+dependencies=gcc;libgcc;glibc-devel;psmisc;numactl
+softDependencies=
 repoRequires=general/include;general/scheduler/include

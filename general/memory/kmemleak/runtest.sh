@@ -27,7 +27,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 
@@ -67,11 +66,11 @@ function report_leak()
     rlRun -l "echo scan > ${LEAKFILE}" 0-255
     # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
-        report_result "skip_scan_stopped" SKIP
+        rstrnt-report-result "skip_scan_stopped" SKIP
     fi
 
     sleep 10        # wait a few secs for leak happens
-    rlRun "cat ${LEAKFILE} > ${LEAKREPORT}" 0-255
+    rlRun "cat ${LEAKFILE} | tee ${LEAKREPORT}" 0-255
 
     l1=$(cat "${LEAKREPORT}" | wc -l)
     l2=$(cat "${LEAKREPORT_OLD}" | wc -l)
@@ -87,8 +86,8 @@ function report_leak()
         return;
     fi
 
-    report_result  "$TEST/kmemleak" Warn
-    rhts-submit-log -l "$LEAKREPORT"
+    rstrnt-report-result  "$TEST/kmemleak" WARN
+    rstrnt-report-log -l "$LEAKREPORT"
     cat "${LEAKFILE}" > "${LEAKREPORT_OLD}"
 
     if [ "${LEAKUPLOAD}" != "yes" ]; then
@@ -107,7 +106,7 @@ function report_leak()
 
     /usr/bin/expect <<EOF
 set timeout -1
-spawn scp ${LEAKREPORT} kgqe@vmcore.usersys.redhat.com:/data/kgqe/kmemleak/$leakname
+spawn scp ${LEAKREPORT} ${KG_SERVER_USER}@vmcore.usersys.redhat.com:/data/kgqe/kmemleak/$leakname
 expect {
 "*yes/no" { send "yes\r"; exp_continue }
 "*password:" { send "redhat\r"; exp_continue }
@@ -157,7 +156,7 @@ function install_debugkernel()
     rlPhaseEnd
 
     echo 1 > /mnt/DK_INSTALL
-    rhts-reboot
+    rstrnt-reboot
 }
 
 function install_upstream()
@@ -183,14 +182,14 @@ function install_upstream()
     make run
     pushd ./kernel
     gitinfo=$(git describe)
-    report_result  "$TEST/$gitinfo" Pass
+    rstrnt-report-result  "$TEST/$gitinfo" PASS
     popd
     popd
     echo "$gitinfo" > ./gitinfo
     rlPhaseEnd
 
     echo 1 > /mnt/DK_INSTALL
-    rhts-reboot
+    rstrnt-reboot
 }
 
 
@@ -227,7 +226,7 @@ function install_kernelurl()
     rlPhaseEnd
 
     echo 1 > /mnt/DK_INSTALL
-    rhts-reboot
+    rstrnt-reboot
 }
 
 function install_brew_or_other()
@@ -245,20 +244,19 @@ function install_brew_or_other()
     else
         # for brew build
         echo 1 > /mnt/DK_INSTALL
-        rhts-reboot
+        rstrnt-reboot
     fi
 }
 
 function hack_reboot()
 {
-    if grep -q kmemleakreport /usr/bin/rhts-reboot; then
-        rlRun "echo rhts-reboot has already been hacked"
+    if grep -q kmemleakreport /usr/bin/rstrnt-reboot; then
+        rlRun "echo rstrnt-reboot has already been hacked"
         return 0;
     fi
 
     cat > /usr/bin/kmemleakreport.sh <<EOF
 if test -f "${LEAKFILE}" && test -f "${LEAKREPORT}" && test -f "${LEAKREPORT_OLD}"; then
-    . /usr/bin/rhts-environment.sh
     echo scan > ${LEAKFILE}
     cat ${LEAKFILE} > ${LEAKREPORT}
     l1=\$(cat ${LEAKREPORT} | wc -l)
@@ -266,15 +264,15 @@ if test -f "${LEAKFILE}" && test -f "${LEAKREPORT}" && test -f "${LEAKREPORT_OLD
     if [ "\${l1}" == "\${l2}" ]; then
         exit 0
     fi
-    report_result  $TEST/kmemleak.before_reboot Warn
-    rhts-submit-log -l $LEAKREPORT
+    rstrnt-report-result  $TEST/kmemleak.before_reboot WARN
+    rstrnt-report-log -l $LEAKREPORT
     cat /dev/null > ${LEAKREPORT_OLD}
 fi
 EOF
     rlRun "chmod +x /usr/bin/kmemleakreport.sh"
 
-    rlRun "echo hookup kmemleak report with rhts-reboot"
-    sed -i "/shutdown -r/ikmemleakreport.sh" /usr/bin/rhts-reboot
+    rlRun "echo hookup kmemleak report with rstrnt-reboot"
+    sed -i "/shutdown -r/ikmemleakreport.sh" /usr/bin/rstrnt-reboot
 }
 
 

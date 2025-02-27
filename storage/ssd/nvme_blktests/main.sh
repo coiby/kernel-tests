@@ -299,7 +299,7 @@ function runtest() {
 		testcases+=" loop/007"
 		testcases+=" loop/008"
 		testcases+=" loop/009"
-		testcases+=" loop/010"
+		#testcases+=" loop/010"  RHEL-56242
 		testcases+=" loop/011"
 		testcases+=" zbd/001"
 		testcases+=" zbd/002"

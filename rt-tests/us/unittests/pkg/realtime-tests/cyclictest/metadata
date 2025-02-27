@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=python3 test.py
 repoRequires=rt-tests/us/unittests/framework
-softDependencies=rt-tests;realtime-tests
+softDependencies=rt-tests;realtime-tests;rpmdevtools
 max_time=10m

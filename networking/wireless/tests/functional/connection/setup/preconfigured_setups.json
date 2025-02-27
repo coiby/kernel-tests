@@ -5,9 +5,9 @@
         "eap": "tls",
         "identity": "Bill Smith",
         "private_key_password": "12345testing",
-        "ca_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem",
-        "client_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/client.pem",
-        "private_key_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/client.pem"
+        "ca_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/ca.pem",
+        "client_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/client.pem",
+        "private_key_url": "http://tools.lab.eng.brq2.redhat.com:8080/client.pem"
     },
     "dynamic_wep_ttls": {
         "ssid": "qe-wep-enterprise",
@@ -16,7 +16,7 @@
         "identity": "Bill Smith",
         "password": "testing123",
         "phase2_autheap": "mschapv2",
-        "ca_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem"
+        "ca_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/ca.pem"
     },
     "hidden_wpa2_passphrase": {
         "ssid": "qe-hidden-wpa2-psk",
@@ -44,7 +44,7 @@
         "identity": "Bill Smith",
         "password": "testing123",
         "phase2_autheap": "mschapv2",
-        "ca_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem"
+        "ca_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/ca.pem"
     },
     "wpa1_tls": {
         "ssid": "qe-wpa1-enterprise",
@@ -52,9 +52,9 @@
         "eap": "tls",
         "identity": "Bill Smith",
         "private_key_password": "12345testing",
-        "ca_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem",
-        "client_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/client.pem",
-        "private_key_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/client.pem"
+        "ca_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/ca.pem",
+        "client_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/client.pem",
+        "private_key_url": "http://tools.lab.eng.brq2.redhat.com:8080/client.pem"
     },
     "wpa1_ttls": {
         "ssid": "qe-wpa1-enterprise",
@@ -63,7 +63,7 @@
         "identity": "Bill Smith",
         "password": "testing123",
         "phase2_autheap": "mschapv2",
-        "ca_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem"
+        "ca_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/ca.pem"
     },
     "wpa2_passphrase": {
         "ssid": "qe-wpa2-psk",
@@ -77,7 +77,7 @@
         "identity": "Bill Smith",
         "password": "testing123",
         "phase2_autheap": "mschapv2",
-        "ca_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem"
+        "ca_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/ca.pem"
     },
     "wpa2_tls": {
         "ssid": "qe-wpa2-enterprise",
@@ -85,9 +85,9 @@
         "eap": "tls",
         "identity": "Bill Smith",
         "private_key_password": "12345testing",
-        "ca_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem",
-        "client_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/client.pem",
-        "private_key_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/client.pem"
+        "ca_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/ca.pem",
+        "client_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/client.pem",
+        "private_key_url": "http://tools.lab.eng.brq2.redhat.com:8080/client.pem"
     },
     "wpa2_ttls": {
         "ssid": "qe-wpa2-enterprise",
@@ -96,7 +96,7 @@
         "identity": "Bill Smith",
         "password": "testing123",
         "phase2_autheap": "mschapv2",
-        "ca_cert_url": "http://hpe-dl380pgen9-02.wlan.rhts.eng.bos.redhat.com/ca.pem"
+        "ca_cert_url": "http://tools.lab.eng.brq2.redhat.com:8080/ca.pem"
     },
     "wep_leap": {
         "ssid": "qe-wep-enterprise-cisco",

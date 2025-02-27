@@ -1,0 +1,28 @@
+summary: 32-bit app on 64-bit host shmget 2GB+ test by J. Marchand
+contact: Jarod Wilson <jwilson@redhat.com>
+enabled: true
+test: chmod +x ./runtest.sh
+path: /memory/shmget
+framework: shell
+recommend:
+  - kernel-devel
+  - glibc-devel
+  - gcc
+  - glibc-devel.i386
+  - glibc-devel.i686
+  - glibc-devel.s390
+  - libgcc.i386
+  - libgcc.i686
+  - libgcc.s390
+  - '@developer-tools'
+duration: 10m
+extra-summary: /kernel/memory/shmget
+extra-task: /kernel/memory/shmget
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION
+

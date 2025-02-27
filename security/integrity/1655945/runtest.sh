@@ -28,9 +28,10 @@ rlJournalStart
         rlShowRunningKernel
         rlRun -l "evmctl --version"
         current_version=$(evmctl --version | awk '{print $NF}')
-        IFS='.' read -r current_major current_minor <<< "$current_version"
+        IFS='.' read -r current_major current_minor current_patch <<< "$current_version"
         current_major=$((current_major))
         current_minor=$((current_minor))
+        current_patch=$((current_patch))
         if (( current_major > 1 )) || { (( current_major == 1 )) && (( current_minor > 4 )); }; then
             rlLog "[SKIP] Skipping test for evmctl versions > 1.4"
             rstrnt-report-result $RSTRNT_TASKNAME SKIP

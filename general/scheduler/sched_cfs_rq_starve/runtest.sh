@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1090
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -29,12 +30,6 @@
 # Enable TMT testing for RHIVOS
 auto_include=../../../automotive/include/rhivos.sh
 [ -f $auto_include ] && . $auto_include
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-
-if ! (($is_rhivos)); then
-	# Include rhts environment
-	. /usr/bin/rhts-environment.sh || exit 1
-fi
 
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../include/runtest.sh || exit 1
@@ -61,7 +56,7 @@ rlJournalStart
 			rlLog "sleeping 30 seconds to wait for processes ready"
 			sleep 30
 			rlLog "sample tasks executing time(pid,sum_runtime)"
-			for i in $(seq 1 5); do
+			for _ in $(seq 1 5); do
 				./show.sh > old
 				rlRun -l "cat old" 0 "old: looping $loop"
 				rlLog "sleeping 120 seconds ..."
@@ -70,7 +65,6 @@ rlJournalStart
 				rlRun -l "cat new" 0 "new: looping $loop"
 				# If got starve, it should be failed.
 				if rlRun "./compare.sh | grep starve" 1-255 "check if any cputests starve for $sec seconds"; then
-					fail=1
 					rlFileSubmit old
 					rlFileSubmit new
 					break

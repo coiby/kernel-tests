@@ -9,4 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 max_time=360m
+dependencies=kpatch
 repoRequires=general/kpatch/include

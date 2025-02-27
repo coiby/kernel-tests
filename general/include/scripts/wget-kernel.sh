@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2166
 
 # This script is from kernel-general.git, started by chuhu@redhat.com. Also
 # ever got updated by liwan@redhat.com with cleanup and let it choose nearest
@@ -241,6 +242,8 @@ init_vars()
     # shellcheck disable=SC2034
     doc_url=${path_prefix}/noarch/kernel-doc-${version}-${release}.noarch.rpm
     # shellcheck disable=SC2034
+    header_url=${path_prefix}/${arch}/kernel-headers-${version}-${release}.${arch}.rpm
+    # shellcheck disable=SC2034
     perf_url="${path_prefix}/$arch/perf-${version}-${release}.$arch.rpm"
 }
 
@@ -366,7 +369,7 @@ function download_rpm()
 }
 
 # ------- start ------------
-TEMP=$(getopt -o vd:aipt -l cki:,brewrepo:,brew:,ckirepo:,srpm,rpm,kabi,perf,fw,install,arch:,debuginfo,debugkernel,internal,int,extra,ext,ktest,curr,running,nvr:,kvm,devel,print,variant:, -n 'example.bash' -- "$@")
+TEMP=$(getopt -o vd:aipt -l cki:,brewrepo:,brew:,ckirepo:,header,srpm,rpm,kabi,perf,fw,install,arch:,debuginfo,debugkernel,internal,int,extra,ext,ktest,curr,running,nvr:,kvm,devel,print,variant:, -n 'example.bash' -- "$@")
 if [ $? != 0 ]; then echo "Terminating..." >&2; exit 1; fi
 eval set -- "$TEMP"
 
@@ -379,6 +382,7 @@ while true ; do
         --kabi)  list_url+=" abi_url";shift;;
         --rpm)   list_url+=" rpm_url";shift 1;;
         --devel) list_url+=" dev_url";shift 1;;
+        --header) list_url+=" header_url";shift 1;;
         --srpm)  list_url+=" src_url";shift 1;;
         --perf)  list_url+=" perf_url";shift 1;;
         --curr|--running)

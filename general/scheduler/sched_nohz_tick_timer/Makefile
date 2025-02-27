@@ -1,7 +1,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of regression
-#	Description: Fix me.
+#   Makefile of sched_nohz_tick_timer
+#	Description: run nohz_full prameter test
 #   Author: Chunyu Hu <chuhu@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,56 +24,14 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TENV=_env
-ifeq ($(PKG_TOP_DIR),)
-	export PKG_TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -e $$p/env.mk -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	export _TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -d $$p/.git -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	-include $(PKG_TOP_DIR)/env.mk
-endif
-include $(TENV)
-ifeq ($(_TOP_DIR),)
-	_TOP_DIR=/mnt/tests/$(TOPLEVEL_NAMESPACE)
-endif
-
-export TESTVERSION=1.0
-
 BUILT_FILES=
 
-FILES=$(TENV) $(METADATA) runtest.sh Makefile PURPOSE tests
-
-.PHONY: all install download clean
-
-run: $(FILES) build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
-		. runtest.sh )
+run: build
+	./runtest.sh
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
 
 clean:
 	rm -fr *~ $(BUILT_FILES)
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Chunyu Hu <chuhu@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     timer affinity when nohz core running cpu hog process" >> $(METADATA)
-	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        1h" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel" >> $(METADATA)
-	@echo "Requires:        gcc glibc glibc-devel wget git sysstat perf trace-cmd tuned numactl-devel" >> $(METADATA)
-	@echo "RhtsRequires:    kernel-kernel-general-scheduler-include" >> $(METADATA)
-	@echo "RhtsRequires:    kernel-kernel-general-include" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	rhts-lint $(METADATA)
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2166,SC2034
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -26,8 +27,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh	  || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 set -o pipefail
@@ -62,7 +61,7 @@ function system_check()
 	fi
 
 	if [ $TESTSKIP -eq 1 ]; then
-		report_result Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
 	fi
 }

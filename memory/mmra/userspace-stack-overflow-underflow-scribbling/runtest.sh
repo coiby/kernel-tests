@@ -21,14 +21,15 @@ rlJournalStart
 
     rlPhaseStartTest
         rlRun "script -O output.log -c \"./stackman underflow 2>&1\"" 0 "Run underflow program (SEGFAULT expected)"
-        rlAssertGrep "Segmentation fault" "output.log"
-        rlAssertGrep "COMMAND_EXIT_CODE=\"139\"" "output.log"
+        grep -q -e "Segmentation fault" -e "Bus error" output.log
+        rlAssert0 "Segmentation fault or bus error" $?
+        grep -q -e "COMMAND_EXIT_CODE=\"139\"" -e "COMMAND_EXIT_CODE=\"135\""  output.log
+        rlAssert0 "Segmentation fault or bus error return values" $?
     rlPhaseEnd
 
     rlPhaseStartTest
         rlRun "script -O output.log -c \"./stackman scribbling 2>&1\"" 0 "Run scribbling program (SEGFAULT expected)"
-        rlAssertGrep "Segmentation fault" "output.log"
-        rlAssertGrep "COMMAND_EXIT_CODE=\"139\"" "output.log"
+        rlAssertGrep "*** stack smashing detected ***" "output.log"
     rlPhaseEnd
 
     rlPhaseStartCleanup

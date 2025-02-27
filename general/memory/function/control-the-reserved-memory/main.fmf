@@ -1,0 +1,32 @@
+summary: Test case for *_reserve_kbytes check
+description: |
+    Summary: 
+    #bz-1127398
+    Allow administrators to control the amount of reserved memory in the kernel
+
+    For overcommit 'guess', we can sum resident set sizes (RSS).
+    On x86_64 this is about 8MB.
+    	
+    #Until now, RHEL6 has not apply this patch
+    For overcommit 'never', we can take the max of their virtual sizes (VSZ)
+    and add the sum of their RSS.
+    On x86_64 this is about 128MB.
+
+contact: Li Wang <liwang@redhat.com>
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1127398
+component:
+  - kernel
+test: ./runtest.sh
+framework: beakerlib
+recommend: []
+duration: 1m
+extra-summary: /kernel/general/memory/function/control-the-reserved-memory
+extra-task: /kernel/general/memory/function/control-the-reserved-memory
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

@@ -4,6 +4,7 @@ contact: Jianhong Yin <jiyin@redhat.com>
 component:
   - kernel
 tag:
+  - KT1-9
   - KernelTier1
 test: bash ./runtest.sh
 framework: shell

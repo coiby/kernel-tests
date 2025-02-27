@@ -28,15 +28,7 @@
 
 # Enable TMT testing for RHIVOS
 . ../../../automotive/include/rhivos.sh
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-
-if ! (($is_rhivos)); then
-    # Include rhts environment
-    . /usr/bin/rhts-environment.sh || exit 1
-fi
-
-. ../../../distribution/ltp/include/runtest.sh		|| exit 1
-. ../../../distribution/ltp/include/ltp-make.sh		|| exit 1
+. ../../../distribution/ltp/include-ng/include.sh	|| exit 1
 
 trap 'trap "" EXIT; TearDown' EXIT
 HPAGE=/proc/sys/vm/nr_hugepages
@@ -57,7 +49,7 @@ function TestBuild()
                 return
         fi
 
-        build-all
+        build_all
 }
 
 SetupHugetlb()
@@ -73,7 +65,11 @@ SetupHugetlb()
     cat /proc/meminfo
     echo "========================="
 
-    cat hugetlb.inc > HUGEPAGE
+    if [ "${TESTVERSION}" -ge 20240930 ]; then
+        cat hugetlb.inc.new > HUGEPAGE
+    else
+        cat hugetlb.inc > HUGEPAGE
+    fi
 
     Hugepagesize=$(echo `grep 'Hugepagesize:' /proc/meminfo | awk '{print $2}'` / 1024 | bc)
     # Calculate nr_hugepages to allocate
@@ -86,7 +82,7 @@ SetupHugetlb()
         MemAlloc=1024
     elif [ "$MemFree" -le "0" ]; then
         echo "[SKIP] No enough memory for testing" | tee -a ${OUTPUTFILE}
-        report_result Test_Skipped PASS 99
+        rstrnt-report-result Test_Skipped PASS 99
         exit 0
     fi
     if [ "${ARCH}" = "s390x" ]; then
@@ -94,7 +90,7 @@ SetupHugetlb()
             MemAlloc=128 # only allocate 128MB on s390x
         else
             echo "the MemFree is too small to test"
-                report_result Test_Skipped PASS 99
+                rstrnt-report-result Test_Skipped PASS 99
                 exit 0
         fi
     fi
@@ -128,14 +124,14 @@ cat /proc/filesystems | grep -q hugetlbfs
 if [ $? -ne 0 ]; then
     # Bug 1143877 - hugetlbfs: disabling because there are no supported hugepage sizes
     echo "hugetlbfs not found in /proc/filesystems, skipping test"
-    report_result Test_Skipped PASS 99
+    rstrnt-report-result Test_Skipped PASS 99
     exit 0
 fi
 
 TestBuild
 SetupHugetlb
 
-report_result "${TEST}/Setup" "${RESULT}"
+rstrnt-report-result "${TEST}/Setup" "${RESULT}"
 
 DisableNTP
 
@@ -155,7 +151,5 @@ EnableNTP
 echo "============================="
 cat /proc/meminfo
 echo "============================="
-
-SubmitLog $DEBUGLOG
 
 exit 0

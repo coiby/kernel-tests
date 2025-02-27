@@ -1,0 +1,2263 @@
+summary: Fuzz sysfs entries related to resource scaling risk assessment.
+description: |
+  Confirm system call fuzz testing is being performed on cpu, regulator, thermal and cpuidle sysfs entries specified in resource scaling risk assessment.
+  The database is checked at the end to ensure each entry was executed at least once.
+  Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
+  Test inputs:
+      A list with the sysfs entries to be fuzzed, and a fuzzer program
+      called syzkaller. Input details:
+      - sysfs entries list from RA documentation.
+      - syzkaller code: https://github.com/google/syzkaller
+      - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
+  Expected results:
+      If the system calls are executed without incident during the test runtime,
+      the following output should be expected:
+        [   LOG    ] :: Test duration was 3602 seconds.
+        [   PASS   ] :: openat$cpu0_cache_index0_level executed.
+        [   PASS   ] :: write$cpu0_cache_index0_level executed.
+        [   PASS   ] :: openat$cpu0_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu0_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu0_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu0_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu0_cache_index0_type executed.
+        [   PASS   ] :: write$cpu0_cache_index0_type executed.
+        [   PASS   ] :: openat$cpu0_cache_index0_uevent executed.
+        [   PASS   ] :: write$cpu0_cache_index0_uevent executed.
+        [   PASS   ] :: openat$cpu0_cache_index1_level executed.
+        [   PASS   ] :: write$cpu0_cache_index1_level executed.
+        [   PASS   ] :: openat$cpu0_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu0_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu0_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu0_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu0_cache_index1_type executed.
+        [   PASS   ] :: write$cpu0_cache_index1_type executed.
+        [   PASS   ] :: openat$cpu0_cache_index1_uevent executed.
+        [   PASS   ] :: write$cpu0_cache_index1_uevent executed.
+        [   PASS   ] :: openat$cpu0_cache_index2_level executed.
+        [   PASS   ] :: write$cpu0_cache_index2_level executed.
+        [   PASS   ] :: openat$cpu0_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu0_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu0_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu0_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu0_cache_index2_type executed.
+        [   PASS   ] :: write$cpu0_cache_index2_type executed.
+        [   PASS   ] :: openat$cpu0_cache_index2_uevent executed.
+        [   PASS   ] :: write$cpu0_cache_index2_uevent executed.
+        [   PASS   ] :: openat$cpu0_cpu_capacity executed.
+        [   PASS   ] :: write$cpu0_cpu_capacity executed.
+        [   PASS   ] :: openat$cpu0_crash_notes executed.
+        [   PASS   ] :: write$cpu0_crash_notes executed.
+        [   PASS   ] :: openat$cpu0_crash_notes_size executed.
+        [   PASS   ] :: write$cpu0_crash_notes_size executed.
+        [   PASS   ] :: openat$cpu0_regs_identification_midr_el1 executed.
+        [   PASS   ] :: write$cpu0_regs_identification_midr_el1 executed.
+        [   PASS   ] :: openat$cpu0_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: write$cpu0_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: openat$cpu0_topology_core_id executed.
+        [   PASS   ] :: write$cpu0_topology_core_id executed.
+        [   PASS   ] :: openat$cpu0_topology_core_siblings executed.
+        [   PASS   ] :: write$cpu0_topology_core_siblings executed.
+        [   PASS   ] :: openat$cpu0_topology_core_siblings_list executed.
+        [   PASS   ] :: write$cpu0_topology_core_siblings_list executed.
+        [   PASS   ] :: openat$cpu0_topology_physical_package_id executed.
+        [   PASS   ] :: write$cpu0_topology_physical_package_id executed.
+        [   PASS   ] :: openat$cpu0_topology_thread_siblings executed.
+        [   PASS   ] :: write$cpu0_topology_thread_siblings executed.
+        [   PASS   ] :: openat$cpu0_topology_thread_siblings_list executed.
+        [   PASS   ] :: write$cpu0_topology_thread_siblings_list executed.
+        [   PASS   ] :: openat$cpu1_cache_index0_level executed.
+        [   PASS   ] :: write$cpu1_cache_index0_level executed.
+        [   PASS   ] :: openat$cpu1_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu1_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu1_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu1_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu1_cache_index0_type executed.
+        [   PASS   ] :: write$cpu1_cache_index0_type executed.
+        [   PASS   ] :: openat$cpu1_cache_index0_uevent executed.
+        [   PASS   ] :: write$cpu1_cache_index0_uevent executed.
+        [   PASS   ] :: openat$cpu1_cache_index1_level executed.
+        [   PASS   ] :: write$cpu1_cache_index1_level executed.
+        [   PASS   ] :: openat$cpu1_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu1_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu1_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu1_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu1_cache_index1_type executed.
+        [   PASS   ] :: write$cpu1_cache_index1_type executed.
+        [   PASS   ] :: openat$cpu1_cache_index1_uevent executed.
+        [   PASS   ] :: write$cpu1_cache_index1_uevent executed.
+        [   PASS   ] :: openat$cpu1_cache_index2_level executed.
+        [   PASS   ] :: write$cpu1_cache_index2_level executed.
+        [   PASS   ] :: openat$cpu1_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu1_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu1_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu1_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu1_cache_index2_type executed.
+        [   PASS   ] :: write$cpu1_cache_index2_type executed.
+        [   PASS   ] :: openat$cpu1_cache_index2_uevent executed.
+        [   PASS   ] :: write$cpu1_cache_index2_uevent executed.
+        [   PASS   ] :: openat$cpu1_cpu_capacity executed.
+        [   PASS   ] :: write$cpu1_cpu_capacity executed.
+        [   PASS   ] :: openat$cpu1_crash_notes executed.
+        [   PASS   ] :: write$cpu1_crash_notes executed.
+        [   PASS   ] :: openat$cpu1_crash_notes_size executed.
+        [   PASS   ] :: write$cpu1_crash_notes_size executed.
+        [   PASS   ] :: openat$cpu1_regs_identification_midr_el1 executed.
+        [   PASS   ] :: write$cpu1_regs_identification_midr_el1 executed.
+        [   PASS   ] :: openat$cpu1_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: write$cpu1_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: openat$cpu1_topology_core_id executed.
+        [   PASS   ] :: write$cpu1_topology_core_id executed.
+        [   PASS   ] :: openat$cpu1_topology_core_siblings executed.
+        [   PASS   ] :: write$cpu1_topology_core_siblings executed.
+        [   PASS   ] :: openat$cpu1_topology_core_siblings_list executed.
+        [   PASS   ] :: write$cpu1_topology_core_siblings_list executed.
+        [   PASS   ] :: openat$cpu1_topology_physical_package_id executed.
+        [   PASS   ] :: write$cpu1_topology_physical_package_id executed.
+        [   PASS   ] :: openat$cpu1_topology_thread_siblings executed.
+        [   PASS   ] :: write$cpu1_topology_thread_siblings executed.
+        [   PASS   ] :: openat$cpu1_topology_thread_siblings_list executed.
+        [   PASS   ] :: write$cpu1_topology_thread_siblings_list executed.
+        [   PASS   ] :: openat$cpu2_cache_index0_level executed.
+        [   PASS   ] :: write$cpu2_cache_index0_level executed.
+        [   PASS   ] :: openat$cpu2_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu2_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu2_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu2_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu2_cache_index0_type executed.
+        [   PASS   ] :: write$cpu2_cache_index0_type executed.
+        [   PASS   ] :: openat$cpu2_cache_index0_uevent executed.
+        [   PASS   ] :: write$cpu2_cache_index0_uevent executed.
+        [   PASS   ] :: openat$cpu2_cache_index1_level executed.
+        [   PASS   ] :: write$cpu2_cache_index1_level executed.
+        [   PASS   ] :: openat$cpu2_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu2_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu2_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu2_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu2_cache_index1_type executed.
+        [   PASS   ] :: write$cpu2_cache_index1_type executed.
+        [   PASS   ] :: openat$cpu2_cache_index1_uevent executed.
+        [   PASS   ] :: write$cpu2_cache_index1_uevent executed.
+        [   PASS   ] :: openat$cpu2_cache_index2_level executed.
+        [   PASS   ] :: write$cpu2_cache_index2_level executed.
+        [   PASS   ] :: openat$cpu2_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu2_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu2_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu2_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu2_cache_index2_type executed.
+        [   PASS   ] :: write$cpu2_cache_index2_type executed.
+        [   PASS   ] :: openat$cpu2_cache_index2_uevent executed.
+        [   PASS   ] :: write$cpu2_cache_index2_uevent executed.
+        [   PASS   ] :: openat$cpu2_cpu_capacity executed.
+        [   PASS   ] :: write$cpu2_cpu_capacity executed.
+        [   PASS   ] :: openat$cpu2_crash_notes executed.
+        [   PASS   ] :: write$cpu2_crash_notes executed.
+        [   PASS   ] :: openat$cpu2_crash_notes_size executed.
+        [   PASS   ] :: write$cpu2_crash_notes_size executed.
+        [   PASS   ] :: openat$cpu2_regs_identification_midr_el1 executed.
+        [   PASS   ] :: write$cpu2_regs_identification_midr_el1 executed.
+        [   PASS   ] :: openat$cpu2_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: write$cpu2_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: openat$cpu2_topology_core_id executed.
+        [   PASS   ] :: write$cpu2_topology_core_id executed.
+        [   PASS   ] :: openat$cpu2_topology_core_siblings executed.
+        [   PASS   ] :: write$cpu2_topology_core_siblings executed.
+        [   PASS   ] :: openat$cpu2_topology_core_siblings_list executed.
+        [   PASS   ] :: write$cpu2_topology_core_siblings_list executed.
+        [   PASS   ] :: openat$cpu2_topology_physical_package_id executed.
+        [   PASS   ] :: write$cpu2_topology_physical_package_id executed.
+        [   PASS   ] :: openat$cpu2_topology_thread_siblings executed.
+        [   PASS   ] :: write$cpu2_topology_thread_siblings executed.
+        [   PASS   ] :: openat$cpu2_topology_thread_siblings_list executed.
+        [   PASS   ] :: write$cpu2_topology_thread_siblings_list executed.
+        [   PASS   ] :: openat$cpu3_cache_index0_level executed.
+        [   PASS   ] :: write$cpu3_cache_index0_level executed.
+        [   PASS   ] :: openat$cpu3_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu3_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu3_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu3_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu3_cache_index0_type executed.
+        [   PASS   ] :: write$cpu3_cache_index0_type executed.
+        [   PASS   ] :: openat$cpu3_cache_index0_uevent executed.
+        [   PASS   ] :: write$cpu3_cache_index0_uevent executed.
+        [   PASS   ] :: openat$cpu3_cache_index1_level executed.
+        [   PASS   ] :: write$cpu3_cache_index1_level executed.
+        [   PASS   ] :: openat$cpu3_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu3_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu3_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu3_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu3_cache_index1_type executed.
+        [   PASS   ] :: write$cpu3_cache_index1_type executed.
+        [   PASS   ] :: openat$cpu3_cache_index1_uevent executed.
+        [   PASS   ] :: write$cpu3_cache_index1_uevent executed.
+        [   PASS   ] :: openat$cpu3_cache_index2_level executed.
+        [   PASS   ] :: write$cpu3_cache_index2_level executed.
+        [   PASS   ] :: openat$cpu3_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu3_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu3_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu3_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu3_cache_index2_type executed.
+        [   PASS   ] :: write$cpu3_cache_index2_type executed.
+        [   PASS   ] :: openat$cpu3_cache_index2_uevent executed.
+        [   PASS   ] :: write$cpu3_cache_index2_uevent executed.
+        [   PASS   ] :: openat$cpu3_cpu_capacity executed.
+        [   PASS   ] :: write$cpu3_cpu_capacity executed.
+        [   PASS   ] :: openat$cpu3_crash_notes executed.
+        [   PASS   ] :: write$cpu3_crash_notes executed.
+        [   PASS   ] :: openat$cpu3_crash_notes_size executed.
+        [   PASS   ] :: write$cpu3_crash_notes_size executed.
+        [   PASS   ] :: openat$cpu3_regs_identification_midr_el1 executed.
+        [   PASS   ] :: write$cpu3_regs_identification_midr_el1 executed.
+        [   PASS   ] :: openat$cpu3_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: write$cpu3_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: openat$cpu3_topology_core_id executed.
+        [   PASS   ] :: write$cpu3_topology_core_id executed.
+        [   PASS   ] :: openat$cpu3_topology_core_siblings executed.
+        [   PASS   ] :: write$cpu3_topology_core_siblings executed.
+        [   PASS   ] :: openat$cpu3_topology_core_siblings_list executed.
+        [   PASS   ] :: write$cpu3_topology_core_siblings_list executed.
+        [   PASS   ] :: openat$cpu3_topology_physical_package_id executed.
+        [   PASS   ] :: write$cpu3_topology_physical_package_id executed.
+        [   PASS   ] :: openat$cpu3_topology_thread_siblings executed.
+        [   PASS   ] :: write$cpu3_topology_thread_siblings executed.
+        [   PASS   ] :: openat$cpu3_topology_thread_siblings_list executed.
+        [   PASS   ] :: write$cpu3_topology_thread_siblings_list executed.
+        [   PASS   ] :: openat$cpu4_cache_index0_level executed.
+        [   PASS   ] :: write$cpu4_cache_index0_level executed.
+        [   PASS   ] :: openat$cpu4_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu4_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu4_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu4_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu4_cache_index0_type executed.
+        [   PASS   ] :: write$cpu4_cache_index0_type executed.
+        [   PASS   ] :: openat$cpu4_cache_index0_uevent executed.
+        [   PASS   ] :: write$cpu4_cache_index0_uevent executed.
+        [   PASS   ] :: openat$cpu4_cache_index1_level executed.
+        [   PASS   ] :: write$cpu4_cache_index1_level executed.
+        [   PASS   ] :: openat$cpu4_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu4_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu4_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu4_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu4_cache_index1_type executed.
+        [   PASS   ] :: write$cpu4_cache_index1_type executed.
+        [   PASS   ] :: openat$cpu4_cache_index1_uevent executed.
+        [   PASS   ] :: write$cpu4_cache_index1_uevent executed.
+        [   PASS   ] :: openat$cpu4_cache_index2_level executed.
+        [   PASS   ] :: write$cpu4_cache_index2_level executed.
+        [   PASS   ] :: openat$cpu4_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu4_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu4_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu4_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu4_cache_index2_type executed.
+        [   PASS   ] :: write$cpu4_cache_index2_type executed.
+        [   PASS   ] :: openat$cpu4_cache_index2_uevent executed.
+        [   PASS   ] :: write$cpu4_cache_index2_uevent executed.
+        [   PASS   ] :: openat$cpu4_cpu_capacity executed.
+        [   PASS   ] :: write$cpu4_cpu_capacity executed.
+        [   PASS   ] :: openat$cpu4_crash_notes executed.
+        [   PASS   ] :: write$cpu4_crash_notes executed.
+        [   PASS   ] :: openat$cpu4_crash_notes_size executed.
+        [   PASS   ] :: write$cpu4_crash_notes_size executed.
+        [   PASS   ] :: openat$cpu4_regs_identification_midr_el1 executed.
+        [   PASS   ] :: write$cpu4_regs_identification_midr_el1 executed.
+        [   PASS   ] :: openat$cpu4_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: write$cpu4_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: openat$cpu4_topology_core_id executed.
+        [   PASS   ] :: write$cpu4_topology_core_id executed.
+        [   PASS   ] :: openat$cpu4_topology_core_siblings executed.
+        [   PASS   ] :: write$cpu4_topology_core_siblings executed.
+        [   PASS   ] :: openat$cpu4_topology_core_siblings_list executed.
+        [   PASS   ] :: write$cpu4_topology_core_siblings_list executed.
+        [   PASS   ] :: openat$cpu4_topology_physical_package_id executed.
+        [   PASS   ] :: write$cpu4_topology_physical_package_id executed.
+        [   PASS   ] :: openat$cpu4_topology_thread_siblings executed.
+        [   PASS   ] :: write$cpu4_topology_thread_siblings executed.
+        [   PASS   ] :: openat$cpu4_topology_thread_siblings_list executed.
+        [   PASS   ] :: write$cpu4_topology_thread_siblings_list executed.
+        [   PASS   ] :: openat$cpu5_cache_index0_level executed.
+        [   PASS   ] :: write$cpu5_cache_index0_level executed.
+        [   PASS   ] :: openat$cpu5_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu5_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu5_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu5_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu5_cache_index0_type executed.
+        [   PASS   ] :: write$cpu5_cache_index0_type executed.
+        [   PASS   ] :: openat$cpu5_cache_index0_uevent executed.
+        [   PASS   ] :: write$cpu5_cache_index0_uevent executed.
+        [   PASS   ] :: openat$cpu5_cache_index1_level executed.
+        [   PASS   ] :: write$cpu5_cache_index1_level executed.
+        [   PASS   ] :: openat$cpu5_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu5_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu5_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu5_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu5_cache_index1_type executed.
+        [   PASS   ] :: write$cpu5_cache_index1_type executed.
+        [   PASS   ] :: openat$cpu5_cache_index1_uevent executed.
+        [   PASS   ] :: write$cpu5_cache_index1_uevent executed.
+        [   PASS   ] :: openat$cpu5_cache_index2_level executed.
+        [   PASS   ] :: write$cpu5_cache_index2_level executed.
+        [   PASS   ] :: openat$cpu5_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu5_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu5_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu5_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu5_cache_index2_type executed.
+        [   PASS   ] :: write$cpu5_cache_index2_type executed.
+        [   PASS   ] :: openat$cpu5_cache_index2_uevent executed.
+        [   PASS   ] :: write$cpu5_cache_index2_uevent executed.
+        [   PASS   ] :: openat$cpu5_cpu_capacity executed.
+        [   PASS   ] :: write$cpu5_cpu_capacity executed.
+        [   PASS   ] :: openat$cpu5_crash_notes executed.
+        [   PASS   ] :: write$cpu5_crash_notes executed.
+        [   PASS   ] :: openat$cpu5_crash_notes_size executed.
+        [   PASS   ] :: write$cpu5_crash_notes_size executed.
+        [   PASS   ] :: openat$cpu5_regs_identification_midr_el1 executed.
+        [   PASS   ] :: write$cpu5_regs_identification_midr_el1 executed.
+        [   PASS   ] :: openat$cpu5_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: write$cpu5_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: openat$cpu5_topology_core_id executed.
+        [   PASS   ] :: write$cpu5_topology_core_id executed.
+        [   PASS   ] :: openat$cpu5_topology_core_siblings executed.
+        [   PASS   ] :: write$cpu5_topology_core_siblings executed.
+        [   PASS   ] :: openat$cpu5_topology_core_siblings_list executed.
+        [   PASS   ] :: write$cpu5_topology_core_siblings_list executed.
+        [   PASS   ] :: openat$cpu5_topology_physical_package_id executed.
+        [   PASS   ] :: write$cpu5_topology_physical_package_id executed.
+        [   PASS   ] :: openat$cpu5_topology_thread_siblings executed.
+        [   PASS   ] :: write$cpu5_topology_thread_siblings executed.
+        [   PASS   ] :: openat$cpu5_topology_thread_siblings_list executed.
+        [   PASS   ] :: write$cpu5_topology_thread_siblings_list executed.
+        [   PASS   ] :: openat$cpu6_cache_index0_level executed.
+        [   PASS   ] :: write$cpu6_cache_index0_level executed.
+        [   PASS   ] :: openat$cpu6_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu6_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu6_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu6_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu6_cache_index0_type executed.
+        [   PASS   ] :: write$cpu6_cache_index0_type executed.
+        [   PASS   ] :: openat$cpu6_cache_index0_uevent executed.
+        [   PASS   ] :: write$cpu6_cache_index0_uevent executed.
+        [   PASS   ] :: openat$cpu6_cache_index1_level executed.
+        [   PASS   ] :: write$cpu6_cache_index1_level executed.
+        [   PASS   ] :: openat$cpu6_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu6_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu6_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu6_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu6_cache_index1_type executed.
+        [   PASS   ] :: write$cpu6_cache_index1_type executed.
+        [   PASS   ] :: openat$cpu6_cache_index1_uevent executed.
+        [   PASS   ] :: write$cpu6_cache_index1_uevent executed.
+        [   PASS   ] :: openat$cpu6_cache_index2_level executed.
+        [   PASS   ] :: write$cpu6_cache_index2_level executed.
+        [   PASS   ] :: openat$cpu6_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu6_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu6_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu6_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu6_cache_index2_type executed.
+        [   PASS   ] :: write$cpu6_cache_index2_type executed.
+        [   PASS   ] :: openat$cpu6_cache_index2_uevent executed.
+        [   PASS   ] :: write$cpu6_cache_index2_uevent executed.
+        [   PASS   ] :: openat$cpu6_cpu_capacity executed.
+        [   PASS   ] :: write$cpu6_cpu_capacity executed.
+        [   PASS   ] :: openat$cpu6_crash_notes executed.
+        [   PASS   ] :: write$cpu6_crash_notes executed.
+        [   PASS   ] :: openat$cpu6_crash_notes_size executed.
+        [   PASS   ] :: write$cpu6_crash_notes_size executed.
+        [   PASS   ] :: openat$cpu6_regs_identification_midr_el1 executed.
+        [   PASS   ] :: write$cpu6_regs_identification_midr_el1 executed.
+        [   PASS   ] :: openat$cpu6_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: write$cpu6_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: openat$cpu6_topology_core_id executed.
+        [   PASS   ] :: write$cpu6_topology_core_id executed.
+        [   PASS   ] :: openat$cpu6_topology_core_siblings executed.
+        [   PASS   ] :: write$cpu6_topology_core_siblings executed.
+        [   PASS   ] :: openat$cpu6_topology_core_siblings_list executed.
+        [   PASS   ] :: write$cpu6_topology_core_siblings_list executed.
+        [   PASS   ] :: openat$cpu6_topology_physical_package_id executed.
+        [   PASS   ] :: write$cpu6_topology_physical_package_id executed.
+        [   PASS   ] :: openat$cpu6_topology_thread_siblings executed.
+        [   PASS   ] :: write$cpu6_topology_thread_siblings executed.
+        [   PASS   ] :: openat$cpu6_topology_thread_siblings_list executed.
+        [   PASS   ] :: write$cpu6_topology_thread_siblings_list executed.
+        [   PASS   ] :: openat$cpu7_cache_index0_level executed.
+        [   PASS   ] :: write$cpu7_cache_index0_level executed.
+        [   PASS   ] :: openat$cpu7_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu7_cache_index0_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu7_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu7_cache_index0_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu7_cache_index0_type executed.
+        [   PASS   ] :: write$cpu7_cache_index0_type executed.
+        [   PASS   ] :: openat$cpu7_cache_index0_uevent executed.
+        [   PASS   ] :: write$cpu7_cache_index0_uevent executed.
+        [   PASS   ] :: openat$cpu7_cache_index1_level executed.
+        [   PASS   ] :: write$cpu7_cache_index1_level executed.
+        [   PASS   ] :: openat$cpu7_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu7_cache_index1_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu7_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu7_cache_index1_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu7_cache_index1_type executed.
+        [   PASS   ] :: write$cpu7_cache_index1_type executed.
+        [   PASS   ] :: openat$cpu7_cache_index1_uevent executed.
+        [   PASS   ] :: write$cpu7_cache_index1_uevent executed.
+        [   PASS   ] :: openat$cpu7_cache_index2_level executed.
+        [   PASS   ] :: write$cpu7_cache_index2_level executed.
+        [   PASS   ] :: openat$cpu7_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: write$cpu7_cache_index2_shared_cpu_list executed.
+        [   PASS   ] :: openat$cpu7_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: write$cpu7_cache_index2_shared_cpu_map executed.
+        [   PASS   ] :: openat$cpu7_cache_index2_type executed.
+        [   PASS   ] :: write$cpu7_cache_index2_type executed.
+        [   PASS   ] :: openat$cpu7_cache_index2_uevent executed.
+        [   PASS   ] :: write$cpu7_cache_index2_uevent executed.
+        [   PASS   ] :: openat$cpu7_cpu_capacity executed.
+        [   PASS   ] :: write$cpu7_cpu_capacity executed.
+        [   PASS   ] :: openat$cpu7_crash_notes executed.
+        [   PASS   ] :: write$cpu7_crash_notes executed.
+        [   PASS   ] :: openat$cpu7_crash_notes_size executed.
+        [   PASS   ] :: write$cpu7_crash_notes_size executed.
+        [   PASS   ] :: openat$cpu7_regs_identification_midr_el1 executed.
+        [   PASS   ] :: write$cpu7_regs_identification_midr_el1 executed.
+        [   PASS   ] :: openat$cpu7_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: write$cpu7_regs_identification_revidr_el1 executed.
+        [   PASS   ] :: openat$cpu7_topology_core_id executed.
+        [   PASS   ] :: write$cpu7_topology_core_id executed.
+        [   PASS   ] :: openat$cpu7_topology_core_siblings executed.
+        [   PASS   ] :: write$cpu7_topology_core_siblings executed.
+        [   PASS   ] :: openat$cpu7_topology_core_siblings_list executed.
+        [   PASS   ] :: write$cpu7_topology_core_siblings_list executed.
+        [   PASS   ] :: openat$cpu7_topology_physical_package_id executed.
+        [   PASS   ] :: write$cpu7_topology_physical_package_id executed.
+        [   PASS   ] :: openat$cpu7_topology_thread_siblings executed.
+        [   PASS   ] :: write$cpu7_topology_thread_siblings executed.
+        [   PASS   ] :: openat$cpu7_topology_thread_siblings_list executed.
+        [   PASS   ] :: write$cpu7_topology_thread_siblings_list executed.
+        [   PASS   ] :: openat$kernel_max executed.
+        [   PASS   ] :: write$kernel_max executed.
+        [   PASS   ] :: openat$offline executed.
+        [   PASS   ] :: write$offline executed.
+        [   PASS   ] :: openat$online executed.
+        [   PASS   ] :: write$online executed.
+        [   PASS   ] :: openat$possible executed.
+        [   PASS   ] :: write$possible executed.
+        [   PASS   ] :: openat$present executed.
+        [   PASS   ] :: write$present executed.
+        [   PASS   ] :: openat$smt_active executed.
+        [   PASS   ] :: write$smt_active executed.
+        [   PASS   ] :: openat$smt_control executed.
+        [   PASS   ] :: write$smt_control executed.
+        [   PASS   ] :: openat$vulnerabilities_gather_data_sampling executed.
+        [   PASS   ] :: write$vulnerabilities_gather_data_sampling executed.
+        [   PASS   ] :: openat$vulnerabilities_itlb_multihit executed.
+        [   PASS   ] :: write$vulnerabilities_itlb_multihit executed.
+        [   PASS   ] :: openat$vulnerabilities_l1tf executed.
+        [   PASS   ] :: write$vulnerabilities_l1tf executed.
+        [   PASS   ] :: openat$vulnerabilities_mds executed.
+        [   PASS   ] :: write$vulnerabilities_mds executed.
+        [   PASS   ] :: openat$vulnerabilities_meltdown executed.
+        [   PASS   ] :: write$vulnerabilities_meltdown executed.
+        [   PASS   ] :: openat$vulnerabilities_mmio_stale_data executed.
+        [   PASS   ] :: write$vulnerabilities_mmio_stale_data executed.
+        [   PASS   ] :: openat$vulnerabilities_reg_file_data_sampling executed.
+        [   PASS   ] :: write$vulnerabilities_reg_file_data_sampling executed.
+        [   PASS   ] :: openat$vulnerabilities_retbleed executed.
+        [   PASS   ] :: write$vulnerabilities_retbleed executed.
+        [   PASS   ] :: openat$vulnerabilities_spec_store_bypass executed.
+        [   PASS   ] :: write$vulnerabilities_spec_store_bypass executed.
+        [   PASS   ] :: openat$vulnerabilities_spectre_v1 executed.
+        [   PASS   ] :: write$vulnerabilities_spectre_v1 executed.
+        [   PASS   ] :: openat$vulnerabilities_spectre_v2 executed.
+        [   PASS   ] :: write$vulnerabilities_spectre_v2 executed.
+        [   PASS   ] :: openat$vulnerabilities_srbds executed.
+        [   PASS   ] :: write$vulnerabilities_srbds executed.
+        [   PASS   ] :: openat$vulnerabilities_tsx_async_abort executed.
+        [   PASS   ] :: write$vulnerabilities_tsx_async_abort executed.
+        [   PASS   ] :: openat$regulator_0_type executed.
+        [   PASS   ] :: write$regulator_0_type executed.
+        [   PASS   ] :: openat$regulator_0_name executed.
+        [   PASS   ] :: write$regulator_0_name executed.
+        [   PASS   ] :: openat$regulator_0_num_users executed.
+        [   PASS   ] :: write$regulator_0_num_users executed.
+        [   PASS   ] :: openat$regulator_0_requested_microamps executed.
+        [   PASS   ] :: write$regulator_0_requested_microamps executed.
+        [   PASS   ] :: openat$regulator_0_suspend_mem_state executed.
+        [   PASS   ] :: write$regulator_0_suspend_mem_state executed.
+        [   PASS   ] :: openat$regulator_0_suspend_disk_state executed.
+        [   PASS   ] :: write$regulator_0_suspend_disk_state executed.
+        [   PASS   ] :: openat$regulator_0_suspend_standby_state executed.
+        [   PASS   ] :: write$regulator_0_suspend_standby_state executed.
+        [   PASS   ] :: openat$regulator_1_type executed.
+        [   PASS   ] :: write$regulator_1_type executed.
+        [   PASS   ] :: openat$regulator_1_microvolts executed.
+        [   PASS   ] :: write$regulator_1_microvolts executed.
+        [   PASS   ] :: openat$regulator_1_name executed.
+        [   PASS   ] :: write$regulator_1_name executed.
+        [   PASS   ] :: openat$regulator_1_num_users executed.
+        [   PASS   ] :: write$regulator_1_num_users executed.
+        [   PASS   ] :: openat$regulator_1_requested_microamps executed.
+        [   PASS   ] :: write$regulator_1_requested_microamps executed.
+        [   PASS   ] :: openat$regulator_1_suspend_mem_state executed.
+        [   PASS   ] :: write$regulator_1_suspend_mem_state executed.
+        [   PASS   ] :: openat$regulator_1_suspend_disk_state executed.
+        [   PASS   ] :: write$regulator_1_suspend_disk_state executed.
+        [   PASS   ] :: openat$regulator_1_suspend_standby_state executed.
+        [   PASS   ] :: write$regulator_1_suspend_standby_state executed.
+        [   PASS   ] :: openat$regulator_2_type executed.
+        [   PASS   ] :: write$regulator_2_type executed.
+        [   PASS   ] :: openat$regulator_2_microvolts executed.
+        [   PASS   ] :: write$regulator_2_microvolts executed.
+        [   PASS   ] :: openat$regulator_2_name executed.
+        [   PASS   ] :: write$regulator_2_name executed.
+        [   PASS   ] :: openat$regulator_2_num_users executed.
+        [   PASS   ] :: write$regulator_2_num_users executed.
+        [   PASS   ] :: openat$regulator_2_requested_microamps executed.
+        [   PASS   ] :: write$regulator_2_requested_microamps executed.
+        [   PASS   ] :: openat$regulator_2_suspend_mem_state executed.
+        [   PASS   ] :: write$regulator_2_suspend_mem_state executed.
+        [   PASS   ] :: openat$regulator_2_suspend_disk_state executed.
+        [   PASS   ] :: write$regulator_2_suspend_disk_state executed.
+        [   PASS   ] :: openat$regulator_2_suspend_standby_state executed.
+        [   PASS   ] :: write$regulator_2_suspend_standby_state executed.
+        [   PASS   ] :: openat$thermal_zone0_type executed.
+        [   PASS   ] :: write$thermal_zone0_type executed.
+        [   PASS   ] :: openat$thermal_zone0_temp executed.
+        [   PASS   ] :: write$thermal_zone0_temp executed.
+        [   PASS   ] :: openat$thermal_zone0_mode executed.
+        [   PASS   ] :: write$thermal_zone0_mode executed.
+        [   PASS   ] :: openat$thermal_zone0_policy executed.
+        [   PASS   ] :: write$thermal_zone0_policy executed.
+        [   PASS   ] :: openat$thermal_zone0_available_policies executed.
+        [   PASS   ] :: write$thermal_zone0_available_policies executed.
+        [   PASS   ] :: openat$thermal_zone0_k_d executed.
+        [   PASS   ] :: write$thermal_zone0_k_d executed.
+        [   PASS   ] :: openat$thermal_zone0_k_i executed.
+        [   PASS   ] :: write$thermal_zone0_k_i executed.
+        [   PASS   ] :: openat$thermal_zone0_k_po executed.
+        [   PASS   ] :: write$thermal_zone0_k_po executed.
+        [   PASS   ] :: openat$thermal_zone0_k_pu executed.
+        [   PASS   ] :: write$thermal_zone0_k_pu executed.
+        [   PASS   ] :: openat$thermal_zone0_integral_cutoff executed.
+        [   PASS   ] :: write$thermal_zone0_integral_cutoff executed.
+        [   PASS   ] :: openat$thermal_zone0_slope executed.
+        [   PASS   ] :: write$thermal_zone0_slope executed.
+        [   PASS   ] :: openat$thermal_zone0_offset executed.
+        [   PASS   ] :: write$thermal_zone0_offset executed.
+        [   PASS   ] :: openat$thermal_zone0_sustainable_power executed.
+        [   PASS   ] :: write$thermal_zone0_sustainable_power executed.
+        [   PASS   ] :: openat$thermal_zone1_type executed.
+        [   PASS   ] :: write$thermal_zone1_type executed.
+        [   PASS   ] :: openat$thermal_zone1_temp executed.
+        [   PASS   ] :: write$thermal_zone1_temp executed.
+        [   PASS   ] :: openat$thermal_zone1_mode executed.
+        [   PASS   ] :: write$thermal_zone1_mode executed.
+        [   PASS   ] :: openat$thermal_zone1_policy executed.
+        [   PASS   ] :: write$thermal_zone1_policy executed.
+        [   PASS   ] :: openat$thermal_zone1_available_policies executed.
+        [   PASS   ] :: write$thermal_zone1_available_policies executed.
+        [   PASS   ] :: openat$thermal_zone1_k_d executed.
+        [   PASS   ] :: write$thermal_zone1_k_d executed.
+        [   PASS   ] :: openat$thermal_zone1_k_i executed.
+        [   PASS   ] :: write$thermal_zone1_k_i executed.
+        [   PASS   ] :: openat$thermal_zone1_k_po executed.
+        [   PASS   ] :: write$thermal_zone1_k_po executed.
+        [   PASS   ] :: openat$thermal_zone1_k_pu executed.
+        [   PASS   ] :: write$thermal_zone1_k_pu executed.
+        [   PASS   ] :: openat$thermal_zone1_integral_cutoff executed.
+        [   PASS   ] :: write$thermal_zone1_integral_cutoff executed.
+        [   PASS   ] :: openat$thermal_zone1_slope executed.
+        [   PASS   ] :: write$thermal_zone1_slope executed.
+        [   PASS   ] :: openat$thermal_zone1_offset executed.
+        [   PASS   ] :: write$thermal_zone1_offset executed.
+        [   PASS   ] :: openat$thermal_zone1_sustainable_power executed.
+        [   PASS   ] :: write$thermal_zone1_sustainable_power executed.
+        [   PASS   ] :: openat$thermal_zone2_type executed.
+        [   PASS   ] :: write$thermal_zone2_type executed.
+        [   PASS   ] :: openat$thermal_zone2_temp executed.
+        [   PASS   ] :: write$thermal_zone2_temp executed.
+        [   PASS   ] :: openat$thermal_zone2_mode executed.
+        [   PASS   ] :: write$thermal_zone2_mode executed.
+        [   PASS   ] :: openat$thermal_zone2_policy executed.
+        [   PASS   ] :: write$thermal_zone2_policy executed.
+        [   PASS   ] :: openat$thermal_zone2_available_policies executed.
+        [   PASS   ] :: write$thermal_zone2_available_policies executed.
+        [   PASS   ] :: openat$thermal_zone2_k_d executed.
+        [   PASS   ] :: write$thermal_zone2_k_d executed.
+        [   PASS   ] :: openat$thermal_zone2_k_i executed.
+        [   PASS   ] :: write$thermal_zone2_k_i executed.
+        [   PASS   ] :: openat$thermal_zone2_k_po executed.
+        [   PASS   ] :: write$thermal_zone2_k_po executed.
+        [   PASS   ] :: openat$thermal_zone2_k_pu executed.
+        [   PASS   ] :: write$thermal_zone2_k_pu executed.
+        [   PASS   ] :: openat$thermal_zone2_integral_cutoff executed.
+        [   PASS   ] :: write$thermal_zone2_integral_cutoff executed.
+        [   PASS   ] :: openat$thermal_zone2_slope executed.
+        [   PASS   ] :: write$thermal_zone2_slope executed.
+        [   PASS   ] :: openat$thermal_zone2_offset executed.
+        [   PASS   ] :: write$thermal_zone2_offset executed.
+        [   PASS   ] :: openat$thermal_zone2_sustainable_power executed.
+        [   PASS   ] :: write$thermal_zone2_sustainable_power executed.
+        [   PASS   ] :: openat$cpufreq_policy0_scaling_min_freq executed.
+        [   PASS   ] :: write$cpufreq_policy0_scaling_min_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy0_scaling_available_governors executed.
+        [   PASS   ] :: write$cpufreq_policy0_scaling_available_governors executed.
+        [   PASS   ] :: openat$cpufreq_policy0_cpuinfo_cur_freq executed.
+        [   PASS   ] :: write$cpufreq_policy0_cpuinfo_cur_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy0_scaling_governor executed.
+        [   PASS   ] :: write$cpufreq_policy0_scaling_governor executed.
+        [   PASS   ] :: openat$cpufreq_policy0_cpuinfo_max_freq executed.
+        [   PASS   ] :: write$cpufreq_policy0_cpuinfo_max_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy0_scaling_available_frequencies executed.
+        [   PASS   ] :: write$cpufreq_policy0_scaling_available_frequencies executed.
+        [   PASS   ] :: openat$cpufreq_policy0_related_cpus executed.
+        [   PASS   ] :: write$cpufreq_policy0_related_cpus executed.
+        [   PASS   ] :: openat$cpufreq_policy0_scaling_cur_freq executed.
+        [   PASS   ] :: write$cpufreq_policy0_scaling_cur_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy0_scaling_setspeed executed.
+        [   PASS   ] :: write$cpufreq_policy0_scaling_setspeed executed.
+        [   PASS   ] :: openat$cpufreq_policy0_stats_reset executed.
+        [   PASS   ] :: write$cpufreq_policy0_stats_reset executed.
+        [   PASS   ] :: openat$cpufreq_policy0_stats_trans_table executed.
+        [   PASS   ] :: write$cpufreq_policy0_stats_trans_table executed.
+        [   PASS   ] :: openat$cpufreq_policy0_stats_total_trans executed.
+        [   PASS   ] :: write$cpufreq_policy0_stats_total_trans executed.
+        [   PASS   ] :: openat$cpufreq_policy0_stats_time_in_state executed.
+        [   PASS   ] :: write$cpufreq_policy0_stats_time_in_state executed.
+        [   PASS   ] :: openat$cpufreq_policy0_affected_cpus executed.
+        [   PASS   ] :: write$cpufreq_policy0_affected_cpus executed.
+        [   PASS   ] :: openat$cpufreq_policy0_scaling_max_freq executed.
+        [   PASS   ] :: write$cpufreq_policy0_scaling_max_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy0_cpuinfo_transition_latency executed.
+        [   PASS   ] :: write$cpufreq_policy0_cpuinfo_transition_latency executed.
+        [   PASS   ] :: openat$cpufreq_policy0_scaling_driver executed.
+        [   PASS   ] :: write$cpufreq_policy0_scaling_driver executed.
+        [   PASS   ] :: openat$cpufreq_policy0_cpuinfo_min_freq executed.
+        [   PASS   ] :: write$cpufreq_policy0_cpuinfo_min_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy4_scaling_min_freq executed.
+        [   PASS   ] :: write$cpufreq_policy4_scaling_min_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy4_scaling_available_governors executed.
+        [   PASS   ] :: write$cpufreq_policy4_scaling_available_governors executed.
+        [   PASS   ] :: openat$cpufreq_policy4_cpuinfo_cur_freq executed.
+        [   PASS   ] :: write$cpufreq_policy4_cpuinfo_cur_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy4_scaling_governor executed.
+        [   PASS   ] :: write$cpufreq_policy4_scaling_governor executed.
+        [   PASS   ] :: openat$cpufreq_policy4_cpuinfo_max_freq executed.
+        [   PASS   ] :: write$cpufreq_policy4_cpuinfo_max_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy4_scaling_available_frequencies executed.
+        [   PASS   ] :: write$cpufreq_policy4_scaling_available_frequencies executed.
+        [   PASS   ] :: openat$cpufreq_policy4_related_cpus executed.
+        [   PASS   ] :: write$cpufreq_policy4_related_cpus executed.
+        [   PASS   ] :: openat$cpufreq_policy4_scaling_cur_freq executed.
+        [   PASS   ] :: write$cpufreq_policy4_scaling_cur_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy4_scaling_setspeed executed.
+        [   PASS   ] :: write$cpufreq_policy4_scaling_setspeed executed.
+        [   PASS   ] :: openat$cpufreq_policy4_stats_reset executed.
+        [   PASS   ] :: write$cpufreq_policy4_stats_reset executed.
+        [   PASS   ] :: openat$cpufreq_policy4_stats_trans_table executed.
+        [   PASS   ] :: write$cpufreq_policy4_stats_trans_table executed.
+        [   PASS   ] :: openat$cpufreq_policy4_stats_total_trans executed.
+        [   PASS   ] :: write$cpufreq_policy4_stats_total_trans executed.
+        [   PASS   ] :: openat$cpufreq_policy4_stats_time_in_state executed.
+        [   PASS   ] :: write$cpufreq_policy4_stats_time_in_state executed.
+        [   PASS   ] :: openat$cpufreq_policy4_affected_cpus executed.
+        [   PASS   ] :: write$cpufreq_policy4_affected_cpus executed.
+        [   PASS   ] :: openat$cpufreq_policy4_scaling_max_freq executed.
+        [   PASS   ] :: write$cpufreq_policy4_scaling_max_freq executed.
+        [   PASS   ] :: openat$cpufreq_policy4_cpuinfo_transition_latency executed.
+        [   PASS   ] :: write$cpufreq_policy4_cpuinfo_transition_latency executed.
+        [   PASS   ] :: openat$cpufreq_policy4_scaling_driver executed.
+        [   PASS   ] :: write$cpufreq_policy4_scaling_driver executed.
+        [   PASS   ] :: openat$cpufreq_policy4_cpuinfo_min_freq executed.
+        [   PASS   ] :: write$cpufreq_policy4_cpuinfo_min_freq executed.
+        [   PASS   ] :: openat$cpuidle_current_governor_ro executed.
+        [   PASS   ] :: write$cpuidle_current_governor_ro executed.
+        [   PASS   ] :: openat$cpuidle_current_driver executed.
+        [   PASS   ] :: write$cpuidle_current_driver executed.
+        [   PASS   ] :: openat$cpuidle_available_governors executed.
+        [   PASS   ] :: write$cpuidle_available_governors executed.
+        [   PASS   ] :: openat$cpuidle_current_governor executed.
+        [   PASS   ] :: write$cpuidle_current_governor executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_disable executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_disable executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_above executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_above executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_time executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_time executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_rejected executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_rejected executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_power executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_power executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_residency executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_residency executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_latency executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_latency executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_usage executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_usage executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_desc executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_desc executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_below executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_below executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_default_status executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_default_status executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_name executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_name executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_driver_name executed.
+        [   PASS   ] :: write$cpu0_cpuidle_driver_name executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_disable executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_disable executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_above executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_above executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_time executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_time executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_rejected executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_rejected executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_power executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_power executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_residency executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_residency executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_latency executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_latency executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_usage executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_usage executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_desc executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_desc executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_below executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_below executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_default_status executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_default_status executed.
+        [   PASS   ] :: openat$cpu0_cpuidle_state0_name executed.
+        [   PASS   ] :: write$cpu0_cpuidle_state0_name executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_disable executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_disable executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_above executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_above executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_time executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_time executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_rejected executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_rejected executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_power executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_power executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_residency executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_residency executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_latency executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_latency executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_usage executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_usage executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_desc executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_desc executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_below executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_below executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_default_status executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_default_status executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_name executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_name executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_driver_name executed.
+        [   PASS   ] :: write$cpu1_cpuidle_driver_name executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_disable executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_disable executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_above executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_above executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_time executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_time executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_rejected executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_rejected executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_power executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_power executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_residency executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_residency executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_latency executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_latency executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_usage executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_usage executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_desc executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_desc executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_below executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_below executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_default_status executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_default_status executed.
+        [   PASS   ] :: openat$cpu1_cpuidle_state0_name executed.
+        [   PASS   ] :: write$cpu1_cpuidle_state0_name executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_disable executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_disable executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_above executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_above executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_time executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_time executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_rejected executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_rejected executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_power executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_power executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_residency executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_residency executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_latency executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_latency executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_usage executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_usage executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_desc executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_desc executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_below executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_below executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_default_status executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_default_status executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_name executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_name executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_driver_name executed.
+        [   PASS   ] :: write$cpu2_cpuidle_driver_name executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_disable executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_disable executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_above executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_above executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_time executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_time executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_rejected executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_rejected executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_power executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_power executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_residency executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_residency executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_latency executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_latency executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_usage executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_usage executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_desc executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_desc executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_below executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_below executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_default_status executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_default_status executed.
+        [   PASS   ] :: openat$cpu2_cpuidle_state0_name executed.
+        [   PASS   ] :: write$cpu2_cpuidle_state0_name executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_disable executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_disable executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_above executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_above executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_time executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_time executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_rejected executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_rejected executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_power executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_power executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_residency executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_residency executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_latency executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_latency executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_usage executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_usage executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_desc executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_desc executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_below executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_below executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_default_status executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_default_status executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_name executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_name executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_driver_name executed.
+        [   PASS   ] :: write$cpu3_cpuidle_driver_name executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_disable executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_disable executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_above executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_above executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_time executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_time executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_rejected executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_rejected executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_power executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_power executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_residency executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_residency executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_latency executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_latency executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_usage executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_usage executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_desc executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_desc executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_below executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_below executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_default_status executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_default_status executed.
+        [   PASS   ] :: openat$cpu3_cpuidle_state0_name executed.
+        [   PASS   ] :: write$cpu3_cpuidle_state0_name executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_disable executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_disable executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_above executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_above executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_time executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_time executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_rejected executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_rejected executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_power executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_power executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_residency executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_residency executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_latency executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_latency executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_usage executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_usage executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_desc executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_desc executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_below executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_below executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_default_status executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_default_status executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_name executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_name executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_driver_name executed.
+        [   PASS   ] :: write$cpu4_cpuidle_driver_name executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_disable executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_disable executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_above executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_above executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_time executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_time executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_rejected executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_rejected executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_power executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_power executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_residency executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_residency executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_latency executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_latency executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_usage executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_usage executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_desc executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_desc executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_below executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_below executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_default_status executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_default_status executed.
+        [   PASS   ] :: openat$cpu4_cpuidle_state0_name executed.
+        [   PASS   ] :: write$cpu4_cpuidle_state0_name executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_disable executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_disable executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_above executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_above executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_time executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_time executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_rejected executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_rejected executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_power executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_power executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_residency executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_residency executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_latency executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_latency executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_usage executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_usage executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_desc executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_desc executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_below executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_below executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_default_status executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_default_status executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_name executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_name executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_driver_name executed.
+        [   PASS   ] :: write$cpu5_cpuidle_driver_name executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_disable executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_disable executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_above executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_above executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_time executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_time executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_rejected executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_rejected executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_power executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_power executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_residency executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_residency executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_latency executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_latency executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_usage executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_usage executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_desc executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_desc executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_below executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_below executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_default_status executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_default_status executed.
+        [   PASS   ] :: openat$cpu5_cpuidle_state0_name executed.
+        [   PASS   ] :: write$cpu5_cpuidle_state0_name executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_disable executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_disable executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_above executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_above executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_time executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_time executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_rejected executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_rejected executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_power executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_power executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_residency executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_residency executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_latency executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_latency executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_usage executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_usage executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_desc executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_desc executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_below executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_below executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_default_status executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_default_status executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_name executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_name executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_driver_name executed.
+        [   PASS   ] :: write$cpu6_cpuidle_driver_name executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_disable executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_disable executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_above executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_above executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_time executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_time executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_rejected executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_rejected executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_power executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_power executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_residency executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_residency executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_latency executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_latency executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_usage executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_usage executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_desc executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_desc executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_below executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_below executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_default_status executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_default_status executed.
+        [   PASS   ] :: openat$cpu6_cpuidle_state0_name executed.
+        [   PASS   ] :: write$cpu6_cpuidle_state0_name executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_disable executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_disable executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_above executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_above executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_time executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_time executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_rejected executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_rejected executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_power executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_power executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_residency executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_residency executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_latency executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_latency executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_usage executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_usage executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_desc executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_desc executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_below executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_below executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_default_status executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_default_status executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_name executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_name executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_s2idle_time executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state1_s2idle_usage executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_driver_name executed.
+        [   PASS   ] :: write$cpu7_cpuidle_driver_name executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_disable executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_disable executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_above executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_above executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_time executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_time executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_rejected executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_rejected executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_power executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_power executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_residency executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_residency executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_latency executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_latency executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_usage executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_usage executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_desc executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_desc executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_below executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_below executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_default_status executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_default_status executed.
+        [   PASS   ] :: openat$cpu7_cpuidle_state0_name executed.
+        [   PASS   ] :: write$cpu7_cpuidle_state0_name executed.
+component:
+  - kernel
+test: bash ./runtest.sh
+path: /memory/mmra/procfs
+framework: beakerlib
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+        - /kernel-include
+        - /misc/resource-scaling-fuzzing
+duration: 2h
+id: e5f27f7c-f987-42b2-bacd-db93ff4ff0a4
+enabled: false  # this test targets Renesas R-Car S4 specific hardware
+adjust:
+    enabled: true
+    when: hw_target == rcar_s4
+environment:
+    timer: 7200
+    git_patch: '../../../../misc/resource-scaling-fuzzing/resource-scaling-fuzzing.patch'
+    syscalls: |
+      "openat$cpu0_cache_index0_level",
+      "write$cpu0_cache_index0_level",
+      "openat$cpu0_cache_index0_shared_cpu_list",
+      "write$cpu0_cache_index0_shared_cpu_list",
+      "openat$cpu0_cache_index0_shared_cpu_map",
+      "write$cpu0_cache_index0_shared_cpu_map",
+      "openat$cpu0_cache_index0_type",
+      "write$cpu0_cache_index0_type",
+      "openat$cpu0_cache_index0_uevent",
+      "write$cpu0_cache_index0_uevent",
+      "openat$cpu0_cache_index1_level",
+      "write$cpu0_cache_index1_level",
+      "openat$cpu0_cache_index1_shared_cpu_list",
+      "write$cpu0_cache_index1_shared_cpu_list",
+      "openat$cpu0_cache_index1_shared_cpu_map",
+      "write$cpu0_cache_index1_shared_cpu_map",
+      "openat$cpu0_cache_index1_type",
+      "write$cpu0_cache_index1_type",
+      "openat$cpu0_cache_index1_uevent",
+      "write$cpu0_cache_index1_uevent",
+      "openat$cpu0_cache_index2_level",
+      "write$cpu0_cache_index2_level",
+      "openat$cpu0_cache_index2_shared_cpu_list",
+      "write$cpu0_cache_index2_shared_cpu_list",
+      "openat$cpu0_cache_index2_shared_cpu_map",
+      "write$cpu0_cache_index2_shared_cpu_map",
+      "openat$cpu0_cache_index2_type",
+      "write$cpu0_cache_index2_type",
+      "openat$cpu0_cache_index2_uevent",
+      "write$cpu0_cache_index2_uevent",
+      "openat$cpu0_cpu_capacity",
+      "write$cpu0_cpu_capacity",
+      "openat$cpu0_crash_notes",
+      "write$cpu0_crash_notes",
+      "openat$cpu0_crash_notes_size",
+      "write$cpu0_crash_notes_size",
+      "openat$cpu0_regs_identification_midr_el1",
+      "write$cpu0_regs_identification_midr_el1",
+      "openat$cpu0_regs_identification_revidr_el1",
+      "write$cpu0_regs_identification_revidr_el1",
+      "openat$cpu0_topology_core_id",
+      "write$cpu0_topology_core_id",
+      "openat$cpu0_topology_core_siblings",
+      "write$cpu0_topology_core_siblings",
+      "openat$cpu0_topology_core_siblings_list",
+      "write$cpu0_topology_core_siblings_list",
+      "openat$cpu0_topology_physical_package_id",
+      "write$cpu0_topology_physical_package_id",
+      "openat$cpu0_topology_thread_siblings",
+      "write$cpu0_topology_thread_siblings",
+      "openat$cpu0_topology_thread_siblings_list",
+      "write$cpu0_topology_thread_siblings_list",
+      "openat$cpu1_cache_index0_level",
+      "write$cpu1_cache_index0_level",
+      "openat$cpu1_cache_index0_shared_cpu_list",
+      "write$cpu1_cache_index0_shared_cpu_list",
+      "openat$cpu1_cache_index0_shared_cpu_map",
+      "write$cpu1_cache_index0_shared_cpu_map",
+      "openat$cpu1_cache_index0_type",
+      "write$cpu1_cache_index0_type",
+      "openat$cpu1_cache_index0_uevent",
+      "write$cpu1_cache_index0_uevent",
+      "openat$cpu1_cache_index1_level",
+      "write$cpu1_cache_index1_level",
+      "openat$cpu1_cache_index1_shared_cpu_list",
+      "write$cpu1_cache_index1_shared_cpu_list",
+      "openat$cpu1_cache_index1_shared_cpu_map",
+      "write$cpu1_cache_index1_shared_cpu_map",
+      "openat$cpu1_cache_index1_type",
+      "write$cpu1_cache_index1_type",
+      "openat$cpu1_cache_index1_uevent",
+      "write$cpu1_cache_index1_uevent",
+      "openat$cpu1_cache_index2_level",
+      "write$cpu1_cache_index2_level",
+      "openat$cpu1_cache_index2_shared_cpu_list",
+      "write$cpu1_cache_index2_shared_cpu_list",
+      "openat$cpu1_cache_index2_shared_cpu_map",
+      "write$cpu1_cache_index2_shared_cpu_map",
+      "openat$cpu1_cache_index2_type",
+      "write$cpu1_cache_index2_type",
+      "openat$cpu1_cache_index2_uevent",
+      "write$cpu1_cache_index2_uevent",
+      "openat$cpu1_cpu_capacity",
+      "write$cpu1_cpu_capacity",
+      "openat$cpu1_crash_notes",
+      "write$cpu1_crash_notes",
+      "openat$cpu1_crash_notes_size",
+      "write$cpu1_crash_notes_size",
+      "openat$cpu1_regs_identification_midr_el1",
+      "write$cpu1_regs_identification_midr_el1",
+      "openat$cpu1_regs_identification_revidr_el1",
+      "write$cpu1_regs_identification_revidr_el1",
+      "openat$cpu1_topology_core_id",
+      "write$cpu1_topology_core_id",
+      "openat$cpu1_topology_core_siblings",
+      "write$cpu1_topology_core_siblings",
+      "openat$cpu1_topology_core_siblings_list",
+      "write$cpu1_topology_core_siblings_list",
+      "openat$cpu1_topology_physical_package_id",
+      "write$cpu1_topology_physical_package_id",
+      "openat$cpu1_topology_thread_siblings",
+      "write$cpu1_topology_thread_siblings",
+      "openat$cpu1_topology_thread_siblings_list",
+      "write$cpu1_topology_thread_siblings_list",
+      "openat$cpu2_cache_index0_level",
+      "write$cpu2_cache_index0_level",
+      "openat$cpu2_cache_index0_shared_cpu_list",
+      "write$cpu2_cache_index0_shared_cpu_list",
+      "openat$cpu2_cache_index0_shared_cpu_map",
+      "write$cpu2_cache_index0_shared_cpu_map",
+      "openat$cpu2_cache_index0_type",
+      "write$cpu2_cache_index0_type",
+      "openat$cpu2_cache_index0_uevent",
+      "write$cpu2_cache_index0_uevent",
+      "openat$cpu2_cache_index1_level",
+      "write$cpu2_cache_index1_level",
+      "openat$cpu2_cache_index1_shared_cpu_list",
+      "write$cpu2_cache_index1_shared_cpu_list",
+      "openat$cpu2_cache_index1_shared_cpu_map",
+      "write$cpu2_cache_index1_shared_cpu_map",
+      "openat$cpu2_cache_index1_type",
+      "write$cpu2_cache_index1_type",
+      "openat$cpu2_cache_index1_uevent",
+      "write$cpu2_cache_index1_uevent",
+      "openat$cpu2_cache_index2_level",
+      "write$cpu2_cache_index2_level",
+      "openat$cpu2_cache_index2_shared_cpu_list",
+      "write$cpu2_cache_index2_shared_cpu_list",
+      "openat$cpu2_cache_index2_shared_cpu_map",
+      "write$cpu2_cache_index2_shared_cpu_map",
+      "openat$cpu2_cache_index2_type",
+      "write$cpu2_cache_index2_type",
+      "openat$cpu2_cache_index2_uevent",
+      "write$cpu2_cache_index2_uevent",
+      "openat$cpu2_cpu_capacity",
+      "write$cpu2_cpu_capacity",
+      "openat$cpu2_crash_notes",
+      "write$cpu2_crash_notes",
+      "openat$cpu2_crash_notes_size",
+      "write$cpu2_crash_notes_size",
+      "openat$cpu2_regs_identification_midr_el1",
+      "write$cpu2_regs_identification_midr_el1",
+      "openat$cpu2_regs_identification_revidr_el1",
+      "write$cpu2_regs_identification_revidr_el1",
+      "openat$cpu2_topology_core_id",
+      "write$cpu2_topology_core_id",
+      "openat$cpu2_topology_core_siblings",
+      "write$cpu2_topology_core_siblings",
+      "openat$cpu2_topology_core_siblings_list",
+      "write$cpu2_topology_core_siblings_list",
+      "openat$cpu2_topology_physical_package_id",
+      "write$cpu2_topology_physical_package_id",
+      "openat$cpu2_topology_thread_siblings",
+      "write$cpu2_topology_thread_siblings",
+      "openat$cpu2_topology_thread_siblings_list",
+      "write$cpu2_topology_thread_siblings_list",
+      "openat$cpu3_cache_index0_level",
+      "write$cpu3_cache_index0_level",
+      "openat$cpu3_cache_index0_shared_cpu_list",
+      "write$cpu3_cache_index0_shared_cpu_list",
+      "openat$cpu3_cache_index0_shared_cpu_map",
+      "write$cpu3_cache_index0_shared_cpu_map",
+      "openat$cpu3_cache_index0_type",
+      "write$cpu3_cache_index0_type",
+      "openat$cpu3_cache_index0_uevent",
+      "write$cpu3_cache_index0_uevent",
+      "openat$cpu3_cache_index1_level",
+      "write$cpu3_cache_index1_level",
+      "openat$cpu3_cache_index1_shared_cpu_list",
+      "write$cpu3_cache_index1_shared_cpu_list",
+      "openat$cpu3_cache_index1_shared_cpu_map",
+      "write$cpu3_cache_index1_shared_cpu_map",
+      "openat$cpu3_cache_index1_type",
+      "write$cpu3_cache_index1_type",
+      "openat$cpu3_cache_index1_uevent",
+      "write$cpu3_cache_index1_uevent",
+      "openat$cpu3_cache_index2_level",
+      "write$cpu3_cache_index2_level",
+      "openat$cpu3_cache_index2_shared_cpu_list",
+      "write$cpu3_cache_index2_shared_cpu_list",
+      "openat$cpu3_cache_index2_shared_cpu_map",
+      "write$cpu3_cache_index2_shared_cpu_map",
+      "openat$cpu3_cache_index2_type",
+      "write$cpu3_cache_index2_type",
+      "openat$cpu3_cache_index2_uevent",
+      "write$cpu3_cache_index2_uevent",
+      "openat$cpu3_cpu_capacity",
+      "write$cpu3_cpu_capacity",
+      "openat$cpu3_crash_notes",
+      "write$cpu3_crash_notes",
+      "openat$cpu3_crash_notes_size",
+      "write$cpu3_crash_notes_size",
+      "openat$cpu3_regs_identification_midr_el1",
+      "write$cpu3_regs_identification_midr_el1",
+      "openat$cpu3_regs_identification_revidr_el1",
+      "write$cpu3_regs_identification_revidr_el1",
+      "openat$cpu3_topology_core_id",
+      "write$cpu3_topology_core_id",
+      "openat$cpu3_topology_core_siblings",
+      "write$cpu3_topology_core_siblings",
+      "openat$cpu3_topology_core_siblings_list",
+      "write$cpu3_topology_core_siblings_list",
+      "openat$cpu3_topology_physical_package_id",
+      "write$cpu3_topology_physical_package_id",
+      "openat$cpu3_topology_thread_siblings",
+      "write$cpu3_topology_thread_siblings",
+      "openat$cpu3_topology_thread_siblings_list",
+      "write$cpu3_topology_thread_siblings_list",
+      "openat$cpu4_cache_index0_level",
+      "write$cpu4_cache_index0_level",
+      "openat$cpu4_cache_index0_shared_cpu_list",
+      "write$cpu4_cache_index0_shared_cpu_list",
+      "openat$cpu4_cache_index0_shared_cpu_map",
+      "write$cpu4_cache_index0_shared_cpu_map",
+      "openat$cpu4_cache_index0_type",
+      "write$cpu4_cache_index0_type",
+      "openat$cpu4_cache_index0_uevent",
+      "write$cpu4_cache_index0_uevent",
+      "openat$cpu4_cache_index1_level",
+      "write$cpu4_cache_index1_level",
+      "openat$cpu4_cache_index1_shared_cpu_list",
+      "write$cpu4_cache_index1_shared_cpu_list",
+      "openat$cpu4_cache_index1_shared_cpu_map",
+      "write$cpu4_cache_index1_shared_cpu_map",
+      "openat$cpu4_cache_index1_type",
+      "write$cpu4_cache_index1_type",
+      "openat$cpu4_cache_index1_uevent",
+      "write$cpu4_cache_index1_uevent",
+      "openat$cpu4_cache_index2_level",
+      "write$cpu4_cache_index2_level",
+      "openat$cpu4_cache_index2_shared_cpu_list",
+      "write$cpu4_cache_index2_shared_cpu_list",
+      "openat$cpu4_cache_index2_shared_cpu_map",
+      "write$cpu4_cache_index2_shared_cpu_map",
+      "openat$cpu4_cache_index2_type",
+      "write$cpu4_cache_index2_type",
+      "openat$cpu4_cache_index2_uevent",
+      "write$cpu4_cache_index2_uevent",
+      "openat$cpu4_cpu_capacity",
+      "write$cpu4_cpu_capacity",
+      "openat$cpu4_crash_notes",
+      "write$cpu4_crash_notes",
+      "openat$cpu4_crash_notes_size",
+      "write$cpu4_crash_notes_size",
+      "openat$cpu4_regs_identification_midr_el1",
+      "write$cpu4_regs_identification_midr_el1",
+      "openat$cpu4_regs_identification_revidr_el1",
+      "write$cpu4_regs_identification_revidr_el1",
+      "openat$cpu4_topology_core_id",
+      "write$cpu4_topology_core_id",
+      "openat$cpu4_topology_core_siblings",
+      "write$cpu4_topology_core_siblings",
+      "openat$cpu4_topology_core_siblings_list",
+      "write$cpu4_topology_core_siblings_list",
+      "openat$cpu4_topology_physical_package_id",
+      "write$cpu4_topology_physical_package_id",
+      "openat$cpu4_topology_thread_siblings",
+      "write$cpu4_topology_thread_siblings",
+      "openat$cpu4_topology_thread_siblings_list",
+      "write$cpu4_topology_thread_siblings_list",
+      "openat$cpu5_cache_index0_level",
+      "write$cpu5_cache_index0_level",
+      "openat$cpu5_cache_index0_shared_cpu_list",
+      "write$cpu5_cache_index0_shared_cpu_list",
+      "openat$cpu5_cache_index0_shared_cpu_map",
+      "write$cpu5_cache_index0_shared_cpu_map",
+      "openat$cpu5_cache_index0_type",
+      "write$cpu5_cache_index0_type",
+      "openat$cpu5_cache_index0_uevent",
+      "write$cpu5_cache_index0_uevent",
+      "openat$cpu5_cache_index1_level",
+      "write$cpu5_cache_index1_level",
+      "openat$cpu5_cache_index1_shared_cpu_list",
+      "write$cpu5_cache_index1_shared_cpu_list",
+      "openat$cpu5_cache_index1_shared_cpu_map",
+      "write$cpu5_cache_index1_shared_cpu_map",
+      "openat$cpu5_cache_index1_type",
+      "write$cpu5_cache_index1_type",
+      "openat$cpu5_cache_index1_uevent",
+      "write$cpu5_cache_index1_uevent",
+      "openat$cpu5_cache_index2_level",
+      "write$cpu5_cache_index2_level",
+      "openat$cpu5_cache_index2_shared_cpu_list",
+      "write$cpu5_cache_index2_shared_cpu_list",
+      "openat$cpu5_cache_index2_shared_cpu_map",
+      "write$cpu5_cache_index2_shared_cpu_map",
+      "openat$cpu5_cache_index2_type",
+      "write$cpu5_cache_index2_type",
+      "openat$cpu5_cache_index2_uevent",
+      "write$cpu5_cache_index2_uevent",
+      "openat$cpu5_cpu_capacity",
+      "write$cpu5_cpu_capacity",
+      "openat$cpu5_crash_notes",
+      "write$cpu5_crash_notes",
+      "openat$cpu5_crash_notes_size",
+      "write$cpu5_crash_notes_size",
+      "openat$cpu5_regs_identification_midr_el1",
+      "write$cpu5_regs_identification_midr_el1",
+      "openat$cpu5_regs_identification_revidr_el1",
+      "write$cpu5_regs_identification_revidr_el1",
+      "openat$cpu5_topology_core_id",
+      "write$cpu5_topology_core_id",
+      "openat$cpu5_topology_core_siblings",
+      "write$cpu5_topology_core_siblings",
+      "openat$cpu5_topology_core_siblings_list",
+      "write$cpu5_topology_core_siblings_list",
+      "openat$cpu5_topology_physical_package_id",
+      "write$cpu5_topology_physical_package_id",
+      "openat$cpu5_topology_thread_siblings",
+      "write$cpu5_topology_thread_siblings",
+      "openat$cpu5_topology_thread_siblings_list",
+      "write$cpu5_topology_thread_siblings_list",
+      "openat$cpu6_cache_index0_level",
+      "write$cpu6_cache_index0_level",
+      "openat$cpu6_cache_index0_shared_cpu_list",
+      "write$cpu6_cache_index0_shared_cpu_list",
+      "openat$cpu6_cache_index0_shared_cpu_map",
+      "write$cpu6_cache_index0_shared_cpu_map",
+      "openat$cpu6_cache_index0_type",
+      "write$cpu6_cache_index0_type",
+      "openat$cpu6_cache_index0_uevent",
+      "write$cpu6_cache_index0_uevent",
+      "openat$cpu6_cache_index1_level",
+      "write$cpu6_cache_index1_level",
+      "openat$cpu6_cache_index1_shared_cpu_list",
+      "write$cpu6_cache_index1_shared_cpu_list",
+      "openat$cpu6_cache_index1_shared_cpu_map",
+      "write$cpu6_cache_index1_shared_cpu_map",
+      "openat$cpu6_cache_index1_type",
+      "write$cpu6_cache_index1_type",
+      "openat$cpu6_cache_index1_uevent",
+      "write$cpu6_cache_index1_uevent",
+      "openat$cpu6_cache_index2_level",
+      "write$cpu6_cache_index2_level",
+      "openat$cpu6_cache_index2_shared_cpu_list",
+      "write$cpu6_cache_index2_shared_cpu_list",
+      "openat$cpu6_cache_index2_shared_cpu_map",
+      "write$cpu6_cache_index2_shared_cpu_map",
+      "openat$cpu6_cache_index2_type",
+      "write$cpu6_cache_index2_type",
+      "openat$cpu6_cache_index2_uevent",
+      "write$cpu6_cache_index2_uevent",
+      "openat$cpu6_cpu_capacity",
+      "write$cpu6_cpu_capacity",
+      "openat$cpu6_crash_notes",
+      "write$cpu6_crash_notes",
+      "openat$cpu6_crash_notes_size",
+      "write$cpu6_crash_notes_size",
+      "openat$cpu6_regs_identification_midr_el1",
+      "write$cpu6_regs_identification_midr_el1",
+      "openat$cpu6_regs_identification_revidr_el1",
+      "write$cpu6_regs_identification_revidr_el1",
+      "openat$cpu6_topology_core_id",
+      "write$cpu6_topology_core_id",
+      "openat$cpu6_topology_core_siblings",
+      "write$cpu6_topology_core_siblings",
+      "openat$cpu6_topology_core_siblings_list",
+      "write$cpu6_topology_core_siblings_list",
+      "openat$cpu6_topology_physical_package_id",
+      "write$cpu6_topology_physical_package_id",
+      "openat$cpu6_topology_thread_siblings",
+      "write$cpu6_topology_thread_siblings",
+      "openat$cpu6_topology_thread_siblings_list",
+      "write$cpu6_topology_thread_siblings_list",
+      "openat$cpu7_cache_index0_level",
+      "write$cpu7_cache_index0_level",
+      "openat$cpu7_cache_index0_shared_cpu_list",
+      "write$cpu7_cache_index0_shared_cpu_list",
+      "openat$cpu7_cache_index0_shared_cpu_map",
+      "write$cpu7_cache_index0_shared_cpu_map",
+      "openat$cpu7_cache_index0_type",
+      "write$cpu7_cache_index0_type",
+      "openat$cpu7_cache_index0_uevent",
+      "write$cpu7_cache_index0_uevent",
+      "openat$cpu7_cache_index1_level",
+      "write$cpu7_cache_index1_level",
+      "openat$cpu7_cache_index1_shared_cpu_list",
+      "write$cpu7_cache_index1_shared_cpu_list",
+      "openat$cpu7_cache_index1_shared_cpu_map",
+      "write$cpu7_cache_index1_shared_cpu_map",
+      "openat$cpu7_cache_index1_type",
+      "write$cpu7_cache_index1_type",
+      "openat$cpu7_cache_index1_uevent",
+      "write$cpu7_cache_index1_uevent",
+      "openat$cpu7_cache_index2_level",
+      "write$cpu7_cache_index2_level",
+      "openat$cpu7_cache_index2_shared_cpu_list",
+      "write$cpu7_cache_index2_shared_cpu_list",
+      "openat$cpu7_cache_index2_shared_cpu_map",
+      "write$cpu7_cache_index2_shared_cpu_map",
+      "openat$cpu7_cache_index2_type",
+      "write$cpu7_cache_index2_type",
+      "openat$cpu7_cache_index2_uevent",
+      "write$cpu7_cache_index2_uevent",
+      "openat$cpu7_cpu_capacity",
+      "write$cpu7_cpu_capacity",
+      "openat$cpu7_crash_notes",
+      "write$cpu7_crash_notes",
+      "openat$cpu7_crash_notes_size",
+      "write$cpu7_crash_notes_size",
+      "openat$cpu7_regs_identification_midr_el1",
+      "write$cpu7_regs_identification_midr_el1",
+      "openat$cpu7_regs_identification_revidr_el1",
+      "write$cpu7_regs_identification_revidr_el1",
+      "openat$cpu7_topology_core_id",
+      "write$cpu7_topology_core_id",
+      "openat$cpu7_topology_core_siblings",
+      "write$cpu7_topology_core_siblings",
+      "openat$cpu7_topology_core_siblings_list",
+      "write$cpu7_topology_core_siblings_list",
+      "openat$cpu7_topology_physical_package_id",
+      "write$cpu7_topology_physical_package_id",
+      "openat$cpu7_topology_thread_siblings",
+      "write$cpu7_topology_thread_siblings",
+      "openat$cpu7_topology_thread_siblings_list",
+      "write$cpu7_topology_thread_siblings_list",
+      "openat$kernel_max",
+      "write$kernel_max",
+      "openat$offline",
+      "write$offline",
+      "openat$online",
+      "write$online",
+      "openat$possible",
+      "write$possible",
+      "openat$present",
+      "write$present",
+      "openat$smt_active",
+      "write$smt_active",
+      "openat$smt_control",
+      "write$smt_control",
+      "openat$vulnerabilities_gather_data_sampling",
+      "write$vulnerabilities_gather_data_sampling",
+      "openat$vulnerabilities_itlb_multihit",
+      "write$vulnerabilities_itlb_multihit",
+      "openat$vulnerabilities_l1tf",
+      "write$vulnerabilities_l1tf",
+      "openat$vulnerabilities_mds",
+      "write$vulnerabilities_mds",
+      "openat$vulnerabilities_meltdown",
+      "write$vulnerabilities_meltdown",
+      "openat$vulnerabilities_mmio_stale_data",
+      "write$vulnerabilities_mmio_stale_data",
+      "openat$vulnerabilities_reg_file_data_sampling",
+      "write$vulnerabilities_reg_file_data_sampling",
+      "openat$vulnerabilities_retbleed",
+      "write$vulnerabilities_retbleed",
+      "openat$vulnerabilities_spec_store_bypass",
+      "write$vulnerabilities_spec_store_bypass",
+      "openat$vulnerabilities_spectre_v1",
+      "write$vulnerabilities_spectre_v1",
+      "openat$vulnerabilities_spectre_v2",
+      "write$vulnerabilities_spectre_v2",
+      "openat$vulnerabilities_srbds",
+      "write$vulnerabilities_srbds",
+      "openat$vulnerabilities_tsx_async_abort",
+      "write$vulnerabilities_tsx_async_abort",
+      "openat$regulator_0_type",
+      "write$regulator_0_type",
+      "openat$regulator_0_name",
+      "write$regulator_0_name",
+      "openat$regulator_0_num_users",
+      "write$regulator_0_num_users",
+      "openat$regulator_0_requested_microamps",
+      "write$regulator_0_requested_microamps",
+      "openat$regulator_0_suspend_mem_state",
+      "write$regulator_0_suspend_mem_state",
+      "openat$regulator_0_suspend_disk_state",
+      "write$regulator_0_suspend_disk_state",
+      "openat$regulator_0_suspend_standby_state",
+      "write$regulator_0_suspend_standby_state",
+      "openat$regulator_1_type",
+      "write$regulator_1_type",
+      "openat$regulator_1_microvolts",
+      "write$regulator_1_microvolts",
+      "openat$regulator_1_name",
+      "write$regulator_1_name",
+      "openat$regulator_1_num_users",
+      "write$regulator_1_num_users",
+      "openat$regulator_1_requested_microamps",
+      "write$regulator_1_requested_microamps",
+      "openat$regulator_1_suspend_mem_state",
+      "write$regulator_1_suspend_mem_state",
+      "openat$regulator_1_suspend_disk_state",
+      "write$regulator_1_suspend_disk_state",
+      "openat$regulator_1_suspend_standby_state",
+      "write$regulator_1_suspend_standby_state",
+      "openat$regulator_2_type",
+      "write$regulator_2_type",
+      "openat$regulator_2_microvolts",
+      "write$regulator_2_microvolts",
+      "openat$regulator_2_name",
+      "write$regulator_2_name",
+      "openat$regulator_2_num_users",
+      "write$regulator_2_num_users",
+      "openat$regulator_2_requested_microamps",
+      "write$regulator_2_requested_microamps",
+      "openat$regulator_2_suspend_mem_state",
+      "write$regulator_2_suspend_mem_state",
+      "openat$regulator_2_suspend_disk_state",
+      "write$regulator_2_suspend_disk_state",
+      "openat$regulator_2_suspend_standby_state",
+      "write$regulator_2_suspend_standby_state",
+      "openat$thermal_zone0_type",
+      "write$thermal_zone0_type",
+      "openat$thermal_zone0_temp",
+      "write$thermal_zone0_temp",
+      "openat$thermal_zone0_mode",
+      "write$thermal_zone0_mode",
+      "openat$thermal_zone0_policy",
+      "write$thermal_zone0_policy",
+      "openat$thermal_zone0_available_policies",
+      "write$thermal_zone0_available_policies",
+      "openat$thermal_zone0_k_d",
+      "write$thermal_zone0_k_d",
+      "openat$thermal_zone0_k_i",
+      "write$thermal_zone0_k_i",
+      "openat$thermal_zone0_k_po",
+      "write$thermal_zone0_k_po",
+      "openat$thermal_zone0_k_pu",
+      "write$thermal_zone0_k_pu",
+      "openat$thermal_zone0_integral_cutoff",
+      "write$thermal_zone0_integral_cutoff",
+      "openat$thermal_zone0_slope",
+      "write$thermal_zone0_slope",
+      "openat$thermal_zone0_offset",
+      "write$thermal_zone0_offset",
+      "openat$thermal_zone0_sustainable_power",
+      "write$thermal_zone0_sustainable_power",
+      "openat$thermal_zone1_type",
+      "write$thermal_zone1_type",
+      "openat$thermal_zone1_temp",
+      "write$thermal_zone1_temp",
+      "openat$thermal_zone1_mode",
+      "write$thermal_zone1_mode",
+      "openat$thermal_zone1_policy",
+      "write$thermal_zone1_policy",
+      "openat$thermal_zone1_available_policies",
+      "write$thermal_zone1_available_policies",
+      "openat$thermal_zone1_k_d",
+      "write$thermal_zone1_k_d",
+      "openat$thermal_zone1_k_i",
+      "write$thermal_zone1_k_i",
+      "openat$thermal_zone1_k_po",
+      "write$thermal_zone1_k_po",
+      "openat$thermal_zone1_k_pu",
+      "write$thermal_zone1_k_pu",
+      "openat$thermal_zone1_integral_cutoff",
+      "write$thermal_zone1_integral_cutoff",
+      "openat$thermal_zone1_slope",
+      "write$thermal_zone1_slope",
+      "openat$thermal_zone1_offset",
+      "write$thermal_zone1_offset",
+      "openat$thermal_zone1_sustainable_power",
+      "write$thermal_zone1_sustainable_power",
+      "openat$thermal_zone2_type",
+      "write$thermal_zone2_type",
+      "openat$thermal_zone2_temp",
+      "write$thermal_zone2_temp",
+      "openat$thermal_zone2_mode",
+      "write$thermal_zone2_mode",
+      "openat$thermal_zone2_policy",
+      "write$thermal_zone2_policy",
+      "openat$thermal_zone2_available_policies",
+      "write$thermal_zone2_available_policies",
+      "openat$thermal_zone2_k_d",
+      "write$thermal_zone2_k_d",
+      "openat$thermal_zone2_k_i",
+      "write$thermal_zone2_k_i",
+      "openat$thermal_zone2_k_po",
+      "write$thermal_zone2_k_po",
+      "openat$thermal_zone2_k_pu",
+      "write$thermal_zone2_k_pu",
+      "openat$thermal_zone2_integral_cutoff",
+      "write$thermal_zone2_integral_cutoff",
+      "openat$thermal_zone2_slope",
+      "write$thermal_zone2_slope",
+      "openat$thermal_zone2_offset",
+      "write$thermal_zone2_offset",
+      "openat$thermal_zone2_sustainable_power",
+      "write$thermal_zone2_sustainable_power",
+      "openat$cpuidle_current_governor_ro",
+      "write$cpuidle_current_governor_ro",
+      "openat$cpuidle_current_driver",
+      "write$cpuidle_current_driver",
+      "openat$cpuidle_available_governors",
+      "write$cpuidle_available_governors",
+      "openat$cpuidle_current_governor",
+      "write$cpuidle_current_governor",
+      "openat$cpu0_cpuidle_state1_disable",
+      "write$cpu0_cpuidle_state1_disable",
+      "openat$cpu0_cpuidle_state1_above",
+      "write$cpu0_cpuidle_state1_above",
+      "openat$cpu0_cpuidle_state1_time",
+      "write$cpu0_cpuidle_state1_time",
+      "openat$cpu0_cpuidle_state1_rejected",
+      "write$cpu0_cpuidle_state1_rejected",
+      "openat$cpu0_cpuidle_state1_power",
+      "write$cpu0_cpuidle_state1_power",
+      "openat$cpu0_cpuidle_state1_residency",
+      "write$cpu0_cpuidle_state1_residency",
+      "openat$cpu0_cpuidle_state1_latency",
+      "write$cpu0_cpuidle_state1_latency",
+      "openat$cpu0_cpuidle_state1_usage",
+      "write$cpu0_cpuidle_state1_usage",
+      "openat$cpu0_cpuidle_state1_desc",
+      "write$cpu0_cpuidle_state1_desc",
+      "openat$cpu0_cpuidle_state1_below",
+      "write$cpu0_cpuidle_state1_below",
+      "openat$cpu0_cpuidle_state1_default_status",
+      "write$cpu0_cpuidle_state1_default_status",
+      "openat$cpu0_cpuidle_state1_name",
+      "write$cpu0_cpuidle_state1_name",
+      "openat$cpu0_cpuidle_state1_s2idle_time",
+      "write$cpu0_cpuidle_state1_s2idle_time",
+      "openat$cpu0_cpuidle_state1_s2idle_usage",
+      "write$cpu0_cpuidle_state1_s2idle_usage",
+      "openat$cpu0_cpuidle_driver_name",
+      "write$cpu0_cpuidle_driver_name",
+      "openat$cpu0_cpuidle_state0_disable",
+      "write$cpu0_cpuidle_state0_disable",
+      "openat$cpu0_cpuidle_state0_above",
+      "write$cpu0_cpuidle_state0_above",
+      "openat$cpu0_cpuidle_state0_time",
+      "write$cpu0_cpuidle_state0_time",
+      "openat$cpu0_cpuidle_state0_rejected",
+      "write$cpu0_cpuidle_state0_rejected",
+      "openat$cpu0_cpuidle_state0_power",
+      "write$cpu0_cpuidle_state0_power",
+      "openat$cpu0_cpuidle_state0_residency",
+      "write$cpu0_cpuidle_state0_residency",
+      "openat$cpu0_cpuidle_state0_latency",
+      "write$cpu0_cpuidle_state0_latency",
+      "openat$cpu0_cpuidle_state0_usage",
+      "write$cpu0_cpuidle_state0_usage",
+      "openat$cpu0_cpuidle_state0_desc",
+      "write$cpu0_cpuidle_state0_desc",
+      "openat$cpu0_cpuidle_state0_below",
+      "write$cpu0_cpuidle_state0_below",
+      "openat$cpu0_cpuidle_state0_default_status",
+      "write$cpu0_cpuidle_state0_default_status",
+      "openat$cpu0_cpuidle_state0_name",
+      "write$cpu0_cpuidle_state0_name",
+      "openat$cpu1_cpuidle_state1_disable",
+      "write$cpu1_cpuidle_state1_disable",
+      "openat$cpu1_cpuidle_state1_above",
+      "write$cpu1_cpuidle_state1_above",
+      "openat$cpu1_cpuidle_state1_time",
+      "write$cpu1_cpuidle_state1_time",
+      "openat$cpu1_cpuidle_state1_rejected",
+      "write$cpu1_cpuidle_state1_rejected",
+      "openat$cpu1_cpuidle_state1_power",
+      "write$cpu1_cpuidle_state1_power",
+      "openat$cpu1_cpuidle_state1_residency",
+      "write$cpu1_cpuidle_state1_residency",
+      "openat$cpu1_cpuidle_state1_latency",
+      "write$cpu1_cpuidle_state1_latency",
+      "openat$cpu1_cpuidle_state1_usage",
+      "write$cpu1_cpuidle_state1_usage",
+      "openat$cpu1_cpuidle_state1_desc",
+      "write$cpu1_cpuidle_state1_desc",
+      "openat$cpu1_cpuidle_state1_below",
+      "write$cpu1_cpuidle_state1_below",
+      "openat$cpu1_cpuidle_state1_default_status",
+      "write$cpu1_cpuidle_state1_default_status",
+      "openat$cpu1_cpuidle_state1_name",
+      "write$cpu1_cpuidle_state1_name",
+      "openat$cpu1_cpuidle_state1_s2idle_time",
+      "write$cpu1_cpuidle_state1_s2idle_time",
+      "openat$cpu1_cpuidle_state1_s2idle_usage",
+      "write$cpu1_cpuidle_state1_s2idle_usage",
+      "openat$cpu1_cpuidle_driver_name",
+      "write$cpu1_cpuidle_driver_name",
+      "openat$cpu1_cpuidle_state0_disable",
+      "write$cpu1_cpuidle_state0_disable",
+      "openat$cpu1_cpuidle_state0_above",
+      "write$cpu1_cpuidle_state0_above",
+      "openat$cpu1_cpuidle_state0_time",
+      "write$cpu1_cpuidle_state0_time",
+      "openat$cpu1_cpuidle_state0_rejected",
+      "write$cpu1_cpuidle_state0_rejected",
+      "openat$cpu1_cpuidle_state0_power",
+      "write$cpu1_cpuidle_state0_power",
+      "openat$cpu1_cpuidle_state0_residency",
+      "write$cpu1_cpuidle_state0_residency",
+      "openat$cpu1_cpuidle_state0_latency",
+      "write$cpu1_cpuidle_state0_latency",
+      "openat$cpu1_cpuidle_state0_usage",
+      "write$cpu1_cpuidle_state0_usage",
+      "openat$cpu1_cpuidle_state0_desc",
+      "write$cpu1_cpuidle_state0_desc",
+      "openat$cpu1_cpuidle_state0_below",
+      "write$cpu1_cpuidle_state0_below",
+      "openat$cpu1_cpuidle_state0_default_status",
+      "write$cpu1_cpuidle_state0_default_status",
+      "openat$cpu1_cpuidle_state0_name",
+      "write$cpu1_cpuidle_state0_name",
+      "openat$cpu2_cpuidle_state1_disable",
+      "write$cpu2_cpuidle_state1_disable",
+      "openat$cpu2_cpuidle_state1_above",
+      "write$cpu2_cpuidle_state1_above",
+      "openat$cpu2_cpuidle_state1_time",
+      "write$cpu2_cpuidle_state1_time",
+      "openat$cpu2_cpuidle_state1_rejected",
+      "write$cpu2_cpuidle_state1_rejected",
+      "openat$cpu2_cpuidle_state1_power",
+      "write$cpu2_cpuidle_state1_power",
+      "openat$cpu2_cpuidle_state1_residency",
+      "write$cpu2_cpuidle_state1_residency",
+      "openat$cpu2_cpuidle_state1_latency",
+      "write$cpu2_cpuidle_state1_latency",
+      "openat$cpu2_cpuidle_state1_usage",
+      "write$cpu2_cpuidle_state1_usage",
+      "openat$cpu2_cpuidle_state1_desc",
+      "write$cpu2_cpuidle_state1_desc",
+      "openat$cpu2_cpuidle_state1_below",
+      "write$cpu2_cpuidle_state1_below",
+      "openat$cpu2_cpuidle_state1_default_status",
+      "write$cpu2_cpuidle_state1_default_status",
+      "openat$cpu2_cpuidle_state1_name",
+      "write$cpu2_cpuidle_state1_name",
+      "openat$cpu2_cpuidle_state1_s2idle_time",
+      "write$cpu2_cpuidle_state1_s2idle_time",
+      "openat$cpu2_cpuidle_state1_s2idle_usage",
+      "write$cpu2_cpuidle_state1_s2idle_usage",
+      "openat$cpu2_cpuidle_driver_name",
+      "write$cpu2_cpuidle_driver_name",
+      "openat$cpu2_cpuidle_state0_disable",
+      "write$cpu2_cpuidle_state0_disable",
+      "openat$cpu2_cpuidle_state0_above",
+      "write$cpu2_cpuidle_state0_above",
+      "openat$cpu2_cpuidle_state0_time",
+      "write$cpu2_cpuidle_state0_time",
+      "openat$cpu2_cpuidle_state0_rejected",
+      "write$cpu2_cpuidle_state0_rejected",
+      "openat$cpu2_cpuidle_state0_power",
+      "write$cpu2_cpuidle_state0_power",
+      "openat$cpu2_cpuidle_state0_residency",
+      "write$cpu2_cpuidle_state0_residency",
+      "openat$cpu2_cpuidle_state0_latency",
+      "write$cpu2_cpuidle_state0_latency",
+      "openat$cpu2_cpuidle_state0_usage",
+      "write$cpu2_cpuidle_state0_usage",
+      "openat$cpu2_cpuidle_state0_desc",
+      "write$cpu2_cpuidle_state0_desc",
+      "openat$cpu2_cpuidle_state0_below",
+      "write$cpu2_cpuidle_state0_below",
+      "openat$cpu2_cpuidle_state0_default_status",
+      "write$cpu2_cpuidle_state0_default_status",
+      "openat$cpu2_cpuidle_state0_name",
+      "write$cpu2_cpuidle_state0_name",
+      "openat$cpu3_cpuidle_state1_disable",
+      "write$cpu3_cpuidle_state1_disable",
+      "openat$cpu3_cpuidle_state1_above",
+      "write$cpu3_cpuidle_state1_above",
+      "openat$cpu3_cpuidle_state1_time",
+      "write$cpu3_cpuidle_state1_time",
+      "openat$cpu3_cpuidle_state1_rejected",
+      "write$cpu3_cpuidle_state1_rejected",
+      "openat$cpu3_cpuidle_state1_power",
+      "write$cpu3_cpuidle_state1_power",
+      "openat$cpu3_cpuidle_state1_residency",
+      "write$cpu3_cpuidle_state1_residency",
+      "openat$cpu3_cpuidle_state1_latency",
+      "write$cpu3_cpuidle_state1_latency",
+      "openat$cpu3_cpuidle_state1_usage",
+      "write$cpu3_cpuidle_state1_usage",
+      "openat$cpu3_cpuidle_state1_desc",
+      "write$cpu3_cpuidle_state1_desc",
+      "openat$cpu3_cpuidle_state1_below",
+      "write$cpu3_cpuidle_state1_below",
+      "openat$cpu3_cpuidle_state1_default_status",
+      "write$cpu3_cpuidle_state1_default_status",
+      "openat$cpu3_cpuidle_state1_name",
+      "write$cpu3_cpuidle_state1_name",
+      "openat$cpu3_cpuidle_state1_s2idle_time",
+      "write$cpu3_cpuidle_state1_s2idle_time",
+      "openat$cpu3_cpuidle_state1_s2idle_usage",
+      "write$cpu3_cpuidle_state1_s2idle_usage",
+      "openat$cpu3_cpuidle_driver_name",
+      "write$cpu3_cpuidle_driver_name",
+      "openat$cpu3_cpuidle_state0_disable",
+      "write$cpu3_cpuidle_state0_disable",
+      "openat$cpu3_cpuidle_state0_above",
+      "write$cpu3_cpuidle_state0_above",
+      "openat$cpu3_cpuidle_state0_time",
+      "write$cpu3_cpuidle_state0_time",
+      "openat$cpu3_cpuidle_state0_rejected",
+      "write$cpu3_cpuidle_state0_rejected",
+      "openat$cpu3_cpuidle_state0_power",
+      "write$cpu3_cpuidle_state0_power",
+      "openat$cpu3_cpuidle_state0_residency",
+      "write$cpu3_cpuidle_state0_residency",
+      "openat$cpu3_cpuidle_state0_latency",
+      "write$cpu3_cpuidle_state0_latency",
+      "openat$cpu3_cpuidle_state0_usage",
+      "write$cpu3_cpuidle_state0_usage",
+      "openat$cpu3_cpuidle_state0_desc",
+      "write$cpu3_cpuidle_state0_desc",
+      "openat$cpu3_cpuidle_state0_below",
+      "write$cpu3_cpuidle_state0_below",
+      "openat$cpu3_cpuidle_state0_default_status",
+      "write$cpu3_cpuidle_state0_default_status",
+      "openat$cpu3_cpuidle_state0_name",
+      "write$cpu3_cpuidle_state0_name",
+      "openat$cpu4_cpuidle_state1_disable",
+      "write$cpu4_cpuidle_state1_disable",
+      "openat$cpu4_cpuidle_state1_above",
+      "write$cpu4_cpuidle_state1_above",
+      "openat$cpu4_cpuidle_state1_time",
+      "write$cpu4_cpuidle_state1_time",
+      "openat$cpu4_cpuidle_state1_rejected",
+      "write$cpu4_cpuidle_state1_rejected",
+      "openat$cpu4_cpuidle_state1_power",
+      "write$cpu4_cpuidle_state1_power",
+      "openat$cpu4_cpuidle_state1_residency",
+      "write$cpu4_cpuidle_state1_residency",
+      "openat$cpu4_cpuidle_state1_latency",
+      "write$cpu4_cpuidle_state1_latency",
+      "openat$cpu4_cpuidle_state1_usage",
+      "write$cpu4_cpuidle_state1_usage",
+      "openat$cpu4_cpuidle_state1_desc",
+      "write$cpu4_cpuidle_state1_desc",
+      "openat$cpu4_cpuidle_state1_below",
+      "write$cpu4_cpuidle_state1_below",
+      "openat$cpu4_cpuidle_state1_default_status",
+      "write$cpu4_cpuidle_state1_default_status",
+      "openat$cpu4_cpuidle_state1_name",
+      "write$cpu4_cpuidle_state1_name",
+      "openat$cpu4_cpuidle_state1_s2idle_time",
+      "write$cpu4_cpuidle_state1_s2idle_time",
+      "openat$cpu4_cpuidle_state1_s2idle_usage",
+      "write$cpu4_cpuidle_state1_s2idle_usage",
+      "openat$cpu4_cpuidle_driver_name",
+      "write$cpu4_cpuidle_driver_name",
+      "openat$cpu4_cpuidle_state0_disable",
+      "write$cpu4_cpuidle_state0_disable",
+      "openat$cpu4_cpuidle_state0_above",
+      "write$cpu4_cpuidle_state0_above",
+      "openat$cpu4_cpuidle_state0_time",
+      "write$cpu4_cpuidle_state0_time",
+      "openat$cpu4_cpuidle_state0_rejected",
+      "write$cpu4_cpuidle_state0_rejected",
+      "openat$cpu4_cpuidle_state0_power",
+      "write$cpu4_cpuidle_state0_power",
+      "openat$cpu4_cpuidle_state0_residency",
+      "write$cpu4_cpuidle_state0_residency",
+      "openat$cpu4_cpuidle_state0_latency",
+      "write$cpu4_cpuidle_state0_latency",
+      "openat$cpu4_cpuidle_state0_usage",
+      "write$cpu4_cpuidle_state0_usage",
+      "openat$cpu4_cpuidle_state0_desc",
+      "write$cpu4_cpuidle_state0_desc",
+      "openat$cpu4_cpuidle_state0_below",
+      "write$cpu4_cpuidle_state0_below",
+      "openat$cpu4_cpuidle_state0_default_status",
+      "write$cpu4_cpuidle_state0_default_status",
+      "openat$cpu4_cpuidle_state0_name",
+      "write$cpu4_cpuidle_state0_name",
+      "openat$cpu5_cpuidle_state1_disable",
+      "write$cpu5_cpuidle_state1_disable",
+      "openat$cpu5_cpuidle_state1_above",
+      "write$cpu5_cpuidle_state1_above",
+      "openat$cpu5_cpuidle_state1_time",
+      "write$cpu5_cpuidle_state1_time",
+      "openat$cpu5_cpuidle_state1_rejected",
+      "write$cpu5_cpuidle_state1_rejected",
+      "openat$cpu5_cpuidle_state1_power",
+      "write$cpu5_cpuidle_state1_power",
+      "openat$cpu5_cpuidle_state1_residency",
+      "write$cpu5_cpuidle_state1_residency",
+      "openat$cpu5_cpuidle_state1_latency",
+      "write$cpu5_cpuidle_state1_latency",
+      "openat$cpu5_cpuidle_state1_usage",
+      "write$cpu5_cpuidle_state1_usage",
+      "openat$cpu5_cpuidle_state1_desc",
+      "write$cpu5_cpuidle_state1_desc",
+      "openat$cpu5_cpuidle_state1_below",
+      "write$cpu5_cpuidle_state1_below",
+      "openat$cpu5_cpuidle_state1_default_status",
+      "write$cpu5_cpuidle_state1_default_status",
+      "openat$cpu5_cpuidle_state1_name",
+      "write$cpu5_cpuidle_state1_name",
+      "openat$cpu5_cpuidle_state1_s2idle_time",
+      "write$cpu5_cpuidle_state1_s2idle_time",
+      "openat$cpu5_cpuidle_state1_s2idle_usage",
+      "write$cpu5_cpuidle_state1_s2idle_usage",
+      "openat$cpu5_cpuidle_driver_name",
+      "write$cpu5_cpuidle_driver_name",
+      "openat$cpu5_cpuidle_state0_disable",
+      "write$cpu5_cpuidle_state0_disable",
+      "openat$cpu5_cpuidle_state0_above",
+      "write$cpu5_cpuidle_state0_above",
+      "openat$cpu5_cpuidle_state0_time",
+      "write$cpu5_cpuidle_state0_time",
+      "openat$cpu5_cpuidle_state0_rejected",
+      "write$cpu5_cpuidle_state0_rejected",
+      "openat$cpu5_cpuidle_state0_power",
+      "write$cpu5_cpuidle_state0_power",
+      "openat$cpu5_cpuidle_state0_residency",
+      "write$cpu5_cpuidle_state0_residency",
+      "openat$cpu5_cpuidle_state0_latency",
+      "write$cpu5_cpuidle_state0_latency",
+      "openat$cpu5_cpuidle_state0_usage",
+      "write$cpu5_cpuidle_state0_usage",
+      "openat$cpu5_cpuidle_state0_desc",
+      "write$cpu5_cpuidle_state0_desc",
+      "openat$cpu5_cpuidle_state0_below",
+      "write$cpu5_cpuidle_state0_below",
+      "openat$cpu5_cpuidle_state0_default_status",
+      "write$cpu5_cpuidle_state0_default_status",
+      "openat$cpu5_cpuidle_state0_name",
+      "write$cpu5_cpuidle_state0_name",
+      "openat$cpu6_cpuidle_state1_disable",
+      "write$cpu6_cpuidle_state1_disable",
+      "openat$cpu6_cpuidle_state1_above",
+      "write$cpu6_cpuidle_state1_above",
+      "openat$cpu6_cpuidle_state1_time",
+      "write$cpu6_cpuidle_state1_time",
+      "openat$cpu6_cpuidle_state1_rejected",
+      "write$cpu6_cpuidle_state1_rejected",
+      "openat$cpu6_cpuidle_state1_power",
+      "write$cpu6_cpuidle_state1_power",
+      "openat$cpu6_cpuidle_state1_residency",
+      "write$cpu6_cpuidle_state1_residency",
+      "openat$cpu6_cpuidle_state1_latency",
+      "write$cpu6_cpuidle_state1_latency",
+      "openat$cpu6_cpuidle_state1_usage",
+      "write$cpu6_cpuidle_state1_usage",
+      "openat$cpu6_cpuidle_state1_desc",
+      "write$cpu6_cpuidle_state1_desc",
+      "openat$cpu6_cpuidle_state1_below",
+      "write$cpu6_cpuidle_state1_below",
+      "openat$cpu6_cpuidle_state1_default_status",
+      "write$cpu6_cpuidle_state1_default_status",
+      "openat$cpu6_cpuidle_state1_name",
+      "write$cpu6_cpuidle_state1_name",
+      "openat$cpu6_cpuidle_state1_s2idle_time",
+      "write$cpu6_cpuidle_state1_s2idle_time",
+      "openat$cpu6_cpuidle_state1_s2idle_usage",
+      "write$cpu6_cpuidle_state1_s2idle_usage",
+      "openat$cpu6_cpuidle_driver_name",
+      "write$cpu6_cpuidle_driver_name",
+      "openat$cpu6_cpuidle_state0_disable",
+      "write$cpu6_cpuidle_state0_disable",
+      "openat$cpu6_cpuidle_state0_above",
+      "write$cpu6_cpuidle_state0_above",
+      "openat$cpu6_cpuidle_state0_time",
+      "write$cpu6_cpuidle_state0_time",
+      "openat$cpu6_cpuidle_state0_rejected",
+      "write$cpu6_cpuidle_state0_rejected",
+      "openat$cpu6_cpuidle_state0_power",
+      "write$cpu6_cpuidle_state0_power",
+      "openat$cpu6_cpuidle_state0_residency",
+      "write$cpu6_cpuidle_state0_residency",
+      "openat$cpu6_cpuidle_state0_latency",
+      "write$cpu6_cpuidle_state0_latency",
+      "openat$cpu6_cpuidle_state0_usage",
+      "write$cpu6_cpuidle_state0_usage",
+      "openat$cpu6_cpuidle_state0_desc",
+      "write$cpu6_cpuidle_state0_desc",
+      "openat$cpu6_cpuidle_state0_below",
+      "write$cpu6_cpuidle_state0_below",
+      "openat$cpu6_cpuidle_state0_default_status",
+      "write$cpu6_cpuidle_state0_default_status",
+      "openat$cpu6_cpuidle_state0_name",
+      "write$cpu6_cpuidle_state0_name",
+      "openat$cpu7_cpuidle_state1_disable",
+      "write$cpu7_cpuidle_state1_disable",
+      "openat$cpu7_cpuidle_state1_above",
+      "write$cpu7_cpuidle_state1_above",
+      "openat$cpu7_cpuidle_state1_time",
+      "write$cpu7_cpuidle_state1_time",
+      "openat$cpu7_cpuidle_state1_rejected",
+      "write$cpu7_cpuidle_state1_rejected",
+      "openat$cpu7_cpuidle_state1_power",
+      "write$cpu7_cpuidle_state1_power",
+      "openat$cpu7_cpuidle_state1_residency",
+      "write$cpu7_cpuidle_state1_residency",
+      "openat$cpu7_cpuidle_state1_latency",
+      "write$cpu7_cpuidle_state1_latency",
+      "openat$cpu7_cpuidle_state1_usage",
+      "write$cpu7_cpuidle_state1_usage",
+      "openat$cpu7_cpuidle_state1_desc",
+      "write$cpu7_cpuidle_state1_desc",
+      "openat$cpu7_cpuidle_state1_below",
+      "write$cpu7_cpuidle_state1_below",
+      "openat$cpu7_cpuidle_state1_default_status",
+      "write$cpu7_cpuidle_state1_default_status",
+      "openat$cpu7_cpuidle_state1_name",
+      "write$cpu7_cpuidle_state1_name",
+      "openat$cpu7_cpuidle_state1_s2idle_time",
+      "write$cpu7_cpuidle_state1_s2idle_time",
+      "openat$cpu7_cpuidle_state1_s2idle_usage",
+      "write$cpu7_cpuidle_state1_s2idle_usage",
+      "openat$cpu7_cpuidle_driver_name",
+      "write$cpu7_cpuidle_driver_name",
+      "openat$cpu7_cpuidle_state0_disable",
+      "write$cpu7_cpuidle_state0_disable",
+      "openat$cpu7_cpuidle_state0_above",
+      "write$cpu7_cpuidle_state0_above",
+      "openat$cpu7_cpuidle_state0_time",
+      "write$cpu7_cpuidle_state0_time",
+      "openat$cpu7_cpuidle_state0_rejected",
+      "write$cpu7_cpuidle_state0_rejected",
+      "openat$cpu7_cpuidle_state0_power",
+      "write$cpu7_cpuidle_state0_power",
+      "openat$cpu7_cpuidle_state0_residency",
+      "write$cpu7_cpuidle_state0_residency",
+      "openat$cpu7_cpuidle_state0_latency",
+      "write$cpu7_cpuidle_state0_latency",
+      "openat$cpu7_cpuidle_state0_usage",
+      "write$cpu7_cpuidle_state0_usage",
+      "openat$cpu7_cpuidle_state0_desc",
+      "write$cpu7_cpuidle_state0_desc",
+      "openat$cpu7_cpuidle_state0_below",
+      "write$cpu7_cpuidle_state0_below",
+      "openat$cpu7_cpuidle_state0_default_status",
+      "write$cpu7_cpuidle_state0_default_status",
+      "openat$cpu7_cpuidle_state0_name",
+      "write$cpu7_cpuidle_state0_name"
+    procfs_entry: |
+      "name",
+      "num_users",
+      "requested_microamps",
+      "suspend_disk_state",
+      "suspend_mem_state",
+      "suspend_standby_state",
+      "type",
+      "available_policies",
+      "integral_cutoff",
+      "k_d",
+      "k_i",
+      "k_po",
+      "k_pu",
+      "mode",
+      "offset",
+      "policy",
+      "slope",
+      "sustainable_power",
+      "temp",
+      "type",
+      "level",
+      "shared_cpu_list",
+      "shared_cpu_map",
+      "type",
+      "uevent",
+      "cpu_capacity",
+      "affected_cpus",
+      "cpuinfo_cur_freq",
+      "related_cpus",
+      "scaling_governor",
+      "above",
+      "below",
+      "default_status",
+      "desc",
+      "disable",
+      "latency",
+      "power",
+      "rejected",
+      "residency",
+      "time",
+      "usage",
+      "above",
+      "below",
+      "default_status",
+      "desc",
+      "disable",
+      "latency",
+      "power",
+      "rejected",
+      "residency",
+      "time",
+      "usage",
+      "time",
+      "usage",
+      "crash_notes",
+      "crash_notes_size",
+      "midr_el1",
+      "revidr_el1",
+      "core_id",
+      "core_siblings",
+      "core_siblings_list",
+      "physical_package_id",
+      "thread_siblings",
+      "thread_siblings_list",
+      "affected_cpus",
+      "cpuinfo_cur_freq",
+      "cpuinfo_max_freq",
+      "cpuinfo_min_freq",
+      "cpuinfo_transition_latency",
+      "related_cpus",
+      "scaling_available_frequencies",
+      "scaling_available_governors",
+      "scaling_cur_freq",
+      "scaling_driver",
+      "scaling_governor",
+      "scaling_max_freq",
+      "scaling_min_freq",
+      "scaling_setspeed",
+      "reset",
+      "time_in_state",
+      "total_trans",
+      "trans_table",
+      "available_governors",
+      "current_driver",
+      "current_governor",
+      "current_governor_ro",
+      "kernel_max",
+      "offline",
+      "online",
+      "possible",
+      "present",
+      "active",
+      "control",
+      "gather_data_sampling",
+      "itlb_multihit",
+      "l1tf",
+      "mds",
+      "meltdown",
+      "mmio_stale_data",
+      "reg_file_data_sampling",
+      "retbleed",
+      "spec_store_bypass",
+      "spectre_v1",
+      "spectre_v2",
+      "srbds"

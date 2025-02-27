@@ -6,6 +6,7 @@ test: bash ./runtest.sh
 framework: beakerlib
 duration: 360m
 require:
+  - kpatch
   - type: file
     pattern:
       - /general/kpatch/include/lib.sh

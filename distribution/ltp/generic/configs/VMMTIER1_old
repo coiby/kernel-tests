@@ -1,0 +1,265 @@
+#Added-by:  Caspar Zhang <czhang@redhat.com>
+#Update-by: Li Wang <liwang@redhat.com>
+
+# covered by runtest/mm
+mm01 mmap001 -m 10000
+mm02 mmap001
+
+mtest01 mtest01 -p80
+mtest01w mtest01 -p80 -w
+
+#test for race conditions
+mtest05   mmstress
+mtest06   mmap1 -x 0.05
+mtest06_2 mmap2 -x 0.002 -a -p
+mtest06_3 mmap3 -x 0.002 -p
+
+mem02 mem02
+
+page01 page01
+page02 page02
+
+data_space data_space
+stack_space stack_space
+
+shmt02 shmt02
+shmt03 shmt03
+shmt04 shmt04
+shmt05 shmt05
+shmt06 shmt06
+shmt07 shmt07
+shmt08 shmt08
+shmt09 shmt09
+shmt10 shmt10
+
+shm_test01	shm_test -l 10 -t 2
+mallocstress01	mallocstress
+
+mmapstress01 mmapstress01 -p 20 -t 0.2
+mmapstress02 mmapstress02
+mmapstress03 mmapstress03
+mmapstress04 mmapstress04
+mmapstress05 mmapstress05
+mmapstress06 mmapstress06 20
+mmapstress07 TMPFILE=`mktemp /tmp/example.XXXXXXXXXXXX`; mmapstress07 $TMPFILE
+mmapstress08 mmapstress08
+mmapstress09 mmapstress09 -p 20 -t 0.2
+mmapstress10 mmapstress10 -p 20 -t 0.2
+
+mmap10 mmap10
+mmap10_1 mmap10 -a
+mmap10_2 mmap10 -s
+mmap10_3 mmap10 -a -s
+mmap10_4 mmap10 -a -s -i 60
+
+qmm01 mmap001 -m 1
+mmap01 mmap01
+mmap02 mmap02
+mmap03 mmap03
+mmap04 mmap04
+mmap05 mmap05
+mmap06 mmap06
+mmap07 mmap07
+mmap08 mmap08
+mmap09 mmap09
+mmap12 mmap12
+mmap13 mmap13
+mmap14 mmap14
+mmap15 mmap15
+mmap16 mmap16
+
+munmap01 munmap01
+munmap02 munmap02
+munmap03 munmap03
+
+remap_file_pages01 remap_file_pages01
+remap_file_pages02 remap_file_pages02
+
+ksm01 ksm01
+ksm01_1 ksm01 -u 128
+ksm02 ksm02
+ksm02_1 ksm02 -u 128
+ksm03 ksm03
+ksm03_1 ksm03 -u 128
+ksm04 ksm04
+ksm04_1 ksm04 -u 128
+ksm05 ksm05 -I 10
+ksm06 ksm06
+ksm06_1 ksm06 -n 10
+ksm06_2 ksm06 -n 8000
+
+cpuset01 cpuset01
+
+oom01 oom01
+oom02 oom02
+oom03 oom03
+oom04 oom04
+oom05 oom05
+
+thp01 thp01 -I 120
+thp02 thp02
+thp03 thp03
+
+vma01 vma01
+vma02 vma02
+vma03 vma03
+vma04 vma04
+vma05 vma05.sh
+
+#vmsplice test cases
+vmsplice01 vmsplice01
+vmsplice02 vmsplice02
+
+mallopt01 mallopt01
+
+# These come from ltp other place
+mlockall01 mlockall01
+mlockall02 mlockall02
+mlockall03 mlockall03
+mlock01 mlock01
+mlock02 mlock02
+mlock03 mlock03 -i 20
+mlock04 mlock04
+# These tests require an unmounted block device
+munlock01 munlock01
+munlock02 munlock02
+munlockall01 munlockall01
+mlockall01 mlockall01
+mlockall02 mlockall02
+mlockall03 mlockall03
+mlock201 mlock201
+mlock202 mlock202
+mlock203 mlock203
+
+execl01 execl01
+execle01 execle01
+execlp01 execlp01
+
+execv01 execv01
+execve01 execve01
+execve02 execve02
+execve03 execve03
+execve04 execve04
+execve05 execve05 -i 5 -n 32
+execvp01 execvp01
+execveat03 execveat03
+
+
+fork13 fork13 -i 1000000
+
+ftest01 ftest01
+ftest02 ftest02
+ftest03 ftest03
+ftest04 ftest04
+ftest05 ftest05
+ftest06 ftest06
+ftest07 ftest07
+ftest08 ftest08
+
+shmctl01 shmctl01
+shmctl02 shmctl02
+shmctl03 shmctl03
+shmctl04 shmctl04
+
+shmdt01 shmdt01
+shmdt02 shmdt02
+
+shmget02 shmget02
+shmget03 shmget03
+shmget04 shmget04
+shmget05 shmget05
+
+shmat01 shmat01
+shmat02 shmat02
+
+mremap01 mremap01
+mremap02 mremap02
+mremap03 mremap03
+mremap04 mremap04
+
+zram01 zram01.sh
+#zram02 zram02.sh
+#zram03 zram03
+
+#fallocate test cases
+fallocate01 fallocate01
+fallocate02 fallocate02
+fallocate03 fallocate03
+fallocate04 fallocate04
+
+memset01 memset01
+memcmp01 memcmp01
+memcpy01 memcpy01
+
+migrate_pages01 migrate_pages01
+migrate_pages02 migrate_pages02
+migrate_pages03 migrate_pages03
+
+swapping01 swapping01 -i 5
+
+swapoff01 swapoff01
+swapoff02 swapoff02
+
+swapon01 swapon01
+swapon02 swapon02
+swapon03 swapon03
+
+#cve
+cve-2017-1000364 stack_clash
+cve-2017-5754 meltdown
+cve-2014-0196 cve-2014-0196
+cve-2015-0235 gethostbyname_r01
+cve-2015-7550 keyctl02
+cve-2016-4470 keyctl01.sh
+cve-2015-3290 cve-2015-3290
+cve-2016-5195 dirtyc0w
+cve-2016-7042 cve-2016-7042
+cve-2016-7117 cve-2016-7117
+cve-2016-9604 keyctl08
+cve-2016-10044 cve-2016-10044
+cve-2017-2618 cve-2017-2618
+cve-2017-2671 cve-2017-2671
+cve-2017-7308 setsockopt02
+cve-2017-7472 keyctl04
+cve-2017-12192 keyctl07
+cve-2017-12193 add_key04
+cve-2017-15274 add_key02
+cve-2017-15299 request_key03 -b cve-2017-15299
+cve-2017-15537 ptrace07
+cve-2017-15951 request_key03 -b cve-2017-15951
+cve-2017-17807 request_key04
+cve-2017-1000364 stack_clash
+cve-2017-5754 meltdown
+cve-2017-17052 cve-2017-17052
+cve-2017-16939 cve-2017-16939
+cve-2017-17053 cve-2017-17053
+cve-2017-18075 pcrypt_aead01
+cve-2018-5803 sctp_big_chunk
+cve-2018-1000001 realpath01
+
+overcommit_memory01 overcommit_memory
+overcommit_memory02 overcommit_memory -R 0
+overcommit_memory03 overcommit_memory -R 30
+overcommit_memory04 overcommit_memory -R 80
+overcommit_memory05 overcommit_memory -R 100
+overcommit_memory06 overcommit_memory -R 200
+
+max_map_count max_map_count -i 10
+
+min_free_kbytes min_free_kbytes
+
+futex_wait01 futex_wait01       -i 10
+futex_wait02 futex_wait02       -i 10
+futex_wait03 futex_wait03       -i 10
+futex_wait04 futex_wait04       -i 10
+futex_wait05 futex_wait05       -i 10
+futex_wake01 futex_wake01       -i 10
+futex_wake02 futex_wake02       -i 10
+futex_wake03 futex_wake03       -i 10
+futex_wake04 futex_wake04       -i 10
+futex_wait_bitset01 futex_wait_bitset01 -i 10
+
+memfd_create01 memfd_create01
+memfd_create02 memfd_create02
+memfd_create03 memfd_create03
+memfd_create04 memfd_create04

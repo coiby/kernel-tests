@@ -3,7 +3,7 @@ description: |
     ipxe test booting ipxe.iso from the ipxe-bootimgs package into a vm.
     It just checks that the VM boots a RHEL kernel going through an ipxe
     script.
-contact: Oliver Gutierrez <ogutierr@redhat.com>
+contact: Jiri Dluhos <jdluhos@redhat.com>
 test: bash ./runtest.sh
 path: /ipxe/iso
 framework: beakerlib

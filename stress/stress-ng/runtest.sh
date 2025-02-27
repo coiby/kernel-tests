@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2166
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /kernel/stress/stress-ng
@@ -33,8 +34,8 @@ TEST="stress/stress-ng"
 BUILDDIR="/opt/stress-ng"
 
 # task parameters
-# stress-ng git location
-GIT_URL=${GIT_URL:-"https://github.com/ColinIanKing/stress-ng.git"}
+# stress-ng git location, mirroring from https://github.com/ColinIanKing/stress-ng.git
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/stress-ng.git"}
 # current release
 GIT_BRANCH=${GIT_BRANCH:-"tags/V0.13.00"}
 # test 'random' or 'sequential' class only by parameter passing
@@ -195,7 +196,7 @@ rlPhaseStartSetup
     if systemctl list-unit-files | grep -q systemd-zram-setup ; then
             rlRun "systemctl disable --now systemd-zram-setup@zram0" 0 "disable zram for os class tests"
             if [ -e /etc/systemd/zram-generator.conf ]; then
-                rstrnt-backup /etc/systemd/zram-generator.conf
+                rlFileBackup /etc/systemd/zram-generator.conf
             fi
             cat /dev/null > /etc/systemd/zram-generator.conf
          fi
@@ -233,7 +234,7 @@ rlPhaseStartCleanup
 
         if systemctl list-unit-files | grep -q systemd-zram-setup ; then
             rm -f /etc/systemd/zram-generator.conf
-            rstrnt-restore
+            rlFileRestore
             rlRun "systemctl enable --now systemd-zram-setup@zram0" 0 "re-enable zram"
 
         fi

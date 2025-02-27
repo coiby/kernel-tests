@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2207,SC2210,SC2034
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -277,7 +278,7 @@ function run_swap_sress_file()
 
 	rlRun "$cgexec $cgroup_version $cgroup timeout $((STRESS_NG_RUNTIME + 20)) stress-ng --vm $(nproc) --vm-bytes ${workingset_size}m -t ${STRESS_NG_RUNTIME}" 0-255
 
-	test -f ./pmbench/pmbench || { skip_pmbench=1; report_result "pmbench_no_binary" SKIP; }
+	test -f ./pmbench/pmbench || { skip_pmbench=1; rstrnt-report-result "pmbench_no_binary" SKIP; }
 	for j in $(seq 1 5); do
 		((skip_pmbench)) && break
 		local probe_time=20
@@ -311,19 +312,19 @@ function run_swap_stress()
 		rlRun "${run_tests[$i]}"
 		# No runtest for this disk/partition, it's nope test, mark SKIP
 		if [ "${run_tests[$i]}" = "true" ]; then
-			echo "No test runner for "${swap_test_devices[$i]}" type:${swap_dev_types[$i]} mnt:${swap_dev_mnts[$i]}"
+			echo "No test runner for ${swap_test_devices[$i]} type:${swap_dev_types[$i]} mnt:${swap_dev_mnts[$i]}"
 			result=SKIP
 		else
-			echo "Test runner:${run_tests[$i]} for "${swap_test_devices[$i]}" type:${swap_dev_types[$i]} mnt:${swap_dev_mnts[$i]}"
+			echo "Test runner:${run_tests[$i]} for ${swap_test_devices[$i]} type:${swap_dev_types[$i]} mnt:${swap_dev_mnts[$i]}"
 			dmesg | grep -E "WARNING:|BUG:|Oops" && result=FAIL
 		fi
 
-		report_result "${result_names[$i]}" $result
+		rstrnt-report-result "${result_names[$i]}" $result
 
 		result=PASS
 		run_swap_sress_file
 		dmesg | grep -E "WARNING:|BUG:|Oops" && result=FAIL && echo "Please check dmesg.log or console.log"
-		report_result "${result_names[$i]}_file" $result
+		rstrnt-report-result "${result_names[$i]}_file" $result
 	done
 
 	swapon -a

@@ -1,0 +1,16 @@
+summary: test wrapper for kernel module_diff
+contact: zhijwang@redhat.com
+test: bash ./runtest.sh
+framework: beakerlib
+extra-summary: module_diff
+extra-task: module_diff
+
+environment:
+  BASEURL: "http://download.devel.redhat.com/brewroot/packages"
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - KT1-9

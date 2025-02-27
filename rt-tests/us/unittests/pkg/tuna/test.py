@@ -2,12 +2,21 @@
 """
 Unittest for package tuna
 """
+import glob
 import os
 import subprocess
 import rtut
 import re
 
 class TunaTest(rtut.RTUnitTest):
+
+    @staticmethod
+    def get_cpu_sockets():
+        cpu_sockets = set()
+        for path in glob.glob("/sys/devices/system/cpu/cpu*/topology/physical_package_id"):
+            with open(path, "r") as f:
+                cpu_sockets.add(int(f.read().rstrip()))
+        return sorted(list(cpu_sockets))
 
     def setUp(self):
         # pylint: disable=R1732
@@ -16,7 +25,7 @@ class TunaTest(rtut.RTUnitTest):
         self.pidplay = self.thrdplay.pid
         self.tmp_file = f"{os.getcwd()}/output.txt"
         f = open("/etc/redhat-release", "r")
-        self.rhel_version = float(re.findall(r"\d+\.\d+", f.read().rstrip())[0])
+        self.rhel_version = float(re.findall(r"\d+\.\d+|\d+", f.read().rstrip())[0])
         f.close()
 
     def tearDown(self):
@@ -79,7 +88,7 @@ class TunaTest(rtut.RTUnitTest):
 
     def test_isolate(self):
         if self.rhel_version >= 9.2:
-            self.run_cmd(f'tuna isolate --cpus 0')
+            self.run_cmd('tuna isolate --cpus 0')
         else:
             self.run_cmd(f'tuna --threads={self.pidplay} --cpus=0 --isolate')
 
@@ -124,10 +133,11 @@ class TunaTest(rtut.RTUnitTest):
             self.run_cmd('tuna --cpus=0,1 --run="ps -ef"')
 
     def test_sockets(self):
+        cpu_socket = self.get_cpu_sockets()[0]
         if self.rhel_version >= 9.2:
-            self.run_cmd('tuna show_threads --sockets 0')
+            self.run_cmd(f'tuna show_threads --sockets {cpu_socket}')
         else:
-            self.run_cmd('tuna --sockets=0')
+            self.run_cmd(f'tuna --sockets={cpu_socket}')
 
 if __name__ == '__main__':
     TunaTest.run_unittests()
