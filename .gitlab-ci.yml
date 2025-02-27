@@ -126,7 +126,7 @@ codeowners check:
   variables:
     FOOTER_CONFIG: |
       name: codeowners-check
-      source_code: https://gitlab.com/cki-project/cki-tools/-/blob/main/cki/deployment_tools/gitlab_codeowners_config.py
+      source_code: https://gitlab.com/cki-project/cki-tools/-/blob/main/cki_tools/gitlab_codeowners_config.py
       faq_name: CKI FAQ
       faq_url: https://cki-project.org/l/devel-faq/
       documentation_url: https://cki-project.org/l/gitlab-codeowners-config-docs
@@ -137,14 +137,14 @@ codeowners check:
     - |
       # compare CODEOWNERS
       export GITLAB_TOKENS='{"gitlab.com":"GITLAB_JOB_CODEOWNERS_KERNEL_TESTS_MR_ACCESS_TOKEN"}'
-      if ! python3 -m cki.deployment_tools.gitlab_codeowners_config \
+      if ! python3 -m cki_tools.gitlab_codeowners_config \
           ${CI_MERGE_REQUEST_IID:+--comment-mr-iid "${CI_MERGE_REQUEST_IID}"} \
           needs-update
       then
           python3 -m pip install git+https://gitlab.com/cki-project/kpet.git
           git clone https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db.git --depth 1
           python3 -m kpet --db kpet-db test list -o json > kpet-db-tests.json
-          python3 -m cki.deployment_tools.gitlab_codeowners_config \
+          python3 -m cki_tools.gitlab_codeowners_config \
               --test-path kpet-db-tests.json \
               ${CI_MERGE_REQUEST_IID:+--comment-mr-iid "${CI_MERGE_REQUEST_IID}"} \
               diff
@@ -364,7 +364,7 @@ check if LTP version on DCI matches the default on distribution/ltp/include-ng/i
             --mr-iid "${CI_MERGE_REQUEST_IID}" \
             --id
         # post a new note with the URL
-        body=$(python3 -m cki.deployment_tools.render --no-autoescape <<< "${COMMENT_TEMPLATE_J2}")
+        body=$(python3 -m cki_tools.render --no-autoescape <<< "${COMMENT_TEMPLATE_J2}")
         footer=$(python3 -m cki_lib.footer --format gitlab)
         python3 -m cki_lib.gitlab \
             --gitlab-url "${CI_SERVER_URL}" \
