@@ -38,7 +38,7 @@ rlJournalStart
         rlTestVersion "${packageVersion}" '>=' 'clevis-7-6' || rlDie "Tested functionality is not in old version ${packageVersion}"
 
         TmpDir="mktemp -d"
-        rlRun "pushd $TmpDir"
+        rlRun "pushd ${TmpDir}"
     rlPhaseEnd
 
     rlPhaseStartTest
