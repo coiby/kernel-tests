@@ -7,6 +7,6 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=./runtest.sh
 max_type=10m
-dependencies=xfsprogs;util-linux
+dependencies=xfsprogs;util-linux,gawk
