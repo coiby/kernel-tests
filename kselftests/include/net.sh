@@ -304,7 +304,7 @@ do_bpf_test_progs_config()
 	modprobe nf_conntrack
 	modprobe nf_nat
 
-	install_epel_pkg iptables_legacy || test_warn "Install iptables-legacy failed"
+	install_epel_pkg iptables-legacy || test_warn "Install iptables-legacy failed"
 }
 
 do_bpf_test_progs_run()
