@@ -37,8 +37,8 @@ rlJournalStart
         packageVersion=$(rpm -q ${PACKAGE} --qf ${FMT})
         rlTestVersion "${packageVersion}" '>=' 'clevis-7-6' || rlDie "Tested functionality is not in old version ${packageVersion}"
 
-        TmpDir="mktemp -d"
-        rlRun "pushd $TmpDir"
+        TmpDir=$(mktemp -d)
+        rlRun "pushd ${TmpDir}"
     rlPhaseEnd
 
     rlPhaseStartTest
