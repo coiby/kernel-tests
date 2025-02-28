@@ -8,6 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
+dependencies=rpmdevtools
 repoRequires=cki_lib;rt-tests/include;automotive/include
 max_time=2h
 use_pty=false
