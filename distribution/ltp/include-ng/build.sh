@@ -29,16 +29,18 @@ install_kirk()
 			$pkg_mgr -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
 			$pkg_mgr -y install python3-click
 		fi
-
-		# install python3 click module from pip
-		pip3 show click --quiet || pip3 install click
-		if [ $? -ne 0 ]; then
-			echo "Aborting current task: Couldn't install click" | tee -a $OUTPUTFILE
-			if [[ -n $RSTRNT_TASKNAME ]]; then
-				rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-				exit 0
-			else
-				exit 1
+		if ! rpm -q python3-click; then
+			rpm -q python3-pip > /dev/null || $pkg_mgr -y install python3-pip
+			# install python3 click module from pip
+			pip3 show click --quiet || pip3 install click
+			if [ $? -ne 0 ]; then
+				echo "Aborting current task: Couldn't install click" | tee -a $OUTPUTFILE
+				if [[ -n $RSTRNT_TASKNAME ]]; then
+					rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+					exit 0
+				else
+					exit 1
+				fi
 			fi
 		fi
 	fi

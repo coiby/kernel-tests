@@ -30,8 +30,6 @@ require:
   - numactl
   - strace
   - wget
-  - python3
-  - python3-pip
   - initscripts-service
   - type: file
     pattern:
