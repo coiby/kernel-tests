@@ -6,7 +6,7 @@
 static int cpu = 0;
 static int flag = 0;
 /* runtime 1s by default */
-static const unsigned long max_runtime = msecs_to_jiffies(1000);
+static unsigned long max_runtime = 0;
 static unsigned long start_time = 0;
 
 static struct task_struct *thread_locker;
@@ -61,6 +61,8 @@ static int __init spinlock_preempt_test_init(void)
 #endif
 	pr_info("Checking spin_lock() is converted to rtmutex in PREEMPT_RT and could be preempted.");
 	pr_info("Threads bind to cpus %d\n", cpu);
+
+	max_runtime = msecs_to_jiffies(1000);
 
 	spin_lock_init(&test_spinlock);
 
