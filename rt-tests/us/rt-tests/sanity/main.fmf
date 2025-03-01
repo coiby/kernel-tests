@@ -1,11 +1,19 @@
-summary: Functional test for rt-tests
+summary: KG-RT /kernel/rt-tests/us/rt-tests/sanity
 description: Functional test for the rt-tests userspace package.
 contact: Shizhao Chen <shichen@redhat.com>
+enabled: true
+id: 9f732898-ef3f-453d-8f1a-553162f6df9f
+component:
+    - kernel-rt
 test: bash ./runtest.sh
 framework: shell
 require:
-  - procps-ng
-  - psmisc
+    - procps-ng
+    - psmisc
+    - realtime-tests
+    - type: file
+      pattern:
+          - /rt-tests/include
 duration: 60m
 extra-summary: rt-tests/us/rt-tests/sanity
 extra-task: rt-tests/us/rt-tests/sanity
