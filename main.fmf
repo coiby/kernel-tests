@@ -1,0 +1,21 @@
+check:
+  - how: avc
+  - how: dmesg
+  - how: watchdog
+adjust:
+  - when: check-result == info
+    check+:
+      - how: avc
+        result: info
+      - how: dmesg
+        result: info
+      - how: watchdog
+        result: info
+  - when: check-result == disabled
+    check+:
+      - how: avc
+        enabled: false
+      - how: dmesg
+        enabled: false
+      - how: watchdog
+        enabled: false
