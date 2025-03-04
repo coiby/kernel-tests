@@ -274,6 +274,8 @@ function setupRepo
     rlRun "rm -rf kvm-unit-tests"
     if [[ "${UPSTREAM}" == "YES" ]] ; then
       rlRun "git clone --depth=1 --branch=upstream https://gitlab.com/multi-arch-ci/kvm-unit-tests.git > /dev/null 2>&1"
+    elif [[ "$OSVERSION" == "RHEL8" ]] ; then
+      rlRun "git clone --depth=1 --branch=RHEL8 https://gitlab.com/multi-arch-ci/kvm-unit-tests.git > /dev/null 2>&1"
     else
       rlRun "git clone --depth=1 --branch=master https://gitlab.com/multi-arch-ci/kvm-unit-tests.git > /dev/null 2>&1"
     fi
