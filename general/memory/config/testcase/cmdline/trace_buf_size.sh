@@ -44,12 +44,10 @@ function trace_buf_size()
 	fi
 
 	cpus=$(grep -w processor /proc/cpuinfo | wc -l)
-	mem_total_K=$(awk -e '/^MemTotal:/ { print $2}' /proc/meminfo)
 	early_mem_K=$(journalctl -kb | awk -e '/Memory:/ {split(toupper($7), array, "K"); print array[1]}')
 	dmi_total_mem=$(dmidecode -t 17 | grep -e 'Form Factor: DIMM' -B1 --no-group-separator | awk -e '/[[:digit:]]/ {sum+=$2; unit=$3} END{print sum" "unit}')
 	total_mem=$(echo $dmi_total_mem | awk -e '{if ($2 == "MB") print $1/1024; else print $1}')
 	mem_early_B=$(($early_mem_K * 1024))
-	mem_total_B=$(($mem_total_K * 1024))
 
 	if  [ $total_mem -lt $cpus ]; then
 		rlReport "trace_buf_size: do not have enough memroy!, skipped." SKIP
