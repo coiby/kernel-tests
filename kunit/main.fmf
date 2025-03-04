@@ -8,6 +8,11 @@ tag:
 require:
   - python3
   - python3-pip
+  - type: file
+    pattern:
+      - /cmdline_helper
+      - /cki_lib
+      - /kernel-include
 extra-summary: KUNIT
 extra-task: KUNIT
 id: c55dc1bf-96af-4322-987f-ee36eda21b74
