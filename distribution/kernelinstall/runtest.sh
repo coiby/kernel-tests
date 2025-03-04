@@ -57,7 +57,6 @@ function Abort ()
 {
     # Abort the rhts recipe if we are running the wrong kernel
     DeBug "Abort recipe"
-    rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
     rstrnt-abort recipe
 }
 
