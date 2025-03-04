@@ -36,11 +36,14 @@ function trace_buf_size()
 	#rhel6 not backport this regression. only check on rhel7,8 x86_64 which have journalctl.
 
 	if rlIsRHEL 6; then
-		return
+		rlLog "Only for rhel > 6"
+		rstrnt-report-result "${FUNCNAME[0]}-is_rhel6" SKIP
+		return 0
 	fi
 	if [ "$(rlGetPrimaryArch)" != "x86_64" ]; then
 		rlLog "Only for x86_64"
-		return
+		rstrnt-report-result "${FUNCNAME[0]}-not_x86_64" SKIP
+		return 0
 	fi
 
 	cpus=$(grep -w processor /proc/cpuinfo | wc -l)
@@ -50,8 +53,9 @@ function trace_buf_size()
 	mem_early_B=$(($early_mem_K * 1024))
 
 	if  [ $total_mem -lt $cpus ]; then
-		rlReport "trace_buf_size: do not have enough memroy!, skipped." SKIP
-		return
+		rlLog "total_mem $total_mem < cpus $cpus"
+		rstrnt-report-result "${FUNCNAME[0]}-total_mem" SKIP
+		return 0
 	fi
 	per_core_buf=$(($mem_early_B/$cpus))
 
@@ -62,4 +66,5 @@ function trace_buf_size()
 	setup_cmdline_args "trace_buf_size=$per_core_buf trace_event=sched:*" trace_buf
 	sleep 60
 	cleanup_cmdline_args "trace_buf_size trace_event" trace_buf
+	return 0
 }
