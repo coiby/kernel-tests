@@ -1,0 +1,7 @@
+summary: Basic sanity test for rv
+contact: Qiao Zhao <qzhao@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 20m
+extra-summary: rt-tests/us/rv/sanity
+extra-task: rt-tests/us/rv/sanity

@@ -1,0 +1,16 @@
+summary: Basic/sanity test for rtla-osnoise
+description: |
+    Unit test for the rtla osnoise userspace package.The rtla osnoise
+    tool is an interface for the osnoise tracer. The osnoise tracer
+    dispatches a kernel thread per-cpu. These threads read the time in
+    a loop while with preemption, softirq and IRQs enabled, thus allowing
+    all the sources of operating system noise during its execution. The
+    osnoise’s tracer threads take note of the delta between each time read
+    along with an interference counter of all sources of interference. At
+    the end of each period, the osnoise tracer displays a summary of the results.
+contact: Chang Yin <cyin@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 30m
+extra-summary: rt-tests/us/rtla/rtla-osnoise
+extra-task: rt-tests/us/rtla/rtla-osnoise

@@ -1,0 +1,13 @@
+summary: Basic/sanity test for rtla-timerlat
+description: |
+    Unit test for the rtla-timerlat userspace package. The rtla timerlat
+    tool is an interface for the timerlat tracer. The timerlat tracer
+    dispatches a kernel thread per-cpu. These threads set a periodic timer 
+    to wake themselves up and go back to sleep. After the wakeup, they collect 
+    and generate useful information for the debugging of operating system timer latency.
+contact: Chang Yin <cyin@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 30m
+extra-summary: rt-tests/us/rtla/rtla-timerlat
+extra-task: rt-tests/us/rtla/rtla-timerlat

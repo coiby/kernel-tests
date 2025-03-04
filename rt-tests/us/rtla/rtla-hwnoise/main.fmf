@@ -1,0 +1,12 @@
+summary: Basic/sanity test for rtla-hwnoise
+description: |
+    Unit test for the rtla hwnoise userspace package.rtla hwnoise collects
+    the periodic summary from the osnoise tracer running with interrupts
+    disabled. By disabling interrupts, and the scheduling of threads as a 
+    consequence only non-maskable interrupts and hardware-related noise is allowed.
+contact: Chang Yin <cyin@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 20m
+extra-summary: rt-tests/us/rtla/rtla-hwnoise
+extra-task: rt-tests/us/rtla/rtla-hwnoise
