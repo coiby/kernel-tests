@@ -1493,9 +1493,9 @@ else
     if [[ "$RT_REQUESTED" == "true" && "$RT_DEBUG" == "true" ]]; then
         # Ensure proper name "kernel-rt-debug" is handled regardless of what strings
         # the user utilized to request kernel-rt-debug
-        testkernbase=kernel-rt-debug-$KERNELARGVERSION
-        testkername=kernel-rt-debug
-        testkerndevel=kernel-rt-debug-devel-$KERNELARGVERSION
+        testkernbase=kernel-rt$RT_SUBTYPE-debug-$KERNELARGVERSION
+        testkername=kernel-rt$RT_SUBTYPE-debug
+        testkerndevel=kernel-rt$RT_SUBTYPE-debug-devel-$KERNELARGVERSION
     else
         testkernbase=$KERNELARGNAME-$KERNELARGVARIANT-$KERNELARGVERSION
         testkername=$KERNELARGNAME-$KERNELARGVARIANT
