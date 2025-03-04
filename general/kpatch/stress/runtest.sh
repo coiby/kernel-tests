@@ -36,6 +36,7 @@
 
 KPATCH_MODULE="${KPATCH_MODULE:-}"
 KPATCH_PATH="${KPATCH_PATH:-}"
+STRESSER="${STRESSER:-kbuild trace stress-ng}"
 if [ -z "$KPATCH_MODULE" ]; then
     if rpm -qa | grep kpatch-patch ; then
         KPATCH_PATH="/usr/lib/kpatch/$(uname -r)"
@@ -164,7 +165,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest
-        for stresser in kbuild trace stress-ng; do
+        for stresser in ${STRESSER}; do
             run_kpatch_in_stress $stresser
         done
     rlPhaseEnd
