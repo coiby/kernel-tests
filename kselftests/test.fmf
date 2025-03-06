@@ -29,6 +29,7 @@ require:
         - /cki_lib
         - /kernel-include
 recommend:
+  - conntrack-tools
   - fuse
   - iperf3
   - netsniff-ng
