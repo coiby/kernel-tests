@@ -50,7 +50,7 @@ function runtest {
 	if [[ "$(readlink -f "/sys/block/$nvme_dev/device")" =~ /nvme-subsystem/ ]]; then
 		tlog "$nvme_devs are NVMe multipath devices"
 		for nvme_multi in /sys/block/nvme*c*n*; do
-			nr_num=$(cat /sys/block/"$nvme_multi"/queue/nr_requests)
+			nr_num=$(cat "$nvme_multi"/queue/nr_requests)
 			tok "echo 64 > $nvme_multi/queue/nr_requests"
 			ret=$?
 			if (( ret == 0 )); then
