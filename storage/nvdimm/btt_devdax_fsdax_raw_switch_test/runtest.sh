@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
@@ -19,13 +19,13 @@ function btt_fsdax_raw_devdax_switch_ns() {
 	NS=$1
 	for sector_size in $sector_size_list; do
 		tok "ndctl create-namespace -f -e $NS --mode=sector -l $sector_size | tee temp_ns"
-		NS=$(cat temp_ns | grep -oE namespace.*[0-9])
+		NS=$(cat temp_ns | grep -oE "namespace.*[0-9]")
 		tok "ndctl create-namespace -f -e $NS --mode=fsdax | tee temp_ns"
-		NS=$(cat temp_ns | grep -oE namespace.*[0-9])
+		NS=$(cat temp_ns | grep -oE "namespace.*[0-9]")
 		tok "ndctl create-namespace -f -e $NS --mode=raw | tee temp_ns"
-		NS=$(cat temp_ns | grep -oE namespace.*[0-9])
+		NS=$(cat temp_ns | grep -oE "namespace.*[0-9]")
 		tok "ndctl create-namespace -f -e $NS --mode=devdax | tee temp_ns"
-		NS=$(cat temp_ns | grep -oE namespace.*[0-9])
+		NS=$(cat temp_ns | grep -oE "namespace.*[0-9]")
 	done
 }
 
@@ -44,7 +44,7 @@ function runtest (){
 			local test_dev="$RETURN_STR"
 			for((i=0;i<4;i++)); do
 				((num=$i+1))
-				NS_List[$i]=$(ndctl list | grep -oE namespace.*[0-9] | head -$num | tail -1)
+				NS_List[$i]=$(ndctl list | grep -oE "namespace.*[0-9]" | head -$num | tail -1)
 			done
 			for((i=0;i<4;i++)); do
 				btt_fsdax_raw_devdax_switch_ns "${NS_List[$i]}"

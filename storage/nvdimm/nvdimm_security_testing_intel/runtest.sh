@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
@@ -75,8 +75,8 @@ setup_keys()
 		backup_handle=1
 	fi
 
-	tok "dd if=/dev/urandom bs=1 count=32 2>/dev/null | keyctl padd user "$masterkey" @u"
-	tok "keyctl pipe "$(keyctl search @u user $masterkey)" > "$masterpath""
+	tok "dd if=/dev/urandom bs=1 count=32 2>/dev/null | keyctl padd user ${masterkey} @u"
+	tok "keyctl pipe $(keyctl search @u user ${masterkey}) > ${masterpath}"
 }
 
 test_cleanup()

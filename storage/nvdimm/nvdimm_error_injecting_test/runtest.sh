@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
@@ -18,14 +18,13 @@ function error_inject ()
 }
 
 function runtest (){
-	num=0
 	sector_size_list="$SECTOR_SIZE_LIST"
 			echo $sector_size_list
 
 			#For RAW
 			NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX 1 RAW
 			local test_dev="$RETURN_STR"
-			NS=`ndctl list | grep -oE namespace.*[0-9]`
+			NS=$(ndctl list | grep -oE "namespace.*[0-9]")
 			error_inject $NS
 
 #			#For BTT
@@ -39,14 +38,14 @@ function runtest (){
 			#For FSDAX
 			NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX 1 FSDAX
 			local test_dev="$RETURN_STR"
-			NS=`ndctl list | grep -oE namespace.*[0-9]`
+			NS=$(ndctl list | grep -oE "namespace.*[0-9]")
 			error_inject $NS
 
 			#For DEVDAX
 			for align_size in 2M 1G; do
 				NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX 1 DEVDAX $align_size
 				local test_dev="$RETURN_STR"
-				NS=`ndctl list | grep -oE namespace.*[0-9]`
+				NS=$(ndctl list | grep -oE "namespace.*[0-9]")
 				error_inject $NS
 			done
 }

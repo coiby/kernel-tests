@@ -2,13 +2,12 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
 function LV_Create (){
 
-	local disk_list=''
 	local disk_num=0
 	LV_LIST=''
 
@@ -39,7 +38,6 @@ function LV_Create (){
 
 function LV_Delete (){
 
-	local disk_list=''
 	local disk_num=0
 
 	for disk in $devlist; do

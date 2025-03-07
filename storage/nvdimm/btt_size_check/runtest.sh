@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 
 # Include Storage related environment
-FILE=$(readlink -f "$BASH_SOURCE")
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
 . "$CDIR"/../include/include.sh || exit 200
 
@@ -24,7 +24,7 @@ function runtest (){
 
 		NVDIMM_Get_RAW_BTT_FSDAX_DEVDAX 1 BTT "$sector_size"
 		local test_dev="$RETURN_STR"
-		if [ ${test_dev} = "pmem0s" -o ${test_dev} = "pmem1s" ]; then
+		if [ ${test_dev} = "pmem0s" ] || [ ${test_dev} = "pmem1s" ]; then
 			m=${test_dev:4:1}
 			NS=namespace$m.0
 		else
