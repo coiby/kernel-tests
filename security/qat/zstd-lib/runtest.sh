@@ -52,57 +52,20 @@ rlPhaseStartSetup
 			rlRun "mv qat_4xxx_mmp.bin /lib/firmware"
 		fi
 
+		# Set reboot flag, we want it up if all of the previous steps
+		# and the reboot have already happened. For the sake of the
+		# other qat tests which might be in the test plan.
 		rlRun "touch /var/tmp/qat-reboot"
 		# Reboot to activate the firmware (Beaker safe)
 		rlRun "rstrnt-reboot"
 	else
-		# If already enabled firmware and rebooted, continue
-		rlRun "rm -f /var/tmp/qat-reboot"
 		# Get a file to test on, recommended in the QAT ZSTD Plugin repo
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
+		rlLogInfo "The distro release is $(rlGetDistroRelease)"
+		rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
+		rlLogInfo "selinux is "$(getenforce)
+		rlRun "systemctl start qat"
 	fi
-rlPhaseEnd
-
-rlPhaseStart FAIL "Functionality"
-	rlLogInfo rlGetDistroRelease
-	rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
-	rlLogInfo "selinug "$(getenforce)
-	rlRun "systemctl start qat"
-	rlRun "cpa_sample_code"
-	if rlIsRHEL "<10"; then
-		rlRun "openssl speed -engine qatengine -elapsed -async_jobs 72 rsa2048"
-		rlRun "openssl speed -engine qatengine -elapsed ecdhx25519"
-		rlRun "openssl engine -t -c -v qatengine"
-	else
-		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 72 rsa2048"
-		rlRun "openssl speed -provider qatprovider -elapsed ecdhx25519"
-		rlRun "openssl list -providers -provider qatprovider"
-	fi
-rlPhaseEnd
-
-rlPhaseStart FAIL "QATzip"
-	rlLogInfo $(rpm -q qatzip)
-	TMP=`mktemp`
-	rlRun "bunzip2 dickens.bz2 -c > /tmp/data" 0 "preparing data"
-	cp /tmp/data /tmp/in
-	rlRun "/bin/time -f '%e' qzip /tmp/in 2>\"$TMP\"" 0 "QAT zip"
-	QZIP_TIME=$(cat "$TMP")
-	rlLogInfo "Time: ${QZIP_TIME} s"
-	rlRun "/bin/time -f '%e' qzip -d /tmp/in.gz 2>\"$TMP\"" 0  "QAT unzip"
-	QUNZIP_TIME=$(cat "$TMP")
-	rlLogInfo "Time: ${QUNZIP_TIME} s"
-	rlRun "diff /tmp/data /tmp/in" 0 "Comparing decompressed file with original"
-	rlRun "/bin/time -f '%e' gzip /tmp/data 2>\"$TMP\"" 0 "gzip"
-	GZIP_TIME=$(cat "$TMP")
-	rlLogInfo "Time: ${GZIP_TIME} s"
-	rlRun "/bin/time -f '%e' gzip -d /tmp/data.gz 2>\"$TMP\"" 0 "gunzip"
-	GUNZIP_TIME=$(cat "$TMP")
-	rlLogInfo "Time: ${GUNZIP_TIME} s"
-	ZIP_RATIO=$(echo ${QZIP_TIME}/${GZIP_TIME} | bc -l)
-	UNZIP_RATIO=$(echo ${QUNZIP_TIME}/${GUNZIP_TIME} | bc -l)
-	rlLogInfo "qzip/gzip speed: ${ZIP_RATIO}"
-	rlLogInfo "qunzip/gunzip speed: ${UNZIP_RATIO}"
-	rm ${TMP}
 rlPhaseEnd
 
 rlPhaseStartSetup

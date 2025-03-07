@@ -1,7 +1,7 @@
 [General]
-name=/kernel/security/qat
+name=/kernel/security/qat/lib
 owner=Denis Aleksandrov <daleksan@redhat.com>
-description=Tests for QAT userspace packages
+description=QAT lib tests
 license=GPLv2
 confidential=no
 destructive=no

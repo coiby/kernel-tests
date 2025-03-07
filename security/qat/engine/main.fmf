@@ -1,0 +1,37 @@
+summary: Tests for QAT engine to be used with Testing Farm
+contact: Denis Aleksandrov <daleksan@redhat.com>
+path: /security/qat/engine
+test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
+require:
+  - qatlib
+  - qatlib-service
+  - qatengine
+  - qatlib-tests
+  - qatzip
+  - gcc
+  - clang
+  - wget
+  - unzip
+  - git
+  - automake
+  - libtool
+  - openssl
+  - openssl-devel
+  - numactl-devel
+  - nasm
+  - zlib-devel
+  - pip
+  - bzip2
+  - autoconf
+  - cmake
+  - pkg-config
+  - libusdm-dev
+  - https://mirror.stream.centos.org/SIGs/9-stream/extras/x86_64/extras-common/Packages/c/centos-release-isa-override-9-2.el9s.noarch.rpm
+  - intel-ipsec-mb
+  - intel-ipp-crypto-mb
+  - intel-ipsec-mb-devel
+  - intel-ipp-crypto-mb-devel
+duration: 45m

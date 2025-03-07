@@ -1,0 +1,4 @@
+Description: Test suite for QAT lib userspace package
+Author: Vilem Marsik <vmarsik@redhat.com> and Denis Aleksandrov <daleksan@redhat.com>
+Links: The Intel QAT configuration script is from
+https://intel.github.io/quickassist/qatlib/configuration.html

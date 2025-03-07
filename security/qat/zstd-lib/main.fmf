@@ -1,6 +1,6 @@
-summary: Baseline tests for QAT userspace packages to be run with Testing Farm
+summary: Tests for QAT zstd-lib to be used with Testing Farm
 contact: Denis Aleksandrov <daleksan@redhat.com>
-path: /security/qat
+path: /security/qat/zstd-lib
 test: bash ./runtest.sh
 component:
   - kernel
