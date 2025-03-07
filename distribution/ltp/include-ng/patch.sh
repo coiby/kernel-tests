@@ -17,6 +17,7 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
 		${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
 		${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+		${PATCH} < ${ABS_DIR}/INTERNAL/0001-setrlimit06-cover-the-setting-resource-limit64.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-aio-stress-fix-opened-fd-leak.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-bpf-zero-initialize-bpf_attr-including-padd.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-mallinfo02-introduce-LTP_VAR_USED-to-avoid-.patch
