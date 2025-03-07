@@ -22,8 +22,8 @@
 # Test configuration
 # TODO: Make it customizable so we can test different driver versions
 # RHEL AI versions info: https://gitlab.com/redhat/rhel-ai/containers/nvidia-bootc/-/blob/main/argfile.conf?ref_type=heads
-DRIVER_VERSION="550.144.03"
-CUDA_VERSION='12.4.1'
+DRIVER_VERSION="570.86.15"
+CUDA_VERSION='12.8.0'
 BASE_URL='https://us.download.nvidia.com/tesla'
 SPECFILE_REPO='https://github.com/NVIDIA/yum-packaging-precompiled-kmod'
 
@@ -97,12 +97,11 @@ rlJournalStart
 
         rlLog "Installing CUDA"
         rlRun "dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel${OS_VERSION_MAJOR}/${TARGET_ARCH}/cuda-rhel${OS_VERSION_MAJOR}.repo"
-        rlRun "dnf -y module enable nvidia-driver:${DRIVER_STREAM}/default"
+        rlRun "dnf -y module enable nvidia-driver:${DRIVER_STREAM}-open/default"
         rlRun "dnf install -y \
             nvidia-driver-${DRIVER_VERSION} \
             nvidia-driver-cuda-${DRIVER_VERSION} \
             nvidia-driver-libs-${DRIVER_VERSION} \
-            nvidia-driver-NVML-${DRIVER_VERSION} \
             cuda-compat-${CUDA_DASHED_VERSION} \
             cuda-cudart-${CUDA_DASHED_VERSION} \
             nvidia-persistenced-${DRIVER_VERSION} \
