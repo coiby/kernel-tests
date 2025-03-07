@@ -22,8 +22,15 @@ mixed_tab_space:
 	fi
 
 internal_hostname:
-	readarray -t allowed_hosts < <(sed '/^#/d' .allowed-hosts) ; \
+	mirror="https://gitlab.com/redhat/centos-stream/src/kernel/documentation/-/raw/main/info/allowed-hosts.txt" ; \
+	curl -L --retry 20 --remote-time -o .allowed-hosts "$${mirror}" ; \
+	if [[ ! -f .allowed-hosts ]]; then \
+		echo "Error: failed to fetch allowed-hosts from $${mirror}" ; \
+		exit 1 ; \
+	fi ; \
+	readarray -t allowed_hosts < <(sed -e '/^#/d' -e 's/\s*#.*//' .allowed-hosts) ; \
 	readarray -t internal_hosts < <(grep -hroE --exclude=.allowed-hosts '([a-zA-Z0-9\\.\\-]+\.redhat.com)' * | sort -u) ; \
+	rm -f .allowed-hosts ; \
 	fail=0 ; \
 	for host in "$${internal_hosts[@]}"; do \
 		allowed=0 ; \
@@ -34,18 +41,11 @@ internal_hostname:
 			fi \
 		done ; \
 		if [[ "$${allowed}" -eq 0 ]]; then \
-			echo "$${host} is not allowed according to .allowed-hosts" ; \
+			echo "FAIL: hostname $${host} is not allowed.  For details, refer to: $${mirror}" ; \
 			fail=1 ; \
 		fi \
 	done ; \
-	# check if allowed entry should be removed as it is not being used \
-	for allowed_host in "$${allowed_hosts[@]}"; do \
-		if ! grep -hroEq --exclude=.allowed-hosts "$${allowed_host}"; then \
-			echo "$${allowed_host} from .allowed-hosts should be removed as it is not used" ; \
-			fail=1 ; \
-		fi ; \
-	done ; \
-	exit "$${fail}" ;
+	exit $${fail} ;
 
 deprecated_uname:
 	if grep --exclude-dir .git -Er "uname -[ip]"; then \

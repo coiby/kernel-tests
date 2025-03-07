@@ -1,5 +1,8 @@
 ---
 include:
+  - project: redhat/centos-stream/tests/kernel/gitlab-ci-templates
+    file: .gitlab/ci_templates/common.yml
+    ref: main
   - project: cki-project/cki-lib
     file: .gitlab/ci_templates/cki-common.yml
     ref: production
@@ -213,41 +216,8 @@ no-tmt-plans:
     - !reference [.rules, production-branch]
 
 check usage of internal hostnames:
-  extends: .cki_tools
-  script:
-    - |
-      readarray -t allowed_hosts < <(sed -e '/^#/d' -e 's/\s*#.*//' .allowed-hosts)
-      readarray -t internal_hosts < <(grep -hroE --exclude=.allowed-hosts '([a-zA-Z0-9\\.\\-]+\.redhat.com)' * | sort -u)
-      fail=0
-      warn=0
-      for host in "${internal_hosts[@]}"; do
-        allowed=0
-        for allowed_host in "${allowed_hosts[@]}"; do
-          if grep -E -w -q "${allowed_host}" <<< "${host}"; then
-              allowed=1
-              break
-          fi
-        done
-        if [[ "${allowed}" -eq 0 ]]; then
-            echo "${host} is not allowed according to .allowed-hosts"
-            fail=1
-        fi
-      done
-      # check if allowed entry should be removed as it is not being used
-      for allowed_host in "${allowed_hosts[@]}"; do
-        if ! grep -hroEq --exclude=.allowed-hosts "${allowed_host}"; then
-            echo "${allowed_host} from .allowed-hosts should be removed as it is not used"
-            warn=1
-        fi
-      done
-      if [[ "${fail}" -eq "1" ]]; then
-        exit 1
-      fi
-      if [[ "${warn}" -eq "1" ]]; then
-        exit 2
-      fi
-  allow_failure:
-    exit_codes: 2
+  extends: .kqe_internal_hostname_check
+  stage: 🐛
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
