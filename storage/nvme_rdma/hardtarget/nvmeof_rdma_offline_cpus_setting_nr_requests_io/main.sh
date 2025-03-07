@@ -47,29 +47,53 @@ function runtest {
 	tok "echo 0 > /sys/devices/system/cpu/cpu2/online"
 	tok "echo 0 > /sys/devices/system/cpu/cpu3/online"
 
-	nr_num=$(cat /sys/block/"$nvme_dev"/queue/nr_requests)
-	for nvme_dev in $nvme_devs; do
-		tok "echo 127 >/sys/block/${nvme_dev}/queue/nr_requests"
-		ret=$?
-		if (( ret == 0 )); then
-			tlog "INFO: setting nr_requests:127 on $nvme_dev pass"
-		else
-			tlog "INFO: setting nr_requests:127 on $nvme_dev failed"
-		fi
-	done
-
-	# setting nr_requests
-	tlog "INFO: restore nr_requests with $nr_num"
-	for nvme_dev in $nvme_devs; do
-		tok echo "$nr_num" >/sys/block/"$nvme_dev"/queue/nr_requests
-		ret=$?
-		if [ $ret -eq 0 ]; then
-			tlog "INFO: restore nr_requests:$nr_num on $nvme_dev pass"
-		else
-			tlog "INFO: setting nr_requests:$nr_num on $nvme_dev failed"
-		fi
-		trun cat /sys/block/"$nvme_dev"/queue/nr_requests
-	done
+	if [[ "$(readlink -f "/sys/block/$nvme_dev/device")" =~ /nvme-subsystem/ ]]; then
+		tlog "$nvme_devs are NVMe multipath devices"
+		for nvme_multi in /sys/block/nvme*c*n*; do
+			nr_num=$(cat "$nvme_multi"/queue/nr_requests)
+			tok "echo 64 > $nvme_multi/queue/nr_requests"
+			ret=$?
+			if (( ret == 0 )); then
+				tlog "INFO: setting nr_requests:64 on $nvme_multi pass"
+			else
+				tlog "INFO: setting nr_requests:64 on $nvme_multi failed"
+			fi
+		done
+		# restore nr_requests
+		tlog "INFO: restore nr_requests with $nr_num"
+		for nvme_multi in /sys/block/nvme*c*n*; do
+			tok "echo $nr_num > $nvme_multi/queue/nr_requests"
+			ret=$?
+			if (( ret == 0 )); then
+				tlog "INFO: setting nr_requests:$nr_num on $nvme_multi pass"
+			else
+				tlog "INFO: setting nr_requests:$nr_num on $nvme_multi failed"
+			fi
+		done
+	else
+		nr_num=$(cat /sys/block/"$nvme_dev"/queue/nr_requests)
+		for nvme_dev in $nvme_devs; do
+			tok "echo 64 >/sys/block/${nvme_dev}/queue/nr_requests"
+			ret=$?
+			if (( ret == 0 )); then
+				tlog "INFO: setting nr_requests:127 on $nvme_dev pass"
+			else
+				tlog "INFO: setting nr_requests:127 on $nvme_dev failed"
+			fi
+		done
+		# restore nr_requests
+		tlog "INFO: restore nr_requests with $nr_num"
+		for nvme_dev in $nvme_devs; do
+			tok "echo $nr_num >/sys/block/$nvme_dev/queue/nr_requests"
+			ret=$?
+			if [ $ret -eq 0 ]; then
+				tlog "INFO: restore nr_requests:$nr_num on $nvme_dev pass"
+			else
+				tlog "INFO: setting nr_requests:$nr_num on $nvme_dev failed"
+			fi
+			trun cat /sys/block/"$nvme_dev"/queue/nr_requests
+		done
+	fi
 
 	# online cpus
 	tlog "INFO: start online cpus"
