@@ -44,8 +44,8 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "906" && tskip "proc_sched_rt01" unfix
 	# https://issues.redhat.com/browse/RHELMISC-5339 ltp/swapon03.c:56: TFAIL: swapon(filename, 0) failed: EPERM (1)
 	kernel_in_range "5.14.0-441.el9" "5.14.0-999.el9" && tskip "swapon03" unfix
-	# fanotify09 failures on rhel9
-	osver_in_range "900" "907" && tskip "fanotify09" unfix
+	# fanotify09 failures on rhel9 - https://issues.redhat.com/browse/RHEL-82827
+	osver_in_range "900" "908" && tskip "fanotify09" unfix
 	# setpgid01 failures on rhel9
 	osver_in_range "900" "907" && tskip "setpgid01" unfix
 	# RHEL-65410: ltp/lite move_pages04 test failed
