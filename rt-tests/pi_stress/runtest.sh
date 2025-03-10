@@ -32,13 +32,14 @@ fi
 
 if (( rhel_x == 9 )); then
     # https://issues.redhat.com/browse/RHEL-77110
-    rpmdev-vercmp "$(rpm -q --qf '%{V}-%{R}' realtime-tests)" 2.8-4.el9 > /dev/null
+    rpmdev-vercmp "$(rpm -q --qf '%{V}-%{R}' realtime-tests)" 2.8-3.el9 > /dev/null
 elif (( rhel_x == 10 )); then
     # https://issues.redhat.com/browse/RHEL-77111
-    rpmdev-vercmp "$(rpm -q --qf '%{V}-%{R}' realtime-tests)" 2.8-5.el10 > /dev/null
+    rpmdev-vercmp "$(rpm -q --qf '%{V}-%{R}' realtime-tests)" 2.8-4.el10 > /dev/null
 fi
 
-if (( $? != 12 )); then
+# Use option when realtime-tests version is greater than the versions above
+if (( $? == 11 )); then
     OPT_USLEEP="-u $PIP_STRESS_USLEEP"
 fi
 
@@ -62,7 +63,7 @@ oneliner "pi_stress --quiet --groups=$(( nrcpus )) --duration=30"
 # Running pip_stress: used priority inheritance to handle an inversion
 
 # Try up to N times for a successful pip_stress run
-phase_start pip_stress
+phase_start_test pip_stress
 PIP_SUCCESS=0
 for attempt in $(seq "$PIP_STRESS_RETRIES"); do
     log "Attempt $attempt"
