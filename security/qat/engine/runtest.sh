@@ -28,7 +28,7 @@ rlJournalStart
 # Setting up environment for qatlib, qatengine, and qatzip testing
 rlPhaseStartSetup
 	# Start setup, including reboot
-	if ! [ -e /var/tmp/qat-reboot ]; then
+	if ! ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
 		# Get libzstd.a from source
 		rlRun "git clone https://github.com/facebook/zstd.git"
 		rlRun "cd zstd"
@@ -42,8 +42,6 @@ rlPhaseStartSetup
 		# Decompress the qat_4xxx firmware and reboot
 		if ls /lib/firmware/qat_4*.bin.xz > /dev/null 2>&1; then
 			rlRun "unxz /lib/firmware/qat_4*.bin.xz"
-		elif ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
-			echo "QAT firmware is active"
 		else
 			# Download the firmware packages if they are not present on the machine
 			rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx.bin"
@@ -52,10 +50,6 @@ rlPhaseStartSetup
 			rlRun "mv qat_4xxx_mmp.bin /lib/firmware"
 		fi
 
-		# Set reboot flag, we want it up if all of the previous steps
-		# and the reboot have already happened. For the sake of the
-		# other qat tests which might be in the test plan.
-		rlRun "touch /var/tmp/qat-reboot"
 		# Reboot to activate the firmware (Beaker safe)
 		rlRun "rstrnt-reboot"
 	else
