@@ -392,7 +392,7 @@ cki_has_kernel_debug_flags()
 # return 0 when running kernel automotive. Note will not work with older el9s kernels.
 cki_is_kernel_automotive()
 {
-    if (uname -r | grep -wq "el[0-9]*iv"); then
+    if (uname -r | grep -wq "el[0-9].*iv"); then
        return  0
     fi
     return 1
