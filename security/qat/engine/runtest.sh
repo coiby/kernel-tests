@@ -113,6 +113,15 @@ rlPhaseStart FAIL "QATengine: qat_sw tests"
 		rlRun "openssl speed -engine qatengine -elapsed -evp aes-192-gcm" 0 "Testing AES-192-GCM"
 		rlRun "openssl speed -engine qatengine -elapsed -evp aes-256-gcm" 0 "Testing AES-256-GCM"
 	else
+		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 8 rsa2048" 0 "Testing RSA 2k"
+		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 8 ecdhx25519" 0 "Testing ECDH X25519"
+		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 8 ecdhp256" 0 "Testing ECDH P-256"
+		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 8 ecdsap256" 0 "Testing ECDSA P-256"
+		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 8 ecdhp384" 0 "Testing ECDH P-384"
+		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 8 ecdsap384" 0 "Testing ECDSA P-384"
+		rlRun "openssl speed -provider qatprovider -elapsed -evp aes-128-gcm" 0 "Testing AES-128-GCM"
+		rlRun "openssl speed -provider qatprovider -elapsed -evp aes-192-gcm" 0 "Testing AES-192-GCM"
+		rlRun "openssl speed -provider qatprovider -elapsed -evp aes-256-gcm" 0 "Testing AES-256-GCM"
 	fi
 rlPhaseEnd
 
