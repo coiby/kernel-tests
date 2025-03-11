@@ -59,8 +59,8 @@ rlPhaseStartSetup
 		rlRun "systemctl start qat"
 
 		# Setup for qat_sw tests
-		rlRun "dnf install -y https://mirror.stream.centos.org/SIGs/9-stream/extras/x86_64/extras-common    /Packages/c/centos-release-isa-override-9-2.el9s.noarch.rpm" 0 "Installing override package in-scrip    t since beaker metadata can't handle links"
-		rlRun "dnf install -y intel-ipsec-mb intel-ipp-crypto-mb intel-ipsec-mb-devel intel-ipp-crypto-m    b-devel"
+		rlRun "dnf install -y https://mirror.stream.centos.org/SIGs/9-stream/extras/x86_64/extras-common/Packages/c/centos-release-isa-override-9-2.el9s.noarch.rpm" 0 "Installing override package in-scrip    t since beaker metadata can't handle links"
+		rlRun "dnf install -y intel-ipsec-mb intel-ipp-crypto-mb intel-ipsec-mb-devel intel-ipp-crypto-mb-devel"
 		rlRun "cd .."
 		rlRun "git clone https://github.com/intel/QAT_Engine.git"
 		rlRun "cd QAT_Engine/"
