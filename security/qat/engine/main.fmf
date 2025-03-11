@@ -28,5 +28,4 @@ require:
   - autoconf
   - cmake
   - pkg-config
-  - libusdm-dev
 duration: 45m
