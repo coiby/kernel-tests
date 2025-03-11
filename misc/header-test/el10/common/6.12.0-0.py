@@ -9,3 +9,6 @@ def setup(exc):
 
     exc['ynl/ynl-priv.h'] = (['string.h', 'linux/netlink.h'],
                                    OK, 'memset memcpy strcpy strlen nlattr NLMSG_HDRLEN')
+
+    exc['ynl/ynl.h'] = (['string.h', 'linux/netlink.h'],
+                                   OK, 'memset memcpy strcpy strlen nlattr NLMSG_HDRLEN')
