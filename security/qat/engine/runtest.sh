@@ -70,11 +70,11 @@ rlPhaseEnd
 
 # Setup for qat_sw tests
 rlPhaseStartSetup
-	rlRun "git clone https://github.com/intel/intel-ipsec-mb.git"
-	rlRun "cd intel-ipsec-mb"
-	rlRun "git checkout v1.3"
-	rlRun "make -j$(nproc)"
-	rlRun "sudo make install NOLDCONFIG=y"
+	#rlRun "git clone https://github.com/intel/intel-ipsec-mb.git"
+	#rlRun "cd intel-ipsec-mb"
+	#rlRun "git checkout v1.3"
+	#rlRun "make -j$(nproc)"
+	#rlRun "sudo make install NOLDCONFIG=y"
 
 	rlRun "cd .."
 	rlRun "git clone https://github.com/intel/QAT_Engine.git"
