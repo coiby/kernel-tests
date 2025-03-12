@@ -1,0 +1,9 @@
+summary: Unittest case for tuna
+contact: Qiao Zhao <qzhao@redhat.com>
+test: python3 test.py
+framework: shell
+require:
+  - tuna
+duration: 10m
+extra-summary: rt-tests/us/unittests/pkg/tuna
+extra-task: rt-tests/us/unittests/pkg/tuna
