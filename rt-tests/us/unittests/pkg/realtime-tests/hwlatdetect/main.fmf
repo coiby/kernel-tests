@@ -1,0 +1,10 @@
+summary: Unittest case for hwlatdetect
+contact: Qiao Zhao <qzhao@redhat.com>
+test: python3 test.py
+framework: shell
+recommend:
+  - rt-tests
+  - realtime-tests
+duration: 10m
+extra-summary: rt-tests/us/unittests/pkg/realtime-tests/hwlatdetect
+extra-task: rt-tests/us/unittests/pkg/realtime-tests/hwlatdetect
