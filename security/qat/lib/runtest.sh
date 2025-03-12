@@ -25,16 +25,9 @@
 
 rlJournalStart
 
-# Setting up environment for qatlib, qatengine, and qatzip testing
 rlPhaseStartSetup
 	# Start setup, including reboot
-	if ! ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
-		# Get libzstd.a from source
-		rlRun "git clone https://github.com/facebook/zstd.git"
-		rlRun "cd zstd"
-		rlRun "make -j$(nproc) && make install"
-		rlRun "cd .."
-
+	if ! ls /lib/firmware/qat_4*.bin > /dev/null 2>%1 || ! grubby --info=ALL | grep "intel_iommu=on     sm_on"; then
 		# Set kernel boot parameters for firmware and to reboot back
 		# into test execution
 		rlRun "grubby --update-kernel=ALL --args=\"intel_iommu=on sm_on\""
@@ -42,6 +35,8 @@ rlPhaseStartSetup
 		# Decompress the qat_4xxx firmware and reboot
 		if ls /lib/firmware/qat_4*.bin.xz > /dev/null 2>&1; then
 			rlRun "unxz /lib/firmware/qat_4*.bin.xz"
+		elif ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
+			rlLogInfo "Firmware is already set up"
 		else
 			# Download the firmware packages if they are not present on the machine
 			rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx.bin"
@@ -53,11 +48,20 @@ rlPhaseStartSetup
 		# Reboot to activate the firmware (Beaker safe)
 		rlRun "rstrnt-reboot"
 	else
-		rlRun "pip install prettytable"
+		# Get libzstd.a from source
+		rlRun "git clone https://github.com/facebook/zstd.git"
+		rlRun "cd zstd"
+		rlRun "make -j$(nproc) && make install"
+		rlRun "cd .."
+
+		# Start the QAT service
 		rlLogInfo "The distro release is $(rlGetDistroRelease)"
 		rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
 		rlLogInfo "selinux is "$(getenforce)
 		rlRun "systemctl start qat"
+
+		# Get dependency for Intel's QAT configuration script
+		rlRun "pip install prettytable"
 	fi
 rlPhaseEnd
 
