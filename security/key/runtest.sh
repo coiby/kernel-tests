@@ -32,6 +32,9 @@ rlJournalStart
         fi
         rlRun "git clone $GIT_URL" 0
         rlRun "cd ltp"
+        if rlIsRHEL '>9' && [[ $(uname -m) == "x86_64" ]]; then
+            rlRun "sed -i '/cve-2015-3290:*\+/ s/$/ -O0/' testcases/cve/Makefile"
+        fi
         rlRun "make -s autotools"
         rlRun "./configure"
         rlRun "make &> /dev/null"
