@@ -61,8 +61,8 @@ rlPhaseStartSetup
 
 		# Get files to test on, recommended in the QAT ZSTD Plugin repo
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
-		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/silesia.bz2"
-		rlRun "bunzip2 silesia.bz2"
+		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/silesia.zip"
+		rlRun "unzip silesia.zip"
 
 		# Configuration for Intel's qatzip-test
 		rlRun "git clone https://github.com/intel/QATzip.git"
