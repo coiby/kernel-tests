@@ -59,8 +59,10 @@ rlPhaseStartSetup
 		rlLogInfo "selinux is "$(getenforce)
 		rlRun "systemctl start qat"
 
-		# Get a file to test on, recommended in the QAT ZSTD Plugin repo
+		# Get files to test on, recommended in the QAT ZSTD Plugin repo
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
+		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/silesia.bz2"
+		rlRun "bunzip2 silesia.bz2"
 
 		# Configuration for Intel's qatzip-test
 		rlRun "git clone https://github.com/intel/QATzip.git"
@@ -69,6 +71,7 @@ rlPhaseStartSetup
 		rlRun "./autogen.sh"
 		rlRun "./configure"
 		rlRun "make -j$(nproc) && make install"
+		rlRun "cd .."
 
 		# Configure QAT to dc compression mode
 		rlRun "pip install prettytable"
@@ -76,7 +79,7 @@ rlPhaseStartSetup
 	fi
 rlPhaseEnd
 
-rlPhaseStart FAIL "QATzip"
+rlPhaseStart FAIL "QATzip: qzip compared against gzip"
 	rlLogInfo $(rpm -q qatzip)
 	TMP=`mktemp`
 	rlRun "bunzip2 dickens.bz2 -c > /tmp/data" 0 "preparing data"
@@ -99,6 +102,10 @@ rlPhaseStart FAIL "QATzip"
 	rlLogInfo "qzip/gzip speed: ${ZIP_RATIO}"
 	rlLogInfo "qunzip/gunzip speed: ${UNZIP_RATIO}"
 	rm ${TMP}
+rlPhaseEnd
+
+rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
+	rlRun "taskset -c 1 ~/QATzip/test/qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i ./silesia" 0 "Running unithread level 1 compression test 100 times with sw disabled on provided silesia file"
 rlPhaseEnd
 
 rlPhaseStartCleanup
