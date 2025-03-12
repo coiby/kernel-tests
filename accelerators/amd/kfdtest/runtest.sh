@@ -17,22 +17,27 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 
-ROCM_REPO_URL="https://raw.githubusercontent.com/containers/ai-lab-recipes/refs/heads/main/training/amd-bootc/repos.d/rocm.repo"
-AMDGPU_REPO_URL="https://raw.githubusercontent.com/containers/ai-lab-recipes/refs/heads/main/training/amd-bootc/repos.d/amdgpu.repo"
-
 rlJournalStart
 
     rlPhaseStartSetup
-        rlLog "Install wget"
-        rlRun "dnf install -y wget"
+        rlLog "Install build dependencies"
+        rlRun "dnf install -y cmake llvm llvm-devel numactl-devel"
+        rlLog "Build kfdtest"
+        rlRun "dnf install -y cmake llvm llvm-devel"
+        rlRun "git clone https://github.com/ROCm/ROCT-Thunk-Interface"
+        rlRun "cd ROCT-Thunk-Interface"
+        rlRun "git checkout rocm-6.2.x"
+        rlRun "git cherry-pick 8bb5764"
+        rlRun "cd tests/kfdtest/"
+        rlRun "mkdir build; cd build"
+        rlRun "cmake ../ -DCMAKE_PREFIX_PATH='/opt/rocm-6.2.0'"
+        rlRun "make -j$(nproc)"
     rlPhaseEnd
 
     rlPhaseStartTest
-        rlLog "Install ROCm and AMDGPU needed bits"
-        rlRun "wget ${ROCM_REPO_URL} -P /etc/yum.repos.d/"
-        rlRun "wget  ${AMDGPU_REPO_URL} -P /etc/yum.repos.d/"
-        rlRun "echo 'exclude=amdgpu-dkms-* dkms-*' >> /etc/dnf/dnf.conf"
-        rlRun "dnf install -y libdrm-* rocm6.2.0"
+        rlLog "TODO: Run kfdtest tests"
+        # ./run_kfdtest.sh -p aldebaran
+        # TODO: Identify which tests to run
     rlPhaseEnd
 
 rlJournalEnd

@@ -16,16 +16,19 @@
 # Include environments
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-# Include cki library
-# . ../../cki_lib/libcki.sh || exit 1
 
 rlJournalStart
 
     rlPhaseStartTest
-        rlLog "TODO: Tasks TBD yet"
+        rlLog "rocminfo check"
+        rlRun "rocminfo"
+        rlLog "amd-smi checks"
+        rlrun "amd-smi list"
+        rlrun "amd-smi static"
+        rlrun "amd-smi firmware"
+        rlrun "amd-smi monitor"
     rlPhaseEnd
 
 rlJournalEnd
 
 rlJournalPrintText
-
