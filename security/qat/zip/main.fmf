@@ -25,4 +25,6 @@ require:
   - zlib-devel
   - pip
   - bzip2
+  - autoconf
+  - lz4-devel
 duration: 45m
