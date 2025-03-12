@@ -25,8 +25,6 @@
 
 rlJournalStart
 
-# Setting up environment for qatlib, qatengine, and qatzip testing
-		if 
 rlPhaseStartSetup
 	# Start setup, including reboot
 	if ! ls /lib/firmware/qat_4*.bin > /dev/null 2>%1 || ! grubby --info=ALL | grep "intel_iommu=on sm_on"; then
