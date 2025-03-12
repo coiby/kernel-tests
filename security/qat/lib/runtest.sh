@@ -27,7 +27,7 @@ rlJournalStart
 
 rlPhaseStartSetup
 	# Start setup, including reboot
-	if ! ls /lib/firmware/qat_4*.bin > /dev/null 2>%1 || ! grubby --info=ALL | grep "intel_iommu=on     sm_on"; then
+	if ! ls /lib/firmware/qat_4*.bin > /dev/null 2>%1 || ! grubby --info=ALL | grep "intel_iommu=on sm_on"; then
 		# Set kernel boot parameters for firmware and to reboot back
 		# into test execution
 		rlRun "grubby --update-kernel=ALL --args=\"intel_iommu=on sm_on\""
