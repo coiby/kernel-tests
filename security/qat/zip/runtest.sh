@@ -61,6 +61,18 @@ rlPhaseStartSetup
 
 		# Get a file to test on, recommended in the QAT ZSTD Plugin repo
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
+
+		# Configuration for Intel's qatzip-test
+		rlRun "git clone https://github.com/intel/QATzip.git"
+		rlRun "cd QATzip/"
+		rlRun "export QZ_ROOT=`pwd`"
+		rlRun "./autogen.sh"
+		rlRun "./configure"
+		rlRun "make -j$(nproc) && make install"
+
+		# Configure QAT to dc compression mode
+		rlRun "pip install prettytable"
+		rlRun "python3 qat -c -m 2" 0 "Turning QAT mode to dc"
 	fi
 rlPhaseEnd
 
