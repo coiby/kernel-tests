@@ -416,6 +416,10 @@ function SetOSRelease ()
         # This is RHEL7 (Maipo)
         OS="RHEL7"
         case ${Base} in
+            957)
+                # RHEL-7.6
+                Release="7.6"
+                ;;
             1062)
                 # RHEL-7.7
                 Release="7.7"
