@@ -64,6 +64,8 @@
 
 [CKI]
 /accelerators/amd/build-setup/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/accelerators/amd/kfdtest/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/accelerators/amd/rocBLAS/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /accelerators/amd/tier0-sanity/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /accelerators/nvidia/openrm-build/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /accelerators/nvidia/openrm-sanity/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -204,6 +206,8 @@
 
 [kpet-db-maintainers]
 /accelerators/amd/build-setup/ @bgoncalv @lulinqing @olivergs
+/accelerators/amd/kfdtest/ @bgoncalv @lulinqing @olivergs
+/accelerators/amd/rocBLAS/ @bgoncalv @lulinqing @olivergs
 /accelerators/amd/tier0-sanity/ @bgoncalv @lulinqing @olivergs
 /accelerators/nvidia/openrm-build/ @bgoncalv @lulinqing @olivergs
 /accelerators/nvidia/openrm-sanity/ @bgoncalv @lulinqing @olivergs
