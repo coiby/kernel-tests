@@ -1,3 +1,28 @@
 #!/bin/bash
-chmod +x main.sh
-rhts-run-simple-test nvdimm_suspend_disk_resume "./main.sh"
+# vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+
+# Include Storage related environment
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../include/include.sh || exit 200
+
+function runtest() {
+	install_fio
+
+	prepare_reboot
+
+	suspend_resume disk 180
+}
+
+tlog "running $0"
+trun "uname -a"
+tlog "REBOOTCOUNT=$REBOOTCOUNT"
+if [ "$REBOOTCOUNT" -eq 0 ]; then
+	add_kernel_option
+elif [ "$REBOOTCOUNT" -eq 1 ]; then
+	runtest
+	report_result
+else
+	tlog "$0 test completed"
+fi
+tend

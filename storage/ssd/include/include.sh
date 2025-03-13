@@ -423,5 +423,13 @@ function setup_os_boot_entry() {
 	fi
 }
 
-#setup_os_boot_entry
+function report_result() {
+	ret=$?
+	if (( $ret == 0 )); then
+		rstrnt-report-result "${RSTRNT_TASKNAME}" PASS
+	else
+		rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL
+	fi
+}
+
 tok "nvme list"
