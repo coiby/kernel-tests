@@ -16,7 +16,6 @@
 # Include environments
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-
 rlJournalStart
 
     rlPhaseStartSetup
@@ -35,9 +34,10 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest
-        rlLog "TODO: Run kfdtest tests"
+        rlLog "Run kfdtest tests"
         # ./run_kfdtest.sh -p aldebaran
         # TODO: Identify which tests to run
+        ./kfdtest --gtest_filter=KFDMemoryTest.MapMemoryToGPU
     rlPhaseEnd
 
 rlJournalEnd
