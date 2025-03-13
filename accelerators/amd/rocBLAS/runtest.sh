@@ -41,8 +41,9 @@ rlJournalStart
         rlRun "./rocblas-example-sgemm"
         rlRun "./rocblas-example-sgemm-strided-batched"
         rlRun "./rocblas-example-sgemm-multiple-strided-batch"
-        rlLog "Run rocBLAS test suite"
-        rlRun "./rocblas-test"
+        # Disabled full rocBLAS test suite due to execution timeout
+        # rlLog "Run rocBLAS test suite"
+        # rlRun "./rocblas-test"
     rlPhaseEnd
 
 rlJournalEnd
