@@ -60,16 +60,6 @@ rlPhaseStartSetup
 		rlLogInfo "selinux is "$(getenforce)
 		rlRun "systemctl start qat"
 
-		# Setup for qat_sw tests
-		rlRun "dnf install -y https://mirror.stream.centos.org/SIGs/9-stream/extras/x86_64/extras-common/Packages/c/centos-release-isa-override-9-2.el9s.noarch.rpm" 0 "Installing override package in-script since beaker metadata can't handle links"
-		rlRun "dnf install -y intel-ipsec-mb intel-ipp-crypto-mb intel-ipsec-mb-devel intel-ipp-crypto-mb-devel"
-		rlRun "git clone https://github.com/intel/QAT_Engine.git"
-		rlRun "cd QAT_Engine/"
-		rlRun "./autogen.sh"
-		rlRun "./configure --enable-qat_sw"
-		rlRun "make -j$(nproc) && make install"
-		rlRun "cd .."
-
 		# Configure QAT to sym:asym encryption mode
 		rlRun "pip install prettytable"
 		rlRun "python3 qat -c -m 1" 0 "Turning QAT mode to sym:asym"
