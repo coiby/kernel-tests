@@ -64,6 +64,8 @@ rlPhaseStartSetup
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/silesia.zip"
 		rlRun "unzip silesia.zip"
 
+		# Add qatlib repo autogen, configure, and make. No install
+
 		# Configuration for Intel's qatzip-test
 		#rlRun "git clone https://github.com/intel/QATzip.git"
 		#rlRun "cd QATzip/"
