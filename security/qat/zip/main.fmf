@@ -26,4 +26,6 @@ require:
   - bzip2
   - autoconf
   - lz4-devel
+  - qatzip-devel
+  - qatzip-test
 duration: 45m
