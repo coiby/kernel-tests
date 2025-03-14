@@ -112,6 +112,7 @@ unset_nm_unmanage()
 set_network_env()
 {
 	set_nm_unmanage
+	run "setenforce 0"
 	return 0
 }
 
@@ -135,6 +136,7 @@ reset_network_env()
 	# call unset_nm_unmanage() here as each reset function will call
 	# reset_network_env()
 	unset_nm_unmanage
+	run "setenforce 1"
 	return 0
 }
 
