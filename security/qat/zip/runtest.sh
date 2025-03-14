@@ -63,6 +63,8 @@ rlPhaseStartSetup
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/silesia.zip"
 		rlRun "unzip silesia.zip -d silesia"
+		rlRun "cp -r silesia silesia2"
+		rlRun "cp -r silesia silesia3"
 
 		# Add qatlib repo autogen, configure, and make. No install
 
@@ -106,8 +108,22 @@ rlPhaseStart FAIL "QATzip: qzip compared against gzip"
 	rm ${TMP}
 rlPhaseEnd
 
+rlPhaseStart FAIL "QATzip: qzip multiple files"
+	rlRun "qzip -O 7z silesia/* -o silesia.7z"
+	rlRun "cd silesia"
+	rlRun "qzip -d silesia.7z"
+	rlRun "cd .."
+rlPhaseEnd
+
+# Weird behaviour, decompression just spits all files into pwd
+# and seems like it overwrites the files if the dirs are identical
+rlPhaseStart FAIL "QATzip: qzip multiple dirs"
+	rlRun "qzip -O 7z silesia silesia2 silesia3 -o multi_silesia.7z"
+	rlRun "qzip -d multi_silesia.7z"
+rlPhaseEnd
+
 rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
-	rlRun "taskset -c 1 qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i ./silesia" 0 "Running unithread level 1 compression test 100 times with sw disabled on provided silesia file"
+	rlRun "taskset -c 1 qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i dickens" 0 "Running unithread level 1 compression test 100 times with sw disabled on provided dickens file"
 rlPhaseEnd
 
 rlPhaseStartCleanup
