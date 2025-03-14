@@ -82,11 +82,15 @@ rlPhaseStart FAIL "QATengine: qat_hw tests"
 		rlRun "openssl speed -engine qatengine -elapsed -async_jobs 72 rsa2048" 0 "Testing RSA 2k"
 		rlRun "openssl speed -engine qatengine -elapsed -async_jobs 36 ecdh" 0 "Testing ECDH compute key"
 		rlRun "openssl speed -engine qatengine -elapsed -async_jobs 128 -multi 2 -evp aes-128-cbc-hmac-sha1" 0 "Testing aes-128-cbc-hmac-sha1 chained cipher"
+		rlRun "openssl speed -engine qatengine -elapsed des" 0 "Testing DES"
+		rlRun "openssl speed -engine qatengine -elapsed rand" 0 "Testing RAND"
 	else
 		rlRun "openssl list -providers -provider qatprovider" 0 "Checking QATprovider (>RHEL10 engine) functionality"
 		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 72 rsa2048" 0 "Testing RSA 2k"
 		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 36 ecdh" 0 "Testing ECDH compute key"
 		rlRun "openssl speed -provider qatprovider -elapsed -async_jobs 128 -multi 2 -evp aes-128-cbc-hmac-sha1" 0 "Testing aes-128-cbc-hmac-sha1 chained cipher"
+		rlRun "openssl speed -provider qatprovider -elapsed des" 0 "Testing DES"
+		rlRun "openssl speed -provider qatprovider -elapsed rand" 0 "Testing RAND"
 	fi
 rlPhaseEnd
 
