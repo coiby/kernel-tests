@@ -187,6 +187,7 @@ do_net_config()
 do_net_reset()
 {
 	pushd "$EXEC_DIR"/net || exit
+	[ -f log.txt ] && rlFileSubmit log.txt
 	# for test fib-onlink-tests.sh we'd better restore default IPv6 route
 	ip -6 route restore < default_ipv6.route
 	popd || exit
