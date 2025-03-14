@@ -62,7 +62,7 @@ rlPhaseStartSetup
 		# Get files to test on, recommended in the QAT ZSTD Plugin repo
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
 		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/silesia.zip"
-		rlRun "unzip silesia.zip"
+		rlRun "unzip silesia.zip -d silesia"
 
 		# Add qatlib repo autogen, configure, and make. No install
 
