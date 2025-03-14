@@ -62,6 +62,7 @@ rlPhaseStartSetup
 
 		# Get dependency for Intel's QAT configuration script
 		rlRun "pip install prettytable"
+		rlRun "python3 qat -c -m 1" 0 "Setting QAT mode to sym:asym"
 	fi
 rlPhaseEnd
 
@@ -70,7 +71,6 @@ rlPhaseStart FAIL "QATlib: baseline functionality verification"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATlib: sym/asym encryption operations"
-	rlRun "python3 qat -c -m 1" 0 "Setting QAT mode to sym:asym"
 	rlRun "algchaining_sample"
 	rlRun "ccm_sample"
 	rlRun "cipher_sample"
