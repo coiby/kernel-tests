@@ -65,13 +65,13 @@ rlPhaseStartSetup
 		rlRun "unzip silesia.zip"
 
 		# Configuration for Intel's qatzip-test
-		rlRun "git clone https://github.com/intel/QATzip.git"
-		rlRun "cd QATzip/"
-		rlRun "export QZ_ROOT=`pwd`"
-		rlRun "./autogen.sh"
-		rlRun "./configure"
-		rlRun "make -j$(nproc) && make install"
-		rlRun "cd .."
+		#rlRun "git clone https://github.com/intel/QATzip.git"
+		#rlRun "cd QATzip/"
+		#rlRun "export QZ_ROOT=`pwd`"
+		#rlRun "./autogen.sh"
+		#rlRun "./configure"
+		#rlRun "make -j$(nproc) && make install"
+		#rlRun "cd .."
 
 		# Configure QAT to dc compression mode
 		rlRun "pip install prettytable"
@@ -105,7 +105,7 @@ rlPhaseStart FAIL "QATzip: qzip compared against gzip"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
-	rlRun "taskset -c 1 ~/QATzip/test/qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i ./silesia" 0 "Running unithread level 1 compression test 100 times with sw disabled on provided silesia file"
+	rlRun "taskset -c 1 qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i ./silesia" 0 "Running unithread level 1 compression test 100 times with sw disabled on provided silesia file"
 rlPhaseEnd
 
 rlPhaseStartCleanup
