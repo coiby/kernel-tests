@@ -17,6 +17,9 @@
 # Turn off the POSIX to avoid syntax errors
 set +o posix
 
+# keep automotive/include/rhivos.sh from removing /mnt/testarea
+[[ -z $RSTRNT_JOBID ]] && export RSTRNT_JOBID=FAKE_RSTRNT_JOBID_KDUMP
+
 . ../../automotive/include/rhivos.sh
 . ../../cmdline_helper/libcmd.sh
 . ../include/lib.sh
