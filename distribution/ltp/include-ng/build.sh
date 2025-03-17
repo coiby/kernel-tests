@@ -28,6 +28,7 @@ install_kirk()
 		else
 			$pkg_mgr -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
 			$pkg_mgr -y install python3-click
+			$pkg_mgr -y remove epel-release
 		fi
 		if ! rpm -q python3-click; then
 			rpm -q python3-pip > /dev/null || $pkg_mgr -y install python3-pip
