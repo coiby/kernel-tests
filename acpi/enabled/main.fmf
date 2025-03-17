@@ -10,7 +10,7 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 adjust:
-  - enable: false
+  - enabled: false
     when: arch != aarch64
 duration: 15m
 extra-summary: /kernel/acpi/enabled

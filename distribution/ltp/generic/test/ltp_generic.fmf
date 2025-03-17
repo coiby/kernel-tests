@@ -47,7 +47,7 @@ require:
 recommend:
   - python3-click
 adjust:
-  - enable: false
+  - enabled: false
     when: arch == x86_64
 duration: 6h
 extra-summary: /kernel/distribution/ltp/generic
