@@ -14,7 +14,13 @@
 . ../include/runtest.sh || exit 1
 
 : "${PIP_STRESS_RETRIES:=10}"
-: "${PIP_STRESS_USLEEP:=500}"
+
+if [[ -z "${PIP_STRESS_USLEEP}" ]]; then
+    if uname -r | grep -qE "aarch64|rt-debug"; then
+        # aarch64 and rt-debug requires more sleep to get an inversion triggered
+        PIP_STRESS_USLEEP=10000
+    fi
+fi
 
 export nrcpus rhel_x
 
