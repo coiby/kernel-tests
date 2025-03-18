@@ -25,10 +25,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-if [ -f /usr/bin/rhts-environment.sh ]; then
-    . /usr/bin/rhts-environment.sh || exit 1
-fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 #shellcheck disable=SC2034

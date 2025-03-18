@@ -26,7 +26,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ./lib/lib.sh
 
@@ -156,7 +155,7 @@ rlJournalStart
         cat /proc/meminfo
         echo "End hugepage meminfo:"
         find /sys/devices/system/node -name nr_hugepages -exec cat {} \; -a -printf "%h/%f\n"
-        sed -i '/reboot_dogfile/d' /usr/bin/rhts-reboot
+        sed -i '/reboot_dogfile/d' /usr/bin/rstrnt-reboot
         make reset
     rlPhaseEnd
 rlJournalEnd
