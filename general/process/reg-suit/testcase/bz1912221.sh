@@ -2,10 +2,10 @@
 function bz1912221()
 {
 	# first reboot and second reboot.
-	local rebootflag_f=${DIR_DEBUG}/REBOOT_${FUNCNAME}_F
-	local rebootflag_s=${DIR_DEBUG}/REBOOT_${FUNCNAME}_S
+	local rebootflag_f=${DIR_DEBUG}/REBOOT_${FUNCNAME[0]}_F
+	local rebootflag_s=${DIR_DEBUG}/REBOOT_${FUNCNAME[0]}_S
 
-	uname -a | grep x86 || { report_result $FUNCNAME SKIP; return; }
+	uname -a | grep x86 || { report_result ${FUNCNAME[0]} SKIP; return; }
 
 	if [ -f "$rebootflag_s" ];then
 		rlAssertNotGrep "console=ttyS0" /proc/cmdline "-E"
@@ -33,6 +33,7 @@ function bz1912221()
 		$DIR_SOURCE/bz1912221_run_in_serial.sh &
 		sleep 5
 		pkill dd
+		#shellcheck disable=SC2034
 		for i in $(seq 1 10); do
 			ps -C dd --no-headers && pkill dd
 			sleep 5
@@ -40,7 +41,7 @@ function bz1912221()
 		ps -C dd --no-headers  && report_result cleanup WARN
 		# set the kernel cmdline to the default.
 		rlRun "grubby --remove-args console=ttyS0,115200n81 --update-kernel DEFAULT"
-		rlLogInfo "$FUNCNAME: reboot the machine"
+		rlLogInfo "${FUNCNAME[0]}: reboot the machine"
 		rlRun "touch $rebootflag_s"
 		rstrnt-reboot
 	fi
