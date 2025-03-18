@@ -22,19 +22,6 @@
 #   along with this program. If not, see http://www.gnu.org/licenses/.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-TENV=_env
-ifeq ($(PKG_TOP_DIR),)
-	export PKG_TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -e $$p/env.mk -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	export _TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -d $$p/.git -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	-include $(PKG_TOP_DIR)/env.mk
-endif
-include $(TENV)
-ifeq ($(_TOP_DIR),)
-	_TOP_DIR=/mnt/tests/$(TOPLEVEL_NAMESPACE)
-endif
-
 export TESTVERSION=1.0
 
 BUILT_FILES=
@@ -51,28 +38,3 @@ build: $(BUILT_FILES)
 
 clean:
 	rm -f *~ $(BUILT_FILES)
-
-
-RHTS_INCLUDE=$(strip $(wildcard /usr/share/rhts/lib/rhts-make.include))
-ifeq ($(RHTS_INCLUDE),)
-    export TEST_DIR=/mnt/tests$(TEST)
-    export METADATA=testinfo.desc
-else
-    include /usr/share/rhts/lib/rhts-make.include
-endif
-
-$(METADATA): Makefile
-	@echo "Owner:           Shu Wang <shuwang@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Test for memfd_create syscall." >> $(METADATA)
-	@echo "Type:            Function" >> $(METADATA)
-	@echo "TestTime:        20m" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        @development" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2+" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	rhts-lint $(METADATA)

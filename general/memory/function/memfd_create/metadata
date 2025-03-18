@@ -1,0 +1,18 @@
+[General]
+description=Test for memfd_create syscall.
+name=/kernel/general/memory/function/memfd_create
+owner=MM QE <mm-qe@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=20m
+dependencies=gcc
+softDependencies=@development
+repoRequires=
+TestVersion=1.0
+Type=Function
+RunFor=kernel
+Priority=Normal
