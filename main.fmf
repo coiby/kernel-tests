@@ -7,7 +7,7 @@ check:
   - how: watchdog
 adjust:
   - when: check-result == info
-    check+:
+    check:
       - how: avc
         result: info
       - how: dmesg
@@ -18,7 +18,7 @@ adjust:
       - how: watchdog
         result: info
   - when: check-result == disabled
-    check+:
+    check:
       - how: avc
         enabled: false
       - how: dmesg
