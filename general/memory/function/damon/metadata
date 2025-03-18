@@ -1,0 +1,17 @@
+[General]
+description=general regression test for VM
+name=/general/memory/function/damon
+owner=Ping Fang <pifang@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=20m
+dependencies=gcc;git;make;python3;python3-pip;perf
+repoRequires=
+TestVersion=1.0
+Type=Regression
+RunFor=kernel
+Priority=Normal

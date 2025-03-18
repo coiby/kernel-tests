@@ -35,24 +35,3 @@ run:
 	@echo "No Build required"
 	chmod +x ./runtest.sh
 	./runtest.sh
-
-# Include a global make rules file
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA):
-	touch $(METADATA)
-	@echo "Owner:		Li Wang <liwang@redhat.com>" 	> $(METADATA)
-	@echo "Name:		$(TEST)"				>> $(METADATA)
-	@echo "Description:	Verifies gigantic page parameter works."	>> $(METADATA)
-	@echo "Path:		$(TEST_DIR)"				>> $(METADATA)
-	@echo "TestTime:	60m"					>> $(METADATA)
-	@echo "TestVersion:	$(TESTVERSION)"				>> $(METADATA)
-	@echo "Releases:	RHEL7"					>> $(METADATA)
-	@echo "Architectures:	x86_64" 				>> $(METADATA)
-	@echo "Destructive:	no"					>> $(METADATA)
-	@echo "Confidential:	no"					>> $(METADATA)
-	@echo "Priority:	Normal"					>> $(METADATA)
-	@echo "RunFor:		kernel"					>> $(METADATA)
-	@echo "License:		GPLv2"					>> $(METADATA)
-	@echo "Requires:	$(PACKAGE_NAME)"			>> $(METADATA)
-	@echo "Requires:	grubby numactl"				>> $(METADATA)

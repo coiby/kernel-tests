@@ -48,24 +48,3 @@ build: $(BUILT_FILES)
 clean:
 	rm -f *~ $(BUILT_FILES)
 
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
-
-# Generate the testinfo.desc here:
-$(METADATA): Makefile
-	@echo "Owner:           Li Wang <liwang@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Test case for Huge Zero Page" >> $(METADATA)
-	@echo "TestTime:        1m" >> $(METADATA)
-	@echo "Bug:             1035927" >> $(METADATA)
-	@echo "RunFor:          $(PACKAGE_NAME)" >> $(METADATA)
-	@echo "Requires:        " >> $(METADATA)
-	@echo "Releases:        RedHatEnterpriseLinuxServer6 RedHatEnterpriseLinuxServer7" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	
-	rhts-lint $(METADATA)

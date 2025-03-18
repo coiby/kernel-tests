@@ -1,0 +1,15 @@
+[General]
+name=general/memory/drain_pages
+owner=MM QE <mm-qe@redhat.com>
+description=drain buddy allocator pages by order
+license=GPLv3
+confidential=no
+destructive=no
+type=regression
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=gcc
+softDependencies=@development
+repoRequires=cki_lib
+max_time=10m

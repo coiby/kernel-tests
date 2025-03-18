@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=make run
-max_time=5m
+max_time=15m
 dependencies=yum-utils
 softDependencies=@development
 repoRequires=general/include;cki_lib

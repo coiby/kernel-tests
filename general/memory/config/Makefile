@@ -47,9 +47,7 @@ FILES=$(TENV) $(METADATA) runtest.sh Makefile PURPOSE testcase lib
 .PHONY: all install download clean
 
 run: $(FILES)  build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
-		. runtest.sh )
+	./runtest.sh
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
@@ -64,21 +62,3 @@ dbg: testcase
 cleanall: clean
 	rm -fr *~ $(BUILT_FILES) tmp.* RS_*\.[0-9]* debug *.log
 
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Wang Shu <shuwang@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     This is a general memory configuration test suit" >> $(METADATA)
-	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        12h" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel kernel-devel, " >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	rhts-lint $(METADATA)

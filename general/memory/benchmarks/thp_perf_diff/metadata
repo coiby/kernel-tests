@@ -1,0 +1,13 @@
+[General]
+name=general/memory/benchmarks/thp_perf_diff
+owner=Chunyu Hu <chuhu@redhat.com>
+description=transparent hugepage performance diff
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=kernel;bc;wget;rpm-build
+repoRequires=general/include
+max_time=1h

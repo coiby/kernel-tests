@@ -30,27 +30,3 @@ clean:
 run:
 	chmod +x ./runtest.sh
 	./runtest.sh
-
-$(METADATA):
-	touch $(METADATA)
-	@echo "Owner:		Jarod Wilson <jarod@redhat.com>"	> $(METADATA)
-	@echo "Name:		$(TEST)"	>> $(METADATA)
-	@echo "Description:	pthread read and fork hugetlb test" >> $(METADATA)
-	@echo "Path:		$(TEST_DIR)"	>> $(METADATA)
-	@echo "TestTime:	35m"		>> $(METADATA)
-	@echo "TestVersion:	$(TESTVERSION)"	>> $(METADATA)
-	@echo "Releases:	RHELServer5 RHEL6" >> $(METADATA)
-	@echo "Destructive:	no"		>> $(METADATA)
-	@echo "Confidential:	no"		>> $(METADATA)
-	@echo "Priority:	Normal"		>> $(METADATA)
-	@echo "Type:		Regression"	>> $(METADATA)
-	@echo "Type:		Crasher"	>> $(METADATA)
-	@echo "NeedProperty:	PROCESSORS > 1"	>> $(METADATA)
-	@echo "NeedProperty:	MEMORY >= 2048"	>> $(METADATA)
-	@echo "RunFor:		kernel"		>> $(METADATA)
-	@echo "Requires:	coreutils"	>> $(METADATA)
-	@echo "Requires:	gcc"	>> $(METADATA)
-	@echo "License:		GPLv2" >> $(METADATA)
-
-# Include a global make rules file
-include /usr/share/rhts/lib/rhts-make.include
