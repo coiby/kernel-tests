@@ -1,0 +1,19 @@
+[General]
+description=Test memkind with upstream testsuite
+name=/general/memory/function/memkind
+owner=Li Wang <liwang@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+max_time=1h
+dependencies=gcc;wget;unzip
+softDependencies=@development;numactl;numactl-devel;libgcc.x86_64;glibc-devel.x86_64;glibc-static.x86_64;gcc-c++;libtool;pytest;memkind.x86_64;memkind-utils.x86_64
+repoRequires=
+TestVersion=1.3
+Type=Regression
+RunFor=memkind
+Priority=Normal
+Architectures=x86_64

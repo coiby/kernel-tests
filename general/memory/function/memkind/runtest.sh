@@ -30,8 +30,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 set -o pipefail
-
-OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/memkind/outputfile}
+OUTPUTFILE=${OUTPUTFILE:-$(mktemp /var/tmp/tmp.XXXXXX)}
 TASKID=${TASKID:-UNKNOWN}
 NODES=$(numactl -H | grep available | cut -d ' ' -f 2)
 
