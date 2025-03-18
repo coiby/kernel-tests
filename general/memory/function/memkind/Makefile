@@ -92,23 +92,3 @@ run: testfullbuild
 clean:
 	rm -rf *~ $(TARGET) $(TARGET).tar.gz
 
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Li Wang <liwang@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Test memkind with upstream testsuite" >> $(METADATA)
-	@echo "TestTime:        60m" >> $(METADATA)
-	@echo "RunFor:          $(PACKAGE_NAME) $(PACKAGE_NAME)-utils" >> $(METADATA)
-	@echo "Requires:        @development numactl numactl-devel \
-				libgcc.x86_64  glibc-devel.x86_64  glibc-static.x86_64 \
-				gcc-c++ unzip libtool pytest memkind.x86_64  memkind-utils.x86_64 wget" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPL-v2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	@echo "Architectures:	x86_64"	>> $(METADATA)
-
-	rhts-lint $(METADATA)
