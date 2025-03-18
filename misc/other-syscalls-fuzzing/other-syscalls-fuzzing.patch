@@ -1,0 +1,84 @@
+diff --git a/sys/linux/sys.txt b/sys/linux/sys.txt
+index 57af33efe..117bbd124 100644
+--- a/sys/linux/sys.txt
++++ b/sys/linux/sys.txt
+@@ -152,6 +152,7 @@ cachestat {
+ stat(file ptr[in, filename], statbuf ptr[out, stat])
+ lstat(file ptr[in, filename], statbuf ptr[out, stat])
+ fstat(fd fd, statbuf ptr[out, stat])
++newfstat(fd fd, stat ptr[out, stat])
+ newfstatat(dfd const[AT_FDCWD], file ptr[in, filename], statbuf ptr[out, stat], flag flags[statx_flags])
+ stat64(file ptr[in, filename], statbuf ptr[out, stat64])
+ lstat64(file ptr[in, filename], statbuf ptr[out, stat64])
+@@ -449,6 +450,8 @@ init_module(mod ptr[in, string], len len[mod], args ptr[in, string])
+ finit_module(fd fd, args ptr[in, string], flags flags[finit_module_flags])
+ delete_module(name ptr[in, string], flags flags[delete_module_flags])
+ kexec_load(entry intptr, nr_segments len[segments], segments ptr[in, array[kexec_segment]], flags flags[kexec_load_flags])
++kexec_file_flags = 0x1, 0x2, 0x4
++kexec_file_load(kernel_fd fd, initrd_fd fd, cmdline buffer[in], flags flags[kexec_file_flags])
+ syslog(cmd flags[syslog_cmd], buf ptr[out, array[int8], opt], len len[buf])
+ uname(buf buffer[out])
+ sysinfo(info buffer[out])
+@@ -1389,7 +1392,7 @@ define KCOV_REMOTE_ENABLE	1075340134
+ 
+ # Not yet implemented syscalls:
+ # umask
+-# vhangup
++vhangup()
+ # _sysctl
+ # adjtimex
+ # swapon
+diff --git a/sys/linux/sys.txt.const b/sys/linux/sys.txt.const
+index ba024ae99..8ff742eef 100644
+--- a/sys/linux/sys.txt.const
++++ b/sys/linux/sys.txt.const
+@@ -700,6 +700,7 @@ __NR_ioprio_get = 31, 386:290, amd64:252, arm:315, mips64le:5274, ppc64le:274, s
+ __NR_ioprio_set = 30, 386:289, amd64:251, arm:314, mips64le:5273, ppc64le:273, s390x:282
+ __NR_kcmp = 272, 386:349, amd64:312, arm:378, mips64le:5306, ppc64le:354, s390x:343
+ __NR_kexec_load = 104, 386:283, amd64:246, arm:347, mips64le:5270, ppc64le:268, s390x:277
++__NR_kexec_file_load = arm64:294
+ __NR_lchown = 16, amd64:94, arm64:riscv64:???, mips64le:5092, s390x:198
+ __NR_link = 9, amd64:86, arm64:riscv64:???, mips64le:5084
+ __NR_linkat = 37, 386:303, amd64:265, arm:330, mips64le:5255, ppc64le:294, s390x:296
+@@ -730,8 +731,8 @@ __NR_mprotect = 125, amd64:10, arm64:riscv64:226, mips64le:5010
+ __NR_mq_getsetattr = 185, 386:282, amd64:245, arm:279, mips64le:5235, ppc64le:267, s390x:276
+ __NR_mq_notify = 184, 386:281, amd64:244, arm:278, mips64le:5234, ppc64le:266, s390x:275
+ __NR_mq_open = 180, 386:277, amd64:240, arm:274, mips64le:5230, ppc64le:262, s390x:271
+-__NR_mq_timedreceive = 183, 386:280, amd64:243, arm:277, mips64le:5233, ppc64le:265, s390x:274
+-__NR_mq_timedsend = 182, 386:279, amd64:242, arm:276, mips64le:5232, ppc64le:264, s390x:273
++__NR_mq_timedreceive = arm64:183
++__NR_mq_timedsend = arm64:182
+ __NR_mq_unlink = 181, 386:278, amd64:241, arm:275, mips64le:5231, ppc64le:263, s390x:272
+ __NR_mremap = 163, amd64:25, arm64:riscv64:216, mips64le:5024
+ __NR_msync = 144, amd64:26, arm64:riscv64:227, mips64le:5025
+@@ -740,7 +741,11 @@ __NR_munlockall = 153, amd64:152, arm64:riscv64:231, mips64le:5149
+ __NR_munmap = 91, amd64:11, arm64:riscv64:215, mips64le:5011
+ __NR_name_to_handle_at = 264, 386:341, amd64:303, arm:370, mips64le:5298, ppc64le:345, s390x:335
+ __NR_nanosleep = 162, amd64:35, arm64:riscv64:101, mips64le:5034
+-__NR_newfstatat = 79, 386:arm:???, amd64:262, mips64le:5252, ppc64le:291, s390x:293
++__NR_newfstatat = arm64:79
++__NR_newfstat = arm64:80
++__NR_vhangup = arm64:58
++__NR_semtimedop = arm64:192
++__NR_setns = arm64:268
+ __NR_open = 5, amd64:2, arm64:riscv64:???, mips64le:5002
+ __NR_open_by_handle_at = 265, 386:342, amd64:304, arm:371, mips64le:5299, ppc64le:346, s390x:336
+ __NR_openat = 56, 386:295, amd64:257, arm:322, mips64le:5247, ppc64le:286, s390x:288
+@@ -788,7 +793,7 @@ __NR_rt_sigaction = 174, amd64:13, arm64:riscv64:134, mips64le:5013, ppc64le:173
+ __NR_rt_sigpending = 176, amd64:127, arm64:riscv64:136, mips64le:5125, ppc64le:175
+ __NR_rt_sigprocmask = 175, amd64:14, arm64:riscv64:135, mips64le:5014, ppc64le:174
+ __NR_rt_sigqueueinfo = 178, amd64:129, arm64:riscv64:138, mips64le:5127, ppc64le:177
+-__NR_rt_sigreturn = 173, amd64:15, arm64:riscv64:139, mips64le:5211, ppc64le:172
++__NR_rt_sigreturn = arm64:139
+ __NR_rt_sigsuspend = 179, amd64:130, arm64:riscv64:133, mips64le:5128, ppc64le:178
+ __NR_rt_sigtimedwait = 177, amd64:128, arm64:riscv64:137, mips64le:5126, ppc64le:176
+ __NR_rt_tgsigqueueinfo = 240, 386:335, amd64:297, arm:363, mips64le:5291, ppc64le:322, s390x:330
+@@ -858,7 +863,7 @@ __NR_unlinkat = 35, 386:301, amd64:263, arm:328, mips64le:5253, ppc64le:292, s39
+ __NR_uselib = 86, amd64:134, arm64:mips64le:riscv64:???
+ __NR_ustat = 62, amd64:136, arm64:riscv64:???, mips64le:5133
+ __NR_utime = 30, amd64:132, arm:arm64:riscv64:???, mips64le:5130
+-__NR_utimensat = 88, 386:320, amd64:280, arm:348, mips64le:5275, ppc64le:304, s390x:315
++__NR_utimensat = arm64:88
+ __NR_utimes = 386:271, amd64:235, arm:269, arm64:riscv64:???, mips64le:5226, ppc64le:251, s390x:313
+ __NR_vmsplice = 75, 386:316, amd64:278, arm:343, mips64le:5266, ppc64le:285, s390x:309
+ __NR_wait4 = 114, amd64:61, arm64:riscv64:260, mips64le:5059
