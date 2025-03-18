@@ -45,7 +45,7 @@ install_kirk()
 			fi
 		fi
 	fi
-	git clone -b v1.4 https://github.com/linux-test-project/kirk.git
+	[[ -d kirk ]] || git clone -b v1.4 https://github.com/linux-test-project/kirk.git
 	if [ $? -ne 0 ]; then
 		echo "Aborting current task: Couldn't clone kirk" | tee -a $OUTPUTFILE
 		if [[ -n $RSTRNT_TASKNAME ]]; then
