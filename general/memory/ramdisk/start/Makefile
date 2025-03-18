@@ -24,19 +24,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TENV=_env
-ifeq ($(PKG_TOP_DIR),)
-	export PKG_TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -e $$p/env.mk -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	export _TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -d $$p/.git -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	-include $(PKG_TOP_DIR)/env.mk
-endif
-include $(TENV)
-ifeq ($(_TOP_DIR),)
-	_TOP_DIR=/mnt/tests/$(TOPLEVEL_NAMESPACE)
-endif
-
 export TESTVERSION=1.1
 
 BUILT_FILES=
@@ -46,9 +33,7 @@ FILES=$(TENV) $(METADATA) runtest.sh Makefile PURPOSE
 .PHONY: all clean
 
 run: $(FILES)  build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
-		. runtest.sh )
+	./runtest.sh
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
@@ -56,21 +41,3 @@ build: $(BUILT_FILES)
 clean:
 	rm -f ./RAMDISK_REBOOTFLAG
 
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Wang Shu <shuwang@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Init and mount ramdisk." >> $(METADATA)
-	@echo "Type:            Function" >> $(METADATA)
-	@echo "TestTime:        1h" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel, " >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	rhts-lint $(METADATA)

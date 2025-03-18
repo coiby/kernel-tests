@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/memory/function/huge-zero-page
+owner=mm-qe <mm-qe@redhat.com>
+description=Test case for Huge Zero Page
+license=GPLv2+
+confidential=yes
+destructive=no
+bug=1035927
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=elfutils-libelf-devel
+max_time=5m
+repoRequires=kernel-include

@@ -56,23 +56,3 @@ build: $(BUILT_FILES)
 clean:
 	rm -fr *~ $(BUILT_FILES)
 
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Wang Shu<shuwang@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     install kmemleak kernel and make report" >> $(METADATA)
-	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        2h" >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        @development expect" >> $(METADATA)
-	@echo "RhtsRequires:    test(/kernel/distribution/upstream-kernel/install)" >> $(METADATA)
-	@echo "RhtsRequires:    kernel-kernel-general-include" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	rhts-lint $(METADATA)

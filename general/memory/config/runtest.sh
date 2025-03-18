@@ -29,7 +29,6 @@
 . ./lib/lib.sh
 . ../../../kernel-include/runtest.sh || exit 2
 
-
 trap 'rlFileRestore; exit' SIGHUP SIGINT SIGQUIT SIGTERM
 
 export DIR_CASE=$PWD/testcase
