@@ -17,7 +17,7 @@ function bz1912221()
 		if ! grep "console=ttyS0" /proc/cmdline; then
 			rlRun "grubby --args console=ttyS0,115200n81 --update-kernel DEFAULT"
 			touch $rebootflag_f
-			rhts-reboot
+			rstrnt-reboot
 		else
 			# Sometimes dd soft lockup, but that's not bug but load too heavy
 			$DIR_SOURCE/bz1912221_run_in_serial.sh &
@@ -42,6 +42,6 @@ function bz1912221()
 		rlRun "grubby --remove-args console=ttyS0,115200n81 --update-kernel DEFAULT"
 		rlLogInfo "$FUNCNAME: reboot the machine"
 		rlRun "touch $rebootflag_s"
-		rhts-reboot
+		rstrnt-reboot
 	fi
 }

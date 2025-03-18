@@ -194,9 +194,9 @@ get_skip_summary(){
 rebootdog_setup(){
 	shopt -s expand_aliases
 	# Feed the rebootdog, or it will bark when system restarted.
-	alias rhts-reboot="rm -f $REBOOT_DOGFILE; rhts-reboot"
+	alias rstrnt-reboot="rm -f $REBOOT_DOGFILE; rstrnt-reboot"
 	alias reboot="rm -f $REBOOT_DOGFILE; reboot"
-	grep -q reboot_dogfile /usr/bin/rhts-reboot  || sed -i '4irm \/mnt\/reboot_dogfile -f' /usr/bin/rhts-reboot
+	grep -q reboot_dogfile /usr/bin/rstrnt-reboot  || sed -i '4irm \/mnt\/reboot_dogfile -f' /usr/bin/rstrnt-reboot
 }
 
 install_packages
