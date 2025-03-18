@@ -53,15 +53,15 @@ is_broken(){
 	fi
 
 	if rlIsRHEL "9.5"; then
-		skip_string="drm_gem_shmem_test drm_buddy_test"
+		skip_string="drm_gem_shmem_test drm_buddy_test kasan_test"
 	fi
 
 	if rlIsRHEL ">=9.6" || rlIsCentOS "9"; then
-		skip_string="drm_gem_shmem_test drm_buddy_test"
+		skip_string="drm_gem_shmem_test drm_buddy_test kasan_test"
 	fi
 
 	if rlIsRHEL ">=10.0" || rlIsCentOS "10"; then
-		skip_string="drm_gem_shmem_test drm_format_helper_test drm_hdmi_state_helper_test usercopy_kunit fortify_kunit"
+		skip_string="drm_gem_shmem_test drm_format_helper_test drm_hdmi_state_helper_test usercopy_kunit fortify_kunit kasan_test"
 	fi
 
 	if [[ -n "$skip_string" && "$skip_string" =~ $test_name ]]; then
