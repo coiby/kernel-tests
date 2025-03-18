@@ -45,7 +45,11 @@ install_kirk()
 			fi
 		fi
 	fi
-	[[ -d kirk ]] || git clone -b v1.4 https://github.com/linux-test-project/kirk.git
+
+	KIRK_VER="${KIRK_VER:-v1.5}"
+	KIRK_DIR="$(pwd)/kirk"
+
+	[[ -d $KIRK_DIR ]] || git clone -b $KIRK_VER https://github.com/linux-test-project/kirk.git --depth=10
 	if [ $? -ne 0 ]; then
 		echo "Aborting current task: Couldn't clone kirk" | tee -a $OUTPUTFILE
 		if [[ -n $RSTRNT_TASKNAME ]]; then
@@ -55,14 +59,18 @@ install_kirk()
 			exit 1
 		fi
 	fi
-	patch --forward -p1 -d kirk/ < ${ABS_DIR}/kirk-v1.4/0001-host-remove-preexec_fn-from-process-run.patch
-	patch --forward -p1 -d kirk/ < ${ABS_DIR}/kirk-v1.4/0001-libkirk-events-register-the-event-handler-for-suite_.patch
-	cp -r kirk /mnt/testarea/
+
+	if [[ "$KIRK_VER" == "v1.4"* ]]; then
+		patch --forward -p1 -d "$KIRK_DIR" < ${ABS_DIR}/kirk-v1.4/0001-host-remove-preexec_fn-from-process-run.patch
+		patch --forward -p1 -d "$KIRK_DIR" < ${ABS_DIR}/kirk-v1.4/0001-libkirk-events-register-the-event-handler-for-suite_.patch
+	fi
+
+	cp -r "$KIRK_DIR" /mnt/testarea/
 }
 
 download_ltp()
 {
-	echo "============ Download package ============" | tee -a $OUTPUTFILE
+	echo "============ Download LTP package ============" | tee -a $OUTPUTFILE
 	if [ -z "$LTP_DOWNLOAD_URL" ]; then
 		curl --fail --retry 5 -s -SLO https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
 		if [ $? -ne 0 ]; then
@@ -90,7 +98,7 @@ download_ltp()
 
 	rm -rf ${TARGET}
 
-	echo "============ Unzip package ============" | tee -a $OUTPUTFILE
+	echo "============ Unzip LTP package ============" | tee -a $OUTPUTFILE
 	tar xjf ${TARGET}.tar.bz2 | tee -a $OUTPUTFILE
 
 }
@@ -134,7 +142,7 @@ configure()
 	patch_inc > patchinc.log 2>&1
 	cat patchinc.log | tee -a $OUTPUTFILE
 
-	echo "============ Start configure ============" | tee -a $OUTPUTFILE
+	echo "============ Start LTP configure ============" | tee -a $OUTPUTFILE
 	AUTOCONFIGVER=$(rpm -qa autoconf |cut -f 2 -d "-")
 	# AUTOMAKEVER=$(rpm -qa automake |cut -f 2 -d "-"|cut -f 1,2 -d ".")
 	AUTOCONFIGVER_1=$(echo $AUTOCONFIGVER |cut -f 1 -d ".")
@@ -191,7 +199,7 @@ build_all()
 	install_kirk
 
 	configure
-	echo "============ Start ${MAKE} and install ============" | tee -a $OUTPUTFILE
+	echo "============ Start ${MAKE} and install LTP ============" | tee -a $OUTPUTFILE
 	timeout_value=${LTP_BUILD_TIMEOUT_M:-30}
 	if uname -r | grep -q 'debug'; then
 		timeout_value=${LTP_BUILD_TIMEOUT_M:-90}
