@@ -1,6 +1,9 @@
 check:
   - how: avc
   - how: dmesg
+    failure-pattern:
+      # These are default patterns
+      - 'Call Trace:'
   - how: watchdog
 adjust:
   - when: check-result == info
@@ -9,6 +12,9 @@ adjust:
         result: info
       - how: dmesg
         result: info
+        failure-pattern:
+          # These are default patterns
+          - 'Call Trace:'
       - how: watchdog
         result: info
   - when: check-result == disabled
