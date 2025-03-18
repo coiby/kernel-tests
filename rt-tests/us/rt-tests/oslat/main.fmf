@@ -3,7 +3,7 @@ description: |
     Unit test for the oslat subpackage of the rt-tests package.
     Runs oslat command for a specified duration and optionally
     checks if latency exceeds the maximum threshold.
-contact: Qiao Zhao <qzhao@redhat.com>
+contact: Shizhao Chen <shichen@redhat.com>
 test: bash ./runtest.sh
 framework: shell
 require:
@@ -12,5 +12,3 @@ require:
   - numactl-libs
   - procps-ng
 duration: 3h
-extra-summary: rt-tests/us/rt-tests/oslat
-extra-task: rt-tests/us/rt-tests/oslat

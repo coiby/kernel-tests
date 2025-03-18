@@ -9,9 +9,7 @@ description: |
       - adds udev specific rules for threaded irqs and /dev/rtc access
       - adds /usr/bin/slub_cpu_partial_off to turn off cpu_partials in SLUB
       - adds net-socket timestamp static key daemon (rt-entsk)
-contact: Mike Stowell <mstowell@redhat.com>
+contact: Shizhao Chen <shichen@redhat.com>
 test: bash ./runtest.sh
 framework: shell
 duration: 10m
-extra-summary: rt-tests/us/rt-setup/sanity
-extra-task: rt-tests/us/rt-setup/sanity

@@ -5,5 +5,3 @@ framework: shell
 require:
   - python3-ethtool
 duration: 10m
-extra-summary: rt-tests/us/unittests/pkg/python-ethtool
-extra-task: rt-tests/us/unittests/pkg/python-ethtool

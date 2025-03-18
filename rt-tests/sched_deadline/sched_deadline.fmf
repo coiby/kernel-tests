@@ -14,8 +14,6 @@ require:
           - /cki_lib
           - /automotive/include
 duration: 5m
-extra-summary: /rt-tests/sched_deadline
-extra-task: /rt-tests/sched_deadline
 environment:
     ENABLE_HRTICK: 0
 id: 04375c0a-d389-4935-b015-31155fa7daa6

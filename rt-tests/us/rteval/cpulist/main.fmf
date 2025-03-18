@@ -1,8 +1,6 @@
 summary: cpulist test for rteval
 description: Ensure loads and measurement CPUs are scheduled correctly via rteval.
-contact: Mike Stowell <mstowell@redhat.com>
+contact: Waylon Cude <wcude@redhat.com>
 test: bash ./runtest.sh
 framework: shell
 duration: 30m
-extra-summary: rt-tests/us/rteval/cpulist
-extra-task: rt-tests/us/rteval/cpulist

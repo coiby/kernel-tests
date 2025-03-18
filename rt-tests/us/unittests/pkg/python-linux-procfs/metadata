@@ -1,6 +1,6 @@
 [General]
 name=rt-tests/us/unittests/pkg/python-linux-procfs
-owner=Mike Stowell <mstowell@redhat.com>
+owner=Qiao Zhao <qzhao@redhat.com>
 description=Unittest case for python-linux-procfs
 license=GPLv3
 confidential=no

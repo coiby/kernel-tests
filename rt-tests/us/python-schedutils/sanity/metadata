@@ -1,6 +1,6 @@
 [General]
 name=rt-tests/us/python-schedutils/sanity
-owner=Mike Stowell <mstowell@redhat.com>
+owner=rt-qe <rt-qe@redhat.com>
 description=Basic/sanity test for python-schedutils
 license=GPLv3
 confidential=no

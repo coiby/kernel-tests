@@ -5,5 +5,3 @@ framework: shell
 require:
   - rteval
 duration: 30m
-extra-summary: rt-tests/us/unittests/pkg/rteval
-extra-task: rt-tests/us/unittests/pkg/rteval

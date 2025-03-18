@@ -1,9 +1,7 @@
 summary: Unittest case for stalld
-contact: Waylon Cude <wcude@redhat.com>
+contact: Chang Yin <cyin@redhat.com>
 test: python3 test.py
 framework: shell
 require:
   - stalld
 duration: 10m
-extra-summary: rt-tests/us/unittests/pkg/stalld
-extra-task: rt-tests/us/unittests/pkg/stalld

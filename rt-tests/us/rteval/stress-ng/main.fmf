@@ -1,8 +1,6 @@
 summary: stress-ng test for rteval
 description: Test stress-ng loads and options in rteval / rteval-loads.
-contact: Mike Stowell <mstowell@redhat.com>
+contact: Waylon Cude <wcude@redhat.com>
 test: bash ./runtest.sh
 framework: shell
 duration: 90m
-extra-summary: rt-tests/us/rteval/stress-ng
-extra-task: rt-tests/us/rteval/stress-ng

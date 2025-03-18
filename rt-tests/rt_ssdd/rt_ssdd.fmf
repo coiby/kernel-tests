@@ -9,8 +9,6 @@ framework: shell
 require:
   - realtime-tests
 duration: 30m
-extra-summary: /rt-tests/rt_ssdd
-extra-task: /rt-tests/rt_ssdd
 environment:
   NFORKS: 10
   NITERS: 10000

@@ -5,5 +5,3 @@ framework: shell
 require:
   - tuna
 duration: 10m
-extra-summary: rt-tests/us/unittests/pkg/tuna
-extra-task: rt-tests/us/unittests/pkg/tuna

@@ -1,10 +1,8 @@
 summary: Unittest case for python-linux-procfs
-contact: Mike Stowell <mstowell@redhat.com>
+contact: Qiao Zhao <qzhao@redhat.com>
 test: python3 test.py
 framework: shell
 recommend:
   - python-linux-procfs
   - python3-linux-procfs
 duration: 10m
-extra-summary: rt-tests/us/unittests/pkg/python-linux-procfs
-extra-task: rt-tests/us/unittests/pkg/python-linux-procfs

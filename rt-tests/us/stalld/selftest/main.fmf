@@ -7,5 +7,3 @@ framework: shell
 require:
   - gcc
 duration: 10m
-extra-summary: rt-tests/us/stalld/selftest
-extra-task: rt-tests/us/stalld/selftest
