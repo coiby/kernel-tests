@@ -1,0 +1,14 @@
+[General]
+name=runtime_overrun_multithreaded
+owner=Evgeni Vakhonin <evakhoni@redhat.com>
+description=signalling SCHED_DEADLINE process runtime overrun under service thread architecture for signal handling
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=5m
+dependencies=gcc;libgcc
+softDependencies=glibc
+repoRequires=kernel-include

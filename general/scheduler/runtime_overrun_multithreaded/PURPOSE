@@ -1,0 +1,116 @@
+# SUMMARY
+
+in linux task scheduling, SCHED_DEADLINE policy implements the Earliest Deadline First algorithm and Constant Bandwidth Server,
+with tasks assigned a Runtime it allowed to run each Period, within a Deadline counting from the start of the period.
+
+Whenever the task runtime is being overrun, a task is considered throttled and cannot be scheduled until its scheduling deadline.
+A SCHED_FLAG_DL_OVERRUN flag can be set via sched_flags to inform the application about an overrun event by the means of SIGXCPU signal.
+
+Usually, when signals are delivered to an application, execution is interrupted and stops following the expected control 
+flow in order to jump to the designated signal handler. A better approach is the use of a dedicated "service" thread that 
+synchronously waits for queued signals, avoiding the breaking of local control flow and increasing predictability.
+
+As the aforementioned flag can be set on per-thread basis, altering the runtime overrun behavior of that specific thread, 
+and since the overrun can occur within either the main or a child thread, it is beneficial to test the different combinations 
+of such, while also verifying the correct cross-thread separation, taking into account that a SIGXCPU signal being 
+process-oriented rather than thread oriented.
+
+The following test is approaching this goal by creating a runtime overrun condition by the means of a busy loop set 
+to perform an excessive 500ms operation, while SCHED_DEADLINE policy being set to a runtime of 50ms, interval of 100ms, 
+and a deadline of 100ms. This overrun condition is applied to either the main or the child thread, with the combinations of 
+the aforementioned flag being either set or unset for each, while a dedicated service thread is listening for a signal.
+
+
+# Test Implementation
+
+1. SIGXCPU signal is being masked from the main thread
+2. a service thread is being created, waiting for a SIGXCPU signal to be handled
+3. semaphore is utilised to enable flow control between the main and the child threads
+4. depending on the test, SCHED_DEADLINE policy is being applied to the threads with and without SCHED_FLAG_DL_OVERRUN flag
+5. thread overrun is being produced on either of the threads by the means of a busy loop
+6. the presence or absence of SIGXCPU signal is verified against the expectation
+
+# Expected results
+
+test#1 - main thread runtime overrun generates SIGXCPU with SCHED_FLAG_DL_OVERRUN flag applied to the main thread,
+and child thread overrun doesn't generate the signal while only main have the flag.
+
+applying FLAG_DL_OVERRUN
+child: waiting for a semaphore
+main: producing thread overrun
+success: with main thread flag set, main thread overrun SIGXCPU is detected.
+signalling child thread to apply No Flag
+main: allowing child thread to apply policy and overrun
+main: waiting for child thread to return
+child: applying policy
+child: releasing semaphore to allow main thread
+child: waiting for a semaphore
+child: producing thread overrun
+child: thread finished
+success: with main thread flag set, child thread overrun SIGXCPU not detected.
+test #1 passed
+
+test#2 - main thread runtime overrun doesn't generate SIGXCPU with no flag applied to main,
+and main thread overrun doesn't generate the signal with the flag applied to child thread.
+
+child: waiting for a semaphore
+main: producing thread overrun
+success: with no main thread flag, main thread overrun SIGXCPU not detected.
+signalling child thread to apply FLAG_DL_OVERRUN
+main: allowing child thread to apply policy
+child: applying policy
+child: releasing semaphore to allow main thread
+main: receiving a child thread semaphore
+main: producing thread overrun
+child: waiting for a semaphore
+success: with child thread flag, main thread overrun SIGXCPU not detected.
+test #2 passed
+
+test#3 - child thread runtime overrun generates SIGXCPU with the flag applied to the child thread,
+and child thread still generates the signal while the flag is applied to both child and main.
+
+signalling child thread to apply FLAG_DL_OVERRUN
+main: allowing child thread to apply policy and overrun
+child: waiting for a semaphore
+child: applying policy
+main: waiting for child thread to return
+child: releasing semaphore to allow main thread
+child: waiting for a semaphore
+child: producing thread overrun
+child: thread finished
+success: with child thread flag set, child thread overrun SIGXCPU is detected.
+main: allowing child thread to apply policy and overrun
+main: waiting for child thread to return
+child: waiting for a semaphore
+child: applying policy
+child: releasing semaphore to allow main thread
+child: waiting for a semaphore
+child: producing thread overrun
+child: thread finished
+success: with flag applied to both threads, child thread overrun SIGXCPU is detected.
+test #3 passed
+
+test#4 - child thread runtime overrun doesn't generate SIGXCPU with no flag applied to child,
+and child doesn't generate with the flag applied to main but not to child.
+
+main: allowing child thread to apply policy and overrun
+main: waiting for child thread to return
+child: waiting for a semaphore
+child: applying policy
+child: releasing semaphore to allow main thread
+child: waiting for a semaphore
+child: producing thread overrun
+child: thread finished
+success: with no child flag set, child thread overrun SIGXCPU not detected.
+applying FLAG_DL_OVERRUN
+signalling child thread to apply No Flag
+main: allowing child thread to apply policy and overrun
+main: waiting for child thread to return
+child: waiting for a semaphore
+child: applying policy
+child: releasing semaphore to allow main thread
+child: waiting for a semaphore
+child: producing thread overrun
+child: thread finished
+success: with flag applied to main, child thread overrun SIGXCPU not detected.
+test #4 passed
