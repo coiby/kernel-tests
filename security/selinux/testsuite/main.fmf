@@ -54,7 +54,7 @@ recommend:
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 1h
-adjust:
+adjust+:
   - when: KernelTier1 == 1
     description: Run the test using specific version of the testsuite.
     id: ""
