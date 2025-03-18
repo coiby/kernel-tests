@@ -1,0 +1,19 @@
+[General]
+description=Run upstream trinity
+name=/kernel/general/process/trinity_git
+owner=Chunyu Hu <chuhu@redhat.com>
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=2h
+dependencies=gcc
+softDependencies=json-c-devel;@development
+repoRequires=general/include;automotive/include
+environment=AVC_ERROR=+no_avc_check
+TestVersion=1.3
+Type=Regression
+RunFor=kernel
+Priority=Normal

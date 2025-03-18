@@ -26,7 +26,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
 # Enable TMT testing for RHIVOS
