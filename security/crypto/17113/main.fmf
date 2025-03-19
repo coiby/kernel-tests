@@ -12,6 +12,7 @@ require:
   - type: file
     pattern:
       - /kernel-include/runtest.sh
+      - /kernel-tests/security/crypto/17113/source
 duration: 10m
 extra-summary: /kernel-tests/security/crypto/17113
 extra-task: /kernel-tests/security/crypto/17113
