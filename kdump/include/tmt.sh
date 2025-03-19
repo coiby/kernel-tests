@@ -1,5 +1,5 @@
-#!/bin/sh
-# Copyright (c) 2020 Red Hat, Inc. All rights reserved.
+#!/bin/bash
+# Copyright (c) 2025 Red Hat, Inc. All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,15 +14,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Source Kdump tests common functions.
-. ../include/runtest.sh
+assign_server_roles() {
+    if [ -n "${TMT_TOPOLOGY_BASH}" ] && [ -f "${TMT_TOPOLOGY_BASH}" ]; then
+        # assign roles based on tmt topology data
+        # shellcheck source=/dev/null
+        . "${TMT_TOPOLOGY_BASH}"
 
-# --- start ---
-if [ -z "$TMT_TEST_RESTART_COUNT" ] || [ "$TMT_TEST_RESTART_COUNT" = 0 ]; then
-    # Delete /tmp/rstrntsync.sock beforehand otherwise rstrnt-sync will fail
-    # with the error "Failed to connect: Connection refused"
-    if [ -n "$TMT_TEST_RESTART_COUNT" ] && echo "${CLIENTS}" | grep -qi "${HOSTNAME}"; then
-        rm -f /tmp/rstrntsync.sock
+        if [[ $(grep -Ec "TMT_GUESTS\[.*role\]" "${TMT_TOPOLOGY_BASH}") -gt 1 ]]; then
+            export SERVERS=${TMT_GUESTS[server.hostname]}
+            export CLIENTS=${TMT_GUESTS[client.hostname]}
+        fi
+
+        export HOSTNAME=${TMT_GUEST[hostname]}
     fi
-Multihost SystemCrashTest TriggerSysrqC
-fi
+}
+
+assign_server_roles

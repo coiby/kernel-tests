@@ -1,0 +1,6 @@
+summary: Set up the crashkernel kernel parameter
+test: ./runtest.sh
+framework: beakerlib
+require:
+# Install the squashfs kernel module for the default crashkernel value to work
+- kernel-modules-core
