@@ -212,6 +212,14 @@ check_cpu_cgroup ()
 	# Move us to root cpu cgroup
 	# see: Bug 773259 - tests don't run in root cpu cgroup with systemd
 
+	# Check for the container env, skip this function if inside container
+	CONTAINER_TYPE="$(systemd-detect-virt --container 2>/dev/null || echo none)"
+
+	if [[ "$CONTAINER_TYPE" == "podman" || "$CONTAINER_TYPE" == "container-other" ]]; then
+		echo "Running inside a $CONTAINER_TYPE container check_cpu_cgroup() skipped"
+		return
+	fi
+
 	cgroup2_mntpoint=$(mount | grep ^cgroup2 | awk '{print $3}')
 	if [ -n "$cgroup2_mntpoint" ]; then
 		echo "Found cgroup2 mount point, moving pid $$ to $cgroup2_mntpoint/cgroup.procs"
