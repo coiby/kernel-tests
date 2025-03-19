@@ -597,6 +597,11 @@ rlJournalStart
             if cki_kver_lt "5.14.0-537.el9"; then
                 sed -i "/^tegra-ahb.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-builtin-aarch64.lst
             fi
+            if cki_kver_lt "5.14.0-571.el9"; then
+                sed -i "/intel-ishtp_eclite.ko/d;/intel-oaktrail.ko/d;/intel-plr_tpmi.ko/d;/intel-sdsi.ko/d;
+                /intel-tpmi_power_domains.ko/d;/intel-vsec.ko/d;
+                /intel-vsec_tpmi.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+            fi
         fi
     rlPhaseEnd
 
