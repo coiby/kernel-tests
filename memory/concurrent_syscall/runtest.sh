@@ -18,5 +18,5 @@ rlJournalStart
         rlAssertGrep "broken.* 0$" ${TMT_PLAN_DATA}/concurrent_syscalls.log
         rlAssertGrep "warnings.* 0$" ${TMT_PLAN_DATA}/concurrent_syscalls.log
     rlPhaseEnd
-rlJournalEnd
 rlJournalPrintText
+rlJournalEnd
