@@ -12,8 +12,6 @@ require:
     - elfutils-libelf-devel
     - gcc
     - glibc
-    - libcgroup
-    - libcgroup-tools
     - make
     - numactl
     - perf
@@ -28,6 +26,8 @@ require:
           - /cmdline_helper
           - /kernel-include
 recommend:
+    - libcgroup
+    - libcgroup-tools
     - abootimg
     - grubby
     - numactl-devel
