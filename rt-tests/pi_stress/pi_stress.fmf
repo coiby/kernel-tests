@@ -13,8 +13,6 @@ require:
           - /cki_lib
           - /automotive/include
 duration: 2h
-extra-summary: /rt-tests/pi_stress
-extra-task: /rt-tests/pi_stress
 environment:
     PARAM_SEC: 30
     PARAM_GROUPS: 1

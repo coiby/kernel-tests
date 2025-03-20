@@ -1,6 +1,6 @@
 [General]
 name=rt-tests/us/unittests/pkg/realtime-tests/sigwaittest
-owner=Qiao Zhao <qzhao@redhat.com>
+owner=Shizhao Chen <shichen@redhat.com>
 description=Unittest case for sigwaittest
 license=GPLv2
 confidential=no

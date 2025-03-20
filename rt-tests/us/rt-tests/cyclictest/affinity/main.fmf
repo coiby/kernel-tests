@@ -1,0 +1,9 @@
+summary: Test affinity settings for cyclictest
+description: Test affinity settings for cyclictest
+contact: Shizhao Chen <shichen@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - procps-ng
+  - psmisc
+duration: 60m

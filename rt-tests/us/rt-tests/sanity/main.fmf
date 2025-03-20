@@ -83,5 +83,3 @@ require:
       pattern:
           - /rt-tests/include
 duration: 60m
-extra-summary: rt-tests/us/rt-tests/sanity
-extra-task: rt-tests/us/rt-tests/sanity

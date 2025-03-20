@@ -14,8 +14,6 @@ require:
           - /cki_lib
           - /automotive/include
 duration: 3h
-extra-summary: /rt-tests/smidetect
-extra-task: /rt-tests/smidetect
 environment:
     DURATION: 1m
     LATCHECK: 1

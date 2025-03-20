@@ -1,0 +1,14 @@
+summary: Basic test for oslat
+description: |
+    Unit test for the oslat subpackage of the rt-tests package.
+    Runs oslat command for a specified duration and optionally
+    checks if latency exceeds the maximum threshold.
+contact: Shizhao Chen <shichen@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - stalld
+  - numactl
+  - numactl-libs
+  - procps-ng
+duration: 3h

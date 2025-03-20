@@ -1,0 +1,10 @@
+summary: Snapshot test for cyclictest
+description: |
+    Functional test for the snapshot feature of the cyclictest utility. Sending
+    SIGUSR2 to a running cyclictest instance will capture a snapshot in
+    /dev/shm/cyclictest${pid} without interrupting the process, originally requested
+    in bz1469185.
+contact: Shizhao Chen <shichen@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 60m

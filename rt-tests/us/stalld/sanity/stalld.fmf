@@ -12,8 +12,6 @@ require:
   - stalld
   - gcc
 duration: 40m
-extra-summary: /rt-tests/us/stalld/sanity
-extra-task: /rt-tests/us/stalld/sanity
 environment:
   ACTION: TEST
 tag: NoRHIVOS

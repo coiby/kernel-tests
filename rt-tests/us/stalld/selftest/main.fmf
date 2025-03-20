@@ -1,0 +1,9 @@
+summary: stalld selftest
+contact: Chang Yin <cyin@redhat.com>
+component:
+  - kernel-rt
+test: bash ./runtest.sh
+framework: shell
+require:
+  - gcc
+duration: 10m

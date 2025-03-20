@@ -1,6 +1,6 @@
 [General]
 name=rt-tests/us/unittests/pkg/realtime-tests/pi_stress
-owner=Qiao Zhao <qzhao@redhat.com>
+owner=Shizhao Chen <shichen@redhat.com>
 description=Unittest case for pi_stress
 license=GPLv2
 confidential=no

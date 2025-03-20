@@ -1,6 +1,6 @@
 [General]
 name=rt-tests/us/rt-tests/cyclictest/snapshot
-owner=Qiao Zhao <qzhao@redhat.com>
+owner=Shizhao Chen <shichen@redhat.com>
 description=Snapshot test for cyclictest
 license=GPLv3
 confidential=no
