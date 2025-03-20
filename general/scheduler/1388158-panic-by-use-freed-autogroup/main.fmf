@@ -1,0 +1,13 @@
+summary: sched cpu autogroup free panic test
+contact: Chunyu Hu <chuhu@redhat.com>
+id: b3285ff4-2ead-4ae6-af87-f43ef4282b28
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+duration: 30m
+extra-summary: /kernel/general/scheduler/1388158-panic-by-use-freed-autogroup
+extra-task: /kernel/general/scheduler/1388158-panic-by-use-freed-autogroup
