@@ -54,7 +54,12 @@ recommend:
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 1h
-adjust:
+# set avc check back to default that is disabled
+# until there is a better solution:
+# https://github.com/teemtee/tmt/issues/3611
+check-:
+  - how: avc
+adjust+:
   - when: KernelTier1 == 1
     description: Run the test using specific version of the testsuite.
     id: ""
@@ -64,3 +69,10 @@ adjust:
      GIT_BRANCH: 6aba9eb5ba78bcabe8abb5e3809f3680dc0403a1
   - when: stream is defined and stream != ystream
     enabled: false
+  # set avc check back to default that is disabled
+  # until there is a better solution:
+  # https://github.com/teemtee/tmt/issues/3611
+  - when: check-result == info
+    check-:
+      - how: avc
+        result: info
