@@ -12,3 +12,4 @@ max_time=30m
 dependencies=gcc;glibc
 softDependencies=
 repoRequires=
+RunFor=kernel
