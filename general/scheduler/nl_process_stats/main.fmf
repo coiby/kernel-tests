@@ -1,0 +1,13 @@
+summary: through netlink interface to get taskstats
+contact: Chunyu Hu <chuhu@redhat.com>
+id: baa85ee4-2ffd-4356-aa87-f54ef4282b28
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+duration: 30m
+extra-summary: /kernel/general/scheduler/nl_process_stats
+extra-task: /kernel/general/scheduler/nl_process_stats
