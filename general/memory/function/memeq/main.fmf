@@ -24,7 +24,7 @@ contact: Jiri Vohanka <jvohanka@redhat.com>
 id: 89873f8c-9dd8-45ab-8868-a4654ae07bfb
 component: kernel
 test: bash ./runtest.sh
-framework: shell
+framework: beakerlib
 require:
   - grubby
 duration: 90m
