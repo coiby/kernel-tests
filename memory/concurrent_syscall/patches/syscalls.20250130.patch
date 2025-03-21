@@ -1,0 +1,28 @@
+--- syscalls	2025-03-20 18:53:23.290276330 -0400
++++ syscalls.mod	2025-03-20 18:54:08.464446632 -0400
+@@ -1,6 +1,12 @@
+ #DESCRIPTION:Kernel system calls
+ abort01 abort01
+ 
++shmget02 shmget02
++shmget03 shmget03
++shmget04 shmget04
++shmget05 shmget05
++shmget06 shmget06
++
+ accept01 accept01
+ accept02 accept02
+ accept03 accept03
+@@ -1498,12 +1504,6 @@
+ shmdt01 shmdt01
+ shmdt02 shmdt02
+ 
+-shmget02 shmget02
+-shmget03 shmget03
+-shmget04 shmget04
+-shmget05 shmget05
+-shmget06 shmget06
+-
+ shutdown01 shutdown01
+ shutdown02 shutdown02
+ 
