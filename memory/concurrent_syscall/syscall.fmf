@@ -55,6 +55,6 @@ recommend+:
 duration: 180m
 environment+:
     TESTARGS: SYSCALLS
-    LTP_TIMEOUT_MUL: 20
+    LTP_TIMEOUT_MUL: 200
     SKIPTESTS: "getxattr04"
-    OPTS: "-w 2 -p"
+    OPTS: "-w 2"

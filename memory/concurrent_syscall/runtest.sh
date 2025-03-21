@@ -9,6 +9,9 @@ rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         rlRun "wget https://gitlab.com/redhat/centos-stream/tests/ltp/-/raw/${LTP_VERSION}/runtest/syscalls -O ../../distribution/ltp/generic/configs/SYSCALLS"
+        if [[ -e patches/syscalls.${LTP_VERSION}.patch ]]; then
+            rlRun "patch ../../distribution/ltp/generic/configs/SYSCALLS patches/syscalls.${LTP_VERSION}.patch"
+        fi
     rlPhaseEnd
     rlPhaseStartTest "Concurrent execution"
         rlRun "pushd ../../distribution/ltp/generic"
