@@ -106,15 +106,17 @@ function run_ltp_syscalls_continuously()
 rlJournalStart
     rlPhaseStartSetup
         rlRun setup_ltp
-        # Setup container mountpoints
-        mkdir -p /etc/containers/systemd/qm.container.d
-        cat > /etc/containers/systemd/qm.container.d/ltp_syscalls.conf << EOF
+        # Setup container mountpoints, if not done during prepare step (all:qm/scripts/beaker-prepare.sh)
+        if [ ! -f /etc/containers/systemd/qm.container.d/volume.conf ]; then
+            mkdir -p /etc/containers/systemd/qm.container.d
+            cat > /etc/containers/systemd/qm.container.d/ltp_syscalls.conf << EOF
 [Container]
 Volume=${syscalls_test_path}:${syscalls_test_path}:z
 EOF
-        cat /etc/containers/systemd/qm.container.d/ltp_syscalls.conf
-        rlRun "systemctl daemon-reload"
-        rlRun "systemctl restart qm"
+            cat /etc/containers/systemd/qm.container.d/ltp_syscalls.conf
+            rlRun "systemctl daemon-reload"
+            rlRun "systemctl restart qm"
+        fi
     rlPhaseEnd
     rlPhaseStartTest "Run LTP syscalls tests in QM, syzkaller in ASIL-B"
         run_ltp_syscalls_continuously $timer &
