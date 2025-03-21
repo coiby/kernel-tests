@@ -60,9 +60,11 @@ function set_mem()
 	} else {
 		echo "Sorry, the system RAM is too low to test."
 		rstrnt-report-result $RSTRNT_TASKNAME SKIP
-		exit 0
+		return 1
 	}
 	fi
+
+	return 0
 }
 
 function kilobytes()
@@ -88,7 +90,12 @@ rlJournalStart
 if [ ! -d "$tmpdir" ]; then
 	rlPhaseStartSetup
 		# setup MEM paramenter
-		rlRun "set_mem"
+		rlRun "set_mem" 0
+		if [ $? -ne 0 ]; then
+			rlPhaseEnd
+			rlJournalEnd
+			exit 0
+		fi
 
 		if [ -z "$MEM" ]; then
 			rlFail "MEM parameter is empty."
