@@ -11,7 +11,7 @@ require:
 extra-summary: KUNIT
 extra-task: KUNIT
 id: c55dc1bf-96af-4322-987f-ee36eda21b74
-adjust:
+adjust+:
     # test doesn't build on rhel before 8.4
     enabled: false
     when: distro < rhel-8.4
