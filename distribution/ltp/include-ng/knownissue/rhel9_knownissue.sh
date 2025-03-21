@@ -49,7 +49,7 @@ function rhel9_unfix_issues()
 	# setpgid01 failures on rhel9
 	osver_in_range "900" "907" && tskip "setpgid01" unfix
 	# RHEL-65410: ltp/lite move_pages04 test failed
-	osver_in_range "900" "907" && tskip "move_pages04" unfix
+	osver_in_range "900" "911" && tskip "move_pages04" unfix
 	# pty01, ptem01 failed with kirk
 	osver_in_range "900" "907" && tskip "pty01 ptem01" unfix
 }
