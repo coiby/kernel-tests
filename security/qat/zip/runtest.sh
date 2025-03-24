@@ -109,9 +109,9 @@ rlPhaseStart FAIL "QATzip: qzip compared against gzip"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: qzip multiple files"
-	rlRun "qzip -k -O 7z silesia/* -o silesia.7z"
 	rlRun "mkdir temp"
 	rlRun "cd temp"
+	rlRun "qzip -k -O 7z ../silesia/* -o silesia.7z"
 	rlRun "qzip -k -d silesia.7z"
 	rlRun "cd .."
 rlPhaseEnd
