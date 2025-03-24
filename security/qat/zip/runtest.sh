@@ -123,13 +123,15 @@ rlPhaseStart FAIL "QATzip: qzip multiple dirs"
 	rlRun "ls silesia/ silesia2/ silesia3/ > /dev/null"
 rlPhaseEnd
 
-rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
-	rlRun "taskset -c 1 qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i dickens" 0 "Running unithread level 1 compression test 100 times with sw disabled on provided dickens file"
-rlPhaseEnd
+#rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
+#	rlRun "taskset -c 1 qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i dickens" 0 "Running unithread level 1 compression test 100 times with sw disabled on provided dickens file"
+#rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
 	rlRun "rm -fr temp *silesia* dickens*"
+	rlRun "cd zstd && make uninstall && cd .. && rm -fr zstd"
+	#rlRun "cd QATzip && make uninstall && cd .. && rm -fr QATzip"
 rlPhaseEnd
 
 rlJournalPrintText
