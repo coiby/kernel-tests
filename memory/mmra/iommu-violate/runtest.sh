@@ -361,7 +361,7 @@ rlJournalStart
 
 # Check if the current kernel version matches the RHIVOS environment pattern
 rlShowRunningKernel
-if ! (uname -r | grep -w -q 'el[0-9]*iv'); then
+if ! (uname -r | grep -w -q 'el[0-9].*iv'); then
     rlLog "Skipping $TEST: This test is intended to run only in the RHIVOS environment."
     rstrnt-report-result "$TEST" SKIP
     rlJournalEnd
