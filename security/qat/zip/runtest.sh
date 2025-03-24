@@ -110,16 +110,17 @@ rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: qzip multiple files"
 	rlRun "qzip -k -O 7z silesia/* -o silesia.7z"
-	rlRun "cd silesia"
-	rlRun "qzip -d silesia.7z"
+	rlRun "mkdir temp"
+	rlRun "cd temp"
+	rlRun "qzip -k -d silesia.7z"
 	rlRun "cd .."
 rlPhaseEnd
 
-# Weird behaviour, decompression just spits all files into pwd
-# and seems like it overwrites the files if the dirs are identical
 rlPhaseStart FAIL "QATzip: qzip multiple dirs"
 	rlRun "qzip -k -O 7z silesia silesia2 silesia3 -o multi_silesia.7z"
-	rlRun "qzip -d multi_silesia.7z"
+	rlRun "rm -fr silesia/ silesia2/ silesia3/"
+	rlRun "qzip -k -d multi_silesia.7z"
+	rlRun "ls silesia/ silesia2/ silesia3/ > /dev/null"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
@@ -128,6 +129,7 @@ rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
+	rlRun "rm -fr temp *silesia* dickens*"
 rlPhaseEnd
 
 rlJournalPrintText
