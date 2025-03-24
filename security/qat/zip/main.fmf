@@ -27,4 +27,5 @@ require:
   - autoconf
   - lz4-devel
   - qatzip-devel
+  - qatlib-devel
 duration: 45m
