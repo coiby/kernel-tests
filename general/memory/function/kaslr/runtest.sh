@@ -360,7 +360,15 @@ function arch_nokaslr_test()
 
 function run_kaslr()
 {
-    grep CONFIG_RANDOMIZE_BASE=y ${k_boot}/config-"$(uname -r)" 2>/dev/null || { rlReport "Skip-not-support" PASS; return; }
+    if [ -e ${k_boot}/config-"$(uname -r)" ]; then
+        grep CONFIG_RANDOMIZE_BASE=y ${k_boot}/config-"$(uname -r)" || { rlReport "Skip-not-support" PASS; return; }
+    elif [ -e /proc/config.gz ]; then
+        zcat /proc/config.gz | grep CONFIG_RANDOMIZE_BASE=y || { rlReport "Skip-not-support" PASS; return; }
+    else
+        rlReport "Skip-not-support" PASS;
+        return;
+    fi
+
     get_kernel_version
     if  [ "$kver_major" -lt 3 ]; then
         rlReport "Skip-not-support" PASS
