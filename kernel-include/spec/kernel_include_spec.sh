@@ -107,6 +107,8 @@ Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
         kernel kernel-64k-debug 5.14.0-291.el9 devel kernel-64k-debug-devel-5.14.0-291.el9
         kernel-automotive kernel-automotive 5.14.0-301.264.el9iv devel kernel-automotive-devel-5.14.0-301.264.el9iv
         kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9iv devel kernel-automotive-debug-devel-5.14.0-301.264.el9iv
+        kernel-automotive kernel-automotive 5.14.0-301.264.el9_6iv devel kernel-automotive-devel-5.14.0-301.264.el9_6iv
+        kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9_6iv devel kernel-automotive-debug-devel-5.14.0-301.264.el9_6iv
         # headers
         kernel kernel 5.14.0-291.el9 headers kernel-headers-5.14.0-291.el9
         kernel kernel-debug 5.14.0-291.el9 headers kernel-headers-5.14.0-291.el9
@@ -118,6 +120,8 @@ Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
         kernel kernel-64k-debug 5.14.0-291.el9 headers kernel-headers-5.14.0-291.el9
         kernel-automotive kernel-automotive 5.14.0-301.264.el9iv headers kernel-headers-5.14.0-301.el9
         kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9iv headers kernel-headers-5.14.0-301.el9
+        kernel-automotive kernel-automotive 5.14.0-301.264.el9_6iv headers kernel-headers-5.14.0-301.el9_6
+        kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9_6iv headers kernel-headers-5.14.0-301.el9_6
         # modules-internal
         kernel kernel 5.14.0-291.el9 modules-internal kernel-modules-internal-5.14.0-291.el9
         kernel kernel-debug 5.14.0-291.el9 modules-internal kernel-debug-modules-internal-5.14.0-291.el9
@@ -129,6 +133,8 @@ Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
         kernel kernel-64k-debug 5.14.0-291.el9 modules-internal kernel-64k-debug-modules-internal-5.14.0-291.el9
         kernel-automotive kernel-automotive 5.14.0-301.264.el9iv modules-internal kernel-automotive-modules-internal-5.14.0-301.264.el9iv
         kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9iv modules-internal kernel-automotive-debug-modules-internal-5.14.0-301.264.el9iv
+        kernel-automotive kernel-automotive 5.14.0-301.264.el9_6iv modules-internal kernel-automotive-modules-internal-5.14.0-301.264.el9_6iv
+        kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9_6iv modules-internal kernel-automotive-debug-modules-internal-5.14.0-301.264.el9_6iv
         # selftests-internal
         kernel kernel 5.14.0-291.el9 selftests-internal kernel-selftests-internal-5.14.0-291.el9
         kernel kernel-debug 5.14.0-291.el9 selftests-internal kernel-selftests-internal-5.14.0-291.el9
@@ -140,6 +146,8 @@ Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
         kernel kernel-64k-debug 5.14.0-291.el9 selftests-internal kernel-selftests-internal-5.14.0-291.el9
         kernel-automotive kernel-automotive 5.14.0-301.264.el9iv selftests-internal kernel-automotive-selftests-internal-5.14.0-301.264.el9iv
         kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9iv selftests-internal kernel-automotive-selftests-internal-5.14.0-301.264.el9iv
+        kernel-automotive kernel-automotive 5.14.0-301.264.el9_6iv selftests-internal kernel-automotive-selftests-internal-5.14.0-301.264.el9_6iv
+        kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9_6iv selftests-internal kernel-automotive-selftests-internal-5.14.0-301.264.el9_6iv
         # tools-libs
         kernel kernel 5.14.0-291.el9 tools-libs kernel-tools-libs-5.14.0-291.el9
         kernel kernel-debug 5.14.0-291.el9 tools-libs kernel-tools-libs-5.14.0-291.el9
@@ -151,6 +159,8 @@ Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
         kernel kernel-64k-debug 5.14.0-291.el9 tools-libs kernel-tools-libs-5.14.0-291.el9
         kernel-automotive kernel-automotive 5.14.0-301.264.el9iv tools-libs kernel-tools-libs-5.14.0-301.el9
         kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9iv tools-libs kernel-tools-libs-5.14.0-301.el9
+        kernel-automotive kernel-automotive 5.14.0-301.264.el9_6iv tools-libs kernel-tools-libs-5.14.0-301.el9_6
+        kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9_6iv tools-libs kernel-tools-libs-5.14.0-301.el9_6
         # debuginfo-common
         kernel kernel 5.14.0-291.el9 debuginfo-common kernel-debuginfo-common-5.14.0-291.el9
         kernel kernel-debug 5.14.0-291.el9 debuginfo-common kernel-debuginfo-common-5.14.0-291.el9
@@ -162,6 +172,8 @@ Describe 'kernel-include: K_GetRunningKernelRpmSubPackageNVR'
         kernel kernel-64k-debug 5.14.0-291.el9 debuginfo-common kernel-debuginfo-common-5.14.0-291.el9
         kernel-automotive kernel-automotive 5.14.0-301.264.el9iv debuginfo-common kernel-automotive-debuginfo-common-5.14.0-301.264.el9iv
         kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9iv debuginfo-common kernel-automotive-debuginfo-common-5.14.0-301.264.el9iv
+        kernel-automotive kernel-automotive 5.14.0-301.264.el9_6iv debuginfo-common kernel-automotive-debuginfo-common-5.14.0-301.264.el9_6iv
+        kernel-automotive kernel-automotive-debug 5.14.0-301.264.el9_6iv debuginfo-common kernel-automotive-debuginfo-common-5.14.0-301.264.el9_6iv
     End
     Mock K_GetRunningKernelRpmName
         echo "$KERNEL_NAME"
