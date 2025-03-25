@@ -9,9 +9,9 @@ component:
   - kernel
 test: ./runtest.sh
 framework: beakerlib
-adjust:
-  - enabled: false
-    when: arch != aarch64
+adjust+:
+  - when: arch != aarch64
+    enabled: false
 duration: 15m
 extra-summary: /kernel/acpi/enabled
 extra-task: /kernel/acpi/enabled

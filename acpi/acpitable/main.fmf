@@ -10,9 +10,9 @@ framework: shell
 require:
   - dmidecode
   - acpica-tools
-adjust:
-  - enable: false
-    when: arch == s390x or arch == ppc64le
+adjust+:
+  - when: arch == s390x or arch == ppc64le
+    enable: false
 duration: 1h
 extra-summary: /kernel/acpi/acpi-tables
 extra-task: /kernel/acpi/acpi-tables
