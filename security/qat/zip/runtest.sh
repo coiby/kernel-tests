@@ -59,12 +59,9 @@ rlPhaseStartSetup
 		rlLogInfo "selinux is "$(getenforce)
 		rlRun "systemctl start qat"
 
-		# Get files to test on, recommended in the QAT ZSTD Plugin repo
-		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
-		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/silesia.zip"
-		rlRun "unzip silesia.zip -d silesia"
-		rlRun "cp -r silesia silesia2"
-		rlRun "cp -r silesia silesia3"
+		# Get 6.14 kernel for raw data testing
+		rlRun "wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.14.tar.xz"
+		rlRun "tar -xf linux-6.14.tar.xz"
 
 		# Add qatlib repo autogen, configure, and make. No install
 
@@ -77,15 +74,15 @@ rlPhaseStartSetup
 		#rlRun "make -j$(nproc) && make install"
 		#rlRun "cd .."
 
-		# Configure QAT to dc compression mode
+		# Configure QAT to dc (de)compression mode
 		rlRun "pip install prettytable"
 		rlRun "python3 qat -c -m 2" 0 "Turning QAT mode to dc"
 	fi
 rlPhaseEnd
 
-rlPhaseStart FAIL "QATzip: qzip (de)compression of individual files"
+rlPhaseStart FAIL "QATzip: qzip (de)compression of individual file"
 	rlLogInfo $(rpm -q qatzip)
-	rlRun "bunzip2 dickens.bz2 -c > /tmp/data" 0 "preparing data"
+	rlRun "cp linux-6.14/MAINTAINERS /tmp/data" 0 "preparing data"
 	cp /tmp/data /tmp/in
 	rlRun "qzip /tmp/in" 0 "QAT zip"
 	rlRun "qzip -d /tmp/in.gz" 0  "QAT unzip"
@@ -93,27 +90,24 @@ rlPhaseStart FAIL "QATzip: qzip (de)compression of individual files"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: qzip multiple files"
-	rlRun "mkdir temp"
-	rlRun "cd temp"
-	rlRun "qzip -k -O 7z ../silesia/* -o silesia.7z"
-	rlRun "qzip -k -d silesia.7z"
-	rlRun "cd .."
+	rlRun "qzip -k -O 7z linux-6.14/MAINTAINERS linux-6.14/CREDITS linux-6.14/README -o kernel_docs.7z"
+	rlRun "qzip -k -d kernel_docs.7z"
+	rlRun "ls MAINTAINERS CREDITS README > /dev/null"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: qzip multiple dirs"
-	rlRun "qzip -k -O 7z silesia silesia2 silesia3 -o multi_silesia.7z"
-	rlRun "rm -fr silesia/ silesia2/ silesia3/"
-	rlRun "qzip -k -d multi_silesia.7z"
-	rlRun "ls silesia/ silesia2/ silesia3/ > /dev/null"
+	rlRun "qzip -k -O 7z linux-6.14/drivers/crypto/intel/qat/qat_4xxx/ linux-6.14/drivers/crypto/intel/qat/qat_420xx/ linux-6.14/drivers/crypto/intel/qat/qat_c3xxx/ -o multi_qat.7z"
+	rlRun "qzip -k -d multi_qat.7z"
+	rlRun "ls qat_420xx  qat_4xxx  qat_c3xxx > /dev/null"
 rlPhaseEnd
 
 #rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
-#	rlRun "taskset -c 1 qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i dickens" 0 "Running unithread level 1 compression test 100 times with sw disabled on provided dickens file"
+#	rlRun "taskset -c 1 qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i linux-6.14/MAINTAINERS" 0 "Running unithread level 1 compression test 100 times with sw disabled on kernel maintainers file"
 #rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
-	rlRun "rm -fr temp *silesia* dickens*"
+	rlRun "rm -fr MAINTAINERS CREDITS README qat_420xx  qat_4xxx  qat_c3xxx"
 	rlRun "cd zstd && make uninstall && cd .. && rm -fr zstd"
 	#rlRun "cd QATzip && make uninstall && cd .. && rm -fr QATzip"
 rlPhaseEnd
