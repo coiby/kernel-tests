@@ -126,7 +126,6 @@
 /networking/route/pmtu/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/route/route_func/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/sctp/auth/sockopts/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
-/networking/socket/fuzz/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/tcp/tcp_keepalive/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/tunnel/geneve/basic/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/tunnel/gre/basic/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -267,7 +266,6 @@
 /networking/route/pmtu/ @bgoncalv @linup2011 @lulinqing @stowellm
 /networking/route/route_func/ @bgoncalv @linup2011 @liuhangbin @lulinqing @stowellm
 /networking/sctp/auth/sockopts/ @bgoncalv @liuhangbin @lulinqing @stowellm @yinxu
-/networking/socket/fuzz/ @bgoncalv @liuhangbin @lulinqing @stowellm
 /networking/tcp/tcp_keepalive/ @bgoncalv @liuhangbin @lulinqing @stowellm @xmu2
 /networking/tunnel/geneve/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing @stowellm
 /networking/tunnel/gre/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing @stowellm
