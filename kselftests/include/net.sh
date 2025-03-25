@@ -171,6 +171,8 @@ do_net_config()
 	modprobe -a l2tp_eth l2tp_ip6 l2tp_ip
 	# for net:txtimestamp.sh
 	modprobe sch_netem
+	# for net:ip_local_port_range.sh
+	modprobe sctp
 	# for msg_zerocopy.sh, we don't have UDP zero copy support yet
 	sed -i 's/$0 4 udp -t 1/#$0 4 udp -t 1/' msg_zerocopy.sh
 	sed -i 's/$0 6 udp -t 1/#$0 6 udp -t 1/' msg_zerocopy.sh
