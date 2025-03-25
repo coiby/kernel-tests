@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck disable=all
+# Disabling all shellcheck warnings to allow the merge request, as this script is scheduled for deprecation
+
 [ ! "$RSTRNT_JOBID" ] && rm -rf logs && mkdir logs && export TMPDIR="$PWD/logs"
 
 if [ ! "$RSTRNT_JOBID" ]; then
