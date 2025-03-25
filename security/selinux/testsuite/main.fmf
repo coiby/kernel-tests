@@ -76,3 +76,6 @@ adjust+:
     check-:
       - how: avc
         result: info
+  # kernel debug is slow, double the test runtime
+  - when: package-name ~ kernel.*debug
+    duration+: "*2"
