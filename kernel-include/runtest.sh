@@ -548,7 +548,7 @@ function K_GetRunningKernelRpmSubPackageNVR ()
   elif [[ "$k_rpm" == "kernel-automotive"* ]]; then
     # e.g.: kernel-automotive-5.14.0-301.264.el9iv --> kernel-5.14.0-301.el9
     k_srpm="kernel"
-    local X=${k_srpm_vr%.[0-9]*.el[0-9].*iv} # 5.14.0-301
+    local X=${k_srpm_vr%.[0-9]*.el[0-9]*iv}  # 5.14.0-301
     local Y=${k_srpm_vr/*.el/el}             # el9iv
     k_srpm_vr="${X}.${Y//iv}"                # 5.14.0-301.el9
   fi
