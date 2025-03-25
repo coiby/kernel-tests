@@ -83,29 +83,13 @@ rlPhaseStartSetup
 	fi
 rlPhaseEnd
 
-rlPhaseStart FAIL "QATzip: qzip compared against gzip"
+rlPhaseStart FAIL "QATzip: qzip (de)compression of individual files"
 	rlLogInfo $(rpm -q qatzip)
-	TMP=`mktemp`
 	rlRun "bunzip2 dickens.bz2 -c > /tmp/data" 0 "preparing data"
 	cp /tmp/data /tmp/in
-	rlRun "/bin/time -f '%e' qzip /tmp/in 2>\"$TMP\"" 0 "QAT zip"
-	QZIP_TIME=$(cat "$TMP")
-	rlLogInfo "Time: ${QZIP_TIME} s"
-	rlRun "/bin/time -f '%e' qzip -d /tmp/in.gz 2>\"$TMP\"" 0  "QAT unzip"
-	QUNZIP_TIME=$(cat "$TMP")
-	rlLogInfo "Time: ${QUNZIP_TIME} s"
+	rlRun "qzip /tmp/in" 0 "QAT zip"
+	rlRun "qzip -d /tmp/in.gz" 0  "QAT unzip"
 	rlRun "diff /tmp/data /tmp/in" 0 "Comparing decompressed file with original"
-	rlRun "/bin/time -f '%e' gzip /tmp/data 2>\"$TMP\"" 0 "gzip"
-	GZIP_TIME=$(cat "$TMP")
-	rlLogInfo "Time: ${GZIP_TIME} s"
-	rlRun "/bin/time -f '%e' gzip -d /tmp/data.gz 2>\"$TMP\"" 0 "gunzip"
-	GUNZIP_TIME=$(cat "$TMP")
-	rlLogInfo "Time: ${GUNZIP_TIME} s"
-	ZIP_RATIO=$(echo ${QZIP_TIME}/${GZIP_TIME} | bc -l)
-	UNZIP_RATIO=$(echo ${QUNZIP_TIME}/${GUNZIP_TIME} | bc -l)
-	rlLogInfo "qzip/gzip speed: ${ZIP_RATIO}"
-	rlLogInfo "qunzip/gunzip speed: ${UNZIP_RATIO}"
-	rm ${TMP}
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: qzip multiple files"
