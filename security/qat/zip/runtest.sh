@@ -107,7 +107,7 @@ rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
-	rlRun "rm -fr MAINTAINERS CREDITS README qat_420xx  qat_4xxx  qat_c3xxx"
+	rlRun "rm -fr MAINTAINERS CREDITS README qat_420xx  qat_4xxx qat_c3xxx kernel_docs.7z linux-6.14* multi_qat.7z"
 	rlRun "cd zstd && make uninstall && cd .. && rm -fr zstd"
 	#rlRun "cd QATzip && make uninstall && cd .. && rm -fr QATzip"
 rlPhaseEnd
