@@ -53,8 +53,8 @@ rlPhaseStartSetup
 		# Reboot to activate the firmware (Beaker safe)
 		rlRun "rstrnt-reboot"
 	else
-		# Get a file to test on, recommended in the QAT ZSTD Plugin repo
-		rlRun "wget https://github.com/yewq/Silesia-compression-corpus/raw/refs/heads/main/dickens.bz2"
+		# Create nullbytes test file
+		rlRun "dd < /dev/zero bs=10485760 count=1 > nullbytes"
 		rlLogInfo "The distro release is $(rlGetDistroRelease)"
 		rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
 		rlLogInfo "selinux is "$(getenforce)
@@ -80,9 +80,6 @@ rlPhaseStartSetup
 	# Get the baseline QAT ZSTD Plugin tests
 	rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
 
-	# Decompress test file
-	rlRun "bunzip2 dickens.bz2"
-
 	# Compile
 	rlRun "cd QAT-ZSTD-Plugin/"
 	rlRun "make test"
@@ -90,7 +87,7 @@ rlPhaseStartSetup
 rlPhaseEnd
 
 rlPhaseStart FAIL "QAT-ZSTD-Plugin"
-	rlRun "./QAT-ZSTD-Plugin/test/test dickens" 0 "compressing and decompressing dickens"
+	rlRun "./QAT-ZSTD-Plugin/test/test nullbytes" 0 "compressing and decompressing zeroes"
 rlPhaseEnd
 
 rlPhaseStartCleanup
@@ -99,6 +96,3 @@ rlPhaseEnd
 
 rlJournalPrintText
 rlJournalEnd
-
-
-
