@@ -603,6 +603,12 @@ rlJournalStart
                 /intel-vsec_tpmi.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
             fi
         fi
+        if [[ "$Release" == "HEAD-10.0" ]]; then
+            if cki_kver_lt "6.12.0-66.el10"; then
+                sed -i "/pci-pwrctl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
+                sed -i "/pci-pwrctrl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
+            fi
+        fi
     rlPhaseEnd
 
     # -----------------------------------

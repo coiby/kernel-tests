@@ -1149,6 +1149,7 @@ pci-hyperv.ko
 pci-pf-stub.ko
 pci-pwrctl-core.ko
 pci-pwrctl-pwrseq.ko
+pci-pwrctrl-pwrseq.ko
 pcrypt.ko
 pcs_xpcs.ko
 peak_pciefd.ko
