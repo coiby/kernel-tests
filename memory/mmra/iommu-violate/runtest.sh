@@ -23,6 +23,7 @@
 # Include Beaker environment
 # shellcheck disable=SC1091
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../cki_lib/libcki.sh || exit 1
 
 # Test name and paths
 TEST="memory/mmra/iommu-violate"
@@ -361,7 +362,7 @@ rlJournalStart
 
 # Check if the current kernel version matches the RHIVOS environment pattern
 rlShowRunningKernel
-if ! (uname -r | grep -w -q 'el[0-9]*iv'); then
+if ! cki_is_kernel_automotive; then
     rlLog "Skipping $TEST: This test is intended to run only in the RHIVOS environment."
     rstrnt-report-result "$TEST" SKIP
     rlJournalEnd
