@@ -4,5 +4,9 @@ description: |2
 contact: Stephen Bertram <sbertram@redhat.com>
 id: 3513a6ee-3132-41ae-86fd-46f67511582a
 test: bash ./runtest.sh
+require:
+  - type: file
+    pattern:
+      - /kernel-include/runtest.sh
 framework: beakerlib
 duration: 1h
