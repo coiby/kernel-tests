@@ -1,0 +1,15 @@
+[General]
+name=/kernel-tests/security/rng-jitter
+owner=Rafael Parra Zoquier <rparrazo@redhat.com>
+description=Test jitter and rng-tools
+license=GPLv2
+confidential=no
+destructive=no
+[restraint]
+entry_point=./runtest.sh
+dependencies=kernel;beakerlib;beakerlib-redhat
+Path=/mnt/tests/kernel-tests/security/rng-jitter
+Type=Function
+RunFor=kernel
+Priority=Normal
+max_time=5m
