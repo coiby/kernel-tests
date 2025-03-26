@@ -66,13 +66,13 @@ rlPhaseStartSetup
 		# Add qatlib repo autogen, configure, and make. No install
 
 		# Configuration for Intel's qatzip-test
-		#rlRun "git clone https://github.com/intel/QATzip.git"
-		#rlRun "cd QATzip/"
-		#rlRun "export QZ_ROOT=`pwd`"
-		#rlRun "./autogen.sh"
-		#rlRun "./configure"
-		#rlRun "make -j$(nproc) && make install"
-		#rlRun "cd .."
+		rlRun "git clone https://github.com/intel/QATzip.git"
+		rlRun "cd QATzip/"
+		rlRun "export QZ_ROOT=`pwd`"
+		rlRun "./autogen.sh"
+		rlRun "./configure"
+		rlRun "make -j$(nproc)"
+		rlRun "cd .."
 
 		# Configure QAT to dc (de)compression mode
 		rlRun "pip install prettytable"
@@ -101,15 +101,16 @@ rlPhaseStart FAIL "QATzip: qzip multiple dirs"
 	rlRun "ls qat_420xx  qat_4xxx  qat_c3xxx > /dev/null"
 rlPhaseEnd
 
-#rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
-#	rlRun "taskset -c 1 qatzip-test -m 4 -l 100 -t 1 -D comp -L 1 -B 0 -i linux-6.14/MAINTAINERS" 0 "Running unithread level 1 compression test 100 times with sw disabled on kernel maintainers file"
-#rlPhaseEnd
+rlPhaseStart FAIL "QATzip: Intel's qatzip-test"
+	rlRun "./QATzip/test/qatzip-test -m 4 -l 100 -t 8 -D comp -L 1 -B 0 -i linux-6.14/MAINTAINERS" 0 "Running eight-thread level 1 compression test 100 times with sw disabled on kernel maintainers file"
+	rlRun "./QATzip/test/qatzip-test -m 4 -t 8 -l 100 -i linux-6.14/MAINTAINERS -C 65536 -b 524288 -L 1 -A deflate -O gzipext -T dynamic" 0 "Running test mode 4 from QATzip/test/README"
+rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
 	rlRun "rm -fr MAINTAINERS CREDITS README qat_420xx  qat_4xxx qat_c3xxx kernel_docs.7z linux-6.14* multi_qat.7z"
 	rlRun "cd zstd && make uninstall && cd .. && rm -fr zstd"
-	#rlRun "cd QATzip && make uninstall && cd .. && rm -fr QATzip"
+	rlRun "rm -fr QATzip"
 rlPhaseEnd
 
 rlJournalPrintText
