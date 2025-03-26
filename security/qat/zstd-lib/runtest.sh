@@ -63,16 +63,6 @@ rlPhaseStartSetup
 rlPhaseEnd
 
 rlPhaseStartSetup
-	# Get all necessary includes
-	rlRun "git clone https://github.com/intel/qatlib.git"
-	rlRun "cd qatlib"
-	rlRun "./autogen.sh" 0 "generating necessary include files"
-	rlRun "./configure --enable-service" 0 "configuring include files"
-	rlRun "make -j$(nproc)" 0 "making include files"
-	rlRun "make install" 0 "installing necessary include files"
-	rlRun "cd .."
-	rlRun "dnf reinstall -y qatlib qatengine"
-
 	# Run the Intel QAT configuration script
 	rlRun "pip install prettytable"
 	rlRun "python3 qat --config" 0 "reconfiguring QAT devices"
