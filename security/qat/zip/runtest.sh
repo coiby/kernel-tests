@@ -103,7 +103,7 @@ rlPhaseEnd
 rlPhaseStart FAIL "QATzip: Intel's qatzip-test mode 4"
 	rlRun "systemctl start qat"
 	rlRun "./QATzip/test/qatzip-test -m 4 -l 100 -t 8 -D comp -L 1 -B 0 -i linux-6.14/MAINTAINERS" 0 "Running eight-thread level 1 compression test 100 times with sw disabled"
-	rlRun "./QATzip/test/qatzip-test -m 4 -t 8 -l -B 0 100 -i linux-6.14/MAINTAINERS -C 65536 -b 524288 -L 1 -A deflate -O gzipext -T dynamic" 0 "Running eight-thread level 1 deflation test 100 times with 65536 hw buffer and 524288 block size(data_format=gzipext && huffman=dynamic && sw disabled)"
+	rlRun "./QATzip/test/qatzip-test -m 4 -t 8 -l 100 -B 0 -i linux-6.14/MAINTAINERS -C 65536 -b 524288 -L 1 -A deflate -O gzipext -T dynamic" 0 "Running eight-thread level 1 deflation test 100 times with 65536 hw buffer and 524288 block size (data_format=gzipext && huffman=dynamic && sw disabled)"
 	rlRun "./QATzip/test/qatzip-test -m 4 -t 10 -l 100 -L 1 -B 0 -A lz4 -O lz4" 0 "Running ten-threaded level 1 lz4 test 100 times (sw disabled)"
 rlPhaseEnd
 
@@ -122,7 +122,7 @@ rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
-	rlRun "rm -fr MAINTAINERS CREDITS README qat_420xx  qat_4xxx qat_c3xxx kernel_docs.7z linux-6.14* multi_qat.7z"
+	rlRun "rm -fr MAINTAINERS CREDITS README qat_420xx qat_4xxx qat_c3xxx kernel_docs.7z linux-6.14* multi_qat.7z"
 	rlRun "cd zstd && make uninstall && cd .. && rm -fr zstd"
 	rlRun "rm -fr QATzip"
 rlPhaseEnd
