@@ -55,25 +55,23 @@ rlPhaseStartSetup
 	else
 		# Create nullbytes test file
 		rlRun "dd < /dev/zero bs=10485760 count=1 > nullbytes"
+
+		# Run the Intel QAT configuration script
+		rlRun "pip install prettytable"
+		rlRun "python3 qat --config" 0 "reconfiguring QAT devices"
+
+		# Get the baseline QAT ZSTD Plugin tests
+		rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
+		rlRun "cd QAT-ZSTD-Plugin/"
+		rlRun "make test"
+		rlRun "cd .."
+
+		# Logging and starting qat.service
 		rlLogInfo "The distro release is $(rlGetDistroRelease)"
 		rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
 		rlLogInfo "selinux is "$(getenforce)
 		rlRun "systemctl start qat"
 	fi
-rlPhaseEnd
-
-rlPhaseStartSetup
-	# Run the Intel QAT configuration script
-	rlRun "pip install prettytable"
-	rlRun "python3 qat --config" 0 "reconfiguring QAT devices"
-
-	# Get the baseline QAT ZSTD Plugin tests
-	rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
-
-	# Compile
-	rlRun "cd QAT-ZSTD-Plugin/"
-	rlRun "make test"
-	rlRun "cd .."
 rlPhaseEnd
 
 rlPhaseStart FAIL "QAT-ZSTD-Plugin"
