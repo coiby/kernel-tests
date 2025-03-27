@@ -12,17 +12,10 @@ description: |
     Results location:
         output.txt
 contact: Stephen Bertram <sbertram@redhat.com>
-test: |
-    if [ -n "${FFI_QM_SCENARIO}" ]; then
-        podman exec --env TEST_DIR="$(pwd)" --env BEAKERLIB_DIR="$BEAKERLIB_DIR" \
-          -t qm sh -c 'cd "$TEST_DIR"; bash runtest.sh'
-    else
-        bash ./runtest.sh
-    fi
+test: bash ./runtest.sh
 id: 19ccd078-d9ca-4502-8ea0-b951b733e054
 framework: beakerlib
 require+:
-  - beakerlib
   - procmail
   - automake
   - autoconf
