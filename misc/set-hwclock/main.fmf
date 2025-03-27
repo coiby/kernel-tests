@@ -9,7 +9,7 @@ require:
   - chrony
 # hwclock is not included in the util-linux build for s390x
 adjust:
-  - enable: false
+  - enabled: false
     when: arch == s390x
 duration: 10m
 extra-summary: /kernel/misc/set-hwclock
