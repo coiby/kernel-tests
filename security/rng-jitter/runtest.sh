@@ -2,8 +2,8 @@
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /kernel-tests/security/vulnerabilities
-#   Description: Check vulnerabilities/* files for unmitigated CVEs
+#   runtest.sh of /kernel-tests/security/rng-jitter
+#   Description: Test jitter and rngtools
 #   Author: Vilem Marsik <vmarsik@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,7 +43,6 @@ rlPhaseStart FAIL "Functionality"
     FILE="/tmp/entropy"
     CMD=$(echo -n "rngd -n jitter -O jitter:timeout:10"; rngd -l 2>&1 | grep '^[0-9]' | cut -d\( -f2 | cut -d\) -f1 | grep -v jitter | while read A; do echo -n " -x $A"; done; echo " -f -o /dev/stdout > ${FILE}")
     rlRun "timeout 120 $CMD" 124
-    # Need to figure out 'ok' amount of failures
     rlRun "cat ${FILE} | rngtest" 0-255
     rlRun "systemctl start rngd"
     rlRun "systemctl status rngd"
@@ -102,7 +101,6 @@ rlPhaseStartTest "rngtest"
     fi
     SUCCESSES=$(awk '/FIPS 140-2 successes/{print $NF}' $rlRun_LOG)
     FAILURES=$(awk '/FIPS 140-2 failures/{print $NF}' $rlRun_LOG)
-    # TODO: how many FIPS-140-2 failures are acceptable?
     if [ "$FAILURES" -lt 100 ] ; then
         rlReport "FIPS 140-2 successes" "PASS" "$SUCCESSES"
         rlReport "FIPS 140-2 failures" "PASS" "$FAILURES"
@@ -129,7 +127,7 @@ rlPhaseStartTest "entropy-pool"
         else
             rlReport "entropy_avail" "FAIL" "$ENTROPY"
         fi
-	sleep 1
+        sleep 1
     done
 rlPhaseEnd
 
