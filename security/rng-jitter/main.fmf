@@ -1,6 +1,6 @@
 summary: Test jitter and rng-tools
 contact: Rafael Parra Zoquier <rparrazo@redhat.com>
-path: security/rng-jitter
+path: /security/rng-jitter
 test: bash ./runtest.sh
 framework: beakerlib
 duration: 5m
