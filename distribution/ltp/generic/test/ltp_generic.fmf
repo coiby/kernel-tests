@@ -46,9 +46,9 @@ require:
      - /distribution/ltp/kirk
 recommend:
   - python3-click
-adjust:
-  - enabled: false
-    when: arch == x86_64
+adjust+:
+  - when: arch == x86_64
+    enabled: false
 duration: 6h
 extra-summary: /kernel/distribution/ltp/generic
 extra-task: /kernel/distribution/ltp/generic

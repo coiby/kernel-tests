@@ -38,9 +38,9 @@ require+:
   - wget
   - python3
   - ntpsec
-adjust:
-  - enabled: false
-    when: arch == x86_64
+adjust+:
+  - when: arch == x86_64
+    enabled: false
 duration: 180m
 environment:
     TESTARGS: RHIVOS
