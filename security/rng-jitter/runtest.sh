@@ -68,7 +68,7 @@ rlPhaseStart FAIL "options test"
     [ -e $FILE ]
     EXISTS=$?
     killall rngd # returns true if rngd runs
-    if [ $? -eq 0 && $EXISTS -ne 0 ]
+    if [ $? -eq 0 ] && [ $EXISTS -ne 0 ]
     then
         rlPass "foreground run OK"
     else
