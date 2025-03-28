@@ -135,6 +135,8 @@ patch_inc()
 patch-rtltp()
 {
 	echo "============ Patch rt_ltp ============" | tee -a $OUTPUTFILE
-	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0001-rhivos-increase-threshold-based-on-hardware.patch
-	find ${TARGET} -type f -name run_auto.sh -exec chmod a+x {} \;  # Solve VROOM-23546
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0001-Correct-the-permissions-on-run_auto.sh.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0002-Ensure-prio-wake-test-runs-on-a-single-core.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0003-Fix-the-result-parsing-bug-for-pi-tests.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0004-Only-analyze-testpi-log-if-the-test-was-actually-exe.patch
 }

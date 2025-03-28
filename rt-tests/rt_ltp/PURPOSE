@@ -22,7 +22,7 @@ Expected result:
     Execution of a case with a pass result will have the following entry in the executor log.
     :: ./run.sh -t  $case :: PASS ::
 
-    If all cases executed with a result of pass then the following entry shall appear in the executor log.
+    If no cases executed with a result of FAIL then the following entry shall appear in the executor log.
     overall result: PASS
 
 Results location:
