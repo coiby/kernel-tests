@@ -82,9 +82,14 @@ function check_status() {
 
     local count=$(echo "$log_files" | wc -w)
     if [[ $count -eq 0 ]]; then
+        # Skipping a test by commenting it out in the profile prevents it from
+        # being executed and generating any logs.
+        # Therefore, it should be treated as a SKIP, not a WARN.
         echo "No log files containing '$keywords' were found in $PWD/logs."
-        rstrnt-report-result "${casename}" "WARN" 2
-        return 2
+        echo "Test '$casename' is not being executed and does not produce any logs."
+        echo ":: $1 :: SKIP ::" | tee -a "$OUTPUTFILE"
+        rstrnt-report-result "${casename}" "SKIP" 0
+        return 0
     else
         echo "Found $count log file(s) containing '$keywords':"
         for log_file in $log_files; do echo ">> $log_file"; done
