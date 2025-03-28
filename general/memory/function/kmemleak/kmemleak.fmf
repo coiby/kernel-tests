@@ -1,0 +1,20 @@
+summary: Check that kmemleak is working
+description: |
+    Kmemleak provides a way of detecting possible kernel memory leaks in a way similar to a tracing garbage collector,
+    with the difference that the orphan objects are not freed but only reported via /sys/kernel/debug/kmemleak.
+    Author: Chunyu Hu <chuhu@redhat.com>
+contact: Chunyu Hu <chuhu@redhat.com>
+component:
+  - kernel-debug
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 1h
+extra-summary: memory/function/kmemleak
+extra-task: memory/function/kmemleak
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION
