@@ -9,9 +9,9 @@ framework: beakerlib
 require:
   - grubby
   - numactl
-adjust:
-  enabled: false
-  when: arch != x86_64
+adjust+:
+  - enabled: false
+    when: arch != x86_64
 duration: 60m
 extra-summary: /general/memory/function/gigantic-page
 extra-task: /general/memory/function/gigantic-page

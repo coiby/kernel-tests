@@ -4,9 +4,9 @@ component:
   - kernel
 test: bash -x ./runtest.sh
 framework: shell
-adjust:
-  enabled: false
-  when: arch != x86_64
+adjust+:
+  - enabled: false
+    when: arch != x86_64
 duration: 30m
 extra-summary: /kernel-tests/general/time/check_freq_ced
 extra-task: /kernel-tests/general/time/check_freq_ced

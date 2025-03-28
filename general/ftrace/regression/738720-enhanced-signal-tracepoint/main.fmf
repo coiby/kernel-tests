@@ -10,9 +10,9 @@ tag:
   - tier2
   - NoRHIVOS
 enabled: true
-adjust:
-  enabled: false
-  when: arch != i386 and arch != x86_64
+adjust+:
+  - enabled: false
+    when: arch != i386 and arch != x86_64
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=738720
 extra-summary: /kernel/general/ftrace/regression/738720-enhanced-signal-tracepoint
