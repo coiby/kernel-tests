@@ -7,6 +7,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+TEST_VERSION=${TEST_VERSION:-20250130}
+RTLTP_PROFILE=${RTLTP_PROFILE:-default}
+
 # shellcheck disable=SC1091
 # Source rt common functions
 . ../include/runtest.sh || exit 1
@@ -132,6 +135,16 @@ function runtest() {
     download_ltp
     patch-rtltp
 
+    # Deploy the profile
+    if [[ $RTLTP_PROFILE != "default" ]]; then
+        cp ./profiles/$RTLTP_PROFILE ./ltp-full-$ltp_version/testcases/realtime/profiles/ || {
+            echo "Fail to deploy profile '$RTLTP_PROFILE'." | tee -a "$OUTPUTFILE"
+            rstrnt-report-result $TEST WARN 1
+            rlLog "Aborting test because profile deploy failed"
+            exit 1
+        }
+    fi
+
     pushd "ltp-full-$ltp_version" || exit 1
     ./configure
 
@@ -142,10 +155,10 @@ function runtest() {
     func_list=$(./run.sh -t list | grep "${TEST_TYPE// /\\|}" | sed 's/^\s*//')
     while IFS= read -r case; do
         echo "=== Running $case ==="
-        ./run.sh -t "$case"
+        ./run.sh -p $RTLTP_PROFILE -t "$case"
         local return_code=$?
         echo "=== Checking $case ==="
-        check_status "./run.sh -t $case" $return_code
+        check_status "./run.sh -p $RTLTP_PROFILE -t $case" $return_code
     done <<<"$func_list"
 
     # shellcheck disable=SC2164

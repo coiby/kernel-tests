@@ -49,3 +49,10 @@ require:
 extra-summary: rt-tests/rt_ltp
 extra-task: rt-tests/rt_ltp
 id: 0e4c6f26-c0cd-4d3d-8f64-8597fdd1909c
+adjust+:
+    - environment+:
+          RTLTP_PROFILE: default
+      when: hw_target == ridesx4 or hw_target is not defined
+    - environment+:
+          RTLTP_PROFILE: rcar_s4
+      when: hw_target == rcar_s4
