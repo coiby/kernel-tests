@@ -12,8 +12,8 @@ tag:
   - functional
 tier: 2
 enabled: true
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-8
     because: The feature was added in rhel-8
 extra-summary: /rdma/rdma_tool

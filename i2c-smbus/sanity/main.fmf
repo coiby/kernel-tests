@@ -22,8 +22,8 @@ framework: shell
 recommend:
   - kernel
 duration: 5m
-adjust:
-  duration: 15m
-  when: arch == aarch64
+adjust+:
+  - duration: 15m
+    when: arch == aarch64
 extra-summary: /kernel/i2c-smbus/sanity
 extra-task: /kernel/i2c-smbus/sanity

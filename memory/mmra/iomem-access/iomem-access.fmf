@@ -29,10 +29,9 @@ test: |
         bash ./runtest.sh
     fi
 framework: beakerlib
-adjust:
- require+:
-   - gcc
-   - glibc-devel
+require:
+  - gcc
+  - glibc-devel
 extra-summary: memory/mmra/iomem-access
 extra-task: memory/mmra/iomem-access
 id: d6723b25-77bf-4112-9188-e03eb7491600
