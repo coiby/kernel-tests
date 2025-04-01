@@ -6,6 +6,7 @@ tag:
   - KernelTier1
   - fmf-export
   - NoRHIVOS
+  - KernelAutomotiveTier1
 contact: Memory Management QE <mm-qe@redhat.com>
 component:
   - kernel

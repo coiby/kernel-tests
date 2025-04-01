@@ -96,7 +96,7 @@ description: |
     </task>
 contact: Boris Ranto <branto@redhat.com>
 test: bash ./runtest.sh
-framework: beakerlib
+framework: shell
 require:
   - acl
   - attr
@@ -153,3 +153,5 @@ recommend:
 extra-summary: filesystems/xfs/xfstests
 extra-task: filesystems/xfs/xfstests
 id: 009f8479-5045-4686-b74e-443dc999d34d
+tag: KernelAutomotiveTier1
+duration: 5m

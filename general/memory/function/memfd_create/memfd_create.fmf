@@ -11,3 +11,4 @@ require:
 tag:
   - /kernel/general/memory/function/memfd_create
   - KG-VMM-TAG
+  - KernelAutomotiveTier1

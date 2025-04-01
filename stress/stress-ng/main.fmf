@@ -35,6 +35,7 @@ test: bash ./runtest.sh
 framework: beakerlib
 tag:
   - KernelTier1
+  - KernelAutomotiveTier1
 require:
   - wget
   - git

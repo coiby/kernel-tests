@@ -19,3 +19,4 @@ environment:
     PIP_STRESS_RETRIES: 10
     PIP_STRESS_USLEEP: 10000
 id: 2512d602-6f29-4377-a6f1-150ba80ac4e3
+tag: KernelAutomotiveTier1

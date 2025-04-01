@@ -19,3 +19,4 @@ require:
   - glibc-static
 extra-summary: filesystems/loopdev/sanity
 extra-task: filesystems/loopdev/sanity
+tag: KernelAutomotiveTier1

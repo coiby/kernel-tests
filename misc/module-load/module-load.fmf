@@ -18,6 +18,7 @@ tag:
   - KT1-9
   - fmf-export
   - KernelTier1
+  - KernelAutomotiveTier1
 contact: Jeff Bastian <jbastian@redhat.com>
 component:
   - kernel

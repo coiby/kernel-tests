@@ -5,6 +5,7 @@ duration: 1h
 framework: beakerlib
 tag:
   - KernelTier1
+  - KernelAutomotiveTier1
 require:
   - python3
   - python3-pip
