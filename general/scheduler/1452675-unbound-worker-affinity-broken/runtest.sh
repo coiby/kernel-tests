@@ -95,10 +95,11 @@ rlJournalStart
 			numa_affinity_v=system
 		fi
 		old_numa=$(awk '{print $1}' $numa_affinity_f)
+                socket_id=$(cat /sys/devices/system/cpu/cpu*/topology/physical_package_id | sort | uniq | head -n 1)
 		if rlIsRHEL ">8"; then
-			rlRun "tuna isolate -S1"
+                    rlRun "tuna isolate -S${socket_id}"
 		else
-			rlRun "tuna -S1 -i"
+			rlRun "tuna -S${socket_id} -i"
 		fi
 		package_cpus="$(sh package.sh 1)"
 		rlLogInfo "$package_cpus"
