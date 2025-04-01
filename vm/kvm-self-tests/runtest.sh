@@ -302,7 +302,7 @@ function setup
         typeset tests_srcdir="$linux_srcdir/tools/testing/selftests/kvm"
         typeset hwpf=$(uname -m)
 
-        rlAssertExists "$tests_srcdir"
+        rlAssertExists "$tests_srcdir" || rlDie "$tests_srcdir doesn't exist"
         rlAssertExists "${BINDIR}"
 
         #
@@ -332,7 +332,7 @@ function setup
         rlRun "mv ${BINDIR}/aarch64/* ${BINDIR} ; rm -rf ${BINDIR}/aarch64"
     else
         rlRun "wget --no-check-certificate $CKI_SELFTESTS_URL -O kselftest.tar.gz"
-        rlRun "tar zxf kselftest.tar.gz"
+        rlRun "tar zxf kselftest.tar.gz" || rlDie "failed to extract kselftest.tar.gz"
         rlRun "cp kvm/* ${BINDIR}"
     fi
 
