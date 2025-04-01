@@ -1,0 +1,7 @@
+summary: Upload machine info
+contact: Artem Savkov <asavkov@redhat.com>
+test: ./runtest.sh
+framework: shell
+duration: 30m
+require:
+  - lshw
