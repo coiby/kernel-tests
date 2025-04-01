@@ -35,7 +35,7 @@ for DISK in $DISKS; do
 			for ses in 0 1 2; do
 				for pi in 0 1 2 3; do
 					if [[ $lbaf == 0 && $pi != 0 ]]; then
-						if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Samsung SSD 983 DCT"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe v2 AGN RI U.2"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Ent NVMe v2 AGN FIPS MU"|"SAMSUNG MZWLO1T9HCJR-00A07" ]]; then
+						if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Samsung SSD 983 DCT"|"Micron_9300_MTFDHAL3T8TDP"|"Dell Ent NVMe v2 AGN RI U.2"|"INTEL SSDPEDMD016T4"|"Dell Express Flash NVMe P4600"|"SAMSUNG MZQL2960HCJR-00A07"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007"|"Dell Ent NVMe v2 AGN FIPS MU"|"SAMSUNG MZWLO1T9HCJR-00A07"|"KIOXIA KCMYDRUG1T92" ]]; then
 							continue
 						fi
 					fi
@@ -70,7 +70,7 @@ for DISK in $DISKS; do
 								if [[ $MODEL =~ "Dell Express Flash PM1725a"|"Dell Express Flash NVMe PM1725 "|"Dell Ent NVMe v2 AGN RI U.2"|"Dell Ent NVMe CM6 RI"|"Dell Ent NVMe P5500 RI U.2"|"SAMSUNG MZWLL1T6HAJQ-00005"|"SAMSUNG MZPLJ1T6HBJR-00007"|"SAMSUNG MZWLO1T9HCJR-00A07" ]]; then
 									tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms, /dev/$DISK node disappeared, BZ2081713, skipping"
 									continue
-								elif [[ $MODEL =~ "Dell Express Flash PM1725b"|"Dell Ent NVMe v2 AGN FIPS MU" ]]; then
+								elif [[ $MODEL =~ "Dell Express Flash PM1725b"|"Dell Ent NVMe v2 AGN FIPS MU"|"KIOXIA KCMYDRUG1T92" ]]; then
 									tlog "$DISK: --lbaf=$lbaf --ses=$ses --pi=$pi --pil=$pil --ms=$ms, /dev/$DISK node cannot be used after format, skipping"
 									continue
 								fi
