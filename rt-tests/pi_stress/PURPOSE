@@ -47,12 +47,10 @@ Test Inputs:
         Execute 'pi_stress --quiet --duration=$PARAM_SEC --groups=$PARAM_GROUPS --rr'.
         Execute 'pi_stress --quiet --groups=$(( nrcpus )) --duration=30'.
 
-    Execute 'pip_stress' to verify that a priority inversion is correctly handled
-    through priority inheritance. The test runs multiple attempts to ensure that a
-    priority inversion occurs, checking the output of pip_stress after each run. If
-    the expected inversion is not detected, the test is retried until a successful
-    outcome is achieved. By default, the test runs 10 attempts, but this can be
-    adjusted using the PIP_STRESS_RETRIES environment variable.
+    Execute pip_stress to verify proper handling of process-level priority
+    inversion via priority inheritance. Use $PIP_STRESS_USLEEP to control the
+    usleep value, ensuring reliable inversion triggering. If unspecified, it
+    defaults to 500, or 10,000 on aarch64 and rt-debug systems.
 
 Expected result:
     pi_stress:
