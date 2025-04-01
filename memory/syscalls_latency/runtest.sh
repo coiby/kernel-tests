@@ -52,24 +52,31 @@ function is_excluded() {
 
 # Get syscalls in scope list, execute LTP/syscalls tests for each one.
 # Parameter is run time in seconds, default is 60 seconds.
-function run_ltp_syscalls_concurrently()
-{
+function run_ltp_syscalls_concurrently() {
     IFS=',' read -ra folders <<< "$(echo "${mm_syscalls//\"/}" | tr -d '\n')"
-    deadline=$(($SECONDS+${1:-60}))
+    deadline=$(($SECONDS + ${1:-60}))
+
+    # Ensure the container is running
+    if ! podman inspect -f '{{.State.Running}}' qm &>/dev/null; then
+        echo "Error: The 'qm' container is not running."
+        return 1
+    fi
+
     while [[ $SECONDS -lt $deadline ]]; do
-        jobs=() # Clear the jobs array at the start of each cycle
+        jobs=()  # Track background jobs
+        commands=()  # Collect syscall paths
+
         for folder in "${folders[@]}"; do
             # Trim leading and trailing whitespace
             folder=$(echo "$folder" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
             # Construct absolute path
             full_path="$syscalls_test_path/$folder"
-            # Iterate over executables and run them in QM
+
+            # Iterate over executables and collect them
             if [[ -d "$full_path" ]]; then
                 while IFS= read -r -d '' file; do
                     if [[ -x "$file" ]] && ! is_excluded "$file"; then
-                        echo "Executing: $file"
-                        podman exec -it qm $file &
-                        jobs+=($!)
+                        commands+=("$file")  # Collect executable paths
                     fi
                 done < <(find "$full_path" -type f -executable -print0 | sort -z)
             else
@@ -77,13 +84,24 @@ function run_ltp_syscalls_concurrently()
             fi
         done
 
-        # wait for all background jobs to finish after each cycle
-        for job in "${jobs[@]}"; do
-            wait "$job"
-        done
+        if [[ ${#commands[@]} -gt 0 ]]; then
+            echo "Executing ${#commands[@]} syscalls in batches of 10"
+
+            for ((i = 0; i < ${#commands[@]}; i += 10)); do
+                batch=("${commands[@]:i:10}")  # Get a batch of 10
+
+                # Run podman exec in the background and track jobs
+                podman exec -it qm bash -c "$(printf '%q\n' "${batch[@]}")" &
+                jobs+=($!)  # Store process ID
+            done
+
+            # Wait for all background jobs to finish before the next cycle
+            for job in "${jobs[@]}"; do
+                wait "$job"
+            done
+        fi
     done
 }
-
 
 rlJournalStart
     rlPhaseStartSetup
