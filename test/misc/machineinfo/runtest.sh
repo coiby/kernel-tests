@@ -15,8 +15,6 @@
 #
 # Author: Artem Savkov <asavkov@redhat.com>
 
-. ../../../cki_lib/libcki.sh || exit 1
-
 set +x
 
 TEST="test/misc/machineinfo"

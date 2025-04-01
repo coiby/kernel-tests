@@ -9,4 +9,3 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=lshw
-repoRequires=cki_lib
