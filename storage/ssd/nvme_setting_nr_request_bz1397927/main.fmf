@@ -15,7 +15,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_setting_nr_request_bz1397927
 extra-task: /storage/ssd/nvme_setting_nr_request_bz1397927
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: e5725011-3bee-4d1c-869f-54de050ac0a7

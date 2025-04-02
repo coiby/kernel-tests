@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/stratis/lvm
 extra-task: /storage/stratis/lvm
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 12020FBA-2939-4521-BF1D-E88428904B30

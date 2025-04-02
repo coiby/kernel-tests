@@ -15,7 +15,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_removal_cause_stuck_process_bz1279699
 extra-task: /storage/ssd/nvme_removal_cause_stuck_process_bz1279699
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: ca7d95b0-bb5e-4cd2-9ab0-87def23e01d9

@@ -20,7 +20,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_mkfs_xfs_bz1443807
 extra-task: /storage/ssd/nvme_mkfs_xfs_bz1443807
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 34bb6279-91e2-4265-8a3c-9bdabafb4c0e

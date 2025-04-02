@@ -17,6 +17,6 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_fw_update_reflect_new_fw_version
 extra-task: /storage/ssd/nvme_fw_update_reflect_new_fw_version
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-9

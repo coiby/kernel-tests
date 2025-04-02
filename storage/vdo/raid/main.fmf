@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/vdo/raid
 extra-task: /storage/vdo/raid
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro > rhel-8
 id: 2BEC4627-0543-4AAF-AF54-12FC41759A0E

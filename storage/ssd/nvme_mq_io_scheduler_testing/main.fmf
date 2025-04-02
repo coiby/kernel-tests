@@ -15,7 +15,7 @@ tag:
 tier: 2
 extra-summary: /storage/ssd/nvme_mq_io_scheduler_testing
 extra-task: /storage/ssd/nvme_mq_io_scheduler_testing
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 89a72ee5-7767-4923-a566-a8a174ae6697

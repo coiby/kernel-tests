@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/vdo/common
 extra-task: /storage/vdo/common
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro > rhel-8
 id: 2DD54EAA-163F-4C73-A1BA-9BC006BA0DF2

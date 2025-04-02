@@ -17,7 +17,7 @@ extra-task: /storage/ssd/test_devs_setup
 environment:
     TEST_DEVS: nvme0n1
     TEST_DEVS_LIST: /dev/nvme0n1
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 23c510fc-9d2d-4365-b280-fc3b95117fd0

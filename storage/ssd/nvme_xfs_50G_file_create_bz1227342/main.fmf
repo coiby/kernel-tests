@@ -15,7 +15,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_xfs_50G_file_create_bz1227342
 extra-task: /storage/ssd/nvme_xfs_50G_file_create_bz1227342
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: f09adb30-281b-40ba-8a95-683c5ee00b02

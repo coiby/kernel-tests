@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/vdo/kernel_smoke
 extra-task: /storage/vdo/kernel_smoke
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro > rhel-8
 id: 9483FA20-7218-41D7-9576-C9FD10BA188E

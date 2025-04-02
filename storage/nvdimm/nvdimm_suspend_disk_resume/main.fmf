@@ -17,7 +17,7 @@ tag:
 tier: 1
 extra-summary: /storage/nvdimm/nvdimm_suspend_disk_resume
 extra-task: /storage/nvdimm/nvdimm_suspend_disk_resume
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-8
 id: e6ac87c5-7fa2-4495-a3f7-0755ed1de16f

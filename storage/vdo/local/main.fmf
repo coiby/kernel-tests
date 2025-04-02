@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/vdo/local
 extra-task: /storage/vdo/local
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro > rhel-8
 id: BFCA33B4-56ED-4335-B288-B0D636F6FF17

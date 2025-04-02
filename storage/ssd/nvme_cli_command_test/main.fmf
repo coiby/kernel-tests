@@ -15,7 +15,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_cli_command_test
 extra-task: /storage/ssd/nvme_cli_command_test
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: e43e76c1-f4f4-4224-8c76-78f48cc12133
