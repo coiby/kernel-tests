@@ -133,9 +133,9 @@ rlJournalStart
 		rlRun "echo nop > $tracing_dir/current_tracer"
 		rlRun "echo '!cpu != 0 && req_cpu == 5120'  > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/filter" 0-255
 		if rlIsRHEL ">8"; then
-			rlRun "tuna include -S1" 0-255 "include the isolated socket"
+			rlRun "tuna include -S${socket_id}" 0-255 "include the isolated socket"
 		else
-			rlRun "tuna -S1 -I" 0-255 "include the isolated socket"
+			rlRun "tuna -S${socket_id} -I" 0-255 "include the isolated socket"
 		fi
 		rlRun "ps -p $pid -o args | grep cyclictest && kill $pid" 0-255
 		rlRun "echo $old_cpumask > /sys/devices/virtual/workqueue/cpumask" 0-255
