@@ -29,12 +29,6 @@ rlJournalStart
 rlPhaseStartSetup
 	# Start setup, including reboot
 	if ! ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
-		# Get libzstd.a from source
-		rlRun "git clone https://github.com/facebook/zstd.git"
-		rlRun "cd zstd"
-		rlRun "make -j$(nproc) && make install"
-		rlRun "cd .."
-
 		# Set kernel boot parameters for firmware and to reboot back
 		# into test execution
 		rlRun "grubby --update-kernel=ALL --args=\"intel_iommu=on sm_on\""
@@ -58,28 +52,60 @@ rlPhaseStartSetup
 
 		# Run the Intel QAT configuration script
 		rlRun "pip install prettytable"
-		rlRun "python3 qat --config" 0 "reconfiguring QAT devices"
+		rlRun "python3 qat -c -m 2" 0 "reconfiguring QAT devices to (de)compression mode"
 
 		# Get the baseline QAT ZSTD Plugin tests
 		rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
 		rlRun "cd QAT-ZSTD-Plugin/"
 		rlRun "make test"
-		rlRun "cd .."
+		rlRun "cd test/fuzzing"
+		rlRun "make qatseqprodfuzzer.o"
+		rlRun "cd ../../.."
+
+		rlRun "git clone https://github.com/facebook/zstd.git"
+		# Build fuzzing targets
+		rlRun "cd zstd/tests/fuzz/"
+		rlRun "make corpora"
+		rlRun "python3 ./fuzz.py build all --custom-seq-prod=~/QAT-ZSTD-Plugin/test/fuzzing/qatseqprodfuzzer.o --enable-fuzzer --enable-asan --enable-ubsan --cc clang --cxx clang++ --ldflags=-lqat_s"
+		rlRun "cd ../../.."
 
 		# Logging and starting qat.service
 		rlLogInfo "The distro release is $(rlGetDistroRelease)"
 		rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
 		rlLogInfo "selinux is "$(getenforce)
 		rlRun "systemctl start qat"
+		rlRun "systemctl enable qat"
+
+		# Include qat headers in c include path
+		rlRun "export C_INCLUDE_PATH=/usr/include/qat/:$C_INCLUDE_PATH"
+		# Add path to user enabled ld libs
+		rlRun "export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH"
 	fi
 rlPhaseEnd
 
-rlPhaseStart FAIL "QAT-ZSTD-Plugin"
+rlPhaseStart FAIL "QAT-ZSTD-Plugin: basic (de)compression test"
 	rlRun "./QAT-ZSTD-Plugin/test/test nullbytes" 0 "compressing and decompressing zeroes"
+rlPhaseEnd
+
+rlPhaseStart FAIL "QAT-ZSTD-Plugin: fuzzing tests"
+	rlRun "cd zstd/tests/fuzz"
+	rlRun "python3 ./fuzz.py libfuzzer simple_round_trip"
+	rlRun "python3 ./fuzz.py libfuzzer stream_round_trip"
+	rlRun "python3 ./fuzz.py libfuzzer dictionary_round_trip"
+	rlRun "python3 ./fuzz.py libfuzzer block_round_trip"
+	rlRun "python3 ./fuzz.py libfuzzer decompress_dstSize_tooSmall"
+	rlRun "python3 ./fuzz.py libfuzzer dictionary_decompress"
+	rlRun "python3 ./fuzz.py libfuzzer dictionary_loader"
+	rlRun "python3 ./fuzz.py libfuzzer dictionary_stream_round_trip"
+	rlRun "python3 ./fuzz.py libfuzzer raw_dictionary_round_trip"
+	rlRun "python3 ./fuzz.py libfuzzer sequence_compression_api"
+	rlRun "python3 ./fuzz.py libfuzzer simple_compress"
+	rlRun "cd ../../.."
 rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
+	rlRun "rm -fr QAT-ZSTD-Plugin/ zstd/ nullbytes"
 rlPhaseEnd
 
 rlJournalPrintText
