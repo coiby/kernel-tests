@@ -26,4 +26,5 @@ require:
   - zlib-devel
   - pip
   - bzip2
+  - qat-zstd-plugin-devel
 duration: 45m
