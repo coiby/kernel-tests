@@ -9,7 +9,7 @@ test: bash ./runtest.sh
 framework: beakerlib
 require:
   - lm_sensors
-adjust:
+adjust+:
   - enabled: false
     when: arch == aarch64
 duration: 5m

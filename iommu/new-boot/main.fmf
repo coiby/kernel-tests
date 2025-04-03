@@ -20,7 +20,7 @@ recommend:
   - beakerlib-redhat
 duration: 20m
 enabled: true
-adjust:
+adjust+:
   - enabled: false
     when: distro < rhel9 or arch != x86_64, aarch64
 extra-summary: /kernel/iommu/new-boot

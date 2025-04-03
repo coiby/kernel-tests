@@ -44,12 +44,11 @@ test: |
         bash ./runtest.sh
     fi
 framework: beakerlib
-adjust:
-  require+:
-    - beakerlib
-    - gcc
-    - glibc-devel
-    - make
+require:
+  - beakerlib
+  - gcc
+  - glibc-devel
+  - make
 extra-summary: memory/mmra/shm-access
 extra-task: memory/mmra/shm-access
 enabled: true

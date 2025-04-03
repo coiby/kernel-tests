@@ -30,7 +30,7 @@ recommend:
   - wget
   - abootimg
 
-adjust:
+adjust+:
     - when: NODEBUGINFO==true
       recommend+: 
         - kernel-debuginfo 

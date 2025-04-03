@@ -11,7 +11,7 @@ require:
 duration: 1h
 tag: NoRHIVOS
 enabled: true
-adjust:
-  enabled: false
-  when: arch != x86_64
+adjust+:
+  - enabled: false
+    when: arch != x86_64
 id: 4990cf8f-3422-4a4b-8c5e-dc457d18462d
