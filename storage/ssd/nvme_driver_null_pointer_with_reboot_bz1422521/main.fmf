@@ -14,7 +14,7 @@ tag:
 tier: 2
 extra-summary: /storage/ssd/nvme_driver_null_pointer_with_reboot_bz1422521
 extra-task: /storage/ssd/nvme_driver_null_pointer_with_reboot_bz1422521
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: ab9f4d62-677d-4670-bc70-cf2da4364693

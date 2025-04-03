@@ -17,7 +17,7 @@ tag:
 tier: 1
 extra-summary: /storage/nvdimm/fsdax_suspend_mem_resume_io
 extra-task: /storage/nvdimm/fsdax_suspend_mem_resume_io
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-8
 id: 4132d94d-01c8-41fa-9a40-8c172915c085

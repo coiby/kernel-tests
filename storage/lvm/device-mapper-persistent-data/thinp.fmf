@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/lvm/device-mapper-persistent-data/thinp
 extra-task: /storage/lvm/device-mapper-persistent-data/thinp
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 60895E1B-F243-42B3-A494-05C92ACD482E

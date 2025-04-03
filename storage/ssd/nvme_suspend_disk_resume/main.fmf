@@ -17,7 +17,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_suspend_disk_resume
 extra-task: /storage/ssd/nvme_suspend_disk_resume
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-8
 id: 714470fd-44bf-49e8-b149-5af51debdc87

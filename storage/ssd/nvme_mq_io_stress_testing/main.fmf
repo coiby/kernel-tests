@@ -14,7 +14,7 @@ tag:
 tier: 2
 extra-summary: /storage/ssd/nvme_mq_io_stress_testing
 extra-task: /storage/ssd/nvme_mq_io_stress_testing
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 5eaf8d49-f394-4476-9bd4-ab937b25d6cc

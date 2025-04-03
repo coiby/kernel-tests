@@ -14,7 +14,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_module_rmmod_insmod
 extra-task: /storage/ssd/nvme_module_rmmod_insmod
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 55d1e458-35b7-46c5-aa7f-e0ba46dd3c7c

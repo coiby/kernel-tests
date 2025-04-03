@@ -21,7 +21,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_blktests
 extra-task: /storage/ssd/nvme_blktests
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 077c89e2-f7c1-466c-a824-59ae55d2fad9

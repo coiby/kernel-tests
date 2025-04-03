@@ -21,7 +21,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/libnvme_unit_tests
 extra-task: /storage/ssd/libnvme_unit_tests
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-9
 id: e2308678-415c-479d-88a3-1c4ccc4e2021

@@ -19,7 +19,7 @@ recommend:
   - python-devel
   - python3-devel
 duration: 1h
-adjust:
+adjust+:
     - when: distro < rhel-7
       enabled: false
     - when: distro == rhel-7 and distro < rhel-7.7

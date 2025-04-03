@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/lvm/thinp/stqe
 extra-task: /storage/lvm/thinp/stqe
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 32510008-D41C-47CE-A2D4-4CA066367EFC

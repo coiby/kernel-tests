@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/vdo/multipath
 extra-task: /storage/vdo/multipath
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro > rhel-8
 id: 413C9AB7-D0A7-49D8-85E8-8FC6E2856C25

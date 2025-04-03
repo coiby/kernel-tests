@@ -12,6 +12,6 @@ tag:
 tier: 1
 extra-summary: /storage/lvm/cache
 extra-task: /storage/lvm/cache
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
