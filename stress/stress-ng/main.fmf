@@ -74,3 +74,6 @@ adjust+:
     environment:
       # Don't run 'os' class for Tier1 as the results are not stable
       CLASSES: 'interrupt cpu cpu-cache memory'
+  # don't run on kernel debug
+  - when: package-name ~ kernel.*debug
+    enabled: false
