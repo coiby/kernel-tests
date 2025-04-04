@@ -11,4 +11,23 @@ require:
 extra-summary: packages/selinux-policy/serge-testsuite
 extra-task: packages/selinux-policy/serge-testsuite
 tag: KernelAutomotiveTier1
-duration: 5m
+duration: 1h
+# set avc check back to default that is disabled
+# until there is a better solution:
+# https://github.com/teemtee/tmt/issues/3611
+check-:
+  - how: avc
+check+:
+  - how: avc
+    enabled: false
+adjust+:
+  # set avc check back to default that is disabled
+  # until there is a better solution:
+  # https://github.com/teemtee/tmt/issues/3611
+  - when: check-result == info
+    check-:
+      - how: avc
+        result: info
+    check+:
+      - how: avc
+        enabled: false
