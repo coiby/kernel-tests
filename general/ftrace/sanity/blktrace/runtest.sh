@@ -31,6 +31,11 @@ else
             fi
         done
     fi
+    # If scsci device does not match test partition name then
+    # device may not be scsi. Find device name from partition.
+    if [ $(echo $DEVICE_NAME | wc -w) -gt 1 ]; then
+        DEVICE_NAME=$(lsblk -no pkname /dev/${TESTPART})
+    fi
 fi
 
 rlJournalStart
