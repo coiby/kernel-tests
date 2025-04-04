@@ -1,0 +1,7 @@
+summary: Check if running kernel is signed
+contact: Bruno Goncalves <bgoncalv@redhat.com>
+test: ./runtest.sh
+framework: shell
+duration: 30m
+tag:
+  - KernelTier1
