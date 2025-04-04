@@ -23,10 +23,10 @@ rlJournalStart
         rlLog "rocminfo check"
         rlRun "rocminfo"
         rlLog "amd-smi checks"
-        rlrun "amd-smi list"
-        rlrun "amd-smi static"
-        rlrun "amd-smi firmware"
-        rlrun "amd-smi monitor"
+        rlRun "amd-smi list"
+        rlRun "amd-smi static"
+        rlRun "amd-smi firmware"
+        rlRun "amd-smi monitor"
     rlPhaseEnd
 
 rlJournalEnd
