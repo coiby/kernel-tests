@@ -56,7 +56,9 @@ rlPhaseStartSetup
 
 		# Get zstd setup files
 		rlRun "git clone https://github.com/facebook/zstd.git"
+		rlRun "cd zstd"
 		rlRun "make -j$(nproc) && make install"
+		rlRun "cd .."
 
 		# Include qat headers in c include path
 		rlRun "export C_INCLUDE_PATH=/usr/include/qat/:$C_INCLUDE_PATH"
