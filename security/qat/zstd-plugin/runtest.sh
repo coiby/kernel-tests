@@ -54,15 +54,21 @@ rlPhaseStartSetup
 		rlRun "pip install prettytable"
 		rlRun "python3 qat -c -m 2" 0 "reconfiguring QAT devices to (de)compression mode"
 
+		# Get zstd setup files
+		rlRun "git clone https://github.com/facebook/zstd.git"
+		rlRun "make -j$(nproc) && make install"
+
+		# Include qat headers in c include path
+		rlRun "export C_INCLUDE_PATH=/usr/include/qat/:$C_INCLUDE_PATH"
+
 		# Get the baseline QAT ZSTD Plugin tests
 		rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
-		rlRun "cd QAT-ZSTD-Plugin/"
-		rlRun "make test"
-		rlRun "cd test/fuzzing"
+		rlRun "cd QAT-ZSTD-Plugin/test"
+		rlRun "make"
+		rlRun "cd fuzzing"
 		rlRun "make qatseqprodfuzzer.o"
 		rlRun "cd ../../.."
 
-		rlRun "git clone https://github.com/facebook/zstd.git"
 		# Build fuzzing targets
 		rlRun "cd zstd/tests/fuzz/"
 		rlRun "make corpora"
@@ -76,8 +82,6 @@ rlPhaseStartSetup
 		rlRun "systemctl start qat"
 		rlRun "systemctl enable qat"
 
-		# Include qat headers in c include path
-		rlRun "export C_INCLUDE_PATH=/usr/include/qat/:$C_INCLUDE_PATH"
 		# Add path to user enabled ld libs
 		rlRun "export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH"
 	fi
@@ -85,6 +89,10 @@ rlPhaseEnd
 
 rlPhaseStart FAIL "QAT-ZSTD-Plugin: basic (de)compression test"
 	rlRun "./QAT-ZSTD-Plugin/test/test nullbytes" 0 "compressing and decompressing zeroes"
+rlPhaseEnd
+
+rlPhaseStart FAIL "QAT-ZSTD-Plugin: benchmark test"
+	rlRun "./QAT-ZSTD-Plugin/test/benchmark -m1 -l100 -c64K -t64 -E2 nullbytes"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QAT-ZSTD-Plugin: fuzzing tests"
