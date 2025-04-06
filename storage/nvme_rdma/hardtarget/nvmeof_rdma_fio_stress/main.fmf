@@ -1,5 +1,5 @@
 summary: KS-TC:nvme_rdma/hardtarget/nvmeof_rdma_fio_stress
-description: nvmeof rdma discover stress testing with NETAPP E5700
+description: nvmeof rdma fio stress testing with NETAPP E5700
 contact: Yi Zhang <yizhan@redhat.com>
 component:
   - kernel
