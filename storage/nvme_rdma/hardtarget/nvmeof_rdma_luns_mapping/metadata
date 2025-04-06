@@ -1,0 +1,14 @@
+[General]
+name=storage/nvme_rdma/hardtarget/nvmeof_rdma_luns_mapping
+owner=Yi Zhang <yi.zhang@redhat.com>
+description=nvmeof rdma luns mapping test with NETAPP E5700
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/nvme_rdma/include
+dependencies=nvme-cli
+max_time=1h
+use_pty=false
