@@ -112,6 +112,7 @@
 /misc/header-test/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /misc/kernel-fips-mode/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /misc/module-load/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
+/misc/secureboot/pesign/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/bridge/sanity_check/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/dpdk-standalone/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
 /networking/driver/sanity/ @IamEld3st @Toaster192 @bgoncalv @bgrech @caringi @dhodovsk @ftjahjad @iwienand @jwilsonrh @kamaxeon @lulinqing @lzampier @marcelo.leitner @mh21_rh @ptalbert @stowellm @sturivny @tales-aparecida @veruu
@@ -252,6 +253,7 @@
 /misc/header-test/ @bgoncalv @jbastianrh @lulinqing @stowellm
 /misc/kernel-fips-mode/ @bgoncalv @lulinqing @omoris @stowellm
 /misc/module-load/ @bgoncalv @jbastianrh @lulinqing @stowellm
+/misc/secureboot/pesign/ @bgoncalv @lulinqing @stowellm
 /networking/bridge/sanity_check/ @Feiliu_A @bgoncalv @lulinqing @stowellm
 /networking/dpdk-standalone/ @bgoncalv @jiqiu @lulinqing @ralongi @stowellm @wanghekai @zfang1
 /networking/driver/sanity/ @bgoncalv @linville-rh @lulinqing @stowellm
