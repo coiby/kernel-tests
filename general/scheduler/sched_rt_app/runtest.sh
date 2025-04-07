@@ -244,7 +244,7 @@ function test_setup()
 	if curl -LkO  $LOOKASIDE/$pkg; then
 		tar -zxf $pkg
 	else
-		rlRun "git clone https://github.com/scheduler-tools/rt-app.git"
+		rlRun "git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/rt-app.git"
 		folder=rt-app
 	fi
 
