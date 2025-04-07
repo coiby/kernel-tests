@@ -8,7 +8,7 @@ rlJournalStart
 rlPhaseStartSetup
 if ! rlCheckRpm "pesign"; then
     yum install "pesign" -y
-    rlAssertRpm "pesign"
+    rlAssertRpm "pesign" || rlDie "failed: pesign couldn't be installed."
 fi
 rlShowPackageVersion "pesign"
 rlPhaseEnd
