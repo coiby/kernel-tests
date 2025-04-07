@@ -23,7 +23,7 @@ rlJournalStart
         rlLog "Install EPEL repositories"
         rlRun "dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
         rlLog "Install build dependencies"
-        rlRun "dnf install -y gfortran gtest-devel"
+        rlRun "dnf install -y cmake gfortran gtest-devel"
         rlLog "Build rocBLAS tests"
         rlRun "git clone https://github.com/ROCm/rocBLAS.git"
         rlRun "cd rocBLAS/"
