@@ -18,10 +18,10 @@ rlShowPackageVersion "kernel"
 set -o pipefail
 if file /boot/vmlinuz-$(uname -r) | grep "gzip compressed data"; then
     rlRun "zcat /boot/vmlinuz-$(uname -r) > /tmp/Image"
-    rlRun -s "pesign -i /tmp/Image -S | tee pesign-log"
+    rlRun -l "pesign -i /tmp/Image -S | tee pesign-log"
     rlRun "rm -f /tmp/Image"
 else
-    rlRun -s "pesign -i /boot/vmlinuz-$(uname -r) -S | tee pesign-log"
+    rlRun -l "pesign -i /boot/vmlinuz-$(uname -r) -S | tee pesign-log"
 fi
 set +o pipefail
 grep 'common name' pesign-log > pesign-signer
@@ -38,7 +38,7 @@ if [[ "$(arch)" == x86_64 ]]; then
     rlPhaseStartTest shim-x64
     rlShowPackageVersion "shim-x64"
     set -o pipefail
-    rlRun -s "pesign -i /boot/efi/EFI/BOOT/BOOTX64.EFI -S | tee pesign-log"
+    rlRun -l "pesign -i /boot/efi/EFI/BOOT/BOOTX64.EFI -S | tee pesign-log"
     set +o pipefail
     grep 'common name' pesign-log > pesign-signer
     rlAssertGrep "Microsoft" pesign-signer
@@ -53,7 +53,7 @@ if [[ "$(arch)" == aarch64 ]]; then
     rlPhaseStartTest shim-aa64
     rlShowPackageVersion "shim-aa64"
     set -o pipefail
-    rlRun -s "pesign -i /boot/efi/EFI/BOOT/BOOTAA64.EFI -S | tee pesign-log"
+    rlRun -l "pesign -i /boot/efi/EFI/BOOT/BOOTAA64.EFI -S | tee pesign-log"
     set +o pipefail
     grep 'common name' pesign-log > pesign-signer
     rlAssertGrep "Red Hat\|Fedora\|CentOS" pesign-signer
