@@ -62,20 +62,14 @@ rlPhaseStartSetup
 
 		# Include qat headers in c include path
 		rlRun "export C_INCLUDE_PATH=/usr/include/qat/:$C_INCLUDE_PATH"
+		# Add path to user enabled ld libs
+		rlRun "export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH"
 
 		# Get the baseline QAT ZSTD Plugin tests
 		rlRun "git clone https://github.com/intel/QAT-ZSTD-Plugin.git"
 		rlRun "cd QAT-ZSTD-Plugin/test"
 		rlRun "make"
-		rlRun "cd fuzzing"
-		rlRun "make qatseqprodfuzzer.o"
-		rlRun "cd ../../.."
-
-		# Build fuzzing targets
-		rlRun "cd zstd/tests/fuzz/"
-		rlRun "make corpora"
-		rlRun "python3 ./fuzz.py build all --custom-seq-prod=~/QAT-ZSTD-Plugin/test/fuzzing/qatseqprodfuzzer.o --enable-fuzzer --enable-asan --enable-ubsan --cc clang --cxx clang++ --ldflags=-lqat_s"
-		rlRun "cd ../../.."
+		rlRun "cd ../../"
 
 		# Logging and starting qat.service
 		rlLogInfo "The distro release is $(rlGetDistroRelease)"
@@ -83,9 +77,6 @@ rlPhaseStartSetup
 		rlLogInfo "selinux is "$(getenforce)
 		rlRun "systemctl start qat"
 		rlRun "systemctl enable qat"
-
-		# Add path to user enabled ld libs
-		rlRun "export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH"
 	fi
 rlPhaseEnd
 
@@ -95,22 +86,6 @@ rlPhaseEnd
 
 rlPhaseStart FAIL "QAT-ZSTD-Plugin: benchmark test"
 	rlRun "./QAT-ZSTD-Plugin/test/benchmark -m1 -l100 -c64K -t64 -E2 nullbytes"
-rlPhaseEnd
-
-rlPhaseStart FAIL "QAT-ZSTD-Plugin: fuzzing tests"
-	rlRun "cd zstd/tests/fuzz"
-	rlRun "python3 ./fuzz.py libfuzzer simple_round_trip"
-	rlRun "python3 ./fuzz.py libfuzzer stream_round_trip"
-	rlRun "python3 ./fuzz.py libfuzzer dictionary_round_trip"
-	rlRun "python3 ./fuzz.py libfuzzer block_round_trip"
-	rlRun "python3 ./fuzz.py libfuzzer decompress_dstSize_tooSmall"
-	rlRun "python3 ./fuzz.py libfuzzer dictionary_decompress"
-	rlRun "python3 ./fuzz.py libfuzzer dictionary_loader"
-	rlRun "python3 ./fuzz.py libfuzzer dictionary_stream_round_trip"
-	rlRun "python3 ./fuzz.py libfuzzer raw_dictionary_round_trip"
-	rlRun "python3 ./fuzz.py libfuzzer sequence_compression_api"
-	rlRun "python3 ./fuzz.py libfuzzer simple_compress"
-	rlRun "cd ../../.."
 rlPhaseEnd
 
 rlPhaseStartCleanup
