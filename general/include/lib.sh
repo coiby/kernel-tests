@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #shellcheck disable=SC2034
 
 # Define of the general test ENV in kernel-general test.
@@ -234,8 +234,8 @@ function stress_ng_install()
 		ret=$?
 		if [ "$ret" -ne 0 ]; then
 			dirname=stress-ng
-			echo "Tring to get stress-ng from github: https://github.com/ColinIanKing/stress-ng.git"
-			git clone https://github.com/ColinIanKing/stress-ng.git
+			echo "Tring to get stress-ng from upstream mirror: https://gitlab.com/redhat/centos-stream/tests/kernel/core/stress-ng.git"
+			git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/stress-ng.git
 			test -d $dirname
 			ret=$?
 
