@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -f /opt/ltp/runltp ]; then
-    git clone https://github.com/linux-test-project/ltp.git
+    git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/ltp.git
     pushd ltp
     git checkout 20220930
     make autotools &> /dev/null
