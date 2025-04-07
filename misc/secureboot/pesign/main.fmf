@@ -5,3 +5,8 @@ framework: shell
 duration: 30m
 tag:
   - KernelTier1
+adjust+:
+  - when: arch != x86_64 and arch != aarch64
+    enabled: false
+  - when: distro < rhel-8 and arch != x86_64
+    enabled: false
