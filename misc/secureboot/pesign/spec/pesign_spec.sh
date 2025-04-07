@@ -1,6 +1,10 @@
 #!/bin/bash
 eval "$(shellspec - -c) exit 1"
 
+Mock file
+   echo "file $*"
+End
+
 Mock rlPhaseStartSetup
     echo "rlPhaseStartSetup"
 End

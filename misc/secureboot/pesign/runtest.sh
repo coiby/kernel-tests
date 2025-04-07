@@ -16,7 +16,13 @@ rlPhaseEnd
 rlPhaseStartTest kernel
 rlShowPackageVersion "kernel"
 set -o pipefail
-rlRun -s "pesign -i /boot/vmlinuz-$(uname -r) -S | tee pesign-log"
+if file /boot/vmlinuz-$(uname -r) | grep "gzip compressed data"; then
+    rlRun "zcat /boot/vmlinuz-$(uname -r) > /tmp/Image"
+    rlRun -s "pesign -i /tmp/Image -S | tee pesign-log"
+    rlRun "rm -f /tmp/Image"
+else
+    rlRun -s "pesign -i /boot/vmlinuz-$(uname -r) -S | tee pesign-log"
+fi
 set +o pipefail
 grep 'common name' pesign-log > pesign-signer
 rlAssertGrep "Red Hat\|Fedora\|CentOS" pesign-signer
@@ -29,19 +35,31 @@ rlPhaseEnd
 if [[ "$(arch)" == x86_64 ]]; then
     rpm -q shim-x64 > /dev/null 2>&1 || yum install "shim-x64" -y
 
-    # skip if shim-x64 couldn't be installed
-    if rpm -q shim-x64 > /dev/null 2>&1; then
-        rlPhaseStartTest shim-x64
-        rlShowPackageVersion "shim-x64"
-        set -o pipefail
-        rlRun -s "pesign -i /boot/efi/EFI/BOOT/BOOTX64.EFI -S | tee pesign-log"
-        set +o pipefail
-        grep 'common name' pesign-log > pesign-signer
-        rlAssertGrep "Microsoft" pesign-signer
-        rlAssertNotGrep "Red Hat\|Fedora\|CentOS" pesign-signer
-        rlAssertNotGrep "No signatures found" pesign-log
-        rlPhaseEnd
-    fi
+    rlPhaseStartTest shim-x64
+    rlShowPackageVersion "shim-x64"
+    set -o pipefail
+    rlRun -s "pesign -i /boot/efi/EFI/BOOT/BOOTX64.EFI -S | tee pesign-log"
+    set +o pipefail
+    grep 'common name' pesign-log > pesign-signer
+    rlAssertGrep "Microsoft" pesign-signer
+    rlAssertNotGrep "Red Hat\|Fedora\|CentOS" pesign-signer
+    rlAssertNotGrep "No signatures found" pesign-log
+    rlPhaseEnd
+fi
+
+if [[ "$(arch)" == aarch64 ]]; then
+    rpm -q shim-aa64 > /dev/null 2>&1 || yum install "shim-aa64" -y
+
+    rlPhaseStartTest shim-aa64
+    rlShowPackageVersion "shim-aa64"
+    set -o pipefail
+    rlRun -s "pesign -i /boot/efi/EFI/BOOT/BOOTAA64.EFI -S | tee pesign-log"
+    set +o pipefail
+    grep 'common name' pesign-log > pesign-signer
+    rlAssertGrep "Red Hat\|Fedora\|CentOS" pesign-signer
+    rlAssertNotGrep "Red Hat Test Certificate" pesign-signer # known point of failure
+    rlAssertNotGrep "No signatures found" pesign-log
+    rlPhaseEnd
 fi
 
 rm pesign-log pesign-signer
