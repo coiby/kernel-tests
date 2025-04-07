@@ -272,9 +272,9 @@ function stress_ng_install()
 		echo "Building stress-ng"
 		ret=0
 		make -C $dirname clean
-		make -C $dirname || ret+=1
+		make -C $dirname || ((ret+=1))
 		echo "Installing stress-ng"
-		make -C $dirname install || ret+=1
+		make -C $dirname install || ((ret+=1))
 
 		if ((ret == 0)); then
 			echo "Install stress-ng finished"
