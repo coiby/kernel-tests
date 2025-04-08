@@ -1,5 +1,5 @@
 [General]
-name=/kernel/security/qat/zstd-lib
+name=/kernel/security/qat/zstd-plugin
 owner=Denis Aleksandrov <daleksan@redhat.com>
 description=QAT zsrd-lib tests
 license=GPLv2
