@@ -235,7 +235,20 @@ function RunKSelfTest()
     # run the self-test script
     rlLog "=== Running: $testscript"
     pushd $EXEC_DIR/${test_folder}
-    ./${test_case} ${TEST_PARAM[${testscript}]} |& tee $OUTPUTFILE
+
+    WORKERS=${WORKERS:-1}
+    if [[ "$WORKERS" -gt 1 ]]; then
+        rlLog "Concurrent testing: Spawning $WORKERS processes of ${testscript}."
+    fi
+    # Spawn WORKERS processes
+    for ((i = 1; i <= WORKERS; i++)); do
+        temp_output="${OUTPUTFILE}_${i}"
+        (./${test_case} ${TEST_PARAM[${testscript}]} |& tee $temp_output) &
+    done
+    wait
+    # After all workers finish, combine the outputs
+    cat "$OUTPUTFILE"_* > "$OUTPUTFILE"
+
     ret=${PIPESTATUS[0]}
     # use rlLog instead of `rlRun -l` to avoid the 50 lines limit
     rlLog "$(cat "${OUTPUTFILE}")"
