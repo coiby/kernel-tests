@@ -43,7 +43,22 @@ rlPhaseStart FAIL "Functionality"
     FILE="/tmp/entropy"
     CMD=$(echo -n "rngd -n jitter -O jitter:timeout:10"; rngd -l 2>&1 | grep '^[0-9]' | cut -d\( -f2 | cut -d\) -f1 | grep -v jitter | while read A; do echo -n " -x $A"; done; echo " -f -o /dev/stdout > ${FILE}")
     rlRun "timeout 120 $CMD" 124
-    rlRun "cat ${FILE} | rngtest" 0-255
+    rlRun -s "cat ${FILE} | rngtest" 0-255
+    SUCCESSES=$(awk '/FIPS 140-2 successes/{print $NF}' $rlRun_LOG)
+    FAILURES=$(awk '/FIPS 140-2 failures/{print $NF}' $rlRun_LOG)
+    FIPSTOTAL=$(echo $FAILURES+$SUCCESSES | bc -l)
+    FIPSPERCENT=$(echo $FAILURES/$FIPSTOTAL*100 | bc -l)
+    if (( $(echo "$FIPSPERCENT < 1" | bc -l) )); then
+        rlLogInfo "FIPS 140-2 failures are less than ~1%"
+        rlReport "FIPS 140-2 successes" "PASS" "$SUCCESSES"
+        rlReport "FIPS 140-2 failures" "PASS" "$FAILURES"
+    else
+        rlLogInfo "FIPS 140-2 failures are over 1%"
+        rlReport "FIPS 140-2 successes" "FAIL" "$SUCCESSES"
+        rlReport "FIPS 140-2 failures" "FAIL" "$FAILURES"
+        rlFail "rngtest shows >1% FIPS 140-2 failures using jitter. Please review."
+    fi
+    rlFileSubmit $rlRun_LOG functionality-test.out
     rlRun "systemctl start rngd"
     rlRun "systemctl status rngd"
 rlPhaseEnd

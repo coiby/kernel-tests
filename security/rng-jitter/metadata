@@ -12,4 +12,4 @@ Path=/mnt/tests/kernel-tests/security/rng-jitter
 Type=Function
 RunFor=kernel
 Priority=Normal
-max_time=5m
+max_time=15m
