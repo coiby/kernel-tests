@@ -50,6 +50,9 @@ default none
 DEBUG_CMD		Run debug commands after running each test case. i.e. at the end of each check_result().
 default none
 
+WORKERS         Number of parallel execution processes of each test.
+default 1
+
 ### Usage
 
 The wrapper allows you to run your tests with four suites.
