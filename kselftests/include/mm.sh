@@ -41,6 +41,31 @@
 #
 # Results location:
 #     output.txt
+#
+# === concurrent_syscalls ===
+# DESCRIPTION
+# test wrapper for concurrently running kernel selftest.
+#
+# Test Inputs:
+#     "-c test_suite=concurrent_syscalls": specifies the testsuite to run
+#     WORKERS: Number of parallel execution processes of each test.
+#     BUILD_FROM_SRC: flag to specify if building from source (=y if building from source)
+#     TEST_ITEMS: kselftest syscalls test items from tools/testing/selftests/
+# Expected result:
+#     RESULT: PASS (do_mm_config)
+#     RESULT: PASS (selftests: mm:run_vmtests.sh)
+#     RESULT: PASS (do_mm_reset)
+#     RESULT: PASS (do_rseq_config)
+#     RESULT: PASS (selftests: rseq:basic_test)
+#     RESULT: PASS (selftests: rseq:basic_percpu_ops_test)
+#     RESULT: PASS (selftests: rseq:param_test)
+#     RESULT: PASS (selftests: rseq:param_test_benchmark)
+#     RESULT: PASS (selftests: rseq:param_test_compare_twice)
+#     RESULT: PASS (selftests: rseq:run_param_test.sh)
+#     RESULT: PASS (do_rseq_reset)
+#     OVERALL RESULT: PASS (kselftests)
+# Results location:
+#     output.txt
 
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
 CDIR=$(dirname "$FILE")
