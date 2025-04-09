@@ -45,3 +45,12 @@ extra-task: kselftests
   adjust+:
     - id: 1d584e6d-4d5e-4a7b-8b78-1f2b0992b583
       when: test_suite = kself_compiled
+    - id: 1b10a1fe-6159-4de5-bbfc-ce6e214f2630
+    - summary: Ensuring that self-tests are tested concurrently.
+    - environment+:
+        WORKERS: 4
+        ARCH: arm64
+        BUILD_FROM_SRC: y
+        TEST_ITEMS: "mm rseq"
+        INCLUDE: "mm.sh"
+      when: test_suite = kself_concurrent_syscalls
