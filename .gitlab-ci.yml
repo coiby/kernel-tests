@@ -175,6 +175,21 @@ check bash lines ending with white spaces:
     - !reference [.rules, default-branch]
     - !reference [.rules, production-branch]
 
+check tmt adjust metadata:
+  extends: .cki_tools
+  script:
+    - |
+      if output=$(find ./ -mindepth 2 -type f -name "*.fmf" -exec grep -l "adjust:" {} \+); then
+        echo "FAIL: fmf- fix test 'adjust:' with 'adjust+:' to not overwrite adjust global setting on tests below:"
+        echo "${output}"
+        echo "For more details see: https://gitlab.com/cki-project/infrastructure/-/issues/529"
+        exit 1
+      fi
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
+
 check tmt lint:
   extends: .cki_tools
   before_script:
