@@ -31,6 +31,7 @@
 
 rlJournalStart
 rlPhaseStart FAIL "Functionality"
+    rlRun_LOG=0
     rlShowRunningKernel
     rlRun "which dnf && export PACKAGE_MANAGER=dnf || export PACKAGE_MANAGER=yum"
     rlRun "$PACKAGE_MANAGER install -y beakerlib rng-tools jitterentropy"
@@ -80,8 +81,12 @@ rlPhaseStart FAIL "options test"
     FILE=`mktemp -u`
     ( rngd -f; touch $FILE )&
     sleep 2;
-    [ -e $FILE ]
-    EXISTS=$?
+    if [ -e $FILE ]
+    then
+        EXISTS=0
+    else
+        EXISTS=1
+    fi
     killall rngd # returns true if rngd runs
     if [ $? -eq 0 ] && [ $EXISTS -ne 0 ]
     then
@@ -134,7 +139,7 @@ rlPhaseStartTest "entropy-pool"
     # from random(4) man page, entropy_avail maxes out now at 256 bits
     # rngd + hwrng should keep entropy_avail high all the time
     i=0
-    for i in {1..10}; do
+    for $i in {1..10}; do
         dd if=/dev/random of=/dev/null bs=1024 count=1
         ENTROPY=$(</proc/sys/kernel/random/entropy_avail)
         rlAssertGreater "Available entropy at least 128" $ENTROPY 127
