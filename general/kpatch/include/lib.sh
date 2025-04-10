@@ -53,6 +53,15 @@ is_fedora()
     fi
 }
 
+is_rhel10()
+{
+    local ret=0
+
+    is_rhel "10"
+    ret=$?
+    return $ret
+}
+
 is_rhel9()
 {
     local ret=0
