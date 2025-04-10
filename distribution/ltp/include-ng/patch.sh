@@ -22,6 +22,7 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-bpf-zero-initialize-bpf_attr-including-padd.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-mallinfo02-introduce-LTP_VAR_USED-to-avoid-.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-statx07-Skip-test-if-NFS-service-is-never-enabled.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cve-2015-3290-Disable-AVX-for-x86_64.patch
 	fi
 	if [ "$TESTVERSION" == "20240930" ]; then
 		# Tips: this patch should be applied in single on ltp-next(version > 20180926)
@@ -88,10 +89,6 @@ patch_generic()
 	if [ "$KVER" == "5.14.0" ] && ([ "$KREV" = "284" ] && [ "$KREV2" -ge "33" ] || [ "$KREV" -ge "362" ]); then
 		echo " - returning ENODEV for empty cpumask stands for reseting user cpu mask" | tee -a $OUTPUTFILE
 		${PATCH} < ${ABS_DIR}/INTERNAL/sched_setaffinity_ENODEV.patch
-	fi
-
-	if [[ $KVER =~ ^6 ]]; then
-		${PATCH} < ${ABS_DIR}/INTERNAL/build-cve-2015-3290.patch
 	fi
 }
 
