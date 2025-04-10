@@ -14,7 +14,7 @@ function add_aboot_param()
     else
         current_aboot_cmdline+="${CMDLINEARGS}"
     fi
-    abootimg -u /boot/aboot-"$(uname -r)".img -c cmdline="${current_aboot_cmdline}" || exit 1
+    aboot-update -c "${current_aboot_cmdline}" "$(uname -r)" || exit 1
     dd if=/boot/aboot-"$(uname -r)".img of=/dev/disk/by-partlabel/boot_a || exit 1
     sync
 }
@@ -46,7 +46,7 @@ function remove_aboot_param()
         # want to keep spaces as delimiter
         # shellcheck disable=SC2124
         new_aboot_cmdline="${current_aboot_cmdline[@]}"
-        abootimg -u /boot/aboot-"$(uname -r)".img -c cmdline="${new_aboot_cmdline}" || exit 1
+        aboot-update -c "${new_aboot_cmdline}" "$(uname -r)" || exit 1
         dd if=/boot/aboot-"$(uname -r)".img of=/dev/disk/by-partlabel/boot_a || exit 1
         sync
     fi
