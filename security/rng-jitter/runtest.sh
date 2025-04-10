@@ -138,8 +138,7 @@ rlPhaseStartTest "entropy-pool"
 
     # from random(4) man page, entropy_avail maxes out now at 256 bits
     # rngd + hwrng should keep entropy_avail high all the time
-    i=0
-    for $i in {1..10}; do
+    for i in {1..10}; do
         dd if=/dev/random of=/dev/null bs=1024 count=1
         ENTROPY=$(</proc/sys/kernel/random/entropy_avail)
         rlAssertGreater "Available entropy at least 128" $ENTROPY 127
