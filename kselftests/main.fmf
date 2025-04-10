@@ -38,11 +38,14 @@ recommend:
   - tcpdump
   - valgrind
 duration: 24h
+tag: KernelAutomotiveTier1
 extra-summary: kselftests
 extra-task: kselftests
 /test:
   id: 83986a89-c53a-4ed6-a17b-6c18216168b8
   adjust+:
+    - duration: 30h
+      when: hw_target = rcar_s4
     - id: 1d584e6d-4d5e-4a7b-8b78-1f2b0992b583
       when: test_suite = kself_compiled
     - id: 1b10a1fe-6159-4de5-bbfc-ce6e214f2630
