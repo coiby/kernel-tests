@@ -163,11 +163,14 @@ export INITRD_KDUMP_PREFIX INITRD_KDUMP_IMG_PATH
 shopt -s extglob
 
 if system_ostree; then
-    K_BOOT="/usr/lib/ostree-boot"
+    #K_BOOT="/usr/lib/ostree-boot"
+    K_BOOT=$(find /boot/ostree -name "initramfs-$(uname -r).img" -print0 | xargs -0 dirname)
+    ## not anymore?
     # kernel-automotive kernel and initramfs image on ostree contains a hash:
     # kernel image - vmlinuz-$(uname -r)-$(commit_hash)
     # initramfs image - initramfs-$(uname -r).img-${commit_hash}
-    INITRD_IMG_PATH=$(find $K_BOOT -name "${INITRD_PREFIX}-$(uname -r).img-*")
+    #INITRD_IMG_PATH=$(find $K_BOOT -name "${INITRD_PREFIX}-$(uname -r).img-*")
+    INITRD_IMG_PATH="$K_BOOT/$INITRD_PREFIX-$(uname -r).img"
     VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-"$(uname -r)"!(*debug*|*64k*|*rt*))
     [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-"$(uname -r)"!(*debug*|*64k*|*rt*))
 else
@@ -1155,8 +1158,13 @@ ResetCrashkernel() {
             _reboot_required=true
     elif kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
         [ -n "${fadump_opts}" ] && fadump_opts="--${fadump_opts}"
-        LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'Please reboot the system'" && \
-            _reboot_required=true
+        if system_ostree; then
+            LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'systemctl reboot'" && \
+                _reboot_required=true
+        else
+            LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'Please reboot the system'" && \
+                _reboot_required=true
+        fi
     else # retrieve default CK values and update the boot kernel cmdline
         if $IS_RHEL7 || $IS_RHEL8; then
             _ck_args="crashkernel=auto"
