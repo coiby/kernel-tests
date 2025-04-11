@@ -47,7 +47,7 @@ DEFAULT_PULLS=""
 DEFAULT_PATCHES=""
 
 # Optional test parameter - location of testuite git.
-GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/selinux-testsuite"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/core/selinux-testsuite.git"}
 
 # Optional test parameter - timeout for detecting lost packets
 NETWORK_TIMEOUT=${NETWORK_TIMEOUT:-4}
@@ -193,7 +193,7 @@ rlJournalStart
             rlRun "echo 'expand-check = 0' >>/etc/selinux/semanage.conf"
         fi
         if [ ! -d selinux-testsuite ]; then
-            if ! rlRun "git clone $GIT_URL selinux-testsuite" 0; then
+            if ! rlRun "git clone $GIT_URL selinux-testsuite --depth=1" 0; then
                 rlLogFatal "Unable to clone the testsuite repo!"
                 rlPhaseEnd
                 exit 127
