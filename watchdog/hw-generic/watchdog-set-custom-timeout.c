@@ -6,7 +6,7 @@
 #include <linux/watchdog.h>
 #include <sys/ioctl.h>
 
-#define CUSTOM_TIMEOUT_S 30
+#define CUSTOM_TIMEOUT_S 120
 
 int main(void)
 {
