@@ -30,10 +30,6 @@ install_epel_pkg()
 		fi
 	fi
 
-	if [ "${krelease}" -eq "10" ]; then
-		# epel10 doesn't have netsniff-ng yet, use Felix's repo first
-		$pkg_mgr copr -y enable fmaurer/netsniff
-	fi
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string $param $pkg
 
