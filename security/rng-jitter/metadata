@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 [restraint]
 entry_point=./runtest.sh
-dependencies=kernel;beakerlib;beakerlib-redhat
+dependencies=kernel;beakerlib;beakerlib-redhat;rng-tools;jitterentropy
 Path=/mnt/tests/kernel-tests/security/rng-jitter
 Type=Function
 RunFor=kernel

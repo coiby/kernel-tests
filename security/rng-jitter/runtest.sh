@@ -33,11 +33,9 @@ rlJournalStart
 rlPhaseStart FAIL "Functionality"
     rlRun_LOG=0
     rlShowRunningKernel
-    rlRun "which dnf && export PACKAGE_MANAGER=dnf || export PACKAGE_MANAGER=yum"
-    rlRun "$PACKAGE_MANAGER install -y beakerlib rng-tools jitterentropy"
-    rlLogInfo "$DISTRO"
-    rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
-    rlLogInfo "selinug "$(getenforce)
+    rlLog "$DISTRO"
+    rlLog "kernel $(uname -r; rpm -q qatlib qatengine)"
+    rlLog "selinug "$(getenforce)
     rlRun "cat /dev/zero | rngtest -c 100 --pipe > /dev/null" 1 "zeros fail rngtest"
     rlRun "timeout 15 rngd -f -o /dev/stdout -x hwrng -x rdrand -x tpm -O jitter:timeout:10 -O jitter:use_aes:1 | rngtest -c 100 --pipe > /dev/null"
     rlRun "cat /dev/urandom | rngtest -c 100 --pipe >/dev/null" 0 "urandom passes rngtest"
@@ -50,13 +48,12 @@ rlPhaseStart FAIL "Functionality"
     FIPSTOTAL=$(echo $FAILURES+$SUCCESSES | bc -l)
     FIPSPERCENT=$(echo $FAILURES/$FIPSTOTAL*100 | bc -l)
     if (( $(echo "$FIPSPERCENT < 1" | bc -l) )); then
-        rlLogInfo "FIPS 140-2 failures are less than ~1%"
-        rlReport "FIPS 140-2 successes" "PASS" "$SUCCESSES"
-        rlReport "FIPS 140-2 failures" "PASS" "$FAILURES"
+        rlLog "FIPS 140-2 successes $SUCCESSES"
+        rlLong "FIPS 140-2 failures $FAILURES"
+        rlPass "FIPS 140-2 failures are less than ~1%"
     else
-        rlLogInfo "FIPS 140-2 failures are over 1%"
-        rlReport "FIPS 140-2 successes" "FAIL" "$SUCCESSES"
-        rlReport "FIPS 140-2 failures" "FAIL" "$FAILURES"
+        rlLog "FIPS 140-2 successes $SUCCESSES"
+        rlLog "FIPS 140-2 failures $FAILURES"
         rlFail "rngtest shows >1% FIPS 140-2 failures using jitter. Please review."
     fi
     rlFileSubmit $rlRun_LOG functionality-test.out
@@ -122,11 +119,13 @@ rlPhaseStartTest "rngtest"
     SUCCESSES=$(awk '/FIPS 140-2 successes/{print $NF}' $rlRun_LOG)
     FAILURES=$(awk '/FIPS 140-2 failures/{print $NF}' $rlRun_LOG)
     if [ "$FAILURES" -lt 100 ] ; then
-        rlReport "FIPS 140-2 successes" "PASS" "$SUCCESSES"
-        rlReport "FIPS 140-2 failures" "PASS" "$FAILURES"
+        rlLog "FIPS 140-2 successes $SUCCESSES"
+        rlLog "FIPS 140-2 failures $FAILURES"
+        rlPass "rng test passed."
     else
-        rlReport "FIPS 140-2 successes" "FAIL" "$SUCCESSES"
-        rlReport "FIPS 140-2 failures" "FAIL" "$FAILURES"
+        rlLog "FIPS 140-2 successes $SUCCESSES"
+        rlLog "FIPS 140-2 failures $FAILURES"
+        rlFail "rng test failed."
     fi
     rlFileSubmit $rlRun_LOG rngtest.out
     #rm -f $rlRun_LOG
@@ -144,9 +143,9 @@ rlPhaseStartTest "entropy-pool"
         ENTROPY=$(</proc/sys/kernel/random/entropy_avail)
         rlAssertGreater "Available entropy at least 128" $ENTROPY 127
         if [ "$ENTROPY" -gt 127 ]; then
-            rlReport "entropy_avail" "PASS" "$ENTROPY"
+            rlPass "entropy_avail $ENTROPY"
         else
-            rlReport "entropy_avail" "FAIL" "$ENTROPY"
+            rlFail "entropy_avail $ENTROPY"
         fi
         sleep 1
     done
