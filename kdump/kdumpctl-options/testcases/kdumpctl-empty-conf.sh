@@ -12,7 +12,7 @@
 
 
 CheckKdumpConfFromInitramfs() {
-    local squash_file
+    local squash_file squash_dir
 
     Log "Check kdump.conf in kdump initramfs img"
     # Get the kdump initramfs img path
@@ -37,19 +37,20 @@ CheckKdumpConfFromInitramfs() {
     Log "Unpack initramfs and squashed root img"
     if LogRun "lsinitrd --unpack ${kdump_initramfs_path}"; then
         if $IS_RHEL10; then
-            # On RHEL-10,the root image squashfs-root.img is in current folder
-            squash_file="squashfs-root.img"
+            # On RHEL-10,the root image erofs-root.img erofs-root is in current folder
+            squash_dir="erofs-root"
         else
             # for RHEL8.4 and older,the root image squash/root.img is in squash folder
             # from RHEL8.5 to RHEL-9.5, the root image squash-root.img is in current folder
             squash_file="squash-root.img"
+            squash_dir="squashfs-root"
+            [ -d "./${squash_dir}" ] && rm -rf ./${squash_dir}
+            LogRun "unsquashfs -n ${squash_file} >/dev/null"
         fi
-        [ -d "./squashfs-root" ] && rm -rf ./squashfs-root
-        LogRun "unsquashfs -n $squash_file >/dev/null"
 
         Log "Locate and check content of kdump.conf file in initramfs"
         local kdump_config_insquash=./kdump.conf.insquash
-        \cp -f squashfs-root/${KDUMP_CONFIG} ${kdump_config_insquash} || {
+        \cp -f ${squash_dir}/${KDUMP_CONFIG} ${kdump_config_insquash} || {
             Error "Failed to find kdump.conf in initramfs"
             return
         }
