@@ -70,7 +70,7 @@ rlJournalStart
                 rlIsRHEL ">=9" && tst=realtime-tests
                 rlRun "yum -y install $tst" 0-255 || reason+="(rt-tests)"
                 mount | grep debug || mount -t debugfs dd /sys/kernel/debug
-                rlRun "nr_sockets=$(lscpu |  awk '/Socket/ {print $2}')"  0-255
+                rlRun "nr_sockets=$(cat /sys/devices/system/cpu/cpu*/topology/physical_package_id | sort | uniq | wc -l)"  0-255
                 # shellcheck disable=SC2154
                 if ((nr_sockets < 2)); then
                         reason+="(SocketNumber)"
