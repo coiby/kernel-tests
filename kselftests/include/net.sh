@@ -60,17 +60,6 @@ install_mtools()
 	which msend && return 0 || return 1
 }
 
-install_sendip()
-{
-
-	which sendip && return 0
-	dnf -y copr enable cygn/SendIP
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string sendip
-
-	which sendip && return 0 || return 1
-}
-
 install_scapy()
 {
 	scapy -h && return 0
@@ -258,7 +247,6 @@ do_netfilter_config()
 
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which conntrack || $pkg_mgr $pkg_mgr_inst_string conntrack-tools
-	install_sendip
 }
 
 do_netfilter_reset()

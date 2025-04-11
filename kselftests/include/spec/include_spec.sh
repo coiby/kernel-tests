@@ -44,19 +44,6 @@ Describe 'kselftests/include/net install_mtools'
     End
 End
 
-Describe 'kselftests/include/net install_sendip'
-    # the function call which command twice
-    export WHICH_EXITCODES=(1 0)
-    It "can call install_sendip"
-        When call install_sendip
-        The line 1 should equal "which sendip"
-        The line 2 should equal "dnf -y copr enable cygn/SendIP"
-        The line 3 should equal "dnf -y install sendip"
-        The line 4 should equal "which sendip"
-        The status should be success
-    End
-End
-
 Describe 'kselftests/include/net install_scapy'
     # the function call scapy command twice
     export SCAPY_EXITCODES=(1 0)
@@ -141,9 +128,6 @@ Describe 'kselftests/include/net do_netfilter_config'
         function set_network_env(){
             echo "set_network_env"
         }
-        function install_sendip(){
-            echo "install_sendip"
-        }
         function which(){
             echo "which $*"
             return 1
@@ -153,7 +137,6 @@ Describe 'kselftests/include/net do_netfilter_config'
         The line 1 should equal "set_network_env"
         The line 2 should equal "which conntrack"
         The line 3 should equal "dnf -y install conntrack-tools"
-        The line 4 should equal "install_sendip"
         The status should be success
     End
 End
