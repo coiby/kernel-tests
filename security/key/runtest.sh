@@ -22,7 +22,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/ltp.git"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/core/ltp.git"}
 
 rlJournalStart
     rlPhaseStartSetup
@@ -30,7 +30,7 @@ rlJournalStart
         if stat /run/ostree-booted > /dev/null 2>&1; then
             rlRun "export KCONFIG_PATH=/usr/lib/ostree-boot/config-$(uname -r)"
         fi
-        rlRun "git clone $GIT_URL" 0
+        rlRun "git clone $GIT_URL --depth=1" 0
         rlRun "cd ltp"
         if rlIsRHEL '>9' && [[ $(uname -m) == "x86_64" ]]; then
             rlRun "sed -i '/cve-2015-3290:*\+/ s/$/ -O0/' testcases/cve/Makefile"

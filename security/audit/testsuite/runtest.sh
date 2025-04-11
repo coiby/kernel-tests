@@ -22,7 +22,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/audit-testsuite"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/core/audit-testsuite.git"}
 GIT_REF=${GIT_REF:-"main"}
 
 report_subtests() {
@@ -52,7 +52,7 @@ rlJournalStart
         rlIsRHEL ">9" && { yum install -y kernel-modules-extra; }
         rlRun "perl -MCPAN -e 'install Socket::Netlink' > perlCPAN.log 2>&1"
         rlFileSubmit perlCPAN.log
-        rlRun "git clone $GIT_URL"
+        rlRun "git clone $GIT_URL --depth=1"
         rlRun "pushd audit-testsuite"
         rlRun "git checkout $GIT_REF"
         rlIsRHEL "<9" && rlRun "sed -i '/backlog_wait_time_actual_reset/d' tests/Makefile"

@@ -24,7 +24,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 TESTS=${TESTS:-}
-GIT_URL=${GIT_URL:-"https://github.com/SUSE/qa_test_klp.git"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/core/qa-test-klp.git"}
 
 function run_test()
 {

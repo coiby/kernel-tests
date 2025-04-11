@@ -23,7 +23,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../kernel-include/runtest.sh || exit 1
-GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/ltp.git"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/core/ltp.git"}
 
 rlJournalStart
     rlPhaseStartSetup
@@ -37,7 +37,7 @@ rlJournalStart
         ${installer} ${install_opts} ${devel_pkg}
 
         rlShowRunningKernel
-        rlRun "git clone $GIT_URL" 0
+        rlRun "git clone $GIT_URL --depth=1" 0
         rlRun "cd ltp"
         rlRun "make -s autotools"
         rlRun "./configure > /dev/null"
