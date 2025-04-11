@@ -169,8 +169,10 @@ disable_wdt_test() {
 	./watchdog-simple &
 	sleep 5
 	killall watchdog-simple
-	rlLog "Inform tmt that we're rebooting using rstrnt-reboot with a custom non-reboot command."
-	rstrnt-reboot -c "echo 'reboot using watchdog'"
+	if command -v tmt-reboot &> /dev/null; then
+		rlLog "Inform tmt that we're rebooting using tmt-reboot with a custom non-reboot command."
+		tmt-reboot -c "echo 'reboot using watchdog'"
+	fi
 	sleep 65
 	# If we get here it didn't reboot, so report as FAIL
 	rlLog "The system didn't reboot, reporting FAIL!"
@@ -199,8 +201,10 @@ disable_wdt_test_custom_timeout() {
 	./watchdog-simple &
 	sleep 5
 	killall watchdog-simple
-	rlLog "Inform tmt that we're rebooting using rstrnt-reboot with a custom non-reboot command."
-	rstrnt-reboot -c "echo 'reboot using watchdog with custom timeout'"
+	if command -v tmt-reboot &> /dev/null; then
+		rlLog "Inform tmt that we're rebooting using tmt-reboot with a custom non-reboot command."
+		tmt-reboot -c "echo 'reboot using watchdog with custom timeout'"
+	fi
 	sleep 125
 	# If we get here it didn't reboot, so report as FAIL
 	rlLog "The system didn't reboot, reporting FAIL!"
