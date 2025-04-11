@@ -192,7 +192,7 @@ disable_wdt_test_custom_timeout() {
 	# Start watchdog "daemon" in the background (which writes 1's into
 	# /dev/watchdog and keeps the box up). After several seconds, kill
 	# the program which should then cause the box to reboot.
-	rlLog "Disabling writes to /dev/watchdog... System should reboot in 30 seconds"
+	rlLog "Disabling writes to /dev/watchdog... System should reboot in 120 seconds"
 	sync;sync
 	sleep 3
 	./watchdog-set-custom-timeout
@@ -201,7 +201,7 @@ disable_wdt_test_custom_timeout() {
 	killall watchdog-simple
 	rlLog "Inform tmt that we're rebooting using rstrnt-reboot with a custom non-reboot command."
 	rstrnt-reboot -c "echo 'reboot using watchdog with custom timeout'"
-	sleep 30
+	sleep 125
 	# If we get here it didn't reboot, so report as FAIL
 	rlLog "The system didn't reboot, reporting FAIL!"
 	rstrnt-report-result $TEST/disable_wdt_test FAIL
