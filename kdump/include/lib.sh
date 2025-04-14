@@ -365,6 +365,11 @@ InstallKernel()
 
     local brew_server=""
     local brew_baseurl=""
+    # after ostree switches releases, we need to re-get the release info
+    if system_ostree; then
+        local _family_=$(sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g' < /etc/redhat-release)
+        [[ "$_family_" =~ RedHatEnterpriseLinux ]] && IS_RHEL=true
+    fi
     if $IS_RHEL; then
         brew_server=download.devel.redhat.com
         brew_baseurl="http://$brew_server/brewroot/packages/${K_SPEC_NAME}"
@@ -389,7 +394,7 @@ InstallKernel()
     if pushd temp; then
         for i in ${tmp}; do
             Log "Downloading: ${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm"
-            curl -LO --fail "${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm" 2> /dev/null || {
+            curl -LO -k --fail "${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm" 2> /dev/null || {
                 retval=$?
                 Log "Downloading ${i}.rpm failed"
                 break
