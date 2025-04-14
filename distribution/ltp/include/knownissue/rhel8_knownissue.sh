@@ -117,7 +117,7 @@ function rhel8_fixed_issues()
 	# Bug 1820405 - KEYS: allow reaching the keys quotas exactly
 	kernel_in_range "0" "4.18.0-193.7.el8" && tskip "add_key05" fixed
 	# Bug 1771351 - fat: race between udev and mkdir leads to EIO
-	kernel_in_range "0" "4.18.0-194.el8" && tskip "statx04" fixed
+	kernel_in_range "0" "4.18.0-194.el8" && tskip "statx04 statx08" fixed
 	# Bug 1760638  timer_create: alarmtimer return wrong errno, on RTC-less system, s390x, ppc64
 	kernel_in_range "0" "4.18.0-148.el8" && tskip "timer_delete01 timer_settime01 timer_settime02" fixed
 	! is_arch "x86_64" && osver_in_range "800" "803" && tskip "timer_create01" fixed
