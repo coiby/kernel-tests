@@ -227,7 +227,9 @@ function install_xfstests_git_upstream ()
 
 	cd "$repo"
 	grep _filter_stat common/filter || patch -p1 < ../f33-stat.patch
-	grep std=gnu include/builddefs.in || patch -p1 < ../gcc15-workaround.patch
+	if rlIsRHEL ">6" ; then
+		grep std=gnu include/builddefs.in || patch -p1 < ../gcc15-workaround.patch
+	fi
 	make
 	rm -f configure
 	rm -fr tests/ceph/
