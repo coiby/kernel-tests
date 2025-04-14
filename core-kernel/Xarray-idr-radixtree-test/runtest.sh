@@ -43,9 +43,7 @@ function install_dependency()
 	rpm -q userspace-rcu-devel   --quiet	|| RC=1
 
 	if [ $RC -eq 1 ]; then
-		rlLog "Failed to install dependecy packages"
-		rstrnt-report-result "${TEST}" WARN
-		exit 1
+		rlDie "Failed to install dependecy packages"
 	fi
 
 }
@@ -101,10 +99,8 @@ function run_radixtree()
 
 function startup()
 {
-	rlRun -l "install_dependency"
-	rlRun -l "build_radixtree"
-
-	return $CKI_PASS
+	rlRun -l "install_dependency" || rlDie "failed on install_dependency"
+	rlRun -l "build_radixtree" || rlDie "failed on build_radixtree"
 }
 
 function runtest()
@@ -120,15 +116,26 @@ function runtest()
 #	rlRun -l "run_radixtree main"
 #	cki_upload_log_file main.log
 
-	return $CKI_PASS
 }
 
 function cleanup()
 {
 	rlRun -l "rm -fr linux-*/ *.log *.tar.*"
-
-	return $CKI_PASS
 }
 
-cki_main
-exit $?
+
+rlJournalStart
+
+rlPhaseStartSetup
+	startup
+rlPhaseEnd
+
+rlPhaseStartTest
+	runtest
+rlPhaseEnd
+
+rlPhaseStartCleanup
+	cleanup
+rlPhaseEnd
+
+rlJournalEnd
