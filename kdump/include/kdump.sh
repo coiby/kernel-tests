@@ -97,7 +97,11 @@ IfMemoryAboveThreshold()
     local total_mem mem
 
     total_mem=$(lshw -short | grep -i 'System Memory' | awk '{print $3}')
-    mem=${total_mem::-3}
+    if $IS_RHEL6 ; then
+            mem=$(echo $total_mem | sed 's/...$//')
+    else
+            mem=${total_mem::-3}
+    fi
 
     if [[ "$total_mem" =~ "TiB" ]]; then
         mem=$((mem*1024*1024))
