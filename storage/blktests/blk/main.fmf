@@ -5,7 +5,8 @@ framework: shell
 require:
   - type: file
     pattern:
-      - storage/blktests/include
+      - /storage/blktests/include
+      - /storage/blktests/config
   - blktrace
   - fio
   - gcc
