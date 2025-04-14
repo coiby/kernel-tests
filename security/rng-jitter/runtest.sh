@@ -49,7 +49,7 @@ rlPhaseStart FAIL "Functionality"
     FIPSPERCENT=$(echo $FAILURES/$FIPSTOTAL*100 | bc -l)
     if (( $(echo "$FIPSPERCENT < 1" | bc -l) )); then
         rlLog "FIPS 140-2 successes $SUCCESSES"
-        rlLong "FIPS 140-2 failures $FAILURES"
+        rlLog "FIPS 140-2 failures $FAILURES"
         rlPass "FIPS 140-2 failures are less than ~1%"
     else
         rlLog "FIPS 140-2 successes $SUCCESSES"
