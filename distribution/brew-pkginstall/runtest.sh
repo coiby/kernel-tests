@@ -35,7 +35,7 @@ install_brew() {
     baseurl="http://download.devel.redhat.com/rel-eng/RCMTOOLS"
 
     case "${rhel_major}" in
-        9|10)
+        8|9|10)
             curl -L --retry 5 "${baseurl}/rcm-tools-rhel-${rhel_major}-baseos.repo" > /etc/yum.repos.d/rcm-tools.repo
             ;;
         *)
