@@ -6,7 +6,7 @@ rpm -q gcc-c++ || yum -y install gcc-c++ &>/dev/null
 rpm -q cmake || yum -y install cmake &>/dev/null
 rpm -q git || yum -y install git &>/dev/null
 
-git clone https://github.com/google/benchmark.git
+git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/benchmark.git
 cd benchmark
 
 cmake -E make_directory "build"
