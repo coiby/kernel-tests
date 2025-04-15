@@ -59,9 +59,12 @@ CheckVmlinux()
     [ ! -f "${vmlinux}" ] && MajorError "vmlinux not found."
 
     # validate kernel-debuginfo file sanity
-    rpm -V "${K_NAME%-core}-debuginfo" || {
-        ls -l "/usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
-        MajorError "${K_NAME%-core}-debuginfo file sanity check failed"
+    # don't check when in ostree/bootc mode
+    [ -e /run/ostree-booted ] || {
+        rpm -V "${K_NAME%-core}-debuginfo" || {
+            ls -l "/usr/lib/debug/lib/modules/$(uname -r)/vmlinux"
+            MajorError "${K_NAME%-core}-debuginfo file sanity check failed"
+        }
     }
 }
 
