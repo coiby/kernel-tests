@@ -275,7 +275,7 @@ function SetupTest ()
       export pkg_mgr_inst_string="-y install"
     fi
     if [ "${BUILD_FROM_SRC}" ]; then
-        rlRun install_packages
+        install_packages
         # do patches
         for item in $TEST_ITEMS; do
             _item=$(echo $item | tr \/ \_)
