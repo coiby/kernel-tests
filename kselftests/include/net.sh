@@ -164,6 +164,8 @@ do_net_config()
 	# txtimestamp.sh do not support IPPROTO_RAW and pf_packet??
 	sed -i 's/run_test_v4v6 ${args} -R/#run_test_v4v6 ${args} -R/' txtimestamp.sh
 	sed -i 's/run_test_v4v6 ${args} -P/#run_test_v4v6 ${args} -P/' txtimestamp.sh
+	# remove python3 shebang for nl_netdev.py and bpf_offload.py
+	sed -i 's/python3 -sP\?/python3/' *.py
 	# incase some test not add exec permission
 	chmod +x ./*.sh
 	popd || exit
