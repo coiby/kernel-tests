@@ -35,6 +35,7 @@ arch=$(uname -m)
 version=$(uname -r | cut -f1 -d'-')
 release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
 SKIP_CODE=4
+uname -r | grep -q debug && export KSFT_MACHINE_SLOW=yes
 TMPDIR=/var/tmp/$(date +"%Y%m%d%H%M%S")
 TEST_ITEMS=${TEST_ITEMS:-"default"}
 if [ ${DELIVERED_TESTS} ]; then
