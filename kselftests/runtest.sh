@@ -284,7 +284,7 @@ function SetupTest ()
             fi
         done
     fi
-    rlRun install_kselftests || test_fail_exit "install kselftests failed"
+    install_kselftests || test_fail_exit "install kselftests failed"
     submit_log "$EXEC_DIR/kselftest-list.txt"
     rlPhaseEnd
 }
