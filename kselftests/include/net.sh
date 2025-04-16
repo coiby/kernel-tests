@@ -30,42 +30,14 @@ install_epel_pkg()
 		fi
 	fi
 
+	$pkg_mgr copr -y enable liuhangbin/kselftests
+
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string $param $pkg
 
 	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
 
 	rpm -q --quiet $pkg && return 0 || return 1
-}
-
-install_smcroute()
-{
-	which smcroute && return 0
-	dnf copr -y enable liuhangbin/smcroute
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string smcroute
-	which smcroute && return 0 || return 1
-}
-
-install_mtools()
-{
-	which msend && return 0
-	dnf copr -y enable liuhangbin/mtools
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string mcast-tools
-	which msend && return 0 || return 1
-}
-
-install_scapy()
-{
-	scapy -h && return 0
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	[ "${krelease}" -eq "8" ] && \
-		$pkg_mgr $pkg_mgr_inst_string https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string scapy
-	[ "${krelease}" -eq "8" ] && rpm -e epel-release
-	scapy -h && return 0 || return 1
 }
 
 # Config Networkmanager to ignore network interfaces except default port.
@@ -193,8 +165,8 @@ do_net_forwarding_config()
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
 	install_epel_pkg netsniff-ng || { test_warn "install netsniff for forwarding test failed" && return 1; }
-	install_smcroute || { test_warn "install smcrouted for forwarding test failed" && return 1; }
-	install_mtools || { test_warn "install mtools for forwarding test failed" && return 1; }
+	install_epel_pkg smcroute || { test_warn "install smcroute for forwarding test failed" && return 1; }
+	install_epel_pkg mcast-tools || { test_warn "install mcast-tools for forwarding test failed" && return 1; }
 
 	pushd "$EXEC_DIR"/net/forwarding || exit
 	# RHEL9/10 doesn't support meta
@@ -376,8 +348,7 @@ do_tc-testing_config()
 
 	# prepare evn
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string clang valgrind
-	install_scapy
+	install_epel_pkg python3-scapy
 	pip -q install pyroute2 2>/dev/null
 	modprobe -r veth
 
