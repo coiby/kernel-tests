@@ -193,7 +193,7 @@ rlJournalStart
             rlRun "echo 'expand-check = 0' >>/etc/selinux/semanage.conf"
         fi
         if [ ! -d selinux-testsuite ]; then
-            if ! rlRun "git clone $GIT_URL selinux-testsuite --depth=1" 0; then
+            if ! rlRun "git clone $GIT_URL selinux-testsuite" 0; then
                 rlLogFatal "Unable to clone the testsuite repo!"
                 rlPhaseEnd
                 exit 127
