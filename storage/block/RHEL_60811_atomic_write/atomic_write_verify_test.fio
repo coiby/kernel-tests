@@ -1,0 +1,33 @@
+[global]
+#filename=/dev/nvme0n1
+offset=8192000            # LBA 2000 * 4096
+size=5G
+bs=4096
+direct=1
+ioengine=libaio
+iodepth=1
+
+[init]
+description=Initialize write to 0xAA
+rw=write
+verify=pattern
+#verify_pattern=0xAA
+do_verify=1
+
+[atomic_write]
+description=Perform atomic write (write to 0xBB),then reset disk
+rw=write
+verify=pattern
+#verify_pattern=0xBB
+do_verify=0
+atomic=1
+time_based=1
+runtime=30s
+stonewall
+
+[atomic_verify]
+description=Verify whether the write is completely successful (verify whether it is 0xBB)
+rw=read
+verify=pattern
+#verify_pattern=0xBB
+do_verify=1
