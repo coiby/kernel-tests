@@ -56,7 +56,7 @@ rlJournalStart
             rlRun "dnf install -y perf python3 python3-pip @development" 0
         fi
         rlShowRunningKernel
-        rlRun "git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/masim.git" 0
+        rlRun "git clone https://gitlab.com/redhat/centos-stream/tests/kernel/core/masim.git" 0
         if [ $? != 0 ]; then
                 rlLog "git clone fail"
                 rstrnt-report-result "$RSTRNT_TASKNAME" FAIL 99
