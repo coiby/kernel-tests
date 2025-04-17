@@ -100,6 +100,8 @@ rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
+	rlRun "cd zstd/ && make uninstall && cd .."
+	rlRun "rm -fr zstd/"
 rlPhaseEnd
 
 rlJournalPrintText
