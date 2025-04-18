@@ -47,7 +47,7 @@ function check_nvme_atomic_support()
     fi
 }
 
-function atomic_write_test()
+function atomic_write_test_manual_panic()
 {
     check_nvme_atomic_support
     BLOCK_DEVICE=${DEV}
@@ -55,7 +55,7 @@ function atomic_write_test()
     touch "${CDIR}/write_test_flage"
 
 #    dd if=${DATA_FILE} of=${BLOCK_DEVICE} bs=512 seek=${LBA_START} count=${LBA_COUNT} oflag=direct conv=fsync &
-    rlRun "fio --name=write_test atomic_write_test.fio &"
+    rlRun "fio --filename=${BLOCK_DEVICE} --name=write_test atomic_write_test.fio &"
 # shellcheck disable=SC2034
     FIO_PID=$!
     sleep 100
@@ -74,7 +74,39 @@ function atomic_verify_test()
     rlLog "verify data on the block device"
     rlRun "fio --name=verify_test atomic_write_test.fio"
 
-    rm -rf ${DIR}/write_test_flage
+    rm -rf ${CDIR}/write_test_flage
+}
+
+function atomic_write_verify_test_reset()
+{
+    check_nvme_atomic_support
+    BLOCK_DEVICE=${DEV}
+    CONTROLLER=${BLOCK_DEVICE%n1}
+
+    rlRun "fio --filename=${BLOCK_DEVICE} --section=init --verify_pattern=0xAA atomic_write_verify_test.fio"
+
+    rlRun "fio --filename=${BLOCK_DEVICE} --section=atomic_write --verify_pattern=0xBB atomic_write_verify_test.fio &"
+    for i in {1..5}; do
+        sleep 5
+        rlRun "nvme reset ${CONTROLLER}"
+#        rlRun "echo 1 > /sys/block/$(basename ${BLOCK_DEVICE})/device/reset"
+    done
+    sleep 60
+
+    rlRun "fio --filename=${BLOCK_DEVICE} --section=atomic_verify --verify_pattern=0xBB atomic_write_verify_test.fio > bb.log 2>&1"
+    bb_rc=$?
+    rlRun "fio --filename=${BLOCK_DEVICE} --section=atomic_verify --verify_pattern=0xAA atomic_write_verify_test.fio > aa.log 2>&1" 1 "Pass"
+    aa_rc=$?
+
+    if [ ${bb_rc} -eq 0 ] && [ ${aa_rc} -ne 0 ]; then
+        rlPass "Completely written"
+    elif [ ${bb_rc} -ne 0 ] && [ ${aa_rc} -eq 0 ]; then
+        rlPass "Completely not written"
+    elif [ ${bb_rc} -ne 0 ] && [ ${aa_rc} -ne 0 ]; then
+        rlFail "Mixed written"
+    else
+        rlFail "Please check the exception"
+    fi
 }
 
 function check_atomicity()
@@ -96,11 +128,16 @@ rlJournalStart
     rlPhaseStartTest
         rlRun "uname -a"
         rlLog "$0"
-        if [[ -e "${DIR}/write_test_flage" ]];then
-            atomic_verify_test
-        else
-            atomic_write_test
-        fi
+
+#after manually triggering panic, sometimes the system cannot boot from the correct boot item,
+#so this way is temporarily shelved.
+#        if [[ -e "${CDIR}/write_test_flage" ]];then
+#            atomic_verify_test
+#        else
+#            atomic_write_test
+#        fi
+
+        atomic_write_verify_test_reset
         check_log
     rlPhaseEnd
 rlJournalPrintText
