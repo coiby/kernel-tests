@@ -1,6 +1,24 @@
-PURPOSE of /CoreOS/i2c-tools/sanity/i2cdetect-smoke
+This is a smoke test to test the i2c-dev kernel module
 
-Description: Loads i2c-dev module, tries i2cdetect -l.
-If some buses are detected probes each one for capatibilities.
+Description: Loads i2c-dev module, then checks if there is any i2c devices activate on the board.
+If buses are activated it will show it's name and the address.
+
+Test inputs:
+TmpDir=$(mktemp -d)
+touch $TmpDir/list.txt $TmpDir/adapter_info.txt
+
+Expected results:
+:: [ 11:00:10 ] :: [   PASS   ] :: Command 'ls /sys/class/i2c-adapter/ > /tmp/tmp.XaJBStiFYM/list.txt 2>/dev/null' (Expected 0, got 0)
+:: [ 11:00:10 ] :: [   LOG    ] :: I2C adapters found, reading information.
+:: [ 11:00:10 ] :: [   PASS   ] :: Reading bus name (Expected 0, got 0)
+:: [ 11:00:10 ] :: [   PASS   ] :: Reading bus address (Expected 0, got 0)
+:: [ 11:00:10 ] :: [   PASS   ] :: Reading bus name (Expected 0, got 0)
+:: [ 11:00:10 ] :: [   PASS   ] :: Reading bus address (Expected 0, got 0)
+:: [ 11:00:11 ] :: [   LOG    ] :: Bus names and address.
+:: [ 11:00:11 ] :: [   PASS   ] :: Command 'cat /tmp/tmp.XaJBStiFYM/adapter_info.txt' (Expected 0, got 0)
+
+Results location:
+output.txt
 
 Author: Lukas Zachar <lzachar@redhat.com>
+Contributor: Michael Menasherov <mmenashe@redhat.com>
