@@ -3,8 +3,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /CoreOS/i2c-tools/Sanity/i2cdetect-smoke
-#   Description: Loads i2c-dev module, tries i2cdetect -l. If something is detected probes for more info.
+#   Description: Loads i2c-dev module, and checking if there are devices active in the board.
 #   Author: Lukas Zachar <lzachar@redhat.com>
+#   Contributor: Michael Menasherov <mmenashe@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -27,31 +28,38 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include Beaker environment
-. ../../../../cki_lib/libcki.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-
-PACKAGE="i2c-tools"
 
 rlJournalStart
     rlPhaseStartSetup
-        rlAssertRpm $PACKAGE
-        rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
+        rlShowRunningKernel
+        TmpDir=$(mktemp -d)
+        rlRun "touch $TmpDir/list.txt $TmpDir/adapter_info.txt" 0 "Creating 2 temp files"
+        rlRun "modprobe i2c-dev" 0 "Loading I2C kernel module"
     rlPhaseEnd
 
     rlPhaseStartTest
-        rlRun "modprobe i2c-dev"
-        rlRun "i2cdetect -l > list 2>list.err"
-        cat list
-        for I2C in $(sed 's/^i2c-\([0-9]\+\).*/\1/' list); do
-            rlRun "i2cdetect -F $I2C > $I2C-f.txt 2> $I2C-f.err"
-        done
+        rlRun "ls /sys/class/i2c-adapter/ > $TmpDir/list.txt 2>/dev/null"
+        if [ -s "$TmpDir/list.txt" ]; then
+            rlLog "I2C adapters found, reading information."
+            while read -r line; do
+                rlRun "cat /sys/class/i2c-adapter/$line/name >> $TmpDir/adapter_info.txt 2>/dev/null" 0 "Reading bus name"
+                rlRun "cat /sys/class/i2c-adapter/$line/i2c-dev/$line/dev >> $TmpDir/adapter_info.txt 2>/dev/null" 0 "Reading bus address"
+            done < $TmpDir/list.txt
+            if [ -s "$TmpDir/adapter_info.txt" ]; then
+                rlLog "Bus names and address."
+                rlRun "cat $TmpDir/adapter_info.txt"
+            else
+                rlLogWarning "adapter_info.txt is empty,please check."
+            fi
+        else
+            rlFail "I2C detection failed or no buses available,please check."
+        fi
     rlPhaseEnd
 
     rlPhaseStartCleanup
         rlRun "modprobe -r i2c-dev"
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+        rlRun "rm -rf \"$TmpDir\"" 0 "Removing tmp directory"
     rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd

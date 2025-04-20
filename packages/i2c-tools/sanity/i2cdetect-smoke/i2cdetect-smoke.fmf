@@ -1,16 +1,10 @@
-summary: Load i2c-dev module and try i2cdetect -l
+summary: Load i2c-dev module and checking if there are devices active in the board
 description: |
-    Description: Loads i2c-dev module, tries i2cdetect -l.
-    If some buses are detected probes each one for capatibilities.
-
-    Author: Lukas Zachar <lzachar@redhat.com>
+    Description: Loads i2c-dev module, then checks if there is any i2c devices activate on the board.
+    If buses are activated it will show it's name and the address.
 contact: Lukas Zachar <lzachar@redhat.com>
 id: 8640786e-7022-4291-8d1f-47b230ec5693
 test: ./runtest.sh
 framework: beakerlib
-require:
-  - i2c-tools
-  - type: file
-    pattern: /cki_lib
 extra-summary: packages/i2c-tools/sanity/i2cdetect-smoke
 extra-task: packages/i2c-tools/sanity/i2cdetect-smoke
