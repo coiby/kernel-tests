@@ -224,6 +224,19 @@ do_netfilter_reset()
 	reset_network_env
 }
 
+do_net_netfilter_config()
+{
+	set_network_env
+
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	which conntrack || $pkg_mgr $pkg_mgr_inst_string conntrack-tools
+}
+
+do_net_netfilter_reset()
+{
+	reset_network_env
+}
+
 do_bpf_config()
 {
 	set_network_env
