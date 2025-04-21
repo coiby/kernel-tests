@@ -45,7 +45,9 @@ clean:
 	rm -f *~ $(BUILT_FILES)
 
 
-include /usr/share/rhts/lib/rhts-make.include
+# Common VARs from rhts makefile
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
 
 $(METADATA): Makefile
 	@echo "Owner:           Kdump QE <kdump-qe-list@redhat.com>" > $(METADATA)
@@ -60,4 +62,4 @@ $(METADATA): Makefile
 	@echo "Destructive:     no" >> $(METADATA)
 	@echo "RepoRequires:    kdump/include" >> $(METADATA)
 
-	rhts-lint $(METADATA)
+	

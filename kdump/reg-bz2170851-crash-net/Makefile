@@ -20,8 +20,10 @@
 
 export TEST  :=   /kernel/kdump/reg-bz2170851-crash-net
 
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
+
+# Common VARs from rhts makefile
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
 
 .PHONY: build run
 
@@ -41,4 +43,4 @@ $(METADATA): Makefile
 	@echo "License: GPLv3" >> $(METADATA)
 	@echo "RepoRequires:  kdump/include" >> $(METADATA)
 	@echo "Description: Regression Test for bug 2170851" >> $(METADATA)
-	rhts-lint $(METADATA)
+	

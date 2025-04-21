@@ -21,8 +21,10 @@
 export TEST=/kernel/kdump/analyse-crash-bpf
 export TESTVERSION=1.0
 
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
+
+# Common VARs from rhts makefile
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
 
 .PHONY: build clean run
 
@@ -53,4 +55,4 @@ $(METADATA): Makefile
 	@echo "Destructive:     no" >> $(METADATA)
 	@echo "RepoRequires:    kdump/include" >> $(METADATA)
 
-	rhts-lint $(METADATA)
+	

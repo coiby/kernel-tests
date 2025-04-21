@@ -24,6 +24,6 @@ Accepted Parameters:
 
 - KEXEC_BOOT_AFTER_CMD
   The command will be run after a kexec load.
-  By default it's "RhtsReboot" which will prepare next boot sequence and call rhts-reboot.
+  By default it's "RhtsReboot" which will prepare next boot sequence and call rstrnt-reboot.
   You can set it to other commands, e.g. "kexec -e" or "return" if you don't want to
   reboot the system
