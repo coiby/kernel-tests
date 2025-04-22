@@ -41,6 +41,9 @@ require+:
 adjust+:
   - when: arch == x86_64
     enabled: false
+  - when: hw_target == rcar_s4
+    environment+:
+      OPTS: "--suite-timeout=21600"
 duration: 180m
 environment:
     TESTARGS: VMMTIER1
