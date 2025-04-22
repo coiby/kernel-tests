@@ -224,7 +224,7 @@ function RunKSelfTest()
     local testscript="$1"
     local test_folder="$(echo ${testscript}|cut -d : -f 1)"
     local test_case="$(echo ${testscript}|cut -d : -f 2)"
-    local ret
+    local ret=0
 
     OUTPUTFILE=$(new_outputfile)
 
@@ -238,20 +238,27 @@ function RunKSelfTest()
     rlLog "=== Running: $testscript"
     pushd $EXEC_DIR/${test_folder}
 
-    WORKERS=${WORKERS:-1}
-    if [[ "$WORKERS" -gt 1 ]]; then
+    if [[ "${WORKERS:-1}" -gt 1 ]]; then
         rlLog "Concurrent testing: Spawning $WORKERS processes of ${testscript}."
+        declare -a pids  # Store process IDs
+        for ((i = 1; i <= WORKERS; i++)); do
+            temp_output="${OUTPUTFILE}_${i}"
+            # Run test case with pipefail to preserve exit code through tee
+            (set -o pipefail; ./${test_case} ${TEST_PARAM[${testscript}]} |& tee "$temp_output") &
+            pids+=($!)  # Save PID of background process
+        done
+        for pid in "${pids[@]}"; do
+            wait "$pid" || ret=1  # Update ret if any process fails
+        done
+        # After all workers finish, combine the outputs
+        cat "$OUTPUTFILE"_* > "$OUTPUTFILE"
+    else
+        # run the test separately if $WORKERS not supplied as we may use
+        # run_kselftest.sh to run selftests in future
+        ./${test_case} ${TEST_PARAM[${testscript}]} |& tee $OUTPUTFILE
+        ret=${PIPESTATUS[0]}
     fi
-    # Spawn WORKERS processes
-    for ((i = 1; i <= WORKERS; i++)); do
-        temp_output="${OUTPUTFILE}_${i}"
-        (./${test_case} ${TEST_PARAM[${testscript}]} |& tee $temp_output) &
-    done
-    wait
-    # After all workers finish, combine the outputs
-    cat "$OUTPUTFILE"_* > "$OUTPUTFILE"
 
-    ret=${PIPESTATUS[0]}
     # use rlLog instead of `rlRun -l` to avoid the 50 lines limit
     rlLog "$(cat "${OUTPUTFILE}")"
     popd
