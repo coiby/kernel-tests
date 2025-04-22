@@ -13,9 +13,6 @@
 #
 # Author: WANG Chao <chaowang@redhat.com>
 
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
-
 # The toplevel namespace within which the test lives.
 TOPLEVEL_NAMESPACE=/kernel
 
@@ -30,6 +27,11 @@ export TESTVERSION=0
 
 # The relative path name to the test.
 export TEST=$(TOPLEVEL_NAMESPACE)/$(PACKAGE_NAME)/$(TEST_CASE)
+
+# Common VARs from rhts makefile
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
+
 
 .PHONY: build clean run
 
