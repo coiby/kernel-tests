@@ -2,6 +2,7 @@ summary: Wrapper for Linux radix-tree Test
 contact: Li Wang <liwang@redhat.com>
 test: ./runtest.sh
 framework: beakerlib
+duration: 1h
 require:
     - dwarves
     - libasan
