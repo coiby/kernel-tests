@@ -1586,9 +1586,6 @@ else
             Abort
         else
             DeBug "After reboot we are running the correct kernel"
-            # CheckCPU count with test kernel
-            CheckCPUcount
-            YumUpgradeKernelHeaders
             REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
             DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
             if [[ ${DIFF} -gt ${MAX_REBOOT_TIME:-900} ]]; then
@@ -1597,6 +1594,9 @@ else
                  echo "***** WARN: rstrnt-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-900} seconds *****" | tee -a $OUTPUTFILE
                  RprtRslt $TEST/${kernbase}_boot WARN $DIFF
             fi
+            # CheckCPU count with test kernel
+            CheckCPUcount
+            YumUpgradeKernelHeaders
             RprtRslt $TEST/$kernbase PASS $DIFF
             DepmodChk
             DiffDmesg
