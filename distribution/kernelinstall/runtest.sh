@@ -1588,10 +1588,11 @@ else
             DeBug "After reboot we are running the correct kernel"
             REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
             DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
-            if [[ ${DIFF} -gt ${MAX_REBOOT_TIME:-900} ]]; then
+            MAX_REBOOT_TIME=${MAX_REBOOT_TIME:-900}
+            if [[ "${MAX_REBOOT_TIME}" != "0" ]] && [[ ${DIFF} -gt ${MAX_REBOOT_TIME} ]]; then
                  let DIFF_MIN=$DIFF/60
                  let DIFF_SEC=$DIFF%60
-                 echo "***** WARN: rstrnt-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-900} seconds *****" | tee -a $OUTPUTFILE
+                 echo "***** WARN: rstrnt-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME} seconds *****" | tee -a $OUTPUTFILE
                  RprtRslt $TEST/${kernbase}_boot WARN $DIFF
             fi
             # CheckCPU count with test kernel
