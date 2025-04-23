@@ -45,12 +45,18 @@ static void print_pgtable_entries_pgd(void *vaddr, pgd_t *pgd)
 	pud = pud_offset(pgd, address);
 #endif
 	pr_alert("VMGuard:  PUD: Base=%#018lx, Index=%03lu, Offset=%#05lx, Entry=%#018lx%s\n",
-		 base, idx, idx * sizeof(pud_t), pud_val(*pud), pud_val(*pud) & sme_me_mask ? " (encrypted)" : "");
+		base, idx, idx * sizeof(pud_t), pud_val(*pud), pud_val(*pud) & sme_me_mask ? " (encrypted)" : "");
 	if (!pud_present(*pud))
 		return;
+#ifndef OLD_RHEL
+	if (pud_leaf(*pud)) {
+		pr_alert("VMGuard:  Address %#018lx at physical address %#018lx\n",
+			address, (pud_val(*pud) & PTE_PFN_MASK) + (address & ~PUD_MASK));
+#else
 	if (pud_large(*pud)) {
 		pr_alert("VMGuard:  Address %#018lx at physical address %#018lx\n",
 			 address, (pud_val(*pud) & PTE_PFN_MASK) + (address & ~PUD_PAGE_MASK));
+#endif
 		return;
 	}
 
@@ -61,9 +67,15 @@ static void print_pgtable_entries_pgd(void *vaddr, pgd_t *pgd)
 		 base, idx, idx * sizeof(pmd_t), pmd_val(*pmd), pmd_val(*pmd) & sme_me_mask ? " (encrypted)" : "");
 	if (!pmd_present(*pmd))
 		return;
+#ifndef OLD_RHEL
+	if (pmd_leaf(*pmd)) {
+		pr_alert("VMGuard:  Address %#018lx at physical address %#018lx\n",
+			 address, (pmd_val(*pmd) & PTE_PFN_MASK) + (address & ~PMD_MASK));
+#else
 	if (pmd_large(*pmd)) {
 		pr_alert("VMGuard:  Address %#018lx at physical address %#018lx\n",
 			 address, (pmd_val(*pmd) & PTE_PFN_MASK) + (address & ~PMD_PAGE_MASK));
+#endif
 		return;
 	}
 
