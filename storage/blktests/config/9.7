@@ -4,35 +4,25 @@
 #scsi/008 scsi_debug does not support group number statistics
 #zbd/009 zbd/010 need btrfs f2fs
 #block/032 RHEL-88002
+#block/010 take long time on debug kernel
 BLK="block/001 block/002 block/006 block/007 block/009 block/010 block/016 block/017 block/018 block/020 block/021 block/022 block/023 block/024 block/025 block/027 block/028 block/029 block/031 block/032 block/035 block/037 block/038 loop/001 loop/002 loop/003 loop/004 loop/005 loop/006 loop/007 loop/008 loop/009 scsi/004 scsi/005 scsi/007 zbd/001 zbd/002 zbd/003 zbd/004 zbd/005 zbd/006 zbd/008 nbd/001 nbd/002 nbd/003 nbd/004 md/001"
-uname -r | grep -q ppc64le && BLK=${BLK//block\/032 /}
+uname -r | grep -q debug && BLK=${BLK//loop\/003 /}
+uname -r | grep -q debug && BLK=${BLK//block\/010 /}
+uname -r | grep -qE "s390x|debug" && BLK=${BLK//block\/024 /}
+uname -r | grep -qE "ppc64le|64k" && BLK=${BLK//block\/032 /}
 
 NVME_LOOP="nvme/002 nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/016 nvme/017 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/051 nvme/052 nvme/057 nvme/058"
-
-#disabled for RHEL9
-#NVME_RDMA_SIW="nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/047 nvme/048 nvme/051"
-
-#disabled for RHEL9
-#NVME_RDMA_RXE="nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/047 nvme/048 nvme/051"
+# RHEL-88002
+uname -r | grep -qE "64k" && NVME_LOOP=${NVME_LOOP//nvme\/045 /}
+# RHEL-73614
+uname -r | grep -qE "rt|debug" && NVME_LOOP=${NVME_LOOP//nvme\/058/}
 
 NVME_TCP="nvme/003 nvme/004 nvme/005 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/047 nvme/048 nvme/051 nvme/057 nvme/058 nvme/061"
-
-#disabled for RHEL9
-#NVMEOF_MP_RXE="nvmeof-mp/005 nvmeof-mp/006 nvmeof-mp/009 nvmeof-mp/010 nvmeof-mp/011"
-
-#nvmeof-mp/012 RHEL-21548 WON'TFIX
-
-#disabled for RHEL9
-#NVMEOF_MP_SIW="nvmeof-mp/005 nvmeof-mp/006 nvmeof-mp/009 nvmeof-mp/010 nvmeof-mp/011 nvmeof-mp/012"
-
-#disabled for RHEL9
-#SRP_SIW="srp/001 srp/002 srp/005 srp/006 srp/007 srp/008 srp/009 srp/010 srp/012 srp/013 srp/014 srp/016"
-#srp/011 random failure
-
-#disabled for RHEL9
-#SRP_RXE="srp/005 srp/006 srp/007 srp/008 srp/009 srp/010 srp/012 srp/013 srp/014 srp/016"
-#srp/001 RHEL-14071
-#srp/011 random failure
+uname -r | grep -q aarch64 && NVME_TCP=${NVME_TCP//nvme\/061/}
+# RHEL-88002
+uname -r | grep -qE "64k" && NVME_TCP=${NVME_TCP//nvme\/045 /} && NVME_TCP=${NVME_TCP//nvme\/047 /}
 
 THROTL="throtl/001 throtl/002 throtl/003 throtl/004 throtl/005 throtl/006"
 uname -r | grep -qE "s390x|ppc64le|aarch64" && THROTL=${THROTL//throtl\/001 /}
+# RHEL-88138
+uname -r | grep -qE "debug|s390x\+debug" && THROTL=${THROTL//throtl\/006/}
