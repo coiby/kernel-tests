@@ -42,14 +42,6 @@ rlJournalStart
 		rlPhaseEnd
 		rlJournalEnd
 		exit 0; }
-	lscpu | grep -w sme && rlLog "sme is supported / enabled" || {
-		rstrnt-report-result "sme not enabled in bios" SKIP
-		rstrnt-report-result "$TEST" SKIP
-		rlLog "SME not enabled in BIOS, skipping test..."
-		rlPhaseEnd
-		rlJournalEnd
-		exit 0
-	}
 	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlRpmInstall "${kname}-devel" "$kversion" "$krelease" "$(uname -m)"
 	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
 	# for rhel8, we keep it compile old code by providing the OLD_RHEL hint.
