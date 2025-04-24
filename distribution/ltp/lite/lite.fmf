@@ -42,5 +42,8 @@ require:
 recommend:
   - python3-click
 duration: 6h
+adjust+:
+  - when: package-name ~ kernel.*debug
+    enabled: false
 extra-summary: /kernel/distribution/ltp/lite
 extra-task: /kernel/distribution/ltp/lite
