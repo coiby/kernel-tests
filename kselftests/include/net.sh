@@ -211,6 +211,40 @@ do_net_mptcp_reset()
 	reset_network_env
 }
 
+do_net_packetdrill_config()
+{
+	set_network_env
+	install_epel_pkg packetdrill || test_warn "Install packetdrill failed"
+}
+
+do_net_packetdrill_run()
+{
+	# Start net packetdrill test
+	local item="net/packetdrill"
+
+	[ ! -d "$EXEC_DIR"/${item} ] && test_skip "No $item test, skip" && return 1
+	pushd "$EXEC_DIR"/${item} || return 1
+	if [ ! -f ksft_runner.sh ]; then
+		test_skip "No ksft_runner.sh for $item test, skip"
+		return 1
+	fi
+
+	local total_tests=$(ls *.pkt)
+
+	for name in ${total_tests}; do
+		rlPhaseStartTest "selftests: ${item}:${name}"
+		rlRun -l "./ksft_runner.sh ${name}"
+		rlPhaseEnd
+	done
+
+	popd || exit
+}
+
+do_net_packetdrill_reset()
+{
+	reset_network_env
+}
+
 do_netfilter_config()
 {
 	set_network_env
