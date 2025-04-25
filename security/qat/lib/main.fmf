@@ -24,4 +24,5 @@ require:
   - zlib-devel
   - pip
   - bzip2
+  - python3-prettytable
 duration: 45m

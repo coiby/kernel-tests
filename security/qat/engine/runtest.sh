@@ -61,7 +61,6 @@ rlPhaseStartSetup
 		rlRun "systemctl start qat"
 
 		# Configure QAT to sym:asym encryption mode
-		rlRun "pip install prettytable"
 		rlRun "python3 qat -c -m 1" 0 "Turning QAT mode to sym:asym"
 	fi
 rlPhaseEnd

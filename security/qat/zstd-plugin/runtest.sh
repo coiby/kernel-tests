@@ -51,7 +51,6 @@ rlPhaseStartSetup
 		rlRun "dd < /dev/zero bs=10485760 count=1 > nullbytes"
 
 		# Run the Intel QAT configuration script
-		rlRun "pip install prettytable"
 		rlRun "python3 qat -c -m 2" 0 "reconfiguring QAT devices to (de)compression mode"
 
 		# Get zstd setup files
