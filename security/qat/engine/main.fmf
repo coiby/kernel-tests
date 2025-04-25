@@ -27,5 +27,4 @@ require:
   - autoconf
   - cmake
   - pkg-config
-  - python3-prettytable
 duration: 45m

@@ -61,6 +61,7 @@ rlPhaseStartSetup
 		rlRun "systemctl start qat"
 
 		# Get dependency for Intel's QAT configuration script
+		rlRun "pip install prettytable"
 		rlRun "python3 qat -c -m 1" 0 "Setting QAT mode to sym:asym"
 	fi
 rlPhaseEnd

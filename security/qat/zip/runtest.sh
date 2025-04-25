@@ -82,6 +82,7 @@ rlPhaseStartSetup
 		rlRun "cd .."
 
 		# Configure QAT to dc (de)compression mode
+		rlRun "pip install prettytable"
 		rlRun "python3 qat -c -m 2" 0 "Turning QAT mode to dc"
 	fi
 rlPhaseEnd

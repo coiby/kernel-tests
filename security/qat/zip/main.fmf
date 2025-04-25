@@ -28,5 +28,4 @@ require:
   - lz4-devel
   - qatzip-devel
   - qatlib-devel
-  - python3-prettytable
 duration: 45m

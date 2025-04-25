@@ -27,5 +27,4 @@ require:
   - pip
   - bzip2
   - qat-zstd-plugin-devel
-  - python3-prettytable
 duration: 45m
