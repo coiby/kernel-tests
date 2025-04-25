@@ -36,12 +36,22 @@ rlPhaseStartSetup
 			rlRun "unxz /lib/firmware/qat_4*.bin.xz"
 		elif ls /lib/firmware/qat_4*.bin > /dev/null 2>%1; then
 			rlLogInfo "Firmware is already set up"
-		else
-			# Download the firmware packages if they are not present on the machine
+		fi
+
+		# Install necessary firmware if it's not present
+		if ! ls /lib/firmware/qat_4xxx*.bin > /dev/null 2>&1; then
+			# Download the 4xxx firmware packages if they are not present on the machine
 			rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx.bin"
 			rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_4xxx_mmp.bin"
 			rlRun "mv qat_4xxx.bin /lib/firmware"
 			rlRun "mv qat_4xxx_mmp.bin /lib/firmware"
+		fi
+		if ! ls /lib/firmware/qat_402xx*.bin > /dev/null 2>&1; then
+			# Download the 402xx firmware packages if they are not present on the machine
+			rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_402xx.bin"
+			rlRun "wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qat_402xx_mmp.bin"
+			rlRun "mv qat_402xx.bin /lib/firmware"
+			rlRun "mv qat_402xx_mmp.bin /lib/firmware"
 		fi
 
 		# Reboot to activate the firmware (Beaker safe)
@@ -62,8 +72,6 @@ rlPhaseStartSetup
 		# Get 6.14 kernel for raw data testing
 		rlRun "wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.14.tar.xz"
 		rlRun "tar -xf linux-6.14.tar.xz"
-
-		# Add qatlib repo autogen, configure, and make. No install
 
 		# Configuration for Intel's qatzip-test
 		rlRun "git clone https://github.com/intel/QATzip.git"
