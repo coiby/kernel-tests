@@ -46,6 +46,23 @@ SLUB_RANDOM=${SLUB_RANDOM:-0}
 
 this_arch=$(uname -m)
 
+function get_kernel_config()
+{
+    CONFIGS=("/usr/lib/modules/$(uname -r)/config" "/boot/config-$(uname -r)")
+
+    for C in "${CONFIGS[@]}"; do
+        if [ -e $C ]; then
+            echo $C
+            break
+        fi
+    done
+}
+
+function is_kaslr_enabled()
+{
+    grep CONFIG_RANDOMIZE_BASE=y $(get_kernel_config) 2>/dev/null
+}
+
 # For debug extra reboot code
 function fault_injection()
 {
@@ -174,7 +191,7 @@ function check_x86_paging_level()
         SUPPORT_NO5LVL=1
     fi
 
-    if grep -q CONFIG_X86_5LEVEL=y ${k_boot}/config-"$(uname -r)" 2>/dev/null  ; then
+    if grep -q CONFIG_X86_5LEVEL=y $(get_kernel_config) 2>/dev/null; then
         echo "Detected 5lvl config"
         SUPPORT_CONFIG_5LVL=1
     fi
@@ -187,7 +204,7 @@ function check_x86_paging_level()
 
 function get_default_addr()
 {
-    if uname -r | grep x86_64 && grep CONFIG_RANDOMIZE_MEMORY=y ${k_boot}/config-"$(uname -r)"; then
+    if uname -r | grep x86_64 && is_kaslr_enabled; then
         cmp_file_list="_text page_offset_base vmemmap_base Kernel_code Kernel_data Kernel_bss"
     elif uname -r | grep x86_64; then
         cmp_file_list="_text Kernel_code Kernel_data Kernel_bss"
@@ -360,14 +377,8 @@ function arch_nokaslr_test()
 
 function run_kaslr()
 {
-    if [ -e ${k_boot}/config-"$(uname -r)" ]; then
-        grep CONFIG_RANDOMIZE_BASE=y ${k_boot}/config-"$(uname -r)" || { rlReport "Skip-not-support" PASS; return; }
-    elif [ -e /proc/config.gz ]; then
-        zcat /proc/config.gz | grep CONFIG_RANDOMIZE_BASE=y || { rlReport "Skip-not-support" PASS; return; }
-    else
-        rlReport "Skip-not-support" PASS;
-        return;
-    fi
+
+    is_kaslr_enabled || { rlReport "Skip-not-support" PASS; return; }
 
     get_kernel_version
     if  [ "$kver_major" -lt 3 ]; then
@@ -438,7 +449,13 @@ function select_yum_tool()
     fi
 }
 
-k_name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/-core//')
+if [[ -z $(get_kernel_config) ]]; then
+    rlLog "kconfig-missing: test FAIL"
+    rlReport "kconfig-missing" FAIL
+    return
+fi
+
+k_name=$(rpm --queryformat '%{name}\n' -qf $(get_kernel_config) | sed -e 's/-core//')
 rlJournalStart
     if ! test -f SETUP_FINISH; then
         rlPhaseStartSetup
