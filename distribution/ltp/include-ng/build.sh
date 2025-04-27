@@ -46,10 +46,10 @@ install_kirk()
 		fi
 	fi
 
-	KIRK_VER="${KIRK_VER:-v1.5}"
+	KIRK_VER="${KIRK_VER:-v2.0}"
 	KIRK_DIR="$(pwd)/kirk"
 
-	[[ -d $KIRK_DIR ]] || git clone -b $KIRK_VER https://github.com/linux-test-project/kirk.git --depth=10
+	[[ -d $KIRK_DIR ]] || git clone -b $KIRK_VER https://gitlab.com/redhat/centos-stream/tests/kernel/core/kirk --depth=10
 	if [ $? -ne 0 ]; then
 		echo "Aborting current task: Couldn't clone kirk" | tee -a $OUTPUTFILE
 		if [[ -n $RSTRNT_TASKNAME ]]; then
