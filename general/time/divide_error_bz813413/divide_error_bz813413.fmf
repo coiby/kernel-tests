@@ -2,7 +2,7 @@ summary: bz813413 divide by zero check
 contact: Qiao Zhao <qzhao@redhat.com>
 component:
   - kernel
-test: bash -x ./runtest.sh
+test: bash ./runtest.sh
 require:
   - gcc
   - libguestfs-tools-c
