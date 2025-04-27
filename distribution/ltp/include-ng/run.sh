@@ -40,6 +40,7 @@ report_result ()
 
     logfile_run=$OUTPUTDIR/$TEST.run.log
     logfile_fail=$OUTPUTDIR/$TEST.fail.log
+    logfile_html=$OUTPUTDIR/$TEST.html
     logfile_json=$OUTPUTDIR/$TEST.json
 
     if [[ -z ${LTP_DMESG_DIR_PREFIX} ]]; then
@@ -85,6 +86,7 @@ report_result ()
     fi
     # I want to see the succeeded running log as well
     SubmitLog $logfile_run
+    SubmitLog $logfile_html
     SubmitLog $logfile_json
     score=$(cat $OUTPUTDIR/$RUNTEST.log | grep "failed" | awk '{print $2}')
     if test -f "$KIRK_DEBUG" && grep -E "Testing suite timed out: $RUNTEST" $KIRK_DEBUG; then
