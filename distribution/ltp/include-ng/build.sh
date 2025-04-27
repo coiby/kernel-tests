@@ -60,11 +60,6 @@ install_kirk()
 		fi
 	fi
 
-	if [[ "$KIRK_VER" == "v1.4"* ]]; then
-		patch --forward -p1 -d "$KIRK_DIR" < ${ABS_DIR}/kirk-v1.4/0001-host-remove-preexec_fn-from-process-run.patch
-		patch --forward -p1 -d "$KIRK_DIR" < ${ABS_DIR}/kirk-v1.4/0001-libkirk-events-register-the-event-handler-for-suite_.patch
-	fi
-
 	cp -r "$KIRK_DIR" /mnt/testarea/
 }
 
