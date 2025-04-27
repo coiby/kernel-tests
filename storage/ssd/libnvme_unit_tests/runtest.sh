@@ -27,11 +27,11 @@ function libnvme_setup
 
 function startup
 {
-	if rlIsRHEL ">9.0" || rlIsFedora ||rlIsCentOS "9"; then
+	if rlIsRHEL ">9.0" || rlIsFedora || rlIsCentOS "9" || rlIsCentOS "10"; then
 		libnvme_setup
 
 	else
-		rlLog "Abort test as $(cat /etc/redhat-release) doesn't support"
+		rlLog "SKip test as $(cat /etc/redhat-release) doesn't support"
 		rstrnt-report-result "${RSTRNT_TASKNAME}" SKIP
 		exit 0
 	fi
