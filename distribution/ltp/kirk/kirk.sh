@@ -21,7 +21,7 @@ function kirk_run()
 	local json2html=$KIRKDIR/utils/json2html.py
 
 	# there is no way to disable kirk suite-timeout, to make sure we rely only on tmt/restraint timeout we set a very large (12h) number here
-	time -p ${KIRKDIR}/kirk -f ltp:root=${LTPDIR} -r $RUNTEST -v -j $OUTPUTDIR/$RUNTEST.json --suite-timeout 43200 $OPTIONS | sed -r 's/\x1b\[[0-9;]*m//g'
+	time -p ${KIRKDIR}/kirk --framework ltp:root=${LTPDIR} --run-suite $RUNTEST -v --json-report $OUTPUTDIR/$RUNTEST.json --suite-timeout 43200 $OPTIONS | sed -r 's/\x1b\[[0-9;]*m//g'
 	python3 $json2logs --resfile $OUTPUTDIR/$RUNTEST.json --sumfile $OUTPUTDIR/$RUNTEST.log --runfile $OUTPUTDIR/$RUNTEST.run.log --failfile $OUTPUTDIR/$RUNTEST.fail.log
 	python3 $json2html -r $OUTPUTDIR/$RUNTEST.json > $OUTPUTDIR/$RUNTEST.html
 	# shellcheck disable=SC2034
