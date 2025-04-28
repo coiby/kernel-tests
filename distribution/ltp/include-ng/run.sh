@@ -163,7 +163,7 @@ RunTest ()
     ipc_debug_info Before
     debug "Command Line:"
     debug "kirk $RUNTEST $OUTPUTDIR \"$OPTIONS\""
-    kirk_run $RUNTEST $OUTPUTDIR "$OPTIONS"
+    kirk_runltp $RUNTEST $OUTPUTDIR "$OPTIONS"
 
     ipc_debug_info After
     if [ $RUNTEST = "ipc" ]; then

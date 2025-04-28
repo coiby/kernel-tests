@@ -7,7 +7,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-function kirk_run()
+function kirk_runltp()
 {
 	RUNTEST=$1
 	OUTPUTDIR=$2
