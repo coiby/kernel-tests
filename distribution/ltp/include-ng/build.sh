@@ -46,10 +46,10 @@ install_kirk()
 		fi
 	fi
 
-	KIRK_VER="${KIRK_VER:-v1.5}"
+	KIRK_VER="${KIRK_VER:-v2.0}"
 	KIRK_DIR="$(pwd)/kirk"
 
-	[[ -d $KIRK_DIR ]] || git clone -b $KIRK_VER https://github.com/linux-test-project/kirk.git --depth=10
+	[[ -d $KIRK_DIR ]] || git clone -b $KIRK_VER https://gitlab.com/redhat/centos-stream/tests/kernel/core/kirk --depth=10
 	if [ $? -ne 0 ]; then
 		echo "Aborting current task: Couldn't clone kirk" | tee -a $OUTPUTFILE
 		if [[ -n $RSTRNT_TASKNAME ]]; then
@@ -58,11 +58,6 @@ install_kirk()
 		else
 			exit 1
 		fi
-	fi
-
-	if [[ "$KIRK_VER" == "v1.4"* ]]; then
-		patch --forward -p1 -d "$KIRK_DIR" < ${ABS_DIR}/kirk-v1.4/0001-host-remove-preexec_fn-from-process-run.patch
-		patch --forward -p1 -d "$KIRK_DIR" < ${ABS_DIR}/kirk-v1.4/0001-libkirk-events-register-the-event-handler-for-suite_.patch
 	fi
 
 	cp -r "$KIRK_DIR" /mnt/testarea/
