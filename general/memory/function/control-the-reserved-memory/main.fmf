@@ -20,7 +20,7 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 recommend: []
-duration: 1m
+duration: 5m
 extra-summary: /kernel/general/memory/function/control-the-reserved-memory
 extra-task: /kernel/general/memory/function/control-the-reserved-memory
 

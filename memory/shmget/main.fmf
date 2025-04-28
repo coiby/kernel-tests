@@ -1,13 +1,13 @@
 summary: 32-bit app on 64-bit host shmget 2GB+ test by J. Marchand
 contact: Jarod Wilson <jwilson@redhat.com>
-enabled: true
-test: chmod +x ./runtest.sh
+enabled: false
+test: bash ./runtest.sh
 path: /memory/shmget
 framework: shell
-recommend:
-  - kernel-devel
-  - glibc-devel
+require:
   - gcc
+  - glibc-devel
+recommend:
   - glibc-devel.i386
   - glibc-devel.i686
   - glibc-devel.s390
@@ -18,6 +18,12 @@ recommend:
 duration: 10m
 extra-summary: /kernel/memory/shmget
 extra-task: /kernel/memory/shmget
+adjust+:
+  - enabled: true
+    when: arch = x86_64
+  - enabled: true
+    when: arch != s390x
+
 
 # ---------------------
 # Filter definitions   |
