@@ -132,3 +132,16 @@ function get_test_cases_list
 	case_list=$(eval echo '$'"$case_type")
 	echo "$case_list"
 }
+
+function install_ktls_utils()
+{
+	yum -y install automake gnutls-devel glib2-devel libnl3-devel keyutils-libs-devel
+	git clone -b ktls-utils-1.0-rc2 https://github.com/oracle/ktls-utils.git
+	pushd ktls-utils
+	./autogen.sh
+	./configure --with-systemd
+	make
+	make install
+	systemctl daemon-reload
+	popd
+}
