@@ -7,7 +7,7 @@ confidential=no
 destructive=no
 
 [restraint]
-entry_point=make run
+entry_point=bash ./runtest.sh
 dependencies=grubby;numactl
 repoRequires=automotive/include
 max_time=60m
