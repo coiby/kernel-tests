@@ -10,6 +10,7 @@ destructive=no
 entry_point=bash ./runtest.sh
 max_time=1h
 dependencies=gcc;elfutils-libelf-devel
+softDependencies=bison;flex;openssl-devel
 repoRequires=general/include
 TestVersion=1.3
 Type=Regression

@@ -42,14 +42,18 @@ rlJournalStart
 		rlPhaseEnd
 		rlJournalEnd
 		exit 0; }
-	lscpu | grep -w sme && rlLog "sme is supported / enabled" || {
-		rstrnt-report-result "sme not enabled in bios" SKIP
-		rstrnt-report-result "$TEST" SKIP
-		rlLog "SME not enabled in BIOS, skipping test..."
+	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlRpmInstall "${kname}-devel" "$kversion" "$krelease" "$(uname -m)"
+	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
+	# for rhel8, we keep it compile old code by providing the OLD_RHEL hint.
+	if rlIsRHEL "<9"; then
+		ext_cflag=" -DOLD_RHEL"
+	fi
+	if ! rlRun "make -C sme_module $ext_cflag" 0; then
+		echo "Quit test as fail to build test module"
 		rlPhaseEnd
 		rlJournalEnd
 		exit 0
-	}
+	fi
 	if test -f $firstboot && grep "done" $firstboot; then
 		grep "mem_encrypt=on" /proc/cmdline
 		rlRun "rm -f $firstboot"
@@ -86,15 +90,18 @@ rlJournalStart
 		rlJournalEnd
 		rstrnt-reboot
 	fi
-	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlRpmInstall "${kname}-devel" "$kversion" "$krelease" "$(uname -m)"
-	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
-	rlRun "make -C sme_module" 0
 	rlRun "dmesg -C"
 	rlRun "insmod sme_module/sme_test.ko" 1
 	rlRun "journalctl -k --no-hostname | grep SMEtest | awk '{print \$5,\$6,\$7,\$8,\$9,\$10,\$11,\$12}' | grep -v deadbeef" 0
 	rlRun "dmesg -C"
 	if [ -e $firstboot ]; then
-		grep skip_cleanup_cmdline $firstboot && echo "reserve mem_encrypt=on in cmdline" && rm -f $firstboot && exit 0
+		if grep skip_cleanup_cmdline $firstboot; then
+			echo "reserve mem_encrypt=on in cmdline"
+			rm -f $firstboot
+			rlPhaseEnd
+			rlJournalEnd
+			exit 0
+		fi
 		rlRun "grubby --remove-args mem_encrypt=on --update-kernel DEFAULT"
 		rlRun "echo done > $firstboot"
 		rlPhaseEnd
