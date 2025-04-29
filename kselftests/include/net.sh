@@ -100,6 +100,7 @@ reset_network_env()
 do_net_config()
 {
 	set_network_env
+	sysctl_set kernel.io_uring_disabled 0
 
 	pushd "$EXEC_DIR"/net || exit
 	# Fix some known issues
@@ -155,6 +156,7 @@ do_net_reset()
 	ip -6 route restore < default_ipv6.route
 	popd || exit
 
+	sysctl_restore kernel.io_uring_disabled
 	reset_network_env
 }
 
@@ -204,10 +206,12 @@ do_net_forwarding_reset()
 do_net_mptcp_config()
 {
 	set_network_env
+	sysctl_set net.mptcp.enabled 1
 }
 
 do_net_mptcp_reset()
 {
+	sysctl_restore net.mptcp.enabled
 	reset_network_env
 }
 
