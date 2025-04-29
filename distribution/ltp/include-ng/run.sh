@@ -205,10 +205,12 @@ RunTest ()
 RunFiltTest ()
 {
     if [ -n "$FILTERTESTS" ]; then
-        rm -f $OUTPUTDIR/filtered_runtest.log
-        rm -f $OUTPUTDIR/filtered_runtest.run.log
+        rm -f $OUTPUTDIR/filtertests.log
+        rm -f $OUTPUTDIR/filtertests.run.log
 
-        RunTest filtered_runtest "$OPTS"
+        echo "$FILTERTESTS" | tr ' ' '\n' | awk '{print $1, $1}' > $LTPDIR/runtest/filtertests
+
+        RunTest filtertests "$OPTS"
         return 0
     fi
 
