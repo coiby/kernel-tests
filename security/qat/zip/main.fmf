@@ -9,7 +9,6 @@ require:
   - qatlib
   - qatlib-service
   - qatengine
-  - qatlib-tests
   - gcc
   - clang
   - wget

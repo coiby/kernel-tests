@@ -10,7 +10,6 @@ require:
   - qatlib-devel
   - qatlib-service
   - qatengine
-  - qatlib-tests
   - qatzip
   - gcc
   - clang
