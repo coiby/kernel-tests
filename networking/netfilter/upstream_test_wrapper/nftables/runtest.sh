@@ -16,6 +16,10 @@ rlJournalStart
 		# making it unclear which test originally lead to taint
 		rlRun "NFT_TEST_JOBS=1 bash run-tests.sh"
 		rlRun "popd"
+		rlRun "pushd /tmp"
+		rlRun "tar -czhf nft-test.latest.root.tar.gz nft-test.latest.root"
+		rlFileSubmit nft-test.latest.root.tar.gz
+		rlRun "popd"
 	rlPhaseEnd
 
 	rlPhaseStartTest "nftables/tests/monitor"
@@ -27,6 +31,9 @@ rlJournalStart
 	rlPhaseStartTest "nftables/tests/py"
 		rlRun "pushd nftables/tests/py"
 		rlRun "python nft-test.py"
+		rlRun "popd"
+		rlRun "pushd /tmp"
+		rlFileSubmit nftables-test.log nftables-py-test.log
 		rlRun "popd"
 	rlPhaseEnd
 
