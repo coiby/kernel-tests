@@ -171,7 +171,7 @@ function get_kpkg_ver()
         cki_abort_recipe "get_kpkg_ver: Failed to query repo to get provides and requires." WARN
       fi
     fi
-    KVER=$(sed -n '/uname-r/{s/.*= //p;q}' <<< "${repoquery_output}")
+    KVER=$(sed -n '/^[^(].*core-uname-r =/{s/.*= //p;q}' <<< "${repoquery_output}")
     # rpm doesn't allow '-' character in the version-release
     # that's why in the provides we intentionally switch from '-' to '_'
     # uname -r would still output with -
