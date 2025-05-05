@@ -1,0 +1,52 @@
+From ebf74262e5dce0ffbe74ba37824bc0169f557087 Mon Sep 17 00:00:00 2001
+From: Charles Shi <schrht@gmail.com>
+Date: Mon, 5 May 2025 15:39:26 -0400
+Subject: [PATCH 2/2] Enhance log checking for realtime/perf/latency
+
+---
+ testcases/realtime/perf/latency/run_auto.sh | 24 ++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/testcases/realtime/perf/latency/run_auto.sh b/testcases/realtime/perf/latency/run_auto.sh
+index d34423c36..a258ff1d7 100755
+--- a/testcases/realtime/perf/latency/run_auto.sh
++++ b/testcases/realtime/perf/latency/run_auto.sh
+@@ -33,14 +33,32 @@ echo "number of iterations = $iter " | tee -a $LOG_FILE
+ echo "number of processes = $nproc " | tee -a $LOG_FILE
+ 
+ # Remove any existing local log files
+-rm -f $nthread.$iter.$nproc.*.out
++rm -f ./*.out
+ 
+ i=0
+-./pthread_cond_many --realtime --broadcast -i $iter -n $nthread > $nthread.$iter.$nproc.$i.out &
++./pthread_cond_many --realtime --broadcast -i $iter -n $nthread &> $nthread.$iter.$nproc.$i.out &
+ i=1
+ while test $i -lt $nproc
+ do
+-        ./pthread_cond_many --broadcast -i $iter -n $nthread > $nthread.$iter.$nproc.$i.out &
++        ./pthread_cond_many --broadcast -i $iter -n $nthread &> $nthread.$iter.$nproc.$i.out &
+         i=`expr $i + 1`
+ done
+ wait
++
++# Check local log files
++for file in *.out; do
++        if [ ! -e "$file" ]; then
++                echo "Cannot find local *.out log files." | tee -a "$LOG_FILE"
++                echo "Result: FAIL" | tee -a "$LOG_FILE"
++                break
++        fi
++        echo ---- | tee -a "$LOG_FILE"
++        echo "$file" | tee -a "$LOG_FILE"
++        cat < "$file" | tee -a "$LOG_FILE"
++        if grep -q 'pthread_attr_setstacksize: Success' "$file"; then
++                echo "Result: PASS" | tee -a "$LOG_FILE"
++        else
++                echo "Result: FAIL" | tee -a "$LOG_FILE"
++        fi
++done
++
+-- 
+2.49.0
+
