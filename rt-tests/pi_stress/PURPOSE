@@ -50,7 +50,7 @@ Test Inputs:
     Execute pip_stress to verify proper handling of process-level priority
     inversion via priority inheritance. Use $PIP_STRESS_USLEEP to control the
     usleep value, ensuring reliable inversion triggering. If unspecified, it
-    defaults to 500, or 10,000 on aarch64 and rt-debug systems.
+    defaults to 5000, or 10,000 on aarch64 and rt-debug systems.
 
 Expected result:
     pi_stress:
