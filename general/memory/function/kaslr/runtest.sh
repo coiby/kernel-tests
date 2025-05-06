@@ -29,6 +29,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../../cki_lib/libcki.sh || exit 1
+. ../../../../cmdline_helper/libcmd.sh || exit 1
 
 trap 'rlLog "Rebooting!"; exit' SIGHUP SIGINT SIGQUIT SIGTERM
 
@@ -286,12 +287,7 @@ function arch_kaslr_test()
             rlAssertNotEquals "$f should be changed" "$(cat ${f}.old)" "$(cat $f)"
         done
         slub_freelist_random 1 $i
-        if stat /run/ostree-booted > /dev/null 2>&1; then
-            rlRun "rpm-ostree kargs --append-if-missing=nokaslr --import-proc-cmdline" 0
-        else
-            rlRun "grubby --args nokaslr --update-kernel ALL" 0
-            [ "$this_arch" = "s390x" ] && zipl
-        fi
+        rlRun "change_cmdline nokaslr" 0
         rlPhaseEnd
         rstrnt-reboot
         # Make sure the script doesn't continue if rstrnt-reboot get's killed
@@ -352,12 +348,7 @@ function arch_nokaslr_test()
             rlAssertEquals "$f should be same" "$(cat ${f}.old)" "$(cat $f)"
         done
         slub_freelist_random 0 $i
-        if stat /run/ostree-booted > /dev/null 2>&1; then
-            rlRun "rpm-ostree kargs --delete-if-present=nokaslr --import-proc-cmdline" 0
-        else
-            rlRun "grubby --remove-args nokaslr --update-kernel ALL"
-            [ "$this_arch" = "s390x" ] && zipl
-        fi
+        rlRun "change_cmdline -nokaslr" 0
         rlPhaseEnd
         rstrnt-reboot
     elif [ "$current_state" = "after_r_nokaslr_cleanup" ]; then
@@ -462,6 +453,8 @@ rlJournalStart
             if journalctl -kb | grep -i 'kaslr disabled due to lack of seed'; then
                 rlLog "kaslr is disabled because of no EFI_RNG_PROTOCOL available, skip test"
                 rstrnt-report-result "${TEST}" SKIP
+                rlPhaseEnd
+                rlJournalEnd
                 exit 0
             fi
             select_yum_tool

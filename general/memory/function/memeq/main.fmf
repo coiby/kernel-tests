@@ -27,6 +27,10 @@ test: bash ./runtest.sh
 framework: shell
 require:
   - grubby
+  - type: file
+    pattern:
+      - /cki_lib
+      - /cmdline_helper
 duration: 90m
 extra-summary: /kernel/general/memory/function/memeq
 extra-task: /kernel/general/memory/function/memeq
