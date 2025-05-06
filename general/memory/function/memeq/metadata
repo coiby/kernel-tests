@@ -13,5 +13,6 @@ max_time=90m
 dependencies=grubby
 TestVersion=2.0
 Path=kernel/general/memory/function/memeq
+repoRequires=cki_lib;cmdline_helper
 RunFor=kernel
 Priority=Normal

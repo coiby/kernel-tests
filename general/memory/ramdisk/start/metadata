@@ -12,6 +12,7 @@ entry_point=make run
 max_time=1h
 dependencies=kernel
 TestVersion=1.1
+repoRequires=cki_lib;cmdline_helper
 Path=kernel/general/memory/ramdisk/start
 Type=Function
 RunFor=kernel

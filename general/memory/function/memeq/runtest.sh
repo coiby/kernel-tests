@@ -2,6 +2,8 @@
 
 # include beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../../cki_lib/libcki.sh || exit 1
+. ../../../../cmdline_helper/libcmd.sh || exit 1
 
 set -o pipefail
 
@@ -168,15 +170,9 @@ rlPhaseStartTest
 	fi
 
 	if [ "$next" == "stop" ]; then
-		rlRun "grubby --update-kernel=DEFAULT --remove-args=mem"
-		if [ "$(uname -m)" = "s390x" ]; then
-			rlRun "zipl"
-		fi
+		rlRun "change_cmdline -mem"
 	elif [ "$next" != "exit" ]; then
-		rlRun "grubby --update-kernel=DEFAULT --args=mem=$next"
-		if [ "$(uname -m)" = "s390x" ]; then
-			rlRun "zipl"
-		fi
+		rlRun "change_cmdline mem=${next}"
 	fi
 
 	rlRun "popd"

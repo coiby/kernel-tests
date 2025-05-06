@@ -24,6 +24,10 @@ require:
   - libtool
   - bison
   - flex
+  - type: file
+    pattern:
+      - /cki_lib
+      - /cmdline_helper
 extra-summary: memory/function/kaslr
 extra-task: memory/function/kaslr
 
