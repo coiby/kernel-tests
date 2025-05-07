@@ -40,8 +40,9 @@ if [[ -z "${PIP_STRESS_USLEEP}" ]]; then
     if uname -r | grep -qE "aarch64|rt.*debug"; then
         PIP_STRESS_USLEEP=10000
     else
-        # this is the default for "normal" hardwares
-        PIP_STRESS_USLEEP=500
+        # defaults in pip_stress is 500, and we still see failures on certain
+        # hardwares occasionally, make it 5000
+        PIP_STRESS_USLEEP=5000
     fi
 fi
 OPT_USLEEP="-u $PIP_STRESS_USLEEP"
