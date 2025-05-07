@@ -1,0 +1,7 @@
+[General]
+description=Pseudo test for sys/firmware/fdt checksum
+name=misc/fdt-checksum
+owner=Bilal Elmoussaoui <belmouss@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh

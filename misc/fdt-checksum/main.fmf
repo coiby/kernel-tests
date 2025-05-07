@@ -1,0 +1,14 @@
+summary: Pseudo test for sys/firmware/fdt checksum
+description: Run sha256sum for /sys/firmware/fdt
+    as a pseudo test to be used by a validator to ensure it doesn't change.
+contact: Bilal Elmoussaoui <belmouss@redhat.com>
+component:
+  - kernel
+path: /misc/fdt-checksum
+test: bash -x ./runtest.sh
+framework: shell
+require: []
+duration: 1m
+extra-summary: /misc/fdt-checksum
+extra-task: /misc/fdt-checksum
+id: 291aa437-4830-4c13-83fc-3eb76ef8ba46
