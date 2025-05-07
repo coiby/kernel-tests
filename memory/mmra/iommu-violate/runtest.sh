@@ -235,7 +235,12 @@ EOF
     export LIBGUESTFS_BACKEND=direct
     export SUPERMIN_KERNEL=/boot/vmlinuz-$(uname -r)
     export SUPERMIN_MODULES=/lib/modules/$(uname -r)
-    guestfish --rw -a "$qcow2_image" -m /dev/sda3 -f guestfish.cmd || {
+
+    # Determine the partition to mount
+    local partition=$(guestfish --ro -a "$qcow2_image" -i list_partitions | sort -n | tail -n 1)
+
+    # Update the qcow2 image
+    guestfish --rw -a "$qcow2_image" -m "$partition" -f guestfish.cmd || {
         rlLogError "Failed to inject the SSH key into the VM image."
         return 1
     }
