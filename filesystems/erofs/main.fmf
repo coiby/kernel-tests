@@ -10,4 +10,4 @@ require:
 extra-summary: filesystems/erofs
 extra-task: filesystems/erofs
 tag: KernelAutomotiveTier1
-duration: 5m
+duration: 1h
