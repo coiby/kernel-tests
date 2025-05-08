@@ -112,22 +112,22 @@ rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: Intel's qatzip-test mode 4"
 	rlRun "systemctl start qat"
-	rlRun "./QATzip/test/qatzip-test -m 4 -l 100 -t 8 -D comp -L 1 -B 0 -i linux-6.14/MAINTAINERS" 0 "Running eight-thread level 1 compression test 100 times with sw disabled"
-	rlRun "./QATzip/test/qatzip-test -m 4 -t 8 -l 100 -B 0 -i linux-6.14/MAINTAINERS -C 65536 -b 524288 -L 1 -A deflate -O gzipext -T dynamic" 0 "Running eight-thread level 1 deflation test 100 times with 65536 hw buffer and 524288 block size (data_format=gzipext && huffman=dynamic && sw disabled)"
-	rlRun "./QATzip/test/qatzip-test -m 4 -t 10 -l 100 -L 1 -B 0 -A lz4 -O lz4" 0 "Running ten-threaded level 1 lz4 test 100 times (sw disabled)"
+	rlRun "./QATzip*/test/qatzip-test -m 4 -l 100 -t 8 -D comp -L 1 -B 0 -i linux-6.14/MAINTAINERS" 0 "Running eight-thread level 1 compression test 100 times with sw disabled"
+	rlRun "./QATzip*/test/qatzip-test -m 4 -t 8 -l 100 -B 0 -i linux-6.14/MAINTAINERS -C 65536 -b 524288 -L 1 -A deflate -O gzipext -T dynamic" 0 "Running eight-thread level 1 deflation test 100 times with 65536 hw buffer and 524288 block size (data_format=gzipext && huffman=dynamic && sw disabled)"
+	rlRun "./QATzip*/test/qatzip-test -m 4 -t 10 -l 100 -L 1 -B 0 -A lz4 -O lz4" 0 "Running ten-threaded level 1 lz4 test 100 times (sw disabled)"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: Intel's qatzip-test mode 23"
 	rlRun "systemctl start qat"
-	rlRun "./QATzip/test/qatzip-test -m 23 -l 1000 -t 64 -i linux-6.14/MAINTAINERS -b 65536 -e enable -B 1" 0 "Running 64-threaded test with block size 65536 1000 times with init-engine, sw, and sensitive_mode enabled"
-	rlRun "./QATzip/test/qatzip-test -m 23 -l 1000 -t 64 -i linux-6.14/MAINTAINERS -b 65536 -e enable -B 0" 0 "Running 64-threaded test with block size 65536 1000 times with init-engine and sensitive mode enabled (sw disabled)"
-	rlRun "./QATzip/test/qatzip-test -m 23 -l 1000 -t 64 -i linux-6.14/MAINTAINERS -b 65536 -e disable -B 0" 0 "Running 64-threaded test with block size 65536 1000 times with init-engine and sw disabled and sensitive mode enabled"
+	rlRun "./QATzip*/test/qatzip-test -m 23 -l 1000 -t 64 -i linux-6.14/MAINTAINERS -b 65536 -e enable -B 1" 0 "Running 64-threaded test with block size 65536 1000 times with init-engine, sw, and sensitive_mode enabled"
+	rlRun "./QATzip*/test/qatzip-test -m 23 -l 1000 -t 64 -i linux-6.14/MAINTAINERS -b 65536 -e enable -B 0" 0 "Running 64-threaded test with block size 65536 1000 times with init-engine and sensitive mode enabled (sw disabled)"
+	rlRun "./QATzip*/test/qatzip-test -m 23 -l 1000 -t 64 -i linux-6.14/MAINTAINERS -b 65536 -e disable -B 0" 0 "Running 64-threaded test with block size 65536 1000 times with init-engine and sw disabled and sensitive mode enabled"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATzip: Intel's qatzip-test mode 29"
 	rlRun "systemctl start qat"
-	rlRun "./QATzip/test/qatzip-test -m 4 -l 2000 -t 8 -B 0 -D decomp -L 1 -i linux-6.14/MAINTAINERS -T dynamic -C 4096 -b 4096" 0 "Running eight-threaded level 1 decompression test 2000 times with hardware buff and block size 4K (huffman=dynamic && sw disabled)"
-	rlRun "./QATzip/test/qatzip-test -m 4 -l 2000 -t 8 -D comp -L 1 -i linux-6.14/MAINTAINERS -A lz4 -O lz4" 0 "Running eight-threaded level 1 compression lz4 test 200 times with async queue size 2K"
+	rlRun "./QATzip*/test/qatzip-test -m 4 -l 2000 -t 8 -B 0 -D decomp -L 1 -i linux-6.14/MAINTAINERS -T dynamic -C 4096 -b 4096" 0 "Running eight-threaded level 1 decompression test 2000 times with hardware buff and block size 4K (huffman=dynamic && sw disabled)"
+	rlRun "./QATzip*/test/qatzip-test -m 4 -l 2000 -t 8 -D comp -L 1 -i linux-6.14/MAINTAINERS -A lz4 -O lz4" 0 "Running eight-threaded level 1 compression lz4 test 200 times with async queue size 2K"
 rlPhaseEnd
 
 rlPhaseStartCleanup
