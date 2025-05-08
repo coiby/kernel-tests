@@ -73,9 +73,10 @@ rlPhaseStartSetup
 		rlRun "wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.14.tar.xz"
 		rlRun "tar -xf linux-6.14.tar.xz"
 
-		# Configuration for Intel's qatzip-test, specifically v1.2.0
-		rlRun "git clone --branch v1.2.0 --single-branch https://github.com/intel/QATzip.git"
-		rlRun "cd QATzip/"
+		# Configuration for Intel's qatzip-test
+		rlRun "cp rpmbuild/SOURCES/qatzip-1.3.1.tar.gz ."
+		rlRun "tar -xzvf qatzip-1.3.1.tar.gz"
+		rlRun "cd QATzip-1.3.1/"
 		rlRun "./autogen.sh"
 		rlRun "./configure"
 		rlRun "make -j$(nproc)"
