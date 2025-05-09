@@ -9,10 +9,22 @@
 
 sendip_install()
 {
+	which sendip 2> /dev/null && return 0
+	rlRun "rm -rf SendIP"
 	#SendIP github: https://github.com/rickettm/SendIP
-	rlRun "git clone https://github.com/rickettm/SendIP.git || return 1"
-	rlRun "pushd SendIP || return 1"
+	rlRun "git clone https://github.com/rickettm/SendIP.git" || return 1
+	rlRun "pushd SendIP" || return 1
 	rlRun "sed -i 's/-Werror//g' Makefile"
+	# The CKI test distro already uses a newer C standard
+	rlRun "sed -i 's/^CFLAGS=/CFLAGS= -std=gnu23/g' Makefile"
+	# with standard gnu23, bool/true/false are keywords. lead to double defined in types.h
+	rlRun "sed -i '/typedef int bool;/c\\
+	#if defined(__STDC_VERSION__) && (__STDC_VERSION__ > 201710L)\\
+	/* bool, true and false are keywords.  */\\
+	#else\\
+	typedef int bool;\\
+	#endif\\
+	' types.h"
 	rlRun "make"
 	rlRun "make install"
 	popd
@@ -25,18 +37,31 @@ kselftest_install()
 	rlRun "wget --no-check-certificate ${TEST_URL} -O kselftests.tar.gz" || {
 		rlDie "Download kselftests.tar.gz failed"
 	}
-
 	rlRun "tar -xf kselftests.tar.gz"
 }
 
 packetdrill_install()
 {
+	which packetdrill 2> /dev/null && return 0
 	rlRun "rpm -q bison || dnf -y install bison"
-	pushd /tmp
-	test -e packetdrill && rm -rf packetdrill
-	git clone https://github.com/google/packetdrill.git
-	pushd packetdrill/gtests/net/packetdrill/
-	sed -i 's/-static//g' Makefile
+	rlRun "pushd /tmp"
+	rlRun "rm -rf packetdrill"
+	rlRun "git clone https://github.com/google/packetdrill.git"
+	rlRun "pushd packetdrill/gtests/net/packetdrill/"
+	rlRun "sed -i 's/-static//g' Makefile"
+	rlRun "sed -i 's/^CFLAGS =/CFLAGS = -std=gnu23/g' Makefile.common"
+	rlRun "mv types.h types.h.bak"
+	rlRun "awk '
+	/typedef u8 bool;/ {
+		print \"#if defined(__STDC_VERSION__) && (__STDC_VERSION__ > 201710L)\"
+		print \"#else\"
+		in_block = 1
+	}
+	{ print }
+	/^};/ && in_block {
+		print \"#endif\"
+		in_block = 0
+	}' types.h.bak > types.h"
 	make
 	popd
 	popd
