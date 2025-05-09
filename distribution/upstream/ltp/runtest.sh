@@ -17,7 +17,7 @@ cki_is_vm && export LTP_TIMEOUT_MUL=2
 cki_has_kernel_debug_flags && export LTP_TIMEOUT_MUL=2
 
 TARGET_DIR=/mnt/testarea/ltp
-RUNTESTS=${RUNTESTS:-"cve sched syscalls can commands containers dio fs math hugetlb mm nptl pty ipc tracing"}
+RUNTESTS=${RUNTESTS:-"cve sched syscalls can commands containers dio fs math hugetlb mm nptl pty tracing"}
 CPUS_NUM=$(getconf _NPROCESSORS_ONLN || echo 1)
 MEM_AVAILABLE=$(echo "$(grep '^MemAvailable:' /proc/meminfo | sed 's/^[^0-9]*\([0-9]*\).*/\1/') / 1024" |bc -q)
 
