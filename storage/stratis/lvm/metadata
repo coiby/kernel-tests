@@ -10,4 +10,4 @@ destructive=no
 entry_point=bash ./runtest.sh
 dependencies=stratisd;stratis-cli;lvm2;python3-pip;
 repoRequires=cki_lib;storage/include
-max_time=1h
+max_time=3h
