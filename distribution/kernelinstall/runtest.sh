@@ -1427,6 +1427,15 @@ DeBug "1=$kernbase 2=$kernver 3=$kernrel 4=$kernarch 5=$kernvariant"
 DeBug "TEST ARGS (Environment variables)"
 DeBug "1=$KERNELARGNAME 2=$KERNELARGVARIANT 3=$KERNELARGVERSION 4=$KERNELARGTMPREPO 5=$KERNELARGPERMREPO"
 
+if [[ -z "$KERNELARGVARIANT" ]]; then
+    KERNELARGVARIANT="up"
+    if [[ "${KERNELARGNAME}" =~ debug ]]; then
+        KERNELARGVARIANT="debug"
+    fi
+    # remove -debug from KERNELARGNAME, -debug pattern, this is handled by variant
+    KERNELARGNAME=${KERNELARGNAME/-debug/}
+fi
+
 # Save KERNELARGNAME because it might be modified after this point in some
 # cases, and will be necessary as a directory name to assemble the brewroot url
 KERNPKGDIRECTORY="$KERNELARGNAME"
