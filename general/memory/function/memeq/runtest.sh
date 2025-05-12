@@ -139,15 +139,15 @@ rlPhaseStartTest
 	rlRun -l 'free_total=$(free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p")'
 	# shellcheck disable=SC2154
 	rlLog "Total memory (reported by 'free') $free_total kB"
-	rlRun -l "dmesg_total=\$(dmesg | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
+	rlRun -l "dmesg_total=\$(journalctl -k | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
 
 	if [[ "$current" != "start" && "$current" != "stop" ]]; then
 		# check if the kernel parameter is set
 		rlRun "cat /proc/cmdline | grep \"mem=$current\""
 		rlLog "mem=$current which is $(kilobytes $current) kB"
-		rlRun -l "mem_absent=\$(dmesg | sed -n 's/.*\\ \\([0-9]\\+\\)[Kk]\ absent.*$/\1/p')"
+		rlRun -l "mem_absent=\$(journalctl -k | sed -n 's/.*\\ \\([0-9]\\+\\)[Kk]\ absent.*$/\1/p')"
 
-		rlRun -l "dmesg_total=\$(dmesg | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
+		rlRun -l "dmesg_total=\$(journalctl -k | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
 		if [ -n "$mem_absent" ]; then
 			rlLog "Absent memory (from dmesg message) $mem_absent kB"
 			# shellcheck disable=SC2154
