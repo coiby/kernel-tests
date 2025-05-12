@@ -76,14 +76,11 @@ function GetCurrentModuleList ()
             local moduleList="moduleList_current"
             if [[ "${OS}" = "RHEL8" || "${OS}" = "RHEL9" || "${OS}" = "RHEL10" ]]; then
                 PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
-                if cki_is_kernel_rt; then
-                    PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
-                fi
             else
                 PKG_LIST="${name}-${K_VER}-${K_REL}"
-                if cki_is_kernel_rt; then
-                    PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
-                fi
+            fi
+            if cki_is_kernel_rt && rt_kvm_check; then
+                PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
             fi
             rpm -q --filesbypkg $PKG_LIST | grep '\.ko' | awk -F/ '{ print $NF }' | sed 's/\.xz$//' | sort > ${TESTAREA}/${moduleList}
             ;;
@@ -372,6 +369,18 @@ function DisplayModuleFail ()
     echo "************ Missing modules list end *************" | tee -a $OUTPUTFILE
 }
 
+# kernel-rt-kvm package no longer provided in 9.7 and 10.1
+function rt_kvm_check ()
+{
+    if grep -q 'Red Hat Enterprise Linux 9' /etc/redhat-release; then
+        cki_kver_ge "5.14.0-581.el9" && return 1
+    elif grep -q 'Red Hat Enterprise Linux 10' /etc/redhat-release; then
+        cki_kver_ge "6.12.0-79.el10" && return 1
+    else
+        return 0
+    fi
+}
+
 function inst_kernel_rt_kvm ()
 {
     rt_kvm="${name}-kvm-${K_VER}-${K_REL}.${K_ARCH}"
@@ -531,7 +540,7 @@ rlJournalStart
         elif grep -q "release 8" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
         fi
-        if cki_is_kernel_rt; then
+        if cki_is_kernel_rt && rt_kvm_check; then
             inst_kernel_rt_kvm
         fi
 
