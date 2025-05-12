@@ -16,6 +16,7 @@
 # Include environments
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+
 rlJournalStart
 
     rlPhaseStartSetup
@@ -31,13 +32,14 @@ rlJournalStart
         rlRun "mkdir build; cd build"
         rlRun "cmake ../ -DCMAKE_PREFIX_PATH='/opt/rocm-6.2.0'"
         rlRun "make -j$(nproc)"
+        rlLog "Copy excludes file"
+        rlRun "cp ../../../../kfdtest.exclude ."
     rlPhaseEnd
 
     rlPhaseStartTest
         rlLog "Run kfdtest tests"
-        # ./run_kfdtest.sh -p aldebaran
-        # TODO: Identify which tests to run
-        ./kfdtest --gtest_filter=KFDMemoryTest.MapMemoryToGPU
+        # TODO: Select correct filter for different systems as they get available
+        ./run_kfdtest.sh -p RHEL9
     rlPhaseEnd
 
 rlJournalEnd
