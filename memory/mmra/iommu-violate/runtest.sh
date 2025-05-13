@@ -424,6 +424,10 @@ rlLog "Verifying the IOMMU is running in Translated mode."
 rlRun "ssh vm 'dmesg | grep \"iommu: Default domain type: Translated\"'" 0 "IOMMU should run in Translated Mode on the VM."
 rlRun "ssh vm 'grep -w DMA /sys/kernel/iommu_groups/*/type'" 0 "IOMMU should run in Translated Mode on the VM."
 
+# Configure the Name Servers on the VM
+rlLog "Configuring the Name Servers on the VM."
+rlRun "scp /etc/resolv.conf vm:/etc/resolv.conf"
+
 # Setup the Root Certificate on the VM
 rlLog "Setting up the Root Certificate on the VM."
 if ssh vm '[ -f /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt ]'; then
