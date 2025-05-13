@@ -13,3 +13,8 @@ root# bash ../../cki_bin/pkgs_install.sh metadata
 ```bash
 bash ./runtest.sh
 ```
+
+### Variables
+```bash
+KFDTEST_SKIP_BUILD: If true, skips build phase
+```

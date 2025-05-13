@@ -13,3 +13,9 @@ root# bash ../../cki_bin/pkgs_install.sh metadata
 ```bash
 bash ./runtest.sh
 ```
+
+### Variables
+```bash
+ROCBLAS_SKIP_BUILD: If true, skips build phase
+ROCBLAS_FULL_TEST: If true, enables full rocBLAS test (Long, and can hang the SUT)
+```
