@@ -132,8 +132,10 @@ patch_inc()
 patch-rtltp()
 {
 	echo "============ Patch rt_ltp ============" | tee -a $OUTPUTFILE
-	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0001-Correct-the-permissions-on-run_auto.sh.patch
-	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0002-Ensure-prio-wake-test-runs-on-a-single-core.patch
-	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0003-Fix-the-result-parsing-bug-for-pi-tests.patch
-	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0004-Only-analyze-testpi-log-if-the-test-was-actually-exe.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0001-Correct-the-permissions-on-run_auto.sh.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0002-Ensure-prio-wake-test-runs-on-a-single-core.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0003-Fix-the-result-parsing-bug-for-pi-tests.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0004-Only-analyze-testpi-log-if-the-test-was-actually-exe.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0001-Create-missing-log-directory-for-realtime-perf-laten.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0002-Enhance-log-checking-for-realtime-perf-latency.patch
 }

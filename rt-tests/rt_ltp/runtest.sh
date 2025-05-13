@@ -152,7 +152,7 @@ function runtest() {
     ./configure
 
     # default test-arguments: func, stress, perf, list
-    func_list=$(./run.sh -t list | grep "${TEST_TYPE// /\\|}" | sed 's/^\s*//')
+    func_list=$(./run.sh -t list | grep "${TEST_TYPE// /\\|}" | sed 's/^\s*//' | sort)
     while IFS= read -r case; do
         echo "=== Running $case ==="
         ./run.sh -p $RTLTP_PROFILE -t "$case"
