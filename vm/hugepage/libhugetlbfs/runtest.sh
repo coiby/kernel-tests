@@ -116,7 +116,7 @@ echo "HPCOUNT: $HPCOUNT" | tee -a $OUTPUTFILE
 #  is usually not needed because this test carries its own version of libhugetlbfs.
 cver=$(uname -r)
 
-if grep -q "release 6.[0-9] " /etc/redhat-release; then
+if grep -q "release 6.*" /etc/redhat-release; then
     # legacy known issue
     # TODO: BZ
     if uname -r | grep -q 686; then
