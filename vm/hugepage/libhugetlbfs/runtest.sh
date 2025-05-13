@@ -100,7 +100,7 @@ if [ "$HPCOUNT" -lt 6 ]; then
     HMEMSZ=$((HPCOUNT * $hpagesz / 1024))
 fi
 
-if [ -n "$hpagesz" -a "$hpagesz" -gt 0 ]; then
+if [ -n "$hpagesz" ] && [ "$hpagesz" -gt 0 ]; then
     HPSIZE="$(($hpagesz / 1024))M"
 else
     HPSIZE=0
@@ -247,7 +247,7 @@ EOF
                 # If we get message about low memory and free ram is not at least
                 # 10x what the test needs, assume we have low memory or the memory
                 # is too fragmented. Skip the test and exit with PASS.
-                if [ $? -eq 0 -a $mem_free -lt $(($HMEMSZ * 1024 * 10)) ]; then
+                if [ $? -eq 0 ] && [ $mem_free -lt $(($HMEMSZ * 1024 * 10)) ]; then
                         cat /proc/meminfo | tee -a $OUTPUTFILE
                         rstrnt-report-result Test_Skipped PASS 99
                         exit 0
