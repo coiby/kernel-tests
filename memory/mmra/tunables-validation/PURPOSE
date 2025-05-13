@@ -1,0 +1,16 @@
+Test for VM-related kernel tunables validate.
+
+The test works as follows:
+    checking if the tunable value correct one by one.
+
+See
+https://issues.redhat.com/browse/RHELMISC-3343
+https://issues.redhat.com/browse/VROOM-18563
+Test inputs:
+    expected_values  <== An array of tunables and the expected values.
+    current_value=$(cat "/proc/sys/vm/$tunable" 2>/dev/null)
+    "$current_value" -eq "$expected_value"
+Expected results:
+    [   PASS   ] :: $tunable expected: $expected_value, matches expected value!
+Results location:
+    output.txt
