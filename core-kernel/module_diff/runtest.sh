@@ -372,9 +372,9 @@ function DisplayModuleFail ()
 # kernel-rt-kvm package no longer provided in 9.7 and 10.1
 function rt_kvm_check ()
 {
-    if grep -q 'Red Hat Enterprise Linux 9' /etc/redhat-release; then
+    if grep -q 'Red Hat Enterprise Linux release 9' /etc/redhat-release; then
         cki_kver_ge "5.14.0-581.el9" && return 1
-    elif grep -q 'Red Hat Enterprise Linux 10' /etc/redhat-release; then
+    elif grep -q 'Red Hat Enterprise Linux release 10' /etc/redhat-release; then
         cki_kver_ge "6.12.0-79.el10" && return 1
     else
         return 0
