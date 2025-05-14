@@ -1,0 +1,18 @@
+[General]
+name=tunables-validation
+owner=mm-qe <mm-qe@redhat.com>
+description=Verifies that VM-related kernel tunables correct
+license=GPLv2
+_architectures=x86_64;ppc64;s390x;aarch64
+destructive=no
+confidential=no
+Releases=RHEL9
+
+[restraint]
+entry_point=./runtest.sh
+max_time=15m
+TestVersion=1.0
+Path=/kernel/memory/mmra/tunables-validation
+RunFor=kernel
+Priority=Normal
+repoRequires=automotive/include
