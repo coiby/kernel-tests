@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=wget;git;samba;time;patch;cups;samba-client;cifs-utils;gcc;bzip2;nfs-utils;net-tools
+dependencies=beakerlib;wget;git;samba;time;patch;cups;samba-client;cifs-utils;gcc;bzip2;nfs-utils;net-tools
 softDependencies=libnsl2;libtirpc-devel;python3-lxml;rusers
 environment=TEST=filesystems/cifs/connectathon
 repoRequires=cki_lib
