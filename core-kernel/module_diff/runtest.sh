@@ -373,9 +373,9 @@ function DisplayModuleFail ()
 function rt_kvm_check ()
 {
     if grep -q 'Red Hat Enterprise Linux release 9' /etc/redhat-release; then
-        cki_kver_ge "5.14.0-581.el9" && return 1
+        cki_kver_ge "5.14.0-581.el9" && return 1 || return 0
     elif grep -q 'Red Hat Enterprise Linux release 10' /etc/redhat-release; then
-        cki_kver_ge "6.12.0-79.el10" && return 1
+        cki_kver_ge "6.12.0-79.el10" && return 1 || return 0
     else
         return 0
     fi
