@@ -20,26 +20,34 @@
 rlJournalStart
 
     rlPhaseStartSetup
-        rlLog "Install build dependencies"
-        rlRun "dnf install -y cmake llvm llvm-devel numactl-devel"
-        rlLog "Build kfdtest"
-        rlRun "dnf install -y cmake llvm llvm-devel"
-        rlRun "git clone https://github.com/ROCm/ROCT-Thunk-Interface"
-        rlRun "cd ROCT-Thunk-Interface"
-        rlRun "git checkout rocm-6.2.x"
-        rlRun "git cherry-pick 8bb5764"
-        rlRun "cd tests/kfdtest/"
-        rlRun "mkdir build; cd build"
-        rlRun "cmake ../ -DCMAKE_PREFIX_PATH='/opt/rocm-6.2.0'"
-        rlRun "make -j$(nproc)"
-        rlLog "Copy excludes file"
-        rlRun "cp ../../../../kfdtest.exclude ."
+        if [[ ! -n $KFDTEST_SKIP_BUILD ]]; then
+            rlLog "Install build dependencies"
+            rlRun "dnf install -y cmake llvm llvm-devel numactl-devel"
+            rlLog "Build kfdtest"
+            rlRun "dnf install -y cmake llvm llvm-devel"
+            rlRun "git clone https://github.com/ROCm/ROCT-Thunk-Interface"
+            rlRun "pushd ROCT-Thunk-Interface"
+            rlRun "git checkout rocm-6.2.x"
+            rlRun "git cherry-pick 8bb5764"
+            rlRun "pushd tests/kfdtest/"
+            rlRun "mkdir build"
+            rlRun "pushd build"
+            rlRun "cmake ../ -DCMAKE_PREFIX_PATH='/opt/rocm-6.2.0'"
+            rlRun "make -j$(nproc)"
+            rlLog "Copy excludes file"
+            rlRun "cp ../../../../kfdtest.exclude ."
+            rlRun "popd"
+            rlRun "popd"
+            rlRun "popd"
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest
         rlLog "Run kfdtest tests"
         # TODO: Select correct filter for different systems as they get available
-        ./run_kfdtest.sh -p RHEL9
+        rlRun "pushd ROCT-Thunk-Interface/tests/kfdtest/build"
+        rlRun "./run_kfdtest.sh -p RHEL9"
+        rlRun "popd"
     rlPhaseEnd
 
 rlJournalEnd

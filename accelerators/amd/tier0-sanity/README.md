@@ -13,3 +13,8 @@ root# bash ../../cki_bin/pkgs_install.sh metadata
 ```bash
 bash ./runtest.sh
 ```
+
+### Variables
+```bash
+AMDGPU_MODULE_TEST: If true, performs AMDGPU module testing
+```
