@@ -235,7 +235,12 @@ EOF
     export LIBGUESTFS_BACKEND=direct
     export SUPERMIN_KERNEL=/boot/vmlinuz-$(uname -r)
     export SUPERMIN_MODULES=/lib/modules/$(uname -r)
-    guestfish --rw -a "$qcow2_image" -m /dev/sda3 -f guestfish.cmd || {
+
+    # Determine the partition to mount
+    local partition=$(guestfish --ro -a "$qcow2_image" -i list_partitions | sort -n | tail -n 1)
+
+    # Update the qcow2 image
+    guestfish --rw -a "$qcow2_image" -m "$partition" -f guestfish.cmd || {
         rlLogError "Failed to inject the SSH key into the VM image."
         return 1
     }
@@ -418,6 +423,10 @@ fi
 rlLog "Verifying the IOMMU is running in Translated mode."
 rlRun "ssh vm 'dmesg | grep \"iommu: Default domain type: Translated\"'" 0 "IOMMU should run in Translated Mode on the VM."
 rlRun "ssh vm 'grep -w DMA /sys/kernel/iommu_groups/*/type'" 0 "IOMMU should run in Translated Mode on the VM."
+
+# Configure the Name Servers on the VM
+rlLog "Configuring the Name Servers on the VM."
+rlRun "scp /etc/resolv.conf vm:/etc/resolv.conf"
 
 # Setup the Root Certificate on the VM
 rlLog "Setting up the Root Certificate on the VM."
