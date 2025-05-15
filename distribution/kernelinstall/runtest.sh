@@ -1357,6 +1357,17 @@ function Main ()
             DisableTmpRepo
             ARCH=$BeakerARCH
         fi
+
+        if [ "${KERNELARGPANICONOOPS:-}" == "1" ]; then
+            echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf
+            echo "Set panic_on_oops to 1"
+        fi
+
+        if [ "${KERNELARGPANICONWARN:-}" == "1" ]; then
+            echo "kernel.panic_on_warn = 1" >> /etc/sysctl.conf
+            echo "Set panic_on_warn to 1"
+        fi
+
         # Lets make it our default boot kernel the kernel we want to test
         SelectKernel $KERNELARGVERSION $KERNELARGVARIANT
         if [ "$?" -ne "0" ]; then
