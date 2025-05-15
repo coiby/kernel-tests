@@ -44,6 +44,14 @@ along with kernel-modules rpm. On RHEL8 and later distributions the extra
 package is not installed by default. Same for KERNELARGINTERNALMODULES="1",
 kernel-modules-internal will be installed if set to 1.
 
+You can optionally pass KERNELARGPANICONOOPS environment variable:
+KERNELARGPANICONOOPS="1"
+This does `echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf` after the kernel is installed.
+
+You can optionally pass KERNELARGPANICONWARN environment variable:
+KERNELARGPANICONOWARN="1"
+This does `echo "kernel.panic_on_warn = 1" >> /etc/sysctl.conf` after the kernel is installed.
+
 You can optionally pass MAX_REBOOT_TIME environment variable:
 MAX_REBOOT_TIME="0"
 
