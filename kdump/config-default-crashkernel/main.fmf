@@ -4,3 +4,4 @@ framework: beakerlib
 require:
 # Install the squashfs kernel module for the default crashkernel value to work
 - kernel-modules-core
+- kdump-utils
