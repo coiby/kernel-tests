@@ -23,6 +23,7 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-mallinfo02-introduce-LTP_VAR_USED-to-avoid-.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-statx07-Skip-test-if-NFS-service-is-never-enabled.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cve-2015-3290-Disable-AVX-for-x86_64.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-setsockopt10-handle-explicit-disallow-of-di.patch
 	fi
 	if [ "$TESTVERSION" == "20240930" ]; then
 		# Tips: this patch should be applied in single on ltp-next(version > 20180926)
