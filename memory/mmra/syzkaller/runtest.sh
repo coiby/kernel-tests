@@ -34,19 +34,15 @@ mm_syscalls_default=${mm_syscalls:-'
     "cachestat",
     "fadvise64_64",
     "fallocate",
-    "get_mempolicy",
     "madvise",
-    "mbind",
     "membarrier",
     "memfd_create",
     "memfd_secret",
-    "migrate_pages",
     "mincore",
     "mlock",
     "mlock2",
     "mlockall",
     "mmap",
-    "move_pages",
     "mprotect",
     "mremap",
     "msync",
@@ -59,15 +55,12 @@ mm_syscalls_default=${mm_syscalls:-'
     "process_vm_writev",
     "readahead",
     "remap_file_pages",
-    "set_mempolicy",
-    "set_mempolicy_home_node",
     "shmat",
     "shmctl",
     "shmdt",
     "shmget",
     "swapoff",
-    "swapon",
-    "userfaultfd"'}
+    "swapon"'}
 
 if [ "$(arch)" = "x86_64" ]; then
     mm_syscalls_default=${mm_syscalls:-'

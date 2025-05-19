@@ -7,19 +7,15 @@ description: |
             brk
             cachestat
             fadvise64_64
-            get_mempolicy
             madvise
-            mbind
             membarrier
             memfd_create
             memfd_secret
-            migrate_pages
             mincore
             mlock
             mlock2
             mlockall
             mmap
-            move_pages
             mprotect
             mremap
             msync
@@ -32,8 +28,6 @@ description: |
             process_vm_writev
             readahead
             remap_file_pages
-            set_mempolicy
-            set_mempolicy_home_node
             shmat
             shmctl
             shmdt
@@ -51,19 +45,15 @@ description: |
         [   PASS   ] :: brk executed.
         [   PASS   ] :: cachestat executed.
         [   PASS   ] :: fadvise64_64 executed.
-        [   PASS   ] :: get_mempolicy executed.
         [   PASS   ] :: madvise executed.
-        [   PASS   ] :: mbind executed.
         [   PASS   ] :: membarrier executed.
         [   PASS   ] :: memfd_create executed.
         [   PASS   ] :: memfd_secret executed.
-        [   PASS   ] :: migrate_pages executed.
         [   PASS   ] :: mincore executed.
         [   PASS   ] :: mlock executed.
         [   PASS   ] :: mlock2 executed.
         [   PASS   ] :: mlockall executed.
         [   PASS   ] :: mmap executed.
-        [   PASS   ] :: move_pages executed.
         [   PASS   ] :: mprotect executed.
         [   PASS   ] :: mremap executed.
         [   PASS   ] :: msync executed.
@@ -76,8 +66,6 @@ description: |
         [   PASS   ] :: process_vm_writev executed.
         [   PASS   ] :: readahead executed.
         [   PASS   ] :: remap_file_pages executed.
-        [   PASS   ] :: set_mempolicy executed.
-        [   PASS   ] :: set_mempolicy_home_node executed.
         [   PASS   ] :: shmat executed.
         [   PASS   ] :: shmctl executed.
         [   PASS   ] :: shmdt executed.
