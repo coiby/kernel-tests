@@ -437,6 +437,7 @@ RestartKdump()
     # It may report "No kdump initial ramdisk found.[WARNING]" in rhel6
     local skip_pat="No kdump initial ramdisk found|Warning: There might not be enough space to save a vmcore|Warning no default label"
     skip_pat+="|WARNING: Option 'default' was renamed 'failure_action' and will be removed in the future"
+    skip_pat+="|WARNING: this kernel does not support passing additional parameters to fadump capture kernel"
     if grep -q '^\s*raw' ${KDUMP_CONFIG}; then
         # If raw target. skip following warning as well
         skip_pat+="|signature on.*data loss is expected"
