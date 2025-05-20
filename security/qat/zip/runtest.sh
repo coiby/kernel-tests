@@ -74,7 +74,7 @@ rlPhaseStartSetup
 		rlRun "tar -xf linux-6.14.tar.xz"
 
 		# Configuration for Intel's qatzip-test
-		rlRun "rpm -i qatzip-1.3.1-1.el10.src.rpm"
+		rlRun "rpm -i qatzip-1.3.1-1.*.src.rpm"
 		rlRun "cp rpmbuild/SOURCES/qatzip-1.3.1.tar.gz ."
 		rlRun "tar -xzvf qatzip-1.3.1.tar.gz"
 		rlRun "cd QATzip-1.3.1/"
