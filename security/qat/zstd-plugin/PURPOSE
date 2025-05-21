@@ -6,4 +6,4 @@ README:
 This test suite is meant to be run using the `bkr workflow-kernel` or `bkr workflow-tomorrow`
 utility. At every run of the test suite, the QE must include the following:
 --task <link to internal beaker-core-tasks#command task> --taskparam CMDS_TO_RUN="dnf install -y <link to qat-zsd-plugin test target package rpm>"
---task <link to internal beaker-core-tasks#command task> --taskparam CMDS_TO_RUN="dnf install -y --enablerepo='*' qatlib-devel nasm"
+--task <link to internal beaker-core-tasks#command task> --taskparam CMDS_TO_RUN="dnf install -y --enablerepo='*' qatlib-devel nasm wget"
