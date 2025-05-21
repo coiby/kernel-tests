@@ -165,12 +165,14 @@ disable_wdt_test() {
 	# the program which should then cause the box to reboot.
 	rlLog "Disabling writes to /dev/watchdog... System should reboot in 60 seconds"
 	sync;sync
-	sleep 3
+	sleep 5
 	./watchdog-simple &
 	sleep 5
 	killall watchdog-simple
 	if command -v tmt-reboot &> /dev/null; then
 		rlLog "Inform tmt that we're rebooting using tmt-reboot with a custom non-reboot command."
+		sync
+		sleep 5
 		tmt-reboot -c "echo 'reboot using watchdog'"
 	fi
 	sleep 65
@@ -196,13 +198,15 @@ disable_wdt_test_custom_timeout() {
 	# the program which should then cause the box to reboot.
 	rlLog "Disabling writes to /dev/watchdog... System should reboot in 120 seconds"
 	sync;sync
-	sleep 3
+	sleep 5
 	./watchdog-set-custom-timeout
 	./watchdog-simple &
 	sleep 5
 	killall watchdog-simple
 	if command -v tmt-reboot &> /dev/null; then
 		rlLog "Inform tmt that we're rebooting using tmt-reboot with a custom non-reboot command."
+		sync
+		sleep 5
 		tmt-reboot -c "echo 'reboot using watchdog with custom timeout'"
 	fi
 	sleep 125
