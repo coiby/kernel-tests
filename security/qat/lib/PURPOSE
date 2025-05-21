@@ -8,5 +8,5 @@ https://intel.github.io/quickassist/qatlib/sample_code.html
 README:
 This test suite is meant to be run using the `bkr workflow-kernel` or `bkr workflow-tomorrow`
 utility. At every run of the test suite, the QE must include the following:
---task https://gitlab.cee.redhat.com/beaker/forked/beaker-core-tasks/-/archive/master/beaker-core-tasks-master.tar.gz#command --taskparam CMDS_TO_RUN="dnf install -y <link to qatlib test target package rpm>"
---task https://gitlab.cee.redhat.com/beaker/forked/beaker-core-tasks/-/archive/master/beaker-core-tasks-master.tar.gz#command --taskparam CMDS_TO_RUN="dnf install -y --enablerepo='*' qatlib-devel nasm"
+--task <link to internal beaker-core-tasks#command task> --taskparam CMDS_TO_RUN="dnf install -y <link to qatlib test target package rpm>"
+--task <link to internal beaker-core-tasks#command task> --taskparam CMDS_TO_RUN="dnf install -y --enablerepo='*' qatlib-devel nasm"
