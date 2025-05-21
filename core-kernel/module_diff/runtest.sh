@@ -480,18 +480,24 @@ function SetOSRelease ()
             503)
                 Release="9.5"
                 ;;
+            570)
+                Release="9.6"
+                ;;
             *)
                 # Still in developing phase, need to update in future.
-                Release="HEAD-9.6"
+                Release="HEAD-9.7"
                 ;;
         esac
     elif [[ "${K_VER}" = "6.12.0" ]];then
         # RHEL10
         OS="RHEL10"
         case ${Base} in
+            55)
+                Release="10.0"
+                ;;
             *)
-                # RHEL-10.0, developing phase
-                Release="HEAD-10.0"
+                # RHEL-10.1, developing phase
+                Release="HEAD-10.1"
                 ;;
         esac
     elif [[ -n "$(echo ${K_NAME} | grep kernel-pegas)" && "${K_VER}" = "4.10.0" ]]; then
@@ -590,29 +596,14 @@ rlJournalStart
             fi
         fi
 
-        if [[ "$Release" == "HEAD-9.6" ]]; then
-            if cki_kver_lt "5.14.0-508.el9"; then
-                sed -i "/gpio-regulator.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
-            fi
-            if cki_kver_lt "5.14.0-527.el9"; then
-                sed -i "/onboard_usb_hub.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-{aarch64,ppc64le}.lst
-            fi
-            if cki_kver_lt "5.14.0-520.el9"; then
-                sed -i "/^t10-pi.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
-            fi
-            if cki_kver_lt "5.14.0-534.el9"; then
-                sed -i "/^rtsx_pci_ms.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-{ppc64le,x86_64}.lst
-            fi
-            if cki_kver_lt "5.14.0-537.el9"; then
-                sed -i "/^tegra-ahb.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-builtin-aarch64.lst
-            fi
+        if [[ "$Release" == "HEAD-9.7" ]]; then
             if cki_kver_lt "5.14.0-571.el9"; then
                 sed -i "/intel-ishtp_eclite.ko/d;/intel-oaktrail.ko/d;/intel-plr_tpmi.ko/d;/intel-sdsi.ko/d;
                 /intel-tpmi_power_domains.ko/d;/intel-vsec.ko/d;
                 /intel-vsec_tpmi.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
             fi
         fi
-        if [[ "$Release" == "HEAD-10.0" ]]; then
+        if [[ "$Release" == "HEAD-10.1" ]]; then
             if cki_kver_lt "6.12.0-66.el10"; then
                 sed -i "/pci-pwrctl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
                 sed -i "/pci-pwrctrl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst

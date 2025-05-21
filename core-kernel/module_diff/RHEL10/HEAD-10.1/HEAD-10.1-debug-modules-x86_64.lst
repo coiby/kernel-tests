@@ -1,0 +1,4 @@
+acpi_configfs.ko
+acpi_dbg.ko
+ec_sys.ko
+erst-dbg.ko
