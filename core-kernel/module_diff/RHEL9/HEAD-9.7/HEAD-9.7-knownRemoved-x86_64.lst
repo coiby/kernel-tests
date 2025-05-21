@@ -1,0 +1,7 @@
+intel_oaktrail.ko
+intel_plr_tpmi.ko
+intel_sdsi.ko
+intel_tpmi_power_domains.ko
+intel_vsec.ko
+intel_vsec_tpmi.ko
+ishtp_eclite.ko
