@@ -61,8 +61,11 @@ function set_mem()
 		export MEM="${MEM:-4096M}"
 	} else {
 		echo "Sorry, the system RAM is too low to test."
+		if [[ -n "${TMT_TEST_NAME}" ]]; then
+			RSTRNT_TASKNAME="${TMT_TEST_NAME}"
+		fi
 		rstrnt-report-result $RSTRNT_TASKNAME SKIP
-		return 1
+		return 4
 	}
 	fi
 
@@ -92,7 +95,7 @@ rlJournalStart
 if [ ! -d "$tmpdir" ]; then
 	rlPhaseStartSetup
 		# setup MEM paramenter
-		rlRun "set_mem" 0
+		rlRun "set_mem" "0,4"
 		if [ $? -ne 0 ]; then
 			rlPhaseEnd
 			rlJournalEnd
