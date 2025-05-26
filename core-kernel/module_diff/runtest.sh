@@ -596,6 +596,12 @@ rlJournalStart
             fi
         fi
 
+        if [[ "$Release" == "9.6" ]]; then
+            if cki_kver_lt "5.14.0-570.14.1.el9_6"; then
+                sed -i "/x509_selftest.ko/d"  ${OS}/${Release}/${Release}-builtin-${ARCH}.lst
+            fi
+        fi
+
         if [[ "$Release" == "HEAD-9.7" ]]; then
             if cki_kver_lt "5.14.0-571.el9"; then
                 sed -i "/intel-ishtp_eclite.ko/d;/intel-oaktrail.ko/d;/intel-plr_tpmi.ko/d;/intel-sdsi.ko/d;
@@ -603,6 +609,7 @@ rlJournalStart
                 /intel-vsec_tpmi.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
             fi
         fi
+
         if [[ "$Release" == "HEAD-10.1" ]]; then
             if cki_kver_lt "6.12.0-66.el10"; then
                 sed -i "/pci-pwrctl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
