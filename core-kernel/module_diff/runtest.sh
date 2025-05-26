@@ -608,6 +608,11 @@ rlJournalStart
                 sed -i "/pci-pwrctl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
                 sed -i "/pci-pwrctrl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
             fi
+            if cki_kver_lt "6.12.0-86.el10"; then
+                sed -i "/raid6test.ko/d; /scsi_proto_test.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
+                sed -i "/mailbox-test.ko/d"  ${OS}/${Release}/${Release}-debug-knownRemoved-aarch64.lst
+                sed -i "/ntb_msi_test.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-x86_64.lst
+            fi
         fi
     rlPhaseEnd
 
