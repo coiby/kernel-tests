@@ -36,8 +36,14 @@ oneliner "pi_stress --quiet --duration=$PI_STRESS_DURATION --groups=$PI_STRESS_G
 oneliner "pi_stress --quiet --groups=$(( nrcpus )) --duration=30"
 
 if [[ -z "${PIP_STRESS_USLEEP}" ]]; then
-    # aarch64 and rt-debug requires more sleep to get an inversion triggered
-    if uname -r | grep -qE "aarch64|rt.*debug"; then
+    if uname -r | grep -qE "aarch64.*debug"; then
+        # takes more sleep for debug kernels to trigger an inversion, even more for aarch64 platforms
+        # aarch64+(rt-debug,debug,rhivos-debug): 1000000
+        # aarch64+(kernel,rt,rhivos) || x86_64+(rt-debug): 10000
+        # all the rest: 5000
+        PIP_STRESS_USLEEP=1000000
+    elif uname -r | grep -qE "aarch64|rt.*debug"; then
+        # aarch64 and rt-debug requires more sleep to get an inversion triggered; do not match automotive-debug
         PIP_STRESS_USLEEP=10000
     else
         # defaults in pip_stress is 500, and we still see failures on certain
