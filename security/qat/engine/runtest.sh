@@ -86,6 +86,7 @@ rlPhaseEnd
 
 rlPhaseStartCleanup
 	rlRun "systemctl stop qat"
+	rlRun "rm -fr zstd"
 rlPhaseEnd
 
 rlJournalPrintText
