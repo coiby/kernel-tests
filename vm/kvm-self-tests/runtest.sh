@@ -172,6 +172,15 @@ function disableTests
             fi
         fi
     fi
+    # Disable tests for RHIVOS Kernel (elxxiv)
+    if [[ $PRODUCT == "RHIVOS" ]]; then
+        if [[ $hwpf == "aarch64" ]]; then
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "page_fault_test")
+        fi
+        if [[ $hwpf == "x86_64" ]]; then
+            mapfile -d $'\0' -t ALL_TESTS < <(printf '%s\0' "${ALL_TESTS[@]}" | grep -Pzv "page_fault_test")
+        fi
+    fi
 }
 
 function setup
@@ -189,6 +198,12 @@ function setup
         OSVERSION="UPSTREAM"
     else
         OSVERSION="ARK"
+    fi
+
+    if cki_is_kernel_automotive; then
+        PRODUCT="RHIVOS"
+    else
+        PRODUCT="RHEL"
     fi
 
     # tests are currently supported on x86_64, aarch64, and s390x
