@@ -210,7 +210,11 @@ function get_default_addr()
     elif uname -r | grep x86_64; then
         cmp_file_list="_text Kernel_code Kernel_data Kernel_bss"
     elif uname -r | grep aarch64; then
-        cmp_file_list="_text Kernel_code Kernel_data"
+        if [ -e /sys/firmware/efi/efivars ]; then
+            cmp_file_list="_text Kernel_code Kernel_data"
+        else
+            cmp_file_list="_text"
+        fi
     elif uname -r | grep s390x; then
         cmp_file_list="_text Kernel_code Kernel_data Kernel_bss"
     else
