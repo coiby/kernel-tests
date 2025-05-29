@@ -21,6 +21,17 @@ description: |
       [   PASS   ] :: settimeofday executed.
       [   PASS   ] :: adjtimex executed.
       [   PASS   ] :: nanosleep executed.
+      [   PASS   ] :: timerfd_create executed.
+      [   PASS   ] :: timerfd_gettime executed.
+      [   PASS   ] :: timerfd_settime executed.
+      [   PASS   ] :: timer_create executed.
+      [   PASS   ] :: timer_delete executed.
+      [   PASS   ] :: timer_getoverrun executed.
+      [   PASS   ] :: timer_gettime executed.
+      [   PASS   ] :: timer_settime executed.
+      [   PASS   ] :: setitimer executed.
+      [   PASS   ] :: getitimer executed.
+      [   PASS   ] :: clock_adjtime executed.
   Results location:
       output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
@@ -54,7 +65,18 @@ environment:
       "gettimeofday",
       "settimeofday",
       "adjtimex",
-      "nanosleep"
+      "nanosleep",
+      "timerfd_create",
+      "timerfd_gettime",
+      "timerfd_settime",
+      "timer_create",
+      "timer_delete",
+      "timer_getoverrun",
+      "timer_gettime",
+      "timer_settime",
+      "setitimer",
+      "getitimer",
+      "clock_adjtime"
     supportcalls: ''
     git_patches: '../../../../general/time/time_fuzzing_test/time.patch'
 duration: 2h
