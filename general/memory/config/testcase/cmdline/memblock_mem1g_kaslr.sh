@@ -40,6 +40,10 @@ function memblock_mem1g_kaslr()
         limit=$use_mem
         use_mem=$(echo | awk -v use=$use_mem '{printf("0x%x", use)}')
     fi
+    if ((free_g > 32)); then
+        use_mem=0x100000000
+        limit=4294967296
+    fi
     if ((free_g > 128)); then
         use_mem=0x800000000
         limit=34359738368
