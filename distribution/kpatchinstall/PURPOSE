@@ -26,9 +26,13 @@ Parameters:
                    because kernel version might not be known ahead of time,
                    this parameter will add kernel yum repo at runtime
                    Example: http://myrepo.com/repos/#name/#version/#release/#arch/#kpatchnvr.#arch.rpm"
-  KERNELARGNAME    \
-  KERNELARGVERSION - please refer to kernelinstall task documentation
-  KERNELARGVARIANT /
+
+  Following params, please refer to kernelinstall task documentation
+
+  KERNELARGNAME
+  KERNELARGVERSION
+  KERNELARGVARIANT
+  KERNELARGEXTRAMODULES
 
 Example 1: install kpatch patches and latest supported kernel
 <task name="/distribution/kpatchinstall" role="STANDALONE">
