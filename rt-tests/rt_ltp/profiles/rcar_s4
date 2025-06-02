@@ -16,10 +16,13 @@
 # for local or global runs (<RT_TESTS_ROOT>/run.sh or <TESTDIR>/run_auto.sh)
 #
 
+# In this profile, the RHIVOS QE team has removed certain tests from the FuSa scope. Details are as follows:
+# https://issues.redhat.com/browse/VROOM-26713?focusedId=26888461&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-26888461
+
 # Pass if maximum time for signaled thread to be scheduled is less
 # than threshold (us).
 # Default threshold=100 us
-# func/async_handler			sync_handler -c 100
+# func/async_handler			sync_handler -c 100	# VROOM-26713
 func/async_handler				async_handler_jk -c 520
 
 # Pass if maximum lock time is less than threshold (us).
@@ -51,7 +54,7 @@ func/thread_clock				tc-2 -c 0.5
 # Default latency=10 us
 func/hrtimer-prio				hrtimer-prio -c 290
 
-# Skip the measurement tests for non-TSC support
+# VROOM-26713 & VROOM-24955: Skip the measurement tests for non-TSC support
 # func/measurement				preempt_timing
 # func/measurement				rdtsc-latency
 
@@ -61,8 +64,8 @@ func/sched_jitter				sched_jitter
 func/periodic_cpu_load			periodic_cpu_load
 func/periodic_cpu_load			periodic_cpu_load_single
 func/prio-wake					prio-wake
-func/sched_football				sched_football
-# func/pi-tests					testpi-0
+# func/sched_football			sched_football	# VROOM-26713
+# func/pi-tests					testpi-0		# VROOM-26713 & VROOM-24954
 # func/pi-tests					testpi-1
 # func/pi-tests					testpi-2
 # func/pi-tests					testpi-4
