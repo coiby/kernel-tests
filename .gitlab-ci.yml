@@ -264,7 +264,6 @@ check if LTP version on DCI matches the default on distribution/ltp/include-ng/i
   extends: .cki_tools
   stage: 🚀
   variables:
-    GIT_DEPTH: 100  # works for MRs <= 100 commits on top of the target branch
     FOOTER_CONFIG: |
       name: git-sync
       source_code: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/blob/main/.gitlab-ci.yml
@@ -311,10 +310,16 @@ check if LTP version on DCI matches the default on distribution/ltp/include-ng/i
       ```
       </details>
   script:
-    - git push --force
-      "https://git:${GITLAB_JOB_MIRROR_KERNEL_TESTS_MIRROR_ACCESS_TOKEN}@${INTERNAL_GITLAB_HOST}/${INTERNAL_GITLAB_PROJECT}.git"
-      "HEAD:refs/heads/$TARGET_BRANCH"
     - |
+      git_sync=(
+        git push --force
+        "https://git:${GITLAB_JOB_MIRROR_KERNEL_TESTS_MIRROR_ACCESS_TOKEN}@${INTERNAL_GITLAB_HOST}/${INTERNAL_GITLAB_PROJECT}.git"
+        "HEAD:refs/heads/$TARGET_BRANCH"
+      )
+      if ! "${git_sync[@]}"; then
+        git fetch --unshallow origin
+        "${git_sync[@]}"
+      fi
       if [[ -n "${CI_MERGE_REQUEST_PROJECT_ID:-}" ]]; then
         # delete old bot notes
         bot_user_id=$(
