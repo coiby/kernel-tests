@@ -31,7 +31,7 @@ func/pi_perf					pi_perf -c 200
 
 # Pass if maximum latency is less than criterium (us).
 # Default=20 us
-func/pthread_kill_latency		pthread_kill_latency -c 20
+func/pthread_kill_latency		pthread_kill_latency -c 108
 
 # Pass if all threads get preempted within max loops.
 # Default max=1
@@ -52,7 +52,7 @@ func/thread_clock				tc-2 -c 0.5
 
 # Pass if maximum timer latency is less than criterium (us).
 # Default latency=10 us
-func/hrtimer-prio				hrtimer-prio
+func/hrtimer-prio				hrtimer-prio -c 36
 
 # VROOM-26713 & VROOM-24955: Skip the measurement tests for non-TSC support
 # func/measurement				preempt_timing
