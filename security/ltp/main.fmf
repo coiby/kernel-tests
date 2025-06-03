@@ -28,6 +28,9 @@ require:
   - openssl-devel
   - pkgconf
   - xfsprogs-devel
+  - type: file
+    pattern:
+        - /kernel-include
 recommend:
   - numactl-devel
 duration: 4h
