@@ -25,7 +25,6 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cve-2015-3290-Disable-AVX-for-x86_64.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-setsockopt10-handle-explicit-disallow-of-di.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tracing-pt_test-TCONF-if-Intel-PT-across-VMXON-is-no.patch
-		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-ksm-fix-segfault-on-s390.patch
 	fi
 	if [ "$TESTVERSION" == "20240930" ]; then
 		# Tips: this patch should be applied in single on ltp-next(version > 20180926)
