@@ -138,7 +138,7 @@ do_net_config()
 	sed -i 's/run_test_v4v6 ${args} -R/#run_test_v4v6 ${args} -R/' txtimestamp.sh
 	sed -i 's/run_test_v4v6 ${args} -P/#run_test_v4v6 ${args} -P/' txtimestamp.sh
 	# remove python3 shebang for nl_netdev.py and bpf_offload.py
-	sed -i 's/python3 -sP\?/python3/' *.py
+	find . -type f -name '*.py' -exec sed -i 's/python3 -sP\?/python3/' {} +
 	# incase some test not add exec permission
 	chmod +x ./*.sh
 	popd || exit
@@ -406,7 +406,7 @@ do_tc-testing_config()
 	pushd "$EXEC_DIR"/tc-testing || exit
 	# extend test timeout
 	sed -i '/TIMEOUT/s/24/180/' tdc_config.py
-	sed -i 's/python3 -sP\?/python3/' *.py plugin-lib/*.py
+	find . -type f -name '*.py' -exec sed -i 's/python3 -sP\?/python3/' {} +
 	popd || exit
 }
 
