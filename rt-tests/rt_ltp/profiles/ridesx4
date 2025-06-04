@@ -23,15 +23,15 @@
 # than threshold (us).
 # Default threshold=100 us
 # func/async_handler			sync_handler -c 100	# VROOM-26713
-func/async_handler				async_handler_jk -c 520
+func/async_handler				async_handler_jk -c 100
 
 # Pass if maximum lock time is less than threshold (us).
 # Default threshold=200 us
-func/pi_perf					pi_perf -c 300
+func/pi_perf					pi_perf -c 200
 
 # Pass if maximum latency is less than criterium (us).
 # Default=20 us
-func/pthread_kill_latency		pthread_kill_latency -c 490
+func/pthread_kill_latency		pthread_kill_latency -c 108
 
 # Pass if all threads get preempted within max loops.
 # Default max=1
@@ -39,7 +39,7 @@ func/prio-preempt				prio-preempt -c 1
 
 # Pass if all delay are less than maxduration (us).
 # Default maxduration=100 us
-func/sched_latency				sched_latency -d 1 -t 5 -c 360
+func/sched_latency				sched_latency -d 1 -t 5 -c 100
 
 # Pass if ratio * average concurrent time < average sequential time
 # Default ratio=0.75
@@ -52,7 +52,7 @@ func/thread_clock				tc-2 -c 0.5
 
 # Pass if maximum timer latency is less than criterium (us).
 # Default latency=10 us
-func/hrtimer-prio				hrtimer-prio -c 290
+func/hrtimer-prio				hrtimer-prio -c 36
 
 # VROOM-26713 & VROOM-24955: Skip the measurement tests for non-TSC support
 # func/measurement				preempt_timing
