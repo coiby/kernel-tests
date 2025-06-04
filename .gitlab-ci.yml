@@ -265,8 +265,10 @@ check if LTP version on DCI matches the default on distribution/ltp/include-ng/i
   stage: 🚀
   variables:
     FOOTER_CONFIG: |
+      .schema: cki_lib/footer-schema.yml
       name: git-sync
       source_code: https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/blob/main/.gitlab-ci.yml
+      documentation_url: https://documentation.internal.cki-project.org/l/qe-repository-mirroring
       faq_name: CKI FAQ
       faq_url: https://cki-project.org/devel-faq/
       slack_name: '#team-kernel-cki'
