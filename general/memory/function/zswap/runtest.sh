@@ -11,12 +11,13 @@ set -o pipefail
 
 OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile}
 TASKID=${TASKID:-UNKNOWN}
+ARCH=$(uname -m)
 
 tmpdir=$(dirname $OUTPUTFILE)/zsawp_$TASKID
 
 function arch_check()
 {
-	if [ ${ARCH} = s390x ] || [ ${ARCH} = i386 ] || [ ${ARCH} = aarch64 ]; then
+	if [ ${ARCH} = s390x ] || [ ${ARCH} = i386 ]; then
 		echo " zswap has not been supported on ${ARCH}" | tee -a $OUTPUTFILE
 		rstrnt-report-result Test_Skipped PASS 99
 		exit 0
