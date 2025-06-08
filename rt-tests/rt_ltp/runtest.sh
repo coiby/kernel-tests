@@ -10,15 +10,20 @@
 TEST_VERSION=${TEST_VERSION:-20250130}
 RTLTP_PROFILE=${RTLTP_PROFILE:-default}
 
-# shellcheck disable=SC1091
 # Source rt common functions
+# shellcheck disable=SC1091
 . ../include/runtest.sh || exit 1
+# shellcheck disable=SC1091
 . ../../distribution/ltp/include-ng/include.sh || exit 1
+# shellcheck disable=SC1091
 . ../../cki_lib/libcki.sh || exit 1
 
 set -x
 
+# Test name and paths
 TEST="rt-tests/rt_ltp"
+TESTPATH=$(pwd)
+WORKSPACE="$HOME/rt_ltp"
 
 TEST_TYPE=${TEST_TYPE:-"func"}
 # TEST_TYPE = "func perf" to enable ./perf/latency
@@ -123,28 +128,65 @@ function check_status() {
     fi
 }
 
-function runtest() {
-    $PKGMGR wget gcc make automake || {
-        echo "dependent package install failed" | tee -a "$OUTPUTFILE"
-        rstrnt-report-result $TEST WARN 1
-        rlLog "Aborting test because dependent package install failed"
+function setup() {
+    if cki_is_kernel_automotive; then
+        # Ensure the workspace directory exists and is accessible
+        if [[ -z "$WORKSPACE" ]]; then
+            rlLogError "WORKSPACE variable is not set."
+        rstrnt-report-result "$TEST" WARN 1
+            exit 1
+        fi
+
+        mkdir -p "$WORKSPACE"
+        cd "$WORKSPACE" || {
+            rlLogError "Unable to access workspace directory '$WORKSPACE'."
+            rstrnt-report-result "$TEST" WARN 1
         exit 1
     }
 
-    # Downoad and setup ltp
+    if [[ -f ./setup.txt ]]; then
+            # LTP has already been set up, skip further initialization
+            rlLog "Setup already completed previously. Skipping initialization."
+            return
+        else
+            # Clean workspace to prepare for a fresh setup
+            rlLog "Cleaning workspace directory before LTP setup."
+            rm -rf ./*
+        fi
+    fi
+
+    # Install required dependencies
+    if ! $PKGMGR wget gcc make automake; then
+        echo "Failed to install required packages: wget, gcc, make, automake." | tee -a "$OUTPUTFILE"
+        rlLogError "Test aborted due to package installation failure."
+        rstrnt-report-result "$TEST" WARN 1
+        exit 1
+    fi
+
+    # Download and prepare the LTP suite
     download_ltp
     patch-rtltp
 
-    # Deploy the profile
-    if [[ $RTLTP_PROFILE != "default" ]]; then
-        cp ./profiles/$RTLTP_PROFILE ./ltp-full-$ltp_version/testcases/realtime/profiles/ || {
-            echo "Fail to deploy profile '$RTLTP_PROFILE'." | tee -a "$OUTPUTFILE"
-            rstrnt-report-result $TEST WARN 1
-            rlLog "Aborting test because profile deploy failed"
-            exit 1
-        }
-    fi
+    if cki_is_kernel_automotive; then
+        # Copy predefined test profiles to the appropriate LTP directory
+        local profile_dir="$WORKSPACE/ltp-full-$ltp_version/testcases/realtime/profiles/"
+        rlLog "Copying test profiles to: $profile_dir"
+        cp -v "$TESTPATH"/profiles/* "$profile_dir"
 
+        # Ensure the specified profile exists
+        if [[ ! -f "$profile_dir/$RTLTP_PROFILE" ]]; then
+            rlLogError "Profile '$RTLTP_PROFILE' not found in '$profile_dir'."
+            rstrnt-report-result "$TEST" WARN 1
+                        exit 1
+        fi
+
+        # Create a flag to indicate setup completion
+        date >./setup.txt
+        rlLog "LTP setup completed successfully."
+    fi
+}
+
+function runtest() {
     pushd "ltp-full-$ltp_version" || exit 1
     ./configure
 
@@ -173,5 +215,6 @@ function runtest() {
 }
 
 rt_env_setup
+setup
 runtest
 exit 0
