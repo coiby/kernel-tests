@@ -318,7 +318,10 @@ do_bpf_test_progs_config()
 	modprobe nf_conntrack
 	modprobe nf_nat
 
-	install_epel_pkg iptables-legacy || test_warn "Install iptables-legacy failed"
+	cat >> /usr/local/bin/iptables-legacy << EOF
+#!/bin/sh
+exec iptables-nft "$@"
+EOF
 }
 
 do_bpf_test_progs_run()
