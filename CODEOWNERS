@@ -211,12 +211,12 @@
 /watchdog/hw-generic/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 
 [kpet-db-maintainers]
-/accelerators/amd/build-setup/ @bgoncalv @lulinqing @olivergs @stowellm
-/accelerators/amd/kfdtest/ @bgoncalv @lulinqing @olivergs @stowellm
-/accelerators/amd/rocBLAS/ @bgoncalv @lulinqing @olivergs @stowellm
-/accelerators/amd/tier0-sanity/ @bgoncalv @lulinqing @olivergs @stowellm
-/accelerators/nvidia/openrm-build/ @bgoncalv @lulinqing @olivergs @stowellm
-/accelerators/nvidia/openrm-sanity/ @bgoncalv @lulinqing @olivergs @stowellm
+/accelerators/amd/build-setup/ @bgoncalv @imykytyn1 @lulinqing @olivergs @stowellm
+/accelerators/amd/kfdtest/ @bgoncalv @imykytyn1 @lulinqing @olivergs @stowellm
+/accelerators/amd/rocBLAS/ @bgoncalv @imykytyn1 @lulinqing @olivergs @stowellm
+/accelerators/amd/tier0-sanity/ @bgoncalv @imykytyn1 @lulinqing @olivergs @stowellm
+/accelerators/nvidia/openrm-build/ @bgoncalv @imykytyn1 @lulinqing @olivergs @stowellm
+/accelerators/nvidia/openrm-sanity/ @bgoncalv @imykytyn1 @lulinqing @olivergs @stowellm
 /container/podman/ @ajia2 @bgoncalv @lulinqing @stowellm @ypu2
 /core-kernel/Xarray-idr-radixtree-test/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang @stowellm
 /core-kernel/module_diff/ @bgoncalv @lulinqing @stowellm @zhijwang
