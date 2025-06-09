@@ -195,12 +195,26 @@ function runtest() {
 
     # default test-arguments: func, stress, perf, list
     func_list=$(./run.sh -t list | grep "${TEST_TYPE// /\\|}" | sed 's/^\s*//' | sort)
+
+    if cki_is_kernel_automotive; then
+        # If running on a debug kernel, check for a debug-specific profile variant
+        local profile=$RTLTP_PROFILE
+        if cki_is_kernel_debug; then
+            local debug_profile="${RTLTP_PROFILE}-kdebug"
+            if [[ -f "$WORKSPACE/ltp-full-$ltp_version/testcases/realtime/profiles/$debug_profile" ]]; then
+                rlLog "Detected debug kernel. Switching to debug-specific profile: '$debug_profile'"
+                profile="$debug_profile"
+            else
+                rlLog "Debug kernel detected, but no debug-specific profile '$debug_profile' found. Continuing with profile: '$RTLTP_PROFILE'."
+            fi
+        fi
+    fi
     while IFS= read -r case; do
         echo "=== Running $case ==="
-        ./run.sh -p $RTLTP_PROFILE -t "$case"
+        ./run.sh -p "$profile" -t "$case"
         local return_code=$?
         echo "=== Checking $case ==="
-        check_status "./run.sh -p $RTLTP_PROFILE -t $case" $return_code
+        check_status "./run.sh -p $profile -t $case" $return_code
     done <<<"$func_list"
 
     # shellcheck disable=SC2164
