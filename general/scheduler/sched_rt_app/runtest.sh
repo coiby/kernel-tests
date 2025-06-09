@@ -248,6 +248,11 @@ function test_setup()
 		folder=rt-app
 	fi
 
+	# WORKAROUND VROOM-30173: Patch the .h file to avoid redefinition and conflicts
+	if grep sched_setattr /usr/include/bits/sched.h; then
+		patch -p1 -d "$folder" < ./patch/remove_duplicated_definition.patch
+	fi
+
 	rlRun "pushd $folder" || rlDie "rt-app failed to download"
 
 	rlRun "autoreconf --install &> autoreconf.log"

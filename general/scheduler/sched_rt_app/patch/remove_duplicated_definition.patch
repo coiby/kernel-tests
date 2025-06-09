@@ -1,0 +1,52 @@
+diff -Naur rt-app.20210311.original/libdl/dl_syscalls.h rt-app.20210311.modified/libdl/dl_syscalls.h
+--- rt-app.20210311.original/libdl/dl_syscalls.h	2025-06-09 01:35:56.847867019 +0000
++++ rt-app.20210311.modified/libdl/dl_syscalls.h	2025-06-09 01:34:54.708196678 +0000
+@@ -85,11 +85,6 @@
+ #define SCHED_FLAG_UTIL_CLAMP_MIN       0x20
+ #define SCHED_FLAG_UTIL_CLAMP_MAX       0x40
+ 
+-#define SCHED_FLAG_KEEP_ALL 	(SCHED_FLAG_KEEP_POLICY | \
+-				 SCHED_FLAG_KEEP_PARAMS)
+-
+-#define SCHED_FLAG_UTIL_CLAMP	(SCHED_FLAG_UTIL_CLAMP_MIN | \
+-				 SCHED_FLAG_UTIL_CLAMP_MAX)
+ 
+ #define SCHED_FLAG_ALL	(SCHED_FLAG_RESET_ON_FORK	| \
+ 			 SCHED_FLAG_RECLAIM		| \
+@@ -97,36 +92,5 @@
+ 			 SCHED_FLAG_KEEP_ALL		| \
+ 			 SCHED_FLAG_UTIL_CLAMP)
+ 
+-struct sched_attr {
+-	__u32 size;
+-
+-	__u32 sched_policy;
+-	__u64 sched_flags;
+-
+-	/* SCHED_NORMAL, SCHED_BATCH */
+-	__s32 sched_nice;
+-
+-	/* SCHED_FIFO, SCHED_RR */
+-	__u32 sched_priority;
+-
+-	/* SCHED_DEADLINE */
+-	__u64 sched_runtime;
+-	__u64 sched_deadline;
+-	__u64 sched_period;
+-
+-	/* Utilization hints */
+-	__u32 sched_util_min;
+-	__u32 sched_util_max;
+-};
+-
+-int sched_setattr(pid_t pid,
+-		      const struct sched_attr *attr,
+-		      unsigned int flags);
+-
+-int sched_getattr(pid_t pid,
+-		      struct sched_attr *attr,
+-		      unsigned int size,
+-		      unsigned int flags);
+-
+ #endif /* __DL_SYSCALLS__ */
+ 
