@@ -615,6 +615,10 @@ rlJournalStart
                 sed -i "/pci-pwrctl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
                 sed -i "/pci-pwrctrl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
             fi
+            if cki_kver_lt "6.12.0-84.el10"; then
+                sed -i "/snd-acp-sdw-mach.ko/d; /snd-soc-acpi-intel-sdca-quirks.ko/d; /snd-soc-sdca.ko/d;
+                /snd-soc-rt721-sdca.ko/d; /snd-soc-rt-sdw-common.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+            fi
             if cki_kver_lt "6.12.0-86.el10"; then
                 sed -i "/raid6test.ko/d; /scsi_proto_test.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
                 sed -i "/mailbox-test.ko/d"  ${OS}/${Release}/${Release}-debug-knownRemoved-aarch64.lst
