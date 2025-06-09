@@ -154,42 +154,34 @@ rlJournalStart
 		# (wrongly set ARCH variable breaks LLVM tests!!)
 		unset ARCH
 
-		export KERNEL_PKG_NAME="kernel-$KERNEL"
-		if [ $(is_kernel_rt) -eq 0 ]; then
-			export KERNEL_DEBUGINFO_PKG_NAME="kernel-rt-debuginfo-$KERNEL"
-	        else
-	                export KERNEL_DEBUGINFO_PKG_NAME="kernel-debuginfo-$KERNEL"
-	                if cki_is_kernel_automotive; then
-	                       export KERNEL_DEBUGINFO_PKG_NAME="kernel-automotive-debuginfo-$KERNEL"
-	                       export KERNEL_PKG_NAME="kernel-automotive-$KERNEL"
-	                fi
-	        fi
-		echo $KERNEL | grep -q debug
-		if [ $? -eq 0 ]; then
-			export KERNEL=${KERNEL%[.+]debug}
-			if [ $(is_kernel_rt) -eq 0 ]; then
-				export KERNEL_PKG_NAME="kernel-rt-debug-$KERNEL"
-				export KERNEL_DEBUGINFO_PKG_NAME="kernel-rt-debug-debuginfo-$KERNEL"
-			else
-				export KERNEL_PKG_NAME="kernel-debug-$KERNEL"
-				export KERNEL_DEBUGINFO_PKG_NAME="kernel-debug-debuginfo-$KERNEL"
-			fi
+		kernel_name=$(rpm -q --queryformat '%{name}\n' -qf "/boot/config-$(uname -r)" | sed 's/-core//')
+		KERNEL_PKG_NAME="$kernel_name-$KERNEL"
+		KERNEL_DEBUGINFO_PKG_NAME="$kernel_name-debuginfo-$KERNEL"
+
+		# strip-off the "+debug" and "+64k" suffix if present
+		export KERNEL_DEBUGINFO_PKG_NAME=${KERNEL_DEBUGINFO_PKG_NAME%[+.]*}
+		export KERNEL_PKG_NAME=${KERNEL_PKG_NAME%[+.]*}
+
+		if cki_is_kernel_automotive; then
+			export KERNEL_PKG_NAME="kernel-automotive-$KERNEL"
+			export KERNEL_DEBUGINFO_PKG_NAME="kernel-automotive-debuginfo-$KERNEL"
 		fi
+
 		rlLog "Variables:"
 		rlLog "KERNEL = $KERNEL"
 		rlLog "KERNEL_PKG_NAME = $KERNEL_PKG_NAME"
 		rlLog "KERNEL_DEBUGINFO_PKG_NAME = $KERNEL_DEBUGINFO_PKG_NAME"
 		rpmquery $KERNEL_DEBUGINFO_PKG_NAME
 		if [ $? -ne 0 ]; then
-	                INSTALL_CMD="debuginfo-install -y"
-	                if cki_is_kernel_automotive; then
-	                    INSTALL_CMD="rpm-ostree -A --idempotent --allow-inactive install"
-		        else
-			    # we need to install debuginfo for the proper kernel
-			    # but sometimes, debuginfo-install is not available!
-			    which debuginfo-install || rlRun "yum -y install yum-utils dnf-utils" 0 "Installing {yum,dnf}-utils (it has not been present)"
-	                fi
-	                rlRun "$INSTALL_CMD $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing ($KERNEL_DEBUGINFO_PKG_NAME) via ($INSTALL_CMD)"
+			INSTALL_CMD="debuginfo-install -y"
+			if cki_is_kernel_automotive; then
+				INSTALL_CMD="rpm-ostree -A --idempotent --allow-inactive install"
+			else
+				# we need to install debuginfo for the proper kernel
+				# but sometimes, debuginfo-install is not available!
+				which debuginfo-install || rlRun "yum -y install yum-utils dnf-utils" 0 "Installing {yum,dnf}-utils (it has not been present)"
+			fi
+			rlRun "$INSTALL_CMD $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing ($KERNEL_DEBUGINFO_PKG_NAME) via ($INSTALL_CMD)"
 		fi
 		rpmquery $KERNEL_DEBUGINFO_PKG_NAME
 		if [ $? -ne 0 ]; then
