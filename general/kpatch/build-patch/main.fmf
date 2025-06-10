@@ -1,0 +1,23 @@
+summary: kpatch build test for kpatch-patch modules
+description: |
+    kpatch build test for kpatch-patch modules
+contact: Roberto Bergantinos Corpas <rbergant@redhat.com>
+component:
+  - kernel
+path: /general/kpatch/build
+test: bash +x runtest.sh
+framework: beakerlib
+require:
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
+recommend:
+  - git
+  - make
+  - openssl-devel
+  - flex
+  - rpm-build
+  - kernel-debuginfo
+  - python3-devel
+  - redhat-sb-certs
+duration: 480m
