@@ -13,16 +13,20 @@
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
 
+if cki_is_baremetal; then
+	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-0.1}
+fi
+
 # VMs can have slow performance, therefore increase LTP_TIMEOUT_MUL
 if cki_is_vm; then
 	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
-	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-5}
+	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-0.2}
 fi
 
 # debug kernel is slower increase LTP_TIMEOUT_MUL
 if cki_is_kernel_debug; then
 	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
-	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-5}
+	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-0.2}
 fi
 
 [ -n "${LTP_TIMEOUT_MUL}" ] && echo "LTP_TIMEOUT_MUL is ${LTP_TIMEOUT_MUL}"
