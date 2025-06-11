@@ -455,9 +455,14 @@ InstallKpatchPatchDebuginfo()
     # Example of a kpatch-patch debuginfo pkg "kpatch-patch-4_18_0-107-debuginfo-0-1.test.el8.x86_64"
     kpp_debuginfo_pkg=$(echo "$kpp_pkg" | sed 's/-/-debuginfo-/4')
 
-    # Kpatch-patch repo is supposed to be ready during test
+    brew_pkgs="http://download.devel.redhat.com/brewroot/packages"
+    kpp_name=$(rpm -q --queryformat "%{NAME}" $kpp_pkg)
+    kpp_version=$(rpm -q --queryformat "%{VERSION}" $kpp_pkg)
+    kpp_release=$(rpm -q --queryformat "%{RELEASE}" $kpp_pkg)
+    kpp_arch=$(rpm -q --queryformat "%{ARCH}" $kpp_pkg)
     rpm -q "${kpp_debuginfo_pkg}" || {
-        InstallPackages "${kpp_debuginfo_pkg}" || Error "Failed to install ${kpp_debuginfo_pkg}"
+        InstallPackages "${brew_pkgs}/${kpp_name}/${kpp_version}/${kpp_release}/${kpp_arch}/${kpp_debuginfo_pkg}.rpm" || \
+            Error "Failed to install ${kpp_debuginfo_pkg}"
     }
 
 }
