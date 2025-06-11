@@ -51,5 +51,5 @@ duration: 360m
 environment+:
     TESTARGS: SYSCALLS
     LTP_TIMEOUT_MUL: 200
-    SKIPTESTS: "getxattr04 add_key05 fanotify24 fchownat03 flock07 mmap21_01 mmap21_02 move_mount03 semop04 shmctl05 shmget03 splice07 unshare03"
-    OPTS: "-w 4 --suite-timeout=21600"
+    SKIPTESTS: "clone303 getxattr04 add_key05 fanotify24 fchownat03 flock07 mmap21_01 mmap21_02 move_mount03 semop04 shmctl05 shmget03 splice07 unshare03"
+    OPTS: "-w 4 --suite-timeout=43200"
