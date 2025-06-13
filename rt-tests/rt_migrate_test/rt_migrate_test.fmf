@@ -6,8 +6,9 @@ component:
 path: /rt-tests/rt_migrate_test
 test: bash ./runtest.sh
 framework: shell
-require:
+recommend:
   - realtime-tests
+  - rt-tests
 duration: 1h
 tag: NoRHIVOS
 enabled: true

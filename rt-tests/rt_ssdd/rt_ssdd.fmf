@@ -6,8 +6,9 @@ component:
 path: /rt-tests/rt_ssdd
 test: bash ./runtest.sh
 framework: shell
-require:
+recommend:
   - realtime-tests
+  - rt-tests
 duration: 30m
 environment:
   NFORKS: 10

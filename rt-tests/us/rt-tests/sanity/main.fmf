@@ -78,8 +78,10 @@ framework: shell
 require:
     - procps-ng
     - psmisc
-    - realtime-tests
     - type: file
       pattern:
           - /rt-tests/include
+recommend:
+    - realtime-tests
+    - rt-tests
 duration: 60m

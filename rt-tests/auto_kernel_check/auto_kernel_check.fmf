@@ -7,7 +7,6 @@ path: /rt-tests/auto_kernel_check
 test: bash ./runtest.sh
 framework: shell
 require:
-    - realtime-tests
     - stress-ng
     - stalld
     - bc
@@ -28,6 +27,9 @@ require:
     - type: file
       pattern:
           - /automotive/include
+recommend:
+    - realtime-tests
+    - rt-tests
 duration: 20m
 extra-summary: /rt-tests/auto_kernel_check
 extra-task: /rt-tests/auto_kernel_check
