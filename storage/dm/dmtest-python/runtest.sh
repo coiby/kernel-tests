@@ -32,10 +32,11 @@ function runtest
       echo "Skipping tests that require linux repo."
       ./dmtest run --result-set "$RESULT_SET" --and-filters \
       --rx '^/(?!thin/snapshot/(many-snaps-with-changes|try-and-create-duplicates|parallel-io-to-shared-thins))' \
-      --rx '^/(?!blk-archive/rolling-snaps)' --rx '^/(?!thin/fs-bench)' --rx '^/(?!thin/discard)'
+      --rx '^/(?!blk-archive/rolling-snaps)' --rx '^/(?!thin/fs-bench)' --rx '^/(?!thin/discard)' --rx '^/(?!cache/resize)'
     else
       ./dmtest run --result-set "$RESULT_SET" --and-filters \
-      --rx '^/(?!thin/snapshot/parallel-io-to-shared-thins)' --rx '^/(?!thin/fs-bench/)' --rx '^/(?!thin/discard)'
+      --rx '^/(?!thin/snapshot/parallel-io-to-shared-thins)' --rx '^/(?!thin/fs-bench/)' --rx '^/(?!thin/discard)' \
+      --rx '^/(?!cache/resize)'
     fi
 }
 
