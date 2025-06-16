@@ -1,0 +1,14 @@
+summary: tests for eevdf scheduler
+description: |
+    Test sched eevdf related syscalls, for now sched_setattr syscall.
+    TODO: verify the slice from the function perspective.
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+recommend: []
+duration: 10m
+extra-summary: /kernel/general/scheduler/sched_eevdf
+extra-task: /kernel/general/scheduler/sched_eevdf
