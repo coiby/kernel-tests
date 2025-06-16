@@ -1,0 +1,19 @@
+summary: check if PSI featrue works
+description: |
+    Linux Kernel 4.20 includes PSI metrics (pressure stall information) for CPU, memory, and IO.
+    PSI provides for the first time metrics for resources.
+    Both the kernel and cgroup2 include pressure metrics.
+
+    This case will run stress-ng to generate stress of resources, and check if statistics of PSI increses.
+    Then move stressful process to Cgroup v2 subsystem, check if PSI works in Cgroup v2.
+    For trigger registered, the case would generate stress in the same group that trigger in.
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+recommend: []
+duration: 90m
+extra-summary: /kernel/general/schedular/sched_psi
+extra-task: /kernel/general/schedular/sched_psi
