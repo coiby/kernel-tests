@@ -163,7 +163,7 @@ configure()
 build_all()
 {
 	setup_testarea
-	if [[ "y" == ${USE_LTP_RPM} ]]; then
+	if [[ "y" == "${USE_LTP_RPM}" ]]; then
 		dnf copr -y enable pifang/ltp
 		dnf install -y ltp
 	elif [[ -z ${LTP_COMMIT_ID} ]]; then
@@ -195,7 +195,7 @@ build_all()
 	fi
 
 	install_kirk
-	if [[ "y" == ${USE_LTP_RPM} ]]; then
+	if [[ "y" == "${USE_LTP_RPM}" ]]; then
 		return
 	fi
 
