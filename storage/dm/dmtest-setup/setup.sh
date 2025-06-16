@@ -23,8 +23,8 @@ source ../../../kernel-include/runtest.sh
 DT_TARBALL="https://github.com/RobinTMiller/dt/archive/master.zip"
 BUFIO_REPO="https://github.com/bmarzins/bufio-test/"
 LINUX_REPO="https://github.com/torvalds/linux"
-BLK_ARCHIVE_REPO="https://github.com/jthornber/blk-archive"
-DMTS_REPO="https://github.com/jthornber/dmtest-python.git"
+BLK_ARCHIVE_REPO="https://github.com/device-mapper-utils/blk-archive"
+DMTS_REPO="https://github.com/device-mapper-utils/dmtest-python.git"
 DMTS_LOCAL="/opt/$(basename $DMTS_REPO | sed 's%.git%%')"
 SETUP_FLAG=".SETUP_PASS"
 
