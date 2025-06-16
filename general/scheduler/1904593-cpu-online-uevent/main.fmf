@@ -1,0 +1,16 @@
+summary: spam cpu online/offline events to test for regression
+description: |
+    This is a regression test for bz1904593. It rapidly offlines and onlines a cpu
+    while setting its affinity. If the affinity is set too quickly after the cpu
+    comes online it can fail. This tests for a regression of the issue.
+contact: Waylon Cude <wcude@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+recommend:
+  - libudev-devel
+duration: 30m
+extra-summary: /kernel/general/scheduler/1904593-cpu-online-uevent
+extra-task: /kernel/general/scheduler/1904593-cpu-online-uevent
