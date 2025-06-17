@@ -33,6 +33,11 @@ PACKAGE="rpm"
 
 rlJournalStart
     rlPhaseStartSetup
+        if [ -e /proc/sys/crypto/fips_enabled ] && [ "$(cat /proc/sys/crypto/fips_enabled)" = "1" ]; then
+            echo "FIPS mode enabled, skipping tests."
+            rstrnt-report-result "$RSTRNT_TASKNAME" SKIP
+            exit 0
+        fi
         rlAssertRpm $PACKAGE
         BACKUP=false
         if [[ -e ~/.rpmmacros || -d /root/.gnupg ]]; then
