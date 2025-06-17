@@ -1,0 +1,12 @@
+[General]
+name=64k kernel verification
+owner=Eddie Kovsky <ekovsky@redhat.com>
+description=Verify that a 4k kernel is not installed alongside the 64k kernel
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=make run
+dependencies=make;gcc
+max_time=5m
