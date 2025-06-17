@@ -104,9 +104,10 @@ do_net_config()
 
 	pushd "$EXEC_DIR"/net || exit
 	# Fix some known issues
-	# rm 0x10 for fib_rule_tests.sh due to bz1480136
+	# rm 0x10 for fib_rule_tests.sh due to bz1480136 and RHEL-79454
 	# FIXME: should we restore it back after finishing test?
-	sed -i "/0x10/d" /etc/iproute2/rt_dsfield
+	sed -i 's/0x10/#0x10/' /etc/iproute2/rt_dsfield
+	sed -i 's/0x10/#0x10/' /usr/share/iproute2/rt_dsfield
 	# FIXME: sleep 5s before do IPv6 "Using route with mtu metric" test to
 	# pass it. Not sure why ping would fail if not sleep some seconds, need to check
 	sed -i "/via 2001:db8:101::2 mtu 1300/a\\\\tsleep 5" fib_tests.sh
