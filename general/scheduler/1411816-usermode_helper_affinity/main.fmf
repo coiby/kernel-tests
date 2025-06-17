@@ -1,0 +1,15 @@
+summary: user mode helper affinity test
+description: |
+    User mode helper is user process started by kernel thread.
+    This case test the affinitibility to CPU mask for a user
+    mode helper.
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+recommend: []
+duration: 30m
+extra-summary: /kernel/general/scheduler/1411816-usermode_helper_affinity
+extra-task: /kernel/general/scheduler/1411816-usermode_helper_affinity

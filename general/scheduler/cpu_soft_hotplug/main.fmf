@@ -1,0 +1,16 @@
+summary: excercise scheduler by online offline cpus operations
+description: |
+    cpu offline and online operations will excercise scheduler code heavily.
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - libgcc
+  - glibc-devel
+  - psmisc
+  - numactl
+recommend: []
+duration: 1h
+extra-summary: kernel/general/scheduler/cpu_soft_hotplug
+extra-task: kernel/general/scheduler/cpu_soft_hotplug

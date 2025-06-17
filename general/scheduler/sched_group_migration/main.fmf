@@ -1,0 +1,19 @@
+summary: Test cpu cgroup migration
+description: |
+    This is a test for process migration test between different cgroups (sched)
+
+    REGRESSION covered list:
+    bz1738415: Bug 1738415 - Backport "sched: Fix race between task_group and sched_task_group"
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+  - wget
+  - bc
+recommend:
+  - json-c-devel
+duration: 30m
+extra-summary: /kernel/general/scheduler/sched_group_migration
+extra-task: /kernel/general/scheduler/sched_group_migration

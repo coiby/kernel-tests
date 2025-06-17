@@ -1,0 +1,21 @@
+summary: sched load avg check
+description: |
+    We start some processes with different sleep/run time. Then
+    collect the loagavg date through /proc/loadavg or userspace
+    sar -q 5 10 command. And report it to beaker test results.
+
+    Also we can compare with the last baseline, if the value changes
+    wildly or event mildly, we should mark it with a alarm warn.
+
+    We should know that, the value is effecting our customer applications
+    directly. So a small change will lead to customer app's wrong decision.
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+recommend: []
+duration: 720m
+extra-summary: /kernel/general/scheduler/sched_load_avg
+extra-task: /kernel/general/scheduler/sched_load_avg
