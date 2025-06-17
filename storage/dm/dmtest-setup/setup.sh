@@ -134,8 +134,8 @@ function install_blk_archive
     git clone "$BLK_ARCHIVE_REPO" "$blk_path"
 
     pushd "$blk_path" || return 1
-    cargo build --release
-    cargo install --path .
+    cargo build --release || return 1
+    cargo install --locked --path . || return 1
     export PATH="$PATH":~/.cargo/bin
     popd || return 1
     return 0
