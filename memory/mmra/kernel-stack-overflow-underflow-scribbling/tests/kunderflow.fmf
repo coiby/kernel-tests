@@ -14,6 +14,7 @@ require:
     pattern:
       - /kernel-include
       - /memory/mmra/userspace-stack-overflow-underflow-scribbling/stacklib.c
+      - /memory/mmra/userspace-stack-overflow-underflow-scribbling/stacklib.h
 duration: 30m
 restart-on-exit-code:
     - 255
