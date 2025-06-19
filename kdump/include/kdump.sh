@@ -44,8 +44,8 @@ DefKdumpMem()
         fi
 
     elif $IS_RHEL9 || $IS_CentOS9; then
-        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
-        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
+        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-2G:192M,2G-64G:256M,64G-:512M"
+        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-2G:192M,2G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
             args="crashkernel=0G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
             [[ "$1" = fadump ]] && args="crashkernel=0G-16G:768M,16G-64G:1G,64G-128G:2G,128G-1T:4G,1T-2T:6G,2T-4T:12G,4T-8T:20G,8T-16T:36G,16T-32T:64G,32T-64T:128G,64T-:180G"
@@ -53,8 +53,8 @@ DefKdumpMem()
         fi
 
     elif $IS_RHEL10 || $IS_CentOS10; then
-        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
-        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
+        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-64G:256M,64G-:512M"
+        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
             args="crashkernel=0G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
             [[ "$1" = fadump ]] && args="crashkernel=0G-16G:768M,16G-64G:1G,64G-128G:2G,128G-1T:4G,1T-2T:6G,2T-4T:12G,4T-8T:20G,8T-16T:36G,16T-32T:64G,32T-64T:128G,64T-:180G"
@@ -62,8 +62,8 @@ DefKdumpMem()
         fi
 
     elif $IS_FC; then
-        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
-        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-4G:192M,4G-64G:256M,64G-:512M"
+        if   [[ "${K_ARCH}"  = "x86_64" ]]; then args="crashkernel=0G-64G:256M,64G-:512M"
+        elif [[ "${K_ARCH}"  = "s390x"  ]]; then args="crashkernel=0G-64G:256M,64G-:512M"
         elif [[ "${K_ARCH}"  = ppc64*  ]]; then
             args="crashkernel=0G-4G:384M,4G-16G:512M,16G-64G:1G,64G-128G:2G,128G-:4G"
         elif [[ "${K_ARCH}"  = "aarch64"  ]]; then args="crashkernel=0G-4G:256M,4G-64G:766M,64G-:1G"
@@ -124,7 +124,7 @@ IfMemoryAboveThreshold()
         elif [[ "${K_ARCH}" = "aarch64" ]] && [ $mem -ge 2048 ]; then
             retval=0
         fi
-    elif $IS_RHEL8 || $IS_RHEL9 || $IS_FC; then
+    elif $IS_RHEL8 || $IS_RHEL9; then
         if   [[ "${K_ARCH}" = "x86_64" ]] && [ $mem -ge 1024 ]; then
             retval=0
         elif [[ "${K_ARCH}" = "ppc64"  ]] && [ $mem -ge 2048 ]; then
@@ -132,6 +132,18 @@ IfMemoryAboveThreshold()
         elif [[ "${K_ARCH}" = "ppc64le" ]] && [ $mem -ge 2048 ]; then
             retval=0
         elif [[ "${K_ARCH}" = "s390x" ]] && [ $mem -ge 1024 ]; then
+            retval=0
+        elif [[ "${K_ARCH}" = "aarch64" ]] && [ $mem -ge 2048 ]; then
+            retval=0
+        fi
+    elif $IS_RHEL10 || $IS_FC; then
+        if   [[ "${K_ARCH}" = "x86_64" ]] && [ $mem -ge 2048 ]; then
+            retval=0
+        elif [[ "${K_ARCH}" = "ppc64"  ]] && [ $mem -ge 2048 ]; then
+            retval=0
+        elif [[ "${K_ARCH}" = "ppc64le" ]] && [ $mem -ge 2048 ]; then
+            retval=0
+        elif [[ "${K_ARCH}" = "s390x" ]] && [ $mem -ge 2048 ]; then
             retval=0
         elif [[ "${K_ARCH}" = "aarch64" ]] && [ $mem -ge 2048 ]; then
             retval=0
