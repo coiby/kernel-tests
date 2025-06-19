@@ -323,6 +323,7 @@ do_bpf_test_progs_config()
 #!/bin/sh
 exec iptables-nft "$@"
 EOF
+	chmod +x /usr/local/bin/iptables-legacy
 }
 
 do_bpf_test_progs_run()
