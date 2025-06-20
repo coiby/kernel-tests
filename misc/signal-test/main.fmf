@@ -9,5 +9,6 @@ test: bash -x ./runtest.sh
 framework: shell
 require:
   - gcc
+  - man-pages
 duration: 10m
 id: aa2d44c4-8fdf-466b-ad29-85ba755c49d5

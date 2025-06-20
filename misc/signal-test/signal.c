@@ -7,50 +7,51 @@
 #include <errno.h>
 #include <sys/resource.h>
 
+#define BEHAVIOR_IGNORE 0x01
+#define BEHAVIOR_CORE   0x02
+#define BEHAVIOR_TERM   0x04
+#define BEHAVIOR_STOP   0x08
+
 typedef struct {
     int signum;
-    const char *signame;
-    const char *expected_action;
-    int should_terminate;
-    int should_core;
-    int should_stop;
-    int can_be_ignored;
+    char signame[10];
+    char expected_action[10];
+    int action_flags;
 } signal_desc;
 
-signal_desc test_cases[] = {
-    {SIGHUP,    "SIGHUP",    "Term",         1, 0, 0, 1},
-    {SIGINT,    "SIGINT",    "Term",         1, 0, 0, 1},
-    {SIGQUIT,   "SIGQUIT",   "Core",         1, 1, 0, 1},
-    {SIGILL,    "SIGILL",    "Core",         1, 1, 0, 1},
-    {SIGTRAP,   "SIGTRAP",   "Core",         1, 1, 0, 1},
-    {SIGABRT,   "SIGABRT",   "Core",         1, 1, 0, 1},
-    {SIGBUS,    "SIGBUS",    "Core",         1, 1, 0, 1},
-    {SIGFPE,    "SIGFPE",    "Core",         1, 1, 0, 1},
-    {SIGKILL,   "SIGKILL",   "Term",         1, 0, 0, 0},
-    {SIGUSR1,   "SIGUSR1",   "Term",         1, 0, 0, 1},
-    {SIGSEGV,   "SIGSEGV",   "Core",         1, 1, 0, 1},
-    {SIGUSR2,   "SIGUSR2",   "Term",         1, 0, 0, 1},
-    {SIGPIPE,   "SIGPIPE",   "Term",         1, 0, 0, 1},
-    {SIGALRM,   "SIGALRM",   "Term",         1, 0, 0, 1},
-    {SIGTERM,   "SIGTERM",   "Term",         1, 0, 0, 1},
-    {SIGSTKFLT, "SIGSTKFLT", "Term",         1, 0, 0, 1},
-    {SIGCHLD,   "SIGCHLD",   "Ign",          0, 0, 0, 1},
-    {SIGCONT,   "SIGCONT",   "Cont",         0, 0, 0, 1},
-    {SIGSTOP,   "SIGSTOP",   "Stop",         0, 0, 1, 0},
-    {SIGTSTP,   "SIGTSTP",   "Stop",         0, 0, 1, 1},
-    {SIGTTIN,   "SIGTTIN",   "Stop",         0, 0, 1, 1},
-    {SIGTTOU,   "SIGTTOU",   "Stop",         0, 0, 1, 1},
-    {SIGURG,    "SIGURG",    "Ign",          0, 0, 0, 1},
-    {SIGXCPU,   "SIGXCPU",   "Core",         1, 1, 0, 1},
-    {SIGXFSZ,   "SIGXFSZ",   "Core",         1, 1, 0, 1},
-    {SIGVTALRM, "SIGVTALRM", "Term",         1, 0, 0, 1},
-    {SIGPROF,   "SIGPROF",   "Term",         1, 0, 0, 1},
-    {SIGWINCH,  "SIGWINCH",  "Ign",          0, 0, 0, 1},
-    {SIGIO,     "SIGIO",     "Term",         1, 0, 0, 1},
-    {SIGPWR,    "SIGPWR",    "Term",         1, 0, 0, 1},
-    {SIGSYS,    "SIGSYS",    "Core",         1, 1, 0, 1},
-    {0, NULL, NULL, 0, 0, 0, 0}
-};
+#define GET_SIGNAL_NUM(sig_name) \
+    (strcmp(sig_name, "SIGABRT") == 0 ? SIGABRT : \
+    (strcmp(sig_name, "SIGALRM") == 0 ? SIGALRM : \
+    (strcmp(sig_name, "SIGBUS") == 0 ? SIGBUS : \
+    (strcmp(sig_name, "SIGCHLD") == 0 ? SIGCHLD : \
+    (strcmp(sig_name, "SIGCONT") == 0 ? SIGCONT : \
+    (strcmp(sig_name, "SIGFPE") == 0 ? SIGFPE : \
+    (strcmp(sig_name, "SIGHUP") == 0 ? SIGHUP : \
+    (strcmp(sig_name, "SIGILL") == 0 ? SIGILL : \
+    (strcmp(sig_name, "SIGINT") == 0 ? SIGINT : \
+    (strcmp(sig_name, "SIGIO") == 0 ? SIGIO : \
+    (strcmp(sig_name, "SIGKILL") == 0 ? SIGKILL : \
+    (strcmp(sig_name, "SIGPIPE") == 0 ? SIGPIPE : \
+    (strcmp(sig_name, "SIGPROF") == 0 ? SIGPROF : \
+    (strcmp(sig_name, "SIGPWR") == 0 ? SIGPWR : \
+    (strcmp(sig_name, "SIGQUIT") == 0 ? SIGQUIT : \
+    (strcmp(sig_name, "SIGSEGV") == 0 ? SIGSEGV : \
+    (strcmp(sig_name, "SIGSTKFLT") == 0 ? SIGSTKFLT : \
+    (strcmp(sig_name, "SIGSTOP") == 0 ? SIGSTOP : \
+    (strcmp(sig_name, "SIGTSTP") == 0 ? SIGTSTP : \
+    (strcmp(sig_name, "SIGSYS") == 0 ? SIGSYS : \
+    (strcmp(sig_name, "SIGTERM") == 0 ? SIGTERM : \
+    (strcmp(sig_name, "SIGTRAP") == 0 ? SIGTRAP : \
+    (strcmp(sig_name, "SIGTTIN") == 0 ? SIGTTIN : \
+    (strcmp(sig_name, "SIGTTOU") == 0 ? SIGTTOU : \
+    (strcmp(sig_name, "SIGURG") == 0 ? SIGURG : \
+    (strcmp(sig_name, "SIGUSR1") == 0 ? SIGUSR1 : \
+    (strcmp(sig_name, "SIGUSR2") == 0 ? SIGUSR2 : \
+    (strcmp(sig_name, "SIGVTALRM") == 0 ? SIGVTALRM : \
+    (strcmp(sig_name, "SIGXCPU") == 0 ? SIGXCPU : \
+    (strcmp(sig_name, "SIGXFSZ") == 0 ? SIGXFSZ : \
+    (strcmp(sig_name, "SIGWINCH") == 0 ? SIGWINCH : \
+    -1 )))))))))))))))))))))))))))))))
 
 int tests_passed = 0;
 int tests_failed = 0;
@@ -86,10 +87,10 @@ void test_signal(signal_desc sig){
         if (WIFSIGNALED(status)) {
             int term_sig = WTERMSIG(status);
             if (term_sig == sig.signum) {
-                if (sig.should_terminate){
+                if (sig.action_flags & BEHAVIOR_TERM){
                     #ifdef WCOREDUMP
                     int core_dumped = !!WCOREDUMP(status);
-                    if (core_dumped == sig.should_core){
+                    if (core_dumped == !!(sig.action_flags & BEHAVIOR_CORE)){
                         passed = 1;
                     }
                     #else
@@ -98,10 +99,10 @@ void test_signal(signal_desc sig){
                 }
             }
         } else if (WIFSTOPPED(status)) {
-            passed = !sig.should_terminate && 
+            passed = !(sig.action_flags & BEHAVIOR_TERM) &&
                 (strstr(sig.expected_action, "Stop") != NULL);
         } else if (WIFEXITED(status)) {
-            passed = !sig.should_terminate && sig.can_be_ignored;
+            passed = !(sig.action_flags & BEHAVIOR_TERM) && (sig.action_flags & BEHAVIOR_IGNORE);
         }
 
         if (skipped) {
@@ -129,9 +130,41 @@ void test_signal(signal_desc sig){
 }
 
 int main() {
-    for (int i = 0; test_cases[i].signame != NULL; i++){
-        test_signal (test_cases[i]);
+    char input[80];
+    signal_desc items[60];
+    int count = 0;
+
+    while (fgets(input, sizeof(input), stdin)){
+        input[strcspn(input, "\n")] = 0;
+        if (sscanf(input, "%s %s", items[count].signame, items[count].expected_action) == 2){
+            if (strcmp(items[count].expected_action, "Term") == 0){
+                if (strcmp(items[count].signame, "SIGKILL") == 0)
+                    items[count].action_flags = BEHAVIOR_TERM;
+                else
+                    items[count].action_flags = BEHAVIOR_TERM | BEHAVIOR_IGNORE;
+            } else if (strcmp(items[count].expected_action, "Core") == 0) {
+                items[count].action_flags = BEHAVIOR_TERM | BEHAVIOR_CORE | BEHAVIOR_IGNORE;
+            } else if (strcmp(items[count].expected_action, "Stop") == 0){
+                if (strcmp(items[count].signame, "SIGSTOP") == 0)
+                    items[count].action_flags = BEHAVIOR_STOP;
+                else
+                    items[count].action_flags = BEHAVIOR_STOP | BEHAVIOR_IGNORE; 
+            } else if (strcmp(items[count].expected_action, "Ign") == 0){
+                items[count].action_flags = BEHAVIOR_IGNORE;
+            } else if (strcmp(items[count].expected_action, "Cont") == 0){
+                items[count].action_flags = BEHAVIOR_IGNORE;
+            } else {
+                printf("Unknown action: %s", items[count].expected_action);
+            }
+            items[count].signum = GET_SIGNAL_NUM(items[count].signame);
+            count++;
+        }
     }
+
+    for (int i = 0; i < count; i++){
+        test_signal (items[i]);
+    }
+
     printf("\n=== Results ===\n");
     printf("Passed: %d\nFailed: %d\nSkipped: %d\n", tests_passed, tests_failed, tests_skipped);
     return tests_failed ? EXIT_FAILURE : EXIT_SUCCESS;
