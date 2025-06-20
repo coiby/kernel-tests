@@ -13,20 +13,19 @@
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
 
-if cki_is_baremetal; then
+if [ "${TESTVERSION}" -ge 20250530 ] || [ -n "${LTP_COMMIT_ID}" ]; then
+	# Since commit a6a369c5eeb, LTP supports fractional values for LTP_RUNTIME_MUL.
+	# We set it to 0.1 to significantly reduce the effective .runtime duration.
+	# This helps limit execution time in CKI pipelines, which are focused on quick
+	# functional verification rather than stress or longevity testing.
 	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-0.1}
-fi
-
-# VMs can have slow performance, therefore increase LTP_TIMEOUT_MUL
-if cki_is_vm; then
-	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
-	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-0.2}
-fi
-
-# debug kernel is slower increase LTP_TIMEOUT_MUL
-if cki_is_kernel_debug; then
-	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
-	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-0.2}
+else
+	# For older LTP versions (pre-20250530), retain the original integer multiplier
+	# to ensure compatibility with CKI testing in legacy (e.g., zstream) environments.
+	if cki_is_vm || cki_is_kernel_debug; then
+		export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
+		export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-5}
+	fi
 fi
 
 [ -n "${LTP_TIMEOUT_MUL}" ] && echo "LTP_TIMEOUT_MUL is ${LTP_TIMEOUT_MUL}"
