@@ -1,0 +1,57 @@
+diff --git a/src/include/rt-sched.h b/src/include/rt-sched.h
+index 679c4bd..242bb6d 100644
+--- a/src/include/rt-sched.h
++++ b/src/include/rt-sched.h
+@@ -56,30 +56,4 @@
+ #define __NR_sched_getattr		275
+ #endif
+ 
+-struct sched_attr {
+-	uint32_t size;
+-	uint32_t sched_policy;
+-	uint64_t sched_flags;
+-
+-	/* SCHED_NORMAL, SCHED_BATCH */
+-	int32_t sched_nice;
+-
+-	/* SCHED_FIFO, SCHED_RR */
+-	uint32_t sched_priority;
+-
+-	/* SCHED_DEADLINE */
+-	uint64_t sched_runtime;
+-	uint64_t sched_deadline;
+-	uint64_t sched_period;
+-};
+-
+-int sched_setattr(pid_t pid,
+-		  const struct sched_attr *attr,
+-		  unsigned int flags);
+-
+-int sched_getattr(pid_t pid,
+-		  struct sched_attr *attr,
+-		  unsigned int size,
+-		  unsigned int flags);
+-
+ #endif /* __RT_SCHED_H__ */
+diff --git a/src/lib/rt-sched.c b/src/lib/rt-sched.c
+index 4a8e3c4..afa677d 100644
+--- a/src/lib/rt-sched.c
++++ b/src/lib/rt-sched.c
+@@ -27,17 +27,3 @@
+ 
+ #include "rt-sched.h"
+ 
+-int sched_setattr(pid_t pid,
+-		  const struct sched_attr *attr,
+-		  unsigned int flags)
+-{
+-	return syscall(__NR_sched_setattr, pid, attr, flags);
+-}
+-
+-int sched_getattr(pid_t pid,
+-		  struct sched_attr *attr,
+-		  unsigned int size,
+-		  unsigned int flags)
+-{
+-        return syscall(__NR_sched_getattr, pid, attr, size, flags);
+-}

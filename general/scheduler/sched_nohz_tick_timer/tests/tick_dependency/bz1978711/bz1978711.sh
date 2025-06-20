@@ -5,6 +5,11 @@ function bz1978711()
 	git clone git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
 	pushd rt-tests
 	git checkout stable/v1.0
+	if grep 'int sched_setattr' /usr/include/bits/sched.h; then
+		echo "sched_attr" is defined in glic-headers.
+		echo "Undefine it in the source in case of redefinition errorr."
+		patch -p1 < ../undefine_sched_attr.patch
+	fi
 	make -j4
 	# this is defined in runtest.sh
 	# shellcheck disable=SC2154
