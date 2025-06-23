@@ -30,8 +30,9 @@ SETUP_FLAG=".SETUP_PASS"
 
 function install_kernel_devel
 {
-    cki_debug
-
+    if ! K_IsKernelRPM; then
+      return 0
+    fi
     devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
     rpm -q "${devel_pkg}" || yum install -y "${devel_pkg}"
     if ! rpm -q "${devel_pkg}"; then
@@ -54,8 +55,6 @@ function load_vdo {
 
 function install_dt
 {
-    cki_debug
-
     local tarball
     tarball=$(basename $DT_TARBALL)
     wget -O /tmp/"$tarball" $DT_TARBALL || return 1
@@ -72,8 +71,6 @@ function install_dt
 
 function install_bufio
 {
-    cki_debug
-
     local bufio_dir
     local os_version
     os_version="9"
@@ -107,8 +104,6 @@ function install_bufio
 
 function clone_linux_repo
 {
-    cki_debug
-
     local repo_dir="linux"
     if [ -e "$DMTS_LOCAL"/"$repo_dir" ]; then
         echo "Linux repo already exists in $DMTS_LOCAL!"
@@ -122,8 +117,6 @@ function clone_linux_repo
 
 function install_blk_archive
 {
-    cki_debug
-
     local blk_archive_dir
     local blk_path
     blk_archive_dir=$(basename $BLK_ARCHIVE_REPO)
@@ -143,8 +136,6 @@ function install_blk_archive
 
 function clone_test_suite
 {
-    cki_debug
-
     if [ -e "$DMTS_LOCAL" ]; then
         rm -rf "$DMTS_LOCAL"
     fi
@@ -169,8 +160,6 @@ function ts_config_setup
     # Some poorly written tests use all of the data dev, no matter how big
     # it is, so will take longer to run with large volumes.
     #
-    cki_debug
-
     mnt_metadata=/mnt/dmtest/metadata
     mnt_data=/mnt/dmtest/data
 
@@ -216,8 +205,6 @@ function ts_config_setup
 
 function ts_setup
 {
-    cki_debug
-
     if [[ -e "$DMTS_LOCAL/$SETUP_FLAG" ]]; then
         return "$CKI_PASS"
     fi
