@@ -5,7 +5,6 @@ id: 1deb2781-456d-459b-a21f-229a3ba367a1
 tag:
   - KernelTier1
   - fmf-export
-  - NoRHIVOS
   - KernelAutomotiveTier1
 contact: Memory Management QE <mm-qe@redhat.com>
 component:
