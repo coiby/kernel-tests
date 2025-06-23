@@ -33,11 +33,12 @@
 trap 'killall make; kill runtest.sh' SIGHUP SIGINT SIGQUIT SIGTERM
 
 #  When using rpm
-KPATCH_MODULE="${KPATCH_MODULE:-}"
+KPATCH_PATCH="${KPATCH_PATCH:-}"
 KPATCH_PATH="/home/kpatch-patch-modules"
+KPATCH_MODULE=""
 TEST_CMD="${TEST_CMD:-cat /proc/meminfo}"
 GREP_STR="${GREP_STR:-kpatch:         5}"
-TARGET_FUNCTION=${TARGET_FUNCTION:-meminfo_proc_show}
+KPATCH_TARGET_FUNCTION=${KPATCH_TARGET_FUNCTION:-meminfo_proc_show}
 BUILDS_URL="${BUILDS_URL:-}"
 NFS_SHARE=${NFS_SHARE:-}
 KPATCH_LOCATION=${KPATCH_LOCATION:-"/data/kpatch"}
@@ -46,15 +47,23 @@ KPATCH_MNT="/mnt/kpatch"
 PACKAGE="kernel kpatch crash systemtap"
 MOUNT_FLAG=0
 
-if [ -z "${KPATCH_MODULE}" ]; then
-    if rpm -qa | grep kpatch-patch ; then
-        KPATCH_PATH="/usr/lib/kpatch/$(uname -r)"
-        KPATCH_MODULE=$(ls ${KPATCH_PATH}/kpatch-* | head -n 1 | sed -e 's/.ko//')
-        yum -y install $(rpm -qa | grep kpatch-patch |grep -v debug | sed "s/-/-debuginfo-/4")
-    else
-        KPATCH_MODULE="test-data-new"
-    fi
-fi
+
+function install_kpp_debuginfo()
+{
+    # Example of a kpatch-patch pkg "kpatch-patch-4_18_0-107-0-1.test.el8.x86_64"
+    local kpp_pkg kpp_debuginfo_pkg kpp_name kpp_version kpp_release kpp_arch
+    kpp_pkg=$1
+
+    # Example of a kpatch-patch debuginfo pkg "kpatch-patch-4_18_0-107-debuginfo-0-1.test.el8.x86_64"
+    kpp_debuginfo_pkg=$(echo "$kpp_pkg" | sed 's/-/-debuginfo-/4')
+
+    kpp_name=$(rpm -q --queryformat "%{NAME}" $kpp_pkg)
+    kpp_version=$(rpm -q --queryformat "%{VERSION}" $kpp_pkg)
+    kpp_release=$(rpm -q --queryformat "%{RELEASE}" $kpp_pkg)
+    kpp_arch=$(rpm -q --queryformat "%{ARCH}" $kpp_pkg)
+    rpm -q "${kpp_debuginfo_pkg}" || \
+        yum install -y "${BUILDS_URL}/${kpp_name}/${kpp_version}/${kpp_release}/${kpp_arch}/${kpp_debuginfo_pkg}.${kpp_arch}.rpm"
+}
 
 trace_dir="/sys/kernel/debug/tracing"
 func_filter="${trace_dir}/set_ftrace_filter"
@@ -75,13 +84,13 @@ function install_deps() {
 }
 
 function setup_ftrace() {
-    rlRun "echo ${TARGET_FUNCTION} > ${func_filter}"
+    rlRun "echo ${KPATCH_TARGET_FUNCTION} > ${func_filter}"
     rlRun "echo function > ${tracer}"
 }
 
 # shellcheck disable=SC2120
 function setup_crash() {
-    symbol=${1:-${TARGET_FUNCTION}}
+    symbol=${1:-${KPATCH_TARGET_FUNCTION}}
     symbol_addr=$(cat /proc/kallsyms | grep ${symbol} | grep ${KPATCH_MODULE//-/_} | awk '{print $1}')
     src_result=~/source
     crash_cmd=crash.cmd
@@ -98,11 +107,11 @@ EOF
 }
 
 function setup_perf() {
-    eval perf probe --add '${TARGET_FUNCTION}'
+    eval perf probe --add '${KPATCH_TARGET_FUNCTION}'
 }
 
 function setup_kprobe() {
-    rlRun "echo \"p ${KPATCH_MODULE//-/_}:${TARGET_FUNCTION}\" > ${kprobe_trace}"
+    rlRun "echo \"p ${KPATCH_MODULE//-/_}:${KPATCH_TARGET_FUNCTION}\" > ${kprobe_trace}"
 }
 
 function setup_stap() {
@@ -110,7 +119,7 @@ function setup_stap() {
         export STAP_FIPS_OVERRIDE=1;
         rlLog "Run SystemTap with enabled FIPS mode."
     fi
-    rlRun "stap -ve 'probe kernel.function(\"${TARGET_FUNCTION}\") {printf(\"hello\")}' -c '${TEST_CMD}' | grep \"${GREP_STR}\""
+    rlRun "stap -ve 'probe kernel.function(\"${KPATCH_TARGET_FUNCTION}\") {printf(\"hello\")}' -c '${TEST_CMD}' | grep \"${GREP_STR}\""
 }
 
 function reset_trace_probes() {
@@ -124,6 +133,13 @@ rlJournalStart
     rlPhaseStartSetup
         install_deps
         rlShowPackageVersion ${PACKAGE}
+        if [ -z "${KPATCH_PATCH}" ]; then
+            KPATCH_MODULE="test-data-new"
+        else
+            KPATCH_PATH="/usr/lib/kpatch/$(uname -r)"
+            KPATCH_MODULE=$(echo ${KPATCH_PATCH} | sed -e "s/kpatch-patch/kpatch/" | sed -e "s/\.test.*/_test/")
+            rlRun "install_kpp_debuginfo ${KPATCH_PATCH}"
+        fi
         if [ -d ${KPATCH_PATH} ] && ls ${KPATCH_PATH}/*ko > /dev/null ; then
             echo "Test module is existed"
         elif ! mount | grep mnt/kpatch; then
@@ -151,8 +167,8 @@ rlJournalStart
     rlPhaseStartTest "Kpatch compat with perf"
         setup_perf
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
-        rlRun "perf stat -e probe:${TARGET_FUNCTION}  -- ${TEST_CMD} 2>&1| grep \"1.*probe:${TARGET_FUNCTION%%_*}\" -o"
-        rlRun "perf probe --del \"probe:${TARGET_FUNCTION}\""
+        rlRun "perf stat -e probe:${KPATCH_TARGET_FUNCTION}  -- ${TEST_CMD} 2>&1| grep \"1.*probe:${KPATCH_TARGET_FUNCTION%%_*}\" -o"
+        rlRun "perf probe --del \"probe:${KPATCH_TARGET_FUNCTION}\""
     rlPhaseEnd
 
     rlPhaseStartTest "Kpatch compat with kprobe"
@@ -162,7 +178,7 @@ rlJournalStart
         rlRun "echo 1 > ${kprobe_enable}" 0
         rlRun "${TEST_CMD} | grep \"${GREP_STR}\""
         # this should fail as only one of kpatch and kprobe can pin the smae func.
-        rlRun "cat ${trace_res} | grep ${TARGET_FUNCTION}" 0
+        rlRun "cat ${trace_res} | grep ${KPATCH_TARGET_FUNCTION}" 0
         # shellcheck disable=SC2188
         > ${trace_res}
     rlPhaseEnd
@@ -173,7 +189,7 @@ rlJournalStart
         > ${trace_res}
         rlRun "kpatch list | grep ${KPATCH_MODULE//-/_}"
         rlRun "${TEST_CMD} | grep \"${GREP_STR}\""
-        rlRun "cat ${trace_res} | grep \"${TARGET_FUNCTION} <\""
+        rlRun "cat ${trace_res} | grep \"${KPATCH_TARGET_FUNCTION} <\""
     rlPhaseEnd
 
     rlPhaseStartTest "Kpatch compat with live crash"
