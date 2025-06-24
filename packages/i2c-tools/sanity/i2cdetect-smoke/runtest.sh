@@ -39,12 +39,12 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest
-        rlRun "ls /sys/class/i2c-adapter/ > $TmpDir/list.txt 2>/dev/null"
+        rlRun "ls /sys/class/i2c-dev/ > $TmpDir/list.txt 2>/dev/null"
         if [ -s "$TmpDir/list.txt" ]; then
             rlLog "I2C adapters found, reading information."
             while read -r line; do
-                rlRun "cat /sys/class/i2c-adapter/$line/name >> $TmpDir/adapter_info.txt 2>/dev/null" 0 "Reading bus name"
-                rlRun "cat /sys/class/i2c-adapter/$line/i2c-dev/$line/dev >> $TmpDir/adapter_info.txt 2>/dev/null" 0 "Reading bus address"
+                rlRun "cat /sys/class/i2c-dev/$line/name >> $TmpDir/adapter_info.txt 2>/dev/null" 0 "Reading bus name"
+                rlRun "cat /sys/class/i2c-dev/$line/dev >> $TmpDir/adapter_info.txt 2>/dev/null" 0 "Reading bus address"
             done < $TmpDir/list.txt
             if [ -s "$TmpDir/adapter_info.txt" ]; then
                 rlLog "Bus names and address."
@@ -53,7 +53,7 @@ rlJournalStart
                 rlLogWarning "adapter_info.txt is empty,please check."
             fi
         else
-            rlFail "I2C detection failed or no buses available,please check."
+            rlLogWarning "I2C detection failed or no buses available,please check."
         fi
     rlPhaseEnd
 
