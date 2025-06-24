@@ -30,7 +30,7 @@ function fair_restore_free()
     if [[ -e /tmp/fair_save ]]; then
         pushd /sys/kernel/debug/sched/fair_server/
         for a in * ; do
-            echo "/tmp/fair_save/$a/runtime" > "/sys/kernel/debug/sched/fair_server/$a/runtime"
+            cat "/tmp/fair_save/$a/runtime" > "/sys/kernel/debug/sched/fair_server/$a/runtime"
         done
         popd
         rm -rf /tmp/fair_save
