@@ -22,7 +22,7 @@ CheckUnexpectedReboot
 
 TESTARGS=${TESTARGS:-""}
 SKIP_TESTARGS=${SKIP_TESTARGS:-""}
-KPATCH_FUNC_LIST=${KPATCH_FUNC_LIST:-""}
+KPATCH_TARGET_FUNCTION=${KPATCH_TARGET_FUNCTION:-""}
 
 Log "================================="
 Log "  Preparing for Kpatch crash test"

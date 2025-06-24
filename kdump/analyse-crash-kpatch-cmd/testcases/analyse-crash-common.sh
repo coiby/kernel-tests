@@ -17,7 +17,7 @@ analyse()
 mod -s "${kpatch_module}"
 EOF
 
-    for func_name in ${KPATCH_FUNC_LIST};
+    for func_name in ${KPATCH_TARGET_FUNCTION};
     do
         cat <<EOF >>"${K_TESTAREA}/crash.cmd"
 l ${func_name}
@@ -44,7 +44,7 @@ EOF
     local crash_output_file="${K_TESTAREA}/crash.vmcore.log"
 
     Log "Validating patched functions in crash output."
-    for func_name in ${KPATCH_FUNC_LIST};
+    for func_name in ${KPATCH_TARGET_FUNCTION};
     do
         # Expect report 'duplicate symbols' for patched function.
         # And 'dis -l $func' should list patched function with kpatch module.
