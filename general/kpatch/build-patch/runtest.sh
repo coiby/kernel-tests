@@ -3,8 +3,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   /kernel/general/kpatch/build
-#   Description: use upstream kpatch-build to build kpatch kernel modules.
-#   Author: Chunyu Hu <chuhu@redhat.com>
+#   Description: use upstream kpatch-build to build kpatch modules based
+#                on an upstream commit.
+#   Author: Roberto Bergantinos Corpas <rbergant@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -37,6 +38,7 @@ KPATCH_REV="${KPATCH_REV:-}"
 KPATCH_REPO="${KPATCH_REPO:-https://github.com/dynup/kpatch.git}"
 KPATCH_BUILD_OPTS="${KPATCH_BUILD_OPTS:-}"
 KPATCH_SKIP_TEST="${KPATCH_SKIP_TEST:-}"
+UPSTREAM_COMMIT_ID="${UPSTREAM_COMMIT_ID:-}"
 
 rlJournalStart
     rlPhaseStartSetup
@@ -44,29 +46,15 @@ rlJournalStart
         download_kpatch_repo ${KPATCH_REPO} ${KPATCH_REV}
         pushd kpatch
         build_kpatch_setup
-        check_test_target
-        if [ ! -z "${KPATCH_SKIP_TEST}" ]; then
-            pushd test/integration/${ID}-${VERSION_ID}
-            rm -rf ${KPATCH_SKIP_TEST}
-            popd
-        fi
         popd
         rlRun "basic_build" || rlDie "build kpatch builder failed ..."
-        rlRun "start_module_collect_worker"
     rlPhaseEnd
 
-    rlPhaseStartTest "Run kpatch integration tests (slow)"
-        rlRun "unset ARCH" 0-255 "power64 can't parse ppc64le when kernel build"
-        rlRun "RunBuildTest rlFileSubmit"
-    rlPhaseEnd
-
-    rlPhaseStartTest "Run kpatch integration tests (quick)"
-        rlRun "RunCombinedBuild rlFileSubmit"
-    rlPhaseEnd
-
-    rlPhaseStartCleanup
-        rlRun "end_module_collect_worker"
-        umount ${KPATCH_MNT}
+    rlPhaseStartTest "Run kpatch-build against upstream patch"
+        pushd kpatch
+        rlRun "get_src_rpm" 0 "Downloading SRC RPM"
+        rlRun "get_patch_file ${UPSTREAM_COMMIT_ID}" 0 "Obtaining upstream patchfile"
+        rlRun "kpatch-build/kpatch-build -r $(get_srpm_name) ${UPSTREAM_COMMIT_ID}.patch" 0
+        rstrnt-report-log -l /root/.kpatch/build.log
     rlPhaseEnd
 rlJournalEnd
-rlJournalPrintText

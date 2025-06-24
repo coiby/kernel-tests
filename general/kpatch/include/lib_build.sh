@@ -36,6 +36,7 @@ function end_module_collect_worker() {
     kill $module_collector
 }
 
+# shellcheck disable=SC2034
 function basic_build() {
     set -x
     cd kpatch && make all && BASIC_DONE=1 || exit 1
@@ -78,5 +79,29 @@ function RunCombinedBuild() {
     upload_modules
 
     return ${ret}
+}
+
+function get_srpm_name() {
+    kern="kernel-$(uname -r | sed 's/\.[^.]*$//')"
+    echo "${kern}.src.rpm"
+}
+
+function get_src_rpm() {
+    k_ver=$(uname -r | awk -F "-" '{print $1}')
+    k_rel=$(uname -r | awk -F "-" '{print $2}' | sed 's/\.[^.]*$//')
+
+    src_url=https://download.devel.redhat.com/brewroot/packages/kernel/"$k_ver"/"$k_rel"/src/$(get_srpm_name)
+    wget "$src_url"
+
+    return $?
+}
+
+function get_patch_file() {
+    ucid=$1
+    u_url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=$ucid"
+
+    wget "$u_url" -O "$ucid".patch
+
+    return $?
 }
 
