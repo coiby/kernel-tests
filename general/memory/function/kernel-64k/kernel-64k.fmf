@@ -1,0 +1,11 @@
+summary: 64k kernel verification
+description: 'Verify that a 4k kernel is not installed alongside the 64k kernel'
+contact: Eddie Kovsky <ekovsky@redhat.com>
+component:
+  - kernel
+path: /general/memory/function/kernel-64k
+test: make run
+require:
+  - make
+  - gcc
+duration: 5m
