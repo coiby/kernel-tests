@@ -84,7 +84,6 @@
 /distribution/ltp/lite/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /distribution/ltp/openposix_testsuite/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /filesystems/cifs/connectathon/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
-/filesystems/erofs/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /filesystems/general/pjd-fstest/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /filesystems/loopdev/sanity/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /filesystems/xfs/xfstests/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
@@ -156,7 +155,6 @@
 /pciutils/sanity-smoke/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /pciutils/update-pciids/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /rt-tests/pi_stress/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
-/rt-tests/rt_ltp/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /rt-tests/rt_migrate_test/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /rt-tests/rteval/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /rt-tests/sched_deadline/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
@@ -226,7 +224,6 @@
 /distribution/ltp/lite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang @stowellm
 /distribution/ltp/openposix_testsuite/ @bgoncalv @chuhu @jstancek @liwan1 @lulinqing @pifang @stowellm
 /filesystems/cifs/connectathon/ @bgoncalv @jianhong @lulinqing @stowellm
-/filesystems/erofs/ @bgoncalv @bgrech @lulinqing @stowellm
 /filesystems/general/pjd-fstest/ @bgoncalv @lulinqing @stowellm @zrlang
 /filesystems/loopdev/sanity/ @bgoncalv @lulinqing @stowellm @yoyang
 /filesystems/xfs/xfstests/ @andyprice @bgoncalv @lulinqing @stowellm @yoyang
@@ -297,7 +294,6 @@
 /pciutils/sanity-smoke/ @bgoncalv @lulinqing @stowellm @wrgrh
 /pciutils/update-pciids/ @bgoncalv @lulinqing @stowellm @wrgrh
 /rt-tests/pi_stress/ @afazekas @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
-/rt-tests/rt_ltp/ @afazekas @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/rt_migrate_test/ @afazekas @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/rteval/ @afazekas @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
 /rt-tests/sched_deadline/ @afazekas @bgoncalv @cyin2 @lulinqing @pity4yeats @stowellm @waylon531 @zhaoqiao
