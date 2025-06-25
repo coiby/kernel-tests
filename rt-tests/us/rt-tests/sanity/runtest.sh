@@ -8,6 +8,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # shellcheck source=/dev/null
+# Source the common test script helpers
+. ../../../../cki_lib/libcki.sh || exit 1
 
 # Source rt common functions
 . ../../../include/lib.sh || exit 1
@@ -59,10 +61,13 @@ function test_run()
     #       sanity/functionality than performance in this test.
     oneliner "hwlatdetect --duration=30s --threshold=2000"
 
+    # Skip oslat test for automotive, as CONFIG_NUMA is disabled in the RHIVOS kernel
+    if ! cki_is_kernel_automotive; then
         if rpm -ql "$rt_tests_pkgname" | grep -q '/usr/bin/oslat' ; then
-        declare duration_flag="--duration"
-        oslat --help | grep -q '\-\-runtime' && duration_flag="--runtime"
-        oneliner "oslat --cpu-list 1 --rtprio 1 $duration_flag 30s"
+            declare duration_flag="--duration"
+            oslat --help | grep -q '\-\-runtime' && duration_flag="--runtime"
+            oneliner "oslat --cpu-list 1 --rtprio 1 $duration_flag 30s"
+        fi
     fi
 
     oneliner "pi_stress --quiet --duration=30"
