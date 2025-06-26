@@ -19,6 +19,7 @@ require:
   - llvm
   - net-tools
   - nmap-ncat
+  - popt-devel
   - python3
   - tar
   - wget
