@@ -81,6 +81,7 @@ require:
     - type: file
       pattern:
           - /rt-tests/include
+          - /cki_lib/libcki.sh
 recommend:
     - realtime-tests
     - rt-tests
