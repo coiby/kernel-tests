@@ -6,7 +6,6 @@ test: bash ./runtest.sh
 framework: beakerlib
 recommend: 
     - grubby
-    - abootimg
 require:
     - type: file
       pattern:
