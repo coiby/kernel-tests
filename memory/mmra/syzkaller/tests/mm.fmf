@@ -78,7 +78,7 @@ contact: sbertram <sbertram@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
-path: /memory/mmra/syzkaller
+path: /syzkaller
 framework: beakerlib
 id: bd5a5909-5250-4427-9192-09bdd6501c26
 require:
@@ -92,7 +92,80 @@ require:
   - wget
   - git
   - patch
+  - sshpass
   - type: file
     pattern:
         -  /kernel-include
+        -  /syzkaller
 duration: 24h
+environment+:
+  main_syscalls: |
+    "brk",
+    "cachestat",
+    "fadvise64_64",
+    "fallocate",
+    "madvise",
+    "membarrier",
+    "memfd_create",
+    "memfd_secret",
+    "mincore",
+    "mlock",
+    "mlock2",
+    "mlockall",
+    "mmap",
+    "mprotect",
+    "mremap",
+    "msync",
+    "munlock",
+    "munlockall",
+    "munmap",
+    "process_madvise",
+    "process_mrelease",
+    "process_vm_readv",
+    "process_vm_writev",
+    "readahead",
+    "remap_file_pages",
+    "shmat",
+    "shmctl",
+    "shmdt",
+    "shmget",
+    "swapoff",
+    "swapon"
+  disable_syscalls: |
+    "mmap$DRM_I915",
+    "mmap$DRM_MSM",
+    "mmap$IORING_OFF_CQ_RING",
+    "mmap$IORING_OFF_SQ_RING",
+    "mmap$IORING_OFF_SQES",
+    "mmap$KVM_VCPU",
+    "mmap$bifrost",
+    "mmap$dsp",
+    "mmap$fb",
+    "mmap$qrtrtun",
+    "mmap$snddsp",
+    "mmap$snddsp_control",
+    "mmap$snddsp_status",
+    "mmap$xdp"
+  support_syscalls: |
+    "clone3",
+    "getegid",
+    "geteuid",
+    "getgid",
+    "getgroups",
+    "getpgid",
+    "getpid",
+    "getresgid",
+    "getresuid",
+    "mq_open",
+    "newfstatat",
+    "openat$binderfs",
+    "openat$cgroup",
+    "openat$cgroup_root",
+    "openat$pidfd",
+    "openat$thread_pidfd",
+    "perf_event_open",
+    "pidfd_open",
+    "syz_open_dev$usbfs",
+    "syz_open_dev$usbmon"
+  SYZKALLER_COMMIT_HASH: "21339d7b9986698282dce93709157dc36907fbf8"
+  git_patches: "../memory/mmra/syzkaller/mmra.patch"
