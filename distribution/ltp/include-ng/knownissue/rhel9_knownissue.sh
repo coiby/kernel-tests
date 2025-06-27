@@ -12,6 +12,8 @@ function rhel9_fatal_issues()
 	# Bug 1984293 - RHEL9: kernel-rt: WARNING: possible circular locking dependency detected (raw_v6_hashinfo.lock->(softirq_ctrl.lock).lock->raw_v6_hashinfo.lock
 	is_rt && cki_is_kernel_debug && osver_in_range "900" "902" && tskip "read_all_proc" fatal
 	is_rt && cki_is_kernel_debug && osver_in_range "900" "902" && tskip "proc01" fatal
+	# proc01 failed on 9.6z, RHELTEST-1063
+	is_rt && cki_is_kernel_debug && osver_in_range "906" "907" && tskip "proc01" fatal
 	# RHEL-17195 RHEL-9: RIP: 0010:memset_orig+0x33/0xb0 - intel_pt_interrupt+0x5c/0xf0
 	is_arch "x86_64" && osver_in_range "904" "906" && tskip "pt_ex_user" fatal
 }
