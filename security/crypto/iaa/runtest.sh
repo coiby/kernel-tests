@@ -34,8 +34,8 @@ fi
 rlJournalStart
 
 rlPhaseStartSetup
-cat <<EOF > memory_advise.c
-// memory_madvise.c (gcc -o memory_madvise memory_madvise.c)
+cat <<EOF > memory_madvise.c
+// memory_madvise.c (gcc -o memory_madvise memory_advise.c)
 
 #include <stdio.h>
 #include <stdlib.h>
