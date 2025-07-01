@@ -1,0 +1,11 @@
+[General]
+name=/kernel/security/crypto/iaa
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=IAA regression tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;gcc
