@@ -119,7 +119,7 @@ rlPhaseStart FAIL "Functionality"
 	rlLogInfo "kernel $(uname -r; rpm -q qatlib qatengine)"
 	rlLogInfo "selinug "$(getenforce)
 	rlLogInfo "CPU "$(cat /proc/cpuinfo | grep Xeon | head -1)
-	rlRun "lspci | grep 0c:fe" 0 "IAA device presence"
+	rlRun "lspci -d:0cfe" 0 "IAA device presence"
 	rlRun "lsmod | grep iaa" 0 "module loaded"
 	rlRun "dmesg | grep iaa | grep ENABLED" 0 "iaa enabled in dmesg"
 	rlRun "grep enabled /sys/bus/dsa/devices/iax1/state" 0 "iax1 enabled"
