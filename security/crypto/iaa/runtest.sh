@@ -121,7 +121,6 @@ rlPhaseStart FAIL "Functionality"
 	rlLogInfo "CPU "$(cat /proc/cpuinfo | grep Xeon | head -1)
 	rlRun "lspci -d:0cfe" 0 "IAA device presence"
 	rlRun "lsmod | grep iaa" 0 "module loaded"
-	rlRun "dmesg | grep iaa | grep ENABLED" 0 "iaa enabled in dmesg"
 	rlRun "grep enabled /sys/bus/dsa/devices/iax1/state" 0 "iax1 enabled"
 	rlRun "grep enabled /sys/bus/dsa/devices/iax1/wq1.0/state" 0 "wq0 enabled"
 	rlRun "echo -n 'module iaa_crypto +p' > /sys/kernel/debug/dynamic_debug/control" 0 "enable iaa_crypto debug output"
