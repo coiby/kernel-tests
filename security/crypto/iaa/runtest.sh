@@ -128,9 +128,11 @@ rlPhaseStart FAIL "Functionality"
 	rlRun "echo 0 > /sys/module/zswap/parameters/enabled" 0 "disable zswap parameters"
 	rlRun "echo 50 > /sys/module/zswap/parameters/max_pool_percent" 0 "zswap max size to 50"
 	rlRun "echo deflate-iaa > /sys/module/zswap/parameters/compressor" 0 "set zswap compressor to deflate-iaa"
-	rlRun "echo zsmalloc > /sys/module/zswap/parameters/zpool" 
+	rlRun "echo zsmalloc > /sys/module/zswap/parameters/zpool"
 	rlRun "echo 1 > /sys/module/zswap/parameters/enabled" 0 "enable zswap parameters"
-	rlRun "echo 0 > /sys/module/zswap/parameters/same_filled_pages_enabled" 0 "disable zswap same_filled_pages"
+	if rlIsRHEL "<10"; then
+		rlRun "echo 0 > /sys/module/zswap/parameters/same_filled_pages_enabled" 0 "disable zswap same_filled_pages"
+	fi
 	rlRun "echo 100 > /proc/sys/vm/swappiness" 0 "swappiness to 100"
 	rlRun "echo never > /sys/kernel/mm/transparent_hugepage/enabled" 0 "disable transparent hugepage"
 	rlRun "echo 1 > /proc/sys/vm/overcommit_memory"
