@@ -52,6 +52,7 @@ rlJournalStart
 
     rlPhaseStartTest "Run kpatch-build against upstream patch"
         pushd kpatch
+        rlRun "install_debuginfo" 0 "Installing debuginfo if needed"
         rlRun "get_src_rpm" 0 "Downloading SRC RPM"
         rlRun "get_patch_file ${UPSTREAM_COMMIT_ID}" 0 "Obtaining upstream patchfile"
         rlRun "kpatch-build/kpatch-build -r $(get_srpm_name) ${UPSTREAM_COMMIT_ID}.patch" 0
