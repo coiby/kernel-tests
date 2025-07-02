@@ -163,7 +163,21 @@ configure()
 build_all()
 {
 	setup_testarea
-	if [[ -z ${LTP_COMMIT_ID} ]]; then
+	if [[ "y" == "${USE_LTP_RPM}" ]]; then
+		echo "============ Install LTP-${TESTVERSION} rpm ============" | tee -a $OUTPUTFILE
+		dnf copr -y enable pifang/ltp
+		dnf install -y ltp-${TESTVERSION}
+		if [ $? -ne 0 ]; then
+			echo "Aborting current task: Couldn't install LTP rpm." | tee -a $OUTPUTFILE
+			if [[ -n $RSTRNT_TASKNAME ]]; then
+				rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+				exit 0
+			else
+				exit 1
+			fi
+		fi
+
+	elif [[ -z ${LTP_COMMIT_ID} ]]; then
 		download_ltp
 	else
 		clone_ltp
@@ -192,6 +206,9 @@ build_all()
 	fi
 
 	install_kirk
+	if [[ "y" == "${USE_LTP_RPM}" ]]; then
+		return
+	fi
 
 	configure
 	echo "============ Start ${MAKE} and install LTP ============" | tee -a $OUTPUTFILE

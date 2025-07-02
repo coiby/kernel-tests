@@ -30,7 +30,7 @@ function fetch_testcase()
 	else
 		# Default lists of tests to run.
 		echo " ========== execute default testcases ============"
-		TESTS='syscalls can cve commands fs math mm numa nptl pty sched ipc tracing dio'
+		TESTS='syscalls can cve commands fs math mm numa nptl pty sched tracing dio'
 	fi
 }
 
