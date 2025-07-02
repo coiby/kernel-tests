@@ -164,7 +164,7 @@ function syzkaller_run() {
 function syzkaller_start() {
     # Run syzkaller in the background
     start_time=$(date +%s)
-    rlRun "tmux new-session -d -s syzkaller '${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf'"
+    rlRun "tmux new-session -d -s syzkaller '${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syzkaller_run.log'"
     echo $syzkaller_root > /var/tmp/syzkaller.root
     echo $start_time > /var/tmp/syzkaller.start_time
     rlLog "Syzkaller root: $(cat /var/tmp/syzkaller.root)"
@@ -173,6 +173,7 @@ function syzkaller_start() {
 function syzkaller_stop() {
     rlRun "tmux kill-session -t syzkaller"
     end_time=$(date +%s)
+    rlFileSubmit /var/tmp/syzkaller_run.log
 }
 
 function syzkaller_check_results() {
