@@ -164,19 +164,24 @@ build_all()
 {
 	setup_testarea
 	if [[ "y" == "${USE_LTP_RPM}" ]]; then
-		echo "============ Install LTP-${TESTVERSION} rpm ============" | tee -a $OUTPUTFILE
 		dnf copr -y enable pifang/ltp
-		dnf install -y ltp-${TESTVERSION}
-		if [ $? -ne 0 ]; then
-			echo "Aborting current task: Couldn't install LTP rpm." | tee -a $OUTPUTFILE
-			if [[ -n $RSTRNT_TASKNAME ]]; then
-				rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-				exit 0
-			else
-				exit 1
+		if dnf repoquery --available --queryformat '%{version}-%{release}' ltp | grep "${TESTVERSION}"; then
+			echo "============ Install LTP-${TESTVERSION} rpm ============" | tee -a $OUTPUTFILE
+			dnf install -y ltp-${TESTVERSION}
+			if [ $? -ne 0 ]; then
+				echo "Aborting current task: Couldn't install LTP rpm." | tee -a $OUTPUTFILE
+				if [[ -n $RSTRNT_TASKNAME ]]; then
+					rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+					exit 0
+				else
+					exit 1
+				fi
 			fi
+		else
+			echo "============ USE_LTP_RPM is set, but version ${TESTVERSION} is not build in copr ============" | tee -a $OUTPUTFILE
+			echo "============ Install LTP-${TESTVERSION} from source ============" | tee -a $OUTPUTFILE
+			download_ltp
 		fi
-
 	elif [[ -z ${LTP_COMMIT_ID} ]]; then
 		download_ltp
 	else
