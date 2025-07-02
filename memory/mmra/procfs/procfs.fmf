@@ -16,7 +16,9 @@ require:
   - wget
   - git
   - patch
+  - sshpass
   - type: file
     pattern:
         -  /kernel-include
+        -  /syzkaller
 duration: 2h
