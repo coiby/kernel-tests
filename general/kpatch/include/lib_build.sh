@@ -96,6 +96,19 @@ function get_src_rpm() {
     return $?
 }
 
+function install_debuginfo() {
+    rpm -q --quiet kernel-debuginfo-$(uname -r) && return 0
+    k_ver=$(uname -r | awk -F "-" '{print $1}')
+    k_rel=$(uname -r | awk -F "-" '{print $2}' | sed 's/\.[^.]*$//')
+    base_url=https://download.devel.redhat.com/brewroot/packages/kernel/"$k_ver"/"$k_rel"/$(uname -m)/
+    dbg_url="${base_url}/kernel-debuginfo-$(uname -r).rpm"
+    dbg_com_url="${base_url}/kernel-debuginfo-common-$(uname -m)-$(uname -r).rpm"
+
+    dnf install -y $dbg_com_url $dbg_url
+
+    return $?
+}
+
 function get_patch_file() {
     ucid=$1
     u_url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=$ucid"
