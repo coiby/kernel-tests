@@ -6,6 +6,7 @@ component:
   - kernel
 framework: beakerlib
 require:
+  - qatengine
   - qatlib
   - qatlib-service
   - qatzip
