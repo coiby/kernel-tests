@@ -63,3 +63,8 @@ DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        4.18.0      9.99.9      p
 
 DENYLIST+=("FAIL  aarch64,                             4.18.0      9.99.9      perf_trace :: test_basic :: attach process (output regexp parsing)")
 
+### new RHEL10 issues ###
+DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        6.12.0      6.13.0      perf_config :: test_set_trace :: checking trace.args_alignment variable - alignment (output regexp parsing)")
+DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        6.12.0      6.13.0      perf_sched :: test_timehist :: --state (output regexp parsing)")
+DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        6.12.0      6.13.0      perf_trace :: test_basic :: basic execution (output regexp parsing)")
+DENYLIST+=("FAIL  aarch64,ppc64le,s390x,x86_64,        6.12.0      6.13.0      perf_kmem :: test_basic :: stat --page (command exitcode + output regexp parsing)")
