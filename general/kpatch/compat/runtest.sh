@@ -28,6 +28,7 @@
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../include/lib.sh
+. ../include/lib_build.sh
 . ../../../security/crypto/enable_fips/lib.sh
 
 trap 'killall make; kill runtest.sh' SIGHUP SIGINT SIGQUIT SIGTERM
@@ -50,7 +51,7 @@ MOUNT_FLAG=0
 
 function install_kpp_debuginfo()
 {
-    # Example of a kpatch-patch pkg "kpatch-patch-4_18_0-107-0-1.test.el8.x86_64"
+    # Example of a kpatch-patch pkg "kpatch-patch-4_18_0-107-0-1.test.el8"
     local kpp_pkg kpp_debuginfo_pkg kpp_name kpp_version kpp_release kpp_arch
     kpp_pkg=$1
 
@@ -75,7 +76,7 @@ tracer="${trace_dir}/current_tracer"
 function install_deps() {
     # need to pass brew url to BUILDS_URL
     package_install perf-${kver}-${krel}
-    package_install kernel-debuginfo-${kver}-${krel}
+    install_debuginfo
     install_kernel_devel
 
     for i in $PACKAGE; do
