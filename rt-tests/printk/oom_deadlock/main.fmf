@@ -1,0 +1,21 @@
+summary: Flood the serial console with frequent oom-killer messages, exposing a lockup caused by atomic console contention.
+description: |
+  https://issues.redhat.com/browse/RHEL-72528
+
+  This test stresses printk subsystem under out-of-memory (OOM) conditions. It
+  does so by creating a large number of memory cgroups and launching many
+  processes that intentionally exhaust their cgroup's memory limit, triggering
+  the OOM killer. At the same time, the test continuously writes long messages
+  to /dev/console to generate heavy printk activity.
+
+  It is designed to expose potential deadlocks or stalls in printk, especially
+  those related to console locking or memory allocation failures during OOM
+  events. The test passes if the system remains responsive and no deadlock
+  occurs during the stress period.
+
+contact: Shizhao Chen<shichen@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+require:
+  - gcc
+duration: 2h
