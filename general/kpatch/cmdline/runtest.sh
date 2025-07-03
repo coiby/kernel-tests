@@ -278,7 +278,7 @@ rlJournalStart
         label_check
         if [ -z "${SKIP_SETUP}" ] && [ ! -z "${KPATCH_PATCH}" ] ; then
             yum -y remove ${KPATCH_PATCH} && label_check
-            install_kpp && label_check
+            install_kpp ${KPATCH_PATCH} && label_check
         fi
     rlPhaseEnd
 
