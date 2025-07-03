@@ -24,7 +24,6 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../../kernel-include/runtest.sh || exit 1
 
-
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
@@ -40,7 +39,7 @@ rlJournalStart
         ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
         rlRun "free=$(cat /proc/meminfo | awk '/MemFree/ {print $2}')"
         # shellcheck disable=SC2154
-        rlRun "size=$((free/1024/1024-1))"
+        rlRun "size=$((free/1024/1024-3))"
         # shellcheck disable=SC2154
         if [[ ${size} -le 0 ]]; then
             rlLog "Insuffecient free memory to run this test."
