@@ -25,4 +25,4 @@ require:
   - zlib-devel
   - pip
   - bzip2
-duration: 45m
+duration: 2h
