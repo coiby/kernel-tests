@@ -171,7 +171,7 @@ build_all()
 			if [ $? -ne 0 ]; then
 				echo "Aborting current task: Couldn't install LTP rpm." | tee -a $OUTPUTFILE
 				if [[ -n $RSTRNT_TASKNAME ]]; then
-					rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+					rstrnt-report-result "build_all rpm install" WARN
 					exit 0
 				else
 					exit 1
@@ -200,7 +200,7 @@ build_all()
 			cat config-maker.txt
 			echo "Aborting current task: Couldn't generate test config." | tee -a $OUTPUTFILE
 			if [[ -n $RSTRNT_TASKNAME ]]; then
-				rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
+				rstrnt-report-result "build_all config-maker" WARN
 				exit 0
 			else
 				exit 1
