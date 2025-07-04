@@ -211,7 +211,7 @@ build_all()
 	fi
 
 	install_kirk
-	if [[ "y" == "${USE_LTP_RPM}" ]]; then
+	if [[ "y" == "${USE_LTP_RPM}" ]] && rpm -q "ltp-${TESTVERSION}"; then
 		return
 	fi
 
