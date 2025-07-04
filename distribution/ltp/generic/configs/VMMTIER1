@@ -1,5 +1,4 @@
 # covered by runtest/mm
-mm01 mmap001 -m 10000
 mm02 mmap001
 
 mtest01 mtest01 -p80
