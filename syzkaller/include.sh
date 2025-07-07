@@ -98,6 +98,38 @@ EOF
     [ -e syzkaller.conf ] && return 0 || return 1
 }
 
+function create_syzkaller_qm_config() {
+    local syscalls="${main_syscalls}${support_syscalls:+, ${support_syscalls}}"
+    cat <<EOF > syzkaller.conf
+{
+    "http": "127.0.0.1:56741",
+    "rpc": "127.0.0.1:56742",
+    "max_crash_logs" : 10,
+    "target": "linux/${arch}",
+    "syzkaller": "${syzkaller_root}",
+    "cover": false,
+    "type": "none",
+    "reproduce": false,
+    "workdir": "${syzkaller_workdir}",
+    "enable_syscalls": [${syscalls}],
+    "disable_syscalls": [${disable_syscalls}],
+    "no_mutate_syscalls": [${support_syscalls}]
+}
+EOF
+    [ -e syzkaller.conf ] && return 0 || return 1
+}
+
+function setup_qm() {
+    rlRun "mkdir -p /etc/containers/systemd/qm.container.d"
+    cat <<EOF > /etc/containers/systemd/qm.container.d/syzkaller.conf
+[Container]
+Volume=${syzkaller_root}:${syzkaller_root}:z
+EOF
+    rlRun "semodule -i ${CDIR}/qm/syz_bpf_mounton.pp"
+    rlRun "systemctl daemon-reload"
+    rlRun "systemctl restart qm"
+}
+
 function syzkaller_setup() {
     rlLog "DUT is $DUT"
     if ! ping -c 1 $DUT > /dev/null 2>&1; then
@@ -144,41 +176,63 @@ function syzkaller_setup() {
     rlRun "git checkout ${SYZKALLER_COMMIT_HASH}"
     syzkaller_root=$(pwd)
     syzkaller_workdir=${syzkaller_root}/workdir
+    if [ -n "$FUZZ_IN_QM" ]; then
+        rlRun "git apply ${CDIR}/qm/qm.patch"
+    fi
     for git_patch in $git_patches; do
         rlRun "git apply ${CDIR}/$git_patch"
     done
     rlRun make
 
     # Create config
-    rlRun create_syzkaller_config
+    if [ -z "$FUZZ_IN_QM" ]; then
+        rlRun create_syzkaller_config
+    else
+        rlRun create_syzkaller_qm_config
+        rlRun "mkdir -p ${syzkaller_workdir}"
+        rlRun setup_qm
+    fi
     rlFileSubmit syzkaller.conf
-}
-
-function syzkaller_run() {
-    # Run syzkaller
-    start_time=$(date +%s)
-    rlWatchdog "${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf" "${time}"
-    end_time=$(date +%s)
 }
 
 function syzkaller_start() {
     # Run syzkaller in the background
     start_time=$(date +%s)
-    rlRun "tmux new-session -d -s syzkaller '${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syzkaller_run.log'"
-    echo $syzkaller_root > /var/tmp/syzkaller.root
+    if [ -z "$FUZZ_IN_QM" ]; then
+        rlRun "tmux new-session -d -s syzkaller '${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syzkaller_run.log'"
+    else
+        rlRun "tmux new-session -d -s syz-manager \"podman exec -it qm ${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syz-manager_run.log\""
+        sleep 10 # wait for syz-manager to start
+        rlRun "tmux new-session -d -s syz-executor \"podman exec -it qm bash -c \\\"cd ${syzkaller_workdir}; ${syzkaller_root}/bin/linux_arm64/syz-executor runner 0 127.0.0.1 56742\\\" 2>&1 | tee /var/tmp/syz-executor_run.log\""
+    fi
     echo $start_time > /var/tmp/syzkaller.start_time
-    rlLog "Syzkaller root: $(cat /var/tmp/syzkaller.root)"
 }
 
 function syzkaller_stop() {
-    rlRun "tmux kill-session -t syzkaller"
+    if [ -z "$FUZZ_IN_QM" ]; then
+        rlRun "tmux kill-session -t syzkaller"
+        rlFileSubmit /var/tmp/syzkaller_run.log
+    else
+        rlRun "tmux kill-session -t syz-manager"
+        rlRun "tmux kill-session -t syz-executor"
+        rlFileSubmit /var/tmp/syz-manager_run.log
+        rlFileSubmit /var/tmp/syz-executor_run.log
+    fi
     end_time=$(date +%s)
-    rlFileSubmit /var/tmp/syzkaller_run.log
+}
+
+function syzkaller_run() {
+    # Run syzkaller
+    start_time=$(date +%s)
+    rlRun syzkaller_start
+    rlRun "sleep ${time}"
+    rlRun syzkaller_stop
+    end_time=$(date +%s)
 }
 
 function syzkaller_check_results() {
     # Check test duration
-    syzkaller_root=${syzkaller_root:-$(cat /var/tmp/syzkaller.root)}
+    syzkaller_root=${syzkaller_root:-"/root/tmp/syzkaller_root/syzkaller"}
     syzkaller_workdir=${syzkaller_root}/workdir
     start_time=${start_time:-$(cat /var/tmp/syzkaller.start_time)}
     duration=$((${end_time}-${start_time}))
@@ -209,9 +263,17 @@ function syzkaller_check_results() {
 function syzkaller_cleanup() {
     rlRun "tar cf syzkaller_test_results.tar ${syzkaller_workdir}"
     rlFileSubmit syzkaller_test_results.tar
+    if [ -n "$FUZZ_IN_QM" ]; then
+        rlRun "semodule -r syz_bpf_mounton"
+        rlRun "rm -f /etc/containers/systemd/qm.container.d/syzkaller.conf"
+        rlRun "systemctl daemon-reload"
+        rlRun "systemctl restart qm"
+    else
+        rlRun "ssh $SSH_OPTIONS root@$DUT '[ -f /root/tmp/syzkaller/swap-file ] && swapoff /root/tmp/syzkaller/swap-file'"
+        rlRun "ssh $SSH_OPTIONS root@$DUT '[ -f ${syzkaller_workdir}/swap-file ] && swapoff ${syzkaller_workdir}/swap-file'"
+    fi
     rlRun "rm -rf ${syzkaller_workdir}" 0,1
     rlRun "rm -rf ${syzkaller_root}"
-    rlRun "rm -f /var/tmp/syzkaller.root /var/tmp/syzkaller.start_time"
-    rlRun "ssh $SSH_OPTIONS root@$DUT '[ -f /root/tmp/syzkaller/swap-file ] && swapoff /root/tmp/syzkaller/swap-file'"
+    rlRun "rm -f /var/tmp/syzkaller.start_time"
     rlRun "ssh $SSH_OPTIONS root@$DUT 'rm -rf /root/tmp/syzkaller'"
 }
