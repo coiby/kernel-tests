@@ -1,0 +1,10 @@
+summary: Tests for IAA to be used with Testing Farm
+contact: Denis Aleksandrov <daleksan@redhat.com>
+path: /security/crypto/iaa
+test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
+require:
+  - gcc
+duration: 45m
