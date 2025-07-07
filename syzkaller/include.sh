@@ -274,7 +274,6 @@ function syzkaller_cleanup() {
         rlRun "systemctl restart qm"
     else
         rlRun "ssh $SSH_OPTIONS root@$DUT '[ -f /root/tmp/syzkaller/swap-file ] && swapoff /root/tmp/syzkaller/swap-file'"
-        rlRun "ssh $SSH_OPTIONS root@$DUT '[ -f ${syzkaller_workdir}/swap-file ] && swapoff ${syzkaller_workdir}/swap-file'"
     fi
     rlRun "rm -rf ${syzkaller_workdir}" 0,1
     rlRun "rm -rf ${syzkaller_root}"
