@@ -326,15 +326,33 @@ EOF
 	chmod +x /usr/local/bin/iptables-legacy
 }
 
+run_test_progs()
+{
+	local ret
+	local prog="$1"
+	local test_case="$2"
+
+	run "${prog} ${test_case}"
+	ret=$?
+
+	# Get more detailed log info with -vv if failed
+	[ ${ret} -ne 0 ] && run "${prog} -vv ${test_case}"
+
+	# bpf_nf test opened a tcp port, which will be in TIME-WAIT after close.
+	echo "${test_case}" | grep -q "bpf_nf" && sleep 65
+
+	return $ret
+}
+
 do_bpf_test_progs_run()
 {
 	local item="bpf_test_progs"
-	local ret ret_1 ret_2 name_opt
+	local ret ret_1 name_opt
 
 	[ ! -d "$EXEC_DIR"/bpf ] && test_skip "No $item test, skip" && return 1
 
 	pushd "$EXEC_DIR"/bpf || exit
-	if [ ! -f test_progs ] || [ ! -f test_progs-no_alu32 ] || ! ./test_progs --count; then
+	if [ ! -f test_progs ] || ! ./test_progs --count; then
 		test_skip "No $item test, skip"
 		return 1
 	fi
@@ -349,6 +367,7 @@ do_bpf_test_progs_run()
 
 	for name in ${total_tests}; do
 		num=$((num + 1))
+		ret=0
 
 		# report results as a subphase
 		rlPhaseStartTest "selftests: ${item}:${name}"
@@ -361,16 +380,21 @@ do_bpf_test_progs_run()
 		local OUTPUTFILE=$LOG_DIR/${item}_${name}.log
 		dmesg -C
 
-		run "./test_progs ${name_opt} $name"
+		run_test_progs "./test_progs" "${name_opt} $name"
 		ret_1=$?
-		# Get more detailed log info with -vv if failed
-		[ ${ret_1} -ne 0 ] && run "./test_progs -vv ${name_opt} $name"
+		[ $ret_1 -ne 0 ] && ret=$ret_1
 
-		# bpf_nf test opened a tcp port, which will be in TIME-WAIT after close.
-		echo "${name}" | grep -q "bpf_nf" && sleep 65
+		if [ -f test_progs-no_alu32 ]; then
+			run_test_progs "./test_progs-no_alu32" "${name_opt} $name"
+			ret_1=$?
+			[ $ret_1 -ne 0 ] && ret=$ret_1
+		fi
 
-		run "./test_progs-no_alu32 ${name_opt} $name"
-		ret_2=$?
+		if [ -f test_progs-cpuv4 ]; then
+			run_test_progs "./test_progs-cpuv4" "${name_opt} $name"
+			ret_1=$?
+			[ $ret_1 -ne 0 ] && ret=$ret_1
+		fi
 
 		echo -e "\n=== Dmesg result ===" >> "$OUTPUTFILE"
 		dmesg >> "$OUTPUTFILE"
@@ -378,7 +402,6 @@ do_bpf_test_progs_run()
 		# submit logs
 		rlLog "$(cat ${OUTPUTFILE})"
 
-		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
 		check_result $num "$total_num" "${item}:${name}" $ret
 		rlPhaseEnd
 	done
