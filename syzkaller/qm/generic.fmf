@@ -1,27 +1,10 @@
-summary: Multihost capable fuzzing test based on syzkaller
+summary: QM version of the syzkaller fuzzing test.
 description: |
-  This is a wrapper for a system call fuzzing test based on syzkaller. You should create your own
-  fmf file setting required environment variables, such as the list of system calls to be fuzzed,
-  and set path: /syzkaller.
-
-  Wrapper test description:
-  Confirm system call fuzz testing is being performed.
-  The database is checked at the end to ensure each entry was executed at least once.
-  Default runtime is 1 hour (3600 seconds), but can be changed using the "time" environment variable.
-  Test inputs:
-      A list with the sysfs entries to be fuzzed, and a fuzzer program
-      called syzkaller. Input details:
-      - sycalls list (environment variable `enable_syscalls`)
-      - syzkaller code: https://github.com/google/syzkaller
-      - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
-  Expected results:
-      If the system calls are executed without incident during the test runtime,
-      all syscalls in list should be executed at least once. Example:
-      [   PASS   ] :: No crash results found.
-      [   PASS   ] :: [syscall_name] executed.
+  QM version of the syzkaller fuzzing test.
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 framework: beakerlib
 test: ./runtest.sh
+path: /syzkaller
 require:
   - gcc
   - gcc-c++
@@ -38,9 +21,11 @@ require:
   - type: file
     pattern:
         -  /kernel-include
+        -  /syzkaller
 environment:
   # Following environment variables are for wrapper debugging purposes only.
   time: 3600
+  FUZZ_IN_QM: 1
   main_syscalls: |
     "open",
     "read",

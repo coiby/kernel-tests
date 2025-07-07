@@ -164,3 +164,20 @@ testing-farm request \
     -c image_type=${image_type} \
     --timeout 5760
 ```
+
+## Fuzzing in QM
+
+- **Multihost testing is not supported for this mode**.
+- Set `FUZZ_IN_QM` environment variable.
+- Check SELinux policies required. Current file `syz_bpf_mounton` was created/installed with the following commands:
+
+```bash
+ausearch -m avc -ts recent | audit2allow -M syz_bpf_mounton
+semodule -i syz_bpf_mounton.pp
+```
+
+- Test cleanup phase removes the policy with
+
+```bash
+semodule -r syz_bpf_mounton
+```
