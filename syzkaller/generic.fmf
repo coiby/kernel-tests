@@ -33,11 +33,13 @@ require:
   - patch
   - sshpass
   - tar
-  - tmux
   - wget
   - type: file
     pattern:
         -  /kernel-include
+# tmux is required if syzkaller_start and syzkaller_stop are used
+recommend:
+  - tmux
 environment:
   # Following environment variables are for wrapper debugging purposes only.
   time: 3600

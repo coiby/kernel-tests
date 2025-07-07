@@ -190,6 +190,7 @@ function syzkaller_setup() {
     else
         rlRun create_syzkaller_qm_config
         rlRun "mkdir -p ${syzkaller_workdir}"
+        rlRun "cp /usr/lib64/libstdc++.so.6 /usr/lib/qm/rootfs/usr/lib64/"
         rlRun setup_qm
     fi
     rlFileSubmit syzkaller.conf
@@ -222,11 +223,14 @@ function syzkaller_stop() {
 }
 
 function syzkaller_run() {
-    # Run syzkaller
     start_time=$(date +%s)
-    rlRun syzkaller_start
-    rlRun "sleep ${time}"
-    rlRun syzkaller_stop
+    if [ -z "$FUZZ_IN_QM" ]; then
+        rlWatchdog "${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf" "${time}"
+    else
+        rlRun syzkaller_start
+        rlRun "sleep ${time}"
+        rlRun syzkaller_stop
+    fi
     end_time=$(date +%s)
 }
 
