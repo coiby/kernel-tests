@@ -685,13 +685,6 @@ function main() {
       echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf
       cki_print_success "Set panic_on_oops to 1"
 
-      # for kernel-rt-debug set panic_on_warn
-      # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db/-/issues/186
-      if cki_is_kernel_rt && cki_is_kernel_debug; then
-        echo "kernel.panic_on_warn = 1" >> /etc/sysctl.conf
-        cki_print_success "Set panic_on_warn to 1"
-      fi
-
       # print the rpm version if it is set, otherwise default to KVER
       cki_print_success "Installed kernel ${KVER_RPM:-$KVER}, rebooting (this may take a while)"
       cat << EOF
