@@ -485,17 +485,22 @@ do_tc-testing_reset()
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
 	# source skip/waive list
+	arch="$(uname -m)"
+	skip_link="https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main"
 	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
 		[ ! -f skip_waive.list ] && \
-			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive."${krelease}" -O skip_waive.list
+			# Try download arch specific skip_waive list first
+			if ! wget -q ${skip_link}/skip_waive."${krelease}"."${arch}" -O skip_waive.list; then
+				wget -q ${skip_link}/skip_waive."${krelease}" -O skip_waive.list
+			fi
 		[ ! -f param.list ] && \
-			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param."${krelease}" -O param.list
+			wget -q ${skip_link}/param."${krelease}" -O param.list
 	else
 		# This list is used for upstream testing
 		[ ! -f skip_waive.list ] && \
-			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.list -O skip_waive.list
+			wget -q ${skip_link}/skip_waive.list -O skip_waive.list
 		[ ! -f param.list ] && \
-			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.list -O param.list
+			wget -q ${skip_link}/param.list -O param.list
 	fi
 
 	if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
