@@ -181,3 +181,12 @@ semodule -i syz_bpf_mounton.pp
 ```bash
 semodule -r syz_bpf_mounton
 ```
+
+### Explanation of current persmissions
+
+This policy grants qm four high-privilege capabilities:
+
+- `allow qm_t binfmt_misc_fs_t:file open;`: Lets qm open files in the binfmt_misc filesystem. This is likely needed to check the status of custom binary format handlers.
+- `allow qm_t self:process execmem;`: It allows Syzkaller to execute code from writable memory. This is required for fuzzing but is a major security allowance.
+- `allow qm_t sysctl_fs_t:dir mounton;`: Allows qm to mount the /proc/sys filesystem, which is necessary for the fuzzer to complete its setup phase (which involves mount checks).
+- `allow qm_t system_map_t:file { open read };`: Lets qm read the System.map file. This is essential for turning kernel crash addresses into readable function names.
