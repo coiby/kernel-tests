@@ -25,6 +25,12 @@ function runtest() {
 	if rlIsRHEL 9; then
 		trun dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 		trun yum -y install nbd
+	elif rlIsRHEL 10; then
+		trun sysctl -wq kernel.io_uring_disabled=0
+		trun git clone -b ktls-utils-1.0-rc2 https://github.com/oracle/ktls-utils.git
+		trun pushd ktls-utils
+		trun "./autogen.sh && ./configure --with-systemd && make && make install && systemctl daemon-reload"
+		trun popd
 	fi
 	testcases=""
 	if rlIsRHEL 7; then
@@ -147,8 +153,8 @@ function runtest() {
 		testcases+=" block/010"
 		#testcases+=" block/011" #disable for normal SSD
 		testcases+=" block/012"
-		testcases+=" block/014"
-		testcases+=" block/015"
+		#testcases+=" block/014" module null_blk does not have parameter timeout
+		#testcases+=" block/015" module null_blk does not have parameter requeue
 		testcases+=" block/016"
 		testcases+=" block/017"
 		testcases+=" block/018"
@@ -162,13 +168,13 @@ function runtest() {
 		testcases+=" block/027"
 		testcases+=" block/028"
 		testcases+=" block/029"
-		testcases+=" block/030"
+		#testcases+=" block/030" module null_blk does not have parameter init_hctx
 		testcases+=" block/031"
 		testcases+=" block/032"
 		#testcases+=" block/033" ublk_drv
 		testcases+=" block/034"
 		cki_kver_ge "5.14.0-503" && sysctl -wq kernel.io_uring_disabled=0 && testcases+=" block/035"
-		testcases+=" block/036"
+		#testcases+=" block/036" debugfs does not exist
 		testcases+=" block/037"
 		testcases+=" block/038"
 		testcases+=" scsi/001"
@@ -176,7 +182,7 @@ function runtest() {
 		testcases+=" scsi/004"
 		testcases+=" scsi/005"
 		testcases+=" scsi/006"
-		#testcases+=" scsi/007" bz2027550
+		cki_kver_ge "5.14.0-384" && testcases+=" scsi/007"
 		testcases+=" loop/001"
 		testcases+=" loop/002"
 		testcases+=" loop/003"
@@ -202,24 +208,17 @@ function runtest() {
 		testcases+=" nvme/004"
 		testcases+=" nvme/005"
 		testcases+=" nvme/006"
-		#testcases+=" nvme/007"
 		testcases+=" nvme/008"
-		#testcases+=" nvme/009"
 		testcases+=" nvme/010"
-		#testcases+=" nvme/011"
 		testcases+=" nvme/012"
-		#testcases+=" nvme/013"
 		testcases+=" nvme/014"
-		#testcases+=" nvme/015"
 		testcases+=" nvme/016"
 		testcases+=" nvme/017"
 		testcases+=" nvme/018"
 		testcases+=" nvme/019"
-		#testcases+=" nvme/020"
 		testcases+=" nvme/021"
 		testcases+=" nvme/022"
 		testcases+=" nvme/023"
-		#testcases+=" nvme/024"
 		testcases+=" nvme/025"
 		testcases+=" nvme/026"
 		testcases+=" nvme/027"
@@ -227,7 +226,7 @@ function runtest() {
 		testcases+=" nvme/029"
 		testcases+=" nvme/030"
 		testcases+=" nvme/031"
-		#testcases+=" nvme/032" #BZ2005657
+		cki_kver_ge "5.14.0-571" && testcases+=" nvme/032" #BZ2005657
 		#testcases+=" nvme/033" #enable NVME_TARGET_PASSTHRU
 		#testcases+=" nvme/034" #enable NVME_TARGET_PASSTHRU
 		#testcases+=" nvme/035" #enable NVME_TARGET_PASSTHRU
@@ -247,6 +246,8 @@ function runtest() {
 		testcases+=" nvme/051"
 		testcases+=" nvme/052"
 		testcases+=" nvme/053"
+		cki_kver_ge "5.14.0-571" && testcases+=" nvme/057"
+		cki_kver_ge "5.14.0-571" && testcases+=" nvme/058"
 		tok "cd blktests && ./check $testcases"
 	elif rlIsRHEL 10; then
 		#For RHEL-10
@@ -280,7 +281,7 @@ function runtest() {
 		#testcases+=" block/033" ublk_drv
 		testcases+=" block/034"
 		testcases+=" block/035"
-		testcases+=" block/036" #debugfs does not exist
+		#testcases+=" block/036" #debugfs does not exist
 		testcases+=" block/037"
 		testcases+=" block/038"
 		testcases+=" scsi/001"
@@ -289,7 +290,7 @@ function runtest() {
 		testcases+=" scsi/005"
 		testcases+=" scsi/006"
 		testcases+=" scsi/007"
-		testcases+=" scsi/008"
+		testcases+=" scsi/008" #fio version is older than 3.37.0
 		testcases+=" loop/001"
 		testcases+=" loop/002"
 		testcases+=" loop/003"
@@ -307,7 +308,7 @@ function runtest() {
 		testcases+=" zbd/004"
 		testcases+=" zbd/005"
 		testcases+=" zbd/006"
-		testcases+=" zbd/007"
+		#testcases+=" zbd/007"
 		testcases+=" zbd/008"
 		testcases+=" zbd/011"
 		testcases+=" nvme/002"
@@ -315,15 +316,10 @@ function runtest() {
 		testcases+=" nvme/004"
 		testcases+=" nvme/005"
 		testcases+=" nvme/006"
-		#testcases+=" nvme/007"
 		testcases+=" nvme/008"
-		#testcases+=" nvme/009"
 		testcases+=" nvme/010"
-		#testcases+=" nvme/011"
 		testcases+=" nvme/012"
-		#testcases+=" nvme/013"
 		testcases+=" nvme/014"
-		#testcases+=" nvme/015"
 		testcases+=" nvme/016"
 		testcases+=" nvme/017"
 		testcases+=" nvme/018"
@@ -340,7 +336,7 @@ function runtest() {
 		testcases+=" nvme/029"
 		testcases+=" nvme/030"
 		testcases+=" nvme/031"
-		#testcases+=" nvme/032" #BZ2005657
+		testcases+=" nvme/032" #BZ2005657
 		#testcases+=" nvme/033" #enable NVME_TARGET_PASSTHRU
 		#testcases+=" nvme/034" #enable NVME_TARGET_PASSTHRU
 		#testcases+=" nvme/035" #enable NVME_TARGET_PASSTHRU
@@ -360,6 +356,10 @@ function runtest() {
 		testcases+=" nvme/051"
 		testcases+=" nvme/052"
 		testcases+=" nvme/053"
+		testcases+=" nvme/054"
+		testcases+=" nvme/055"
+		testcases+=" nvme/057"
+		testcases+=" nvme/058" #RHEL-88145
 		testcases+=" ublk/001"
 		testcases+=" ublk/002"
 		testcases+=" ublk/003"
