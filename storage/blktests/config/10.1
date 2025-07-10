@@ -39,7 +39,6 @@ uname -r | grep -qE "aarch64" && NVME_TCP=${NVME_TCP//nvme\/014 /}
 UBLK="ublk/001 ublk/002 ublk/003 ublk/004 ublk/005 ublk/006"
 
 THROTL="throtl/001 throtl/002 throtl/003 throtl/004 throtl/005 throtl/006"
-uname -r | grep -qE "s390x|ppc64le|aarch64" && THROTL=${THROTL//throtl\/001 /}
 # RHEL-88174 throtl/006 lead OOM on s390x+debug kernel
 # RHEL-88706
 uname -r | grep -qE "aarch64\+debug|x86_64\+debug|s390x\+debug" && THROTL=${THROTL//throtl\/006/}
