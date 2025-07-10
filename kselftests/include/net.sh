@@ -488,32 +488,39 @@ if [ ! "${__SOURCED__:+x}" ]; then
 	arch="$(uname -m)"
 	skip_link="https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main"
 	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
-		[ ! -f skip_waive.list ] && \
-			# Try download arch specific skip_waive list first
-			if ! wget -q ${skip_link}/skip_waive."${krelease}"."${arch}" -O skip_waive.list; then
-				wget -q ${skip_link}/skip_waive."${krelease}" -O skip_waive.list
-			fi
+		[ ! -f skip_waive.arch ] && \
+		# Try download arch specific skip_waive list first
+			wget -q "${skip_link}"/skip_waive."${krelease}"."${arch}" -O skip_waive.arch || true
+		# Now download release-wide skip_waive list
+		[ ! -f skip_waive.release ] && \
+			wget -q "${skip_link}"/skip_waive."${krelease}" -O skip_waive.release || true
 		[ ! -f param.list ] && \
-			wget -q ${skip_link}/param."${krelease}" -O param.list
+			wget -q "${skip_link}"/param."${krelease}" -O param.list
 	else
 		# This list is used for upstream testing
 		[ ! -f skip_waive.list ] && \
-			wget -q ${skip_link}/skip_waive.list -O skip_waive.list
+			wget -q "${skip_link}"/skip_waive.list -O skip_waive.list
 		[ ! -f param.list ] && \
-			wget -q ${skip_link}/param.list -O param.list
+			wget -q "${skip_link}"/param.list -O param.list
 	fi
 
-	if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
-		submit_log skip_waive.list
-		source skip_waive.list
+	for file in skip_waive.arch skip_waive.release skip_waive.list; do
+		[ -f "$file" ] || continue
+		[ "$(wc -l < "$file")" -eq 0 ] && continue
+
+		submit_log "$file"
+		# shellcheck source=/dev/null
+		. "$file"
 
 		SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
-		[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]:-}"
+		[ "$(free -m | awk '/Mem/ {print $2}')" -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]:-}"
 		WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]:-}"
 
-	fi
+		# clear arrays so next file doesn't append old data
+		unset skip_tests waive_tests large_mem_tests
+	done
 
-	if [ $(wc -l param.list | cut -f 1 -d ' ') -ne 0 ]; then
+	if [ -f param.list ] && [ "$(wc -l < param.list)" -ne 0 ]; then
 		submit_log param.list
 
 		while read -r line; do
