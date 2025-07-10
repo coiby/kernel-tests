@@ -67,6 +67,9 @@ disable_syscalls=${disable_syscalls:-'"mmap$DRM_I915",
 # shellcheck disable=SC2016
 support_syscalls=${support_syscalls:-''}
 
+# syscalls returning ENOSYS in QM
+not_present_syscalls=${not_present_syscalls:-''}
+
 time=${time:-3600}
 
 arch=$(uname -m|sed 's/x86_/amd/g'|sed 's/aarch/arm/g')
@@ -202,25 +205,35 @@ function syzkaller_start() {
     # Run syzkaller in the background
     start_time=$(date +%s)
     if [ -z "$FUZZ_IN_QM" ]; then
-        rlRun "tmux new-session -d -s syzkaller '${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syzkaller_run.log'"
+        rlRun "tmux new-session -d -s syzkaller '${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syz-manager_run.log'"
     else
         rlRun "tmux new-session -d -s syz-manager \"podman exec -it qm ${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syz-manager_run.log\""
         sleep 10 # wait for syz-manager to start
         rlRun "tmux new-session -d -s syz-executor \"podman exec -it qm bash -c \\\"cd ${syzkaller_workdir}; ${syzkaller_root}/bin/linux_arm64/syz-executor runner 0 127.0.0.1 56742\\\" 2>&1 | tee /var/tmp/syz-executor_run.log\""
     fi
     echo $start_time > /var/tmp/syzkaller.start_time
+    sleep 30
+    for call in ${not_present_syscalls}; do
+        syscall=$(echo "${call//\"}" | sed -e 's/,//')
+        if grep -q "syscall ${syscall} is not present" /var/tmp/syz-manager_run.log; then
+            rlPass "${syscall} not present as expected."
+        else
+            rlFail "${syscall} in not_present_syscalls list, but it is present. Refusing to continue."
+            syzkaller_stop
+            exit 1
+        fi
+    done
 }
 
 function syzkaller_stop() {
     if [ -z "$FUZZ_IN_QM" ]; then
         rlRun "tmux kill-session -t syzkaller"
-        rlFileSubmit /var/tmp/syzkaller_run.log
     else
         rlRun "tmux kill-session -t syz-manager"
         rlRun "tmux kill-session -t syz-executor"
-        rlFileSubmit /var/tmp/syz-manager_run.log
         rlFileSubmit /var/tmp/syz-executor_run.log
     fi
+    rlFileSubmit /var/tmp/syz-manager_run.log
     end_time=$(date +%s)
 }
 
@@ -237,6 +250,9 @@ function syzkaller_run() {
 }
 
 function syzkaller_check_results() {
+    # Sanitize not_present_syscalls to have all entries separated by spaces
+    local not_present_syscalls_sanitized=$(echo "${not_present_syscalls}" | tr ',\n\r\t"'"'" ' ' | tr -s ' ')
+
     # Check test duration
     syzkaller_root=${syzkaller_root:-"/root/tmp/syzkaller_root/syzkaller"}
     syzkaller_workdir=${syzkaller_root}/workdir
@@ -258,7 +274,9 @@ function syzkaller_check_results() {
     rlRun "${syzkaller_root}/bin/syz-db unpack ${syzkaller_workdir}/corpus.db ${syzkaller_workdir}/corpus_dir"
     for call in ${main_syscalls}; do
         syscall=$(echo "${call//\"}" | sed -e 's/,//')
-        if grep -q "^${syscall}[$,(]" "${syzkaller_workdir}"/corpus_dir/* ; then
+        if [[ " ${not_present_syscalls_sanitized} " == *" ${syscall} "* ]]; then
+            rlLog "${syscall} not present."
+        elif grep -q "^${syscall}[$,(]" "${syzkaller_workdir}"/corpus_dir/* ; then
             rlPass "${syscall} executed."
         else
             rlFail "${syscall} not executed."
