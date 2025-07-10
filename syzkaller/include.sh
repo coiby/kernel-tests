@@ -46,7 +46,7 @@ else
 fi
 
 verbose=${verbose:-""}
-
+ignore_crash_patterns=${ignore_crash_patterns:-""}
 git_patches=${git_patches:-""}
 
 # syscalls to fuzz
@@ -92,7 +92,8 @@ function create_syzkaller_config() {
     },
     "enable_syscalls": [${syscalls}],
     "disable_syscalls": [${disable_syscalls}],
-    "no_mutate_syscalls": [${support_syscalls}]
+    "no_mutate_syscalls": [${support_syscalls}],
+    "ignores": [${ignore_crash_patterns}]
 }
 EOF
     [ -e syzkaller.conf ] && return 0 || return 1
@@ -113,7 +114,8 @@ function create_syzkaller_qm_config() {
     "workdir": "${syzkaller_workdir}",
     "enable_syscalls": [${syscalls}],
     "disable_syscalls": [${disable_syscalls}],
-    "no_mutate_syscalls": [${support_syscalls}]
+    "no_mutate_syscalls": [${support_syscalls}],
+    "ignores": [${ignore_crash_patterns}]
 }
 EOF
     [ -e syzkaller.conf ] && return 0 || return 1
