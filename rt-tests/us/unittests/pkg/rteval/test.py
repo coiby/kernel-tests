@@ -2,6 +2,7 @@
 """
 Unittest for package rteval
 """
+import configparser
 import subprocess
 import os
 import glob
@@ -11,10 +12,23 @@ import rtut
 
 class RtevalTest(rtut.RTUnitTest):
 
+    @staticmethod
+    def check_timerlat_in_measurement():
+        config = configparser.ConfigParser()
+        config.read("/etc/rteval.conf")
+
+        if "measurement" in config:
+            if "timerlat" in config["measurement"]:
+                return True
+        return False
+
     def setUp(self):
         cwd = os.getcwd()
         self.wrkdir = f"{cwd}/workingdir"
         self.summary = f"{cwd}/workingdir/*/summary.xml"
+        # true if timerlat is the preferred over cyclictest
+        timerlat = self.check_timerlat_in_measurement()
+        self.preferred_measurement_module = "timerlat" if timerlat else "cyclictest"
         self.make_dirs(self.wrkdir)
         self.cpulist = "0"
 
@@ -50,13 +64,13 @@ class RtevalTest(rtut.RTUnitTest):
     def test_cpu_list(self):
         self.run_cmd(
             f"rteval -d 10s -w {self.wrkdir} -D --loads-cpulist={self.cpulist} "
-            f"-L --cyclictest-priority=90"
+            f"-L --{self.preferred_measurement_module}-priority=90"
         )
 
     def test_measurement_cpu_list(self):
         self.run_cmd(
             f"rteval -d 10s -w {self.wrkdir} -s --measurement-cpulist={self.cpulist} "
-            f"-L --cyclictest-priority=90"
+            f"-L --{self.preferred_measurement_module}-priority=90"
         )
 
     def test_summarize(self):
