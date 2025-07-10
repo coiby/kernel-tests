@@ -22,6 +22,8 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+# Source the Intel QAT configuration script
+. ../include/lib.sh
 
 rlJournalStart
 
@@ -52,7 +54,7 @@ rlPhaseStartSetup
 
 		# Run the Intel QAT configuration script
 		rlRun "pip install prettytable"
-		rlRun "python3 qat -c -m 2" 0 "reconfiguring QAT devices to (de)compression mode"
+		rlRun "run_qat \"-c -m 2\"" 0 "reconfiguring QAT devices to (de)compression mode"
 
 		# Get zstd setup files
 		rlRun "git clone https://github.com/facebook/zstd.git"

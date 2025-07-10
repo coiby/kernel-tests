@@ -22,6 +22,8 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+# Source the Intel QAT configuration script
+. ../include/lib.sh
 
 rlJournalStart
 
@@ -62,7 +64,7 @@ rlPhaseStartSetup
 
 		# Configure QAT to sym:asym encryption mode
 		rlRun "pip install prettytable"
-		rlRun "python3 qat -c -m 1" 0 "Turning QAT mode to sym:asym"
+		rlRun "run_qat \"-c -m 1\"" 0 "Turning QAT mode to sym:asym"
 	fi
 rlPhaseEnd
 

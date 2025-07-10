@@ -22,6 +22,8 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+# Source the Intel QAT configuration script
+. ../include/lib.sh
 
 rlJournalStart
 
@@ -75,7 +77,7 @@ rlPhaseStartSetup
 
 		# Configure QAT to dc (de)compression mode
 		rlRun "pip install prettytable"
-		rlRun "python3 qat -c -m 2" 0 "Turning QAT mode to dc"
+		rlRun "run_qat \"-c -m 2\"" 0 "Turning QAT mode to dc"
 	fi
 rlPhaseEnd
 
