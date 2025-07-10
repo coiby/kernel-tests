@@ -1,0 +1,2 @@
+test: bash ../stop_and_get_results.sh
+id: 3898d141-3d28-4009-8d32-ef40d49dd61c
