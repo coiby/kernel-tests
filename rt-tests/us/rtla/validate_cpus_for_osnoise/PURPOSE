@@ -1,0 +1,13 @@
+DESCRIPTION
+regression check of https://issues.redhat.com/browse/RHEL-86520
+This test checks whether the system has at least 128 logical processors
+and attempts to write CPUs 0-100 to the /sys/kernel/tracing/osnoise/cpus file.
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+n/a

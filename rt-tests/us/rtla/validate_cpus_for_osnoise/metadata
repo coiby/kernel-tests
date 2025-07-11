@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/rtla/validate_cpus_for_osnoise
+owner=Chang Yin <cyin@redhat.com>
+description=Validate writing CPU list to osnoise tracing file with at least 128 processors
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=rt-tests/include
+max_time=10m
+use_pty=false
