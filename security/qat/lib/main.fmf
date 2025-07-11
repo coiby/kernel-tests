@@ -25,4 +25,8 @@ require:
   - zlib-devel
   - pip
   - bzip2
+  - type: file
+    pattern:
+      - /security/qat/include/lib.sh
+      - /security/qat/include/qat
 duration: 2h

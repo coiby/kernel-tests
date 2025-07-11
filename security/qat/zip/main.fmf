@@ -28,4 +28,8 @@ require:
   - lz4-devel
   - qatzip-devel
   - qatlib-devel
+  - type: file
+    pattern:
+      - /security/qat/include/lib.sh
+      - /security/qat/include/qat
 duration: 45m

@@ -27,4 +27,8 @@ require:
   - pip
   - bzip2
   - qat-zstd-plugin-devel
+  - type: file
+    pattern:
+      - /security/qat/include/lib.sh
+      - /security/qat/include/qat
 duration: 45m

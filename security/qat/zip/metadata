@@ -10,3 +10,4 @@ destructive=no
 entry_point=bash ./runtest.sh
 dependencies=beakerlib;qatzip;qatlib;qatlib-service;qatengine;gcc;clang;wget;unzip;git;automake;libtool;openssl;openssl-devel;numactl-devel;zlib-devel;pip;bzip2;autoconf;lz4-devel
 softDependencies=nasm;qatlib-devel
+repoRequires=security/qat/include
