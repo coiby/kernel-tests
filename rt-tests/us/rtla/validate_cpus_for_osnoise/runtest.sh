@@ -20,16 +20,7 @@ function runtest()
     phase_start_test "Generate and write CPUs string"
     cpus=$(seq -s, 0 100)
     log "Length of CPUs string: ${#cpus}"
-
-    err_msg=$( { echo "$cpus" > cpus; } 2>&1 )
-
-    if [[ -z "$err_msg" ]]; then
-        log_pass "Successfully wrote to 'cpus'"
-    elif [[ "$err_msg" == *"Invalid argument"* ]]; then
-        log_fail "Failed to write to 'cpus': Invalid argument"
-    else
-        log_fail "Failed to write to 'cpus': $err_msg"
-    fi
+    run "echo \"$cpus\" > cpus"
     phase_end
 }
 
