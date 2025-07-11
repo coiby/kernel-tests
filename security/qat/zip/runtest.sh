@@ -20,10 +20,13 @@
 #
 # Original script written by Vilem Marsik <vmarsik@redhat.com>
 
+FILE=$(readlink -f ${BASH_SOURCE[0]})
+CDIR=$(dirname $FILE)
+
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 # Source the Intel QAT configuration script
-. ../include/lib.sh
+. ${CDIR}/../include/lib.sh
 
 rlJournalStart
 
