@@ -1,5 +1,4 @@
-
-module syz_bpf_mounton 1.0;
+module syzkaller 1.0;
 
 require {
 	type sysctl_fs_t;
