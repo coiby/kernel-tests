@@ -125,28 +125,34 @@ test_pass_exit()
 {
 	test_pass "$@"
 	clean_env
-	exit 0
+	rlPhaseEnd
+	rlJournalEnd
+	rlJournalPrint
+	exit
 }
 
 test_fail_exit()
 {
 	test_fail "$@"
 	clean_env
-	exit 1
+	rlDie "$@"
 }
 
 test_warn_exit()
 {
 	test_warn "$@"
 	clean_env
-	exit 1
+	rlDie "$@"
 }
 
 test_skip_exit()
 {
 	test_skip "$@"
 	clean_env
-	exit 0
+	rlPhaseEnd
+	rlJournalEnd
+	rlJournalPrint
+	exit
 }
 
 # Usage: run command [return_value]
