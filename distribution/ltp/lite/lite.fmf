@@ -8,7 +8,6 @@ component:
   - glibc
 test: bash ./runtest.sh
 tag:
-  - KT1-9
   - KernelTier1
   - KernelAutomotiveTier1
 framework: shell
@@ -31,7 +30,6 @@ require:
   - numactl
   - strace
   - wget
-  - initscripts-service
   - iputils
   - type: file
     pattern:
@@ -40,6 +38,7 @@ require:
       - /distribution/ltp/include-ng
       - /distribution/ltp/kirk
 recommend:
+  - initscripts-service
   - python3-click
 duration: 6h
 adjust+:
