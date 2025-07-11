@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-repoRequires=rt-tests/include
+repoRequires=cki_lib;rt-tests/include
 max_time=10m
 use_pty=false
