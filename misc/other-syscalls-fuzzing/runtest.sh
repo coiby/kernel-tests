@@ -77,7 +77,7 @@ function is_excluded() {
 function run_ltp_syscalls_continuously()
 {
     # wait for syzkaller binary to be built
-    while [ ! -f ../../memory/mmra/syzkaller/syzkaller/syzkaller-test.cfg ]; do
+    while [ ! -f /root/tmp/syzkaller_root/syzkaller/syzkaller.conf ]; do
         sleep 10
     done
     IFS=',' read -ra folders <<< "$(echo "${mm_syscalls//\"/}" | tr -d '\n')"
@@ -120,7 +120,7 @@ EOF
     rlPhaseEnd
     rlPhaseStartTest "Run LTP syscalls tests in QM, syzkaller in ASIL-B"
         run_ltp_syscalls_continuously $timer &
-        pushd ../../memory/mmra/syzkaller
+        pushd ../../syzkaller
         rlLog "Fuzzing syscalls in ASIL-B context"
         rlRun "bash ./runtest.sh"
         popd

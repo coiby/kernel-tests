@@ -48,9 +48,10 @@ require:
   - type: file
     pattern:
         - /kernel-include
-        - /memory/mmra/syzkaller
+        - /syzkaller
 environment:
-    mm_syscalls: '"ioctl$WDIOC_GETSUPPORT", "ioctl$WDIOC_GETSTATUS", "ioctl$WDIOC_GETBOOTSTATUS", "ioctl$WDIOC_GETTEMP", "ioctl$WDIOC_SETOPTIONS", "ioctl$WDIOC_KEEPALIVE", "ioctl$WDIOC_SETTIMEOUT", "ioctl$WDIOC_GETTIMEOUT", "ioctl$WDIOC_SETPRETIMEOUT", "ioctl$WDIOC_GETPRETIMEOUT", "ioctl$WDIOC_GETTIMELEFT"'
-    supportcalls: '"syz_open_dev$watchdog"'
-    git_patches: '../../../../misc/watchdog-fuzzing-test/dev_watchdog.patch'
+    SYZKALLER_COMMIT_HASH: "21339d7b9986698282dce93709157dc36907fbf8"
+    main_syscalls: '"ioctl$WDIOC_GETSUPPORT", "ioctl$WDIOC_GETSTATUS", "ioctl$WDIOC_GETBOOTSTATUS", "ioctl$WDIOC_GETTEMP", "ioctl$WDIOC_SETOPTIONS", "ioctl$WDIOC_KEEPALIVE", "ioctl$WDIOC_SETTIMEOUT", "ioctl$WDIOC_GETTIMEOUT", "ioctl$WDIOC_SETPRETIMEOUT", "ioctl$WDIOC_GETPRETIMEOUT", "ioctl$WDIOC_GETTIMELEFT"'
+    support_syscalls: '"syz_open_dev$watchdog"'
+    git_patches: '../misc/watchdog-fuzzing-test/dev_watchdog.patch'
 duration: 2h
