@@ -40,13 +40,12 @@ function report_results
 function startup
 {
     echo "INFO: Installing testsuite"
-    if ! ts_setup &> setup.log ; then
-      cat setup.log
+    if ! ts_setup; then
       echo "Aborting test as it failed to setup test suite."
       rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
       exit 0
     fi
 
-    echo "INFO: testsuite installed successfully. More information on setup.log"
-    [[ -n $RSTRNT_TASKID ]] && rstrnt-report-result -o setup.log "Setup" PASS
+    echo "INFO: testsuite installed successfully"
+    [[ -n $RSTRNT_TASKID ]] && rstrnt-report-result "Setup" PASS
 }

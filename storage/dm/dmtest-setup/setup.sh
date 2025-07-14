@@ -46,9 +46,11 @@ function load_vdo {
     # If the kernel version is lower than 6.10.0, skip loading VDO
     # because the 'dm-vdo' module is not available on older kernels.
     TARGET_VERSION="6.9.0"
-    if [[ "$(printf '%s\n' "$K_VER" "$TARGET_VERSION" | sort -V | head -n 1)" == "$TARGET_VERSION" ]]; then
-      modprobe dm-vdo || return 1
-      lsmod | grep "dm_vdo"
+    KERNEL_FULL=$(uname -r)
+    KERNEL_VER_STRIPPED=$(echo "$KERNEL_FULL" | cut -d'-' -f1)
+    if [[ "$(printf '%s\n' "$KERNEL_VER_STRIPPED" "$TARGET_VERSION" | sort -V | head -n 1)" == "$TARGET_VERSION" ]]; then
+        modprobe dm-vdo || return 1
+        lsmod | grep "dm_vdo"
     fi
     return 0
 }
