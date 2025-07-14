@@ -130,7 +130,9 @@ function setup_qm() {
 [Container]
 Volume=${syzkaller_root}:${syzkaller_root}:z
 EOF
-    rlRun "semodule -i ${CDIR}/qm/syz_bpf_mounton.pp"
+    rlRun "checkmodule -M -m -o syzkaller.mod ${CDIR}/qm/syzkaller.te"
+    rlRun "semodule_package -o syzkaller.pp -m syzkaller.mod"
+    rlRun "semodule -i syzkaller.pp"
     rlRun "systemctl daemon-reload"
     rlRun "systemctl restart qm"
 }
@@ -212,7 +214,7 @@ function syzkaller_start() {
         rlRun "tmux new-session -d -s syz-executor \"podman exec -it qm bash -c \\\"cd ${syzkaller_workdir}; ${syzkaller_root}/bin/linux_arm64/syz-executor runner 0 127.0.0.1 56742\\\" 2>&1 | tee /var/tmp/syz-executor_run.log\""
     fi
     echo $start_time > /var/tmp/syzkaller.start_time
-    sleep 30
+    sleep 20
     for call in ${not_present_syscalls}; do
         syscall=$(echo "${call//\"}" | sed -e 's/,//')
         if grep -q "syscall ${syscall} is not present" /var/tmp/syz-manager_run.log; then
@@ -220,6 +222,7 @@ function syzkaller_start() {
         else
             rlFail "${syscall} in not_present_syscalls list, but it is present. Refusing to continue."
             syzkaller_stop
+            rlRun "semodule -r syzkaller"
             exit 1
         fi
     done
@@ -288,7 +291,7 @@ function syzkaller_cleanup() {
     rlRun "tar cf syzkaller_test_results.tar ${syzkaller_workdir}"
     rlFileSubmit syzkaller_test_results.tar
     if [ -n "$FUZZ_IN_QM" ]; then
-        rlRun "semodule -r syz_bpf_mounton"
+        rlRun "semodule -r syzkaller"
         rlRun "rm -f /etc/containers/systemd/qm.container.d/syzkaller.conf"
         rlRun "systemctl daemon-reload"
         rlRun "systemctl restart qm"
