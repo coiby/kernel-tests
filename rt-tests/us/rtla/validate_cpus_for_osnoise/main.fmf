@@ -1,8 +1,9 @@
 summary: Validate writing CPU list to osnoise tracing file with at least 128 processors
 description: |-
     regression check of https://issues.redhat.com/browse/RHEL-86520
-    This test checks whether the system has at least 128 logical processors
-    and attempts to write CPUs 0-100 to the /sys/kernel/tracing/osnoise/cpus file.
+    Dynamically generate full CPU list (0..nrcpus-1) and verify that it can
+    be successfully written to /sys/kernel/tracing/osnoise/cpus. This test
+    verifies kernel support for large cpulist parsing in osnoise tracing.
 contact: Chang Yin <cyin@redhat.com>
 test: bash ./runtest.sh
 framework: shell

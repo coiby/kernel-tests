@@ -4,37 +4,29 @@
 . ../../../include/runtest.sh || exit 1
 
 export TEST="rt-tests/us/rtla/validate_cpus_for_osnoise"
-# minimum number of processors required
-export MIN_CPU_REQUIRED=128
 
 function runtest()
 {
-    # Verify rtla is installed
     oneliner "yum install -y rtla"
 
     cd /sys/kernel/tracing/osnoise || {
-        log "Error: Cannot change directory to /sys/kernel/tracing/osnoise"
-        exit 1
+        log_fail "Cannot change directory to /sys/kernel/tracing/osnoise"
+        return 1
     }
 
-    phase_start_test "Generate and write CPUs string"
-    cpus=$(seq -s, 0 100)
-    log "Length of CPUs string: ${#cpus}"
+    phase_start_test "Detected $nrcpus processors. Write full CPU list to osnoise/cpus"
+    # Generate cpus string: 0,1,...,$((nrcpus-1))
+    max_cpu=$((nrcpus - 1))
+    cpus=$(seq -s, 0 "$max_cpu")
+
+    log "Generated CPUs string of length ${#cpus}"
     run "echo \"$cpus\" > cpus"
     phase_end
 }
 
-# Only run on 9.7+
-if rhel_in_range 0 9.6; then
-    rstrnt-report-result "Bug fix in RHEL-9.7+ and RHEL-10.1+ -- skipping test case" "SKIP" 0
-    exit 0
-fi
-
-# check if the number of CPU processors is >= MIN_CPU_REQUIRED
-cpu_count=$(grep -c ^processor /proc/cpuinfo)
-log "Detected $cpu_count processors."
-if (( cpu_count < MIN_CPU_REQUIRED )); then
-    rstrnt-report-result "CPU count is less than $MIN_CPU_REQUIRED. At least $MIN_CPU_REQUIRED processors are required" "SKIP" 0
+# Only run on 9.7+ and 10.1+
+if rhel_in_range 0 9.6 || rhel_in_range 10.0 10.0; then
+    rstrnt-report-result "Known bug fixed in RHEL 9.7+ and 10.1+. Skipping test." "SKIP" 0
     exit 0
 fi
 
