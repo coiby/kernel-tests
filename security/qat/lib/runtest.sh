@@ -92,14 +92,14 @@ rlPhaseStart FAIL "QATlib: sym/asym encryption operations"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QATlib: dc compression operations"
-	rlRun "python3 qat -c -m 2" 0 "Setting QAT mode to dc"
+	rlRun "run_qat \"-c -m 2\"" 0 "Setting QAT mode to dc"
 	rlRun "dc_dp_sample"
 	rlRun "dc_stateless_multi_op_sample"
 	rlRun "dc_stateless_sample"
 rlPhaseEnd
 
 rlPhaseStart FAIL "QAT:lib: dcc operations"
-	rlRun "python3 qat -c -m 7" 0 "Setting QAT mode to dcc"
+	rlRun "run_qat \"-c -m 7\"" 0 "Setting QAT mode to dcc"
 	rlRun "chaining_sample"
 rlPhaseEnd
 
