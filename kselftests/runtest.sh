@@ -388,4 +388,5 @@ if [ ! "${__SOURCED__:+x}" ]; then
         CleanupTest
 
     rlJournalEnd
+    rlJournalPrint
 fi
