@@ -30,6 +30,8 @@ function runtest
     ./dmtest run --result-set $RESULT_SET --rx "vdo"
 }
 
-startup
+load_vdo || return "$CKI_UNINITIATED"
+clone_test_suite || return "$CKI_UNINITIATED"
+ts_config_setup "$DMTS_LOCAL"/config.toml || return "$CKI_UNINITIATED"
 runtest
 report_results $RESULT_SET
