@@ -14,6 +14,7 @@ function runtest()
         return 1
     }
 
+    # shellcheck disable=SC2154
     phase_start_test "Detected $nrcpus processors. Write full CPU list to osnoise/cpus"
     # Generate cpus string: 0,1,...,$((nrcpus-1))
     max_cpu=$((nrcpus - 1))
