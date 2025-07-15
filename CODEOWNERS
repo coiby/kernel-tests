@@ -278,7 +278,7 @@
 /networking/tunnel/vxlan/basic/ @bgoncalv @linup2011 @liuhangbin @lulinqing @stowellm
 /networking/udp/udp_socket/ @bgoncalv @liuhangbin @lulinqing @stowellm @yiche
 /networking/vnic/ipvlan/basic/ @bgoncalv @linup2011 @lulinqing @stowellm
-/networking/vnic/sriov/ @bgoncalv @jiqiu @lulinqing @ralongi @stowellm @wanghekai @zfang1
+/networking/vnic/sriov/ @bgoncalv @lulinqing @stowellm @yuma4
 /networking/vrf/sanity_check/ @atenart @bgoncalv @lulinqing @stowellm
 /packages/httpd/mod_ssl-smoke/ @bgoncalv @brako @lulinqing @stowellm
 /packages/i2c-tools/sanity/i2cdetect-smoke/ @bgoncalv @lulinqing @psklenar1 @stowellm
