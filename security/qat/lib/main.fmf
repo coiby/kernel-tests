@@ -1,0 +1,32 @@
+summary: Tests for QAT lib to be used with Testing Farm
+contact: Denis Aleksandrov <daleksan@redhat.com>
+path: /security/qat/lib
+test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
+require:
+  - qatlib-service
+  - qatlib
+  - qatlib-tests
+  - qatengine
+  - qatzip
+  - gcc
+  - clang
+  - wget
+  - unzip
+  - git
+  - automake
+  - libtool
+  - openssl
+  - openssl-devel
+  - numactl-devel
+  - nasm
+  - zlib-devel
+  - pip
+  - bzip2
+  - type: file
+    pattern:
+      - /security/qat/include/lib.sh
+      - /security/qat/include/qat
+duration: 2h

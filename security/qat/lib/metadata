@@ -1,0 +1,13 @@
+[General]
+name=/kernel/security/qat/lib
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=QAT lib tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;qatlib;qatlib-tests;qatlib-service;qatengine;qatzip;gcc;clang;wget;unzip;git;automake;libtool;openssl;openssl-devel;numactl-devel;nasm;zlib-devel;pip;bzip2
+max_time=2h
+repoRequires=security/qat/include

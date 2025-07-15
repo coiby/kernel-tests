@@ -1,16 +1,15 @@
-summary: Baseline tests for QAT userspace packages to be run with Testing Farm
+summary: Tests for QAT zip to be used with Testing Farm
 contact: Denis Aleksandrov <daleksan@redhat.com>
-path: /security/qat
+path: /security/qat/zip
 test: bash ./runtest.sh
 component:
   - kernel
 framework: beakerlib
 require:
+  - qatzip
   - qatlib
   - qatlib-service
   - qatengine
-  - qatlib-tests
-  - qatzip
   - gcc
   - clang
   - wget
@@ -25,4 +24,12 @@ require:
   - zlib-devel
   - pip
   - bzip2
+  - autoconf
+  - lz4-devel
+  - qatzip-devel
+  - qatlib-devel
+  - type: file
+    pattern:
+      - /security/qat/include/lib.sh
+      - /security/qat/include/qat
 duration: 45m

@@ -1,0 +1,34 @@
+summary: Tests for QAT zstd-plugin to be used with Testing Farm
+contact: Denis Aleksandrov <daleksan@redhat.com>
+path: /security/qat/zstd-plugin
+test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
+require:
+  - qat-zstd-plugin
+  - qatlib
+  - qatlib-devel
+  - qatlib-service
+  - qatengine
+  - qatzip
+  - gcc
+  - clang
+  - wget
+  - unzip
+  - git
+  - automake
+  - libtool
+  - openssl
+  - openssl-devel
+  - numactl-devel
+  - nasm
+  - zlib-devel
+  - pip
+  - bzip2
+  - qat-zstd-plugin-devel
+  - type: file
+    pattern:
+      - /security/qat/include/lib.sh
+      - /security/qat/include/qat
+duration: 45m

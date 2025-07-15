@@ -1,0 +1,7 @@
+Description: Test suite for QAT engine userspace package
+Authors: Vilem Marsik <vmarsik@redhat.com> and Denis Aleksandrov <daleksan@redhat.com>
+Links: 
+- The Intel QAT configuration script is from
+https://intel.github.io/quickassist/qatlib/configuration.html
+- The tests for qat_hw and qat_sw are from
+https://intel.github.io/quickassist/qatlib/qatengine.html
