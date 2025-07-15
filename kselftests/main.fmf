@@ -59,6 +59,8 @@ extra-task: kselftests
       id: 2a05643f-5a1a-4d27-b5e0-e19b9af7a79b
     - when: test_suite == kself_delivered_misc
       id: 2c9cb810-504b-44b6-8818-cd2b0ec011b8
+    - when: test_suite == fuzzing_functional
+      id: 10331c46-75dc-46ea-af4f-66cac01b360c
     - when: test_suite == kself_concurrent_syscalls
       id: 1b10a1fe-6159-4de5-bbfc-ce6e214f2630
       summary: Ensuring that self-tests are tested concurrently.
