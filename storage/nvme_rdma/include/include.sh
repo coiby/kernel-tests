@@ -60,6 +60,10 @@ load_modules()
 
 function nvme_core_multipath_conf
 {
+	if rlIsRHEL "10" || rlIsCentOS "10"; then
+		tlog "INFO: `cat /etc/redhat-release` already enabled nvme_core.multipath by default"
+		return
+	fi
 	tlog "INFO: start to $1 nvme native multipath"
 	if [ "$1" = "enable" ]; then
 		tlog "INFO: start to unload: nvme_rdma nvme_fabrics nvme nvme_core"
@@ -78,8 +82,8 @@ function nvme_core_multipath_conf
 	tok sleep 5
 }
 
-# disable nvme_core multipath for RHEL9/10
-if rlIsRHEL 9 || rlIsRHEL 10; then
+# disable nvme_core multipath for RHEL9
+if rlIsRHEL 9; then
 	if [ ! -f /etc/modprobe.d/nvme.conf ]; then
 		nvme_core_multipath_conf disable
 	fi
