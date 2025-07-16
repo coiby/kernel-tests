@@ -1,0 +1,8 @@
+summary: Set up Open vSwitch bridge network
+test: ./runtest.sh
+framework: shell
+require:
+ - NetworkManager-ovs
+ - nmap-ncat
+ - jq
+
