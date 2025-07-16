@@ -22,6 +22,7 @@ function runtest()
 
     log "Generated CPUs string of length ${#cpus}"
     run "echo \"$cpus\" > cpus"
+    run "cat cpus"
     phase_end
 }
 
