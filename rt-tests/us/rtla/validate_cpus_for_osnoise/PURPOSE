@@ -1,0 +1,14 @@
+DESCRIPTION
+regression check of https://issues.redhat.com/browse/RHEL-86520
+Dynamically generate full CPU list (0..nrcpus-1) and verify that it can
+be successfully written to /sys/kernel/tracing/osnoise/cpus. This test
+verifies kernel support for large cpulist parsing in osnoise tracing.
+
+STEPS TO RUN
+./runtest.sh
+
+SUPPORTED PLATFORMS
+all
+
+KNOWN ISSUES
+n/a

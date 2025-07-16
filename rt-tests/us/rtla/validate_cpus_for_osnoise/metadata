@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/rtla/validate_cpus_for_osnoise
+owner=Chang Yin <cyin@redhat.com>
+description=Validate full CPU list can be written to osnoise/cpus
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;rt-tests/include
+max_time=10m
+use_pty=false
