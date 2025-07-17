@@ -30,8 +30,13 @@ function runtest
     ./dmtest run --result-set $RESULT_SET --rx "vdo"
 }
 
-load_vdo || return "$CKI_UNINITIATED"
-clone_test_suite || return "$CKI_UNINITIATED"
-ts_config_setup "$DMTS_LOCAL"/config.toml || return "$CKI_UNINITIATED"
+echo "INFO: Installing testsuite"
+if ! setup_vdo_env; then
+    echo "Aborting test as it failed to setup test suite."
+    rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL
+    exit 0
+fi
+
+echo "INFO: testsuite installed successfully"
 runtest
 report_results $RESULT_SET
