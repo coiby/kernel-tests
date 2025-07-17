@@ -175,6 +175,7 @@ cifs_arc4.ko
 cifs.ko
 cifs_md4.ko
 cirrus.ko
+cirrus-qemu.ko
 clip.ko
 cls_bpf.ko
 cls_flower.ko
@@ -197,6 +198,9 @@ csiostor.ko
 curve25519-generic.ko
 curve25519-ppc64le.ko
 cuse.ko
+cx231xx.ko
+cx2341x.ko
+cx25840.ko
 cx82310_eth.ko
 cxacru.ko
 cxgb4i.ko
@@ -261,11 +265,13 @@ dp83867.ko
 dp83tc811.ko
 dp83tg720.ko
 drm_buddy.ko
+drm_client_lib.ko
 drm_display_helper.ko
 drm_exec.ko
 drm_gpuvm.ko
 drm_kms_helper.ko
 drm.ko
+drm_panel_backlight_quirks.ko
 drm_panel_orientation_quirks.ko
 drm_shmem_helper.ko
 drm_suballoc_helper.ko
@@ -336,6 +342,7 @@ fscache.ko
 ftdi_sio.ko
 fusb302.ko
 fuse.ko
+fwctl.ko
 g760a.ko
 garmin_gps.ko
 garp.ko
@@ -817,6 +824,7 @@ mlx4_en.ko
 mlx4_ib.ko
 mlx5_core.ko
 mlx5_dpll.ko
+mlx5_fwctl.ko
 mlx5_ib.ko
 mlx5-vfio-pci.ko
 mlxfw.ko
@@ -1390,12 +1398,15 @@ ts_fsm.ko
 ts_kmp.ko
 tsl2550.ko
 ttm.ko
+tuner.ko
 tun.ko
 tunnel4.ko
 tunnel6.ko
+tveeprom.ko
 twofish_common.ko
 twofish_generic.ko
 typec_displayport.ko
+typec_thunderbolt.ko
 uartlite.ko
 uas.ko
 ubi.ko

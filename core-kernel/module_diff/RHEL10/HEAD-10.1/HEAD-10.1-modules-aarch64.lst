@@ -48,6 +48,7 @@ appledisplay.ko
 aquantia.ko
 arc_ps2.ko
 ark3116.ko
+arm-cca-guest.ko
 arm-cmn.ko
 arm_cspmu_module.ko
 arm_dmc620_pmu.ko
@@ -197,6 +198,7 @@ ci_hdrc_npcm.ko
 ci_hdrc_tegra.ko
 ci_hdrc_usb2.ko
 cirrus.ko
+cirrus-qemu.ko
 clk-scpi.ko
 cls_bpf.ko
 cls_flower.ko
@@ -234,9 +236,13 @@ crct10dif-ce.ko
 cros_hps_i2c.ko
 crypto_engine.ko
 cs3308.ko
+cs_dsp.ko
 csiostor.ko
 curve25519-generic.ko
 cuse.ko
+cx231xx.ko
+cx2341x.ko
+cx25840.ko
 cx82310_eth.ko
 cxgb4i.ko
 cxgb4.ko
@@ -308,6 +314,7 @@ drm_dma_helper.ko
 drm_dp_aux_bus.ko
 drm_exec.ko
 drm_gpuvm.ko
+drm_panel_backlight_quirks.ko
 drm_suballoc_helper.ko
 drm_ttm_helper.ko
 drm_vram_helper.ko
@@ -742,6 +749,7 @@ iuu_phoenix.ko
 iw_cm.ko
 iw_cxgb4.ko
 iwldvm.ko
+iwlmld.ko
 iwlmvm.ko
 iwlwifi.ko
 ixgbe.ko
@@ -1108,6 +1116,7 @@ nls_ucs2_utils.ko
 nls_utf8.ko
 nouveau.ko
 null_blk.ko
+nvgrace-gpu-vfio-pci.ko
 nvidia_cspmu.ko
 nvme-auth.ko
 nvme-core.ko
@@ -1667,13 +1676,17 @@ tps6598x.ko
 ts_bm.ko
 ts_fsm.ko
 ts_kmp.ko
+tsm.ko
 ttm.ko
+tuner.ko
 tun.ko
 tunnel4.ko
 tunnel6.ko
+tveeprom.ko
 twofish_common.ko
 twofish_generic.ko
 typec_displayport.ko
+typec_thunderbolt.ko
 uas.ko
 ubi.ko
 ublk_drv.ko

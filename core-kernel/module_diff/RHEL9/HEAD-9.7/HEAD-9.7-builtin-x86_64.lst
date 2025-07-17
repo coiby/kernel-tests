@@ -123,6 +123,7 @@ hid.ko
 hid-magicmouse.ko
 hid-ntrig.ko
 hid-sensor-hub.ko
+hkdf.ko
 hmac.ko
 hsu_dma.ko
 hwmon.ko
@@ -132,6 +133,7 @@ i8042.ko
 inet_diag.ko
 input-core.ko
 input-leds.ko
+iommufd_driver.ko
 iosf_mbi.ko
 iova.ko
 ipv6.ko

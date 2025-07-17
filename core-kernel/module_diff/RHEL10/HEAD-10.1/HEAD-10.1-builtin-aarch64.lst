@@ -106,6 +106,7 @@ digsig.ko
 dimlib.ko
 dmi-sysfs.ko
 drbg.ko
+drm_client_lib.ko
 drm_kms_helper.ko
 drm.ko
 drm_mipi_dsi.ko
@@ -182,6 +183,7 @@ imx-sm-misc.ko
 inet_diag.ko
 input-core.ko
 input-leds.ko
+iommufd_driver.ko
 iova.ko
 ipv6.ko
 irqbypass.ko

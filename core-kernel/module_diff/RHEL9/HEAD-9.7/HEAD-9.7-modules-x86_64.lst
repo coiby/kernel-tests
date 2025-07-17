@@ -62,6 +62,7 @@ altera_ps2.ko
 altera-stapl.ko
 alx.ko
 amc6821.ko
+amd_3d_vcache.ko
 amd64_edac.ko
 amd_atl.ko
 amd_freq_sensitivity.ko
@@ -232,6 +233,7 @@ cifs_arc4.ko
 cifs.ko
 cifs_md4.ko
 cirrus.ko
+cirrus-qemu.ko
 clip.ko
 cls_bpf.ko
 cls_flower.ko
@@ -262,6 +264,9 @@ csiostor.ko
 curve25519-generic.ko
 curve25519-x86_64.ko
 cuse.ko
+cx231xx.ko
+cx2341x.ko
+cx25840.ko
 cx82310_eth.ko
 cxacru.ko
 cxgb4i.ko
@@ -345,11 +350,13 @@ dp83tg720.ko
 dptf_pch_fivr.ko
 dptf_power.ko
 drm_buddy.ko
+drm_client_lib.ko
 drm_display_helper.ko
 drm_exec.ko
 drm_gpuvm.ko
 drm_kms_helper.ko
 drm.ko
+drm_panel_backlight_quirks.ko
 drm_shmem_helper.ko
 drm_suballoc_helper.ko
 drm_ttm_helper.ko
@@ -439,6 +446,7 @@ fujitsu-laptop.ko
 fujitsu-tablet.ko
 fusb302.ko
 fuse.ko
+fwctl.ko
 g760a.ko
 garmin_gps.ko
 garp.ko
@@ -1078,6 +1086,7 @@ mlx4_en.ko
 mlx4_ib.ko
 mlx5_core.ko
 mlx5_dpll.ko
+mlx5_fwctl.ko
 mlx5_ib.ko
 mlx5_vdpa.ko
 mlx5-vfio-pci.ko
@@ -1687,6 +1696,7 @@ snd-ak4114.ko
 snd-ak4xxx-adda.ko
 snd-ali5451.ko
 snd-aloop.ko
+snd-amd-acpi-mach.ko
 snd-amd-sdw-acpi.ko
 snd-asihpi.ko
 snd-atiixp.ko
@@ -1962,6 +1972,7 @@ snd-sof-intel-hda-common.ko
 snd-sof-intel-hda-generic.ko
 snd-sof-intel-hda.ko
 snd-sof-intel-hda-mlink.ko
+snd-sof-intel-hda-sdw-bpt.ko
 snd-sof.ko
 snd-sof-pci-intel-apl.ko
 snd-sof-pci-intel-cnl.ko
@@ -2082,6 +2093,7 @@ tmp421.ko
 topstar-laptop.ko
 toshiba_bluetooth.ko
 tpm_i2c_nuvoton.ko
+tpm_svsm.ko
 tpm_vtpm_proxy.ko
 tps6598x.ko
 ts_bm.ko
@@ -2090,15 +2102,18 @@ ts_kmp.ko
 tsl2550.ko
 tsm.ko
 ttm.ko
+tuner.ko
 tun.ko
 tunnel4.ko
 tunnel6.ko
+tveeprom.ko
 twofish-avx-x86_64.ko
 twofish_common.ko
 twofish_generic.ko
 twofish-x86_64-3way.ko
 twofish-x86_64.ko
 typec_displayport.ko
+typec_thunderbolt.ko
 uas.ko
 ubi.ko
 ucd9000.ko

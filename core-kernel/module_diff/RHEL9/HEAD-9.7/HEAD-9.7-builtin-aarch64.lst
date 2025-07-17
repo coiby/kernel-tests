@@ -158,6 +158,7 @@ hisi_uncore_pa_pmu.ko
 hisi_uncore_pmu.ko
 hisi_uncore_sllc_pmu.ko
 hisi_uncore_uc_pmu.ko
+hkdf.ko
 hmac.ko
 hwmon.ko
 hwspinlock_core.ko
@@ -174,6 +175,7 @@ imx.ko
 inet_diag.ko
 input-core.ko
 input-leds.ko
+iommufd_driver.ko
 iova.ko
 ipv6.ko
 irqbypass.ko
@@ -279,6 +281,8 @@ sch_fq_codel.ko
 scmi-core.ko
 scmi-module.ko
 scmi_perf_domain.ko
+scmi_transport_mailbox.ko
+scmi_transport_smc.ko
 scsi_common.ko
 scsi_dh_alua.ko
 scsi_dh_emc.ko
