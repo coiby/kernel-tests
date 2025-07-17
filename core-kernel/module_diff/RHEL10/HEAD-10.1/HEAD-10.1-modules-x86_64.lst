@@ -229,6 +229,7 @@ cifs_arc4.ko
 cifs.ko
 cifs_md4.ko
 cirrus.ko
+cirrus-qemu.ko
 clk-tps68470.ko
 cls_bpf.ko
 cls_flower.ko
@@ -260,6 +261,9 @@ csiostor.ko
 curve25519-generic.ko
 curve25519-x86_64.ko
 cuse.ko
+cx231xx.ko
+cx2341x.ko
+cx25840.ko
 cx82310_eth.ko
 cxgb4i.ko
 cxgb4.ko
@@ -344,6 +348,7 @@ drm_buddy.ko
 drm_display_helper.ko
 drm_exec.ko
 drm_gpuvm.ko
+drm_panel_backlight_quirks.ko
 drm_suballoc_helper.ko
 drm_ttm_helper.ko
 drm_vram_helper.ko
@@ -860,6 +865,7 @@ ipvtap.ko
 ip_vti.ko
 ipw.ko
 irdma.ko
+irqbypass.ko
 ir-usb.ko
 iscsi_boot_sysfs.ko
 iscsi_ibft.ko
@@ -885,6 +891,7 @@ ivsc-csi.ko
 iw_cm.ko
 iw_cxgb4.ko
 iwldvm.ko
+iwlmld.ko
 iwlmvm.ko
 iwlwifi.ko
 ixgbe.ko
@@ -2071,6 +2078,7 @@ tmp421.ko
 topstar-laptop.ko
 toshiba_bluetooth.ko
 tpm_i2c_nuvoton.ko
+tpm_svsm.ko
 tpm_tis_i2c_cr50.ko
 tpm_vtpm_proxy.ko
 tps6598x.ko
@@ -2081,15 +2089,18 @@ ts_kmp.ko
 tsl2550.ko
 tsm.ko
 ttm.ko
+tuner.ko
 tun.ko
 tunnel4.ko
 tunnel6.ko
+tveeprom.ko
 twofish-avx-x86_64.ko
 twofish_common.ko
 twofish_generic.ko
 twofish-x86_64-3way.ko
 twofish-x86_64.ko
 typec_displayport.ko
+typec_thunderbolt.ko
 uas.ko
 ubi.ko
 ublk_drv.ko

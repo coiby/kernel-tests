@@ -169,6 +169,7 @@ cifs_arc4.ko
 cifs.ko
 cifs_md4.ko
 cirrus.ko
+cirrus-qemu.ko
 cls_bpf.ko
 cls_flower.ko
 cls_flow.ko
@@ -187,10 +188,14 @@ crc7.ko
 crc8.ko
 crc-itu-t.ko
 cs3308.ko
+cs_dsp.ko
 csiostor.ko
 curve25519-generic.ko
 curve25519-ppc64le.ko
 cuse.ko
+cx231xx.ko
+cx2341x.ko
+cx25840.ko
 cx82310_eth.ko
 cxgb4i.ko
 cxgb4.ko
@@ -254,6 +259,7 @@ drm_buddy.ko
 drm_display_helper.ko
 drm_exec.ko
 drm_gpuvm.ko
+drm_panel_backlight_quirks.ko
 drm_suballoc_helper.ko
 drm_ttm_helper.ko
 drm_vram_helper.ko
@@ -1363,12 +1369,15 @@ ts_fsm.ko
 ts_kmp.ko
 tsl2550.ko
 ttm.ko
+tuner.ko
 tun.ko
 tunnel4.ko
 tunnel6.ko
+tveeprom.ko
 twofish_common.ko
 twofish_generic.ko
 typec_displayport.ko
+typec_thunderbolt.ko
 uartlite.ko
 uas.ko
 ubi.ko

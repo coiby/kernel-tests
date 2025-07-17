@@ -72,6 +72,7 @@ dh_generic.ko
 digsig.ko
 dimlib.ko
 drbg.ko
+drm_client_lib.ko
 drm_kms_helper.ko
 drm.ko
 drm_panel_orientation_quirks.ko
@@ -99,6 +100,7 @@ geniv.ko
 gf128mul.ko
 ghash-generic.ko
 glob.ko
+hid_bpf.ko
 hid-generic.ko
 hid.ko
 hid-magicmouse.ko
@@ -110,6 +112,7 @@ i2c-opal.ko
 inet_diag.ko
 input-core.ko
 input-leds.ko
+iommufd_driver.ko
 ipv6.ko
 irqbypass.ko
 jitterentropy_rng.ko

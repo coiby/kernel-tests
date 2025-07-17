@@ -81,6 +81,7 @@ digsig.ko
 dimlib.ko
 dmi-sysfs.ko
 drbg.ko
+drm_client_lib.ko
 drm_kms_helper.ko
 drm.ko
 drm_mipi_dsi.ko
@@ -133,6 +134,7 @@ input-leds.ko
 intel-lpss-acpi.ko
 intel-lpss.ko
 intel-lpss-pci.ko
+iommufd_driver.ko
 iosf_mbi.ko
 iova.ko
 ipv6.ko

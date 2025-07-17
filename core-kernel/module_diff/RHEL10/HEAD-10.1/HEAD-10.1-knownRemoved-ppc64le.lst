@@ -1,2 +1,4 @@
+cirrus.ko
+drm_vram_helper.ko
 raid6test.ko
 scsi_proto_test.ko
