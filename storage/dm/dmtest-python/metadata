@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash -x ./runtest.sh
-dependencies=bc;wget;unzip;gcc;git;curl;make;libaio-devel;lvm2;lsof;clang;cargo;systemd-devel;device-mapper-devel;python3-pip;blktrace;device-mapper-persistent-data;fio
+dependencies=bc;wget;unzip;gcc;git;curl;make;libaio-devel;lvm2;lsof;clang;cargo;systemd-devel;device-mapper-devel;python3-pip;blktrace;device-mapper-persistent-data;fio;g++;python3-devel;
 softDependencies=coreutils;
 repoRequires=cki_lib;storage/include;kernel-include;storage/dm
 max_time=4h

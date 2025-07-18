@@ -87,12 +87,15 @@ function install_bufio
     if [ -e "/etc/fedora-release" ]; then
       os_version="9"
       echo "Found fedora-release, using rhel-9 branch."
+      cat /etc/fedora-release
     elif [ -e "/etc/redhat-release" ]; then
       os_version=$(cut -d" " -f6 /etc/redhat-release | cut -d"." -f1)
       echo "Found major version $os_version in redhat-release."
+      cat /etc/redhat-release
     elif [ -e "/etc/centos-release" ]; then
       os_version=$(cut -d" " -f4 /etc/centos-release)
       echo "Found major version $os_version in centos-release."
+      cat /etc/centos-release
     fi
     if (( os_version > 9 )); then
         os_version="9"
@@ -226,4 +229,11 @@ function ts_setup
     touch "$DMTS_LOCAL/$SETUP_FLAG"
 
     return "$CKI_PASS"
+}
+
+function setup_vdo_env
+{
+    load_vdo || return "$CKI_UNINITIATED"
+    clone_test_suite || return "$CKI_UNINITIATED"
+    ts_config_setup "$DMTS_LOCAL"/config.toml || return "$CKI_UNINITIATED"
 }
