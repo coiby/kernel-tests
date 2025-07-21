@@ -1,0 +1,21 @@
+contact: Yulia Kopkova <ykopkova@redhat.com>
+description: |
+    Kpatch integration testing (upstream kernel)
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - kpatch
+  - make
+  - git
+  - curl
+  - clang
+  - gcc
+  - grubby
+  - mailx
+  - sendmail
+  - postfix
+duration: 24h
+extra-summary: /kernel/kpatch/integration-upstream
+extra-task: /kernel/kpatch/integration-upstream
