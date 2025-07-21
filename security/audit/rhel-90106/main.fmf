@@ -1,0 +1,12 @@
+summary: Security Audit verifier for RHEL-90106
+description: 'Test for RHEL-90106 - audit logs should show proper path names instead of "(null)" when monitoring directory operations'
+contact: Dennis Li <denli@redhat.com>
+component:
+  - kernel
+path: /security/audit/rhel-90106
+test: bash +x runtest.sh
+framework: beakerlib
+require: [audit]
+duration: 10m
+extra-summary: /kernel-tests/security/audit/RHEL-90106
+extra-task: /kernel-tests/security/audit/RHEL-90106 
