@@ -54,6 +54,8 @@ for file in $INCLUDE; do
     # shellcheck source=/dev/null
     . "$CDIR"/include/$file
 done
+SKIP_TARGETS=$(echo $SKIP_TARGETS | tr ' ' '\n' | awk '!seen[$0]++' | tr '\n' ' ')
+echo "Skip targets: ${SKIP_TARGETS}"
 
 name="kernel"
 if  cki_is_kernel_rt; then
