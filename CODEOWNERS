@@ -89,6 +89,7 @@
 /filesystems/xfs/xfstests/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /firmware/user-specified/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /general/memory/function/kaslr/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
+/general/memory/function/kernel-64k/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /general/memory/function/mem_encrypt/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /general/memory/function/memfd_create/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /general/process/trinity_git/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
@@ -229,6 +230,7 @@
 /filesystems/xfs/xfstests/ @andyprice @bgoncalv @lulinqing @stowellm @yoyang
 /firmware/user-specified/ @JiriDluhosRH @bgoncalv @lulinqing @stowellm
 /general/memory/function/kaslr/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang @stowellm
+/general/memory/function/kernel-64k/ @bgoncalv @ekovsky @lulinqing @stowellm
 /general/memory/function/mem_encrypt/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang @stowellm
 /general/memory/function/memfd_create/ @aubaker @bgoncalv @chuhu @liwan1 @lulinqing @pifang @raquini @stowellm
 /general/process/trinity_git/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang @stowellm
