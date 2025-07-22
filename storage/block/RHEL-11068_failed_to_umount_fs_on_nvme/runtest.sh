@@ -34,7 +34,9 @@ function run_test()
     dd_pid=$!
     sleep 30
     disk=$(basename ${dev0})
-    rlRun "echo 1 > /sys/block/${disk}/device/device/remove"
+#    rlRun "echo 1 > /sys/block/${disk}/device/device/remove"
+    nvme_pci_id=$(get_nvme_pci_id "$disk")
+    rlRun "echo 1 > /sys/bus/pci/devices/${nvme_pci_id}/remove"
     sleep 120
     rlRun "umount /mnt/ext4"
     rlRun "cat /proc/${dd_pid}/stack" 1 "please check the error"
