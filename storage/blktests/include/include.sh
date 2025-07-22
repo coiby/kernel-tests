@@ -145,3 +145,19 @@ function install_ktls_utils()
 	systemctl daemon-reload
 	popd
 }
+
+function filter_testcases() {
+	testcases="$1"
+	skip_list="$2"
+	result=""
+
+	for t in $testcases; do
+		local skip=false
+		for skip_test in $skip_list; do
+			[[ "$t" == "$skip_test" ]] && skip=true && break
+		done
+		! $skip && result+="$t "
+	done
+
+	echo "$result"
+}
