@@ -214,18 +214,24 @@ function syzkaller_start() {
         rlRun "tmux new-session -d -s syz-executor \"podman exec -it qm bash -c \\\"cd ${syzkaller_workdir}; ${syzkaller_root}/bin/linux_arm64/syz-executor runner 0 127.0.0.1 56742\\\" 2>&1 | tee /var/tmp/syz-executor_run.log\""
     fi
     echo $start_time > /var/tmp/syzkaller.start_time
-    sleep 20
-    for call in ${not_present_syscalls}; do
-        syscall=$(echo "${call//\"}" | sed -e 's/,//')
-        if grep -q "syscall ${syscall} is not present" /var/tmp/syz-manager_run.log; then
-            rlPass "${syscall} not present as expected."
-        else
-            rlFail "${syscall} in not_present_syscalls list, but it is present. Refusing to continue."
-            syzkaller_stop
-            rlRun "semodule -r syzkaller"
-            exit 1
-        fi
-    done
+    if [ -n "${not_present_syscalls}" ]; then
+        rlLog "Waiting for syzkaller to start before checking for not present syscalls..."
+        while ! grep -q "machine check:" /var/tmp/syz-manager_run.log; do
+            sleep 2
+        done
+        sleep 10
+        for call in ${not_present_syscalls}; do
+            syscall=$(echo "${call//\"}" | sed -e 's/,//')
+            if grep -q "syscall ${syscall} is not present" /var/tmp/syz-manager_run.log; then
+                rlPass "${syscall} not present as expected."
+            else
+                rlFail "${syscall} in not_present_syscalls list, but it is present. Refusing to continue."
+                syzkaller_stop
+                rlRun "semodule -r syzkaller"
+                exit 1
+            fi
+        done
+    fi
 }
 
 function syzkaller_stop() {
