@@ -33,7 +33,7 @@ rlJournalStart
         rlRun ./feed_watchdog 0,143 & # Feed watchdog during test, expect it to be killed
     rlPhaseEnd
     rlPhaseStartTest "Run syzkaller with watchdog API"
-        pushd ../../memory/mmra/syzkaller
+        pushd ../../syzkaller
         rlRun "bash ./runtest.sh"
         popd
     rlPhaseEnd

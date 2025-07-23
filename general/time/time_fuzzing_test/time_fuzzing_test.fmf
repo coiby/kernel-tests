@@ -54,10 +54,11 @@ require:
   - type: file
     pattern:
         -  /kernel-include
-        -  /memory/mmra/syzkaller
+        -  /syzkaller
         -  /general/time/time_fuzzing_test
 environment:
-    mm_syscalls: |
+    SYZKALLER_COMMIT_HASH: "21339d7b9986698282dce93709157dc36907fbf8"
+    main_syscalls: |
       "clock_getres",
       "clock_gettime",
       "clock_settime",
@@ -77,7 +78,8 @@ environment:
       "setitimer",
       "getitimer",
       "clock_adjtime"
-    supportcalls: ''
-    git_patches: '../../../../general/time/time_fuzzing_test/time.patch'
+    support_syscalls: |
+      "getpid"
+    git_patches: '../general/time/time_fuzzing_test/time.patch'
 duration: 2h
 id: 286e1009-37f1-48b9-82cf-31dce5f30270

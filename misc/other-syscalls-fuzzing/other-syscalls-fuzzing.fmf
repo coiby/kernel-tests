@@ -128,13 +128,14 @@ require:
   - type: file
     pattern:
         - /kernel-include
-        - /memory/mmra/syzkaller
+        - /syzkaller
 duration: 3h
 id: 0c347229-844a-4648-95f9-a0fdb8ffa6d8
 environment:
-    timer: 3600
-    git_patches: '../../../../misc/other-syscalls-fuzzing/other-syscalls-fuzzing.patch'
-    mm_syscalls: |
+    time: 3600
+    SYZKALLER_COMMIT_HASH: "21339d7b9986698282dce93709157dc36907fbf8"
+    git_patches: '../misc/other-syscalls-fuzzing/other-syscalls-fuzzing.patch'
+    main_syscalls: |
       "acct",
       "add_key",
       "capget",
@@ -220,6 +221,8 @@ environment:
       "epoll_create1",
       "syz_open_procfs$userns",
       "getitimer"
+    support_syscalls: |
+      "getpid"
 # Exclude LTP tests unsuitable for executing inside QM (broken or failed due to access permissions)
     exclude_ltp_tests: |
       acct01,

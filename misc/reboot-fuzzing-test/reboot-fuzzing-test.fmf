@@ -21,7 +21,7 @@ contact: Pablo Ridolfi <pridolfi@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
-path: /memory/mmra/syzkaller
+path: /syzkaller
 framework: beakerlib
 require:
   - make
@@ -37,12 +37,13 @@ require:
   - type: file
     pattern:
         -  /kernel-include
-        -  /memory/mmra/syzkaller
+        -  /syzkaller
         -  /misc/reboot-fuzzing-test
 environment:
-    mm_syscalls: |
+    SYZKALLER_COMMIT_HASH: "21339d7b9986698282dce93709157dc36907fbf8"
+    main_syscalls: |
       "reboot"
-    supportcalls: ''
-    git_patches: '../../../../misc/reboot-fuzzing-test/reboot.patch'
+    support_syscalls: ''
+    git_patches: '../misc/reboot-fuzzing-test/reboot.patch'
 duration: 2h
 id: 86dc5c06-50d9-4c08-a64b-a4091e8ad9b9
