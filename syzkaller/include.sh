@@ -210,7 +210,11 @@ function syzkaller_start() {
         rlRun "tmux new-session -d -s syzkaller '${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syz-manager_run.log'"
     else
         rlRun "tmux new-session -d -s syz-manager \"podman exec -it qm ${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller.conf 2>&1 | tee /var/tmp/syz-manager_run.log\""
-        sleep 10 # wait for syz-manager to start
+        # wait for syz-manager to start
+        while ! grep -q "skipped [0-9]* seeds" /var/tmp/syz-manager_run.log; do
+            sleep 2
+        done
+        sleep 10
         rlRun "tmux new-session -d -s syz-executor \"podman exec -it qm bash -c \\\"cd ${syzkaller_workdir}; ${syzkaller_root}/bin/linux_arm64/syz-executor runner 0 127.0.0.1 56742\\\" 2>&1 | tee /var/tmp/syz-executor_run.log\""
     fi
     echo $start_time > /var/tmp/syzkaller.start_time
