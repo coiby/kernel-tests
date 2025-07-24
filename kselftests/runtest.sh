@@ -118,13 +118,16 @@ install_packages()
         rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
         rpm -ivh --define "_topdir $TMPDIR" $K_SRC
         pushd SPECS
-        # patch for x86_64 systems. Introduction of efiuki causes dependency to break.
-        # per https://issues.redhat.com/browse/ENGCMP-2966 this is only temporary.
-        # once this is removed, this patch can also be removed.
-        rlRun "sed -i 's/efiuki 1/efiuki 0/' kernel.spec"
-        # I'm not sure why to run yum-builddep, but if it fails doens't seem critical, therefore ignore any error.
-        rlRun "yum-builddep --downloadonly -y ./kernel.spec --downloaddir $(pwd)" 0-255
-
+        if rlIsRHELLike ">9" && cki_is_kernel_automotive; then
+            rlRun "yum-builddep --downloadonly -y ./kernel-automotive.spec --downloaddir $(pwd)" 0-255
+        else
+            # patch for x86_64 systems. Introduction of efiuki causes dependency to break.
+            # per https://issues.redhat.com/browse/ENGCMP-2966 this is only temporary.
+            # once this is removed, this patch can also be removed.
+            rlRun "sed -i 's/efiuki 1/efiuki 0/' kernel.spec"
+            # I'm not sure why to run yum-builddep, but if it fails doens't seem critical, therefore ignore any error.
+            rlRun "yum-builddep --downloadonly -y ./kernel.spec --downloaddir $(pwd)" 0-255
+        fi
         $pkg_mgr $pkg_mgr_inst_string *.rpm
         pushd ../SOURCES
         tar Jxf linux-${version}-${release}.tar.xz
