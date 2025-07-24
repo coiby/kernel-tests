@@ -289,7 +289,7 @@ function syzkaller_check_results() {
         syscall=$(echo "${call//\"}" | sed -e 's/,//')
         if [[ " ${not_present_syscalls_sanitized} " == *" ${syscall} "* ]]; then
             rlLog "${syscall} not present."
-        elif grep -q "^${syscall}[$,(]" "${syzkaller_workdir}"/corpus_dir/* ; then
+        elif find "${syzkaller_workdir}"/corpus_dir/ -type f -print0 | xargs -0 grep -l "^${syscall}[$,(]" | grep -q . ; then
             rlPass "${syscall} executed."
         else
             rlFail "${syscall} not executed."
