@@ -19,5 +19,15 @@ framework: shell
 require:
   - gcc
 duration: 2h
-environment:
-  TMT_PLUGIN_TEST-CHECKS_DMESG_FAILURE_PATTERN: "Oops|BUG:|KASAN:|UBSAN:|NMI appears to be stuck|Badness at|WARNING:"
+adjust+:
+  - check:
+    - how: dmesg
+      enabled: true
+      failure-pattern:
+        - "Oops"
+        - "BUG:"
+        - "WARNING:"
+        - "KASAN:"
+        - "UBSAN:"
+        - "NMI appears to be stuck"
+        - "Basness at"
