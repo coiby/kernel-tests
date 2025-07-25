@@ -24,6 +24,7 @@ require:
   - glibc-devel
   - make
   - patch
+  - rtla
   - sshpass
   - tar
   - tmux
