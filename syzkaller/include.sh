@@ -214,8 +214,14 @@ function syzkaller_start() {
         while ! grep -q "skipped [0-9]* seeds" /var/tmp/syz-manager_run.log; do
             sleep 2
         done
-        sleep 10
         rlRun "tmux new-session -d -s syz-executor \"podman exec -it qm bash -c \\\"cd ${syzkaller_workdir}; ${syzkaller_root}/bin/linux_arm64/syz-executor runner 0 127.0.0.1 56742\\\" 2>&1 | tee /var/tmp/syz-executor_run.log\""
+        # wait for the swap-file to be present before resizing and mounting
+        while [ ! -f "${syzkaller_workdir}/swap-file" ]; do
+            sleep 1
+        done
+        rlRun "dd if=/dev/zero of=${syzkaller_workdir}/swap-file bs=1M count=1024 conv=notrunc"
+        rlRun "mkswap ${syzkaller_workdir}/swap-file"
+        rlRun "swapon ${syzkaller_workdir}/swap-file"
     fi
     echo $start_time > /var/tmp/syzkaller.start_time
     if [ -n "${not_present_syscalls}" ]; then
@@ -301,6 +307,7 @@ function syzkaller_cleanup() {
     rlRun "tar cf syzkaller_test_results.tar ${syzkaller_workdir}"
     rlFileSubmit syzkaller_test_results.tar
     if [ -n "$FUZZ_IN_QM" ]; then
+        rlRun "swapoff ${syzkaller_workdir}/swap-file"
         rlRun "semodule -r syzkaller"
         rlRun "rm -f /etc/containers/systemd/qm.container.d/syzkaller.conf"
         rlRun "systemctl daemon-reload"
