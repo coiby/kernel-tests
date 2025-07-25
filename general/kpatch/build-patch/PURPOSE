@@ -1,2 +1,0 @@
-Use kpatch-build to get an upstream patch passed as parameter
-in UPSTREAM_COMMIT_ID and build the module.

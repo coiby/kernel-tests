@@ -2,7 +2,7 @@
 #  vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   /kernel/general/kpatch/build
+#   /kernel/general/kpatch/patch-build
 #   Description: use upstream kpatch-build to build kpatch modules based
 #                on an upstream commit.
 #   Author: Roberto Bergantinos Corpas <rbergant@redhat.com>

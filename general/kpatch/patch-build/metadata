@@ -1,5 +1,5 @@
 [General]
-name=/kernel/general/kpatch/build
+name=/kernel/general/kpatch/patch-build
 owner=Roberto Bergantinos Corpas <rbergant@redhat.com>
 description=kpatch build test for kpatch-patch modules
 license=GPLv2
