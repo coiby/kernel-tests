@@ -1,0 +1,17 @@
+summary: KS-TC:ssd/kmemleak_check
+description: do kmemleak check after test
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/ssd/kmemleak_check
+test: bash ./runtest.sh
+framework: beakerlib
+recommend:
+  - beakerlib-redhat
+duration: 30m
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/ssd/kmemleak_check
+extra-task: /storage/ssd/kmemleak_check
+id: cd6cc497-5e29-4dd8-88aa-4f7c62d35299
