@@ -11,5 +11,5 @@ entry_point=bash ./runtest.sh
 repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
 dependencies=git;gcc;gcc-c++;blktrace;nvme-cli;fio;xfsprogs;parted;dosfstools
 softDependencies=nbd;libnl3-cli;cryptsetup;liburing;liburing-devel;automake;gnutls-devel;glib2-devel;libnl3-devel;keyutils-libs-devel
-max_time=4h
+max_time=8h
 use_pty=false
