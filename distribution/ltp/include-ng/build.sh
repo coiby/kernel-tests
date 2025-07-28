@@ -70,7 +70,7 @@ download_ltp()
 		curl --fail --retry 5 -s -SLO https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
 		if [ $? -ne 0 ]; then
 			TARGET=ltp-$TESTVERSION
-			curl --fail --retry 5 -s -SLO https://gitlab.com/redhat/centos-stream/tests/ltp/-/archive/$TESTVERSION/ltp-$TESTVERSION.tar.bz2
+			curl --fail --retry 5 -s -SLO https://download.eng.bos.redhat.com/qa/rhts/lookaside/ltp-full-${TESTVERSION}.tar.bz2
 		fi
 	elif echo $LTP_DOWNLOAD_URL | grep -E "tar.bz2"; then
 		LTP_DOWNLOAD_URL=${LTP_DOWNLOAD_URL//TESTVERSION/"$TESTVERSION"}
