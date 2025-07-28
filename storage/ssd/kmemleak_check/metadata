@@ -1,0 +1,13 @@
+[General]
+name=storage/ssd/kmemleak_check
+owner=Yi Zhang <yizhan@redhat.com>
+description=do kmemleak check aftter test
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=cki_lib;storage/include/bash_modules/lxt;storage/ssd/include
+max_time=30m
+use_pty=false

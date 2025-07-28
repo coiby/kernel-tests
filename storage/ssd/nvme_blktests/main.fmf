@@ -15,7 +15,7 @@ require:
   - nvme-cli
   - git
   - fio
-duration: 4h
+duration: 8h
 tag:
   - regression
 tier: 1
