@@ -20,8 +20,12 @@ install_epel_pkg()
 
 	if [[ "$krelease" =~ ^(8|9|10)$ ]]; then
 		if ! rpm -q --quiet epel-release; then
-			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
+			cat >> /etc/yum.repos.d/epel.repo << EOF
+[epel]
+name=Extra Packages for Enterprise Linux \$releasever - \$basearch
+metalink = https://mirrors.fedoraproject.org/metalink?repo=epel-\$releasever_major&arch=\$basearch
+enabled = 1
+EOF
 			local need_remove=1
 		else
 			if [ "$pkg_mgr" != "rpm-ostree" ]; then
@@ -35,7 +39,7 @@ install_epel_pkg()
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string $param $pkg
 
-	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
+	[ "${need_remove}" ] && rm -f /etc/yum.repos.d/epel.repo
 
 	rpm -q --quiet $pkg && return 0 || return 1
 }
