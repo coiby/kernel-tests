@@ -17,35 +17,6 @@ fi
 install_kirk()
 {
 	echo "============ Download kirk ============" | tee -a $OUTPUTFILE
-	if ! rpm -q python3-click; then
-		# install python3-click from epel
-		source /etc/os-release
-		rhel_x=$(echo $VERSION_ID | cut -d. -f1)
-		pkg_mgr=$(command -v dnf &>/dev/null && echo dnf || echo yum)
-		if [[ -e /run/ostree-booted ]]; then
-			rpm-ostree -Ay --idempotent --allow-inactive install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
-			rpm-ostree -Ay --idempotent --allow-inactive install python3-click
-		else
-			$pkg_mgr -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_x}.noarch.rpm
-			$pkg_mgr -y install python3-click
-			$pkg_mgr -y remove epel-release
-		fi
-		if ! rpm -q python3-click; then
-			rpm -q python3-pip > /dev/null || $pkg_mgr -y install python3-pip
-			# install python3 click module from pip
-			pip3 show click --quiet || pip3 install click
-			if [ $? -ne 0 ]; then
-				echo "Aborting current task: Couldn't install click" | tee -a $OUTPUTFILE
-				if [[ -n $RSTRNT_TASKNAME ]]; then
-					rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
-					exit 0
-				else
-					exit 1
-				fi
-			fi
-		fi
-	fi
-
 	KIRK_VER="${KIRK_VER:-v2.0}"
 	KIRK_DIR="$(pwd)/kirk"
 
