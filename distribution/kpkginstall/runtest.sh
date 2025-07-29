@@ -452,6 +452,11 @@ function rpm_install()
   # download & install kernel, or report result
   download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM}"
 
+  # download & install kernel devel, or report result
+  # kernel devel must be installed, otherwise we can't detect if we need to apply
+  # cross compile workaround or not.
+  download_install_package "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM}"
+
   if ! cki_is_ostree_booted ;then
     if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} successfully"
@@ -502,12 +507,6 @@ function rpm_install()
 
 function rpm_extra_package_install()
 {
-  devel_nvr="$(K_GetRunningKernelRpmSubPackageNVR devel)"
-  # download & install kernel devel, or report result
-  # kernel devel must be installed, otherwise we can't detect if we need to apply
-  # cross compile workaround or not.
-  download_install_package "${devel_nvr}"
-
   extra_packages=(modules-internal headers)
   for package in "${extra_packages[@]}"; do
     _nvr="$(K_GetRunningKernelRpmSubPackageNVR "${package}")"
@@ -536,12 +535,6 @@ function rpm_extra_package_install()
 function ostree_extra_package_install()
 {
   PKG_CMD="${RPM_OSTREE} -A install --allow-inactive --idempotent -y "
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM} successfully"
-  else
-    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM} found, skipping!"
-    cki_print_warning "Note that some tests might require the package and can fail!"
-  fi
   if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} successfully"
   else
