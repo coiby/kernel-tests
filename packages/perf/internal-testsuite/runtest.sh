@@ -249,30 +249,18 @@ rlJournalStart
 		rlRun "perf test list |& tee tests.list" 0 "We will run the following tests:"
 	rlPhaseEnd
 
-	read line < tests.list
-	NEXT_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
-	NEXT_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
-
-	# skip the first line as it was already parsed
-	tail -n +2 tests.list | while true; do
+	while read line; do
 		CURRENT_TEST="$line"
 		# we found the end of the file
 		test -n "$CURRENT_TEST" || break
 
-		# take the parsed data
-		TEST_NUMBER="$NEXT_NUMBER"
-		TEST_DESC="$NEXT_DESC"
+		# parse the line
+		TEST_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
+		TEST_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
 		TEST_PATTERNS="-e \"$TEST_DESC\""
 
-		# parse the possibile subtests for pattern matching, store the next test
-		while read line; do
-			NEXT_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
-			NEXT_DESC="`echo $line | perl -pe 's/^(:?\d+:)+\s//'`"
-
-			# we found a testcase, not the subtest
-			test -z "$NEXT_NUMBER" || break
-			TEST_PATTERNS+=" -e \"$NEXT_DESC\""
-		done
+		# skip in case of subtest
+		test -z $TEST_NUMBER && continue
 
 		rlPhaseStart FAIL "TEST #$TEST_NUMBER : $TEST_DESC"
 			if check_allowlisted "$TEST_DESC"; then
@@ -299,7 +287,7 @@ rlJournalStart
 				sysctl kernel.perf_event_max_sample_rate=$ORIGINAL_SAMPLE_RATE
 			fi
 		rlPhaseEnd
-	done
+	done < tests.list
 
 	# bz1414043 coverage
 	rlPhaseStartTest "bz1414043 coverage -- \"Session topology\" test fails with some CPUs disabled"
