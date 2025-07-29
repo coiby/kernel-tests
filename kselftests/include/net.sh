@@ -24,6 +24,7 @@ install_epel_pkg()
 [epel]
 name=Extra Packages for Enterprise Linux \$releasever - \$basearch
 metalink = https://mirrors.fedoraproject.org/metalink?repo=epel-\$releasever_major&arch=\$basearch
+gpgcheck = 0
 enabled = 1
 EOF
 			local need_remove=1
