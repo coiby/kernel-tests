@@ -1,6 +1,6 @@
 [General]
 name=filesystems/loopdev/sanity
-owner=Xiong Zhou <xzhou@redhat.com>
+owner=Yongcheng Yang <yoyang@redhat.com>
 description=Sanity test for loop device
 license=GPLv2
 confidential=no

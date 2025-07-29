@@ -3,7 +3,7 @@ description: <a href="https://gitlab.com/cki-project/kernel-tests.git" target="_
     class="descriptionLink">https://gitlab.com/cki-project/kernel-tests.git</a>  filesystems/loopdev/sanity<br/>
 enabled: true
 id: ca1cabf2-f770-43e4-9474-c0172e838e8b
-contact: Xiong Zhou <xzhou@redhat.com>
+contact: Yongcheng Yang <yoyang@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
