@@ -53,6 +53,15 @@ rlJournalStart
     rlPhaseEnd
     rlPhaseStartTest "Start fuzzing with syzkaller"
         rlRun timerlat_start
-        syzkaller_start
+        rlRun syzkaller_start
+    rlPhaseEnd
+    rlPhaseStartCleanup
+        # Install glibc-static again, required for functional tests
+        pkg_mgr=$(K_GetPkgMgr)
+        if [[ $pkg_mgr == "rpm-ostree" ]]; then
+            rlRun "rpm-ostree -y --idempotent --allow-inactive install glibc-static"
+        else
+            rlRun "dnf -y history undo $(dnf history list | grep -m 1 -- '-y remove glibc-static' | awk '{print $1}')"
+        fi
     rlPhaseEnd
 rlJournalEnd
