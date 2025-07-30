@@ -63,7 +63,8 @@ function get_free_disk()
     done
 }
 
-function get_nvme_pci_id() {
+function get_nvme_pci_id()
+{
     NVME_DISK=$1
     NVME_CHAR=${NVME_DISK:0:5}
     TEST_DEV_SYSFS=/sys/block/$NVME_DISK/device
@@ -71,4 +72,27 @@ function get_nvme_pci_id() {
     readlink -f "$TEST_DEV_SYSFS" | \
         grep -Eo '[0-9a-f]{4,5}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]' | \
         tail -1
+}
+
+function clear_partition()
+{
+    boot_disk=$(lsblk -no MOUNTPOINT,PKNAME | awk '$1=="/boot"{print $2}' | head -n1)
+    echo "Boot is on disk: $boot_disk"
+
+    all_disks=$(lsblk -dn -o NAME,TYPE | awk '$2=="disk"{print $1}')
+    for disk in $all_disks; do
+        if [[ "$disk" == "$boot_disk" ]]; then
+            echo "Skipping /dev/$disk (contains /boot)"
+            continue
+        fi
+
+        echo "Processing /dev/$disk: removing all partitions..."
+        part_numbers=$(parted -s /dev/$disk print | awk '/^ [0-9]+/{print $1}')
+
+        for num in $part_numbers; do
+            echo "  Deleting partition $num on /dev/$disk"
+            parted -s /dev/$disk rm "$num"
+        done
+        echo "Finished wiping /dev/$disk"
+    done
 }
