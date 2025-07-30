@@ -17,4 +17,4 @@ recommend:
   - openssl-devel
   - flex
   - rpm-build
-duration: 480m
+duration: 720m
