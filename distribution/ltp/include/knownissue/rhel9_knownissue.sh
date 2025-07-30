@@ -34,8 +34,6 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "903" && tskip "fork14" unfix
 	# Bug 2152548 (CVE-2022-4378) - CVE-2022-4378 kernel: a stack overflow in do_proc_dointvec and proc_skip_spaces
 	osver_in_range "900" "904" && tskip "cve-2022-4378" unfix
-	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1670
-	is_rt && pkg_in_range "tuned" "2.19.0" "99" && tskip "numa_testcases" unfix
 	# https://issues.redhat.com/browse/RHEL-8576 [RHEL-9.3.0] "stack_clash" LTP CVE test fails
 	is_arch "x86_64" && osver_in_range "900" "906" && tskip "cve-2017-1000364 stack_clash" unfix
 	# https://issues.redhat.com/browse/RHEL-5767 [RHEL9.3] ltp- fanotify14.c:286: TFAIL: fanotify_mark(fanotify_fd, 0x00000001 | tc->mark.flags, tc->mask.flags, dirfd, path) expected EINVAL: EACCES (13)
