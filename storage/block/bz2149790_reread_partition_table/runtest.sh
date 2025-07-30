@@ -22,7 +22,9 @@ CDIR=$(dirname "$FILE")
 
 # Include enviroment and libraries
 # shellcheck source=/dev/null
-source "$CDIR"/../../../cki_lib/libcki.sh || exit 1
+#source "$CDIR"/../../../cki_lib/libcki.sh || exit 1
+. "$CDIR"/../include/include.sh    || exit 1
+. /usr/share/beakerlib/beakerlib.sh     || exit 1
 
 function get_disk()
 {
@@ -44,6 +46,7 @@ function get_disk()
 
 function setup_md()
 {
+    clear_partition
     get_disk
     # shellcheck disable=SC2154
     rlLog "disk: $dev0 $dev1"
