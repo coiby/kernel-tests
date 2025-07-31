@@ -34,6 +34,7 @@ require:
   - sshpass
   - tar
   - wget
+  - python
   - type: file
     pattern:
         -  /kernel-include

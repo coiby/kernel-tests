@@ -295,10 +295,15 @@ function syzkaller_check_results() {
         syscall=$(echo "${call//\"}" | sed -e 's/,//')
         if [[ " ${not_present_syscalls_sanitized} " == *" ${syscall} "* ]]; then
             rlLog "${syscall} not present."
-        elif find "${syzkaller_workdir}"/corpus_dir/ -type f -print0 | xargs -0 grep -q "^${syscall}[$,(]" ; then
-            rlPass "${syscall} executed."
         else
-            rlFail "${syscall} not executed."
+            find_syscall_ret=$(python ${CDIR}/find_syscall_in_corpus.py "${syzkaller_workdir}/corpus_dir" "$syscall")
+            if [ "$find_syscall_ret" = "executed" ]; then
+                rlPass "${syscall} executed."
+            elif [ "$find_syscall_ret" = "not executed" ]; then
+                rlFail "${syscall} not executed."
+            else
+                rlFail "Error while finding $syscall in corpus: $find_syscall_ret"
+            fi
         fi
     done
 }
