@@ -304,10 +304,9 @@ function syzkaller_check_results() {
 }
 
 function syzkaller_cleanup() {
-    rlRun "tar cf syzkaller_test_results.tar ${syzkaller_workdir}"
-    rlFileSubmit syzkaller_test_results.tar
     if [ -n "$FUZZ_IN_QM" ]; then
         rlRun "swapoff ${syzkaller_workdir}/swap-file"
+        rlRun "rm -f ${syzkaller_workdir}/swap-file"
         rlRun "semodule -r syzkaller"
         rlRun "rm -f /etc/containers/systemd/qm.container.d/syzkaller.conf"
         rlRun "systemctl daemon-reload"
@@ -315,6 +314,8 @@ function syzkaller_cleanup() {
     else
         rlRun "ssh $SSH_OPTIONS root@$DUT '[ -f /root/tmp/syzkaller/swap-file ] && swapoff /root/tmp/syzkaller/swap-file'"
     fi
+    rlRun "tar cf syzkaller_test_results.tar ${syzkaller_workdir}"
+    rlFileSubmit syzkaller_test_results.tar
     rlRun "rm -rf ${syzkaller_workdir}" 0,1
     rlRun "rm -rf ${syzkaller_root}"
     rlRun "rm -f /var/tmp/syzkaller.start_time"
