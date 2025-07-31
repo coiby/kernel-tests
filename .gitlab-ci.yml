@@ -1,7 +1,7 @@
 ---
 include:
   - project: redhat/centos-stream/tests/kernel/gitlab-ci-templates
-    file: .gitlab/ci_templates/common.yml
+    file: .gitlab/all_templates.yml
     ref: main
   - project: cki-project/cki-lib
     file: .gitlab/ci_templates/cki-common.yml
@@ -225,6 +225,14 @@ no-tmt-plans:
         echo "Move the test plans to https://gitlab.com/redhat/centos-stream/tests/kernel/test-plans"
         exit 1
       fi
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
+
+check tmt test has RH contact:
+  extends: .kqe_tmt_rh_contact
+  stage: 🐛
   rules:
     - !reference [.rules, mr-parent]
     - !reference [.rules, default-branch]
