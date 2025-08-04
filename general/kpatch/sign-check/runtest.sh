@@ -29,7 +29,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 
 KPATCH_PATCH="${KPATCH_PATCH:-}"
-KPATCH_MODULE=$(echo ${KPATCH_PATCH} | sed -e "s/kpatch-patch/kpatch/" | sed -e "s/\.el.*//" | sed -e "s/-/_/g")
+KPATCH_MODULE=$(echo ${KPATCH_PATCH} | sed -e "s/kpatch-patch/kpatch/" | sed -e "s/\.el.*//" | sed -e "s/[-.]/_/g")
 
 rlJournalStart
     rlPhaseStartSetup
