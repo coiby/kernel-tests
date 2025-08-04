@@ -39,6 +39,13 @@ function setupRepos
 function setup
 {
     rlPhaseStartSetup
+    # Skip entire test if environment is missing required input interface
+    if [ ! -d /dev/input ] || [ ! -e /dev/uinput ]; then
+        rlLog "SKIP: Environment does not support input device testing /dev/input AND/OR /dev/uinput missing"
+        rlPhaseEnd
+        rlJournalEnd
+        exit 0
+    fi
     setupRepos
     rlPhaseEnd
 }
