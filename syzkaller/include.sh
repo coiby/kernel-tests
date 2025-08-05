@@ -48,6 +48,8 @@ fi
 verbose=${verbose:-""}
 ignore_crash_patterns=${ignore_crash_patterns:-""}
 git_patches=${git_patches:-""}
+syzkaller_root=${syzkaller_root:-"/root/tmp/syzkaller_root/syzkaller"}
+syzkaller_workdir=${syzkaller_root}/workdir
 
 # syscalls to fuzz
 main_syscalls=${main_syscalls:-''}
@@ -181,8 +183,6 @@ function syzkaller_setup() {
     rlRun "git_retry_clone https://github.com/google/syzkaller"
     cd syzkaller
     rlRun "git checkout ${SYZKALLER_COMMIT_HASH}"
-    syzkaller_root=$(pwd)
-    syzkaller_workdir=${syzkaller_root}/workdir
     if [ -n "$FUZZ_IN_QM" ]; then
         rlRun "git apply ${CDIR}/qm/qm.patch"
     fi
@@ -273,8 +273,6 @@ function syzkaller_check_results() {
     local not_present_syscalls_sanitized=$(echo "${not_present_syscalls}" | tr ',\n\r\t"'"'" ' ' | tr -s ' ')
 
     # Check test duration
-    syzkaller_root=${syzkaller_root:-"/root/tmp/syzkaller_root/syzkaller"}
-    syzkaller_workdir=${syzkaller_root}/workdir
     start_time=${start_time:-$(cat /var/tmp/syzkaller.start_time)}
     duration=$((${end_time}-${start_time}))
     rlLog "Test duration was ${duration} seconds."

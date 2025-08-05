@@ -1,8 +1,8 @@
 diff --git a/sys/linux/sys.txt b/sys/linux/sys.txt
-index 57af33efe..c61ae5f69 100644
+index 947be41ab..456d16408 100644
 --- a/sys/linux/sys.txt
 +++ b/sys/linux/sys.txt
-@@ -200,6 +200,9 @@ madvise(addr vma, len len[addr], advice flags[madvise_flags])
+@@ -218,6 +218,9 @@ madvise(addr vma, len len[addr], advice flags[madvise_flags])
  process_madvise(pidfd fd_pidfd, vec ptr[in, array[iovec_in]], vlen len[vec], advice flags[madvise_flags], flags const[0])
  process_mrelease(pidfd fd_pidfd, flags const[0])
  fadvise64(fd fd, offset fileoff, len intptr, advice flags[fadvise_flags])
@@ -12,7 +12,7 @@ index 57af33efe..c61ae5f69 100644
  readahead(fd fd, off intptr, count intptr)
  mbind(addr vma, len len[addr], mode flags[mbind_mode], nodemask ptr[in, int64], maxnode intptr, flags flags[mbind_flags])
  move_pages(pid pid, nr len[pages], pages ptr[in, array[vma]], nodes ptr[in, array[int32], opt], status ptr[out, array[int32]], flags flags[move_pages_flags])
-@@ -1287,6 +1290,7 @@ open_mode = S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWO
+@@ -1304,6 +1307,7 @@ open_mode = S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWO
  resolve_flags = RESOLVE_CACHED, RESOLVE_BENEATH, RESOLVE_IN_ROOT, RESOLVE_NO_MAGICLINKS, RESOLVE_NO_SYMLINKS, RESOLVE_NO_XDEV
  madvise_flags = MADV_NORMAL, MADV_RANDOM, MADV_SEQUENTIAL, MADV_WILLNEED, MADV_DONTNEED, MADV_REMOVE, MADV_DONTFORK, MADV_DOFORK, MADV_HWPOISON, MADV_SOFT_OFFLINE, MADV_MERGEABLE, MADV_UNMERGEABLE, MADV_HUGEPAGE, MADV_NOHUGEPAGE, MADV_DONTDUMP, MADV_DODUMP, MADV_WIPEONFORK, MADV_KEEPONFORK, MADV_COLD, MADV_PAGEOUT, MADV_POPULATE_READ, MADV_POPULATE_WRITE, MADV_COLLAPSE
  fadvise_flags = POSIX_FADV_NORMAL, POSIX_FADV_SEQUENTIAL, POSIX_FADV_RANDOM, POSIX_FADV_NOREUSE, POSIX_FADV_WILLNEED, POSIX_FADV_DONTNEED
@@ -21,7 +21,7 @@ index 57af33efe..c61ae5f69 100644
  msync_flags = MS_ASYNC, MS_SYNC, MS_INVALIDATE
  mmap_prot = PROT_EXEC, PROT_READ, PROT_WRITE, PROT_SEM, PROT_GROWSDOWN, PROT_GROWSUP
 diff --git a/sys/linux/sys.txt.const b/sys/linux/sys.txt.const
-index ba024ae99..34d4fbeb3 100644
+index ba024ae99..613d55ff1 100644
 --- a/sys/linux/sys.txt.const
 +++ b/sys/linux/sys.txt.const
 @@ -566,6 +566,11 @@ STA_PPSWANDER = 1024
@@ -40,9 +40,9 @@ index ba024ae99..34d4fbeb3 100644
  __NR_faccessat = 48, 386:307, amd64:269, arm:334, mips64le:5259, ppc64le:298, s390x:300
  __NR_faccessat2 = 439, mips64le:5439
  __NR_fadvise64 = 223, 386:250, amd64:221, arm:???, mips64le:5215, ppc64le:233, s390x:253
-+__NR_fadvise64_64 = 223, 386:250, amd64:221, arm:???, mips64le:5215, ppc64le:233, s390x:253
-+__NR_swapon = 224, amd64:mips64le:ppc64le:riscv64:s390x:???
-+__NR_swapoff = 225, amd64:mips64le:ppc64le:riscv64:s390x:???
++__NR_fadvise64_64 = 386:272, arm64:270, amd64:arm:mips64le:ppc64le:riscv64:s390x:???
++__NR_swapon = 87, amd64:mips64le:ppc64le:riscv64:s390x:???
++__NR_swapoff = 115, amd64:mips64le:ppc64le:riscv64:s390x:???
  __NR_fallocate = 47, 386:324, amd64:285, arm:352, mips64le:5279, ppc64le:309, s390x:314
  __NR_fchdir = 133, amd64:81, arm64:riscv64:50, mips64le:5079
  __NR_fchmod = 94, amd64:91, arm64:riscv64:52, mips64le:5089
