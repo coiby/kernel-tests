@@ -16,6 +16,9 @@ recommend:
   - mailx
   - sendmail
   - postfix
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
 duration: 24h
 extra-summary: /kernel/kpatch/integration-upstream
 extra-task: /kernel/kpatch/integration-upstream
