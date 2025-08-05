@@ -16,6 +16,8 @@ function rhel9_fatal_issues()
 	is_rt && cki_is_kernel_debug && osver_in_range "906" "907" && tskip "proc01" fatal
 	# RHEL-17195 RHEL-9: RIP: 0010:memset_orig+0x33/0xb0 - intel_pt_interrupt+0x5c/0xf0
 	is_arch "x86_64" && osver_in_range "904" "906" && tskip "pt_ex_user" fatal
+	# RHELTEST-1405: distribution/ltp/generic: VMMTIER1 mmap21_*__with_dmesg_entry "mmap21: command not found"
+	osver_in_range "900" "906" && tskip "mmap21*" fatal
 }
 
 function rhel9_unfix_issues()
