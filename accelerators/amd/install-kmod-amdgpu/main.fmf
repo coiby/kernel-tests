@@ -1,0 +1,13 @@
+summary: Install AMDGPU kernel module
+description: >
+    This test installs the AMDGPU kernel module on the target system, ensuring that all required dependencies are present and the module loads correctly. 
+    It verifies the installation process, checks for successful module loading, and prepares the environment for further GPU-related testing or validation.
+contact:
+    - Ihor Mykytyn <imykytyn@redhat.com>
+    - Oliver Gutiérrez <ogutierr@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 1h
+environment:
+    BREW_TASK_ID: $BREW_TASK_ID
+
