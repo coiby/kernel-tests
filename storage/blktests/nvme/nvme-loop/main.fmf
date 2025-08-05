@@ -7,6 +7,7 @@ require:
     pattern:
       - /storage/blktests/include
       - /storage/blktests/config
+      - /cki_lib
   - blktrace
   - fio
   - gcc
