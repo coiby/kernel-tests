@@ -165,24 +165,6 @@ build_all()
 			# the LTP_COMMIT_ID is already the version installed
 			return
 		fi
-		# generate RHELKT1LITE.next
-		echo "Going to generate RHELKT1LITE.next"
-		pushd ../lite/configs
-		# restraint doesn't seem to keep the file permission
-		chmod +x ./config-maker.sh
-		LTP_VERSION=next ./config-maker.sh &> config-maker.txt
-		if [ $? -ne 0 ]; then
-			cat config-maker.txt
-			echo "Aborting current task: Couldn't generate test config." | tee -a $OUTPUTFILE
-			if [[ -n $RSTRNT_TASKNAME ]]; then
-				rstrnt-report-result "build_all config-maker" WARN
-				exit 0
-			else
-				exit 1
-			fi
-		fi
-		popd
-		echo "RHELKT1LITE.next is generated"
 	fi
 
 	install_kirk

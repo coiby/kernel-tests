@@ -50,6 +50,24 @@ function ltp_test_build()
 	if [[ -z ${LTP_COMMIT_ID} ]]; then
 		RHELKT1LITE_CONFIG=$RUNTESTS.${TESTVERSION}
 	else
+		# generate RHELKT1LITE.next
+		echo "Going to generate RHELKT1LITE.next"
+		pushd ../lite/configs
+		# restraint doesn't seem to keep the file permission
+		chmod +x ./config-maker.sh
+		LTP_VERSION=next ./config-maker.sh &> config-maker.txt
+		if [ $? -ne 0 ]; then
+			cat config-maker.txt
+			echo "Aborting current task: Couldn't generate test config." | tee -a $OUTPUTFILE
+			if [[ -n $RSTRNT_TASKNAME ]]; then
+				rstrnt-report-result "build_all config-maker" WARN
+				exit 0
+			else
+				exit 1
+			fi
+		fi
+		popd
+		echo "RHELKT1LITE.next is generated"
 		RHELKT1LITE_CONFIG=$RUNTESTS.next
 	fi
 	cp -vf configs/${RHELKT1LITE_CONFIG} ${runtest_path}/$RUNTESTS
