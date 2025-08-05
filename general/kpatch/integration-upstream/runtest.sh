@@ -15,9 +15,11 @@
 #
 # Author: Artem Savkov <asavkov@redhat.com>
 
-. /usr/bin/rhts_environment.sh
-
+. ../include/lib.sh
 set -x
+
+# Create log
+export OUTPUTFILE=${OUTPUTFILE:-$(mktemp /mnt/testarea/tmp.XXXXXX)}
 
 BUILDDIR="/mnt/build"
 KVER=${KVER:-linux-6.2}
@@ -86,34 +88,34 @@ function prepare_dependencies()
         kpatch_set_ccache_max_size 10G | tee -a "${OUTPUTFILE}"
         source /etc/profile.d/ccache.sh
 
-        report_result "${TEST}/dependencies" PASS 0
+        test_pass "dependencies"
 }
 
 function prepare_kernel_sources()
 {
         if ! wget -O "${KERNEL_TARBALL_PATH}" "${KERNEL_TARBALL_URL}"; then
-                report_result "${TEST}/kernel_sources_wget" FAIL "${?}"
+                test_fail "kernel_sources_wget" "${?}"
                 exit 1
         fi
 
         if ! tar xf "${KERNEL_TARBALL_PATH}" -C "${BUILDDIR}"; then
-                report_result "${TEST}/kernel_sources_untar" FAIL "${?}"
+                test_fail "kernel_sources_untar" "${?}"
                 exit 1
         fi
 
         if [[ -n "${KERNEL_PATCH_URL}" ]]; then
                 if ! wget -O "${KERNEL_SOURCE_PATH}/kernel.patch" "${KERNEL_PATCH_URL}"; then
-                        report_result "${TEST}/kernel_patch_wget" FAIL "${?}"
+                        test_fail "kernel_patch_wget" "${?}"
                         exit 1
                 fi
 
                 if ! patch --directory="${KERNEL_SOURCE_PATH}" -p1 < "${KERNEL_SOURCE_PATH}/kernel.patch"; then
-                        report_result "${TEST}/kernel_patch_apply" FAIL "${?}"
+                        test_fail "kernel_patch_apply" "${?}"
                         exit 1
                 fi
         fi
 
-        report_result "${TEST}/kernel_sources" PASS 0
+        test_pass "kernel_sources"
 }
 
 function install_kernel()
@@ -121,12 +123,12 @@ function install_kernel()
         local compiler="${1}"
 
         if ! cp "config.${KVER}.${compiler}.$(uname -m)" "${KERNEL_SOURCE_PATH}/.config"; then
-                report_result "${TEST}/kernel_${compiler}_config" FAIL "${rc}"
+                test_fail "kernel_${compiler}_config" "${rc}"
                 exit 1
         fi
 
         if ! cd "${KERNEL_SOURCE_PATH}"; then
-                report_result "${TEST}/kernel_${compiler}_cd" FAIL "${rc}"
+                test_fail "kernel_${compiler}_cd" "${rc}"
                 exit 1
         fi
 
@@ -138,25 +140,25 @@ function install_kernel()
 
         rc=${PIPESTATUS[0]}
         if [ "${rc}" -ne 0 ]; then
-                report_result "${TEST}/kernel_${compiler}_build" FAIL "${rc}"
+                test_fail "kernel_${compiler}_build" "${rc}"
                 exit 1
         fi
 
         make modules_install 2>&1 | tee -a "${OUTPUTFILE}"
         rc=${PIPESTATUS[0]}
         if [ "${rc}" -ne 0 ]; then
-                report_result "${TEST}/kernel_${compiler}_modules_install" FAIL "${rc}"
+                test_fail "kernel_${compiler}_modules_install" "${rc}"
                 exit 1
         fi
 
         make install 2>&1 | tee -a "${OUTPUTFILE}"
         rc=${PIPESTATUS[0]}
         if [ "${rc}" -ne 0 ]; then
-                report_result "${TEST}/kernel_${compiler}_install" FAIL "${rc}"
+                test_fail "kernel_${compiler}_install" "${rc}"
                 exit 1
         fi
 
-        grubby --set-default="/boot/vmlinuz-${KVER#linux-}" && rhts-reboot
+        grubby --set-default="/boot/vmlinuz-${KVER#linux-}" && rstrnt-reboot
 }
 
 function get_kpatch()
@@ -166,12 +168,12 @@ function get_kpatch()
         git clone --recursive "${KPATCH_GIT}" "${KPATCH_DIR}" | tee "${OUTPUTFILE}"
         rc=${PIPESTATUS[0]}
         if [ "${rc}" -ne 0 ]; then
-                report_result "${TEST}/kpatch_clone" FAIL "${rc}"
+                test_fail "kpatch_clone" "${rc}"
                 exit 1
         fi
 
         if ! cd "${KPATCH_DIR}"; then
-                report_result "${TEST}/kpatch_cd" FAIL "${rc}"
+                test_fail "kpatch_cd" "${rc}"
                 exit 1
         fi
 
@@ -179,11 +181,11 @@ function get_kpatch()
         git checkout -f "${KPATCH_REV}" | tee -a "${OUTPUTFILE}"
         rc=${PIPESTATUS[0]}
         if [ "${rc}" -ne 0 ]; then
-                report_result "${TEST}/kpetch_checkout" FAIL "${rc}"
+                test_fail "kpetch_checkout" "${rc}"
                 exit 1
         fi
 
-        report_result "${TEST}/kpatch" PASS 0
+        test_pass "kpatch"
 
         cd "${previous_dir}" || exit 1
 }
@@ -194,7 +196,7 @@ function kpatch_integration_tests()
         local previous_dir=$(pwd)
 
         if ! cd "${KPATCH_DIR}"; then
-                report_result "${TEST}/integration_${prefix}_cd" FAIL "${rc}"
+                test_fail "integration_${prefix}_cd" "${rc}"
                 exit 1
         fi
 
@@ -214,14 +216,14 @@ function kpatch_integration_tests()
         for file in "${KPATCH_DIR}"/test/integration/*.log; do
                 newfile="$(dirname "${file}")/${prefix}_$(basename "${file}")"
                 mv "${file}" "${newfile}"
-                rhts_submit_log -l "${newfile}"
+                rstrnt-report-log -l "${newfile}"
         done
 
         if [ "$rc" -eq 0 ]; then
-                report_result "${TEST}/integration_${prefix}" PASS "${rc}"
+                test_pass "integration_${prefix}"
         else
                 send_mail "integration" "${KPATCH_DIR}/test/integration/*.log"
-                report_result "${TEST}/integration_${prefix}" FAIL "${rc}"
+                test_fail "integration_${prefix}" FAIL "${rc}"
         fi
 
         cd "${previous_dir}" || exit 1
@@ -230,19 +232,19 @@ function kpatch_integration_tests()
 # Beaker exports arch as uname -m which confuses kernel build a lot
 export -n ARCH
 
-if [[ -z "${REBOOTCOUNT}" || "${REBOOTCOUNT}" -eq "0" ]]; then
+if [[ -z "${RSTRNT_REBOOTCOUNT}" || "${RSTRNT_REBOOTCOUNT}" -eq "0" ]]; then
         get_kpatch
         prepare_dependencies
         prepare_kernel_sources
         install_kernel gcc
-elif [[ "${REBOOTCOUNT}" -eq "1" ]]; then
-        report_result "${TEST}/kernel_gcc_install" PASS 0
+elif [[ "${RSTRNT_REBOOTCOUNT}" -eq "1" ]]; then
+        test_pass "kernel_gcc_install"
         kpatch_integration_tests gcc
         if [[ "${KPATCH_CHECK_CLANG}" -ne "1" ]]; then
                 exit
         fi
         install_kernel clang
-elif [[ "${REBOOTCOUNT}" -eq "2" ]]; then
-        report_result "${TEST}/kernel_clang_install" PASS 0
+elif [[ "${RSTRNT_REBOOTCOUNT}" -eq "2" ]]; then
+        test_pass "kernel_clang_install"
         kpatch_integration_tests clang
 fi

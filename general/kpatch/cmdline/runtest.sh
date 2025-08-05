@@ -266,7 +266,7 @@ rlJournalStart
             touch REBOOT
         rlPhaseEnd
 
-        rhts-reboot
+        rstrnt-reboot
     else
         rlPhaseStartTest "Kpatch Cmdline reboot test"
             run_checkproc
