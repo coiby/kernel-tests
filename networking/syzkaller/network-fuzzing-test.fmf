@@ -1,0 +1,184 @@
+summary: Fuzz networking API system calls.
+description: |
+  Confirm networking system calls fuzz testing is being performed as specified in Kernel Networking Risk Assessment.
+  The database is checked at the end to ensure each syscall was executed at least once.
+  Default runtime is 1 hour (3600 seconds), but can be changed using the "timer parameter.
+  Test inputs:
+      A list with the system calls to be fuzzed, and a fuzzer program
+      called syzkaller. Input details:
+      - System call list from RA documentation.
+      - syzkaller code: https://github.com/google/syzkaller
+      - check for execution: python /var/tmp/find_syscall_in_corpus.py "${syzkaller_workdir}/corpus_dir" "$syscall"
+  Expected results:
+      If the system calls are executed without incident during the test runtime,
+      the following output should be expected:
+      [   LOG    ] :: Test duration was 3602 seconds.
+      [   PASS   ] :: No crash results found.
+      [   PASS   ] :: bpf executed.
+      [   PASS   ] :: ioctl executed.
+      [   PASS   ] :: socket executed.
+      [   PASS   ] :: socketpair executed.
+      [   PASS   ] :: setsockopt executed.
+      [   PASS   ] :: getsockopt executed.
+      [   PASS   ] :: getsockname executed.
+      [   PASS   ] :: getpeername executed.
+      [   PASS   ] :: bind executed.
+      [   PASS   ] :: listen executed.
+      [   PASS   ] :: connect executed.
+      [   PASS   ] :: accept executed.
+      [   PASS   ] :: accept4 executed.
+      [   PASS   ] :: close executed.
+      [   PASS   ] :: shutdown executed.
+      [   PASS   ] :: sendmsg executed.
+      [   PASS   ] :: sendmmsg executed.
+      [   PASS   ] :: sendto executed.
+      [   PASS   ] :: recvmsg executed.
+      [   PASS   ] :: recvmmsg executed.
+      [   PASS   ] :: recvfrom executed.
+      [   PASS   ] :: epoll_create1 executed.
+      [   PASS   ] :: epoll_ctl executed.
+      [   PASS   ] :: epoll_pwait executed.
+      [   PASS   ] :: mmap executed.
+      [   PASS   ] :: ppoll executed.
+      [   PASS   ] :: pread64 executed.
+      [   PASS   ] :: preadv executed.
+      [   PASS   ] :: pselect6 executed.
+      [   PASS   ] :: sendfile executed.
+      [   PASS   ] :: getgid executed.
+      [   PASS   ] :: getuid executed.
+      [   PASS   ] :: gettid executed.
+      [   PASS   ] :: unshare executed.
+      [   PASS   ] :: pipe2 executed.
+      [   PASS   ] :: splice executed.
+      [   PASS   ] :: clock_gettime executed.
+      [   PASS   ] :: openat$tun executed.
+      [   PASS   ] :: vmsplice executed.
+      [   PASS   ] :: write executed.
+      [   PASS   ] :: writev executed.
+      [   PASS   ] :: tee executed.
+      [   PASS   ] :: getpid executed.
+      [   PASS   ] :: pwrite64 executed.
+      [   PASS   ] :: pwritev executed.
+      [   PASS   ] :: read executed.
+      [   PASS   ] :: readv executed.
+      [   PASS   ] :: write$cgroup_subtree executed.
+      [   PASS   ] :: write$cgroup_freezer_state executed.
+      [   PASS   ] :: write$cgroup_netprio_ifpriomap executed.
+      [   PASS   ] :: write$cgroup_pid executed.
+      [   PASS   ] :: write$cgroup_int executed.
+      [   PASS   ] :: write$cgroup_devices executed.
+      [   PASS   ] :: write$cgroup_pressure executed.
+      [   PASS   ] :: write$cgroup_type executed.
+      [   PASS   ] :: openat$cgroup_subtree executed.
+      [   PASS   ] :: openat$cgroup_freezer_state executed.
+      [   PASS   ] :: openat$cgroup_netprio_ifpriomap executed.
+      [   PASS   ] :: openat$cgroup_int executed.
+      [   PASS   ] :: openat$cgroup_devices executed.
+      [   PASS   ] :: openat$cgroup_pressure executed.
+      [   PASS   ] :: openat$cgroup_type executed.
+      [   PASS   ] :: openat$cgroup executed.
+      [   PASS   ] :: openat$cgroup_root executed.
+      [   PASS   ] :: openat$cgroup_procs executed.
+      [   PASS   ] :: mkdirat$cgroup executed.
+      [   PASS   ] :: mkdirat$cgroup_root executed.
+      [   PASS   ] :: Command 'syzkaller_check_results' (Expected 0, got 0)
+      Duration: 3620s
+      Assertions: 71 good, 0 bad
+      RESULT: PASS (Fuzzing with syzkaller)
+
+  Results location:
+      output.txt
+contact: Filippo Storniolo <fstornio@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+path: /syzkaller
+framework: beakerlib
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+        -  /kernel-include
+        -  /syzkaller
+        -  /networking/syzkaller
+environment:
+    main_syscalls: |
+      "bpf",
+      "ioctl",
+      "socket",
+      "socketpair",
+      "setsockopt",
+      "getsockopt",
+      "getsockname",
+      "getpeername",
+      "bind",
+      "listen",
+      "connect",
+      "accept",
+      "accept4",
+      "close",
+      "shutdown",
+      "sendmsg",
+      "sendmmsg",
+      "sendto",
+      "recvmsg",
+      "recvmmsg",
+      "recvfrom",
+      "epoll_create1",
+      "epoll_ctl",
+      "epoll_pwait",
+      "mmap",
+      "ppoll",
+      "pread64",
+      "preadv",
+      "pselect6",
+      "sendfile",
+      "getgid",
+      "getuid",
+      "gettid",
+      "unshare",
+      "pipe2",
+      "splice",
+      "clock_gettime",
+      "openat$tun",
+      "vmsplice",
+      "write",
+      "writev",
+      "tee",
+      "getpid",
+      "pwrite64",
+      "pwritev",
+      "read",
+      "readv",
+      "write$cgroup_subtree",
+      "write$cgroup_freezer_state",
+      "write$cgroup_netprio_ifpriomap",
+      "write$cgroup_pid",
+      "write$cgroup_int",
+      "write$cgroup_devices",
+      "write$cgroup_pressure",
+      "write$cgroup_type",
+      "openat$cgroup_subtree",
+      "openat$cgroup_freezer_state",
+      "openat$cgroup_netprio_ifpriomap",
+      "openat$cgroup_int",
+      "openat$cgroup_devices",
+      "openat$cgroup_pressure",
+      "openat$cgroup_type",
+      "openat$cgroup",
+      "openat$cgroup_root",
+      "openat$cgroup_procs",
+      "mkdirat$cgroup",
+      "mkdirat$cgroup_root"
+    time: 3600
+duration: 2h
+id: f66c31a8-fd9e-41bf-8908-7b1e1be3e028
