@@ -23,8 +23,8 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../kernel-include/runtest.sh || exit 1
-. ../../../syzkaller/include.sh || exit 1
 . ../../../cmdline_helper/libcmd.sh || exit 1
+. ../../../syzkaller/include.sh || exit 1
 
 mm_syscalls_default='
     "brk",
