@@ -21,6 +21,8 @@ function rhel8_fatal_issues()
 	# Bug 2115120 - RHEL8: kernel-rt: WARNING: possible circular locking dependency detected (raw_v6_hashinfo.lock->(softirq_ctrl.lock).lock->raw_v6_hashinfo.lock
 	is_rt && cki_is_kernel_debug && osver_in_range "806" "807" && tskip "read_all_proc" fatal
 	is_rt && cki_is_kernel_debug && osver_in_range "806" "807" && tskip "proc01" fatal
+	# RHELTEST-1405: distribution/ltp/generic: VMMTIER1 mmap21_*__with_dmesg_entry "mmap21: command not found"
+	osver_in_range "800" "811" && tskip "mmap21*" fatal
 }
 
 function rhel8_unfix_issues()
