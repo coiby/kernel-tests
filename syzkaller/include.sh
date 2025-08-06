@@ -23,9 +23,9 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 FILE=$(readlink -f "${BASH_SOURCE[0]}")
-CDIR=$(dirname "$FILE")
+syzkaller_CDIR=$(dirname "$FILE")
 
-. ${CDIR}/../kernel-include/runtest.sh
+. ${syzkaller_CDIR}/../kernel-include/runtest.sh
 
 # Source guest topology stored in TMT_TOPOLOGY_BASH
 # shellcheck disable=SC1090
@@ -132,7 +132,7 @@ function setup_qm() {
 [Container]
 Volume=${syzkaller_root}:${syzkaller_root}:z
 EOF
-    rlRun "checkmodule -M -m -o syzkaller.mod ${CDIR}/qm/syzkaller.te"
+    rlRun "checkmodule -M -m -o syzkaller.mod ${syzkaller_CDIR}/qm/syzkaller.te"
     rlRun "semodule_package -o syzkaller.pp -m syzkaller.mod"
     rlRun "semodule -i syzkaller.pp"
     rlRun "systemctl daemon-reload"
@@ -184,10 +184,10 @@ function syzkaller_setup() {
     cd syzkaller
     rlRun "git checkout ${SYZKALLER_COMMIT_HASH}"
     if [ -n "$FUZZ_IN_QM" ]; then
-        rlRun "git apply ${CDIR}/qm/qm.patch"
+        rlRun "git apply ${syzkaller_CDIR}/qm/qm.patch"
     fi
     for git_patch in $git_patches; do
-        rlRun "git apply ${CDIR}/$git_patch"
+        rlRun "git apply ${syzkaller_CDIR}/$git_patch"
     done
     rlRun make
 
@@ -294,7 +294,7 @@ function syzkaller_check_results() {
         if [[ " ${not_present_syscalls_sanitized} " == *" ${syscall} "* ]]; then
             rlLog "${syscall} not present."
         else
-            find_syscall_ret=$(python ${CDIR}/find_syscall_in_corpus.py "${syzkaller_workdir}/corpus_dir" "$syscall")
+            find_syscall_ret=$(python ${syzkaller_CDIR}/find_syscall_in_corpus.py "${syzkaller_workdir}/corpus_dir" "$syscall")
             if [ "$find_syscall_ret" = "executed" ]; then
                 rlPass "${syscall} executed."
             elif [ "$find_syscall_ret" = "not executed" ]; then
