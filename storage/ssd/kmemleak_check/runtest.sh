@@ -8,7 +8,7 @@ function runtest
 	if [ -f '/sys/kernel/debug/kmemleak' ]; then
 		rlRun "echo scan > /sys/kernel/debug/kmemleak"
 		rlRun "sleep 120"
-		rlRun "dmesg | grep 'kmemleak.*new suspected memory leaks'"
+		dmesg | grep "kmemleak.*new suspected memory leaks"
 		if [ $? -eq 0 ]; then
 			rlRun "cat /sys/kernel/debug/kmemleak"
 			rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL
