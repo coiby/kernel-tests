@@ -10,3 +10,4 @@ test: bash ./runtest.sh
 framework: shell
 require: rteval
 duration: 10h
+tag: NoRHIVOS

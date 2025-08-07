@@ -5,3 +5,4 @@ framework: shell
 require:
   - rteval
 duration: 30m
+tag: NoRHIVOS

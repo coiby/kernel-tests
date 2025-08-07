@@ -4,3 +4,4 @@ contact: Waylon Cude <wcude@redhat.com>
 test: bash ./runtest.sh
 framework: shell
 duration: 30m
+tag: NoRHIVOS
