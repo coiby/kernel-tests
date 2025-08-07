@@ -28,9 +28,7 @@ function runtest() {
 	elif rlIsRHEL 10; then
 		trun sysctl -wq kernel.io_uring_disabled=0
 		trun git clone -b ktls-utils-1.0-rc2 https://github.com/oracle/ktls-utils.git
-		trun pushd ktls-utils
-		trun "./autogen.sh && ./configure --with-systemd && make && make install && systemctl daemon-reload"
-		trun popd
+		trun "pushd ktls-utils && ./autogen.sh && ./configure --with-systemd && make && make install && systemctl daemon-reload && popd"
 	fi
 	testcases=""
 	if rlIsRHEL 7; then
