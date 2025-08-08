@@ -110,7 +110,6 @@
 /kunit/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /legacy/pci_id/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /legacy/whitelist/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
-/libevdev/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /livepatch/selftests/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /memory/fork_mem/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
 /misc/amtu/ @IamEld3st @bgoncalv @ftjahjad @kamaxeon @lulinqing @mh21_rh @spbnick @stowellm @sturivny @tales-aparecida
@@ -250,7 +249,6 @@
 /kunit/ @bgoncalv @lulinqing @npache @stowellm
 /legacy/pci_id/ @bgoncalv @ckalina @lulinqing @stowellm
 /legacy/whitelist/ @bgoncalv @ckalina @lulinqing @stowellm
-/libevdev/ @bgoncalv @lulinqing @stowellm
 /livepatch/selftests/ @bgoncalv @joe.lawrence @lulinqing @stowellm @ykopkova
 /memory/fork_mem/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang @stowellm
 /misc/amtu/ @bgoncalv @chuhu @liwan1 @lulinqing @pifang @stowellm
