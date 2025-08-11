@@ -18,6 +18,17 @@
 #     Does nothing, leaving the system in place
 export TUNED_ACTION="${TUNED_ACTION:-on}"
 
+# HANDLE_NOHZ=<on|off|ignore>
+#   HANDLE_NOHZ=on
+#      Whenever enabling the realtime profile ensure the nohz_full also
+#      applied on the isolcpus and when disabling the profile the
+#      extra setting also removed
+#   HANDLE_NOHZ=off
+#      Remove nohz_full at activation
+#   HANDLE_NOHZ=ignore
+#      Do nothing with nohz_full argument
+export HANDLE_NOHZ="${HANDLE_NOHZ:-off}"
+
 # ISOLCPUS=<""|default|VALUE>
 #   ISOLCPUS=default
 #     When activating the realtime tuned profile, leaves whatever default
@@ -50,14 +61,36 @@ function __disable_tuned ()
 {
     echo "Disabling tuned" | tee -a "$OUTPUTFILE"
     tuned-adm off
+    if [[ $HANDLE_NOHZ == on ]]; then
+        grubby --update-kernel=ALL --remove-args="nohz_full"
+    fi
     tuned-adm active | tee -a "$OUTPUTFILE"
+}
+
+# get cpulist without reboot and respecting the 'default' behavior
+function __predict_tuned_cpulist ()
+{
+    local bootcmdline
+    local isolcpus
+    local cpu_list_with_flags
+
+    bootcmdline=$(grep '^TUNED_BOOT_CMDLINE=' /etc/tuned/bootcmdline | cut -d'"' -f2)
+    isolcpus=$(echo "$bootcmdline" | grep -o 'isolcpus=[^[:space:]]*')
+
+    # Extract just the CPU list, without 'managed_irq,domain' or other flags
+    if [[ -n "$isolcpus" ]]; then
+       cpu_list_with_flags=${isolcpus#isolcpus=}
+       # NOTE: nohz behavior before RHEL 11 is not the same as nohz_full
+       echo "$cpu_list_with_flags" | sed -e 's/managed_irq,//' -e 's/domain,//' -e 's/nohz,//'
+    fi
 }
 
 function __enable_tuned ()
 {
+    local actual_cpu_list
     if tuned-adm active | grep -q realtime; then
         echo "TuneD realtime is already active" | tee -a "$OUTPUTFILE"
-        __check_isolated_cores || return
+        __check_settings_in_place || return
     fi
 
     echo "Enabling TuneD realtime with following isolcpus: $ISOLCPUS" | \
@@ -65,14 +98,39 @@ function __enable_tuned ()
     __set_isolated_cores
     tuned-adm profile realtime
     tuned-adm active | tee -a "$OUTPUTFILE"
+    if [[ $HANDLE_NOHZ == on ]]; then
+      actual_cpu_list=$(__predict_tuned_cpulist)
+      echo "Enabling nohz_full with following cpus: $actual_cpu_list" | \
+        tee -a "$OUTPUTFILE"
+      grubby --update-kernel=ALL --args="nohz_full=$actual_cpu_list"
+    elif [[ $HANDLE_NOHZ == off ]]; then
+      grubby --update-kernel=ALL --remove-args="nohz_full"
+    fi
 
     sleep 3
     sync
     rstrnt-reboot
 }
 
-function __check_isolated_cores ()
+function __is_nohz_live ()
 {
+    # true if the currently active profile includes nohz_full
+    grep -q nohz_full= /proc/cmdline
+}
+
+function __check_settings_in_place ()
+{
+    if [[ $HANDLE_NOHZ == on ]]; then
+        if ! __is_nohz_live; then
+            # nohz_full is missing and expected, needs reboot
+            return 0
+        fi
+    elif [[ $HANDLE_NOHZ == off ]]; then
+        if __is_nohz_live; then
+            # nohz_full needs to be removed and reboot
+            return 0
+        fi
+    fi
     cur_isolcpus="$(get_isolated_cores)"
     if [ -z "$ISOLCPUS" ]; then
         # User requested ISOLCPUS=""
