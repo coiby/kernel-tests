@@ -9,4 +9,4 @@ destructive=no
 [restraint]
 entry_point=./runtest.sh
 max_time=20m
-dependencies=coreutils;crypto-policies;crypto-policies-scripts;fips-mode-setup;grubby
+dependencies=coreutils;crypto-policies;crypto-policies-scripts;grubby
