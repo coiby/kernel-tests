@@ -56,7 +56,7 @@ function __disable_tuned ()
 function __enable_tuned ()
 {
     if tuned-adm active | grep -q realtime; then
-        echo "TuneD realtime is already active" | tee -a $OUTPUTFILE
+        echo "TuneD realtime is already active" | tee -a "$OUTPUTFILE"
         __check_isolated_cores || return
     fi
 
@@ -74,9 +74,9 @@ function __enable_tuned ()
 function __check_isolated_cores ()
 {
     cur_isolcpus="$(get_isolated_cores)"
-    if [ -z $ISOLCPUS ]; then
+    if [ -z "$ISOLCPUS" ]; then
         # User requested ISOLCPUS=""
-        if [ -z $cur_isolcpus ]; then
+        if [ -z "$cur_isolcpus" ]; then
             # isolcpus is already empty, so no action required
             return 1
         else
@@ -85,7 +85,7 @@ function __check_isolated_cores ()
         fi
     else
         # Either user requested specific isolated cores or set "default"
-        if [ -z $cur_isolcpus ]; then
+        if [ -z "$cur_isolcpus" ]; then
             # isolcpus is currently empty, so we must update tuned
             # realtime and reboot
             return 0
@@ -120,7 +120,7 @@ function __set_isolated_cores ()
             # none were specified by the user
             echo "isolated_cores=" >> /etc/tuned/realtime-variables.conf
         fi
-    elif [ -z $ISOLCPUS ]; then
+    elif [ -z "$ISOLCPUS" ]; then
         # ISOLCPUS="", so set empty isolated_cores
         echo "isolated_cores=" >> /etc/tuned/realtime-variables.conf
     else
