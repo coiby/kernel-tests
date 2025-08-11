@@ -80,6 +80,7 @@ free_pagecache_dentries_inodes()
     original_cache=$(vmstat | awk '{print $6}'| sed -n '3p')
 
     dmesg -C
+    sync
     echo 3 > "${TUNE_FILE}"
     verify_tune_value "${TUNE_FILE}" 3
     sleep 1
