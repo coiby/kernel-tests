@@ -6,19 +6,6 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 
-netmask_install()
-{
-	dnf -y install texinfo
-	git clone https://github.com/tlby/netmask.git || return 1
-	pushd netmask/ || return 1
-	./autogen
-	./configure
-	make
-	make install
-	popd
-	which netmask >/dev/null 2>&1
-}
-
 sendip_install()
 {
 	which sendip 2> /dev/null && return 0
@@ -79,9 +66,8 @@ ipset_install()
 
 rlJournalStart
 	rlPhaseStartSetup "ipset upstream test installing"
-		rlRun "dnf -y install libmnl-devel libtool-ltdl-devel automake autoconf libtool elfutils-libelf-devel git"
+		rlRun "dnf -y install libmnl-devel libtool-ltdl-devel automake autoconf libtool elfutils-libelf-devel git ipcalc"
 		which sendip || rlRun "sendip_install"
-		which netmask || rlRun "netmask_install"
 		test -e libmnl/install/lib/libmnl.so.0 || rlRun "libmnl_install"
 		ldd ipset/src/ipset | grep 'libmnl/install/lib/libmnl.so.0' || {
 			rlRun "ipset_install"
