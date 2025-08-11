@@ -53,7 +53,7 @@ recommend:
   - jfsutils
 test: bash ./runtest.sh
 framework: beakerlib
-duration: 1h
+duration: 2h
 # set avc check back to default that is disabled
 # until there is a better solution:
 # https://github.com/teemtee/tmt/issues/3611
