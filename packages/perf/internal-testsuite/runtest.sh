@@ -246,7 +246,7 @@ rlJournalStart
 		fi
 
 		rlRun "pushd $TmpDir >/dev/null"
-		rlRun "perf test list |& tee tests.list" 0 "We will run the following tests:"
+		rlRun "perf test list |& perl -pe 's/ \(exclusive\)$//' | tee tests.list" 0 "We will run the following tests:"
 	rlPhaseEnd
 
 	while read line; do
