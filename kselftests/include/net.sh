@@ -23,7 +23,7 @@ install_epel_pkg()
 			cat >> /etc/yum.repos.d/epel.repo << EOF
 [epel]
 name=Extra Packages for Enterprise Linux \$releasever - \$basearch
-metalink = https://mirrors.fedoraproject.org/metalink?repo=epel-\$releasever_major&arch=\$basearch
+metalink = https://mirrors.fedoraproject.org/metalink?repo=epel-\$releasever&arch=\$basearch
 gpgcheck = 0
 enabled = 1
 EOF
