@@ -257,7 +257,7 @@ rlJournalStart
 		# parse the line
 		TEST_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
 		TEST_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
-		TEST_PATTERNS="-e \"$TEST_DESC\""
+		#TEST_PATTERNS="-e \"$TEST_DESC\""
 
 		# skip in case of subtest
 		test -z $TEST_NUMBER && continue
@@ -270,7 +270,7 @@ rlJournalStart
 				RETVAL=$?
 				rlLog "$(cat $TEST_NUMBER.log)"
 				# use eval to correctly interpret the patters, -F to not match regex characters
-				RESULT=`eval grep -F "$TEST_PATTERNS" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
+				RESULT=`eval cat $TEST_NUMBER.log | grep -E '[0-9]+(\.[0-9]+)?:' | awk -F':' '{print $NF}'| tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
 				printf "%8s -- %s\n" $RESULT "$CURRENT_TEST" | tee -a results.log
 
 				# search for successful report, not fail for testcase with subtests
