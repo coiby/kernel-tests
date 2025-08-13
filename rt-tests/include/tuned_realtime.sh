@@ -90,7 +90,7 @@ function __enable_tuned ()
     local actual_cpu_list
     if tuned-adm active | grep -q realtime; then
         echo "TuneD realtime is already active" | tee -a "$OUTPUTFILE"
-        __check_settings_in_place || return
+        __check_settings_in_place && return
     fi
 
     echo "Enabling TuneD realtime with following isolcpus: $ISOLCPUS" | \
@@ -123,12 +123,12 @@ function __check_settings_in_place ()
     if [[ $HANDLE_NOHZ == on ]]; then
         if ! __is_nohz_live; then
             # nohz_full is missing and expected, needs reboot
-            return 0
+            return 1
         fi
     elif [[ $HANDLE_NOHZ == off ]]; then
         if __is_nohz_live; then
             # nohz_full needs to be removed and reboot
-            return 0
+            return 1
         fi
     fi
     cur_isolcpus="$(get_isolated_cores)"
@@ -136,23 +136,23 @@ function __check_settings_in_place ()
         # User requested ISOLCPUS=""
         if [ -z "$cur_isolcpus" ]; then
             # isolcpus is already empty, so no action required
-            return 1
+            return 0
         else
             # isolcpus are set, so we must update tuned realtime and reboot
-            return 0
+            return 1
         fi
     else
         # Either user requested specific isolated cores or set "default"
         if [ -z "$cur_isolcpus" ]; then
             # isolcpus is currently empty, so we must update tuned
             # realtime and reboot
-            return 0
+            return 1
         else
             # the user requested some isolated cores, but some isolated
             # cores are already set; theoretically we should determine if
             # the isolated core set are different, but this library does
             # not yet support that; for now, return no action required
-            return 1
+            return 0
         fi
     fi
 }
