@@ -8,8 +8,8 @@ component:
   - glibc
 test: bash ./runtest.sh
 tag:
-  - KT1-9
   - KernelTier1
+  - KernelAutomotiveTier1
 framework: shell
 require:
   - procmail
@@ -30,7 +30,7 @@ require:
   - numactl
   - strace
   - wget
-  - initscripts-service
+  - iputils
   - type: file
     pattern:
       - /cki_lib
@@ -38,7 +38,13 @@ require:
       - /distribution/ltp/include-ng
       - /distribution/ltp/kirk
 recommend:
+  - initscripts-service
   - python3-click
 duration: 6h
+adjust+:
+  - when: package-name ~ kernel.*debug
+    enabled: false
+  - when: test_suite == fuzzing_functional
+    id: cfc4e45b-e64c-4761-a9da-38d2dee4bc30
 extra-summary: /kernel/distribution/ltp/lite
 extra-task: /kernel/distribution/ltp/lite

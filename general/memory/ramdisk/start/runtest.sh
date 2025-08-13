@@ -25,22 +25,24 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 2
+. ../../../../cmdline_helper/libcmd.sh || exit 1
 
-
-#RAMDISK_DIR=${RAMDISK_DIR:-/mnt}
+RAMDISK_DIR=${RAMDISK_DIR:-}
 RAMDISK_DEV=${RAMDISK_DEV:-/dev/ram0}
 RAMDISK_SIZE=${RAMDISK_SIZE:-}
 RAMDISK_PERCENT=${RAMDISK_PERCENT:-75}
 RAMDISK_FSTYPE=${RAMDISK_FSTYPE:-ext4}
 
 
-
 function ramdisk_mount()
 {
+    if [ -f ./RAMDISK_CLEANUPFLAG ]; then
+        return 0
+    fi
     mkdir -p $RAMDISK_DIR
     rlRun "mkfs.$RAMDISK_FSTYPE $RAMDISK_DEV"
     rlRun "mount $RAMDISK_DEV $RAMDISK_DIR"
-    mkdir -p /mnt/scratchspace /mnt/testarea /mnt/scratch
+    mkdir -p ${RAMDISK_DIR}/scratchspace ${RAMDISK_DIR}/testarea ${RAMDISK_DIR}/scratch
 }
 
 function ramdisk_setup()
@@ -68,14 +70,25 @@ function ramdisk_setup()
 
     # for rhel6, ramdisk is compiled in kernel
     # CONFIG_BLK_DEV_RAM=y
-    rlRun "grubby --args=ramdisk_size=${size} --update-kernel=DEFAULT"
-    zipl > /dev/null 2>&1
+    rlRun "change_cmdline ramdisk_size=${size}"
 
     touch ./RAMDISK_REBOOTFLAG
     rstrnt-reboot
     sleep 100
 }
 
+function ramdisk_cleanup()
+{
+    if [ -f ./RAMDISK_CLEANUPFLAG ]; then
+        return 0
+    fi
+    rlRun "umount $RAMDISK_DEV"
+    rlRun "rm -rf ${RAMDISK_DIR}"
+    rlRun "change_cmdline -ramdisk_size"
+    touch ./RAMDISK_CLEANUPFLAG
+    rstrnt-reboot
+    sleep 100
+}
 
 rlJournalStart
     rlPhaseStartSetup
@@ -84,13 +97,13 @@ rlJournalStart
 
     rlPhaseStartTest
     ramdisk_setup
-    if [ ! -z "$RAMDISK_DIR" ]; then
+    if [ -n "$RAMDISK_DIR" ]; then
         ramdisk_mount
     fi
     rlPhaseEnd
 
     rlPhaseStartCleanup
-
+    ramdisk_cleanup
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText

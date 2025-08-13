@@ -24,19 +24,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TENV=_env
-ifeq ($(PKG_TOP_DIR),)
-	export PKG_TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -e $$p/env.mk -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	export _TOP_DIR := $(shell p=$$PWD; while :; do \
-		[ -d $$p/.git -o -z "$$p" ] && { echo $$p; break; }; p=$${p%/*}; done)
-	-include $(PKG_TOP_DIR)/env.mk
-endif
-include $(TENV)
-ifeq ($(_TOP_DIR),)
-	_TOP_DIR=/mnt/tests/$(TOPLEVEL_NAMESPACE)
-endif
-
 export TESTVERSION=1.0
 
 BUILT_FILES=
@@ -46,9 +33,7 @@ FILES=$(TENV) $(METADATA) runtest.sh Makefile PURPOSE dependency.sh kvercmp.sh
 .PHONY: all install download clean
 
 run: $(FILES) build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
-		. runtest.sh )
+	./runtest.sh
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
@@ -56,27 +41,4 @@ build: $(BUILT_FILES)
 clean:
 	rm -fr *~ $(BUILT_FILES) *.rpm BUILD_DONE \
 		/root/rpmbuild/BUILD/libhugetlbfs-*
-
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@touch $(METADATA)
-	@echo "Owner:           Chunyu Hu <chuhu@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Test libhugetlbfs with testsuite in source rpm" >> $(METADATA)
-	@echo "TestTime:        1h" >> $(METADATA)
-	@echo "Releases:        RHEL7 RHEL8" >> $(METADATA)
-	@echo "Type:         	Regression"        >> $(METADATA)
-	@echo "RunFor:          kernel" >> $(METADATA)
-	@echo "Requires:        kernel" >> $(METADATA)
-	@echo "Requires:        @development libgcc glibc-devel beakerlib bc rpm-build" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         RedHat Internal" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-
-	rhts-lint $(METADATA)
 

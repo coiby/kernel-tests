@@ -1,7 +1,8 @@
 # The list for streams already support modules builtin test
-HEAD-10.0
-HEAD-9.6
-9.5
+HEAD-10.1
+10.0
+HEAD-9.7
+9.6
 9.4
 9.2
 9.0
@@ -12,3 +13,4 @@ HEAD-8.10
 8.2
 HEAD-7.9
 7.7
+7.6

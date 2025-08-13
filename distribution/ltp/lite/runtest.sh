@@ -13,16 +13,19 @@
 #export AVC_ERROR=+no_avc_check
 #export RHTS_OPTION_STRONGER_AVC=
 
-# VMs can have slow performance, therefore increase LTP_TIMEOUT_MUL
-if cki_is_vm; then
-	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
-	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-5}
-fi
-
-# debug kernel is slower increase LTP_TIMEOUT_MUL
-if cki_is_kernel_debug; then
-	export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
-	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-5}
+if [ "${TESTVERSION}" -ge 20250530 ] || [ -n "${LTP_COMMIT_ID}" ]; then
+	# Since commit a6a369c5eeb, LTP supports fractional values for LTP_RUNTIME_MUL.
+	# We set it to 0.1 to significantly reduce the effective .runtime duration.
+	# This helps limit execution time in CKI pipelines, which are focused on quick
+	# functional verification rather than stress or longevity testing.
+	export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-0.1}
+else
+	# For older LTP versions (pre-20250530), retain the original integer multiplier
+	# to ensure compatibility with CKI testing in legacy (e.g., zstream) environments.
+	if cki_is_vm || cki_is_kernel_debug; then
+		export LTP_TIMEOUT_MUL=${LTP_TIMEOUT_MUL:-2}
+		export LTP_RUNTIME_MUL=${LTP_RUNTIME_MUL:-5}
+	fi
 fi
 
 [ -n "${LTP_TIMEOUT_MUL}" ] && echo "LTP_TIMEOUT_MUL is ${LTP_TIMEOUT_MUL}"
@@ -47,6 +50,24 @@ function ltp_test_build()
 	if [[ -z ${LTP_COMMIT_ID} ]]; then
 		RHELKT1LITE_CONFIG=$RUNTESTS.${TESTVERSION}
 	else
+		# generate RHELKT1LITE.next
+		echo "Going to generate RHELKT1LITE.next"
+		pushd ../lite/configs
+		# restraint doesn't seem to keep the file permission
+		chmod +x ./config-maker.sh
+		LTP_VERSION=next ./config-maker.sh &> config-maker.txt
+		if [ $? -ne 0 ]; then
+			cat config-maker.txt
+			echo "Aborting current task: Couldn't generate test config." | tee -a $OUTPUTFILE
+			if [[ -n $RSTRNT_TASKNAME ]]; then
+				rstrnt-report-result "build_all config-maker" WARN
+				exit 0
+			else
+				exit 1
+			fi
+		fi
+		popd
+		echo "RHELKT1LITE.next is generated"
 		RHELKT1LITE_CONFIG=$RUNTESTS.next
 	fi
 	cp -vf configs/${RHELKT1LITE_CONFIG} ${runtest_path}/$RUNTESTS
@@ -192,6 +213,13 @@ function add_external_timeout()
 	sed -i 's/ioctl09 ioctl09/ioctl09 timeout 180 sh -c "ioctl09 || true"/' "$runtest"
 	sed -i 's/madvise06 madvise06/madvise06 timeout 180 sh -c "madvise06 || true"/' "$runtest"
 	sed -i 's/pty07 pty07/pty07 timeout 900 sh -c "pty07 || true"/' "$runtest"
+
+	# nice05 has a very short .runtime (3s), so using LTP_RUNTIME_MUL=0.1
+	# would round the runtime down to 0 and effectively skip the test.
+	#
+	# A patch fixing this issue has been submitted: https://lists.linux.it/pipermail/ltp/2025-June/043960.html
+	# Once that patch is backported, this workaround can be safely removed.
+	sed -i 's/nice05 nice05/nice05 timeout 60 sh -c "LTP_RUNTIME_MUL=1 nice05"/' "$runtest"
 }
 
 function audit_rule_setting()

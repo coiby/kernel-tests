@@ -15,7 +15,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_cpu_random_online_offline_io_bz1376948
 extra-task: /storage/ssd/nvme_cpu_random_online_offline_io_bz1376948
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: eb104a9f-8e30-44b8-ab21-a63d767e486f

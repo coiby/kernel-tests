@@ -1,0 +1,35 @@
+summary: Tests for QAT zip to be used with Testing Farm
+contact: Denis Aleksandrov <daleksan@redhat.com>
+path: /security/qat/zip
+test: bash ./runtest.sh
+component:
+  - kernel
+framework: beakerlib
+require:
+  - qatzip
+  - qatlib
+  - qatlib-service
+  - qatengine
+  - gcc
+  - clang
+  - wget
+  - unzip
+  - git
+  - automake
+  - libtool
+  - openssl
+  - openssl-devel
+  - numactl-devel
+  - nasm
+  - zlib-devel
+  - pip
+  - bzip2
+  - autoconf
+  - lz4-devel
+  - qatzip-devel
+  - qatlib-devel
+  - type: file
+    pattern:
+      - /security/qat/include/lib.sh
+      - /security/qat/include/qat
+duration: 45m

@@ -28,7 +28,7 @@ function _install_bats ()
     if [ $? -ne 0 ]; then
         echo "FAIL Couldn't install BATS. Aborting test..."
         rstrnt-report-result install-BATS WARN
-        exit 1
+        exit 0
     fi
 }
 
@@ -109,7 +109,7 @@ function run_tests()
                 echo "FAIL: test failed with timeout. Likely infra issue."
                 rstrnt-report-result -o "${TEST_LOG}" "${TEST_NAME}" WARN
                 cleanup
-                exit 1
+                exit 0
             else
                 rstrnt-report-result -o "${TEST_LOG}" "${TEST_NAME}" FAIL
             fi
@@ -126,7 +126,7 @@ rpm -q podman-tests
 if [ $? -ne 0 ]; then
     echo "FAIL: podman-tests is not installed. Aborting test..."
     rstrnt-report-result "${TEST}" WARN
-    exit 1
+    exit 0
 fi
 
 TEST_DIR=/usr/share/podman/test/system

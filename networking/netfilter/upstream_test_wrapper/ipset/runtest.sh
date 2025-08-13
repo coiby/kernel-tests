@@ -6,41 +6,28 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 
-libtool_install()
-{
-	local ret=0
-	test -e libtool-2.4.2.tar.gz || { wget http://ftpmirror.gnu.org/libtool/libtool-2.4.2.tar.gz; }
-	tar zxf libtool-2.4.2.tar.gz
-	cd libtool-2.4.2 || return 1
-	./configure		||((ret+=1))
-	make			||((ret+=1))
-	make install	||((ret+=1))
-	cd -
-	return $ret
-}
-netmask_install()
-{
-	dnf -y install texinfo
-	git clone https://github.com/tlby/netmask.git || return 1
-	pushd netmask/ || return 1
-	./autogen
-	./configure
-	make
-	make install
-	popd
-	which netmask >/dev/null 2>&1
-}
-
 sendip_install()
 {
+	which sendip 2> /dev/null && return 0
+	rlRun "rm -rf SendIP"
 	#SendIP github: https://github.com/rickettm/SendIP
-	git clone https://github.com/rickettm/SendIP.git || return 1
-	pushd SendIP || return 1
-	sed -i 's/-Werror//g' Makefile
-	make
-	make install
+	rlRun "git clone https://github.com/rickettm/SendIP.git" || return 1
+	rlRun "pushd SendIP" || return 1
+	rlRun "sed -i 's/-Werror//g' Makefile"
+	# The CKI test distro already uses a newer C standard
+	rlRun "sed -i 's/^CFLAGS=/CFLAGS= -std=gnu23/g' Makefile"
+	# with standard gnu23, bool/true/false are keywords. lead to double defined in types.h
+	rlRun "sed -i '/typedef int bool;/c\\
+	#if defined(__STDC_VERSION__) && (__STDC_VERSION__ > 201710L)\\
+	/* bool, true and false are keywords.  */\\
+	#else\\
+	typedef int bool;\\
+	#endif\\
+	' types.h"
+	rlRun "make"
+	rlRun "make install"
 	popd
-	which sendip >/dev/null 2>&1
+	rlRun "which sendip"
 }
 
 libmnl_install()
@@ -73,15 +60,14 @@ ipset_install()
 	rlRun "./configure"
 	rlRun "make clean"
 	rlRun "make -j $(nproc)" || riDie "ipset didn't build successfully"
-	rlRun "sed -i 's/exit 1/# exit 1/g' ./tests/runtest.sh"	# don't exit when fail,finish test
+	rlRun "sed -i 's/exit 1/# exit 1/g' ./tests/runtest.sh" # don't exit when fail,finish test
 	rlRun "popd"
 }
 
 rlJournalStart
 	rlPhaseStartSetup "ipset upstream test installing"
-		rlRun "dnf -y install libmnl-devel libtool-ltdl-devel automake autoconf libtool elfutils-libelf-devel git"
+		rlRun "dnf -y install libmnl-devel libtool-ltdl-devel automake autoconf libtool elfutils-libelf-devel git ipcalc"
 		which sendip || rlRun "sendip_install"
-		which netmask || rlRun "netmask_install"
 		test -e libmnl/install/lib/libmnl.so.0 || rlRun "libmnl_install"
 		ldd ipset/src/ipset | grep 'libmnl/install/lib/libmnl.so.0' || {
 			rlRun "ipset_install"

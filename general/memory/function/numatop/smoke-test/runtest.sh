@@ -46,7 +46,7 @@ rlJournalStart
 		# we need to build mgen for test
 		for (( i=0; i<$CLONE_ATTEMPTS_COUNT; i++ )); do
 			echo "Trying to clone the repo....... take $i..."
-			git clone https://github.com/intel/numatop.git
+			git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/numatop.git
 			if [ $? -eq 0 ]; then
 				echo "I have been able to clone the repo."
 				REPO_CLONED=1

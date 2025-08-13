@@ -9,6 +9,7 @@ RHEL testing.
 
 Parameters
 ==========
+USE_LTP_RPM		set to "y" install LTP by rpm
 TESTARGS		LTP job file to run, see configs dir in git repo
 TEST_VERSION		Running a specific version of LTP other than the default
 FILTERTESTS		Running some specific testcases other than the default

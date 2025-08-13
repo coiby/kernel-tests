@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/vdo/crypt
 extra-task: /storage/vdo/crypt
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro > rhel-8
 id: 484C5813-5F7E-40B6-A5C5-5588E9C7C945

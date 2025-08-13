@@ -22,8 +22,8 @@
 # Test configuration
 # TODO: Make it customizable so we can test different driver versions
 # RHEL AI versions info: https://gitlab.com/redhat/rhel-ai/containers/nvidia-bootc/-/blob/main/argfile.conf?ref_type=heads
-DRIVER_VERSION="550.144.03"
-CUDA_VERSION='12.4.1'
+DRIVER_VERSION="570.124.06"
+CUDA_VERSION='12.8.1'
 BASE_URL='https://us.download.nvidia.com/tesla'
 SPECFILE_REPO='https://github.com/NVIDIA/yum-packaging-precompiled-kmod'
 
@@ -35,12 +35,17 @@ CUDA_DASHED_VERSION=${CUDA_VERSION_ARRAY[0]}-${CUDA_VERSION_ARRAY[1]}
 # Environment information
 KCORE_PACKAGE="kernel-core-$(uname -r)"
 KVER=$(rpm -q --qf "%{VERSION}" ${KCORE_PACKAGE})
-KREL=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | sed 's/\.el.\(_.\)*$//')
+KREL=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | sed 's/\.el\(8\|9\|10\)\(_.\)*$//')
 KDIST=$(rpm -q --qf "%{RELEASE}" ${KCORE_PACKAGE} | awk -F '.' '{ print "."$NF}')
 OS_VERSION=$(grep "^VERSION=" /etc/os-release)
 OS_VERSION_MAJOR=$(grep "^VERSION=" /etc/os-release | cut -d '=' -f 2 | sed 's/"//g' | cut -d '.' -f 1)
 BUILD_ARCH=$(arch)
 TARGET_ARCH=$(echo "${BUILD_ARCH}" | sed 's/+64k//')
+
+if [ ${OS_VERSION_MAJOR} == 10 ]; then
+    OS_VERSION_MAJOR=9
+    echo "WARNING: Changing OS_VERSION_MAJOR to 9 for compatibility"
+fi
 
 
 rlJournalStart
@@ -97,12 +102,11 @@ rlJournalStart
 
         rlLog "Installing CUDA"
         rlRun "dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel${OS_VERSION_MAJOR}/${TARGET_ARCH}/cuda-rhel${OS_VERSION_MAJOR}.repo"
-        rlRun "dnf -y module enable nvidia-driver:${DRIVER_STREAM}/default"
-        rlRun "dnf install -y \
+        rlRun "dnf -y module enable nvidia-driver:${DRIVER_STREAM}-open/default"
+        rlRun "dnf install -y --nogpgcheck \
             nvidia-driver-${DRIVER_VERSION} \
             nvidia-driver-cuda-${DRIVER_VERSION} \
             nvidia-driver-libs-${DRIVER_VERSION} \
-            nvidia-driver-NVML-${DRIVER_VERSION} \
             cuda-compat-${CUDA_DASHED_VERSION} \
             cuda-cudart-${CUDA_DASHED_VERSION} \
             nvidia-persistenced-${DRIVER_VERSION} \

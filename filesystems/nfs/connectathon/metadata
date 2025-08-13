@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=wget;git;gcc;make;autoconf;patch;time;tar;bzip2;nfs-utils;net-tools;wireshark;tcpdump
+dependencies=wget;git;gcc;make;autoconf;patch;time;tar;bzip2;nfs-utils;net-tools;wireshark;tcpdump;nmap-ncat
 softDependencies=net-snmp;libnsl2;libtirpc-devel;ethereal;rusers
 repoRequires=cki_lib

@@ -76,14 +76,11 @@ function GetCurrentModuleList ()
             local moduleList="moduleList_current"
             if [[ "${OS}" = "RHEL8" || "${OS}" = "RHEL9" || "${OS}" = "RHEL10" ]]; then
                 PKG_LIST="${name}-modules-${K_VER}-${K_REL} ${name}-modules-extra-${K_VER}-${K_REL} ${name}-modules-core-${K_VER}-${K_REL} ${name}-core-${K_VER}-${K_REL}"
-                if cki_is_kernel_rt; then
-                    PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
-                fi
             else
                 PKG_LIST="${name}-${K_VER}-${K_REL}"
-                if cki_is_kernel_rt; then
-                    PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
-                fi
+            fi
+            if cki_is_kernel_rt && rt_kvm_check; then
+                PKG_LIST="${PKG_LIST} ${name}-kvm-${K_VER}-${K_REL}"
             fi
             rpm -q --filesbypkg $PKG_LIST | grep '\.ko' | awk -F/ '{ print $NF }' | sed 's/\.xz$//' | sort > ${TESTAREA}/${moduleList}
             ;;
@@ -372,6 +369,18 @@ function DisplayModuleFail ()
     echo "************ Missing modules list end *************" | tee -a $OUTPUTFILE
 }
 
+# kernel-rt-kvm package no longer provided in 9.7 and 10.1
+function rt_kvm_check ()
+{
+    if grep -q 'Red Hat Enterprise Linux release 9' /etc/redhat-release; then
+        cki_kver_ge "5.14.0-581.el9" && return 1 || return 0
+    elif grep -q 'Red Hat Enterprise Linux release 10' /etc/redhat-release; then
+        cki_kver_ge "6.12.0-79.el10" && return 1 || return 0
+    else
+        return 0
+    fi
+}
+
 function inst_kernel_rt_kvm ()
 {
     rt_kvm="${name}-kvm-${K_VER}-${K_REL}.${K_ARCH}"
@@ -416,6 +425,10 @@ function SetOSRelease ()
         # This is RHEL7 (Maipo)
         OS="RHEL7"
         case ${Base} in
+            957)
+                # RHEL-7.6
+                Release="7.6"
+                ;;
             1062)
                 # RHEL-7.7
                 Release="7.7"
@@ -467,18 +480,24 @@ function SetOSRelease ()
             503)
                 Release="9.5"
                 ;;
+            570)
+                Release="9.6"
+                ;;
             *)
                 # Still in developing phase, need to update in future.
-                Release="HEAD-9.6"
+                Release="HEAD-9.7"
                 ;;
         esac
     elif [[ "${K_VER}" = "6.12.0" ]];then
         # RHEL10
         OS="RHEL10"
         case ${Base} in
+            55)
+                Release="10.0"
+                ;;
             *)
-                # RHEL-10.0, developing phase
-                Release="HEAD-10.0"
+                # RHEL-10.1, developing phase
+                Release="HEAD-10.1"
                 ;;
         esac
     elif [[ -n "$(echo ${K_NAME} | grep kernel-pegas)" && "${K_VER}" = "4.10.0" ]]; then
@@ -527,7 +546,7 @@ rlJournalStart
         elif grep -q "release 8" /etc/redhat-release ; then
             chk_inst_kernel_modules_extra
         fi
-        if cki_is_kernel_rt; then
+        if cki_is_kernel_rt && rt_kvm_check; then
             inst_kernel_rt_kvm
         fi
 
@@ -577,21 +596,33 @@ rlJournalStart
             fi
         fi
 
-        if [[ "$Release" == "HEAD-9.6" ]]; then
-            if cki_kver_lt "5.14.0-508.el9"; then
-                sed -i "/gpio-regulator.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
+        if [[ "$Release" == "9.6" ]]; then
+            if cki_kver_lt "5.14.0-570.14.1.el9_6"; then
+                sed -i "/x509_selftest.ko/d"  ${OS}/${Release}/${Release}-builtin-${ARCH}.lst
             fi
-            if cki_kver_lt "5.14.0-527.el9"; then
-                sed -i "/onboard_usb_hub.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-{aarch64,ppc64le}.lst
+        fi
+
+        if [[ "$Release" == "HEAD-9.7" ]]; then
+            if cki_kver_lt "5.14.0-571.el9"; then
+                sed -i "/intel-ishtp_eclite.ko/d;/intel-oaktrail.ko/d;/intel-plr_tpmi.ko/d;/intel-sdsi.ko/d;
+                /intel-tpmi_power_domains.ko/d;/intel-vsec.ko/d;
+                /intel-vsec_tpmi.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
             fi
-            if cki_kver_lt "5.14.0-520.el9"; then
-                sed -i "/^t10-pi.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
+        fi
+
+        if [[ "$Release" == "HEAD-10.1" ]]; then
+            if cki_kver_lt "6.12.0-66.el10"; then
+                sed -i "/pci-pwrctl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-aarch64.lst
+                sed -i "/pci-pwrctrl-pwrseq.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
             fi
-            if cki_kver_lt "5.14.0-534.el9"; then
-                sed -i "/^rtsx_pci_ms.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-{ppc64le,x86_64}.lst
+            if cki_kver_lt "6.12.0-84.el10"; then
+                sed -i "/snd-acp-sdw-mach.ko/d; /snd-soc-acpi-intel-sdca-quirks.ko/d; /snd-soc-sdca.ko/d;
+                /snd-soc-rt721-sdca.ko/d; /snd-soc-rt-sdw-common.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
             fi
-            if cki_kver_lt "5.14.0-537.el9"; then
-                sed -i "/^tegra-ahb.ko$/d"  ${OS}/${Release}/${Release}-knownRemoved-builtin-aarch64.lst
+            if cki_kver_lt "6.12.0-86.el10"; then
+                sed -i "/raid6test.ko/d; /scsi_proto_test.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
+                sed -i "/mailbox-test.ko/d"  ${OS}/${Release}/${Release}-debug-knownRemoved-aarch64.lst
+                sed -i "/ntb_msi_test.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-x86_64.lst
             fi
         fi
     rlPhaseEnd

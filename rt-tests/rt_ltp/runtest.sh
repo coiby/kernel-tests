@@ -7,18 +7,29 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# shellcheck disable=SC1091
+TEST_VERSION=${TEST_VERSION:-20250130}
+RTLTP_PROFILE=${RTLTP_PROFILE:-default}
+
 # Source rt common functions
+# shellcheck disable=SC1091
 . ../include/runtest.sh || exit 1
+# shellcheck disable=SC1091
 . ../../distribution/ltp/include-ng/include.sh || exit 1
+# shellcheck disable=SC1091
 . ../../cki_lib/libcki.sh || exit 1
 
 set -x
 
+# Test name and paths
 TEST="rt-tests/rt_ltp"
+TESTPATH=$(pwd)
+WORKSPACE="$HOME/rt_ltp"
 
-TEST_TYPE=${TEST_TYPE:-"func"}
 # TEST_TYPE = "func perf" to enable ./perf/latency
+TEST_TYPE=${TEST_TYPE:-"func"}
+
+TESTLIST=${TESTLIST:-}
+SKIPLIST=${SKIPLIST:-}
 
 # $TESTVERSION is set in ltp-make.sh
 ltp_version=${ltp_version:-$TESTVERSION}
@@ -82,9 +93,14 @@ function check_status() {
 
     local count=$(echo "$log_files" | wc -w)
     if [[ $count -eq 0 ]]; then
+        # Skipping a test by commenting it out in the profile prevents it from
+        # being executed and generating any logs.
+        # Therefore, it should be treated as a SKIP, not a WARN.
         echo "No log files containing '$keywords' were found in $PWD/logs."
-        rstrnt-report-result "${casename}" "WARN" 2
-        return 2
+        echo "Test '$casename' is not being executed and does not produce any logs."
+        echo ":: $1 :: SKIP ::" | tee -a "$OUTPUTFILE"
+        rstrnt-report-result "${casename}" "SKIP" 0
+        return 0
     else
         echo "Found $count log file(s) containing '$keywords':"
         for log_file in $log_files; do echo ">> $log_file"; done
@@ -115,33 +131,175 @@ function check_status() {
     fi
 }
 
-function runtest() {
-    $PKGMGR wget gcc make automake || {
-        echo "dependent package install failed" | tee -a "$OUTPUTFILE"
-        rstrnt-report-result $TEST WARN 1
-        rlLog "Aborting test because dependent package install failed"
-        exit 1
-    }
+function setup() {
+    if cki_is_kernel_automotive; then
+        # Ensure the workspace directory exists and is accessible
+        if [[ -z "$WORKSPACE" ]]; then
+            rlLogError "WORKSPACE variable is not set."
+            rstrnt-report-result "$TEST" WARN 1
+            exit 1
+        fi
 
-    # Downoad and setup ltp
+        mkdir -p "$WORKSPACE"
+        cd "$WORKSPACE" || {
+            rlLogError "Unable to access workspace directory '$WORKSPACE'."
+            rstrnt-report-result "$TEST" WARN 1
+            exit 1
+        }
+
+        if [[ -f ./setup.txt ]]; then
+            # LTP has already been set up, skip further initialization
+            rlLog "Setup already completed previously. Skipping initialization."
+            return
+        else
+            # Clean workspace to prepare for a fresh setup
+            rlLog "Cleaning workspace directory before LTP setup."
+            rm -rf ./*
+        fi
+    fi
+
+    # Install required dependencies
+    if ! $PKGMGR wget gcc make automake; then
+        echo "Failed to install required packages: wget, gcc, make, automake." | tee -a "$OUTPUTFILE"
+        rlLogError "Test aborted due to package installation failure."
+        rstrnt-report-result "$TEST" WARN 1
+        exit 1
+    fi
+
+    # Download and prepare the LTP suite
     download_ltp
     patch-rtltp
 
+    if cki_is_kernel_automotive; then
+        # Copy predefined test profiles to the appropriate LTP directory
+        local profile_dir="$WORKSPACE/ltp-full-$ltp_version/testcases/realtime/profiles/"
+        rlLog "Copying test profiles to: $profile_dir"
+        cp -v "$TESTPATH"/profiles/* "$profile_dir"
+
+        # Ensure the specified profile exists
+        if [[ ! -f "$profile_dir/$RTLTP_PROFILE" ]]; then
+            rlLogError "Profile '$RTLTP_PROFILE' not found in '$profile_dir'."
+            rstrnt-report-result "$TEST" WARN 1
+            exit 1
+        fi
+
+        # Create a flag to indicate setup completion
+        date >./setup.txt
+        rlLog "LTP setup completed successfully."
+    fi
+}
+
+function filter_subtests() {
+    # filter_subtests - Filter available sub-tests using TESTLIST and SKIPLIST
+    #
+    # Inputs:
+    #   func_list      - A newline-delimited list of all available sub-tests
+    #   TESTLIST       - (optional) A space-separated whitelist of test names to run
+    #   SKIPLIST       - (optional) A space-separated blacklist of test names to skip
+    #
+    # Outputs:
+    #   selected_cases - Global array populated with the final list of tests to run
+    #                    after applying whitelist/blacklist rules
+    #
+    # Filtering behavior:
+    #   1. If only TESTLIST is set: run only the listed tests.
+    #   2. If only SKIPLIST is set: run all except those listed.
+    #   3. If both are set: run only tests in TESTLIST that are not in SKIPLIST.
+    #   4. If neither is set: run all available tests from func_list.
+    #
+    # Example format for either list:
+    #   TESTLIST="./func/sched_jitter ./func/sched_latency"
+
+    # Convert space-separated TESTLIST and SKIPLIST into arrays
+    read -r -a testlist_arr <<<"$TESTLIST"
+    read -r -a skiplist_arr <<<"$SKIPLIST"
+
+    # Declare an array to hold selected subtests after filtering
+    selected_cases=()
+
+    # Function to check if an element is in an array
+    in_list() {
+        local element=$1
+        shift
+        local list=("$@")
+        for item in "${list[@]}"; do
+            [[ "$item" == "$element" ]] && return 0
+        done
+        return 1
+    }
+
+    # Output selection summary
+    local total_tests=$(wc -l <<<"$func_list")
+    local pad_width=${#total_tests}
+    local index=0
+    rlLogDebug "Filtering test cases:"
+    while IFS= read -r case; do
+        [[ -z "$case" ]] && continue
+        ((index++))
+
+        local status="RUNNING"
+        local should_include=true
+
+        if [[ -n "$TESTLIST" && -n "$SKIPLIST" ]]; then
+            in_list "$case" "${testlist_arr[@]}" && in_list "$case" "${skiplist_arr[@]}" && should_include=false
+            in_list "$case" "${testlist_arr[@]}" || should_include=false
+        elif [[ -n "$TESTLIST" ]]; then
+            in_list "$case" "${testlist_arr[@]}" || should_include=false
+        elif [[ -n "$SKIPLIST" ]]; then
+            in_list "$case" "${skiplist_arr[@]}" && should_include=false
+        fi
+
+        if ! $should_include; then
+            status="SKIPPED"
+        else
+            selected_cases+=("$case")
+        fi
+
+        # Format output with padded index and aligned status
+        rlLogDebug "$(printf "[%0${pad_width}d] %-40s %s\n" "$index" "$case" "$status")"
+
+    done <<<"$func_list"
+}
+
+function runtest() {
     pushd "ltp-full-$ltp_version" || exit 1
     ./configure
 
     pushd "testcases/realtime" || exit 1
     ./configure
 
-    # default test-arguments: func, stress, perf, list
-    func_list=$(./run.sh -t list | grep "${TEST_TYPE// /\\|}" | sed 's/^\s*//')
-    while IFS= read -r case; do
+    if cki_is_kernel_automotive; then
+        # If running on a debug kernel, check for a debug-specific profile variant
+        local profile=$RTLTP_PROFILE
+        if cki_is_kernel_debug; then
+            local debug_profile="${RTLTP_PROFILE}-kdebug"
+            if [[ -f "$WORKSPACE/ltp-full-$ltp_version/testcases/realtime/profiles/$debug_profile" ]]; then
+                rlLog "Detected debug kernel. Switching to debug-specific profile: '$debug_profile'"
+                profile="$debug_profile"
+            else
+                rlLog "Debug kernel detected, but no debug-specific profile '$debug_profile' found. Continuing with profile: '$RTLTP_PROFILE'."
+            fi
+        fi
+    fi
+
+    # Fetch all available subtests matching the given TEST_TYPE (default: func, perf)
+    func_list=$(./run.sh -t list | grep "${TEST_TYPE// /\\|}" | sed 's/^\s*//' | sort)
+
+    if cki_is_kernel_automotive; then
+        filter_subtests
+    else
+        rlLogDebug "Running all detected test cases without filtering."
+        mapfile -t selected_cases <<<"$func_list"
+    fi
+
+    # Run the selected test cases
+    for case in "${selected_cases[@]}"; do
         echo "=== Running $case ==="
-        ./run.sh -t "$case"
+        ./run.sh -p "$profile" -t "$case"
         local return_code=$?
         echo "=== Checking $case ==="
-        check_status "./run.sh -t $case" $return_code
-    done <<<"$func_list"
+        check_status "./run.sh -p $profile -t $case" $return_code
+    done
 
     # shellcheck disable=SC2164
     popd || exit # "testcases/realtime"
@@ -149,11 +307,13 @@ function runtest() {
 
     if [ $result_r = "PASS" ]; then
         echo "overall result: PASS"
+        exit 0
     else
         echo "overall result: FAIL"
+        exit 1
     fi
 }
 
 rt_env_setup
+setup
 runtest
-exit 0

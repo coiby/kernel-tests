@@ -17,6 +17,13 @@ function main
 		echo "Skip test because $CASE_TYPE case list is empty"
 		rstrnt-report-result "$TNAME" SKIP
 	fi
+	if rlIsRHEL 9; then
+		dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+		yum -y install nbd
+	fi
+	if [ -n "$SKIP_STORAGE_TEST" ]; then
+		testcases=$(filter_testcases "$testcases" "$SKIP_STORAGE_TEST")
+	fi
 	for testcase in $testcases; do
 		if (rlIsRHEL ">9.4" || rlIsCentOS 9) && [[ "$testcase" == "block/035" ]]; then
 			sysctl -w kernel.io_uring_disabled=0

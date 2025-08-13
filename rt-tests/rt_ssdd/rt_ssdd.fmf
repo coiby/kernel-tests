@@ -6,17 +6,16 @@ component:
 path: /rt-tests/rt_ssdd
 test: bash ./runtest.sh
 framework: shell
-require:
+recommend:
   - realtime-tests
+  - rt-tests
 duration: 30m
-extra-summary: /rt-tests/rt_ssdd
-extra-task: /rt-tests/rt_ssdd
 environment:
   NFORKS: 10
   NITERS: 10000
 tag: NoRHIVOS
 enabled: true
-adjust:
-  enabled: false
-  when: arch != x86_64
+adjust+:
+  - enabled: false
+    when: arch != x86_64
 id: 0652c919-71a8-4eb3-bbc1-d1641c8d92ed

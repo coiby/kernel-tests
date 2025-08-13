@@ -8,4 +8,3 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-repoRequires=cki_lib

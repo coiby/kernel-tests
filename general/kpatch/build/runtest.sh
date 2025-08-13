@@ -28,7 +28,7 @@
 
 # Include rhts environment
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
-. lib_build.sh
+. ../include/lib_build.sh
 . ../include/lib.sh
 
 # shellcheck disable=SC2034

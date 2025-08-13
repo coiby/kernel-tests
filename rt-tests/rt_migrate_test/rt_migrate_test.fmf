@@ -6,14 +6,13 @@ component:
 path: /rt-tests/rt_migrate_test
 test: bash ./runtest.sh
 framework: shell
-require:
+recommend:
   - realtime-tests
+  - rt-tests
 duration: 1h
-extra-summary: /rt-tests/rt_migrate_test
-extra-task: /rt-tests/rt_migrate_test
 tag: NoRHIVOS
 enabled: true
-adjust:
-  enabled: false
-  when: arch != x86_64
+adjust+:
+  - enabled: false
+    when: arch != x86_64
 id: 4990cf8f-3422-4a4b-8c5e-dc457d18462d

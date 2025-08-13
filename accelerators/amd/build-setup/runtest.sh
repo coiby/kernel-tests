@@ -16,18 +16,25 @@
 # Include environments
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-# Include cki library
-# . ../../cki_lib/libcki.sh || exit 1
+
+ROCM_REPO_URL="https://raw.githubusercontent.com/containers/ai-lab-recipes/refs/heads/main/training/amd-bootc/repos.d/rocm.repo"
+AMDGPU_REPO_URL="https://raw.githubusercontent.com/containers/ai-lab-recipes/refs/heads/main/training/amd-bootc/repos.d/amdgpu.repo"
 
 rlJournalStart
 
+    rlPhaseStartSetup
+        rlLog "Install wget"
+        rlRun "dnf install -y wget"
+    rlPhaseEnd
+
     rlPhaseStartTest
-        rlLog "TODO: Build kernel from given repository"
-        rlLog "TODO: Generate RPM package and install it"
-        rlLog "TODO: Install ROCm"
+        rlLog "Install ROCm and AMDGPU needed bits"
+        rlRun "wget ${ROCM_REPO_URL} -P /etc/yum.repos.d/"
+        rlRun "wget  ${AMDGPU_REPO_URL} -P /etc/yum.repos.d/"
+        rlRun "echo 'exclude=amdgpu-dkms-* dkms-*' >> /etc/dnf/dnf.conf"
+        rlRun "dnf install -y libdrm-* rocm6.2.0"
     rlPhaseEnd
 
 rlJournalEnd
 
 rlJournalPrintText
-

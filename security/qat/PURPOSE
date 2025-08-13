@@ -1,5 +1,0 @@
-Description: Test suite for QAT userspace packages;
-qatlib, qatengine, qatzip, and qat-zstd-plugin.
-Author: Vilem Marsik <vmarsik@redhat.com> and Denis Aleksandrov <daleksan@redhat.com>
-Links: The Intel qat configuration script is from
-https://intel.github.io/quickassist/qatlib/configuration.html

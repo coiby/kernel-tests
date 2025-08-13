@@ -1,0 +1,17 @@
+module syzkaller 1.0;
+
+require {
+	type sysctl_fs_t;
+	type qm_t;
+	type binfmt_misc_fs_t;
+	type system_map_t;
+	class file { open read };
+	class dir mounton;
+	class process execmem;
+}
+
+#============= qm_t ==============
+allow qm_t binfmt_misc_fs_t:file open;
+allow qm_t self:process execmem;
+allow qm_t sysctl_fs_t:dir mounton;
+allow qm_t system_map_t:file { open read };

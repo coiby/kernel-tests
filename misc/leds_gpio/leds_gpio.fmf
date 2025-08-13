@@ -23,15 +23,15 @@ description: |
     [   PASS   ] :: File '/sys/kernel/tracing/trace' should contain 'leds_gpio'
 
   Results location:
-      output.txt
+    output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
 framework: beakerlib
 enabled: false
-adjust:
-    enabled: true
+adjust+:
+  - enabled: true
     when: hw_target == rcar_s4
 duration: 15m
 id: 49d78336-43ab-4f94-a677-ced32103350e

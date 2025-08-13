@@ -1,0 +1,12 @@
+[General]
+name=/kernel/security/qat/zstd-plugin
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=QAT zsrd-lib tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;qat-zstd-plugin;qatlib;qatlib-devel;qatlib-service;qatengine;qatzip;gcc;clang;wget;unzip;git;automake;libtool;openssl;openssl-devel;numactl-devel;nasm;zlib-devel;pip;bzip2;qat-zstd-plugin-devel
+repoRequires=security/qat/include

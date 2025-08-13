@@ -6,7 +6,7 @@ TEST="general/time/posix_timer"
 # ---------- Start Test -------------
 
 # Get the posix test suite from github
-git clone https://github.com/linuxqiao/posixtestsuite.git || exit 1
+git clone https://gitlab.com/redhat/centos-stream/tests/kernel/core/posixtestsuite.git --depth=1 || exit 1
 
 pushd posixtestsuite
 

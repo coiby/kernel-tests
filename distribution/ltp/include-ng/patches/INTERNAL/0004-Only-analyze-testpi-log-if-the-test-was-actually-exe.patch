@@ -1,0 +1,35 @@
+From c6dd9d69f127f0bf1d0d87b62a8632c83ec79de6 Mon Sep 17 00:00:00 2001
+From: Charles Shi <schrht@gmail.com>
+Date: Fri, 28 Mar 2025 09:56:47 -0400
+Subject: [PATCH 4/4] Only analyze testpi log if the test was actually executed
+
+---
+ testcases/realtime/func/pi-tests/run_auto.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/testcases/realtime/func/pi-tests/run_auto.sh b/testcases/realtime/func/pi-tests/run_auto.sh
+index 277988568..fcd2fb55e 100755
+--- a/testcases/realtime/func/pi-tests/run_auto.sh
++++ b/testcases/realtime/func/pi-tests/run_auto.sh
+@@ -15,15 +15,15 @@ $SCRIPTS_DIR/run_c_files.sh $profile testpi-0
+ 
+ export LOG_FILE="$LOG_DIR/$LOG_FORMAT-testpi-1.log"
+ $SCRIPTS_DIR/run_c_files.sh $profile testpi-1
+-PYTHONPATH=../../  python3 parse-testpi1.py $LOG_FILE 2>&1 | tee -a $LOG_FILE
++[ -f $LOG_FILE ] && PYTHONPATH=../../  python3 parse-testpi1.py $LOG_FILE 2>&1 | tee -a $LOG_FILE
+ 
+ export LOG_FILE="$LOG_DIR/$LOG_FORMAT-testpi-2.log"
+ $SCRIPTS_DIR/run_c_files.sh $profile testpi-2
+-PYTHONPATH=../../  python3 parse-testpi2.py $LOG_FILE 2>&1 | tee -a $LOG_FILE
++[ -f $LOG_FILE ] && PYTHONPATH=../../  python3 parse-testpi2.py $LOG_FILE 2>&1 | tee -a $LOG_FILE
+ 
+ export LOG_FILE="$LOG_DIR/$LOG_FORMAT-testpi-4.log"
+ $SCRIPTS_DIR/run_c_files.sh $profile testpi-4
+-PYTHONPATH=../../  python3 parse-testpi1.py $LOG_FILE 2>&1 | tee -a $LOG_FILE
++[ -f $LOG_FILE ] && PYTHONPATH=../../  python3 parse-testpi1.py $LOG_FILE 2>&1 | tee -a $LOG_FILE
+ 
+ 
+ export LOG_FILE=""
+-- 
+2.49.0
+

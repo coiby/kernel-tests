@@ -131,7 +131,7 @@ setup_sys ()
 {
 	export dmachans=()
 	modprobe -q dmatest wait=1
-	if [[ "$(uname -r)" =~ "+debug" ]]; then
+	if [[ "$(uname -r)" =~ "debug" ]]; then
 	    # disable pr_debug messages
 	    echo "-p" > /sys/kernel/debug/dynamic_debug/control
 	fi

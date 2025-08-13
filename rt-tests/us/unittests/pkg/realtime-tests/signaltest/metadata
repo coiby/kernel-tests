@@ -1,6 +1,6 @@
 [General]
 name=rt-tests/us/unittests/pkg/realtime-tests/signaltest
-owner=Qiao Zhao <qzhao@redhat.com>
+owner=Shizhao Chen <shichen@redhat.com>
 description=Unittest case for signaltest
 license=GPLv2
 confidential=no

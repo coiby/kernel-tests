@@ -19,7 +19,9 @@ if [[ "${BUILD_NVR}" =~ kernel ]]; then
     exit 0
 fi
 
-repo_directory=/tmp/"${BUILD_NVR}"
+# remove any draft suffix that my be added for brew draft builds
+BUILD_NVR_WITHOUT_DRAFT=${BUILD_NVR%%,draft_*}
+repo_directory=/tmp/"${BUILD_NVR_WITHOUT_DRAFT}"
 repo_file_path=/etc/yum.repos.d/brew-pkginstall.repo
 
 install_brew() {
@@ -35,7 +37,7 @@ install_brew() {
     baseurl="http://download.devel.redhat.com/rel-eng/RCMTOOLS"
 
     case "${rhel_major}" in
-        9|10)
+        8|9|10)
             curl -L --retry 5 "${baseurl}/rcm-tools-rhel-${rhel_major}-baseos.repo" > /etc/yum.repos.d/rcm-tools.repo
             ;;
         *)
@@ -79,9 +81,9 @@ create_build_repo() {
 
     # Create a repo file
     (
-        echo "[${BUILD_NVR}]"
-        echo "name=${BUILD_NVR}"
-        echo "baseurl=file:///tmp/${BUILD_NVR}"
+        echo "[${BUILD_NVR_WITHOUT_DRAFT}]"
+        echo "name=${BUILD_NVR_WITHOUT_DRAFT}"
+        echo "baseurl=file://${repo_directory}"
         echo "enabled=1"
         echo "gpgcheck=0"
     ) > "${repo_file_path}"
@@ -100,14 +102,14 @@ main() {
         create_build_repo
 
         if [[ -z "${PACKAGES_NAMES:-}" ]]; then
-            PACKAGES_NAMES="${BUILD_NVR}"
+            PACKAGES_NAMES="${BUILD_NVR_WITHOUT_DRAFT}"
         fi
 
         repofrompath="brewrpm,${repo_directory}"
 
         packages_nvr=$(dnf repoquery --nvr --quiet  --disablerepo=* --repofrompath="${repofrompath}" ${PACKAGES_NAMES})
 
-        if ! dnf install --repofrompath="${repofrompath}" -y ${packages_nvr}; then
+        if ! dnf install --disablerepo="*" --enablerepo="${BUILD_NVR_WITHOUT_DRAFT}" -y ${packages_nvr}; then
                 echo "ERROR: couldn't install package rpms."
                 rstrnt-report-result "install-rpms" WARN
                 rstrnt-abort recipe

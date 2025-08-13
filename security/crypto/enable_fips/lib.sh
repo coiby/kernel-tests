@@ -135,7 +135,7 @@ function _enforceModulusBits {
 
 function _enableFIPS {
 
-    if rlIsRHEL ">=10"; then
+    if rlIsRHEL ">=10" || rlIsFedora ">=42"; then
 
         # Since RHEL-10.0 there is no fips-mode-setup anymore (RHEL-65652).
         rlRun "update-crypto-policies --set FIPS" 0 "Enable FIPS policy" || return 1

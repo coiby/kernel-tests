@@ -2,6 +2,8 @@
 
 # include beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../../cki_lib/libcki.sh || exit 1
+. ../../../../cmdline_helper/libcmd.sh || exit 1
 
 set -o pipefail
 
@@ -59,10 +61,15 @@ function set_mem()
 		export MEM="${MEM:-4096M}"
 	} else {
 		echo "Sorry, the system RAM is too low to test."
+		if [[ -n "${TMT_TEST_NAME}" ]]; then
+			RSTRNT_TASKNAME="${TMT_TEST_NAME}"
+		fi
 		rstrnt-report-result $RSTRNT_TASKNAME SKIP
-		exit 0
+		return 4
 	}
 	fi
+
+	return 0
 }
 
 function kilobytes()
@@ -88,7 +95,12 @@ rlJournalStart
 if [ ! -d "$tmpdir" ]; then
 	rlPhaseStartSetup
 		# setup MEM paramenter
-		rlRun "set_mem"
+		rlRun "set_mem" "0,4"
+		if [ $? -ne 0 ]; then
+			rlPhaseEnd
+			rlJournalEnd
+			exit 0
+		fi
 
 		if [ -z "$MEM" ]; then
 			rlFail "MEM parameter is empty."
@@ -130,15 +142,15 @@ rlPhaseStartTest
 	rlRun -l 'free_total=$(free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p")'
 	# shellcheck disable=SC2154
 	rlLog "Total memory (reported by 'free') $free_total kB"
-	rlRun -l "dmesg_total=\$(dmesg | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
+	rlRun -l "dmesg_total=\$(journalctl -k | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
 
 	if [[ "$current" != "start" && "$current" != "stop" ]]; then
 		# check if the kernel parameter is set
 		rlRun "cat /proc/cmdline | grep \"mem=$current\""
 		rlLog "mem=$current which is $(kilobytes $current) kB"
-		rlRun -l "mem_absent=\$(dmesg | sed -n 's/.*\\ \\([0-9]\\+\\)[Kk]\ absent.*$/\1/p')"
+		rlRun -l "mem_absent=\$(journalctl -k | sed -n 's/.*\\ \\([0-9]\\+\\)[Kk]\ absent.*$/\1/p')"
 
-		rlRun -l "dmesg_total=\$(dmesg | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
+		rlRun -l "dmesg_total=\$(journalctl -k | sed -n 's/^.*Memory:\\s*[0-9]\\+K\\s*\\/\\s*\\([0-9]\\+\\)K\\s*available.*$/\1/ip')"
 		if [ -n "$mem_absent" ]; then
 			rlLog "Absent memory (from dmesg message) $mem_absent kB"
 			# shellcheck disable=SC2154
@@ -161,15 +173,9 @@ rlPhaseStartTest
 	fi
 
 	if [ "$next" == "stop" ]; then
-		rlRun "grubby --update-kernel=DEFAULT --remove-args=mem"
-		if [ "$(uname -m)" = "s390x" ]; then
-			rlRun "zipl"
-		fi
+		rlRun "change_cmdline -mem"
 	elif [ "$next" != "exit" ]; then
-		rlRun "grubby --update-kernel=DEFAULT --args=mem=$next"
-		if [ "$(uname -m)" = "s390x" ]; then
-			rlRun "zipl"
-		fi
+		rlRun "change_cmdline mem=${next}"
 	fi
 
 	rlRun "popd"

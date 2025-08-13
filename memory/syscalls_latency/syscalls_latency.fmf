@@ -1,0 +1,183 @@
+summary: Perform concurrency testing on system calls in parallel with the RHIVOS scheduler
+    latency with RTLA
+description: |
+    This script performs concurrency testing of system calls while conducting a latency performance
+    test on systems running RHIVOS, focusing on measuring system latency while the syscalls are running
+    repeatedly in rapid succession from within the QM partition. The goal of this test is to measure the
+    latency introduced.
+    Inputs:
+        - RHIVOS_THRES: Threshold for acceptable latency in microseconds (default values are defined for different hardware).
+        LTP/syscalls test suite:
+        - https://gitlab.com/redhat/centos-stream/tests/ltp.git, release tag can be set with LTP_VERSION.
+    Expectations:
+        - The test expects to run on a system with RHIVOS kernel.
+        - The test is expected to repeatedly execute syscalls in rapid successions.
+        - Latency measurements should be taken while concurrently executing syscalls and the latency ideally should be below the specified threshold (RHIVOS_THRES).
+    Details:
+        - The test script begins by running rtla timerlat command to measure system latency.
+        - The test then concurrently execute each system call in rapid succession as a background task.
+        - The outcome of the test is reported as either PASS or FAIL based on the concurrent syscalls executed and the maximum latency recorded.
+    Expected result:
+        Max Latency: Below threshold
+        PASS: System latency within acceptable range
+        OVERALL RESULT: PASS (/memory/syscalls_latency/syscalls_latency)
+        RESULT: PASS (Concurrent syscall execution in parallel with latency test)
+        OVERALL RESULT: PASS (syscalls_latency)
+        NOTE: Some LTP tests are unsuitable for execution inside QM (broken or
+        failed due to access permissions). Therefore, LTP TFAIL or TBROK log
+        messages are expected.
+    Results location:
+        output.txt
+contact:
+  - Qiao Zhao <qzhao@redhat.com>
+  - Charles Shi <cheshi@redhat.com>
+  - Pablo Ridolfi <pridolfi@redhat.com>
+component:
+  - kernel
+path: /memory/syscalls_latency
+environment+:
+    timer: 180
+    mm_syscalls: |
+      "acct",
+      "add_key",
+      "capget",
+      "capset",
+      "close_range",
+      "copy_file_range",
+      "delete_module",
+      "execve",
+      "execveat",
+      "faccessat2",
+      "fgetxattr",
+      "finit_module",
+      "flistxattr",
+      "fremovexattr",
+      "fsconfig",
+      "fsetxattr",
+      "fspick",
+      "fstatfs",
+      "getrandom",
+      "getxattr",
+      "init_module",
+      "ioprio_get",
+      "ioprio_set",
+      "kcmp",
+      "kexec_file_load",
+      "kexec_load",
+      "keyctl",
+      "keyctl",
+      "landlock_add_rule",
+      "landlock_create_ruleset",
+      "landlock_restrict_self",
+      "lgetxattr",
+      "listxattr",
+      "llistxattr",
+      "lremovexattr",
+      "lsetxattr",
+      "mq_getsetattr",
+      "mq_notify",
+      "mq_open",
+      "mq_timedreceive",
+      "mq_timedsend",
+      "mq_unlink",
+      "msgctl",
+      "msgget",
+      "msgrcv",
+      "msgsnd",
+      "name_to_handle_at",
+      "newfstat",
+      "newfstatat",
+      "open_tree",
+      "openat2",
+      "perf_event_open",
+      "personality",
+      "pipe2",
+      "pivot_root",
+      "ptrace",
+      "removexattr",
+      "renameat2",
+      "request_key",
+      "restart_syscall",
+      "rseq",
+      "rt_sigqueueinfo",
+      "seccomp",
+      "semctl",
+      "semget",
+      "semop",
+      "semtimedop",
+      "setfsgid",
+      "setfsuid",
+      "setns",
+      "setreuid",
+      "setxattr",
+      "sigaltstack",
+      "signalfd4",
+      "statfs",
+      "statx",
+      "syslog",
+      "tee",
+      "tkill",
+      "utimensat",
+      "vhangup",
+      "clock_gettime",
+      "epoll_create1",
+      "getitimer"
+# Exclude LTP tests unsuitable for executing inside QM (broken or failed due to access permissions)
+    exclude_ltp_tests: |
+      acct01,
+      close_range01,
+      copy_file_range01,
+      execveat01,
+      fgetxattr01,
+      fremovexattr01,
+      fsconfig01,
+      fsetxattr01,
+      fspick01,
+      fstatfs01,
+      lremovexattr01,
+      open_tree01,
+      perf_event_open02,
+      personality01,
+      seccomp01,
+      setxattr01,
+      statfs01,
+      syslog12
+# Following syscalls are covered in Memory Management fuzzing tests
+      # "mmap",
+      # "munlockall",
+      # "set_mempolicy_home_node",
+      # "shmat",
+      # "shmctl",
+      # "shmdt",
+      # "shmget",
+# rt_sigreturn never returns, remove it from list
+      # "rt_sigreturn",
+test: bash ./runtest.sh
+id: 6b6f731b-555c-418c-a93c-e65745020f6f
+framework: beakerlib
+require:
+  - beakerlib
+  - rtla
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - type: file
+    pattern:
+      - /cmdline_helper
+      - /cki_lib
+duration: 4h
+enabled: true
+adjust+:
+  - environment+:
+        RHIVOS_THRES: 50000
+    when: hw_target == ridesx4 or hw_target is not defined
+  - environment+:
+        RHIVOS_THRES: 50000
+    when: hw_target == rcar_s4

@@ -6,7 +6,7 @@ contact: John Doe <jdoe@redhat.com>
 component:
   - kernel
 test: ./runtest.sh
-framework: shell
+framework: beakerlib
 require:
   - type: file
     pattern:
@@ -14,3 +14,10 @@ require:
 duration: 15m
 extra-summary: /kernel/vm/sysctl/block_dump
 extra-task: /kernel/vm/sysctl/block_dump
+
+# ---------------------
+# Filter definitions   |
+# ---------------------
+
+tag:
+  - VMM_FUNCTION

@@ -7,6 +7,10 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# shellcheck source=/dev/null
+# Source the common test script helpers
+. ../../../../cki_lib/libcki.sh || exit 1
+
 # Source rt common functions
 . ../../../include/lib.sh || exit 1
 
@@ -57,10 +61,13 @@ function test_run()
     #       sanity/functionality than performance in this test.
     oneliner "hwlatdetect --duration=30s --threshold=2000"
 
-    if rpm -ql $rt_tests_pkgname | grep -q '/usr/bin/oslat' ; then
-        declare duration_flag="--duration"
-        oslat --help | grep -q '\-\-runtime' && duration_flag="--runtime"
-        oneliner "oslat --cpu-list 1 --rtprio 1 $duration_flag 30s"
+    # Skip oslat test for automotive, as CONFIG_NUMA is disabled in the RHIVOS kernel
+    if ! cki_is_kernel_automotive; then
+        if rpm -ql "$rt_tests_pkgname" | grep -q '/usr/bin/oslat' ; then
+            declare duration_flag="--duration"
+            oslat --help | grep -q '\-\-runtime' && duration_flag="--runtime"
+            oneliner "oslat --cpu-list 1 --rtprio 1 $duration_flag 30s"
+        fi
     fi
 
     oneliner "pi_stress --quiet --duration=30"
@@ -74,7 +81,7 @@ function test_run()
 
     oneliner "ptsematest --affinity --loops=1000 --interval=1000 --prio=99 --threads"
 
-    if rpm -ql $rt_tests_pkgname | grep -q '/usr/bin/queuelat' ; then
+    if rpm -ql "$rt_tests_pkgname" | grep -q '/usr/bin/queuelat' ; then
         oneliner "queuelat -m 20us -c 100 -p 100 -f 1000 -t 60s"
     fi
 
@@ -83,7 +90,7 @@ function test_run()
     # Note: many of the /proc/sys/kernel/* interfaces do not exist in RHEL-8+
     oneliner "signaltest -b 20us -l 100 -q -t 10 -m -v"
 
-    if rpm -ql $rt_tests_pkgname | grep -q '/usr/bin/ssdd' ; then
+    if rpm -ql "$rt_tests_pkgname" | grep -q '/usr/bin/ssdd' ; then
         # Note: ssdd is expected to finish within 40s under most scenarios, the
         # timeout is just a safe-belt for possible unresponsive situations
         oneliner "timeout --preserve-status -k 60s -s SIGINT -v 40s ssdd 10 10000"

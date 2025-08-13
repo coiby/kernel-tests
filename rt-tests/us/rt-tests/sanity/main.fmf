@@ -78,10 +78,11 @@ framework: shell
 require:
     - procps-ng
     - psmisc
-    - realtime-tests
     - type: file
       pattern:
           - /rt-tests/include
+          - /cki_lib/libcki.sh
+recommend:
+    - realtime-tests
+    - rt-tests
 duration: 60m
-extra-summary: rt-tests/us/rt-tests/sanity
-extra-task: rt-tests/us/rt-tests/sanity

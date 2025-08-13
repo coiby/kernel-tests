@@ -23,6 +23,7 @@
 # Include Beaker environment
 # shellcheck disable=SC1091
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../../cki_lib/libcki.sh || exit 1
 
 # Test name and paths
 TEST="memory/mmra/iommu-violate"
@@ -234,7 +235,12 @@ EOF
     export LIBGUESTFS_BACKEND=direct
     export SUPERMIN_KERNEL=/boot/vmlinuz-$(uname -r)
     export SUPERMIN_MODULES=/lib/modules/$(uname -r)
-    guestfish --rw -a "$qcow2_image" -m /dev/sda3 -f guestfish.cmd || {
+
+    # Determine the partition to mount
+    local partition=$(guestfish --ro -a "$qcow2_image" -i list_partitions | sort -n | tail -n 1)
+
+    # Update the qcow2 image
+    guestfish --rw -a "$qcow2_image" -m "$partition" -f guestfish.cmd || {
         rlLogError "Failed to inject the SSH key into the VM image."
         return 1
     }
@@ -361,7 +367,7 @@ rlJournalStart
 
 # Check if the current kernel version matches the RHIVOS environment pattern
 rlShowRunningKernel
-if ! (uname -r | grep -w -q 'el[0-9]*iv'); then
+if ! cki_is_kernel_automotive; then
     rlLog "Skipping $TEST: This test is intended to run only in the RHIVOS environment."
     rstrnt-report-result "$TEST" SKIP
     rlJournalEnd
@@ -417,6 +423,10 @@ fi
 rlLog "Verifying the IOMMU is running in Translated mode."
 rlRun "ssh vm 'dmesg | grep \"iommu: Default domain type: Translated\"'" 0 "IOMMU should run in Translated Mode on the VM."
 rlRun "ssh vm 'grep -w DMA /sys/kernel/iommu_groups/*/type'" 0 "IOMMU should run in Translated Mode on the VM."
+
+# Configure the Name Servers on the VM
+rlLog "Configuring the Name Servers on the VM."
+rlRun "scp /etc/resolv.conf vm:/etc/resolv.conf"
 
 # Setup the Root Certificate on the VM
 rlLog "Setting up the Root Certificate on the VM."

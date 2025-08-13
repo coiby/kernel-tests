@@ -17,19 +17,23 @@
 # Turn off the POSIX to avoid syntax errors
 set +o posix
 
+# keep automotive/include/rhivos.sh from removing /mnt/testarea
+[[ -z $RSTRNT_JOBID ]] && export RSTRNT_JOBID=FAKE_RSTRNT_JOBID_KDUMP
+
 . ../../automotive/include/rhivos.sh
 . ../../cmdline_helper/libcmd.sh
 . ../include/lib.sh
 . ../include/kdump.sh
 . ../include/kdump-multi.sh
 . ../include/crash.sh
+. ../include/tmt.sh
 
 # This is to allow loading an extra/internal lib file
 
 RESOURCE_URL=${RESOURCE_URL:-""}
 if [ -n "$RESOURCE_URL" ]; then
     lib_file="${RESOURCE_URL##*/}"
-    [ ! -f "$lib_file" ] && curl -LO --fail "$RESOURCE_URL"
+    [ ! -f "$lib_file" ] && curl -LOk --fail "$RESOURCE_URL"
     if [ -f "$lib_file" ]; then
         # To bypass ShellCheck SC1090
         # shellcheck source=./

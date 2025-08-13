@@ -16,6 +16,6 @@ tier: 1
 extra-summary: /storage/ssd/
 extra-task: /storage/ssd/
 environment:
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7

@@ -56,7 +56,6 @@ if is_rhel "8" || is_rhel "9" ; then
 	klp_module_file=$(modinfo $KLP_MODULE | head -n 1 | awk '{print $2}')
 	busy_module_file=$(modinfo $BUSY_MODULE | head -n 1 | awk '{print $2}')
 else
-	install_selftests_internal
 	build_selftests_modules
 	klp_module_file="$LIVEPATCH_TEST_MODULES/test_modules/$KLP_MODULE.ko"
 	busy_module_file="$LIVEPATCH_TEST_MODULES/test_modules/$BUSY_MODULE.ko"

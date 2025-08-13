@@ -1,0 +1,21 @@
+summary: Wrapper for Linux radix-tree Test
+contact: Li Wang <liwang@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+duration: 1h
+require:
+    - dwarves
+    - libasan
+    - libubsan
+    - git
+    - python3-pip
+    - userspace-rcu
+    - userspace-rcu-devel
+    - type: file
+      pattern:
+          -  /cki_lib
+tag:
+    - KernelTier1
+adjust+:
+    - when: distro < rhel-8.5
+      enabled: false

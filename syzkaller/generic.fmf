@@ -1,0 +1,111 @@
+summary: Multihost capable fuzzing test based on syzkaller
+description: |
+  This is a wrapper for a system call fuzzing test based on syzkaller. You should create your own
+  fmf file setting required environment variables, such as the list of system calls to be fuzzed,
+  and set path: /syzkaller.
+
+  Wrapper test description:
+  Confirm system call fuzz testing is being performed.
+  The database is checked at the end to ensure each entry was executed at least once.
+  Default runtime is 1 hour (3600 seconds), but can be changed using the "time" environment variable.
+  Test inputs:
+      A list with the sysfs entries to be fuzzed, and a fuzzer program
+      called syzkaller. Input details:
+      - sycalls list (environment variable `enable_syscalls`)
+      - syzkaller code: https://github.com/google/syzkaller
+      - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
+  Expected results:
+      If the system calls are executed without incident during the test runtime,
+      all syscalls in list should be executed at least once. Example:
+      [   PASS   ] :: No crash results found.
+      [   PASS   ] :: [syscall_name] executed.
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+framework: beakerlib
+test: ./runtest.sh
+require:
+  - gcc
+  - gcc-c++
+  - git
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - make
+  - patch
+  - sshpass
+  - tar
+  - wget
+  - python
+  - type: file
+    pattern:
+        -  /kernel-include
+# tmux is required if syzkaller_start and syzkaller_stop are used
+recommend:
+  - tmux
+environment:
+  # Following environment variables are for wrapper debugging purposes only.
+  time: 3600
+  main_syscalls: |
+    "open",
+    "read",
+    "write",
+    "close",
+    "brk",
+    "fadvise64",
+    "madvise",
+    "membarrier",
+    "memfd_create",
+    "mincore",
+    "mlock",
+    "mlock2",
+    "mlockall",
+    "mmap",
+    "mprotect",
+    "mremap",
+    "msync",
+    "munlock",
+    "munlockall",
+    "munmap",
+    "process_madvise",
+    "process_vm_readv",
+    "process_vm_writev",
+    "readahead",
+    "remap_file_pages",
+    "shmat",
+    "shmctl",
+    "shmdt",
+    "shmget"
+  disable_syscalls: |
+    "mmap$DRM_I915",
+    "mmap$DRM_MSM",
+    "mmap$KVM_VCPU",
+    "mmap$bifrost",
+    "mmap$dsp",
+    "mmap$fb",
+    "mmap$qrtrtun",
+    "mmap$snddsp",
+    "mmap$snddsp_control",
+    "mmap$snddsp_status"
+  support_syscalls: |
+    "clone3",
+    "getegid",
+    "geteuid",
+    "getgid",
+    "getgroups",
+    "getpgid",
+    "getpid",
+    "getresgid",
+    "getresuid",
+    "io_uring_setup",
+    "mq_open",
+    "newfstatat",
+    "openat$binderfs",
+    "openat$cgroup",
+    "openat$cgroup_root",
+    "openat$pidfd",
+    "openat$thread_pidfd",
+    "perf_event_open",
+    "pidfd_open",
+    "socket$xdp",
+    "syz_open_dev$usbmon"
+  verbose: '' # '-debug -vv 3'
+duration: 2h

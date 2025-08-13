@@ -12,15 +12,25 @@ patch_generic()
 {
 	echo "============ Applying General Patch ============" | tee -a $OUTPUTFILE
 
+	if [ "$TESTVERSION" == "20250530" ]; then
+		# Tips: this patch should be applied in single on ltp-next(version > 20180926)
+		${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
+		${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
+		${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+	fi
 	if [ "$TESTVERSION" == "20250130" ]; then
 		# Tips: this patch should be applied in single on ltp-next(version > 20180926)
 		${PATCH} < ${ABS_DIR}/INTERNAL/0001-shmat03-ignore-EACCES.patch
 		${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
 		${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
+		${PATCH} < ${ABS_DIR}/INTERNAL/0001-setrlimit06-cover-the-setting-resource-limit64.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-aio-stress-fix-opened-fd-leak.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-bpf-zero-initialize-bpf_attr-including-padd.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-mallinfo02-introduce-LTP_VAR_USED-to-avoid-.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-statx07-Skip-test-if-NFS-service-is-never-enabled.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-cve-2015-3290-Disable-AVX-for-x86_64.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-setsockopt10-handle-explicit-disallow-of-di.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tracing-pt_test-TCONF-if-Intel-PT-across-VMXON-is-no.patch
 	fi
 	if [ "$TESTVERSION" == "20240930" ]; then
 		# Tips: this patch should be applied in single on ltp-next(version > 20180926)
@@ -88,10 +98,6 @@ patch_generic()
 		echo " - returning ENODEV for empty cpumask stands for reseting user cpu mask" | tee -a $OUTPUTFILE
 		${PATCH} < ${ABS_DIR}/INTERNAL/sched_setaffinity_ENODEV.patch
 	fi
-
-	if [[ $KVER =~ ^6 ]]; then
-		${PATCH} < ${ABS_DIR}/INTERNAL/build-cve-2015-3290.patch
-	fi
 }
 
 patch_lite()
@@ -134,6 +140,10 @@ patch_inc()
 patch-rtltp()
 {
 	echo "============ Patch rt_ltp ============" | tee -a $OUTPUTFILE
-	patch -d ${TARGET} -p1 < ${ABS_DIR}/${TESTVERSION}/0001-rhivos-increase-threshold-based-on-hardware.patch
-	find ${TARGET} -type f -name run_auto.sh -exec chmod a+x {} \;  # Solve VROOM-23546
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0001-Correct-the-permissions-on-run_auto.sh.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0002-Ensure-prio-wake-test-runs-on-a-single-core.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0003-Fix-the-result-parsing-bug-for-pi-tests.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0004-Only-analyze-testpi-log-if-the-test-was-actually-exe.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0001-Create-missing-log-directory-for-realtime-perf-laten.patch
+	patch -d ${TARGET} -p1 < ${ABS_DIR}/INTERNAL/0002-Enhance-log-checking-for-realtime-perf-latency.patch
 }

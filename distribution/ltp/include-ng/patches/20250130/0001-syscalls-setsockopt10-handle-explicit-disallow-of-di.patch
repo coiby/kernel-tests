@@ -1,0 +1,40 @@
+From 7685728780f38ef6fb3c6fd74ead800cb514b803 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 17 Apr 2025 10:55:00 +0200
+Subject: [PATCH] syscalls/setsockopt10: handle explicit disallow of disconnect
+
+Since commit 5071a1e606b3 ("net: tls: explicitly disallow disconnect") in
+6.15 kernel, disconnect is now explicitly disallowed.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Tested-by: Avinesh Kumar <akumar@suse.de>
+---
+ testcases/kernel/syscalls/setsockopt/setsockopt10.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/setsockopt/setsockopt10.c b/testcases/kernel/syscalls/setsockopt/setsockopt10.c
+index e52c6cd93..f955f4e83 100644
+--- a/testcases/kernel/syscalls/setsockopt/setsockopt10.c
++++ b/testcases/kernel/syscalls/setsockopt/setsockopt10.c
+@@ -145,7 +145,16 @@ static void run(void)
+ 	TST_CHECKPOINT_WAKE(1);
+ 
+ 	tst_res(TINFO, "parent: Disconnect by setting unspec address");
+-	SAFE_CONNECT(tcp1_sk, &unspec_addr, sizeof(unspec_addr));
++	TEST(connect(tcp1_sk, &unspec_addr, sizeof(unspec_addr)));
++	if (TST_RET == -1) {
++		if (TST_ERR == EOPNOTSUPP)
++			tst_res(TPASS | TTERRNO, "parent: tls disallows disconnect");
++		else
++			tst_res(TFAIL | TTERRNO, "parent: unexpected errno from connect");
++		TST_CHECKPOINT_WAKE(2);
++		tst_reap_children();
++		return;
++	}
+ 	SAFE_BIND(tcp1_sk, (struct sockaddr *)&tcp1_addr, sizeof(tcp1_addr));
+ 
+ 	TEST(listen(tcp1_sk, 1));
+-- 
+2.49.0
+

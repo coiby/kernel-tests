@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/vdo/fcoe
 extra-task: /storage/stratis/fcoe
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro > rhel-8
 id: 6CFBDFFB-BCEA-40AF-B31F-7F5A2D34A913

@@ -38,7 +38,7 @@ rlJournalStart
         rlLog "current date and time : $current_date"
     rlPhaseEnd
     rlPhaseStartTest
-        pushd ../../../memory/mmra/syzkaller
+        pushd ../../../syzkaller
         rlRun "bash ./runtest.sh"
         popd
     rlPhaseEnd

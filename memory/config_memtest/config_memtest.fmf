@@ -5,6 +5,7 @@ description: |
 contact: Michael Menasherov <mmenashe@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
+id: ed438fea-f4d7-43e9-a369-842eac6fb938
 require:
     - type: file
       pattern:

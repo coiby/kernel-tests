@@ -94,7 +94,9 @@ function checkServers ()
 
     for S in $servers; do
         local server=$(echo $S | cut -f1 -d:)
-        ping -c 3 $server >> $OUTPUTFILE 2>&1
+        # check if nfs servers are online
+        # nc command added for nfs servers in BOS2 that are provided by openshift
+        ping -c 3 "$server" > /dev/null 2>&1 || nc -zv "$server" 22 > /dev/null 2>&1
         if [ $? != 0 ]; then
             echo " ***** Warn: $server not online or unavailable in this domain *****" | tee -a $OUTPUTFILE
             offlineserver=$(expr "$offlineserver" + 1)
@@ -526,7 +528,8 @@ function cthon_main ()
         #
         # ServerStatus: Lets see if the server is online
         #
-        ping -c 3 $server >> $OUTPUTFILE 2>&1
+        # nc command added for nfs servers in BOS2 that are provided by openshift
+        ping -c 3 "$server" > /dev/null 2>&1 || nc -zv "$server" 22 > /dev/null 2>&1
         if [ $? -ne 0 ]; then
             echo "" | tee -a $OUTPUTFILE
             echo " ===== cthon_main: $server is offline =====" | tee -a $OUTPUTFILE

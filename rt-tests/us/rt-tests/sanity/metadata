@@ -11,4 +11,4 @@ entry_point=bash ./runtest.sh
 dependencies=procps-ng;psmisc
 max_time=60m
 use_pty=false
-repoRequires=rt-tests/include
+repoRequires=rt-tests/include;cki_lib

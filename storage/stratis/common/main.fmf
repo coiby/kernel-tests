@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/stratis/common
 extra-task: /storage/stratis/common
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 36D34649-2737-4150-845F-D04F0C515D44

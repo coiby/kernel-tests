@@ -10,3 +10,4 @@ require:
 extra-summary: networking/driver/sanity
 extra-task: networking/driver/sanity
 id: 56d777a1-9f9b-4f5a-b5e7-1fed25c71f97
+tag: KernelAutomotiveTier1

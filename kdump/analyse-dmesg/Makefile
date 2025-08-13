@@ -47,8 +47,10 @@ clean:
 run:	build
 	./runtest.sh
 
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
+
+# Common VARs from rhts makefile
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
 
 # Generate the testinfo.desc here:
 $(METADATA): Makefile

@@ -1,0 +1,7 @@
+[General]
+description=Test the default behavior of signals
+name=misc/signal-test
+owner=Yumei Huang <yuhuang@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh

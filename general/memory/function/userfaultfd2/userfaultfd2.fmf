@@ -4,7 +4,7 @@ description: |
     Author: David McDougall <dmcdouga@redhat-com> 
 enabled: true
 id: 9cb33d26-3ba0-4aad-b85b-efd0055d3e5c
-contact: David McDougall <dmcdouga@redhat-com> 
+contact: KFT QE <kernel-ft-plumbers-qe@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh

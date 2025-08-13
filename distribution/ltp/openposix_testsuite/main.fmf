@@ -5,7 +5,7 @@ id: 1deb2781-456d-459b-a21f-229a3ba367a1
 tag:
   - KernelTier1
   - fmf-export
-  - NoRHIVOS
+  - KernelAutomotiveTier1
 contact: Memory Management QE <mm-qe@redhat.com>
 component:
   - kernel
@@ -30,11 +30,11 @@ require:
   - initscripts-service
   - type: file
     pattern:
-        - /automotive/include
-        - /cki_lib
-        - /distribution/ltp/kirk
-        - /distribution/ltp/include
-        - /distribution/ltp/include-ng
+      - /automotive/include
+      - /cki_lib
+      - /distribution/ltp/kirk
+      - /distribution/ltp/include
+      - /distribution/ltp/include-ng
 recommend:
   - numactl-devel
   - ntpdate
@@ -44,9 +44,9 @@ recommend:
   - numactl
   - redhat-lsb
 duration: 180m
-adjust:
-    # numactl is not available for s390x/rhel7
-    - when: distro == rhel-7 and arch == s390x
-      enabled: false
+adjust+:
+  # numactl is not available for s390x/rhel7
+  - when: distro == rhel-7 and arch == s390x
+    enabled: false
 extra-summary: kernel/distribution/ltp/openposix_testsuite
 extra-task: kernel/distribution/ltp/openposix_testsuite

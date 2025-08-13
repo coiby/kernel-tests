@@ -1,0 +1,28 @@
+summary: test scheduler nohz mode tick and other timer issues
+description: |
+    Verify workqueue and timer won't run on nohz cpu which has cpu hog process on.
+    Verify the tick is stopped as expected in nohz_full cpus
+
+    PARAMETERS
+
+    SKIP_CASE="bzxxxxx"
+    CASE_LIST="bzxxxxx"
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - libgcc
+  - glibc-devel
+  - rpm-build
+  - psmisc
+recommend:
+  - trace-cmd
+  - git
+  - glibc
+  - numactl-devel
+  - tuned
+  - stalld
+duration: 2h
+extra-summary: /kernel/general/scheduler/sched_nohz_tick_timer
+extra-task: /kernel/general/scheduler/sched_nohz_tick_timer

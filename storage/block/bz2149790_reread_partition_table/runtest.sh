@@ -22,7 +22,9 @@ CDIR=$(dirname "$FILE")
 
 # Include enviroment and libraries
 # shellcheck source=/dev/null
-source "$CDIR"/../../../cki_lib/libcki.sh || exit 1
+#source "$CDIR"/../../../cki_lib/libcki.sh || exit 1
+. "$CDIR"/../include/include.sh    || exit 1
+. /usr/share/beakerlib/beakerlib.sh     || exit 1
 
 function get_disk()
 {
@@ -44,9 +46,12 @@ function get_disk()
 
 function setup_md()
 {
+    clear_partition
     get_disk
     # shellcheck disable=SC2154
     rlLog "disk: $dev0 $dev1"
+    wipefs -a /dev/${dev0}
+    wipefs -a /dev/${dev1}
     rlRun 'mdadm -CR /dev/md0 -l 1 -n 2 /dev/"$dev0" /dev/"$dev1" -e 1.0'
     md_result=$?
     if [ ${md_result} != 0 ];then
@@ -96,6 +101,8 @@ function run_test()
     while [ -b /dev/md0 ]; do
         sleep 3
     done
+    rlRun "wipefs -a /dev/${dev0}"
+    rlRun "wipefs -a /dev/${dev1}"
     rlRun "cat /proc/partitions"
     rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
     rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"

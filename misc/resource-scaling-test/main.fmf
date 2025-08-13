@@ -1,0 +1,11 @@
+summary: Verify the sysfs entries exposed by the subsystems
+description: Check if the sysfs entries exist and are read-only
+    for non-root users
+contact: Yumei Huang <yuhuang@redhat.com>
+component:
+  - kernel
+path: /misc/resource-scaling-test
+test: bash -x ./runtest.sh
+framework: shell
+duration: 3m
+id: 31d84387-16f2-4ac4-986b-bd5fc77dec3a

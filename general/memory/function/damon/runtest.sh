@@ -25,10 +25,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include Beaker environment
-if [ -f /usr/bin/rhts-environment.sh ]; then
-    . /usr/bin/rhts-environment.sh || exit 1
-fi
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 #shellcheck disable=SC2034
@@ -60,7 +56,7 @@ rlJournalStart
             rlRun "dnf install -y perf python3 python3-pip @development" 0
         fi
         rlShowRunningKernel
-        rlRun "git clone https://github.com/sjp38/masim.git" 0
+        rlRun "git clone https://gitlab.com/redhat/centos-stream/tests/kernel/core/masim.git" 0
         if [ $? != 0 ]; then
                 rlLog "git clone fail"
                 rstrnt-report-result "$RSTRNT_TASKNAME" FAIL 99

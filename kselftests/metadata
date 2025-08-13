@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=beakerlib;tar;autoconf;automake;wget;bison;bpftool;flex;python3;llvm;iproute-tc;clang;jq;ethtool;net-tools;nmap-ncat;pip;rsync
+dependencies=beakerlib;tar;autoconf;automake;wget;bison;bpftool;flex;python3;llvm;iproute-tc;clang;jq;ethtool;net-tools;nmap-ncat;pip;rsync;tcpdump
 max_time=4h
-softDependencies=netsniff-ng;valgrind;numactl-libs;socat;iperf3;scapy;netperf;iputils;ndisc6
+softDependencies=netsniff-ng;valgrind;numactl-libs;socat;conntrack-tools;iperf3;scapy;netperf;iputils;ndisc6;iptables-nft;traceroute
 repoRequires=cki_lib;kernel-include

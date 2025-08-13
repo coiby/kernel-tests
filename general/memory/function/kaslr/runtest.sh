@@ -29,6 +29,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../../cki_lib/libcki.sh || exit 1
+. ../../../../cmdline_helper/libcmd.sh || exit 1
 
 trap 'rlLog "Rebooting!"; exit' SIGHUP SIGINT SIGQUIT SIGTERM
 
@@ -45,6 +46,23 @@ SLUB_RANDOM=${SLUB_RANDOM:-0}
 # Fourth reboot(up) - remove nokaslr in cmdline
 
 this_arch=$(uname -m)
+
+function get_kernel_config()
+{
+    CONFIGS=("/usr/lib/modules/$(uname -r)/config" "/boot/config-$(uname -r)")
+
+    for C in "${CONFIGS[@]}"; do
+        if [ -e $C ]; then
+            echo $C
+            break
+        fi
+    done
+}
+
+function is_kaslr_enabled()
+{
+    grep CONFIG_RANDOMIZE_BASE=y $(get_kernel_config) 2>/dev/null
+}
 
 # For debug extra reboot code
 function fault_injection()
@@ -174,7 +192,7 @@ function check_x86_paging_level()
         SUPPORT_NO5LVL=1
     fi
 
-    if grep -q CONFIG_X86_5LEVEL=y ${k_boot}/config-"$(uname -r)" 2>/dev/null  ; then
+    if grep -q CONFIG_X86_5LEVEL=y $(get_kernel_config) 2>/dev/null; then
         echo "Detected 5lvl config"
         SUPPORT_CONFIG_5LVL=1
     fi
@@ -187,12 +205,16 @@ function check_x86_paging_level()
 
 function get_default_addr()
 {
-    if uname -r | grep x86_64 && grep CONFIG_RANDOMIZE_MEMORY=y ${k_boot}/config-"$(uname -r)"; then
+    if uname -r | grep x86_64 && is_kaslr_enabled; then
         cmp_file_list="_text page_offset_base vmemmap_base Kernel_code Kernel_data Kernel_bss"
     elif uname -r | grep x86_64; then
         cmp_file_list="_text Kernel_code Kernel_data Kernel_bss"
     elif uname -r | grep aarch64; then
-        cmp_file_list="_text Kernel_code Kernel_data"
+        if [ -e /sys/firmware/efi/efivars ]; then
+            cmp_file_list="_text Kernel_code Kernel_data"
+        else
+            cmp_file_list="_text"
+        fi
     elif uname -r | grep s390x; then
         cmp_file_list="_text Kernel_code Kernel_data Kernel_bss"
     else
@@ -269,12 +291,7 @@ function arch_kaslr_test()
             rlAssertNotEquals "$f should be changed" "$(cat ${f}.old)" "$(cat $f)"
         done
         slub_freelist_random 1 $i
-        if stat /run/ostree-booted > /dev/null 2>&1; then
-            rlRun "rpm-ostree kargs --append-if-missing=nokaslr --import-proc-cmdline" 0
-        else
-            rlRun "grubby --args nokaslr --update-kernel ALL" 0
-            [ "$this_arch" = "s390x" ] && zipl
-        fi
+        rlRun "change_cmdline nokaslr" 0
         rlPhaseEnd
         rstrnt-reboot
         # Make sure the script doesn't continue if rstrnt-reboot get's killed
@@ -335,12 +352,7 @@ function arch_nokaslr_test()
             rlAssertEquals "$f should be same" "$(cat ${f}.old)" "$(cat $f)"
         done
         slub_freelist_random 0 $i
-        if stat /run/ostree-booted > /dev/null 2>&1; then
-            rlRun "rpm-ostree kargs --delete-if-present=nokaslr --import-proc-cmdline" 0
-        else
-            rlRun "grubby --remove-args nokaslr --update-kernel ALL"
-            [ "$this_arch" = "s390x" ] && zipl
-        fi
+        rlRun "change_cmdline -nokaslr" 0
         rlPhaseEnd
         rstrnt-reboot
     elif [ "$current_state" = "after_r_nokaslr_cleanup" ]; then
@@ -360,7 +372,9 @@ function arch_nokaslr_test()
 
 function run_kaslr()
 {
-    grep CONFIG_RANDOMIZE_BASE=y ${k_boot}/config-"$(uname -r)" 2>/dev/null || { rlReport "Skip-not-support" PASS; return; }
+
+    is_kaslr_enabled || { rlReport "Skip-not-support" PASS; return; }
+
     get_kernel_version
     if  [ "$kver_major" -lt 3 ]; then
         rlReport "Skip-not-support" PASS
@@ -430,13 +444,21 @@ function select_yum_tool()
     fi
 }
 
-k_name=$(rpm --queryformat '%{name}\n' -qf /boot/config-$(uname -r) | sed -e 's/-core//')
+if [[ -z $(get_kernel_config) ]]; then
+    rlLog "kconfig-missing: test FAIL"
+    rlReport "kconfig-missing" FAIL
+    return
+fi
+
+k_name=$(rpm --queryformat '%{name}\n' -qf $(get_kernel_config) | sed -e 's/-core//')
 rlJournalStart
     if ! test -f SETUP_FINISH; then
         rlPhaseStartSetup
             if journalctl -kb | grep -i 'kaslr disabled due to lack of seed'; then
                 rlLog "kaslr is disabled because of no EFI_RNG_PROTOCOL available, skip test"
                 rstrnt-report-result "${TEST}" SKIP
+                rlPhaseEnd
+                rlJournalEnd
                 exit 0
             fi
             select_yum_tool

@@ -1,0 +1,105 @@
+summary: Confirm MM system call fuzz testing.
+description: |
+    Confirms that all MM syscalls are being fuzzed. The database is checked at the end to ensure each syscal was fuzzed at least once.
+    Default runtime is 1 hour (3600 seconds), but can be changed using the "timer" parameter.
+    Test Inputs:
+        AARCH64 and x86_64:
+            brk
+            cachestat
+            fadvise64_64
+            madvise
+            membarrier
+            memfd_create
+            memfd_secret
+            mincore
+            mlock
+            mlock2
+            mlockall
+            mmap
+            mprotect
+            mremap
+            msync
+            munlock
+            munlockall
+            munmap
+            process_madvise
+            process_mrelease
+            process_vm_readv
+            process_vm_writev
+            readahead
+            remap_file_pages
+            shmat
+            shmctl
+            shmdt
+            shmget
+            swapoff
+            swapon
+        Additional for x86_64 only:
+            pkey_alloc
+            pkey_free
+            pkey_mprotect
+        syzcaller code: https://github.com/google/syzkaller
+        patch: mmra.patch
+        check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
+    Expected results:
+        [   PASS   ] :: brk executed.
+        [   PASS   ] :: cachestat executed.
+        [   PASS   ] :: fadvise64_64 executed.
+        [   PASS   ] :: madvise executed.
+        [   PASS   ] :: membarrier executed.
+        [   PASS   ] :: memfd_create executed.
+        [   PASS   ] :: memfd_secret executed.
+        [   PASS   ] :: mincore executed.
+        [   PASS   ] :: mlock executed.
+        [   PASS   ] :: mlock2 executed.
+        [   PASS   ] :: mlockall executed.
+        [   PASS   ] :: mmap executed.
+        [   PASS   ] :: mprotect executed.
+        [   PASS   ] :: mremap executed.
+        [   PASS   ] :: msync executed.
+        [   PASS   ] :: munlock executed.
+        [   PASS   ] :: munlockall executed.
+        [   PASS   ] :: munmap executed.
+        [   PASS   ] :: process_madvise executed.
+        [   PASS   ] :: process_mrelease executed.
+        [   PASS   ] :: process_vm_readv executed.
+        [   PASS   ] :: process_vm_writev executed.
+        [   PASS   ] :: readahead executed.
+        [   PASS   ] :: remap_file_pages executed.
+        [   PASS   ] :: shmat executed.
+        [   PASS   ] :: shmctl executed.
+        [   PASS   ] :: shmdt executed.
+        [   PASS   ] :: shmget executed.
+        [   PASS   ] :: swapoff executed.
+        [   PASS   ] :: swapon executed.
+    Results location:
+        output.txt
+contact: sbertram <sbertram@redhat.com>
+component:
+  - kernel
+test: bash ./runtest.sh
+path: /memory/mmra/syscall_fuzzing
+framework: beakerlib
+id: bd5a5909-5250-4427-9192-09bdd6501c26
+require:
+  - make
+  - golang
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - sshpass
+  - type: file
+    pattern:
+        -  /kernel-include
+        -  /syzkaller
+        -  /cmdline_helper
+        -  /cki_lib
+duration: 24h
+environment+:
+  SYZKALLER_COMMIT_HASH: "3cda49cfaa8556b73277ccd7e75952f0f2de2d74"
+  git_patches: "../memory/mmra/syscall_fuzzing/mmra.patch"

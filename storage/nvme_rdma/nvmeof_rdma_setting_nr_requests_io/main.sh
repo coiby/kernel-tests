@@ -47,24 +47,46 @@ function client {
 	# fio basic device level testing
 	FIO_Basic_Device_Level_Test "$nvme_device"
 
-	nr_num=$(cat /sys/block/"$nvme_device"/queue/nr_requests)
-	tok "echo 127 >/sys/block/${nvme_device}/queue/nr_requests"
-	ret=$?
-	if [ $ret -eq 0 ]; then
-		tlog "INFO: setting nr_requests:127 operation pass"
+	if [[ "$(readlink -f "/sys/block/$nvme_device/device")" =~ /nvme-subsystem/ ]]; then
+		tlog "$nvme_device are NVMe multipath devices"
+		nr_num=$(cat /sys/block/nvme*c*n*/queue/nr_requests)
+		tok "echo 64 >/sys/block/nvme*c*n*/queue/nr_requests"
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			tlog "INFO: setting nr_requests:64 operation pass"
+		else
+			tlog "INFO: setting nr_requests:64 operation failed"
+		fi
+		tlog "INFO: restore nr_requests with $nr_num"
+		tok "echo $nr_num >/sys/block/nvme*c*n*/queue/nr_requests"
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			tlog "INFO: restore nr_requests:$nr_num operation pass"
+		else
+			tlog "INFO: setting nr_requests:$nr_num operation failed"
+		fi
+		trun cat /sys/block/nvme*c*n*/queue/nr_requests
 	else
-		tlog "INFO: setting nr_requests:127 operation failed"
-	fi
+		nr_num=$(cat /sys/block/"$nvme_device"/queue/nr_requests)
+		tok "echo 64 >/sys/block/${nvme_device}/queue/nr_requests"
+		tok "echo 64 >/sys/block/${nvme_device}/queue/nr_requests"
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			tlog "INFO: setting nr_requests:64 operation pass"
+		else
+			tlog "INFO: setting nr_requests:64 operation failed"
+		fi
 
-	tlog "INFO: restore nr_requests with $nr_num"
-	tok echo "$nr_num" >/sys/block/"$nvme_device"/queue/nr_requests
-	ret=$?
-	if [ $ret -eq 0 ]; then
-		tlog "Restore nr_requests:$nr_num operation pass"
-	else
-		tlog "Setting nr_requests:$nr_num operation failed"
+		tlog "INFO: restore nr_requests with $nr_num"
+		tok echo "$nr_num" >/sys/block/"$nvme_device"/queue/nr_requests
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			tlog "INFO: restore nr_requests:$nr_num operation pass"
+		else
+			tlog "INFO: setting nr_requests:$nr_num operation failed"
+		fi
+		trun cat /sys/block/"$nvme_device"/queue/nr_requests
 	fi
-	trun cat /sys/block/"$nvme_device"/queue/nr_requests
 
 	# wait background fio operation done
 	tlog "INFO: wait fio operation done"

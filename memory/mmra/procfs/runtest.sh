@@ -23,15 +23,12 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../kernel-include/runtest.sh || exit 1
+. ../../../syzkaller/include.sh || exit 1
 
-local_dir=${local_dir:-"/root/tmp"}
-timer=${timer:-3600} # In seconds. Defaults to 1 hour.
-verbose=${verbose:-""}
-supportcalls=${supportcalls:-""}
-discalls=${discalls:-""}
-commit=${commit:-"21339d7b9986698282dce93709157dc36907fbf8"}
+git_patches="../memory/mmra/procfs/procfs.patch"
+SYZKALLER_COMMIT_HASH="21339d7b9986698282dce93709157dc36907fbf8"
 # shellcheck disable=SC2016
-syscalls=${syscalls:-'
+main_syscalls=${main_syscalls:-'
     "openat$ark",
     "openat$cm",
     "openat$cp",
@@ -47,9 +44,6 @@ syscalls=${syscalls:-'
     "openat$mfr",
     "openat$mma",
     "openat$mrb",
-    "openat$ms_ratio",
-    "openat$mur",
-    "openat$nzo",
     "openat$odt",
     "openat$ok",
     "openat$okat",
@@ -63,11 +57,9 @@ syscalls=${syscalls:-'
     "openat$statr",
     "openat$swap",
     "openat$urk",
-    "openat$uu",
     "openat$vcp",
     "openat$wbf",
     "openat$wsf",
-    "openat$zrm",
     "write$ark",
     "write$cm",
     "write$cp",
@@ -83,9 +75,6 @@ syscalls=${syscalls:-'
     "write$mfr",
     "write$mma",
     "write$mrb",
-    "write$ms_ratio",
-    "write$mur",
-    "write$nzo",
     "write$odt",
     "write$ok",
     "write$okat",
@@ -99,11 +88,9 @@ syscalls=${syscalls:-'
     "write$statr",
     "write$swap",
     "write$urk",
-    "write$uu",
     "write$vcp",
     "write$wbf",
-    "write$wsf",
-    "write$zrm"'}
+    "write$wsf"'}
 
 #    "openat$mmc",
 #    "write$mmc",
@@ -147,97 +134,14 @@ procfs_entry=${procfs_entry:-'
     "watermark_scale_factor",
     "zone_reclaim_mode"'}
 
-create-test-cfg()
-{
-    local vm_param
-    local targets=$(echo "$1" | awk -F' ' '{for(i=1;i<=NF;i++){printf "\"%s\", ", $i}}' | sed 's/, $//')
-    if [[ -n ${supportcalls} ]]; then
-        local syscalls="${syscalls}, ${supportcalls}"
-    fi
-    arch=$(uname -m|sed 's/x86_/amd/g'|sed 's/aarch/arm/g')
-    vm_param="\"targets\" : [ ${targets} ], \"target_dir\" : \"${local_dir}/syzkaller-client\""
-    cat > syzkaller-test.cfg << EOF
-{
-    "http": "0.0.0.0:56741",
-    "rpc": "127.0.0.1:0",
-    "procs" : 1,
-    "max_crash_logs" : 10,
-    "workdir": "${local_dir}/syz-manager-logs",
-    "target": "linux/${arch}",
-    "enable_syscalls" : [${syscalls}],
-    "disable_syscalls" : [${discalls}],
-    "no_mutate_syscalls" : [${supportcalls}],
-    "syzkaller": "${syzkaller_root}",
-    "sandbox": "none",
-    "cover": false,
-    "reproduce": false,
-    "type": "isolated",
-    "vm": {
-        ${vm_param}
-    }
-}
-EOF
-    [ -e syzkaller-test.cfg ] && return 0 || return 1
-}
-
-pkg_mgr=$(K_GetPkgMgr)
-rlLog "pkg_mgr = ${pkg_mgr}"
-if [[ $pkg_mgr == "rpm-ostree" ]]; then
-    export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
-    export pkg_mgr_rmv_string="-y --idempotent --allow-inactive uninstall"
-else
-    export pkg_mgr_inst_string="-y install"
-    export pkg_mgr_rmv_string="-y remove"
-fi
-
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        # glibc-static causes an error in syzkaller build
-        # /usr/bin/ld: read-only segment has dynamic relocations
-        # shellcheck disable=SC2086
-        rlRun "${pkg_mgr} ${pkg_mgr_rmv_string} glibc-static"
-        rlRun "git_retry_clone https://github.com/google/syzkaller" 0,128
-        rlRun "pushd syzkaller"
-        syzkaller_root=$(pwd)
-        rlRun "git branch mmra_temp ${commit}"
-        rlRun "git switch mmra_temp"
-        rlRun "git apply ${git_patch:-'../procfs.patch'}"
-        rlRun "make"
-        sut_ip=$(nmcli | grep -A1 "ip4 default" | grep -v "ip4 default" | awk '{print $2}' | awk -F "/" '{print $1}')
-        # create config file:
-        rlRun "create-test-cfg ${sut_ip}"
-        rlFileSubmit syzkaller-test.cfg
-        rlRun "popd"
-        rlRun "ssh-keygen -q -t ed25519 -N '' <<< $'\ny' > /dev/null 2>&1"
-        rlRun "cat /root/.ssh/id_ed25519.pub >> /root/.ssh/authorized_keys"
+        syzkaller_setup
     rlPhaseEnd
     rlPhaseStartTest
-        rlRun "dmesg -C"
-        start_time=$(date +%s)
-        rlWatchdog "${syzkaller_root}/bin/syz-manager ${verbose} -config ${syzkaller_root}/syzkaller-test.cfg" "${timer}"
-        end_time=$(date +%s)
-        duration=$((${end_time}-${start_time}))
-        rlLog "Test duration was ${duration} seconds."
-        if [ "${duration}" -lt "${timer}" ]; then
-            rlFail "Command ended before timer expired."
-        fi
-        if [ "$(ls -l "${local_dir}"/syz-manager-logs/crashes)" != "total 0" ]; then
-            rlFail "Crash results found."
-        else
-            rlPass "No crash results found."
-        fi
-        # Additional verification that all syscalls were executed.
-        rlRun "mkdir ${local_dir}/corpus_dir"
-        rlRun "${syzkaller_root}/bin/syz-db unpack ${local_dir}/syz-manager-logs/corpus.db ${local_dir}/corpus_dir"
-        for call in ${syscalls}; do
-            syscall=$(echo "${call//\"}" | sed -e 's/,//')
-            if grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/* ; then
-                rlPass "${syscall} executed."
-            else
-               rlFail "${syscall} not executed."
-            fi
-        done
+        syzkaller_run
+        syzkaller_check_results
         rlLog "The following tuneables are covered."
         for call in ${procfs_entry}; do
             entry=$(echo "${call//\"}" | sed -e 's/,//')
@@ -247,10 +151,7 @@ rlJournalStart
         rlFileSubmit dmesg-mmsyscalls.log
     rlPhaseEnd
     rlPhaseStartCleanup
-        rlRun "tar cf syzkaller_test_results.tar ${local_dir}"
-        rlFileSubmit syzkaller_test_results.tar
-        rlRun "rm -rf /root/go"
-        rlRun "rm -rf ${local_dir}" 0,1
+        syzkaller_cleanup
     rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText

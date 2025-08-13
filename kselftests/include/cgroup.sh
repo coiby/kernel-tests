@@ -14,6 +14,11 @@ do_cgroup_run()
         # report results as a subphase
         rlPhaseStartTest "selftests: ${test}"
         if [ "${test}" = "cgroup:test_cpuset_prs.sh" ]; then
+            if check_skip "${test}"; then
+                rlLog "=== Skipping: $test"
+                rlPhaseEnd
+                continue
+            fi
             pushd cgroup || exit
             ./"${test##cgroup:}" -d 2
             popd || exit

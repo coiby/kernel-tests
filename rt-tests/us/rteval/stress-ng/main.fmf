@@ -1,0 +1,7 @@
+summary: stress-ng test for rteval
+description: Test stress-ng loads and options in rteval / rteval-loads.
+contact: Waylon Cude <wcude@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 90m
+tag: NoRHIVOS

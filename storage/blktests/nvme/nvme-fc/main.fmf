@@ -3,6 +3,11 @@ contact: Yi Zhang <yizhan@redhat.com>
 test: bash ./runtest.sh
 framework: shell
 require:
+  - type: file
+    pattern:
+      - /storage/blktests/include
+      - /storage/blktests/config
+      - /cki_lib
   - blktrace
   - fio
   - gcc

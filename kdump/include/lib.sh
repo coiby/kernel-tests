@@ -163,11 +163,14 @@ export INITRD_KDUMP_PREFIX INITRD_KDUMP_IMG_PATH
 shopt -s extglob
 
 if system_ostree; then
-    K_BOOT="/usr/lib/ostree-boot"
+    #K_BOOT="/usr/lib/ostree-boot"
+    K_BOOT=$(find /boot/ostree -name "initramfs-$(uname -r).img" -print0 | xargs -0 dirname)
+    ## not anymore?
     # kernel-automotive kernel and initramfs image on ostree contains a hash:
     # kernel image - vmlinuz-$(uname -r)-$(commit_hash)
     # initramfs image - initramfs-$(uname -r).img-${commit_hash}
-    INITRD_IMG_PATH=$(find $K_BOOT -name "${INITRD_PREFIX}-$(uname -r).img-*")
+    #INITRD_IMG_PATH=$(find $K_BOOT -name "${INITRD_PREFIX}-$(uname -r).img-*")
+    INITRD_IMG_PATH="$K_BOOT/$INITRD_PREFIX-$(uname -r).img"
     VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinuz-"$(uname -r)"!(*debug*|*64k*|*rt*))
     [ -z "${VMLINUZ_PATH}" ] && VMLINUZ_PATH=$(ls ${K_BOOT}/vmlinux-"$(uname -r)"!(*debug*|*64k*|*rt*))
 else
@@ -362,6 +365,11 @@ InstallKernel()
 
     local brew_server=""
     local brew_baseurl=""
+    # after ostree switches releases, we need to re-get the release info
+    if system_ostree; then
+        local _family_=$(sed -e 's/\(.*\)release\s\([0-9]*\).*/\1\2/; s/\s//g' < /etc/redhat-release)
+        [[ "$_family_" =~ RedHatEnterpriseLinux ]] && IS_RHEL=true
+    fi
     if $IS_RHEL; then
         brew_server=download.devel.redhat.com
         brew_baseurl="http://$brew_server/brewroot/packages/${K_SPEC_NAME}"
@@ -386,7 +394,7 @@ InstallKernel()
     if pushd temp; then
         for i in ${tmp}; do
             Log "Downloading: ${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm"
-            curl -LO --fail "${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm" 2> /dev/null || {
+            curl -LO -k --fail "${brew_baseurl}/${K_VER}/${K_REL}/${K_ARCH}/${i}.rpm" 2> /dev/null || {
                 retval=$?
                 Log "Downloading ${i}.rpm failed"
                 break
@@ -447,9 +455,14 @@ InstallKpatchPatchDebuginfo()
     # Example of a kpatch-patch debuginfo pkg "kpatch-patch-4_18_0-107-debuginfo-0-1.test.el8.x86_64"
     kpp_debuginfo_pkg=$(echo "$kpp_pkg" | sed 's/-/-debuginfo-/4')
 
-    # Kpatch-patch repo is supposed to be ready during test
+    brew_pkgs="http://download.devel.redhat.com/brewroot/packages"
+    kpp_name=$(rpm -q --queryformat "%{NAME}" $kpp_pkg)
+    kpp_version=$(rpm -q --queryformat "%{VERSION}" $kpp_pkg)
+    kpp_release=$(rpm -q --queryformat "%{RELEASE}" $kpp_pkg)
+    kpp_arch=$(rpm -q --queryformat "%{ARCH}" $kpp_pkg)
     rpm -q "${kpp_debuginfo_pkg}" || {
-        InstallPackages "${kpp_debuginfo_pkg}" || Error "Failed to install ${kpp_debuginfo_pkg}"
+        InstallPackages "${brew_pkgs}/${kpp_name}/${kpp_version}/${kpp_release}/${kpp_arch}/${kpp_debuginfo_pkg}.rpm" || \
+            Error "Failed to install ${kpp_debuginfo_pkg}"
     }
 
 }
@@ -1155,8 +1168,13 @@ ResetCrashkernel() {
             _reboot_required=true
     elif kdumpctl -h 2>&1 | grep -q reset-crashkernel; then
         [ -n "${fadump_opts}" ] && fadump_opts="--${fadump_opts}"
-        LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'Please reboot the system'" && \
-            _reboot_required=true
+        if system_ostree; then
+            LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'systemctl reboot'" && \
+                _reboot_required=true
+        else
+            LogRun "kdumpctl reset-crashkernel ${fadump_opts} 2>&1 | grep -i 'Please reboot the system'" && \
+                _reboot_required=true
+        fi
     else # retrieve default CK values and update the boot kernel cmdline
         if $IS_RHEL7 || $IS_RHEL8; then
             _ck_args="crashkernel=auto"

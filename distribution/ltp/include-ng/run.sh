@@ -40,6 +40,7 @@ report_result ()
 
     logfile_run=$OUTPUTDIR/$TEST.run.log
     logfile_fail=$OUTPUTDIR/$TEST.fail.log
+    logfile_html=$OUTPUTDIR/$TEST.html
     logfile_json=$OUTPUTDIR/$TEST.json
 
     if [[ -z ${LTP_DMESG_DIR_PREFIX} ]]; then
@@ -85,6 +86,7 @@ report_result ()
     fi
     # I want to see the succeeded running log as well
     SubmitLog $logfile_run
+    SubmitLog $logfile_html
     SubmitLog $logfile_json
     score=$(cat $OUTPUTDIR/$RUNTEST.log | grep "failed" | awk '{print $2}')
     if test -f "$KIRK_DEBUG" && grep -E "Testing suite timed out: $RUNTEST" $KIRK_DEBUG; then
@@ -161,7 +163,7 @@ RunTest ()
     ipc_debug_info Before
     debug "Command Line:"
     debug "kirk $RUNTEST $OUTPUTDIR \"$OPTIONS\""
-    kirk_run $RUNTEST $OUTPUTDIR "$OPTIONS"
+    kirk_runltp $RUNTEST $OUTPUTDIR "$OPTIONS"
 
     ipc_debug_info After
     if [ $RUNTEST = "ipc" ]; then
@@ -203,10 +205,12 @@ RunTest ()
 RunFiltTest ()
 {
     if [ -n "$FILTERTESTS" ]; then
-        rm -f $OUTPUTDIR/filtered_runtest.log
-        rm -f $OUTPUTDIR/filtered_runtest.run.log
+        rm -f $OUTPUTDIR/filtertests.log
+        rm -f $OUTPUTDIR/filtertests.run.log
 
-        RunTest filtered_runtest "$OPTS"
+        echo "$FILTERTESTS" | tr ' ' '\n' | awk '{print $1, $1}' > $LTPDIR/runtest/filtertests
+
+        RunTest filtertests "$OPTS"
         return 0
     fi
 

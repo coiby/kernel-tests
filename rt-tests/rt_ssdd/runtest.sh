@@ -13,8 +13,13 @@ if ! kernel_automotive; then
     run "yum install -y $pkg_name"
 fi
 
+VERBOSE_FLAG=""
+if timeout --help 2>&1 | grep -q '\--verbose'; then
+    VERBOSE_FLAG="--verbose"
+fi
+
 log "Test the default options of ssdd"
-oneliner "timeout --preserve-status --verbose 10m ssdd"
+oneliner "timeout --preserve-status $VERBOSE_FLAG 10m ssdd"
 
 log "Stress test ssdd with 100 forks and 10000 iters"
-oneliner "timeout --preserve-status --verbose 10m ssdd --forks=100 --iters=10000"
+oneliner "timeout --preserve-status $VERBOSE_FLAG 10m ssdd --forks=100 --iters=10000"

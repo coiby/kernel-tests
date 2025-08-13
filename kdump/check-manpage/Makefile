@@ -18,8 +18,10 @@
 
 export TEST  :=   /kernel/kdump/check-manpage
 
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
+
+# Common VARs from rhts makefile
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
 
 .PHONY: build run
 
@@ -39,4 +41,4 @@ $(METADATA): Makefile
 	@echo "License: GPLv3" >> $(METADATA)
 	@echo "RepoRequires:  kdump/include" >> $(METADATA)
 	@echo "Description: Check the manpage for kdump related commands" >> $(METADATA)
-	rhts-lint $(METADATA)
+	

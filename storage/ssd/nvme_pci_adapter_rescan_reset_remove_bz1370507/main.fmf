@@ -15,7 +15,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvme_pci_adapter_rescan_reset_remove_bz1370507
 extra-task: /storage/ssd/nvme_pci_adapter_rescan_reset_remove_bz1370507
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: dbe0fba2-83d4-4884-8dec-9064994683a9

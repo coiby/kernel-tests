@@ -1,0 +1,3 @@
+summary: Enable RHTS support to synchronize between hosts
+test: ./runtest.sh
+framework: beakerlib

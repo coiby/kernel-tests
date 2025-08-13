@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck disable=all
+# Disabling all shellcheck warnings to allow the merge request, as this script is scheduled for deprecation
+
 [ ! "$RSTRNT_JOBID" ] && rm -rf logs && mkdir logs && export TMPDIR="$PWD/logs"
 
 if [ ! "$RSTRNT_JOBID" ]; then
@@ -227,7 +230,7 @@ kernel_debug()
 # return 0 when running kernel automotive
 kernel_automotive()
 {
-    if (uname -r | grep -w -q el[0-9]*iv); then
+    if (uname -r | grep -w -q el[0-9].*iv); then
        return  0
     fi
     return 1

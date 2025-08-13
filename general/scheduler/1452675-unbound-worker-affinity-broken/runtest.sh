@@ -33,7 +33,7 @@ trap 'Cleanup' SIGHUP SIGINT SIGQUIT SIGTERM SIGUSR1
 tracing_dir=/sys/kernel/debug/tracing
 
 Cleanup() {
-	true
+        true
 }
 
 # Convert cpu number list to bitmask, such as
@@ -41,105 +41,106 @@ Cleanup() {
 # result: 1,00fff000
 # then echo 1,00fff000 > /sys/kernel/debug/tracing/tracing_cpumask
 function get_cpumask() {
-	local index=0
-	local mask=""
-	local c
-	declare -a package_cpus_masks
-	local cpu_list=$*
-	for index in $(seq 0 $((1024 / 32))); do
-		package_cpus_masks[$index]=0
-	done
+        local index=0
+        local mask=""
+        local c
+        declare -a package_cpus_masks
+        local cpu_list=$*
+        for index in $(seq 0 $((1024 / 32))); do
+                package_cpus_masks[$index]=0
+        done
 
-	for c in $cpu_list; do
-		index=$((c / 32))
-		package_cpus_masks[$index]=$((package_cpus_masks[$index] | ((1 << (( c - ((32*index)) )) ))))
-	done
-	for index in ${!package_cpus_masks[*]}; do
-		package_cpus_masks[$index]=$(printf "%08x" ${package_cpus_masks[$index]})
-		mask=${package_cpus_masks[$index]},$mask
-	done
-	echo $mask | awk -F, 'BEGIN{i=1;out=""}{while($i == "00000000" && i<NF) i++}END{for (;i<=NF;i++) out=out","$i; gsub("^,|,$","",out);printf("%s\n", out);}'
+        for c in $cpu_list; do
+                index=$((c / 32))
+                package_cpus_masks[$index]=$((package_cpus_masks[$index] | ((1 << (( c - ((32*index)) )) ))))
+        done
+        for index in ${!package_cpus_masks[*]}; do
+                package_cpus_masks[$index]=$(printf "%08x" ${package_cpus_masks[$index]})
+                mask=${package_cpus_masks[$index]},$mask
+        done
+        echo $mask | awk -F, 'BEGIN{i=1;out=""}{while($i == "00000000" && i<NF) i++}END{for (;i<=NF;i++) out=out","$i; gsub("^,|,$","",out);printf("%s\n", out);}'
 }
 
 rlJournalStart
-	rlPhaseStartSetup
-		reason=""
-		rlRun "yum -y install tuna" || reason="(tuna)"
-		# Only x86_64 have this
-		tst=rt-tests
-		rlIsRHEL ">=9" && tst=realtime-tests
-		rlRun "yum -y install $tst" 0-255 || reason+="(rt-tests)"
-		mount | grep debug || mount -t debugfs dd /sys/kernel/debug
-		rlRun "nr_sockets=$(lscpu |  awk '/Socket/ {print $2}')"  0-255
-		# shellcheck disable=SC2154
-		if ((nr_sockets < 2)); then
-			reason+="(SocketNumber)"
-		fi
-		if [ -n "$reason" ]; then
-			rstrnt-report-result "Skipped$reason" PASS
-			rlPhaseEnd
-			rlJournalPrintText
-			exit 0
-		fi
-	rlPhaseEnd
+        rlPhaseStartSetup
+                reason=""
+                rlRun "yum -y install tuna" || reason="(tuna)"
+                # Only x86_64 have this
+                tst=rt-tests
+                rlIsRHEL ">=9" && tst=realtime-tests
+                rlRun "yum -y install $tst" 0-255 || reason+="(rt-tests)"
+                mount | grep debug || mount -t debugfs dd /sys/kernel/debug
+                rlRun "nr_sockets=$(cat /sys/devices/system/cpu/cpu*/topology/physical_package_id | sort | uniq | wc -l)"  0-255
+                # shellcheck disable=SC2154
+                if ((nr_sockets < 2)); then
+                        reason+="(SocketNumber)"
+                fi
+                if [ -n "$reason" ]; then
+                        rstrnt-report-result "Skipped$reason" PASS
+                        rlPhaseEnd
+                        rlJournalPrintText
+                        exit 0
+                fi
+        rlPhaseEnd
 
-	rlPhaseStartTest
-		old_cpumask=$(cat /sys/devices/virtual/workqueue/cpumask)
-		# older release
-		if test -f /sys/bus/workqueue/devices/writeback/numa; then
-			numa_affinity_f=/sys/bus/workqueue/devices/writeback/numa
-			numa_affinity_v=0
-		# rhel10
-		elif test -f /sys/devices/virtual/workqueue/writeback/affinity_scope; then
-			numa_affinity_f=/sys/devices/virtual/workqueue/writeback/affinity_scope
-			numa_affinity_v=system
-		fi
-		old_numa=$(awk '{print $1}' $numa_affinity_f)
-		if rlIsRHEL ">8"; then
-			rlRun "tuna isolate -S1"
-		else
-			rlRun "tuna -S1 -i"
-		fi
-		package_cpus="$(sh package.sh 1)"
-		rlLogInfo "$package_cpus"
-		rlRun "package_nr_cpus=$(echo $package_cpus | awk '{print NF}')" 0-255
-		package_cpus_mask=0
-		# For 1ffffffff such kind, covert to 1,ffffffff with ',' as seperator
-		package_cpus_mask=$(get_cpumask "$package_cpus")
-		rlLogInfo "package_cpus_mask=$package_cpus_mask"
-		rlLogInfo "grouped package_cpus_mask=$package_cpus_mask"
-		package_cpus_mask_hex=$(echo | awk -v e=$package_cpus_mask '{printf "%x\n", e}')
-		rlLogInfo "cpumask hex: $package_cpus_mask_hex"
-		rlRun "echo 1 >  /sys/devices/virtual/workqueue/cpumask"
-		rlRun "echo $numa_affinity_v > $numa_affinity_f"
-		# clean the buffer
-		rlRun "> /sys/kernel/debug/tracing/trace"
-		rlRun "echo 'cpu != 0 && req_cpu == 5120'  > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/filter"
-		rlRun "echo 1 > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/enable"
-		rlRun "echo $package_cpus_mask_hex > /sys/kernel/debug/tracing/tracing_cpumask"
-		# it's defined with rlRun parameter.
-		# shellcheck disable=SC2154
-		rlLogInfo "taskset -c ${package_cpus// /,} cyclictest -- -a ${package_cpus// /,} -t $package_nr_cpus -m -d 30 -D 350 --quiet &"
-		taskset -c ${package_cpus// /,} cyclictest -- -a ${package_cpus// /,} -t $package_nr_cpus -m -d 30 -D 350 --quiet > /dev/null &
-		pid=$!
-		rlLogInfo "Sleeping 180s"
-		sleep 180
-		rlRun "grep -v vmstat $tracing_dir/trace | grep -v queue_work"
-	rlPhaseEnd
+        rlPhaseStartTest
+                old_cpumask=$(cat /sys/devices/virtual/workqueue/cpumask)
+                # older release
+                if test -f /sys/bus/workqueue/devices/writeback/numa; then
+                        numa_affinity_f=/sys/bus/workqueue/devices/writeback/numa
+                        numa_affinity_v=0
+                # rhel10
+                elif test -f /sys/devices/virtual/workqueue/writeback/affinity_scope; then
+                        numa_affinity_f=/sys/devices/virtual/workqueue/writeback/affinity_scope
+                        numa_affinity_v=system
+                fi
+                old_numa=$(awk '{print $1}' $numa_affinity_f)
+                socket_id=$(cat /sys/devices/system/cpu/cpu*/topology/physical_package_id | sort | uniq | head -n 1)
+                if rlIsRHEL ">8"; then
+                    rlRun "tuna isolate -S${socket_id}"
+                else
+                        rlRun "tuna -S${socket_id} -i"
+                fi
+                package_cpus="$(sh package.sh 1)"
+                rlLogInfo "$package_cpus"
+                rlRun "package_nr_cpus=$(echo $package_cpus | awk '{print NF}')" 0-255
+                package_cpus_mask=0
+                # For 1ffffffff such kind, covert to 1,ffffffff with ',' as seperator
+                package_cpus_mask=$(get_cpumask "$package_cpus")
+                rlLogInfo "package_cpus_mask=$package_cpus_mask"
+                rlLogInfo "grouped package_cpus_mask=$package_cpus_mask"
+                package_cpus_mask_hex=$(echo | awk -v e=$package_cpus_mask '{printf "%x\n", e}')
+                rlLogInfo "cpumask hex: $package_cpus_mask_hex"
+                rlRun "echo 1 >  /sys/devices/virtual/workqueue/cpumask"
+                rlRun "echo $numa_affinity_v > $numa_affinity_f"
+                # clean the buffer
+                rlRun "> /sys/kernel/debug/tracing/trace"
+                rlRun "echo 'cpu != 0 && req_cpu == 5120'  > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/filter"
+                rlRun "echo 1 > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/enable"
+                rlRun "echo $package_cpus_mask_hex > /sys/kernel/debug/tracing/tracing_cpumask"
+                # it's defined with rlRun parameter.
+                # shellcheck disable=SC2154
+                rlLogInfo "taskset -c ${package_cpus// /,} cyclictest -- -a ${package_cpus// /,} -t $package_nr_cpus -m -d 30 -D 350 --quiet &"
+                taskset -c ${package_cpus// /,} cyclictest -- -a ${package_cpus// /,} -t $package_nr_cpus -m -d 30 -D 350 --quiet > /dev/null &
+                pid=$!
+                rlLogInfo "Sleeping 180s"
+                sleep 180
+                rlRun "grep -v vmstat $tracing_dir/trace | grep -v queue_work"
+        rlPhaseEnd
 
-	rlPhaseStartCleanup
-		rlRun "echo 0 > $tracing_dir/events/enable"
-		rlRun "echo nop > $tracing_dir/current_tracer"
-		rlRun "echo '!cpu != 0 && req_cpu == 5120'  > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/filter" 0-255
-		if rlIsRHEL ">8"; then
-			rlRun "tuna include -S1" 0-255 "include the isolated socket"
-		else
-			rlRun "tuna -S1 -I" 0-255 "include the isolated socket"
-		fi
-		rlRun "ps -p $pid -o args | grep cyclictest && kill $pid" 0-255
-		rlRun "echo $old_cpumask > /sys/devices/virtual/workqueue/cpumask" 0-255
-		rlRun "echo $old_numa > $numa_affinity_f" 0-255
-	rlPhaseEnd
+        rlPhaseStartCleanup
+                rlRun "echo 0 > $tracing_dir/events/enable"
+                rlRun "echo nop > $tracing_dir/current_tracer"
+                rlRun "echo '!cpu != 0 && req_cpu == 5120'  > /sys/kernel/debug/tracing/events/workqueue/workqueue_queue_work/filter" 0-255
+                if rlIsRHEL ">8"; then
+                        rlRun "tuna include -S${socket_id}" 0-255 "include the isolated socket"
+                else
+                        rlRun "tuna -S${socket_id} -I" 0-255 "include the isolated socket"
+                fi
+                rlRun "ps -p $pid -o args | grep cyclictest && kill $pid" 0-255
+                rlRun "echo $old_cpumask > /sys/devices/virtual/workqueue/cpumask" 0-255
+                rlRun "echo $old_numa > $numa_affinity_f" 0-255
+        rlPhaseEnd
 rlJournalEnd
 rlJournalPrintText
 

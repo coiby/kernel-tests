@@ -23,15 +23,16 @@ source ../../../kernel-include/runtest.sh
 DT_TARBALL="https://github.com/RobinTMiller/dt/archive/master.zip"
 BUFIO_REPO="https://github.com/bmarzins/bufio-test/"
 LINUX_REPO="https://github.com/torvalds/linux"
-BLK_ARCHIVE_REPO="https://github.com/jthornber/blk-archive"
-DMTS_REPO="https://github.com/jthornber/dmtest-python.git"
+BLK_ARCHIVE_REPO="https://github.com/device-mapper-utils/blk-archive"
+DMTS_REPO="https://github.com/device-mapper-utils/dmtest-python.git"
 DMTS_LOCAL="/opt/$(basename $DMTS_REPO | sed 's%.git%%')"
 SETUP_FLAG=".SETUP_PASS"
 
 function install_kernel_devel
 {
-    cki_debug
-
+    if ! K_IsKernelRPM; then
+      return 0
+    fi
     devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
     rpm -q "${devel_pkg}" || yum install -y "${devel_pkg}"
     if ! rpm -q "${devel_pkg}"; then
@@ -45,17 +46,17 @@ function load_vdo {
     # If the kernel version is lower than 6.10.0, skip loading VDO
     # because the 'dm-vdo' module is not available on older kernels.
     TARGET_VERSION="6.9.0"
-    if [[ "$(printf '%s\n' "$K_VER" "$TARGET_VERSION" | sort -V | head -n 1)" == "$TARGET_VERSION" ]]; then
-      modprobe dm-vdo || return 1
-      lsmod | grep "dm_vdo"
+    KERNEL_FULL=$(uname -r)
+    KERNEL_VER_STRIPPED=$(echo "$KERNEL_FULL" | cut -d'-' -f1)
+    if [[ "$(printf '%s\n' "$KERNEL_VER_STRIPPED" "$TARGET_VERSION" | sort -V | head -n 1)" == "$TARGET_VERSION" ]]; then
+        modprobe dm-vdo || return 1
+        lsmod | grep "dm_vdo"
     fi
     return 0
 }
 
 function install_dt
 {
-    cki_debug
-
     local tarball
     tarball=$(basename $DT_TARBALL)
     wget -O /tmp/"$tarball" $DT_TARBALL || return 1
@@ -72,8 +73,6 @@ function install_dt
 
 function install_bufio
 {
-    cki_debug
-
     local bufio_dir
     local os_version
     os_version="9"
@@ -88,12 +87,15 @@ function install_bufio
     if [ -e "/etc/fedora-release" ]; then
       os_version="9"
       echo "Found fedora-release, using rhel-9 branch."
+      cat /etc/fedora-release
     elif [ -e "/etc/redhat-release" ]; then
       os_version=$(cut -d" " -f6 /etc/redhat-release | cut -d"." -f1)
       echo "Found major version $os_version in redhat-release."
+      cat /etc/redhat-release
     elif [ -e "/etc/centos-release" ]; then
       os_version=$(cut -d" " -f4 /etc/centos-release)
       echo "Found major version $os_version in centos-release."
+      cat /etc/centos-release
     fi
     if (( os_version > 9 )); then
         os_version="9"
@@ -107,8 +109,6 @@ function install_bufio
 
 function clone_linux_repo
 {
-    cki_debug
-
     local repo_dir="linux"
     if [ -e "$DMTS_LOCAL"/"$repo_dir" ]; then
         echo "Linux repo already exists in $DMTS_LOCAL!"
@@ -122,8 +122,6 @@ function clone_linux_repo
 
 function install_blk_archive
 {
-    cki_debug
-
     local blk_archive_dir
     local blk_path
     blk_archive_dir=$(basename $BLK_ARCHIVE_REPO)
@@ -134,8 +132,8 @@ function install_blk_archive
     git clone "$BLK_ARCHIVE_REPO" "$blk_path"
 
     pushd "$blk_path" || return 1
-    cargo build --release
-    cargo install --path .
+    cargo build --release || return 1
+    cargo install --locked --path . || return 1
     export PATH="$PATH":~/.cargo/bin
     popd || return 1
     return 0
@@ -143,8 +141,6 @@ function install_blk_archive
 
 function clone_test_suite
 {
-    cki_debug
-
     if [ -e "$DMTS_LOCAL" ]; then
         rm -rf "$DMTS_LOCAL"
     fi
@@ -169,8 +165,6 @@ function ts_config_setup
     # Some poorly written tests use all of the data dev, no matter how big
     # it is, so will take longer to run with large volumes.
     #
-    cki_debug
-
     mnt_metadata=/mnt/dmtest/metadata
     mnt_data=/mnt/dmtest/data
 
@@ -216,8 +210,6 @@ function ts_config_setup
 
 function ts_setup
 {
-    cki_debug
-
     if [[ -e "$DMTS_LOCAL/$SETUP_FLAG" ]]; then
         return "$CKI_PASS"
     fi
@@ -237,4 +229,11 @@ function ts_setup
     touch "$DMTS_LOCAL/$SETUP_FLAG"
 
     return "$CKI_PASS"
+}
+
+function setup_vdo_env
+{
+    load_vdo || return "$CKI_UNINITIATED"
+    clone_test_suite || return "$CKI_UNINITIATED"
+    ts_config_setup "$DMTS_LOCAL"/config.toml || return "$CKI_UNINITIATED"
 }

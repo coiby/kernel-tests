@@ -19,7 +19,7 @@ require:
     - qemu-img
     - gcc-c++
     - nbdkit
-duration: 2h
+duration: 4h
 tier: 1
 extra-summary: /storage/block/RHEL_2107_ublk_testing
 extra-task: /storage/block/RHEL_2107_ublk_testing

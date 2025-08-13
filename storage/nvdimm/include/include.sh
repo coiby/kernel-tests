@@ -7,6 +7,15 @@ CDIR=$(dirname "$FILE")
 
 trun "rpm -q redhat-rpm-config gcc gcc-c++ git wget ndctl || yum -y install redhat-rpm-config gcc gcc-c++ git wget ndctl"
 
+function report_result() {
+	ret=$?
+	if (( $ret == 0 )); then
+		rstrnt-report-result "${RSTRNT_TASKNAME}" PASS
+	else
+		rstrnt-report-result "${RSTRNT_TASKNAME}" FAIL
+	fi
+}
+
 # shellcheck disable=SC2034
 SECTOR_SIZE_LIST="512 4096"
 
@@ -674,7 +683,7 @@ function Create_Loop_Devices (){
 	local loop_dev_list=''
 	# shellcheck disable=SC2034
 	for X in `seq 1 ${count}`;do
-		local loop_file_name=$(mktemp /opt/loop.XXXXXX)
+		local loop_file_name=$(mktemp /tmp/loop.XXXXXX)
 		#dd if=/dev/zero of=${loop_file_name} count=$size_mib  bs=1M 1>/dev/null 2>&1
 		fallocate -l  $((size_mib * 1024 * 1024)) ${loop_file_name} 1>/dev/null 2>&1
 		local loop_dev_name=$(losetup -f)

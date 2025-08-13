@@ -1,0 +1,142 @@
+diff --git a/sys/linux/sys.txt b/sys/linux/sys.txt
+index a48d38c0b..c242cbbf4 100644
+--- a/sys/linux/sys.txt
++++ b/sys/linux/sys.txt
+@@ -64,6 +64,7 @@ include <fs/smb/client/cifsglob.h>
+ include <xen/interface/io/xs_wire.h>
+ include <uapi/linux/prctl.h>
+ include <asm/prctl.h>
++include <linux/reboot.h>
+ 
+ resource fd[int32]: -1
+ resource fd_dir[fd]: AT_FDCWD
+@@ -419,9 +420,9 @@ setgroups(size len[list], list ptr[in, array[gid]])
+ personality(persona flags[personality_flags])
+ # Don't mess with parent (fuzzer). If we ptrace attach to it, it will hang.
+ # If we setrlimit for parent, it will misbehave. Killing - the same. Nothing good.
+-#getppid() pid
+-#getsid(pid pid) pid
+-#setsid() pid
++getppid() pid
++getsid(pid pid) pid
++setsid() pid
+ 
+ link(old ptr[in, filename], new ptr[in, filename])
+ linkat(oldfd fd_dir, old ptr[in, filename], newfd fd_dir, new ptr[in, filename], flags flags[linkat_flags])
+@@ -729,6 +730,11 @@ openat$ocfs2_control(fd const[AT_FDCWD], file ptr[in, string["/dev/ocfs2_control
+ openat$nvme_fabrics(fd const[AT_FDCWD], file ptr[in, string["/dev/nvme-fabrics"]], flags flags[open_flags], mode const[0]) fd
+ openat$bsg(fd const[AT_FDCWD], file ptr[in, string["/dev/bsg"]], flags flags[open_flags], mode const[0]) fd
+ 
++newfstat(fd fd, stat ptr[out, stat])
++kexec_file_flags = 0x1, 0x2, 0x4
++kexec_file_load(kernel_fd fd, initrd_fd fd, cmdline buffer[in], flags flags[kexec_file_flags])
++vhangup()
++
+ pipefd {
+ 	rfd	fd
+ 	wfd	fd
+@@ -1406,21 +1412,34 @@ _ = KCOV_INIT_TRACE, KCOV_ENABLE, KCOV_DISABLE, KCOV_TRACE_PC, KCOV_TRACE_CMP, P
+ define KCOV_REMOTE_ENABLE	1075340134
+ 
+ # Not yet implemented syscalls:
+-# umask
++umask(mask flags[open_mode])
+ # vhangup
+ # _sysctl
+-# adjtimex
+-# swapon
+-# swapoff
++adjtimex(buf ptr[inout, timex])
++swapon(path ptr[in, filename], swapflags flags[open_mode])
++swapoff(path ptr[in, string])
+ # nfsservctl
+-# getcpu
++getcpu(cpu_ptr ptr[out, int32], node_ptr ptr[out, int32], tcache ptr[in, void])
++
++timezone {
++	tz_minuteswest	int32
++	tz_dsttime	int32
++}
+ 
+ # Probably no sense in calling these.
+ # Also affect system-wide state, so not reproducible anyway.
+-# gettimeofday
+-# settimeofday
+-# reboot
+-# sethostname
+-# setdomainname
+-# sched_get_priority_max
+-# sched_get_priority_min
++gettimeofday(tv ptr[out, timeval], tz ptr[out, timezone])
++settimeofday(tv ptr[in, timeval], tz ptr[in, timezone])
++
++reboot_magic2 = LINUX_REBOOT_MAGIC2, LINUX_REBOOT_MAGIC2A, LINUX_REBOOT_MAGIC2B, LINUX_REBOOT_MAGIC2C
++reboot_cmds = LINUX_REBOOT_CMD_RESTART, LINUX_REBOOT_CMD_HALT, LINUX_REBOOT_CMD_CAD_ON, LINUX_REBOOT_CMD_CAD_OFF, LINUX_REBOOT_CMD_POWER_OFF, LINUX_REBOOT_CMD_SW_SUSPEND
++
++reboot(magic const[LINUX_REBOOT_MAGIC1], magic2 flags[reboot_magic2], cmd flags[reboot_cmds], arg const[0])
++# Command to reboot with a specific string
++reboot$restart2(magic const[LINUX_REBOOT_MAGIC1], magic2 flags[reboot_magic2], cmd const[LINUX_REBOOT_CMD_RESTART2], arg ptr[in, string])
++
++sethostname(name ptr[in, string], len int32)
++setdomainname(name ptr[in, string], len int32)
++
++sched_get_priority_max(policy flags[sched_policy])
++sched_get_priority_min(policy flags[sched_policy])
+diff --git a/sys/linux/sys.txt.const b/sys/linux/sys.txt.const
+index ba024ae99..7179613d0 100644
+--- a/sys/linux/sys.txt.const
++++ b/sys/linux/sys.txt.const
+@@ -869,3 +869,40 @@ __O_TMPFILE = 4194304
+ __WALL = 1073741824
+ __WCLONE = 2147483648
+ __WNOTHREAD = 536870912
++__NR_kexec_file_load = arm64:294
++__NR_mq_timedreceive = arm64:183
++__NR_mq_timedsend = arm64:182
++__NR_newfstatat = arm64:79
++__NR_newfstat = arm64:80
++__NR_vhangup = arm64:58
++__NR_semtimedop = arm64:192
++__NR_setns = arm64:268
++__NR_utimensat = arm64:88
++__NR_finit_module = arm64:273
++__NR_get_mempolicy = arm64:236
++__NR_getcpu = arm64:168
++__NR_mbind = arm64:235
++__NR_gettimeofday = arm64:169
++__NR_migrate_pages = arm64:238
++__NR_move_pages = arm64:239
++__NR_sched_get_priority_max = arm64:125
++__NR_sched_get_priority_min = arm64:126
++__NR_setitimer = arm64:103
++__NR_settimeofday = arm64:170
++__NR_swapon = arm64:224
++__NR_swapoff = arm64:225
++__NR_getppid = arm64:173
++__NR_setsid = arm64:157
++__NR_reboot = arm64:142
++LINUX_REBOOT_MAGIC1 = arm64:0xfee1dead
++LINUX_REBOOT_MAGIC2 = arm64:0x28121969
++LINUX_REBOOT_MAGIC2A = arm64:0x05121996
++LINUX_REBOOT_MAGIC2B = arm64:0x16041998
++LINUX_REBOOT_MAGIC2C = arm64:0x20112000
++LINUX_REBOOT_CMD_RESTART = arm64:0x01234567
++LINUX_REBOOT_CMD_HALT = arm64:0xcdef0123
++LINUX_REBOOT_CMD_CAD_ON = arm64:0x89abcdef
++LINUX_REBOOT_CMD_CAD_OFF = arm64:0
++LINUX_REBOOT_CMD_POWER_OFF = arm64:0x4321fedc
++LINUX_REBOOT_CMD_RESTART2 = arm64:0xa1b2c3d4
++LINUX_REBOOT_CMD_SW_SUSPEND = arm64:0xd000fce1
+diff --git a/sys/targets/targets.go b/sys/targets/targets.go
+index 1166134bc..f53563c9f 100644
+--- a/sys/targets/targets.go
++++ b/sys/targets/targets.go
+@@ -509,7 +509,7 @@ var oses = map[string]osCommon{
+ 			"syz_clone":           {"clone", "exit"},
+ 			"syz_pidfd_open":      {"pidfd_open"},
+ 		},
+-		cflags: []string{"-static-pie"},
++		cflags: []string{"-static"},
+ 	},
+ 	FreeBSD: {
+ 		SyscallNumbers:         true,

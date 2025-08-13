@@ -1,0 +1,13 @@
+diff --git a/syz-manager/manager.go b/syz-manager/manager.go
+index f951db46c..e6e2b214f 100644
+--- a/syz-manager/manager.go
++++ b/syz-manager/manager.go
+@@ -1314,7 +1314,7 @@ func (mgr *Manager) setPhaseLocked(newPhase int) {
+ 	}
+ 	if newPhase == phaseTriagedHub {
+ 		// Start reproductions.
+-		go mgr.reproLoop.Loop(vm.ShutdownCtx())
++		// go mgr.reproLoop.Loop(vm.ShutdownCtx())
+ 	}
+ 	mgr.phase = newPhase
+ }

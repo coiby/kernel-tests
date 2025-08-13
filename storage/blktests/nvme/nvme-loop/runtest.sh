@@ -21,6 +21,9 @@ function main
 		echo "Skip test because $CASE_TYPE case list is empty"
 		rstrnt-report-result "$TNAME" SKIP
 	fi
+	if [ -n "$SKIP_STORAGE_TEST" ]; then
+		testcases=$(filter_testcases "$testcases" "$SKIP_STORAGE_TEST")
+	fi
 	for testcase in $testcases; do
 		if (rlIsRHEL ">9.4" || rlIsRHEL 10 || rlIsCentOS 10 || rlIsCentOS 9 || rlIsFedora) && [[ "$DCLIST" =~ $testcase ]]; then
 			for NVMET_BLKDEV_TYPE in device file; do

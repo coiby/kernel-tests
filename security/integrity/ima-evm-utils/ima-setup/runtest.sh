@@ -29,16 +29,14 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 TmpDir=$(pwd)/tmp
+min_version="1.5"
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
         rlRun -l "evmctl --version"
         current_version=$(evmctl --version | awk '{print $NF}')
-        IFS='.' read -r current_major current_minor <<< "$current_version"
-        current_major=$((current_major))
-        current_minor=$((current_minor))
-        if (( current_major < 1 )) || { (( current_major == 1 )) && (( current_minor < 5 )); }; then
+        if [[ "$(printf '%s\n' "$current_version" "$min_version" | sort -V | head -n1)" != "$min_version" ]]; then
             rlLog "[SKIP] Skipping test for evmctl versions < 1.5"
             rstrnt-report-result $RSTRNT_TASKNAME SKIP
             exit 0

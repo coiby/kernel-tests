@@ -154,42 +154,34 @@ rlJournalStart
 		# (wrongly set ARCH variable breaks LLVM tests!!)
 		unset ARCH
 
-		export KERNEL_PKG_NAME="kernel-$KERNEL"
-		if [ $(is_kernel_rt) -eq 0 ]; then
-			export KERNEL_DEBUGINFO_PKG_NAME="kernel-rt-debuginfo-$KERNEL"
-	        else
-	                export KERNEL_DEBUGINFO_PKG_NAME="kernel-debuginfo-$KERNEL"
-	                if cki_is_kernel_automotive; then
-	                       export KERNEL_DEBUGINFO_PKG_NAME="kernel-automotive-debuginfo-$KERNEL"
-	                       export KERNEL_PKG_NAME="kernel-automotive-$KERNEL"
-	                fi
-	        fi
-		echo $KERNEL | grep -q debug
-		if [ $? -eq 0 ]; then
-			export KERNEL=${KERNEL%[.+]debug}
-			if [ $(is_kernel_rt) -eq 0 ]; then
-				export KERNEL_PKG_NAME="kernel-rt-debug-$KERNEL"
-				export KERNEL_DEBUGINFO_PKG_NAME="kernel-rt-debug-debuginfo-$KERNEL"
-			else
-				export KERNEL_PKG_NAME="kernel-debug-$KERNEL"
-				export KERNEL_DEBUGINFO_PKG_NAME="kernel-debug-debuginfo-$KERNEL"
-			fi
+		kernel_name=$(rpm -q --queryformat '%{name}\n' -qf "/boot/config-$(uname -r)" | sed 's/-core//')
+		KERNEL_PKG_NAME="$kernel_name-$KERNEL"
+		KERNEL_DEBUGINFO_PKG_NAME="$kernel_name-debuginfo-$KERNEL"
+
+		# strip-off the "+debug" and "+64k" suffix if present
+		export KERNEL_DEBUGINFO_PKG_NAME=${KERNEL_DEBUGINFO_PKG_NAME%[+.]*}
+		export KERNEL_PKG_NAME=${KERNEL_PKG_NAME%[+.]*}
+
+		if cki_is_kernel_automotive; then
+			export KERNEL_PKG_NAME="kernel-automotive-$KERNEL"
+			export KERNEL_DEBUGINFO_PKG_NAME="kernel-automotive-debuginfo-$KERNEL"
 		fi
+
 		rlLog "Variables:"
 		rlLog "KERNEL = $KERNEL"
 		rlLog "KERNEL_PKG_NAME = $KERNEL_PKG_NAME"
 		rlLog "KERNEL_DEBUGINFO_PKG_NAME = $KERNEL_DEBUGINFO_PKG_NAME"
 		rpmquery $KERNEL_DEBUGINFO_PKG_NAME
 		if [ $? -ne 0 ]; then
-	                INSTALL_CMD="debuginfo-install -y"
-	                if cki_is_kernel_automotive; then
-	                    INSTALL_CMD="rpm-ostree -A --idempotent --allow-inactive install"
-		        else
-			    # we need to install debuginfo for the proper kernel
-			    # but sometimes, debuginfo-install is not available!
-			    which debuginfo-install || rlRun "yum -y install yum-utils dnf-utils" 0 "Installing {yum,dnf}-utils (it has not been present)"
-	                fi
-	                rlRun "$INSTALL_CMD $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing ($KERNEL_DEBUGINFO_PKG_NAME) via ($INSTALL_CMD)"
+			INSTALL_CMD="debuginfo-install -y"
+			if cki_is_kernel_automotive; then
+				INSTALL_CMD="rpm-ostree -A --idempotent --allow-inactive install"
+			else
+				# we need to install debuginfo for the proper kernel
+				# but sometimes, debuginfo-install is not available!
+				which debuginfo-install || rlRun "yum -y install yum-utils dnf-utils" 0 "Installing {yum,dnf}-utils (it has not been present)"
+			fi
+			rlRun "$INSTALL_CMD $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing ($KERNEL_DEBUGINFO_PKG_NAME) via ($INSTALL_CMD)"
 		fi
 		rpmquery $KERNEL_DEBUGINFO_PKG_NAME
 		if [ $? -ne 0 ]; then
@@ -254,33 +246,21 @@ rlJournalStart
 		fi
 
 		rlRun "pushd $TmpDir >/dev/null"
-		rlRun "perf test list |& tee tests.list" 0 "We will run the following tests:"
+		rlRun "perf test list |& perl -pe 's/ \(exclusive\)$//' | tee tests.list" 0 "We will run the following tests:"
 	rlPhaseEnd
 
-	read line < tests.list
-	NEXT_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
-	NEXT_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
-
-	# skip the first line as it was already parsed
-	tail -n +2 tests.list | while true; do
+	while read line; do
 		CURRENT_TEST="$line"
 		# we found the end of the file
 		test -n "$CURRENT_TEST" || break
 
-		# take the parsed data
-		TEST_NUMBER="$NEXT_NUMBER"
-		TEST_DESC="$NEXT_DESC"
-		TEST_PATTERNS="-e \"$TEST_DESC\""
+		# parse the line
+		TEST_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
+		TEST_DESC="`echo $line | perl -pe 's/^\d+:\s//'`"
+		#TEST_PATTERNS="-e \"$TEST_DESC\""
 
-		# parse the possibile subtests for pattern matching, store the next test
-		while read line; do
-			NEXT_NUMBER="`echo $line | perl -ne 'print $1 if /^(\d+):\s/'`"
-			NEXT_DESC="`echo $line | perl -pe 's/^(:?\d+:)+\s//'`"
-
-			# we found a testcase, not the subtest
-			test -z "$NEXT_NUMBER" || break
-			TEST_PATTERNS+=" -e \"$NEXT_DESC\""
-		done
+		# skip in case of subtest
+		test -z $TEST_NUMBER && continue
 
 		rlPhaseStart FAIL "TEST #$TEST_NUMBER : $TEST_DESC"
 			if check_allowlisted "$TEST_DESC"; then
@@ -290,7 +270,7 @@ rlJournalStart
 				RETVAL=$?
 				rlLog "$(cat $TEST_NUMBER.log)"
 				# use eval to correctly interpret the patters, -F to not match regex characters
-				RESULT=`eval grep -F "$TEST_PATTERNS" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
+				RESULT=`eval cat $TEST_NUMBER.log | grep -E '[0-9]+(\.[0-9]+)?:' | awk -F':' '{print $NF}'| tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
 				printf "%8s -- %s\n" $RESULT "$CURRENT_TEST" | tee -a results.log
 
 				# search for successful report, not fail for testcase with subtests
@@ -307,7 +287,7 @@ rlJournalStart
 				sysctl kernel.perf_event_max_sample_rate=$ORIGINAL_SAMPLE_RATE
 			fi
 		rlPhaseEnd
-	done
+	done < tests.list
 
 	# bz1414043 coverage
 	rlPhaseStartTest "bz1414043 coverage -- \"Session topology\" test fails with some CPUs disabled"

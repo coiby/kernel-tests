@@ -24,7 +24,7 @@ description: |
         Execution of a case with a pass result will have the following entry in the executor log.
         :: ./run.sh -t  $case :: PASS ::
 
-        If all cases executed with a result of pass then the following entry shall appear in the executor log.
+        If no cases executed with a result of FAIL then the following entry shall appear in the executor log.
         overall result: PASS
 
     Results location:
@@ -49,3 +49,10 @@ require:
 extra-summary: rt-tests/rt_ltp
 extra-task: rt-tests/rt_ltp
 id: 0e4c6f26-c0cd-4d3d-8f64-8597fdd1909c
+adjust+:
+    - environment+:
+          RTLTP_PROFILE: ridesx4
+      when: hw_target == ridesx4
+    - environment+:
+          RTLTP_PROFILE: rcar_s4
+      when: hw_target == rcar_s4

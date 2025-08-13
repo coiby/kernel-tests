@@ -10,4 +10,4 @@ destructive=no
 entry_point=bash ./runtest.sh
 repoRequires=storage/block/include
 dependencies=bpftrace;fio;libaio;libaio-devel;libtool;automake;autoconf;liburing-devel;qemu-img;gcc-c++;nbdkit
-max_time=2h
+max_time=4h

@@ -20,6 +20,6 @@ extra-summary: standards/usex
 extra-task: standards/usex
 enabled: true
 duration: 60m
-adjust:
+adjust+:
+  - when: arch == s390x
     enabled: false
-    when: arch == s390x

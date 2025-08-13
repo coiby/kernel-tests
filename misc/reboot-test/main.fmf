@@ -1,0 +1,7 @@
+summary: Reboot a machine and check for call traces
+contact: Bruno Goncalves <bgoncalv@redhat.com>
+test: chmod a+x ./runtest.sh; ./runtest.sh
+framework: shell
+duration: 30m
+tag:
+  - KernelTier1

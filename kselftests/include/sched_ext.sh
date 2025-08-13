@@ -38,7 +38,8 @@ do_sched_ext_run()
     for _test in $(grep '^sched_ext' kselftest-list.txt); do
         rlPhaseStartTest "$_test"
         dmesg -C
-        rlRun "sched_ext/runner -t ${_test/sched_ext:/}"
+        rlRun "sched_ext/runner -t ${_test/sched_ext:/}" 2>&1 | tee ${_test}.log
+        rlAssertGrep "FAILED:\s+0" "${_test}.log" -P
         rlRun "dmesg"
         rlPhaseEnd
     done

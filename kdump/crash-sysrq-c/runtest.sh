@@ -18,4 +18,11 @@
 . ../include/runtest.sh
 
 # --- start ---
+if [ -z "$TMT_TEST_RESTART_COUNT" ] || [ "$TMT_TEST_RESTART_COUNT" = 0 ]; then
+    # Delete /tmp/rstrntsync.sock beforehand otherwise rstrnt-sync will fail
+    # with the error "Failed to connect: Connection refused"
+    if [ -n "$TMT_TEST_RESTART_COUNT" ] && echo "${CLIENTS}" | grep -qi "${HOSTNAME}"; then
+        rm -f /tmp/rstrntsync.sock
+    fi
 Multihost SystemCrashTest TriggerSysrqC
+fi

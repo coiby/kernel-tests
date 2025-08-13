@@ -1,0 +1,44 @@
+#block/034 it may cause false positive since kernel may use memory for lots of reasons such as page cache, buffer cache, ...dentry cache, all these may reduce MemFree
+# loop/010 RHEL-56242
+# block/032 RHEL-88003
+BLK="block/001 block/002 block/006 block/007 block/009 block/010 block/016 block/017 block/018 block/020 block/021 block/022 block/023 block/024 block/025 block/027 block/028 block/029 block/031 block/032 block/035 block/037 block/038 loop/001 loop/002 loop/003 loop/004 loop/005 loop/006 loop/007 loop/008 loop/009 loop/011 scsi/004 scsi/005 scsi/007 zbd/001 zbd/002 zbd/003 zbd/004 zbd/005 zbd/006 zbd/008 zbd/011 md/001"
+#block/010 take long time on debug kernel
+uname -r | grep -q debug && BLK=${BLK//block\/010 /}
+uname -r | grep -qE "s390x|ppc64le|debug" && BLK=${BLK//block\/024 /}
+uname -r | grep -qE "ppc64le|64k" && BLK=${BLK//block\/032 /}
+uname -r | grep -q debug && BLK=${BLK//loop\/003 /}
+
+NVME_LOOP="nvme/002 nvme/003 nvme/004 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/016 nvme/017 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/051 nvme/052 nvme/054 nvme/057 nvme/058"
+# block/032 RHEL-88003
+uname -r | grep -qE "ppc64le|64k" && NVME_LOOP=${NVME_LOOP//nvme\/012 /}
+uname -r | grep -qE "64k" && NVME_LOOP=${NVME_LOOP//nvme\/045 /}
+# RHEL-74462
+uname -r | grep -qE "s390x\+debug" && NVME_LOOP=${NVME_LOOP//nvme\/040 /}
+
+NVME_TCP="nvme/003 nvme/004 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/047 nvme/048 nvme/051 nvme/054 nvme/057 nvme/058 nvme/061 nvme/062"
+# RHEL-84825 nvme/014 nvme/018 nvme/019 nvme/023 nvme/026 nvme/047 failed on 6.12.*aarch64+rt-64k
+uname -r | grep -q 6.1.*rt && NVME_TCP="nvme/003 nvme/004 nvme/006 nvme/008 nvme/010 nvme/012 nvme/021 nvme/022 nvme/025 nvme/027 nvme/028 nvme/029 nvme/030 nvme/031 nvme/038 nvme/040 nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/048 nvme/051 nvme/054 nvme/057 nvme/058 nvme/061 nvme/062"
+# block/032 RHEL-88003
+uname -r | grep -qE "ppc64le|64k" && NVME_TCP=${NVME_TCP//nvme\/012 /}
+# RHEL-74462
+uname -r | grep -qE "s390x\+debug" && NVME_TCP=${NVME_TCP//nvme\/014 /} && NVME_TCP=${NVME_TCP//nvme\/057 /}
+# RHEL-33441
+uname -r | grep -qE "aarch64" && NVME_TCP=${NVME_TCP//nvme\/014 /}
+# RHEL-88145
+uname -r | grep -q "64k" && NVME_TCP=${NVME_TCP//nvme\/045 /} && NVME_TCP=${NVME_TCP//nvme\/047 /}
+uname -r | grep -q "debug" && NVME_TCP=${NVME_TCP//nvme\/058 /}
+
+# nvme/041 failed on RHEL10.0
+# nvme/031 RHEL-66871
+# nvme/014 RHEL-33441
+NVME_FC="nvme/003 nvme/004 nvme/006 nvme/008 nvme/010 nvme/012 nvme/014 nvme/018 nvme/019 nvme/021 nvme/022 nvme/023 nvme/025 nvme/026 nvme/027 nvme/028 nvme/029 nvme/030 nvme/038 nvme/040 nvme/042 nvme/043 nvme/044 nvme/045 nvme/048 nvme/051 nvme/054 nvme/057 nvme/058"
+uname -r | grep -qE "ppc64le|64k" && NVME_FC=${NVME_FC//nvme\/012 /}
+uname -r | grep -qE "64k" && NVME_FC=${NVME_FC//nvme\/045 /}
+uname -r | grep -qE "aarch64" && NVME_TCP=${NVME_TCP//nvme\/014 /}
+
+UBLK="ublk/001 ublk/002 ublk/003 ublk/004 ublk/005 ublk/006"
+
+THROTL="throtl/001 throtl/002 throtl/003 throtl/004 throtl/005 throtl/006"
+# RHEL-88174 throtl/006 lead OOM on s390x+debug kernel
+# RHEL-88706
+uname -r | grep -qE "aarch64\+debug|x86_64\+debug|s390x\+debug" && THROTL=${THROTL//throtl\/006/}

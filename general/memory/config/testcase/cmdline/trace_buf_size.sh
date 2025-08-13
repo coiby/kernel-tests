@@ -36,24 +36,26 @@ function trace_buf_size()
 	#rhel6 not backport this regression. only check on rhel7,8 x86_64 which have journalctl.
 
 	if rlIsRHEL 6; then
-		return
+		rlLog "Only for rhel > 6"
+		rstrnt-report-result "${FUNCNAME[0]}-is_rhel6" SKIP
+		return 0
 	fi
 	if [ "$(rlGetPrimaryArch)" != "x86_64" ]; then
 		rlLog "Only for x86_64"
-		return
+		rstrnt-report-result "${FUNCNAME[0]}-not_x86_64" SKIP
+		return 0
 	fi
 
 	cpus=$(grep -w processor /proc/cpuinfo | wc -l)
-	mem_total_K=$(awk -e '/^MemTotal:/ { print $2}' /proc/meminfo)
 	early_mem_K=$(journalctl -kb | awk -e '/Memory:/ {split(toupper($7), array, "K"); print array[1]}')
 	dmi_total_mem=$(dmidecode -t 17 | grep -e 'Form Factor: DIMM' -B1 --no-group-separator | awk -e '/[[:digit:]]/ {sum+=$2; unit=$3} END{print sum" "unit}')
 	total_mem=$(echo $dmi_total_mem | awk -e '{if ($2 == "MB") print $1/1024; else print $1}')
 	mem_early_B=$(($early_mem_K * 1024))
-	mem_total_B=$(($mem_total_K * 1024))
 
 	if  [ $total_mem -lt $cpus ]; then
-		rlReport "trace_buf_size: do not have enough memroy!, skipped." SKIP
-		return
+		rlLog "total_mem $total_mem < cpus $cpus"
+		rstrnt-report-result "${FUNCNAME[0]}-total_mem" SKIP
+		return 0
 	fi
 	per_core_buf=$(($mem_early_B/$cpus))
 
@@ -64,4 +66,5 @@ function trace_buf_size()
 	setup_cmdline_args "trace_buf_size=$per_core_buf trace_event=sched:*" trace_buf
 	sleep 60
 	cleanup_cmdline_args "trace_buf_size trace_event" trace_buf
+	return 0
 }

@@ -249,6 +249,10 @@ EOF
     export KERNELARGVERSION
     export KERNELARGVARIANT
 
+    if [ -n "$KERNELARGEXTRAMODULES" ]; then
+      export KERNELARGEXTRAMODULES
+    fi
+
     logmsg "prepare_for_kernelinstall end"
 }
 

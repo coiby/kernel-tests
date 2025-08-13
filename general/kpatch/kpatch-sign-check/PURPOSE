@@ -1,3 +1,0 @@
-Description:Add kpatch sign check
-Author: xiaoli feng <xifeng@redhat.com>
-Before run this task,you must run the task "/kernel/RHEL7/kpatch/kpatch-download-install"

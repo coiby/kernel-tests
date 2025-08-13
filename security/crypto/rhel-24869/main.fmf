@@ -8,5 +8,6 @@ test: bash +x runtest.sh
 framework: beakerlib
 require: [gcc, make]
 duration: 10m
+tag: NoRHIVOS
 extra-summary: /kernel-tests/security/crypto/rhel-24869
 extra-task: /kernel-tests/security/crypto/rhel-24869

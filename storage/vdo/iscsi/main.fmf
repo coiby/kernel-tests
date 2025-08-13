@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/vdo/iscsi
 extra-task: /storage/vdo/iscsi
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro > rhel-8
 id: C8A5933F-DDBA-45B3-B04D-C64449EF7665

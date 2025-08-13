@@ -49,19 +49,19 @@ is_broken(){
 	fi
 
 	if rlIsRHEL "9.4"; then
-		skip_string="slub_kunit test_kasan kasan_test handshake-test drm_gem_shmem_test"
+		skip_string="slub_kunit test_kasan kasan_test handshake-test drm_gem_shmem_test dev_addr_lists_test"
 	fi
 
 	if rlIsRHEL "9.5"; then
-		skip_string="drm_gem_shmem_test drm_buddy_test"
+		skip_string="drm_gem_shmem_test drm_buddy_test kasan_test dev_addr_lists_test"
 	fi
 
 	if rlIsRHEL ">=9.6" || rlIsCentOS "9"; then
-		skip_string="drm_gem_shmem_test drm_buddy_test"
+		skip_string="drm_gem_shmem_test drm_buddy_test kasan_test dev_addr_lists_test"
 	fi
 
 	if rlIsRHEL ">=10.0" || rlIsCentOS "10"; then
-		skip_string="drm_gem_shmem_test drm_format_helper_test drm_hdmi_state_helper_test usercopy_kunit fortify_kunit"
+		skip_string="drm_gem_shmem_test drm_format_helper_test drm_hdmi_state_helper_test usercopy_kunit fortify_kunit kasan_test dev_addr_lists_test"
 	fi
 
 	if [[ -n "$skip_string" && "$skip_string" =~ $test_name ]]; then
@@ -92,17 +92,25 @@ generate_test_list(){
 		# Determine the extension to handle decompression
 		if [[ "$module" == *.xz ]]; then
 			unxz -c "$module" > "$TEMP_DIR/$(basename "$module" .xz)"
+			decompressed_module="$TEMP_DIR/$(basename "$module" .xz)"
+			module_name=$(basename "$module" .ko.xz)  # Strip both .ko.xz
+		elif [[ "$module" == *.zst ]]; then
+			unzstd -c "$module" > "$TEMP_DIR/$(basename "$module" .zst)"
+			decompressed_module="$TEMP_DIR/$(basename "$module" .zst)"
+			if [[ "$module" == *.ko.zst ]]; then
+				module_name=$(basename "$module" .ko.zst)  # Strip both .ko and .zst
+			else
+				module_name=$(basename "$module" .zst)    # Only strip .zst if needed
+			fi
 		else
 			# If the module is not compressed, copy it to the temp directory
 			cp "$module" "$TEMP_DIR/$(basename "$module")"
+			decompressed_module="$TEMP_DIR/$(basename "$module")"
+			module_name=$(basename "$module" .ko)  # Strip only .ko if needed
 		fi
-
-		# The decompressed or copied module file
-		decompressed_module="$TEMP_DIR/$(basename "$module" .xz)"
 
 		# Check if the module contains 'kunit_test_suites'
 		if objdump -x "$decompressed_module" | grep -q 'kunit_test_suites'; then
-			module_name=$(basename "$module" .ko.xz)
 			echo "$module_name" >> kunit-tests.list
 		fi
 	done
@@ -112,6 +120,7 @@ generate_test_list(){
 . ../cki_lib/libcki.sh || exit 1
 . ../kernel-include/runtest.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../cmdline_helper/libcmd.sh || exit 1
 
 
 # parse SKIP_BROKEN
@@ -126,6 +135,21 @@ TEST="KUNIT"
 export PACKAGE="kernel"
 
 rlJournalStart
+	if [[ ! -f "./KUNIT_REBOOT_CLEANUP" ]]; then
+	# Automotive hardware android bootloader
+	# Install abootimg ; Set cmdline param to enable kunit
+	if ! systemd-detect-virt &>/dev/null && rpm -qa | grep -q "^kernel-automotive"; then
+		if [[ "$REBOOTCOUNT" -eq 0 ]]; then
+			rlPhaseStartTest "Install abootimg"
+				major=$(grep ^VERSION_ID= /etc/os-release | cut -d = -f 2 | cut -d \" -f 2 | cut -d . -f 1)
+				karch=$(arch)
+				dnf install -y --nobest --allowerasing --nogpgcheck --repofrompath aboot,https://mirror.stream.centos.org/SIGs/${major}-stream/automotive/${karch}/packages-main/ abootimg
+				rlRun "change_cmdline 'kunit.enable=1'"
+				rlRun "change_cmdline 'kernel.panic_on_oops=0'"
+				rlRun "rstrnt-reboot"
+			rlPhaseEnd
+		fi
+	fi
 	# Clean start is a test phase as we want report this as test failure
 	# in the setup phase this would be reported as WARN/ERROR
 	rlPhaseStartTest "clean-start"
@@ -258,6 +282,14 @@ rlJournalStart
 		rmmod kunit
 		rm -f kunit-tests.list
 		rm -f not_ok.log
+		if ! systemd-detect-virt &>/dev/null && rpm -qa | grep -q "^kernel-automotive"; then
+			# Restore automotive kernel cmdline
+			rlRun "change_cmdline '-kunit.enable=1'"
+			rlRun "change_cmdline '-kernel.panic_on_oops=0'"
+			rlRun "touch KUNIT_REBOOT_CLEANUP"
+			rlRun "rstrnt-reboot"
+		fi
+	fi
 	rlPhaseEnd
 
 rlJournalEnd

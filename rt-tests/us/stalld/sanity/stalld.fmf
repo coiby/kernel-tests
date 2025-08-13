@@ -7,18 +7,18 @@ path: /rt-tests/us/stalld/sanity
 test: bash ./runtest.sh
 framework: shell
 require:
-  - realtime-tests
   - python3
   - stalld
   - gcc
+recommend:
+  - realtime-tests
+  - rt-tests
 duration: 40m
-extra-summary: /rt-tests/us/stalld/sanity
-extra-task: /rt-tests/us/stalld/sanity
 environment:
   ACTION: TEST
 tag: NoRHIVOS
 enabled: true
-adjust:
-  enabled: false
-  when: arch != x86_64
+adjust+:
+  - enabled: false
+    when: arch != x86_64
 id: 963acae9-9ad5-4667-99b1-9345577d9a23

@@ -21,8 +21,10 @@
 export TEST        := /kernel/kdump/reg-bz1731578-function-tracer
 export TESTVERSION := 1.0
 
-# Include Common Makefile
-include /usr/share/rhts/lib/rhts-make.include
+
+# Common VARs from rhts makefile
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
 
 .PHONY: build clean run
 

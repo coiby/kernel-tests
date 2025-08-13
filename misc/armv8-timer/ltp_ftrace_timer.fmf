@@ -1,0 +1,32 @@
+summary: Verify that LTP timer tests exercise arm_arch_timer driver via ftrace
+description: |
+    This test compiles and runs two LTP timer-related test cases:
+    - timer_create01
+    - futex_wait05
+
+    It sets up function-level ftrace tracing and verifies that the
+    `arch_timer_handler_phys` and `arch_timer_set_next_event_phys` functions
+    are invoked. These confirm that the arm_arch_timer driver is responsible
+    for handling timer expiration and scheduling on the platform.
+
+    The script:
+      - Clones LTP sources
+      - Builds only the specified tests (no full LTP install)
+      - Configures ftrace
+      - Runs each test and captures traces
+      - Parses the trace log to confirm function invocation
+
+    Expected result:
+        [   PASS   ] :: timer_create01 executed
+        [   PASS   ] :: arch_timer_handler_phys was called
+        [   PASS   ] :: arch_timer_set_next_event_phys was called
+        [   PASS   ] :: futex_wait05 executed
+        [   PASS   ] :: arch_timer_handler_phys was called
+        [   PASS   ] :: arch_timer_set_next_event_phys was called
+        OVERALL RESULT: PASS
+contact: Rakesh Musalay <rmusalay@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 10m
+enabled: true
+id: 2366cc3d-7621-4017-8980-981d3b3d5d14

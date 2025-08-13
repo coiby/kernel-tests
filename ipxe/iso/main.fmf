@@ -14,7 +14,7 @@ require:
   - libvirt
   - qemu-kvm
   - virt-install
-adjust:
-  - enable: false
+adjust+:
+  - enabled: false
     when: arch != x86_64
 duration: 1h

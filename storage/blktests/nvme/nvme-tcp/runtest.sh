@@ -10,7 +10,11 @@ CASE_TYPE=NVME_TCP
 
 function main
 {
-	enable_nvme_core_multipath
+	if rlIsRHEL 9 || rlIsCentOS 9 || rlIsFedora; then
+		enable_nvme_core_multipath
+	elif rlIsRHEL 10 || rlIsCentOS 10; then
+		install_ktls_utils
+	fi
 
 	ret=0
 	test_ws="${CDIR}"/blktests

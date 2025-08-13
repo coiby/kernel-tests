@@ -1,0 +1,45 @@
+description: |
+  Fuzz enabled system calls.
+  Test inputs:
+      A list with the system calls to be fuzzed, and a fuzzer program
+      called syzkaller. Input details:
+      - System call list from RA documentation.
+      - syzkaller code: https://github.com/google/syzkaller
+      - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
+  Expected results:
+      If the system calls are executed without incident during the test runtime,
+      the following output should be expected:
+      [   LOG    ] :: Test duration was [time] seconds.
+      [   PASS   ] :: No crash results found.
+      [   PASS   ] :: [syscall_name] executed.
+  Results location:
+      output.txt
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+component:
+  - kernel
+framework: beakerlib
+require:
+  - make
+  - gcc
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gcc-c++
+  - wget
+  - git
+  - patch
+  - rtla
+  - sshpass
+  - tar
+  - tmux
+  - type: file
+    pattern:
+        - /kernel-include
+        - /syzkaller
+        - /misc/all-syscalls-fuzzing
+duration: 3h
+environment:
+    time: 3600
+    git_patches: '../misc/all-syscalls-fuzzing/all-syscalls-fuzzing.patch'
+    RHIVOS_LATENCY_THRES: 50000
+    FUZZ_IN_QM: y

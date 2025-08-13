@@ -26,7 +26,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
 # Enable TMT testing for RHIVOS
@@ -110,7 +109,7 @@ function test_setup()
 	# rpm -q util-linux || yum -y install util-linux
 	which trinity && return
 	# Can't clone in beaker env when automation. prepare the head into lookaside
-	# rlRun "git clone https://github.com/kernelslacker/trinity.git" 0-255
+	# rlRun "git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/trinity" 0-255
 	test -d testversion || get_lookaside
 	patch_apply
 	rlRun "pushd $testversion"

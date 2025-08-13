@@ -1,0 +1,21 @@
+From 85de8c34543ff3629312aa517e71c66a65966dd9 Mon Sep 17 00:00:00 2001
+From: Charles Shi <schrht@gmail.com>
+Date: Thu, 27 Mar 2025 21:19:07 -0400
+Subject: [PATCH 1/4] Correct the permissions on run_auto.sh
+
+---
+ testcases/realtime/func/hrtimer-prio/run_auto.sh | 0
+ testcases/realtime/func/measurement/run_auto.sh  | 0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 testcases/realtime/func/hrtimer-prio/run_auto.sh
+ mode change 100644 => 100755 testcases/realtime/func/measurement/run_auto.sh
+
+diff --git a/testcases/realtime/func/hrtimer-prio/run_auto.sh b/testcases/realtime/func/hrtimer-prio/run_auto.sh
+old mode 100644
+new mode 100755
+diff --git a/testcases/realtime/func/measurement/run_auto.sh b/testcases/realtime/func/measurement/run_auto.sh
+old mode 100644
+new mode 100755
+-- 
+2.49.0
+

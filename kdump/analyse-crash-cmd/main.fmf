@@ -39,10 +39,6 @@ component:
   - crash
 test: chmod a+x ./runtest.sh; ./runtest.sh
 framework: shell
-require:
-  - crash
-recommend:
-  - kernel-debuginfo
 duration: 300m
 extra-summary: /kernel/kdump/analyse-crash-cmd
 extra-task: /kernel/kdump/analyse-crash-cmd
@@ -50,10 +46,18 @@ extra-task: /kernel/kdump/analyse-crash-cmd
 /common_analyse:
     environment:
       TESTARGS: analyse-crash-common.sh
+    require:
+      - crash
+    recommend:
+      - kernel-debuginfo
 
 /simple_analyse:
     environment:
       TESTARGS: analyse-crash-simple.sh
+    require:
+      - crash
+    recommend:
+      - kernel-debuginfo
 
 /simple_check:
     environment:

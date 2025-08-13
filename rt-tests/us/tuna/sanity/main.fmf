@@ -1,0 +1,7 @@
+summary: Basic/Sanity test for tuna
+description: |
+    Unit test for the tuna userspace package.
+contact: Qiao Zhao <qzhao@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 10m

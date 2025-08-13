@@ -23,7 +23,7 @@ environment:
     DMA_MODNAME: idxd
 duration: 20m
 enabled: true
-adjust:
+adjust+:
   - enabled: false
     when: distro < rhel9 or arch != x86_64
 extra-summary: /kernel/hw-enablement/dmaengine/idxd

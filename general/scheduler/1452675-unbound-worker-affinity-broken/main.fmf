@@ -1,0 +1,13 @@
+summary: 1452675 regression test
+contact: Chunyu Hu <chuhu@redhat.com>
+id: bee8ffe4-2eed-4ee6-aaf7-f54234282b28
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+duration: 30m
+extra-summary: /kernel/general/scheduler/1452675-unbound-worker-affinity-broken
+extra-task: /kernel/general/scheduler/1452675-unbound-worker-affinity-broken

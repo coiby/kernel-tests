@@ -53,6 +53,15 @@ is_fedora()
     fi
 }
 
+is_rhel10()
+{
+    local ret=0
+
+    is_rhel "10"
+    ret=$?
+    return $ret
+}
+
 is_rhel9()
 {
     local ret=0
@@ -118,6 +127,12 @@ install_kernel_devel()
     package_install ${devel}-${kver}-${krel}
 }
 
+function download_srpm()
+{
+    dnf download --source kernel-${kver}-${krel} \
+        || wget ${BUILDS_URL}/kernel/${kver}/${krel}/src/kernel-${kver}-${krel}.src.rpm
+}
+
 rhel10_build_selftests_modules()
 {
     is_rhel "10" && build_selftests_modules
@@ -128,7 +143,14 @@ build_selftests_modules()
     local ret=0
 
     rpm -q kernel-devel-$(uname -r) || install_kernel_devel
-    pushd ${LIVEPATCH_TEST_MODULES}
+    download_srpm
+    rpm -ivh kernel-${kver}-${krel}.src.rpm
+    cd $HOME/rpmbuild/SPECS
+    dnf builddep -y ./kernel.spec
+    rpmbuild -bp kernel.spec
+
+    LIVEPATCH_TEST_MODULES="$HOME/rpmbuild/BUILD/kernel-${kver}-${krel}/linux-${kver}-${krel}.${karch}/tools/testing/selftests/livepatch"
+    cd ${LIVEPATCH_TEST_MODULES}
     if [ "${karch}" == "s390x" ]; then
         OPT="SRCARCH=s390"
     elif [ "${karch}" == "ppc64le" ]; then
@@ -136,9 +158,9 @@ build_selftests_modules()
     else
         OPT=""
     fi
-    make -C test_modules ${OPT} modules
+    make ${OPT}
     ret=$?
-    popd
+
     return $ret
 }
 

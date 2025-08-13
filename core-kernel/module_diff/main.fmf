@@ -13,4 +13,5 @@ environment:
 # ---------------------
 
 tag:
+  - KernelTier1
   - KT1-9

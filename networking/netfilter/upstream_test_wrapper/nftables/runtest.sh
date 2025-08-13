@@ -14,7 +14,11 @@ rlJournalStart
 		rlRun "pushd nftables/tests/shell"
 		# If tests are executed in parallel, a tainted kernel can cause other reports to show as TAINTED,
 		# making it unclear which test originally lead to taint
-		rlRun "NFT_TEST_JOBS=1 bash run-tests.sh"
+		rlRun "NFT_TEST_JOBS=1 bash run-tests.sh -k"
+		rlRun "popd"
+		rlRun "pushd /tmp"
+		rlRun "tar -czhf nft-test.latest.logs.tar.gz nft-test.latest.$USER"
+		rlFileSubmit nft-test.latest.logs.tar.gz
 		rlRun "popd"
 	rlPhaseEnd
 
@@ -27,6 +31,9 @@ rlJournalStart
 	rlPhaseStartTest "nftables/tests/py"
 		rlRun "pushd nftables/tests/py"
 		rlRun "python nft-test.py"
+		rlRun "popd"
+		rlRun "pushd /tmp"
+		rlFileSubmit nftables-test.log nftables-py-test.log
 		rlRun "popd"
 	rlPhaseEnd
 

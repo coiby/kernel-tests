@@ -1,0 +1,19 @@
+summary: SCHED_DEADLINE runtime overrun signal delivery with service thread
+description: signalling SCHED_DEADLINE process runtime overrun under service thread
+    architecture for signal handling
+contact: Evgeni Vakhonin <evakhoni@redhat.com>
+component:
+  - kernel
+path: /general/scheduler/runtime_overrun_multithreaded
+test: bash -x ./runtest.sh
+framework: shell
+require:
+  - gcc
+  - libgcc
+  - type: file
+    pattern:
+      - /kernel-include
+duration: 5m
+extra-summary: /general/scheduler/runtime_overrun_multithreaded
+extra-task: /general/scheduler/runtime_overrun_multithreaded
+id: 329354e5-bfb8-4514-9986-72d24db9731f

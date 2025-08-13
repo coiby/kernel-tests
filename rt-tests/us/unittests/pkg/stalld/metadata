@@ -1,6 +1,6 @@
 [General]
 name=rt-tests/us/unittests/pkg/stalld
-owner=Waylon Cude <wcude@redhat.com>
+owner=Chang Yin <cyin@redhat.com>
 description=Unittest case for stalld
 license=GPLv2
 confidential=no

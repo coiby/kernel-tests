@@ -1,0 +1,33 @@
+summary: Functional tests for the LSM-based SELinux security module
+description: |+
+    This TC runs a functional test suite for the LSM-based SELinux security module.
+
+contact: Milos Malik <mmalik@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - git
+  - rpm
+extra-summary: packages/selinux-policy/serge-testsuite
+extra-task: packages/selinux-policy/serge-testsuite
+tag: KernelAutomotiveTier1
+duration: 1h
+# set avc check back to default that is disabled
+# until there is a better solution:
+# https://github.com/teemtee/tmt/issues/3611
+check-:
+  - how: avc
+check+:
+  - how: avc
+    enabled: false
+adjust+:
+  # set avc check back to default that is disabled
+  # until there is a better solution:
+  # https://github.com/teemtee/tmt/issues/3611
+  - when: check-result == info
+    check-:
+      - how: avc
+        result: info
+    check+:
+      - how: avc
+        enabled: false

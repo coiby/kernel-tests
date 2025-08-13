@@ -38,7 +38,7 @@ function runtest()
    # verify help page
     oneliner "rtla timerlat --help"
     # rtla-timerlat top test: verify -s/--stack
-    oneliner "rtla timerlat top -s 3 -T 10 -t"
+    oneliner "rtla timerlat top -s 3 -T 10 -t -d 30s"
     # rtla-timerlat top test: verify -P/--priority
     oneliner "rtla timerlat top -P F:1 -c 0 -d 1M -q"
     # rtla-timerlat top test in nanoseconds

@@ -39,31 +39,11 @@ FILES=$(METADATA) runtest.sh Makefile
 .PHONY: all clean build
 
 run: $(FILES) build
-	( set +o posix; . /usr/bin/rhts_environment.sh; \
-		. /usr/share/beakerlib/beakerlib.sh; \
-		. runtest.sh )
+	./runtest.sh
 
 build: $(BUILT_FILES)
 	test -x runtest.sh || chmod a+x runtest.sh
 
 clean:
 	rm -fr *~ $(BUILT_FILES)
-
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Ping Fang <pifang@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     DAMON verification" >> $(METADATA)
-	@echo "Type:            Function" >> $(METADATA)
-	@echo "TestTime:        20m" >> $(METADATA)
-	@echo "Requires:        gcc git make python3 python3-pip perf" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	rhts-lint $(METADATA)
 

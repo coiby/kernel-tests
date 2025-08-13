@@ -1,0 +1,19 @@
+summary: KS-TC:nvme_rdma/hardtarget/nvmeof_rdma_nvme_resv_test
+description: nvmeof rdma nvme resv-report with NETAPP E5700
+contact: Yi Zhang <yizhan@redhat.com>
+component:
+  - kernel
+path: /storage/nvme_rdma/hardtarget/nvmeof_rdma_nvme_resv_test
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - beakerlib-redhat
+require:
+  - nvme-cli
+  - uuid
+duration: 1h
+tag:
+  - regression
+tier: 1
+extra-summary: /storage/nvme_rdma/hardtarget/nvmeof_rdma_nvme_resv_test
+extra-task: /storage/nvme_rdma/hardtarget/nvmeof_rdma_nvme_resv_test

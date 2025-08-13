@@ -9,6 +9,7 @@ tag:
 test: bash ./runtest.sh
 framework: shell
 require:
+  - beakerlib  # the test doesn't use beakerlib framework, but still uses some functions from it. 
   - wget
   - git
   - samba

@@ -10,14 +10,8 @@
 export TEST        := /kernel/kdump/setup-bare-metal
 export TESTVERSION := 4.0
 
-# Include Common Makefile
-RHTS_INCLUDE=$(strip $(wildcard /usr/share/rhts/lib/rhts-make.include))
-ifeq ($(RHTS_INCLUDE),)
-    export TEST_DIR=/mnt/tests$(TEST)
-    export METADATA=testinfo.desc
-else
-    include /usr/share/rhts/lib/rhts-make.include
-endif
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
 
 .PHONY: build clean run
 

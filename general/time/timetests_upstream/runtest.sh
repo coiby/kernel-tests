@@ -9,7 +9,7 @@ clone_upstream_code()
 {
     if [ ! -d timetests ]; then
         git config --global http.sslVerify false
-        git clone https://github.com/linuxqiao/timetests.git
+        git clone https://gitlab.com/redhat/centos-stream/tests/kernel/core/timetests.git --depth=1
     fi
     if [ -d timetests ]; then
         echo "Clone successful."
@@ -24,7 +24,7 @@ install_depends_package()
 {
     echo "Installing rpm(s) $*"
     if [[ $# -gt 0 ]]; then
-        for pkg in $*; do
+        for pkg in "$@"; do
             if stat /run/ostree-booted > /dev/null 2>&1; then
                 rpm -q "$pkg" || rpm-ostree -A --idempotent --allow-inactive install "$pkg" || echo "Install pakcage $pkg failed!"
             else
@@ -42,8 +42,8 @@ check_release_version()
 
 ntp_chrony_service_handling()
 {
-    systemctl $* ntpd || service ntpd $* || true
-    systemctl $* chronyd || service chronyd $* || true
+    systemctl "$@" ntpd || service ntpd "$@" || true
+    systemctl "$@" chronyd || service chronyd "$@" || true
 }
 
 runtest()

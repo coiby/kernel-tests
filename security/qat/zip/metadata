@@ -1,0 +1,13 @@
+[General]
+name=/kernel/security/qat/zip
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=QAT zip tests
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=beakerlib;qatzip;qatlib;qatlib-service;qatengine;gcc;clang;wget;unzip;git;automake;libtool;openssl;openssl-devel;numactl-devel;zlib-devel;pip;bzip2;autoconf;lz4-devel
+softDependencies=nasm;qatlib-devel
+repoRequires=security/qat/include

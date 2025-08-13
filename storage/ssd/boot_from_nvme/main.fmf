@@ -14,7 +14,7 @@ tag:
 tier: 3
 extra-summary: /storage/ssd/boot_from_nvme
 extra-task: /storage/ssd/boot_from_nvme
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: 5f44f805-ac71-49f2-ad91-478273761d32

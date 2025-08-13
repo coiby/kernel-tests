@@ -34,6 +34,8 @@ function rhel6_fatal_issues()
 	osver_in_range "600" "611" && tskip "request_key04 cve-2017-17807" fatal
 	# Bug 1579128 - sched/sysctl: Check user input value of sysctl_sched_time_avg
 	osver_in_range "600" "611" && tskip "sysctl01.*" fatal
+	# RHELTEST-1405: distribution/ltp/generic: VMMTIER1 mmap21_*__with_dmesg_entry "mmap21: command not found"
+	osver_in_range "600" "611" && tskip "mmap21*" fatal
 }
 
 function rhel6_unfix_issues()

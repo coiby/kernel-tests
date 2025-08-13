@@ -36,7 +36,7 @@ contact: Pablo Ridolfi <pridolfi@redhat.com>
 component:
     - kernel
 test: bash ./runtest.sh
-path: /memory/mmra/syzkaller
+path: /syzkaller
 id: 4e9c19c4-ef1a-4503-837d-b6d485cb9157
 framework: beakerlib
 require:
@@ -53,10 +53,11 @@ require:
     - type: file
       pattern:
           - /kernel-include
-          - /memory/mmra/syzkaller
+          - /syzkaller
           - /general/scheduler/scheduler_fuzzing
 environment:
-    mm_syscalls: |
+    SYZKALLER_COMMIT_HASH: "21339d7b9986698282dce93709157dc36907fbf8"
+    main_syscalls: |
         "setpriority",
         "getpriority",
         "sched_setscheduler",
@@ -72,6 +73,7 @@ environment:
         "sched_rr_get_interval",
         "sched_yield",
         "membarrier"
-    supportcalls: ""
-    git_patches: "../../../../general/scheduler/scheduler_fuzzing/sched_ra.patch"
+    support_syscalls: |
+        "getpid"
+    git_patches: "../general/scheduler/scheduler_fuzzing/sched_ra.patch"
 duration: 24h

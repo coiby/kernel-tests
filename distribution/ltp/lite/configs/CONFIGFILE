@@ -119,6 +119,7 @@
 %writetest01	writetest
 %fs_di fs_di -d $TMPDIR
 %fs_racer fs_racer.sh -t 5
+%fsx22 fsx-linux -N 100000
 %quota_remount_test01 quota_remount_test01.sh
 %isofs isofs.sh
 %fs_fill fs_fill

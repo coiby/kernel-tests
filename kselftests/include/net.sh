@@ -20,8 +20,13 @@ install_epel_pkg()
 
 	if [[ "$krelease" =~ ^(8|9|10)$ ]]; then
 		if ! rpm -q --quiet epel-release; then
-			# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-			$pkg_mgr $pkg_mgr_inst_string  https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${krelease}".noarch.rpm
+			cat >> /etc/yum.repos.d/epel.repo << EOF
+[epel]
+name=Extra Packages for Enterprise Linux \$releasever - \$basearch
+metalink = https://mirrors.fedoraproject.org/metalink?repo=epel-\$releasever&arch=\$basearch
+gpgcheck = 0
+enabled = 1
+EOF
 			local need_remove=1
 		else
 			if [ "$pkg_mgr" != "rpm-ostree" ]; then
@@ -30,57 +35,14 @@ install_epel_pkg()
 		fi
 	fi
 
-	if [ "${krelease}" -eq "10" ]; then
-		# epel10 doesn't have netsniff-ng yet, use Felix's repo first
-		$pkg_mgr copr -y enable fmaurer/netsniff
-	fi
+	$pkg_mgr copr -y enable liuhangbin/kselftests
+
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	$pkg_mgr $pkg_mgr_inst_string $param $pkg
 
-	[ "${need_remove}" ] && $pkg_mgr -y remove epel-release
+	[ "${need_remove}" ] && rm -f /etc/yum.repos.d/epel.repo
 
 	rpm -q --quiet $pkg && return 0 || return 1
-}
-
-install_smcroute()
-{
-	which smcroute && return 0
-	dnf copr -y enable liuhangbin/smcroute
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string smcroute
-	which smcroute && return 0 || return 1
-}
-
-install_mtools()
-{
-	which msend && return 0
-	dnf copr -y enable liuhangbin/mtools
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string mcast-tools
-	which msend && return 0 || return 1
-}
-
-install_sendip()
-{
-
-	which sendip && return 0
-	dnf -y copr enable cygn/SendIP
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string sendip
-
-	which sendip && return 0 || return 1
-}
-
-install_scapy()
-{
-	scapy -h && return 0
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	[ "${krelease}" -eq "8" ] && \
-		$pkg_mgr $pkg_mgr_inst_string https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string scapy
-	[ "${krelease}" -eq "8" ] && rpm -e epel-release
-	scapy -h && return 0 || return 1
 }
 
 # Config Networkmanager to ignore network interfaces except default port.
@@ -112,6 +74,7 @@ unset_nm_unmanage()
 set_network_env()
 {
 	set_nm_unmanage
+	run "setenforce 0"
 	return 0
 }
 
@@ -135,18 +98,21 @@ reset_network_env()
 	# call unset_nm_unmanage() here as each reset function will call
 	# reset_network_env()
 	unset_nm_unmanage
+	run "setenforce 1"
 	return 0
 }
 
 do_net_config()
 {
 	set_network_env
+	sysctl_set kernel.io_uring_disabled 0
 
 	pushd "$EXEC_DIR"/net || exit
 	# Fix some known issues
-	# rm 0x10 for fib_rule_tests.sh due to bz1480136
+	# rm 0x10 for fib_rule_tests.sh due to bz1480136 and RHEL-79454
 	# FIXME: should we restore it back after finishing test?
-	sed -i "/0x10/d" /etc/iproute2/rt_dsfield
+	sed -i 's/0x10/#0x10/' /etc/iproute2/rt_dsfield
+	sed -i 's/0x10/#0x10/' /usr/share/iproute2/rt_dsfield
 	# FIXME: sleep 5s before do IPv6 "Using route with mtu metric" test to
 	# pass it. Not sure why ping would fail if not sleep some seconds, need to check
 	sed -i "/via 2001:db8:101::2 mtu 1300/a\\\\tsleep 5" fib_tests.sh
@@ -169,12 +135,16 @@ do_net_config()
 	modprobe -a l2tp_eth l2tp_ip6 l2tp_ip
 	# for net:txtimestamp.sh
 	modprobe sch_netem
+	# for net:ip_local_port_range.sh
+	modprobe sctp
 	# for msg_zerocopy.sh, we don't have UDP zero copy support yet
 	sed -i 's/$0 4 udp -t 1/#$0 4 udp -t 1/' msg_zerocopy.sh
 	sed -i 's/$0 6 udp -t 1/#$0 6 udp -t 1/' msg_zerocopy.sh
 	# txtimestamp.sh do not support IPPROTO_RAW and pf_packet??
 	sed -i 's/run_test_v4v6 ${args} -R/#run_test_v4v6 ${args} -R/' txtimestamp.sh
 	sed -i 's/run_test_v4v6 ${args} -P/#run_test_v4v6 ${args} -P/' txtimestamp.sh
+	# remove python3 shebang for nl_netdev.py and bpf_offload.py
+	find . -type f -name '*.py' -exec sed -i 's/python3 -sP\?/python3/' {} +
 	# incase some test not add exec permission
 	chmod +x ./*.sh
 	popd || exit
@@ -187,10 +157,12 @@ do_net_config()
 do_net_reset()
 {
 	pushd "$EXEC_DIR"/net || exit
+	[ -f log.txt ] && rlFileSubmit log.txt
 	# for test fib-onlink-tests.sh we'd better restore default IPv6 route
 	ip -6 route restore < default_ipv6.route
 	popd || exit
 
+	sysctl_restore kernel.io_uring_disabled
 	reset_network_env
 }
 
@@ -201,8 +173,8 @@ do_net_forwarding_config()
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which tc || $pkg_mgr $pkg_mgr_inst_string iproute-tc
 	install_epel_pkg netsniff-ng || { test_warn "install netsniff for forwarding test failed" && return 1; }
-	install_smcroute || { test_warn "install smcrouted for forwarding test failed" && return 1; }
-	install_mtools || { test_warn "install mtools for forwarding test failed" && return 1; }
+	install_epel_pkg smcroute || { test_warn "install smcroute for forwarding test failed" && return 1; }
+	install_epel_pkg mcast-tools || { test_warn "install mcast-tools for forwarding test failed" && return 1; }
 
 	pushd "$EXEC_DIR"/net/forwarding || exit
 	# RHEL9/10 doesn't support meta
@@ -240,9 +212,45 @@ do_net_forwarding_reset()
 do_net_mptcp_config()
 {
 	set_network_env
+	sysctl_set net.mptcp.enabled 1
 }
 
 do_net_mptcp_reset()
+{
+	sysctl_restore net.mptcp.enabled
+	reset_network_env
+}
+
+do_net_packetdrill_config()
+{
+	set_network_env
+	install_epel_pkg packetdrill || test_warn "Install packetdrill failed"
+}
+
+do_net_packetdrill_run()
+{
+	# Start net packetdrill test
+	local item="net/packetdrill"
+
+	[ ! -d "$EXEC_DIR"/${item} ] && test_skip "No $item test, skip" && return 1
+	pushd "$EXEC_DIR"/${item} || return 1
+	if [ ! -f ksft_runner.sh ]; then
+		test_skip "No ksft_runner.sh for $item test, skip"
+		return 1
+	fi
+
+	local total_tests=$(ls *.pkt)
+
+	for name in ${total_tests}; do
+		rlPhaseStartTest "selftests: ${item}:${name}"
+		rlRun -l "./ksft_runner.sh ${name}"
+		rlPhaseEnd
+	done
+
+	popd || exit
+}
+
+do_net_packetdrill_reset()
 {
 	reset_network_env
 }
@@ -253,10 +261,22 @@ do_netfilter_config()
 
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
 	which conntrack || $pkg_mgr $pkg_mgr_inst_string conntrack-tools
-	install_sendip
 }
 
 do_netfilter_reset()
+{
+	reset_network_env
+}
+
+do_net_netfilter_config()
+{
+	set_network_env
+
+	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
+	which conntrack || $pkg_mgr $pkg_mgr_inst_string conntrack-tools
+}
+
+do_net_netfilter_reset()
 {
 	reset_network_env
 }
@@ -304,18 +324,40 @@ do_bpf_test_progs_config()
 	modprobe nf_conntrack
 	modprobe nf_nat
 
-	install_epel_pkg iptables-legacy || test_warn "Install iptables-legacy failed"
+	cat >> /usr/local/bin/iptables-legacy << EOF
+#!/bin/sh
+exec iptables-nft "$@"
+EOF
+	chmod +x /usr/local/bin/iptables-legacy
+}
+
+run_test_progs()
+{
+	local ret
+	local prog="$1"
+	local test_case="$2"
+
+	run "${prog} ${test_case}"
+	ret=$?
+
+	# Get more detailed log info with -vv if failed
+	[ ${ret} -ne 0 ] && run "${prog} -vv ${test_case}"
+
+	# bpf_nf test opened a tcp port, which will be in TIME-WAIT after close.
+	echo "${test_case}" | grep -q "bpf_nf" && sleep 65
+
+	return $ret
 }
 
 do_bpf_test_progs_run()
 {
 	local item="bpf_test_progs"
-	local ret ret_1 ret_2 name_opt
+	local ret ret_1 name_opt
 
 	[ ! -d "$EXEC_DIR"/bpf ] && test_skip "No $item test, skip" && return 1
 
 	pushd "$EXEC_DIR"/bpf || exit
-	if [ ! -f test_progs ] || [ ! -f test_progs-no_alu32 ] || ! ./test_progs --count; then
+	if [ ! -f test_progs ] || ! ./test_progs --count; then
 		test_skip "No $item test, skip"
 		return 1
 	fi
@@ -330,6 +372,7 @@ do_bpf_test_progs_run()
 
 	for name in ${total_tests}; do
 		num=$((num + 1))
+		ret=0
 
 		# report results as a subphase
 		rlPhaseStartTest "selftests: ${item}:${name}"
@@ -342,16 +385,21 @@ do_bpf_test_progs_run()
 		local OUTPUTFILE=$LOG_DIR/${item}_${name}.log
 		dmesg -C
 
-		run "./test_progs ${name_opt} $name"
+		run_test_progs "./test_progs" "${name_opt} $name"
 		ret_1=$?
-		# Get more detailed log info with -vv if failed
-		[ ${ret_1} -ne 0 ] && run "./test_progs -vv ${name_opt} $name"
+		[ $ret_1 -ne 0 ] && ret=$ret_1
 
-		# bpf_nf test opened a tcp port, which will be in TIME-WAIT after close.
-		echo "${name}" | grep -q "bpf_nf" && sleep 65
+		if [ -f test_progs-no_alu32 ]; then
+			run_test_progs "./test_progs-no_alu32" "${name_opt} $name"
+			ret_1=$?
+			[ $ret_1 -ne 0 ] && ret=$ret_1
+		fi
 
-		run "./test_progs-no_alu32 ${name_opt} $name"
-		ret_2=$?
+		if [ -f test_progs-cpuv4 ]; then
+			run_test_progs "./test_progs-cpuv4" "${name_opt} $name"
+			ret_1=$?
+			[ $ret_1 -ne 0 ] && ret=$ret_1
+		fi
 
 		echo -e "\n=== Dmesg result ===" >> "$OUTPUTFILE"
 		dmesg >> "$OUTPUTFILE"
@@ -359,7 +407,6 @@ do_bpf_test_progs_run()
 		# submit logs
 		rlLog "$(cat ${OUTPUTFILE})"
 
-		[ "$ret_1" -ne 0 ] && ret=${ret_1} || ret=${ret_2}
 		check_result $num "$total_num" "${item}:${name}" $ret
 		rlPhaseEnd
 	done
@@ -385,15 +432,14 @@ do_tc-testing_config()
 
 	# prepare evn
 	# shellcheck disable=SC2086 # disabled on purpose as we want pkg_mgr_inst_string to expand
-	$pkg_mgr $pkg_mgr_inst_string clang valgrind
-	install_scapy
+	install_epel_pkg python3-scapy
 	pip -q install pyroute2 2>/dev/null
 	modprobe -r veth
 
 	pushd "$EXEC_DIR"/tc-testing || exit
 	# extend test timeout
 	sed -i '/TIMEOUT/s/24/180/' tdc_config.py
-	sed -i 's/python3 -sP\?/python3/' *.py plugin-lib/*.py
+	find . -type f -name '*.py' -exec sed -i 's/python3 -sP\?/python3/' {} +
 	popd || exit
 }
 
@@ -467,30 +513,42 @@ do_tc-testing_reset()
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
 	# source skip/waive list
+	arch="$(uname -m)"
+	skip_link="https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main"
 	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
-		[ ! -f skip_waive.list ] && \
-			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive."${krelease}" -O skip_waive.list
+		[ ! -f skip_waive.arch ] && \
+		# Try download arch specific skip_waive list first
+			wget -q "${skip_link}"/skip_waive."${krelease}"."${arch}" -O skip_waive.arch || true
+		# Now download release-wide skip_waive list
+		[ ! -f skip_waive.release ] && \
+			wget -q "${skip_link}"/skip_waive."${krelease}" -O skip_waive.release || true
 		[ ! -f param.list ] && \
-			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param."${krelease}" -O param.list
+			wget -q "${skip_link}"/param."${krelease}" -O param.list
 	else
 		# This list is used for upstream testing
 		[ ! -f skip_waive.list ] && \
-			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/skip_waive.list -O skip_waive.list
+			wget -q "${skip_link}"/skip_waive.list -O skip_waive.list
 		[ ! -f param.list ] && \
-			wget -q https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main/param.list -O param.list
+			wget -q "${skip_link}"/param.list -O param.list
 	fi
 
-	if [ $(wc -l skip_waive.list | cut -f 1 -d ' ') -ne 0 ]; then
-		submit_log skip_waive.list
-		source skip_waive.list
+	for file in skip_waive.arch skip_waive.release skip_waive.list; do
+		[ -f "$file" ] || continue
+		[ "$(wc -l < "$file")" -eq 0 ] && continue
+
+		submit_log "$file"
+		# shellcheck source=/dev/null
+		. "$file"
 
 		SKIP_TARGETS="$SKIP_TARGETS ${skip_tests[*]}"
-		[ $(free -m | awk '/Mem/ {print $2}') -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]:-}"
+		[ "$(free -m | awk '/Mem/ {print $2}')" -lt 8000 ] && SKIP_TARGETS="$SKIP_TARGETS ${large_mem_tests[*]:-}"
 		WAIVE_TARGETS="$WAIVE_TARGETS ${waive_tests[*]:-}"
 
-	fi
+		# clear arrays so next file doesn't append old data
+		unset skip_tests waive_tests large_mem_tests
+	done
 
-	if [ $(wc -l param.list | cut -f 1 -d ' ') -ne 0 ]; then
+	if [ -f param.list ] && [ "$(wc -l < param.list)" -ne 0 ]; then
 		submit_log param.list
 
 		while read -r line; do

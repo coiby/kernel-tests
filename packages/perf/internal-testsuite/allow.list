@@ -61,6 +61,17 @@ c07970a0464c9337daf18ab2edc53cce0d251cb7    all                                 
 a314df14af58957548d292f859cbd2ee451c9c9f    all                                 5.14.0-200      5.14.0-500          # Parse event definition strings
 8c95b0f59c6e176ff4d12aa75c45c1a90f928a46    all                                 6.11.0-0.rc0    6.11.0-0.rc7        # Sysfs PMU tests
 
+9b1e8f8fef88de8a45c13a06a9e79780f0859013    all                                 5.14.0-571      5.14.0-600          # perf stat --bpf-counters --for-each-cgroup test
+df1c7acaaf54ab9f1240e97016eef97823697bea    all                                 5.14.0-571      5.14.0-600          # perf script task-analyzer tests
+
+
+### RHEL-10 ###
+9b1e8f8fef88de8a45c13a06a9e79780f0859013    all                                 6.12.0-56      6.12.0-120           # perf stat --bpf-counters --for-each-cgroup test
+df1c7acaaf54ab9f1240e97016eef97823697bea    all                                 6.12.0-56      6.12.0-120           # perf script task-analyzer tests
+d4b88ad2ef3ad11d1d65485ad3209f8849f4aeeb    all                                 6.12.0-56      6.12.0-120           # Add vfs_getname probe to get syscall args filenames
+90ae3743ecb512bf3d9956df1d6ea8cbb3f63dc6    all                                 6.12.0-56      6.12.0-120           # Use vfs_getname probe to get syscall args filenames
+467b4575131cc49df2591dcd52ac524e71de7925    all                                 6.12.0-56      6.12.0-120           # perf stat --bpf-counters test
+aba5be59b8476eb15178828406fa0d307fb794b9    all                                 6.12.0-56      6.12.0-120           # Test dwarf unwind
 
 
 ##############################################

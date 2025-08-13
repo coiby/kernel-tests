@@ -30,15 +30,19 @@
 . ../include/lib.sh
 
 MOD="test_klp_livepatch"
+ARCH=$(uname -m)
 
-if is_rhel9; then
+if is_rhel9 || { is_rhel8 && [[ "$ARCH" =~ ^(x86_64|ppc64le)$ ]]; }; then
     dnf_install_modules_internal
     MOD_PATH=$(dirname `modinfo --field=filename $MOD`)
     xz --decompress $MOD_PATH/$MOD.ko.xz
-else
+elif is_rhel10; then
     install_selftests_internal
     rhel10_build_selftests_modules
     MOD_PATH="${LIVEPATCH_TEST_MODULES}/test_modules"
+else
+    test_skip "Test not supported"
+    exit 0
 fi
 
 echo "MOD=$MOD"

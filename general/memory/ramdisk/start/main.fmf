@@ -5,6 +5,12 @@ component:
   - kernel
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - e2fsprogs
+  - type: file
+    pattern:
+      - /cki_lib/libcki.sh
+      - /cmdline_helper
 duration: 1h
 tier: 1
 tag: [tier1]

@@ -5,9 +5,12 @@ enabled: true
 id: d6d93c88-4420-48ce-b627-00ed17abd1ac
 test: bash ./runtest.sh
 framework: beakerlib
-duration: 5m
+duration: 20m
 require:
-  - make
+  - gcc
+recommend:
+  - '@development-tools'
 tag:
   - /kernel/general/memory/function/memfd_create
   - KG-VMM-TAG
+  - KernelAutomotiveTier1

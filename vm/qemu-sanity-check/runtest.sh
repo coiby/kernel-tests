@@ -58,7 +58,7 @@ else
 fi
 
 # Boot the kernel using TCG (software emulation).
-qemu-sanity-check --accel=tcg --cpu=max | tee tcg.log
+qemu-sanity-check --accel=tcg --cpu=max -t 20m | tee tcg.log
 if [[ ${PIPESTATUS[0]} == 0 ]]; then
     rstrnt-report-result -o tcg.log tcg PASS
 else

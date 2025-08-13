@@ -1,0 +1,32 @@
+summary: Verifies trace is provided after system crash.
+description: |
+    Verifies trace is provided after system crash.
+    Also confirms that setting panic=1 in cmdline causes kernel to reboot after panic.
+    Test Inputs:
+        trigger, echo c > /proc/sysrq-trigger
+        check, validators inspect after test completion if console contains trace.
+    Expected results:
+        [   PASS   ] :: Command 'change_cmdline panic=1' (Expected 0, got 0)
+        [   PASS   ] :: Command 'change_cmdline -panic=1' (Expected 0, got 0)
+        OVERALL RESULT: PASS (/misc/crash-sysrqc/crash_sysrqc)
+    Results location:
+        output.txt
+contact: Stephen Bertram <sbertram@redhat.com>
+id: 11e4e965-18f4-41c4-9c49-472246e7d1c7
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - type: file
+    pattern:
+      - /kernel-include
+      - /cki_lib
+      - /cmdline_helper
+recommend:
+  - abootimg
+  - grubby
+restart-on-exit-code:
+    - 255
+restart-max-count: 3
+duration: 30m

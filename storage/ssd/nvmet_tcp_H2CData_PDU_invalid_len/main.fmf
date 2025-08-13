@@ -17,7 +17,7 @@ tag:
 tier: 1
 extra-summary: /storage/ssd/nvmet_tcp_H2CData_PDU_invalid_len
 extra-task: /storage/ssd/nvmet_tcp_H2CData_PDU_invalid_len
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-8
 id: 7c3c2265-3c19-4b00-b319-47bf7ff6de75

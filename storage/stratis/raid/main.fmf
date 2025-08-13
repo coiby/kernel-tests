@@ -12,7 +12,7 @@ tag:
 tier: 1
 extra-summary: /storage/stratis/raid
 extra-task: /storage/stratis/raid
-adjust:
-    enabled: false
+adjust+:
+  - enabled: false
     when: distro < rhel-7
 id: F1FE3FED-0836-41B1-B574-5FEBF903E726

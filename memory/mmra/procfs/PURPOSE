@@ -18,9 +18,6 @@ Test Inputs:
         openat$mfr
         openat$mma
         openat$mrb
-        openat$ms_ratio
-        openat$mur
-        openat$nzo
         openat$odt
         openat$ok
         openat$okat
@@ -34,11 +31,9 @@ Test Inputs:
         openat$statr
         openat$swap
         openat$urk
-        openat$uu
         openat$vcp
         openat$wbf
         openat$wsf
-        openat$zrm
         write$ark
         write$cm
         write$cp
@@ -54,9 +49,6 @@ Test Inputs:
         write$mfr
         write$mma
         write$mrb
-        write$ms_ratio
-        write$mur
-        write$nzo
         write$odt
         write$ok
         write$okat
@@ -70,11 +62,9 @@ Test Inputs:
         write$statr
         write$swap
         write$urk
-        write$uu
         write$vcp
         write$wbf
         write$wsf
-        write$zrm
     syzcaller code: https://github.com/google/syzkaller
     patch: procfs.patch
     check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
@@ -94,9 +84,6 @@ Expected results:
     [   PASS   ] :: openat$mfr executed.
     [   PASS   ] :: openat$mma executed.
     [   PASS   ] :: openat$mrb executed.
-    [   PASS   ] :: openat$ms_ratio executed.
-    [   PASS   ] :: openat$mur executed.
-    [   PASS   ] :: openat$nzo executed.
     [   PASS   ] :: openat$odt executed.
     [   PASS   ] :: openat$ok executed.
     [   PASS   ] :: openat$okat executed.
@@ -110,11 +97,9 @@ Expected results:
     [   PASS   ] :: openat$statr executed.
     [   PASS   ] :: openat$swap executed.
     [   PASS   ] :: openat$urk executed.
-    [   PASS   ] :: openat$uu executed.
     [   PASS   ] :: openat$vcp executed.
     [   PASS   ] :: openat$wbf executed.
     [   PASS   ] :: openat$wsf executed.
-    [   PASS   ] :: openat$zrm executed.
     [   PASS   ] :: write$ark executed.
     [   PASS   ] :: write$cm executed.
     [   PASS   ] :: write$cp executed.
@@ -130,9 +115,6 @@ Expected results:
     [   PASS   ] :: write$mfr executed.
     [   PASS   ] :: write$mma executed.
     [   PASS   ] :: write$mrb executed.
-    [   PASS   ] :: write$ms_ratio executed.
-    [   PASS   ] :: write$mur executed.
-    [   PASS   ] :: write$nzo executed.
     [   PASS   ] :: write$odt executed.
     [   PASS   ] :: write$ok executed.
     [   PASS   ] :: write$okat executed.
@@ -146,11 +128,9 @@ Expected results:
     [   PASS   ] :: write$statr executed.
     [   PASS   ] :: write$swap executed.
     [   PASS   ] :: write$urk executed.
-    [   PASS   ] :: write$uu executed.
     [   PASS   ] :: write$vcp executed.
     [   PASS   ] :: write$wbf executed.
     [   PASS   ] :: write$wsf executed.
-    [   PASS   ] :: write$zrm executed.
     [   LOG    ] :: The following /proc/sys/vm tuneables are covered.
     [   LOG    ] :: admin_reserve_kbytes
     [   LOG    ] :: compaction_proactiveness

@@ -1,0 +1,25 @@
+From 61ed6bb2f451f01bb19f388bed6386eff69dd1f8 Mon Sep 17 00:00:00 2001
+From: Charles Shi <schrht@gmail.com>
+Date: Thu, 27 Mar 2025 21:25:27 -0400
+Subject: [PATCH 3/4] Fix the result parsing bug for pi-tests
+
+---
+ testcases/realtime/func/pi-tests/parse-testpi1.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/realtime/func/pi-tests/parse-testpi1.py b/testcases/realtime/func/pi-tests/parse-testpi1.py
+index 740e7d1c3..551bcd691 100644
+--- a/testcases/realtime/func/pi-tests/parse-testpi1.py
++++ b/testcases/realtime/func/pi-tests/parse-testpi1.py
+@@ -41,7 +41,7 @@ class TestPi1(Log):
+ 		for line in self.read():
+ 			if exp1.search(line) and  exp2.search(prev_line)and exp3.search(prev_line):
+ 				list=prev_line.split(" ")
+-				if int(list[4])< 9900:
++				if int(list[4])<= 9900:
+ 					flag=True
+ 				else:
+ 					flag=False
+-- 
+2.49.0
+

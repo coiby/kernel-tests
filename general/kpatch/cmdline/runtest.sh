@@ -227,6 +227,21 @@ function label_check() {
     fi
 }
 
+function install_kpp()
+{
+    # Example of a kpatch-patch pkg "kpatch-patch-4_18_0-107-0-1.test.el8"
+    local kpp_pkg kpp_name kpp_version kpp_release kpp_arch
+    kpp_pkg=$1
+
+    kpp_name=$(echo $KPATCH_PATCH | cut -d- -f1,2,3,4)
+    kpp_version=$(echo $KPATCH_PATCH | cut -d- -f5)
+    kpp_release=$(echo $KPATCH_PATCH | cut -d- -f6)
+    kpp_arch=$(uname -m)
+
+    yum -y install ${kpp_pkg} || \
+        yum install -y "${BUILDS_URL}/${kpp_name}/${kpp_version}/${kpp_release}/${kpp_arch}/${kpp_pkg}.${kpp_arch}.rpm"
+}
+
 rlJournalStart
     test -d /sys/kernel/livepatch && use_livepatch=1
     if [ -z "${SKIP_SETUP}" ]; then
@@ -251,7 +266,7 @@ rlJournalStart
             touch REBOOT
         rlPhaseEnd
 
-        rhts-reboot
+        rstrnt-reboot
     else
         rlPhaseStartTest "Kpatch Cmdline reboot test"
             run_checkproc
@@ -263,7 +278,7 @@ rlJournalStart
         label_check
         if [ -z "${SKIP_SETUP}" ] && [ ! -z "${KPATCH_PATCH}" ] ; then
             yum -y remove ${KPATCH_PATCH} && label_check
-            yum -y install ${KPATCH_PATCH} && label_check
+            install_kpp ${KPATCH_PATCH} && label_check
         fi
     rlPhaseEnd
 

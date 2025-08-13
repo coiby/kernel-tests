@@ -221,7 +221,7 @@ function bz1157802()
 				rlRun "grubby --args=\"nohz_full=$first_cpu-$last_cpu rcu_nocbs=$first_cpu-$last_cpu nmi_watchdog=0 nohz=on nowatchdog nosoftlockup\"\
 					--update-kernel=$(grubby --default-kernel)"
 				touch $rebootflag_f
-				rhts-reboot
+				rstrnt-reboot
 			else
 				# test how long a task on an isolated cpu can work continuously without being intterupted.
 				test_timer_interval
@@ -233,7 +233,7 @@ function bz1157802()
 					--update-kernel=$(grubby --default-kernel)"
 				rlLogInfo "$FUNCNAME: reboot the machine"
 				rlRun "touch $rebootflag_s"
-				rhts-reboot
+				rstrnt-reboot
 			fi
 			rlRun "pidstat > pidstat.log"
 			rlFileSubmit pidstat.log

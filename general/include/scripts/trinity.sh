@@ -1,5 +1,5 @@
 #!/bin/bash
-git clone https://github.com/kernelslacker/trinity.git
+git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/trinity.git
 pushd trinity
 ./configure
 make -j $(nproc)

@@ -4,7 +4,7 @@ description: |+
 
     Parameter:
 
-    KPATCH_FUNC_LIST: 
+    KPATCH_TARGET_FUNCTION:
         Allow passing a list of functions being patched. Functions need to be separated by a space.
 
 

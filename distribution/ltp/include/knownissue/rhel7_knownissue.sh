@@ -44,6 +44,8 @@ function rhel7_fatal_issues()
 	kernel_in_range "0" "3.10.0-584.el7" && tskip "cve-2017-2618" fatal
 	# Bug 1805590 - [FJ7.8 Bug]: system crash happened due to NULL pointer dereference at slip_write_wakeup()
 	osver_in_range "700" "710" && tskip "pty03" fatal
+	# RHELTEST-1405: distribution/ltp/generic: VMMTIER1 mmap21_*__with_dmesg_entry "mmap21: command not found"
+	osver_in_range "700" "711" && tskip "mmap21*" fatal
 }
 
 function rhel7_unfix_issues()

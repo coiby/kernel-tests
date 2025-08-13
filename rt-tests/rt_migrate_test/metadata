@@ -7,5 +7,6 @@ confidential=no
 destructive=no
 
 [restraint]
+max_time=1h
 entry_point=bash ./runtest.sh
 repoRequires=cki_lib;rt-tests/include;automotive/include

@@ -6,7 +6,7 @@ which python && python=python || python=/usr/libexec/platform-python
 function ppc64le_setup()
 {
 	rlIsRHEL ">=8" || return
-	rlRun "git clone https://github.com/open-power-host-os/tests/"
+	rlRun "git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/opos-tests tests"
 
 	pushd tests
 	rlRun "git checkout python3"

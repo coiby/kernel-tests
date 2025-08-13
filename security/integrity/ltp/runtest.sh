@@ -25,7 +25,7 @@
 . ../../../kernel-include/runtest.sh || exit 1
 . ../../../cmdline_helper/libcmd.sh || exit 1
 . ../../../cki_lib/libcki.sh || exit 1
-GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/ltp.git"}
+GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/core/ltp.git"}
 
 rlJournalStart
     rlPhaseStartSetup
@@ -60,8 +60,11 @@ rlJournalStart
         fi
         rm -f ./REBOOT
         rlShowRunningKernel
-        rlRun "git clone $GIT_URL" 0
+        rlRun "git clone $GIT_URL --depth=1" 0
         rlRun "cd ltp"
+        if rlIsRHEL '>9' && [[ $(uname -m) == "x86_64" ]]; then
+            rlRun "sed -i '/cve-2015-3290:*\+/ s/$/ -O0/' testcases/cve/Makefile"
+        fi
         rlRun "make -s autotools"
         rlRun "./configure > /dev/null"
         rlRun "make -s all &> /dev/null"

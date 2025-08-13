@@ -31,6 +31,7 @@ set -x
 git_url=${WRAPPER_GIT_URL:-"https://src.fedoraproject.org/tests/selinux.git"}
 git_branch=${WRAPPER_GIT_BRANCH:-"main"}
 git_path=${WRAPPER_GIT_PATH:-"kernel/selinux-testsuite"}
+TIMEOUT=${WRAPPER_SERGE_TIMEOUT:-"3300"}
 
 TEST="packages/selinux-policy/serge-testsuite"
 # Test doesn't run without IPv6
@@ -61,7 +62,7 @@ cd "$git_path" || __prepare_failed
 
 # NOTE: the timeout needs to be sufficiently lower than
 # max_duration_seconds in kpet-db.
-timeout -s KILL 3300 ./runtest.sh
+timeout -s KILL "$TIMEOUT" ./runtest.sh
 test_exit_code=$?
 
 # Clean up stuff that could cause errors later; errors are ignored.

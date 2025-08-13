@@ -1,0 +1,7 @@
+summary: Unittest case for python-ethtool
+contact: Chang Yin <cyin@redhat.com>
+test: python3 test.py
+framework: shell
+require:
+  - python3-ethtool
+duration: 10m

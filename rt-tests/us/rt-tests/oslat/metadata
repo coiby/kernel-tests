@@ -1,6 +1,6 @@
 [General]
 name=rt-tests/us/rt-tests/oslat
-owner=Qiao Zhao <qzhao@redhat.com>
+owner=Shizhao Chen <shichen@redhat.com>
 description=Basic test for oslat
 license=GPLv3
 confidential=no

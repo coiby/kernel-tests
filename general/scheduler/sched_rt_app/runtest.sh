@@ -244,8 +244,13 @@ function test_setup()
 	if curl -LkO  $LOOKASIDE/$pkg; then
 		tar -zxf $pkg
 	else
-		rlRun "git clone https://github.com/scheduler-tools/rt-app.git"
+		rlRun "git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/rt-app.git"
 		folder=rt-app
+	fi
+
+	# WORKAROUND VROOM-30173: Patch the .h file to avoid redefinition and conflicts
+	if grep sched_setattr /usr/include/bits/sched.h; then
+		patch -p1 -d "$folder" < ./patch/remove_duplicated_definition.patch
 	fi
 
 	rlRun "pushd $folder" || rlDie "rt-app failed to download"

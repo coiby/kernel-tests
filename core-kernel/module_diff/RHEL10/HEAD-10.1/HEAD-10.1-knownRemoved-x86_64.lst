@@ -1,0 +1,5 @@
+cirrus.ko
+drm_vram_helper.ko
+ntb_msi_test.ko
+raid6test.ko
+scsi_proto_test.ko

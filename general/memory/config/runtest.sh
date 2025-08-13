@@ -25,13 +25,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Include Beaker environment
-if [ -e /usr/bin/rhts-environment.sh ]; then
-    . /usr/bin/rhts-environment.sh || exit 2
-fi
 . /usr/share/beakerlib/beakerlib.sh || exit 2
 . ./lib/lib.sh
 . ../../../kernel-include/runtest.sh || exit 2
-
 
 trap 'rlFileRestore; exit' SIGHUP SIGINT SIGQUIT SIGTERM
 

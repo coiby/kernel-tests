@@ -1,6 +1,6 @@
 summary: LTP key syscalls tests
 contact: Linqing Lu <lilu@redhat.com>
-id: 75252e1e-07ef-4013-9691-24298296d3ef
+id: 84b0b2f3-3a1d-4feb-8102-ccb0ee905430
 path: /security/key
 test: bash ./runtest.sh
 framework: beakerlib

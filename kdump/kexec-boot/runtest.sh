@@ -68,7 +68,8 @@ KexecBoot() {
         # kernel-automotive kernel and initramfs img on ostree contains a hash:
         # kernel image - vmlinuz-$(uname -r)-${commit_hash}
         # initramfs image - initramfs-$(uname -r).img-${commit_hash}
-        _initrd_img_path=$(find $K_BOOT -name "${INITRD_PREFIX}-${KEXEC_VER}.img-*")
+        #_initrd_img_path=$(find $K_BOOT -name "${INITRD_PREFIX}-${KEXEC_VER}.img-*")
+        _initrd_img_path="$K_BOOT/$INITRD_PREFIX-${KEXEC_VER}.img"
         _vmlinuz_path=$(ls ${K_BOOT}/vmlinuz-${KEXEC_VER}!(*debug*|*64k*|*rt*))
         [ -z "${_vmlinuz_path}" ] && _vmlinuz_path=$(ls ${K_BOOT}/vmlinux-${KEXEC_VER}!(*debug*|*64k*|*rt*))
     else
@@ -146,7 +147,12 @@ KexecBoot() {
         fi
 
         # Prepare kexec cmd and run kexec
-        LogRun "${cmd} ${_vmlinuz_path} --initrd=${_initrd_img_path} --command-line=\"${boot_cmdline}\""
+        #LogRun "${cmd} ${_vmlinuz_path} --initrd=${_initrd_img_path} --command-line=\"${boot_cmdline}\""
+        if system_ostree; then
+            LogRun "${cmd} ${_vmlinuz_path} --initrd=${_initrd_img_path} --reuse-cmdline --append=\"${KEXEC_BOOT_CMDLINE_APPEND}\""
+        else
+            LogRun "${cmd} ${_vmlinuz_path} --initrd=${_initrd_img_path} --command-line=\"${boot_cmdline}\""
+        fi
         if [ "$?" -ne 0 ] || [ "$(cat /sys/kernel/kexec_loaded)" = "0" ]; then
             # rm -f "${K_REBOOT}"
             Error "Loading kexec kernel ${KEXEC_VER} failed."

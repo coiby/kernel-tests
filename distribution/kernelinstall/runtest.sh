@@ -1357,6 +1357,17 @@ function Main ()
             DisableTmpRepo
             ARCH=$BeakerARCH
         fi
+
+        if [ "${KERNELARGPANICONOOPS:-}" == "1" ]; then
+            echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf
+            echo "Set panic_on_oops to 1"
+        fi
+
+        if [ "${KERNELARGPANICONWARN:-}" == "1" ]; then
+            echo "kernel.panic_on_warn = 1" >> /etc/sysctl.conf
+            echo "Set panic_on_warn to 1"
+        fi
+
         # Lets make it our default boot kernel the kernel we want to test
         SelectKernel $KERNELARGVERSION $KERNELARGVARIANT
         if [ "$?" -ne "0" ]; then
@@ -1427,6 +1438,15 @@ DeBug "1=$kernbase 2=$kernver 3=$kernrel 4=$kernarch 5=$kernvariant"
 DeBug "TEST ARGS (Environment variables)"
 DeBug "1=$KERNELARGNAME 2=$KERNELARGVARIANT 3=$KERNELARGVERSION 4=$KERNELARGTMPREPO 5=$KERNELARGPERMREPO"
 
+if [[ -z "$KERNELARGVARIANT" ]]; then
+    KERNELARGVARIANT="up"
+    if [[ "${KERNELARGNAME}" =~ debug ]]; then
+        KERNELARGVARIANT="debug"
+    fi
+    # remove -debug from KERNELARGNAME, -debug pattern, this is handled by variant
+    KERNELARGNAME=${KERNELARGNAME/-debug/}
+fi
+
 # Save KERNELARGNAME because it might be modified after this point in some
 # cases, and will be necessary as a directory name to assemble the brewroot url
 KERNPKGDIRECTORY="$KERNELARGNAME"
@@ -1493,9 +1513,9 @@ else
     if [[ "$RT_REQUESTED" == "true" && "$RT_DEBUG" == "true" ]]; then
         # Ensure proper name "kernel-rt-debug" is handled regardless of what strings
         # the user utilized to request kernel-rt-debug
-        testkernbase=kernel-rt-debug-$KERNELARGVERSION
-        testkername=kernel-rt-debug
-        testkerndevel=kernel-rt-debug-devel-$KERNELARGVERSION
+        testkernbase=kernel-rt$RT_SUBTYPE-debug-$KERNELARGVERSION
+        testkername=kernel-rt$RT_SUBTYPE-debug
+        testkerndevel=kernel-rt$RT_SUBTYPE-debug-devel-$KERNELARGVERSION
     else
         testkernbase=$KERNELARGNAME-$KERNELARGVARIANT-$KERNELARGVERSION
         testkername=$KERNELARGNAME-$KERNELARGVARIANT
@@ -1586,17 +1606,18 @@ else
             Abort
         else
             DeBug "After reboot we are running the correct kernel"
+            REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
+            DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
+            MAX_REBOOT_TIME=${MAX_REBOOT_TIME:-900}
+            if [[ "${MAX_REBOOT_TIME}" != "0" ]] && [[ ${DIFF} -gt ${MAX_REBOOT_TIME} ]]; then
+                 let DIFF_MIN=$DIFF/60
+                 let DIFF_SEC=$DIFF%60
+                 echo "***** WARN: rstrnt-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME} seconds *****" | tee -a $OUTPUTFILE
+                 RprtRslt $TEST/${kernbase}_boot WARN $DIFF
+            fi
             # CheckCPU count with test kernel
             CheckCPUcount
             YumUpgradeKernelHeaders
-            REBOOT_TIME=$(cat /mnt/testarea/kernelinstall_reboottime.log)
-            DIFF=$(expr ${CUR_TIME} - ${REBOOT_TIME})
-            if [[ ${DIFF} -gt ${MAX_REBOOT_TIME:-900} ]]; then
-                 let DIFF_MIN=$DIFF/60
-                 let DIFF_SEC=$DIFF%60
-                 echo "***** WARN: rstrnt-reboot took ${DIFF_MIN} minutes and ${DIFF_SEC} second(s), that exceeded ${MAX_REBOOT_TIME:-900} seconds *****" | tee -a $OUTPUTFILE
-                 RprtRslt $TEST/${kernbase}_boot WARN $DIFF
-            fi
             RprtRslt $TEST/$kernbase PASS $DIFF
             DepmodChk
             DiffDmesg

@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# shellcheck disable=SC2034,SC2124
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -47,7 +49,7 @@ export TEST_IGNORE_MISSING_PMU=y
 export PERFTOOL_TESTSUITE_RUNMODE=$RUNMODE_BASIC
 
 # hook, someone likes using "True" there, we like 1, 0 values more
-if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" -o "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
+if [ "$PERFTESTS_ENABLE_DENYLIST" = "true" ] || [ "$PERFTESTS_ENABLE_DENYLIST" = "True" ]; then
 	PERFTESTS_ENABLE_DENYLIST=1
 fi
 
@@ -194,21 +196,19 @@ rlJournalStart
 			# detect virtualization
 			rlLog "Virtualization: `virt-what`"
 		fi
+		unset ARCH
 
-		export KERNEL_DEBUGINFO_PKG_NAME="kernel-debuginfo-$KERNEL"
-		if [ $(is_kernel_rt) -eq 0 ]; then
-			export KERNEL_DEBUGINFO_PKG_NAME="kernel-rt-debuginfo-$KERNEL"
-		fi
-		export KERNEL_PKG_NAME="kernel-$KERNEL"
-		echo $KERNEL | grep -q debug
-		if [ $? -eq 0 ]; then
-			export KERNEL=${KERNEL%[.+]debug}
-			export KERNEL_PKG_NAME="kernel-debug-$KERNEL"
-			export KERNEL_DEBUGINFO_PKG_NAME="kernel-debug-debuginfo-$KERNEL"
-			if [ $(is_kernel_rt) -eq 0 ]; then
-				export KERNEL_PKG_NAME="kernel-rt-debug-$KERNEL"
-				export KERNEL_DEBUGINFO_PKG_NAME="kernel-rt-debug-debuginfo-$KERNEL"
-			fi
+		kernel_name=$(rpm -q --queryformat '%{name}\n' -qf "/boot/config-$(uname -r)" | sed 's/-core//')
+		KERNEL_PKG_NAME="$kernel_name-$KERNEL"
+		KERNEL_DEBUGINFO_PKG_NAME="$kernel_name-debuginfo-$KERNEL"
+
+		# strip-off the "+debug" or "+64k" suffix if present
+		export KERNEL_DEBUGINFO_PKG_NAME=${KERNEL_DEBUGINFO_PKG_NAME%[+.]*}
+		export KERNEL_PKG_NAME=${KERNEL_PKG_NAME%[+.]*}
+
+		if cki_is_kernel_automotive; then
+			export KERNEL_PKG_NAME="kernel-automotive-$KERNEL"
+			export KERNEL_DEBUGINFO_PKG_NAME="kernel-automotive-debuginfo-$KERNEL"
 		fi
 
 		rlLog "Variables:"

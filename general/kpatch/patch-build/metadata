@@ -1,0 +1,14 @@
+[General]
+name=/kernel/general/kpatch/patch-build
+owner=Roberto Bergantinos Corpas <rbergant@redhat.com>
+description=kpatch build test for kpatch-patch modules
+license=GPLv2
+confidental=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=480m
+dependencies=beakerlib;beakerlib-redhat;git;make;openssl-devel;gcc-plugin-devel;flex;openssl;rpm-build;kernel-debuginfo;python3-devel
+softDependencies=platform-python-devel;bison;python36;redhat-sb-certs;libtraceevent-devel;dwarves
+repoRequires=general/kpatch/include

@@ -407,12 +407,15 @@ else
         rlRun "ip netns exec ns1 ping 192.168.9.1 -c 5"
         rlRun "ip netns exec ns1 ping6 2009::01 -c 5"
 
-        iperf3 -v
-        if [ $? -eq 0 ];then
-            rlRun "ip netns exec ns1 iperf3 -c 192.168.9.1"
-            rlRun "ip netns exec ns1 iperf3 -c 2009::01"
-            rlRun "ip netns exec ns1 iperf3 -c 192.168.9.1 -u"
-            rlRun "ip netns exec ns1 iperf3 -c 2009::01 -u"
+        arch_name=`uname -m`
+        if [ $arch_name != "ppc64le" ];then # because RHEL-84189 , will not run iperf3 on ppc64le
+            iperf3 -v
+            if [ $? -eq 0 ];then
+                rlRun "ip netns exec ns1 iperf3 -c 192.168.9.1"
+                rlRun "ip netns exec ns1 iperf3 -c 2009::01"
+                rlRun "ip netns exec ns1 iperf3 -c 192.168.9.1 -u"
+                rlRun "ip netns exec ns1 iperf3 -c 2009::01 -u"
+            fi
         fi
 
         ip netns exec ns0 ip link set veth0 netns 1

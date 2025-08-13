@@ -1,0 +1,22 @@
+From ab49d643a65dfb6be78d3825db0de525184e5d35 Mon Sep 17 00:00:00 2001
+From: Charles Shi <schrht@gmail.com>
+Date: Thu, 27 Mar 2025 21:22:19 -0400
+Subject: [PATCH 2/4] Ensure prio-wake test runs on a single core
+
+---
+ testcases/realtime/func/prio-wake/run_auto.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/realtime/func/prio-wake/run_auto.sh b/testcases/realtime/func/prio-wake/run_auto.sh
+index 576b46c25..491bb8db3 100755
+--- a/testcases/realtime/func/prio-wake/run_auto.sh
++++ b/testcases/realtime/func/prio-wake/run_auto.sh
+@@ -9,4 +9,4 @@ if [ ! $SCRIPTS_DIR ]; then
+ fi
+ . $SCRIPTS_DIR/setenv.sh
+ # Warning: tests args are now set in profiles
+-$SCRIPTS_DIR/run_c_files.sh $profile prio-wake
++taskset -c 1 $SCRIPTS_DIR/run_c_files.sh $profile prio-wake
+-- 
+2.49.0
+

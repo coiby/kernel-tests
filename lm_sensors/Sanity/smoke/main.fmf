@@ -9,8 +9,8 @@ test: bash ./runtest.sh
 framework: beakerlib
 require:
   - lm_sensors
-adjust:
-  - enable: false
+adjust+:
+  - enabled: false
     when: arch == aarch64
 duration: 5m
 extra-task: /kernel/lm_sensors/Sanity/smoke

@@ -21,6 +21,8 @@ function rhel8_fatal_issues()
 	# Bug 2115120 - RHEL8: kernel-rt: WARNING: possible circular locking dependency detected (raw_v6_hashinfo.lock->(softirq_ctrl.lock).lock->raw_v6_hashinfo.lock
 	is_rt && cki_is_kernel_debug && osver_in_range "806" "807" && tskip "read_all_proc" fatal
 	is_rt && cki_is_kernel_debug && osver_in_range "806" "807" && tskip "proc01" fatal
+	# RHELTEST-1405: distribution/ltp/generic: VMMTIER1 mmap21_*__with_dmesg_entry "mmap21: command not found"
+	osver_in_range "800" "811" && tskip "mmap21*" fatal
 }
 
 function rhel8_unfix_issues()
@@ -90,8 +92,6 @@ function rhel8_unfix_issues()
 	osver_in_range "800" "809" && tskip "creat09 cve-2018-13405" unfix
 	# Bug 2163455 - RHEL8.8 - LTP testcase inotify12 fails on LPAR & z/VM
 	osver_in_range "800" "810" && tskip "inotify12" unfix
-	# https://gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/issues/1670
-	is_rt && pkg_in_range "tuned" "2.19.0" "99" && tskip "numa_testcases" unfix
 	# https://issues.redhat.com/browse/RHEL-8577 [RHEL-8.9.0] "stack_clash" LTP CVE test fails
 	is_arch "x86_64" && osver_in_range "800" "811" && tskip "cve-2017-1000364 stack_clash" unfix
 	# https://issues.redhat.com/browse/RHEL-8429 ltp-starvation test get timed out
@@ -117,7 +117,7 @@ function rhel8_fixed_issues()
 	# Bug 1820405 - KEYS: allow reaching the keys quotas exactly
 	kernel_in_range "0" "4.18.0-193.7.el8" && tskip "add_key05" fixed
 	# Bug 1771351 - fat: race between udev and mkdir leads to EIO
-	kernel_in_range "0" "4.18.0-194.el8" && tskip "statx04" fixed
+	kernel_in_range "0" "4.18.0-194.el8" && tskip "statx04 statx08" fixed
 	# Bug 1760638  timer_create: alarmtimer return wrong errno, on RTC-less system, s390x, ppc64
 	kernel_in_range "0" "4.18.0-148.el8" && tskip "timer_delete01 timer_settime01 timer_settime02" fixed
 	! is_arch "x86_64" && osver_in_range "800" "803" && tskip "timer_create01" fixed

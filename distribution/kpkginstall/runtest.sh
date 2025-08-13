@@ -171,7 +171,7 @@ function get_kpkg_ver()
         cki_abort_recipe "get_kpkg_ver: Failed to query repo to get provides and requires." WARN
       fi
     fi
-    KVER=$(sed -n '/uname-r/{s/.*= //p;q}' <<< "${repoquery_output}")
+    KVER=$(sed -n '/^[^(].*uname-r =/{s/.*= //p;q}' <<< "${repoquery_output}")
     # rpm doesn't allow '-' character in the version-release
     # that's why in the provides we intentionally switch from '-' to '_'
     # uname -r would still output with -
@@ -452,6 +452,11 @@ function rpm_install()
   # download & install kernel, or report result
   download_install_package "${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM}"
 
+  # download & install kernel devel, or report result
+  # kernel devel must be installed, otherwise we can't detect if we need to apply
+  # cross compile workaround or not.
+  download_install_package "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM}"
+
   if ! cki_is_ostree_booted ;then
     if $YUM install -y "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
       cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} successfully"
@@ -502,12 +507,6 @@ function rpm_install()
 
 function rpm_extra_package_install()
 {
-  devel_nvr="$(K_GetRunningKernelRpmSubPackageNVR devel)"
-  # download & install kernel devel, or report result
-  # kernel devel must be installed, otherwise we can't detect if we need to apply
-  # cross compile workaround or not.
-  download_install_package "${devel_nvr}"
-
   extra_packages=(modules-internal headers)
   for package in "${extra_packages[@]}"; do
     _nvr="$(K_GetRunningKernelRpmSubPackageNVR "${package}")"
@@ -536,12 +535,6 @@ function rpm_extra_package_install()
 function ostree_extra_package_install()
 {
   PKG_CMD="${RPM_OSTREE} -A install --allow-inactive --idempotent -y "
-  if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
-    cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM} successfully"
-  else
-    cki_print_warning "No package ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM} found, skipping!"
-    cki_print_warning "Note that some tests might require the package and can fail!"
-  fi
   if $PKG_CMD "${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM}" >> ${RPM_INSTALL_LOG}; then
     cki_print_success "Installed ${KPKG_VAR_PACKAGE_NAME}-modules-extra-${KVER_RPM} successfully"
   else
@@ -684,13 +677,6 @@ function main() {
       # https://gitlab.com/cki-project/upt/-/issues/49
       echo "kernel.panic_on_oops = 1" >> /etc/sysctl.conf
       cki_print_success "Set panic_on_oops to 1"
-
-      # for kernel-rt-debug set panic_on_warn
-      # https://gitlab.com/redhat/centos-stream/tests/kernel/kpet-db/-/issues/186
-      if cki_is_kernel_rt && cki_is_kernel_debug; then
-        echo "kernel.panic_on_warn = 1" >> /etc/sysctl.conf
-        cki_print_success "Set panic_on_warn to 1"
-      fi
 
       # print the rpm version if it is set, otherwise default to KVER
       cki_print_success "Installed kernel ${KVER_RPM:-$KVER}, rebooting (this may take a while)"

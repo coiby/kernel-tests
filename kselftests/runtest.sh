@@ -35,6 +35,7 @@ arch=$(uname -m)
 version=$(uname -r | cut -f1 -d'-')
 release=$(uname -r | cut -f2 -d'-' | sed "s/\.${arch}.*//")
 SKIP_CODE=4
+uname -r | grep -q debug && export KSFT_MACHINE_SLOW=yes
 TMPDIR=/var/tmp/$(date +"%Y%m%d%H%M%S")
 TEST_ITEMS=${TEST_ITEMS:-"default"}
 if [ ${DELIVERED_TESTS} ]; then
@@ -53,6 +54,8 @@ for file in $INCLUDE; do
     # shellcheck source=/dev/null
     . "$CDIR"/include/$file
 done
+SKIP_TARGETS=$(echo $SKIP_TARGETS | tr ' ' '\n' | awk '!seen[$0]++' | tr '\n' ' ')
+echo "Skip targets: ${SKIP_TARGETS}"
 
 name="kernel"
 if  cki_is_kernel_rt; then
@@ -115,12 +118,16 @@ install_packages()
         rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
         rpm -ivh --define "_topdir $TMPDIR" $K_SRC
         pushd SPECS
-        # patch for x86_64 systems. Introduction of efiuki causes dependency to break.
-        # per https://issues.redhat.com/browse/ENGCMP-2966 this is only temporary.
-        # once this is removed, this patch can also be removed.
-        rlRun "sed -i 's/efiuki 1/efiuki 0/' kernel.spec"
-        rlRun "yum-builddep --downloadonly -y ./kernel.spec --downloaddir $(pwd)"
-
+        if rlIsRHELLike ">9" && cki_is_kernel_automotive; then
+            rlRun "yum-builddep --downloadonly -y ./kernel-automotive.spec --downloaddir $(pwd)" 0-255
+        else
+            # patch for x86_64 systems. Introduction of efiuki causes dependency to break.
+            # per https://issues.redhat.com/browse/ENGCMP-2966 this is only temporary.
+            # once this is removed, this patch can also be removed.
+            rlRun "sed -i 's/efiuki 1/efiuki 0/' kernel.spec"
+            # I'm not sure why to run yum-builddep, but if it fails doens't seem critical, therefore ignore any error.
+            rlRun "yum-builddep --downloadonly -y ./kernel.spec --downloaddir $(pwd)" 0-255
+        fi
         $pkg_mgr $pkg_mgr_inst_string *.rpm
         pushd ../SOURCES
         tar Jxf linux-${version}-${release}.tar.xz
@@ -222,7 +229,7 @@ function RunKSelfTest()
     local testscript="$1"
     local test_folder="$(echo ${testscript}|cut -d : -f 1)"
     local test_case="$(echo ${testscript}|cut -d : -f 2)"
-    local ret
+    local ret=0
 
     OUTPUTFILE=$(new_outputfile)
 
@@ -235,8 +242,28 @@ function RunKSelfTest()
     # run the self-test script
     rlLog "=== Running: $testscript"
     pushd $EXEC_DIR/${test_folder}
-    ./${test_case} ${TEST_PARAM[${testscript}]} |& tee $OUTPUTFILE
-    ret=${PIPESTATUS[0]}
+
+    if [[ "${WORKERS:-1}" -gt 1 ]]; then
+        rlLog "Concurrent testing: Spawning $WORKERS processes of ${testscript}."
+        declare -a pids  # Store process IDs
+        for ((i = 1; i <= WORKERS; i++)); do
+            temp_output="${OUTPUTFILE}_${i}"
+            # Run test case with pipefail to preserve exit code through tee
+            (set -o pipefail; ./${test_case} ${TEST_PARAM[${testscript}]} |& tee "$temp_output") &
+            pids+=($!)  # Save PID of background process
+        done
+        for pid in "${pids[@]}"; do
+            wait "$pid" || ret=1  # Update ret if any process fails
+        done
+        # After all workers finish, combine the outputs
+        cat "$OUTPUTFILE"_* > "$OUTPUTFILE"
+    else
+        # run the test separately if $WORKERS not supplied as we may use
+        # run_kselftest.sh to run selftests in future
+        ./${test_case} ${TEST_PARAM[${testscript}]} |& tee $OUTPUTFILE
+        ret=${PIPESTATUS[0]}
+    fi
+
     # use rlLog instead of `rlRun -l` to avoid the 50 lines limit
     rlLog "$(cat "${OUTPUTFILE}")"
     popd
@@ -262,7 +289,7 @@ function SetupTest ()
       export pkg_mgr_inst_string="-y install"
     fi
     if [ "${BUILD_FROM_SRC}" ]; then
-        rlRun install_packages
+        install_packages
         # do patches
         for item in $TEST_ITEMS; do
             _item=$(echo $item | tr \/ \_)
@@ -271,7 +298,7 @@ function SetupTest ()
             fi
         done
     fi
-    rlRun install_kselftests || test_fail_exit "install kselftests failed"
+    install_kselftests || test_fail_exit "install kselftests failed"
     submit_log "$EXEC_DIR/kselftest-list.txt"
     rlPhaseEnd
 }
@@ -366,4 +393,5 @@ if [ ! "${__SOURCED__:+x}" ]; then
         CleanupTest
 
     rlJournalEnd
+    rlJournalPrint
 fi

@@ -1,0 +1,13 @@
+This test checks the output of the auxiliary vectors to ensure the values are not changing on new kernel updates or installs.
+These values should be the same provided the hardware has not changed.
+
+User can provide custom TYPE and VALUE lists through variables:
+AUXILIARY_TYPES
+AUXILIARY_VALUES
+It allows the user to pick which TYPES to report on.
+NOTE:   It is important to make sure type and value are at the same index in each list. So the first type must match the first value and so on to the last.
+        The user must set VAR_HWCAP, VAR_HWCAP2 and VAR_PLATFORM for the test defaults to work.
+
+By default:
+    AUXILIARY_TYPES="AT_HWCAP AT_HWCAP2 AT_PLATFORM"
+    AUXILIARY_VALUES="${VAR_HWCAP} ${VAR_HWCAP2} ${VAR_PLATFORM}"

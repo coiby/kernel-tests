@@ -89,7 +89,7 @@ run_kpatch_in_stress()
         rlRun "kpatch load $MOD" 0
         local ret=$?
         if ((already_loaded == 0)) && [ $ret -ne 0 ]; then
-            report_result "hit_load_failure_in_loop$((501 - loop_times))" PASS
+            rlPass "hit_load_failure_in_loop$((501 - loop_times))"
             report_activeness_failures
             (( failures++ ))
             (( failures > 25 )) && break
@@ -102,7 +102,7 @@ run_kpatch_in_stress()
         fi
         rlRun "kpatch force unload $MOD" 0
         if [ $? -ne 0 ]; then
-            report_result "hit_unload_failure_in_loop$((const_loop - loop_times))" PASS
+            rlPass "hit_unload_failure_in_loop$((const_loop - loop_times))"
             report_activeness_failures
             (( unload_failures++ ))
             already_loaded=1
@@ -118,9 +118,9 @@ run_kpatch_in_stress()
 
     # We assume 5% failure rate as normal.
     if (( failures > 25 )); then
-        report_result "$saved_loop_times:hit_${failures}_failures" FAIL
+        rlFail "$saved_loop_times:hit_${failures}_failures"
     else
-        report_result "$saved_loop_times:hit_${failures}_failures" PASS
+        rlPass "$saved_loop_times:hit_${failures}_failures"
     fi
 
     __kpatch_stress_cleanup $_pid
@@ -151,7 +151,7 @@ report_activeness_failures()
     local c_new=$(grep 'kpatch: activeness safety check failed' /var/log/messages | wc -l | awk '{print $1}')
     f=$(grep 'kpatch: activeness safety check failed' /var/log/messages | tail -n 1 | awk '{print $NF}')
     echo $f >> $reported_failures
-    report_result "activeness-fail$c_new:$f" PASS
+    rlPass "activeness-fail$c_new:$f"
 }
 
 rlJournalStart

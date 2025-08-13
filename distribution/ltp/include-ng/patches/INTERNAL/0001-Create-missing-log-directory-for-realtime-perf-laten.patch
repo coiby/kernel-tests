@@ -1,0 +1,24 @@
+From 1a1eeeb6a4dc0092ab8f486b82f11949a6cdb2ba Mon Sep 17 00:00:00 2001
+From: Charles Shi <schrht@gmail.com>
+Date: Mon, 5 May 2025 13:27:55 -0400
+Subject: [PATCH 1/2] Create missing log directory for realtime/perf/latency
+
+---
+ testcases/realtime/perf/latency/run_auto.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testcases/realtime/perf/latency/run_auto.sh b/testcases/realtime/perf/latency/run_auto.sh
+index 3311c1e19..d34423c36 100755
+--- a/testcases/realtime/perf/latency/run_auto.sh
++++ b/testcases/realtime/perf/latency/run_auto.sh
+@@ -7,6 +7,7 @@ fi
+ 
+ source $SCRIPTS_DIR/setenv.sh
+ LOG_FILE="$LOG_DIR/$LOG_FORMAT-pthread_cond_many.log"
++[ ! -d $LOG_DIR ] && mkdir -p $LOG_DIR
+ 
+ echo "Logging to: " | tee -a $LOG_FILE
+ echo "$LOG_FILE " | tee -a $LOG_FILE
+-- 
+2.49.0
+

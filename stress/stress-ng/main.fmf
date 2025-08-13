@@ -35,6 +35,7 @@ test: bash ./runtest.sh
 framework: beakerlib
 tag:
   - KernelTier1
+  - KernelAutomotiveTier1
 require:
   - wget
   - git
@@ -68,3 +69,11 @@ extra-summary: stress/stress-ng
 extra-task: stress/stress-ng
 id: 78648bc2-5de1-4390-b0b8-fbe37d31b064
 duration: 1h
+adjust+:
+  - when: KernelTier1 == 1
+    environment:
+      # Don't run 'os' class for Tier1 as the results are not stable
+      CLASSES: 'interrupt cpu cpu-cache memory'
+  # don't run on kernel debug
+  - when: package-name ~ kernel.*debug
+    enabled: false

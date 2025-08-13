@@ -119,7 +119,7 @@ function ndctl_setup
 	ndctl_srcdir=$(realpath /root/rpmbuild/BUILD/ndctl-*)
 	rlRun "pushd $ndctl_srcdir"
 
-	if rlIsRHEL 9 || rlIsFedora || rlIsCentOS "9"; then
+	if rlIsRHEL ">9.1" || rlIsFedora || rlIsCentOS "9"; then
 		if rlIsRHEL "<9.5"; then
 			rlRun "patch -p1 < $CDIR/ndctl.patch"
 		fi

@@ -8,7 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=gcc
-softDependencies=kernel-devel;glibc-devel;glibc-devel.i386;glibc-devel.i686;glibc-devel.s390;libgcc.i386;libgcc.i686;libgcc.s390
+dependencies=gcc;glibc-devel
+max_time=10m
+softDependencies=glibc-devel.i386;glibc-devel.i686;glibc-devel.s390;libgcc.i386;libgcc.i686;libgcc.s390
 repoRequires=cki_lib
-

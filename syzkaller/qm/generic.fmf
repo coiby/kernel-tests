@@ -1,0 +1,94 @@
+summary: QM version of the syzkaller fuzzing test.
+description: |
+  QM version of the syzkaller fuzzing test.
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+framework: beakerlib
+test: ./runtest.sh
+path: /syzkaller
+require:
+  - gcc
+  - gcc-c++
+  - git
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - make
+  - patch
+  - sshpass
+  - tar
+  - tmux
+  - wget
+  - type: file
+    pattern:
+        -  /kernel-include
+        -  /syzkaller
+environment:
+  # Following environment variables are for wrapper debugging purposes only.
+  time: 3600
+  FUZZ_IN_QM: 1
+  main_syscalls: |
+    "open",
+    "read",
+    "write",
+    "close",
+    "brk",
+    "fadvise64",
+    "madvise",
+    "membarrier",
+    "memfd_create",
+    "mincore",
+    "mlock",
+    "mlock2",
+    "mlockall",
+    "mmap",
+    "mprotect",
+    "mq_getsetattr",
+    "mq_notify",
+    "mq_open",
+    "mq_timedreceive",
+    "mq_timedsend",
+    "mq_unlink",
+    "process_madvise",
+    "process_vm_readv",
+    "process_vm_writev",
+    "readahead",
+    "remap_file_pages",
+    "shmat",
+    "shmctl",
+    "shmdt",
+    "shmget"
+  disable_syscalls: |
+    "mmap$DRM_I915",
+    "mmap$DRM_MSM",
+    "mmap$KVM_VCPU",
+    "mmap$bifrost",
+    "mmap$dsp",
+    "mmap$fb",
+    "mmap$qrtrtun",
+    "mmap$snddsp",
+    "mmap$snddsp_control",
+    "mmap$snddsp_status"
+  support_syscalls: |
+    "clone3",
+    "getegid",
+    "geteuid",
+    "getgid",
+    "getgroups",
+    "getpgid",
+    "getpid",
+    "getresgid",
+    "getresuid",
+    "io_uring_setup",
+    "mq_open",
+    "newfstatat",
+    "openat$binderfs",
+    "openat$cgroup",
+    "openat$cgroup_root",
+    "openat$pidfd",
+    "openat$thread_pidfd",
+    "perf_event_open",
+    "pidfd_open",
+    "socket$xdp",
+    "syz_open_dev$usbmon"
+  verbose: '' # '-debug -vv 3'
+duration: 2h

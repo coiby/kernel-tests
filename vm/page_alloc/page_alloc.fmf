@@ -3,12 +3,10 @@ contact: MM-QE <mm-qe@redhat.com>
 component:
   - kernel
 path: /vm/page_alloc
-test: make run
+test: bash ./runtest.sh
 framework: shell
 require:
-  - make
   - kexec-tools
-  - gnuplot
   - iptables
   - type: file
     pattern:
@@ -18,6 +16,7 @@ require:
       - /cmdline_helper
       - /cki_lib
 recommend:
+  - gnuplot
   - wget
   - abootimg
 duration: 2h

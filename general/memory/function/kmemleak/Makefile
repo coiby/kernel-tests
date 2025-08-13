@@ -41,24 +41,3 @@ build: $(BUILT_FILES)
 clean:
 	rm -f *~ $(BUILT_FILES)
 
-
-include /usr/share/rhts/lib/rhts-make.include
-
-$(METADATA): Makefile
-	@echo "Owner:           Chunyu Hu <chuhu@redhat.com>" > $(METADATA)
-	@echo "Name:            $(TEST)" >> $(METADATA)
-	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
-	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Sanity check that kmemleak is working" >> $(METADATA)
-	@echo "Type:            Memory" >> $(METADATA)
-	@echo "TestTime:        5m" >> $(METADATA)
-	@echo "RunFor:          kernel-debug" >> $(METADATA)
-	@echo "Requires:        kernel-debug" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
-	@echo "License:         GPLv2+" >> $(METADATA)
-	@echo "Confidential:    yes" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	@echo "RhtsRequires:    kernel-kernel-general-include" >> $(METADATA)
-	@echo "Releases:        RHEL8 RHEL9" >> $(METADATA)
-
-	rhts-lint $(METADATA)

@@ -39,7 +39,9 @@ clean:
 	rm -f *~ $(BUILT_FILES)
 
 
-include /usr/share/rhts/lib/rhts-make.include
+# Common VARs from rhts makefile
+export TEST_DIR=/mnt/tests$(TEST)
+export METADATA=testinfo.desc
 
 $(METADATA):
 	touch $(METADATA)

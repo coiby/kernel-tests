@@ -3,7 +3,6 @@ name=/kernel/general/memory/function/memeq
 owner=mm-qe <mm-qe@redhat.com>
 description=Verifies that mem= kernel parameter works.
 license=GPLv2
-_architectures=x86_64;i386;ppc64;s390x;aarch64
 destructive=no
 confidential=no
 Releases=RHEL7
@@ -14,5 +13,6 @@ max_time=90m
 dependencies=grubby
 TestVersion=2.0
 Path=kernel/general/memory/function/memeq
+repoRequires=cki_lib;cmdline_helper
 RunFor=kernel
 Priority=Normal

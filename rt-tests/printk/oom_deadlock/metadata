@@ -1,0 +1,13 @@
+[General]
+name=OOM Deadlock
+owner=Shizhao Chen<shichen@redhat.com>
+description=Flood the serial console with frequent oom-killer messages, exposing a lockup caused by atomic console contention.
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=2h
+dependencies=gcc
+repoRequires=rt-tests/include

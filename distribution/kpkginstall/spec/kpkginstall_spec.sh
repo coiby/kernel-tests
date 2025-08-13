@@ -592,6 +592,7 @@ Describe 'kpkginstall: rpm_install'
         The first line should equal "ℹ️ rpm_install: Extracting kernel version from ${KPKG_URL}"
         The line 4 should equal "✅ Kernel version is ${KVER_RPM}"
         The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM} successfully"
         if [[ ${KPKG_VAR_PACKAGE_NAME} == kernel-rt* ]]; then
             The stdout should include "✅ Installed /usr/sbin/kernel-is-rt successfully"
         fi
@@ -665,6 +666,7 @@ Describe 'kpkginstall: rpm_install automotive'
         The line 4 should equal "ℹ️ Test automotive installed kernel"
         The stdout should include "✅ Downloaded ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
         The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-${KVER_RPM} successfully"
+        The stdout should include "✅ Installed ${KPKG_VAR_PACKAGE_NAME}-devel-${KVER_RPM} successfully"
         The status should be success
     End
 End
@@ -692,9 +694,8 @@ Describe 'kpkginstall: rpm_extra_package_install'
         export KVER=$3
         export YUM=dnf
         When call rpm_extra_package_install
-        The line 1 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR devel successfully"
-        The line 2 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR modules-internal successfully"
-        The line 3 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR headers successfully"
+        The line 1 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR modules-internal successfully"
+        The line 2 should include "✅ Installed K_GetRunningKernelRpmSubPackageNVR headers successfully"
         The status should be success
     End
 End

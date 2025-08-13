@@ -1,0 +1,12 @@
+[General]
+name=accelerators/amd/install-kmod-amdgpu
+owner=Ihor Mykytyn <imykytyn@redhat.com>
+description=Install the AMDGPU kernel module on the target system, ensuring that all required dependencies are present and the module loads correctly. It verifies the installation process, checks for successful module loading, and prepares the environment for further GPU-related testing or validation.
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=git;
+softDependencies=beakerlib-redhat

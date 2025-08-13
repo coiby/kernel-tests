@@ -42,13 +42,13 @@ function check_mce_support()
 function test_setup()
 {
 	rlRun "rm -rf mce-test" 0 "Cleanup mce-test if exists"
-	rlRun "git clone git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git"
+	rlRun "git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/mce-test.git"
 	rlAssertExists "mce-test" || rlDie "Failed to fetch mce-test!"
 	pushd mce-test &> /dev/null
 	rlRun "make & make install"
 	popd
 
-	rlRun "git clone git://git.kernel.org/pub/scm/utils/cpu/mce/mce-inject.git"
+	rlRun "git clone --depth 1 https://gitlab.com/redhat/centos-stream/tests/kernel/core/mce-inject.git"
 	rlAssertExists "mce-inject" || rlDie "Failed to fetch mce-inject!"
 	pushd mce-inject &> /dev/null
 	rlRun "make && make install"

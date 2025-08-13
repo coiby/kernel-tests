@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Include Beaker environment
+. /usr/share/beakerlib/beakerlib.sh || exit 1
+
+rlJournalStart
+
+rlPhaseStartSetup
+if ! rlCheckRpm "pesign"; then
+    yum install "pesign" -y
+    rlAssertRpm "pesign" || rlDie "failed: pesign couldn't be installed."
+fi
+rlShowPackageVersion "pesign"
+rlPhaseEnd
+
+rlPhaseStartTest kernel
+rlShowPackageVersion "kernel"
+set -o pipefail
+if file /boot/vmlinuz-$(uname -r) | grep "gzip compressed data"; then
+    rlRun "zcat /boot/vmlinuz-$(uname -r) > /tmp/Image"
+    rlRun -l "pesign -i /tmp/Image -S | tee pesign-log"
+    rlRun "rm -f /tmp/Image"
+else
+    rlRun -l "pesign -i /boot/vmlinuz-$(uname -r) -S | tee pesign-log"
+fi
+set +o pipefail
+grep 'common name' pesign-log > pesign-signer
+rlAssertGrep "Red Hat\|Fedora\|CentOS" pesign-signer
+rlAssertNotGrep "Red Hat Test Certificate" pesign-signer # known point of failure
+rlAssertNotGrep "No signatures found" pesign-log
+
+rlPhaseEnd
+
+# this package is not from kernel, I'm not sure if we should do the check here, but for now...
+if [[ "$(arch)" == x86_64 ]]; then
+    rpm -q shim-x64 > /dev/null 2>&1 || yum install "shim-x64" -y
+
+    rlPhaseStartTest shim-x64
+    rlShowPackageVersion "shim-x64"
+    set -o pipefail
+    rlRun -l "pesign -i /boot/efi/EFI/BOOT/BOOTX64.EFI -S | tee pesign-log"
+    set +o pipefail
+    grep 'common name' pesign-log > pesign-signer
+    rlAssertGrep "Microsoft" pesign-signer
+    rlAssertNotGrep "Red Hat\|Fedora\|CentOS" pesign-signer
+    rlAssertNotGrep "No signatures found" pesign-log
+    rlPhaseEnd
+fi
+
+if [[ "$(arch)" == aarch64 ]]; then
+    rpm -q shim-aa64 > /dev/null 2>&1 || yum install "shim-aa64" -y
+
+    rlPhaseStartTest shim-aa64
+    rlShowPackageVersion "shim-aa64"
+    set -o pipefail
+    rlRun -l "pesign -i /boot/efi/EFI/BOOT/BOOTAA64.EFI -S | tee pesign-log"
+    set +o pipefail
+    grep 'common name' pesign-log > pesign-signer
+    rlAssertGrep "Red Hat\|Fedora\|CentOS" pesign-signer
+    rlAssertNotGrep "Red Hat Test Certificate" pesign-signer # known point of failure
+    rlAssertNotGrep "No signatures found" pesign-log
+    rlPhaseEnd
+fi
+
+rm pesign-log pesign-signer
+
+rlJournalPrintText
+rlJournalEnd

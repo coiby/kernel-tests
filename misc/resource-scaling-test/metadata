@@ -1,0 +1,7 @@
+[General]
+description=Verify the sysfs entries exposed by the subsystems
+name=misc/resource-scaling-test
+owner=Yumei Huang <yuhuang@redhat.com>
+
+[restraint]
+entry_point=bash ./runtest.sh

@@ -7,15 +7,15 @@ path: /rt-tests/smidetect
 test: bash ./runtest.sh
 framework: shell
 require:
-    - realtime-tests
     - type: file
       pattern:
           - /rt-tests/include
           - /cki_lib
           - /automotive/include
+recommend:
+    - realtime-tests
+    - rt-tests
 duration: 3h
-extra-summary: /rt-tests/smidetect
-extra-task: /rt-tests/smidetect
 environment:
     DURATION: 1m
     LATCHECK: 1

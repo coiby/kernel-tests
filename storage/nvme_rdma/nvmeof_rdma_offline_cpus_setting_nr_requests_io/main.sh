@@ -53,24 +53,45 @@ function client {
 	tok "echo 0 > /sys/devices/system/cpu/cpu2/online"
 	tok "echo 0 > /sys/devices/system/cpu/cpu3/online"
 
-	nr_num=$(cat /sys/block/"$nvme_device"/queue/nr_requests)
-	tok "echo 127 >/sys/block/${nvme_device}/queue/nr_requests"
-	ret=$?
-	if [ $ret -eq 0 ]; then
-		tlog "INFO: setting nr_requests:127 operation pass"
+	if [[ "$(readlink -f "/sys/block/$nvme_device/device")" =~ /nvme-subsystem/ ]]; then
+		tlog "$nvme_device are NVMe multipath devices"
+		nr_num=$(cat /sys/block/nvme*c*n*/queue/nr_requests)
+		tok "echo 64 >/sys/block/nvme*c*n*/queue/nr_requests"
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			tlog "INFO: setting nr_requests:64 operation pass"
+		else
+			tlog "INFO: setting nr_requests:64 operation failed"
+		fi
+		tlog "INFO: restore nr_requests with $nr_num"
+		tok "echo $nr_num >/sys/block/nvme*c*n*/queue/nr_requests"
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			tlog "INFO: restore nr_requests:$nr_num operation pass"
+		else
+			tlog "INFO: setting nr_requests:$nr_num operation failed"
+		fi
+		trun cat /sys/block/nvme*c*n*/queue/nr_requests
 	else
-		tlog "INFO: setting nr_requests:127 operation failed"
-	fi
+		nr_num=$(cat /sys/block/"$nvme_device"/queue/nr_requests)
+		tok "echo 64 >/sys/block/${nvme_device}/queue/nr_requests"
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			tlog "INFO: setting nr_requests:64 operation pass"
+		else
+			tlog "INFO: setting nr_requests:64 operation failed"
+		fi
 
-	tlog "INFO: restore nr_requests with $nr_num"
-	tok echo "$nr_num" >/sys/block/"$nvme_device"/queue/nr_requests
-	ret=$?
-	if [ $ret -eq 0 ]; then
-		tlog "INFO: restore nr_requests:$nr_num operation pass"
-	else
-		tlog "INFO: setting nr_requests:$nr_num operation failed"
+		tlog "INFO: restore nr_requests with $nr_num"
+		tok echo "$nr_num" >/sys/block/"$nvme_device"/queue/nr_requests
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			tlog "INFO: restore nr_requests:$nr_num operation pass"
+		else
+			tlog "INFO: setting nr_requests:$nr_num operation failed"
+		fi
+		trun cat /sys/block/"$nvme_device"/queue/nr_requests
 	fi
-	trun cat /sys/block/"$nvme_device"/queue/nr_requests
 
 	# online cpus
 	tlog "INFO: start online cpus"

@@ -1,0 +1,23 @@
+summary: 1479560-syscall-nmi-stackp-race regression test
+description: |+
+    Stack pointer got corrupted while syscall entry path
+    race with nmi patch, which can lead to kernel panic
+    as result of running in user stack.
+
+    smep supported (cpu flag) machine can reproduce this easily,
+    have not reproduced this with non smep systems.
+
+    #1479560 Timing/race between system_call() and nmi_handle()->
+    arch_trigger_all_cpu_backtrace_handler() causes page fault -
+    protection violation on user mode stack address.
+
+contact: Chunyu Hu <chuhu@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - glibc
+recommend: []
+duration: 10m
+extra-summary: /kernel/general/scheduler/1479560-syscall-nmi-stackp-race
+extra-task: /kernel/general/scheduler/1479560-syscall-nmi-stackp-race

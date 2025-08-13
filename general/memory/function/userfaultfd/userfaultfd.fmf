@@ -5,7 +5,7 @@ enabled: true
 id: bcd699f4-4a08-43d8-ae06-8068a4730a8a
 component:
   - kernel
-contact: David McDougall <dmcdouga@redhat-com>
+contact: KFT QE <kernel-ft-plumbers-qe@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
 require:
