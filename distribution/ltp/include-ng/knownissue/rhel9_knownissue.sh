@@ -52,6 +52,8 @@ function rhel9_unfix_issues()
 	osver_in_range "900" "911" && tskip "move_pages04" unfix
 	# pty01, ptem01 failed with kirk
 	osver_in_range "900" "907" && tskip "pty01 ptem01" unfix
+	# https://issues.redhat.com/browse/RHELTEST-292
+	osver_in_range "900" "911" && tskip "fanotify22" unfix
 }
 
 function rhel9_fixed_issues()
