@@ -270,7 +270,7 @@ rlJournalStart
 				RETVAL=$?
 				rlLog "$(cat $TEST_NUMBER.log)"
 				# use eval to correctly interpret the patters, -F to not match regex characters
-				if rlIsRHEL '>8'; then
+				if rlIsRHEL '>9.4'; then
 					RESULT=`eval cat $TEST_NUMBER.log | sed 's/^[[:space:]]*//' | grep -E '^[0-9]+(\.[0-9]+)?:' | awk -F':' '{print $NF}'| tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
 				else
 					RESULT=`eval grep -F "$TEST_PATTERNS" < $TEST_NUMBER.log | grep : | awk -F':' '{print $NF}' | tr -d ' ' | grep -oP "^[\s\w]+" | tr -d '\n'`
