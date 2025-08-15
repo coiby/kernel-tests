@@ -372,9 +372,9 @@ function DisplayModuleFail ()
 # kernel-rt-kvm package no longer provided in 9.7 and 10.1
 function rt_kvm_check ()
 {
-    if grep -q 'Red Hat Enterprise Linux release 9' /etc/redhat-release; then
+    if grep -q 'release 9' /etc/redhat-release; then
         cki_kver_ge "5.14.0-581.el9" && return 1 || return 0
-    elif grep -q 'Red Hat Enterprise Linux release 10' /etc/redhat-release; then
+    elif grep -q 'release 10' /etc/redhat-release; then
         cki_kver_ge "6.12.0-79.el10" && return 1 || return 0
     else
         return 0
@@ -385,7 +385,8 @@ function inst_kernel_rt_kvm ()
 {
     rt_kvm="${name}-kvm-${K_VER}-${K_REL}.${K_ARCH}"
     local rpm_url="${url}/${rt_kvm}.rpm"
-    rpm -q $rt_kvm || $YUM -y install $rt_kvm || $YUM -y install ${rpm_url} || (cki_abort_task "Missing ${name}-kvm")
+    rpm -q $rt_kvm || $YUM -y install $rt_kvm || $YUM -y install ${rpm_url}
+    rpm -q $rt_kvm || cki_abort_task "Missing ${name}-kvm"
 
 }
 
@@ -516,6 +517,14 @@ function SetOSRelease ()
     fi
 }
 
+function kernel_is_rhel() {
+    [[ "$K_REL" =~ \.el[67891] ]]
+}
+
+if ! kernel_is_rhel; then
+    cki_beakerlib_skip_task "Non support release"
+fi
+
 rlJournalStart
     rlPhaseStartSetup
         YUM=$(cki_get_yum_tool)
@@ -608,6 +617,12 @@ rlJournalStart
                 /intel-tpmi_power_domains.ko/d;/intel-vsec.ko/d;
                 /intel-vsec_tpmi.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
             fi
+            if cki_kver_lt "5.14.0-598.el9"; then
+                sed -i "/snd-amd-acpi-mach.ko/d; /snd-sof-intel-hda-sdw-bpt.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+            fi
+            if cki_kver_lt "5.14.0-599.el9"; then
+                sed -i "/fwctl.ko/d; /mlx5_fwctl.ko/d; /tpm_svsm.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+            fi
         fi
 
         if [[ "$Release" == "HEAD-10.1" ]]; then
@@ -623,6 +638,37 @@ rlJournalStart
                 sed -i "/raid6test.ko/d; /scsi_proto_test.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-${ARCH}.lst
                 sed -i "/mailbox-test.ko/d"  ${OS}/${Release}/${Release}-debug-knownRemoved-aarch64.lst
                 sed -i "/ntb_msi_test.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-x86_64.lst
+            fi
+            if cki_kver_lt "6.12.0-87.el10"; then
+                sed -i "/cs_dsp.ko/d"  ${OS}/${Release}/${Release}-modules-{aarch64,ppc64le}.lst
+            fi
+            if cki_kver_lt "6.12.0-91.el10"; then
+                sed -i "/cx231xx.ko/d;/cx2341x.ko/d;/cx25840.ko/d;/^tuner.ko$/d;
+                /tveeprom.ko/d"  ${OS}/${Release}/${Release}-modules-${ARCH}.lst
+            fi
+            if cki_kver_lt "6.12.0-93.el10"; then
+                sed -i "/iommufd_driver.ko/d"  ${OS}/${Release}/${Release}-builtin-${ARCH}.lst
+            fi
+            if cki_kver_lt "6.12.0-95.el10"; then
+                sed -i "/typec_thunderbolt.ko/d; /tsm.ko/d"  ${OS}/${Release}/${Release}-modules-${ARCH}.lst
+            fi
+            if cki_kver_lt "6.12.0-96.el10"; then
+                sed -i "/arm-cca-guest.ko/d; /tsm.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
+            fi
+            if cki_kver_lt "6.12.0-98.el10"; then
+                sed -i "/cirrus-qemu.ko/d; /drm_panel_backlight_quirks.ko/d"  ${OS}/${Release}/${Release}-modules-${ARCH}.lst
+                sed -i "/drm_client_lib.ko/d" ${OS}/${Release}/${Release}-builtin-${ARCH}.lst
+            fi
+            if cki_kver_lt "6.12.0-107.el10"; then
+                sed -i "/tpm_svsm.ko/d"  ${OS}/${Release}/${Release}-modules-x86_64.lst
+            fi
+            if cki_kver_lt "6.12.0-109.el10"; then
+                sed -i "/iwlmld.ko/d"  ${OS}/${Release}/${Release}-modules-{x86_64,aarch64}.lst
+                sed -i "/nvgrace-gpu-vfio-pci.ko/d"  ${OS}/${Release}/${Release}-modules-aarch64.lst
+                sed -i "/hid_bpf.ko/d"  ${OS}/${Release}/${Release}-builtin-ppc64le.lst
+            fi
+            if cki_kver_lt "6.12.0-115.el10"; then
+                sed -i "/cs_dsp.ko/d; /snd-hda-cirrus-scodec.ko/d"  ${OS}/${Release}/${Release}-knownRemoved-{aarch64,ppc64le}.lst
             fi
         fi
     rlPhaseEnd
