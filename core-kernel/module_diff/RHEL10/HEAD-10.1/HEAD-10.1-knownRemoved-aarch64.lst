@@ -1,4 +1,6 @@
 cirrus.ko
+cs_dsp.ko
 pci-pwrctl-pwrseq.ko
 raid6test.ko
 scsi_proto_test.ko
+snd-hda-cirrus-scodec.ko
