@@ -14,6 +14,11 @@ require:
     pattern:
      - /general/ftrace/include
 duration: 5m
+adjust+:
+  - duration: 10m
+    when: hw_target == rcar_s4
+  - duration: 40m
+    when: hw_target == ridesx4
 tier: 2
 tag: [tier2]
 link:
