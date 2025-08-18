@@ -18,6 +18,6 @@ require:
   - fio-engine-libaio
 extra-summary: storage/blktests/nvme/nvme-loop
 extra-task: storage/blktests/nvme/nvme-loop
-id: 307a82fa-2b95-42fd-84e0-fbc1ad33c0f2
+id: 1a58ef89-a8d5-4561-b314-4f8f61e64adb
 tag: KernelAutomotiveTier1
 duration: 2h
