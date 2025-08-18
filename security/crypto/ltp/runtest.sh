@@ -24,6 +24,7 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../kernel-include/runtest.sh || exit 1
 GIT_URL=${GIT_URL:-"https://gitlab.com/redhat/centos-stream/tests/kernel/core/ltp.git"}
+LTP_TAG=${LTP_TAG:-""}
 
 rlJournalStart
     rlPhaseStartSetup
@@ -42,8 +43,18 @@ rlJournalStart
             rstrnt-report-result CHECKLOGS FAIL 99
             exit 0
         fi
+
+        if [ -z "$LTP_TAG" ]; then
+            LTP_TAG="master"
+
+            if rlIsRHEL '8.2'; then
+                LTP_TAG="20230929"
+            fi
+        fi
+
         rlShowRunningKernel
-        rlRun "git clone $GIT_URL --depth=1" 0
+        rlLog "LTP version: $LTP_TAG"
+        rlRun "git clone $GIT_URL --branch $LTP_TAG --depth=1" 0
         rlRun "cd ltp"
         if rlIsRHEL '>9' && [[ $(uname -m) == "x86_64" ]]; then
             rlRun "sed -i '/cve-2015-3290:*\+/ s/$/ -O0/' testcases/cve/Makefile"
