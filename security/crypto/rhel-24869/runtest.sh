@@ -36,6 +36,13 @@ devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
 rlJournalStart
 	rlPhaseStartSetup
 		rlShowRunningKernel
+
+		if rlIsRHEL "< 8.8"; then
+			echo "[SKIP] Test requires RHEL 8.8+"
+			rstrnt-report-result $RSTRNT_TASKNAME SKIP
+			exit 0
+		fi
+
 		rlRun "fipsIsEnabled" 0 && rlPass "FIPS mode is enabled" && fips_enabled=0
 		if [ ! ${fips_enabled} ]; then
 			echo "[SKIP] Test should run under FIPS mode"
