@@ -23,6 +23,7 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../../../kernel-include/runtest.sh || exit 1
+. ../../../../cki_lib/libcki.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
@@ -38,8 +39,13 @@ rlJournalStart
         # shellcheck disable=SC2086
         ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
         rlRun "free=$(cat /proc/meminfo | awk '/MemFree/ {print $2}')"
-        # shellcheck disable=SC2154
-        rlRun "size=$((free/1024/1024-3))"
+        if cki_is_kernel_debug; then
+            # shellcheck disable=SC2154
+            rlRun "size=$((free/1024/1024-3))"
+        else
+            # shellcheck disable=SC2154
+            rlRun "size=$((free/1024/1024-1))"
+        fi
         # shellcheck disable=SC2154
         if [[ ${size} -le 0 ]]; then
             rlLog "Insuffecient free memory to run this test."

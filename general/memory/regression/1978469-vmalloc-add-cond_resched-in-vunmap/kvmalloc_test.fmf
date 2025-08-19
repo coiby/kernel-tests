@@ -25,4 +25,5 @@ require:
   - type: file
     pattern:
       - /kernel-include
+      - /cki_lib
 duration: 50m

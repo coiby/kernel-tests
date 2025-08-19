@@ -10,4 +10,4 @@ destructive=no
 entry_point=bash ./runtest.sh
 max_time=10m
 dependencies=make;kernel-devel
-repoRequires=kernel-include
+repoRequires=kernel-include;cki_lib
