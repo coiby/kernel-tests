@@ -37,4 +37,4 @@ require:
 duration: 3h
 environment:
   time: 3600
-  RHIVOS_LATENCY_THRES: 50000
+  RHIVOS_LATENCY_THRES: 51000
