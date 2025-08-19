@@ -96,56 +96,59 @@ IfMemoryAboveThreshold()
     # dmidecode -t 17 | grep "Size.*MB" | awk '{s+=$2} END {print s}'
     local total_mem mem
 
-    total_mem=$(lshw -short | grep -i 'System Memory' | awk '{print $3}')
-    if $IS_RHEL6 ; then
-            mem=$(echo $total_mem | sed 's/...$//')
-    else
-            mem=${total_mem::-3}
-    fi
+    ## total_mem=$(lshw -short | grep -i 'System Memory' | awk '{print $3}')
+    total_mem=$(lsmem -b | grep -i 'Total online memory:' | awk '{print $4/1024/1024}')
+    mem=${total_mem}
+    ## Below is not needed as `lsmem` gets memory in MiB unit already.
+    # if $IS_RHEL6 ; then
+    #         mem=$(echo $total_mem | sed 's/...$//')
+    # else
+    #         mem=${total_mem::-3}
+    # fi
 
-    if [[ "$total_mem" =~ "TiB" ]]; then
-        mem=$((mem*1024*1024))
-    elif [[ "$total_mem" =~ "GiB" ]]; then
-        mem=$((mem*1024))
-    fi
+    # if [[ "$total_mem" =~ "TiB" ]]; then
+    #     mem=$((mem*1024*1024))
+    # elif [[ "$total_mem" =~ "GiB" ]]; then
+    #     mem=$((mem*1024))
+    # fi
 
     local retval=1
     local result="below"
 
     if $IS_RHEL7; then
-        if   [[ "${K_ARCH}" = "x86_64" ]] && [ $mem -ge 2048 ]; then
+        if   [[ "${K_ARCH}" = "x86_64" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "ppc64"  ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "ppc64"  ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "ppc64le" ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "ppc64le" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "s390x" ]] && [ $mem -ge 4096 ]; then
+        elif [[ "${K_ARCH}" = "s390x" ]] && [ "$mem" -ge 4096 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "aarch64" ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "aarch64" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
         fi
     elif $IS_RHEL8 || $IS_RHEL9; then
-        if   [[ "${K_ARCH}" = "x86_64" ]] && [ $mem -ge 1024 ]; then
+        if   [[ "${K_ARCH}" = "x86_64" ]] && [ "$mem" -ge 1024 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "ppc64"  ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "ppc64"  ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "ppc64le" ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "ppc64le" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "s390x" ]] && [ $mem -ge 1024 ]; then
+        elif [[ "${K_ARCH}" = "s390x" ]] && [ "$mem" -ge 1024 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "aarch64" ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "aarch64" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
         fi
     elif $IS_RHEL10 || $IS_FC; then
-        if   [[ "${K_ARCH}" = "x86_64" ]] && [ $mem -ge 2048 ]; then
+        if   [[ "${K_ARCH}" = "x86_64" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "ppc64"  ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "ppc64"  ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "ppc64le" ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "ppc64le" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "s390x" ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "s390x" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
-        elif [[ "${K_ARCH}" = "aarch64" ]] && [ $mem -ge 2048 ]; then
+        elif [[ "${K_ARCH}" = "aarch64" ]] && [ "$mem" -ge 2048 ]; then
             retval=0
         fi
     fi

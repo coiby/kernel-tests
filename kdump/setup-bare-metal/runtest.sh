@@ -147,7 +147,8 @@ SetupKdump()
     LogRun "rpm -q kexec-tools kdump-utils makedumpfile crash ${K_NAME/-core}"
     LogRun "uname -r"
     LogRun "cat /proc/cmdline"
-    Log "Total system memory: $(lshw -short | grep -i "System Memory" | awk '{print $3}')"
+    ## Log "Total system memory: $(lshw -short | grep -i "System Memory" | awk '{print $3}')"
+    Log "Total system memory: $(lsmem | grep -i "Total online memory:" | awk '{print $4}')"
     LogRun "kdumpctl showmem || cat /sys/kernel/kexec_crash_size"
     grep -oE "fadump=\w+" /proc/cmdline > /dev/null && {
         Log "Dump mode is fadump"
