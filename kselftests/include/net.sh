@@ -119,6 +119,8 @@ do_net_config()
 	# match basic has been removed on RHEL9
 	sed -i 's/arp basic/arp flower/g' fib_tests.sh
 	sed -i 's/ip basic/ip flower/g' fib_tests.sh
+	# temp fix for c9s, the fib_test.sh blocks all net tests
+	sed -i 's/^ksft_skip=4$/source lib.sh/' fib_tests.sh
 	# need to be run on bare metal machines, or set -C 0 when run on VM
 	sed -i 's/-C [0-9]/-C 0/g' msg_zerocopy.sh
 	# fou is not enabled on RHEL
