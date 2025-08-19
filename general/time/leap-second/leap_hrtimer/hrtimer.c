@@ -6,7 +6,9 @@
 #include <unistd.h>
 
 
-#define MSECREQ 1000
+// not milisec but increased by 10 to allow for more time
+// on low powered cpu's.
+#define MSECREQ 10000
 
 void event_handler (int signum)
 {
