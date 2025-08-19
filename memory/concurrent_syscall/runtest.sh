@@ -3,12 +3,19 @@
 # Source the common test script helpers
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-LTP_VERSION=${LTP_VERSION:-20250130}
+LTP_VERSION=${LTP_VERSION:-20250530}
 
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
-        rlRun "wget https://gitlab.com/redhat/centos-stream/tests/ltp/-/raw/${LTP_VERSION}/runtest/syscalls"
+        # Check if version ok else use default.
+        if wget -q https://raw.githubusercontent.com/linux-test-project/ltp/refs/tags/${LTP_VERSION}/runtest/syscalls ; then
+            rlLog "https://raw.githubusercontent.com/linux-test-project/ltp/refs/tags/${LTP_VERSION}/runtest/syscalls downloaded"
+        else
+            LTP_VERSION=20250530
+            rlLog "Could not find version supplied using https://raw.githubusercontent.com/linux-test-project/ltp/refs/tags/${LTP_VERSION}/runtest/syscalls for test."
+            wget -q https://raw.githubusercontent.com/linux-test-project/ltp/refs/tags/${LTP_VERSION}/runtest/syscalls
+        fi
         rlRun "cp syscalls syscalls2"
         rlRun "cat syscalls >> syscalls2"
         rlRun "cat syscalls >> syscalls2"
