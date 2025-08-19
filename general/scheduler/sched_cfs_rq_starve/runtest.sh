@@ -36,8 +36,19 @@ auto_include=../../../automotive/include/rhivos.sh
 
 rlJournalStart
 	rlPhaseStartSetup
-		if ! (rlAssertGreaterOrEqual "Assert at least 8 CPUs" "$(nproc)" 8); then
-			rlLog "Skipping test: not enough CPUs."
+		np=$(nproc)
+		rlLog "Found $np CPUs"
+		if ((np < 8)); then
+			rlLog "Skipping test: Insufficient CPUs (need at least 8, found $np)"
+
+			# RHEL continues to use SKIP to avoid cluttering the data warehouse with WARN results.
+			# For RHIVOS, use rlFail in Setup phase to leave a WARN result for FuSa validator requirements.
+			if ! kernel_automotive; then
+				rstrnt-report-result sched_cfs_rq_starve SKIP
+			else
+				rlFail "Insufficient CPUs"
+			fi
+
 			rlPhaseEnd
 			rlJournalEnd
 			rlJournalPrintText
