@@ -1,0 +1,56 @@
+--- syscalls.sorted	2025-08-18 15:59:00.203136295 -0400
++++ syscalls.upd	2025-08-18 16:01:30.649814264 -0400
+@@ -2,6 +2,26 @@
+ abort01 abort01
+ abort01 abort01
+ abort01 abort01
++shmget02 shmget02
++shmget02 shmget02
++shmget02 shmget02
++shmget02 shmget02
++shmget03 shmget03
++shmget03 shmget03
++shmget03 shmget03
++shmget03 shmget03
++shmget04 shmget04
++shmget04 shmget04
++shmget04 shmget04
++shmget04 shmget04
++shmget05 shmget05
++shmget05 shmget05
++shmget05 shmget05
++shmget05 shmget05
++shmget06 shmget06
++shmget06 shmget06
++shmget06 shmget06
++shmget06 shmget06
+ accept01 accept01
+ accept01 accept01
+ accept01 accept01
+@@ -4950,26 +4970,6 @@
+ shmdt02 shmdt02
+ shmdt02 shmdt02
+ shmdt02 shmdt02
+-shmget02 shmget02
+-shmget02 shmget02
+-shmget02 shmget02
+-shmget02 shmget02
+-shmget03 shmget03
+-shmget03 shmget03
+-shmget03 shmget03
+-shmget03 shmget03
+-shmget04 shmget04
+-shmget04 shmget04
+-shmget04 shmget04
+-shmget04 shmget04
+-shmget05 shmget05
+-shmget05 shmget05
+-shmget05 shmget05
+-shmget05 shmget05
+-shmget06 shmget06
+-shmget06 shmget06
+-shmget06 shmget06
+-shmget06 shmget06
+ shutdown01 shutdown01
+ shutdown01 shutdown01
+ shutdown01 shutdown01
