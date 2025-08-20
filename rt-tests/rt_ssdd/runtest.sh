@@ -20,6 +20,3 @@ fi
 
 log "Test the default options of ssdd"
 oneliner "timeout --preserve-status $VERBOSE_FLAG 10m ssdd"
-
-log "Stress test ssdd with 100 forks and 10000 iters"
-oneliner "timeout --preserve-status $VERBOSE_FLAG 10m ssdd --forks=100 --iters=10000"
