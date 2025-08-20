@@ -8,6 +8,6 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-max_time=30m
+max_time=10m
 use_pty=false
 repoRequires=automotive/include;rt-tests/include
