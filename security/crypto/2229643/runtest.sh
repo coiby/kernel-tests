@@ -32,11 +32,15 @@ TmpDir=./tmp
 
 rlJournalStart
     rlPhaseStartSetup
+        if rlIsRHEL 7; then
+            CFLAGS="-std=c99"
+        fi
+
         rlShowRunningKernel
         rlRun "mkdir $TmpDir" 0 "Creating tmp directory"
         rlRun "cp repro.c repro.c $TmpDir"
         rlRun "pushd $TmpDir"
-        rlRun "gcc repro.c -o repro"
+        rlRun "gcc repro.c $CFLAGS -o repro"
         rlRun "touch result.log"
     rlPhaseEnd
 
