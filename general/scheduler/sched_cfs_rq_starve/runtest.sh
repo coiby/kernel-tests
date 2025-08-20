@@ -36,6 +36,25 @@ auto_include=../../../automotive/include/rhivos.sh
 
 rlJournalStart
 	rlPhaseStartSetup
+		np=$(nproc)
+		rlLog "Found $np CPUs"
+		if ((np < 8)); then
+			rlLog "Skipping test: Insufficient CPUs (need at least 8, found $np)"
+
+			# RHEL continues to use SKIP to avoid cluttering the data warehouse with WARN results.
+			# For RHIVOS, use rlFail in Setup phase to leave a WARN result for FuSa validator requirements.
+			if ! kernel_automotive; then
+				rstrnt-report-result sched_cfs_rq_starve SKIP
+			else
+				rlFail "Insufficient CPUs"
+			fi
+
+			rlPhaseEnd
+			rlJournalEnd
+			rlJournalPrintText
+			exit 0
+		fi
+
 		check_cgroup_version
 		cgroup_create hello cpu
 		cgroup_path=$(cgroup_get_path hello cpu)
@@ -48,32 +67,28 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartTest
-		np=$(nproc)
 		loop=0
 		sec=120
-		if ((np >= 8)); then
-			rlRun "./do_it.sh"
-			rlLog "sleeping 30 seconds to wait for processes ready"
-			sleep 30
-			rlLog "sample tasks executing time(pid,sum_runtime)"
-			for _ in $(seq 1 5); do
-				./show.sh > old
-				rlRun -l "cat old" 0 "old: looping $loop"
-				rlLog "sleeping 120 seconds ..."
-				sleep $sec
-				./show.sh > new
-				rlRun -l "cat new" 0 "new: looping $loop"
-				# If got starve, it should be failed.
-				if rlRun "./compare.sh | grep starve" 1-255 "check if any cputests starve for $sec seconds"; then
-					rlFileSubmit old
-					rlFileSubmit new
-					break
-				fi
-				((loop++))
-			done
-		else
-			rlReport "testskip" PASS
-		fi
+
+		rlRun "./do_it.sh"
+		rlLog "sleeping 30 seconds to wait for processes ready"
+		sleep 30
+		rlLog "sample tasks executing time(pid,sum_runtime)"
+		for _ in $(seq 1 5); do
+			./show.sh > old
+			rlRun -l "cat old" 0 "old: looping $loop"
+			rlLog "sleeping 120 seconds ..."
+			sleep $sec
+			./show.sh > new
+			rlRun -l "cat new" 0 "new: looping $loop"
+			# If got starve, it should be failed.
+			if rlRun "./compare.sh | grep starve" 1-255 "check if any cputests starve for $sec seconds"; then
+				rlFileSubmit old
+				rlFileSubmit new
+				break
+			fi
+			((loop++))
+		done
 	rlPhaseEnd
 
 	rlPhaseStartCleanup
