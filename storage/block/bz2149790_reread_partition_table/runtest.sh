@@ -65,12 +65,7 @@ function run_test()
 {
     setup_md
 # gdisk removed from rhel10
-    if rlIsRHEL '>=10' ;then
-        rlRun "parted -s /dev/md0 mklabel gpt mkpart xfs 1M 100M"
-    else
-        rlRun "yum install -y gdisk"
-        rlRun "sgdisk -n 0:0:+100MiB /dev/md0"
-    fi
+    rlRun "parted -s /dev/md0 mklabel gpt mkpart xfs 1M 100M"
 
     rlRun "lsblk"
     rlRun "cat /proc/partitions"
@@ -82,12 +77,7 @@ function run_test()
 #    rlRun 'cat /proc/partitions | grep "$dev0"1' 1 "reread partition issue"
 #    rlRun 'cat /proc/partitions | grep "$dev1"1' 1 "reread partition issue"
 
-    if rlIsRHEL '>=10' ;then
-        rlRun "parted -s /dev/md0 rm 1"
-    else
-        rlRun "sgdisk --zap-all /dev/md0"
-    fi
-
+    rlRun "parted -s /dev/md0 rm 1"
     sleep 10
     rlRun "lsblk"
 #    rlRun "cat /proc/partitions"
