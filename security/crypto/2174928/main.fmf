@@ -6,8 +6,12 @@ component:
 path: /security/crypto/2174928
 test: make run
 framework: beakerlib
-require: [gcc, make]
+require:
+  - gcc
+  - make
+  - type: file
+    pattern:
+      - /security/crypto/enable_fips/lib.sh
 duration: 30m
 extra-summary: /kernel-tests/security/crypto/2174928
 extra-task: /kernel-tests/security/crypto/2174928
-
