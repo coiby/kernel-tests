@@ -1,6 +1,5 @@
 #!/bin/sh
-auto_include=../../../automotive/include/rhivos.sh
-[ -f $auto_include ] && . $auto_include
+. ../../../cki_lib/libcki.sh || exit 1
 
 . ../include/runtest.sh
 
