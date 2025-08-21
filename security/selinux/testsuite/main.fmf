@@ -32,7 +32,6 @@ require:
   - net-tools
   - nftables
   - nmap-ncat
-  - perl-Test
   - perl-Test-Harness
   - perl-Test-Simple
   - policycoreutils
@@ -48,6 +47,7 @@ require:
         -  /kernel-include
         -  /cki_lib
 recommend:
+  - perl-Test
   - policycoreutils-python
   - python2-lxml
   - jfsutils
