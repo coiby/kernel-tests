@@ -1,5 +1,4 @@
 require:
-  - initscripts-service
   - type: file
     pattern:
       - /cki_lib
@@ -7,4 +6,6 @@ require:
       - /distribution/ltp/include-ng
       - /distribution/ltp/kirk
 recommend:
+  - initscripts
+  - initscripts-service
   - python3-click

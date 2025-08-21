@@ -36,6 +36,7 @@ require:
       - /distribution/ltp/include-ng
       - /distribution/ltp/kirk
 recommend:
+  - initscripts
   - initscripts-service
   - numactl-devel
   - numactl
