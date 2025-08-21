@@ -27,7 +27,7 @@ require:
       pattern:
           - /general/include
           - /general/scheduler/include
-          - /automotive/include
+          - /cki_lib
 duration: 1h
 extra-summary: /general/scheduler/sched_rt_app
 extra-task: /general/scheduler/sched_rt_app

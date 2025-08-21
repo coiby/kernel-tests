@@ -28,10 +28,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Enable TMT testing for RHIVOS
-auto_include=../../../automotive/include/rhivos.sh
-[ -f $auto_include ] && . $auto_include
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-declare -F check_result && report_func=check_result || report_func=rstrnt-report-result
+. ../../../cki_lib/libcki.sh || exit 1
 
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../../include/lib.sh
@@ -168,7 +165,7 @@ function setup_cpu_affinity()
 
 function test_setup()
 {
-	if ! (($is_rhivos)); then
+	if ! cki_is_kernel_automotive; then
 		# rhel9.0
 		yum -y install cmake autoconf gcc libgcc gcc-c++ m4 libtool git bzip2
 
@@ -179,7 +176,7 @@ function test_setup()
 	rlAssertRpm  util-linux || rlDie "util-linux is needed for change policy of rt"
 
 	# Install stress-ng, which is hacked to support deadline sched policy.
-	if ! (($is_rhivos)); then
+	if ! cki_is_kernel_automotive; then
 		stress_ng_install && have_stress_ng=1
 	fi
 
@@ -200,7 +197,7 @@ function test_setup()
 		echo "Skip installing libcgroup-tools as running cgroup v2"
 	fi
 
-	if ! (($is_rhivos)); then
+	if ! cki_is_kernel_automotive; then
 		rlIsRHEL ">=9" && sched_feature_file="/sys/kernel/debug/sched/features"
 	else
 		sched_feature_file="/sys/kernel/debug/sched/features"
@@ -214,13 +211,13 @@ function test_setup()
 	rlFileSubmit "cgroups.txt"
 
 	if uname -r | grep rt && virt-what | grep kvm; then
-		$report_func skip_kernel_rt_kvm_guest_${SCHED_NR_CPU} SKIP
+		rstrnt-report-result skip_kernel_rt_kvm_guest_${SCHED_NR_CPU} SKIP
 		exit 0
 	fi
 
 	SCHED_NR_CPU=$(nproc)
 	if [ $SCHED_NR_CPU -lt 1 ]; then
-		$report_func test_skip_nr_cpu_${SCHED_NR_CPU} SKIP
+		rstrnt-report-result test_skip_nr_cpu_${SCHED_NR_CPU} SKIP
 		return
 	fi
 
@@ -350,7 +347,7 @@ function test_sched_rr()
 {
 	if [ "$CGROUP_VERSION" = 2 ]; then
 		echo "not supported cgroup v2"
-		$report_func "sched_rr" SKIP
+		rstrnt-report-result "sched_rr" SKIP
 		return
 	fi
 
@@ -411,7 +408,7 @@ function test_sched_fifo()
 {
 	if [ "$CGROUP_VERSION" = 2 ]; then
 		echo "not supported cgroup v2"
-		$report_func "sched_fifo" SKIP
+		rstrnt-report-result "sched_fifo" SKIP
 		return
 	fi
 
@@ -470,7 +467,7 @@ function test_rt_runtime_share()
 	uname -r | grep -q s390x && rlLogInfo "Skip test ${FUNCNAME[0]} on s390x ..." && return
 
 	if [ "$CGROUP_VERSION" = 2 ]; then
-		$report_func "rt_runtime_not_support" SKIP
+		rstrnt-report-result "rt_runtime_not_support" SKIP
 		return
 	fi
 
