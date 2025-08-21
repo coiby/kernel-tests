@@ -19,7 +19,6 @@ require:
   - grep
   - iptables
   - keyutils-libs-devel
-  - libbpf-devel
   - libibverbs-devel
   - libselinux-devel
   - libselinux-utils
@@ -47,6 +46,7 @@ require:
         -  /kernel-include
         -  /cki_lib
 recommend:
+  - libbpf-devel
   - perl-Test
   - policycoreutils-python
   - python2-lxml
