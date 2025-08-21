@@ -28,6 +28,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../enable_fips/lib.sh || exit 1
 threshold=25
 TmpDir=$(pwd)/tmp
 
@@ -46,7 +47,7 @@ rlJournalStart
             else
                 rlRun "gcc -pthread -o threaded_getrandom threaded_getrandom_ns.c"
             fi
-            rlRun "fips-mode-setup --is-enabled" 2 && rlDie "FIPS mode is enabled before test setup, please start test without FIPS mode"
+            fipsIsEnabled && rlDie "FIPS mode is enabled before test setup, please start test without FIPS mode"
         rlPhaseEnd
 
         rlPhaseStartTest "iteration 1000 and 10000 before enable FIPS mode"
@@ -56,14 +57,10 @@ rlJournalStart
     elif [[ -e $TmpDir/disable_fips_attempted ]]; then
         rlPhaseStartCleanup
             rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-            fips-mode-setup --is-enabled && fips_enabled=1
-            if [ ${fips_enabled} ]; then
-                rlDie "Failed to disable FIPS, remaining testsuite might be effected"
-            else
-                rlLog "FIPS mode disabled, end of test"
-                rlJournalEnd ; rlJournalPrintText
-                exit 0
-            fi
+            fipsIsEnabled; [ $? -eq 1 ] || rlDie "Failed to disable FIPS, remaining testsuite might be affected"
+            rlLog "FIPS mode disabled, end of test"
+            rlJournalEnd ; rlJournalPrintText
+            exit 0
         rlPhaseEnd
 
     else
@@ -71,19 +68,11 @@ rlJournalStart
     fi
 
     rlPhaseStartTest "enabling FIPS mode and check"
-        rlRun "fips-mode-setup --check"
-        fips-mode-setup --is-enabled && rlPass "FIPS mode is enabled" && fips_enabled=1
-        if [ ! ${fips_enabled} ]; then
+        rlRun "fipsIsEnabled" 0 && rlPass "FIPS mode is already enabled" && fips_already_enabled=1
+        if [ -z "${fips_already_enabled:-}" ]; then
             [[ -e $TmpDir/enable_fips_attempted ]] && rlDie "Failed to enable FIPS, end of test"
             rlRun "touch $TmpDir/enable_fips_attempted" && sync
-            if stat /run/ostree-booted > /dev/null 2>&1; then
-                rlRun -l "fips-mode-setup --enable --no-bootcfg"
-                kernel_args=$(fips-mode-setup --enable --no-bootcfg | awk -F\" '/fips=1/ {print $2}')
-                kernel_current=$(grubby --info=DEFAULT | awk -F\" '/kernel=/ {print $2}')
-                grubby --update-kernel="${kernel_current}" --args="${kernel_args}"
-            else
-                rlRun -l "fips-mode-setup --enable"
-            fi
+            rlRun "fipsEnable" 0
             rlRun "rhts-reboot"
         fi
     rlPhaseEnd
@@ -101,7 +90,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "Disabling FIPS mode."
-        rlRun -l "fips-mode-setup --disable"
+        rlRun "fipsDisable" 0
         touch $TmpDir/disable_fips_attempted && sync
         rlRun "rhts-reboot"
     rlPhaseEnd

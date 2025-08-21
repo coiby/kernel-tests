@@ -457,6 +457,55 @@ function fipsEnable {
 true <<'=cut'
 =pod
 
+=head2 fipsDisable
+
+Function disables FIPS 140 mode. Disabling must be completed by system restart.
+Returns 0 if disabling was successful, 1 otherwise.
+
+=over
+
+=back
+
+=cut
+function fipsDisable {
+
+    rlLog "Disabling FIPS 140 mode"
+
+    if rlIsRHEL ">=10" || rlIsFedora ">=42"; then
+
+        # Since RHEL-10.0 there is no fips-mode-setup anymore (RHEL-65652).
+        rlRun "update-crypto-policies --set DEFAULT" 0 "Disable FIPS policy" || return 1
+
+    elif rlIsFedora || rlIsRHEL "8" "9"; then
+
+        # Use crypto-policies/fips-mode-setup to disable FIPS 140 mode.
+        rlRun "FIPS_MODE_SETUP_SKIP_WARNING=1 fips-mode-setup --disable" 0 "Disable FIPS 140 mode" || return 1
+
+    elif rlIsRHEL "6" "7"; then
+
+        # Remove userspace FIPS marker if present.
+        rlRun "rm -f /etc/system-fips" 0,1 "Remove userspace FIPS marker" || return 1
+
+    else
+        rlLogError "Unsupported distro!"
+        return 1
+    fi
+
+    # Remove kernel fips=1 argument from all entries.
+    rlRun "grubby --update-kernel=ALL --remove-args='fips=1'" 0,1 "Remove fips=1 from kernel cmdline" || return 1
+
+    # Apply bootloader changes on s390x.
+    if [ "$(uname -m)" == "s390x" ]; then
+        rlRun "zipl" 0 "Apply zipl configuration" || return 1
+    fi
+
+    return 0
+}
+
+
+true <<'=cut'
+=pod
+
 =head2 fipsLibraryLoaded
 
 Initialization callback.
