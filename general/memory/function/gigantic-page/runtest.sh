@@ -5,8 +5,7 @@
 # ---------------------------------------
 
 # Enable TMT testing for RHIVOS
-. ../../../../automotive/include/rhivos.sh
-declare -F check_result && report_func=check_result || report_func=rstrnt-report-result
+. ../../../cki_lib/libcki.sh
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
@@ -58,7 +57,7 @@ function system_check()
 	fi
 
 	if [ $TESTSKIP -eq 1 ]; then
-		$report_func Test_Skipped PASS 99
+		rstrnt-report-result Test_Skipped PASS 99
 		rlPhaseEnd
 		rlJournalPrintText
 		rlJournalEnd

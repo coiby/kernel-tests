@@ -9,6 +9,6 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=grubby;numactl
-repoRequires=automotive/include
+repoRequires=cki_lib
 max_time=60m
 use_pty=false
