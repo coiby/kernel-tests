@@ -29,9 +29,7 @@
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 
 # Enable TMT testing for RHIVOS
-. ../../../automotive/include/rhivos.sh
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
-
+. ../../../cki_lib/libcki.sh
 
 # trinity-9f6f9f916da3 (v1.8)
 # trinity-865ac5d8 (v1.9)
@@ -120,7 +118,7 @@ function test_setup()
 		rlRun "./configure"
 	fi
 	rlRun "make -j ${SCHED_NR_CPU}" || rlDie "compile"
-	if [ $is_rhivos == 1 ];then
+	if cki_is_kernel_automotive; then
 		#rlRun "echo \"DESTDIR=\"/usr/local\"\" >> /etc/environment"
 		rlRun "export DESTDIR=\"/usr/local\""
 	fi
