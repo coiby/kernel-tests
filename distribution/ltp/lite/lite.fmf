@@ -26,8 +26,6 @@ require:
   - rpm-build
   - libaio-devel
   - libcap-devel
-  - numactl-devel
-  - numactl
   - strace
   - wget
   - iputils
@@ -38,7 +36,10 @@ require:
       - /distribution/ltp/include-ng
       - /distribution/ltp/kirk
 recommend:
+  - initscripts
   - initscripts-service
+  - numactl-devel
+  - numactl
   - python3-click
 duration: 6h
 adjust+:

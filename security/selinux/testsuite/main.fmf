@@ -19,7 +19,6 @@ require:
   - grep
   - iptables
   - keyutils-libs-devel
-  - libbpf-devel
   - libibverbs-devel
   - libselinux-devel
   - libselinux-utils
@@ -32,7 +31,6 @@ require:
   - net-tools
   - nftables
   - nmap-ncat
-  - perl-Test
   - perl-Test-Harness
   - perl-Test-Simple
   - policycoreutils
@@ -48,6 +46,8 @@ require:
         -  /kernel-include
         -  /cki_lib
 recommend:
+  - libbpf-devel
+  - perl-Test
   - policycoreutils-python
   - python2-lxml
   - jfsutils
