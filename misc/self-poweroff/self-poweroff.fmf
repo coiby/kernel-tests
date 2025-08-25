@@ -15,7 +15,10 @@ component:
 path: /misc/self-poweroff
 test: bash -x ./runtest.sh
 framework: shell
-require: []
+require:
+    - type: file
+      pattern:
+          - /cki_lib
 duration: 1h
 extra-summary: /misc/self-poweroff
 extra-task: /misc/self-poweroff
