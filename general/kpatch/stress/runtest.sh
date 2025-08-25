@@ -34,10 +34,11 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../include/lib.sh
 
-KPATCH_MODULE="${KPATCH_MODULE:-}"
+KPATCH_PATCH="${KPATCH_PATCH:-}"
+KPATCH_MODULE=""
 KPATCH_PATH="${KPATCH_PATH:-}"
 STRESSER="${STRESSER:-kbuild trace stress-ng}"
-if [ -z "$KPATCH_MODULE" ]; then
+if [ -z "$KPATCH_PATCH" ]; then
     if rpm -qa | grep kpatch-patch ; then
         KPATCH_PATH="/usr/lib/kpatch/$(uname -r)"
         for m in $KPATCH_PATH/*.ko
@@ -58,6 +59,8 @@ if [ -z "$KPATCH_MODULE" ]; then
         KPATCH_MODULE="test_klp_livepatch"
         KPATCH_PATH="${LIVEPATCH_TEST_MODULES}/test_modules"
     fi
+else
+    KPATCH_MODULE=$(echo ${KPATCH_PATCH} | sed -e "s/kpatch-patch/kpatch/" | sed -e "s/\.test.*/_test/")
 fi
 
 echo "KPATCH_MODULE=$KPATCH_MODULE"
