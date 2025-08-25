@@ -2,7 +2,7 @@ summary: packages/perf/perftool-testsuite
 description: Wrapper to run upstream perftool test suite
 tag:
   - KernelTier1
-contact: Michael Petlan <mpetlan@redhat.com>
+contact: Qiao Zhao <qzhao@redhat.com>
 component:
   - kernel
 test: bash ./runtest.sh
