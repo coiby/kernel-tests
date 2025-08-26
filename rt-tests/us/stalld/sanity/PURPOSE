@@ -1,15 +1,49 @@
-Start the stalld daemon:
+DESCRIPTION
 
-  stalld -v -t 30 -r 1000000
+This test validates that starved SCHED_NORMAL tasks can be boosted with either
+stalld or dl-server,
 
-  -t 30
-       The startving task will wait 30s before getting boosted.
+A high-priority hogger task (stress-ng at SCHED_FIFO(1)) is used to continuously
+occupy the core. A starver task (SCHED_NORMAL) is pinned to the same core, which
+would normally be starved.
 
-  -r 1000000
-       The starving task will receive this [ns] of SCHED_DEADLINE runtime.
+The test passes if the starver task gets scheduled, which is verified by
+observing its sched_switch events. This confirms that the kernel's starvation
+relief mechanism (either stalld or dl-server) has successfully boosted the
+starver, allowing it to preempt the hogger.
 
-This test uses stress-ng to monopolize a CPU with a timeout of 120s, then starts
-a non-realtime task and let it starve on the same CPU. It should take no more
-than 120s for the task to finish, otherwise it's considered as a FAIL. In
-practice, one boost cycle is sufficient to finish the task, plus some other time
-costs, tests can usually finish in 60s.
+
+CONFIGURATION
+
+* The hogger and starver processes are pined to an isolated core to minimize the
+  impact on housekeeping.
+* Hogger: stress-ng running a CPU-bound load in FIFO(1).
+* Starver: A SCHED_NORMAL process that repeatedly checks and prints its own
+  sched policy.
+* Stalld: In our setting the period is 200ms, runtime is 1ms, and boost duration
+  is 1s, process will get boosted when they get starved for 1s. Basically when a
+  task is starved for 1s, then for the next 1s it will be SCHED_DEADLINE, and
+  for every 200ms it gets 1ms runtime. That's the design anyways..
+
+
+NOTES
+
+The overall goal is to verify that starved, non-real-time threads are correctly
+boosted. The specific mechanism for this has changed.
+
+* Prior to 10.1: stalld must be explicitly run to detect and boost any starved
+  task to SCHED_DEADLINE.
+* 10.1+: The kernel's dl-server (fair-server) is enabled by default. It provides
+  a runtime bandwidth to starved SCHED_NORMAL tasks. In this environment, stalld
+  automatically enters a "log-only" mode and no longer performs boosts,
+  deferring to dl-server.
+
+
+KNOWN ISSUES
+
+* ktimers/N threads run in FIFO(1) which is the same priority with the hogger
+  process. Both the starver task and the timeout option in stress-ng command
+  rely on the ktimers/N to handle the timer request, and that will essentially
+  block our testing on el10 with the log-only stalld and dl-server combination
+  as RT tasks won't get boosted. As a workaround the ktimers/N thread on the
+  test core is manually changed to FIFO(5) and restored after testing.
