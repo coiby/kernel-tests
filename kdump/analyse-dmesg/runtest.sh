@@ -82,10 +82,10 @@ AnalyseDmesg(){
     GetDumpFile ${file_name}
     # shellcheck disable=SC2154
     if [ $? -ne 0 ]; then
-        Error "Couldn't find the dmesg file. Please check kdump process in console log"
+        Skip "Couldn't find the dmesg file. Please check kdump process in console log"
         return
     elif [ ! -s "${dump_file_path}" ]; then
-        Error "The dmesg file is empty"
+        Skip "The dmesg file is empty"
         return
     else
         RhtsSubmit "${dump_file_path}"

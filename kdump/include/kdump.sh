@@ -796,7 +796,7 @@ SystemCrashTest(){
             Log "--------------------------------------------------"
             Log "[PANIC_VMCORE_CHECK=true] Check if vmcore is saved"
             Log "--------------------------------------------------"
-            GetCorePath
+            CheckCoreFile
             report_result "check-vmcore" PASS 0
         }
 
