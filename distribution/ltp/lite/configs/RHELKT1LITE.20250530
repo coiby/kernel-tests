@@ -153,8 +153,6 @@ clock_settime01 clock_settime01
 clock_settime02 clock_settime02
 clock_settime03 clock_settime03
 
-clone01 clone01
-clone02 clone02
 clone03 clone03
 clone04 clone04
 clone05 clone05
@@ -2163,3 +2161,7 @@ FSX042 fsx-linux -N 10000 -o 4096
 # to disturb the kernel. A good kernel latency killer too.
 # Was not sure why it should reside in runtest/crashme and won´t get tested ever
 proc01 proc01 -m 128
+#Move clone01 and clone02 to the end of RHELKT1LITE config so they run after other tests, in case of restraintd stop LTP abnormally during the test.
+#https://datawarehouse.cki-project.org/kcidb/tests?testresult_filter=RHELKT1LITE&testresult_status_filter=FAIL&page=1
+clone01 clone01
+clone02 clone02
