@@ -1,0 +1,13 @@
+[General]
+name=/kernel/kpatch/integration-rhel
+owner=Yulia Kopkova <ykopkova@redhat.com>
+description=Kpatch integration testing (RHEL)
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=24h
+softDependencies=kpatch;make;git;curl;clang;gcc;grubby;mailx;sendmail;postfix;gzip
+repoRequires=general/kpatch/include

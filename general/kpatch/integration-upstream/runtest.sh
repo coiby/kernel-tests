@@ -223,7 +223,7 @@ function kpatch_integration_tests()
                 test_pass "integration_${prefix}"
         else
                 send_mail "integration" "${KPATCH_DIR}/test/integration/*.log"
-                test_fail "integration_${prefix}" FAIL "${rc}"
+                test_fail "integration_${prefix}" "${rc}"
         fi
 
         cd "${previous_dir}" || exit 1
