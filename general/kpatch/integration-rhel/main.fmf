@@ -1,0 +1,25 @@
+contact: Yulia Kopkova <ykopkova@redhat.com>
+description: |
+    Kpatch integration testing (RHEL)
+component:
+  - kernel
+test: bash ./runtest.sh
+framework: shell
+recommend:
+  - kpatch
+  - make
+  - git
+  - gzip
+  - curl
+  - clang
+  - gcc
+  - grubby
+  - mailx
+  - sendmail
+  - postfix
+  - type: file
+    pattern:
+      - /general/kpatch/include/lib.sh
+duration: 24h
+extra-summary: /kernel/kpatch/integration-rhel
+extra-task: /kernel/kpatch/integration-rhel
