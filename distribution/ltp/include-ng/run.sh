@@ -164,6 +164,7 @@ RunTest ()
     debug "Command Line:"
     debug "kirk $RUNTEST $OUTPUTDIR \"$OPTIONS\""
     kirk_runltp $RUNTEST $OUTPUTDIR "$OPTIONS"
+    kirk_exit_code=$?
 
     ipc_debug_info After
     if [ $RUNTEST = "ipc" ]; then
@@ -172,6 +173,13 @@ RunTest ()
     fi
 
     log_deceiver
+
+    if  [[ $kirk_exit_code -ne 0 ]]; then
+        # create the file with this information
+        echo "fail: kirk_runltp failed to run" | tee -a $OUTPUTFILE
+        SubmitLog $KIRK_DEBUG
+        result_r="FAIL"
+    fi
 
     if ! [ -e $OUTPUTDIR/$RUNTEST.log ] || grep -q '\bfail\b' $OUTPUTDIR/$RUNTEST.log; then
         echo "$RUNTEST Failed: " | tee -a $OUTPUTFILE
