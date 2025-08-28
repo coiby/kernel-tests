@@ -57,11 +57,11 @@ timer_getoverrun01 timer_getoverrun01
 timer_gettime01 timer_gettime01
 # utime
 utime01 utime01
-utime01A symlink01 -T utime01
 utime02 utime02
 utime03 utime03
 utime04 utime04
 utime05 utime05
 utime06 utime06
+utime07 utime07
 utimes01 utimes01
 utimensat01 utimensat01
