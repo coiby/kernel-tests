@@ -4,8 +4,8 @@
 . ../../kernel-include/runtest.sh
 
 # PARAMS: KPATCHNVR, KERNELREPOTMPL, KPATCHURL
-
-KPATCHNVR=${KPATCHNVR:-}
+KPATCH_PATCH=${KPATCH_PATCH:-}
+KPATCHNVR=${KPATCHNVR:-$KPATCH_PATCH}
 KPATCHURL=${KPATCHURL:-}
 
 function logmsg ()
@@ -13,15 +13,15 @@ function logmsg ()
     echo "* kpatchinstall $(date):  $1" | tee -a $OUTPUTFILE
 }
 
-function RHTSAbort ()
+function Abort ()
 {
     logmsg "Aborting recipe: $1"
-    rhts-abort -t recipe
+    rstrnt-abort recipe
 }
 
 function report_result ()
 {
-    rhts-report-result "$1" "$2" "$OUTPUTFILE" "$3"
+    rstrnt-report-result "$1" "$2" "$OUTPUTFILE" "$3"
 }
 
 function RprtRslt ()
@@ -63,7 +63,7 @@ function install_kpatch_yum ()
 }
 
 [ -z "$KPATCHNVR" ] && [ -z "$KPATCHURL" ] && \
-    RHTSAbort "Either KPATCHNVR or KPATCHURL should be provided"
+    Abort "Either KPATCHNVR or KPATCHURL should be provided"
 
 [ ! -z "$KPATCHURL" ] && \
     KPATCHNVR=$(echo ${KPATCHURL##*/} | sed -e "s/.rpm//"  -e "s/.$(uname -m)//")
@@ -86,7 +86,7 @@ function install_kpatch_brew ()
     if [ $ret -ne 0 ]; then
         logmsg "Failed to brew_install $KPATCHNVR rpm"
         RprtRslt $TEST/install_kpatch_brew FAIL $ret
-        RHTSAbort "Failed to brew_install $KPATCHNVR rpm"
+        Abort "Failed to brew_install $KPATCHNVR rpm"
     fi
 
     logmsg "Check to see if kpatch is now installed, using rpm"
@@ -113,14 +113,14 @@ function download_kpatch_brew ()
     if [ $ret -ne 0 ]; then
         logmsg "Failed to download $KPATCHNVR rpm"
         RprtRslt $TEST/download_kpatch_rpm_brew FAIL $ret
-        RHTSAbort "Failed to download $KPATCHNVR rpm"
+        Abort "Failed to download $KPATCHNVR rpm"
     fi
     local kpatch_rpm=$(ls $KPATCHNVR.* | tail -1)
     if [ ! -e $kpatch_rpm ]; then
         logmsg "Failed to find kpatch $KPATCHNVR rpm"
         ls -la >> $OUTPUTFILE 2>&1
         RprtRslt $TEST/download_kpatch_rpm_brew FAIL 1
-        RHTSAbort "Failed to find kpatch $KPATCHNVR rpm"
+        Abort "Failed to find kpatch $KPATCHNVR rpm"
     fi
 
     logmsg "download_kpatch_brew end"
@@ -132,7 +132,7 @@ function download_kpatch_rpm ()
 {
     logmsg "download_kpatch_rpm start"
     if [ -z "$KPATCHNVR" ]; then
-        RHTSAbort "KPATCHNVR parameter is empty"
+        Abort "KPATCHNVR parameter is empty"
     fi
 
     # remove old stuff
@@ -149,7 +149,7 @@ function download_kpatch_rpm ()
         ret=$?
         if [ "$ret" -ne "0" ]; then
             RprtRslt $TEST/brew_download_kpatch FAIL $ret
-            RHTSAbort "Could not download from yum repo or brew"
+            Abort "Could not download from yum repo or brew"
         fi
     fi
 
@@ -158,7 +158,7 @@ function download_kpatch_rpm ()
         logmsg "Failed to find kpatch $KPATCHNVR rpm"
         ls -la >> $OUTPUTFILE 2>&1
         RprtRslt $TEST/download_kpatch_rpm FAIL 1
-        RHTSAbort "Failed to find kpatch $KPATCHNVR rpm"
+        Abort "Failed to find kpatch $KPATCHNVR rpm"
     fi
     logmsg "download_kpatch_rpm end"
 }
@@ -174,7 +174,7 @@ function install_kpatch ()
         ret=$?
         if [ "$ret" -ne "0" ]; then
             RprtRslt $TEST/brew_install_kpatch FAIL $ret
-            RHTSAbort "Could not install from yum repo or brew"
+            Abort "Could not install from yum repo or brew"
         fi
     fi
     lsmod | grep kpatch | tee -a $OUTPUTFILE
@@ -218,7 +218,7 @@ function prepare_for_kernelinstall ()
 
     if [ -z "$KERNELARGVERSION" ]; then
         logmsg "KERNELARGVERSION is empty, failed to find latest supported kernel"
-        RHTSAbort
+        Abort
     fi
 
     if [ -n "$KERNELREPOTMPL" ]; then
@@ -262,7 +262,7 @@ function run_kernelinstall ()
     if [ -e "../kernelinstall" ]; then
         cd ../kernelinstall
     else
-        RHTSAbort "Unable to find kernelinstall directory"
+        Abort "Unable to find kernelinstall directory"
     fi
 
     logmsg "KERNELARGNAME=$KERNELARGNAME, KERNELARGVERSION=$KERNELARGVERSION, KERNELARGVARIANT=$KERNELARGVARIANT"
@@ -271,7 +271,6 @@ function run_kernelinstall ()
         RprtRslt "kernelinstall/start" PASS 0
         echo > $OUTPUTFILE
     fi
-    rhts-flush
     chmod a+x runtest.sh ; ./runtest.sh
     echo > $OUTPUTFILE
     logmsg "run_kernelinstall end"
@@ -287,7 +286,7 @@ function verify_kpatch_loaded ()
             RprtRslt "done" PASS 0
         else
             RprtRslt "done" FAIL 1
-            RHTSAbort "No empty kpatch package found."
+            Abort "No empty kpatch package found."
         fi
         return 0
     fi
@@ -306,7 +305,7 @@ function verify_kpatch_loaded ()
         RprtRslt "done" PASS 0
     else
         RprtRslt "done" FAIL 1
-        RHTSAbort "Failed to verify that kpatch module loaded"
+        Abort "Failed to verify that kpatch module loaded"
     fi
     rm -f mod_names
     logmsg "verify_kpatch_loaded end"
