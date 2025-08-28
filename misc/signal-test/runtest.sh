@@ -7,40 +7,38 @@
 #   Author: Yumei Huang <yuhuang@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+. /usr/share/beakerlib/beakerlib.sh || exit 1
 
-TEST="misc/signal-test"
+rlJournalStart
+    rlPhaseStartSetup "Preparing system signals"
+        rlRun "gcc -o signal_test signal.c"
+        rlAssertExists "signal_test"
+    rlPhaseEnd
 
-result=FAIL
+    rlPhaseStartTest "Verify System Signals Against Man Page"
+        sys_signals=$(kill -l | tr ' ' '\n' | grep '^SIG' | awk '{print $1}')
+        sig_count=$(echo "$sys_signals" | wc -w)
+        rlAssertEquals "Should equal to 62 signals" 62 "$sig_count"
+        man_signals=$(man 7 signal | awk -v sys_signals="$sys_signals" '
+        BEGIN { in_table = 0; after_header = 0 }
+        # Find start of signal table
+        /Signal      Standard   Action   Comment/ { in_table = 1; next }
+        /────────────────────/ { if (in_table) after_header = 1; next }
+        /The signals SIGKILL and SIGSTOP/ { in_table = 0 }
 
-sys_signals=$(kill -l | tr ' ' '\n' | grep '^SIG' | awk '{print $1}')
-sig_count=$(echo "$sys_signals" | wc -w)
-if [ $sig_count -ne 62 ]; then
-    rstrnt-report-result $TEST $result
-    exit 0
-fi
+        # Process signal lines
+        in_table && after_header && /^\s{1,}SIG/ {
+            if (index(sys_signals, $1) > 0)
+                printf("%s %s\n", $1, $3)
+        }
+        ')
+        rlRun "echo -e '$man_signals' | ./signal_test"
+    rlPhaseEnd
 
-man_signals=$(man 7 signal | awk -v sys_signals="$sys_signals" '
-BEGIN { in_table = 0; after_header = 0 }
-# Find start of signal table
-/Signal      Standard   Action   Comment/ { in_table = 1; next }
-/────────────────────/ { if (in_table) after_header = 1; next }
-/The signals SIGKILL and SIGSTOP/ { in_table = 0 }
+    rlPhaseStartCleanup
+        rlRun "pkill -9 -f 'signal_test' || true"
+        rlRun "rm -f signal_test"
+    rlPhaseEnd
 
-# Process signal lines
-in_table && after_header && /^\s{1,}SIG/ {
-    if (index(sys_signals, $1) > 0)
-        printf("%s %s\n", $1, $3)
-}
-')
-
-gcc -o signal_test signal.c
-
-echo -e "$man_signals" | ./signal_test
-
-if [ "$?" -eq "0" ]; then
-    result=PASS
-else
-    result=FAIL
-fi
-
-rstrnt-report-result $TEST $result
+    rlJournalPrintText
+rlJournalEnd
