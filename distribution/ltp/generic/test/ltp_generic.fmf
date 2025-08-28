@@ -37,7 +37,6 @@ require:
   - strace
   - wget
   - python3
-  - ntpsec
   - type: file
     pattern:
      - /cki_lib
@@ -45,6 +44,8 @@ require:
      - /distribution/ltp/include-ng
      - /distribution/ltp/kirk
 recommend:
+  - ntp
+  - ntpsec
   - python3-click
 adjust+:
   - when: arch == x86_64
