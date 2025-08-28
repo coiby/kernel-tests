@@ -28,8 +28,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Enable TMT testing for RHIVOS
-auto_include=../../../automotive/include/rhivos.sh
-[ -f $auto_include ] && . $auto_include
+. ../../../cki_lib/libcki.sh || exit 1
 
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../include/runtest.sh || exit 1
@@ -43,7 +42,7 @@ rlJournalStart
 
 			# RHEL continues to use SKIP to avoid cluttering the data warehouse with WARN results.
 			# For RHIVOS, use rlFail in Setup phase to leave a WARN result for FuSa validator requirements.
-			if ! kernel_automotive; then
+			if ! cki_is_kernel_automotive; then
 				rstrnt-report-result sched_cfs_rq_starve SKIP
 			else
 				rlFail "Insufficient CPUs"

@@ -27,8 +27,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export is_rhivos=0
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "$FILE")
+. "$CDIR"/../../../cki_lib/libcki.sh || exit 1
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
@@ -426,7 +427,7 @@ function check_cgroup_version()
 
         gen_cgexec
 
-        if (($is_rhivos)); then
+        if cki_is_kernel_automotive; then
                 CGROUP_EXEC=/tmp/cgexec.sh
         else
                 CGROUP_EXEC=/usr/bin/cgexec.sh
@@ -932,7 +933,7 @@ function gen_cgexec()
 
         echo "cgexec.sh in $res"
 
-        if (($is_rhivos)); then
+        if cki_is_kernel_automotive; then
                 \cp $res /tmp -f
                 test -f /tmp/cgexec.sh
         else

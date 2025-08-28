@@ -11,4 +11,4 @@ entry_point=bash ./runtest.sh
 max_time=1h
 dependencies=gcc;libgcc;glibc-devel;rpm-build;psmisc;
 softDependencies=rt-setup;trace-cmd
-repoRequires=general/include
+repoRequires=general/include;cki_lib
