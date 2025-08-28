@@ -37,6 +37,8 @@ require+:
   - strace
   - wget
   - python3
+recommend:
+  - ntp
   - ntpsec
 adjust+:
   - when: arch == x86_64
