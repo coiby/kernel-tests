@@ -5,10 +5,10 @@ contact: Yumei Huang <yuhuang@redhat.com>
 component:
   - kernel
 path: /misc/signal-test
-test: bash -x ./runtest.sh
-framework: shell
+test: bash ./runtest.sh
+framework: beakerlib
 require:
   - gcc
   - man-pages
-duration: 10m
+duration: 5m
 id: aa2d44c4-8fdf-466b-ad29-85ba755c49d5
