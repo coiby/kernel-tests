@@ -1,3 +1,4 @@
+summary: Kpatch integration testing (upstream kernel)
 contact: Yulia Kopkova <ykopkova@redhat.com>
 description: |
     Kpatch integration testing (upstream kernel)
