@@ -17,6 +17,7 @@ recommend:
   - mailx
   - sendmail
   - postfix
+require:
   - type: file
     pattern:
       - /general/kpatch/include/lib.sh
