@@ -154,6 +154,7 @@ do_net_config()
 	# install jq for fib_nexthops.sh test
 	install_epel_pkg netsniff-ng || { test_fail "install netsniff for net test failed" && return 1; }
 	install_epel_pkg netperf || { test_fail "install netperf for net test failed" && return 1; }
+	install_epel_pkg ndisc6 || { test_warn "install ndisc6 for net test failed" && return 1; }
 }
 
 do_net_reset()
