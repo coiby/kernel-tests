@@ -38,6 +38,16 @@ rlJournalStart
       rstrnt-report-result "${RSTRNT_TASKNAME}" WARN
       exit 0
     fi
+
+    echo "Disable avocado framework beaker plugin"
+    cfg=~/.config/avocado/avocado.conf
+    if test -d ~/.config/avocado/; then
+        mv -f ~/.config/avocado/ ~/.config/avocado.restore && req_restore=1
+    fi
+    mkdir -p ~/.config/avocado/
+    touch $cfg
+    echo "[plugins]" > $cfg
+    echo "disable = ['result_events.beaker']" >> $cfg
   rlPhaseEnd
 
   rlPhaseStartSetup
@@ -56,6 +66,11 @@ rlJournalStart
     # expect a timeout exit code in machines with large RAM
     rlRun -l "avocado run avocado-misc-tests/memory/fork_mem.py --job-timeout 15m" "0,8"
     rstrnt-report-log -l /root/avocado/job-results/latest/job.log
+    if [ "$req_restore" = 1 ]; then
+        mv -f ~/.config/avocado.restore  ~/.config/avocado
+    else
+        rm -fr ~/.config/avocado
+    fi
   rlPhaseEnd
 rlJournalEnd
 
