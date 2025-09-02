@@ -9,6 +9,9 @@ framework: beakerlib
 require:
   - grubby
   - numactl
+  - type: file
+    pattern:
+        - /cki_lib
 adjust+:
   - enabled: false
     when: arch != x86_64

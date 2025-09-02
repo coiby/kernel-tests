@@ -26,11 +26,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Enable TMT testing for RHIVOS
-auto_include=../../automotive/include/rhivos.sh
-[ -f $auto_include ] && . $auto_include
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+. ../../cki_lib/libcki.sh || exit 1
 
-if ! (($is_rhivos)); then
+if ! cki_is_kernel_automotive; then
     # Include rhts environment
     . /usr/bin/rhts-environment.sh
 fi
@@ -44,7 +42,7 @@ export TEST="misc/self-poweroff"
 # once. When the guest gets powered on again by the host, we don't want
 # to power off repeatedly.
 
-if (($is_rhivos)); then
+if cki_is_kernel_automotive; then
     STAMP_FILE=/tmp/.self-poweroff
 else
     STAMP_FILE=/.self-poweroff

@@ -13,7 +13,7 @@ framework: beakerlib
 require:
   - type: file
     pattern:
-      - /automotive/include
+      - /cki_lib
 recommend:
   - kernel
   - kernel-headers

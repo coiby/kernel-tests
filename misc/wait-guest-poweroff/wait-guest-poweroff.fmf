@@ -7,7 +7,10 @@ component:
 path: /misc/wait-guest-poweroff
 test: bash -x ./runtest.sh
 framework: shell
-require: []
+require:
+    - type: file
+      pattern:
+          - /cki_lib
 duration: 1h
 extra-summary: /misc/wait-guest-poweroff
 extra-task: /misc/wait-guest-poweroff

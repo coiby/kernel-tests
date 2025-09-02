@@ -26,11 +26,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Enable TMT testing for RHIVOS
-auto_include=../../automotive/include/rhivos.sh
-[ -f $auto_include ] && . $auto_include
-declare -F kernel_automotive && kernel_automotive && is_rhivos=1 || is_rhivos=0
+. ../../cki_lib/libcki.sh || exit 1
 
-if ! (($is_rhivos)); then
+if ! cki_is_kernel_automotive; then
     # Include rhts environment
     . /usr/bin/rhts-environment.sh
 fi
@@ -49,6 +47,7 @@ fi
 
 poll_seconds=10
 
+# shellcheck disable=SC2034
 get_guest_info.py | while IFS=$'\t' read guest_recipeid guest_name \
     guest_mac guest_loc guest_ks guest_args guest_kernel_options
 do
@@ -63,7 +62,7 @@ do
     do
         if ! virsh domstate $guest_name | head -n1 | grep -q "$WAIT_STATE"
         then
-    	    echo "$guest_name still not "$WAIT_STATE", retrying in $poll_seconds seconds."
+    	    echo "$guest_name still not '$WAIT_STATE', retrying in $poll_seconds seconds."
     	    sleep $poll_seconds
     	    continue
         fi
