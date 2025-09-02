@@ -46,6 +46,10 @@ function timerlat_start() {
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
+        # Increase hung_task_timeout_secs to 300 from 120 to avoid possible hung task crash.
+        rlRun "sysctl -w kernel.hung_task_timeout_secs=300"
+        # Dont panic if hung task encountered.
+        rlRun "sysctl -w kernel.hung_task_panic=0"
         rlRun "cp $chrony_config $backup_chrony_config"
         rlLog "Current date and time: $(date '+%d-%m-%y %H:%m:%S')"
         rlRun syzkaller_setup
