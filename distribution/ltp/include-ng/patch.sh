@@ -18,6 +18,9 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
 		${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-splice07.c-Skip-invalid-splice-tests-involving-memfd.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-rename-tid-to-tcid.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tst_atomic-drop-legacy-inline-assembly-and-use-__ato.patch
+		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tst_atomic-Introduce-tst_atomic_t-and-apply-it-consi.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-sched_football-synchronize-start-with-barrier-and-ad.patch
 	fi
 	if [ "$TESTVERSION" == "20250130" ]; then
