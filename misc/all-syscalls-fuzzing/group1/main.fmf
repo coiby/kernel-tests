@@ -100,6 +100,9 @@ environment+:
       "io_pgetevents",
       "io_setup",
       "io_submit",
+      "io_uring_enter",
+      "io_uring_register",
+      "io_uring_setup",
       "ioprio_get",
       "ioprio_set",
       "kcmp",
@@ -170,7 +173,10 @@ environment+:
     not_present_syscalls: |
       "add_key",
       "cachestat",
-      "futex_waitv"
+      "futex_waitv",
+      "io_uring_enter",
+      "io_uring_register",
+      "io_uring_setup"
 # kill could kill any process, remove it from list
 # it is actually disabled in syzkaller as default
       # "kill",
