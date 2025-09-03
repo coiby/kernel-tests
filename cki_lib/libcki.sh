@@ -8,12 +8,11 @@
 #       2) All global variables start with 'CKI_'.
 #
 
-# Set CKI test environment
+# OUTPUTFILE is set when running on restraint, otherwise let's create our own
 if [ -z "$OUTPUTFILE" ]; then
-    if ! [ -d '/mnt/testarea' ]; then
-        mkdir /mnt/testarea/
-    fi
-    OUTPUTFILE=$(mktemp /mnt/testarea/tmp.XXXXXX)
+    OUTPUTFILE="$(mktemp -d)/resultoutputfile.log"
+    touch "${OUTPUTFILE}"
+    echo "Setting OUTPUTFILE as ${OUTPUTFILE}"
     export OUTPUTFILE
 fi
 
@@ -32,6 +31,9 @@ export REBOOTCOUNT=${RSTRNT_REBOOTCOUNT:-0}
 # current tasks log file.  This well-known file is also
 # used by the local watchdog to upload the log
 # of the current task.
+if ! [ -d '/mnt/testarea' ]; then
+    mkdir /mnt/testarea/
+fi
 if [ -h /mnt/testarea/current.log ]; then
     ln -sf "$OUTPUTFILE" /mnt/testarea/current.log
 else
