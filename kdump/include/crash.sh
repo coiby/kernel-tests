@@ -30,7 +30,7 @@ GetDumpFile()
     LogRun 'find "${core_dir}" 2>&1'
     dump_file_path=$(ls -t -1 "${core_dir}"/*/${file_name} 2>/dev/null | head -1)
     if [ -z "${dump_file_path}" ]; then
-        Error "No ${file_name} saved in ${core_dir}."
+        Log "No ${file_name} saved in ${core_dir}."
         return 1
     else
         LogRun "file -i ${dump_file_path}"
@@ -44,6 +44,20 @@ GetCorePath()
     vmcore=""
     GetDumpFile "vmcore"
     if [ $? -ne 0 ]; then
+        Skip "Failed to find vmcore file. Please check kdump process in console.log"
+        Report
+    elif [ ! -s "${dump_file_path}" ]; then
+        Skip "The vmcore is empty. Please check kdump process in console.log"
+        Report
+    fi
+    vmcore="${dump_file_path}"
+}
+
+CheckCoreFile()
+{
+    vmcore=""
+    GetDumpFile "vmcore"
+    if [ $? -ne 0 ]; then
         Error "Failed to find vmcore file. Please check kdump process in console.log"
         Report
     elif [ ! -s "${dump_file_path}" ]; then
@@ -52,6 +66,7 @@ GetCorePath()
     fi
     vmcore="${dump_file_path}"
 }
+
 
 CheckVmlinux()
 {
