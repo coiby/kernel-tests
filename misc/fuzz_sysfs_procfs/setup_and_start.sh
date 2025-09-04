@@ -34,6 +34,8 @@ rlJournalStart
         rlRun "sysctl -w kernel.hung_task_timeout_secs=300"
         # Dont panic if hung task encountered.
         rlRun "sysctl -w kernel.hung_task_panic=0"
+        # Set fs.file-max to 200000 to avoid possible file descriptor limit crash during fuzzing + LTP running at the same time.
+        rlRun "sysctl -w fs.file-max=200000"
         rlRun "cp $chrony_config $backup_chrony_config"
         rlLog "Current date and time: $(date '+%d-%m-%y %H:%m:%S')"
         rlRun syzkaller_setup
