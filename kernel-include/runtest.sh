@@ -15,22 +15,6 @@ devnull=0
 # don't run it if running as part of shellspec
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
-    # Create debug log
-    DEBUGLOG=$(mktemp -p /mnt/testarea -t DeBug.XXXXXX)
-    K_DEBUGLOG=$(mktemp -p /mnt/testarea -t K_DeBug.XXXXXX)
-
-    # In the event your not running automated Beaker job
-    if [ -z "$OUTPUTFILE" ]; then
-        echo ""
-        echo "***** \$OUTPUTFILE is not defined "
-        echo "***** This is generally do to a "
-        echo "***** manual testing setup  "
-        echo "***** Creating: \$OUTPUTFILE "
-        echo ""
-        export OUTPUTFILE=$(mktemp /mnt/testarea/tmp.XXXXXX)
-    fi
-    # ToDo: $RESULT_SERVER $TESTID also need workaround
-
     OUTPUTDIR=/mnt/testarea
     if [ ! -d "$OUTPUTDIR" ]; then
 
@@ -40,6 +24,21 @@ if [ ! "${__SOURCED__:+x}" ]; then
         echo ""
         mkdir -p $OUTPUTDIR
     fi
+
+    # Create debug log
+    DEBUGLOG=$(mktemp -p "${OUTPUTDIR}" -t DeBug.XXXXXX)
+    K_DEBUGLOG=$(mktemp -p "${OUTPUTDIR}" -t K_DeBug.XXXXXX)
+
+    # OUTPUTFILE is set when running on restraint, otherwise let's create our own
+    if [ -z "$OUTPUTFILE" ]; then
+        export OUTPUTFILE="$(mktemp -d -p ${OUTPUTDIR})/resultoutputfile.log"
+        echo ""
+        echo "***** \$OUTPUTFILE is not defined "
+        echo "***** Creating: \$OUTPUTFILE "
+        echo ""
+        touch "${OUTPUTFILE}"
+    fi
+    # ToDo: $RESULT_SERVER $TESTID also need workaround
 
     # locking to avoid races
     lck=$OUTPUTDIR/$(basename $0).lck
