@@ -15,9 +15,19 @@ devnull=0
 # don't run it if running as part of shellspec
 # https://github.com/shellspec/shellspec#__sourced__
 if [ ! "${__SOURCED__:+x}" ]; then
+    OUTPUTDIR=/mnt/testarea
+    if [ ! -d "$OUTPUTDIR" ]; then
+
+        echo ""
+        echo "***** OUTPUTDIR is not defined "
+        echo "***** Creating: $OUTPUTDIR  "
+        echo ""
+        mkdir -p $OUTPUTDIR
+    fi
+
     # Create debug log
-    DEBUGLOG=$(mktemp -p /mnt/testarea -t DeBug.XXXXXX)
-    K_DEBUGLOG=$(mktemp -p /mnt/testarea -t K_DeBug.XXXXXX)
+    DEBUGLOG=$(mktemp -p "${OUTPUTDIR}" -t DeBug.XXXXXX)
+    K_DEBUGLOG=$(mktemp -p "${OUTPUTDIR}" -t K_DeBug.XXXXXX)
 
     # In the event your not running automated Beaker job
     if [ -z "$OUTPUTFILE" ]; then
@@ -30,16 +40,6 @@ if [ ! "${__SOURCED__:+x}" ]; then
         export OUTPUTFILE=$(mktemp /mnt/testarea/tmp.XXXXXX)
     fi
     # ToDo: $RESULT_SERVER $TESTID also need workaround
-
-    OUTPUTDIR=/mnt/testarea
-    if [ ! -d "$OUTPUTDIR" ]; then
-
-        echo ""
-        echo "***** OUTPUTDIR is not defined "
-        echo "***** Creating: $OUTPUTDIR  "
-        echo ""
-        mkdir -p $OUTPUTDIR
-    fi
 
     # locking to avoid races
     lck=$OUTPUTDIR/$(basename $0).lck
