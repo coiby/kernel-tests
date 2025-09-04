@@ -21,3 +21,10 @@ recommend:
   - dnf-utils
   - libbpf 
 duration: 60m
+adjust+:
+  # don't run on kernel debug
+  - when: package-name ~ kernel.*debug
+    enabled: false
+  # don't run on kernel rt
+  - when: package-name ~ kernel.*rt
+    enabled: false
