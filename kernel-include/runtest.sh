@@ -29,15 +29,14 @@ if [ ! "${__SOURCED__:+x}" ]; then
     DEBUGLOG=$(mktemp -p "${OUTPUTDIR}" -t DeBug.XXXXXX)
     K_DEBUGLOG=$(mktemp -p "${OUTPUTDIR}" -t K_DeBug.XXXXXX)
 
-    # In the event your not running automated Beaker job
+    # OUTPUTFILE is set when running on restraint, otherwise let's create our own
     if [ -z "$OUTPUTFILE" ]; then
+        export OUTPUTFILE="$(mktemp -d -p ${OUTPUTDIR})/resultoutputfile.log"
         echo ""
         echo "***** \$OUTPUTFILE is not defined "
-        echo "***** This is generally do to a "
-        echo "***** manual testing setup  "
         echo "***** Creating: \$OUTPUTFILE "
         echo ""
-        export OUTPUTFILE=$(mktemp /mnt/testarea/tmp.XXXXXX)
+        touch "${OUTPUTFILE}"
     fi
     # ToDo: $RESULT_SERVER $TESTID also need workaround
 
