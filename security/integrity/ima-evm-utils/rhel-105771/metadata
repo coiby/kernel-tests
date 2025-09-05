@@ -1,0 +1,13 @@
+[General]
+name=/kernel-tests/security/integrity/ima-evm-utils/rhel-105771
+owner=Dennis Li <denli@redhat.com>
+description=Test for RHEL-105771 (verify all files pass verification with ima-add-sigs)
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash -x ./runtest.sh
+max_time=30m
+use_pty=false
+dependencies=ima-evm-utils;ima-evm-utils-devel;openssl;attr

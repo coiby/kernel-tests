@@ -1,0 +1,14 @@
+summary: Test for ima-evm-utils ima-add-sigs function
+description: Test for RHEL-105771 (verify all files pass verification with ima-add-sigs)
+contact: Dennis Li <denli@redhat.com>
+component:
+  - kernel
+path: /security/integrity/ima-evm-utils/rhel-105771
+test: bash +x runtest.sh
+framework: beakerlib
+require:
+  - ima-evm-utils
+  - ima-evm-utils-devel
+  - openssl
+  - attr
+duration: 30m
