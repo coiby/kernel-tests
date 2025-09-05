@@ -46,6 +46,8 @@ function rhel7_fatal_issues()
 	osver_in_range "700" "710" && tskip "pty03" fatal
 	# RHELTEST-1405: distribution/ltp/generic: VMMTIER1 mmap21_*__with_dmesg_entry "mmap21: command not found"
 	osver_in_range "700" "711" && tskip "mmap21*" fatal
+	# RHELTEST-1653: distribution/ltp/generic: utime07 fails with "utime07: command not found"
+	osver_in_range "700" "711" && tskip "utime07" fatal
 }
 
 function rhel7_unfix_issues()

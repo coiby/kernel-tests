@@ -23,6 +23,8 @@ function rhel8_fatal_issues()
 	is_rt && cki_is_kernel_debug && osver_in_range "806" "807" && tskip "proc01" fatal
 	# RHELTEST-1405: distribution/ltp/generic: VMMTIER1 mmap21_*__with_dmesg_entry "mmap21: command not found"
 	osver_in_range "800" "811" && tskip "mmap21*" fatal
+	# RHELTEST-1653: distribution/ltp/generic: utime07 fails with "utime07: command not found"
+	osver_in_range "800" "811" && tskip "utime07" fatal
 }
 
 function rhel8_unfix_issues()
