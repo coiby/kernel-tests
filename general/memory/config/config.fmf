@@ -16,7 +16,7 @@ require:
     - numactl
     - perf
     - psmisc
-    - python
+    - python3
     - strace
     - sysstat
     - trace-cmd
@@ -26,6 +26,7 @@ require:
           - /cmdline_helper
           - /kernel-include
 recommend:
+    - python
     - libcgroup
     - libcgroup-tools
     - abootimg
