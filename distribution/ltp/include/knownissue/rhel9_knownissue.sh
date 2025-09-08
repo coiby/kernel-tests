@@ -16,6 +16,8 @@ function rhel9_fatal_issues()
 	is_arch "x86_64" && osver_in_range "904" "906" && tskip "pt_ex_user" fatal
 	# RHELTEST-1405: distribution/ltp/generic: VMMTIER1 mmap21_*__with_dmesg_entry "mmap21: command not found"
 	osver_in_range "900" "906" && tskip "mmap21*" fatal
+	# RHELTEST-1653: distribution/ltp/generic: utime07 fails with "utime07: command not found"
+	osver_in_range "900" "905" && tskip "utime07" fatal
 }
 
 function rhel9_unfix_issues()
