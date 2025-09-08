@@ -175,8 +175,10 @@ RunTest ()
     log_deceiver
 
     if  [[ $kirk_exit_code -ne 0 ]]; then
-        # create the file with this information
         echo "fail: kirk_runltp failed to run" | tee -a $OUTPUTFILE
+        # It might help to know why kirk failed
+        journalctl -n 100 --no-pager | tee -a $OUTPUTFILE
+        echo "upload kirk debug log: $KIRK_DEBUG" | tee -a $OUTPUTFILE
         SubmitLog $KIRK_DEBUG
         result_r="FAIL"
     fi
