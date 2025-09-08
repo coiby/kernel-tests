@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TEST="general/time/hpet_device"
+
 hpet_cmd="./hpet_example"
 hpet_device="/dev/hpet"
 result_r="PASS"
