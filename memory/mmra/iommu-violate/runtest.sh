@@ -68,7 +68,7 @@ function install_qemu() {
 
 # Function to download the VM image
 function download_image() {
-    local file image_name base_url
+    local file image_name base_url release_candidates rel xz_files file_count
 
     # Check if the VM image already exists
     file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2' -print)
@@ -90,39 +90,82 @@ function download_image() {
     fi
 
     # Content of a typical /etc/build-info:
-    # 	RELEASE="nightly"
-    # 	UUID="8326686.cbce78cd"
-    # 	TIMESTAMP="2024-06-03 01:00:31.167657"
+    # 	DISTRO="rhivos"
+    # 	RELEASE="RHIVOS-1.0.0-RC2-202505150717"
+    # 	UUID="11664414.72af3145"
+    # 	TIMESTAMP="2025-05-15 08:28:58.314913"
     # 	IMAGE_NAME="qa"
     # 	IMAGE_MODE="package"
     # 	IMAGE_TARGET="ridesx4"
+    # 	IMAGE_VERSION="unversioned"
+
     rlLog "Content of /etc/build-info:\n$(cat /etc/build-info)"
 
     # shellcheck disable=SC1091
     source /etc/build-info
 
-    IMAGE_NAME=qa                     # ATC only provide qa regular images
+    IMAGE_NAME=qa # ATC only provide qa regular images
     IMAGE_TYPE=regular
-    [[ ${#UUID} -gt 16 ]] && UUID='*' # Support non-toolchain images
-    image_name="auto-osbuild-qemu-rhivos-${IMAGE_NAME}-${IMAGE_TYPE:=regular}-$(arch)-${UUID}.qcow2"
+    [[ ${#UUID} -gt 17 ]] && UUID='*' # Support non-toolchain images
+    image_name="auto-osbuild-qemu-rhivos-${IMAGE_NAME}-${IMAGE_TYPE}-$(arch)-${UUID}.qcow2"
     rlLog "The image name to be downloaded is '$image_name'."
 
-    # Download the qcow2 image
-    rlLog "Starting download of the qcow2 image."
-    base_url="http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/RHIVOS-1/${RELEASE_NAME:=latest-RHIVOS-1}/sample-images"
-    if [[ $image_name =~ \* ]]; then
-        wget --no-verbose -r -p --level 1 -E -e robots=off --cut-dirs=7 -nH --reject='index.html*' --reject='*.png' --reject='*.gif' \
-            -P "$WORKSPACE" -A "${image_name}.xz" -A "${image_name}.xz.sha256" "${base_url}"
+    # If $RELEASE doesn't work, also try $RELEASE_NAME as a fallback
+    if [[ -z $RELEASE ]] || [[ $RELEASE = "nightly" ]] || [[ $RELEASE = "$RELEASE_NAME" ]]; then
+        release_candidates=("$RELEASE_NAME")
     else
-        wget --no-verbose -P "$WORKSPACE" "${base_url}/${image_name}.xz"
-        wget --no-verbose -P "$WORKSPACE" "${base_url}/${image_name}.xz.sha256"
+        release_candidates=("$RELEASE" "$RELEASE_NAME")
     fi
 
-    # Verify download and checksum
-    file=$(find "$WORKSPACE" -maxdepth 1 -type f -name 'auto-osbuild-qemu-rhivos-*.qcow2.xz' -print)
-    if [[ $(echo "$file" | wc -w) -ne 1 ]]; then
-        rlLog "Downloaded zero or multiple images. Please check the workspace content:"
-        ls -la "$WORKSPACE"
+    # Loop through each release candidate
+    for rel in "${release_candidates[@]}"; do
+        # Construct the base URL for the given release
+        base_url="http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/RHIVOS-1/${rel}/sample-images"
+        rlLog "Attempting download from: $base_url (pattern: ${image_name}.xz[.sha256])"
+
+        # Use wget to download files matching .xz and .xz.sha256 pattern (the latter is optional)
+        # --recursive: enable recursive download
+        # --level=1: only go one level deep
+        # --no-parent: don't ascend to parent directories
+        # --accept: only download files matching the specified patterns
+        # --cut-dirs=7: strip the first 7 directories in the URL when saving locally
+        # --no-host-directories: avoid creating a host-based directory structure
+        # --directory-prefix: set download destination to $WORKSPACE
+        # --execute robots=off: ignore robots.txt
+        wget --no-verbose --recursive --level=1 --no-parent \
+            --accept="${image_name}.xz,${image_name}.xz.sha256" \
+            --cut-dirs=7 --no-host-directories --directory-prefix="$WORKSPACE" \
+            --execute robots=off "$base_url"
+
+        # Find all .xz files downloaded (excluding any .xz.sha256 files)
+        mapfile -t xz_files < <(find "$WORKSPACE" -type f -name "${image_name}.xz")
+        file_count=${#xz_files[@]} # Count number of matched .xz files
+
+        if [[ $file_count -gt 0 ]]; then
+            # If .xz file is found, treat this as success and stop
+            rlLog "Download successful from release: $rel"
+            break
+        else
+            # No .xz file was found in this attempt
+            rlLog "No .xz files downloaded from release: $rel"
+        fi
+    done
+
+    # If no valid .xz file was downloaded after all attempts, exit with failure
+    if [[ $file_count -eq 0 ]]; then
+        rlLogError "Failed to download a valid .xz file from any release candidate."
+        return 1
+    fi
+
+    # Print the list of successfully downloaded .xz file(s)
+    rlLog "Downloaded .xz file:"
+    for file in "${xz_files[@]}"; do
+        rlLog "$file"
+    done
+
+    # If more than one .xz file found — this is treated as failure due to ambiguity
+    if [[ $file_count -gt 1 ]]; then
+        rlLogError "Unexpected number of .xz files downloaded from $rel. Expected exactly one."
         return 1
     fi
 
