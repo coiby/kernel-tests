@@ -427,7 +427,7 @@ function check_cgroup_version()
 
         gen_cgexec
 
-        if cki_is_kernel_automotive; then
+        if cki_is_ostree_booted; then
                 CGROUP_EXEC=/tmp/cgexec.sh
         else
                 CGROUP_EXEC=/usr/bin/cgexec.sh
@@ -933,7 +933,7 @@ function gen_cgexec()
 
         echo "cgexec.sh in $res"
 
-        if cki_is_kernel_automotive; then
+        if cki_is_ostree_booted; then
                 \cp $res /tmp -f
                 test -f /tmp/cgexec.sh
         else
