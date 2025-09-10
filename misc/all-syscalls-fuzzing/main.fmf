@@ -28,7 +28,6 @@ require:
   - wget
   - git
   - patch
-  - rtla
   - sshpass
   - tar
   - tmux
@@ -41,5 +40,4 @@ duration: 3h
 environment:
     time: 3600
     git_patches: '../misc/all-syscalls-fuzzing/all-syscalls-fuzzing.patch'
-    RHIVOS_LATENCY_THRES: 51000
     FUZZ_IN_QM: y

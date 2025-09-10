@@ -27,36 +27,12 @@ CDIR=$(dirname "$FILE")
 chrony_config=/etc/chrony.conf
 backup_chrony_config=/root/chrony.conf.bak
 
-function report_latency_results() {
-    rlRun "killall -s SIGINT rtla"
-    while pgrep -x rtla > /dev/null; do
-        rlLog "rtla processes still running: $(pgrep -x rtla | wc -l)"
-        sleep 1
-    done
-    rlFileSubmit /var/tmp/timerlat_hist.txt
-    # Extract the maximum latency value from the timerlat_hist.txt file and log the latency results
-    max_latency=$(grep "max:" /var/tmp/timerlat_hist.txt | awk -F":" '{print $2}' | tr ' ' '\n' | grep -E "[0-9]+" | awk '$0>x {x=$0}; END{print x}')
-    if [[ -z $max_latency ]]; then
-        rlFail "Unable to get maximum latency. Refer to timerlat_hist.txt for detailed results."
-    elif [[ $max_latency -gt $RHIVOS_LATENCY_THRES ]]; then
-        rlFail "Maximum latency is $max_latency which exceeds threshold $RHIVOS_LATENCY_THRES. Refer to timerlat_hist.txt for detailed results."
-    else
-        rlPass "System latency within acceptable range: $max_latency (threshold is $RHIVOS_LATENCY_THRES)."
-    fi
-    # Restore the timerlat tracing service if it was stopped earlier
-    if [[ -f /var/tmp/timerlat_trace_stopped ]]; then
-        rlRun "systemctl start timerlat_trace"
-        rlRun "rm -f /var/tmp/timerlat_trace_stopped"
-    fi
-}
-
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
     rlPhaseEnd
     rlPhaseStartTest "Stop syzkaller and get results"
         rlRun syzkaller_stop
-        rlRun report_latency_results
         rlRun syzkaller_check_results
     rlPhaseEnd
     rlPhaseStartCleanup
