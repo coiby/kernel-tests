@@ -29,6 +29,7 @@ function check_kpatch() {
     command -v kpatch || dnf -y install kpatch kpatch-dnf
 }
 
+# shellcheck disable=SC2120 # warning: cleanup_env references arguments, but none are ever passed - it seems false positive
 function cleanup_env() {
     load_patch=$(kpatch list | awk "/^Loaded/,/^Installed/ {print $1}" |grep -v "Loaded\|Installed\|^$" | awk '{print $1}')
     install_patch=$(kpatch list | awk "/^Installed/,/*/ {print $1}" |grep -v "Installed\|^$" | awk '{print $1}')
