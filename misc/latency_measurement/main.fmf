@@ -1,0 +1,19 @@
+summary: Measure system latency using rtla timerlat.
+description: |
+  This test measures system latency in microseconds (us) using rtla timerlat.
+  It runs the rtla timerlat command in the background using tmux and
+  checks if latency exceeds the maximum threshold.
+
+  Use the /start case to start measuring latency as a background process.
+  Use the /stop case to stop the background process and report results.
+
+  Inputs:
+    - LATENCY_THRES_US: The maximum threshold for acceptable latency in microseconds.
+  Expected results:
+    - Both start and stop cases should run successfully and the latency should be below the maximum threshold.
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+framework: beakerlib
+require:
+  - tmux
+  - rtla
+duration: 24h

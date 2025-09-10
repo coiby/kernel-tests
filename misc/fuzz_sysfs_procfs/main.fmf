@@ -24,7 +24,6 @@ require:
   - glibc-devel
   - make
   - patch
-  - rtla
   - sshpass
   - tar
   - tmux
@@ -37,4 +36,3 @@ require:
 duration: 3h
 environment:
   time: 3600
-  RHIVOS_LATENCY_THRES: 51000

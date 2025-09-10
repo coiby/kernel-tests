@@ -27,22 +27,6 @@ CDIR=$(dirname "$FILE")
 chrony_config=/etc/chrony.conf
 backup_chrony_config=/root/chrony.conf.bak
 
-function timerlat_setup() {
-    # Temporarily stop the timerlat tracing service if it is active (VROOM-23444)
-    if systemctl is-active --quiet timerlat_trace; then
-        rlLog "'timerlat_trace' service is currently active. Temporarily stopping it to avoid conflicts."
-        rlRun "systemctl stop timerlat_trace"
-        rlRun "touch /var/tmp/timerlat_trace_stopped"
-    else
-        rlLog "'timerlat_trace' service is not active. Proceeding with the test."
-        rlRun "rm -f /var/tmp/timerlat_trace_stopped"
-    fi
-}
-
-function timerlat_start() {
-    rlRun "tmux new-session -d -s timerlat 'rtla timerlat hist -d \"24h\" -u | tee /var/tmp/timerlat_hist.txt'"
-}
-
 rlJournalStart
     rlPhaseStartSetup
         rlShowRunningKernel
@@ -53,10 +37,8 @@ rlJournalStart
         rlRun "cp $chrony_config $backup_chrony_config"
         rlLog "Current date and time: $(date '+%d-%m-%y %H:%m:%S')"
         rlRun syzkaller_setup
-        rlRun timerlat_setup
     rlPhaseEnd
     rlPhaseStartTest "Start fuzzing with syzkaller"
-        rlRun timerlat_start
         rlRun syzkaller_start
     rlPhaseEnd
     rlPhaseStartCleanup
