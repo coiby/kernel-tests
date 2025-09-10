@@ -1,0 +1,18 @@
+summary: Get the list of available syscalls
+description: |
+    This pseudo-test retrieves a list of available
+    syscall numbers by systematically trying every one
+    from 0 to 600.
+
+    Results location:
+      output.txt
+contact: Bilal Elmoussaoui <belmouss@redhat.com>
+require:
+  - gcc
+component: kernel-automotive
+test: bash runtest.sh
+tier: 0
+id: c4590b5d-6707-4030-9606-a63ae04b106c
+adjust+:
+  - enabled: false
+    when: arch == x86_64
