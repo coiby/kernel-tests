@@ -1,0 +1,129 @@
+From 2836bdcbfd7f997a344157f20a11b3df7f8b6823 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Sat, 6 Sep 2025 08:40:31 +0800
+Subject: [PATCH] sched_football: synchronize with kickoff flag to reduce skew
+
+Previously, thread synchronization in sched_football only relied on a
+thread_barrier. This ensured that all threads were created before the
+referee started the game, but did not fully prevent offense threads from
+getting a scheduling opportunity before defense threads were migrated,
+leading to occasional non-zero final ball positions on kvm or debug kernels.
+
+This patch introduces an explicit `kickoff_flag`:
+
+* All player threads (offense, defense, fans) wait at the barrier and
+  then spin until the referee sets `kickoff_flag`. This reduces kernel
+  scheduling skew, as threads only proceed once the referee explicitly
+  signals the kickoff.
+
+* The referee now:
+  - Waits at the barrier.
+  - Clears the ball position.
+  - Sets `kickoff_flag` to start the ball.
+  - Adds a short sleep (longer on non-RT kernels) to stabilize startup.
+
+* Game termination is also slightly reordered (by Cyril):
+  - Final ball position is read before `game_over` is set,
+    avoiding a race where the ball could still move right after
+    defense threads stop.
+
+* Add a short usleep() before the referee sets the kickoff_flag so
+  that the system has more time to shuffle processes.
+
+* Wait more times on non-RT kernels.
+
+This makes startup sequencing more deterministic while still allowing
+some nondeterminism, which is intentional for testing scheduler
+behavior under load.
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Signed-off-by: Cyril Hrubis <chrubis@suse.cz>
+Tested-by: Andrea Cervesato <andrea.cervesato@suse.com>
+Tested-by: Petr Vorel <pvorel@suse.cz>
+Tested-by: Avinesh Kumar <akumar@suse.de>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+---
+ .../func/sched_football/sched_football.c      | 27 ++++++++++++++-----
+ 1 file changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/testcases/realtime/func/sched_football/sched_football.c b/testcases/realtime/func/sched_football/sched_football.c
+index 0617bdb87..4465bdde8 100644
+--- a/testcases/realtime/func/sched_football/sched_football.c
++++ b/testcases/realtime/func/sched_football/sched_football.c
+@@ -44,6 +44,7 @@
+ static tst_atomic_t the_ball;
+ static int players_per_team = 0;
+ static int game_length = DEF_GAME_LENGTH;
++static tst_atomic_t kickoff_flag;
+ static tst_atomic_t game_over;
+ 
+ static char *str_game_length;
+@@ -80,6 +81,9 @@ void *thread_defense(void *arg LTP_ATTRIBUTE_UNUSED)
+ {
+ 	prctl(PR_SET_NAME, "defense", 0, 0, 0);
+ 	pthread_barrier_wait(&start_barrier);
++	while (!tst_atomic_load(&kickoff_flag))
++		;
++
+ 	/*keep the ball from being moved */
+ 	while (!tst_atomic_load(&game_over)) {
+ 	}
+@@ -92,6 +96,9 @@ void *thread_offense(void *arg LTP_ATTRIBUTE_UNUSED)
+ {
+ 	prctl(PR_SET_NAME, "offense", 0, 0, 0);
+ 	pthread_barrier_wait(&start_barrier);
++	while (!tst_atomic_load(&kickoff_flag))
++		sched_yield();
++
+ 	while (!tst_atomic_load(&game_over)) {
+ 		tst_atomic_add_return(1, &the_ball); /* move the ball ahead one yard */
+ 	}
+@@ -115,9 +122,16 @@ void referee(int game_length)
+ 	now = start;
+ 
+ 	/* Start the game! */
+-	tst_atomic_store(0, &the_ball);
+-	pthread_barrier_wait(&start_barrier);
+ 	atrace_marker_write("sched_football", "Game_started!");
++	pthread_barrier_wait(&start_barrier);
++	usleep(200000);
++
++	tst_atomic_store(0, &the_ball);
++	tst_atomic_store(1, &kickoff_flag);
++	if (tst_check_preempt_rt())
++		usleep(20000);
++	else
++		usleep(2000000);
+ 
+ 	/* Watch the game */
+ 	while ((now.tv_sec - start.tv_sec) < game_length) {
+@@ -125,14 +139,14 @@ void referee(int game_length)
+ 		gettimeofday(&now, NULL);
+ 	}
+ 
+-	/* Stop the game! */
+-	tst_atomic_store(1, &game_over);
+-	atrace_marker_write("sched_football", "Game_Over!");
+-
+ 	/* Blow the whistle */
+ 	final_ball = tst_atomic_load(&the_ball);
+ 	tst_res(TINFO, "Final ball position: %d", final_ball);
+ 
++	/* Stop the game! */
++	tst_atomic_store(1, &game_over);
++	atrace_marker_write("sched_football", "Game_Over!");
++
+ 	TST_EXP_EXPR(final_ball == 0);
+ }
+ 
+@@ -154,6 +168,7 @@ static void do_test(void)
+ 	/* We're the ref, so set our priority right */
+ 	param.sched_priority = sched_get_priority_min(SCHED_FIFO) + 80;
+ 	sched_setscheduler(0, SCHED_FIFO, &param);
++	tst_atomic_store(0, &kickoff_flag);
+ 
+ 	/*
+ 	 * Start the offense
+-- 
+2.51.0
+
