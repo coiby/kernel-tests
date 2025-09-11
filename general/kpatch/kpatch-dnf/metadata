@@ -1,0 +1,12 @@
+[General]
+name=/kernel/general/kpatch/kpatch-dnf
+owner=Zhijun Wang <zhijwang@redhat.com>
+description=kpatch dnf plugin test suite
+license=GPLv2
+confidental=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+dependencies=kpatch;kpatch-dnf

@@ -1,0 +1,11 @@
+summary: Test kpatch-dnf function
+description: 'kpatch dnf plugin test suite'
+contact: Zhijun Wang <zhijwang@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+require:
+  - kpatch
+  - kpatch-dnf
+duration: 30m
+extra-summary: /kernel/general/kpatch/kpatch-dnf
+extra-task: /kernel/general/kpatch/kpatch-dnf
