@@ -25,8 +25,8 @@ kpp_module=kpatch_$(sed "s/[\.-]/_/g" <<< ${knvr%%.el*})
 
 config_file="/etc/dnf/plugins/kpatch.conf"
 
-function check_kpatch() {
-    command -v kpatch || dnf -y install kpatch kpatch-dnf
+function install_kpatch_package() {
+    dnf -y install kpatch kpatch-dnf
 }
 
 # shellcheck disable=SC2120 # warning: cleanup_env references arguments, but none are ever passed - it seems false positive
@@ -42,7 +42,7 @@ function cleanup_env() {
         kpatch uninstall $i
     done
 
-    dnf -qy remove ${kpp_pkg}
+    rpm -e ${kpp_pkg}
 }
 
 function dnf_auto() {
@@ -76,7 +76,7 @@ function kpatch_status() {
 
 rlJournalStart
     rlPhaseStartSetup
-        check_kpatch
+        install_kpatch_package
         cleanup_env
     rlPhaseEnd
 
