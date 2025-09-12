@@ -22,8 +22,8 @@
 # Test configuration
 # TODO: Make it customizable so we can test different driver versions
 # RHEL AI versions info: https://gitlab.com/redhat/rhel-ai/containers/nvidia-bootc/-/blob/main/argfile.conf?ref_type=heads
-DRIVER_VERSION="570.124.06"
-CUDA_VERSION='12.8.1'
+DRIVER_VERSION="580.82.07"
+CUDA_VERSION='13.0.1'
 BASE_URL='https://us.download.nvidia.com/tesla'
 SPECFILE_REPO='https://github.com/NVIDIA/yum-packaging-precompiled-kmod'
 
