@@ -102,11 +102,7 @@ rlJournalStart
         kpatch_status manual
         rlAssertGrep False ${config_file}
         kpatch_module_check 0
-        cleanup_env
     rlPhaseEnd
 
-    rlPhaseStartCleanup
-        cleanup_env
-    rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
