@@ -17,7 +17,7 @@ fi
 install_kirk()
 {
 	echo "============ Download kirk ============" | tee -a $OUTPUTFILE
-	KIRK_VER="${KIRK_VER:-v2.0}"
+	KIRK_VER="${KIRK_VER:-v2.2.2}"
 	KIRK_DIR="$(pwd)/kirk"
 
 	curl --fail --retry 5 -ks -SLO https://download.eng.bos.redhat.com/qa/rhts/lookaside/kirk-$KIRK_VER.tar.gz
