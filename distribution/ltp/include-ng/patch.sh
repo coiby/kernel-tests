@@ -23,6 +23,7 @@ patch_generic()
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tst_atomic-Introduce-tst_atomic_t-and-apply-it-consi.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-sched_football-synchronize-start-with-barrier-and-ad.patch
 		${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-sched_football-synchronize-with-kickoff-flag-to-redu.patch
+		${PATCH} < ${ABS_DIR}/INTERNAL/0001-mmap22-Improve-MAP_DROPPABLE-test-stability-using-mi.patch
 	fi
 	if [ "$TESTVERSION" == "20250130" ]; then
 		# Tips: this patch should be applied in single on ltp-next(version > 20180926)
