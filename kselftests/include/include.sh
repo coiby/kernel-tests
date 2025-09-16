@@ -241,7 +241,7 @@ check_test_exist()
 	folder=$(echo "$item" | cut -f1 -d':')
 
 	# Check if the test in kselftest-list.txt and has it's own folder
-	if grep -qE "$folder" "$EXEC_DIR"/kselftest-list.txt; then
+	if grep -qE "^$folder:" "$EXEC_DIR"/kselftest-list.txt; then
 		if [ -d "$EXEC_DIR/$folder" ]; then
 			return 0
 		fi
