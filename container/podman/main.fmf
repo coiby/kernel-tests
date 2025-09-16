@@ -3,6 +3,8 @@ contact: Kernel General Test Team <kernel-general-test-team@redhat.com>
 component:
   - kernel
   - podman
+tag:
+  - KernelTier1
 test: ./runtest.sh
 require:
   - podman
