@@ -29,6 +29,7 @@ str_dpdk_version = os.environ["DPDK_VERSION"]
 dpdk_verion = int(str_dpdk_version[0:2])
 dpdk_minor_version = int(str_dpdk_version[3:5])
 dut_nic_driver = os.getenv("NIC_DRIVER")
+CKI_case_list = "dpdk_port_info_test,dpdk_broadcast_test,dpdk_multicast_test,dpdk_promisc_test,dpdk_vlan_test,dpdk_qinq_test,dpdk_sriov_vf_func_test"
 
 def load_env():
     log(sys.path)
@@ -42,6 +43,12 @@ def test_item_check(f):
         if test_item_list == "all" or f_name in test_item_list:
             with enter_phase(f_name):
                 f(*args, **kwargs)
+        elif test_item_list == "cki" or test_item_list == "CKI":
+            if f_name in functional_case_list:
+                with enter_phase(f_name):
+                    f(*args, **kwargs)
+            else:
+                log(f"SKIP {f_name} test")
         else:
             log(f"SKIP {f_name} test")
     return check_itemlist
