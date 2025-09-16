@@ -19,6 +19,16 @@ framework: shell
 duration: 3h
 extra-summary: container/podman
 extra-task: container/podman
+adjust+:
+  # test doesn't build on rhel before 8.10
+  - when: distro < rhel-8.10
+    enabled: false
+  # don't run on kernel debug
+  - when: package-name ~ kernel.*debug
+    enabled: false
+  # don't run on kernel rt
+  - when: package-name ~ kernel.*rt
+    enabled: false
 /root:
   id: 79c01611-e568-4fd9-aa3a-fd6803599f80
 /rootless:
