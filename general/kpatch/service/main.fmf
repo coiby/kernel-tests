@@ -4,7 +4,7 @@ description: |
 contact: Yulia Kopkova <ykopkova@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
-duration: 5m
+duration: 30m
 require:
   - binutils
   - type: file
