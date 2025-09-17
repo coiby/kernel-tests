@@ -1499,6 +1499,10 @@ if [[ "$KERNELARGVARIANT" = "rt"* || "$KERNELARGNAME" == "kernel-rt"* ]]; then
 fi
 
 # New kernel variables
+# testkernrelbrewpath should contain ",draft" suffix if it is a draft brew build
+testkernrelbrewpath=$(echo $KERNELARGVERSION | awk -F- '{print $2}')
+# the rpm package does not contain the ",draft" suffix
+KERNELARGVERSION=${KERNELARGVERSION%%,draft*}
 if [ "$KERNELARGVARIANT" == "up" ]; then
     DeBug "Running up variant, or newer smp"
     testkernbase=$KERNELARGNAME-$KERNELARGVERSION
@@ -1558,12 +1562,12 @@ if [ "$RHEL6TREE" == "0" ] ; then
 fi
 
 # Generic test variables
-if curl -s http://download.devel.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel/$kernarch/$testkernbase.$kernarch.rpm -o /dev/null -f; then
-    httpbase=http://download.devel.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
+if curl -s http://download.devel.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrelbrewpath/$kernarch/$testkernbase.$kernarch.rpm -o /dev/null -f; then
+    httpbase=http://download.devel.redhat.com/brewroot/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrelbrewpath
 else
-    httpbase=http://download.devel.redhat.com/brewroot/vol/rhel-${RHEL_X}/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
+    httpbase=http://download.devel.redhat.com/brewroot/vol/rhel-${RHEL_X}/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrelbrewpath
 fi
-archbase=http://download.devel.redhat.com/brewroot/vol/kernelarchive/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrel
+archbase=http://download.devel.redhat.com/brewroot/vol/kernelarchive/packages/$KERNPKGDIRECTORY/$testkernver/$testkernrelbrewpath
 
 if [ -z "$OUTPUTDIR" ]; then
     OUTPUTDIR=/mnt/testarea
