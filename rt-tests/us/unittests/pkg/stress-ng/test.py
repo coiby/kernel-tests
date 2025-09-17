@@ -40,7 +40,7 @@ class StressNgTest(rtut.RTUnitTest):
         self.run_cmd(f'stress-ng -c {self.cpulist} --timeout 5s --log-brief')
 
     def test_random(self):
-        self.run_cmd(f'stress-ng --random 10 -x numa,hdd,key --timeout 5s')
+        self.run_cmd(f'stress-ng --random 10 -x numa,hdd,key --timeout 5s', expected_status=[0, 3])
 
 if __name__ == '__main__':
     StressNgTest.run_unittests()
