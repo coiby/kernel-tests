@@ -1,7 +1,35 @@
 #!/bin/bash
 
 . /usr/share/beakerlib/beakerlib.sh
+. denylist.sh
 
+BCC_TOOLS_ENABLE_DENYLIST=${BCC_TOOLS_ENABLE_DENYLIST:-*}
+
+function waive_fails()
+{
+	local arch="$1"; shift
+	local kernel_version="$1"; shift
+	local tool="$@"
+
+	for fail in "${DENYLIST[@]}"
+	do
+		set -- $fail
+		local denylist_result=$1; shift
+		local denylist_arch=$1; shift
+		local denylist_kernel_version_start=$1; shift
+		local denylist_kernel_version_end=$1; shift
+		local denylist_tool="$@"
+
+		grep -q "$arch," <<<"$denylist_arch" || continue
+		grep -q "$tool" <<<"$denylist_tool" || continue
+		# K_Vercmp $kernel_version $denylist_kernel_version_start
+		# [[ $K_KVERCMP_RET -ge "0" ]] || continue
+		# K_Vercmp $kernel_version $denylist_kernel_version_start
+		# [[ $K_KVERCMP_RET -lt "0" ]] || continue
+		return 0
+	done
+	return 1
+}
 
 function test_setup()
 {
@@ -95,8 +123,18 @@ for cmd in $(rpm -ql libbpf-tools| grep bin | awk -F '/' '{print $NF}') ; do
         echo "$cmd PASS" | tee -a libbpf-tools-result.txt
         rlPass "$cmd"
     else
-        echo "$cmd FAILED with $retcode"  | tee -a libbpf-tools-result.txt
-        rlFail "$cmd FAILED with $retcode"
+        if [[ "${BCC_TOOLS_ENABLE_DENYLIST}" == "y" ]]; then
+            rlLog "LIBBPF TOOLS DENYLIST ENABLED (known fails will be hidden)"
+            if waive_fails "$(uname -m)" "$(uname -r)" "$cmd"; then
+                rlPass "Command $cmd failed but was waived as a known issue."
+            else
+                echo "$cmd FAILED with $retcode"  | tee -a libbpf-tools-result.txt
+                rlFail "$cmd FAILED with $retcode"
+            fi
+        else
+            echo "$cmd FAILED with $retcode"  | tee -a libbpf-tools-result.txt
+            rlFail "$cmd FAILED with $retcode"
+        fi
     fi
     rlPhaseEnd
 done
