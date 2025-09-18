@@ -363,7 +363,11 @@ function RunTest ()
         fi
 
         # do reset
-        rlPhaseStartCleanup do_${_item}_reset
+        if [ -z "$VM_SELFTEST_ITEMS" ]; then
+            rlPhaseStartCleanup do_${_item}_reset
+        else
+            rlPhaseStartCleanup do_${_item}_reset-$VM_SELFTEST_ITEMS
+        fi
         if type do_${_item}_reset >& /dev/null; then
             rlRun do_${_item}_reset
         fi
