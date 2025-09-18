@@ -48,23 +48,14 @@ duration: 24h
 tag: KernelAutomotiveTier1
 extra-summary: kselftests
 extra-task: kselftests
+adjust+:
+  - when: hw_target == rcar_s4
+    duration: 30h
 /test:
   id: 83986a89-c53a-4ed6-a17b-6c18216168b8
   adjust+:
-    - when: hw_target == rcar_s4
-      duration: 30h
     - when: test_suite == kself_compiled
       id: 1d584e6d-4d5e-4a7b-8b78-1f2b0992b583
-    - when: test_suite == kself_delivered_bpf
-      id: 04676274-1c07-484a-bc10-c2dd5e389632
-    - when: test_suite == kself_delivered_net
-      id: ea3f511c-2f03-4eee-ae32-900bfa4a23e4
-    - when: test_suite == kself_delivered_net_forwarding
-      id: 74c72ee5-2334-41f9-9885-72e630160bc4
-    - when: test_suite == kself_delivered_netfilter
-      id: 2a05643f-5a1a-4d27-b5e0-e19b9af7a79b
-    - when: test_suite == kself_delivered_misc
-      id: 2c9cb810-504b-44b6-8818-cd2b0ec011b8
     - when: test_suite == fuzzing_functional
       id: 10331c46-75dc-46ea-af4f-66cac01b360c
     - when: test_suite == kself_concurrent_syscalls
@@ -76,3 +67,85 @@ extra-task: kselftests
         BUILD_FROM_SRC: y
         TEST_ITEMS: "mm rseq"
         INCLUDE: "mm.sh"
+
+/net/rhivos_bpf:
+  summary+: " - rhivos_bpf-bpf_test_progs"
+  environment+:
+    TEST_ITEMS: "bpf bpf_test_progs"
+    INCLUDE: "net.sh"
+    DELIVERED_TESTS: y
+  adjust+:
+    - when: test_suite == kself_delivered_bpf
+      id: 04676274-1c07-484a-bc10-c2dd5e389632
+    - when: package-name ~ .*automotive.* or package_name ~ .*automotive.*
+      environment+:
+        SKIP_TARGETS: "bpf_test_progs:timer_mim bpf_test_progs:timer bpf_test_progs:bpf_cookie bpf_test_progs:sk_storage_omem_uncharge bpf:test_tunnel.sh bpf:test_lwt_ip_encap.sh bpf:test_progs bpf:test_progs-no_alu32 bpf:test_tcp_check_syncookie.sh bpf_test_progs:attach_probe bpf_test_progs:task_pt_regs bpf_test_progs:usdt bpf_test_progs:autoattach bpf_test_progs:uprobe_autoattach bpf_test_progs:stacktrace_build_id bpf_test_progs:bpf_iter bpf_test_progs:btf_skc_cls_ingress"
+    # skipping bpf_test_progs:timer https://issues.redhat.com/browse/VROOM-32923
+    # skipping bpf_test_progs:sk_storage_omem_uncharge Triggers https://issues.redhat.com/browse/AUTOBUG-431
+    # skipping bpf_test_progs:stacktrace_build_id https://issues.redhat.com/browse/AUTOBUG-379
+    # skipping bpf:test_tcp_check_syncookie.sh, bpf_test_progs:bpf_iter, bpf_test_progs:btf_skc_cls_ingress https://issues.redhat.com/browse/RHEL-2363
+    - when: package-name !~ .*automotive.*
+      enabled: false
+
+/net/net:
+  summary+: " - net"
+  environment+:
+    TEST_ITEMS: "net"
+    INCLUDE: "net.sh"
+    DELIVERED_TESTS: y
+  adjust+:
+    - when: test_suite == kself_delivered_net
+      id: ea3f511c-2f03-4eee-ae32-900bfa4a23e4
+    - when: package-name ~ .*automotive.* or package_name ~ .*automotive.*
+      environment+:
+        SKIP_TARGETS: "net:test_bridge_backup_port.sh net:test_bridge_neigh_suppress.sh net:rtnetlink.sh net:l2_tos_ttl_inherit.sh net:udpgro.sh"
+        # net/mptcp disabled in rhivos https://issues.redhat.com/browse/RHEL-2363
+        # net-test-bridge-neigh-suppress-sh failing https://issues.redhat.com/browse/VROOM-33306
+        # net-test-bridge-backup-port-sh failing https://issues.redhat.com/browse/VROOM-33393
+
+/net/forwarding:
+  summary+: " - net_forwarding"
+  environment+:
+    TEST_ITEMS: "net/forwarding"
+    INCLUDE: "net.sh"
+    DELIVERED_TESTS: y
+  adjust+:
+    - when: test_suite == kself_delivered_net_forwarding
+      id: 74c72ee5-2334-41f9-9885-72e630160bc4
+    - when: package-name ~ .*automotive.* or package_name ~ .*automotive.*
+      environment+:
+        SKIP_TARGETS: "net/forwarding:tc_actions.sh"
+
+/net/netfilter:
+  summary+: " - net_netfilter"
+  environment+:
+    INCLUDE: "net.sh"
+    DELIVERED_TESTS: y
+  adjust+:
+    - when: distro <= rhel-9.6
+      environment+:
+        TEST_ITEMS: "netfilter"
+    - when: distro >= rhel-9.7
+      environment+:
+        # netfilter tests moved to net directory in rhel-9.7+
+        TEST_ITEMS: "net/netfilter"
+    - when: test_suite == kself_delivered_netfilter
+      id: 2a05643f-5a1a-4d27-b5e0-e19b9af7a79b
+    - when: distro <= rhel-9.6 and package-name ~ .*automotive.* or distro <= rhel-9.6 and package_name ~ .*automotive.*
+      environment+:
+        SKIP_TARGETS: "netfilter:nft_trans_stress.sh netfilter:nft_conntrack_helper.sh netfilter:ipip-conntrack-mtu.sh"
+        # skipping netfilter:nft_conntrack_helper.sh, flaky test. mostly passes but when it fails freezes the testing.
+        # note conntrack-mtu name variation
+    - when: distro >= rhel-9.7 and package-name ~ .*automotive.* or distro >= rhel-9.7 and package_name ~ .*automotive.*
+      environment+:
+        SKIP_TARGETS: "net/netfilter:nft_trans_stress.sh net/netfilter:nft_conntrack_helper.sh net/netfilter:conntrack_ipip_mtu.sh"
+
+/net/tc-testing:
+  summary+: " - tc-testing"
+  environment+:
+    TEST_ITEMS: "tc-testing"
+    INCLUDE: "net.sh"
+    DELIVERED_TESTS: y
+  adjust+:
+    - when: test_suite == kself_delivered_tc
+      id: 2c9cb810-504b-44b6-8818-cd2b0ec011b8
