@@ -1,0 +1,13 @@
+[General]
+name=rt-tests/us/rv/wwnr
+owner=Waylon Cude <wcude@redhat.com>
+description=Test the wwnr monitor
+license=GPLv3
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+repoRequires=rt-tests/include
+max_time=20m
+use_pty=false

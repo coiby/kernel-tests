@@ -1,0 +1,5 @@
+summary: Test the wwnr monitor
+contact: Waylon Cude <wcude@redhat.com>
+test: bash ./runtest.sh
+framework: shell
+duration: 20m
