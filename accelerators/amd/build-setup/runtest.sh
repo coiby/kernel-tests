@@ -20,19 +20,30 @@
 ROCM_REPO_URL="https://raw.githubusercontent.com/containers/ai-lab-recipes/refs/heads/main/training/amd-bootc/repos.d/rocm.repo"
 AMDGPU_REPO_URL="https://raw.githubusercontent.com/containers/ai-lab-recipes/refs/heads/main/training/amd-bootc/repos.d/amdgpu.repo"
 
-rlJournalStart
+EPEL10_REPO_URL="https://dl.fedoraproject.org/pub/epel/10.1/Everything/x86_64/"
+EPEL10_TEST_REPO_URL="https://dl.fedoraproject.org/pub/epel/testing/10/Everything/x86_64/"
 
-    rlPhaseStartSetup
-        rlLog "Install wget"
-        rlRun "dnf install -y wget"
-    rlPhaseEnd
+
+rlJournalStart
 
     rlPhaseStartTest
         rlLog "Install ROCm and AMDGPU needed bits"
-        rlRun "wget ${ROCM_REPO_URL} -P /etc/yum.repos.d/"
-        rlRun "wget  ${AMDGPU_REPO_URL} -P /etc/yum.repos.d/"
-        rlRun "echo 'exclude=amdgpu-dkms-* dkms-*' >> /etc/dnf/dnf.conf"
-        rlRun "dnf install -y libdrm-* rocm6.2.0"
+        if rlIsRHEL "<10"
+        then
+            rlLog "Install wget"
+            rlRun "dnf install -y wget"
+            rlLog "RHEL9: Use AMD ROCm repositories"
+            rlRun "wget ${ROCM_REPO_URL} -P /etc/yum.repos.d/"
+            rlRun "wget  ${AMDGPU_REPO_URL} -P /etc/yum.repos.d/"
+            rlRun "echo 'exclude=amdgpu-dkms-* dkms-*' >> /etc/dnf/dnf.conf"
+            rlRun "dnf install -y libdrm-* rocm6.2.0"
+        else
+            rlLog "RHEL10: Use EPEL10 repositories"
+            rlRun "dnf config-manager --add-repo ${EPEL10_REPO_URL}"
+            rlLog "Adding EPEL10 test repositories"
+            rlRun "dnf config-manager --add-repo ${EPEL10_TEST_REPO_URL}"
+            rlRun "dnf install --nogpgcheck -y libdrm-* rocm"
+        fi
     rlPhaseEnd
 
 rlJournalEnd
