@@ -1,0 +1,1 @@
+The test is to set up LUKS-encrypted volume to test vmcore dumping. It use Clevis+Tang to automatically unlock the LUKS volumes.
