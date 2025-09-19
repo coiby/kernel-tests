@@ -26,21 +26,25 @@ class RTUnitTest(unittest.TestCase):
         """
         return
 
-    def run_cmd(self, cmd, status=0):
+    def run_cmd(self, cmd, expected_status=[0]):
         """ Execute the unittest by executing the shell cmd arg """
         ret, out = subprocess.getstatusoutput(cmd)
         caller = inspect.stack()[1].function
-        self.report_result(caller, cmd, out, ret, status)
-        self.assertEqual(status, ret)
+        
+        if not isinstance(expected_status, list):
+            expected_status = [expected_status]
+            
+        self.report_result(caller, cmd, out, ret, expected_status)
+        self.assertIn(ret, expected_status, f"Expected status {expected_status}, but got {ret}")
 
     @staticmethod
-    def report_result(testname, command, out, ret, status):
+    def report_result(testname, command, out, ret, expected_status):
         """ Pretty print unittest output and report via restraint """
-        result = 'PASS' if ret == status else 'FAIL'
+        result = 'PASS' if ret in expected_status else 'FAIL'
         print("\n")
         print("=" * 70)
         print(f"{result} || {command} [{testname}]")
-        print(f"     || Expected: {status}, Got: {ret}")
+        print(f"     || Expected: {expected_status}, Got: {ret}")
         print("-" * 70)
         print(f"{out}\n")
         subprocess.getstatusoutput(f'/usr/bin/rstrnt-report-result {testname} {result} {ret}')
