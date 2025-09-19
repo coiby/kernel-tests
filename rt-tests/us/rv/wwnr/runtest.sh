@@ -21,6 +21,7 @@ function runtest()
     rv mon wwnr -r printk -t >rv.log &
     rv_pid=$!
     run 'rv list | grep "wwnr.*\[ON]"'
+    log "$(rv list)"
     stress-ng --timer "$STRESS_THREADS" &
     stress_pid=$!
 
@@ -47,6 +48,8 @@ function runtest()
         log_fail "Found no errors while testing error generation"
         PHASE_STATUS=FAIL
     fi
+
+    rstrnt-report-log -l "rv.log"
 
     phase_end
 }
