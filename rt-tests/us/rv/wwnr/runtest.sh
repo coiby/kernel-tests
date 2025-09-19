@@ -23,7 +23,7 @@ function runtest()
     sleep 1s
     run 'rv list | grep "wwnr.*\[ON]"'
     log "$(rv list)"
-    stress-ng --timer "$STRESS_THREADS" &
+    run "stress-ng --timer $STRESS_THREADS &"
     stress_pid=$!
 
     # Wait for a while to collect data
