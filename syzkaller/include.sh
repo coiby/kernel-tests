@@ -232,7 +232,7 @@ function syzkaller_start() {
         sleep 10
         for call in ${not_present_syscalls}; do
             syscall=$(echo "${call//\"}" | sed -e 's/,//')
-            if grep -q "syscall ${syscall} is not present" /var/tmp/syz-manager_run.log; then
+            if grep -q "syscall ${syscall}.* is not present" /var/tmp/syz-manager_run.log; then
                 rlPass "${syscall} not present as expected."
             elif grep "${syscall}" /var/tmp/syz-manager_run.log | grep -q ": permission denied"; then
                 rlPass "${syscall} can't be accessed as expected."
