@@ -18,8 +18,9 @@ function runtest()
     phase_start_test wwnr
 
     # Start rv and stress-ng
-    rv mon wwnr -r printk -t >rv.log &
+    run "rv mon wwnr -r printk -t >rv.log &"
     rv_pid=$!
+    sleep 1s
     run 'rv list | grep "wwnr.*\[ON]"'
     log "$(rv list)"
     stress-ng --timer "$STRESS_THREADS" &
@@ -33,8 +34,8 @@ function runtest()
     run "kill -INT $stress_pid"
 
     # Check logfile
-    events=$(grep -cE "\[0-9+\] event" rv.log)
-    errors=$(grep -cE "\[0-9+\] error" rv.log)
+    events=$(grep -cE "\[[0-9]+] event" rv.log)
+    errors=$(grep -cE "\[[0-9]+] error" rv.log)
 
     log "$events events found"
     log "$errors errors found"
