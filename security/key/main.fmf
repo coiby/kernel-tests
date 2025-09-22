@@ -1,5 +1,5 @@
 summary: LTP key syscalls tests
-contact: denli Li <denli@redhat.com>
+contact: Dennis Li <denli@redhat.com>
 id: 84b0b2f3-3a1d-4feb-8102-ccb0ee905430
 path: /security/key
 test: bash ./runtest.sh

@@ -2,7 +2,7 @@ summary: KG-Sec ima-evm-utils
 description: <code>tests/ima-evm-utils#sanity</code>
 enabled: true
 id: cae321ab-a42e-4d7d-a59a-4e6395cc49f1
-contact: denli Li <denli@redhat.com>
+contact: Dennis Li <denli@redhat.com>
 component:
   - kernel
 test: ./runtest.sh
