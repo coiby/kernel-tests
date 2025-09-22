@@ -1,0 +1,10 @@
+summary: Sanity testing of the AMD in-tree driver
+description: Sanity testing of the AMD in-tree driver
+contact:
+    - Ihor Mykytyn <imykytyn@redhat.com>
+    - Oliver Gutiérrez <ogutierr@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 1h
+recommend:
+    - beakerlib-redhat

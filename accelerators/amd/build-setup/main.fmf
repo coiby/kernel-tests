@@ -1,0 +1,14 @@
+summary: AMD build setup test
+description: Build and install kernel package and ROCm
+contact:
+    - Ihor Mykytyn <imykytyn@redhat.com>
+    - Oliver Gutiérrez <ogutierr@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 1h
+require:
+  - git
+  - kernel-devel
+  - rpm-build
+recommend:
+    - beakerlib-redhat
