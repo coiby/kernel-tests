@@ -1,5 +1,5 @@
 summary: Selinux testsuite security tests
-contact: Linqing Lu <lilu@redhat.com>
+contact: Dennis Li <denli@redhat.com>
 id: d119e344-5fde-4701-9b61-7bfea3681f5e
 component:
   - kernel
