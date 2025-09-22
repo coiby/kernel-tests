@@ -9,10 +9,7 @@ framework: shell
 recommend:
   - realtime-tests
   - rt-tests
-duration: 30m
-environment:
-  NFORKS: 10
-  NITERS: 10000
+duration: 10m
 tag: NoRHIVOS
 enabled: true
 adjust+:
