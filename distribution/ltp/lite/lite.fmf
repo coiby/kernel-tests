@@ -8,7 +8,6 @@ component:
   - glibc
 test: bash ./runtest.sh
 tag:
-  - KernelTier1
   - KernelAutomotiveTier1
 framework: shell
 require:
