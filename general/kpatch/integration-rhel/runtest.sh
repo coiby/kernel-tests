@@ -30,8 +30,8 @@ KPATCH_COMMIT_DESCRIPTION=""
 KPATCH_COMMIT_ID=""
 KPATCH_BUILD_OPTS="${KPATCH_BUILD_OPTS:-}"
 
-MAIL_FROM=${MAIL_FROM:-kpatch-team@redhat.com}
-MAIL_TO=${MAIL_TO:-kpatch-team@redhat.com}
+MAIL_FROM=${MAIL_FROM:-kernel-livepatching@redhat.com}
+MAIL_TO=${MAIL_TO:-kernel-livepatching@redhat.com}
 
 function send_mail()
 {
