@@ -40,7 +40,10 @@ class StressNgTest(rtut.RTUnitTest):
         self.run_cmd(f'stress-ng -c {self.cpulist} --timeout 5s --log-brief')
 
     def test_random(self):
+        # far-branch stressor has mmap_zero operations which is disabled by default
+        self.run_cmd('setsebool -P mmap_low_allowed on')
         self.run_cmd(f'stress-ng --random 10 -x numa,hdd,key --timeout 5s', expected_status=[0, 3])
+        self.run_cmd('setsebool -P mmap_low_allowed off')
 
 if __name__ == '__main__':
     StressNgTest.run_unittests()
