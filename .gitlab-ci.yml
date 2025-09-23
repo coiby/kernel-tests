@@ -238,6 +238,14 @@ check tmt test has RH contact:
     - !reference [.rules, default-branch]
     - !reference [.rules, production-branch]
 
+check tmt library syntax:
+  extends: .kqe_tmt_library_shorthand
+  stage: 🐛
+  rules:
+    - !reference [.rules, mr-parent]
+    - !reference [.rules, default-branch]
+    - !reference [.rules, production-branch]
+
 check usage of internal hostnames:
   extends: .kqe_internal_hostname_check
   stage: 🐛
