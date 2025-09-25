@@ -1,0 +1,85 @@
+Title:
+    Test that /proc/filesystems is read correctly and retrieve the currently available file systems.
+
+Description:
+    List the supported file systems from /proc/filesystems and save the output in a log file. This list will be used for further comparison by the FoA validator to check for system file changes between releases.
+
+Test inputs:
+    /proc/filesystems
+
+Expected result:
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ::   Listing and formatting filesystems
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    :: [ 00:23:50 ] :: [   PASS   ] :: File /proc/filesystems should exist 
+    :: [ 00:23:50 ] :: [  BEGIN   ] :: Running 'cat /proc/filesystems | awk '{print $NF}' | sort'
+    autofs
+    bdev
+    binder
+    binfmt_misc
+    bpf
+    btrfs
+    cgroup
+    cgroup2
+    configfs
+    cpuset
+    debugfs
+    devpts
+    devtmpfs
+    efivarfs
+    ext2
+    ext3
+    ext4
+    fuse
+    fuseblk
+    fusectl
+    hugetlbfs
+    mqueue
+    overlay
+    pipefs
+    proc
+    pstore
+    ramfs
+    rpc_pipefs
+    securityfs
+    selinuxfs
+    sockfs
+    squashfs
+    sysfs
+    tmpfs
+    tracefs
+    vfat
+    :: [ 00:23:50 ] :: [   PASS   ] :: Command 'cat /proc/filesystems | awk '{print $NF}' | sort' (Expected 0, got 0)
+    filesystem_list=['autofs', 'bdev', 'binder', 'binfmt_misc', 'bpf', 'btrfs', 'cgroup', 'cgroup2', 'configfs', 'cpuset', 'debugfs', 'devpts', 'devtmpfs', 'efivarfs', 'ext2', 'ext3', 'ext4', 'fuse', 'fuseblk', 'fusectl', 'hugetlbfs', 'mqueue', 'overlay', 'pipefs', 'proc', 'pstore', 'ramfs', 'rpc_pipefs', 'securityfs', 'selinuxfs', 'sockfs', 'squashfs', 'sysfs', 'tmpfs', 'tracefs', 'vfat']
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ::   Duration: 0s
+    ::   Assertions: 2 good, 0 bad
+    ::   RESULT: PASS (Listing and formatting filesystems)
+
+
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ::   Cleanup
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    :: [ 00:23:50 ] :: [  BEGIN   ] :: Remove temporary files :: actually running 'rm -f /var/tmp/rlRun_LOG.grgSJVal /var/tmp/filesystem_list.txt'
+    :: [ 00:23:50 ] :: [   PASS   ] :: Remove temporary files (Expected 0, got 0)
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ::   Duration: 0s
+    ::   Assertions: 1 good, 0 bad
+    ::   RESULT: PASS (Cleanup)
+
+
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ::   unknown
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    :: [ 00:23:50 ] :: [   LOG    ] :: Phases fingerprint:  +4gEhNYZ
+    :: [ 00:23:50 ] :: [   LOG    ] :: Asserts fingerprint: GpTeNtEf
+    :: [ 00:23:50 ] :: [   LOG    ] :: JOURNAL XML: /var/tmp/beakerlib-2wEWL9c/journal.xml
+    :: [ 00:23:50 ] :: [   LOG    ] :: JOURNAL TXT: /var/tmp/beakerlib-2wEWL9c/journal.txt
+    :: [ 00:23:50 ] :: [   INFO   ] :: Deleting rlRun_LOG file(s)
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ::   Duration: 0s
+    ::   Phases: 2 good, 0 bad
+    ::   OVERALL RESULT: PASS (unknown)

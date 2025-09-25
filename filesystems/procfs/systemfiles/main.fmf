@@ -1,0 +1,7 @@
+summary: List currently available file systems from /proc/filesystems, format and
+    print it to the log.
+contact: Polina Agranat <pagranat@redhat.com>
+component: kernel-automotive
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 20s
