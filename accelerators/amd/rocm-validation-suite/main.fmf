@@ -1,0 +1,10 @@
+summary: ROCm Validation Suite tests
+description: ROCm validation suite for testing userspace libraries for AMDGPU driver
+contact:
+    - Ihor Mykytyn <imykytyn@redhat.com>
+    - Oliver Gutiérrez <ogutierr@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 1h
+recommend:
+    - beakerlib-redhat
