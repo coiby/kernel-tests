@@ -44,7 +44,7 @@ def test_item_check(f):
             with enter_phase(f_name):
                 f(*args, **kwargs)
         elif test_item_list == "cki" or test_item_list == "CKI":
-            if f_name in functional_case_list:
+            if f_name in CKI_case_list:
                 with enter_phase(f_name):
                     f(*args, **kwargs)
             else:
@@ -1253,6 +1253,49 @@ def dpdk_port_info_test():
         pass
     else:
         pass
+
+##add reproducer of bug https://issues.redhat.com/browse/RHEL-22992
+@test_item_check
+def dpdk_vfmac_zero_check():
+    func_name = inspect.stack()[0][3]
+    nic1_mac,nic2_mac = get_nic_mac()
+    nic1_name = get_nic_name_from_mac(nic1_mac)
+    testpmd = get_testpmd()
+    if i_am_server():
+        with enter_phase(f"{func_name}"):
+            clear_dpdk_interface_by_driverctl()
+            vf1_list = vf_create_from_pf_mac(nic1_mac,1,True,False)
+            log(f"{vf1_list}")
+            vf1_name = vf1_list[0]
+            log(f"{vf1_name}")
+            cmd = f"""
+            ip link set {nic1_name} vf 0 mac 00:de:ad:07:08:08
+            sleep 3
+            ip link set {vf1_name} up
+            sleep 3
+            ip link set {vf1_name} down
+            sleep 3
+            ip link show {nic1_name}
+            """
+            run(cmd)
+            vf1_mac = pysriov.sriov_get_mac_from_name(vf1_name)
+            log(f"{vf1_mac}")
+            bus1_info = my_tool.get_bus_from_name(vf1_name)
+            log(f"{bus1_info}")
+            #enable_dpdk_by_driverctl(vf1_mac)
+
+        with enter_phase(f"{func_name}-check-result-and-clean"):
+            if vf1_mac == "00:00:00:00:00:00":
+                rl_fail("vf mac zero check test fail")
+            else:
+                rl_pass("vf mac zero check test success")
+            #clear_dpdk_interface_by_driverctl()
+            pass
+    elif i_am_client():
+        pass
+    else:
+        pass
+
 
 @test_item_check
 def dpdk_port_blocklist_test():
