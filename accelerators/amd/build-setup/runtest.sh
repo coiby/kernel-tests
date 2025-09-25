@@ -20,8 +20,7 @@
 ROCM_REPO_URL="https://raw.githubusercontent.com/containers/ai-lab-recipes/refs/heads/main/training/amd-bootc/repos.d/rocm.repo"
 AMDGPU_REPO_URL="https://raw.githubusercontent.com/containers/ai-lab-recipes/refs/heads/main/training/amd-bootc/repos.d/amdgpu.repo"
 
-EPEL10_REPO_URL="https://dl.fedoraproject.org/pub/epel/10.1/Everything/x86_64/"
-EPEL10_TEST_REPO_URL="https://dl.fedoraproject.org/pub/epel/testing/10/Everything/x86_64/"
+EPEL10_REPO_URL="https://dl.fedoraproject.org/pub/epel/10/Everything/x86_64/"
 
 
 rlJournalStart
@@ -40,8 +39,6 @@ rlJournalStart
         else
             rlLog "RHEL10: Use EPEL10 repositories"
             rlRun "dnf config-manager --add-repo ${EPEL10_REPO_URL}"
-            rlLog "Adding EPEL10 test repositories"
-            rlRun "dnf config-manager --add-repo ${EPEL10_TEST_REPO_URL}"
             rlRun "dnf install --nogpgcheck -y libdrm-* rocm"
         fi
     rlPhaseEnd
