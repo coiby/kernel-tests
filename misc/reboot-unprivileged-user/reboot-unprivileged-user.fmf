@@ -17,6 +17,9 @@ description: |
       [   PASS   ] :: Expected to fail: unprivileged users should not be able to reboot the system (Expected 1, got 1)
       [   PASS   ] :: Command 'userdel -r unprivileged_user' (Expected 0, got 0)
       OVERALL RESULT: PASS (/misc/reboot-unprivileged-user/reboot-unprivileged-user)
+
+  Results location:
+      output.txt
 contact: Filippo Storniolo <fstornio@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
