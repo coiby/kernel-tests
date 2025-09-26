@@ -19,6 +19,8 @@ description: |
       all syscalls in list should be executed at least once. Example:
       [   PASS   ] :: No crash results found.
       [   PASS   ] :: [syscall_name] executed.
+  Results location:
+      output.txt
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 framework: beakerlib
 test: ./runtest.sh
