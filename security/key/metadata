@@ -1,6 +1,6 @@
 [General]
 name=/kernel-tests/security/key
-owner=Linqing Lu <lilu@redhat.com>
+owner=Dennis Li <denli@redhat.com>
 description=LTP key syscalls tests
 license=GPLv2
 confidential=no
