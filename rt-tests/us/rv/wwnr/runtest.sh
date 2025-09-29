@@ -8,7 +8,7 @@ STRESS_THREADS="${STRESS_THREADS:-"2"}"
 function runtest()
 {
     if rhel_in_range 0 9.2; then
-        rstrnt-report-result "rv is only supported for RHEL >= 9.3" "SKIP" 0
+        report_result "rv is only supported for RHEL >= 9.3" "SKIP" 0
         exit 0
     fi
 
@@ -18,12 +18,12 @@ function runtest()
     phase_start_test wwnr
 
     # Start rv and stress-ng
-    run "rv mon wwnr -r printk -t >rv.log &"
+    run "rv mon wwnr -r printk -t >rv.log" &
     rv_pid=$!
     sleep 1s
     run 'rv list | grep "wwnr.*\[ON]"'
-    log "$(rv list)"
-    run "stress-ng --timer $STRESS_THREADS &"
+    run -l "rv list"
+    run "stress-ng --timer $STRESS_THREADS" &
     stress_pid=$!
 
     # Wait for a while to collect data
