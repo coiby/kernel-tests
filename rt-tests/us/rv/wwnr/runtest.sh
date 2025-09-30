@@ -20,7 +20,7 @@ function runtest()
     # Start rv and stress-ng
     run "rv mon wwnr -r printk -t >rv.log" &
     rv_pid=$!
-    sleep 1s
+    sleep 5s
     run 'rv list | grep "wwnr.*\[ON]"'
     run -l "rv list"
     run "stress-ng --timer $STRESS_THREADS" &
