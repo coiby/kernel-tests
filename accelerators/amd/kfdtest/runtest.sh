@@ -26,7 +26,6 @@ rlJournalStart
                 rlLog "Install kfdtest build dependencies"
                 rlRun "dnf install -y cmake llvm llvm-devel numactl-devel"
                 rlLog "Build kfdtest"
-                rlRun "dnf install -y cmake llvm llvm-devel"
                 rlRun "git clone https://github.com/ROCm/ROCT-Thunk-Interface"
                 rlRun "pushd ROCT-Thunk-Interface"
                 rlRun "git checkout rocm-6.2.x"
