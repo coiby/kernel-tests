@@ -1,0 +1,11 @@
+[General]
+name=/kernel/security/crypto/tpm/tpm2-pkcs11
+owner=Denis Aleksandrov <daleksan@redhat.com>
+description=Tests for the PKSC#11 interface on TPM2 hardware
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash runtest.sh
+dependencies=beakerlib;tpm2-tools;tpm2-abrmd;tpm2-tss;tpm2-pkcs11;tpm2-pkcs11-tools;opensc;openssl

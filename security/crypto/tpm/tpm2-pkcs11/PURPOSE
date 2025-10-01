@@ -1,0 +1,2 @@
+Description: Runs tpm2-tss on openssl-engine against TPM2 HW.
+Authors: Denis Aleksandrov <daleksan@redhat.com>
