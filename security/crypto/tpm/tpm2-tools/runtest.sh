@@ -63,6 +63,31 @@ rlJournalStart
 		rlAssertExists "/dev/tpm0"
 	rlPhaseEnd
 
+	rlPhaseStart FAIL "Query for properties and supported algorithms"
+		rlRun "tpm2_getcap properties-fixed" 0 "Vendor info and fixed properties"
+		rlRun "tpm2_getcap properties-variable" 0 "Mutable properties"
+		rlRun "tpm2_getcap algorithms" 0 "Supported cryptographic algorithms"
+	rlPhaseEnd
+
+	if tpm2_getcap algorithms | grep -q hmac; then
+		rlPhaseStart FAIL "Testing TPM-resident key for keyed hashing (HMAC)"
+			rlRun "tpm2_createprimary -Q -C o -c primary.ctx" 0 "Create primary key to use with HMAC"
+			rlRun "tpm2_create -Q -C primary.ctx -G hmac -c hmac.ctx" 0 " Create HMAC key under primary key"
+			rlRun "echo \"test data\" | tpm2_hmac -Q -c hmac.ctx -o hmac.out" 0 "Generate HMAC"
+		rlPhaseEnd
+	fi
+
+	rlPhaseStart FAIL "Tests creating, loading, and using a key within the TPM"
+		rlRun "tpm2_createprimary -Q -C o -g sha256 -G rsa -c primary.ctx" 0 "Creates root key"
+		rlRun "tpm2_create -Q -C primary.ctx -g sha256 -G rsa -u key.pub -r key.priv" 0 "Creates RSA key under root key"
+		rlRun "tpm2_load -Q -C primary.ctx -u key.pub -r key.priv -c key.ctx" 0 "Load key into the TPM"
+		rlRun "echo \"secret tpm data\" > data.txt" 0 "Creates sample data"
+		rlRun "tpm2_rsaencrypt -Q -c key.ctx -o data.encrypted data.txt" 0 "RSA encryption using TPM"
+		rlRun "tpm2_rsadecrypt -Q -c key.ctx -o data.decrypted data.encrypted" 0 "Decrypt using TPM"
+		rlRun "diff data.decrypted data.txt" 0 "Check that the decrypted data matches original"
+		rlRun "tpm2_flushcontext -l" 0 "Remove all RSA session contexts from TPM chip"
+	rlPhaseEnd
+
 	rlPhaseStart FAIL "Functionality"
 		if rlIsRHEL ">7"; then
 			rlRun "tpm2_nvreadpublic $COM_OPTS"
@@ -71,6 +96,7 @@ rlJournalStart
 		rlRun "tpm2_getrandom $COM_OPTS -o $DATA 20" 0 "random number generator"
 		COUNT=`wc -c "$DATA" | cut -d\  -f1`
 		rlAssertEquals "random number count" "$COUNT" 20
+		rlRun "tpm2_selftest -f" 0 "Running internal self-tests"
 		HASHED=`mktemp -u`
 		TICKET=`mktemp -u`
 		rlRun "tpm2_hash $COM_OPTS $HASH_OPTS -g 0x0004 -o $HASHED -t $TICKET $DATA" 0 "hashing"
@@ -113,6 +139,10 @@ rlJournalStart
 		fi
 	rlPhaseEnd
 
+	rlPhaseStartCleanup
+		rlRun "rm -fr primary.ctx hmac.*" 0 "Removes HMAC testing files"
+		rlRun "rm -fr primary.ctx key.pub key.priv key.ctx data.txt data.encrypted data.decrypted" 0 "Removes full TPM lifecycle RSA files"
+	rlPhaseEnd
+
 	rlJournalPrintText
 rlJournalEnd
-

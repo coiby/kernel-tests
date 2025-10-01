@@ -6,6 +6,6 @@ component:
   - kernel
 framework: beakerlib
 require:
-  - tpm2-tools
   - clevis
+  - tpm2-tools
   - tpm2-abrmd
