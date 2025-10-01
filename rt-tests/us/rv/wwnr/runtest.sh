@@ -33,6 +33,7 @@ function runtest()
     run "kill -INT $rv_pid"
     run "kill -INT $stress_pid"
 
+
     # Check logfile
     events=$(grep -cE "\[[0-9]+] event" rv.log)
     errors=$(grep -cE "\[[0-9]+] error" rv.log)
@@ -49,6 +50,12 @@ function runtest()
         log_fail "Found no errors while testing error generation"
         PHASE_STATUS=FAIL
     fi
+
+    # Check to make sure processes exited
+    sleep 5s
+    log "Checking to make sure all processes exited"
+    run "ps -p $rv_pid"
+    run "ps -p $stress_pid"
 
     rstrnt-report-log -l "rv.log"
 
