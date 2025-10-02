@@ -20,7 +20,7 @@ install_kirk()
 	KIRK_VER="${KIRK_VER:-v2.2.2}"
 	KIRK_DIR="$(pwd)/kirk"
 
-	curl --fail --retry 5 -ks -SLO https://download.eng.bos.redhat.com/qa/rhts/lookaside/kirk-$KIRK_VER.tar.gz
+	curl --fail --retry 5 -ks -SLO https://download.devel.redhat.com/qa/rhts/lookaside/kirk-$KIRK_VER.tar.gz
 	tar -xzf kirk-$KIRK_VER.tar.gz
 	mv kirk-*/ $KIRK_DIR
 
@@ -45,7 +45,7 @@ download_ltp()
 		curl --fail --retry 5 -s -SLO https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
 		if [ $? -ne 0 ]; then
 			TARGET=ltp-$TESTVERSION
-			curl --fail --retry 5 -ks -SLO https://download.eng.bos.redhat.com/qa/rhts/lookaside/ltp-full-${TESTVERSION}.tar.bz2
+			curl --fail --retry 5 -ks -SLO https://download.devel.redhat.com/qa/rhts/lookaside/ltp-full-${TESTVERSION}.tar.bz2
 		fi
 	elif echo $LTP_DOWNLOAD_URL | grep -E "tar.bz2"; then
 		LTP_DOWNLOAD_URL=${LTP_DOWNLOAD_URL//TESTVERSION/"$TESTVERSION"}
