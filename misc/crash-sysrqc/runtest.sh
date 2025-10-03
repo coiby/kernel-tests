@@ -30,18 +30,18 @@ rlJournalStart
             rlShowRunningKernel
             # reboot on crash in 1 second
             rlRun "change_cmdline panic=1"
-            rlRun "systemctl reboot"
+            rlRun "tmt-reboot -c 'systemctl reboot'"
         rlPhaseEnd
     elif [ "${TMT_TEST_RESTART_COUNT}" -eq 1 ]; then
         rlPhaseStartTest Panic
             # Triiger crash
             rlLog "*** Triggering Crash ***"
-            rlRun "echo c > /proc/sysrq-trigger"
+            rlRun "tmt-reboot -c 'echo c > /proc/sysrq-trigger'"
         rlPhaseEnd
     elif [ "${TMT_TEST_RESTART_COUNT}" -eq 2 ]; then
         rlPhaseStartCleanup
             rlRun "change_cmdline -panic=1"
-            rlRun "systemctl reboot"
+            rlRun "tmt-reboot -c 'systemctl reboot'"
         rlPhaseEnd
     fi
 rlJournalEnd
