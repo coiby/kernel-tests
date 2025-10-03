@@ -1,0 +1,20 @@
+summary: Ensure sufficient memory is reserved for qcom_scm to load.
+description: |
+    Ensure sufficient memory is reserved for qcom_scm to load by chekcing
+    the boot messages using journalctl.
+    Test Inputs:
+        kernel message logs.
+    Expected results:
+        [   PASS   ] :: Command 'journalctl -k | grep 'qcom_scm firmware:scm: assigned reserved memory node.*'' (Expected 0, got 0)
+    Results location:
+        output.txt
+contact: Stephen Bertram <sbertram@redhat.com>
+component:
+  - kernel
+adjust+:
+    when: hw_target != ridesx4 or hw_target is not defined
+    enabled: false
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 10m
+id: ac081e09-f6bf-4e12-b899-54312ab5db1d
