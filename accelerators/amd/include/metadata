@@ -1,0 +1,12 @@
+[General]
+name=accelerators/amd/include
+owner=Israel Santana <isantana@redhat.com>
+description=Smoke test for AMD accelerators include library functions
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+max_time=30m
+softDependencies=beakerlib-redhat

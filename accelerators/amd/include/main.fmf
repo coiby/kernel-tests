@@ -1,0 +1,9 @@
+summary: AMD Accelerators Include Library Smoke Test
+description: Smoke test for AMD accelerators include library functions to verify they are available and working correctly
+contact:
+    - Israel Santana <isantana@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 30m
+recommend:
+    - beakerlib-redhat
