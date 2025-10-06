@@ -16,10 +16,14 @@
 # Include environments
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+# Include the AMD accelerators library
+CDIR=$(dirname "${FILE}")
+. "${CDIR}/../include.sh"    || exit 1
 
 rlJournalStart
 
     rlPhaseStartSetup
+        AmdROCmSetUp
         if rlIsRHEL "<10"
         then
             if [[ ! -n $KFDTEST_SKIP_BUILD ]]; then
@@ -42,9 +46,7 @@ rlJournalStart
                 rlRun "popd"
             fi
         else
-            rlLog "Install kfdtest and dependencies from EPEL10 repository"
-            rlRun "dnf config-manager --add-repo https://dl.fedoraproject.org/pub/epel/10.1/Everything/x86_64/"
-            rlRun "dnf install --nogpgcheck -y libdrm-* rocm kfdtest"
+            rlRun "dnf install -y kfdtest"
         fi
     rlPhaseEnd
 
@@ -59,6 +61,17 @@ rlJournalStart
         else
             rlRun "KFDTEST_SHARE_DIR=. run_kfdtest.sh -p RHEL9"
         fi
+    rlPhaseEnd
+
+    rlPhaseStartCleanup
+         if rlIsRHEL "<10"
+        then
+          rlLog "Remove kfdtest build dependencies"
+          rlRun "dnf remove -y cmake llvm llvm-devel numactl-devel"
+        else
+          rlRun "dnf remove -y kfdtest"
+        fi
+      AmdROCmCleanUp
     rlPhaseEnd
 
 rlJournalEnd
