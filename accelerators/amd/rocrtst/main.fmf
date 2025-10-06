@@ -1,0 +1,17 @@
+summary: rocr tests for the AMD in-tree driver
+description: rocr tests for the AMD in-tree driver
+contact:
+    - Ihor Mykytyn <imykytyn@redhat.com>
+    - Oliver Gutiérrez <ogutierr@redhat.com>
+test: bash ./runtest.sh
+framework: beakerlib
+duration: 1h
+require:
+    - cmake
+    - gcc-c++
+    - git
+    - libtool-ltdl
+    - make
+    - numactl-devel
+recommend:
+    - beakerlib-redhat

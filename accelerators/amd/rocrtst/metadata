@@ -1,0 +1,12 @@
+[General]
+name=accelerators/amd/rocrtst
+owner=Ihor Mykytyn <imykytyn@redhat.com>
+description=ROCR runtime rocrtst sanity
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+softDependencies=beakerlib-redhat
+dependencies=cmake;gcc-c++;git;libtool-ltdl;make;numactl-devel
