@@ -381,3 +381,13 @@ FILTER[RHEL9]=\
 "KFDIPCTest.*:"\
 "KFDEvictTest.QueueTest:"\
 "KFDPCSamplingTest.*"
+
+FILTER[RHEL10]=\
+"$BLACKLIST_ALL_ASICS:"\
+"$BLACKLIST_GFX11:"\
+"KFDQMTest.ExtendedCuMasking:"\
+"KFDIPCTest.*:"\
+"KFDEvictTest.QueueTest:"\
+"KFDPCSamplingTest.*"\
+"KFDSVMEvictTest.*"
+

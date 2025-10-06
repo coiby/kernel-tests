@@ -57,7 +57,7 @@ rlJournalStart
             rlRun "./run_kfdtest.sh -p RHEL9"
             rlRun "popd"
         else
-            rlRun "KFDTEST_SHARE_DIR=. run_kfdtest.sh -p RHEL9"
+            rlRun "KFDTEST_SHARE_DIR=. run_kfdtest.sh -p RHEL10"
         fi
     rlPhaseEnd
 
