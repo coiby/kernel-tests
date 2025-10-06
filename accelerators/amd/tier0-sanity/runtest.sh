@@ -15,9 +15,14 @@
 # Include environments
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+# Include the AMD accelerators library
+CDIR=$(dirname "${FILE}")
+. "${CDIR}/../include.sh"    || exit 1
+
 
 rlJournalStart
     rlPhaseStartSetup "Setup Environment"
+        AmdROCmSetUp
         rlAssertRpm "kernel"
     rlPhaseEnd
 
@@ -47,6 +52,10 @@ rlJournalStart
         rlRun "amd-smi static"
         rlRun "amd-smi firmware"
         rlRun "amd-smi monitor"
+    rlPhaseEnd
+
+    rlPhaseStartCleanup "Cleanup Environment"
+        AmdROCmCleanUp
     rlPhaseEnd
 
 rlJournalEnd
