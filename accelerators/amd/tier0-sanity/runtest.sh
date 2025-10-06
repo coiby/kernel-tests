@@ -17,7 +17,7 @@
 
 # Include the AMD accelerators library
 CDIR=$(dirname "${FILE}")
-. "${CDIR}/../include.sh"    || exit 1
+. "${CDIR}/../include/include.sh"    || exit 1
 
 
 rlJournalStart
