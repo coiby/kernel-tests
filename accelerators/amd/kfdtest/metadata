@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=bash ./runtest.sh
 dependencies=
+max_time=180m
 softDependencies=beakerlib-redhat
-
