@@ -1,0 +1,31 @@
+summary: System reboot verification on failure to mount root filesystem
+description: |
+    The purpose of this test is to verify that the system successfully reboots when
+    it encounters an error or is unable to mount its designated root filesystem
+    during the boot sequence. This demonstrates proper error detection and recovery
+    mechanisms in the event of root filesystem access issues, preventing a stalled
+    or unbootable system.
+
+    Test Inputs:
+        corrupt rootfs mount point: change related cmdline parameter
+    Expected results:
+        [   PASS   ] :: Command 'aboot-update -c ... $(uname -r)' (Expected 0, got 0)
+        [   PASS   ] :: Command 'aboot-deploy -l aboot-$(uname -r).img' (Expected 0, got 0)
+        SUT fails to reach the login prompt and test timeouts. Message expected on console:
+        - [FAILED] Failed to start Mount sysroot.
+    Results location:
+        output.txt
+        console.log
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+id: 5c167a18-99f3-4187-a654-9dad9ad9aaed
+component:
+  - kernel
+test: bash ./runtest.sh rootfs
+framework: beakerlib
+restart-on-exit-code:
+    - 255
+restart-max-count: 2
+duration: 5m
+adjust+:
+    enabled: false
+    when: hw_target != rcar_s4 and hw_target != ridesx4
