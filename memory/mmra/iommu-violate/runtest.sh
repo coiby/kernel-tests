@@ -117,10 +117,20 @@ function download_image() {
         release_candidates=("$RELEASE" "$RELEASE_NAME")
     fi
 
+    # Determine RHIVOS version from RELEASE information
+    if [[ "$RELEASE" == *RHIVOS-1* ]]; then
+        rhivos_version="RHIVOS-1"
+    elif [[ "$RELEASE" == *RHIVOS-2* ]]; then
+        rhivos_version="RHIVOS-2"
+    else
+        rlLogWarning "Unable to determine RHIVOS version from RELEASE: $RELEASE, defaulting to RHIVOS-2"
+        rhivos_version="RHIVOS-2"
+    fi
+
     # Loop through each release candidate
     for rel in "${release_candidates[@]}"; do
-        # Construct the base URL for the given release
-        base_url="http://rhivos.auto-toolchain.redhat.com/in-vehicle-os-9/RHIVOS-1/${rel}/sample-images"
+        # Construct the base URL with HTTPS, updated path, and dynamic RHIVOS version
+        base_url="https://rhivos.auto-toolchain.redhat.com/in-vehicle-os/${rhivos_version}/${rel}/sample-images"
         rlLog "Attempting download from: $base_url (pattern: ${image_name}.xz[.sha256])"
 
         # Use wget to download files matching .xz and .xz.sha256 pattern (the latter is optional)
@@ -494,7 +504,18 @@ if ssh vm "ls /etc/yum.repos.d/synced &>/dev/null"; then
 else
     rlRun "ssh vm 'rm -rf /etc/yum.repos.d/*.repo'"
     rlRun "scp /etc/yum.repos.d/*.repo vm:/etc/yum.repos.d/"
-    rlRun "ssh vm 'dnf clean all && dnf makecache --nogpgcheck && touch /etc/yum.repos.d/synced'"
+
+    # Configure dnf defaults for the VM
+    rlLog "Configuring dnf defaults for the VM."
+    rlRun "ssh vm 'cat >> /etc/dnf/dnf.conf << EOF
+
+# Additional settings for test environment
+gpgcheck=0
+sslverify=false
+skip_if_unavailable=true
+EOF'"
+
+    rlRun "ssh vm 'dnf clean all && dnf makecache && touch /etc/yum.repos.d/synced'"
 fi
 
 # Upload the cmdline_helper to the VM
