@@ -1,0 +1,30 @@
+summary: System reboot verification on loading a corrupted initramfs
+description: |
+    The purpose of this test is to verify that the system successfully reboots when
+    it attempts to load a deliberately corrupted initramfs image during the boot
+    sequence. This demonstrates proper error detection and recovery mechanisms in
+    the event of initramfs corruption, preventing a stalled or unbootable system.
+    Test Inputs:
+        corrupt initramfs: dd if=/dev/zero of=/boot/initramfs-$(uname -r).img bs=1 count=100 conv=notrunc
+    Expected results:
+        [   PASS   ] :: Command 'dd if=/dev/zero of=/boot/initramfs-5.14.0-570.518.16.1.16.el9_6iv.aarch64.img bs=1 count=100 conv=notrunc' (Expected 0, got 0)
+        [   PASS   ] :: Command 'aboot-update -i /boot/initramfs-5.14.0-570.518.16.1.16.el9_6iv.aarch64.img $(uname -r)' (Expected 0, got 0)
+        [   PASS   ] :: Command 'aboot-deploy -l aboot-5.14.0-570.518.16.1.16.el9_6iv.aarch64.img' (Expected 0, got 0)
+        SUT keeps rebooting and test timeouts. Message expected on console:
+        - Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
+    Results location:
+        output.txt
+        console.log
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+id: 571c06c7-4683-4b71-8f30-13ce1fc37092
+component:
+  - kernel
+test: bash ./runtest.sh initramfs
+framework: beakerlib
+restart-on-exit-code:
+    - 255
+restart-max-count: 2
+duration: 5m
+adjust+:
+    enabled: false
+    when: hw_target != rcar_s4 and hw_target != ridesx4
