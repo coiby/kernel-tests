@@ -25,20 +25,20 @@
 . ../../cmdline_helper/libcmd.sh || exit 1
 
 rlJournalStart
-    if [ "${TMT_TEST_RESTART_COUNT}" -eq 0 ]; then
+    if [ "${TMT_REBOOT_COUNT}" -eq 0 ]; then
         rlPhaseStartSetup
             rlShowRunningKernel
             # reboot on crash in 1 second
             rlRun "change_cmdline panic=1"
             rlRun "tmt-reboot -c 'systemctl reboot'"
         rlPhaseEnd
-    elif [ "${TMT_TEST_RESTART_COUNT}" -eq 1 ]; then
+    elif [ "${TMT_REBOOT_COUNT}" -eq 1 ]; then
         rlPhaseStartTest Panic
             # Triiger crash
             rlLog "*** Triggering Crash ***"
             rlRun "tmt-reboot -c 'echo c > /proc/sysrq-trigger'"
         rlPhaseEnd
-    elif [ "${TMT_TEST_RESTART_COUNT}" -eq 2 ]; then
+    elif [ "${TMT_REBOOT_COUNT}" -eq 2 ]; then
         rlPhaseStartCleanup
             rlRun "change_cmdline -panic=1"
             rlRun "tmt-reboot -c 'systemctl reboot'"

@@ -26,7 +26,4 @@ require:
 recommend:
   - abootimg
   - grubby
-restart-on-exit-code:
-    - 255
-restart-max-count: 3
 duration: 30m
