@@ -6,7 +6,7 @@
 SimpleCheck()
 {
     # Check the existence of the vmcore file.
-    GetCorePath
+    CheckCoreFile
 }
 
 #+---------------------------+
