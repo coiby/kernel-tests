@@ -620,8 +620,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # Patch and compile binaries
+#patch -d $CONNECTATHON_SRCDIR -p1 < patches/434966lock.patch
 patch -d $CONNECTATHON_SRCDIR -p1 < patches/patch
-patch -d $CONNECTATHON_SRCDIR -p1 < patches/434966lock.patch
 patch -d $CONNECTATHON_SRCDIR -p1 < patches/hostnamefix.patch
 patch -d $CONNECTATHON_SRCDIR -p1 < patches/umount.patch
 patch -d $CONNECTATHON_SRCDIR -p1 < patches/filter_nroff_warnings.patch
