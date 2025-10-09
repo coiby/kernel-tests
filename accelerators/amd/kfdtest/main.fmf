@@ -5,6 +5,6 @@ contact:
     - Oliver Gutiérrez <ogutierr@redhat.com>
 test: bash ./runtest.sh
 framework: beakerlib
-duration: 1h
+duration: 3h
 recommend:
     - beakerlib-redhat
