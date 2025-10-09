@@ -1,18 +1,18 @@
 description: |
-  Confirm system call fuzz testing is being performed.
+  Confirm system call fuzz testing is being performed on all enabled sysfs and procfs entries.
   The database is checked at the end to ensure each entry was executed at least once.
   Default runtime is 1 hour (3600 seconds), but can be changed using the "time" environment variable.
   Test inputs:
-      A list with the sysfs entries to be fuzzed, and a fuzzer program
+      A list with the sysfs and procfs entries to be fuzzed, and a fuzzer program
       called syzkaller. Input details:
-      - sycalls list (environment variable `enable_syscalls`)
+      - entries list (environment variable `main_syscalls`)
       - syzkaller code: https://github.com/google/syzkaller
       - check for execution: grep -q "^${syscall}[$,(]" "${local_dir}"/corpus_dir/*
   Expected results:
       If the system calls are executed without incident during the test runtime,
-      all syscalls in list should be executed at least once. Example:
+      all entries in list should be executed at least once. Example:
       [   PASS   ] :: No crash results found.
-      [   PASS   ] :: [syscall_name] executed.
+      [   PASS   ] :: [entry_name] executed.
 contact: Pablo Ridolfi <pridolfi@redhat.com>
 framework: beakerlib
 require:
