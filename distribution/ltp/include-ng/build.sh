@@ -14,13 +14,15 @@ if [[ -z $RSTRNT_TASKNAME ]] && [[ -n $TMT_TEST_NAME ]]; then
 	RSTRNT_TASKNAME="${TMT_TEST_NAME}"
 fi
 
+DOWNLOAD_HOST="download.devel.redhat.com"
+
 install_kirk()
 {
 	echo "============ Download kirk ============" | tee -a $OUTPUTFILE
 	KIRK_VER="${KIRK_VER:-v2.2.2}"
 	KIRK_DIR="$(pwd)/kirk"
 
-	curl --fail --retry 5 -ks -SLO https://download.devel.redhat.com/qa/rhts/lookaside/kirk-$KIRK_VER.tar.gz
+	curl --fail --retry 5 -ks -SLO https://${DOWNLOAD_HOST}/qa/rhts/lookaside/kirk-$KIRK_VER.tar.gz
 	tar -xzf kirk-$KIRK_VER.tar.gz
 	mv kirk-*/ $KIRK_DIR
 
@@ -45,7 +47,7 @@ download_ltp()
 		curl --fail --retry 5 -s -SLO https://github.com/linux-test-project/ltp/releases/download/${TESTVERSION}/ltp-full-${TESTVERSION}.tar.bz2
 		if [ $? -ne 0 ]; then
 			TARGET=ltp-$TESTVERSION
-			curl --fail --retry 5 -ks -SLO https://download.devel.redhat.com/qa/rhts/lookaside/ltp-full-${TESTVERSION}.tar.bz2
+			curl --fail --retry 5 -ks -SLO https://${DOWNLOAD_HOST}/qa/rhts/lookaside/ltp-full-${TESTVERSION}.tar.bz2
 		fi
 	elif echo $LTP_DOWNLOAD_URL | grep -E "tar.bz2"; then
 		LTP_DOWNLOAD_URL=${LTP_DOWNLOAD_URL//TESTVERSION/"$TESTVERSION"}
@@ -117,7 +119,7 @@ configure()
 	# AUTOMAKEVER=$(rpm -qa automake |cut -f 2 -d "-"|cut -f 1,2 -d ".")
 	AUTOCONFIGVER_1=$(echo $AUTOCONFIGVER |cut -f 1 -d ".")
 	AUTOCONFIGVER_2=$(echo $AUTOCONFIGVER |cut -f 2 -d ".")
-	DOWNLOAD_URL=$(echo ${LOOKASIDE:-http:\/\/download.devel.redhat.com\/qa\/rhts\/lookaside\/})
+	DOWNLOAD_URL=$(echo ${LOOKASIDE:-http:\/\/${DOWNLOAD_HOST}\/qa\/rhts\/lookaside\/})
 	if [[ $AUTOCONFIGVER_1 -lt 1 || $AUTOCONFIGVER_1 -eq 2 && $AUTOCONFIGVER_2 -lt 69 ]]; then \
 		wget -q $DOWNLOAD_URL/m4-1.4.16.tar.gz ; \
 		tar xzf m4-1.4.16.tar.gz; \
