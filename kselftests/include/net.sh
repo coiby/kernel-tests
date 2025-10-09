@@ -518,24 +518,35 @@ if [ ! "${__SOURCED__:+x}" ]; then
 	# source skip/waive list
 	arch="$(uname -m)"
 	skip_link="https://gitlab.com/liuhangbin/kselftests-known-issues/-/raw/main"
+	download_if_missing() {
+		local url="$1"
+		local file="$2"
+		[ ! -f "$file" ] && wget -q "$url" -O "$file" || true
+	}
 	if [ "${krelease}" -eq "8" ] || [ "${krelease}" -eq "9" ]; then
-		[ ! -f skip_waive.arch ] && \
-		# Try download arch specific skip_waive list first
-			wget -q "${skip_link}"/skip_waive."${krelease}"."${arch}" -O skip_waive.arch || true
-		# Now download release-wide skip_waive list
-		[ ! -f skip_waive.release ] && \
-			wget -q "${skip_link}"/skip_waive."${krelease}" -O skip_waive.release || true
-		[ ! -f param.list ] && \
-			wget -q "${skip_link}"/param."${krelease}" -O param.list
+		# arch-specific
+		download_if_missing \
+			"${skip_link}/skip_waive.${krelease}.${arch}" "skip_waive.arch"
+		# release-wide
+		download_if_missing \
+			"${skip_link}/skip_waive.${krelease}" "skip_waive.release"
+		# params
+		download_if_missing \
+			"${skip_link}/param.${krelease}" "param.list"
 	else
-		# This list is used for upstream testing
-		[ ! -f skip_waive.list ] && \
-			wget -q "${skip_link}"/skip_waive.list -O skip_waive.list
-		[ ! -f param.list ] && \
-			wget -q "${skip_link}"/param.list -O param.list
+		# upstream defaults
+		download_if_missing \
+			"${skip_link}/skip_waive.list" "skip_waive.list"
+		download_if_missing \
+			"${skip_link}/param.list" "param.list"
+	fi
+	# optional: OS-specific handling
+	if cki_is_kernel_automotive; then
+		download_if_missing \
+			"${skip_link}/skip_waive.${krelease}.rhivos" "skip_waive.rhivos"
 	fi
 
-	for file in skip_waive.arch skip_waive.release skip_waive.list; do
+	for file in skip_waive.arch skip_waive.release skip_waive.list skip_waive.rhivos; do
 		[ -f "$file" ] || continue
 		[ "$(wc -l < "$file")" -eq 0 ] && continue
 
