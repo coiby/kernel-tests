@@ -11,12 +11,16 @@ elif rlIsRHEL 9.5; then
 	BR=rhel9.5
 elif rlIsRHEL 9.6; then
 	BR=rhel9.6
-elif rlIsRHEL 9.7 || rlIsCentOS 9; then
+elif rlIsRHEL 9.7; then
 	BR=rhel9.7
+elif rlIsRHEL 9.8 || rlIsCentOS 9; then
+	BR=rhel9.8
 elif rlIsRHEL 10.0; then
 	BR=rhel10.0
-elif rlIsRHEL 10.1 || rlIsCentOS 10; then
+elif rlIsRHEL 10.1; then
 	BR=rhel10.1
+elif rlIsRHEL 10.2 || rlIsCentOS 10; then
+	BR=rhel10.2
 elif rlIsFedora; then
 	BR=fedora
 fi
