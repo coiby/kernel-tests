@@ -1,0 +1,18 @@
+summary: Read all read-only sysfs and procfs entries continuously in QM container
+description: |
+  The goal of this test is to excercise the underlying kernel code that handles
+  the sysfs and procfs entries when accessed, looking for possible
+  interference with the ASIL-B environment.
+  Test inputs:
+    - Read only entries found using `find /sys -type f -not -perm /222` and `find /proc -type f -not -perm /222`.
+  Expected results:
+    - Test do not crash until it is stopped.
+  Results location:
+    - output.txt
+contact: Pablo Ridolfi <pridolfi@redhat.com>
+component:
+  - kernel
+framework: beakerlib
+require:
+  - tmux
+duration: 3h
