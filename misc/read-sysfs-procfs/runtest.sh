@@ -37,18 +37,15 @@ rlJournalStart
     rlPhaseEnd
     rlPhaseStartTest Start reading all sysfs and procfs entries continuously
         if  [ "$1" == "start" ]; then
-            rlRun "tmux new-session -d -s sysfs 'podman exec -it qm bash -c \"while true; do /var/tmp/find /sys -type f -not -perm /222 -exec cat {} \\; ; done\" 2>&1 | tee /var/tmp/sysfs.log'"
-            rlRun "tmux new-session -d -s procfs 'podman exec -it qm bash -c \"while true; do /var/tmp/find /proc -type f -not -perm /222 -exec cat {} \\; ; done\" 2>&1 | tee /var/tmp/procfs.log'"
+            rlRun "tmux new-session -d -s sysfs 'podman exec qm bash -c \"while true; do /var/tmp/find /sys -type f -not -perm /222 -exec cat {} \\; ; done\"'"
+            rlRun "tmux new-session -d -s procfs 'podman exec qm bash -c \"while true; do /var/tmp/find /proc -type f -not -perm /222 -exec cat {} \\; ; done\"'"
         elif [ "$1" == "stop" ]; then
             rlRun "tmux kill-session -t sysfs"
             rlRun "tmux kill-session -t procfs"
-            rlFileSubmit /var/tmp/sysfs.log
-            rlFileSubmit /var/tmp/procfs.log
         fi
     rlPhaseEnd
     if [ "$1" == "stop" ]; then
         rlPhaseStartCleanup
-            rlRun "rm -f /var/tmp/sysfs.log /var/tmp/procfs.log"
             rlRun "rm -f /var/qm/tmp/find"
         rlPhaseEnd
     fi
