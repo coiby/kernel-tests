@@ -20,6 +20,15 @@ function runtest()
     oneliner "rv list"
     ral=$(rv list | awk -F' ' '{print $1}')
     log "Available monitors: $ral"
+
+    # check that monitors have the correct syntax
+    # name, then description, then whether it is on or off
+    phase_start_test check_monitor_syntax
+    while read -r line
+    do
+        run "echo $line | grep -E '[[:alnum:]]+[ ]+[[:print:]]+\[(OFF|ON)\]'"
+    done < <(rv list)
+    phase_end
 }
 
 runtest
