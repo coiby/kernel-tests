@@ -149,7 +149,7 @@ build_selftests_modules()
     dnf builddep -y ./kernel.spec
     rpmbuild -bp kernel.spec
 
-    LIVEPATCH_TEST_MODULES="$HOME/rpmbuild/BUILD/kernel-${kver}-${krel}/linux-${kver}-${krel}.${karch}/tools/testing/selftests/livepatch"
+    LIVEPATCH_TEST_MODULES="$HOME/rpmbuild/BUILD/kernel-${kver}-${krel}/linux-${kver}-${krel%%_*}.${karch}/tools/testing/selftests/livepatch"
     cd ${LIVEPATCH_TEST_MODULES}
     if [ "${karch}" == "s390x" ]; then
         OPT="SRCARCH=s390"
