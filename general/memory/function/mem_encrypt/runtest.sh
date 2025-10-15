@@ -46,7 +46,7 @@ rlJournalStart
 	rpm -q "${kname}-devel-${kversion}-${krelease}" || rlDie "no ${kname}-devel package available"
 	# for rhel8, we keep it compile old code by providing the OLD_RHEL hint.
 	if rlIsRHEL "<9"; then
-		ext_cflag=" -DOLD_RHEL"
+		ext_cflag="EXTRA_CFLAGS=' -DOLD_RHEL'"
 	fi
 	if ! rlRun "make -C sme_module $ext_cflag" 0; then
 		echo "Quit test as fail to build test module"
