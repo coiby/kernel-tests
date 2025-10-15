@@ -59,6 +59,7 @@ function set_mem()
 		rstrnt-report-result $RSTRNT_TASKNAME SKIP
 		return 4
 	fi
+	echo "set_mem: MEM=$MEM"
 
 	return 0
 }
