@@ -7,6 +7,8 @@ function rhel10_fatal_issues()
 
 function rhel10_unfix_issues()
 {
+	# RHELTEST-1601: ltp/pty03/4: Test timeouted, sending SIGKILL! Cannot kill test processes!
+	is_arch "x86_64" && is_rt && tskip "pty03 pty04" unfix
 	# setpgid01 failed on rhel10
 	osver_in_range "1000" "1001" && tskip "setpgid01" unfix
 	# RHEL-65410: ltp/lite move_pages04 test failed
