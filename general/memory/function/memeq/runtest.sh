@@ -10,7 +10,7 @@ set -o pipefail
 OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile}
 TASKID=${TASKID:-UNKNOWN}
 
-tmpdir=$(dirname "$OUTPUTFILE")/mem_$TASKID
+tmpdir=/var/tmp/mem_$TASKID
 kmem_peak=$(cat /sys/fs/cgroup/memory/memory.kmem.max_usage_in_bytes)
 cur_used=$(free | awk '/Mem/ {print $3}')
 
