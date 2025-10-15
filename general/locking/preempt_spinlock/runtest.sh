@@ -44,7 +44,7 @@ rlJournalStart
 			CONFIG=/boot/config-$(uname -r)
 		fi
 		if ! grep 'CONFIG_PREEMPT_RT=y' $CONFIG; then
-			rstrnt-report-result "CONFIG_PREEMPT_RT not enabled" SKIP
+			rlReport "CONFIG_PREEMPT_RT not enabled" SKIP
 			rlPhaseEnd
 			rlJournalEnd
 			rlJournalPrintText
