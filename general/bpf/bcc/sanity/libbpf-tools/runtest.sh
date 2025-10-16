@@ -128,52 +128,61 @@ for cmd in $(rpm -ql libbpf-tools| grep bin | awk -F '/' '{print $NF}') ; do
         continue
     fi
     rlPhaseStartTest "${cmd}"
+    retcode=0
     case "${cmd}" in
         *nfs*)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd -t nfs 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         *ext4*)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd -t ext4 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         *xfs*)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd -t xfs 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         bpf-fsslower|bpf-fsdist)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd -t xfs 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         bpf-ksnoop)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd trace ip_send_skb 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         bpf-vfsstat)
              timeout --preserve-status --signal=SIGINT -k 20s 20s $cmd 3 3 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         bpf-funclatency)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd vfs_read 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         bpf-gethostlatency)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd -l /usr/lib64/libc.so.6 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         *)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
             ;;
     esac
-    retcode=$?
     if [ $retcode == 0 ] ; then
         echo "$cmd PASS" | tee -a libbpf-tools-result.txt
         rlPass "$cmd"
     else
         if [[ "${LIBBPF_TOOLS_ENABLE_DENYLIST}" == "y" ]]; then
             rlLog "LIBBPF TOOLS DENYLIST ENABLED (known fails will be hidden)"
-            if waive_fails "${RHEL_VERSION}" "${ARCH}" "${LIBBPF_TOOLS_VERSION}" "${tool}" "${LOGDIR}/${tool}.out"; then
+            if waive_fails "${RHEL_VERSION}" "${ARCH}" "${LIBBPF_TOOLS_VERSION}" "$cmd" "${LOGDIR}/$cmd.out"; then
                 echo "$cmd FAILED with $retcode but was waived as a known issue." | tee -a libbpf-tools-result.txt
                 rlPass "$cmd"
             else
