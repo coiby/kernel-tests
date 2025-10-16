@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# This is a list of test exceptions for bcctool-testsuite.
+# This is a list of test exceptions for libbpftools-testsuite.
 
-# format:  RESULT  ARCH,[ARCH2,]*  BCC_VERSION_START  BCC_VERSION_END  test_name
-# test_name may specify a class of tests; any test containing it in the
-# full name will also be considered to expect RESULT.
+# format:  status|rhel_version|arch|libbpf_tools_version_start|libbpf_tools_version_end|tool|keywords|jira
 
 DENYLIST=()
 
