@@ -10,4 +10,5 @@ destructive=no
 entry_point=bash ./runtest.sh
 max_time=10m
 use_pty=false
+dependencies=kernel-tools-libs-devel
 repoRequires=rt-tests/include

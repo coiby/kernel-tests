@@ -9,5 +9,5 @@ destructive=no
 [restraint]
 entry_point=python3 test.py
 repoRequires=rt-tests/us/unittests/framework
-dependencies=tuna
+dependencies=tuna;kernel-tools-libs-devel
 max_time=10m
