@@ -70,7 +70,10 @@ select_yum_tool()
 skip_testcase()
 {
 	echo "$1" | tee -a ${OUTPUTFILE}
-	rstrnt-report-result $TEST SKIP
+	rlReport $TEST SKIP
+	rlPhaseEnd
+	rlJournalPrintText
+	rlJournalEnd
 	exit 0
 }
 
