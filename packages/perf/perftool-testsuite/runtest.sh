@@ -70,7 +70,10 @@ select_yum_tool()
 skip_testcase()
 {
 	echo "$1" | tee -a ${OUTPUTFILE}
-	rstrnt-report-result $TEST SKIP
+	rlReport $TEST SKIP
+	rlPhaseEnd
+	rlJournalPrintText
+	rlJournalEnd
 	exit 0
 }
 
@@ -222,7 +225,10 @@ rlJournalStart
 			which debuginfo-install || rlRun "$YUM -y install yum-utils dnf-utils" 0 "Installing {yum,dnf}-utils (it has not been present)"
 			which debuginfo-install # now it should be installed, but what if it fails...
 			if [ $? -eq 0 ]; then
-				rlRun "$YUM install -y $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing debuginfo for $KERNEL_PKG_NAME via yum/dnf (unable to obtain debuginfo-install)"
+				rlRun "debuginfo-install -y $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing debuginfo for $KERNEL_PKG_NAME via debuginfo-install"
+			else
+				# as debuginfo repos can be disabled by default, when using yum/dnf make sure to try with all repos enabled
+				rlRun "$YUM install -y --enablerepo=* $KERNEL_DEBUGINFO_PKG_NAME" 0 "Installing debuginfo for $KERNEL_PKG_NAME via yum/dnf (unable to obtain debuginfo-install)"
 			fi
 		fi
 		rlRun "rpmquery $KERNEL_DEBUGINFO_PKG_NAME" 0 "Correct debuginfo is installed ($KERNEL)"
