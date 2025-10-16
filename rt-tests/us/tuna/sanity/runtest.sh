@@ -14,6 +14,12 @@ function tuna_rhel()
 
     # Task tuning in the CLI
     oneliner "tuna show_threads --threads=1"
+
+    # New option cpu_power in the CLI since 10.2
+    if rhel_in_range 10.2 99; then
+        oneliner "tuna cpu_power -i"
+        oneliner "tuna cpu_power -i -c 1"
+    fi
 }
 
 function tuna_rhel8()

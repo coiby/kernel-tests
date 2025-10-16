@@ -139,5 +139,9 @@ class TunaTest(rtut.RTUnitTest):
         else:
             self.run_cmd(f'tuna --sockets={cpu_socket}')
 
+    def test_cpupower(self):
+        if self.rhel_version >= 10.2:
+            self.run_cmd(f'tuna cpu_power -i -c 1')
+
 if __name__ == '__main__':
     TunaTest.run_unittests()
