@@ -10,7 +10,7 @@ set -o pipefail
 OUTPUTFILE=${OUTPUTFILE:-/mnt/testarea/outputfile}
 TASKID=${TASKID:-UNKNOWN}
 
-tmpdir=$(dirname "$OUTPUTFILE")/mem_$TASKID
+tmpdir=/var/tmp/mem_$TASKID
 kmem_peak=$(cat /sys/fs/cgroup/memory/memory.kmem.max_usage_in_bytes)
 cur_used=$(free | awk '/Mem/ {print $3}')
 
@@ -22,13 +22,10 @@ function set_mem()
 	MEM_TOTAL=$(free | sed -n "s/^Mem:\s*\([0-9]\+\).*\$/\1/p")
 	echo "MEM_TOTAL= $MEM_TOTAL kB"
 	if [ "$MEM_TOTAL" -ge 1073741824 ]; then
-	{
 		export MEM="${MEM:-1024G}"
-	} elif [ "$MEM_TOTAL" -ge 536870912 ]; then
-	{
+	elif [ "$MEM_TOTAL" -ge 536870912 ]; then
 		export MEM="${MEM:-65536M 128G 0x500000000}"
-	} elif [ "$MEM_TOTAL" -ge 12582912 ]; then
-	{
+	elif [ "$MEM_TOTAL" -ge 12582912 ]; then
 		# For ppc64le on rhel-alt, 12G caused oom, system with 500G memory.
 		local szlist="12G"
 		local factor=12
@@ -41,33 +38,28 @@ function set_mem()
 		local inG
 
 		if [[ "$cur_used" -gt "$comp" && "$kmem_peak" -ne 0 && "$kmem_peak" -gt "$cur_used" ]]; then
-		{
 			szlist=$((kmem_peak + nproc * 1024 * 1024 * 32))
 			inG=$((szlist /1024/1024/1024 + 1))
 			szlist+=" ${inG}G"
-		} elif [[ "$cur_used" -ne 0 && "$cur_used" -gt $comp ]]; then
-		{
+		elif [[ "$cur_used" -ne 0 && "$cur_used" -gt $comp ]]; then
 			inG=$((cur_used / 1024 / 1024 / 1024 + nproc * 32 / 1024 + 1))
 			szlist="$((cur_used + nproc * 1024 * 1024 * 32))"
 			szlist+=" ${inG}G"
-		}
 		fi
 		export MEM="${MEM:-${szlist:-12G 0x200000000}}"
-	} elif [ "$MEM_TOTAL" -ge 8388608 ]; then
-	{
+	elif [ "$MEM_TOTAL" -ge 8388608 ]; then
 		export MEM="${MEM:-4096M 0x200000000}"
-	} elif [ "$MEM_TOTAL" -ge 4194304 ]; then
-	{
+	elif [ "$MEM_TOTAL" -ge 4194304 ]; then
 		export MEM="${MEM:-4096M}"
-	} else {
+	else
 		echo "Sorry, the system RAM is too low to test."
 		if [[ -n "${TMT_TEST_NAME}" ]]; then
 			RSTRNT_TASKNAME="${TMT_TEST_NAME}"
 		fi
 		rstrnt-report-result $RSTRNT_TASKNAME SKIP
 		return 4
-	}
 	fi
+	echo "set_mem: MEM=$MEM"
 
 	return 0
 }
