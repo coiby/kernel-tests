@@ -30,26 +30,26 @@ TEST="/kernel-tests/general/locking/preempt_spinlock"
 . /usr/share/beakerlib/beakerlib.sh ||  exit 1
 . ../../../kernel-include/runtest.sh || exit 1
 
-devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
-pkg_mgr=$(K_GetPkgMgr)
-rlLog "pkg_mgr = ${pkg_mgr}"
-if [[ $pkg_mgr == "rpm-ostree" ]]; then
-	export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
-	CONFIG=/usr/lib/ostree-boot/config-$(uname -r)
-else
-	export pkg_mgr_inst_string="-y install"
-	CONFIG=/boot/config-$(uname -r)
-fi
-
 rlJournalStart
-	if ! grep 'CONFIG_PREEMPT_RT=y' $CONFIG; then
-		rstrnt-report-result "CONFIG_PREEMPT_RT not enabled" SKIP
-		rlPhaseEnd
-		exit 0
-	fi
-
 	rlPhaseStartSetup
 		rlShowRunningKernel
+		devel_pkg=$(K_GetRunningKernelRpmSubPackageNVR devel)
+		pkg_mgr=$(K_GetPkgMgr)
+		rlLog "pkg_mgr = ${pkg_mgr}"
+		if [[ $pkg_mgr == "rpm-ostree" ]]; then
+			export pkg_mgr_inst_string="-A -y --idempotent --allow-inactive install"
+			CONFIG=/usr/lib/ostree-boot/config-$(uname -r)
+		else
+			export pkg_mgr_inst_string="-y install"
+			CONFIG=/boot/config-$(uname -r)
+		fi
+		if ! grep 'CONFIG_PREEMPT_RT=y' $CONFIG; then
+			rlReport "CONFIG_PREEMPT_RT not enabled" SKIP
+			rlPhaseEnd
+			rlJournalEnd
+			rlJournalPrintText
+			exit 0
+		fi
 		# shellcheck disable=SC2086
 		rpm -q "${devel_pkg}" || ${pkg_mgr} ${pkg_mgr_inst_string} ${devel_pkg}
 		rpm -q "${devel_pkg}" || rlDie "no ${K_NAME/-core}-devel package available"

@@ -42,3 +42,7 @@ recommend:
 id: 43375efc-a271-4da3-8136-7aa4a1edf036
 extra-summary: kernel-tests/general/locking/preempt_spinlock
 extra-task: kernel-tests/general/locking/preempt_spinlock
+adjust+:
+  # run only on kernel rt
+  - when: package-name !~ kernel.*rt
+    enabled: false
