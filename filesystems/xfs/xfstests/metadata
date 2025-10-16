@@ -1,6 +1,6 @@
 [General]
 name=filesystems/xfs/xfstests
-owner=Boris Ranto <branto@redhat.com>
+owner=Yongcheng Yang <yoyang@redhat.com>
 description=The internal wrapper of upstream xfstests test suite
 license=GPLv2
 confidential=no

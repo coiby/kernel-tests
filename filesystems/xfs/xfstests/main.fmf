@@ -94,7 +94,7 @@ description: |
     		<param name="TEST_PARAM_SCRATCH_DEV_POOL_MNT" value="/mnt/xfstests/mnt3 /mnt/xfstests/mnt4 /mnt/xfstests/mnt5 /mnt/xfstests/mnt6"/>
     	</params>
     </task>
-contact: Boris Ranto <branto@redhat.com>
+contact: Yongcheng Yang <yoyang@redhat.com>
 test: bash ./runtest.sh
 framework: shell
 require:
