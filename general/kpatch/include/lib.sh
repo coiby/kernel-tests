@@ -141,6 +141,7 @@ rhel10_build_selftests_modules()
 build_selftests_modules()
 {
     local ret=0
+    local linux_krel=$(echo $krel | sed -E 's/^(.*\.el[0-9]+)_.*/\1/')
 
     rpm -q kernel-devel-$(uname -r) || install_kernel_devel
     download_srpm
@@ -149,7 +150,7 @@ build_selftests_modules()
     dnf builddep -y ./kernel.spec
     rpmbuild -bp kernel.spec
 
-    LIVEPATCH_TEST_MODULES="$HOME/rpmbuild/BUILD/kernel-${kver}-${krel}/linux-${kver}-${krel%%_*}.${karch}/tools/testing/selftests/livepatch"
+    LIVEPATCH_TEST_MODULES="$HOME/rpmbuild/BUILD/kernel-${kver}-${krel}/linux-${kver}-${linux_krel}.${karch}/tools/testing/selftests/livepatch"
     cd ${LIVEPATCH_TEST_MODULES}
     if [ "${karch}" == "s390x" ]; then
         OPT="SRCARCH=s390"
