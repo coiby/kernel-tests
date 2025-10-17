@@ -3,6 +3,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 . denylist.sh
 
+FIBSOURCE="$(pwd)/source"
 LOGDIR=$(mktemp -d)
 LIBBPF_TOOLS_ENABLE_DENYLIST=${LIBBPF_TOOLS_ENABLE_DENYLIST:-*}
 
@@ -80,12 +81,22 @@ function test_setup()
         exit 0
     fi
     rlPhaseStartSetup
+    yum install -y -q java-11-openjdk-devel
+    # In RHEL-10 we need java-21-openjdk-devel instead
+    yum install -y -q java-21-openjdk-devel
     # required by gethostlatency (to provide libc.so)
     rlRun "dnf install -y glibc-devel"
     modprobe ext4
     modprobe nfs
     modprobe xfs
     rm libbpf-tools-result.txt -f
+    # required by application tools
+    rlLog "Running language related tools setup"
+    pushd $FIBSOURCE
+    rlRun "javac Fib.java"
+    java Fib &
+    java_pid=$!
+    popd
     rlPhaseEnd
 
 }
@@ -94,6 +105,7 @@ function test_cleanup()
     rlPhaseStartCleanup
         rlFileSubmit libbpf-tools-result.txt
         grep -v PASS libbpf-tools-result.txt
+        rlRun "kill $java_pid"
     rlPhaseEnd
 }
 
@@ -159,6 +171,10 @@ for cmd in $(rpm -ql libbpf-tools| grep bin | awk -F '/' '{print $NF}') ; do
              ;;
         bpf-gethostlatency)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd -l /usr/lib64/libc.so.6 2>&1 \
+                        | tee -a ${LOGDIR}/${tool}.out
+             ;;
+        bpf-javagc)
+             timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd --pid $java_pid 2>&1 \
                         | tee -a ${LOGDIR}/${tool}.out
              ;;
         *)
