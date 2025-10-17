@@ -179,8 +179,8 @@ function _enableFIPS {
 
 function _modifyBootloader {
 
-    # On Fedora, RHEL-8 and RHEL-9, fips-mode-setup binary modifies bootloader.
-    if rlIsFedora || rlIsRHEL "8" "9"; then
+    # On Fedora<42, RHEL-8 and RHEL-9, fips-mode-setup binary modifies bootloader.
+    if rlIsFedora rlIsFedora "<42" || rlIsRHEL "8" "9"; then
         return 0
     fi
 
@@ -266,7 +266,7 @@ function fipsIsEnabled {
     local check_fips=""
     if [ -e /proc/sys/crypto/fips_enabled ]; then
         kernelspace_fips=$(cat /proc/sys/crypto/fips_enabled)
-        if rlIsFedora || rlIsRHEL "8" "9"; then
+        if rlIsFedora "<42" || rlIsRHEL "8" "9"; then
             check_fips=$(fips-mode-setup --check | grep "FIPS mode")
         fi
     fi
@@ -310,10 +310,10 @@ function fipsIsEnabled {
             ret_val=1;
         fi
 
-    elif rlIsRHEL ">=10"; then
+    elif rlIsRHEL ">=10" || rlIsFedora ">=42"; then
 
-        # Since RHEL-10.0 there is no fips-mode-setup and hence there
-        # is no $check_fips check.
+        # Since RHEL-10.0 and Fedora-42 there is no fips-mode-setup and hence
+        # there is no $check_fips check.
         if [ "$kernelspace_fips" == "1" ] && \
            [ "$cryptopolicy_fips" == "FIPS" ]; then
             rlLog "FIPS mode is enabled"
@@ -324,7 +324,7 @@ function fipsIsEnabled {
             ret_val=1;
         fi
 
-    elif rlIsFedora; then
+    elif rlIsFedora "<42"; then
 
         # Since Fedora-36 there is no /etc/system-fips and hence there is
         # no $userspace_fips check.
@@ -355,7 +355,7 @@ function fipsIsEnabled {
         if rlIsFedora || rlIsRHEL ">=8"; then
             rlLog "crypto policy = $cryptopolicy_fips"
         fi
-        if rlIsFedora || rlIsRHEL "8" "9"; then
+        if rlIsFedora "<42" || rlIsRHEL "8" "9"; then
             rlLog "fips-mode-setup --check = $check_fips"
         fi
     fi
@@ -519,9 +519,9 @@ fully enabled) FIPS 140 mode will produce an error.
 =cut
 function fipsLibraryLoaded {
 
-    # In Fedora, fips-mode-setup is separate package, but cannot
+    # In Fedora < 42, fips-mode-setup is separate package, but cannot
     # be installed via fips library dependecies.
-    if rlIsFedora && ! which fips-mode-setup >/dev/null 2>&1; then
+    if rlIsFedora "<42" && ! which fips-mode-setup >/dev/null 2>&1; then
         rlLog "Installing Missing fips-mode-setup package"
         rlRun "dnf install fips-mode-setup -y"
     fi
