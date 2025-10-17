@@ -1,0 +1,44 @@
+contact: Memory Management <mm-qe@redhat.com>
+summary+: " - mm/"
+duration: 4h
+adjust+:
+  # don't run on kernel rt
+  - when: package-name ~ kernel.*rt
+    enabled: false
+  - when: distro < rhel-9.5
+    enabled: false
+environment+:
+  DELIVERED_TESTS: "1"
+  TEST_ITEMS: "TEST_ITEMS"
+/compaction:
+  summary+: "compaction"
+  environment+:
+    VM_SELFTEST_ITEMS: "compaction"
+/cow:
+  summary+: "cow"
+  environment+:
+    VM_SELFTEST_ITEMS: "cow"
+/hugetlb:
+  summary+: "hugetlb"
+  environment+:
+    VM_SELFTEST_ITEMS: "hugetlb"
+/mlock:
+  summary+: "mlock"
+  environment+:
+    VM_SELFTEST_ITEMS: "mlock"
+/mmap:
+  summary+: "mmap"
+  environment+:
+    VM_SELFTEST_ITEMS: "mmap"
+/mremap:
+  summary+: "mremap"
+  environment+:
+    VM_SELFTEST_ITEMS: "mremap"
+/soft_dirty:
+  summary+: "soft_dirty"
+  environment+:
+    VM_SELFTEST_ITEMS: "soft_dirty"
+/vmalloc:
+  summary+: "vmalloc"
+  environment+:
+    VM_SELFTEST_ITEMS: "vmalloc"
