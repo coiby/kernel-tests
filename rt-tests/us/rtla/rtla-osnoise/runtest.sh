@@ -30,7 +30,7 @@ function runtest()
     phase_start_test "rtla osnoise hist -s 30 -T 1 -t"
     run "rtla osnoise hist -s 30 -T 1 -t" "0 2"
     phase_end
-    
+
     # rtla-osnoise hist test: verify the --entries/-E param
     oneliner "rtla osnoise hist -P F:1 -c 0 -r 900000 -d 1M -b 10 -E 25"
 }

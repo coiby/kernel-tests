@@ -28,7 +28,7 @@ function runtest()
 
     # set scheduling param to the osnoise tracer threads
     oneliner "rtla hwnoise -P F:1 -c 0 -r 900000 -d 1M -q"
-    
+
     # stop the trace if a single sample is higher than 1 us
     phase_start_test "rtla hwnoise -s 1 -T 1 -t -d 30s"
     run "rtla hwnoise -s 1 -T 1 -t -d 30s" "0 2"
