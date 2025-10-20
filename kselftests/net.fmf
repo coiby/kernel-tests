@@ -60,7 +60,7 @@ summary+: " - net/"
     - when: distro >= rhel-9.7
       environment+:
         # netfilter tests moved to net directory in rhel-9.7+
-        TEST_ITEMS: "netfilter"
+        TEST_ITEMS: "net/netfilter"
     - when: test_suite == kself_delivered_netfilter
       id: 2a05643f-5a1a-4d27-b5e0-e19b9af7a79b
     - when: distro <= rhel-9.6 and package-name ~ .*automotive.* or distro <= rhel-9.6 and package_name ~ .*automotive.*
@@ -70,7 +70,7 @@ summary+: " - net/"
         # note conntrack-mtu name variation
     - when: distro >= rhel-9.7 and package-name ~ .*automotive.* or distro >= rhel-9.7 and package_name ~ .*automotive.*
       environment+:
-        SKIP_TARGETS: "netfilter:nft_trans_stress.sh net/netfilter:nft_conntrack_helper.sh net/netfilter:conntrack_ipip_mtu.sh"
+        SKIP_TARGETS: "net/netfilter:nft_trans_stress.sh net/netfilter:nft_conntrack_helper.sh net/netfilter:conntrack_ipip_mtu.sh"
 
 /tc-testing:
   summary+: "tc-testing"
