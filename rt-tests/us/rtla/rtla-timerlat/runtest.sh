@@ -26,6 +26,15 @@ function skip_auto_analysis_test()
     return 1
 }
 
+function skip_on_threshold_test()
+{
+    if rhel_in_range 0 9.7 || rhel_in_range 10.0 10.1; then
+        log "rtla on_threshold is only supported for RHEL >= 9.8 and >= 10.2"
+        return 0
+    fi
+    return 1
+}
+
 function runtest()
 {
     if rhel_in_range 0 8.7 || rhel_in_range 9.0 9.1; then
@@ -37,33 +46,64 @@ function runtest()
 
    # verify help page
     oneliner "rtla timerlat --help"
+
     # rtla-timerlat top test: verify -s/--stack
-    oneliner "rtla timerlat top -s 3 -T 10 -t -d 30s"
+    phase_start_test "rtla timerlat top -s 3 -T 10 -t -d 30s"
+    run "rtla timerlat top -s 3 -T 10 -t -d 30s" "0 2"
+    phase_end
+
     # rtla-timerlat top test: verify -P/--priority
     oneliner "rtla timerlat top -P F:1 -c 0 -d 1M -q"
+
     # rtla-timerlat top test in nanoseconds
-    oneliner "rtla timerlat top -i 2 -c 0 -n -d 30s"
+    phase_start_test "rtla timerlat top -i 2 -c 0 -n -d 30s"
+    run "rtla timerlat top -i 2 -c 0 -n -d 30s" "0 2"
+    phase_end
 
     if ! skip_auto_analysis_test; then
         # rtla-timerlat top: Set the automatic trace mode
-        oneliner "rtla timerlat top -a 5 --dump-tasks"
+        phase_start_test "rtla timerlat top -a 5 --dump-tasks"
+        run "rtla timerlat top -a 5 --dump-tasks" "0 2"
+        phase_end
+
         # Print the auto-analysis if hits the stop tracing condition
-        oneliner "rtla timerlat top --aa-only 5"
+        phase_start_test "rtla timerlat top --aa-only 5"
+        run "rtla timerlat top --aa-only 5" "0 2"
+        phase_end
+
         # disable auto-analysis
-        oneliner "rtla timerlat top -s 3 -T 10 -t --no-aa"
+        phase_start_test "rtla timerlat top -s 3 -T 10 -t --no-aa"
+        run "rtla timerlat top -s 3 -T 10 -t --no-aa" "0 2"
+        phase_end
     fi
 
     # rtla-timerlat hist test: verify -c/--cpus
     oneliner "rtla timerlat hist -c 0 -d 30s"
 
     # rtla-timerlat hist test in nanoseconds
-    oneliner "rtla timerlat hist -i 2 -c 0 -n -d 30s"
+    phase_start_test "rtla timerlat hist -i 2 -c 0 -n -d 30s"
+    run "rtla timerlat hist -i 2 -c 0 -n -d 30s" "0 2"
+    phase_end
 
     phase_start_test "rtla-timerlat hist test: verify -P/--priority"
     run "sysctl -w kernel.sched_rt_runtime_us=-1" 0 "verify the disabled admission control"
     run "rtla timerlat hist -d 30s -c 0 -P d:100us:1ms"
     run "restore_admission_control"
     phase_end
+
+    if ! skip_on_threshold_test; then
+        # run rtla timerlat with threshold trigger
+        phase_start_test "rtla timerlat hist with on-threshold shell command"
+        run "rtla timerlat hist -T 1 --on-threshold shell,command=\"echo 'Threshold hit' >> /tmp/thresh.log\"" "2"
+        run "grep -q 'Threshold hit' /tmp/thresh.log"
+        phase_end
+
+        # run rtla timerlat with on-end trace + shell action
+        phase_start_test "rtla timerlat hist with on-end trace and shell"
+        run "rtla timerlat hist -d 5s --on-end trace --on-end shell,command=\"echo 'End triggered' >> /tmp/end.log\""
+        run "grep -q 'End triggered' /tmp/end.log"
+        phase_end
+    fi
 }
 
 if [ "$RSTRNT_REBOOTCOUNT" -eq 0 ]; then

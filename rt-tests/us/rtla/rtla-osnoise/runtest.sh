@@ -20,10 +20,17 @@ function runtest()
 
     # rtla-osnoise top test: verify the --priority/-P param
     oneliner "rtla osnoise top -P F:1 -c 0 -r 900000 -d 1M -q"
+
     # rtla-osnoise top test: verify the --stop/-s param
-    oneliner "rtla osnoise top -s 30 -T 1 -t"
-    # rtla-osnoise hist test: verify the  --trace param
-    oneliner "rtla osnoise hist -s 30 -T 1 -t"
+    phase_start_test "rtla osnoise top -s 30 -T 1 -t"
+    run "rtla osnoise top -s 30 -T 1 -t" "0 2"
+    phase_end
+
+    # rtla-osnoise hist test: verify the --trace param
+    phase_start_test "rtla osnoise hist -s 30 -T 1 -t"
+    run "rtla osnoise hist -s 30 -T 1 -t" "0 2"
+    phase_end
+
     # rtla-osnoise hist test: verify the --entries/-E param
     oneliner "rtla osnoise hist -P F:1 -c 0 -r 900000 -d 1M -b 10 -E 25"
 }
