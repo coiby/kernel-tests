@@ -25,7 +25,6 @@ require:
   - lksctp-tools-devel
   - m4
   - make
-  - numactl-devel
   - openssl
   - openssl-devel
   - xfsprogs-devel
@@ -34,6 +33,7 @@ require:
         -  /kernel-include
         -  /cki_lib
 recommend:
+  - numactl-devel
   - pkgconf
   - pkgconfig
 duration: 4h
