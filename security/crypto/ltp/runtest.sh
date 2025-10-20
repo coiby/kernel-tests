@@ -47,8 +47,17 @@ rlJournalStart
         if [ -z "$LTP_TAG" ]; then
             LTP_TAG="master"
 
-            if rlIsRHEL '8.2'; then
+            # using distribution/ltp as reference
+            if rlIsRHEL '6'; then
+                LTP_TAG="20200120"
+            elif rlIsRHEL '7'; then
+                LTP_TAG="20210927"
+            elif rlIsRHEL '8.2'; then
                 LTP_TAG="20230929"
+            elif rlIsRHEL '>=8.4' && '<9.5'; then
+                LTP_TAG="20240129"
+            elif rlIsRHEL '>=9.5' && '<9.6'; then
+                LTP_TAG="20250530"
             fi
         fi
 
