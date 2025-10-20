@@ -68,7 +68,7 @@ function runtest()
 
         # Print the auto-analysis if hits the stop tracing condition
         phase_start_test "rtla timerlat top --aa-only 5"
-        run "rtla timerlat top --aa-only 5" “0 2”
+        run "rtla timerlat top --aa-only 5" "0 2"
         phase_end
 
         # disable auto-analysis
