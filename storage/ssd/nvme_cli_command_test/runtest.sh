@@ -16,6 +16,9 @@ function runtest() {
 
 	tok "nvme list"
 
+	# RHEL-121216
+	tok "nvme list --output-format=json | jq -r '.Devices[]|.DevicePath' | grep nvme[0-9]n[0-9]"
+
 for DISK in $DISKS; do
 
 	NVME_CHAR=/dev/${DISK:0:5}
