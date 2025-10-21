@@ -184,7 +184,8 @@ for cmd in $(rpm -ql libbpf-tools| grep bin | awk -F '/' '{print $NF}') ; do
              ;;
         bpf-javagc)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd --pid $java_pid 2>&1 \
-                        | tee -a ${LOGDIR}/${tool}.out
+                        | tee -a ${LOGDIR}/$cmd.out
+             retcode=${PIPESTATUS[0]}
              ;;
         *)
              timeout --preserve-status --signal=SIGINT -k 5s 5s $cmd 2>&1 \
