@@ -12,6 +12,7 @@ require:
   - type: file
     pattern:
       - /security/crypto/enable_fips/lib.sh
+restart-max-count: 2
 duration: 30m
 extra-summary: /kernel-tests/security/crypto/2174928
 extra-task: /kernel-tests/security/crypto/2174928
