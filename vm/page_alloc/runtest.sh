@@ -27,10 +27,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include rhts environment
-if [ -f /usr/bin/rhts-environment.sh ]; then
-    . /usr/bin/rhts-environment.sh
-fi
 if [ -f ../../automotive/include/rhivos.sh ]; then
     . ../../automotive/include/rhivos.sh
     setup_env
