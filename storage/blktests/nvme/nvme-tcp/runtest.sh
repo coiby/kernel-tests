@@ -12,7 +12,8 @@ function main
 {
 	if rlIsRHEL 9 || rlIsCentOS 9 || rlIsFedora; then
 		enable_nvme_core_multipath
-	elif rlIsRHEL 10 || rlIsCentOS 10; then
+	elif rlIsRHEL 10.1; then
+		# RHEL-10.1 has the lower ktls-utils version, we need to install the higher version
 		install_ktls_utils
 	fi
 
