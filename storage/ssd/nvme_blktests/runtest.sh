@@ -291,7 +291,7 @@ function runtest() {
 		testcases+=" scsi/008" #fio version is older than 3.37.0
 		testcases+=" loop/001"
 		testcases+=" loop/002"
-		testcases+=" loop/003"
+		grep -q "DEBUG_KERNEL=y"  /boot/config-`uname -r` || testcases+=" loop/003"
 		testcases+=" loop/004"
 		testcases+=" loop/005"
 		testcases+=" loop/006"
@@ -409,7 +409,7 @@ function runtest() {
 		testcases+=" scsi/008"
 		testcases+=" loop/001"
 		testcases+=" loop/002"
-		testcases+=" loop/003"
+		grep -q "DEBUG_KERNEL=y"  /boot/config-`uname -r` || testcases+=" loop/003"
 		testcases+=" loop/004"
 		testcases+=" loop/005"
 		testcases+=" loop/006"
@@ -489,6 +489,6 @@ function runtest() {
 
 tlog "running $0"
 trun "uname -a"
-report_result
 runtest
+report_result
 tend
