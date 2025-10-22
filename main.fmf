@@ -5,6 +5,10 @@ check:
       # These are default patterns
       - 'Call Trace:'
   - how: watchdog
+    # Use only SSH ping.
+    ping: false
+    ssh-ping: true
+    reboot: true
 adjust:
   - when: check-result == info
     check:
@@ -17,6 +21,10 @@ adjust:
           - 'Call Trace:'
       - how: watchdog
         result: info
+        # Use only SSH ping.
+        ping: false
+        ssh-ping: true
+        reboot: true
   - when: check-result == disabled
     check:
       - how: avc
