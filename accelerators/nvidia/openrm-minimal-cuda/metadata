@@ -1,0 +1,13 @@
+[General]
+name=accelerators/openrm-minimal-cuda
+owner=Oliver Gutiérrez <ogutierr@redhat.com>
+description=NVIDIA OpenRM minimal CUDA testing
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=bash ./runtest.sh
+dependencies=git;cmake;gcc-c++
+softDependencies=beakerlib-redhat
+
