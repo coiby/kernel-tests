@@ -118,7 +118,7 @@ install_packages()
         rlFetchSrcForInstalled $pkg || test_fail_exit "Fetch Src Failed"
         rpm -ivh --define "_topdir $TMPDIR" $K_SRC
         pushd SPECS
-        if rlIsRHELLike ">9" && cki_is_kernel_automotive; then
+        if ( rlIsOS rhivos && rlIsOSVersion ">1" ) || ( rlIsOS autosd && rlIsOSVersion ">9" ); then
             rlRun "yum-builddep --downloadonly -y ./kernel-automotive.spec --downloaddir $(pwd)" 0-255
         else
             # patch for x86_64 systems. Introduction of efiuki causes dependency to break.
