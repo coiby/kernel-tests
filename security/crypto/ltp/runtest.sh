@@ -54,9 +54,9 @@ rlJournalStart
                 LTP_TAG="20210927"
             elif rlIsRHEL '8.2'; then
                 LTP_TAG="20230929"
-            elif rlIsRHEL '>=8.4' && '<9.5'; then
+            elif rlIsRHEL '>=8.4' && rlIsRHEL '<9.5'; then
                 LTP_TAG="20240129"
-            elif rlIsRHEL '>=9.5' && '<9.6'; then
+            elif rlIsRHEL '>=9.5' && rlIsRHEL '<9.6'; then
                 LTP_TAG="20250530"
             fi
         fi
