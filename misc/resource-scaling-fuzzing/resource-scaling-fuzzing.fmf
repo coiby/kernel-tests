@@ -1108,7 +1108,7 @@ description: |
 component:
   - kernel
 test: bash ./runtest.sh
-path: /memory/mmra/procfs
+path: /syzkaller
 framework: beakerlib
 require:
   - make
@@ -1124,6 +1124,7 @@ require:
   - type: file
     pattern:
         - /kernel-include
+        - /syzkaller
         - /misc/resource-scaling-fuzzing
 duration: 2h
 id: e5f27f7c-f987-42b2-bacd-db93ff4ff0a4
@@ -1132,9 +1133,10 @@ adjust+:
     - enabled: true
       when: hw_target == rcar_s4
 environment:
-    timer: 7200
-    git_patch: '../../../../misc/resource-scaling-fuzzing/resource-scaling-fuzzing.patch'
-    syscalls: |
+    time: 7200
+    SYZKALLER_COMMIT_HASH: "21339d7b9986698282dce93709157dc36907fbf8"
+    git_patches: '../misc/resource-scaling-fuzzing/resource-scaling-fuzzing.patch'
+    main_syscalls: |
       "openat$cpu0_cache_index0_level",
       "write$cpu0_cache_index0_level",
       "openat$cpu0_cache_index0_shared_cpu_list",
@@ -2155,109 +2157,3 @@ environment:
       "write$cpu7_cpuidle_state0_default_status",
       "openat$cpu7_cpuidle_state0_name",
       "write$cpu7_cpuidle_state0_name"
-    procfs_entry: |
-      "name",
-      "num_users",
-      "requested_microamps",
-      "suspend_disk_state",
-      "suspend_mem_state",
-      "suspend_standby_state",
-      "type",
-      "available_policies",
-      "integral_cutoff",
-      "k_d",
-      "k_i",
-      "k_po",
-      "k_pu",
-      "mode",
-      "offset",
-      "policy",
-      "slope",
-      "sustainable_power",
-      "temp",
-      "type",
-      "level",
-      "shared_cpu_list",
-      "shared_cpu_map",
-      "type",
-      "uevent",
-      "cpu_capacity",
-      "affected_cpus",
-      "cpuinfo_cur_freq",
-      "related_cpus",
-      "scaling_governor",
-      "above",
-      "below",
-      "default_status",
-      "desc",
-      "disable",
-      "latency",
-      "power",
-      "rejected",
-      "residency",
-      "time",
-      "usage",
-      "above",
-      "below",
-      "default_status",
-      "desc",
-      "disable",
-      "latency",
-      "power",
-      "rejected",
-      "residency",
-      "time",
-      "usage",
-      "time",
-      "usage",
-      "crash_notes",
-      "crash_notes_size",
-      "midr_el1",
-      "revidr_el1",
-      "core_id",
-      "core_siblings",
-      "core_siblings_list",
-      "physical_package_id",
-      "thread_siblings",
-      "thread_siblings_list",
-      "affected_cpus",
-      "cpuinfo_cur_freq",
-      "cpuinfo_max_freq",
-      "cpuinfo_min_freq",
-      "cpuinfo_transition_latency",
-      "related_cpus",
-      "scaling_available_frequencies",
-      "scaling_available_governors",
-      "scaling_cur_freq",
-      "scaling_driver",
-      "scaling_governor",
-      "scaling_max_freq",
-      "scaling_min_freq",
-      "scaling_setspeed",
-      "reset",
-      "time_in_state",
-      "total_trans",
-      "trans_table",
-      "available_governors",
-      "current_driver",
-      "current_governor",
-      "current_governor_ro",
-      "kernel_max",
-      "offline",
-      "online",
-      "possible",
-      "present",
-      "active",
-      "control",
-      "gather_data_sampling",
-      "itlb_multihit",
-      "l1tf",
-      "mds",
-      "meltdown",
-      "mmio_stale_data",
-      "reg_file_data_sampling",
-      "retbleed",
-      "spec_store_bypass",
-      "spectre_v1",
-      "spectre_v2",
-      "srbds"
