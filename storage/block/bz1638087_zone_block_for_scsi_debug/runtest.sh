@@ -17,9 +17,8 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
-CDIR=$(dirname $FILE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "${FILE}")
 
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh     || exit 1
@@ -27,7 +26,7 @@ source $CDIR/../../../cki_lib/libcki.sh     || exit 1
 
 function setup ()
 {
-    rlRun "git clone https://github.com/westerndigitalcorporation/libzbc.git"
+    rlRun "git clone https://gitlab.com/redhat/centos-stream/tests/kernel/storage/libzbc.git"
     rlRun "pushd libzbc"
     rlRun "sh ./autogen.sh;./configure --with-test;make;make install"
     rlRun "popd"

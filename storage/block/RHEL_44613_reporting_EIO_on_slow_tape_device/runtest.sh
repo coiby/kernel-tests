@@ -35,7 +35,7 @@ function run_test()
     check_result output1.log
 
     rlRun "rpm -q kernel-devel || yum install -y kernel-devel"
-    rlRun "git clone https://github.com/markh794/mhvtl.git"
+    rlRun "git clone https://gitlab.com/redhat/centos-stream/tests/kernel/storage/mhvtl.git"
     rlRun "cd mhvtl/kernel && make && make install > /dev/null 2>&1"
     rlRun "cd ../ && make && make install > /dev/null 2>&1"
     rlRun "modprobe mhvtl"

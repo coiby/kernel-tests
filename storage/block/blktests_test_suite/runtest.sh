@@ -17,9 +17,8 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
-CDIR=$(dirname $FILE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "${FILE}")
 
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh     || exit 1
@@ -52,7 +51,7 @@ function setup()
 
 
     [ -d blktests ] && rm -rf blktests
-    git clone https://github.com/osandov/blktests.git
+    git clone https://gitlab.com/redhat/centos-stream/tests/kernel/storage/blktests.git
     pushd blktests
     make
     echo "TEST_DEVS=(/dev/$NVME /dev/$SSD)" > config
@@ -109,6 +108,7 @@ function run_test()
     skip_case="block/011 nvme/002 nvme/016 nvme/017"
 #testgroup="block"
     for j in $testgroup;do
+# shellcheck disable=SC2010
         testcase=$(ls blktests/tests/$j | grep '[0-9]$')
         for i in $testcase;do
             if exists_in_list "$skip_case" " " "$j/$i"; then

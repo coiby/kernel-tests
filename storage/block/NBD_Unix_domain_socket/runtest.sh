@@ -17,9 +17,8 @@
 # Boston, MA 02110-1301, USA.
 #
 
-FILE=$(readlink -f $BASH_SOURCE)
-NAME=$(basename $FILE)
-CDIR=$(dirname $FILE)
+FILE=$(readlink -f "${BASH_SOURCE[0]}")
+CDIR=$(dirname "${FILE}")
 
 # Include enviroment and libraries
 source $CDIR/../../../cki_lib/libcki.sh		|| exit 1
@@ -28,7 +27,7 @@ source $CDIR/../../../cki_lib/libcki.sh		|| exit 1
 function run_test()
 {
 # Clone and install NBD from upstream
-	[ ! -d nbd ] && rlRun "git clone https://github.com/NetworkBlockDevice/nbd.git"
+	[ ! -d nbd ] && rlRun "git clone -b nbd-3.25 https://gitlab.com/redhat/centos-stream/tests/kernel/storage/nbd.git"
 	rlRun "cd nbd"
 	rlRun "./autogen.sh > /dev/null 2>&1"
 	rlRun "./configure > /dev/null 2>&1"
