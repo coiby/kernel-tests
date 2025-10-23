@@ -1,0 +1,3 @@
+NVIDIA OpenRM minimal CUDA testing
+
+Builds and run a minimal subset of CUDA samples to check CUDA functionality
