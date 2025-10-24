@@ -26,7 +26,8 @@ rlJournalStart
         AmdROCmSetUp
         if rlIsRHEL "<10"
         then
-            if [[ ! -n $ROCBLAS_SKIP_BUILD ]]; then
+            if [[ ! -n $ROCBLAS_SKIP_BUILD ]]
+            then
                 rlLog "Install EPEL repositories"
                 rlRun "dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
                 rlLog "Install build dependencies"
@@ -72,7 +73,8 @@ rlJournalStart
         rlRun "${CMD_PREFIX}rocblas-bench -f gemv -r s -m 10240 -n 10240 --lda 10240"
         rlRun "${CMD_PREFIX}rocblas-bench -f axpy -r d -n 102400000"
 
-        if rlIsRHEL "<10"; then
+        if rlIsRHEL "<10"
+        then
             rlLog "Run rocBLAS examples"
             rlRun "${CMD_PREFIX}rocblas-example-sgemm"
             rlRun "${CMD_PREFIX}rocblas-example-sgemm-strided-batched"
@@ -80,7 +82,8 @@ rlJournalStart
         else
             rlLog "Skipping rocBLAS examples (not available in RHEL 10 rocblas-test package)"
         fi
-        if [[ -n $ROCBLAS_FULL_TEST ]]; then
+        if [[ -n $ROCBLAS_FULL_TEST ]]
+        then
             # Full rocBLAS test suite is disabled by default
             rlLog "Run full rocBLAS test suite"
             rlRun "${CMD_PREFIX}rocblas-test"
@@ -94,13 +97,16 @@ rlJournalStart
 
     rlPhaseStartCleanup
         # Remove rocBLAS-specific artifacts
-        if rlIsRHEL 10; then
+        if rlIsRHEL "10"
+        then
             rlLog "Cleaning up rocBLAS RPMs and test packages"
             rlRun "dnf remove -y rocblas rocblas-test" 0,1
             rlRun "rm -f rocblas-*.rpm"
         fi
-        if rlIsRHEL "<10"; then
-            if [[ ! -n $ROCBLAS_SKIP_BUILD ]]; then
+        if rlIsRHEL "<10"
+        then
+            if [[ ! -n $ROCBLAS_SKIP_BUILD ]]
+            then
                 rlLog "Cleaning up rocBLAS build directory"
                 rlRun "rm -rf rocBLAS"
             fi
