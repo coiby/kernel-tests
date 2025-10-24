@@ -40,15 +40,15 @@ function run_test()
     fi
 
     if [ "${ublk_flag}" -eq 1 ];then
-        rlRun "git clone https://github.com/ming1/ubdsrv.git"
-        pushd ubdsrv
+        rlRun "git clone https://gitlab.com/redhat/centos-stream/tests/kernel/storage/ublksrv.git"
+        pushd ublksrv
         rlRun "autoreconf -i && ./configure && make -j 4 && make install > tmp.out 2>&1" "0-255"
         popd
 
         rlRun "echo 0 > /proc/sys/kernel/io_uring_disabled"
         rlRun "modprobe ublk_drv"
 #make test T=all
-        rlRun "cd ubdsrv"
+        rlRun "cd ublksrv"
         rlRun "make test T=null"
 
         rlRun "make test T=loop"
