@@ -26,8 +26,10 @@ function delete_cgroups()
     pids=${pids//$'\n'/ }
     if [[ -n "$pids" ]]; then
         log "remaining pids: $pids"
-        run "ps -p ${pids//[[:space:]]/,} -o pid,ppid,cmd,%mem,%cpu"
-        run "kill -9 $pids"
+        # run these commands in logonly mode as the processes may already be
+        # cleaned up after they were acquired
+        run -l "ps -p ${pids//[[:space:]]/,} -o pid,ppid,cmd,%mem,%cpu"
+        run -l "kill -9 $pids"
         # give the oom processes some time to exit
         run "sleep 10s"
     else
@@ -96,7 +98,7 @@ function cleanup()
     run "mv killme_pids killme_pids.old"
     # run with -l because the oom processes may already be killed by oom-killer
     run -l "killall oom"
-    run "sleep 10s"
+    run "sleep 20s"
     phase_end
 }
 
