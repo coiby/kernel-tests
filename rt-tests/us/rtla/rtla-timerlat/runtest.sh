@@ -4,18 +4,8 @@
 . ../../../include/runtest.sh || exit 1
 
 export TEST="rt-tests/us/rtla/rtla-timerlat"
-export SCHED_RT_RUNTIME=$(sysctl kernel.sched_rt_runtime_us | awk -F '= ' '{print $NF}')
-
-# timerlat has one thread pinned to each cpu, so the SCHED_DEADLINE admission control rejects it.
-# restore the param after the timerlat test.
-function restore_admission_control()
-{
-    if [ -n "$SCHED_RT_RUNTIME" ]; then
-        sysctl -w kernel.sched_rt_runtime_us=$SCHED_RT_RUNTIME
-    else
-        sysctl -w kernel.sched_rt_runtime_us=950000
-    fi
-}
+export SCHED_RT_RUNTIME=$(sysctl -n kernel.sched_rt_runtime_us)
+export rhel_x
 
 function skip_auto_analysis_test()
 {
@@ -26,13 +16,20 @@ function skip_auto_analysis_test()
     return 1
 }
 
-function skip_on_threshold_test()
+function support_on_threshold_action()
 {
-    if rhel_in_range 0 9.7 || rhel_in_range 10.0 10.1; then
-        log "rtla on_threshold is only supported for RHEL >= 9.8 and >= 10.2"
-        return 0
+    local rtla_vr="$(rpm -q --qf '%{VERSION}-%{RELEASE}\n' rtla)"
+
+    if ((rhel_x == 9)); then
+        rpmdev-vercmp 5.14.0-625.el9 "$rtla_vr"
+    else
+        rpmdev-vercmp 6.12.0-143.el10 "$rtla_vr"
     fi
-    return 1
+    if [[ $? == 12 || $? == 0 ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 function runtest()
@@ -86,12 +83,12 @@ function runtest()
     phase_end
 
     phase_start_test "rtla-timerlat hist test: verify -P/--priority"
-    run "sysctl -w kernel.sched_rt_runtime_us=-1" 0 "verify the disabled admission control"
+    run "sysctl -w kernel.sched_rt_runtime_us=-1" 0 "disable admission control"
     run "rtla timerlat hist -d 30s -c 0 -P d:100us:1ms"
-    run "restore_admission_control"
+    run "sysctl -w kernel.sched_rt_runtime_us=\"${SCHED_RT_RUNTIME:-950000}\""
     phase_end
 
-    if ! skip_on_threshold_test; then
+    if support_on_threshold_action; then
         # run rtla timerlat with threshold trigger
         phase_start_test "rtla timerlat hist with on-threshold shell command"
         run "rtla timerlat hist -T 1 --on-threshold shell,command=\"echo 'Threshold hit' >> /tmp/thresh.log\"" "2"
