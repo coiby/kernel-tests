@@ -130,7 +130,12 @@ function install_fio_git_upstream()
 		pushd fio
 		local last_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 		# fio-3.20 breaks build on RHEL7
-		[[ `uname -r` =~ el7 ]] && last_tag=fio-3.19
+		# Also add a proper version for RHEL6
+		if rlIsRHEL "6" ; then
+			last_tag=fio-2.1.10
+		elif rlIsRHEL "7" ; then
+			last_tag=fio-3.19
+		fi
 		echoo "Choose fio $last_tag"
 		git checkout -b $last_tag $last_tag
 		make >> ../build-fio-upstream.log 2>&1
@@ -227,7 +232,9 @@ function install_xfstests_git_upstream ()
 
 	cd "$repo"
 	grep _filter_stat common/filter || patch -p1 < ../f33-stat.patch
-	grep std=gnu include/builddefs.in || patch -p1 < ../gcc15-workaround.patch
+	if rlIsRHEL ">6" ; then
+		grep std=gnu include/builddefs.in || patch -p1 < ../gcc15-workaround.patch
+	fi
 	make
 	rm -f configure
 	rm -fr tests/ceph/

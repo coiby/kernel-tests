@@ -254,7 +254,7 @@ function get_test_dev()
 	local DEV_TYPE="$1"
 	if [[ $FREE -lt $(( test_size + scratch_size + 1 )) ]]; then
 		echo "Not enough space for approx loop sizes so allocate 35% of FREE for test_dev"
-		test_size=$(("$FREE * 35 / 100"))
+		test_size=$((${FREE} * 35 / 100))
 		echo "New test_size : ${test_size}G"
 	fi
 
@@ -493,7 +493,7 @@ function get_scratch_dev()
 	local DEV_TYPE="$1"
 	if [[ $FREE -lt $(( test_size + scratch_size + 1 )) ]]; then
 		echo "Not enough space for approx loop sizes so allocate 60% of FREE for scratch_dev"
-		scratch_size=$(("$FREE * 6 / 10"))
+		scratch_size=$((${FREE} * 6 / 10))
 		echo "New scratch_size : ${scratch_size}G"
 	fi
 
@@ -1291,7 +1291,11 @@ export FSTYPE=${FSTYPE:-xfs}
 echo "####################"
 lsblk
 df -h
-FREE=$(df -BG --output=avail / | tail -n 1 | sed 's|G||' | sed 's|.||')
+if rlIsRHEL "6"; then
+	FREE=$(df -BG  / | tail -n 1 | awk '{print $4}'| sed 's|G||')
+else
+	FREE=$(df -BG --output=avail / | tail -n 1 | sed 's|G||' | sed 's|.||')
+fi
 echo "Free Space of /: $FREE"
 export FREE
 test_size=${XFS_LOOP_TEST_SIZE_G:-6}
