@@ -1,0 +1,110 @@
+From 634376ea6d5acae71b3d958aba2a76e78d44e43a Mon Sep 17 00:00:00 2001
+From: Petr Vorel <pvorel@suse.cz>
+Date: Tue, 26 Mar 2024 12:50:00 +0100
+Subject: [PATCH] tst_test_macros.h: Require to pass array size in
+ TST_EXP_FAIL*_ARR()
+
+Although having to pass ARRAY_SIZE() of the expected errnos is not
+ideal, it gives more flexibility to the tests allowing to use just
+portion of the array (will be used in fanotify14 in the next commit).
+
+It looks to be better than keep introduce yet another functions.
+
+Requires updating 2 tests and 1 library test.
+
+Link: https://lore.kernel.org/ltp/20240326144145.747735-3-pvorel@suse.cz/
+Suggested-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
+---
+ include/tst_test_macros.h                         | 8 ++++----
+ lib/newlib_tests/test_macros02.c                  | 8 ++++----
+ testcases/kernel/syscalls/readahead/readahead01.c | 2 +-
+ testcases/kernel/syscalls/splice/splice07.c       | 2 +-
+ 4 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/include/tst_test_macros.h b/include/tst_test_macros.h
+index d2e50a219..6a7bcdce5 100644
+--- a/include/tst_test_macros.h
++++ b/include/tst_test_macros.h
+@@ -242,9 +242,9 @@ const char *tst_errno_names(char *buf, const int *exp_errs, int exp_errs_cnt);
+                                   ##__VA_ARGS__);                              \
+ 	} while (0)
+ 
+-#define TST_EXP_FAIL_ARR(SCALL, EXP_ERRS, ...)                                 \
++#define TST_EXP_FAIL_ARR(SCALL, EXP_ERRS, EXP_ERRS_CNT, ...)                   \
+ 		TST_EXP_FAIL_ARR_(SCALL, #SCALL, EXP_ERRS,                     \
+-				  ARRAY_SIZE(EXP_ERRS), ##__VA_ARGS__);
++				  EXP_ERRS_CNT, ##__VA_ARGS__);
+ 
+ #define TST_EXP_FAIL2_ARR_(SCALL, SSCALL, EXP_ERRS, EXP_ERRS_CNT, ...)         \
+ 	do {                                                                   \
+@@ -254,9 +254,9 @@ const char *tst_errno_names(char *buf, const int *exp_errs, int exp_errs_cnt);
+ 			TST_MSG_(TPASS | TTERRNO, " ", SSCALL, ##__VA_ARGS__); \
+ 	} while (0)
+ 
+-#define TST_EXP_FAIL2_ARR(SCALL, EXP_ERRS, ...)                                \
++#define TST_EXP_FAIL2_ARR(SCALL, EXP_ERRS, EXP_ERRS_CNT, ...)                \
+ 		TST_EXP_FAIL2_ARR_(SCALL, #SCALL, EXP_ERRS,                    \
+-		                  ARRAY_SIZE(EXP_ERRS), ##__VA_ARGS__);
++		                  EXP_ERRS_CNT, ##__VA_ARGS__);
+ 
+ #define TST_EXP_FAIL2(SCALL, EXP_ERR, ...)                                     \
+ 	do {                                                                   \
+diff --git a/lib/newlib_tests/test_macros02.c b/lib/newlib_tests/test_macros02.c
+index 6c1ca7a8a..8e5a83346 100644
+--- a/lib/newlib_tests/test_macros02.c
++++ b/lib/newlib_tests/test_macros02.c
+@@ -39,9 +39,9 @@ static void do_test(void)
+ 	tst_res(TINFO, "TST_PASS = %i", TST_PASS);
+ 	TST_EXP_FAIL(inval_ret_fn(), ENOTTY, "inval_ret_fn()");
+ 	tst_res(TINFO, "TST_PASS = %i", TST_PASS);
+-	TST_EXP_FAIL_ARR(fail_fn(), exp_errs_pass, "fail_fn()");
++	TST_EXP_FAIL_ARR(fail_fn(), exp_errs_pass, ARRAY_SIZE(exp_errs_pass), "fail_fn()");
+ 	tst_res(TINFO, "TST_PASS = %i", TST_PASS);
+-	TST_EXP_FAIL_ARR(fail_fn(), exp_errs_fail, "fail_fn()");
++	TST_EXP_FAIL_ARR(fail_fn(), exp_errs_fail, ARRAY_SIZE(exp_errs_fail), "fail_fn()");
+ 	tst_res(TINFO, "TST_PASS = %i", TST_PASS);
+ 
+ 	tst_res(TINFO, "Testing TST_EXP_FAIL2 macro");
+@@ -53,9 +53,9 @@ static void do_test(void)
+ 	tst_res(TINFO, "TST_PASS = %i", TST_PASS);
+ 	TST_EXP_FAIL2(inval_ret_fn(), ENOTTY, "inval_ret_fn()");
+ 	tst_res(TINFO, "TST_PASS = %i", TST_PASS);
+-	TST_EXP_FAIL2_ARR(fail_fn(), exp_errs_pass, "fail_fn()");
++	TST_EXP_FAIL2_ARR(fail_fn(), exp_errs_pass, ARRAY_SIZE(exp_errs_pass), "fail_fn()");
+ 	tst_res(TINFO, "TST_PASS = %i", TST_PASS);
+-	TST_EXP_FAIL2_ARR(fail_fn(), exp_errs_fail, "fail_fn()");
++	TST_EXP_FAIL2_ARR(fail_fn(), exp_errs_fail, ARRAY_SIZE(exp_errs_fail), "fail_fn()");
+ 	tst_res(TINFO, "TST_PASS = %i", TST_PASS);
+ }
+ 
+diff --git a/testcases/kernel/syscalls/readahead/readahead01.c b/testcases/kernel/syscalls/readahead/readahead01.c
+index 0f610daf8..d4b3f306f 100644
+--- a/testcases/kernel/syscalls/readahead/readahead01.c
++++ b/testcases/kernel/syscalls/readahead/readahead01.c
+@@ -61,7 +61,7 @@ static void test_invalid_fd(struct tst_fd *fd)
+ 	int exp_errnos[] = {EBADF, EINVAL, ESPIPE};
+ 
+ 	TST_EXP_FAIL_ARR(readahead(fd->fd, 0, getpagesize()), exp_errnos,
+-			"readahead() on %s", tst_fd_desc(fd));
++			ARRAY_SIZE(exp_errnos), "readahead() on %s", tst_fd_desc(fd));
+ }
+ 
+ static void test_readahead(void)
+diff --git a/testcases/kernel/syscalls/splice/splice07.c b/testcases/kernel/syscalls/splice/splice07.c
+index 9c23e0aac..d3b527a4f 100644
+--- a/testcases/kernel/syscalls/splice/splice07.c
++++ b/testcases/kernel/syscalls/splice/splice07.c
+@@ -54,7 +54,7 @@ static void check_splice(struct tst_fd *fd_in, struct tst_fd *fd_out)
+ 	const int exp_errnos[] = {EBADF, EINVAL};
+ 
+ 	TST_EXP_FAIL2_ARR(splice(fd_in->fd, NULL, fd_out->fd, NULL, 1, 0),
+-		exp_errnos, "splice() on %s -> %s",
++		exp_errnos, ARRAY_SIZE(exp_errnos), "splice() on %s -> %s",
+ 		tst_fd_desc(fd_in), tst_fd_desc(fd_out));
+ }
+ 
+-- 
+2.51.0
+

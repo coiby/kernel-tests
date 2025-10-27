@@ -119,6 +119,8 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-execve04-creat07-skip-for-kernels-6.11-and-.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-Create-tst_tmpdir.h.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-lib-make-tst_detach_device_by_fd-also-close-dev_fd.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tst_test_macros.h-Require-to-pass-array-size-in-TST_.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-epoll_ctl04-add-ELOOP-to-expected-errnos.patch
     fi
     if [ "$TESTVERSION" == "20240129" ]; then
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-fix-broken-failure-detection-with-dmesg.patch
@@ -127,6 +129,8 @@ patch-generic()
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-Disable-btrfs-as-we-don-t-support-it-anymore-new.patch
         ${PATCH} < ${ABS_DIR}/INTERNAL/0001-rhel9-support-futex_waitv.patch
         ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-madvise06-set-max_runtime-to-60.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-tst_test_macros.h-Require-to-pass-array-size-in-TST_.patch
+        ${PATCH} < ${ABS_DIR}/${TESTVERSION}/0001-syscalls-epoll_ctl04-add-ELOOP-to-expected-errnos.patch
     fi
     if [ "$TESTVERSION" == "20230929" ]; then
         # Tips: this patch should be applied in single on ltp-next(version > 20180926)
