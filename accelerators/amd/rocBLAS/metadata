@@ -8,6 +8,7 @@ destructive=no
 
 [restraint]
 entry_point=bash ./runtest.sh
-dependencies=
+repoRequires=accelerators/amd/include
+dependencies=git
 softDependencies=beakerlib-redhat
 
