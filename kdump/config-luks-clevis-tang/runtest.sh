@@ -77,7 +77,7 @@ ConfigLUKS() {
 			LUKS_DEVICE=$DEFAULT_LUKS_DEVICE
 			LUKS_MP=$DEFAULT_LUKS_MP
 		else
-			MajorError "Neither is LUKS_MP=$LUKS_MP valid nor does $DEFAULT_LUKS_DEVICE exist"
+MajorError "Neither is mount point $DEFAULT_LUKS_MP valid nor does device $DEFAULT_LUKS_DEVICE exist"
 		fi
 
 		VG_NAME=luks_vg
