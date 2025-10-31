@@ -156,7 +156,7 @@ else
 	# On Fedora rawhide, dracut-clevis has an issue that it can't resolve DNS when unlocking the
 	# device so use IP instead.
 	# https://github.com/latchset/clevis/issues/413
-	tmp_ip_line=$(getent ahosts "$_TANG_SERVER" | grep -v : | head -n 1)
+tmp_ip_line=$(getent ahosts "$TANG_SERVER" | grep -v : | head -n 1)
 	if [[ -z $tmp_ip_line ]]; then
 FatalError "Failed to get IP of Tang server $TANG_SERVER"
 	fi
