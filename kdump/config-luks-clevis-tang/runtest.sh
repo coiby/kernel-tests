@@ -158,7 +158,7 @@ else
 	# https://github.com/latchset/clevis/issues/413
 	tmp_ip_line=$(getent ahosts "$_TANG_SERVER" | grep -v : | head -n 1)
 	if [[ -z $tmp_ip_line ]]; then
-		FatalError "Faied to get IP of Tang server $TANG_SERVER"
+FatalError "Failed to get IP of Tang server $TANG_SERVER"
 	fi
 	if [[ -z $TANG_SERVER_PORT ]]; then
 		tang_server_port=7500
