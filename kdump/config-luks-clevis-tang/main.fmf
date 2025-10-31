@@ -1,0 +1,9 @@
+summary: Set up LUKS dumping target
+test: ./runtest.sh
+framework: shell
+require:
+ - lvm2
+ - clevis-luks
+ - clevis-dracut
+ - tang
+ - cryptsetup
